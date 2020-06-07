@@ -72,6 +72,21 @@ describe('GroupList', () => {
     $imports.$restore();
   });
 
+  it('displays descriptive menu title about which group is currently selected', () => {
+    const wrapper = createGroupList();
+    const menu = wrapper.find('Menu');
+
+    assert.equal(menu.props().title, 'Select group (now viewing: Test group)');
+  });
+
+  it('adds descriptive label text if no currently-focused group', () => {
+    fakeStore.focusedGroup.returns(undefined);
+    const wrapper = createGroupList();
+    const menu = wrapper.find('Menu');
+
+    assert.equal(menu.props().title, 'Select group');
+  });
+
   it('displays no sections if there are no groups', () => {
     const wrapper = createGroupList();
     assert.isFalse(wrapper.exists('GroupListSection'));

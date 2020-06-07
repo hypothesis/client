@@ -136,6 +136,12 @@ function createAPICall(
           body: data ? JSON.stringify(stripInternalProperties(data)) : null,
           headers,
           method: descriptor.method,
+        }).catch(() => {
+          // Re-throw Fetch errors such that they all "look the same" (different
+          // browsers throw different Errors on Fetch failure). This allows
+          // Fetch failures to be either handled in particular ways higher up
+          // or for them to be ignored in error reporting (see `sentry` config).
+          throw new Error(`Fetch operation failed for URL '${url}'`);
         });
       })
       .then(response => {

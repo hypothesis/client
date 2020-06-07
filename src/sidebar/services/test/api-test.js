@@ -175,7 +175,8 @@ describe('sidebar.services.api', function () {
         // Network error
         status: null,
         body: 'Service unreachable.',
-        expectedMessage: 'Service unreachable.',
+        expectedMessage:
+          "Fetch operation failed for URL 'https://example.com/api/profile'",
       },
       {
         // Request failed with an error given in the JSON body

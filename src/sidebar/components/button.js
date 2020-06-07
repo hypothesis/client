@@ -21,6 +21,7 @@ export default function Button({
   className = '',
   disabled = false,
   icon = '',
+  isExpanded,
   isPressed,
   onClick = () => null,
   style = {},
@@ -36,9 +37,19 @@ export default function Button({
   const baseClassName = buttonText ? 'button--labeled' : 'button--icon-only';
 
   const extraProps = {};
+
+  // If there is no displayed text in the button, or if the provided `title`
+  // differs from the displayed text, add `aria-label` and `title` attributes
+  if (!buttonText || title !== buttonText) {
+    extraProps.title = title;
+    extraProps['aria-label'] = title;
+  }
   if (typeof isPressed === 'boolean') {
     // Indicate that this is a toggle button.
     extraProps['aria-pressed'] = isPressed;
+  }
+  if (typeof isExpanded === 'boolean') {
+    extraProps['aria-expanded'] = isExpanded;
   }
 
   return (
@@ -55,7 +66,6 @@ export default function Button({
         className
       )}
       onClick={onClick}
-      title={title}
       style={style}
       disabled={disabled}
       {...extraProps}
@@ -109,6 +119,11 @@ Button.propTypes = {
    * provided.
    */
   icon: requiredStringIfButtonTextMissing,
+
+  /**
+   * Is the expandable element controlled by this button currently expanded?
+   */
+  isExpanded: propTypes.bool,
 
   /**
    * Indicate that this is a toggle button (if `isPressed` is a boolean) and

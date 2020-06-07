@@ -26,6 +26,7 @@ describe('GroupListItem', () => {
         enforced: false,
       },
       type: 'private',
+      canLeave: true,
     };
 
     fakeStore = {
@@ -168,11 +169,13 @@ describe('GroupListItem', () => {
 
   it('expands submenu if `isExpanded` is `true`', () => {
     const wrapper = createGroupListItem(fakeGroup, { isExpanded: true });
+    assert.isTrue(wrapper.find('MenuItem').prop('isSubmenuVisible'));
     assert.isTrue(wrapper.find('MenuItem').first().prop('isExpanded'));
   });
 
   it('collapses submenu if `isExpanded` is `false`', () => {
     const wrapper = createGroupListItem(fakeGroup, { isExpanded: false });
+    assert.isFalse(wrapper.find('MenuItem').prop('isSubmenuVisible'));
     assert.isFalse(wrapper.find('MenuItem').first().prop('isExpanded'));
   });
 
@@ -196,11 +199,18 @@ describe('GroupListItem', () => {
     assert.calledWith(onExpand, false);
   });
 
-  it('does not show submenu toggle if there are no available actions', () => {
-    fakeGroup.links.html = null;
-    fakeGroup.type = 'open';
-    const wrapper = createGroupListItem(fakeGroup);
-    assert.isFalse(wrapper.find('MenuItem').prop('isExpanded'));
+  [true, false].forEach(isExpanded => {
+    it('does not show submenu toggle if there are no available actions', () => {
+      fakeGroup.links.html = null;
+      fakeGroup.type = 'open';
+      fakeGroup.canLeave = false;
+      // isExpanded value should not matter
+      const wrapper = createGroupListItem(fakeGroup, { isExpanded });
+      assert.equal(
+        wrapper.find('MenuItem').prop('isSubmenuVisible'),
+        undefined
+      );
+    });
   });
 
   function getSubmenu(wrapper) {
@@ -227,6 +237,7 @@ describe('GroupListItem', () => {
 
   it('does not show "Leave" action if user cannot leave', () => {
     fakeGroup.type = 'open';
+    fakeGroup.canLeave = false;
     const wrapper = createGroupListItem(fakeGroup, {
       isExpanded: true,
     });

@@ -2,11 +2,9 @@
  * Load stylesheets for annotator UI components into the shadow DOM root.
  */
 function loadStyles(shadowRoot) {
-  // nb. When we stop using the icon font in the "annotator" part of the client,
-  // we can remove "icomoon" here.
   const adderStyles = Array.from(document.styleSheets)
     .map(sheet => sheet.href)
-    .filter(url => (url || '').match(/(icomoon|annotator)\.css/));
+    .filter(url => (url || '').match(/annotator\.css/));
 
   // Stylesheet <link> elements are inert inside shadow roots [1]. Until
   // Shadow DOM implementations support external stylesheets [2], grab the

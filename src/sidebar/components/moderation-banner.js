@@ -51,15 +51,16 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
   };
 
   const toggleButtonProps = (() => {
-    const props = {};
+    const buttonProps = {};
     if (annotation.hidden) {
-      props.onClick = unhideAnnotation;
-      props.title = 'Make this annotation visible to everyone';
+      buttonProps.onClick = unhideAnnotation;
+      buttonProps.title = 'Make this annotation visible to everyone';
     } else {
-      props.onClick = hideAnnotation;
-      props.title = 'Hide this annotation from non-moderators';
+      buttonProps.onClick = hideAnnotation;
+      buttonProps.title = 'Hide this annotation from non-moderators';
     }
-    return props;
+    buttonProps['aria-label'] = buttonProps.title;
+    return buttonProps;
   })();
 
   const bannerClasses = classnames('moderation-banner', {

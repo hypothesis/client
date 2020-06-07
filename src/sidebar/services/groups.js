@@ -30,6 +30,9 @@ export default function groups(
   const svc = serviceConfig(settings);
   const authority = svc ? svc.authority : null;
 
+  // `expand` parameter for various groups API calls.
+  const expandParam = ['organization', 'scopes'];
+
   /**
    * Return the main document URI that is used to fetch groups associated with
    * the site that the user is on.
@@ -111,22 +114,6 @@ export default function groups(
         directLinkedGroupId = null;
       }
     }
-    // If service groups are specified only return those.
-    // If a service group doesn't exist in the list of groups don't return it.
-    if (svc && svc.groups) {
-      try {
-        // The groups may not be immediately available if they are being fetched via RPC.
-        const focusedGroups = await svc.groups;
-        const filteredGroups = groups.filter(
-          g => focusedGroups.includes(g.id) || focusedGroups.includes(g.groupid)
-        );
-        return filteredGroups;
-      } catch (e) {
-        toastMessenger.error(e.message);
-        // Don't show any groups if we catch an error
-        return [];
-      }
-    }
 
     // Logged-in users always see the "Public" group.
     if (isLoggedIn) {
@@ -172,16 +159,13 @@ export default function groups(
   }
 
   /*
-   * Fetch an individual group.
+   * Fetch a specific group.
    *
-   * @param {Object} requestParams
-   * @return {Promise<Group>|undefined}
+   * @param {string} id
+   * @return {Promise<Group>}
    */
-  function fetchGroup(requestParams) {
-    return api.group.read(requestParams).catch(() => {
-      // If the group does not exist or the user doesn't have permission.
-      return null;
-    });
+  async function fetchGroup(id) {
+    return api.group.read({ id, expand: expandParam });
   }
 
   let reloadSetUp = false;
@@ -218,19 +202,12 @@ export default function groups(
   }
 
   /**
-   * Fetch groups from the API, load them into the store and set the focused
-   * group.
-   *
-   * The groups that are fetched depend on the current user, the URI of
-   * the current document, and the direct-linked group and/or annotation.
-   *
-   * On startup, `load()` must be called to trigger the initial groups fetch.
-   * Subsequently groups are automatically reloaded if the logged-in user or
-   * main document URI changes.
+   * Fetch the groups associated with the current user and document, as well
+   * as any groups that have been direct-linked to.
    *
    * @return {Promise<Group[]>}
    */
-  async function load() {
+  async function loadGroupsForUserAndDocument() {
     // Step 1: Get the URI of the active document, so we can fetch groups
     // associated with that document.
     let documentUri;
@@ -243,15 +220,6 @@ export default function groups(
     // Step 2: Concurrently fetch the groups the user is a member of,
     // the groups associated with the current document and the annotation
     // and/or group that was direct-linked (if any).
-    const params = {
-      expand: ['organization', 'scopes'],
-    };
-    if (authority) {
-      params.authority = authority;
-    }
-    if (documentUri) {
-      params.document_uri = documentUri;
-    }
 
     // If there is a direct-linked annotation, fetch the annotation in case
     // the associated group has not already been fetched and we need to make
@@ -273,18 +241,26 @@ export default function groups(
     const directLinkedGroupId = store.directLinkedGroupId();
     let directLinkedGroupApi = null;
     if (directLinkedGroupId) {
-      directLinkedGroupApi = fetchGroup({
-        id: directLinkedGroupId,
-        expand: params.expand,
-      }).then(group => {
-        // If the group does not exist or the user doesn't have permission.
-        if (group === null) {
-          store.setDirectLinkedGroupFetchFailed();
-        } else {
+      directLinkedGroupApi = fetchGroup(directLinkedGroupId)
+        .then(group => {
           store.clearDirectLinkedGroupFetchFailed();
-        }
-        return group;
-      });
+          return group;
+        })
+        .catch(() => {
+          // If the group does not exist or the user doesn't have permission.
+          store.setDirectLinkedGroupFetchFailed();
+          return null;
+        });
+    }
+
+    const listParams = {
+      expand: expandParam,
+    };
+    if (authority) {
+      listParams.authority = authority;
+    }
+    if (documentUri) {
+      listParams.document_uri = documentUri;
     }
 
     const [
@@ -294,8 +270,8 @@ export default function groups(
       directLinkedAnn,
       directLinkedGroup,
     ] = await Promise.all([
-      api.profile.groups.read({ expand: params.expand }),
-      api.groups.list(params),
+      api.profile.groups.read({ expand: expandParam }),
+      api.groups.list(listParams),
       auth.tokenGetter(),
       directLinkedAnnApi,
       directLinkedGroupApi,
@@ -328,12 +304,11 @@ export default function groups(
         .find(g => g.id === directLinkedAnn.group);
 
       if (!directLinkedAnnGroup) {
-        const directLinkedAnnGroup = await fetchGroup({
-          id: directLinkedAnn.group,
-          expand: params.expand,
-        });
-        if (directLinkedAnnGroup) {
+        try {
+          const directLinkedAnnGroup = await fetchGroup(directLinkedAnn.group);
           featuredGroups.push(directLinkedAnnGroup);
+        } catch (e) {
+          toastMessenger.error('Unable to fetch group for linked annotation');
         }
       }
     }
@@ -342,31 +317,121 @@ export default function groups(
     // metadata on them that will be used elsewhere in the app.
     const isLoggedIn = token !== null;
     const groups = await filterGroups(
-      combineGroups(myGroups, featuredGroups, documentUri),
+      combineGroups(myGroups, featuredGroups, documentUri, settings),
       isLoggedIn,
       directLinkedAnnotationGroupId,
       directLinkedGroupId
     );
 
+    const groupToFocus =
+      directLinkedAnnotationGroupId || directLinkedGroupId || null;
+    addGroupsToStore(groups, groupToFocus);
+
+    return groups;
+  }
+
+  /**
+   * Load the specific groups configured by the annotation service.
+   *
+   * @param {string[]} groupIds - `id` or `groupid`s of groups to fetch
+   */
+  async function loadServiceSpecifiedGroups(groupIds) {
+    // Fetch the groups that the user is a member of in one request and then
+    // fetch any other groups not returned in that request directly.
+    //
+    // This reduces the number of requests to the backend on the assumption
+    // that most or all of the group IDs that the service configures the client
+    // to show are groups that the user is a member of.
+    const userGroups = await api.profile.groups.read({ expand: expandParam });
+
+    let error;
+    const tryFetchGroup = async id => {
+      try {
+        return await fetchGroup(id);
+      } catch (e) {
+        error = e;
+        return null;
+      }
+    };
+
+    const getGroup = id =>
+      userGroups.find(g => g.id === id || g.groupid === id) ||
+      tryFetchGroup(id);
+
+    const groups = (await Promise.all(groupIds.map(getGroup))).filter(
+      g => g !== null
+    );
+
+    addGroupsToStore(groups);
+
+    if (error) {
+      toastMessenger.error(`Unable to fetch groups: ${error.message}`, {
+        autoDismiss: false,
+      });
+    }
+
+    return groups;
+  }
+
+  /**
+   * Add groups to the store and set the initial focused group.
+   *
+   * @param {Group[]} groups
+   * @param {string|null} [groupToFocus]
+   */
+  function addGroupsToStore(groups, groupToFocus) {
+    // Add a default organization to groups that don't have one. The organization
+    // provides the logo to display when the group is selected and is also used
+    // to order groups.
     injectOrganizations(groups);
 
-    // Step 5. Load the groups into the store and focus the appropriate
-    // group.
     const isFirstLoad = store.allGroups().length === 0;
     const prevFocusedGroup = store.getDefault('focusedGroup');
 
     store.loadGroups(groups);
 
     if (isFirstLoad) {
-      if (groups.some(g => g.id === directLinkedAnnotationGroupId)) {
-        focus(directLinkedAnnotationGroupId);
-      } else if (groups.some(g => g.id === directLinkedGroupId)) {
-        focus(directLinkedGroupId);
+      if (groups.some(g => g.id === groupToFocus)) {
+        focus(groupToFocus);
       } else if (groups.some(g => g.id === prevFocusedGroup)) {
         focus(prevFocusedGroup);
       }
     }
+  }
 
+  /**
+   * Fetch groups from the API, load them into the store and set the focused
+   * group.
+   *
+   * There are two main scenarios:
+   *
+   * 1. The groups loaded depend on the current user, current document URI and
+   *    active direct links. This is the default.
+   *
+   *    On startup, `load()` must be called to trigger the initial groups fetch.
+   *    Subsequently groups are automatically reloaded if the logged-in user or
+   *    main document URI changes.
+   *
+   * 2. The annotation service specifies exactly which groups to load via the
+   *    configuration it passes to the client.
+   *
+   * @return {Promise<Group[]>}
+   */
+  async function load() {
+    let groups;
+    if (svc && svc.groups) {
+      let groupIds = [];
+      try {
+        groupIds = await svc.groups;
+      } catch (e) {
+        toastMessenger.error(
+          `Unable to fetch group configuration: ${e.message}`
+        );
+      }
+      groups = await loadServiceSpecifiedGroups(groupIds);
+    } else {
+      groups = await loadGroupsForUserAndDocument();
+    }
     return groups;
   }
 

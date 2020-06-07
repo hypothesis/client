@@ -2,8 +2,7 @@
 @use "../../variables" as var;
 
 .annotation-header {
-  @include forms.pie-clearfix;
-  color: var.$grey-6;
+  color: var.$color-text;
 
   &__row {
     display: flex;
@@ -15,7 +14,7 @@
     margin-right: 5px;
     width: 10px;
     height: 10px;
-    color: var.$grey-6;
+    color: var.$color-text;
   }
 
   &__reply-toggle.button {
@@ -24,7 +23,7 @@
     background-color: transparent;
     &:hover {
       background-color: transparent;
-      color: var.$link-color-hover;
+      color: var.$color-link-hover;
     }
   }
 
@@ -36,7 +35,7 @@
   &__timestamp-edited {
     @include var.font-small;
     font-style: italic;
-    color: var.$grey-5;
+    color: var.$color-text-light;
   }
 
   &__timestamp-created-link {
@@ -46,7 +45,7 @@
   }
 
   &__timestamp-created-link {
-    color: var.$grey-6;
+    color: var.$color-text-light;
   }
 
   &__highlight {
@@ -54,6 +53,7 @@
   }
 
   &__highlight-icon {
+    color: var.$grey-5;
     width: 12px;
     height: 12px;
     /* bring down the baseline a little */

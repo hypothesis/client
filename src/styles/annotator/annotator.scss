@@ -1,34 +1,41 @@
 @use "sass:meta";
 @use '../variables' as var;
-@use '../mixins/icons';
 @use '../mixins/focus';
 @use '../mixins/reset';
 @use '../mixins/shadow';
 
+// Shared components.
+@use '../components/svg-icon';
+
+// Annotator-specific components.
 @use './adder';
 @use './bucket-bar';
 @use './highlights';
 
-var.$base-font-size: 14px;
+$annotator-font-size: 14px;
 $sidebar-collapse-transition-time: 150ms;
 
 // Sidebar
 .annotator-frame {
-  // a CSS reset which attempts to prevent the host page's styles
-  // from affecting the styles of the sidebar.
-  //
-  // FIXME - This component and other annotator components which currently
-  // live on the page could be isolated from the host page's CSS/JS via
-  // transparent same-origin iframes
+  // CSS reset which attempts to isolate this element and its children from
+  // host page styles.
   @include meta.load-css('../reset');
   @include reset.nested-reset;
   @include reset.reset-box-model;
+
+  * {
+    background: none;
+    font-size: 100%;
+    text-indent: 0;
+    height: initial;
+    width: initial;
+  }
 
   // frame styles
   user-select: none;
   direction: ltr;
   background: none;
-  font-size: var.$base-font-size;
+  font-size: $annotator-font-size;
   line-height: var.$base-line-height;
   height: 100%;
   position: fixed;
@@ -49,24 +56,12 @@ $sidebar-collapse-transition-time: 150ms;
     }
   }
 
-  * {
-    background: none;
-    font-size: 100%;
-    text-indent: 0;
-    height: initial;
-    width: initial;
-  }
-
   .h-sidebar-iframe {
     border: none;
     height: 100%;
     width: 100%;
     z-index: 3;
     position: relative;
-  }
-
-  @include icons.icons {
-    font-family: 'h';
   }
 
   // the vertical toolbar at the left-edge of the sidebar
@@ -82,17 +77,6 @@ $sidebar-collapse-transition-time: 150ms;
     left: -(var.$bucket-bar-width + 18px - 7px);
     width: 37px;
     z-index: 2;
-
-    ul {
-      height: 100%;
-    }
-
-    ul,
-    li {
-      box-sizing: border-box;
-      list-style: none;
-      @include reset.reset-box-model;
-    }
   }
 
   .annotator-frame-button {
@@ -103,12 +87,11 @@ $sidebar-collapse-transition-time: 150ms;
     background: var.$white;
     border: solid 1px var.$grey-3;
     border-radius: 4px;
-    color: var.$grey-semi;
+    color: var.$grey-5;
     text-decoration: none;
     height: 30px;
     width: 30px;
-    padding: 0;
-    font-size: 16px;
+    padding: 1px 6px;
     margin-bottom: 5px;
 
     &:active {
@@ -117,7 +100,7 @@ $sidebar-collapse-transition-time: 150ms;
 
     &:focus,
     &:hover {
-      color: var.$text-color;
+      color: var.$grey-7;
     }
   }
 
@@ -129,6 +112,7 @@ $sidebar-collapse-transition-time: 150ms;
     width: 36px;
     margin-bottom: 10px;
     height: var.$top-bar-height;
+    color: var.$grey-semi;
   }
 
   .annotator-frame-button--sidebar_close {
@@ -157,11 +141,6 @@ $sidebar-collapse-transition-time: 150ms;
 // it is manually resized by dragging
 .annotator-no-transition {
   transition: none !important;
-}
-
-.annotator-hide {
-  display: none;
-  visibility: hidden;
 }
 
 /*
@@ -203,22 +182,4 @@ $sidebar-collapse-transition-time: 150ms;
     width: 428px;
     margin-left: -428px;
   }
-}
-
-/*
-  Widescreen layout
-  912-1887 px
-  Zoomed in above 912 px
-*/
-
-@media screen and (min-width: 57em) {
-}
-
-/*
-  Huge-screen layout
-  1888-2520 px
-  Zoomed in above 1920 px
-*/
-
-@media screen and (min-width: 118em) {
 }

@@ -1,4 +1,5 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .top-bar {
@@ -19,20 +20,22 @@
 
   &__icon-button,
   &__menu-icon {
+    color: var.$grey-mid;
+
     &.is-active {
-      color: var.$grey-6;
+      color: var.$grey-7;
 
       &:hover {
-        color: var.$grey-6;
+        color: var.$grey-7;
       }
     }
   }
 
   &__icon-button--refresh {
-    color: var.$brand;
+    color: var.$color-brand;
 
     &:hover {
-      color: var.$brand;
+      color: var.$color-brand;
     }
   }
 
@@ -48,12 +51,12 @@
 .top-bar__login-button.button {
   padding: 0 0.25em;
   background-color: transparent;
-  color: var.$brand;
+  color: var.$color-brand;
   font-size: var.$body2-font-size;
   font-weight: 400;
 
   &:hover {
-    color: var.$link-color-hover;
+    color: var.$color-link-hover;
   }
 }
 
@@ -63,6 +66,8 @@
 }
 
 .top-bar__inner {
+  @include layout.sidebar-content;
+
   // the edges of the top-bar's contents should be aligned
   // with the edges of annotation cards displayed below
   $h-padding: 9px;

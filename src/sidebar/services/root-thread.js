@@ -1,5 +1,4 @@
 import buildThread from '../build-thread';
-import events from '../events';
 import * as metadata from '../util/annotation-metadata';
 import memoize from '../util/memoize';
 import * as tabs from '../util/tabs';
@@ -38,7 +37,6 @@ const sortFns = {
  */
 // @ngInject
 export default function RootThread(
-  $rootScope,
   annotationsService,
   store,
   searchFilter,
@@ -97,10 +95,6 @@ export default function RootThread(
       threadFilterFn: threadFilterFn,
     });
   }
-
-  $rootScope.$on(events.BEFORE_ANNOTATION_CREATED, function (event, ann) {
-    annotationsService.create(ann);
-  });
 
   /**
    * Build the root conversation thread from the given UI state.

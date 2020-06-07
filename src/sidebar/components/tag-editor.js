@@ -239,6 +239,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
                 onClick={() => {
                   removeTag(tag);
                 }}
+                aria-label={`Remove Tag: ${tag}`}
                 title={`Remove Tag: ${tag}`}
                 className="tag-editor__delete"
               >

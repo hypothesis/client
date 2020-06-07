@@ -8,9 +8,26 @@ describe('sidebar/store/modules/activity', () => {
     store = createStore([activity]);
   });
 
+  describe('hasFetchedAnnotations', () => {
+    it('returns false if no fetches have completed yet', () => {
+      assert.isFalse(store.hasFetchedAnnotations());
+    });
+
+    it('returns false after fetch(es) started', () => {
+      store.annotationFetchStarted();
+      assert.isFalse(store.hasFetchedAnnotations());
+    });
+
+    it('returns true once a fetch has finished', () => {
+      store.annotationFetchStarted();
+      store.annotationFetchFinished();
+      assert.isTrue(store.hasFetchedAnnotations());
+    });
+  });
+
   describe('#isLoading', () => {
-    it('returns false with the initial state', () => {
-      assert.equal(store.isLoading(), false);
+    it('returns true when annotations have never been loaded', () => {
+      assert.isTrue(store.isLoading());
     });
 
     it('returns true when API requests are in flight', () => {
@@ -18,14 +35,16 @@ describe('sidebar/store/modules/activity', () => {
       assert.equal(store.isLoading(), true);
     });
 
-    it('returns false when all requests end', () => {
+    it('returns false when all requests end and annotations are fetched', () => {
       store.apiRequestStarted();
       store.apiRequestStarted();
       store.apiRequestFinished();
+      store.annotationFetchStarted();
 
       assert.equal(store.isLoading(), true);
 
       store.apiRequestFinished();
+      store.annotationFetchFinished();
 
       assert.equal(store.isLoading(), false);
     });

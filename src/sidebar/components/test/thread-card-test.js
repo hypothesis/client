@@ -32,6 +32,7 @@ describe('ThreadCard', () => {
     };
     fakeStore = {
       isAnnotationFocused: sinon.stub().returns(false),
+      route: sinon.stub(),
     };
 
     fakeThread = {
@@ -69,6 +70,22 @@ describe('ThreadCard', () => {
     assert(wrapper.find('.thread-card').hasClass('thread-card--theme-clean'));
   });
 
+  it('shows document info if current route is not sidebar', () => {
+    fakeStore.route.returns('whatever');
+
+    const wrapper = createComponent();
+
+    assert.isTrue(wrapper.find('Thread').props().showDocumentInfo);
+  });
+
+  it('does not show document info if current route is sidebar', () => {
+    fakeStore.route.returns('sidebar');
+
+    const wrapper = createComponent();
+
+    assert.isFalse(wrapper.find('Thread').props().showDocumentInfo);
+  });
+
   describe('mouse and click events', () => {
     it('scrolls to the annotation when the `ThreadCard` is clicked', () => {
       const wrapper = createComponent();
@@ -92,6 +109,23 @@ describe('ThreadCard', () => {
       wrapper.find('.thread-card').simulate('mouseleave');
 
       assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match([]));
+    });
+
+    ['button', 'a'].forEach(tag => {
+      it(`does not scroll to the annotation if the event's target or ancestor is a ${tag}`, () => {
+        const wrapper = createComponent();
+        const nodeTarget = document.createElement(tag);
+        const nodeChild = document.createElement('div');
+        nodeTarget.appendChild(nodeChild);
+
+        wrapper.find('.thread-card').props().onClick({
+          target: nodeTarget,
+        });
+        wrapper.find('.thread-card').props().onClick({
+          target: nodeChild,
+        });
+        assert.notCalled(fakeFrameSync.scrollToAnnotation);
+      });
     });
   });
 

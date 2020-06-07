@@ -31,15 +31,11 @@ export default function AnnotationBody({
   const [isCollapsible, setIsCollapsible] = useState(false);
 
   const toggleText = isCollapsed ? 'More' : 'Less';
-  const toggleTitle = isCollapsed
-    ? 'Show full annotation text'
-    : 'Show the first few lines only';
-
   const showExcerpt = !isEditing && text.length > 0;
   const showTagList = !isEditing && tags.length > 0;
 
   return (
-    <section className="annotation-body">
+    <div className="annotation-body">
       {showExcerpt && (
         <Excerpt
           collapse={isCollapsed}
@@ -69,16 +65,18 @@ export default function AnnotationBody({
       {isCollapsible && !isEditing && (
         <div className="annotation-body__collapse-toggle">
           <Button
-            className="annotation-body__collapse-toggle-button"
-            onClick={() => setIsCollapsed(!isCollapsed)}
             buttonText={toggleText}
-            title={toggleTitle}
+            className="annotation-body__collapse-toggle-button"
+            isExpanded={!isCollapsed}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            aria-label="Toggle visibility of full annotation text"
+            title="Toggle visibility of full annotation text"
           />
         </div>
       )}
       {showTagList && <TagList annotation={annotation} tags={tags} />}
       {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
-    </section>
+    </div>
   );
 }
 

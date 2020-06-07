@@ -320,21 +320,45 @@ describe 'Guest', ->
 
   describe 'document events', ->
 
+    fakeSidebarFrame = null
     guest = null
+    rootElement = null
+
+    methods =
+      'click': 'onElementClick'
+      'touchstart': 'onElementTouchStart'
 
     beforeEach ->
+      fakeSidebarFrame = null
       guest = createGuest()
+      rootElement = guest.element[0]
 
-    it 'emits "hideSidebar" on cross frame when the user taps or clicks in the page', ->
-      methods =
-        'click': 'onElementClick'
-        'touchstart': 'onElementTouchStart'
+    afterEach ->
+      fakeSidebarFrame?.remove()
+
+    it 'hides sidebar when the user taps or clicks in the page', ->
 
       for event in ['click', 'touchstart']
         sandbox.spy(guest, methods[event])
-        guest.element.trigger(event)
+
+        rootElement.dispatchEvent(new Event(event))
+
         assert.called(guest[methods[event]])
         assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
+
+    it 'does not hide sidebar if event occurs inside annotator UI', ->
+      fakeSidebarFrame = document.createElement('div')
+      fakeSidebarFrame.className = 'annotator-frame'
+      rootElement.appendChild(fakeSidebarFrame)
+
+      for event in ['click', 'touchstart']
+        sandbox.spy(guest, methods[event])
+
+        fakeSidebarFrame.dispatchEvent(new Event(event, { bubbles: true }))
+
+        assert.called(guest[methods[event]])
+        assert.notCalled(guest.plugins.CrossFrame.call)
+
 
   describe 'when the selection changes', ->
     container = null
@@ -348,35 +372,38 @@ describe 'Guest', ->
     afterEach ->
       container.remove()
 
-    it 'shows the adder if the selection contains text', ->
-      guest = createGuest()
+    simulateSelectionWithText = ->
       rangeUtil.selectionFocusRect.returns({left: 0, top: 0, width: 5, height: 5})
       FakeAdder::instance.target.returns({
         left: 0, top: 0, arrowDirection: adder.ARROW_POINTING_UP
       })
       selections.next({})
+
+    simulateSelectionWithoutText = ->
+      rangeUtil.selectionFocusRect.returns(null)
+      selections.next({})
+
+    it 'shows the adder if the selection contains text', ->
+      guest = createGuest()
+      simulateSelectionWithText()
       assert.called FakeAdder::instance.showAt
 
     it 'sets the annotations associated with the selection', ->
       guest = createGuest()
       ann = {}
       $(container).data('annotation', ann)
-      rangeUtil.selectionFocusRect.returns({left: 0, top: 0, width: 5, height: 5})
-      FakeAdder::instance.target.returns({
-        left: 0, top: 0, arrowDirection: adder.ARROW_POINTING_UP
-      })
       rangeUtil.itemsForRange.callsFake((range, callback) ->
         [callback(range.startContainer)]
       )
-
-      selections.next({})
+      simulateSelectionWithText()
 
       assert.deepEqual FakeAdder::instance.annotationsForSelection, [ann]
 
     it 'hides the adder if the selection does not contain text', ->
       guest = createGuest()
-      rangeUtil.selectionFocusRect.returns(null)
-      selections.next({})
+
+      simulateSelectionWithoutText()
+
       assert.called FakeAdder::instance.hide
       assert.notCalled FakeAdder::instance.showAt
 
@@ -384,6 +411,22 @@ describe 'Guest', ->
       guest = createGuest()
       selections.next(null)
       assert.called FakeAdder::instance.hide
+
+    it "sets the toolbar's `newAnnotationType` to 'annotation' if there is a selection", ->
+      guest = createGuest()
+      guest.toolbar = {}
+
+      simulateSelectionWithText()
+
+      assert.equal guest.toolbar.newAnnotationType, 'annotation'
+
+    it "sets the toolbar's `newAnnotationType` to 'note' if the selection is empty", ->
+      guest = createGuest()
+      guest.toolbar = {}
+
+      simulateSelectionWithoutText()
+
+      assert.equal guest.toolbar.newAnnotationType, 'note'
 
   describe 'when adder toolbar buttons are clicked', ->
     # TODO - Add tests for "Annotate" and "Highlight" buttons.

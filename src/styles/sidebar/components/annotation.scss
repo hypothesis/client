@@ -1,16 +1,15 @@
-@use "../../mixins/forms";
-@use "../../mixins/icons";
 @use "../../variables" as var;
 
 // FIXME These hover-related rules should live elsewhere
 // Highlight quote of annotation whenever its thread is hovered
 .thread-list__card:hover .annotation-quote__quote {
-  border-left: var.$highlight 3px solid;
+  border-left: var.$color-quote 3px solid;
 }
 
 // When hovering a top-level annotation, show the footer in a hovered state.
 // When hovering a reply (at any level), show the reply's own footer in
 // a hovered state and also the footer of the top-level annotation.
+// TODO: Make these work again or remove
 .thread-list__card:hover > .annotation,
 .annotation:hover {
   .annotation-replies__link,
@@ -26,7 +25,7 @@
     // make them stand out next to others, which will have the `is-dimmed` state
     // set
     .annotation-body {
-      color: var.$grey-7;
+      color: var.$color-text;
     }
   }
 
@@ -34,7 +33,7 @@
     // Lighten the bodies of dimmed annotations to make other
     // annotations which are not dimmed stand out
     .annotation-body {
-      color: var.$grey-5;
+      color: var.$color-text-light;
     }
   }
 
@@ -65,7 +64,7 @@
 
   &__footer {
     @include var.font-normal;
-    color: var.$grey-5;
+    color: var.$color-text-light;
     margin-top: 1em;
   }
 }

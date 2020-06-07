@@ -38,7 +38,7 @@
     display: flex;
     align-items: center;
     margin-left: auto;
-    color: var.$brand;
+    color: var.$color-brand;
 
     &-icon {
       margin-left: 2px;
@@ -57,7 +57,7 @@
       border-right: 1px solid var.$grey-3;
       text-align: center;
       font-size: 1.25em;
-      color: var.$grey-5;
+      color: var.$color-text-light;
 
       &:last-of-type {
         border-right: none;
@@ -65,7 +65,7 @@
     }
 
     &__link {
-      color: var.$grey-5;
+      color: var.$color-text-light;
     }
 
     &__icon {

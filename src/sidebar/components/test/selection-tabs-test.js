@@ -106,6 +106,34 @@ describe('SelectionTabs', function () {
       assert.equal(tabs.length, 2);
     });
 
+    it('should render `title` and `aria-label` attributes for tab buttons, with counts', () => {
+      fakeStore.orphanCount.returns(1);
+      const wrapper = createComponent({});
+
+      const tabs = wrapper.find('button');
+
+      assert.equal(
+        tabs.at(0).prop('aria-label'),
+        'Annotations (123 available)'
+      );
+      assert.equal(tabs.at(0).prop('title'), 'Annotations (123 available)');
+      assert.equal(tabs.at(1).prop('aria-label'), 'Page notes (456 available)');
+      assert.equal(tabs.at(1).prop('title'), 'Page notes (456 available)');
+      assert.equal(tabs.at(2).prop('aria-label'), 'Orphans (1 available)');
+      assert.equal(tabs.at(2).prop('title'), 'Orphans (1 available)');
+    });
+
+    it('should not render count in `title` and `aria-label` for page notes tab if there are no page notes', () => {
+      fakeStore.noteCount.returns(0);
+
+      const wrapper = createComponent({});
+
+      const tabs = wrapper.find('button');
+
+      assert.equal(tabs.at(1).prop('aria-label'), 'Page notes');
+      assert.equal(tabs.at(1).prop('title'), 'Page notes');
+    });
+
     it('should show the clean theme when settings contains the clean theme option', function () {
       fakeSettings.theme = 'clean';
       const wrapper = createComponent();

@@ -1,3 +1,4 @@
+$ = require('jquery')
 Hammer = require('hammerjs')
 
 Host = require('./host')
@@ -5,6 +6,8 @@ Host = require('./host')
 { default: sidebarTrigger } = require('./sidebar-trigger')
 { default: events } = require('../shared/bridge-events')
 { default: features } = require('./features')
+
+{ ToolbarController } = require('./toolbar')
 
 # Minimum width to which the frame can be resized.
 MIN_RESIZE = 280
@@ -16,8 +19,6 @@ module.exports = class Sidebar extends Host
     TextSelection: {}
     BucketBar:
       container: '.annotator-frame'
-    Toolbar:
-      container: '.annotator-frame'
 
   renderFrame: null
   gestureState: null
@@ -25,12 +26,8 @@ module.exports = class Sidebar extends Host
   constructor: (element, config) ->
     if config.theme == 'clean' || config.externalContainerSelector
       delete config.pluginClasses.BucketBar
-    if config.externalContainerSelector
-      delete config.pluginClasses.Toolbar
 
     super
-
-    this.hide()
 
     if config.openSidebar || config.annotations || config.query || config.group
       this.on 'panelReady', => this.show()
@@ -38,16 +35,32 @@ module.exports = class Sidebar extends Host
     if @plugins.BucketBar?
       @plugins.BucketBar.element.on 'click', (event) => this.show()
 
-    if @plugins.Toolbar?
-      @toolbarWidth = @plugins.Toolbar.getWidth()
-      if config.theme == 'clean'
-        @plugins.Toolbar.disableMinimizeBtn()
-        @plugins.Toolbar.disableHighlightsBtn()
-        @plugins.Toolbar.disableNewNoteBtn()
-      else
-        @plugins.Toolbar.disableCloseBtn()
+    # Set up the toolbar on the left edge of the sidebar.
+    toolbarContainer = document.createElement('div')
+    @toolbar = new ToolbarController(toolbarContainer, {
+      createAnnotation: => this.createAnnotation()
+      setSidebarOpen: (open) =>
+        if open
+          this.show()
+        else
+          this.hide()
+      setHighlightsVisible: (show) => this.setAllVisibleHighlights(show)
+    })
+    @toolbar.useMinimalControls = config.theme == 'clean'
 
-      this._setupGestures()
+    if @frame
+      # If using our own container frame for the sidebar, add the toolbar to
+      # it.
+      @frame.prepend(toolbarContainer)
+      @toolbarWidth = @toolbar.getWidth()
+    else
+      # If using a host-page provided container for the sidebar, the toolbar is
+      # not shown.
+      @toolbarWidth = 0
+
+    this._setupGestures()
+
+    this.hide()
 
     # The partner-provided callback functions.
     serviceConfig = config.services?[0]
@@ -96,7 +109,7 @@ module.exports = class Sidebar extends Host
     this
 
   _setupGestures: ->
-    $toggle = @toolbar.find('[name=sidebar-toggle]')
+    $toggle = $(@toolbar.sidebarToggleButton)
 
     if $toggle[0]
       # Prevent any default gestures on the handle
@@ -246,10 +259,7 @@ module.exports = class Sidebar extends Host
       @frame.css 'margin-left': "#{-1 * @frame.width()}px"
       @frame.removeClass 'annotator-collapsed'
 
-    if @plugins.Toolbar?
-      @plugins.Toolbar.showCollapseSidebarBtn();
-      @plugins.Toolbar.showCloseBtn();
-
+    @toolbar.sidebarOpen = true
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(true)
@@ -261,9 +271,7 @@ module.exports = class Sidebar extends Host
       @frame.css 'margin-left': ''
       @frame.addClass 'annotator-collapsed'
 
-    if @plugins.Toolbar?
-      @plugins.Toolbar.hideCloseBtn();
-      @plugins.Toolbar.showExpandSidebarBtn();
+    @toolbar.sidebarOpen = false
 
     if @options.showHighlights == 'whenSidebarOpen'
       @setVisibleHighlights(false)
@@ -279,6 +287,3 @@ module.exports = class Sidebar extends Host
 
   setAllVisibleHighlights: (shouldShowHighlights) ->
     @crossframe.call('setVisibleHighlights', shouldShowHighlights)
-
-    # Let the Toolbar know about this event
-    this.publish 'setVisibleHighlights', shouldShowHighlights

@@ -119,7 +119,7 @@ describe('TopBar', () => {
 
         wrapper.update();
 
-        assert.isTrue(helpButton.props().isPressed);
+        assert.isTrue(helpButton.props().isExpanded);
       });
 
       context('help service handler configured in services', () => {
@@ -228,7 +228,7 @@ describe('TopBar', () => {
     const wrapper = createTopBar();
     const shareButton = getButton(wrapper, 'share');
 
-    assert.isTrue(shareButton.prop('isPressed'));
+    assert.isTrue(shareButton.prop('isExpanded'));
   });
 
   it('displays search input in the sidebar', () => {

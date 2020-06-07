@@ -47,6 +47,21 @@ describe('toastMessenger', function () {
       );
     });
 
+    it('passes along `moreInfoURL` when present', () => {
+      fakeStore.hasToastMessage.returns(false);
+
+      service.success('hooray', { moreInfoURL: 'http://www.example.com' });
+
+      assert.calledWith(
+        fakeStore.addToastMessage,
+        sinon.match({
+          type: 'success',
+          message: 'hooray',
+          moreInfoURL: 'http://www.example.com',
+        })
+      );
+    });
+
     it('dismisses the message after timeout fires', () => {
       fakeStore.hasToastMessage.returns(false);
       fakeStore.getToastMessage.returns(undefined);
@@ -59,6 +74,19 @@ describe('toastMessenger', function () {
 
       assert.calledOnce(fakeStore.getToastMessage);
       assert.notCalled(fakeStore.updateToastMessage);
+    });
+  });
+
+  describe('#notice', () => {
+    it('adds a new notice toast message to the store', () => {
+      fakeStore.hasToastMessage.returns(false);
+
+      service.notice('boo');
+
+      assert.calledWith(
+        fakeStore.addToastMessage,
+        sinon.match({ type: 'notice', message: 'boo' })
+      );
     });
   });
 

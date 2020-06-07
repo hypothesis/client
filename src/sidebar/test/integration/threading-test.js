@@ -1,4 +1,4 @@
-import angular from 'angular';
+import { Injector } from '../../../shared/injector';
 
 import rootThreadFactory from '../../services/root-thread';
 import searchFilterFactory from '../../services/search-filter';
@@ -52,23 +52,18 @@ describe('annotation threading', function () {
       flagEnabled: sinon.stub().returns(true),
     };
 
-    angular
-      .module('app', [])
-      .service('store', storeFactory)
-      .service('rootThread', rootThreadFactory)
-      .service('searchFilter', searchFilterFactory)
-      .service('annotationsService', () => {})
-      .service('viewFilter', viewFilterFactory)
-      .value('features', fakeFeatures)
-      .value('settings', {})
-      .value('unicode', fakeUnicode);
+    const container = new Injector()
+      .register('store', storeFactory)
+      .register('rootThread', rootThreadFactory)
+      .register('searchFilter', searchFilterFactory)
+      .register('annotationsService', () => {})
+      .register('viewFilter', viewFilterFactory)
+      .register('features', { value: fakeFeatures })
+      .register('settings', { value: {} })
+      .register('unicode', { value: fakeUnicode });
 
-    angular.mock.module('app');
-
-    angular.mock.inject(function (_store_, _rootThread_) {
-      store = _store_;
-      rootThread = _rootThread_;
-    });
+    store = container.get('store');
+    rootThread = container.get('rootThread');
   });
 
   it('should display newly loaded annotations', function () {

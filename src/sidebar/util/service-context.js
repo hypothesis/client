@@ -4,10 +4,6 @@
  * This module provides dependency injection of services into React
  * components via React's "context" API [1].
  *
- * It is initially being used to enable React components to depend on Angular
- * services/values without having to plumb the services through the tree of
- * components.
- *
  * [1] See https://reactjs.org/docs/context.html#api and
  *     https://reactjs.org/docs/hooks-reference.html#usecontext
  */

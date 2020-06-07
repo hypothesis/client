@@ -43,13 +43,17 @@ describe('loadAnnotationsService', () => {
     longRunningSearchClient = false;
 
     fakeApi = {
-      search: sinon.stub(),
+      search: sinon.stub().returns({ rows: [] }),
+      annotation: {
+        get: sinon.stub(),
+      },
     };
 
     fakeStore = {
       addAnnotations: sinon.stub(),
       annotationFetchFinished: sinon.stub(),
       annotationFetchStarted: sinon.stub(),
+      clearAnnotations: sinon.stub(),
       frames: sinon.stub(),
       removeAnnotations: sinon.stub(),
       savedAnnotations: sinon.stub(),
@@ -62,6 +66,9 @@ describe('loadAnnotationsService', () => {
       reconnect: sinon.stub(),
     };
     fakeStreamFilter = {
+      addClause: sinon.stub().returns({
+        addClause: sinon.stub(),
+      }),
       resetFilter: sinon.stub().returns({
         addClause: sinon.stub(),
       }),
@@ -255,6 +262,189 @@ describe('loadAnnotationsService', () => {
       searchClients[0].emit('error', error);
 
       assert.calledWith(console.error, error);
+    });
+  });
+
+  describe('loadThread', () => {
+    let threadAnnotations = [
+      { id: 'parent_annotation_1' },
+      { id: 'parent_annotation_2', references: ['parent_annotation_1'] },
+      {
+        id: 'target_annotation',
+        references: ['parent_annotation_1', 'parent_annotation_2'],
+      },
+    ];
+    it('clears annotations from the store first', () => {
+      const svc = createService();
+      svc.loadThread('target_annotation');
+      assert.calledOnce(fakeStore.clearAnnotations);
+    });
+
+    describe('fetching the target annotation', () => {
+      beforeEach(() => {
+        fakeApi.annotation.get.onFirstCall().resolves({
+          id: 'target_annotation',
+          references: [],
+        });
+      });
+
+      it('fetches annotation with given `id`', async () => {
+        const svc = createService();
+        await svc.loadThread('target_annotation');
+
+        assert.calledWith(
+          fakeApi.annotation.get,
+          sinon.match({ id: 'target_annotation' })
+        );
+      });
+
+      it('records the start and end of annotation fetch with the store', async () => {
+        const svc = createService();
+        await svc.loadThread('target_annotation');
+
+        assert.calledOnce(fakeStore.annotationFetchStarted);
+        assert.calledOnce(fakeStore.annotationFetchFinished);
+      });
+
+      it('stops the annotation fetch with the store on error', async () => {
+        fakeApi.annotation.get.onFirstCall().throws();
+
+        const svc = createService();
+        try {
+          await svc.loadThread('target_annotation');
+        } catch (e) {
+          assert.calledOnce(fakeStore.annotationFetchStarted);
+          assert.calledOnce(fakeStore.annotationFetchFinished);
+        }
+      });
+    });
+
+    describe('fetching top-level annotation in thread', () => {
+      beforeEach(() => {
+        fakeApi.annotation.get.onFirstCall().resolves({
+          id: 'target_annotation',
+          references: ['parent_annotation_1', 'parent_annotation_2'],
+        });
+        fakeApi.annotation.get.onSecondCall().resolves({
+          id: 'parent_annotation_1',
+          references: [],
+        });
+      });
+
+      it('fetches top-level annotation', async () => {
+        const svc = createService();
+        await svc.loadThread('target_annotation');
+
+        assert.calledWith(
+          fakeApi.annotation.get,
+          sinon.match({ id: 'parent_annotation_1' })
+        );
+      });
+    });
+
+    describe('fetching other annotations in the thread', () => {
+      beforeEach(() => {
+        fakeApi.annotation.get.onFirstCall().resolves({
+          id: 'target_annotation',
+          references: ['parent_annotation_1', 'parent_annotation_2'],
+        });
+        fakeApi.annotation.get.onSecondCall().resolves({
+          id: 'parent_annotation_1',
+          references: [],
+        });
+        fakeApi.search.resolves({
+          rows: [threadAnnotations[1], threadAnnotations[2]],
+        });
+      });
+
+      it('retrieves all annotations in the thread', async () => {
+        const svc = createService();
+        await svc.loadThread('target_annotation');
+
+        assert.calledWith(
+          fakeApi.search,
+          sinon.match({ references: 'parent_annotation_1' })
+        );
+      });
+
+      it('adds all of the annotations in the thread to the store', async () => {
+        const svc = createService();
+        await svc.loadThread('target_annotation');
+
+        assert.calledWith(fakeStore.addAnnotations, sinon.match.array);
+      });
+
+      it('returns thread annotations', async () => {
+        const svc = createService();
+        const annots = await svc.loadThread('target_annotation');
+
+        assert.equal(annots[0].id, 'parent_annotation_1');
+        assert.equal(annots[1].id, 'parent_annotation_2');
+        assert.equal(annots[2].id, 'target_annotation');
+      });
+    });
+
+    describe('connecting to streamer for thread updates', () => {
+      beforeEach(() => {
+        fakeApi.annotation.get.onFirstCall().resolves({
+          id: 'target_annotation',
+          references: ['parent_annotation_1', 'parent_annotation_2'],
+        });
+        fakeApi.annotation.get.onSecondCall().resolves({
+          id: 'parent_annotation_1',
+          references: [],
+        });
+        fakeApi.search.resolves({
+          rows: [threadAnnotations[1], threadAnnotations[2]],
+        });
+      });
+
+      it('does not connect to the streamer if no top-level annotation available', async () => {
+        // Make it so the "top-level" annotation isn't really top level: it has references
+        // and so is a reply
+        fakeApi.annotation.get.onSecondCall().resolves({
+          id: 'parent_annotation_1',
+          references: ['something_else'],
+        });
+
+        const svc = createService();
+        svc.loadThread('target_annotation');
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert.notCalled(fakeStreamer.connect);
+      });
+
+      it('configures the stream filter for changes to the thread', async () => {
+        const fakeAddClause = sinon.stub();
+        fakeStreamFilter.addClause.returns({ addClause: fakeAddClause });
+        fakeStreamFilter.getFilter.returns('filter');
+        const svc = createService();
+        svc.loadThread('target_annotation');
+
+        await new Promise(resolve => setTimeout(resolve, 0));
+
+        assert.calledWith(
+          fakeStreamFilter.addClause,
+          '/references',
+          'one_of',
+          'parent_annotation_1',
+          true
+        );
+        assert.calledWith(
+          fakeAddClause,
+          '/id',
+          'equals',
+          'parent_annotation_1',
+          true
+        );
+        assert.calledWith(
+          fakeStreamer.setConfig,
+          'filter',
+          sinon.match({ filter: 'filter' })
+        );
+        assert.calledOnce(fakeStreamer.connect);
+      });
     });
   });
 });

@@ -5,9 +5,6 @@ sinon.assert.expose(assert, { prefix: null });
 import { patch } from '../../test-util/assert-methods';
 patch(assert);
 
-import 'angular';
-import 'angular-mocks';
-
 // Configure Enzyme for UI tests.
 import 'preact/debug';
 
@@ -19,6 +16,10 @@ configure({ adapter: new Adapter() });
 // Make all the icons that are available for use with `SvgIcon` in the actual
 // app available in the tests. This enables validation of icon names passed to
 // `SvgIcon`.
-import iconSet from '../icons';
+import sidebarIcons from '../icons';
+import annotatorIcons from '../../annotator/icons';
 import { registerIcons } from '../../shared/components/svg-icon';
-registerIcons(iconSet);
+registerIcons({
+  ...sidebarIcons,
+  ...annotatorIcons,
+});

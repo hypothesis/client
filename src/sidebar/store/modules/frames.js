@@ -1,4 +1,9 @@
-import { createSelector } from 'reselect';
+import {
+  createSelector,
+  createSelectorCreator,
+  defaultMemoize,
+} from 'reselect';
+import shallowEqual from 'shallowequal';
 
 import * as util from '../util';
 
@@ -103,15 +108,23 @@ function searchUrisForFrame(frame) {
   return uris;
 }
 
-/**
- * Return the set of URIs that should be used to search for annotations on the
- * current page.
- */
-function searchUris(state) {
-  return state.frames.reduce(function (uris, frame) {
-    return uris.concat(searchUrisForFrame(frame));
-  }, []);
-}
+// "selector creator" that uses `shallowEqual` instead of `===` for memoization
+const createShallowEqualSelector = createSelectorCreator(
+  defaultMemoize,
+  shallowEqual
+);
+
+// Memoized selector will return the same array (of URIs) reference unless the
+// values of the array change (are not shallow-equal).
+const searchUris = createShallowEqualSelector(
+  state => {
+    return state.frames.reduce(
+      (uris, frame) => uris.concat(searchUrisForFrame(frame)),
+      []
+    );
+  },
+  uris => uris
+);
 
 export default {
   init: init,

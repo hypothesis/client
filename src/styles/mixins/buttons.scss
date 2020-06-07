@@ -25,14 +25,14 @@
 
   &:hover {
     transition: 0.2s ease-out;
-    color: var.$grey-6;
+    color: var.$grey-7;
   }
 
   &.is-active {
-    color: var.$brand;
+    color: var.$color-brand;
 
     &:hover {
-      color: var.$brand;
+      color: var.$color-brand;
     }
   }
 }

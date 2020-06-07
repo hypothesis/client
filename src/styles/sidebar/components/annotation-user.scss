@@ -3,15 +3,15 @@
 .annotation-user {
   &__user-name {
     @include var.font-normal;
-    color: var.$grey-7;
+    color: var.$color-text;
     font-weight: bold;
 
     .is-dimmed & {
-      color: var.$grey-5;
+      color: var.$color-text-light;
     }
 
     .is-highlighted & {
-      color: var.$grey-7;
+      color: var.$color-text;
     }
   }
 }

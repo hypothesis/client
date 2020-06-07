@@ -13,12 +13,21 @@ import SvgIcon from '../../shared/components/svg-icon';
 /**
  *  Display name of the tab and annotation count.
  */
-function Tab({ children, count, isWaitingToAnchor, isSelected, onSelect }) {
+function Tab({
+  children,
+  count,
+  isWaitingToAnchor,
+  isSelected,
+  label,
+  onSelect,
+}) {
   const selectTab = () => {
     if (!isSelected) {
       onSelect();
     }
   };
+
+  const title = count > 0 ? `${label} (${count} available)` : label;
 
   return (
     <button
@@ -32,6 +41,8 @@ function Tab({ children, count, isWaitingToAnchor, isSelected, onSelect }) {
       onMouseDown={selectTab}
       role="tab"
       tabIndex="0"
+      title={title}
+      aria-label={title}
       aria-selected={isSelected.toString()}
     >
       {children}
@@ -59,6 +70,10 @@ Tab.propTypes = {
    * Are there any annotations still waiting to anchor?
    */
   isWaitingToAnchor: propTypes.bool.isRequired,
+  /**
+   * A string label to use for `aria-label` and `title`
+   */
+  label: propTypes.string.isRequired,
   /**
    * Callback to invoke when this tab is selected.
    */
@@ -110,6 +125,7 @@ function SelectionTabs({ isLoading, settings }) {
           count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
           isSelected={selectedTab === uiConstants.TAB_ANNOTATIONS}
+          label="Annotations"
           onSelect={() => selectTab(uiConstants.TAB_ANNOTATIONS)}
         >
           Annotations
@@ -118,6 +134,7 @@ function SelectionTabs({ isLoading, settings }) {
           count={noteCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
           isSelected={selectedTab === uiConstants.TAB_NOTES}
+          label="Page notes"
           onSelect={() => selectTab(uiConstants.TAB_NOTES)}
         >
           Page Notes
@@ -127,6 +144,7 @@ function SelectionTabs({ isLoading, settings }) {
             count={orphanCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
             isSelected={selectedTab === uiConstants.TAB_ORPHANS}
+            label="Orphans"
             onSelect={() => selectTab(uiConstants.TAB_ORPHANS)}
           >
             Orphans

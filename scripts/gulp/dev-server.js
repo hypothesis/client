@@ -39,6 +39,7 @@ function DevServer(port, config) {
 
       if (url.pathname === '/document/license') {
         content = `
+          <!DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -51,6 +52,7 @@ function DevServer(port, config) {
         `;
       } else if (url.pathname === '/document/code_of_conduct') {
         content = `
+          <!DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -63,6 +65,7 @@ function DevServer(port, config) {
         `;
       } else {
         content = `
+          <!DOCTYPE html>
           <html>
           <head>
             <meta charset="UTF-8">
@@ -86,8 +89,11 @@ function DevServer(port, config) {
             var appHost = document.location.hostname;
 
             window.hypothesisConfig = function () {
+              // See https://h.readthedocs.io/projects/client/en/latest/publishers/config/
               return {
-                // Force into focused user mode
+                // enableExperimentalNewNoteButton: true,
+                // showHighlights: 'always',
+                // theme: 'clean',
 
                 // Example focused user mode
                 // focus: {
@@ -97,6 +103,13 @@ function DevServer(port, config) {
                 //     displayName: 'Foo Bar',
                 //   }
                 // },
+                // Example services config
+                // services: [{
+                //   apiUrl: 'http://localhost:5000/api',
+                //   authority: 'partner.org',
+                //   allowLeavingGroups: false,
+                //   groups: ['a-group-id', 'another-group-id'],
+                // }],
 
                 // Open the sidebar when the page loads
                 openSidebar: true,

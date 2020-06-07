@@ -1,5 +1,5 @@
 /**
- * Set of icons used by the sidebar application for use with the `SvgIcon`
+ * Set of icons used by the sidebar application via the `SvgIcon`
  * component.
  */
 export default {
@@ -12,6 +12,7 @@ export default {
   'cc-std': require('../images/icons/cc-std.svg'),
   'cc-zero': require('../images/icons/cc-zero.svg'),
   'collapse-menu': require('../images/icons/collapse-menu.svg'),
+  collapsed: require('../images/icons/collapsed.svg'),
   copy: require('../images/icons/copy.svg'),
   cursor: require('../images/icons/cursor.svg'),
   edit: require('../images/icons/edit.svg'),

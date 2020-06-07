@@ -19,6 +19,10 @@ function init() {
      * The number of annotation fetches that have started and not yet completed.
      */
     activeAnnotationFetches: 0,
+    /**
+     * Have annotations ever been fetched?
+     */
+    hasFetchedAnnotations: false,
   };
 }
 
@@ -86,6 +90,7 @@ const update = {
 
     return {
       ...state,
+      hasFetchedAnnotations: true,
       activeAnnotationFetches: state.activeAnnotationFetches - 1,
     };
   },
@@ -127,6 +132,10 @@ function apiRequestFinished() {
 
 /** Selectors */
 
+function hasFetchedAnnotations(state) {
+  return state.activity.hasFetchedAnnotations;
+}
+
 /**
  * Return true when annotations are actively being fetched.
  */
@@ -136,10 +145,13 @@ function isFetchingAnnotations(state) {
 
 /**
  * Return true when any activity is happening in the app that needs to complete
- * before the UI will be idle.
+ * before the UI is ready for interactivity with annotations.
  */
 function isLoading(state) {
-  return state.activity.activeApiRequests > 0;
+  return (
+    state.activity.activeApiRequests > 0 ||
+    !state.activity.hasFetchedAnnotations
+  );
 }
 
 /**
@@ -173,6 +185,7 @@ export default {
   },
 
   selectors: {
+    hasFetchedAnnotations,
     isLoading,
     isFetchingAnnotations,
     isSavingAnnotation,

@@ -75,6 +75,20 @@ describe('sidebar/util/sentry', () => {
       );
     });
 
+    it('configures Sentry to ignore Errors with matching the text "Fetch operation failed"', () => {
+      sentry.init({
+        dsn: 'test-dsn',
+        environment: 'dev',
+      });
+
+      assert.calledWith(
+        fakeSentry.init,
+        sinon.match({
+          ignoreErrors: ['Fetch operation failed'],
+        })
+      );
+    });
+
     it('disables the URL whitelist if `document.currentScript` is inaccessible', () => {
       fakeDocumentCurrentScript.get(() => null);
 

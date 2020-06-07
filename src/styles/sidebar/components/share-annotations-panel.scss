@@ -3,10 +3,10 @@
 @use "../../mixins/links";
 
 .share-annotations-panel {
-  color: var.$grey-5;
+  color: var.$color-text-light;
 
   &__intro {
-    color: var.$grey-7;
+    color: var.$color-text;
     font-weight: 500;
   }
 

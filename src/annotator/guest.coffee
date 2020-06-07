@@ -10,6 +10,7 @@ highlighter = require('./highlighter')
 rangeUtil = require('./range-util')
 { default: selections } = require('./selections')
 xpathRange = require('./anchoring/range')
+{ closest } = require('../shared/dom-element')
 { normalizeURI } = require('./util/url')
 
 animationPromise = (fn) ->
@@ -425,11 +426,7 @@ module.exports = class Guest extends Delegator
       return
 
     @selectedRanges = [range]
-
-    $('.annotator-toolbar .h-icon-note')
-      .attr('title', 'New Annotation')
-      .removeClass('h-icon-note')
-      .addClass('h-icon-annotate');
+    @toolbar?.newAnnotationType = 'annotation'
 
     {left, top, arrowDirection} = this.adderCtrl.target(focusRect, isBackwards)
     this.adderCtrl.annotationsForSelection = annotationsForSelection()
@@ -438,11 +435,7 @@ module.exports = class Guest extends Delegator
   _onClearSelection: () ->
     this.adderCtrl.hide()
     @selectedRanges = []
-
-    $('.annotator-toolbar .h-icon-annotate')
-      .attr('title', 'New Page Note')
-      .removeClass('h-icon-annotate')
-      .addClass('h-icon-note');
+    @toolbar?.newAnnotationType = 'note'
 
   selectAnnotations: (annotations, toggle) ->
     if toggle
@@ -450,8 +443,15 @@ module.exports = class Guest extends Delegator
     else
       this.showAnnotations annotations
 
+  # Did an event originate from an element in the annotator UI? (eg. the sidebar
+  # frame, or its toolbar)
+  _isEventInAnnotator: (event) ->
+    return closest(event.target, '.annotator-frame') != null
+
+  # Event handlers to close the sidebar when the user clicks in the document.
+  # These really ought to live with the sidebar code.
   onElementClick: (event) ->
-    if !@selectedTargets?.length
+    if !this._isEventInAnnotator(event) and !@selectedTargets?.length
       @crossframe?.call('hideSidebar')
 
   onElementTouchStart: (event) ->
@@ -460,7 +460,7 @@ module.exports = class Guest extends Delegator
     # adding that to every element, we can add the initial
     # touchstart event which is always registered to
     # make up for the lack of click support for all elements.
-    if !@selectedTargets?.length
+    if !this._isEventInAnnotator(event) and !@selectedTargets?.length
       @crossframe?.call('hideSidebar')
 
   onHighlightMouseover: (event) ->
@@ -502,3 +502,4 @@ module.exports = class Guest extends Delegator
       @element.removeClass(SHOW_HIGHLIGHTS_CLASS)
 
     @visibleHighlights = shouldShowHighlights
+    @toolbar?.highlightsVisible = shouldShowHighlights

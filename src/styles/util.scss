@@ -1,3 +1,5 @@
+@use "./mixins/a11y";
+
 // Utility classes for layout
 .u-stretch {
   flex-grow: 1;
@@ -10,4 +12,8 @@
 
 .u-strong {
   font-weight: bold;
+}
+
+.u-screen-reader-only {
+  @include a11y.screen-reader-only;
 }

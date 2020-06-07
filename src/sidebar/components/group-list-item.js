@@ -22,9 +22,8 @@ function GroupListItem({
   onExpand,
   toastMessenger,
 }) {
-  const canLeaveGroup = group.type === 'private';
   const activityUrl = group.links.html;
-  const hasActionMenu = activityUrl || canLeaveGroup;
+  const hasActionMenu = activityUrl || group.canLeave;
   const isSelectable = !group.scopes.enforced || group.isScopedToUri;
 
   const focusedGroupId = useStore(store => store.focusedGroupId());
@@ -84,7 +83,7 @@ function GroupListItem({
       isDisabled={!isSelectable}
       isExpanded={hasActionMenu ? isExpanded : false}
       isSelected={isSelected}
-      isSubmenuVisible={isExpanded}
+      isSubmenuVisible={hasActionMenu ? isExpanded : undefined}
       label={group.name}
       onClick={isSelectable ? focusGroup : toggleSubmenu}
       onToggleSubmenu={toggleSubmenu}
@@ -111,7 +110,7 @@ function GroupListItem({
                 />
               </li>
             )}
-            {canLeaveGroup && (
+            {group.canLeave && (
               <li>
                 <MenuItem
                   icon="leave"

@@ -49,7 +49,7 @@ export default function FocusedModeHeader() {
   })();
 
   return (
-    <div className="focused-mode-header sheet sheet--short">
+    <div className="focused-mode-header">
       {filterStatus}
       <button onClick={toggleFocusedMode} className="focused-mode-header__btn">
         {buttonText}

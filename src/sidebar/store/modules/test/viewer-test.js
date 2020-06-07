@@ -19,4 +19,23 @@ describe('store/modules/viewer', function () {
       assert.isFalse(store.getState().viewer.visibleHighlights);
     });
   });
+
+  describe('hasSidebarOpened', () => {
+    it('is `false` if sidebar has never been opened', () => {
+      assert.isFalse(store.hasSidebarOpened());
+      store.setSidebarOpened(false);
+      assert.isFalse(store.hasSidebarOpened());
+    });
+
+    it('is `true` if sidebar has been opened', () => {
+      store.setSidebarOpened(true);
+      assert.isTrue(store.hasSidebarOpened());
+    });
+
+    it('is `true` if sidebar is closed after being opened', () => {
+      store.setSidebarOpened(true);
+      store.setSidebarOpened(false);
+      assert.isTrue(store.hasSidebarOpened());
+    });
+  });
 });

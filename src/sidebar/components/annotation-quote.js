@@ -23,7 +23,7 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
   const documentLanguage = '';
 
   return (
-    <section
+    <div
       className={classnames('annotation-quote', {
         'is-orphan': isOrphan(annotation),
         'is-focused': isFocused,
@@ -43,7 +43,7 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
           {quote(annotation)}
         </blockquote>
       </Excerpt>
-    </section>
+    </div>
   );
 }
 

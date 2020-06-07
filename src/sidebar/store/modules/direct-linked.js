@@ -136,6 +136,10 @@ function directLinkedGroupId(state) {
   return state.directLinked.directLinkedGroupId;
 }
 
+function directLinkedGroupFetchFailed(state) {
+  return state.directLinked.directLinkedGroupFetchFailed;
+}
+
 export default {
   init,
   namespace: 'directLinked',
@@ -149,6 +153,7 @@ export default {
   },
   selectors: {
     directLinkedAnnotationId,
+    directLinkedGroupFetchFailed,
     directLinkedGroupId,
   },
 };

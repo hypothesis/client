@@ -3,11 +3,9 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 
-import events from '../events';
 import useStore from '../store/use-store';
-import { isHighlight, isReply } from '../util/annotation-metadata';
+import { isHighlight } from '../util/annotation-metadata';
 import { getElementHeightWithMargins } from '../util/dom';
-import { withServices } from '../util/service-context';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
@@ -32,7 +30,7 @@ function getScrollContainer() {
  * user-defined content may include rich media such as images, audio clips,
  * embedded YouTube videos, rendered math and more.
  */
-function ThreadList({ thread, $rootScope }) {
+function ThreadList({ thread }) {
   const clearSelection = useStore(store => store.clearSelection);
 
   // Height of the visible area of the scroll container.
@@ -72,24 +70,33 @@ function ThreadList({ thread, $rootScope }) {
     [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
   );
 
-  // Listen for when a new annotation is created in the application, and trigger
-  // a scroll to that annotation's thread card (unless highlight or reply)
+  // Get the `$tag` of the most recently created unsaved annotation.
+  const newAnnotationTag = useStore(store => {
+    // If multiple unsaved annotations exist, assume that the last one in the
+    // list is the most recently created one.
+    const newAnnotations = store
+      .unsavedAnnotations()
+      .filter(ann => !ann.id && !isHighlight(ann));
+    if (!newAnnotations.length) {
+      return null;
+    }
+    return newAnnotations[newAnnotations.length - 1].$tag;
+  });
+
+  // Scroll to newly created annotations and replies.
+  //
+  // nb. If there are multiple unsaved annotations and the newest one is saved
+  // or removed, `newAnnotationTag` will revert to the previous unsaved annotation
+  // and the thread list will scroll to that.
   useEffect(() => {
-    const removeListener = $rootScope.$on(
-      events.BEFORE_ANNOTATION_CREATED,
-      (event, annotation) => {
-        if (!isHighlight(annotation) && !isReply(annotation)) {
-          clearSelection();
-          setScrollToId(annotation.$tag);
-        }
-      }
-    );
-    return removeListener;
-  }, [$rootScope, clearSelection]);
+    if (newAnnotationTag) {
+      clearSelection();
+      setScrollToId(newAnnotationTag);
+    }
+  }, [clearSelection, newAnnotationTag]);
 
   // Effect to scroll a particular thread into view. This is mainly used to
-  // scroll a newly created annotation into view (as triggered by the
-  // listener for `BEFORE_ANNOTATION_CREATED`)
+  // scroll a newly created annotation into view.
   useEffect(() => {
     if (!scrollToId) {
       return;
@@ -97,12 +104,8 @@ function ThreadList({ thread, $rootScope }) {
 
     const threadIndex = topLevelThreads.findIndex(t => t.id === scrollToId);
     if (threadIndex === -1) {
-      // Thread is not currently present.
-      //
-      // When `scrollToId` is set as a result of a `BEFORE_ANNOTATION_CREATED`
-      // event, the annotation is not always present in the _next_ render after
-      // that event is received, but in another render after that. Therefore
-      // we wait until the annotation appears before "consuming" the scroll-to-id.
+      // Thread is not currently present. The `scrollToId` will be consumed
+      // when this thread appears.
       return;
     }
 
@@ -174,7 +177,7 @@ function ThreadList({ thread, $rootScope }) {
   }, [visibleThreads]);
 
   return (
-    <section>
+    <div>
       <div style={{ height: offscreenUpperHeight }} />
       {visibleThreads.map(child => (
         <div className="thread-list__card" id={child.id} key={child.id}>
@@ -182,18 +185,13 @@ function ThreadList({ thread, $rootScope }) {
         </div>
       ))}
       <div style={{ height: offscreenLowerHeight }} />
-    </section>
+    </div>
   );
 }
 
 ThreadList.propTypes = {
   /** Should annotations render extra document metadata? */
   thread: propTypes.object.isRequired,
-
-  /** injected */
-  $rootScope: propTypes.object.isRequired,
 };
 
-ThreadList.injectedProps = ['$rootScope'];
-
-export default withServices(ThreadList);
+export default ThreadList;

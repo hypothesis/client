@@ -29,6 +29,16 @@ describe('ToastMessages', () => {
     };
   };
 
+  let fakeNoticeMessage = () => {
+    return {
+      type: 'notice',
+      message: 'you should know...',
+      id: 'someid3',
+      isDismissed: false,
+      moreInfoURL: 'http://www.example.com',
+    };
+  };
+
   function createComponent(props) {
     return mount(
       <ToastMessages toastMessenger={fakeToastMessenger} {...props} />
@@ -58,11 +68,12 @@ describe('ToastMessages', () => {
     fakeStore.getToastMessages.returns([
       fakeSuccessMessage(),
       fakeErrorMessage(),
+      fakeNoticeMessage(),
     ]);
 
     const wrapper = createComponent();
 
-    assert.lengthOf(wrapper.find('ToastMessage'), 2);
+    assert.lengthOf(wrapper.find('ToastMessage'), 3);
   });
 
   describe('`ToastMessage` sub-component', () => {
@@ -91,9 +102,24 @@ describe('ToastMessages', () => {
       assert.calledOnce(fakeToastMessenger.dismiss);
     });
 
+    it('should not dismiss the message if a "More info" link is clicked', () => {
+      fakeStore.getToastMessages.returns([fakeNoticeMessage()]);
+
+      const wrapper = createComponent();
+
+      const link = wrapper.find('.toast-message__link a');
+
+      act(() => {
+        link.getDOMNode().dispatchEvent(new Event('click', { bubbles: true }));
+      });
+
+      assert.notCalled(fakeToastMessenger.dismiss);
+    });
+
     [
       { message: fakeSuccessMessage(), className: 'toast-message--success' },
       { message: fakeErrorMessage(), className: 'toast-message--error' },
+      { message: fakeNoticeMessage(), className: 'toast-message--notice' },
     ].forEach(testCase => {
       it('should assign a CSS class based on message type', () => {
         fakeStore.getToastMessages.returns([testCase.message]);
@@ -129,6 +155,7 @@ describe('ToastMessages', () => {
     [
       { messages: [fakeSuccessMessage()], icons: ['success'] },
       { messages: [fakeErrorMessage()], icons: ['error'] },
+      { messages: [fakeNoticeMessage()], icons: ['cancel'] },
       {
         messages: [fakeSuccessMessage(), fakeErrorMessage()],
         icons: ['success', 'error'],
@@ -148,11 +175,22 @@ describe('ToastMessages', () => {
     });
   });
 
+  it('should render a "more info" link if URL is present in message object', () => {
+    fakeStore.getToastMessages.returns([fakeNoticeMessage()]);
+
+    const wrapper = createComponent();
+
+    const link = wrapper.find('.toast-message__link a');
+    assert.equal(link.props().href, 'http://www.example.com');
+    assert.equal(link.text(), 'More info');
+  });
+
   describe('a11y', () => {
     beforeEach(() => {
       fakeStore.getToastMessages.returns([
         fakeSuccessMessage(),
         fakeErrorMessage(),
+        fakeNoticeMessage(),
       ]);
     });
 

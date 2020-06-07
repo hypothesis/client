@@ -6,7 +6,7 @@
  * padding, heading and close-button styles.
  */
 @mixin panel {
-  background-color: var.$body-background;
+  background-color: var.$color-background;
   border: solid 1px var.$grey-3;
   border-radius: 2px;
 
@@ -31,11 +31,11 @@
     border-bottom: 1px solid var.$grey-3;
     font-size: 1.25em;
     font-weight: 500;
-    color: var.$grey-5;
+    color: var.$color-text-light;
   }
 
   &__title {
-    color: var.$brand;
+    color: var.$color-brand;
     font-size: var.$body2-font-size;
     font-weight: 700;
   }

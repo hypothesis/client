@@ -41,6 +41,18 @@ describe('Button', () => {
     assert.equal(wrapper.find('SvgIcon').prop('name'), 'fakeIcon');
   });
 
+  [true, false].forEach(isExpanded => {
+    it('sets `aria-expanded` attribute if `isExpanded` is a boolean', () => {
+      const wrapper = createComponent({ isExpanded });
+      assert.equal(wrapper.find('button').prop('aria-expanded'), isExpanded);
+    });
+  });
+
+  it('does not set `aria-expanded` attribute if `isExpanded` is omitted', () => {
+    const wrapper = createComponent();
+    assert.notProperty(wrapper.find('button').props(), 'aria-expanded');
+  });
+
   [true, false].forEach(isPressed => {
     it('sets `aria-pressed` attribute if `isPressed` is a boolean', () => {
       const wrapper = createComponent({ isPressed });
@@ -53,18 +65,48 @@ describe('Button', () => {
     assert.notProperty(wrapper.find('button').props(), 'aria-pressed');
   });
 
-  it('sets `title` to provided `title` prop', () => {
-    const wrapper = createComponent({});
-    assert.equal(wrapper.find('button').prop('title'), 'My Action');
-  });
-
-  it('uses `buttonText` to set `title` attr if `title` missing', () => {
-    const wrapper = createComponent({
-      buttonText: 'My Label',
-      title: undefined,
+  describe('`title` and `aria-label` attributes', () => {
+    it('sets attrs to provided `title` prop', () => {
+      const wrapper = createComponent({});
+      assert.equal(wrapper.find('button').prop('title'), 'My Action');
+      assert.equal(wrapper.find('button').prop('aria-label'), 'My Action');
     });
 
-    assert.equal(wrapper.find('button').prop('title'), 'My Label');
+    it('sets attrs if `title` is different than `buttonText`', () => {
+      const wrapper = createComponent({
+        buttonText: 'My Label',
+        title: 'Click here to do something',
+      });
+
+      assert.equal(
+        wrapper.find('button').prop('title'),
+        'Click here to do something'
+      );
+      assert.equal(
+        wrapper.find('button').prop('aria-label'),
+        'Click here to do something'
+      );
+    });
+
+    it('does not set attrs if no `title` provided and `buttonText` present', () => {
+      const wrapper = createComponent({
+        buttonText: 'My Label',
+        title: undefined,
+      });
+
+      assert.notProperty(wrapper.find('button').props(), 'title');
+      assert.notProperty(wrapper.find('button').props(), 'aria-label');
+    });
+
+    it('does not set attrs if `title` is the same as `buttonText`', () => {
+      const wrapper = createComponent({
+        buttonText: 'My Label',
+        title: 'My Label',
+      });
+
+      assert.notProperty(wrapper.find('button').props(), 'title');
+      assert.notProperty(wrapper.find('button').props(), 'aria-label');
+    });
   });
 
   it('invokes `onClick` callback when pressed', () => {
