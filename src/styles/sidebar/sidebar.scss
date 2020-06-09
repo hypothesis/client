@@ -62,12 +62,11 @@
 // ----------------
 
 body {
+  @include var.font-normal;
   height: 100%;
 
   background-color: var.$color-background;
   color: var.$color-text;
   font-family: var.$sans-font-family;
-  font-size: var.$base-font-size;
   font-weight: normal;
-  line-height: var.$base-line-height;
 }
