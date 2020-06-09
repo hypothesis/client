@@ -61,17 +61,21 @@ function GroupList({ serviceUrl, settings }) {
 
   let label;
   if (focusedGroup) {
-    const icon = focusedGroup.organization.logo;
+    const icon =
+      focusedGroup.organization.logo || publisherProvidedIcon(settings);
+
     // If org name is missing, then treat this icon like decoration
     // and pass an empty string.
     const altName = orgName(focusedGroup) ? orgName(focusedGroup) : '';
     label = (
       <span className="group-list__menu-label">
-        <img
-          className="group-list__menu-icon"
-          src={icon || publisherProvidedIcon(settings)}
-          alt={altName}
-        />
+        {icon && (
+          <img
+            className="group-list__menu-icon"
+            src={icon || publisherProvidedIcon(settings)}
+            alt={altName}
+          />
+        )}
         {focusedGroup.name}
       </span>
     );
