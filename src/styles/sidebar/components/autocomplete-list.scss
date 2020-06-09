@@ -8,6 +8,7 @@
 }
 
 .autocomplete-list__items {
+  @include var.font-normal;
   @supports (clip-path: polygon(0 0, 100% 0, 0% 100%, 0% 100%)) {
     &:before {
       /**
@@ -29,7 +30,6 @@
     }
   }
   position: absolute;
-  font-size: var.$body2-font-size;
   top: 5px;
   max-width: 100%;
   min-width: 10em;

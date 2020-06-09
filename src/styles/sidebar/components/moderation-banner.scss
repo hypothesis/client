@@ -5,12 +5,12 @@
   $h-padding: 15px;
 
   .moderation-banner {
+    @include var.font-normal;
     position: relative;
 
     color: white;
     display: flex;
     flex-direction: row;
-    font-size: var.$normal-font-size;
     font-weight: bold;
   }
 

@@ -5,8 +5,8 @@
 }
 
 .menu-section__heading {
+  @include var.font-normal;
   color: var.$color-text-light;
-  font-size: var.$body1-font-size;
   line-height: 1;
   margin: 1px 1px 0;
   margin-bottom: 10px;

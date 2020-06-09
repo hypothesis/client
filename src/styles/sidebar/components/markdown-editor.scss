@@ -42,7 +42,7 @@ $toolbar-border: 0.1em solid var.$grey-3;
   }
 
   &.is-text {
-    font-size: 13px;
+    @include var.font-normal;
   }
 
   &-icon {
