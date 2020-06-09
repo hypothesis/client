@@ -145,8 +145,7 @@ function SearchStatusBar({ rootThread }) {
             icon="cancel"
             buttonText="Clear search"
             onClick={actions.clearSelection}
-            useCompactStyle
-            usePrimaryStyle
+            className="search-status-bar__button"
           />
           <span className="search-status-bar__filtered-text">
             {modeText.filtered}
@@ -165,8 +164,7 @@ function SearchStatusBar({ rootThread }) {
           <Button
             buttonText={modeText.selected}
             onClick={actions.clearSelection}
-            useCompactStyle
-            usePrimaryStyle
+            className="search-status-bar__button"
           />
         </div>
       )}

@@ -1,24 +1,49 @@
+/**
+ * Button mixins for use by the `Button` component or any component that wishes
+ * to override default `Button`-component styling. These mixins are meant to be
+ * applied to `<button>` HTML elements, with an optional contained icon
+ * (i.e. `SvgIcon` component or `<svg>` element).
+ *
+ * To customize default `Button` styling, start with an appropriate button mixin
+ * and extend or or override rules as necessary in your component's SCSS module.
+ *
+ * e.g., let's pretend you wish the `Button` used in `MyComponent`
+ * to have a pink background. In `my-component.scss`, you might do something like:
+ *
+ * .my-component-button {
+ *    @include button--labeled;
+ *    background-color: pink;
+ * }
+ *
+ * And pass 'my-component-button' as the `className` prop to `Button`.
+ */
 @use "./focus";
 @use "../variables" as var;
 
 @mixin reset-native-btn-styles {
   @include focus.outline-on-keyboard-focus;
 
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
   background-color: transparent;
   border-style: none;
 }
 
 /**
- * Basic color, sizing, padding and hover for any button
+ * Basic color, sizing, padding and hover for buttons.
  */
-@mixin button-base {
+@mixin button {
   @include reset-native-btn-styles;
   padding: 0.5em;
-  color: var.$grey-mid;
 
-  &__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 2px;
+  border: none;
+
+  // Icon
+  svg {
     width: 16px;
     height: 16px;
   }
@@ -27,8 +52,18 @@
     transition: 0.2s ease-out;
     color: var.$grey-7;
   }
+}
 
-  &.is-active {
+/* A button with an icon and no displayed text */
+@mixin button--icon-only {
+  @include button;
+  color: var.$grey-mid;
+  @media (pointer: coarse) {
+    min-width: var.$touch-target-size;
+    min-height: var.$touch-target-size;
+  }
+  &[aria-expanded='true'],
+  &[aria-pressed='true'] {
     color: var.$color-brand;
 
     &:hover {
@@ -37,33 +72,66 @@
   }
 }
 
-/**
- * A button with background color, layout rules to allow an icon, and text settings
- */
-@mixin button-basic {
-  display: flex;
-  align-items: center;
-  border-radius: 2px;
-  border: none;
-  background-color: var.$grey-1;
-  font-weight: 700;
+/* A button with displayed text. It may or may not have an icon. */
+@mixin button--labeled {
+  @include button;
   color: var.$grey-mid;
-
-  padding-right: 0.75em;
-  padding-left: 0.75em;
+  font-weight: 700;
+  background-color: var.$grey-1;
 
   &:hover {
     background-color: var.$grey-2;
   }
+
+  // Icon
+  svg {
+    margin: 0 5px 0 0;
+  }
 }
 
-/* colors for a "primary" button */
-@mixin button-primary {
+/**
+ * A labeled button that is a primary action.
+ */
+@mixin button--primary {
+  @include button;
+  @include button--labeled;
   color: var.$grey-1;
   background-color: var.$grey-mid;
 
   &:hover {
     color: var.$grey-1;
     background-color: var.$grey-6;
+  }
+}
+
+/**
+ * An icon-only button that sits to the right of a text-input field
+ * (e.g. "copy to clipboard" button in share panels)
+ */
+@mixin button--input {
+  @include button;
+  color: var.$grey-mid;
+  padding: 0.5em 0.75em;
+  background-color: var.$grey-1;
+
+  border-radius: 0; // Turn off border-radius to align with <input> edges
+  border: 1px solid var.$grey-3;
+  border-left: 0; // Avoid double border with the <input>
+
+  &:hover {
+    background-color: var.$grey-2;
+  }
+}
+
+/**
+ * A button that is styled roughly like an `<a>` element (link-like)
+ */
+@mixin button--link {
+  @include button;
+  color: var.$grey-mid;
+  padding: 0;
+  &:hover {
+    color: var.$color-link-hover;
+    text-decoration: underline;
   }
 }

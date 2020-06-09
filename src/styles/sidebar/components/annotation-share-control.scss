@@ -1,3 +1,4 @@
+@use '../../mixins/buttons';
 @use '../../mixins/links';
 @use '../../mixins/panel';
 @use "../../variables" as var;
@@ -17,6 +18,15 @@
 
   &__input {
     display: flex;
+  }
+
+  &__icon-button {
+    @include buttons.button--input;
+    padding: 0.25em 0.5em;
+
+    &__icon {
+      margin: 0;
+    }
   }
 
   & .form-input {

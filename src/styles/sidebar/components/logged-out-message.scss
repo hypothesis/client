@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 .logged-out-message {
@@ -10,17 +11,11 @@
 }
 
 .logged-out-message__link {
+  @include buttons.button--link;
   padding: 0;
   display: inline;
   color: var.$color-text;
-  background-color: transparent;
   text-decoration: underline;
-  font-weight: 400;
-
-  &:hover {
-    color: var.$color-text;
-    text-decoration: none;
-  }
 }
 
 .logged-out-message__logo {

@@ -57,12 +57,7 @@ export default function SidebarPanel({
           )}
           <h2 className="sidebar-panel__title u-stretch">{title}</h2>
           <div>
-            <Button
-              icon="cancel"
-              buttonText="Close"
-              onClick={closePanel}
-              useCompactStyle
-            />
+            <Button icon="cancel" buttonText="Close" onClick={closePanel} />
           </div>
         </div>
         <div className="sidebar-panel__content">{children}</div>

@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 // FIXME These hover-related rules should live elsewhere
@@ -37,15 +38,8 @@
     }
   }
 
-  &__reply-toggle.button {
-    background-color: transparent;
-    padding: 0;
-    font-weight: 400;
-
-    &:hover {
-      background-color: transparent;
-      text-decoration: underline;
-    }
+  &__reply-toggle {
+    @include buttons.button--link;
   }
 
   &__controls {

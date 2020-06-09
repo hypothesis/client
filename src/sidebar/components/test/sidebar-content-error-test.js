@@ -36,9 +36,7 @@ describe('SidebarContentError', () => {
   });
 
   const findButtonByText = (wrapper, text) => {
-    return wrapper
-      .find('.sidebar-content-error__button')
-      .filter({ buttonText: text });
+    return wrapper.find('Button').filter({ buttonText: text });
   };
 
   const errorText = wrapper => {

@@ -30,12 +30,6 @@ describe('Button', () => {
     $imports.$restore();
   });
 
-  it('adds active className if `isPressed` is `true`', () => {
-    const wrapper = createComponent({ isPressed: true });
-
-    assert.isTrue(wrapper.find('button').hasClass('is-active'));
-  });
-
   it('renders `SvgIcon` for associated icon', () => {
     const wrapper = createComponent();
     assert.equal(wrapper.find('SvgIcon').prop('name'), 'fakeIcon');
@@ -115,28 +109,26 @@ describe('Button', () => {
     assert.calledOnce(fakeOnClick);
   });
 
-  it('adds additional class name passed in `className` prop', () => {
+  it('applies icon-only class if no visible label present', () => {
+    const wrapper = createComponent();
+
+    assert.isTrue(wrapper.find('button').hasClass('button--icon-only'));
+    assert.isFalse(wrapper.find('button').hasClass('button--labeled'));
+  });
+
+  it('applies labeled class if any visible label present', () => {
+    const wrapper = createComponent({ buttonText: 'Some text' });
+
+    assert.isTrue(wrapper.find('button').hasClass('button--labeled'));
+    assert.isFalse(wrapper.find('button').hasClass('button--icon-only'));
+  });
+
+  it('applies class passed in `className` prop', () => {
     const wrapper = createComponent({ className: 'my-class' });
 
-    assert.isTrue(wrapper.hasClass('my-class'));
-  });
-
-  it('sets compact style if `useCompactStyle` is set`', () => {
-    const wrapper = createComponent({ useCompactStyle: true });
-
-    assert.isTrue(wrapper.find('button').hasClass('button--compact'));
-  });
-
-  it('sets input style if `useInputStyle` is set', () => {
-    const wrapper = createComponent({ useInputStyle: true });
-
-    assert.isTrue(wrapper.find('button').hasClass('button--input'));
-  });
-
-  it('sets primary style if `usePrimaryStyle` is set`', () => {
-    const wrapper = createComponent({ usePrimaryStyle: true });
-
-    assert.isTrue(wrapper.find('button').hasClass('button--primary'));
+    assert.isTrue(wrapper.find('button').hasClass('my-class'));
+    assert.isFalse(wrapper.hasClass('button--icon-only'));
+    assert.isFalse(wrapper.hasClass('button--labeled'));
   });
 
   it('disables the button when `disabled` prop is true', () => {

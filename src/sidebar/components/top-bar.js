@@ -108,7 +108,6 @@ function TopBar({
             isExpanded={currentActivePanel === uiConstants.PANEL_HELP}
             onClick={requestHelp}
             title="Help"
-            useCompactStyle
           />
           {loginControl}
         </div>
@@ -126,7 +125,6 @@ function TopBar({
               title={`Show ${pendingUpdateCount} new/updated ${
                 pendingUpdateCount === 1 ? 'annotation' : 'annotations'
               }`}
-              useCompactStyle
             />
           )}
           <SearchInput query={filterQuery} onSearch={setFilterQuery} />
@@ -140,7 +138,6 @@ function TopBar({
               }
               onClick={toggleSharePanel}
               title="Share annotations on this page"
-              useCompactStyle
             />
           )}
           <Button
@@ -149,7 +146,6 @@ function TopBar({
             isExpanded={currentActivePanel === uiConstants.PANEL_HELP}
             onClick={requestHelp}
             title="Help"
-            useCompactStyle
           />
           {loginControl}
         </div>

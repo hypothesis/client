@@ -1,4 +1,5 @@
 import { createElement } from 'preact';
+import classnames from 'classnames';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
@@ -50,17 +51,18 @@ export default function SidebarContentError({
           {showClearSelection && (
             <Button
               buttonText="Show all annotations"
-              className="sidebar-content-error__button"
+              className={classnames({
+                'sidebar-content-error__button': !isLoggedIn,
+                'sidebar-content-error__button--primary': isLoggedIn,
+              })}
               onClick={clearSelection}
-              usePrimaryStyle={isLoggedIn}
             />
           )}
           {!isLoggedIn && (
             <Button
               buttonText="Log in"
-              className="sidebar-content-error__button"
+              className="sidebar-content-error__button--primary"
               onClick={onLoginRequest}
-              usePrimaryStyle
             />
           )}
         </div>

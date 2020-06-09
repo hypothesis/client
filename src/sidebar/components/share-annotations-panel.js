@@ -80,7 +80,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
               icon="copy"
               onClick={copyShareLink}
               title="Copy share link"
-              useInputStyle
+              className="share-annotations-panel__icon-button"
             />
           </div>
           <p>

@@ -3,6 +3,7 @@
 @use "../../variables" as var;
 
 .top-bar {
+  color: var.$grey-mid;
   background: var.$white;
   border-bottom: solid 1px var.$grey-3;
   height: var.$top-bar-height;
@@ -18,8 +19,19 @@
   // the window is scrolled.
   transform: translate3d(0, 0, 0);
 
-  &__icon-button,
-  &__menu-icon {
+  &__icon-button {
+    @include buttons.button--icon-only;
+    padding: 0.25em;
+    @media (pointer: coarse) {
+      // Until the top bar can be refactored to allow for breathing room around
+      // the search interface, we can't spare the room for comfortable tap targets
+      // on touchscreen devices. This overrides `Button`'s larger tap targets.
+      min-width: auto;
+      min-height: auto;
+    }
+  }
+
+  &__icon-button {
     color: var.$grey-mid;
 
     &.is-active {
@@ -48,15 +60,19 @@
   border-bottom: none;
 }
 
-.top-bar__login-button.button {
+.top-bar__login-button {
+  @include buttons.button;
   padding: 0 0.25em;
-  background-color: transparent;
   color: var.$color-brand;
   font-size: var.$body2-font-size;
-  font-weight: 400;
 
   &:hover {
     color: var.$color-link-hover;
+  }
+
+  @media (pointer: coarse) {
+    min-width: inherit;
+    min-height: inherit;
   }
 }
 

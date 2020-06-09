@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 .thread {
@@ -30,29 +31,29 @@
     }
   }
 
-  // TODO These styles should be consolidated with other `Button` styles
   &__collapse-button {
+    @include buttons.button;
+    color: var.$grey-mid;
     margin-right: -1.25em;
     padding: 0.25em 0.75em 0.75em 0.75em;
     // Need a non-transparent background so that the dashed border line
     // does not show through the button
     background-color: var.$white;
 
-    .button__icon {
+    svg {
       width: 12px;
       height: 12px;
       color: var.$grey-4;
     }
 
-    &:hover {
-      .button__icon {
-        color: var.$grey-6;
-      }
+    &:hover &__icon {
+      color: var.$grey-6;
     }
   }
   &__hidden-toggle-button {
     // This makes the vertical alignment with thread-collapse chevrons
     // more precise
+    @include buttons.button--labeled;
     margin-top: -0.25em;
   }
 

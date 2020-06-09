@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../variables" as var;
 
@@ -29,6 +30,16 @@
     // menu arrow
     &-menu-content {
       min-width: 100%;
+    }
+
+    &-cancel {
+      @include buttons.button--labeled;
+      padding-right: 0.5em;
+      padding-left: 0.5em;
+
+      &__icon {
+        margin: 0;
+      }
     }
 
     &-primary {

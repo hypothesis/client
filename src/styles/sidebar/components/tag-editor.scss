@@ -32,7 +32,8 @@
   }
 
   &__delete {
-    @include buttons.button-base;
+    @include buttons.button;
+    color: var.$grey-mid;
     background-color: var.$grey-1;
     padding: 0 0.5em;
     border: 1px solid var.$grey-3;
