@@ -25,8 +25,8 @@
   }
 
   &__title {
+    @include var.font-big;
     color: var.$color-brand;
-    font-size: var.$body2-font-size;
     font-weight: 700;
   }
 
