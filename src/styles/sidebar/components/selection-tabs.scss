@@ -5,8 +5,8 @@
 .selection-tabs {
   display: flex;
   flex-direction: row;
-  color: var.$color-text-light;
   @include var.font-normal;
+  color: var.$color-text-light;
 
   &:hover {
     color: var.$color-text;
@@ -46,9 +46,9 @@
 }
 
 .selection-tabs__count {
+  @include var.font-tiny;
   position: relative;
   bottom: 3px;
-  font-size: 10px;
 }
 
 .selection-tabs__empty-message {

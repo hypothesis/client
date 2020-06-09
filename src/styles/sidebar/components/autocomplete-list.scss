@@ -39,7 +39,6 @@
   z-index: 10;
 
   @media (pointer: coarse) {
-    font-size: var.$touch-target-size;
     line-height: var.$touch-target-size;
   }
 }

@@ -3,9 +3,9 @@
 
 .help-panel {
   &__sub-panel-title {
+    @include var.font-big;
     margin: 0;
     padding: 0.5em 0;
-    font-size: 1.25em;
     font-weight: 500;
   }
 
@@ -51,11 +51,11 @@
     align-items: center;
 
     &__tab {
+      @include var.font-big;
       flex: 1 1 0px;
       margin-top: 0.5em;
       border-right: 1px solid var.$grey-3;
       text-align: center;
-      font-size: 1.25em;
       color: var.$color-text-light;
 
       &:last-of-type {
