@@ -12,7 +12,6 @@
 @use './bucket-bar';
 @use './highlights';
 
-$annotator-font-size: 14px;
 $sidebar-collapse-transition-time: 150ms;
 
 // Sidebar
@@ -35,8 +34,8 @@ $sidebar-collapse-transition-time: 150ms;
   user-select: none;
   direction: ltr;
   background: none;
-  font-size: $annotator-font-size;
-  line-height: var.$base-line-height;
+  font-size: var.$annotator-base-font-size;
+  line-height: var.$annotator-base-line-height;
   height: 100%;
   position: fixed;
   top: 0;

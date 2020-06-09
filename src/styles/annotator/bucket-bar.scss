@@ -37,8 +37,8 @@
       color: var.$color-text-light;
       font-weight: bold;
       font-family: var.$sans-font-family;
-      font-size: 10px;
-      line-height: 14px;
+      font-size: var.$annotator-bucket-bar-font-size;
+      line-height: var.$annotator-bucket-bar-line-height;
       margin: 0 auto;
     }
 
