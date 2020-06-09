@@ -41,10 +41,6 @@ $toolbar-border: 0.1em solid var.$grey-3;
     color: var.$grey-3;
   }
 
-  &.is-text {
-    @include var.font-normal;
-  }
-
   &-icon {
     width: 10px;
     height: 10px;

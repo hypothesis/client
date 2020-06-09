@@ -23,10 +23,6 @@
   &__icon-button {
     @include buttons.button--input;
     padding: 0.25em 0.5em;
-
-    &__icon {
-      margin: 0;
-    }
   }
 
   & .form-input {

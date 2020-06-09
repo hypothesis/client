@@ -1,7 +1,6 @@
 @use "../../variables" as var;
 
 .annotation-document-info {
-  @include var.font-normal;
   color: var.$color-text-light;
   display: flex;
 

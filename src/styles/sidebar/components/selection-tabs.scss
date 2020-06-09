@@ -5,8 +5,6 @@
 .selection-tabs {
   display: flex;
   flex-direction: row;
-  @include var.font-normal;
-  color: var.$color-text-light;
 
   &:hover {
     color: var.$color-text;
