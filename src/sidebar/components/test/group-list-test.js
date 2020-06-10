@@ -181,11 +181,13 @@ describe('GroupList', () => {
     });
 
     it('uses the organization name for the `alt` attribute', () => {
+      fakeServiceConfig.returns({ icon: 'test-icon' });
       const wrapper = createGroupList();
       assert.equal(wrapper.find('img').prop('alt'), 'Test Org');
     });
 
     it('uses a blank string for the `alt` attribute if the organization name is missing', () => {
+      fakeServiceConfig.returns({ icon: 'test-icon' });
       testGroup.organization = {};
       const wrapper = createGroupList();
       assert.equal(wrapper.find('img').prop('alt'), '');
@@ -205,6 +207,12 @@ describe('GroupList', () => {
     const label = wrapper.find('Menu').prop('label');
     const img = mount(label).find('img');
     assert.equal(img.prop('src'), 'test-icon');
+  });
+
+  it('does not render an icon if the the publisher-provided icon is missing', () => {
+    const wrapper = createGroupList();
+    const label = wrapper.find('Menu').prop('label');
+    assert.isFalse(mount(label).find('img').exists());
   });
 
   /**
