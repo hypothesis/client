@@ -22,3 +22,7 @@
 .button--labeled {
   @include buttons.button--labeled;
 }
+
+.button--primary {
+  @include buttons.button--primary;
+}
