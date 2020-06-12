@@ -1,4 +1,5 @@
 @use '../../mixins/buttons';
+@use '../../mixins/forms';
 @use '../../mixins/layout';
 @use '../../mixins/molecules';
 @use "../../mixins/utils";
@@ -25,10 +26,10 @@
     padding: 0.25em 0.5em;
   }
 
-  & .form-input {
+  &__form-input {
+    @include forms.form-input--with-button;
     @include utils.font--small;
     padding: 0.5em;
-    border-radius: 0;
   }
 
   &__permissions {

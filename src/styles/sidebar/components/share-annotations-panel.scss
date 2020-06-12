@@ -1,7 +1,8 @@
 @use "../../variables" as var;
 @use "../../mixins/buttons";
-@use "../../mixins/utils";
+@use "../../mixins/forms";
 @use "../../mixins/molecules";
+@use "../../mixins/utils";
 
 .share-annotations-panel {
   color: var.$color-text-light;
@@ -16,7 +17,7 @@
   }
 
   &__form-input {
-    border-radius: 0;
+    @include forms.form-input--with-button;
   }
 
   &__icon--inline {
