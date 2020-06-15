@@ -45,7 +45,7 @@
     "eslint": "^6.0.1",
     "eslint-config-hypothesis": "^2.0.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-mocha": "^5.2.1",
+    "eslint-plugin-mocha": "^7.0.1",
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-react-hooks": "^3.0.0",
     "exorcist": "^1.0.1",
