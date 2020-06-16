@@ -11,12 +11,18 @@ function getDocumentDCIdentifier(store) {
     const metaFrame = state.frames.find(function (frame) {
       return frame.metadata && frame.metadata.documentFingerprint;
     });
-
     return metaFrame ? metaFrame.metadata.documentFingerprint : null;
   }
   return awaitStateChange(store, getIdentifier);
 }
 
+function getDCIdentifier(store) {
+    const state = store.getState();
+    const metaFrame = state.frames.find(function (frame) {
+      return frame.metadata && frame.metadata.dc.identifier;
+    });
+    return metaFrame ? metaFrame.metadata.dc.identifier : null;
+  }
 /**
  * Return a value from app state when it meets certain criteria.
  *
@@ -44,4 +50,4 @@ function awaitStateChange(store, selector) {
   });
 }
 
-module.exports = { awaitStateChange, getDocumentDCIdentifier } ;
+module.exports = { awaitStateChange, getDocumentDCIdentifier, getDCIdentifier } ;

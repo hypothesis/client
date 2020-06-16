@@ -15,7 +15,7 @@ const DEFAULT_ORGANIZATION = {
 
 const events = require('../events');
 const { combineGroups } = require('../util/groups');
-const { getDocumentDCIdentifier } = require('../util/state-util');
+const { getDocumentDCIdentifier, getDCIdentifier } = require('../util/state-util');
 const serviceConfig = require('../service-config');
 
 // @ngInject
@@ -170,7 +170,8 @@ function groups(
         injectOrganizations(groups);
 
         const isFirstLoad = store.allGroups().length === 0;
-        const prevFocusedGroup = localStorage.getItem(STORAGE_KEY);
+        const dcIdentifier = getDCIdentifier(store);
+        const prevFocusedGroup = localStorage.getItem(`${dcIdentifier}_${STORAGE_KEY}`);
 
         store.loadGroups(groups);
         if (isFirstLoad && groups.some(g => g.id === prevFocusedGroup)) {
@@ -224,7 +225,8 @@ function groups(
     if (focusedId !== prevFocusedId) {
       prevFocusedId = focusedId;
 
-      localStorage.setItem(STORAGE_KEY, focusedId);
+      const dcIdentifier = getDCIdentifier(store);
+      localStorage.setItem(`${dcIdentifier}_${STORAGE_KEY}`, focusedId);
 
       // Emit the `GROUP_FOCUSED` event for code that still relies on it.
       $rootScope.$broadcast(events.GROUP_FOCUSED, focusedId);
