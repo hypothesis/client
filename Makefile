@@ -10,6 +10,7 @@ help:
 	@echo "make format            Automatically format code"
 	@echo "make test              Run the unit tests once"
 	@echo "make servetests        Start the unit test server on localhost"
+	@echo "make sure              Make sure that the formatter, linter, tests, etc all pass"
 	@echo "make docs              Build docs website and serve it locally"
 	@echo "make checkdocs         Crash if building the docs website fails"
 	@echo "make clean             Delete development artefacts (cached files, "
@@ -59,6 +60,9 @@ format:
 .PHONY: checkformatting
 checkformatting:
 	yarn run checkformatting
+
+.PHONY: sure
+sure: checkformatting lint test
 
 .PHONY: python
 python:
