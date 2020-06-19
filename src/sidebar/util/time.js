@@ -162,7 +162,7 @@ function getBreakpoint(date, now) {
  * Return the number of milliseconds until the next update for a given date
  * should be handled, based on the delta between `date` and `now`.
  *
- * @param {Date} date
+ * @param {Date|null} date
  * @param {Date} now
  * @return {Number|null} - ms until next update or `null` if no update
  *                         should occur

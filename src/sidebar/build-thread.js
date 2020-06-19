@@ -3,13 +3,13 @@
  *
  * @typedef Thread
  * @prop {string} id
- * @prop {Annotation} [annotation]
- * @prop {Thread} [parent]
+ * @prop {Annotation|undefined} annotation
+ * @prop {Thread|undefined} parent
  * @prop {boolean} visible
  * @prop {boolean} collapsed
  * @prop {Thread[]} children
  * @prop {number} totalChildren
- * @prop {'dim'|'highlight'} [highlightState]
+ * @prop {'dim'|'highlight'|undefined} highlightState
  */
 
 /**
@@ -22,7 +22,7 @@ const DEFAULT_THREAD_STATE = {
    * The ID of this thread. This will be the same as the annotation ID for
    * created annotations or the `$tag` property for new annotations.
    */
-  id: undefined,
+  id: '__default__',
   /**
    * The Annotation which is displayed by this thread.
    *
@@ -152,6 +152,8 @@ function threadAnnotations(annotations) {
     visible: true,
     collapsed: false,
     totalChildren: roots.length,
+    parent: undefined,
+    highlightState: undefined,
   };
 
   return root;
@@ -253,7 +255,7 @@ function hasVisibleChildren(thread) {
 /**
  * Default options for buildThread()
  *
- * @type {Options}
+ * @type {Partial<Options>}
  */
 const defaultOpts = {
   /** List of currently selected annotation IDs */

@@ -36,7 +36,8 @@
  * @typedef Group
  * @prop {string} id
  * @prop {'private'|'open'} type
- * @prop {Organization|null} organization
+ * @prop {Organization} organization - nb. This field is nullable in the API, but
+ *   we assign a default organization on the client.
  *
  * // Properties not present on API objects, but added by utilities in the client.
  * @prop {string} logo

@@ -47,7 +47,7 @@ export function init(config) {
   // If we can't determine the current script's origin, just disable the
   // whitelist and report all errors.
   const scriptOrigin = currentScriptOrigin();
-  const whitelistUrls = scriptOrigin ? [scriptOrigin] : null;
+  const whitelistUrls = scriptOrigin ? [scriptOrigin] : undefined;
 
   Sentry.init({
     dsn: config.dsn,

@@ -6,7 +6,9 @@
     "jsx": "react",
     "jsxFactory": "createElement",
     "module": "commonjs",
-    "noEmit": true
+    "noEmit": true,
+    "strictNullChecks": true,
+    "target": "ES2020"
   },
   "include": [
     "sidebar/util/*.js"
