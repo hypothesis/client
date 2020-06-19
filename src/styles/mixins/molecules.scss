@@ -12,8 +12,7 @@
 
   &__icon {
     @include layout.row;
-    width: 18px;
-    height: 18px;
+    @include utils.icon--medium;
     margin: 0 8px;
     color: var.$grey-5;
 

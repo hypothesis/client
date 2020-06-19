@@ -1,8 +1,8 @@
-@use '../../mixins/links';
 @use "../../mixins/utils";
+@use '../../mixins/molecules';
 
 .share-links {
-  @include links.footer-links;
+  @include molecules.footer-links;
 
   &__icon {
     @include utils.icon--large;
