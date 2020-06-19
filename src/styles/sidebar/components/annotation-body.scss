@@ -1,30 +1,11 @@
 @use '../../variables' as var;
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
+@use "../../mixins/molecules";
 
 .annotation-body__text {
-  // Hidden annotations displayed to moderators, where the content is still
-  // present.
-  &.is-hidden.has-content {
-    text-decoration: line-through;
-    filter: grayscale(100%) contrast(65%);
-  }
-
-  // Hidden annotations displayed to non-moderators, where the content has been
-  // filtered out by the service.
-  &.is-hidden:not(.has-content) {
-    // Create a column of horizontal stripes, giving the impression of text
-    // underneath that has been censored.
-    display: block;
-    height: 60px;
-    width: 100vw;
-    background: repeating-linear-gradient(
-      to bottom,
-      var.$grey-2,
-      var.$grey-2 15px,
-      white 15px,
-      white 20px
-    );
+  &.is-hidden {
+    @include molecules.redacted-content;
   }
 }
 
