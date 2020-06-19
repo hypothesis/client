@@ -100,7 +100,7 @@ describe('sidebar/util/sentry', () => {
       assert.calledWith(
         fakeSentry.init,
         sinon.match({
-          whitelistUrls: null,
+          whitelistUrls: undefined,
         })
       );
     });
