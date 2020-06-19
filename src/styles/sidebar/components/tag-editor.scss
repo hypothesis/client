@@ -19,7 +19,6 @@
   &__item {
     display: flex;
     margin: 0.25em 0.5em 0.25em 0;
-    line-height: var.$base-line-height;
   }
 
   &__edit {
@@ -28,7 +27,7 @@
     border: 1px solid var.$grey-3;
     border-radius: 2px 0 0 2px;
     border-right-width: 0;
-    padding: 0 0.5em;
+    padding: 2px 0.5em;
   }
 
   &__delete {

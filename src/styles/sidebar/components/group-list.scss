@@ -5,6 +5,7 @@
 }
 
 .group-list__menu-label {
+  @include var.font-big;
   align-items: center;
   color: var.$color-text;
   display: flex;
@@ -12,8 +13,6 @@
   // Prevent label from wrapping if top bar is too narrow to fit all of its
   // items.
   flex-shrink: 0;
-
-  font-size: var.$body2-font-size;
   font-weight: bold;
 }
 

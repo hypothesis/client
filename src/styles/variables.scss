@@ -70,19 +70,17 @@ $sans-font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande',
   sans-serif !default;
 $mono-font-family: Open Sans Mono, Menlo, DejaVu Sans Mono, monospace !default;
 
-$base-font-size: 16px !default;
-$base-line-height: 20px !default;
+// Transitional Typography (Temporary)
+// -----------------------------------
 
-$body1-font-size: 12px;
-$body1-line-height: 1.4em;
+$annotator-base-font-size: 14px;
+$annotator-base-line-height: 20px;
 
-$body2-font-size: 14px;
+$annotator-adder-font-size: 12px;
+$annotator-adder-line-height: 1em;
 
-$normal-font-size: 13px;
-$normal-line-height: 17px;
-
-$small-font-size: 11px;
-$small-line-height: 12px;
+$annotator-bucket-bar-font-size: 10px;
+$annotator-bucket-bar-line-height: 14px;
 
 // Minimum font size for <input> fields on iOS. If the font size is smaller than
 // this, iOS will zoom into the field when focused.
@@ -108,14 +106,26 @@ $popup-menu-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 
 // Mixins
 // ------
+
+@mixin font-tiny {
+  font-size: 10px;
+  line-height: 14px;
+  font-weight: 400;
+}
+
 @mixin font-small {
-  font-size: $small-font-size;
-  line-height: $small-line-height;
+  font-size: 11px;
+  line-height: 15px;
   font-weight: 400;
 }
 
 @mixin font-normal {
-  font-size: $normal-font-size;
-  line-height: $normal-line-height;
+  font-size: 13px;
+  line-height: 17px;
   font-weight: 400;
+}
+
+@mixin font-big {
+  font-size: 14px;
+  line-height: 20px;
 }

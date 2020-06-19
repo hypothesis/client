@@ -109,9 +109,9 @@ $adder-transition-duration: 80ms;
   align-items: center;
   border: none;
   cursor: pointer;
-  font-size: 12px;
+  font-size: var.$annotator-adder-font-size;
   font-family: sans-serif;
-  line-height: 1em;
+  line-height: var.$annotator-adder-line-height;
 
   padding: 10px;
   padding-bottom: 7px;

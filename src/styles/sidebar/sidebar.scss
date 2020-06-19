@@ -1,7 +1,4 @@
-@use '../variables' as var with (
-  $base-font-size: 12px,
-  $base-line-height: 20px
-);
+@use '../variables' as var;
 
 // Base styles
 // -----------
@@ -57,7 +54,6 @@
 @use './components/thread-card';
 @use './components/thread-list';
 @use './components/toast-messages';
-@use './components/tooltip';
 @use './components/top-bar';
 @use './components/tutorial';
 @use './components/version-info';
@@ -66,12 +62,11 @@
 // ----------------
 
 body {
+  @include var.font-normal;
   height: 100%;
 
   background-color: var.$color-background;
   color: var.$color-text;
   font-family: var.$sans-font-family;
-  font-size: var.$base-font-size;
   font-weight: normal;
-  line-height: var.$base-line-height;
 }

@@ -30,14 +30,14 @@
   }
 
   & .form-input {
+    @include var.font-small;
     padding: 0.5em;
     border-radius: 0;
-    font-size: var.$small-font-size;
   }
 
   &__permissions {
+    @include var.font-small;
     margin: 0.5em 0;
-    font-size: var.$small-font-size;
   }
 
   &__arrow {
