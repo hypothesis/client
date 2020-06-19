@@ -6,12 +6,12 @@
 .annotation-header {
   &__row {
     @include layout.row($align: baseline);
+    @include layout.horizontal-rhythm;
     // Wrap onto multiple rows from bottom to top
     flex-wrap: wrap-reverse;
   }
 
   &__icon {
-    margin-right: 5px;
     width: 10px;
     height: 10px;
     color: var.$color-text;
@@ -41,10 +41,6 @@
 
   &__timestamp-created-link {
     color: var.$color-text-light;
-  }
-
-  &__highlight {
-    margin-right: 5px;
   }
 
   &__highlight-icon {

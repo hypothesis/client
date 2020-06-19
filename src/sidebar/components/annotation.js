@@ -122,18 +122,19 @@ function Annotation({
         />
       )}
 
+      {isEditing && (
+        <div className="annotation__form-actions">
+          <AnnotationPublishControl
+            annotation={annotation}
+            isDisabled={isEmpty}
+            onSave={onSave}
+          />
+        </div>
+      )}
+      {shouldShowLicense && <AnnotationLicense />}
+
       {!isCollapsedReply && (
         <footer className="annotation__footer">
-          {isEditing && (
-            <div className="annotation__form-actions">
-              <AnnotationPublishControl
-                annotation={annotation}
-                isDisabled={isEmpty}
-                onSave={onSave}
-              />
-            </div>
-          )}
-          {shouldShowLicense && <AnnotationLicense />}
           <div className="annotation__controls">
             {shouldShowReplyToggle && (
               <Button

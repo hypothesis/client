@@ -3,14 +3,19 @@
 @use "../../mixins/layout";
 @use "../../variables" as var;
 
+.selection-tabs-container {
+  @include layout.vertical-rhythm;
+  // FIXME: This should be a margin, and it should be handled by the parent,
+  // but needs to be considered carefully because applying vertical rhythm to
+  // this component's parent messes with the calculations in the virtualized
+  // thread list. Needs another pass. Note also that it is `10px` (and looks
+  // unbalanced at the standard vertical rhythm size of `1em`)
+  padding-bottom: 10px;
+}
+
 .selection-tabs {
   @include layout.row;
-
-  &:hover {
-    color: var.$color-text;
-  }
-
-  padding-bottom: 10px;
+  @include layout.horizontal-rhythm(20px);
 }
 
 .selection-tabs__icon {
@@ -27,7 +32,6 @@
   @include focus.outline-on-keyboard-focus;
 
   color: var.$color-text;
-  margin-right: 20px;
   cursor: pointer;
   min-width: 85px;
   min-height: 18px;

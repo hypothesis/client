@@ -126,7 +126,11 @@ function AnnotationShareControl({
               className="annotation-share-control__links"
             />
           </div>
-          <SvgIcon name="pointer" className="annotation-share-panel__arrow" />
+          <SvgIcon
+            name="pointer"
+            inline={true}
+            className="annotation-share-panel__arrow"
+          />
         </div>
       )}
     </div>

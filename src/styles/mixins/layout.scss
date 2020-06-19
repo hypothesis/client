@@ -55,12 +55,23 @@
   @include flex(row, $justify, $align);
 }
 
+/**
+ * Establish a horizontal (margin) rhythm for this element's immediate
+ * children (i.e. put equal space between children).
+ *
+ * @param $size [5px] - Size of horizontal margin between child elements
+ */
 @mixin horizontal-rhythm($size: 5px) {
   & > * + * {
     margin-left: $size;
   }
 }
 
+/**
+ * Establish a vertical (margin) rhythm for this element's immediate
+ * children (i.e. put equal space between children). Currently set to 1em.
+ * @FIXME Find workaround for SvgIcon exception
+ */
 @mixin vertical-rhythm {
   & > * + *:not([class*='svg-icon--inline']) {
     margin-top: 1em;

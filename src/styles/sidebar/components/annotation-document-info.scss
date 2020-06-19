@@ -3,13 +3,6 @@
 
 .annotation-document-info {
   @include layout.row;
+  @include layout.horizontal-rhythm;
   color: var.$color-text-light;
-
-  &__title {
-    margin-right: 5px;
-  }
-
-  &__domain {
-    margin-right: 5px;
-  }
 }

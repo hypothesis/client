@@ -2,10 +2,6 @@
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
 
-.annotation-body {
-  margin: 1em 0;
-}
-
 .annotation-body__text {
   // Hidden annotations displayed to moderators, where the content is still
   // present.

@@ -9,9 +9,16 @@
     margin-top: 0.5em;
   }
 
-  // Conserve space for deeper usable nesting
+  &--reply &__content {
+    margin-left: 1em;
+  }
+
   &__children {
-    margin-left: -0.75em;
+    margin-left: -1em;
+  }
+
+  &__unavailable-message {
+    margin: 0 1em;
   }
 
   // Left "channel" of thread

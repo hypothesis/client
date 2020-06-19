@@ -10,15 +10,8 @@
     color: var.$color-text-light;
   }
 
-  &__group-info {
-    margin-right: 5px;
-  }
-
-  &__private-info {
-    margin-right: 5px;
-  }
-
   &__icon {
+    // This margin is currently needed because the icon is within an `a` element
     margin-right: 5px;
     width: 10px;
     height: 10px;

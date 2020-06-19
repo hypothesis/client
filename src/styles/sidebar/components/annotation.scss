@@ -22,6 +22,8 @@
 }
 
 .annotation {
+  @include layout.vertical-rhythm;
+
   &.is-highlighted {
     // Slightly darken the bodies of highlighted annotations to
     // make them stand out next to others, which will have the `is-dimmed` state
@@ -53,12 +55,6 @@
 
   &__form-actions {
     @include layout.row;
-    margin-bottom: 10px;
-  }
-
-  &__footer {
-    color: var.$color-text-light;
-    margin-top: 1em;
   }
 }
 
