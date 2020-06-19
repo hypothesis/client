@@ -1,4 +1,5 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 // FIXME These hover-related rules should live elsewhere
@@ -43,7 +44,7 @@
   }
 
   &__controls {
-    display: flex;
+    @include layout.row;
   }
 
   &__actions {
@@ -51,8 +52,7 @@
   }
 
   &__form-actions {
-    display: flex;
-    flex-direction: row;
+    @include layout.row;
     margin-bottom: 10px;
   }
 

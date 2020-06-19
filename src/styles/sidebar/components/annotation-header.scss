@@ -1,12 +1,13 @@
 @use "../../mixins/buttons";
 @use "../../mixins/forms";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .annotation-header {
   &__row {
-    display: flex;
+    @include layout.row($align: baseline);
+    // Wrap onto multiple rows from bottom to top
     flex-wrap: wrap-reverse;
-    align-items: baseline;
   }
 
   &__icon {

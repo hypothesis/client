@@ -1,13 +1,12 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 
 .annotation-share-info {
-  display: flex;
-  align-items: baseline;
+  @include layout.row($align: baseline);
 
   &__group,
   &__private {
-    display: flex;
-    align-items: baseline;
+    @include layout.row($align: baseline);
     color: var.$color-text-light;
   }
 

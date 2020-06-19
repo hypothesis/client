@@ -1,5 +1,6 @@
 @use "../variables" as var;
 @use "./buttons";
+@use "./layout";
 
 /**
  * Base styles for a "panel"-like element, with appropriate
@@ -11,9 +12,7 @@
   border-radius: 2px;
 
   &__header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    @include layout.row($align: center);
     padding: 1em 0;
     margin: 0 1em;
     border: 1px none var.$grey-3;

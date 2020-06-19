@@ -1,4 +1,5 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .help-panel {
@@ -33,8 +34,7 @@
 
   &__sub-panel-link {
     @include buttons.reset-native-btn-styles;
-    display: flex;
-    align-items: center;
+    @include layout.row($align: center);
     margin-left: auto;
     color: var.$color-brand;
 
@@ -46,8 +46,7 @@
   }
 
   &-tabs {
-    display: flex;
-    align-items: center;
+    @include layout.row($align: center);
 
     &__tab {
       @include var.font-big;

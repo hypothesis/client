@@ -1,8 +1,9 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 
 .annotation-document-info {
+  @include layout.row;
   color: var.$color-text-light;
-  display: flex;
 
   &__title {
     margin-right: 5px;

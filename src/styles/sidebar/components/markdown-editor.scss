@@ -1,12 +1,12 @@
 @use "../../mixins/buttons";
 @use "../../mixins/forms";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 $toolbar-border: 0.1em solid var.$grey-3;
 
 .markdown-editor__toolbar {
-  display: flex;
-  flex-direction: row;
+  @include layout.row;
 
   // Toolbar buttons wrap on non-touch devices if they don't fit. We don't use
   // scrolling because that's less convenient to use with a mouse/touchpad.
@@ -23,9 +23,7 @@ $toolbar-border: 0.1em solid var.$grey-3;
 
 .markdown-editor__toolbar-button {
   @include buttons.reset-native-btn-styles;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include layout.row(center, center);
   appearance: none;
   min-width: 24px;
   min-height: 24px;
@@ -54,8 +52,7 @@ $toolbar-border: 0.1em solid var.$grey-3;
 }
 
 .markdown-editor__toolbar-help-link {
-  display: flex;
-  align-items: center;
+  @include layout.row($align: center);
   margin-bottom: 2px; // Tweak to align help icon better with adjacent buttons
 }
 

@@ -1,10 +1,10 @@
 @use "../../mixins/focus";
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .selection-tabs {
-  display: flex;
-  flex-direction: row;
+  @include layout.row;
 
   &:hover {
     color: var.$color-text;

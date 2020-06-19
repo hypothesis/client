@@ -1,8 +1,9 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .thread {
-  display: flex;
+  @include layout.row;
 
   &--reply {
     margin-top: 0.5em;

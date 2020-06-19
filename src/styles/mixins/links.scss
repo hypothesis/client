@@ -1,17 +1,16 @@
 @use "../variables" as var;
+@use "./layout";
 
 /**
  * horizontally-oriented collection of linked icons
  */
 @mixin footer-links {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
+  @include layout.row(center);
   padding-top: 8px;
   border-top: 1px solid var.$grey-3;
 
   &__icon {
-    display: flex;
+    @include layout.row;
     width: 18px;
     height: 18px;
     margin: 0 8px;

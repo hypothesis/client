@@ -1,4 +1,5 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 
 .version-info {
   margin-top: 0.5em;
@@ -22,8 +23,7 @@
   }
 
   &__actions {
-    display: flex;
-    justify-content: center;
+    @include layout.row(center);
     padding-bottom: 0.5em;
   }
 }

@@ -1,5 +1,6 @@
 @use '../../variables' as var;
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 
 .annotation-body {
   margin: 1em 0;
@@ -32,9 +33,8 @@
 }
 
 .annotation-body__collapse-toggle {
+  @include layout.row(right);
   margin: 0.5em 0;
-  display: flex;
-  justify-content: flex-end;
 
   .annotation-body__collapse-toggle-button {
     @include buttons.button--labeled;

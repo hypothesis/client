@@ -1,7 +1,7 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 
 .new-note-button {
-  display: flex;
-  justify-content: flex-end;
+  @include layout.row(right);
   margin: 0 1em 1em 0;
 }

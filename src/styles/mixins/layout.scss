@@ -11,3 +11,58 @@
     padding-right: 4rem;
   }
 }
+/**
+ * Abstract mixin for establishing basic flex container. External users should
+ * use `row` or `column` as needed. Default values here reflect default CSS
+ * values for flex rules.
+ *
+ * @param {string} $direction [row] - value for flex-direction (row or column).
+ * @param {string} $justify [flex-start] - How to align contents on main axis.
+ *                                    Accepts and maps special value of 'right'
+ *                                   (roughly analogous to horizontal alignment)
+ * @param {string} $align [stretch] - How to align contents on cross axis.
+ *                                    (roughly analogous to vertical alignment)
+ */
+@mixin flex($direction: row, $justify: flex-start, $align: stretch) {
+  display: flex;
+  flex-direction: $direction;
+
+  @if $justify == right {
+    justify-content: flex-end;
+  } @else {
+    justify-content: $justify;
+  }
+  align-items: $align;
+}
+
+/**
+ * Establish a column (flex-direction: column) flex container.
+ *
+ * @param {string} $justify [flex-start] - How to justify flex contents
+ * @param {string} $align [stretch] - How to align flex contents
+ */
+@mixin column($justify: flex-start, $align: stretch) {
+  @include flex(column, $justify, $align);
+}
+
+/**
+ * Establish a row (flex-direction: column) flex container.
+ *
+ * @param {string} $justify [flex-start] - How to justify flex contents
+ * @param {string} $align [stretch] - How to align flex contents
+ */
+@mixin row($justify: flex-start, $align: stretch) {
+  @include flex(row, $justify, $align);
+}
+
+@mixin horizontal-rhythm($size: 5px) {
+  & > * + * {
+    margin-left: $size;
+  }
+}
+
+@mixin vertical-rhythm {
+  & > * + *:not([class*='svg-icon--inline']) {
+    margin-top: 1em;
+  }
+}

@@ -1,4 +1,5 @@
 @use "../../mixins/focus";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .menu {
@@ -30,8 +31,7 @@
 }
 
 .menu__toggle-wrapper {
-  display: flex;
-  align-items: center;
+  @include layout.row($align: center);
   height: 100%;
 }
 .menu__toggle-icon {
