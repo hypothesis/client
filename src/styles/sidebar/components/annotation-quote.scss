@@ -8,7 +8,6 @@
   }
 
   &__quote {
-    @include var.font-normal;
     border-left: 3px solid var.$grey-3;
     color: var.$color-text-light;
     font-style: italic;

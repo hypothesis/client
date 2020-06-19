@@ -3,8 +3,6 @@
 @use "../../variables" as var;
 
 .annotation-header {
-  color: var.$color-text;
-
   &__row {
     display: flex;
     flex-wrap: wrap-reverse;

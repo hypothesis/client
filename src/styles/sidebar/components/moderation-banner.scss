@@ -5,7 +5,6 @@
   $h-padding: 15px;
 
   .moderation-banner {
-    @include var.font-normal;
     position: relative;
 
     color: white;

@@ -10,7 +10,6 @@
   }
 
   &__content {
-    @include var.font-normal;
     padding: 0.5em;
     border-top: 1px solid var.$grey-3;
     border-bottom: 1px solid var.$grey-3;

@@ -2,7 +2,6 @@
 
 .annotation-user {
   &__user-name {
-    @include var.font-normal;
     color: var.$color-text;
     font-weight: bold;
 

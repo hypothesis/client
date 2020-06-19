@@ -2,8 +2,6 @@
 @use "../../mixins/buttons";
 
 .annotation-body {
-  @include var.font-normal;
-  color: var.$color-text;
   margin: 1em 0;
 }
 
@@ -40,7 +38,6 @@
 
   .annotation-body__collapse-toggle-button {
     @include buttons.button--labeled;
-    padding: 0.5em;
     background-color: transparent;
   }
 }

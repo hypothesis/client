@@ -6,7 +6,6 @@
 
   &__group,
   &__private {
-    @include var.font-normal;
     display: flex;
     align-items: baseline;
     color: var.$color-text-light;
