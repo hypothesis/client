@@ -24,14 +24,14 @@
   // Left "channel" of thread
   &__collapse {
     margin-right: 1em;
-    border-right: 1px dashed var.$grey-3;
+    border-right: 1px dashed var.$color-border;
     // The entire channel is NOT clickable so don't make it look like it is
     // (overrides `pointer` cursor applied to entire card)
     cursor: auto;
 
     // Darken thread line on hover as a visual cue to show related thread items
     &:hover {
-      border-right: 1px dashed var.$grey-4;
+      border-color: var.$grey-4;
     }
 
     .is-collapsed & {

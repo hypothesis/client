@@ -1,20 +1,19 @@
 @use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
-
-$toolbar-border: 0.1em solid var.$grey-3;
 
 .markdown-editor__toolbar {
   @include layout.row;
-
   // Toolbar buttons wrap on non-touch devices if they don't fit. We don't use
   // scrolling because that's less convenient to use with a mouse/touchpad.
   flex-wrap: wrap;
 
-  background-color: white;
-  border: $toolbar-border;
+  @include utils.border;
   border-bottom: none;
+
+  background-color: white;
   border-radius: 0.15em 0.15em 0 0;
   width: 100%;
   margin-bottom: -0.1em;
@@ -46,7 +45,7 @@ $toolbar-border: 0.1em solid var.$grey-3;
 }
 
 .markdown-editor__preview {
-  border: $toolbar-border;
+  @include utils.border;
   background-color: var.$grey-1;
   padding: 10px;
 }

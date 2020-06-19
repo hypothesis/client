@@ -1,5 +1,6 @@
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .help-panel {
@@ -11,9 +12,9 @@
   }
 
   &__content {
+    @include utils.border-top;
+    @include utils.border-bottom;
     padding: 0.5em;
-    border-top: 1px solid var.$grey-3;
-    border-bottom: 1px solid var.$grey-3;
 
     a {
       text-decoration: underline;
@@ -50,9 +51,9 @@
 
     &__tab {
       @include var.font-big;
+      @include utils.border-right;
       flex: 1 1 0px;
       margin-top: 0.5em;
-      border-right: 1px solid var.$grey-3;
       text-align: center;
       color: var.$color-text-light;
 

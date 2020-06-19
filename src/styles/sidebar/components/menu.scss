@@ -1,5 +1,6 @@
 @use "../../mixins/focus";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .menu {
@@ -72,8 +73,8 @@
 // Content area of the menu.
 .menu__content {
   @include var.font-big;
+  @include utils.border;
   background-color: white;
-  border: 1px solid var.$grey-3;
   box-shadow: var.$popup-menu-shadow;
   position: absolute;
   top: calc(100% + 5px);

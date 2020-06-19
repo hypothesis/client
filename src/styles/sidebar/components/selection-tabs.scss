@@ -1,6 +1,7 @@
 @use "../../mixins/focus";
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .selection-tabs-container {
@@ -63,8 +64,8 @@
 }
 
 .selection-tabs__message {
+  @include utils.border;
   color: var.$color-text;
-  border: 1px solid var.$grey-3;
   padding: 2em;
   text-align: center;
 }

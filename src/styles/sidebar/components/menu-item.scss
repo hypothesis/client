@@ -1,6 +1,7 @@
 @use "sass:color";
 @use "../../mixins/focus";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 $menu-item-padding: 10px;
@@ -60,9 +61,9 @@ a.menu-item:hover {
   }
 
   &.is-expanded {
+    @include utils.border-bottom;
     background-color: var.$grey-1;
     color: var.$color-text;
-    border-bottom: solid 1px var.$grey-3;
     &:hover {
       background-color: var.$grey-3;
     }
@@ -141,7 +142,7 @@ a.menu-item:hover {
 
 // The container for open submenus
 .menu-item__submenu {
-  border-bottom: solid 1px var.$grey-3;
+  @include utils.border-bottom;
   &:hover {
     // Make it a bit darker on hover.
     background-color: var.$grey-3;

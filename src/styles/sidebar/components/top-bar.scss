@@ -1,12 +1,13 @@
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .top-bar {
   @include var.font-big;
+  @include utils.border-bottom;
   color: var.$grey-mid;
   background: var.$white;
-  border-bottom: solid 1px var.$grey-3;
   height: var.$top-bar-height;
   position: absolute;
   left: 0;

@@ -1,17 +1,18 @@
 @use "../../mixins/focus";
 @use "../../mixins/forms";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 // A dark grey button used for the primary action
 // in a form
 .focused-mode-header {
   @include layout.row($align: center);
+  @include utils.border;
   position: relative;
 
   background-color: var.$color-background;
   border-radius: 2px;
-  border: solid 1px var.$grey-3;
   font-weight: 300;
   margin-bottom: 0.72em;
   padding: 0.5em 1em;

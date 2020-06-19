@@ -1,0 +1,21 @@
+@use "../variables" as var;
+
+@mixin border {
+  border: var.$border-width solid var.$color-border;
+}
+
+@mixin border-top {
+  border-top: var.$border-width solid var.$color-border;
+}
+
+@mixin border-right {
+  border-right: var.$border-width solid var.$color-border;
+}
+
+@mixin border-bottom {
+  border-bottom: var.$border-width solid var.$color-border;
+}
+
+@mixin border-left {
+  border-left: 1px var.$border-width var.$color-border;
+}
