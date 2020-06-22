@@ -36,8 +36,7 @@
   height: 100%;
 }
 .menu__toggle-icon {
-  width: 10px;
-  height: 10px;
+  @include utils.icon--xsmall;
 }
 
 // Triangular indicator next to the toggle button indicating that there is

@@ -22,8 +22,7 @@
   }
 
   &__icon {
-    width: 12px;
-    height: 12px;
+    @include utils.icon--xsmall;
   }
 
   &__footer {
@@ -67,8 +66,7 @@
     }
 
     &__icon {
-      width: 12px;
-      height: 12px;
+      @include utils.icon--xsmall;
     }
   }
 }

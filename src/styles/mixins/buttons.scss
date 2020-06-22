@@ -43,8 +43,7 @@
 
   // Icon
   svg {
-    width: 16px;
-    height: 16px;
+    @include utils.icon--medium;
   }
 
   &:hover {

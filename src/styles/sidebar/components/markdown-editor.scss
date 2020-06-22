@@ -39,8 +39,7 @@
   }
 
   &-icon {
-    width: 10px;
-    height: 10px;
+    @include utils.icon--xsmall;
   }
 }
 
@@ -87,8 +86,7 @@
     min-height: var.$touch-target-size;
 
     &-icon {
-      width: 12px;
-      height: 12px;
+      @include utils.icon--small;
     }
   }
 }

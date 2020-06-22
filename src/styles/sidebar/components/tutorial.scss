@@ -1,4 +1,5 @@
 @use "../../variables" as var;
+@use "../../mixins/utils";
 
 .tutorial {
   &__list {
@@ -11,8 +12,7 @@
   }
 
   &__icon {
-    width: 12px;
-    height: 12px;
+    @include utils.icon--inline;
     margin-right: 1px;
     margin-bottom: -1px; // Pull the icon a little toward the baseline
     color: var.$grey-5;

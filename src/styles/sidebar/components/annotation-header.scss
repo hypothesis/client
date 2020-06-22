@@ -1,6 +1,7 @@
 @use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .annotation-header {
@@ -12,8 +13,7 @@
   }
 
   &__icon {
-    width: 10px;
-    height: 10px;
+    @include utils.icon--xsmall;
     color: var.$color-text;
   }
 
@@ -44,10 +44,7 @@
   }
 
   &__highlight-icon {
-    color: var.$grey-5;
-    width: 12px;
-    height: 12px;
-    /* bring down the baseline a little */
-    margin-bottom: -1px;
+    @include utils.icon--xsmall;
+    color: var.$color-text;
   }
 }
