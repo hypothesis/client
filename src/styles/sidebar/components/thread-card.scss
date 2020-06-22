@@ -1,25 +1,9 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
+@use "../../mixins/molecules";
+@use "../../mixins/utils";
 
 .thread-card {
-  padding: 1em;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+  @include molecules.card;
   cursor: pointer;
-  background-color: var.$white;
-
-  &.is-focused {
-    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
-  }
-
-  &--theme-clean {
-    // Give a little more space so that the border appears centered
-    // between cards
-    padding-bottom: 1.5em;
-    border-bottom: 1px solid var.$grey-2;
-    box-shadow: none;
-
-    &:hover {
-      box-shadow: none;
-    }
-  }
 }

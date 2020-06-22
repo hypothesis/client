@@ -1,4 +1,4 @@
-@use "../../mixins/panel";
+@use "../../mixins/molecules";
 @use "../../mixins/layout";
 @use "../mixins/responsive";
 @use "../../variables" as var;
@@ -36,12 +36,10 @@
 }
 
 .toast-message {
-  @include panel.panel;
-  @include layout.row;
+  @include molecules.card-frame;
+  @include layout.row($align: center);
   position: relative;
   width: 100%;
-  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
-  border-radius: 2px;
   margin-bottom: 0.75em;
 
   &--success {

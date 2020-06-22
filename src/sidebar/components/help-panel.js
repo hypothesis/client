@@ -99,51 +99,53 @@ function HelpPanel({ auth, session }) {
       panelName={uiConstants.PANEL_HELP}
       onActiveChanged={onActiveChanged}
     >
-      <div className="u-layout-row">
-        <h3 className="help-panel__sub-panel-title">
-          {subPanelTitles[activeSubPanel]}
-        </h3>
-        <div className="help-panel__footer">
+      <div className="help-panel__content">
+        <div className="help-panel__subtitle">
+          <h3 className="help-panel__sub-panel-title">
+            {subPanelTitles[activeSubPanel]}
+          </h3>
+          <div className="help-panel__navigation">
+            {activeSubPanel === 'versionInfo' && (
+              <button
+                className="help-panel__sub-panel-link"
+                onClick={e => openSubPanel(e, 'tutorial')}
+                aria-label="Show tutorial panel"
+              >
+                Getting started
+                <SvgIcon
+                  name="arrow-right"
+                  className="help-panel__sub-panel-link-icon"
+                />
+              </button>
+            )}
+            {activeSubPanel === 'tutorial' && (
+              <button
+                className="help-panel__sub-panel-link"
+                onClick={e => openSubPanel(e, 'versionInfo')}
+                aria-label="Show version information panel"
+              >
+                About this version
+                <SvgIcon
+                  name="arrow-right"
+                  className="help-panel__sub-panel-link-icon"
+                />
+              </button>
+            )}
+          </div>
+        </div>
+        <div className="help-panel__subcontent">
+          {activeSubPanel === 'tutorial' && <Tutorial />}
           {activeSubPanel === 'versionInfo' && (
-            <button
-              className="help-panel__sub-panel-link"
-              onClick={e => openSubPanel(e, 'tutorial')}
-              aria-label="Show tutorial panel"
-            >
-              Getting started
-              <SvgIcon
-                name="arrow-right"
-                className="help-panel__sub-panel-link-icon"
-              />
-            </button>
-          )}
-          {activeSubPanel === 'tutorial' && (
-            <button
-              className="help-panel__sub-panel-link"
-              onClick={e => openSubPanel(e, 'versionInfo')}
-              aria-label="Show version information panel"
-            >
-              About this version
-              <SvgIcon
-                name="arrow-right"
-                className="help-panel__sub-panel-link-icon"
-              />
-            </button>
+            <VersionInfo versionData={versionData} />
           )}
         </div>
-      </div>
-      <div className="help-panel__content">
-        {activeSubPanel === 'tutorial' && <Tutorial />}
-        {activeSubPanel === 'versionInfo' && (
-          <VersionInfo versionData={versionData} />
-        )}
-      </div>
-      <div className="help-panel-tabs">
-        <HelpPanelTab
-          linkText="Help topics"
-          url="https://web.hypothes.is/help/"
-        />
-        <HelpPanelTab linkText="New support ticket" url={supportTicketURL} />
+        <div className="help-panel-tabs">
+          <HelpPanelTab
+            linkText="Help topics"
+            url="https://web.hypothes.is/help/"
+          />
+          <HelpPanelTab linkText="New support ticket" url={supportTicketURL} />
+        </div>
       </div>
     </SidebarPanel>
   );

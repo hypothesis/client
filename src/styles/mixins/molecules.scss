@@ -1,4 +1,5 @@
 @use "../variables" as var;
+@use "./buttons";
 @use "./layout";
 @use "./utils";
 
@@ -88,5 +89,82 @@
       white 15px,
       white 20px
     );
+  }
+}
+
+/**
+ * Base styles for a "panel"-like element, with appropriate
+ * padding, heading and close-button styles.
+ */
+@mixin panel {
+  @include card;
+
+  &__header {
+    @include layout.row($align: center);
+    @include utils.border-bottom;
+    padding-bottom: 1em;
+  }
+
+  &__header-icon {
+    margin-right: 0.5em;
+  }
+
+  &__title {
+    @include var.font-big;
+    color: var.$color-brand;
+    font-weight: 700;
+  }
+
+  &__button {
+    @include buttons.button--labeled;
+  }
+
+  &__button--primary {
+    @include buttons.button--primary;
+  }
+
+  &__actions {
+    @include layout.row(right);
+    @include layout.horizontal-rhythm(10px);
+  }
+}
+
+/**
+ * `panel` with tighter margins and padding, for use in more confined spaces
+ */
+@mixin panel--compact {
+  @include panel;
+  padding: 0.75em;
+
+  &__header {
+    padding: 0;
+    border-bottom: none;
+  }
+}
+
+/**
+ * Styled external-linked "tabs" with icons, intended for use in a panel
+ */
+@mixin panel-tabs {
+  @include layout.row($align: center);
+
+  &__tab {
+    @include utils.font-large;
+    @include utils.border-right;
+    flex: 1 1;
+    text-align: center;
+    color: var.$color-text-light;
+
+    &:last-of-type {
+      border-right: none;
+    }
+  }
+
+  &__link {
+    color: var.$color-text-light;
+  }
+
+  &__icon {
+    @include utils.icon--xsmall;
   }
 }

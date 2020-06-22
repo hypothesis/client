@@ -1,6 +1,6 @@
 @use '../../mixins/buttons';
 @use '../../mixins/layout';
-@use '../../mixins/panel';
+@use '../../mixins/molecules';
 @use "../../mixins/utils";
 @use "../../variables" as var;
 
@@ -9,7 +9,7 @@
 }
 
 .annotation-share-panel {
-  @include panel.panel--compact;
+  @include molecules.panel--compact;
   position: absolute;
   right: 5px;
   bottom: 32px;
@@ -38,12 +38,14 @@
   }
 
   &__arrow {
+    margin: 0;
     color: var.$grey-3;
     fill: white;
     transform: rotateX(180deg);
     position: absolute;
     z-index: 100;
     right: 0px;
+    bottom: -8px;
   }
 
   .share-links__icon {
