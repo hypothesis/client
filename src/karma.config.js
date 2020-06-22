@@ -95,6 +95,9 @@ module.exports = function (config) {
 
         // Disable watching because karma-browserify handles this.
         watched: false,
+
+        // Configure `type` explicitly to avoid warning about .coffee files.
+        type: 'js',
       })),
 
       // CSS bundles, relied upon by accessibility tests (eg. for color-contrast
