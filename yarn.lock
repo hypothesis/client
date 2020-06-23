@@ -3642,9 +3642,9 @@ fd-slicer@~1.1.0:
     pend "~1.2.0"
 
 fetch-mock@9:
-  version "9.10.1"
-  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.10.1.tgz#1f0a7a3795490956bf4cfd5fa6ff912bc4dc71d3"
-  integrity sha512-pTSLpg/Z9LvoqTRu8S9Aeyu4wsyNHLcqON6F5iw1nLHkSOZ+snKgkijwtOVtVsgNzyiZCq9NHRwGxPRpLwth7A==
+  version "9.10.2"
+  resolved "https://registry.yarnpkg.com/fetch-mock/-/fetch-mock-9.10.2.tgz#68f33d0c598cd5ef1e41bddcacde63eb9ec5cf1f"
+  integrity sha512-5buRoztM1wVluB7RTtesMWxbIWd3m9j82Y38U01iFJLbaG9DmPeIsWYZZAow8G+F264IKsbAlsO8Z88RH7lLsg==
   dependencies:
     babel-runtime "^6.26.0"
     core-js "^3.0.0"
