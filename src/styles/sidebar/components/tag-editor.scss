@@ -27,7 +27,7 @@
     @include utils.border;
     color: var.$color-text;
     background: var.$grey-1;
-    border-radius: 2px 0 0 2px;
+    border-radius: var.$border-radius 0 0 var.$border-radius;
     border-right-width: 0;
     padding: 2px 0.5em;
   }
@@ -38,7 +38,7 @@
     color: var.$grey-mid;
     background-color: var.$grey-1;
     padding: 0 0.5em;
-    border-radius: 0 2px 2px 0;
+    border-radius: 0 var.$border-radius var.$border-radius 0;
 
     &:hover {
       background-color: var.$grey-2;

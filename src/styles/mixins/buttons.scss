@@ -38,7 +38,7 @@
   @include reset-native-btn-styles;
   @include layout.row(center, center);
   padding: 0.5em;
-  border-radius: 2px;
+  border-radius: var.$border-radius;
   border: none;
 
   // Icon

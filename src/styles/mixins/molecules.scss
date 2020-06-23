@@ -11,7 +11,7 @@
 @mixin card-frame {
   @include utils.border;
   @include utils.shadow;
-  border-radius: 2px;
+  border-radius: var.$border-radius;
   background-color: var.$color-background;
 }
 
