@@ -1,6 +1,7 @@
 @use "../../variables" as var;
 @use "../../mixins/buttons";
 @use "../../mixins/links";
+@use "../../mixins/utils";
 
 .share-annotations-panel {
   color: var.$color-text-light;
@@ -31,8 +32,7 @@
     @include links.footer-links;
 
     &__icon {
-      width: 24px;
-      height: 24px;
+      @include utils.icon--large;
     }
   }
 }

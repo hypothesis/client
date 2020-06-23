@@ -1,7 +1,8 @@
 @use "../../variables" as var;
+@use "../../mixins/utils";
 
 .menu-section__content {
-  border-bottom: solid 1px var.$grey-3;
+  @include utils.border-bottom;
 }
 
 .menu-section__heading {

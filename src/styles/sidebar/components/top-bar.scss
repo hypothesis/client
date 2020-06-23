@@ -1,12 +1,13 @@
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .top-bar {
   @include var.font-big;
+  @include utils.border-bottom;
   color: var.$grey-mid;
   background: var.$white;
-  border-bottom: solid 1px var.$grey-3;
   height: var.$top-bar-height;
   position: absolute;
   left: 0;
@@ -83,6 +84,11 @@
 .top-bar__inner {
   @include layout.sidebar-content;
   @include layout.row(right, center);
+
+  // FIXME: This odd font size rule is because the spinner uses a `1em` dimension
+  // and we want to assure it displays at the same dimensions as the other icons
+  // in this top bar
+  font-size: var.$icon-size--medium;
 
   // the edges of the top-bar's contents should be aligned
   // with the edges of annotation cards displayed below

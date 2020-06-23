@@ -1,9 +1,10 @@
 @use "../../variables" as var;
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 
 .annotation-license {
   @include var.font-small;
-  border-top: 1px solid var.$grey-3;
+  @include utils.border-top;
   padding-top: 0.5em;
 
   &__link {
@@ -12,8 +13,8 @@
   }
 
   &__icon {
-    width: 12px;
-    height: 12px;
+    @include utils.icon--xsmall;
+    // Need a tiny space between license icons
     margin-right: 1px;
   }
 

@@ -19,6 +19,7 @@
  */
 @use "./focus";
 @use "./layout";
+@use "./utils";
 @use "../variables" as var;
 
 @mixin reset-native-btn-styles {
@@ -42,8 +43,7 @@
 
   // Icon
   svg {
-    width: 16px;
-    height: 16px;
+    @include utils.icon--medium;
   }
 
   &:hover {
@@ -108,12 +108,12 @@
  */
 @mixin button--input {
   @include button;
+  @include utils.border;
   color: var.$grey-mid;
   padding: 0.5em 0.75em;
   background-color: var.$grey-1;
 
   border-radius: 0; // Turn off border-radius to align with <input> edges
-  border: 1px solid var.$grey-3;
   border-left: 0; // Avoid double border with the <input>
 
   &:hover {

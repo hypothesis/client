@@ -1,5 +1,6 @@
 @use "../../variables" as var;
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 
 .annotation-share-info {
   @include layout.row($align: baseline);
@@ -11,9 +12,8 @@
   }
 
   &__icon {
+    @include utils.icon--xsmall;
     // This margin is currently needed because the icon is within an `a` element
     margin-right: 5px;
-    width: 10px;
-    height: 10px;
   }
 }

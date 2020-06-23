@@ -2,6 +2,7 @@
 @use '../../mixins/layout';
 @use '../../mixins/links';
 @use '../../mixins/panel';
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .annotation-share-control {
@@ -47,7 +48,6 @@
   }
 
   .share-links__icon {
-    width: 18px;
-    height: 18px;
+    @include utils.icon--medium;
   }
 }

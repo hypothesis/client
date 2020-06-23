@@ -1,13 +1,14 @@
 @use "../variables" as var;
 @use "./layout";
+@use "./utils";
 
 /**
  * horizontally-oriented collection of linked icons
  */
 @mixin footer-links {
   @include layout.row(center);
+  @include utils.border-top;
   padding-top: 8px;
-  border-top: 1px solid var.$grey-3;
 
   &__icon {
     @include layout.row;

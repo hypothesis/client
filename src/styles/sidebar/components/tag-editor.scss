@@ -1,6 +1,7 @@
 @use "../../mixins/forms";
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .tag-editor {
@@ -23,9 +24,9 @@
   }
 
   &__edit {
+    @include utils.border;
     color: var.$color-text;
     background: var.$grey-1;
-    border: 1px solid var.$grey-3;
     border-radius: 2px 0 0 2px;
     border-right-width: 0;
     padding: 2px 0.5em;
@@ -33,10 +34,10 @@
 
   &__delete {
     @include buttons.button;
+    @include utils.border;
     color: var.$grey-mid;
     background-color: var.$grey-1;
     padding: 0 0.5em;
-    border: 1px solid var.$grey-3;
     border-radius: 0 2px 2px 0;
 
     &:hover {

@@ -1,22 +1,22 @@
 @use "../variables" as var;
 @use "./buttons";
 @use "./layout";
+@use "./utils";
 
 /**
  * Base styles for a "panel"-like element, with appropriate
  * padding, heading and close-button styles.
  */
 @mixin panel {
+  @include utils.border;
   background-color: var.$color-background;
-  border: solid 1px var.$grey-3;
   border-radius: 2px;
 
   &__header {
     @include layout.row($align: center);
+    @include utils.border-bottom;
     padding: 1em 0;
     margin: 0 1em;
-    border: 1px none var.$grey-3;
-    border-bottom-style: solid;
   }
 
   &__header-icon {
