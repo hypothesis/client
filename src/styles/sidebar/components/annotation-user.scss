@@ -4,13 +4,5 @@
   &__user-name {
     color: var.$color-text;
     font-weight: bold;
-
-    .is-dimmed & {
-      color: var.$color-text-light;
-    }
-
-    .is-highlighted & {
-      color: var.$color-text;
-    }
   }
 }
