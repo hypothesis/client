@@ -1,3 +1,5 @@
+@use "../../variables" as var;
+
 .thread-list__card {
-  margin-bottom: 1em;
+  margin-bottom: var.$layout-margin;
 }

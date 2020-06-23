@@ -34,8 +34,8 @@
 
     &-cancel {
       @include buttons.button--labeled;
-      padding-right: 0.5em;
-      padding-left: 0.5em;
+      padding-right: var.$layout-margin--small;
+      padding-left: var.$layout-margin--small;
 
       &__icon {
         margin: 0;

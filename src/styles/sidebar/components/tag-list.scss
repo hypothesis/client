@@ -9,8 +9,9 @@
 
   &__item {
     @include utils.border;
-    margin: 0.25em 0.5em 0.25em 0;
-    padding: 2px 0.5em;
+    margin: var.$layout-margin--xsmall var.$layout-margin--small
+      var.$layout-margin--xsmall 0;
+    padding: 2px var.$layout-margin--small;
     background: var.$grey-0;
     border-radius: var.$border-radius;
   }

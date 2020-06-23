@@ -23,7 +23,7 @@
 @mixin card {
   @include card-frame;
   @include layout.vertical-rhythm;
-  padding: 1em;
+  padding: var.$layout-margin;
 
   &:hover,
   &.is-focused {
@@ -102,11 +102,11 @@
   &__header {
     @include layout.row($align: center);
     @include utils.border-bottom;
-    padding-bottom: 1em;
+    padding-bottom: var.$layout-margin;
   }
 
   &__header-icon {
-    margin-right: 0.5em;
+    margin-right: var.$layout-margin--small;
   }
 
   &__title {

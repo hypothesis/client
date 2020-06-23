@@ -7,7 +7,7 @@
   }
 
   &__item {
-    margin: 0.5em 0;
+    margin: var.$layout-margin--small 0;
   }
 
   &__icon {

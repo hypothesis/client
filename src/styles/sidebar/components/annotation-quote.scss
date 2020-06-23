@@ -9,7 +9,7 @@
     border-left: 3px solid var.$color-border;
     color: var.$color-text-light;
     font-style: italic;
-    padding: 0 1em;
+    padding: 0 var.$layout-margin;
 
     // Prevent long URLs etc. in quote causing overflow
     overflow-wrap: break-word;

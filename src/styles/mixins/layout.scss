@@ -1,4 +1,5 @@
 @use "./responsive";
+@use "../variables" as var;
 
 @mixin sidebar-content {
   margin-left: auto;
@@ -74,6 +75,6 @@
  */
 @mixin vertical-rhythm {
   & > * + *:not([class*='svg-icon--inline']) {
-    margin-top: 1em;
+    margin-top: var.$layout-margin;
   }
 }

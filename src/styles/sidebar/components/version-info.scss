@@ -2,13 +2,13 @@
 @use "../../mixins/layout";
 
 .version-info {
-  margin-top: 0.5em;
+  margin-top: var.$layout-margin--small;
 
   &__key {
     float: left;
     width: 8em;
-    margin-bottom: 0.5em;
-    padding-right: 1em;
+    margin-bottom: var.$layout-margin--small;
+    padding-right: var.$layout-margin;
     line-height: 1.25em;
     text-align: right;
     font-weight: 500;
@@ -16,7 +16,7 @@
   }
 
   &__value {
-    margin-bottom: 0.5em;
+    margin-bottom: var.$layout-margin--small;
     margin-left: 8em;
     overflow-wrap: break-word; // Keep really long userids from overflowing
     color: var.$color-text-light;
@@ -24,6 +24,6 @@
 
   &__actions {
     @include layout.row(center);
-    padding-bottom: 0.5em;
+    padding-bottom: var.$layout-margin--small;
   }
 }
