@@ -49,7 +49,7 @@
 }
 
 .selection-tabs__count {
-  @include var.font-tiny;
+  @include utils.font--xsmall;
   position: relative;
   bottom: 3px;
 }

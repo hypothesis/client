@@ -28,7 +28,7 @@
   }
 
   &__timestamp-edited {
-    @include var.font-small;
+    @include utils.font--small;
     font-style: italic;
     color: var.$color-text-light;
   }

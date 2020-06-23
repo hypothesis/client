@@ -32,7 +32,7 @@
 }
 
 @mixin form-input {
-  @include var.font-normal;
+  @include utils.font--medium;
   @include utils.border;
   border-radius: 2px;
   padding: 0.5em 0.75em;
@@ -51,7 +51,7 @@
 
 @mixin primary-action-btn {
   @include focus.outline-on-keyboard-focus;
-  @include var.font-normal;
+  @include utils.font--medium;
   color: var.$grey-1;
   background-color: var.$grey-mid;
   height: 35px;

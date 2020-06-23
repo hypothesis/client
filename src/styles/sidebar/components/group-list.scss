@@ -6,7 +6,7 @@
 }
 
 .group-list__menu-label {
-  @include var.font-big;
+  @include utils.font--large;
   align-items: center;
   color: var.$color-text;
   display: flex;
