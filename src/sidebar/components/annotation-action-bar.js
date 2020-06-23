@@ -76,7 +76,7 @@ function AnnotationActionBar({
   };
 
   return (
-    <div className="annotation-action-bar">
+    <div className="annotation-action-bar u-layout-row">
       {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
       {showDeleteAction && (
         <Button icon="trash" title="Delete" onClick={onDelete} />
