@@ -18,6 +18,7 @@
  * And pass 'my-component-button' as the `className` prop to `Button`.
  */
 @use "./focus";
+@use "./layout";
 @use "../variables" as var;
 
 @mixin reset-native-btn-styles {
@@ -34,11 +35,8 @@
  */
 @mixin button {
   @include reset-native-btn-styles;
+  @include layout.row(center, center);
   padding: 0.5em;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border-radius: 2px;
   border: none;
 

@@ -1,14 +1,8 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 
 .annotation-document-info {
+  @include layout.row;
+  @include layout.horizontal-rhythm;
   color: var.$color-text-light;
-  display: flex;
-
-  &__title {
-    margin-right: 5px;
-  }
-
-  &__domain {
-    margin-right: 5px;
-  }
 }

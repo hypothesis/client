@@ -1,5 +1,6 @@
 @use "../../mixins/forms";
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .tag-editor {
@@ -11,13 +12,13 @@
   }
 
   &__tags {
-    display: flex;
+    @include layout.row;
     flex-wrap: wrap;
     margin: 0.5em 0;
   }
 
   &__item {
-    display: flex;
+    @include layout.row;
     margin: 0.25em 0.5em 0.25em 0;
   }
 

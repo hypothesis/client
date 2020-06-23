@@ -1,13 +1,13 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 
 .annotation-license {
   @include var.font-small;
   border-top: 1px solid var.$grey-3;
   padding-top: 0.5em;
-  margin: 1em 0;
 
   &__link {
-    display: flex;
+    @include layout.row;
     color: var.$color-text-light;
   }
 

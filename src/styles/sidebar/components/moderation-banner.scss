@@ -1,15 +1,14 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 
 @at-root {
   // Horizontal margin between edge of annotation card and content
   $h-padding: 15px;
 
   .moderation-banner {
+    @include layout.row;
     position: relative;
-
     color: white;
-    display: flex;
-    flex-direction: row;
     font-weight: bold;
   }
 

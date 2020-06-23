@@ -1,9 +1,6 @@
 @use '../../variables' as var;
 @use "../../mixins/buttons";
-
-.annotation-body {
-  margin: 1em 0;
-}
+@use "../../mixins/layout";
 
 .annotation-body__text {
   // Hidden annotations displayed to moderators, where the content is still
@@ -32,9 +29,8 @@
 }
 
 .annotation-body__collapse-toggle {
+  @include layout.row(right);
   margin: 0.5em 0;
-  display: flex;
-  justify-content: flex-end;
 
   .annotation-body__collapse-toggle-button {
     @include buttons.button--labeled;

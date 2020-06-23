@@ -1,8 +1,6 @@
 @use '../../variables' as var;
 
 .annotation-quote {
-  margin: 1em 0;
-
   &.is-orphan {
     text-decoration: line-through;
   }

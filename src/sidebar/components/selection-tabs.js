@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { createElement } from 'preact';
-import { Fragment } from 'preact';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
@@ -30,26 +29,28 @@ function Tab({
   const title = count > 0 ? `${label} (${count} available)` : label;
 
   return (
-    <button
-      className={classnames('selection-tabs__type', {
-        'is-selected': isSelected,
-      })}
-      // Listen for `onMouseDown` so that the tab is selected when _pressed_
-      // as this makes the UI feel faster. Also listen for `onClick` as a fallback
-      // to enable selecting the tab via other input methods.
-      onClick={selectTab}
-      onMouseDown={selectTab}
-      role="tab"
-      tabIndex="0"
-      title={title}
-      aria-label={title}
-      aria-selected={isSelected.toString()}
-    >
-      {children}
-      {count > 0 && !isWaitingToAnchor && (
-        <span className="selection-tabs__count"> {count}</span>
-      )}
-    </button>
+    <div>
+      <button
+        className={classnames('selection-tabs__type', {
+          'is-selected': isSelected,
+        })}
+        // Listen for `onMouseDown` so that the tab is selected when _pressed_
+        // as this makes the UI feel faster. Also listen for `onClick` as a fallback
+        // to enable selecting the tab via other input methods.
+        onClick={selectTab}
+        onMouseDown={selectTab}
+        role="tab"
+        tabIndex="0"
+        title={title}
+        aria-label={title}
+        aria-selected={isSelected.toString()}
+      >
+        {children}
+        {count > 0 && !isWaitingToAnchor && (
+          <span className="selection-tabs__count"> {count}</span>
+        )}
+      </button>
+    </div>
   );
 }
 
@@ -114,7 +115,7 @@ function SelectionTabs({ isLoading, settings }) {
     selectedTab === uiConstants.TAB_NOTES && noteCount === 0;
 
   return (
-    <Fragment>
+    <div className="selection-tabs-container">
       <div
         className={classnames('selection-tabs', {
           'selection-tabs--theme-clean': isThemeClean,
@@ -153,29 +154,25 @@ function SelectionTabs({ isLoading, settings }) {
       </div>
       {selectedTab === uiConstants.TAB_NOTES &&
         settings.enableExperimentalNewNoteButton && <NewNoteBtn />}
-      {!isLoading && (
-        <div>
-          {showNotesUnavailableMessage && (
-            <div className="selection-tabs__message">
-              There are no page notes in this group.
-            </div>
-          )}
-          {showAnnotationsUnavailableMessage && (
-            <div className="selection-tabs__message">
-              There are no annotations in this group.
-              <br />
-              Create one by selecting some text and clicking the{' '}
-              <SvgIcon
-                name="annotate"
-                inline={true}
-                className="selection-tabs__icon"
-              />{' '}
-              button.
-            </div>
-          )}
+      {!isLoading && showNotesUnavailableMessage && (
+        <div className="selection-tabs__message">
+          There are no page notes in this group.
         </div>
       )}
-    </Fragment>
+      {!isLoading && showAnnotationsUnavailableMessage && (
+        <div className="selection-tabs__message">
+          There are no annotations in this group.
+          <br />
+          Create one by selecting some text and clicking the{' '}
+          <SvgIcon
+            name="annotate"
+            inline={true}
+            className="selection-tabs__icon"
+          />{' '}
+          button.
+        </div>
+      )}
+    </div>
   );
 }
 SelectionTabs.propTypes = {

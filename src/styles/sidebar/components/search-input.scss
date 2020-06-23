@@ -1,10 +1,9 @@
 @use "../../mixins/forms";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .search-input__form {
-  display: flex;
-  flex-flow: row nowrap;
-
+  @include layout.row;
   position: relative;
   color: var.$color-text;
 }

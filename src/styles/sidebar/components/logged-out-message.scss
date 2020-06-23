@@ -1,13 +1,13 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 .logged-out-message {
+  @include layout.column;
   margin: 25px auto;
   width: 70%;
   text-align: center;
   color: var.$color-text;
-  display: flex;
-  flex-direction: column;
 }
 
 .logged-out-message__link {
@@ -19,9 +19,8 @@
 }
 
 .logged-out-message__logo {
+  @include layout.row(center);
   margin-top: 25px;
-  display: flex;
-  justify-content: center;
 }
 
 .logged-out-message__logo-icon {

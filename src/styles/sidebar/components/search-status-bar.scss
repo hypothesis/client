@@ -1,8 +1,8 @@
 @use '../../mixins/buttons';
+@use '../../mixins/layout';
 
 .search-status-bar {
-  display: flex;
-  align-items: center;
+  @include layout.row($align: center);
   margin-bottom: 10px;
 }
 

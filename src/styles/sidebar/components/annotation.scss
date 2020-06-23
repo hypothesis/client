@@ -1,4 +1,5 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../variables" as var;
 
 // FIXME These hover-related rules should live elsewhere
@@ -21,6 +22,8 @@
 }
 
 .annotation {
+  @include layout.vertical-rhythm;
+
   &.is-highlighted {
     // Slightly darken the bodies of highlighted annotations to
     // make them stand out next to others, which will have the `is-dimmed` state
@@ -43,7 +46,7 @@
   }
 
   &__controls {
-    display: flex;
+    @include layout.row;
   }
 
   &__actions {
@@ -51,14 +54,7 @@
   }
 
   &__form-actions {
-    display: flex;
-    flex-direction: row;
-    margin-bottom: 10px;
-  }
-
-  &__footer {
-    color: var.$color-text-light;
-    margin-top: 1em;
+    @include layout.row;
   }
 }
 

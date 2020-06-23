@@ -76,21 +76,17 @@
 }
 
 .top-bar__login-links {
-  display: flex;
+  @include layout.row;
   flex-shrink: 0;
 }
 
 .top-bar__inner {
   @include layout.sidebar-content;
+  @include layout.row(right, center);
 
   // the edges of the top-bar's contents should be aligned
   // with the edges of annotation cards displayed below
   $h-padding: 9px;
-
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
-  justify-content: flex-end;
 
   padding-left: $h-padding;
   padding-right: $h-padding;
