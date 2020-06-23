@@ -1,5 +1,5 @@
 @use "../mixins/reset";
-@use "../mixins/shadow";
+@use "../mixins/utils";
 @use "../variables" as var;
 
 // Bucket-bar styles are nested inside `.annotator-frame` to ensure they take
@@ -69,7 +69,7 @@
 
     &.lower,
     &.upper {
-      @include shadow.smallshadow;
+      @include utils.shadow;
       z-index: 1;
 
       &:before,

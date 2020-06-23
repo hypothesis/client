@@ -10,8 +10,8 @@
  */
 @mixin card-frame {
   @include utils.border;
+  @include utils.shadow;
   border-radius: 2px;
-  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
   background-color: var.$color-background;
 }
 
@@ -27,7 +27,7 @@
 
   &:hover,
   &.is-focused {
-    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
+    @include utils.active-shadow;
   }
 
   &--theme-clean {
