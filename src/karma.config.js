@@ -8,6 +8,9 @@ const glob = require('glob');
 
 let chromeFlags = [];
 
+// Output only summary and errors in development to make output easier to parse.
+let mochaOutputMode = 'minimal';
+
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 // On Travis and in Docker, the tests run as root, so the sandbox must be
@@ -34,6 +37,10 @@ if (process.env.TRAVIS || process.env.RUNNING_IN_DOCKER) {
   chromeFlags.push('--trace-startup');
   chromeFlags.push('--trace-startup-duration=7');
   chromeFlags.push(`--trace-startup-file=${traceFile}`);
+
+  // Log test details as they are executed so we can tell where test execution
+  // got to if a failure happens.
+  mochaOutputMode = 'full';
 }
 
 if (process.env.RUNNING_IN_DOCKER) {
@@ -146,9 +153,7 @@ module.exports = function (config) {
       // See https://www.npmjs.com/package/karma-mocha-reporter#showdiff
       showDiff: true,
 
-      // Output only summary and errors in development to make output easier
-      // to parse.
-      output: 'minimal',
+      output: mochaOutputMode,
     },
 
     coverageIstanbulReporter: {
