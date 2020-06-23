@@ -70,6 +70,12 @@ $sans-font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande',
   sans-serif !default;
 $mono-font-family: Open Sans Mono, Menlo, DejaVu Sans Mono, monospace !default;
 
+$font-size--xsmall: 10px;
+$font-size--small: 11px;
+$font-size--medium: 13px;
+$font-size--large: 14px;
+$line-height: 1.4;
+
 // Transitional Typography (Temporary)
 // -----------------------------------
 
@@ -114,26 +120,3 @@ $icon-size--large: 24px;
 
 // Mixins
 // ------
-
-@mixin font-tiny {
-  font-size: 10px;
-  line-height: 14px;
-  font-weight: 400;
-}
-
-@mixin font-small {
-  font-size: 11px;
-  line-height: 15px;
-  font-weight: 400;
-}
-
-@mixin font-normal {
-  font-size: 13px;
-  line-height: 17px;
-  font-weight: 400;
-}
-
-@mixin font-big {
-  font-size: 14px;
-  line-height: 20px;
-}

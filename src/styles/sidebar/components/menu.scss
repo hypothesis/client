@@ -71,7 +71,7 @@
 
 // Content area of the menu.
 .menu__content {
-  @include var.font-big;
+  @include utils.font--large;
   @include utils.border;
   background-color: white;
   box-shadow: var.$popup-menu-shadow;

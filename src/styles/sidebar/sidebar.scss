@@ -1,4 +1,5 @@
 @use '../variables' as var;
+@use '../mixins/utils';
 
 // Base styles
 // -----------
@@ -62,7 +63,7 @@
 // ----------------
 
 body {
-  @include var.font-normal;
+  @include utils.font--medium;
   height: 100%;
 
   background-color: var.$color-background;

@@ -1,4 +1,5 @@
 @use "../variables" as var;
+@use "../mixins/utils";
 
 @mixin styled-text() {
   // Reset the line-height in case any parent elements have set it.
@@ -107,7 +108,7 @@
   }
 
   blockquote {
-    @include var.font-normal;
+    @include utils.font--medium;
 
     border-left: 3px solid var.$grey-3;
     color: var.$color-text-light;

@@ -3,7 +3,7 @@
 @use "../../mixins/utils";
 
 .annotation-license {
-  @include var.font-small;
+  @include utils.font--small;
   @include utils.border-top;
   padding-top: 0.5em;
 

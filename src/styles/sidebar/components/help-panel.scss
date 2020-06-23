@@ -13,9 +13,8 @@
   }
 
   &__sub-panel-title {
-    @include var.font-big;
+    @include utils.font--large;
     flex-grow: 1;
-    font-weight: 500;
   }
 
   &__subcontent {
@@ -49,7 +48,7 @@
     @include layout.row($align: center);
 
     &__tab {
-      @include var.font-big;
+      @include utils.font--large;
       @include utils.border-right;
       flex: 1 1;
       text-align: center;

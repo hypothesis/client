@@ -4,7 +4,7 @@
 @use "../../variables" as var;
 
 .top-bar {
-  @include var.font-big;
+  @include utils.font--large;
   @include utils.border-bottom;
   color: var.$grey-mid;
   background: var.$white;
@@ -62,7 +62,7 @@
 
 .top-bar__login-button {
   @include buttons.button;
-  @include var.font-big;
+  @include utils.font--large;
   padding: 0 0.25em;
   color: var.$color-brand;
 

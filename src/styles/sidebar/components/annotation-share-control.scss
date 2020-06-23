@@ -27,13 +27,13 @@
   }
 
   & .form-input {
-    @include var.font-small;
+    @include utils.font--small;
     padding: 0.5em;
     border-radius: 0;
   }
 
   &__permissions {
-    @include var.font-small;
+    @include utils.font--small;
     margin: 0.5em 0;
   }
 

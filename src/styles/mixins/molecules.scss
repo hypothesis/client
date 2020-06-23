@@ -110,7 +110,7 @@
   }
 
   &__title {
-    @include var.font-big;
+    @include utils.font--large;
     color: var.$color-brand;
     font-weight: 700;
   }
@@ -149,7 +149,7 @@
   @include layout.row($align: center);
 
   &__tab {
-    @include utils.font-large;
+    @include utils.font--large;
     @include utils.border-right;
     flex: 1 1;
     text-align: center;
