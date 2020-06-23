@@ -1,17 +1,10 @@
 @use "../../mixins/buttons";
 @use "../../mixins/layout";
+@use "../../mixins/molecules";
 @use "../../mixins/utils";
 @use "../../variables" as var;
 
 .help-panel {
-  &__content {
-    @include layout.vertical_rhythm;
-  }
-
-  &__subtitle {
-    @include layout.row($justify: right, $align: center);
-  }
-
   &__sub-panel-title {
     @include utils.font--large;
     flex-grow: 1;
@@ -20,7 +13,6 @@
   &__subcontent {
     @include utils.border-top;
     @include utils.border-bottom;
-    padding: 0.5em 0;
 
     a {
       text-decoration: underline;
@@ -31,40 +23,11 @@
     @include utils.icon--xsmall;
   }
 
-  &__sub-panel-link {
-    @include buttons.reset-native-btn-styles;
-    @include layout.row($align: center);
-    margin-left: auto;
-    color: var.$color-brand;
-
-    &-icon {
-      margin-left: 2px;
-      width: 12px;
-      height: 12px;
-    }
+  &__sub-panel-navigation-button {
+    @include buttons.button--navigation;
   }
 
   &-tabs {
-    @include layout.row($align: center);
-
-    &__tab {
-      @include utils.font--large;
-      @include utils.border-right;
-      flex: 1 1;
-      text-align: center;
-      color: var.$color-text-light;
-
-      &:last-of-type {
-        border-right: none;
-      }
-    }
-
-    &__link {
-      color: var.$color-text-light;
-    }
-
-    &__icon {
-      @include utils.icon--xsmall;
-    }
+    @include molecules.panel-tabs;
   }
 }
