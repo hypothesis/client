@@ -1,7 +1,7 @@
-@use "../../mixins/panel";
+@use "../../mixins/molecules";
 
 .sidebar-panel {
-  @include panel.panel;
+  @include molecules.panel;
   position: relative;
   margin-bottom: 0.75em;
 }

@@ -1,8 +1,8 @@
-@use "../../mixins/panel";
+@use "../../mixins/molecules";
 @use "../../variables" as var;
 
 .sidebar-content-error {
-  @include panel.panel;
+  @include molecules.panel;
   position: relative;
   margin-bottom: 0.75em;
 }

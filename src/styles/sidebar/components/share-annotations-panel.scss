@@ -1,7 +1,7 @@
 @use "../../variables" as var;
 @use "../../mixins/buttons";
-@use "../../mixins/links";
 @use "../../mixins/utils";
+@use "../../mixins/molecules";
 
 .share-annotations-panel {
   color: var.$color-text-light;
@@ -29,7 +29,7 @@
   }
 
   .share-annotations-panel-links {
-    @include links.footer-links;
+    @include molecules.footer-links;
 
     &__icon {
       @include utils.icon--large;

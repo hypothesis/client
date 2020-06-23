@@ -4,17 +4,24 @@
 @use "../../variables" as var;
 
 .help-panel {
+  &__content {
+    @include layout.vertical_rhythm;
+  }
+
+  &__subtitle {
+    @include layout.row($justify: right, $align: center);
+  }
+
   &__sub-panel-title {
     @include var.font-big;
-    margin: 0;
-    padding: 0.5em 0;
+    flex-grow: 1;
     font-weight: 500;
   }
 
-  &__content {
+  &__subcontent {
     @include utils.border-top;
     @include utils.border-bottom;
-    padding: 0.5em;
+    padding: 0.5em 0;
 
     a {
       text-decoration: underline;
@@ -23,13 +30,6 @@
 
   &__icon {
     @include utils.icon--xsmall;
-  }
-
-  &__footer {
-    padding: 0.5em 0;
-    margin-left: auto;
-    display: flex;
-    align-items: center;
   }
 
   &__sub-panel-link {
@@ -51,8 +51,7 @@
     &__tab {
       @include var.font-big;
       @include utils.border-right;
-      flex: 1 1 0px;
-      margin-top: 0.5em;
+      flex: 1 1;
       text-align: center;
       color: var.$color-text-light;
 

@@ -1,0 +1,170 @@
+@use "../variables" as var;
+@use "./buttons";
+@use "./layout";
+@use "./utils";
+
+/**
+ * A straightforward "frame" that serves as a basis for other card-like
+ * patterns. May be used on its own for components that don't need all of
+ * `card` or `panel's` bells and whistles.
+ */
+@mixin card-frame {
+  @include utils.border;
+  border-radius: 2px;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+  background-color: var.$color-background;
+}
+
+/**
+ * A "card"-like pattern that may be displayed in vertical lists, a la
+ * annotation (thread) cards. Will vertically-space its children. Adds a
+ * hover/active intensified box shadow and accounts for "theme-clean" affordances.
+ */
+@mixin card {
+  @include card-frame;
+  @include layout.vertical-rhythm;
+  padding: 1em;
+
+  &:hover,
+  &.is-focused {
+    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
+  }
+
+  &--theme-clean {
+    // Give a little more space so that the border appears centered
+    // between cards
+    padding-bottom: 1.5em;
+    border-bottom: 1px solid var.$grey-2;
+    box-shadow: none;
+
+    &:hover {
+      box-shadow: none;
+    }
+  }
+}
+
+/**
+ * horizontally-oriented collection of linked icons
+ */
+@mixin footer-links {
+  @include layout.row(center);
+  @include utils.border-top;
+  padding-top: 8px;
+
+  &__icon {
+    @include layout.row;
+    @include utils.icon--medium;
+    margin: 0 8px;
+    color: var.$grey-5;
+
+    &:hover {
+      color: var.$grey-6;
+    }
+  }
+}
+
+/**
+ * A pattern for displaying redacted (moderated) text content
+ */
+@mixin redacted-content {
+  // Hidden annotations displayed to moderators, where the content is still
+  // present.
+  &.has-content {
+    text-decoration: line-through;
+    filter: grayscale(100%) contrast(65%);
+  }
+
+  // Hidden annotations displayed to non-moderators, where the content has been
+  // filtered out by the service.
+  &:not(.has-content) {
+    // Create a column of horizontal stripes, giving the impression of text
+    // underneath that has been censored.
+    display: block;
+    height: 60px;
+    width: 100vw;
+    background: repeating-linear-gradient(
+      to bottom,
+      var.$grey-2,
+      var.$grey-2 15px,
+      white 15px,
+      white 20px
+    );
+  }
+}
+
+/**
+ * Base styles for a "panel"-like element, with appropriate
+ * padding, heading and close-button styles.
+ */
+@mixin panel {
+  @include card;
+
+  &__header {
+    @include layout.row($align: center);
+    @include utils.border-bottom;
+    padding-bottom: 1em;
+  }
+
+  &__header-icon {
+    margin-right: 0.5em;
+  }
+
+  &__title {
+    @include var.font-big;
+    color: var.$color-brand;
+    font-weight: 700;
+  }
+
+  &__button {
+    @include buttons.button--labeled;
+  }
+
+  &__button--primary {
+    @include buttons.button--primary;
+  }
+
+  &__actions {
+    @include layout.row(right);
+    @include layout.horizontal-rhythm(10px);
+  }
+}
+
+/**
+ * `panel` with tighter margins and padding, for use in more confined spaces
+ */
+@mixin panel--compact {
+  @include panel;
+  padding: 0.75em;
+
+  &__header {
+    padding: 0;
+    border-bottom: none;
+  }
+}
+
+/**
+ * Styled external-linked "tabs" with icons, intended for use in a panel
+ */
+@mixin panel-tabs {
+  @include layout.row($align: center);
+
+  &__tab {
+    @include utils.font-large;
+    @include utils.border-right;
+    flex: 1 1;
+    text-align: center;
+    color: var.$color-text-light;
+
+    &:last-of-type {
+      border-right: none;
+    }
+  }
+
+  &__link {
+    color: var.$color-text-light;
+  }
+
+  &__icon {
+    @include utils.icon--xsmall;
+  }
+}
