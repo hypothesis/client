@@ -45,7 +45,7 @@ function stripInternalProperties(obj) {
  * Options controlling how an API call is made or processed.
  *
  * @typedef APICallOptions
- * @prop [boolean] includeMetadata - If false (the default), the response is
+ * @prop {boolean} [includeMetadata] - If false (the default), the response is
  *   just the JSON response from the API. If true, the response is an `APIResponse`
  *   containing additional metadata about the request and response.
  */
@@ -53,10 +53,10 @@ function stripInternalProperties(obj) {
 /**
  * Function which makes an API request.
  *
- * @typedef {function} APICallFunction
- * @param [any] params - A map of URL and query string parameters to include with the request.
- * @param [any] data - The body of the request.
- * @param [APICallOptions] options
+ * @callback APICallFunction
+ * @param {any} [params] - A map of URL and query string parameters to include with the request.
+ * @param {any} [data] - The body of the request.
+ * @param {APICallOptions} options
  * @return {Promise<any|APIResponse>}
  */
 
@@ -66,11 +66,11 @@ function stripInternalProperties(obj) {
  * @typedef {Object} APIMethodOptions
  * @prop {() => Promise<string>} getAccessToken -
  *   Function which acquires a valid access token for making an API request.
- * @prop [() => string|null] getClientId -
+ * @prop {() => string|null} getClientId -
  *   Function that returns a per-session client ID to include with the request
  *   or `null`.
- * @prop [() => any] onRequestStarted - Callback invoked when the API request starts.
- * @prop [() => any] onRequestFinished - Callback invoked when the API request finishes.
+ * @prop {() => any} onRequestStarted - Callback invoked when the API request starts.
+ * @prop {() => any} onRequestFinished - Callback invoked when the API request finishes.
  */
 
 // istanbul ignore next

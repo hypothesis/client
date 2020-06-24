@@ -21,7 +21,7 @@ export default function tags(localStorage) {
    * Return a list of tag suggestions matching `query`.
    *
    * @param {string} query
-   * @param {number} limit - Optional limit of the results.
+   * @param {number|null} limit - Optional limit of the results.
    * @return {Tag[]} List of matching tags
    */
   function filter(query, limit = null) {
@@ -44,7 +44,7 @@ export default function tags(localStorage) {
    * Update the list of stored tag suggestions based on the tags that a user has
    * entered for a given annotation.
    *
-   * @param {Tag} tags - List of tags.
+   * @param {Tag[]} tags - List of tags.
    */
   function store(tags) {
     // Update the stored (tag, frequency) map.

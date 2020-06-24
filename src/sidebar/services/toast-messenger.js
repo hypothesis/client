@@ -44,8 +44,8 @@ export default function toastMessenger(store) {
    * extant in the store's collection of toast messages (i.e. has the same
    * `type` and `message` text of an existing message).
    *
-   * @param {('error'|'success')} type
-   * @param {string} message - The message to be rendered
+   * @param {('error'|'success'|'notice')} type
+   * @param {string} messageText - The message to be rendered
    * @param {MessageOptions} [options]
    */
   const addMessage = (

@@ -5,7 +5,7 @@ import retry from 'retry';
  * fails after a set number of attempts.
  *
  * @param {Function} opFn - The operation to retry
- * @param {Object} options - The options object to pass to retry.operation()
+ * @param {Object} [options] - The options object to pass to retry.operation()
  *
  * @return A promise for the first successful result of the operation, if
  *         it succeeds within the allowed number of attempts.

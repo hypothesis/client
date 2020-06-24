@@ -4,6 +4,8 @@ import { combineGroups } from '../util/groups';
 import { awaitStateChange } from '../util/state';
 import { watch } from '../util/watch';
 
+/** @typedef {import('../../types/api').Group} Group */
+
 const DEFAULT_ORG_ID = '__default__';
 
 /**
@@ -11,8 +13,10 @@ const DEFAULT_ORG_ID = '__default__';
  */
 const DEFAULT_ORGANIZATION = {
   id: DEFAULT_ORG_ID,
+  name: '__DEFAULT__',
   logo:
     'data:image/svg+xml;utf8,' +
+    // @ts-ignore - TS doesn't know about .svg files.
     encodeURIComponent(require('../../images/icons/logo.svg')),
 };
 
@@ -93,7 +97,7 @@ export default function groups(
    * @param {boolean} isLoggedIn
    * @param {string|null} directLinkedAnnotationGroupId
    * @param {string|null} directLinkedGroupId
-   * @return {Group[]}
+   * @return {Promise<Group[]>}
    */
   async function filterGroups(
     groups,
@@ -107,6 +111,7 @@ export default function groups(
       if (
         directLinkedGroup &&
         !directLinkedGroup.isScopedToUri &&
+        directLinkedGroup.scopes &&
         directLinkedGroup.scopes.enforced
       ) {
         groups = groups.filter(g => g.id !== directLinkedGroupId);
@@ -365,6 +370,7 @@ export default function groups(
     addGroupsToStore(groups);
 
     if (error) {
+      // @ts-ignore - TS can't track the type of `error` here.
       toastMessenger.error(`Unable to fetch groups: ${error.message}`, {
         autoDismiss: false,
       });
