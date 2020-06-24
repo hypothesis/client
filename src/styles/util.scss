@@ -54,6 +54,10 @@
   @include utils.icon--inline;
 }
 
+.u-icon--xsmall {
+  @include utils.icon--xsmall;
+}
+
 .u-icon--large {
   @include utils.icon--large;
 }

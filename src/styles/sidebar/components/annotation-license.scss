@@ -5,16 +5,15 @@
 .annotation-license {
   @include utils.font--small;
   @include utils.border-top;
+  // Space between border and text content
   padding-top: var.$layout-margin--small;
 
-  &__icon {
-    @include utils.icon--xsmall;
-    // Need a tiny space between license icons
-    margin-right: 1px;
-  }
-
-  &__details {
-    // TODO: Horizontal rhythm
-    margin-left: 0.25em;
+  // Container with two icons (representing CC licenses)
+  // with a very small amount of spacing between them
+  &__icons {
+    @include layout.row;
+    @include layout.horizontal-rhythm(1px);
+    // Add space before text
+    margin-right: var.$layout-margin--xsmall;
   }
 }
