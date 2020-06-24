@@ -1,13 +1,10 @@
 @use "../../variables" as var;
+@use "../../mixins/layout";
 @use "../../mixins/utils";
 
 .tutorial {
   &__list {
-    padding-left: 2em;
-  }
-
-  &__item {
-    margin: var.$layout-margin--small 0;
+    @include layout.vertical-rhythm(var.$layout-margin--small);
   }
 
   &__icon {

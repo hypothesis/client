@@ -70,12 +70,14 @@
 
 /**
  * Establish a vertical (margin) rhythm for this element's immediate
- * children (i.e. put equal space between children). Currently set to 1em.
+ * children (i.e. put equal space between children).
+ *
+ * @param $size [var.$layout-margin--medium]: Spacing size (padding)
  * @FIXME Find workaround for SvgIcon exception
  */
-@mixin vertical-rhythm {
+@mixin vertical-rhythm($size: var.$layout-margin) {
   & > * + *:not([class*='svg-icon--inline']) {
-    margin-top: var.$layout-margin;
+    margin-top: $size;
   }
 }
 

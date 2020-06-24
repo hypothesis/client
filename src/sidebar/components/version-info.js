@@ -20,7 +20,7 @@ function VersionInfo({ toastMessenger, versionData }) {
   };
 
   return (
-    <div>
+    <div className="u-vertical-rhythm">
       <dl className="version-info">
         <dt className="version-info__key">Version</dt>
         <dd className="version-info__value">{versionData.version}</dd>
@@ -35,7 +35,7 @@ function VersionInfo({ toastMessenger, versionData }) {
         <dt className="version-info__key">Date</dt>
         <dd className="version-info__value">{versionData.timestamp}</dd>
       </dl>
-      <div className="version-info__actions">
+      <div className="u-layout-row--justify-center">
         <Button
           buttonText="Copy version details"
           onClick={copyVersionData}

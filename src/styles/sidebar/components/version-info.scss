@@ -2,28 +2,21 @@
 @use "../../mixins/layout";
 
 .version-info {
-  margin-top: var.$layout-margin--small;
+  @include layout.row;
+  // Allow multiple lines of content
+  flex-wrap: wrap;
 
   &__key {
-    float: left;
-    width: 8em;
-    margin-bottom: var.$layout-margin--small;
-    padding-right: var.$layout-margin;
-    line-height: 1.25em;
+    flex-basis: 25%;
     text-align: right;
     font-weight: 500;
-    color: var.$color-text;
   }
 
   &__value {
-    margin-bottom: var.$layout-margin--small;
-    margin-left: 8em;
+    margin-left: 1em; // Space between key and value
+    flex-basis: 70%;
+    flex-grow: 1;
     overflow-wrap: break-word; // Keep really long userids from overflowing
     color: var.$color-text-light;
-  }
-
-  &__actions {
-    @include layout.row(center);
-    padding-bottom: var.$layout-margin--small;
   }
 }
