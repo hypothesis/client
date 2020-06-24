@@ -78,3 +78,13 @@
     margin-top: var.$layout-margin;
   }
 }
+
+/**
+ * Establish vertical space outside of elements in the container
+ *
+ * @param $size [var.$layout-margin--medium]: Spacing size (padding)
+ */
+@mixin vertical-space($size: var.$layout-margin--medium) {
+  padding-top: $size;
+  padding-bottom: $size;
+}
