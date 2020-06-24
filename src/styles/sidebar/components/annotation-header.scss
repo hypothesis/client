@@ -39,10 +39,6 @@
     }
   }
 
-  &__timestamp-created-link {
-    color: var.$color-text-light;
-  }
-
   &__highlight-icon {
     @include utils.icon--small;
     color: var.$color-text-light;
