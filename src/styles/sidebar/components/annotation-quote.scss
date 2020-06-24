@@ -1,21 +1,12 @@
 @use '../../variables' as var;
+@use "../../mixins/molecules";
 
 .annotation-quote {
-  &.is-orphan {
-    text-decoration: line-through;
-  }
-
   &__quote {
-    border-left: 3px solid var.$color-border;
-    color: var.$color-text-light;
-    font-style: italic;
-    padding: 0 var.$layout-margin;
-
-    // Prevent long URLs etc. in quote causing overflow
-    overflow-wrap: break-word;
+    @include molecules.quoted-text;
   }
-
-  &.is-focused &__quote {
-    border-left: var.$color-quote 3px solid;
+  &.is-orphan &__quote {
+    // In orphans, quotes should be rendered as if they're missing/redacted
+    @include molecules.redacted-content;
   }
 }
