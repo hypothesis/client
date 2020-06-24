@@ -1,10 +1,14 @@
+/**
+ * @typedef {import('../../types/config').HostConfig} HostConfig
+ */
+
 import serviceConfig from '../service-config';
 
 /**
  * Is the sharing of annotations enabled? Check for any defined `serviceConfig`,
  * but default to `true` if none found.
  *
- * @param {object} settings
+ * @param {HostConfig} settings
  * @return {boolean}
  */
 export function sharingEnabled(settings) {
@@ -35,7 +39,7 @@ export function shareURI(annotation) {
  * and the annotation itself needs to have a sharing URI.
  *
  * @param {object} annotation
- * @param {object} settings
+ * @param {HostConfig} settings
  * @return {boolean}
  */
 export function isShareable(annotation, settings) {

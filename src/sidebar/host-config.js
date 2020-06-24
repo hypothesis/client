@@ -6,44 +6,13 @@ import {
   toString,
 } from '../shared/type-coercions';
 
-/**
- * @typedef RequestConfigFromFrameOptions
- * @prop {number} ancestorLevel
- * @prop {string} origin
- */
-
-/**
- * Configuration for the client provided by the frame embedding it.
- *
- * User-facing documentation exists at
- * https://h.readthedocs.io/projects/client/en/latest/publishers/config/
- *
- * @typedef Config
- * @prop {string} [annotations] - Direct-linked annotation ID
- * @prop {string} [group] - Direct-linked group ID
- * @prop {string} [query] - Initial filter query
- * @prop {string} [appType] - Method used to load the client
- * @prop {boolean} [openSidebar] - Whether to open the sidebar on the initial load
- * @prop {boolean} [showHighlights] - Whether to show highlights
- * @prop {Object[]} [services] -
- *   Configuration for the annotation services that the client connects to
- * @prop {Object} [branding] -
- *   Theme properties (fonts, colors etc.)
- * @prop {boolean} [enableExperimentalNewNoteButton] -
- *   Whether to show the "New note" button on the "Page Notes" tab
- * @prop {RequestConfigFromFrameOptions|string} [requestConfigFromFrame]
- *   Origin of the ancestor frame to request configuration from
- * @prop {string} [theme]
- *   Name of the base theme to use.
- * @prop {string} [usernameUrl]
- *   URL template for username links
- */
+/** @typedef {import('../types/config').HostConfig} HostConfig */
 
 /**
  * Return the app configuration specified by the frame embedding the Hypothesis
  * client.
  *
- * @return {Config}
+ * @return {HostConfig}
  */
 export default function hostPageConfig(window) {
   const configStr = window.location.hash.slice(1);

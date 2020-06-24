@@ -3,6 +3,11 @@ import hostConfig from '../host-config';
 import * as postMessageJsonRpc from './postmessage-json-rpc';
 
 /**
+ * @typedef {import('../../types/config').SidebarConfig} SidebarConfig
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ */
+
+/**
  * @deprecated
  */
 function ancestors(window_) {
@@ -180,9 +185,9 @@ async function fetchGroupsAsync(config, rpcCall) {
  *  Legacy RPC with unknown parent - From a ancestor parent frame that passes it down via RPC. (deprecated)
  *  RPC with known parent - From a ancestor parent frame that passes it down via RPC.
  *
- * @param {Object} appConfig - Settings rendered into `app.html` by the h service.
+ * @param {SidebarConfig} appConfig
  * @param {Window} window_ - Test seam.
- * @return {Promise<Object>} - The merged settings.
+ * @return {Promise<MergedConfig>} - The merged settings.
  */
 export async function fetchConfig(appConfig, window_ = window) {
   const hostPageConfig = hostConfig(window);
