@@ -44,7 +44,10 @@
   }
 
   &__highlight-icon {
-    @include utils.icon--xsmall;
-    color: var.$color-text;
+    @include utils.icon--small;
+    color: var.$color-text-light;
+    // Pull the icon down a tad for better vertical alignment with other
+    // items in the same layout row
+    margin-bottom: -1px;
   }
 }
