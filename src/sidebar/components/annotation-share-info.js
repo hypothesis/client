@@ -26,7 +26,7 @@ function AnnotationShareInfo({ annotation }) {
   );
 
   return (
-    <div className="annotation-share-info">
+    <div className="annotation-share-info u-layout-row--align-baseline">
       {linkToGroup && (
         <a
           className="annotation-share-info__group"

@@ -1,24 +1,71 @@
 @use "./mixins/a11y";
 @use "./mixins/layout";
+@use "./mixins/utils";
+@use './variables' as var;
 
-// Utility classes for layout
-.u-stretch {
-  flex-grow: 1;
-}
+// Utility classes
+// Use these classes on elements that don't require additional styling
 
+// Layout
+
+// Establish a flex container with a horizontal flow
 .u-layout-row {
   @include layout.row;
 }
 
+// Establish a row flex container that aligns its children to (vertical) center
 .u-layout-row--align-center,
 .u-layout-row--align-middle {
   @include layout.row($align: center);
 }
 
+// Establish a row flex container that aligns its children along the baseline
+.u-layout-row--align-baseline {
+  @include layout.row($align: baseline);
+}
+
+// Establish a row flex container justifies its children right
+.u-layout-row--justify-right {
+  @include layout.row($justify: right);
+}
+
+// Use this class to make an element in a flex container "stretchy" and grow
+// when there is extra space available.
+.u-stretch {
+  flex-grow: 1;
+}
+
+// Put equal, standard spacing between children horizontally
+.u-horizontal-rhythm {
+  @include layout.horizontal-rhythm;
+}
+
+// Put equal standard spacing between children vertically
 .u-vertical-rhythm {
   @include layout.vertical-rhythm;
 }
 
+// Icons
+
+// These utilities establish dimensions appropriate for icon elements
+
+// Use for inline icons to size according to text content
+.u-icon--inline {
+  @include utils.icon--inline;
+}
+
+.u-icon--large {
+  @include utils.icon--large;
+}
+
+// Misc
+
+// Make element content invisible except to assistive technology
 .u-screen-reader-only {
   @include a11y.screen-reader-only;
+}
+
+// Use on elements for a de-emphasized, muted text color
+.u-color-text--muted {
+  color: var.$color-text-light;
 }

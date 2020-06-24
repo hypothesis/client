@@ -68,7 +68,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
               <p>Use this link to share these annotations with anyone:</p>
             )}
           </div>
-          <div className="share-annotations-panel__input">
+          <div className="u-layout-row">
             <input
               aria-label="Use this URL to share these annotations"
               className="share-annotations-panel__form-input"
@@ -97,11 +97,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
             )}{' '}
             <span>
               Private (
-              <SvgIcon
-                name="lock"
-                inline
-                className="share-annotations-panel__icon--inline"
-              />{' '}
+              <SvgIcon name="lock" inline className="u-icon--inline" />{' '}
               <em>Only Me</em>) annotations are only visible to you.
             </span>
           </p>
