@@ -11,6 +11,7 @@
     "target": "ES2020"
   },
   "include": [
+    "boot/*.js",
     "shared/*.js",
     "sidebar/util/*.js"
   ]

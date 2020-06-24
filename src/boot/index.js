@@ -18,6 +18,7 @@ const settings = jsonConfigsFrom(document);
 
 boot(document, {
   assetRoot: processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__'),
+  // @ts-ignore - `__MANIFEST__` is injected by the build script
   manifest: __MANIFEST__,
   sidebarAppUrl: processUrlTemplate(
     settings.sidebarAppUrl || '__SIDEBAR_APP_URL__'

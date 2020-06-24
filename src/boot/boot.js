@@ -1,5 +1,17 @@
 import { requiredPolyfillSets } from '../shared/polyfills';
 
+/**
+ * @typedef Config
+ * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
+ * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
+ * @prop {Object.<string,string>} manifest -
+ *   A mapping from canonical asset path to cache-busted asset path
+ */
+
+/**
+ * @param {Document} doc
+ * @param {string} href
+ */
 function injectStylesheet(doc, href) {
   const link = doc.createElement('link');
   link.rel = 'stylesheet';
@@ -8,6 +20,10 @@ function injectStylesheet(doc, href) {
   doc.head.appendChild(link);
 }
 
+/**
+ * @param {Document} doc
+ * @param {string} src - The script URL
+ */
 function injectScript(doc, src) {
   const script = doc.createElement('script');
   script.type = 'text/javascript';
@@ -19,6 +35,11 @@ function injectScript(doc, src) {
   doc.head.appendChild(script);
 }
 
+/**
+ * @param {Document} doc
+ * @param {Config} config
+ * @param {string[]} assets
+ */
 function injectAssets(doc, config, assets) {
   assets.forEach(function (path) {
     const url = config.assetRoot + 'build/' + config.manifest[path];
@@ -40,6 +61,9 @@ function polyfillBundles(needed) {
  * Bootstrap the Hypothesis client.
  *
  * This triggers loading of the necessary resources for the client
+ *
+ * @param {Document} doc
+ * @param {Config} config
  */
 function bootHypothesisClient(doc, config) {
   // Detect presence of Hypothesis in the page
@@ -91,6 +115,9 @@ function bootHypothesisClient(doc, config) {
 
 /**
  * Bootstrap the sidebar application which displays annotations.
+ *
+ * @param {Document} doc
+ * @param {Config} config
  */
 function bootSidebarApp(doc, config) {
   const polyfills = polyfillBundles([
@@ -122,6 +149,13 @@ function bootSidebarApp(doc, config) {
   ]);
 }
 
+/**
+ * Initialize the "sidebar" application if run in the sidebar's stub HTML
+ * page or the "annotator" application otherwise.
+ *
+ * @param {Document} document_
+ * @param {Config} config
+ */
 export default function boot(document_, config) {
   if (document_.querySelector('hypothesis-app')) {
     bootSidebarApp(document_, config);
