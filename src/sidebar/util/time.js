@@ -43,13 +43,7 @@ function delta(date, now) {
  *                      param is present for dependency injection during test.
  * @returns {string}
  */
-function formatIntl(date, options, Intl) {
-  // If the tests have passed in a mock Intl then use it, otherwise use the
-  // real one.
-  if (typeof Intl === 'undefined') {
-    Intl = window.Intl;
-  }
-
+function formatIntl(date, options, Intl = window.Intl) {
   if (Intl && Intl.DateTimeFormat) {
     const key = JSON.stringify(options);
     let formatter = formatters[key];
@@ -144,7 +138,7 @@ const BREAKPOINTS = [
 
 /** @type {Breakpoint} */
 const DEFAULT_BREAKPOINT = {
-  test: () => true,
+  test: /* istanbul ignore next */ () => true,
   formatFn: dayAndMonthAndYear,
   nextUpdate: null,
 };
