@@ -224,23 +224,6 @@ describe('SidebarContent', () => {
     assert.isTrue(wrapper.find('FocusedModeHeader').exists());
   });
 
-  it('renders search status', () => {
-    fakeStore.hasFetchedAnnotations.returns(true);
-    fakeStore.isLoading.returns(false);
-
-    const wrapper = createComponent();
-
-    assert.isTrue(wrapper.find('SearchStatusBar').exists());
-  });
-
-  it('does not render search status if annotations are loading', () => {
-    fakeStore.isLoading.returns(true);
-
-    const wrapper = createComponent();
-
-    assert.isFalse(wrapper.find('SearchStatusBar').exists());
-  });
-
   describe('selection tabs', () => {
     it('renders tabs', () => {
       const wrapper = createComponent();
