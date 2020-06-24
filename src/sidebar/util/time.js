@@ -101,6 +101,14 @@ function dayAndMonthAndYear(date, now, Intl) {
   );
 }
 
+/**
+ * @typedef Breakpoint
+ * @prop {(date: Date, now: Date) => boolean} test
+ * @prop {(date: Date, now: Date, Intl: typeof window.Intl) => string} formatFn
+ * @prop {number|null} nextUpdate
+ */
+
+/** @type {Breakpoint[]} */
 const BREAKPOINTS = [
   {
     // Less than 30 seconds
@@ -132,13 +140,14 @@ const BREAKPOINTS = [
     formatFn: dayAndMonth,
     nextUpdate: null,
   },
-  {
-    // everything else (default case)
-    test: () => true,
-    formatFn: dayAndMonthAndYear,
-    nextUpdate: null,
-  },
 ];
+
+/** @type {Breakpoint} */
+const DEFAULT_BREAKPOINT = {
+  test: () => true,
+  formatFn: dayAndMonthAndYear,
+  nextUpdate: null,
+};
 
 /**
  * Returns a dict that describes how to format the date based on the delta
@@ -146,8 +155,7 @@ const BREAKPOINTS = [
  *
  * @param {Date} date - The date to consider as the timestamp to format.
  * @param {Date} now - The date to consider as the current time.
- * @return {Object} An object that describes how to format the date or
- *                           null if no breakpoint matches.
+ * @return {Breakpoint} An object that describes how to format the date.
  */
 function getBreakpoint(date, now) {
   for (let breakpoint of BREAKPOINTS) {
@@ -155,7 +163,7 @@ function getBreakpoint(date, now) {
       return breakpoint;
     }
   }
-  return null;
+  return DEFAULT_BREAKPOINT;
 }
 
 /**
