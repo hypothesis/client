@@ -96,6 +96,7 @@ export class Injector {
           const resolveErr = new Error(
             `Failed to construct dependency "${dependency}" of "${name}": ${e.message}`
           );
+          // @ts-ignore - `cause` is a custom property
           resolveErr.cause = e;
           throw resolveErr;
         }
@@ -143,7 +144,7 @@ export class Injector {
    * Run a function which uses one or more dependencies provided by the
    * container.
    *
-   * @param {Function} -
+   * @param {Function} callback -
    *   A callback to run, with dependencies annotated in the same way as
    *   functions or classes passed to `register`.
    * @return {any} - Returns the result of running the function.

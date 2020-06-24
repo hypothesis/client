@@ -44,10 +44,10 @@ export function matchShortcut(event, shortcut) {
   }
 
   const actualModifiers =
-    (event.ctrlKey && modifiers.ctrl) |
-    (event.metaKey && modifiers.meta) |
-    (event.altKey && modifiers.alt) |
-    (event.shiftKey && modifiers.shift);
+    (event.ctrlKey ? modifiers.ctrl : 0) |
+    (event.metaKey ? modifiers.meta : 0) |
+    (event.altKey ? modifiers.alt : 0) |
+    (event.shiftKey ? modifiers.shift : 0);
 
   return (
     actualModifiers === requiredModifiers &&
@@ -57,7 +57,7 @@ export function matchShortcut(event, shortcut) {
 
 /**
  * @typedef ShortcutOptions
- * @prop {HTMLElement} rootElement -
+ * @prop {HTMLElement} [rootElement] -
  *   Element on which the key event listener should be installed. Defaults to
  *   `document.body`.
  */
@@ -110,7 +110,7 @@ export function useShortcut(
 ) {
   useEffect(() => {
     if (!shortcut) {
-      return null;
+      return undefined;
     }
     return installShortcut(shortcut, onPress, { rootElement });
   }, [shortcut, onPress, rootElement]);

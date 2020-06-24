@@ -34,7 +34,7 @@ export function jsonConfigsFrom(document) {
   for (let i = 0; i < settingsElements.length; i++) {
     let settings;
     try {
-      settings = JSON.parse(settingsElements[i].textContent);
+      settings = JSON.parse(settingsElements[i].textContent || '');
     } catch (err) {
       console.warn(
         'Could not parse settings from js-hypothesis-config tags',
