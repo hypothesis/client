@@ -25,6 +25,7 @@ export function clearFormatters() {
  * @param {Date} now
  */
 function delta(date, now) {
+  // @ts-ignore
   return now - date;
 }
 
@@ -42,13 +43,7 @@ function delta(date, now) {
  *                      param is present for dependency injection during test.
  * @returns {string}
  */
-function formatIntl(date, options, Intl) {
-  // If the tests have passed in a mock Intl then use it, otherwise use the
-  // real one.
-  if (typeof Intl === 'undefined') {
-    Intl = window.Intl;
-  }
-
+function formatIntl(date, options, Intl = window.Intl) {
   if (Intl && Intl.DateTimeFormat) {
     const key = JSON.stringify(options);
     let formatter = formatters[key];
@@ -100,6 +95,14 @@ function dayAndMonthAndYear(date, now, Intl) {
   );
 }
 
+/**
+ * @typedef Breakpoint
+ * @prop {(date: Date, now: Date) => boolean} test
+ * @prop {(date: Date, now: Date, Intl: typeof window.Intl) => string} formatFn
+ * @prop {number|null} nextUpdate
+ */
+
+/** @type {Breakpoint[]} */
 const BREAKPOINTS = [
   {
     // Less than 30 seconds
@@ -131,13 +134,14 @@ const BREAKPOINTS = [
     formatFn: dayAndMonth,
     nextUpdate: null,
   },
-  {
-    // everything else (default case)
-    test: () => true,
-    formatFn: dayAndMonthAndYear,
-    nextUpdate: null,
-  },
 ];
+
+/** @type {Breakpoint} */
+const DEFAULT_BREAKPOINT = {
+  test: /* istanbul ignore next */ () => true,
+  formatFn: dayAndMonthAndYear,
+  nextUpdate: null,
+};
 
 /**
  * Returns a dict that describes how to format the date based on the delta
@@ -145,8 +149,7 @@ const BREAKPOINTS = [
  *
  * @param {Date} date - The date to consider as the timestamp to format.
  * @param {Date} now - The date to consider as the current time.
- * @return {breakpoint|null} An object that describes how to format the date or
- *                           null if no breakpoint matches.
+ * @return {Breakpoint} An object that describes how to format the date.
  */
 function getBreakpoint(date, now) {
   for (let breakpoint of BREAKPOINTS) {
@@ -154,14 +157,14 @@ function getBreakpoint(date, now) {
       return breakpoint;
     }
   }
-  return null;
+  return DEFAULT_BREAKPOINT;
 }
 
 /**
  * Return the number of milliseconds until the next update for a given date
  * should be handled, based on the delta between `date` and `now`.
  *
- * @param {Date} date
+ * @param {Date|null} date
  * @param {Date} now
  * @return {Number|null} - ms until next update or `null` if no update
  *                         should occur
@@ -195,7 +198,7 @@ export function nextFuzzyUpdate(date, now) {
  * This can be used to refresh parts of a UI whose
  * update frequency depends on the age of a timestamp.
  *
- * @param {String} date - An ISO 8601 date string timestamp to format.
+ * @param {string} date - An ISO 8601 date string timestamp to format.
  * @param {UpdateCallback} callback - A callback function to call when the timestamp changes.
  * @return {Function} A function that cancels the automatic refresh.
  */
@@ -223,7 +226,7 @@ export function decayingInterval(date, callback) {
 /**
  * This callback is a param for the `decayingInterval` function.
  * @callback UpdateCallback
- * @param {Date} - The date associated with the current interval/timeout
+ * @param {string} date - The date associated with the current interval/timeout
  */
 
 /**

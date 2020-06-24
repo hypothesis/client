@@ -92,6 +92,7 @@
     "terser": "^4.4.0",
     "through2": "^3.0.0",
     "tiny-emitter": "^2.0.2",
+    "typescript": "^3.9.5",
     "unorm": "^1.3.3",
     "vinyl": "^2.2.0",
     "watchify": "^3.7.0",
@@ -127,6 +128,7 @@
     "checkformatting": "prettier --check '**/*.{js,scss}'",
     "format": "prettier --list-different --write '**/*.{js,scss}'",
     "test": "gulp test",
+    "typecheck": "tsc --build src/tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build/manifest.json"
   }

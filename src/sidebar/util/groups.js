@@ -1,3 +1,5 @@
+/** @typedef {import('../../types/api').Group} Group */
+
 import escapeStringRegexp from 'escape-string-regexp';
 import serviceConfig from '../service-config';
 

@@ -16,7 +16,7 @@ export function copyText(text) {
 
   try {
     const range = document.createRange();
-    const selection = document.getSelection();
+    const selection = /** @type {Selection} */ (document.getSelection());
 
     selection.removeAllRanges();
     range.selectNodeContents(temp);

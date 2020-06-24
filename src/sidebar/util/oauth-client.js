@@ -192,6 +192,8 @@ export default class OAuthClient {
         response_type: 'code',
         state: state,
       });
+
+    // @ts-ignore - TS doesn't know about `location = <string>`.
     authWindow.location = authUrl;
 
     return authResponse.then(rsp => rsp.code);
@@ -253,10 +255,10 @@ export default class OAuthClient {
       })
       .replace(/&/g, ',');
 
-    return $window.open(
+    return /** @type {Window} */ ($window.open(
       'about:blank',
       'Log in to Hypothesis',
       authWindowSettings
-    );
+    ));
   }
 }

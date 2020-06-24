@@ -1,5 +1,9 @@
 import immutable from './immutable';
 
+/**
+ * @typedef {import('../../types/api').Group} Group
+ */
+
 // TODO: Update when this is a property available on the API response
 const DEFAULT_ORG_ID = '__default__';
 

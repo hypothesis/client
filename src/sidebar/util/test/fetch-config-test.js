@@ -102,6 +102,7 @@ describe('sidebar.util.fetch-config', () => {
             frame,
             'https://embedder.com',
             'requestConfig',
+            [],
             expectedTimeout
           );
         });
@@ -130,6 +131,7 @@ describe('sidebar.util.fetch-config', () => {
             fakeWindow.parent.parent,
             'https://embedder.com',
             'requestConfig',
+            [],
             expectedTimeout
           )
           .returns(

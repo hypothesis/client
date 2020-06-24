@@ -12,7 +12,9 @@
  * @return {() => void}
  */
 export default function observeElementSize(element, onSizeChanged) {
+  // @ts-ignore - TS is missing `ResizeObserver` type definition
   if (typeof ResizeObserver !== 'undefined') {
+    // @ts-ignore
     const observer = new ResizeObserver(() =>
       onSizeChanged(element.clientWidth, element.clientHeight)
     );

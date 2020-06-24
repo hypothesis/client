@@ -1,10 +1,28 @@
-/** Default state for new threads, before applying filters etc. */
+/**
+ * @typedef {import('../types/api').Annotation} Annotation
+ *
+ * @typedef Thread
+ * @prop {string} id
+ * @prop {Annotation|undefined} annotation
+ * @prop {Thread|undefined} parent
+ * @prop {boolean} visible
+ * @prop {boolean} collapsed
+ * @prop {Thread[]} children
+ * @prop {number} totalChildren
+ * @prop {'dim'|'highlight'|undefined} highlightState
+ */
+
+/**
+ * Default state for new threads, before applying filters etc.
+ *
+ * @type {Thread}
+ */
 const DEFAULT_THREAD_STATE = {
   /**
    * The ID of this thread. This will be the same as the annotation ID for
    * created annotations or the `$tag` property for new annotations.
    */
-  id: undefined,
+  id: '__default__',
   /**
    * The Annotation which is displayed by this thread.
    *
@@ -128,11 +146,14 @@ function threadAnnotations(annotations) {
   });
 
   const root = {
+    id: 'root',
     annotation: undefined,
     children: roots,
     visible: true,
     collapsed: false,
     totalChildren: roots.length,
+    parent: undefined,
+    highlightState: undefined,
   };
 
   return root;
@@ -157,7 +178,7 @@ function mapThread(thread, mapFn) {
  * Return a sorted copy of an array of threads.
  *
  * @param {Array<Thread>} threads - The list of threads to sort
- * @param {(Annotation,Annotation) => boolean} compareFn
+ * @param {(a: Annotation, b: Annotation) => boolean} compareFn
  * @return {Array<Thread>} Sorted list of threads
  */
 function sort(threads, compareFn) {
@@ -220,7 +241,21 @@ function hasVisibleChildren(thread) {
 }
 
 /**
+ * @typedef Options
+ * @prop {string[]} [selected]
+ * @prop {string[]} [forceVisible]
+ * @prop {(a: Annotation) => boolean} [filterFn]
+ * @prop {(t: Thread) => boolean} [threadFilterFn]
+ * @prop {Object} [expanded]
+ * @prop {Object} [highlighted]
+ * @prop {(a: Annotation, b: Annotation) => boolean} [sortCompareFn]
+ * @prop {(a: Annotation, b: Annotation) => boolean} [replySortCompareFn]
+ */
+
+/**
  * Default options for buildThread()
+ *
+ * @type {Partial<Options>}
  */
 const defaultOpts = {
   /** List of currently selected annotation IDs */

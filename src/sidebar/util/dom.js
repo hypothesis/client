@@ -27,9 +27,10 @@ export function getElementHeightWithMargins(element) {
  * Attach listeners for one or multiple events to an element and return a
  * function that removes the listeners.
  *
- * @param {Element}
+ * @param {HTMLElement} element
  * @param {string[]} events
- * @param {(event: Event) => any} listener
+ * @param {EventListener} listener
+ * @param {Object} options
  * @param {boolean} [options.useCapture]
  * @return {function} Function which removes the event listeners.
  */

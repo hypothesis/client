@@ -39,6 +39,7 @@ endif
 .PHONY: lint
 lint: node_modules/.uptodate
 	yarn run lint
+	yarn run typecheck
 
 .PHONY: docs
 docs: python

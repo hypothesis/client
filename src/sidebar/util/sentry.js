@@ -20,7 +20,8 @@ function currentScriptOrigin() {
   try {
     // nb. IE 11 does not support `document.currentScript` and this property
     // is only available while a `<script>` tag is initially being executed.
-    const scriptUrl = new URL(document.currentScript.src);
+    const script = /** @type {HTMLScriptElement} */ (document.currentScript);
+    const scriptUrl = new URL(script.src);
     return scriptUrl.origin;
   } catch (e) {
     return null;
@@ -46,7 +47,7 @@ export function init(config) {
   // If we can't determine the current script's origin, just disable the
   // whitelist and report all errors.
   const scriptOrigin = currentScriptOrigin();
-  const whitelistUrls = scriptOrigin ? [scriptOrigin] : null;
+  const whitelistUrls = scriptOrigin ? [scriptOrigin] : undefined;
 
   Sentry.init({
     dsn: config.dsn,
@@ -80,6 +81,7 @@ export function init(config) {
         if (originalErr instanceof Event) {
           Object.assign(event.extra, {
             type: originalErr.type,
+            // @ts-ignore - `detail` is a property of certain event types.
             detail: originalErr.detail,
             isTrusted: originalErr.isTrusted,
           });
