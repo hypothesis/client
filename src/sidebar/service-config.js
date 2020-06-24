@@ -1,8 +1,14 @@
 /**
+ * @typedef {import('../types/config').HostConfig} HostConfig
+ * @typedef {import('../types/config').Service} Service
+ */
+
+/**
  * Return the configuration for the annotation service which the client would retrieve
  * annotations from which may contain the authority, grantToken and icon.
  *
- * @param {Object} settings - The settings object which would contain the services array.
+ * @param {HostConfig} settings
+ * @return {Service|null}
  */
 
 export default function serviceConfig(settings) {

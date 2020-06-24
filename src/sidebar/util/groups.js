@@ -1,4 +1,7 @@
-/** @typedef {import('../../types/api').Group} Group */
+/**
+ * @typedef {import('../../types/config').HostConfig} HostConfig
+ * @typedef {import('../../types/api').Group} Group
+ */
 
 import escapeStringRegexp from 'escape-string-regexp';
 import serviceConfig from '../service-config';
@@ -9,14 +12,15 @@ import serviceConfig from '../service-config';
  * explicitly disallowed in the service configuration of the
  * `settings` object.
  *
- * @param {object} settings
+ * @param {HostConfig} settings
  * @return {boolean}
  */
 function allowLeavingGroups(settings) {
-  const config = serviceConfig(settings) || {};
-  return typeof config.allowLeavingGroups === 'boolean'
-    ? config.allowLeavingGroups
-    : true;
+  const config = serviceConfig(settings);
+  if (!config) {
+    return true;
+  }
+  return !!config.allowLeavingGroups;
 }
 
 /**
@@ -28,7 +32,7 @@ function allowLeavingGroups(settings) {
  * @param {Group[]} userGroups - groups the user is a member of
  * @param {Group[]} featuredGroups - all other groups, may include some duplicates from the userGroups
  * @param {string} uri - uri of the current page
- * @param {object} settings - The settings object.
+ * @param {HostConfig} settings
  */
 export function combineGroups(userGroups, featuredGroups, uri, settings) {
   const worldGroup = featuredGroups.find(g => g.id === '__world__');

@@ -1,6 +1,9 @@
 import serviceConfig from '../service-config';
 
-/** @typedef {import('../../types/api').Profile} Profile */
+/**
+ * @typedef {import('../../types/config').HostConfig} HostConfig
+ * @typedef {import('../../types/api').Profile} Profile
+ */
 
 /**
  * Returns true if the sidebar tutorial has to be shown to a user for a given session.
@@ -28,14 +31,15 @@ export function shouldShowSidebarTutorial(sessionState) {
  *
  * @param {boolean} isSidebar - is the app currently displayed in a sidebar?
  * @param {Profile} profile - User profile returned from the API
- * @param {Object} settings - app configuration/settings
+ * @param {HostConfig} settings
  * @return {boolean} - Tutorial panel should be displayed automatically
  */
 export function shouldAutoDisplayTutorial(isSidebar, profile, settings) {
   const shouldShowBasedOnProfile =
     typeof profile.preferences === 'object' &&
     !!profile.preferences.show_sidebar_tutorial;
-  const service = serviceConfig(settings) || {};
+
+  const service = serviceConfig(settings) || { onHelpRequestProvided: false };
   return (
     isSidebar && !service.onHelpRequestProvided && shouldShowBasedOnProfile
   );
