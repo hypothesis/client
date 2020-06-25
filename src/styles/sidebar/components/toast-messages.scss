@@ -8,7 +8,7 @@
   z-index: 1;
   left: 0;
   width: 100%;
-  padding: 0 0.5em;
+  padding: 0 var.$layout-margin--small;
 
   @include responsive.tablet-and-up {
     // When displaying in a wider viewport (desktop/tablet outside of sidebar)
@@ -78,7 +78,7 @@
   }
 
   &__message {
-    padding: 1em;
+    padding: var.$layout-margin;
     width: 100%;
   }
 

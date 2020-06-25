@@ -19,7 +19,7 @@
 
   &__reply-toggle {
     @include buttons.button--link;
-    padding: 0 0.5em;
+    padding: 0 var.$layout-margin--small;
   }
 
   // Timestamps are right aligned in a flex row

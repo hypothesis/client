@@ -73,3 +73,11 @@
   font-size: var.$font-size--large;
   font-weight: 500;
 }
+
+@mixin shadow {
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+
+@mixin active-shadow {
+  box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
+}

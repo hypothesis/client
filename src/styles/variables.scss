@@ -76,25 +76,17 @@ $font-size--medium: 13px;
 $font-size--large: 14px;
 $line-height: 1.4;
 
-// Transitional Typography (Temporary)
-// -----------------------------------
-
-$annotator-base-font-size: 14px;
-$annotator-base-line-height: 20px;
-
-$annotator-adder-font-size: 12px;
-$annotator-adder-line-height: 1em;
-
-$annotator-bucket-bar-font-size: 10px;
-$annotator-bucket-bar-line-height: 14px;
-
 // Minimum font size for <input> fields on iOS. If the font size is smaller than
 // this, iOS will zoom into the field when focused.
 $touch-input-font-size: 16px;
 
 // Layout margins
 // -------------------------
-$layout-h-margin: 15px;
+$layout-h-margin: 15px; // Legacy
+$layout-margin: 1em;
+$layout-margin--medium: $layout-h-margin;
+$layout-margin--small: $layout-h-margin / 2;
+$layout-margin--xsmall: $layout-h-margin / 4;
 
 // Minimum recommended size for tap targets on mobile.
 // This value originated from Apple's Human Interface Guidelines.
@@ -108,7 +100,7 @@ $zindex-tooltip: 20;
 // -------------------------
 $bucket-bar-width: 22px;
 $top-bar-height: 40px;
-$popup-menu-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+$border-radius: 2px;
 
 $color-border: $grey-3;
 $border-width: 1px;
@@ -118,5 +110,14 @@ $icon-size--small: 12px;
 $icon-size--medium: 16px;
 $icon-size--large: 24px;
 
-// Mixins
-// ------
+// Transitional Typography (Temporary)
+// -----------------------------------
+
+$annotator-base-font-size: 14px;
+$annotator-base-line-height: 20px;
+
+$annotator-adder-font-size: 12px;
+$annotator-adder-line-height: 1em;
+
+$annotator-bucket-bar-font-size: 10px;
+$annotator-bucket-bar-line-height: 14px;

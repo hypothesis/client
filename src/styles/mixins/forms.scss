@@ -34,7 +34,7 @@
 @mixin form-input {
   @include utils.font--medium;
   @include utils.border;
-  border-radius: 2px;
+  border-radius: var.$border-radius;
   padding: 0.5em 0.75em;
   font-weight: normal;
   color: var.$color-text-light;
@@ -62,7 +62,7 @@
   background-color: var.$grey-mid;
   height: 35px;
   border: none;
-  border-radius: 2px;
+  border-radius: var.$border-radius;
 
   font-weight: bold;
 

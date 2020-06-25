@@ -10,8 +10,8 @@
  */
 @mixin card-frame {
   @include utils.border;
-  border-radius: 2px;
-  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1);
+  @include utils.shadow;
+  border-radius: var.$border-radius;
   background-color: var.$color-background;
 }
 
@@ -23,11 +23,11 @@
 @mixin card {
   @include card-frame;
   @include layout.vertical-rhythm;
-  padding: 1em;
+  padding: var.$layout-margin;
 
   &:hover,
   &.is-focused {
-    box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
+    @include utils.active-shadow;
   }
 
   &--theme-clean {
@@ -102,11 +102,11 @@
   &__header {
     @include layout.row($align: center);
     @include utils.border-bottom;
-    padding-bottom: 1em;
+    padding-bottom: var.$layout-margin;
   }
 
   &__header-icon {
-    margin-right: 0.5em;
+    margin-right: var.$layout-margin--small;
   }
 
   &__title {

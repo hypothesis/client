@@ -23,7 +23,7 @@
 
   &__icon-button {
     @include buttons.button--input;
-    padding: 0.25em 0.5em;
+    padding: var.$layout-margin--xsmall var.$layout-margin--small;
   }
 
   &__form-input {
@@ -34,7 +34,7 @@
 
   &__permissions {
     @include utils.font--small;
-    margin: 0.5em 0;
+    margin: var.$layout-margin--small 0;
   }
 
   &__arrow {

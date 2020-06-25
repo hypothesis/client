@@ -2,7 +2,7 @@
 @use '../variables' as var;
 @use '../mixins/focus';
 @use '../mixins/reset';
-@use '../mixins/shadow';
+@use '../mixins/utils';
 
 // Shared components.
 @use '../components/svg-icon';
@@ -82,7 +82,7 @@ $sidebar-collapse-transition-time: 150ms;
     @include focus.outline-on-keyboard-focus;
 
     transition: background-color 0.25s;
-    @include shadow.smallshadow;
+    @include utils.shadow;
     background: var.$white;
     border: solid 1px var.$grey-3;
     border-radius: 4px;

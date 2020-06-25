@@ -15,7 +15,6 @@
     $hover-background-color: var.$grey-6;
     $h-padding: 9px;
     $height: 35px;
-    $border-radius: 2px;
     $arrow-indicator-width: 26px;
 
     height: $height;
@@ -35,8 +34,8 @@
 
     &-cancel {
       @include buttons.button--labeled;
-      padding-right: 0.5em;
-      padding-left: 0.5em;
+      padding-right: var.$layout-margin--small;
+      padding-left: var.$layout-margin--small;
 
       &__icon {
         margin: 0;
@@ -67,8 +66,8 @@
 
       border: none;
       background-color: var.$grey-mid;
-      border-top-right-radius: $border-radius;
-      border-bottom-right-radius: $border-radius;
+      border-top-right-radius: var.$border-radius;
+      border-bottom-right-radius: var.$border-radius;
 
       &:hover,
       button[aria-expanded='true'] & {

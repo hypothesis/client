@@ -1,4 +1,5 @@
 @use "../../variables" as var;
+@use "../../mixins/utils";
 
 .autocomplete-list {
   position: relative;
@@ -8,6 +9,7 @@
 }
 
 .autocomplete-list__items {
+  @include utils.shadow;
   @supports (clip-path: polygon(0 0, 100% 0, 0% 100%, 0% 100%)) {
     &:before {
       /**
@@ -34,7 +36,6 @@
   min-width: 10em;
   background-color: var.$white;
   border: 1px solid var.$grey-3;
-  box-shadow: var.$popup-menu-shadow;
   z-index: 10;
 
   @media (pointer: coarse) {
