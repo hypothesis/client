@@ -50,7 +50,6 @@ export default function AnnotationBody({
             textClass={{
               'annotation-body__text': true,
               'is-hidden': isHidden(annotation),
-              'has-content': text.length > 0,
             }}
           />
         </Excerpt>

@@ -9,25 +9,17 @@ export default function AnnotationLicense() {
   return (
     <div className="annotation-license">
       <a
-        className="annotation-license__link u-layout-row u-color-text--muted"
+        className="u-layout-row u-color-text--muted"
         href="http://creativecommons.org/publicdomain/zero/1.0/"
         title="View more information about the Creative Commons Public Domain dedication"
         target="_blank"
         rel="noopener noreferrer"
       >
-        <SvgIcon
-          name="cc-std"
-          inline={true}
-          className="annotation-license__icon"
-        />
-        <SvgIcon
-          name="cc-zero"
-          inline={true}
-          className="annotation-license__icon"
-        />
-        <span className="annotation-license__details">
-          Annotations can be freely reused by anyone for any purpose.
-        </span>
+        <div className="annotation-license__icons">
+          <SvgIcon name="cc-std" inline={true} className="u-icon--xsmall" />
+          <SvgIcon name="cc-zero" inline={true} className="u-icon--xsmall" />
+        </div>
+        Annotations can be freely reused by anyone for any purpose.
       </a>
     </div>
   );
