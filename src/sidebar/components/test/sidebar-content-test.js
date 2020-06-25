@@ -169,8 +169,12 @@ describe('SidebarContent', () => {
 
       it('does not render tabs', () => {
         const wrapper = createComponent();
-
         assert.isFalse(wrapper.find('SelectionTabs').exists());
+      });
+
+      it('does not render search status', () => {
+        const wrapper = createComponent();
+        assert.isFalse(wrapper.find('SearchStatusBar').exists());
       });
     });
   });
@@ -194,8 +198,12 @@ describe('SidebarContent', () => {
 
     it('does not render tabs', () => {
       const wrapper = createComponent();
-
       assert.isFalse(wrapper.find('SelectionTabs').exists());
+    });
+
+    it('does not render search status', () => {
+      const wrapper = createComponent();
+      assert.isFalse(wrapper.find('SearchStatusBar').exists());
     });
   });
 
@@ -222,6 +230,11 @@ describe('SidebarContent', () => {
     const wrapper = createComponent();
 
     assert.isTrue(wrapper.find('FocusedModeHeader').exists());
+  });
+
+  it('renders the search status', () => {
+    const wrapper = createComponent();
+    assert.isTrue(wrapper.find('SearchStatusBar').exists());
   });
 
   describe('selection tabs', () => {
