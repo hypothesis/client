@@ -75,7 +75,7 @@ export default class Bridge {
    *
    * @param {string} method - Name of remote method to call.
    * @param {any[]} args - Arguments to method.
-   * @param [Function] callback - Called with an array of results.
+   * @return {Promise<any[]>} - Array of results, one per connected frame
    */
   call(method, ...args) {
     let cb;

@@ -2,7 +2,7 @@
  * Callback invoked when another frame is discovered in this window which runs
  * the Hypothesis sidebar or annotation layer code.
  *
- * @type {Function} DiscoveryCallback
+ * @callback DiscoveryCallback
  * @param {Window} source - The frame that was discovered.
  * @param {string} origin - The origin to use when posting messages to this frame.
  * @param {string} token - A random identifier used by this frame.
@@ -115,7 +115,7 @@ export default class Discovery {
     // window and send messages to them.
     const queue = [this.target.top];
     while (queue.length > 0) {
-      const parent = queue.shift();
+      const parent = /** @type {Window} */ (queue.shift());
       if (parent !== this.target) {
         parent.postMessage(beaconMessage, this.origin);
       }
@@ -176,7 +176,7 @@ export default class Discovery {
 
     // Notify caller of `startDiscovery` in this frame that we found another
     // frame.
-    if (discovered) {
+    if (discovered && this.onDiscovery) {
       this.onDiscovery.call(null, source, origin, token);
     }
   }
