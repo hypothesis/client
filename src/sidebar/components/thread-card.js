@@ -1,8 +1,8 @@
 import classnames from 'classnames';
-import { createElement } from 'preact';
-import { useCallback } from 'preact/hooks';
-
 import debounce from 'lodash.debounce';
+import { createElement } from 'preact';
+import { useCallback, useMemo } from 'preact/hooks';
+
 import propTypes from 'prop-types';
 import { closest } from '../../shared/dom-element';
 import useStore from '../store/use-store';
@@ -18,12 +18,12 @@ function ThreadCard({ frameSync, settings = {}, thread }) {
   const threadTag = thread.annotation && thread.annotation.$tag;
   const isFocused = useStore(store => store.isAnnotationFocused(threadTag));
   const showDocumentInfo = useStore(store => store.route() !== 'sidebar');
-
-  const focusThreadAnnotation = useCallback(
-    debounce(tag => {
-      const focusTags = tag ? [tag] : [];
-      frameSync.focusAnnotations(focusTags);
-    }, 10),
+  const focusThreadAnnotation = useMemo(
+    () =>
+      debounce(tag => {
+        const focusTags = tag ? [tag] : [];
+        frameSync.focusAnnotations(focusTags);
+      }, 10),
     [frameSync]
   );
 
