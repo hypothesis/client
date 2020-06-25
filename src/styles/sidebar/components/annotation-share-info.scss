@@ -3,8 +3,6 @@
 @use "../../mixins/utils";
 
 .annotation-share-info {
-  @include layout.row($align: baseline);
-
   &__group,
   &__private {
     @include layout.row($align: baseline);

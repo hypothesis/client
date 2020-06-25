@@ -17,10 +17,6 @@
   width: 275px;
   cursor: default;
 
-  &__input {
-    @include layout.row;
-  }
-
   &__icon-button {
     @include buttons.button--input;
     padding: var.$layout-margin--xsmall var.$layout-margin--small;

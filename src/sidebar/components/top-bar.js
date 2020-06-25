@@ -101,7 +101,7 @@ function TopBar({
       {!isSidebar && (
         <div className="top-bar__inner content">
           <StreamSearchInput />
-          <div className="top-bar__expander" />
+          <div className="u-stretch" />
           <Button
             className="top-bar__icon-button"
             icon="help"
@@ -116,7 +116,7 @@ function TopBar({
       {isSidebar && (
         <div className="top-bar__inner content">
           <GroupList className="GroupList" auth={auth} />
-          <div className="top-bar__expander" />
+          <div className="u-stretch" />
           {pendingUpdateCount > 0 && (
             <Button
               className="top-bar__icon-button top-bar__icon-button--refresh"

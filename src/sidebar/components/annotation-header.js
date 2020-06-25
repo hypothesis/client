@@ -80,7 +80,7 @@ export default function AnnotationHeader({
             )}
             <span className="annotation-header__timestamp-created">
               <Timestamp
-                className="annotation-header__timestamp-created-link"
+                className="annotation-header__timestamp-created-link u-color-text--muted"
                 href={annotationLink}
                 timestamp={annotation.created}
               />

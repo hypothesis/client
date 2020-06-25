@@ -28,16 +28,8 @@
     @include buttons.button--link;
   }
 
-  &__controls {
-    @include layout.row;
-  }
-
   &__actions {
     margin-left: auto;
-  }
-
-  &__form-actions {
-    @include layout.row;
   }
 }
 

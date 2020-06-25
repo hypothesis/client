@@ -7,11 +7,6 @@
   @include utils.border-top;
   padding-top: var.$layout-margin--small;
 
-  &__link {
-    @include layout.row;
-    color: var.$color-text-light;
-  }
-
   &__icon {
     @include utils.icon--xsmall;
     // Need a tiny space between license icons

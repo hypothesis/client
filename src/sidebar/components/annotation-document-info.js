@@ -15,8 +15,8 @@ export default function AnnotationDocumentInfo({ annotation }) {
   }
 
   return (
-    <div className="annotation-document-info">
-      <div className="annotation-document-info__title">
+    <div className="annotation-document-info u-layout-row u-horizontal-rhythm">
+      <div className="annotation-document-info__title u-color-text--muted">
         on &quot;
         {documentInfo.titleLink ? (
           <a href={documentInfo.titleLink}>{documentInfo.titleText}</a>
@@ -26,7 +26,7 @@ export default function AnnotationDocumentInfo({ annotation }) {
         &quot;
       </div>
       {documentInfo.domain && (
-        <div className="annotation-document-info__domain">
+        <div className="annotation-document-info__domain u-color-text--muted">
           ({documentInfo.domain})
         </div>
       )}

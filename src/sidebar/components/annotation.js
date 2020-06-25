@@ -123,7 +123,7 @@ function Annotation({
       )}
 
       {isEditing && (
-        <div className="annotation__form-actions">
+        <div className="annotation__form-actions u-layout-row">
           <AnnotationPublishControl
             annotation={annotation}
             isDisabled={isEmpty}
@@ -135,7 +135,7 @@ function Annotation({
 
       {!isCollapsedReply && (
         <footer className="annotation__footer">
-          <div className="annotation__controls">
+          <div className="annotation__controls u-layout-row">
             {shouldShowReplyToggle && (
               <Button
                 className="annotation__reply-toggle"

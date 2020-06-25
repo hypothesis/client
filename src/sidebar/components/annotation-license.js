@@ -9,7 +9,7 @@ export default function AnnotationLicense() {
   return (
     <div className="annotation-license">
       <a
-        className="annotation-license__link"
+        className="annotation-license__link u-layout-row u-color-text--muted"
         href="http://creativecommons.org/publicdomain/zero/1.0/"
         title="View more information about the Creative Commons Public Domain dedication"
         target="_blank"

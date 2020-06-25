@@ -27,7 +27,7 @@ function NewNoteButton({ annotationsService, settings }) {
   };
 
   return (
-    <div className="new-note-button">
+    <div className="u-layout-row--justify-right">
       <Button
         buttonText="New note"
         className="button--primary"

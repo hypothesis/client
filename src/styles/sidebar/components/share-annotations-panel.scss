@@ -12,28 +12,11 @@
     font-weight: 500;
   }
 
-  &__input {
-    display: flex;
-  }
-
   &__form-input {
     @include forms.form-input--with-button;
   }
 
-  &__icon--inline {
-    width: 1em;
-    height: 1em;
-  }
-
   &__icon-button {
     @include buttons.button--input;
-  }
-
-  .share-annotations-panel-links {
-    @include molecules.footer-links;
-
-    &__icon {
-      @include utils.icon--large;
-    }
   }
 }
