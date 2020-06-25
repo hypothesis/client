@@ -15,7 +15,7 @@ function extractOrigin(url) {
 
 function currentScriptOrigin(document_ = document) {
   try {
-    let scriptEl = document_.currentScript;
+    let scriptEl = /** @type {HTMLScriptElement} */ (document_.currentScript);
 
     if (!scriptEl) {
       // Fallback for IE 11.
@@ -37,6 +37,9 @@ function currentScriptOrigin(document_ = document) {
  * from a device or VM that is not the system where the development server is
  * running. In that case, all references to `localhost` need to be replaced
  * with the IP/hostname of the dev server.
+ *
+ * @param {string} url
+ * @param {Document} document_
  */
 export default function processUrlTemplate(url, document_ = document) {
   if (url.indexOf('{') === -1) {
