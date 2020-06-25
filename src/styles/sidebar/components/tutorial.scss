@@ -4,7 +4,7 @@
 
 .tutorial {
   &__list {
-    @include layout.vertical-rhythm(var.$layout-margin--small);
+    @include layout.vertical-rhythm(var.$layout-space--small);
   }
 
   &__icon {

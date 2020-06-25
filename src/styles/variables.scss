@@ -83,10 +83,10 @@ $touch-input-font-size: 16px;
 // Layout margins
 // -------------------------
 $layout-h-margin: 15px; // Legacy
-$layout-margin: 1em;
-$layout-margin--medium: $layout-h-margin;
-$layout-margin--small: $layout-h-margin / 2;
-$layout-margin--xsmall: $layout-h-margin / 4;
+$layout-space: 1em;
+$layout-space--xsmall: $layout-space / 4;
+$layout-space--small: $layout-space / 2;
+$layout-space--medium: $layout-space;
 
 // Minimum recommended size for tap targets on mobile.
 // This value originated from Apple's Human Interface Guidelines.

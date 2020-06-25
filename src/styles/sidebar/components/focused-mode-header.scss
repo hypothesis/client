@@ -17,8 +17,8 @@
   font-weight: 300;
 
   // TODO cleanup
-  padding: var.$layout-margin--small;
-  margin-bottom: var.$layout-margin;
+  padding: var.$layout-space--small;
+  margin-bottom: var.$layout-space;
 
   &__btn {
     // TODO use Button component

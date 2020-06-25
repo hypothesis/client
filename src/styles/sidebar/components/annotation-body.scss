@@ -11,7 +11,7 @@
 
 .annotation-body__collapse-toggle {
   @include layout.row(right);
-  @include layout.vertical-space(var.$layout-margin--small);
+  @include layout.vertical-space(var.$layout-space--small);
 
   .annotation-body__collapse-toggle-button {
     @include buttons.button--labeled;
