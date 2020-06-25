@@ -169,8 +169,12 @@ describe('SidebarContent', () => {
 
       it('does not render tabs', () => {
         const wrapper = createComponent();
-
         assert.isFalse(wrapper.find('SelectionTabs').exists());
+      });
+
+      it('does not render search status', () => {
+        const wrapper = createComponent();
+        assert.isFalse(wrapper.find('SearchStatusBar').exists());
       });
     });
   });
@@ -194,8 +198,12 @@ describe('SidebarContent', () => {
 
     it('does not render tabs', () => {
       const wrapper = createComponent();
-
       assert.isFalse(wrapper.find('SelectionTabs').exists());
+    });
+
+    it('does not render search status', () => {
+      const wrapper = createComponent();
+      assert.isFalse(wrapper.find('SearchStatusBar').exists());
     });
   });
 
@@ -224,21 +232,9 @@ describe('SidebarContent', () => {
     assert.isTrue(wrapper.find('FocusedModeHeader').exists());
   });
 
-  it('renders search status', () => {
-    fakeStore.hasFetchedAnnotations.returns(true);
-    fakeStore.isLoading.returns(false);
-
+  it('renders the search status', () => {
     const wrapper = createComponent();
-
     assert.isTrue(wrapper.find('SearchStatusBar').exists());
-  });
-
-  it('does not render search status if annotations are loading', () => {
-    fakeStore.isLoading.returns(true);
-
-    const wrapper = createComponent();
-
-    assert.isFalse(wrapper.find('SearchStatusBar').exists());
   });
 
   describe('selection tabs', () => {

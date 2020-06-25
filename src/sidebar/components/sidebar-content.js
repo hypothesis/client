@@ -76,7 +76,6 @@ function SidebarContent({
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
   const showTabs = !hasContentError && !hasAppliedFilter;
-  const showSearchStatus = !hasContentError && !isLoading;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -139,7 +138,7 @@ function SidebarContent({
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
       {showTabs && <SelectionTabs isLoading={isLoading} />}
-      {showSearchStatus && <SearchStatusBar />}
+      {!hasContentError && <SearchStatusBar />}
       <ThreadList thread={rootThread} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
