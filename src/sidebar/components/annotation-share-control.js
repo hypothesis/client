@@ -104,7 +104,7 @@ function AnnotationShareControl({
             <div className="annotation-share-panel__input">
               <input
                 aria-label="Use this URL to share this annotation"
-                className="form-input"
+                className="annotation-share-panel__form-input"
                 type="text"
                 value={shareUri}
                 readOnly

@@ -58,14 +58,16 @@ describe('HelpPanel', function () {
 
     it('should show navigation link to versionInfo sub-panel', () => {
       const wrapper = createComponent();
-      const link = wrapper.find('.help-panel__sub-panel-link');
+      const link = wrapper.find('.help-panel__sub-panel-navigation-button');
 
       assert.equal(link.text(), 'About this version');
     });
 
     it('should switch to versionInfo sub-panel when footer link clicked', () => {
       const wrapper = createComponent();
-      wrapper.find('.help-panel__sub-panel-link').simulate('click');
+      wrapper
+        .find('.help-panel__sub-panel-navigation-button')
+        .simulate('click');
 
       assert.equal(
         wrapper.find('.help-panel__sub-panel-title').text(),
@@ -83,9 +85,11 @@ describe('HelpPanel', function () {
   context('when viewing versionInfo sub-panel', () => {
     it('should show navigation link back to tutorial sub-panel', () => {
       const wrapper = createComponent();
-      wrapper.find('.help-panel__sub-panel-link').simulate('click');
+      wrapper
+        .find('.help-panel__sub-panel-navigation-button')
+        .simulate('click');
 
-      const link = wrapper.find('.help-panel__sub-panel-link');
+      const link = wrapper.find('.help-panel__sub-panel-navigation-button');
 
       assert.isTrue(wrapper.find('VersionInfo').exists());
       assert.isFalse(wrapper.find('Tutorial').exists());
@@ -96,9 +100,11 @@ describe('HelpPanel', function () {
       const wrapper = createComponent();
 
       // Click to get to version-info sub-panel...
-      wrapper.find('.help-panel__sub-panel-link').simulate('click');
+      wrapper
+        .find('.help-panel__sub-panel-navigation-button')
+        .simulate('click');
 
-      const link = wrapper.find('.help-panel__sub-panel-link');
+      const link = wrapper.find('.help-panel__sub-panel-navigation-button');
       // Click again to get back to tutorial sub-panel
       link.simulate('click');
 

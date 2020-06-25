@@ -133,3 +133,19 @@
     text-decoration: underline;
   }
 }
+
+/**
+ * A button pattern that looks like a link with a small icon on the right
+ * Used, e.g., in the help panel to navigate between sub-panels
+ */
+@mixin button--navigation {
+  @include reset-native-btn-styles;
+  @include layout.row($justify: right, $align: center);
+  color: var.$color-brand;
+
+  svg {
+    margin-left: 2px;
+    width: 12px;
+    height: 12px;
+  }
+}

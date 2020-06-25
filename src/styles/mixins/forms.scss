@@ -49,6 +49,12 @@
   }
 }
 
+@mixin form-input--with-button {
+  @include form-input;
+  width: 100%;
+  border-radius: 0;
+}
+
 @mixin primary-action-btn {
   @include focus.outline-on-keyboard-focus;
   @include utils.font--medium;

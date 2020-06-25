@@ -1,8 +1,0 @@
-@use "../../mixins/forms";
-@use "../../variables" as var;
-
-.form-input {
-  @include forms.form-input;
-  width: 100%;
-  display: block;
-}

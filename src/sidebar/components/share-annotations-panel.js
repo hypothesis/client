@@ -71,7 +71,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
           <div className="share-annotations-panel__input">
             <input
               aria-label="Use this URL to share these annotations"
-              className="form-input share-annotations-panel__form-input"
+              className="share-annotations-panel__form-input"
               type="text"
               value={shareURI}
               readOnly

@@ -10,6 +10,15 @@
   @include layout.row;
 }
 
+.u-layout-row--align-center,
+.u-layout-row--align-middle {
+  @include layout.row($align: center);
+}
+
+.u-vertical-rhythm {
+  @include layout.vertical-rhythm;
+}
+
 .u-screen-reader-only {
   @include a11y.screen-reader-only;
 }

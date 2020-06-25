@@ -99,15 +99,15 @@ function HelpPanel({ auth, session }) {
       panelName={uiConstants.PANEL_HELP}
       onActiveChanged={onActiveChanged}
     >
-      <div className="help-panel__content">
-        <div className="help-panel__subtitle">
+      <div className="help-panel__content u-vertical-rhythm">
+        <div className="u-layout-row--align-middle">
           <h3 className="help-panel__sub-panel-title">
             {subPanelTitles[activeSubPanel]}
           </h3>
-          <div className="help-panel__navigation">
+          <div>
             {activeSubPanel === 'versionInfo' && (
               <button
-                className="help-panel__sub-panel-link"
+                className="help-panel__sub-panel-navigation-button"
                 onClick={e => openSubPanel(e, 'tutorial')}
                 aria-label="Show tutorial panel"
               >
@@ -120,15 +120,12 @@ function HelpPanel({ auth, session }) {
             )}
             {activeSubPanel === 'tutorial' && (
               <button
-                className="help-panel__sub-panel-link"
+                className="help-panel__sub-panel-navigation-button"
                 onClick={e => openSubPanel(e, 'versionInfo')}
                 aria-label="Show version information panel"
               >
                 About this version
-                <SvgIcon
-                  name="arrow-right"
-                  className="help-panel__sub-panel-link-icon"
-                />
+                <SvgIcon name="arrow-right" />
               </button>
             )}
           </div>

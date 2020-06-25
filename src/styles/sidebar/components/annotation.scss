@@ -24,23 +24,6 @@
 .annotation {
   @include layout.vertical-rhythm;
 
-  &.is-highlighted {
-    // Slightly darken the bodies of highlighted annotations to
-    // make them stand out next to others, which will have the `is-dimmed` state
-    // set
-    .annotation-body {
-      color: var.$color-text;
-    }
-  }
-
-  &.is-dimmed {
-    // Lighten the bodies of dimmed annotations to make other
-    // annotations which are not dimmed stand out
-    .annotation-body {
-      color: var.$color-text-light;
-    }
-  }
-
   &__reply-toggle {
     @include buttons.button--link;
   }
