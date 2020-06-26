@@ -10,16 +10,17 @@
 /**
  * Describes the state of a plain text input field.
  *
- * interface EditorState {
- *   text: string;
- *   selectionStart: number;
- *   selectionEnd: number;
- * }
+ * @typedef EditorState
+ * @prop {string} text
+ * @prop {number} selectionStart
+ * @prop {number} selectionEnd
  */
 
 /**
  * Types of Markdown link that can be inserted with
  * convertSelectionToLink()
+ *
+ * @enum {number}
  */
 export const LinkType = {
   ANCHOR_LINK: 0,
@@ -134,7 +135,7 @@ export function convertSelectionToLink(state, linkType) {
  * @param {EditorState} state - The current state of the input field.
  * @param {string} prefix - The prefix to add or remove
  *                          before the selection.
- * @param {string?} suffix - The suffix to add or remove after the selection,
+ * @param {string|undefined} suffix - The suffix to add or remove after the selection,
  *                           defaults to being the same as the prefix.
  * @param {string} placeholder - The text to insert between 'prefix' and
  *                               'suffix' if the input text is empty.
@@ -200,7 +201,7 @@ function endOfLine(str, pos) {
  * @param {EditorState} state - The initial state of the input field
  * @param {number} start - The start position within the input text
  * @param {number} end - The end position within the input text
- * @param {(EditorState, number) => EditorState} callback
+ * @param {(s: EditorState, start: number, end: number) => EditorState} callback
  *  - Callback which is invoked with the current state of the input and
  *    the start of the current line and returns the new state of the input.
  */

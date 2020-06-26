@@ -1,3 +1,5 @@
+// @ts-nocheck - The `ga` property is unknown.
+
 let loaded = false;
 
 export default function loadGoogleAnalytics(trackingId) {

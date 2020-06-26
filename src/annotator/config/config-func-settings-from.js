@@ -1,4 +1,10 @@
 /**
+ * @typedef HypothesisWindowProps
+ * @prop {() => Object} [hypothesisConfig] - Function that returns configuration
+ *   for the Hypothesis client
+ */
+
+/**
  * Return an object containing config settings from window.hypothesisConfig().
  *
  * Return an object containing config settings returned by the
@@ -12,7 +18,7 @@
  *
  * If there's no window.hypothesisConfig() function then return {}.
  *
- * @param {Window} window_ - The window to search for a hypothesisConfig() function
+ * @param {Window & HypothesisWindowProps} window_ - The window to search for a hypothesisConfig() function
  * @return {Object} - Any config settings returned by hypothesisConfig()
  *
  */

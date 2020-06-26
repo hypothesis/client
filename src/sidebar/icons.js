@@ -1,3 +1,5 @@
+// @ts-nocheck - TS doesn't understand `require('.../icon.svg')`
+
 /**
  * Set of icons used by the sidebar application via the `SvgIcon`
  * component.
