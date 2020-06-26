@@ -15,16 +15,7 @@ function splitTerm(term) {
   }
 
   if (
-    [
-      'group',
-      'quote',
-      'result',
-      'since',
-      'tag',
-      'text',
-      'uri',
-      'user',
-    ].includes(filter)
+    ['group', 'quote', 'since', 'tag', 'text', 'uri', 'user'].includes(filter)
   ) {
     const data = term.slice(filter.length + 1);
     return [filter, data];
@@ -118,7 +109,7 @@ function toObject(searchText) {
 
 /**
  * @typedef Facet
- * @property {'and'|'or'|'min'} operator
+ * @property {'and'|'or'} operator
  * @property {string[]|number[]} terms
  */
 
@@ -143,7 +134,6 @@ function generateFacetedFilter(searchText, focusFilters = {}) {
   let terms;
   const any = [];
   const quote = [];
-  const result = [];
   const since = [];
   const tag = [];
   const text = [];
@@ -158,9 +148,6 @@ function generateFacetedFilter(searchText, focusFilters = {}) {
       switch (filter) {
         case 'quote':
           quote.push(fieldValue);
-          break;
-        case 'result':
-          result.push(fieldValue);
           break;
         case 'since':
           {
@@ -211,10 +198,6 @@ function generateFacetedFilter(searchText, focusFilters = {}) {
     quote: {
       terms: quote,
       operator: 'and',
-    },
-    result: {
-      terms: result,
-      operator: 'min',
     },
     since: {
       terms: since,
