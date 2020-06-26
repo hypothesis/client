@@ -81,6 +81,9 @@ img::-moz-selection {
 
 ul,
 ol,
+dl,
+dd,
+dt,
 li {
   @include reset.reset-box-model;
 }

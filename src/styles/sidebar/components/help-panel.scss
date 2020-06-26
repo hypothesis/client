@@ -1,4 +1,5 @@
 @use "../../mixins/buttons";
+@use "../../mixins/layout";
 @use "../../mixins/molecules";
 @use "../../mixins/utils";
 @use "../../variables" as var;
@@ -12,6 +13,7 @@
   &__subcontent {
     @include utils.border-top;
     @include utils.border-bottom;
+    @include layout.vertical-space;
 
     a {
       text-decoration: underline;

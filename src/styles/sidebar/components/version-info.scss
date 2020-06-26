@@ -1,29 +1,36 @@
 @use "../../variables" as var;
 @use "../../mixins/layout";
+@use "../../mixins/responsive";
 
 .version-info {
-  margin-top: var.$layout-margin--small;
+  // Lay out version info as a column when viewport (sidebar) is narrow
+  @include layout.column;
 
   &__key {
-    float: left;
-    width: 8em;
-    margin-bottom: var.$layout-margin--small;
-    padding-right: var.$layout-margin;
-    line-height: 1.25em;
-    text-align: right;
     font-weight: 500;
-    color: var.$color-text;
   }
 
   &__value {
-    margin-bottom: var.$layout-margin--small;
-    margin-left: 8em;
-    overflow-wrap: break-word; // Keep really long userids from overflowing
     color: var.$color-text-light;
   }
 
-  &__actions {
-    @include layout.row(center);
-    padding-bottom: var.$layout-margin--small;
+  @media only screen and (min-width: 20em) {
+    // Change to a layout that puts key-value pairs on a single line
+    // when space allows
+    @include layout.row;
+    // Allow multiple lines of content
+    flex-wrap: wrap;
+
+    &__key {
+      flex-basis: 25%;
+      text-align: right;
+    }
+
+    &__value {
+      margin-left: 1em; // Space between key and value
+      flex-basis: 70%;
+      flex-grow: 1;
+      overflow-wrap: break-word; // Keep really long userids from overflowing
+    }
   }
 }
