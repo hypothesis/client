@@ -11,8 +11,15 @@
     "target": "ES2020"
   },
   "include": [
+    "annotator/config/*.js",
+    "annotator/util/*.js",
     "boot/*.js",
     "shared/*.js",
+    "sidebar/*.js",
     "sidebar/util/*.js"
+  ],
+  "exclude": [
+    // Enable this once the rest of `src/sidebar` is checked.
+    "sidebar/index.js"
   ]
 }

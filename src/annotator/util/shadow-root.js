@@ -29,8 +29,8 @@ function loadStyles(shadowRoot) {
  * In browsers that support it, shadow DOM is used to isolate annotator UI
  * components from the host page's styles.
  *
- * @param {HTMLElement} - Container element to render the UI into
- * @return {Element} -
+ * @param {HTMLElement} container - Container element to render the UI into
+ * @return {HTMLElement|ShadowRoot} -
  *   The element to render the UI into. This may be `container` or the shadow
  *   root.
  */

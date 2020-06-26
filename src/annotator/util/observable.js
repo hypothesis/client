@@ -58,6 +58,7 @@ export function delay(delay, src) {
  * Buffers events from a source Observable, waiting for a pause of `delay`
  * ms with no events before emitting the last value from `src`.
  *
+ * @template T
  * @param {number} delay
  * @param {Observable<T>} src
  * @return {Observable<T>}

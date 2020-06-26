@@ -1,5 +1,5 @@
 import retry from 'retry';
-import EventEmitter from 'tiny-emitter';
+import { TinyEmitter } from 'tiny-emitter';
 
 // Status codes indicating the reason why a WebSocket connection closed.
 // See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent and
@@ -27,7 +27,7 @@ const RECONNECT_MIN_DELAY = 1000;
  * - Uses the standard EventEmitter API for reporting open, close, error
  *   and message events.
  */
-export default class Socket extends EventEmitter {
+export default class Socket extends TinyEmitter {
   constructor(url) {
     super();
 

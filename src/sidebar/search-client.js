@@ -1,11 +1,11 @@
-import EventEmitter from 'tiny-emitter';
+import { TinyEmitter } from 'tiny-emitter';
 
 /**
  * Client for the Hypothesis search API.
  *
  * SearchClient handles paging through results, canceling search etc.
  */
-export default class SearchClient extends EventEmitter {
+export default class SearchClient extends TinyEmitter {
   /**
    * @param {Object} searchFn - Function for querying the search API
    * @param {Object} opts - Search options
@@ -23,6 +23,7 @@ export default class SearchClient extends EventEmitter {
       this._incremental = true;
     }
     this._canceled = false;
+    this._results = [];
   }
 
   _getBatch(query, offset) {
