@@ -23,7 +23,7 @@
 @mixin card {
   @include card-frame;
   @include layout.vertical-rhythm;
-  padding: var.$layout-margin;
+  padding: var.$layout-space;
 
   &:hover,
   &.is-focused {
@@ -79,7 +79,7 @@
   border-left: 3px solid var.$color-border;
   color: var.$color-text-light;
   font-style: italic;
-  padding: 0 var.$layout-margin;
+  padding: 0 var.$layout-space;
 
   // Prevent long URLs etc. in quote causing overflow
   overflow-wrap: break-word;
@@ -99,11 +99,11 @@
   &__header {
     @include layout.row($align: center);
     @include utils.border-bottom;
-    padding-bottom: var.$layout-margin;
+    padding-bottom: var.$layout-space;
   }
 
   &__header-icon {
-    margin-right: var.$layout-margin--small;
+    margin-right: var.$layout-space--small;
   }
 
   &__title {

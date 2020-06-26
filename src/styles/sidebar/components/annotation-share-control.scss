@@ -19,7 +19,7 @@
 
   &__icon-button {
     @include buttons.button--input;
-    padding: var.$layout-margin--xsmall var.$layout-margin--small;
+    padding: var.$layout-space--xsmall var.$layout-space--small;
   }
 
   &__form-input {
@@ -30,7 +30,7 @@
 
   &__permissions {
     @include utils.font--small;
-    margin: var.$layout-margin--small 0;
+    margin: var.$layout-space--small 0;
   }
 
   &__arrow {

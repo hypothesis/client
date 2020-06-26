@@ -6,19 +6,19 @@
   @include layout.row;
 
   &--reply {
-    margin-top: var.$layout-margin--small;
+    margin-top: var.$layout-space--small;
   }
 
   &--reply &__content {
-    margin-left: var.$layout-margin;
+    margin-left: var.$layout-space;
   }
 
   &__children {
-    margin-left: -1 * var.$layout-margin;
+    margin-left: -1 * var.$layout-space;
   }
 
   &__unavailable-message {
-    margin: 0 var.$layout-margin;
+    margin: 0 var.$layout-space;
   }
 
   // Left "channel" of thread
