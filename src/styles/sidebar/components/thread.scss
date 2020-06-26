@@ -6,7 +6,7 @@
   @include layout.row;
 
   &--reply {
-    margin-top: var.$layout-space--small;
+    margin-top: var.$layout-space--xsmall;
   }
 
   &--reply &__content {
