@@ -3,6 +3,9 @@
  *
  * ie. 'user:johndoe' -> ['user', 'johndoe']
  *     'example:text' -> [null, 'example:text']
+ *
+ * @param {string} term
+ * @return {[null|string, string]}
  */
 function splitTerm(term) {
   const filter = term.slice(0, term.indexOf(':'));
@@ -12,16 +15,7 @@ function splitTerm(term) {
   }
 
   if (
-    [
-      'group',
-      'quote',
-      'result',
-      'since',
-      'tag',
-      'text',
-      'uri',
-      'user',
-    ].includes(filter)
+    ['group', 'quote', 'since', 'tag', 'text', 'uri', 'user'].includes(filter)
   ) {
     const data = term.slice(filter.length + 1);
     return [filter, data];
@@ -34,11 +28,14 @@ function splitTerm(term) {
 /**
  * Tokenize a search query.
  *
- * Splits `searchtext` into tokens, separated by spaces.
- * Quoted phrases in `searchtext` are returned as a single token.
+ * Splits `searchText` into tokens, separated by spaces.
+ * Quoted phrases in `searchText` are returned as a single token.
+ *
+ * @param {string} searchText
+ * @return {string[]}
  */
-function tokenize(searchtext) {
-  if (!searchtext) {
+function tokenize(searchText) {
+  if (!searchText) {
     return [];
   }
 
@@ -59,7 +56,7 @@ function tokenize(searchtext) {
     return text;
   };
 
-  let tokens = searchtext.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
+  let tokens = searchText.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || [];
 
   // Cut the opening and closing quote characters
   tokens = tokens.map(_removeQuoteCharacter);
@@ -80,14 +77,15 @@ function tokenize(searchtext) {
 /**
  * Parse a search query into a map of search field to term.
  *
- * @param {string} searchtext
- * @return {Object}
+ * @param {string} searchText
+ * @return {Object.<string,string[]>}
  */
-function toObject(searchtext) {
+function toObject(searchText) {
+  /** @type {Object.<string,string[]>} */
   const obj = {};
   const backendFilter = f => (f === 'tag' ? 'tags' : f);
 
-  const addToObj = function (key, data) {
+  const addToObj = (key, data) => {
     if (obj[key]) {
       return obj[key].push(data);
     } else {
@@ -95,8 +93,8 @@ function toObject(searchtext) {
     }
   };
 
-  if (searchtext) {
-    const terms = tokenize(searchtext);
+  if (searchText) {
+    const terms = tokenize(searchText);
     for (const term of terms) {
       let [filter, data] = splitTerm(term);
       if (!filter) {
@@ -111,9 +109,13 @@ function toObject(searchtext) {
 
 /**
  * @typedef Facet
- * @property {'and'|'or'|'min'} operator
- * @property {boolean} lowercase
- * @property {string[]} terms
+ * @property {'and'|'or'} operator
+ * @property {string[]|number[]} terms
+ */
+
+/**
+ * @typedef FocusFilter
+ * @prop {string} [user]
  */
 
 /**
@@ -124,90 +126,63 @@ function toObject(searchtext) {
  * Terms that are not associated with a particular facet are stored in the "any"
  * facet.
  *
- * @param {string} searchtext
- * @param {object} focusFilters - Map of the filter objects keyed to array values.
- *  Currently, only the `user` filter key is supported.
- *
- * @return {Object}
+ * @param {string} searchText - Filter query to parse
+ * @param {FocusFilter} focusFilters - Additional filter terms to mix in
+ * @return {Object.<string,Facet>}
  */
-function generateFacetedFilter(searchtext, focusFilters = {}) {
+function generateFacetedFilter(searchText, focusFilters = {}) {
   let terms;
   const any = [];
   const quote = [];
-  const result = [];
   const since = [];
   const tag = [];
   const text = [];
   const uri = [];
   const user = focusFilters.user ? [focusFilters.user] : [];
-  if (searchtext) {
-    terms = tokenize(searchtext);
+  if (searchText) {
+    terms = tokenize(searchText);
     for (const term of terms) {
-      let t;
       const filter = term.slice(0, term.indexOf(':'));
+      const fieldValue = term.slice(filter.length + 1);
+
       switch (filter) {
         case 'quote':
-          quote.push(term.slice(6));
-          break;
-        case 'result':
-          result.push(term.slice(7));
+          quote.push(fieldValue);
           break;
         case 'since':
           {
-            // We'll turn this into seconds
-            let time = term.slice(6).toLowerCase();
-            if (time.match(/^\d+$/)) {
-              // Only digits, assuming seconds
-              since.push(time * 1);
-            }
-            if (time.match(/^\d+sec$/)) {
-              // Time given in seconds
-              t = /^(\d+)sec$/.exec(time)[1];
-              since.push(t * 1);
-            }
-            if (time.match(/^\d+min$/)) {
-              // Time given in minutes
-              t = /^(\d+)min$/.exec(time)[1];
-              since.push(t * 60);
-            }
-            if (time.match(/^\d+hour$/)) {
-              // Time given in hours
-              t = /^(\d+)hour$/.exec(time)[1];
-              since.push(t * 60 * 60);
-            }
-            if (time.match(/^\d+day$/)) {
-              // Time given in days
-              t = /^(\d+)day$/.exec(time)[1];
-              since.push(t * 60 * 60 * 24);
-            }
-            if (time.match(/^\d+week$/)) {
-              // Time given in week
-              t = /^(\d+)week$/.exec(time)[1];
-              since.push(t * 60 * 60 * 24 * 7);
-            }
-            if (time.match(/^\d+month$/)) {
-              // Time given in month
-              t = /^(\d+)month$/.exec(time)[1];
-              since.push(t * 60 * 60 * 24 * 30);
-            }
-            if (time.match(/^\d+year$/)) {
-              // Time given in year
-              t = /^(\d+)year$/.exec(time)[1];
-              since.push(t * 60 * 60 * 24 * 365);
+            const time = term.slice(6).toLowerCase();
+            const secondsPerDay = 24 * 60 * 60;
+            const secondsPerUnit = {
+              sec: 1,
+              min: 60,
+              hour: 60 * 60,
+              day: secondsPerDay,
+              week: 7 * secondsPerDay,
+              month: 30 * secondsPerDay,
+              year: 365 * secondsPerDay,
+            };
+            const match = time.match(
+              /^(\d+)(sec|min|hour|day|week|month|year)?$/
+            );
+            if (match) {
+              const value = parseFloat(match[1]);
+              const unit = match[2] || 'sec';
+              since.push(value * secondsPerUnit[unit]);
             }
           }
           break;
         case 'tag':
-          tag.push(term.slice(4));
+          tag.push(fieldValue);
           break;
         case 'text':
-          text.push(term.slice(5));
+          text.push(fieldValue);
           break;
         case 'uri':
-          uri.push(term.slice(4));
+          uri.push(fieldValue);
           break;
         case 'user':
-          user.push(term.slice(5));
+          user.push(fieldValue);
           break;
         default:
           any.push(term);
@@ -223,10 +198,6 @@ function generateFacetedFilter(searchtext, focusFilters = {}) {
     quote: {
       terms: quote,
       operator: 'and',
-    },
-    result: {
-      terms: result,
-      operator: 'min',
     },
     since: {
       terms: since,
