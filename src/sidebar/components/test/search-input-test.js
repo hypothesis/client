@@ -61,6 +61,14 @@ describe('SearchInput', () => {
     assert.calledWith(onSearch, 'new-query');
   });
 
+  it('does not call `onSearch` if the input is blank', () => {
+    const onSearch = sinon.stub();
+    const wrapper = createSearchInput({ onSearch });
+    typeQuery(wrapper, ' ');
+    wrapper.find('form').simulate('submit');
+    assert.notCalled(onSearch);
+  });
+
   it('renders loading indicator when app is in a "loading" state', () => {
     fakeStore.isLoading.returns(true);
     const wrapper = createSearchInput();

@@ -149,7 +149,10 @@ const update = {
   },
 
   SELECT_ANNOTATIONS: function (state, action) {
-    return { selectedAnnotationMap: action.selection };
+    return {
+      selectedAnnotationMap: action.selection,
+      filterQuery: null,
+    };
   },
 
   FOCUS_ANNOTATIONS: function (state, action) {
@@ -247,6 +250,7 @@ const update = {
       filterQuery: action.query,
       forceVisible: {},
       expanded: {},
+      selectedAnnotationMap: {},
     };
   },
 

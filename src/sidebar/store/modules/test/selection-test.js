@@ -152,6 +152,12 @@ describe('sidebar/store/modules/selection', () => {
       store.selectAnnotations([]);
       assert.isNull(store.getSelectedAnnotationMap());
     });
+
+    it('clears the filter query when selecting an annotation', function () {
+      store.setFilterQuery('a-query');
+      store.selectAnnotations([1]);
+      assert.equal(getSelectionState().filterQuery, null);
+    });
   });
 
   describe('toggleSelectedAnnotations()', function () {
@@ -219,6 +225,12 @@ describe('sidebar/store/modules/selection', () => {
       store.setFilterQuery('some-query');
       assert.deepEqual(getSelectionState().forceVisible, {});
       assert.deepEqual(getSelectionState().expanded, {});
+    });
+
+    it('clears selectedAnnotationMap when setting the filter query', function () {
+      store.selectAnnotations([1, 2, 3]);
+      store.setFilterQuery('a-query');
+      assert.deepEqual(store.getSelectedAnnotationMap(), {});
     });
   });
 
