@@ -42,6 +42,7 @@ export default function router($window, store) {
       case 'annotation':
         {
           const id = params.id;
+          // @ts-ignore - TS doesn't know what properties `queryParams` has.
           delete queryParams.id;
           url = `/a/${id}`;
         }

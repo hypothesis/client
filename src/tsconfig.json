@@ -16,6 +16,7 @@
     "boot/*.js",
     "shared/*.js",
     "sidebar/*.js",
+    "sidebar/services/*.js",
     "sidebar/util/*.js"
   ],
   "exclude": [

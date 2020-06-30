@@ -65,6 +65,10 @@ export function combineGroups(userGroups, featuredGroups, uri, settings) {
   return groups;
 }
 
+/**
+ * @param {Group} group
+ * @param {string} uri
+ */
 function isScopedToUri(group, uri) {
   /* If a scope check cannot be performed, meaning:
    * - the group doesn't have a scopes attribute

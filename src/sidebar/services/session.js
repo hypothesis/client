@@ -4,12 +4,7 @@ import * as sentry from '../util/sentry';
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
-/**
- * @typedef Profile
- *
- * An object returned by the API (`GET /api/profile`) containing profile data
- * for the current user.
- */
+/** @typedef {import('../../types/api').Profile} Profile */
 
 /**
  * This service handles fetching the user's profile, updating profile settings

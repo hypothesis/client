@@ -1,10 +1,12 @@
-import EventEmitter from 'tiny-emitter';
+import { TinyEmitter } from 'tiny-emitter';
 
 import serviceConfig from '../service-config';
 import OAuthClient from '../util/oauth-client';
 import { resolve } from '../util/url';
 
 /**
+ * @typedef {import('../util/oauth-client').TokenInfo} TokenInfo
+ *
  * @typedef RefreshOptions
  * @property {boolean} persist - True if access tokens should be persisted for
  *   use in future sessions.
@@ -32,7 +34,7 @@ export default function auth(
 ) {
   /**
    * Authorization code from auth popup window.
-   * @type {string}
+   * @type {string|null}
    */
   let authCode;
 
@@ -41,7 +43,7 @@ export default function auth(
    *
    * Resolves to `null` if the user is not logged in.
    *
-   * @type {Promise<TokenInfo|null>}
+   * @type {Promise<TokenInfo|null>|null}
    */
   let tokenInfoPromise;
 
@@ -127,7 +129,7 @@ export default function auth(
       });
   }
 
-  const emitter = new EventEmitter();
+  const emitter = new TinyEmitter();
 
   /**
    * Listen for updated access & refresh tokens saved by other instances of the
@@ -162,7 +164,7 @@ export default function auth(
   /**
    * Retrieve an access token for the API.
    *
-   * @return {Promise<string>} The API access token.
+   * @return {Promise<string|null>} The API access token or `null` if not logged in.
    */
   function tokenGetter() {
     if (!tokenInfoPromise) {
@@ -205,50 +207,52 @@ export default function auth(
 
     const origToken = tokenInfoPromise;
 
-    return tokenInfoPromise.then(token => {
-      if (!token) {
-        // No token available. User will need to log in.
-        return null;
-      }
-
-      if (origToken !== tokenInfoPromise) {
-        // A token refresh has been initiated via a call to `refreshAccessToken`
-        // below since `tokenGetter()` was called.
-        return tokenGetter();
-      }
-
-      if (Date.now() > token.expiresAt) {
-        let shouldPersist = true;
-
-        // If we are using automatic login via a grant token, do not persist the
-        // initial access token or refreshed tokens.
-        const cfg = serviceConfig(settings);
-        if (cfg && typeof cfg.grantToken !== 'undefined') {
-          shouldPersist = false;
+    return /** @type {Promise<TokenInfo|null>} */ (tokenInfoPromise).then(
+      token => {
+        if (!token) {
+          // No token available. User will need to log in.
+          return null;
         }
 
-        // Token expired. Attempt to refresh.
-        tokenInfoPromise = refreshAccessToken(token.refreshToken, {
-          persist: shouldPersist,
-        })
-          .then(token => {
-            // Sanity check that prevents an infinite loop. Mostly useful in
-            // tests.
-            if (Date.now() > token.expiresAt) {
-              throw new Error('Refreshed token expired in the past');
-            }
-            return token;
-          })
-          .catch(() => {
-            // If refreshing the token fails, the user is simply logged out.
-            return null;
-          });
+        if (origToken !== tokenInfoPromise) {
+          // A token refresh has been initiated via a call to `refreshAccessToken`
+          // below since `tokenGetter()` was called.
+          return tokenGetter();
+        }
 
-        return tokenGetter();
-      } else {
-        return token.accessToken;
+        if (Date.now() > token.expiresAt) {
+          let shouldPersist = true;
+
+          // If we are using automatic login via a grant token, do not persist the
+          // initial access token or refreshed tokens.
+          const cfg = serviceConfig(settings);
+          if (cfg && typeof cfg.grantToken !== 'undefined') {
+            shouldPersist = false;
+          }
+
+          // Token expired. Attempt to refresh.
+          tokenInfoPromise = refreshAccessToken(token.refreshToken, {
+            persist: shouldPersist,
+          })
+            .then(token => {
+              // Sanity check that prevents an infinite loop. Mostly useful in
+              // tests.
+              if (Date.now() > token.expiresAt) {
+                throw new Error('Refreshed token expired in the past');
+              }
+              return token;
+            })
+            .catch(() => {
+              // If refreshing the token fails, the user is simply logged out.
+              return null;
+            });
+
+          return tokenGetter();
+        } else {
+          return token.accessToken;
+        }
       }
-    });
+    );
   }
 
   /**
@@ -282,7 +286,10 @@ export default function auth(
       tokenInfoPromise,
       oauthClient(),
     ]);
-    await client.revokeToken(token.accessToken);
+
+    if (token) {
+      await client.revokeToken(token.accessToken);
+    }
 
     // eslint-disable-next-line require-atomic-updates
     tokenInfoPromise = Promise.resolve(null);
@@ -292,7 +299,7 @@ export default function auth(
 
   listenForTokenStorageEvents();
 
-  // The returned object `extends` the EventEmitter. We could rework this
+  // The returned object `extends` the emitter. We could rework this
   // service to be a class in future to do this more explicitly.
   return Object.assign(emitter, {
     login,

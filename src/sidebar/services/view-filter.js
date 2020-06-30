@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ */
+
 import { quote } from '../util/annotation-metadata';
 
 // Prevent Babel inserting helper code after `@ngInject` comment below which
@@ -10,6 +14,18 @@ function displayName(ann) {
   }
   return ann.user_info.display_name || '';
 }
+
+/**
+ * @typedef Filter
+ * @prop {(ann: Annotation) => boolean} matches
+ */
+
+/**
+ * @typedef Checker
+ * @prop {(ann: Annotation) => boolean} autofalse
+ * @prop {(ann: Annotation) => any|any[]} value
+ * @prop {(term: any, value: any) => boolean} match
+ */
 
 /**
  * Filter annotations against parsed search queries.
@@ -35,6 +51,8 @@ export default function ViewFilter(unicode) {
    * Filter that matches annotations against a single field & term.
    *
    * eg. "quote:foo" or "text:bar"
+   *
+   * @implements {Filter}
    */
   class TermFilter {
     /**
@@ -67,11 +85,13 @@ export default function ViewFilter(unicode) {
 
   /**
    * Filter that combines other filters using AND or OR combinators.
+   *
+   * @implements {Filter}
    */
   class BinaryOpFilter {
     /**
      * @param {'and'|'or'} op - Binary operator
-     * @param {Filter[]} - Array of filters to test against
+     * @param {Filter[]} filters - Array of filters to test against
      */
     constructor(op, filters) {
       this.operator = op;
@@ -95,6 +115,8 @@ export default function ViewFilter(unicode) {
    *   autofalse: a function for a preliminary false match result
    *   value: a function to extract to facet value for the annotation.
    *   match: a function to check if the extracted value matches the facet value
+   *
+   * @type {Object.<string,Checker>}
    */
   const fieldMatchers = {
     quote: {

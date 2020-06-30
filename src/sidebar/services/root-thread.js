@@ -54,7 +54,15 @@ export default function RootThread(
       // Is there a search query, or are we in an active (focused) focus mode?
       return state.selection.filterQuery || store.focusModeFocused();
     };
-    let filterFn;
+
+    const options = {
+      forceVisible: truthyKeys(state.selection.forceVisible),
+      expanded: store.expandedThreads(),
+      highlighted: state.selection.highlighted,
+      selected: truthyKeys(store.getSelectedAnnotationMap() || {}),
+      sortCompareFn: sortFn,
+    };
+
     if (shouldFilterThread()) {
       const filters = searchFilter.generateFacetedFilter(
         state.selection.filterQuery,
@@ -64,14 +72,13 @@ export default function RootThread(
         }
       );
 
-      filterFn = function (annot) {
+      options.filterFn = function (annot) {
         return viewFilter.filter([annot], filters).length > 0;
       };
     }
 
-    let threadFilterFn;
     if (state.route.name === 'sidebar' && !shouldFilterThread()) {
-      threadFilterFn = function (thread) {
+      options.threadFilterFn = function (thread) {
         if (!thread.annotation) {
           return false;
         }
@@ -85,15 +92,7 @@ export default function RootThread(
 
     // Get the currently loaded annotations and the set of inputs which
     // determines what is visible and build the visible thread structure
-    return buildThread(state.annotations.annotations, {
-      forceVisible: truthyKeys(state.selection.forceVisible),
-      expanded: store.expandedThreads(),
-      highlighted: state.selection.highlighted,
-      selected: truthyKeys(store.getSelectedAnnotationMap() || {}),
-      sortCompareFn: sortFn,
-      filterFn: filterFn,
-      threadFilterFn: threadFilterFn,
-    });
+    return buildThread(state.annotations.annotations, options);
   }
 
   /**

@@ -20,6 +20,7 @@ import * as urlUtil from '../util/url';
  * always returns empty strings as the URLs. After the links object has been
  * received from the API this function starts returning the real URLs.
  *
+ * @callback ServiceUrlGetter
  * @param {string} linkName - The name of the link to expand
  * @param {object} params - The params with which to expand the link
  * @returns {string} The expanded absolute URL, or an empty string if the
@@ -28,7 +29,10 @@ import * as urlUtil from '../util/url';
  *                 linkName is unknown
  * @throws {Error} If one or more of the params given isn't used in the URL
  *                 template
- *
+ */
+
+/**
+ * @return {ServiceUrlGetter}
  * @ngInject
  */
 export default function serviceUrl(store, apiRoutes) {

@@ -507,13 +507,13 @@ describe('groups', function () {
       });
     });
 
-    it('injects a defalt organization if group is missing an organization', function () {
+    it('injects a default organization if group is missing an organization', function () {
       const svc = service();
       const groups = [{ id: '39r39f', name: 'Ding Dong!' }];
       fakeApi.groups.list.returns(Promise.resolve(groups));
       return svc.load().then(groups => {
         assert.isObject(groups[0].organization);
-        assert.hasAllKeys(groups[0].organization, ['id', 'logo']);
+        assert.hasAllKeys(groups[0].organization, ['id', 'name', 'logo']);
       });
     });
 
