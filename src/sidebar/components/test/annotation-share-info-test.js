@@ -50,19 +50,16 @@ describe('AnnotationShareInfo', () => {
     it('should show a link to the group for extant, first-party groups', () => {
       const wrapper = createAnnotationShareInfo();
 
-      const groupLink = wrapper.find('.annotation-share-info__group');
-      const groupName = wrapper.find('.annotation-share-info__group-info');
+      const groupLink = wrapper.find('a');
 
       assert.equal(groupLink.prop('href'), fakeGroup.links.html);
-      assert.equal(groupName.text(), fakeGroup.name);
+      assert.equal(groupLink.text(), fakeGroup.name);
     });
 
     it('should display a group icon for private and restricted groups', () => {
       const wrapper = createAnnotationShareInfo();
 
-      const groupIcon = wrapper.find(
-        '.annotation-share-info__group .annotation-share-info__icon'
-      );
+      const groupIcon = wrapper.find('SvgIcon');
 
       assert.equal(groupIcon.prop('name'), 'groups');
     });
@@ -71,9 +68,7 @@ describe('AnnotationShareInfo', () => {
       fakeGroup.type = 'open';
       const wrapper = createAnnotationShareInfo();
 
-      const groupIcon = wrapper.find(
-        '.annotation-share-info__group .annotation-share-info__icon'
-      );
+      const groupIcon = wrapper.find('SvgIcon');
 
       assert.equal(groupIcon.prop('name'), 'public');
     });

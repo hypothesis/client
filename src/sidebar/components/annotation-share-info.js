@@ -29,7 +29,7 @@ function AnnotationShareInfo({ annotation }) {
     <div className="annotation-share-info u-layout-row--align-baseline">
       {linkToGroup && (
         <a
-          className="annotation-share-info__group"
+          className="u-layout-row--align-baseline u-color-text--muted"
           href={group.links.html}
           target="_blank"
           rel="noopener noreferrer"
@@ -45,7 +45,7 @@ function AnnotationShareInfo({ annotation }) {
         </a>
       )}
       {annotationIsPrivate && !linkToGroup && (
-        <span className="annotation-share-info__private">
+        <span className="u-layout-row--align-baseline u-color-text--muted">
           <span className="annotation-share-info__private-info">Only me</span>
         </span>
       )}
