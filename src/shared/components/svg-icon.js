@@ -54,6 +54,9 @@ export default function SvgIcon({
   const element = /** @type {Ref<HTMLElement>} */ (useRef());
   useLayoutEffect(() => {
     const svg = element.current.querySelector('svg');
+
+    // The icon should always contain an `<svg>` element, but check here as we
+    // don't validate the markup when it is registered.
     if (svg) {
       svg.setAttribute('class', className);
     }
@@ -89,7 +92,7 @@ SvgIcon.propTypes = {
 /**
  * Register icons for use with the `SvgIcon` component.
  *
- * @param {IconMap} icons - Object mapping icon names to SVG data.
+ * @param {IconMap} icons
  * @param {Object} options
  *  @param {boolean} [options.reset] - If `true`, remove existing registered icons.
  */
