@@ -46,7 +46,7 @@
     @include utils.icon--medium;
   }
 
-  &:hover {
+  &:hover:not([disabled]) {
     transition: 0.2s ease-out;
     color: var.$grey-7;
   }
@@ -64,7 +64,7 @@
   &[aria-pressed='true'] {
     color: var.$color-brand;
 
-    &:hover {
+    &:hover:not([disabled]) {
       color: var.$color-brand;
     }
   }
@@ -77,7 +77,7 @@
   font-weight: 700;
   background-color: var.$grey-1;
 
-  &:hover {
+  &:hover:not([disabled]) {
     background-color: var.$grey-2;
   }
 
@@ -96,9 +96,15 @@
   color: var.$grey-1;
   background-color: var.$grey-mid;
 
-  &:hover {
+  &:hover:not([disabled]) {
     color: var.$grey-1;
     background-color: var.$grey-6;
+  }
+
+  &:disabled {
+    // Note: this color does not meet WCAG contrast requirements,
+    // but is admissable because it is applied to disabled elements
+    color: var.$grey-semi;
   }
 }
 
@@ -116,7 +122,7 @@
   border-radius: 0; // Turn off border-radius to align with <input> edges
   border-left: 0; // Avoid double border with the <input>
 
-  &:hover {
+  &:hover:not([disabled]) {
     background-color: var.$grey-2;
   }
 }
@@ -128,7 +134,7 @@
   @include button;
   color: var.$grey-mid;
   padding: 0;
-  &:hover {
+  &:hover:not([disabled]) {
     color: var.$color-link-hover;
     text-decoration: underline;
   }

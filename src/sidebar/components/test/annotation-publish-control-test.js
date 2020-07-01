@@ -75,9 +75,7 @@ describe('AnnotationPublishControl', () => {
       const fakeStyle = { foo: 'bar' };
       fakeApplyTheme.returns(fakeStyle);
       const wrapper = createAnnotationPublishControl();
-      const btnPrimary = wrapper.find(
-        '.annotation-publish-control__btn-primary'
-      );
+      const btnPrimary = wrapper.find('.annotation-publish-button__primary');
 
       assert.calledWith(
         fakeApplyTheme,
@@ -89,7 +87,7 @@ describe('AnnotationPublishControl', () => {
   });
 
   describe('dropdown menu button (form submit button)', () => {
-    const btnClass = '.annotation-publish-control__btn-primary';
+    const btnClass = '.annotation-publish-button__primary';
     context('shared annotation', () => {
       it('should label the button with the group name', () => {
         const wrapper = createAnnotationPublishControl();
@@ -99,7 +97,6 @@ describe('AnnotationPublishControl', () => {
           btn.prop('title'),
           `Publish this annotation to ${fakeGroup.name}`
         );
-        assert.equal(btn.text(), `Post to ${fakeGroup.name}`);
       });
     });
 
@@ -112,7 +109,6 @@ describe('AnnotationPublishControl', () => {
 
         const btn = wrapper.find(btnClass);
         assert.equal(btn.prop('title'), 'Publish this annotation to Only Me');
-        assert.equal(btn.text(), 'Post to Only Me');
       });
     });
 
@@ -254,7 +250,7 @@ describe('AnnotationPublishControl', () => {
   describe('cancel button', () => {
     it('should remove the current draft on cancel button click', () => {
       const wrapper = createAnnotationPublishControl({});
-      const cancelBtn = wrapper.find('Button');
+      const cancelBtn = wrapper.find('Button').filter({ buttonText: 'Cancel' });
 
       cancelBtn.props().onClick();
 
@@ -266,7 +262,7 @@ describe('AnnotationPublishControl', () => {
     it('should remove the annotation from the store if it is new/unsaved', () => {
       fakeMetadata.isNew.returns(true);
       const wrapper = createAnnotationPublishControl({});
-      const cancelBtn = wrapper.find('Button');
+      const cancelBtn = wrapper.find('Button').filter({ buttonText: 'Cancel' });
 
       cancelBtn.props().onClick();
 

@@ -10,6 +10,7 @@ import { applyTheme } from '../util/theme';
 import Button from './button';
 import Menu from './menu';
 import MenuItem from './menu-item';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * Render a compound control button for publishing (saving) an annotation:
@@ -53,32 +54,32 @@ function AnnotationPublishControl({
   };
 
   const menuLabel = (
-    <div className="annotation-publish-control__btn-dropdown-arrow">
-      <div className="annotation-publish-control__btn-dropdown-arrow-separator" />
-      <div
-        className="annotation-publish-control__btn-dropdown-arrow-indicator"
-        style={applyTheme(themeProps, settings)}
+    <div
+      className="annotation-publish-button__menu-label"
+      style={applyTheme(themeProps, settings)}
+    >
+      <SvgIcon
+        name="expand-menu"
+        className="annotation-publish-button__menu-icon"
       />
     </div>
   );
 
   return (
     <div className="annotation-publish-control">
-      <div className="annotation-publish-control__btn">
-        <button
-          className="annotation-publish-control__btn-primary"
+      <div className="annotation-publish-button">
+        <Button
+          className="annotation-publish-button__primary"
           style={applyTheme(themeProps, settings)}
           onClick={onSave}
           disabled={isDisabled}
-          aria-label={`Publish this annotation to ${publishDestination}`}
           title={`Publish this annotation to ${publishDestination}`}
-        >
-          Post to {publishDestination}
-        </button>
+          buttonText={`Post to ${publishDestination}`}
+        />
         <Menu
-          arrowClass="annotation-publish-control__btn-menu-arrow"
+          arrowClass="annotation-publish-button__menu-arrow"
           containerPositioned={false}
-          contentClass="annotation-publish-control__btn-menu-content"
+          contentClass="annotation-publish-button__menu-content"
           label={menuLabel}
           menuIndicator={false}
           title="Change annotation sharing setting"
@@ -98,12 +99,14 @@ function AnnotationPublishControl({
           />
         </Menu>
       </div>
-      <Button
-        icon="cancel"
-        buttonText="Cancel"
-        onClick={onCancel}
-        className="annotation-publish-control__btn-cancel"
-      />
+      <div>
+        <Button
+          icon="cancel"
+          className="annotation-publish-control__cancel-button"
+          buttonText="Cancel"
+          onClick={onCancel}
+        />
+      </div>
     </div>
   );
 }

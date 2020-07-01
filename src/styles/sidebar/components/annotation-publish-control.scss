@@ -1,118 +1,72 @@
 @use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../mixins/layout";
+@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .annotation-publish-control {
   @include layout.row;
+  @include layout.horizontal-rhythm(var.$layout-space);
 
-  // A split button with a primary submit on the left and a drop-down menu
-  // of related options to the right
-  .annotation-publish-control__btn {
-    @include layout.row;
-    $text-color: var.$color-text-inverted;
-    $default-background-color: var.$grey-mid;
-    $hover-background-color: var.$grey-6;
-    $h-padding: 9px;
-    $height: 35px;
-    $arrow-indicator-width: 26px;
+  &__cancel-button {
+    @include buttons.button--labeled;
+    // TODO: Magic number
+    padding: 0.75em;
+  }
+}
 
-    height: $height;
-    position: relative;
-    margin-right: 1em;
+// A split button with a primary submit on the left and a drop-down menu
+// of related options to the right
+.annotation-publish-button {
+  @include layout.row;
+  // For proper menu alignment
+  position: relative;
 
-    // Align the menu arrow correctly with the ▼ in the toggle
-    &-menu-arrow {
-      right: 5px;
+  // Align the menu (upward) arrow correctly with the ▼ in the menu label icon
+  // Note the extra `&` needed for specificity against `Menu`'s own arrow styling
+  & &__menu-arrow {
+    right: 8px;
+  }
+
+  // Make sure the menu content is wide enough to "reach" to the right-aligned
+  // menu arrow
+  &__menu-content {
+    min-width: 100%;
+  }
+
+  &__primary {
+    @include buttons.button--primary;
+    // TODO magic number
+    padding: 0.75em;
+
+    // Turn off right-side border radius for alignment with menu label/button
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  // dropdown arrow which reveals the button's associated menu
+  // when clicked
+  &__menu-label {
+    @include layout.row(center);
+    color: var.$color-text-inverted;
+    background-color: var.$grey-mid;
+    // Make sure label element takes up full available vertical space
+    height: 100%;
+    // TODO magic number
+    padding: 0 0.75em;
+
+    // Add border radius to the right to match the left side of the primary button
+    border-top-right-radius: var.$border-radius;
+    border-bottom-right-radius: var.$border-radius;
+
+    &:hover {
+      background-color: var.$grey-6;
     }
+  }
 
-    // Make sure the menu content is wide enough to "reach" to the right-aligned
-    // menu arrow
-    &-menu-content {
-      min-width: 100%;
-    }
-
-    &-cancel {
-      @include buttons.button--labeled;
-      padding-right: var.$layout-space--small;
-      padding-left: var.$layout-space--small;
-
-      &__icon {
-        margin: 0;
-      }
-    }
-
-    &-primary {
-      @include forms.primary-action-btn;
-
-      // the label occupies the entire space of the button and
-      // shows a darker state on hover
-      width: 100%;
-      height: 100%;
-      text-align: left;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-    }
-
-    // dropdown arrow which reveals the button's associated menu
-    // when clicked
-    &-dropdown-arrow {
-      @include layout.row(center);
-      right: 0px;
-      top: 0px;
-
-      height: 100%;
-      width: $arrow-indicator-width;
-
-      border: none;
-      background-color: var.$grey-mid;
-      border-top-right-radius: var.$border-radius;
-      border-bottom-right-radius: var.$border-radius;
-
-      &:hover,
-      button[aria-expanded='true'] & {
-        // Show a hover effect on hover or if associated menu is open
-        background-color: $hover-background-color;
-      }
-
-      &:hover &-separator,
-      button[aria-expanded='true'] &-separator {
-        // hide the 1px vertical separator when the dropdown arrow
-        // is hovered or menu is open
-        background-color: var.$grey-mid;
-      }
-
-      // 1px vertical separator between label and dropdown arrow
-      &-separator {
-        position: absolute;
-        top: 0px;
-        bottom: 0px;
-        margin-top: auto;
-        margin-bottom: auto;
-
-        width: 1px;
-        height: 15px;
-
-        background-color: var.$grey-5;
-      }
-
-      // the ▼ arrow which reveals the dropdown menu when clicked
-      &-indicator {
-        color: $text-color;
-        left: 0px;
-        right: 0px;
-        top: 0px;
-        bottom: 0px;
-        line-height: $height;
-        text-align: center;
-        width: 100%;
-
-        &:after {
-          content: '▼';
-          display: inline-block;
-          transform: scaleY(0.7);
-        }
-      }
-    }
+  &__menu-icon {
+    @include utils.icon--small;
+    // To properly vertically center menu-label icon
+    height: 100%;
   }
 }
