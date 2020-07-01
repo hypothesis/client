@@ -1,6 +1,10 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 /**
+ * @typedef {import('../types/api').Annotation} Annotation
+ */
+
+/**
  * Client for the Hypothesis search API.
  *
  * SearchClient handles paging through results, canceling search etc.
@@ -8,21 +12,28 @@ import { TinyEmitter } from 'tiny-emitter';
 export default class SearchClient extends TinyEmitter {
   /**
    * @param {Object} searchFn - Function for querying the search API
-   * @param {Object} opts - Search options
+   * @param {Object} options
+   *   @param {number} [options.chunkSize] - page size/number of annotations
+   *   per batch
+   *   @param {boolean} [options.separateReplies] - When `true`, request that
+   *   top-level annotations and replies be returned separately.
+   *   NOTE: This has issues with annotations that have large numbers of
+   *   replies.
+   *   @param {boolean} [options.incremental] - Emit `results` events incrementally
+   *   as batches of annotations are available
    */
-  constructor(searchFn, opts) {
+  constructor(
+    searchFn,
+    { chunkSize = 200, separateReplies = true, incremental = true } = {}
+  ) {
     super();
-    opts = opts || {};
-
-    const DEFAULT_CHUNK_SIZE = 200;
     this._searchFn = searchFn;
-    this._chunkSize = opts.chunkSize || DEFAULT_CHUNK_SIZE;
-    if (typeof opts.incremental !== 'undefined') {
-      this._incremental = opts.incremental;
-    } else {
-      this._incremental = true;
-    }
+    this._chunkSize = chunkSize;
+    this._separateReplies = separateReplies;
+    this._incremental = incremental;
+
     this._canceled = false;
+    /** @type {Annotation[]} */
     this._results = [];
   }
 
@@ -33,7 +44,7 @@ export default class SearchClient extends TinyEmitter {
         offset: offset,
         sort: 'created',
         order: 'asc',
-        _separate_replies: true,
+        _separate_replies: this._separateReplies,
       },
       query
     );

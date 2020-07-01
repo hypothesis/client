@@ -1,6 +1,7 @@
 /**
  * A service for fetching annotations, filtered by document URIs and group.
  */
+
 import SearchClient from '../search-client';
 
 import { isReply } from '../util/annotation-metadata';
@@ -8,6 +9,7 @@ import { isReply } from '../util/annotation-metadata';
 // @ngInject
 export default function loadAnnotationsService(
   api,
+  features,
   store,
   streamer,
   streamFilter
@@ -39,6 +41,7 @@ export default function loadAnnotationsService(
   function searchAndLoad(uris, groupId) {
     searchClient = new SearchClient(api.search, {
       incremental: true,
+      separateReplies: !features.flagEnabled('client_do_not_separate_replies'),
     });
     searchClient.on('results', results => {
       if (results.length) {
