@@ -8,7 +8,7 @@
   z-index: 1;
   left: 0;
   width: 100%;
-  padding: 0 var.$layout-space--small;
+  padding: 0 var.$layout-space--xsmall;
 
   @include responsive.tablet-and-up {
     // When displaying in a wider viewport (desktop/tablet outside of sidebar)

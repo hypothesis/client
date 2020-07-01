@@ -5,7 +5,7 @@
 @use "../../variables" as var;
 
 .tag-editor {
-  margin: var.$layout-space--small 0;
+  margin: var.$layout-space--xsmall 0;
 
   &__input {
     @include forms.form-input;
@@ -15,13 +15,13 @@
   &__tags {
     @include layout.row;
     flex-wrap: wrap;
-    margin: var.$layout-space--small 0;
+    margin: var.$layout-space--xsmall 0;
   }
 
   &__item {
     @include layout.row;
-    margin: var.$layout-space--xsmall var.$layout-space--small
-      var.$layout-space--small 0;
+    margin: var.$layout-space--xxsmall var.$layout-space--xsmall
+      var.$layout-space--xsmall 0;
   }
 
   &__edit {
@@ -30,7 +30,7 @@
     background: var.$grey-1;
     border-radius: var.$border-radius 0 0 var.$border-radius;
     border-right-width: 0;
-    padding: 2px var.$layout-space--small;
+    padding: 2px var.$layout-space--xsmall;
   }
 
   &__delete {
@@ -38,7 +38,7 @@
     @include utils.border;
     color: var.$grey-mid;
     background-color: var.$grey-1;
-    padding: 0 var.$layout-space--small;
+    padding: 0 var.$layout-space--xsmall;
     border-radius: 0 var.$border-radius var.$border-radius 0;
 
     &:hover {

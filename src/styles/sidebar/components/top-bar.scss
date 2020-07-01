@@ -52,7 +52,7 @@
   }
 
   &__menu-label {
-    padding: var.$layout-space--xsmall;
+    padding: var.$layout-space--xxsmall;
   }
 }
 
@@ -63,7 +63,7 @@
 .top-bar__login-button {
   @include buttons.button;
   @include utils.font--large;
-  padding: 0 var.$layout-space--xsmall;
+  padding: 0 var.$layout-space--xxsmall;
   color: var.$color-brand;
 
   &:hover {

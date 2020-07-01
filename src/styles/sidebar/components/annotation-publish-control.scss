@@ -10,8 +10,7 @@
 
   &__cancel-button {
     @include buttons.button--labeled;
-    // TODO: Magic number
-    padding: 0.75em;
+    padding: var.$layout-space--small;
   }
 }
 
@@ -36,8 +35,7 @@
 
   &__primary {
     @include buttons.button--primary;
-    // TODO magic number
-    padding: 0.75em;
+    padding: var.$layout-space--small;
 
     // Turn off right-side border radius for alignment with menu label/button
     border-top-right-radius: 0;
@@ -48,12 +46,11 @@
   // when clicked
   &__menu-label {
     @include layout.row(center);
+    @include layout.horizontal-space(var.$layout-space--small);
     color: var.$color-text-inverted;
     background-color: var.$grey-mid;
     // Make sure label element takes up full available vertical space
     height: 100%;
-    // TODO magic number
-    padding: 0 0.75em;
 
     // Add border radius to the right to match the left side of the primary button
     border-top-right-radius: var.$border-radius;

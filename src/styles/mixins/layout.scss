@@ -82,11 +82,21 @@
 }
 
 /**
- * Establish vertical space outside of elements in the container
+ * Establish vertical space outside of elements within the container
  *
  * @param $size [var.$layout-space--medium]: Spacing size (padding)
  */
 @mixin vertical-space($size: var.$layout-space--medium) {
   padding-top: $size;
   padding-bottom: $size;
+}
+
+/**
+ * Establish horizontal space outside of elements within the container
+ *
+ * @param $size [var.$layout-space--medium]: Spacing size (padding)
+ */
+@mixin horizontal-space($size: var.$layout-space--medium) {
+  padding-left: $size;
+  padding-right: $size;
 }
