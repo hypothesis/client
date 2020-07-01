@@ -12,6 +12,7 @@
   },
   "include": [
     "annotator/config/*.js",
+    "annotator/components/*.js",
     "annotator/util/*.js",
     "boot/*.js",
     "shared/*.js",

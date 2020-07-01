@@ -5,6 +5,14 @@ import propTypes from 'prop-types';
 import { useShortcut } from '../../shared/shortcut';
 import SvgIcon from '../../shared/components/svg-icon';
 
+/**
+ * @param {Object} props
+ *  @param {number} [props.badgeCount]
+ *  @param {string} [props.icon]
+ *  @param {string} props.label
+ *  @param {() => any} props.onClick
+ *  @param {string|null} props.shortcut
+ */
 function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
   useShortcut(shortcut, onClick);
 
@@ -37,8 +45,30 @@ ToolbarButton.propTypes = {
 };
 
 /**
+ * Union of possible toolbar commands.
+ *
+ * @typedef {'annotate'|'highlight'|'show'} Command
+ */
+
+/**
+ * @typedef AdderToolbarProps
+ * @prop {'up'|'down'} arrowDirection -
+ *   Whether the arrow pointing out of the toolbar towards the selected text
+ *   should appear above the toolbar pointing Up or below the toolbar pointing
+ *   Down.
+ * @prop {boolean} isVisible - Whether to show the toolbar or not.
+ * @prop {(c: Command) => any} onCommand - Called when a toolbar button is clicked.
+ * @prop {number} [annotationCount] -
+ *   Number of annotations associated with the selected text.
+ *   If non-zero, a "Show" button is displayed to allow the user to see the
+ *   annotations that correspond to the selection.
+ */
+
+/**
  * The toolbar that is displayed above selected text in the document providing
  * options to create annotations or highlights.
+ *
+ * @param {AdderToolbarProps} props
  */
 export default function AdderToolbar({
   arrowDirection,
@@ -63,6 +93,7 @@ export default function AdderToolbar({
   // nb. The adder is hidden using the `visibility` property rather than `display`
   // so that we can compute its size in order to position it before display.
   return (
+    // @ts-ignore - TS doesn't know about our custom element types.
     <hypothesis-adder-toolbar
       class={classnames('annotator-adder', {
         'annotator-adder--arrow-down': arrowDirection === 'down',
@@ -71,6 +102,7 @@ export default function AdderToolbar({
       })}
       style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
+      {/* @ts-ignore */}
       <hypothesis-adder-actions className="annotator-adder-actions">
         <ToolbarButton
           icon="annotate"
@@ -95,35 +127,16 @@ export default function AdderToolbar({
             shortcut={showShortcut}
           />
         )}
+        {/* @ts-ignore */}
       </hypothesis-adder-actions>
+      {/* @ts-ignore */}
     </hypothesis-adder-toolbar>
   );
 }
 
 AdderToolbar.propTypes = {
-  /**
-   * Whether the arrow pointing out of the toolbar towards the selected text
-   * should appear above the toolbar pointing Up or below the toolbar pointing
-   * Down.
-   */
   arrowDirection: propTypes.oneOf(['up', 'down']).isRequired,
-
-  /**
-   * Whether to show the toolbar or not.
-   */
   isVisible: propTypes.bool.isRequired,
-
-  /**
-   * Callback invoked with the name ("annotate", "highlight", "show") of the
-   * selected command when a toolbar command is clicked.
-   */
   onCommand: propTypes.func.isRequired,
-
-  /**
-   * Number of annotations associated with the selected text.
-   *
-   * If non-zero, a "Show" button is displayed to allow the user to see the
-   * annotations that correspond to the selection.
-   */
   annotationCount: propTypes.number,
 };
