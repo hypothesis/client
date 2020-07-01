@@ -15,6 +15,7 @@
     "annotator/util/*.js",
     "boot/*.js",
     "shared/*.js",
+    "shared/components/*.js",
     "sidebar/*.js",
     "sidebar/services/*.js",
     "sidebar/util/*.js"
