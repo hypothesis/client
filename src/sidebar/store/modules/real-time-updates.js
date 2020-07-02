@@ -3,6 +3,10 @@
  * WebSocket connection to h's real-time API.
  */
 
+/**
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ */
+
 import { createSelector } from 'reselect';
 
 import { actionTypes } from '../util';

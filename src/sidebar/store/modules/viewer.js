@@ -41,7 +41,7 @@ function setShowHighlights(show) {
 }
 
 /**
- * @param {boolean} sidebarState - If the sidebar is open
+ * @param {boolean} opened - If the sidebar is open
  */
 function setSidebarOpened(opened) {
   return { type: actions.SET_SIDEBAR_OPENED, opened };

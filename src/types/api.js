@@ -12,6 +12,7 @@
  * @prop {string} [id]
  * @prop {string[]} [references]
  * @prop {string} created
+ * @prop {string} group
  * @prop {string} updated
  * @prop {string[]} tags
  * @prop {string} text

@@ -1,11 +1,15 @@
 /**
  * Return an object where each key in `updateFns` is mapped to the key itself.
+ *
+ * @template {Object.<string,Function>} T
+ * @param {T} reducers - Object containing reducer functions
+ * @return {{ [index in keyof T]: string }}
  */
-export function actionTypes(updateFns) {
-  return Object.keys(updateFns).reduce(function (types, key) {
+export function actionTypes(reducers) {
+  return Object.keys(reducers).reduce(function (types, key) {
     types[key] = key;
     return types;
-  }, {});
+  }, /** @type {any} */ ({}));
 }
 
 /**

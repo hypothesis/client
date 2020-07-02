@@ -18,6 +18,7 @@
     "shared/*.js",
     "shared/components/*.js",
     "sidebar/*.js",
+    "sidebar/store/modules/*.js",
     "sidebar/services/*.js",
     "sidebar/util/*.js"
   ],

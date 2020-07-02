@@ -4,6 +4,10 @@ import * as util from '../util';
 
 import session from './session';
 
+/**
+ * @typedef {import('../../../types/api').Group} Group
+ */
+
 function init() {
   return {
     /**
@@ -97,7 +101,7 @@ function loadGroups(groups) {
 /**
  * Return the currently focused group.
  *
- * @return {Group|null}
+ * @return {Group|undefined|null}
  */
 function focusedGroup(state) {
   if (!state.groups.focusedGroupId) {

@@ -3,6 +3,10 @@
  * sidebar.
  */
 
+/**
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ */
+
 import { createSelector } from 'reselect';
 
 import * as metadata from '../../util/annotation-metadata';
@@ -56,7 +60,7 @@ function findByTag(annotations, tag) {
  * from the service.
  *
  * @param {Object} annotation
- * @param {Number} tag - The `$tag` value that should be used for this
+ * @param {string} tag - The `$tag` value that should be used for this
  *                       if it doesn't have a `$tag` already
  * @return {Object} - annotation with local (`$*`) fields set
  */
@@ -226,7 +230,7 @@ function updateFlagStatus(id, isFlagged) {
 /**
  * Add these `annotations` to the current collection of annotations in the store.
  *
- * @param {Object}[] annotations - Array of annotation objects to add.
+ * @param {Annotation[]} annotations - Array of annotation objects to add.
  */
 function addAnnotations(annotations) {
   return function (dispatch, getState) {
@@ -344,7 +348,7 @@ function unhideAnnotation(id) {
 /**
  * Return all loaded annotations which have been saved to the server.
  *
- * @param {state} - The global app state
+ * @param {Object} state - The global app state
  */
 function savedAnnotations(state) {
   return state.annotations.annotations.filter(function (ann) {
@@ -365,7 +369,7 @@ function annotationExists(state, id) {
  * If an annotation does not have an ID because it has not been created on
  * the server, there will be no entry for it in the returned array.
  *
- * @param {string[]} Local tags of annotations to look up
+ * @param {string[]} tags - Local tags of annotations to look up
  */
 function findIDsForTags(state, tags) {
   const ids = [];
