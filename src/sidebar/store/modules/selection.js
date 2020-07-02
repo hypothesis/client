@@ -313,7 +313,7 @@ function setForceVisible(id, visible) {
 /**
  * Sets which annotations are currently focused.
  *
- * @param {Array<string>} Tags of annotations to focus
+ * @param {string[]} tags - Tags of annotations to focus
  */
 function focusAnnotations(tags) {
   return {
