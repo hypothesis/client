@@ -15,7 +15,7 @@
  * @prop {string} updated
  * @prop {string[]} tags
  * @prop {string} text
- * @prop {string|null} uri
+ * @prop {string} uri
  * @prop {string} user
  * @prop {boolean} hidden
  * @prop {boolean} [$highlight]

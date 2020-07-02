@@ -15,7 +15,7 @@
 export function documentMetadata(annotation) {
   const uri = annotation.uri;
 
-  let domain = new URL(/** @type {string} */ (uri)).hostname;
+  let domain = new URL(uri).hostname;
   let title = domain;
 
   if (annotation.document && annotation.document.title) {
@@ -53,7 +53,7 @@ export function domainAndTitle(annotation) {
  * @param {Annotation} annotation - An annotation domain model object.
  */
 function titleLinkFromAnnotation(annotation) {
-  let titleLink = annotation.uri;
+  let titleLink = /** @type {string|null} */ (annotation.uri);
 
   if (
     titleLink &&
