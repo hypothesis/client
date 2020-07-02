@@ -15,8 +15,34 @@
  * @prop {string} updated
  * @prop {string[]} tags
  * @prop {string} text
- * @prop {string} uri
+ * @prop {string|null} uri
  * @prop {string} user
+ * @prop {boolean} hidden
+ * @prop {boolean} [$highlight]
+ * @prop {boolean} [$orphan]
+ * @prop {boolean} [$anchorTimeout]
+ *
+ * @prop {Object} document
+ *   @prop {string} document.title
+ *
+ * @prop {Object} permissions
+ *   @prop {string[]} permissions.read
+ *   @prop {string[]} permissions.update
+ *   @prop {string[]} permissions.delete
+ *
+ * @prop {Object[]} target
+ *   @prop {string} target.source
+ *   @prop {Object[]} target.selector
+ *     @prop {string} target.selector.type
+ *     @prop {string} target.selector.exact
+ *     @prop {number} target.selector.start
+ *
+ * @prop {Object} moderation
+ *   @prop {number} moderation.flagCount
+ *
+ * @prop {Object} links
+ *   @prop {string} links.incontext
+ *   @prop {string} links.html
  */
 
 /**
