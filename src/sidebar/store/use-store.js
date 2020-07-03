@@ -50,7 +50,7 @@ export default function useStore(callback) {
 
   // Store the last-used callback in a ref so we can access it in the effect
   // below without having to re-subscribe to the store when it changes.
-  const lastCallback = /** @type {Ref<HTMLElement>} */ useRef();
+  const lastCallback = useRef();
   lastCallback.current = callback;
 
   const lastResult = useRef();
