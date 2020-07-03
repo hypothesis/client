@@ -11,9 +11,10 @@ import { useService } from '../util/service-context';
  */
 
 /**
+ * @template T
  * @callback StoreCallback
  * @param {Store} store
- * @return {any}
+ * @return {T}
  */
 
 /**
@@ -40,7 +41,7 @@ import { useService } from '../util/service-context';
  *   }
  *
  * @template T
- * @param {StoreCallback} callback -
+ * @param {StoreCallback<T>} callback -
  *   Callback that receives the store as an argument and returns some state
  *   and/or actions extracted from the store.
  * @return {T} - The result of `callback(store)`
@@ -50,10 +51,10 @@ export default function useStore(callback) {
 
   // Store the last-used callback in a ref so we can access it in the effect
   // below without having to re-subscribe to the store when it changes.
-  const lastCallback = useRef();
+  const lastCallback = useRef(/** @type {typeof callback|null} */ (null));
   lastCallback.current = callback;
 
-  const lastResult = useRef();
+  const lastResult = useRef(/** @type {T|undefined} */ (undefined));
   lastResult.current = callback(store);
 
   // Check for a performance issue caused by `callback` returning a different
@@ -75,7 +76,7 @@ export default function useStore(callback) {
   // and re-render the component if the result changed.
   useEffect(() => {
     function checkForUpdate() {
-      const result = /** @type {StoreCallback} */ (lastCallback.current)(store);
+      const result = lastCallback.current(store);
       if (shallowEqual(result, lastResult.current)) {
         return;
       }
@@ -94,5 +95,5 @@ export default function useStore(callback) {
     return unsubscribe;
   }, [forceUpdate, store]);
 
-  return /** @type {T} */ (lastResult.current);
+  return lastResult.current;
 }

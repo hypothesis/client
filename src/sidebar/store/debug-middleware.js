@@ -1,9 +1,4 @@
 /**
- * @typedef HypothesisGlobals
- * @prop {boolean} debug
- */
-
-/**
  * A debug utility that prints information about internal application state
  * changes to the console.
  *
@@ -22,7 +17,7 @@ export default function debugMiddleware(store) {
   return function (next) {
     return function (action) {
       // @ts-ignore The window interface needs to be expanded to include this property
-      if (!(/** @type {Window & HypothesisGlobals} */ (window).debug)) {
+      if (!window.debug) {
         next(action);
         return;
       }
