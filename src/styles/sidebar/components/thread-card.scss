@@ -6,4 +6,12 @@
 .thread-card {
   @include molecules.card;
   cursor: pointer;
+  .annotation__footer {
+     display:none;
+  }
+}
+.thread-card:hover {
+   .annotation__footer {
+      display:block;
+   }
 }

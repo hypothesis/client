@@ -363,7 +363,7 @@ module.exports = class Guest extends Delegator
     targets.then(-> self.publish('beforeAnnotationCreated', [annotation]))
     targets.then(-> self.anchor(annotation))
 
-    @crossframe?.call('showSidebar') unless annotation.$highlight
+   # @crossframe?.call('showSidebar') unless annotation.$highlight
     annotation
 
   createHighlight: ->

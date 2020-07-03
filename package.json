@@ -4,7 +4,7 @@
   "description": "Annotate with anyone, anywhere.",
   "license": "BSD-2-Clause",
   "homepage": "https://hypothes.is",
-  "bugs": "https://github.com/hypothesis/client/issues",
+  "bugs": "https://github.com/browngraphicslab/client/issues",
   "repository": "hypothesis/client",
   "devDependencies": {
     "@babel/core": "^7.1.6",
@@ -29,7 +29,6 @@
     "coffeeify": "^2.1.0",
     "commander": "^5.0.0",
     "core-js": "^3.4.1",
-    "cross-env": "^7.0.0",
     "custom-event": "^1.0.1",
     "diff": "^4.0.1",
     "document-base-uri": "^1.0.0",
@@ -53,8 +52,8 @@
     "fancy-log": "^1.3.3",
     "fetch-mock": "9",
     "focus-visible": "^5.0.0",
-    "gulp": "^4.0.0",
-    "gulp-changed": "^4.0.0",
+    "gulp": "^4.0.2",
+    "gulp-changed": "^4.0.2",
     "gulp-rename": "^2.0.0",
     "gulp-replace": "^1.0.0",
     "hammerjs": "^2.0.4",
@@ -131,5 +130,9 @@
     "typecheck": "tsc --build src/tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build/manifest.json"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.2",
+    "gulp-cli": "^2.3.0"
   }
 }

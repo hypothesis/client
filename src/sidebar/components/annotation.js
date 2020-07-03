@@ -99,15 +99,15 @@ function Annotation({
       })}
       onKeyDown={onKeyDown}
     >
-      <AnnotationHeader
+      {text && (text[0] == "~" || text[0] == "^") &&  <AnnotationHeader
         annotation={annotation}
         isEditing={isEditing}
         replyCount={replyCount}
         showDocumentInfo={showDocumentInfo}
         threadIsCollapsed={threadIsCollapsed}
-      />
+      />}
 
-      {hasQuote && (
+      {hasQuote && text && (text[0] == "_" || text[0] == "^") && (
         <AnnotationQuote annotation={annotation} isFocused={isFocused} />
       )}
 

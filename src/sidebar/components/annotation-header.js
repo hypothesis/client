@@ -48,7 +48,7 @@ export default function AnnotationHeader({
 
   return (
     <header className="annotation-header">
-      <div className="annotation-header__row">
+      <div className="annotation-header__row" style={{fontSize:"xx-small"}}>
         {annotationIsPrivate && (
           <SvgIcon
             className="annotation-header__icon"
@@ -57,6 +57,8 @@ export default function AnnotationHeader({
           />
         )}
         <AnnotationUser annotation={annotation} />
+          <AnnotationShareInfo annotation={annotation} />
+            <AnnotationDocumentInfo annotation={annotation} />
         {showReplyButton && (
           <Button
             className="annotation-header__reply-toggle"
@@ -88,25 +90,6 @@ export default function AnnotationHeader({
           </div>
         )}
       </div>
-
-      {showExtendedInfo && (
-        <div className="annotation-header__row">
-          <AnnotationShareInfo annotation={annotation} />
-          {!isEditing && isHighlight(annotation) && (
-            <div className="annotation-header__highlight">
-              <SvgIcon
-                name="highlight"
-                title="This is a highlight. Click 'edit' to add a note or tag."
-                inline={true}
-                className="annotation-header__highlight-icon"
-              />
-            </div>
-          )}
-          {showDocumentInfo && (
-            <AnnotationDocumentInfo annotation={annotation} />
-          )}
-        </div>
-      )}
     </header>
   );
 }

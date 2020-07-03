@@ -120,7 +120,7 @@ export default function Toolbar({
           onClick={toggleSidebar}
         />
       )}
-      {!useMinimalControls && (
+      {/* {!useMinimalControls && (
         <ToolbarButton
           label="Show highlights"
           icon={showHighlights ? 'show' : 'hide'}
@@ -136,7 +136,7 @@ export default function Toolbar({
           icon={newAnnotationType === 'note' ? 'note' : 'annotate'}
           onClick={createAnnotation}
         />
-      )}
+      )} */}
     </div>
   );
 }

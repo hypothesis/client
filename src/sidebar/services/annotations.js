@@ -81,22 +81,30 @@ export default function annotationsService(api, store) {
    * @param {Object} annotationData
    * @param {Date} now
    */
-  function create(annotationData, now = new Date()) {
-    const annotation = initialize(annotationData, now);
-
-    store.addAnnotations([annotation]);
-
-    // Remove other drafts that are in the way, and their annotations (if new)
-    store.deleteNewAndEmptyDrafts();
-
-    // Create a draft unless it's a highlight
-    if (!metadata.isHighlight(annotation)) {
-      store.createDraft(annotation, {
-        tags: annotation.tags,
-        text: annotation.text,
-        isPrivate: !metadata.isPublic(annotation),
-      });
-    }
+  async function create(annotationData, now = new Date()) {
+      const annotation = initialize(annotationData, now);
+  
+      store.addAnnotations([annotation]);
+  
+      // Remove other drafts that are in the way, and their annotations (if new)
+      store.deleteNewAndEmptyDrafts();
+  
+      // Create a draft unless it's a highlight
+      if (!metadata.isHighlight(annotation)) {
+        store.createDraft(annotation, {
+          tags: annotation.tags,
+          text: "placeholder",
+          // text: annotation.text,
+          isPrivate: !metadata.isPublic(annotation),
+        });
+  
+        try {
+          console.log("Saving annotation");
+          await save(annotation);
+        } catch (err) {
+          console.log("Saving annotation failed");
+        }
+      }
 
     // NB: It may make sense to move the following code at some point to
     // the UI layer

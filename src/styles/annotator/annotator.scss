@@ -23,7 +23,7 @@ $sidebar-collapse-transition-time: 150ms;
   @include reset.reset-box-model;
 
   * {
-    background: none;
+    background: lightGreen;
     font-size: 100%;
     text-indent: 0;
     height: initial;
@@ -33,7 +33,7 @@ $sidebar-collapse-transition-time: 150ms;
   // frame styles
   user-select: none;
   direction: ltr;
-  background: none;
+  background: lightGreen;
   font-size: var.$annotator-base-font-size;
   line-height: var.$annotator-base-line-height;
   height: 100%;
@@ -83,10 +83,10 @@ $sidebar-collapse-transition-time: 150ms;
 
     transition: background-color 0.25s;
     @include utils.shadow;
-    background: var.$white;
+    background: lightGreen;
     border: solid 1px var.$grey-3;
     border-radius: 4px;
-    color: var.$grey-5;
+    color: black;
     text-decoration: none;
     height: 30px;
     width: 30px;
@@ -94,12 +94,12 @@ $sidebar-collapse-transition-time: 150ms;
     margin-bottom: 5px;
 
     &:active {
-      background-color: var.$grey-semi;
+      color: black;
     }
 
     &:focus,
     &:hover {
-      color: var.$grey-7;
+      color: black;
     }
   }
 
@@ -111,7 +111,7 @@ $sidebar-collapse-transition-time: 150ms;
     width: 36px;
     margin-bottom: 10px;
     height: var.$top-bar-height;
-    color: var.$grey-semi;
+    color: black;
   }
 
   .annotator-frame-button--sidebar_close {
