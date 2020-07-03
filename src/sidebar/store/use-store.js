@@ -7,6 +7,16 @@ import warnOnce from '../../shared/warn-once';
 import { useService } from '../util/service-context';
 
 /**
+ * @typedef {import("redux").Store} Store
+ */
+
+/**
+ * @callback StoreCallback
+ * @param {Store} store
+ * @return {any}
+ */
+
+/**
  * Hook for accessing state or actions from the store inside a component.
  *
  * This hook fetches the store using `useService` and returns the result of
@@ -30,7 +40,7 @@ import { useService } from '../util/service-context';
  *   }
  *
  * @template T
- * @param {Function} callback -
+ * @param {StoreCallback} callback -
  *   Callback that receives the store as an argument and returns some state
  *   and/or actions extracted from the store.
  * @return {T} - The result of `callback(store)`
@@ -40,10 +50,10 @@ export default function useStore(callback) {
 
   // Store the last-used callback in a ref so we can access it in the effect
   // below without having to re-subscribe to the store when it changes.
-  const lastCallback = useRef(null);
+  const lastCallback = /** @type {Ref<HTMLElement>} */ useRef();
   lastCallback.current = callback;
 
-  const lastResult = useRef(null);
+  const lastResult = useRef();
   lastResult.current = callback(store);
 
   // Check for a performance issue caused by `callback` returning a different
@@ -58,18 +68,20 @@ export default function useStore(callback) {
   }
 
   // Abuse `useReducer` to force updates when the store state changes.
+
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   // Connect to the store, call `callback(store)` whenever the store changes
   // and re-render the component if the result changed.
   useEffect(() => {
     function checkForUpdate() {
-      const result = lastCallback.current(store);
+      const result = /** @type {StoreCallback} */ (lastCallback.current)(store);
       if (shallowEqual(result, lastResult.current)) {
         return;
       }
       lastResult.current = result;
-      forceUpdate();
+      // Force this function to ignore parameters and just force a store update.
+      /** @type {()=>any} */ (forceUpdate)();
     }
 
     // Check for any changes since the component was rendered.
@@ -82,5 +94,5 @@ export default function useStore(callback) {
     return unsubscribe;
   }, [forceUpdate, store]);
 
-  return lastResult.current;
+  return /** @type {T} */ (lastResult.current);
 }

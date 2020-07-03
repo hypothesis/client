@@ -1,4 +1,9 @@
 /**
+ * @typedef HypothesisGlobals
+ * @prop {boolean} debug
+ */
+
+/**
  * A debug utility that prints information about internal application state
  * changes to the console.
  *
@@ -7,6 +12,8 @@
  * When enabled, every action that changes application state will be printed
  * to the console, along with the application state before and after the action
  * was handled.
+ *
+ * @param {import("redux").Store} store
  */
 export default function debugMiddleware(store) {
   /* eslint-disable no-console */
@@ -14,7 +21,8 @@ export default function debugMiddleware(store) {
 
   return function (next) {
     return function (action) {
-      if (!window.debug) {
+      // @ts-ignore The window interface needs to be expanded to include this property
+      if (/** @type {Window & HypothesisGlobals} */ (!window).debug) {
         next(action);
         return;
       }
@@ -29,7 +37,7 @@ export default function debugMiddleware(store) {
       next(action);
 
       console.log('Next State:', store.getState());
-      console.groupEnd(groupTitle);
+      console.groupEnd();
     };
   };
   /* eslint-enable no-console */

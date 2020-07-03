@@ -8,6 +8,10 @@
  *     https://reactjs.org/docs/hooks-reference.html#usecontext
  */
 
+/**
+ * @typedef {import("redux").Store} Store
+ */
+
 import { createContext, createElement } from 'preact';
 import { useContext } from 'preact/hooks';
 
@@ -103,6 +107,7 @@ export function withServices(Component) {
  * context of custom hooks.
  *
  * @param {string} service - Name of the service to look up
+ * @return {Store}
  */
 export function useService(service) {
   const injector = useContext(ServiceContext);
