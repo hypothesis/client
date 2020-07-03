@@ -3,11 +3,12 @@
  */
 
 /** @typedef {import('../../types/api').Annotation} Annotation */
+/** @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector */
+/** @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector */
 
 /** Extract a URI, domain and title from the given domain model object.
  *
- * @param {object} annotation An annotation domain model object as received
- *   from the server-side API.
+ * @param {object} annotation
  * @returns {object} An object with three properties extracted from the model:
  *   uri, domain and title.
  *
@@ -36,7 +37,7 @@ export function documentMetadata(annotation) {
 /**
  * Return the domain and title of an annotation for display on an annotation
  * card.
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function domainAndTitle(annotation) {
   return {
@@ -47,10 +48,7 @@ export function domainAndTitle(annotation) {
 }
 
 /**
- * Returns the uri or the incontext link from an annotation,
- * or null if the protocol is not http(s).
- *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 function titleLinkFromAnnotation(annotation) {
   let titleLink = /** @type {string|null} */ (annotation.uri);
@@ -72,7 +70,7 @@ function titleLinkFromAnnotation(annotation) {
 /**
  * Returns the domain text from an annotation.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 function domainTextFromAnnotation(annotation) {
   const document = documentMetadata(annotation);
@@ -95,7 +93,7 @@ function domainTextFromAnnotation(annotation) {
  * Returns the title text from an annotation and crops it to 30 chars
  * if needed.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 function titleTextFromAnnotation(annotation) {
   const document = documentMetadata(annotation);
@@ -122,7 +120,7 @@ export function isReply(annotation) {
  * "New" means this annotation has been newly created client-side and not
  * saved to the server yet.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function isNew(annotation) {
   return !annotation.id;
@@ -131,7 +129,7 @@ export function isNew(annotation) {
 /**
  * Return `true` if the given annotation is public, `false` otherwise.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function isPublic(annotation) {
   let isPublic = false;
@@ -157,7 +155,7 @@ export function isPublic(annotation) {
  * as opposed to a Page Note which refers to the whole document or a reply,
  * which refers to another annotation.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 function hasSelector(annotation) {
   return !!(
@@ -173,7 +171,7 @@ function hasSelector(annotation) {
  * Returns false if anchoring is still in process but the flag indicating that
  * the initial timeout allowed for anchoring has expired.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function isWaitingToAnchor(annotation) {
   return (
@@ -186,7 +184,7 @@ export function isWaitingToAnchor(annotation) {
 /**
  * Has this annotation hidden by moderators?
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  * @return {boolean}
  */
 export function isHidden(annotation) {
@@ -199,7 +197,7 @@ export function isHidden(annotation) {
  * Highlights are generally identifiable by having no text content AND no tags,
  * but there is some nuance.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  * @return {boolean}
  */
 export function isHighlight(annotation) {
@@ -233,7 +231,7 @@ export function isHighlight(annotation) {
 /**
  * Return `true` if the given annotation is an orphan.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function isOrphan(annotation) {
   return hasSelector(annotation) && annotation.$orphan;
@@ -242,7 +240,7 @@ export function isOrphan(annotation) {
 /**
  * Return `true` if the given annotation is a page note.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function isPageNote(annotation) {
   return !hasSelector(annotation) && !isReply(annotation);
@@ -251,7 +249,7 @@ export function isPageNote(annotation) {
 /**
  * Return `true` if the given annotation is a top level annotation, `false` otherwise.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function isAnnotation(annotation) {
   return !!(hasSelector(annotation) && !isOrphan(annotation));
@@ -259,7 +257,7 @@ export function isAnnotation(annotation) {
 
 /** Return a numeric key that can be used to sort annotations by location.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  * @return {number} - A key representing the location of the annotation in
  *                    the document, where lower numbers mean closer to the
  *                    start.
@@ -271,7 +269,7 @@ export function location(annotation) {
       const selectors = targets[i].selector || [];
       for (let k = 0; k < selectors.length; k++) {
         if (selectors[k].type === 'TextPositionSelector') {
-          return selectors[k].start;
+          return /** @type {TextPositionSelector} */ (selectors[k]).start;
         }
       }
     }
@@ -283,7 +281,7 @@ export function location(annotation) {
  * Return the number of times the annotation has been flagged
  * by other users. If moderation metadata is not present, returns `null`.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  * @return {number|null}
  */
 export function flagCount(annotation) {
@@ -296,7 +294,7 @@ export function flagCount(annotation) {
 /**
  * Return the text quote that an annotation refers to.
  *
- * @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  * @return {string|null}
  */
 export function quote(annotation) {
@@ -308,5 +306,5 @@ export function quote(annotation) {
     return null;
   }
   const quoteSel = target.selector.find(s => s.type === 'TextQuoteSelector');
-  return quoteSel ? quoteSel.exact : null;
+  return quoteSel ? /** @type {TextQuoteSelector}*/ (quoteSel).exact : null;
 }

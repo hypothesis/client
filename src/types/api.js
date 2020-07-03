@@ -6,6 +6,25 @@
  */
 
 /**
+ * @typedef TextQuoteSelector
+ * @prop {'TextQuoteSelector'} type
+ * @prop {string} exact
+ * @prop {string} [prefix]
+ * @prop {string} [suffix]
+ */
+
+/**
+ * @typedef TextPositionSelector
+ * @prop {'TextPositionSelector'} type
+ * @prop {number} start
+ * @prop {number} end
+ */
+
+/**
+ * @typedef {TextQuoteSelector | TextPositionSelector} Selector
+ */
+
+/**
  * TODO - Fill out remaining properties
  *
  * @typedef Annotation
@@ -18,9 +37,6 @@
  * @prop {string} uri
  * @prop {string} user
  * @prop {boolean} hidden
- * @prop {boolean} [$highlight]
- * @prop {boolean} [$orphan]
- * @prop {boolean} [$anchorTimeout]
  *
  * @prop {Object} document
  *   @prop {string} document.title
@@ -32,17 +48,19 @@
  *
  * @prop {Object[]} target
  *   @prop {string} target.source
- *   @prop {Object[]} target.selector
- *     @prop {string} target.selector.type
- *     @prop {string} target.selector.exact
- *     @prop {number} target.selector.start
+ *   @prop {Selector[]} [target.selector]
  *
- * @prop {Object} moderation
+ * @prop {Object} [moderation]
  *   @prop {number} moderation.flagCount
  *
  * @prop {Object} links
- *   @prop {string} links.incontext
- *   @prop {string} links.html
+ *   @prop {string} [links.incontext]
+ *   @prop {string} [links.html]
+ *
+ * // Properties not present on API objects, but added by utilities in the client.
+ * @prop {boolean} [$highlight]
+ * @prop {boolean} [$orphan]
+ * @prop {boolean} [$anchorTimeout]
  */
 
 /**
