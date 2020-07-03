@@ -75,11 +75,12 @@ $.noConflict(true)(function () {
   // Modify the placeholder annotation's text content to the linked Dash document URL
   document.addEventListener('hypothesisLink', async function (e) {
     console.log("HEARD FROM DASH!!");
-    let linkedDocUrl = e.detail;
+    let username = "melissaz";
     let apiKey = "6879-mvJ14m2jrc6-EcXjJtEZc_W3-NN7lGMpANpe2SIHkxY";
-    let getResponse = await DashUtil.getAnnotation('?user=acct:melissaz@hypothes.is&text=placeholder');
+    let linkedDocUrl = e.detail;
 
-    if (getResponse.rows) {
+    let getResponse = await DashUtil.getAnnotation(`?user=acct:${username}@hypothes.is&text=placeholder`);
+    if (getResponse && getResponse.rows.length > 0) {
       let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, linkedDocUrl, apiKey);
       console.log(linkedDocUrl, "edited annotation", patchResponse);
     } else {
