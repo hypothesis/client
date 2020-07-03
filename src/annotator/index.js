@@ -23,6 +23,7 @@ import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import PDFPlugin from './plugin/pdf';
 import Sidebar from './sidebar';
+import * as DashUtil from './util/dash-util';
 
 const pluginClasses = {
   // UI plugins
@@ -69,4 +70,20 @@ $.noConflict(true)(function () {
     appLinkEl.parentElement.removeChild(appLinkEl);
     annotator.destroy();
   });
+
+  // Listen to 'hypothesisLink' event from Dash
+  // Modify the placeholder annotation's text content to the linked Dash document URL
+  document.addEventListener('hypothesisLink', async function (e) {
+    console.log("HEARD FROM DASH!!");
+    let linkedDocUrl = e.detail;
+    let apiKey = "6879-mvJ14m2jrc6-EcXjJtEZc_W3-NN7lGMpANpe2SIHkxY";
+    let getResponse = await DashUtil.getAnnotation('?user=acct:melissaz@hypothes.is&text=placeholder');
+
+    if (getResponse.rows) {
+      let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, linkedDocUrl, apiKey);
+      console.log(linkedDocUrl, "edited annotation", patchResponse);
+    } else {
+      console.log("no corresponding annotations found");
+    }
+  })
 });
