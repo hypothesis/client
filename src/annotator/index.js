@@ -71,20 +71,22 @@ $.noConflict(true)(function () {
     annotator.destroy();
   });
 
+  console.log(" DASH adding event listener");
   // Listen to 'hypothesisLink' event from Dash
   // Modify the placeholder annotation's text content to the linked Dash document URL
   document.addEventListener('hypothesisLink', async function (e) {
-    console.log("HEARD FROM DASH!!");
-    let username = "melissaz";
-    let apiKey = "6879-mvJ14m2jrc6-EcXjJtEZc_W3-NN7lGMpANpe2SIHkxY";
+    console.log("DASH got link request!!");
+    let username = "bobzel";
+    let apiKey = "6879-DnMTKjWjnnLPa0Php7f5Ra2kunZ_X0tMRDbTF220_q0";
     let linkedDocUrl = e.detail;
 
     let getResponse = await DashUtil.getAnnotation(`?user=acct:${username}@hypothes.is&text=placeholder`);
     if (getResponse && getResponse.rows.length > 0) {
+      console.log("DASH: editing annotation");
       let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, linkedDocUrl, apiKey);
-      console.log(linkedDocUrl, "edited annotation", patchResponse);
+      console.log("DASH:" + linkedDocUrl, "edited annotation", patchResponse);
     } else {
-      console.log("no corresponding annotations found");
+      console.log("DASH: no corresponding annotations found");
     }
   })
 });

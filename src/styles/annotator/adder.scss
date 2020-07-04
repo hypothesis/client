@@ -19,7 +19,7 @@ $adder-transition-duration: 80ms;
   box-sizing: border-box;
   direction: ltr;
   position: absolute;
-  background: lightGreen;
+  background: lightBlue;
   border: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 4px;
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
@@ -61,7 +61,7 @@ $adder-transition-duration: 80ms;
 
 @mixin adder-arrow($rotation) {
   transform: rotate($rotation);
-  background: lightGreen;
+  background: lightBlue;
   border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   border-right: 1px solid rgba(0, 0, 0, 0.2);
   content: '';
@@ -102,7 +102,7 @@ $adder-transition-duration: 80ms;
   @include focus.outline-on-keyboard-focus;
 
   box-shadow: none;
-  background: lightGreen;
+  background: lightBlue;
   color: var.$color-text;
   display: flex;
   flex-direction: column;

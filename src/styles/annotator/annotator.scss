@@ -23,7 +23,7 @@ $sidebar-collapse-transition-time: 150ms;
   @include reset.reset-box-model;
 
   * {
-    background: lightGreen;
+    background: lightBlue;
     font-size: 100%;
     text-indent: 0;
     height: initial;
@@ -33,7 +33,7 @@ $sidebar-collapse-transition-time: 150ms;
   // frame styles
   user-select: none;
   direction: ltr;
-  background: lightGreen;
+  background: lightBlue;
   font-size: var.$annotator-base-font-size;
   line-height: var.$annotator-base-line-height;
   height: 100%;
@@ -83,7 +83,7 @@ $sidebar-collapse-transition-time: 150ms;
 
     transition: background-color 0.25s;
     @include utils.shadow;
-    background: lightGreen;
+    background: lightBlue;
     border: solid 1px var.$grey-3;
     border-radius: 4px;
     color: black;
