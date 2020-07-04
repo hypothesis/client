@@ -73,19 +73,25 @@ $.noConflict(true)(function () {
 
   // Listen to 'hypothesisLink' event from Dash
   // Modify the placeholder annotation's text content to the linked Dash document URL
-  document.addEventListener('hypothesisLink', async function (e) {
-    console.log("HEARD FROM DASH!!");
+  document.addEventListener('linkRequest', async function (e) {
+    console.log("DASH link request");
     let username = "melissaz";
     let apiKey = "6879-mvJ14m2jrc6-EcXjJtEZc_W3-NN7lGMpANpe2SIHkxY";
     let linkedDocUrl = e.detail.url;
     let linkedDocTitle = e.detail.title;
 
-    let getResponse = await DashUtil.getAnnotation(`?user=acct:${username}@hypothes.is&text=placeholder`);
+    let getResponse = await DashUtil.getAnnotation(`?user=acct:${username}@hypothes.is&text=placeholder`); // get the placeholder annotation
     if (getResponse && getResponse.rows.length > 0) {
-      let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, apiKey, linkedDocUrl, linkedDocTitle);
-      console.log(linkedDocUrl, "edited annotation", patchResponse);
+      let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, apiKey, linkedDocUrl, linkedDocTitle); // modify the placeholder annotation
+      console.log(linkedDocUrl, "DASH edited annotation", patchResponse);
+      
+      // notify dash that the link has been completed, with the URL of the annotated website
+      document.dispatchEvent(new CustomEvent("linkComplete", {
+        detail: patchResponse.uri,
+        bubbles: true
+      }));
     } else {
-      console.log("no corresponding annotations found");
+      console.log("DASH no corresponding annotations found");
     }
   })
 });

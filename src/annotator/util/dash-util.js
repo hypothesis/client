@@ -5,7 +5,7 @@ export async function getAnnotation(searchParams) {
   if (response.ok) {
     return response.json();
   } else {
-    throw new Error('Error in GET request');
+    throw new Error('DASH Error in GET request');
   }
 }
 
@@ -26,6 +26,6 @@ export async function editAnnotation(annotationID, apiKey, docUrl, docTitle) {
   if (response.ok) {
       return response.json();
   } else {
-      throw new Error('PATCH request error');
+      throw new Error('DASH PATCH request error');
   }
 } 
