@@ -77,11 +77,12 @@ $.noConflict(true)(function () {
     console.log("HEARD FROM DASH!!");
     let username = "melissaz";
     let apiKey = "6879-mvJ14m2jrc6-EcXjJtEZc_W3-NN7lGMpANpe2SIHkxY";
-    let linkedDocUrl = e.detail;
+    let linkedDocUrl = e.detail.url;
+    let linkedDocTitle = e.detail.title;
 
     let getResponse = await DashUtil.getAnnotation(`?user=acct:${username}@hypothes.is&text=placeholder`);
     if (getResponse && getResponse.rows.length > 0) {
-      let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, linkedDocUrl, apiKey);
+      let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, apiKey, linkedDocUrl, linkedDocTitle);
       console.log(linkedDocUrl, "edited annotation", patchResponse);
     } else {
       console.log("no corresponding annotations found");
