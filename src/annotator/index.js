@@ -76,15 +76,17 @@ $.noConflict(true)(function () {
   // Modify the placeholder annotation's text content to the linked Dash document URL
   document.addEventListener('hypothesisLink', async function (e) {
     console.log("DASH got link request!!");
-    let username = "bobzel";
-    let apiKey = "6879-DnMTKjWjnnLPa0Php7f5Ra2kunZ_X0tMRDbTF220_q0";
-    let linkedDocUrl = e.detail;
+    let username = "need your Hypothesis user name";
+    let apiKey = "need your Hypothesis API key: https://hypothes.is/account/developer";
+    let linkedDocUrl = e.detail.url;
+    let linkedDocTitle = e.detail.title;
 
     let getResponse = await DashUtil.getAnnotation(`?user=acct:${username}@hypothes.is&text=placeholder`);
-    if (getResponse && getResponse.rows.length > 0) {
+    if (getResponse&& getResponse.rows.length > 0) {
       console.log("DASH: editing annotation");
-      let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, linkedDocUrl, apiKey);
+      let patchResponse = await DashUtil.editAnnotation(getResponse.rows[0].id, apiKey, linkedDocUrl, linkedDocTitle);
       console.log("DASH:" + linkedDocUrl, "edited annotation", patchResponse);
+      
     } else {
       console.log("DASH: no corresponding annotations found");
     }

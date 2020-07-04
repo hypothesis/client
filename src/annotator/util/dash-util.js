@@ -11,7 +11,7 @@ export async function getAnnotation(searchParams) {
 }
 
 // Edit the text of an existing annotation through the API
-export async function editAnnotation(annotationID, newText, apiKey) {
+export async function editAnnotation(annotationID, apiKey, docUrl, docTitle) {
   const base = 'https://api.hypothes.is/api/annotations/';
   const request = base + annotationID;
   const response = await fetch(request, {
@@ -20,7 +20,7 @@ export async function editAnnotation(annotationID, newText, apiKey) {
         'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-        text: newText
+        text: `[${docTitle}](${docUrl})`
     })
   });
 
