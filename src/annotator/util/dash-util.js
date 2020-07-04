@@ -1,11 +1,12 @@
 // Search for an existing annotation through the API
 export async function getAnnotation(searchParams) {
   let base = 'https://api.hypothes.is/api/search';
+  console.log("DASH Querying:" + base + searchParams );
   let response = await fetch(base + searchParams);
   if (response.ok) {
     return response.json();
   } else {
-    throw new Error('DASH Error in GET request');
+    throw new Error('DASH: Error in GET request');
   }
 }
 
@@ -26,6 +27,6 @@ export async function editAnnotation(annotationID, apiKey, docUrl, docTitle) {
   if (response.ok) {
       return response.json();
   } else {
-      throw new Error('DASH PATCH request error');
+      throw new Error('DASH: PATCH request error');
   }
 } 

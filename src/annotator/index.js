@@ -71,6 +71,7 @@ $.noConflict(true)(function () {
     annotator.destroy();
   });
 
+  console.log("DASH adding event listener");
   // Listen to 'hypothesisLink' event from Dash
   // Modify the placeholder annotation's text content to the linked Dash document URL
   document.addEventListener('linkRequest', async function (e) {
