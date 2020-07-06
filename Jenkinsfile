@@ -1,5 +1,11 @@
 #!groovy
 
+// `color` can be a color code or one of "good", "warning" or "danger".
+// See https://www.jenkins.io/doc/pipeline/steps/slack/.
+def postSlack(color, message) {
+    slackSend channel: "#eng-frontend", color: color, message: message
+}
+
 // Enable concurrent builds of this project to be throttled using the
 // throttle-concurrents Jenkins plugin (https://plugins.jenkins.io/throttle-concurrents)
 
@@ -91,38 +97,46 @@ node {
     milestone()
 
     stage('Publish to QA') {
-        qaVersion = pkgVersion + "-${lastCommitHash}"
-        nodeEnv.inside("-e HOME=${workspace}") {
-            withCredentials([
-                string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
-                usernamePassword(credentialsId: 'github-jenkins-user',
-                                 passwordVariable: 'GITHUB_TOKEN_NOT_USED',
-                                 usernameVariable: 'GITHUB_USERNAME'),
-                [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
-                ]) {
-                sh """
-                git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
-                git config --replace-all user.name ${env.GITHUB_USERNAME}
-                """
+        postSlack 'good', "Starting QA deployment of ${lastCommitHash}"
 
-                // Build a prerelease version of the client, configured to load
-                // the sidebar from the qa h deployment.
-                sh """
-                export SIDEBAR_APP_URL=https://qa.hypothes.is/app.html
-                yarn version --no-git-tag-version --new-version ${qaVersion}
-                """
+        try {
+            qaVersion = pkgVersion + "-${lastCommitHash}"
+            nodeEnv.inside("-e HOME=${workspace}") {
+                withCredentials([
+                    string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
+                    usernamePassword(credentialsId: 'github-jenkins-user',
+                                     passwordVariable: 'GITHUB_TOKEN_NOT_USED',
+                                     usernameVariable: 'GITHUB_USERNAME'),
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
+                    ]) {
+                    sh """
+                    git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
+                    git config --replace-all user.name ${env.GITHUB_USERNAME}
+                    """
 
-                // Deploy to S3, so the package can be served by
-                // https://qa.hypothes.is/embed.js.
-                //
-                // If we decide to build a QA browser extension using the QA
-                // client in future then we will need to deploy to npm as well.
-                sh """
-                export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}
-                export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}
-                scripts/deploy-to-s3.js --bucket ${s3Bucket} --tag qa --no-cache-entry
-                """
+                    // Build a prerelease version of the client, configured to load
+                    // the sidebar from the qa h deployment.
+                    sh """
+                    export SIDEBAR_APP_URL=https://qa.hypothes.is/app.html
+                    yarn version --no-git-tag-version --new-version ${qaVersion}
+                    """
+
+                    // Deploy to S3, so the package can be served by
+                    // https://qa.hypothes.is/embed.js.
+                    //
+                    // If we decide to build a QA browser extension using the QA
+                    // client in future then we will need to deploy to npm as well.
+                    sh """
+                    export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}
+                    export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}
+                    scripts/deploy-to-s3.js --bucket ${s3Bucket} --tag qa --no-cache-entry
+                    """
+                }
             }
+            postSlack 'good', "QA deployment of ${lastCommitHash} succeeded"
+        } catch (exc) {
+            postSlack 'danger', "QA deployment of ${lastCommitHash} failed"
+            throw exc
         }
     }
 }
@@ -142,52 +156,59 @@ stage('Publish') {
         checkout scm
 
         echo "Publishing ${pkgName} v${newPkgVersion} from ${releaseFromBranch} branch."
+        postSlack 'good', "Starting prod deployment of v${newPkgVersion} (${lastCommitHash})"
 
-        nodeEnv.inside("-e HOME=${workspace} -e BRANCH_NAME=${env.BRANCH_NAME}") {
-            withCredentials([
-                string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
-                usernamePassword(credentialsId: 'github-jenkins-user',
-                                  passwordVariable: 'GITHUB_TOKEN',
-                                  usernameVariable: 'GITHUB_USERNAME'),
-                [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
-                ]) {
+        try {
+            nodeEnv.inside("-e HOME=${workspace} -e BRANCH_NAME=${env.BRANCH_NAME}") {
+                withCredentials([
+                    string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
+                    usernamePassword(credentialsId: 'github-jenkins-user',
+                                      passwordVariable: 'GITHUB_TOKEN',
+                                      usernameVariable: 'GITHUB_USERNAME'),
+                    [$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 's3-cdn']
+                    ]) {
 
-                // Configure author for tag and auth credentials for pushing tag to GitHub.
-                // See https://git-scm.com/docs/git-credential-store.
-                sh """
-                git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
-                git config --replace-all user.name ${env.GITHUB_USERNAME}
-                git config credential.helper store
-                echo https://${env.GITHUB_USERNAME}:${env.GITHUB_TOKEN}@github.com >> \$HOME/.git-credentials
-                """
+                    // Configure author for tag and auth credentials for pushing tag to GitHub.
+                    // See https://git-scm.com/docs/git-credential-store.
+                    sh """
+                    git config --replace-all user.email ${env.GITHUB_USERNAME}@hypothes.is
+                    git config --replace-all user.name ${env.GITHUB_USERNAME}
+                    git config credential.helper store
+                    echo https://${env.GITHUB_USERNAME}:${env.GITHUB_TOKEN}@github.com >> \$HOME/.git-credentials
+                    """
 
-                // Create and push a git tag.
-                sh "git tag v${newPkgVersion}"
-                sh "git push https://github.com/hypothesis/client.git v${newPkgVersion}"
-                sh "sleep 2" // Give GitHub a moment to realize the tag exists.
+                    // Create and push a git tag.
+                    sh "git tag v${newPkgVersion}"
+                    sh "git push https://github.com/hypothesis/client.git v${newPkgVersion}"
+                    sh "sleep 2" // Give GitHub a moment to realize the tag exists.
 
-                // Bump the package version and create the GitHub release.
-                sh """
-                export SIDEBAR_APP_URL=https://hypothes.is/app.html
-                yarn version --no-git-tag-version --new-version ${newPkgVersion}
-                """
-                sh "scripts/create-github-release.js"
+                    // Bump the package version and create the GitHub release.
+                    sh """
+                    export SIDEBAR_APP_URL=https://hypothes.is/app.html
+                    yarn version --no-git-tag-version --new-version ${newPkgVersion}
+                    """
+                    sh "scripts/create-github-release.js"
 
-                // Publish the updated package to the npm registry.
-                // Use `npm` rather than `yarn` for publishing.
-                // See https://github.com/yarnpkg/yarn/pull/3391.
-                sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
-                sh "npm publish --tag ${npmTag}"
-                sh "scripts/wait-for-npm-release.sh ${npmTag}"
+                    // Publish the updated package to the npm registry.
+                    // Use `npm` rather than `yarn` for publishing.
+                    // See https://github.com/yarnpkg/yarn/pull/3391.
+                    sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
+                    sh "npm publish --tag ${npmTag}"
+                    sh "scripts/wait-for-npm-release.sh ${npmTag}"
 
-                // Deploy the client to cdn.hypothes.is, where the embedded
-                // client is served from by https://hypothes.is/embed.js.
-                sh """
-                export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}
-                export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}
-                scripts/deploy-to-s3.js --bucket ${s3Bucket}
-                """
+                    // Deploy the client to cdn.hypothes.is, where the embedded
+                    // client is served from by https://hypothes.is/embed.js.
+                    sh """
+                    export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}
+                    export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}
+                    scripts/deploy-to-s3.js --bucket ${s3Bucket}
+                    """
+                }
             }
+            postSlack 'good', "Prod deployment of v${newPkgVersion} (${lastCommitHash}) succeeded"
+        } catch (exc) {
+            postSlack 'danger', "Prod deployment of v${newPkgVersion} (${lastCommitHash}) failed"
+            throw exc
         }
     }
 }
