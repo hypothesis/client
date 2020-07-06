@@ -27,6 +27,7 @@
     "sidebar/store/create-store.js",
     "sidebar/store/debug-middleware.js",
     "sidebar/store/use-store.js",
+    "sidebar/store/utils.js",
     
   ],
   "exclude": [

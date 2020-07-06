@@ -1,3 +1,6 @@
+/** @typedef {import('../../types/api').Annotation} Annotation */
+/** @typedef {import('../../types/annotator').AnnotationData} AnnotationData */
+
 /**
  * A service for creating, manipulating and persisting annotations and their
  * application-store representations. Interacts with API services as needed.
@@ -17,6 +20,8 @@ export default function annotationsService(api, store) {
   /**
    * Apply changes for the given `annotation` from its draft in the store (if
    * any) and return a new object with those changes integrated.
+   *
+   * @param {Annotation} annotation
    */
   function applyDraftChanges(annotation) {
     const changes = {};
@@ -36,6 +41,10 @@ export default function annotationsService(api, store) {
 
   /**
    * Extend new annotation objects with defaults and permissions.
+   *
+   * @param {AnnotationData} annotationData
+   * @param {Date} now
+   * @return {Annotation}
    */
   function initialize(annotationData, now = new Date()) {
     const defaultPrivacy = store.getDefault('annotationPrivacy');
@@ -50,27 +59,29 @@ export default function annotationsService(api, store) {
     // as it has not been persisted to the service.
     const $tag = generateHexString(8);
 
-    let permissions = defaultPermissions(userid, groupid, defaultPrivacy);
-
-    // Highlights are peculiar in that they always have private permissions
-    if (metadata.isHighlight(annotationData)) {
-      permissions = privatePermissions(userid);
-    }
-
-    return Object.assign(
+    /** @type {Annotation} */
+    const annotation = Object.assign(
       {
         created: now.toISOString(),
         group: groupid,
-        permissions,
+        permissions: defaultPermissions(userid, groupid, defaultPrivacy),
         tags: [],
         text: '',
         updated: now.toISOString(),
         user: userid,
         user_info: userInfo,
         $tag: $tag,
+        hidden: false,
+        links: {},
       },
       annotationData
     );
+
+    // Highlights are peculiar in that they always have private permissions
+    if (metadata.isHighlight(annotation)) {
+      annotation.permissions = privatePermissions(userid);
+    }
+    return annotation;
   }
 
   /**

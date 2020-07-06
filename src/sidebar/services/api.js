@@ -19,6 +19,8 @@ function translateResponseToError(response, data) {
 /**
  * Return a shallow clone of `obj` with all client-only properties removed.
  * Client-only properties are marked by a '$' prefix.
+ *
+ * @param {Object} obj
  */
 function stripInternalProperties(obj) {
   const result = {};

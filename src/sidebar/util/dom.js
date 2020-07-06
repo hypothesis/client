@@ -31,7 +31,7 @@ export function getElementHeightWithMargins(element) {
  * @param {string[]} events
  * @param {EventListener} listener
  * @param {Object} options
- * @param {boolean} [options.useCapture]
+ *   @param {boolean} [options.useCapture]
  * @return {function} Function which removes the event listeners.
  */
 export function listen(element, events, listener, { useCapture = false } = {}) {
