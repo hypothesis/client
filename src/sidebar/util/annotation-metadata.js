@@ -8,9 +8,7 @@
 
 /** Extract a URI, domain and title from the given domain model object.
  *
- * @param {object} annotation
- * @returns {object} An object with three properties extracted from the model:
- *   uri, domain and title.
+ * @param {Annotation} annotation
  *
  */
 export function documentMetadata(annotation) {
@@ -267,9 +265,9 @@ export function location(annotation) {
     const targets = annotation.target || [];
     for (let i = 0; i < targets.length; i++) {
       const selectors = targets[i].selector || [];
-      for (let k = 0; k < selectors.length; k++) {
-        if (selectors[k].type === 'TextPositionSelector') {
-          return /** @type {TextPositionSelector} */ (selectors[k]).start;
+      for (const selector of selectors) {
+        if (selector.type === 'TextPositionSelector') {
+          return selector.start;
         }
       }
     }

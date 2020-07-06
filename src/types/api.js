@@ -21,7 +21,16 @@
  */
 
 /**
- * @typedef {TextQuoteSelector | TextPositionSelector} Selector
+ * @typedef RangeSelector
+ * @prop {'RangeSelector'} type
+ * @prop {string} startContainer
+ * @prop {string} endContainer
+ * @prop {number} startOffset
+ * @prop {number} endOffset
+ */
+
+/**
+ * @typedef {TextQuoteSelector | TextPositionSelector | RangeSelector} Selector
  */
 
 /**
