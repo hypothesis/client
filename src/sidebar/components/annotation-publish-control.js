@@ -58,10 +58,7 @@ function AnnotationPublishControl({
       className="annotation-publish-button__menu-label"
       style={applyTheme(themeProps, settings)}
     >
-      <SvgIcon
-        name="expand-menu"
-        className="annotation-publish-button__menu-icon"
-      />
+      <SvgIcon name="expand-menu" className="u-icon--small" />
     </div>
   );
 
@@ -76,28 +73,32 @@ function AnnotationPublishControl({
           title={`Publish this annotation to ${publishDestination}`}
           buttonText={`Post to ${publishDestination}`}
         />
-        <Menu
-          arrowClass="annotation-publish-button__menu-arrow"
-          containerPositioned={false}
-          contentClass="annotation-publish-button__menu-content"
-          label={menuLabel}
-          menuIndicator={false}
-          title="Change annotation sharing setting"
-          align="left"
-        >
-          <MenuItem
-            icon={group.type === 'open' ? 'public' : 'groups'}
-            label={group.name}
-            isSelected={!isPrivate}
-            onClick={() => onSetPrivacy('shared')}
-          />
-          <MenuItem
-            icon="lock"
-            label="Only Me"
-            isSelected={isPrivate}
-            onClick={() => onSetPrivacy('private')}
-          />
-        </Menu>
+        {/* This wrapper div is necessary because of peculiarities with
+             Safari: see https://github.com/hypothesis/client/issues/2302 */}
+        <div className="annotation-publish-button__menu-wrapper">
+          <Menu
+            arrowClass="annotation-publish-button__menu-arrow"
+            containerPositioned={false}
+            contentClass="annotation-publish-button__menu-content"
+            label={menuLabel}
+            menuIndicator={false}
+            title="Change annotation sharing setting"
+            align="left"
+          >
+            <MenuItem
+              icon={group.type === 'open' ? 'public' : 'groups'}
+              label={group.name}
+              isSelected={!isPrivate}
+              onClick={() => onSetPrivacy('shared')}
+            />
+            <MenuItem
+              icon="lock"
+              label="Only Me"
+              isSelected={isPrivate}
+              onClick={() => onSetPrivacy('private')}
+            />
+          </Menu>
+        </div>
       </div>
       <div>
         <Button
