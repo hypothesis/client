@@ -77,7 +77,7 @@
  */
 @mixin quoted-text {
   border-left: 3px solid var.$color-border;
-  color: var.$color-text-light;
+  color: var.$color-text--light;
   font-style: italic;
   padding: 0 var.$layout-space;
 
@@ -154,7 +154,7 @@
     @include utils.border-right;
     flex: 1 1;
     text-align: center;
-    color: var.$color-text-light;
+    color: var.$color-text--light;
 
     &:last-of-type {
       border-right: none;
@@ -162,7 +162,7 @@
   }
 
   &__link {
-    color: var.$color-text-light;
+    color: var.$color-text--light;
   }
 
   &__icon {

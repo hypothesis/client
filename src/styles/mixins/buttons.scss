@@ -93,11 +93,11 @@
 @mixin button--primary {
   @include button;
   @include button--labeled;
-  color: var.$grey-1;
+  color: var.$color-text--inverted;
   background-color: var.$grey-mid;
 
   &:hover:not([disabled]) {
-    color: var.$grey-1;
+    color: var.$color-text--inverted;
     background-color: var.$grey-6;
   }
 

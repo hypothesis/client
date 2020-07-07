@@ -34,7 +34,7 @@
       @include reset.reset-box-model;
       @include reset.reset-font;
       background: none;
-      color: var.$color-text-light;
+      color: var.$color-text--light;
       font-weight: bold;
       font-family: var.$sans-font-family;
       font-size: var.$annotator-bucket-bar-font-size;
