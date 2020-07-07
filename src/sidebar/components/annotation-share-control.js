@@ -101,7 +101,7 @@ function AnnotationShareControl({
             </div>
           </div>
           <div className="annotation-share-panel__content">
-            <div className="annotation-share-panel__input u-layout-row">
+            <div className="u-layout-row">
               <input
                 aria-label="Use this URL to share this annotation"
                 className="annotation-share-panel__form-input"

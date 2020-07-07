@@ -6,42 +6,52 @@
 @use "../../variables" as var;
 
 .annotation-share-control {
+  // Allow pointer arrow to be positioned absolutely relative to this container
   position: relative;
 }
 
+// A compact panel that appears/disappears by tapping the "share" icon on a
+// single annotation.
 .annotation-share-panel {
   @include molecules.panel--compact;
+  // Position panel to align with share-annotation icon and alignment arrow
   position: absolute;
   right: 5px;
   bottom: 32px;
-  width: 275px;
-  cursor: default;
 
-  &__icon-button {
-    @include buttons.button--input;
-    padding: var.$layout-space--xxsmall var.$layout-space--xsmall;
+  @media (pointer: coarse) {
+    // Adjust arrow/panel positioning to account for larger icon target
+    right: 13px;
+    bottom: 40px;
   }
 
+  // Override the pointer cursor that applies to the entire annotation card
+  cursor: default;
+
   &__form-input {
-    @include forms.form-input--with-button;
-    @include utils.font--small;
-    padding: 0.5em;
+    @include forms.form-input--with-button($compact: true);
+  }
+
+  &__icon-button {
+    @include buttons.button--input($compact: true);
   }
 
   &__permissions {
     @include utils.font--small;
-    margin: var.$layout-space--xsmall 0;
+    padding: var.$layout-space--xsmall 0;
   }
 
+  // Position the pointer icon absolutely and flip it to make it point at the
+  // share icon. Fill it with background color and give it the same color as
+  // the border to make it look like part of the panel frame.
   &__arrow {
-    margin: 0;
-    color: var.$grey-3;
-    fill: white;
-    transform: rotateX(180deg);
     position: absolute;
     z-index: 100;
     right: 0px;
     bottom: -8px;
+    color: var.$color-border;
+    fill: var.$color-background;
+    transform: rotateX(180deg);
   }
 
   .share-links__icon {

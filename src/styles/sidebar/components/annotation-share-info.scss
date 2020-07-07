@@ -3,12 +3,6 @@
 @use "../../mixins/utils";
 
 .annotation-share-info {
-  &__group,
-  &__private {
-    @include layout.row($align: baseline);
-    color: var.$color-text-light;
-  }
-
   &__icon {
     @include utils.icon--xsmall;
     // This margin is currently needed because the icon is within an `a` element

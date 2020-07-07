@@ -111,12 +111,20 @@
 /**
  * An icon-only button that sits to the right of a text-input field
  * (e.g. "copy to clipboard" button in share panels)
+ *
+ * @param {boolean} [$compact] - Tighten padding for small spaces
  */
-@mixin button--input {
+@mixin button--input($compact: false) {
   @include button;
   @include utils.border;
+
+  @if $compact {
+    padding: var.$layout-space--xxsmall var.$layout-space--xsmall;
+  } @else {
+    padding: var.$layout-space--xsmall var.$layout-space--small;
+  }
+
   color: var.$grey-mid;
-  padding: 0.5em 0.75em;
   background-color: var.$grey-1;
 
   border-radius: 0; // Turn off border-radius to align with <input> edges

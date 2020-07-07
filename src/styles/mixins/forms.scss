@@ -31,14 +31,26 @@
   }
 }
 
-@mixin form-input {
-  @include utils.font--medium;
+/**
+ * A text input field.
+ *
+ * @param {boolean} [$compact] - Style for a compact space, with tighter padding
+ */
+@mixin form-input($compact: false) {
+  @if $compact {
+    @include utils.font--small;
+    padding: var.$layout-space--xsmall;
+  } @else {
+    @include utils.font--medium;
+    padding: var.$layout-space--xsmall var.$layout-space--small;
+  }
+
   @include utils.border;
   border-radius: var.$border-radius;
-  padding: 0.5em 0.75em;
-  font-weight: normal;
   color: var.$color-text-light;
   background-color: var.$grey-0;
+  // Tighten up spacing around text in input
+  line-height: 1;
 
   &:focus {
     @include form-input-focus;
@@ -49,12 +61,18 @@
   }
 }
 
-@mixin form-input--with-button {
-  @include form-input;
+/**
+ * A text input that has a button to its right; no border radius
+ *
+ * @param {boolean} [$compact] - For use in compact areas, with tighter padding
+ */
+@mixin form-input--with-button($compact: false) {
+  @include form-input($compact);
   width: 100%;
   border-radius: 0;
 }
 
+// TODO: Deprecate
 @mixin primary-action-btn {
   @include focus.outline-on-keyboard-focus;
   @include utils.font--medium;

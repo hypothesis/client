@@ -131,7 +131,11 @@
  */
 @mixin panel--compact {
   @include panel;
-  padding: 0.75em;
+  width: 20em;
+  // Keep panel constrained within annotation card boundaries and not cut off
+  // on left side when sidebar is extremely narrow
+  max-width: 85vw;
+  padding: var.$layout-space--small;
 
   &__header {
     padding: 0;
