@@ -170,19 +170,14 @@ export default function Menu({
         aria-label={title}
         title={title}
       >
-        <span
-          // wrapper is needed to serve as the flex layout for the label and indicator content.
-          className="menu__toggle-wrapper"
-        >
-          {label}
-          {menuIndicator && (
-            <span
-              className={classnames('menu__toggle-arrow', isOpen && 'is-open')}
-            >
-              <SvgIcon name="expand-menu" className="menu__toggle-icon" />
-            </span>
-          )}
-        </span>
+        {label}
+        {menuIndicator && (
+          <span
+            className={classnames('menu__toggle-arrow', isOpen && 'is-open')}
+          >
+            <SvgIcon name="expand-menu" className="menu__toggle-icon" />
+          </span>
+        )}
       </PseudoButton>
       {isOpen && (
         <Fragment>

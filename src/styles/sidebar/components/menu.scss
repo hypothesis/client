@@ -3,6 +3,8 @@
 @use "../../mixins/utils";
 @use "../../variables" as var;
 
+// Container for the menu toggle button and absolutely positioned elements
+// that show the menu content when open.
 .menu {
   position: relative;
 }
@@ -11,16 +13,16 @@
 .menu__toggle {
   @include focus.outline-on-keyboard-focus;
 
+  display: flex;
+  align-items: center;
+  height: 100%;
+
   appearance: none;
   border: none;
   background: none;
   padding: 0;
   color: inherit;
-  // "block" display is needed so it can take up the
-  //  full height of its parent container
-  display: block;
-  height: 100%;
-  align-items: center;
+
   &:hover {
     transition: 0.2s ease-out;
     color: var.$color-text;
@@ -31,10 +33,6 @@
   }
 }
 
-.menu__toggle-wrapper {
-  @include layout.row($align: center);
-  height: 100%;
-}
 .menu__toggle-icon {
   @include utils.icon--xsmall;
 }
