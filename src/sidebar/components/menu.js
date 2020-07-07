@@ -25,6 +25,37 @@ const menuArrow = className => (
 let ignoreNextClick = false;
 
 /**
+ * A `<button>` element implemented with `<div role="button">`.
+ *
+ * This exists to work around a rendering issue with `<button>`s in Safari.
+ * See https://github.com/hypothesis/client/issues/2302.
+ */
+function PseudoButton({ children, onClick, ...props }) {
+  const handleKeyUp = event => {
+    // See https://www.w3.org/TR/wai-aria-practices/#keyboard-interaction-3
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.target.click();
+    }
+  };
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onKeyUp={handleKeyUp}
+      onClick={onClick}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+}
+
+PseudoButton.propTypes = {
+  children: propTypes.any,
+  onClick: propTypes.func,
+};
+
+/**
  * A drop-down menu.
  *
  * Menus consist of a button which toggles whether the menu is open, an
@@ -130,7 +161,7 @@ export default function Menu({
       // except for the toggle button.
       onMouseDown={stopPropagation}
     >
-      <button
+      <PseudoButton
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
         className="menu__toggle"
@@ -152,7 +183,7 @@ export default function Menu({
             </span>
           )}
         </span>
-      </button>
+      </PseudoButton>
       {isOpen && (
         <Fragment>
           {menuArrow(arrowClass)}

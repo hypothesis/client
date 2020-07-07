@@ -46,21 +46,34 @@ describe('Menu', () => {
     }
   });
 
+  function getMenuToggle(wrapper) {
+    return wrapper.find('div.menu__toggle');
+  }
+
   it('opens and closes when the toggle button is clicked', () => {
     const wrapper = createMenu();
     assert.isFalse(isOpen(wrapper));
-    wrapper.find('button').simulate('click');
+    getMenuToggle(wrapper).simulate('click');
     assert.isTrue(isOpen(wrapper));
-    wrapper.find('button').simulate('click');
+    getMenuToggle(wrapper).simulate('click');
+    assert.isFalse(isOpen(wrapper));
+  });
+
+  it('opens and closes when the toggle button is activated by keypress', () => {
+    const wrapper = createMenu();
+    assert.isFalse(isOpen(wrapper));
+    getMenuToggle(wrapper).simulate('keyup', { key: 'Enter' });
+    assert.isTrue(isOpen(wrapper));
+    getMenuToggle(wrapper).simulate('keyup', { key: ' ' });
     assert.isFalse(isOpen(wrapper));
   });
 
   it('calls `onOpenChanged` prop when menu is opened or closed', () => {
     const onOpenChanged = sinon.stub();
     const wrapper = createMenu({ onOpenChanged });
-    wrapper.find('button').simulate('click');
+    getMenuToggle(wrapper).simulate('click');
     assert.calledWith(onOpenChanged, true);
-    wrapper.find('button').simulate('click');
+    getMenuToggle(wrapper).simulate('click');
     assert.calledWith(onOpenChanged, false);
   });
 
@@ -68,9 +81,9 @@ describe('Menu', () => {
     const wrapper = createMenu();
     assert.isFalse(isOpen(wrapper));
 
-    wrapper.find('button').simulate('mousedown');
+    getMenuToggle(wrapper).simulate('mousedown');
     // Make sure the follow-up click doesn't close the menu.
-    wrapper.find('button').simulate('click');
+    getMenuToggle(wrapper).simulate('click');
 
     assert.isTrue(isOpen(wrapper));
   });
