@@ -27,7 +27,7 @@
 
   @include focus-outline;
   @include placeholder {
-    color: var.$color-text-light;
+    color: var.$color-text--light;
   }
 }
 
@@ -47,7 +47,7 @@
 
   @include utils.border;
   border-radius: var.$border-radius;
-  color: var.$color-text-light;
+  color: var.$color-text--light;
   background-color: var.$grey-0;
   // Tighten up spacing around text in input
   line-height: 1;

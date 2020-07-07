@@ -5,7 +5,7 @@
 @use "../../mixins/utils";
 
 .share-annotations-panel {
-  color: var.$color-text-light;
+  color: var.$color-text--light;
 
   &__intro {
     color: var.$color-text;
