@@ -141,6 +141,39 @@ describe('build-thread', function () {
       ]);
     });
 
+    it('handles annotations that have their own ID in their `references` list', () => {
+      const fixture = [
+        { id: '1', references: ['1'] },
+        { id: '2', references: ['1'] },
+        { id: '3', references: ['1', '3'] },
+      ];
+      const thread = createThread(fixture);
+      assert.deepEqual(thread, [
+        {
+          annotation: {
+            id: '1',
+            references: ['1'],
+          },
+          children: [
+            {
+              annotation: {
+                id: '2',
+                references: ['1'],
+              },
+              children: [],
+            },
+            {
+              annotation: {
+                id: '3',
+                references: ['1', '3'],
+              },
+              children: [],
+            },
+          ],
+        },
+      ]);
+    });
+
     it('handles missing parent annotations', function () {
       const fixture = [
         {

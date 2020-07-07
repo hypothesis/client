@@ -38,6 +38,8 @@
  *
  * @typedef Annotation
  * @prop {string} [id]
+ * @prop {string} [$tag] - A locally-generated unique identifier for annotations
+ *       that have not been saved to the service yet (and thus do not have an id)
  * @prop {string[]} [references]
  * @prop {string} created
  * @prop {string} group
