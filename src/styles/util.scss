@@ -63,6 +63,10 @@
   @include utils.icon--xsmall;
 }
 
+.u-icon--small {
+  @include utils.icon--small;
+}
+
 .u-icon--large {
   @include utils.icon--large;
 }

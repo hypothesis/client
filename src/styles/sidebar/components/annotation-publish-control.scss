@@ -14,11 +14,13 @@
   }
 }
 
-// A split button with a primary submit on the left and a drop-down menu
-// of related options to the right
+// A split control with a primary submit button on the left
+// (.annotation-publish-button__primary) and a drop-down menu for changing
+// the annotation's privacy settings on the right
+// (within .annotation-publish-button__menu-wrapper)
 .annotation-publish-button {
   @include layout.row;
-  // For proper menu alignment
+  // To allow absolute menu alignment
   position: relative;
 
   // Align the menu (upward) arrow correctly with the ▼ in the menu label icon
@@ -33,37 +35,36 @@
     min-width: 100%;
   }
 
+  // The left side of the control (the publish button)
   &__primary {
     @include buttons.button--primary;
     padding: var.$layout-space--small;
 
-    // Turn off right-side border radius for alignment with menu label/button
+    // Turn off right-side border radius for alignment with the right side of
+    // the control
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
 
-  // dropdown arrow which reveals the button's associated menu
-  // when clicked
-  &__menu-label {
-    @include layout.row(center);
-    @include layout.horizontal-space(var.$layout-space--small);
-    color: var.$color-text-inverted;
-    background-color: var.$grey-mid;
-    // Make sure label element takes up full available vertical space
-    height: 100%;
+  // The right side of the control (the privacy `Menu`)
 
+  // This wrapper element styling is necessary to account for a peculiarity in
+  // Safari. See https://github.com/hypothesis/client/issues/2302
+  &__menu-wrapper {
+    @include layout.row;
     // Add border radius to the right to match the left side of the primary button
     border-top-right-radius: var.$border-radius;
     border-bottom-right-radius: var.$border-radius;
+    background-color: var.$grey-mid;
 
     &:hover {
       background-color: var.$grey-6;
     }
   }
 
-  &__menu-icon {
-    @include utils.icon--small;
-    // To properly vertically center menu-label icon
-    height: 100%;
+  // dropdown arrow which reveals the  associated `Menu` when clicked
+  &__menu-label {
+    padding: var.$layout-space--small;
+    color: var.$color-text-inverted;
   }
 }
