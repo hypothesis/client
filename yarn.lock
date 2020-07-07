@@ -7679,11 +7679,10 @@ through2@^3.0.1:
     readable-stream "2 || 3"
 
 through2@^4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/through2/-/through2-4.0.1.tgz#ef2964e95a055bef1ec06f45688f6e5245da699b"
-  integrity sha512-G04e2YDcXGlUPGbPKpqcPgcw+CmIWbHAy9ifmGrjfoeColNJ93CsA2qpSOoGvFylskm22ItBIg7L3Wv/eLiVaw==
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/through2/-/through2-4.0.2.tgz#a7ce3ac2a7a8b0b966c80e7c49f0484c3b239764"
+  integrity sha512-iOqSav00cVxEEICeD7TjLB1sueEL+81Wpzp2bY17uZjZN0pWZPuo4suZ/61VujxmqSGFfgOcNuTZ85QJwNZQpw==
   dependencies:
-    inherits "^2.0.4"
     readable-stream "3"
 
 "through@>=2.2.7 <3", through@^2.3.7, through@^2.3.8:
