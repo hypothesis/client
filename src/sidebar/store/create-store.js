@@ -8,6 +8,23 @@ import immutable from '../util/immutable';
 import { createReducer, bindSelectors } from './util';
 
 /**
+ * @typedef {import("../../types/api").State} State
+ * @typedef {import("../../types/api").Action} Action
+ *
+ * // Base redux store
+ * @typedef {import("redux").Store} ReduxStore<State, Action>
+ *
+ * // Custom stores
+ * @typedef {import("./modules/activity").ActivityStore<State, Action>} ActivityStore
+ * @typedef {import("./modules/annotations").AnnotationsStore<State, Action>} AnnotationsStore
+ * @typedef {import("./modules/defaults").DefaultsStore<State, Action>} Defaults
+ * TODO: add the rest of the stores...
+ *
+ * // Combine all stores
+ * @typedef {ReduxStore & ActivityStore & AnnotationsStore & Defaults} HypothesisStore
+ */
+
+/**
  * Create a Redux store from a set of _modules_.
  *
  * Each module defines the logic related to a particular piece of the application
@@ -25,6 +42,7 @@ import { createReducer, bindSelectors } from './util';
  * @param {Object[]} modules
  * @param {any[]} [initArgs] - Arguments to pass to each state module's `init` function
  * @param {any[]} [middleware] - List of additional Redux middlewares to use.
+ * @return {HypothesisStore}
  */
 export default function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
@@ -78,7 +96,11 @@ export default function createStore(modules, initArgs = [], middleware = []) {
   }
 
   // Create the store.
-  const store = redux.createStore(reducer, initialState, enhancer);
+  const store = /** @type {HypothesisStore} */ (redux.createStore(
+    reducer,
+    initialState,
+    enhancer
+  ));
 
   // Add actions and selectors as methods to the store.
   const actions = Object.assign({}, ...modules.map(m => m.actions));

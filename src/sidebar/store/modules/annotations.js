@@ -441,6 +441,20 @@ const isWaitingToAnchorAnnotations = createSelector(
   annotations => annotations.some(metadata.isWaitingToAnchor)
 );
 
+/**
+ * @template S The type of state held by this store.
+ * @template A the type of actions which may be dispatched by this store.
+ * @typedef AnnotationsStore<S, A>
+ *
+ * // actions
+ * @prop {()=>A} addAnnotations
+ * // TODO: add the rest
+ *
+ * // selectors
+ * @prop {(a: S) => S} annotationCount
+ * // TODO: add the rest
+ */
+
 export default {
   init: init,
   namespace: 'annotations',

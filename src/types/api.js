@@ -113,5 +113,14 @@
  * @prop {boolean} canLeave
  */
 
+/**
+ * Store state object type.
+ * @typedef {Object} State
+ *
+ * Store actions type.
+ * @typedef Action
+ * @prop {string} type
+ */
+
 // Make TypeScript treat this file as a module.
 export const unused = {};

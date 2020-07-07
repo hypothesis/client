@@ -54,6 +54,9 @@ import viewer from './modules/viewer';
  * the individual state modules. ie. `store.actionName(args)` dispatches an
  * action through the store and `store.selectorName(args)` invokes a selector
  * passing the current state of the store.
+ *
+ * @param {import('../../types/config').SidebarConfig} settings
+ * @return {import('.create-store').HypothesisStore}
  */
 // @ngInject
 export default function store(settings) {

@@ -170,6 +170,20 @@ function isSavingAnnotation(state, annotation) {
   return state.activity.activeAnnotationSaveRequests.includes(annotation.$tag);
 }
 
+/**
+ * @template S The type of state held by this store.
+ * @template A the type of actions which may be dispatched by this store.
+ * @typedef ActivityStore<S, A>
+ *
+ * // actions
+ * @prop {()=>S} annotationFetchStarted
+ * // TODO: add the rest
+ *
+ * // selectors
+ * @prop {(a: S) => S} hasFetchedAnnotations
+ * // TODO: add the rest
+ */
+
 export default {
   init,
   update,

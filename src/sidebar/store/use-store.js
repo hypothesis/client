@@ -6,14 +6,13 @@ import shallowEqual from 'shallowequal';
 import warnOnce from '../../shared/warn-once';
 import { useService } from '../util/service-context';
 
-/**
- * @typedef {import("redux").Store} Store
- */
+/** @typedef {import("redux").Store} Store */
+/** @typedef {import("./create-store").HypothesisStore} HypothesisStore */
 
 /**
  * @template T
  * @callback StoreCallback
- * @param {Store} store
+ * @param {HypothesisStore} store
  * @return {T}
  */
 
