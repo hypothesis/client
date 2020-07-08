@@ -3,6 +3,8 @@ import { createSelector } from 'reselect';
 import * as metadata from '../../util/annotation-metadata';
 import * as util from '../util';
 
+/** @typedef {import('../../../types/api').Annotation} Annotation */
+
 /**
  * The drafts store provides temporary storage for unsaved edits to new or
  * existing annotations.
@@ -147,7 +149,7 @@ function countDrafts(state) {
 /**
  * Retrieve the draft changes for an annotation.
  *
- * @return {Draft|null}
+ * @return {?Draft}
  */
 function getDraft(state, annotation) {
   const drafts = state.drafts;
@@ -178,12 +180,28 @@ function getDraftIfNotEmpty(state, annotation) {
 /**
  * Returns a list of draft annotations which have no id.
  *
- * @return {Object[]}
+ * @return {Annotation[]}
  */
 const unsavedAnnotations = createSelector(
   state => state.drafts,
   drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );
+
+/**
+ * @typedef DraftsStore
+ *
+ * // actions
+ * @prop {typeof createDraft} createDraft
+ * @prop {typeof deleteNewAndEmptyDrafts} deleteNewAndEmptyDrafts
+ * @prop {typeof discardAllDrafts} discardAllDrafts
+ * @prop {typeof removeDraft} removeDraft
+ *
+ * // selectors
+ * @prop {() => boolean} countDrafts
+ * @prop {(a: Annotation) => ?Draft} getDraft
+ * @prop {(a: Annotation) => boolean} getDraftIfNotEmpty
+ * @prop {() => Annotation[]} unsavedAnnotations
+ */
 
 export default {
   init,

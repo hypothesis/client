@@ -3,9 +3,7 @@
  * sidebar.
  */
 
-/**
- * @typedef {import('../../../types/api').Annotation} Annotation
- */
+/** @typedef {import('../../../types/api').Annotation} Annotation */
 
 import { createSelector } from 'reselect';
 
@@ -442,17 +440,28 @@ const isWaitingToAnchorAnnotations = createSelector(
 );
 
 /**
- * @template S The type of state held by this store.
- * @template A the type of actions which may be dispatched by this store.
- * @typedef AnnotationsStore<S, A>
+ * @typedef AnnotationsStore
  *
  * // actions
- * @prop {()=>A} addAnnotations
- * // TODO: add the rest
+ * @prop {typeof addAnnotations} addAnnotations
+ * @prop {typeof clearAnnotations} clearAnnotations
+ * @prop {typeof hideAnnotation} hideAnnotation
+ * @prop {typeof removeAnnotations} removeAnnotations
+ * @prop {typeof updateAnchorStatus} updateAnchorStatus
+ * @prop {typeof updateFlagStatus} updateFlagStatus
+ * @prop {typeof unhideAnnotation} unhideAnnotation
  *
  * // selectors
- * @prop {(a: S) => S} annotationCount
- * // TODO: add the rest
+ * @prop {() => number} annotationCount
+ * @prop {(a: string) => boolean} annotationExists
+ * @prop {(a: string) => Annotation} findAnnotationByID
+ * @prop {(a: string[]) => string[]} findIDsForTags
+ * @prop {() => boolean} isWaitingToAnchorAnnotations
+ * @prop {() => Annotation[]} newAnnotations
+ * @prop {() => Annotation[]} newHighlights
+ * @prop {() => boolean} noteCount
+ * @prop {() => boolean} orphanCount
+ * @prop {() => Annotation[]} savedAnnotations
  */
 
 export default {

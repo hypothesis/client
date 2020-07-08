@@ -53,6 +53,17 @@ function hasSidebarOpened(state) {
   return state.viewer.sidebarHasOpened;
 }
 
+/**
+ * @typedef ViewerStore
+ *
+ * // actions
+ * @prop {typeof setShowHighlights} setShowHighlights
+ * @prop {typeof setSidebarOpened} setSidebarOpened
+ *
+ * // selectors
+ * @prop {() => boolean} hasSidebarOpened
+ */
+
 export default {
   init: init,
   namespace: 'viewer',

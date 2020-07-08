@@ -90,8 +90,8 @@ function closeSidebarPanel(panelName) {
  * Toggle a sidebar panel from its current state, or set it to the
  * designated `panelState`
  *
- * @param {String} panelName
- * @param {Boolean} panelState - Should the panel be active?
+ * @param {string} panelName
+ * @param {boolean} panelState - Should the panel be active?
  */
 function toggleSidebarPanel(panelName, panelState) {
   return {
@@ -104,12 +104,24 @@ function toggleSidebarPanel(panelName, panelState) {
 /**
  * Is the panel indicated by `panelName` currently active (open)?
  *
- * @param {String} panelName
- * @return {Boolean} - `true` if `panelName` is the currently-active panel
+ * @param {string} panelName
+ * @return {boolean} - `true` if `panelName` is the currently-active panel
  */
 function isSidebarPanelOpen(state, panelName) {
   return state.sidebarPanels.activePanelName === panelName;
 }
+
+/**
+ * @typedef SidebarPanelsStore
+ *
+ * // actions
+ * @prop {typeof openSidebarPanel} openSidebarPanel
+ * @prop {typeof closeSidebarPanel} closeSidebarPanel
+ * @prop {typeof toggleSidebarPanel} toggleSidebarPanel
+ *
+ * // selectors
+ * @prop {(a: string) => boolean} isSidebarPanelOpen
+ */
 
 export default {
   namespace: 'sidebarPanels',

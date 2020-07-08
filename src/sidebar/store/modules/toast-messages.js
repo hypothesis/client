@@ -98,6 +98,20 @@ function hasMessage(state, type, text) {
   });
 }
 
+/**
+ * @typedef ToastMessagesStore
+ *
+ * // actions
+ * @prop {typeof addMessage} addToastMessage
+ * @prop {typeof removeMessage} removeToastMessage
+ * @prop {typeof updateMessage} updateToastMessage
+ *
+ * // selectors
+ * @prop {(a: string) => (Object|undefined)} getToastMessage
+ * @prop {() => Object[]} getToastMessages
+ * @prop {(a: string, b: string) => boolean} hasToastMessage
+ */
+
 export default {
   init,
   namespace: 'toastMessages',

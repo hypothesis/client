@@ -170,18 +170,24 @@ function isSavingAnnotation(state, annotation) {
   return state.activity.activeAnnotationSaveRequests.includes(annotation.$tag);
 }
 
+/** @typedef {import('../../../types/api').Annotation} Annotation */
+
 /**
- * @template S The type of state held by this store.
- * @template A the type of actions which may be dispatched by this store.
- * @typedef ActivityStore<S, A>
+ * @typedef ActivityStore
  *
  * // actions
- * @prop {()=>S} annotationFetchStarted
- * // TODO: add the rest
+ * @prop {typeof annotationFetchStarted} annotationFetchStarted
+ * @prop {typeof annotationFetchFinished} annotationFetchFinished
+ * @prop {typeof annotationSaveStarted} annotationSaveStarted
+ * @prop {typeof annotationSaveFinished} annotationSaveFinished
+ * @prop {typeof apiRequestStarted} apiRequestStarted
+ * @prop {typeof apiRequestFinished} apiRequestFinished
  *
  * // selectors
- * @prop {(a: S) => S} hasFetchedAnnotations
- * // TODO: add the rest
+ * @prop {() => boolean} hasFetchedAnnotations
+ * @prop {() => boolean} isLoading
+ * @prop {() => boolean} isFetchingAnnotations
+ * @prop {(a: Annotation) => boolean} isSavingAnnotation
  */
 
 export default {

@@ -1,8 +1,17 @@
 import * as util from '../util';
 
 /**
+ * @typedef Profile
+ * @prop {Object} features
+ * @prop {Object} preferences
+ * @prop {?string} userid
+ */
+
+/**
  * A dummy profile returned by the `profile` selector before the real profile
  * is fetched.
+ *
+ * @type Profile
  */
 const initialProfile = {
   /** A map of features that are enabled for the current user. */
@@ -68,6 +77,8 @@ function isFeatureEnabled(state, feature) {
  * Return true if the user's profile has been fetched. This can be used to
  * distinguish the dummy profile returned by `profile()` on startup from a
  * logged-out user profile returned by the server.
+ *
+ * @param {object} state - The application state
  */
 function hasFetchedProfile(state) {
   return state.session.profile !== initialProfile;
@@ -84,6 +95,19 @@ function hasFetchedProfile(state) {
 function profile(state) {
   return state.session.profile;
 }
+
+/**
+ * @typedef SessionStore
+ *
+ * // actions
+ * @prop {typeof hasFetchedProfile} hasFetchedProfile
+ *
+ * // selectors
+ * @prop {()=> boolean} hasFetchedProfile
+ * @prop {(a: string)=> boolean} isFeatureEnabled
+ * @prop {() => boolean} isLoggedIn
+ * @prop {() => Profile} profile
+ */
 
 export default {
   init,

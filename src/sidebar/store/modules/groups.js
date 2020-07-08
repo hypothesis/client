@@ -194,6 +194,19 @@ const getInScopeGroups = createSelector(
   groups => groups.filter(g => g.isScopedToUri)
 );
 
+/**
+ * @typedef GroupsStore
+ *
+ * // actions
+ * @prop {typeof focusGroup} focusGroup
+ * @prop {typeof loadGroups} loadGroups
+ * @prop {typeof clearGroups} clearGroups
+ *
+ * // selectors
+ * @prop {() => Group[]} allGroups
+ * // TODO: add rest ...
+ */
+
 export default {
   init,
   namespace: 'groups',

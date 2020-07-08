@@ -29,7 +29,7 @@ function init(settings) {
     directLinkedAnnotationId: settings.annotations || null,
 
     /**
-     * Indicates that an error occured in retrieving/showing the direct linked group.
+     * Indicates that an error occurred in retrieving/showing the direct linked group.
      * This could be because:
      * - the group does not exist
      * - the user does not have permission
@@ -139,6 +139,18 @@ function directLinkedGroupId(state) {
 function directLinkedGroupFetchFailed(state) {
   return state.directLinked.directLinkedGroupFetchFailed;
 }
+
+/**
+ * @typedef DirectLinkedStore
+ *
+ * // actions
+ * @prop {typeof setDirectLinkedGroupFetchFailed} setDirectLinkedGroupFetchFailed
+ *
+ * // selectors
+ * @prop {() => ?string} directLinkedAnnotationId
+ * @prop {() => boolean} directLinkedGroupFetchFailed
+ * @prop {() => ?string} directLinkedGroupId
+ */
 
 export default {
   init,

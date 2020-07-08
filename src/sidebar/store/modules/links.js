@@ -22,6 +22,13 @@ function updateLinksAction(newLinks) {
   return { type: 'UPDATE_LINKS', newLinks: newLinks };
 }
 
+/**
+ * @typedef LinksStore
+ *
+ * // actions
+ * @prop {typeof updateLinks} updateLinksAction
+ */
+
 export default {
   init: init,
   namespace: 'links',

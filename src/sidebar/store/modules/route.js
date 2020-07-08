@@ -56,6 +56,17 @@ function routeParams(state) {
   return state.route.params;
 }
 
+/**
+ * @typedef RouteStore
+ *
+ * // actions
+ * @prop {typeof changeRoute} changeRoute
+ *
+ * // selectors
+ * @prop {() => ?string} route
+ * @prop {() => Object} routeParams
+ */
+
 export default {
   init,
   namespace: 'route',

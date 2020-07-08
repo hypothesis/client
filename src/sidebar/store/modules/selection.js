@@ -534,6 +534,29 @@ const hasAppliedFilter = createSelector(
     !!filterQuery || focusModeFocused || hasSelectedAnnotations
 );
 
+/**
+ * @typedef SelectionStore
+ *
+ * // actions
+ * @prop {typeof clearSelectedAnnotations} clearSelectedAnnotations
+ * @prop {typeof clearSelection} clearSelection
+ * @prop {typeof clearSelection} clearSelection
+ * @prop {typeof focusAnnotations} focusAnnotations
+ * @prop {typeof highlightAnnotations} highlightAnnotations
+ * @prop {typeof selectAnnotations} selectAnnotations
+ * @prop {typeof selectTab} selectTab
+ * @prop {typeof setCollapsed} setCollapsed
+ * @prop {typeof setFilterQuery} setFilterQuery
+ * @prop {typeof setFocusModeFocused} setFocusModeFocused
+ * @prop {typeof changeFocusModeUser} changeFocusModeUser
+ * @prop {typeof setForceVisible} setForceVisible
+ * @prop {typeof setSortKey} setSortKey
+ * @prop {typeof toggleSelectedAnnotations} toggleSelectedAnnotations
+ *
+ * // selectors
+ * // TODO: add the rest
+ */
+
 export default {
   init: init,
   namespace: 'selection',

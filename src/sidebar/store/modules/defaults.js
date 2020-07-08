@@ -56,16 +56,14 @@ function getDefaults(state) {
 }
 
 /**
- * @template S The type of state held by this store.
- * @template A the type of actions which may be dispatched by this store.
- * @typedef DefaultsStore<S, A>
+ * @typedef DefaultsStore
  *
  * // actions
- * @prop {(a: string, b: string) => A} setDefault
+ * @prop {typeof setDefault} setDefault
  *
  * // selectors
- * @prop {(a: S, b: string) => S|undefined} getDefault
- * @prop {(a: S) => S} getDefaults
+ * @prop {(a: string) => *} getDefault
+ * @prop {() => *[]} getDefaults
  */
 
 export default {
