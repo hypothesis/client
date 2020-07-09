@@ -7,6 +7,9 @@
 /**
  * Implementation of `element.closest(selector)`. This is used to support browsers
  * (IE 11) that don't have a native implementation.
+ *
+ * @param {Element|null} element
+ * @param {string} selector
  */
 export function closest(element, selector) {
   while (element) {

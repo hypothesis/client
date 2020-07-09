@@ -29,6 +29,13 @@
 
 const VERSION = '1.0.0';
 
+/**
+ *  @constructor
+ *  @param {Window} src
+ *  @param {Window} dst
+ *  @param {string} origin
+ *  @param {(Object<string, ((any) => any)>) | ((any) => any)} methods
+ */
 export default function RPC(src, dst, origin, methods) {
   if (!(this instanceof RPC)) return new RPC(src, dst, origin, methods);
   const self = this;
@@ -64,11 +71,18 @@ RPC.prototype.destroy = function () {
   this.src.removeEventListener('message', this._onmessage);
 };
 
+/**
+ * @param {string} method
+ */
 RPC.prototype.call = function (method) {
   const args = [].slice.call(arguments, 1);
   return this.apply(method, args);
 };
 
+/**
+ * @param {string} method
+ * @param {any[]} args
+ */
 RPC.prototype.apply = function (method, args) {
   if (this._destroyed) return;
   const seq = this._sequence++;
