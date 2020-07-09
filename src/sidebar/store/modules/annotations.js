@@ -390,6 +390,15 @@ function findAnnotationByID(state, id) {
 }
 
 /**
+ * Return all annotations currently in the store
+ *
+ * @return {Array<Annotation>}
+ */
+function annotations(state) {
+  return state.annotations.annotations;
+}
+
+/**
  * Return all loaded annotations that are not highlights and have not been saved
  * to the server.
  */
@@ -456,6 +465,7 @@ export default {
   },
 
   selectors: {
+    annotations,
     annotationCount,
     annotationExists,
     findAnnotationByID,
