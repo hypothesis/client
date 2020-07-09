@@ -3,11 +3,10 @@ import * as metadata from '../util/annotation-metadata';
 import memoize from '../util/memoize';
 import * as tabs from '../util/tabs';
 
-function truthyKeys(map) {
-  return Object.keys(map).filter(function (k) {
-    return !!map[k];
-  });
-}
+/**
+ * @typedef {import('../build-thread').Thread} Thread
+ * @typedef {import('../build-thread').Options} BuildOptions
+ */
 
 // Mapping from sort order name to a less-than predicate
 // function for comparing annotations to determine their sort order.
@@ -36,67 +35,61 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-export default function RootThreadService(
-  annotationsService,
-  store,
-  searchFilter,
-  viewFilter
-) {
+export default function RootThreadService(store, searchFilter, viewFilter) {
   /**
-   * Build the root conversation thread from the given UI state.
+   * Compose the options needed to build the root thread, including search
+   * filters and sort options.
    *
    * @param state - The current UI state (loaded annotations, sort mode,
-   *        filter settings etc.)
+   *        filter settings etc.). Not used directly within the function
+   *        but used to memoize it.
+   * @return {Thread}
    */
+  /* eslint-disable-next-line no-unused-vars */
   function buildRootThread(state) {
-    const sortFn = sortFns[state.selection.sortKey];
-    const shouldFilterThread = () => {
-      // Is there a search query, or are we in an active (focused) focus mode?
-      return state.selection.filterQuery || store.focusModeFocused();
-    };
+    const shouldFilterThread = !!(
+      store.filterQuery() || store.focusModeFocused()
+    );
 
+    /** @type {BuildOptions} */
     const options = {
-      forceVisible: truthyKeys(state.selection.forceVisible),
+      forceVisible: store.forcedVisibleAnnotations(),
       expanded: store.expandedThreads(),
-      highlighted: state.selection.highlighted,
-      selected: truthyKeys(store.getSelectedAnnotationMap() || {}),
-      sortCompareFn: sortFn,
+      highlighted: store.highlightedAnnotations(),
+      selected: store.selectedAnnotations(),
+      sortCompareFn: sortFns[store.sortKey()],
     };
 
-    if (shouldFilterThread()) {
-      const filters = searchFilter.generateFacetedFilter(
-        state.selection.filterQuery,
-        {
-          // if a focus mode is applied (focused) and we're focusing on a user
-          user: store.focusModeFocused() && store.focusModeUserId(),
-        }
-      );
+    if (shouldFilterThread) {
+      const filters = searchFilter.generateFacetedFilter(store.filterQuery(), {
+        // if a focus mode is applied (focused) and we're focusing on a user
+        user: store.focusModeFocused() && store.focusModeUserId(),
+      });
 
-      options.filterFn = function (annot) {
-        return viewFilter.filter([annot], filters).length > 0;
-      };
+      options.filterFn = annot =>
+        viewFilter.filter([annot], filters).length > 0;
     }
 
-    if (state.route.name === 'sidebar' && !shouldFilterThread()) {
-      options.threadFilterFn = function (thread) {
+    // In sidebar mode, filter out threads with missing annotations,
+    // or threads that don't belong in the
+    // current tab (e.g. only show Page Notes in the Notes tab)
+    if (store.route() === 'sidebar' && !shouldFilterThread) {
+      options.threadFilterFn = thread => {
         if (!thread.annotation) {
           return false;
         }
-
-        return tabs.shouldShowInTab(
-          thread.annotation,
-          state.selection.selectedTab
-        );
+        return tabs.shouldShowInTab(thread.annotation, store.selectedTab());
       };
     }
 
     // Get the currently loaded annotations and the set of inputs which
     // determines what is visible and build the visible thread structure
-    return buildThread(state.annotations.annotations, options);
+    return buildThread(store.annotations(), options);
   }
 
   /**
-   * Build the root conversation thread from the given UI state.
+   * Build the root conversation thread from the given UI state. Memoize it
+   * so that it only gets re-computed when store state changes.
    * @return {Thread}
    */
   this.thread = memoize(buildRootThread);
