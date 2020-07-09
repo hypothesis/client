@@ -75,12 +75,11 @@ $.noConflict(true)(function () {
   // Modify the placeholder annotation's text content to the linked Dash document URL
   document.addEventListener('linkRequest', async function (e) {
     console.log("DASH linkRequest received, editing annotation");
-    let apiKey = "6879-mvJ14m2jrc6-EcXjJtEZc_W3-NN7lGMpANpe2SIHkxY";
+    let apiKey = e.detail.apiKey;
     let annotationId = e.detail.id;
-    let linkedDocUrl = e.detail.url;
-    let linkedDocTitle = e.detail.title;
+    let text = e.detail.newText;
 
-    let patchResponse = await DashUtil.editAnnotation(annotationId, apiKey, linkedDocUrl, linkedDocTitle); // modify the placeholder annotation
+    let patchResponse = await DashUtil.editAnnotation(annotationId, apiKey, text); // modify the placeholder annotation
   
     // notify dash that the link has been completed, with the URL of the annotated website
     document.dispatchEvent(new CustomEvent("linkComplete", {
