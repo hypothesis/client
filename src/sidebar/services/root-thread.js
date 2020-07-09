@@ -36,7 +36,7 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-export default function RootThread(
+export default function RootThreadService(
   annotationsService,
   store,
   searchFilter,

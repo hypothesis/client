@@ -22,7 +22,7 @@ function SidebarContent({
   onLogin,
   onSignUp,
   loadAnnotationsService,
-  rootThread: rootThreadService,
+  rootThreadService,
   streamer,
 }) {
   const rootThread = useStore(store =>
@@ -153,14 +153,14 @@ SidebarContent.propTypes = {
   // Injected
   frameSync: propTypes.object,
   loadAnnotationsService: propTypes.object,
-  rootThread: propTypes.object,
+  rootThreadService: propTypes.object,
   streamer: propTypes.object,
 };
 
 SidebarContent.injectedProps = [
   'frameSync',
   'loadAnnotationsService',
-  'rootThread',
+  'rootThreadService',
   'streamer',
 ];
 

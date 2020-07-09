@@ -22,7 +22,7 @@ describe('SidebarContent', () => {
         onSignUp={() => null}
         frameSync={fakeFrameSync}
         loadAnnotationsService={fakeLoadAnnotationsService}
-        rootThread={fakeRootThreadService}
+        rootThreadService={fakeRootThreadService}
         streamer={fakeStreamer}
         {...props}
       />

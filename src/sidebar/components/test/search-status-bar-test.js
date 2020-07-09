@@ -8,15 +8,17 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('SearchStatusBar', () => {
-  let fakeRootThread;
+  let fakeRootThreadService;
   let fakeStore;
 
   function createComponent(props) {
-    return mount(<SearchStatusBar rootThread={fakeRootThread} {...props} />);
+    return mount(
+      <SearchStatusBar rootThreadService={fakeRootThreadService} {...props} />
+    );
   }
 
   beforeEach(() => {
-    fakeRootThread = {
+    fakeRootThreadService = {
       thread: sinon.stub().returns({ children: [] }),
     };
     fakeStore = {
@@ -105,7 +107,7 @@ describe('SearchStatusBar', () => {
       },
     ].forEach(test => {
       it(test.description, () => {
-        fakeRootThread.thread.returns({
+        fakeRootThreadService.thread.returns({
           children: test.children,
         });
 
@@ -156,7 +158,7 @@ describe('SearchStatusBar', () => {
       },
     ].forEach(test => {
       it(test.description, () => {
-        fakeRootThread.thread.returns({
+        fakeRootThreadService.thread.returns({
           children: test.children,
         });
         const wrapper = createComponent({});
@@ -169,7 +171,7 @@ describe('SearchStatusBar', () => {
     });
 
     it('should not display user-focused mode text if filtered mode is (also) applied', () => {
-      fakeRootThread.thread.returns({
+      fakeRootThreadService.thread.returns({
         children: [
           { id: '1', visible: true, children: [] },
           { id: '2', visible: true, children: [] },

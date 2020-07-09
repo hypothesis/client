@@ -12,7 +12,7 @@ import ThreadList from './thread-list';
  */
 function StreamContent({
   api,
-  rootThread: rootThreadService,
+  rootThreadService,
   searchFilter,
   toastMessenger,
 }) {
@@ -88,14 +88,14 @@ function StreamContent({
 StreamContent.propTypes = {
   // Injected services.
   api: propTypes.object,
-  rootThread: propTypes.object,
+  rootThreadService: propTypes.object,
   searchFilter: propTypes.object,
   toastMessenger: propTypes.object,
 };
 
 StreamContent.injectedProps = [
   'api',
-  'rootThread',
+  'rootThreadService',
   'searchFilter',
   'toastMessenger',
 ];

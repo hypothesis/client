@@ -17,7 +17,7 @@ const fixtures = immutable({
   },
 });
 
-describe('rootThread', function () {
+describe('rootThreadService', function () {
   let fakeAnnotationsService;
   let fakeBuildThread;
   let fakeSearchFilter;
@@ -25,7 +25,7 @@ describe('rootThread', function () {
   let fakeStore;
   let fakeViewFilter;
 
-  let rootThread;
+  let rootThreadService;
 
   beforeEach(function () {
     fakeAnnotationsService = {
@@ -83,14 +83,14 @@ describe('rootThread', function () {
       filter: sinon.stub(),
     };
 
-    rootThread = new Injector()
+    rootThreadService = new Injector()
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('store', { value: fakeStore })
       .register('searchFilter', { value: fakeSearchFilter })
       .register('settings', { value: fakeSettings })
       .register('viewFilter', { value: fakeViewFilter })
-      .register('rootThread', rootThreadFactory)
-      .get('rootThread');
+      .register('rootThreadService', rootThreadFactory)
+      .get('rootThreadService');
   });
 
   beforeEach(() => {
@@ -105,13 +105,16 @@ describe('rootThread', function () {
 
   describe('#thread', function () {
     it('returns the result of buildThread()', function () {
-      assert.equal(rootThread.thread(fakeStore.state), fixtures.emptyThread);
+      assert.equal(
+        rootThreadService.thread(fakeStore.state),
+        fixtures.emptyThread
+      );
     });
 
     it('passes loaded annotations to buildThread()', function () {
       const annotation = annotationFixtures.defaultAnnotation();
       fakeStore.state.annotations.annotations = [annotation];
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       assert.calledWith(fakeBuildThread, sinon.match([annotation]));
     });
 
@@ -120,7 +123,7 @@ describe('rootThread', function () {
         id1: true,
         id2: true,
       });
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
         [],
@@ -132,7 +135,7 @@ describe('rootThread', function () {
 
     it('passes the current expanded set to buildThread()', function () {
       fakeStore.expandedThreads.returns({ id1: true, id2: true });
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
         [],
@@ -144,7 +147,7 @@ describe('rootThread', function () {
 
     it('passes the current force-visible set to buildThread()', function () {
       fakeStore.state.selection.forceVisible = { id1: true, id2: true };
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
         [],
@@ -156,7 +159,7 @@ describe('rootThread', function () {
 
     it('passes the highlighted set to buildThread()', function () {
       fakeStore.state.selection.highlighted = ['id1', 'id2'];
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,
         [],
@@ -220,7 +223,7 @@ describe('rootThread', function () {
         fakeStore.state.selection.sortKey = testCase.order;
         fakeStore.state.selection.sortKeysAvailable = [testCase.order];
 
-        rootThread.thread(fakeStore.state);
+        rootThreadService.thread(fakeStore.state);
         const sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
         const actualOrder = sortBy(annotations, sortCompareFn).map(function (
           annot
@@ -236,7 +239,7 @@ describe('rootThread', function () {
     it('filter matches only annotations when Annotations tab is selected', function () {
       fakeBuildThread.reset();
       fakeStore.state.selection.selectedTab = uiConstants.TAB_ANNOTATIONS;
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       const annotation = { target: [{ selector: {} }] };
@@ -246,7 +249,7 @@ describe('rootThread', function () {
     it('filter matches only notes when Notes tab is selected', function () {
       fakeBuildThread.reset();
       fakeStore.state.selection.selectedTab = uiConstants.TAB_NOTES;
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isTrue(threadFilterFn({ annotation: { target: [{}] } }));
@@ -255,7 +258,7 @@ describe('rootThread', function () {
     it('filter matches only orphans when Orphans tab is selected', function () {
       fakeBuildThread.reset();
       fakeStore.state.selection.selectedTab = uiConstants.TAB_ORPHANS;
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       const orphan = Object.assign(annotationFixtures.defaultAnnotation(), {
@@ -268,7 +271,7 @@ describe('rootThread', function () {
     it('filter does not match notes when Annotations tab is selected', function () {
       fakeBuildThread.reset();
       fakeStore.state.selection.selectedTab = uiConstants.TAB_ANNOTATIONS;
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isFalse(threadFilterFn({ annotation: { target: [{}] } }));
@@ -277,7 +280,7 @@ describe('rootThread', function () {
     it('filter does not match orphans when Annotations tab is selected', function () {
       fakeBuildThread.reset();
       fakeStore.state.selection.selectedTab = uiConstants.TAB_ANNOTATIONS;
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       assert.isFalse(threadFilterFn({ annotation: { $orphan: true } }));
@@ -287,7 +290,7 @@ describe('rootThread', function () {
       fakeBuildThread.reset();
       fakeStore.state.route.name = 'stream';
 
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
 
       // There should be no thread filter function on the stream and standalone
@@ -297,7 +300,7 @@ describe('rootThread', function () {
 
     it('filter returns false when no annotations are provided', function () {
       fakeBuildThread.reset();
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
       assert.isFalse(threadFilterFn({}));
     });
@@ -311,7 +314,7 @@ describe('rootThread', function () {
       fakeSearchFilter.generateFacetedFilter.returns(filters);
       fakeStore.state.selection.filterQuery = 'queryterm';
 
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 
       fakeViewFilter.filter.returns([annotation]);
@@ -331,7 +334,7 @@ describe('rootThread', function () {
       const annotation = annotationFixtures.defaultAnnotation();
       fakeSearchFilter.generateFacetedFilter.returns(filters);
       fakeStore.focusModeFocused = sinon.stub().returns(true);
-      rootThread.thread(fakeStore.state);
+      rootThreadService.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 
       fakeViewFilter.filter.returns([annotation]);

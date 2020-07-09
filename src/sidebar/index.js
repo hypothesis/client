@@ -157,7 +157,7 @@ function startApp(config) {
     .register('loadAnnotationsService', loadAnnotationsService)
     .register('localStorage', localStorageService)
     .register('persistedDefaults', persistedDefaultsService)
-    .register('rootThread', rootThreadService)
+    .register('rootThreadService', rootThreadService)
     .register('router', routerService)
     .register('searchFilter', searchFilterService)
     .register('serviceUrl', serviceUrlService)

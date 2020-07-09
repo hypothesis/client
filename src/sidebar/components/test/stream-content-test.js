@@ -8,7 +8,7 @@ import StreamContent, { $imports } from '../stream-content';
 
 describe('StreamContent', () => {
   let fakeApi;
-  let fakeRootThread;
+  let fakeRootThreadService;
   let fakeSearchFilter;
   let fakeStore;
   let fakeToastMessenger;
@@ -18,7 +18,7 @@ describe('StreamContent', () => {
       search: sinon.stub().resolves({ rows: [], replies: [], total: 0 }),
     };
 
-    fakeRootThread = {
+    fakeRootThreadService = {
       thread: sinon.stub().returns({}),
     };
 
@@ -54,7 +54,7 @@ describe('StreamContent', () => {
     return mount(
       <StreamContent
         api={fakeApi}
-        rootThread={fakeRootThread}
+        rootThreadService={fakeRootThreadService}
         searchFilter={fakeSearchFilter}
         toastMessenger={fakeToastMessenger}
       />

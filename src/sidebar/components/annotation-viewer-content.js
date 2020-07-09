@@ -14,7 +14,7 @@ import SidebarContentError from './sidebar-content-error';
 function AnnotationViewerContent({
   loadAnnotationsService,
   onLogin,
-  rootThread: rootThreadService,
+  rootThreadService,
 }) {
   const annotationId = useStore(store => store.routeParams().id);
   const clearAnnotations = useStore(store => store.clearAnnotations);
@@ -100,12 +100,12 @@ AnnotationViewerContent.propTypes = {
 
   // Injected.
   loadAnnotationsService: propTypes.object,
-  rootThread: propTypes.object,
+  rootThreadService: propTypes.object,
 };
 
 AnnotationViewerContent.injectedProps = [
   'loadAnnotationsService',
-  'rootThread',
+  'rootThreadService',
 ];
 
 export default withServices(AnnotationViewerContent);

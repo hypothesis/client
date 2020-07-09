@@ -36,7 +36,7 @@ const fixtures = immutable({
 
 describe('annotation threading', function () {
   let store;
-  let rootThread;
+  let rootThreadService;
 
   beforeEach(function () {
     const fakeUnicode = {
@@ -54,7 +54,7 @@ describe('annotation threading', function () {
 
     const container = new Injector()
       .register('store', storeFactory)
-      .register('rootThread', rootThreadFactory)
+      .register('rootThreadService', rootThreadFactory)
       .register('searchFilter', searchFilterFactory)
       .register('annotationsService', () => {})
       .register('viewFilter', viewFilterFactory)
@@ -63,25 +63,28 @@ describe('annotation threading', function () {
       .register('unicode', { value: fakeUnicode });
 
     store = container.get('store');
-    rootThread = container.get('rootThread');
+    rootThreadService = container.get('rootThreadService');
   });
 
   it('should display newly loaded annotations', function () {
     store.addAnnotations(fixtures.annotations);
-    assert.equal(rootThread.thread(store.getState()).children.length, 2);
+    assert.equal(rootThreadService.thread(store.getState()).children.length, 2);
   });
 
   it('should not display unloaded annotations', function () {
     store.addAnnotations(fixtures.annotations);
     store.removeAnnotations(fixtures.annotations);
-    assert.equal(rootThread.thread(store.getState()).children.length, 0);
+    assert.equal(rootThreadService.thread(store.getState()).children.length, 0);
   });
 
   it('should filter annotations when a search is set', function () {
     store.addAnnotations(fixtures.annotations);
     store.setFilterQuery('second');
-    assert.equal(rootThread.thread(store.getState()).children.length, 1);
-    assert.equal(rootThread.thread(store.getState()).children[0].id, '2');
+    assert.equal(rootThreadService.thread(store.getState()).children.length, 1);
+    assert.equal(
+      rootThreadService.thread(store.getState()).children[0].id,
+      '2'
+    );
   });
 
   [
@@ -97,7 +100,7 @@ describe('annotation threading', function () {
     it(`should sort annotations by ${testCase.mode}`, () => {
       store.addAnnotations(fixtures.annotations);
       store.setSortKey(testCase.sortKey);
-      const actualOrder = rootThread
+      const actualOrder = rootThreadService
         .thread(store.getState())
         .children.map(function (thread) {
           return thread.annotation.id;

@@ -25,8 +25,8 @@ const countVisibleAnns = annThread => {
  * UI for displaying information about the currently-applied filtering of
  * annotations, and, in some cases, a mechanism for clearing the filter(s).
  * */
-function SearchStatusBar({ rootThread }) {
-  const thread = useStore(store => rootThread.thread(store.getState()));
+function SearchStatusBar({ rootThreadService }) {
+  const thread = useStore(store => rootThreadService.thread(store.getState()));
 
   const actions = useStore(store => ({
     clearSelection: store.clearSelection,
@@ -174,9 +174,9 @@ function SearchStatusBar({ rootThread }) {
 
 SearchStatusBar.propTypes = {
   // Injected services.
-  rootThread: propTypes.object.isRequired,
+  rootThreadService: propTypes.object.isRequired,
 };
 
-SearchStatusBar.injectedProps = ['rootThread'];
+SearchStatusBar.injectedProps = ['rootThreadService'];
 
 export default withServices(SearchStatusBar);
