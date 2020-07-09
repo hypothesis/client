@@ -32,6 +32,7 @@ describe('sidebar/store/modules/selection', () => {
     it('sets the visibility of the annotation', function () {
       store.setForceVisible('id1', true);
       assert.deepEqual(getSelectionState().forceVisible, { id1: true });
+      assert.deepEqual(store.forcedVisibleAnnotations(), ['id1']);
     });
   });
 
@@ -218,6 +219,7 @@ describe('sidebar/store/modules/selection', () => {
       store.setCollapsed('456', false);
       store.setFilterQuery('some-query');
       assert.deepEqual(getSelectionState().forceVisible, {});
+      assert.deepEqual(store.forcedVisibleAnnotations(), []);
       assert.deepEqual(getSelectionState().expanded, {});
     });
   });
@@ -262,6 +264,7 @@ describe('sidebar/store/modules/selection', () => {
       });
 
       assert.isEmpty(getSelectionState().forceVisible);
+      assert.isEmpty(store.forcedVisibleAnnotations());
       assert.isNull(store.filterQuery());
     });
   });
@@ -386,7 +389,7 @@ describe('sidebar/store/modules/selection', () => {
   describe('highlightAnnotations()', function () {
     it('sets the highlighted annotations', function () {
       store.highlightAnnotations(['id1', 'id2']);
-      assert.deepEqual(getSelectionState().highlighted, ['id1', 'id2']);
+      assert.deepEqual(store.highlightedAnnotations(), ['id1', 'id2']);
     });
   });
 
@@ -404,18 +407,12 @@ describe('sidebar/store/modules/selection', () => {
   describe('selectTab()', function () {
     it('sets the selected tab', function () {
       store.selectTab(uiConstants.TAB_ANNOTATIONS);
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      assert.equal(store.selectedTab(), uiConstants.TAB_ANNOTATIONS);
     });
 
     it('ignores junk tag names', function () {
       store.selectTab('flibbertigibbert');
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      assert.equal(store.selectedTab(), uiConstants.TAB_ANNOTATIONS);
     });
 
     it('allows sorting annotations by time and document location', function () {
@@ -467,7 +464,7 @@ describe('sidebar/store/modules/selection', () => {
 
       store.selectTab(uiConstants.TAB_NOTES);
 
-      assert.equal(getSelectionState().sortKey, 'Newest');
+      assert.equal(store.sortKey(), 'Newest');
     });
   });
 
@@ -479,7 +476,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 0,
       });
 
-      assert.equal(getSelectionState().selectedTab, uiConstants.TAB_NOTES);
+      assert.equal(store.selectedTab(), uiConstants.TAB_NOTES);
     });
 
     it('should select the page notes tab if page notes have replies', () => {
@@ -492,7 +489,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 0,
       });
 
-      assert.equal(getSelectionState().selectedTab, uiConstants.TAB_NOTES);
+      assert.equal(store.selectedTab(), uiConstants.TAB_NOTES);
     });
 
     it('should not select the page notes tab if there were previously annotations in the store', () => {
@@ -502,10 +499,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 4,
       });
 
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      assert.equal(store.selectedTab(), uiConstants.TAB_ANNOTATIONS);
     });
 
     it('should not select the page notes tab if there are non-page-note annotations at the top level', () => {
@@ -519,10 +513,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 0,
       });
 
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      assert.equal(store.selectedTab(), uiConstants.TAB_ANNOTATIONS);
     });
   });
 });

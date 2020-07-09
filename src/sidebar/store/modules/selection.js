@@ -515,8 +515,55 @@ function focusModeUserPrettyName(state) {
   }
 }
 
+/**
+ * Return an array of annotation ids that have been forced visible by the
+ * user—i.e. return the "truthy keys" of `forceVisible`
+ *
+ * @return {Array<string>}
+ */
+const forcedVisibleAnnotations = createSelector(
+  state => state.selection.forceVisible,
+  forcedVisible =>
+    Object.keys(forcedVisible).filter(forceKey => !!forcedVisible[forceKey])
+);
+
 function getSelectedAnnotationMap(state) {
   return state.selection.selectedAnnotationMap;
+}
+
+/**
+ * @return {Array<string>} - ids of highlighted annotations
+ */
+function highlightedAnnotations(state) {
+  return state.selection.highlighted;
+}
+
+/**
+ * Return an array of currently-selected annotation ids
+ *
+ * @return {Array<string>}
+ */
+const selectedAnnotations = createSelector(
+  state => state.selection.selectedAnnotationMap,
+  selectedMap =>
+    Object.keys(selectedMap || {}).filter(
+      selectedKey => !!selectedMap[selectedKey]
+    )
+);
+
+/**
+ * @return {string} - The currently-selected tab
+ */
+function selectedTab(state) {
+  return state.selection.selectedTab;
+}
+
+/**
+ * Retrieve current sorting order for annotations
+ * @return {string}
+ */
+function sortKey(state) {
+  return state.selection.sortKey;
 }
 
 /**
@@ -563,11 +610,16 @@ export default {
     focusModeHasUser,
     focusModeUserId,
     focusModeUserPrettyName,
+    forcedVisibleAnnotations,
+    highlightedAnnotations,
     isAnnotationFocused,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
     getSelectedAnnotationMap,
     hasAppliedFilter,
     hasSelectedAnnotations,
+    selectedAnnotations,
+    selectedTab,
+    sortKey,
   },
 };
