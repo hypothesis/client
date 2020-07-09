@@ -99,12 +99,12 @@ function profile(state) {
 /**
  * @typedef SessionStore
  *
- * // actions
+ * // Actions
  * @prop {typeof hasFetchedProfile} hasFetchedProfile
  *
- * // selectors
- * @prop {()=> boolean} hasFetchedProfile
- * @prop {(a: string)=> boolean} isFeatureEnabled
+ * // Selectors
+ * @prop {() => boolean} hasFetchedProfile
+ * @prop {(feature: string) => boolean} isFeatureEnabled
  * @prop {() => boolean} isLoggedIn
  * @prop {() => Profile} profile
  */

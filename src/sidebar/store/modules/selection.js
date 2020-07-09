@@ -537,7 +537,7 @@ const hasAppliedFilter = createSelector(
 /**
  * @typedef SelectionStore
  *
- * // actions
+ * // Actions
  * @prop {typeof clearSelectedAnnotations} clearSelectedAnnotations
  * @prop {typeof clearSelection} clearSelection
  * @prop {typeof clearSelection} clearSelection
@@ -553,7 +553,7 @@ const hasAppliedFilter = createSelector(
  * @prop {typeof setSortKey} setSortKey
  * @prop {typeof toggleSelectedAnnotations} toggleSelectedAnnotations
  *
- * // selectors
+ * // Selectors
  * // TODO: add the rest
  */
 

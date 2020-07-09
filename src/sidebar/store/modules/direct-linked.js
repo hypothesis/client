@@ -143,10 +143,10 @@ function directLinkedGroupFetchFailed(state) {
 /**
  * @typedef DirectLinkedStore
  *
- * // actions
+ * // Actions
  * @prop {typeof setDirectLinkedGroupFetchFailed} setDirectLinkedGroupFetchFailed
  *
- * // selectors
+ * // Selectors
  * @prop {() => ?string} directLinkedAnnotationId
  * @prop {() => boolean} directLinkedGroupFetchFailed
  * @prop {() => ?string} directLinkedGroupId

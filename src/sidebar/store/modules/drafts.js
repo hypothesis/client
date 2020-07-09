@@ -149,7 +149,7 @@ function countDrafts(state) {
 /**
  * Retrieve the draft changes for an annotation.
  *
- * @return {?Draft}
+ * @return {Draft|null}
  */
 function getDraft(state, annotation) {
   const drafts = state.drafts;
@@ -190,16 +190,16 @@ const unsavedAnnotations = createSelector(
 /**
  * @typedef DraftsStore
  *
- * // actions
+ * // Actions
  * @prop {typeof createDraft} createDraft
  * @prop {typeof deleteNewAndEmptyDrafts} deleteNewAndEmptyDrafts
  * @prop {typeof discardAllDrafts} discardAllDrafts
  * @prop {typeof removeDraft} removeDraft
  *
- * // selectors
+ * // Selectors
  * @prop {() => boolean} countDrafts
- * @prop {(a: Annotation) => ?Draft} getDraft
- * @prop {(a: Annotation) => boolean} getDraftIfNotEmpty
+ * @prop {(a: Annotation) => Draft|null} getDraft
+ * @prop {(a: Annotation) => Draft|null} getDraftIfNotEmpty
  * @prop {() => Annotation[]} unsavedAnnotations
  */
 

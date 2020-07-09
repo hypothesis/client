@@ -101,15 +101,15 @@ function hasMessage(state, type, text) {
 /**
  * @typedef ToastMessagesStore
  *
- * // actions
+ * // Actions
  * @prop {typeof addMessage} addToastMessage
  * @prop {typeof removeMessage} removeToastMessage
  * @prop {typeof updateMessage} updateToastMessage
  *
- * // selectors
- * @prop {(a: string) => (Object|undefined)} getToastMessage
+ * // Selectors
+ * @prop {(id: string) => (Object|undefined)} getToastMessage
  * @prop {() => Object[]} getToastMessages
- * @prop {(a: string, b: string) => boolean} hasToastMessage
+ * @prop {(type: string, text: string) => boolean} hasToastMessage
  */
 
 export default {

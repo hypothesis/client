@@ -114,13 +114,13 @@ function isSidebarPanelOpen(state, panelName) {
 /**
  * @typedef SidebarPanelsStore
  *
- * // actions
+ * // Actions
  * @prop {typeof openSidebarPanel} openSidebarPanel
  * @prop {typeof closeSidebarPanel} closeSidebarPanel
  * @prop {typeof toggleSidebarPanel} toggleSidebarPanel
  *
- * // selectors
- * @prop {(a: string) => boolean} isSidebarPanelOpen
+ * // Selectors
+ * @prop {(name: string) => boolean} isSidebarPanelOpen
  */
 
 export default {

@@ -442,7 +442,7 @@ const isWaitingToAnchorAnnotations = createSelector(
 /**
  * @typedef AnnotationsStore
  *
- * // actions
+ * // Actions
  * @prop {typeof addAnnotations} addAnnotations
  * @prop {typeof clearAnnotations} clearAnnotations
  * @prop {typeof hideAnnotation} hideAnnotation
@@ -451,11 +451,11 @@ const isWaitingToAnchorAnnotations = createSelector(
  * @prop {typeof updateFlagStatus} updateFlagStatus
  * @prop {typeof unhideAnnotation} unhideAnnotation
  *
- * // selectors
+ * // Selectors
  * @prop {() => number} annotationCount
- * @prop {(a: string) => boolean} annotationExists
- * @prop {(a: string) => Annotation} findAnnotationByID
- * @prop {(a: string[]) => string[]} findIDsForTags
+ * @prop {(id: string) => boolean} annotationExists
+ * @prop {(id: string) => Annotation} findAnnotationByID
+ * @prop {(tags: string[]) => string[]} findIDsForTags
  * @prop {() => boolean} isWaitingToAnchorAnnotations
  * @prop {() => Annotation[]} newAnnotations
  * @prop {() => Annotation[]} newHighlights

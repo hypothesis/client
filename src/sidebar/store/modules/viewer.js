@@ -56,11 +56,11 @@ function hasSidebarOpened(state) {
 /**
  * @typedef ViewerStore
  *
- * // actions
+ * // Actions
  * @prop {typeof setShowHighlights} setShowHighlights
  * @prop {typeof setSidebarOpened} setSidebarOpened
  *
- * // selectors
+ * // Selectors
  * @prop {() => boolean} hasSidebarOpened
  */
 

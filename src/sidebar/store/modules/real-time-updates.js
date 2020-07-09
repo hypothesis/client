@@ -179,11 +179,11 @@ function hasPendingDeletion(state, id) {
 /**
  * @typedef RealTimeUpdatesStore
  *
- * // actions
+ * // Actions
  * @prop {typeof receiveRealTimeUpdates} receiveRealTimeUpdates
  * @prop {typeof clearPendingUpdates} clearPendingUpdates
  *
- * // selectors
+ * // Selectors
  * @prop {() => boolean} hasPendingDeletion
  * @prop {() => Object<string, boolean>} pendingDeletions
  * @prop {() => Object<string, Annotation>} pendingUpdates

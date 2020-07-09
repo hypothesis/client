@@ -129,12 +129,12 @@ const searchUris = createShallowEqualSelector(
 /**
  * @typedef FramesStore
  *
- * // actions
+ * // Actions
  * @prop {typeof connectFrame} connectFrame
  * @prop {typeof destroyFrame} destroyFrame
  * @prop {typeof updateFrameAnnotationFetchStatus} updateFrameAnnotationFetchStatus
  *
- * // selectors
+ * // Selectors
  * // TODO add rest ...
  */
 

@@ -175,7 +175,7 @@ function isSavingAnnotation(state, annotation) {
 /**
  * @typedef ActivityStore
  *
- * // actions
+ * // Actions
  * @prop {typeof annotationFetchStarted} annotationFetchStarted
  * @prop {typeof annotationFetchFinished} annotationFetchFinished
  * @prop {typeof annotationSaveStarted} annotationSaveStarted
@@ -183,7 +183,7 @@ function isSavingAnnotation(state, annotation) {
  * @prop {typeof apiRequestStarted} apiRequestStarted
  * @prop {typeof apiRequestFinished} apiRequestFinished
  *
- * // selectors
+ * // Selectors
  * @prop {() => boolean} hasFetchedAnnotations
  * @prop {() => boolean} isLoading
  * @prop {() => boolean} isFetchingAnnotations

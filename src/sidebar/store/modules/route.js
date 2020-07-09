@@ -59,10 +59,10 @@ function routeParams(state) {
 /**
  * @typedef RouteStore
  *
- * // actions
+ * // Actions
  * @prop {typeof changeRoute} changeRoute
  *
- * // selectors
+ * // Selectors
  * @prop {() => ?string} route
  * @prop {() => Object} routeParams
  */

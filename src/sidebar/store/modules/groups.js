@@ -197,12 +197,12 @@ const getInScopeGroups = createSelector(
 /**
  * @typedef GroupsStore
  *
- * // actions
+ * // Actions
  * @prop {typeof focusGroup} focusGroup
  * @prop {typeof loadGroups} loadGroups
  * @prop {typeof clearGroups} clearGroups
  *
- * // selectors
+ * // Selectors
  * @prop {() => Group[]} allGroups
  * // TODO: add rest ...
  */

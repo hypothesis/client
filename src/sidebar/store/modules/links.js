@@ -25,7 +25,7 @@ function updateLinksAction(newLinks) {
 /**
  * @typedef LinksStore
  *
- * // actions
+ * // Actions
  * @prop {typeof updateLinks} updateLinksAction
  */
 

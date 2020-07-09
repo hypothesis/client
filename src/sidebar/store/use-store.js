@@ -7,12 +7,12 @@ import warnOnce from '../../shared/warn-once';
 import { useService } from '../util/service-context';
 
 /** @typedef {import("redux").Store} Store */
-/** @typedef {import("./create-store").HypothesisStore} HypothesisStore */
+/** @typedef {import("./create-store").SidebarStore} SidebarStore */
 
 /**
  * @template T
  * @callback StoreCallback
- * @param {HypothesisStore} store
+ * @param {SidebarStore} store
  * @return {T}
  */
 
