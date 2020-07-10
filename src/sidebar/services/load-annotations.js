@@ -9,7 +9,6 @@ import { isReply } from '../util/annotation-metadata';
 // @ngInject
 export default function loadAnnotationsService(
   api,
-  features,
   store,
   streamer,
   streamFilter
@@ -41,7 +40,7 @@ export default function loadAnnotationsService(
   function searchAndLoad(uris, groupId) {
     searchClient = new SearchClient(api.search, {
       incremental: true,
-      separateReplies: !features.flagEnabled('client_do_not_separate_replies'),
+      separateReplies: false,
     });
     searchClient.on('results', results => {
       if (results.length) {
