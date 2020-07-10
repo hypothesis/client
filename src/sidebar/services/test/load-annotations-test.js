@@ -31,7 +31,6 @@ class FakeSearchClient extends EventEmitter {
 
 describe('loadAnnotationsService', () => {
   let fakeApi;
-  let fakeFeatures;
   let fakeStore;
   let fakeStreamer;
   let fakeStreamFilter;
@@ -49,10 +48,6 @@ describe('loadAnnotationsService', () => {
       annotation: {
         get: sinon.stub(),
       },
-    };
-
-    fakeFeatures = {
-      flagEnabled: sinon.stub().returns(false),
     };
 
     fakeStore = {
@@ -100,7 +95,6 @@ describe('loadAnnotationsService', () => {
     );
     return loadAnnotationsService(
       fakeApi,
-      fakeFeatures,
       fakeStore,
       fakeStreamer,
       fakeStreamFilter
@@ -224,24 +218,11 @@ describe('loadAnnotationsService', () => {
       assert.ok(searchClients[0].incremental);
     });
 
-    it('loads annotations without separating replies if feature flag is enabled', () => {
-      fakeFeatures.flagEnabled
-        .withArgs('client_do_not_separate_replies')
-        .returns(true);
+    it('loads annotations without separating replies', () => {
       const svc = createService();
 
       svc.load(fakeUris, fakeGroupId);
       assert.isFalse(searchClients[0].separateReplies);
-    });
-
-    it('loads annotations with separated replies if feature flag is not enabled', () => {
-      fakeFeatures.flagEnabled
-        .withArgs('client_do_not_separate_replies')
-        .returns(false);
-      const svc = createService();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.isTrue(searchClients[0].separateReplies);
     });
 
     it("cancels previously search client if it's still running", () => {
