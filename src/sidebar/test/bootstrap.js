@@ -23,3 +23,6 @@ registerIcons({
   ...sidebarIcons,
   ...annotatorIcons,
 });
+
+import { flushTimersAfterEachTest } from '../../test-util/flush-timers';
+flushTimersAfterEachTest();
