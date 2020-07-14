@@ -44,21 +44,21 @@ describe('sidebar/store/modules/selection', () => {
 
   describe('focusAnnotations()', function () {
     it('adds the provided annotation IDs to the focused annotations', function () {
-      store.focusAnnotations([1, 2, 3]);
-      assert.deepEqual(getSelectionState().focusedAnnotations, [1, 2, 3]);
+      store.focusAnnotations(['1', '2', '3']);
+      assert.deepEqual(store.focusedAnnotations(), ['1', '2', '3']);
     });
 
     it('replaces any other focused annotation IDs', function () {
-      store.focusAnnotations([1]);
-      store.focusAnnotations([2, 3]);
-      assert.deepEqual(getSelectionState().focusedAnnotations, [2, 3]);
+      store.focusAnnotations(['1']);
+      store.focusAnnotations(['2', '3']);
+      assert.deepEqual(store.focusedAnnotations(), ['2', '3']);
     });
 
-    it('sets focused annotations to an empty array if no IDs provided', function () {
-      store.focusAnnotations([1]);
+    it('sets focused annotations to an empty object if no IDs provided', function () {
+      store.focusAnnotations(['1']);
       store.focusAnnotations([]);
-      assert.isArray(getSelectionState().focusedAnnotations);
-      assert.isEmpty(getSelectionState().focusedAnnotations);
+      assert.isObject(getSelectionState().focused);
+      assert.isEmpty(getSelectionState().focused);
     });
   });
 

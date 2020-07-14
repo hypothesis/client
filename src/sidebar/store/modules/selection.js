@@ -1,11 +1,6 @@
 /**
- * This module handles state related to the current sort, search and filter
- * settings in the UI, including:
- *
- * - The set of annotations that are currently focused (hovered) or selected
- * - The selected tab
- * - The current sort order
- * - The current filter query
+ * This module handles the state affecting the visibility and presence of
+ * annotations and threads in the UI.
  */
 
 /**
@@ -92,8 +87,17 @@ const setTab = (selectedTab, newTab) => {
 
 function init(settings) {
   return {
-    // An array of annotation `$tag`s representing annotations that are focused
-    focusedAnnotations: [],
+    /**
+     * The following objects map annotation identifiers to a boolean
+     * (typically `true`). They are objects (i.e. instead of Arrays) for two
+     * reasons:
+     * - Allows explicit setting of `false`
+     * - Prevents duplicate entries for a single annotation
+     */
+
+    // A set of annotations that are currently "focused" — hovered over in
+    // the UI, e.g.
+    focused: {},
 
     // Contains a map of annotation id:true pairs.
     selectedAnnotationMap: initialSelection(settings),
@@ -153,7 +157,9 @@ const update = {
   },
 
   FOCUS_ANNOTATIONS: function (state, action) {
-    return { focusedAnnotations: [...action.focusedTags] };
+    const focused = {};
+    action.focusedTags.forEach(tag => (focused[tag] = true));
+    return { focused };
   },
 
   SET_FOCUS_MODE_FOCUSED: function (state, action) {
@@ -311,9 +317,10 @@ function setForceVisible(id, visible) {
 }
 
 /**
- * Sets which annotations are currently focused.
+ * Replace the current set of focused annotations with the annotations
+ * identified by `tags`
  *
- * @param {string[]} tags - Tags of annotations to focus
+ * @param {string[]} tags - Identifiers of annotations to focus
  */
 function focusAnnotations(tags) {
   return {
@@ -395,11 +402,17 @@ function setSortKey(key) {
   };
 }
 
+/* Selectors */
+
+function focusedAnnotations(state) {
+  return Object.keys(state.selection.focused).filter(
+    id => state.selection.focused[id] === true
+  );
+}
+
 /** Is the annotation referenced by `$tag` currently focused? */
 function isAnnotationFocused(state, $tag) {
-  return state.selection.focusedAnnotations.some(
-    focusedAnn => $tag && focusedAnn === $tag
-  );
+  return state.selection.focused[$tag] === true;
 }
 
 /**
@@ -563,6 +576,7 @@ export default {
     focusModeHasUser,
     focusModeUserId,
     focusModeUserPrettyName,
+    focusedAnnotations,
     isAnnotationFocused,
     isAnnotationSelected,
     getFirstSelectedAnnotationId,
