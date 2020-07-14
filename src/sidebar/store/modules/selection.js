@@ -45,6 +45,17 @@ TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = [
   'Location',
 ];
 
+/**
+ * Utility function that returns all of the properties of an object whose
+ * value is `true`.
+ *
+ * @param {Object} obj
+ * @return {any[]}
+ */
+function truthyKeys(obj) {
+  return Object.keys(obj).filter(key => obj[key] === true);
+}
+
 function initialSelection(settings) {
   const selection = {};
   // TODO: Do not take into account existence of `settings.query` here
@@ -402,9 +413,7 @@ function setSortKey(key) {
 /* Selectors */
 
 function focusedAnnotations(state) {
-  return Object.keys(state.selection.focused).filter(
-    id => state.selection.focused[id] === true
-  );
+  return truthyKeys(state.selection.focused);
 }
 
 /** Is the annotation referenced by `$tag` currently focused? */
@@ -417,8 +426,7 @@ function isAnnotationFocused(state, $tag) {
  */
 const hasSelectedAnnotations = createSelector(
   state => state.selection.selected,
-  selection =>
-    Object.keys(selection).filter(id => selection[id] === true).length > 0
+  selection => truthyKeys(selection).length > 0
 );
 
 /** De-select all annotations. */
@@ -441,9 +449,7 @@ function clearSelection() {
 const getFirstSelectedAnnotationId = createSelector(
   state => state.selection.selected,
   selection => {
-    const selectedIds = Object.keys(selection).filter(
-      id => selection[id] === true
-    );
+    const selectedIds = truthyKeys(selection);
     return selectedIds.length ? selectedIds[0] : null;
   }
 );
@@ -543,7 +549,7 @@ const hasAppliedFilter = createSelector(
 
 const selectedAnnotations = createSelector(
   state => state.selection.selected,
-  selection => Object.keys(selection).filter(id => selection[id] === true)
+  selection => truthyKeys(selection)
 );
 
 export default {
