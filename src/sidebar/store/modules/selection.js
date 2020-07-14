@@ -13,8 +13,7 @@ import { createSelector } from 'reselect';
 
 import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
-import { countIf, toSet } from '../../util/array';
-import immutable from '../../util/immutable';
+import { countIf } from '../../util/array';
 import * as util from '../util';
 
 /**
@@ -48,18 +47,13 @@ TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = [
 
 function initialSelection(settings) {
   const selection = {};
+  // TODO: Do not take into account existence of `settings.query` here
+  // once `RootThreadService` is fully updated: the decision of whether
+  // selection trumps any query is not one for the store to make
   if (settings.annotations && !settings.query) {
     selection[settings.annotations] = true;
   }
-  return freeze(selection);
-}
-
-function freeze(selection) {
-  if (Object.keys(selection).length) {
-    return immutable(selection);
-  } else {
-    return null;
-  }
+  return selection;
 }
 
 const setTab = (selectedTab, newTab) => {
@@ -99,8 +93,8 @@ function init(settings) {
     // the UI, e.g.
     focused: {},
 
-    // Contains a map of annotation id:true pairs.
-    selectedAnnotationMap: initialSelection(settings),
+    // A map of annotation ids to their selection state (true/false)
+    selected: initialSelection(settings),
 
     // Map of annotation IDs to expanded/collapsed state. For annotations not
     // present in the map, the default state is used which depends on whether
@@ -143,17 +137,25 @@ const update = {
     return {
       filterQuery: null,
       forceVisible: {},
-      selectedAnnotationMap: null,
+      selected: {},
       ...tabSettings,
     };
   },
 
   CLEAR_SELECTED_ANNOTATIONS: function () {
-    return { filterQuery: null, selectedAnnotationMap: null };
+    return { filterQuery: null, selected: {} };
   },
 
   SELECT_ANNOTATIONS: function (state, action) {
-    return { selectedAnnotationMap: action.selection };
+    return { selected: action.selection };
+  },
+
+  TOGGLE_SELECTED_ANNOTATIONS: function (state, action) {
+    const selection = { ...state.selected };
+    action.toggleIds.forEach(id => {
+      selection[id] = !selection[id];
+    });
+    return { selected: selection };
   },
 
   FOCUS_ANNOTATIONS: function (state, action) {
@@ -229,7 +231,7 @@ const update = {
   },
 
   REMOVE_ANNOTATIONS: function (state, action) {
-    const selection = Object.assign({}, state.selectedAnnotationMap);
+    const selection = { ...state.selected };
     action.annotationsToRemove.forEach(annotation => {
       if (annotation.id) {
         delete selection[annotation.id];
@@ -243,7 +245,7 @@ const update = {
       selectedTab = uiConstants.TAB_ANNOTATIONS;
     }
     return {
-      selectedAnnotationMap: freeze(selection),
+      selected: selection,
       selectedTab: selectedTab,
     };
   },
@@ -263,36 +265,31 @@ const update = {
 
 const actions = util.actionTypes(update);
 
-function select(annotations) {
+/**
+ * Set the currently selected annotation IDs. Will replace the entire
+ * selection. All provided annotation ids will be set to `true` in the selection.
+ *
+ * @param {string[]} ids - Idenfiers of annotations to select
+ */
+function selectAnnotations(ids) {
+  const selection = {};
+  ids.forEach(id => (selection[id] = true));
   return {
     type: actions.SELECT_ANNOTATIONS,
-    selection: freeze(annotations),
+    selection,
   };
 }
 
 /**
- * Set the currently selected annotation IDs.
+ * Toggle the selected state for the annotations in `toggledAnnotations`:
+ * unselect any that are selected; select any that are unselected.
+ *
+ * @param {string[]} toggleIds - identifiers of annotations to toggle
  */
-function selectAnnotations(ids) {
-  return select(toSet(ids));
-}
-
-/** Toggle whether annotations are selected or not. */
-function toggleSelectedAnnotations(ids) {
-  return function (dispatch, getState) {
-    const selection = Object.assign(
-      {},
-      getState().selection.selectedAnnotationMap
-    );
-    for (let i = 0; i < ids.length; i++) {
-      const id = ids[i];
-      if (selection[id]) {
-        delete selection[id];
-      } else {
-        selection[id] = true;
-      }
-    }
-    dispatch(select(selection));
+function toggleSelectedAnnotations(toggleIds) {
+  return {
+    type: actions.TOGGLE_SELECTED_ANNOTATIONS,
+    toggleIds,
   };
 }
 
@@ -416,18 +413,13 @@ function isAnnotationFocused(state, $tag) {
 }
 
 /**
- * Returns true if the annotation with the given `id` is selected.
- */
-function isAnnotationSelected(state, id) {
-  return (state.selection.selectedAnnotationMap || {}).hasOwnProperty(id);
-}
-
-/**
  * Return true if any annotations are currently selected.
  */
-function hasSelectedAnnotations(state) {
-  return !!state.selection.selectedAnnotationMap;
-}
+const hasSelectedAnnotations = createSelector(
+  state => state.selection.selected,
+  selection =>
+    Object.keys(selection).filter(id => selection[id] === true).length > 0
+);
 
 /** De-select all annotations. */
 function clearSelectedAnnotations() {
@@ -441,13 +433,19 @@ function clearSelection() {
 }
 
 /**
- * Returns the annotation ID of the first annotation in `selectedAnnotationMap`.
+ * Returns the annotation ID of the first annotation in the selection that is
+ * selected (`true`).
  *
  * @return {string|null}
  */
 const getFirstSelectedAnnotationId = createSelector(
-  state => state.selection.selectedAnnotationMap,
-  selected => (selected ? Object.keys(selected)[0] : null)
+  state => state.selection.selected,
+  selection => {
+    const selectedIds = Object.keys(selection).filter(
+      id => selection[id] === true
+    );
+    return selectedIds.length ? selectedIds[0] : null;
+  }
 );
 
 function expandedThreads(state) {
@@ -528,10 +526,6 @@ function focusModeUserPrettyName(state) {
   }
 }
 
-function getSelectedAnnotationMap(state) {
-  return state.selection.selectedAnnotationMap;
-}
-
 /**
  * Is any sort of filtering currently applied to the list of annotations? This
  * includes a search query, but also if annotations are selected or a user
@@ -545,6 +539,11 @@ const hasAppliedFilter = createSelector(
   hasSelectedAnnotations,
   (filterQuery, focusModeFocused, hasSelectedAnnotations) =>
     !!filterQuery || focusModeFocused || hasSelectedAnnotations
+);
+
+const selectedAnnotations = createSelector(
+  state => state.selection.selected,
+  selection => Object.keys(selection).filter(id => selection[id] === true)
 );
 
 export default {
@@ -578,10 +577,9 @@ export default {
     focusModeUserPrettyName,
     focusedAnnotations,
     isAnnotationFocused,
-    isAnnotationSelected,
     getFirstSelectedAnnotationId,
-    getSelectedAnnotationMap,
     hasAppliedFilter,
     hasSelectedAnnotations,
+    selectedAnnotations,
   },
 };

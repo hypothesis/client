@@ -41,13 +41,13 @@ function SearchStatusBar({ rootThread }) {
     filterQuery,
     focusModeFocused,
     focusModeUserPrettyName,
-    selectionMap,
+    hasSelectedAnnotations,
     selectedTab,
   } = useStore(store => ({
     filterQuery: store.getState().selection.filterQuery,
     focusModeFocused: store.focusModeFocused(),
     focusModeUserPrettyName: store.focusModeUserPrettyName(),
-    selectionMap: store.getSelectedAnnotationMap(),
+    hasSelectedAnnotations: store.hasSelectedAnnotations(),
     selectedTab: store.getState().selection.selectedTab,
   }));
 
@@ -72,9 +72,7 @@ function SearchStatusBar({ rootThread }) {
      * `filtered` mode.
      */
     selected: (() => {
-      return (
-        !!selectionMap && Object.keys(selectionMap).length > 0 && !filterQuery
-      );
+      return hasSelectedAnnotations && !filterQuery;
     })(),
   };
 

@@ -112,53 +112,38 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('isAnnotationSelected', function () {
-    it('returns true if the id provided is selected', function () {
-      store.selectAnnotations([1]);
-      assert.isTrue(store.isAnnotationSelected(1));
-    });
-
-    it('returns false if the id provided is not selected', function () {
-      store.selectAnnotations([1]);
-      assert.isFalse(store.isAnnotationSelected(2));
-    });
-
-    it('returns false if there are no selected annotations', function () {
-      assert.isFalse(store.isAnnotationSelected(1));
-    });
-  });
-
   describe('selectAnnotations()', function () {
-    it('adds the passed annotations to the selectedAnnotationMap', function () {
+    it('adds the passed annotations to the selectedAnnotations', function () {
       store.selectAnnotations([1, 2, 3]);
-      assert.deepEqual(store.getSelectedAnnotationMap(), {
+      assert.deepEqual(getSelectionState().selected, {
         1: true,
         2: true,
         3: true,
       });
     });
 
-    it('replaces any annotations originally in the map', function () {
+    it('replaces any annotations originally in the selection', function () {
       store.selectAnnotations([1]);
       store.selectAnnotations([2, 3]);
-      assert.deepEqual(store.getSelectedAnnotationMap(), {
+      assert.deepEqual(getSelectionState().selected, {
         2: true,
         3: true,
       });
     });
 
-    it('nulls the map if no annotations are selected', function () {
+    it('empties the selection object if no annotations are selected', function () {
       store.selectAnnotations([1]);
       store.selectAnnotations([]);
-      assert.isNull(store.getSelectedAnnotationMap());
+      assert.isObject(getSelectionState().selected);
+      assert.isEmpty(getSelectionState().selected);
     });
   });
 
   describe('toggleSelectedAnnotations()', function () {
-    it('adds annotations missing from the selectedAnnotationMap', function () {
+    it('adds annotations missing from the selectedAnnotations', function () {
       store.selectAnnotations([1, 2]);
       store.toggleSelectedAnnotations([3, 4]);
-      assert.deepEqual(store.getSelectedAnnotationMap(), {
+      assert.deepEqual(getSelectionState().selected, {
         1: true,
         2: true,
         3: true,
@@ -166,27 +151,22 @@ describe('sidebar/store/modules/selection', () => {
       });
     });
 
-    it('removes annotations already in the selectedAnnotationMap', function () {
+    it('removes annotations already in the selection', function () {
       store.selectAnnotations([1, 3]);
       store.toggleSelectedAnnotations([1, 2]);
-      assert.deepEqual(store.getSelectedAnnotationMap(), {
+      assert.deepEqual(getSelectionState().selected, {
+        1: false,
         2: true,
         3: true,
       });
     });
-
-    it('nulls the map if no annotations are selected', function () {
-      store.selectAnnotations([1]);
-      store.toggleSelectedAnnotations([1]);
-      assert.isNull(store.getSelectedAnnotationMap());
-    });
   });
 
   describe('#REMOVE_ANNOTATIONS', function () {
-    it('removing an annotation should also remove it from selectedAnnotationMap', function () {
+    it('removing an annotation should also remove it from the selection', function () {
       store.selectAnnotations([1, 2, 3]);
       store.removeAnnotations([{ id: 2 }]);
-      assert.deepEqual(store.getSelectedAnnotationMap(), {
+      assert.deepEqual(getSelectionState().selected, {
         1: true,
         3: true,
       });
@@ -197,7 +177,7 @@ describe('sidebar/store/modules/selection', () => {
     it('removes all annotations from the selection', function () {
       store.selectAnnotations([1]);
       store.clearSelectedAnnotations();
-      assert.isNull(store.getSelectedAnnotationMap());
+      assert.isEmpty(getSelectionState().selected);
     });
 
     it('clears the current search query', function () {
