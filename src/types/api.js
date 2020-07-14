@@ -34,6 +34,12 @@
  */
 
 /**
+ * @typedef Target
+ * @prop {string} source
+ * @prop {Selector[]} [selector]
+ * 
+ 
+/**
  * TODO - Fill out remaining properties
  *
  * @typedef Annotation
@@ -58,9 +64,7 @@
  *   @prop {string[]} permissions.update
  *   @prop {string[]} permissions.delete
  *
- * @prop {Object[]} target
- *   @prop {string} target.source
- *   @prop {Selector[]} [target.selector]
+ * @prop {Target[]} target
  *
  * @prop {Object} [moderation]
  *   @prop {number} moderation.flagCount

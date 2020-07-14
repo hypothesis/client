@@ -7,6 +7,7 @@
  * @throws {Error}
  *   This function may throw an exception if the browser rejects the attempt
  *   to copy text.
+ * @param {string} text
  */
 export function copyText(text) {
   const temp = document.createElement('pre');

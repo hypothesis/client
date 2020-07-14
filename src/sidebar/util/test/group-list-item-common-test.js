@@ -1,22 +1,6 @@
-import { events } from '../../services/analytics';
 import * as groupListItemCommon from '../group-list-item-common';
 
 describe('sidebar/util/groupListItemCommon', () => {
-  describe('trackViewGroupActivity', () => {
-    it('triggers the GROUP_VIEW_ACTIVITY event when called', () => {
-      const fakeAnalytics = {
-        track: sinon.stub(),
-        events,
-      };
-      groupListItemCommon.trackViewGroupActivity(fakeAnalytics);
-
-      assert.calledWith(
-        fakeAnalytics.track,
-        fakeAnalytics.events.GROUP_VIEW_ACTIVITY
-      );
-    });
-  });
-
   describe('orgName', () => {
     it('returns the organization name if it exists', () => {
       const fakeGroup = { id: 'groupid', organization: { name: 'org' } };
