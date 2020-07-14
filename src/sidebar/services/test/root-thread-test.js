@@ -57,12 +57,12 @@ describe('rootThread', function () {
       },
 
       expandedThreads: sinon.stub().returns({}),
-      getSelectedAnnotationMap: sinon.stub().returns(null),
       subscribe: sinon.stub(),
       removeAnnotations: sinon.stub(),
       removeSelectedAnnotation: sinon.stub(),
       addAnnotations: sinon.stub(),
       setCollapsed: sinon.stub(),
+      selectedAnnotations: sinon.stub().returns([]),
       selectTab: sinon.stub(),
       getDraftIfNotEmpty: sinon.stub().returns(null),
       removeDraft: sinon.stub(),
@@ -116,10 +116,7 @@ describe('rootThread', function () {
     });
 
     it('passes the current selection to buildThread()', function () {
-      fakeStore.getSelectedAnnotationMap.returns({
-        id1: true,
-        id2: true,
-      });
+      fakeStore.selectedAnnotations.returns(['id1', 'id2']);
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,

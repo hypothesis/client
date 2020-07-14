@@ -26,7 +26,7 @@ describe('SearchStatusBar', () => {
       annotationCount: sinon.stub().returns(1),
       focusModeFocused: sinon.stub().returns(false),
       focusModeUserPrettyName: sinon.stub().returns('Fake User'),
-      getSelectedAnnotationMap: sinon.stub(),
+      hasSelectedAnnotations: sinon.stub(),
       noteCount: sinon.stub().returns(0),
     };
 
@@ -243,7 +243,7 @@ describe('SearchStatusBar', () => {
           });
           fakeStore.annotationCount.returns(test.annotationCount);
           fakeStore.noteCount.returns(test.noteCount);
-          fakeStore.getSelectedAnnotationMap.returns({ annId: true });
+          fakeStore.hasSelectedAnnotations.returns(true);
 
           const wrapper = createComponent({});
 
@@ -270,7 +270,7 @@ describe('SearchStatusBar', () => {
             },
           });
           fakeStore.annotationCount.returns(5);
-          fakeStore.getSelectedAnnotationMap.returns({ annId: true });
+          fakeStore.hasSelectedAnnotations.returns(true);
           fakeStore.noteCount.returns(3);
 
           const wrapper = createComponent({});
