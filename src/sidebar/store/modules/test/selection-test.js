@@ -45,10 +45,14 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('setCollapsed()', function () {
+  describe('setExpanded()', function () {
     it('sets the expanded state of the annotation', function () {
-      store.setCollapsed('parent_id', false);
-      assert.deepEqual(store.expandedThreads(), { parent_id: true });
+      store.setExpanded('parent_id', true);
+      store.setExpanded('whatnot', false);
+      assert.deepEqual(store.expandedMap(), {
+        parent_id: true,
+        whatnot: false,
+      });
     });
   });
 
@@ -205,7 +209,7 @@ describe('sidebar/store/modules/selection', () => {
 
     it('resets the force-visible and expanded sets', function () {
       store.setForcedVisible('123', true);
-      store.setCollapsed('456', false);
+      store.setExpanded('456', true);
       store.setFilterQuery('some-query');
       assert.deepEqual(getSelectionState().forcedVisible, {});
       assert.deepEqual(getSelectionState().expanded, {});

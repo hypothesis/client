@@ -16,7 +16,7 @@ import ModerationBanner from './moderation-banner';
  * and at any given time it may be `collapsed`.
  */
 function Thread({ showDocumentInfo = false, thread, threadsService }) {
-  const setCollapsed = useStore(store => store.setCollapsed);
+  const setExpanded = useStore(store => store.setExpanded);
 
   // Only render this thread's annotation if it exists and the thread is `visible`
   const showAnnotation = thread.annotation && thread.visible;
@@ -40,7 +40,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
     child => countVisible(child) > 0
   );
 
-  const onToggleReplies = () => setCollapsed(thread.id, !thread.collapsed);
+  const onToggleReplies = () => setExpanded(thread.id, !!thread.collapsed);
   return (
     <section
       className={classnames('thread', {

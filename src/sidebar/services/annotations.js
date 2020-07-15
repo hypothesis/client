@@ -123,7 +123,7 @@ export default function annotationsService(api, store) {
 
     (annotation.references || []).forEach(parent => {
       // Expand any parents of this annotation.
-      store.setCollapsed(parent, false);
+      store.setExpanded(parent, true);
     });
   }
 

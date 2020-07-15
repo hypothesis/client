@@ -22,7 +22,7 @@ function AnnotationViewerContent({
   const rootThread = useStore(store =>
     rootThreadService.thread(store.getState())
   );
-  const setCollapsed = useStore(store => store.setCollapsed);
+  const setExpanded = useStore(store => store.setExpanded);
   const userid = useStore(store => store.profile().userid);
 
   const [fetchError, setFetchError] = useState(false);
@@ -57,7 +57,7 @@ function AnnotationViewerContent({
 
         // Make the full thread of annotations visible. By default replies are
         // not shown until the user expands the thread.
-        annots.forEach(annot => setCollapsed(annot.id, false));
+        annots.forEach(annot => setExpanded(annot.id, true));
 
         // FIXME - This should show a visual indication of which reply the
         // annotation ID in the URL refers to. That isn't currently working.
@@ -79,7 +79,7 @@ function AnnotationViewerContent({
     clearAnnotations,
     highlightAnnotations,
     loadAnnotationsService,
-    setCollapsed,
+    setExpanded,
   ]);
 
   return (
