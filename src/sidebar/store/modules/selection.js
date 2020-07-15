@@ -115,7 +115,7 @@ function init(settings) {
 
     // Set of IDs of annotations that have been explicitly shown
     // by the user even if they do not match the current search filter
-    forceVisible: {},
+    forcedVisible: {},
 
     // IDs of annotations that should be highlighted
     highlighted: [],
@@ -147,7 +147,7 @@ const update = {
     const tabSettings = setTab(state.selectedTab, selectedTab);
     return {
       filterQuery: null,
-      forceVisible: {},
+      forcedVisible: {},
       selected: {},
       ...tabSettings,
     };
@@ -207,8 +207,10 @@ const update = {
     }
   },
 
-  SET_FORCE_VISIBLE: function (state, action) {
-    return { forceVisible: action.forceVisible };
+  SET_FORCED_VISIBLE: function (state, action) {
+    return {
+      forcedVisible: { ...state.forcedVisible, [action.id]: action.visible },
+    };
   },
 
   SET_EXPANDED: function (state, action) {
@@ -264,7 +266,7 @@ const update = {
   SET_FILTER_QUERY: function (state, action) {
     return {
       filterQuery: action.query,
-      forceVisible: {},
+      forcedVisible: {},
       expanded: {},
     };
   },
@@ -305,22 +307,19 @@ function toggleSelectedAnnotations(toggleIds) {
 }
 
 /**
- * Sets whether a given annotation should be visible, even if it does not
- * match the current search query.
+ * A user may "force" an annotation to be visible, even if it would be otherwise
+ * not be visible because of applied filters. Set the force-visibility for a
+ * single annotation, without affecting other forced-visible annotations.
  *
- * @param {string} id - Annotation ID
- * @param {boolean} visible
+ * @param {string} id
+ * @param {boolean} visible - Should this annotation be visible, even if it
+ *        conflicts with current filters?
  */
-function setForceVisible(id, visible) {
-  // FIXME: This should be converted to a plain action and accessing the state
-  // should happen in the update() function
-  return function (dispatch, getState) {
-    const forceVisible = Object.assign({}, getState().selection.forceVisible);
-    forceVisible[id] = visible;
-    dispatch({
-      type: actions.SET_FORCE_VISIBLE,
-      forceVisible: forceVisible,
-    });
+function setForcedVisible(id, visible) {
+  return {
+    type: actions.SET_FORCED_VISIBLE,
+    id,
+    visible,
   };
 }
 
@@ -414,6 +413,10 @@ function setSortKey(key) {
 
 function focusedAnnotations(state) {
   return truthyKeys(state.selection.focused);
+}
+
+function forcedVisibleAnnotations(state) {
+  return truthyKeys(state.selection.forcedVisible);
 }
 
 /** Is the annotation referenced by `$tag` currently focused? */
@@ -568,7 +571,7 @@ export default {
     setFilterQuery,
     setFocusModeFocused,
     changeFocusModeUser,
-    setForceVisible,
+    setForcedVisible,
     setSortKey,
     toggleSelectedAnnotations,
   },
@@ -582,6 +585,7 @@ export default {
     focusModeUserId,
     focusModeUserPrettyName,
     focusedAnnotations,
+    forcedVisibleAnnotations,
     isAnnotationFocused,
     getFirstSelectedAnnotationId,
     hasAppliedFilter,

@@ -290,7 +290,7 @@ describe('build-thread', function () {
         filterFn: function (annot) {
           return annot.text.match(/first/);
         },
-        forceVisible: ['3'],
+        forcedVisible: ['3'],
       });
       assert.isFalse(thread.children[0].collapsed);
     });
