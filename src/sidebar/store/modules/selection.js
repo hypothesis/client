@@ -50,7 +50,7 @@ TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = [
  * value is `true`.
  *
  * @param {Object} obj
- * @return {any[]}
+ * @return {string[]}
  */
 function truthyKeys(obj) {
   return Object.keys(obj).filter(key => obj[key] === true);
@@ -100,21 +100,24 @@ function init(settings) {
      * - Prevents duplicate entries for a single annotation
      */
 
-    // A set of annotations that are currently "focused" — hovered over in
-    // the UI, e.g.
+    // A set of annotations that are currently "focused" — e.g. hovered over in
+    // the UI
     focused: {},
 
-    // A map of annotation ids to their selection state (true/false)
+    // A set of annotations that are currently "selected" by the user —
+    // these will supersede other filters/selections
     selected: initialSelection(settings),
 
-    // Map of annotation IDs to expanded/collapsed state. For annotations not
-    // present in the map, the default state is used which depends on whether
-    // the annotation is a top-level annotation or a reply, whether it is
-    // selected and whether it matches the current filter.
+    // Explicitly-expanded or -collapsed annotations (threads). A collapsed
+    // annotation thread will not show its replies; an expanded thread will
+    // show its replies. Note that there are other factors affecting
+    // collapsed states, e.g., top-level threads are collapsed by default
+    // until explicitly expanded.
     expanded: initialSelection(settings) || {},
 
-    // Set of IDs of annotations that have been explicitly shown
-    // by the user even if they do not match the current search filter
+    // Set of annotations that have been "forced" visible by the user
+    // (e.g. by clicking on "Show x more" button) even though they may not
+    // match the currently-applied filters
     forcedVisible: {},
 
     // A map of annotations that should appear as "highlighted", e.g. the
@@ -122,9 +125,7 @@ function init(settings) {
     highlighted: {},
 
     filterQuery: settings.query || null,
-
     selectedTab: TAB_DEFAULT,
-
     focusMode: {
       enabled: settings.hasOwnProperty('focus'),
       focused: true,
@@ -280,10 +281,10 @@ const update = {
 const actions = util.actionTypes(update);
 
 /**
- * Set the currently selected annotation IDs. Will replace the entire
+ * Set the currently selected annotation IDs. This will replace the current
  * selection. All provided annotation ids will be set to `true` in the selection.
  *
- * @param {string[]} ids - Idenfiers of annotations to select
+ * @param {string[]} ids - Identifiers of annotations to select
  */
 function selectAnnotations(ids) {
   const selection = {};
@@ -326,7 +327,8 @@ function setForcedVisible(id, visible) {
 
 /**
  * Replace the current set of focused annotations with the annotations
- * identified by `tags`
+ * identified by `tags`. All provided annotations (`tags`) will be set to
+ * `true` in the `focused` map.
  *
  * @param {string[]} tags - Identifiers of annotations to focus
  */
@@ -338,8 +340,7 @@ function focusAnnotations(tags) {
 }
 
 /**
- * Set the expanded state for a single annotation/thread, affecting whether or not
- * an annotation's replies are visible.
+ * Set the expanded state for a single annotation/thread.
  *
  * @param {string} id - annotation (or thread) id
  * @param {boolean} expanded - `true` for expanded replies, `false` to collapse
@@ -357,8 +358,10 @@ function setExpanded(id, expanded) {
  *
  * This is used to indicate the specific annotation in a thread that was
  * linked to for example. Replaces the current map of highlighted annotations.
+ * All provided annotations (`ids`) will be set to `true` in the `highlighted`
+ * map.
  *
- * @param {string[ids]} - ids of annotations to highlight
+ * @param {string[]} ids - annotations to highlight
  */
 function highlightAnnotations(ids) {
   const highlighted = {};
@@ -426,13 +429,20 @@ function forcedVisibleAnnotations(state) {
   return truthyKeys(state.selection.forcedVisible);
 }
 
-/** Is the annotation referenced by `$tag` currently focused? */
+/**
+ * Is the annotation referenced by `$tag` currently focused?
+ *
+ * @param {string} $tag - annotation identifier
+ * @return {boolean}
+ */
 function isAnnotationFocused(state, $tag) {
   return state.selection.focused[$tag] === true;
 }
 
 /**
- * Return true if any annotations are currently selected.
+ * Are any annotations currently selected?
+ *
+ * @return {boolean}
  */
 const hasSelectedAnnotations = createSelector(
   state => state.selection.selected,
@@ -452,7 +462,7 @@ function clearSelection() {
 
 /**
  * Returns the annotation ID of the first annotation in the selection that is
- * selected (`true`).
+ * selected (`true`) or `null` if there are none.
  *
  * @return {string|null}
  */
@@ -466,6 +476,8 @@ const getFirstSelectedAnnotationId = createSelector(
 
 /**
  * Retrieve map of expanded/collapsed annotations (threads)
+ *
+ * @return {Object<string,boolean>}
  */
 function expandedMap(state) {
   return state.selection.expanded;
