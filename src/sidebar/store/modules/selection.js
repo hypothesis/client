@@ -17,33 +17,13 @@ import { countIf } from '../../util/array';
 import * as util from '../util';
 
 /**
- * Default starting tab.
- */
-const TAB_DEFAULT = uiConstants.TAB_ANNOTATIONS;
-
-/**
  * Default sort keys for each tab.
  */
-const TAB_SORTKEY_DEFAULT = {};
-TAB_SORTKEY_DEFAULT[uiConstants.TAB_ANNOTATIONS] = 'Location';
-TAB_SORTKEY_DEFAULT[uiConstants.TAB_NOTES] = 'Oldest';
-TAB_SORTKEY_DEFAULT[uiConstants.TAB_ORPHANS] = 'Location';
-
-/**
- * Available sort keys for each tab.
- */
-const TAB_SORTKEYS_AVAILABLE = {};
-TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ANNOTATIONS] = [
-  'Newest',
-  'Oldest',
-  'Location',
-];
-TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_NOTES] = ['Newest', 'Oldest'];
-TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = [
-  'Newest',
-  'Oldest',
-  'Location',
-];
+const TAB_SORTKEY_DEFAULT = {
+  [uiConstants.TAB_ANNOTATIONS]: 'Location',
+  [uiConstants.TAB_NOTES]: 'Oldest',
+  [uiConstants.TAB_ORPHANS]: 'Location',
+};
 
 /**
  * Utility function that returns all of the properties of an object whose
@@ -80,29 +60,6 @@ function initialSelection(settings) {
   return selection;
 }
 
-const setTab = (selectedTab, newTab) => {
-  // Do nothing if the "new tab" is not a valid tab.
-  if (
-    [
-      uiConstants.TAB_ANNOTATIONS,
-      uiConstants.TAB_NOTES,
-      uiConstants.TAB_ORPHANS,
-    ].indexOf(newTab) === -1
-  ) {
-    return {};
-  }
-  // Shortcut if the tab is already correct, to avoid resetting the sortKey
-  // unnecessarily.
-  if (selectedTab === newTab) {
-    return {};
-  }
-  return {
-    selectedTab: newTab,
-    sortKey: TAB_SORTKEY_DEFAULT[newTab],
-    sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[newTab],
-  };
-};
-
 function init(settings) {
   return {
     /**
@@ -138,7 +95,6 @@ function init(settings) {
     highlighted: {},
 
     filterQuery: settings.query || null,
-    selectedTab: TAB_DEFAULT,
     focusMode: {
       enabled: settings.hasOwnProperty('focus'),
       focused: true,
@@ -146,25 +102,30 @@ function init(settings) {
       config: { ...(settings.focus ? settings.focus : {}) },
     },
 
+    selectedTab: uiConstants.TAB_ANNOTATIONS,
     // Key by which annotations are currently sorted.
-    sortKey: TAB_SORTKEY_DEFAULT[TAB_DEFAULT],
-    // Keys by which annotations can be sorted.
-    sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[TAB_DEFAULT],
+    sortKey: TAB_SORTKEY_DEFAULT[uiConstants.TAB_ANNOTATIONS],
   };
 }
 
+const setTab = (newTab, oldTab) => {
+  // Do nothing if the "new tab" is not a valid tab or is the same as the
+  // tab already selected. This will avoid resetting the `sortKey`, too.
+  if (!uiConstants.TABS.includes(newTab) || oldTab === newTab) {
+    return {};
+  }
+  return {
+    selectedTab: newTab,
+    sortKey: TAB_SORTKEY_DEFAULT[newTab],
+  };
+};
+
 const update = {
-  CLEAR_SELECTION: function (state) {
-    let selectedTab = state.selectedTab;
-    if (selectedTab === uiConstants.TAB_ORPHANS) {
-      selectedTab = uiConstants.TAB_ANNOTATIONS;
-    }
-    const tabSettings = setTab(state.selectedTab, selectedTab);
+  CLEAR_SELECTION: function () {
     return {
       filterQuery: null,
       forcedVisible: {},
       selected: {},
-      ...tabSettings,
     };
   },
 
@@ -235,7 +196,7 @@ const update = {
   },
 
   SELECT_TAB: function (state, action) {
-    return setTab(state.selectedTab, action.tab);
+    return setTab(action.tab, state.selectedTab);
   },
 
   /**
@@ -251,7 +212,7 @@ const update = {
 
     const haveOnlyPageNotes = noteCount === topLevelAnnotations.length;
     if (action.currentAnnotationCount === 0 && haveOnlyPageNotes) {
-      return { selectedTab: uiConstants.TAB_NOTES };
+      return setTab(uiConstants.TAB_NOTES, state.selectedTab);
     }
     return {};
   },
@@ -263,16 +224,18 @@ const update = {
         delete selection[annotation.id];
       }
     });
-    let selectedTab = state.selectedTab;
+    let newTab = state.selectedTab;
+    // If the orphans tab is selected but no remaining annotations are orphans,
+    // switch back to annotations tab
     if (
-      selectedTab === uiConstants.TAB_ORPHANS &&
+      newTab === uiConstants.TAB_ORPHANS &&
       countIf(action.remainingAnnotations, metadata.isOrphan) === 0
     ) {
-      selectedTab = uiConstants.TAB_ANNOTATIONS;
+      newTab = uiConstants.TAB_ANNOTATIONS;
     }
     return {
+      ...setTab(newTab, state.selectedTab),
       selected: selection,
-      selectedTab: selectedTab,
     };
   },
 
@@ -379,11 +342,15 @@ function highlightAnnotations(ids) {
   };
 }
 
-/** Set the type annotations to be displayed. */
-function selectTab(type) {
+/**
+ * Set the currently-selected tab to `tabKey`.
+ *
+ * @param {'annotation'|'note'|'orphan'} tabKey
+ */
+function selectTab(tabKey) {
   return {
     type: actions.SELECT_TAB,
-    tab: type,
+    tab: tabKey,
   };
 }
 
@@ -586,6 +553,20 @@ const selectedAnnotations = createSelector(
   selection => trueKeys(selection)
 );
 
+/**
+ * Retrieve applicable sort options for the currently-selected tab.
+ *
+ * @return {string[]}
+ */
+function sortKeys(state) {
+  const sortKeysForTab = ['Newest', 'Oldest'];
+  if (state.selection.selectedTab !== uiConstants.TAB_NOTES) {
+    // Location is inapplicable to Notes tab
+    sortKeysForTab.push('Location');
+  }
+  return sortKeysForTab;
+}
+
 export default {
   init: init,
   namespace: 'selection',
@@ -622,5 +603,6 @@ export default {
     hasAppliedFilter,
     hasSelectedAnnotations,
     selectedAnnotations,
+    sortKeys,
   },
 };
