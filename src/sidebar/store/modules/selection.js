@@ -52,8 +52,21 @@ TAB_SORTKEYS_AVAILABLE[uiConstants.TAB_ORPHANS] = [
  * @param {Object} obj
  * @return {string[]}
  */
-function truthyKeys(obj) {
+function trueKeys(obj) {
   return Object.keys(obj).filter(key => obj[key] === true);
+}
+
+/**
+ * Convert an array of strings into an object mapping each array entry (string)
+ * to `true`.
+ *
+ * @param {string[]} arr
+ * @return {Object<string,true>}
+ */
+function toTrueMap(arr) {
+  const obj = /** @type {Object<string,true>} */ ({});
+  arr.forEach(key => (obj[key] = true));
+  return obj;
 }
 
 function initialSelection(settings) {
@@ -172,9 +185,7 @@ const update = {
   },
 
   FOCUS_ANNOTATIONS: function (state, action) {
-    const focused = {};
-    action.focusedTags.forEach(tag => (focused[tag] = true));
-    return { focused };
+    return { focused: toTrueMap(action.focusedTags) };
   },
 
   SET_FOCUS_MODE_FOCUSED: function (state, action) {
@@ -287,11 +298,9 @@ const actions = util.actionTypes(update);
  * @param {string[]} ids - Identifiers of annotations to select
  */
 function selectAnnotations(ids) {
-  const selection = {};
-  ids.forEach(id => (selection[id] = true));
   return {
     type: actions.SELECT_ANNOTATIONS,
-    selection,
+    selection: toTrueMap(ids),
   };
 }
 
@@ -364,11 +373,9 @@ function setExpanded(id, expanded) {
  * @param {string[]} ids - annotations to highlight
  */
 function highlightAnnotations(ids) {
-  const highlighted = {};
-  ids.forEach(id => (highlighted[id] = true));
   return {
     type: actions.HIGHLIGHT_ANNOTATIONS,
-    highlighted,
+    highlighted: toTrueMap(ids),
   };
 }
 
@@ -421,13 +428,15 @@ function setSortKey(key) {
 
 /* Selectors */
 
-function focusedAnnotations(state) {
-  return truthyKeys(state.selection.focused);
-}
+const focusedAnnotations = createSelector(
+  state => state.selection.focused,
+  focused => trueKeys(focused)
+);
 
-function forcedVisibleAnnotations(state) {
-  return truthyKeys(state.selection.forcedVisible);
-}
+const forcedVisibleAnnotations = createSelector(
+  state => state.selection.forcedVisible,
+  forcedVisible => trueKeys(forcedVisible)
+);
 
 /**
  * Is the annotation referenced by `$tag` currently focused?
@@ -446,7 +455,7 @@ function isAnnotationFocused(state, $tag) {
  */
 const hasSelectedAnnotations = createSelector(
   state => state.selection.selected,
-  selection => truthyKeys(selection).length > 0
+  selection => trueKeys(selection).length > 0
 );
 
 /** De-select all annotations. */
@@ -469,7 +478,7 @@ function clearSelection() {
 const getFirstSelectedAnnotationId = createSelector(
   state => state.selection.selected,
   selection => {
-    const selectedIds = truthyKeys(selection);
+    const selectedIds = trueKeys(selection);
     return selectedIds.length ? selectedIds[0] : null;
   }
 );
@@ -574,7 +583,7 @@ const hasAppliedFilter = createSelector(
 
 const selectedAnnotations = createSelector(
   state => state.selection.selected,
-  selection => truthyKeys(selection)
+  selection => trueKeys(selection)
 );
 
 export default {
