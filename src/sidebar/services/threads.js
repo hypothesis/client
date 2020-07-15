@@ -9,7 +9,7 @@ export default function threadsService(store) {
     thread.children.forEach(child => {
       forceVisible(child);
     });
-    store.setForceVisible(thread.id, true);
+    store.setForcedVisible(thread.id, true);
   }
 
   return {

@@ -263,7 +263,7 @@ function hasVisibleChildren(thread) {
  * @typedef Options
  * @prop {string[]} [selected] - List of currently-selected annotation ids, from
  *       the data store
- * @prop {string[]} [forceVisible] - List of ids of annotations that have
+ * @prop {string[]} [forcedVisible] - List of ids of annotations that have
  *       been explicitly expanded by the user, even if they don't
  *       match current filters
  * @prop {(a: Annotation) => boolean} [filterFn] - Predicate function that
@@ -326,7 +326,7 @@ export default function buildThread(annotations, options) {
 
   const hasHighlights = opts.highlighted.length > 0;
   const hasSelection = opts.selected.length > 0;
-  const hasForcedVisible = opts.forceVisible && opts.forceVisible.length;
+  const hasForcedVisible = opts.forcedVisible && opts.forcedVisible.length;
 
   let thread = threadAnnotations(annotations);
 
@@ -351,7 +351,7 @@ export default function buildThread(annotations, options) {
     } else if (annotationsFiltered) {
       if (
         hasForcedVisible &&
-        opts.forceVisible.indexOf(annotationId(thread.annotation)) !== -1
+        opts.forcedVisible.indexOf(annotationId(thread.annotation)) !== -1
       ) {
         // This annotation may or may not match the filter, but we should
         // make sure it is visible because it has been forced visible by user

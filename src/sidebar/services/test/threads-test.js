@@ -40,7 +40,7 @@ describe('threadsService', function () {
 
   beforeEach(() => {
     fakeStore = {
-      setForceVisible: sinon.stub(),
+      setForcedVisible: sinon.stub(),
     };
     service = threadsService(fakeStore);
   });
@@ -64,7 +64,7 @@ describe('threadsService', function () {
         '2bi',
         '2bii',
       ].forEach(threadId =>
-        assert.calledWith(fakeStore.setForceVisible, threadId)
+        assert.calledWith(fakeStore.setForcedVisible, threadId)
       );
     });
 
@@ -73,8 +73,8 @@ describe('threadsService', function () {
       service.forceVisible(NESTED_THREADS.children[0]);
 
       const calledWithThreadIds = [];
-      for (let i = 0; i < fakeStore.setForceVisible.callCount; i++) {
-        calledWithThreadIds.push(fakeStore.setForceVisible.getCall(i).args[0]);
+      for (let i = 0; i < fakeStore.setForcedVisible.callCount; i++) {
+        calledWithThreadIds.push(fakeStore.setForcedVisible.getCall(i).args[0]);
       }
       assert.deepEqual(calledWithThreadIds, [
         '1ai',

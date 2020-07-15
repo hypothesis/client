@@ -3,12 +3,6 @@ import * as metadata from '../util/annotation-metadata';
 import memoize from '../util/memoize';
 import * as tabs from '../util/tabs';
 
-function truthyKeys(map) {
-  return Object.keys(map).filter(function (k) {
-    return !!map[k];
-  });
-}
-
 // Mapping from sort order name to a less-than predicate
 // function for comparing annotations to determine their sort order.
 const sortFns = {
@@ -56,7 +50,7 @@ export default function RootThread(
     };
 
     const options = {
-      forceVisible: truthyKeys(state.selection.forceVisible),
+      forcedVisible: store.forcedVisibleAnnotations(),
       expanded: store.expandedThreads(),
       highlighted: state.selection.highlighted,
       selected: store.selectedAnnotations(),

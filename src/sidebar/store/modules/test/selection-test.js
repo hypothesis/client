@@ -28,10 +28,20 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('setForceVisible()', function () {
+  describe('setForcedVisible', function () {
     it('sets the visibility of the annotation', function () {
-      store.setForceVisible('id1', true);
-      assert.deepEqual(getSelectionState().forceVisible, { id1: true });
+      store.setForcedVisible('id1', true);
+      assert.deepEqual(getSelectionState().forcedVisible, { id1: true });
+    });
+
+    it('does not affect the visibility of other annotations', () => {
+      store.setForcedVisible('id1', true);
+      store.setForcedVisible('id2', false);
+      assert.deepEqual(getSelectionState().forcedVisible, {
+        id1: true,
+        id2: false,
+      });
+      assert.deepEqual(store.forcedVisibleAnnotations(), ['id1']);
     });
   });
 
@@ -194,10 +204,10 @@ describe('sidebar/store/modules/selection', () => {
     });
 
     it('resets the force-visible and expanded sets', function () {
-      store.setForceVisible('123', true);
+      store.setForcedVisible('123', true);
       store.setCollapsed('456', false);
       store.setFilterQuery('some-query');
-      assert.deepEqual(getSelectionState().forceVisible, {});
+      assert.deepEqual(getSelectionState().forcedVisible, {});
       assert.deepEqual(getSelectionState().expanded, {});
     });
   });
@@ -234,14 +244,14 @@ describe('sidebar/store/modules/selection', () => {
 
     it('clears other applied selections', () => {
       store.setFocusModeFocused(true);
-      store.setForceVisible('someAnnotationId');
+      store.setForcedVisible('someAnnotationId');
       store.setFilterQuery('somequery');
       store.changeFocusModeUser({
         username: 'testuser',
         displayName: 'Test User',
       });
 
-      assert.isEmpty(getSelectionState().forceVisible);
+      assert.isEmpty(getSelectionState().forcedVisible);
       assert.isNull(store.filterQuery());
     });
   });
