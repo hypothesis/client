@@ -17,9 +17,7 @@ export default function SortMenu() {
   const sortKey = useStore(store => store.getState().selection.sortKey);
   // All available sorting options. These change depending on current
   // "tab" or context.
-  const sortKeysAvailable = useStore(
-    store => store.getState().selection.sortKeysAvailable
-  );
+  const sortKeysAvailable = useStore(store => store.sortKeys());
 
   const menuItems = sortKeysAvailable.map(sortOption => {
     return (

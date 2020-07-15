@@ -43,8 +43,6 @@ describe('rootThread', function () {
         selection: {
           filterQuery: null,
           highlighted: [],
-          sortKey: 'Location',
-          sortKeysAvailable: ['Location'],
         },
         route: {
           name: 'sidebar',
@@ -214,7 +212,6 @@ describe('rootThread', function () {
       it(`sort order is correct when sorting by ${testCase.order}`, () => {
         fakeBuildThread.reset();
         fakeStore.state.selection.sortKey = testCase.order;
-        fakeStore.state.selection.sortKeysAvailable = [testCase.order];
 
         rootThread.thread(fakeStore.state);
         const sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;

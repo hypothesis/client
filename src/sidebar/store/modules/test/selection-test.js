@@ -423,28 +423,17 @@ describe('sidebar/store/modules/selection', () => {
 
     it('allows sorting annotations by time and document location', function () {
       store.selectTab(uiConstants.TAB_ANNOTATIONS);
-      assert.deepEqual(getSelectionState().sortKeysAvailable, [
-        'Newest',
-        'Oldest',
-        'Location',
-      ]);
+      assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
     });
 
     it('allows sorting page notes by time', function () {
       store.selectTab(uiConstants.TAB_NOTES);
-      assert.deepEqual(getSelectionState().sortKeysAvailable, [
-        'Newest',
-        'Oldest',
-      ]);
+      assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest']);
     });
 
     it('allows sorting orphans by time and document location', function () {
       store.selectTab(uiConstants.TAB_ORPHANS);
-      assert.deepEqual(getSelectionState().sortKeysAvailable, [
-        'Newest',
-        'Oldest',
-        'Location',
-      ]);
+      assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
     });
 
     it('sorts annotations by document location by default', function () {

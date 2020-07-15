@@ -87,25 +87,6 @@ describe('store', function () {
       assert.equal(store.getState().selection.sortKey, 'Location');
     });
 
-    it('sets `sortKeysAvailable` to available annotation sort keys if set to Orphans', () => {
-      store.selectTab(uiConstants.TAB_ORPHANS);
-      store.clearSelection();
-      assert.deepEqual(store.getState().selection.sortKeysAvailable, [
-        'Newest',
-        'Oldest',
-        'Location',
-      ]);
-    });
-
-    it('sets `selectedTab` to Annotations if set to Orphans', () => {
-      store.selectTab(uiConstants.TAB_ORPHANS);
-      store.clearSelection();
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
-    });
-
     it('does not change `selectedTab` if set to something other than Orphans', () => {
       store.selectTab(uiConstants.TAB_NOTES);
       store.clearSelection();
