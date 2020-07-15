@@ -117,8 +117,9 @@ function init(settings) {
     // by the user even if they do not match the current search filter
     forcedVisible: {},
 
-    // IDs of annotations that should be highlighted
-    highlighted: [],
+    // A map of annotations that should appear as "highlighted", e.g. the
+    // target of a single-annotation view
+    highlighted: {},
 
     filterQuery: settings.query || null,
 
@@ -355,12 +356,16 @@ function setExpanded(id, expanded) {
  * Highlight annotations with the given `ids`.
  *
  * This is used to indicate the specific annotation in a thread that was
- * linked to for example.
+ * linked to for example. Replaces the current map of highlighted annotations.
+ *
+ * @param {string[ids]} - ids of annotations to highlight
  */
 function highlightAnnotations(ids) {
+  const highlighted = {};
+  ids.forEach(id => (highlighted[id] = true));
   return {
     type: actions.HIGHLIGHT_ANNOTATIONS,
-    highlighted: ids,
+    highlighted,
   };
 }
 

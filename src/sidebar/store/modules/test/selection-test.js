@@ -380,7 +380,16 @@ describe('sidebar/store/modules/selection', () => {
   describe('highlightAnnotations()', function () {
     it('sets the highlighted annotations', function () {
       store.highlightAnnotations(['id1', 'id2']);
-      assert.deepEqual(getSelectionState().highlighted, ['id1', 'id2']);
+      assert.deepEqual(getSelectionState().highlighted, {
+        id1: true,
+        id2: true,
+      });
+    });
+
+    it('replaces the current set of highlighted annotations', () => {
+      store.highlightAnnotations(['id1', 'id2']);
+      store.highlightAnnotations(['id3']);
+      assert.deepEqual(getSelectionState().highlighted, { id3: true });
     });
   });
 
