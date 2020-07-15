@@ -31,7 +31,7 @@ function Annotation({
   const isFocused = useStore(store =>
     store.isAnnotationFocused(annotation.$tag)
   );
-  const setCollapsed = useStore(store => store.setCollapsed);
+  const setExpanded = useStore(store => store.setExpanded);
 
   // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
@@ -87,7 +87,7 @@ function Annotation({
     }
   };
 
-  const onToggleReplies = () => setCollapsed(annotation.id, !threadIsCollapsed);
+  const onToggleReplies = () => setExpanded(annotation.id, !!threadIsCollapsed);
 
   return (
     /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */

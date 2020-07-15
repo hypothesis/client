@@ -21,7 +21,7 @@ describe('AnnotationViewerContent', () => {
       highlightAnnotations: sinon.stub(),
       routeParams: sinon.stub().returns({ id: 'test_annotation_id' }),
       profile: sinon.stub().returns({ userid: null }),
-      setCollapsed: sinon.stub(),
+      setExpanded: sinon.stub(),
     };
 
     fakeLoadAnnotationsService = {
@@ -81,8 +81,8 @@ describe('AnnotationViewerContent', () => {
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        assert.calledWith(fakeStore.setCollapsed, 'test_annotation_id', false);
-        assert.calledWith(fakeStore.setCollapsed, 'test_reply_id', false);
+        assert.calledWith(fakeStore.setExpanded, 'test_annotation_id', true);
+        assert.calledWith(fakeStore.setExpanded, 'test_reply_id', true);
       });
     });
 

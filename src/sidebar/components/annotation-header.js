@@ -25,7 +25,7 @@ export default function AnnotationHeader({
   threadIsCollapsed,
 }) {
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
-  const setCollapsed = useStore(store => store.setCollapsed);
+  const setExpanded = useStore(store => store.setExpanded);
 
   const annotationIsPrivate = isPrivate(
     annotation.permissions,
@@ -44,7 +44,7 @@ export default function AnnotationHeader({
   const showReplyButton = replyCount > 0 && isCollapsedReply;
   const showExtendedInfo = !isReply(annotation);
 
-  const onReplyCountClick = () => setCollapsed(annotation.id, false);
+  const onReplyCountClick = () => setExpanded(annotation.id, true);
 
   return (
     <header className="annotation-header">

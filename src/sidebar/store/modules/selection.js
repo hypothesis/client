@@ -214,7 +214,7 @@ const update = {
   },
 
   SET_EXPANDED: function (state, action) {
-    return { expanded: action.expanded };
+    return { expanded: { ...state.expanded, [action.id]: action.expanded } };
   },
 
   HIGHLIGHT_ANNOTATIONS: function (state, action) {
@@ -336,16 +336,18 @@ function focusAnnotations(tags) {
   };
 }
 
-function setCollapsed(id, collapsed) {
-  // FIXME: This should be converted to a plain action and accessing the state
-  // should happen in the update() function
-  return function (dispatch, getState) {
-    const expanded = Object.assign({}, getState().selection.expanded);
-    expanded[id] = !collapsed;
-    dispatch({
-      type: actions.SET_EXPANDED,
-      expanded: expanded,
-    });
+/**
+ * Set the expanded state for a single annotation/thread, affecting whether or not
+ * an annotation's replies are visible.
+ *
+ * @param {string} id - annotation (or thread) id
+ * @param {boolean} expanded - `true` for expanded replies, `false` to collapse
+ */
+function setExpanded(id, expanded) {
+  return {
+    type: actions.SET_EXPANDED,
+    id,
+    expanded,
   };
 }
 
@@ -457,7 +459,10 @@ const getFirstSelectedAnnotationId = createSelector(
   }
 );
 
-function expandedThreads(state) {
+/**
+ * Retrieve map of expanded/collapsed annotations (threads)
+ */
+function expandedMap(state) {
   return state.selection.expanded;
 }
 
@@ -567,7 +572,7 @@ export default {
     highlightAnnotations,
     selectAnnotations,
     selectTab,
-    setCollapsed,
+    setExpanded,
     setFilterQuery,
     setFocusModeFocused,
     changeFocusModeUser,
@@ -577,7 +582,7 @@ export default {
   },
 
   selectors: {
-    expandedThreads,
+    expandedMap,
     filterQuery,
     focusModeFocused,
     focusModeEnabled,

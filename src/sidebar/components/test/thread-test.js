@@ -81,7 +81,7 @@ describe('Thread', () => {
 
   beforeEach(() => {
     fakeStore = {
-      setCollapsed: sinon.stub(),
+      setExpanded: sinon.stub(),
     };
 
     fakeThreadsService = {
@@ -134,8 +134,8 @@ describe('Thread', () => {
         getToggleButton(wrapper).props().onClick();
       });
 
-      assert.calledOnce(fakeStore.setCollapsed);
-      assert.calledWith(fakeStore.setCollapsed, replyThread.id, true);
+      assert.calledOnce(fakeStore.setExpanded);
+      assert.calledWith(fakeStore.setExpanded, replyThread.id, false);
     });
 
     it('assigns an appropriate CSS class to the element', () => {

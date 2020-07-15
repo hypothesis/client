@@ -55,13 +55,12 @@ describe('rootThread', function () {
         return this.state;
       },
 
-      expandedThreads: sinon.stub().returns({}),
+      expandedMap: sinon.stub().returns({}),
       forcedVisibleAnnotations: sinon.stub().returns([]),
       subscribe: sinon.stub(),
       removeAnnotations: sinon.stub(),
       removeSelectedAnnotation: sinon.stub(),
       addAnnotations: sinon.stub(),
-      setCollapsed: sinon.stub(),
       selectedAnnotations: sinon.stub().returns([]),
       selectTab: sinon.stub(),
       getDraftIfNotEmpty: sinon.stub().returns(null),
@@ -128,7 +127,7 @@ describe('rootThread', function () {
     });
 
     it('passes the current expanded set to buildThread()', function () {
-      fakeStore.expandedThreads.returns({ id1: true, id2: true });
+      fakeStore.expandedMap.returns({ id1: true, id2: true });
       rootThread.thread(fakeStore.state);
       assert.calledWith(
         fakeBuildThread,

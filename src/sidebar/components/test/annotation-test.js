@@ -72,7 +72,7 @@ describe('Annotation', () => {
       isAnnotationFocused: sinon.stub().returns(false),
       isSavingAnnotation: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
-      setCollapsed: sinon.stub(),
+      setExpanded: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -398,7 +398,7 @@ describe('Annotation', () => {
       });
       wrapper.setProps({ threadIsCollapsed: false });
 
-      assert.calledOnce(fakeStore.setCollapsed);
+      assert.calledOnce(fakeStore.setExpanded);
       assert.equal(
         findRepliesButton(wrapper).props().buttonText,
         'Hide replies (5)'

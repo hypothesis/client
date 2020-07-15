@@ -49,7 +49,7 @@ describe('annotationsService', () => {
       removeAnnotations: sinon.stub(),
       removeDraft: sinon.stub(),
       selectTab: sinon.stub(),
-      setCollapsed: sinon.stub(),
+      setExpanded: sinon.stub(),
       updateFlagStatus: sinon.stub(),
     };
 
@@ -220,10 +220,10 @@ describe('annotationsService', () => {
 
       svc.create(annot, now);
 
-      assert.equal(fakeStore.setCollapsed.callCount, 3);
-      assert.calledWith(fakeStore.setCollapsed, 'aparent', false);
-      assert.calledWith(fakeStore.setCollapsed, 'anotherparent', false);
-      assert.calledWith(fakeStore.setCollapsed, 'yetanotherancestor', false);
+      assert.equal(fakeStore.setExpanded.callCount, 3);
+      assert.calledWith(fakeStore.setExpanded, 'aparent', true);
+      assert.calledWith(fakeStore.setExpanded, 'anotherparent', true);
+      assert.calledWith(fakeStore.setExpanded, 'yetanotherancestor', true);
     });
   });
 

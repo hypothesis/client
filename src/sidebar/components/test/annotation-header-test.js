@@ -33,7 +33,7 @@ describe('AnnotationHeader', () => {
     fakeIsPrivate = sinon.stub();
 
     fakeStore = {
-      setCollapsed: sinon.stub(),
+      setExpanded: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -97,8 +97,8 @@ describe('AnnotationHeader', () => {
       const btn = findReplyButton(wrapper);
       btn.props().onClick();
 
-      assert.calledOnce(fakeStore.setCollapsed);
-      assert.calledWith(fakeStore.setCollapsed, fakeAnnotation.id, false);
+      assert.calledOnce(fakeStore.setExpanded);
+      assert.calledWith(fakeStore.setExpanded, fakeAnnotation.id, true);
     });
 
     it('should not render if there are no replies to show', () => {

@@ -35,7 +35,7 @@ describe('store', function () {
   describe('initialization', function () {
     it('does not set a selection when settings.annotations is null', function () {
       assert.isFalse(store.hasSelectedAnnotations());
-      assert.equal(Object.keys(store.expandedThreads()).length, 0);
+      assert.equal(Object.keys(store.expandedMap()).length, 0);
     });
 
     it('sets the selection when settings.annotations is set', function () {
@@ -45,7 +45,7 @@ describe('store', function () {
 
     it('expands the selected annotations when settings.annotations is set', function () {
       store = storeFactory({ annotations: 'testid' });
-      assert.deepEqual(store.expandedThreads(), {
+      assert.deepEqual(store.expandedMap(), {
         testid: true,
       });
     });
