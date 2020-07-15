@@ -181,6 +181,12 @@ module.exports = class Guest extends Delegator
           if defaultNotPrevented
             scrollIntoView(anchor.highlights[0])
 
+    crossframe.on 'linkToDash', (id) => 
+      document.dispatchEvent new CustomEvent('linkToDash', {
+        detail: id
+        bubbles: true
+      })
+
     crossframe.on 'getDocumentInfo', (cb) =>
       this.getDocumentInfo()
       .then((info) -> cb(null, info))

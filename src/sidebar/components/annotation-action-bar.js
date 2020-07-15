@@ -9,6 +9,7 @@ import { withServices } from '../util/service-context';
 
 import AnnotationShareControl from './annotation-share-control';
 import Button from './button';
+import { useCallback } from 'preact/hooks';
 
 /**
  * A collection of `Button`s in the footer area of an annotation that take
@@ -20,6 +21,7 @@ function AnnotationActionBar({
   onReply,
   settings,
   toastMessenger,
+  frameSync,
 }) {
   const userProfile = useStore(store => store.profile());
   const annotationGroup = useStore(store => store.getGroup(annotation.group));
@@ -75,13 +77,16 @@ function AnnotationActionBar({
     onReply(event);
   };
 
-  const onDashLink = () => {
-
-  }
+  const onDashLink = useCallback(
+    id => {
+      frameSync.linkToDash(id);
+    },
+    [frameSync]
+  );
 
   return (
     <div className="annotation-action-bar u-layout-row">
-      <Button icon="link" title="Link to Dash" onClick={onDashLink}/>
+      <Button icon="link" title="Link to Dash" onClick={() => onDashLink(annotation.id)}/>
       {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
       {showDeleteAction && (
         <Button icon="trash" title="Delete" onClick={onDelete} />
@@ -121,12 +126,14 @@ AnnotationActionBar.propTypes = {
   annotationsService: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,
+  frameSync: propTypes.object.isRequired,
 };
 
 AnnotationActionBar.injectedProps = [
   'annotationsService',
   'settings',
   'toastMessenger',
+  'frameSync',
 ];
 
 export default withServices(AnnotationActionBar);

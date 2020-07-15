@@ -251,4 +251,8 @@ export default function FrameSync(annotationsService, bridge, store) {
   this.scrollToAnnotation = function (tag) {
     bridge.call('scrollToAnnotation', tag);
   };
+  
+  this.linkToDash = function (id) {
+    bridge.call('linkToDash', id)
+  }
 }
