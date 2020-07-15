@@ -75,8 +75,13 @@ function AnnotationActionBar({
     onReply(event);
   };
 
+  const onDashLink = () => {
+
+  }
+
   return (
     <div className="annotation-action-bar u-layout-row">
+      <Button icon="link" title="Link to Dash" onClick={onDashLink}/>
       {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
       {showDeleteAction && (
         <Button icon="trash" title="Delete" onClick={onDelete} />

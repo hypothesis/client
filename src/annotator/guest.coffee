@@ -70,7 +70,7 @@ module.exports = class Guest extends Delegator
       onAnnotate: ->
         self.createAnnotation()
         document.getSelection().removeAllRanges()
-        parent.postMessage { 'message': 'annotation created' }, 'http://localhost:1050'
+        parent.postMessage { 'message': 'annotation created' }, window.origin
       onHighlight: ->
         self.setVisibleHighlights(true)
         self.createHighlight()

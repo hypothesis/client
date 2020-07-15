@@ -73,8 +73,8 @@ $.noConflict(true)(function () {
 
   // Listen to 'hypothesisLink' event from Dash
   // Modify the placeholder annotation's text content to the linked Dash document URL
-  document.addEventListener('linkRequest', async function (e) {
-    console.log("DASH linkRequest received, editing annotation");
+  document.addEventListener('editRequest', async function (e) {
+    console.log("DASH editRequest received");
     let apiKey = e.detail.apiKey;
     let annotationId = e.detail.id;
     let text = e.detail.newText;
