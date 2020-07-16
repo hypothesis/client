@@ -62,7 +62,7 @@ export default function RootThread(
         state.selection.filterQuery,
         {
           // if a focus mode is applied (focused) and we're focusing on a user
-          user: store.focusModeActive() && store.focusModeUserId(),
+          user: store.focusModeUserFilter(),
         }
       );
 

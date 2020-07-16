@@ -11,12 +11,12 @@ export default function FocusedModeHeader() {
   const toggleFocusMode = useStore(store => store.toggleFocusMode);
   const selectors = useStore(store => ({
     focusModeActive: store.focusModeActive(),
-    focusModeHasUser: store.focusModeHasUser(),
+    focusModeConfigured: store.focusModeConfigured(),
     focusModeUserPrettyName: store.focusModeUserPrettyName(),
   }));
 
   // Nothing to do here for now if we're not focused on a user
-  if (!selectors.focusModeHasUser) {
+  if (!selectors.focusModeConfigured) {
     return null;
   }
 

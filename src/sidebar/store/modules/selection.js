@@ -5,8 +5,24 @@
 
 /**
  * @typedef User
- * @property {string} userid - Unique user's id
+ * @property {string} [userid]
+ * @property {string} [username]
  * @property {string} displayName - User's display name
+ */
+
+/**
+ * @typedef FocusedUser
+ * @property {string} filter - The identifier to use for filtering annotations
+ *           derived from either a userId or a username
+ * @property {string} displayName
+ */
+
+/**
+ * @typedef FocusState
+ * @property {boolean} configured - Focus config contains valid `user` and
+ *           is good to go
+ * @property {boolean} active - Focus mode is currently applied
+ * @property {FocusedUser} [user] - User to focus on (filter annotations for)
  */
 
 import { createSelector } from 'reselect';
@@ -60,6 +76,46 @@ function initialSelection(settings) {
   return selection;
 }
 
+/**
+ * Configure (user-)focused mode. User-focus mode may be set in one of two
+ * ways:
+ * - A `focus` object containing a valid `user` object is present in the
+ *   application's `settings` object during initialization time
+ * - A `user` object is given to the `changeFocusedUser` action (this
+ *   is implemented via an RPC method call)
+ * For focus mode to be considered configured, it must have a valid `user`.
+ * A successfully-configured focus mode will be set to `active` immediately
+ * and may be toggled via `toggleFocusMode`.
+ *
+ * @param {Object} [focusConfig]
+ * @return {FocusState}
+ */
+function setFocus(focusConfig = {}) {
+  const focusDefaultState = {
+    configured: false,
+    active: false,
+  };
+
+  // To be able to apply a focused mode, a `user` object must be present,
+  // and that user object must have either a `username` or a `userid`
+  const focusUser = focusConfig.user || {};
+  const userFilter = focusUser.username || focusUser.userid;
+
+  // If that requirement is not met, we can't configure/activate focus mode
+  if (!userFilter) {
+    return focusDefaultState;
+  }
+
+  return {
+    configured: true,
+    active: true, // Activate valid focus mode immediately
+    user: {
+      filter: userFilter,
+      displayName: focusUser.displayName || userFilter || '',
+    },
+  };
+}
+
 function init(settings) {
   return {
     /**
@@ -95,12 +151,7 @@ function init(settings) {
     highlighted: {},
 
     filterQuery: settings.query || null,
-    focusMode: {
-      configured: settings.hasOwnProperty('focus'),
-      active: true,
-      // Copy over the focus confg from settings object
-      config: { ...(settings.focus ? settings.focus : {}) },
-    },
+    focusMode: setFocus(settings.focus),
 
     selectedTab: uiConstants.TAB_ANNOTATIONS,
     // Key by which annotations are currently sorted.
@@ -163,26 +214,9 @@ const update = {
   },
 
   CHANGE_FOCUS_MODE_USER: function (state, action) {
-    if (action.user.username === undefined) {
-      return {
-        focusMode: {
-          ...state.focusMode,
-          configured: false,
-          active: false,
-        },
-      };
-    } else {
-      return {
-        focusMode: {
-          ...state.focusMode,
-          configured: true,
-          active: true,
-          config: {
-            user: { ...action.user },
-          },
-        },
-      };
-    }
+    return {
+      focusMode: setFocus({ user: action.user }),
+    };
   },
 
   SET_FORCED_VISIBLE: function (state, action) {
@@ -471,7 +505,9 @@ function filterQuery(state) {
 }
 
 /**
- * Does the configuration used by the app contain valid focus-mode configuration?
+ * Does the state have a configured focus mode? That is, does it have a valid
+ * focus mode filter that could be applied (regardless of whether it is currently
+ * active)?
  *
  * @return {boolean}
  */
@@ -480,41 +516,24 @@ function focusModeConfigured(state) {
 }
 
 /**
- * Is a focus mode configured, and is it presently applied?
+ * Is a focus mode currently applied?
  *
  * @return {boolean}
  */
 function focusModeActive(state) {
-  return focusModeConfigured(state) && state.selection.focusMode.active;
+  return state.selection.focusMode.active;
 }
 
 /**
- * Returns the `userid` for a focused user or `null` if no focused user.
+ * Returns the user identifier for a focused user or `null` if no focused user.
  *
  * @return {string|null}
  */
-function focusModeUserId(state) {
-  if (state.selection.focusMode.config.user) {
-    if (state.selection.focusMode.config.user.userid) {
-      return state.selection.focusMode.config.user.userid;
-    }
-    if (state.selection.focusMode.config.user.username) {
-      // remove once LMS no longer sends username in RPC or config
-      // https://github.com/hypothesis/client/issues/1516
-      return state.selection.focusMode.config.user.username;
-    }
+function focusModeUserFilter(state) {
+  if (!focusModeActive(state)) {
+    return null;
   }
-  return null;
-}
-
-/**
- * Does the configured focus mode include user info, i.e. are we focusing on a
- * user?
- *
- * @return {boolean}
- */
-function focusModeHasUser(state) {
-  return focusModeConfigured(state) && !!focusModeUserId(state);
+  return state.selection.focusMode.user.filter;
 }
 
 /**
@@ -525,19 +544,10 @@ function focusModeHasUser(state) {
  * @return {string}
  */
 function focusModeUserPrettyName(state) {
-  const user = state.selection.focusMode.config.user;
-  if (!user) {
-    return '';
-  } else if (user.displayName) {
-    return user.displayName;
-  } else if (user.userid) {
-    return user.userid;
-  } else if (user.username) {
-    // remove once LMS no longer sends `username` in RPC
-    return user.username;
-  } else {
+  if (!focusModeConfigured(state)) {
     return '';
   }
+  return state.selection.focusMode.user.displayName;
 }
 
 /**
@@ -600,8 +610,7 @@ export default {
     filterQuery,
     focusModeActive,
     focusModeConfigured,
-    focusModeHasUser,
-    focusModeUserId,
+    focusModeUserFilter,
     focusModeUserPrettyName,
     focusedAnnotations,
     forcedVisibleAnnotations,
