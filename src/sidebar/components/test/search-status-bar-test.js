@@ -24,7 +24,7 @@ describe('SearchStatusBar', () => {
         selection: {},
       }),
       annotationCount: sinon.stub().returns(1),
-      focusModeFocused: sinon.stub().returns(false),
+      focusModeActive: sinon.stub().returns(false),
       focusModeUserPrettyName: sinon.stub().returns('Fake User'),
       hasSelectedAnnotations: sinon.stub(),
       noteCount: sinon.stub().returns(0),
@@ -122,7 +122,7 @@ describe('SearchStatusBar', () => {
 
   context('user-focused mode applied', () => {
     beforeEach(() => {
-      fakeStore.focusModeFocused = sinon.stub().returns(true);
+      fakeStore.focusModeActive = sinon.stub().returns(true);
     });
 
     it('should not display a clear/show-all-annotations button when user-focused', () => {
@@ -262,7 +262,7 @@ describe('SearchStatusBar', () => {
         { tab: 'note', buttonText: 'Show all notes by Fake User' },
       ].forEach(test => {
         it(`displays correct text for tab '${test.tab}', without count`, () => {
-          fakeStore.focusModeFocused = sinon.stub().returns(true);
+          fakeStore.focusModeActive = sinon.stub().returns(true);
           fakeStore.getState.returns({
             selection: {
               filterQuery: null,
@@ -286,7 +286,7 @@ describe('SearchStatusBar', () => {
     context('combined with applied query filter', () => {
       // Applied-query mode wins out here; no selection UI rendered
       it('does not show selected-mode elements', () => {
-        fakeStore.focusModeFocused = sinon.stub().returns(true);
+        fakeStore.focusModeActive = sinon.stub().returns(true);
         fakeStore.getState.returns({
           selection: {
             filterQuery: 'tag:foo',

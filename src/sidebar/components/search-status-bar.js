@@ -39,13 +39,13 @@ function SearchStatusBar({ rootThread }) {
 
   const {
     filterQuery,
-    focusModeFocused,
+    focusModeActive,
     focusModeUserPrettyName,
     hasSelectedAnnotations,
     selectedTab,
   } = useStore(store => ({
     filterQuery: store.getState().selection.filterQuery,
-    focusModeFocused: store.focusModeFocused(),
+    focusModeActive: store.focusModeActive(),
     focusModeUserPrettyName: store.focusModeUserPrettyName(),
     hasSelectedAnnotations: store.hasSelectedAnnotations(),
     selectedTab: store.getState().selection.selectedTab,
@@ -64,7 +64,7 @@ function SearchStatusBar({ rootThread }) {
      * The client has a currently-applied focus on a single user. Superseded by
      * `filtered` mode.
      */
-    focused: focusModeFocused && !filterQuery,
+    focused: focusModeActive && !filterQuery,
     /**
      * @type {Boolean}
      * 0 - n annotations are currently "selected", by, e.g. clicking on highlighted

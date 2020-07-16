@@ -60,23 +60,6 @@ function initialSelection(settings) {
   return selection;
 }
 
-// function initialFocus(settings) {
-//   const focusConfig = {
-//     configured: false,
-//     active: false,
-//     user: undefined,
-//   };
-//
-//   if (settings.hasOwnProperty('user')) {
-//     const focusedUser = {...settings.user};
-//     if (focusedUser.username && focusedUser.authority) {
-//       focusConfig.configured = true;
-//       focusConfig.user = focusedUser;
-//     }
-//   }
-//   return focusConfig;
-// }
-
 function init(settings) {
   return {
     /**
@@ -114,7 +97,7 @@ function init(settings) {
     filterQuery: settings.query || null,
     focusMode: {
       configured: settings.hasOwnProperty('focus'),
-      focused: true,
+      active: true,
       // Copy over the focus confg from settings object
       config: { ...(settings.focus ? settings.focus : {}) },
     },
@@ -166,11 +149,15 @@ const update = {
     return { focused: toTrueMap(action.focusedTags) };
   },
 
-  SET_FOCUS_MODE_FOCUSED: function (state, action) {
+  SET_FOCUS_MODE: function (state, action) {
+    const active =
+      typeof action.active !== 'undefined'
+        ? action.active
+        : !state.focusMode.active;
     return {
       focusMode: {
         ...state.focusMode,
-        focused: action.focused,
+        active,
       },
     };
   },
@@ -181,7 +168,7 @@ const update = {
         focusMode: {
           ...state.focusMode,
           configured: false,
-          focused: false,
+          active: false,
         },
       };
     } else {
@@ -189,7 +176,7 @@ const update = {
         focusMode: {
           ...state.focusMode,
           configured: true,
-          focused: true,
+          active: true,
           config: {
             user: { ...action.user },
           },
@@ -380,12 +367,15 @@ function setFilterQuery(query) {
 }
 
 /**
- * Set the focused to only show annotations matching the current focus mode.
+ * Toggle whether or not a (user-)focus mode is applied, either inverting the
+ * current active state or setting it to a target `active` state, if provided.
+ *
+ * @param {boolean} [active] - Optional `active` state for focus mode
  */
-function setFocusModeFocused(focused) {
+function toggleFocusMode(active) {
   return {
-    type: actions.SET_FOCUS_MODE_FOCUSED,
-    focused,
+    type: actions.SET_FOCUS_MODE,
+    active,
   };
 }
 
@@ -494,8 +484,8 @@ function focusModeConfigured(state) {
  *
  * @return {boolean}
  */
-function focusModeFocused(state) {
-  return focusModeConfigured(state) && state.selection.focusMode.focused;
+function focusModeActive(state) {
+  return focusModeConfigured(state) && state.selection.focusMode.active;
 }
 
 /**
@@ -559,10 +549,10 @@ function focusModeUserPrettyName(state) {
  */
 const hasAppliedFilter = createSelector(
   filterQuery,
-  focusModeFocused,
+  focusModeActive,
   hasSelectedAnnotations,
-  (filterQuery, focusModeFocused, hasSelectedAnnotations) =>
-    !!filterQuery || focusModeFocused || hasSelectedAnnotations
+  (filterQuery, focusModeActive, hasSelectedAnnotations) =>
+    !!filterQuery || focusModeActive || hasSelectedAnnotations
 );
 
 const selectedAnnotations = createSelector(
@@ -598,17 +588,17 @@ export default {
     selectTab,
     setExpanded,
     setFilterQuery,
-    setFocusModeFocused,
     changeFocusModeUser,
     setForcedVisible,
     setSortKey,
+    toggleFocusMode,
     toggleSelectedAnnotations,
   },
 
   selectors: {
     expandedMap,
     filterQuery,
-    focusModeFocused,
+    focusModeActive,
     focusModeConfigured,
     focusModeHasUser,
     focusModeUserId,
