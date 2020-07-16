@@ -32,7 +32,7 @@ function SidebarContent({
   // Store state values
   const focusedGroupId = useStore(store => store.focusedGroupId());
   const hasAppliedFilter = useStore(store => store.hasAppliedFilter());
-  const isFocusedMode = useStore(store => store.focusModeEnabled());
+  const isFocusedMode = useStore(store => store.focusModeConfigured());
   const isLoading = useStore(store => store.isLoading());
   const isLoggedIn = useStore(store => store.isLoggedIn());
   const linkedAnnotationId = useStore(store =>

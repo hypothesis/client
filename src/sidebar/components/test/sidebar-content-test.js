@@ -52,7 +52,7 @@ describe('SidebarContent', () => {
       directLinkedGroupFetchFailed: sinon.stub(),
       findAnnotationByID: sinon.stub(),
       focusedGroupId: sinon.stub(),
-      focusModeEnabled: sinon.stub(),
+      focusModeConfigured: sinon.stub(),
       hasAppliedFilter: sinon.stub(),
       hasFetchedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
@@ -226,7 +226,7 @@ describe('SidebarContent', () => {
   });
 
   it('renders a focused header if in focused mode', () => {
-    fakeStore.focusModeEnabled.returns(true);
+    fakeStore.focusModeConfigured.returns(true);
     const wrapper = createComponent();
 
     assert.isTrue(wrapper.find('FocusedModeHeader').exists());
