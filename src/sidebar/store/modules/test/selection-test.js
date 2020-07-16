@@ -216,14 +216,14 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('changeFocusModeUser()', function () {
+  describe('changeFocusModeUser', function () {
     it('sets the focused user and enables focus mode', function () {
       store.toggleFocusMode(false);
       store.changeFocusModeUser({
         username: 'testuser',
         displayName: 'Test User',
       });
-      assert.equal(store.focusModeUserId(), 'testuser');
+      assert.equal(store.focusModeUserFilter(), 'testuser');
       assert.equal(store.focusModeUserPrettyName(), 'Test User');
       assert.equal(store.focusModeActive(), true);
       assert.equal(store.focusModeConfigured(), true);
@@ -264,21 +264,30 @@ describe('sidebar/store/modules/selection', () => {
     it('toggles the current active state if called without arguments', function () {
       store.toggleFocusMode(false);
       store.toggleFocusMode();
-      assert.equal(getSelectionState().focusMode.active, true);
+      assert.isTrue(store.focusModeActive());
     });
 
     it('toggles the current active state to designated state', function () {
       store.toggleFocusMode(true);
       store.toggleFocusMode(false);
-      assert.equal(getSelectionState().focusMode.active, false);
+      assert.isFalse(store.focusModeActive());
     });
   });
 
   describe('focusModeConfigured', function () {
-    it('should be true when the focus setting is present', function () {
-      store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.equal(store.focusModeConfigured(), true);
+    it('should be true when the focus setting is present and user valid', function () {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'anybody' } } }]
+      );
+      assert.isTrue(store.focusModeConfigured());
     });
+
+    it('should be false when the focus setting is present but user object invalid', function () {
+      store = createStore([selection], [{ focus: { user: {} } }]);
+      assert.isFalse(store.focusModeConfigured());
+    });
+
     it('should be false when the focus setting is not present', function () {
       assert.equal(store.focusModeConfigured(), false);
     });
@@ -286,86 +295,79 @@ describe('sidebar/store/modules/selection', () => {
 
   describe('focusModeActive', function () {
     it('should return true by default when focus mode is active', function () {
-      store = createStore([selection], [{ focus: { user: {} } }]);
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'anybody' } } }]
+      );
       assert.equal(getSelectionState().focusMode.configured, true);
       assert.equal(getSelectionState().focusMode.active, true);
       assert.equal(store.focusModeActive(), true);
     });
+
+    it('should return false when focus config is not valid', () => {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { blerp: 'anybody' } } }]
+      );
+      assert.isFalse(store.focusModeActive());
+    });
+
     it('should return false by default when focus mode is not active', function () {
-      assert.equal(getSelectionState().focusMode.configured, false);
-      assert.equal(getSelectionState().focusMode.active, true);
       assert.equal(store.focusModeActive(), false);
     });
   });
 
-  describe('focusModeHasUser()', () => {
-    it('should return `true` if focus configured and valid `user` object present', () => {
+  describe('focusModeUserPrettyName', function () {
+    it('returns `displayName` when available', function () {
       store = createStore(
         [selection],
-        [{ focus: { user: { userid: 'acct:userid@authority' } } }]
-      );
-      assert.isTrue(store.focusModeHasUser());
-    });
-    it('should return `false` if focus configured but `user` object invalid', () => {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { displayName: 'FakeDisplayName' } } }] // `userid` is required
-      );
-      assert.isFalse(store.focusModeHasUser());
-    });
-    it('should return `false` if `user` object missing', () => {
-      store = createStore([selection], [{ focus: {} }]);
-      assert.isFalse(store.focusModeHasUser());
-    });
-  });
-
-  describe('focusModeUserPrettyName()', function () {
-    it('returns false by default when focus mode is not configured', function () {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { displayName: 'FakeDisplayName' } } }]
+        [
+          {
+            focus: {
+              user: { username: 'anybody', displayName: 'FakeDisplayName' },
+            },
+          },
+        ]
       );
       assert.equal(store.focusModeUserPrettyName(), 'FakeDisplayName');
     });
-    it('returns the userid when displayName is missing', function () {
+
+    it('returns the `username` when `displayName` is missing', function () {
       store = createStore(
         [selection],
-        [{ focus: { user: { userid: 'acct:userid@authority' } } }]
+        [{ focus: { user: { username: 'anybody', userid: 'nobody' } } }]
       );
-      assert.equal(store.focusModeUserPrettyName(), 'acct:userid@authority');
+      assert.equal(store.focusModeUserPrettyName(), 'anybody');
     });
-    it('returns an empty string when user object has is empty', function () {
-      store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.equal(store.focusModeUserPrettyName(), '');
-    });
-    it('return an empty string when there is no focus object', function () {
-      assert.equal(store.focusModeUserPrettyName(), '');
-    });
-    it('returns the username when displayName and userid is missing', function () {
-      // remove once LMS no longer sends username in RPC or config
-      // https://github.com/hypothesis/client/issues/1516
+
+    it('returns the `userid` if `displayName` and `username` are missing', () => {
       store = createStore(
         [selection],
-        [{ focus: { user: { username: 'fake_user_name' } } }]
+        [{ focus: { user: { userid: 'nobody' } } }]
       );
-      assert.equal(store.focusModeUserPrettyName(), 'fake_user_name');
+      assert.equal(store.focusModeUserPrettyName(), 'nobody');
+    });
+
+    it('returns empty string if focus mode is not configured', () => {
+      store = createStore([selection], [{ focus: {} }]);
+      assert.equal(store.focusModeUserPrettyName(), '');
     });
   });
 
-  describe('focusModeUserId()', function () {
-    it('should return the userid when present', function () {
+  describe('focusModeUserFilter', function () {
+    it('should return the user identifier when present', function () {
       store = createStore(
         [selection],
         [{ focus: { user: { userid: 'acct:userid@authority' } } }]
       );
-      assert.equal(store.focusModeUserId(), 'acct:userid@authority');
+      assert.equal(store.focusModeUserFilter(), 'acct:userid@authority');
     });
-    it('should return null when the userid is not present', function () {
+    it('should return null when no filter available', function () {
       store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.isNull(store.focusModeUserId());
+      assert.isNull(store.focusModeUserFilter());
     });
     it('should return null when the user object is not present', function () {
-      assert.isNull(store.focusModeUserId());
+      assert.isNull(store.focusModeUserFilter());
     });
     it('should return the username when present but no userid', function () {
       // remove once LMS no longer sends username in RPC or config
@@ -374,7 +376,7 @@ describe('sidebar/store/modules/selection', () => {
         [selection],
         [{ focus: { user: { username: 'fake_user_name' } } }]
       );
-      assert.equal(store.focusModeUserId(), 'fake_user_name');
+      assert.equal(store.focusModeUserFilter(), 'fake_user_name');
     });
   });
 

@@ -22,8 +22,8 @@ describe('FocusedModeHeader', function () {
         },
       },
       focusModeActive: sinon.stub().returns(true),
+      focusModeConfigured: sinon.stub().returns(true),
       focusModeUserPrettyName: sinon.stub().returns('Fake User'),
-      focusModeHasUser: sinon.stub().returns(true),
       toggleFocusMode: sinon.stub(),
     };
 
@@ -39,7 +39,7 @@ describe('FocusedModeHeader', function () {
 
   context('not in user-focused mode', () => {
     it('should not render anything if not in user-focused mode', () => {
-      fakeStore.focusModeHasUser = sinon.stub().returns(false);
+      fakeStore.focusModeConfigured.returns(false);
 
       const wrapper = createComponent();
 
