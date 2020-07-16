@@ -60,6 +60,23 @@ function initialSelection(settings) {
   return selection;
 }
 
+// function initialFocus(settings) {
+//   const focusConfig = {
+//     configured: false,
+//     active: false,
+//     user: undefined,
+//   };
+//
+//   if (settings.hasOwnProperty('user')) {
+//     const focusedUser = {...settings.user};
+//     if (focusedUser.username && focusedUser.authority) {
+//       focusConfig.configured = true;
+//       focusConfig.user = focusedUser;
+//     }
+//   }
+//   return focusConfig;
+// }
+
 function init(settings) {
   return {
     /**
@@ -96,7 +113,7 @@ function init(settings) {
 
     filterQuery: settings.query || null,
     focusMode: {
-      enabled: settings.hasOwnProperty('focus'),
+      configured: settings.hasOwnProperty('focus'),
       focused: true,
       // Copy over the focus confg from settings object
       config: { ...(settings.focus ? settings.focus : {}) },
@@ -163,7 +180,7 @@ const update = {
       return {
         focusMode: {
           ...state.focusMode,
-          enabled: false,
+          configured: false,
           focused: false,
         },
       };
@@ -171,7 +188,7 @@ const update = {
       return {
         focusMode: {
           ...state.focusMode,
-          enabled: true,
+          configured: true,
           focused: true,
           config: {
             user: { ...action.user },
@@ -464,21 +481,21 @@ function filterQuery(state) {
 }
 
 /**
- * Do the config settings indicate that the client should be in a focused mode?
+ * Does the configuration used by the app contain valid focus-mode configuration?
  *
  * @return {boolean}
  */
-function focusModeEnabled(state) {
-  return state.selection.focusMode.enabled;
+function focusModeConfigured(state) {
+  return state.selection.focusMode.configured;
 }
 
 /**
- * Is a focus mode enabled, and is it presently applied?
+ * Is a focus mode configured, and is it presently applied?
  *
  * @return {boolean}
  */
 function focusModeFocused(state) {
-  return focusModeEnabled(state) && state.selection.focusMode.focused;
+  return focusModeConfigured(state) && state.selection.focusMode.focused;
 }
 
 /**
@@ -507,7 +524,7 @@ function focusModeUserId(state) {
  * @return {boolean}
  */
 function focusModeHasUser(state) {
-  return focusModeEnabled(state) && !!focusModeUserId(state);
+  return focusModeConfigured(state) && !!focusModeUserId(state);
 }
 
 /**
@@ -592,7 +609,7 @@ export default {
     expandedMap,
     filterQuery,
     focusModeFocused,
-    focusModeEnabled,
+    focusModeConfigured,
     focusModeHasUser,
     focusModeUserId,
     focusModeUserPrettyName,

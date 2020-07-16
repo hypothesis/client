@@ -226,7 +226,7 @@ describe('sidebar/store/modules/selection', () => {
       assert.equal(store.focusModeUserId(), 'testuser');
       assert.equal(store.focusModeUserPrettyName(), 'Test User');
       assert.equal(store.focusModeFocused(), true);
-      assert.equal(store.focusModeEnabled(), true);
+      assert.equal(store.focusModeConfigured(), true);
     });
 
     // When the LMS app wants the client to disable focus mode it sends a
@@ -243,7 +243,7 @@ describe('sidebar/store/modules/selection', () => {
         displayName: undefined,
       });
       assert.equal(store.focusModeFocused(), false);
-      assert.equal(store.focusModeEnabled(), false);
+      assert.equal(store.focusModeConfigured(), false);
     });
 
     it('clears other applied selections', () => {
@@ -261,51 +261,51 @@ describe('sidebar/store/modules/selection', () => {
   });
 
   describe('setFocusModeFocused()', function () {
-    it('sets the focus mode to enabled', function () {
+    it('sets the focus mode to focused', function () {
       store.setFocusModeFocused(true);
       assert.equal(getSelectionState().focusMode.focused, true);
     });
 
-    it('sets the focus mode to not enabled', function () {
+    it('sets the focus mode to not focused', function () {
       store = createStore([selection], [{ focus: { user: {} } }]);
       store.setFocusModeFocused(false);
       assert.equal(getSelectionState().focusMode.focused, false);
     });
   });
 
-  describe('focusModeEnabled()', function () {
+  describe('focusModeConfigured', function () {
     it('should be true when the focus setting is present', function () {
       store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.equal(store.focusModeEnabled(), true);
+      assert.equal(store.focusModeConfigured(), true);
     });
     it('should be false when the focus setting is not present', function () {
-      assert.equal(store.focusModeEnabled(), false);
+      assert.equal(store.focusModeConfigured(), false);
     });
   });
 
-  describe('focusModeFocused()', function () {
-    it('should return true by default when focus mode is enabled', function () {
+  describe('focusModeFocused', function () {
+    it('should return true by default when focus mode is focused', function () {
       store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.equal(getSelectionState().focusMode.enabled, true);
+      assert.equal(getSelectionState().focusMode.configured, true);
       assert.equal(getSelectionState().focusMode.focused, true);
       assert.equal(store.focusModeFocused(), true);
     });
-    it('should return false by default when focus mode is not enabled', function () {
-      assert.equal(getSelectionState().focusMode.enabled, false);
+    it('should return false by default when focus mode is not focused', function () {
+      assert.equal(getSelectionState().focusMode.configured, false);
       assert.equal(getSelectionState().focusMode.focused, true);
       assert.equal(store.focusModeFocused(), false);
     });
   });
 
   describe('focusModeHasUser()', () => {
-    it('should return `true` if focus enabled and valid `user` object present', () => {
+    it('should return `true` if focus configured and valid `user` object present', () => {
       store = createStore(
         [selection],
         [{ focus: { user: { userid: 'acct:userid@authority' } } }]
       );
       assert.isTrue(store.focusModeHasUser());
     });
-    it('should return `false` if focus enabled but `user` object invalid', () => {
+    it('should return `false` if focus configured but `user` object invalid', () => {
       store = createStore(
         [selection],
         [{ focus: { user: { displayName: 'FakeDisplayName' } } }] // `userid` is required
@@ -319,7 +319,7 @@ describe('sidebar/store/modules/selection', () => {
   });
 
   describe('focusModeUserPrettyName()', function () {
-    it('returns false by default when focus mode is not enabled', function () {
+    it('returns false by default when focus mode is not configured', function () {
       store = createStore(
         [selection],
         [{ focus: { user: { displayName: 'FakeDisplayName' } } }]
