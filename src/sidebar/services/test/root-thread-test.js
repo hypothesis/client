@@ -64,7 +64,7 @@ describe('rootThread', function () {
       getDraftIfNotEmpty: sinon.stub().returns(null),
       removeDraft: sinon.stub(),
       createAnnotation: sinon.stub(),
-      focusModeFocused: sinon.stub().returns(false),
+      focusModeActive: sinon.stub().returns(false),
       focusModeUserId: sinon.stub().returns({}),
     };
 
@@ -323,7 +323,7 @@ describe('rootThread', function () {
       const filters = [{ user: { terms: ['acct:bill@localhost'] } }];
       const annotation = annotationFixtures.defaultAnnotation();
       fakeSearchFilter.generateFacetedFilter.returns(filters);
-      fakeStore.focusModeFocused = sinon.stub().returns(true);
+      fakeStore.focusModeActive = sinon.stub().returns(true);
       rootThread.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 

@@ -8,11 +8,9 @@ import useStore from '../store/use-store';
  * and abstracted if needed. Allow user to toggle in and out of the focus "mode."
  */
 export default function FocusedModeHeader() {
-  const actions = useStore(store => ({
-    setFocusModeFocused: store.setFocusModeFocused,
-  }));
+  const toggleFocusMode = useStore(store => store.toggleFocusMode);
   const selectors = useStore(store => ({
-    focusModeFocused: store.focusModeFocused(),
+    focusModeActive: store.focusModeActive(),
     focusModeHasUser: store.focusModeHasUser(),
     focusModeUserPrettyName: store.focusModeUserPrettyName(),
   }));
@@ -22,13 +20,9 @@ export default function FocusedModeHeader() {
     return null;
   }
 
-  const toggleFocusedMode = () => {
-    actions.setFocusModeFocused(!selectors.focusModeFocused);
-  };
-
   const filterStatus = (
     <div className="focused-mode-header__filter-status">
-      {selectors.focusModeFocused ? (
+      {selectors.focusModeActive ? (
         <span>
           Showing <strong>{selectors.focusModeUserPrettyName}</strong> only
         </span>
@@ -41,7 +35,7 @@ export default function FocusedModeHeader() {
   );
 
   const buttonText = (() => {
-    if (selectors.focusModeFocused) {
+    if (selectors.focusModeActive) {
       return 'Show all';
     } else {
       return `Show only ${selectors.focusModeUserPrettyName}`;
@@ -51,7 +45,10 @@ export default function FocusedModeHeader() {
   return (
     <div className="focused-mode-header">
       {filterStatus}
-      <button onClick={toggleFocusedMode} className="focused-mode-header__btn">
+      <button
+        onClick={() => toggleFocusMode()}
+        className="focused-mode-header__btn"
+      >
         {buttonText}
       </button>
     </div>

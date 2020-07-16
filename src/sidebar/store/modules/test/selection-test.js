@@ -83,9 +83,9 @@ describe('sidebar/store/modules/selection', () => {
       assert.isTrue(store.hasAppliedFilter());
     });
 
-    it('returns true if in user-focused mode', () => {
+    it('returns true if user-focused mode applied', () => {
       store = createStore([selection], [{ focus: { user: {} } }]);
-      store.setFocusModeFocused(true);
+      store.toggleFocusMode(true);
 
       assert.isTrue(store.hasAppliedFilter());
     });
@@ -218,14 +218,14 @@ describe('sidebar/store/modules/selection', () => {
 
   describe('changeFocusModeUser()', function () {
     it('sets the focused user and enables focus mode', function () {
-      store.setFocusModeFocused(false);
+      store.toggleFocusMode(false);
       store.changeFocusModeUser({
         username: 'testuser',
         displayName: 'Test User',
       });
       assert.equal(store.focusModeUserId(), 'testuser');
       assert.equal(store.focusModeUserPrettyName(), 'Test User');
-      assert.equal(store.focusModeFocused(), true);
+      assert.equal(store.focusModeActive(), true);
       assert.equal(store.focusModeConfigured(), true);
     });
 
@@ -237,17 +237,17 @@ describe('sidebar/store/modules/selection', () => {
     //
     // This is the LMS app's way of asking the client to disable focus mode.
     it('disables focus mode if username is undefined', function () {
-      store.setFocusModeFocused(true);
+      store.toggleFocusMode(true);
       store.changeFocusModeUser({
         username: undefined,
         displayName: undefined,
       });
-      assert.equal(store.focusModeFocused(), false);
+      assert.equal(store.focusModeActive(), false);
       assert.equal(store.focusModeConfigured(), false);
     });
 
     it('clears other applied selections', () => {
-      store.setFocusModeFocused(true);
+      store.toggleFocusMode(true);
       store.setForcedVisible('someAnnotationId');
       store.setFilterQuery('somequery');
       store.changeFocusModeUser({
@@ -260,16 +260,17 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('setFocusModeFocused()', function () {
-    it('sets the focus mode to focused', function () {
-      store.setFocusModeFocused(true);
-      assert.equal(getSelectionState().focusMode.focused, true);
+  describe('toggleFocusMode', function () {
+    it('toggles the current active state if called without arguments', function () {
+      store.toggleFocusMode(false);
+      store.toggleFocusMode();
+      assert.equal(getSelectionState().focusMode.active, true);
     });
 
-    it('sets the focus mode to not focused', function () {
-      store = createStore([selection], [{ focus: { user: {} } }]);
-      store.setFocusModeFocused(false);
-      assert.equal(getSelectionState().focusMode.focused, false);
+    it('toggles the current active state to designated state', function () {
+      store.toggleFocusMode(true);
+      store.toggleFocusMode(false);
+      assert.equal(getSelectionState().focusMode.active, false);
     });
   });
 
@@ -283,17 +284,17 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('focusModeFocused', function () {
-    it('should return true by default when focus mode is focused', function () {
+  describe('focusModeActive', function () {
+    it('should return true by default when focus mode is active', function () {
       store = createStore([selection], [{ focus: { user: {} } }]);
       assert.equal(getSelectionState().focusMode.configured, true);
-      assert.equal(getSelectionState().focusMode.focused, true);
-      assert.equal(store.focusModeFocused(), true);
+      assert.equal(getSelectionState().focusMode.active, true);
+      assert.equal(store.focusModeActive(), true);
     });
-    it('should return false by default when focus mode is not focused', function () {
+    it('should return false by default when focus mode is not active', function () {
       assert.equal(getSelectionState().focusMode.configured, false);
-      assert.equal(getSelectionState().focusMode.focused, true);
-      assert.equal(store.focusModeFocused(), false);
+      assert.equal(getSelectionState().focusMode.active, true);
+      assert.equal(store.focusModeActive(), false);
     });
   });
 
