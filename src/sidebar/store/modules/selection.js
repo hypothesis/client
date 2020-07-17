@@ -5,24 +5,30 @@
 
 /**
  * @typedef User
- * @property {string} [userid]
- * @property {string} [username]
- * @property {string} displayName - User's display name
+ * @prop {string} [userid]
+ * @prop {string} [username]
+ * @prop {string} displayName - User's display name
  */
 
 /**
  * @typedef FocusedUser
- * @property {string} filter - The identifier to use for filtering annotations
- *           derived from either a userId or a username
- * @property {string} displayName
+ * @prop {string} filter - The identifier to use for filtering annotations
+ *           derived from either a userId or a username. This may take the
+ *           form of a username, e.g. 'oakbucket', or a userid
+ * @prop {string} displayName
  */
 
 /**
  * @typedef FocusState
- * @property {boolean} configured - Focus config contains valid `user` and
+ * @prop {boolean} configured - Focus config contains valid `user` and
  *           is good to go
- * @property {boolean} active - Focus mode is currently applied
- * @property {FocusedUser} [user] - User to focus on (filter annotations for)
+ * @prop {boolean} active - Focus mode is currently applied
+ * @prop {FocusedUser} [user] - User to focus on (filter annotations for)
+ */
+
+/**
+ * @typedef FocusConfig
+ * @prop {User} user
  */
 
 import { createSelector } from 'reselect';
@@ -87,10 +93,10 @@ function initialSelection(settings) {
  * A successfully-configured focus mode will be set to `active` immediately
  * and may be toggled via `toggleFocusMode`.
  *
- * @param {Object} [focusConfig]
+ * @param {FocusConfig} focusConfig
  * @return {FocusState}
  */
-function setFocus(focusConfig = {}) {
+function setFocus(focusConfig) {
   const focusDefaultState = {
     configured: false,
     active: false,
@@ -151,7 +157,7 @@ function init(settings) {
     highlighted: {},
 
     filterQuery: settings.query || null,
-    focusMode: setFocus(settings.focus),
+    focusMode: setFocus(settings.focus || /** @type FocusConfig */ ({})),
 
     selectedTab: uiConstants.TAB_ANNOTATIONS,
     // Key by which annotations are currently sorted.
