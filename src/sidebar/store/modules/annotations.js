@@ -83,6 +83,8 @@ function initializeAnnotation(annotation, tag) {
 function init() {
   return {
     annotations: [],
+    // A set of annotations that are currently "focused" — e.g. hovered over in
+    // the UI
     focused: {},
     // A map of annotations that should appear as "highlighted", e.g. the
     // target of a single-annotation view
@@ -138,6 +140,10 @@ const update = {
       annotations: added.concat(updated).concat(unchanged),
       nextTag: nextTag,
     };
+  },
+
+  FOCUS_ANNOTATIONS: function (state, action) {
+    return { focused: toTrueMap(action.focusedTags) };
   },
 
   HIGHLIGHT_ANNOTATIONS: function (state, action) {
@@ -217,6 +223,20 @@ const update = {
 };
 
 const actions = util.actionTypes(update);
+
+/**
+ * Replace the current set of focused annotations with the annotations
+ * identified by `tags`. All provided annotations (`tags`) will be set to
+ * `true` in the `focused` map.
+ *
+ * @param {string[]} tags - Identifiers of annotations to focus
+ */
+function focusAnnotations(tags) {
+  return {
+    type: actions.FOCUS_ANNOTATIONS,
+    focusedTags: tags,
+  };
+}
 
 /**
  * Highlight annotations with the given `ids`.
@@ -418,6 +438,11 @@ const highlightedAnnotations = createSelector(
   highlighted => trueKeys(highlighted)
 );
 
+const focusedAnnotations = createSelector(
+  state => state.annotations.focused,
+  focused => trueKeys(focused)
+);
+
 /**
  * Return all loaded annotations that are not highlights and have not been saved
  * to the server.
@@ -437,6 +462,16 @@ const newHighlights = createSelector(
   annotations =>
     annotations.filter(ann => metadata.isNew(ann) && metadata.isHighlight(ann))
 );
+
+/**
+ * Is the annotation referenced by `$tag` currently focused?
+ *
+ * @param {string} $tag - annotation identifier
+ * @return {boolean}
+ */
+function isAnnotationFocused(state, $tag) {
+  return state.annotations.focused[$tag] === true;
+}
 
 /**
  * Return the number of page notes.
@@ -477,6 +512,7 @@ export default {
   actions: {
     addAnnotations,
     clearAnnotations,
+    focusAnnotations,
     hideAnnotation,
     highlightAnnotations,
     removeAnnotations,
@@ -489,8 +525,10 @@ export default {
     annotationCount,
     annotationExists,
     findAnnotationByID,
+    focusedAnnotations,
     highlightedAnnotations,
     findIDsForTags,
+    isAnnotationFocused,
     isWaitingToAnchorAnnotations,
     newAnnotations,
     newHighlights,

@@ -148,6 +148,25 @@ describe('sidebar/store/modules/annotations', function () {
       assert.isFalse(store.getState().annotations.annotations[0].$orphan);
     });
 
+    describe('focusAnnotations', function () {
+      it('adds the provided annotation IDs to the focused annotations', function () {
+        store.focusAnnotations(['1', '2', '3']);
+        assert.deepEqual(store.focusedAnnotations(), ['1', '2', '3']);
+      });
+
+      it('replaces any other focused annotation IDs', function () {
+        store.focusAnnotations(['1']);
+        store.focusAnnotations(['2', '3']);
+        assert.deepEqual(store.focusedAnnotations(), ['2', '3']);
+      });
+
+      it('sets focused annotations to an empty object if no IDs provided', function () {
+        store.focusAnnotations(['1']);
+        store.focusAnnotations([]);
+        assert.isEmpty(store.focusedAnnotations());
+      });
+    });
+
     describe('highlightAnnotations', () => {
       it('updates the highlighted state with the passed annotations', () => {
         store.highlightAnnotations(['id1', 'id2', 'id3']);
@@ -162,6 +181,17 @@ describe('sidebar/store/modules/annotations', function () {
         store.highlightAnnotations(['id1', 'id2', 'id3']);
         store.highlightAnnotations(['id3', 'id4']);
         assert.sameMembers(store.highlightedAnnotations(), ['id3', 'id4']);
+      });
+    });
+
+    describe('isAnnotationFocused', () => {
+      it('returns true if the provided annotation ID is in the set of focused annotations', () => {
+        store.focusAnnotations([1, 2]);
+        assert.isTrue(store.isAnnotationFocused(2));
+      });
+
+      it('returns false if the provided annotation ID is not in the set of focused annotations', () => {
+        assert.isFalse(store.isAnnotationFocused(2));
       });
     });
   });

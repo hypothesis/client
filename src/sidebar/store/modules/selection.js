@@ -108,10 +108,6 @@ function init(settings) {
      * - Prevents duplicate entries for a single annotation
      */
 
-    // A set of annotations that are currently "focused" — e.g. hovered over in
-    // the UI
-    focused: {},
-
     // A set of annotations that are currently "selected" by the user —
     // these will supersede other filters/selections
     selected: initialSelection(settings),
@@ -172,10 +168,6 @@ const update = {
       selection[id] = !selection[id];
     });
     return { selected: selection };
-  },
-
-  FOCUS_ANNOTATIONS: function (state, action) {
-    return { focused: toTrueMap(action.focusedTags) };
   },
 
   SET_FOCUS_MODE: function (state, action) {
@@ -310,20 +302,6 @@ function setForcedVisible(id, visible) {
 }
 
 /**
- * Replace the current set of focused annotations with the annotations
- * identified by `tags`. All provided annotations (`tags`) will be set to
- * `true` in the `focused` map.
- *
- * @param {string[]} tags - Identifiers of annotations to focus
- */
-function focusAnnotations(tags) {
-  return {
-    type: actions.FOCUS_ANNOTATIONS,
-    focusedTags: tags,
-  };
-}
-
-/**
  * Set the expanded state for a single annotation/thread.
  *
  * @param {string} id - annotation (or thread) id
@@ -393,25 +371,10 @@ function setSortKey(key) {
 
 /* Selectors */
 
-const focusedAnnotations = createSelector(
-  state => state.selection.focused,
-  focused => trueKeys(focused)
-);
-
 const forcedVisibleAnnotations = createSelector(
   state => state.selection.forcedVisible,
   forcedVisible => trueKeys(forcedVisible)
 );
-
-/**
- * Is the annotation referenced by `$tag` currently focused?
- *
- * @param {string} $tag - annotation identifier
- * @return {boolean}
- */
-function isAnnotationFocused(state, $tag) {
-  return state.selection.focused[$tag] === true;
-}
 
 /**
  * Are any annotations currently selected?
@@ -549,7 +512,6 @@ export default {
   actions: {
     clearSelectedAnnotations,
     clearSelection,
-    focusAnnotations,
     selectAnnotations,
     selectTab,
     setExpanded,
@@ -568,9 +530,7 @@ export default {
     focusModeConfigured,
     focusModeUserFilter,
     focusModeUserPrettyName,
-    focusedAnnotations,
     forcedVisibleAnnotations,
-    isAnnotationFocused,
     getFirstSelectedAnnotationId,
     hasAppliedFilter,
     hasSelectedAnnotations,
