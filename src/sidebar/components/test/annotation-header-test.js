@@ -61,6 +61,15 @@ describe('AnnotationHeader', () => {
 
       assert.isTrue(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
     });
+
+    it('should not render an "Only Me" icon if the annotation is being edited', () => {
+      fakeIsPrivate.returns(true);
+
+      const wrapper = createAnnotationHeader({ isEditing: true });
+
+      assert.isFalse(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
+    });
+
     it('should not render an "Only Me" icon if the annotation is not private', () => {
       fakeIsPrivate.returns(false);
 

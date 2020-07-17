@@ -49,7 +49,7 @@ export default function AnnotationHeader({
   return (
     <header className="annotation-header">
       <div className="annotation-header__row">
-        {annotationIsPrivate && (
+        {annotationIsPrivate && !isEditing && (
           <SvgIcon
             className="annotation-header__icon"
             name="lock"
