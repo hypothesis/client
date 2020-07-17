@@ -58,7 +58,6 @@
     "sidebar/components/markdown-editor.js",
     "sidebar/components/menu-item.js",
     "sidebar/components/menu-keyboard-navigation.js",
-    "sidebar/components/menu-section.js",
     "sidebar/components/menu.js",
     "sidebar/components/moderation-banner.js",
     "sidebar/components/new-note-btn.js",

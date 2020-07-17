@@ -1,6 +1,14 @@
 import { Fragment, createElement, toChildArray } from 'preact';
 import propTypes from 'prop-types';
 
+/** @typedef {import("preact").JSX.Element} JSXElement */
+
+/**
+ * @typedef MenuSectionProps
+ * @prop {string} [heading] - Heading displayed at the top of the menu.
+ * @prop {Object} children - Menu items to display in this section.
+ */
+
 /**
  * Group a set of menu items together visually, with an optional header.
  *
@@ -15,6 +23,8 @@ import propTypes from 'prop-types';
  *       <MenuItem .../>
  *     </MenuSection>
  *   </Menu>
+ *
+ * @param {MenuSectionProps} props
  */
 export default function MenuSection({ heading, children }) {
   return (
@@ -22,7 +32,7 @@ export default function MenuSection({ heading, children }) {
       {heading && <h2 className="menu-section__heading">{heading}</h2>}
       <ul className="menu-section__content">
         {toChildArray(children).map(child => (
-          <li key={child.key}>{child}</li>
+          <li key={/** @type {JSXElement} **/ (child).key}>{child}</li>
         ))}
       </ul>
     </Fragment>
@@ -30,13 +40,6 @@ export default function MenuSection({ heading, children }) {
 }
 
 MenuSection.propTypes = {
-  /**
-   * Heading displayed at the top of the menu.
-   */
   heading: propTypes.string,
-
-  /**
-   * Menu items to display in this section.
-   */
   children: propTypes.any.isRequired,
 };
