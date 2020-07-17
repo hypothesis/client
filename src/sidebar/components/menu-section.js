@@ -1,7 +1,7 @@
 import { Fragment, createElement, toChildArray } from 'preact';
 import propTypes from 'prop-types';
 
-/** @typedef {import("preact").VNode<any>} VNode */
+/** @typedef {import("preact").JSX.Element} JSXElement */
 
 /**
  * @typedef MenuSectionProps
@@ -32,7 +32,7 @@ export default function MenuSection({ heading, children }) {
       {heading && <h2 className="menu-section__heading">{heading}</h2>}
       <ul className="menu-section__content">
         {toChildArray(children).map(child => (
-          <li key={/** @type {VNode} **/ (child).key}>{child}</li>
+          <li key={/** @type {JSXElement} **/ (child).key}>{child}</li>
         ))}
       </ul>
     </Fragment>
