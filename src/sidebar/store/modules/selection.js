@@ -35,7 +35,7 @@ import { createSelector } from 'reselect';
 
 import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
-import { countIf } from '../../util/array';
+import { countIf, trueKeys, toTrueMap } from '../../util/collections';
 import * as util from '../util';
 
 /**
@@ -46,30 +46,6 @@ const TAB_SORTKEY_DEFAULT = {
   [uiConstants.TAB_NOTES]: 'Oldest',
   [uiConstants.TAB_ORPHANS]: 'Location',
 };
-
-/**
- * Utility function that returns all of the properties of an object whose
- * value is `true`.
- *
- * @param {Object} obj
- * @return {string[]}
- */
-function trueKeys(obj) {
-  return Object.keys(obj).filter(key => obj[key] === true);
-}
-
-/**
- * Convert an array of strings into an object mapping each array entry (string)
- * to `true`.
- *
- * @param {string[]} arr
- * @return {Object<string,true>}
- */
-function toTrueMap(arr) {
-  const obj = /** @type {Object<string,true>} */ ({});
-  arr.forEach(key => (obj[key] = true));
-  return obj;
-}
 
 function initialSelection(settings) {
   const selection = {};
