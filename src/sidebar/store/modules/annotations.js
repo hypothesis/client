@@ -10,7 +10,7 @@
 import { createSelector } from 'reselect';
 
 import * as metadata from '../../util/annotation-metadata';
-import * as arrayUtil from '../../util/array';
+import { countIf } from '../../util/collections';
 import * as util from '../util';
 
 import route from './route';
@@ -414,7 +414,7 @@ const newHighlights = createSelector(
  */
 const noteCount = createSelector(
   state => state.annotations.annotations,
-  annotations => arrayUtil.countIf(annotations, metadata.isPageNote)
+  annotations => countIf(annotations, metadata.isPageNote)
 );
 
 /**
@@ -422,7 +422,7 @@ const noteCount = createSelector(
  */
 const annotationCount = createSelector(
   state => state.annotations.annotations,
-  annotations => arrayUtil.countIf(annotations, metadata.isAnnotation)
+  annotations => countIf(annotations, metadata.isAnnotation)
 );
 
 /**
@@ -430,7 +430,7 @@ const annotationCount = createSelector(
  */
 const orphanCount = createSelector(
   state => state.annotations.annotations,
-  annotations => arrayUtil.countIf(annotations, metadata.isOrphan)
+  annotations => countIf(annotations, metadata.isOrphan)
 );
 
 /**
