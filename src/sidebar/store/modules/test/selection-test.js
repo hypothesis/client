@@ -56,26 +56,6 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('focusAnnotations()', function () {
-    it('adds the provided annotation IDs to the focused annotations', function () {
-      store.focusAnnotations(['1', '2', '3']);
-      assert.deepEqual(store.focusedAnnotations(), ['1', '2', '3']);
-    });
-
-    it('replaces any other focused annotation IDs', function () {
-      store.focusAnnotations(['1']);
-      store.focusAnnotations(['2', '3']);
-      assert.deepEqual(store.focusedAnnotations(), ['2', '3']);
-    });
-
-    it('sets focused annotations to an empty object if no IDs provided', function () {
-      store.focusAnnotations(['1']);
-      store.focusAnnotations([]);
-      assert.isObject(getSelectionState().focused);
-      assert.isEmpty(getSelectionState().focused);
-    });
-  });
-
   describe('hasAppliedFilter', () => {
     it('returns true if there is a search query set', () => {
       store.setFilterQuery('foobar');
@@ -377,17 +357,6 @@ describe('sidebar/store/modules/selection', () => {
         [{ focus: { user: { username: 'fake_user_name' } } }]
       );
       assert.equal(store.focusModeUserFilter(), 'fake_user_name');
-    });
-  });
-
-  describe('isAnnotationFocused', () => {
-    it('returns true if the provided annotation ID is in the set of focused annotations', () => {
-      store.focusAnnotations([1, 2]);
-      assert.isTrue(store.isAnnotationFocused(2));
-    });
-
-    it('returns false if the provided annotation ID is not in the set of focused annotations', () => {
-      assert.isFalse(store.isAnnotationFocused(2));
     });
   });
 
