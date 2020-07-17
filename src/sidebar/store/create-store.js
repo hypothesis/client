@@ -93,11 +93,7 @@ export default function createStore(modules, initArgs = [], middleware = []) {
   }
 
   // Create the store.
-  const store = /** @type {SidebarStore} */ (redux.createStore(
-    reducer,
-    initialState,
-    enhancer
-  ));
+  const store = redux.createStore(reducer, initialState, enhancer);
 
   // Add actions and selectors as methods to the store.
   const actions = Object.assign({}, ...modules.map(m => m.actions));
@@ -106,5 +102,5 @@ export default function createStore(modules, initArgs = [], middleware = []) {
 
   Object.assign(store, boundActions, boundSelectors);
 
-  return store;
+  return /** @type {SidebarStore} */ (store);
 }

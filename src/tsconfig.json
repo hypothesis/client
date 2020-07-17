@@ -22,13 +22,7 @@
     "sidebar/store/modules/*.js",
     "sidebar/services/*.js",
     "sidebar/util/*.js",
-
-    // TODO replace these with sidebar/store/* when all modules are converted
-    "sidebar/store/create-store.js",
-    "sidebar/store/debug-middleware.js",
-    "sidebar/store/use-store.js",
-    "sidebar/store/utils.js",
-    
+    "sidebar/store/*.js",
   ],
   "exclude": [
     // Enable this once the rest of `src/sidebar` is checked.

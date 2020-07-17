@@ -56,7 +56,7 @@ import viewer from './modules/viewer';
  * passing the current state of the store.
  *
  * @param {import('../../types/config').SidebarConfig} settings
- * @return {import('.create-store').HypothesisStore}
+ * @return {import('./create-store').SidebarStore}
  */
 // @ngInject
 export default function store(settings) {
