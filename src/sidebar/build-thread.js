@@ -21,10 +21,6 @@
  *       children. This count includes visually-hidden threads.
  * @prop {number} replyCount - Computed count of all replies to a thread
  * @prop {number} [depth] - The thread's depth in the hierarchy
- * @prop {'dim'|'highlight'} [highlightState] - In cases where there are one
- *       or more threads currently designated as "highlighted", we track
- *       the highlight state for each thread. undefined when there are no
- *       highlighted threads.
  */
 
 /**
@@ -271,7 +267,6 @@ function hasVisibleChildren(thread) {
  * @prop {(t: Thread) => boolean} [threadFilterFn] - Predicate function that
  *       returns `true` if the annotation should be included in the thread tree
  * @prop {Object.<string, boolean>} [expanded] - Map of thread id => expansion state
- * @prop {string[]} [highlighted] - List of ids of annotations that are highlighted
  * @prop {(a: Annotation, b: Annotation) => boolean} [sortCompareFn] - Less-than
  *       comparison function for sorting top-level annotations
  * @prop {(a: Annotation, b: Annotation) => boolean} [replySortCompareFn] - Less-than
@@ -286,7 +281,6 @@ function hasVisibleChildren(thread) {
 const defaultOpts = {
   selected: [],
   expanded: {},
-  highlighted: [],
   sortCompareFn: (a, b) => {
     return a.id < b.id;
   },
@@ -324,7 +318,6 @@ export default function buildThread(annotations, options) {
   const annotationsFiltered = !!opts.filterFn;
   const threadsFiltered = !!opts.threadFilterFn;
 
-  const hasHighlights = opts.highlighted.length > 0;
   const hasSelection = opts.selected.length > 0;
   const hasForcedVisible = opts.forcedVisible && opts.forcedVisible.length;
 
@@ -369,19 +362,11 @@ export default function buildThread(annotations, options) {
     child => child.visible || hasVisibleChildren(child)
   );
 
-  // Determine other UI states for threads: highlight and collapsed
+  // Determine collapsed state for UI
   thread = mapThread(thread, thread => {
     const threadStates = {
       collapsed: thread.collapsed,
     };
-
-    if (hasHighlights) {
-      if (thread.annotation && opts.highlighted.indexOf(thread.id) !== -1) {
-        threadStates.highlightState = 'highlight';
-      } else {
-        threadStates.highlightState = 'dim';
-      }
-    }
 
     if (opts.expanded.hasOwnProperty(thread.id)) {
       // This thread has been explicitly expanded/collapsed by user

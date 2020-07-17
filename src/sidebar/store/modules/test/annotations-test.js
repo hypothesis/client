@@ -147,6 +147,23 @@ describe('sidebar/store/modules/annotations', function () {
       store.addAnnotations([fixtures.newAnnotation()]);
       assert.isFalse(store.getState().annotations.annotations[0].$orphan);
     });
+
+    describe('highlightAnnotations', () => {
+      it('updates the highlighted state with the passed annotations', () => {
+        store.highlightAnnotations(['id1', 'id2', 'id3']);
+        assert.sameMembers(store.highlightedAnnotations(), [
+          'id1',
+          'id2',
+          'id3',
+        ]);
+      });
+
+      it('replaces any existing highlighted annotations', () => {
+        store.highlightAnnotations(['id1', 'id2', 'id3']);
+        store.highlightAnnotations(['id3', 'id4']);
+        assert.sameMembers(store.highlightedAnnotations(), ['id3', 'id4']);
+      });
+    });
   });
 
   describe('#isWaitingToAnchorAnnotations', () => {

@@ -52,7 +52,6 @@ export default function RootThread(
     const options = {
       forcedVisible: store.forcedVisibleAnnotations(),
       expanded: store.expandedMap(),
-      highlighted: state.selection.highlighted,
       selected: store.selectedAnnotations(),
       sortCompareFn: sortFn,
     };

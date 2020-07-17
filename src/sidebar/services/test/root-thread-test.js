@@ -42,7 +42,6 @@ describe('rootThread', function () {
         drafts: [],
         selection: {
           filterQuery: null,
-          highlighted: [],
         },
         route: {
           name: 'sidebar',
@@ -144,18 +143,6 @@ describe('rootThread', function () {
         [],
         sinon.match({
           forcedVisible: ['id1', 'id2'],
-        })
-      );
-    });
-
-    it('passes the highlighted set to buildThread()', function () {
-      fakeStore.state.selection.highlighted = ['id1', 'id2'];
-      rootThread.thread(fakeStore.state);
-      assert.calledWith(
-        fakeBuildThread,
-        [],
-        sinon.match({
-          highlighted: ['id1', 'id2'],
         })
       );
     });
