@@ -10,7 +10,7 @@
 import { createSelector } from 'reselect';
 
 import * as metadata from '../../util/annotation-metadata';
-import { countIf } from '../../util/collections';
+import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import * as util from '../util';
 
 import route from './route';
@@ -83,7 +83,10 @@ function initializeAnnotation(annotation, tag) {
 function init() {
   return {
     annotations: [],
-
+    focused: {},
+    // A map of annotations that should appear as "highlighted", e.g. the
+    // target of a single-annotation view
+    highlighted: {},
     // The local tag to assign to the next annotation that is loaded into the
     // app
     nextTag: 1,
@@ -135,6 +138,10 @@ const update = {
       annotations: added.concat(updated).concat(unchanged),
       nextTag: nextTag,
     };
+  },
+
+  HIGHLIGHT_ANNOTATIONS: function (state, action) {
+    return { highlighted: action.highlighted };
   },
 
   REMOVE_ANNOTATIONS: function (state, action) {
@@ -210,6 +217,23 @@ const update = {
 };
 
 const actions = util.actionTypes(update);
+
+/**
+ * Highlight annotations with the given `ids`.
+ *
+ * This is used to indicate the specific annotation in a thread that was
+ * linked to for example. Replaces the current map of highlighted annotations.
+ * All provided annotations (`ids`) will be set to `true` in the `highlighted`
+ * map.
+ *
+ * @param {string[]} ids - annotations to highlight
+ */
+function highlightAnnotations(ids) {
+  return {
+    type: actions.HIGHLIGHT_ANNOTATIONS,
+    highlighted: toTrueMap(ids),
+  };
+}
 
 /**
  * Updating the flagged status of an annotation.
@@ -389,6 +413,11 @@ function findAnnotationByID(state, id) {
   return findByID(state.annotations.annotations, id);
 }
 
+const highlightedAnnotations = createSelector(
+  state => state.annotations.highlighted,
+  highlighted => trueKeys(highlighted)
+);
+
 /**
  * Return all loaded annotations that are not highlights and have not been saved
  * to the server.
@@ -449,6 +478,7 @@ export default {
     addAnnotations,
     clearAnnotations,
     hideAnnotation,
+    highlightAnnotations,
     removeAnnotations,
     updateAnchorStatus,
     updateFlagStatus,
@@ -459,6 +489,7 @@ export default {
     annotationCount,
     annotationExists,
     findAnnotationByID,
+    highlightedAnnotations,
     findIDsForTags,
     isWaitingToAnchorAnnotations,
     newAnnotations,
