@@ -146,6 +146,16 @@ const setTab = (newTab, oldTab) => {
 };
 
 const update = {
+  CHANGE_FOCUS_MODE_USER: function (state, action) {
+    return {
+      focusMode: setFocus({ user: action.user }),
+    };
+  },
+
+  CLEAR_SELECTED_ANNOTATIONS: function () {
+    return { filterQuery: null, selected: {} };
+  },
+
   CLEAR_SELECTION: function () {
     return {
       filterQuery: null,
@@ -154,20 +164,24 @@ const update = {
     };
   },
 
-  CLEAR_SELECTED_ANNOTATIONS: function () {
-    return { filterQuery: null, selected: {} };
-  },
-
   SELECT_ANNOTATIONS: function (state, action) {
     return { selected: action.selection };
   },
 
-  TOGGLE_SELECTED_ANNOTATIONS: function (state, action) {
-    const selection = { ...state.selected };
-    action.toggleIds.forEach(id => {
-      selection[id] = !selection[id];
-    });
-    return { selected: selection };
+  SELECT_TAB: function (state, action) {
+    return setTab(action.tab, state.selectedTab);
+  },
+
+  SET_EXPANDED: function (state, action) {
+    return { expanded: { ...state.expanded, [action.id]: action.expanded } };
+  },
+
+  SET_FILTER_QUERY: function (state, action) {
+    return {
+      filterQuery: action.query,
+      forcedVisible: {},
+      expanded: {},
+    };
   },
 
   SET_FOCUS_MODE: function (state, action) {
@@ -183,24 +197,22 @@ const update = {
     };
   },
 
-  CHANGE_FOCUS_MODE_USER: function (state, action) {
-    return {
-      focusMode: setFocus({ user: action.user }),
-    };
-  },
-
   SET_FORCED_VISIBLE: function (state, action) {
     return {
       forcedVisible: { ...state.forcedVisible, [action.id]: action.visible },
     };
   },
 
-  SET_EXPANDED: function (state, action) {
-    return { expanded: { ...state.expanded, [action.id]: action.expanded } };
+  SET_SORT_KEY: function (state, action) {
+    return { sortKey: action.key };
   },
 
-  SELECT_TAB: function (state, action) {
-    return setTab(action.tab, state.selectedTab);
+  TOGGLE_SELECTED_ANNOTATIONS: function (state, action) {
+    const selection = { ...state.selected };
+    action.toggleIds.forEach(id => {
+      selection[id] = !selection[id];
+    });
+    return { selected: selection };
   },
 
   /**
@@ -242,21 +254,35 @@ const update = {
       selected: selection,
     };
   },
-
-  SET_FILTER_QUERY: function (state, action) {
-    return {
-      filterQuery: action.query,
-      forcedVisible: {},
-      expanded: {},
-    };
-  },
-
-  SET_SORT_KEY: function (state, action) {
-    return { sortKey: action.key };
-  },
 };
 
 const actions = util.actionTypes(update);
+
+/* Action Creators */
+
+/**
+ * Clears any applied filters, changes the focused user and sets
+ * focused enabled to `true`.
+ *
+ * @param {User} user - The user to focus on
+ */
+function changeFocusModeUser(user) {
+  return function (dispatch) {
+    dispatch({ type: actions.CLEAR_SELECTION });
+    dispatch({ type: actions.CHANGE_FOCUS_MODE_USER, user });
+  };
+}
+
+/** De-select all annotations. */
+function clearSelectedAnnotations() {
+  return { type: actions.CLEAR_SELECTED_ANNOTATIONS };
+}
+
+function clearSelection() {
+  return {
+    type: actions.CLEAR_SELECTION,
+  };
+}
 
 /**
  * Set the currently selected annotation IDs. This will replace the current
@@ -272,15 +298,36 @@ function selectAnnotations(ids) {
 }
 
 /**
- * Toggle the selected state for the annotations in `toggledAnnotations`:
- * unselect any that are selected; select any that are unselected.
+ * Set the currently-selected tab to `tabKey`.
  *
- * @param {string[]} toggleIds - identifiers of annotations to toggle
+ * @param {'annotation'|'note'|'orphan'} tabKey
  */
-function toggleSelectedAnnotations(toggleIds) {
+function selectTab(tabKey) {
   return {
-    type: actions.TOGGLE_SELECTED_ANNOTATIONS,
-    toggleIds,
+    type: actions.SELECT_TAB,
+    tab: tabKey,
+  };
+}
+
+/**
+ * Set the expanded state for a single annotation/thread.
+ *
+ * @param {string} id - annotation (or thread) id
+ * @param {boolean} expanded - `true` for expanded replies, `false` to collapse
+ */
+function setExpanded(id, expanded) {
+  return {
+    type: actions.SET_EXPANDED,
+    id,
+    expanded,
+  };
+}
+
+/** Set the query used to filter displayed annotations. */
+function setFilterQuery(query) {
+  return {
+    type: actions.SET_FILTER_QUERY,
+    query: query,
   };
 }
 
@@ -301,37 +348,11 @@ function setForcedVisible(id, visible) {
   };
 }
 
-/**
- * Set the expanded state for a single annotation/thread.
- *
- * @param {string} id - annotation (or thread) id
- * @param {boolean} expanded - `true` for expanded replies, `false` to collapse
- */
-function setExpanded(id, expanded) {
+/** Sets the sort key for the annotation list. */
+function setSortKey(key) {
   return {
-    type: actions.SET_EXPANDED,
-    id,
-    expanded,
-  };
-}
-
-/**
- * Set the currently-selected tab to `tabKey`.
- *
- * @param {'annotation'|'note'|'orphan'} tabKey
- */
-function selectTab(tabKey) {
-  return {
-    type: actions.SELECT_TAB,
-    tab: tabKey,
-  };
-}
-
-/** Set the query used to filter displayed annotations. */
-function setFilterQuery(query) {
-  return {
-    type: actions.SET_FILTER_QUERY,
-    query: query,
+    type: actions.SET_SORT_KEY,
+    key: key,
   };
 }
 
@@ -349,67 +370,19 @@ function toggleFocusMode(active) {
 }
 
 /**
- * Clears any applied filters, changes the focused user and sets
- * focused enabled to `true`.
+ * Toggle the selected state for the annotations in `toggledAnnotations`:
+ * unselect any that are selected; select any that are unselected.
  *
- * @param {User} user - The user to focus on
+ * @param {string[]} toggleIds - identifiers of annotations to toggle
  */
-function changeFocusModeUser(user) {
-  return function (dispatch) {
-    dispatch({ type: actions.CLEAR_SELECTION });
-    dispatch({ type: actions.CHANGE_FOCUS_MODE_USER, user });
-  };
-}
-
-/** Sets the sort key for the annotation list. */
-function setSortKey(key) {
+function toggleSelectedAnnotations(toggleIds) {
   return {
-    type: actions.SET_SORT_KEY,
-    key: key,
+    type: actions.TOGGLE_SELECTED_ANNOTATIONS,
+    toggleIds,
   };
 }
 
 /* Selectors */
-
-const forcedVisibleAnnotations = createSelector(
-  state => state.selection.forcedVisible,
-  forcedVisible => trueKeys(forcedVisible)
-);
-
-/**
- * Are any annotations currently selected?
- *
- * @return {boolean}
- */
-const hasSelectedAnnotations = createSelector(
-  state => state.selection.selected,
-  selection => trueKeys(selection).length > 0
-);
-
-/** De-select all annotations. */
-function clearSelectedAnnotations() {
-  return { type: actions.CLEAR_SELECTED_ANNOTATIONS };
-}
-
-function clearSelection() {
-  return {
-    type: actions.CLEAR_SELECTION,
-  };
-}
-
-/**
- * Returns the annotation ID of the first annotation in the selection that is
- * selected (`true`) or `null` if there are none.
- *
- * @return {string|null}
- */
-const getFirstSelectedAnnotationId = createSelector(
-  state => state.selection.selected,
-  selection => {
-    const selectedIds = trueKeys(selection);
-    return selectedIds.length ? selectedIds[0] : null;
-  }
-);
 
 /**
  * Retrieve map of expanded/collapsed annotations (threads)
@@ -425,6 +398,15 @@ function filterQuery(state) {
 }
 
 /**
+ * Is a focus mode currently applied?
+ *
+ * @return {boolean}
+ */
+function focusModeActive(state) {
+  return state.selection.focusMode.active;
+}
+
+/**
  * Does the state have a configured focus mode? That is, does it have a valid
  * focus mode filter that could be applied (regardless of whether it is currently
  * active)?
@@ -433,15 +415,6 @@ function filterQuery(state) {
  */
 function focusModeConfigured(state) {
   return state.selection.focusMode.configured;
-}
-
-/**
- * Is a focus mode currently applied?
- *
- * @return {boolean}
- */
-function focusModeActive(state) {
-  return state.selection.focusMode.active;
 }
 
 /**
@@ -470,6 +443,40 @@ function focusModeUserPrettyName(state) {
   return state.selection.focusMode.user.displayName;
 }
 
+const forcedVisibleAnnotations = createSelector(
+  state => state.selection.forcedVisible,
+  forcedVisible => trueKeys(forcedVisible)
+);
+
+/**
+ * Returns the annotation ID of the first annotation in the selection that is
+ * selected (`true`) or `null` if there are none.
+ *
+ * @return {string|null}
+ */
+const getFirstSelectedAnnotationId = createSelector(
+  state => state.selection.selected,
+  selection => {
+    const selectedIds = trueKeys(selection);
+    return selectedIds.length ? selectedIds[0] : null;
+  }
+);
+
+/**
+ * Are any annotations currently selected?
+ *
+ * @return {boolean}
+ */
+const hasSelectedAnnotations = createSelector(
+  state => state.selection.selected,
+  selection => trueKeys(selection).length > 0
+);
+
+const selectedAnnotations = createSelector(
+  state => state.selection.selected,
+  selection => trueKeys(selection)
+);
+
 /**
  * Is any sort of filtering currently applied to the list of annotations? This
  * includes a search query, but also if annotations are selected or a user
@@ -483,11 +490,6 @@ const hasAppliedFilter = createSelector(
   hasSelectedAnnotations,
   (filterQuery, focusModeActive, hasSelectedAnnotations) =>
     !!filterQuery || focusModeActive || hasSelectedAnnotations
-);
-
-const selectedAnnotations = createSelector(
-  state => state.selection.selected,
-  selection => trueKeys(selection)
 );
 
 /**
@@ -510,13 +512,13 @@ export default {
   update: update,
 
   actions: {
+    changeFocusModeUser,
     clearSelectedAnnotations,
     clearSelection,
     selectAnnotations,
     selectTab,
     setExpanded,
     setFilterQuery,
-    changeFocusModeUser,
     setForcedVisible,
     setSortKey,
     toggleFocusMode,
