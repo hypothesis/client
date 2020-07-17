@@ -7,6 +7,13 @@
  * @typedef {import('../../../types/api').Annotation} Annotation
  */
 
+/**
+ * @typedef AnnotationStub
+ * @prop {string} [id] - service-provided identifier if annotation has been
+ *       persisted to the service
+ * @prop {string} [$tag] - local-generated identifier
+ */
+
 import { createSelector } from 'reselect';
 
 import * as metadata from '../../util/annotation-metadata';
@@ -17,10 +24,13 @@ import route from './route';
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
- * removed.
+ * removed (matched on identifier—`id` or `$tag`)
  *
  * Annotations in `annotations` may be complete annotations or "stubs" with only
  * the `id` field set.
+ *
+ * @param {Annotation[]} current
+ * @param {AnnotationStub[]} annotations
  */
 function excludeAnnotations(current, annotations) {
   const ids = {};
@@ -142,8 +152,22 @@ const update = {
     };
   },
 
+  CLEAR_ANNOTATIONS: function () {
+    return { annotations: [] };
+  },
+
   FOCUS_ANNOTATIONS: function (state, action) {
     return { focused: toTrueMap(action.focusedTags) };
+  },
+
+  HIDE_ANNOTATION: function (state, action) {
+    const anns = state.annotations.map(function (ann) {
+      if (ann.id !== action.id) {
+        return ann;
+      }
+      return { ...ann, hidden: true };
+    });
+    return { annotations: anns };
   },
 
   HIGHLIGHT_ANNOTATIONS: function (state, action) {
@@ -156,8 +180,30 @@ const update = {
     };
   },
 
-  CLEAR_ANNOTATIONS: function () {
-    return { annotations: [] };
+  UNHIDE_ANNOTATION: function (state, action) {
+    const anns = state.annotations.map(function (ann) {
+      if (ann.id !== action.id) {
+        return ann;
+      }
+      return Object.assign({}, ann, { hidden: false });
+    });
+    return { annotations: anns };
+  },
+
+  UPDATE_ANCHOR_STATUS: function (state, action) {
+    const annotations = state.annotations.map(function (annot) {
+      if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
+        return annot;
+      }
+
+      const state = action.statusUpdates[annot.$tag];
+      if (state === 'timeout') {
+        return Object.assign({}, annot, { $anchorTimeout: true });
+      } else {
+        return Object.assign({}, annot, { $orphan: state === 'orphan' });
+      }
+    });
+    return { annotations: annotations };
   },
 
   UPDATE_FLAG_STATUS: function (state, action) {
@@ -184,92 +230,11 @@ const update = {
     });
     return { annotations: annotations };
   },
-
-  UPDATE_ANCHOR_STATUS: function (state, action) {
-    const annotations = state.annotations.map(function (annot) {
-      if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
-        return annot;
-      }
-
-      const state = action.statusUpdates[annot.$tag];
-      if (state === 'timeout') {
-        return Object.assign({}, annot, { $anchorTimeout: true });
-      } else {
-        return Object.assign({}, annot, { $orphan: state === 'orphan' });
-      }
-    });
-    return { annotations: annotations };
-  },
-
-  HIDE_ANNOTATION: function (state, action) {
-    const anns = state.annotations.map(function (ann) {
-      if (ann.id !== action.id) {
-        return ann;
-      }
-      return Object.assign({}, ann, { hidden: true });
-    });
-    return { annotations: anns };
-  },
-
-  UNHIDE_ANNOTATION: function (state, action) {
-    const anns = state.annotations.map(function (ann) {
-      if (ann.id !== action.id) {
-        return ann;
-      }
-      return Object.assign({}, ann, { hidden: false });
-    });
-    return { annotations: anns };
-  },
 };
 
 const actions = util.actionTypes(update);
 
-/**
- * Replace the current set of focused annotations with the annotations
- * identified by `tags`. All provided annotations (`tags`) will be set to
- * `true` in the `focused` map.
- *
- * @param {string[]} tags - Identifiers of annotations to focus
- */
-function focusAnnotations(tags) {
-  return {
-    type: actions.FOCUS_ANNOTATIONS,
-    focusedTags: tags,
-  };
-}
-
-/**
- * Highlight annotations with the given `ids`.
- *
- * This is used to indicate the specific annotation in a thread that was
- * linked to for example. Replaces the current map of highlighted annotations.
- * All provided annotations (`ids`) will be set to `true` in the `highlighted`
- * map.
- *
- * @param {string[]} ids - annotations to highlight
- */
-function highlightAnnotations(ids) {
-  return {
-    type: actions.HIGHLIGHT_ANNOTATIONS,
-    highlighted: toTrueMap(ids),
-  };
-}
-
-/**
- * Updating the flagged status of an annotation.
- *
- * @param {string} id - Annotation ID
- * @param {boolean} isFlagged - The flagged status of the annotation. True if
- *        the user has flagged the annotation.
- *
- */
-function updateFlagStatus(id, isFlagged) {
-  return {
-    type: actions.UPDATE_FLAG_STATUS,
-    id: id,
-    isFlagged: isFlagged,
-  };
-}
+/* Action creators */
 
 /**
  * Add these `annotations` to the current collection of annotations in the store.
@@ -325,6 +290,55 @@ function addAnnotations(annotations) {
   };
 }
 
+/** Set the currently displayed annotations to the empty set. */
+function clearAnnotations() {
+  return { type: actions.CLEAR_ANNOTATIONS };
+}
+
+/**
+ * Replace the current set of focused annotations with the annotations
+ * identified by `tags`. All provided annotations (`tags`) will be set to
+ * `true` in the `focused` map.
+ *
+ * @param {string[]} tags - Identifiers of annotations to focus
+ */
+function focusAnnotations(tags) {
+  return {
+    type: actions.FOCUS_ANNOTATIONS,
+    focusedTags: tags,
+  };
+}
+
+/**
+ * Update the local hidden state of an annotation.
+ *
+ * This updates an annotation to reflect the fact that it has been hidden from
+ * non-moderators.
+ */
+function hideAnnotation(id) {
+  return {
+    type: actions.HIDE_ANNOTATION,
+    id: id,
+  };
+}
+
+/**
+ * Highlight annotations with the given `ids`.
+ *
+ * This is used to indicate the specific annotation in a thread that was
+ * linked to for example. Replaces the current map of highlighted annotations.
+ * All provided annotations (`ids`) will be set to `true` in the `highlighted`
+ * map.
+ *
+ * @param {string[]} ids - annotations to highlight
+ */
+function highlightAnnotations(ids) {
+  return {
+    type: actions.HIGHLIGHT_ANNOTATIONS,
+    highlighted: toTrueMap(ids),
+  };
+}
+
 /**
  * Remove annotations from the currently displayed set.
  *
@@ -346,36 +360,6 @@ function removeAnnotations(annotations) {
   };
 }
 
-/** Set the currently displayed annotations to the empty set. */
-function clearAnnotations() {
-  return { type: actions.CLEAR_ANNOTATIONS };
-}
-
-/**
- * Update the anchoring status of an annotation.
- *
- * @param {{ [tag: string]: 'anchored'|'orphan'|'timeout'} } statusUpdates - A map of annotation tag to orphan status
- */
-function updateAnchorStatus(statusUpdates) {
-  return {
-    type: actions.UPDATE_ANCHOR_STATUS,
-    statusUpdates,
-  };
-}
-
-/**
- * Update the local hidden state of an annotation.
- *
- * This updates an annotation to reflect the fact that it has been hidden from
- * non-moderators.
- */
-function hideAnnotation(id) {
-  return {
-    type: actions.HIDE_ANNOTATION,
-    id: id,
-  };
-}
-
 /**
  * Update the local hidden state of an annotation.
  *
@@ -390,21 +374,61 @@ function unhideAnnotation(id) {
 }
 
 /**
- * Return all loaded annotations which have been saved to the server.
+ * Update the anchoring status of an annotation
  *
- * @param {Object} state - The global app state
+ * @param {{ [tag: string]: 'anchored'|'orphan'|'timeout'} } statusUpdates - A
+ *        map of annotation tag to orphan status
  */
-function savedAnnotations(state) {
-  return state.annotations.annotations.filter(function (ann) {
-    return !metadata.isNew(ann);
-  });
+function updateAnchorStatus(statusUpdates) {
+  return {
+    type: actions.UPDATE_ANCHOR_STATUS,
+    statusUpdates,
+  };
 }
 
-/** Return true if the annotation with a given ID is currently loaded. */
+/**
+ * Updating the flagged status of an annotation.
+ *
+ * @param {string} id - Annotation ID
+ * @param {boolean} isFlagged - The flagged status of the annotation. True if
+ *        the user has flagged the annotation.
+ *
+ */
+function updateFlagStatus(id, isFlagged) {
+  return {
+    type: actions.UPDATE_FLAG_STATUS,
+    id: id,
+    isFlagged: isFlagged,
+  };
+}
+
+/* Selectors */
+
+/**
+ * Count the number of annotations (as opposed to notes or orphans)
+ *
+ * @return {number}
+ */
+const annotationCount = createSelector(
+  state => state.annotations.annotations,
+  annotations => countIf(annotations, metadata.isAnnotation)
+);
+
+/**
+ * Does the annotation indicated by `id` exist in the collection?
+ *
+ * @param {string} id
+ * @return {boolean}
+ */
 function annotationExists(state, id) {
-  return state.annotations.annotations.some(function (annot) {
-    return annot.id === id;
-  });
+  return state.annotations.annotations.some(annot => annot.id === id);
+}
+
+/**
+ * Return the annotation with the given ID
+ */
+function findAnnotationByID(state, id) {
+  return findByID(state.annotations.annotations, id);
 }
 
 /**
@@ -417,7 +441,7 @@ function annotationExists(state, id) {
  */
 function findIDsForTags(state, tags) {
   const ids = [];
-  tags.forEach(function (tag) {
+  tags.forEach(tag => {
     const annot = findByTag(state.annotations.annotations, tag);
     if (annot && annot.id) {
       ids.push(annot.id);
@@ -427,40 +451,23 @@ function findIDsForTags(state, tags) {
 }
 
 /**
- * Return the annotation with the given ID.
+ * Retrieve currently-focused annotation identifiers
+ *
+ * @return {string[]}
  */
-function findAnnotationByID(state, id) {
-  return findByID(state.annotations.annotations, id);
-}
-
-const highlightedAnnotations = createSelector(
-  state => state.annotations.highlighted,
-  highlighted => trueKeys(highlighted)
-);
-
 const focusedAnnotations = createSelector(
   state => state.annotations.focused,
   focused => trueKeys(focused)
 );
 
 /**
- * Return all loaded annotations that are not highlights and have not been saved
- * to the server.
+ * Retrieve currently-highlighted annotation identifiers
+ *
+ * @return {string[]}
  */
-const newAnnotations = createSelector(
-  state => state.annotations.annotations,
-  annotations =>
-    annotations.filter(ann => metadata.isNew(ann) && !metadata.isHighlight(ann))
-);
-
-/**
- * Return all loaded annotations that are highlights and have not been saved
- * to the server.
- */
-const newHighlights = createSelector(
-  state => state.annotations.annotations,
-  annotations =>
-    annotations.filter(ann => metadata.isNew(ann) && metadata.isHighlight(ann))
+const highlightedAnnotations = createSelector(
+  state => state.annotations.highlighted,
+  highlighted => trueKeys(highlighted)
 );
 
 /**
@@ -474,7 +481,43 @@ function isAnnotationFocused(state, $tag) {
 }
 
 /**
- * Return the number of page notes.
+ * Are there any annotations still waiting to anchor?
+ *
+ * @return {boolean}
+ */
+const isWaitingToAnchorAnnotations = createSelector(
+  state => state.annotations.annotations,
+  annotations => annotations.some(metadata.isWaitingToAnchor)
+);
+
+/**
+ * Return all loaded annotations that are not highlights and have not been saved
+ * to the server
+ *
+ * @return {Annotation[]}
+ */
+const newAnnotations = createSelector(
+  state => state.annotations.annotations,
+  annotations =>
+    annotations.filter(ann => metadata.isNew(ann) && !metadata.isHighlight(ann))
+);
+
+/**
+ * Return all loaded annotations that are highlights and have not been saved
+ * to the server
+ *
+ * @return {Annotation[]}
+ */
+const newHighlights = createSelector(
+  state => state.annotations.annotations,
+  annotations =>
+    annotations.filter(ann => metadata.isNew(ann) && metadata.isHighlight(ann))
+);
+
+/**
+ * Count the number of page notes currently in the collection
+ *
+ * @return {number}
  */
 const noteCount = createSelector(
   state => state.annotations.annotations,
@@ -482,15 +525,9 @@ const noteCount = createSelector(
 );
 
 /**
- * Returns the number of annotations (as opposed to notes or orphans).
- */
-const annotationCount = createSelector(
-  state => state.annotations.annotations,
-  annotations => countIf(annotations, metadata.isAnnotation)
-);
-
-/**
- * Returns the number of orphaned annotations.
+ * Count the number of orphans currently in the collection
+ *
+ * @type {(state: any) => number}
  */
 const orphanCount = createSelector(
   state => state.annotations.annotations,
@@ -498,12 +535,15 @@ const orphanCount = createSelector(
 );
 
 /**
- * Returns true if some annotations have not been anchored yet.
+ * Return all loaded annotations which have been saved to the server
+ *
+ * @return {Annotation[]}
  */
-const isWaitingToAnchorAnnotations = createSelector(
-  state => state.annotations.annotations,
-  annotations => annotations.some(metadata.isWaitingToAnchor)
-);
+function savedAnnotations(state) {
+  return state.annotations.annotations.filter(function (ann) {
+    return !metadata.isNew(ann);
+  });
+}
 
 export default {
   init: init,
@@ -516,18 +556,18 @@ export default {
     hideAnnotation,
     highlightAnnotations,
     removeAnnotations,
+    unhideAnnotation,
     updateAnchorStatus,
     updateFlagStatus,
-    unhideAnnotation,
   },
 
   selectors: {
     annotationCount,
     annotationExists,
     findAnnotationByID,
+    findIDsForTags,
     focusedAnnotations,
     highlightedAnnotations,
-    findIDsForTags,
     isAnnotationFocused,
     isWaitingToAnchorAnnotations,
     newAnnotations,
