@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../build-thread').Thread} Thread
+ * @typedef {import('../util/build-thread').Thread} Thread
  */
 
 export const THREAD_DIMENSION_DEFAULTS = {
