@@ -148,6 +148,21 @@ describe('sidebar/store/modules/annotations', function () {
       assert.isFalse(store.getState().annotations.annotations[0].$orphan);
     });
 
+    describe('clearAnnotations', () => {
+      it('should clear annotations and annotation state from the store', () => {
+        const annot = fixtures.defaultAnnotation();
+        store.addAnnotations([annot]);
+        store.focusAnnotations([annot.id]);
+        store.highlightAnnotations([annot.id]);
+
+        store.clearAnnotations();
+
+        assert.isEmpty(store.getState().annotations.annotations);
+        assert.isEmpty(store.focusedAnnotations());
+        assert.isEmpty(store.highlightedAnnotations());
+      });
+    });
+
     describe('focusAnnotations', function () {
       it('adds the provided annotation IDs to the focused annotations', function () {
         store.focusAnnotations(['1', '2', '3']);
