@@ -8,7 +8,7 @@ import StreamContent, { $imports } from '../stream-content';
 
 describe('StreamContent', () => {
   let fakeApi;
-  let fakeRootThread;
+  let fakeUseRootThread;
   let fakeSearchFilter;
   let fakeStore;
   let fakeToastMessenger;
@@ -18,9 +18,7 @@ describe('StreamContent', () => {
       search: sinon.stub().resolves({ rows: [], replies: [], total: 0 }),
     };
 
-    fakeRootThread = {
-      thread: sinon.stub().returns({}),
-    };
+    fakeUseRootThread = sinon.stub();
 
     fakeSearchFilter = {
       toObject: sinon.stub().returns({}),
@@ -42,6 +40,7 @@ describe('StreamContent', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      './hooks/use-root-thread': fakeUseRootThread,
       '../store/use-store': callback => callback(fakeStore),
       '../util/search-filter': fakeSearchFilter,
     });
@@ -53,11 +52,7 @@ describe('StreamContent', () => {
 
   function createComponent() {
     return mount(
-      <StreamContent
-        api={fakeApi}
-        rootThread={fakeRootThread}
-        toastMessenger={fakeToastMessenger}
-      />
+      <StreamContent api={fakeApi} toastMessenger={fakeToastMessenger} />
     );
   }
 

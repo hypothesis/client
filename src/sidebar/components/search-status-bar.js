@@ -1,10 +1,9 @@
 import { createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
 import uiConstants from '../ui-constants';
-import { withServices } from '../util/service-context';
+import useRootThread from './hooks/use-root-thread';
 
 import Button from './button';
 
@@ -25,8 +24,8 @@ const countVisibleAnns = annThread => {
  * UI for displaying information about the currently-applied filtering of
  * annotations, and, in some cases, a mechanism for clearing the filter(s).
  * */
-function SearchStatusBar({ rootThread }) {
-  const thread = useStore(store => rootThread.thread(store.getState()));
+function SearchStatusBar() {
+  const thread = useRootThread();
 
   const actions = useStore(store => ({
     clearSelection: store.clearSelection,
@@ -170,11 +169,7 @@ function SearchStatusBar({ rootThread }) {
   );
 }
 
-SearchStatusBar.propTypes = {
-  // Injected services.
-  rootThread: propTypes.object.isRequired,
-};
+// Necessary for test-mocking purposes (`mockImportedComponents`)
+SearchStatusBar.propTypes = {};
 
-SearchStatusBar.injectedProps = ['rootThread'];
-
-export default withServices(SearchStatusBar);
+export default SearchStatusBar;

@@ -11,7 +11,7 @@ import AnnotationViewerContent, {
 describe('AnnotationViewerContent', () => {
   let fakeStore;
   let fakeOnLogin;
-  let fakeRootThread;
+  let fakeUseRootThread;
   let fakeLoadAnnotationsService;
 
   beforeEach(() => {
@@ -30,10 +30,11 @@ describe('AnnotationViewerContent', () => {
 
     fakeOnLogin = sinon.stub();
 
-    fakeRootThread = { thread: sinon.stub().returns({}) };
+    fakeUseRootThread = sinon.stub().returns({});
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      './hooks/use-root-thread': fakeUseRootThread,
       '../store/use-store': callback => callback(fakeStore),
     });
   });
@@ -47,7 +48,6 @@ describe('AnnotationViewerContent', () => {
       <AnnotationViewerContent
         loadAnnotationsService={fakeLoadAnnotationsService}
         onLogin={fakeOnLogin}
-        rootThread={fakeRootThread}
         {...props}
       />
     );
