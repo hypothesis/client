@@ -129,7 +129,6 @@ import streamerService from './services/streamer';
 import tagsService from './services/tags';
 import threadsService from './services/threads';
 import toastMessenger from './services/toast-messenger';
-import viewFilterService from './services/view-filter';
 
 // Redux store.
 import store from './store';
@@ -164,7 +163,6 @@ function startApp(config) {
     .register('tags', tagsService)
     .register('threadsService', threadsService)
     .register('toastMessenger', toastMessenger)
-    .register('viewFilter', viewFilterService)
     .register('store', store);
 
   // Register utility values/classes.

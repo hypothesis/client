@@ -75,15 +75,12 @@ describe('rootThread', function () {
 
     fakeSettings = {};
 
-    fakeViewFilter = {
-      filter: sinon.stub(),
-    };
+    fakeViewFilter = sinon.stub();
 
     rootThread = new Injector()
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('store', { value: fakeStore })
       .register('settings', { value: fakeSettings })
-      .register('viewFilter', { value: fakeViewFilter })
       .register('rootThread', rootThreadFactory)
       .get('rootThread');
   });
@@ -92,6 +89,7 @@ describe('rootThread', function () {
     $imports.$mock({
       '../build-thread': fakeBuildThread,
       '../util/search-filter': fakeSearchFilter,
+      '../util/view-filter': fakeViewFilter,
     });
   });
 
@@ -294,13 +292,9 @@ describe('rootThread', function () {
       rootThread.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 
-      fakeViewFilter.filter.returns([annotation]);
+      fakeViewFilter.returns([annotation]);
       assert.isTrue(filterFn(annotation));
-      assert.calledWith(
-        fakeViewFilter.filter,
-        sinon.match([annotation]),
-        filters
-      );
+      assert.calledWith(fakeViewFilter, sinon.match([annotation]), filters);
     });
   });
 
@@ -314,13 +308,9 @@ describe('rootThread', function () {
       rootThread.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 
-      fakeViewFilter.filter.returns([annotation]);
+      fakeViewFilter.returns([annotation]);
       assert.isTrue(filterFn(annotation));
-      assert.calledWith(
-        fakeViewFilter.filter,
-        sinon.match([annotation]),
-        filters
-      );
+      assert.calledWith(fakeViewFilter, sinon.match([annotation]), filters);
     });
   });
 });
