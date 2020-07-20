@@ -18,7 +18,6 @@ const fixtures = immutable({
 });
 
 describe('rootThread', function () {
-  let fakeAnnotationsService;
   let fakeBuildThread;
   let fakeSearchFilter;
   let fakeSettings;
@@ -28,9 +27,6 @@ describe('rootThread', function () {
   let rootThread;
 
   beforeEach(function () {
-    fakeAnnotationsService = {
-      create: sinon.stub(),
-    };
     fakeStore = {
       state: {
         annotations: {
@@ -78,7 +74,6 @@ describe('rootThread', function () {
     fakeViewFilter = sinon.stub();
 
     rootThread = new Injector()
-      .register('annotationsService', { value: fakeAnnotationsService })
       .register('store', { value: fakeStore })
       .register('settings', { value: fakeSettings })
       .register('rootThread', rootThreadFactory)

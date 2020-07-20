@@ -32,7 +32,7 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-export default function RootThread(annotationsService, store) {
+export default function RootThread(store) {
   /**
    * Build the root conversation thread from the given UI state.
    *
