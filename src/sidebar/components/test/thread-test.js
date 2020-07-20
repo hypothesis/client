@@ -31,7 +31,7 @@ const addChildThread = parent => {
   return childThread;
 };
 
-// NB: This logic lifted from `build-thread.js`
+// NB: This logic lifted from `util/build-thread.js`
 function countRepliesAndDepth(thread, depth) {
   const children = thread.children.map(child => {
     return countRepliesAndDepth(child, depth + 1);

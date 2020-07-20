@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../types/api').Annotation} Annotation
+ * @typedef {import('../../types/api').Annotation} Annotation
  *
  * @typedef Thread
  * @prop {string} id - The thread's id, which equivalent to the id of its

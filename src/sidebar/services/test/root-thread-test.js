@@ -82,7 +82,7 @@ describe('rootThread', function () {
 
   beforeEach(() => {
     $imports.$mock({
-      '../build-thread': fakeBuildThread,
+      '../util/build-thread': fakeBuildThread,
       '../util/search-filter': fakeSearchFilter,
       '../util/view-filter': fakeViewFilter,
     });

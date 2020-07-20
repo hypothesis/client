@@ -1,4 +1,4 @@
-import buildThread from '../build-thread';
+import buildThread from '../util/build-thread';
 import * as metadata from '../util/annotation-metadata';
 import memoize from '../util/memoize';
 import { generateFacetedFilter } from '../util/search-filter';
