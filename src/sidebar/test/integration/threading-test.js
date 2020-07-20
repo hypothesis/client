@@ -39,15 +39,6 @@ describe('annotation threading', function () {
   let rootThread;
 
   beforeEach(function () {
-    const fakeUnicode = {
-      normalize: function (s) {
-        return s;
-      },
-      fold: function (s) {
-        return s;
-      },
-    };
-
     const fakeFeatures = {
       flagEnabled: sinon.stub().returns(true),
     };
@@ -59,8 +50,7 @@ describe('annotation threading', function () {
       .register('annotationsService', () => {})
       .register('viewFilter', viewFilterFactory)
       .register('features', { value: fakeFeatures })
-      .register('settings', { value: {} })
-      .register('unicode', { value: fakeUnicode });
+      .register('settings', { value: {} });
 
     store = container.get('store');
     rootThread = container.get('rootThread');

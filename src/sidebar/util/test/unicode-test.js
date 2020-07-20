@@ -1,9 +1,7 @@
-import unicodeFactory from '../unicode';
+import * as unicode from '../unicode';
 
-const unicode = unicodeFactory();
-
-describe('unicode', () => {
-  describe('#fold', () => {
+describe('sidebar/util/unicode', () => {
+  describe('fold', () => {
     it('removes hungarian marks', () => {
       const text = 'Fürge rőt róka túlszökik zsíros étkű kutyán';
       const decoded = unicode.fold(unicode.normalize(text));
