@@ -31,7 +31,7 @@ const SHORTCUT_KEYS = {
  * Apply a toolbar command to an editor input field.
  *
  * @param {string} command
- * @param {HTMLInputElement} inputEl
+ * @param {HTMLInputElement|HTMLTextAreaElement} inputEl
  */
 function handleToolbarCommand(command, inputEl) {
   const update = newStateFn => {
@@ -94,11 +94,24 @@ function handleToolbarCommand(command, inputEl) {
   }
 }
 
+/**
+ * @typedef ToolbarButtonProps
+ * @prop {Object} buttonRef
+ * @prop {boolean} [disabled]
+ * @prop {string} [iconName]
+ * @prop {string} [label]
+ * @prop {(e: MouseEvent) => void} onClick
+ * @prop {string} [shortcutKey]
+ * @prop {number} tabIndex
+ * @prop {string} [title]
+ */
+
+/** @param {ToolbarButtonProps} props */
 function ToolbarButton({
   buttonRef,
   disabled = false,
   iconName,
-  label = null,
+  label,
   onClick,
   shortcutKey,
   tabIndex,
@@ -147,9 +160,14 @@ ToolbarButton.propTypes = {
 };
 
 /**
- * @typedef {string} ButtonID
- * A unique string that can be one of one of:
- * [bold, italic, quote, link, image, math, numlist, list, preview, help]
+ * @typedef {'bold'|'italic'|'quote'|'link'|'image'|'math'|'numlist'|'list'|'preview'|'help'} ButtonID
+ */
+
+/**
+ * @typedef ToolbarProps
+ * @prop {boolean} [isPreviewing] - `true` if the editor's "Preview" mode is active.
+ * @prop {(a: ButtonID) => any} [onCommand] - Callback invoked with the selected command when a toolbar button is clicked.
+ * @prop {() => any} [onTogglePreview] - Callback invoked when the "Preview" toggle button is clicked.
  */
 
 /**
@@ -159,6 +177,8 @@ ToolbarButton.propTypes = {
  *
  * Canonical example
  * https://www.w3.org/TR/wai-aria-practices/examples/toolbar/toolbar.html
+ *
+ * @param {ToolbarProps} props
  */
 function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
   const buttonIds = {
@@ -247,8 +267,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
    * Each element should be set to -1 unless its the
    * active roving index, in which case it will be 0.
    *
-   * @param {ButtonID} id
-   * @return {number} index - An index from `buttonIds`
+   * @param {number} index - An index from `buttonIds`
+   * @return {number}
    */
   const getTabIndex = index => {
     if (rovingElement === index) {
@@ -364,18 +384,25 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
 }
 
 Toolbar.propTypes = {
-  /** `true` if the editor's "Preview" mode is active. */
   isPreviewing: propTypes.bool,
-
-  /** Callback invoked with the selected command when a toolbar button is clicked. */
   onCommand: propTypes.func,
-
-  /** Callback invoked when the "Preview" toggle button is clicked. */
   onTogglePreview: propTypes.func,
 };
 
 /**
+ * @typedef MarkdownEditorProps
+ * @prop {string} label - An accessible label for the input field.
+ * @prop {string} [text] - The markdown text to edit.
+ * @prop {(a?: Object<'text', string>) => void} [onEditText]
+ *   - Callback invoked with `{ text }` object when user edits text.
+ *   TODO: Simplify this callback to take just a string rather than an object once the
+ *   parent component is converted to Preact.
+ */
+
+/**
  * Viewer/editor for the body of an annotation in markdown format.
+ *
+ * @param {MarkdownEditorProps} props
  */
 export default function MarkdownEditor({
   label = '',
@@ -386,7 +413,7 @@ export default function MarkdownEditor({
   const [preview, setPreview] = useState(false);
 
   // The input element where the user inputs their comment.
-  const input = useRef(null);
+  const input = useRef(/** @type {HTMLTextAreaElement|null} */ (null));
 
   useEffect(() => {
     if (!preview) {
@@ -435,7 +462,11 @@ export default function MarkdownEditor({
           ref={input}
           onClick={e => e.stopPropagation()}
           onKeyDown={handleKeyDown}
-          onInput={e => onEditText({ text: e.target.value })}
+          onInput={e => {
+            onEditText({
+              text: /** @type {HTMLTextAreaElement} */ (e.target).value,
+            });
+          }}
           value={text}
         />
       )}
@@ -444,19 +475,7 @@ export default function MarkdownEditor({
 }
 
 MarkdownEditor.propTypes = {
-  /**
-   * An accessible label for the input field.
-   */
   label: propTypes.string.isRequired,
-
-  /** The markdown text to edit. */
   text: propTypes.string,
-
-  /**
-   * Callback invoked with `{ text }` object when user edits text.
-   *
-   * TODO: Simplify this callback to take just a string rather than an object
-   * once the parent component is converted to Preact.
-   */
   onEditText: propTypes.func,
 };

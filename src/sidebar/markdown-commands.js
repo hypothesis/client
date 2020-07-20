@@ -83,14 +83,10 @@ function replaceText(state, pos, length, text) {
  * Convert the selected text into a Markdown link.
  *
  * @param {EditorState} state - The current state of the input field.
- * @param {LinkType} linkType - The type of link to insert.
+ * @param {LinkType} [linkType] - The type of link to insert.
  * @return {EditorState} - The new state of the input field.
  */
-export function convertSelectionToLink(state, linkType) {
-  if (typeof linkType === 'undefined') {
-    linkType = LinkType.ANCHOR_LINK;
-  }
-
+export function convertSelectionToLink(state, linkType = LinkType.ANCHOR_LINK) {
   const selection = state.text.slice(state.selectionStart, state.selectionEnd);
 
   let linkPrefix = '';

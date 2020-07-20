@@ -17,7 +17,7 @@ export default function Button({
   icon = '',
   isExpanded,
   isPressed,
-  onClick = () => null,
+  onClick = () => {},
   style = {},
   title,
 }) {

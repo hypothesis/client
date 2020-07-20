@@ -5,8 +5,19 @@ import propTypes from 'prop-types';
 import { isThirdPartyUser } from '../util/account-id';
 import { withServices } from '../util/service-context';
 
+/** @typedef {import('../../types/api').Annotation} Annotation */
+
+/**
+ * @typedef TagListProps
+ * @prop {Annotation} annotation - Annotation that owns the tags.
+ * @prop {string[]} tags - List of tags as strings.
+ * @prop {(a: string, b: Object<'tag', string>) => any} [serviceUrl] - Services
+ * @prop {Object} [settings]
+ */
+
 /**
  * Component to render an annotation's tags.
+ * @param {TagListProps} props
  */
 function TagList({ annotation, serviceUrl, settings, tags }) {
   const renderLink = useMemo(
@@ -52,19 +63,9 @@ function TagList({ annotation, serviceUrl, settings, tags }) {
   );
 }
 
-/**
- * @typedef Tag
- * @param tag {string} - The tag text
- */
-
 TagList.propTypes = {
-  /* Annotation that owns the tags. */
   annotation: propTypes.object.isRequired,
-
-  /* List of tags as strings. */
   tags: propTypes.array.isRequired,
-
-  /** Services */
   serviceUrl: propTypes.func,
   settings: propTypes.object,
 };
