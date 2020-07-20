@@ -153,7 +153,7 @@ const update = {
   },
 
   CLEAR_ANNOTATIONS: function () {
-    return { annotations: [] };
+    return { annotations: [], focused: {}, highlighted: {} };
   },
 
   FOCUS_ANNOTATIONS: function (state, action) {
