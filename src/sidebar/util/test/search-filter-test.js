@@ -1,9 +1,7 @@
-import searchFilterFactory from '../search-filter';
+import * as searchFilter from '../search-filter';
 
-const searchFilter = searchFilterFactory();
-
-describe('sidebar.search-filter', () => {
-  describe('#toObject', () => {
+describe('sidebar/util/search-filter', () => {
+  describe('toObject', () => {
     it('puts a simple search string under the any filter', () => {
       const query = 'foo';
       const result = searchFilter.toObject(query);
@@ -74,7 +72,7 @@ describe('sidebar.search-filter', () => {
     });
   });
 
-  describe('#generateFacetedFilter', () => {
+  describe('generateFacetedFilter', () => {
     [
       {
         query: 'one two three',

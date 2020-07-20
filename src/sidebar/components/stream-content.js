@@ -2,6 +2,7 @@ import { createElement } from 'preact';
 import { useCallback, useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import * as searchFilter from '../util/search-filter';
 import { withServices } from '../util/service-context';
 import useStore from '../store/use-store';
 
@@ -10,12 +11,7 @@ import ThreadList from './thread-list';
 /**
  * The main content of the "stream" route (https://hypothes.is/stream)
  */
-function StreamContent({
-  api,
-  rootThread: rootThreadService,
-  searchFilter,
-  toastMessenger,
-}) {
+function StreamContent({ api, rootThread: rootThreadService, toastMessenger }) {
   const addAnnotations = useStore(store => store.addAnnotations);
   const annotationFetchStarted = useStore(
     store => store.annotationFetchStarted
@@ -52,13 +48,7 @@ function StreamContent({
         annotationFetchFinished();
       }
     },
-    [
-      addAnnotations,
-      annotationFetchStarted,
-      annotationFetchFinished,
-      api,
-      searchFilter,
-    ]
+    [addAnnotations, annotationFetchStarted, annotationFetchFinished, api]
   );
 
   // Update the stream when this route is initially displayed and whenever
@@ -89,15 +79,9 @@ StreamContent.propTypes = {
   // Injected services.
   api: propTypes.object,
   rootThread: propTypes.object,
-  searchFilter: propTypes.object,
   toastMessenger: propTypes.object,
 };
 
-StreamContent.injectedProps = [
-  'api',
-  'rootThread',
-  'searchFilter',
-  'toastMessenger',
-];
+StreamContent.injectedProps = ['api', 'rootThread', 'toastMessenger'];
 
 export default withServices(StreamContent);

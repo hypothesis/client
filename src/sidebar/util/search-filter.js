@@ -1,4 +1,12 @@
 /**
+ * Parse annotation filter queries into structured representations.
+ *
+ * Provides methods to parse Lucene-style queries ("foo tag: bar")
+ * into structured representations which are then used by other services to
+ * filter annotations displayed to the user or fetched from the API.
+ */
+
+/**
  * Splits a search term into filter and data.
  *
  * ie. 'user:johndoe' -> ['user', 'johndoe']
@@ -80,7 +88,7 @@ function tokenize(searchText) {
  * @param {string} searchText
  * @return {Object.<string,string[]>}
  */
-function toObject(searchText) {
+export function toObject(searchText) {
   /** @type {Object.<string,string[]>} */
   const obj = {};
   const backendFilter = f => (f === 'tag' ? 'tags' : f);
@@ -130,7 +138,7 @@ function toObject(searchText) {
  * @param {FocusFilter} focusFilters - Additional filter terms to mix in
  * @return {Object.<string,Facet>}
  */
-function generateFacetedFilter(searchText, focusFilters = {}) {
+export function generateFacetedFilter(searchText, focusFilters = {}) {
   let terms;
   const any = [];
   const quote = [];
@@ -219,20 +227,5 @@ function generateFacetedFilter(searchText, focusFilters = {}) {
       terms: user,
       operator: 'or',
     },
-  };
-}
-
-/**
- * Parse annotation filter queries into structured representations.
- *
- * Provides methods to parse Lucene-style queries ("foo tag: bar")
- * into structured representations which are then used by other services to
- * filter annotations displayed to the user or fetched from the API.
- */
-// @ngInject
-export default function searchFilter() {
-  return {
-    toObject,
-    generateFacetedFilter,
   };
 }

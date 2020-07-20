@@ -82,7 +82,6 @@ describe('rootThread', function () {
     rootThread = new Injector()
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('store', { value: fakeStore })
-      .register('searchFilter', { value: fakeSearchFilter })
       .register('settings', { value: fakeSettings })
       .register('viewFilter', { value: fakeViewFilter })
       .register('rootThread', rootThreadFactory)
@@ -92,6 +91,7 @@ describe('rootThread', function () {
   beforeEach(() => {
     $imports.$mock({
       '../build-thread': fakeBuildThread,
+      '../util/search-filter': fakeSearchFilter,
     });
   });
 
