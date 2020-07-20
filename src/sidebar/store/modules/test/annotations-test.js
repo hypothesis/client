@@ -459,4 +459,18 @@ describe('sidebar/store/modules/annotations', function () {
       });
     });
   });
+
+  describe('#annotationExists', () => {
+    it('returns false if annotation does not exist', () => {
+      const store = createTestStore();
+      assert.isFalse(store.annotationExists('foobar'));
+    });
+
+    it('returns true if annotation does exist', () => {
+      const store = createTestStore();
+      const annot = fixtures.defaultAnnotation();
+      store.addAnnotations([annot]);
+      assert.isTrue(store.annotationExists(annot.id));
+    });
+  });
 });

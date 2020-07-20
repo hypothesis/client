@@ -50,7 +50,7 @@ function updateProfile(profile) {
  * @param {object} state - The application state
  */
 function isLoggedIn(state) {
-  return state.session.profile.userid !== null;
+  return state.profile.userid !== null;
 }
 
 /**
@@ -61,7 +61,7 @@ function isLoggedIn(state) {
  *        name of the feature flag as declared in the Hypothesis service.
  */
 function isFeatureEnabled(state, feature) {
-  return !!state.session.profile.features[feature];
+  return !!state.profile.features[feature];
 }
 
 /**
@@ -70,7 +70,7 @@ function isFeatureEnabled(state, feature) {
  * logged-out user profile returned by the server.
  */
 function hasFetchedProfile(state) {
-  return state.session.profile !== initialProfile;
+  return state.profile !== initialProfile;
 }
 
 /**
@@ -82,7 +82,7 @@ function hasFetchedProfile(state) {
  * returned. This allows code to skip a null check.
  */
 function profile(state) {
-  return state.session.profile;
+  return state.profile;
 }
 
 export default {

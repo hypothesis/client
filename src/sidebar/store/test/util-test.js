@@ -15,23 +15,29 @@ const fixtures = {
   selectors: {
     namespace1: {
       selectors: {
-        countAnnotations1: function (state) {
-          return state.namespace1.annotations.length;
-        },
+        countAnnotations1: localState => localState.annotations.length,
+      },
+
+      rootSelectors: {
+        rootCountAnnotations1: rootState =>
+          rootState.namespace1.annotations.length,
       },
     },
     namespace2: {
       selectors: {
-        countAnnotations2: function (state) {
-          return state.namespace2.annotations.length;
-        },
+        countAnnotations2: localState => localState.annotations.length,
+      },
+
+      rootSelectors: {
+        rootCountAnnotations2: rootState =>
+          rootState.namespace2.annotations.length,
       },
     },
   },
 };
 
-describe('reducer utils', function () {
-  describe('#actionTypes', function () {
+describe('sidebar/store/util', function () {
+  describe('actionTypes', function () {
     it('returns an object with values equal to keys', function () {
       assert.deepEqual(
         util.actionTypes({
@@ -46,7 +52,7 @@ describe('reducer utils', function () {
     });
   });
 
-  describe('#createReducer', function () {
+  describe('createReducer', function () {
     it('returns an object if input state is undefined', function () {
       // See redux.js:assertReducerShape in the "redux" package.
       const reducer = util.createReducer(fixtures.update);
@@ -120,8 +126,8 @@ describe('reducer utils', function () {
     });
   });
 
-  describe('#bindSelectors', function () {
-    it('bound functions call original functions with current value of getState()', function () {
+  describe('bindSelectors', function () {
+    it('binds selectors to current value of module state', () => {
       const getState = sinon.stub().returns({
         namespace1: {
           annotations: [{ id: 1 }],
@@ -133,6 +139,20 @@ describe('reducer utils', function () {
       const bound = util.bindSelectors(fixtures.selectors, getState);
       assert.equal(bound.countAnnotations1(), 1);
       assert.equal(bound.countAnnotations2(), 1);
+    });
+
+    it('binds root selectors to current value of root state', () => {
+      const getState = sinon.stub().returns({
+        namespace1: {
+          annotations: [{ id: 1 }],
+        },
+        namespace2: {
+          annotations: [{ id: 2 }],
+        },
+      });
+      const bound = util.bindSelectors(fixtures.selectors, getState);
+      assert.equal(bound.rootCountAnnotations1(), 1);
+      assert.equal(bound.rootCountAnnotations2(), 1);
     });
   });
 });

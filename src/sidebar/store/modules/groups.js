@@ -104,10 +104,10 @@ function loadGroups(groups) {
  * @return {Group|undefined|null}
  */
 function focusedGroup(state) {
-  if (!state.groups.focusedGroupId) {
+  if (!state.focusedGroupId) {
     return null;
   }
-  return getGroup(state, state.groups.focusedGroupId);
+  return getGroup(state, state.focusedGroupId);
 }
 
 /**
@@ -116,7 +116,7 @@ function focusedGroup(state) {
  * @return {string|null}
  */
 function focusedGroupId(state) {
-  return state.groups.focusedGroupId;
+  return state.focusedGroupId;
 }
 
 /**
@@ -125,7 +125,7 @@ function focusedGroupId(state) {
  * @return {Group[]}
  */
 function allGroups(state) {
-  return state.groups.groups;
+  return state.groups;
 }
 
 /**
@@ -135,8 +135,32 @@ function allGroups(state) {
  * @return {Group|undefined}
  */
 function getGroup(state, id) {
-  return state.groups.groups.find(g => g.id === id);
+  return state.groups.find(g => g.id === id);
 }
+
+/**
+ * Return groups the user isn't a member of that are scoped to the URI.
+ *
+ * @return {Group[]}
+ */
+const getFeaturedGroups = createSelector(
+  state => state.groups,
+  groups => groups.filter(group => !group.isMember && group.isScopedToUri)
+);
+
+/**
+ * Return groups that are scoped to the uri. This is used to return the groups
+ * that show up in the old groups menu. This should be removed once the new groups
+ * menu is permanent.
+ *
+ * @return {Group[]}
+ */
+const getInScopeGroups = createSelector(
+  state => state.groups,
+  groups => groups.filter(g => g.isScopedToUri)
+);
+
+// Selectors that receive root state.
 
 /**
  * Return groups the logged in user is a member of.
@@ -145,7 +169,7 @@ function getGroup(state, id) {
  */
 const getMyGroups = createSelector(
   state => state.groups.groups,
-  session.selectors.isLoggedIn,
+  state => session.selectors.isLoggedIn(state.session),
   (groups, loggedIn) => {
     // If logged out, the Public group still has isMember set to true so only
     // return groups with membership in logged in state.
@@ -157,41 +181,19 @@ const getMyGroups = createSelector(
 );
 
 /**
- * Return groups the user isn't a member of that are scoped to the URI.
- *
- * @return {Group[]}
- */
-const getFeaturedGroups = createSelector(
-  state => state.groups.groups,
-  groups => groups.filter(group => !group.isMember && group.isScopedToUri)
-);
-
-/**
  * Return groups that don't show up in Featured and My Groups.
  *
  * @return {Group[]}
  */
 const getCurrentlyViewingGroups = createSelector(
-  allGroups,
-  getMyGroups,
-  getFeaturedGroups,
+  state => allGroups(state.groups),
+  state => getMyGroups(state),
+  state => getFeaturedGroups(state.groups),
   (allGroups, myGroups, featuredGroups) => {
     return allGroups.filter(
       g => !myGroups.includes(g) && !featuredGroups.includes(g)
     );
   }
-);
-
-/**
- * Return groups that are scoped to the uri. This is used to return the groups
- * that show up in the old groups menu. This should be removed once the new groups
- * menu is permanent.
- *
- * @return {Group[]}
- */
-const getInScopeGroups = createSelector(
-  state => state.groups.groups,
-  groups => groups.filter(g => g.isScopedToUri)
 );
 
 export default {
@@ -205,12 +207,14 @@ export default {
   },
   selectors: {
     allGroups,
-    getGroup,
-    getCurrentlyViewingGroups,
-    getFeaturedGroups,
-    getMyGroups,
-    getInScopeGroups,
     focusedGroup,
     focusedGroupId,
+    getFeaturedGroups,
+    getGroup,
+    getInScopeGroups,
+  },
+  rootSelectors: {
+    getCurrentlyViewingGroups,
+    getMyGroups,
   },
 };

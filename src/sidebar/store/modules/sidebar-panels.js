@@ -108,7 +108,7 @@ function toggleSidebarPanel(panelName, panelState) {
  * @return {Boolean} - `true` if `panelName` is the currently-active panel
  */
 function isSidebarPanelOpen(state, panelName) {
-  return state.sidebarPanels.activePanelName === panelName;
+  return state.activePanelName === panelName;
 }
 
 export default {
