@@ -1,13 +1,13 @@
-import ViewFilter, { $imports } from '../view-filter';
+import viewFilter, { $imports } from '../view-filter';
 
 function isoDateWithAge(age) {
   return new Date(Date.now() - age * 1000).toISOString();
 }
 
 const poem = {
-  tiger: `Tiger! Tiger! burning bright
-          In the forest of the night
-          When immortal  hand  or eye
+  tiger: `Tyger Tyger, burning bright
+          In the forest of the night;
+          What immortal  hand  or eye,
           Could frame thy fearful symmetry?`,
   raven: `Once upon a midnight dreary, when I pondered, weak and weary,
           Over many a quaint and curious volume of forgotten lore-
@@ -17,8 +17,7 @@ const poem = {
           Only this and nothing more.”`,
 };
 
-describe('sidebar/services/view-filter', () => {
-  let viewFilter;
+describe('sidebar/util/view-filter', () => {
   let fakeUnicode;
 
   beforeEach(() => {
@@ -26,10 +25,9 @@ describe('sidebar/services/view-filter', () => {
       fold: sinon.stub().returnsArg(0),
       normalize: sinon.stub().returnsArg(0),
     };
-    viewFilter = new ViewFilter(fakeUnicode);
 
     $imports.$mock({
-      '../util/unicode': fakeUnicode,
+      './unicode': fakeUnicode,
     });
   });
 
@@ -43,7 +41,7 @@ describe('sidebar/services/view-filter', () => {
         text: { terms: ['Tiger'], operator: 'and' },
       };
 
-      viewFilter.filter([], filters);
+      viewFilter([], filters);
 
       assert.calledWith(fakeUnicode.fold, 'Tiger');
     });
@@ -61,20 +59,20 @@ describe('sidebar/services/view-filter', () => {
 
     it('requires all terms to match for "and" operator', () => {
       const filters = {
-        text: { terms: ['Tiger', 'burning', 'bright'], operator: 'and' },
+        text: { terms: ['Tyger', 'burning', 'bright'], operator: 'and' },
       };
 
-      const result = viewFilter.filter(annotations, filters);
+      const result = viewFilter(annotations, filters);
 
       assert.deepEqual(result, [1]);
     });
 
     it('requires at least one term to match for "or" operator', () => {
       const filters = {
-        text: { terms: ['Tiger', 'quaint'], operator: 'or' },
+        text: { terms: ['Tyger', 'quaint'], operator: 'or' },
       };
 
-      const result = viewFilter.filter(annotations, filters);
+      const result = viewFilter(annotations, filters);
 
       assert.equal(result.length, 2);
     });
@@ -85,12 +83,12 @@ describe('sidebar/services/view-filter', () => {
       const annotations = [
         { id: 1, text: poem.tiger, target: [{}] },
         { id: 4, user: 'lion', target: [{}] },
-        { id: 2, user: 'Tiger', target: [{}] },
-        { id: 3, tags: ['Tiger'], target: [{}] },
+        { id: 2, user: 'Tyger', target: [{}] },
+        { id: 3, tags: ['Tyger'], target: [{}] },
       ];
-      const filters = { any: { terms: ['Tiger'], operator: 'and' } };
+      const filters = { any: { terms: ['Tyger'], operator: 'and' } };
 
-      const result = viewFilter.filter(annotations, filters);
+      const result = viewFilter(annotations, filters);
 
       assert.equal(result.length, 3);
     });
@@ -104,13 +102,13 @@ describe('sidebar/services/view-filter', () => {
             selector: [
               {
                 type: 'TextQuoteSelector',
-                exact: 'The Tiger by William Blake',
+                exact: 'The Tyger by William Blake',
               },
             ],
           },
         ],
         user: 'acct:poe@edgar.com',
-        tags: ['poem', 'Blake', 'Tiger'],
+        tags: ['poem', 'Blake', 'Tyger'],
       };
 
       // A query which matches the combined fields from the annotation, but not
@@ -122,7 +120,7 @@ describe('sidebar/services/view-filter', () => {
         },
       };
 
-      const result = viewFilter.filter([annotation], filters);
+      const result = viewFilter([annotation], filters);
 
       assert.equal(result.length, 1);
     });
@@ -136,7 +134,7 @@ describe('sidebar/services/view-filter', () => {
       };
       const filters = { uri: { terms: ['publisher'], operator: 'or' } };
 
-      const result = viewFilter.filter([annotation], filters);
+      const result = viewFilter([annotation], filters);
 
       assert.deepEqual(result, [1]);
     });
@@ -165,7 +163,7 @@ describe('sidebar/services/view-filter', () => {
         annotationWithUser('jamesdean'),
         annotationWithUser('johnjones'),
       ];
-      const result = viewFilter.filter(anns, userQuery('john'));
+      const result = viewFilter(anns, userQuery('john'));
 
       assert.deepEqual(result, [anns[0].id, anns[2].id]);
     });
@@ -184,14 +182,14 @@ describe('sidebar/services/view-filter', () => {
         // Annotation with no extended user info.
         { id: 100, user: 'acct:jim@example.com' },
       ];
-      const result = viewFilter.filter(anns, userQuery('james'));
+      const result = viewFilter(anns, userQuery('james'));
 
       assert.deepEqual(result, [anns[1].id, anns[2].id, anns[3].id]);
     });
 
     it('ignores display name if not set', () => {
       const anns = [annotationWithUser('msmith')];
-      const result = viewFilter.filter(anns, userQuery('null'));
+      const result = viewFilter(anns, userQuery('null'));
       assert.deepEqual(result, []);
     });
   });
@@ -207,7 +205,7 @@ describe('sidebar/services/view-filter', () => {
         since: { terms: [100], operator: 'and' },
       };
 
-      const result = viewFilter.filter([annotation], filters);
+      const result = viewFilter([annotation], filters);
 
       assert.deepEqual(result, [1]);
     });
@@ -222,7 +220,7 @@ describe('sidebar/services/view-filter', () => {
         since: { terms: [100], operator: 'and' },
       };
 
-      const result = viewFilter.filter([annotation], filters);
+      const result = viewFilter([annotation], filters);
 
       assert.deepEqual(result, []);
     });
@@ -245,7 +243,7 @@ describe('sidebar/services/view-filter', () => {
       },
     };
 
-    const result = viewFilter.filter([annotation], filters);
+    const result = viewFilter([annotation], filters);
 
     assert.deepEqual(result, [1]);
   });
@@ -262,7 +260,7 @@ describe('sidebar/services/view-filter', () => {
       },
     };
 
-    const result = viewFilter.filter([annotation], filters);
+    const result = viewFilter([annotation], filters);
 
     assert.deepEqual(result, []);
   });
