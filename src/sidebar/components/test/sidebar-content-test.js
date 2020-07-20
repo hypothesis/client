@@ -10,7 +10,7 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('SidebarContent', () => {
   let fakeFrameSync;
   let fakeLoadAnnotationsService;
-  let fakeRootThreadService;
+  let fakeUseRootThread;
   let fakeStore;
   let fakeStreamer;
   let fakeTabsUtil;
@@ -22,7 +22,6 @@ describe('SidebarContent', () => {
         onSignUp={() => null}
         frameSync={fakeFrameSync}
         loadAnnotationsService={fakeLoadAnnotationsService}
-        rootThread={fakeRootThreadService}
         streamer={fakeStreamer}
         {...props}
       />
@@ -36,9 +35,7 @@ describe('SidebarContent', () => {
     fakeLoadAnnotationsService = {
       load: sinon.stub(),
     };
-    fakeRootThreadService = {
-      thread: sinon.stub().returns({}),
-    };
+    fakeUseRootThread = sinon.stub().returns({});
     fakeStreamer = {
       connect: sinon.stub(),
     };
@@ -69,6 +66,7 @@ describe('SidebarContent', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      './hooks/use-root-thread': fakeUseRootThread,
       '../store/use-store': callback => callback(fakeStore),
       '../util/tabs': fakeTabsUtil,
     });

@@ -4,6 +4,7 @@ import propTypes from 'prop-types';
 
 import * as searchFilter from '../util/search-filter';
 import { withServices } from '../util/service-context';
+import useRootThread from './hooks/use-root-thread';
 import useStore from '../store/use-store';
 
 import ThreadList from './thread-list';
@@ -11,7 +12,7 @@ import ThreadList from './thread-list';
 /**
  * The main content of the "stream" route (https://hypothes.is/stream)
  */
-function StreamContent({ api, rootThread: rootThreadService, toastMessenger }) {
+function StreamContent({ api, toastMessenger }) {
   const addAnnotations = useStore(store => store.addAnnotations);
   const annotationFetchStarted = useStore(
     store => store.annotationFetchStarted
@@ -68,9 +69,7 @@ function StreamContent({ api, rootThread: rootThreadService, toastMessenger }) {
     toastMessenger,
   ]);
 
-  const rootThread = useStore(store =>
-    rootThreadService.thread(store.getState())
-  );
+  const rootThread = useRootThread();
 
   return <ThreadList thread={rootThread} />;
 }
@@ -78,10 +77,9 @@ function StreamContent({ api, rootThread: rootThreadService, toastMessenger }) {
 StreamContent.propTypes = {
   // Injected services.
   api: propTypes.object,
-  rootThread: propTypes.object,
   toastMessenger: propTypes.object,
 };
 
-StreamContent.injectedProps = ['api', 'rootThread', 'toastMessenger'];
+StreamContent.injectedProps = ['api', 'toastMessenger'];
 
 export default withServices(StreamContent);

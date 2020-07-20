@@ -4,6 +4,7 @@ import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
+import useRootThread from './hooks/use-root-thread';
 
 import ThreadList from './thread-list';
 import SidebarContentError from './sidebar-content-error';
@@ -11,17 +12,11 @@ import SidebarContentError from './sidebar-content-error';
 /**
  * The main content for the single annotation page (aka. https://hypothes.is/a/<annotation ID>)
  */
-function AnnotationViewerContent({
-  loadAnnotationsService,
-  onLogin,
-  rootThread: rootThreadService,
-}) {
+function AnnotationViewerContent({ loadAnnotationsService, onLogin }) {
   const annotationId = useStore(store => store.routeParams().id);
   const clearAnnotations = useStore(store => store.clearAnnotations);
   const highlightAnnotations = useStore(store => store.highlightAnnotations);
-  const rootThread = useStore(store =>
-    rootThreadService.thread(store.getState())
-  );
+  const rootThread = useRootThread();
   const setExpanded = useStore(store => store.setExpanded);
   const userid = useStore(store => store.profile().userid);
 
@@ -100,12 +95,8 @@ AnnotationViewerContent.propTypes = {
 
   // Injected.
   loadAnnotationsService: propTypes.object,
-  rootThread: propTypes.object,
 };
 
-AnnotationViewerContent.injectedProps = [
-  'loadAnnotationsService',
-  'rootThread',
-];
+AnnotationViewerContent.injectedProps = ['loadAnnotationsService'];
 
 export default withServices(AnnotationViewerContent);

@@ -2,6 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 import { useEffect, useRef } from 'preact/hooks';
 
+import useRootThread from './hooks/use-root-thread';
 import { withServices } from '../util/service-context';
 import useStore from '../store/use-store';
 import { tabForAnnotation } from '../util/tabs';
@@ -22,12 +23,9 @@ function SidebarContent({
   onLogin,
   onSignUp,
   loadAnnotationsService,
-  rootThread: rootThreadService,
   streamer,
 }) {
-  const rootThread = useStore(store =>
-    rootThreadService.thread(store.getState())
-  );
+  const rootThread = useRootThread();
 
   // Store state values
   const focusedGroupId = useStore(store => store.focusedGroupId());
@@ -153,14 +151,12 @@ SidebarContent.propTypes = {
   // Injected
   frameSync: propTypes.object,
   loadAnnotationsService: propTypes.object,
-  rootThread: propTypes.object,
   streamer: propTypes.object,
 };
 
 SidebarContent.injectedProps = [
   'frameSync',
   'loadAnnotationsService',
-  'rootThread',
   'streamer',
 ];
 

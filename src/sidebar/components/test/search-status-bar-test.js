@@ -8,17 +8,15 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('SearchStatusBar', () => {
-  let fakeRootThread;
+  let fakeUseRootThread;
   let fakeStore;
 
   function createComponent(props) {
-    return mount(<SearchStatusBar rootThread={fakeRootThread} {...props} />);
+    return mount(<SearchStatusBar {...props} />);
   }
 
   beforeEach(() => {
-    fakeRootThread = {
-      thread: sinon.stub().returns({ children: [] }),
-    };
+    fakeUseRootThread = sinon.stub().returns({ children: [] });
     fakeStore = {
       getState: sinon.stub().returns({
         selection: {},
@@ -32,6 +30,7 @@ describe('SearchStatusBar', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      './hooks/use-root-thread': fakeUseRootThread,
       '../store/use-store': callback => callback(fakeStore),
     });
   });
@@ -105,7 +104,7 @@ describe('SearchStatusBar', () => {
       },
     ].forEach(test => {
       it(test.description, () => {
-        fakeRootThread.thread.returns({
+        fakeUseRootThread.returns({
           children: test.children,
         });
 
@@ -156,7 +155,7 @@ describe('SearchStatusBar', () => {
       },
     ].forEach(test => {
       it(test.description, () => {
-        fakeRootThread.thread.returns({
+        fakeUseRootThread.returns({
           children: test.children,
         });
         const wrapper = createComponent({});
@@ -169,7 +168,7 @@ describe('SearchStatusBar', () => {
     });
 
     it('should not display user-focused mode text if filtered mode is (also) applied', () => {
-      fakeRootThread.thread.returns({
+      fakeUseRootThread.returns({
         children: [
           { id: '1', visible: true, children: [] },
           { id: '2', visible: true, children: [] },
