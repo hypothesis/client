@@ -1,4 +1,4 @@
-import ViewFilter from '../view-filter';
+import ViewFilter, { $imports } from '../view-filter';
 
 function isoDateWithAge(age) {
   return new Date(Date.now() - age * 1000).toISOString();
@@ -27,6 +27,14 @@ describe('sidebar/services/view-filter', () => {
       normalize: sinon.stub().returnsArg(0),
     };
     viewFilter = new ViewFilter(fakeUnicode);
+
+    $imports.$mock({
+      '../util/unicode': fakeUnicode,
+    });
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   describe('#filter', () => {

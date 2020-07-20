@@ -130,7 +130,6 @@ import streamerService from './services/streamer';
 import tagsService from './services/tags';
 import threadsService from './services/threads';
 import toastMessenger from './services/toast-messenger';
-import unicodeService from './services/unicode';
 import viewFilterService from './services/view-filter';
 
 // Redux store.
@@ -167,7 +166,6 @@ function startApp(config) {
     .register('tags', tagsService)
     .register('threadsService', threadsService)
     .register('toastMessenger', toastMessenger)
-    .register('unicode', unicodeService)
     .register('viewFilter', viewFilterService)
     .register('store', store);
 

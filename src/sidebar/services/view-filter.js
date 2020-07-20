@@ -3,6 +3,7 @@
  */
 
 import { quote } from '../util/annotation-metadata';
+import * as unicodeUtils from '../util/unicode';
 
 // Prevent Babel inserting helper code after `@ngInject` comment below which
 // breaks browserify-ngannotate.
@@ -35,8 +36,8 @@ function displayName(ann) {
  * against the parsed query by the `filter` method of this class. Annotations
  * which do not match the filter are then hidden.
  */
-// @ngInject
-export default function ViewFilter(unicode) {
+
+export default function ViewFilter() {
   /**
    * Normalize a field value or query term for comparison.
    */
@@ -44,7 +45,7 @@ export default function ViewFilter(unicode) {
     if (typeof val !== 'string') {
       return val;
     }
-    return unicode.fold(unicode.normalize(val)).toLowerCase();
+    return unicodeUtils.fold(unicodeUtils.normalize(val)).toLowerCase();
   }
 
   /**
