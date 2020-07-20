@@ -4,14 +4,13 @@ import createStore from '../../create-store';
 import annotations from '../annotations';
 import route from '../route';
 
-const { actions, selectors } = annotations;
-
 function createTestStore() {
   return createStore([annotations, route], [{}]);
 }
 
-// Tests for most of the functionality in reducers/annotations.js are currently
-// in the tests for the whole Redux store
+// Tests for some of the functionality in this store module are currently in
+// still in `sidebar/store/test/index-test.js`. These tests should be migrated
+// here in future.
 
 describe('sidebar/store/modules/annotations', function () {
   describe('#addAnnotations()', function () {
@@ -214,26 +213,20 @@ describe('sidebar/store/modules/annotations', function () {
   describe('#isWaitingToAnchorAnnotations', () => {
     it('returns true if there are unanchored annotations', () => {
       const unanchored = Object.assign(fixtures.oldAnnotation(), {
-        $orphan: 'undefined',
+        $orphan: undefined,
       });
-      const state = {
-        annotations: {
-          annotations: [unanchored, fixtures.defaultAnnotation()],
-        },
-      };
-      assert.isTrue(selectors.isWaitingToAnchorAnnotations(state));
+      const store = createTestStore();
+      store.addAnnotations([unanchored]);
+      assert.isTrue(store.isWaitingToAnchorAnnotations());
     });
 
     it('returns false if all annotations are anchored', () => {
-      const state = {
-        annotations: {
-          annotations: [
-            Object.assign(fixtures.oldPageNote(), { $orphan: false }),
-            Object.assign(fixtures.defaultAnnotation(), { $orphan: false }),
-          ],
-        },
-      };
-      assert.isFalse(selectors.isWaitingToAnchorAnnotations(state));
+      const store = createTestStore();
+      store.addAnnotations([
+        Object.assign(fixtures.oldPageNote(), { $orphan: false }),
+        Object.assign(fixtures.defaultAnnotation(), { $orphan: false }),
+      ]);
+      assert.isFalse(store.isWaitingToAnchorAnnotations());
     });
   });
 
@@ -263,11 +256,9 @@ describe('sidebar/store/modules/annotations', function () {
       },
     ].forEach(testCase => {
       it('returns number of unsaved, new annotations', () => {
-        const state = { annotations: { annotations: testCase.annotations } };
-        assert.lengthOf(
-          selectors.newAnnotations(state),
-          testCase.expectedLength
-        );
+        const store = createTestStore();
+        store.addAnnotations(testCase.annotations);
+        assert.lengthOf(store.newAnnotations(), testCase.expectedLength);
       });
     });
   });
@@ -296,95 +287,79 @@ describe('sidebar/store/modules/annotations', function () {
       },
     ].forEach(testCase => {
       it('returns number of unsaved, new highlights', () => {
-        const state = { annotations: { annotations: testCase.annotations } };
-        assert.lengthOf(
-          selectors.newHighlights(state),
-          testCase.expectedLength
-        );
+        const store = createTestStore();
+        store.addAnnotations(testCase.annotations);
+        assert.lengthOf(store.newHighlights(), testCase.expectedLength);
       });
     });
   });
 
   describe('noteCount', () => {
     it('returns number of page notes', () => {
-      const state = {
-        annotations: {
-          annotations: [
-            fixtures.oldPageNote(),
-            fixtures.oldAnnotation(),
-            fixtures.defaultAnnotation(),
-          ],
-        },
-      };
-      assert.deepEqual(selectors.noteCount(state), 1);
+      const store = createTestStore();
+      store.addAnnotations([
+        fixtures.oldPageNote(),
+        fixtures.oldAnnotation(),
+        fixtures.defaultAnnotation(),
+      ]);
+      assert.deepEqual(store.noteCount(), 1);
     });
   });
 
   describe('annotationCount', () => {
     it('returns number of annotations', () => {
-      const state = {
-        annotations: {
-          annotations: [
-            fixtures.oldPageNote(),
-            fixtures.oldAnnotation(),
-            fixtures.defaultAnnotation(),
-          ],
-        },
-      };
-      assert.deepEqual(selectors.annotationCount(state), 2);
+      const store = createTestStore();
+      store.addAnnotations([
+        fixtures.oldPageNote(),
+        fixtures.oldAnnotation(),
+        fixtures.defaultAnnotation(),
+      ]);
+      assert.deepEqual(store.annotationCount(), 2);
     });
   });
 
   describe('orphanCount', () => {
     it('returns number of orphaned annotations', () => {
       const orphan = Object.assign(fixtures.oldAnnotation(), { $orphan: true });
-      const state = {
-        annotations: {
-          annotations: [
-            orphan,
-            fixtures.oldAnnotation(),
-            fixtures.defaultAnnotation(),
-          ],
-        },
-      };
-      assert.deepEqual(selectors.orphanCount(state), 1);
+      const store = createTestStore();
+      store.addAnnotations([
+        orphan,
+        fixtures.oldAnnotation(),
+        fixtures.defaultAnnotation(),
+      ]);
+      assert.deepEqual(store.orphanCount(), 1);
     });
   });
 
   describe('#savedAnnotations', function () {
-    const savedAnnotations = selectors.savedAnnotations;
-
     it('returns annotations which are saved', function () {
-      const state = {
-        annotations: {
-          annotations: [fixtures.newAnnotation(), fixtures.defaultAnnotation()],
-        },
-      };
-      assert.deepEqual(savedAnnotations(state), [fixtures.defaultAnnotation()]);
+      const store = createTestStore();
+      store.addAnnotations([
+        fixtures.newAnnotation(),
+        fixtures.defaultAnnotation(),
+      ]);
+
+      // `assert.match` is used here to ignore internal properties added by
+      // `store.addAnnotations`.
+      assert.match(store.savedAnnotations(), [
+        sinon.match(fixtures.defaultAnnotation()),
+      ]);
     });
   });
 
   describe('#findIDsForTags', function () {
-    const findIDsForTags = selectors.findIDsForTags;
-
     it('returns the IDs corresponding to the provided local tags', function () {
+      const store = createTestStore();
       const ann = fixtures.defaultAnnotation();
-      const state = {
-        annotations: {
-          annotations: [Object.assign(ann, { $tag: 't1' })],
-        },
-      };
-      assert.deepEqual(findIDsForTags(state, ['t1']), [ann.id]);
+      store.addAnnotations([Object.assign(ann, { $tag: 't1' })]);
+      assert.deepEqual(store.findIDsForTags(['t1']), [ann.id]);
     });
 
     it('does not return IDs for annotations that do not have an ID', function () {
+      const store = createTestStore();
       const ann = fixtures.newAnnotation();
-      const state = {
-        annotations: {
-          annotations: [Object.assign(ann, { $tag: 't1' })],
-        },
-      };
-      assert.deepEqual(findIDsForTags(state, ['t1']), []);
+      store.addAnnotations([Object.assign(ann, { $tag: 't1' })]);
+      assert.deepEqual(store.findIDsForTags(['t1']), []);
     });
   });
 
@@ -393,10 +368,10 @@ describe('sidebar/store/modules/annotations', function () {
       const store = createTestStore();
       const ann = fixtures.moderatedAnnotation({ hidden: false });
 
-      store.dispatch(actions.addAnnotations([ann]));
-      store.dispatch(actions.hideAnnotation(ann.id));
+      store.addAnnotations([ann]);
+      store.hideAnnotation(ann.id);
 
-      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+      const storeAnn = store.findAnnotationByID(ann.id);
       assert.equal(storeAnn.hidden, true);
     });
   });
@@ -406,10 +381,10 @@ describe('sidebar/store/modules/annotations', function () {
       const store = createTestStore();
       const ann = fixtures.moderatedAnnotation({ hidden: true });
 
-      store.dispatch(actions.addAnnotations([ann]));
-      store.dispatch(actions.unhideAnnotation(ann.id));
+      store.addAnnotations([ann]);
+      store.unhideAnnotation(ann.id);
 
-      const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+      const storeAnn = store.findAnnotationByID(ann.id);
       assert.equal(storeAnn.hidden, false);
     });
   });
@@ -418,8 +393,8 @@ describe('sidebar/store/modules/annotations', function () {
     it('removes the annotation', function () {
       const store = createTestStore();
       const ann = fixtures.defaultAnnotation();
-      store.dispatch(actions.addAnnotations([ann]));
-      store.dispatch(actions.removeAnnotations([ann]));
+      store.addAnnotations([ann]);
+      store.removeAnnotations([ann]);
       assert.equal(store.getState().annotations.annotations.length, 0);
     });
   });
@@ -475,10 +450,10 @@ describe('sidebar/store/modules/annotations', function () {
         ann.flagged = testCase.wasFlagged;
         ann.moderation = testCase.oldModeration;
 
-        store.dispatch(actions.addAnnotations([ann]));
-        store.dispatch(actions.updateFlagStatus(ann.id, testCase.nowFlagged));
+        store.addAnnotations([ann]);
+        store.updateFlagStatus(ann.id, testCase.nowFlagged);
 
-        const storeAnn = selectors.findAnnotationByID(store.getState(), ann.id);
+        const storeAnn = store.findAnnotationByID(ann.id);
         assert.equal(storeAnn.flagged, testCase.nowFlagged);
         assert.deepEqual(storeAnn.moderation, testCase.newModeration);
       });
