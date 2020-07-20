@@ -1,6 +1,7 @@
 import buildThread from '../build-thread';
 import * as metadata from '../util/annotation-metadata';
 import memoize from '../util/memoize';
+import { generateFacetedFilter } from '../util/search-filter';
 import * as tabs from '../util/tabs';
 
 // Mapping from sort order name to a less-than predicate
@@ -30,12 +31,7 @@ const sortFns = {
  * The root thread is then displayed by viewer.html
  */
 // @ngInject
-export default function RootThread(
-  annotationsService,
-  store,
-  searchFilter,
-  viewFilter
-) {
+export default function RootThread(annotationsService, store, viewFilter) {
   /**
    * Build the root conversation thread from the given UI state.
    *
@@ -57,13 +53,10 @@ export default function RootThread(
     };
 
     if (shouldFilterThread()) {
-      const filters = searchFilter.generateFacetedFilter(
-        state.selection.filterQuery,
-        {
-          // if a focus mode is applied (focused) and we're focusing on a user
-          user: store.focusModeUserFilter(),
-        }
-      );
+      const filters = generateFacetedFilter(state.selection.filterQuery, {
+        // if a focus mode is applied (focused) and we're focusing on a user
+        user: store.focusModeUserFilter(),
+      });
 
       options.filterFn = function (annot) {
         return viewFilter.filter([annot], filters).length > 0;

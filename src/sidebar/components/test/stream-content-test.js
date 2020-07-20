@@ -43,6 +43,7 @@ describe('StreamContent', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': callback => callback(fakeStore),
+      '../util/search-filter': fakeSearchFilter,
     });
   });
 
@@ -55,7 +56,6 @@ describe('StreamContent', () => {
       <StreamContent
         api={fakeApi}
         rootThread={fakeRootThread}
-        searchFilter={fakeSearchFilter}
         toastMessenger={fakeToastMessenger}
       />
     );

@@ -1,7 +1,6 @@
 import { Injector } from '../../../shared/injector';
 
 import rootThreadFactory from '../../services/root-thread';
-import searchFilterFactory from '../../services/search-filter';
 import viewFilterFactory from '../../services/view-filter';
 import storeFactory from '../../store';
 import immutable from '../../util/immutable';
@@ -46,7 +45,6 @@ describe('annotation threading', function () {
     const container = new Injector()
       .register('store', storeFactory)
       .register('rootThread', rootThreadFactory)
-      .register('searchFilter', searchFilterFactory)
       .register('annotationsService', () => {})
       .register('viewFilter', viewFilterFactory)
       .register('features', { value: fakeFeatures })

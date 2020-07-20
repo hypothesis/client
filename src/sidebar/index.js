@@ -122,7 +122,6 @@ import localStorageService from './services/local-storage';
 import persistedDefaultsService from './services/persisted-defaults';
 import rootThreadService from './services/root-thread';
 import routerService from './services/router';
-import searchFilterService from './services/search-filter';
 import serviceUrlService from './services/service-url';
 import sessionService from './services/session';
 import streamFilterService from './services/stream-filter';
@@ -158,7 +157,6 @@ function startApp(config) {
     .register('persistedDefaults', persistedDefaultsService)
     .register('rootThread', rootThreadService)
     .register('router', routerService)
-    .register('searchFilter', searchFilterService)
     .register('serviceUrl', serviceUrlService)
     .register('session', sessionService)
     .register('streamer', streamerService)
