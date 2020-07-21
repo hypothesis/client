@@ -154,5 +154,37 @@ describe('sidebar/store/util', function () {
       assert.equal(bound.rootCountAnnotations1(), 1);
       assert.equal(bound.rootCountAnnotations2(), 1);
     });
+
+    it('throws an error if selector names in different modules conflict', () => {
+      const getState = () => ({});
+      assert.throws(() => {
+        util.bindSelectors(
+          {
+            moduleA: {
+              selectors: { someSelector: () => {} },
+            },
+            moduleB: {
+              selectors: { someSelector: () => {} },
+            },
+          },
+          getState
+        );
+      }, 'Duplicate selector "someSelector"');
+    });
+
+    it('throws an error if selector names in different modules conflict', () => {
+      const getState = () => ({});
+      assert.throws(() => {
+        util.bindSelectors(
+          {
+            moduleA: {
+              selectors: { someSelector: () => {} },
+              rootSelectors: { someSelector: () => {} },
+            },
+          },
+          getState
+        );
+      });
+    });
   });
 });

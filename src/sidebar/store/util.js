@@ -49,11 +49,17 @@ export function bindSelectors(namespaces, getState) {
     const { selectors, rootSelectors = {} } = namespaces[namespace];
 
     Object.keys(selectors).forEach(selector => {
+      if (boundSelectors[selector]) {
+        throw new Error(`Duplicate selector "${selector}"`);
+      }
       boundSelectors[selector] = (...args) =>
         selectors[selector](getState()[namespace], ...args);
     });
 
     Object.keys(rootSelectors).forEach(selector => {
+      if (boundSelectors[selector]) {
+        throw new Error(`Duplicate selector "${selector}"`);
+      }
       boundSelectors[selector] = (...args) =>
         rootSelectors[selector](getState(), ...args);
     });
