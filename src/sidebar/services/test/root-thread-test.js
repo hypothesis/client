@@ -22,7 +22,7 @@ describe('rootThread', function () {
   let fakeSearchFilter;
   let fakeSettings;
   let fakeStore;
-  let fakeViewFilter;
+  let fakeFilterAnnotations;
 
   let rootThread;
 
@@ -71,7 +71,7 @@ describe('rootThread', function () {
 
     fakeSettings = {};
 
-    fakeViewFilter = sinon.stub();
+    fakeFilterAnnotations = sinon.stub();
 
     rootThread = new Injector()
       .register('store', { value: fakeStore })
@@ -84,7 +84,7 @@ describe('rootThread', function () {
     $imports.$mock({
       '../util/build-thread': fakeBuildThread,
       '../util/search-filter': fakeSearchFilter,
-      '../util/view-filter': fakeViewFilter,
+      '../util/view-filter': fakeFilterAnnotations,
     });
   });
 
@@ -287,9 +287,13 @@ describe('rootThread', function () {
       rootThread.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 
-      fakeViewFilter.returns([annotation]);
+      fakeFilterAnnotations.returns([annotation]);
       assert.isTrue(filterFn(annotation));
-      assert.calledWith(fakeViewFilter, sinon.match([annotation]), filters);
+      assert.calledWith(
+        fakeFilterAnnotations,
+        sinon.match([annotation]),
+        filters
+      );
     });
   });
 
@@ -303,9 +307,13 @@ describe('rootThread', function () {
       rootThread.thread(fakeStore.state);
       const filterFn = fakeBuildThread.args[0][1].filterFn;
 
-      fakeViewFilter.returns([annotation]);
+      fakeFilterAnnotations.returns([annotation]);
       assert.isTrue(filterFn(annotation));
-      assert.calledWith(fakeViewFilter, sinon.match([annotation]), filters);
+      assert.calledWith(
+        fakeFilterAnnotations,
+        sinon.match([annotation]),
+        filters
+      );
     });
   });
 });
