@@ -1,17 +1,14 @@
-import { useService } from '../../util/service-context';
 import useStore from '../../store/use-store';
+import thread from '../../util/root-thread';
+
+/** @typedef {import('../../util/build-thread').Thread} Thread */
 
 /**
  * Gather together state relevant to building a root thread of annotations and
  * replies and return an updated root thread when changes occur.
+ *
+ * @return {Thread}
  */
 export default function useRootThread() {
-  const rootThreadService = useService('rootThread');
-  // Use a to-be-written selector to get relevant selection state, e.g.
-  // filters and forced-visible annotations, etc.
-  // const selectionState = useStore(store => store.getSelectionState());
-  // const route = useStore(store => store.routeName());
-  // const annotations = useStore(store => store.annotations());
-  // return useMemo(() => rootThreadService.buildRootThread(annotations, selectionState, route), [annotations, selectionState, route]);
-  return useStore(store => rootThreadService.thread(store.getState()));
+  return useStore(store => thread(store.threadState()));
 }

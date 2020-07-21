@@ -4,6 +4,10 @@
  */
 
 /**
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ */
+
+/**
  * @typedef User
  * @prop {string} [userid]
  * @prop {string} [username]
@@ -29,6 +33,20 @@
 /**
  * @typedef FocusConfig
  * @prop {User} user
+ */
+
+/**
+ * @typedef ThreadState
+ * @prop {Annotation[]} annotations
+ * @prop {Object} selection
+ *   @prop {Object<string,boolean>} selection.expanded
+ *   @prop {string|null} selection.filterQuery
+ *   @prop {Object<string,string>} selection.filters
+ *   @prop {string[]} selection.forcedVisible
+ *   @prop {string[]} selection.selected
+ *   @prop {string} selection.sortKey
+ *   @prop {'annotation'|'note'|'orphan'} selection.selectedTab
+ * @prop {string} route
  */
 
 import { createSelector } from 'reselect';
@@ -173,7 +191,9 @@ const update = {
   },
 
   SET_EXPANDED: function (state, action) {
-    return { expanded: { ...state.expanded, [action.id]: action.expanded } };
+    const newExpanded = { ...state.expanded };
+    newExpanded[action.id] = action.expanded;
+    return { expanded: newExpanded };
   },
 
   SET_FILTER_QUERY: function (state, action) {
@@ -506,6 +526,35 @@ function sortKeys(state) {
   return sortKeysForTab;
 }
 
+/* Selectors that take root state */
+
+/**
+ * Retrieve state needed to calculate the root thread
+ *
+ * @return {ThreadState}
+ */
+const threadState = createSelector(
+  rootState => rootState.annotations.annotations,
+  rootState => rootState.route.name,
+  rootState => rootState.selection,
+  (annotations, routeName, selection) => {
+    const filters = {};
+    if (focusModeActive(selection)) {
+      filters.user = focusModeUserFilter(selection);
+    }
+    const selectionState = {
+      expanded: expandedMap(selection),
+      filterQuery: filterQuery(selection),
+      filters,
+      forcedVisible: forcedVisibleAnnotations(selection),
+      selected: selectedAnnotations(selection),
+      sortKey: selection.sortKey, // TODO: This should have a selector
+      selectedTab: selection.selectedTab, // TODO: This should have a selector
+    };
+    return { annotations, route: routeName, selection: selectionState };
+  }
+);
+
 export default {
   init: init,
   namespace: 'selection',
@@ -538,5 +587,9 @@ export default {
     hasSelectedAnnotations,
     selectedAnnotations,
     sortKeys,
+  },
+
+  rootSelectors: {
+    threadState,
   },
 };
