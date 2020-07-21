@@ -29,6 +29,12 @@ const modules = [
 
     selectors: {
       getCountA(state) {
+        return state.count;
+      },
+    },
+
+    rootSelectors: {
+      getCountAFromRoot(state) {
         return state.a.count;
       },
     },
@@ -57,7 +63,7 @@ const modules = [
 
     selectors: {
       getCountB(state) {
-        return state.b.count;
+        return state.count;
       },
     },
   },
@@ -104,6 +110,12 @@ describe('sidebar/store/create-store', () => {
     const store = counterStore();
     store.dispatch(modules[A].actions.incrementA(5));
     assert.equal(store.getCountA(), 5);
+  });
+
+  it('adds root selectors as methods to the store', () => {
+    const store = counterStore();
+    store.dispatch(modules[A].actions.incrementA(5));
+    assert.equal(store.getCountAFromRoot(), 5);
   });
 
   it('applies `thunk` middleware by default', () => {

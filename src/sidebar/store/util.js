@@ -44,16 +44,25 @@ export function createReducer(actionToUpdateFn) {
  * selectors with the `state` argument set to the current value of `getState()`.
  */
 export function bindSelectors(namespaces, getState) {
-  const totalSelectors = {};
+  const boundSelectors = {};
   Object.keys(namespaces).forEach(namespace => {
-    const selectors = namespaces[namespace].selectors;
+    const { selectors, rootSelectors = {} } = namespaces[namespace];
+
     Object.keys(selectors).forEach(selector => {
-      totalSelectors[selector] = function () {
-        const args = [].slice.apply(arguments);
-        args.unshift(getState());
-        return selectors[selector].apply(null, args);
-      };
+      if (boundSelectors[selector]) {
+        throw new Error(`Duplicate selector "${selector}"`);
+      }
+      boundSelectors[selector] = (...args) =>
+        selectors[selector](getState()[namespace], ...args);
+    });
+
+    Object.keys(rootSelectors).forEach(selector => {
+      if (boundSelectors[selector]) {
+        throw new Error(`Duplicate selector "${selector}"`);
+      }
+      boundSelectors[selector] = (...args) =>
+        rootSelectors[selector](getState(), ...args);
     });
   });
-  return totalSelectors;
+  return boundSelectors;
 }

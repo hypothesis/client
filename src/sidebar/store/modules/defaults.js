@@ -48,11 +48,11 @@ function setDefault(defaultKey, value) {
  *               present
  */
 function getDefault(state, defaultKey) {
-  return state.defaults[defaultKey];
+  return state[defaultKey];
 }
 
 function getDefaults(state) {
-  return state.defaults;
+  return state;
 }
 
 export default {

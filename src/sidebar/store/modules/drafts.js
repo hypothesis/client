@@ -102,7 +102,7 @@ function deleteNewAndEmptyDrafts() {
     const newDrafts = getState().drafts.filter(draft => {
       return (
         metadata.isNew(draft.annotation) &&
-        !getDraftIfNotEmpty(getState(), draft.annotation)
+        !getDraftIfNotEmpty(getState().drafts, draft.annotation)
       );
     });
     const removedAnnotations = newDrafts.map(draft => {
@@ -141,7 +141,7 @@ function removeDraft(annotation) {
  * @return {number}
  */
 function countDrafts(state) {
-  return state.drafts.length;
+  return state.length;
 }
 
 /**
@@ -150,7 +150,7 @@ function countDrafts(state) {
  * @return {Draft|null}
  */
 function getDraft(state, annotation) {
-  const drafts = state.drafts;
+  const drafts = state;
   for (let i = 0; i < drafts.length; i++) {
     const draft = drafts[i];
     if (draft.match(annotation)) {
@@ -181,7 +181,7 @@ function getDraftIfNotEmpty(state, annotation) {
  * @return {Object[]}
  */
 const unsavedAnnotations = createSelector(
-  state => state.drafts,
+  state => state,
   drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );
 

@@ -133,14 +133,14 @@ function apiRequestFinished() {
 /** Selectors */
 
 function hasFetchedAnnotations(state) {
-  return state.activity.hasFetchedAnnotations;
+  return state.hasFetchedAnnotations;
 }
 
 /**
  * Return true when annotations are actively being fetched.
  */
 function isFetchingAnnotations(state) {
-  return state.activity.activeAnnotationFetches > 0;
+  return state.activeAnnotationFetches > 0;
 }
 
 /**
@@ -148,10 +148,7 @@ function isFetchingAnnotations(state) {
  * before the UI is ready for interactivity with annotations.
  */
 function isLoading(state) {
-  return (
-    state.activity.activeApiRequests > 0 ||
-    !state.activity.hasFetchedAnnotations
-  );
+  return state.activeApiRequests > 0 || !state.hasFetchedAnnotations;
 }
 
 /**
@@ -167,7 +164,7 @@ function isSavingAnnotation(state, annotation) {
   if (!annotation.$tag) {
     return false;
   }
-  return state.activity.activeAnnotationSaveRequests.includes(annotation.$tag);
+  return state.activeAnnotationSaveRequests.includes(annotation.$tag);
 }
 
 export default {

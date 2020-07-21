@@ -71,7 +71,7 @@ function updateMessage(message) {
  * @return {Object|undefined}
  */
 function getMessage(state, id) {
-  return state.toastMessages.messages.find(message => message.id === id);
+  return state.messages.find(message => message.id === id);
 }
 
 /**
@@ -80,7 +80,7 @@ function getMessage(state, id) {
  * @return {Object[]}
  */
 function getMessages(state) {
-  return state.toastMessages.messages;
+  return state.messages;
 }
 
 /**
@@ -93,7 +93,7 @@ function getMessages(state) {
  * @return {boolean}
  */
 function hasMessage(state, type, text) {
-  return state.toastMessages.messages.some(message => {
+  return state.messages.some(message => {
     return message.type === type && message.message === text;
   });
 }

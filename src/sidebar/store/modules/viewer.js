@@ -50,7 +50,7 @@ function setSidebarOpened(opened) {
 // Selectors
 
 function hasSidebarOpened(state) {
-  return state.viewer.sidebarHasOpened;
+  return state.sidebarHasOpened;
 }
 
 export default {

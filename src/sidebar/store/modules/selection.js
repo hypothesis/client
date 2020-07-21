@@ -390,11 +390,11 @@ function toggleSelectedAnnotations(toggleIds) {
  * @return {Object<string,boolean>}
  */
 function expandedMap(state) {
-  return state.selection.expanded;
+  return state.expanded;
 }
 
 function filterQuery(state) {
-  return state.selection.filterQuery;
+  return state.filterQuery;
 }
 
 /**
@@ -403,7 +403,7 @@ function filterQuery(state) {
  * @return {boolean}
  */
 function focusModeActive(state) {
-  return state.selection.focusMode.active;
+  return state.focusMode.active;
 }
 
 /**
@@ -414,7 +414,7 @@ function focusModeActive(state) {
  * @return {boolean}
  */
 function focusModeConfigured(state) {
-  return state.selection.focusMode.configured;
+  return state.focusMode.configured;
 }
 
 /**
@@ -426,7 +426,7 @@ function focusModeUserFilter(state) {
   if (!focusModeActive(state)) {
     return null;
   }
-  return state.selection.focusMode.user.filter;
+  return state.focusMode.user.filter;
 }
 
 /**
@@ -440,11 +440,11 @@ function focusModeUserPrettyName(state) {
   if (!focusModeConfigured(state)) {
     return '';
   }
-  return state.selection.focusMode.user.displayName;
+  return state.focusMode.user.displayName;
 }
 
 const forcedVisibleAnnotations = createSelector(
-  state => state.selection.forcedVisible,
+  state => state.forcedVisible,
   forcedVisible => trueKeys(forcedVisible)
 );
 
@@ -455,7 +455,7 @@ const forcedVisibleAnnotations = createSelector(
  * @return {string|null}
  */
 const getFirstSelectedAnnotationId = createSelector(
-  state => state.selection.selected,
+  state => state.selected,
   selection => {
     const selectedIds = trueKeys(selection);
     return selectedIds.length ? selectedIds[0] : null;
@@ -468,12 +468,12 @@ const getFirstSelectedAnnotationId = createSelector(
  * @return {boolean}
  */
 const hasSelectedAnnotations = createSelector(
-  state => state.selection.selected,
+  state => state.selected,
   selection => trueKeys(selection).length > 0
 );
 
 const selectedAnnotations = createSelector(
-  state => state.selection.selected,
+  state => state.selected,
   selection => trueKeys(selection)
 );
 
@@ -499,7 +499,7 @@ const hasAppliedFilter = createSelector(
  */
 function sortKeys(state) {
   const sortKeysForTab = ['Newest', 'Oldest'];
-  if (state.selection.selectedTab !== uiConstants.TAB_NOTES) {
+  if (state.selectedTab !== uiConstants.TAB_NOTES) {
     // Location is inapplicable to Notes tab
     sortKeysForTab.push('Location');
   }

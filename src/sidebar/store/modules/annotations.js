@@ -256,7 +256,7 @@ function addAnnotations(annotations) {
     // If we're not in the sidebar, we're done here.
     // FIXME Split the annotation-adding from the anchoring code; possibly
     // move into service
-    if (route.selectors.route(getState()) !== 'sidebar') {
+    if (route.selectors.route(getState().route) !== 'sidebar') {
       return;
     }
 
@@ -410,7 +410,7 @@ function updateFlagStatus(id, isFlagged) {
  * @return {number}
  */
 const annotationCount = createSelector(
-  state => state.annotations.annotations,
+  state => state.annotations,
   annotations => countIf(annotations, metadata.isAnnotation)
 );
 
@@ -421,14 +421,14 @@ const annotationCount = createSelector(
  * @return {boolean}
  */
 function annotationExists(state, id) {
-  return state.annotations.annotations.some(annot => annot.id === id);
+  return state.annotations.some(annot => annot.id === id);
 }
 
 /**
  * Return the annotation with the given ID
  */
 function findAnnotationByID(state, id) {
-  return findByID(state.annotations.annotations, id);
+  return findByID(state.annotations, id);
 }
 
 /**
@@ -442,7 +442,7 @@ function findAnnotationByID(state, id) {
 function findIDsForTags(state, tags) {
   const ids = [];
   tags.forEach(tag => {
-    const annot = findByTag(state.annotations.annotations, tag);
+    const annot = findByTag(state.annotations, tag);
     if (annot && annot.id) {
       ids.push(annot.id);
     }
@@ -456,7 +456,7 @@ function findIDsForTags(state, tags) {
  * @return {string[]}
  */
 const focusedAnnotations = createSelector(
-  state => state.annotations.focused,
+  state => state.focused,
   focused => trueKeys(focused)
 );
 
@@ -466,7 +466,7 @@ const focusedAnnotations = createSelector(
  * @return {string[]}
  */
 const highlightedAnnotations = createSelector(
-  state => state.annotations.highlighted,
+  state => state.highlighted,
   highlighted => trueKeys(highlighted)
 );
 
@@ -477,7 +477,7 @@ const highlightedAnnotations = createSelector(
  * @return {boolean}
  */
 function isAnnotationFocused(state, $tag) {
-  return state.annotations.focused[$tag] === true;
+  return state.focused[$tag] === true;
 }
 
 /**
@@ -486,7 +486,7 @@ function isAnnotationFocused(state, $tag) {
  * @return {boolean}
  */
 const isWaitingToAnchorAnnotations = createSelector(
-  state => state.annotations.annotations,
+  state => state.annotations,
   annotations => annotations.some(metadata.isWaitingToAnchor)
 );
 
@@ -497,7 +497,7 @@ const isWaitingToAnchorAnnotations = createSelector(
  * @return {Annotation[]}
  */
 const newAnnotations = createSelector(
-  state => state.annotations.annotations,
+  state => state.annotations,
   annotations =>
     annotations.filter(ann => metadata.isNew(ann) && !metadata.isHighlight(ann))
 );
@@ -509,7 +509,7 @@ const newAnnotations = createSelector(
  * @return {Annotation[]}
  */
 const newHighlights = createSelector(
-  state => state.annotations.annotations,
+  state => state.annotations,
   annotations =>
     annotations.filter(ann => metadata.isNew(ann) && metadata.isHighlight(ann))
 );
@@ -520,7 +520,7 @@ const newHighlights = createSelector(
  * @return {number}
  */
 const noteCount = createSelector(
-  state => state.annotations.annotations,
+  state => state.annotations,
   annotations => countIf(annotations, metadata.isPageNote)
 );
 
@@ -530,7 +530,7 @@ const noteCount = createSelector(
  * @type {(state: any) => number}
  */
 const orphanCount = createSelector(
-  state => state.annotations.annotations,
+  state => state.annotations,
   annotations => countIf(annotations, metadata.isOrphan)
 );
 
@@ -540,7 +540,7 @@ const orphanCount = createSelector(
  * @return {Annotation[]}
  */
 function savedAnnotations(state) {
-  return state.annotations.annotations.filter(function (ann) {
+  return state.annotations.filter(function (ann) {
     return !metadata.isNew(ann);
   });
 }

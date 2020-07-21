@@ -45,7 +45,7 @@ function changeRoute(name, params = {}) {
  * Return the name of the current route.
  */
 function route(state) {
-  return state.route.name;
+  return state.name;
 }
 
 /**
@@ -53,7 +53,7 @@ function route(state) {
  * query string.
  */
 function routeParams(state) {
-  return state.route.params;
+  return state.params;
 }
 
 export default {

@@ -52,6 +52,7 @@ export default function createStore(modules, initArgs = [], middleware = []) {
       allReducers[module.namespace] = createReducer(module.update);
       allSelectors[module.namespace] = {
         selectors: module.selectors,
+        rootSelectors: module.rootSelectors || {},
       };
     } else {
       console.warn('Store module does not specify a namespace', module);

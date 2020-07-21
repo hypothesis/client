@@ -67,7 +67,7 @@ function updateFrameAnnotationFetchStatus(uri, status) {
  * Return the list of frames currently connected to the sidebar app.
  */
 function frames(state) {
-  return state.frames;
+  return state;
 }
 
 /**
@@ -81,7 +81,7 @@ function frames(state) {
  * This may be `null` during startup.
  */
 const mainFrame = createSelector(
-  state => state.frames,
+  state => state,
 
   // Sub-frames will all have a "frame identifier" set. The main frame is the
   // one with a `null` id.
@@ -117,8 +117,8 @@ const createShallowEqualSelector = createSelectorCreator(
 // Memoized selector will return the same array (of URIs) reference unless the
 // values of the array change (are not shallow-equal).
 const searchUris = createShallowEqualSelector(
-  state => {
-    return state.frames.reduce(
+  frames => {
+    return frames.reduce(
       (uris, frame) => uris.concat(searchUrisForFrame(frame)),
       []
     );

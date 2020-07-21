@@ -129,15 +129,15 @@ function clearDirectLinkedIds() {
  * Selectors
  */
 function directLinkedAnnotationId(state) {
-  return state.directLinked.directLinkedAnnotationId;
+  return state.directLinkedAnnotationId;
 }
 
 function directLinkedGroupId(state) {
-  return state.directLinked.directLinkedGroupId;
+  return state.directLinkedGroupId;
 }
 
 function directLinkedGroupFetchFailed(state) {
-  return state.directLinked.directLinkedGroupFetchFailed;
+  return state.directLinkedGroupFetchFailed;
 }
 
 export default {
