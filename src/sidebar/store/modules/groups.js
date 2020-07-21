@@ -168,8 +168,8 @@ const getInScopeGroups = createSelector(
  * @return {Group[]}
  */
 const getMyGroups = createSelector(
-  state => state.groups.groups,
-  state => session.selectors.isLoggedIn(state.session),
+  rootState => rootState.groups.groups,
+  rootState => session.selectors.isLoggedIn(rootState.session),
   (groups, loggedIn) => {
     // If logged out, the Public group still has isMember set to true so only
     // return groups with membership in logged in state.
@@ -186,9 +186,9 @@ const getMyGroups = createSelector(
  * @return {Group[]}
  */
 const getCurrentlyViewingGroups = createSelector(
-  state => allGroups(state.groups),
-  state => getMyGroups(state),
-  state => getFeaturedGroups(state.groups),
+  rootState => allGroups(rootState.groups),
+  rootState => getMyGroups(rootState),
+  rootState => getFeaturedGroups(rootState.groups),
   (allGroups, myGroups, featuredGroups) => {
     return allGroups.filter(
       g => !myGroups.includes(g) && !featuredGroups.includes(g)
