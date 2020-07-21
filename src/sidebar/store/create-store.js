@@ -8,19 +8,6 @@ import immutable from '../util/immutable';
 import { createReducer, bindSelectors } from './util';
 
 /**
- * // Base redux store
- * @typedef {import("redux").Store} ReduxStore
- *
- * // Custom stores
- * @typedef {import("./modules/activity").ActivityStore} ActivityStore
- * // TODO: add more stores
- *
- * // Combine all stores
- * @typedef {ReduxStore &
- *  ActivityStore} SidebarStore
- */
-
-/**
  * Create a Redux store from a set of _modules_.
  *
  * Each module defines the logic related to a particular piece of the application
@@ -37,8 +24,7 @@ import { createReducer, bindSelectors } from './util';
  *
  * @param {Object[]} modules
  * @param {any[]} [initArgs] - Arguments to pass to each state module's `init` function
- * @param {any[]} [middleware] - List of additional Redux middlewares to use.
- * @return {SidebarStore}
+ * @param {any[]} [middleware] - List of additional Redux middlewares to use
  */
 export default function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
@@ -102,5 +88,5 @@ export default function createStore(modules, initArgs = [], middleware = []) {
 
   Object.assign(store, boundActions, boundSelectors);
 
-  return /** @type {SidebarStore} */ (store);
+  return store;
 }

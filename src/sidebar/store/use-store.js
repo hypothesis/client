@@ -7,7 +7,8 @@ import warnOnce from '../../shared/warn-once';
 import { useService } from '../util/service-context';
 
 /** @typedef {import("redux").Store} Store */
-/** @typedef {import("./create-store").SidebarStore} SidebarStore */
+
+/** @typedef {import("./index").SidebarStore} SidebarStore */
 
 /**
  * @template T
