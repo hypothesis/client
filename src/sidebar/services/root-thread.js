@@ -3,7 +3,7 @@ import * as metadata from '../util/annotation-metadata';
 import memoize from '../util/memoize';
 import { generateFacetedFilter } from '../util/search-filter';
 import * as tabs from '../util/tabs';
-import viewFilter from '../util/view-filter';
+import filterAnnotations from '../util/view-filter';
 
 // Mapping from sort order name to a less-than predicate
 // function for comparing annotations to determine their sort order.
@@ -60,7 +60,7 @@ export default function RootThread(store) {
       });
 
       options.filterFn = function (annot) {
-        return viewFilter([annot], filters).length > 0;
+        return filterAnnotations([annot], filters).length > 0;
       };
     }
 

@@ -1,4 +1,4 @@
-import viewFilter, { $imports } from '../view-filter';
+import filterAnnotations, { $imports } from '../view-filter';
 
 function isoDateWithAge(age) {
   return new Date(Date.now() - age * 1000).toISOString();
@@ -41,7 +41,7 @@ describe('sidebar/util/view-filter', () => {
         text: { terms: ['Tiger'], operator: 'and' },
       };
 
-      viewFilter([], filters);
+      filterAnnotations([], filters);
 
       assert.calledWith(fakeUnicode.fold, 'Tiger');
     });
@@ -62,7 +62,7 @@ describe('sidebar/util/view-filter', () => {
         text: { terms: ['Tyger', 'burning', 'bright'], operator: 'and' },
       };
 
-      const result = viewFilter(annotations, filters);
+      const result = filterAnnotations(annotations, filters);
 
       assert.deepEqual(result, [1]);
     });
@@ -72,7 +72,7 @@ describe('sidebar/util/view-filter', () => {
         text: { terms: ['Tyger', 'quaint'], operator: 'or' },
       };
 
-      const result = viewFilter(annotations, filters);
+      const result = filterAnnotations(annotations, filters);
 
       assert.equal(result.length, 2);
     });
@@ -88,7 +88,7 @@ describe('sidebar/util/view-filter', () => {
       ];
       const filters = { any: { terms: ['Tyger'], operator: 'and' } };
 
-      const result = viewFilter(annotations, filters);
+      const result = filterAnnotations(annotations, filters);
 
       assert.equal(result.length, 3);
     });
@@ -120,7 +120,7 @@ describe('sidebar/util/view-filter', () => {
         },
       };
 
-      const result = viewFilter([annotation], filters);
+      const result = filterAnnotations([annotation], filters);
 
       assert.equal(result.length, 1);
     });
@@ -134,7 +134,7 @@ describe('sidebar/util/view-filter', () => {
       };
       const filters = { uri: { terms: ['publisher'], operator: 'or' } };
 
-      const result = viewFilter([annotation], filters);
+      const result = filterAnnotations([annotation], filters);
 
       assert.deepEqual(result, [1]);
     });
@@ -163,7 +163,7 @@ describe('sidebar/util/view-filter', () => {
         annotationWithUser('jamesdean'),
         annotationWithUser('johnjones'),
       ];
-      const result = viewFilter(anns, userQuery('john'));
+      const result = filterAnnotations(anns, userQuery('john'));
 
       assert.deepEqual(result, [anns[0].id, anns[2].id]);
     });
@@ -182,14 +182,14 @@ describe('sidebar/util/view-filter', () => {
         // Annotation with no extended user info.
         { id: 100, user: 'acct:jim@example.com' },
       ];
-      const result = viewFilter(anns, userQuery('james'));
+      const result = filterAnnotations(anns, userQuery('james'));
 
       assert.deepEqual(result, [anns[1].id, anns[2].id, anns[3].id]);
     });
 
     it('ignores display name if not set', () => {
       const anns = [annotationWithUser('msmith')];
-      const result = viewFilter(anns, userQuery('null'));
+      const result = filterAnnotations(anns, userQuery('null'));
       assert.deepEqual(result, []);
     });
   });
@@ -205,7 +205,7 @@ describe('sidebar/util/view-filter', () => {
         since: { terms: [100], operator: 'and' },
       };
 
-      const result = viewFilter([annotation], filters);
+      const result = filterAnnotations([annotation], filters);
 
       assert.deepEqual(result, [1]);
     });
@@ -220,7 +220,7 @@ describe('sidebar/util/view-filter', () => {
         since: { terms: [100], operator: 'and' },
       };
 
-      const result = viewFilter([annotation], filters);
+      const result = filterAnnotations([annotation], filters);
 
       assert.deepEqual(result, []);
     });
@@ -243,7 +243,7 @@ describe('sidebar/util/view-filter', () => {
       },
     };
 
-    const result = viewFilter([annotation], filters);
+    const result = filterAnnotations([annotation], filters);
 
     assert.deepEqual(result, [1]);
   });
@@ -260,7 +260,7 @@ describe('sidebar/util/view-filter', () => {
       },
     };
 
-    const result = viewFilter([annotation], filters);
+    const result = filterAnnotations([annotation], filters);
 
     assert.deepEqual(result, []);
   });

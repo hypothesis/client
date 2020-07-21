@@ -1,5 +1,5 @@
 /**
- * Filter annotations against parsed search queries.
+ * Tools for applying search filters against annotations.
  *
  * When the user enters a query in the search box, the query is parsed using
  * `generateFacetedFilter` and the currently loaded annotations are then matched
@@ -104,6 +104,53 @@ class BinaryOpFilter {
 }
 
 /**
+ * Functions for extracting field values from annotations and testing whether
+ * they match a query term.
+ *
+ * [facet_name]:
+ *   autofalse: a function for a preliminary false match result
+ *   value: a function to extract to facet value for the annotation.
+ *   match: a function to check if the extracted value matches the facet value
+ *
+ * @type {Object.<string,Checker>}
+ */
+const fieldMatchers = {
+  quote: {
+    autofalse: ann => (ann.references || []).length > 0,
+    value: ann => quote(ann) || '',
+    match: (term, value) => value.indexOf(term) > -1,
+  },
+  since: {
+    autofalse: ann => typeof ann.updated !== 'string',
+    value: ann => new Date(ann.updated),
+    match(term, value) {
+      const delta = (Date.now() - value) / 1000;
+      return delta <= term;
+    },
+  },
+  tag: {
+    autofalse: ann => !Array.isArray(ann.tags),
+    value: ann => ann.tags,
+    match: (term, value) => value.includes(term),
+  },
+  text: {
+    autofalse: ann => typeof ann.text !== 'string',
+    value: ann => ann.text,
+    match: (term, value) => value.indexOf(term) > -1,
+  },
+  uri: {
+    autofalse: ann => typeof ann.uri !== 'string',
+    value: ann => ann.uri,
+    match: (term, value) => value.indexOf(term) > -1,
+  },
+  user: {
+    autofalse: ann => typeof ann.user !== 'string',
+    value: ann => ann.user + ' ' + displayName(ann),
+    match: (term, value) => value.indexOf(term) > -1,
+  },
+};
+
+/**
  * Filters a set of annotations.
  *
  * @param {Annotation[]} annotations
@@ -111,54 +158,7 @@ class BinaryOpFilter {
  * `generateFacetedFilter`.
  * @return {string[]} IDs of matching annotations.
  */
-export default function viewFilter(annotations, filters) {
-  /**
-   * Functions for extracting field values from annotations and testing whether
-   * they match a query term.
-   *
-   * [facet_name]:
-   *   autofalse: a function for a preliminary false match result
-   *   value: a function to extract to facet value for the annotation.
-   *   match: a function to check if the extracted value matches the facet value
-   *
-   * @type {Object.<string,Checker>}
-   */
-  const fieldMatchers = {
-    quote: {
-      autofalse: ann => (ann.references || []).length > 0,
-      value: ann => quote(ann) || '',
-      match: (term, value) => value.indexOf(term) > -1,
-    },
-    since: {
-      autofalse: ann => typeof ann.updated !== 'string',
-      value: ann => new Date(ann.updated),
-      match(term, value) {
-        const delta = (Date.now() - value) / 1000;
-        return delta <= term;
-      },
-    },
-    tag: {
-      autofalse: ann => !Array.isArray(ann.tags),
-      value: ann => ann.tags,
-      match: (term, value) => value.includes(term),
-    },
-    text: {
-      autofalse: ann => typeof ann.text !== 'string',
-      value: ann => ann.text,
-      match: (term, value) => value.indexOf(term) > -1,
-    },
-    uri: {
-      autofalse: ann => typeof ann.uri !== 'string',
-      value: ann => ann.uri,
-      match: (term, value) => value.indexOf(term) > -1,
-    },
-    user: {
-      autofalse: ann => typeof ann.user !== 'string',
-      value: ann => ann.user + ' ' + displayName(ann),
-      match: (term, value) => value.indexOf(term) > -1,
-    },
-  };
-
+export default function filterAnnotations(annotations, filters) {
   // Convert the input filter object into a filter tree, expanding "any"
   // filters.
   const fieldFilters = Object.entries(filters)
