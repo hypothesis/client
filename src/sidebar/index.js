@@ -120,7 +120,6 @@ import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
 import localStorageService from './services/local-storage';
 import persistedDefaultsService from './services/persisted-defaults';
-import rootThreadService from './services/root-thread';
 import routerService from './services/router';
 import serviceUrlService from './services/service-url';
 import sessionService from './services/session';
@@ -154,7 +153,6 @@ function startApp(config) {
     .register('loadAnnotationsService', loadAnnotationsService)
     .register('localStorage', localStorageService)
     .register('persistedDefaults', persistedDefaultsService)
-    .register('rootThread', rootThreadService)
     .register('router', routerService)
     .register('serviceUrl', serviceUrlService)
     .register('session', sessionService)

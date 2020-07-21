@@ -68,7 +68,7 @@ const TAB_SORTKEY_DEFAULT = {
 function initialSelection(settings) {
   const selection = {};
   // TODO: Do not take into account existence of `settings.query` here
-  // once `RootThreadService` is fully updated: the decision of whether
+  // once root-thread-building is fully updated: the decision of whether
   // selection trumps any query is not one for the store to make
   if (settings.annotations && !settings.query) {
     selection[settings.annotations] = true;
