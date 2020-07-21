@@ -2,6 +2,7 @@ import uiConstants from '../../../ui-constants';
 import createStore from '../../create-store';
 import annotations from '../annotations';
 import selection from '../selection';
+import route from '../route';
 import * as fixtures from '../../../test/annotation-fixtures';
 
 describe('sidebar/store/modules/selection', () => {
@@ -13,7 +14,7 @@ describe('sidebar/store/modules/selection', () => {
   };
 
   beforeEach(() => {
-    store = createStore([annotations, selection], fakeSettings);
+    store = createStore([annotations, selection, route], fakeSettings);
   });
 
   describe('getFirstSelectedAnnotationId', function () {
@@ -103,6 +104,52 @@ describe('sidebar/store/modules/selection', () => {
 
     it('returns null when no filterQuery is present', function () {
       assert.isNull(store.filterQuery());
+    });
+  });
+
+  describe('threadState', () => {
+    it('returns the current annotations in rootState', () => {
+      const myAnnotation = fixtures.defaultAnnotation();
+      store.addAnnotations([myAnnotation]);
+
+      // `addAnnotations` injects some additional properties to annotations,
+      // so we can't compare objects
+      assert.equal(store.threadState().annotations[0].id, myAnnotation.id);
+      assert.lengthOf(store.threadState().annotations, 1);
+    });
+
+    it('returns the current route name from rootState', () => {
+      store.changeRoute('kamchatka');
+
+      assert.equal(store.threadState().route, 'kamchatka');
+    });
+
+    it('returns relevant state from selection', () => {
+      // The order of these matters, as these actions change multiple properties
+      // on the selection state
+      store.selectTab('orphan');
+      store.setSortKey('pyrrhic');
+      store.changeFocusModeUser({
+        username: 'testuser',
+        displayName: 'Test User',
+      });
+      store.setFilterQuery('frappe');
+      // Order doesn't matter past here
+      store.selectAnnotations(['1', '2']);
+      store.setExpanded('3', true);
+      store.setExpanded('4', false);
+      store.setForcedVisible('5', true);
+      store.setForcedVisible('6', false);
+
+      const selection = store.threadState().selection;
+
+      assert.equal(selection.filterQuery, 'frappe');
+      assert.equal(selection.selectedTab, 'orphan');
+      assert.equal(selection.sortKey, 'pyrrhic');
+      assert.deepEqual(selection.selected, ['1', '2']);
+      assert.deepEqual(selection.expanded, { '3': true, '4': false });
+      assert.deepEqual(selection.forcedVisible, ['5']);
+      assert.deepEqual(selection.filters, { user: 'testuser' });
     });
   });
 
