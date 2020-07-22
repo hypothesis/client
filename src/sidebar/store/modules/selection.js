@@ -531,16 +531,17 @@ function sortKeys(state) {
 /**
  * Retrieve state needed to calculate the root thread
  *
- * @return {ThreadState}
+ * @type {(rootState: any) => ThreadState}
  */
 const threadState = createSelector(
   rootState => rootState.annotations.annotations,
   rootState => rootState.route.name,
   rootState => rootState.selection,
   (annotations, routeName, selection) => {
-    const filters = {};
-    if (focusModeActive(selection)) {
-      filters.user = focusModeUserFilter(selection);
+    const filters = /** @type {Object.<string,string>} */ ({});
+    const userFilter = focusModeUserFilter(selection);
+    if (userFilter) {
+      filters.user = userFilter;
     }
     const selectionState = {
       expanded: expandedMap(selection),
