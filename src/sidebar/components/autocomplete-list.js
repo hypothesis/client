@@ -31,7 +31,7 @@ const defaultListFormatter = item => item;
  * used by itself.
  *
  * Modeled after the "ARIA 1.1 Combobox with Listbox Popup"
- * 
+ *
  * @template T
  * @param {AutocompleteListProps<T>} props
  */
