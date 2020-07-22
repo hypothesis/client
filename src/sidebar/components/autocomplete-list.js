@@ -4,6 +4,7 @@ import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 const defaultListFormatter = item => item;
+
 /**
  * @template T
  * @typedef AutocompleteListProps
@@ -30,10 +31,10 @@ const defaultListFormatter = item => item;
  * used by itself.
  *
  * Modeled after the "ARIA 1.1 Combobox with Listbox Popup"
+ * 
  * @template T
  * @param {AutocompleteListProps<T>} props
  */
-
 export default function AutocompleteList({
   activeItem = -1,
   id,

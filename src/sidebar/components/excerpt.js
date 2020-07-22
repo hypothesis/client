@@ -17,6 +17,7 @@ import { applyTheme } from '../util/theme';
 /**
  * An optional toggle link at the bottom of an excerpt which controls whether
  * it is expanded or collapsed.
+ * 
  * @param {InlineControlsProps} props
  */
 function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
