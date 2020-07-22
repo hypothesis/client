@@ -48,12 +48,27 @@ import toastMessages from './modules/toast-messages';
 import viewer from './modules/viewer';
 
 /**
+ * // Base redux store
+ * @typedef {import("redux").Store} ReduxStore
+ *
+ * // Custom stores
+ * @typedef {import("./modules/activity").ActivityStore} ActivityStore
+ * // TODO: add more stores
+ *
+ * // Combine all stores
+ * @typedef {ReduxStore & ActivityStore} SidebarStore
+ */
+
+/**
  * Factory which creates the sidebar app's state store.
  *
  * Returns a Redux store augmented with methods for each action and selector in
  * the individual state modules. ie. `store.actionName(args)` dispatches an
  * action through the store and `store.selectorName(args)` invokes a selector
  * passing the current state of the store.
+ *
+ * @param {import('../../types/config').SidebarConfig} settings
+ * @return {SidebarStore}
  */
 // @ngInject
 export default function store(settings) {
@@ -76,5 +91,9 @@ export default function store(settings) {
     toastMessages,
     viewer,
   ];
-  return createStore(modules, [settings], middleware);
+  return /** @type {SidebarStore} */ (createStore(
+    modules,
+    [settings],
+    middleware
+  ));
 }

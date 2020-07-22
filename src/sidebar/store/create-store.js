@@ -24,7 +24,7 @@ import { createReducer, bindSelectors } from './util';
  *
  * @param {Object[]} modules
  * @param {any[]} [initArgs] - Arguments to pass to each state module's `init` function
- * @param {any[]} [middleware] - List of additional Redux middlewares to use.
+ * @param {any[]} [middleware] - List of additional Redux middlewares to use
  */
 export default function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
