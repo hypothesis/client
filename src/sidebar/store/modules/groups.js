@@ -196,6 +196,19 @@ const getCurrentlyViewingGroups = createSelector(
   }
 );
 
+/**
+ * @typedef GroupsStore
+ *
+ * // Actions
+ * @prop {typeof focusGroup} focusGroup
+ * @prop {typeof loadGroups} loadGroups
+ * @prop {typeof clearGroups} clearGroups
+ *
+ * // Selectors
+ * @prop {() => Group[]} allGroups
+ * // TODO: add rest ...
+ */
+
 export default {
   init,
   namespace: 'groups',

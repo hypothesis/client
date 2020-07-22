@@ -1,3 +1,5 @@
+import { actionTypes } from '../util';
+
 /**
  * Reducer for storing a "links" object in the Redux state store.
  *
@@ -12,20 +14,37 @@ function init() {
   return null;
 }
 
+const update = {
+  UPDATE_LINKS(state, action) {
+    return {
+      ...action.newLinks,
+    };
+  },
+};
+
+const actions = actionTypes(update);
+
 /** Return updated links based on the given current state and action object. */
-function updateLinks(state, action) {
-  return { ...action.newLinks };
+function updateLinks(newLinks) {
+  return {
+    type: actions.UPDATE_LINKS,
+    newLinks,
+  };
 }
 
-/** Return an action object for updating the links to the given newLinks. */
-function updateLinksAction(newLinks) {
-  return { type: 'UPDATE_LINKS', newLinks: newLinks };
-}
+/**
+ * @typedef LinksStore
+ *
+ * // Actions
+ * @prop {typeof updateLinks} updateLinks
+ */
 
 export default {
   init: init,
   namespace: 'links',
-  update: { UPDATE_LINKS: updateLinks },
-  actions: { updateLinks: updateLinksAction },
+  update,
+  actions: {
+    updateLinks,
+  },
   selectors: {},
 };

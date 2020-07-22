@@ -53,10 +53,37 @@ import viewer from './modules/viewer';
  *
  * // Custom stores
  * @typedef {import("./modules/activity").ActivityStore} ActivityStore
+ * @typedef {import("./modules/annotations").AnnotationsStore} AnnotationsStore
+ * @typedef {import("./modules/defaults").DefaultsStore} DefaultsStore
+ * @typedef {import("./modules/direct-linked").DirectLinkedStore} DirectLinkedStore
+ * @typedef {import("./modules/drafts").DraftsStore} DraftsStore
+ * @typedef {import("./modules/frames").FramesStore} FramesStore
+ * @typedef {import("./modules/groups").GroupsStore} GroupsStore
+ * @typedef {import("./modules/links").LinksStore} LinksStore
+ * @typedef {import("./modules/real-time-updates").RealTimeUpdatesStore} RealTimeUpdatesStore
+ * @typedef {import("./modules/selection").SelectionStore} SelectionStore
+ * @typedef {import("./modules/session").SessionStore} SessionStore
+ * @typedef {import("./modules/sidebar-panels").SidebarPanelsStore} SidebarPanelsStore
+ * @typedef {import("./modules/toast-messages").ToastMessagesStore} ToastMessagesStore
+ * @typedef {import("./modules/viewer").ViewerStore} ViewerStore
  * // TODO: add more stores
  *
  * // Combine all stores
- * @typedef {ReduxStore & ActivityStore} SidebarStore
+ * @typedef {ReduxStore &
+ *  ActivityStore &
+ *  AnnotationsStore &
+ *  DefaultsStore &
+ *  DirectLinkedStore &
+ *  DraftsStore &
+ *  FramesStore &
+ *  GroupsStore &
+ *  LinksStore &
+ *  RealTimeUpdatesStore &
+ *  SelectionStore &
+ *  SessionStore &
+ *  SidebarPanelsStore &
+ *  ToastMessagesStore &
+ *  ViewerStore} SidebarStore
  */
 
 /**

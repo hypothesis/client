@@ -556,6 +556,26 @@ const threadState = createSelector(
   }
 );
 
+/**
+ * @typedef SelectionStore
+ *
+ * // Actions
+ * @prop {typeof changeFocusModeUser} changeFocusModeUser
+ * @prop {typeof clearSelectedAnnotations} clearSelectedAnnotations
+ * @prop {typeof clearSelection} clearSelection
+ * @prop {typeof selectAnnotations} selectAnnotations
+ * @prop {typeof selectTab} selectTab
+ * @prop {typeof setExpanded} setExpanded
+ * @prop {typeof setFilterQuery} setFilterQuery
+ * @prop {typeof setForcedVisible} setForcedVisible
+ * @prop {typeof setSortKey} setSortKey
+ * @prop {typeof toggleFocusMode} toggleFocusMode
+ * @prop {typeof toggleSelectedAnnotations} toggleSelectedAnnotations
+ *
+ * // Selectors
+ * // TODO: add the rest
+ */
+
 export default {
   init: init,
   namespace: 'selection',

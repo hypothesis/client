@@ -126,15 +126,27 @@ const searchUris = createShallowEqualSelector(
   uris => uris
 );
 
+/**
+ * @typedef FramesStore
+ *
+ * // Actions
+ * @prop {typeof connectFrame} connectFrame
+ * @prop {typeof destroyFrame} destroyFrame
+ * @prop {typeof updateFrameAnnotationFetchStatus} updateFrameAnnotationFetchStatus
+ *
+ * // Selectors
+ * // TODO add rest ...
+ */
+
 export default {
   init: init,
   namespace: 'frames',
   update: update,
 
   actions: {
-    connectFrame: connectFrame,
-    destroyFrame: destroyFrame,
-    updateFrameAnnotationFetchStatus: updateFrameAnnotationFetchStatus,
+    connectFrame,
+    destroyFrame,
+    updateFrameAnnotationFetchStatus,
   },
 
   selectors: {

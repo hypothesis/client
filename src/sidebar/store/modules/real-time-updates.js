@@ -140,7 +140,7 @@ function clearPendingUpdates() {
  * Return added or updated annotations received via the WebSocket
  * which have not been applied to the local state.
  *
- * @return {{[id: string]: Annotation}}
+ * @return {Object.<string, Annotation>}
  */
 function pendingUpdates(state) {
   return state.pendingUpdates;
@@ -150,7 +150,7 @@ function pendingUpdates(state) {
  * Return IDs of annotations which have been deleted on the server but not
  * yet removed from the local state.
  *
- * @return {{[id: string]: boolean}}
+ * @return {Object.<string, Annotation>}
  */
 function pendingDeletions(state) {
   return state.pendingDeletions;
@@ -172,6 +172,20 @@ const pendingUpdateCount = createSelector(
 function hasPendingDeletion(state, id) {
   return state.pendingDeletions.hasOwnProperty(id);
 }
+
+/**
+ * @typedef RealTimeUpdatesStore
+ *
+ * // Actions
+ * @prop {typeof receiveRealTimeUpdates} receiveRealTimeUpdates
+ * @prop {typeof clearPendingUpdates} clearPendingUpdates
+ *
+ * // Selectors
+ * @prop {() => boolean} hasPendingDeletion
+ * @prop {() => Object.<string, boolean>} pendingDeletions
+ * @prop {() => Object.<string, Annotation>} pendingUpdates
+ * @prop {() => number} pendingUpdateCount
+ */
 
 export default {
   init,

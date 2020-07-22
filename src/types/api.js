@@ -83,9 +83,10 @@
  * TODO - Fill out remaining properties
  *
  * @typedef Profile
- * @prop {string} userid
+ * @prop {string|null} userid
  * @prop {Object} preferences
- * @prop {boolean} preferences.show_sidebar_tutorial
+ * @prop {boolean} [preferences.show_sidebar_tutorial]
+ * @prop {Object.<string, boolean>} features
  */
 
 /**

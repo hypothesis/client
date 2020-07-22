@@ -31,7 +31,7 @@ const actions = actionTypes(update);
  * Change the active route.
  *
  * @param {string} name - Name of the route to activate. See `init` for possible values
- * @param {Object} params - Parameters associated with the route
+ * @param {Object.<string,string>} params - Parameters associated with the route
  */
 function changeRoute(name, params = {}) {
   return {
@@ -55,6 +55,17 @@ function route(state) {
 function routeParams(state) {
   return state.params;
 }
+
+/**
+ * @typedef RouteStore
+ *
+ * // Actions
+ * @prop {typeof changeRoute} changeRoute
+ *
+ * // Selectors
+ * @prop {() => string|null} route
+ * @prop {() => Object.<string,string>} routeParams
+ */
 
 export default {
   init,
