@@ -1,7 +1,7 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
-import thread from '../root-thread';
-import { $imports } from '../root-thread';
+import threadAnnotations from '../thread-annotations';
+import { $imports } from '../thread-annotations';
 import immutable from '../immutable';
 
 const fixtures = immutable({
@@ -16,7 +16,7 @@ const fixtures = immutable({
   },
 });
 
-describe('sidebar/utils/rootThread', () => {
+describe('sidebar/utils/thread-annotations', () => {
   let fakeBuildThread;
   let fakeFilterAnnotations;
   let fakeSearchFilter;
@@ -54,24 +54,24 @@ describe('sidebar/utils/rootThread', () => {
     $imports.$restore();
   });
 
-  describe('#thread', () => {
+  describe('threadAnnotations', () => {
     it('returns the result of buildThread', () => {
-      assert.equal(thread(fakeThreadState), fixtures.emptyThread);
+      assert.equal(threadAnnotations(fakeThreadState), fixtures.emptyThread);
     });
 
     it('memoizes on `threadState`', () => {
       fakeBuildThread.onCall(0).returns({ brisket: 'fingers' });
       fakeBuildThread.onCall(1).returns({ brisket: 'bananas' });
 
-      const thread1 = thread(fakeThreadState);
-      const thread2 = thread(fakeThreadState);
+      const thread1 = threadAnnotations(fakeThreadState);
+      const thread2 = threadAnnotations(fakeThreadState);
 
       assert.calledOnce(fakeBuildThread);
       assert.strictEqual(thread1, thread2);
 
       fakeThreadState = { ...fakeThreadState };
 
-      const thread3 = thread(fakeThreadState);
+      const thread3 = threadAnnotations(fakeThreadState);
 
       assert.calledTwice(fakeBuildThread);
       assert.notStrictEqual(thread2, thread3);
@@ -81,12 +81,12 @@ describe('sidebar/utils/rootThread', () => {
       const annotation = annotationFixtures.defaultAnnotation();
       fakeThreadState.annotations = [annotation];
 
-      thread(fakeThreadState);
+      threadAnnotations(fakeThreadState);
       assert.calledWith(fakeBuildThread, sinon.match([annotation]));
     });
 
     it('passes on annotation states to buildThread as options', () => {
-      thread(fakeThreadState);
+      threadAnnotations(fakeThreadState);
 
       assert.calledWith(
         fakeBuildThread,
@@ -154,7 +154,7 @@ describe('sidebar/utils/rootThread', () => {
         it(`sorts correctly when sorting by ${testCase.order}`, () => {
           fakeThreadState.selection.sortKey = testCase.order;
 
-          thread(fakeThreadState);
+          threadAnnotations(fakeThreadState);
 
           // The sort compare fn passed to `buildThread`
           const sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
@@ -196,7 +196,7 @@ describe('sidebar/utils/rootThread', () => {
             ];
             fakeThreadState.selection.selectedTab = selectedTab;
 
-            thread(fakeThreadState);
+            threadAnnotations(fakeThreadState);
 
             const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
             const filteredThreads = fakeThreads.filter(thread =>
@@ -214,7 +214,7 @@ describe('sidebar/utils/rootThread', () => {
         it('should not filter the thread if annotations are filtered', () => {
           fakeThreadState.selection.filterQuery = 'foo';
 
-          thread(fakeThreadState);
+          threadAnnotations(fakeThreadState);
 
           assert.isUndefined(fakeBuildThread.args[0][1].threadFilterFn);
         });
@@ -222,7 +222,7 @@ describe('sidebar/utils/rootThread', () => {
         it('should not filter the thread if there are applied focus filters', () => {
           fakeThreadState.selection.filters = { user: 'someusername' };
 
-          thread(fakeThreadState);
+          threadAnnotations(fakeThreadState);
 
           assert.isUndefined(fakeBuildThread.args[0][1].threadFilterFn);
         });
@@ -232,7 +232,7 @@ describe('sidebar/utils/rootThread', () => {
         it('should not filter the thread', () => {
           fakeThreadState.route = 'nonsense';
 
-          thread(fakeThreadState);
+          threadAnnotations(fakeThreadState);
 
           assert.isUndefined(fakeBuildThread.args[0][1].threadFilterFn);
         });
@@ -243,7 +243,7 @@ describe('sidebar/utils/rootThread', () => {
         const annotation = annotationFixtures.defaultAnnotation();
         fakeFilterAnnotations.returns([annotation]);
 
-        thread(fakeThreadState);
+        threadAnnotations(fakeThreadState);
 
         const filterFn = fakeBuildThread.args[0][1].filterFn;
 
@@ -260,7 +260,7 @@ describe('sidebar/utils/rootThread', () => {
       it('should filter annotations if there is an applied focus filter', () => {
         fakeThreadState.selection.filters = { user: 'somebody' };
 
-        thread(fakeThreadState);
+        threadAnnotations(fakeThreadState);
 
         assert.isFunction(fakeBuildThread.args[0][1].filterFn);
         assert.calledWith(

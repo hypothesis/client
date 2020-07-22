@@ -70,6 +70,6 @@ function buildRootThread(threadState) {
   return buildThread(threadState.annotations, options);
 }
 
-const thread = memoize(buildRootThread);
+const threadAnnotations = memoize(buildRootThread);
 
-export default thread;
+export default threadAnnotations;
