@@ -8,8 +8,17 @@ import { withServices } from '../util/service-context';
 import { applyTheme } from '../util/theme';
 
 /**
+ * @typedef InlineControlsProps
+ * @prop {boolean} [isCollapsed]
+ * @prop {(collapsed: boolean) => any} [setCollapsed]
+ * @prop {Object} [linkStyle]
+ */
+
+/**
  * An optional toggle link at the bottom of an excerpt which controls whether
  * it is expanded or collapsed.
+ *
+ * @param {InlineControlsProps} props
  */
 function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
   const toggleLabel = isCollapsed ? 'More' : 'Less';
@@ -40,11 +49,35 @@ InlineControls.propTypes = {
 const noop = () => {};
 
 /**
+ * @typedef ExcerptProps
+ * @prop {Object} [children]
+ * @prop {boolean} [inlineControls] - If `true`, the excerpt provides internal
+ *   controls to expand and collapse the content. If `false`, the caller sets
+ *   the collapsed state via the `collapse` prop.  When using inline controls,
+ *   the excerpt is initially collapsed.
+ * @prop {boolean} [collapse] - If the content should be truncated if its height
+ *   exceeds `collapsedHeight + overflowThreshold`.  This prop is only used if
+ *   `inlineControls` is false.
+ * @prop {number} collapsedHeight - Maximum height of the container, in pixels,
+ *   when it is collapsed.
+ * @prop {number} [overflowThreshold] - An additional margin of pixels by which
+ *   the content height can exceed `collapsedHeight` before it becomes collapsible.
+ * @prop {(isCollapsible?: boolean) => any} [onCollapsibleChanged] - Called when the content height
+ *   exceeds or falls below `collapsedHeight + overflowThreshold`.
+ * @prop {(collapsed?: boolean) => any} [onToggleCollapsed] - When `inlineControls` is `false`, this
+ *   function is called when the user requests to expand the content by clicking a
+ *   zone at the bottom of the container.
+ * @prop {Object} [settings] - Used for theming.
+ */
+
+/**
  * A container which truncates its content when they exceed a specified height.
  *
  * The collapsed state of the container can be handled either via internal
  * controls (if `inlineControls` is `true`) or by the caller using the
  * `collapse` prop.
+ *
+ * @param {ExcerptProps} props
  */
 function Excerpt({
   children,
@@ -61,7 +94,7 @@ function Excerpt({
   );
 
   // Container for the excerpt's content.
-  const contentElement = useRef(null);
+  const contentElement = useRef(/** @type {HTMLDivElement|null} */ (null));
 
   // Measured height of `contentElement` in pixels.
   const [contentHeight, setContentHeight] = useState(0);
@@ -94,6 +127,7 @@ function Excerpt({
   const isCollapsed = inlineControls ? collapsedByInlineControls : collapse;
   const isExpandable = isOverflowing && isCollapsed;
 
+  /** @type {Object} */
   const contentStyle = {};
   if (contentHeight !== 0) {
     contentStyle['max-height'] = isExpandable ? collapsedHeight : contentHeight;
@@ -132,48 +166,12 @@ function Excerpt({
 
 Excerpt.propTypes = {
   children: propTypes.object,
-
-  /**
-   * If `true`, the excerpt provides internal controls to expand and collapse
-   * the content. If `false`, the caller sets the collapsed state via the
-   * `collapse` prop.
-   *
-   * When using inline controls, the excerpt is initially collapsed.
-   */
   inlineControls: propTypes.bool,
-
-  /**
-   * If the content should be truncated if its height exceeds
-   * `collapsedHeight + overflowThreshold`.
-   *
-   * This prop is only used if `inlineControls` is false.
-   */
   collapse: propTypes.bool,
-
-  /**
-   * Maximum height of the container, in pixels, when it is collapsed.
-   */
   collapsedHeight: propTypes.number,
-
-  /**
-   * An additional margin of pixels by which the content height can exceed
-   * `collapsedHeight` before it becomes collapsible.
-   */
   overflowThreshold: propTypes.number,
-
-  /**
-   * Called when the content height exceeds or falls below `collapsedHeight + overflowThreshold`.
-   */
   onCollapsibleChanged: propTypes.func,
-
-  /**
-   * When `inlineControls` is `false`, this function is called when the user
-   * requests to expand the content by clicking a zone at the bottom of the
-   * container.
-   */
   onToggleCollapsed: propTypes.func,
-
-  // Used for theming.
   settings: propTypes.object,
 };
 

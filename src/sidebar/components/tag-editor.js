@@ -14,15 +14,23 @@ import useElementShouldClose from './hooks/use-element-should-close';
 let tagEditorIdCounter = 0;
 
 /**
+ * @typedef TagEditorProps
+ * @prop {(a: Object<'tags', string[]>) => any} onEditTags - Callback that saves the tag list.
+ * @prop {string[]} tagList - The list of editable tags as strings.
+ * @prop {Object} tags - Services
+ */
+
+/**
  * Component to edit annotation's tags.
  *
  * Component accessibility is modeled after "Combobox with Listbox Popup Examples" found here:
  * https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
+ *
+ * @param {TagEditorProps} props
  */
-
 function TagEditor({ onEditTags, tags: tagsService, tagList }) {
-  const inputEl = useRef(null);
-  const [suggestions, setSuggestions] = useState([]);
+  const inputEl = useRef(/** @type {HTMLInputElement|null} */ (null));
+  const [suggestions, setSuggestions] = useState(/** @type {string[]} */ ([]));
   const [activeItem, setActiveItem] = useState(-1); // -1 is unselected
   const [suggestionsListOpen, setSuggestionsListOpen] = useState(false);
   const [tagEditorId] = useState(() => {
@@ -31,7 +39,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   });
 
   // Set up callback to monitor outside click events to close the AutocompleteList
-  const closeWrapperRef = useRef();
+  const closeWrapperRef = useRef(/** @type {HTMLElement|null} */ (null));
+  /** @ts-ignore - TODO: fix useElementShouldClose Ref types */
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
@@ -42,9 +51,9 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * Helper function that returns a list of suggestions less any
    * results also found from the duplicates list.
    *
-   * @param {Array<string>} suggestions - Original list of suggestions
-   * @param {Array<string>} duplicates - Items to be removed from the result
-   * @return {Array<string>}
+   * @param {string[]} suggestions - Original list of suggestions
+   * @param {string[]} duplicates - Items to be removed from the result
+   * @return {string[]}
    */
   const removeDuplicates = (suggestions, duplicates) => {
     const suggestionsSet = [];
@@ -73,11 +82,14 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       setSuggestions(removeDuplicates(suggestions, tagList));
       setSuggestionsListOpen(suggestions.length > 0);
     }
+
     setActiveItem(-1);
   };
 
   /**
    * Handle changes to this annotation's tags
+   *
+   * @param {string[]} tagList
    */
   const updateTags = tagList => {
     // update suggested tags list via service
@@ -100,6 +112,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   /**
    * Adds a tag to the annotation equal to the value of the input field
    * and then clears out the suggestions list and the input field.
+   *
+   * @param {string} newTag
    */
   const addTag = newTag => {
     const value = newTag.trim();
@@ -115,12 +129,15 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
     setSuggestionsListOpen(false);
     setActiveItem(-1);
 
-    inputEl.current.value = '';
-    inputEl.current.focus();
+    const input = inputEl.current;
+    input.value = '';
+    input.focus();
   };
 
   /**
    *  Update the suggestions if the user changes the value of the input
+   *
+   * @param {import("preact").JSX.TargetedEvent<HTMLInputElement, InputEvent>} e
    */
   const handleOnInput = e => {
     if (
@@ -135,6 +152,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   /**
    *  Callback when the user clicked one of the items in the suggestions list.
    *  This will add a new tag.
+   *
+   * @param {string} item
    */
   const handleSelect = item => {
     if (item) {
@@ -176,6 +195,8 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * Keydown handler for keyboard navigation of the suggestions list
    * and when the user presses "Enter" or ","" to add a new typed item not
    * found in the suggestions list
+   *
+   * @param {KeyboardEvent} e
    */
   const handleKeyDown = e => {
     switch (normalizeKeyName(e.key)) {
@@ -191,7 +212,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       case ',':
         if (activeItem === -1) {
           // nothing selected, just add the typed text
-          addTag(inputEl.current.value);
+          addTag(/** @type {HTMLInputElement} */ (inputEl.current).value);
         } else {
           addTag(suggestions[activeItem]);
         }
@@ -288,27 +309,12 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   );
 }
 
-/**
- * @typedef Tag
- * @param tag {string} - The tag text
- */
-
 TagEditor.propTypes = {
-  /**
-   *  Callback that saves the tag list.
-   *
-   *  @param {Array<Tag>} - Array of tags to save
-   */
   onEditTags: propTypes.func.isRequired,
-
-  /* The list of editable tags as strings. */
   tagList: propTypes.array.isRequired,
-
-  /** Services */
   tags: propTypes.object.isRequired,
-  serviceUrl: propTypes.func.isRequired,
 };
 
-TagEditor.injectedProps = ['serviceUrl', 'tags'];
+TagEditor.injectedProps = ['tags'];
 
 export default withServices(TagEditor);

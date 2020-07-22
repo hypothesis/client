@@ -28,7 +28,7 @@ export function getElementHeightWithMargins(element) {
  * function that removes the listeners.
  *
  * @param {HTMLElement} element
- * @param {string[]} events
+ * @param {string[]|string} events
  * @param {EventListener} listener
  * @param {Object} options
  *   @param {boolean} [options.useCapture]
@@ -42,7 +42,7 @@ export function listen(element, events, listener, { useCapture = false } = {}) {
     element.addEventListener(event, listener, useCapture)
   );
   return () => {
-    events.forEach(event =>
+    /** @type {string[]} */ (events).forEach(event =>
       element.removeEventListener(event, listener, useCapture)
     );
   };
