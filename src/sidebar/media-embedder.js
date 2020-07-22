@@ -2,8 +2,9 @@ import * as queryString from 'query-string';
 
 /**
  * Return an HTML5 audio player with the given src URL.
+ *
+ * @param {string} src
  */
-
 function audioElement(src) {
   const html5audio = document.createElement('audio');
   html5audio.controls = true;
@@ -93,6 +94,7 @@ function parseTimeString(timeValue) {
  * See https://developers.google.com/youtube/player_parameters for
  * all parameter possibilities.
  *
+ * @param {HTMLAnchorElement} link
  * @returns {string} formatted filtered URL query string, e.g. '?start=90'
  * @example
  * // returns '?end=10&start=5'
@@ -100,6 +102,8 @@ function parseTimeString(timeValue) {
  * // - `t` is translated to `start`
  * // - `baz` is not allowed param
  * // - param keys are sorted
+ *
+ * @param {HTMLAnchorElement} link
  */
 function youTubeQueryParams(link) {
   let query;
@@ -132,6 +136,9 @@ function youTubeQueryParams(link) {
 }
 /**
  * Return a YouTube embed (<iframe>) DOM element for the given video ID.
+ *
+ * @param {string} id
+ * @param {HTMLAnchorElement} link
  */
 function youTubeEmbed(id, link) {
   const query = youTubeQueryParams(link);
@@ -149,6 +156,7 @@ function vimeoEmbed(id) {
  * Each function either returns `undefined` if it can't generate an embed for
  * the link, or a DOM element if it can.
  *
+ * @type {Array<(link: HTMLAnchorElement) => HTMLElement|null>}
  */
 const embedGenerators = [
   // Matches URLs like https://www.youtube.com/watch?v=rw6oWkCojpw
@@ -293,6 +301,8 @@ const embedGenerators = [
  *
  * Otherwise return undefined.
  *
+ * @param {HTMLAnchorElement} link
+ * @return {HTMLElement|null}
  */
 function embedForLink(link) {
   let embed;
@@ -328,6 +338,7 @@ function embedForLink(link) {
  *
  * If the link is not a link to an embeddable media it will be left untouched.
  *
+ * @param {HTMLAnchorElement} link
  * @return {HTMLElement|null}
  */
 function replaceLinkWithEmbed(link) {
@@ -342,7 +353,7 @@ function replaceLinkWithEmbed(link) {
   }
   const embed = embedForLink(link);
   if (embed) {
-    link.parentElement.replaceChild(embed, link);
+    /** @type {Element} */ (link.parentElement).replaceChild(embed, link);
   }
   return embed;
 }
