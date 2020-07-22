@@ -1,6 +1,14 @@
 import * as util from '../util';
 
 /**
+ * @typedef ToastMessage
+ * @prop {('error'|'success'|'notice')} type
+ * @prop {string} id
+ * @prop {string} message
+ * @prop {string} moreInfoURL
+ */
+
+/**
  * A store module for managing a collection of toast messages. This module
  * maintains state only; it's up to other layers to handle the management
  * and interactions with these messages.
@@ -40,6 +48,9 @@ const actions = util.actionTypes(update);
 
 /** Actions */
 
+/**
+ * @param {ToastMessage} message
+ */
 function addMessage(message) {
   return { type: actions.ADD_MESSAGE, message };
 }
@@ -56,7 +67,7 @@ function removeMessage(id) {
 /**
  * Update the `message` object (lookup is by `id`).
  *
- * @param {Object} message
+ * @param {ToastMessage} message
  */
 function updateMessage(message) {
   return { type: actions.UPDATE_MESSAGE, message };
@@ -97,6 +108,20 @@ function hasMessage(state, type, text) {
     return message.type === type && message.message === text;
   });
 }
+
+/**
+ * @typedef ToastMessagesStore
+ *
+ * // Actions
+ * @prop {typeof addMessage} addToastMessage
+ * @prop {typeof removeMessage} removeToastMessage
+ * @prop {typeof updateMessage} updateToastMessage
+ *
+ * // Selectors
+ * @prop {(id: string) => (ToastMessage|undefined)} getToastMessage
+ * @prop {() => ToastMessage[]} getToastMessages
+ * @prop {(type: string, text: string) => boolean} hasToastMessage
+ */
 
 export default {
   init,

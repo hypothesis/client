@@ -3,9 +3,7 @@
  * sidebar.
  */
 
-/**
- * @typedef {import('../../../types/api').Annotation} Annotation
- */
+/** @typedef {import('../../../types/api').Annotation} Annotation */
 
 /**
  * @typedef AnnotationStub
@@ -544,6 +542,35 @@ function savedAnnotations(state) {
     return !metadata.isNew(ann);
   });
 }
+
+/**
+ * @typedef AnnotationsStore
+ *
+ * // Actions
+ * @prop {typeof addAnnotations} addAnnotations
+ * @prop {typeof clearAnnotations} clearAnnotations
+ * @prop {typeof focusAnnotations} focusAnnotations
+ * @prop {typeof hideAnnotation} hideAnnotation
+ * @prop {typeof removeAnnotations} removeAnnotations
+ * @prop {typeof unhideAnnotation} unhideAnnotation
+ * @prop {typeof updateAnchorStatus} updateAnchorStatus
+ * @prop {typeof updateFlagStatus} updateFlagStatus
+ 
+ *
+ * // Selectors
+ * @prop {() => number} annotationCount
+ * @prop {(id: string) => boolean} annotationExists
+ * @prop {(id: string) => Annotation} findAnnotationByID
+ * @prop {(tags: string[]) => string[]} findIDsForTags
+ * @prop {() => string[]} focusedAnnotations
+ * @prop {() => string[]} highlightedAnnotations
+ * @prop {() => boolean} isWaitingToAnchorAnnotations
+ * @prop {() => Annotation[]} newAnnotations
+ * @prop {() => Annotation[]} newHighlights
+ * @prop {() => number} noteCount
+ * @prop {() => number} orphanCount
+ * @prop {() => Annotation[]} savedAnnotations
+ */
 
 export default {
   init: init,

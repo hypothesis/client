@@ -44,7 +44,7 @@ function setDefault(defaultKey, value) {
 /**
  * Retrieve the state's current value for `defaultKey`.
  *
- * @return {*} - The current value for `defaultKey` or `undefined` if it is not
+ * @return {string|null} - The current value for `defaultKey` or `undefined` if it is not
  *               present
  */
 function getDefault(state, defaultKey) {
@@ -54,6 +54,17 @@ function getDefault(state, defaultKey) {
 function getDefaults(state) {
   return state;
 }
+
+/**
+ * @typedef DefaultsStore
+ *
+ * // Actions
+ * @prop {typeof setDefault} setDefault
+ *
+ * // Selectors
+ * @prop {(key: string) => string|null} getDefault
+ * @prop {() => Object.<string,string|null>} getDefaults
+ */
 
 export default {
   init,

@@ -1,8 +1,14 @@
 import * as util from '../util';
 
 /**
+ * @typedef {import('../../../types/api').Profile} Profile
+ */
+
+/**
  * A dummy profile returned by the `profile` selector before the real profile
  * is fetched.
+ *
+ * @type Profile
  */
 const initialProfile = {
   /** A map of features that are enabled for the current user. */
@@ -84,6 +90,19 @@ function hasFetchedProfile(state) {
 function profile(state) {
   return state.profile;
 }
+
+/**
+ * @typedef SessionStore
+ *
+ * // Actions
+ * @prop {typeof hasFetchedProfile} hasFetchedProfile
+ *
+ * // Selectors
+ * @prop {() => boolean} hasFetchedProfile
+ * @prop {(feature: string) => boolean} isFeatureEnabled
+ * @prop {() => boolean} isLoggedIn
+ * @prop {() => Profile} profile
+ */
 
 export default {
   init,
