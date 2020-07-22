@@ -2,7 +2,7 @@ import { Injector } from '../../../shared/injector';
 
 import storeFactory from '../../store';
 import immutable from '../../util/immutable';
-import thread from '../../util/root-thread';
+import threadAnnotations from '../../util/thread-annotations';
 
 const fixtures = immutable({
   annotations: [
@@ -51,20 +51,20 @@ describe('annotation threading', function () {
 
   it('should display newly loaded annotations', function () {
     store.addAnnotations(fixtures.annotations);
-    assert.equal(thread(store.threadState()).children.length, 2);
+    assert.equal(threadAnnotations(store.threadState()).children.length, 2);
   });
 
   it('should not display unloaded annotations', function () {
     store.addAnnotations(fixtures.annotations);
     store.removeAnnotations(fixtures.annotations);
-    assert.equal(thread(store.threadState()).children.length, 0);
+    assert.equal(threadAnnotations(store.threadState()).children.length, 0);
   });
 
   it('should filter annotations when a search is set', function () {
     store.addAnnotations(fixtures.annotations);
     store.setFilterQuery('second');
-    assert.equal(thread(store.threadState()).children.length, 1);
-    assert.equal(thread(store.threadState()).children[0].id, '2');
+    assert.equal(threadAnnotations(store.threadState()).children.length, 1);
+    assert.equal(threadAnnotations(store.threadState()).children[0].id, '2');
   });
 
   [
@@ -80,11 +80,11 @@ describe('annotation threading', function () {
     it(`should sort annotations by ${testCase.mode}`, () => {
       store.addAnnotations(fixtures.annotations);
       store.setSortKey(testCase.sortKey);
-      const actualOrder = thread(store.threadState()).children.map(function (
-        thread
-      ) {
-        return thread.annotation.id;
-      });
+      const actualOrder = threadAnnotations(store.threadState()).children.map(
+        function (thread) {
+          return thread.annotation.id;
+        }
+      );
       assert.deepEqual(actualOrder, testCase.expectedOrder);
     });
   });

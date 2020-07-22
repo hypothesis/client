@@ -1,5 +1,5 @@
 import useStore from '../../store/use-store';
-import thread from '../../util/root-thread';
+import threadAnnotations from '../../util/thread-annotations';
 
 /** @typedef {import('../../util/build-thread').Thread} Thread */
 
@@ -10,5 +10,5 @@ import thread from '../../util/root-thread';
  * @return {Thread}
  */
 export default function useRootThread() {
-  return useStore(store => thread(store.threadState()));
+  return useStore(store => threadAnnotations(store.threadState()));
 }
