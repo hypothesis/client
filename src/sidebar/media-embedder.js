@@ -41,16 +41,13 @@ function wrapInAspectRatioContainer(element, aspectRatio) {
  * Return an iframe DOM element with the given src URL.
  *
  * @param {string} src
+ * @param {number} [aspectRatio]
  */
-function iframe(src) {
+function iframe(src, aspectRatio = 16 / 9) {
   const iframe_ = document.createElement('iframe');
   iframe_.src = src;
   iframe_.setAttribute('frameborder', '0');
   iframe_.setAttribute('allowfullscreen', '');
-
-  // 16:9 is the aspect ratio that YouTube videos are optimized for.
-  // We assume here that this works for other embed types as well.
-  const aspectRatio = 16 / 9;
 
   return wrapInAspectRatioContainer(iframe_, aspectRatio);
 }
@@ -145,8 +142,41 @@ function youTubeEmbed(id, link) {
   return iframe(`https://www.youtube.com/embed/${id}${query}`);
 }
 
-function vimeoEmbed(id) {
-  return iframe('https://player.vimeo.com/video/' + id);
+/**
+ * Create an iframe embed generator for links that have the form
+ * `https://<hostname>/<path containing a video ID>`
+ *
+ * @param {string} hostname
+ * @param {RegExp} pathPattern -
+ *   Pattern to match against the pathname part of the link. This regex should
+ *   contain a single capture group which matches the video ID within the path.
+ * @param {(videoId: string) => string} iframeUrlGenerator -
+ *   Generate the URL for an embedded video iframe from a video ID
+ * @param {Object} [options]
+ *   @param {number} [options.aspectRatio]
+ * @return {(link: HTMLAnchorElement) => HTMLElement|null}
+ */
+function createEmbedGenerator(
+  hostname,
+  pathPattern,
+  iframeUrlGenerator,
+  { aspectRatio } = {}
+) {
+  const generator = link => {
+    if (link.hostname !== hostname) {
+      return null;
+    }
+
+    const groups = pathPattern.exec(link.pathname);
+    if (!groups) {
+      return null;
+    }
+
+    const id = groups[1];
+    return iframe(iframeUrlGenerator(id), aspectRatio);
+  };
+
+  return generator;
 }
 
 /**
@@ -156,7 +186,7 @@ function vimeoEmbed(id) {
  * Each function either returns `undefined` if it can't generate an embed for
  * the link, or a DOM element if it can.
  *
- * @type {Array<(link: HTMLAnchorElement) => HTMLElement|null>}
+ * @type {Array<(link: HTMLAnchorElement) => (HTMLElement|null)>}
  */
 const embedGenerators = [
   // Matches URLs like https://www.youtube.com/watch?v=rw6oWkCojpw
@@ -191,30 +221,31 @@ const embedGenerators = [
   },
 
   // Matches URLs like https://vimeo.com/149000090
-  function iFrameFromVimeoLink(link) {
-    if (link.hostname !== 'vimeo.com') {
-      return null;
-    }
-
-    const groups = /^\/([^/?#]+)\/?$/.exec(link.pathname);
-    if (groups) {
-      return vimeoEmbed(groups[1]);
-    }
-    return null;
-  },
+  createEmbedGenerator(
+    'vimeo.com',
+    /^\/([^/?#]+)\/?$/,
+    id => `https://player.vimeo.com/video/${id}`
+  ),
 
   // Matches URLs like https://vimeo.com/channels/staffpicks/148845534
-  function iFrameFromVimeoChannelLink(link) {
-    if (link.hostname !== 'vimeo.com') {
-      return null;
-    }
+  createEmbedGenerator(
+    'vimeo.com',
+    /^\/channels\/[^/]+\/([^/?#]+)\/?$/,
+    id => `https://player.vimeo.com/video/${id}`
+  ),
 
-    const groups = /^\/channels\/[^/]+\/([^/?#]+)\/?$/.exec(link.pathname);
-    if (groups) {
-      return vimeoEmbed(groups[1]);
+  // Matches URLs like https://flipgrid.com/s/030475b8ceff
+  createEmbedGenerator(
+    'flipgrid.com',
+    /^\/s\/([^/]+)$/,
+    id => `https://flipgrid.com/s/${id}?embed=true`,
+    {
+      // Flipgrid renders the video with a very small size if using the default
+      // 16:9 aspect ratio, so change to 4:3 instead. This does create empty
+      // vertical space, but this is better than a tiny video.
+      aspectRatio: 4 / 3,
     }
-    return null;
-  },
+  ),
 
   /**
    * Match Internet Archive URLs

@@ -283,6 +283,22 @@ describe('media-embedder', function () {
     });
   });
 
+  it('replaces Flipgrid links with iframes', () => {
+    [
+      ['https://flipgrid.com/s/abc123', 'abc123'],
+      ['https://flipgrid.com/s/def456?foo', 'def456'],
+    ].forEach(([url, id]) => {
+      const element = domElement('<a href="' + url + '">' + url + '</a>');
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(
+        embedUrl(element),
+        'https://flipgrid.com/s/' + id + '?embed=true'
+      );
+    });
+  });
+
   it('replaces internet archive links with iframes', function () {
     const urls = [
       // Video details page.
