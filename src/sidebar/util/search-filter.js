@@ -134,7 +134,7 @@ export function toObject(searchText) {
  * Terms that are not associated with a particular facet are stored in the "any"
  * facet.
  *
- * @param {string|null} searchText - Filter query to parse
+ * @param {string} searchText - Filter query to parse
  * @param {FocusFilter} focusFilters - Additional filter terms to mix in
  * @return {Object.<string,Facet>}
  */
