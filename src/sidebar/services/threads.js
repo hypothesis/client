@@ -7,9 +7,13 @@ export default function threadsService(store) {
    */
   function forceVisible(thread) {
     thread.children.forEach(child => {
-      forceVisible(child);
+      if (!child.visible) {
+        forceVisible(child);
+      }
     });
-    store.setForcedVisible(thread.id, true);
+    if (!thread.visible) {
+      store.setForcedVisible(thread.id, true);
+    }
   }
 
   return {
