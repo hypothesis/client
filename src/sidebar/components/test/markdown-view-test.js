@@ -13,10 +13,7 @@ describe('MarkdownView', () => {
   beforeEach(() => {
     fakeRenderMarkdown = markdown => `rendered:${markdown}`;
     fakeMediaEmbedder = {
-      replaceLinksWithEmbeds: el => {
-        // Tag the element as having been processed
-        el.dataset.replacedLinksWithEmbeds = 'yes';
-      },
+      replaceLinksWithEmbeds: sinon.stub(),
     };
 
     $imports.$mock({
@@ -50,7 +47,9 @@ describe('MarkdownView', () => {
   it('replaces links with embeds in rendered output', () => {
     const wrapper = mount(<MarkdownView markdown="**test**" />);
     const rendered = wrapper.find('.markdown-view').getDOMNode();
-    assert.equal(rendered.dataset.replacedLinksWithEmbeds, 'yes');
+    assert.calledWith(fakeMediaEmbedder.replaceLinksWithEmbeds, rendered, {
+      className: 'markdown-view__embed',
+    });
   });
 
   it('applies `textClass` class to container', () => {

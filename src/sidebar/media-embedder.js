@@ -12,15 +12,46 @@ function audioElement(src) {
 }
 
 /**
+ * Wrap an element in a container that causes the element to be displayed at
+ * a given aspect ratio.
+ *
+ * See https://css-tricks.com/aspect-ratio-boxes/.
+ *
+ * @param {HTMLElement} element
+ * @param {number} aspectRatio - Aspect ratio as `width/height`
+ * @return {HTMLElement}
+ */
+function wrapInAspectRatioContainer(element, aspectRatio) {
+  element.style.position = 'absolute';
+  element.style.top = '0';
+  element.style.left = '0';
+  element.style.width = '100%';
+  element.style.height = '100%';
+
+  const container = document.createElement('div');
+  container.style.paddingBottom = `${(1 / aspectRatio) * 100}%`;
+  container.style.position = 'relative';
+  container.appendChild(element);
+
+  return container;
+}
+
+/**
  * Return an iframe DOM element with the given src URL.
+ *
+ * @param {string} src
  */
 function iframe(src) {
   const iframe_ = document.createElement('iframe');
   iframe_.src = src;
-  iframe_.classList.add('annotation-media-embed');
   iframe_.setAttribute('frameborder', '0');
   iframe_.setAttribute('allowfullscreen', '');
-  return iframe_;
+
+  // 16:9 is the aspect ratio that YouTube videos are optimized for.
+  // We assume here that this works for other embed types as well.
+  const aspectRatio = 16 / 9;
+
+  return wrapInAspectRatioContainer(iframe_, aspectRatio);
 }
 
 /**
@@ -297,6 +328,7 @@ function embedForLink(link) {
  *
  * If the link is not a link to an embeddable media it will be left untouched.
  *
+ * @return {HTMLElement|null}
  */
 function replaceLinkWithEmbed(link) {
   // The link's text may or may not be percent encoded. The `link.href` property
@@ -306,12 +338,13 @@ function replaceLinkWithEmbed(link) {
     link.href !== link.textContent &&
     decodeURI(link.href) !== link.textContent
   ) {
-    return;
+    return null;
   }
   const embed = embedForLink(link);
   if (embed) {
     link.parentElement.replaceChild(embed, link);
   }
+  return embed;
 }
 
 /**
@@ -320,8 +353,13 @@ function replaceLinkWithEmbed(link) {
  * All links to YouTube videos or other embeddable media will be replaced with
  * embeds of the same media.
  *
+ * @param {HTMLElement} element
+ * @param {Object} options
+ *   @param {string} [options.className] -
+ *     Class name to apply to embed containers. An important function of this class is to set
+ *     the width of the embed.
  */
-export function replaceLinksWithEmbeds(element) {
+export function replaceLinksWithEmbeds(element, { className } = {}) {
   let links = element.getElementsByTagName('a');
 
   // `links` is a "live list" of the <a> element children of `element`.
@@ -332,6 +370,14 @@ export function replaceLinksWithEmbeds(element) {
 
   let i;
   for (i = 0; i < links.length; i++) {
-    replaceLinkWithEmbed(links[i]);
+    const embed = replaceLinkWithEmbed(links[i]);
+    if (embed) {
+      if (className) {
+        embed.className = className;
+      } else {
+        // Default width.
+        embed.style.width = '350px';
+      }
+    }
   }
 }
