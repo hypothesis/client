@@ -14,10 +14,12 @@ export default function MarkdownView({ markdown = '', textClass = {} }) {
   const html = useMemo(() => (markdown ? renderMarkdown(markdown) : ''), [
     markdown,
   ]);
-  const content = useRef(null);
+  const content = useRef(/** @type {HTMLDivElement|null} */ (null));
 
   useEffect(() => {
-    replaceLinksWithEmbeds(content.current);
+    replaceLinksWithEmbeds(content.current, {
+      className: 'markdown-view__embed',
+    });
   }, [markdown]);
 
   // Use a blank string to indicate that the content language is unknown and may be

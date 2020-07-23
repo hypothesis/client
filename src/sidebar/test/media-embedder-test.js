@@ -17,6 +17,28 @@ describe('media-embedder', function () {
     clock.restore();
   });
 
+  /**
+   * Find all the media embed elements in a container.
+   */
+  function findEmbeds(element) {
+    return [...element.querySelectorAll('iframe,audio')];
+  }
+
+  /**
+   * Return the URL of the single media embed in `element`.
+   */
+  function embedUrl(element) {
+    const embeds = findEmbeds(element);
+    assert.equal(embeds.length, 1);
+    return embeds[0].src;
+  }
+
+  function assertStyle(element, expectedProperties) {
+    Object.entries(expectedProperties).forEach(([prop, value]) => {
+      assert.equal(element.style[prop], value);
+    });
+  }
+
   it('replaces YouTube watch links with iframes', function () {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc',
@@ -30,10 +52,8 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME', url);
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
         'https://www.youtube.com/embed/QCkm0lL-6lc'
       );
     });
@@ -50,14 +70,12 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME', url);
-      // queryString's #stringify sorts keys, so resulting query string
-      // will be reliably as follows, regardless of original ordering
-      // Note also `v` param is handled elsewhere and is not "allowed" in
-      // queryString.
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
+        // queryString's #stringify sorts keys, so resulting query string
+        // will be reliably as follows, regardless of original ordering
+        // Note also `v` param is handled elsewhere and is not "allowed" in
+        // queryString.
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -74,10 +92,8 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME', url);
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -131,9 +147,7 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME', url[0]);
-      assert.equal(element.children[0].src, url[1]);
+      assert.equal(embedUrl(element), url[1]);
     });
   });
 
@@ -147,12 +161,10 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME');
-      // queryString's #stringify sorts keys, so resulting query string
-      // will be reliably as follows, regardless of original ordering
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
+        // queryString's #stringify sorts keys, so resulting query string
+        // will be reliably as follows, regardless of original ordering
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -168,10 +180,8 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
         'https://www.youtube.com/embed/QCkm0lL-6lc'
       );
     });
@@ -187,12 +197,10 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME');
-      // queryString's #stringify sorts keys, so resulting query string
-      // will be reliably as follows, regardless of original ordering
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
+        // queryString's #stringify sorts keys, so resulting query string
+        // will be reliably as follows, regardless of original ordering
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -208,10 +216,8 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME', url);
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -227,12 +233,8 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME');
-      // queryString's #stringify sorts keys, so resulting query string
-      // will be reliably as follows, regardless of original ordering
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -252,10 +254,8 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
         'https://player.vimeo.com/video/149000090'
       );
     });
@@ -276,10 +276,8 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.childElementCount, 1);
-      assert.equal(element.children[0].tagName, 'IFRAME');
       assert.equal(
-        element.children[0].src,
+        embedUrl(element),
         'https://player.vimeo.com/video/148845534'
       );
     });
@@ -304,9 +302,7 @@ describe('media-embedder', function () {
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
 
-      assert.equal(element.children[0].tagName, 'IFRAME');
-
-      const actual = element.children[0].src;
+      const actual = embedUrl(element);
       const expected =
         url.indexOf('start') !== -1
           ? 'https://archive.org/embed/PATH?start=360&end=420.3'
@@ -406,16 +402,59 @@ describe('media-embedder', function () {
 
     mediaEmbedder.replaceLinksWithEmbeds(element);
 
-    assert.equal(element.childElementCount, 2);
-    assert.equal(element.children[0].tagName, 'IFRAME');
-    assert.equal(
-      element.children[0].src,
-      'https://www.youtube.com/embed/QCkm0lL-6lc'
-    );
-    assert.equal(element.children[1].tagName, 'IFRAME');
-    assert.equal(
-      element.children[1].src,
-      'https://www.youtube.com/embed/abcdefg'
-    );
+    const embeds = findEmbeds(element);
+
+    assert.equal(embeds.length, 2);
+    assert.equal(embeds[0].src, 'https://www.youtube.com/embed/QCkm0lL-6lc');
+    assert.equal(embeds[1].src, 'https://www.youtube.com/embed/abcdefg');
+  });
+
+  it('applies `className` option to video embeds', () => {
+    const url = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
+    const element = domElement('<a href="' + url + '">' + url + '</a>');
+
+    mediaEmbedder.replaceLinksWithEmbeds(element, {
+      className: 'widget__video',
+    });
+
+    assert.equal(element.childElementCount, 1);
+    assert.equal(element.children[0].className, 'widget__video');
+  });
+
+  it('sets a default width on video embeds if no `className` if provided', () => {
+    const url = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
+    const element = domElement('<a href="' + url + '">' + url + '</a>');
+
+    mediaEmbedder.replaceLinksWithEmbeds(element);
+
+    assert.equal(element.childElementCount, 1);
+    assert.equal(element.children[0].style.width, '350px');
+  });
+
+  it('wraps video embeds in an aspect-ratio box', () => {
+    const url = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
+    const element = domElement('<a href="' + url + '">' + url + '</a>');
+
+    mediaEmbedder.replaceLinksWithEmbeds(element);
+
+    assert.equal(element.childElementCount, 1);
+    assert.equal(element.children[0].tagName, 'DIV');
+
+    const aspectRatioBox = element.children[0];
+    assertStyle(aspectRatioBox, {
+      position: 'relative',
+      paddingBottom: '56.25%' /* 9/16 as a percentage */,
+    });
+    assert.equal(aspectRatioBox.childElementCount, 1);
+
+    const embed = aspectRatioBox.children[0];
+    assert.equal(embed.tagName, 'IFRAME');
+    assertStyle(embed, {
+      position: 'absolute',
+      top: '0px',
+      left: '0px',
+      width: '100%',
+      height: '100%',
+    });
   });
 });

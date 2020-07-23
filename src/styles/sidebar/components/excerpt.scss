@@ -20,6 +20,7 @@
     // See https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
     // and https://github.com/hypothesis/client/issues/1518.
     display: inline-block;
+    width: 100%;
   }
 
   // inline controls for expanding and collapsing

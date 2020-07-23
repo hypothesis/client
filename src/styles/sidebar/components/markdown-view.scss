@@ -1,6 +1,8 @@
 @use "../styled-text";
 
 .markdown-view {
+  width: 100%;
+
   @include styled-text.styled-text;
 
   cursor: text;
@@ -23,5 +25,9 @@
   // the annotation-body
   p:last-child {
     margin-bottom: 1px;
+  }
+
+  &__embed {
+    width: 100%;
   }
 }
