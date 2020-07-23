@@ -77,8 +77,10 @@ function SidebarContent({
 
   const showTabs = !hasContentError && !hasAppliedFilter;
   const showFilterStatus = features.flagEnabled('client_filter_status');
-  const showFocusModeHeader = isFocusedMode; // && !features.flagEnabled('client_filter_status');
-  const showSearchStatus = !hasContentError; // && !features.flagEnabled('client_filter_status');
+  const showFocusModeHeader =
+    isFocusedMode && !features.flagEnabled('client_filter_status');
+  const showSearchStatus =
+    !hasContentError && !features.flagEnabled('client_filter_status');
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -129,6 +131,7 @@ function SidebarContent({
     <div>
       <h2 className="u-screen-reader-only">Annotations</h2>
       {showFocusModeHeader && <FocusedModeHeader />}
+      {showFilterStatus && <FilterStatus />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
@@ -142,7 +145,6 @@ function SidebarContent({
       )}
       {showTabs && <SelectionTabs isLoading={isLoading} />}
       {showSearchStatus && <SearchStatusBar />}
-      {showFilterStatus && <FilterStatus />}
       <ThreadList thread={rootThread} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>

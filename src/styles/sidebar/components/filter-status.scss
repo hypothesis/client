@@ -2,27 +2,34 @@
 @use "../../mixins/molecules";
 @use "../../variables" as var;
 
+@mixin facet {
+  white-space: nowrap;
+}
+
+.filter-facet {
+  @include facet;
+  font-weight: bold;
+}
+
+.filter-facet--muted {
+  @include facet;
+  color: var.$color-text--light;
+  font-style: italic;
+}
+
+.filter-facet--pre {
+  @include facet;
+}
+
 .filter-status {
   @include molecules.card;
-  margin-bottom: 2em;
+  margin-bottom: 1em;
+  padding: var.$layout-space--small;
   justify-content: space-between;
 
   &__text {
     flex-grow: 1;
     padding-right: var.$layout-space--xsmall;
-  }
-
-  &__facet {
-    white-space: nowrap;
-    font-weight: bold;
-
-    &--muted {
-      color: var.$color-text--light;
-    }
-
-    &--pre {
-      font-weight: normal;
-    }
   }
 
   &__header {

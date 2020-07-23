@@ -29,7 +29,11 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
 
   const onSubmit = e => {
     e.preventDefault();
-    onSearch(input.current.value);
+    if (input.current.value || prevQuery) {
+      // Don't set an initial empty query, but allow a later empty query to
+      // clear `prevQuery`
+      onSearch(input.current.value);
+    }
   };
 
   // When the active query changes outside of this component, update the input
