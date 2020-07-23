@@ -23,7 +23,7 @@
     "sidebar/store/modules/*.js",
     "sidebar/services/*.js",
     "sidebar/util/*.js",
-    "sidebar/store/*.js",
+    "sidebar/store/*.js"
   ],
   "exclude": [
     // Enable this once the rest of `src/sidebar` is checked.
@@ -31,6 +31,7 @@
 
     // Files in `src/sidebar/components` that may still have errors.
     // Remove them from this list as they are resolved.
+    "sidebar/components/hooks/use-root-thread.js",
     "sidebar/components/annotation-action-bar.js",
     "sidebar/components/annotation-header.js",
     "sidebar/components/annotation-publish-control.js",
