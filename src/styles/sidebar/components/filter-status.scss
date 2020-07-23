@@ -1,0 +1,34 @@
+@use "../../mixins/layout";
+@use "../../mixins/molecules";
+@use "../../variables" as var;
+
+.filter-status {
+  @include molecules.card;
+  margin-bottom: 2em;
+  justify-content: space-between;
+
+  &__text {
+    flex-grow: 1;
+    padding-right: var.$layout-space--xsmall;
+  }
+
+  &__facet {
+    white-space: nowrap;
+    font-weight: bold;
+
+    &--muted {
+      color: var.$color-text--light;
+    }
+
+    &--pre {
+      font-weight: normal;
+    }
+  }
+
+  &__header {
+    // Temporary
+    font-size: 16px;
+    font-weight: bold;
+    margin: var.$layout-space 0;
+  }
+}

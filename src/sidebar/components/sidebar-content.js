@@ -7,6 +7,7 @@ import { withServices } from '../util/service-context';
 import useStore from '../store/use-store';
 import { tabForAnnotation } from '../util/tabs';
 
+import FilterStatus from './filter-status';
 import FocusedModeHeader from './focused-mode-header';
 import LoggedOutMessage from './logged-out-message';
 import LoginPromptPanel from './login-prompt-panel';
@@ -19,6 +20,7 @@ import ThreadList from './thread-list';
  * Render the sidebar and its components
  */
 function SidebarContent({
+  features,
   frameSync,
   onLogin,
   onSignUp,
@@ -74,6 +76,9 @@ function SidebarContent({
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
   const showTabs = !hasContentError && !hasAppliedFilter;
+  const showFilterStatus = features.flagEnabled('client_filter_status');
+  const showFocusModeHeader = isFocusedMode; // && !features.flagEnabled('client_filter_status');
+  const showSearchStatus = !hasContentError; // && !features.flagEnabled('client_filter_status');
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -123,7 +128,7 @@ function SidebarContent({
   return (
     <div>
       <h2 className="u-screen-reader-only">Annotations</h2>
-      {isFocusedMode && <FocusedModeHeader />}
+      {showFocusModeHeader && <FocusedModeHeader />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
@@ -136,7 +141,8 @@ function SidebarContent({
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
       {showTabs && <SelectionTabs isLoading={isLoading} />}
-      {!hasContentError && <SearchStatusBar />}
+      {showSearchStatus && <SearchStatusBar />}
+      {showFilterStatus && <FilterStatus />}
       <ThreadList thread={rootThread} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
@@ -149,12 +155,14 @@ SidebarContent.propTypes = {
   onSignUp: propTypes.func.isRequired,
 
   // Injected
+  features: propTypes.object,
   frameSync: propTypes.object,
   loadAnnotationsService: propTypes.object,
   streamer: propTypes.object,
 };
 
 SidebarContent.injectedProps = [
+  'features',
   'frameSync',
   'loadAnnotationsService',
   'streamer',

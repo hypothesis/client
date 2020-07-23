@@ -73,6 +73,7 @@
 /* A button with displayed text. It may or may not have an icon. */
 @mixin button--labeled {
   @include button;
+  white-space: nowrap; // Keep multi-word button labels from wrapping
   color: var.$grey-mid;
   font-weight: 700;
   background-color: var.$grey-1;
