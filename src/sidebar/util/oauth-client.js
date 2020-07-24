@@ -204,6 +204,7 @@ export default class OAuthClient {
         try {
           chrome.runtime.sendMessage(
             {
+              type: 'auth',
               authUrl: this.authorizationEndpoint,
               clientId: this.clientId,
               state: state,
