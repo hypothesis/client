@@ -27,7 +27,7 @@
     "classnames": "^2.2.4",
     "codecov": "^3.1.0",
     "coffeeify": "^2.1.0",
-    "commander": "^5.0.0",
+    "commander": "^6.0.0",
     "core-js": "^3.4.1",
     "cross-env": "^7.0.0",
     "custom-event": "^1.0.1",
