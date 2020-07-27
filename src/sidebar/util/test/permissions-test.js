@@ -93,5 +93,10 @@ describe('sidebar/util/permissions', () => {
       assert.isFalse(permissions.permits(perms, 'update', userid));
       assert.isFalse(permissions.permits(perms, 'delete', userid));
     });
+
+    it('returns false if the userid is null', () => {
+      const perms = permissions.privatePermissions(userid);
+      assert.isFalse(permissions.permits(perms, 'update', null));
+    });
   });
 });

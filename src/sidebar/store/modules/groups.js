@@ -206,7 +206,6 @@ const getCurrentlyViewingGroups = createSelector(
  *
  * // Selectors
  * @prop {() => Group[]} allGroups
- * @prop {() => Group[]} allGroups
  * @prop {() => Group|undefined|null} focusedGroup
  * @prop {() => string|null} focusedGroupId
  * @prop {() => Group[]} getFeaturedGroups

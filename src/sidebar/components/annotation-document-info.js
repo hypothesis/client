@@ -3,9 +3,18 @@ import propTypes from 'prop-types';
 
 import * as annotationMetadata from '../util/annotation-metadata';
 
+/** @typedef {import("../../types/api").Annotation} Annotation */
+
+/**
+ * @typedef AnnotationDocumentInfoProps
+ * @prop {Annotation} annotation - Annotation for which the document metadata will be rendered
+ */
+
 /**
  * Render some metadata about an annotation's document and link to it
  * if a link is available.
+ *
+ * @param {AnnotationDocumentInfoProps} props
  */
 export default function AnnotationDocumentInfo({ annotation }) {
   const documentInfo = annotationMetadata.domainAndTitle(annotation);
@@ -35,6 +44,5 @@ export default function AnnotationDocumentInfo({ annotation }) {
 }
 
 AnnotationDocumentInfo.propTypes = {
-  /* Annotation for which the document metadata will be rendered */
   annotation: propTypes.object.isRequired,
 };

@@ -98,9 +98,9 @@ export function isPrivate(perms) {
  *
  * @param {Permissions} perms
  * @param {'update'|'delete'} action
- * @param {string} userid
+ * @param {string|null} userid
  * @return {boolean}
  */
 export function permits(perms, action, userid) {
-  return perms[action].indexOf(userid) !== -1;
+  return perms[action].indexOf(userid || '') !== -1;
 }

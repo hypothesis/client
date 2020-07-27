@@ -48,6 +48,7 @@
  *       that have not been saved to the service yet (and thus do not have an id)
  * @prop {string[]} [references]
  * @prop {string} created
+ * @prop {boolean} [flagged]
  * @prop {string} group
  * @prop {string} updated
  * @prop {string[]} tags

@@ -21,12 +21,9 @@ function AnnotationShareControl({
   group,
   shareUri,
 }) {
-  const annotationIsPrivate = isPrivate(
-    annotation.permissions,
-    annotation.user
-  );
-  const shareRef = useRef();
-  const inputRef = useRef();
+  const annotationIsPrivate = isPrivate(annotation.permissions);
+  const shareRef = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const inputRef = useRef(/** @type {HTMLInputElement|null} */ (null));
 
   const [isOpen, setOpen] = useState(false);
   const wasOpen = useRef(isOpen);
