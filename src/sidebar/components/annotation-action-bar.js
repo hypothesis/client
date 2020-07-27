@@ -10,9 +10,24 @@ import { withServices } from '../util/service-context';
 import AnnotationShareControl from './annotation-share-control';
 import Button from './button';
 
+/** @typedef {import("../../types/api").Annotation} Annotation */
+
+/** @typedef {import('../../types/config').HostConfig} HostConfig */
+
+/**
+ * @typedef AnnotationActionBarProps
+ * @prop {Annotation} annotation - The annotation in question
+ * @prop {() => any} onReply - Callbacks for when action buttons are clicked/tapped
+ * @prop {Object} annotationsService
+ * @prop {HostConfig} settings
+ * @prop {Object} toastMessenger
+ */
+
 /**
  * A collection of `Button`s in the footer area of an annotation that take
  * actions on the annotation.
+ *
+ * @param {AnnotationActionBarProps} props
  */
 function AnnotationActionBar({
   annotation,
@@ -67,12 +82,12 @@ function AnnotationActionBar({
       .catch(() => toastMessenger.error('Flagging annotation failed'));
   };
 
-  const onReplyClick = event => {
+  const onReplyClick = () => {
     if (!isLoggedIn) {
       openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
       return;
     }
-    onReply(event);
+    onReply();
   };
 
   return (
@@ -109,10 +124,7 @@ function AnnotationActionBar({
 
 AnnotationActionBar.propTypes = {
   annotation: propTypes.object.isRequired,
-  /** Callbacks for when action buttons are clicked/tapped */
   onReply: propTypes.func.isRequired,
-
-  // Injected services
   annotationsService: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,

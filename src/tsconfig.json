@@ -32,7 +32,6 @@
     // Files in `src/sidebar/components` that may still have errors.
     // Remove them from this list as they are resolved.
     "sidebar/components/hooks/use-root-thread.js",
-    "sidebar/components/annotation-action-bar.js",
     "sidebar/components/annotation-header.js",
     "sidebar/components/annotation-publish-control.js",
     "sidebar/components/annotation-quote.js",
