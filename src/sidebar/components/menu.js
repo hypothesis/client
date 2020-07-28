@@ -25,6 +25,34 @@ const menuArrow = className => (
 let ignoreNextClick = false;
 
 /**
+ * @typedef MenuProps
+ * @prop {'left'|'right'} [align] -
+ *   Whether the menu content is aligned with the left (default) or right edges of the
+ *   toggle element.
+ * @prop {string} [arrowClass] -
+ *   Additional CSS class for the arrow caret at the edge of the menu content that "points"
+ *   toward the menu's toggle button. This can be used to adjust the position of that caret
+ *   respective to the toggle button.
+ * @prop {Object|string} [label] - Label element for the toggle button that hides and shows the menu.
+ * @prop {Object} [children] -
+ *   Menu items and sections to display in the content area of the menu.  These are typically
+ *   `MenuSection` and `MenuItem` components, but other custom content is also allowed.
+ * @prop {boolean} [containerPositioned] -
+ *   Whether the menu elements should be positioned relative to the Menu container. When
+ *   `false`, the consumer is responsible for positioning.
+ * @prop {string} [contentClass] - Additional CSS classes to apply to the menu.
+ * @prop {boolean} [defaultOpen] - Whether the menu is open or closed when initially rendered.
+ * @prop {(open: boolean) => any} [onOpenChanged] - Callback invoked when the menu is
+ *   opened or closed.  This can be used, for example, to reset any ephemeral state that the
+ *   menu content may have.
+ * @prop {string} title -
+ *   A title for the menu. This is important for accessibility if the menu's toggle button
+ *   has only an icon as a label.
+ * @prop {boolean} [menuIndicator] -
+ *   Whether to display an indicator next to the label that there is a dropdown menu.
+ */
+
+/**
  * A drop-down menu.
  *
  * Menus consist of a button which toggles whether the menu is open, an
@@ -41,6 +69,8 @@ let ignoreNextClick = false;
  *       <MenuItem label="Log out"/>
  *     </MenuSection>
  *   </Menu>
+ *
+ * @param {MenuProps} props
  */
 export default function Menu({
   align = 'left',
@@ -89,7 +119,7 @@ export default function Menu({
   //
   // These handlers close the menu when the user taps or clicks outside the
   // menu or presses Escape.
-  const menuRef = useRef();
+  const menuRef = useRef(/** @type {HTMLDivElement|null} */ (null));
 
   // Menu element should close via `closeMenu` whenever it's open and there
   // are user interactions outside of it (e.g. clicks) in the document
@@ -163,7 +193,7 @@ export default function Menu({
               contentClass
             )}
             role="menu"
-            tabIndex="-1"
+            tabIndex={-1}
             onClick={closeMenu}
             onKeyDown={handleMenuKeyDown}
           >
@@ -178,68 +208,17 @@ export default function Menu({
 }
 
 Menu.propTypes = {
-  /**
-   * Whether the menu content is aligned with the left (default) or right edges
-   * of the toggle element.
-   */
   align: propTypes.oneOf(['left', 'right']),
-
-  /**
-   * Additional CSS class for the arrow caret at the edge of the menu
-   * content that "points" toward the menu's toggle button. This can be used
-   * to adjust the position of that caret respective to the toggle button.
-   */
   arrowClass: propTypes.string,
-
-  /**
-   * Label element for the toggle button that hides and shows the menu.
-   */
   label: propTypes.oneOfType([
     propTypes.object.isRequired,
     propTypes.string.isRequired,
   ]),
-
-  /**
-   * Menu items and sections to display in the content area of the menu.
-   *
-   * These are typically `MenuSection` and `MenuItem` components, but other
-   * custom content is also allowed.
-   */
   children: propTypes.any,
-
-  /**
-   * Whether the menu elements should be positioned relative to the Menu
-   * container. When `false`, the consumer is responsible for positioning.
-   */
   containerPositioned: propTypes.bool,
-
-  /**
-   * Additional CSS classes to apply to the menu.
-   */
   contentClass: propTypes.string,
-
-  /**
-   * Whether the menu is open or closed when initially rendered.
-   */
   defaultOpen: propTypes.bool,
-
-  /**
-   * Callback invoked when the menu is opened or closed.
-   *
-   * This can be used, for example, to reset any ephemeral state that the
-   * menu content may have.
-   */
   onOpenChanged: propTypes.func,
-
-  /**
-   * A title for the menu. This is important for accessibility if the menu's
-   * toggle button has only an icon as a label.
-   */
   title: propTypes.string.isRequired,
-
-  /**
-   * Whether to display an indicator next to the label that there is a
-   * dropdown menu.
-   */
   menuIndicator: propTypes.bool,
 };

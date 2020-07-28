@@ -10,6 +10,44 @@ import MenuKeyboardNavigation from './menu-keyboard-navigation';
 import Slider from './slider';
 
 /**
+ * @typedef MenuItemProps
+ * @prop {string} [href] -
+ *   URL of the external link to open when this item is clicked. Either the `href` or an
+ *   `onClick` callback should be supplied.
+ * @prop {string} [iconAlt] - Alt text for icon.
+ * @prop {string} [icon] -
+ *   Name or URL of icon to display. If the value is a URL it is displayed using an `<img>`,
+ *   if it is a name it is displayed using `SvgIcon`.  If the property is `"blank"` a blank
+ *   placeholder is displayed in place of an icon. If the property is falsey, no placeholder
+ *   is displayed. The placeholder is useful to keep menu item labels aligned in a list if
+ *   some items have icons and others do not.
+ * @prop {boolean} [isDisabled] -
+ *   Dim the label to indicate that this item is not currently available.  The `onClick`
+ *   callback will still be invoked when this item is clicked and the submenu, if any,
+ *   can still be toggled.
+ * @prop {boolean} [isExpanded] -
+ *   Indicates that the submenu associated with this item is currently open.
+ * @prop {boolean} [isSelected] -
+ *   Display an indicator to show that this menu item represents something which is currently
+ *   selected/active/focused.
+ * @prop {boolean} [isSubmenuItem] -
+ *   True if this item is part of a submenu, in which case it is rendered with a different
+ *   style (shaded background)
+ * @prop {boolean} [isSubmenuVisible] -
+ *   If present, display a button to toggle the sub-menu associated with this item and
+ *   indicate the current state; `true` if the submenu is visible. Note. Omit this prop,
+ *    or set it to null, if there is no `submenu`.
+ * @prop {string} label - Label of the menu item.
+ * @prop {(e: Event) => any} [onClick] - Callback to invoke when the menu item is clicked.
+ * @prop {(e: Event) => any} [onToggleSubmenu] -
+ *   Callback when the user clicks on the toggle to change the expanded state of the menu.
+ * @prop {Object} [submenu] -
+ *   Contents of the submenu for this item.  This is typically a list of `MenuItem` components
+ *    with the `isSubmenuItem` prop set to `true`, but can include other content as well.
+ *    The submenu is only rendered if `isSubmenuVisible` is `true`.
+ */
+
+/**
  * An item in a dropdown menu.
  *
  * Dropdown menu items display an icon, a label and can optionally have a submenu
@@ -24,6 +62,8 @@ import Slider from './slider';
  * For items that have submenus, the `MenuItem` will call the `renderSubmenu`
  * prop to render the content of the submenu, when the submenu is visible.
  * Note that the `submenu` is not supported for link (`href`) items.
+ *
+ * @param {MenuItemProps} props
  */
 export default function MenuItem({
   href,
@@ -45,7 +85,9 @@ export default function MenuItem({
   const hasLeftIcon = icon || isSubmenuItem;
   const hasRightIcon = icon && isSubmenuItem;
 
-  const menuItemRef = useRef(null);
+  const menuItemRef = useRef(
+    /** @type {(HTMLAnchorElement & HTMLDivElement)|null} */ (null)
+  );
   let focusTimer = null;
 
   let renderedIcon = null;
@@ -110,7 +152,7 @@ export default function MenuItem({
         })}
         href={href}
         target="_blank"
-        tabIndex="-1"
+        tabIndex={-1}
         rel="noopener noreferrer"
         role="menuitem"
         onKeyDown={onKeyDown}
@@ -137,7 +179,7 @@ export default function MenuItem({
           'is-expanded': isExpanded,
           'is-selected': isSelected,
         })}
-        tabIndex="-1"
+        tabIndex={-1}
         onKeyDown={onKeyDown}
         onClick={onClick}
         role={isRadioButtonType ? 'menuitemradio' : 'menuitem'}
@@ -193,76 +235,16 @@ export default function MenuItem({
 }
 
 MenuItem.propTypes = {
-  /**
-   * URL of the external link to open when this item is clicked.
-   * Either the `href` or an  `onClick` callback should be supplied.
-   */
   href: propTypes.string,
-
-  /** Alt text for icon. */
   iconAlt: propTypes.string,
-
-  /**
-   * Name or URL of icon to display. If the value is a URL it is displayed
-   * using an `<img>`, if it is a name it is displayed using `SvgIcon`.
-   *
-   * If the property is `"blank"` a blank placeholder is displayed in place of an
-   * icon. If the property is falsey, no placeholder is displayed.
-   * The placeholder is useful to keep menu item labels aligned in a list if
-   * some items have icons and others do not.
-   */
   icon: propTypes.string,
-
-  /**
-   * Dim the label to indicate that this item is not currently available.
-   *
-   * The `onClick` callback will still be invoked when this item is clicked and
-   * the submenu, if any, can still be toggled.
-   */
   isDisabled: propTypes.bool,
-
-  /**
-   * Indicates that the submenu associated with this item is currently open.
-   */
   isExpanded: propTypes.bool,
-
-  /**
-   * Display an indicator to show that this menu item represents something
-   * which is currently selected/active/focused.
-   */
   isSelected: propTypes.bool,
-
-  /**
-   * True if this item is part of a submenu, in which case it is rendered
-   * with a different style (shaded background)
-   */
   isSubmenuItem: propTypes.bool,
-
-  /**
-   * If present, display a button to toggle the sub-menu associated with this
-   * item and indicate the current state; `true` if the submenu is visible.
-   * Note. Omit this prop, or set it to null, if there is no `submenu`.
-   */
   isSubmenuVisible: propTypes.bool,
-
-  /** Label of the menu item. */
   label: propTypes.string.isRequired,
-
-  /** Callback to invoke when the menu item is clicked. */
   onClick: propTypes.func,
-
-  /**
-   * Callback when the user clicks on the toggle to change the expanded
-   * state of the menu.
-   */
   onToggleSubmenu: propTypes.func,
-
-  /**
-   * Contents of the submenu for this item.
-   *
-   * This is typically a list of `MenuItem` components with the `isSubmenuItem`
-   * prop set to `true`, but can include other content as well.
-   * The submenu is only rendered if `isSubmenuVisible` is `true`.
-   */
   submenu: propTypes.any,
 };
