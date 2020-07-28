@@ -7,10 +7,10 @@ const NESTED_THREADS = {
       id: '1',
       children: [
         { id: '1a', children: [{ id: '1ai', children: [] }] },
-        { id: '1b', children: [] },
+        { id: '1b', children: [], visible: true },
         {
           id: '1c',
-          children: [{ id: '1ci', children: [] }],
+          children: [{ id: '1ci', children: [], visible: false }],
         },
       ],
     },
@@ -21,7 +21,7 @@ const NESTED_THREADS = {
         {
           id: '2b',
           children: [
-            { id: '2bi', children: [] },
+            { id: '2bi', children: [], visible: true },
             { id: '2bii', children: [] },
           ],
         },
@@ -46,26 +46,31 @@ describe('threadsService', function () {
   });
 
   describe('#forceVisible', () => {
-    it('should set the thread and its children force-visible in the store', () => {
-      service.forceVisible(NESTED_THREADS);
-
-      [
+    let nonVisibleThreadIds;
+    beforeEach(() => {
+      nonVisibleThreadIds = [
         'top',
         '1',
         '2',
         '3',
         '1a',
-        '1b',
         '1c',
         '2a',
         '2b',
         '1ai',
         '1ci',
-        '2bi',
         '2bii',
-      ].forEach(threadId =>
-        assert.calledWith(fakeStore.setForcedVisible, threadId)
-      );
+      ];
+    });
+    it('should set the thread and its children force-visible in the store', () => {
+      service.forceVisible(NESTED_THREADS);
+      nonVisibleThreadIds.forEach(threadId => {
+        assert.calledWith(fakeStore.setForcedVisible, threadId);
+        assert.callCount(
+          fakeStore.setForcedVisible,
+          nonVisibleThreadIds.length
+        );
+      });
     });
 
     it('should not set the visibility on thread ancestors', () => {
@@ -76,14 +81,7 @@ describe('threadsService', function () {
       for (let i = 0; i < fakeStore.setForcedVisible.callCount; i++) {
         calledWithThreadIds.push(fakeStore.setForcedVisible.getCall(i).args[0]);
       }
-      assert.deepEqual(calledWithThreadIds, [
-        '1ai',
-        '1a',
-        '1b',
-        '1ci',
-        '1c',
-        '1',
-      ]);
+      assert.deepEqual(calledWithThreadIds, ['1ai', '1a', '1ci', '1c', '1']);
     });
   });
 });
