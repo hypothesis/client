@@ -61,6 +61,25 @@ describe('SearchInput', () => {
     assert.calledWith(onSearch, 'new-query');
   });
 
+  it('does not set an initial empty query when form is submitted', () => {
+    // If the first query entered is empty, it will be ignored
+    const onSearch = sinon.stub();
+    const wrapper = createSearchInput({ onSearch });
+    typeQuery(wrapper, '');
+    wrapper.find('form').simulate('submit');
+    assert.notCalled(onSearch);
+  });
+
+  it('sets subsequent empty queries if entered', () => {
+    // If there has already been at least one query set, subsequent
+    // empty queries will be honored
+    const onSearch = sinon.stub();
+    const wrapper = createSearchInput({ query: 'foo', onSearch });
+    typeQuery(wrapper, '');
+    wrapper.find('form').simulate('submit');
+    assert.calledWith(onSearch, '');
+  });
+
   it('renders loading indicator when app is in a "loading" state', () => {
     fakeStore.isLoading.returns(true);
     const wrapper = createSearchInput();
