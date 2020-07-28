@@ -3,6 +3,12 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 /**
+ * @typedef SliderProps
+ * @prop {Object} [children] - The slideable content to hide or reveal.
+ * @prop {boolean} visible - Whether the content should be visible or not.
+ */
+
+/**
  * A container which reveals its content when `visible` is `true` using
  * a sliding animation.
  *
@@ -11,6 +17,8 @@ import propTypes from 'prop-types';
  * order.
  *
  * Currently the only reveal/expand direction supported is top-down.
+ *
+ * @param {SliderProps} props
  */
 export default function Slider({ children, visible }) {
   const containerRef = useRef(null);
@@ -76,6 +84,7 @@ export default function Slider({ children, visible }) {
       // nb. Preact uses "ontransitionend" rather than "onTransitionEnd".
       // See https://bugs.chromium.org/p/chromium/issues/detail?id=961193
       //
+      // @ts-ignore
       // eslint-disable-next-line react/no-unknown-property
       ontransitionend={handleTransitionEnd}
       ref={containerRef}
@@ -97,9 +106,5 @@ export default function Slider({ children, visible }) {
 
 Slider.propTypes = {
   children: propTypes.any,
-
-  /**
-   * Whether the content should be visible or not.
-   */
   visible: propTypes.bool,
 };

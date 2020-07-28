@@ -14,7 +14,7 @@ import { listen } from '../../util/dom';
  */
 
 /**
- * @typedef {Ref<HTMLButtonElement> & Ref<PreactElement>} PreactRef
+ * @typedef {Ref<HTMLElement> | Ref<PreactElement>} PreactRef
  */
 
 /**
@@ -52,13 +52,13 @@ export default function useElementShouldClose(
 
   const getCurrentNode = closeableEl => {
     // if base is present, assume its a preact component
-    const node = closeableEl.current.base
-      ? closeableEl.current.base
+    const node = /** @type {PreactElement} */ (closeableEl.current).base
+      ? /** @type {PreactElement} */ (closeableEl.current).base
       : closeableEl.current;
     if (typeof node !== 'object') {
       throw new Error('useElementShouldClose can not find a node reference');
     }
-    return node;
+    return /** @type {Node} */ (node);
   };
 
   useEffect(() => {

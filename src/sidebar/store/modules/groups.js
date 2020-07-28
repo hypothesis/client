@@ -206,7 +206,12 @@ const getCurrentlyViewingGroups = createSelector(
  *
  * // Selectors
  * @prop {() => Group[]} allGroups
- * // TODO: add rest ...
+ * @prop {() => Group[]} allGroups
+ * @prop {() => Group|undefined|null} focusedGroup
+ * @prop {() => string|null} focusedGroupId
+ * @prop {() => Group[]} getFeaturedGroups
+ * @prop {(id: string) => Group|undefined} getGroup
+ * @prop {() => Group[]} getInScopeGroups
  */
 
 export default {
