@@ -49,6 +49,16 @@
  * @prop {string} route
  */
 
+/**
+ * @typedef FilterState
+ * @prop {string|null} filterQuery
+ * @prop {boolean} focusActive
+ * @prop {boolean} focusConfigured
+ * @prop {string|null} focusDisplayName
+ * @prop {number} forcedVisibleCount
+ * @prop {number} selectedCount
+ */
+
 import { createSelector } from 'reselect';
 
 import uiConstants from '../../ui-constants';
@@ -163,27 +173,36 @@ const setTab = (newTab, oldTab) => {
   };
 };
 
+/**
+ * Return state object representing a reset selection. This
+ * resets user-set filters (but leaves focus mode intact)
+ */
+const resetSelection = () => {
+  return {
+    filterQuery: null,
+    forcedVisible: {},
+    selected: {},
+  };
+};
+
 const update = {
   CHANGE_FOCUS_MODE_USER: function (state, action) {
     return {
+      ...resetSelection(),
       focusMode: setFocus({ user: action.user }),
     };
   },
 
   CLEAR_SELECTED_ANNOTATIONS: function () {
-    return { filterQuery: null, selected: {} };
+    return resetSelection();
   },
 
   CLEAR_SELECTION: function () {
-    return {
-      filterQuery: null,
-      forcedVisible: {},
-      selected: {},
-    };
+    return resetSelection();
   },
 
   SELECT_ANNOTATIONS: function (state, action) {
-    return { selected: action.selection };
+    return { ...resetSelection(), selected: action.selection };
   },
 
   SELECT_TAB: function (state, action) {
@@ -197,11 +216,7 @@ const update = {
   },
 
   SET_FILTER_QUERY: function (state, action) {
-    return {
-      filterQuery: action.query,
-      forcedVisible: {},
-      expanded: {},
-    };
+    return { ...resetSelection(), expanded: {}, filterQuery: action.query };
   },
 
   SET_FOCUS_MODE: function (state, action) {
@@ -210,6 +225,7 @@ const update = {
         ? action.active
         : !state.focusMode.active;
     return {
+      ...resetSelection(),
       focusMode: {
         ...state.focusMode,
         active,
@@ -287,10 +303,7 @@ const actions = util.actionTypes(update);
  * @param {User} user - The user to focus on
  */
 function changeFocusModeUser(user) {
-  return function (dispatch) {
-    dispatch({ type: actions.CLEAR_SELECTION });
-    dispatch({ type: actions.CHANGE_FOCUS_MODE_USER, user });
-  };
+  return { type: actions.CHANGE_FOCUS_MODE_USER, user };
 }
 
 /** De-select all annotations. */
@@ -311,9 +324,12 @@ function clearSelection() {
  * @param {string[]} ids - Identifiers of annotations to select
  */
 function selectAnnotations(ids) {
-  return {
-    type: actions.SELECT_ANNOTATIONS,
-    selection: toTrueMap(ids),
+  return dispatch => {
+    dispatch({ type: actions.SET_FOCUS_MODE, active: false });
+    dispatch({
+      type: actions.SELECT_ANNOTATIONS,
+      selection: toTrueMap(ids),
+    });
   };
 }
 
@@ -526,6 +542,25 @@ function sortKeys(state) {
   return sortKeysForTab;
 }
 
+/**
+ * Summary of applied filters
+ *
+ * @type {(state: any) => FilterState}
+ */
+const filterState = createSelector(
+  state => state,
+  selection => {
+    return {
+      filterQuery: filterQuery(selection),
+      focusActive: focusModeActive(selection),
+      focusConfigured: focusModeConfigured(selection),
+      focusDisplayName: focusModeUserPrettyName(selection),
+      forcedVisibleCount: forcedVisibleAnnotations(selection).length,
+      selectedCount: selectedAnnotations(selection).length,
+    };
+  }
+);
+
 /* Selectors that take root state */
 
 /**
@@ -598,6 +633,7 @@ export default {
   selectors: {
     expandedMap,
     filterQuery,
+    filterState,
     focusModeActive,
     focusModeConfigured,
     focusModeUserFilter,
