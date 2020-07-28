@@ -64,11 +64,23 @@ describe('sidebar/store/modules/selection', () => {
       assert.isTrue(store.hasAppliedFilter());
     });
 
-    it('returns true if user-focused mode applied', () => {
-      store = createStore([selection], [{ focus: { user: {} } }]);
-      store.toggleFocusMode(true);
+    it('returns true if user-focused mode is active', () => {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'somebody' } } }]
+      );
 
       assert.isTrue(store.hasAppliedFilter());
+    });
+
+    it('returns false if user-focused mode is configured but inactive', () => {
+      store = createStore(
+        [selection],
+        [{ focus: { user: { username: 'somebody' } } }]
+      );
+      store.toggleFocusMode(false);
+
+      assert.isFalse(store.hasAppliedFilter());
     });
 
     it('returns true if there are selected annotations', () => {
@@ -107,6 +119,47 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
+  describe('filterState', () => {
+    it('returns the current filter query', () => {
+      store.setFilterQuery('doodah, doodah');
+      assert.equal(store.filterState().filterQuery, 'doodah, doodah');
+    });
+
+    it('returns user focus information', () => {
+      store.changeFocusModeUser({
+        username: 'filbert',
+        displayName: 'Pantomime Nutball',
+      });
+
+      const filterState = store.filterState();
+      assert.isTrue(filterState.focusActive);
+      assert.isTrue(filterState.focusConfigured);
+      assert.equal(filterState.focusDisplayName, 'Pantomime Nutball');
+    });
+
+    it('returns a count of forced-visible annotations', () => {
+      store.setForcedVisible('kaboodle', true);
+      store.setForcedVisible('stampy', false);
+
+      assert.equal(store.filterState().forcedVisibleCount, 1);
+    });
+
+    it('returns a count of selected annotations', () => {
+      store.selectAnnotations(['tabulature', 'felonious']);
+      assert.equal(store.filterState().selectedCount, 2);
+    });
+
+    it('returns empty filter states when no filters active', () => {
+      const filterState = store.filterState();
+      assert.isFalse(filterState.focusActive);
+      assert.isFalse(filterState.focusConfigured);
+      assert.isEmpty(filterState.focusDisplayName);
+      assert.isNull(filterState.filterQuery);
+      assert.equal(filterState.forcedVisibleCount, 0);
+      assert.equal(filterState.selectedCount, 0);
+    });
+  });
+
   describe('threadState', () => {
     it('returns the current annotations in rootState', () => {
       const myAnnotation = fixtures.defaultAnnotation();
@@ -124,32 +177,44 @@ describe('sidebar/store/modules/selection', () => {
       assert.equal(store.threadState().route, 'kamchatka');
     });
 
-    it('returns relevant state from selection', () => {
-      // The order of these matters, as these actions change multiple properties
-      // on the selection state
+    it('returns relevant state about tab and sort', () => {
       store.selectTab('orphan');
       store.setSortKey('pyrrhic');
+
+      const selection = store.threadState().selection;
+
+      assert.equal(selection.selectedTab, 'orphan');
+      assert.equal(selection.sortKey, 'pyrrhic');
+    });
+
+    it('returns the relevant state when annotations are selected', () => {
+      store.selectAnnotations(['1', '2']);
+      store.setExpanded('3', true);
+      store.setExpanded('4', false);
+
+      const selection = store.threadState().selection;
+
+      assert.deepEqual(selection.expanded, { '3': true, '4': false });
+      assert.deepEqual(selection.selected, ['1', '2']);
+    });
+
+    it('returns the relevant state when user-focus mode is applied', () => {
       store.changeFocusModeUser({
         username: 'testuser',
         displayName: 'Test User',
       });
+
+      const selection = store.threadState().selection;
+
+      assert.deepEqual(selection.filters, { user: 'testuser' });
+    });
+
+    it('returns the relevant state when a filter query is applied', () => {
       store.setFilterQuery('frappe');
-      // Order doesn't matter past here
-      store.selectAnnotations(['1', '2']);
-      store.setExpanded('3', true);
-      store.setExpanded('4', false);
-      store.setForcedVisible('5', true);
-      store.setForcedVisible('6', false);
 
       const selection = store.threadState().selection;
 
       assert.equal(selection.filterQuery, 'frappe');
-      assert.equal(selection.selectedTab, 'orphan');
-      assert.equal(selection.sortKey, 'pyrrhic');
-      assert.deepEqual(selection.selected, ['1', '2']);
-      assert.deepEqual(selection.expanded, { '3': true, '4': false });
-      assert.deepEqual(selection.forcedVisible, ['5']);
-      assert.deepEqual(selection.filters, { user: 'testuser' });
     });
   });
 
