@@ -21,7 +21,7 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @prop {boolean} [isPressed] -
  *   Indicate that this is a toggle button (if `isPressed` is a boolean) and whether it
  *   is pressed.  If omitted, the button is a non-toggle button.
- * @prop {(e: Event) => any} onClick - callback for button clicks
+ * @prop {(e: Event) => any} [onClick] - callback for button clicks
  * @prop {boolean} [disabled] - disables the button when true
  * @prop {Object} [style] - optional inline styling
  * @prop {string} [title] -
@@ -112,7 +112,7 @@ Button.propTypes = {
   icon: requiredStringIfButtonTextMissing,
   isExpanded: propTypes.bool,
   isPressed: propTypes.bool,
-  onClick: propTypes.func.isRequired,
+  onClick: propTypes.func,
   disabled: propTypes.bool,
   style: propTypes.object,
   title: requiredStringIfButtonTextMissing,
