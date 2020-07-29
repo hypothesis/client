@@ -53,6 +53,7 @@ describe('SidebarContent', () => {
       hasAppliedFilter: sinon.stub(),
       hasFetchedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
+      isFeatureEnabled: sinon.stub().returns(false),
       isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
       getState: sinon.stub(),
@@ -174,6 +175,14 @@ describe('SidebarContent', () => {
         const wrapper = createComponent();
         assert.isFalse(wrapper.find('SearchStatusBar').exists());
       });
+
+      it('does not render filter status', () => {
+        fakeStore.isFeatureEnabled
+          .withArgs('client_filter_status')
+          .returns(true);
+        const wrapper = createComponent();
+        assert.isFalse(wrapper.find('FilterStatus').exists());
+      });
     });
   });
 
@@ -202,6 +211,42 @@ describe('SidebarContent', () => {
     it('does not render search status', () => {
       const wrapper = createComponent();
       assert.isFalse(wrapper.find('SearchStatusBar').exists());
+    });
+  });
+
+  context('user-focus mode', () => {
+    it('shows focus mode header when focus mode is configured', () => {
+      fakeStore.focusModeConfigured.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('FocusedModeHeader').exists());
+    });
+
+    it('shows filter status when focus mode and feature flag enabled', () => {
+      fakeStore.isFeatureEnabled.withArgs('client_filter_status').returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('FocusedModeHeader').exists());
+      assert.isTrue(wrapper.find('FilterStatus').exists());
+    });
+  });
+
+  describe('search status', () => {
+    it('shows the search status bar', () => {
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('SearchStatusBar').exists());
+    });
+
+    it('shows filter status instead of search status when feature flag enabled', () => {
+      fakeStore.isFeatureEnabled.withArgs('client_filter_status').returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('SearchStatusBar').exists());
+      assert.isTrue(wrapper.find('FilterStatus').exists());
     });
   });
 
