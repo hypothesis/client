@@ -9,17 +9,29 @@ import Button from './button';
 import Spinner from './spinner';
 
 /**
+ * @typedef SearchInputProps
+ * @prop {boolean} [alwaysExpanded] -
+ *   If true, the input field is always shown. If false, the input field is only shown
+ *   if the query is non-empty.
+ * @prop {string} [query] - The currently active filter query.
+ * @prop {(value: string) => any} [onSearch] -
+ *   Callback to invoke when the current filter query changes.
+ */
+
+/**
  * An input field in the top bar for entering a query that filters annotations
  * (in the sidebar) or searches annotations (in the stream/single annotation
  * view).
  *
- * This component also renders a loading spinner to indicate when the client
+ * This component also renders a eloading spinner to indicate when the client
  * is fetching for data from the API or in a "loading" state for any other
  * reason.
+ *
+ * @param {SearchInputProps} props
  */
 export default function SearchInput({ alwaysExpanded, query, onSearch }) {
   const isLoading = useStore(store => store.isLoading());
-  const input = useRef();
+  const input = useRef(/** @type {HTMLInputElement|null} */ (null));
 
   // The active filter query from the previous render.
   const [prevQuery, setPrevQuery] = useState(query);
@@ -58,7 +70,9 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         disabled={isLoading}
         ref={input}
         value={pendingQuery}
-        onInput={e => setPendingQuery(e.target.value)}
+        onInput={e =>
+          setPendingQuery(/** @type {HTMLInputElement} */ (e.target).value)
+        }
       />
       {!isLoading && (
         <Button
@@ -68,25 +82,13 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
           title="Search annotations"
         />
       )}
-      {isLoading && <Spinner className="top-bar__btn" title="Loading…" />}
+      {isLoading && <Spinner />}
     </form>
   );
 }
 
 SearchInput.propTypes = {
-  /**
-   * If true, the input field is always shown. If false, the input field is
-   * only shown if the query is non-empty.
-   */
   alwaysExpanded: propTypes.bool,
-
-  /**
-   * The currently active filter query.
-   */
   query: propTypes.string,
-
-  /**
-   * Callback to invoke when the current filter query changes.
-   */
   onSearch: propTypes.func,
 };
