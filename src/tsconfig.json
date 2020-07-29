@@ -50,7 +50,6 @@
     "sidebar/components/login-prompt-panel.js",
     "sidebar/components/moderation-banner.js",
     "sidebar/components/new-note-btn.js",
-    "sidebar/components/search-input.js",
     "sidebar/components/search-status-bar.js",
     "sidebar/components/selection-tabs.js",
     "sidebar/components/share-annotations-panel.js",
