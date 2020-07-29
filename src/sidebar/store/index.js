@@ -61,6 +61,7 @@ import viewer from './modules/viewer';
  * @typedef {import("./modules/groups").GroupsStore} GroupsStore
  * @typedef {import("./modules/links").LinksStore} LinksStore
  * @typedef {import("./modules/real-time-updates").RealTimeUpdatesStore} RealTimeUpdatesStore
+ * @typedef {import("./modules/route").RouteStore} RouteStore
  * @typedef {import("./modules/selection").SelectionStore} SelectionStore
  * @typedef {import("./modules/session").SessionStore} SessionStore
  * @typedef {import("./modules/sidebar-panels").SidebarPanelsStore} SidebarPanelsStore
@@ -79,6 +80,7 @@ import viewer from './modules/viewer';
  *  GroupsStore &
  *  LinksStore &
  *  RealTimeUpdatesStore &
+ *  RouteStore &
  *  SelectionStore &
  *  SessionStore &
  *  SidebarPanelsStore &
