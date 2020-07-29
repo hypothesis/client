@@ -7,6 +7,7 @@ import { withServices } from '../util/service-context';
 import useStore from '../store/use-store';
 import { tabForAnnotation } from '../util/tabs';
 
+import FilterStatus from './filter-status';
 import FocusedModeHeader from './focused-mode-header';
 import LoggedOutMessage from './logged-out-message';
 import LoginPromptPanel from './login-prompt-panel';
@@ -45,6 +46,9 @@ function SidebarContent({
     ? tabForAnnotation(linkedAnnotation)
     : null;
   const searchUris = useStore(store => store.searchUris());
+  const filterStatusEnabled = useStore(store =>
+    store.isFeatureEnabled('client_filter_status')
+  );
   const sidebarHasOpened = useStore(store => store.hasSidebarOpened());
   const userId = useStore(store => store.profile().userid);
 
@@ -73,7 +77,10 @@ function SidebarContent({
   const hasContentError =
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
+  const showFilterStatus = filterStatusEnabled && !hasContentError;
   const showTabs = !hasContentError && !hasAppliedFilter;
+  const showFocusModeHeader = isFocusedMode && !showFilterStatus;
+  const showSearchStatus = !hasContentError && !showFilterStatus;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -123,7 +130,8 @@ function SidebarContent({
   return (
     <div>
       <h2 className="u-screen-reader-only">Annotations</h2>
-      {isFocusedMode && <FocusedModeHeader />}
+      {showFocusModeHeader && <FocusedModeHeader />}
+      {showFilterStatus && <FilterStatus />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
         <SidebarContentError
@@ -136,7 +144,7 @@ function SidebarContent({
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
       {showTabs && <SelectionTabs isLoading={isLoading} />}
-      {!hasContentError && <SearchStatusBar />}
+      {showSearchStatus && <SearchStatusBar />}
       <ThreadList thread={rootThread} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
