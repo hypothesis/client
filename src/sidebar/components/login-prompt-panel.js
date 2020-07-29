@@ -8,7 +8,15 @@ import Button from './button';
 import SidebarPanel from './sidebar-panel';
 
 /**
+ * @typedef LoginPromptPanelProps
+ * @prop {() => any} onLogin
+ * @prop {() => any} onSignUp
+ */
+
+/**
  * A sidebar panel that prompts a user to log in (or sign up) to annotate.
+ *
+ * @param {LoginPromptPanelProps} props
  */
 export default function LoginPromptPanel({ onLogin, onSignUp }) {
   const isLoggedIn = useStore(store => store.isLoggedIn());

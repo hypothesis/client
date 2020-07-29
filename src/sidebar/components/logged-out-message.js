@@ -6,10 +6,20 @@ import { withServices } from '../util/service-context';
 import Button from './button';
 import SvgIcon from '../../shared/components/svg-icon';
 
+/** @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter */
+
+/**
+ * @typedef LoggedOutMessageProps
+ * @prop {() => any} onLogin
+ * @prop {ServiceUrlGetter} serviceUrl
+ */
+
 /**
  * Render a call-to-action to log in or sign up. This message is intended to be
  * displayed to non-auth'd users when viewing a single annotation in a
  * direct-linked context (i.e. URL with syntax `/#annotations:<annotation_id>`)
+ *
+ * @param {LoggedOutMessageProps} props
  */
 function LoggedOutMessage({ onLogin, serviceUrl }) {
   return (
