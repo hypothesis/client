@@ -479,6 +479,9 @@ function focusModeUserPrettyName(state) {
   return state.focusMode.user.displayName;
 }
 
+/**
+ * @type {(state: any) => string[]}
+ */
 const forcedVisibleAnnotations = createSelector(
   state => state.forcedVisible,
   forcedVisible => trueKeys(forcedVisible)
@@ -488,7 +491,7 @@ const forcedVisibleAnnotations = createSelector(
  * Returns the annotation ID of the first annotation in the selection that is
  * selected (`true`) or `null` if there are none.
  *
- * @return {string|null}
+ * @type {(state: any) => string|null}
  */
 const getFirstSelectedAnnotationId = createSelector(
   state => state.selected,
@@ -501,13 +504,16 @@ const getFirstSelectedAnnotationId = createSelector(
 /**
  * Are any annotations currently selected?
  *
- * @return {boolean}
+ * @type {(state: any) => boolean}
  */
 const hasSelectedAnnotations = createSelector(
   state => state.selected,
   selection => trueKeys(selection).length > 0
 );
 
+/**
+ * @type {(state: any) => string[]}
+ */
 const selectedAnnotations = createSelector(
   state => state.selected,
   selection => trueKeys(selection)
@@ -518,7 +524,7 @@ const selectedAnnotations = createSelector(
  * includes a search query, but also if annotations are selected or a user
  * is focused.
  *
- * @return {boolean}
+ * @type {(state: any) => boolean}
  */
 const hasAppliedFilter = createSelector(
   filterQuery,
@@ -608,7 +614,18 @@ const threadState = createSelector(
  * @prop {typeof toggleSelectedAnnotations} toggleSelectedAnnotations
  *
  * // Selectors
- * // TODO: add the rest
+ * @prop {() => Object<string,boolean>} expandedMap
+ * @prop {() => string|null} filterQuery
+ * @prop {() => boolean} focusModeActive
+ * @prop {() => boolean} focusModeConfigured
+ * @prop {() => string|null} focusModeUserFilter
+ * @prop {() => string} focusModeUserPrettyName
+ * @prop {() => string[]} forcedVisibleAnnotations
+ * @prop {() => string|null} getFirstSelectedAnnotationId
+ * @prop {() => boolean} hasAppliedFilter
+ * @prop {() => boolean} hasSelectedAnnotations
+ * @prop {() => string[]} selectedAnnotations
+ * @prop {() => string[]} sortKeys
  */
 
 export default {

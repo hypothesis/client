@@ -40,7 +40,6 @@
     "sidebar/components/annotation-viewer-content.js",
     "sidebar/components/annotation.js",
     "sidebar/components/filter-status.js",
-    "sidebar/components/focused-mode-header.js",
     "sidebar/components/group-list-item.js",
     "sidebar/components/group-list-section.js",
     "sidebar/components/group-list.js",
