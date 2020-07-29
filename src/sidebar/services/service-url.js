@@ -22,7 +22,7 @@ import * as urlUtil from '../util/url';
  *
  * @callback ServiceUrlGetter
  * @param {string} linkName - The name of the link to expand
- * @param {object} params - The params with which to expand the link
+ * @param {object} [params] - The params with which to expand the link
  * @returns {string} The expanded absolute URL, or an empty string if the
  *                   links haven't been received from the API yet
  * @throws {Error} If the links have been received from the API but the given

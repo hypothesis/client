@@ -10,11 +10,25 @@ import Slider from './slider';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef SidebarPanelProps
+ * @prop {Object} [children]
+ * @prop {string} [icon] - An optional icon name for display next to the panel's title
+ * @prop {string} panelName -
+ *   A string identifying this panel. Only one `panelName` may be active at any time.
+ *   Multiple panels with the same `panelName` would be "in sync", opening and closing together.
+ * @prop {string} title - The panel's title: rendered in its containing visual "frame"
+ * @prop {(active: boolean) => any} [onActiveChanged] -
+ *   Optional callback to invoke when this panel's active status changes
+ */
+
+/**
  * Base component for a sidebar panel.
  *
  * This component provides a basic visual container for sidebar panels, as well
  * as providing a close button. Only one sidebar panel (as defined by the panel's
  * `panelName`) is active at one time.
+ *
+ * @param {SidebarPanelProps} props
  */
 export default function SidebarPanel({
   children,
@@ -26,7 +40,7 @@ export default function SidebarPanel({
   const panelIsActive = useStore(store => store.isSidebarPanelOpen(panelName));
   const togglePanelFn = useStore(store => store.toggleSidebarPanel);
 
-  const panelElement = useRef();
+  const panelElement = useRef(/** @type {HTMLDivElement|null}*/ (null));
   const panelWasActive = useRef(panelIsActive);
 
   // Scroll the panel into view if it has just been opened
@@ -68,22 +82,8 @@ export default function SidebarPanel({
 
 SidebarPanel.propTypes = {
   children: propTypes.any,
-
-  /**
-   * An optional icon name for display next to the panel's title
-   */
   icon: propTypes.string,
-
-  /**
-   * A string identifying this panel. Only one `panelName` may be active at
-   * any time. Multiple panels with the same `panelName` would be "in sync",
-   * opening and closing together.
-   */
   panelName: propTypes.string.isRequired,
-
-  /** The panel's title: rendered in its containing visual "frame" */
   title: propTypes.string.isRequired,
-
-  /** Optional callback to invoke when this panel's active status changes */
   onActiveChanged: propTypes.func,
 };
