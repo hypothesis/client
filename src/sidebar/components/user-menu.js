@@ -12,10 +12,35 @@ import MenuSection from './menu-section';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * /
+
+/**
+ * @typedef AuthState
+ * @prop {'logged-in'|'logged-out'} status
+ * @prop {string} [displayName]
+ * @prop {string} [userid]
+ * @prop {string} [username]
+ * @prop {string} [provider]
+ */
+
+/**
+ * @typedef UserMenuProps
+ * @prop {AuthState} auth - object representing authenticated user and auth status
+ * @prop {() => any} onLogout - onClick callback for the "log out" button
+ * @prop {Object} bridge
+ * @prop {ServiceUrlGetter} serviceUrl
+ * @prop {MergedConfig} settings
+ */
+
+/**
  * A menu with user and account links.
  *
  * This menu will contain different items depending on service configuration,
  * context and whether the user is first- or third-party.
+ *
+ * @param {UserMenuProps} props
  */
 function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
   const isThirdParty = isThirdPartyUser(auth.userid, settings.authDomain);
@@ -75,12 +100,8 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
 }
 
 UserMenu.propTypes = {
-  /* object representing authenticated user and auth status */
   auth: propTypes.object.isRequired,
-  /* onClick callback for the "log out" button */
   onLogout: propTypes.func.isRequired,
-
-  /* services */
   bridge: propTypes.object.isRequired,
   serviceUrl: propTypes.func.isRequired,
   settings: propTypes.object.isRequired,

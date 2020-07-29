@@ -52,7 +52,6 @@
     "sidebar/components/share-annotations-panel.js",
     "sidebar/components/sidebar-content-error.js",
     "sidebar/components/sidebar-content.js",
-    "sidebar/components/sort-menu.js",
     "sidebar/components/stream-content.js",
     "sidebar/components/stream-search-input.js",
     "sidebar/components/thread-card.js",
@@ -61,7 +60,6 @@
     "sidebar/components/timestamp.js",
     "sidebar/components/toast-messages.js",
     "sidebar/components/top-bar.js",
-    "sidebar/components/user-menu.js",
     "sidebar/components/version-info.js"
   ]
 }
