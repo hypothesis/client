@@ -25,13 +25,13 @@ describe('sidebar/util/dom', () => {
   });
 
   describe('listen', () => {
-    const createElement = () => ({
+    const createFakeElement = () => ({
       addEventListener: sinon.stub(),
       removeEventListener: sinon.stub(),
     });
     [true, false].forEach(useCapture => {
       it('adds listeners for specified events', () => {
-        const element = createElement();
+        const element = createFakeElement();
         const handler = sinon.stub();
 
         listen(element, ['click', 'mousedown'], handler, { useCapture });
@@ -53,7 +53,7 @@ describe('sidebar/util/dom', () => {
 
     [true, false].forEach(useCapture => {
       it('removes listeners when returned function is invoked', () => {
-        const element = createElement();
+        const element = createFakeElement();
         const handler = sinon.stub();
 
         const removeListeners = listen(
