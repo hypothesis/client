@@ -45,7 +45,6 @@
     "sidebar/components/group-list.js",
     "sidebar/components/help-panel.js",
     "sidebar/components/hypothesis-app.js",
-    "sidebar/components/moderation-banner.js",
     "sidebar/components/new-note-btn.js",
     "sidebar/components/search-status-bar.js",
     "sidebar/components/selection-tabs.js",
@@ -57,7 +56,6 @@
     "sidebar/components/thread-card.js",
     "sidebar/components/thread-list.js",
     "sidebar/components/thread.js",
-    "sidebar/components/timestamp.js",
     "sidebar/components/toast-messages.js",
     "sidebar/components/top-bar.js",
     "sidebar/components/version-info.js"
