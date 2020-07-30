@@ -7,8 +7,23 @@ import * as annotationMetadata from '../util/annotation-metadata';
 import { withServices } from '../util/service-context';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ */
+
+/**
+ * @typedef ModerationBannerProps
+ * @prop {Annotation} annotation -
+ *   The annotation object for this banner. This contains state about the flag count
+ *   or its hidden value.
+ * @prop {Object} api - Injected service
+ * @prop {Object} toastMessenger - Injected service
+ */
+
+/**
  * Banner allows moderators to hide/unhide the flagged
  * annotation from other users.
+ *
+ * @param {ModerationBannerProps} props
  */
 function ModerationBanner({ annotation, api, toastMessenger }) {
   // actions
@@ -64,7 +79,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
   })();
 
   const bannerClasses = classnames('moderation-banner', {
-    'is-flagged': flagCount > 0,
+    'is-flagged': flagCount !== null && flagCount > 0,
     'is-hidden': annotation.hidden,
     'is-reply': annotationMetadata.isReply(annotation),
   });
@@ -89,13 +104,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
 }
 
 ModerationBanner.propTypes = {
-  /**
-   * The annotation object for this banner. This contains
-   * state about the flag count or its hidden value.
-   */
   annotation: propTypes.object.isRequired,
-
-  // Injected services.
   api: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,
 };

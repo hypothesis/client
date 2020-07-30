@@ -200,7 +200,7 @@ export function nextFuzzyUpdate(date, now) {
  *
  * @param {string} date - An ISO 8601 date string timestamp to format.
  * @param {UpdateCallback} callback - A callback function to call when the timestamp changes.
- * @return {Function} A function that cancels the automatic refresh.
+ * @return {()=>void} A function that cancels the automatic refresh.
  */
 export function decayingInterval(date, callback) {
   let timer;
@@ -232,9 +232,9 @@ export function decayingInterval(date, callback) {
 /**
  * Formats a date as a string relative to the current date.
  *
- * @param {Date} date - The date to consider as the timestamp to format.
+ * @param {Date|null} date - The date to consider as the timestamp to format.
  * @param {Date} now - The date to consider as the current time.
- * @param {Object} Intl - JS internationalization API implementation; this
+ * @param {Object} [Intl] - JS internationalization API implementation; this
  *                      param is present for dependency injection during test.
  * @return {string} A 'fuzzy' string describing the relative age of the date.
  */
