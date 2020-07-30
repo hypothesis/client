@@ -33,9 +33,7 @@
     // Remove them from this list as they are resolved.
     "sidebar/components/hooks/use-root-thread.js",
     "sidebar/components/annotation-header.js",
-    "sidebar/components/annotation-publish-control.js",
     "sidebar/components/annotation-quote.js",
-    "sidebar/components/annotation-share-control.js",
     "sidebar/components/annotation-share-info.js",
     "sidebar/components/annotation-viewer-content.js",
     "sidebar/components/annotation.js",

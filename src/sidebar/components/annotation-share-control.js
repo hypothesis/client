@@ -12,7 +12,26 @@ import ShareLinks from './share-links';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ * @typedef {import('../../types/api').Group} Group
+ */
+
+/**
+ * @typedef AnnotationShareControlProps
+ * @prop {Annotation} annotation - The annotation in question
+ * @prop {Group} [group] -
+ *  Group that the annotation is in. If missing, this component will not render.
+ *  FIXME: Refactor after root cause is addressed.
+ *  See https://github.com/hypothesis/client/issues/1542
+ * @prop {string} shareUri - The URI to view the annotation on its own
+ * @prop {Object} analytics - Injected service
+ * @prop {Object} toastMessenger - Injected service
+ */
+
+/**
  * "Popup"-style component for sharing a single annotation.
+ *
+ * @param {AnnotationShareControlProps} props
  */
 function AnnotationShareControl({
   annotation,
@@ -135,18 +154,9 @@ function AnnotationShareControl({
 }
 
 AnnotationShareControl.propTypes = {
-  /* The annotation in question */
   annotation: propTypes.object.isRequired,
-  /** group that the annotation is in
-   *  If missing, this component will not render
-   *  FIXME: Refactor after root cause is addressed
-   *  See https://github.com/hypothesis/client/issues/1542
-   */
   group: propTypes.object,
-  /** The URI to view the annotation on its own */
   shareUri: propTypes.string.isRequired,
-
-  /* services */
   analytics: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,
 };
