@@ -141,7 +141,7 @@ function getGroup(state, id) {
 /**
  * Return groups the user isn't a member of that are scoped to the URI.
  *
- * @return {Group[]}
+ * @type {(state: any) => Group[]}
  */
 const getFeaturedGroups = createSelector(
   state => state.groups,
@@ -153,7 +153,7 @@ const getFeaturedGroups = createSelector(
  * that show up in the old groups menu. This should be removed once the new groups
  * menu is permanent.
  *
- * @return {Group[]}
+ * @type {(state: any) => Group[]}
  */
 const getInScopeGroups = createSelector(
   state => state.groups,
@@ -165,7 +165,7 @@ const getInScopeGroups = createSelector(
 /**
  * Return groups the logged in user is a member of.
  *
- * @return {Group[]}
+ * @type {(state: any) => Group[]}
  */
 const getMyGroups = createSelector(
   rootState => rootState.groups.groups,
@@ -183,7 +183,7 @@ const getMyGroups = createSelector(
 /**
  * Return groups that don't show up in Featured and My Groups.
  *
- * @return {Group[]}
+ * @type {(state: any) => Group[]}
  */
 const getCurrentlyViewingGroups = createSelector(
   rootState => allGroups(rootState.groups),

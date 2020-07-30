@@ -405,7 +405,7 @@ function updateFlagStatus(id, isFlagged) {
 /**
  * Count the number of annotations (as opposed to notes or orphans)
  *
- * @return {number}
+ * @type {(state: any) => number}
  */
 const annotationCount = createSelector(
   state => state.annotations,
@@ -451,7 +451,7 @@ function findIDsForTags(state, tags) {
 /**
  * Retrieve currently-focused annotation identifiers
  *
- * @return {string[]}
+ * @type {(state: any) => string[]}
  */
 const focusedAnnotations = createSelector(
   state => state.focused,
@@ -461,7 +461,7 @@ const focusedAnnotations = createSelector(
 /**
  * Retrieve currently-highlighted annotation identifiers
  *
- * @return {string[]}
+ * @type {(state: any) => string[]}
  */
 const highlightedAnnotations = createSelector(
   state => state.highlighted,
@@ -481,7 +481,7 @@ function isAnnotationFocused(state, $tag) {
 /**
  * Are there any annotations still waiting to anchor?
  *
- * @return {boolean}
+ * @type {(state: any) => boolean}
  */
 const isWaitingToAnchorAnnotations = createSelector(
   state => state.annotations,
@@ -492,7 +492,7 @@ const isWaitingToAnchorAnnotations = createSelector(
  * Return all loaded annotations that are not highlights and have not been saved
  * to the server
  *
- * @return {Annotation[]}
+ * @type {(state: any) => Annotation[]}
  */
 const newAnnotations = createSelector(
   state => state.annotations,
@@ -504,7 +504,7 @@ const newAnnotations = createSelector(
  * Return all loaded annotations that are highlights and have not been saved
  * to the server
  *
- * @return {Annotation[]}
+ * @type {(state: any) => Annotation[]}
  */
 const newHighlights = createSelector(
   state => state.annotations,
@@ -515,7 +515,7 @@ const newHighlights = createSelector(
 /**
  * Count the number of page notes currently in the collection
  *
- * @return {number}
+ @type {(state: any) => number}
  */
 const noteCount = createSelector(
   state => state.annotations,

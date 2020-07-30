@@ -7,15 +7,6 @@ import * as metadata from '../util/annotation-metadata';
 import { watch } from '../util/watch';
 
 /**
- * @typedef FrameInfo
- * @property {string} uri - Current primary URI of the document being displayed
- * @property {string[]} searchUris - List of URIs that should be passed to the
- *           search API when searching for annotations on this document.
- * @property {string} documentFingerprint - Fingerprint of the document, used
- *                    for PDFs
- */
-
-/**
  * Return a minimal representation of an annotation that can be sent from the
  * sidebar app to a connected frame.
  *
