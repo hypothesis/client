@@ -158,6 +158,8 @@ function pendingDeletions(state) {
 
 /**
  * Return a total count of pending updates and deletions.
+ *
+ * @type {(state: any) => number}
  */
 const pendingUpdateCount = createSelector(
   state => [state.pendingUpdates, state.pendingDeletions],
@@ -168,6 +170,8 @@ const pendingUpdateCount = createSelector(
 /**
  * Return true if an annotation has been deleted on the server but the deletion
  * has not yet been applied.
+ *
+ * @param {string} id
  */
 function hasPendingDeletion(state, id) {
   return state.pendingDeletions.hasOwnProperty(id);

@@ -180,7 +180,7 @@ function getDraftIfNotEmpty(state, annotation) {
 /**
  * Returns a list of draft annotations which have no id.
  *
- * @return {Draft[]}
+ * @type {(state: any) => Annotation[]}
  */
 const unsavedAnnotations = createSelector(
   state => state,
@@ -200,7 +200,7 @@ const unsavedAnnotations = createSelector(
  * @prop {() => number} countDrafts
  * @prop {(a: Annotation) => Draft|null} getDraft
  * @prop {(a: Annotation) => Draft|null} getDraftIfNotEmpty
- * @prop {() => Draft[]} unsavedAnnotations
+ * @prop {() => Annotation[]} unsavedAnnotations
  */
 
 export default {

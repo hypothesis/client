@@ -7,6 +7,18 @@ import shallowEqual from 'shallowequal';
 
 import * as util from '../util';
 
+/**
+ * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
+ */
+
+/**
+ * @typedef Frame
+ * @prop {string|null} id
+ *   - Sub-frames will all have a id (frame identifier) set. The main frame's id is always `null`
+ * @prop {DocumentMetadata} metadata - Metadata about the document currently loaded in this frame
+ * @prop {string} uri - Current primary URI of the document being displayed
+ */
+
 function init() {
   // The list of frames connected to the sidebar app
   return [];
@@ -40,6 +52,8 @@ const actions = util.actionTypes(update);
 
 /**
  * Add a frame to the list of frames currently connected to the sidebar app.
+ *
+ * @param {Frame} frame
  */
 function connectFrame(frame) {
   return { type: actions.CONNECT_FRAME, frame: frame };
@@ -47,6 +61,8 @@ function connectFrame(frame) {
 
 /**
  * Remove a frame from the list of frames currently connected to the sidebar app.
+ *
+ * @param {Frame} frame
  */
 function destroyFrame(frame) {
   return { type: actions.DESTROY_FRAME, frame: frame };
@@ -54,11 +70,14 @@ function destroyFrame(frame) {
 
 /**
  * Update the `isAnnotationFetchComplete` flag of the frame.
+ *
+ * @param {string} uri
+ * @param {boolean} isFetchComplete
  */
-function updateFrameAnnotationFetchStatus(uri, status) {
+function updateFrameAnnotationFetchStatus(uri, isFetchComplete) {
   return {
     type: actions.UPDATE_FRAME_ANNOTATION_FETCH_STATUS,
-    isAnnotationFetchComplete: status,
+    isAnnotationFetchComplete: isFetchComplete,
     uri: uri,
   };
 }
@@ -79,6 +98,8 @@ function frames(state) {
  * for that purpose.
  *
  * This may be `null` during startup.
+ *
+ * @type {(state: any) => Frame|null}
  */
 const mainFrame = createSelector(
   state => state,
@@ -88,6 +109,9 @@ const mainFrame = createSelector(
   frames => frames.find(f => !f.id) || null
 );
 
+/**
+ * @param {Frame} frame
+ */
 function searchUrisForFrame(frame) {
   let uris = [frame.uri];
 
@@ -114,8 +138,12 @@ const createShallowEqualSelector = createSelectorCreator(
   shallowEqual
 );
 
-// Memoized selector will return the same array (of URIs) reference unless the
-// values of the array change (are not shallow-equal).
+/**
+ * Memoized selector will return the same array (of URIs) reference unless the
+ * values of the array change (are not shallow-equal).
+ *
+ * @type {(state: any) => string[]}
+ */
 const searchUris = createShallowEqualSelector(
   frames => {
     return frames.reduce(
