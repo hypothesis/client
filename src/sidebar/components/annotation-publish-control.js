@@ -13,10 +13,25 @@ import MenuItem from './menu-item';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ */
+
+/**
+ * @typedef AnnotationPublishControlProps
+ * @prop {Annotation} annotation
+ * @prop {boolean} [isDisabled]
+ *  - Should the save button be disabled? Hint: it will be if the annotation has no content
+ * @prop {() => any} onSave - Callback for save button click
+ * @prop {MergedConfig} settings - Injected service
+ */
+
+/**
  * Render a compound control button for publishing (saving) an annotation:
  * - Save the annotation — left side of button
  * - Choose sharing/privacy option - drop-down menu on right side of button
  *
+ * @param {AnnotationPublishControlProps} props
  */
 function AnnotationPublishControl({
   annotation,
@@ -31,6 +46,12 @@ function AnnotationPublishControl({
   const removeDraft = useStore(store => store.removeDraft);
   const setDefault = useStore(store => store.setDefault);
   const removeAnnotations = useStore(store => store.removeAnnotations);
+
+  if (!group) {
+    // If there is no group, then don't render anything as a missing group
+    // may mean the group is not loaded yet.
+    return null;
+  }
 
   const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
 
@@ -114,17 +135,8 @@ function AnnotationPublishControl({
 
 AnnotationPublishControl.propTypes = {
   annotation: propTypes.object.isRequired,
-
-  /**
-   * Should the save button be disabled?
-   * Hint: it will be if the annotation has no content
-   */
   isDisabled: propTypes.bool,
-
-  /** Callback for save button click */
   onSave: propTypes.func.isRequired,
-
-  /** services */
   settings: propTypes.object.isRequired,
 };
 

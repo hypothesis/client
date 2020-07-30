@@ -118,6 +118,7 @@
  * @prop {string} logo
  * @prop {boolean} isMember
  * @prop {boolean} isScopedToUri
+ * @prop {string} name
  * @prop {boolean} canLeave
  */
 

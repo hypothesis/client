@@ -70,6 +70,12 @@ describe('AnnotationPublishControl', () => {
     $imports.$restore();
   });
 
+  it('should not render if group is missing', () => {
+    fakeStore.getGroup.returns(undefined);
+    const wrapper = createAnnotationPublishControl();
+    assert.isFalse(wrapper.find('.annotation-publish-control').exists());
+  });
+
   describe('theming', () => {
     it('should apply theme styles', () => {
       const fakeStyle = { foo: 'bar' };
