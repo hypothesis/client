@@ -71,7 +71,7 @@
     "katex": "^0.12.0",
     "lodash.debounce": "^4.0.3",
     "loose-envify": "^1.4.0",
-    "mocha": "8.0.1",
+    "mocha": "8.1.0",
     "npm-packlist": "^2.0.1",
     "postcss": "^7.0.13",
     "postcss-url": "^8.0.0",
