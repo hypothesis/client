@@ -152,7 +152,7 @@ AnnotationSync.prototype._tag = function (ann, tag) {
   if (ann.$tag) {
     return ann;
   }
-  tag = tag || window.btoa(Math.random());
+  tag = tag || window.btoa(Math.random().toString());
   Object.defineProperty(ann, '$tag', {
     value: tag,
   });
