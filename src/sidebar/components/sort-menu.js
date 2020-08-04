@@ -26,9 +26,7 @@ export default function SortMenu() {
         label={sortOption}
         onClick={() => actions.setSortKey(sortOption)}
         isSelected={sortOption === sortKey}
-      >
-        {sortOption}
-      </MenuItem>
+      />
     );
   });
 
