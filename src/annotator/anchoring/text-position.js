@@ -28,19 +28,21 @@ export function toRange(root, start, end) {
     root,
     NodeFilter.SHOW_TEXT,
     null, // filter
+
+    // @ts-ignore - Ignored parameter required for IE 11
     false // expandEntityReferences
   );
 
   let startContainer;
-  let startOffset;
+  let startOffset = 0;
   let endContainer;
-  let endOffset;
+  let endOffset = 0;
 
   let textLength = 0;
 
   let node;
   while ((node = nodeIter.nextNode()) && (!startContainer || !endContainer)) {
-    const nodeText = node.nodeValue;
+    const nodeText = /** @type {string} */ (node.nodeValue);
 
     if (
       !startContainer &&
