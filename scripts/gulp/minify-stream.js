@@ -27,17 +27,17 @@ function minifyStream() {
       callback();
     },
 
-    flush(callback) {
+    async flush(callback) {
       const code = Buffer.concat(this.chunks).toString();
-      const minified = terser.minify(code, {
+      const minifyResult = await terser.minify(code, {
         // See https://github.com/terser/terser#minify-options-structure
         sourceMap: {
           content: 'inline',
           url: 'inline',
         },
-      }).code;
+      });
 
-      this.push(minified);
+      this.push(minifyResult.code);
       callback();
     },
   });
