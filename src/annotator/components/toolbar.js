@@ -6,7 +6,7 @@ import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @param {Object} props
- *  @param {import("preact/hooks").Ref<HTMLButtonElement>} [props.buttonRef]
+ *  @param {import("preact").Ref<HTMLButtonElement>} [props.buttonRef]
  *  @param {boolean} [props.expanded]
  *  @param {string} [props.extraClasses]
  *  @param {string} props.label
@@ -74,7 +74,7 @@ ToolbarButton.propTypes = {
  *   Callback to toggle visibility of highlights in the document.
  * @prop {() => any} toggleSidebar -
  *   Callback to toggle the visibility of the sidebar.
- * @prop {import("preact/hooks").Ref<HTMLButtonElement>} [toggleSidebarRef] -
+ * @prop {import("preact").Ref<HTMLButtonElement>} [toggleSidebarRef] -
  *   Ref that gets set to the toolbar button for toggling the sidebar.
  *   This is exposed to enable the drag-to-resize functionality of this
  *   button.
