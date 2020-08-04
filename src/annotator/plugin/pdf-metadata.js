@@ -30,7 +30,7 @@ export default class PDFMetadata {
    * Construct a `PDFMetadata` that returns URIs/metadata associated with a
    * given PDF viewer.
    *
-   * @param {PDFViewerApplication} app
+   * @param {Object} app - The `PDFViewerApplication` global from PDF.js
    */
   constructor(app) {
     this._loaded = new Promise(resolve => {

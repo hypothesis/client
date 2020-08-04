@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 /**
  * Set of icons used by the annotator part of the application via the `SvgIcon`
  * component.
