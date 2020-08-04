@@ -11,8 +11,11 @@
     "target": "ES2020"
   },
   "include": [
+    "annotator/*.js",
+    "annotator/anchoring/*.js",
     "annotator/config/*.js",
     "annotator/components/*.js",
+    "annotator/plugin/*.js",
     "annotator/util/*.js",
     "boot/*.js",
     "shared/*.js",
@@ -26,6 +29,14 @@
     "sidebar/store/*.js"
   ],
   "exclude": [
+    // Enable this once the rest of `src/annotator` is checked.
+    "annotator/index.js",
+
+    // Files in `src/annotator` that still have errors to be resolved.
+    "annotator/pdf-sidebar.js",
+    "annotator/anchoring/pdf.js",
+    "annotator/plugin/document.js",
+
     // Enable this once the rest of `src/sidebar` is checked.
     "sidebar/index.js",
 
