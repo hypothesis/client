@@ -45,7 +45,7 @@ function getPdfCanvas(highlightEl) {
     return null;
   }
 
-  return canvasEl;
+  return /** @type {HTMLCanvasElement} */ (canvasEl);
 }
 
 /**
@@ -62,10 +62,11 @@ function getPdfCanvas(highlightEl) {
  */
 function drawHighlightsAbovePdfCanvas(highlightEl) {
   const canvasEl = getPdfCanvas(highlightEl);
-  if (!canvasEl) {
+  if (!canvasEl || !canvasEl.parentElement) {
     return null;
   }
 
+  /** @type {SVGElement|null} */
   let svgHighlightLayer = canvasEl.parentElement.querySelector(
     '.hypothesis-highlight-layer'
   );
@@ -88,8 +89,8 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
 
     const svgStyle = svgHighlightLayer.style;
     svgStyle.position = 'absolute';
-    svgStyle.left = 0;
-    svgStyle.top = 0;
+    svgStyle.left = '0';
+    svgStyle.top = '0';
     svgStyle.width = '100%';
     svgStyle.height = '100%';
 
@@ -99,13 +100,15 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
       // of highlighted text, especially for overlapping highlights.
       //
       // This choice optimizes for the common case of dark text on a light background.
+      //
+      // @ts-ignore - `mixBlendMode` property is missing from type definitions.
       svgStyle.mixBlendMode = 'multiply';
     } else {
       // For older browsers (IE 11, Edge < 79) we draw all the highlights as
       // opaque and then make the entire highlight layer transparent. This means
       // that there is no visual indication of whether text has one or multiple
       // highlights, but it preserves readability.
-      svgStyle.opacity = 0.3;
+      svgStyle.opacity = '0.3';
     }
   }
 
@@ -114,10 +117,10 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
 
   // Create SVG element for the current highlight element.
   const rect = document.createElementNS(SVG_NAMESPACE, 'rect');
-  rect.setAttribute('x', highlightRect.left - canvasRect.left);
-  rect.setAttribute('y', highlightRect.top - canvasRect.top);
-  rect.setAttribute('width', highlightRect.width);
-  rect.setAttribute('height', highlightRect.height);
+  rect.setAttribute('x', (highlightRect.left - canvasRect.left).toString());
+  rect.setAttribute('y', (highlightRect.top - canvasRect.top).toString());
+  rect.setAttribute('width', highlightRect.width.toString());
+  rect.setAttribute('height', highlightRect.height.toString());
 
   if (isCssBlendSupported) {
     rect.setAttribute('class', 'hypothesis-svg-highlight');
@@ -131,12 +134,31 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
 }
 
 /**
+ * Subset of the `NormalizedRange` class defined in `range.coffee` that this
+ * module currently uses.
+ *
+ * @typedef NormalizedRange
+ * @prop {() => Node[]} textNodes
+ */
+
+/**
+ * Additional properties added to text highlight HTML elements.
+ *
+ * @typedef HighlightProps
+ * @prop {SVGElement} [svgHighlight]
+ */
+
+/**
+ * @typedef {HTMLElement & HighlightProps} HighlightElement
+ */
+
+/**
  * Wraps the DOM Nodes within the provided range with a highlight
  * element of the specified class and returns the highlight Elements.
  *
  * @param {NormalizedRange} normedRange - Range to be highlighted.
  * @param {string} cssClass - A CSS class to use for the highlight
- * @return {HTMLElement[]} - Elements wrapping text in `normedRange` to add a highlight effect
+ * @return {HighlightElement[]} - Elements wrapping text in `normedRange` to add a highlight effect
  */
 export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   const white = /^\s*$/;
@@ -148,7 +170,10 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   // a PDF. These highlights should be invisible.
   const isPlaceholder =
     textNodes.length > 0 &&
-    closest(textNodes[0].parentNode, '.annotator-placeholder') !== null;
+    closest(
+      /** @type {Element} */ (textNodes[0].parentNode),
+      '.annotator-placeholder'
+    ) !== null;
 
   // Group text nodes into spans of adjacent nodes. If a group of text nodes are
   // adjacent, we only need to create one highlight element for the group.
@@ -179,6 +204,8 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   textNodeSpans.forEach(nodes => {
     // A custom element name is used here rather than `<span>` to reduce the
     // likelihood of highlights being hidden by page styling.
+
+    /** @type {HighlightElement} */
     const highlightEl = document.createElement('hypothesis-highlight');
     highlightEl.className = cssClass;
 
@@ -210,11 +237,11 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
  *
  * nb. This is like `ChildNode.replaceWith` but it works in IE 11.
  *
- * @param {Node} node
+ * @param {ChildNode} node
  * @param {Node[]} replacements
  */
 function replaceWith(node, replacements) {
-  const parent = node.parentNode;
+  const parent = /** @type {Node} */ (node.parentNode);
   replacements.forEach(r => parent.insertBefore(r, node));
   node.remove();
 }
@@ -222,7 +249,7 @@ function replaceWith(node, replacements) {
 /**
  * Remove highlights from a range previously highlighted with `highlightRange`.
  *
- * @param {HTMLElement[]} highlights - The highlight elements returned by `highlightRange`
+ * @param {HighlightElement[]} highlights - The highlight elements returned by `highlightRange`
  */
 export function removeHighlights(highlights) {
   for (let h of highlights) {
@@ -238,6 +265,8 @@ export function removeHighlights(highlights) {
 }
 
 /**
+ * Subset of `DOMRect` interface.
+ *
  * @typedef Rect
  * @prop {number} top
  * @prop {number} left
@@ -257,7 +286,9 @@ export function removeHighlights(highlights) {
  */
 export function getBoundingClientRect(collection) {
   // Reduce the client rectangles of the highlights to a bounding box
-  const rects = collection.map(n => n.getBoundingClientRect());
+  const rects = collection.map(
+    n => /** @type {Rect} */ (n.getBoundingClientRect())
+  );
   return rects.reduce((acc, r) => ({
     top: Math.min(acc.top, r.top),
     left: Math.min(acc.left, r.left),
