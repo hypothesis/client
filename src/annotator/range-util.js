@@ -1,6 +1,8 @@
 /**
  * Returns true if the start point of a selection occurs after the end point,
  * in document order.
+ *
+ * @param {Selection} selection
  */
 export function isSelectionBackwards(selection) {
   if (selection.focusNode === selection.anchorNode) {
@@ -25,7 +27,7 @@ export function isNodeInRange(range, node) {
     return true;
   }
 
-  const nodeRange = node.ownerDocument.createRange();
+  const nodeRange = /** @type {Document} */ (node.ownerDocument).createRange();
   nodeRange.selectNode(node);
   const isAtOrBeforeStart =
     range.compareBoundaryPoints(Range.START_TO_START, nodeRange) <= 0;
@@ -40,17 +42,19 @@ export function isNodeInRange(range, node) {
  * for each of them.
  *
  * @param {Range} range
- * @param {Function} callback
+ * @param {(n: Node) => any} callback
  */
 function forEachNodeInRange(range, callback) {
   const root = range.commonAncestorContainer;
 
   // The `whatToShow`, `filter` and `expandEntityReferences` arguments are
   // mandatory in IE although optional according to the spec.
-  const nodeIter = root.ownerDocument.createNodeIterator(
+  const nodeIter = /** @type {Document} */ (root.ownerDocument).createNodeIterator(
     root,
     NodeFilter.SHOW_ALL,
     null /* filter */,
+
+    // @ts-ignore - Deprecated last parameter. Required for IE 11.
     false /* expandEntityReferences */
   );
 
@@ -67,7 +71,7 @@ function forEachNodeInRange(range, callback) {
  * Returns the bounding rectangles of non-whitespace text nodes in `range`.
  *
  * @param {Range} range
- * @return {Array<Rect>} Array of bounding rects in viewport coordinates.
+ * @return {Array<DOMRect>} Array of bounding rects in viewport coordinates.
  */
 export function getTextBoundingBoxes(range) {
   const whitespaceOnly = /^\s*$/;
@@ -75,7 +79,7 @@ export function getTextBoundingBoxes(range) {
   forEachNodeInRange(range, function (node) {
     if (
       node.nodeType === Node.TEXT_NODE &&
-      !node.textContent.match(whitespaceOnly)
+      !(/** @type {string} */ (node.textContent).match(whitespaceOnly))
     ) {
       textNodes.push(node);
     }
@@ -112,7 +116,7 @@ export function getTextBoundingBoxes(range) {
  * Returns null if the selection is empty.
  *
  * @param {Selection} selection
- * @return {Rect|null}
+ * @return {DOMRect|null}
  */
 export function selectionFocusRect(selection) {
   if (selection.isCollapsed) {
@@ -146,6 +150,7 @@ export function itemsForRange(range, itemForNode) {
   const items = new Set();
 
   forEachNodeInRange(range, node => {
+    /** @type {Node|null} */
     let current = node;
     while (current) {
       if (checkedNodes.has(current)) {
