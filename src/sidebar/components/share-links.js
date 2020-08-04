@@ -8,12 +8,13 @@ import SvgIcon from '../../shared/components/svg-icon';
 /**
  * A single sharing link as a list item
  */
-function ShareLink({ iconName, title, uri, onClick }) {
+function ShareLink({ label, iconName, uri, onClick }) {
   return (
     <li className="share-links__link">
       <a
+        aria-label={label}
         href={uri}
-        title={title}
+        title={label}
         onClick={onClick}
         target="_blank"
         rel="noopener noreferrer"
@@ -27,8 +28,8 @@ function ShareLink({ iconName, title, uri, onClick }) {
 ShareLink.propTypes = {
   /** The name of the SVG icon to use for this link */
   iconName: propTypes.string.isRequired,
-  /** link title */
-  title: propTypes.string.isRequired,
+  /** Accessible label / tooltip for link. */
+  label: propTypes.string.isRequired,
   /** URI for sharing this annotation on the given social service */
   uri: propTypes.string.isRequired,
   /** click callback (for analytics tracking) */
@@ -55,21 +56,21 @@ function ShareLinks({ analytics, analyticsEventName, shareURI }) {
     <ul className="share-links">
       <ShareLink
         iconName="twitter"
-        title="Tweet share link"
+        label="Tweet share link"
         uri={`https://twitter.com/intent/tweet?url=${encodedURI}&hashtags=annotated`}
         onClick={trackShareClick('twitter')}
       />
 
       <ShareLink
         iconName="facebook"
-        title="Share on Facebook"
+        label="Share on Facebook"
         uri={`https://www.facebook.com/sharer/sharer.php?u=${encodedURI}`}
         onClick={trackShareClick('facebook')}
       />
 
       <ShareLink
         iconName="email"
-        title="Share via email"
+        label="Share via email"
         uri={`mailto:?subject=${encodeURIComponent(
           "Let's Annotate"
         )}&body=${encodedURI}`}

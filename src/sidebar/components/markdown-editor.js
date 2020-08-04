@@ -366,6 +366,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
           ref={buttonRefs[buttonIds.help]}
           tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
+          aria-label="Formatting help"
         >
           <SvgIcon
             name="help"
