@@ -44,7 +44,11 @@ function LoggedOutMessage({ onLogin, serviceUrl }) {
         .
       </span>
       <div className="logged-out-message__logo">
-        <a href="https://hypothes.is" title="Hypothesis homepage">
+        <a
+          href="https://hypothes.is"
+          aria-label="Hypothesis homepage"
+          title="Hypothesis homepage"
+        >
           <SvgIcon name="logo" className="logged-out-message__logo-icon" />
         </a>
       </div>
