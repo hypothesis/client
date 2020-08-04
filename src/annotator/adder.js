@@ -41,7 +41,7 @@ const ARROW_H_MARGIN = 20;
  * @return {Element}
  */
 function nearestPositionedAncestor(el) {
-  let parentEl = el.parentElement;
+  let parentEl = /** @type {Element} */ (el.parentElement);
   while (parentEl.parentElement) {
     if (getComputedStyle(parentEl).position !== 'static') {
       break;
@@ -95,15 +95,23 @@ export class Adder {
       zIndex: 999,
     });
 
-    this._view = container.ownerDocument.defaultView;
+    this._view = /** @type {Window} */ (container.ownerDocument.defaultView);
 
-    this._width = () =>
-      this._shadowRoot.firstChild.getBoundingClientRect().width;
-    this._height = () =>
-      this._shadowRoot.firstChild.getBoundingClientRect().height;
+    this._width = () => {
+      const firstChild = /** @type {Element} */ (this._shadowRoot.firstChild);
+      return firstChild.getBoundingClientRect().width;
+    };
+
+    this._height = () => {
+      const firstChild = /** @type {Element} */ (this._shadowRoot.firstChild);
+      return firstChild.getBoundingClientRect().height;
+    };
 
     this._isVisible = false;
+
+    /** @type {'up'|'down'} */
     this._arrowDirection = 'up';
+
     this._onAnnotate = options.onAnnotate;
     this._onHighlight = options.onHighlight;
     this._onShowAnnotations = options.onShowAnnotations;
@@ -130,7 +138,7 @@ export class Adder {
    * Return the best position to show the adder in order to target the
    * selected text in `targetRect`.
    *
-   * @param {Rect} targetRect - The rect of text to target, in viewport
+   * @param {DOMRect} targetRect - The rect of text to target, in viewport
    *        coordinates.
    * @param {boolean} isSelectionBackwards - True if the selection was made
    *        backwards, such that the focus point is mosty likely at the top-left
