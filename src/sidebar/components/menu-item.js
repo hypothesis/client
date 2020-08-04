@@ -45,7 +45,6 @@ import Slider from './slider';
  *   Contents of the submenu for this item.  This is typically a list of `MenuItem` components
  *    with the `isSubmenuItem` prop set to `true`, but can include other content as well.
  *    The submenu is only rendered if `isSubmenuVisible` is `true`.
- * @prop {Object} [children] -  The content of the menu item.
  */
 
 /**
@@ -248,5 +247,4 @@ MenuItem.propTypes = {
   onClick: propTypes.func,
   onToggleSubmenu: propTypes.func,
   submenu: propTypes.any,
-  children: propTypes.object,
 };
