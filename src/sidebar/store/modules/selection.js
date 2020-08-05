@@ -626,6 +626,10 @@ const threadState = createSelector(
  * @prop {() => boolean} hasSelectedAnnotations
  * @prop {() => string[]} selectedAnnotations
  * @prop {() => string[]} sortKeys
+ *
+ * // Root Selectors
+ * @prop {() => ThreadState} threadState
+ *
  */
 
 export default {

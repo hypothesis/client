@@ -163,7 +163,9 @@ const searchUris = createShallowEqualSelector(
  * @prop {typeof updateFrameAnnotationFetchStatus} updateFrameAnnotationFetchStatus
  *
  * // Selectors
- * // TODO add rest ...
+ * @prop {() => Frame[]} frames
+ * @prop {() => Frame|null} mainFrame
+ * @prop {() => string[]} searchUris
  */
 
 export default {

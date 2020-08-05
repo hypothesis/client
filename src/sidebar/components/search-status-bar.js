@@ -108,7 +108,7 @@ function SearchStatusBar() {
       // For non-user-focused modes, we can display the number of annotations
       // that will be visible if the selection is cleared (`counts.annotations`)
       // but this number is inaccurate/misleading when also focused on a user.
-      let selectedText;
+      let selectedText = '';
       switch (selectedTab) {
         case uiConstants.TAB_ORPHANS:
           selectedText = 'Show all annotations and notes';

@@ -9,7 +9,21 @@ import { applyTheme } from '../util/theme';
 import Excerpt from './excerpt';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ */
+
+/**
+ * @typedef AnnotationQuoteProps
+ * @prop {Annotation} annotation
+ * @prop {boolean} [isFocused] - Is this annotation currently focused?
+ * @prop {MergedConfig} [settings] - Used for theming.
+ */
+
+/**
  * Display the selected text from the document associated with an annotation.
+ *
+ * @parm {AnnotationQuoteProps} props
  */
 function AnnotationQuote({ annotation, isFocused, settings = {} }) {
   // The language for the quote may be different than the client's UI (set by
@@ -49,9 +63,7 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
 
 AnnotationQuote.propTypes = {
   annotation: propTypes.object.isRequired,
-  /** Is this annotation currently focused? */
   isFocused: propTypes.bool,
-  // Used for theming.
   settings: propTypes.object,
 };
 

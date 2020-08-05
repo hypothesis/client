@@ -10,7 +10,23 @@ import NewNoteBtn from './new-note-btn';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
- *  Display name of the tab and annotation count.
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ */
+
+/**
+ * @typedef TabProps
+ * @prop {Object} children - Child components.
+ * @prop {number} count - The total annotations for this tab.
+ * @prop {boolean} isSelected - Is this tab currently selected?
+ * @prop {boolean} isWaitingToAnchor - Are there any annotations still waiting to anchor?
+ * @prop {string} label - A string label to use for `aria-label` and `title`
+ * @prop {() => any} onSelect - Callback to invoke when this tab is selected.
+ */
+
+/**
+ * Display name of the tab and annotation count.
+ *
+ * @param {TabProps} props
  */
 function Tab({
   children,
@@ -40,7 +56,7 @@ function Tab({
         onClick={selectTab}
         onMouseDown={selectTab}
         role="tab"
-        tabIndex="0"
+        tabIndex={0}
         title={title}
         aria-label={title}
         aria-selected={isSelected.toString()}
@@ -55,36 +71,25 @@ function Tab({
 }
 
 Tab.propTypes = {
-  /**
-   * Child components.
-   */
   children: propTypes.node.isRequired,
-  /**
-   * The total annotations for this tab.
-   */
   count: propTypes.number.isRequired,
-  /**
-   * Is this tab currently selected?
-   */
   isSelected: propTypes.bool.isRequired,
-  /**
-   * Are there any annotations still waiting to anchor?
-   */
   isWaitingToAnchor: propTypes.bool.isRequired,
-  /**
-   * A string label to use for `aria-label` and `title`
-   */
   label: propTypes.string.isRequired,
-  /**
-   * Callback to invoke when this tab is selected.
-   */
   onSelect: propTypes.func.isRequired,
 };
 
 /**
- *  Tabbed display of annotations and notes.
+ * @typedef SelectionTabsProps
+ * @prop {boolean} isLoading - Are we waiting on any annotations from the server?
+ * @prop {MergedConfig} settings - Injected service.
  */
 
+/**
+ * Tabbed display of annotations and notes.
+ *
+ * @param {SelectionTabsProps} props
+ */
 function SelectionTabs({ isLoading, settings }) {
   const selectedTab = useStore(store => store.getState().selection.selectedTab);
   const noteCount = useStore(store => store.noteCount());
@@ -176,12 +181,7 @@ function SelectionTabs({ isLoading, settings }) {
   );
 }
 SelectionTabs.propTypes = {
-  /**
-   * Are we waiting on any annotations from the server?
-   */
   isLoading: propTypes.bool.isRequired,
-
-  // Injected services.
   settings: propTypes.object.isRequired,
 };
 
