@@ -8,6 +8,16 @@ import { applyTheme } from '../util/theme';
 
 import Button from './button';
 
+/**
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ */
+
+/**
+ * @typedef NewNoteButtonProps
+ * @prop {Object} annotationsService - Injected service.
+ * @prop {MergedConfig} settings - Injected service.
+ */
+
 function NewNoteButton({ annotationsService, settings }) {
   const topLevelFrame = useStore(store => store.mainFrame());
   const isLoggedIn = useStore(store => store.isLoggedIn());
@@ -17,6 +27,9 @@ function NewNoteButton({ annotationsService, settings }) {
   const onNewNoteBtnClick = function () {
     if (!isLoggedIn) {
       openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      return;
+    }
+    if (!topLevelFrame) {
       return;
     }
     const annot = {
@@ -39,7 +52,6 @@ function NewNoteButton({ annotationsService, settings }) {
   );
 }
 NewNoteButton.propTypes = {
-  // Injected services.
   annotationsService: propTypes.object.isRequired,
   settings: propTypes.object.isRequired,
 };

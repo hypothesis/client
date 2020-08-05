@@ -57,7 +57,7 @@ describe('NewNoteButton', function () {
     );
   });
 
-  it('should display login prompt on click if user not logged in', () => {
+  it('should display login prompt on click if user is not logged in', () => {
     fakeStore.isLoggedIn.returns(false);
     const wrapper = createComponent();
 
@@ -69,6 +69,17 @@ describe('NewNoteButton', function () {
       fakeStore.openSidebarPanel,
       uiConstants.PANEL_LOGIN_PROMPT
     );
+  });
+
+  it('should not add a new annotation if mainFrame() is null', () => {
+    fakeStore.mainFrame.returns(null);
+    fakeStore.isLoggedIn.returns(true);
+    const wrapper = createComponent();
+
+    act(() => {
+      wrapper.find('Button').props().onClick();
+    });
+    assert.notCalled(fakeAnnotationsService.create);
   });
 
   it('should add a new annotation to the store if user is logged in', () => {

@@ -10,9 +10,10 @@ import { withServices } from '../util/service-context';
 import AnnotationShareControl from './annotation-share-control';
 import Button from './button';
 
-/** @typedef {import("../../types/api").Annotation} Annotation */
-
-/** @typedef {import('../../types/config').HostConfig} HostConfig */
+/**
+ *  @typedef {import("../../types/api").Annotation} Annotation
+ *  @typedef {import('../../types/config').HostConfig} HostConfig
+ */
 
 /**
  * @typedef AnnotationActionBarProps

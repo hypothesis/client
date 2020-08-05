@@ -33,7 +33,6 @@
     // Remove them from this list as they are resolved.
     "sidebar/components/hooks/use-root-thread.js",
     "sidebar/components/annotation-header.js",
-    "sidebar/components/annotation-quote.js",
     "sidebar/components/annotation-share-info.js",
     "sidebar/components/annotation-viewer-content.js",
     "sidebar/components/annotation.js",
@@ -43,9 +42,6 @@
     "sidebar/components/group-list.js",
     "sidebar/components/help-panel.js",
     "sidebar/components/hypothesis-app.js",
-    "sidebar/components/new-note-btn.js",
-    "sidebar/components/search-status-bar.js",
-    "sidebar/components/selection-tabs.js",
     "sidebar/components/share-annotations-panel.js",
     "sidebar/components/sidebar-content-error.js",
     "sidebar/components/sidebar-content.js",
