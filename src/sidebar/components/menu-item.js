@@ -33,7 +33,7 @@ import Slider from './slider';
  * @prop {boolean} [isSubmenuItem] -
  *   True if this item is part of a submenu, in which case it is rendered with a different
  *   style (shaded background)
- * @prop {boolean} [isSubmenuVisible] -
+ * @prop {boolean|undefined} [isSubmenuVisible] -
  *   If present, display a button to toggle the sub-menu associated with this item and
  *   indicate the current state; `true` if the submenu is visible. Note. Omit this prop,
  *    or set it to null, if there is no `submenu`.
@@ -220,10 +220,10 @@ export default function MenuItem({
     <Fragment>
       {menuItem}
       {hasSubmenuVisible && (
-        <Slider visible={isSubmenuVisible}>
+        <Slider visible={/** @type {boolean} */ (isSubmenuVisible)}>
           <MenuKeyboardNavigation
             closeMenu={onCloseSubmenu}
-            visible={isSubmenuVisible}
+            visible={/** @type {boolean} */ (isSubmenuVisible)}
             className="menu-item__submenu"
           >
             {submenu}

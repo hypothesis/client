@@ -15,6 +15,12 @@ import Menu from './menu';
 import MenuItem from './menu-item';
 
 /**
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/api').Group} Group
+ * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
+ */
+
+/**
  * Return the custom icon for the top bar configured by the publisher in
  * the Hypothesis client configuration.
  */
@@ -24,8 +30,16 @@ function publisherProvidedIcon(settings) {
 }
 
 /**
+ * @typedef GroupListProps
+ * @prop {ServiceUrlGetter} [serviceUrl]
+ * @prop {MergedConfig} [settings]
+ */
+
+/**
  * Menu allowing the user to select which group to show and also access
  * additional actions related to groups.
+ *
+ * @param {GroupListProps} props
  */
 function GroupList({ serviceUrl, settings }) {
   const currentGroups = useStore(store => store.getCurrentlyViewingGroups());
@@ -57,12 +71,14 @@ function GroupList({ serviceUrl, settings }) {
   //
   // nb. If we create other menus that behave similarly in future, we may want
   // to move this state to the `Menu` component.
-  const [expandedGroup, setExpandedGroup] = useState(null);
+  const [expandedGroup, setExpandedGroup] = useState(
+    /** @type {Group|null} */ (null)
+  );
 
   let label;
   if (focusedGroup) {
     const icon =
-      focusedGroup.organization.logo || publisherProvidedIcon(settings);
+      focusedGroup.organization.logo || publisherProvidedIcon(settings) || '';
 
     // If org name is missing, then treat this icon like decoration
     // and pass an empty string.
@@ -70,11 +86,7 @@ function GroupList({ serviceUrl, settings }) {
     label = (
       <span className="group-list__menu-label">
         {icon && (
-          <img
-            className="group-list__menu-icon"
-            src={icon || publisherProvidedIcon(settings)}
-            alt={altName}
-          />
+          <img className="group-list__menu-icon" src={icon} alt={altName} />
         )}
         {focusedGroup.name}
       </span>
@@ -131,12 +143,7 @@ function GroupList({ serviceUrl, settings }) {
       )}
 
       {canCreateNewGroup && (
-        <MenuItem
-          icon="add"
-          href={newGroupLink}
-          label="New private group"
-          style="shaded"
-        />
+        <MenuItem icon="add" href={newGroupLink} label="New private group" />
       )}
     </Menu>
   );
