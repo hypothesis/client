@@ -1,6 +1,10 @@
 import { normalizeURI } from '../util/url';
 
 /**
+ * @typedef {import('../../types/pdfjs').PDFViewerApplication} PDFViewerApplication
+ */
+
+/**
  * @typedef Link
  * @prop {string} href
  */
@@ -30,9 +34,10 @@ export default class PDFMetadata {
    * Construct a `PDFMetadata` that returns URIs/metadata associated with a
    * given PDF viewer.
    *
-   * @param {Object} app - The `PDFViewerApplication` global from PDF.js
+   * @param {PDFViewerApplication} app - The `PDFViewerApplication` global from PDF.js
    */
   constructor(app) {
+    /** @type {Promise<PDFViewerApplication>} */
     this._loaded = new Promise(resolve => {
       const finish = () => {
         window.removeEventListener('documentload', finish);
@@ -89,7 +94,7 @@ export default class PDFMetadata {
         app.metadata.has('dc:title') &&
         app.metadata.get('dc:title') !== 'Untitled'
       ) {
-        title = app.metadata.get('dc:title');
+        title = /** @type {string} */ (app.metadata.get('dc:title'));
       } else if (app.documentInfo && app.documentInfo.Title) {
         title = app.documentInfo.Title;
       }

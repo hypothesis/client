@@ -8,9 +8,20 @@ const createNodeIterator = require('dom-node-iterator/polyfill')();
 
 import RenderingStates from '../pdfjs-rendering-states';
 
+// @ts-expect-error - `./range` needs to be converted to JS.
 import xpathRange from './range';
 import { toRange as textPositionToRange } from './text-position';
+
+// @ts-expect-error - `./types` needs to be converted to JS.
 import { TextPositionAnchor, TextQuoteAnchor } from './types';
+
+/**
+ * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
+ * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
+ *
+ * @typedef {import('../../types/pdfjs').PDFPageView} PDFPageView
+ * @typedef {import('../../types/pdfjs').PDFViewer} PDFViewer
+ */
 
 // Caches for performance.
 
@@ -38,6 +49,16 @@ function getNodeTextLayer(node) {
 }
 
 /**
+ * Get the PDF.js viewer application.
+ *
+ * @return {PDFViewer}
+ */
+function getPdfViewer() {
+  // @ts-ignore - TS doesn't know about PDFViewerApplication global.
+  return PDFViewerApplication.pdfViewer;
+}
+
+/**
  * Returns the view into which a PDF page is drawn.
  *
  * If called while the PDF document is still loading, this will delay until
@@ -48,7 +69,7 @@ function getNodeTextLayer(node) {
  * @return {Promise<PDFPageView>}
  */
 async function getPageView(pageIndex) {
-  const pdfViewer = PDFViewerApplication.pdfViewer;
+  const pdfViewer = getPdfViewer();
   let pageView = pdfViewer.getPageView(pageIndex);
 
   if (!pageView || !pageView.pdfPage) {
@@ -68,7 +89,7 @@ async function getPageView(pageIndex) {
     });
   }
 
-  return pageView;
+  return /** @type {PDFPageView} */ (pageView);
 }
 
 /**
@@ -150,7 +171,7 @@ function getPageOffset(pageIndex) {
  * `offset` within the complete text of the document.
  *
  * @param {number} offset
- * @return {PageOffset}
+ * @return {Promise<PageOffset>}
  */
 function findPage(offset) {
   let index = 0;
@@ -182,7 +203,7 @@ function findPage(offset) {
   //    149    | 1
   //    150    | 2
   const count = textContent => {
-    const lastPageIndex = PDFViewerApplication.pdfViewer.pagesCount - 1;
+    const lastPageIndex = getPdfViewer().pagesCount - 1;
     if (total + textContent.length > offset || index === lastPageIndex) {
       // Offset is in current page.
       offset = total;
@@ -214,11 +235,11 @@ function findPage(offset) {
 async function anchorByPosition(pageIndex, anchor) {
   const page = await getPageView(pageIndex);
 
-  let renderingDone = false;
-  if (page.textLayer) {
-    renderingDone = page.textLayer.renderingDone;
-  }
-  if (page.renderingState === RenderingStates.FINISHED && renderingDone) {
+  if (
+    page.renderingState === RenderingStates.FINISHED &&
+    page.textLayer &&
+    page.textLayer.renderingDone
+  ) {
     // The page has been rendered. Locate the position in the text layer.
     const root = page.textLayer.textLayerDiv;
     return textPositionToRange(root, anchor.start, anchor.end);
@@ -226,7 +247,7 @@ async function anchorByPosition(pageIndex, anchor) {
 
   // The page has not been rendered yet. Create a placeholder element and
   // anchor to that instead.
-  const div = page.div || page.el;
+  const div = /** @type {HTMLElement} */ (page.div || page.el);
   let placeholder = div.getElementsByClassName('annotator-placeholder')[0];
   if (!placeholder) {
     placeholder = document.createElement('span');
@@ -304,11 +325,11 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
  * When a position anchor is available, quote search can be optimized by
  * searching pages nearest the expected position first.
  *
- * @param [TextPositionAnchor] position
- * @return {number[]}
+ * @param {TextPositionAnchor} position
+ * @return {Promise<number[]>}
  */
 function prioritizePages(position) {
-  const pageCount = PDFViewerApplication.pdfViewer.pagesCount;
+  const pageCount = getPdfViewer().pagesCount;
   const pageIndices = Array(pageCount)
     .fill(0)
     .map((_, i) => i);
@@ -317,17 +338,21 @@ function prioritizePages(position) {
     return Promise.resolve(pageIndices);
   }
 
-  // Sort page indexes by offset from `pageIndex`.
+  /**
+   * Sort page indexes by offset from `pageIndex`.
+   *
+   * @param {number} pageIndex
+   */
   function sortPages(pageIndex) {
     const left = pageIndices.slice(0, pageIndex);
     const right = pageIndices.slice(pageIndex);
     const result = [];
     while (left.length > 0 || right.length > 0) {
       if (right.length) {
-        result.push(right.shift());
+        result.push(/** @type {number} */ (right.shift()));
       }
       if (left.length) {
-        result.push(left.pop());
+        result.push(/** @type {number} */ (left.pop()));
       }
     }
     return result;
@@ -347,6 +372,7 @@ export function anchor(root, selectors) {
   const position = selectors.find(s => s.type === 'TextPositionSelector');
   const quote = selectors.find(s => s.type === 'TextQuoteSelector');
 
+  /** @type {Promise<Range>} */
   let result = Promise.reject('unable to anchor');
 
   const checkQuote = range => {
