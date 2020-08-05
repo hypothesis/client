@@ -10,9 +10,18 @@
  ** https://github.com/openannotation/annotator/blob/master/LICENSE
  */
 
+/**
+ * nb. The `DocumentMetadata` type is renamed to avoid a conflict with the
+ * `DocumentMetadata` class below.
+ *
+ * @typedef {import('../../types/annotator').DocumentMetadata} Metadata
+ */
+
 import baseURI from 'document-base-uri';
 
+// @ts-expect-error - '../plugin' needs to be converted to JS.
 import Plugin from '../plugin';
+
 import { normalizeURI } from '../util/url';
 
 /**
@@ -26,14 +35,16 @@ export default class DocumentMeta extends Plugin {
     this.events = {
       beforeAnnotationCreated: 'beforeAnnotationCreated',
     };
+
+    /** @type {Metadata} */
+    this.metadata = { title: document.title, link: [] };
+
+    this.baseURI = options.baseURI || baseURI;
+    this.document = options.document || document;
+    this.normalizeURI = options.normalizeURI || normalizeURI;
   }
 
   pluginInit() {
-    // Test seams.
-    this.baseURI = this.options.baseURI || baseURI;
-    this.document = this.options.document || document;
-    this.normalizeURI = this.options.normalizeURI || normalizeURI;
-
     this.getDocumentMetadata();
   }
 
@@ -79,7 +90,7 @@ export default class DocumentMeta extends Plugin {
    * Return metadata for the current page.
    */
   getDocumentMetadata() {
-    this.metadata = {};
+    this.metadata = { title: document.title, link: [] };
 
     // first look for some common metadata types
     // TODO: look for microdata/rdfa?
@@ -122,7 +133,17 @@ export default class DocumentMeta extends Plugin {
     this.metadata.eprints = this._getMetaTags('eprints', 'name', '.');
   }
 
+  /**
+   * Return an array of all the `content` values of `<meta>` tags on the page
+   * where the attribute named `attribute` begins with `<prefix><delimiter>`.
+   *
+   * @param {string} prefix
+   * @param {string} attribute
+   * @param {string} delimiter
+   * @return {Object.<string,string[]>}
+   */
   _getMetaTags(prefix, attribute, delimiter) {
+    /** @type {Object.<string,string[]>} */
     const tags = {};
     for (let meta of Array.from(this.document.querySelectorAll('meta'))) {
       const name = meta.getAttribute(attribute);

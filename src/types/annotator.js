@@ -17,8 +17,8 @@
  * @typedef DocumentMetadata
  * @prop {string} title
  * @prop {Object[]} link
- *   @prop {string} link.rel
- *   @prop {string} link.type
+ *   @prop {string} [link.rel]
+ *   @prop {string} [link.type]
  *   @prop {string} link.href
  * // html pages
  * @prop {Object.<string, string[]>} [dc]
@@ -27,6 +27,7 @@
  * @prop {Object.<string, string[]>} [highwire]
  * @prop {Object.<string, string[]>} [prism]
  * @prop {Object.<string, string[]>} [twitter]
+ * @prop {string} [favicon]
  * // pdf files
  * @prop {string} [documentFingerprint]
  */

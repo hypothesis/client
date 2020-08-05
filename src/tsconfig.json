@@ -34,7 +34,6 @@
 
     // Files in `src/annotator` that still have errors to be resolved.
     "annotator/pdf-sidebar.js",
-    "annotator/plugin/document.js",
 
     // Enable this once the rest of `src/sidebar` is checked.
     "sidebar/index.js",
