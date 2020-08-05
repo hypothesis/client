@@ -312,6 +312,16 @@ describe('GroupListItem', () => {
     });
   });
 
+  it('disables menu item and shows note in submenu if `group.scopes` is missing', () => {
+    fakeGroup.scopes = undefined;
+    const wrapper = createGroupListItem(fakeGroup, {
+      isExpanded: true,
+    });
+    assert.equal(wrapper.find('MenuItem').first().prop('isDisabled'), true);
+    const submenu = getSubmenu(wrapper);
+    assert.equal(submenu.exists('.group-list-item__footer'), true);
+  });
+
   [
     {
       groupType: 'private',

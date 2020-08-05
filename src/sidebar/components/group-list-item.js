@@ -9,10 +9,27 @@ import { withServices } from '../util/service-context';
 import MenuItem from './menu-item';
 
 /**
+ * @typedef {import('../../types/api').Group} Group
+ */
+
+/**
+ * @typedef GroupListItemProps
+ * @prop {Group} group
+ * @prop {boolean} [isExpanded] - Whether the submenu for this group is expanded
+ * @prop {(expand: boolean) => any} [onExpand] -
+ *   Callback invoked to expand or collapse the current group
+ * @prop {Object} analytics - Injected service
+ * @prop {Object} groups - Injected service
+ * @prop {Object} toastMessenger - Injected service
+ */
+
+/**
  * An item in the groups selection menu.
  *
  * The item has a primary action which selects the group, along with a set of
  * secondary actions accessible via a toggle menu.
+ *
+ * @param {GroupListItemProps} props
  */
 function GroupListItem({
   analytics,
@@ -24,7 +41,8 @@ function GroupListItem({
 }) {
   const activityUrl = group.links.html;
   const hasActionMenu = activityUrl || group.canLeave;
-  const isSelectable = !group.scopes.enforced || group.isScopedToUri;
+  const isSelectable =
+    (group.scopes && !group.scopes.enforced) || group.isScopedToUri;
 
   const focusedGroupId = useStore(store => store.focusedGroupId());
   const isSelected = group.id === focusedGroupId;
@@ -134,20 +152,8 @@ function GroupListItem({
 
 GroupListItem.propTypes = {
   group: propTypes.object.isRequired,
-
-  /**
-   * Whether the submenu for this group is expanded.
-   */
   isExpanded: propTypes.bool,
-
-  /**
-   * Callback invoked to expand or collapse the current group.
-   *
-   * @type {(expand: boolean) => any}
-   */
   onExpand: propTypes.func,
-
-  // Injected services.
   analytics: propTypes.object.isRequired,
   groups: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,
