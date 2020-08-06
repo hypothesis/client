@@ -29,7 +29,7 @@ describe('SelectionTabs', function () {
       enableExperimentalNewNoteButton: false,
     };
     fakeStore = {
-      clearSelectedAnnotations: sinon.stub(),
+      clearSelection: sinon.stub(),
       selectTab: sinon.stub(),
       annotationCount: sinon.stub().returns(123),
       noteCount: sinon.stub().returns(456),
@@ -245,7 +245,7 @@ describe('SelectionTabs', function () {
 
       findButton(wrapper, label).simulate('click');
 
-      assert.calledOnce(fakeStore.clearSelectedAnnotations);
+      assert.calledOnce(fakeStore.clearSelection);
       assert.calledWith(fakeStore.selectTab, tab);
     });
   });
@@ -260,7 +260,7 @@ describe('SelectionTabs', function () {
 
     findButton(wrapper, 'Page Notes').simulate('click');
 
-    assert.notCalled(fakeStore.clearSelectedAnnotations);
+    assert.notCalled(fakeStore.clearSelection);
     assert.notCalled(fakeStore.selectTab);
   });
 

@@ -37,7 +37,6 @@ describe('HypothesisApp', () => {
     fakeShouldAutoDisplayTutorial = sinon.stub().returns(false);
 
     fakeStore = {
-      clearSelectedAnnotations: sinon.spy(),
       clearGroups: sinon.stub(),
       closeSidebarPanel: sinon.stub(),
       openSidebarPanel: sinon.stub(),

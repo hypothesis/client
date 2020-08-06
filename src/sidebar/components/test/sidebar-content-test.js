@@ -41,7 +41,7 @@ describe('SidebarContent', () => {
     };
     fakeStore = {
       // actions
-      clearSelectedAnnotations: sinon.stub(),
+      clearSelection: sinon.stub(),
       selectTab: sinon.stub(),
       // selectors
       annotationExists: sinon.stub(),
@@ -91,21 +91,21 @@ describe('SidebarContent', () => {
       fakeStore.profile.returns({ userid: 'somethingElse' });
       wrapper.setProps({});
       assert.calledOnce(fakeLoadAnnotationsService.load);
-      assert.notCalled(fakeStore.clearSelectedAnnotations);
+      assert.notCalled(fakeStore.clearSelection);
     });
 
     it('clears selected annotations and loads annotations when groupId changes', () => {
       fakeStore.focusedGroupId.returns('affable');
       wrapper.setProps({});
       assert.calledOnce(fakeLoadAnnotationsService.load);
-      assert.calledOnce(fakeStore.clearSelectedAnnotations);
+      assert.calledOnce(fakeStore.clearSelection);
     });
 
     it('loads annotations when searchURIs change', () => {
       fakeStore.searchUris.returns(['abandon-ship']);
       wrapper.setProps({});
       assert.calledOnce(fakeLoadAnnotationsService.load);
-      assert.notCalled(fakeStore.clearSelectedAnnotations);
+      assert.notCalled(fakeStore.clearSelection);
     });
   });
 

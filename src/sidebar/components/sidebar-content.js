@@ -60,9 +60,7 @@ function SidebarContent({
       : null;
 
   // Actions
-  const clearSelectedAnnotations = useStore(
-    store => store.clearSelectedAnnotations
-  );
+  const clearSelection = useStore(store => store.clearSelection);
   const selectTab = useStore(store => store.selectTab);
 
   // If, after loading completes, no `linkedAnnotation` object is present when
@@ -96,14 +94,14 @@ function SidebarContent({
   useEffect(() => {
     if (!prevGroupId.current || prevGroupId.current !== focusedGroupId) {
       // Clear any selected annotations when the group ID changes
-      clearSelectedAnnotations();
+      clearSelection();
       prevGroupId.current = focusedGroupId;
     }
     if (focusedGroupId && searchUris.length) {
       loadAnnotationsService.load(searchUris, focusedGroupId);
     }
   }, [
-    clearSelectedAnnotations,
+    clearSelection,
     loadAnnotationsService,
     focusedGroupId,
     userId,

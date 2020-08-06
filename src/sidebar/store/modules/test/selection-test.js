@@ -279,20 +279,6 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('clearSelectedAnnotations()', function () {
-    it('removes all annotations from the selection', function () {
-      store.selectAnnotations([1]);
-      store.clearSelectedAnnotations();
-      assert.isEmpty(getSelectionState().selected);
-    });
-
-    it('clears the current search query', function () {
-      store.setFilterQuery('foo');
-      store.clearSelectedAnnotations();
-      assert.isNull(getSelectionState().filterQuery);
-    });
-  });
-
   describe('setFilterQuery()', function () {
     it('sets the filter query', function () {
       store.setFilterQuery('a-query');
