@@ -238,13 +238,7 @@ const embedGenerators = [
   createEmbedGenerator(
     'flipgrid.com',
     /^\/s\/([^/]+)$/,
-    id => `https://flipgrid.com/s/${id}?embed=true`,
-    {
-      // Flipgrid renders the video with a very small size if using the default
-      // 16:9 aspect ratio, so change to 4:3 instead. This does create empty
-      // vertical space, but this is better than a tiny video.
-      aspectRatio: 4 / 3,
-    }
+    id => `https://flipgrid.com/s/${id}?embed=true`
   ),
 
   /**
