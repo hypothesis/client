@@ -100,14 +100,14 @@ function SelectionTabs({ isLoading, settings }) {
   );
   // actions
   const store = useStore(store => ({
-    clearSelectedAnnotations: store.clearSelectedAnnotations,
+    clearSelection: store.clearSelection,
     selectTab: store.selectTab,
   }));
 
   const isThemeClean = settings.theme === 'clean';
 
   const selectTab = tabId => {
-    store.clearSelectedAnnotations();
+    store.clearSelection();
     store.selectTab(tabId);
   };
 

@@ -193,10 +193,6 @@ const update = {
     };
   },
 
-  CLEAR_SELECTED_ANNOTATIONS: function () {
-    return resetSelection();
-  },
-
   CLEAR_SELECTION: function () {
     return resetSelection();
   },
@@ -306,11 +302,10 @@ function changeFocusModeUser(user) {
   return { type: actions.CHANGE_FOCUS_MODE_USER, user };
 }
 
-/** De-select all annotations. */
-function clearSelectedAnnotations() {
-  return { type: actions.CLEAR_SELECTED_ANNOTATIONS };
-}
-
+/**
+ * Clear all selected annotations and filters. This will leave user-focus
+ * alone, however.
+ */
 function clearSelection() {
   return {
     type: actions.CLEAR_SELECTION,
@@ -602,7 +597,6 @@ const threadState = createSelector(
  *
  * // Actions
  * @prop {typeof changeFocusModeUser} changeFocusModeUser
- * @prop {typeof clearSelectedAnnotations} clearSelectedAnnotations
  * @prop {typeof clearSelection} clearSelection
  * @prop {typeof selectAnnotations} selectAnnotations
  * @prop {typeof selectTab} selectTab
@@ -639,7 +633,6 @@ export default {
 
   actions: {
     changeFocusModeUser,
-    clearSelectedAnnotations,
     clearSelection,
     selectAnnotations,
     selectTab,
