@@ -11,29 +11,13 @@
     "target": "ES2020"
   },
   "include": [
-    "annotator/*.js",
-    "annotator/anchoring/*.js",
-    "annotator/config/*.js",
-    "annotator/components/*.js",
-    "annotator/plugin/*.js",
-    "annotator/util/*.js",
-    "boot/*.js",
-    "shared/*.js",
-    "shared/components/*.js",
-    "sidebar/*.js",
-    "sidebar/components/*.js",
-    "sidebar/components/hooks/*.js",
-    "sidebar/store/modules/*.js",
-    "sidebar/services/*.js",
-    "sidebar/util/*.js",
-    "sidebar/store/*.js"
+    "**/*.js"
   ],
   "exclude": [
-    // Enable this once the rest of `src/annotator` is checked.
-    "annotator/index.js",
-
-    // Files in `src/annotator` that still have errors to be resolved.
-    "annotator/pdf-sidebar.js",
+    // Tests are not checked.
+    "**/test/**/*.js",
+    "test-util/**/*.js",
+    "karma.config.js",
 
     // Enable this once the rest of `src/sidebar` is checked.
     "sidebar/index.js",
