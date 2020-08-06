@@ -7,9 +7,16 @@ import { withServices } from '../util/service-context';
 import SearchInput from './search-input';
 
 /**
+ * @typedef StreamSearchInputProps
+ * @prop {Object} router - Injected service
+ */
+
+/**
  * Search input for the single annotation view and stream.
  *
  * This displays and updates the "q" query param in the URL.
+ *
+ * @param {StreamSearchInputProps} props
  */
 function StreamSearchInput({ router }) {
   const query = useStore(store => store.routeParams().q);
