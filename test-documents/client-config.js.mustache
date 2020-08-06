@@ -1,0 +1,32 @@
+<script>
+  var appHost = document.location.hostname;
+  window.hypothesisConfig = function() {
+    return {
+      // enableExperimentalNewNoteButton: true,
+      // showHighlights: 'always',
+      // theme: 'clean',
+
+      // Example focused user mode
+      // focus: {
+      //   user: {
+      //     username: 'foo',
+      //     authority: 'lms',
+      //     displayName: 'Foo Bar',
+      //   }
+      // },
+      // Example services config
+      // services: [{
+      //   apiUrl: 'http://localhost:5000/api',
+      //   authority: 'partner.org',
+      //   allowLeavingGroups: false,
+      //   groups: ['a-group-id', 'another-group-id'],
+      // }],
+
+      // Open the sidebar when the page loads
+      openSidebar: true,
+    };
+  };
+  var embedScript = document.createElement('script');
+  embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
+  document.body.appendChild(embedScript);
+</script>
