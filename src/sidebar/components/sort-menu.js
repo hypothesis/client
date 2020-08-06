@@ -14,7 +14,7 @@ export default function SortMenu() {
     setSortKey: store.setSortKey,
   }));
   // The currently-applied sort order
-  const sortKey = useStore(store => store.getState().selection.sortKey);
+  const sortKey = useStore(store => store.sortKey());
   // All available sorting options. These change depending on current
   // "tab" or context.
   const sortKeysAvailable = useStore(store => store.sortKeys());

@@ -7,7 +7,6 @@ import { $imports } from '../sort-menu';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('SortMenu', () => {
-  let fakeState;
   let fakeStore;
 
   const createSortMenu = () => {
@@ -15,14 +14,9 @@ describe('SortMenu', () => {
   };
 
   beforeEach(() => {
-    fakeState = {
-      selection: {
-        sortKey: 'Location',
-      },
-    };
     fakeStore = {
       setSortKey: sinon.stub(),
-      getState: sinon.stub().returns(fakeState),
+      sortKey: sinon.stub().returns('Location'),
       sortKeys: sinon.stub().returns(['Newest', 'Oldest', 'Location']),
     };
 
@@ -55,9 +49,7 @@ describe('SortMenu', () => {
 
     const currentSortKeyMenuItem = wrapper
       .find('MenuItem')
-      .filterWhere(
-        menuItem => menuItem.prop('label') === fakeState.selection.sortKey
-      );
+      .filterWhere(menuItem => menuItem.prop('label') === fakeStore.sortKey());
     assert.isTrue(currentSortKeyMenuItem.prop('isSelected'));
   });
 

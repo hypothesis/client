@@ -530,6 +530,24 @@ const hasAppliedFilter = createSelector(
 );
 
 /**
+ * Return the currently-selected tab
+ *
+ * @return {'annotation'|'note'|'orphan'}
+ */
+function selectedTab(state) {
+  return state.selectedTab;
+}
+
+/**
+ * Retrieve the current sort option key
+ *
+ * @return {string}
+ */
+function sortKey(state) {
+  return state.sortKey;
+}
+
+/**
  * Retrieve applicable sort options for the currently-selected tab.
  *
  * @return {string[]}
@@ -585,8 +603,8 @@ const threadState = createSelector(
       filters,
       forcedVisible: forcedVisibleAnnotations(selection),
       selected: selectedAnnotations(selection),
-      sortKey: selection.sortKey, // TODO: This should have a selector
-      selectedTab: selection.selectedTab, // TODO: This should have a selector
+      sortKey: sortKey(selection),
+      selectedTab: selectedTab(selection),
     };
     return { annotations, route: routeName, selection: selectionState };
   }
@@ -619,6 +637,8 @@ const threadState = createSelector(
  * @prop {() => boolean} hasAppliedFilter
  * @prop {() => boolean} hasSelectedAnnotations
  * @prop {() => string[]} selectedAnnotations
+ * @prop {() => string} selectedTab
+ * @prop {() => string} sortKey
  * @prop {() => string[]} sortKeys
  *
  * // Root Selectors
@@ -657,6 +677,8 @@ export default {
     hasAppliedFilter,
     hasSelectedAnnotations,
     selectedAnnotations,
+    selectedTab,
+    sortKey,
     sortKeys,
   },
 

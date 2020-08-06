@@ -517,6 +517,21 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
+  describe('selectedTab', () => {
+    it('should return the currently-selected tab', () => {
+      store.selectTab(uiConstants.TAB_NOTES);
+      assert.equal(store.selectedTab(), uiConstants.TAB_NOTES);
+    });
+  });
+
+  describe('sortKey', () => {
+    it('should return the currently-active sort key', () => {
+      store.setSortKey('Newest');
+
+      assert.equal(store.sortKey(), 'Newest');
+    });
+  });
+
   describe('ADD_ANNOTATIONS', () => {
     it('should select the page notes tab if all top-level annotations are page notes', () => {
       store.dispatch({
