@@ -32,5 +32,20 @@
  * @prop {string} [documentFingerprint]
  */
 
+/**
+ * Global variables which the Hypothesis client looks for on the `window` object
+ * when loaded in a frame that influence how it behaves.
+ *
+ * @typedef Globals
+ * @prop {Object} [PDFViewerApplication] -
+ *   PDF.js entry point. If set triggers loading of PDF rather than HTML integration.
+ * @prop {boolean} [__hypothesis_frame] -
+ *   Flag used to indicate that Hypothesis is loaded in the current frame.
+ */
+
+/**
+ * @typedef {Window & Globals} HypothesisWindow
+ */
+
 // Make TypeScript treat this file as a module.
 export const unused = {};
