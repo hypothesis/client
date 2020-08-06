@@ -1,3 +1,4 @@
+// @ts-expect-error - './sidebar' needs to be converted from JS.
 import Sidebar from './sidebar';
 
 const DEFAULT_CONFIG = {
