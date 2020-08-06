@@ -8,10 +8,22 @@ import { withServices } from '../util/service-context';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef {import('../store/modules/toast-messages').ToastMessage} ToastMessage
+ */
+
+/**
+ * @typedef ToastMessageProps
+ * @prop {ToastMessage} message - The message object to render
+ * @prop {(id: string) => any} onDismiss
+ */
+
+/**
  * An individual toast message—a brief and transient success or error message.
  * The message may be dismissed by clicking on it.
  * Otherwise, the `toastMessenger` service handles removing messages after a
  * certain amount of time.
+ *
+ * @param {ToastMessageProps} props
  */
 function ToastMessage({ message, onDismiss }) {
   // Capitalize the message type for prepending
@@ -66,14 +78,20 @@ function ToastMessage({ message, onDismiss }) {
 }
 
 ToastMessage.propTypes = {
-  // The message object to render
   message: propTypes.object.isRequired,
   onDismiss: propTypes.func,
 };
 
 /**
+ * @typedef ToastMessagesProps
+ * @prop {Object} toastMessenger - Injected service
+ */
+
+/**
  * A collection of toast messages. These are rendered within an `aria-live`
  * region for accessibility with screen readers.
+ *
+ * @param {ToastMessagesProps} props
  */
 function ToastMessages({ toastMessenger }) {
   const messages = useStore(store => store.getToastMessages());
@@ -97,7 +115,6 @@ function ToastMessages({ toastMessenger }) {
 }
 
 ToastMessages.propTypes = {
-  // Injected services
   toastMessenger: propTypes.object.isRequired,
 };
 

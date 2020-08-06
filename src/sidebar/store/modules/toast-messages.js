@@ -6,6 +6,7 @@ import * as util from '../util';
  * @prop {string} id
  * @prop {string} message
  * @prop {string} moreInfoURL
+ * @prop {boolean} isDismissed
  */
 
 /**

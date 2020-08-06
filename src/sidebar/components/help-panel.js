@@ -13,7 +13,15 @@ import Tutorial from './tutorial';
 import VersionInfo from './version-info';
 
 /**
+ * @typedef {import('../components/user-menu').AuthState} AuthState
+ */
+
+/**
  * External link "tabs" inside of the help panel.
+ *
+ * @param {Object} props
+ *   @param {string} props.linkText - What the tab's link should say
+ *   @param {string} props.url - Where the tab's link should go
  */
 function HelpPanelTab({ linkText, url }) {
   return (
@@ -36,14 +44,20 @@ function HelpPanelTab({ linkText, url }) {
 }
 
 HelpPanelTab.propTypes = {
-  /* What the tab's link should say */
   linkText: propTypes.string.isRequired,
-  /* Where the tab's link should go */
   url: propTypes.string.isRequired,
 };
 
 /**
+ * @typedef HelpPanelProps
+ * @prop {AuthState} auth - Object with auth and user information
+ * @prop {Object} session - Injected service
+ */
+
+/**
  * A help sidebar panel with two sub-panels: tutorial and version info.
+ *
+ * @param {HelpPanelProps} props
  */
 function HelpPanel({ auth, session }) {
   const mainFrame = useStore(store => store.mainFrame());
@@ -61,7 +75,7 @@ function HelpPanel({ auth, session }) {
 
   // Build version details about this session/app
   const versionData = useMemo(() => {
-    const userInfo = auth || {};
+    const userInfo = auth || { status: 'logged-out' };
     const documentInfo = mainFrame || {};
     return new VersionData(userInfo, documentInfo);
   }, [auth, mainFrame]);
@@ -149,7 +163,6 @@ function HelpPanel({ auth, session }) {
 }
 
 HelpPanel.propTypes = {
-  /* Object with auth and user information */
   auth: propTypes.object.isRequired,
   session: propTypes.object.isRequired,
 };

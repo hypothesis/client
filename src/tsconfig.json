@@ -30,18 +30,14 @@
     "sidebar/components/annotation-viewer-content.js",
     "sidebar/components/annotation.js",
     "sidebar/components/filter-status.js",
-    "sidebar/components/help-panel.js",
     "sidebar/components/hypothesis-app.js",
     "sidebar/components/share-annotations-panel.js",
     "sidebar/components/sidebar-content-error.js",
     "sidebar/components/sidebar-content.js",
     "sidebar/components/stream-content.js",
-    "sidebar/components/stream-search-input.js",
     "sidebar/components/thread-card.js",
     "sidebar/components/thread-list.js",
     "sidebar/components/thread.js",
-    "sidebar/components/toast-messages.js",
-    "sidebar/components/top-bar.js",
-    "sidebar/components/version-info.js"
+    "sidebar/components/top-bar.js"
   ]
 }

@@ -7,7 +7,15 @@ import { withServices } from '../util/service-context';
 import Button from './button';
 
 /**
+ * @typedef VersionInfoProps
+ * @prop {import('../util/version-data').default} versionData - Object with version information
+ * @prop {Object} toastMessenger - Injected service
+ */
+
+/**
  * Display current client version info
+ *
+ * @param {VersionInfoProps} props
  */
 function VersionInfo({ toastMessenger, versionData }) {
   const copyVersionData = () => {
@@ -47,14 +55,7 @@ function VersionInfo({ toastMessenger, versionData }) {
 }
 
 VersionInfo.propTypes = {
-  /**
-   * Object with version information
-   *
-   * @type {import('../util/version-info').VersionData}
-   */
   versionData: propTypes.object.isRequired,
-
-  /** injected properties */
   toastMessenger: propTypes.object.isRequired,
 };
 

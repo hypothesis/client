@@ -1,30 +1,25 @@
 /**
- * An object representing user info
- *
- * @typedef {Object} UserInfo
- * @property {string=} userid
- * @property {string=} displayName
+ * @typedef {import('../components/user-menu').AuthState} AuthState
  */
 
 /**
- * An object representing document metadata
+ * An object representing document metadata.
  *
  * @typedef {Object} DocMetadata
- * @property {string=} documentFingerprint - optional PDF fingerprint for
- *                     current document
+ * @prop {string=} documentFingerprint - Optional PDF fingerprint for current document
  */
 
 /**
- * An object representing document info
+ * An object representing document info.
  *
  * @typedef {Object} DocumentInfo
- * @property {string=} uri - current document URL
- * @property {DocMetadata} metadata - document metadata
+ * @prop {string=} [uri] - Current document URL
+ * @prop {DocMetadata} [metadata] - Document metadata
  */
 
 export default class VersionData {
   /**
-   * @param {UserInfo} userInfo
+   * @param {AuthState} userInfo
    * @param {DocumentInfo} documentInfo
    * @param {Window} window_ - test seam
    */
