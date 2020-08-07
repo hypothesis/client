@@ -38,9 +38,10 @@
  *
  * @typedef Globals
  * @prop {Object} [PDFViewerApplication] -
- *   PDF.js entry point. If set triggers loading of PDF rather than HTML integration.
+ *   PDF.js entry point. If set, triggers loading of PDF rather than HTML integration.
  * @prop {boolean} [__hypothesis_frame] -
- *   Flag used to indicate that Hypothesis is loaded in the current frame.
+ *   Flag used to indicate that the "annotator" part of Hypothesis is loaded in
+ *   the current frame.
  */
 
 /**
