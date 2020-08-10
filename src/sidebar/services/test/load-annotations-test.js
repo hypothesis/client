@@ -282,9 +282,15 @@ describe('loadAnnotationsService', () => {
         references: ['parent_annotation_1', 'parent_annotation_2'],
       },
     ];
-    it('clears annotations from the store first', () => {
+    it('clears annotations from the store first', async () => {
+      fakeApi.annotation.get.onFirstCall().resolves({
+        id: 'target_annotation',
+        references: [],
+      });
       const svc = createService();
-      svc.loadThread('target_annotation');
+
+      await svc.loadThread('target_annotation');
+
       assert.calledOnce(fakeStore.clearAnnotations);
     });
 
