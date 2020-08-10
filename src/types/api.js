@@ -116,7 +116,7 @@
  *   we assign a default organization on the client.
  * @prop {GroupScopes|null} scopes
  * @prop {Object} links
- *   @prop {string} links.html
+ *   @prop {string} [links.html]
  *
  * // Properties not present on API objects, but added by utilities in the client.
  * @prop {string} logo

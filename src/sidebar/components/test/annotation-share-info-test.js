@@ -108,7 +108,7 @@ describe('AnnotationShareInfo', () => {
       });
 
       it('should show "only me" text for annotation in third-party group', () => {
-        fakeGetGroup.returns({ name: 'Some Name' });
+        fakeGetGroup.returns({ name: 'Some Name', links: {} });
         const wrapper = createAnnotationShareInfo();
 
         const privacyText = wrapper.find(

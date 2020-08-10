@@ -564,6 +564,7 @@ function savedAnnotations(state) {
  * @prop {(tags: string[]) => string[]} findIDsForTags
  * @prop {() => string[]} focusedAnnotations
  * @prop {() => string[]} highlightedAnnotations
+ * @prop {(tag: string) => boolean} isAnnotationFocused
  * @prop {() => boolean} isWaitingToAnchorAnnotations
  * @prop {() => Annotation[]} newAnnotations
  * @prop {() => Annotation[]} newHighlights

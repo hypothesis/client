@@ -103,6 +103,15 @@ describe('ThreadList', () => {
     wrapper.setProps({});
   };
 
+  context('invalid scroll container', () => {
+    it('should throw an error if the scroll container is missing', () => {
+      fakeScrollContainer.remove();
+      assert.throws(() => {
+        createComponent();
+      }, 'Scroll container is missing');
+    });
+  });
+
   context('new annotation created in application', () => {
     it('clears the current selection in the store', () => {
       const wrapper = createComponent();

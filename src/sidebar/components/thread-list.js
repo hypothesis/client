@@ -13,13 +13,24 @@ import {
 
 import ThreadCard from './thread-card';
 
+/** @typedef {import('../util/build-thread').Thread} Thread */
+
 // The precision of the `scrollPosition` value in pixels; values will be rounded
 // down to the nearest multiple of this scale value
 const SCROLL_PRECISION = 50;
 
 function getScrollContainer() {
-  return document.querySelector('.js-thread-list-scroll-root');
+  const container = document.querySelector('.js-thread-list-scroll-root');
+  if (!container) {
+    throw new Error('Scroll container is missing');
+  }
+  return container;
 }
+
+/**
+ * @typedef ThreadListProps
+ * @prop {Thread} thread
+ */
 
 /**
  * Render a list of threads.
@@ -29,6 +40,8 @@ function getScrollContainer() {
  * annotations (and replies) are complex interactive components whose
  * user-defined content may include rich media such as images, audio clips,
  * embedded YouTube videos, rendered math and more.
+ *
+ * @param {ThreadListProps} props
  */
 function ThreadList({ thread }) {
   const clearSelection = useStore(store => store.clearSelection);
@@ -51,7 +64,9 @@ function ThreadList({ thread }) {
 
   // ID of thread to scroll to after the next render. If the thread is not
   // present, the value persists until it can be "consumed".
-  const [scrollToId, setScrollToId] = useState(null);
+  const [scrollToId, setScrollToId] = useState(
+    /** @type {string|null} */ (null)
+  );
 
   const topLevelThreads = thread.children;
 
@@ -159,7 +174,9 @@ function ThreadList({ thread }) {
     setThreadHeights(prevHeights => {
       const changedHeights = {};
       for (let { id } of visibleThreads) {
-        const threadElement = document.getElementById(id);
+        const threadElement = /** @type {HTMLElement} */ (document.getElementById(
+          id
+        ));
         const height = getElementHeightWithMargins(threadElement);
         if (height !== prevHeights[id]) {
           changedHeights[id] = height;

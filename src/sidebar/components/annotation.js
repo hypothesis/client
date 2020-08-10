@@ -53,7 +53,8 @@ function Annotation({
   const toggleText = `${toggleAction} (${replyCount})`;
 
   const shouldShowActions = !isSaving && !isEditing;
-  const shouldShowLicense = isEditing && !isPrivate && group.type !== 'private';
+  const shouldShowLicense =
+    isEditing && !isPrivate && group && group.type !== 'private';
   const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
 
   const onEditTags = ({ tags }) => {

@@ -6,7 +6,16 @@ import { format as formatDate } from '../util/date';
 import { decayingInterval, toFuzzyString } from '../util/time';
 
 /**
+ * @typedef TimestampProps
+ * @prop {string} [className] - Custom class name for the anchor/span element
+ * @prop {string} [href] - Link destination
+ * @prop {string} timestamp - The timestamp as an ISO 8601 date string
+ */
+
+/**
  * Display a relative timestamp (eg. '6 minutes ago') as static text or a link.
+ *
+ * @param {TimestampProps} props
  *
  * The timestamp automatically refreshes at an appropriate frequency.
  */
@@ -49,14 +58,7 @@ export default function Timestamp({ className, href, timestamp }) {
 }
 
 Timestamp.propTypes = {
-  /** Custom class name for the anchor/span element. */
   className: propTypes.string,
-
-  /** Link destination. */
   href: propTypes.string,
-
-  /**
-   * The timestamp as an ISO 8601 date string.
-   */
   timestamp: propTypes.string.isRequired,
 };

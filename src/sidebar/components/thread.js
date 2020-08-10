@@ -10,10 +10,21 @@ import Annotation from './annotation';
 import Button from './button';
 import ModerationBanner from './moderation-banner';
 
+/** @typedef {import('../util/build-thread').Thread} Thread */
+
+/**
+ * @typedef ThreadProps
+ * @prop {boolean} [showDocumentInfo]
+ * @prop {Thread} thread
+ * @prop {Object} threadsService - Injected service
+ */
+
 /**
  * A thread, which contains a single annotation at its top level, and its
  * recursively-rendered children (i.e. replies). A thread may have a parent,
  * and at any given time it may be `collapsed`.
+ *
+ * @param {ThreadProps} props
  */
 function Thread({ showDocumentInfo = false, thread, threadsService }) {
   const setExpanded = useStore(store => store.setExpanded);

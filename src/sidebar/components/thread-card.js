@@ -11,10 +11,23 @@ import { withServices } from '../util/service-context';
 import Thread from './thread';
 
 /**
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ */
+
+/**
+ * @typedef ThreadCardProps
+ * @prop {Thread} thread
+ * @prop {Object} frameSync - Injected service
+ * @prop {MergedConfig} [settings] - Injected service
+ */
+
+/**
  * A "top-level" `Thread`, rendered as a "card" in the sidebar. A `Thread`
  * renders its own child `Thread`s within itself.
+ *
+ * @param {ThreadCardProps} props
  */
-function ThreadCard({ frameSync, settings = {}, thread }) {
+function ThreadCard({ frameSync, settings, thread }) {
   const threadTag = thread.annotation && thread.annotation.$tag;
   const isFocused = useStore(store => store.isAnnotationFocused(threadTag));
   const showDocumentInfo = useStore(store => store.route() !== 'sidebar');
@@ -67,8 +80,6 @@ function ThreadCard({ frameSync, settings = {}, thread }) {
 
 ThreadCard.propTypes = {
   thread: propTypes.object.isRequired,
-
-  /** injected */
   frameSync: propTypes.object.isRequired,
   settings: propTypes.object,
 };

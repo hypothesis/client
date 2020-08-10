@@ -27,10 +27,7 @@ export default function AnnotationHeader({
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
   const setExpanded = useStore(store => store.setExpanded);
 
-  const annotationIsPrivate = isPrivate(
-    annotation.permissions,
-    annotation.user
-  );
+  const annotationIsPrivate = isPrivate(annotation.permissions);
   const annotationLink = annotation.links ? annotation.links.html : '';
 
   // NB: `created` and `updated` are strings, not `Date`s
