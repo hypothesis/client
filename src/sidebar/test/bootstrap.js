@@ -23,3 +23,21 @@ registerIcons({
   ...sidebarIcons,
   ...annotatorIcons,
 });
+
+// Ensure that uncaught exceptions between tests result in the tests failing.
+// This works around an issue with mocha / karma-mocha, see
+// https://github.com/hypothesis/client/issues/2249.
+let pendingError = null;
+window.addEventListener('error', event => {
+  pendingError = event.error;
+});
+window.addEventListener('unhandledrejection', event => {
+  pendingError = event.reason;
+});
+
+afterEach(() => {
+  if (pendingError) {
+    console.error('An uncaught exception was thrown between tests');
+    throw pendingError;
+  }
+});
