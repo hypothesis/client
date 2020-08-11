@@ -74,6 +74,9 @@
  *   @prop {string} [links.incontext]
  *   @prop {string} [links.html]
  *
+ * @prop {Object} [user_info]
+ *   @prop {string|null} user_info.display_name
+ *
  * // Properties not present on API objects, but added by utilities in the client.
  * @prop {boolean} [$highlight]
  * @prop {boolean} [$orphan]

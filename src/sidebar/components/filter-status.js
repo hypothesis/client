@@ -125,8 +125,11 @@ export default function FilterStatus() {
   const buttonProps = {
     buttonText,
     onClick: () => clearSelection(),
-    icon: filterMode !== 'focusOnly' ? 'cancel' : null,
   };
+
+  if (filterMode !== 'focusOnly') {
+    buttonProps.icon = 'cancel';
+  }
 
   // In most cases, the action button will clear the current (filter) selection,
   // but when in 'focusOnly' mode, it will toggle activation of the focus
