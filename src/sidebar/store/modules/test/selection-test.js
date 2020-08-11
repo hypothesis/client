@@ -271,11 +271,17 @@ describe('sidebar/store/modules/selection', () => {
   describe('#REMOVE_ANNOTATIONS', function () {
     it('removing an annotation should also remove it from the selection', function () {
       store.selectAnnotations([1, 2, 3]);
+      store.setForcedVisible(2, true);
+      store.setForcedVisible(1, true);
+      store.setExpanded(1, true);
+      store.setExpanded(2, true);
       store.removeAnnotations([{ id: 2 }]);
       assert.deepEqual(getSelectionState().selected, {
         1: true,
         3: true,
       });
+      assert.deepEqual(store.forcedVisibleAnnotations(), ['1']);
+      assert.deepEqual(store.expandedMap(), { 1: true });
     });
   });
 

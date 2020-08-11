@@ -266,12 +266,6 @@ const update = {
   },
 
   REMOVE_ANNOTATIONS: function (state, action) {
-    const selection = { ...state.selected };
-    action.annotationsToRemove.forEach(annotation => {
-      if (annotation.id) {
-        delete selection[annotation.id];
-      }
-    });
     let newTab = state.selectedTab;
     // If the orphans tab is selected but no remaining annotations are orphans,
     // switch back to annotations tab
@@ -281,9 +275,23 @@ const update = {
     ) {
       newTab = uiConstants.TAB_ANNOTATIONS;
     }
+
+    const removeAnns = collection => {
+      action.annotationsToRemove.forEach(annotation => {
+        if (annotation.id) {
+          delete collection[annotation.id];
+        }
+        if (annotation.$tag) {
+          delete collection[annotation.$tag];
+        }
+      });
+      return collection;
+    };
     return {
       ...setTab(newTab, state.selectedTab),
-      selected: selection,
+      expanded: removeAnns({ ...state.expanded }),
+      forcedVisible: removeAnns({ ...state.forcedVisible }),
+      selected: removeAnns({ ...state.selected }),
     };
   },
 };
