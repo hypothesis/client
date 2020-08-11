@@ -628,6 +628,7 @@ const threadState = createSelector(
  * // Selectors
  * @prop {() => Object<string,boolean>} expandedMap
  * @prop {() => string|null} filterQuery
+ * @prop {() => FilterState} filterState
  * @prop {() => boolean} focusModeActive
  * @prop {() => boolean} focusModeConfigured
  * @prop {() => string|null} focusModeUserFilter

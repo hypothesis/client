@@ -5,8 +5,24 @@ import { isThirdPartyUser, username } from '../util/account-id';
 import { withServices } from '../util/service-context';
 
 /**
+ * @typedef {import("../../types/api").Annotation} Annotation
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
+ */
+
+/**
+ * @typedef AnnotationUserProps
+ * @prop {Annotation} annotation - The annotation whose user is relevant
+ * @prop {Object} features - Injected service
+ * @prop {ServiceUrlGetter} serviceUrl - Injected service
+ * @prop {MergedConfig} settings - Injected service
+ */
+
+/**
  * Display information about an annotation's user. Link to the user's
  * activity if it is a first-party user or `settings.usernameUrl` is present.
+ *
+ * @param {AnnotationUserProps} props
  */
 function AnnotationUser({ annotation, features, serviceUrl, settings }) {
   const user = annotation.user;
@@ -53,10 +69,7 @@ function AnnotationUser({ annotation, features, serviceUrl, settings }) {
 }
 
 AnnotationUser.propTypes = {
-  /** The annotation whose user is relevant */
   annotation: propTypes.object.isRequired,
-
-  /** services */
   features: propTypes.object.isRequired,
   serviceUrl: propTypes.func.isRequired,
   settings: propTypes.object.isRequired,

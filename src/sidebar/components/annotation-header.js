@@ -13,9 +13,26 @@ import SvgIcon from '../../shared/components/svg-icon';
 import Timestamp from './timestamp';
 
 /**
+ * @typedef {import("../../types/api").Annotation} Annotation
+ */
+
+/**
+ * @typedef AnnotationHeaderProps
+ * @prop {Annotation} annotation
+ * @prop {boolean} [isEditing] - Whether the annotation is actively being edited
+ * @prop {number} [replyCount] - How many replies this annotation currently has
+ * @prop {boolean} [showDocumentInfo] -
+ *   Should document metadata be rendered? Hint: this is enabled for single annotation
+ *   and stream views.
+ * @prop {boolean} threadIsCollapsed - Is this thread currently collapsed?
+ */
+
+/**
  * Render an annotation's header summary, including metadata about its user,
  * sharing status, document and timestamp. It also allows the user to
  * toggle sub-threads/replies in certain cases.
+ *
+ * @param {AnnotationHeaderProps} props
  */
 export default function AnnotationHeader({
   annotation,
@@ -109,19 +126,9 @@ export default function AnnotationHeader({
 }
 
 AnnotationHeader.propTypes = {
-  /* The annotation */
   annotation: propTypes.object.isRequired,
-  /* Whether the annotation is actively being edited */
   isEditing: propTypes.bool,
-  /* How many replies this annotation currently has */
   replyCount: propTypes.number,
-  /**
-   * Should document metadata be rendered? Hint: this is enabled for single-
-   * annotation and stream views
-   */
   showDocumentInfo: propTypes.bool,
-  /**
-   * Is this thread currently collapsed?
-   */
   threadIsCollapsed: propTypes.bool.isRequired,
 };
