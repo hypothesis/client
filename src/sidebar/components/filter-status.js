@@ -90,10 +90,19 @@ export default function FilterStatus() {
   // forced-visible threads out to get a correct count of actual filter matches.
   // In 'selection' mode, rely on the count of selected annotations
   const visibleCount = countVisible(rootThread);
+  const visibleAnnotationCount = rootThread.children.filter(
+    thread => thread.annotation && thread.visible
+  ).length;
+
   const resultCount =
     filterMode === 'selection'
       ? filterState.selectedCount
       : visibleCount - filterState.forcedVisibleCount;
+
+  const additionalCount =
+    filterMode === 'selection'
+      ? visibleAnnotationCount - resultCount
+      : filterState.forcedVisibleCount;
 
   let buttonText;
   switch (filterMode) {
@@ -133,7 +142,7 @@ export default function FilterStatus() {
 
   // In most cases, the action button will clear the current (filter) selection,
   // but when in 'focusOnly' mode, it will toggle activation of the focus
-  if (filterMode === 'focusOnly' && !filterState.forcedVisibleCount) {
+  if (filterMode === 'focusOnly' && !additionalCount) {
     buttonProps.onClick = () => toggleFocusMode();
   }
 
@@ -144,6 +153,9 @@ export default function FilterStatus() {
           {resultCount > 0 && <span>Showing </span>}
           <span className="filter-facet">
             {resultCount > 0 ? resultCount : 'No'}{' '}
+            {filterMode === 'selection' && additionalCount > 0
+              ? 'selected '
+              : ''}
             {filterMode === 'query' ? 'result' : 'annotation'}
             {resultCount !== 1 ? 's' : '' /* pluralize */}
           </span>
@@ -165,10 +177,10 @@ export default function FilterStatus() {
               </span>
             </span>
           )}
-          {filterState.forcedVisibleCount > 0 && (
+          {additionalCount > 0 && (
             <span className="filter-facet--muted">
               {' '}
-              (and {filterState.forcedVisibleCount} more)
+              (and {additionalCount} more)
             </span>
           )}
         </div>
