@@ -324,9 +324,12 @@ export default function buildThread(annotations, options) {
   let thread = threadAnnotations(annotations);
 
   if (hasSelection) {
-    // Remove threads (annotations) that are not selected
+    // Remove threads (annotations) that are not selected or
+    // are not forced-visible
     thread.children = thread.children.filter(
-      child => opts.selected.indexOf(child.id) !== -1
+      child =>
+        opts.selected.indexOf(child.id) !== -1 ||
+        opts.forcedVisible.indexOf(child.id) !== -1
     );
   }
 

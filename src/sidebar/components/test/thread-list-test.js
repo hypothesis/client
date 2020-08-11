@@ -40,7 +40,7 @@ describe('ThreadList', () => {
     document.body.appendChild(fakeScrollContainer);
 
     fakeStore = {
-      clearSelection: sinon.stub(),
+      setForcedVisible: sinon.stub(),
       unsavedAnnotations: sinon.stub().returns([]),
     };
 
@@ -113,19 +113,11 @@ describe('ThreadList', () => {
   });
 
   context('new annotation created in application', () => {
-    it('clears the current selection in the store', () => {
+    it('sets the new annotation to forced-visible', () => {
       const wrapper = createComponent();
       addNewAnnotation(wrapper);
-      assert.calledOnce(fakeStore.clearSelection);
-    });
-
-    it('does not clear the selection in the store if new annotation is a highlight', () => {
-      fakeMetadata.isHighlight.returns(true);
-      const wrapper = createComponent();
-
-      addNewAnnotation(wrapper);
-
-      assert.notCalled(fakeStore.clearSelection);
+      assert.calledOnce(fakeStore.setForcedVisible);
+      assert.calledWith(fakeStore.setForcedVisible, 'foobar', true);
     });
   });
 
