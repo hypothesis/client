@@ -44,7 +44,7 @@ function getScrollContainer() {
  * @param {ThreadListProps} props
  */
 function ThreadList({ thread }) {
-  const clearSelection = useStore(store => store.clearSelection);
+  const setForcedVisible = useStore(store => store.setForcedVisible);
 
   // Height of the visible area of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(
@@ -105,10 +105,10 @@ function ThreadList({ thread }) {
   // and the thread list will scroll to that.
   useEffect(() => {
     if (newAnnotationTag) {
-      clearSelection();
+      setForcedVisible(newAnnotationTag, true);
       setScrollToId(newAnnotationTag);
     }
-  }, [clearSelection, newAnnotationTag]);
+  }, [setForcedVisible, newAnnotationTag]);
 
   // Effect to scroll a particular thread into view. This is mainly used to
   // scroll a newly created annotation into view.
