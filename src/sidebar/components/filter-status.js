@@ -1,4 +1,5 @@
 import { createElement } from 'preact';
+import propTypes from 'prop-types';
 
 import { countVisible } from '../util/thread';
 
@@ -8,135 +9,57 @@ import useRootThread from './hooks/use-root-thread';
 import useStore from '../store/use-store';
 
 /**
- * Render information about the currently-applied filters and allow the
- * user to clear filters or toggle user-focus mode on and off
- *
- * When any filtering is applied, we are in one of 3 mutually-exclusive filtering
- * "modes". In any mode, we display descriptive text about what the user
- * is looking at, and present one button to take action on the current filtering
- * state.
- *
- * Descriptive text about the filter status and annotations follows the
- * pattern:
- *
- *   [Showing] (<resultCount>|No) (annotation[s]|result[s]) [for <filterQuery>]
- *   [by <focusedUser>] [\(and <forcedCount> more\)]`
- *
- * Modes are as follows:
- *
- * - selection: One of more annotations have been selected in the document by
- *   the user, or there is a direct-linked annotation active. Other filters
- *   will be ignored and it supersedes other modes.
- *    - Text:
- *      "Showing <selectedCount> annotation[s]"
- *    - Button:
- *      "<cancelIcon> Show all [\(<totalCount>\)]"
- *      Action: clears selection
- *      (`totalCount` is not displayed if user focus is configured)
- *
- * - query: There is a user-entered filter query, and potentially other filters
- *   (e.g. user-focus).
- *    - Text:
- *    "[Showing] (No|<resultCount>) result[s] for '<filterQuery>'
- *    [by <focusDisplayName>] [\(and <forcedVisibleCount> more\)]"
- *    - Button:
- *      "<cancelIcon> Clear search"
- *      Action: clears selection/filters (leaves user focus state intact)
- *
- * - focusOnly: Neither of the above two modes apply and user-focus is
- *   configured.
- *   - Text:
- *     "[Showing] (No|<resultCount>) annotation[s]
- *     by <focusDisplayName> [\(and <forcedVisibleCount> more\)]"
- *   - Button:
- *     "Show only <focusDisplayName>" (when user-focus mode not active)
- *     "Show all" (when user-focus mode active)
- *     "Reset filters" (When user-focus mode is active
- *                      and threads are force-expanded)
- *     Action: Toggle user focus
- *
+ * @typedef {import('../store/modules/selection').FilterState} FilterState
+ * @typedef {import('../util/build-thread').Thread} Thread
  */
-export default function FilterStatus() {
-  const rootThread = useRootThread();
 
-  const filterState = useStore(store => store.filterState());
+/**
+ * @typedef FilterStatusPanelProps
+ * @prop {object} actionButton -
+ *   A `Button` component that serves as an action button, typically to clear
+ *   the currently-applied filters
+ * @prop {number} [additionalCount=0] -
+ *   A count of items that don't match the filter(s) but should be visible
+ *   anyway: threads that have been forced-visible by the user, or newly-created
+ *   annotations or replies that don't match the current filter(s), but should
+ *   be visible. Similar to `resultCount`, this value includes both annotations
+ *   and replies, except when there are selected annotations, when it includes
+ *   top-level annotations only.
+ * @prop {string} [entitySingular="annotation"] -
+ *   singular variant of the "thing" being shown (e.g. "result" when there is
+ *   a query string)
+ * @prop {string} [entityPlural="annotations"]
+ * @prop {string|null} [filterQuery] - Currently-applied filter query string, if any
+ * @prop {string|null} [focusDisplayName] -
+ *   Display name for the user currently being focused
+ * @prop {number} resultCount -
+ *   The number of "things" that match the current filter(s). When searching by
+ *   query or focusing on a user, this value includes annotations and replies.
+ *   When there are selected annotations, this number includes only top-level
+ *   annotations.
+ */
 
-  // The total count of all of the annotations in the store—may differ from
-  // the number of annotations in the thread and the number of visible annotations
-  const totalCount = useStore(store => store.annotationCount());
+/**
+ * @typedef FilterModeProps
+ * @prop {FilterState} filterState
+ * @prop {Thread} rootThread
+ */
 
-  // Actions
-  const clearSelection = useStore(store => store.clearSelection);
-  const toggleFocusMode = useStore(store => store.toggleFocusMode);
-
-  const filterMode = (() => {
-    if (filterState.selectedCount > 0) {
-      return 'selection';
-    } else if (filterState.filterQuery) {
-      return 'query';
-    } else if (filterState.focusConfigured) {
-      return 'focusOnly';
-    }
-    return null;
-  })();
-
-  if (!filterMode) {
-    // Nothing to do here
-    return null;
-  }
-
-  // Some threads in the `visibleCount` may have been "forced visible" by
-  // the user by clicking "Show x more in conversation" — subtract these
-  // forced-visible threads out to get a correct count of actual filter matches.
-  // In 'selection' mode, rely on the count of selected annotations
-  const visibleCount = countVisible(rootThread);
-  const resultCount =
-    filterMode === 'selection'
-      ? filterState.selectedCount
-      : visibleCount - filterState.forcedVisibleCount;
-
-  let buttonText;
-  switch (filterMode) {
-    case 'selection':
-      // If user focus is configured, displayed counts include annotations AND replies,
-      // while `totalCount` only includes top-level annotations, so that count
-      // doesn't make sense when user focus is involved in the mix
-      buttonText = filterState.focusConfigured
-        ? 'Show all'
-        : `Show all (${totalCount})`;
-      break;
-    case 'focusOnly':
-      if (!filterState.forcedVisibleCount) {
-        buttonText = filterState.focusActive
-          ? 'Show all'
-          : `Show only ${filterState.focusDisplayName}`;
-      } else {
-        // When user focus is applied and there are some forced-visible threads,
-        // this special case applies. The button will clear force-visible threads
-        // but leave user focus intact
-        buttonText = 'Reset filters';
-      }
-      break;
-    case 'query':
-      buttonText = 'Clear search';
-      break;
-  }
-
-  const buttonProps = {
-    buttonText,
-    onClick: () => clearSelection(),
-  };
-
-  if (filterMode !== 'focusOnly') {
-    buttonProps.icon = 'cancel';
-  }
-
-  // In most cases, the action button will clear the current (filter) selection,
-  // but when in 'focusOnly' mode, it will toggle activation of the focus
-  if (filterMode === 'focusOnly' && !filterState.forcedVisibleCount) {
-    buttonProps.onClick = () => toggleFocusMode();
-  }
-
+/**
+ * Render information about the currently-applied filters and a button that
+ * allows the user to clear filters (or toggle user-focus mode on and off).
+ *
+ * @param {FilterStatusPanelProps} props
+ */
+function FilterStatusPanel({
+  actionButton,
+  additionalCount = 0,
+  entitySingular = 'annotation',
+  entityPlural = 'annotations',
+  filterQuery,
+  focusDisplayName,
+  resultCount,
+}) {
   return (
     <div className="filter-status">
       <div className="u-layout-row--align-center">
@@ -144,40 +67,224 @@ export default function FilterStatus() {
           {resultCount > 0 && <span>Showing </span>}
           <span className="filter-facet">
             {resultCount > 0 ? resultCount : 'No'}{' '}
-            {filterMode === 'query' ? 'result' : 'annotation'}
-            {resultCount !== 1 ? 's' : '' /* pluralize */}
+            {resultCount === 1 ? entitySingular : entityPlural}
           </span>
-          {filterMode === 'query' && (
+          {filterQuery && (
             <span>
               {' '}
               for{' '}
-              <span className="filter-facet--pre">
-                &#39;{filterState.filterQuery}&#39;
-              </span>
+              <span className="filter-facet--pre">&#39;{filterQuery}&#39;</span>
             </span>
           )}
-          {filterMode !== 'selection' && filterState.focusActive && (
+          {focusDisplayName && (
             <span>
               {' '}
-              by{' '}
-              <span className="filter-facet">
-                {filterState.focusDisplayName}
-              </span>
+              by <span className="filter-facet">{focusDisplayName}</span>
             </span>
           )}
-          {filterState.forcedVisibleCount > 0 && (
+          {additionalCount > 0 && (
             <span className="filter-facet--muted">
               {' '}
-              (and {filterState.forcedVisibleCount} more)
+              (and {additionalCount} more)
             </span>
           )}
         </div>
-        <div>
-          <Button className="button--primary" {...buttonProps} />
-        </div>
+        <div>{actionButton}</div>
       </div>
     </div>
   );
+}
+
+FilterStatusPanel.propTypes = {
+  resultCount: propTypes.number.isRequired,
+  actionButton: propTypes.object.isRequired,
+  additionalCount: propTypes.number,
+  entitySingular: propTypes.string,
+  entityPlural: propTypes.string,
+  filterQuery: propTypes.string,
+  focusDisplayName: propTypes.string,
+};
+
+/**
+ * This status is used when there are selected annotations (including direct-
+ * linked annotations). This status takes precedence over others.
+ *
+ * Message formatting:
+ * "[Showing] (No|<resultCount>) annotation[s] [\(and <additionalCount> more\)]"
+ * Button:
+ * "<cancel icon> Show all [\(<totalCount)\)]" - clears the selection
+ *
+ * @param {FilterModeProps} props
+ */
+function SelectionFilterStatus({ filterState, rootThread }) {
+  const clearSelection = useStore(store => store.clearSelection);
+  // The total number of top-level annotations (visible or not)
+  const totalCount = useStore(store => store.annotationCount());
+  // Count the number of visible annotations—top-level only
+  const visibleAnnotationCount = (rootThread.children || []).filter(
+    thread => thread.annotation && thread.visible
+  ).length;
+
+  // The number displayed in "(and x more)" is the difference between
+  // all visible top-level annotations and the count of selected annotations
+  // (i.e. additionalCount accounts for any visible top-level annotations
+  // that are not in the current selection)
+  const additionalCount = visibleAnnotationCount - filterState.selectedCount;
+
+  // Because of the confusion between counts of entities between selected
+  // annotations and filtered annotations, don't display the total number
+  // when in user-focus mode because the numbers won't appear to make sense.
+  const buttonText = filterState.focusConfigured
+    ? 'Show all'
+    : `Show all (${totalCount})`;
+
+  const button = (
+    <Button
+      buttonText={buttonText}
+      className="button--primary"
+      onClick={() => clearSelection()}
+      icon="cancel"
+    />
+  );
+  return (
+    <FilterStatusPanel
+      resultCount={filterState.selectedCount}
+      additionalCount={additionalCount}
+      actionButton={button}
+    />
+  );
+}
+
+SelectionFilterStatus.propTypes = {
+  filterState: propTypes.object.isRequired,
+  rootThread: propTypes.object.isRequired,
+};
+
+/**
+ * This status is used when there is an applied filter query and
+ * `SelectionFilterStatus` does not apply.
+ *
+ * Message formatting:
+ * "[Showing] (No|<resultCount>) result[s] for '<filterQuery>'
+ *  [by <focusDisplayName] [\(and <additionalCount> more\)]""
+ *
+ * Button:
+ * "<cancel icon> Clear search" - Clears the selection
+ *
+ * @param {FilterModeProps} props
+ */
+function QueryFilterStatus({ filterState, rootThread }) {
+  const clearSelection = useStore(store => store.clearSelection);
+  const visibleCount = countVisible(rootThread);
+  const resultCount = visibleCount - filterState.forcedVisibleCount;
+
+  const button = (
+    <Button
+      icon="cancel"
+      className="button--primary"
+      buttonText="Clear search"
+      onClick={() => clearSelection()}
+    />
+  );
+
+  return (
+    <FilterStatusPanel
+      actionButton={button}
+      additionalCount={filterState.forcedVisibleCount}
+      entitySingular="result"
+      entityPlural="results"
+      filterQuery={filterState.filterQuery}
+      focusDisplayName={filterState.focusDisplayName}
+      resultCount={resultCount}
+    />
+  );
+}
+
+QueryFilterStatus.propTypes = {
+  filterState: propTypes.object.isRequired,
+  rootThread: propTypes.object.isRequired,
+};
+
+/**
+ * This status is used if user-focus mode is configured and neither
+ * `SelectionFilterStatus` nor `QueryFilterStatus` apply.
+ *
+ * Message formatting:
+ * "[Showing] (No|<resultCount>) annotation[s] [by <focusDisplayName>]
+ *   [\(and <additionalCount> more\)]"
+ *
+ * Button:
+ *  - If there are no forced-visible threads:
+ * "Show (all|only <focusDisplayName>)" - Toggles the user filter activation
+ * - If there are any forced-visible threads:
+ * "Reset filters" - Clears selection (does not affect user filter activation)
+ *
+ * @param {FilterModeProps} props
+ */
+function FocusFilterStatus({ filterState, rootThread }) {
+  const clearSelection = useStore(store => store.clearSelection);
+  const toggleFocusMode = useStore(store => store.toggleFocusMode);
+  const visibleCount = countVisible(rootThread);
+  const resultCount = visibleCount - filterState.forcedVisibleCount;
+  const buttonProps = {};
+
+  if (filterState.forcedVisibleCount > 0) {
+    buttonProps.onClick = () => clearSelection();
+    buttonProps.buttonText = 'Reset filters';
+  } else {
+    buttonProps.onClick = () => toggleFocusMode();
+    buttonProps.buttonText = filterState.focusActive
+      ? 'Show all'
+      : `Show only ${filterState.focusDisplayName}`;
+  }
+  const focusDisplayName = filterState.focusActive
+    ? filterState.focusDisplayName
+    : '';
+
+  const button = <Button className="button--primary" {...buttonProps} />;
+
+  return (
+    <FilterStatusPanel
+      resultCount={resultCount}
+      actionButton={button}
+      additionalCount={filterState.forcedVisibleCount}
+      filterQuery={filterState.filterQuery}
+      focusDisplayName={focusDisplayName}
+    />
+  );
+}
+
+FocusFilterStatus.propTypes = {
+  filterState: propTypes.object.isRequired,
+  rootThread: propTypes.object.isRequired,
+};
+
+/**
+ * Determine which (if any) of the filter status variants to render depending
+ * on current `filterState`. Only one filter status panel is displayed at a time:
+ * they are mutually exclusive.
+ */
+export default function FilterStatus() {
+  const rootThread = useRootThread();
+  const filterState = useStore(store => store.filterState());
+
+  if (filterState.selectedCount > 0) {
+    return (
+      <SelectionFilterStatus
+        filterState={filterState}
+        rootThread={rootThread}
+      />
+    );
+  } else if (filterState.filterQuery) {
+    return (
+      <QueryFilterStatus filterState={filterState} rootThread={rootThread} />
+    );
+  } else if (filterState.focusConfigured) {
+    return (
+      <FocusFilterStatus filterState={filterState} rootThread={rootThread} />
+    );
+  }
+  return null;
 }
 
 FilterStatus.propTypes = {};

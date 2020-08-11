@@ -150,6 +150,32 @@ describe('FilterStatus', () => {
       assertFilterText(createComponent(), 'Showing 4 annotations');
     });
 
+    it('should show the count of additionally-shown top-level annotations', () => {
+      // In selection mode, "forced visible" count is computed by subtracting
+      // the selectedCount from the count of all visible top-level threads
+      // (children/replies are ignored in this count)
+      fakeUseRootThread.returns({
+        id: '__default__',
+        children: [
+          { id: '1', annotation: { $tag: '1' }, visible: true, children: [] },
+          {
+            id: '2',
+            annotation: { $tag: '2' },
+            visible: true,
+            children: [
+              {
+                id: '2a',
+                annotation: { $tag: '2a' },
+                visible: true,
+                children: [],
+              },
+            ],
+          },
+        ],
+      });
+      assertFilterText(createComponent(), 'Showing 1 annotation (and 1 more)');
+    });
+
     it('should provide a "Show all" button that shows a count of all annotations', () => {
       fakeStore.annotationCount.returns(5);
       assertButton(createComponent(), {
