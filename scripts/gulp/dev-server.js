@@ -8,22 +8,7 @@ const Mustache = require('mustache');
 const { createServer, useSsl } = require('./create-server');
 
 const DOCUMENT_PATH = './test-documents/';
-const DOCUMENT_PATTERN = /\.html\.mustache/;
-
-/**
- * Render some content in an HTML document with `<pre>` tags
- *
- * @param {string} filename - source to inject between `<pre>` tags
- * @return {string}
- */
-function preformattedContent(filename) {
-  const textContent = fs.readFileSync(filename, 'utf-8');
-  const template = fs.readFileSync(
-    `${DOCUMENT_PATH}preformatted.template.mustache`,
-    'utf-8'
-  );
-  return Mustache.render(template, { textContent });
-}
+const DOCUMENT_PATTERN = /\.mustache/;
 
 /**
  * Generate `<script>` content for client configuration and injection
@@ -68,7 +53,8 @@ function buildDocumentRoutes() {
     .filter(filename => filename.match(DOCUMENT_PATTERN));
   documentPaths.forEach(filename => {
     const shortName = filename.replace(DOCUMENT_PATTERN, '');
-    documentRoutes[`/document/${shortName}`] = `${DOCUMENT_PATH}${filename}`;
+    const routePath = shortName === 'index' ? '/' : `/document/${shortName}`;
+    documentRoutes[routePath] = `${DOCUMENT_PATH}${filename}`;
   });
   return documentRoutes;
 }
@@ -88,10 +74,6 @@ function buildDocumentRoutes() {
  */
 function DevServer(port, config) {
   const documentRoutes = buildDocumentRoutes();
-  const preformattedRoutes = {
-    '/document/code_of_conduct': './CODE_OF_CONDUCT',
-    '/document/license': './LICENSE',
-  };
 
   function listen() {
     const app = function (req, response) {
@@ -103,13 +85,10 @@ function DevServer(port, config) {
           documentRoutes[url.pathname],
           config.clientUrl
         );
-      } else if (preformattedRoutes[url.pathname]) {
-        content = preformattedContent(preformattedRoutes[url.pathname]);
       } else {
         content = injectClientScript(
-          `${DOCUMENT_PATH}index.template.mustache`,
+          `${DOCUMENT_PATH}404.mustache`,
           config.clientUrl,
-          { readme: fs.readFileSync('./README.md', 'utf-8') }
         );
       }
       response.end(content);

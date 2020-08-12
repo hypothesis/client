@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hypothesis Client Test</title>
+<style>
+  body {
+    font-family: sans-serif;
+  }
+</style>
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" height="28" viewBox="0 0 24 28" width="24"><path d="M3.886 3.945H21.03v16.047H3.886z" fill="#fff"></path><path d="M0 2.005C0 .898.897 0 2.005 0h19.99C23.102 0 24 .897 24 2.005v19.99A2.005 2.005 0 0121.995 24H2.005A2.005 2.005 0 010 21.995V2.005zM9 24l3 4 3-4H9zM7.008 4H4v16h3.008v-4.997C7.008 12.005 8.168 12.01 9 12c1 .007 2.019.06 2.019 2.003V20h3.008v-6.891C14.027 10 12 9.003 10 9.003c-1.99 0-2 0-2.992 1.999V4zM19 19.987c1.105 0 2-.893 2-1.994A1.997 1.997 0 0019 16c-1.105 0-2 .892-2 1.993s.895 1.994 2 1.994z" fill="currentColor" fill-rule="evenodd"></path></svg>
+  <h1>Hypothesis Client development server</h1>
+  <p>Welcome to the Hypothesis client's development server.</p>
+  <h2>Test documents</h2>
+  <ul>
+    <li><a href="/document/doyle">The Disappearance of Lady Carfax, by Arthur Conan Doyle</a></li>
+    <li><a href="/document/tolstoy">Anna Karenina, by Leo Tolstoy</a></li>
+  </ul>
+  <h2>Page feature tests</h2>
+  <p>Page elements that interact with the Hypothesis client.</p>
+  <div>
+    Number of annotations on this page:
+    <span data-hypothesis-annotation-count>...</span>
+  </div>
+  <button data-hypothesis-trigger>
+    Open sidebar
+  </button>
+  <h2>Useful links</h2>
+  <ul>
+    <li><a href="https://github.com/hypothesis/client">GitHub project</a></li>
+    <li><a href="https://h-client.readthedocs.io">Documentation for publishers and
+        developers</a></li>
+    <li><a href="https://h.readthedocs.io/en/latest/api/">Hypothesis API documentation</a></li>
+  </ul>
+  {{{hypothesisScript}}}
+</body>
+</html>
