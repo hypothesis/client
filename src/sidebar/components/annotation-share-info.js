@@ -7,12 +7,20 @@ import { isPrivate } from '../util/permissions';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef {import("../../types/api").Annotation} Annotation
  * @typedef {import('../../types/api').Group} Group
+ */
+
+/**
+ * @typedef AnnotationShareInfoProps
+ * @prop {Annotation} annotation
  */
 
 /**
  * Render information about what group an annotation is in and
  * whether it is private to the current user (only me)
+ *
+ * @param {AnnotationShareInfoProps} props
  */
 function AnnotationShareInfo({ annotation }) {
   const group = useStore(store => store.getGroup(annotation.group));
@@ -52,7 +60,6 @@ function AnnotationShareInfo({ annotation }) {
 }
 
 AnnotationShareInfo.propTypes = {
-  /** The current annotation object for which sharing info will be rendered */
   annotation: propTypes.object.isRequired,
 };
 

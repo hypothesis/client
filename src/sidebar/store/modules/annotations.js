@@ -551,6 +551,7 @@ function savedAnnotations(state) {
  * @prop {typeof clearAnnotations} clearAnnotations
  * @prop {typeof focusAnnotations} focusAnnotations
  * @prop {typeof hideAnnotation} hideAnnotation
+ * @prop {typeof highlightAnnotations} highlightAnnotations
  * @prop {typeof removeAnnotations} removeAnnotations
  * @prop {typeof unhideAnnotation} unhideAnnotation
  * @prop {typeof updateAnchorStatus} updateAnchorStatus
