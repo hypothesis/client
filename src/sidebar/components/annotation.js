@@ -17,7 +17,24 @@ import AnnotationQuote from './annotation-quote';
 import Button from './button';
 
 /**
+ * @typedef {import("../../types/api").Annotation} Annotation
+ * @typedef {import('../../types/api').Group} Group
+ */
+
+/**
+ * @typedef AnnotationProps
+ * @prop {Annotation} annotation
+ * @prop {number} replyCount - Number of replies to this annotation (thread)
+ * @prop {boolean} showDocumentInfo - Should extended document info be rendered (e.g. in non-sidebar contexts)?
+ * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
+ * @prop {Object} annotationsService - Injected service
+ * @prop {Object} toastMessenger - Injected service
+ */
+
+/**
  * A single annotation.
+ *
+ * @param {AnnotationProps} props
  */
 function Annotation({
   annotation,
@@ -162,15 +179,9 @@ function Annotation({
 
 Annotation.propTypes = {
   annotation: propTypes.object.isRequired,
-
-  /** Number of replies to this annotation (thread) */
   replyCount: propTypes.number.isRequired,
-  /** Should extended document info be rendered (e.g. in non-sidebar contexts)? */
   showDocumentInfo: propTypes.bool.isRequired,
-  /** Is the thread to which this annotation belongs currently collapsed? */
   threadIsCollapsed: propTypes.bool.isRequired,
-
-  /* Injected services */
   annotationsService: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,
 };
