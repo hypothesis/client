@@ -16,7 +16,7 @@ const through = require('through2');
 const createBundle = require('./scripts/gulp/create-bundle');
 const createStyleBundle = require('./scripts/gulp/create-style-bundle');
 const manifest = require('./scripts/gulp/manifest');
-const servePackage = require('./scripts/gulp/serve-package');
+const servePackage = require('./dev-server/serve-package');
 const vendorBundles = require('./scripts/gulp/vendor-bundles');
 
 const IS_PRODUCTION_BUILD = process.env.NODE_ENV === 'production';
@@ -294,7 +294,7 @@ gulp.task('serve-package', function () {
 });
 
 gulp.task('serve-test-pages', function () {
-  const DevServer = require('./scripts/gulp/dev-server');
+  const DevServer = require('./dev-server');
   new DevServer(3000, {
     // The scheme is omitted here as the client asset server will use the same
     // protcol (HTTP or HTTPS) as the test page server.

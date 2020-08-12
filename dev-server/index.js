@@ -1,3 +1,5 @@
+/* global __dirname */
+
 'use strict';
 
 const fs = require('fs');
@@ -7,7 +9,8 @@ const Mustache = require('mustache');
 
 const { createServer, useSsl } = require('./create-server');
 
-const DOCUMENT_PATH = './test-documents/';
+const DOCUMENT_PATH = `${__dirname}/documents/`;
+const TEMPLATE_PATH = `${__dirname}/templates/`;
 const DOCUMENT_PATTERN = /\.mustache/;
 
 /**
@@ -18,7 +21,7 @@ const DOCUMENT_PATTERN = /\.mustache/;
  */
 function renderConfig(clientUrl) {
   const scriptTemplate = fs.readFileSync(
-    `${DOCUMENT_PATH}client-config.js.mustache`,
+    `${TEMPLATE_PATH}client-config.js.mustache`,
     'utf-8'
   );
   return Mustache.render(scriptTemplate, { clientUrl });
@@ -87,8 +90,8 @@ function DevServer(port, config) {
         );
       } else {
         content = injectClientScript(
-          `${DOCUMENT_PATH}404.mustache`,
-          config.clientUrl,
+          `${TEMPLATE_PATH}404.mustache`,
+          config.clientUrl
         );
       }
       response.end(content);

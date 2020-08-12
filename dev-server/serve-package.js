@@ -6,7 +6,7 @@ const express = require('express');
 const log = require('fancy-log');
 
 const { createServer, useSsl } = require('./create-server');
-const { version } = require('../../package.json');
+const { version } = require('../package.json');
 
 /**
  * An express server which serves the contents of the package.
@@ -30,7 +30,7 @@ function servePackage(port) {
   });
 
   const serveBootScript = function (req, res) {
-    const entryPath = require.resolve('../..');
+    const entryPath = require.resolve('../');
     const entryScript = readFileSync(entryPath).toString('utf-8');
     res.send(entryScript);
   };
