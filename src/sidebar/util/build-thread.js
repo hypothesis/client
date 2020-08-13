@@ -259,7 +259,7 @@ function hasVisibleChildren(thread) {
  * @typedef Options
  * @prop {string[]} [selected] - List of currently-selected annotation ids, from
  *       the data store
- * @prop {string[]} [forcedVisible] - List of ids of annotations that have
+ * @prop {string[]} [forcedVisible] - List of $tags of annotations that have
  *       been explicitly expanded by the user, even if they don't
  *       match current filters
  * @prop {(a: Annotation) => boolean} [filterFn] - Predicate function that
@@ -326,11 +326,14 @@ export default function buildThread(annotations, options) {
   if (hasSelection) {
     // Remove threads (annotations) that are not selected or
     // are not forced-visible
-    thread.children = thread.children.filter(
-      child =>
-        opts.selected.indexOf(child.id) !== -1 ||
-        opts.forcedVisible.indexOf(child.id) !== -1
-    );
+    thread.children = thread.children.filter(child => {
+      const isSelected = opts.selected.includes(child.id);
+      const isForcedVisible =
+        hasForcedVisible &&
+        child.annotation &&
+        opts.forcedVisible.includes(child.annotation.$tag);
+      return isSelected || isForcedVisible;
+    });
   }
 
   if (threadsFiltered) {
@@ -347,7 +350,7 @@ export default function buildThread(annotations, options) {
     } else if (annotationsFiltered) {
       if (
         hasForcedVisible &&
-        opts.forcedVisible.indexOf(annotationId(thread.annotation)) !== -1
+        opts.forcedVisible.includes(thread.annotation.$tag)
       ) {
         // This annotation may or may not match the filter, but we should
         // make sure it is visible because it has been forced visible by user

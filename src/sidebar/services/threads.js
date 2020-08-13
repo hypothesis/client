@@ -16,8 +16,8 @@ export default function threadsService(store) {
     thread.children.forEach(child => {
       forceVisible(child);
     });
-    if (!thread.visible) {
-      store.setForcedVisible(thread.id, true);
+    if (!thread.visible && thread.annotation) {
+      store.setForcedVisible(thread.annotation.$tag, true);
     }
   }
 
