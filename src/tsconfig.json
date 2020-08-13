@@ -26,10 +26,6 @@
     // Remove them from this list as they are resolved.
     "sidebar/components/hooks/use-root-thread.js",
     "sidebar/components/hypothesis-app.js",
-    "sidebar/components/share-annotations-panel.js",
-    "sidebar/components/sidebar-content-error.js",
-    "sidebar/components/sidebar-content.js",
-    "sidebar/components/stream-content.js",
     "sidebar/components/top-bar.js"
   ]
 }
