@@ -12,20 +12,23 @@ import SidebarPanel from './sidebar-panel';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef ShareAnnotationsPanelProps
+ * @prop {Object} analytics - Injected service
+ * @prop {Object} toastMessenger - Injected service
+ */
+
+/**
  * A panel for sharing the current group's annotations.
  *
- * Links withinin this component allow a user to share the set of annotations that
+ * Links within this component allow a user to share the set of annotations that
  * are on the current page (as defined by the main frame's URI) and contained
  * within the app's currently-focused group.
+ *
+ * @param {ShareAnnotationsPanelProps} props
  */
 function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   const mainFrame = useStore(store => store.mainFrame());
   const focusedGroup = useStore(store => store.focusedGroup());
-
-  // We can render a basic frame for the panel at any time,
-  // but hold off rendering panel content if needed things aren't present.
-  // We need to know what page we're on and what group is focused.
-  const shouldRenderPanelContent = focusedGroup && mainFrame;
 
   const groupName = (focusedGroup && focusedGroup.name) || '...';
   const panelTitle = `Share Annotations in ${groupName}`;
@@ -34,12 +37,11 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   // This is the URI format for the web-sharing link shown in the input
   // and is available to be copied to clipboard
   const shareURI = ((frame, group) => {
-    if (!shouldRenderPanelContent) {
-      return '';
-    }
-    return `https://hyp.is/go?url=${encodeURIComponent(mainFrame.uri)}&group=${
-      group.id
-    }`;
+    return group && frame
+      ? `https://hyp.is/go?url=${encodeURIComponent(frame.uri)}&group=${
+          group.id
+        }`
+      : '';
   })(mainFrame, focusedGroup);
 
   const copyShareLink = () => {
@@ -56,7 +58,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
       title={panelTitle}
       panelName={uiConstants.PANEL_SHARE_ANNOTATIONS}
     >
-      {shouldRenderPanelContent && (
+      {focusedGroup && mainFrame && (
         <div className="share-annotations-panel">
           <div className="share-annotations-panel__intro">
             {focusedGroup.type === 'private' ? (
@@ -112,7 +114,6 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
 }
 
 ShareAnnotationsPanel.propTypes = {
-  // Injected services
   analytics: propTypes.object.isRequired,
   toastMessenger: propTypes.object.isRequired,
 };

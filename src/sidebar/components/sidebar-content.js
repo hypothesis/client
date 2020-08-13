@@ -17,7 +17,18 @@ import SidebarContentError from './sidebar-content-error';
 import ThreadList from './thread-list';
 
 /**
+ * @typedef SidebarContentProps
+ * @prop {() => any} onLogin
+ * @prop {() => any} onSignUp
+ * @prop {Object} [frameSync] - Injected service
+ * @prop {Object} [loadAnnotationsService]  - Injected service
+ * @prop {Object} [streamer] - Injected service
+ */
+
+/**
  * Render the sidebar and its components
+ *
+ * @param {SidebarContentProps} props
  */
 function SidebarContent({
   frameSync,
@@ -44,7 +55,7 @@ function SidebarContent({
   });
   const directLinkedTab = linkedAnnotation
     ? tabForAnnotation(linkedAnnotation)
-    : null;
+    : 'annotation';
   const searchUris = useStore(store => store.searchUris());
   const filterStatusEnabled = useStore(store =>
     store.isFeatureEnabled('client_filter_status')
@@ -88,6 +99,7 @@ function SidebarContent({
     !hasDirectLinkedAnnotationError &&
     !isLoading;
 
+  /** @type {import("preact/hooks").Ref<string|null>} */
   const prevGroupId = useRef(focusedGroupId);
 
   // Reload annotations when group, user or document search URIs change
@@ -150,11 +162,8 @@ function SidebarContent({
 }
 
 SidebarContent.propTypes = {
-  // Callbacks for log in and out
   onLogin: propTypes.func.isRequired,
   onSignUp: propTypes.func.isRequired,
-
-  // Injected
   frameSync: propTypes.object,
   loadAnnotationsService: propTypes.object,
   streamer: propTypes.object,

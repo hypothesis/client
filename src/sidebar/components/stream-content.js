@@ -10,7 +10,15 @@ import useStore from '../store/use-store';
 import ThreadList from './thread-list';
 
 /**
+ * @typedef StreamContentProps
+ * @prop {Object} [api] - Injected service
+ * @prop {Object} [toastMessenger] - Injected service
+ */
+
+/**
  * The main content of the "stream" route (https://hypothes.is/stream)
+ *
+ * @param {StreamContentProps} props
  */
 function StreamContent({ api, toastMessenger }) {
   const addAnnotations = useStore(store => store.addAnnotations);
@@ -75,7 +83,6 @@ function StreamContent({ api, toastMessenger }) {
 }
 
 StreamContent.propTypes = {
-  // Injected services.
   api: propTypes.object,
   toastMessenger: propTypes.object,
 };

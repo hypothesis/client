@@ -8,8 +8,17 @@ import Button from './button';
 import SvgIcon from '../../shared/components/svg-icon';
 
 /**
+ * @typedef SidebarContentErrorProps
+ * @prop {'annotation'|'group'} errorType
+ * @prop {boolean} [showClearSelection] - Whether to show a "Clear selection" button.
+ * @prop {() => any} onLoginRequest - A function that will launch the login flow for the user.
+ */
+
+/**
  * Show an error indicating that an annotation or group referenced in the URL
  * could not be fetched.
+ *
+ * @param {SidebarContentErrorProps} props
  */
 export default function SidebarContentError({
   errorType,
@@ -72,13 +81,7 @@ export default function SidebarContentError({
 }
 
 SidebarContentError.propTypes = {
-  errorType: propTypes.oneOf(['annotation', 'group']),
-
-  /**
-   * Whether to show a "Clear selection" button.
-   */
+  errorType: propTypes.oneOf(['annotation', 'group']).isRequired,
   showClearSelection: propTypes.bool,
-
-  /* A function that will launch the login flow for the user. */
   onLoginRequest: propTypes.func.isRequired,
 };
