@@ -1,5 +1,5 @@
 import EventEmitter from 'tiny-emitter';
-import router from '../router';
+import { RouterService } from '../router';
 
 const fixtures = [
   // Sidebar for the embedded Hypothesis client.
@@ -40,12 +40,12 @@ const fixtures = [
   },
 ];
 
-describe('router', () => {
+describe('RouterService', () => {
   let fakeWindow;
   let fakeStore;
 
   function createService() {
-    return router(fakeWindow, fakeStore);
+    return new RouterService(fakeWindow, fakeStore);
   }
 
   function updateUrl(path, search) {

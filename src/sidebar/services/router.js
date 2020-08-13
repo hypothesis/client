@@ -5,14 +5,24 @@ import * as queryString from 'query-string';
  * implied by the URL and the corresponding route state in the store.
  */
 // @inject
-export default function router($window, store) {
+export class RouterService {
+  /**
+   * @param {Window} $window
+   * @param {import('../store').SidebarStore} store
+   */
+  constructor($window, store) {
+    this._window = $window;
+    this._store = store;
+    this._didRegisterPopstateListener = false;
+  }
+
   /**
    * Return the name and parameters of the current route.
    */
-  function currentRoute() {
-    const path = $window.location.pathname;
+  currentRoute() {
+    const path = this._window.location.pathname;
     const pathSegments = path.slice(1).split('/');
-    const params = queryString.parse($window.location.search);
+    const params = queryString.parse(this._window.location.search);
 
     // The extension puts client resources under `/client/` to separate them
     // from extension-specific resources. Ignore this part.
@@ -49,8 +59,11 @@ export default function router($window, store) {
 
   /**
    * Generate a URL for a given route.
+   *
+   * @param {string} name
+   * @param {Object.<string,string>} params
    */
-  function routeUrl(name, params = {}) {
+  routeUrl(name, params = {}) {
     let url;
     const queryParams = { ...params };
 
@@ -81,8 +94,6 @@ export default function router($window, store) {
     return url;
   }
 
-  let didRegisterPopstateListener = false;
-
   /**
    * Synchronize the route name and parameters in the store with the current
    * URL.
@@ -90,21 +101,21 @@ export default function router($window, store) {
    * The first call to this method also registers a listener for future back/forwards
    * navigation in the browser.
    */
-  function sync() {
-    const { route, params } = currentRoute();
-    store.changeRoute(route, params);
+  sync() {
+    const { route, params } = this.currentRoute();
+    this._store.changeRoute(route, params);
 
     // Set up listener for back/forward navigation. We do this in `sync()` to
     // avoid the route being changed by a "popstate" emitted by the browser on
     // document load (which Safari and Chrome do).
-    if (!didRegisterPopstateListener) {
-      $window.addEventListener('popstate', () => {
+    if (!this._didRegisterPopstateListener) {
+      this._window.addEventListener('popstate', () => {
         // All the state we need to update the route is contained in the URL, which
         // has already been updated at this point, so just sync the store route
         // to match the URL.
-        sync();
+        this.sync();
       });
-      didRegisterPopstateListener = true;
+      this._didRegisterPopstateListener = true;
     }
   }
 
@@ -112,12 +123,10 @@ export default function router($window, store) {
    * Navigate to a given route.
    *
    * @param {string} name
-   * @param {Object} params
+   * @param {Object.<string,string>} params
    */
-  function navigate(name, params) {
-    $window.history.pushState({}, '', routeUrl(name, params));
-    sync();
+  navigate(name, params) {
+    this._window.history.pushState({}, '', this.routeUrl(name, params));
+    this.sync();
   }
-
-  return { sync, navigate };
 }
