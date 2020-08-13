@@ -6,15 +6,18 @@ const SIMPLE_FIXTURE = [
   {
     id: '1',
     text: 'first annotation',
+    $tag: '1',
     references: [],
   },
   {
     id: '2',
+    $tag: '2',
     text: 'second annotation',
     references: [],
   },
   {
     id: '3',
+    $tag: '3',
     text: 'third annotation',
     references: [1],
   },
@@ -363,6 +366,28 @@ describe('sidebar/util/build-thread', function () {
                 children: [],
               },
             ],
+          },
+        ]);
+      });
+
+      it('shows forced-visible annotations, also', function () {
+        const thread = createThread(SIMPLE_FIXTURE, {
+          selected: ['1'],
+          forcedVisible: ['2'],
+        });
+        assert.deepEqual(thread, [
+          {
+            annotation: SIMPLE_FIXTURE[0],
+            children: [
+              {
+                annotation: SIMPLE_FIXTURE[2],
+                children: [],
+              },
+            ],
+          },
+          {
+            annotation: SIMPLE_FIXTURE[1],
+            children: [],
           },
         ]);
       });
