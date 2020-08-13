@@ -5,7 +5,7 @@ import SearchInput from './SearchInput';
 
 /**
  * @typedef StreamSearchInputProps
- * @prop {Object} router - Injected service
+ * @prop {import('../services/router').RouterService} router
  */
 
 /**

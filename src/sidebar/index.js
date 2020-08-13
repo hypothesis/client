@@ -44,6 +44,10 @@ function setupApi(api, streamer) {
 /**
  * Perform the initial fetch of groups and user profile and then set the initial
  * route to match the current URL.
+ *
+ * @param {Object} groups
+ * @param {Object} session
+ * @param {import('./services/router').RouterService} router
  */
 // @inject
 function setupRoute(groups, session, router) {
@@ -102,7 +106,7 @@ import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
 import localStorageService from './services/local-storage';
 import persistedDefaultsService from './services/persisted-defaults';
-import routerService from './services/router';
+import { RouterService } from './services/router';
 import serviceUrlService from './services/service-url';
 import sessionService from './services/session';
 import streamFilterService from './services/stream-filter';
@@ -140,7 +144,7 @@ function startApp(config, appEl) {
     .register('loadAnnotationsService', loadAnnotationsService)
     .register('localStorage', localStorageService)
     .register('persistedDefaults', persistedDefaultsService)
-    .register('router', routerService)
+    .register('router', RouterService)
     .register('serviceUrl', serviceUrlService)
     .register('session', sessionService)
     .register('streamer', streamerService)
