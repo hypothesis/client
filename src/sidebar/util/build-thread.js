@@ -27,7 +27,6 @@
  * Default state for new threads
  */
 const DEFAULT_THREAD_STATE = {
-  id: '__default__',
   collapsed: false,
   visible: true,
   replyCount: 0,
@@ -88,6 +87,7 @@ function setParent(threads, id, parents = []) {
     threads[parentId] = {
       ...DEFAULT_THREAD_STATE,
       children: [],
+      id: parentId,
     };
     // Link up this new thread to _its_ parent, which should be the original
     // thread's grandparent
