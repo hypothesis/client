@@ -58,9 +58,6 @@ function AnnotationPublishControl({
 
   const publishDestination = isPrivate ? 'Only Me' : group.name;
 
-  /** @type {ThemeProperty[]} */
-  const themeProps = ['ctaTextColor', 'ctaBackgroundColor'];
-
   // Revert changes to this annotation
   const onCancel = () => {
     removeDraft(annotation);
@@ -77,11 +74,13 @@ function AnnotationPublishControl({
     }
   };
 
+  const buttonStyle = applyTheme(
+    ['ctaTextColor', 'ctaBackgroundColor'],
+    settings
+  );
+
   const menuLabel = (
-    <div
-      className="annotation-publish-button__menu-label"
-      style={applyTheme(themeProps, settings)}
-    >
+    <div className="annotation-publish-button__menu-label" style={buttonStyle}>
       <SvgIcon name="expand-menu" className="u-icon--small" />
     </div>
   );
@@ -91,7 +90,7 @@ function AnnotationPublishControl({
       <div className="annotation-publish-button">
         <Button
           className="annotation-publish-button__primary"
-          style={applyTheme(themeProps, settings)}
+          style={buttonStyle}
           onClick={onSave}
           disabled={isDisabled}
           title={`Publish this annotation to ${publishDestination}`}
@@ -99,7 +98,10 @@ function AnnotationPublishControl({
         />
         {/* This wrapper div is necessary because of peculiarities with
              Safari: see https://github.com/hypothesis/client/issues/2302 */}
-        <div className="annotation-publish-button__menu-wrapper">
+        <div
+          className="annotation-publish-button__menu-wrapper"
+          style={buttonStyle}
+        >
           <Menu
             arrowClass="annotation-publish-button__menu-arrow"
             containerPositioned={false}
