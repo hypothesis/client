@@ -88,10 +88,11 @@ function closeSidebarPanel(panelName) {
 
 /**
  * Toggle a sidebar panel from its current state, or set it to the
- * designated `panelState`
+ * designated `panelState`.
  *
  * @param {string} panelName
- * @param {boolean} panelState - Should the panel be active?
+ * @param {boolean} [panelState] -
+ *   Should the panel be active? Omit this prop to simply toggle the value.
  */
 function toggleSidebarPanel(panelName, panelState) {
   return {

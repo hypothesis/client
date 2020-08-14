@@ -13,7 +13,9 @@ import { fetchConfig } from './util/fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const appConfig = jsonConfigsFrom(document);
+const appConfig = /** @type {import('../types/config').SidebarConfig} */ (jsonConfigsFrom(
+  document
+));
 
 if (appConfig.sentry) {
   // Initialize Sentry. This is required at the top of this file
@@ -182,7 +184,9 @@ function startApp(config) {
   container.run(setupFrameSync);
 
   // Render the UI.
-  const appEl = document.querySelector('hypothesis-app');
+  const appEl = /** @type {HTMLElement} */ (document.querySelector(
+    'hypothesis-app'
+  ));
   render(
     <ServiceContext.Provider value={container}>
       <HypothesisApp />

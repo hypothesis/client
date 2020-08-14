@@ -15,6 +15,12 @@
 import { createContext, createElement } from 'preact';
 import { useContext } from 'preact/hooks';
 
+/**
+ * @typedef ServiceProvider
+ * @prop {(serviceName: string) => any} get
+ */
+
+/** @type {ServiceProvider} */
 const fallbackInjector = {
   get(service) {
     throw new Error(
