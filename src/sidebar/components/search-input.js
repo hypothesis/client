@@ -13,7 +13,7 @@ import Spinner from './spinner';
  * @prop {boolean} [alwaysExpanded] -
  *   If true, the input field is always shown. If false, the input field is only shown
  *   if the query is non-empty.
- * @prop {string} [query] - The currently active filter query
+ * @prop {string|null} query - The currently active filter query
  * @prop {(value: string) => any} [onSearch] -
  *   Callback to invoke when the current filter query changes
  */
@@ -73,7 +73,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         placeholder={(isLoading && 'Loading…') || 'Search…'}
         disabled={isLoading}
         ref={input}
-        value={pendingQuery}
+        value={pendingQuery || ''}
         onInput={e =>
           setPendingQuery(/** @type {HTMLInputElement} */ (e.target).value)
         }

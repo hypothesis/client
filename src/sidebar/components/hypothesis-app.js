@@ -21,13 +21,20 @@ import ToastMessages from './toast-messages';
 import TopBar from './top-bar';
 
 /**
+ * @typedef {import('../../types/api').Profile} Profile
+ * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
+ * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../shared/bridge').default} Bridge
+ */
+
+/**
  * Return the user's authentication status from their profile.
  *
  * @param {Profile} profile - The profile object from the API.
  */
 function authStateFromProfile(profile) {
-  if (profile.userid) {
-    const parsed = parseAccountID(profile.userid);
+  const parsed = parseAccountID(profile.userid);
+  if (parsed) {
     let displayName = parsed.username;
     if (profile.user_info && profile.user_info.display_name) {
       displayName = profile.user_info.display_name;
@@ -45,10 +52,22 @@ function authStateFromProfile(profile) {
 }
 
 /**
+ * @typedef HypothesisAppProps
+ * @prop {Object} [auth]
+ * @prop {Bridge} [bridge]
+ * @prop {ServiceUrlGetter} [serviceUrl]
+ * @prop {MergedConfig} [settings]
+ * @prop {Object} [session]
+ * @prop {Object} [toastMessenger]
+ */
+
+/**
  * The root component for the Hypothesis client.
  *
  * This handles login/logout actions and renders the top navigation bar
  * and content appropriate for the current route.
+ *
+ * @param {HypothesisAppProps} props
  */
 function HypothesisApp({
   auth,
@@ -198,7 +217,6 @@ function HypothesisApp({
 }
 
 HypothesisApp.propTypes = {
-  // Injected.
   auth: propTypes.object,
   bridge: propTypes.object,
   serviceUrl: propTypes.func,

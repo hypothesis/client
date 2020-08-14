@@ -84,13 +84,15 @@
  */
 
 /**
- * TODO - Fill out remaining properties
- *
  * @typedef Profile
  * @prop {string|null} userid
  * @prop {Object} preferences
- * @prop {boolean} [preferences.show_sidebar_tutorial]
+ *   @prop {boolean} [preferences.show_sidebar_tutorial]
  * @prop {Object.<string, boolean>} features
+ * @prop {Object} [user_info]
+ *   @prop {string|null} user_info.display_name
+ *
+ * @prop {unknown} [groups] - Deprecated.
  */
 
 /**

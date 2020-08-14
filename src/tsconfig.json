@@ -18,14 +18,5 @@
     "**/test/**/*.js",
     "test-util/**/*.js",
     "karma.config.js",
-
-    // Enable this once the rest of `src/sidebar` is checked.
-    "sidebar/index.js",
-
-    // Files in `src/sidebar/components` that may still have errors.
-    // Remove them from this list as they are resolved.
-    "sidebar/components/hooks/use-root-thread.js",
-    "sidebar/components/hypothesis-app.js",
-    "sidebar/components/top-bar.js"
   ]
 }
