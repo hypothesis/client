@@ -1,7 +1,3 @@
-/**
- * @const {Object} All supported options for theming and their corresponding
- *                 CSS property names (JS-style)
- */
 const supportedThemeProperties = {
   accentColor: 'color',
   appBackgroundColor: 'backgroundColor',
@@ -10,6 +6,19 @@ const supportedThemeProperties = {
   selectionFontFamily: 'fontFamily',
   annotationFontFamily: 'fontFamily',
 };
+
+/**
+ * Name of a theme element which can be configured.
+ *
+ * @typedef {keyof supportedThemeProperties} ThemeProperty
+ */
+
+/**
+ * Subset of the config from the host page which includes theme configuration.
+ *
+ * @typedef Settings
+ * @prop {Object.<ThemeProperty,string>} [branding]
+ */
 
 /**
  * Return a React `style` object suitable for use as the value of the `style`
@@ -27,12 +36,11 @@ const supportedThemeProperties = {
  *
  * See https://reactjs.org/docs/dom-elements.html#style
  *
- * @param {String[]} themeProperties    Which of the supported theme properties
- *                                      should have applied rules in the `style`
- *                                      object
- * @param {Object} settings             A settings object, in which any `branding`
- *                                      property values are set
- * @return {Object}                     An React-style style object
+ * @param {ThemeProperty[]} themeProperties -
+ *   Which of the supported theme properties should have applied rules in the `style`
+ *   object
+ * @param {Settings} settings
+ * @return {Object.<string,string>} - Object that can be passed as the `style` prop
  *
  * @example
  * let themeProperties = ['accentColor', 'ctaTextColor', 'foo'];
@@ -46,6 +54,7 @@ const supportedThemeProperties = {
  * applyTheme(themeProperties, settings); // -> { color: '#ffc '}
  */
 export function applyTheme(themeProperties, settings) {
+  /** @type {Object.<string,string>} */
   const style = {};
   if (!settings.branding) {
     return style;

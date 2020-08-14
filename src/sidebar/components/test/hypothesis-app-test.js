@@ -7,6 +7,7 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 import HypothesisApp, { $imports } from '../hypothesis-app';
 
 describe('HypothesisApp', () => {
+  let fakeApplyTheme;
   let fakeUserAgent = null;
   let fakeStore = null;
   let fakeAuth = null;
@@ -33,6 +34,7 @@ describe('HypothesisApp', () => {
   };
 
   beforeEach(() => {
+    fakeApplyTheme = sinon.stub().returns({});
     fakeServiceConfig = sinon.stub();
     fakeShouldAutoDisplayTutorial = sinon.stub().returns(false);
 
@@ -89,6 +91,7 @@ describe('HypothesisApp', () => {
       '../util/session': {
         shouldAutoDisplayTutorial: fakeShouldAutoDisplayTutorial,
       },
+      '../util/theme': { applyTheme: fakeApplyTheme },
     });
   });
 
@@ -448,5 +451,16 @@ describe('HypothesisApp', () => {
         assert.notCalled(fakeSession.logout);
       });
     });
+  });
+
+  it('applies theme config', () => {
+    const style = { backgroundColor: 'red' };
+    fakeApplyTheme.returns({ backgroundColor: 'red' });
+
+    const wrapper = createComponent();
+    const background = wrapper.find('.hypothesis-app');
+
+    assert.calledWith(fakeApplyTheme, ['appBackgroundColor'], fakeSettings);
+    assert.deepEqual(background.prop('style'), style);
   });
 });
