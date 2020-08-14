@@ -184,11 +184,14 @@ describe('sidebar/util/build-thread', function () {
           references: ['3'],
         },
       ];
-      const thread = createThread(fixture);
+      // Get the threads with `id` key included
+      const thread = createThread(fixture, {}, ['id']);
+      // It should create a thread with an id of the missing annotation (3)
       assert.deepEqual(thread, [
         {
+          id: '3',
           annotation: undefined,
-          children: [{ annotation: fixture[0], children: [] }],
+          children: [{ id: '1', annotation: fixture[0], children: [] }],
         },
       ]);
     });
