@@ -15,7 +15,6 @@ import SvgIcon from '../../shared/components/svg-icon';
 /**
  * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
- * @typedef {import('../util/theme').ThemeProperty} ThemeProperty
  */
 
 /**
