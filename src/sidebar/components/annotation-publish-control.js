@@ -15,6 +15,7 @@ import SvgIcon from '../../shared/components/svg-icon';
 /**
  * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../util/theme').ThemeProperty} ThemeProperty
  */
 
 /**
@@ -56,6 +57,8 @@ function AnnotationPublishControl({
   const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
 
   const publishDestination = isPrivate ? 'Only Me' : group.name;
+
+  /** @type {ThemeProperty[]} */
   const themeProps = ['ctaTextColor', 'ctaBackgroundColor'];
 
   // Revert changes to this annotation

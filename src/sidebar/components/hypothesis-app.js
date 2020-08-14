@@ -77,7 +77,7 @@ function HypothesisApp({
   }, [hasFetchedProfile, profile]);
 
   const backgroundStyle = useMemo(
-    () => applyTheme(['backgroundColor'], settings),
+    () => applyTheme(['appBackgroundColor'], settings),
     [settings]
   );
 
