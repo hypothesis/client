@@ -42,16 +42,11 @@
   }
 
   // Position the pointer icon absolutely and flip it to make it point at the
-  // share icon. Fill it with background color and give it the same color as
-  // the border to make it look like part of the panel frame.
+  // share icon
   &__arrow {
-    position: absolute;
-    z-index: 100;
+    @include molecules.menu-arrow($direction: 'down');
     right: 0px;
     bottom: -8px;
-    color: var.$color-border;
-    fill: var.$color-background;
-    transform: rotateX(180deg);
   }
 
   .share-links__icon {

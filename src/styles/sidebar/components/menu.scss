@@ -1,5 +1,6 @@
 @use "../../mixins/focus";
 @use "../../mixins/layout";
+@use "../../mixins/molecules";
 @use "../../mixins/utils";
 @use "../../variables" as var;
 
@@ -56,17 +57,14 @@
 // Triangular indicator at the top of the menu that associates it with the
 // toggle button.
 .menu__arrow {
-  color: var.$grey-3;
-  fill: white;
+  @include molecules.menu-arrow;
 
   // Position the arrow so that it appears flush with the right edge of the
   // content when the menu is right-aligned, and the bottom of the arrow just
   // overlaps the content's border. The effect is that the menu's border is a
   // rounded rect with a notch at the top.
-  position: absolute;
   top: calc(100% - 2px); // nb. Adjust this if changing the <svg> size.
   right: 0;
-  z-index: 2;
 }
 
 // Content area of the menu.

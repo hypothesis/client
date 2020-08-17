@@ -64,6 +64,25 @@
 }
 
 /**
+ * A pattern for styling a little "pointer" (arrow) icon that attaches to
+ * menu content and serves as a visual anchor back to the triggering
+ * button/element. When using, you'll need to provide the appropriate
+ * positioning details to get the pointer to be where you want it in the
+ * given menu.
+ *
+ * @param {string} [$direction] - Which direction the arrow should "point"
+ */
+@mixin menu-arrow($direction: 'up') {
+  position: absolute;
+  z-index: 2;
+  color: var.$color-border;
+  fill: var.$color-background;
+  @if ($direction == 'down') {
+    transform: rotateX(180deg);
+  }
+}
+
+/**
  * A pattern for displaying redacted (moderated) text content
  */
 @mixin redacted-content {
