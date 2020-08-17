@@ -3,6 +3,8 @@ import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { isHidden } from '../util/annotation-metadata';
+import { withServices } from '../util/service-context';
+import { applyTheme } from '../util/theme';
 
 import Button from './button';
 import Excerpt from './excerpt';
@@ -11,7 +13,10 @@ import MarkdownView from './markdown-view';
 import TagEditor from './tag-editor';
 import TagList from './tag-list';
 
-/** @typedef {import("../../types/api").Annotation} Annotation */
+/**
+ * @typedef {import("../../types/api").Annotation} Annotation
+ * @typedef {import("../../types/config").MergedConfig} MergedConfig
+ */
 
 /**
  * @typedef AnnotationBodyProps
@@ -23,6 +28,7 @@ import TagList from './tag-list';
  * @prop {string} text -
  *     The markdown annotation body, which is either rendered as HTML (if `isEditing`
  *     is false) or displayed in a text area otherwise.
+ * @prop {MergedConfig} [settings]
  */
 
 /**
@@ -30,13 +36,14 @@ import TagList from './tag-list';
  *
  * @param {AnnotationBodyProps} props
  */
-export default function AnnotationBody({
+function AnnotationBody({
   annotation,
   isEditing,
   onEditTags,
   onEditText,
   tags,
   text,
+  settings,
 }) {
   // Should the text content of `Excerpt` be rendered in a collapsed state,
   // assuming it is collapsible (exceeds allotted collapsed space)?
@@ -50,6 +57,8 @@ export default function AnnotationBody({
   const showExcerpt = !isEditing && text.length > 0;
   const showTagList = !isEditing && tags.length > 0;
 
+  const textStyle = applyTheme(['annotationFontFamily'], settings);
+
   return (
     <div className="annotation-body">
       {showExcerpt && (
@@ -62,6 +71,7 @@ export default function AnnotationBody({
           overflowThreshold={20}
         >
           <MarkdownView
+            textStyle={textStyle}
             markdown={text}
             textClass={{
               'annotation-body__text': true,
@@ -72,6 +82,7 @@ export default function AnnotationBody({
       )}
       {isEditing && (
         <MarkdownEditor
+          textStyle={textStyle}
           label="Annotation body"
           text={text}
           onEditText={onEditText}
@@ -105,4 +116,9 @@ AnnotationBody.propTypes = {
   onEditText: propTypes.func,
   tags: propTypes.array.isRequired,
   text: propTypes.string,
+  settings: propTypes.object,
 };
+
+AnnotationBody.injectedProps = ['settings'];
+
+export default withServices(AnnotationBody);

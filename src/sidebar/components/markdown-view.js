@@ -7,10 +7,25 @@ import { replaceLinksWithEmbeds } from '../media-embedder';
 import renderMarkdown from '../render-markdown';
 
 /**
+ * @typedef MarkdownViewProps
+ * @prop {string} markdown - The string of markdown to display
+ * @prop {Object.<string,string>} [textStyle] -
+ *   Additional CSS properties to apply to the rendered markdown
+ * @prop {Object.<string,boolean>} [textClass] -
+ *   Map of classes to apply to the container of the rendered markdown
+ */
+
+/**
  * A component which renders markdown as HTML and replaces recognized links
  * with embedded video/audio.
+ *
+ * @param {MarkdownViewProps} props
  */
-export default function MarkdownView({ markdown = '', textClass = {} }) {
+export default function MarkdownView({
+  markdown = '',
+  textClass = {},
+  textStyle = {},
+}) {
   const html = useMemo(() => (markdown ? renderMarkdown(markdown) : ''), [
     markdown,
   ]);
@@ -34,17 +49,13 @@ export default function MarkdownView({ markdown = '', textClass = {} }) {
       lang={contentLanguage}
       ref={content}
       dangerouslySetInnerHTML={{ __html: html }}
+      style={textStyle}
     />
   );
 }
 
 MarkdownView.propTypes = {
-  /** The string of markdown to display. */
   markdown: propTypes.string,
-
-  /**
-   * A CSS classname-to-boolean map of classes to apply to the container of
-   * the rendered markdown.
-   */
   textClass: propTypes.object,
+  textStyle: propTypes.object,
 };
