@@ -29,14 +29,20 @@ function minifyStream() {
 
     async flush(callback) {
       const code = Buffer.concat(this.chunks).toString();
-      const minifyResult = await terser.minify(code, {
-        // See https://github.com/terser/terser#minify-options-structure
-        sourceMap: {
+
+      // See https://github.com/terser/terser#minify-options-structure
+      const options = {};
+
+      // If the code we're minifying has a sourcemap then generate one for the
+      // minified output, otherwise skip it.
+      if (code.includes('sourceMappingURL=data:')) {
+        options.sourceMap = {
           content: 'inline',
           url: 'inline',
-        },
-      });
+        };
+      }
 
+      const minifyResult = await terser.minify(code, options);
       this.push(minifyResult.code);
       callback();
     },
