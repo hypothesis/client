@@ -486,6 +486,24 @@ describe('MarkdownEditor', () => {
     });
   });
 
+  it('applies `textStyle` style to <textarea>', () => {
+    const textStyle = { fontFamily: 'serif' };
+    const wrapper = createComponent({ textStyle });
+    assert.deepEqual(wrapper.find('textarea').prop('style'), textStyle);
+  });
+
+  it('applies `textStyle` style to preview', () => {
+    const textStyle = { fontFamily: 'serif' };
+    const wrapper = createComponent({ textStyle });
+
+    act(() => {
+      wrapper.find('Toolbar').props().onTogglePreview();
+    });
+    wrapper.update();
+
+    assert.deepEqual(wrapper.find('MarkdownView').prop('textStyle'), textStyle);
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

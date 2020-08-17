@@ -11,6 +11,9 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AnnotationBody', () => {
+  let fakeApplyTheme;
+  let fakeSettings;
+
   function createBody(props = {}) {
     return mount(
       <AnnotationBody
@@ -19,13 +22,20 @@ describe('AnnotationBody', () => {
         onEditTags={() => null}
         tags={[]}
         text="test comment"
+        settings={fakeSettings}
         {...props}
       />
     );
   }
 
   beforeEach(() => {
+    fakeApplyTheme = sinon.stub();
+    fakeSettings = {};
+
     $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../util/theme': { applyTheme: fakeApplyTheme },
+    });
   });
 
   afterEach(() => {
@@ -117,6 +127,22 @@ describe('AnnotationBody', () => {
       assert.isTrue(wrapper.find('TagEditor').exists());
       assert.isFalse(wrapper.find('TagList').exists());
     });
+  });
+
+  it('applies theme', () => {
+    const textStyle = { fontFamily: 'serif' };
+    fakeApplyTheme
+      .withArgs(['annotationFontFamily'], fakeSettings)
+      .returns(textStyle);
+
+    const wrapper = createBody();
+    assert.deepEqual(wrapper.find('MarkdownView').prop('textStyle'), textStyle);
+
+    wrapper.setProps({ isEditing: true });
+    assert.deepEqual(
+      wrapper.find('MarkdownEditor').prop('textStyle'),
+      textStyle
+    );
   });
 
   it(

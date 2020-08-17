@@ -59,6 +59,15 @@ describe('MarkdownView', () => {
     assert.isTrue(wrapper.find('.markdown-view.fancy-effect').exists());
   });
 
+  it('applies `textStyle` style to container', () => {
+    const wrapper = mount(
+      <MarkdownView markdown="foo" textStyle={{ fontFamily: 'serif' }} />
+    );
+    assert.deepEqual(wrapper.find('.markdown-view').prop('style'), {
+      fontFamily: 'serif',
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility({

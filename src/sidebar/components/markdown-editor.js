@@ -393,6 +393,8 @@ Toolbar.propTypes = {
 /**
  * @typedef MarkdownEditorProps
  * @prop {string} label - An accessible label for the input field.
+ * @prop {Object.<string,string>} [textStyle] -
+ *   Additional CSS properties to apply to the input field and rendered preview
  * @prop {string} [text] - The markdown text to edit.
  * @prop {(a?: Object<'text', string>) => void} [onEditText]
  *   - Callback invoked with `{ text }` object when user edits text.
@@ -409,6 +411,7 @@ export default function MarkdownEditor({
   label = '',
   onEditText = () => {},
   text = '',
+  textStyle = {},
 }) {
   // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
@@ -452,8 +455,9 @@ export default function MarkdownEditor({
       />
       {preview ? (
         <MarkdownView
-          textClass={{ 'markdown-editor__preview': true }}
           markdown={text}
+          textClass={{ 'markdown-editor__preview': true }}
+          textStyle={textStyle}
         />
       ) : (
         <textarea
@@ -469,6 +473,7 @@ export default function MarkdownEditor({
             });
           }}
           value={text}
+          style={textStyle}
         />
       )}
     </div>
@@ -476,6 +481,7 @@ export default function MarkdownEditor({
 }
 
 MarkdownEditor.propTypes = {
+  textStyle: propTypes.object,
   label: propTypes.string.isRequired,
   text: propTypes.string,
   onEditText: propTypes.func,
