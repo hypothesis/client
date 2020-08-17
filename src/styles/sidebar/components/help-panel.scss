@@ -11,8 +11,8 @@
   }
 
   &__subcontent {
-    @include utils.border-top;
-    @include utils.border-bottom;
+    @include utils.border--top;
+    @include utils.border--bottom;
     @include layout.vertical-space;
 
     a {

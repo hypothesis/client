@@ -2,7 +2,7 @@
 @use "../../mixins/utils";
 
 .menu-section__content {
-  @include utils.border-bottom;
+  @include utils.border--bottom;
 }
 
 .menu-section__heading {

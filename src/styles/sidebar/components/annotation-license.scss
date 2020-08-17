@@ -4,7 +4,7 @@
 
 .annotation-license {
   @include utils.font--small;
-  @include utils.border-top;
+  @include utils.border--top;
   // Space between border and text content
   padding-top: var.$layout-space--xsmall;
 

@@ -27,7 +27,7 @@
 
   &:hover,
   &.is-focused {
-    @include utils.active-shadow;
+    @include utils.shadow--active;
   }
 
   &--theme-clean {
@@ -48,7 +48,7 @@
  */
 @mixin footer-links {
   @include layout.row(center);
-  @include utils.border-top;
+  @include utils.border--top;
   padding-top: 8px;
 
   &__icon {
@@ -117,7 +117,7 @@
 
   &__header {
     @include layout.row($align: center);
-    @include utils.border-bottom;
+    @include utils.border--bottom;
     padding-bottom: var.$layout-space;
   }
 
@@ -170,7 +170,7 @@
 
   &__tab {
     @include utils.font--large;
-    @include utils.border-right;
+    @include utils.border--right;
     flex: 1 1;
     text-align: center;
     color: var.$color-text--light;
