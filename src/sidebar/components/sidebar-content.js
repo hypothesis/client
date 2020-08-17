@@ -8,10 +8,8 @@ import useStore from '../store/use-store';
 import { tabForAnnotation } from '../util/tabs';
 
 import FilterStatus from './filter-status';
-import FocusedModeHeader from './focused-mode-header';
 import LoggedOutMessage from './logged-out-message';
 import LoginPromptPanel from './login-prompt-panel';
-import SearchStatusBar from './search-status-bar';
 import SelectionTabs from './selection-tabs';
 import SidebarContentError from './sidebar-content-error';
 import ThreadList from './thread-list';
@@ -42,7 +40,6 @@ function SidebarContent({
   // Store state values
   const focusedGroupId = useStore(store => store.focusedGroupId());
   const hasAppliedFilter = useStore(store => store.hasAppliedFilter());
-  const isFocusedMode = useStore(store => store.focusModeConfigured());
   const isLoading = useStore(store => store.isLoading());
   const isLoggedIn = useStore(store => store.isLoggedIn());
   const linkedAnnotationId = useStore(store =>
@@ -57,9 +54,6 @@ function SidebarContent({
     ? tabForAnnotation(linkedAnnotation)
     : 'annotation';
   const searchUris = useStore(store => store.searchUris());
-  const filterStatusEnabled = useStore(store =>
-    store.isFeatureEnabled('client_filter_status')
-  );
   const sidebarHasOpened = useStore(store => store.hasSidebarOpened());
   const userId = useStore(store => store.profile().userid);
 
@@ -86,10 +80,8 @@ function SidebarContent({
   const hasContentError =
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
 
-  const showFilterStatus = filterStatusEnabled && !hasContentError;
+  const showFilterStatus = !hasContentError;
   const showTabs = !hasContentError && !hasAppliedFilter;
-  const showFocusModeHeader = isFocusedMode && !showFilterStatus;
-  const showSearchStatus = !hasContentError && !showFilterStatus;
 
   // Show a CTA to log in if successfully viewing a direct-linked annotation
   // and not logged in
@@ -140,7 +132,6 @@ function SidebarContent({
   return (
     <div>
       <h2 className="u-screen-reader-only">Annotations</h2>
-      {showFocusModeHeader && <FocusedModeHeader />}
       {showFilterStatus && <FilterStatus />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (
@@ -154,7 +145,6 @@ function SidebarContent({
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
       {showTabs && <SelectionTabs isLoading={isLoading} />}
-      {showSearchStatus && <SearchStatusBar />}
       <ThreadList thread={rootThread} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>

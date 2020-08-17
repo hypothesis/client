@@ -49,14 +49,11 @@ describe('SidebarContent', () => {
       directLinkedGroupFetchFailed: sinon.stub(),
       findAnnotationByID: sinon.stub(),
       focusedGroupId: sinon.stub(),
-      focusModeConfigured: sinon.stub(),
       hasAppliedFilter: sinon.stub(),
       hasFetchedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
-      isFeatureEnabled: sinon.stub().returns(false),
       isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
-      getState: sinon.stub(),
       profile: sinon.stub().returns({ userid: null }),
       searchUris: sinon.stub().returns([]),
     };
@@ -171,15 +168,7 @@ describe('SidebarContent', () => {
         assert.isFalse(wrapper.find('SelectionTabs').exists());
       });
 
-      it('does not render search status', () => {
-        const wrapper = createComponent();
-        assert.isFalse(wrapper.find('SearchStatusBar').exists());
-      });
-
       it('does not render filter status', () => {
-        fakeStore.isFeatureEnabled
-          .withArgs('client_filter_status')
-          .returns(true);
         const wrapper = createComponent();
         assert.isFalse(wrapper.find('FilterStatus').exists());
       });
@@ -208,44 +197,15 @@ describe('SidebarContent', () => {
       assert.isFalse(wrapper.find('SelectionTabs').exists());
     });
 
-    it('does not render search status', () => {
+    it('does not render filter status', () => {
       const wrapper = createComponent();
-      assert.isFalse(wrapper.find('SearchStatusBar').exists());
+      assert.isFalse(wrapper.find('FilterStatus').exists());
     });
   });
 
   context('user-focus mode', () => {
-    it('shows focus mode header when focus mode is configured', () => {
-      fakeStore.focusModeConfigured.returns(true);
-
+    it('shows filter status when focus mode configured', () => {
       const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('FocusedModeHeader').exists());
-    });
-
-    it('shows filter status when focus mode and feature flag enabled', () => {
-      fakeStore.isFeatureEnabled.withArgs('client_filter_status').returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('FocusedModeHeader').exists());
-      assert.isTrue(wrapper.find('FilterStatus').exists());
-    });
-  });
-
-  describe('search status', () => {
-    it('shows the search status bar', () => {
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('SearchStatusBar').exists());
-    });
-
-    it('shows filter status instead of search status when feature flag enabled', () => {
-      fakeStore.isFeatureEnabled.withArgs('client_filter_status').returns(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('SearchStatusBar').exists());
       assert.isTrue(wrapper.find('FilterStatus').exists());
     });
   });
@@ -268,16 +228,9 @@ describe('SidebarContent', () => {
     });
   });
 
-  it('renders a focused header if in focused mode', () => {
-    fakeStore.focusModeConfigured.returns(true);
+  it('renders the filter status', () => {
     const wrapper = createComponent();
-
-    assert.isTrue(wrapper.find('FocusedModeHeader').exists());
-  });
-
-  it('renders the search status', () => {
-    const wrapper = createComponent();
-    assert.isTrue(wrapper.find('SearchStatusBar').exists());
+    assert.isTrue(wrapper.find('FilterStatus').exists());
   });
 
   describe('selection tabs', () => {
