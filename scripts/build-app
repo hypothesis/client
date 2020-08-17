@@ -15,6 +15,11 @@
 
 set -eu
 
+if [ $# -eq 0 ]; then
+  echo "Usage: $0 <oauth_client_id> [<api_url>]"
+  exit 0
+fi
+
 export NODE_ENV=production
 export OAUTH_CLIENT_ID=$1
 export API_URL=${2:-https://hypothes.is/api/}
