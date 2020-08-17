@@ -4,19 +4,19 @@
   border: var.$border-width solid var.$color-border;
 }
 
-@mixin border-top {
+@mixin border--top {
   border-top: var.$border-width solid var.$color-border;
 }
 
-@mixin border-right {
+@mixin border--right {
   border-right: var.$border-width solid var.$color-border;
 }
 
-@mixin border-bottom {
+@mixin border--bottom {
   border-bottom: var.$border-width solid var.$color-border;
 }
 
-@mixin border-left {
+@mixin border--left {
   border-left: var.$border-width solid var.$color-border;
 }
 
@@ -78,6 +78,6 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-@mixin active-shadow {
+@mixin shadow--active {
   box-shadow: 0px 2px 3px 0px rgba(0, 0, 0, 0.15);
 }

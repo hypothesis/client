@@ -61,7 +61,7 @@ a.menu-item:hover {
   }
 
   &.is-expanded {
-    @include utils.border-bottom;
+    @include utils.border--bottom;
     background-color: var.$grey-1;
     color: var.$color-text;
     &:hover {
@@ -142,7 +142,7 @@ a.menu-item:hover {
 
 // The container for open submenus
 .menu-item__submenu {
-  @include utils.border-bottom;
+  @include utils.border--bottom;
   &:hover {
     // Make it a bit darker on hover.
     background-color: var.$grey-3;
