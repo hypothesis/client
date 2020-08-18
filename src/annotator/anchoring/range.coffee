@@ -21,7 +21,7 @@
 
 $ = require('jquery')
 
-Util = require('./util')
+{ getTextNodes, getLastTextNodeUpTo, getFirstTextNodeNotBefore, xpathFromNode, nodeFromXPath } = require('./range-util')
 
 Range = {}
 
@@ -81,7 +81,7 @@ Range.nodeFromXPath = (xpath, root=document) ->
       console.log "Trying fallback..."
       # We have a an 'evaluator' for the really simple expressions that
       # should work for the simple expressions we generate.
-      Util.nodeFromXPath(xp, root)
+      nodeFromXPath(xp, root)
 
   if not $.isXMLDoc document.documentElement
     evaluateXPath xpath
@@ -164,9 +164,9 @@ class Range.BrowserRange
     if @startContainer.nodeType is Node.ELEMENT_NODE
       # We are dealing with element nodes
       if @startOffset < @startContainer.childNodes.length
-        r.start = Util.getFirstTextNodeNotBefore @startContainer.childNodes[@startOffset]
+        r.start = getFirstTextNodeNotBefore @startContainer.childNodes[@startOffset]
       else
-        r.start = Util.getFirstTextNodeNotBefore @startContainer
+        r.start = getFirstTextNodeNotBefore @startContainer
       r.startOffset = 0
     else
       # We are dealing with simple text nodes
@@ -194,7 +194,7 @@ class Range.BrowserRange
           node = @endContainer.childNodes[@endOffset - 1]
         else
           node = @endContainer.previousSibling
-        r.end = Util.getLastTextNodeUpTo node
+        r.end = getLastTextNodeUpTo node
         r.endOffset = r.end.nodeValue.length
 
     else # We are dealing with simple text nodes
@@ -312,8 +312,8 @@ class Range.NormalizedRange
       else
         origParent = $(node).parent()
 
-      xpath = Util.xpathFromNode(origParent, root)[0]
-      textNodes = Util.getTextNodes(origParent)
+      xpath = xpathFromNode(origParent, root)[0]
+      textNodes = getTextNodes(origParent)
 
       # Calculate real offset as the combined length of all the
       # preceding textNode siblings. We include the length of the
@@ -350,7 +350,7 @@ class Range.NormalizedRange
   #
   # Returns an Array of TextNode instances.
   textNodes: ->
-    textNodes = Util.getTextNodes($(this.commonAncestor))
+    textNodes = getTextNodes($(this.commonAncestor))
     [start, end] = [textNodes.index(this.start), textNodes.index(this.end)]
     # Return the textNodes that fall between the start and end indexes.
     $.makeArray textNodes[start..end]
@@ -420,7 +420,7 @@ class Range.SerializedRange
       # Target the string index of the last character inside the range.
       if p is 'end' then targetOffset--
 
-      for tn in Util.getTextNodes($(node))
+      for tn in getTextNodes($(node))
         if (length + tn.nodeValue.length > targetOffset)
           range[p + 'Container'] = tn
           range[p + 'Offset'] = this[p + 'Offset'] - length
