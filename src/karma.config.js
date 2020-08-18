@@ -13,9 +13,8 @@ let mochaOutputMode = 'minimal';
 
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
-// On Travis and in Docker, the tests run as root, so the sandbox must be
-// disabled.
-if (process.env.TRAVIS || process.env.RUNNING_IN_DOCKER) {
+// In Docker, the tests run as root, so the sandbox must be disabled.
+if (process.env.RUNNING_IN_DOCKER) {
   chromeFlags.push('--no-sandbox');
 
   // Enable debug logging from Chrome to help track down a cause of frequent
@@ -190,7 +189,7 @@ module.exports = function (config) {
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
     browsers: ['ChromeHeadless_Custom'],
-    browserNoActivityTimeout: 20000, // Travis is slow...
+    browserNoActivityTimeout: 20000,
 
     customLaunchers: {
       ChromeHeadless_Custom: {
