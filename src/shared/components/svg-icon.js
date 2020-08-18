@@ -49,7 +49,7 @@ export default function SvgIcon({
   if (!iconRegistry[name]) {
     throw new Error(`Icon name "${name}" is not registered`);
   }
-  const markup = { __html: iconRegistry[name] };
+  const markup = iconRegistry[name];
 
   const element = /** @type {Ref<HTMLElement>} */ (useRef());
   useLayoutEffect(() => {
@@ -75,7 +75,7 @@ export default function SvgIcon({
   return (
     <span
       className={classnames('svg-icon', { 'svg-icon--inline': inline })}
-      dangerouslySetInnerHTML={markup}
+      dangerouslySetInnerHTML={{ __html: markup }}
       ref={element}
       {...spanProps}
     />
