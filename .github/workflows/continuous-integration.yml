@@ -1,0 +1,23 @@
+name: Continuous integration
+on: [push]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Cache the node_modules dir
+      uses: actions/cache@v2
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+    - name: Install
+      run: yarn install --frozen-lockfile
+    - name: Format
+      run: yarn checkformatting
+    - name: Lint
+      run: yarn lint
+    - name: Typecheck
+      run: yarn typecheck
+    - name: Test
+      run: yarn test
