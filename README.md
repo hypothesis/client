@@ -3,12 +3,10 @@ Hypothesis client
 
 [![Continuous integration](https://github.com/hypothesis/client/workflows/Continuous%20integration/badge.svg?branch=master)][gha]
 [![npm version](https://img.shields.io/npm/v/hypothesis.svg)][npm]
-[![#hypothes.is IRC channel](https://img.shields.io/badge/IRC-%23hypothes.is-blue.svg)][irc]
 [![BSD licensed](https://img.shields.io/badge/license-BSD-blue.svg)][license]
 
 [gha]: https://github.com/hypothesis/client/actions?query=branch%3Amaster
 [npm]: https://www.npmjs.com/package/hypothesis
-[irc]: https://www.irccloud.com/invite?channel=%23hypothes.is&amp;hostname=irc.freenode.net&amp;port=6667&amp;ssl=1
 [license]: https://github.com/hypothesis/client/blob/master/LICENSE
 
 The Hypothesis client is a browser-based tool for making annotations on web
@@ -33,8 +31,8 @@ testing and contributing to the client.
 Community
 ---------
 
-See our [Contact page to join us on Slack](https://web.hypothes.is/contact/), or [log in once you've already created an account](https://hypothesis-open.slack.com/) - or in [#hypothes.is][irc] on
-[freenode](https://freenode.net/) for discussion.
+See our [Contact page to join us on Slack](https://web.hypothes.is/contact/), or
+[log in once you've already created an account](https://hypothesis-open.slack.com/).
 
 If you'd like to contribute to the project, you should consider subscribing to
 the [development mailing list][ml], where we can help you plan your
@@ -43,7 +41,7 @@ contributions.
 Please note that this project is released with a [Contributor Code of
 Conduct][coc]. By participating in this project you agree to abide by its terms.
 
-[ml]: https://groups.google.com/a/list.hypothes.is/forum/#!forum/dev
+[ml]: https://groups.google.com/a/list.hypothes.is/g/dev
 [coc]: https://github.com/hypothesis/client/blob/master/CODE_OF_CONDUCT
 
 License
