@@ -91,7 +91,7 @@ export default function MenuItem({
   let focusTimer = null;
 
   let renderedIcon = null;
-  if (icon !== 'blank') {
+  if (icon && icon !== 'blank') {
     renderedIcon = iconIsUrl ? (
       <img className={iconClass} alt={iconAlt} src={icon} />
     ) : (

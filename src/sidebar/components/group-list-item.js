@@ -82,9 +82,12 @@ function GroupListItem({
     onExpand(!isExpanded);
   };
 
-  const copyLink = () => {
+  /**
+   * @param {string} url
+   */
+  const copyLink = url => {
     try {
-      copyText(activityUrl);
+      copyText(url);
       toastMessenger.success(`Copied link for "${group.name}"`);
     } catch (err) {
       toastMessenger.error('Unable to copy link');
@@ -121,7 +124,7 @@ function GroupListItem({
             {activityUrl && (
               <li>
                 <MenuItem
-                  onClick={copyLink}
+                  onClick={() => copyLink(activityUrl)}
                   icon="copy"
                   isSubmenuItem={true}
                   label={copyLinkLabel}
