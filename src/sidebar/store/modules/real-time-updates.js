@@ -102,12 +102,13 @@ function receiveRealTimeUpdates({
         ann.group === groups.selectors.focusedGroupId(getState()) ||
         route.selectors.route(getState()) !== 'sidebar'
       ) {
-        pendingUpdates[ann.id] = ann;
+        pendingUpdates[/** @type {string} */ (ann.id)] = ann;
       }
     });
     deletedAnnotations.forEach(ann => {
+      const id = /** @type {string} */ (ann.id);
       // Discard any pending but not-yet-applied updates for this annotation
-      delete pendingUpdates[ann.id];
+      delete pendingUpdates[id];
 
       // If we already have this annotation loaded, then record a pending
       // deletion. We do not check the group of the annotation here because a)
@@ -115,8 +116,8 @@ function receiveRealTimeUpdates({
       // even if the annotation is from the current group, it might be for a
       // new annotation (saved in pendingUpdates and removed above), that has
       // not yet been loaded.
-      if (annotations.selectors.annotationExists(getState(), ann.id)) {
-        pendingDeletions[ann.id] = true;
+      if (annotations.selectors.annotationExists(getState(), id)) {
+        pendingDeletions[id] = true;
       }
     });
     dispatch({
