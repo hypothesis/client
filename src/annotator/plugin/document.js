@@ -25,6 +25,43 @@ import Plugin from '../plugin';
 import { normalizeURI } from '../util/url';
 
 /**
+ * Extension of the `Metadata` type with non-optional fields for `dc`, `eprints` etc.
+ *
+ * @typedef HTMLDocumentMetadata
+ * @prop {string} title
+ * @prop {Object[]} link
+ *   @prop {string} [link.rel]
+ *   @prop {string} [link.type]
+ *   @prop {string} link.href
+ * @prop {Object.<string, string[]>} dc
+ * @prop {Object.<string, string[]>} eprints
+ * @prop {Object.<string, string[]>} facebook
+ * @prop {Object.<string, string[]>} highwire
+ * @prop {Object.<string, string[]>} prism
+ * @prop {Object.<string, string[]>} twitter
+ * @prop {string} [favicon]
+ * @prop {string} [documentFingerprint]
+ */
+
+/**
+ * Create an empty `HTMLDocumentMetadata` object.
+ *
+ * @return {HTMLDocumentMetadata}
+ */
+function createMetadata() {
+  return {
+    title: document.title,
+    link: [],
+    dc: {},
+    eprints: {},
+    facebook: {},
+    highwire: {},
+    prism: {},
+    twitter: {},
+  };
+}
+
+/**
  * DocumentMeta reads metadata/links from the current HTML document and
  * populates the `document` property of new annotations.
  */
@@ -36,8 +73,7 @@ export default class DocumentMeta extends Plugin {
       beforeAnnotationCreated: 'beforeAnnotationCreated',
     };
 
-    /** @type {Metadata} */
-    this.metadata = { title: document.title, link: [] };
+    this.metadata = createMetadata();
 
     this.baseURI = options.baseURI || baseURI;
     this.document = options.document || document;
@@ -90,7 +126,7 @@ export default class DocumentMeta extends Plugin {
    * Return metadata for the current page.
    */
   getDocumentMetadata() {
-    this.metadata = { title: document.title, link: [] };
+    this.metadata = createMetadata();
 
     // first look for some common metadata types
     // TODO: look for microdata/rdfa?
