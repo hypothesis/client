@@ -27,7 +27,10 @@ export class ToolbarController {
     this._container.className = 'annotator-toolbar';
 
     this._useMinimalControls = false;
+
+    /** @type {'annotation'|'note'} */
     this._newAnnotationType = 'note';
+
     this._highlightsVisible = false;
     this._sidebarOpen = false;
 
