@@ -63,11 +63,6 @@ $.noConflict(true)(function () {
 
   let Klass = isPDF ? PdfSidebar : Sidebar;
 
-  if (config.hasOwnProperty('constructor')) {
-    Klass = config.constructor;
-    delete config.constructor;
-  }
-
   if (config.subFrameIdentifier) {
     // Make sure the PDF plugin is loaded if the subframe contains the PDF.js viewer.
     if (isPDF) {
