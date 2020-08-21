@@ -43,9 +43,12 @@
  * TODO - Fill out remaining properties
  *
  * @typedef Annotation
- * @prop {string} [id]
- * @prop {string} [$tag] - A locally-generated unique identifier for annotations
- *       that have not been saved to the service yet (and thus do not have an id)
+ * @prop {string} [id] -
+ *   The server-assigned ID for the annotation. This is only set once the
+ *   annotation has been saved to the backend
+ * @prop {string} $tag - A locally-generated unique identifier for annotations.
+ *   This is set for all annotations, whether they have been saved to the backend
+ *   or not.
  * @prop {string[]} [references]
  * @prop {string} created
  * @prop {boolean} [flagged]

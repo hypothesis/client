@@ -165,9 +165,9 @@ ToolbarButton.propTypes = {
 
 /**
  * @typedef ToolbarProps
- * @prop {boolean} [isPreviewing] - `true` if the editor's "Preview" mode is active.
- * @prop {(a: ButtonID) => any} [onCommand] - Callback invoked with the selected command when a toolbar button is clicked.
- * @prop {() => any} [onTogglePreview] - Callback invoked when the "Preview" toggle button is clicked.
+ * @prop {boolean} isPreviewing - `true` if the editor's "Preview" mode is active.
+ * @prop {(a: ButtonID) => any} onCommand - Callback invoked with the selected command when a toolbar button is clicked.
+ * @prop {() => any} onTogglePreview - Callback invoked when the "Preview" toggle button is clicked.
  */
 
 /**

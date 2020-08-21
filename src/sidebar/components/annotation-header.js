@@ -20,7 +20,7 @@ import Timestamp from './timestamp';
  * @typedef AnnotationHeaderProps
  * @prop {Annotation} annotation
  * @prop {boolean} [isEditing] - Whether the annotation is actively being edited
- * @prop {number} [replyCount] - How many replies this annotation currently has
+ * @prop {number} replyCount - How many replies this annotation currently has
  * @prop {boolean} [showDocumentInfo] -
  *   Should document metadata be rendered? Hint: this is enabled for single annotation
  *   and stream views.

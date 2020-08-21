@@ -9,8 +9,8 @@ import { applyTheme } from '../util/theme';
 
 /**
  * @typedef InlineControlsProps
- * @prop {boolean} [isCollapsed]
- * @prop {(collapsed: boolean) => any} [setCollapsed]
+ * @prop {boolean} isCollapsed
+ * @prop {(collapsed: boolean) => any} setCollapsed
  * @prop {Object} [linkStyle]
  */
 

@@ -28,7 +28,7 @@ import TagList from './tag-list';
  * @prop {string} text -
  *     The markdown annotation body, which is either rendered as HTML (if `isEditing`
  *     is false) or displayed in a text area otherwise.
- * @prop {MergedConfig} [settings]
+ * @prop {MergedConfig} settings
  */
 
 /**

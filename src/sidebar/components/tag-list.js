@@ -11,8 +11,8 @@ import { withServices } from '../util/service-context';
  * @typedef TagListProps
  * @prop {Annotation} annotation - Annotation that owns the tags.
  * @prop {string[]} tags - List of tags as strings.
- * @prop {(a: string, b: Object<'tag', string>) => any} [serviceUrl] - Services
- * @prop {Object} [settings]
+ * @prop {(a: string, b: Object<'tag', string>) => any} serviceUrl - Services
+ * @prop {{ authDomain: string }} settings
  */
 
 /**

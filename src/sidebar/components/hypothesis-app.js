@@ -53,12 +53,12 @@ function authStateFromProfile(profile) {
 
 /**
  * @typedef HypothesisAppProps
- * @prop {Object} [auth]
- * @prop {Bridge} [bridge]
- * @prop {ServiceUrlGetter} [serviceUrl]
- * @prop {MergedConfig} [settings]
- * @prop {Object} [session]
- * @prop {Object} [toastMessenger]
+ * @prop {Object} auth
+ * @prop {Bridge} bridge
+ * @prop {ServiceUrlGetter} serviceUrl
+ * @prop {MergedConfig} settings
+ * @prop {Object} session
+ * @prop {Object} toastMessenger
  */
 
 /**

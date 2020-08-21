@@ -18,7 +18,7 @@ import Thread from './thread';
  * @typedef ThreadCardProps
  * @prop {Thread} thread
  * @prop {Object} frameSync - Injected service
- * @prop {MergedConfig} [settings] - Injected service
+ * @prop {MergedConfig} settings - Injected service
  */
 
 /**
