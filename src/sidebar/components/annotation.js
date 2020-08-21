@@ -105,7 +105,10 @@ function Annotation({
     }
   };
 
-  const onToggleReplies = () => setExpanded(annotation.id, !!threadIsCollapsed);
+  const onToggleReplies = () =>
+    // nb. We assume the annotation has an ID here because it is not possible
+    // to create replies until the annotation has been saved.
+    setExpanded(/** @type {string} */ (annotation.id), !!threadIsCollapsed);
 
   return (
     /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */

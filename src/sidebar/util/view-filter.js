@@ -191,5 +191,5 @@ export default function filterAnnotations(annotations, filters) {
     .filter(ann => {
       return ann.id && rootFilter.matches(ann);
     })
-    .map(ann => ann.id);
+    .map(ann => /** @type {string} */ (ann.id));
 }

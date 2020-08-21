@@ -58,7 +58,10 @@ export default function AnnotationHeader({
   const showReplyButton = replyCount > 0 && isCollapsedReply;
   const showExtendedInfo = !isReply(annotation);
 
-  const onReplyCountClick = () => setExpanded(annotation.id, true);
+  const onReplyCountClick = () =>
+    // If an annotation has replies it must have been saved and therefore have
+    // an ID.
+    setExpanded(/** @type {string} */ (annotation.id), true);
 
   return (
     <header className="annotation-header">
