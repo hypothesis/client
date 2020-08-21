@@ -16,7 +16,7 @@ import MenuItem from './menu-item';
  * @typedef GroupListItemProps
  * @prop {Group} group
  * @prop {boolean} [isExpanded] - Whether the submenu for this group is expanded
- * @prop {(expand: boolean) => any} [onExpand] -
+ * @prop {(expand: boolean) => any} onExpand -
  *   Callback invoked to expand or collapse the current group
  * @prop {Object} analytics - Injected service
  * @prop {Object} groups - Injected service

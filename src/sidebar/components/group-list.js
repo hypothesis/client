@@ -31,8 +31,8 @@ function publisherProvidedIcon(settings) {
 
 /**
  * @typedef GroupListProps
- * @prop {ServiceUrlGetter} [serviceUrl]
- * @prop {MergedConfig} [settings]
+ * @prop {ServiceUrlGetter} serviceUrl
+ * @prop {MergedConfig} settings
  */
 
 /**

@@ -18,11 +18,9 @@ import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef AuthState
- * @prop {'logged-in'|'logged-out'} status
- * @prop {string} [displayName]
- * @prop {string} [userid]
- * @prop {string} [username]
- * @prop {string} [provider]
+ * @prop {string} displayName
+ * @prop {string} userid
+ * @prop {string} username
  */
 
 /**
