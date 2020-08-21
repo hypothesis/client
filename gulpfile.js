@@ -16,6 +16,7 @@ const through = require('through2');
 const createBundle = require('./scripts/gulp/create-bundle');
 const createStyleBundle = require('./scripts/gulp/create-style-bundle');
 const manifest = require('./scripts/gulp/manifest');
+const serveDev = require('./dev-server/serve-dev');
 const servePackage = require('./dev-server/serve-package');
 const vendorBundles = require('./scripts/gulp/vendor-bundles');
 
@@ -294,12 +295,7 @@ gulp.task('serve-package', function () {
 });
 
 gulp.task('serve-test-pages', function () {
-  const DevServer = require('./dev-server');
-  new DevServer(3000, {
-    // The scheme is omitted here as the client asset server will use the same
-    // protcol (HTTP or HTTPS) as the test page server.
-    clientUrl: `//{current_host}:3001/hypothesis`,
-  });
+  serveDev(3000, { clientUrl: `//{current_host}:3001/hypothesis` });
 });
 
 const buildAssets = gulp.parallel(
