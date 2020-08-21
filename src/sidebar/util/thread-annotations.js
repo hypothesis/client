@@ -32,7 +32,7 @@ const sortFns = {
 function buildRootThread(threadState) {
   const selection = threadState.selection;
 
-  /** @type {BuildThreadOptions} */
+  /** @type {Partial<BuildThreadOptions>} */
   const options = {
     expanded: selection.expanded,
     forcedVisible: selection.forcedVisible,

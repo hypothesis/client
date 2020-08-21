@@ -20,7 +20,7 @@
  * @prop {number} totalChildren - Computed count of this thread's immediate
  *       children. This count includes visually-hidden threads.
  * @prop {number} replyCount - Computed count of all replies to a thread
- * @prop {number} [depth] - The thread's depth in the hierarchy
+ * @prop {number} depth - The thread's depth in the hierarchy
  */
 
 /**
@@ -28,6 +28,7 @@
  */
 const DEFAULT_THREAD_STATE = {
   collapsed: false,
+  depth: 0,
   visible: true,
   replyCount: 0,
   totalChildren: 0,
@@ -257,19 +258,19 @@ function hasVisibleChildren(thread) {
 
 /**
  * @typedef Options
- * @prop {string[]} [selected] - List of currently-selected annotation ids, from
+ * @prop {string[]} selected - List of currently-selected annotation ids, from
  *       the data store
- * @prop {string[]} [forcedVisible] - List of $tags of annotations that have
+ * @prop {string[]} forcedVisible - List of $tags of annotations that have
  *       been explicitly expanded by the user, even if they don't
  *       match current filters
  * @prop {(a: Annotation) => boolean} [filterFn] - Predicate function that
  *       returns `true` if annotation should be visible
  * @prop {(t: Thread) => boolean} [threadFilterFn] - Predicate function that
  *       returns `true` if the annotation should be included in the thread tree
- * @prop {Object.<string, boolean>} [expanded] - Map of thread id => expansion state
- * @prop {(a: Annotation, b: Annotation) => boolean} [sortCompareFn] - Less-than
+ * @prop {Object.<string, boolean>} expanded - Map of thread id => expansion state
+ * @prop {(a: Annotation, b: Annotation) => boolean} sortCompareFn - Less-than
  *       comparison function for sorting top-level annotations
- * @prop {(a: Annotation, b: Annotation) => boolean} [replySortCompareFn] - Less-than
+ * @prop {(a: Annotation, b: Annotation) => boolean} replySortCompareFn - Less-than
  *       comparison function for sorting replies
  */
 
@@ -281,8 +282,9 @@ function hasVisibleChildren(thread) {
 const defaultOpts = {
   selected: [],
   expanded: {},
+  forcedVisible: [],
   sortCompareFn: (a, b) => {
-    return a.id < b.id;
+    return a.$tag < b.$tag;
   },
   replySortCompareFn: (a, b) => {
     return a.created < b.created;
@@ -315,11 +317,8 @@ const defaultOpts = {
 export default function buildThread(annotations, options) {
   const opts = { ...defaultOpts, ...options };
 
-  const annotationsFiltered = !!opts.filterFn;
-  const threadsFiltered = !!opts.threadFilterFn;
-
   const hasSelection = opts.selected.length > 0;
-  const hasForcedVisible = opts.forcedVisible && opts.forcedVisible.length;
+  const hasForcedVisible = opts.forcedVisible.length > 0;
 
   let thread = threadAnnotations(annotations);
 
@@ -336,7 +335,7 @@ export default function buildThread(annotations, options) {
     });
   }
 
-  if (threadsFiltered) {
+  if (opts.threadFilterFn) {
     // Remove threads not matching thread-level filters
     thread.children = thread.children.filter(opts.threadFilterFn);
   }
@@ -347,7 +346,7 @@ export default function buildThread(annotations, options) {
 
     if (!thread.annotation) {
       threadIsVisible = false; // Nothing to show
-    } else if (annotationsFiltered) {
+    } else if (opts.filterFn) {
       if (
         hasForcedVisible &&
         opts.forcedVisible.includes(thread.annotation.$tag)
@@ -380,8 +379,7 @@ export default function buildThread(annotations, options) {
     } else {
       // If annotations are filtered, and at least one child matches
       // those filters, make sure thread is not collapsed
-      const hasUnfilteredChildren =
-        annotationsFiltered && hasVisibleChildren(thread);
+      const hasUnfilteredChildren = opts.filterFn && hasVisibleChildren(thread);
       threadStates.collapsed = thread.collapsed && !hasUnfilteredChildren;
     }
     return { ...thread, ...threadStates };
