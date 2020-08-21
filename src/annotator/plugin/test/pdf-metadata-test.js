@@ -1,3 +1,5 @@
+import EventEmitter from 'tiny-emitter';
+
 import PDFMetadata from '../pdf-metadata';
 
 /**
@@ -41,11 +43,22 @@ class FakePDFViewerApplication {
    * Initialize the "PDF viewer" as it would be when loading a document or
    * when a document fails to load.
    */
-  constructor(url = '') {
+  constructor(url = '', { domEvents = false, eventBusEvents = true } = {}) {
     this.url = url;
     this.documentInfo = undefined;
     this.metadata = undefined;
     this.pdfDocument = null;
+    this.dispatchDOMEvents = domEvents;
+
+    // Use `EventEmitter` as a fake version of PDF.js's `EventBus` class as the
+    // API for subscribing to events is the same.
+    if (eventBusEvents) {
+      this.eventBus = new EventEmitter();
+    }
+
+    this.initializedPromise = new Promise(resolve => {
+      this._resolveInitializedPromise = resolve;
+    });
   }
 
   /**
@@ -58,10 +71,6 @@ class FakePDFViewerApplication {
     title,
     eventName = 'documentload',
   }) {
-    const event = document.createEvent('Event');
-    event.initEvent(eventName, false, false);
-    window.dispatchEvent(event);
-
     this.url = url;
     this.downloadComplete = true;
     this.documentInfo = {};
@@ -75,19 +84,61 @@ class FakePDFViewerApplication {
     }
 
     this.pdfDocument = new FakePDFDocumentProxy({ fingerprint });
+
+    if (this.dispatchDOMEvents) {
+      const event = document.createEvent('Event');
+      event.initEvent(eventName, false, false);
+      window.dispatchEvent(event);
+    }
+    this.eventBus?.emit(eventName);
   }
+
+  /**
+   * Simulate PDF viewer initialization completing.
+   *
+   * At this point the event bus becomes available.
+   */
+  completeInit() {
+    this._resolveInitializedPromise();
+  }
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 describe('annotator/plugin/pdf-metadata', function () {
   [
-    // Event dispatched in older PDF.js versions (pre-7bc4bfcc).
-    'documentload',
-    // Event dispatched in newer PDF.js versions (post-7bc4bfcc).
-    'documentloaded',
-  ].forEach(eventName => {
-    it('waits for the PDF to load before returning metadata', function () {
-      const fakeApp = new FakePDFViewerApplication();
+    {
+      // Oldest PDF.js versions (pre-2.x)
+      eventName: 'documentload',
+      domEvents: true,
+      eventBusEvents: false,
+    },
+    {
+      // Newer PDF.js versions (~ < 2.5.x)
+      eventName: 'documentloaded',
+      domEvents: true,
+      eventBusEvents: false,
+    },
+    {
+      // Current PDF.js versions (>= 2.5.x)
+      eventName: 'documentloaded',
+      domEvents: false,
+      eventBusEvents: true,
+    },
+  ].forEach(({ eventName, domEvents = false, eventBusEvents = false }, i) => {
+    it(`waits for PDF to load (${i})`, async () => {
+      const fakeApp = new FakePDFViewerApplication('', {
+        domEvents,
+        eventBusEvents,
+      });
       const pdfMetadata = new PDFMetadata(fakeApp);
+
+      fakeApp.completeInit();
+
+      // Give `PDFMetadata` a chance to register the "documentloaded" event listener.
+      await delay(0);
 
       fakeApp.finishLoading({
         eventName,
@@ -95,9 +146,7 @@ describe('annotator/plugin/pdf-metadata', function () {
         fingerprint: 'fakeFingerprint',
       });
 
-      return pdfMetadata.getUri().then(function (uri) {
-        assert.equal(uri, 'http://fake.com/');
-      });
+      assert.equal(await pdfMetadata.getUri(), 'http://fake.com/');
     });
   });
 

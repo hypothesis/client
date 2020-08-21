@@ -68,16 +68,29 @@
  */
 
 /**
+ * Defined in `web/ui_utils.js` in the PDF.js source.
+ *
+ * @typedef EventBus
+ * @prop {(event: string, listener: Function) => void} on
+ * @prop {(event: string, listener: Function) => void} off
+ */
+
+/**
  * The `PDFViewerApplication` global which is the entry-point for accessing PDF.js.
  *
  * Defined in `web/app.js` in the PDF.js source.
  *
  * @typedef PDFViewerApplication
+ * @prop {EventBus} [eventBus] -
+ *   Global event bus. Since v1.6.210.
  * @prop {PDFDocument} pdfDocument
  * @prop {PDFViewer} pdfViewer
  * @prop {boolean} downloadComplete
  * @prop {PDFDocumentInfo} documentInfo
  * @prop {Metadata} metadata
+ * @prop {Promise<void>} [initializedPromise] -
+ *   Promise that resolves when PDF.js is initialized. Since v2.4.456.
+ *   See https://github.com/mozilla/pdf.js/wiki/Third-party-viewer-usage#initialization-promise.
  */
 
 /**

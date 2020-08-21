@@ -42,19 +42,32 @@ export default class PDFMetadata {
       const finish = () => {
         window.removeEventListener('documentload', finish);
         window.removeEventListener('documentloaded', finish);
+        app.eventBus?.off('documentloaded', finish);
+
         resolve(app);
       };
 
       if (app.downloadComplete) {
         resolve(app);
       } else {
-        // Listen for either the `documentload` (older PDF.js) or
-        // `documentloaded` (newer PDF.js) events which signal that the document
+        // Listen for "documentloaded" event which signals that the document
         // has been downloaded and the first page has been rendered.
-        //
+
+        // Newer versions of PDF.js (>= v2.5.207) report events only via
+        // the PDFViewerApplication's own event bus.
+        app.initializedPromise?.then(() => {
+          app.eventBus?.on('documentloaded', finish);
+        });
+
+        // Older versions of PDF.js (< v2.5.207) dispatch events to the DOM
+        // instead or as well.
+
+        // PDF.js >= v2.0.943.
         // See https://github.com/mozilla/pdf.js/commit/7bc4bfcc8b7f52b14107f0a551becdf01643c5c2
-        window.addEventListener('documentload', finish);
         window.addEventListener('documentloaded', finish);
+
+        // PDF.js < v2.0.943.
+        window.addEventListener('documentload', finish);
       }
     });
   }
