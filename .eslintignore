@@ -2,3 +2,4 @@ build/**
 **/vendor/**/*.js
 **/coverage/**
 docs/_build/*
+dev-server/static/**/*.js

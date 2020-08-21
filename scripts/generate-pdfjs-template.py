@@ -29,15 +29,15 @@ FILE_HEADER = """
 #
 HYPOTHESIS_HEADER = """
 <!-- Begin Hypothesis modifications -->
-<base href="/scripts/pdfjs-2/web/">
+<base href="/scripts/pdfjs/web/">
 
 <title>via Hypothesis</title>
-{#
+<!--
   It's worth noting that this link tag is *not* currently used by the
   Hypothesis client to determine the URL of this page. For consistency with
   how these pages are served on via, however, we serve it with the PDF.js
   viewer application.
--#}
+-->
 <link rel="canonical" href="{{{ documentUrl }}}"/>
 <script>
 window.DOCUMENT_URL = '{{{documentUrl}}}';
@@ -47,7 +47,7 @@ window.CLIENT_URL = '{{{clientUrl}}}'.replace('{current_host}', document.locatio
 
 <script src="/scripts/pdfjs-init.js"></script>
 
-{# Configure Hypothesis client. #}
+<!-- Configure Hypothesis client. -->
 <script>
 window.hypothesisConfig = function() {
   return {

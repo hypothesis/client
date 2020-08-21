@@ -19,7 +19,7 @@ set -eu
 # If you make changes to the PDF.js viewer template generator only and want to
 # regenerate the HTML template, run this script with the `--no-download` flag.
 
-DEST_DIR=dev-server/static/scripts/pdfjs-2
+DEST_DIR=dev-server/static/scripts/pdfjs
 PREFIX=pdf.js-gh-pages
 COMPONENTS="$PREFIX/build $PREFIX/web $PREFIX/LICENSE"
 
@@ -42,6 +42,9 @@ if [ $download_pdfjs ]; then
 
   # Remove example content from viewer
   rm $DEST_DIR/web/*.pdf
+
+  # Remove sourcemap files, as they are quite large
+  find $DEST_DIR -type f -name '*.map' -exec rm {} +
 
   # Remove the check that the PDF being loaded is from the same origin as the
   # viewer.
