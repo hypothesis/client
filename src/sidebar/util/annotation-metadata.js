@@ -232,7 +232,7 @@ export function isHighlight(annotation) {
  * @param {Annotation} annotation
  */
 export function isOrphan(annotation) {
-  return hasSelector(annotation) && annotation.$orphan;
+  return hasSelector(annotation) && annotation.$orphan === true;
 }
 
 /**
