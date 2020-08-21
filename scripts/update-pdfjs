@@ -1,0 +1,56 @@
+#!/bin/sh
+
+set -eu
+
+# This script fetches the latest build of PDF.js from the viewer demo
+# page. It also regenerates the Mustache-templated HTML viewer for use
+# by the local devserver.
+#
+# See https://github.com/mozilla/pdf.js/wiki/Setup-pdf.js-in-a-website#from-examples
+#
+# To update PDF.js to the latest version:
+#
+# 1. Create a new branch and run this script.
+# 2. Re-start `make dev` and verify that PDFs in the `dev-server/documents/pdf`
+#    directory work correctly.
+# 3. Commit the changes to the `static/` and `templates/` directories inside of
+#    `dev-server`
+#
+# If you make changes to the PDF.js viewer template generator only and want to
+# regenerate the HTML template, run this script with the `--no-download` flag.
+
+DEST_DIR=dev-server/static/scripts/pdfjs-2
+PREFIX=pdf.js-gh-pages
+COMPONENTS="$PREFIX/build $PREFIX/web $PREFIX/LICENSE"
+
+download_pdfjs=1
+for arg in "$@"
+do
+  if [ "$arg" = "--no-download" ]; then
+    download_pdfjs=""
+  fi
+done
+
+# Download the latest version of the PDF.js library and viewer.
+if [ $download_pdfjs ]; then
+  rm -rf $DEST_DIR
+  mkdir -p $DEST_DIR
+
+  # Get the latest build of the viewer
+  curl -L https://github.com/mozilla/pdf.js/archive/gh-pages.tar.gz \
+    | tar -xz --directory $DEST_DIR --strip-components=1 $COMPONENTS
+
+  # Remove example content from viewer
+  rm $DEST_DIR/web/*.pdf
+
+  # Remove the check that the PDF being loaded is from the same origin as the
+  # viewer.
+  sed -i '' -e 's/HOSTED_VIEWER_ORIGINS.includes(viewerOrigin)/true \/* Hypothesis *\//' $DEST_DIR/web/viewer.js
+fi
+
+# Generate the PDF viewer mustache (HTML) template.
+BASEDIR=$(dirname $0)
+python \
+  $BASEDIR/generate-pdfjs-template.py \
+  $DEST_DIR/web/viewer.html \
+  dev-server/templates/pdfjs-viewer.mustache
