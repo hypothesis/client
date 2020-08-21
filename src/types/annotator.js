@@ -20,7 +20,8 @@
  *   @prop {string} [link.rel]
  *   @prop {string} [link.type]
  *   @prop {string} link.href
- * // html pages
+ *
+ * // HTML only.
  * @prop {Object.<string, string[]>} [dc]
  * @prop {Object.<string, string[]>} [eprints]
  * @prop {Object.<string, string[]>} [facebook]
@@ -28,7 +29,8 @@
  * @prop {Object.<string, string[]>} [prism]
  * @prop {Object.<string, string[]>} [twitter]
  * @prop {string} [favicon]
- * // pdf files
+ *
+ * // HTML + PDF.
  * @prop {string} [documentFingerprint]
  */
 
