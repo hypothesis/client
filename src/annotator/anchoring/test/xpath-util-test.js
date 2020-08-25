@@ -10,7 +10,7 @@ import {
 } from '../xpath-util';
 
 describe('annotator/anchoring/xpath-util', () => {
-  describe('#findChild', () => {
+  describe('findChild', () => {
     let container;
 
     beforeEach(() => {
@@ -37,13 +37,7 @@ describe('annotator/anchoring/xpath-util', () => {
 
     describe('with children', () => {
       beforeEach(() => {
-        container = document.createElement('div');
         container.innerHTML = `text 1<span>text 2</span><span>text 3</span>text 4`;
-        document.body.appendChild(container);
-      });
-
-      afterEach(() => {
-        container.remove();
       });
 
       it('finds the desired text() node at index 1', () => {
@@ -65,8 +59,11 @@ describe('annotator/anchoring/xpath-util', () => {
     });
   });
 
-  describe('#getTextNodes', () => {
+  describe('getTextNodes', () => {
     let container;
+
+    // Helper (expects a jquery array)
+    const nodeValues = nodes => nodes.map((i, n) => n.nodeValue);
 
     beforeEach(() => {
       container = document.createElement('div');
@@ -80,28 +77,29 @@ describe('annotator/anchoring/xpath-util', () => {
     it('finds basic text nodes', () => {
       container.innerHTML = `<span>text 1</span><span>text 2</span>`;
       const result = getTextNodes($(container));
-      assert.equal(result.length, 2);
-      assert.equal(result[0].nodeValue, 'text 1');
-      assert.equal(result[1].nodeValue, 'text 2');
+      assert.deepEqual(nodeValues(result).toArray(), ['text 1', 'text 2']);
     });
 
     it('finds basic text nodes and whitespace', () => {
       container.innerHTML = `<span>text 1</span>
         <span>text 2</span>`;
       const result = getTextNodes($(container));
-      assert.equal(result.length, 3);
+      assert.deepEqual(nodeValues(result).toArray(), [
+        'text 1',
+        '\n        ',
+        'text 2',
+      ]);
     });
 
     it('finds basic text nodes and whitespace but ignores comments', () => {
       container.innerHTML = `<span>text 1</span>
         <!--span>text 2</span-->`;
       const result = getTextNodes($(container));
-      assert.equal(result.length, 2);
-      assert.equal(result[0].nodeValue, 'text 1');
+      assert.deepEqual(nodeValues(result).toArray(), ['text 1', '\n        ']);
     });
   });
 
-  describe('#getLastTextNodeUpTo', () => {
+  describe('getLastTextNodeUpTo', () => {
     let container;
 
     beforeEach(() => {
@@ -119,7 +117,7 @@ describe('annotator/anchoring/xpath-util', () => {
       assert.equal(result.nodeValue, 'text');
     });
 
-    it('gets the last text node nested', () => {
+    it('gets the last text node (with siblings)', () => {
       container.innerHTML = `<span>text first</span><span>text last</span>`;
       const result = getLastTextNodeUpTo(container);
       assert.equal(result.nodeValue, 'text last');
@@ -138,7 +136,7 @@ describe('annotator/anchoring/xpath-util', () => {
     });
   });
 
-  describe('#getFirstTextNodeNotBefore', () => {
+  describe('getFirstTextNodeNotBefore', () => {
     let container;
 
     beforeEach(() => {
@@ -156,7 +154,7 @@ describe('annotator/anchoring/xpath-util', () => {
       assert.equal(result.nodeValue, 'text');
     });
 
-    it('gets the last text node nested', () => {
+    it('gets the first text node (with siblings)', () => {
       container.innerHTML = `<span>text first</span><span>text last</span>`;
       const result = getFirstTextNodeNotBefore(container);
       assert.equal(result.nodeValue, 'text first');
@@ -179,7 +177,7 @@ describe('annotator/anchoring/xpath-util', () => {
 
   describe('xpath', () => {
     let container;
-    const html = `<div id="root">
+    const html = `
         <h1 id="h1-1">text</h1>
         <p id="p-1">text<br/><br/><a id="a-1">text</a></p>
         <p id="p-2">text<br/><em id="em-1"><br/>text</em>text</p>
@@ -189,12 +187,10 @@ describe('annotator/anchoring/xpath-util', () => {
             <li id="li-2">text</li>
             <li id="li-3">text</li>
           </ul>
-        </span>
-      </div>`;
+        </span>`;
 
     beforeEach(() => {
       container = document.createElement('div');
-      container.setAttribute('id', 'root');
       container.innerHTML = html;
       document.body.appendChild(container);
     });
@@ -203,7 +199,7 @@ describe('annotator/anchoring/xpath-util', () => {
       container.remove();
     });
 
-    describe('#xpathFromNode', () => {
+    describe('xpathFromNode', () => {
       [
         {
           id: 'a-1',
@@ -236,15 +232,19 @@ describe('annotator/anchoring/xpath-util', () => {
       ].forEach(test => {
         it('produces the correct xpath for the provided nodes', () => {
           let node = document.getElementById(test.id);
-          assert.equal(
-            simpleXPathJQuery($(node), document.querySelector('#root')),
-            test.xpath
-          );
+          assert.equal(simpleXPathJQuery($(node), document.body), test.xpath);
         });
       });
     });
 
-    describe('#simpleXPathPure', () => {
+    describe('simpleXPathPure', () => {
+      it('throws an error if the provided node is not a descendant of `relativeRoot`', () => {
+        const node = document.createElement('p'); // not attached to DOM
+        assert.throws(() => {
+          simpleXPathPure($(node), document.body);
+        }, 'Called getPathTo on a node which was not a descendant of @rootNode. [object HTMLBodyElement]');
+      });
+
       [
         {
           id: 'a-1',
@@ -284,10 +284,7 @@ describe('annotator/anchoring/xpath-util', () => {
       ].forEach(test => {
         it('produces the correct xpath for the provided node', () => {
           let node = document.getElementById(test.id);
-          assert.equal(
-            simpleXPathPure($(node), document.querySelector('#root')),
-            test.xpaths[0]
-          );
+          assert.equal(simpleXPathPure($(node), document.body), test.xpaths[0]);
         });
 
         it('produces the correct xpath for the provided text node(s)', () => {
@@ -302,7 +299,7 @@ describe('annotator/anchoring/xpath-util', () => {
           }
           textNodes.forEach((node, index) => {
             assert.equal(
-              simpleXPathPure($(node), document.querySelector('#root')),
+              simpleXPathPure($(node), document.body),
               test.xpaths[index + 1]
             );
           });
