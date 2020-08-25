@@ -45,7 +45,7 @@
  * @typedef Annotation
  * @prop {string} [id] -
  *   The server-assigned ID for the annotation. This is only set once the
- *   annotation has been saved to the backend
+ *   annotation has been saved to the backend.
  * @prop {string} $tag - A locally-generated unique identifier for annotations.
  *   This is set for all annotations, whether they have been saved to the backend
  *   or not.
