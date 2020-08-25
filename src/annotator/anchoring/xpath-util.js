@@ -32,12 +32,6 @@ function getNodeName(node) {
   if (nodeName === '#text') {
     result = 'text()';
   }
-  if (nodeName === '#comment') {
-    result = 'comment()';
-  }
-  if (nodeName === '#cdata-section') {
-    result = 'cdata-section()';
-  }
   return result;
 }
 
@@ -76,17 +70,17 @@ export function simpleXPathJQuery(nodes, relativeRoot) {
   return paths.get();
 }
 
+function getPathSegment(node) {
+  const name = getNodeName(node);
+  const pos = getNodePosition(node);
+  return `${name}[${pos}]`;
+}
+
 /**
  * A simple XPath evaluator using only standard DOM methods which can
  * evaluate queries of the form /tag[index]/tag[index].
  */
 export function simpleXPathPure(nodes, relativeRoot) {
-  function getPathSegment(node) {
-    const name = getNodeName(node);
-    const pos = getNodePosition(node);
-    return `${name}[${pos}]`;
-  }
-
   let rootNode = relativeRoot;
 
   function getPathTo(node) {
@@ -106,9 +100,7 @@ export function simpleXPathPure(nodes, relativeRoot) {
     xpath = xpath.replace(/\/$/, '');
     return xpath;
   }
-  const paths = nodes.map((index, node) => {
-    return getPathTo(node);
-  });
+  const paths = nodes.map((index, node) => getPathTo(node));
   return paths.get();
 }
 
@@ -138,7 +130,7 @@ function flatten(array) {
 export function getTextNodes(jq) {
   const getTextNodes = node => {
     if (node && node.nodeType !== Node.TEXT_NODE) {
-      let nodes = [];
+      const nodes = [];
       if (node.nodeType !== Node.COMMENT_NODE) {
         [...node.childNodes].forEach(child => {
           nodes.push(getTextNodes(child));
@@ -157,22 +149,22 @@ export function getTextNodes(jq) {
 /**
  * Determine the last text node inside or before the given node.
  */
-export function getLastTextNodeUpTo(n) {
-  switch (n.nodeType) {
+export function getLastTextNodeUpTo(node) {
+  switch (node.nodeType) {
     case Node.TEXT_NODE:
-      return n; // We have found our text node.
+      return node; // We have found our text node.
     case Node.ELEMENT_NODE:
       // This is an element, we need to dig in
-      if (n.lastChild) {
+      if (node.lastChild) {
         // Does it have children at all?
-        const result = getLastTextNodeUpTo(n.lastChild);
+        const result = getLastTextNodeUpTo(node.lastChild);
         if (result) {
           return result;
         }
       }
   }
   // Could not find a text node in current node, go backwards
-  const prev = n.previousSibling;
+  const prev = node.previousSibling;
   if (prev) {
     // eslint-disable-next-line no-unused-vars
     return getLastTextNodeUpTo(prev);
@@ -182,24 +174,24 @@ export function getLastTextNodeUpTo(n) {
 }
 
 /**
- * Determine the first text node in or after the given jQuery node.
+ * Determine the first text node in or after the given node.
  */
-export function getFirstTextNodeNotBefore(n) {
-  switch (n.nodeType) {
+export function getFirstTextNodeNotBefore(node) {
+  switch (node.nodeType) {
     case Node.TEXT_NODE:
-      return n; // We have found our text node.
+      return node; // We have found our text node.
     case Node.ELEMENT_NODE:
       // This is an element, we need to dig in
-      if (n.firstChild) {
+      if (node.firstChild) {
         // Does it have children at all?
-        const result = getFirstTextNodeNotBefore(n.firstChild);
+        const result = getFirstTextNodeNotBefore(node.firstChild);
         if (result) {
           return result;
         }
       }
   }
   // Could not find a text node in current node, go forward
-  const next = n.nextSibling;
+  const next = node.nextSibling;
   if (next) {
     // eslint-disable-next-line no-unused-vars
     return getFirstTextNodeNotBefore(next);
