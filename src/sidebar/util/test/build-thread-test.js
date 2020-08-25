@@ -276,14 +276,14 @@ describe('sidebar/util/build-thread', function () {
 
     it('expands threads which have been explicitly expanded', function () {
       const thread = buildThread(SIMPLE_FIXTURE, {
-        expanded: { '1': true },
+        expanded: { 1: true },
       });
       assert.isFalse(thread.children[0].collapsed);
     });
 
     it('collapses replies which have been explicitly collapsed', function () {
       const thread = buildThread(SIMPLE_FIXTURE, {
-        expanded: { '3': false },
+        expanded: { 3: false },
       });
       assert.isTrue(thread.children[0].children[0].collapsed);
     });

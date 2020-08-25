@@ -194,7 +194,7 @@ describe('sidebar/store/modules/selection', () => {
 
       const selection = store.threadState().selection;
 
-      assert.deepEqual(selection.expanded, { '3': true, '4': false });
+      assert.deepEqual(selection.expanded, { 3: true, 4: false });
       assert.deepEqual(selection.selected, ['1', '2']);
     });
 

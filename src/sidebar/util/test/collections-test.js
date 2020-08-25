@@ -28,8 +28,8 @@ describe('sidebar/util/collections', () => {
       const myObj = {
         yes: true,
         no: false,
-        '1': true,
-        '0': false,
+        1: true,
+        0: false,
         hooray: true,
       };
       assert.sameMembers(collectionsUtil.trueKeys(myObj), [
