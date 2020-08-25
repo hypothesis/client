@@ -1,5 +1,4 @@
 <script>
-  var appHost = document.location.hostname;
   window.hypothesisConfig = function() {
     return {
       // enableExperimentalNewNoteButton: true,
@@ -25,7 +24,4 @@
       openSidebar: true,
     };
   };
-  var embedScript = document.createElement('script');
-  embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
-  document.body.appendChild(embedScript);
 </script>

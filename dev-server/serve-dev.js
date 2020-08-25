@@ -21,28 +21,40 @@ const TEMPLATE_PATH = `${__dirname}/templates/`;
  */
 
 /**
- * Generate `<script>` content for client configuration and injection
+ * Render client config and script embed
  *
- * @param {string} clientUrl
- * @return {string}
+ * @param {Object} context
  */
-function renderConfig(clientUrl) {
-  const scriptTemplate = fs.readFileSync(
-    `${TEMPLATE_PATH}client-config.js.mustache`,
-    'utf-8'
-  );
-  return Mustache.render(scriptTemplate, { clientUrl });
+function renderScript(context) {
+  const scriptTemplate = `
+    {{{hypothesisConfig}}}
+    <script>
+    const embedScript = document.createElement('script');
+    embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
+    document.body.appendChild(embedScript);
+    </script>
+  `;
+  return Mustache.render(scriptTemplate, context);
 }
 
 /**
- * Build context for rendering templates in the defined views directory. This
- * is dead simple at present but could be extended as needs grow.
+ * Build context for rendering templates in the defined views directory.
  *
  * @param {Config} config
  */
 function templateContext(config) {
+  // Just the config by itself, in contrast with `hypothesisScript`, which
+  // combines this config with a <script> that adds the embed script
+  const hypothesisConfig = fs.readFileSync(
+    `${TEMPLATE_PATH}client-config.js.mustache`,
+    'utf-8'
+  );
   return {
-    hypothesisScript: renderConfig(config.clientUrl),
+    hypothesisConfig,
+    hypothesisScript: renderScript({
+      hypothesisConfig,
+      clientUrl: config.clientUrl,
+    }),
   };
 }
 
@@ -89,11 +101,15 @@ function serveDev(port, config) {
   // Serve PDF documents with PDFJS viewer and client script
   app.get('/pdf/:pdf', (req, res, next) => {
     if (fs.existsSync(`${PDF_PATH}${req.params.pdf}.pdf`)) {
+      const relativeSourceUrl = `/pdf-source/${req.params.pdf}.pdf`;
       const fullUrl = `${req.protocol}://${req.hostname}:${port}${req.originalUrl}`;
+      const context = templateContext(config);
+
       res.render('pdfjs-viewer', {
+        ...context,
+        clientUrl: config.clientUrl, // URL to embed source
         documentUrl: fullUrl, // The URL that annotations are associated with
-        url: `/pdf-source/${req.params.pdf}.pdf`, // The URL for the PDF source file
-        clientUrl: config.clientUrl,
+        url: relativeSourceUrl, // The URL for the PDF source file
       });
     } else {
       next();

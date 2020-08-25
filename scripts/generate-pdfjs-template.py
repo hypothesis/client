@@ -48,13 +48,7 @@ window.CLIENT_URL = '{{{clientUrl}}}'.replace('{current_host}', document.locatio
 <script src="/scripts/pdfjs-init.js"></script>
 
 <!-- Configure Hypothesis client. -->
-<script>
-window.hypothesisConfig = function() {
-  return {
-    openSidebar: true,
-  };
-};
-</script>
+{{{hypothesisConfig}}}
 <!-- End Hypothesis modifications -->
 """
 
