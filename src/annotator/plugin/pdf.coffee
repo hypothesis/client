@@ -24,8 +24,37 @@ module.exports = class PDF extends Plugin
       subtree: true
     })
 
+    @lastLayoutInfo = {
+      expanded: false
+      width: 0
+      height: 0
+    }
+
+    @boundResizeHandler = @onResize.bind(this)
+
+    window.addEventListener 'resize', @boundResizeHandler
+
+  onResize: ->
+    this.pageFit(@lastLayoutInfo)
+
+  pageFit: (layoutInfo) ->
+    document.getElementById('outerContainer').style.width = window.innerWidth - layoutInfo.width + 'px'
+
+    if @pdfViewer
+      # The code in this block is copied from `webViewerResize` in PDFJS
+      currentScaleValue = @pdfViewer.currentScaleValue
+
+      if (currentScaleValue == "auto" || currentScaleValue == "page-fit" || currentScaleValue == "page-width")
+        @pdfViewer.currentScaleValue = currentScaleValue
+
+      @pdfViewer.update()
+
+    @lastLayoutInfo = layoutInfo
+
+
   destroy: ->
     @pdfViewer.viewer.classList.remove('has-transparent-text-layer')
+    window.removeEventListener 'resize', @boundResizeHandler
     @observer.disconnect()
 
   uri: ->

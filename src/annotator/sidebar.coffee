@@ -71,7 +71,11 @@ module.exports = class Sidebar extends Host
       @onProfileRequest = serviceConfig.onProfileRequest
       @onHelpRequest = serviceConfig.onHelpRequest
 
-    @onLayoutChange = config.onLayoutChange
+    @onLayoutChangeHandlers = []
+    if @plugins?.PDF
+      @onLayoutChangeHandlers.push(@plugins.PDF.pageFit.bind(@plugins.PDF))
+    if config.onLayoutChange
+      @onLayoutChangeHandlers.push(@onLayoutChange)
 
     # initial layout notification
     this._notifyOfLayoutChange(false)
@@ -172,42 +176,43 @@ module.exports = class Sidebar extends Host
     # The sidebar iframe is hidden or shown by adjusting the left margin of its
     # container.
 
-    if @onLayoutChange
-      frame = @frame || @externalFrame
-      rect = frame[0].getBoundingClientRect()
-      computedStyle = window.getComputedStyle(frame[0])
-      width = parseInt(computedStyle.width)
-      leftMargin = parseInt(computedStyle.marginLeft)
+    frame = @frame || @externalFrame
+    rect = frame[0].getBoundingClientRect()
+    computedStyle = window.getComputedStyle(frame[0])
+    width = parseInt(computedStyle.width)
+    leftMargin = parseInt(computedStyle.marginLeft)
 
-      # The width of the sidebar that is visible on screen, including the
-      # toolbar, which is always visible.
-      frameVisibleWidth = toolbarWidth
+    # The width of the sidebar that is visible on screen, including the
+    # toolbar, which is always visible.
+    frameVisibleWidth = toolbarWidth
 
-      if explicitExpandedState?
-        # When we are explicitly saying to open or close, jump
-        # straight to the upper and lower bounding widths.
-        if explicitExpandedState
-          frameVisibleWidth += width
+    if explicitExpandedState?
+      # When we are explicitly saying to open or close, jump
+      # straight to the upper and lower bounding widths.
+      if explicitExpandedState
+        frameVisibleWidth += width
+    else
+      if leftMargin < MIN_RESIZE
+        # When the width hits its threshold of MIN_RESIZE,
+        # the left margin continues to push the sidebar off screen.
+        # So it's the best indicator of width when we get below that threshold.
+        # Note: when we hit the right edge, it will be -0
+        frameVisibleWidth += -leftMargin
       else
-        if leftMargin < MIN_RESIZE
-          # When the width hits its threshold of MIN_RESIZE,
-          # the left margin continues to push the sidebar off screen.
-          # So it's the best indicator of width when we get below that threshold.
-          # Note: when we hit the right edge, it will be -0
-          frameVisibleWidth += -leftMargin
-        else
-          frameVisibleWidth += width
+        frameVisibleWidth += width
 
-      # Since we have added logic on if this is an explicit show/hide
-      # and applied proper width to the visible value above, we can infer
-      # expanded state on that width value vs the lower bound
-      expanded = frameVisibleWidth > toolbarWidth
+    # Since we have added logic on if this is an explicit show/hide
+    # and applied proper width to the visible value above, we can infer
+    # expanded state on that width value vs the lower bound
+    expanded = frameVisibleWidth > toolbarWidth
 
-      @onLayoutChange({
+    @onLayoutChangeHandlers?.forEach((handler) ->
+      handler({
         expanded: expanded,
         width: if expanded then frameVisibleWidth else toolbarWidth,
         height: rect.height,
       })
+    )
 
   onPan: (event) =>
     return unless @frame
