@@ -5,6 +5,7 @@ import sidebarTrigger from './sidebar-trigger';
 import events from '../shared/bridge-events';
 import features from './features';
 
+import Host from './host';
 import { ToolbarController } from './toolbar';
 
 /**
@@ -16,10 +17,6 @@ import { ToolbarController } from './toolbar';
 
 // Minimum width to which the frame can be resized.
 const MIN_RESIZE = 280;
-
-// TODO - Convert this to an ES import once `host.coffee` is converted.
-// @ts-expect-error
-const Host = require('./host');
 
 const defaultConfig = {
   Document: {},
