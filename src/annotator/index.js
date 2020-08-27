@@ -33,7 +33,6 @@ import BucketBarPlugin from './plugin/bucket-bar';
 import CrossFramePlugin from './plugin/cross-frame';
 // @ts-expect-error
 import PDFPlugin from './plugin/pdf';
-// @ts-expect-error
 import Sidebar from './sidebar';
 
 const pluginClasses = {

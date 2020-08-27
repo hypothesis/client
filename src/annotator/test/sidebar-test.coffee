@@ -2,7 +2,7 @@ $ = require('jquery')
 
 { default: events } = require('../../shared/bridge-events')
 
-Sidebar = require('../sidebar')
+{ default: Sidebar } = require('../sidebar')
 { $imports } = require('../sidebar')
 
 DEFAULT_WIDTH = 350
@@ -233,44 +233,44 @@ describe 'Sidebar', ->
 
     describe 'panstart event', ->
       it 'disables pointer events and transitions on the widget', ->
-        sidebar.onPan({type: 'panstart'})
+        sidebar._onPan({type: 'panstart'})
 
         assert.isTrue(sidebar.frame.hasClass('annotator-no-transition'))
         assert.equal(sidebar.frame.css('pointer-events'), 'none')
 
       it 'captures the left margin as the gesture initial state', ->
         sandbox.stub(window, 'getComputedStyle').returns({marginLeft: '100px'})
-        sidebar.onPan({type: 'panstart'})
-        assert.equal(sidebar.gestureState.initial, '100')
+        sidebar._onPan({type: 'panstart'})
+        assert.equal(sidebar._gestureState.initial, '100')
 
     describe 'panend event', ->
       it 'enables pointer events and transitions on the widget', ->
-        sidebar.gestureState = {final: 0}
-        sidebar.onPan({type: 'panend'})
+        sidebar._gestureState = {final: 0}
+        sidebar._onPan({type: 'panend'})
         assert.isFalse(sidebar.frame.hasClass('annotator-no-transition'))
         assert.equal(sidebar.frame.css('pointer-events'), '')
 
       it 'calls `show` if the widget is fully visible', ->
-        sidebar.gestureState = {final: -500}
+        sidebar._gestureState = {final: -500}
         show = sandbox.stub(sidebar, 'show')
-        sidebar.onPan({type: 'panend'})
+        sidebar._onPan({type: 'panend'})
         assert.calledOnce(show)
 
       it 'calls `hide` if the widget is not fully visible', ->
-        sidebar.gestureState = {final: -100}
+        sidebar._gestureState = {final: -100}
         hide = sandbox.stub(sidebar, 'hide')
-        sidebar.onPan({type: 'panend'})
+        sidebar._onPan({type: 'panend'})
         assert.calledOnce(hide)
 
     describe 'panleft and panright events', ->
       it 'shrinks or grows the widget to match the delta', ->
-        sidebar.gestureState = {initial: -100}
+        sidebar._gestureState = {initial: -100}
 
-        sidebar.onPan({type: 'panleft', deltaX: -50})
-        assert.equal(sidebar.gestureState.final, -150)
+        sidebar._onPan({type: 'panleft', deltaX: -50})
+        assert.equal(sidebar._gestureState.final, -150)
 
-        sidebar.onPan({type: 'panright', deltaX: 100})
-        assert.equal(sidebar.gestureState.final, 0)
+        sidebar._onPan({type: 'panright', deltaX: 100})
+        assert.equal(sidebar._gestureState.final, 0)
 
   describe 'panelReady event', ->
     it 'opens the sidebar when a direct-linked annotation is present.', ->
@@ -332,12 +332,12 @@ describe 'Sidebar', ->
 
     it 'opens the sidebar on swipeleft', ->
       show = sandbox.stub(sidebar, 'show')
-      sidebar.onSwipe({type: 'swipeleft'})
+      sidebar._onSwipe({type: 'swipeleft'})
       assert.calledOnce(show)
 
     it 'closes the sidebar on swiperight', ->
       hide = sandbox.stub(sidebar, 'hide')
-      sidebar.onSwipe({type: 'swiperight'})
+      sidebar._onSwipe({type: 'swiperight'})
       assert.calledOnce(hide)
 
   describe 'destruction', ->
@@ -459,15 +459,15 @@ describe 'Sidebar', ->
         }
 
       it 'notifies when sidebar is panned left', ->
-        sidebar.gestureState = { initial: -DEFAULT_WIDTH }
-        sidebar.onPan({type: 'panleft', deltaX: -50})
+        sidebar._gestureState = { initial: -DEFAULT_WIDTH }
+        sidebar._onPan({type: 'panleft', deltaX: -50})
         assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
           width: DEFAULT_WIDTH + 50 + fakeToolbar.getWidth()
         }
 
       it 'notifies when sidebar is panned right', ->
-        sidebar.gestureState = { initial: -DEFAULT_WIDTH }
-        sidebar.onPan({type: 'panright', deltaX: 50})
+        sidebar._gestureState = { initial: -DEFAULT_WIDTH }
+        sidebar._onPan({type: 'panright', deltaX: 50})
         assertLayoutValues layoutChangeHandlerSpy.lastCall.args[0], {
           width: DEFAULT_WIDTH - 50 + fakeToolbar.getWidth()
         }

@@ -1,7 +1,6 @@
-// @ts-expect-error - './sidebar' needs to be converted from JS.
 import Sidebar from './sidebar';
 
-const DEFAULT_CONFIG = {
+const defaultConfig = {
   TextSelection: {},
   PDF: {},
   BucketBar: {
@@ -15,6 +14,6 @@ const DEFAULT_CONFIG = {
 
 export default class PdfSidebar extends Sidebar {
   constructor(element, config) {
-    super(element, Object.assign({}, DEFAULT_CONFIG, config));
+    super(element, { ...defaultConfig, ...config });
   }
 }
