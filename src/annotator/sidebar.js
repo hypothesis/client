@@ -64,7 +64,10 @@ export default class Sidebar extends Host {
     }
 
     this._gestureState = {
+      // Initial position at the start of a drag/pan resize event (in pixels).
       initial: /** @type {number|null} */ (null),
+
+      // Final position at end of drag resize event.
       final: /** @type {number|null} */ (null),
     };
     this._setupGestures();
@@ -320,6 +323,11 @@ export default class Sidebar extends Host {
     }
   }
 
+  /**
+   * Hide or show highlights associated with annotations in the document.
+   *
+   * @param {boolean} shouldShowHighlights
+   */
   setAllVisibleHighlights(shouldShowHighlights) {
     this.crossframe.call('setVisibleHighlights', shouldShowHighlights);
   }
