@@ -15,3 +15,13 @@
 .textLayer .highlight.selected {
   background-color: rgba(0, 100, 0, 0.5);
 }
+
+// Remove horizontal `margin:auto` so that PDF pages are left-aligned
+.pdfViewer .page {
+  margin: 1px 0 -8px 0;
+}
+
+// Make sure sidebar bucket bar/toolbar don't obscure PDF JS tools menu
+#toolbarViewer {
+  margin-right: 32px;
+}

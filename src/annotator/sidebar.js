@@ -172,10 +172,6 @@ export default class Sidebar extends Host {
    *   opposed to being resized via the sidebar's drag handles
    */
   _notifyOfLayoutChange(expanded) {
-    if (!this.onLayoutChange) {
-      return;
-    }
-
     // The sidebar structure is:
     //
     // [ Toolbar    ][                                   ]
@@ -212,11 +208,16 @@ export default class Sidebar extends Host {
       expanded = frameVisibleWidth > toolbarWidth;
     }
 
-    this.onLayoutChange({
+    const layoutState = {
       expanded,
       width: expanded ? frameVisibleWidth : toolbarWidth,
       height: rect.height,
-    });
+    };
+
+    if (this.onLayoutChange) {
+      this.onLayoutChange(layoutState);
+    }
+    this.publish('sidebarLayoutChanged', [layoutState]);
   }
 
   _onPan(event) {
