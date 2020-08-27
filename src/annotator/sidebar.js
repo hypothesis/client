@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import Hammer from 'hammerjs';
 
 import annotationCounts from './annotation-counts';
@@ -90,6 +89,11 @@ export default class Sidebar extends Host {
     this._setupSidebarEvents();
   }
 
+  destroy() {
+    this._hammerManager?.destroy();
+    super.destroy();
+  }
+
   _setupSidebarEvents() {
     annotationCounts(document.body, this.crossframe);
     sidebarTrigger(document.body, () => this.show());
@@ -117,27 +121,17 @@ export default class Sidebar extends Host {
   }
 
   _setupGestures() {
-    const toggle = $(this.toolbar.sidebarToggleButton);
-
-    if (toggle[0]) {
+    const toggleButton = this.toolbar.sidebarToggleButton;
+    if (toggleButton) {
       // Prevent any default gestures on the handle.
-      toggle.on('touchmove', e => e.preventDefault());
+      toggleButton.addEventListener('touchmove', e => e.preventDefault());
 
-      // Set up Hammer instance and handlers.
-      const manager = new Hammer.Manager(toggle[0])
+      this._hammerManager = new Hammer.Manager(toggleButton)
         // eslint-disable-next-line no-restricted-properties
-        .on('panstart panend panleft panright', this._onPan.bind(this))
-        // eslint-disable-next-line no-restricted-properties
-        .on('swipeleft swiperight', this._onSwipe.bind(this));
-
-      // Set up gesture recognition.
-      const pan = manager.add(
+        .on('panstart panend panleft panright', this._onPan.bind(this));
+      this._hammerManager.add(
         new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL })
       );
-      const swipe = manager.add(
-        new Hammer.Swipe({ direction: Hammer.DIRECTION_HORIZONTAL })
-      );
-      swipe.recognizeWith(pan);
     }
   }
 
@@ -268,17 +262,6 @@ export default class Sidebar extends Host {
         this._updateLayout();
         break;
       }
-    }
-  }
-
-  _onSwipe(event) {
-    switch (event.type) {
-      case 'swipeleft':
-        this.show();
-        break;
-      case 'swiperight':
-        this.hide();
-        break;
     }
   }
 
