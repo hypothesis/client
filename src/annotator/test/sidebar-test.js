@@ -15,6 +15,9 @@ describe('Sidebar', () => {
   let fakeCrossFrame;
   const sidebarConfig = { pluginClasses: {} };
 
+  // `Sidebar` instances created by current test.
+  let sidebars;
+
   let FakeToolbarController;
   let fakeToolbar;
 
@@ -32,7 +35,11 @@ describe('Sidebar', () => {
     }
     config = Object.assign({}, sidebarConfig, config);
     const element = document.createElement('div');
-    return new Sidebar(element, config);
+    const sidebar = new Sidebar(element, config);
+
+    sidebars.push(sidebar);
+
+    return sidebar;
   };
 
   const createExternalContainer = () => {
@@ -44,8 +51,6 @@ describe('Sidebar', () => {
   };
 
   beforeEach(() => {
-    sandbox.stub(Sidebar.prototype, '_setupGestures');
-
     fakeCrossFrame = {};
     fakeCrossFrame.onConnect = sandbox.stub().returns(fakeCrossFrame);
     fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame);
@@ -75,6 +80,8 @@ describe('Sidebar', () => {
     sidebarConfig.pluginClasses.CrossFrame = CrossFrame;
     sidebarConfig.pluginClasses.BucketBar = BucketBar;
 
+    sidebars = [];
+
     $imports.$mock({
       './toolbar': {
         ToolbarController: FakeToolbarController,
@@ -83,6 +90,7 @@ describe('Sidebar', () => {
   });
 
   afterEach(() => {
+    sidebars.forEach(s => s.destroy());
     sandbox.restore();
     $imports.$restore();
   });
@@ -358,26 +366,6 @@ describe('Sidebar', () => {
       const show = sandbox.stub(sidebar, 'show');
       sidebar.publish('panelReady');
       assert.notCalled(show);
-    });
-  });
-
-  describe('swipe gestures', () => {
-    let sidebar;
-
-    beforeEach(() => {
-      sidebar = createSidebar({});
-    });
-
-    it('opens the sidebar on swipeleft', () => {
-      const show = sandbox.stub(sidebar, 'show');
-      sidebar._onSwipe({ type: 'swipeleft' });
-      assert.calledOnce(show);
-    });
-
-    it('closes the sidebar on swiperight', () => {
-      const hide = sandbox.stub(sidebar, 'hide');
-      sidebar._onSwipe({ type: 'swiperight' });
-      assert.calledOnce(hide);
     });
   });
 
