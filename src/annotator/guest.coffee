@@ -104,6 +104,9 @@ module.exports = class Guest extends Delegator
     @crossframe = this.plugins.CrossFrame
 
     @crossframe.onConnect(=> this._setupInitialState(config))
+
+    # Whether clicks on non-highlighted text should close the sidebar
+    this.closeSidebarOnDocumentClick = true
     this._connectAnnotationSync(@crossframe)
     this._connectAnnotationUISync(@crossframe)
 
@@ -445,14 +448,15 @@ module.exports = class Guest extends Delegator
 
   # Did an event originate from an element in the annotator UI? (eg. the sidebar
   # frame, or its toolbar)
-  _isEventInAnnotator: (event) ->
+  isEventInAnnotator: (event) ->
     return closest(event.target, '.annotator-frame') != null
 
   # Event handlers to close the sidebar when the user clicks in the document.
   # These really ought to live with the sidebar code.
   onElementClick: (event) ->
-    if !this._isEventInAnnotator(event) and !@selectedTargets?.length
-      @crossframe?.call('hideSidebar')
+    if this.closeSidebarOnDocumentClick
+      if !this.isEventInAnnotator(event) and !@selectedTargets?.length and not event.annotations?.length
+        @crossframe?.call('hideSidebar')
 
   onElementTouchStart: (event) ->
     # Mobile browsers do not register click events on
@@ -460,8 +464,9 @@ module.exports = class Guest extends Delegator
     # adding that to every element, we can add the initial
     # touchstart event which is always registered to
     # make up for the lack of click support for all elements.
-    if !this._isEventInAnnotator(event) and !@selectedTargets?.length
-      @crossframe?.call('hideSidebar')
+    if this.closeSidebarOnDocumentClick
+      if !this.isEventInAnnotator(event) and !@selectedTargets?.length and not event.annotations?.length
+        @crossframe?.call('hideSidebar')
 
   onHighlightMouseover: (event) ->
     return unless @visibleHighlights
