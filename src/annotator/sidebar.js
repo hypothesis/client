@@ -8,6 +8,13 @@ import features from './features';
 
 import { ToolbarController } from './toolbar';
 
+/**
+ * @typedef LayoutState
+ * @prop {boolean} expanded
+ * @prop {number} width
+ * @prop {number} height
+ */
+
 // Minimum width to which the frame can be resized.
 const MIN_RESIZE = 280;
 
@@ -208,11 +215,11 @@ export default class Sidebar extends Host {
       expanded = frameVisibleWidth > toolbarWidth;
     }
 
-    const layoutState = {
+    const layoutState = /** @type LayoutState */ ({
       expanded,
       width: expanded ? frameVisibleWidth : toolbarWidth,
       height: rect.height,
-    };
+    });
 
     if (this.onLayoutChange) {
       this.onLayoutChange(layoutState);
