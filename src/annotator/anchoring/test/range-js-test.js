@@ -1,6 +1,6 @@
 import $ from 'jquery';
 
-import { xpathFromNode, nodeFromXPath, $imports } from '../range-js';
+import { nodeFromXPath, xpathFromNode, $imports } from '../range-js';
 
 describe('annotator/anchoring/range-js', () => {
   describe('xpathFromNode', () => {
@@ -24,6 +24,7 @@ describe('annotator/anchoring/range-js', () => {
 
     afterEach(() => {
       container.remove();
+      $imports.$restore();
     });
 
     it('calls `simpleXPathJQuery`', () => {
@@ -51,82 +52,61 @@ describe('annotator/anchoring/range-js', () => {
 
   describe('nodeFromXPath', () => {
     let container;
-    let fakeFindChild;
+    const html = `
+        <h1 id="h1-1">text</h1>
+        <p id="p-1">text<br/><br/><a id="a-1">text</a></p>
+        <p id="p-2">text<br/><em id="em-1"><br/>text</em>text</p>
+        <span>
+          <ul>
+            <li id="li-1">text 1</li>
+            <li id="li-2">text 2</li>
+            <li id="li-3">text 3</li>
+          </ul>
+        </span>`;
 
     beforeEach(() => {
       container = document.createElement('div');
+      container.innerHTML = html;
       document.body.appendChild(container);
-      fakeFindChild = sinon.stub().returns(document.body);
-
-      $imports.$mock({
-        './xpath-util': {
-          findChild: fakeFindChild,
-        },
-      });
     });
 
     afterEach(() => {
       container.remove();
     });
 
-    it('returns the last node returned from `findChild`', () => {
-      const span = document.createElement('span');
-      container.appendChild(span);
-      fakeFindChild.onFirstCall().returns(container);
-      fakeFindChild.onSecondCall().returns(span);
-      assert.equal(nodeFromXPath('/div[1]/span[1]', document.body), span);
-    });
-
     [
       {
-        xpath: '/div[1]',
-        params: [
-          {
-            name: 'div',
-            idx: 1,
-          },
-        ],
+        xpath: '/h1[1]',
+        nodeName: 'H1',
       },
       {
-        xpath: '/div[1]/span[3]/p[1]',
-        params: [
-          {
-            name: 'div',
-            idx: 1,
-          },
-          {
-            name: 'span',
-            idx: 3,
-          },
-          {
-            name: 'p',
-            idx: 1,
-          },
-        ],
+        xpath: '/p[1]/a[1]/text()[1]',
+        nodeName: '#text',
       },
       {
-        xpath: '/DIV[2]/TEXT()[3]/SPAN[1]',
-        params: [
-          {
-            name: 'div',
-            idx: 2,
-          },
-          {
-            name: 'text()',
-            idx: 3,
-          },
-          {
-            name: 'span',
-            idx: 1,
-          },
-        ],
+        xpath: '/span[1]/ul[1]/li[2]',
+        nodeName: 'LI',
+      },
+      {
+        xpath: '/SPAN[1]/UL[1]/LI[2]',
+        nodeName: 'LI',
+      },
+      {
+        xpath: '/SPAN[1]/UL[1]/LI[2]/text()',
+        nodeName: '#text',
       },
     ].forEach(test => {
-      it('calls `findChild` with the following node names and indices', () => {
-        nodeFromXPath(test.xpath, document.body);
-        test.params.forEach(call => {
-          assert.calledWith(fakeFindChild, document.body, call.name, call.idx);
-        });
+      it('it returns the node associated with the XPath', () => {
+        const result = nodeFromXPath(test.xpath, container);
+        assert.equal(result.nodeName, test.nodeName);
+      });
+
+      it('it returns the node associated with the XPath when `document.evaluate` throws an error', () => {
+        const result = nodeFromXPath(test.xpath, container);
+        sinon.stub(document, 'evaluate').throws(new Error());
+        const resultFallback = nodeFromXPath(test.xpath, container);
+        assert.equal(result, resultFallback);
+        document.evaluate.restore();
       });
     });
   });
