@@ -172,10 +172,6 @@ export default class Sidebar extends Host {
    *   opposed to being resized via the sidebar's drag handles
    */
   _notifyOfLayoutChange(expanded) {
-    if (!this.onLayoutChange) {
-      return;
-    }
-
     // The sidebar structure is:
     //
     // [ Toolbar    ][                                   ]
@@ -185,7 +181,7 @@ export default class Sidebar extends Host {
     // The sidebar iframe is hidden or shown by adjusting the left margin of
     // its container.
 
-    const toolbarWidth = this.toolbarWidth || 0;
+    const toolbarWidth = (this.frame && this.toolbar.getWidth()) || 0;
     const frame = this.frame || this.externalFrame;
     const rect = frame[0].getBoundingClientRect();
     const computedStyle = window.getComputedStyle(frame[0]);
@@ -212,11 +208,16 @@ export default class Sidebar extends Host {
       expanded = frameVisibleWidth > toolbarWidth;
     }
 
-    this.onLayoutChange({
+    const layoutState = {
       expanded,
       width: expanded ? frameVisibleWidth : toolbarWidth,
       height: rect.height,
-    });
+    };
+
+    if (this.onLayoutChange) {
+      this.onLayoutChange(layoutState);
+    }
+    this.publish('sidebarLayoutChanged', [layoutState]);
   }
 
   _onPan(event) {
