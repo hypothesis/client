@@ -22,6 +22,13 @@ export default function configFrom(window_) {
     enableExperimentalNewNoteButton: settings.hostPageSetting(
       'enableExperimentalNewNoteButton'
     ),
+    enableExperimentalPDFSideBySide: settings.hostPageSetting(
+      'enableExperimentalPDFSideBySide',
+      {
+        coerce: toBoolean,
+        defaultValue: false,
+      }
+    ),
     group: settings.group,
     focus: settings.hostPageSetting('focus'),
     theme: settings.hostPageSetting('theme'),
