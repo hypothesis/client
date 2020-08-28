@@ -78,6 +78,7 @@ $sidebar-collapse-transition-time: 150ms;
     z-index: 2;
   }
 
+  // FIXME:  Use variables for sizing here
   .annotator-frame-button {
     @include focus.outline-on-keyboard-focus;
 
