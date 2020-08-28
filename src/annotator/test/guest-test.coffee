@@ -346,6 +346,17 @@ describe 'Guest', ->
         assert.called(guest[methods[event]])
         assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
 
+    it 'does not hide sidebar if configured not to close sidebar on document click', ->
+
+      for event in ['click', 'touchstart']
+        sandbox.spy(guest, methods[event])
+        guest.closeSidebarOnDocumentClick = false
+
+        rootElement.dispatchEvent(new Event(event))
+
+        assert.called(guest[methods[event]])
+        assert.notCalled(guest.plugins.CrossFrame.call)
+
     it 'does not hide sidebar if event occurs inside annotator UI', ->
       fakeSidebarFrame = document.createElement('div')
       fakeSidebarFrame.className = 'annotator-frame'
