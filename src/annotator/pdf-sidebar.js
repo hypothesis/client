@@ -39,7 +39,7 @@ export default class PdfSidebar extends Sidebar {
     // Prefer to lay out the sidebar and the PDF side-by-side (with the sidebar
     // not overlapping the PDF) when space allows
     this.sideBySide = !!(
-      config.enableExperimentalPDFSideBySide &&
+      config.experimental?.pdfSideBySide &&
       this.pdfViewer &&
       this.pdfContainer
     );
