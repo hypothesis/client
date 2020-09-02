@@ -84,7 +84,6 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       setSuggestions(removeDuplicates(suggestions, tagList));
       setSuggestionsListOpen(suggestions.length > 0);
     }
-
     setActiveItem(-1);
   };
 
@@ -194,44 +193,63 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   };
 
   /**
-   * Keydown handler for keyboard navigation of the suggestions list
-   * and when the user presses "Enter" or ","" to add a new typed item not
-   * found in the suggestions list
+   * Keydown handler for keyboard navigation of the tag editor field and the
+   * suggested-tags list.
    *
    * @param {KeyboardEvent} e
    */
   const handleKeyDown = e => {
     switch (normalizeKeyName(e.key)) {
       case 'ArrowUp':
+        // Select the previous item in the suggestion list
         changeSelectedItem(-1);
         e.preventDefault();
         break;
       case 'ArrowDown':
+        // Select the next item in the suggestion list
         changeSelectedItem(1);
+        e.preventDefault();
+        break;
+      case 'Escape':
+        // Clear any entered text, but retain focus
+        inputEl.current.value = '';
         e.preventDefault();
         break;
       case 'Enter':
       case ',':
+        // Commit a tag
         if (activeItem === -1) {
           // nothing selected, just add the typed text
           addTag(/** @type {HTMLInputElement} */ (inputEl.current).value);
         } else {
+          // Add the selected tag
           addTag(suggestions[activeItem]);
         }
         e.preventDefault();
         break;
       case 'Tab':
-        if (activeItem !== -1) {
-          // If there is a selected item, then allow `Tab` to behave exactly
-          // like `Enter` or `,`.
-          addTag(suggestions[activeItem]);
-          e.preventDefault();
-        } else if (suggestionsListOpen) {
-          // If there is no selected item, then allow `Tab` to add the first
-          // item in the list if the list is open.
-          addTag(suggestions[0]);
-          e.preventDefault();
+        // Commit a tag, or tab out of the field if it is empty (default browser
+        // behavior)
+        if (inputEl.current.value.trim() === '') {
+          // If the tag field is empty, allow `Tab` to have its default
+          // behavior: continue to the next element in tab order
+          break;
         }
+        if (activeItem !== -1) {
+          // If there is a selected item in the suggested tag list,
+          // commit that tag (just like `Enter` and `,` in this case)
+          addTag(suggestions[activeItem]);
+        } else if (suggestions.length === 1) {
+          // If there is exactly one suggested tag match, commit that tag
+          // This emulates a "tab-complete" behavior
+          addTag(suggestions[0]);
+        } else {
+          // Commit the tag as typed in the field
+          addTag(/** @type {HTMLInputElement} */ (inputEl.current).value);
+        }
+        // Retain focus
+        e.preventDefault();
+        break;
     }
   };
 

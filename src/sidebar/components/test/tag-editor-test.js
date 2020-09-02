@@ -207,8 +207,9 @@ describe('TagEditor', function () {
      */
     const assertAddTagsSuccess = (wrapper, tagList) => {
       // saves the suggested tags to the service
-      assert.isTrue(
-        fakeTagsService.store.calledWith(tagList.map(tag => ({ text: tag })))
+      assert.calledWith(
+        fakeTagsService.store,
+        tagList.map(tag => ({ text: tag }))
       );
       // called the onEditTags callback prop
       assert.isTrue(fakeOnEditTags.calledWith({ tags: tagList }));
@@ -242,10 +243,10 @@ describe('TagEditor', function () {
     ].forEach(keyAction => {
       it(`adds a tag from the <input> field when typing "${keyAction[1]}"`, () => {
         const wrapper = createComponent();
-        wrapper.find('input').instance().value = 'tag3';
+        wrapper.find('input').instance().value = 'umbrella';
         typeInput(wrapper); // opens suggestion list
         keyAction[0](wrapper);
-        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'umbrella']);
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
@@ -268,49 +269,90 @@ describe('TagEditor', function () {
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
     });
-    it('should not add a tag if the <input> is empty', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = '';
-      selectOptionViaEnter(wrapper);
-      assertAddTagsFail();
+
+    context('When using the "Escape" key', () => {
+      it('should clear tag text in <input> but retain focus', () => {
+        const wrapper = createComponent();
+        // Add and commit a tag
+        wrapper.find('input').instance().value = 'thankyou';
+        typeInput(wrapper);
+        wrapper.find('input').simulate('keydown', { key: 'Tab' });
+        // Type more text
+        wrapper.find('input').instance().value = 'food';
+        typeInput(wrapper);
+        // // Now press escape
+        wrapper.find('input').simulate('keydown', { key: 'Escape' });
+        assert.equal(wrapper.find('input').instance().value, '');
+        assert.equal(document.activeElement.nodeName, 'INPUT');
+      });
     });
 
-    it('should not add a tag if the input is empty', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = '';
-      selectOptionViaEnter(wrapper);
-      assertAddTagsFail();
+    context('When using the "Enter" key', () => {
+      it('should not add a tag if the <input> is empty', () => {
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = '';
+        selectOptionViaEnter(wrapper);
+        assertAddTagsFail();
+      });
+
+      it('should not add a tag if the <input> value is only white space', () => {
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = '  ';
+        selectOptionViaEnter(wrapper);
+        assertAddTagsFail();
+      });
+
+      it('should not add a tag if its a duplicate of one already in the list', () => {
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = 'tag1';
+        selectOptionViaEnter(wrapper);
+        assertAddTagsFail();
+      });
     });
 
-    it('should not add a tag if the <input> value is only white space', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = '  ';
-      selectOptionViaEnter(wrapper);
-      assertAddTagsFail();
-    });
+    context('Using the "Tab" key', () => {
+      it('should add the tag as typed when there are no suggestions', () => {
+        const wrapper = createComponent();
+        fakeTagsService.filter.returns([]);
+        wrapper.find('input').instance().value = 'tag33';
+        typeInput(wrapper);
+        selectOptionViaTab(wrapper);
+        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag33']);
+        // ensure focus is still on the input field
+        assert.equal(document.activeElement.nodeName, 'INPUT');
+      });
 
-    it('should not add a tag if its a duplicate of one already in the list', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag1';
-      selectOptionViaEnter(wrapper);
-      assertAddTagsFail();
-    });
+      it('should add the tag as typed when there are multiple suggestions', () => {
+        const wrapper = createComponent();
+        fakeTagsService.filter.returns([]);
+        wrapper.find('input').instance().value = 't';
+        typeInput(wrapper);
+        selectOptionViaTab(wrapper);
+        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 't']);
+        // ensure focus is still on the input field
+        assert.equal(document.activeElement.nodeName, 'INPUT');
+      });
 
-    it('should not add a tag when pressing "Tab" and there are no suggestions', () => {
-      const wrapper = createComponent();
-      fakeTagsService.filter.returns([]);
-      wrapper.find('input').instance().value = 'tag33';
-      typeInput(wrapper);
-      selectOptionViaTab(wrapper);
-      assertAddTagsFail();
-    });
+      it('should add the suggested tag when there is exactly one suggestion', () => {
+        const wrapper = createComponent();
+        fakeTagsService.filter.returns(['tag3']);
+        wrapper.find('input').instance().value = 'tag';
+        typeInput(wrapper);
+        // suggestions: [tag3]
+        selectOptionViaTab(wrapper);
+        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        // ensure focus is still on the input field
+        assert.equal(document.activeElement.nodeName, 'INPUT');
+      });
 
-    it('should not a tag when pressing "Tab" and no suggestions are found', () => {
-      const wrapper = createComponent();
-      wrapper.find('input').instance().value = 'tag3';
-      // note: typeInput() opens the suggestions list
-      selectOptionViaTab(wrapper);
-      assertAddTagsFail();
+      it('should allow navigation out of field when there is no <input> value', () => {
+        const wrapper = createComponent();
+        wrapper.find('input').instance().value = '';
+        typeInput(wrapper);
+        selectOptionViaTab(wrapper);
+        // Focus has moved
+        assert.equal(document.activeElement.nodeName, 'BODY');
+      });
     });
   });
 
