@@ -17,7 +17,7 @@ class FakeStorage {
   }
 }
 
-describe('sidebar.tags', () => {
+describe('sidebar/services/tags', () => {
   let fakeLocalStorage;
   let tags;
 
@@ -34,6 +34,16 @@ describe('sidebar.tags', () => {
       bar: {
         text: 'bar',
         count: 5,
+        updated: stamp,
+      },
+      'bar argon': {
+        text: 'bar argon',
+        count: 2,
+        updated: stamp,
+      },
+      banana: {
+        text: 'banana',
+        count: 2,
         updated: stamp,
       },
       future: {
@@ -56,18 +66,22 @@ describe('sidebar.tags', () => {
   });
 
   describe('#filter', () => {
-    it('returns tags having the query as a substring', () => {
-      assert.deepEqual(tags.filter('a'), ['bar', 'argon']);
+    it('returns tags that start with the query string', () => {
+      assert.deepEqual(tags.filter('b'), ['bar', 'bar argon', 'banana']);
+    });
+
+    it('returns tags that have any word starting with the query string', () => {
+      assert.deepEqual(tags.filter('ar'), ['bar argon', 'argon']);
     });
 
     it('is case insensitive', () => {
-      assert.deepEqual(tags.filter('Ar'), ['bar', 'argon']);
+      assert.deepEqual(tags.filter('Ar'), ['bar argon', 'argon']);
     });
 
     it('limits tags when provided a limit value', () => {
-      assert.deepEqual(tags.filter('r', 1), ['bar']);
-      assert.deepEqual(tags.filter('r', 2), ['bar', 'future']);
-      assert.deepEqual(tags.filter('r', 3), ['bar', 'future', 'argon']);
+      assert.deepEqual(tags.filter('b', 1), ['bar']);
+      assert.deepEqual(tags.filter('b', 2), ['bar', 'bar argon']);
+      assert.deepEqual(tags.filter('b', 3), ['bar', 'bar argon', 'banana']);
     });
   });
 
@@ -101,7 +115,14 @@ describe('sidebar.tags', () => {
       }
 
       const storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);
-      assert.deepEqual(storedTagsList, ['foo', 'bar', 'future', 'argon']);
+      assert.deepEqual(storedTagsList, [
+        'foo',
+        'bar',
+        'banana',
+        'bar argon',
+        'future',
+        'argon',
+      ]);
     });
   });
 });
