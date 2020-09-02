@@ -10,6 +10,8 @@ import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import SvgIcon from '../../shared/components/svg-icon';
 import useElementShouldClose from './hooks/use-element-should-close';
 
+/** @typedef {import("preact").JSX.Element} JSXElement */
+
 // Global counter used to create a unique id for each instance of a TagEditor
 let tagEditorIdCounter = 0;
 
@@ -233,6 +235,28 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
     }
   };
 
+  /**
+   * Callback for formatting a suggested tag item. Use selective bolding
+   * to help delineate which part of the entered tag text matches the
+   * suggestion.
+   *
+   * @param {string} item - Suggested tag
+   * @return {JSXElement} - Formatted tag for use in list
+   */
+  const formatSuggestItem = item => {
+    const curVal = inputEl.current.value.trim();
+    const prefix = item.slice(0, item.indexOf(curVal));
+    const suffix = item.slice(item.indexOf(curVal) + curVal.length);
+
+    return (
+      <span>
+        <strong>{prefix}</strong>
+        {curVal}
+        <strong>{suffix}</strong>
+      </span>
+    );
+  };
+
   // The activedescendant prop should match the activeItem's value except
   // when its -1 (no item selected), and in this case set the activeDescendant to "".
   const activeDescendant =
@@ -299,6 +323,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
         <AutocompleteList
           id={`${tagEditorId}-autocomplete-list`}
           list={suggestions}
+          listFormatter={formatSuggestItem}
           open={suggestionsListOpen}
           onSelectItem={handleSelect}
           itemPrefixId={`${tagEditorId}-autocomplete-list-item-`}
