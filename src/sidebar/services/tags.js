@@ -27,8 +27,15 @@ export default function tags(localStorage) {
   function filter(query, limit = null) {
     const savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
     let resultCount = 0;
-    return savedTags.filter(e => {
-      if (e.toLowerCase().indexOf(query.toLowerCase()) !== -1) {
+    // query will match tag if:
+    // * tag starts with query (e.g. tag "banana" matches query "ban"), OR
+    // * any word in the tag starts with query
+    //   (e.g. tag "pink banana" matches query "ban"), OR
+    // * tag has substring query occurring after a non-word character
+    //   (e.g. tag "pink!banana" matches query "ban")
+    let regex = new RegExp('(\\W|\\b)' + query, 'i');
+    return savedTags.filter(tag => {
+      if (tag.match(regex)) {
         if (limit === null || resultCount < limit) {
           // limit allows a subset of the results
           // See https://github.com/hypothesis/client/issues/1606
