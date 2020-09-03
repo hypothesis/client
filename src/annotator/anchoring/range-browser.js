@@ -1,5 +1,5 @@
 /**
- * Public: Creates a wrapper around a range object obtained from a DOMSelection.
+ * Creates a wrapper around a range object obtained from a DOMSelection.
  */
 export class BrowserRange {
   /**
