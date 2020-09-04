@@ -447,7 +447,7 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div>
+    <div className="markdown-editor">
       <Toolbar
         onCommand={handleCommand}
         isPreviewing={preview}

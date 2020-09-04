@@ -5,8 +5,7 @@
 @use "../../variables" as var;
 
 .tag-editor {
-  margin: var.$layout-space--xsmall 0;
-
+  @include layout.vertical-rhythm(var.$layout-space--xsmall);
   &__input {
     @include forms.form-input;
     width: 100%;
@@ -15,7 +14,6 @@
   &__tags {
     @include layout.row;
     flex-wrap: wrap;
-    margin: var.$layout-space--xsmall 0;
   }
 
   &__item {

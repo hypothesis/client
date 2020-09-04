@@ -6,7 +6,6 @@ import * as fixtures from '../../test/annotation-fixtures';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
-import { waitFor } from '../../../test-util/wait';
 
 import Annotation from '../annotation';
 import { $imports } from '../annotation';
@@ -14,11 +13,9 @@ import { $imports } from '../annotation';
 describe('Annotation', () => {
   // Dependency Mocks
   let fakeMetadata;
-  let fakePermissions;
 
   // Injected dependency mocks
   let fakeAnnotationsService;
-  let fakeToastMessenger;
   let fakeStore;
 
   const setEditingMode = (isEditing = true) => {
@@ -35,7 +32,6 @@ describe('Annotation', () => {
       <Annotation
         annotation={fixtures.defaultAnnotation()}
         annotationsService={fakeAnnotationsService}
-        toastMessenger={fakeToastMessenger}
         replyCount={0}
         showDocumentInfo={false}
         threadIsCollapsed={true}
@@ -50,25 +46,13 @@ describe('Annotation', () => {
       save: sinon.stub().resolves(),
     };
 
-    fakeToastMessenger = {
-      error: sinon.stub(),
-    };
-
     fakeMetadata = {
       isReply: sinon.stub(),
       quote: sinon.stub(),
     };
 
-    fakePermissions = {
-      isShared: sinon.stub().returns(true),
-    };
-
     fakeStore = {
-      createDraft: sinon.stub(),
       getDraft: sinon.stub().returns(null),
-      getGroup: sinon.stub().returns({
-        type: 'private',
-      }),
       isAnnotationFocused: sinon.stub().returns(false),
       isSavingAnnotation: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
@@ -78,7 +62,6 @@ describe('Annotation', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/annotation-metadata': fakeMetadata,
-      '../util/permissions': fakePermissions,
       '../store/use-store': callback => callback(fakeStore),
     });
   });
@@ -141,211 +124,12 @@ describe('Annotation', () => {
     });
   });
 
-  describe('annotation body and excerpt', () => {
-    it('updates annotation draft when text edited', () => {
-      const wrapper = createComponent();
-      const body = wrapper.find('AnnotationBody');
+  it('should show a "Saving" message when annotation is saving', () => {
+    fakeStore.isSavingAnnotation.returns(true);
 
-      act(() => {
-        body.props().onEditText({ text: 'updated text' });
-      });
+    const wrapper = createComponent();
 
-      const call = fakeStore.createDraft.getCall(0);
-      assert.calledOnce(fakeStore.createDraft);
-      assert.equal(call.args[1].text, 'updated text');
-    });
-  });
-
-  describe('publish control', () => {
-    it('should show the publish control if in edit mode', () => {
-      setEditingMode(true);
-
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('AnnotationPublishControl').exists());
-    });
-
-    it('should not show the publish control if not in edit mode', () => {
-      setEditingMode(false);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('AnnotationPublishControl').exists());
-    });
-
-    it('should enable the publish control if the annotation is not empty', () => {
-      const draft = fixtures.defaultDraft();
-      draft.text = 'bananas';
-      fakeStore.getDraft.returns(draft);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(
-        wrapper.find('AnnotationPublishControl').props().isDisabled
-      );
-    });
-
-    it('should set the publish control to disabled if annotation is empty', () => {
-      const draft = fixtures.defaultDraft();
-      draft.tags = [];
-      draft.text = '';
-      fakeStore.getDraft.returns(draft);
-
-      const wrapper = createComponent();
-
-      assert.isTrue(
-        wrapper.find('AnnotationPublishControl').props().isDisabled
-      );
-    });
-
-    context('saving an annotation', () => {
-      it('should save the annotation when the publish control invokes the `onSave` callback', () => {
-        setEditingMode(true);
-
-        const wrapper = createComponent();
-        wrapper.find('AnnotationPublishControl').props().onSave();
-
-        assert.calledWith(
-          fakeAnnotationsService.save,
-          wrapper.props().annotation
-        );
-      });
-
-      it('should show a "Saving" message when annotation is saving', () => {
-        setEditingMode(true);
-        fakeStore.isSavingAnnotation.returns(true);
-
-        const wrapper = createComponent();
-
-        assert.include(
-          wrapper.find('.annotation__actions').text(),
-          'Saving...'
-        );
-      });
-
-      it('should show an error message on failure', async () => {
-        setEditingMode(true);
-        fakeAnnotationsService.save.rejects();
-
-        const wrapper = createComponent();
-        wrapper.find('AnnotationPublishControl').props().onSave();
-
-        await waitFor(() => fakeToastMessenger.error.called);
-      });
-
-      describe('saving using shortcut-key combo', () => {
-        context('in editing mode with text or tag content populated', () => {
-          beforeEach(() => {
-            // Put into editing mode by presence of draft, and add some `text`
-            // so that the annotation is not seen as "empty"
-            const draft = fixtures.defaultDraft();
-            draft.text = 'bananas';
-            fakeStore.getDraft.returns(draft);
-          });
-
-          it('should save annotation if `CTRL+Enter` is typed', () => {
-            const wrapper = createComponent();
-
-            wrapper
-              .find('.annotation')
-              .simulate('keydown', { key: 'Enter', ctrlKey: true });
-
-            assert.calledWith(
-              fakeAnnotationsService.save,
-              wrapper.props().annotation
-            );
-          });
-
-          it('should save annotation if `META+Enter` is typed', () => {
-            const wrapper = createComponent();
-
-            wrapper
-              .find('.annotation')
-              .simulate('keydown', { key: 'Enter', metaKey: true });
-
-            assert.calledWith(
-              fakeAnnotationsService.save,
-              wrapper.props().annotation
-            );
-          });
-
-          it('should not save annotation if `META+g` is typed', () => {
-            // i.e. don't save on non-"Enter" keys
-            const wrapper = createComponent();
-
-            wrapper
-              .find('.annotation')
-              .simulate('keydown', { key: 'g', metaKey: true });
-
-            assert.notCalled(fakeAnnotationsService.save);
-          });
-        });
-
-        context('empty or not in editing mode', () => {
-          it('should not save annotation if not in editing mode', () => {
-            fakeStore.getDraft.returns(null);
-            const wrapper = createComponent();
-
-            wrapper
-              .find('.annotation')
-              .simulate('keydown', { key: 'Enter', metaKey: true });
-
-            assert.notCalled(fakeAnnotationsService.save);
-          });
-
-          it('should not save annotation if content is empty', () => {
-            fakeStore.getDraft.returns(fixtures.defaultDraft());
-            const wrapper = createComponent();
-
-            wrapper
-              .find('.annotation')
-              .simulate('keydown', { key: 'Enter', ctrlKey: true });
-
-            assert.notCalled(fakeAnnotationsService.save);
-          });
-        });
-      });
-    });
-  });
-
-  describe('license information', () => {
-    it('should show license information when editing shared annotations in public groups', () => {
-      fakeStore.getGroup.returns({ type: 'open' });
-      setEditingMode(true);
-
-      const wrapper = createComponent();
-
-      assert.isTrue(wrapper.find('AnnotationLicense').exists());
-    });
-
-    it('should not show license information when not editing', () => {
-      fakeStore.getGroup.returns({ type: 'open' });
-      setEditingMode(false);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('AnnotationLicense').exists());
-    });
-
-    it('should not show license information for annotations in private groups', () => {
-      fakeStore.getGroup.returns({ type: 'private' });
-      setEditingMode(true);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('AnnotationLicense').exists());
-    });
-
-    it('should not show license information for private annotations', () => {
-      const draft = fixtures.defaultDraft();
-      draft.isPrivate = true;
-      fakeStore.getGroup.returns({ type: 'open' });
-      fakeStore.getDraft.returns(draft);
-
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('AnnotationLicense').exists());
-    });
+    assert.include(wrapper.find('.annotation__actions').text(), 'Saving...');
   });
 
   describe('reply thread toggle button', () => {

@@ -14,7 +14,9 @@ describe('TagEditor', function () {
   let fakeTags = ['tag1', 'tag2'];
   let fakeTagsService;
   let fakeServiceUrl;
-  let fakeOnEditTags;
+  let fakeOnAddTag;
+  let fakeOnRemoveTag;
+  let fakeOnTagInput;
   let fakeIsIE11;
 
   function createComponent(props) {
@@ -26,7 +28,9 @@ describe('TagEditor', function () {
     return mount(
       <TagEditor
         // props
-        onEditTags={fakeOnEditTags}
+        onAddTag={fakeOnAddTag}
+        onRemoveTag={fakeOnRemoveTag}
+        onTagInput={fakeOnTagInput}
         tagList={fakeTags}
         // service props
         serviceUrl={fakeServiceUrl}
@@ -38,12 +42,13 @@ describe('TagEditor', function () {
   }
 
   beforeEach(function () {
-    fakeOnEditTags = sinon.stub();
+    fakeOnAddTag = sinon.stub().returns(true);
+    fakeOnRemoveTag = sinon.stub();
+    fakeOnTagInput = sinon.stub();
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeIsIE11 = sinon.stub().returns(false);
     fakeTagsService = {
       filter: sinon.stub().returns(['tag4', 'tag3']),
-      store: sinon.stub(),
     };
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -205,14 +210,10 @@ describe('TagEditor', function () {
     /**
      * Helper function to assert that a tag was correctly added
      */
-    const assertAddTagsSuccess = (wrapper, tagList) => {
-      // saves the suggested tags to the service
-      assert.calledWith(
-        fakeTagsService.store,
-        tagList.map(tag => ({ text: tag }))
-      );
-      // called the onEditTags callback prop
-      assert.isTrue(fakeOnEditTags.calledWith({ tags: tagList }));
+    const assertAddTagsSuccess = (wrapper, tag) => {
+      // called the onAddTags callback
+      assert.calledOnce(fakeOnAddTag);
+      assert.calledWith(fakeOnAddTag, tag);
       // hides the suggestions
       assert.equal(wrapper.find('AutocompleteList').prop('open'), false);
       // removes the selected index
@@ -222,18 +223,11 @@ describe('TagEditor', function () {
       // input element should have focus
       assert.equal(document.activeElement.nodeName, 'INPUT');
     };
-    /**
-     * Helper function to assert that a tag was correctly not added
-     */
-    const assertAddTagsFail = () => {
-      assert.isTrue(fakeTagsService.store.notCalled);
-      assert.isTrue(fakeOnEditTags.notCalled);
-    };
 
     it('adds a tag from the <input> field', () => {
       const wrapper = createComponent();
       selectOption(wrapper, 'tag3');
-      assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+      assertAddTagsSuccess(wrapper, 'tag3');
     });
 
     [
@@ -246,7 +240,7 @@ describe('TagEditor', function () {
         wrapper.find('input').instance().value = 'umbrella';
         typeInput(wrapper); // opens suggestion list
         keyAction[0](wrapper);
-        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'umbrella']);
+        assertAddTagsSuccess(wrapper, 'umbrella');
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
@@ -264,7 +258,7 @@ describe('TagEditor', function () {
         // suggestions: [tag3, tag4]
         navigateDown(wrapper);
         keyAction[0](wrapper);
-        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        assertAddTagsSuccess(wrapper, 'tag3');
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
@@ -288,25 +282,19 @@ describe('TagEditor', function () {
     });
 
     context('When using the "Enter" key', () => {
-      it('should not add a tag if the <input> is empty', () => {
+      it('should invoke addTag callback even if input is empty', () => {
         const wrapper = createComponent();
         wrapper.find('input').instance().value = '';
         selectOptionViaEnter(wrapper);
-        assertAddTagsFail();
+        assertAddTagsSuccess(wrapper, '');
       });
 
-      it('should not add a tag if the <input> value is only white space', () => {
+      it('should invoke addTag callback even if <input> value is only white space', () => {
         const wrapper = createComponent();
         wrapper.find('input').instance().value = '  ';
         selectOptionViaEnter(wrapper);
-        assertAddTagsFail();
-      });
-
-      it('should not add a tag if its a duplicate of one already in the list', () => {
-        const wrapper = createComponent();
-        wrapper.find('input').instance().value = 'tag1';
-        selectOptionViaEnter(wrapper);
-        assertAddTagsFail();
+        // Callback will be invoked with the _trimmed_ string
+        assertAddTagsSuccess(wrapper, '');
       });
     });
 
@@ -317,7 +305,7 @@ describe('TagEditor', function () {
         wrapper.find('input').instance().value = 'tag33';
         typeInput(wrapper);
         selectOptionViaTab(wrapper);
-        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag33']);
+        assertAddTagsSuccess(wrapper, 'tag33');
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
@@ -328,7 +316,7 @@ describe('TagEditor', function () {
         wrapper.find('input').instance().value = 't';
         typeInput(wrapper);
         selectOptionViaTab(wrapper);
-        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 't']);
+        assertAddTagsSuccess(wrapper, 't');
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
@@ -340,7 +328,7 @@ describe('TagEditor', function () {
         typeInput(wrapper);
         // suggestions: [tag3]
         selectOptionViaTab(wrapper);
-        assertAddTagsSuccess(wrapper, ['tag1', 'tag2', 'tag3']);
+        assertAddTagsSuccess(wrapper, 'tag3');
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
@@ -354,74 +342,73 @@ describe('TagEditor', function () {
         assert.equal(document.activeElement.nodeName, 'BODY');
       });
     });
-  });
 
-  describe('when removing tags', () => {
-    it('removes `tag1` when clicking its delete button', () => {
-      const wrapper = createComponent(); // note: initial tagList is ['tag1', 'tag2']
-      assert.equal(wrapper.find('.tag-editor__edit').length, 2);
-      wrapper
-        .find('button')
-        .at(0) // delete 'tag1'
-        .simulate('click');
+    describe('when removing tags', () => {
+      it('removes `tag1` when clicking its delete button', () => {
+        const wrapper = createComponent(); // note: initial tagList is ['tag1', 'tag2']
+        assert.equal(wrapper.find('.tag-editor__edit').length, 2);
+        wrapper
+          .find('button')
+          .at(0) // delete 'tag1'
+          .simulate('click');
 
-      // saves the suggested tags to the service (only 'tag2' should be passed)
-      assert.isTrue(fakeTagsService.store.calledWith([{ text: 'tag2' }]));
-      // called the onEditTags callback prop  (only 'tag2' should be passed)
-      assert.isTrue(fakeOnEditTags.calledWith({ tags: ['tag2'] }));
+        assert.calledWith(fakeOnRemoveTag, 'tag1');
+      });
     });
-  });
 
-  describe('navigating suggestions via keyboard', () => {
-    [true, false].forEach(ie11 => {
-      it('should set the initial `activeItem` value to -1 when opening suggestions', () => {
-        fakeIsIE11.returns(ie11);
-        const wrapper = createComponent();
-        wrapper.find('input').instance().value = 'non-empty';
-        typeInput(wrapper);
-        assert.equal(wrapper.find('AutocompleteList').prop('open'), true);
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
-      });
-      it('should increment the `activeItem` when pressing down circularly', () => {
-        fakeIsIE11.returns(ie11);
-        const wrapper = createComponent();
-        wrapper.find('input').instance().value = 'non-empty';
-        typeInput(wrapper);
-        // 2 suggestions: ['tag3', 'tag4'];
-        navigateDown(wrapper);
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
-        navigateDown(wrapper);
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
-        navigateDown(wrapper);
-        // back to unselected
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
-      });
+    describe('navigating suggestions via keyboard', () => {
+      [true, false].forEach(ie11 => {
+        it('should set the initial `activeItem` value to -1 when opening suggestions', () => {
+          fakeIsIE11.returns(ie11);
+          const wrapper = createComponent();
+          wrapper.find('input').instance().value = 'non-empty';
+          typeInput(wrapper);
+          assert.equal(wrapper.find('AutocompleteList').prop('open'), true);
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+        });
 
-      it('should decrement the `activeItem` when pressing up circularly', () => {
-        fakeIsIE11.returns(ie11);
-        const wrapper = createComponent();
-        wrapper.find('input').instance().value = 'non-empty';
-        typeInput(wrapper);
-        // 2 suggestions: ['tag3', 'tag4'];
-        navigateUp(wrapper);
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
-        navigateUp(wrapper);
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
-        navigateUp(wrapper);
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
-      });
-      it('should set `activeItem` to -1 when clearing the suggestions', () => {
-        fakeIsIE11.returns(ie11);
-        const wrapper = createComponent();
-        wrapper.find('input').instance().value = 'non-empty';
-        typeInput(wrapper);
-        navigateDown(wrapper);
-        // change to non-default value
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
-        // clear suggestions
-        wrapper.find('input').instance().value = '';
-        typeInput(wrapper);
-        assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+        it('should increment the `activeItem` when pressing down circularly', () => {
+          fakeIsIE11.returns(ie11);
+          const wrapper = createComponent();
+          wrapper.find('input').instance().value = 'non-empty';
+          typeInput(wrapper);
+          // 2 suggestions: ['tag3', 'tag4'];
+          navigateDown(wrapper);
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
+          navigateDown(wrapper);
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
+          navigateDown(wrapper);
+          // back to unselected
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+        });
+
+        it('should decrement the `activeItem` when pressing up circularly', () => {
+          fakeIsIE11.returns(ie11);
+          const wrapper = createComponent();
+          wrapper.find('input').instance().value = 'non-empty';
+          typeInput(wrapper);
+          // 2 suggestions: ['tag3', 'tag4'];
+          navigateUp(wrapper);
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 1);
+          navigateUp(wrapper);
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
+          navigateUp(wrapper);
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+        });
+
+        it('should set `activeItem` to -1 when clearing the suggestions', () => {
+          fakeIsIE11.returns(ie11);
+          const wrapper = createComponent();
+          wrapper.find('input').instance().value = 'non-empty';
+          typeInput(wrapper);
+          navigateDown(wrapper);
+          // change to non-default value
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), 0);
+          // clear suggestions
+          wrapper.find('input').instance().value = '';
+          typeInput(wrapper);
+          assert.equal(wrapper.find('AutocompleteList').prop('activeItem'), -1);
+        });
       });
     });
   });
