@@ -2,17 +2,14 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import useStore from '../store/use-store';
 import { isReply, quote } from '../util/annotation-metadata';
-import { isShared } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
 import AnnotationActionBar from './annotation-action-bar';
 import AnnotationBody from './annotation-body';
+import AnnotationEditor from './annotation-editor';
 import AnnotationHeader from './annotation-header';
-import AnnotationLicense from './annotation-license';
-import AnnotationPublishControl from './annotation-publish-control';
 import AnnotationQuote from './annotation-quote';
 import Button from './button';
 
@@ -28,7 +25,6 @@ import Button from './button';
  * @prop {boolean} showDocumentInfo - Should extended document info be rendered (e.g. in non-sidebar contexts)?
  * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
  * @prop {Object} annotationsService - Injected service
- * @prop {Object} toastMessenger - Injected service
  */
 
 /**
@@ -42,9 +38,7 @@ function Annotation({
   replyCount,
   showDocumentInfo,
   threadIsCollapsed,
-  toastMessenger,
 }) {
-  const createDraft = useStore(store => store.createDraft);
   const isFocused = useStore(store =>
     store.isAnnotationFocused(annotation.$tag)
   );
@@ -52,17 +46,12 @@ function Annotation({
 
   // An annotation will have a draft if it is being edited
   const draft = useStore(store => store.getDraft(annotation));
-  const group = useStore(store => store.getGroup(annotation.group));
   const userid = useStore(store => store.profile().userid);
   const isSaving = useStore(store => store.isSavingAnnotation(annotation));
 
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
-  const isPrivate = draft ? draft.isPrivate : !isShared(annotation.permissions);
-  const tags = draft ? draft.tags : annotation.tags;
-  const text = draft ? draft.text : annotation.text;
 
   const hasQuote = !!quote(annotation);
-  const isEmpty = !text && !tags.length;
 
   const isEditing = !!draft && !isSaving;
 
@@ -70,40 +59,9 @@ function Annotation({
   const toggleText = `${toggleAction} (${replyCount})`;
 
   const shouldShowActions = !isSaving && !isEditing;
-  const shouldShowLicense =
-    isEditing && !isPrivate && group && group.type !== 'private';
   const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
 
-  const onEditTags = ({ tags }) => {
-    createDraft(annotation, { ...draft, tags });
-  };
-
-  const onEditText = ({ text }) => {
-    createDraft(annotation, { ...draft, text });
-  };
-
   const onReply = () => annotationsService.reply(annotation, userid);
-
-  const onSave = async () => {
-    try {
-      await annotationsService.save(annotation);
-    } catch (err) {
-      toastMessenger.error('Saving annotation failed');
-    }
-  };
-
-  // Allow saving of annotation by pressing CMD/CTRL-Enter
-  const onKeyDown = event => {
-    const key = normalizeKeyName(event.key);
-    if (isEmpty || !isEditing) {
-      return;
-    }
-    if ((event.metaKey || event.ctrlKey) && key === 'Enter') {
-      event.stopPropagation();
-      event.preventDefault();
-      onSave();
-    }
-  };
 
   const onToggleReplies = () =>
     // nb. We assume the annotation has an ID here because it is not possible
@@ -111,14 +69,12 @@ function Annotation({
     setExpanded(/** @type {string} */ (annotation.id), !!threadIsCollapsed);
 
   return (
-    /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */
     <article
       className={classnames('annotation', {
         'annotation--reply': isReply(annotation),
         'is-collapsed': threadIsCollapsed,
         'is-focused': isFocused,
       })}
-      onKeyDown={onKeyDown}
     >
       <AnnotationHeader
         annotation={annotation}
@@ -132,27 +88,11 @@ function Annotation({
         <AnnotationQuote annotation={annotation} isFocused={isFocused} />
       )}
 
-      {!isCollapsedReply && (
-        <AnnotationBody
-          annotation={annotation}
-          isEditing={isEditing}
-          onEditTags={onEditTags}
-          onEditText={onEditText}
-          tags={tags}
-          text={text}
-        />
+      {!isCollapsedReply && !isEditing && (
+        <AnnotationBody annotation={annotation} />
       )}
 
-      {isEditing && (
-        <div className="annotation__form-actions u-layout-row">
-          <AnnotationPublishControl
-            annotation={annotation}
-            isDisabled={isEmpty}
-            onSave={onSave}
-          />
-        </div>
-      )}
-      {shouldShowLicense && <AnnotationLicense />}
+      {isEditing && <AnnotationEditor annotation={annotation} />}
 
       {!isCollapsedReply && (
         <footer className="annotation__footer">
@@ -186,9 +126,8 @@ Annotation.propTypes = {
   showDocumentInfo: propTypes.bool.isRequired,
   threadIsCollapsed: propTypes.bool.isRequired,
   annotationsService: propTypes.object.isRequired,
-  toastMessenger: propTypes.object.isRequired,
 };
 
-Annotation.injectedProps = ['annotationsService', 'toastMessenger'];
+Annotation.injectedProps = ['annotationsService'];
 
 export default withServices(Annotation);

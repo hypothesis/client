@@ -17,9 +17,11 @@ let tagEditorIdCounter = 0;
 
 /**
  * @typedef TagEditorProps
- * @prop {(a: Object<'tags', string[]>) => any} onEditTags - Callback that saves the tag list.
- * @prop {string[]} tagList - The list of editable tags as strings.
- * @prop {Object} tags - Services
+ * @prop {(tag: string) => boolean} onAddTag - Callback to add a tag to the annotation
+ * @prop {(tag: string) => boolean} onRemoveTag - Callback to remove a tag from the annotation
+ * @prop {(tag: string) => any} onTagInput - Callback when inputted tag text changes
+ * @prop {string[]} tagList - The list of tags for the annotation under edit
+ * @prop {Object} tags - Injected service
  */
 
 /**
@@ -30,7 +32,13 @@ let tagEditorIdCounter = 0;
  *
  * @param {TagEditorProps} props
  */
-function TagEditor({ onEditTags, tags: tagsService, tagList }) {
+function TagEditor({
+  onAddTag,
+  onRemoveTag,
+  onTagInput,
+  tagList,
+  tags: tagsService,
+}) {
   const inputEl = useRef(/** @type {HTMLInputElement|null} */ (null));
   const [suggestions, setSuggestions] = useState(/** @type {string[]} */ ([]));
   const [activeItem, setActiveItem] = useState(-1); // -1 is unselected
@@ -48,6 +56,13 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   });
 
   const ie11 = useMemo(() => isIE11(), []);
+
+  /**
+   * Retrieve the current trimmed text value of the tag <input>
+   */
+  const pendingTag = () => inputEl.current.value.trim();
+  const hasPendingTag = () => pendingTag() && pendingTag().length > 0;
+  const clearPendingTag = () => (inputEl.current.value = '');
 
   /**
    * Helper function that returns a list of suggestions less any
@@ -72,13 +87,12 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * reset the activeItem and open the AutocompleteList
    */
   const updateSuggestions = () => {
-    const value = inputEl.current.value.trim();
-    if (value === '') {
+    if (!hasPendingTag()) {
       // If there is no input, just hide the suggestions
       setSuggestionsListOpen(false);
     } else {
       // Call filter() with a query value to return all matching suggestions.
-      const suggestions = tagsService.filter(value);
+      const suggestions = tagsService.filter(pendingTag());
       // Remove any repeated suggestions that are already tags
       // and set those to state.
       setSuggestions(removeDuplicates(suggestions, tagList));
@@ -88,51 +102,19 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
   };
 
   /**
-   * Handle changes to this annotation's tags
-   *
-   * @param {string[]} tagList
-   */
-  const updateTags = tagList => {
-    // update suggested tags list via service
-    tagsService.store(tagList.map(tag => ({ text: tag })));
-    onEditTags({ tags: tagList });
-  };
-
-  /**
-   * Remove a tag from this annotation.
-   *
-   * @param {string} tag
-   */
-  const removeTag = tag => {
-    const newTagList = [...tagList]; // make a copy
-    const index = newTagList.indexOf(tag);
-    newTagList.splice(index, 1);
-    updateTags(newTagList);
-  };
-
-  /**
-   * Adds a tag to the annotation equal to the value of the input field
-   * and then clears out the suggestions list and the input field.
+   * Invokes callback to add tag. If the tag was added, close the suggestions
+   * list, clear the field content and maintain focus.
    *
    * @param {string} newTag
    */
   const addTag = newTag => {
-    const value = newTag.trim();
-    if (value.length === 0) {
-      // don't add an empty tag
-      return;
-    }
-    if (tagList.indexOf(value) >= 0) {
-      // don't add duplicate tag
-      return;
-    }
-    updateTags([...tagList, value]);
-    setSuggestionsListOpen(false);
-    setActiveItem(-1);
+    if (onAddTag(newTag)) {
+      setSuggestionsListOpen(false);
+      setActiveItem(-1);
 
-    const input = inputEl.current;
-    input.value = '';
-    input.focus();
+      clearPendingTag();
+      inputEl.current.focus();
+    }
   };
 
   /**
@@ -141,6 +123,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * @param {import("preact").JSX.TargetedEvent<HTMLInputElement, InputEvent>} e
    */
   const handleOnInput = e => {
+    onTagInput?.(pendingTag());
     if (
       e.inputType === 'insertText' ||
       e.inputType === 'deleteContentBackward' ||
@@ -166,7 +149,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * Opens the AutocompleteList on focus if there is a value in the input
    */
   const handleFocus = () => {
-    if (inputEl.current.value.trim().length) {
+    if (hasPendingTag()) {
       setSuggestionsListOpen(true);
     }
   };
@@ -212,7 +195,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
         break;
       case 'Escape':
         // Clear any entered text, but retain focus
-        inputEl.current.value = '';
+        clearPendingTag();
         e.preventDefault();
         break;
       case 'Enter':
@@ -220,7 +203,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
         // Commit a tag
         if (activeItem === -1) {
           // nothing selected, just add the typed text
-          addTag(/** @type {HTMLInputElement} */ (inputEl.current).value);
+          addTag(pendingTag());
         } else {
           // Add the selected tag
           addTag(suggestions[activeItem]);
@@ -230,7 +213,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       case 'Tab':
         // Commit a tag, or tab out of the field if it is empty (default browser
         // behavior)
-        if (inputEl.current.value.trim() === '') {
+        if (!hasPendingTag()) {
           // If the tag field is empty, allow `Tab` to have its default
           // behavior: continue to the next element in tab order
           break;
@@ -245,7 +228,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
           addTag(suggestions[0]);
         } else {
           // Commit the tag as typed in the field
-          addTag(/** @type {HTMLInputElement} */ (inputEl.current).value);
+          addTag(pendingTag());
         }
         // Retain focus
         e.preventDefault();
@@ -262,7 +245,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
    * @return {JSXElement} - Formatted tag for use in list
    */
   const formatSuggestItem = item => {
-    const curVal = inputEl.current.value.trim();
+    const curVal = pendingTag();
     const prefix = item.slice(0, item.indexOf(curVal));
     const suffix = item.slice(item.indexOf(curVal) + curVal.length);
 
@@ -283,7 +266,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
       : '';
 
   return (
-    <section className="tag-editor">
+    <div className="tag-editor">
       <ul
         className="tag-editor__tags"
         aria-label="Suggested tags for annotation"
@@ -300,7 +283,7 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
               </span>
               <button
                 onClick={() => {
-                  removeTag(tag);
+                  onRemoveTag(tag);
                 }}
                 aria-label={`Remove Tag: ${tag}`}
                 title={`Remove Tag: ${tag}`}
@@ -348,12 +331,14 @@ function TagEditor({ onEditTags, tags: tagsService, tagList }) {
           activeItem={activeItem}
         />
       </span>
-    </section>
+    </div>
   );
 }
 
 TagEditor.propTypes = {
-  onEditTags: propTypes.func.isRequired,
+  onAddTag: propTypes.func.isRequired,
+  onRemoveTag: propTypes.func.isRequired,
+  onTagInput: propTypes.func,
   tagList: propTypes.array.isRequired,
   tags: propTypes.object.isRequired,
 };

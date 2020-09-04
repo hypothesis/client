@@ -11,17 +11,14 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('AnnotationBody', () => {
+  let fakeAnnotation;
   let fakeApplyTheme;
   let fakeSettings;
 
   function createBody(props = {}) {
     return mount(
       <AnnotationBody
-        annotation={fixtures.defaultAnnotation()}
-        isEditing={false}
-        onEditTags={() => null}
-        tags={[]}
-        text="test comment"
+        annotation={fakeAnnotation}
         settings={fakeSettings}
         {...props}
       />
@@ -29,6 +26,9 @@ describe('AnnotationBody', () => {
   }
 
   beforeEach(() => {
+    fakeAnnotation = fixtures.defaultAnnotation();
+    fakeAnnotation.text = 'some text here';
+    fakeAnnotation.tags = ['eenie', 'minie'];
     fakeApplyTheme = sinon.stub();
     fakeSettings = {};
 
@@ -42,24 +42,12 @@ describe('AnnotationBody', () => {
     $imports.$restore();
   });
 
-  it('displays the body if `isEditing` is false', () => {
-    const wrapper = createBody({ isEditing: false });
-    assert.isFalse(wrapper.exists('MarkdownEditor'));
-    assert.isTrue(wrapper.exists('MarkdownView'));
-  });
-
-  it('displays an editor if `isEditing` is true', () => {
-    const wrapper = createBody({ isEditing: true });
-    assert.isTrue(wrapper.exists('MarkdownEditor'));
-    assert.isFalse(wrapper.exists('MarkdownView'));
-  });
-
   it('does not render controls to expand/collapse the excerpt if it is not collapsible', () => {
     const wrapper = createBody();
 
     // By default, `isCollapsible` is `false` until changed by `Excerpt`,
     // so the expand/collapse button will not render
-    assert.notOk(wrapper.find('Button').exists());
+    assert.isFalse(wrapper.find('Button').exists());
   });
 
   it('renders controls to expand/collapse the excerpt if it is collapsible', () => {
@@ -109,40 +97,30 @@ describe('AnnotationBody', () => {
   });
 
   describe('tag list and editor', () => {
-    it('renders a list of tags if not editing and annotation has tags', () => {
-      const wrapper = createBody({ isEditing: false, tags: ['foo', 'bar'] });
+    it('renders a list of tags if annotation has tags', () => {
+      const wrapper = createBody();
 
       assert.isTrue(wrapper.find('TagList').exists());
     });
 
     it('does not render a tag list if annotation has no tags', () => {
-      const wrapper = createBody({ isEditing: false, tags: [] });
+      const wrapper = createBody({ annotation: fixtures.defaultAnnotation() });
 
       assert.isFalse(wrapper.find('TagList').exists());
     });
 
-    it('renders a tag editor if annotation is being edited', () => {
-      const wrapper = createBody({ isEditing: true, tags: ['foo', 'bar'] });
+    it('applies theme', () => {
+      const textStyle = { fontFamily: 'serif' };
+      fakeApplyTheme
+        .withArgs(['annotationFontFamily'], fakeSettings)
+        .returns(textStyle);
 
-      assert.isTrue(wrapper.find('TagEditor').exists());
-      assert.isFalse(wrapper.find('TagList').exists());
+      const wrapper = createBody();
+      assert.deepEqual(
+        wrapper.find('MarkdownView').prop('textStyle'),
+        textStyle
+      );
     });
-  });
-
-  it('applies theme', () => {
-    const textStyle = { fontFamily: 'serif' };
-    fakeApplyTheme
-      .withArgs(['annotationFontFamily'], fakeSettings)
-      .returns(textStyle);
-
-    const wrapper = createBody();
-    assert.deepEqual(wrapper.find('MarkdownView').prop('textStyle'), textStyle);
-
-    wrapper.setProps({ isEditing: true });
-    assert.deepEqual(
-      wrapper.find('MarkdownEditor').prop('textStyle'),
-      textStyle
-    );
   });
 
   it(
@@ -153,14 +131,14 @@ describe('AnnotationBody', () => {
       },
       {
         name: 'when annotation has tags (tag list)',
-        content: () => createBody({ isEditing: false, tags: ['foo', 'bar'] }),
+        content: () => {
+          const annotation = fixtures.defaultAnnotation();
+          annotation.tags = ['foo', 'bar'];
+          return createBody({ annotation });
+        },
       },
       {
-        name: 'when annotation is being edited and has tags',
-        content: () => createBody({ isEditing: true, tags: ['foo', 'bar'] }),
-      },
-      {
-        name: 'when expandable and not editing',
+        name: 'when expandable',
         content: () => {
           const wrapper = createBody();
           act(() => {

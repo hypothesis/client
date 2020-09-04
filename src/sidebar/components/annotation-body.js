@@ -8,9 +8,7 @@ import { applyTheme } from '../util/theme';
 
 import Button from './button';
 import Excerpt from './excerpt';
-import MarkdownEditor from './markdown-editor';
 import MarkdownView from './markdown-view';
-import TagEditor from './tag-editor';
 import TagList from './tag-list';
 
 /**
@@ -21,13 +19,6 @@ import TagList from './tag-list';
 /**
  * @typedef AnnotationBodyProps
  * @prop {Annotation} annotation - The annotation in question
- * @prop {boolean} [isEditing] - Whether to display the body in edit mode (if true) or view mode.
- * @prop {(a: Object<'tags', string[]>) => void} [onEditTags] - Callback invoked when the user edits tags.
- * @prop {(a?: Object<'text', string>) => void} [onEditText] - Callback invoked when the user edits the content of the annotation body.
- * @prop {string[]} tags
- * @prop {string} text -
- *     The markdown annotation body, which is either rendered as HTML (if `isEditing`
- *     is false) or displayed in a text area otherwise.
  * @prop {MergedConfig} settings
  */
 
@@ -36,15 +27,7 @@ import TagList from './tag-list';
  *
  * @param {AnnotationBodyProps} props
  */
-function AnnotationBody({
-  annotation,
-  isEditing,
-  onEditTags,
-  onEditText,
-  tags,
-  text,
-  settings,
-}) {
+function AnnotationBody({ annotation, settings }) {
   // Should the text content of `Excerpt` be rendered in a collapsed state,
   // assuming it is collapsible (exceeds allotted collapsed space)?
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -54,8 +37,10 @@ function AnnotationBody({
   const [isCollapsible, setIsCollapsible] = useState(false);
 
   const toggleText = isCollapsed ? 'More' : 'Less';
-  const showExcerpt = !isEditing && text.length > 0;
-  const showTagList = !isEditing && tags.length > 0;
+  const tags = annotation.tags;
+  const text = annotation.text;
+  const showExcerpt = text.length > 0;
+  const showTagList = tags.length > 0;
 
   const textStyle = applyTheme(['annotationFontFamily'], settings);
 
@@ -80,15 +65,7 @@ function AnnotationBody({
           />
         </Excerpt>
       )}
-      {isEditing && (
-        <MarkdownEditor
-          textStyle={textStyle}
-          label="Annotation body"
-          text={text}
-          onEditText={onEditText}
-        />
-      )}
-      {isCollapsible && !isEditing && (
+      {isCollapsible && (
         <div className="annotation-body__collapse-toggle">
           {/* @ts-ignore - TODO: Button props need to be fixed */}
           <Button
@@ -104,18 +81,12 @@ function AnnotationBody({
         </div>
       )}
       {showTagList && <TagList annotation={annotation} tags={tags} />}
-      {isEditing && <TagEditor onEditTags={onEditTags} tagList={tags} />}
     </div>
   );
 }
 
 AnnotationBody.propTypes = {
   annotation: propTypes.object.isRequired,
-  isEditing: propTypes.bool,
-  onEditTags: propTypes.func,
-  onEditText: propTypes.func,
-  tags: propTypes.array.isRequired,
-  text: propTypes.string,
   settings: propTypes.object,
 };
 

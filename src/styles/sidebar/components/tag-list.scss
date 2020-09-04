@@ -5,7 +5,6 @@
 .tag-list {
   @include layout.row;
   flex-wrap: wrap;
-  margin: 1em 0;
 
   &__item {
     @include utils.border;

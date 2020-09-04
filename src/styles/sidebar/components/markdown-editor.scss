@@ -4,6 +4,13 @@
 @use "../../mixins/utils";
 @use "../../variables" as var;
 
+.markdown-editor {
+  /* Reset line-height to avoid having extra gaps/vertical spacing in the
+     element's container
+  */
+  line-height: 1;
+}
+
 .markdown-editor__toolbar {
   @include layout.row;
   // Toolbar buttons wrap on non-touch devices if they don't fit. We don't use
