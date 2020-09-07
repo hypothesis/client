@@ -31,18 +31,18 @@ export default class Host extends Guest {
       }
     }
 
-    // Make a copy of all config settings except `config.sidebarAppUrl`, the app base URL,
-    // and `config.pluginClasses`
+    // Make a copy of the config for use by the sidebar app with several
+    // annotator-only properties removed. nb. We don't currently strip all the
+    // annotator-only properties here. That's OK because validation / filtering
+    // happens in the sidebar app itself. It just results in unnecessary content
+    // in the sidebar iframe's URL string.
+    const sidebarConfig = { ...config };
+    ['sidebarAppUrl', 'pluginClasses'].forEach(
+      key => delete sidebarConfig[key]
+    );
+
     const configParam =
-      'config=' +
-      encodeURIComponent(
-        JSON.stringify(
-          Object.assign({}, config, {
-            sidebarAppUrl: undefined,
-            pluginClasses: undefined,
-          })
-        )
-      );
+      'config=' + encodeURIComponent(JSON.stringify(sidebarConfig));
 
     const sidebarAppSrc = config.sidebarAppUrl + '#' + configParam;
 

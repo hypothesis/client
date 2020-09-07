@@ -97,18 +97,23 @@ describe('Host', () => {
       host.publish('panelReady');
     });
 
+    function getConfigString(host) {
+      return host.frame[0].children[0].src;
+    }
+
+    function configFragment(config) {
+      return '#config=' + encodeURIComponent(JSON.stringify(config));
+    }
+
     it('passes config to the sidebar iframe', () => {
       const appURL = new URL(
         '/base/annotator/test/empty.html',
         window.location.href
       );
       const host = createHost({ annotations: '1234' });
-      const configStr = encodeURIComponent(
-        JSON.stringify({ annotations: '1234' })
-      );
       assert.equal(
-        host.frame[0].children[0].src,
-        appURL + '#config=' + configStr
+        getConfigString(host),
+        appURL + configFragment({ annotations: '1234' })
       );
     });
 
