@@ -6,8 +6,6 @@ const Guest = require('./guest');
 
 export default class Host extends Guest {
   constructor(element, config) {
-    super(element, config);
-
     // Some config settings are not JSON-stringifiable (e.g. JavaScript
     // functions) and will be omitted when the config is JSON-stringified.
     // Add a JSON-stringifiable option for each of these so that the sidebar can
@@ -65,19 +63,31 @@ export default class Host extends Guest {
       );
     }
 
+    let externalFrame;
+    let frame;
+
     if (externalContainer) {
-      this.externalFrame = $(externalContainer);
+      externalFrame = $(externalContainer);
     } else {
-      this.frame = $('<div></div>')
+      frame = $('<div></div>')
         .css('display', 'none')
         .addClass('annotator-frame annotator-outer');
 
       if (config.theme === 'clean') {
-        this.frame.addClass('annotator-frame--drop-shadow-enabled');
+        frame.addClass('annotator-frame--drop-shadow-enabled');
       }
 
-      this.frame.appendTo(element);
+      frame.appendTo(element);
     }
+
+    // FIXME: We have to call the parent constructor here instead of at the top
+    // of the function because it triggers plugin construction and the BucketBar
+    // plugin constructor in turn assumes that the `.annotator-frame` element is
+    // already in the DOM.
+    super(element, config);
+
+    this.externalFrame = externalFrame;
+    this.frame = frame;
 
     app.appendTo(this.frame || this.externalFrame);
 
