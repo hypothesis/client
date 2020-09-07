@@ -6,6 +6,8 @@ const Guest = require('./guest');
 
 export default class Host extends Guest {
   constructor(element, config) {
+    super(element, config);
+
     // Some config settings are not JSON-stringifiable (e.g. JavaScript
     // functions) and will be omitted when the config is JSON-stringified.
     // Add a JSON-stringifiable option for each of these so that the sidebar can
@@ -62,7 +64,6 @@ export default class Host extends Guest {
         config.externalContainerSelector
       );
     }
-    super(...arguments);
 
     if (externalContainer) {
       this.externalFrame = $(externalContainer);
