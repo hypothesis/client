@@ -40,13 +40,13 @@ describe('Host', () => {
   describe('widget visibility', () => {
     it('starts hidden', () => {
       const host = createHost();
-      assert.equal(host.frame.css('display'), 'none');
+      assert.equal(host.frame.style.display, 'none');
     });
 
     it('becomes visible when the "panelReady" event fires', () => {
       const host = createHost();
       host.publish('panelReady');
-      assert.equal(host.frame.css('display'), '');
+      assert.equal(host.frame.style.display, '');
     });
   });
 
@@ -98,7 +98,7 @@ describe('Host', () => {
     });
 
     function getConfigString(host) {
-      return host.frame[0].children[0].src;
+      return host.frame.children[0].src;
     }
 
     function configFragment(config) {
@@ -120,7 +120,7 @@ describe('Host', () => {
     it('adds drop shadow if the clean theme is enabled', () => {
       const host = createHost({ theme: 'clean' });
       assert.isTrue(
-        host.frame.hasClass('annotator-frame--drop-shadow-enabled')
+        host.frame.classList.contains('annotator-frame--drop-shadow-enabled')
       );
     });
   });

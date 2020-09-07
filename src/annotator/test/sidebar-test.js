@@ -276,8 +276,10 @@ describe('Sidebar', () => {
       it('disables pointer events and transitions on the widget', () => {
         sidebar._onPan({ type: 'panstart' });
 
-        assert.isTrue(sidebar.frame.hasClass('annotator-no-transition'));
-        assert.equal(sidebar.frame.css('pointer-events'), 'none');
+        assert.isTrue(
+          sidebar.frame.classList.contains('annotator-no-transition')
+        );
+        assert.equal(sidebar.frame.style.pointerEvents, 'none');
       });
 
       it('captures the left margin as the gesture initial state', () => {
@@ -293,8 +295,10 @@ describe('Sidebar', () => {
       it('enables pointer events and transitions on the widget', () => {
         sidebar._gestureState = { final: 0 };
         sidebar._onPan({ type: 'panend' });
-        assert.isFalse(sidebar.frame.hasClass('annotator-no-transition'));
-        assert.equal(sidebar.frame.css('pointer-events'), '');
+        assert.isFalse(
+          sidebar.frame.classList.contains('annotator-no-transition')
+        );
+        assert.equal(sidebar.frame.style.pointerEvents, '');
       });
 
       it('calls `show` if the widget is fully visible', () => {
@@ -379,7 +383,7 @@ describe('Sidebar', () => {
     it('the sidebar is destroyed and the frame is detached', () => {
       sidebar.destroy();
       assert.called(fakeCrossFrame.destroy);
-      assert.equal(sidebar.frame[0].parentElement, null);
+      assert.equal(sidebar.frame.parentElement, null);
     });
   });
 
@@ -472,7 +476,7 @@ describe('Sidebar', () => {
         // remove info about call that happens on creation of sidebar
         layoutChangeHandlerSpy.reset();
 
-        frame = sidebar.frame[0];
+        frame = sidebar.frame;
         Object.assign(frame.style, {
           display: 'block',
           width: DEFAULT_WIDTH + 'px',
@@ -603,7 +607,7 @@ describe('Sidebar', () => {
     it('uses the configured external container as the frame', () => {
       assert.equal(sidebar.frame, undefined);
       assert.isDefined(sidebar.externalFrame);
-      assert.equal(sidebar.externalFrame[0], externalFrame);
+      assert.equal(sidebar.externalFrame, externalFrame);
       assert.equal(externalFrame.childNodes.length, 1);
     });
   });

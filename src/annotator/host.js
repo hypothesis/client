@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 // TODO - Convert this to an ES import once the `Guest` class is converted to JS.
 // @ts-expect-error
 const Guest = require('./guest');
@@ -44,15 +42,15 @@ export default class Host extends Guest {
 
     const sidebarAppSrc = config.sidebarAppUrl + '#' + configParam;
 
-    // Create the iframe
-    const app = $('<iframe></iframe>')
-      .attr('name', 'hyp_sidebar_frame')
-      // enable media in annotations to be shown fullscreen
-      .attr('allowfullscreen', '')
-      .attr('seamless', '')
-      .attr('src', sidebarAppSrc)
-      .attr('title', 'Hypothesis annotation viewer')
-      .addClass('h-sidebar-iframe');
+    // Create the sidebar iframe
+    const sidebarFrame = document.createElement('iframe');
+    sidebarFrame.setAttribute('name', 'hyp_sidebar_frame');
+    // Enable media in annotations to be shown fullscreen
+    sidebarFrame.setAttribute('allowfullscreen', '');
+    sidebarFrame.setAttribute('seamless', '');
+    sidebarFrame.src = sidebarAppSrc;
+    sidebarFrame.title = 'Hypothesis annotation viewer';
+    sidebarFrame.className = 'h-sidebar-iframe';
 
     let externalContainer = null;
 
@@ -67,17 +65,17 @@ export default class Host extends Guest {
     let frame;
 
     if (externalContainer) {
-      externalFrame = $(externalContainer);
+      externalFrame = externalContainer;
     } else {
-      frame = $('<div></div>')
-        .css('display', 'none')
-        .addClass('annotator-frame annotator-outer');
+      frame = document.createElement('div');
+      frame.style.display = 'none';
+      frame.className = 'annotator-frame annotator-outer';
 
       if (config.theme === 'clean') {
-        frame.addClass('annotator-frame--drop-shadow-enabled');
+        frame.classList.add('annotator-frame--drop-shadow-enabled');
       }
 
-      frame.appendTo(element);
+      element.appendChild(frame);
     }
 
     // FIXME: We have to call the parent constructor here instead of at the top
@@ -88,12 +86,13 @@ export default class Host extends Guest {
 
     this.externalFrame = externalFrame;
     this.frame = frame;
-
-    app.appendTo(this.frame || this.externalFrame);
+    (frame || externalFrame).appendChild(sidebarFrame);
 
     this.on('panelReady', () => {
       // Show the UI
-      this.frame?.css('display', '');
+      if (this.frame) {
+        this.frame.style.display = '';
+      }
     });
 
     this.on('beforeAnnotationCreated', annotation => {
@@ -101,7 +100,7 @@ export default class Host extends Guest {
       // the sidebar so that the text editor can be focused as
       // soon as the annotation card appears
       if (!annotation.$highlight) {
-        app[0].contentWindow.focus();
+        /** @type {Window} */ (sidebarFrame.contentWindow).focus();
       }
     });
   }

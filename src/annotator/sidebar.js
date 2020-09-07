@@ -150,12 +150,15 @@ export default class Sidebar extends Host {
     this.renderFrame = requestAnimationFrame(() => {
       this.renderFrame = null;
 
-      if (this._gestureState.final !== this._gestureState.initial) {
+      if (
+        this._gestureState.final !== this._gestureState.initial &&
+        this.frame
+      ) {
         const margin = /** @type {number} */ (this._gestureState.final);
         const width = -margin;
-        this.frame.css('margin-left', `${margin}px`);
+        this.frame.style.marginLeft = `${margin}px`;
         if (width >= MIN_RESIZE) {
-          this.frame.css('width', `${width}px`);
+          this.frame.style.width = `${width}px`;
         }
         this._notifyOfLayoutChange();
       }
@@ -181,8 +184,8 @@ export default class Sidebar extends Host {
 
     const toolbarWidth = (this.frame && this.toolbar.getWidth()) || 0;
     const frame = this.frame || this.externalFrame;
-    const rect = frame[0].getBoundingClientRect();
-    const computedStyle = window.getComputedStyle(frame[0]);
+    const rect = frame.getBoundingClientRect();
+    const computedStyle = window.getComputedStyle(frame);
     const width = parseInt(computedStyle.width);
     const leftMargin = parseInt(computedStyle.marginLeft);
 
@@ -219,7 +222,8 @@ export default class Sidebar extends Host {
   }
 
   _onPan(event) {
-    if (!this.frame) {
+    const frame = this.frame;
+    if (!frame) {
       return;
     }
 
@@ -228,21 +232,21 @@ export default class Sidebar extends Host {
         this._resetGestureState();
 
         // Disable animated transition of sidebar position
-        this.frame.addClass('annotator-no-transition');
+        frame.classList.add('annotator-no-transition');
 
         // Disable pointer events on the iframe.
-        this.frame.css('pointer-events', 'none');
+        frame.style.pointerEvents = 'none';
 
         this._gestureState.initial = parseInt(
-          getComputedStyle(this.frame[0]).marginLeft
+          getComputedStyle(frame).marginLeft
         );
 
         break;
       case 'panend':
-        this.frame.removeClass('annotator-no-transition');
+        frame.classList.remove('annotator-no-transition');
 
         // Re-enable pointer events on the iframe.
-        this.frame.css('pointer-events', '');
+        frame.style.pointerEvents = '';
 
         // Snap open or closed.
         if (
@@ -274,8 +278,9 @@ export default class Sidebar extends Host {
     this.crossframe.call('sidebarOpened');
 
     if (this.frame) {
-      this.frame.css('margin-left', `${-1 * this.frame.width()}px`);
-      this.frame.removeClass('annotator-collapsed');
+      const width = this.frame.getBoundingClientRect().width;
+      this.frame.style.marginLeft = `${-1 * width}px`;
+      this.frame.classList.remove('annotator-collapsed');
     }
 
     this.toolbar.sidebarOpen = true;
@@ -289,8 +294,8 @@ export default class Sidebar extends Host {
 
   hide() {
     if (this.frame) {
-      this.frame.css('margin-left', '');
-      this.frame.addClass('annotator-collapsed');
+      this.frame.style.marginLeft = '';
+      this.frame.classList.add('annotator-collapsed');
     }
 
     this.toolbar.sidebarOpen = false;
@@ -304,7 +309,7 @@ export default class Sidebar extends Host {
 
   isOpen() {
     if (this.frame) {
-      return !this.frame.hasClass('annotator-collapsed');
+      return !this.frame.classList.contains('annotator-collapsed');
     } else {
       // Assume an external frame is always open.
       return true;
