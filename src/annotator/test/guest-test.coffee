@@ -337,24 +337,14 @@ describe 'Guest', ->
       fakeSidebarFrame?.remove()
 
     it 'hides sidebar when the user taps or clicks in the page', ->
-
       for event in ['click', 'touchstart']
-        sandbox.spy(guest, methods[event])
-
         rootElement.dispatchEvent(new Event(event))
-
-        assert.called(guest[methods[event]])
         assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar')
 
     it 'does not hide sidebar if configured not to close sidebar on document click', ->
-
       for event in ['click', 'touchstart']
-        sandbox.spy(guest, methods[event])
         guest.closeSidebarOnDocumentClick = false
-
         rootElement.dispatchEvent(new Event(event))
-
-        assert.called(guest[methods[event]])
         assert.notCalled(guest.plugins.CrossFrame.call)
 
     it 'does not hide sidebar if event occurs inside annotator UI', ->
@@ -363,11 +353,7 @@ describe 'Guest', ->
       rootElement.appendChild(fakeSidebarFrame)
 
       for event in ['click', 'touchstart']
-        sandbox.spy(guest, methods[event])
-
         fakeSidebarFrame.dispatchEvent(new Event(event, { bubbles: true }))
-
-        assert.called(guest[methods[event]])
         assert.notCalled(guest.plugins.CrossFrame.call)
 
 
