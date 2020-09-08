@@ -248,8 +248,6 @@ module.exports = class Guest extends Delegator
 
   destroy: ->
     this._removeElementEvents()
-    $('#annotator-dynamic-style').remove()
-
     this.selections.unsubscribe()
     @adder.remove()
 
