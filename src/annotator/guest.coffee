@@ -26,8 +26,9 @@ annotationsForSelection = () ->
   range = selection.getRangeAt(0)
   return rangeUtil.itemsForRange(range, (node) -> $(node).data('annotation'))
 
-# Return a list of `<hypothesis-highlight>` elements that contain the given node.
-highlightsAt = (node) ->
+# Return the annotations associated with any highlights that contain a given
+# DOM node.
+annotationsAt = (node) ->
   if node.nodeType != Node.ELEMENT_NODE
     node = node.parentElement
 
@@ -38,12 +39,7 @@ highlightsAt = (node) ->
       highlights.push(node)
     node = node.parentElement
 
-  return highlights
-
-# Return the annotations associated with any highlights that contain a given
-# DOM node.
-annotationsAt = (node) ->
-  highlightsAt(event.target).map((h) => $(h).data('annotation'))
+  return highlights.map((h) => $(h).data('annotation'))
 
 # A selector which matches elements added to the DOM by Hypothesis (eg. for
 # highlights and annotation UI).
@@ -151,8 +147,8 @@ module.exports = class Guest extends Delegator
     addListener 'click', (event) =>
       annotations = annotationsAt(event.target)
       if annotations.length and @visibleHighlights
-        xor = event.metaKey or event.ctrlKey
-        this.selectAnnotations(annotations, xor)
+        toggle = event.metaKey or event.ctrlKey
+        this.selectAnnotations(annotations, toggle)
       else maybeHideSidebar(event)
 
     # Allow taps on the document to hide the sidebar as well as clicks, because
