@@ -25,15 +25,12 @@ class FakeAdder
 
 class FakePlugin extends Plugin
   instance: null
-  events:
-    'customEvent': 'customEventHandler'
 
   constructor: ->
     FakePlugin::instance = this
     super
 
   pluginInit: sinon.stub()
-  customEventHandler: sinon.stub()
 
 # A little helper which returns a promise that resolves after a timeout
 timeoutPromise = (millis = 0) ->
@@ -120,10 +117,6 @@ describe 'Guest', ->
 
     it 'hold reference to instance', ->
       assert.equal(fakePlugin.annotator, guest)
-
-    it 'subscribe to events', ->
-      guest.publish('customEvent', ['1', '2'])
-      assert.calledWith(fakePlugin.customEventHandler, '1', '2')
 
     it 'destroy when instance is destroyed', ->
       sandbox.spy(fakePlugin, 'destroy')
