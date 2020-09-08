@@ -2,7 +2,7 @@ adder = require('../adder')
 Observable = require('../util/observable').Observable
 Plugin = require('../plugin')
 
-Delegator = require('../delegator')
+{ default: Delegator } = require('../delegator')
 $ = require('jquery')
 
 Guest = require('../guest')
