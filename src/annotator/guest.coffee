@@ -1,7 +1,7 @@
 scrollIntoView = require('scroll-into-view')
 CustomEvent = require('custom-event')
 
-Delegator = require('./delegator')
+{ default: Delegator } = require('./delegator')
 $ = require('jquery')
 
 adder = require('./adder')
