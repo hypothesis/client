@@ -26,6 +26,25 @@ annotationsForSelection = () ->
   range = selection.getRangeAt(0)
   return rangeUtil.itemsForRange(range, (node) -> $(node).data('annotation'))
 
+# Return a list of `<hypothesis-highlight>` elements that contain the given node.
+highlightsAt = (node) ->
+  if node.nodeType != Node.ELEMENT_NODE
+    node = node.parentElement
+
+  highlights = []
+
+  while node
+    if node.classList.contains('hypothesis-highlight')
+      highlights.push(node)
+    node = node.parentElement
+
+  return highlights
+
+# Return the annotations associated with any highlights that contain a given
+# DOM node.
+annotationsAt = (node) ->
+  highlightsAt(event.target).map((h) => $(h).data('annotation'))
+
 # A selector which matches elements added to the DOM by Hypothesis (eg. for
 # highlights and annotation UI).
 #
@@ -35,14 +54,6 @@ IGNORE_SELECTOR = '[class^="annotator-"],[class^="hypothesis-"]'
 
 module.exports = class Guest extends Delegator
   SHOW_HIGHLIGHTS_CLASS = 'hypothesis-highlights-always-on'
-
-  # Events to be bound on Delegator#element.
-  events:
-    ".hypothesis-highlight click":      "onHighlightClick"
-    ".hypothesis-highlight mouseover":  "onHighlightMouseover"
-    ".hypothesis-highlight mouseout":   "onHighlightMouseout"
-    "click":                            "onElementClick"
-    "touchstart":                       "onElementTouchStart"
 
   options:
     Document: {}
@@ -114,6 +125,54 @@ module.exports = class Guest extends Delegator
     for own name, opts of @options
       if not @plugins[name] and @options.pluginClasses[name]
         this.addPlugin(name, opts)
+
+    # Setup event handlers on the root element
+    this._elementEventListeners = []
+    this._setupElementEvents()
+
+
+  # Add DOM event listeners for clicks, taps etc. on the document and
+  # highlights.
+  _setupElementEvents: ->
+    addListener = (event, callback) =>
+      @element[0].addEventListener(event, callback)
+      this._elementEventListeners.push({ event, callback })
+
+    # Hide the sidebar in response to a document click or tap, so it doesn't obscure
+    # the document content.
+    maybeHideSidebar = (event) =>
+      if !this.closeSidebarOnDocumentClick || this.isEventInAnnotator(event) || @selectedTargets?.length
+        # Don't hide the sidebar if event occurred inside Hypothesis UI, or
+        # the user is making a selection, or the behavior was disabled because
+        # the sidebar doesn't overlap the content.
+        return
+      @crossframe?.call('hideSidebar')
+
+    addListener 'click', (event) =>
+      annotations = annotationsAt(event.target)
+      if annotations.length and @visibleHighlights
+        xor = event.metaKey or event.ctrlKey
+        this.selectAnnotations(annotations, xor)
+      else maybeHideSidebar(event)
+
+    # Allow taps on the document to hide the sidebar as well as clicks, because
+    # on touch-input devices, not all elements will generate a "click" event.
+    addListener 'touchstart', (event) =>
+      if !annotationsAt(event.target).length
+        maybeHideSidebar(event)
+
+    addListener 'mouseover', (event) =>
+      annotations = annotationsAt(event.target)
+      if annotations.length and @visibleHighlights
+        this.focusAnnotations(annotations)
+
+    addListener 'mouseout', (event) =>
+      if @visibleHighlights
+        this.focusAnnotations []
+
+  _removeElementEvents: ->
+    this._elementEventListeners.forEach ({ event, callback }) =>
+      @element[0].removeEventListener(event, callback)
 
   addPlugin: (name, options) ->
     if @plugins[name]
@@ -192,6 +251,7 @@ module.exports = class Guest extends Delegator
       this.setVisibleHighlights(state)
 
   destroy: ->
+    this._removeElementEvents()
     $('#annotator-dynamic-style').remove()
 
     this.selections.unsubscribe()
@@ -450,51 +510,6 @@ module.exports = class Guest extends Delegator
   # frame, or its toolbar)
   isEventInAnnotator: (event) ->
     return closest(event.target, '.annotator-frame') != null
-
-  # Event handlers to close the sidebar when the user clicks in the document.
-  # These really ought to live with the sidebar code.
-  onElementClick: (event) ->
-    if this.closeSidebarOnDocumentClick
-      if !this.isEventInAnnotator(event) and !@selectedTargets?.length and not event.annotations?.length
-        @crossframe?.call('hideSidebar')
-
-  onElementTouchStart: (event) ->
-    # Mobile browsers do not register click events on
-    # elements without cursor: pointer. So instead of
-    # adding that to every element, we can add the initial
-    # touchstart event which is always registered to
-    # make up for the lack of click support for all elements.
-    if this.closeSidebarOnDocumentClick
-      if !this.isEventInAnnotator(event) and !@selectedTargets?.length and not event.annotations?.length
-        @crossframe?.call('hideSidebar')
-
-  onHighlightMouseover: (event) ->
-    return unless @visibleHighlights
-    annotation = $(event.currentTarget).data('annotation')
-    annotations = event.annotations ?= []
-    annotations.push(annotation)
-
-    # The innermost highlight will execute this.
-    # The timeout gives time for the event to bubble, letting any overlapping
-    # highlights have time to add their annotations to the list stored on the
-    # event object.
-    if event.target is event.currentTarget
-      setTimeout => this.focusAnnotations(annotations)
-
-  onHighlightMouseout: (event) ->
-    return unless @visibleHighlights
-    this.focusAnnotations []
-
-  onHighlightClick: (event) ->
-    return unless @visibleHighlights
-    annotation = $(event.currentTarget).data('annotation')
-    annotations = event.annotations ?= []
-    annotations.push(annotation)
-
-    # See the comment in onHighlightMouseover
-    if event.target is event.currentTarget
-      xor = (event.metaKey or event.ctrlKey)
-      setTimeout => this.selectAnnotations(annotations, xor)
 
   # Pass true to show the highlights in the frame or false to disable.
   setVisibleHighlights: (shouldShowHighlights) ->
