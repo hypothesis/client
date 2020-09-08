@@ -69,15 +69,26 @@ export default class DocumentMeta extends Plugin {
   constructor(element, options) {
     super(element, options);
 
-    this.events = {
-      beforeAnnotationCreated: 'beforeAnnotationCreated',
-    };
-
     this.metadata = createMetadata();
 
     this.baseURI = options.baseURI || baseURI;
     this.document = options.document || document;
     this.normalizeURI = options.normalizeURI || normalizeURI;
+
+    /**
+     * Event handler that adds document metadata to new annotations.
+     */
+    this.beforeAnnotationCreated = annotation => {
+      annotation.document = this.metadata;
+    };
+
+    // @ts-expect-error - Method comes from CoffeeScript base class.
+    this.subscribe('beforeAnnotationCreated', this.beforeAnnotationCreated);
+  }
+
+  destroy() {
+    // @ts-expect-error - Method comes from CoffeeScript base class.
+    this.unsubscribe('beforeAnnotationCreated', this.beforeAnnotationCreated);
   }
 
   pluginInit() {
@@ -112,14 +123,6 @@ export default class DocumentMeta extends Plugin {
       }
     }
     return Object.keys(uniqueUrls);
-  }
-
-  /**
-   * Hook that augments new annotations with metadata about the document they
-   * came from.
-   */
-  beforeAnnotationCreated(annotation) {
-    annotation.document = this.metadata;
   }
 
   /**
