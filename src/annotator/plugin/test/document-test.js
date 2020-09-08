@@ -31,14 +31,27 @@ describe('DocumentMeta', function () {
       return normalizeURI(url, base);
     });
 
-    testDocument = new DocumentMeta(tempDocument, {
+    // Root element to use for the `Delegator` event bus. This can be different
+    // than the document from which metadata is gathered.
+    const rootElement = document.body;
+
+    testDocument = new DocumentMeta(rootElement, {
       document: tempDocument,
       normalizeURI: fakeNormalizeURI,
     });
     testDocument.pluginInit();
   });
 
-  afterEach(() => $(document).unbind());
+  afterEach(() => {
+    testDocument.destroy();
+    $(document).unbind();
+  });
+
+  it('attaches document metadata to new annotations', () => {
+    const annotation = {};
+    testDocument.publish('beforeAnnotationCreated', [annotation]);
+    assert.equal(annotation.document, testDocument.metadata);
+  });
 
   describe('annotation should have some metadata', function () {
     let metadata = null;
