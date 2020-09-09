@@ -1,4 +1,5 @@
 @use "sass:meta";
+@use "sass:color";
 @use '../variables' as var;
 @use '../mixins/focus';
 @use '../mixins/reset';
@@ -13,6 +14,7 @@
 @use './highlights';
 
 $sidebar-collapse-transition-time: 150ms;
+$shadow--sidebar: 0px 1px 4px color.scale(var.$color-shadow, $alpha: -50%);
 
 // Sidebar
 .annotator-frame {
@@ -115,8 +117,9 @@ $sidebar-collapse-transition-time: 150ms;
     color: var.$grey-semi;
   }
 
+  /** Visible with clean theme */
   .annotator-frame-button--sidebar_close {
-    box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.5);
+    box-shadow: $shadow--sidebar;
     border-radius: 0px;
     border-style: solid none solid solid;
     width: 27px;
@@ -126,8 +129,9 @@ $sidebar-collapse-transition-time: 150ms;
   }
 }
 
+/** Visible with clean theme */
 .annotator-frame--drop-shadow-enabled {
-  box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.5);
+  box-shadow: $shadow--sidebar;
 }
 
 .annotator-placeholder {

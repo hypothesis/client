@@ -48,6 +48,11 @@ $color-error: #d93c3f;
 $color-brand: #bd1c2b;
 $color-quote: #58cef4;
 
+$color-shadow: #000000;
+$color-shadow--base: color.scale($color-shadow, $alpha: -90%);
+$color-shadow--active: color.scale($color-shadow, $alpha: -85%);
+$color-shadow--sidebar: color.scale($color-shadow, $alpha: -50%);
+
 $color-focus-outline: #51a7e8;
 $color-focus-shadow: color.scale($color-focus-outline, $alpha: -50%);
 
