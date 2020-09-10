@@ -20,18 +20,16 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
 
   return (
     <button
-      className="annotator-adder-actions__button"
+      className="annotator-adder-button"
       onClick={onClick}
       aria-label={title}
       title={title}
     >
-      {icon && (
-        <SvgIcon name={icon} className="annotator-adder-actions__icon" />
-      )}
+      {icon && <SvgIcon name={icon} className="annotator-adder-button__icon" />}
       {typeof badgeCount === 'number' && (
-        <span className="annotator-adder-actions__badge">{badgeCount}</span>
+        <span className="annotator-adder-button__badge">{badgeCount}</span>
       )}
-      <span className="annotator-adder-actions__label">{label}</span>
+      <span className="annotator-adder-button__label">{label}</span>
     </button>
   );
 }
@@ -96,8 +94,8 @@ export default function AdderToolbar({
     // @ts-ignore - TS doesn't know about our custom element types.
     <hypothesis-adder-toolbar
       class={classnames('annotator-adder', {
-        'annotator-adder--arrow-down': arrowDirection === 'down',
-        'annotator-adder--arrow-up': arrowDirection === 'up',
+        'annotator-adder--down': arrowDirection === 'up',
+        'annotator-adder--up': arrowDirection === 'down',
         'is-active': isVisible,
       })}
       style={{ visibility: isVisible ? 'visible' : 'hidden' }}
@@ -129,6 +127,14 @@ export default function AdderToolbar({
         )}
         {/* @ts-ignore */}
       </hypothesis-adder-actions>
+      <SvgIcon
+        name="pointer"
+        inline={true}
+        className={classnames('annotator-adder-arrow', {
+          'annotator-adder-arrow--down': arrowDirection === 'down',
+          'annotator-adder-arrow--up': arrowDirection === 'up',
+        })}
+      />
       {/* @ts-ignore */}
     </hypothesis-adder-toolbar>
   );
