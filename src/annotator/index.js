@@ -29,7 +29,6 @@ import DocumentPlugin from './plugin/document';
 import Guest from './guest';
 // @ts-expect-error
 import BucketBarPlugin from './plugin/bucket-bar';
-// @ts-expect-error
 import CrossFramePlugin from './plugin/cross-frame';
 // @ts-expect-error
 import PDFPlugin from './plugin/pdf';
