@@ -12,5 +12,6 @@ export default {
   hide: require('../images/icons/hide.svg'),
   highlight: require('../images/icons/highlight.svg'),
   note: require('../images/icons/note.svg'),
+  pointer: require('../images/icons/pointer.svg'),
   show: require('../images/icons/show.svg'),
 };
