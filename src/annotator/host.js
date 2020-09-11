@@ -1,6 +1,4 @@
-// TODO - Convert this to an ES import once the `Guest` class is converted to JS.
-// @ts-expect-error
-const Guest = require('./guest');
+import Guest from './guest';
 
 export default class Host extends Guest {
   constructor(element, config) {
