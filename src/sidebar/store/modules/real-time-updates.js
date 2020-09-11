@@ -98,9 +98,12 @@ function receiveRealTimeUpdates({
       // focused group, since we only display annotations from the focused
       // group and reload all annotations and discard pending updates
       // when switching groups.
+      const groupState = getState().groups;
+      const routeState = getState().route;
+
       if (
-        ann.group === groups.selectors.focusedGroupId(getState()) ||
-        route.selectors.route(getState()) !== 'sidebar'
+        ann.group === groups.selectors.focusedGroupId(groupState) ||
+        route.selectors.route(routeState) !== 'sidebar'
       ) {
         pendingUpdates[/** @type {string} */ (ann.id)] = ann;
       }
@@ -116,7 +119,8 @@ function receiveRealTimeUpdates({
       // even if the annotation is from the current group, it might be for a
       // new annotation (saved in pendingUpdates and removed above), that has
       // not yet been loaded.
-      if (annotations.selectors.annotationExists(getState(), id)) {
+      const annotationsState = getState().annotations;
+      if (annotations.selectors.annotationExists(annotationsState, id)) {
         pendingDeletions[id] = true;
       }
     });

@@ -16,9 +16,20 @@ describe('sidebar/store/modules/real-time-updates', () => {
   let store;
 
   beforeEach(() => {
-    fakeAnnotationExists = sinon.stub().returns(true);
-    fakeFocusedGroupId = sinon.stub().returns('group-1');
-    fakeRoute = sinon.stub().returns('sidebar');
+    fakeAnnotationExists = sinon.stub().callsFake(state => {
+      assert.equal(state, store.getState().annotations);
+      return true;
+    });
+
+    fakeFocusedGroupId = sinon.stub().callsFake(state => {
+      assert.equal(state, store.getState().groups);
+      return 'group-1';
+    });
+
+    fakeRoute = sinon.stub().callsFake(state => {
+      assert.equal(state, store.getState().route);
+      return 'sidebar';
+    });
 
     store = createStore(
       [realTimeUpdates, annotations, selection],
