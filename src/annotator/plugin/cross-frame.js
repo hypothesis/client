@@ -34,20 +34,23 @@ export default class CrossFrame extends Plugin {
     /**
      * Inject Hypothesis into a newly-discovered iframe.
      */
-    const injectToFrame = frame => {
-      if (!frameUtil.hasHypothesis(frame)) {
-        const { clientUrl } = config;
-
-        frameUtil.isLoaded(frame, () => {
-          const subFrameIdentifier = discovery.generateToken();
-          frameIdentifiers.set(frame, subFrameIdentifier);
-          const injectedConfig = Object.assign({}, config, {
-            subFrameIdentifier,
-          });
-
-          frameUtil.injectHypothesis(frame, clientUrl, injectedConfig);
-        });
+    const injectIntoFrame = frame => {
+      if (frameUtil.hasHypothesis(frame)) {
+        return;
       }
+
+      const { clientUrl } = config;
+
+      frameUtil.isLoaded(frame, () => {
+        const subFrameIdentifier = discovery.generateToken();
+        frameIdentifiers.set(frame, subFrameIdentifier);
+        const injectedConfig = {
+          ...config,
+          subFrameIdentifier,
+        };
+
+        frameUtil.injectHypothesis(frame, clientUrl, injectedConfig);
+      });
     };
 
     const iframeUnloaded = frame => {
@@ -64,7 +67,7 @@ export default class CrossFrame extends Plugin {
 
       discovery.startDiscovery(onDiscoveryCallback);
 
-      frameObserver.observe(injectToFrame, iframeUnloaded);
+      frameObserver.observe(injectIntoFrame, iframeUnloaded);
     };
 
     /**
