@@ -20,19 +20,18 @@ import iconSet from './icons';
 registerIcons(iconSet);
 
 import configFrom from './config/index';
-import PdfSidebar from './pdf-sidebar';
+import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
+import Guest from './guest';
+import PdfSidebar from './pdf-sidebar';
+import Sidebar from './sidebar';
 
 // Modules that are still written in CoffeeScript and need to be converted to
 // JS.
 // @ts-expect-error
-import Guest from './guest';
-// @ts-expect-error
 import BucketBarPlugin from './plugin/bucket-bar';
-import CrossFramePlugin from './plugin/cross-frame';
 // @ts-expect-error
 import PDFPlugin from './plugin/pdf';
-import Sidebar from './sidebar';
 
 const pluginClasses = {
   // UI plugins
@@ -59,6 +58,7 @@ const config = configFrom(window);
 $.noConflict(true)(function () {
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
+  /** @type {new (e: Element, config: any) => Guest} */
   let Klass = isPDF ? PdfSidebar : Sidebar;
 
   if (config.subFrameIdentifier) {

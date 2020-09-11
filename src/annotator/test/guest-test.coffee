@@ -5,7 +5,7 @@ Plugin = require('../plugin')
 { default: Delegator } = require('../delegator')
 $ = require('jquery')
 
-Guest = require('../guest')
+{ default: Guest } = require('../guest')
 { $imports } = require('../guest')
 rangeUtil = null
 selections = null
