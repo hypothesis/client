@@ -38,7 +38,7 @@ export default class Sidebar extends Host {
       config.query ||
       config.group
     ) {
-      this.on('panelReady', () => this.show());
+      this.subscribe('panelReady', () => this.show());
     }
 
     if (this.plugins.BucketBar) {

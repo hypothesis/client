@@ -98,7 +98,7 @@ export default class Guest extends Delegator {
 
     this.adderToolbar = document.createElement('hypothesis-adder');
     this.adderToolbar.style.display = 'none';
-    this.element[0].appendChild(this.adderToolbar);
+    this.element.appendChild(this.adderToolbar);
 
     this.adderCtrl = new Adder(this.adderToolbar, {
       onAnnotate: () => {
@@ -170,7 +170,7 @@ export default class Guest extends Delegator {
   // highlights.
   _setupElementEvents() {
     const addListener = (event, callback) => {
-      this.element[0].addEventListener(event, callback);
+      this.element.addEventListener(event, callback);
       this._elementEventListeners.push({ event, callback });
     };
 
@@ -220,13 +220,13 @@ export default class Guest extends Delegator {
 
   _removeElementEvents() {
     this._elementEventListeners.forEach(({ event, callback }) => {
-      this.element[0].removeEventListener(event, callback);
+      this.element.removeEventListener(event, callback);
     });
   }
 
   addPlugin(name, options) {
     const Klass = this.options.pluginClasses[name];
-    this.plugins[name] = new Klass(this.element[0], options);
+    this.plugins[name] = new Klass(this.element, options);
     this.plugins[name].annotator = this;
     this.plugins[name].pluginInit?.();
   }
@@ -299,7 +299,7 @@ export default class Guest extends Delegator {
               cancelable: true,
               detail: anchor.range,
             });
-            const defaultNotPrevented = this.element[0].dispatchEvent(event);
+            const defaultNotPrevented = this.element.dispatchEvent(event);
             if (defaultNotPrevented) {
               scrollIntoView(anchor.highlights[0]);
             }
@@ -324,7 +324,7 @@ export default class Guest extends Delegator {
     this.selections.unsubscribe();
     this.adderToolbar.remove();
 
-    removeAllHighlights(this.element[0]);
+    removeAllHighlights(this.element);
 
     for (let name of Object.keys(this.plugins)) {
       this.plugins[name].destroy();
@@ -335,7 +335,7 @@ export default class Guest extends Delegator {
 
   anchor(annotation) {
     let anchor;
-    const root = this.element[0];
+    const root = this.element;
 
     // Anchors for all annotations are in the `anchors` instance property. These
     // are anchors for this annotation only. After all the targets have been
@@ -488,7 +488,7 @@ export default class Guest extends Delegator {
   }
 
   createAnnotation(annotation = {}) {
-    const root = this.element[0];
+    const root = this.element;
 
     const ranges = this.selectedRanges ?? [];
     this.selectedRanges = null;
@@ -598,7 +598,7 @@ export default class Guest extends Delegator {
 
   // Pass true to show the highlights in the frame or false to disable.
   setVisibleHighlights(shouldShowHighlights) {
-    setHighlightsVisible(this.element[0], shouldShowHighlights);
+    setHighlightsVisible(this.element, shouldShowHighlights);
 
     this.visibleHighlights = shouldShowHighlights;
     if (this.toolbar) {

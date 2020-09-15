@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import { TinyEmitter as EventEmitter } from 'tiny-emitter';
 
 // Adapted from:
 //  https://github.com/openannotation/annotator/blob/v1.2.x/src/class.coffee
@@ -31,13 +31,18 @@ export default class Delegator {
    * @param {Object} [config]
    */
   constructor(element, config) {
-    // Some subclasses rely on a legacy mechanism of defining options at
-    // the class level by defining an `options` property on the prototype.
-    const classOptions = this.options || {};
-    this.options = { ...classOptions, ...config };
-    this.element = $(element);
+    this.options = { ...config };
+    this.element = element;
 
-    this.on = this.subscribe;
+    const el = /** @type {any} */ (element);
+    let eventBus = el._hypothesisEventBus;
+    if (!eventBus) {
+      eventBus = new EventEmitter();
+      el._hypothesisEventBus = eventBus;
+    }
+
+    this._eventBus = eventBus;
+    this._subscriptions = [];
   }
 
   /**
@@ -47,7 +52,9 @@ export default class Delegator {
    * the base implementation.
    */
   destroy() {
-    // FIXME - This should unbind any event handlers registered via `subscribe`.
+    for (let [event, callback] of this._subscriptions) {
+      this._eventBus.off(event, callback);
+    }
   }
 
   /**
@@ -59,8 +66,8 @@ export default class Delegator {
    * @param {string} event
    * @param {any[]} [args]
    */
-  publish(event, args) {
-    this.element.triggerHandler(event, args);
+  publish(event, args = []) {
+    this._eventBus.emit(event, ...args);
   }
 
   /**
@@ -70,18 +77,8 @@ export default class Delegator {
    * @param {Function} callback
    */
   subscribe(event, callback) {
-    // Wrapper that strips the `event` argument.
-    const closure = (event, ...args) => callback(...args);
-
-    // Ensure both functions have the same unique id so that jQuery will accept
-    // callback when unbinding closure.
-    //
-    // @ts-expect-error - `guid` property is non-standard
-    closure.guid = callback.guid = $.guid += 1;
-
-    // Ignore false positive lint warning about function bind.
-    // eslint-disable-next-line
-    this.element.bind(event, closure);
+    this._eventBus.on(event, callback);
+    this._subscriptions.push([event, callback]);
   }
 
   /**
@@ -91,6 +88,10 @@ export default class Delegator {
    * @param {Function} callback
    */
   unsubscribe(event, callback) {
-    this.element.unbind(event, callback);
+    this._eventBus.off(event, callback);
+    this._subscriptions = this._subscriptions.filter(
+      ([subEvent, subCallback]) =>
+        subEvent !== event || subCallback !== callback
+    );
   }
 }

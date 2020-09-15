@@ -90,7 +90,7 @@ describe('Host', () => {
   describe('config', () => {
     it('disables highlighting if showHighlights: false is given', done => {
       const host = createHost({ showHighlights: false });
-      host.on('panelReady', () => {
+      host.subscribe('panelReady', () => {
         assert.isFalse(host.visibleHighlights);
         done();
       });
