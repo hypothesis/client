@@ -307,15 +307,6 @@ export default class Sidebar extends Host {
     this._notifyOfLayoutChange(false);
   }
 
-  isOpen() {
-    if (this.frame) {
-      return !this.frame.classList.contains('annotator-collapsed');
-    } else {
-      // Assume an external frame is always open.
-      return true;
-    }
-  }
-
   /**
    * Hide or show highlights associated with annotations in the document.
    *
