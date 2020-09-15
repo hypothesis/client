@@ -22,8 +22,8 @@ class FakeAdder {
 FakeAdder.instance = null;
 
 class FakePlugin extends Plugin {
-  constructor() {
-    super();
+  constructor(element, config) {
+    super(element, config);
 
     FakePlugin.instance = this;
     this.pluginInit = sinon.stub();
@@ -291,7 +291,7 @@ describe('Guest', () => {
           ];
 
           return new Promise(resolve => {
-            guest.element.on('scrolltorange', event => {
+            guest.element.addEventListener('scrolltorange', event => {
               assert.equal(event.detail, fakeRange);
               resolve();
             });
@@ -312,7 +312,9 @@ describe('Guest', () => {
             },
           ];
 
-          guest.element.on('scrolltorange', event => event.preventDefault());
+          guest.element.addEventListener('scrolltorange', event =>
+            event.preventDefault()
+          );
           emitGuestEvent('scrollToAnnotation', 'tag1');
           assert.notCalled(scrollIntoView);
         });
@@ -382,14 +384,14 @@ describe('Guest', () => {
         emitGuestEvent('setVisibleHighlights', true);
         assert.calledWith(
           highlighter.setHighlightsVisible,
-          guest.element[0],
+          guest.element,
           true
         );
 
         emitGuestEvent('setVisibleHighlights', false);
         assert.calledWith(
           highlighter.setHighlightsVisible,
-          guest.element[0],
+          guest.element,
           false
         );
       });
@@ -404,7 +406,7 @@ describe('Guest', () => {
     beforeEach(() => {
       fakeSidebarFrame = null;
       guest = createGuest();
-      rootElement = guest.element[0];
+      rootElement = guest.element;
     });
 
     afterEach(() => {

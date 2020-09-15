@@ -25,16 +25,6 @@ module.exports = class BucketBar extends Plugin
         </div>
         """
 
-  # Plugin options
-  options:
-    # gapSize parameter is used by the clustering algorithm
-    # If an annotation is farther then this gapSize from the next bucket
-    # then that annotation will not be merged into the bucket
-    gapSize: 60
-
-    # Selectors for the scrollable elements on the page
-    scrollables: ['body']
-
   # buckets of annotations that overlap
   buckets: []
 
@@ -45,7 +35,16 @@ module.exports = class BucketBar extends Plugin
   tabs: null
 
   constructor: (element, options) ->
-    super $(@html), options
+    defaultOptions = {
+      # gapSize parameter is used by the clustering algorithm
+      # If an annotation is farther then this gapSize from the next bucket
+      # then that annotation will not be merged into the bucket
+      gapSize: 60
+
+      # Selectors for the scrollable elements on the page
+      scrollables: ['body']
+    }
+    super $(@html), Object.assign(defaultOptions, options)
 
     if @options.container?
       $(@options.container).append @element

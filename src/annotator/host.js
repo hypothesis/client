@@ -86,14 +86,14 @@ export default class Host extends Guest {
     this.frame = frame;
     (frame || externalFrame).appendChild(sidebarFrame);
 
-    this.on('panelReady', () => {
+    this.subscribe('panelReady', () => {
       // Show the UI
       if (this.frame) {
         this.frame.style.display = '';
       }
     });
 
-    this.on('beforeAnnotationCreated', annotation => {
+    this.subscribe('beforeAnnotationCreated', annotation => {
       // When a new non-highlight annotation is created, focus
       // the sidebar so that the text editor can be focused as
       // soon as the annotation card appears
