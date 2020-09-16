@@ -92,7 +92,7 @@ export class Adder {
 
       // Assign a high Z-index so that the adder shows above any content on the
       // page
-      zIndex: 999,
+      zIndex: 10000,
     });
 
     this._view = /** @type {Window} */ (container.ownerDocument.defaultView);
