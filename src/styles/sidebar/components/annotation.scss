@@ -2,12 +2,6 @@
 @use "../../mixins/layout";
 @use "../../variables" as var;
 
-// FIXME These hover-related rules should live elsewhere
-// Highlight quote of annotation whenever its thread is hovered
-.thread-list__card:hover .annotation-quote__quote {
-  border-left: var.$color-quote 3px solid;
-}
-
 // When hovering a top-level annotation, show the footer in a hovered state.
 // When hovering a reply (at any level), show the reply's own footer in
 // a hovered state and also the footer of the top-level annotation.
