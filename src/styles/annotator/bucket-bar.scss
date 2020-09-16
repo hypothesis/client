@@ -4,9 +4,15 @@
 
 // Bucket-bar styles are nested inside `.annotator-frame` to ensure they take
 // precedence over the CSS reset applied to `.annotator-frame`.
-.annotator-frame {
+.annotator-frame.annotator-collapsed {
   .annotator-bucket-bar {
     background: rgba(0, 0, 0, 0.08);
+  }
+}
+
+.annotator-frame {
+  .annotator-bucket-bar {
+    background: rgb(235, 235, 235);
     pointer-events: none;
     position: absolute;
     height: 100%;
