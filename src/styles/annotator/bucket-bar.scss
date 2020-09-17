@@ -4,20 +4,19 @@
 
 // Bucket-bar styles are nested inside `.annotator-frame` to ensure they take
 // precedence over the CSS reset applied to `.annotator-frame`.
-.annotator-frame.annotator-collapsed {
-  .annotator-bucket-bar {
-    background: rgba(0, 0, 0, 0.08);
-  }
-}
-
 .annotator-frame {
   .annotator-bucket-bar {
-    background: rgb(235, 235, 235);
+    background: var.$grey-2; // When sidebar is unfolded, remove the background transparency
     pointer-events: none;
     position: absolute;
     height: 100%;
     width: var.$bucket-bar-width;
     left: -(var.$bucket-bar-width);
+  }
+
+  // When the sidebar is collapsed, make the background semi-transparent so the text is visible throughout (useful for pages with tight margins)
+  &.annotator-collapsed .annotator-bucket-bar {
+    background: rgba(0, 0, 0, 0.08);
   }
 
   .annotator-bucket-indicator {
