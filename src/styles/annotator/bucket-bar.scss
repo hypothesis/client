@@ -14,7 +14,8 @@
     left: -(var.$bucket-bar-width);
   }
 
-  // When the sidebar is collapsed, make the background semi-transparent so the text is visible throughout (useful for pages with tight margins)
+  // When the sidebar is collapsed, make the background semi-transparent so the
+  // text is visible throughout (useful for pages with tight margins)
   &.annotator-collapsed .annotator-bucket-bar {
     background: rgba(0, 0, 0, 0.08);
   }
