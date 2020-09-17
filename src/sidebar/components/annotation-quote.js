@@ -40,7 +40,6 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
     <div
       className={classnames('annotation-quote', {
         'is-orphan': isOrphan(annotation),
-        'is-focused': isFocused,
       })}
     >
       <Excerpt
@@ -49,7 +48,9 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
         overflowThreshold={20}
       >
         <blockquote
-          className="annotation-quote__quote"
+          className={classnames('annotation-quote__quote', {
+            'is-focused': isFocused,
+          })}
           dir="auto"
           lang={documentLanguage}
           style={applyTheme(['selectionFontFamily'], settings)}
