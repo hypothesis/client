@@ -244,15 +244,32 @@ function TagEditor({
    * @param {string} item - Suggested tag
    * @return {JSXElement} - Formatted tag for use in list
    */
-  const formatSuggestItem = item => {
-    const curVal = pendingTag();
-    const prefix = item.slice(0, item.indexOf(curVal));
-    const suffix = item.slice(item.indexOf(curVal) + curVal.length);
+  const formatSuggestedItem = item => {
+    // filtering of tags is case-insensitive
+    const curVal = pendingTag().toLowerCase();
+    const suggestedTag = item.toLowerCase();
+    const matchIndex = suggestedTag.indexOf(curVal);
+
+    // If the current input doesn't seem to match the suggested tag,
+    // just render the tag as-is.
+    if (matchIndex === -1) {
+      return <span>{item}</span>;
+    }
+
+    // Break the suggested tag into three parts:
+    // 1. Substring of the suggested tag that occurs before the match
+    //    with the current input
+    const prefix = item.slice(0, matchIndex);
+    // 2. Substring of the suggested tag that matches the input text. NB:
+    //    This may be in a different case than the input text.
+    const matchString = item.slice(matchIndex, matchIndex + curVal.length);
+    // 3. Substring of the suggested tag that occurs after the matched input
+    const suffix = item.slice(matchIndex + curVal.length);
 
     return (
       <span>
         <strong>{prefix}</strong>
-        {curVal}
+        {matchString}
         <strong>{suffix}</strong>
       </span>
     );
@@ -324,7 +341,7 @@ function TagEditor({
         <AutocompleteList
           id={`${tagEditorId}-autocomplete-list`}
           list={suggestions}
-          listFormatter={formatSuggestItem}
+          listFormatter={formatSuggestedItem}
           open={suggestionsListOpen}
           onSelectItem={handleSelect}
           itemPrefixId={`${tagEditorId}-autocomplete-list-item-`}

@@ -116,6 +116,56 @@ describe('TagEditor', function () {
     assert.equal(wrapper.find('AutocompleteList').prop('list')[1], 'tag4');
   });
 
+  it('shows case-insensitive matches to suggested tags', () => {
+    fakeTagsService.filter.returns(['fine AArdvark', 'AAArgh']);
+    const wrapper = createComponent();
+    wrapper.find('input').instance().value = 'aa';
+    typeInput(wrapper);
+
+    const formattingFn = wrapper.find('AutocompleteList').prop('listFormatter');
+    const tagList = wrapper.find('AutocompleteList').prop('list');
+
+    const firstSuggestedTag = mount(formattingFn(tagList[0]))
+      .find('span')
+      .text();
+    const secondSuggestedTag = mount(formattingFn(tagList[1]))
+      .find('span')
+      .text();
+
+    // Even though the entered text was lower case ('aa'), the suggested tag
+    // should be rendered with its original casing (upper-case here)
+    assert.equal(firstSuggestedTag, 'AAArgh');
+    assert.equal(secondSuggestedTag, 'fine AArdvark');
+  });
+
+  it('shows suggested tags as-is if they do not seem to match the input', () => {
+    // This case addresses a situation in which a substring match isn't found
+    // for the current input text against a given suggested tag. This should not
+    // happen in practice—i.e. filtered tags should match the current input—
+    // but there is no contract that the tags service filtering uses the same
+    // "matching" as the component, so we should be able to handle cases where
+    // there doesn't "seem" to be a match by just rendering the suggested tag
+    // as-is.
+    fakeTagsService.filter.returns(['fine AArdvark', 'AAArgh']);
+    const wrapper = createComponent();
+    wrapper.find('input').instance().value = 'bb';
+    typeInput(wrapper);
+
+    const formattingFn = wrapper.find('AutocompleteList').prop('listFormatter');
+    const tagList = wrapper.find('AutocompleteList').prop('list');
+
+    const firstSuggestedTag = mount(formattingFn(tagList[0]))
+      .find('span')
+      .text();
+    const secondSuggestedTag = mount(formattingFn(tagList[1]))
+      .find('span')
+      .text();
+
+    // Obviously, these don't have a `bb` substring; we'll just render them...
+    assert.equal(firstSuggestedTag, 'AAArgh');
+    assert.equal(secondSuggestedTag, 'fine AArdvark');
+  });
+
   it('passes the text value to filter() after receiving input', () => {
     const wrapper = createComponent();
     wrapper.find('input').instance().value = 'tag3';
