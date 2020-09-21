@@ -46,22 +46,12 @@ describe('Guest', () => {
   let selections;
 
   const createGuest = (config = {}) => {
-    config = Object.assign({}, guestConfig, config);
     const element = document.createElement('div');
-    const guest = new Guest(element, config);
-    return guest;
+    return new Guest(element, { ...guestConfig, ...config });
   };
 
   beforeEach(() => {
-    sinon.stub(console, 'warn');
-
     FakeAdder.instance = null;
-    rangeUtil = {
-      itemsForRange: sinon.stub().returns([]),
-      isSelectionBackwards: sinon.stub(),
-      selectionFocusRect: sinon.stub(),
-    };
-    selections = null;
     guestConfig = { pluginClasses: {} };
     highlighter = {
       highlightRange: sinon.stub(),
@@ -70,8 +60,25 @@ describe('Guest', () => {
     htmlAnchoring = {
       anchor: sinon.stub(),
     };
+    rangeUtil = {
+      itemsForRange: sinon.stub().returns([]),
+      isSelectionBackwards: sinon.stub(),
+      selectionFocusRect: sinon.stub(),
+    };
+    selections = null;
 
     sinon.stub(window, 'requestAnimationFrame').yields();
+
+    fakeCrossFrame = {
+      onConnect: sinon.stub(),
+      on: sinon.stub(),
+      call: sinon.stub(),
+      sync: sinon.stub(),
+      destroy: sinon.stub(),
+    };
+
+    CrossFrame = sandbox.stub().returns(fakeCrossFrame);
+    guestConfig.pluginClasses.CrossFrame = CrossFrame;
 
     $imports.$mock({
       './adder': { Adder: FakeAdder },
@@ -87,23 +94,11 @@ describe('Guest', () => {
       './delegator': Delegator,
       'scroll-into-view': scrollIntoView,
     });
-
-    fakeCrossFrame = {
-      onConnect: sinon.stub(),
-      on: sinon.stub(),
-      call: sinon.stub(),
-      sync: sinon.stub(),
-      destroy: sinon.stub(),
-    };
-
-    CrossFrame = sandbox.stub().returns(fakeCrossFrame);
-    guestConfig.pluginClasses.CrossFrame = CrossFrame;
   });
 
   afterEach(() => {
     window.requestAnimationFrame.restore();
     sandbox.restore();
-    console.warn.restore();
     $imports.$restore();
   });
 
@@ -118,15 +113,15 @@ describe('Guest', () => {
       fakePlugin = FakePlugin.instance;
     });
 
-    it('load and "pluginInit" gets called', () => {
+    it('calls `pluginInit`', () => {
       assert.calledOnce(fakePlugin.pluginInit);
     });
 
-    it('hold reference to instance', () => {
+    it('sets `annotator` property of plugin', () => {
       assert.equal(fakePlugin.annotator, guest);
     });
 
-    it('destroy when instance is destroyed', () => {
+    it('calls `destroy` method of plugins when guest is destroyed', () => {
       sandbox.spy(fakePlugin, 'destroy');
       guest.destroy();
       assert.called(fakePlugin.destroy);
@@ -250,7 +245,7 @@ describe('Guest', () => {
           { annotation: { $tag: 'tag1' }, highlights: highlight0.toArray() },
           { annotation: { $tag: 'tag2' }, highlights: highlight1.toArray() },
         ];
-        emitGuestEvent('focusAnnotations', 'ctx', ['tag1']);
+        emitGuestEvent('focusAnnotations', ['tag1']);
         assert.isFalse(highlight1.hasClass('hypothesis-highlight-focused'));
       });
     });
@@ -537,7 +532,7 @@ describe('Guest', () => {
     });
 
     it('removes the fragment identifier from URIs', () => {
-      guest.plugins.PDF.uri = () => 'urn:x-pdf:aabbcc#';
+      guest.plugins.PDF.uri = () => 'urn:x-pdf:aabbcc#ignoreme';
       return guest
         .getDocumentInfo()
         .then(({ uri }) => assert.equal(uri, 'urn:x-pdf:aabbcc'));
@@ -563,14 +558,14 @@ describe('Guest', () => {
       });
     });
 
-    it('treats an argument as the annotation object', () => {
+    it('merges properties of input object into returned annotation', () => {
       const guest = createGuest();
       let annotation = { foo: 'bar' };
       annotation = guest.createAnnotation(annotation);
       assert.equal(annotation.foo, 'bar');
     });
 
-    it('triggers a beforeAnnotationCreated event', done => {
+    it('triggers a "beforeAnnotationCreated" event', done => {
       const guest = createGuest();
       guest.subscribe('beforeAnnotationCreated', () => done());
       guest.createAnnotation();
