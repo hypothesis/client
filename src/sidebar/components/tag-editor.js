@@ -62,7 +62,10 @@ function TagEditor({
    */
   const pendingTag = () => inputEl.current.value.trim();
   const hasPendingTag = () => pendingTag() && pendingTag().length > 0;
-  const clearPendingTag = () => (inputEl.current.value = '');
+  const clearPendingTag = () => {
+    inputEl.current.value = '';
+    onTagInput?.('');
+  };
 
   /**
    * Helper function that returns a list of suggestions less any

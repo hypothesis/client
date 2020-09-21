@@ -228,6 +228,11 @@ describe('TagEditor', function () {
       const wrapper = createComponent();
       selectOption(wrapper, 'tag3');
       assertAddTagsSuccess(wrapper, 'tag3');
+      // Tag wasn't "typed in", so `onTagInput` will only be called once:
+      // when the tag is successfully added and the pending tag is "cleared":
+      assert.equal(fakeOnTagInput.callCount, 1);
+      // This clears the pending tag
+      assert.calledWith(fakeOnTagInput, '');
     });
 
     [
@@ -241,6 +246,11 @@ describe('TagEditor', function () {
         typeInput(wrapper); // opens suggestion list
         keyAction[0](wrapper);
         assertAddTagsSuccess(wrapper, 'umbrella');
+        // The onTagInput callback will have been called twice: once when text
+        // is "inputted" and once on adding the tag to clear the pending value
+        assert.equal(fakeOnTagInput.callCount, 2);
+        assert.calledWith(fakeOnTagInput, 'umbrella');
+        assert.calledWith(fakeOnTagInput, '');
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
