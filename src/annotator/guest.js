@@ -139,7 +139,7 @@ export default class Guest extends Delegator {
     this._connectAnnotationUISync(this.crossframe);
 
     // Load plugins
-    for (let name of Object.keys(this.options || {})) {
+    for (let name of Object.keys(this.options)) {
       const opts = this.options[name];
       if (!this.plugins[name] && this.options.pluginClasses[name]) {
         this.addPlugin(name, opts);
