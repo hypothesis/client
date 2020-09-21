@@ -210,23 +210,10 @@ export default class Guest extends Delegator {
   }
 
   addPlugin(name, options) {
-    if (this.plugins[name]) {
-      console.error('You cannot have more than one instance of any plugin.');
-    } else {
-      const Klass = this.options.pluginClasses[name];
-      if (typeof Klass === 'function') {
-        this.plugins[name] = new Klass(this.element[0], options);
-        this.plugins[name].annotator = this;
-        this.plugins[name].pluginInit?.();
-      } else {
-        console.error(
-          'Could not load ' +
-            name +
-            ' plugin. Have you included the appropriate <script> tag?'
-        );
-      }
-    }
-    return this; // allow chaining
+    const Klass = this.options.pluginClasses[name];
+    this.plugins[name] = new Klass(this.element[0], options);
+    this.plugins[name].annotator = this;
+    this.plugins[name].pluginInit?.();
   }
 
   // Get the document info
@@ -329,8 +316,6 @@ export default class Guest extends Delegator {
       $(element).contents().insertBefore(element);
       $(element).remove();
     });
-
-    this.element.data('annotator', null);
 
     for (let name of Object.keys(this.plugins)) {
       this.plugins[name].destroy();
@@ -538,41 +523,6 @@ export default class Guest extends Delegator {
     return this.createAnnotation({ $highlight: true });
   }
 
-  // Create a blank comment (AKA "page note")
-  createComment() {
-    const annotation = {};
-
-    const prepare = info => {
-      annotation.document = info.metadata;
-      annotation.uri = info.uri;
-      annotation.target = [{ source: info.uri }];
-    };
-
-    this.getDocumentInfo()
-      .then(prepare)
-      .then(() => this.publish('beforeAnnotationCreated', [annotation]));
-
-    return annotation;
-  }
-
-  // Public: Deletes the annotation by removing the highlight from the DOM.
-  // Publishes the 'annotationDeleted' event on completion.
-  //
-  // annotation - An annotation Object to delete.
-  //
-  // Returns deleted annotation.
-  deleteAnnotation(annotation) {
-    if (annotation.highlights) {
-      for (let h of annotation.highlights) {
-        if (h.parentNode !== null) {
-          $(h).replaceWith(h.childNodes);
-        }
-      }
-    }
-
-    this.publish('annotationDeleted', [annotation]);
-  }
-
   showAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
     this.crossframe?.call('showAnnotations', tags);
@@ -582,11 +532,6 @@ export default class Guest extends Delegator {
   toggleAnnotationSelection(annotations) {
     const tags = annotations.map(a => a.$tag);
     this.crossframe?.call('toggleAnnotationSelection', tags);
-  }
-
-  updateAnnotations(annotations) {
-    const tags = annotations.map(a => a.$tag);
-    this.crossframe?.call('updateAnnotations', tags);
   }
 
   focusAnnotations(annotations) {

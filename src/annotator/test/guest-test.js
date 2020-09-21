@@ -572,47 +572,6 @@ describe('Guest', () => {
     });
   });
 
-  describe('#createComment', () => {
-    it('adds metadata to the annotation object', () => {
-      const guest = createGuest();
-      sinon.stub(guest, 'getDocumentInfo').returns(
-        Promise.resolve({
-          metadata: { title: 'hello' },
-          uri: 'http://example.com/',
-        })
-      );
-
-      const annotation = guest.createComment();
-
-      return timeoutPromise().then(() => {
-        assert.equal(annotation.uri, 'http://example.com/');
-        assert.deepEqual(annotation.document, { title: 'hello' });
-      });
-    });
-
-    it('adds a single target with a source property', () => {
-      const guest = createGuest();
-      sinon.stub(guest, 'getDocumentInfo').returns(
-        Promise.resolve({
-          metadata: { title: 'hello' },
-          uri: 'http://example.com/',
-        })
-      );
-
-      const annotation = guest.createComment();
-
-      return timeoutPromise().then(() =>
-        assert.deepEqual(annotation.target, [{ source: 'http://example.com/' }])
-      );
-    });
-
-    it('triggers a beforeAnnotationCreated event', done => {
-      const guest = createGuest();
-      guest.subscribe('beforeAnnotationCreated', () => done());
-      guest.createComment();
-    });
-  });
-
   describe('#anchor', () => {
     let el;
     let range;
@@ -823,7 +782,9 @@ describe('Guest', () => {
       const guest = createGuest();
       const annotation = {};
       guest.anchors.push({ annotation });
+
       guest.detach(annotation);
+
       assert.equal(guest.anchors.length, 0);
     });
 
@@ -831,21 +792,11 @@ describe('Guest', () => {
       const guest = createGuest();
       guest.plugins.BucketBar = { update: sinon.stub() };
       const annotation = {};
-
       guest.anchors.push({ annotation });
+
       guest.detach(annotation);
+
       assert.calledOnce(guest.plugins.BucketBar.update);
-    });
-
-    it('publishes the "annotationDeleted" event', () => {
-      const guest = createGuest();
-      const annotation = {};
-      const publish = sandbox.stub(guest, 'publish');
-
-      guest.deleteAnnotation(annotation);
-
-      assert.calledOnce(publish);
-      assert.calledWith(publish, 'annotationDeleted', [annotation]);
     });
 
     it('removes any highlights associated with the annotation', () => {
@@ -853,9 +804,9 @@ describe('Guest', () => {
       const annotation = {};
       const highlights = [document.createElement('span')];
       const { removeHighlights } = highlighter;
-
       guest.anchors.push({ annotation, highlights });
-      guest.deleteAnnotation(annotation);
+
+      guest.detach(annotation);
 
       assert.calledOnce(removeHighlights);
       assert.calledWith(removeHighlights, highlights);
