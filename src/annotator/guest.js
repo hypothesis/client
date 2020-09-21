@@ -325,9 +325,9 @@ export default class Guest extends Delegator {
     this.selections.unsubscribe();
     this.adder.remove();
 
-    this.element.find('.hypothesis-highlight').each(function () {
-      $(this).contents().insertBefore(this);
-      $(this).remove();
+    this.element.find('.hypothesis-highlight').each((index, element) => {
+      $(element).contents().insertBefore(element);
+      $(element).remove();
     });
 
     this.element.data('annotator', null);
