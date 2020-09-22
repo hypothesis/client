@@ -67,11 +67,9 @@ const IGNORE_SELECTOR = '[class^="annotator-"],[class^="hypothesis-"]';
 
 export default class Guest extends Delegator {
   constructor(element, config, anchoring = htmlAnchoring) {
-    // TODO - Find out if `defaultConfig` actually does anything and remove it
-    // if not.
     const defaultConfig = {
+      // This causes the `Document` plugin to be initialized.
       Document: {},
-      TextSelection: {},
     };
 
     super(element, { ...defaultConfig, ...config });

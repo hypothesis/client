@@ -6,14 +6,10 @@ import Sidebar from './sidebar';
  */
 
 const defaultConfig = {
-  TextSelection: {},
   PDF: {},
   BucketBar: {
     container: '.annotator-frame',
     scrollables: ['#viewerContainer'],
-  },
-  Toolbar: {
-    container: '.annotator-frame',
   },
 };
 
