@@ -19,8 +19,6 @@ import { ToolbarController } from './toolbar';
 const MIN_RESIZE = 280;
 
 const defaultConfig = {
-  Document: {},
-  TextSelection: {},
   BucketBar: {
     container: '.annotator-frame',
   },
