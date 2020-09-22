@@ -1,8 +1,8 @@
 import $ from 'jquery';
 
-import { nodeFromXPath, xpathFromNode, $imports } from '../range-js';
+import { nodeFromXPath, xpathFromNode, $imports } from '../xpath-evaluate';
 
-describe('annotator/anchoring/range-js', () => {
+describe('annotator/anchoring/xpath-evaluate', () => {
   describe('xpathFromNode', () => {
     let container;
     let fakeSimpleXPathJQuery;
