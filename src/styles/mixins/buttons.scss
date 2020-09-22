@@ -31,6 +31,14 @@
   border-style: none;
 }
 
+@mixin button-hover {
+  &:hover:not([disabled]),
+  &:focus:not([disabled]) {
+    transition: 0.2s ease-out;
+    color: var.$grey-7;
+  }
+}
+
 /**
  * Basic color, sizing, padding and hover for buttons.
  */
@@ -45,27 +53,25 @@
   svg {
     @include utils.icon--medium;
   }
-
-  &:hover:not([disabled]) {
-    transition: 0.2s ease-out;
-    color: var.$grey-7;
-  }
+  @include button-hover;
 }
 
 /* A button with an icon and no displayed text */
-@mixin button--icon-only {
+@mixin button--icon-only($with-active-state: true) {
   @include button;
   color: var.$grey-mid;
   @media (pointer: coarse) {
     min-width: var.$touch-target-size;
     min-height: var.$touch-target-size;
   }
-  &[aria-expanded='true'],
-  &[aria-pressed='true'] {
-    color: var.$color-brand;
-
-    &:hover:not([disabled]) {
+  @if $with-active-state == true {
+    &[aria-expanded='true'],
+    &[aria-pressed='true'] {
       color: var.$color-brand;
+
+      &:hover:not([disabled]) {
+        color: var.$color-brand;
+      }
     }
   }
 }
