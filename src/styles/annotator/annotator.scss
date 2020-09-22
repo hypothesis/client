@@ -1,20 +1,17 @@
+// SASS entry point for annotator styling
+
 @use "sass:meta";
-@use "sass:color";
 @use '../variables' as var;
-@use '../mixins/focus';
 @use '../mixins/reset';
-@use '../mixins/utils';
 
 // Shared components.
 @use '../components/svg-icon';
 
 // Annotator-specific components.
 @use './components/adder';
+@use './components/toolbar';
 @use './bucket-bar';
 @use './highlights';
-
-$sidebar-collapse-transition-time: 150ms;
-$shadow--sidebar: 0px 1px 4px color.scale(var.$color-shadow, $alpha: -50%);
 
 // Sidebar
 .annotator-frame {
@@ -33,16 +30,16 @@ $shadow--sidebar: 0px 1px 4px color.scale(var.$color-shadow, $alpha: -50%);
   }
 
   // frame styles
-  user-select: none;
-  direction: ltr;
-  background: none;
-  font-size: var.$annotator-base-font-size;
-  line-height: var.$annotator-base-line-height;
-  height: 100%;
   position: fixed;
   top: 0;
   left: 100%;
+  height: 100%;
   z-index: 2147483647;
+  direction: ltr;
+  font-size: var.$annotator-adder-font-size;
+  line-height: var.$annotator-base-line-height;
+
+  user-select: none;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 
   &.annotator-collapsed {
@@ -52,7 +49,7 @@ $shadow--sidebar: 0px 1px 4px color.scale(var.$color-shadow, $alpha: -50%);
       // Add a transition when collapsing only. This serves to delay
       // the effect until the sidebar finishes closing. Visibility is
       // a boolean value and can not actually animate.
-      transition: visibility $sidebar-collapse-transition-time;
+      transition: visibility var.$annotator-timing--sidebar-collapse-transition;
       visibility: hidden;
     }
   }
@@ -64,74 +61,11 @@ $shadow--sidebar: 0px 1px 4px color.scale(var.$color-shadow, $alpha: -50%);
     z-index: 3;
     position: relative;
   }
-
-  // the vertical toolbar at the left-edge of the sidebar
-  // which provides controls for toggling the sidebar,
-  // toggling highlights etc.
-
-  // note: These components CSS classes are nested inside
-  // .annotator-frame to avoid being overridden by the
-  // CSS reset styles applied to .annotator-frame, which would otherwise
-  // have higher specificity
-  .annotator-toolbar {
-    position: absolute;
-    left: -(var.$bucket-bar-width + 18px - 7px);
-    width: 37px;
-    z-index: 2;
-  }
-
-  // FIXME:  Use variables for sizing here
-  .annotator-frame-button {
-    @include focus.outline-on-keyboard-focus;
-
-    transition: background-color 0.25s;
-    @include utils.shadow;
-    background: var.$white;
-    border: solid 1px var.$grey-3;
-    border-radius: 4px;
-    color: var.$grey-5;
-    text-decoration: none;
-    height: 30px;
-    width: 30px;
-    padding: 1px 6px;
-    margin-bottom: 5px;
-
-    &:active {
-      background-color: var.$grey-semi;
-    }
-
-    &:focus,
-    &:hover {
-      color: var.$grey-7;
-    }
-  }
-
-  .annotator-frame-button--sidebar_toggle {
-    box-shadow: none;
-    border-radius: 0px;
-    border-style: none none solid solid;
-    padding-right: 6px;
-    width: 36px;
-    margin-bottom: 10px;
-    height: var.$top-bar-height;
-    color: var.$grey-semi;
-  }
-
-  /** Visible with clean theme */
-  .annotator-frame-button--sidebar_close {
-    box-shadow: $shadow--sidebar;
-    border-radius: 0px;
-    border-style: solid none solid solid;
-    width: 27px;
-    margin-top: 140px;
-    margin-left: 6px;
-    height: 27px;
-  }
 }
 
 /** Visible with clean theme */
 .annotator-frame--drop-shadow-enabled {
-  box-shadow: $shadow--sidebar;
+  box-shadow: var.$annotator-shadow--sidebar;
 }
 
 .annotator-placeholder {
@@ -181,7 +115,7 @@ $shadow--sidebar: 0px 1px 4px color.scale(var.$color-shadow, $alpha: -50%);
 
 @media screen and (min-width: 37.5em) {
   .annotator-frame {
-    transition: margin-left $sidebar-collapse-transition-time
+    transition: margin-left var.$annotator-timing--sidebar-collapse-transition
       cubic-bezier(0.55, 0, 0.2, 0.8);
     width: 428px;
     margin-left: -428px;

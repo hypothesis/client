@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import propTypes from 'prop-types';
 import { createElement } from 'preact';
 
@@ -8,7 +7,7 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @param {Object} props
  *  @param {import("preact").Ref<HTMLButtonElement>} [props.buttonRef]
  *  @param {boolean} [props.expanded]
- *  @param {string} [props.extraClasses]
+ *  @param {string} [props.className]
  *  @param {string} props.label
  *  @param {string} props.icon
  *  @param {() => any} props.onClick
@@ -17,7 +16,7 @@ import SvgIcon from '../../shared/components/svg-icon';
 function ToolbarButton({
   buttonRef,
   expanded,
-  extraClasses,
+  className = 'annotator-toolbar-button',
   label,
   icon,
   onClick,
@@ -32,7 +31,7 @@ function ToolbarButton({
 
   return (
     <button
-      className={classnames('annotator-frame-button', extraClasses)}
+      className={className}
       aria-label={label}
       aria-expanded={expanded}
       aria-pressed={selected}
@@ -48,7 +47,7 @@ function ToolbarButton({
 ToolbarButton.propTypes = {
   buttonRef: propTypes.any,
   expanded: propTypes.bool,
-  extraClasses: propTypes.string,
+  className: propTypes.string,
   label: propTypes.string.isRequired,
   icon: propTypes.string.isRequired,
   onClick: propTypes.func.isRequired,
@@ -104,7 +103,7 @@ export default function Toolbar({
     <div>
       {useMinimalControls && isSidebarOpen && (
         <ToolbarButton
-          extraClasses="annotator-frame-button--sidebar_close"
+          className="annotator-toolbar__sidebar-close"
           label="Close annotation sidebar"
           icon="cancel"
           onClick={closeSidebar}
@@ -112,7 +111,7 @@ export default function Toolbar({
       )}
       {!useMinimalControls && (
         <ToolbarButton
-          extraClasses="annotator-frame-button--sidebar_toggle"
+          className="annotator-toolbar__sidebar-toggle"
           buttonRef={toggleSidebarRef}
           label="Annotation sidebar"
           icon={isSidebarOpen ? 'caret-right' : 'caret-left'}
@@ -121,21 +120,21 @@ export default function Toolbar({
         />
       )}
       {!useMinimalControls && (
-        <ToolbarButton
-          label="Show highlights"
-          icon={showHighlights ? 'show' : 'hide'}
-          selected={showHighlights}
-          onClick={toggleHighlights}
-        />
-      )}
-      {!useMinimalControls && (
-        <ToolbarButton
-          label={
-            newAnnotationType === 'note' ? 'New page note' : 'New annotation'
-          }
-          icon={newAnnotationType === 'note' ? 'note' : 'annotate'}
-          onClick={createAnnotation}
-        />
+        <div className="annotator-toolbar-buttonbar">
+          <ToolbarButton
+            label="Show highlights"
+            icon={showHighlights ? 'show' : 'hide'}
+            selected={showHighlights}
+            onClick={toggleHighlights}
+          />
+          <ToolbarButton
+            label={
+              newAnnotationType === 'note' ? 'New page note' : 'New annotation'
+            }
+            icon={newAnnotationType === 'note' ? 'note' : 'annotate'}
+            onClick={createAnnotation}
+          />
+        </div>
       )}
     </div>
   );

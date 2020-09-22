@@ -99,7 +99,6 @@ $touch-target-size: 44px;
 
 // Other Variables
 // -------------------------
-$bucket-bar-width: 22px;
 $top-bar-height: 40px;
 $border-radius: 2px;
 
@@ -113,6 +112,8 @@ $icon-size--large: 24px;
 
 // Annotator-specific values
 // -----------------------------------
+$annotator-bucket-bar-width: 22px;
+$annotator-toolbar-width: 33px;
 
 $annotator-base-font-size: 14px;
 $annotator-base-line-height: 20px;
@@ -124,3 +125,6 @@ $annotator-bucket-bar-font-size: 10px;
 $annotator-bucket-bar-line-height: 14px;
 
 $annotator-border-radius: 4px;
+
+$annotator-shadow--sidebar: 0px 1px 4px color.scale($color-shadow, $alpha: -50%);
+$annotator-timing--sidebar-collapse-transition: 150ms;
