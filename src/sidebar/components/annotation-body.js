@@ -2,6 +2,7 @@ import { createElement } from 'preact';
 import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import useStore from '../store/use-store';
 import { isHidden } from '../util/annotation-metadata';
 import { withServices } from '../util/service-context';
 import { applyTheme } from '../util/theme';
@@ -36,9 +37,13 @@ function AnnotationBody({ annotation, settings }) {
   // collapsing/expanding is relevant?
   const [isCollapsible, setIsCollapsible] = useState(false);
 
+  const draft = useStore(store => store.getDraft(annotation));
+
   const toggleText = isCollapsed ? 'More' : 'Less';
-  const tags = annotation.tags;
-  const text = annotation.text;
+
+  // If there is a draft use the tag and text from it.
+  const tags = draft?.tags ?? annotation.tags;
+  const text = draft?.text ?? annotation.text;
   const showExcerpt = text.length > 0;
   const showTagList = tags.length > 0;
 

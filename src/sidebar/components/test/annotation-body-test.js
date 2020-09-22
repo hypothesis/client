@@ -15,6 +15,22 @@ describe('AnnotationBody', () => {
   let fakeApplyTheme;
   let fakeSettings;
 
+  // Inject dependency mocks
+  let fakeStore;
+
+  const setEditingMode = (isEditing = true) => {
+    // The presence of a draft will make `isEditing` `true`
+    if (isEditing) {
+      fakeStore.getDraft.returns({
+        ...fixtures.defaultDraft(),
+        text: 'this is a draft',
+        tags: ['1', '2'],
+      });
+    } else {
+      fakeStore.getDraft.returns(null);
+    }
+  };
+
   function createBody(props = {}) {
     return mount(
       <AnnotationBody
@@ -32,14 +48,41 @@ describe('AnnotationBody', () => {
     fakeApplyTheme = sinon.stub();
     fakeSettings = {};
 
+    fakeStore = {
+      getDraft: sinon.stub().returns(null),
+    };
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/theme': { applyTheme: fakeApplyTheme },
+      '../store/use-store': callback => callback(fakeStore),
     });
   });
 
   afterEach(() => {
     $imports.$restore();
+  });
+
+  it('renders the tags and text from the annotation', () => {
+    const wrapper = createBody();
+    wrapper.update();
+
+    const markdownView = wrapper.find('MarkdownView');
+    const tagList = wrapper.find('TagList');
+    assert.strictEqual(markdownView.props().markdown, 'some text here');
+    assert.deepStrictEqual(tagList.props().tags, ['eenie', 'minie']);
+  });
+
+  it('renders the tags and text from the draft', () => {
+    setEditingMode(true);
+
+    const wrapper = createBody();
+    wrapper.update();
+
+    const markdownView = wrapper.find('MarkdownView');
+    const tagList = wrapper.find('TagList');
+    assert.strictEqual(markdownView.props().markdown, 'this is a draft');
+    assert.deepStrictEqual(tagList.props().tags, ['1', '2']);
   });
 
   it('does not render controls to expand/collapse the excerpt if it is not collapsible', () => {
