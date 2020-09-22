@@ -10,8 +10,8 @@
     pointer-events: none;
     position: absolute;
     height: 100%;
-    width: var.$bucket-bar-width;
-    left: -(var.$bucket-bar-width);
+    width: var.$annotator-bucket-bar-width;
+    left: -(var.$annotator-bucket-bar-width);
   }
 
   // When the sidebar is collapsed, make the background semi-transparent so the
