@@ -6348,9 +6348,9 @@ postcss@^7.0.2, postcss@^7.0.32:
     supports-color "^6.1.0"
 
 postcss@^8.0.3:
-  version "8.0.3"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.0.3.tgz#f1d4658528b778e1c5c67a31a3912faed1600a66"
-  integrity sha512-nJR5mHJuiizWhF1DqVDy6RdeFbyA1Pakcl4wp4VwppKoAZLafPhS7X/rjeUgk3LdQWYQNxyixzbCbcIAbhsCTA==
+  version "8.0.7"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.0.7.tgz#764d26d8bc64a87af6d945238ae6ef36bf6fc32d"
+  integrity sha512-LTCMGOjmC/CGWV/azk3h34u6TNj1s9p4XleEiW8yA3j+8k+z3mnv5V7yyREvWDKlkel8GxqhjEZJ+JXWTzKPWw==
   dependencies:
     colorette "^1.2.1"
     line-column "^1.0.2"
