@@ -8,8 +8,7 @@ const createNodeIterator = require('dom-node-iterator/polyfill')();
 
 import RenderingStates from '../pdfjs-rendering-states';
 
-// @ts-expect-error - `./range` needs to be converted to JS.
-import xpathRange from './range';
+import { BrowserRange } from './range';
 import { toRange as textPositionToRange } from './text-position';
 
 // @ts-expect-error - `./types` needs to be converted to JS.
@@ -434,7 +433,7 @@ export function anchor(root, selectors) {
  * @return {Promise<[TextPositionSelector, TextQuoteSelector]>}
  */
 export function describe(root, range, options = {}) {
-  const normalizedRange = new xpathRange.BrowserRange(range).normalize();
+  const normalizedRange = new BrowserRange(range).normalize();
 
   const startTextLayer = getNodeTextLayer(normalizedRange.start);
   const endTextLayer = getNodeTextLayer(normalizedRange.end);
@@ -447,6 +446,10 @@ export function describe(root, range, options = {}) {
 
   const startRange = normalizedRange.limit(startTextLayer);
   const endRange = normalizedRange.limit(endTextLayer);
+
+  if (!startRange || !endRange) {
+    return Promise.reject(new Error('range is outside text layer'));
+  }
 
   const startPageIndex = getSiblingIndex(startTextLayer.parentNode);
 

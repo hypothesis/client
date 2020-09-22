@@ -6,9 +6,8 @@ import { Adder } from './adder';
 
 // @ts-expect-error - Module is CoffeeScript
 import * as htmlAnchoring from './anchoring/html';
-// @ts-expect-error - Module is CoffeeScript
-import * as xpathRange from './anchoring/range';
 
+import { sniff } from './anchoring/range';
 import {
   getHighlightsContainingNode,
   highlightRange,
@@ -380,7 +379,7 @@ export default class Guest extends Delegator {
       if (!anchor.range) {
         return anchor;
       }
-      const range = xpathRange.sniff(anchor.range);
+      const range = sniff(anchor.range);
       const normedRange = range.normalize(root);
       const highlights = /** @type {AnnotationHighlight[]} */ (highlightRange(
         normedRange

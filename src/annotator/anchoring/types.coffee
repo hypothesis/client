@@ -9,7 +9,7 @@
 domAnchorTextPosition = require('dom-anchor-text-position')
 domAnchorTextQuote = require('dom-anchor-text-quote')
 
-xpathRange = require('./range')
+{ SerializedRange, sniff} = require('./range')
 
 # Helper function for throwing common errors
 missingParameter = (name) ->
@@ -28,7 +28,7 @@ class RangeAnchor
     unless root? then missingParameter('root')
     unless range? then missingParameter('range')
     @root = root
-    @range = xpathRange.sniff(range).normalize(@root)
+    @range = sniff(range).normalize(@root)
 
   @fromRange: (root, range) ->
     return new RangeAnchor(root, range)
@@ -41,7 +41,7 @@ class RangeAnchor
       end: selector.endContainer
       endOffset: selector.endOffset
     }
-    range = new xpathRange.SerializedRange(data)
+    range = new SerializedRange(data)
     return new RangeAnchor(root, range)
 
   toRange: () ->
