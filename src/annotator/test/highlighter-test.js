@@ -1,6 +1,6 @@
 import { createElement, render } from 'preact';
 
-import Range from '../anchoring/range';
+import { NormalizedRange } from '../anchoring/range';
 
 import {
   getBoundingClientRect,
@@ -54,7 +54,7 @@ function PdfPage({ showPlaceholder = false }) {
  */
 function highlightPdfRange(pageContainer) {
   const textSpan = pageContainer.querySelector('.testText');
-  const r = new Range.NormalizedRange({
+  const r = new NormalizedRange({
     commonAncestor: textSpan,
     start: textSpan.childNodes[0],
     end: textSpan.childNodes[0],
@@ -82,7 +82,7 @@ describe('annotator/highlighter', () => {
       const txt = document.createTextNode('test highlight span');
       const el = document.createElement('span');
       el.appendChild(txt);
-      const r = new Range.NormalizedRange({
+      const r = new NormalizedRange({
         commonAncestor: el,
         start: txt,
         end: txt,
@@ -107,7 +107,7 @@ describe('annotator/highlighter', () => {
         el.append(childEl);
       });
 
-      const r = new Range.NormalizedRange({
+      const r = new NormalizedRange({
         commonAncestor: el,
         start: textNodes[0],
         end: textNodes[textNodes.length - 1],
@@ -128,7 +128,7 @@ describe('annotator/highlighter', () => {
       const el = document.createElement('span');
       textNodes.forEach(n => el.append(n));
 
-      const r = new Range.NormalizedRange({
+      const r = new NormalizedRange({
         commonAncestor: el,
         start: textNodes[0],
         end: textNodes[textNodes.length - 1],
@@ -149,7 +149,7 @@ describe('annotator/highlighter', () => {
       el.appendChild(txt);
       el.appendChild(blank);
       el.appendChild(txt2);
-      const r = new Range.NormalizedRange({
+      const r = new NormalizedRange({
         commonAncestor: el,
         start: txt,
         end: txt2,
@@ -166,7 +166,7 @@ describe('annotator/highlighter', () => {
       el.appendChild(document.createTextNode(' '));
       el.appendChild(document.createTextNode(''));
       el.appendChild(document.createTextNode('   '));
-      const r = new Range.NormalizedRange({
+      const r = new NormalizedRange({
         commonAncestor: el,
         start: el.childNodes[0],
         end: el.childNodes[2],
@@ -348,7 +348,7 @@ describe('annotator/highlighter', () => {
     for (let i = 0; i < 3; i++) {
       const span = document.createElement('span');
       span.textContent = 'Test text';
-      const range = new Range.NormalizedRange({
+      const range = new NormalizedRange({
         commonAncestor: span,
         start: span.childNodes[0],
         end: span.childNodes[0],
@@ -431,7 +431,7 @@ describe('annotator/highlighter', () => {
 
   describe('getHighlightsContainingNode', () => {
     const makeRange = (start, end = start) =>
-      new Range.NormalizedRange({
+      new NormalizedRange({
         commonAncestor: start.parentNode,
         start,
         end,

@@ -1,8 +1,8 @@
 import $ from 'jquery';
 
-import { nodeFromXPath, xpathFromNode, $imports } from '../xpath-evaluate';
+import { nodeFromXPath, xpathFromNode, $imports } from '../xpath';
 
-describe('annotator/anchoring/xpath-evaluate', () => {
+describe('annotator/anchoring/xpath', () => {
   describe('xpathFromNode', () => {
     let container;
     let fakeSimpleXPathJQuery;
