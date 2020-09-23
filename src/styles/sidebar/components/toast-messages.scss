@@ -37,7 +37,7 @@
 
 .toast-message {
   @include molecules.card-frame;
-  @include layout.row($align: center);
+  @include layout.row($align: stretch);
   position: relative;
   width: 100%;
   margin-bottom: 0.75em;
