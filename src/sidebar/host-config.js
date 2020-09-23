@@ -1,10 +1,5 @@
 import * as queryString from 'query-string';
-import {
-  toBoolean,
-  toInteger,
-  toObject,
-  toString,
-} from '../shared/type-coercions';
+import coercions from '../shared/type-coercions';
 
 /** @typedef {import('../types/config').HostConfig} HostConfig */
 
@@ -22,44 +17,54 @@ export default function hostPageConfig(window) {
   // Known configuration parameters which we will import from the host page.
   // Note that since the host page is untrusted code, the filtering needs to
   // be done here.
-  const paramWhiteList = [
+
+  const paramWhiteList = {
     // Direct-linked annotation ID
-    'annotations',
+    annotations: coercions.toString.orNull,
 
     // Direct-linked group ID
-    'group',
+    group: coercions.toString.orNull,
 
     // Default query passed by url
-    'query',
+    query: coercions.toString.orNull,
 
     // Config param added by the extension, Via etc.  indicating how Hypothesis
     // was added to the page.
-    'appType',
+    appType: coercions.toString.orNull,
 
     // Config params documented at
     // https://h.readthedocs.io/projects/client/en/latest/publishers/config/
-    'openSidebar',
-    'showHighlights',
-    'services',
-    'branding',
+    openSidebar: coercions.toBoolean,
+    showHighlights: coercions.any,
+    services: coercions.toObject,
+    branding: coercions.toObject.orNull,
 
     // New note button override.
     // This should be removed once new note button is enabled for everybody.
-    'enableExperimentalNewNoteButton',
+    enableExperimentalNewNoteButton: coercions.toBoolean.orNull,
 
     // Forces the sidebar to filter annotations to a single user.
-    'focus',
+    focus: coercions.toObject.orNull,
 
     // Fetch config from a parent frame.
-    'requestConfigFromFrame',
+    requestConfigFromFrame: coercions.custom(value => {
+      if (typeof value === 'string') {
+        // Legacy `requestConfigFromFrame` value which holds only the origin.
+        return value;
+      }
+      const objectVal = coercions.toObject(value);
+      return {
+        origin: coercions.toString(objectVal.origin),
+        ancestorLevel: coercions.toInteger(objectVal.ancestorLevel),
+      };
+    }).orNull,
 
     // Theme which can either be specified as 'clean'.
     // If nothing is the specified the classic look is applied.
-    'theme',
+    theme: coercions.toString.orNull,
 
-    'usernameUrl',
-  ];
-
+    usernameUrl: coercions.toString.orNull,
+  };
   // We need to coerce incoming values from the host config for 2 reasons:
   //
   // 1. New versions of via may no longer support passing any type other than
@@ -79,34 +84,10 @@ export default function hostPageConfig(window) {
   // It is assumed we should expand this list and coerce and eventually
   // even validate all such config values.
   // See https://github.com/hypothesis/client/issues/1968
-  const coercions = {
-    openSidebar: toBoolean,
-    requestConfigFromFrame: value => {
-      if (typeof value === 'string') {
-        // Legacy `requestConfigFromFrame` value which holds only the origin.
-        return value;
-      }
-      const objectVal = toObject(value);
-      return {
-        origin: toString(objectVal.origin),
-        ancestorLevel: toInteger(objectVal.ancestorLevel),
-      };
-    },
-  };
-
-  return Object.keys(config).reduce(function (result, key) {
-    if (paramWhiteList.indexOf(key) !== -1) {
-      // Ignore `null` values as these indicate a default value.
-      // In this case the config value set in the sidebar app HTML config is
-      // used.
-      if (config[key] !== null) {
-        if (coercions[key]) {
-          // If a coercion method exists, pass it through
-          result[key] = coercions[key](config[key]);
-        } else {
-          result[key] = config[key];
-        }
-      }
+  return Object.keys(config).reduce((result, key) => {
+    if (paramWhiteList[key] !== undefined) {
+      const coercion = paramWhiteList[key];
+      result[key] = coercion(config[key]);
     }
     return result;
   }, {});

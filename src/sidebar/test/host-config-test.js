@@ -65,9 +65,9 @@ describe('hostPageConfig', function () {
     assert.deepEqual(hostPageConfig(window_), {});
   });
 
-  it('ignores `null` values in config', function () {
+  it('ignores `undefined` values in config', function () {
     const window_ = fakeWindow({
-      openSidebar: null,
+      openSidebar: undefined,
     });
 
     assert.deepEqual(hostPageConfig(window_), {});

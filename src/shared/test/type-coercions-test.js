@@ -1,4 +1,4 @@
-import { toBoolean, toInteger, toObject, toString } from '../type-coercions';
+import coercions from '../type-coercions';
 
 describe('shared/type-coercions', () => {
   describe('toBoolean', () => {
@@ -48,17 +48,19 @@ describe('shared/type-coercions', () => {
         result: true,
       },
       {
-        value: null,
-        result: false,
-      },
-      {
         value: undefined,
         result: false,
       },
     ].forEach(test => {
       it('coerces the values appropriately', () => {
-        assert.equal(toBoolean(test.value), test.result);
+        assert.equal(coercions.toBoolean(test.value), test.result);
+        assert.equal(coercions.toBoolean.orNull(test.value), test.result);
       });
+    });
+
+    it('coerces null appropriately', () => {
+      assert.equal(coercions.toBoolean(null), false);
+      assert.equal(coercions.toBoolean.orNull(null), null);
     });
   });
 
@@ -86,8 +88,14 @@ describe('shared/type-coercions', () => {
       },
     ].forEach(test => {
       it('coerces the values appropriately', () => {
-        assert.deepEqual(toInteger(test.value), test.result);
+        assert.deepEqual(coercions.toInteger(test.value), test.result);
+        assert.deepEqual(coercions.toInteger.orNull(test.value), test.result);
       });
+    });
+
+    it('coerces null appropriately', () => {
+      assert.deepEqual(coercions.toInteger(null), NaN);
+      assert.deepEqual(coercions.toInteger.orNull(null), null);
     });
   });
 
@@ -102,16 +110,59 @@ describe('shared/type-coercions', () => {
         result: {},
       },
       {
-        value: null,
-        result: {},
-      },
-      {
         value: undefined,
         result: {},
       },
     ].forEach(test => {
       it('coerces the values appropriately', () => {
-        assert.deepEqual(toObject(test.value), test.result);
+        assert.deepEqual(coercions.toObject(test.value), test.result);
+        assert.deepEqual(coercions.toObject.orNull(test.value), test.result);
+      });
+    });
+
+    it('coerces null appropriately', () => {
+      assert.deepEqual(coercions.toObject(null), {});
+      assert.deepEqual(coercions.toObject.orNull(null), null);
+    });
+
+    describe('shape', () => {
+      let shape;
+      beforeEach(() => {
+        shape = coercions.toObject.shape(value => {
+          return {
+            a: value.a,
+            b: value.b,
+          };
+        });
+      });
+
+      [
+        {
+          value: { a: 1, b: 2 },
+          result: { a: 1, b: 2 },
+        },
+        {
+          value: { a: 1, b: 2, c: 3 },
+          result: { a: 1, b: 2 },
+        },
+        {
+          value: { c: 3 },
+          result: { a: undefined, b: undefined },
+        },
+        {
+          value: 'fake',
+          result: { a: undefined, b: undefined },
+        },
+      ].forEach(test => {
+        it('coerces the values appropriately', () => {
+          assert.deepEqual(shape(test.value), test.result);
+          assert.deepEqual(shape.orNull(test.value), test.result);
+        });
+      });
+
+      it('coerces null appropriately', () => {
+        assert.deepEqual(shape(null), { a: undefined, b: undefined });
+        assert.deepEqual(shape.orNull(null), null);
       });
     });
   });
@@ -127,10 +178,6 @@ describe('shared/type-coercions', () => {
         result: '1',
       },
       {
-        value: null,
-        result: '',
-      },
-      {
         value: undefined,
         result: '',
       },
@@ -144,7 +191,55 @@ describe('shared/type-coercions', () => {
       },
     ].forEach(test => {
       it('coerces the values appropriately', () => {
-        assert.equal(toString(test.value), test.result);
+        assert.equal(coercions.toString(test.value), test.result);
+        assert.equal(coercions.toString.orNull(test.value), test.result);
+      });
+    });
+
+    it('coerces null appropriately', () => {
+      assert.deepEqual(coercions.toString(null), '');
+      assert.deepEqual(coercions.toString.orNull(null), null);
+    });
+  });
+
+  describe('custom', () => {
+    let custom;
+    beforeEach(() => {
+      custom = coercions.custom(value => {
+        if (value === 'any?') {
+          return 'any!';
+        } else {
+          return 'none!';
+        }
+      });
+    });
+
+    [
+      {
+        value: 'any?',
+        result: 'any!',
+      },
+      {
+        value: 1,
+        result: 'none!',
+      },
+    ].forEach(test => {
+      it('coerces the values appropriately', () => {
+        assert.equal(custom(test.value), test.result);
+        assert.equal(custom.orNull(test.value), test.result);
+      });
+    });
+
+    it('coerces null appropriately', () => {
+      assert.deepEqual(custom(null), 'none!');
+      assert.deepEqual(custom.orNull(null), null);
+    });
+  });
+
+  describe('any', () => {
+    [true, null, undefined, NaN, {}, 'string', () => {}].forEach(test => {
+      it('returns the original value', () => {
+        assert.deepEqual(coercions.any(test), test);
       });
     });
   });

@@ -9,12 +9,47 @@
  */
 
 /**
- * Returns a boolean
+ * Returns the value as a string or an empty string if the
+ * value undefined, null or otherwise falsely.
  *
- * @param {any} value - initial value
- * @return {boolean}
+ * @param {any} value - Initial value
  */
-export function toBoolean(value) {
+function toStringShim(value) {
+  if (value && typeof value.toString === 'function') {
+    return value.toString();
+  }
+  return '';
+}
+
+/**
+ * Returns either an string or null.
+ *
+ * @type {(value: any) => string|null}
+ */
+toStringShim.orNull = value => (value === null ? null : toStringShim(value));
+
+/**
+ * Returns either an integer or NaN.
+ *
+ * @param {any} value - Initial value
+ */
+function toIntegerShim(value) {
+  return parseInt(value);
+}
+
+/**
+ * Returns either an integer or null.
+ *
+ * @type {(value: any) => number|null}
+ */
+toIntegerShim.orNull = value => (value === null ? null : toIntegerShim(value));
+
+/**
+ * Returns a boolean.
+ *
+ * @param {any} value - Initial value
+ */
+function toBooleanShim(value) {
   if (typeof value === 'string') {
     if (value.trim().toLocaleLowerCase() === 'false') {
       // "false", "False", " false", "FALSE" all return false
@@ -30,23 +65,47 @@ export function toBoolean(value) {
 }
 
 /**
- * Returns either an integer or NaN
+ * Returns either an boolean or null.
  *
- * @param {any} value - initial value
- * @return {number}
+ * @type {(value: any) => boolean|null}
  */
-export function toInteger(value) {
-  // Acts as a simple wrapper
-  return parseInt(value);
+toBooleanShim.orNull = value => (value === null ? null : toBooleanShim(value));
+
+/**
+ * Returns the value from the custom formatter.
+ *
+ * Usage:
+ *
+ *  toCustom(value => {
+ *    return {
+ *       foo: coercions.toString(value.foo),
+ *       bar: coercions.toInteger(value.bar),
+ *    };
+ *  }).orNull
+ *
+ * @param {(value: any) => any} callback - Custom coercion formatter.
+ */
+function customShim(callback) {
+  /**
+   * Custom callback shim.
+   *
+   * @param {any} value - Initial value
+   */
+  function customCallback(value) {
+    return callback(value);
+  }
+  customCallback.orNull = value => {
+    return value === null ? null : customCallback(value);
+  };
+  return customCallback;
 }
 
 /**
- * Returns either the value if its an object or an empty object
+ * Returns either the `value` param if its an object, or an empty object.
  *
- * @param {any} value - initial value
- * @return {Object}
+ * @param {any} value - Initial value
  */
-export function toObject(value) {
+function toObjectShim(value) {
   if (typeof value === 'object' && value !== null) {
     return value;
   }
@@ -55,15 +114,61 @@ export function toObject(value) {
 }
 
 /**
- * Returns the value as a string or an empty string if the
- * value undefined, null or otherwise falsely.
+ * Returns either an object or null.
  *
- * @param {any} value - initial value
- * @return {string}
+ * @type {(value: any) => Object|null}
  */
-export function toString(value) {
-  if (value && typeof value.toString === 'function') {
-    return value.toString();
+toObjectShim.orNull = value => (value === null ? null : toObjectShim(value));
+
+/**
+ * Returns the value from the custom `shape` formatter.  This is different
+ * than `toCustom` in that this ensures the value is an object type before
+ * the custom shape formatter is run.
+ *
+ * Usage:
+ *
+ *  toObject.shape(value => {
+ *    return {
+ *       foo: coercions.toString(value.foo),
+ *       bar: coercions.toInteger(value.bar),
+ *    };
+ *  })
+ *
+ * @param {(value: any) => Object} shape - Custom coercion formatter.
+ */
+toObjectShim.shape = shape => {
+  /**
+   * Custom object shim.
+   *
+   * @param {any} value - Initial value
+   */
+  function toObjectShapeShim(value) {
+    return shape(toObjectShim(value));
   }
-  return '';
-}
+  /**
+   * Returns either the custom `shape` formatter value or null.
+   *
+   * Usage:
+   *
+   *  toObject.shape(value => {
+   *    ...
+   *  }).orNull
+   *
+   * @type {(value: any) => Object|null}
+   */
+  toObjectShapeShim.orNull = value =>
+    value === null ? null : toObjectShapeShim(value);
+  return toObjectShapeShim;
+};
+
+// Exported coercion types
+const coercions = {
+  toString: toStringShim,
+  toInteger: toIntegerShim,
+  toObject: toObjectShim,
+  toBoolean: toBooleanShim,
+  custom: customShim,
+  any: v => v,
+};
+
+export default coercions;
