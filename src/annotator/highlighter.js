@@ -302,6 +302,30 @@ export function setHighlightsVisible(root, visible) {
 }
 
 /**
+ * Get the highlight elements that contain the given node.
+ *
+ * @param {Node} node
+ * @return {HighlightElement[]}
+ */
+export function getHighlightsContainingNode(node) {
+  let el =
+    node.nodeType === Node.ELEMENT_NODE
+      ? /** @type {Element} */ (node)
+      : node.parentElement;
+
+  const highlights = [];
+
+  while (el) {
+    if (el.classList.contains('hypothesis-highlight')) {
+      highlights.push(/** @type {HighlightElement} */ (el));
+    }
+    el = el.parentElement;
+  }
+
+  return highlights;
+}
+
+/**
  * Subset of `DOMRect` interface.
  *
  * @typedef Rect

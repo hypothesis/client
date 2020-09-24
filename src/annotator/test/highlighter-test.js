@@ -4,6 +4,7 @@ import Range from '../anchoring/range';
 
 import {
   getBoundingClientRect,
+  getHighlightsContainingNode,
   highlightRange,
   removeHighlights,
   removeAllHighlights,
@@ -420,6 +421,41 @@ describe('annotator/highlighter', () => {
       assert.isFalse(
         root.classList.contains('hypothesis-highlights-always-on')
       );
+    });
+  });
+
+  describe('getHighlightsContainingNode', () => {
+    const makeRange = (start, end = start) =>
+      new Range.NormalizedRange({
+        commonAncestor: start.parentNode,
+        start,
+        end,
+      });
+
+    it('returns all the highlights containing the node', () => {
+      const root = document.createElement('div');
+      const text0 = document.createTextNode('One');
+      const text1 = document.createTextNode('Two');
+      root.appendChild(text0);
+      root.appendChild(text1);
+
+      const [highlight0] = highlightRange(makeRange(text0, text1));
+      const [highlight1] = highlightRange(makeRange(text0));
+
+      const highlights = getHighlightsContainingNode(text0);
+
+      assert.deepEqual(highlights, [highlight1, highlight0]);
+    });
+
+    it('returns an empty array if the node is not contained in a highlight', () => {
+      const root = document.createElement('div');
+      root.textContent = 'Test text';
+      assert.deepEqual(getHighlightsContainingNode(root.childNodes[0]), []);
+    });
+
+    it('returns an empty array if node has no parent element', () => {
+      const text = document.createTextNode('foobar');
+      assert.deepEqual(getHighlightsContainingNode(text), []);
     });
   });
 
