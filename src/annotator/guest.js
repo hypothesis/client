@@ -44,23 +44,35 @@ const animationPromise = fn =>
     })
   );
 
+/**
+ * Return all the annotations associated with the selected text.
+ *
+ * @return {AnnotationData[]}
+ */
 function annotationsForSelection() {
   const selection = /** @type {Selection} */ (window.getSelection());
   const range = selection.getRangeAt(0);
-  return rangeUtil.itemsForRange(
+  const items = rangeUtil.itemsForRange(
     range,
+
+    // nb. Only non-nullish items are returned by `itemsForRange`.
     node => /** @type {AnnotationHighlight} */ (node)._annotation
   );
+  return /** @type {AnnotationData[]} */ (items);
 }
 
 /**
  * Return the annotations associated with any highlights that contain a given
  * DOM node.
+ *
+ * @param {Node} node
+ * @return {AnnotationData[]}
  */
 function annotationsAt(node) {
-  return getHighlightsContainingNode(node).map(
-    h => /** @type {AnnotationHighlight} */ (h)._annotation
-  );
+  const items = getHighlightsContainingNode(node)
+    .map(h => /** @type {AnnotationHighlight} */ (h)._annotation)
+    .filter(ann => ann !== undefined);
+  return /** @type {AnnotationData[]} */ (items);
 }
 
 // A selector which matches elements added to the DOM by Hypothesis (eg. for
