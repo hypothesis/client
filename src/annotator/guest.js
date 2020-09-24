@@ -10,6 +10,7 @@ import * as htmlAnchoring from './anchoring/html';
 import * as xpathRange from './anchoring/range';
 
 import {
+  getHighlightsContainingNode,
   highlightRange,
   removeAllHighlights,
   removeHighlights,
@@ -57,20 +58,9 @@ function annotationsForSelection() {
  * DOM node.
  */
 function annotationsAt(node) {
-  if (node.nodeType !== Node.ELEMENT_NODE) {
-    node = node.parentElement;
-  }
-
-  const highlights = [];
-
-  while (node) {
-    if (node.classList.contains('hypothesis-highlight')) {
-      highlights.push(node);
-    }
-    node = node.parentElement;
-  }
-
-  return highlights.map(h => h._annotation);
+  return getHighlightsContainingNode(node).map(
+    h => /** @type {AnnotationHighlight} */ (h)._annotation
+  );
 }
 
 // A selector which matches elements added to the DOM by Hypothesis (eg. for
