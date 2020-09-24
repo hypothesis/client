@@ -1,23 +1,35 @@
 import CustomEvent from 'custom-event';
-import $ from 'jquery';
 import scrollIntoView from 'scroll-into-view';
 
 import Delegator from './delegator';
-import * as adder from './adder';
+import { Adder } from './adder';
 
 // @ts-expect-error - Module is CoffeeScript
 import * as htmlAnchoring from './anchoring/html';
 // @ts-expect-error - Module is CoffeeScript
 import * as xpathRange from './anchoring/range';
 
-import * as highlighter from './highlighter';
+import {
+  highlightRange,
+  removeAllHighlights,
+  removeHighlights,
+  setHighlightsFocused,
+  setHighlightsVisible,
+} from './highlighter';
 import * as rangeUtil from './range-util';
 import selections from './selections';
 import { closest } from '../shared/dom-element';
 import { normalizeURI } from './util/url';
 
 /**
+ * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('./toolbar').ToolbarController} ToolbarController
+ */
+
+/**
+ * HTML element created by the highlighter with an associated annotation.
+ *
+ * @typedef {Element & { _annotation?: AnnotationData }} AnnotationHighlight
  */
 
 const animationPromise = fn =>
@@ -34,7 +46,10 @@ const animationPromise = fn =>
 function annotationsForSelection() {
   const selection = /** @type {Selection} */ (window.getSelection());
   const range = selection.getRangeAt(0);
-  return rangeUtil.itemsForRange(range, node => $(node).data('annotation'));
+  return rangeUtil.itemsForRange(
+    range,
+    node => /** @type {AnnotationHighlight} */ (node)._annotation
+  );
 }
 
 /**
@@ -55,7 +70,7 @@ function annotationsAt(node) {
     node = node.parentElement;
   }
 
-  return highlights.map(h => $(h).data('annotation'));
+  return highlights.map(h => h._annotation);
 }
 
 // A selector which matches elements added to the DOM by Hypothesis (eg. for
@@ -79,11 +94,11 @@ export default class Guest extends Delegator {
     /** @type {ToolbarController|null} */
     this.toolbar = null;
 
-    this.adder = $(`<hypothesis-adder></hypothesis-adder>`)
-      .appendTo(this.element)
-      .hide();
+    this.adderToolbar = document.createElement('hypothesis-adder');
+    this.adderToolbar.style.display = 'none';
+    this.element[0].appendChild(this.adderToolbar);
 
-    this.adderCtrl = new adder.Adder(this.adder[0], {
+    this.adderCtrl = new Adder(this.adderToolbar, {
       onAnnotate: () => {
         this.createAnnotation();
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
@@ -268,10 +283,7 @@ export default class Guest extends Delegator {
       for (let anchor of this.anchors) {
         if (anchor.highlights) {
           const toggle = tags.includes(anchor.annotation.$tag);
-          $(anchor.highlights).toggleClass(
-            'hypothesis-highlight-focused',
-            toggle
-          );
+          setHighlightsFocused(anchor.highlights, toggle);
         }
       }
     });
@@ -308,12 +320,9 @@ export default class Guest extends Delegator {
   destroy() {
     this._removeElementEvents();
     this.selections.unsubscribe();
-    this.adder.remove();
+    this.adderToolbar.remove();
 
-    this.element.find('.hypothesis-highlight').each((index, element) => {
-      $(element).contents().insertBefore(element);
-      $(element).remove();
-    });
+    removeAllHighlights(this.element[0]);
 
     for (let name of Object.keys(this.plugins)) {
       this.plugins[name].destroy();
@@ -383,9 +392,12 @@ export default class Guest extends Delegator {
       return animationPromise(() => {
         const range = xpathRange.sniff(anchor.range);
         const normedRange = range.normalize(root);
-        const highlights = highlighter.highlightRange(normedRange);
-
-        $(highlights).data('annotation', anchor.annotation);
+        const highlights = /** @type {AnnotationHighlight[]} */ (highlightRange(
+          normedRange
+        ));
+        highlights.forEach(h => {
+          h._annotation = anchor.annotation;
+        });
         anchor.highlights = highlights;
         return anchor;
       });
@@ -440,7 +452,7 @@ export default class Guest extends Delegator {
     }
 
     // Remove all the highlights that have no corresponding target anymore.
-    requestAnimationFrame(() => highlighter.removeHighlights(deadHighlights));
+    requestAnimationFrame(() => removeHighlights(deadHighlights));
 
     // Anchor any targets of this annotation that are not anchored already.
     for (let target of annotation.target) {
@@ -468,7 +480,7 @@ export default class Guest extends Delegator {
     this.anchors = anchors;
 
     requestAnimationFrame(() => {
-      highlighter.removeHighlights(unhighlight);
+      removeHighlights(unhighlight);
       this.plugins.BucketBar?.update();
     });
   }
@@ -584,16 +596,7 @@ export default class Guest extends Delegator {
 
   // Pass true to show the highlights in the frame or false to disable.
   setVisibleHighlights(shouldShowHighlights) {
-    this.toggleHighlightClass(shouldShowHighlights);
-  }
-
-  toggleHighlightClass(shouldShowHighlights) {
-    const showHighlightsClass = 'hypothesis-highlights-always-on';
-    if (shouldShowHighlights) {
-      this.element.addClass(showHighlightsClass);
-    } else {
-      this.element.removeClass(showHighlightsClass);
-    }
+    setHighlightsVisible(this.element[0], shouldShowHighlights);
 
     this.visibleHighlights = shouldShowHighlights;
     if (this.toolbar) {

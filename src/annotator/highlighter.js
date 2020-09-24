@@ -247,6 +247,16 @@ function replaceWith(node, replacements) {
 }
 
 /**
+ * Remove all highlights under a given root element.
+ *
+ * @param {HTMLElement} root
+ */
+export function removeAllHighlights(root) {
+  const highlights = Array.from(root.querySelectorAll('hypothesis-highlight'));
+  removeHighlights(/** @type {HighlightElement[]} */ (highlights));
+}
+
+/**
  * Remove highlights from a range previously highlighted with `highlightRange`.
  *
  * @param {HighlightElement[]} highlights - The highlight elements returned by `highlightRange`
@@ -262,6 +272,33 @@ export function removeHighlights(highlights) {
       h.svgHighlight.remove();
     }
   }
+}
+
+/**
+ * Set whether the given highlight elements should appear "focused".
+ *
+ * A highlight can be displayed in a different ("focused") style to indicate
+ * that it is current in some other context - for example the user has selected
+ * the corresponding annotation in the sidebar.
+ *
+ * @param {HighlightElement[]} highlights
+ * @param {boolean} focused
+ */
+export function setHighlightsFocused(highlights, focused) {
+  highlights.forEach(h =>
+    h.classList.toggle('hypothesis-highlight-focused', focused)
+  );
+}
+
+/**
+ * Set whether highlights under the given root element should be visible.
+ *
+ * @param {HTMLElement} root
+ * @param {boolean} visible
+ */
+export function setHighlightsVisible(root, visible) {
+  const showHighlightsClass = 'hypothesis-highlights-always-on';
+  root.classList.toggle(showHighlightsClass, visible);
 }
 
 /**

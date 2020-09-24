@@ -54,8 +54,11 @@ describe('Guest', () => {
     FakeAdder.instance = null;
     guestConfig = { pluginClasses: {} };
     highlighter = {
-      highlightRange: sinon.stub(),
+      highlightRange: sinon.stub().returns([]),
       removeHighlights: sinon.stub(),
+      removeAllHighlights: sinon.stub(),
+      setHighlightsFocused: sinon.stub(),
+      setHighlightsVisible: sinon.stub(),
     };
     htmlAnchoring = {
       anchor: sinon.stub(),
@@ -211,7 +214,7 @@ describe('Guest', () => {
     });
   });
 
-  describe('annotation UI events', () => {
+  describe('events from sidebar', () => {
     const emitGuestEvent = (event, ...args) => {
       for (let [evt, fn] of fakeCrossFrame.on.args) {
         if (event === evt) {
@@ -229,24 +232,32 @@ describe('Guest', () => {
           { annotation: { $tag: 'tag1' }, highlights: highlight0.toArray() },
           { annotation: { $tag: 'tag2' }, highlights: highlight1.toArray() },
         ];
+
         emitGuestEvent('focusAnnotations', ['tag1']);
-        assert.isTrue(highlight0.hasClass('hypothesis-highlight-focused'));
+
+        assert.calledWith(
+          highlighter.setHighlightsFocused,
+          guest.anchors[0].highlights,
+          true
+        );
       });
 
       it('unfocuses any annotations without a matching tag', () => {
-        const highlight0 = $(
-          '<span class="hypothesis-highlight-focused"></span>'
-        );
-        const highlight1 = $(
-          '<span class="hypothesis-highlight-focused"></span>'
-        );
+        const highlight0 = $('<span></span>');
+        const highlight1 = $('<span></span>');
         const guest = createGuest();
         guest.anchors = [
           { annotation: { $tag: 'tag1' }, highlights: highlight0.toArray() },
           { annotation: { $tag: 'tag2' }, highlights: highlight1.toArray() },
         ];
+
         emitGuestEvent('focusAnnotations', ['tag1']);
-        assert.isFalse(highlight1.hasClass('hypothesis-highlight-focused'));
+
+        assert.calledWith(
+          highlighter.setHighlightsFocused,
+          guest.anchors[1].highlights,
+          false
+        );
       });
     });
 
@@ -363,6 +374,26 @@ describe('Guest', () => {
         emitGuestEvent('getDocumentInfo', assertComplete);
       });
     });
+
+    describe('on "setVisibleHighlights" event', () => {
+      it('sets visibility of highlights in document', () => {
+        const guest = createGuest();
+
+        emitGuestEvent('setVisibleHighlights', true);
+        assert.calledWith(
+          highlighter.setHighlightsVisible,
+          guest.element[0],
+          true
+        );
+
+        emitGuestEvent('setVisibleHighlights', false);
+        assert.calledWith(
+          highlighter.setHighlightsVisible,
+          guest.element[0],
+          false
+        );
+      });
+    });
   });
 
   describe('document events', () => {
@@ -450,7 +481,7 @@ describe('Guest', () => {
     it('sets the annotations associated with the selection', () => {
       createGuest();
       const ann = {};
-      $(container).data('annotation', ann);
+      container._annotation = ann;
       rangeUtil.itemsForRange.callsFake((range, callback) => [
         callback(range.startContainer),
       ]);
