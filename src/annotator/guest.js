@@ -33,17 +33,6 @@ import { normalizeURI } from './util/url';
  * @typedef {Element & { _annotation?: AnnotationData }} AnnotationHighlight
  */
 
-const animationPromise = fn =>
-  new Promise((resolve, reject) =>
-    requestAnimationFrame(() => {
-      try {
-        resolve(fn());
-      } catch (error) {
-        reject(error);
-      }
-    })
-  );
-
 /**
  * Return all the annotations associated with the selected text.
  *
@@ -391,18 +380,16 @@ export default class Guest extends Delegator {
       if (!anchor.range) {
         return anchor;
       }
-      return animationPromise(() => {
-        const range = xpathRange.sniff(anchor.range);
-        const normedRange = range.normalize(root);
-        const highlights = /** @type {AnnotationHighlight[]} */ (highlightRange(
-          normedRange
-        ));
-        highlights.forEach(h => {
-          h._annotation = anchor.annotation;
-        });
-        anchor.highlights = highlights;
-        return anchor;
+      const range = xpathRange.sniff(anchor.range);
+      const normedRange = range.normalize(root);
+      const highlights = /** @type {AnnotationHighlight[]} */ (highlightRange(
+        normedRange
+      ));
+      highlights.forEach(h => {
+        h._annotation = anchor.annotation;
       });
+      anchor.highlights = highlights;
+      return anchor;
     };
 
     // Store the results of anchoring.
