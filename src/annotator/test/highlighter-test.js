@@ -337,6 +337,11 @@ describe('annotator/highlighter', () => {
     });
   });
 
+  /**
+   * Add some text nodes to `root` and highlight them with `highlightRange`.
+   *
+   * Returns all the highlight elements.
+   */
   function createHighlights(root) {
     let highlights = [];
 
