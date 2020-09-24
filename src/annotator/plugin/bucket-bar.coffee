@@ -3,6 +3,8 @@ Plugin = require('../plugin')
 
 scrollIntoView = require('scroll-into-view')
 
+{ findClosestOffscreenAnchor } = require('./bucket-bar-js')
+
 highlighter = require('../highlighter')
 
 BUCKET_SIZE = 16                              # Regular bucket size
@@ -12,32 +14,8 @@ BUCKET_TOP_THRESHOLD = 115 + BUCKET_NAV_SIZE  # Toolbar
 
 # Scroll to the next closest anchor off screen in the given direction.
 scrollToClosest = (anchors, direction) ->
-  dir = if direction is "up" then +1 else -1
-  {next} = anchors.reduce (acc, anchor) ->
-    unless anchor.highlights?.length
-      return acc
-
-    {start, next} = acc
-    rect = highlighter.getBoundingClientRect(anchor.highlights)
-
-    # Ignore if it's not in the right direction.
-    if (dir is 1 and rect.top >= BUCKET_TOP_THRESHOLD)
-      return acc
-    else if (dir is -1 and rect.top <= window.innerHeight - BUCKET_NAV_SIZE)
-      return acc
-
-    # Select the closest to carry forward
-    if not next?
-      start: rect.top
-      next: anchor
-    else if start * dir < rect.top * dir
-      start: rect.top
-      next: anchor
-    else
-        acc
-  , {}
-
-  scrollIntoView(next.highlights[0])
+  closest = findClosestOffscreenAnchor(anchors, direction)
+  scrollIntoView(closest.highlights[0])
 
 
 module.exports = class BucketBar extends Plugin
