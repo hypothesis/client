@@ -3,9 +3,12 @@ import { createElement, render } from 'preact';
 import Range from '../anchoring/range';
 
 import {
+  getBoundingClientRect,
   highlightRange,
   removeHighlights,
-  getBoundingClientRect,
+  removeAllHighlights,
+  setHighlightsFocused,
+  setHighlightsVisible,
 } from '../highlighter';
 
 /**
@@ -330,6 +333,93 @@ describe('annotator/highlighter', () => {
       removeHighlights([highlight]);
 
       assert.equal(page.querySelectorAll('rect').length, 0);
+    });
+  });
+
+  function createHighlights(root) {
+    let highlights = [];
+
+    for (let i = 0; i < 3; i++) {
+      const span = document.createElement('span');
+      span.textContent = 'Test text';
+      const range = new Range.NormalizedRange({
+        commonAncestor: span,
+        start: span.childNodes[0],
+        end: span.childNodes[0],
+      });
+      root.appendChild(span);
+      highlights.push(...highlightRange(range));
+    }
+
+    return highlights;
+  }
+
+  describe('removeAllHighlights', () => {
+    it('removes all highlight elements under the root element', () => {
+      const root = document.createElement('div');
+
+      createHighlights(root);
+
+      const textContent = root.textContent;
+      assert.equal(root.querySelectorAll('hypothesis-highlight').length, 3);
+
+      removeAllHighlights(root);
+
+      assert.equal(root.querySelectorAll('hypothesis-highlight').length, 0);
+      assert.equal(root.textContent, textContent);
+    });
+
+    it('does nothing if there are no highlights', () => {
+      const root = document.createElement('div');
+      root.innerHTML = '<span>one</span>-<span>two</span>-<span>three</span>';
+
+      removeAllHighlights(root);
+
+      assert.equal(root.textContent, 'one-two-three');
+    });
+  });
+
+  describe('setHighlightsFocused', () => {
+    it('adds class to highlights when focused is `true`', () => {
+      const root = document.createElement('div');
+      const highlights = createHighlights(root);
+
+      setHighlightsFocused(highlights, true);
+
+      highlights.forEach(h =>
+        assert.isTrue(h.classList.contains('hypothesis-highlight-focused'))
+      );
+    });
+
+    it('removes class from highlights when focused is `false`', () => {
+      const root = document.createElement('div');
+      const highlights = createHighlights(root);
+
+      setHighlightsFocused(highlights, true);
+      setHighlightsFocused(highlights, false);
+
+      highlights.forEach(h =>
+        assert.isFalse(h.classList.contains('hypothesis-highlight-focused'))
+      );
+    });
+  });
+
+  describe('setHighlightsVisible', () => {
+    it('adds class to root when `visible` is `true`', () => {
+      const root = document.createElement('div');
+      setHighlightsVisible(root, true);
+      assert.isTrue(root.classList.contains('hypothesis-highlights-always-on'));
+    });
+
+    it('removes class from root when `visible` is `false`', () => {
+      const root = document.createElement('div');
+
+      setHighlightsVisible(root, true);
+      setHighlightsVisible(root, false);
+
+      assert.isFalse(
+        root.classList.contains('hypothesis-highlights-always-on')
+      );
     });
   });
 
