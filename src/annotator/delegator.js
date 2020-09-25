@@ -35,6 +35,8 @@ export default class Delegator {
     this.element = element;
 
     const el = /** @type {any} */ (element);
+
+    /** @type {EventEmitter} */
     let eventBus = el._hypothesisEventBus;
     if (!eventBus) {
       eventBus = new EventEmitter();
@@ -42,6 +44,8 @@ export default class Delegator {
     }
 
     this._eventBus = eventBus;
+
+    /** @type {[event: string, callback: Function][]} */
     this._subscriptions = [];
   }
 
