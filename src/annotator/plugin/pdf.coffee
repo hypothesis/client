@@ -1,4 +1,5 @@
 Plugin = require('../plugin')
+debounce = require('lodash.debounce')
 
 { default: RenderingStates } = require('../pdfjs-rendering-states')
 
@@ -16,7 +17,7 @@ module.exports = class PDF extends Plugin
 
     @pdfMetadata = new PDFMetadata(PDFViewerApplication)
 
-    @observer = new MutationObserver((mutations) => this._update())
+    @observer = new MutationObserver(debounce(this._update.bind(this), 100))
     @observer.observe(@pdfViewer.viewer, {
       attributes: true
       attributeFilter: ['data-loaded']
