@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import * as adder from '../adder';
 import { Observable } from '../util/observable';
 import Delegator from '../delegator';
@@ -225,12 +223,12 @@ describe('Guest', () => {
 
     describe('on "focusAnnotations" event', () => {
       it('focuses any annotations with a matching tag', () => {
-        const highlight0 = $('<span></span>');
-        const highlight1 = $('<span></span>');
+        const highlight0 = document.createElement('span');
+        const highlight1 = document.createElement('span');
         const guest = createGuest();
         guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: highlight0.toArray() },
-          { annotation: { $tag: 'tag2' }, highlights: highlight1.toArray() },
+          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
+          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
         ];
 
         emitGuestEvent('focusAnnotations', ['tag1']);
@@ -243,12 +241,12 @@ describe('Guest', () => {
       });
 
       it('unfocuses any annotations without a matching tag', () => {
-        const highlight0 = $('<span></span>');
-        const highlight1 = $('<span></span>');
+        const highlight0 = document.createElement('span');
+        const highlight1 = document.createElement('span');
         const guest = createGuest();
         guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: highlight0.toArray() },
-          { annotation: { $tag: 'tag2' }, highlights: highlight1.toArray() },
+          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
+          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
         ];
 
         emitGuestEvent('focusAnnotations', ['tag1']);
@@ -267,25 +265,25 @@ describe('Guest', () => {
       });
 
       it('scrolls to the anchor with the matching tag', () => {
-        const highlight = $('<span></span>');
+        const highlight = document.createElement('span');
         const guest = createGuest();
         guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: highlight.toArray() },
+          { annotation: { $tag: 'tag1' }, highlights: [highlight] },
         ];
         emitGuestEvent('scrollToAnnotation', 'tag1');
         assert.called(scrollIntoView);
-        assert.calledWith(scrollIntoView, highlight[0]);
+        assert.calledWith(scrollIntoView, highlight);
       });
 
       context('when dispatching the "scrolltorange" event', () => {
         it('emits with the range', () => {
-          const highlight = $('<span></span>');
+          const highlight = document.createElement('span');
           const guest = createGuest();
           const fakeRange = sinon.stub();
           guest.anchors = [
             {
               annotation: { $tag: 'tag1' },
-              highlights: highlight.toArray(),
+              highlights: [highlight],
               range: fakeRange,
             },
           ];
@@ -301,13 +299,13 @@ describe('Guest', () => {
         });
 
         it('allows the default scroll behaviour to be prevented', () => {
-          const highlight = $('<span></span>');
+          const highlight = document.createElement('span');
           const guest = createGuest();
           const fakeRange = sinon.stub();
           guest.anchors = [
             {
               annotation: { $tag: 'tag1' },
-              highlights: highlight.toArray(),
+              highlights: [highlight],
               range: fakeRange,
             },
           ];

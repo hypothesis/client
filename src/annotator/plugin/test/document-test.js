@@ -10,8 +10,6 @@
  ** https://github.com/openannotation/annotator/blob/master/LICENSE
  */
 
-import $ from 'jquery';
-
 import { normalizeURI } from '../../util/url';
 import DocumentMeta from '../document';
 
@@ -44,7 +42,6 @@ describe('DocumentMeta', function () {
 
   afterEach(() => {
     testDocument.destroy();
-    $(document).unbind();
   });
 
   it('attaches document metadata to new annotations', () => {
@@ -276,7 +273,8 @@ describe('DocumentMeta', function () {
           href,
         },
       };
-      const doc = new DocumentMeta($('<div></div>')[0], {
+      const divEl = document.createElement('div');
+      const doc = new DocumentMeta(divEl, {
         document: fakeDocument,
         baseURI,
       });
