@@ -43,11 +43,11 @@ describe('Sidebar', () => {
   };
 
   const createExternalContainer = () => {
-    const externalFrame = $(
-      '<div class="' + EXTERNAL_CONTAINER_SELECTOR + '"></div>'
-    );
-    externalFrame.width(DEFAULT_WIDTH).height(DEFAULT_HEIGHT);
-    return externalFrame[0];
+    const externalFrame = document.createElement('div');
+    externalFrame.className = EXTERNAL_CONTAINER_SELECTOR;
+    externalFrame.style.width = DEFAULT_WIDTH + 'px';
+    externalFrame.style.height = DEFAULT_HEIGHT + 'px';
+    return externalFrame;
   };
 
   beforeEach(() => {
