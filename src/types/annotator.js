@@ -2,15 +2,50 @@
  * Type definitions for objects passed between the annotator and sidebar.
  */
 
-/** @typedef {import("./api").Target} Target */
+/**
+ * @typedef {import("./api").Selector} Selector
+ * @typedef {import("./api").Target} Target
+ */
 
 /**
+ * An object representing an annotation in the document.
+ *
  * @typedef AnnotationData
  * @prop {string} uri
  * @prop {Target[]} target
  * @prop {string} $tag
  * @prop {boolean} [$highlight]
  * @prop {DocumentMetadata} document
+ */
+
+/**
+ * An object representing the location in a document that an annotation is
+ * associated with.
+ *
+ * @typedef Anchor
+ * @prop {AnnotationData} annotation
+ * @prop {HTMLElement[]} [highlights]
+ * @prop {Range} [range]
+ */
+
+/**
+ * Anchoring implementation for a particular document type (eg. PDF or HTML).
+ *
+ * This is responsible for converting between serialized "selectors" that can
+ * be stored in the Hypothesis backend and ranges in the document.
+ *
+ * @typedef AnchoringImpl
+ * @prop {(root: HTMLElement, selectors: Selector[], options: any) => Promise<Range>} anchor
+ * @prop {(root: HTMLElement, range: Range, options: any) => Promise<Selector[]>} describe
+ */
+
+/**
+ * Subset of the annotator `Guest` instance that is exposed to other modules
+ *
+ * @typedef Annotator
+ * @prop {Anchor[]} anchors
+ * @prop {(ann: AnnotationData) => Promise<Anchor[]>} anchor
+ * @prop {AnchoringImpl} anchoring - Anchoring implementation for the current document type
  */
 
 /**

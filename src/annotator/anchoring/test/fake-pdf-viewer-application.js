@@ -122,6 +122,8 @@ class FakePDFViewer {
 
     /** @type {FakePDFPageView} */
     this._pages = [];
+
+    this.viewer = this._container;
   }
 
   get pagesCount() {
