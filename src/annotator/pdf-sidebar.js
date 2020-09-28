@@ -32,23 +32,11 @@ export default class PdfSidebar extends Sidebar {
     this.pdfViewer = this.window.PDFViewerApplication?.pdfViewer;
     this.pdfContainer = this.window.PDFViewerApplication?.appConfig?.appContainer;
 
-    // Prefer to lay out the sidebar and the PDF side-by-side (with the sidebar
-    // not overlapping the PDF) when space allows
-    this.sideBySide = !!(
-      config.experimental?.pdfSideBySide &&
-      this.pdfViewer &&
-      this.pdfContainer
-    );
-
-    // Is the current state of the layout side-by-side?
+    // Is the PDF currently displayed side-by-side with the sidebar?
     this.sideBySideActive = false;
 
-    if (this.sideBySide) {
-      this.subscribe('sidebarLayoutChanged', state =>
-        this.fitSideBySide(state)
-      );
-      this.window.addEventListener('resize', () => this.fitSideBySide());
-    }
+    this.subscribe('sidebarLayoutChanged', state => this.fitSideBySide(state));
+    this.window.addEventListener('resize', () => this.fitSideBySide());
   }
 
   /**
