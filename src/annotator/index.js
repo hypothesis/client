@@ -23,6 +23,7 @@ import configFrom from './config/index';
 import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import Guest from './guest';
+import PDFPlugin from './plugin/pdf';
 import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
 
@@ -30,8 +31,6 @@ import Sidebar from './sidebar';
 // JS.
 // @ts-expect-error
 import BucketBarPlugin from './plugin/bucket-bar';
-// @ts-expect-error
-import PDFPlugin from './plugin/pdf';
 
 const pluginClasses = {
   // UI plugins
