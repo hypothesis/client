@@ -66,23 +66,10 @@ describe('PdfSidebar', () => {
   });
 
   context('side-by-side mode configured', () => {
-    it('enables side-by-side mode if config and PDF js are present', () => {
-      const sidebar = createPdfSidebar({
-        experimental: {
-          pdfSideBySide: true,
-        },
-      });
-      assert.isTrue(sidebar.sideBySide);
-    });
-
     describe('when window is resized', () => {
       it('attempts to lay out side-by-side', () => {
         sandbox.stub(window, 'innerWidth').value(1300);
-        const sidebar = createPdfSidebar({
-          experimental: {
-            pdfSideBySide: true,
-          },
-        });
+        const sidebar = createPdfSidebar();
 
         window.dispatchEvent(new Event('resize'));
 
@@ -97,11 +84,7 @@ describe('PdfSidebar', () => {
 
       it('resizes and activates side-by-side mode', () => {
         sandbox.stub(window, 'innerWidth').value(1300);
-        const sidebar = createPdfSidebar({
-          experimental: {
-            pdfSideBySide: true,
-          },
-        });
+        const sidebar = createPdfSidebar();
         sidebar._lastSidebarLayoutState = {
           expanded: true,
           width: 428,
@@ -119,11 +102,7 @@ describe('PdfSidebar', () => {
 
       it('does not activate side-by-side mode if there is not enough room', () => {
         sandbox.stub(window, 'innerWidth').value(800);
-        const sidebar = createPdfSidebar({
-          experimental: {
-            pdfSideBySide: true,
-          },
-        });
+        const sidebar = createPdfSidebar();
         sidebar._lastSidebarLayoutState = {
           expanded: true,
           width: 428,
@@ -143,11 +122,7 @@ describe('PdfSidebar', () => {
     describe('when sidebar layout state changes', () => {
       it('resizes and activates side-by-side mode when sidebar expanded', () => {
         sandbox.stub(window, 'innerWidth').value(1350);
-        const sidebar = createPdfSidebar({
-          experimental: {
-            pdfSideBySide: true,
-          },
-        });
+        const sidebar = createPdfSidebar();
 
         sidebar.publish('sidebarLayoutChanged', [
           { expanded: true, width: 428, height: 728 },
@@ -169,11 +144,7 @@ describe('PdfSidebar', () => {
         it('activates side-by-side mode for each relative zoom mode', () => {
           fakePDFViewerApplication.pdfViewer.currentScaleValue = zoomMode;
           sandbox.stub(window, 'innerWidth').value(1350);
-          const sidebar = createPdfSidebar({
-            experimental: {
-              pdfSideBySide: true,
-            },
-          });
+          const sidebar = createPdfSidebar();
 
           sidebar.publish('sidebarLayoutChanged', [
             { expanded: true, width: 428, height: 728 },
@@ -187,11 +158,7 @@ describe('PdfSidebar', () => {
 
       it('deactivates side-by-side mode when sidebar collapsed', () => {
         sandbox.stub(window, 'innerWidth').value(1350);
-        const sidebar = createPdfSidebar({
-          experimental: {
-            pdfSideBySide: true,
-          },
-        });
+        const sidebar = createPdfSidebar();
 
         sidebar.publish('sidebarLayoutChanged', [
           { expanded: false, width: 428, height: 728 },
@@ -203,11 +170,7 @@ describe('PdfSidebar', () => {
 
       it('does not activate side-by-side mode if there is not enough room', () => {
         sandbox.stub(window, 'innerWidth').value(800);
-        const sidebar = createPdfSidebar({
-          experimental: {
-            pdfSideBySide: true,
-          },
-        });
+        const sidebar = createPdfSidebar();
 
         sidebar.publish('sidebarLayoutChanged', [
           { expanded: true, width: 428, height: 728 },
@@ -217,34 +180,6 @@ describe('PdfSidebar', () => {
         assert.calledOnce(fakePDFViewerUpdate);
         assert.equal(fakePDFContainer.style.width, 'auto');
       });
-    });
-  });
-
-  context('side-by-side mode not configured', () => {
-    it('does not enable side-by-side mode', () => {
-      const sidebar = createPdfSidebar({});
-
-      assert.isFalse(sidebar.sideBySide);
-    });
-
-    it('does not attempt to resize PDF container on window resize', () => {
-      const sidebar = createPdfSidebar({});
-
-      window.dispatchEvent(new Event('resize'));
-
-      assert.isFalse(sidebar.sideBySideActive);
-      assert.notCalled(fakePDFViewerUpdate);
-    });
-
-    it('does not attempt to resize PDF container on sidebar layout change', () => {
-      const sidebar = createPdfSidebar({});
-
-      sidebar.publish('sidebarLayoutChanged', [
-        { expanded: true, width: 428, height: 728 },
-      ]);
-
-      assert.isFalse(sidebar.sideBySideActive);
-      assert.notCalled(fakePDFViewerUpdate);
     });
   });
 });
