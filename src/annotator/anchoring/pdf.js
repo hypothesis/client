@@ -10,8 +10,6 @@ import RenderingStates from '../pdfjs-rendering-states';
 
 import { BrowserRange } from './range';
 import { toRange as textPositionToRange } from './text-position';
-
-// @ts-expect-error - `./types` needs to be converted to JS.
 import { TextPositionAnchor, TextQuoteAnchor } from './types';
 
 /**
@@ -427,12 +425,8 @@ export function anchor(root, selectors) {
  *
  * @param {HTMLElement} root - The root element
  * @param {Range} range
- * @param {Object} options -
- *   Options passed to `TextQuoteAnchor` and `TextPositionAnchor`'s
- *   `toSelector` methods.
- * @return {Promise<[TextPositionSelector, TextQuoteSelector]>}
  */
-export function describe(root, range, options = {}) {
+export function describe(root, range) {
   const normalizedRange = new BrowserRange(range).normalize();
 
   const startTextLayer = getNodeTextLayer(normalizedRange.start);
@@ -468,19 +462,17 @@ export function describe(root, range, options = {}) {
     startPos += pageOffset;
     endPos += pageOffset;
 
-    const position = new TextPositionAnchor(root, startPos, endPos).toSelector(
-      options
-    );
+    const position = new TextPositionAnchor(
+      root,
+      startPos,
+      endPos
+    ).toSelector();
 
     const quoteRange = document.createRange();
     quoteRange.setStartBefore(startRange.start);
     quoteRange.setEndAfter(endRange.end);
 
-    const quote = TextQuoteAnchor.fromRange(
-      root,
-      quoteRange,
-      options
-    ).toSelector(options);
+    const quote = TextQuoteAnchor.fromRange(root, quoteRange).toSelector();
 
     return Promise.all([position, quote]);
   });
