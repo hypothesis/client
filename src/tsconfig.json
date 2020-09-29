@@ -10,13 +10,11 @@
     "strictNullChecks": true,
     "target": "ES2020"
   },
-  "include": [
-    "**/*.js"
-  ],
+  "include": ["**/*.js", "**/*.ts"],
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",
     "test-util/**/*.js",
-    "karma.config.js",
+    "karma.config.js"
   ]
 }

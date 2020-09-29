@@ -14,6 +14,10 @@ import TagList from './tag-list';
 
 /**
  * @typedef {import("../../types/api").Annotation} Annotation
+ * @typedef {import("../store/modules/drafts").Draft} Draft
+ *
+ * The following TS utility (Extract) doesn't seem to work
+ * @typedef {Extract<'text' | 'tags' | 'user', Annotation>} AnnotationSubset
  * @typedef {import("../../types/config").MergedConfig} MergedConfig
  */
 
@@ -37,7 +41,9 @@ function AnnotationBody({ annotation, settings }) {
   // collapsing/expanding is relevant?
   const [isCollapsible, setIsCollapsible] = useState(false);
 
-  const draft = useStore(store => store.getDraft(annotation));
+  /** @type {Draft|null} */ const draft = useStore(store =>
+    store.getDraft(annotation)
+  );
 
   const toggleText = isCollapsed ? 'More' : 'Less';
 
