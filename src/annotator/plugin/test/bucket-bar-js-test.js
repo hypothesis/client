@@ -1,4 +1,7 @@
-import { findClosestOffscreenAnchor } from '../bucket-bar-js';
+import {
+  findClosestOffscreenAnchor,
+  constructPositionPoints,
+} from '../bucket-bar-js';
 import { $imports } from '../bucket-bar-js';
 
 function fakeAnchorFactory() {
@@ -10,7 +13,7 @@ function fakeAnchorFactory() {
   };
 }
 
-describe('annotator/plugin/bucket-bar', () => {
+describe('annotator/plugin/bucket-bar-js', () => {
   let fakeGetBoundingClientRect;
 
   beforeEach(() => {
@@ -19,6 +22,7 @@ describe('annotator/plugin/bucket-bar', () => {
       const top = highlights[0] * 100 + 1;
       return {
         top,
+        bottom: top + 50,
       };
     });
 
@@ -105,6 +109,94 @@ describe('annotator/plugin/bucket-bar', () => {
       stubbedInnerHeight = sinon.stub(window, 'innerHeight').value(800);
       assert.isNull(findClosestOffscreenAnchor([{ highlights: [] }], 'down'));
       assert.isNull(findClosestOffscreenAnchor(fakeAnchors, 'down'));
+    });
+  });
+
+  describe('constructPositionPoints', () => {
+    let fakeAnchors;
+    let stubbedInnerHeight;
+
+    beforeEach(() => {
+      const fakeAnchor = fakeAnchorFactory();
+      fakeAnchors = [
+        fakeAnchor(), // top: 1
+        fakeAnchor(), // top: 101
+        fakeAnchor(), // top: 201
+        fakeAnchor(), // top: 301
+        fakeAnchor(), // top: 401
+        fakeAnchor(), // top: 501
+      ];
+      stubbedInnerHeight = sinon.stub(window, 'innerHeight').value(410);
+    });
+
+    afterEach(() => {
+      stubbedInnerHeight.restore();
+    });
+
+    it('returns an Array of anchors that are offscreen above', () => {
+      const positionPoints = constructPositionPoints(fakeAnchors);
+
+      assert.deepEqual(positionPoints.above, [fakeAnchors[0], fakeAnchors[1]]);
+    });
+
+    it('returns an Array of anchors that are offscreen below', () => {
+      const positionPoints = constructPositionPoints(fakeAnchors);
+
+      assert.deepEqual(positionPoints.below, [fakeAnchors[4], fakeAnchors[5]]);
+    });
+
+    it('does not return duplicate anchors', () => {
+      const positionPoints = constructPositionPoints([
+        fakeAnchors[0],
+        fakeAnchors[0],
+        fakeAnchors[5],
+        fakeAnchors[5],
+      ]);
+
+      assert.deepEqual(positionPoints.above, [fakeAnchors[0]]);
+      assert.deepEqual(positionPoints.below, [fakeAnchors[5]]);
+    });
+
+    it('returns an Array of position points for on-screen anchors', () => {
+      const positionPoints = constructPositionPoints(fakeAnchors);
+
+      // It should return two "point" positions for each on-screen anchor,
+      // one representing the top of the anchor's highlight box, one representing
+      // the bottom position
+      assert.equal(positionPoints.points.length, 4);
+      // The top position of the first on-screen anchor
+      assert.deepEqual(positionPoints.points[0], [201, 1, fakeAnchors[2]]);
+      // The bottom position of the first on-screen anchor
+      assert.deepEqual(positionPoints.points[1], [251, -1, fakeAnchors[2]]);
+      // The top position of the second on-screen anchor
+      assert.deepEqual(positionPoints.points[2], [301, 1, fakeAnchors[3]]);
+      // The bottom position of the second on-screen anchor
+      assert.deepEqual(positionPoints.points[3], [351, -1, fakeAnchors[3]]);
+    });
+
+    it('sorts on-screen points based on position type secondarily', () => {
+      fakeGetBoundingClientRect.callsFake(() => {
+        return {
+          top: 250,
+          bottom: 250,
+        };
+      });
+      const positionPoints = constructPositionPoints(fakeAnchors);
+      for (let i = 0; i < fakeAnchors.length; i++) {
+        // The bottom position for all of the fake anchors is the same, so
+        // those points will all be at the top of the list
+        assert.equal(positionPoints.points[i][2], fakeAnchors[i]);
+        // This point is a "bottom" point
+        assert.equal(positionPoints.points[i][1], -1);
+        // The top position for all of the fake anchors is the same, so
+        // they'll be sorted to the end of the list
+        assert.equal(
+          positionPoints.points[i + fakeAnchors.length][2],
+          fakeAnchors[i]
+        );
+        // This point is a "top" point
+        assert.equal(positionPoints.points[i + fakeAnchors.length][1], 1);
+      }
     });
   });
 });

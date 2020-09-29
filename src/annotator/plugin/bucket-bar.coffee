@@ -3,7 +3,7 @@ $ = require('jquery')
 
 scrollIntoView = require('scroll-into-view')
 
-{ findClosestOffscreenAnchor } = require('./bucket-bar-js')
+{ findClosestOffscreenAnchor, constructPositionPoints } = require('./bucket-bar-js')
 
 highlighter = require('../highlighter')
 
@@ -81,64 +81,43 @@ module.exports = class BucketBar extends Delegator
       @_update()
 
   _update: ->
-    # Keep track of buckets of annotations above and below the viewport
-    above = []
-    below = []
+    {above, below, points } = constructPositionPoints(@annotator.anchors)
 
-    # Construct indicator points
-    points = @annotator.anchors.reduce (points, anchor, i) =>
-      unless anchor.highlights?.length
-        return points
-
-      rect = @highlighter.getBoundingClientRect(anchor.highlights)
-      x = rect.top
-      h = rect.bottom - rect.top
-
-      if x < BUCKET_TOP_THRESHOLD
-        if anchor not in above then above.push anchor
-      else if x > window.innerHeight - BUCKET_NAV_SIZE
-        if anchor not in below then below.push anchor
-      else
-        points.push [x, 1, anchor]
-        points.push [x + h, -1, anchor]
-      points
-    , []
-
-    # Accumulate the overlapping annotations into buckets.
+    # Accumulate the overlapping anchors into buckets.
     # The algorithm goes like this:
     # - Collate the points by sorting on position then delta (+1 or -1)
     # - Reduce over the sorted points
-    #   - For +1 points, add the annotation at this point to an array of
-    #     "carried" annotations. If it already exists, increase the
+    #   - For +1 points, add the anchor at this point to an array of
+    #     "carried" anchors. If it already exists, increase the
     #     corresponding value in an array of counts which maintains the
-    #     number of points that include this annotation.
-    #   - For -1 points, decrement the value for the annotation at this point
+    #     number of points that include this anchor.
+    #   - For -1 points, decrement the value for the anchor at this point
     #     in the carried array of counts. If the count is now zero, remove the
-    #     annotation from the carried array of annotations.
+    #     anchor from the carried array of anchors.
     #   - If this point is the first, last, sufficiently far from the previous,
-    #     or there are no more carried annotations, add a bucket marker at this
+    #     or there are no more carried anchors, add a bucket marker at this
     #     point.
     #   - Otherwise, if the last bucket was not isolated (the one before it
-    #     has at least one annotation) then remove it and ensure that its
-    #     annotations and the carried annotations are merged into the previous
+    #     has at least one anchor) then remove it and ensure that its
+    #     anchors and the carried anchors are merged into the previous
     #     bucket.
     {@buckets, @index} = points
-    .sort(this._collate)
     .reduce ({buckets, index, carry}, [x, d, a], i, points) =>
-      if d > 0                                            # Add annotation
-        if (j = carry.anchors.indexOf a) < 0
-          carry.anchors.unshift a
-          carry.counts.unshift 1
+      if d > 0                                            # delta type is "top/start": Add annotation
+        if (j = carry.anchors.indexOf a) < 0              # If anchor not in carry
+          carry.anchors.unshift a                         # push on to front of carry
+          carry.counts.unshift 1                          # initialize counts for this ... bucket?
         else
-          carry.counts[j]++
-      else                                                # Remove annotation
-        j = carry.anchors.indexOf a                       # XXX: assert(i >= 0)
-        if --carry.counts[j] is 0
-          carry.anchors.splice j, 1
-          carry.counts.splice j, 1
+          carry.counts[j]++                               # increment counts for this ...bucket?
+      else                                                # delta type is "bottom/end": Remove annotation
+        j = carry.anchors.indexOf a                       # We're assuming this anchor is already in the carry-anchors...
+        if --carry.counts[j] is 0                         # if carry.counts[j] === 1 — if the bucket with this anchor has exactly
+                                                          # 1 thing in it
+          carry.anchors.splice j, 1                       # Remove this anchor from `carry.anchors`
+          carry.counts.splice j, 1                        # I'm guessing this..."closes" the last open anchor for now?
 
       if (
-        (index.length is 0 or i is points.length - 1) or  # First or last?
+        (index.length is 0 or i is points.length - 1) or  # Is this the first or last point?
         carry.anchors.length is 0 or                      # A zero marker?
         x - index[index.length-1] > @options.gapSize      # A large gap?
       )                                                   # Mark a new bucket.
@@ -146,7 +125,7 @@ module.exports = class BucketBar extends Delegator
         index.push x
       else
         # Merge the previous bucket, making sure its predecessor contains
-        # all the carried annotations and the annotations in the previous
+        # all the carried anchors and the anchors in the previous
         # bucket.
         if buckets[buckets.length-2]?.length
           last = buckets[buckets.length-2]
