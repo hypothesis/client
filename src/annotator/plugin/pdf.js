@@ -62,21 +62,12 @@ export default class PDF extends Plugin {
     // A list of annotations that need to be refreshed.
     const refreshAnnotations = [];
 
-    // Check all the pages with text layers that have finished rendering.
-    for (
-      let pageIndex = 0, end = this.pdfViewer.pagesCount, asc = 0 <= end;
-      asc ? pageIndex < end : pageIndex > end;
-      asc ? pageIndex++ : pageIndex--
-    ) {
+    const pageCount = this.pdfViewer.pagesCount;
+    for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
       const page = this.pdfViewer.getPageView(pageIndex);
       if (!page.textLayer?.renderingDone) {
         continue;
       }
-
-      const div = page.div ?? page.el;
-      const placeholder = div.getElementsByClassName(
-        'annotator-placeholder'
-      )[0];
 
       // Detect what needs to be done by checking the rendering state.
       switch (page.renderingState) {
@@ -90,7 +81,12 @@ export default class PDF extends Plugin {
           // means the PDF anchoring module anchored annotations before it was
           // rendered. Remove this, which will cause the annotations to anchor
           // again, below.
-          placeholder?.parentNode.removeChild(placeholder);
+          {
+            const placeholder = page.div.querySelector(
+              '.annotator-placeholder'
+            );
+            placeholder?.parentNode.removeChild(placeholder);
+          }
           break;
       }
     }

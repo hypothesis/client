@@ -51,8 +51,6 @@
 /**
  * @typedef PDFPageView
  * @prop {HTMLElement} div - Container element for the PDF page
- * @prop {HTMLElement} el -
- *   Obsolete alias for `div`?. TODO: Remove this and stop checking for it.
  * @prop {PDFPageProxy} pdfPage
  * @prop {TextLayer|null} textLayer
  * @prop {number} renderingState - See `src/annotator/pdfjs-rendering-states.js`

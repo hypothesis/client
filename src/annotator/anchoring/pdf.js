@@ -246,13 +246,12 @@ async function anchorByPosition(pageIndex, anchor) {
 
   // The page has not been rendered yet. Create a placeholder element and
   // anchor to that instead.
-  const div = /** @type {HTMLElement} */ (page.div || page.el);
-  let placeholder = div.getElementsByClassName('annotator-placeholder')[0];
+  let placeholder = page.div.querySelector('.annotator-placeholder');
   if (!placeholder) {
     placeholder = document.createElement('span');
     placeholder.classList.add('annotator-placeholder');
     placeholder.textContent = 'Loading annotations…';
-    div.appendChild(placeholder);
+    page.div.appendChild(placeholder);
   }
   const range = document.createRange();
   range.setStartBefore(placeholder);
