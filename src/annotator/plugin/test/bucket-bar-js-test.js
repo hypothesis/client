@@ -1,6 +1,7 @@
 import {
   findClosestOffscreenAnchor,
   constructPositionPoints,
+  buildBuckets,
 } from '../bucket-bar-js';
 import { $imports } from '../bucket-bar-js';
 
@@ -197,6 +198,78 @@ describe('annotator/plugin/bucket-bar-js', () => {
         // This point is a "top" point
         assert.equal(positionPoints.points[i + fakeAnchors.length][1], 1);
       }
+    });
+  });
+  describe('buildBuckets', () => {
+    it('should return empty buckets if points array is empty', () => {
+      const bucketInfo = buildBuckets([]);
+      assert.isArray(bucketInfo.buckets);
+      assert.isEmpty(bucketInfo.buckets);
+      assert.isEmpty(bucketInfo.index);
+    });
+
+    it('should group overlapping anchor highlights into shared buckets', () => {
+      const anchors = [{}, {}, {}, {}];
+      const points = [];
+      // Represents points for 4 anchors that all have a top of 150px and bottom
+      // of 200
+      anchors.forEach(anchor => {
+        points.push([150, 1, anchor]);
+        points.push([200, -1, anchor]);
+      });
+
+      const buckets = buildBuckets(points);
+      assert.equal(buckets.buckets.length, 2);
+      assert.isEmpty(buckets.buckets[1]);
+      // All anchors are in a single bucket
+      assert.deepEqual(buckets.buckets[0], anchors);
+      // Because this is the first bucket, it will be aligned top
+      assert.equal(buckets.index[0], 150);
+    });
+
+    it('should group nearby anchor highlights into shared buckets', () => {
+      let increment = 25;
+      const anchors = [{}, {}, {}, {}];
+      const points = [];
+      // Represents points for 4 anchors that all have different start and
+      // end positions, but only differing by 25px
+      anchors.forEach(anchor => {
+        points.push([150 + increment, 1, anchor]);
+        points.push([200 + increment, -1, anchor]);
+        increment += 25;
+      });
+
+      const buckets = buildBuckets(points);
+      assert.equal(buckets.buckets.length, 2);
+      assert.isEmpty(buckets.buckets[1]);
+      // All anchors are in a single bucket
+      assert.deepEqual(buckets.buckets[0], anchors);
+      // Because this is the first bucket, it will be aligned top
+      assert.equal(buckets.index[0], 175);
+    });
+
+    it('should put anchors that are not near each other in separate buckets', () => {
+      let position = 100;
+      const anchors = [{}, {}, {}, {}];
+      const points = [];
+      // Represents points for 4 anchors that all have different start and
+      // end positions, but only differing by 25px
+      anchors.forEach(anchor => {
+        points.push([position, 1, anchor]);
+        points.push([position + 20, -1, anchor]);
+        position += 100;
+      });
+      const buckets = buildBuckets(points);
+      assert.equal(buckets.buckets.length, 8);
+      // Legacy of previous implementation, shrug?
+      assert.isEmpty(buckets.buckets[1]);
+      assert.isEmpty(buckets.buckets[3]);
+      assert.isEmpty(buckets.buckets[5]);
+      assert.isEmpty(buckets.buckets[7]);
+      assert.deepEqual(buckets.buckets[0], [anchors[0]]);
+      assert.deepEqual(buckets.buckets[2], [anchors[1]]);
+      assert.deepEqual(buckets.buckets[4], [anchors[2]]);
+      assert.deepEqual(buckets.buckets[6], [anchors[3]]);
     });
   });
 });
