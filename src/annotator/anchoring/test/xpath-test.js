@@ -1,55 +1,6 @@
-import $ from 'jquery';
-
-import { nodeFromXPath, xpathFromNode, $imports } from '../xpath';
+import { nodeFromXPath } from '../xpath';
 
 describe('annotator/anchoring/xpath', () => {
-  describe('xpathFromNode', () => {
-    let container;
-    let fakeSimpleXPathJQuery;
-    let fakeSimpleXPathPure;
-
-    beforeEach(() => {
-      container = document.createElement('div');
-      document.body.appendChild(container);
-      fakeSimpleXPathJQuery = sinon.stub().returns('/div[1]');
-      fakeSimpleXPathPure = sinon.stub().returns('/div[1]');
-
-      $imports.$mock({
-        './xpath-util': {
-          simpleXPathJQuery: fakeSimpleXPathJQuery,
-          simpleXPathPure: fakeSimpleXPathPure,
-        },
-      });
-    });
-
-    afterEach(() => {
-      container.remove();
-      $imports.$restore();
-    });
-
-    it('calls `simpleXPathJQuery`', () => {
-      const xpath = xpathFromNode($(container), document.body);
-      assert.called(fakeSimpleXPathJQuery);
-      assert.equal(xpath, '/div[1]');
-    });
-
-    it('calls `simpleXPathPure` if `simpleXPathJQuery` throws an exception', () => {
-      sinon.stub(console, 'log');
-      fakeSimpleXPathJQuery.throws(new Error());
-      const xpath = xpathFromNode($(container), document.body);
-      assert.called(fakeSimpleXPathPure);
-      assert.equal(xpath, '/div[1]');
-      assert.isTrue(
-        // eslint-disable-next-line no-console
-        console.log.calledWith(
-          'jQuery-based XPath construction failed! Falling back to manual.'
-        )
-      );
-      // eslint-disable-next-line no-console
-      console.log.restore();
-    });
-  });
-
   describe('nodeFromXPath', () => {
     let container;
     const html = `

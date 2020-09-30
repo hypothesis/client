@@ -5,8 +5,7 @@ import {
   getTextNodes,
   getLastTextNodeUpTo,
   getFirstTextNodeNotBefore,
-  simpleXPathPure,
-  simpleXPathJQuery,
+  xpathFromNode,
 } from '../xpath-util';
 
 describe('annotator/anchoring/xpath-util', () => {
@@ -175,7 +174,7 @@ describe('annotator/anchoring/xpath-util', () => {
     });
   });
 
-  describe('xpath', () => {
+  describe('xpathFromNode', () => {
     let container;
     const html = `
         <h1 id="h1-1">text</h1>
@@ -199,110 +198,70 @@ describe('annotator/anchoring/xpath-util', () => {
       container.remove();
     });
 
-    describe('xpathFromNode', () => {
-      [
-        {
-          id: 'a-1',
-          xpath: '/div[1]/p[1]/a[1]',
-        },
-        {
-          id: 'h1-1',
-          xpath: '/div[1]/h1[1]',
-        },
-        {
-          id: 'p-1',
-          xpath: '/div[1]/p[1]',
-        },
-        {
-          id: 'a-1',
-          xpath: '/div[1]/p[1]/a[1]',
-        },
-        {
-          id: 'p-2',
-          xpath: '/div[1]/p[2]',
-        },
-        {
-          id: 'em-1',
-          xpath: '/div[1]/p[2]/em[1]',
-        },
-        {
-          id: 'li-3',
-          xpath: '/div[1]/span[1]/ul[1]/li[3]',
-        },
-      ].forEach(test => {
-        it('produces the correct xpath for the provided nodes', () => {
-          let node = document.getElementById(test.id);
-          assert.equal(simpleXPathJQuery($(node), document.body), test.xpath);
-        });
-      });
+    it('throws an error if the provided node is not a descendant of the root node', () => {
+      const node = document.createElement('p'); // not attached to DOM
+      assert.throws(() => {
+        xpathFromNode(node, document.body);
+      }, 'Node is not a descendant of root');
     });
 
-    describe('simpleXPathPure', () => {
-      it('throws an error if the provided node is not a descendant of `relativeRoot`', () => {
-        const node = document.createElement('p'); // not attached to DOM
-        assert.throws(() => {
-          simpleXPathPure($(node), document.body);
-        }, 'Called getPathTo on a node which was not a descendant of @rootNode. [object HTMLBodyElement]');
+    [
+      {
+        id: 'a-1',
+        xpaths: ['/div[1]/p[1]/a[1]', '/div[1]/p[1]/a[1]/text()[1]'],
+      },
+      {
+        id: 'h1-1',
+        xpaths: ['/div[1]/h1[1]', '/div[1]/h1[1]/text()[1]'],
+      },
+      {
+        id: 'p-1',
+        xpaths: ['/div[1]/p[1]', '/div[1]/p[1]/text()[1]'],
+      },
+      {
+        id: 'a-1',
+        xpaths: ['/div[1]/p[1]/a[1]', '/div[1]/p[1]/a[1]/text()[1]'],
+      },
+      {
+        id: 'p-2',
+        xpaths: [
+          '/div[1]/p[2]',
+          '/div[1]/p[2]/text()[1]',
+          '/div[1]/p[2]/text()[2]',
+        ],
+      },
+      {
+        id: 'em-1',
+        xpaths: ['/div[1]/p[2]/em[1]', '/div[1]/p[2]/em[1]/text()[1]'],
+      },
+      {
+        id: 'li-3',
+        xpaths: [
+          '/div[1]/span[1]/ul[1]/li[3]',
+          '/div[1]/span[1]/ul[1]/li[3]/text()[1]',
+        ],
+      },
+    ].forEach(test => {
+      it('produces the correct xpath for the provided node', () => {
+        let node = document.getElementById(test.id);
+        assert.equal(xpathFromNode(node, document.body), test.xpaths[0]);
       });
 
-      [
-        {
-          id: 'a-1',
-          xpaths: ['/div[1]/p[1]/a[1]', '/div[1]/p[1]/a[1]/text()[1]'],
-        },
-        {
-          id: 'h1-1',
-          xpaths: ['/div[1]/h1[1]', '/div[1]/h1[1]/text()[1]'],
-        },
-        {
-          id: 'p-1',
-          xpaths: ['/div[1]/p[1]', '/div[1]/p[1]/text()[1]'],
-        },
-        {
-          id: 'a-1',
-          xpaths: ['/div[1]/p[1]/a[1]', '/div[1]/p[1]/a[1]/text()[1]'],
-        },
-        {
-          id: 'p-2',
-          xpaths: [
-            '/div[1]/p[2]',
-            '/div[1]/p[2]/text()[1]',
-            '/div[1]/p[2]/text()[2]',
-          ],
-        },
-        {
-          id: 'em-1',
-          xpaths: ['/div[1]/p[2]/em[1]', '/div[1]/p[2]/em[1]/text()[1]'],
-        },
-        {
-          id: 'li-3',
-          xpaths: [
-            '/div[1]/span[1]/ul[1]/li[3]',
-            '/div[1]/span[1]/ul[1]/li[3]/text()[1]',
-          ],
-        },
-      ].forEach(test => {
-        it('produces the correct xpath for the provided node', () => {
-          let node = document.getElementById(test.id);
-          assert.equal(simpleXPathPure($(node), document.body), test.xpaths[0]);
-        });
-
-        it('produces the correct xpath for the provided text node(s)', () => {
-          let node = document.getElementById(test.id).firstChild;
-          // collect all text nodes after the target queried node.
-          const textNodes = [];
-          while (node) {
-            if (node.nodeType === Node.TEXT_NODE) {
-              textNodes.push(node);
-            }
-            node = node.nextSibling;
+      it('produces the correct xpath for the provided text node(s)', () => {
+        let node = document.getElementById(test.id).firstChild;
+        // collect all text nodes after the target queried node.
+        const textNodes = [];
+        while (node) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            textNodes.push(node);
           }
-          textNodes.forEach((node, index) => {
-            assert.equal(
-              simpleXPathPure($(node), document.body),
-              test.xpaths[index + 1]
-            );
-          });
+          node = node.nextSibling;
+        }
+        textNodes.forEach((node, index) => {
+          assert.equal(
+            xpathFromNode(node, document.body),
+            test.xpaths[index + 1]
+          );
         });
       });
     });
