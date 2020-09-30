@@ -109,5 +109,15 @@ describe('annotator/anchoring/xpath', () => {
         document.evaluate.restore();
       });
     });
+
+    it('returns `null` if XPath evaluation fails', () => {
+      assert.equal(nodeFromXPath('/missing/element', container), null);
+    });
+
+    it('throws if XPath is invalid', () => {
+      assert.throws(() => {
+        nodeFromXPath('not-a-valid-xpath', container);
+      }, /XPath error: wanted child not found/);
+    });
   });
 });
