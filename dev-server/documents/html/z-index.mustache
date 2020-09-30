@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Hypothesis Client Test</title>
+<style>
+  body {
+    font-family: sans-serif;
+  }
+</style>
+</head>
+<body>
+  <h2>z-index test page</h2>
+  <p>This has a z-index of 0</p>
+  <ol style="z-index: 20000; position: relative">
+    <li style="z-index: 25000; position: relative">This has a z-index of 25000</li>
+    <li style="z-index: 30000; position: relative">This has a z-index of 30000</li>
+    <li>This has a z-index of 20000 (from parent)</li>
+    <li>This has a z-index of 20000 (from parent)</li>
+    <li>This has a z-index of 20000 (from parent)</li>
+  </ol>
+  <p>This has a z-index of 0</p>
+
+   {{{hypothesisScript}}}
+  </body>
+</html>
