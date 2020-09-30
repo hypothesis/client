@@ -1,27 +1,4 @@
 /**
- * Finds the child node associated with the provided index and
- * type relative from a parent.
- */
-export function findChild(parent, type, index) {
-  if (!parent.hasChildNodes()) {
-    throw new Error('XPath error: node has no children!');
-  }
-  const children = parent.childNodes;
-  let found = 0;
-  for (let i = 0; i < children.length; i++) {
-    const child = children[i];
-    let name = getNodeName(child);
-    if (name === type) {
-      found += 1;
-      if (found === index) {
-        return child;
-      }
-    }
-  }
-  throw new Error('XPath error: wanted child not found.');
-}
-
-/**
  * Get the node name for use in generating an xpath expression.
  *
  * @param {Node} node
