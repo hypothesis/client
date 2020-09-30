@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 /**
  * Finds the child node associated with the provided index and
  * type relative from a parent.
@@ -25,6 +23,8 @@ export function findChild(parent, type, index) {
 
 /**
  * Get the node name for use in generating an xpath expression.
+ *
+ * @param {Node} node
  */
 function getNodeName(node) {
   const nodeName = node.nodeName.toLowerCase();
@@ -37,9 +37,12 @@ function getNodeName(node) {
 
 /**
  * Get the index of the node as it appears in its parent's child list
+ *
+ * @param {Node} node
  */
 function getNodePosition(node) {
   let pos = 0;
+  /** @type {Node|null} */
   let tmp = node;
   while (tmp) {
     if (tmp.nodeName === node.nodeName) {
@@ -50,26 +53,6 @@ function getNodePosition(node) {
   return pos;
 }
 
-/**
- * A simple XPath evaluator using jQuery which can evaluate queries of
- *
- * @deprecated
- */
-export function simpleXPathJQuery(nodes, relativeRoot) {
-  const paths = nodes.map((index, node) => {
-    let path = '';
-    let elem = node;
-    while (elem.nodeType === Node.ELEMENT_NODE && elem !== relativeRoot) {
-      let tagName = elem.tagName.replace(':', '\\:');
-      let idx = $(elem.parentNode).children(tagName).index(elem) + 1;
-      path = '/' + elem.tagName.toLowerCase() + `[${idx}]` + path;
-      elem = elem.parentNode;
-    }
-    return path;
-  });
-  return paths.get();
-}
-
 function getPathSegment(node) {
   const name = getNodeName(node);
   const pos = getNodePosition(node);
@@ -77,31 +60,28 @@ function getPathSegment(node) {
 }
 
 /**
- * A simple XPath evaluator using only standard DOM methods which can
- * evaluate queries of the form /tag[index]/tag[index].
+ * A simple XPath generator using which can generate XPaths of the form
+ * /tag[index]/tag[index].
+ *
+ * @param {Node} node - The node to generate a path to
+ * @param {Node} root - Root node to which the returned path is relative
  */
-export function simpleXPathPure(nodes, relativeRoot) {
-  let rootNode = relativeRoot;
+export function xpathFromNode(node, root) {
+  let xpath = '';
 
-  function getPathTo(node) {
-    let xpath = '';
-    let elem = node;
-    while (elem !== rootNode) {
-      if (!elem) {
-        throw new Error(
-          'Called getPathTo on a node which was not a descendant of @rootNode. ' +
-            rootNode
-        );
-      }
-      xpath = getPathSegment(elem) + '/' + xpath;
-      elem = elem.parentNode;
+  /** @type {Node|null} */
+  let elem = node;
+  while (elem !== root) {
+    if (!elem) {
+      throw new Error('Node is not a descendant of root');
     }
-    xpath = '/' + xpath;
-    xpath = xpath.replace(/\/$/, '');
-    return xpath;
+    xpath = getPathSegment(elem) + '/' + xpath;
+    elem = elem.parentNode;
   }
-  const paths = nodes.map((index, node) => getPathTo(node));
-  return paths.get();
+  xpath = '/' + xpath;
+  xpath = xpath.replace(/\/$/, '');
+
+  return xpath;
 }
 
 /**

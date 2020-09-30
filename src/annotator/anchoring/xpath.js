@@ -1,23 +1,6 @@
-import { findChild, simpleXPathJQuery, simpleXPathPure } from './xpath-util';
+import { findChild } from './xpath-util';
 
-/**
- * Wrapper for simpleXPath. Attempts to call the jquery
- * version, and if that excepts, then falls back to pure js
- * version.
- */
-export function xpathFromNode(el, relativeRoot) {
-  let result;
-  try {
-    result = simpleXPathJQuery(el, relativeRoot);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log(
-      'jQuery-based XPath construction failed! Falling back to manual.'
-    );
-    result = simpleXPathPure(el, relativeRoot);
-  }
-  return result;
-}
+export { xpathFromNode } from './xpath-util';
 
 /**
  * Finds an element node using an XPath relative to the document root.

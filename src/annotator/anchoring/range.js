@@ -249,7 +249,7 @@ export class NormalizedRange {
       } else {
         origParent = $(node).parent();
       }
-      const xpath = xpathFromNode(origParent, root)[0];
+      const xpath = xpathFromNode(origParent[0], root ?? document);
       const textNodes = getTextNodes(origParent);
       // Calculate real offset as the combined length of all the
       // preceding textNode siblings. We include the length of the
