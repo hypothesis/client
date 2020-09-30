@@ -1,4 +1,6 @@
 import { act } from 'preact/test-utils';
+import { createElement } from 'preact';
+import { mount } from 'enzyme';
 
 import { Adder, ARROW_POINTING_UP, ARROW_POINTING_DOWN } from '../adder';
 
@@ -214,6 +216,95 @@ describe('Adder', () => {
     it('does not positon the adder beyond the left edge of the viewport', () => {
       const target = adderCtrl.target(rect(-100, 100, 10, 10), false);
       assert.isAtLeast(target.left, 0);
+    });
+  });
+
+  describe('adder Z index', () => {
+    let container;
+
+    function getAdderZIndex(left, top) {
+      adderCtrl.showAt(left, top);
+      return parseInt(adderEl.style.zIndex);
+    }
+
+    beforeEach(() => {
+      container = document.createElement('div');
+      document.body.appendChild(container);
+    });
+
+    afterEach(() => {
+      container.remove();
+    });
+
+    it('returns default hard coded value if `document.elementsFromPoint` is not available', () => {
+      const elementsFromPointBackup = document.elementsFromPoint;
+      document.elementsFromPoint = undefined;
+      assert.strictEqual(getAdderZIndex(0, 0), 32768);
+      document.elementsFromPoint = elementsFromPointBackup;
+    });
+
+    it('returns default value of 1', () => {
+      // Even if not elements are found, it returns 1
+      assert.strictEqual(getAdderZIndex(-100000, -100000), 1);
+      assert.strictEqual(getAdderZIndex(100000, 100000), 1);
+    });
+
+    it('returns the greatest zIndex', () => {
+      const createComponent = (left, top, zIndex, attachTo) =>
+        mount(
+          <div
+            style={{
+              position: 'absolute',
+              width: 1,
+              height: 1,
+              left,
+              top,
+              zIndex,
+            }}
+          />,
+          { attachTo }
+        );
+
+      const wrapper = createComponent(0, 0, 2, container);
+      assert.strictEqual(getAdderZIndex(0, 0), 3);
+
+      const initLeft = 10;
+      const initTop = 10;
+      const adderWidth = adderCtrl._width();
+      const adderHeight = adderCtrl._height();
+      const wrapperDOMNode = wrapper.getDOMNode();
+
+      // Create first element (left-top)
+      createComponent(initLeft, initTop, 3, wrapperDOMNode);
+      assert.strictEqual(getAdderZIndex(initLeft, initTop), 4);
+
+      // Create second element (left-bottom)
+      createComponent(initLeft, initTop + adderHeight, 5, wrapperDOMNode);
+      assert.strictEqual(getAdderZIndex(initLeft, initTop), 6);
+
+      // Create third element (middle-center)
+      createComponent(
+        initLeft + adderWidth / 2,
+        initTop + adderHeight / 2,
+        6,
+        wrapperDOMNode
+      );
+      assert.strictEqual(getAdderZIndex(initLeft, initTop), 7);
+
+      // Create fourth element (right-top)
+      createComponent(initLeft + adderWidth, initTop, 7, wrapperDOMNode);
+      assert.strictEqual(getAdderZIndex(initLeft, initTop), 8);
+
+      // Create third element (right-bottom)
+      createComponent(
+        initLeft + adderWidth,
+        initTop + adderHeight,
+        8,
+        wrapperDOMNode
+      );
+      assert.strictEqual(getAdderZIndex(initLeft, initTop), 9);
+
+      wrapper.unmount();
     });
   });
 

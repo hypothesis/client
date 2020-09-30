@@ -89,10 +89,6 @@ export class Adder {
       // take position out of layout flow initially
       position: 'absolute',
       top: 0,
-
-      // Assign a high Z-index so that the adder shows above any content on the
-      // page
-      zIndex: 10000,
     });
 
     this._view = /** @type {Window} */ (container.ownerDocument.defaultView);
@@ -194,6 +190,51 @@ export class Adder {
   }
 
   /**
+   * Find a Z index value that will cause the adder to appear on top of any
+   * content in the document when the adder is shown at (left, top).
+   *
+   * @param {number} left - Horizontal offset from left edge of viewport.
+   * @param {number} top - Vertical offset from top edge of viewport.
+   * @return {number} - greatest zIndex (default value of 1)
+   */
+  _findZindex(left, top) {
+    if (document.elementsFromPoint === undefined) {
+      // In case of not being able to use `document.elementsFromPoint`,
+      // default to the large arbitrary number (2^15)
+      return 32768;
+    }
+
+    const adderWidth = this._width();
+    const adderHeight = this._height();
+
+    // Find the Z index of all the elements in the screen for five positions
+    // around the adder (left-top, left-bottom, middle-center, right-top,
+    // right-bottom) and use the greatest.
+
+    // Unique elements so `getComputedStyle` is called the minimum amount of times.
+    const elements = new Set([
+      ...document.elementsFromPoint(left, top),
+      ...document.elementsFromPoint(left, top + adderHeight),
+      ...document.elementsFromPoint(
+        left + adderWidth / 2,
+        top + adderHeight / 2
+      ),
+      ...document.elementsFromPoint(left + adderWidth, top),
+      ...document.elementsFromPoint(left + adderWidth, top + adderHeight),
+    ]);
+
+    const zIndexes = [...elements]
+      .map(element => +getComputedStyle(element).zIndex)
+      .filter(Number.isInteger);
+
+    // Make sure the array contains at least one element,
+    // otherwise `Math.max(...[])` results in +Infinity
+    zIndexes.push(0);
+
+    return Math.max(...zIndexes) + 1;
+  }
+
+  /**
    * Show the adder at the given position and with the arrow pointing in
    * `arrowDirection`.
    *
@@ -210,9 +251,12 @@ export class Adder {
     const positionedAncestor = nearestPositionedAncestor(this._container);
     const parentRect = positionedAncestor.getBoundingClientRect();
 
+    const zIndex = this._findZindex(left, top);
+
     Object.assign(this._container.style, {
-      top: toPx(top - parentRect.top),
       left: toPx(left - parentRect.left),
+      top: toPx(top - parentRect.top),
+      zIndex,
     });
 
     this._isVisible = true;
