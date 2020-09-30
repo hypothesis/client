@@ -100,14 +100,6 @@ describe('annotator/anchoring/xpath', () => {
         const result = nodeFromXPath(test.xpath, container);
         assert.equal(result.nodeName, test.nodeName);
       });
-
-      it('it returns the node associated with the XPath when `document.evaluate` throws an error', () => {
-        const result = nodeFromXPath(test.xpath, container);
-        sinon.stub(document, 'evaluate').throws(new Error());
-        const resultFallback = nodeFromXPath(test.xpath, container);
-        assert.equal(result, resultFallback);
-        document.evaluate.restore();
-      });
     });
 
     it('returns `null` if XPath evaluation fails', () => {
@@ -117,7 +109,7 @@ describe('annotator/anchoring/xpath', () => {
     it('throws if XPath is invalid', () => {
       assert.throws(() => {
         nodeFromXPath('not-a-valid-xpath', container);
-      }, /XPath error: wanted child not found/);
+      }, /The string '.not-a-valid-xpath' is not a valid XPath expression/);
     });
   });
 });

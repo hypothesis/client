@@ -1,7 +1,6 @@
 import $ from 'jquery';
 
 import {
-  findChild,
   getTextNodes,
   getLastTextNodeUpTo,
   getFirstTextNodeNotBefore,
@@ -10,55 +9,6 @@ import {
 } from '../xpath-util';
 
 describe('annotator/anchoring/xpath-util', () => {
-  describe('findChild', () => {
-    let container;
-
-    beforeEach(() => {
-      container = document.createElement('div');
-      document.body.appendChild(container);
-    });
-
-    afterEach(() => {
-      container.remove();
-    });
-
-    it('throws an error when the parent has no children', () => {
-      assert.throws(() => {
-        findChild(container, 'fake', 0);
-      }, 'XPath error: node has no children!');
-    });
-
-    it('throws an error when the desired child is not found', () => {
-      container.innerHTML = `<div>text</div>`;
-      assert.throws(() => {
-        findChild(container, 'fake', 0);
-      }, 'XPath error: wanted child not found.');
-    });
-
-    describe('with children', () => {
-      beforeEach(() => {
-        container.innerHTML = `text 1<span>text 2</span><span>text 3</span>text 4`;
-      });
-
-      it('finds the desired text() node at index 1', () => {
-        assert.equal(findChild(container, 'text()', 1).nodeValue, 'text 1');
-        document.body.removeChild(container);
-      });
-
-      it('finds the desired text() node at index 2', () => {
-        assert.equal(findChild(container, 'text()', 2).nodeValue, 'text 4');
-      });
-
-      it('finds the desired span node at index 1', () => {
-        assert.equal(findChild(container, 'span', 1).innerText, 'text 2');
-      });
-
-      it('finds the desired span node at index 2', () => {
-        assert.equal(findChild(container, 'span', 2).innerText, 'text 3');
-      });
-    });
-  });
-
   describe('getTextNodes', () => {
     let container;
 
