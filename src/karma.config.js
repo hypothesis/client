@@ -40,9 +40,7 @@ if (process.env.RUNNING_IN_DOCKER) {
   // Log test details as they are executed so we can tell where test execution
   // got to if a failure happens.
   mochaOutputMode = 'full';
-}
 
-if (process.env.RUNNING_IN_DOCKER) {
   // Disable `/dev/shm` usage as this can cause Chrome to fail to load large
   // HTML pages, such as the one Karma creates with all the tests loaded.
   //
