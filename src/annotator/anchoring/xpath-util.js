@@ -60,7 +60,7 @@ function getPathSegment(node) {
 }
 
 /**
- * A simple XPath generator using which can generate XPaths of the form
+ * A simple XPath generator which can generate XPaths of the form
  * /tag[index]/tag[index].
  *
  * @param {Node} node - The node to generate a path to
@@ -79,7 +79,7 @@ export function xpathFromNode(node, root) {
     elem = elem.parentNode;
   }
   xpath = '/' + xpath;
-  xpath = xpath.replace(/\/$/, '');
+  xpath = xpath.replace(/\/$/, ''); // Remove trailing slash
 
   return xpath;
 }
