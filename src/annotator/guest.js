@@ -133,7 +133,6 @@ export default class Guest extends Delegator {
 
     this.addPlugin('CrossFrame', cfOptions);
     this.crossframe = this.plugins.CrossFrame;
-
     this.crossframe.onConnect(() => this._setupInitialState(config));
 
     // Whether clicks on non-highlighted text should close the sidebar
@@ -214,9 +213,7 @@ export default class Guest extends Delegator {
 
   addPlugin(name, options) {
     const Klass = this.options.pluginClasses[name];
-    this.plugins[name] = new Klass(this.element, options);
-    this.plugins[name].annotator = this;
-    this.plugins[name].pluginInit?.();
+    this.plugins[name] = new Klass(this.element, options, this);
   }
 
   // Get the document info

@@ -1,9 +1,8 @@
 import debounce from 'lodash.debounce';
 
 import * as pdfAnchoring from '../anchoring/pdf';
+import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
-// @ts-expect-error - Plugin module is CoffeeScript
-import Plugin from '../plugin';
 
 import PDFMetadata from './pdf-metadata';
 
@@ -13,17 +12,15 @@ import PDFMetadata from './pdf-metadata';
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  */
 
-export default class PDF extends Plugin {
-  constructor(element, config) {
+export default class PDF extends Delegator {
+  /**
+   * @param {Annotator} annotator
+   */
+  constructor(element, config, annotator) {
     super(element, config);
 
-    /**
-     * The `Guest` instance for the current document.
-     * nb. This is initialized by `Guest` before it calls `pluginInit`.
-     *
-     * @type {Annotator}
-     */
-    this.annotator = /** @type {any} */ (null);
+    this.annotator = annotator;
+    annotator.anchoring = pdfAnchoring;
 
     const window_ = /** @type {HypothesisWindow} */ (window);
     this.pdfViewer = window_.PDFViewerApplication.pdfViewer;
@@ -38,10 +35,6 @@ export default class PDF extends Plugin {
       childList: true,
       subtree: true,
     });
-  }
-
-  pluginInit() {
-    this.annotator.anchoring = pdfAnchoring;
   }
 
   destroy() {

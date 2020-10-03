@@ -1,5 +1,5 @@
 $ = require('jquery')
-Plugin = require('../plugin')
+{ default: Delegator } = require('../delegator')
 
 scrollIntoView = require('scroll-into-view')
 
@@ -18,7 +18,7 @@ scrollToClosest = (anchors, direction) ->
   scrollIntoView(closest.highlights[0])
 
 
-module.exports = class BucketBar extends Plugin
+module.exports = class BucketBar extends Delegator
   # svg skeleton
   html: """
         <div class="annotator-bucket-bar">
@@ -34,7 +34,7 @@ module.exports = class BucketBar extends Plugin
   # tab elements
   tabs: null
 
-  constructor: (element, options) ->
+  constructor: (element, options, annotator) ->
     defaultOptions = {
       # gapSize parameter is used by the clustering algorithm
       # If an annotation is farther then this gapSize from the next bucket
@@ -51,9 +51,9 @@ module.exports = class BucketBar extends Plugin
     else
       $(element).append @element
 
+    @annotator = annotator
     @highlighter = options.highlighter ? highlighter  # Test seam.
 
-  pluginInit: ->
     $(window).on 'resize scroll', @update
 
     for scrollable in @options.scrollables ? []

@@ -45,7 +45,7 @@ describe('CrossFrame multi-frame scenario', function () {
       emit: sandbox.stub(),
     };
 
-    crossFrame = new CrossFrame(container, options);
+    crossFrame = null;
   });
 
   afterEach(function () {
@@ -55,6 +55,10 @@ describe('CrossFrame multi-frame scenario', function () {
 
     $imports.$restore();
   });
+
+  function createCrossFrame() {
+    return new CrossFrame(container, options);
+  }
 
   it('detects frames on page', function () {
     // Create a frame before initializing
@@ -69,7 +73,7 @@ describe('CrossFrame multi-frame scenario', function () {
     container.appendChild(invalidFrame);
 
     // Now initialize
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     const validFramePromise = new Promise(function (resolve) {
       isLoaded(validFrame, function () {
@@ -100,7 +104,7 @@ describe('CrossFrame multi-frame scenario', function () {
     container.appendChild(frame);
 
     // Now initialize
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     // Remove the frame
     frame.remove();
@@ -113,7 +117,7 @@ describe('CrossFrame multi-frame scenario', function () {
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
 
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
@@ -137,7 +141,7 @@ describe('CrossFrame multi-frame scenario', function () {
     container.appendChild(frame);
     frame.contentWindow.eval('window.__hypothesis_frame = true');
 
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
@@ -155,7 +159,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('detects dynamically added frames', function () {
     // Initialize with no initial frame, unlike before
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     // Add a frame to the DOM
     const frame = document.createElement('iframe');
@@ -183,7 +187,7 @@ describe('CrossFrame multi-frame scenario', function () {
     container.appendChild(frame);
 
     // Now initialize
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     return new Promise(function (resolve) {
       // Yield to let the DOM and CrossFrame catch up
@@ -206,7 +210,7 @@ describe('CrossFrame multi-frame scenario', function () {
     container.appendChild(frame);
 
     // Now initialize
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
@@ -239,7 +243,7 @@ describe('CrossFrame multi-frame scenario', function () {
 
   it('detects a frame dynamically added, removed, and added again', function () {
     // Initialize with no initial frame
-    crossFrame.pluginInit();
+    crossFrame = createCrossFrame();
 
     // Add a frame to the DOM
     const frame = document.createElement('iframe');

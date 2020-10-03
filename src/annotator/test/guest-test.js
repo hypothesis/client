@@ -2,7 +2,6 @@ import * as adder from '../adder';
 import { Observable } from '../util/observable';
 import Delegator from '../delegator';
 import Guest from '../guest';
-import Plugin from '../plugin';
 import { $imports } from '../guest';
 
 const scrollIntoView = sinon.stub();
@@ -19,12 +18,11 @@ class FakeAdder {
 }
 FakeAdder.instance = null;
 
-class FakePlugin extends Plugin {
-  constructor(element, config) {
+class FakePlugin extends Delegator {
+  constructor(element, config, annotator) {
     super(element, config);
-
+    this.annotator = annotator;
     FakePlugin.instance = this;
-    this.pluginInit = sinon.stub();
   }
 }
 FakePlugin.instance = null;
@@ -114,11 +112,7 @@ describe('Guest', () => {
       fakePlugin = FakePlugin.instance;
     });
 
-    it('calls `pluginInit`', () => {
-      assert.calledOnce(fakePlugin.pluginInit);
-    });
-
-    it('sets `annotator` property of plugin', () => {
+    it('passes guest reference to constructor', () => {
       assert.equal(fakePlugin.annotator, guest);
     });
 

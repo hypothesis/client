@@ -19,8 +19,7 @@
 
 import baseURI from 'document-base-uri';
 
-// @ts-expect-error - '../plugin' needs to be converted to JS.
-import Plugin from '../plugin';
+import Delegator from '../delegator';
 
 import { normalizeURI } from '../util/url';
 
@@ -65,7 +64,7 @@ function createMetadata() {
  * DocumentMeta reads metadata/links from the current HTML document and
  * populates the `document` property of new annotations.
  */
-export default class DocumentMeta extends Plugin {
+export default class DocumentMeta extends Delegator {
   constructor(element, options) {
     super(element, options);
 
@@ -81,18 +80,13 @@ export default class DocumentMeta extends Plugin {
     this.beforeAnnotationCreated = annotation => {
       annotation.document = this.metadata;
     };
-
-    // @ts-expect-error - Method comes from CoffeeScript base class.
     this.subscribe('beforeAnnotationCreated', this.beforeAnnotationCreated);
+
+    this.getDocumentMetadata();
   }
 
   destroy() {
-    // @ts-expect-error - Method comes from CoffeeScript base class.
     this.unsubscribe('beforeAnnotationCreated', this.beforeAnnotationCreated);
-  }
-
-  pluginInit() {
-    this.getDocumentMetadata();
   }
 
   /**
