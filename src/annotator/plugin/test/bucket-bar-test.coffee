@@ -22,9 +22,17 @@ createMouseEvent = (type, { ctrlKey, metaKey } = {}) ->
 
 
 describe 'BucketBar', ->
+  fakeAnnotator = null
+
+  beforeEach ->
+    fakeAnnotator = {
+      anchors: [],
+      selectAnnotations: sinon.stub(),
+    }
+
   createBucketBar = (options) ->
     element = document.createElement('div')
-    new BucketBar(element, options || {})
+    new BucketBar(element, options || {}, fakeAnnotator)
 
   # Create a fake anchor, which is a combination of annotation object and
   # associated highlight elements.
@@ -36,19 +44,12 @@ describe 'BucketBar', ->
     bucketBar = null
 
     fakeHighlighter = null
-    fakeAnnotator = null
 
     beforeEach ->
       fakeHighlighter =
         getBoundingClientRect: -> { left: 0, top: 200, right: 200, bottom: 250 }
 
       bucketBar = createBucketBar(highlighter: fakeHighlighter)
-
-      # This setup is done by `Guest#addPlugin` in the actual app.
-      bucketBar.annotator = {
-        anchors: [],
-        selectAnnotations: sinon.stub(),
-      }
 
       # Create fake anchors and render buckets.
       anchors = [createAnchor()]

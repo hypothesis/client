@@ -1,8 +1,6 @@
-// @ts-expect-error - `Plugin` base class is still written in CoffeeScript
-import Plugin from '../plugin';
-
 import AnnotationSync from '../annotation-sync';
 import Bridge from '../../shared/bridge';
+import Delegator from '../delegator';
 import Discovery from '../../shared/discovery';
 import * as frameUtil from '../util/frame-util';
 import FrameObserver from '../frame-observer';
@@ -20,7 +18,7 @@ import FrameObserver from '../frame-observer';
  * are added to the page if they have the `enable-annotation` attribute set
  * and are same-origin with the current document.
  */
-export default class CrossFrame extends Plugin {
+export default class CrossFrame extends Delegator {
   constructor(element, options) {
     super(element, options);
 
@@ -58,17 +56,11 @@ export default class CrossFrame extends Plugin {
       frameIdentifiers.delete(frame);
     };
 
-    /**
-     * Initiate the connection to the sidebar.
-     */
-    this.pluginInit = () => {
-      const onDiscoveryCallback = (source, origin, token) =>
-        bridge.createChannel(source, origin, token);
-
-      discovery.startDiscovery(onDiscoveryCallback);
-
-      frameObserver.observe(injectIntoFrame, iframeUnloaded);
-    };
+    // Initiate connection to the sidebar.
+    const onDiscoveryCallback = (source, origin, token) =>
+      bridge.createChannel(source, origin, token);
+    discovery.startDiscovery(onDiscoveryCallback);
+    frameObserver.observe(injectIntoFrame, iframeUnloaded);
 
     /**
      * Remove the connection between the sidebar and annotator.

@@ -1,4 +1,3 @@
-import Plugin from '../../plugin';
 import CrossFrame from '../cross-frame';
 import { $imports } from '../cross-frame';
 
@@ -42,7 +41,6 @@ describe('CrossFrame', () => {
     proxyBridge = sinon.stub().returns(fakeBridge);
 
     $imports.$mock({
-      '../plugin': Plugin,
       '../annotation-sync': proxyAnnotationSync,
       '../../shared/bridge': proxyBridge,
       '../../shared/discovery': proxyDiscovery,
@@ -81,18 +79,14 @@ describe('CrossFrame', () => {
         emit: sinon.match.func,
       });
     });
-  });
 
-  describe('#pluginInit', () => {
     it('starts the discovery of new channels', () => {
-      const bridge = createCrossFrame();
-      bridge.pluginInit();
+      createCrossFrame();
       assert.called(fakeDiscovery.startDiscovery);
     });
 
     it('creates a channel when a new frame is discovered', () => {
-      const bridge = createCrossFrame();
-      bridge.pluginInit();
+      createCrossFrame();
       fakeDiscovery.startDiscovery.yield('SOURCE', 'ORIGIN', 'TOKEN');
       assert.called(fakeBridge.createChannel);
       assert.calledWith(fakeBridge.createChannel, 'SOURCE', 'ORIGIN', 'TOKEN');

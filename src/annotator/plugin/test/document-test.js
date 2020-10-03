@@ -37,7 +37,6 @@ describe('DocumentMeta', function () {
       document: tempDocument,
       normalizeURI: fakeNormalizeURI,
     });
-    testDocument.pluginInit();
   });
 
   afterEach(() => {
@@ -278,7 +277,6 @@ describe('DocumentMeta', function () {
         document: fakeDocument,
         baseURI,
       });
-      doc.pluginInit();
       return doc;
     };
 
