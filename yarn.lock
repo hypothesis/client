@@ -2909,11 +2909,6 @@ dom-node-iterator@^3.5.0:
   resolved "https://registry.yarnpkg.com/dom-node-iterator/-/dom-node-iterator-3.5.3.tgz#32b68aa440962f1734487029f544a3db704637b7"
   integrity sha1-MraKpECWLxc0SHAp9USj23BGN7c=
 
-dom-node-iterator@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/dom-node-iterator/-/dom-node-iterator-5.0.0.tgz#630315338734a814a95455c5a88293f6a9a735ac"
-  integrity sha512-SYApJtqUMs8HRAzTnst9ROFsCVMiDM41kG6PcYfkIVnt2yb3BG68/wetDfqCdtlkNBRzUiX1D5JSpJCYcNtY3Q==
-
 dom-seek@^4.0.1:
   version "4.0.3"
   resolved "https://registry.yarnpkg.com/dom-seek/-/dom-seek-4.0.3.tgz#f14dddf04b3fb062d901c7b00b0c142a06e0a94b"

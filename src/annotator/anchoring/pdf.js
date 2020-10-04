@@ -2,10 +2,6 @@
 
 import seek from 'dom-seek';
 
-// `dom-node-iterator` polyfills optional arguments of `createNodeIterator`
-// and properties of the returned `NodeIterator` for IE 11 compatibility.
-const createNodeIterator = require('dom-node-iterator/polyfill')();
-
 import RenderingStates from '../pdfjs-rendering-states';
 
 import { BrowserRange } from './range';
@@ -446,8 +442,7 @@ export function describe(root, range) {
 
   const startPageIndex = getSiblingIndex(startTextLayer.parentNode);
 
-  const iter = createNodeIterator.call(
-    document,
+  const iter = root.ownerDocument.createNodeIterator(
     startTextLayer,
     NodeFilter.SHOW_TEXT
   );
