@@ -92,7 +92,6 @@ function bootHypothesisClient(doc, config) {
   doc.head.appendChild(clientUrl);
 
   const polyfills = polyfillBundles([
-    'document.evaluate',
     'es2015',
     'es2016',
     'es2017',

@@ -112,7 +112,6 @@ const appBundles = [
 //    the client that need it in `src/boot/boot.js`
 //  - Add the polyfill to the test environment if necessary in `src/karma.config.js`
 const polyfillBundles = [
-  'document.evaluate',
   'es2015',
   'es2016',
   'es2017',

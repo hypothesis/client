@@ -49,10 +49,6 @@ describe('shared/polyfills/index', () => {
         providesMethod: [String.prototype, 'normalize'],
       },
       {
-        set: 'document.evaluate',
-        providesMethod: [Document.prototype, 'evaluate'],
-      },
-      {
         // Missing URL constructor.
         set: 'url',
         providesMethod: [window, 'URL'],
