@@ -1,4 +1,3 @@
-import CustomEvent from 'custom-event';
 import scrollIntoView from 'scroll-into-view';
 
 import Delegator from './delegator';
