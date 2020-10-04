@@ -2881,11 +2881,6 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-document-base-uri@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/document-base-uri/-/document-base-uri-1.0.0.tgz#88013e6ee6aa210f1a991953149f3a1698e1e661"
-  integrity sha1-iAE+buaqIQ8amRlTFJ86Fpjh5mE=
-
 dom-anchor-text-position@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/dom-anchor-text-position/-/dom-anchor-text-position-4.0.0.tgz#4c839b3bded94f0cab0f06a0189468f3f1ec2bb2"

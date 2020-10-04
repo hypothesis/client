@@ -17,8 +17,6 @@
  * @typedef {import('../../types/annotator').DocumentMetadata} Metadata
  */
 
-import baseURI from 'document-base-uri';
-
 import Delegator from '../delegator';
 
 import { normalizeURI } from '../util/url';
@@ -70,7 +68,7 @@ export default class DocumentMeta extends Delegator {
 
     this.metadata = createMetadata();
 
-    this.baseURI = options.baseURI || baseURI;
+    this.baseURI = options.baseURI || document.baseURI;
     this.document = options.document || document;
     this.normalizeURI = options.normalizeURI || normalizeURI;
 
