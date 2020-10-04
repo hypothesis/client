@@ -98,7 +98,6 @@
     "vinyl": "^2.2.0",
     "watchify": "^3.7.0",
     "whatwg-fetch": "^3.0.0",
-    "wicked-good-xpath": "^1.3.0",
     "wrap-text": "^1.0.7",
     "zen-observable": "^0.3.0"
   },

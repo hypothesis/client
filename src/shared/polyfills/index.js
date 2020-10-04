@@ -81,13 +81,6 @@ const needsPolyfill = {
     }
   },
 
-  // Test for XPath evaluation.
-  'document.evaluate': () => {
-    // Depending on the browser the `evaluate` property may be on the prototype
-    // or just the object itself.
-    return typeof document.evaluate !== 'function';
-  },
-
   // Test for Unicode normalization. This depends on a large polyfill so it
   // is separated out into its own bundle.
   'string.prototype.normalize': () => {
