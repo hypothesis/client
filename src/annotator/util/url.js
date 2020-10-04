@@ -1,5 +1,3 @@
-import baseURI from 'document-base-uri';
-
 /**
  * Return a normalized version of a URI.
  *
@@ -9,7 +7,7 @@ import baseURI from 'document-base-uri';
  * @param {string} [base] - Base URL to resolve relative to. Defaults to
  *   the document's base URL.
  */
-export function normalizeURI(uri, base = baseURI) {
+export function normalizeURI(uri, base = document.baseURI) {
   const absUrl = new URL(uri, base).href;
 
   // Remove the fragment identifier.
