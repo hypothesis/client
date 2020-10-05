@@ -85,45 +85,21 @@ export function xpathFromNode(node, root) {
 }
 
 /**
- * Flatten a nested array structure.
- * TODO: use Array.prototype.flat and polyfill
+ * Return all text node descendants of `element`.
+ *
+ * @param {Element} element
+ * @return {Text[]}
  */
-function flatten(array) {
-  const flatten = ary => {
-    let flat = [];
-    ary.forEach(el => {
-      if (el && Array.isArray(el)) {
-        flat = flat.concat(flatten(el));
-      } else {
-        flat = flat.concat(el);
-      }
-    });
-    return flat;
-  };
-  return flatten(array);
-}
-
-/**
- * Finds all text nodes within the elements in the current collection.
- * Returns a new jQuery collection of text nodes.
- */
-export function getTextNodes(jq) {
-  const getTextNodes = node => {
-    if (node && node.nodeType !== Node.TEXT_NODE) {
-      const nodes = [];
-      if (node.nodeType !== Node.COMMENT_NODE) {
-        [...node.childNodes].forEach(child => {
-          nodes.push(getTextNodes(child));
-        });
-      }
-      return nodes;
-    } else {
-      return node;
+export function getTextNodes(element) {
+  const nodes = [];
+  for (let node of Array.from(element.childNodes)) {
+    if (node instanceof Text) {
+      nodes.push(node);
+    } else if (node instanceof Element) {
+      nodes.push(...getTextNodes(node));
     }
-  };
-  return jq.map((index, node) => {
-    return flatten(getTextNodes(node));
-  });
+  }
+  return nodes;
 }
 
 /**

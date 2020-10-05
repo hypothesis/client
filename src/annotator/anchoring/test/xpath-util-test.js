@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import {
   findChild,
   getTextNodes,
@@ -61,8 +59,7 @@ describe('annotator/anchoring/xpath-util', () => {
   describe('getTextNodes', () => {
     let container;
 
-    // Helper (expects a jquery array)
-    const nodeValues = nodes => nodes.map((i, n) => n.nodeValue);
+    const nodeValues = nodes => nodes.map(n => n.nodeValue);
 
     beforeEach(() => {
       container = document.createElement('div');
@@ -75,26 +72,22 @@ describe('annotator/anchoring/xpath-util', () => {
 
     it('finds basic text nodes', () => {
       container.innerHTML = `<span>text 1</span><span>text 2</span>`;
-      const result = getTextNodes($(container));
-      assert.deepEqual(nodeValues(result).toArray(), ['text 1', 'text 2']);
+      const result = getTextNodes(container);
+      assert.deepEqual(nodeValues(result), ['text 1', 'text 2']);
     });
 
     it('finds basic text nodes and whitespace', () => {
       container.innerHTML = `<span>text 1</span>
         <span>text 2</span>`;
-      const result = getTextNodes($(container));
-      assert.deepEqual(nodeValues(result).toArray(), [
-        'text 1',
-        '\n        ',
-        'text 2',
-      ]);
+      const result = getTextNodes(container);
+      assert.deepEqual(nodeValues(result), ['text 1', '\n        ', 'text 2']);
     });
 
     it('finds basic text nodes and whitespace but ignores comments', () => {
       container.innerHTML = `<span>text 1</span>
         <!--span>text 2</span-->`;
-      const result = getTextNodes($(container));
-      assert.deepEqual(nodeValues(result).toArray(), ['text 1', '\n        ']);
+      const result = getTextNodes(container);
+      assert.deepEqual(nodeValues(result), ['text 1', '\n        ']);
     });
   });
 

@@ -1,11 +1,26 @@
-import $ from 'jquery';
-
 import { xpathFromNode, nodeFromXPath } from './xpath';
 import {
   getFirstTextNodeNotBefore,
   getLastTextNodeUpTo,
   getTextNodes,
 } from './xpath-util';
+
+/**
+ * Return ancestors of `element`, optionally filtered by a CSS `selector`.
+ *
+ * @param {Node} node
+ * @param {string} [selector]
+ */
+function parents(node, selector) {
+  const parents = [];
+  while (node.parentElement) {
+    if (!selector || node.parentElement.matches(selector)) {
+      parents.push(node.parentElement);
+    }
+    node = node.parentElement;
+  }
+  return parents;
+}
 
 /**
  * Creates a wrapper around a range object obtained from a DOMSelection.
@@ -209,9 +224,8 @@ export class NormalizedRange {
    * Returns updated self or null.
    */
   limit(bounds) {
-    const nodes = $.grep(
-      this.textNodes(),
-      node => node.parentNode === bounds || $.contains(bounds, node.parentNode)
+    const nodes = this.textNodes().filter(node =>
+      bounds.contains(node.parentNode)
     );
     if (!nodes.length) {
       return null;
@@ -220,10 +234,10 @@ export class NormalizedRange {
     this.start = nodes[0];
     this.end = nodes[nodes.length - 1];
 
-    const startParents = $(this.start).parents();
+    const startParents = parents(this.start);
 
-    for (let parent of $(this.end).parents()) {
-      if (startParents.index(parent) !== -1) {
+    for (let parent of parents(this.end)) {
+      if (startParents.indexOf(parent) !== -1) {
         this.commonAncestor = parent;
         break;
       }
@@ -245,19 +259,19 @@ export class NormalizedRange {
     const serialization = (node, isEnd) => {
       let origParent;
       if (ignoreSelector) {
-        origParent = $(node).parents(`:not(${ignoreSelector})`).eq(0);
+        origParent = parents(node, `:not(${ignoreSelector})`)[0];
       } else {
-        origParent = $(node).parent();
+        origParent = node.parentElement;
       }
-      const xpath = xpathFromNode(origParent[0], root ?? document);
+      const xpath = xpathFromNode(origParent, root ?? document);
       const textNodes = getTextNodes(origParent);
       // Calculate real offset as the combined length of all the
       // preceding textNode siblings. We include the length of the
       // node if it's the end node.
-      const nodes = textNodes.slice(0, textNodes.index(node));
+      const nodes = textNodes.slice(0, textNodes.indexOf(node));
       let offset = 0;
       for (let n of nodes) {
-        offset += n.nodeValue.length;
+        offset += n.nodeValue?.length ?? 0;
       }
 
       if (isEnd) {
@@ -300,11 +314,11 @@ export class NormalizedRange {
    * Returns an Array of TextNode instances.
    */
   textNodes() {
-    const textNodes = getTextNodes($(this.commonAncestor));
-    const start = textNodes.index(this.start);
-    const end = textNodes.index(this.end);
+    const textNodes = getTextNodes(this.commonAncestor);
+    const start = textNodes.indexOf(this.start);
+    const end = textNodes.indexOf(this.end);
     // Return the textNodes that fall between the start and end indexes.
-    return $.makeArray(textNodes.slice(start, +end + 1 || undefined));
+    return textNodes.slice(start, +end + 1 || undefined);
   }
 
   /**
@@ -382,7 +396,10 @@ export class SerializedRange {
         targetOffset--;
       }
 
-      for (let tn of getTextNodes($(node))) {
+      for (let tn of getTextNodes(node)) {
+        if (tn.nodeValue === null) {
+          continue;
+        }
         if (length + tn.nodeValue.length > targetOffset) {
           range[p + 'Container'] = tn;
           range[p + 'Offset'] = this[p + 'Offset'] - length;
@@ -423,17 +440,15 @@ export class SerializedRange {
     // Node.compareDocumentPosition() to decide when to set the
     // commonAncestorContainer and bail out.
 
-    const contains = (a, b) => a.compareDocumentPosition(b) & 16;
-    $(range.startContainer)
-      .parents()
-      .each(function () {
-        if (contains(this, range.endContainer)) {
-          range.commonAncestorContainer = this;
-          // bail out of loop
-          return false;
-        }
-        return true;
-      });
+    const contains = (a, b) =>
+      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_CONTAINED_BY;
+
+    for (let parent of parents(range.startContainer)) {
+      if (contains(parent, range.endContainer)) {
+        range.commonAncestorContainer = parent;
+        break;
+      }
+    }
 
     return new BrowserRange(range).normalize();
   }
