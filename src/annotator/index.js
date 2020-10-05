@@ -20,17 +20,13 @@ import iconSet from './icons';
 registerIcons(iconSet);
 
 import configFrom from './config/index';
+import BucketBarPlugin from './plugin/bucket-bar';
 import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import Guest from './guest';
 import PDFPlugin from './plugin/pdf';
 import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
-
-// Modules that are still written in CoffeeScript and need to be converted to
-// JS.
-// @ts-expect-error
-import BucketBarPlugin from './plugin/bucket-bar';
 
 const pluginClasses = {
   // UI plugins
