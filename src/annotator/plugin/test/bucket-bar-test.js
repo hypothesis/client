@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import BucketBar from '../bucket-bar';
+import { $imports } from '../bucket-bar';
 
 // Return DOM elements for non-empty bucket indicators in a `BucketBar`.
 const nonEmptyBuckets = function (bucketBar) {
@@ -13,22 +14,34 @@ const nonEmptyBuckets = function (bucketBar) {
 };
 
 const createMouseEvent = function (type, { ctrlKey, metaKey } = {}) {
-  // In a modern browser we could use `new MouseEvent` constructor and pass
-  // `ctrlKey` and `metaKey` via the init object.
-  const event = new Event(type);
-  event.ctrlKey = Boolean(ctrlKey);
-  event.metaKey = Boolean(metaKey);
-  return event;
+  return new MouseEvent(type, { ctrlKey, metaKey });
 };
 
-describe('BucketBar', function () {
-  let fakeAnnotator = null;
+describe('BucketBar', () => {
+  let fakeAnnotator;
+  let fakeBucketUtil;
 
   beforeEach(() => {
     fakeAnnotator = {
       anchors: [],
       selectAnnotations: sinon.stub(),
     };
+
+    fakeBucketUtil = {
+      findClosestOffscreenAnchor: sinon.stub(),
+      constructPositionPoints: sinon
+        .stub()
+        .returns({ above: [], below: [], points: [] }),
+      buildBuckets: sinon.stub().returns([]),
+    };
+
+    $imports.$mock({
+      '../util/buckets': fakeBucketUtil,
+    });
+  });
+
+  afterEach(() => {
+    $imports.$restore();
   });
 
   const createBucketBar = function (options) {
@@ -46,43 +59,37 @@ describe('BucketBar', function () {
   };
 
   context('when a bucket is clicked', () => {
-    let bucketBar = null;
-    let fakeHighlighter = null;
+    let bucketBar;
 
     beforeEach(() => {
-      fakeHighlighter = {
-        getBoundingClientRect() {
-          return { left: 0, top: 200, right: 200, bottom: 250 };
-        },
-      };
-
-      bucketBar = createBucketBar({ highlighter: fakeHighlighter });
-
+      bucketBar = createBucketBar();
       // Create fake anchors and render buckets.
       const anchors = [createAnchor()];
+
+      fakeBucketUtil.buildBuckets.returns({
+        index: [250],
+        buckets: [[anchors[0]]],
+      });
+
       bucketBar.annotator.anchors = anchors;
-      return bucketBar._update();
+      bucketBar._update();
     });
 
-    it.skip('selects the annotations', () => {
+    it('selects the annotations', () => {
       // Click on the indicator for the non-empty bucket.
       const bucketEls = nonEmptyBuckets(bucketBar);
       assert.equal(bucketEls.length, 1);
       bucketEls[0].dispatchEvent(createMouseEvent('click'));
 
       const anns = bucketBar.annotator.anchors.map(anchor => anchor.annotation);
-      return assert.calledWith(
-        bucketBar.annotator.selectAnnotations,
-        anns,
-        false
-      );
+      assert.calledWith(bucketBar.annotator.selectAnnotations, anns, false);
     });
 
-    return [
+    [
       { ctrlKey: true, metaKey: false },
       { ctrlKey: false, metaKey: true },
     ].forEach(({ ctrlKey, metaKey }) =>
-      it.skip('toggles selection of the annotations if Ctrl or Alt is pressed', () => {
+      it('toggles selection of the annotations if Ctrl or Alt is pressed', () => {
         // Click on the indicator for the non-empty bucket.
         const bucketEls = nonEmptyBuckets(bucketBar);
         assert.equal(bucketEls.length, 1);
@@ -93,11 +100,7 @@ describe('BucketBar', function () {
         const anns = bucketBar.annotator.anchors.map(
           anchor => anchor.annotation
         );
-        return assert.calledWith(
-          bucketBar.annotator.selectAnnotations,
-          anns,
-          true
-        );
+        assert.calledWith(bucketBar.annotator.selectAnnotations, anns, true);
       })
     );
   });
@@ -107,7 +110,7 @@ describe('BucketBar', function () {
   //
   // Note: This could be tested using only the public APIs of the `BucketBar`
   // class using the approach of the "when a bucket is clicked" tests above.
-  return describe('_buildTabs', function () {
+  describe('_buildTabs', () => {
     const setup = function (tabs) {
       const bucketBar = createBucketBar();
       bucketBar.tabs = tabs;
@@ -120,92 +123,92 @@ describe('BucketBar', function () {
       return bucketBar;
     };
 
-    it('creates a tab with a title', function () {
+    it('creates a tab with a title', () => {
       const tab = $('<div />');
       const bucketBar = setup(tab);
 
       bucketBar._buildTabs();
-      return assert.equal(tab.attr('title'), 'Show one annotation');
+      assert.equal(tab.attr('title'), 'Show one annotation');
     });
 
-    it('creates a tab with a pluralized title', function () {
-      const tab = $('<div />');
-      const bucketBar = setup(tab);
-      bucketBar.buckets[0].push('Another Annotation?');
-
-      bucketBar._buildTabs();
-      return assert.equal(tab.attr('title'), 'Show 2 annotations');
-    });
-
-    it('sets the tab text to the number of annotations', function () {
+    it('creates a tab with a pluralized title', () => {
       const tab = $('<div />');
       const bucketBar = setup(tab);
       bucketBar.buckets[0].push('Another Annotation?');
 
       bucketBar._buildTabs();
-      return assert.equal(tab.text(), '2');
+      assert.equal(tab.attr('title'), 'Show 2 annotations');
     });
 
-    it('sets the tab text to the number of annotations', function () {
+    it('sets the tab text to the number of annotations', () => {
       const tab = $('<div />');
       const bucketBar = setup(tab);
       bucketBar.buckets[0].push('Another Annotation?');
 
       bucketBar._buildTabs();
-      return assert.equal(tab.text(), '2');
+      assert.equal(tab.text(), '2');
     });
 
-    it('adds the class "upper" if the annotation is at the top', function () {
+    it('sets the tab text to the number of annotations', () => {
+      const tab = $('<div />');
+      const bucketBar = setup(tab);
+      bucketBar.buckets[0].push('Another Annotation?');
+
+      bucketBar._buildTabs();
+      assert.equal(tab.text(), '2');
+    });
+
+    it('adds the class "upper" if the annotation is at the top', () => {
       const tab = $('<div />');
       const bucketBar = setup(tab);
       sinon.stub(bucketBar, 'isUpper').returns(true);
 
       bucketBar._buildTabs();
-      return assert.equal(tab.hasClass('upper'), true);
+      assert.equal(tab.hasClass('upper'), true);
     });
 
-    it('removes the class "upper" if the annotation is not at the top', function () {
+    it('removes the class "upper" if the annotation is not at the top', () => {
       const tab = $('<div />').addClass('upper');
       const bucketBar = setup(tab);
       sinon.stub(bucketBar, 'isUpper').returns(false);
 
       bucketBar._buildTabs();
-      return assert.equal(tab.hasClass('upper'), false);
+      assert.equal(tab.hasClass('upper'), false);
     });
 
-    it('adds the class "lower" if the annotation is at the top', function () {
+    it('adds the class "lower" if the annotation is at the top', () => {
       const tab = $('<div />');
       const bucketBar = setup(tab);
       sinon.stub(bucketBar, 'isLower').returns(true);
 
       bucketBar._buildTabs();
-      return assert.equal(tab.hasClass('lower'), true);
+      assert.equal(tab.hasClass('lower'), true);
     });
 
-    it('removes the class "lower" if the annotation is not at the top', function () {
+    it('removes the class "lower" if the annotation is not at the top', () => {
       const tab = $('<div />').addClass('lower');
       const bucketBar = setup(tab);
       sinon.stub(bucketBar, 'isLower').returns(false);
 
       bucketBar._buildTabs();
-      return assert.equal(tab.hasClass('lower'), false);
+      assert.equal(tab.hasClass('lower'), false);
     });
 
-    it('reveals the tab if there are annotations in the bucket', function () {
+    it('reveals the tab if there are annotations in the bucket', () => {
       const tab = $('<div />');
       const bucketBar = setup(tab);
 
       bucketBar._buildTabs();
-      return assert.equal(tab.css('display'), '');
+      assert.equal(tab.css('display'), '');
     });
 
-    return it('hides the tab if there are no annotations in the bucket', function () {
+    it('hides the tab if there are no annotations in the bucket', () => {
       const tab = $('<div />');
       const bucketBar = setup(tab);
       bucketBar.buckets = [];
 
       bucketBar._buildTabs();
-      return assert.equal(tab.css('display'), 'none');
+      assert.equal(tab.css('display'), 'none');
     });
   });
 });
