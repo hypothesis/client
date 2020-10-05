@@ -120,12 +120,10 @@ describe('AnnotationSync', function () {
         options.emit('beforeAnnotationCreated', ann);
 
         assert.called(fakeBridge.call);
-        assert.calledWith(
-          fakeBridge.call,
-          'beforeCreateAnnotation',
-          { msg: ann, tag: ann.$tag },
-          sinon.match.func
-        );
+        assert.calledWith(fakeBridge.call, 'beforeCreateAnnotation', {
+          msg: ann,
+          tag: ann.$tag,
+        });
       });
 
       context('if the annotation has a $tag', function () {
@@ -138,6 +136,17 @@ describe('AnnotationSync', function () {
           assert.notCalled(fakeBridge.call);
         });
       });
+    });
+  });
+
+  describe('#sync', () => {
+    it('calls "sync" method of the bridge', () => {
+      const ann = { id: 1 };
+      const annotationSync = createAnnotationSync();
+
+      annotationSync.sync([ann]);
+
+      assert.calledWith(fakeBridge.call, 'sync', [{ msg: ann, tag: ann.$tag }]);
     });
   });
 });
