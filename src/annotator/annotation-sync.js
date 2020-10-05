@@ -1,176 +1,116 @@
-// AnnotationSync listens for messages from the sidebar app indicating that
-// annotations have been added or removed and relays them to Guest.
-//
-// It also listens for events from Guest when new annotations are created or
-// annotations successfully anchor and relays these to the sidebar app.
-export default function AnnotationSync(bridge, options) {
-  const self = this;
+/**
+ * @typedef {import('../shared/bridge').default} Bridge
+ */
 
-  this.bridge = bridge;
+/**
+ * @callback RpcCallback
+ * @param {Error|null} error
+ * @param {any} result
+ */
 
-  if (!options.on) {
-    throw new Error('options.on unspecified for AnnotationSync.');
-  }
+/**
+ * AnnotationSync listens for messages from the sidebar app indicating that
+ * annotations have been added or removed and relays them to Guest.
+ *
+ * It also listens for events from Guest when new annotations are created or
+ * annotations successfully anchor and relays these to the sidebar app.
+ */
+export default class AnnotationSync {
+  /**
+   * @param {Bridge} bridge
+   * @param {Object} options
+   * @param {(event: string, callback: (data: any, callback: RpcCallback) => void) => void} options.on -
+   *   Function that registers a listener for an event from the rest of the
+   *   annotator
+   * @param {(event: string, ...args: any[]) => void} options.emit -
+   *   Function that publishes an event to the rest of the annotator
+   */
+  constructor(bridge, options) {
+    this.bridge = bridge;
 
-  if (!options.emit) {
-    throw new Error('options.emit unspecified for AnnotationSync.');
-  }
+    /**
+     * Mapping from annotation tags to annotation objects for annotations which
+     * have been sent to or received from the sidebar.
+     *
+     * @type {{ [tag: string]: Object }}
+     */
+    this.cache = {};
 
-  this.cache = {};
+    this._on = options.on;
+    this._emit = options.emit;
 
-  this._on = options.on;
-  this._emit = options.emit;
-
-  // Listen locally for interesting events
-  Object.keys(this._eventListeners).forEach(function (eventName) {
-    const listener = self._eventListeners[eventName];
-    self._on(eventName, function (annotation) {
-      listener.apply(self, [annotation]);
+    // Relay events from the sidebar to the rest of the annotator.
+    this.bridge.on('deleteAnnotation', (body, callback) => {
+      const annotation = this._parse(body);
+      delete this.cache[annotation.$tag];
+      this._emit('annotationDeleted', annotation);
+      callback(null, this._format(annotation));
     });
-  });
 
-  // Register remotely invokable methods
-  Object.keys(this._channelListeners).forEach(function (eventName) {
-    self.bridge.on(eventName, function (data, callbackFunction) {
-      const listener = self._channelListeners[eventName];
-      listener.apply(self, [data, callbackFunction]);
+    this.bridge.on('loadAnnotations', (bodies, callback) => {
+      const annotations = bodies.map(body => this._parse(body));
+      this._emit('annotationsLoaded', annotations);
+      callback(null, annotations);
     });
-  });
-}
 
-// Cache of annotations which have crossed the bridge for fast, encapsulated
-// association of annotations received in arguments to window-local copies.
-AnnotationSync.prototype.cache = null;
-
-AnnotationSync.prototype.sync = function (annotations) {
-  annotations = function () {
-    let i;
-    const formattedAnnotations = [];
-
-    for (i = 0; i < annotations.length; i++) {
-      formattedAnnotations.push(this._format(annotations[i]));
-    }
-    return formattedAnnotations;
-  }.call(this);
-  this.bridge.call(
-    'sync',
-    annotations,
-    (function (_this) {
-      return function (err, annotations) {
-        let i;
-        const parsedAnnotations = [];
-        annotations = annotations || [];
-
-        for (i = 0; i < annotations.length; i++) {
-          parsedAnnotations.push(_this._parse(annotations[i]));
-        }
-        return parsedAnnotations;
-      };
-    })(this)
-  );
-  return this;
-};
-
-// Handlers for messages arriving through a channel
-AnnotationSync.prototype._channelListeners = {
-  deleteAnnotation: function (body, cb) {
-    const annotation = this._parse(body);
-    delete this.cache[annotation.$tag];
-    this._emit('annotationDeleted', annotation);
-    cb(null, this._format(annotation));
-  },
-  loadAnnotations: function (bodies, cb) {
-    const annotations = function () {
-      let i;
-      const parsedAnnotations = [];
-
-      for (i = 0; i < bodies.length; i++) {
-        parsedAnnotations.push(this._parse(bodies[i]));
+    // Relay events from annotator to sidebar.
+    this._on('beforeAnnotationCreated', annotation => {
+      if (annotation.$tag) {
+        return;
       }
-      return parsedAnnotations;
-    }.call(this);
-    this._emit('annotationsLoaded', annotations);
-    return cb(null, annotations);
-  },
-};
+      this.bridge.call('beforeCreateAnnotation', this._format(annotation));
+    });
+  }
 
-// Handlers for events coming from this frame, to send them across the channel
-AnnotationSync.prototype._eventListeners = {
-  beforeAnnotationCreated: function (annotation) {
-    if (annotation.$tag) {
-      return undefined;
-    }
-    return this._mkCallRemotelyAndParseResults('beforeCreateAnnotation')(
-      annotation
+  /**
+   * Relay updated annotations from the annotator to the sidebar.
+   *
+   * This is called for example after annotations are anchored to notify the
+   * sidebar about the current anchoring status.
+   */
+  sync(annotations) {
+    this.bridge.call(
+      'sync',
+      annotations.map(ann => this._format(ann))
     );
-  },
-};
-
-AnnotationSync.prototype._mkCallRemotelyAndParseResults = function (
-  method,
-  callBack
-) {
-  return (function (_this) {
-    return function (annotation) {
-      // Wrap the callback function to first parse returned items
-      const wrappedCallback = function (failure, results) {
-        if (failure === null) {
-          _this._parseResults(results);
-        }
-        if (typeof callBack === 'function') {
-          callBack(failure, results);
-        }
-      };
-      // Call the remote method
-      _this.bridge.call(method, _this._format(annotation), wrappedCallback);
-    };
-  })(this);
-};
-
-// Parse returned message bodies to update cache with any changes made remotely
-AnnotationSync.prototype._parseResults = function (results) {
-  let bodies;
-  let body;
-  let i;
-  let j;
-
-  for (i = 0; i < results.length; i++) {
-    bodies = results[i];
-    bodies = [].concat(bodies);
-    for (j = 0; j < bodies.length; j++) {
-      body = bodies[j];
-      if (body !== null) {
-        this._parse(body);
-      }
-    }
   }
-};
 
-// Assign a non-enumerable tag to objects which cross the bridge.
-// This tag is used to identify the objects between message.
-AnnotationSync.prototype._tag = function (ann, tag) {
-  if (ann.$tag) {
+  /**
+   * Assign a non-enumerable tag to objects which cross the bridge.
+   * This tag is used to identify the objects between message.
+   *
+   * @param {string} [tag]
+   */
+  _tag(ann, tag) {
+    if (ann.$tag) {
+      return ann;
+    }
+    tag = tag || window.btoa(Math.random().toString());
+    Object.defineProperty(ann, '$tag', {
+      value: tag,
+    });
+    this.cache[tag] = ann;
     return ann;
   }
-  tag = tag || window.btoa(Math.random().toString());
-  Object.defineProperty(ann, '$tag', {
-    value: tag,
-  });
-  this.cache[tag] = ann;
-  return ann;
-};
 
-// Parse a message body from a RPC call with the provided parser.
-AnnotationSync.prototype._parse = function (body) {
-  const merged = Object.assign(this.cache[body.tag] || {}, body.msg);
-  return this._tag(merged, body.tag);
-};
+  /**
+   * Copy annotation data from an RPC message into a local copy (in `this.cache`)
+   * and return the local copy.
+   */
+  _parse(body) {
+    const merged = Object.assign(this.cache[body.tag] || {}, body.msg);
+    return this._tag(merged, body.tag);
+  }
 
-// Format an annotation into an RPC message body with the provided formatter.
-AnnotationSync.prototype._format = function (ann) {
-  this._tag(ann);
-  return {
-    tag: ann.$tag,
-    msg: ann,
-  };
-};
+  /**
+   * Format an annotation into an RPC message body.
+   */
+  _format(ann) {
+    this._tag(ann);
+
+    return {
+      tag: ann.$tag,
+      msg: ann,
+    };
+  }
+}
