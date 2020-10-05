@@ -2,8 +2,8 @@ import {
   findClosestOffscreenAnchor,
   constructPositionPoints,
   buildBuckets,
-} from '../bucket-bar-js';
-import { $imports } from '../bucket-bar-js';
+} from '../buckets';
+import { $imports } from '../buckets';
 
 function fakeAnchorFactory() {
   let highlightIndex = 0;
@@ -14,7 +14,7 @@ function fakeAnchorFactory() {
   };
 }
 
-describe('annotator/plugin/bucket-bar-js', () => {
+describe('annotator/util/buckets', () => {
   let fakeGetBoundingClientRect;
 
   beforeEach(() => {
@@ -175,7 +175,7 @@ describe('annotator/plugin/bucket-bar-js', () => {
       assert.deepEqual(positionPoints.points[3], [351, -1, fakeAnchors[3]]);
     });
 
-    it('sorts on-screen points based on position type secondarily', () => {
+    it('sorts on-screen points based on position primarily, type secondarily', () => {
       fakeGetBoundingClientRect.callsFake(() => {
         return {
           top: 250,
@@ -200,6 +200,7 @@ describe('annotator/plugin/bucket-bar-js', () => {
       }
     });
   });
+
   describe('buildBuckets', () => {
     it('should return empty buckets if points array is empty', () => {
       const bucketInfo = buildBuckets([]);

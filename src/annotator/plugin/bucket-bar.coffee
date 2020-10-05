@@ -3,7 +3,7 @@ $ = require('jquery')
 
 scrollIntoView = require('scroll-into-view')
 
-{ findClosestOffscreenAnchor, constructPositionPoints, buildBuckets } = require('./bucket-bar-js')
+{ findClosestOffscreenAnchor, constructPositionPoints, buildBuckets } = require('../util/buckets')
 
 highlighter = require('../highlighter')
 
