@@ -5,7 +5,7 @@ import { getBoundingClientRect } from '../highlighter';
  */
 
 /**
- * A structured Array representing either the top (`startOrEnd` = 1) or the
+ * A tuple representing either the top (`startOrEnd` = 1) or the
  * bottom (`startOrEnd` = -1) of an anchor's highlight bounding box.
  *
  * @typedef {[pixelPosition: number, startOrEnd: (-1 | 1), anchor: Anchor]} PositionPoint
@@ -98,7 +98,7 @@ export function findClosestOffscreenAnchor(anchors, direction) {
 export function constructPositionPoints(anchors) {
   const aboveScreenAnchors = new Set();
   const belowScreenAnchors = new Set();
-  const points = /** @type {PositionPoint[]} */ (new Array());
+  const points = /** @type {PositionPoint[]} */ ([]);
 
   for (let anchor of anchors) {
     if (!anchor.highlights?.length) {
@@ -147,14 +147,14 @@ export function constructPositionPoints(anchors) {
  * @return {BucketInfo}
  */
 export function buildBuckets(points) {
-  const buckets = /** @type {Array<Anchor[]>} */ (new Array());
-  const bucketPositions = /** @type {number[]} */ (new Array());
+  const buckets = /** @type {Array<Anchor[]>} */ ([]);
+  const bucketPositions = /** @type {number[]} */ ([]);
 
   // Anchors that are part of the currently-being-built bucket, and a correspon-
   // ding count of unclosed top edges seen for that anchor
   const current = /** @type {{anchors: Anchor[], counts: number[] }} */ ({
-    anchors: new Array(),
-    counts: new Array(),
+    anchors: [],
+    counts: [],
   });
 
   points.forEach((point, index) => {
@@ -223,12 +223,12 @@ export function buildBuckets(points) {
       // from the buckets collection, and re-add 1 merged bucket (always)
 
       // Always pop off the last bucket
-      const ultimateBucket = buckets.pop() || new Array();
+      const ultimateBucket = buckets.pop() || [];
 
       // If there is a previous/penultimate bucket, pop that off, as well
-      let penultimateBucket = new Array();
+      let penultimateBucket = [];
       if (buckets[buckets.length - 1]?.length) {
-        penultimateBucket = buckets.pop() || new Array();
+        penultimateBucket = buckets.pop() || [];
         // Because we're removing two buckets but only re-adding one below,
         // we'll end up with a misalignment in the `bucketPositions` collection.
         // Remove the last entry here, as it corresponds to the ultimate bucket,
