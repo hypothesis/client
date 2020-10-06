@@ -1,11 +1,15 @@
 /**
+ * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../shared/bridge').default} Bridge
  */
 
 /**
- * @callback RpcCallback
- * @param {Error|null} error
- * @param {any} result
+ * Message sent between the sidebar and annotator about an annotation that has
+ * changed.
+ *
+ * @typedef RpcMessage
+ * @prop {string} tag
+ * @prop {AnnotationData} msg
  */
 
 /**
@@ -19,11 +23,11 @@ export default class AnnotationSync {
   /**
    * @param {Bridge} bridge
    * @param {Object} options
-   * @param {(event: string, callback: (data: any, callback: RpcCallback) => void) => void} options.on -
-   *   Function that registers a listener for an event from the rest of the
-   *   annotator
-   * @param {(event: string, ...args: any[]) => void} options.emit -
-   *   Function that publishes an event to the rest of the annotator
+   *   @param {(event: string, callback: (...args: any[]) => void) => void} options.on -
+   *     Function that registers a listener for an event from the rest of the
+   *     annotator
+   *   @param {(event: string, ...args: any[]) => void} options.emit -
+   *     Function that publishes an event to the rest of the annotator
    */
   constructor(bridge, options) {
     this.bridge = bridge;
@@ -32,7 +36,7 @@ export default class AnnotationSync {
      * Mapping from annotation tags to annotation objects for annotations which
      * have been sent to or received from the sidebar.
      *
-     * @type {{ [tag: string]: Object }}
+     * @type {{ [tag: string]: AnnotationData }}
      */
     this.cache = {};
 
@@ -67,6 +71,8 @@ export default class AnnotationSync {
    *
    * This is called for example after annotations are anchored to notify the
    * sidebar about the current anchoring status.
+   *
+   * @param {AnnotationData[]} annotations
    */
   sync(annotations) {
     this.bridge.call(
@@ -77,9 +83,11 @@ export default class AnnotationSync {
 
   /**
    * Assign a non-enumerable tag to objects which cross the bridge.
-   * This tag is used to identify the objects between message.
+   * This tag is used to identify the objects between messages.
    *
+   * @param {AnnotationData} ann
    * @param {string} [tag]
+   * @return {AnnotationData}
    */
   _tag(ann, tag) {
     if (ann.$tag) {
@@ -96,6 +104,9 @@ export default class AnnotationSync {
   /**
    * Copy annotation data from an RPC message into a local copy (in `this.cache`)
    * and return the local copy.
+   *
+   * @param {RpcMessage} body
+   * @return {AnnotationData}
    */
   _parse(body) {
     const merged = Object.assign(this.cache[body.tag] || {}, body.msg);
@@ -104,6 +115,9 @@ export default class AnnotationSync {
 
   /**
    * Format an annotation into an RPC message body.
+   *
+   * @param {AnnotationData} ann
+   * @return {RpcMessage}
    */
   _format(ann) {
     this._tag(ann);
