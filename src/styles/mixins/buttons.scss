@@ -69,7 +69,8 @@
     &[aria-pressed='true'] {
       color: var.$color-brand;
 
-      &:hover:not([disabled]) {
+      &:hover:not([disabled]),
+      &:focus:not([disabled]) {
         color: var.$color-brand;
       }
     }
@@ -84,7 +85,8 @@
   font-weight: 700;
   background-color: var.$grey-1;
 
-  &:hover:not([disabled]) {
+  &:hover:not([disabled]),
+  &:focus:not([disabled]) {
     background-color: var.$grey-2;
   }
 
@@ -103,7 +105,8 @@
   color: var.$color-text--inverted;
   background-color: var.$grey-mid;
 
-  &:hover:not([disabled]) {
+  &:hover:not([disabled]),
+  &:focus:not([disabled]) {
     color: var.$color-text--inverted;
     background-color: var.$grey-6;
   }
@@ -137,7 +140,8 @@
   border-radius: 0; // Turn off border-radius to align with <input> edges
   border-left: 0; // Avoid double border with the <input>
 
-  &:hover:not([disabled]) {
+  &:hover:not([disabled]),
+  &:focus:not([disabled]) {
     background-color: var.$grey-2;
   }
 }
@@ -149,7 +153,8 @@
   @include button;
   color: var.$grey-mid;
   padding: 0;
-  &:hover:not([disabled]) {
+  &:hover:not([disabled]),
+  &:focus:not([disabled]) {
     color: var.$color-link-hover;
     text-decoration: underline;
   }
