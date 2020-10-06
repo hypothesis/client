@@ -271,7 +271,7 @@ export class NormalizedRange {
       const nodes = textNodes.slice(0, textNodes.indexOf(node));
       let offset = 0;
       for (let n of nodes) {
-        offset += n.data.length ?? 0;
+        offset += n.data.length;
       }
 
       if (isEnd) {
