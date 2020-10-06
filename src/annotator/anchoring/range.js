@@ -271,7 +271,7 @@ export class NormalizedRange {
       const nodes = textNodes.slice(0, textNodes.indexOf(node));
       let offset = 0;
       for (let n of nodes) {
-        offset += n.nodeValue?.length ?? 0;
+        offset += n.data.length ?? 0;
       }
 
       if (isEnd) {
@@ -397,15 +397,12 @@ export class SerializedRange {
       }
 
       for (let tn of getTextNodes(node)) {
-        if (tn.nodeValue === null) {
-          continue;
-        }
-        if (length + tn.nodeValue.length > targetOffset) {
+        if (length + tn.data.length > targetOffset) {
           range[p + 'Container'] = tn;
           range[p + 'Offset'] = this[p + 'Offset'] - length;
           break;
         } else {
-          length += tn.nodeValue.length;
+          length += tn.data.length;
         }
       }
 
