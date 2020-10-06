@@ -446,23 +446,15 @@ describe('HTML anchoring', function () {
 
         frame.contentWindow.document.documentElement.innerHTML = fixtureHtml;
 
-        const annotationsChecked = annotations.map(function (ann) {
-          // Anchor the existing selectors
+        const annotationsChecked = annotations.map(async ann => {
           const root = frame.contentWindow.document.body;
           const selectors = ann.target[0].selector;
-          const result = html.anchor(root, selectors);
-          return result
-            .then(function (range) {
-              // Re-anchor the selectors and check that the new and existing
-              // selectors match.
-              return html.describe(root, range);
-            })
-            .then(function (newSelectors) {
-              assert.deepEqual(sortByType(selectors), sortByType(newSelectors));
-            });
+          const range = await html.anchor(root, selectors);
+          const newSelectors = await html.describe(root, range);
+          assert.deepEqual(sortByType(selectors), sortByType(newSelectors));
         });
 
-        Promise.all(annotationsChecked);
+        return Promise.all(annotationsChecked);
       });
     });
   });
