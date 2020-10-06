@@ -63,13 +63,6 @@ function annotationsAt(node) {
   return /** @type {AnnotationData[]} */ (items);
 }
 
-// A selector which matches elements added to the DOM by Hypothesis (eg. for
-// highlights and annotation UI).
-//
-// We can simplify this once all classes are converted from an "annotator-"
-// prefix to a "hypothesis-" prefix.
-const IGNORE_SELECTOR = '[class^="annotator-"],[class^="hypothesis-"]';
-
 export default class Guest extends Delegator {
   constructor(element, config, anchoring = htmlAnchoring) {
     const defaultConfig = {
@@ -355,11 +348,8 @@ export default class Guest extends Delegator {
       }
 
       // Find a target using the anchoring module.
-      const options = {
-        ignoreSelector: IGNORE_SELECTOR,
-      };
       return this.anchoring
-        .anchor(root, target.selector, options)
+        .anchor(root, target.selector)
         .then(range => ({
           annotation,
           target,
@@ -477,11 +467,8 @@ export default class Guest extends Delegator {
     this.selectedRanges = null;
 
     const getSelectors = range => {
-      const options = {
-        ignoreSelector: IGNORE_SELECTOR,
-      };
       // Returns an array of selectors for the passed range.
-      return this.anchoring.describe(root, range, options);
+      return this.anchoring.describe(root, range);
     };
 
     const setDocumentInfo = info => {
