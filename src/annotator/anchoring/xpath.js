@@ -97,6 +97,7 @@ function evaluateSimpleXPath(xpath, root) {
  *
  * @param {string} xpath
  * @param {Element} [root]
+ * @return {Node|null}
  */
 export function nodeFromXPath(xpath, root = document.body) {
   try {

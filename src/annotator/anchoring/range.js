@@ -380,6 +380,9 @@ export class SerializedRange {
       let node;
       try {
         node = nodeFromXPath(this[p], root);
+        if (!node) {
+          throw new Error('Node not found');
+        }
       } catch (e) {
         throw new RangeError(`Error while finding ${p} node: ${this[p]}: ` + e);
       }
