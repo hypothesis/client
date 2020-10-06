@@ -416,32 +416,8 @@ export class SerializedRange {
       }
     }
 
-    // Here's an elegant next step...
-    //
-    //   range.commonAncestorContainer = $(range.startContainer).parents().has(range.endContainer)[0]
-    //
-    // ...but unfortunately Node.contains() is broken in Safari 5.1.5 (7534.55.3)
-    // and presumably other earlier versions of WebKit. In particular, in a
-    // document like
-    //
-    //   <p>Hello</p>
-    //
-    // the code
-    //
-    //   p = document.getElementsByTagName('p')[0]
-    //   p.contains(p.firstChild)
-    //
-    // returns `false`. Yay.
-    //
-    // So instead, we step through the parents from the bottom up and use
-    // Node.compareDocumentPosition() to decide when to set the
-    // commonAncestorContainer and bail out.
-
-    const contains = (a, b) =>
-      a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_CONTAINED_BY;
-
     for (let parent of parents(range.startContainer)) {
-      if (contains(parent, range.endContainer)) {
+      if (parent.contains(range.endContainer)) {
         range.commonAncestorContainer = parent;
         break;
       }
