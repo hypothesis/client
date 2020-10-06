@@ -272,14 +272,33 @@ describe('annotator/anchoring/range', () => {
         });
       });
 
-      it('converts BrowserRange to SerializedRange instance with `ignoreSelector` condition', () => {
-        const browserRange = createBrowserRange();
-        const result = browserRange.serialize(container, 'p');
-        assert.deepEqual(result, {
-          start: '/section[1]', // /p[1] selector in xpath ignored
-          startOffset: 0,
-          end: '/section[1]/span[1]', // /p[1] selector in xpath ignored
-          endOffset: 1,
+      [
+        // Single selector
+        {
+          ignoreSelector: 'p',
+          expected: {
+            start: '/section[1]', // /p[1] selector in xpath ignored
+            startOffset: 0,
+            end: '/section[1]/span[1]', // /p[1] selector in xpath ignored
+            endOffset: 1,
+          },
+        },
+
+        // Selector list, used to filter out elements using multiple conditions.
+        {
+          ignoreSelector: 'p,p',
+          expected: {
+            start: '/section[1]', // /p[1] selector in xpath ignored
+            startOffset: 0,
+            end: '/section[1]/span[1]', // /p[1] selector in xpath ignored
+            endOffset: 1,
+          },
+        },
+      ].forEach(({ ignoreSelector, expected }) => {
+        it('converts BrowserRange to SerializedRange with `ignoreSelector` filter', () => {
+          const browserRange = createBrowserRange();
+          const result = browserRange.serialize(container, ignoreSelector);
+          assert.deepEqual(result, expected);
         });
       });
     });

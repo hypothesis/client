@@ -6,15 +6,16 @@ import {
 } from './xpath-util';
 
 /**
- * Return ancestors of `element`, optionally filtered by a CSS `selector`.
+ * Return ancestors of `element`, optionally filtered by a CSS selector.
  *
  * @param {Node} node
- * @param {string} [selector]
+ * @param {string} [ignoreSelector] -
+ *   Any elements that match this CSS selector will be excluded from the result
  */
-function parents(node, selector) {
+function parents(node, ignoreSelector) {
   const parents = [];
   while (node.parentElement) {
-    if (!selector || node.parentElement.matches(selector)) {
+    if (!ignoreSelector || !node.parentElement.matches(ignoreSelector)) {
       parents.push(node.parentElement);
     }
     node = node.parentElement;
@@ -259,7 +260,7 @@ export class NormalizedRange {
     const serialization = (node, isEnd) => {
       let origParent;
       if (ignoreSelector) {
-        origParent = parents(node, `:not(${ignoreSelector})`)[0];
+        origParent = parents(node, ignoreSelector)[0];
       } else {
         origParent = node.parentElement;
       }
