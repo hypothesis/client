@@ -82,23 +82,24 @@ export default class AnnotationSync {
   }
 
   /**
-   * Assign a non-enumerable tag to objects which cross the bridge.
-   * This tag is used to identify the objects between messages.
+   * Assign a non-enumerable "tag" to identify annotations exchanged between
+   * the sidebar and annotator and associate the tag with the `annotation` instance
+   * in the local cache.
    *
-   * @param {AnnotationData} ann
-   * @param {string} [tag]
+   * @param {AnnotationData} annotation
+   * @param {string} [tag] - The tag to assign
    * @return {AnnotationData}
    */
-  _tag(ann, tag) {
-    if (ann.$tag) {
-      return ann;
+  _tag(annotation, tag) {
+    if (annotation.$tag) {
+      return annotation;
     }
     tag = tag || window.btoa(Math.random().toString());
-    Object.defineProperty(ann, '$tag', {
+    Object.defineProperty(annotation, '$tag', {
       value: tag,
     });
-    this.cache[tag] = ann;
-    return ann;
+    this.cache[tag] = annotation;
+    return annotation;
   }
 
   /**
@@ -116,15 +117,15 @@ export default class AnnotationSync {
   /**
    * Format an annotation into an RPC message body.
    *
-   * @param {AnnotationData} ann
+   * @param {AnnotationData} annotation
    * @return {RpcMessage}
    */
-  _format(ann) {
-    this._tag(ann);
+  _format(annotation) {
+    this._tag(annotation);
 
     return {
-      tag: ann.$tag,
-      msg: ann,
+      tag: annotation.$tag,
+      msg: annotation,
     };
   }
 }
