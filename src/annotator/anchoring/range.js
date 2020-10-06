@@ -6,17 +6,14 @@ import {
 } from './xpath-util';
 
 /**
- * Return ancestors of `element`, optionally filtered by a CSS `selector`.
+ * Return ancestors of `node`.
  *
  * @param {Node} node
- * @param {string} [selector]
  */
-function parents(node, selector) {
+function parents(node) {
   const parents = [];
   while (node.parentElement) {
-    if (!selector || node.parentElement.matches(selector)) {
-      parents.push(node.parentElement);
-    }
+    parents.push(node.parentElement);
     node = node.parentElement;
   }
   return parents;
@@ -169,13 +166,11 @@ export class BrowserRange {
    * Creates a range suitable for storage.
    *
    * root           - A root Element from which to anchor the serialization.
-   * ignoreSelector - A selector String of elements to ignore. For example
-   *                  elements injected by the annotator.
    *
    * Returns an instance of SerializedRange.
    */
-  serialize(root, ignoreSelector) {
-    return this.normalize().serialize(root, ignoreSelector);
+  serialize(root) {
+    return this.normalize().serialize(root);
   }
 }
 
@@ -250,19 +245,12 @@ export class NormalizedRange {
    * character offset), which can be easily stored in a database.
    *
    * root -           The root Element relative to which XPaths should be calculated
-   * ignoreSelector - A selector String of elements to ignore. For example
-   *                  elements injected by the annotator.
    *
    * Returns an instance of SerializedRange.
    */
-  serialize(root, ignoreSelector) {
+  serialize(root) {
     const serialization = (node, isEnd) => {
-      let origParent;
-      if (ignoreSelector) {
-        origParent = parents(node, `:not(${ignoreSelector})`)[0];
-      } else {
-        origParent = node.parentElement;
-      }
+      const origParent = node.parentElement;
       const xpath = xpathFromNode(origParent, root ?? document);
       const textNodes = getTextNodes(origParent);
       // Calculate real offset as the combined length of all the
@@ -433,13 +421,11 @@ export class SerializedRange {
    * Creates a range suitable for storage.
    *
    * root           - A root Element from which to anchor the serialization.
-   * ignoreSelector - A selector String of elements to ignore. For example
-   *                  elements injected by the annotator.
    *
    * Returns an instance of SerializedRange.
    */
-  serialize(root, ignoreSelector) {
-    return this.normalize(root).serialize(root, ignoreSelector);
+  serialize(root) {
+    return this.normalize(root).serialize(root);
   }
 
   // Returns the range as an Object literal.

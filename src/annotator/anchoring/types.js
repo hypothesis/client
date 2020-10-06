@@ -75,12 +75,10 @@ export class RangeAnchor {
   }
 
   /**
-   * @param {Object} [options]
-   *   @param {string} [options.ignoreSelector]
    * @return {RangeSelector}
    */
-  toSelector(options = {}) {
-    const range = this.range.serialize(this.root, options.ignoreSelector);
+  toSelector() {
+    const range = this.range.serialize(this.root);
     return {
       type: 'RangeSelector',
       startContainer: range.start,

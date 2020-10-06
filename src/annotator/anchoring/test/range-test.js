@@ -271,17 +271,6 @@ describe('annotator/anchoring/range', () => {
           endOffset: 1,
         });
       });
-
-      it('converts BrowserRange to SerializedRange instance with `ignoreSelector` condition', () => {
-        const browserRange = createBrowserRange();
-        const result = browserRange.serialize(container, 'p');
-        assert.deepEqual(result, {
-          start: '/section[1]', // /p[1] selector in xpath ignored
-          startOffset: 0,
-          end: '/section[1]/span[1]', // /p[1] selector in xpath ignored
-          endOffset: 1,
-        });
-      });
     });
   });
 
@@ -373,19 +362,6 @@ describe('annotator/anchoring/range', () => {
         assert.deepEqual(serializedRange, {
           start: '/html[1]/body[1]/div[1]/section[1]/p[1]',
           end: '/html[1]/body[1]/div[1]/section[1]/span[1]/p[1]',
-          startOffset: 0,
-          endOffset: 6,
-        });
-      });
-
-      it('serialize the range with `ignoreSelector` condition', () => {
-        const serializedRange = createNormalizedRange().serialize(
-          container,
-          '#p-3'
-        );
-        assert.deepEqual(serializedRange, {
-          start: '/section[1]/p[1]',
-          end: '/section[1]/span[1]',
           startOffset: 0,
           endOffset: 6,
         });
@@ -510,15 +486,6 @@ describe('annotator/anchoring/range', () => {
         assert.isTrue(result instanceof SerializedRange);
         // The copied instance shall be identical to the initial.
         assert.deepEqual(result, serializedRange);
-      });
-
-      it('converts a SerializedRange to a new SerializedRange instance with `ignoreSelector` condition', () => {
-        const serializedRange = createSerializedRange();
-        const result = serializedRange.serialize(container, '#p-3');
-        // End xpath shall ignore the provided selector and not
-        // be identical to the initial end xpath.
-        assert.notEqual(serializedRange.end, result.end);
-        assert.equal(result.end, '/section[1]/span[1]');
       });
     });
   });
