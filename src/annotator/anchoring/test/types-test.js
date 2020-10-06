@@ -349,9 +349,6 @@ describe('annotator/anchoring/types', () => {
           exact: 'Four',
         });
         const newRange = anchor.toRange();
-        // startContainer of anchor.toRange() points to <div>
-        // rather than the text node "Four score ..."
-        // assert.equal(anchor.toRange(), range);
         assert.equal(newRange.toString(), 'Four');
       });
     });
