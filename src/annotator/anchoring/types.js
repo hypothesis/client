@@ -137,7 +137,7 @@ export class TextPositionAnchor {
 }
 
 /**
- * Converts between TextQuoteSelector selectors and Range objects.
+ * Converts between `TextQuoteSelector` selectors and `Range` objects.
  */
 export class TextQuoteAnchor {
   /**
