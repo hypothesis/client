@@ -4,9 +4,7 @@ import scrollIntoView from 'scroll-into-view';
 import Delegator from './delegator';
 import { Adder } from './adder';
 
-// @ts-expect-error - Module is CoffeeScript
 import * as htmlAnchoring from './anchoring/html';
-
 import { sniff } from './anchoring/range';
 import {
   getHighlightsContainingNode,
