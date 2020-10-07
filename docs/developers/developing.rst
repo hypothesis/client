@@ -14,7 +14,7 @@ Prerequisites
 You will need:
 
 * `git <https://git-scm.com/>`_
-* `Node.js <https://nodejs.org/en/>`_ v6.3+
+* `Node.js <https://nodejs.org/en/>`_ v12+
 * `Yarn <https://yarnpkg.com/lang/en/>`_
 
 Building
@@ -28,17 +28,20 @@ To build the client for development:
    cd client
    make
 
-You now have a development client built. To run your development client in
-a browser you'll need a local copy of either the Hypothesis Chrome extension or
-h. Follow either :ref:`running-from-browser-ext` or
-:ref:`running-from-h` below.
+You now have a development client built. There are three ways to run your
+development client in a browser.
+
+A. Through the Browser Extension connected to our hosted hypothesis h service.
+B. Locally through the built-in express server connected to our hosted hypothesis h service.
+C. Locally through the built-in express server connected to a local instance of the hypothesis h service.
+
 If you're only interested in making changes to the client (and not to h)
-then running the client from the browser extension is easiest.
+then either **A** or **B** is the easiest.
 
 
 .. _running-from-browser-ext:
 
-Running the Client from the Browser Extension
+A. Running the Client from the Browser Extension
 ---------------------------------------------
 
 This is the currently easiest way to get your development client running in a
@@ -64,9 +67,27 @@ extension itself, but not to h.
    `Extensions Reloader <https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid?hl=en>`_
    to make this easier.
 
+.. _running-from-hosted-h:
+
+B. Running the Client Locally, Connected to Hosted h
+---------------------------------------------
+
+Method two is also easy and only requires some extra configuration in the client environment to
+setup. You also do not need to clone the browser extension repository. Assuming you have cloned
+the client repository, set the environment variable accordingly and run the local express
+server as follows:
+
+.. code-block:: sh
+
+   export SIDEBAR_APP_URL=https://hypothes.is/app.html
+   make dev
+
+The express server will be reachable on http://localhost:3000 and should be connected to the
+hosted h/ instance.
+
 .. _running-from-h:
 
-Running the Client From h
+C. Running the Client Locally, Connected to a Local h
 -------------------------
 
 This takes longer to setup than :ref:`running-from-browser-ext`.
