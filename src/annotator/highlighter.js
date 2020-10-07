@@ -134,7 +134,7 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
 }
 
 /**
- * Subset of the `NormalizedRange` class defined in `range.coffee` that this
+ * Subset of the `NormalizedRange` class defined in `range.js` that this
  * module currently uses.
  *
  * @typedef NormalizedRange

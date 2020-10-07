@@ -54,11 +54,7 @@ if (process.env.RUNNING_IN_DOCKER) {
 }
 
 module.exports = function (config) {
-  let testFiles = [
-    'annotator/**/*-test.coffee',
-    '**/test/*-test.js',
-    '**/integration/*-test.js',
-  ];
+  let testFiles = ['**/test/*-test.js', '**/integration/*-test.js'];
 
   if (config.grep) {
     const allFiles = testFiles
@@ -93,7 +89,6 @@ module.exports = function (config) {
         // Disable watching because karma-browserify handles this.
         watched: false,
 
-        // Configure `type` explicitly to avoid warning about .coffee files.
         type: 'js',
       })),
 
@@ -114,27 +109,22 @@ module.exports = function (config) {
       './shared/polyfills/*.js': ['browserify'],
       './sidebar/test/bootstrap.js': ['browserify'],
       '**/*-test.js': ['browserify'],
-      '**/*-test.coffee': ['browserify'],
       '**/*-it.js': ['browserify'],
     },
 
     browserify: {
       debug: true,
-      extensions: ['.coffee'],
       transform: [
-        'coffeeify',
         [
           'babelify',
           {
-            // The transpiled CoffeeScript is fed through Babelify to add
-            // code coverage instrumentation for Istanbul.
-            extensions: ['.js', '.coffee'],
+            extensions: ['.js'],
             plugins: [
               'mockable-imports',
               [
                 'babel-plugin-istanbul',
                 {
-                  exclude: ['**/test/**/*.{coffee,js}', '**/test-util/**'],
+                  exclude: ['**/test/**/*.js', '**/test-util/**'],
                 },
               ],
             ],
