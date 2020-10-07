@@ -94,7 +94,7 @@ const appBundles = [
     // annotation tools on the page and instantiating the sidebar application.
     name: 'annotator',
     entry: './src/annotator/index',
-    transforms: ['babel', 'coffee'],
+    transforms: ['babel'],
   },
 ];
 

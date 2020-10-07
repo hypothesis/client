@@ -8,7 +8,6 @@ const path = require('path');
 
 const babelify = require('babelify');
 const browserify = require('browserify');
-const coffeeify = require('coffeeify');
 const exorcist = require('exorcist');
 const log = require('fancy-log');
 const envify = require('loose-envify/custom');
@@ -26,25 +25,6 @@ function streamFinished(stream) {
 function waitForever() {
   return new Promise(function () {});
 }
-
-/**
- * type Transform = 'coffee';
- *
- * interface BundleOptions {
- *   name: string;
- *   path: string;
- *
- *   entry?: string[];
- *   require?: string[];
- *   transforms: Transform[];
- *
- *   minify?: boolean;
- * }
- *
- * interface BuildOptions {
- *   watch?: boolean;
- * }
- */
 
 /**
  * Generates a JavaScript application or library bundle and source maps
@@ -71,7 +51,6 @@ module.exports = function createBundle(config, buildOpts) {
 
   const bundleOpts = {
     debug: true,
-    extensions: ['.coffee'],
 
     // Browserify will try to detect and automatically provide
     // browser implementations of Node modules.
@@ -190,9 +169,6 @@ module.exports = function createBundle(config, buildOpts) {
   bundle.external(config.external || []);
 
   (config.transforms || []).forEach(function (transform) {
-    if (transform === 'coffee') {
-      bundle.transform(coffeeify);
-    }
     if (transform === 'babel') {
       bundle.transform(babelify);
     }
