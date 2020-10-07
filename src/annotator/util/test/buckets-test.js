@@ -203,10 +203,9 @@ describe('annotator/util/buckets', () => {
 
   describe('buildBuckets', () => {
     it('should return empty buckets if points array is empty', () => {
-      const bucketInfo = buildBuckets([]);
-      assert.isArray(bucketInfo.buckets);
-      assert.isEmpty(bucketInfo.buckets);
-      assert.isEmpty(bucketInfo.index);
+      const buckets = buildBuckets([]);
+      assert.isArray(buckets);
+      assert.isEmpty(buckets);
     });
 
     it('should group overlapping anchor highlights into shared buckets', () => {
@@ -220,12 +219,12 @@ describe('annotator/util/buckets', () => {
       });
 
       const buckets = buildBuckets(points);
-      assert.equal(buckets.buckets.length, 2);
-      assert.isEmpty(buckets.buckets[1]);
+      assert.equal(buckets.length, 2);
+      assert.isEmpty(buckets[1].anchors);
       // All anchors are in a single bucket
-      assert.deepEqual(buckets.buckets[0], anchors);
+      assert.deepEqual(buckets[0].anchors, anchors);
       // Because this is the first bucket, it will be aligned top
-      assert.equal(buckets.index[0], 150);
+      assert.equal(buckets[0].position, 150);
     });
 
     it('should group nearby anchor highlights into shared buckets', () => {
@@ -241,12 +240,12 @@ describe('annotator/util/buckets', () => {
       });
 
       const buckets = buildBuckets(points);
-      assert.equal(buckets.buckets.length, 2);
-      assert.isEmpty(buckets.buckets[1]);
+      assert.equal(buckets.length, 2);
+      assert.isEmpty(buckets[1].anchors);
       // All anchors are in a single bucket
-      assert.deepEqual(buckets.buckets[0], anchors);
+      assert.deepEqual(buckets[0].anchors, anchors);
       // Because this is the first bucket, it will be aligned top
-      assert.equal(buckets.index[0], 175);
+      assert.equal(buckets[0].position, 175);
     });
 
     it('should put anchors that are not near each other in separate buckets', () => {
@@ -261,16 +260,16 @@ describe('annotator/util/buckets', () => {
         position += 100;
       });
       const buckets = buildBuckets(points);
-      assert.equal(buckets.buckets.length, 8);
+      assert.equal(buckets.length, 8);
       // Legacy of previous implementation, shrug?
-      assert.isEmpty(buckets.buckets[1]);
-      assert.isEmpty(buckets.buckets[3]);
-      assert.isEmpty(buckets.buckets[5]);
-      assert.isEmpty(buckets.buckets[7]);
-      assert.deepEqual(buckets.buckets[0], [anchors[0]]);
-      assert.deepEqual(buckets.buckets[2], [anchors[1]]);
-      assert.deepEqual(buckets.buckets[4], [anchors[2]]);
-      assert.deepEqual(buckets.buckets[6], [anchors[3]]);
+      assert.isEmpty(buckets[1].anchors);
+      assert.isEmpty(buckets[3].anchors);
+      assert.isEmpty(buckets[5].anchors);
+      assert.isEmpty(buckets[7].anchors);
+      assert.deepEqual(buckets[0].anchors, [anchors[0]]);
+      assert.deepEqual(buckets[2].anchors, [anchors[1]]);
+      assert.deepEqual(buckets[4].anchors, [anchors[2]]);
+      assert.deepEqual(buckets[6].anchors, [anchors[3]]);
     });
   });
 });
