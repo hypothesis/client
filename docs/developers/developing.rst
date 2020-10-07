@@ -14,7 +14,7 @@ Prerequisites
 You will need:
 
 * `git <https://git-scm.com/>`_
-* `Node.js <https://nodejs.org/en/>`_ v6.3+
+* `Node.js <https://nodejs.org/en/>`_ v12+
 * `Yarn <https://yarnpkg.com/lang/en/>`_
 
 Building
@@ -28,17 +28,20 @@ To build the client for development:
    cd client
    make
 
-You now have a development client built. To run your development client in
-a browser you'll need a local copy of either the Hypothesis Chrome extension or
-h. Follow either :ref:`running-from-browser-ext` or
-:ref:`running-from-h` below.
+You now have a development client built. There are three ways to run your
+development client in a browser.
+
+A. Through the Browser Extension connected to our hosted hypothesis h service.
+B. Locally through the built-in express server connected to our hosted hypothesis h service.
+C. Locally through the built-in express server connected to a local instance of the hypothesis h service.
+
 If you're only interested in making changes to the client (and not to h)
-then running the client from the browser extension is easiest.
+then either **A** or **B** is the easiest.
 
 
 .. _running-from-browser-ext:
 
-Running the Client from the Browser Extension
+A. Running the Client from the Browser Extension
 ---------------------------------------------
 
 This is the currently easiest way to get your development client running in a
@@ -64,9 +67,47 @@ extension itself, but not to h.
    `Extensions Reloader <https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid?hl=en>`_
    to make this easier.
 
+.. _running-from-hosted-h:
+
+B. Running the Client Locally, Connected to Hosted h
+---------------------------------------------
+
+Method two is also very easy and only requires a little extra configuration in
+the client environment to setup. You also do not need to clone the browser extension
+repo. Assuming you have cloned the client repository, set the environment variable accordingly
+and run the local express server as follows:
+
+.. code-block:: sh
+
+   export SIDEBAR_APP_URL=https://hypothes.is/app.html
+   make dev
+
+The express server will be reachable on http://localhost:3000 and should be connected to the
+hosted h/ instance. It may also be relevant to adjust the default group rather than
+using `Public`. To do this, you will need to change the
+`config <https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-services>`_
+
+To adjust the client config accordingly, edit the template file directly in your local
+`cloned repo <https://github.com/hypothesis/client/blob/master/dev-server/templates/client-config.js.mustache>`_.
+If the app is running, then live-reload should automatically reload the config once the file is
+saved with the adjusted config, but you will need to refresh the page to see the new filtered group.
+
+.. code-block:: json
+
+   services: [{
+      apiUrl: 'https://hypothes.is/api/',
+      authority: 'hypothesis',
+      groups: ['your-group-id',],
+   }],
+
+.. note::
+
+   `your-group-id` is the group ID value found in your `hypothesis account <https://hypothes.is>`_.
+   Each group ID can be found in the URL of the group's page. `https://hypothes.is/groups/<your-group-id>`
+
 .. _running-from-h:
 
-Running the Client From h
+C. Running the Client Locally, Connected to a Local h
 -------------------------
 
 This takes longer to setup than :ref:`running-from-browser-ext`.
