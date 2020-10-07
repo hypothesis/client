@@ -23,9 +23,10 @@ import { getBoundingClientRect } from '../highlighter';
  */
 
 /**
- * @typedef BucketInfo
- * @prop {Array<Anchor[]>} buckets
- * @prop {number[]} index - Array of (pixel) positions of each bucket
+ * @typedef Bucket
+ * @prop {Anchor[]} anchors - The anchors in this bucket
+ * @prop {number} position - The vertical pixel offset where this bucket should
+ *                           appear in the bucket bar
  */
 
 // FIXME: Temporary duplication of size constants between here and BucketBar
@@ -144,11 +145,10 @@ export function constructPositionPoints(anchors) {
  * highlights and group them into a collection of "buckets".
  *
  * @param {PositionPoint[]} points
- * @return {BucketInfo}
+ * @return {Bucket[]}
  */
 export function buildBuckets(points) {
-  const buckets = /** @type {Array<Anchor[]>} */ ([]);
-  const bucketPositions = /** @type {number[]} */ ([]);
+  const buckets = /** @type {Bucket[]} */ ([]);
 
   // Anchors that are part of the currently-being-built bucket, and a correspon-
   // ding count of unclosed top edges seen for that anchor
@@ -202,47 +202,47 @@ export function buildBuckets(points) {
     // The ultimate set of buckets is defined by the pattern of creating and
     // merging/removing buckets as we iterate over points.
     const isFirstOrLastPoint =
-      bucketPositions.length === 0 || index === points.length - 1;
+      buckets.length === 0 || index === points.length - 1;
 
     const isLargeGap =
-      bucketPositions.length &&
-      position - bucketPositions[bucketPositions.length - 1] > BUCKET_GAP_SIZE;
+      buckets.length &&
+      position - buckets[buckets.length - 1].position > BUCKET_GAP_SIZE;
 
     if (current.anchors.length === 0 || isFirstOrLastPoint || isLargeGap) {
       // Create a new bucket, because:
       // - There are no more open/working anchors, OR
       // - This is the first or last point, OR
       // - There's been a large dimensional gap since the last bucket's position
-      buckets.push(current.anchors.slice());
-      // Each bucket gets a corresponding entry in `bucketPositions` for the
-      // pixel position of its eventual indicator in the bucket bar
-      bucketPositions.push(position);
+      buckets.push({ anchors: current.anchors.slice(), position });
     } else {
-      // Merge buckets
-      // We will remove 2 (usually) or 1 (if there is only one) bucket
-      // from the buckets collection, and re-add 1 merged bucket (always)
+      // Merge bucket contents
 
-      // Always pop off the last bucket
-      const ultimateBucket = buckets.pop() || [];
+      // Always remove the last bucket
+      const ultimateBucket = buckets.pop() || /** @type Bucket */ ({});
 
-      // If there is a previous/penultimate bucket, pop that off, as well
-      let penultimateBucket = [];
-      if (buckets[buckets.length - 1]?.length) {
-        penultimateBucket = buckets.pop() || [];
-        // Because we're removing two buckets but only re-adding one below,
-        // we'll end up with a misalignment in the `bucketPositions` collection.
-        // Remove the last entry here, as it corresponds to the ultimate bucket,
-        // which won't be re-added in its present form
-        bucketPositions.pop();
+      // Merge working anchors into the last bucket's anchors
+      let mergedAnchors = [...ultimateBucket.anchors, ...current.anchors];
+      let mergedPosition = ultimateBucket.position;
+
+      // If there is a previous bucket (penultimate bucket) and it has anchors
+      // in it (is not empty)
+      if (buckets[buckets.length - 1]?.anchors.length) {
+        // Remove the previous bucket, too
+        const penultimateBucket = /** @type Bucket */ (buckets.pop() || {});
+        // Merge the penultimate bucket's anchors into our working set of
+        // merged anchors
+        mergedAnchors = [...penultimateBucket.anchors, ...mergedAnchors];
+        // We'll use the penultimate bucket's position as the position for
+        // the merged bucket
+        mergedPosition = penultimateBucket.position;
       }
-      // Create a merged bucket from the anchors in the penultimate bucket
-      // (when available), ultimate bucket and current working anchors
-      const activeBucket = Array.from(
-        new Set([...penultimateBucket, ...ultimateBucket, ...current.anchors])
-      );
+
       // Push the now-merged bucket onto the buckets collection
-      buckets.push(activeBucket);
+      buckets.push({
+        anchors: Array.from(new Set(mergedAnchors)), // De-dupe anchors
+        position: mergedPosition,
+      });
     }
   });
-  return { buckets, index: bucketPositions };
+  return buckets;
 }

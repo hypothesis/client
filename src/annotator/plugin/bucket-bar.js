@@ -36,7 +36,6 @@ export default class BucketBar extends Delegator {
     super($(opts.html), opts);
 
     this.buckets = [];
-    this.index = [];
     this.tabs = $([]);
 
     if (this.options.container) {
@@ -80,21 +79,27 @@ export default class BucketBar extends Delegator {
       this.annotator.anchors
     );
 
-    const bucketInfo = buildBuckets(points);
-    this.buckets = bucketInfo.buckets;
-    this.index = bucketInfo.index;
+    this.buckets = buildBuckets(points);
 
     // Scroll up
-    this.buckets.unshift([], above, []);
-    this.index.unshift(0, BUCKET_TOP_THRESHOLD - 1, BUCKET_TOP_THRESHOLD);
-
-    // Scroll down
-    this.buckets.push([], below, []);
-    this.index.push(
-      window.innerHeight - BUCKET_NAV_SIZE,
-      window.innerHeight - BUCKET_NAV_SIZE + 1,
-      window.innerHeight
+    this.buckets.unshift(
+      { anchors: [], position: 0 },
+      { anchors: above, position: BUCKET_TOP_THRESHOLD - 1 },
+      { anchors: [], position: BUCKET_TOP_THRESHOLD }
     );
+    //this.index.unshift(0, BUCKET_TOP_THRESHOLD - 1, BUCKET_TOP_THRESHOLD);
+
+    // Scroll down,
+    this.buckets.push(
+      { anchors: [], position: window.innerHeight - BUCKET_NAV_SIZE },
+      { anchors: below, position: window.innerHeight - BUCKET_NAV_SIZE + 1 },
+      { anchors: [], position: window.innerHeight }
+    );
+    // this.index.push(
+    //   window.innerHeight - BUCKET_NAV_SIZE,
+    //   window.innerHeight - BUCKET_NAV_SIZE + 1,
+    //   window.innerHeight
+    // );
 
     // Remove any extra tabs and update tabs.
     this.tabs.slice(this.buckets.length).remove();
@@ -114,7 +119,7 @@ export default class BucketBar extends Delegator {
         .on('mousemove', event => {
           const bucketIndex = this.tabs.index(event.currentTarget);
           for (let anchor of this.annotator.anchors) {
-            const toggle = this.buckets[bucketIndex].includes(anchor);
+            const toggle = this.buckets[bucketIndex].anchors.includes(anchor);
             $(anchor.highlights).toggleClass(
               'hypothesis-highlight-focused',
               toggle
@@ -124,7 +129,7 @@ export default class BucketBar extends Delegator {
 
         .on('mouseout', event => {
           const bucket = this.tabs.index(event.currentTarget);
-          this.buckets[bucket].forEach(anchor =>
+          this.buckets[bucket].anchors.forEach(anchor =>
             $(anchor.highlights).removeClass('hypothesis-highlight-focused')
           );
         })
@@ -134,12 +139,12 @@ export default class BucketBar extends Delegator {
 
           // If it's the upper tab, scroll to next anchor above
           if (this.isUpper(bucket)) {
-            scrollToClosest(this.buckets[bucket], 'up');
+            scrollToClosest(this.buckets[bucket].anchors, 'up');
             // If it's the lower tab, scroll to next anchor below
           } else if (this.isLower(bucket)) {
-            scrollToClosest(this.buckets[bucket], 'down');
+            scrollToClosest(this.buckets[bucket].anchors, 'down');
           } else {
-            const annotations = this.buckets[bucket].map(
+            const annotations = this.buckets[bucket].anchors.map(
               anchor => anchor.annotation
             );
             this.annotator.selectAnnotations(
@@ -158,7 +163,7 @@ export default class BucketBar extends Delegator {
       let bucketSize;
       el = $(el);
       const bucket = this.buckets[index];
-      const bucketLength = bucket?.length;
+      const bucketLength = bucket?.anchors?.length;
 
       const title = (() => {
         if (bucketLength !== 1) {
@@ -180,7 +185,7 @@ export default class BucketBar extends Delegator {
       }
 
       el.css({
-        top: (this.index[index] + this.index[index + 1]) / 2,
+        top: (bucket.position + this.buckets[index + 1]?.position) / 2,
         marginTop: -bucketSize / 2,
         display: !bucketLength ? 'none' : '',
       });
@@ -195,7 +200,7 @@ export default class BucketBar extends Delegator {
     return i === 1;
   }
   isLower(i) {
-    return i === this.index.length - 2;
+    return i === this.buckets.length - 2;
   }
 }
 
