@@ -8,7 +8,6 @@
 
 module.exports = {
   bundles: {
-    jquery: ['jquery'],
     katex: ['katex'],
     sentry: ['@sentry/browser'],
     showdown: ['showdown'],
@@ -18,10 +17,10 @@ module.exports = {
   //
   // Modules may be excluded from parsing for two reasons:
   //
-  // 1. The module is large (eg. jQuery) and contains no require statements,
+  // 1. The module is large and contains no require statements,
   //    so skipping parsing speeds up the build process.
   // 2. The module is itself a compiled Browserify bundle containing
   //    internal require() statements, which should not be processed
   //    when including the bundle in another project.
-  noParseModules: ['jquery'],
+  noParseModules: [],
 };
