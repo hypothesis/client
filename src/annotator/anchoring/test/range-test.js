@@ -302,7 +302,6 @@ describe('annotator/anchoring/range', () => {
             container.querySelector(test.bound)
           );
           assert.equal(limit.text(), test.textNodes.join(''));
-          // To get a node value from jquery, use ".data".
           assert.deepEqual(
             test.textNodes,
             limit.textNodes().map(n => n.data)
