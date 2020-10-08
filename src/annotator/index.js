@@ -4,8 +4,6 @@
  * @typedef {import('../types/annotator').HypothesisWindow} HypothesisWindow
  */
 
-import $ from 'jquery';
-
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
 
@@ -50,7 +48,7 @@ const appLinkEl = /** @type {Element} */ (document.querySelector(
 
 const config = configFrom(window);
 
-$.noConflict(true)(function () {
+function init() {
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
   /** @type {new (e: Element, config: any) => Guest} */
@@ -76,4 +74,21 @@ $.noConflict(true)(function () {
     appLinkEl.remove();
     annotator.destroy();
   });
-});
+}
+
+/**
+ * Returns a Promise that resolves when the document has loaded (but subresources
+ * may still be loading).
+ */
+function documentReady() {
+  return new Promise(resolve => {
+    if (document.readyState !== 'loading') {
+      resolve();
+    }
+    // nb. `readystatechange` may be emitted twice, but `resolve` only resolves
+    // on the first call.
+    document.addEventListener('readystatechange', resolve);
+  });
+}
+
+documentReady().then(init);
