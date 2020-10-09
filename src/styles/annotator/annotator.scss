@@ -1,6 +1,8 @@
 // SASS entry point for annotator styling
 
 @use "sass:meta";
+@use "sass:color" as color;
+
 @use '../variables' as var;
 @use '../mixins/reset';
 
@@ -79,6 +81,24 @@
 // it is manually resized by dragging
 .annotator-no-transition {
   transition: none !important;
+}
+
+.annotator-pdf-warning-banner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  padding: 10px 5px;
+
+  // TODO - Replace highlight color with preferred warning color.
+  background-color: var.$color-highlight;
+  border-bottom: 3px solid color.adjust(var.$color-highlight, $lightness: -40%);
+  font-size: 12pt;
+  font-weight: bold;
+
+  // The Z-index is necessary to raise the banner above the toolbar at the
+  // top of the PDF.js viewer.
+  z-index: 10000;
 }
 
 /*

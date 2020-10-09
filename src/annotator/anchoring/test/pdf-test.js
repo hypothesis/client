@@ -41,24 +41,44 @@ describe('annotator/anchoring/pdf', function () {
   let container;
   let viewer;
 
-  beforeEach(function () {
+  /**
+   * Initialize the fake PDF.js viewer.
+   *
+   * @param {string[]} content -
+   *   Array containing the text content of each page of the loaded PDF document
+   */
+  function initViewer(content) {
+    cleanupViewer();
+
     // The rendered text for each page is cached during anchoring.
     // Clear this here so that each test starts from the same state.
     pdfAnchoring.purgeCache();
 
+    viewer = new FakePDFViewerApplication({
+      container,
+      content,
+    });
+    window.PDFViewerApplication = viewer;
+
+    if (viewer.pdfViewer.pagesCount > 0) {
+      viewer.pdfViewer.setCurrentPage(0);
+    }
+  }
+
+  /** Clean up any resources created by the fake PDF.js viewer. */
+  function cleanupViewer() {
+    viewer?.dispose();
+    window.PDFViewerApplication = null;
+  }
+
+  beforeEach(function () {
     container = document.createElement('div');
     document.body.appendChild(container);
-
-    window.PDFViewerApplication = viewer = new FakePDFViewerApplication({
-      container: container,
-      content: fixtures.pdfPages,
-    });
-    viewer.pdfViewer.setCurrentPage(0);
+    initViewer(fixtures.pdfPages);
   });
 
   afterEach(function () {
-    window.PDFViewerApplication.dispose();
-    window.PDFViewerApplication = null;
+    cleanupViewer();
     container.remove();
   });
 
@@ -342,6 +362,26 @@ describe('annotator/anchoring/pdf', function () {
         // loaded.
         const anchor = await anchorPromise;
         assert.equal(anchor.toString(), 'a zombie in possession');
+      });
+    });
+  });
+
+  describe('documentHasText', () => {
+    it('returns true if PDF has selectable text', async () => {
+      assert.isTrue(await pdfAnchoring.documentHasText());
+    });
+
+    [
+      // Completely empty document.
+      [],
+      // Single page with no text.
+      [''],
+      // Multiple pages with no text.
+      ['', '', ''],
+    ].forEach(content => {
+      it('returns false if PDF does not have selectable text', async () => {
+        initViewer(content);
+        assert.isFalse(await pdfAnchoring.documentHasText());
       });
     });
   });

@@ -97,6 +97,22 @@ async function getPageView(pageIndex) {
 }
 
 /**
+ * Return true if the document has selectable text.
+ */
+export async function documentHasText() {
+  const viewer = getPdfViewer();
+  let hasText = false;
+  for (let i = 0; i < viewer.pagesCount; i++) {
+    const pageText = await getPageTextContent(i);
+    if (pageText.trim().length > 0) {
+      hasText = true;
+      break;
+    }
+  }
+  return hasText;
+}
+
+/**
  * Return the text of a given PDF page.
  *
  * @param {number} pageIndex
