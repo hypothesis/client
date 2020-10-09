@@ -22,6 +22,11 @@ $adder-transition-duration: 80ms;
   background: var.$color-background;
   border-radius: var.$annotator-border-radius;
 
+  // Prevent the adder from being highlighted during text selection.
+  // This caused an bug that appears on android devices during text selection.
+  // See https://github.com/hypothesis/product-backlog/issues/878
+  user-select: none;
+
   // The adder toolbar has a distinctive, broad-spreading drop shadow
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.25);
 
