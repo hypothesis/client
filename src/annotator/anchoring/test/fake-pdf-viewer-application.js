@@ -6,8 +6,11 @@
  * easier to debug than the full PDF.js viewer application.
  *
  * The general structure is to have `Fake{OriginalClassName}` classes for
- * each of the relevant classes in PDF.js.
+ * each of the relevant classes in PDF.js. The APIs of the fakes should conform
+ * to the corresponding interfaces defined in `src/types/pdfjs.js`.
  */
+
+import { TinyEmitter as EventEmitter } from 'tiny-emitter';
 
 import RenderingStates from '../../pdfjs-rendering-states';
 
@@ -124,6 +127,8 @@ class FakePDFViewer {
     this._pages = [];
 
     this.viewer = this._container;
+
+    this.eventBus = new EventEmitter();
   }
 
   get pagesCount() {
@@ -170,11 +175,17 @@ class FakePDFViewer {
   }
 
   /**
-   * Dispatch a DOM event to notify observers that some event has occurred
+   * Dispatch an event to notify observers that some event has occurred
    * in the PDF viewer.
    */
-  notify(eventName) {
-    this._container.dispatchEvent(new Event(eventName, { bubbles: true }));
+  notify(eventName, { eventDispatch = 'eventBus' } = {}) {
+    if (eventDispatch === 'eventBus') {
+      this.eventBus.emit(eventName);
+    } else if (eventDispatch === 'dom') {
+      this._container.dispatchEvent(
+        new CustomEvent(eventName, { bubbles: true })
+      );
+    }
   }
 
   _checkBounds(index) {
