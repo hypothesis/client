@@ -21,13 +21,15 @@ import { normalizeURI } from './util/url';
 
 /**
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../types/annotator').Anchor} Anchor
+ * @typedef {import('../types/api').Target} Target
  * @typedef {import('./toolbar').ToolbarController} ToolbarController
  */
 
 /**
  * HTML element created by the highlighter with an associated annotation.
  *
- * @typedef {Element & { _annotation?: AnnotationData }} AnnotationHighlight
+ * @typedef {HTMLElement & { _annotation?: AnnotationData }} AnnotationHighlight
  */
 
 /**
@@ -61,7 +63,28 @@ function annotationsAt(node) {
   return /** @type {AnnotationData[]} */ (items);
 }
 
+/**
+ * `Guest` is the central class of the annotator that handles anchoring (locating)
+ * annotations in the document when they are fetched by the sidebar, rendering
+ * highlights for them and handling subsequent interactions with the highlights.
+ *
+ * It is also responsible for listening to changes in the current selection
+ * and triggering the display of controls to create new annotations. When one
+ * of these controls is clicked, it creates the new annotation and sends it to
+ * the sidebar.
+ *
+ * The anchoring implementation defaults to a generic one for HTML documents and
+ * can be overridden to handle different document types.
+ */
 export default class Guest extends Delegator {
+  /**
+   * Initialize the Guest.
+   *
+   * @param {HTMLElement} element -
+   *   The root element of the annotatable content in the current document
+   * @param {Object} config
+   * @param {typeof htmlAnchoring} anchoring - Anchoring implementation
+   */
   constructor(element, config, anchoring = htmlAnchoring) {
     const defaultConfig = {
       // This causes the `Document` plugin to be initialized.
@@ -104,6 +127,8 @@ export default class Guest extends Delegator {
     });
 
     this.plugins = {};
+
+    /** @type {Anchor[]} */
     this.anchors = [];
 
     // Set the frame identifier if it's available.
@@ -207,7 +232,9 @@ export default class Guest extends Delegator {
     this.plugins[name] = new Klass(this.element, options, this);
   }
 
-  // Get the document info
+  /**
+   * Retrieve metadata for the current document.
+   */
   getDocumentInfo() {
     let metadataPromise;
     let uriPromise;
@@ -309,6 +336,12 @@ export default class Guest extends Delegator {
     super.destroy();
   }
 
+  /**
+   * Anchor (locate) an annotation's selectors in the document.
+   *
+   * @param {AnnotationData} annotation
+   * @return {Promise<Anchor[]>}
+   */
   anchor(annotation) {
     let anchor;
     const root = this.element;
@@ -334,6 +367,11 @@ export default class Guest extends Delegator {
       annotation.target = [];
     }
 
+    /**
+     * Locate the region of the current document that the annotation refers to.
+     *
+     * @param {Target} target
+     */
     const locate = target => {
       // Check that the anchor has a TextQuoteSelector -- without a
       // TextQuoteSelector we have no basis on which to verify that we have
@@ -341,7 +379,10 @@ export default class Guest extends Delegator {
       //
       // Returning an anchor without a range will result in this annotation being
       // treated as an orphan (assuming no other targets anchor).
-      if (!(target.selector ?? []).some(s => s.type === 'TextQuoteSelector')) {
+      if (
+        !target.selector ||
+        !target.selector.some(s => s.type === 'TextQuoteSelector')
+      ) {
         return Promise.resolve({ annotation, target });
       }
 
@@ -359,7 +400,11 @@ export default class Guest extends Delegator {
         }));
     };
 
-    // Highlight the range for an anchor.
+    /**
+     * Highlight the range for an anchor.
+     *
+     * @param {Anchor} anchor
+     */
     const highlight = anchor => {
       if (!anchor.range) {
         return anchor;
@@ -376,7 +421,11 @@ export default class Guest extends Delegator {
       return anchor;
     };
 
-    // Store the results of anchoring.
+    /**
+     * Store the results of anchoring.
+     *
+     * @param {Anchor[]} anchors
+     */
     const sync = anchors => {
       // An annotation is considered to be an orphan if it has at least one
       // target with selectors, and all targets with selectors failed to anchor
@@ -438,6 +487,11 @@ export default class Guest extends Delegator {
     return Promise.all(anchors).then(sync);
   }
 
+  /**
+   * Remove the anchors and associated highlights for an annotation from the document.
+   *
+   * @param {AnnotationData} annotation
+   */
   detach(annotation) {
     const anchors = [];
     let unhighlight = [];
@@ -458,6 +512,13 @@ export default class Guest extends Delegator {
     });
   }
 
+  /**
+   * Create a new annotation that is associated with the selected region of
+   * the current document.
+   *
+   * @param {Partial<AnnotationData>} annotation - Initial properties of the
+   *   new annotation, other than the `target` which is set automatically
+   */
   createAnnotation(annotation = {}) {
     const root = this.element;
 
@@ -491,7 +552,7 @@ export default class Guest extends Delegator {
     const targets = Promise.all([info, selectors]).then(setTargets);
 
     targets.then(() => this.publish('beforeAnnotationCreated', [annotation]));
-    targets.then(() => this.anchor(annotation));
+    targets.then(() => this.anchor(/** @type {AnnotationData} */ (annotation)));
 
     if (!annotation.$highlight) {
       this.crossframe?.call('showSidebar');
@@ -499,26 +560,51 @@ export default class Guest extends Delegator {
     return annotation;
   }
 
+  /**
+   * Create a new annotation with the `$highlight` flag set.
+   *
+   * This flag indicates that the sidebar should save the new annotation
+   * immediately rather than prompting the user to write a comment.
+   */
   createHighlight() {
     return this.createAnnotation({ $highlight: true });
   }
 
+  /**
+   * Show annotations in the sidebar.
+   *
+   * @param {AnnotationData[]} annotations
+   */
   showAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
     this.crossframe?.call('showAnnotations', tags);
     this.crossframe?.call('showSidebar');
   }
 
+  /**
+   * @param {AnnotationData[]} annotations
+   */
   toggleAnnotationSelection(annotations) {
     const tags = annotations.map(a => a.$tag);
     this.crossframe?.call('toggleAnnotationSelection', tags);
   }
 
+  /**
+   * Indicate in the sidebar that certain annotations are focused (ie. the
+   * associated document region(s) is hovered).
+   *
+   * @param {AnnotationData[]} annotations
+   */
   focusAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
     this.crossframe?.call('focusAnnotations', tags);
   }
 
+  /**
+   * Show or hide the adder toolbar when the selection changes.
+   *
+   * @param {Range} range
+   */
   _onSelection(range) {
     const selection = /** @type {Selection} */ (document.getSelection());
     const isBackwards = rangeUtil.isSelectionBackwards(selection);
@@ -550,7 +636,13 @@ export default class Guest extends Delegator {
     }
   }
 
-  selectAnnotations(annotations, toggle) {
+  /**
+   * Set the selected annotations in the sidebar.
+   *
+   * @param {AnnotationData[]} annotations
+   * @param {boolean} [toggle]
+   */
+  selectAnnotations(annotations, toggle = false) {
     if (toggle) {
       this.toggleAnnotationSelection(annotations);
     } else {
@@ -558,13 +650,24 @@ export default class Guest extends Delegator {
     }
   }
 
-  // Did an event originate from an element in the annotator UI? (eg. the sidebar
-  // frame, or its toolbar)
+  /**
+   * Did an event originate from an element in the annotator UI? (eg. the sidebar
+   * frame, or its toolbar)
+   *
+   * @param {Event} event
+   */
   isEventInAnnotator(event) {
-    return closest(event.target, '.annotator-frame') !== null;
+    return (
+      closest(/** @type {Element} */ (event.target), '.annotator-frame') !==
+      null
+    );
   }
 
-  // Pass true to show the highlights in the frame or false to disable.
+  /**
+   * Set whether highlights are visible in the document or not.
+   *
+   * @param {boolean} shouldShowHighlights
+   */
   setVisibleHighlights(shouldShowHighlights) {
     setHighlightsVisible(this.element, shouldShowHighlights);
 
