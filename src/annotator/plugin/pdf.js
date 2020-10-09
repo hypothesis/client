@@ -1,4 +1,5 @@
 import debounce from 'lodash.debounce';
+import { Fragment, createElement, render } from 'preact';
 
 import * as pdfAnchoring from '../anchoring/pdf';
 import Delegator from '../delegator';
@@ -11,6 +12,26 @@ import PDFMetadata from './pdf-metadata';
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  */
+
+/**
+ * A banner shown at the top of the PDF viewer if the PDF cannot be annotated
+ * by Hypothesis.
+ */
+function WarningBanner() {
+  return (
+    <Fragment>
+      This PDF does not contain selectable text. To annotate it with Hypothesis
+      you will need to{' '}
+      <a
+        target="_blank"
+        rel="noreferrer"
+        href="https://web.hypothes.is/help/how-to-ocr-optimize-pdfs/"
+      >
+        OCR-optimize it.
+      </a>
+    </Fragment>
+  );
+}
 
 export default class PDF extends Delegator {
   /**
@@ -35,6 +56,16 @@ export default class PDF extends Delegator {
       childList: true,
       subtree: true,
     });
+
+    /**
+     * A banner shown at the top of the PDF viewer warning the user if the PDF
+     * is not suitable for use with Hypothesis.
+     *
+     * @type {HTMLElement|null}
+     */
+    this._warningBanner = null;
+
+    this._checkForSelectableText();
   }
 
   destroy() {
@@ -48,6 +79,68 @@ export default class PDF extends Delegator {
 
   getMetadata() {
     return this.pdfMetadata.getMetadata();
+  }
+
+  /**
+   * Check whether the PDF has selectable text and show a warning if not.
+   */
+  async _checkForSelectableText() {
+    // Wait for PDF to load.
+    try {
+      await this.uri();
+    } catch (e) {
+      return;
+    }
+
+    try {
+      const hasText = await pdfAnchoring.documentHasText();
+      this._showNoSelectableTextWarning(!hasText);
+    } catch (err) {
+      /* istanbul ignore next */
+      console.warn('Unable to check for text in PDF:', err);
+    }
+  }
+
+  /**
+   * Set whether the warning about a PDF's suitability for use with Hypothesis
+   * is shown.
+   *
+   * @param {boolean} showWarning
+   */
+  _showNoSelectableTextWarning(showWarning) {
+    if (!showWarning) {
+      this._warningBanner?.remove();
+      this._warningBanner = null;
+      return;
+    }
+
+    const mainContainer = /** @type {HTMLElement} */ (document.querySelector(
+      '#mainContainer'
+    ));
+
+    const updateBannerHeight = () => {
+      /* istanbul ignore next */
+      if (!this._warningBanner) {
+        return;
+      }
+      const rect = this._warningBanner.getBoundingClientRect();
+      mainContainer.style.top = rect.height + 'px';
+      this._warningBanner.style.top = -rect.height + 'px';
+    };
+
+    this._warningBanner = document.createElement('div');
+    this._warningBanner.className = 'annotator-pdf-warning-banner';
+    mainContainer.appendChild(this._warningBanner);
+    render(<WarningBanner />, this._warningBanner);
+
+    // @ts-expect-error - TS is missing `ResizeObserver`
+    if (typeof ResizeObserver !== 'undefined') {
+      // Update the banner when the window is resized or the Hypothesis
+      // sidebar is opened.
+      // @ts-ignore
+      new ResizeObserver(updateBannerHeight).observe(this._warningBanner);
+    }
+    updateBannerHeight();
   }
 
   // This method (re-)anchors annotations when pages are rendered and destroyed.

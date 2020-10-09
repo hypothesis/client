@@ -9,6 +9,8 @@ function delay(ms) {
 describe('annotator/plugin/pdf', () => {
   let container;
   let fakeAnnotator;
+  let fakePdfAnchoring;
+  let fakePDFMetadata;
   let fakePDFViewerApplication;
   let pdfPlugin;
 
@@ -33,7 +35,19 @@ describe('annotator/plugin/pdf', () => {
       anchoring: null,
     };
 
+    fakePdfAnchoring = {
+      documentHasText: sinon.stub().resolves(true),
+    };
+
+    fakePDFMetadata = {
+      getMetadata: sinon.stub().resolves({}),
+      getUri: sinon.stub().resolves('https://example.com/test.pdf'),
+    };
+
     $imports.$mock({
+      './pdf-metadata': () => fakePDFMetadata,
+      '../anchoring/pdf': fakePdfAnchoring,
+
       // Disable debouncing of updates.
       'lodash.debounce': callback => callback,
     });
@@ -71,6 +85,51 @@ describe('annotator/plugin/pdf', () => {
         )
       );
     });
+  });
+
+  function getWarningBanner() {
+    return document.querySelector('.annotator-pdf-warning-banner');
+  }
+
+  it('does not show a warning when PDF has selectable text', async () => {
+    fakePdfAnchoring.documentHasText.resolves(true);
+
+    pdfPlugin = createPDFPlugin();
+    await delay(0); // Wait for text check to complete.
+
+    assert.called(fakePdfAnchoring.documentHasText);
+    assert.isNull(getWarningBanner());
+  });
+
+  it('does not show a warning if PDF does not load', async () => {
+    fakePDFMetadata.getUri.rejects(new Error('Something went wrong'));
+
+    pdfPlugin = createPDFPlugin();
+    await delay(0); // Wait for text check to complete.
+
+    assert.notCalled(fakePdfAnchoring.documentHasText);
+    assert.isNull(getWarningBanner());
+  });
+
+  it('shows a warning when PDF has no selectable text', async () => {
+    const mainContainer = document.createElement('div');
+    mainContainer.id = 'mainContainer';
+    document.body.appendChild(mainContainer);
+    fakePdfAnchoring.documentHasText.resolves(false);
+
+    pdfPlugin = createPDFPlugin();
+    await delay(0); // Wait for text check to complete.
+
+    assert.called(fakePdfAnchoring.documentHasText);
+    const banner = getWarningBanner();
+    assert.isNotNull(banner);
+    assert.isTrue(mainContainer.contains(banner));
+    assert.include(
+      banner.textContent,
+      'This PDF does not contain selectable text'
+    );
+
+    mainContainer.remove();
   });
 
   context('when the PDF viewer content changes', () => {
