@@ -14,7 +14,11 @@
  * @prop {string} uri
  * @prop {Target[]} target
  * @prop {string} $tag
- * @prop {boolean} [$highlight]
+ * @prop {boolean} [$highlight] -
+ *   Flag indicating that this annotation was created using the "Highlight" button,
+ *   as opposed to "Annotate".
+ * @prop {boolean} [$orphan] -
+ *   Flag indicating whether this annotation was successfully anchored in the document
  * @prop {DocumentMetadata} document
  */
 
@@ -26,6 +30,7 @@
  * @prop {AnnotationData} annotation
  * @prop {HTMLElement[]} [highlights]
  * @prop {Range} [range]
+ * @prop {Target} target
  */
 
 /**
