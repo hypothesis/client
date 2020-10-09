@@ -295,15 +295,28 @@ describe('annotator/anchoring/pdf', function () {
         // `PDFViewer.getPageView` returns a nullish value.
         description: 'page view not loaded',
         pageView: undefined,
+        eventDispatch: 'eventBus',
       },
       {
         // `PDFPageViewer.getPageView` returns a `PDFPageView`, but the associated
         // page is not ready yet and so the `pdfPage` property is missing.
         description: 'page view PDF page not ready',
         pageView: {},
+        eventDispatch: 'eventBus',
       },
-    ].forEach(({ description, pageView }) => {
+      {
+        // Older version of PDF.js (< 1.6.210) using DOM events.
+        description: 'old PDF.js version',
+        pageView: undefined,
+        eventDispatch: 'dom',
+      },
+    ].forEach(({ description, pageView, eventDispatch }) => {
       it(`waits until page views are ready (${description})`, async () => {
+        if (eventDispatch === 'dom') {
+          // To simulate versions of PDF.js < 1.6.210, remove the `eventBus` API.
+          delete viewer.pdfViewer.eventBus;
+        }
+
         viewer.pdfViewer.setCurrentPage(1);
 
         // Simulate PDF viewer not having fully loaded yet.
@@ -323,7 +336,7 @@ describe('annotator/anchoring/pdf', function () {
         // view, but block because it is not ready yet.
         await delay(10);
         getPageView.restore();
-        viewer.pdfViewer.notify('pagesloaded');
+        viewer.pdfViewer.notify('pagesloaded', { eventDispatch });
 
         // Check that anchoring completes successfully when the document has
         // loaded.

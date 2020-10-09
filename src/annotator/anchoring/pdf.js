@@ -75,10 +75,21 @@ async function getPageView(pageIndex) {
     // a "pdfPage" property.
     pageView = await new Promise(resolve => {
       const onPagesLoaded = () => {
-        document.removeEventListener('pagesloaded', onPagesLoaded);
+        if (pdfViewer.eventBus) {
+          pdfViewer.eventBus.off('pagesloaded', onPagesLoaded);
+        } else {
+          document.removeEventListener('pagesloaded', onPagesLoaded);
+        }
+
         resolve(pdfViewer.getPageView(pageIndex));
       };
-      document.addEventListener('pagesloaded', onPagesLoaded);
+
+      if (pdfViewer.eventBus) {
+        pdfViewer.eventBus.on('pagesloaded', onPagesLoaded);
+      } else {
+        // Old PDF.js versions (< 1.6.210) use DOM events.
+        document.addEventListener('pagesloaded', onPagesLoaded);
+      }
     });
   }
 

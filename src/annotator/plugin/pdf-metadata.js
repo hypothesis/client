@@ -19,6 +19,36 @@ import { normalizeURI } from '../util/url';
  */
 
 /**
+ * Wait for a PDFViewerApplication to be initialized.
+ *
+ * @param {PDFViewerApplication} app
+ * @return {Promise<void>}
+ */
+function pdfViewerInitialized(app) {
+  // `initializedPromise` was added in PDF.js v2.4.456.
+  // See https://github.com/mozilla/pdf.js/pull/11607. In earlier versions the
+  // `initialized` property can be queried.
+  if (app.initializedPromise) {
+    return app.initializedPromise;
+  } else if (app.initialized) {
+    return Promise.resolve();
+  } else {
+    // PDF.js < v2.4.456. The recommended approach is to listen for a `localized`
+    // DOM event, but this assumes that PDF.js has been configured to publish
+    // events to the DOM. Here we simply poll `app.initialized` because it is
+    // easier.
+    return new Promise(resolve => {
+      const timeout = setInterval(() => {
+        if (app.initialized) {
+          clearTimeout(timeout);
+          resolve();
+        }
+      }, 5);
+    });
+  }
+}
+
+/**
  * PDFMetadata extracts metadata about a loading/loaded PDF document from a
  * PDF.js PDFViewerApplication object.
  *
@@ -38,37 +68,40 @@ export default class PDFMetadata {
    */
   constructor(app) {
     /** @type {Promise<PDFViewerApplication>} */
-    this._loaded = new Promise(resolve => {
-      const finish = () => {
-        window.removeEventListener('documentload', finish);
-        window.removeEventListener('documentloaded', finish);
-        app.eventBus?.off('documentloaded', finish);
-
-        resolve(app);
-      };
-
+    this._loaded = pdfViewerInitialized(app).then(() => {
+      // Check if document has already loaded.
       if (app.downloadComplete) {
-        resolve(app);
-      } else {
+        return app;
+      }
+
+      return new Promise(resolve => {
+        const finish = () => {
+          if (app.eventBus) {
+            app.eventBus.off('documentload', finish);
+            app.eventBus.off('documentloaded', finish);
+          } else {
+            window.removeEventListener('documentload', finish);
+          }
+          resolve(app);
+        };
+
         // Listen for "documentloaded" event which signals that the document
         // has been downloaded and the first page has been rendered.
+        if (app.eventBus) {
+          // PDF.js >= v1.6.210 dispatch events via an internal event bus.
+          // PDF.js < v2.5.207 also dispatches events to the DOM.
 
-        // Newer versions of PDF.js (>= v2.5.207) report events only via
-        // the PDFViewerApplication's own event bus.
-        app.initializedPromise?.then(() => {
-          app.eventBus?.on('documentloaded', finish);
-        });
+          // `documentloaded` is the preferred event in PDF.js >= v2.0.943.
+          // See https://github.com/mozilla/pdf.js/commit/7bc4bfcc8b7f52b14107f0a551becdf01643c5c2
+          app.eventBus.on('documentloaded', finish);
 
-        // Older versions of PDF.js (< v2.5.207) dispatch events to the DOM
-        // instead or as well.
-
-        // PDF.js >= v2.0.943.
-        // See https://github.com/mozilla/pdf.js/commit/7bc4bfcc8b7f52b14107f0a551becdf01643c5c2
-        window.addEventListener('documentloaded', finish);
-
-        // PDF.js < v2.0.943.
-        window.addEventListener('documentload', finish);
-      }
+          // `documentload` is dispatched by PDF.js < v2.1.266.
+          app.eventBus.on('documentload', finish);
+        } else {
+          // PDF.js < v1.6.210 dispatches events only to the DOM.
+          window.addEventListener('documentload', finish);
+        }
+      });
     });
   }
 

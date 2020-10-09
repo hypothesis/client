@@ -62,6 +62,8 @@
  * Defined in `web/pdf_viewer.js` in the PDF.js source.
  *
  * @prop {number} pagesCount
+ * @prop {EventBus} eventBus -
+ *   Reference to the global event bus. Added in PDF.js v1.6.210.
  * @prop {(page: number) => PDFPageView|null} getPageView
  */
 
@@ -80,12 +82,14 @@
  *
  * @typedef PDFViewerApplication
  * @prop {EventBus} [eventBus] -
- *   Global event bus. Since v1.6.210.
+ *   Global event bus. Since v1.6.210. This is not available until the PDF viewer
+ *   has been initialized. See `initialized` and `initializedPromise` properties.
  * @prop {PDFDocument} pdfDocument
  * @prop {PDFViewer} pdfViewer
  * @prop {boolean} downloadComplete
  * @prop {PDFDocumentInfo} documentInfo
  * @prop {Metadata} metadata
+ * @prop {boolean} initialized - Indicates that the PDF viewer is initialized.
  * @prop {Promise<void>} [initializedPromise] -
  *   Promise that resolves when PDF.js is initialized. Since v2.4.456.
  *   See https://github.com/mozilla/pdf.js/wiki/Third-party-viewer-usage#initialization-promise.
