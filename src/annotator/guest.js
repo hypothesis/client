@@ -73,6 +73,12 @@ function annotationsAt(node) {
  * of these controls is clicked, it creates the new annotation and sends it to
  * the sidebar.
  *
+ * Within a browser tab, there is typically one `Guest` instance per frame that
+ * loads Hypothesis (not all frames will be annotation-enabled). In one frame,
+ * usually the top-level one, there will also be an instance of the `Sidebar`
+ * class that shows the sidebar app and surrounding UI. The `Guest` instance in
+ * each frame connects to the sidebar via the `CrossFrame` service.
+ *
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
  */
@@ -81,7 +87,8 @@ export default class Guest extends Delegator {
    * Initialize the Guest.
    *
    * @param {HTMLElement} element -
-   *   The root element of the annotatable content in the current document
+   *   The root element in which the `Guest` instance should be able to anchor
+   *   or create annotations. In an ordinary web page this typically `document.body`.
    * @param {Object} config
    * @param {typeof htmlAnchoring} anchoring - Anchoring implementation
    */
@@ -422,7 +429,8 @@ export default class Guest extends Delegator {
     };
 
     /**
-     * Store the results of anchoring.
+     * Inform other parts of Hypothesis (eg. the sidebar and bucket bar) about
+     * the results of anchoring.
      *
      * @param {Anchor[]} anchors
      */
@@ -517,7 +525,8 @@ export default class Guest extends Delegator {
    * the current document.
    *
    * @param {Partial<AnnotationData>} annotation - Initial properties of the
-   *   new annotation, other than the `target` which is set automatically
+   *   new annotation, other than `target`, `document` and `uri` which are
+   *   set by this method.
    */
   createAnnotation(annotation = {}) {
     const root = this.element;
@@ -564,14 +573,15 @@ export default class Guest extends Delegator {
    * Create a new annotation with the `$highlight` flag set.
    *
    * This flag indicates that the sidebar should save the new annotation
-   * immediately rather than prompting the user to write a comment.
+   * automatically and not show a form for the user to enter a comment about it.
    */
   createHighlight() {
     return this.createAnnotation({ $highlight: true });
   }
 
   /**
-   * Show annotations in the sidebar.
+   * Open the sidebar and set the selection to `annotations` (ie. Filter the annotation
+   * list to show only these annotations).
    *
    * @param {AnnotationData[]} annotations
    */
@@ -582,6 +592,9 @@ export default class Guest extends Delegator {
   }
 
   /**
+   * Toggle whether the given annotations are included in the selection in the
+   * sidebar.
+   *
    * @param {AnnotationData[]} annotations
    */
   toggleAnnotationSelection(annotations) {
@@ -651,8 +664,8 @@ export default class Guest extends Delegator {
   }
 
   /**
-   * Did an event originate from an element in the annotator UI? (eg. the sidebar
-   * frame, or its toolbar)
+   * Did an event originate from an element in the sidebar UI? (eg. the sidebar
+   * iframe, or its toolbar)
    *
    * @param {Event} event
    */
