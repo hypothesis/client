@@ -5,7 +5,7 @@ import { mount } from 'enzyme';
 import { Adder, ARROW_POINTING_UP, ARROW_POINTING_DOWN } from '../adder';
 
 function rect(left, top, width, height) {
-  return { left: left, top: top, width: width, height: height };
+  return { left, top, width, height };
 }
 
 /**
@@ -41,6 +41,7 @@ describe('Adder', () => {
       onShowAnnotations: sinon.stub(),
     };
     adderEl = document.createElement('div');
+    adderEl.label = 'adder-container';
     document.body.appendChild(adderEl);
 
     adderCtrl = new Adder(adderEl, adderCallbacks);
@@ -97,7 +98,7 @@ describe('Adder', () => {
       // nb. `act` is necessary here to flush effect hooks in `AdderToolbar`
       // which setup shortcut handlers.
       act(() => {
-        adderCtrl.showAt(0, 0, ARROW_POINTING_UP);
+        adderCtrl.show(rect(100, 200, 100, 20), false);
       });
     };
 
@@ -176,28 +177,31 @@ describe('Adder', () => {
     });
   });
 
-  describe('#target', () => {
+  describe('#_calculateTarget', () => {
     it('positions the adder below the selection if the selection is forwards', () => {
-      const target = adderCtrl.target(rect(100, 200, 100, 20), false);
+      const target = adderCtrl._calculateTarget(rect(100, 200, 100, 20), false);
       assert.isAbove(target.top, 220);
       assert.equal(target.arrowDirection, ARROW_POINTING_UP);
     });
 
     it('positions the adder above the selection if the selection is backwards', () => {
-      const target = adderCtrl.target(rect(100, 200, 100, 20), true);
+      const target = adderCtrl._calculateTarget(rect(100, 200, 100, 20), true);
       assert.isBelow(target.top, 200);
       assert.equal(target.arrowDirection, ARROW_POINTING_DOWN);
     });
 
     it('does not position the adder above the top of the viewport', () => {
-      const target = adderCtrl.target(rect(100, -100, 100, 20), false);
+      const target = adderCtrl._calculateTarget(
+        rect(100, -100, 100, 20),
+        false
+      );
       assert.isAtLeast(target.top, 0);
       assert.equal(target.arrowDirection, ARROW_POINTING_UP);
     });
 
     it('does not position the adder below the bottom of the viewport', () => {
       const viewSize = windowSize();
-      const target = adderCtrl.target(
+      const target = adderCtrl._calculateTarget(
         rect(0, viewSize.height + 100, 10, 20),
         false
       );
@@ -206,7 +210,7 @@ describe('Adder', () => {
 
     it('does not position the adder beyond the right edge of the viewport', () => {
       const viewSize = windowSize();
-      const target = adderCtrl.target(
+      const target = adderCtrl._calculateTarget(
         rect(viewSize.width + 100, 100, 10, 20),
         false
       );
@@ -214,7 +218,7 @@ describe('Adder', () => {
     });
 
     it('does not positon the adder beyond the left edge of the viewport', () => {
-      const target = adderCtrl.target(rect(-100, 100, 10, 10), false);
+      const target = adderCtrl._calculateTarget(rect(-100, 100, 10, 10), false);
       assert.isAtLeast(target.left, 0);
     });
   });
@@ -223,7 +227,7 @@ describe('Adder', () => {
     let container;
 
     function getAdderZIndex(left, top) {
-      adderCtrl.showAt(left, top);
+      adderCtrl._showAt(left, top);
       return parseInt(adderEl.style.zIndex);
     }
 
@@ -308,10 +312,10 @@ describe('Adder', () => {
     });
   });
 
-  describe('#showAt', () => {
+  describe('#_showAt', () => {
     context('when the document and body elements have no offset', () => {
       it('shows adder at target position', () => {
-        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
+        adderCtrl._showAt(100, 100, ARROW_POINTING_UP);
 
         const { left, top } = adderEl.getBoundingClientRect();
         assert.equal(left, 100);
@@ -329,7 +333,7 @@ describe('Adder', () => {
       });
 
       it('shows adder at target position', () => {
-        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
+        adderCtrl._showAt(100, 100, ARROW_POINTING_UP);
 
         const { left, top } = adderEl.getBoundingClientRect();
         assert.equal(left, 100);
@@ -347,12 +351,27 @@ describe('Adder', () => {
       });
 
       it('shows adder at target position when document element is offset', () => {
-        adderCtrl.showAt(100, 100, ARROW_POINTING_UP);
+        adderCtrl._showAt(100, 100, ARROW_POINTING_UP);
 
         const { left, top } = adderEl.getBoundingClientRect();
         assert.equal(left, 100);
         assert.equal(top, 100);
       });
+    });
+  });
+
+  describe('#show', () => {
+    it('shows the container in the correct location', () => {
+      adderCtrl.show(rect(100, 200, 100, 20), false);
+      const adder = document.elementFromPoint(150, 250);
+      assert.strictEqual(adder.label, 'adder-container');
+      assert.isTrue(+adder.style.zIndex > 0);
+
+      adderCtrl.show(rect(200, 100, 100, 20), false);
+      assert.strictEqual(
+        document.elementFromPoint(250, 150).label,
+        'adder-container'
+      );
     });
   });
 });

@@ -633,12 +633,8 @@ export default class Guest extends Delegator {
       this.toolbar.newAnnotationType = 'annotation';
     }
 
-    const { left, top, arrowDirection } = this.adderCtrl.target(
-      focusRect,
-      isBackwards
-    );
     this.adderCtrl.annotationsForSelection = annotationsForSelection();
-    this.adderCtrl.showAt(left, top, arrowDirection);
+    this.adderCtrl.show(focusRect, isBackwards);
   }
 
   _onClearSelection() {

@@ -1,4 +1,3 @@
-import * as adder from '../adder';
 import { Observable } from '../util/observable';
 import Delegator from '../delegator';
 import Guest from '../guest';
@@ -11,8 +10,7 @@ class FakeAdder {
     FakeAdder.instance = this;
 
     this.hide = sinon.stub();
-    this.showAt = sinon.stub();
-    this.target = sinon.stub();
+    this.show = sinon.stub();
     this.options = options;
   }
 }
@@ -453,11 +451,6 @@ describe('Guest', () => {
         width: 5,
         height: 5,
       });
-      FakeAdder.instance.target.returns({
-        left: 0,
-        top: 0,
-        arrowDirection: adder.ARROW_POINTING_UP,
-      });
       return selections.next({});
     };
 
@@ -469,7 +462,7 @@ describe('Guest', () => {
     it('shows the adder if the selection contains text', () => {
       createGuest();
       simulateSelectionWithText();
-      assert.called(FakeAdder.instance.showAt);
+      assert.called(FakeAdder.instance.show);
     });
 
     it('sets the annotations associated with the selection', () => {
@@ -490,7 +483,7 @@ describe('Guest', () => {
       simulateSelectionWithoutText();
 
       assert.called(FakeAdder.instance.hide);
-      assert.notCalled(FakeAdder.instance.showAt);
+      assert.notCalled(FakeAdder.instance.show);
     });
 
     it('hides the adder if the selection is empty', () => {
