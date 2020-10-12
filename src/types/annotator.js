@@ -18,7 +18,9 @@
  *   Flag indicating that this annotation was created using the "Highlight" button,
  *   as opposed to "Annotate".
  * @prop {boolean} [$orphan] -
- *   Flag indicating whether this annotation was successfully anchored in the document
+ *   Flag indicating that this annotation was not found in the document.
+ *   It is initially `undefined` while anchoring is in progress and then set to
+ *   `true` if anchoring failed or `false` if it succeeded.
  * @prop {DocumentMetadata} document
  */
 
