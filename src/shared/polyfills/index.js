@@ -88,6 +88,10 @@ const needsPolyfill = {
     return typeof document.evaluate !== 'function';
   },
 
+  'document.elementsFromPoint': () => {
+    return typeof document.elementsFromPoint !== 'function';
+  },
+
   // Test for Unicode normalization. This depends on a large polyfill so it
   // is separated out into its own bundle.
   'string.prototype.normalize': () => {

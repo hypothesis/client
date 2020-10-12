@@ -248,17 +248,27 @@ export class Adder {
     // Find the Z index of all the elements in the screen for five positions
     // around the adder (left-top, left-bottom, middle-center, right-top,
     // right-bottom) and use the greatest.
+    // In old implementations elementsFromPoint return null.
+    const leftTopElements = document.elementsFromPoint(left, top) ?? [];
+    const leftBottomElements =
+      document.elementsFromPoint(left, top + adderHeight) ?? [];
+    const middleCenterElements =
+      document.elementsFromPoint(
+        left + adderWidth / 2,
+        top + adderHeight / 2
+      ) ?? [];
+    const rightTopElements =
+      document.elementsFromPoint(left + adderWidth, top) ?? [];
+    const rightBottomElements =
+      document.elementsFromPoint(left + adderWidth, top + adderHeight) ?? [];
 
     // Unique elements so `getComputedStyle` is called the minimum amount of times.
     const elements = new Set([
-      ...document.elementsFromPoint(left, top),
-      ...document.elementsFromPoint(left, top + adderHeight),
-      ...document.elementsFromPoint(
-        left + adderWidth / 2,
-        top + adderHeight / 2
-      ),
-      ...document.elementsFromPoint(left + adderWidth, top),
-      ...document.elementsFromPoint(left + adderWidth, top + adderHeight),
+      ...leftTopElements,
+      ...leftBottomElements,
+      ...middleCenterElements,
+      ...rightTopElements,
+      ...rightBottomElements,
     ]);
 
     const zIndexes = [...elements]
