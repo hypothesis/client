@@ -4,23 +4,31 @@ import AdderToolbar from './components/adder-toolbar';
 import { createShadowRoot } from './util/shadow-root';
 
 /**
- * @typedef Target
- * @prop {number} left - Offset from left edge of viewport.
- * @prop {number} top - Offset from top edge of viewport.
- * @prop {number} arrowDirection - Direction of the adder's arrow.
- */
-
-/**
+ *  @typedef {1} ArrowPointingDown
  * Show the adder above the selection with an arrow pointing down at the
  * selected text.
  */
 export const ARROW_POINTING_DOWN = 1;
 
 /**
+ *  @typedef {2} ArrowPointingUp
  * Show the adder above the selection with an arrow pointing up at the
  * selected text.
  */
 export const ARROW_POINTING_UP = 2;
+
+/**
+ *  @typedef {ArrowPointingDown|ArrowPointingUp} ArrowDirection
+ * Show the adder above the selection with an arrow pointing up at the
+ * selected text.
+ */
+
+/**
+ * @typedef Target
+ * @prop {number} left - Offset from left edge of viewport.
+ * @prop {number} top - Offset from top edge of viewport.
+ * @prop {ArrowDirection} arrowDirection - Direction of the adder's arrow.
+ */
 
 function toPx(pixels) {
   return pixels.toString() + 'px';
@@ -131,21 +139,48 @@ export class Adder {
   }
 
   /**
-   * Return the best position to show the adder in order to target the
-   * selected text in `targetRect`.
+   * Display the adder in the best position in order to target the
+   * selected text in `selectionRect`.
    *
-   * @param {DOMRect} targetRect - The rect of text to target, in viewport
+   * @param {DOMRect} selectionRect - The rect of text to target, in viewport
    *        coordinates.
-   * @param {boolean} isSelectionBackwards - True if the selection was made
-   *        backwards, such that the focus point is mosty likely at the top-left
-   *        edge of `targetRect`.
+   * @param {boolean} isRTLselection - True if the selection was made
+   *        rigth-to-left, such that the focus point is mosty likely at the
+   *        top-left edge of `targetRect`.
+   */
+  show(selectionRect, isRTLselection) {
+    const { left, top, arrowDirection } = this._calculateTarget(
+      selectionRect,
+      isRTLselection
+    );
+    this._showAt(left, top);
+
+    this._isVisible = true;
+    this._arrowDirection = arrowDirection === ARROW_POINTING_UP ? 'up' : 'down';
+
+    this._render();
+  }
+
+  /**
+   *  Determine the best position for the Adder and its pointer-arrow.
+   * - Position the pointer-arrow near the end of the selection (where the user's
+   *   cursor/input is most likely to be)
+   * - Position the Adder to center horizontally on the pointer-arrow
+   * - Position the Adder below the selection (arrow pointing up) for LTR selections
+   *   and above (arrow down) for RTL selections
+   *
+   * @param {DOMRect} selectionRect - The rect of text to target, in viewport
+   *        coordinates.
+   * @param {boolean} isRTLselection - True if the selection was made
+   *        rigth-to-left, such that the focus point is mosty likely at the
+   *        top-left edge of `targetRect`.
    * @return {Target}
    */
-  target(targetRect, isSelectionBackwards) {
+  _calculateTarget(selectionRect, isRTLselection) {
     // Set the initial arrow direction based on whether the selection was made
     // forwards/upwards or downwards/backwards.
-    let arrowDirection;
-    if (isSelectionBackwards) {
+    /** @type {ArrowDirection} */ let arrowDirection;
+    if (isRTLselection) {
       arrowDirection = ARROW_POINTING_DOWN;
     } else {
       arrowDirection = ARROW_POINTING_UP;
@@ -155,36 +190,39 @@ export class Adder {
 
     // Position the adder such that the arrow it is above or below the selection
     // and close to the end.
-    const hMargin = Math.min(ARROW_H_MARGIN, targetRect.width);
-    if (isSelectionBackwards) {
-      left = targetRect.left - this._width() / 2 + hMargin;
+    const hMargin = Math.min(ARROW_H_MARGIN, selectionRect.width);
+    const adderWidth = this._width();
+    const adderHeight = this._height();
+    if (isRTLselection) {
+      left = selectionRect.left - adderWidth / 2 + hMargin;
     } else {
-      left = targetRect.left + targetRect.width - this._width() / 2 - hMargin;
+      left =
+        selectionRect.left + selectionRect.width - adderWidth / 2 - hMargin;
     }
 
     // Flip arrow direction if adder would appear above the top or below the
     // bottom of the viewport.
     if (
-      targetRect.top - this._height() < 0 &&
+      selectionRect.top - adderHeight < 0 &&
       arrowDirection === ARROW_POINTING_DOWN
     ) {
       arrowDirection = ARROW_POINTING_UP;
-    } else if (targetRect.top + this._height() > this._view.innerHeight) {
+    } else if (selectionRect.top + adderHeight > this._view.innerHeight) {
       arrowDirection = ARROW_POINTING_DOWN;
     }
 
     if (arrowDirection === ARROW_POINTING_UP) {
-      top = targetRect.top + targetRect.height + ARROW_HEIGHT;
+      top = selectionRect.top + selectionRect.height + ARROW_HEIGHT;
     } else {
-      top = targetRect.top - this._height() - ARROW_HEIGHT;
+      top = selectionRect.top - adderHeight - ARROW_HEIGHT;
     }
 
     // Constrain the adder to the viewport.
     left = Math.max(left, 0);
-    left = Math.min(left, this._view.innerWidth - this._width());
+    left = Math.min(left, this._view.innerWidth - adderWidth);
 
     top = Math.max(top, 0);
-    top = Math.min(top, this._view.innerHeight - this._height());
+    top = Math.min(top, this._view.innerHeight - adderHeight);
 
     return { top, left, arrowDirection };
   }
@@ -241,7 +279,7 @@ export class Adder {
    * @param {number} left - Horizontal offset from left edge of viewport.
    * @param {number} top - Vertical offset from top edge of viewport.
    */
-  showAt(left, top, arrowDirection) {
+  _showAt(left, top) {
     // Translate the (left, top) viewport coordinates into positions relative to
     // the adder's nearest positioned ancestor (NPA).
     //
@@ -258,10 +296,6 @@ export class Adder {
       top: toPx(top - parentRect.top),
       zIndex,
     });
-
-    this._isVisible = true;
-    this._arrowDirection = arrowDirection === ARROW_POINTING_UP ? 'up' : 'down';
-    this._render();
   }
 
   _render() {
