@@ -1,15 +1,23 @@
 import { options } from 'preact';
 
-import { isIE11 } from './user-agent';
-
 /**
- * Force the dir="auto" attribute to be dir="" as this otherwise causes
- * an exception in IE11 and breaks subsequent rendering.
+ * Setup workarounds for setting certain HTML element properties or attributes
+ * in some browsers.
  *
  * @param {Object} _options - Test seam
  */
-export function setupIE11Fixes(_options = options) {
-  if (isIE11()) {
+export function setupBrowserFixes(_options = options) {
+  let needsDirAutoFix = false;
+
+  try {
+    const el = document.createElement('div');
+    // The value "auto" causes an exception in IE 11 and Edge Legacy.
+    el.dir = 'auto';
+  } catch (err) {
+    needsDirAutoFix = true;
+  }
+
+  if (needsDirAutoFix) {
     const prevHook = _options.vnode;
     _options.vnode = vnode => {
       if (typeof vnode.type === 'string') {

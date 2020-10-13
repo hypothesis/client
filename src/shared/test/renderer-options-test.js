@@ -1,25 +1,9 @@
 import { createElement } from 'preact';
 
-import { setupIE11Fixes } from '../renderer-options';
-import { $imports } from '../renderer-options';
+import { setupBrowserFixes } from '../renderer-options';
 
 describe('shared/renderer-options', () => {
-  let fakeIsIE11;
-
-  beforeEach(() => {
-    fakeIsIE11 = sinon.stub().returns(true);
-    $imports.$mock({
-      './user-agent': {
-        isIE11: fakeIsIE11,
-      },
-    });
-  });
-
-  afterEach(() => {
-    $imports.$restore();
-  });
-
-  describe('setupIE11Fixes', () => {
+  describe('setupBrowserFixes', () => {
     let fakeOptions;
     let prevHook;
 
@@ -30,36 +14,50 @@ describe('shared/renderer-options', () => {
       };
     });
 
-    context('when isIE11 is false', () => {
-      it('does not set a new vnode option if isIE11 is false', () => {
-        fakeIsIE11.returns(false);
-        setupIE11Fixes(fakeOptions);
+    context('when all checks pass', () => {
+      it('does not set a new vnode option', () => {
+        setupBrowserFixes(fakeOptions);
         assert.isNotOk(fakeOptions.vnode);
       });
     });
 
-    context('when isIE11 is true', () => {
+    context('when `dir = "auto"` check fails', () => {
+      beforeEach(() => {
+        const fakeElement = {
+          set dir(value) {
+            if (value === 'auto') {
+              throw new Error('Invalid argument');
+            }
+          },
+        };
+        sinon.stub(document, 'createElement').returns(fakeElement);
+      });
+
+      afterEach(() => {
+        document.createElement.restore();
+      });
+
       it('sets a new vnode option', () => {
-        setupIE11Fixes(fakeOptions);
+        setupBrowserFixes(fakeOptions);
         assert.isOk(fakeOptions.vnode);
       });
 
       it('does not override an existing option if one exists', () => {
         fakeOptions.vnode = prevHook;
-        setupIE11Fixes(fakeOptions);
+        setupBrowserFixes(fakeOptions);
         fakeOptions.vnode({});
         assert.called(prevHook);
       });
 
       it("alters the `dir` attribute when its equal to 'auto'", () => {
-        setupIE11Fixes(fakeOptions);
+        setupBrowserFixes(fakeOptions);
         const vDiv = createElement('div', { dir: 'auto' }, 'text');
         fakeOptions.vnode(vDiv);
         assert.equal(vDiv.props.dir, '');
       });
 
       it('does not alter the `dir` attribute when vnode.type is not a string', () => {
-        setupIE11Fixes(fakeOptions);
+        setupBrowserFixes(fakeOptions);
         const vDiv = createElement('div', { dir: 'auto' }, 'text');
         vDiv.type = () => {}; // force it to be a function
         fakeOptions.vnode(vDiv);
@@ -67,7 +65,7 @@ describe('shared/renderer-options', () => {
       });
 
       it("does not alter the `dir` attribute when its value is not 'auto'", () => {
-        setupIE11Fixes(fakeOptions);
+        setupBrowserFixes(fakeOptions);
         const vDiv = createElement('function', { dir: 'ltr' }, 'text');
         fakeOptions.vnode(vDiv);
         assert.equal(vDiv.props.dir, 'ltr');

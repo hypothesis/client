@@ -43,8 +43,8 @@ const isSidebar = !(
   window.location.pathname.startsWith('/a/')
 );
 
-// Install Preact renderer options to work around IE11 quirks
-rendererOptions.setupIE11Fixes();
+// Install Preact renderer options to work around browser quirks
+rendererOptions.setupBrowserFixes();
 
 // @ngInject
 function setupApi(api, streamer) {
