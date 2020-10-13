@@ -2,7 +2,7 @@
 
 'use strict';
 
-const { mkdirSync } = require('fs');
+const { mkdirSync, readdirSync } = require('fs');
 const path = require('path');
 
 const changed = require('gulp-changed');
@@ -107,22 +107,16 @@ const appBundles = [
 //  - Add the relevant dependencies to the project
 //  - Create an entry point in `src/shared/polyfills/{set}` and a feature
 //    detection function in `src/shared/polyfills/index.js`
-//  - Add an entry to the list below to generate the polyfill bundle
 //  - Add the polyfill set name to the required dependencies for the parts of
 //    the client that need it in `src/boot/boot.js`
-//  - Add the polyfill to the test environment if necessary in `src/karma.config.js`
-const polyfillBundles = [
-  'es2015',
-  'es2016',
-  'es2017',
-  'fetch',
-  'string.prototype.normalize',
-  'url',
-].map(set => ({
-  name: `polyfills-${set}`,
-  entry: `./src/shared/polyfills/${set}`,
-  transforms: ['babel'],
-}));
+const polyfillBundles = readdirSync('./src/shared/polyfills/')
+  .filter(name => name.endsWith('.js') && name !== 'index.js')
+  .map(name => name.replace(/\.js$/, ''))
+  .map(set => ({
+    name: `polyfills-${set}`,
+    entry: `./src/shared/polyfills/${set}`,
+    transforms: ['babel'],
+  }));
 
 const appBundleConfigs = appBundles.concat(polyfillBundles).map(config => {
   return Object.assign({}, appBundleBaseConfig, config);
