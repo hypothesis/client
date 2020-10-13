@@ -1,6 +1,21 @@
 import { requiredPolyfillSets } from '../shared/polyfills';
 
 /**
+ * Polyfills used by both the annotator and sidebar app.
+ */
+const commonPolyfills = [
+  // ES APIs
+  'es2015',
+  'es2016',
+  'es2017',
+  'es2018',
+
+  // DOM APIs. These may rely on certain ES APIs so they should be loaded after
+  // the above polyfills.
+  'url',
+];
+
+/**
  * @typedef Config
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
  * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
@@ -91,13 +106,7 @@ function bootHypothesisClient(doc, config) {
   clientUrl.type = 'application/annotator+javascript';
   doc.head.appendChild(clientUrl);
 
-  const polyfills = polyfillBundles([
-    'es2015',
-    'es2016',
-    'es2017',
-    'es2018',
-    'url',
-  ]);
+  const polyfills = polyfillBundles(commonPolyfills);
 
   injectAssets(doc, config, [
     // Vendor code and polyfills
@@ -120,16 +129,9 @@ function bootHypothesisClient(doc, config) {
  */
 function bootSidebarApp(doc, config) {
   const polyfills = polyfillBundles([
-    // JS polyfills.
-    'es2015',
-    'es2016',
-    'es2017',
+    ...commonPolyfills,
     'string.prototype.normalize',
-
-    // DOM polyfills. These are loaded after the JS polyfills as they may
-    // depend upon them, eg. for Promises.
     'fetch',
-    'url',
   ]);
 
   injectAssets(doc, config, [
