@@ -4,14 +4,17 @@
       "pragma": "createElement"
     }],
     ["@babel/preset-env", {
+       "bugfixes": true,
        "targets": {
-         "browsers": ["> 0.3%"]
+         "chrome": "55",
+         "edge": "17",
+         "firefox": "53",
+         "safari": "10.1",
       }
     }]
   ],
   "plugins": [
-    "angularjs-annotate",
-    "transform-async-to-promises"
+    "angularjs-annotate"
   ],
   "ignore": ["**/vendor/*"],
   "env": {
