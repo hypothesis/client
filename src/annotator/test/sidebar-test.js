@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import events from '../../shared/bridge-events';
 
 import Sidebar from '../sidebar';
@@ -68,7 +66,7 @@ describe('Sidebar', () => {
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 
     const fakeBucketBar = {};
-    fakeBucketBar.element = $('<div></div>');
+    fakeBucketBar.element = document.createElement('div');
     fakeBucketBar.destroy = sandbox.stub();
 
     CrossFrame = sandbox.stub();
