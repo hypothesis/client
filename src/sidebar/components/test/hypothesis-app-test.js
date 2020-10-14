@@ -8,7 +8,6 @@ import HypothesisApp, { $imports } from '../hypothesis-app';
 
 describe('HypothesisApp', () => {
   let fakeApplyTheme;
-  let fakeUserAgent = null;
   let fakeStore = null;
   let fakeAuth = null;
   let fakeBridge = null;
@@ -74,10 +73,6 @@ describe('HypothesisApp', () => {
       call: sinon.stub(),
     };
 
-    fakeUserAgent = {
-      isIE11: sinon.stub().returns(false),
-    };
-
     fakeToastMessenger = {
       error: sinon.stub(),
       notice: sinon.stub(),
@@ -85,7 +80,6 @@ describe('HypothesisApp', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../../shared/user-agent': fakeUserAgent,
       '../service-config': fakeServiceConfig,
       '../store/use-store': callback => callback(fakeStore),
       '../util/session': {
@@ -144,24 +138,6 @@ describe('HypothesisApp', () => {
       fakeShouldAutoDisplayTutorial.returns(false);
       createComponent();
       assert.notCalled(fakeStore.openSidebarPanel);
-    });
-  });
-
-  describe('toast message warning of IE11 deprecation', () => {
-    it('shows notice if user agent is IE11', () => {
-      fakeUserAgent.isIE11.returns(true);
-
-      createComponent();
-
-      assert.called(fakeToastMessenger.notice);
-    });
-
-    it('does not show notice if another user agent', () => {
-      fakeUserAgent.isIE11.returns(false);
-
-      createComponent();
-
-      assert.notCalled(fakeToastMessenger.notice);
     });
   });
 
