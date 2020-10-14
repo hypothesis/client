@@ -1,10 +1,11 @@
 /**
  * Normalize a keyboard event key name.
  *
- * Several old browsers, such as IE11, use alternate key
- * names for keyboard events. If any abnormal keys are used,
- * this method returns the normalized name so our UI
- * components don't require a special case.
+ * Some old Microsoft browsers, such as IE 11 and Edge Legacy [1], use non-standard
+ * names for some keys. If any abnormal keys are used, this method returns the
+ * normalized name so our UI components don't require a special case.
+ *
+ * [1] https://caniuse.com/keyboardevent-key
  *
  * @param {string} key - The keyboard event `key` name
  * @return {string} - Normalized `key` name

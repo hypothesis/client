@@ -58,11 +58,9 @@ const needsPolyfill = {
   },
 
   es2018: () => {
-    if (!window.Promise) {
-      // IE11 does not have a Promise object.
-      return true;
-    }
-    return !hasMethods(Promise.prototype, 'finally');
+    return (
+      typeof Promise !== 'function' || !hasMethods(Promise.prototype, 'finally')
+    );
   },
 
   // Test for a fully-working URL constructor.

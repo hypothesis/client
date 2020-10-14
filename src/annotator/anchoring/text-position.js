@@ -26,11 +26,7 @@ export function toRange(root, start, end) {
   // although optional according to the spec.
   const nodeIter = root.ownerDocument.createNodeIterator(
     root,
-    NodeFilter.SHOW_TEXT,
-    null, // filter
-
-    // @ts-ignore - Ignored parameter required for IE 11
-    false // expandEntityReferences
+    NodeFilter.SHOW_TEXT
   );
 
   let startContainer;

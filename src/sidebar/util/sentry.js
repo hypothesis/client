@@ -18,8 +18,7 @@ const maxEventsToSendPerSession = 5;
  */
 function currentScriptOrigin() {
   try {
-    // nb. IE 11 does not support `document.currentScript` and this property
-    // is only available while a `<script>` tag is initially being executed.
+    // This property is only available while a `<script>` tag is initially being executed.
     const script = /** @type {HTMLScriptElement} */ (document.currentScript);
     const scriptUrl = new URL(script.src);
     return scriptUrl.origin;
