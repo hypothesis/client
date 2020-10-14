@@ -1,9 +1,8 @@
 import { createElement } from 'preact';
-import { useMemo, useRef, useState } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
-import { isIE11 } from '../../shared/user-agent';
 
 import AutocompleteList from './autocomplete-list';
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
@@ -54,8 +53,6 @@ function TagEditor({
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
-
-  const ie11 = useMemo(() => isIE11(), []);
 
   /**
    * Retrieve the current trimmed text value of the tag <input>
@@ -120,20 +117,9 @@ function TagEditor({
     }
   };
 
-  /**
-   *  Update the suggestions if the user changes the value of the input
-   *
-   * @param {import("preact").JSX.TargetedEvent<HTMLInputElement, InputEvent>} e
-   */
-  const handleOnInput = e => {
+  const handleOnInput = () => {
     onTagInput?.(pendingTag());
-    if (
-      e.inputType === 'insertText' ||
-      e.inputType === 'deleteContentBackward' ||
-      ie11 // inputType is not defined in IE 11, so trigger on any input in this case.
-    ) {
-      updateSuggestions();
-    }
+    updateSuggestions();
   };
 
   /**
