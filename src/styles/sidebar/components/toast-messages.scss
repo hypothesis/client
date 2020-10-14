@@ -36,56 +36,7 @@
 }
 
 .toast-message {
-  @include molecules.card-frame;
-  @include layout.row($align: stretch);
-  position: relative;
-  width: 100%;
-  margin-bottom: 0.75em;
-
-  &--success {
-    border: 1px solid var.$color-success;
-  }
-
-  &--error {
-    border: 1px solid var.$color-error;
-  }
-
-  &--notice {
-    border: 1px solid var.$color-notice;
-  }
-
-  &__type {
-    @include layout.row($align: center);
-    padding: 1em;
-    color: white;
-  }
-
-  &--success &__type {
-    background-color: var.$color-success;
-  }
-
-  &--error &__type {
-    background-color: var.$color-error;
-  }
-
-  &--notice &__type {
-    background-color: var.$color-notice;
-  }
-
-  &__icon {
-    // Specific adjustments for success and error icons
-    margin-top: 2px;
-  }
-
-  &__message {
-    padding: var.$layout-space;
-    width: 100%;
-  }
-
-  &__link {
-    text-align: right;
-    text-decoration: underline;
-  }
+  @include molecules.toast-message;
 }
 
 @keyframes slidein {
