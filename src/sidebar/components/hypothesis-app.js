@@ -3,7 +3,6 @@ import { useEffect, useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
-import { isIE11 } from '../../shared/user-agent';
 import serviceConfig from '../service-config';
 import useStore from '../store/use-store';
 import uiConstants from '../ui-constants';
@@ -107,20 +106,6 @@ function HypothesisApp({
       openSidebarPanel(uiConstants.PANEL_HELP);
     }
   }, [isSidebar, profile, openSidebarPanel, settings]);
-
-  // Show a deprecation warning if current browser is IE11
-  useEffect(() => {
-    if (isIE11()) {
-      toastMessenger.notice(
-        'Hypothesis is ending support for this browser (Internet Explorer 11) on July 1, 2020.',
-        {
-          autoDismiss: false,
-          moreInfoURL:
-            'https://web.hypothes.is/help/which-browsers-are-supported-by-hypothesis/',
-        }
-      );
-    }
-  }, [toastMessenger]);
 
   const login = async () => {
     if (serviceConfig(settings)) {
