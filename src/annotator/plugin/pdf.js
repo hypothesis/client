@@ -6,6 +6,7 @@ import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
 
 import PDFMetadata from './pdf-metadata';
+import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -20,15 +21,23 @@ import PDFMetadata from './pdf-metadata';
 function WarningBanner() {
   return (
     <Fragment>
-      This PDF does not contain selectable text. To annotate it with Hypothesis
-      you will need to{' '}
-      <a
-        target="_blank"
-        rel="noreferrer"
-        href="https://web.hypothes.is/help/how-to-ocr-optimize-pdfs/"
-      >
-        OCR-optimize it.
-      </a>
+      <div className="annotator-pdf-warning-banner__type">
+        <SvgIcon
+          name="caution"
+          className="annotator-pdf-warning-banner__icon"
+        />
+      </div>
+      <div className="annotator-pdf-warning-banner__message">
+        <strong>This PDF does not contain selectable text:</strong>{' '}
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://web.hypothes.is/help/how-to-ocr-optimize-pdfs/"
+        >
+          Learn how to fix this
+        </a>{' '}
+        in order to annotate with Hypothesis.
+      </div>
     </Fragment>
   );
 }
@@ -129,7 +138,8 @@ export default class PDF extends Delegator {
     };
 
     this._warningBanner = document.createElement('div');
-    this._warningBanner.className = 'annotator-pdf-warning-banner';
+    this._warningBanner.className =
+      'annotator-pdf-warning-banner annotator-pdf-warning-banner--notice';
     mainContainer.appendChild(this._warningBanner);
     render(<WarningBanner />, this._warningBanner);
 
