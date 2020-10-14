@@ -106,7 +106,10 @@ export function nodeFromXPath(xpath, root = document.body) {
     return document.evaluate(
       '.' + xpath,
       root,
-      null /* nsResolver */,
+
+      // nb. The `namespaceResolver` and `result` arguments are optional in the spec
+      // but required in Edge Legacy.
+      null /* namespaceResolver */,
       XPathResult.FIRST_ORDERED_NODE_TYPE,
       null /* result */
     ).singleNodeValue;

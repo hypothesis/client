@@ -20,7 +20,17 @@ export function isBrowserSupported() {
 
     // DOM API checks for less frequently-used APIs.
     // These are less likely to have been polyfilled by the host page.
-    () => document.evaluate('/html/body', document), // XPath evaluation.
+    () => {
+      document.evaluate(
+        '/html/body',
+        document,
+
+        // These arguments are optional in the spec but required in Edge Legacy.
+        null /* namespaceResolver */,
+        XPathResult.ANY_TYPE,
+        null /* result */
+      );
+    },
   ];
 
   try {
