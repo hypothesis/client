@@ -16,7 +16,6 @@ import {
 } from './highlighter';
 import * as rangeUtil from './range-util';
 import selections from './selections';
-import { closest } from '../shared/dom-element';
 import { normalizeURI } from './util/url';
 
 /**
@@ -667,8 +666,7 @@ export default class Guest extends Delegator {
    */
   isEventInAnnotator(event) {
     return (
-      closest(/** @type {Element} */ (event.target), '.annotator-frame') !==
-      null
+      /** @type {Element} */ (event.target).closest('.annotator-frame') !== null
     );
   }
 
