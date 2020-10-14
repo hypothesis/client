@@ -102,7 +102,7 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
       // @ts-ignore - `mixBlendMode` property is missing from type definitions.
       svgStyle.mixBlendMode = 'multiply';
     } else {
-      // For older browsers (IE 11, Edge < 79) we draw all the highlights as
+      // For older browsers (eg. Edge < 79) we draw all the highlights as
       // opaque and then make the entire highlight layer transparent. This means
       // that there is no visual indication of whether text has one or multiple
       // highlights, but it preserves readability.
@@ -232,7 +232,7 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
 /**
  * Replace a child `node` with `replacements`.
  *
- * nb. This is like `ChildNode.replaceWith` but it works in IE 11.
+ * nb. This is like `ChildNode.replaceWith` but it works in older browsers.
  *
  * @param {ChildNode} node
  * @param {Node[]} replacements

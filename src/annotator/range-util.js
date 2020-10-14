@@ -51,11 +51,7 @@ function forEachNodeInRange(range, callback) {
   // mandatory in IE although optional according to the spec.
   const nodeIter = /** @type {Document} */ (root.ownerDocument).createNodeIterator(
     root,
-    NodeFilter.SHOW_ALL,
-    null /* filter */,
-
-    // @ts-ignore - Deprecated last parameter. Required for IE 11.
-    false /* expandEntityReferences */
+    NodeFilter.SHOW_ALL
   );
 
   let currentNode;
