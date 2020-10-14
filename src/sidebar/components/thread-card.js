@@ -4,7 +4,6 @@ import { createElement } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';
-import { closest } from '../../shared/dom-element';
 import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 
@@ -50,9 +49,11 @@ function ThreadCard({ frameSync, settings, thread }) {
   /**
    * Is the target's event an <a> or <button> element, or does it have
    * either as an ancestor?
+   *
+   * @param {Element} target
    */
   const isFromButtonOrLink = target => {
-    return !!closest(target, 'button') || !!closest(target, 'a');
+    return !!target.closest('button') || !!target.closest('a');
   };
 
   return (
@@ -61,7 +62,7 @@ function ThreadCard({ frameSync, settings, thread }) {
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
-        if (!isFromButtonOrLink(e.target)) {
+        if (!isFromButtonOrLink(/** @type {Element} */ (e.target))) {
           scrollToAnnotation(threadTag);
         }
       }}

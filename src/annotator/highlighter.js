@@ -1,5 +1,3 @@
-import { closest } from '../shared/dom-element';
-
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 function isCSSPropertySupported(property, value) {
@@ -35,7 +33,7 @@ function getPdfCanvas(highlightEl) {
   // It also assumes that the `highlightEl` element is somewhere under
   // the `.textLayer` div.
 
-  const pageEl = closest(highlightEl, '.page');
+  const pageEl = highlightEl.closest('.page');
   if (!pageEl) {
     return null;
   }
@@ -170,8 +168,7 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   // a PDF. These highlights should be invisible.
   const isPlaceholder =
     textNodes.length > 0 &&
-    closest(
-      /** @type {Element} */ (textNodes[0].parentNode),
+    /** @type {Element} */ (textNodes[0].parentNode).closest(
       '.annotator-placeholder'
     ) !== null;
 
