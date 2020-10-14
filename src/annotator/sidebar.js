@@ -42,7 +42,9 @@ export default class Sidebar extends Host {
     }
 
     if (this.plugins.BucketBar) {
-      this.plugins.BucketBar.element.on('click', () => this.show());
+      this.plugins.BucketBar.element.addEventListener('click', () =>
+        this.show()
+      );
     }
 
     // Set up the toolbar on the left edge of the sidebar.

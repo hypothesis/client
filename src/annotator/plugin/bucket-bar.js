@@ -1,11 +1,17 @@
-import $ from 'jquery';
 import Delegator from '../delegator';
 import scrollIntoView from 'scroll-into-view';
+
+import { setHighlightsFocused } from '../highlighter';
 import {
   findClosestOffscreenAnchor,
   constructPositionPoints,
   buildBuckets,
 } from '../util/buckets';
+
+/**
+ * @typedef {import('../util/buckets').Bucket} Bucket
+ * @typedef {import('../util/buckets').PositionPoints} PositionPoints
+ */
 
 const BUCKET_SIZE = 16; // Regular bucket size
 const BUCKET_NAV_SIZE = BUCKET_SIZE + 6; // Bucket plus arrow (up/down)
@@ -22,44 +28,81 @@ function scrollToClosest(anchors, direction) {
 export default class BucketBar extends Delegator {
   constructor(element, options, annotator) {
     const defaultOptions = {
-      // gapSize parameter is used by the clustering algorithm
-      // If an annotation is farther then this gapSize from the next bucket
-      // then that annotation will not be merged into the bucket
-      // TODO: This is not currently used; reassess
-      gapSize: 60,
-      html: '<div class="annotator-bucket-bar"></div>',
       // Selectors for the scrollable elements on the page
-      scrollables: ['body'],
+      scrollables: [],
     };
 
     const opts = { ...defaultOptions, ...options };
-    super($(opts.html), opts);
 
-    this.buckets = [];
-    this.tabs = $([]);
-
-    if (this.options.container) {
-      $(this.options.container).append(this.element);
-    } else {
-      $(element).append(this.element);
-    }
+    const el = document.createElement('div');
+    el.className = 'annotator-bucket-bar';
+    super(el, opts);
 
     this.annotator = annotator;
 
+    /** @type {Bucket[]} */
+    this.buckets = [];
+    /** @type {HTMLElement[]} - Elements created in the bucket bar for each bucket */
+    this.tabs = [];
+
+    // The element to append this plugin's element to; defaults to the provided
+    // `element` unless a `container` option was provided
+    let container = /** @type {HTMLElement} */ (element);
+
+    if (this.options.container) {
+      // If a container element selector has been provided, and there is an
+      // element corresponding to that container — use it
+      const containerEl = /** @type {HTMLElement | null } */ (document.querySelector(
+        this.options.container
+      ));
+      if (containerEl) {
+        container = containerEl;
+      } else {
+        // A container selector has been supplied, but it didn't pan out...
+        console.warn(
+          `Unable to find container element for selector '${this.options.container}'`
+        );
+      }
+    }
+    container.appendChild(this.element);
+
     this.updateFunc = () => this.update();
 
-    $(window).on('resize scroll', this.updateFunc);
-
+    window.addEventListener('resize', this.updateFunc);
+    window.addEventListener('scroll', this.updateFunc);
     this.options.scrollables.forEach(scrollable => {
-      $(scrollable).on('scroll', this.updateFunc);
+      const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
+        scrollable
+      ));
+      scrollableElement?.addEventListener('scroll', this.updateFunc);
     });
   }
 
   destroy() {
-    $(window).off('resize scroll', this.updateFunc);
+    window.removeEventListener('resize', this.updateFunc);
+    window.removeEventListener('scroll', this.updateFunc);
     this.options.scrollables.forEach(scrollable => {
-      $(scrollable).off('scroll', this.updateFunc);
+      const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
+        scrollable
+      ));
+      scrollableElement?.removeEventListener('scroll', this.updateFunc);
     });
+  }
+
+  /**
+   * Focus or unfocus the anchor highlights in the bucket indicated by `index`
+   *
+   * @param {number} index - The bucket's index in the `this.buckets` array
+   * @param {boolean} toggle - Should this set of highlights be focused (or
+   *   un-focused)?
+   */
+  updateHighlightFocus(index, toggle) {
+    if (index > 0 && this.buckets[index] && !this.isNavigationBucket(index)) {
+      const bucket = this.buckets[index];
+      bucket.anchors.forEach(anchor => {
+        setHighlightsFocused(anchor.highlights || [], toggle);
+      });
+    }
   }
 
   update() {
@@ -68,139 +111,148 @@ export default class BucketBar extends Delegator {
     }
     this._updatePending = true;
     requestAnimationFrame(() => {
-      const updated = this._update();
+      this._update();
       this._updatePending = false;
-      return updated;
     });
   }
 
   _update() {
+    /** @type {PositionPoints} */
     const { above, below, points } = constructPositionPoints(
       this.annotator.anchors
     );
 
     this.buckets = buildBuckets(points);
 
-    // Scroll up
+    // Add a bucket to the top of the bar that, when clicked, will scroll up
+    // to the nearest bucket offscreen above, an upper navigation bucket
+    // TODO: This should be part of building the buckets
     this.buckets.unshift(
       { anchors: [], position: 0 },
       { anchors: above, position: BUCKET_TOP_THRESHOLD - 1 },
       { anchors: [], position: BUCKET_TOP_THRESHOLD }
     );
-    //this.index.unshift(0, BUCKET_TOP_THRESHOLD - 1, BUCKET_TOP_THRESHOLD);
 
-    // Scroll down,
+    // Add a bucket to the bottom of the bar that, when clicked, will scroll down
+    // to the nearest bucket offscreen below, a lower navigation bucket
+    // TODO: This should be part of building the buckets
     this.buckets.push(
       { anchors: [], position: window.innerHeight - BUCKET_NAV_SIZE },
       { anchors: below, position: window.innerHeight - BUCKET_NAV_SIZE + 1 },
       { anchors: [], position: window.innerHeight }
     );
-    // this.index.push(
-    //   window.innerHeight - BUCKET_NAV_SIZE,
-    //   window.innerHeight - BUCKET_NAV_SIZE + 1,
-    //   window.innerHeight
-    // );
 
-    // Remove any extra tabs and update tabs.
-    this.tabs.slice(this.buckets.length).remove();
+    // The following affordances attempt to reuse existing DOM elements
+    // when reconstructing bucket "tabs" to cut down on the number of elements
+    // created and added to the DOM
+
+    // Only leave as many "tab" elements attached to the DOM as there are
+    // buckets
+    this.tabs.slice(this.buckets.length).forEach(tabEl => tabEl.remove());
+
+    // And cut the "tabs" collection down to the size of buckets, too
+    /** @type {HTMLElement[]} */
     this.tabs = this.tabs.slice(0, this.buckets.length);
 
-    // Create any new tabs if needed.
-    $.each(this.buckets.slice(this.tabs.length), () => {
-      const div = $('<div/>').appendTo(this.element);
+    // If the number of "tabs" currently in the DOM is too small (fewer than
+    // buckets), fill that gap by creating new elements (and adding event
+    // listeners to them)
+    this.buckets.slice(this.tabs.length).forEach(() => {
+      const tabEl = document.createElement('div');
+      this.tabs.push(tabEl);
 
-      this.tabs.push(div[0]);
+      // Note that these elements are reused as buckets change, meaning that
+      // any given tab element will correspond to a different bucket over time.
+      // However, we know that we have one "tab" per bucket, in order,
+      // so we can look up the correct bucket for a tab at event time.
 
-      div
-        .addClass('annotator-bucket-indicator')
+      // Focus and unfocus highlights on mouse events
+      tabEl.addEventListener('mousemove', () => {
+        this.updateHighlightFocus(this.tabs.indexOf(tabEl), true);
+      });
 
-        // Focus corresponding highlights bucket when mouse is hovered
-        // TODO: This should use event delegation on the container.
-        .on('mousemove', event => {
-          const bucketIndex = this.tabs.index(event.currentTarget);
-          for (let anchor of this.annotator.anchors) {
-            const toggle = this.buckets[bucketIndex].anchors.includes(anchor);
-            $(anchor.highlights).toggleClass(
-              'hypothesis-highlight-focused',
-              toggle
-            );
-          }
-        })
+      tabEl.addEventListener('mouseout', () => {
+        this.updateHighlightFocus(this.tabs.indexOf(tabEl), false);
+      });
 
-        .on('mouseout', event => {
-          const bucket = this.tabs.index(event.currentTarget);
-          this.buckets[bucket].anchors.forEach(anchor =>
-            $(anchor.highlights).removeClass('hypothesis-highlight-focused')
+      // Select the annotations (in the sidebar)
+      // that have anchors within the clicked bucket
+      tabEl.addEventListener('click', event => {
+        event.stopPropagation();
+        const index = this.tabs.indexOf(tabEl);
+        const bucket = this.buckets[index];
+        if (!bucket) {
+          return;
+        }
+        if (this.isLower(index)) {
+          scrollToClosest(bucket.anchors, 'down');
+        } else if (this.isUpper(index)) {
+          scrollToClosest(bucket.anchors, 'up');
+        } else {
+          const annotations = bucket.anchors.map(anchor => anchor.annotation);
+          this.annotator.selectAnnotations(
+            annotations,
+            event.ctrlKey || event.metaKey
           );
-        })
-        .on('click', event => {
-          const bucket = this.tabs.index(event.currentTarget);
-          event.stopPropagation();
+        }
+      });
 
-          // If it's the upper tab, scroll to next anchor above
-          if (this.isUpper(bucket)) {
-            scrollToClosest(this.buckets[bucket].anchors, 'up');
-            // If it's the lower tab, scroll to next anchor below
-          } else if (this.isLower(bucket)) {
-            scrollToClosest(this.buckets[bucket].anchors, 'down');
-          } else {
-            const annotations = this.buckets[bucket].anchors.map(
-              anchor => anchor.annotation
-            );
-            this.annotator.selectAnnotations(
-              annotations,
-              event.ctrlKey || event.metaKey
-            );
-          }
-        });
+      this.element.appendChild(tabEl);
     });
 
     this._buildTabs();
   }
 
   _buildTabs() {
-    this.tabs.each((index, el) => {
-      let bucketSize;
-      el = $(el);
-      const bucket = this.buckets[index];
-      const bucketLength = bucket?.anchors?.length;
+    this.tabs.forEach((tabEl, index) => {
+      let bucketHeight;
+      const anchorCount = this.buckets[index].anchors.length;
+      // Positioning logic currently _relies_ on their being interstitial
+      // buckets that have no anchors but do have positions. Positioning
+      // is averaged between this bucket's position and the _next_ bucket's
+      // position. For now. TODO: Fix this
+      const pos =
+        (this.buckets[index].position + this.buckets[index + 1]?.position) / 2;
 
-      const title = (() => {
-        if (bucketLength !== 1) {
-          return `Show ${bucketLength} annotations`;
-        } else if (bucketLength > 0) {
-          return 'Show one annotation';
+      tabEl.className = 'annotator-bucket-indicator';
+      tabEl.style.top = `${pos}px`;
+      tabEl.style.display = '';
+
+      if (anchorCount) {
+        tabEl.innerHTML = `<div class="label">${this.buckets[index].anchors.length}</div>`;
+        if (anchorCount === 1) {
+          tabEl.setAttribute('title', 'Show one annotation');
+        } else {
+          tabEl.setAttribute('title', `Show ${anchorCount} annotations`);
         }
-        return '';
-      })();
-
-      el.attr('title', title);
-      el.toggleClass('upper', this.isUpper(index));
-      el.toggleClass('lower', this.isLower(index));
-
-      if (this.isUpper(index) || this.isLower(index)) {
-        bucketSize = BUCKET_NAV_SIZE;
       } else {
-        bucketSize = BUCKET_SIZE;
+        tabEl.style.display = 'none';
       }
 
-      el.css({
-        top: (bucket.position + this.buckets[index + 1]?.position) / 2,
-        marginTop: -bucketSize / 2,
-        display: !bucketLength ? 'none' : '',
-      });
-
-      if (bucket) {
-        el.html(`<div class='label'>${bucketLength}</div>`);
+      if (this.isNavigationBucket(index)) {
+        bucketHeight = BUCKET_NAV_SIZE;
+        tabEl.classList.toggle('upper', this.isUpper(index));
+        tabEl.classList.toggle('lower', this.isLower(index));
+      } else {
+        bucketHeight = BUCKET_SIZE;
+        tabEl.classList.remove('upper');
+        tabEl.classList.remove('lower');
       }
+
+      tabEl.style.marginTop = (-1 * bucketHeight) / 2 + 'px';
     });
   }
 
   isUpper(i) {
     return i === 1;
   }
+
   isLower(i) {
     return i === this.buckets.length - 2;
+  }
+
+  isNavigationBucket(i) {
+    return this.isUpper(i) || this.isLower(i);
   }
 }
 

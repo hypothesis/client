@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import PdfSidebar from '../pdf-sidebar';
 import { $imports } from '../pdf-sidebar';
 
@@ -46,7 +44,7 @@ describe('PdfSidebar', () => {
     fakeCrossFrame.destroy = sandbox.stub();
 
     const fakeBucketBar = {};
-    fakeBucketBar.element = $('<div></div>');
+    fakeBucketBar.element = document.createElement('div');
     fakeBucketBar.destroy = sandbox.stub();
 
     CrossFrame = sandbox.stub();
