@@ -123,10 +123,14 @@ export default class PDF extends Delegator {
       return;
     }
 
+    // Get a reference to the root element of the main content area in
+    // PDF.js.
     const mainContainer = /** @type {HTMLElement} */ (document.querySelector(
       '#mainContainer'
     ));
 
+    // Update the position of the warning banner and `mainContainer` element
+    // below it when the size of the banner changes, eg. due to a window resize.
     const updateBannerHeight = () => {
       /* istanbul ignore next */
       if (!this._warningBanner) {
@@ -143,6 +147,9 @@ export default class PDF extends Delegator {
     mainContainer.appendChild(this._warningBanner);
     render(<WarningBanner />, this._warningBanner);
 
+    // nb. In browsers that don't support `ResizeObserver` the banner height
+    // will simply be static and not adjust if the window is resized.
+    //
     // @ts-expect-error - TS is missing `ResizeObserver`
     if (typeof ResizeObserver !== 'undefined') {
       // Update the banner when the window is resized or the Hypothesis
