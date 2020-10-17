@@ -42,7 +42,7 @@ export function isNodeInRange(range, node) {
  * @param {Range} range
  * @param {(n: Node) => any} callback
  */
-function forEachNodeInRange(range, callback) {
+export function forEachNodeInRange(range, callback) {
   const root = range.commonAncestorContainer;
   const nodeIter = /** @type {Document} */ (root.ownerDocument).createNodeIterator(
     root,

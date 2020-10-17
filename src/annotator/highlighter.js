@@ -1,3 +1,5 @@
+import { forEachNodeInRange } from './range-util';
+
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
 function isCSSPropertySupported(property, value) {
@@ -132,14 +134,6 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
 }
 
 /**
- * Subset of the `NormalizedRange` class defined in `range.js` that this
- * module currently uses.
- *
- * @typedef NormalizedRange
- * @prop {() => Node[]} textNodes
- */
-
-/**
  * Additional properties added to text highlight HTML elements.
  *
  * @typedef HighlightProps
@@ -151,18 +145,47 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
  */
 
 /**
+ * Return the complete text nodes inside `range`.
+ *
+ * If a range starts or ends part-way through a text node, the nodes are split
+ * and the part inside the range is returned.
+ *
+ * @param {Range} range
+ * @return {Text[]}
+ */
+function wholeTextNodesInRange(range) {
+  const textNodes = [];
+
+  forEachNodeInRange(range, node => {
+    if (node.nodeType !== Node.TEXT_NODE) {
+      return;
+    }
+    let text = /** @type {Text} */ (node);
+
+    if (text === range.startContainer && range.startOffset > 0) {
+      text = text.splitText(range.startOffset);
+    }
+
+    if (text === range.endContainer && range.endOffset < text.data.length) {
+      text.splitText(range.endOffset);
+    }
+
+    textNodes.push(text);
+  });
+
+  return textNodes;
+}
+
+/**
  * Wraps the DOM Nodes within the provided range with a highlight
  * element of the specified class and returns the highlight Elements.
  *
- * @param {NormalizedRange} normedRange - Range to be highlighted.
+ * @param {Range} range - Range to be highlighted.
  * @param {string} cssClass - A CSS class to use for the highlight
  * @return {HighlightElement[]} - Elements wrapping text in `normedRange` to add a highlight effect
  */
-export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
-  const white = /^\s*$/;
-
-  // Find text nodes within the range to highlight.
-  const textNodes = normedRange.textNodes();
+export function highlightRange(range, cssClass = 'hypothesis-highlight') {
+  const textNodes = wholeTextNodesInRange(range);
 
   // Check if this range refers to a placeholder for not-yet-rendered text in
   // a PDF. These highlights should be invisible.
@@ -191,6 +214,7 @@ export function highlightRange(normedRange, cssClass = 'hypothesis-highlight') {
   // Filter out text node spans that consist only of white space. This avoids
   // inserting highlight elements in places that can only contain a restricted
   // subset of nodes such as table rows and lists.
+  const white = /^\s*$/;
   textNodeSpans = textNodeSpans.filter(span =>
     // Check for at least one text node with non-space content.
     span.some(node => !white.test(node.nodeValue))
