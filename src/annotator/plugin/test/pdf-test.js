@@ -45,7 +45,7 @@ describe('annotator/plugin/pdf', () => {
     };
 
     $imports.$mock({
-      './pdf-metadata': () => fakePDFMetadata,
+      './pdf-metadata': sinon.stub().returns(fakePDFMetadata),
       '../anchoring/pdf': fakePdfAnchoring,
 
       // Disable debouncing of updates.

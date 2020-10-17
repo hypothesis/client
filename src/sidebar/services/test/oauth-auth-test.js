@@ -78,7 +78,7 @@ describe('sidebar/services/oauth-auth', function () {
       authorize: sinon.stub().returns(Promise.resolve(null)),
     };
 
-    FakeOAuthClient = config => {
+    FakeOAuthClient = function (config) {
       fakeClient.config = config;
       return fakeClient;
     };

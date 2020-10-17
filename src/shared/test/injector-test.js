@@ -66,7 +66,7 @@ describe('Injector', () => {
 
       container.register('foo', fooFactory);
       container.register('bar', barFactory);
-      container.register('baz', bazFactory);
+      container.register('baz', { factory: bazFactory });
 
       const baz = container.get('baz');
       assert.equal(baz.foo, foo);
