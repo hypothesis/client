@@ -1,10 +1,10 @@
-import * as sharedSettings from '../../shared/settings';
+import { parseJsonConfig } from '../../boot/parse-json-config';
 
 import configFuncSettingsFrom from './config-func-settings-from';
 import isBrowserExtension from './is-browser-extension';
 
 export default function settingsFrom(window_) {
-  const jsonConfigs = sharedSettings.jsonConfigsFrom(window_.document);
+  const jsonConfigs = parseJsonConfig(window_.document);
   const configFuncSettings = configFuncSettingsFrom(window_);
 
   /**

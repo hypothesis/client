@@ -9,14 +9,14 @@
 
 /* global __MANIFEST__ */
 
-import { jsonConfigsFrom } from '../shared/settings';
+import { parseJsonConfig } from './parse-json-config';
 
 import boot from './boot';
 import processUrlTemplate from './url-template';
 import { isBrowserSupported } from './browser-check';
 
 if (isBrowserSupported()) {
-  const settings = jsonConfigsFrom(document);
+  const settings = parseJsonConfig(document);
   boot(document, {
     assetRoot: processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__'),
     // @ts-ignore - `__MANIFEST__` is injected by the build script

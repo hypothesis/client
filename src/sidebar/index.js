@@ -1,6 +1,6 @@
 /* global process */
 
-import { jsonConfigsFrom } from '../shared/settings';
+import { parseJsonConfig } from '../boot/parse-json-config';
 import * as rendererOptions from '../shared/renderer-options';
 
 import {
@@ -13,7 +13,7 @@ import { fetchConfig } from './util/fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const appConfig = /** @type {import('../types/config').SidebarConfig} */ (jsonConfigsFrom(
+const appConfig = /** @type {import('../types/config').SidebarConfig} */ (parseJsonConfig(
   document
 ));
 
