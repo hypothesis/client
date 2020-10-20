@@ -25,7 +25,7 @@ function assign(dest, src) {
  *
  * @param {Document|Element} document - The root element to search.
  */
-export function jsonConfigsFrom(document) {
+export function parseJsonConfig(document) {
   const config = {};
   const settingsElements = document.querySelectorAll(
     'script.js-hypothesis-config'

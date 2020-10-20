@@ -4,19 +4,17 @@ import { $imports } from '../settings';
 describe('annotator.config.settingsFrom', function () {
   let fakeConfigFuncSettingsFrom;
   let fakeIsBrowserExtension;
-  let fakeSharedSettings;
+  let fakeParseJsonConfig;
 
   beforeEach(() => {
     fakeConfigFuncSettingsFrom = sinon.stub().returns({});
     fakeIsBrowserExtension = sinon.stub().returns(false);
-    fakeSharedSettings = {
-      jsonConfigsFrom: sinon.stub().returns({}),
-    };
+    fakeParseJsonConfig = sinon.stub().returns({});
 
     $imports.$mock({
       './config-func-settings-from': fakeConfigFuncSettingsFrom,
       './is-browser-extension': fakeIsBrowserExtension,
-      '../../shared/settings': fakeSharedSettings,
+      '../../boot/parse-json-config': { parseJsonConfig: fakeParseJsonConfig },
     });
   });
 
@@ -211,7 +209,7 @@ describe('annotator.config.settingsFrom', function () {
         beforeEach(
           'add a js-hypothesis-config annotations setting',
           function () {
-            fakeSharedSettings.jsonConfigsFrom.returns({
+            fakeParseJsonConfig.returns({
               annotations: 'annotationsFromJSON',
             });
           }
@@ -310,7 +308,7 @@ describe('annotator.config.settingsFrom', function () {
       'when the host page has a js-hypothesis-config with a query setting',
       function () {
         beforeEach('add a js-hypothesis-config query setting', function () {
-          fakeSharedSettings.jsonConfigsFrom.returns({
+          fakeParseJsonConfig.returns({
             query: 'queryFromJSON',
           });
         });
@@ -468,7 +466,7 @@ describe('annotator.config.settingsFrom', function () {
       },
     ].forEach(function (test) {
       it(test.it, function () {
-        fakeSharedSettings.jsonConfigsFrom.returns({
+        fakeParseJsonConfig.returns({
           showHighlights: test.input,
         });
         const settings = settingsFrom(fakeWindow());
@@ -496,7 +494,7 @@ describe('annotator.config.settingsFrom', function () {
       });
 
       it("doesn't read the setting from the host page, defaults to 'always'", function () {
-        fakeSharedSettings.jsonConfigsFrom.returns({
+        fakeParseJsonConfig.returns({
           showHighlights: 'never',
         });
         fakeConfigFuncSettingsFrom.returns({
@@ -627,7 +625,7 @@ describe('annotator.config.settingsFrom', function () {
         specify(test.specify, function () {
           fakeIsBrowserExtension.returns(test.isBrowserExtension);
           fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);
-          fakeSharedSettings.jsonConfigsFrom.returns(test.jsonSettings);
+          fakeParseJsonConfig.returns(test.jsonSettings);
           const settings = settingsFrom(fakeWindow());
 
           const setting = settings.hostPageSetting('foo', {
