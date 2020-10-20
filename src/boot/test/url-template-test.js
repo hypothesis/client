@@ -38,12 +38,11 @@ describe('processUrlTemplate', () => {
         .returns([{ src: 'http://test-host:3001/script.js' }]);
     });
 
-    it('falls back to using origin info from the last <script> tag in the document', () => {
-      const url = processUrlTemplate(
-        '{current_scheme}://{current_host}:2000/style.css',
-        fakeDocument
-      );
-      assert.equal(url, 'http://test-host:2000/style.css');
+    it('throws if script origin cannot be determined', () => {
+      assert.throws(() => {
+        const template = '{current_scheme}://{current_host}:2000/style.css';
+        processUrlTemplate(template, fakeDocument);
+      }, 'Could not process URL template because script origin is unknown');
     });
 
     it('does not try to determine the origin if there are no URL template params', () => {

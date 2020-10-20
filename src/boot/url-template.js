@@ -14,19 +14,12 @@ function extractOrigin(url) {
 }
 
 function currentScriptOrigin(document_ = document) {
-  try {
-    let scriptEl = /** @type {HTMLScriptElement} */ (document_.currentScript);
-
-    if (!scriptEl) {
-      // Fallback for IE 11.
-      const scripts = document_.querySelectorAll('script');
-      scriptEl = scripts[scripts.length - 1];
-    }
-
-    return extractOrigin(scriptEl.src);
-  } catch (err) {
+  const scriptEl = /** @type {HTMLScriptElement|null} */ (document_.currentScript);
+  if (!scriptEl) {
+    // Function was called outside of initial script execution.
     return null;
   }
+  return extractOrigin(scriptEl.src);
 }
 
 /**
@@ -52,6 +45,10 @@ export default function processUrlTemplate(url, document_ = document) {
   if (origin) {
     url = url.replace('{current_host}', origin.hostname);
     url = url.replace('{current_scheme}', origin.protocol);
+  } else {
+    throw new Error(
+      'Could not process URL template because script origin is unknown'
+    );
   }
 
   return url;
