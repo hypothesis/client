@@ -5,36 +5,43 @@ import { getBoundingClientRect } from '../highlighter';
  */
 
 /**
- * A tuple representing either the top (`startOrEnd` = 1) or the
- * bottom (`startOrEnd` = -1) of an anchor's highlight bounding box.
- *
- * @typedef {[pixelPosition: number, startOrEnd: (-1 | 1), anchor: Anchor]} PositionPoint
- */
-
-/**
- * An object containing information about anchor highlight positions
- *
- * @typedef PositionPoints
- * @prop {Anchor[]} above - Anchors that are offscreen above
- * @prop {Anchor[]} below - Anchors that are offscreen below
- * @prop {PositionPoint[]} points - PositionPoints for on-screen anchor
- *   highlights. Each highlight box has 2 PositionPoints (one for top edge
- *   and one for bottom edge).
- */
-
-/**
  * @typedef Bucket
  * @prop {Anchor[]} anchors - The anchors in this bucket
  * @prop {number} position - The vertical pixel offset where this bucket should
- *                           appear in the bucket bar
+ *                           appear in the bucket bar.
  */
 
-// FIXME: Temporary duplication of size constants between here and BucketBar
-const BUCKET_SIZE = 16; // Regular bucket size
-const BUCKET_NAV_SIZE = BUCKET_SIZE + 6; // Bucket plus arrow (up/down)
-const BUCKET_TOP_THRESHOLD = 115 + BUCKET_NAV_SIZE; // Toolbar
+/**
+ * @typedef WorkingBucket
+ * @prop {Anchor[]} anchors - The anchors in this bucket
+ * @prop {number} position - The computed position (offset) for this bucket,
+ *   based on the current anchors. This is centered between `top` and `bottom`
+ * @prop {number} top - The uppermost (lowest) vertical offset for the anchors
+ *   in this bucket — the lowest `top` position value, akin to the top offest of
+ *   a theoretical box drawn around all of the anchor highlights in this bucket
+ * @prop {number} bottom - The bottommost (highest) vertical offset for the
+ *   anchors in this bucket — the highest `top` position value, akin to the
+ *   bottom of a theoretical box drawn around all of the anchor highlights in
+ *   this bucket
+ */
 
-// TODO!! This is an option in the plugin right now
+/**
+ * @typedef AnchorPosition
+ * @prop {Anchor} anchor
+ * @prop {number} top - The vertical offset, in pixels, of the top of this
+ *   anchor's highlight(s) bounding box
+ * @prop {number} bottom - The vertical offset, in pixels, of the bottom of this
+ *   anchor's highlight(s) bounding box
+ */
+
+// Only anchors with top offsets between `BUCKET_TOP_THRESHOLD` and
+// `window.innerHeight - BUCKET_BOTTOM_THRESHOLD` are considered "on-screen"
+// and will be bucketed. This is to account for bucket-bar tool buttons (top
+// and the height of the bottom navigation bucket (bottom)
+const BUCKET_TOP_THRESHOLD = 137;
+const BUCKET_BOTTOM_THRESHOLD = 22;
+// Generated buckets of annotation anchor highlights should be spaced by
+// at least this amount, in pixels
 const BUCKET_GAP_SIZE = 60;
 
 /**
@@ -63,7 +70,7 @@ export function findClosestOffscreenAnchor(anchors, direction) {
       continue;
     } else if (
       direction === 'down' &&
-      top <= window.innerHeight - BUCKET_NAV_SIZE
+      top <= window.innerHeight - BUCKET_BOTTOM_THRESHOLD
     ) {
       // We're headed down but this anchor is already above
       // the usable bottom of the screen: it's not our guy
@@ -88,161 +95,134 @@ export function findClosestOffscreenAnchor(anchors, direction) {
 }
 
 /**
- * Construct an Array of points representing the positional tops and bottoms
- * of current anchor highlights. Each anchor whose highlight(s)' bounding
- * box is onscreen will result in two entries in the `points` Array: one
- * for the top of the highlight box and one for the bottom
+ * Compute the AnchorPositions for the set of anchors provided, sorted
+ * by top offset
  *
  * @param {Anchor[]} anchors
- * @return {PositionPoints}
+ * @return {AnchorPosition[]}
  */
-export function constructPositionPoints(anchors) {
-  const aboveScreenAnchors = new Set();
-  const belowScreenAnchors = new Set();
-  const points = /** @type {PositionPoint[]} */ ([]);
+function getAnchorPositions(anchors) {
+  const anchorPositions = [];
 
-  for (let anchor of anchors) {
+  anchors.forEach(anchor => {
     if (!anchor.highlights?.length) {
-      continue;
+      return;
     }
-
-    const rect = getBoundingClientRect(anchor.highlights);
-
-    if (rect.top < BUCKET_TOP_THRESHOLD) {
-      aboveScreenAnchors.add(anchor);
-    } else if (rect.top > window.innerHeight - BUCKET_NAV_SIZE) {
-      belowScreenAnchors.add(anchor);
-    } else {
-      // Add a point for the top of this anchor's highlight box
-      points.push([rect.top, 1, anchor]);
-      // Add a point for the bottom of this anchor's highlight box
-      points.push([rect.bottom, -1, anchor]);
-    }
-  }
-
-  // Sort onscreen points by pixel position, secondarily by position "type"
-  // (top or bottom of higlight box)
-  points.sort((a, b) => {
-    for (let i = 0; i < a.length; i++) {
-      if (a[i] < b[i]) {
-        return -1;
-      } else if (a[i] > b[i]) {
-        return 1;
-      }
-    }
-    return 0;
+    const anchorBox = getBoundingClientRect(anchor.highlights);
+    anchorPositions.push({
+      top: anchorBox.top,
+      bottom: anchorBox.bottom,
+      anchor,
+    });
   });
 
-  return {
-    above: Array.from(aboveScreenAnchors),
-    below: Array.from(belowScreenAnchors),
-    points,
-  };
+  // Now sort by top position
+  anchorPositions.sort((a, b) => {
+    if (a.top < b.top) {
+      return -1;
+    }
+    return 1;
+  });
+
+  return anchorPositions;
 }
 
 /**
- * Take a sorted set of `points` representing top and bottom positions of anchor
- * highlights and group them into a collection of "buckets".
+ * Compute buckets
  *
- * @param {PositionPoint[]} points
+ * @param {Anchor[]} anchors
  * @return {Bucket[]}
  */
-export function buildBuckets(points) {
+export function anchorBuckets(anchors) {
+  const anchorPositions = getAnchorPositions(anchors);
+  const aboveScreen = new Set();
+  const belowScreen = new Set();
   const buckets = /** @type {Bucket[]} */ ([]);
 
-  // Anchors that are part of the currently-being-built bucket, and a correspon-
-  // ding count of unclosed top edges seen for that anchor
-  const current = /** @type {{anchors: Anchor[], counts: number[] }} */ ({
-    anchors: [],
-    counts: [],
+  // Hold current working anchors and positions as we build each bucket
+  /** @type {WorkingBucket|null} */
+  let currentBucket = null;
+
+  /**
+   * Create a new working bucket based on the provided `AnchorPosition`
+   *
+   * @param {AnchorPosition} anchorPosition
+   * @return {WorkingBucket}
+   */
+  function newBucket(anchorPosition) {
+    const anchorHeight = anchorPosition.bottom - anchorPosition.top;
+    const bucketPosition = anchorPosition.top + anchorHeight / 2;
+    const bucket = /** @type WorkingBucket */ ({
+      anchors: [anchorPosition.anchor],
+      top: anchorPosition.top,
+      bottom: anchorPosition.bottom,
+      position: bucketPosition,
+    });
+    return bucket;
+  }
+
+  // Build buckets from position information
+  anchorPositions.forEach(aPos => {
+    if (aPos.top < BUCKET_TOP_THRESHOLD) {
+      aboveScreen.add(aPos.anchor);
+      return;
+    } else if (aPos.top > window.innerHeight - BUCKET_BOTTOM_THRESHOLD) {
+      belowScreen.add(aPos.anchor);
+      return;
+    }
+
+    if (!currentBucket) {
+      // We've encountered our first on-screen anchor position:
+      // We'll need a bucket!
+      currentBucket = newBucket(aPos);
+      return;
+    }
+    // We want to contain overlapping highlights and those near each other
+    // within a shared bucket
+    const isContainedWithin =
+      aPos.top > currentBucket.top && aPos.bottom < currentBucket.bottom;
+
+    // The new anchor's position is far enough below the bottom of the current
+    // bucket to justify starting a new bucket
+    const isLargeGap = aPos.top - currentBucket.bottom > BUCKET_GAP_SIZE;
+
+    if (isLargeGap && !isContainedWithin) {
+      // We need to start a new bucket; push the working bucket and create
+      // a new bucket
+      buckets.push(currentBucket);
+      currentBucket = newBucket(aPos);
+    } else {
+      // We'll add this anchor to the current working bucket and update
+      // offset properties accordingly.
+      // We can be confident that `aPos.top` is >= `currentBucket.top` because
+      // AnchorPositions are sorted by their `top` offset — meaning that
+      // `currentBucket.top` still accurately represents the `top` offset of
+      // the virtual rectangle enclosing all anchors in this bucket. But
+      // let's check to see if the bottom is larger/lower:
+      const updatedBottom =
+        aPos.bottom > currentBucket.bottom ? aPos.bottom : currentBucket.bottom;
+      const updatedHeight = updatedBottom - currentBucket.top;
+
+      currentBucket.anchors.push(aPos.anchor);
+      currentBucket.bottom = updatedBottom;
+      currentBucket.position = currentBucket.top + updatedHeight / 2;
+    }
   });
 
-  points.forEach((point, index) => {
-    const [position, delta, anchor] = point;
-    // Does this point represent the top or the bottom of an anchor's highlight
-    // box?
-    const positionType = delta > 0 ? 'start' : 'end';
+  if (currentBucket) {
+    buckets.push(currentBucket);
+  }
 
-    // See if this point's anchor is already in our working set of open anchors
-    const anchorIndex = current.anchors.indexOf(anchor);
+  // Add an upper "navigation" bucket with offscreen-above anchors
+  buckets.unshift({
+    anchors: Array.from(aboveScreen),
+    position: BUCKET_TOP_THRESHOLD,
+  });
 
-    if (positionType === 'start') {
-      if (anchorIndex === -1) {
-        // Add an entry for this anchor to our current set of "open" anchors
-        current.anchors.unshift(anchor);
-        current.counts.unshift(1);
-      } else {
-        // Increment the number of times we've seen a start/top edge for this
-        // anchor
-        current.counts[anchorIndex]++;
-      }
-    } else {
-      // positionType = 'end'
-      // This is the bottom/end of an anchor that we should have already seen
-      // a top edge for. Decrement the count, representing that we've found an
-      // end point to balance a previously-seen start point
-      current.counts[anchorIndex]--;
-      if (current.counts[anchorIndex] === 0) {
-        // All start points for this anchor have been balanced by end point(s)
-        // So we can remove this anchor from our collection of open anchors
-        current.anchors.splice(anchorIndex, 1);
-        current.counts.splice(anchorIndex, 1);
-      }
-    }
-
-    // For each point, we'll either:
-    // * create a new bucket: Add a new bucket (w/corresponding bucket position)
-    //   and add the working anchors to the new bucket. This, of course, has
-    //   the effect of making the buckets collection larger. OR:
-    // * merge buckets: In most cases, merge the anchors from the last bucket
-    //   into the penultimate (previous) bucket and remove the last bucket (and
-    //   its corresponding `bucketPosition` entry). Also add the working anchors
-    //   to the previous bucket. Note that this decreases the size of the
-    //   buckets collection.
-    // The ultimate set of buckets is defined by the pattern of creating and
-    // merging/removing buckets as we iterate over points.
-    const isFirstOrLastPoint =
-      buckets.length === 0 || index === points.length - 1;
-
-    const isLargeGap =
-      buckets.length &&
-      position - buckets[buckets.length - 1].position > BUCKET_GAP_SIZE;
-
-    if (current.anchors.length === 0 || isFirstOrLastPoint || isLargeGap) {
-      // Create a new bucket, because:
-      // - There are no more open/working anchors, OR
-      // - This is the first or last point, OR
-      // - There's been a large dimensional gap since the last bucket's position
-      buckets.push({ anchors: current.anchors.slice(), position });
-    } else {
-      // Merge bucket contents
-
-      // Always remove the last bucket
-      const ultimateBucket = buckets.pop() || /** @type Bucket */ ({});
-
-      // Merge working anchors into the last bucket's anchors
-      let mergedAnchors = [...ultimateBucket.anchors, ...current.anchors];
-      let mergedPosition = ultimateBucket.position;
-
-      // If there is a previous bucket (penultimate bucket) and it has anchors
-      // in it (is not empty)
-      if (buckets[buckets.length - 1]?.anchors.length) {
-        // Remove the previous bucket, too
-        const penultimateBucket = /** @type Bucket */ (buckets.pop() || {});
-        // Merge the penultimate bucket's anchors into our working set of
-        // merged anchors
-        mergedAnchors = [...penultimateBucket.anchors, ...mergedAnchors];
-        // We'll use the penultimate bucket's position as the position for
-        // the merged bucket
-        mergedPosition = penultimateBucket.position;
-      }
-
-      // Push the now-merged bucket onto the buckets collection
-      buckets.push({
-        anchors: Array.from(new Set(mergedAnchors)), // De-dupe anchors
-        position: mergedPosition,
-      });
-    }
+  // Add a lower "navigation" bucket with offscreen-below anchors
+  buckets.push({
+    anchors: Array.from(belowScreen),
+    position: window.innerHeight - BUCKET_BOTTOM_THRESHOLD,
   });
   return buckets;
 }

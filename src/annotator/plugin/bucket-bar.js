@@ -2,20 +2,11 @@ import Delegator from '../delegator';
 import scrollIntoView from 'scroll-into-view';
 
 import { setHighlightsFocused } from '../highlighter';
-import {
-  findClosestOffscreenAnchor,
-  constructPositionPoints,
-  buildBuckets,
-} from '../util/buckets';
+import { findClosestOffscreenAnchor, anchorBuckets } from '../util/buckets';
 
 /**
  * @typedef {import('../util/buckets').Bucket} Bucket
- * @typedef {import('../util/buckets').PositionPoints} PositionPoints
  */
-
-const BUCKET_SIZE = 16; // Regular bucket size
-const BUCKET_NAV_SIZE = BUCKET_SIZE + 6; // Bucket plus arrow (up/down)
-const BUCKET_TOP_THRESHOLD = 115 + BUCKET_NAV_SIZE; // Toolbar
 
 // Scroll to the next closest anchor off screen in the given direction.
 function scrollToClosest(anchors, direction) {
@@ -117,30 +108,7 @@ export default class BucketBar extends Delegator {
   }
 
   _update() {
-    /** @type {PositionPoints} */
-    const { above, below, points } = constructPositionPoints(
-      this.annotator.anchors
-    );
-
-    this.buckets = buildBuckets(points);
-
-    // Add a bucket to the top of the bar that, when clicked, will scroll up
-    // to the nearest bucket offscreen above, an upper navigation bucket
-    // TODO: This should be part of building the buckets
-    this.buckets.unshift(
-      { anchors: [], position: 0 },
-      { anchors: above, position: BUCKET_TOP_THRESHOLD - 1 },
-      { anchors: [], position: BUCKET_TOP_THRESHOLD }
-    );
-
-    // Add a bucket to the bottom of the bar that, when clicked, will scroll down
-    // to the nearest bucket offscreen below, a lower navigation bucket
-    // TODO: This should be part of building the buckets
-    this.buckets.push(
-      { anchors: [], position: window.innerHeight - BUCKET_NAV_SIZE },
-      { anchors: below, position: window.innerHeight - BUCKET_NAV_SIZE + 1 },
-      { anchors: [], position: window.innerHeight }
-    );
+    this.buckets = anchorBuckets(this.annotator.anchors);
 
     // The following affordances attempt to reuse existing DOM elements
     // when reconstructing bucket "tabs" to cut down on the number of elements
@@ -205,17 +173,9 @@ export default class BucketBar extends Delegator {
 
   _buildTabs() {
     this.tabs.forEach((tabEl, index) => {
-      let bucketHeight;
       const anchorCount = this.buckets[index].anchors.length;
-      // Positioning logic currently _relies_ on their being interstitial
-      // buckets that have no anchors but do have positions. Positioning
-      // is averaged between this bucket's position and the _next_ bucket's
-      // position. For now. TODO: Fix this
-      const pos =
-        (this.buckets[index].position + this.buckets[index + 1]?.position) / 2;
-
       tabEl.className = 'annotator-bucket-indicator';
-      tabEl.style.top = `${pos}px`;
+      tabEl.style.top = `${this.buckets[index].position}px`;
       tabEl.style.display = '';
 
       if (anchorCount) {
@@ -229,34 +189,20 @@ export default class BucketBar extends Delegator {
         tabEl.style.display = 'none';
       }
 
-      if (this.isNavigationBucket(index)) {
-        bucketHeight = BUCKET_NAV_SIZE;
-        tabEl.classList.toggle('upper', this.isUpper(index));
-        tabEl.classList.toggle('lower', this.isLower(index));
-      } else {
-        bucketHeight = BUCKET_SIZE;
-        tabEl.classList.remove('upper');
-        tabEl.classList.remove('lower');
-      }
-
-      tabEl.style.marginTop = (-1 * bucketHeight) / 2 + 'px';
+      tabEl.classList.toggle('upper', this.isUpper(index));
+      tabEl.classList.toggle('lower', this.isLower(index));
     });
   }
 
   isUpper(i) {
-    return i === 1;
+    return i === 0;
   }
 
   isLower(i) {
-    return i === this.buckets.length - 2;
+    return i === this.buckets.length - 1;
   }
 
   isNavigationBucket(i) {
     return this.isUpper(i) || this.isLower(i);
   }
 }
-
-// Export constants
-BucketBar.BUCKET_SIZE = BUCKET_SIZE;
-BucketBar.BUCKET_NAV_SIZE = BUCKET_NAV_SIZE;
-BucketBar.BUCKET_TOP_THRESHOLD = BUCKET_TOP_THRESHOLD;

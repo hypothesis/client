@@ -28,13 +28,14 @@
     right: 0;
     pointer-events: all;
     position: absolute;
-    margin-top: -8px;
     line-height: 1;
     height: 16px;
     width: 26px;
     -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
     text-align: center;
     cursor: pointer;
+    // Vertically center the element, which is 16px high
+    margin-top: -8px;
 
     .label {
       @include reset.reset-box-model;
@@ -86,10 +87,18 @@
         border-right: solid transparent;
         margin-top: 0;
       }
+      & .label {
+        // Vertical alignment tweak to better center the label in the indicator
+        margin-top: -1px;
+      }
     }
 
     &.upper {
       border-radius: 2px 2px 4px 4px;
+      // Vertically center the element (which is 22px high) by adding a negative
+      // top margin in conjunction with an inline style `top` position (set
+      // in code)
+      margin-top: -11px;
 
       &:before,
       &:after {
@@ -111,6 +120,7 @@
     }
 
     &.lower {
+      margin-top: 0;
       border-radius: 4px 4px 2px 2px;
 
       &:before,
