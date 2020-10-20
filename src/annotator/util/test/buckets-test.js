@@ -1,29 +1,48 @@
-import {
-  findClosestOffscreenAnchor,
-  constructPositionPoints,
-  buildBuckets,
-} from '../buckets';
+import { findClosestOffscreenAnchor, anchorBuckets } from '../buckets';
 import { $imports } from '../buckets';
 
-function fakeAnchorFactory() {
-  let highlightIndex = 0;
+function fakeAnchorFactory(
+  offsetStart = 1,
+  offsetIncrement = 100,
+  boxHeight = 50
+) {
+  let highlightIndex = offsetStart;
   return () => {
-    // This incrementing array-item value allows for differing
-    // `top` results; see fakeGetBoundingClientRect
-    return { highlights: [highlightIndex++] };
+    // In a normal `Anchor` object, `highlights` would be an array of
+    // DOM elements. Here, `highlights[0]` is the vertical offset (top) of the
+    // fake anchor's highlight box and `highlights[1]` is the height of the
+    // box. This is in used in conjunction with the mock for
+    // `getBoundingClientRect`, below
+    const anchor = { highlights: [highlightIndex, boxHeight] };
+    highlightIndex = highlightIndex + offsetIncrement;
+    return anchor;
   };
 }
 
 describe('annotator/util/buckets', () => {
   let fakeGetBoundingClientRect;
 
+  let fakeAnchors;
+  let stubbedInnerHeight;
+
   beforeEach(() => {
+    const fakeAnchor = fakeAnchorFactory();
+    fakeAnchors = [
+      fakeAnchor(), // top: 1, bottom: 51 — above screen
+      fakeAnchor(), // top: 101, bottom: 151 — above screen
+      fakeAnchor(), // top: 201, bottom: 251 — on screen
+      fakeAnchor(), // top: 301, bottom: 351 — on screen
+      fakeAnchor(), // top: 401, bottom: 451 — below screen
+      fakeAnchor(), // top: 501, bottom: 551 - below screen
+    ];
+    stubbedInnerHeight = sinon.stub(window, 'innerHeight').value(410);
+
     fakeGetBoundingClientRect = sinon.stub().callsFake(highlights => {
-      // Return a `top` value based on the first item in the array
-      const top = highlights[0] * 100 + 1;
+      // Use the entries of the faked anchor's `highlights` array to
+      // determine this anchor's "position"
       return {
-        top,
-        bottom: top + 50,
+        top: highlights[0],
+        bottom: highlights[0] + highlights[1],
       };
     });
 
@@ -36,29 +55,10 @@ describe('annotator/util/buckets', () => {
 
   afterEach(() => {
     $imports.$restore();
+    stubbedInnerHeight.restore();
   });
 
   describe('findClosestOffscreenAnchor', () => {
-    let fakeAnchors;
-    let stubbedInnerHeight;
-
-    beforeEach(() => {
-      const fakeAnchor = fakeAnchorFactory();
-      fakeAnchors = [
-        fakeAnchor(), // top: 1
-        fakeAnchor(), // top: 101
-        fakeAnchor(), // top: 201
-        fakeAnchor(), // top: 301
-        fakeAnchor(), // top: 401
-        fakeAnchor(), // top: 501
-      ];
-      stubbedInnerHeight = sinon.stub(window, 'innerHeight').value(410);
-    });
-
-    afterEach(() => {
-      stubbedInnerHeight.restore();
-    });
-
     it('finds the closest anchor above screen when headed up', () => {
       // fakeAnchors [0] and [1] are offscreen upwards, having `top` values
       // < BUCKET_TOP_THRESHOLD. [1] is closer so wins out. [3] and [4] are
@@ -113,163 +113,87 @@ describe('annotator/util/buckets', () => {
     });
   });
 
-  describe('constructPositionPoints', () => {
-    let fakeAnchors;
-    let stubbedInnerHeight;
-
-    beforeEach(() => {
-      const fakeAnchor = fakeAnchorFactory();
-      fakeAnchors = [
-        fakeAnchor(), // top: 1
-        fakeAnchor(), // top: 101
-        fakeAnchor(), // top: 201
-        fakeAnchor(), // top: 301
-        fakeAnchor(), // top: 401
-        fakeAnchor(), // top: 501
-      ];
-      stubbedInnerHeight = sinon.stub(window, 'innerHeight').value(410);
+  describe('anchorBuckets', () => {
+    it('puts anchors that are above the screen into the first bucket', () => {
+      const buckets = anchorBuckets(fakeAnchors);
+      assert.deepEqual(buckets[0].anchors, [fakeAnchors[0], fakeAnchors[1]]);
     });
 
-    afterEach(() => {
-      stubbedInnerHeight.restore();
-    });
-
-    it('returns an Array of anchors that are offscreen above', () => {
-      const positionPoints = constructPositionPoints(fakeAnchors);
-
-      assert.deepEqual(positionPoints.above, [fakeAnchors[0], fakeAnchors[1]]);
-    });
-
-    it('returns an Array of anchors that are offscreen below', () => {
-      const positionPoints = constructPositionPoints(fakeAnchors);
-
-      assert.deepEqual(positionPoints.below, [fakeAnchors[4], fakeAnchors[5]]);
-    });
-
-    it('does not return duplicate anchors', () => {
-      const positionPoints = constructPositionPoints([
-        fakeAnchors[0],
-        fakeAnchors[0],
-        fakeAnchors[5],
+    it('puts anchors that are below the screen into the last bucket', () => {
+      const buckets = anchorBuckets(fakeAnchors);
+      assert.deepEqual(buckets[buckets.length - 1].anchors, [
+        fakeAnchors[4],
         fakeAnchors[5],
       ]);
-
-      assert.deepEqual(positionPoints.above, [fakeAnchors[0]]);
-      assert.deepEqual(positionPoints.below, [fakeAnchors[5]]);
     });
 
-    it('returns an Array of position points for on-screen anchors', () => {
-      const positionPoints = constructPositionPoints(fakeAnchors);
-
-      // It should return two "point" positions for each on-screen anchor,
-      // one representing the top of the anchor's highlight box, one representing
-      // the bottom position
-      assert.equal(positionPoints.points.length, 4);
-      // The top position of the first on-screen anchor
-      assert.deepEqual(positionPoints.points[0], [201, 1, fakeAnchors[2]]);
-      // The bottom position of the first on-screen anchor
-      assert.deepEqual(positionPoints.points[1], [251, -1, fakeAnchors[2]]);
-      // The top position of the second on-screen anchor
-      assert.deepEqual(positionPoints.points[2], [301, 1, fakeAnchors[3]]);
-      // The bottom position of the second on-screen anchor
-      assert.deepEqual(positionPoints.points[3], [351, -1, fakeAnchors[3]]);
+    it('puts on-screen anchors into a bucket', () => {
+      const buckets = anchorBuckets(fakeAnchors);
+      assert.deepEqual(buckets[1].anchors, [fakeAnchors[2], fakeAnchors[3]]);
     });
 
-    it('sorts on-screen points based on position primarily, type secondarily', () => {
-      fakeGetBoundingClientRect.callsFake(() => {
-        return {
-          top: 250,
-          bottom: 250,
-        };
-      });
-      const positionPoints = constructPositionPoints(fakeAnchors);
-      for (let i = 0; i < fakeAnchors.length; i++) {
-        // The bottom position for all of the fake anchors is the same, so
-        // those points will all be at the top of the list
-        assert.equal(positionPoints.points[i][2], fakeAnchors[i]);
-        // This point is a "bottom" point
-        assert.equal(positionPoints.points[i][1], -1);
-        // The top position for all of the fake anchors is the same, so
-        // they'll be sorted to the end of the list
-        assert.equal(
-          positionPoints.points[i + fakeAnchors.length][2],
-          fakeAnchors[i]
-        );
-        // This point is a "top" point
-        assert.equal(positionPoints.points[i + fakeAnchors.length][1], 1);
-      }
-    });
-  });
-
-  describe('buildBuckets', () => {
-    it('should return empty buckets if points array is empty', () => {
-      const buckets = buildBuckets([]);
-      assert.isArray(buckets);
-      assert.isEmpty(buckets);
+    it('puts anchors into separate buckets if more than 60px separates their boxes', () => {
+      fakeAnchors[2].highlights = [201, 15]; // bottom 216
+      fakeAnchors[3].highlights = [301, 15]; // top 301 - more than 60px from 216
+      const buckets = anchorBuckets(fakeAnchors);
+      assert.deepEqual(buckets[1].anchors, [fakeAnchors[2]]);
+      assert.deepEqual(buckets[2].anchors, [fakeAnchors[3]]);
     });
 
-    it('should group overlapping anchor highlights into shared buckets', () => {
-      const anchors = [{}, {}, {}, {}];
-      const points = [];
-      // Represents points for 4 anchors that all have a top of 150px and bottom
-      // of 200
-      anchors.forEach(anchor => {
-        points.push([150, 1, anchor]);
-        points.push([200, -1, anchor]);
-      });
+    it('puts overlapping anchors into a shared bucket', () => {
+      fakeAnchors[2].highlights = [201, 200]; // Bottom 401
+      fakeAnchors[3].highlights = [285, 100]; // Bottom 385
+      const buckets = anchorBuckets(fakeAnchors);
+      assert.deepEqual(buckets[1].anchors, [fakeAnchors[2], fakeAnchors[3]]);
+    });
 
-      const buckets = buildBuckets(points);
+    it('positions the bucket at v. midpoint of the box containing all bucket anchors', () => {
+      fakeAnchors[2].highlights = [200, 50]; // Top 200
+      fakeAnchors[3].highlights = [225, 75]; // Bottom 300
+      const buckets = anchorBuckets(fakeAnchors);
+      assert.equal(buckets[1].position, 250);
+    });
+
+    it('only buckets annotations that have highlights', () => {
+      const badAnchor = { highlights: [] };
+      fakeAnchors.push(badAnchor);
+      const buckets = anchorBuckets([badAnchor]);
       assert.equal(buckets.length, 2);
-      assert.isEmpty(buckets[1].anchors);
-      // All anchors are in a single bucket
-      assert.deepEqual(buckets[0].anchors, anchors);
-      // Because this is the first bucket, it will be aligned top
-      assert.equal(buckets[0].position, 150);
+      assert.isEmpty(buckets[0].anchors); // Holder for above-screen anchors
+      assert.isEmpty(buckets[1].anchors); // Holder for below-screen anchors
     });
 
-    it('should group nearby anchor highlights into shared buckets', () => {
-      let increment = 25;
-      const anchors = [{}, {}, {}, {}];
-      const points = [];
-      // Represents points for 4 anchors that all have different start and
-      // end positions, but only differing by 25px
-      anchors.forEach(anchor => {
-        points.push([150 + increment, 1, anchor]);
-        points.push([200 + increment, -1, anchor]);
-        increment += 25;
-      });
+    it('sorts anchors by top position', () => {
+      const buckets = anchorBuckets([
+        fakeAnchors[3],
+        fakeAnchors[2],
+        fakeAnchors[5],
+        fakeAnchors[4],
+        fakeAnchors[0],
+        fakeAnchors[1],
+      ]);
+      assert.deepEqual(buckets[0].anchors, [fakeAnchors[0], fakeAnchors[1]]);
+      assert.deepEqual(buckets[1].anchors, [fakeAnchors[2], fakeAnchors[3]]);
+      assert.deepEqual(buckets[2].anchors, [fakeAnchors[4], fakeAnchors[5]]);
+    });
 
-      const buckets = buildBuckets(points);
+    it('returns only above- and below-screen anchors if none are on-screen', () => {
+      // Push these anchors below screen
+      fakeAnchors[2].highlights = [1000, 100];
+      fakeAnchors[3].highlights = [1100, 75];
+      fakeAnchors[4].highlights = [1200, 100];
+      fakeAnchors[5].highlights = [1300, 75];
+      const buckets = anchorBuckets(fakeAnchors);
       assert.equal(buckets.length, 2);
-      assert.isEmpty(buckets[1].anchors);
-      // All anchors are in a single bucket
-      assert.deepEqual(buckets[0].anchors, anchors);
-      // Because this is the first bucket, it will be aligned top
-      assert.equal(buckets[0].position, 175);
-    });
-
-    it('should put anchors that are not near each other in separate buckets', () => {
-      let position = 100;
-      const anchors = [{}, {}, {}, {}];
-      const points = [];
-      // Represents points for 4 anchors that all have different start and
-      // end positions, but only differing by 25px
-      anchors.forEach(anchor => {
-        points.push([position, 1, anchor]);
-        points.push([position + 20, -1, anchor]);
-        position += 100;
-      });
-      const buckets = buildBuckets(points);
-      assert.equal(buckets.length, 8);
-      // Legacy of previous implementation, shrug?
-      assert.isEmpty(buckets[1].anchors);
-      assert.isEmpty(buckets[3].anchors);
-      assert.isEmpty(buckets[5].anchors);
-      assert.isEmpty(buckets[7].anchors);
-      assert.deepEqual(buckets[0].anchors, [anchors[0]]);
-      assert.deepEqual(buckets[2].anchors, [anchors[1]]);
-      assert.deepEqual(buckets[4].anchors, [anchors[2]]);
-      assert.deepEqual(buckets[6].anchors, [anchors[3]]);
+      // Above-screen
+      assert.deepEqual(buckets[0].anchors, [fakeAnchors[0], fakeAnchors[1]]);
+      // Below-screen
+      assert.deepEqual(buckets[1].anchors, [
+        fakeAnchors[2],
+        fakeAnchors[3],
+        fakeAnchors[4],
+        fakeAnchors[5],
+      ]);
     });
   });
 });

@@ -46,11 +46,8 @@ describe('BucketBar', () => {
     };
 
     fakeBucketUtil = {
+      anchorBuckets: sinon.stub().returns([]),
       findClosestOffscreenAnchor: sinon.stub(),
-      constructPositionPoints: sinon
-        .stub()
-        .returns({ above: [], below: [], points: [] }),
-      buildBuckets: sinon.stub().returns([]),
     };
 
     fakeHighlighter = {
@@ -105,16 +102,16 @@ describe('BucketBar', () => {
   describe('updating buckets', () => {
     it('should update buckets when the window is resized', () => {
       bucketBar = createBucketBar();
-      assert.notCalled(fakeBucketUtil.buildBuckets);
+      assert.notCalled(fakeBucketUtil.anchorBuckets);
       window.dispatchEvent(new Event('resize'));
-      assert.calledOnce(fakeBucketUtil.buildBuckets);
+      assert.calledOnce(fakeBucketUtil.anchorBuckets);
     });
 
     it('should update buckets when the window is scrolled', () => {
       bucketBar = createBucketBar();
-      assert.notCalled(fakeBucketUtil.buildBuckets);
+      assert.notCalled(fakeBucketUtil.anchorBuckets);
       window.dispatchEvent(new Event('scroll'));
-      assert.calledOnce(fakeBucketUtil.buildBuckets);
+      assert.calledOnce(fakeBucketUtil.anchorBuckets);
     });
 
     context('when scrollables provided', () => {
@@ -144,11 +141,11 @@ describe('BucketBar', () => {
         bucketBar = createBucketBar({
           scrollables: ['.scrollable-1', '.scrollable-2'],
         });
-        assert.notCalled(fakeBucketUtil.buildBuckets);
+        assert.notCalled(fakeBucketUtil.anchorBuckets);
         scrollableEls[0].dispatchEvent(new Event('scroll'));
-        assert.calledOnce(fakeBucketUtil.buildBuckets);
+        assert.calledOnce(fakeBucketUtil.anchorBuckets);
         scrollableEls[1].dispatchEvent(new Event('scroll'));
-        assert.calledTwice(fakeBucketUtil.buildBuckets);
+        assert.calledTwice(fakeBucketUtil.anchorBuckets);
       });
     });
 
@@ -165,8 +162,10 @@ describe('BucketBar', () => {
       // Create fake anchors and render buckets.
       const anchors = [createAnchor()];
 
-      fakeBucketUtil.buildBuckets.returns([
+      fakeBucketUtil.anchorBuckets.returns([
+        { anchors: [], position: 137 }, // Upper navigation
         { anchors: [anchors[0]], position: 250 },
+        { anchors: [], position: 400 }, // Lower navigation
       ]);
 
       bucketBar.annotator.anchors = anchors;
@@ -256,21 +255,17 @@ describe('BucketBar', () => {
       ];
       // These two anchors are considered to be offscreen upwards
       fakeAbove = [fakeAnchors[0], fakeAnchors[1]];
+      fakeBelow = [fakeAnchors[5]];
       // These buckets are on-screen
       fakeBuckets = [
+        { anchors: fakeAbove, position: 137 },
         { anchors: [fakeAnchors[2], fakeAnchors[3]], position: 350 },
-        { anchors: [], position: 450 }, // This is an empty bucket
         { anchors: [fakeAnchors[4]], position: 550 },
+        { anchors: fakeBelow, position: 600 },
       ];
       // This anchor is offscreen below
-      fakeBelow = [fakeAnchors[5]];
 
-      fakeBucketUtil.constructPositionPoints.returns({
-        above: fakeAbove,
-        below: fakeBelow,
-        points: [],
-      });
-      fakeBucketUtil.buildBuckets.returns(fakeBuckets.slice());
+      fakeBucketUtil.anchorBuckets.returns(fakeBuckets.slice());
     });
 
     describe('navigation bucket tabs', () => {
@@ -302,7 +297,7 @@ describe('BucketBar', () => {
 
         // Resetting this return is necessary to return a fresh array reference
         // on next update
-        fakeBucketUtil.buildBuckets.returns(fakeBuckets.slice());
+        fakeBucketUtil.anchorBuckets.returns(fakeBuckets.slice());
         bucketBar.update();
         assert.equal(bucketBar.tabs.length, bucketBar.buckets.length);
         assert.notExists(bucketBar.element.querySelector('.extraTab'));
@@ -370,12 +365,7 @@ describe('BucketBar', () => {
     });
 
     it('does not display empty bucket tabs', () => {
-      fakeBucketUtil.buildBuckets.returns([]);
-      fakeBucketUtil.constructPositionPoints.returns({
-        above: [],
-        below: [],
-        points: [],
-      });
+      fakeBucketUtil.anchorBuckets.returns([]);
       bucketBar.update();
 
       const allBuckets = bucketBar.element.querySelectorAll(
