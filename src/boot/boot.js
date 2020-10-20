@@ -1,4 +1,4 @@
-import { requiredPolyfillSets } from '../shared/polyfills';
+import { requiredPolyfillSets } from './polyfills';
 
 /**
  * Polyfills used by both the annotator and sidebar app.

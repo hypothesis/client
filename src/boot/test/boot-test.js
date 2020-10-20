@@ -18,7 +18,7 @@ describe('bootstrap', function () {
     };
 
     $imports.$mock({
-      '../shared/polyfills': fakePolyfills,
+      './polyfills': fakePolyfills,
     });
   });
 

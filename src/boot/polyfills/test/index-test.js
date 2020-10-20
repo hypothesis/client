@@ -12,7 +12,7 @@ function stubOut(obj, property, replacement = undefined) {
   };
 }
 
-describe('shared/polyfills/index', () => {
+describe('boot/polyfills/index', () => {
   describe('requiredPolyfillSets', () => {
     let undoStub;
 
