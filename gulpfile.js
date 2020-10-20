@@ -105,16 +105,16 @@ const appBundles = [
 //
 // To add a new polyfill:
 //  - Add the relevant dependencies to the project
-//  - Create an entry point in `src/shared/polyfills/{set}` and a feature
-//    detection function in `src/shared/polyfills/index.js`
+//  - Create an entry point in `src/boot/polyfills/{set}` and a feature
+//    detection function in `src/boot/polyfills/index.js`
 //  - Add the polyfill set name to the required dependencies for the parts of
 //    the client that need it in `src/boot/boot.js`
-const polyfillBundles = readdirSync('./src/shared/polyfills/')
+const polyfillBundles = readdirSync('./src/boot/polyfills/')
   .filter(name => name.endsWith('.js') && name !== 'index.js')
   .map(name => name.replace(/\.js$/, ''))
   .map(set => ({
     name: `polyfills-${set}`,
-    entry: `./src/shared/polyfills/${set}`,
+    entry: `./src/boot/polyfills/${set}`,
     transforms: ['babel'],
   }));
 
