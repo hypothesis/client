@@ -76,12 +76,10 @@ function createSidebarIframe(config) {
   const sidebarAppSrc = config.sidebarAppUrl + '#' + configParam;
 
   const sidebarFrame = document.createElement('iframe');
-  sidebarFrame.setAttribute('name', 'hyp_sidebar_frame');
 
   // Enable media in annotations to be shown fullscreen
   sidebarFrame.setAttribute('allowfullscreen', '');
 
-  sidebarFrame.setAttribute('seamless', '');
   sidebarFrame.src = sidebarAppSrc;
   sidebarFrame.title = 'Hypothesis annotation viewer';
   sidebarFrame.className = 'h-sidebar-iframe';
