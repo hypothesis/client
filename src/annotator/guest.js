@@ -21,7 +21,6 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Anchor} Anchor
  * @typedef {import('../types/api').Target} Target
- * @typedef {import('./toolbar').ToolbarController} ToolbarController
  */
 
 /**
@@ -120,9 +119,6 @@ export default class Guest extends Delegator {
 
     this.visibleHighlights = false;
 
-    /** @type {ToolbarController|null} */
-    this.toolbar = null;
-
     this.adderToolbar = document.createElement('hypothesis-adder');
     this.adderToolbar.style.display = 'none';
     this.element.appendChild(this.adderToolbar);
@@ -151,9 +147,6 @@ export default class Guest extends Delegator {
     });
 
     this.plugins = {};
-
-    /** @typedef {import('./bucket-bar').default|null} */
-    this.bucketBar = null;
 
     /** @type {Anchor[]} */
     this.anchors = [];
@@ -483,10 +476,9 @@ export default class Guest extends Delegator {
       annotation.$orphan = hasAnchorableTargets && !hasAnchoredTargets;
 
       // Add the anchors for this annotation to instance storage.
-      this.anchors = this.anchors.concat(anchors);
+      this._updateAnchors(this.anchors.concat(anchors));
 
       // Let plugins know about the new information.
-      this.bucketBar?.update();
       this.plugins.CrossFrame?.sync([annotation]);
 
       return anchors;
@@ -534,7 +526,6 @@ export default class Guest extends Delegator {
   detach(annotation) {
     const anchors = [];
     let unhighlight = [];
-
     for (let anchor of this.anchors) {
       if (anchor.annotation === annotation) {
         unhighlight.push(...(anchor.highlights ?? []));
@@ -542,11 +533,14 @@ export default class Guest extends Delegator {
         anchors.push(anchor);
       }
     }
-
-    this.anchors = anchors;
-
     removeHighlights(unhighlight);
-    this.bucketBar?.update();
+
+    this._updateAnchors(anchors);
+  }
+
+  _updateAnchors(anchors) {
+    this.anchors = anchors;
+    this.publish('anchorsChanged', [this.anchors]);
   }
 
   /**
@@ -658,9 +652,7 @@ export default class Guest extends Delegator {
     }
 
     this.selectedRanges = [range];
-    if (this.toolbar) {
-      this.toolbar.newAnnotationType = 'annotation';
-    }
+    this.publish('hasSelectionChanged', [true]);
 
     this.adderCtrl.annotationsForSelection = annotationsForSelection();
     this.adderCtrl.show(focusRect, isBackwards);
@@ -669,9 +661,7 @@ export default class Guest extends Delegator {
   _onClearSelection() {
     this.adderCtrl.hide();
     this.selectedRanges = [];
-    if (this.toolbar) {
-      this.toolbar.newAnnotationType = 'note';
-    }
+    this.publish('hasSelectionChanged', [false]);
   }
 
   /**
@@ -707,10 +697,7 @@ export default class Guest extends Delegator {
    */
   setVisibleHighlights(shouldShowHighlights) {
     setHighlightsVisible(this.element, shouldShowHighlights);
-
     this.visibleHighlights = shouldShowHighlights;
-    if (this.toolbar) {
-      this.toolbar.highlightsVisible = shouldShowHighlights;
-    }
+    this.publish('highlightsVisibleChanged', [shouldShowHighlights]);
   }
 }

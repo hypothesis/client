@@ -536,22 +536,24 @@ describe('Guest', () => {
       assert.called(FakeAdder.instance.hide);
     });
 
-    it("sets the toolbar's `newAnnotationType` to 'annotation' if there is a selection", () => {
+    it('emits `hasSelectionChanged` event with argument `true` if selection is non-empty', () => {
       const guest = createGuest();
-      guest.toolbar = {};
+      const callback = sinon.stub();
+      guest.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithText();
 
-      assert.equal(guest.toolbar.newAnnotationType, 'annotation');
+      assert.calledWith(callback, true);
     });
 
-    it("sets the toolbar's `newAnnotationType` to 'note' if the selection is empty", () => {
+    it('emits `hasSelectionChanged` event with argument `false` if selection is empty', () => {
       const guest = createGuest();
-      guest.toolbar = {};
+      const callback = sinon.stub();
+      guest.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithoutText();
 
-      assert.equal(guest.toolbar.newAnnotationType, 'note');
+      assert.calledWith(callback, false);
     });
   });
 
@@ -767,15 +769,24 @@ describe('Guest', () => {
         .then(() => assert.notCalled(htmlAnchoring.anchor));
     });
 
-    it('updates the cross frame and bucket bar plugins', () => {
+    it('updates the cross frame plugin', () => {
       const guest = createGuest();
       guest.plugins.CrossFrame = { sync: sinon.stub() };
-      guest.bucketBar = { update: sinon.stub() };
       const annotation = {};
       return guest.anchor(annotation).then(() => {
-        assert.called(guest.bucketBar.update);
         assert.called(guest.plugins.CrossFrame.sync);
       });
+    });
+
+    it('emits an `anchorsChanged` event', async () => {
+      const guest = createGuest();
+      const annotation = {};
+      const anchorsChanged = sinon.stub();
+      guest.subscribe('anchorsChanged', anchorsChanged);
+
+      await guest.anchor(annotation);
+
+      assert.calledWith(anchorsChanged, guest.anchors);
     });
 
     it('returns a promise of the anchors for the annotation', () => {
@@ -850,15 +861,16 @@ describe('Guest', () => {
       assert.equal(guest.anchors.length, 0);
     });
 
-    it('updates the bucket bar plugin', () => {
+    it('emits an `anchorsChanged` event', () => {
       const guest = createGuest();
-      guest.bucketBar = { update: sinon.stub() };
       const annotation = {};
       guest.anchors.push({ annotation });
+      const anchorsChanged = sinon.stub();
+      guest.subscribe('anchorsChanged', anchorsChanged);
 
       guest.detach(annotation);
 
-      assert.calledOnce(guest.bucketBar.update);
+      assert.calledWith(anchorsChanged, guest.anchors);
     });
 
     it('removes any highlights associated with the annotation', () => {

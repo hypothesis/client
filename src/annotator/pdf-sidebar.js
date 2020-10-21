@@ -1,6 +1,7 @@
 import Sidebar from './sidebar';
 
 /**
+ * @typedef {import('./guest').default} Guest
  * @typedef {import('../types/annotator').HypothesisWindow} HypothesisWindow
  * @typedef {import('./sidebar').LayoutState} LayoutState
  */
@@ -21,9 +22,10 @@ export default class PdfSidebar extends Sidebar {
   /**
    * @param {HTMLElement} element
    * @param {Record<string, any>} config
+   * @param {Guest} guest
    */
-  constructor(element, config) {
-    super(element, { ...defaultConfig, ...config });
+  constructor(element, config, guest) {
+    super(element, { ...defaultConfig, ...config }, guest);
 
     this._lastSidebarLayoutState = {
       expanded: false,
