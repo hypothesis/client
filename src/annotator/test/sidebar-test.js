@@ -1,5 +1,6 @@
 import events from '../../shared/bridge-events';
 
+import Delegator from '../delegator';
 import Sidebar, { MIN_RESIZE } from '../sidebar';
 import { $imports } from '../sidebar';
 
@@ -9,15 +10,15 @@ const EXTERNAL_CONTAINER_SELECTOR = 'test-external-container';
 
 describe('Sidebar', () => {
   const sandbox = sinon.createSandbox();
-  let CrossFrame;
   let fakeCrossFrame;
-  const sidebarConfig = { pluginClasses: {} };
+  let fakeGuest;
 
   // Containers and Sidebar instances created by current test.
   let containers;
   let sidebars;
 
   let FakeToolbarController;
+  let fakeBucketBar;
   let fakeToolbar;
 
   before(() => {
@@ -34,14 +35,13 @@ describe('Sidebar', () => {
         // Dummy sidebar app.
         sidebarAppUrl: '/base/annotator/test/empty.html',
       },
-      sidebarConfig,
       config
     );
     const container = document.createElement('div');
     document.body.appendChild(container);
     containers.push(container);
 
-    const sidebar = new Sidebar(container, config);
+    const sidebar = new Sidebar(container, config, fakeGuest);
     sidebars.push(sidebar);
 
     return sidebar;
@@ -62,11 +62,22 @@ describe('Sidebar', () => {
   beforeEach(() => {
     sidebars = [];
     containers = [];
-    fakeCrossFrame = {};
-    fakeCrossFrame.onConnect = sandbox.stub().returns(fakeCrossFrame);
-    fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame);
-    fakeCrossFrame.call = sandbox.spy();
-    fakeCrossFrame.destroy = sandbox.stub();
+    fakeCrossFrame = {
+      on: sandbox.stub(),
+      call: sandbox.stub(),
+    };
+
+    class FakeGuest extends Delegator {
+      constructor() {
+        const element = document.createElement('div');
+        super(element, {});
+
+        this.createAnnotation = sinon.stub();
+        this.crossframe = fakeCrossFrame;
+        this.setVisibleHighlights = sinon.stub();
+      }
+    }
+    fakeGuest = new FakeGuest();
 
     fakeToolbar = {
       getWidth: sinon.stub().returns(100),
@@ -78,16 +89,11 @@ describe('Sidebar', () => {
     };
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 
-    const fakeBucketBar = {};
-    fakeBucketBar.element = document.createElement('div');
-    fakeBucketBar.destroy = sandbox.stub();
-    const BucketBar = sandbox.stub();
-    BucketBar.returns(fakeBucketBar);
-
-    CrossFrame = sandbox.stub();
-    CrossFrame.returns(fakeCrossFrame);
-
-    sidebarConfig.pluginClasses.CrossFrame = CrossFrame;
+    fakeBucketBar = {
+      destroy: sinon.stub(),
+      update: sinon.stub(),
+    };
+    const BucketBar = sandbox.stub().returns(fakeBucketBar);
 
     sidebars = [];
 
@@ -218,11 +224,30 @@ describe('Sidebar', () => {
 
     it('creates an annotation when toolbar button is clicked', () => {
       const sidebar = createSidebar();
-      sinon.stub(sidebar, 'createAnnotation');
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.called(sidebar.createAnnotation);
+      assert.called(sidebar.guest.createAnnotation);
+    });
+
+    it('sets create annotation button to "Annotation" when selection becomes non-empty', () => {
+      const sidebar = createSidebar();
+
+      // nb. This event is normally published by the Guest, but the sidebar
+      // doesn't care about that.
+      sidebar.publish('hasSelectionChanged', [true]);
+
+      assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
+    });
+
+    it('sets create annotation button to "Page Note" when selection becomes empty', () => {
+      const sidebar = createSidebar();
+
+      // nb. This event is normally published by the Guest, but the sidebar
+      // doesn't care about that.
+      sidebar.publish('hasSelectionChanged', [false]);
+
+      assert.equal(sidebar.toolbar.newAnnotationType, 'note');
     });
   });
 
@@ -495,30 +520,35 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('destruction', () => {
-    it('the sidebar is destroyed and the frame is detached', () => {
+  describe('#destroy', () => {
+    it('removes sidebar DOM elements', () => {
       const sidebar = createSidebar();
       const sidebarContainer = containers[0];
+
       sidebar.destroy();
-      assert.called(fakeCrossFrame.destroy);
+
       assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
       assert.equal(sidebar.iframeContainer.parentElement, null);
+    });
+
+    it('cleans up bucket bar', () => {
+      const sidebar = createSidebar();
+      sidebar.destroy();
+      assert.called(sidebar.bucketBar.destroy);
     });
   });
 
   describe('#show', () => {
     it('shows highlights if "showHighlights" is set to "whenSidebarOpen"', () => {
       const sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' });
-      assert.isFalse(sidebar.visibleHighlights);
       sidebar.show();
-      assert.isTrue(sidebar.visibleHighlights);
+      assert.calledWith(sidebar.guest.setVisibleHighlights, true);
     });
 
     it('does not show highlights otherwise', () => {
       const sidebar = createSidebar({ showHighlights: 'never' });
-      assert.isFalse(sidebar.visibleHighlights);
       sidebar.show();
-      assert.isFalse(sidebar.visibleHighlights);
+      assert.notCalled(sidebar.guest.setVisibleHighlights);
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -535,7 +565,7 @@ describe('Sidebar', () => {
       sidebar.show();
       sidebar.hide();
 
-      assert.isFalse(sidebar.visibleHighlights);
+      assert.calledWith(sidebar.guest.setVisibleHighlights, false);
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -794,22 +824,30 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('config', () => {
-    it('does have the BucketBar', () => {
+  describe('bucket bar state', () => {
+    it('displays the bucket bar by default', () => {
       const sidebar = createSidebar();
       assert.isNotNull(sidebar.bucketBar);
     });
 
-    it('does not have the BucketBar if the clean theme is enabled', () => {
+    it('does not display the bucket bar if using the "clean" theme', () => {
       const sidebar = createSidebar({ theme: 'clean' });
       assert.isNull(sidebar.bucketBar);
     });
 
-    it('does not have the BucketBar if an external container is provided', () => {
+    it('does not display the bucket bar if using an external container for the sidebar', () => {
       const sidebar = createSidebar({
         externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
       assert.isNull(sidebar.bucketBar);
+    });
+
+    it('updates the bucket bar when an `anchorsChanged` event is received', () => {
+      const sidebar = createSidebar();
+
+      fakeGuest.publish('anchorsChanged');
+
+      assert.calledOnce(sidebar.bucketBar.update);
     });
   });
 });

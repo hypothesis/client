@@ -1,25 +1,35 @@
 import PdfSidebar from '../pdf-sidebar';
-import { $imports } from '../pdf-sidebar';
+import Delegator from '../delegator';
+
+import { mockBaseClass } from '../../test-util/mock-base';
+
+class FakeSidebar extends Delegator {
+  constructor(element, config, guest) {
+    super(element, config);
+    this.guest = guest;
+  }
+
+  _registerEvent(target, event, callback) {
+    target.addEventListener(event, callback);
+  }
+}
 
 describe('PdfSidebar', () => {
   const sandbox = sinon.createSandbox();
-  let CrossFrame;
-  let fakeCrossFrame;
 
   let fakePDFViewerApplication;
   let fakePDFContainer;
   let fakePDFViewerUpdate;
-  const sidebarConfig = { pluginClasses: {} };
 
   const createPdfSidebar = config => {
-    config = { ...sidebarConfig, ...config };
-
+    const fakeGuest = {};
     const element = document.createElement('div');
-    return new PdfSidebar(element, config);
+    return new PdfSidebar(element, config, fakeGuest);
   };
 
+  let unmockSidebar;
+
   beforeEach(() => {
-    sandbox.stub(PdfSidebar.prototype, '_setupGestures');
     fakePDFContainer = document.createElement('div');
     fakePDFViewerUpdate = sinon.stub();
 
@@ -36,31 +46,13 @@ describe('PdfSidebar', () => {
     // Can't stub an undefined property in a sandbox
     window.PDFViewerApplication = fakePDFViewerApplication;
 
-    // From `Sidebar.js` tests
-    fakeCrossFrame = {};
-    fakeCrossFrame.onConnect = sandbox.stub().returns(fakeCrossFrame);
-    fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame);
-    fakeCrossFrame.call = sandbox.spy();
-    fakeCrossFrame.destroy = sandbox.stub();
-
-    const fakeBucketBar = {};
-    fakeBucketBar.element = document.createElement('div');
-    fakeBucketBar.destroy = sandbox.stub();
-
-    CrossFrame = sandbox.stub();
-    CrossFrame.returns(fakeCrossFrame);
-
-    const BucketBar = sandbox.stub();
-    BucketBar.returns(fakeBucketBar);
-
-    sidebarConfig.pluginClasses.CrossFrame = CrossFrame;
-    sidebarConfig.pluginClasses.BucketBar = BucketBar;
+    unmockSidebar = mockBaseClass(PdfSidebar, FakeSidebar);
   });
 
   afterEach(() => {
     delete window.PDFViewerApplication;
     sandbox.restore();
-    $imports.$restore();
+    unmockSidebar();
   });
 
   context('side-by-side mode configured', () => {
