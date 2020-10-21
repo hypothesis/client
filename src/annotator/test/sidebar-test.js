@@ -27,11 +27,15 @@ describe('Sidebar', () => {
     window.requestAnimationFrame.restore();
   });
 
-  const createSidebar = config => {
-    if (!config) {
-      config = {};
-    }
-    config = Object.assign({}, sidebarConfig, config);
+  const createSidebar = (config = {}) => {
+    config = Object.assign(
+      {
+        // Dummy sidebar app.
+        sidebarAppUrl: '/base/annotator/test/empty.html',
+      },
+      sidebarConfig,
+      config
+    );
     const element = document.createElement('div');
     const sidebar = new Sidebar(element, config);
 
@@ -91,6 +95,81 @@ describe('Sidebar', () => {
     sidebars.forEach(s => s.destroy());
     sandbox.restore();
     $imports.$restore();
+  });
+
+  describe('sidebar container frame', () => {
+    it('starts hidden', () => {
+      const sidebar = createSidebar();
+      assert.equal(sidebar.frame.style.display, 'none');
+    });
+
+    it('has a shadow if the clean theme is enabled', () => {
+      const sidebar = createSidebar({ theme: 'clean' });
+      assert.isTrue(
+        sidebar.frame.classList.contains('annotator-frame--drop-shadow-enabled')
+      );
+    });
+
+    it('becomes visible when the "panelReady" event fires', () => {
+      const sidebar = createSidebar();
+      sidebar.publish('panelReady');
+      assert.equal(sidebar.frame.style.display, '');
+    });
+  });
+
+  function getConfigString(sidebar) {
+    return sidebar.frame.querySelector('iframe').src;
+  }
+
+  function configFragment(config) {
+    return '#config=' + encodeURIComponent(JSON.stringify(config));
+  }
+
+  it('creates sidebar iframe and passes configuration to it', () => {
+    const appURL = new URL(
+      '/base/annotator/test/empty.html',
+      window.location.href
+    );
+    const sidebar = createSidebar({ annotations: '1234' });
+    assert.equal(
+      getConfigString(sidebar),
+      appURL + configFragment({ annotations: '1234' })
+    );
+  });
+
+  context('when a new annotation is created', () => {
+    function stubIframeWindow(sidebar) {
+      const iframe = sidebar.frame.querySelector('iframe');
+      const fakeIframeWindow = { focus: sinon.stub() };
+      sinon.stub(iframe, 'contentWindow').get(() => fakeIframeWindow);
+      return iframe;
+    }
+
+    it('focuses the sidebar if the annotation is not a highlight', () => {
+      const sidebar = createSidebar();
+      const iframe = stubIframeWindow(sidebar);
+
+      sidebar.publish('beforeAnnotationCreated', [
+        {
+          $highlight: false,
+        },
+      ]);
+
+      assert.called(iframe.contentWindow.focus);
+    });
+
+    it('does not focus the sidebar if the annotation is a highlight', () => {
+      const sidebar = createSidebar();
+      const iframe = stubIframeWindow(sidebar);
+
+      sidebar.publish('beforeAnnotationCreated', [
+        {
+          $highlight: true,
+        },
+      ]);
+
+      assert.notCalled(iframe.contentWindow.focus);
+    });
   });
 
   describe('toolbar buttons', () => {
