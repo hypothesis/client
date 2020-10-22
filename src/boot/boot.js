@@ -10,9 +10,7 @@ const commonPolyfills = [
   'es2017',
   'es2018',
 
-  // DOM APIs. These may rely on certain ES APIs so they should be loaded after
-  // the above polyfills.
-  'url',
+  // Any other polyfills which may rely on certain ES APIs should be listed here.
 ];
 
 /**
@@ -127,11 +125,7 @@ function bootHypothesisClient(doc, config) {
  * @param {Config} config
  */
 function bootSidebarApp(doc, config) {
-  const polyfills = polyfillBundles([
-    ...commonPolyfills,
-    'string.prototype.normalize',
-    'fetch',
-  ]);
+  const polyfills = polyfillBundles(commonPolyfills);
 
   injectAssets(doc, config, [
     ...polyfills,
