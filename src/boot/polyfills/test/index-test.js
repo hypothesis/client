@@ -44,24 +44,6 @@ describe('boot/polyfills/index', () => {
         set: 'es2018',
         providesMethod: [window, 'Promise'],
       },
-      {
-        set: 'string.prototype.normalize',
-        providesMethod: [String.prototype, 'normalize'],
-      },
-      {
-        // Missing URL constructor.
-        set: 'url',
-        providesMethod: [window, 'URL'],
-      },
-      {
-        // Broken URL constructor.
-        set: 'url',
-        providesMethod: [window, 'URL', () => {}],
-      },
-      {
-        set: 'fetch',
-        providesMethod: [window, 'fetch'],
-      },
     ].forEach(({ set, providesMethod }) => {
       it(`includes "${set}" if required`, () => {
         const [obj, method, replacement] = providesMethod;

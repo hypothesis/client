@@ -62,32 +62,6 @@ const needsPolyfill = {
       typeof Promise !== 'function' || !hasMethods(Promise.prototype, 'finally')
     );
   },
-
-  // Test for a fully-working URL constructor.
-  url: () => {
-    try {
-      // Some browsers do not have a URL constructor at all.
-      const url = new window.URL('https://hypothes.is');
-
-      // Other browsers have a broken URL constructor.
-      if (url.hostname !== 'hypothes.is') {
-        throw new Error('Broken URL constructor');
-      }
-      return false;
-    } catch (e) {
-      return true;
-    }
-  },
-
-  // Test for Unicode normalization. This depends on a large polyfill so it
-  // is separated out into its own bundle.
-  'string.prototype.normalize': () => {
-    return !hasMethods(String.prototype, 'normalize');
-  },
-
-  fetch: () => {
-    return typeof window.fetch !== 'function';
-  },
 };
 
 /**
