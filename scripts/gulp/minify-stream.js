@@ -31,7 +31,10 @@ function minifyStream() {
       const code = Buffer.concat(this.chunks).toString();
 
       // See https://github.com/terser/terser#minify-options-structure
-      const options = {};
+      const options = {
+        // See https://github.com/hypothesis/client/issues/2664.
+        safari10: true,
+      };
 
       // If the code we're minifying has a sourcemap then generate one for the
       // minified output, otherwise skip it.
