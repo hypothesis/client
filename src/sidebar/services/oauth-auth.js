@@ -24,6 +24,8 @@ import { resolve } from '../util/url';
  *
  * Interaction with OAuth endpoints in the annotation service is delegated to
  * the `OAuthClient` class.
+ *
+ * @ngInject
  */
 export default function auth(
   $window,
@@ -307,14 +309,3 @@ export default function auth(
     tokenGetter,
   });
 }
-
-// `$inject` is added manually rather than using `@ngInject` to work around
-// a conflict between the transform-async-to-promises and angularjs-annotate
-// Babel plugins.
-auth.$inject = [
-  '$window',
-  'apiRoutes',
-  'localStorage',
-  'settings',
-  'toastMessenger',
-];
