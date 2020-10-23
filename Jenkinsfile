@@ -155,6 +155,8 @@ stage('Publish') {
     node {
         checkout scm
 
+        workspace = pwd()
+
         echo "Publishing ${pkgName} v${newPkgVersion} from ${releaseFromBranch} branch."
         postSlack 'good', "Starting prod deployment of v${newPkgVersion} (${lastCommitHash})"
 
