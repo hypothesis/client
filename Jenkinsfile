@@ -189,11 +189,8 @@ stage('Publish') {
                     """
                     sh "scripts/create-github-release.js"
 
-                    // Publish the updated package to the npm registry.
-                    // Use `npm` rather than `yarn` for publishing.
-                    // See https://github.com/yarnpkg/yarn/pull/3391.
                     sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
-                    sh "npm publish --tag ${npmTag}"
+                    sh "yarn publish --no-interactive --tag ${npmTag} --new-version=${newPkgVersion}"
                     sh "scripts/wait-for-npm-release.sh ${npmTag}"
 
                     // Deploy the client to cdn.hypothes.is, where the embedded
