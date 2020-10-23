@@ -10,7 +10,6 @@ RUN apk update && apk add --no-cache \
   git \
   make \
   nodejs \
-  npm \
   yarn
 
 # Do not download a Chrome build as part of installing the "puppeteer" package,
