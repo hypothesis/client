@@ -134,17 +134,6 @@ describe('SelectionTabs', function () {
       assert.equal(tabs.at(1).prop('title'), 'Page notes');
     });
 
-    it('should show the clean theme when settings contains the clean theme option', function () {
-      fakeSettings.theme = 'clean';
-      const wrapper = createComponent();
-      assert.isTrue(wrapper.exists('.selection-tabs--theme-clean'));
-    });
-
-    it('should not show the clean theme when settings does not contain the clean theme option', function () {
-      const wrapper = createComponent();
-      assert.isFalse(wrapper.exists('.selection-tabs--theme-clean'));
-    });
-
     it('should not display the new-note-btn when the annotations tab is active', function () {
       const wrapper = createComponent();
       assert.equal(wrapper.find('NewNoteButton').length, 0);

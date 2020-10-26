@@ -110,6 +110,10 @@ $icon-size--small: 12px;
 $icon-size--medium: 16px;
 $icon-size--large: 24px;
 
+// Selectors for applying clean-theme styling
+$annotator--theme-clean: '.annotator-frame--theme-clean';
+$sidebar--theme-clean: '.theme-clean';
+
 // Annotator-specific values
 // -----------------------------------
 $annotator-bucket-bar-width: 22px;

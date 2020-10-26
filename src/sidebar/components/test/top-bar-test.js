@@ -249,12 +249,6 @@ describe('TopBar', () => {
     assert.ok(searchInput.exists());
   });
 
-  it('shows the clean theme when settings contains the clean theme option', () => {
-    fakeSettings.theme = 'clean';
-    const wrapper = createTopBar();
-    assert.isTrue(wrapper.exists('.top-bar--theme-clean'));
-  });
-
   context('in the stream and single annotation pages', () => {
     it('does not render the group list, sort menu or share menu', () => {
       const wrapper = createTopBar({ isSidebar: false });

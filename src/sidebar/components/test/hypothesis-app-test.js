@@ -429,14 +429,34 @@ describe('HypothesisApp', () => {
     });
   });
 
-  it('applies theme config', () => {
-    const style = { backgroundColor: 'red' };
-    fakeApplyTheme.returns({ backgroundColor: 'red' });
+  describe('theming', () => {
+    it('applies theme config', () => {
+      const style = { backgroundColor: 'red' };
+      fakeApplyTheme.returns({ backgroundColor: 'red' });
+
+      const wrapper = createComponent();
+      const background = wrapper.find('.hypothesis-app');
+
+      assert.calledWith(fakeApplyTheme, ['appBackgroundColor'], fakeSettings);
+      assert.deepEqual(background.prop('style'), style);
+    });
+  });
+
+  it('applies a clean-theme style when config sets theme to "clean"', () => {
+    fakeSettings.theme = 'clean';
 
     const wrapper = createComponent();
-    const background = wrapper.find('.hypothesis-app');
+    const container = wrapper.find('.hypothesis-app');
 
-    assert.calledWith(fakeApplyTheme, ['appBackgroundColor'], fakeSettings);
-    assert.deepEqual(background.prop('style'), style);
+    assert.isTrue(container.hasClass('theme-clean'));
+  });
+
+  it('does not apply clean-theme style when config does not assert `clean` theme', () => {
+    fakeSettings.theme = '';
+
+    const wrapper = createComponent();
+    const container = wrapper.find('.hypothesis-app');
+
+    assert.isFalse(container.hasClass('hypothesis-app--theme-clean'));
   });
 });

@@ -56,10 +56,6 @@
   }
 }
 
-.top-bar--theme-clean {
-  border-bottom: none;
-}
-
 .top-bar__login-button {
   @include buttons.button;
   @include utils.font--large;
@@ -104,4 +100,9 @@
   justify-self: flex-start;
   margin-right: auto;
   white-space: nowrap;
+}
+
+/** Clean theme affordances */
+#{var.$sidebar--theme-clean} .top-bar {
+  border-bottom: none;
 }

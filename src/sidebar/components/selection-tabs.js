@@ -104,8 +104,6 @@ function SelectionTabs({ isLoading, settings }) {
     selectTab: store.selectTab,
   }));
 
-  const isThemeClean = settings.theme === 'clean';
-
   const selectTab = tabId => {
     store.clearSelection();
     store.selectTab(tabId);
@@ -121,12 +119,7 @@ function SelectionTabs({ isLoading, settings }) {
 
   return (
     <div className="selection-tabs-container">
-      <div
-        className={classnames('selection-tabs', {
-          'selection-tabs--theme-clean': isThemeClean,
-        })}
-        role="tablist"
-      >
+      <div className="selection-tabs" role="tablist">
         <Tab
           count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}

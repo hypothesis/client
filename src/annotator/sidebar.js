@@ -116,7 +116,7 @@ export default class Sidebar extends Guest {
       frame.className = 'annotator-frame annotator-outer';
 
       if (config.theme === 'clean') {
-        frame.classList.add('annotator-frame--drop-shadow-enabled');
+        frame.classList.add('annotator-frame--theme-clean');
       }
 
       element.appendChild(frame);

@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import { Fragment, createElement } from 'preact';
 import propTypes from 'prop-types';
 
@@ -49,7 +48,6 @@ function TopBar({
   settings,
   streamer,
 }) {
-  const useCleanTheme = settings.theme === 'clean';
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
@@ -112,9 +110,7 @@ function TopBar({
   );
 
   return (
-    <div
-      className={classnames('top-bar', useCleanTheme && 'top-bar--theme-clean')}
-    >
+    <div className="top-bar">
       {/* Single-annotation and stream views. */}
       {!isSidebar && (
         <div className="top-bar__inner content">

@@ -103,10 +103,10 @@ describe('Sidebar', () => {
       assert.equal(sidebar.frame.style.display, 'none');
     });
 
-    it('has a shadow if the clean theme is enabled', () => {
+    it('applies a style if theme is configured as "clean"', () => {
       const sidebar = createSidebar({ theme: 'clean' });
       assert.isTrue(
-        sidebar.frame.classList.contains('annotator-frame--drop-shadow-enabled')
+        sidebar.frame.classList.contains('annotator-frame--theme-clean')
       );
     });
 
