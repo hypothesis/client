@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { createElement } from 'preact';
 import { useEffect, useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -98,6 +99,7 @@ function HypothesisApp({
     () => applyTheme(['appBackgroundColor'], settings),
     [settings]
   );
+  const isThemeClean = settings.theme === 'clean';
 
   const isSidebar = route === 'sidebar';
 
@@ -170,7 +172,9 @@ function HypothesisApp({
 
   return (
     <div
-      className="hypothesis-app js-thread-list-scroll-root"
+      className={classnames('hypothesis-app', 'js-thread-list-scroll-root', {
+        'theme-clean': isThemeClean,
+      })}
       style={backgroundStyle}
     >
       <TopBar

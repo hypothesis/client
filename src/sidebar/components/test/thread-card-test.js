@@ -15,12 +15,7 @@ describe('ThreadCard', () => {
 
   function createComponent(props) {
     return mount(
-      <ThreadCard
-        frameSync={fakeFrameSync}
-        settings={{}}
-        thread={fakeThread}
-        {...props}
-      />
+      <ThreadCard frameSync={fakeFrameSync} thread={fakeThread} {...props} />
     );
   }
 
@@ -62,12 +57,6 @@ describe('ThreadCard', () => {
     const wrapper = createComponent();
 
     assert(wrapper.find('.thread-card').hasClass('is-focused'));
-  });
-
-  it('applies a CSS class if settings indicate a `clean` theme', () => {
-    const wrapper = createComponent({ settings: { theme: 'clean' } });
-
-    assert(wrapper.find('.thread-card').hasClass('thread-card--theme-clean'));
   });
 
   it('shows document info if current route is not sidebar', () => {

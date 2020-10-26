@@ -30,7 +30,8 @@
     @include utils.shadow--active;
   }
 
-  &--theme-clean {
+  /** Clean theme affordances */
+  #{var.$sidebar--theme-clean} & {
     // Give a little more space so that the border appears centered
     // between cards
     padding-bottom: 1.5em;

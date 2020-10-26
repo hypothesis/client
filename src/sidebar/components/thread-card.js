@@ -17,7 +17,6 @@ import Thread from './thread';
  * @typedef ThreadCardProps
  * @prop {Thread} thread
  * @prop {Object} frameSync - Injected service
- * @prop {MergedConfig} settings - Injected service
  */
 
 /**
@@ -26,7 +25,7 @@ import Thread from './thread';
  *
  * @param {ThreadCardProps} props
  */
-function ThreadCard({ frameSync, settings, thread }) {
+function ThreadCard({ frameSync, thread }) {
   const threadTag = thread.annotation && thread.annotation.$tag;
   const isFocused = useStore(store => store.isAnnotationFocused(threadTag));
   const showDocumentInfo = useStore(store => store.route() !== 'sidebar');
@@ -71,7 +70,6 @@ function ThreadCard({ frameSync, settings, thread }) {
       key={thread.id}
       className={classnames('thread-card', {
         'is-focused': isFocused,
-        'thread-card--theme-clean': settings.theme === 'clean',
       })}
     >
       <Thread thread={thread} showDocumentInfo={showDocumentInfo} />
@@ -82,9 +80,8 @@ function ThreadCard({ frameSync, settings, thread }) {
 ThreadCard.propTypes = {
   thread: propTypes.object.isRequired,
   frameSync: propTypes.object.isRequired,
-  settings: propTypes.object,
 };
 
-ThreadCard.injectedProps = ['frameSync', 'settings'];
+ThreadCard.injectedProps = ['frameSync'];
 
 export default withServices(ThreadCard);

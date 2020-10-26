@@ -24,10 +24,6 @@
   margin: 0 var.$layout-space--xxsmall;
 }
 
-.selection-tabs--theme-clean {
-  margin-left: 15px;
-}
-
 .selection-tabs__type {
   @include buttons.reset-native-btn-styles;
   @include focus.outline-on-keyboard-focus;
@@ -68,4 +64,9 @@
   color: var.$color-text;
   padding: 2em;
   text-align: center;
+}
+
+/** Clean theme affordances */
+#{var.$sidebar--theme-clean} .selection-tabs {
+  margin-left: 15px;
 }
