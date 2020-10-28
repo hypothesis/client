@@ -14,7 +14,7 @@ import {
   setHighlightsVisible,
 } from './highlighter';
 import * as rangeUtil from './range-util';
-import selections from './selections';
+import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
 
 /**
@@ -121,14 +121,13 @@ export default class Guest extends Delegator {
         this.selectAnnotations(anns);
       },
     });
-    this.selections = selections(document).subscribe({
-      next: range => {
-        if (range) {
-          this._onSelection(range);
-        } else {
-          this._onClearSelection();
-        }
-      },
+
+    this.selectionObserver = new SelectionObserver(range => {
+      if (range) {
+        this._onSelection(range);
+      } else {
+        this._onClearSelection();
+      }
     });
 
     this.plugins = {};
@@ -329,7 +328,8 @@ export default class Guest extends Delegator {
 
   destroy() {
     this._removeElementEvents();
-    this.selections.unsubscribe();
+
+    this.selectionObserver.disconnect();
     this.adderToolbar.remove();
 
     removeAllHighlights(this.element);
