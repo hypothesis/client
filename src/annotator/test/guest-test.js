@@ -1,4 +1,3 @@
-import { Observable } from '../util/observable';
 import Delegator from '../delegator';
 import Guest from '../guest';
 import { $imports } from '../guest';
@@ -37,7 +36,7 @@ describe('Guest', () => {
   let guestConfig;
   let htmlAnchoring;
   let rangeUtil;
-  let selections;
+  let notifySelectionChanged;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -62,7 +61,7 @@ describe('Guest', () => {
       isSelectionBackwards: sinon.stub(),
       selectionFocusRect: sinon.stub(),
     };
-    selections = null;
+    notifySelectionChanged = null;
 
     sinon.stub(window, 'requestAnimationFrame').yields();
 
@@ -74,6 +73,13 @@ describe('Guest', () => {
       destroy: sinon.stub(),
     };
 
+    class FakeSelectionObserver {
+      constructor(callback) {
+        notifySelectionChanged = callback;
+        this.disconnect = sinon.stub();
+      }
+    }
+
     CrossFrame = sandbox.stub().returns(fakeCrossFrame);
     guestConfig.pluginClasses.CrossFrame = CrossFrame;
 
@@ -82,11 +88,8 @@ describe('Guest', () => {
       './anchoring/html': htmlAnchoring,
       './highlighter': highlighter,
       './range-util': rangeUtil,
-      './selections': () => {
-        return new Observable(function (obs) {
-          selections = obs;
-          return () => {};
-        });
+      './selection-observer': {
+        SelectionObserver: FakeSelectionObserver,
       },
       './delegator': Delegator,
       'scroll-into-view': scrollIntoView,
@@ -451,12 +454,12 @@ describe('Guest', () => {
         width: 5,
         height: 5,
       });
-      return selections.next({});
+      notifySelectionChanged({});
     };
 
     const simulateSelectionWithoutText = () => {
       rangeUtil.selectionFocusRect.returns(null);
-      return selections.next({});
+      notifySelectionChanged({});
     };
 
     it('shows the adder if the selection contains text', () => {
@@ -488,7 +491,7 @@ describe('Guest', () => {
 
     it('hides the adder if the selection is empty', () => {
       createGuest();
-      selections.next(null);
+      notifySelectionChanged(null);
       assert.called(FakeAdder.instance.hide);
     });
 
