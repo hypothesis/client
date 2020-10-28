@@ -1,3 +1,4 @@
+@use "../mixins/buttons";
 @use "../mixins/reset";
 @use "../mixins/utils";
 @use "../variables" as var;
@@ -20,126 +21,31 @@
     background: rgba(0, 0, 0, 0.08);
   }
 
-  .annotator-bucket-indicator {
-    box-sizing: border-box;
-    background: var.$white;
-    border: solid 1px var.$grey-3;
-    border-radius: 2px 4px 4px 2px;
-    right: 0;
-    pointer-events: all;
+  .buckets,
+  .bucket {
     position: absolute;
-    line-height: 1;
-    height: 16px;
-    width: 26px;
-    -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-    text-align: center;
-    cursor: pointer;
-    // Vertically center the element, which is 16px high
+    right: 0;
+  }
+
+  .bucket-button {
+    // Need pointer events again. Necessary because of `pointer-events` rule
+    // in `.annotator-bucket-bar`
+    pointer-events: all;
+  }
+
+  .bucket-button--left {
+    // Center the indicator vertically (the element is 16px tall)
     margin-top: -8px;
+    @include buttons.indicator--left;
+  }
 
-    .label {
-      @include reset.reset-box-model;
-      @include reset.reset-font;
-      background: none;
-      color: var.$color-text--light;
-      font-weight: bold;
-      font-family: var.$sans-font-family;
-      font-size: var.$annotator-bucket-bar-font-size;
-      line-height: var.$annotator-bucket-bar-line-height;
-      margin: 0 auto;
-    }
+  .bucket-button--up {
+    @include buttons.indicator--up;
+    // Vertically center the element (which is 22px high)
+    margin-top: -11px;
+  }
 
-    &:before,
-    &:after {
-      content: '';
-      right: 100%;
-      top: 50%;
-      position: absolute;
-      // NB: use of 'inset' here fixes jagged diagonals in FF
-      // https://github.com/zurb/foundation/issues/2230
-      border: inset transparent;
-      height: 0;
-      width: 0;
-    }
-
-    &:before {
-      border-width: 8px;
-      border-right: 5px solid var.$grey-3;
-      margin-top: -8px;
-    }
-
-    &:after {
-      border-width: 7px;
-      border-right: 4px solid var.$white;
-      margin-top: -7px;
-    }
-
-    &.lower,
-    &.upper {
-      @include utils.shadow;
-      z-index: 1;
-
-      &:before,
-      &:after {
-        left: 50%;
-        bottom: 100%;
-        right: auto;
-        border-right: solid transparent;
-        margin-top: 0;
-      }
-      & .label {
-        // Vertical alignment tweak to better center the label in the indicator
-        margin-top: -1px;
-      }
-    }
-
-    &.upper {
-      border-radius: 2px 2px 4px 4px;
-      // Vertically center the element (which is 22px high) by adding a negative
-      // top margin in conjunction with an inline style `top` position (set
-      // in code)
-      margin-top: -11px;
-
-      &:before,
-      &:after {
-        top: auto;
-        bottom: 100%;
-      }
-
-      &:before {
-        border-width: 13px;
-        border-bottom: 6px solid var.$grey-3;
-        margin-left: -13px;
-      }
-
-      &:after {
-        border-width: 12px;
-        border-bottom: 5px solid var.$white;
-        margin-left: -12px;
-      }
-    }
-
-    &.lower {
-      margin-top: 0;
-      border-radius: 4px 4px 2px 2px;
-
-      &:before,
-      &:after {
-        bottom: auto;
-        top: 100%;
-      }
-
-      &:before {
-        border-width: 13px;
-        border-top: 6px solid var.$grey-3;
-        margin-left: -13px;
-      }
-
-      &:after {
-        border-width: 12px;
-        border-top: 5px solid var.$white;
-        margin-left: -12px;
-      }
-    }
+  .bucket-button--down {
+    @include buttons.indicator--down;
   }
 }
