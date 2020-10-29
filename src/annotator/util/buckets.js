@@ -12,6 +12,15 @@ import { getBoundingClientRect } from '../highlighter';
  */
 
 /**
+ * @typedef BucketSet
+ * @prop {Bucket} above - A single bucket containing all of the anchors that
+ *                        are offscreen upwards
+ * @prop {Bucket} below - A single bucket containing all of the anchors that are
+ *                        offscreen downwards
+ * @prop {Bucket[]} buckets - On-screen buckets
+ */
+
+/**
  * @typedef WorkingBucket
  * @prop {Anchor[]} anchors - The anchors in this bucket
  * @prop {number} position - The computed position (offset) for this bucket,
@@ -131,7 +140,7 @@ function getAnchorPositions(anchors) {
  * Compute buckets
  *
  * @param {Anchor[]} anchors
- * @return {Bucket[]}
+ * @return {BucketSet}
  */
 export function anchorBuckets(anchors) {
   const anchorPositions = getAnchorPositions(anchors);
@@ -214,15 +223,20 @@ export function anchorBuckets(anchors) {
   }
 
   // Add an upper "navigation" bucket with offscreen-above anchors
-  buckets.unshift({
+  const above = {
     anchors: Array.from(aboveScreen),
     position: BUCKET_TOP_THRESHOLD,
-  });
+  };
 
   // Add a lower "navigation" bucket with offscreen-below anchors
-  buckets.push({
+  const below = {
     anchors: Array.from(belowScreen),
     position: window.innerHeight - BUCKET_BOTTOM_THRESHOLD,
-  });
-  return buckets;
+  };
+
+  return {
+    above,
+    below,
+    buckets,
+  };
 }

@@ -1,38 +1,12 @@
 import BucketBar from '../bucket-bar';
 import { $imports } from '../bucket-bar';
 
-// Return DOM elements for non-empty bucket indicators in a `BucketBar`
-// (i.e. bucket tab elements containing 1 or more anchors)
-const nonEmptyBuckets = function (bucketBar) {
-  const buckets = bucketBar.element.querySelectorAll(
-    '.annotator-bucket-indicator'
-  );
-  return Array.from(buckets).filter(bucket => {
-    const label = bucket.querySelector('.label');
-    return !!label;
-  });
-};
-
-const createMouseEvent = function (type, { ctrlKey, metaKey } = {}) {
-  return new MouseEvent(type, { ctrlKey, metaKey });
-};
-
-// Create a fake anchor, which is a combination of annotation object and
-// associated highlight elements.
-const createAnchor = () => {
-  return {
-    annotation: { $tag: 'ann1' },
-    highlights: [document.createElement('span')],
-  };
-};
-
 describe('BucketBar', () => {
   const sandbox = sinon.createSandbox();
   let fakeAnnotator;
   let fakeBucketUtil;
-  let fakeHighlighter;
-  let fakeScrollIntoView;
   let bucketBar;
+  let bucketProps;
 
   const createBucketBar = function (options) {
     const element = document.createElement('div');
@@ -40,25 +14,23 @@ describe('BucketBar', () => {
   };
 
   beforeEach(() => {
+    bucketProps = {};
     fakeAnnotator = {
       anchors: [],
       selectAnnotations: sinon.stub(),
     };
 
     fakeBucketUtil = {
-      anchorBuckets: sinon.stub().returns([]),
-      findClosestOffscreenAnchor: sinon.stub(),
+      anchorBuckets: sinon.stub().returns({}),
     };
 
-    fakeHighlighter = {
-      setHighlightsFocused: sinon.stub(),
+    const FakeBuckets = props => {
+      bucketProps = props;
+      return null;
     };
-
-    fakeScrollIntoView = sinon.stub();
 
     $imports.$mock({
-      'scroll-into-view': fakeScrollIntoView,
-      '../highlighter': fakeHighlighter,
+      '../components/buckets': FakeBuckets,
       '../util/buckets': fakeBucketUtil,
     });
 
@@ -114,6 +86,15 @@ describe('BucketBar', () => {
       assert.calledOnce(fakeBucketUtil.anchorBuckets);
     });
 
+    it('should select annotations when Buckets component invokes callback', () => {
+      const fakeAnnotations = ['hi', 'there'];
+      bucketBar = createBucketBar();
+      bucketBar._update();
+
+      bucketProps.onSelectAnnotations(fakeAnnotations, true);
+      assert.calledWith(fakeAnnotator.selectAnnotations, fakeAnnotations, true);
+    });
+
     context('when scrollables provided', () => {
       let scrollableEls = [];
 
@@ -153,229 +134,6 @@ describe('BucketBar', () => {
       bucketBar._updatePending = true;
       bucketBar.update();
       assert.notCalled(window.requestAnimationFrame);
-    });
-  });
-
-  describe('user interactions with buckets', () => {
-    beforeEach(() => {
-      bucketBar = createBucketBar();
-      // Create fake anchors and render buckets.
-      const anchors = [createAnchor()];
-
-      fakeBucketUtil.anchorBuckets.returns([
-        { anchors: [], position: 137 }, // Upper navigation
-        { anchors: [anchors[0]], position: 250 },
-        { anchors: [], position: 400 }, // Lower navigation
-      ]);
-
-      bucketBar.annotator.anchors = anchors;
-      bucketBar.update();
-    });
-
-    it('highlights the bucket anchors when pointer device moved into bucket', () => {
-      const bucketEls = nonEmptyBuckets(bucketBar);
-      bucketEls[0].dispatchEvent(createMouseEvent('mousemove'));
-      assert.calledOnce(fakeHighlighter.setHighlightsFocused);
-      assert.calledWith(
-        fakeHighlighter.setHighlightsFocused,
-        bucketBar.annotator.anchors[0].highlights,
-        true
-      );
-    });
-
-    it('un-highlights the bucket anchors when pointer device moved out of bucket', () => {
-      const bucketEls = nonEmptyBuckets(bucketBar);
-      bucketEls[0].dispatchEvent(createMouseEvent('mousemove'));
-      bucketEls[0].dispatchEvent(createMouseEvent('mouseout'));
-      assert.calledTwice(fakeHighlighter.setHighlightsFocused);
-      const secondCall = fakeHighlighter.setHighlightsFocused.getCall(1);
-      assert.equal(
-        secondCall.args[0],
-        bucketBar.annotator.anchors[0].highlights
-      );
-      assert.equal(secondCall.args[1], false);
-    });
-
-    it('selects the annotations corresponding to the anchors in a bucket when bucket is clicked', () => {
-      const bucketEls = nonEmptyBuckets(bucketBar);
-      assert.equal(bucketEls.length, 1);
-      bucketEls[0].dispatchEvent(createMouseEvent('click'));
-
-      const anns = bucketBar.annotator.anchors.map(anchor => anchor.annotation);
-      assert.calledWith(bucketBar.annotator.selectAnnotations, anns, false);
-    });
-
-    it('handles missing buckets gracefully on click', () => {
-      // FIXME - refactor and remove necessity for this test
-      // There is a coupling between `BucketBar.prototype.tabs` and
-      // `BucketBar.prototype.buckets` — they're "expected" to be the same
-      // length and correspond to each other. This very much should be the case,
-      // but, just in case...
-      const bucketEls = nonEmptyBuckets(bucketBar);
-      assert.equal(bucketEls.length, 1);
-      bucketBar.tabs = [];
-      bucketEls[0].dispatchEvent(createMouseEvent('click'));
-      assert.notCalled(bucketBar.annotator.selectAnnotations);
-    });
-
-    [
-      { ctrlKey: true, metaKey: false },
-      { ctrlKey: false, metaKey: true },
-    ].forEach(({ ctrlKey, metaKey }) =>
-      it('toggles selection of the annotations if Ctrl or Alt is pressed', () => {
-        const bucketEls = nonEmptyBuckets(bucketBar);
-        assert.equal(bucketEls.length, 1);
-        bucketEls[0].dispatchEvent(
-          createMouseEvent('click', { ctrlKey, metaKey })
-        );
-
-        const anns = bucketBar.annotator.anchors.map(
-          anchor => anchor.annotation
-        );
-        assert.calledWith(bucketBar.annotator.selectAnnotations, anns, true);
-      })
-    );
-  });
-
-  describe('rendered bucket "tabs"', () => {
-    let fakeAnchors;
-    let fakeAbove;
-    let fakeBelow;
-    let fakeBuckets;
-
-    beforeEach(() => {
-      bucketBar = createBucketBar();
-      fakeAnchors = [
-        createAnchor(),
-        createAnchor(),
-        createAnchor(),
-        createAnchor(),
-        createAnchor(),
-        createAnchor(),
-      ];
-      // These two anchors are considered to be offscreen upwards
-      fakeAbove = [fakeAnchors[0], fakeAnchors[1]];
-      fakeBelow = [fakeAnchors[5]];
-      // These buckets are on-screen
-      fakeBuckets = [
-        { anchors: fakeAbove, position: 137 },
-        { anchors: [fakeAnchors[2], fakeAnchors[3]], position: 350 },
-        { anchors: [fakeAnchors[4]], position: 550 },
-        { anchors: fakeBelow, position: 600 },
-      ];
-      // This anchor is offscreen below
-
-      fakeBucketUtil.anchorBuckets.returns(fakeBuckets.slice());
-    });
-
-    describe('navigation bucket tabs', () => {
-      it('adds navigation tabs to scroll up and down to nearest anchors offscreen', () => {
-        bucketBar.update();
-        const validBuckets = nonEmptyBuckets(bucketBar);
-        assert.equal(
-          validBuckets[0].getAttribute('title'),
-          'Show 2 annotations'
-        );
-        assert.equal(
-          validBuckets[validBuckets.length - 1].getAttribute('title'),
-          'Show one annotation'
-        );
-
-        assert.isTrue(validBuckets[0].classList.contains('upper'));
-        assert.isTrue(
-          validBuckets[validBuckets.length - 1].classList.contains('lower')
-        );
-      });
-
-      it('removes unneeded tab elements from the document', () => {
-        bucketBar.update();
-        const extraEl = document.createElement('div');
-        extraEl.className = 'extraTab';
-        bucketBar.element.append(extraEl);
-        bucketBar.tabs.push(extraEl);
-        assert.equal(bucketBar.tabs.length, bucketBar.buckets.length + 1);
-
-        // Resetting this return is necessary to return a fresh array reference
-        // on next update
-        fakeBucketUtil.anchorBuckets.returns(fakeBuckets.slice());
-        bucketBar.update();
-        assert.equal(bucketBar.tabs.length, bucketBar.buckets.length);
-        assert.notExists(bucketBar.element.querySelector('.extraTab'));
-      });
-
-      it('scrolls up to nearest anchor above when upper navigation tab clicked', () => {
-        fakeBucketUtil.findClosestOffscreenAnchor.returns(fakeAnchors[1]);
-        bucketBar.update();
-        const visibleBuckets = nonEmptyBuckets(bucketBar);
-        visibleBuckets[0].dispatchEvent(createMouseEvent('click'));
-        assert.calledOnce(fakeBucketUtil.findClosestOffscreenAnchor);
-        assert.calledWith(
-          fakeBucketUtil.findClosestOffscreenAnchor,
-          sinon.match([fakeAnchors[0], fakeAnchors[1]]),
-          'up'
-        );
-        assert.calledOnce(fakeScrollIntoView);
-        assert.calledWith(fakeScrollIntoView, fakeAnchors[1].highlights[0]);
-      });
-
-      it('scrolls down to nearest anchor below when lower navigation tab clicked', () => {
-        fakeBucketUtil.findClosestOffscreenAnchor.returns(fakeAnchors[5]);
-        bucketBar.update();
-        const visibleBuckets = nonEmptyBuckets(bucketBar);
-        visibleBuckets[visibleBuckets.length - 1].dispatchEvent(
-          createMouseEvent('click')
-        );
-        assert.calledOnce(fakeBucketUtil.findClosestOffscreenAnchor);
-        assert.calledWith(
-          fakeBucketUtil.findClosestOffscreenAnchor,
-          sinon.match([fakeAnchors[5]]),
-          'down'
-        );
-        assert.calledOnce(fakeScrollIntoView);
-        assert.calledWith(fakeScrollIntoView, fakeAnchors[5].highlights[0]);
-      });
-    });
-
-    it('displays bucket tabs that have at least one anchor', () => {
-      bucketBar.update();
-      const visibleBuckets = nonEmptyBuckets(bucketBar);
-      // Visible buckets include: upper navigation tab, two on-screen buckets,
-      // lower navigation tab = 4
-      assert.equal(visibleBuckets.length, 4);
-      visibleBuckets.forEach(visibleEl => {
-        assert.equal(visibleEl.style.display, '');
-      });
-    });
-
-    it('sets bucket-tab label text and title based on number of anchors', () => {
-      bucketBar.update();
-      const visibleBuckets = nonEmptyBuckets(bucketBar);
-      // Upper navigation bucket tab
-      assert.equal(visibleBuckets[0].title, 'Show 2 annotations');
-      assert.equal(visibleBuckets[0].querySelector('.label').innerHTML, '2');
-      // First on-screen visible bucket
-      assert.equal(visibleBuckets[1].title, 'Show 2 annotations');
-      assert.equal(visibleBuckets[1].querySelector('.label').innerHTML, '2');
-      // Second on-screen visible bucket
-      assert.equal(visibleBuckets[2].title, 'Show one annotation');
-      assert.equal(visibleBuckets[2].querySelector('.label').innerHTML, '1');
-      // Lower navigation bucket tab
-      assert.equal(visibleBuckets[3].title, 'Show one annotation');
-      assert.equal(visibleBuckets[3].querySelector('.label').innerHTML, '1');
-    });
-
-    it('does not display empty bucket tabs', () => {
-      fakeBucketUtil.anchorBuckets.returns([]);
-      bucketBar.update();
-
-      const allBuckets = bucketBar.element.querySelectorAll(
-        '.annotator-bucket-indicator'
-      );
-
-      // All of the buckets are empty...
-      allBuckets.forEach(bucketEl => {
-        assert.equal(bucketEl.style.display, 'none');
-      });
     });
   });
 });
