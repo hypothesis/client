@@ -17,6 +17,7 @@ export function isBrowserSupported() {
     // DOM API checks for frequently-used APIs.
     () => new URL(document.location.href), // URL constructor.
     () => new Request('https://hypothes.is'), // Part of the `fetch` API.
+    () => document.body.prepend.name, // Element.prepend() method.
 
     // DOM API checks for less frequently-used APIs.
     // These are less likely to have been polyfilled by the host page.
