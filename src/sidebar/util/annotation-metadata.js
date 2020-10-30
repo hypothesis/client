@@ -306,3 +306,39 @@ export function quote(annotation) {
   const quoteSel = target.selector.find(s => s.type === 'TextQuoteSelector');
   return quoteSel ? /** @type {TextQuoteSelector}*/ (quoteSel).exact : null;
 }
+
+/**
+ * Has this annotation been edited subsequent to its creation?
+ *
+ * @param {Annotation} annotation
+ * @return {boolean}
+ */
+export function hasBeenEdited(annotation) {
+  // New annotations created with the current `h` API service will have
+  // equivalent (string) values for `created` and `updated` datetimes.
+  // However, in the past, these values could have sub-second differences,
+  // which can make them appear as having been edited when they have not
+  // been. Only consider an annotation as "edited" if its creation time is
+  // more than 2 seconds before its updated time.
+  const UPDATED_THRESHOLD = 2000;
+
+  // If either time string is non-extant or they are equivalent...
+  if (
+    !annotation.updated ||
+    !annotation.created ||
+    annotation.updated === annotation.created
+  ) {
+    return false;
+  }
+
+  // Both updated and created SHOULD be ISO-8601-formatted strings
+  // with microsecond resolution; (NB: Date.prototype.getTime() returns
+  // milliseconds since epoch, so we're dealing in ms after this)
+  const created = new Date(annotation.created).getTime();
+  const updated = new Date(annotation.updated).getTime();
+  if (isNaN(created) || isNaN(updated)) {
+    // If either is not a valid date...
+    return false;
+  }
+  return updated - created > UPDATED_THRESHOLD;
+}
