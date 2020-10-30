@@ -1,8 +1,13 @@
 import { createElement } from 'preact';
+import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
-import { isHighlight, isReply } from '../util/annotation-metadata';
+import {
+  hasBeenEdited,
+  isHighlight,
+  isReply,
+} from '../util/annotation-metadata';
 import { isPrivate } from '../util/permissions';
 
 import AnnotationDocumentInfo from './annotation-document-info';
@@ -47,11 +52,10 @@ export default function AnnotationHeader({
   const annotationIsPrivate = isPrivate(annotation.permissions);
   const annotationLink = annotation.links ? annotation.links.html : '';
 
-  // NB: `created` and `updated` are strings, not `Date`s
-  const hasBeenEdited =
-    annotation.updated && annotation.created !== annotation.updated;
   const showTimestamp = !isEditing && annotation.created;
-  const showEditedTimestamp = hasBeenEdited && !isCollapsedReply;
+  const showEditedTimestamp = useMemo(() => {
+    return hasBeenEdited(annotation) && !isCollapsedReply;
+  }, [annotation, isCollapsedReply]);
 
   const replyPluralized = replyCount > 1 ? 'replies' : 'reply';
   const replyButtonText = `${replyCount} ${replyPluralized}`;

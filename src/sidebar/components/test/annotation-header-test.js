@@ -11,6 +11,7 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('AnnotationHeader', () => {
   let fakeIsHighlight;
   let fakeIsReply;
+  let fakeHasBeenEdited;
   let fakeIsPrivate;
   let fakeStore;
 
@@ -30,6 +31,7 @@ describe('AnnotationHeader', () => {
   beforeEach(() => {
     fakeIsHighlight = sinon.stub().returns(false);
     fakeIsReply = sinon.stub().returns(false);
+    fakeHasBeenEdited = sinon.stub().returns(false);
     fakeIsPrivate = sinon.stub();
 
     fakeStore = {
@@ -42,6 +44,7 @@ describe('AnnotationHeader', () => {
       '../util/annotation-metadata': {
         isHighlight: fakeIsHighlight,
         isReply: fakeIsReply,
+        hasBeenEdited: fakeHasBeenEdited,
       },
       '../util/permissions': {
         isPrivate: fakeIsPrivate,
@@ -170,7 +173,7 @@ describe('AnnotationHeader', () => {
 
     it('should render edited timestamp if annotation has been edited', () => {
       const annotation = fixtures.defaultAnnotation();
-      annotation.updated = '2018-05-10T20:18:56.613388+00:00';
+      fakeHasBeenEdited.returns(true);
 
       const wrapper = createAnnotationHeader({
         annotation: annotation,
@@ -185,6 +188,7 @@ describe('AnnotationHeader', () => {
     it('should not render edited timestamp if annotation has not been edited', () => {
       // Default annotation's created value is same as updated; as if the annotation
       // has not been edited before
+      fakeHasBeenEdited.returns(false);
       const wrapper = createAnnotationHeader({
         annotation: fixtures.newAnnotation(),
       });
@@ -196,6 +200,7 @@ describe('AnnotationHeader', () => {
     });
 
     it('should not render edited timestamp if annotation is collapsed reply', () => {
+      fakeHasBeenEdited.returns(true);
       const annotation = fixtures.defaultAnnotation();
       annotation.updated = '2018-05-10T20:18:56.613388+00:00';
       fakeIsReply.returns(true);
