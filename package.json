@@ -94,6 +94,7 @@
     "wrap-text": "^1.0.7",
     "zen-observable": "^0.3.0"
   },
+  "browserslist": "chrome 55, edge 17, firefox 53, safari 10.1",
   "browserify": {
     "transform": [
       "browserify-versionify",

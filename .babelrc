@@ -4,13 +4,7 @@
       "pragma": "createElement"
     }],
     ["@babel/preset-env", {
-       "bugfixes": true,
-       "targets": {
-         "chrome": "55",
-         "edge": "17",
-         "firefox": "53",
-         "safari": "10.1",
-      }
+       "bugfixes": true
     }]
   ],
   "plugins": [
