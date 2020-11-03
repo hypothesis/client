@@ -3,7 +3,7 @@
  */
 import { retryPromiseOperation } from '../util/retry';
 
-// @ngInject
+// @inject
 export default function autosaveService(annotationsService, store) {
   // A Set of annotation $tags that have save requests in-flight
   const saving = new Set();

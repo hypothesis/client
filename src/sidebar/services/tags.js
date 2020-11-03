@@ -12,7 +12,7 @@
  * and provides a `filter` method to fetch tags matching a query, ranked based
  * on frequency of usage.
  */
-// @ngInject
+// @inject
 export default function tags(localStorage) {
   const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
   const TAGS_MAP_KEY = 'hypothesis.user.tags.map';

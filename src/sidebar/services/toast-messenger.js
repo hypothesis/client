@@ -18,7 +18,7 @@ const MESSAGE_DISMISS_DELAY = 500;
  * @prop {string} [moreInfoURL=''] - Optional URL for users to visit for "more info"
  */
 
-// @ngInject
+// @inject
 export default function toastMessenger(store) {
   /**
    * Update a toast message's dismiss status and set a timeout to remove

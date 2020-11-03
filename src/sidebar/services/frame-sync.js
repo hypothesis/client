@@ -30,7 +30,7 @@ export function formatAnnot(ann) {
  * annotations displayed in connected frames in sync with the set shown in the
  * sidebar.
  */
-// @ngInject
+// @inject
 export default function FrameSync(annotationsService, bridge, store) {
   // Set of tags of annotations that are currently loaded into the frame
   const inFrame = new Set();

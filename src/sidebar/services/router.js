@@ -4,7 +4,7 @@ import * as queryString from 'query-string';
  * A service that manages the association between the route and route parameters
  * implied by the URL and the corresponding route state in the store.
  */
-// @ngInject
+// @inject
 export default function router($window, store) {
   /**
    * Return the name and parameters of the current route.

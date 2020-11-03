@@ -25,7 +25,7 @@ import { resolve } from '../util/url';
  * Interaction with OAuth endpoints in the annotation service is delegated to
  * the `OAuthClient` class.
  *
- * @ngInject
+ * @inject
  */
 export default function auth(
   $window,

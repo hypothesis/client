@@ -77,7 +77,7 @@ function clientType(win, settings = {}) {
  * @param {Window} $window - Test seam
  * @return {Analytics}
  */
-// @ngInject
+// @inject
 export default function analytics($window, settings) {
   const category = clientType($window, settings);
   const noop = () => {};

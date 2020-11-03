@@ -6,7 +6,7 @@ import SearchClient from '../search-client';
 
 import { isReply } from '../util/annotation-metadata';
 
-// @ngInject
+// @inject
 export default function loadAnnotationsService(
   api,
   store,

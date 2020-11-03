@@ -33,7 +33,7 @@ import * as urlUtil from '../util/url';
 
 /**
  * @return {ServiceUrlGetter}
- * @ngInject
+ * @inject
  */
 export default function serviceUrl(store, apiRoutes) {
   apiRoutes

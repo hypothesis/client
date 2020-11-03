@@ -10,7 +10,7 @@ const DEFAULT_KEYS = {
   focusedGroup: 'hypothesis.groups.focus',
 };
 
-// @ngInject
+// @inject
 export default function persistedDefaults(localStorage, store) {
   /**
    * Store subscribe callback for persisting changes to defaults. It will only
