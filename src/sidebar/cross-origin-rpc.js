@@ -47,7 +47,7 @@ function isJsonRpcMessage(data) {
  *
  * All methods called upon must be mapped in the `registeredMethods` function.
  */
-// @ngInject
+// @inject
 export function startServer(store, settings, $window) {
   const methods = registeredMethods(store);
 

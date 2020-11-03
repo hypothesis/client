@@ -203,7 +203,7 @@ function createAPICall(
  * endpoint, a responsibility delegated to the `apiRoutes` service which does
  * not use authentication.
  */
-// @ngInject
+// @inject
 export default function api(apiRoutes, auth, store) {
   const links = apiRoutes.routes();
   let clientId = null;

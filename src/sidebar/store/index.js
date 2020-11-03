@@ -99,7 +99,7 @@ import viewer from './modules/viewer';
  * @param {import('../../types/config').SidebarConfig} settings
  * @return {SidebarStore}
  */
-// @ngInject
+// @inject
 export default function store(settings) {
   const middleware = [debugMiddleware];
 

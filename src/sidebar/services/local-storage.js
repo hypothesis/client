@@ -24,7 +24,7 @@ class InMemoryStorage {
  * in-memory storage in browsers that block access to `window.localStorage`.
  * in third-party iframes.
  */
-// @ngInject
+// @inject
 export default function localStorage($window) {
   let storage;
   let testKey = 'hypothesis.testKey';

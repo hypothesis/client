@@ -46,7 +46,7 @@ const isSidebar = !(
 // Install Preact renderer options to work around browser quirks
 rendererOptions.setupBrowserFixes();
 
-// @ngInject
+// @inject
 function setupApi(api, streamer) {
   api.setClientId(streamer.clientId);
 }
@@ -55,7 +55,7 @@ function setupApi(api, streamer) {
  * Perform the initial fetch of groups and user profile and then set the initial
  * route to match the current URL.
  */
-// @ngInject
+// @inject
 function setupRoute(groups, session, router) {
   Promise.all([groups.load(), session.load()]).finally(() => {
     router.sync();
@@ -68,7 +68,7 @@ function setupRoute(groups, session, router) {
  * We don't bother tracking route changes later because the client only uses a
  * single route in a given session.
  */
-// @ngInject
+// @inject
 function sendPageView(analytics) {
   analytics.sendPageView();
 }
@@ -77,7 +77,7 @@ function sendPageView(analytics) {
  * Fetch any persisted client-side defaults, and persist any app-state changes to
  * those defaults
  */
-// @ngInject
+// @inject
 function persistDefaults(persistedDefaults) {
   persistedDefaults.init();
 }
@@ -85,12 +85,12 @@ function persistDefaults(persistedDefaults) {
 /**
  * Set up autosave-new-highlights service
  */
-// @ngInject
+// @inject
 function autosave(autosaveService) {
   autosaveService.init();
 }
 
-// @ngInject
+// @inject
 function setupFrameSync(frameSync) {
   if (isSidebar) {
     frameSync.connect();

@@ -20,7 +20,7 @@ const DEFAULT_ORGANIZATION = {
     encodeURIComponent(require('../../images/icons/logo.svg')),
 };
 
-// @ngInject
+// @inject
 export default function groups(
   store,
   api,

@@ -10,7 +10,7 @@ import { watch } from '../util/watch';
  * Only one websocket connection may exist at a time, any existing socket is
  * closed.
  */
-// @ngInject
+// @inject
 export default function Streamer(store, auth, groups, session, settings) {
   // The randomly generated session ID
   const clientId = generateHexString(32);

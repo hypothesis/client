@@ -15,7 +15,7 @@
     "autoprefixer": "^10.0.1",
     "aws-sdk": "^2.345.0",
     "axe-core": "^4.0.0",
-    "babel-plugin-angularjs-annotate": "^0.10.0",
+    "babel-plugin-inject-args": "^1.0.0",
     "babel-plugin-istanbul": "^6.0.0",
     "babel-plugin-mockable-imports": "^1.5.1",
     "babel-plugin-transform-async-to-promises": "^0.8.6",

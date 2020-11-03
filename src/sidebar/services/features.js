@@ -14,7 +14,7 @@ import bridgeEvents from '../../shared/bridge-events';
 import warnOnce from '../../shared/warn-once';
 import { watch } from '../util/watch';
 
-// @ngInject
+// @inject
 export default function features(bridge, session, store) {
   const currentFlags = () => store.profile().features;
   const sendFeatureFlags = () => {

@@ -9,9 +9,7 @@
        "bugfixes": true
     }]
   ],
-  "plugins": [
-    "angularjs-annotate"
-  ],
+  "plugins": ["inject-args"],
   "ignore": ["**/vendor/*"],
   "env": {
     "development": {

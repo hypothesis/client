@@ -15,7 +15,7 @@ import {
 import { generateHexString } from '../util/random';
 import uiConstants from '../ui-constants';
 
-// @ngInject
+// @inject
 export default function annotationsService(api, store) {
   /**
    * Apply changes for the given `annotation` from its draft in the store (if

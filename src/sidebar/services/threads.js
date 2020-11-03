@@ -2,7 +2,7 @@
  * @typedef {import('../util/build-thread').Thread} Thread
  */
 
-// @ngInject
+// @inject
 export default function threadsService(store) {
   /**
    * Make this thread and all of its children "visible". This has the effect of

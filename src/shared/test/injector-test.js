@@ -195,6 +195,8 @@ describe('Injector', () => {
       function increment(first) {
         total += first;
       }
+      increment.$inject = ['first'];
+
       container.run(increment);
       container.run(increment);
 
