@@ -126,7 +126,7 @@ export default function FrameSync(annotationsService, bridge, store) {
       annotationsService.create(annot);
     });
 
-    bridge.on('destroyFrame', destroyFrame.bind(this));
+    bridge.on('destroyFrame', frameIdentifier => destroyFrame(frameIdentifier));
 
     // Map of annotation tag to anchoring status
     // ('anchored'|'orphan'|'timeout').
