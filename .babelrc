@@ -3,6 +3,8 @@
     ["@babel/preset-react", {
       "pragma": "createElement"
     }],
+
+    // Compile JS for browser targets set by `browserslist` key in package.json.
     ["@babel/preset-env", {
        "bugfixes": true
     }]
