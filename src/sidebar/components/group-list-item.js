@@ -70,7 +70,7 @@ function GroupListItem({
   /**
    * Opens or closes the submenu.
    *
-   * @param {MouseEvent|KeyboardEvent} event
+   * @param {Event} event
    */
   const toggleSubmenu = event => {
     event.stopPropagation();

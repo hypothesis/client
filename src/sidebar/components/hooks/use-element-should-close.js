@@ -67,10 +67,9 @@ export default function useElementShouldClose(
     }
 
     // Close element when user presses Escape key, regardless of focus.
-    const removeKeyDownListener = listen(document.body, ['keydown'], (
-      /** @type {KeyboardEvent}*/ event
-    ) => {
-      if (normalizeKeyName(event.key) === 'Escape') {
+    const removeKeyDownListener = listen(document.body, ['keydown'], event => {
+      const keyEvent = /** @type {KeyboardEvent} */ (event);
+      if (normalizeKeyName(keyEvent.key) === 'Escape') {
         handleClose();
       }
     });

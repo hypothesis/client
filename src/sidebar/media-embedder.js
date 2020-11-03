@@ -396,17 +396,12 @@ function replaceLinkWithEmbed(link) {
  *     the width of the embed.
  */
 export function replaceLinksWithEmbeds(element, { className } = {}) {
-  let links = element.getElementsByTagName('a');
+  // Get a static (non-live) list of <a> children of `element`.
+  // It needs to be static because we may replace these elements as we iterate over them.
+  const links = Array.from(element.getElementsByTagName('a'));
 
-  // `links` is a "live list" of the <a> element children of `element`.
-  // We want to iterate over `links` and replace some of them with embeds,
-  // but we can't modify `links` while looping over it so we need to copy it to
-  // a nice, normal array first.
-  links = Array.prototype.slice.call(links, 0);
-
-  let i;
-  for (i = 0; i < links.length; i++) {
-    const embed = replaceLinkWithEmbed(links[i]);
+  for (let link of links) {
+    const embed = replaceLinkWithEmbed(link);
     if (embed) {
       if (className) {
         embed.className = className;

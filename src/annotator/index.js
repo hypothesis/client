@@ -51,7 +51,7 @@ const config = configFrom(window);
 function init() {
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
-  /** @type {new (e: Element, config: any) => Guest} */
+  /** @type {new (e: HTMLElement, config: any) => Guest} */
   let Klass = isPDF ? PdfSidebar : Sidebar;
 
   if (config.subFrameIdentifier) {
