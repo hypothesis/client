@@ -1,0 +1,21 @@
+@use '../variables' as var;
+@use '../mixins/molecules';
+
+.notebook-outer {
+  // TODO: CSS namespace conflicts?
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  padding: var.$layout-space;
+  // Leave explicitly the right amount of room for closed-sidebar affordances
+  padding-right: var.$annotator-toolbar-width + 5px;
+
+  .notebook-inner {
+    box-sizing: border-box;
+    @include molecules.panel;
+    height: 100%;
+  }
+}
