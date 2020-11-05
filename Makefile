@@ -5,6 +5,7 @@ default: help
 help:
 	@echo "make help              Show this help message"
 	@echo "make dev               Run the app in the development server"
+	@echo "make build             Create a production build of the client"
 	@echo "make lint              Run the code linter(s) and print any warnings"
 	@echo "make checkformatting   Check code formatting"
 	@echo "make format            Automatically format code"
@@ -69,7 +70,8 @@ sure: checkformatting lint test
 python:
 	@./bin/install-python
 
-build/manifest.json: node_modules/.uptodate
+.PHONY: build
+build: node_modules/.uptodate
 	yarn run build
 
 node_modules/.uptodate: package.json yarn.lock
