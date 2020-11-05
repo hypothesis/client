@@ -221,6 +221,14 @@ export default class Sidebar extends Guest {
     this.crossframe.on('showSidebar', () => this.show());
     this.crossframe.on('hideSidebar', () => this.hide());
 
+    // Re-publish the crossframe event so that anything extending Delegator
+    // can subscribe to it (without need for crossframe)
+    this.crossframe.on('showNotebook', () => this.publish('showNotebook'));
+    this.crossframe.on('hideNotebook', () => this.publish('hideNotebook'));
+
+    this.subscribe('showNotebook', () => this.hide());
+    this.subscribe('hideNotebook', () => this.show());
+
     const eventHandlers = [
       [events.LOGIN_REQUESTED, this.onLoginRequest],
       [events.LOGOUT_REQUESTED, this.onLogoutRequest],
@@ -391,6 +399,7 @@ export default class Sidebar extends Guest {
 
   show() {
     this.crossframe.call('sidebarOpened');
+    this.publish('sidebarOpened');
 
     if (this.frame) {
       const width = this.frame.getBoundingClientRect().width;

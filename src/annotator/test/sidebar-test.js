@@ -578,19 +578,20 @@ describe('Sidebar', () => {
         sinon.stub(sidebar, 'publish');
         sidebar.show();
         assert.calledOnce(layoutChangeHandlerSpy);
-        assert.calledOnce(sidebar.publish);
         assert.calledWith(
           sidebar.publish,
           'sidebarLayoutChanged',
           sinon.match.any
         );
+        assert.calledWith(sidebar.publish, 'sidebarOpened');
+        assert.calledTwice(sidebar.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: true,
         });
 
         sidebar.hide();
         assert.calledTwice(layoutChangeHandlerSpy);
-        assert.calledTwice(sidebar.publish);
+        assert.calledThrice(sidebar.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: false,
           width: fakeToolbar.getWidth(),
