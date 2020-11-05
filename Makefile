@@ -17,7 +17,7 @@ help:
 	@echo "                       dependencies, etc)"
 
 .PHONY: dev
-dev: build/manifest.json
+dev: node_modules/.uptodate
 	node_modules/.bin/gulp watch
 
 .PHONY: test
