@@ -64,7 +64,7 @@ jobs:
       - deploy:
           name: Deploy to S3
           command: |-
-            aws s3 cp dist s3://${BUCKET}/ --recursive
+            aws s3 sync --acl public-read --delete build s3://${BUCKET}/
       - run:
           name: Invalidate CloudFront
           command: |
