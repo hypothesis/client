@@ -123,6 +123,6 @@
     "test": "gulp test",
     "typecheck": "tsc --build src/tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
-    "version": "make clean build/manifest.json"
+    "version": "make clean build"
   }
 }
