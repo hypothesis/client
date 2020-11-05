@@ -25,14 +25,6 @@ describe('boot/polyfills/index', () => {
 
     [
       {
-        set: 'es2015',
-        providesMethod: [Object, 'assign'],
-      },
-      {
-        set: 'es2016',
-        providesMethod: [Array.prototype, 'includes'],
-      },
-      {
         set: 'es2017',
         providesMethod: [Object, 'entries'],
       },
