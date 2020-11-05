@@ -22,37 +22,6 @@ function hasMethods(obj, ...methods) {
  * if the browser has the functionality natively available.
  */
 const needsPolyfill = {
-  es2015: () => {
-    // Check for new objects in ES2015.
-    if (
-      typeof Promise !== 'function' ||
-      typeof Map !== 'function' ||
-      typeof Set !== 'function' ||
-      typeof Symbol !== 'function'
-    ) {
-      return true;
-    }
-
-    // Check for new methods on existing objects in ES2015.
-    const objMethods = [
-      [Array, 'from'],
-      [Array.prototype, 'fill', 'find', 'findIndex'],
-      [Object, 'assign'],
-      [String.prototype, 'startsWith', 'endsWith'],
-    ];
-    for (let [obj, ...methods] of objMethods) {
-      if (!hasMethods(obj, ...methods)) {
-        return true;
-      }
-    }
-
-    return false;
-  },
-
-  es2016: () => {
-    return !hasMethods(Array.prototype, 'includes');
-  },
-
   es2017: () => {
     return !hasMethods(Object, 'entries', 'values');
   },

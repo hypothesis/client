@@ -30,7 +30,7 @@ describe('bootstrap', function () {
   function runBoot() {
     const assetNames = [
       // Polyfills
-      'scripts/polyfills-es2015.bundle.js',
+      'scripts/polyfills-es2017.bundle.js',
 
       // Annotation layer
       'scripts/annotator.bundle.js',
@@ -110,7 +110,7 @@ describe('bootstrap', function () {
 
     it('loads polyfills if required', () => {
       fakePolyfills.requiredPolyfillSets.callsFake(sets =>
-        sets.filter(s => s.match(/es2015/))
+        sets.filter(s => s.match(/es2017/))
       );
 
       runBoot();
@@ -120,7 +120,7 @@ describe('bootstrap', function () {
       );
       assert.called(fakePolyfills.requiredPolyfillSets);
       assert.deepEqual(polyfillsLoaded, [
-        assetUrl('scripts/polyfills-es2015.bundle.1234.js'),
+        assetUrl('scripts/polyfills-es2017.bundle.1234.js'),
       ]);
     });
   });
@@ -153,7 +153,7 @@ describe('bootstrap', function () {
 
     it('loads polyfills if required', () => {
       fakePolyfills.requiredPolyfillSets.callsFake(sets =>
-        sets.filter(s => s.match(/es2015/))
+        sets.filter(s => s.match(/es2017/))
       );
 
       runBoot();
@@ -163,7 +163,7 @@ describe('bootstrap', function () {
       );
       assert.called(fakePolyfills.requiredPolyfillSets);
       assert.deepEqual(polyfillsLoaded, [
-        assetUrl('scripts/polyfills-es2015.bundle.1234.js'),
+        assetUrl('scripts/polyfills-es2017.bundle.1234.js'),
       ]);
     });
   });
