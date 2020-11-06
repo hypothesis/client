@@ -4,6 +4,7 @@ import { createElement } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';
+import bridgeEvents from '../../shared/bridge-events';
 import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 
@@ -16,7 +17,7 @@ import Thread from './thread';
 /**
  * @typedef ThreadCardProps
  * @prop {Thread} thread
- * @prop {Object} frameSync - Injected service
+ * @prop {Object} bridge - Injected service
  */
 
 /**
@@ -25,24 +26,26 @@ import Thread from './thread';
  *
  * @param {ThreadCardProps} props
  */
-function ThreadCard({ frameSync, thread }) {
+function ThreadCard({ bridge, thread }) {
   const threadTag = thread.annotation && thread.annotation.$tag;
   const isFocused = useStore(store => store.isAnnotationFocused(threadTag));
   const showDocumentInfo = useStore(store => store.route() !== 'sidebar');
+  const focusAnnotations = useStore(store => store.focusAnnotations);
   const focusThreadAnnotation = useMemo(
     () =>
       debounce(tag => {
-        const focusTags = tag ? [tag] : [];
-        frameSync.focusAnnotations(focusTags);
+        const tags = tag ? [tag] : [];
+        focusAnnotations(tags);
+        bridge.call(bridgeEvents.FOCUS_ANNOTATIONS, tags);
       }, 10),
-    [frameSync]
+    [bridge, focusAnnotations]
   );
 
   const scrollToAnnotation = useCallback(
     tag => {
-      frameSync.scrollToAnnotation(tag);
+      bridge.call(bridgeEvents.SCROLL_TO_ANNOTATION, tag);
     },
-    [frameSync]
+    [bridge]
   );
 
   /**
@@ -79,9 +82,9 @@ function ThreadCard({ frameSync, thread }) {
 
 ThreadCard.propTypes = {
   thread: propTypes.object.isRequired,
-  frameSync: propTypes.object.isRequired,
+  bridge: propTypes.object.isRequired,
 };
 
-ThreadCard.injectedProps = ['frameSync'];
+ThreadCard.injectedProps = ['bridge'];
 
 export default withServices(ThreadCard);

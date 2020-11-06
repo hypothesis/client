@@ -8,7 +8,7 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('SidebarContent', () => {
-  let fakeFrameSync;
+  let fakeBridge;
   let fakeLoadAnnotationsService;
   let fakeUseRootThread;
   let fakeStore;
@@ -20,7 +20,7 @@ describe('SidebarContent', () => {
       <SidebarContent
         onLogin={() => null}
         onSignUp={() => null}
-        frameSync={fakeFrameSync}
+        bridge={fakeBridge}
         loadAnnotationsService={fakeLoadAnnotationsService}
         streamer={fakeStreamer}
         {...props}
@@ -28,9 +28,8 @@ describe('SidebarContent', () => {
     );
 
   beforeEach(() => {
-    fakeFrameSync = {
-      focusAnnotations: sinon.stub(),
-      scrollToAnnotation: sinon.stub(),
+    fakeBridge = {
+      call: sinon.stub(),
     };
     fakeLoadAnnotationsService = {
       load: sinon.stub(),
@@ -41,6 +40,7 @@ describe('SidebarContent', () => {
     };
     fakeStore = {
       // actions
+      focusAnnotations: sinon.stub(),
       clearSelection: sinon.stub(),
       selectTab: sinon.stub(),
       // selectors
@@ -119,13 +119,13 @@ describe('SidebarContent', () => {
 
       it('focuses and scrolls to direct-linked annotations once anchored', () => {
         createComponent();
-        assert.calledOnce(fakeFrameSync.scrollToAnnotation);
-        assert.calledWith(fakeFrameSync.scrollToAnnotation, 'myTag');
-        assert.calledOnce(fakeFrameSync.focusAnnotations);
+        assert.calledWith(fakeBridge.call, 'scrollToAnnotation', 'myTag');
         assert.calledWith(
-          fakeFrameSync.focusAnnotations,
+          fakeBridge.call,
+          'focusAnnotations',
           sinon.match(['myTag'])
         );
+        assert.calledWith(fakeStore.focusAnnotations, sinon.match(['myTag']));
       });
 
       it('selects the correct tab for direct-linked annotations once anchored', () => {

@@ -9,23 +9,23 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 
 describe('ThreadCard', () => {
   let fakeDebounce;
-  let fakeFrameSync;
+  let fakeBridge;
   let fakeStore;
   let fakeThread;
 
   function createComponent(props) {
     return mount(
-      <ThreadCard frameSync={fakeFrameSync} thread={fakeThread} {...props} />
+      <ThreadCard bridge={fakeBridge} thread={fakeThread} {...props} />
     );
   }
 
   beforeEach(() => {
     fakeDebounce = sinon.stub().returnsArg(0);
-    fakeFrameSync = {
-      focusAnnotations: sinon.stub(),
-      scrollToAnnotation: sinon.stub(),
+    fakeBridge = {
+      call: sinon.stub(),
     };
     fakeStore = {
+      focusAnnotations: sinon.stub(),
       isAnnotationFocused: sinon.stub().returns(false),
       route: sinon.stub(),
     };
@@ -81,7 +81,7 @@ describe('ThreadCard', () => {
 
       wrapper.find('.thread-card').simulate('click');
 
-      assert.calledWith(fakeFrameSync.scrollToAnnotation, 'myTag');
+      assert.calledWith(fakeBridge.call, 'scrollToAnnotation', 'myTag');
     });
 
     it('focuses the annotation thread when mouse enters', () => {
@@ -89,7 +89,7 @@ describe('ThreadCard', () => {
 
       wrapper.find('.thread-card').simulate('mouseenter');
 
-      assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match(['myTag']));
+      assert.calledWith(fakeStore.focusAnnotations, sinon.match(['myTag']));
     });
 
     it('unfocuses the annotation thread when mouse exits', () => {
@@ -97,7 +97,7 @@ describe('ThreadCard', () => {
 
       wrapper.find('.thread-card').simulate('mouseleave');
 
-      assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match([]));
+      assert.calledWith(fakeStore.focusAnnotations, sinon.match([]));
     });
 
     ['button', 'a'].forEach(tag => {
@@ -113,7 +113,7 @@ describe('ThreadCard', () => {
         wrapper.find('.thread-card').props().onClick({
           target: nodeChild,
         });
-        assert.notCalled(fakeFrameSync.scrollToAnnotation);
+        assert.notCalled(fakeBridge.call);
       });
     });
   });

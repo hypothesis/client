@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 import { useEffect, useRef } from 'preact/hooks';
 
 import useRootThread from './hooks/use-root-thread';
+import bridgeEvents from '../../shared/bridge-events';
 import { withServices } from '../util/service-context';
 import useStore from '../store/use-store';
 import { tabForAnnotation } from '../util/tabs';
@@ -18,7 +19,7 @@ import ThreadList from './thread-list';
  * @typedef SidebarContentProps
  * @prop {() => any} onLogin
  * @prop {() => any} onSignUp
- * @prop {Object} [frameSync] - Injected service
+ * @prop {Object} [bridge] - Injected service
  * @prop {Object} [loadAnnotationsService]  - Injected service
  * @prop {Object} [streamer] - Injected service
  */
@@ -29,7 +30,7 @@ import ThreadList from './thread-list';
  * @param {SidebarContentProps} props
  */
 function SidebarContent({
-  frameSync,
+  bridge,
   onLogin,
   onSignUp,
   loadAnnotationsService,
@@ -65,6 +66,7 @@ function SidebarContent({
       : null;
 
   // Actions
+  const focusAnnotations = useStore(store => store.focusAnnotations);
   const clearSelection = useStore(store => store.clearSelection);
   const selectTab = useStore(store => store.selectTab);
 
@@ -116,11 +118,19 @@ function SidebarContent({
   // and focus it
   useEffect(() => {
     if (linkedAnnotationAnchorTag) {
-      frameSync.focusAnnotations([linkedAnnotationAnchorTag]);
-      frameSync.scrollToAnnotation(linkedAnnotationAnchorTag);
+      focusAnnotations([linkedAnnotationAnchorTag]);
       selectTab(directLinkedTab);
+
+      bridge.call(bridgeEvents.FOCUS_ANNOTATIONS, [linkedAnnotationAnchorTag]);
+      bridge.call(bridgeEvents.SCROLL_TO_ANNOTATION, linkedAnnotationAnchorTag);
     }
-  }, [directLinkedTab, frameSync, linkedAnnotationAnchorTag, selectTab]);
+  }, [
+    directLinkedTab,
+    bridge,
+    focusAnnotations,
+    linkedAnnotationAnchorTag,
+    selectTab,
+  ]);
 
   // Connect to the streamer when the sidebar has opened or if user is logged in
   useEffect(() => {
@@ -154,15 +164,11 @@ function SidebarContent({
 SidebarContent.propTypes = {
   onLogin: propTypes.func.isRequired,
   onSignUp: propTypes.func.isRequired,
-  frameSync: propTypes.object,
+  bridge: propTypes.object,
   loadAnnotationsService: propTypes.object,
   streamer: propTypes.object,
 };
 
-SidebarContent.injectedProps = [
-  'frameSync',
-  'loadAnnotationsService',
-  'streamer',
-];
+SidebarContent.injectedProps = ['bridge', 'loadAnnotationsService', 'streamer'];
 
 export default withServices(SidebarContent);
