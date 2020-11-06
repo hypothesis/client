@@ -220,26 +220,4 @@ export default function FrameSync(annotationsService, bridge, store) {
     setupSyncToFrame();
     setupSyncFromFrame();
   };
-
-  /**
-   * Focus annotations with the given $tags.
-   *
-   * This is used to indicate the highlight in the document that corresponds to
-   * a given annotation in the sidebar.
-   *
-   * @param {string[]} tags - annotation $tags
-   */
-  this.focusAnnotations = function (tags) {
-    store.focusAnnotations(tags);
-    bridge.call('focusAnnotations', tags);
-  };
-
-  /**
-   * Scroll the frame to the highlight for an annotation with a given tag.
-   *
-   * @param {string} tag
-   */
-  this.scrollToAnnotation = function (tag) {
-    bridge.call('scrollToAnnotation', tag);
-  };
 }

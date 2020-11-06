@@ -12,6 +12,11 @@ export default {
   FEATURE_FLAGS_UPDATED: 'featureFlagsUpdated',
 
   /**
+   * Focus the annotations indicated by the passed array of $tags
+   */
+  FOCUS_ANNOTATIONS: 'focusAnnotations',
+
+  /**
    * The sidebar is asking the annotator to open the partner site help page.
    */
   HELP_REQUESTED: 'helpRequested',
@@ -37,6 +42,11 @@ export default {
    * The set of annotations was updated.
    */
   PUBLIC_ANNOTATION_COUNT_CHANGED: 'publicAnnotationCountChanged',
+
+  /**
+   * The annotator should scroll to a particular annotation defined by $tag.
+   */
+  SCROLL_TO_ANNOTATION: 'scrollToAnnotation',
 
   /**
    * The sidebar is asking the annotator to do a partner site sign-up.
