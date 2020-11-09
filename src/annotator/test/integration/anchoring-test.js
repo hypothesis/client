@@ -74,16 +74,12 @@ describe('anchoring', function () {
       quotes: ["This has not been a scientist's war"],
     },
     {
-      // Known failure with nested annotations that are anchored via quotes
-      // or positions. See https://github.com/hypothesis/h/pull/3313 and
-      // https://github.com/hypothesis/h/issues/3278
       tag: 'nested quotes',
       quotes: [
         "This has not been a scientist's war;" +
           ' it has been a war in which all have had a part',
         "scientist's war",
       ],
-      expectFail: true,
     },
   ].forEach(testCase => {
     it(`should highlight ${testCase.tag} when annotations are loaded`, () => {
