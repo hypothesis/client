@@ -29,7 +29,7 @@
     "commander": "^6.0.0",
     "core-js": "^3.4.1",
     "cross-env": "^7.0.0",
-    "diff": "^4.0.1",
+    "diff": "^5.0.0",
     "dom-anchor-text-position": "^5.0.0",
     "dom-anchor-text-quote": "^4.0.2",
     "dom-seek": "^5.0.1",
