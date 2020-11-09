@@ -44,25 +44,38 @@ describe('annotator.range-util', function () {
     selection.addRange(range);
   }
 
-  describe('#isNodeInRange', function () {
-    it('is true for a node in the range', function () {
-      const rng = createRange(testNode, 0, 1);
-      assert.equal(rangeUtil.isNodeInRange(rng, testNode.firstChild), true);
+  describe('#isNodeInRange', () => {
+    it('returns true for a node in the range', () => {
+      const range = createRange(testNode, 0, 1);
+      assert.isTrue(rangeUtil.isNodeInRange(range, testNode.firstChild));
     });
 
-    it('is false for a node before the range', function () {
+    it('returns false for a node before the range', () => {
       testNode.innerHTML = 'one <b>two</b> three';
-      const rng = createRange(testNode, 1, 2);
-      assert.equal(rangeUtil.isNodeInRange(rng, testNode.firstChild), false);
+      const range = createRange(testNode, 1, 2);
+      assert.isFalse(rangeUtil.isNodeInRange(range, testNode.firstChild));
     });
 
-    it('is false for a node after the range', function () {
+    it('returns false for a node after the range', () => {
       testNode.innerHTML = 'one <b>two</b> three';
-      const rng = createRange(testNode, 1, 2);
-      assert.equal(
-        rangeUtil.isNodeInRange(rng, testNode.childNodes.item(2)),
-        false
+      const range = createRange(testNode, 1, 2);
+      assert.isFalse(
+        rangeUtil.isNodeInRange(range, testNode.childNodes.item(2))
       );
+    });
+
+    it('can test a node with no parent', () => {
+      const node = document.createElement('span');
+      const range = new Range();
+      range.setStart(node, 0);
+      range.setEnd(node, 0);
+      assert.isTrue(rangeUtil.isNodeInRange(range, node));
+    });
+
+    it('can test a node against an empty range', () => {
+      const node = document.createElement('span');
+      const range = new Range();
+      assert.isFalse(rangeUtil.isNodeInRange(range, node));
     });
   });
 
