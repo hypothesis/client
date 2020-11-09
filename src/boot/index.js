@@ -21,6 +21,9 @@ if (isBrowserSupported()) {
     assetRoot: processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__'),
     // @ts-ignore - `__MANIFEST__` is injected by the build script
     manifest: __MANIFEST__,
+    notebookAppUrl: processUrlTemplate(
+      settings.notebookAppUrl || '__NOTEBOOK_APP_URL__'
+    ),
     sidebarAppUrl: processUrlTemplate(
       settings.sidebarAppUrl || '__SIDEBAR_APP_URL__'
     ),

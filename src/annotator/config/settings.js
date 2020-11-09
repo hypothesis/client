@@ -8,6 +8,39 @@ export default function settingsFrom(window_) {
   const configFuncSettings = configFuncSettingsFrom(window_);
 
   /**
+   * Return the href URL of the first notebook link in the given document.
+   *
+   * Return the value of the href attribute of the first
+   * `<link type="application/annotator+html" rel="notebook">` element in the given document.
+   *
+   * This URL is used as the src of the notebook's iframe.
+   *
+   * @return {string} - The URL to use for the notebook's iframe.
+   *
+   * @throws {Error} - If there's no notebook link or the first notebook has
+   *   no href.
+   *
+   */
+  function notebookAppUrl() {
+    const link = window_.document.querySelector(
+      'link[type="application/annotator+html"][rel="notebook"]'
+    );
+
+    if (!link) {
+      throw new Error(
+        'No application/annotator+html (rel="notebook") link in the document'
+      );
+    }
+
+    if (!link.href) {
+      throw new Error(
+        'application/annotator+html (rel="notebook") link has no href'
+      );
+    }
+    return link.href;
+  }
+
+  /**
    * Return the href URL of the first annotator sidebar link in the given document.
    *
    * Return the value of the href attribute of the first
@@ -37,7 +70,6 @@ export default function settingsFrom(window_) {
         'application/annotator+html (rel="sidebar") link has no href'
       );
     }
-
     return link.href;
   }
 
@@ -208,6 +240,9 @@ export default function settingsFrom(window_) {
     },
     get showHighlights() {
       return showHighlights();
+    },
+    get notebookAppUrl() {
+      return notebookAppUrl();
     },
     get sidebarAppUrl() {
       return sidebarAppUrl();

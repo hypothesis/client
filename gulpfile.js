@@ -228,6 +228,9 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
     ? `${process.env.SIDEBAR_APP_URL}`
     : '{current_scheme}://{current_host}:5000/app.html';
 
+  const defaultNotebookAppUrl = process.env.SIDEBAR_APP_URL
+    ? `${process.env.NOTEBOOK_APP_URL}`
+    : '{current_scheme}://{current_host}:5000/notebook.html';
   let defaultAssetRoot;
 
   if (process.env.NODE_ENV === 'production' && !usingDevServer) {
@@ -239,6 +242,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
 
   if (isFirstBuild) {
     log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
+    log(`Notebook app URL: ${defaultNotebookAppUrl}`);
     log(`Client asset root URL: ${defaultAssetRoot}`);
     isFirstBuild = false;
   }
@@ -248,6 +252,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
     .pipe(replace('__MANIFEST__', JSON.stringify(manifest)))
     .pipe(replace('__ASSET_ROOT__', defaultAssetRoot))
     .pipe(replace('__SIDEBAR_APP_URL__', defaultSidebarAppUrl))
+    .pipe(replace('__NOTEBOOK_APP_URL__', defaultNotebookAppUrl))
     // Strip sourcemap link. It will have been invalidated by the previous
     // replacements and the bundle is so small that it isn't really valuable.
     .pipe(replace(/^\/\/# sourceMappingURL=\S+$/m, ''))
