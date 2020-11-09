@@ -228,7 +228,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
     ? `${process.env.SIDEBAR_APP_URL}`
     : '{current_scheme}://{current_host}:5000/app.html';
 
-  const defaultNotebookAppUrl = process.env.SIDEBAR_APP_URL
+  const defaultNotebookAppUrl = process.env.NOTEBOOK_APP_URL
     ? `${process.env.NOTEBOOK_APP_URL}`
     : '{current_scheme}://{current_host}:5000/notebook.html';
   let defaultAssetRoot;
