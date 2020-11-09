@@ -24,6 +24,20 @@ class FakePlugin extends Delegator {
 }
 FakePlugin.instance = null;
 
+class FakeTextRange {
+  constructor(range) {
+    this.range = range;
+  }
+
+  toRange() {
+    return this.range;
+  }
+
+  static fromRange(range) {
+    return new FakeTextRange(range);
+  }
+}
+
 // A little helper which returns a promise that resolves after a timeout
 const timeoutPromise = (millis = 0) =>
   new Promise(resolve => setTimeout(resolve, millis));
@@ -86,6 +100,9 @@ describe('Guest', () => {
     $imports.$mock({
       './adder': { Adder: FakeAdder },
       './anchoring/html': htmlAnchoring,
+      './anchoring/text-range': {
+        TextRange: FakeTextRange,
+      },
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './selection-observer': {
@@ -262,55 +279,82 @@ describe('Guest', () => {
       it('scrolls to the anchor with the matching tag', () => {
         const highlight = document.createElement('span');
         const guest = createGuest();
+        const fakeRange = sinon.stub();
         guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: [highlight] },
+          {
+            annotation: { $tag: 'tag1' },
+            highlights: [highlight],
+            range: new FakeTextRange(fakeRange),
+          },
         ];
+
         emitGuestEvent('scrollToAnnotation', 'tag1');
+
         assert.called(scrollIntoView);
         assert.calledWith(scrollIntoView, highlight);
       });
 
-      context('when dispatching the "scrolltorange" event', () => {
-        it('emits with the range', () => {
-          const highlight = document.createElement('span');
-          const guest = createGuest();
-          const fakeRange = sinon.stub();
-          guest.anchors = [
-            {
-              annotation: { $tag: 'tag1' },
-              highlights: [highlight],
-              range: fakeRange,
-            },
-          ];
+      it('emits a "scrolltorange" DOM event', () => {
+        const highlight = document.createElement('span');
+        const guest = createGuest();
+        const fakeRange = sinon.stub();
+        guest.anchors = [
+          {
+            annotation: { $tag: 'tag1' },
+            highlights: [highlight],
+            range: new FakeTextRange(fakeRange),
+          },
+        ];
 
-          return new Promise(resolve => {
-            guest.element.addEventListener('scrolltorange', event => {
-              assert.equal(event.detail, fakeRange);
-              resolve();
-            });
-
-            emitGuestEvent('scrollToAnnotation', 'tag1');
+        return new Promise(resolve => {
+          guest.element.addEventListener('scrolltorange', event => {
+            assert.equal(event.detail, fakeRange);
+            resolve();
           });
-        });
 
-        it('allows the default scroll behaviour to be prevented', () => {
-          const highlight = document.createElement('span');
-          const guest = createGuest();
-          const fakeRange = sinon.stub();
-          guest.anchors = [
-            {
-              annotation: { $tag: 'tag1' },
-              highlights: [highlight],
-              range: fakeRange,
-            },
-          ];
-
-          guest.element.addEventListener('scrolltorange', event =>
-            event.preventDefault()
-          );
           emitGuestEvent('scrollToAnnotation', 'tag1');
-          assert.notCalled(scrollIntoView);
         });
+      });
+
+      it('allows the default scroll behaviour to be prevented', () => {
+        const highlight = document.createElement('span');
+        const guest = createGuest();
+        const fakeRange = sinon.stub();
+        guest.anchors = [
+          {
+            annotation: { $tag: 'tag1' },
+            highlights: [highlight],
+            range: new FakeTextRange(fakeRange),
+          },
+        ];
+        guest.element.addEventListener('scrolltorange', event =>
+          event.preventDefault()
+        );
+
+        emitGuestEvent('scrollToAnnotation', 'tag1');
+
+        assert.notCalled(scrollIntoView);
+      });
+
+      it("does nothing if the anchor's range cannot be resolved", () => {
+        const highlight = document.createElement('span');
+        const guest = createGuest();
+        guest.anchors = [
+          {
+            annotation: { $tag: 'tag1' },
+            highlights: [highlight],
+            range: {
+              toRange: sinon.stub().throws(new Error('Something went wrong')),
+            },
+          },
+        ];
+        const eventEmitted = sinon.stub();
+        guest.element.addEventListener('scrolltorange', eventEmitted);
+
+        emitGuestEvent('scrollToAnnotation', 'tag1');
+
+        assert.notCalled(eventEmitted);
+        assert.notCalled(scrollIntoView);
       });
     });
 
@@ -763,7 +807,7 @@ describe('Guest', () => {
         assert.equal(guest.anchors.length, 1);
         assert.strictEqual(guest.anchors[0].annotation, annotation);
         assert.strictEqual(guest.anchors[0].target, target);
-        assert.strictEqual(guest.anchors[0].range, range);
+        assert.strictEqual(guest.anchors[0].range.toRange(), range);
         assert.strictEqual(guest.anchors[0].highlights, highlights);
       });
     });
