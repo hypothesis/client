@@ -15,10 +15,14 @@ export default function router($window, store) {
     const params = queryString.parse($window.location.search);
 
     let route;
+
     switch (pathSegments[0]) {
       case 'a':
         route = 'annotation';
         params.id = pathSegments[1] || '';
+        break;
+      case 'notebook.html':
+        route = 'stream';
         break;
       case 'stream':
         route = 'stream';

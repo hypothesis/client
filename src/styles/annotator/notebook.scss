@@ -16,6 +16,7 @@
   .notebook-inner {
     box-sizing: border-box;
     @include molecules.panel;
+    width: 100%;
     height: 100%;
   }
 }
