@@ -12,7 +12,14 @@ const commonPolyfills = [
 ];
 
 /**
- * @typedef Config
+ * @typedef SidebarAppConfig
+ * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
+ * @prop {Object.<string,string>} manifest -
+ *   A mapping from canonical asset path to cache-busted asset path
+ */
+
+/**
+ * @typedef AnnotatorConfig
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
  * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
  * @prop {Object.<string,string>} manifest -
@@ -48,7 +55,7 @@ function injectScript(doc, src) {
 
 /**
  * @param {Document} doc
- * @param {Config} config
+ * @param {SidebarAppConfig|AnnotatorConfig} config
  * @param {string[]} assets
  */
 function injectAssets(doc, config, assets) {
@@ -74,9 +81,9 @@ function polyfillBundles(needed) {
  * This triggers loading of the necessary resources for the client
  *
  * @param {Document} doc
- * @param {Config} config
+ * @param {AnnotatorConfig} config
  */
-function bootHypothesisClient(doc, config) {
+export function bootHypothesisClient(doc, config) {
   // Detect presence of Hypothesis in the page
   const appLinkEl = doc.querySelector(
     'link[type="application/annotator+html"]'
@@ -120,9 +127,9 @@ function bootHypothesisClient(doc, config) {
  * Bootstrap the sidebar application which displays annotations.
  *
  * @param {Document} doc
- * @param {Config} config
+ * @param {SidebarAppConfig} config
  */
-function bootSidebarApp(doc, config) {
+export function bootSidebarApp(doc, config) {
   const polyfills = polyfillBundles(commonPolyfills);
 
   injectAssets(doc, config, [
@@ -139,19 +146,4 @@ function bootSidebarApp(doc, config) {
     'styles/katex.min.css',
     'styles/sidebar.css',
   ]);
-}
-
-/**
- * Initialize the "sidebar" application if run in the sidebar's stub HTML
- * page or the "annotator" application otherwise.
- *
- * @param {Document} document_
- * @param {Config} config
- */
-export default function boot(document_, config) {
-  if (document_.querySelector('hypothesis-app')) {
-    bootSidebarApp(document_, config);
-  } else {
-    bootHypothesisClient(document_, config);
-  }
 }
