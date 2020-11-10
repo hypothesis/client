@@ -230,7 +230,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
 
   const defaultNotebookAppUrl = process.env.NOTEBOOK_APP_URL
     ? `${process.env.NOTEBOOK_APP_URL}`
-    : '{current_scheme}://{current_host}:5000/notebook.html';
+    : '{current_scheme}://{current_host}:5000/notebook';
   let defaultAssetRoot;
 
   if (process.env.NODE_ENV === 'production' && !usingDevServer) {
