@@ -23,20 +23,8 @@
   }
 
   // Timestamps are right aligned in a flex row
-  &__timestamp {
+  &__timestamps {
     margin-left: auto;
-  }
-
-  &__timestamp-edited {
-    @include utils.font--small;
-    font-style: italic;
-    color: var.$color-text--light;
-  }
-
-  &__timestamp-created-link {
-    &:hover {
-      text-decoration: underline;
-    }
   }
 
   &__highlight-icon {

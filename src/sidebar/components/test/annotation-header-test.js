@@ -164,39 +164,42 @@ describe('AnnotationHeader', () => {
   });
 
   describe('timestamps', () => {
-    it('should render timestamp container element if annotation has a `created` value', () => {
+    it('should not render timestamps if annotation is missing `created` date', () => {
+      const annotation = fixtures.defaultAnnotation();
+      delete annotation.created;
+      const wrapper = createAnnotationHeader({ annotation });
+
+      const timestamp = wrapper.find('AnnotationTimestamps');
+
+      assert.isFalse(timestamp.exists());
+    });
+
+    it('should render timestamps  if annotation has a `created` value', () => {
       const wrapper = createAnnotationHeader();
-      const timestamp = wrapper.find('.annotation-header__timestamp');
+      const timestamp = wrapper.find('AnnotationTimestamps');
 
       assert.isTrue(timestamp.exists());
     });
 
-    it('should render edited timestamp if annotation has been edited', () => {
+    it('should render `updated` timestamp if annotation has an `updated` value', () => {
       const annotation = fixtures.defaultAnnotation();
       fakeHasBeenEdited.returns(true);
 
       const wrapper = createAnnotationHeader({
         annotation: annotation,
       });
-      const timestamp = wrapper
-        .find('Timestamp')
-        .filter('.annotation-header__timestamp-edited-link');
-
-      assert.isTrue(timestamp.exists());
+      const timestamp = wrapper.find('AnnotationTimestamps');
+      assert.equal(timestamp.props().withEditedTimestamp, true);
     });
 
     it('should not render edited timestamp if annotation has not been edited', () => {
       // Default annotation's created value is same as updated; as if the annotation
       // has not been edited before
       fakeHasBeenEdited.returns(false);
-      const wrapper = createAnnotationHeader({
-        annotation: fixtures.newAnnotation(),
-      });
-      const timestamp = wrapper
-        .find('Timestamp')
-        .filter('.annotation-header__timestamp-edited-link');
+      const wrapper = createAnnotationHeader();
 
-      assert.isFalse(timestamp.exists());
+      const timestamp = wrapper.find('AnnotationTimestamps');
+      assert.equal(timestamp.props().withEditedTimestamp, false);
     });
 
     it('should not render edited timestamp if annotation is collapsed reply', () => {
@@ -210,11 +213,8 @@ describe('AnnotationHeader', () => {
         threadIsCollapsed: true,
       });
 
-      const timestamp = wrapper
-        .find('Timestamp')
-        .filter('.annotation-header__timestamp-edited-link');
-
-      assert.isFalse(timestamp.exists());
+      const timestamp = wrapper.find('AnnotationTimestamps');
+      assert.equal(timestamp.props().withEditedTimestamp, false);
     });
   });
 
@@ -277,7 +277,7 @@ describe('AnnotationHeader', () => {
         isEditing: true,
       });
 
-      const timestamp = wrapper.find('Timestamp');
+      const timestamp = wrapper.find('AnnotationTimestamps');
 
       assert.isFalse(timestamp.exists());
     });
