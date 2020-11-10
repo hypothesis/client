@@ -21,7 +21,7 @@ export default function router($window, store) {
         route = 'annotation';
         params.id = pathSegments[1] || '';
         break;
-      case 'notebook.html':
+      case 'notebook':
         route = 'stream';
         break;
       case 'stream':
