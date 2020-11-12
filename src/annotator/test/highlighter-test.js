@@ -90,6 +90,49 @@ describe('annotator/highlighter', () => {
       assert.isTrue(result[0].classList.contains('hypothesis-highlight'));
     });
 
+    const testText = 'one two three';
+
+    [
+      // Range starting at the start of text node and ending in the middle.
+      [0, 5],
+      // Range starting in the middle of text node and ending in the middle.
+      [4, 7],
+      // Range starting in the middle of text node and ending at the end.
+      [4, testText.length],
+      // Empty ranges.
+      [0, 0],
+      [5, 5],
+      [testText.length, testText.length],
+    ].forEach(([startPos, endPos]) => {
+      it('splits text nodes when only part of one should be highlighted', () => {
+        const el = document.createElement('span');
+        el.append(testText);
+
+        const range = new Range();
+        range.setStart(el.firstChild, startPos);
+        range.setEnd(el.firstChild, endPos);
+        const result = highlightRange(range);
+
+        const highlightedText = result.reduce(
+          (str, el) => str + el.textContent,
+          ''
+        );
+        assert.equal(highlightedText, testText.slice(startPos, endPos));
+        assert.equal(el.textContent, testText);
+      });
+    });
+
+    it('handles a range with no text nodes', () => {
+      const el = document.createElement('span');
+
+      const range = new Range();
+      range.setStart(el, 0);
+      range.setEnd(el, 0);
+      const highlights = highlightRange(range);
+
+      assert.deepEqual(highlights, []);
+    });
+
     it('wraps multiple text nodes which are not adjacent', () => {
       const strings = ['hello', ' Brave ', ' New ', ' World'];
       const textNodes = strings.map(s => document.createTextNode(s));

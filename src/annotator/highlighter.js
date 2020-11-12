@@ -154,6 +154,13 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
  * @return {Text[]}
  */
 function wholeTextNodesInRange(range) {
+  if (range.collapsed) {
+    // Exit early for an empty range to avoid an edge case that breaks the algorithm
+    // below. Splitting a text node at the start of an empty range can leave the
+    // range ending in the left part rather than the right part.
+    return [];
+  }
+
   const textNodes = [];
 
   forEachNodeInRange(range, node => {
@@ -163,10 +170,12 @@ function wholeTextNodesInRange(range) {
     let text = /** @type {Text} */ (node);
 
     if (text === range.startContainer && range.startOffset > 0) {
+      // Split `text` where the range starts, setting it to the part in the range.
       text = text.splitText(range.startOffset);
     }
 
     if (text === range.endContainer && range.endOffset < text.data.length) {
+      // Split `text` where the range ends, leaving it as the part in the range.
       text.splitText(range.endOffset);
     }
 
