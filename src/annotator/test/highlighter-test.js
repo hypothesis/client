@@ -122,6 +122,23 @@ describe('annotator/highlighter', () => {
       });
     });
 
+    it('generates correct highlights when the start text node is split', () => {
+      const el = document.createElement('span');
+      el.append('foo bar baz');
+
+      // nb. It is important for this test case that the start is in the middle
+      // of a text node and the end is a point _after_ the text node.
+      const range = new Range();
+      range.setStart(el.firstChild, 4);
+      range.setEnd(el, 1);
+      highlightRange(range, '' /* cssClass */);
+
+      assert.equal(
+        el.innerHTML,
+        'foo <hypothesis-highlight class="">bar baz</hypothesis-highlight>'
+      );
+    });
+
     it('handles a range with no text nodes', () => {
       const el = document.createElement('span');
 
