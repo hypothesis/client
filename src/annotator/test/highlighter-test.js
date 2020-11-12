@@ -150,6 +150,17 @@ describe('annotator/highlighter', () => {
       assert.deepEqual(highlights, []);
     });
 
+    it('handles a range with no parent element', () => {
+      const text = document.createTextNode('foobar');
+
+      const range = new Range();
+      range.setStart(text, 0);
+      range.setEnd(text, text.data.length);
+      const highlights = highlightRange(range);
+
+      assert.deepEqual(highlights, []);
+    });
+
     it('wraps multiple text nodes which are not adjacent', () => {
       const strings = ['hello', ' Brave ', ' New ', ' World'];
       const textNodes = strings.map(s => document.createTextNode(s));
