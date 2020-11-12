@@ -26,10 +26,18 @@ if (isBrowserSupported()) {
   if (document.querySelector('hypothesis-app')) {
     bootSidebarApp(document, { assetRoot, manifest });
   } else {
+    const notebookAppUrl = processUrlTemplate(
+      settings.notebookAppUrl || '__NOTEBOOK_APP_URL__'
+    );
     const sidebarAppUrl = processUrlTemplate(
       settings.sidebarAppUrl || '__SIDEBAR_APP_URL__'
     );
-    bootHypothesisClient(document, { assetRoot, manifest, sidebarAppUrl });
+    bootHypothesisClient(document, {
+      assetRoot,
+      manifest,
+      notebookAppUrl,
+      sidebarAppUrl,
+    });
   }
 } else {
   // Show a "quiet" warning to avoid being disruptive on non-Hypothesis sites
