@@ -194,6 +194,7 @@ function HypothesisApp({
             {route === 'annotation' && (
               <AnnotationViewerContent onLogin={login} />
             )}
+            {route === 'notebook' && <StreamContent />}
             {route === 'stream' && <StreamContent />}
             {route === 'sidebar' && (
               <SidebarContent onLogin={login} onSignUp={signUp} />
