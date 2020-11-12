@@ -116,6 +116,10 @@ describe('HypothesisApp', () => {
       contentComponent: 'SidebarContent',
     },
     {
+      route: 'notebook',
+      contentComponent: 'StreamContent',
+    },
+    {
       route: 'stream',
       contentComponent: 'StreamContent',
     },

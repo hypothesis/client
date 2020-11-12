@@ -8,6 +8,11 @@ const fixtures = [
     params: {},
   },
   {
+    path: '/notebook',
+    route: 'notebook',
+    params: {},
+  },
+  {
     path: '/a/foo',
     route: 'annotation',
     params: { id: 'foo' },

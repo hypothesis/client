@@ -15,10 +15,14 @@ export default function router($window, store) {
     const params = queryString.parse($window.location.search);
 
     let route;
+
     switch (pathSegments[0]) {
       case 'a':
         route = 'annotation';
         params.id = pathSegments[1] || '';
+        break;
+      case 'notebook':
+        route = 'notebook';
         break;
       case 'stream':
         route = 'stream';
@@ -46,6 +50,9 @@ export default function router($window, store) {
           delete queryParams.id;
           url = `/a/${id}`;
         }
+        break;
+      case 'notebook':
+        url = '/notebook';
         break;
       case 'stream':
         url = '/stream';
