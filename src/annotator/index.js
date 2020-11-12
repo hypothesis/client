@@ -22,6 +22,7 @@ import BucketBarPlugin from './plugin/bucket-bar';
 import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import Guest from './guest';
+import Notebook from './notebook';
 import PDFPlugin from './plugin/pdf';
 import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
@@ -70,9 +71,11 @@ function init() {
   config.pluginClasses = pluginClasses;
 
   const annotator = new Klass(document.body, config);
+  const notebook = new Notebook(document.body, config);
   appLinkEl.addEventListener('destroy', function () {
     appLinkEl.remove();
     annotator.destroy();
+    notebook.destroy();
   });
 }
 
