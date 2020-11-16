@@ -3,7 +3,7 @@
  *
  * @param {Node} node
  */
-function previousSiblingTextLength(node) {
+function previousSiblingsTextLength(node) {
   let sibling = node.previousSibling;
   let length = 0;
   while (sibling) {
@@ -59,6 +59,8 @@ export class TextPosition {
     let textNode;
     let length = 0;
 
+    // Find the text node containing the `this.offset`th character from the start
+    // of `this.element`.
     while ((currentNode = nodeIter.nextNode())) {
       textNode = /** @type {Text} */ (currentNode);
       if (length + textNode.data.length > this.offset) {
@@ -67,6 +69,7 @@ export class TextPosition {
       length += textNode.data.length;
     }
 
+    // Boundary case.
     if (textNode && length === this.offset) {
       return { node: textNode, offset: textNode.data.length };
     }
@@ -92,8 +95,8 @@ export class TextPosition {
           throw new Error('Text node has no parent');
         }
 
-        // Get the offset to the start of the parent element.
-        const textOffset = previousSiblingTextLength(node) + offset;
+        // Get the offset from the start of the parent element.
+        const textOffset = previousSiblingsTextLength(node) + offset;
 
         return new TextPosition(node.parentElement, textOffset);
       }
@@ -153,7 +156,7 @@ export class TextRange {
   }
 
   /**
-   * Convert an exiting DOM `Range` to a `TextRange`
+   * Convert an existing DOM `Range` to a `TextRange`
    *
    * @param {Range} range
    * @return {TextRange}

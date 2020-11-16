@@ -45,43 +45,35 @@ describe('annotator/anchoring/text-range', () => {
     });
 
     describe('#resolve', () => {
-      [
-        // Position at the start of the element.
-        {
-          getPosition: () => 0,
-          getExpected: () => {
-            const firstNode = textNodes(container)[0];
-            return { node: firstNode, offset: 0 };
-          },
-        },
+      it('resolves text position at start of element to correct node and offset', () => {
+        const pos = new TextPosition(container, 0);
 
-        // Position in the middle of the element.
-        {
-          getPosition: () => container.textContent.indexOf('is a'),
-          getExpected: () => ({
-            node: container.querySelector('p').firstChild,
-            offset: 'This '.length,
-          }),
-        },
+        const { node, offset } = pos.resolve();
 
-        // Position at the end of the element.
-        {
-          getPosition: () => container.textContent.length,
-          getExpected: () => {
-            const lastText = textNodes(container).slice(-1)[0];
-            return { node: lastText, offset: lastText.data.length };
-          },
-        },
-      ].forEach(({ getPosition, getExpected }) => {
-        it('resolves text position to correct node and offset', () => {
-          const pos = new TextPosition(container, getPosition());
+        assertNodesEqual(node, textNodes(container)[0]);
+        assert.equal(offset, 0);
+      });
 
-          const { node, offset } = pos.resolve();
-          const { node: expectedNode, offset: expectedOffset } = getExpected();
+      it('resolves text position in middle of element to correct node and offset', () => {
+        const pos = new TextPosition(
+          container,
+          container.textContent.indexOf('is a')
+        );
 
-          assertNodesEqual(node, expectedNode);
-          assert.equal(offset, expectedOffset);
-        });
+        const { node, offset } = pos.resolve();
+
+        assertNodesEqual(node, container.querySelector('p').firstChild);
+        assert.equal(offset, 'This '.length);
+      });
+
+      it('resolves text position at end of element to correct node and offset', () => {
+        const pos = new TextPosition(container, container.textContent.length);
+
+        const { node, offset } = pos.resolve();
+
+        const lastTextNode = textNodes(container).slice(-1)[0];
+        assertNodesEqual(node, lastTextNode);
+        assert.equal(offset, lastTextNode.data.length);
       });
 
       it('throws if offset exceeds current text content length', () => {
