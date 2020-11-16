@@ -127,7 +127,17 @@ describe('annotator/highlighter', () => {
       el.append('foo bar baz');
 
       // nb. It is important for this test case that the start is in the middle
-      // of a text node and the end is a point _after_ the text node.
+      // of a text node and the end is a point _after_ the text node. eg:
+      //
+      // ```
+      // <div>
+      //   some [text
+      //   <b>]foo</b>
+      // </div>
+      // ```
+      //
+      // (Where the `[` and `]` denote the endpoints of the range)
+
       const range = new Range();
       range.setStart(el.firstChild, 4);
       range.setEnd(el, 1);
