@@ -140,6 +140,7 @@ export default function Menu({
     }
   };
 
+  /** @type {{ position: 'relative'|'static' }} */
   const containerStyle = {
     position: containerPositioned ? 'relative' : 'static',
   };
