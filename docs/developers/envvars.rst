@@ -4,6 +4,12 @@ Environment Variables
 This section documents all the environment variables supported by the client's
 build tasks.
 
+.. envvar:: NOTEBOOK_APP_URL
+
+   The default value for the :option:`notebookAppUrl` config setting (the URL of
+   the notebook app's iframe).
+   ``https://hypothes.is/notebook`` by default.
+
 .. envvar:: SIDEBAR_APP_URL
 
    The default value for the :option:`sidebarAppUrl` config setting (the URL of
