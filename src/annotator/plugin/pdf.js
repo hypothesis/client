@@ -75,9 +75,32 @@ export default class PDF extends Delegator {
     this._warningBanner = null;
 
     this._checkForSelectableText();
+
+    // Hide annotation layer when the user is making a selection. The annotation
+    // layer appears above the invisible text layer and can interfere with text
+    // selection. See https://github.com/hypothesis/client/issues/1464.
+    this._updateAnnotationLayerVisibility = () => {
+      const selection = /** @type {Selection} */ (window_.getSelection());
+
+      // Add CSS class to indicate whether there is a selection. Annotation
+      // layers are then hidden by a CSS rule in `pdfjs-overrides.scss`.
+      this.pdfViewer.viewer.classList.toggle(
+        'is-selecting',
+        !selection.isCollapsed
+      );
+    };
+
+    document.addEventListener(
+      'selectionchange',
+      this._updateAnnotationLayerVisibility
+    );
   }
 
   destroy() {
+    document.removeEventListener(
+      'selectionchange',
+      this._updateAnnotationLayerVisibility
+    );
     this.pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this.observer.disconnect();
   }
