@@ -32,10 +32,33 @@ export class TextPosition {
       throw new Error('Offset is invalid');
     }
 
+    /** Element that `offset` is relative to. */
     this.element = element;
 
     /** Character offset from the start of the element's `textContent`. */
     this.offset = offset;
+  }
+
+  /**
+   * Return a copy of this position with offset relative to a given ancestor
+   * element.
+   *
+   * @param {Element} parent - Ancestor of `this.element`
+   * @return {TextPosition}
+   */
+  relativeTo(parent) {
+    if (!parent.contains(this.element)) {
+      throw new Error('Parent is not an ancestor of current element');
+    }
+
+    let el = this.element;
+    let offset = this.offset;
+    while (el !== parent) {
+      offset += previousSiblingsTextLength(el);
+      el = /** @type {Element} */ (el.parentElement);
+    }
+
+    return new TextPosition(el, offset);
   }
 
   /**
@@ -140,6 +163,10 @@ export class TextRange {
 
   /**
    * Resolve the `TextRange` to a DOM range.
+   *
+   * The resulting DOM Range will always start and end in a `Text` node.
+   * Hence `TextRange.fromRange(range).toRange()` can be used to "shrink" a
+   * range to the text it contains.
    *
    * May throw if the `start` or `end` positions cannot be resolved to a range.
    *
