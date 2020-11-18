@@ -159,16 +159,43 @@ describe('annotator/anchoring/pdf', function () {
       });
     });
 
-    it('rejects when text selection spans multiple pages', () => {
+    it('throws if range spans multiple pages', async () => {
       viewer.pdfViewer.setCurrentPage(2, 3);
       const range = findText(container, 'occupied again? NODE A');
 
-      return pdfAnchoring.describe(container, range).catch(err => {
-        assert.equal(
-          err.message,
-          'Selecting across page breaks is not supported'
-        );
-      });
+      await assert.rejects(
+        pdfAnchoring.describe(container, range),
+        'Selecting across page breaks is not supported'
+      );
+    });
+
+    it('throws if range is outside the text layer', async () => {
+      viewer.pdfViewer.setCurrentPage(2, 3);
+
+      const range = new Range();
+      const el = document.createElement('div');
+      el.append('foobar');
+      range.setStart(el.firstChild, 0);
+      range.setEnd(el.firstChild, 6);
+
+      await assert.rejects(
+        pdfAnchoring.describe(container, range),
+        'Selection is outside page text'
+      );
+    });
+
+    it('throws if range does not contain any text nodes', async () => {
+      viewer.pdfViewer.setCurrentPage(2, 3);
+
+      const range = new Range();
+      const el = document.createElement('div');
+      range.setStart(el, 0);
+      range.setEnd(el, 0);
+
+      await assert.rejects(
+        pdfAnchoring.describe(container, range),
+        'Selection does not contain text'
+      );
     });
   });
 
