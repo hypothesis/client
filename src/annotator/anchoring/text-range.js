@@ -14,6 +14,52 @@ function previousSiblingsTextLength(node) {
 }
 
 /**
+ * Resolve one or more character offsets within an element to (text node, position)
+ * pairs.
+ *
+ * @param {Element} element
+ * @param {number[]} offsets - Offsets, which must be sorted in ascending order
+ * @return {{ node: Text, offset: number }[]}
+ */
+function resolveOffsets(element, ...offsets) {
+  let nextOffset = offsets.shift();
+  const nodeIter = /** @type {Document} */ (element.ownerDocument).createNodeIterator(
+    element,
+    NodeFilter.SHOW_TEXT
+  );
+  const results = [];
+
+  let currentNode = nodeIter.nextNode();
+  let textNode;
+  let length = 0;
+
+  // Find the text node containing the `nextOffset`th character from the start
+  // of `element`.
+  while (nextOffset !== undefined && currentNode) {
+    textNode = /** @type {Text} */ (currentNode);
+    if (length + textNode.data.length > nextOffset) {
+      results.push({ node: textNode, offset: nextOffset - length });
+      nextOffset = offsets.shift();
+    } else {
+      currentNode = nodeIter.nextNode();
+      length += textNode.data.length;
+    }
+  }
+
+  // Boundary case.
+  while (nextOffset !== undefined && textNode && length === nextOffset) {
+    results.push({ node: textNode, offset: textNode.data.length });
+    nextOffset = offsets.shift();
+  }
+
+  if (nextOffset !== undefined) {
+    throw new RangeError('Offset exceeds text length');
+  }
+
+  return results;
+}
+
+/**
  * Represents an offset within the text content of an element.
  *
  * This position can be resolved to a specific descendant node in the current
@@ -72,32 +118,7 @@ export class TextPosition {
    * @throws {RangeError}
    */
   resolve() {
-    const root = this.element;
-    const nodeIter = /** @type {Document} */ (root.ownerDocument).createNodeIterator(
-      root,
-      NodeFilter.SHOW_TEXT
-    );
-
-    let currentNode;
-    let textNode;
-    let length = 0;
-
-    // Find the text node containing the `this.offset`th character from the start
-    // of `this.element`.
-    while ((currentNode = nodeIter.nextNode())) {
-      textNode = /** @type {Text} */ (currentNode);
-      if (length + textNode.data.length > this.offset) {
-        return { node: textNode, offset: this.offset - length };
-      }
-      length += textNode.data.length;
-    }
-
-    // Boundary case.
-    if (textNode && length === this.offset) {
-      return { node: textNode, offset: textNode.data.length };
-    }
-
-    throw new RangeError('Offset exceeds text length');
+    return resolveOffsets(this.element, this.offset)[0];
   }
 
   /**
@@ -173,12 +194,27 @@ export class TextRange {
    * @return {Range}
    */
   toRange() {
-    const { node: startNode, offset: startOffset } = this.start.resolve();
-    const { node: endNode, offset: endOffset } = this.end.resolve();
+    let start;
+    let end;
+
+    if (
+      this.start.element === this.end.element &&
+      this.start.offset <= this.end.offset
+    ) {
+      // Fast path for start and end points in same element.
+      [start, end] = resolveOffsets(
+        this.start.element,
+        this.start.offset,
+        this.end.offset
+      );
+    } else {
+      start = this.start.resolve();
+      end = this.end.resolve();
+    }
 
     const range = new Range();
-    range.setStart(startNode, startOffset);
-    range.setEnd(endNode, endOffset);
+    range.setStart(start.node, start.offset);
+    range.setEnd(end.node, end.offset);
     return range;
   }
 
