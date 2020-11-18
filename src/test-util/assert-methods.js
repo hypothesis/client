@@ -29,7 +29,7 @@ const rejects = async (promiseResult, errorMessage) => {
     if (errorMessage instanceof RegExp) {
       assert.isTrue(errorMessage.test(e.message));
     } else {
-      assert.equal(errorMessage, e.message);
+      assert.equal(e.message, errorMessage);
     }
   }
 };
