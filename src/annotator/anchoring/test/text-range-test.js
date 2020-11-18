@@ -174,7 +174,7 @@ describe('annotator/anchoring/text-range', () => {
 
   describe('TextRange', () => {
     describe('#toRange', () => {
-      it('resolves start and end points', () => {
+      it('resolves start and end points in same element', () => {
         const el = document.createElement('div');
         el.textContent = 'one two three';
 
@@ -185,6 +185,51 @@ describe('annotator/anchoring/text-range', () => {
         const range = textRange.toRange();
 
         assert.equal(range.toString(), 'two');
+      });
+
+      it('resolves start and end points in same element but different text nodes', () => {
+        const el = document.createElement('div');
+        el.append('one', 'two', 'three');
+
+        const textRange = new TextRange(
+          new TextPosition(el, 0),
+          new TextPosition(el, el.textContent.length)
+        );
+        const range = textRange.toRange();
+
+        assert.equal(range.toString(), el.textContent);
+      });
+
+      it('resolves start and end points in same element with start > end', () => {
+        const el = document.createElement('div');
+        el.textContent = 'one two three';
+
+        const textRange = new TextRange(
+          new TextPosition(el, 7),
+          new TextPosition(el, 4)
+        );
+        const range = textRange.toRange();
+
+        assert.equal(range.startContainer, el.firstChild);
+        assert.equal(range.startOffset, 4);
+        assert.isTrue(range.collapsed);
+      });
+
+      it('resolves start and end points in different elements', () => {
+        const parent = document.createElement('div');
+        const firstChild = document.createElement('span');
+        firstChild.append('foo');
+        const secondChild = document.createElement('span');
+        secondChild.append('bar');
+        parent.append(firstChild, secondChild);
+
+        const textRange = new TextRange(
+          new TextPosition(firstChild, 0),
+          new TextPosition(secondChild, 3)
+        );
+        const range = textRange.toRange();
+
+        assert.equal(range.toString(), 'foobar');
       });
 
       it('throws if start point cannot be resolved', () => {
