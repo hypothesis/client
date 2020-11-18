@@ -166,7 +166,7 @@ describe('annotator/anchoring/pdf', function () {
       return pdfAnchoring.describe(container, range).catch(err => {
         assert.equal(
           err.message,
-          'selecting across page breaks is not supported'
+          'Selecting across page breaks is not supported'
         );
       });
     });
