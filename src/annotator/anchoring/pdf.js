@@ -64,7 +64,7 @@ function getSiblingIndex(node) {
  */
 function getNodeTextLayer(node) {
   const el = 'closest' in node ? node : node.parentElement;
-  return el?.closest('.page')?.querySelector('.textLayer') ?? null;
+  return el?.closest('.textLayer') ?? null;
 }
 
 /**
