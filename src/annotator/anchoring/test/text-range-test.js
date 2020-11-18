@@ -88,6 +88,38 @@ describe('annotator/anchoring/text-range', () => {
       });
     });
 
+    describe('#relativeTo', () => {
+      it("throws an error if argument is not an ancestor of position's element", () => {
+        const el = document.createElement('div');
+        el.append('One');
+        const pos = TextPosition.fromPoint(el.firstChild, 0);
+
+        assert.throws(() => {
+          pos.relativeTo(document.body);
+        }, 'Parent is not an ancestor of current element');
+      });
+
+      it('returns a TextPosition with offset relative to the given parent', () => {
+        const grandparent = document.createElement('div');
+        const parent = document.createElement('div');
+        const child = document.createElement('span');
+
+        grandparent.append('a', parent);
+        parent.append('bc', child);
+        child.append('def');
+
+        const childPos = TextPosition.fromPoint(child.firstChild, 3);
+
+        const parentPos = childPos.relativeTo(parent);
+        assert.equal(parentPos.element, parent);
+        assert.equal(parentPos.offset, 5);
+
+        const grandparentPos = childPos.relativeTo(grandparent);
+        assert.equal(grandparentPos.element, grandparent);
+        assert.equal(grandparentPos.offset, 6);
+      });
+    });
+
     describe('fromPoint', () => {
       it('returns TextPosition for offset in Text node', () => {
         const el = document.createElement('div');
@@ -155,13 +187,27 @@ describe('annotator/anchoring/text-range', () => {
         assert.equal(range.toString(), 'two');
       });
 
-      it('throws if start or end points cannot be resolved', () => {
+      it('throws if start point cannot be resolved', () => {
         const el = document.createElement('div');
         el.textContent = 'one two three';
 
         const textRange = new TextRange(
-          new TextPosition(el, 4),
-          new TextPosition(el, 20)
+          new TextPosition(el, 100),
+          new TextPosition(el, 5)
+        );
+
+        assert.throws(() => {
+          textRange.toRange();
+        }, 'Offset exceeds text length');
+      });
+
+      it('throws if end point cannot be resolved', () => {
+        const el = document.createElement('div');
+        el.textContent = 'one two three';
+
+        const textRange = new TextRange(
+          new TextPosition(el, 5),
+          new TextPosition(el, 100)
         );
 
         assert.throws(() => {
