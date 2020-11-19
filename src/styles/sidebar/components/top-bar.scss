@@ -9,6 +9,9 @@
   color: var.$grey-mid;
   background: var.$white;
   height: var.$top-bar-height;
+  @media (pointer: coarse) {
+    height: var.$touch-target-size;
+  }
   position: absolute;
   left: 0;
   right: 0;
