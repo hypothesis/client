@@ -76,6 +76,20 @@ describe('annotator/anchoring/text-range', () => {
         assert.equal(offset, lastTextNode.data.length);
       });
 
+      it('ignores text in comments and processing instructions', () => {
+        const el = document.createElement('div');
+        const text = document.createTextNode('some text');
+        const comment = document.createComment('some comment');
+        const piNode = document.createProcessingInstruction('foo', 'bar');
+        el.append(comment, piNode, text);
+
+        const pos = new TextPosition(el, 3);
+        const resolved = pos.resolve();
+
+        assert.equal(resolved.node, text);
+        assert.equal(resolved.offset, 3);
+      });
+
       it('throws if offset exceeds current text content length', () => {
         const pos = new TextPosition(
           container,
@@ -118,6 +132,21 @@ describe('annotator/anchoring/text-range', () => {
         assert.equal(grandparentPos.element, grandparent);
         assert.equal(grandparentPos.offset, 6);
       });
+
+      it('ignores text in comments and processing instructions', () => {
+        const parent = document.createElement('div');
+        const child = document.createElement('span');
+        const comment = document.createComment('foobar');
+        const piNode = document.createProcessingInstruction('one', 'two');
+        child.append('def');
+        parent.append(comment, piNode, child);
+
+        const childPos = TextPosition.fromPoint(child.firstChild, 3);
+        const parentPos = childPos.relativeTo(parent);
+
+        assert.equal(parentPos.element, parent);
+        assert.equal(parentPos.offset, 3);
+      });
     });
 
     describe('fromPoint', () => {
@@ -139,6 +168,18 @@ describe('annotator/anchoring/text-range', () => {
 
         assertNodesEqual(pos.element, el);
         assert.equal(pos.offset, el.textContent.indexOf('bar'));
+      });
+
+      it('ignores text in comments and processing instructions', () => {
+        const el = document.createElement('div');
+        const comment = document.createComment('ignore me');
+        const piNode = document.createProcessingInstruction('one', 'two');
+        el.append(comment, piNode, 'foobar');
+
+        const pos = TextPosition.fromPoint(el.childNodes[2], 3);
+
+        assert.equal(pos.element, el);
+        assert.equal(pos.offset, 3);
       });
 
       it('throws if node is not a Text or Element', () => {

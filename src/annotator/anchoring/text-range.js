@@ -1,4 +1,22 @@
 /**
+ * Return the combined length of text nodes contained in `node`.
+ *
+ * This is different than `node.textContent` if called on a comment or processing
+ * instruction directly.
+ *
+ * @param {Node} node
+ */
+function nodeTextLength(node) {
+  switch (node.nodeType) {
+    case Node.ELEMENT_NODE:
+    case Node.TEXT_NODE:
+      return /** @type {string} */ (node.textContent).length;
+    default:
+      return 0;
+  }
+}
+
+/**
  * Return the total length of the text of all previous siblings of `node`.
  *
  * @param {Node} node
@@ -7,7 +25,7 @@ function previousSiblingsTextLength(node) {
   let sibling = node.previousSibling;
   let length = 0;
   while (sibling) {
-    length += sibling.textContent?.length ?? 0;
+    length += nodeTextLength(sibling);
     sibling = sibling.previousSibling;
   }
   return length;
@@ -152,7 +170,7 @@ export class TextPosition {
         // Get the text length before the `offset`th child of element.
         let textOffset = 0;
         for (let i = 0; i < offset; i++) {
-          textOffset += node.childNodes[i].textContent?.length ?? 0;
+          textOffset += nodeTextLength(node.childNodes[i]);
         }
 
         return new TextPosition(/** @type {Element} */ (node), textOffset);
