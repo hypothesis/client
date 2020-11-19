@@ -201,6 +201,19 @@ export class TextRange {
   }
 
   /**
+   * Return a copy of this range with start and end positions relative to a
+   * given ancestor. See `TextPosition.relativeTo`.
+   *
+   * @param {Element} element
+   */
+  relativeTo(element) {
+    return new TextRange(
+      this.start.relativeTo(element),
+      this.end.relativeTo(element)
+    );
+  }
+
+  /**
    * Resolve the `TextRange` to a DOM range.
    *
    * The resulting DOM Range will always start and end in a `Text` node.
@@ -249,5 +262,19 @@ export class TextRange {
     );
     const end = TextPosition.fromPoint(range.endContainer, range.endOffset);
     return new TextRange(start, end);
+  }
+
+  /**
+   * Return a `TextRange` from the `start`th to `end`th characters in `root`.
+   *
+   * @param {Element} root
+   * @param {number} start
+   * @param {number} end
+   */
+  static fromOffsets(root, start, end) {
+    return new TextRange(
+      new TextPosition(root, start),
+      new TextPosition(root, end)
+    );
   }
 }

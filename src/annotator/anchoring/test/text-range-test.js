@@ -302,6 +302,28 @@ describe('annotator/anchoring/text-range', () => {
       });
     });
 
+    describe('#relativeTo', () => {
+      it('returns a range with start and end positions relative to the given element', () => {
+        const parent = document.createElement('div');
+        const firstChild = document.createElement('span');
+        firstChild.append('foo');
+        const secondChild = document.createElement('span');
+        secondChild.append('bar');
+        parent.append(firstChild, secondChild);
+
+        const textRange = new TextRange(
+          new TextPosition(firstChild, 0),
+          new TextPosition(secondChild, 3)
+        );
+        const parentRange = textRange.relativeTo(parent);
+
+        assert.equal(parentRange.start.element, parent);
+        assert.equal(parentRange.start.offset, 0);
+        assert.equal(parentRange.end.element, parent);
+        assert.equal(parentRange.end.offset, 6);
+      });
+    });
+
     describe('fromRange', () => {
       it('sets `start` and `end` points of range', () => {
         const el = document.createElement('div');
@@ -323,6 +345,20 @@ describe('annotator/anchoring/text-range', () => {
         assert.throws(() => {
           TextRange.fromRange(range);
         }, 'Point is not in an element or text node');
+      });
+    });
+
+    describe('fromOffsets', () => {
+      it('returns a `TextRange` with correct start and end', () => {
+        const root = document.createElement('div');
+        root.append('Some text content');
+
+        const textRange = TextRange.fromOffsets(root, 0, 10);
+
+        assert.equal(textRange.start.element, root);
+        assert.equal(textRange.start.offset, 0);
+        assert.equal(textRange.end.element, root);
+        assert.equal(textRange.end.offset, 10);
       });
     });
   });
