@@ -7,10 +7,7 @@
  *  2. Insulating the rest of the code from API changes in the underlying anchoring
  *     libraries.
  */
-import {
-  fromRange as posFromRange,
-  toRange as posToRange,
-} from 'dom-anchor-text-position';
+
 import {
   fromRange as quoteFromRange,
   toRange as quoteToRange,
@@ -18,6 +15,7 @@ import {
 } from 'dom-anchor-text-quote';
 
 import { SerializedRange, sniff } from './range';
+import { TextRange } from './text-range';
 
 /**
  * @typedef {import("./range").BrowserRange} BrowserRange}
@@ -109,8 +107,12 @@ export class TextPositionAnchor {
    * @param {Range} range
    */
   static fromRange(root, range) {
-    const selector = posFromRange(root, range);
-    return TextPositionAnchor.fromSelector(root, selector);
+    const textRange = TextRange.fromRange(range).relativeTo(root);
+    return new TextPositionAnchor(
+      root,
+      textRange.start.offset,
+      textRange.end.offset
+    );
   }
   /**
    * @param {Element} root
@@ -132,7 +134,7 @@ export class TextPositionAnchor {
   }
 
   toRange() {
-    return posToRange(this.root, { start: this.start, end: this.end });
+    return TextRange.fromOffsets(this.root, this.start, this.end).toRange();
   }
 }
 
