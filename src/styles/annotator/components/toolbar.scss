@@ -19,6 +19,10 @@
     position: absolute;
     left: -(var.$annotator-toolbar-width);
     width: var.$annotator-toolbar-width;
+    @media (pointer: coarse) {
+      left: -(var.$touch-target-size);
+      width: var.$touch-target-size;
+    }
     z-index: 2;
   }
 
