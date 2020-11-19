@@ -85,6 +85,8 @@ describe('annotator/plugin/pdf', () => {
   it('hides annotation layers when there is a text selection', async () => {
     // This tests checks for a CSS class on the root PDF viewer element.
     // The annotation layers are hidden by a CSS rule that uses this class.
+
+    // Start with an empty selection.
     const selection = window.getSelection();
     if (!selection.isCollapsed) {
       selection.collapseToStart();
@@ -92,11 +94,18 @@ describe('annotator/plugin/pdf', () => {
     pdfPlugin = createPDFPlugin();
     assert.isFalse(pdfViewerHasClass('is-selecting'));
 
+    // Make the selection non-empty.
     selection.selectAllChildren(document.body);
     await awaitEvent(document, 'selectionchange');
     assert.isTrue(pdfViewerHasClass('is-selecting'));
 
+    // Then make the selection empty again.
     selection.collapseToStart();
+    await awaitEvent(document, 'selectionchange');
+    assert.isFalse(pdfViewerHasClass('is-selecting'));
+
+    // Finally, remove the selection entirely.
+    selection.removeAllRanges();
     await awaitEvent(document, 'selectionchange');
     assert.isFalse(pdfViewerHasClass('is-selecting'));
   });
