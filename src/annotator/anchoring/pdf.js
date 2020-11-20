@@ -27,7 +27,7 @@ import { TextQuoteAnchor } from './types';
 /**
  * Map of page index to page text content.
  *
- * @type {Record<number,Promise<string>>}
+ * @type {Object<number,Promise<string>>}
  */
 let pageTextCache = {};
 
@@ -39,7 +39,7 @@ let pageTextCache = {};
  * to speed up re-anchoring an annotation that was previously anchored in the
  * current session.
  *
- * @type {Record<string, Record<number, PdfTextRange>>}
+ * @type {Object<string, Object<number, PdfTextRange>>}
  */
 let quotePositionCache = {};
 
