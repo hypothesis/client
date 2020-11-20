@@ -4,9 +4,9 @@ import { createElement } from 'preact';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { waitFor } from '../../../test-util/wait';
 
-import StreamContent, { $imports } from '../stream-content';
+import StreamView, { $imports } from '../stream-view';
 
-describe('StreamContent', () => {
+describe('StreamView', () => {
   let fakeApi;
   let fakeUseRootThread;
   let fakeSearchFilter;
@@ -52,7 +52,7 @@ describe('StreamContent', () => {
 
   function createComponent() {
     return mount(
-      <StreamContent api={fakeApi} toastMessenger={fakeToastMessenger} />
+      <StreamView api={fakeApi} toastMessenger={fakeToastMessenger} />
     );
   }
 
