@@ -21,7 +21,7 @@ async function querySelector(anchor, options = {}) {
  * It encapsulates the core anchoring algorithm, using the selectors alone or
  * in combination to establish the best anchor within the document.
  *
- * @param {Node} root - The root element of the anchoring context.
+ * @param {Element} root - The root element of the anchoring context.
  * @param {Selector[]} selectors - The selectors to try.
  * @param {Object} [options]
  *   @param {number} [options.hint]
@@ -89,7 +89,7 @@ export function anchor(root, selectors, options = {}) {
 }
 
 /**
- * @param {Node} root
+ * @param {Element} root
  * @param {Range} range
  */
 export function describe(root, range) {

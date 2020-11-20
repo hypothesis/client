@@ -94,7 +94,7 @@ export class RangeAnchor {
  */
 export class TextPositionAnchor {
   /**
-   * @param {Node|TextContentNode} root
+   * @param {Element} root
    * @param {number} start
    * @param {number} end
    */
@@ -105,7 +105,7 @@ export class TextPositionAnchor {
   }
 
   /**
-   * @param {Node} root
+   * @param {Element} root
    * @param {Range} range
    */
   static fromRange(root, range) {
@@ -113,7 +113,7 @@ export class TextPositionAnchor {
     return TextPositionAnchor.fromSelector(root, selector);
   }
   /**
-   * @param {Node} root
+   * @param {Element} root
    * @param {TextPositionSelector} selector
    */
   static fromSelector(root, selector) {
@@ -141,7 +141,7 @@ export class TextPositionAnchor {
  */
 export class TextQuoteAnchor {
   /**
-   * @param {Node|TextContentNode} root - A root element from which to anchor.
+   * @param {Element} root - A root element from which to anchor.
    * @param {string} exact
    * @param {Object} context
    *   @param {string} [context.prefix]
@@ -153,7 +153,7 @@ export class TextQuoteAnchor {
     this.context = context;
   }
   /**
-   * @param {Node} root
+   * @param {Element} root
    * @param {Range} range
    */
   static fromRange(root, range) {
@@ -162,7 +162,7 @@ export class TextQuoteAnchor {
   }
 
   /**
-   * @param {Node|TextContentNode} root
+   * @param {Element} root
    * @param {TextQuoteSelector} selector
    */
   static fromSelector(root, selector) {
