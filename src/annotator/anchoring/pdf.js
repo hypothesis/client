@@ -526,7 +526,7 @@ export async function describe(root, range) {
 
   const quote = TextQuoteAnchor.fromRange(root, range).toSelector();
 
-  return Promise.all([position, quote]);
+  return [position, quote];
 }
 
 /**
