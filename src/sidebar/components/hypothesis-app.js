@@ -13,10 +13,11 @@ import { applyTheme } from '../util/theme';
 import { withServices } from '../util/service-context';
 
 import AnnotationView from './annotation-view';
+import SidebarView from './sidebar-view';
+import StreamView from './stream-view';
+
 import HelpPanel from './help-panel';
 import ShareAnnotationsPanel from './share-annotations-panel';
-import SidebarView from './sidebar-view';
-import StreamContent from './stream-content';
 import ToastMessages from './toast-messages';
 import TopBar from './top-bar';
 
@@ -192,8 +193,8 @@ function HypothesisApp({
         {route && (
           <main>
             {route === 'annotation' && <AnnotationView onLogin={login} />}
-            {route === 'notebook' && <StreamContent />}
-            {route === 'stream' && <StreamContent />}
+            {route === 'notebook' && <StreamView />}
+            {route === 'stream' && <StreamView />}
             {route === 'sidebar' && (
               <SidebarView onLogin={login} onSignUp={signUp} />
             )}
