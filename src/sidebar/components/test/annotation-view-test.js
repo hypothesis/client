@@ -4,11 +4,9 @@ import { mount } from 'enzyme';
 import { waitFor } from '../../../test-util/wait';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-import AnnotationViewerContent, {
-  $imports,
-} from '../annotation-viewer-content';
+import AnnotationView, { $imports } from '../annotation-view';
 
-describe('AnnotationViewerContent', () => {
+describe('AnnotationView', () => {
   let fakeStore;
   let fakeOnLogin;
   let fakeUseRootThread;
@@ -45,7 +43,7 @@ describe('AnnotationViewerContent', () => {
 
   function createComponent(props = {}) {
     return mount(
-      <AnnotationViewerContent
+      <AnnotationView
         loadAnnotationsService={fakeLoadAnnotationsService}
         onLogin={fakeOnLogin}
         {...props}

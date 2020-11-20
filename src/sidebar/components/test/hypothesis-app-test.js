@@ -96,7 +96,7 @@ describe('HypothesisApp', () => {
   it('does not render content if route is not yet determined', () => {
     fakeStore.route.returns(null);
     const wrapper = createComponent();
-    ['main', 'AnnotationViewerContent', 'StreamContent', 'SidebarView'].forEach(
+    ['main', 'AnnotationView', 'StreamContent', 'SidebarView'].forEach(
       contentComponent => {
         assert.isFalse(wrapper.exists(contentComponent));
       }
@@ -106,7 +106,7 @@ describe('HypothesisApp', () => {
   [
     {
       route: 'annotation',
-      contentComponent: 'AnnotationViewerContent',
+      contentComponent: 'AnnotationView',
     },
     {
       route: 'sidebar',

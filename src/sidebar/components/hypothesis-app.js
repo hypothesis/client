@@ -12,7 +12,7 @@ import { shouldAutoDisplayTutorial } from '../util/session';
 import { applyTheme } from '../util/theme';
 import { withServices } from '../util/service-context';
 
-import AnnotationViewerContent from './annotation-viewer-content';
+import AnnotationView from './annotation-view';
 import HelpPanel from './help-panel';
 import ShareAnnotationsPanel from './share-annotations-panel';
 import SidebarView from './sidebar-view';
@@ -191,9 +191,7 @@ function HypothesisApp({
 
         {route && (
           <main>
-            {route === 'annotation' && (
-              <AnnotationViewerContent onLogin={login} />
-            )}
+            {route === 'annotation' && <AnnotationView onLogin={login} />}
             {route === 'notebook' && <StreamContent />}
             {route === 'stream' && <StreamContent />}
             {route === 'sidebar' && (
