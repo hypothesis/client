@@ -8,14 +8,9 @@
  *     libraries.
  */
 
-import {
-  fromRange as quoteFromRange,
-  toRange as quoteToRange,
-  toTextPosition,
-} from 'dom-anchor-text-quote';
-
 import { SerializedRange, sniff } from './range';
 import { TextRange } from './text-range';
+import { matchQuote } from './match-quote';
 
 /**
  * @typedef {import("./range").BrowserRange} BrowserRange}
@@ -154,13 +149,33 @@ export class TextQuoteAnchor {
     this.exact = exact;
     this.context = context;
   }
+
   /**
    * @param {Element} root
    * @param {Range} range
    */
   static fromRange(root, range) {
-    const selector = quoteFromRange(root, range);
-    return TextQuoteAnchor.fromSelector(root, selector);
+    const text = /** @type {string} */ (root.textContent);
+    const textRange = TextRange.fromRange(range).relativeTo(root);
+
+    const start = textRange.start.offset;
+    const end = textRange.end.offset;
+
+    // Number of characters around the quote to capture as context. We currently
+    // always use a fixed amount, but it would be better if this code was aware
+    // of logical boundaries in the document (paragraph, article etc.) to avoid
+    // capturing text unrelated to the quote.
+    //
+    // In regular prose the ideal content would often be the surrounding sentence.
+    // This is a natural unit of meaning which enables displaying quotes in
+    // context even when the document is not available. We could use `Intl.Segmenter`
+    // for this when available.
+    const contextLen = 32;
+
+    return new TextQuoteAnchor(root, text.slice(start, end), {
+      prefix: text.slice(Math.max(0, start - contextLen), start),
+      suffix: text.slice(end, Math.min(text.length, end + contextLen)),
+    });
   }
 
   /**
@@ -188,27 +203,26 @@ export class TextQuoteAnchor {
    * @param {Object} [options]
    *   @param {number} [options.hint] -
    *     Offset hint to disambiguate matches
-   *     https://github.com/tilgovi/dom-anchor-text-quote#totextpositionroot-selector-options
    */
   toRange(options = {}) {
-    const range = quoteToRange(this.root, this.toSelector(), options);
-    if (range === null) {
-      throw new Error('Quote not found');
-    }
-    return range;
+    return this.toPositionAnchor(options).toRange();
   }
 
   /**
    * @param {Object} [options]
    *   @param {number} [options.hint] -
-   *     Offset hint to disambiguate matches
-   *     https://github.com/tilgovi/dom-anchor-text-quote#totextpositionroot-selector-options
+   *     Character offset hint to disambiguate matches.
    */
   toPositionAnchor(options = {}) {
-    const anchor = toTextPosition(this.root, this.toSelector(), options);
-    if (anchor === null) {
+    // eslint-disable-line no-unused-vars
+    const text = /** @type {string} */ (this.root.textContent);
+    const match = matchQuote(text, this.exact, {
+      ...this.context,
+      hint: options.hint,
+    });
+    if (!match) {
       throw new Error('Quote not found');
     }
-    return new TextPositionAnchor(this.root, anchor.start, anchor.end);
+    return new TextPositionAnchor(this.root, match.start, match.end);
   }
 }

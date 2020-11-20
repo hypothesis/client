@@ -225,19 +225,13 @@ describe('annotator/anchoring/types', () => {
   });
 
   describe('TextQuoteAnchor', () => {
-    let fakeQuoteToRange;
-    let fakeQuoteFromRange;
-    let fakeToTextPosition;
+    let fakeMatchQuote;
 
     beforeEach(() => {
-      fakeQuoteToRange = sinon.stub();
-      fakeQuoteFromRange = sinon.stub();
-      fakeToTextPosition = sinon.stub();
+      fakeMatchQuote = sinon.stub();
       $imports.$mock({
-        'dom-anchor-text-quote': {
-          fromRange: fakeQuoteFromRange,
-          toRange: fakeQuoteToRange,
-          toTextPosition: fakeToTextPosition,
+        './match-quote': {
+          matchQuote: fakeMatchQuote,
         },
       });
     });
@@ -255,12 +249,11 @@ describe('annotator/anchoring/types', () => {
 
     describe('#fromRange', () => {
       it('returns a TextQuoteAnchor instance', () => {
-        fakeQuoteFromRange.returns({
-          prefix: 'Four score and ',
-          suffix: 'brought forth on this continent',
-        });
-        const anchor = TextQuoteAnchor.fromRange(container, new Range());
-        assert.called(fakeQuoteFromRange);
+        const range = new Range();
+        range.selectNodeContents(container);
+        const anchor = TextQuoteAnchor.fromRange(container, range);
+
+        // TODO - Check the properties of the returned anchor.
         assert.instanceOf(anchor, TextQuoteAnchor);
       });
     });
@@ -292,9 +285,7 @@ describe('annotator/anchoring/types', () => {
     describe('#toRange', () => {
       it('returns a valid DOM Range', () => {
         $imports.$restore({
-          'dom-anchor-text-quote': {
-            toRange: true,
-          },
+          './match-quote': true,
         });
         const quoteAnchor = new TextQuoteAnchor(container, 'Liberty');
         const range = quoteAnchor.toRange();
@@ -303,11 +294,7 @@ describe('annotator/anchoring/types', () => {
       });
 
       it('throws if the quote is not found', () => {
-        $imports.$restore({
-          'dom-anchor-text-quote': {
-            toRange: true,
-          },
-        });
+        fakeMatchQuote.returns(null);
         const quoteAnchor = new TextQuoteAnchor(
           container,
           'five score and nine years ago'
@@ -321,9 +308,7 @@ describe('annotator/anchoring/types', () => {
     describe('#toPositionAnchor', () => {
       it('returns a TextPositionAnchor instance', () => {
         $imports.$restore({
-          'dom-anchor-text-quote': {
-            toTextPosition: true,
-          },
+          './match-quote': true,
         });
         const quoteAnchor = new TextQuoteAnchor(container, 'Liberty');
         const pos = quoteAnchor.toPositionAnchor();
@@ -332,9 +317,7 @@ describe('annotator/anchoring/types', () => {
 
       it('throws if the quote is not found', () => {
         $imports.$restore({
-          'dom-anchor-text-quote': {
-            toTextPosition: true,
-          },
+          './match-quote': true,
         });
         const quoteAnchor = new TextQuoteAnchor(
           container,
@@ -348,9 +331,8 @@ describe('annotator/anchoring/types', () => {
 
     describe('integration tests', () => {
       beforeEach(() => {
-        // restore dom-anchor-text-quote to test third party lib integration
         $imports.$restore({
-          'dom-anchor-text-quote': true,
+          './match-quote': true,
         });
       });
 
