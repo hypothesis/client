@@ -1,13 +1,13 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
-import SidebarContent from '../sidebar-content';
-import { $imports } from '../sidebar-content';
+import SidebarView from '../sidebar-view';
+import { $imports } from '../sidebar-view';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('SidebarContent', () => {
+describe('SidebarView', () => {
   let fakeFrameSync;
   let fakeLoadAnnotationsService;
   let fakeUseRootThread;
@@ -17,7 +17,7 @@ describe('SidebarContent', () => {
 
   const createComponent = props =>
     mount(
-      <SidebarContent
+      <SidebarView
         onLogin={() => null}
         onSignUp={() => null}
         frameSync={fakeFrameSync}
