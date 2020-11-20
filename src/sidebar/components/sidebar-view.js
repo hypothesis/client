@@ -15,7 +15,7 @@ import SidebarContentError from './sidebar-content-error';
 import ThreadList from './thread-list';
 
 /**
- * @typedef SidebarContentProps
+ * @typedef SidebarViewProps
  * @prop {() => any} onLogin
  * @prop {() => any} onSignUp
  * @prop {Object} [frameSync] - Injected service
@@ -26,9 +26,9 @@ import ThreadList from './thread-list';
 /**
  * Render the sidebar and its components
  *
- * @param {SidebarContentProps} props
+ * @param {SidebarViewProps} props
  */
-function SidebarContent({
+function SidebarView({
   frameSync,
   onLogin,
   onSignUp,
@@ -151,7 +151,7 @@ function SidebarContent({
   );
 }
 
-SidebarContent.propTypes = {
+SidebarView.propTypes = {
   onLogin: propTypes.func.isRequired,
   onSignUp: propTypes.func.isRequired,
   frameSync: propTypes.object,
@@ -159,10 +159,6 @@ SidebarContent.propTypes = {
   streamer: propTypes.object,
 };
 
-SidebarContent.injectedProps = [
-  'frameSync',
-  'loadAnnotationsService',
-  'streamer',
-];
+SidebarView.injectedProps = ['frameSync', 'loadAnnotationsService', 'streamer'];
 
-export default withServices(SidebarContent);
+export default withServices(SidebarView);

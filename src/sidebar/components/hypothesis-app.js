@@ -15,7 +15,7 @@ import { withServices } from '../util/service-context';
 import AnnotationViewerContent from './annotation-viewer-content';
 import HelpPanel from './help-panel';
 import ShareAnnotationsPanel from './share-annotations-panel';
-import SidebarContent from './sidebar-content';
+import SidebarView from './sidebar-view';
 import StreamContent from './stream-content';
 import ToastMessages from './toast-messages';
 import TopBar from './top-bar';
@@ -197,7 +197,7 @@ function HypothesisApp({
             {route === 'notebook' && <StreamContent />}
             {route === 'stream' && <StreamContent />}
             {route === 'sidebar' && (
-              <SidebarContent onLogin={login} onSignUp={signUp} />
+              <SidebarView onLogin={login} onSignUp={signUp} />
             )}
           </main>
         )}
