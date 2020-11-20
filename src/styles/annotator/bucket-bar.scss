@@ -11,7 +11,9 @@
     pointer-events: none;
     position: absolute;
     height: 100%;
-    width: var.$annotator-bucket-bar-width;
+    // 2020-11-20: interim and pragmatic solution for an apparent glitch on Safari and Chrome.
+    // Adding one pixel resolve this issue: https://github.com/hypothesis/client/pull/2750
+    width: var.$annotator-bucket-bar-width + 1;
     left: -(var.$annotator-bucket-bar-width);
   }
 
