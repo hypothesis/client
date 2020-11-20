@@ -330,7 +330,8 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
   const offset = getPageOffset(pageIndex);
 
   const attempt = ([content, offset]) => {
-    const root = { textContent: content };
+    const root = document.createElement('div');
+    root.textContent = content;
     const anchor = TextQuoteAnchor.fromSelector(root, quoteSelector);
     if (positionHint) {
       let hint = positionHint.start - offset;
