@@ -18,8 +18,8 @@ import { TextQuoteAnchor } from './types';
  * @typedef PdfTextRange
  * @prop {number} pageIndex
  * @prop {Object} anchor
- * @prop {number} anchor.start
- * @prop {number} anchor.end
+ * @prop {number} anchor.start - Start character offset within the page's text
+ * @prop {number} anchor.end - End character offset within the page's text
  */
 
 // Caches for performance.
@@ -32,11 +32,12 @@ import { TextQuoteAnchor } from './types';
 let pageTextCache = {};
 
 /**
- * A cache that associates the quote and position from an annotation's
- * selectors to the resolved location in the PDF.
+ * A cache that maps a `(quote, text offset in document)` key to a specific
+ * location in the document.
  *
- * This helps with re-anchoring of a pair of quote and position selectors if
- * the position selector fails to anchor.
+ * The components of the key come from an annotation's selectors. This is used
+ * to speed up re-anchoring an annotation that was previously anchored in the
+ * current session.
  *
  * @type {Record<string, Record<number, PdfTextRange>>}
  */
@@ -479,6 +480,7 @@ export function anchor(root, selectors) {
  *
  * @param {HTMLElement} root - The root element
  * @param {Range} range
+ * @return {Promise<Selector[]>}
  */
 export async function describe(root, range) {
   // "Shrink" the range so that the start and endpoints are at offsets within
