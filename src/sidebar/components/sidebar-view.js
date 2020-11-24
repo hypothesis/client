@@ -102,7 +102,10 @@ function SidebarView({
       prevGroupId.current = focusedGroupId;
     }
     if (focusedGroupId && searchUris.length) {
-      loadAnnotationsService.load(searchUris, focusedGroupId);
+      loadAnnotationsService.load({
+        groupId: focusedGroupId,
+        uris: searchUris,
+      });
     }
   }, [
     clearSelection,

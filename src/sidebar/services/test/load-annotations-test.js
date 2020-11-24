@@ -15,12 +15,14 @@ class FakeSearchClient extends EventEmitter {
     this.separateReplies = !!opts.separateReplies;
 
     this.get = sinon.spy(query => {
-      assert.ok(query.uri);
+      if (!query.uri) {
+        query.uri = ['http://www.example.com'];
+      }
 
       for (let i = 0; i < query.uri.length; i++) {
         const uri = query.uri[i];
-        this.emit('results', [{ id: uri + '123', group: '__world__' }]);
-        this.emit('results', [{ id: uri + '456', group: 'private-group' }]);
+        this.emit('results', [{ id: uri + '123', group: query.group }]);
+        this.emit('results', [{ id: uri + '456', group: query.group }]);
       }
       if (!longRunningSearchClient) {
         this.emit('end');
@@ -111,7 +113,7 @@ describe('loadAnnotationsService', () => {
       ]);
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.calledWith(fakeStore.removeAnnotations, [
         sinon.match({ id: fakeUris[0] + '123' }),
         sinon.match({ id: fakeUris[0] + '456' }),
@@ -121,12 +123,22 @@ describe('loadAnnotationsService', () => {
     it('loads all annotations for a URI', () => {
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: fakeUris[0] + '123' }),
       ]);
       assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: fakeUris[0] + '456' }),
+      ]);
+    });
+
+    it('loads all annotations for a group', () => {
+      const svc = createService();
+
+      svc.load({ groupId: 'mygroup' });
+
+      assert.calledWith(fakeStore.addAnnotations, [
+        sinon.match({ group: 'mygroup' }),
       ]);
     });
 
@@ -153,7 +165,7 @@ describe('loadAnnotationsService', () => {
         },
       ]);
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.calledWith(fakeStore.addAnnotations, [
         sinon.match({ id: uri + '123' }),
       ]);
@@ -172,7 +184,7 @@ describe('loadAnnotationsService', () => {
       fakeUris = ['http://example.com', 'http://foobar.com'];
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
 
       [
         fakeUris[0] + '123',
@@ -188,7 +200,7 @@ describe('loadAnnotationsService', () => {
       fakeUris = ['http://example.com', 'http://foobar.com'];
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.calledWith(
         fakeStore.updateFrameAnnotationFetchStatus,
         fakeUris[0],
@@ -204,7 +216,7 @@ describe('loadAnnotationsService', () => {
     it('fetches annotations for the specified group', () => {
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.calledWith(searchClients[0].get, {
         uri: fakeUris,
         group: fakeGroupId,
@@ -214,14 +226,14 @@ describe('loadAnnotationsService', () => {
     it('loads annotations in batches', () => {
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.ok(searchClients[0].incremental);
     });
 
     it('loads annotations without separating replies', () => {
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.isFalse(searchClients[0].separateReplies);
     });
 
@@ -230,26 +242,18 @@ describe('loadAnnotationsService', () => {
 
       // Issue a long running load annotations request.
       longRunningSearchClient = true;
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       // Issue another load annotations request while the
       // previous annotation load is still running.
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
 
       assert.calledOnce(searchClients[0].cancel);
-    });
-
-    it('does not load annotations if URIs list is empty', () => {
-      fakeUris = [];
-      const svc = createService();
-
-      svc.load(fakeUris, fakeGroupId);
-      assert.notCalled(fakeStore.addAnnotations);
     });
 
     it('calls annotationFetchStarted when it starts searching for annotations', () => {
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
 
       assert.calledOnce(fakeStore.annotationFetchStarted);
     });
@@ -257,7 +261,7 @@ describe('loadAnnotationsService', () => {
     it('calls annotationFetchFinished when all annotations have been found', () => {
       const svc = createService();
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
 
       assert.calledOnce(fakeStore.annotationFetchFinished);
     });
@@ -266,7 +270,7 @@ describe('loadAnnotationsService', () => {
       const svc = createService();
       const error = new Error('search for annotations failed');
 
-      svc.load(fakeUris, fakeGroupId);
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
       searchClients[0].emit('error', error);
 
       assert.calledWith(console.error, error);
