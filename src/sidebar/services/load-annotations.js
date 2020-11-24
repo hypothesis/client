@@ -16,12 +16,14 @@ export default function loadAnnotationsService(
   let searchClient = null;
 
   /**
-   * Load annotations for all URIs and groupId.
+   * Load all annotations that match `options` criteria
    *
-   * @param {string[]} uris
-   * @param {string} groupId
+   * @param {Object} options
+   *   @param {string} options.groupId
+   *   @param {string[]} [options.uris]
    */
-  function load(uris, groupId) {
+  function load(options) {
+    const { uris } = options;
     store.removeAnnotations(store.savedAnnotations());
 
     // Cancel previously running search client.
@@ -29,40 +31,53 @@ export default function loadAnnotationsService(
       searchClient.cancel();
     }
 
-    if (uris.length > 0) {
-      searchAndLoad(uris, groupId);
-
+    if (uris && uris.length > 0) {
       streamFilter.resetFilter().addClause('/uri', 'one_of', uris);
       streamer.setConfig('filter', { filter: streamFilter.getFilter() });
     }
+    searchAndLoad(options);
   }
 
-  function searchAndLoad(uris, groupId) {
+  /**
+   * @param {Object} options
+   *   @param {string[]} [options.uris]
+   *   @param {string} options.groupId
+   */
+  function searchAndLoad(options) {
+    const { groupId, uris } = options;
+
     searchClient = new SearchClient(api.search, {
       incremental: true,
       separateReplies: false,
     });
+
     searchClient.on('results', results => {
       if (results.length) {
         store.addAnnotations(results);
       }
     });
+
     searchClient.on('error', error => {
       console.error(error);
     });
+
     searchClient.on('end', () => {
       // Remove client as it's no longer active.
       searchClient = null;
 
-      store.frames().forEach(function (frame) {
-        if (0 <= uris.indexOf(frame.uri)) {
-          store.updateFrameAnnotationFetchStatus(frame.uri, true);
-        }
-      });
+      if (uris && uris.length > 0) {
+        store.frames().forEach(frame => {
+          if (uris.indexOf(frame.uri) >= 0) {
+            store.updateFrameAnnotationFetchStatus(frame.uri, true);
+          }
+        });
+      }
       store.annotationFetchFinished();
     });
+
     store.annotationFetchStarted();
-    searchClient.get({ uri: uris, group: groupId });
+
+    searchClient.get({ group: groupId, uri: uris });
   }
 
   /**
