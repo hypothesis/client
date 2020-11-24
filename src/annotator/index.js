@@ -82,6 +82,7 @@ function init() {
 /**
  * Returns a Promise that resolves when the document has loaded (but subresources
  * may still be loading).
+ * @returns {Promise<void>}
  */
 function documentReady() {
   return new Promise(resolve => {
@@ -90,7 +91,7 @@ function documentReady() {
     }
     // nb. `readystatechange` may be emitted twice, but `resolve` only resolves
     // on the first call.
-    document.addEventListener('readystatechange', resolve);
+    document.addEventListener('readystatechange', () => resolve());
   });
 }
 
