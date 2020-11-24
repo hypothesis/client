@@ -184,9 +184,9 @@ export default class Sidebar extends Guest {
 
     // Re-publish the crossframe event so that anything extending Delegator
     // can subscribe to it (without need for crossframe)
-    this.crossframe.on('showNotebook', () => {
+    this.crossframe.on('showNotebook', groupId => {
       this.hide();
-      this.publish('showNotebook');
+      this.publish('showNotebook', [groupId]);
     });
     this.crossframe.on('hideNotebook', () => {
       this.show();

@@ -6,10 +6,12 @@ import { createSidebarConfig } from './config/sidebar';
  *
  * @return {HTMLIFrameElement}
  */
-function createNotebookFrame(config) {
-  const sidebarConfig = createSidebarConfig(config);
+function createNotebookFrame(config, groupId) {
+  const notebookConfig = createSidebarConfig(config);
+  // Explicity set the "focused" group
+  notebookConfig.group = groupId;
   const configParam =
-    'config=' + encodeURIComponent(JSON.stringify(sidebarConfig));
+    'config=' + encodeURIComponent(JSON.stringify(notebookConfig));
   const notebookAppSrc = config.notebookAppUrl + '#' + configParam;
 
   const notebookFrame = document.createElement('iframe');
@@ -29,26 +31,39 @@ export default class Notebook extends Delegator {
     super(element, config);
     this.frame = null;
 
+    this._groupId = null;
+    this._prevGroupId = null;
+
     this.container = document.createElement('div');
     this.container.style.display = 'none';
     this.container.className = 'notebook-outer';
 
-    this.subscribe('showNotebook', () => this.show());
+    this.subscribe('showNotebook', groupId => {
+      this._groupId = groupId;
+      this.show();
+    });
     this.subscribe('hideNotebook', () => this.hide());
     // If the sidebar has opened, get out of the way
     this.subscribe('sidebarOpened', () => this.hide());
   }
 
-  init() {
-    if (!this.frame) {
-      this.frame = createNotebookFrame(this.options);
+  _update() {
+    // Create a new iFrame if we don't have one at all yet, or if the
+    // groupId has changed since last use
+    const needIframe =
+      !this.frame || !this._prevGroupId || this._prevGroupId !== this._groupId;
+    this._prevGroupId = this._groupId;
+
+    if (needIframe) {
+      this.frame?.remove();
+      this.frame = createNotebookFrame(this.options, this._groupId);
       this.container.appendChild(this.frame);
       this.element.appendChild(this.container);
     }
   }
 
   show() {
-    this.init();
+    this._update();
     this.container.classList.add('is-open');
     this.container.style.display = '';
   }

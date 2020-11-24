@@ -239,8 +239,12 @@ describe('Sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'publish');
         sinon.stub(sidebar, 'hide');
-        emitEvent('showNotebook');
-        assert.calledWith(sidebar.publish, 'showNotebook');
+        emitEvent('showNotebook', 'mygroup');
+        assert.calledWith(
+          sidebar.publish,
+          'showNotebook',
+          sinon.match(['mygroup'])
+        );
         assert.calledOnce(sidebar.hide);
       });
     });

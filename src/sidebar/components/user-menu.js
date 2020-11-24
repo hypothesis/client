@@ -42,6 +42,7 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @param {UserMenuProps} props
  */
 function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
+  const focusedGroupId = useStore(store => store.focusedGroupId);
   const isThirdParty = isThirdPartyUser(auth.userid, settings.authDomain);
   const service = serviceConfig(settings);
   const isNotebookEnabled = useStore(store =>
@@ -56,7 +57,7 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
 
   const onSelectNotebook = () => {
-    bridge.call('showNotebook');
+    bridge.call('showNotebook', focusedGroupId());
   };
 
   const onProfileSelected = () =>
