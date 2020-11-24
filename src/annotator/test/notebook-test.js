@@ -74,6 +74,36 @@ describe('Notebook', () => {
         'http://www.example.com/foo/bar'
       );
     });
+
+    it('does not create a new iframe if shown again with same group ID', () => {
+      const notebook = createNotebook();
+      notebook._groupId = 'mygroup';
+
+      // The first showing will create a new iFrame
+      notebook.publish('showNotebook', ['myGroup']);
+      const removeSpy = sinon.spy(notebook.frame, 'remove');
+      // Show it again — the group hasn't changed so the iframe won't be
+      // replaced
+      notebook.publish('showNotebook', ['myGroup']);
+
+      assert.notCalled(removeSpy);
+    });
+
+    it('does not create a new iframe if shown again with same group ID', () => {
+      const notebook = createNotebook();
+      notebook._groupId = 'mygroup';
+
+      // First show: creates an iframe
+      notebook.publish('showNotebook', ['myGroup']);
+      const removeSpy = sinon.spy(notebook.frame, 'remove');
+
+      // Show again with another group
+      notebook.publish('showNotebook', ['anotherGroup']);
+
+      // Show again, which will remove the first iframe and create a new one
+      notebook.show();
+      assert.calledOnce(removeSpy);
+    });
   });
 
   describe('responding to events', () => {
@@ -108,7 +138,7 @@ describe('Notebook', () => {
     it('should remove the frame', () => {
       const notebook = createNotebook();
       // Make sure the frame is created
-      notebook.init();
+      notebook.show();
 
       notebook.destroy();
 

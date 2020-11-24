@@ -51,6 +51,7 @@ describe('UserMenu', () => {
       authDomain: 'hypothes.is',
     };
     fakeStore = {
+      focusedGroupId: sinon.stub().returns('mygroup'),
       isFeatureEnabled: sinon.stub().returns(false),
     };
 
@@ -204,7 +205,7 @@ describe('UserMenu', () => {
         const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
         openNotebookItem.props().onClick();
         assert.calledOnce(fakeBridge.call);
-        assert.calledWith(fakeBridge.call, 'showNotebook');
+        assert.calledWith(fakeBridge.call, 'showNotebook', 'mygroup');
       });
     });
 
