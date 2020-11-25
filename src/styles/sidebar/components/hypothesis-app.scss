@@ -20,6 +20,15 @@
   &__content {
     @include layout.sidebar-content;
   }
+
+  // FIXME: Temporary affordance for the Notebook view to override some
+  // layout spacing that assumes the presence of the top bar
+  &--notebook {
+    padding: var.$layout-space;
+    @include responsive.respond-to(tablets desktops) {
+      padding: var.$layout-space--xlarge;
+    }
+  }
 }
 
 // Disable scroll anchoring as it interferes with `ThreadList` and

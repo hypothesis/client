@@ -96,11 +96,15 @@ describe('HypothesisApp', () => {
   it('does not render content if route is not yet determined', () => {
     fakeStore.route.returns(null);
     const wrapper = createComponent();
-    ['main', 'AnnotationView', 'StreamView', 'SidebarView'].forEach(
-      contentComponent => {
-        assert.isFalse(wrapper.exists(contentComponent));
-      }
-    );
+    [
+      'main',
+      'AnnotationView',
+      'NotebookView',
+      'StreamView',
+      'SidebarView',
+    ].forEach(contentComponent => {
+      assert.isFalse(wrapper.exists(contentComponent));
+    });
   });
 
   [
@@ -114,7 +118,7 @@ describe('HypothesisApp', () => {
     },
     {
       route: 'notebook',
-      contentComponent: 'StreamView',
+      contentComponent: 'NotebookView',
     },
     {
       route: 'stream',
