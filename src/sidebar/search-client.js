@@ -21,16 +21,28 @@ export default class SearchClient extends TinyEmitter {
    *   replies.
    *   @param {boolean} [options.incremental] - Emit `results` events incrementally
    *   as batches of annotations are available
+   *   @param {number|null} [options.maxResults] - Safety valve for protection when
+   *   loading all annotations in a group in the NotebookView. If the Notebook
+   *   is opened while focused on a group that contains many thousands of
+   *   annotations, it could cause rendering and network misery in the browser.
+   *   When present, do not load annotations if the result set size exceeds
+   *   this value.
    */
   constructor(
     searchFn,
-    { chunkSize = 200, separateReplies = true, incremental = true } = {}
+    {
+      chunkSize = 200,
+      separateReplies = true,
+      incremental = true,
+      maxResults = null,
+    } = {}
   ) {
     super();
     this._searchFn = searchFn;
     this._chunkSize = chunkSize;
     this._separateReplies = separateReplies;
     this._incremental = incremental;
+    this._maxResults = maxResults;
 
     this._canceled = false;
     /** @type {Annotation[]} */
@@ -53,6 +65,27 @@ export default class SearchClient extends TinyEmitter {
     this._searchFn(searchQuery)
       .then(function (results) {
         if (self._canceled) {
+          return;
+        }
+
+        // For now, abort loading of annotations if `maxResults` is set and the
+        // number of annotations in the results set exceeds that value.
+        //
+        // NB: We can’t currently, reliably load a subset of a group’s
+        // annotations, as replies are mixed in with top-level annotations—when
+        // `separateReplies` is false, which it is in most or all cases—so we’d
+        // end up with partially-loaded threads.
+        //
+        // This change has no effect on loading annotations in the SidebarView,
+        // where the `maxResults` option is not used.
+        //
+        // TODO: Implement pagination
+        if (self._maxResults && results.total > self._maxResults) {
+          self.emit(
+            'error',
+            new Error('Results size exceeds maximum allowed annotations')
+          );
+          self.emit('end');
           return;
         }
 

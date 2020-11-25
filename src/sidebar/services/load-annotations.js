@@ -2,6 +2,14 @@
  * A service for fetching annotations, filtered by document URIs and group.
  */
 
+/**
+ * @typedef LoadAnnotationOptions
+ * @prop {string} groupId
+ * @prop {string[]} [uris]
+ * @prop {number} [maxResults] - If number of annotations in search results
+ *   exceeds this value, do not load annotations (see: `SearchClient`)
+ */
+
 import SearchClient from '../search-client';
 
 import { isReply } from '../util/annotation-metadata';
@@ -16,14 +24,12 @@ export default function loadAnnotationsService(
   let searchClient = null;
 
   /**
-   * Load all annotations that match `options` criteria
+   * Load annotations
    *
-   * @param {Object} options
-   *   @param {string} options.groupId
-   *   @param {string[]} [options.uris]
+   * @param {LoadAnnotationOptions} options
    */
   function load(options) {
-    const { uris } = options;
+    const { groupId, uris } = options;
     store.removeAnnotations(store.savedAnnotations());
 
     // Cancel previously running search client.
@@ -35,21 +41,14 @@ export default function loadAnnotationsService(
       streamFilter.resetFilter().addClause('/uri', 'one_of', uris);
       streamer.setConfig('filter', { filter: streamFilter.getFilter() });
     }
-    searchAndLoad(options);
-  }
 
-  /**
-   * @param {Object} options
-   *   @param {string[]} [options.uris]
-   *   @param {string} options.groupId
-   */
-  function searchAndLoad(options) {
-    const { groupId, uris } = options;
-
-    searchClient = new SearchClient(api.search, {
+    const searchOptions = {
       incremental: true,
+      maxResults: options.maxResults ?? null,
       separateReplies: false,
-    });
+    };
+
+    searchClient = new SearchClient(api.search, searchOptions);
 
     searchClient.on('results', results => {
       if (results.length) {
