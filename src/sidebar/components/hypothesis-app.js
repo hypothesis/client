@@ -17,6 +17,7 @@ import SidebarView from './sidebar-view';
 import StreamView from './stream-view';
 
 import HelpPanel from './help-panel';
+import NotebookView from './notebook-view';
 import ShareAnnotationsPanel from './share-annotations-panel';
 import ToastMessages from './toast-messages';
 import TopBar from './top-bar';
@@ -175,16 +176,19 @@ function HypothesisApp({
     <div
       className={classnames('hypothesis-app', 'js-thread-list-scroll-root', {
         'theme-clean': isThemeClean,
+        'hypothesis-app--notebook': route === 'notebook',
       })}
       style={backgroundStyle}
     >
-      <TopBar
-        auth={authState}
-        onLogin={login}
-        onSignUp={signUp}
-        onLogout={logout}
-        isSidebar={isSidebar}
-      />
+      {route !== 'notebook' && (
+        <TopBar
+          auth={authState}
+          onLogin={login}
+          onSignUp={signUp}
+          onLogout={logout}
+          isSidebar={isSidebar}
+        />
+      )}
       <div className="hypothesis-app__content">
         <ToastMessages />
         <HelpPanel auth={authState} />
@@ -193,7 +197,7 @@ function HypothesisApp({
         {route && (
           <main>
             {route === 'annotation' && <AnnotationView onLogin={login} />}
-            {route === 'notebook' && <StreamView />}
+            {route === 'notebook' && <NotebookView />}
             {route === 'stream' && <StreamView />}
             {route === 'sidebar' && (
               <SidebarView onLogin={login} onSignUp={signUp} />
