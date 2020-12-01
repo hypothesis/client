@@ -1,6 +1,5 @@
-import * as domAnchorTextQuote from 'dom-anchor-text-quote';
-
 import * as pdfAnchoring from '../pdf';
+import { TextRange } from '../text-range';
 
 import FakePDFViewerApplication from './fake-pdf-viewer-application';
 
@@ -12,7 +11,11 @@ import FakePDFViewerApplication from './fake-pdf-viewer-application';
  * @return {Range}
  */
 function findText(container, text) {
-  return domAnchorTextQuote.toRange(container, { exact: text });
+  const pos = container.textContent.indexOf(text);
+  if (pos < 0) {
+    throw new Error('Text not found');
+  }
+  return TextRange.fromOffsets(container, pos, pos + text.length).toRange();
 }
 
 function delay(ms) {
@@ -161,7 +164,11 @@ describe('annotator/anchoring/pdf', function () {
 
     it('throws if range spans multiple pages', async () => {
       viewer.pdfViewer.setCurrentPage(2, 3);
-      const range = findText(container, 'occupied again? NODE A');
+      const firstPageRange = findText(container, 'occupied again?');
+      const secondPageRange = findText(container, 'NODE A');
+      const range = new Range();
+      range.setStart(firstPageRange.startContainer, firstPageRange.startOffset);
+      range.setEnd(secondPageRange.startContainer, secondPageRange.endOffset);
 
       await assert.rejects(
         pdfAnchoring.describe(container, range),
