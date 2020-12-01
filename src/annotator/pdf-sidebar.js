@@ -22,34 +22,31 @@ export default class PdfSidebar extends Sidebar {
   constructor(element, config) {
     super(element, { ...defaultConfig, ...config });
 
-    this._lastSidebarLayoutState = {
-      expanded: false,
-      width: 0,
-      height: 0,
-    };
-
     this.window = /** @type {HypothesisWindow} */ (window);
     this.pdfViewer = this.window.PDFViewerApplication?.pdfViewer;
     this.pdfContainer = this.window.PDFViewerApplication?.appConfig?.appContainer;
+  }
 
-    // Is the PDF currently displayed side-by-side with the sidebar?
-    this.sideBySideActive = false;
-
-    this.subscribe('sidebarLayoutChanged', state => this.fitSideBySide(state));
-    this.window.addEventListener('resize', () => this.fitSideBySide());
+  /**
+   * Return the minimum width that the PDF viewer requires to be usable.
+   * This determines whether opening the sidebar activates side-by-side mode
+   */
+  minSideBySideWidth() {
+    return MIN_PDF_WIDTH;
   }
 
   /**
    * Set the PDF.js container element to the designated `width` and
    * activate side-by-side mode.
    *
-   * @param {number} width - in pixels
+   * @param {number} sidebarWidth - in pixels
    */
-  activateSideBySide(width) {
-    this.sideBySideActive = true;
-    this.closeSidebarOnDocumentClick = false;
+  activateSideBySide(sidebarWidth) {
+    const width = window.innerWidth - sidebarWidth;
     this.pdfContainer.style.width = width + 'px';
     this.pdfContainer.classList.add('hypothesis-side-by-side');
+
+    this._updateViewerAfterResize();
   }
 
   /**
@@ -61,29 +58,11 @@ export default class PdfSidebar extends Sidebar {
     this.closeSidebarOnDocumentClick = true;
     this.pdfContainer.style.width = 'auto';
     this.pdfContainer.classList.remove('hypothesis-side-by-side');
+
+    this._updateViewerAfterResize();
   }
 
-  /**
-   * Attempt to make the PDF viewer and the sidebar fit side-by-side without
-   * overlap if there is enough room in the viewport to do so reasonably.
-   * Resize the PDF viewer container element to leave the right amount of room
-   * for the sidebar, and prompt PDF.js to re-render the PDF pages to scale
-   * within that resized container.
-   *
-   * @param {LayoutState} [sidebarLayoutState]
-   */
-  fitSideBySide(sidebarLayoutState) {
-    if (!sidebarLayoutState) {
-      sidebarLayoutState = /** @type {LayoutState} */ (this
-        ._lastSidebarLayoutState);
-    }
-    const maximumWidthToFit = this.window.innerWidth - sidebarLayoutState.width;
-    if (sidebarLayoutState.expanded && maximumWidthToFit >= MIN_PDF_WIDTH) {
-      this.activateSideBySide(maximumWidthToFit);
-    } else {
-      this.deactivateSideBySide();
-    }
-
+  _updateViewerAfterResize() {
     // The following logic is pulled from PDF.js `webViewerResize`
     const currentScaleValue = this.pdfViewer.currentScaleValue;
     if (
@@ -97,7 +76,5 @@ export default class PdfSidebar extends Sidebar {
     }
     // This will cause PDF pages to re-render if their scaling has changed
     this.pdfViewer.update();
-
-    this._lastSidebarLayoutState = sidebarLayoutState;
   }
 }

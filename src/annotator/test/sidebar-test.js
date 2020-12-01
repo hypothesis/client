@@ -729,4 +729,46 @@ describe('Sidebar', () => {
       assert.isUndefined(sidebar.plugins.BucketBar);
     });
   });
+
+  describe('side-by-side mode', () => {
+    it('activates side-by-side mode when sidebar is opened', () => {
+      throw new Error('Implement me!');
+    });
+
+    it('deactivates side-by-side mode when sidebar is opened', () => {
+      throw new Error('Implement me!');
+    });
+
+    it('updates side-by-side mode when window is resized', () => {
+      throw new Error('Implement me!');
+    });
+
+    it('does not activate side-by-side mode if there is not enough space', () => {
+      throw new Error('Implement me!');
+    });
+
+    describe('#activateSideBySide', () => {
+      it('resizes document to make space for sidebar', () => {
+        throw new Error('Implement me!');
+      });
+
+      it('allows secondary content to remain under the sidebar', () => {
+        throw new Error('Implement me!');
+      });
+
+      it('preserves scroll position after resizing document', () => {
+        throw new Error('Implement me!');
+      });
+    });
+
+    describe('#deactivateSideBySide', () => {
+      it('removes the style properties set by `activateSideBySide`', () => {
+        throw new Error('Implement me!');
+      });
+
+      it('preserves scroll position after resizing document', () => {
+        throw new Error('Implement me!');
+      });
+    });
+  });
 });
