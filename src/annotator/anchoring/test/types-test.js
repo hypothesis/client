@@ -5,6 +5,8 @@ import {
   $imports,
 } from '../types';
 
+import { TextRange } from '../text-range';
+
 // These are primarily basic API tests for the anchoring classes. Tests for
 // anchoring a variety of HTML and PDF content exist in `html-test` and
 // `pdf-test`.
@@ -249,12 +251,23 @@ describe('annotator/anchoring/types', () => {
 
     describe('#fromRange', () => {
       it('returns a TextQuoteAnchor instance', () => {
-        const range = new Range();
-        range.selectNodeContents(container);
+        const quote = 'our fathers';
+        const text = container.textContent;
+        const pos = text.indexOf(quote);
+        const range = TextRange.fromOffsets(
+          container,
+          pos,
+          pos + quote.length
+        ).toRange();
+
         const anchor = TextQuoteAnchor.fromRange(container, range);
 
-        // TODO - Check the properties of the returned anchor.
         assert.instanceOf(anchor, TextQuoteAnchor);
+        assert.equal(anchor.exact, quote);
+        assert.deepEqual(anchor.context, {
+          prefix: text.slice(Math.max(0, pos - 32), pos),
+          suffix: text.slice(pos + quote.length, pos + quote.length + 32),
+        });
       });
     });
 
