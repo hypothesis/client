@@ -1254,11 +1254,6 @@ ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.4:
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
 
-ancestors@0.0.3:
-  version "0.0.3"
-  resolved "https://registry.yarnpkg.com/ancestors/-/ancestors-0.0.3.tgz#124eb944447d68b302057047d15d077a9da5179d"
-  integrity sha1-Ek65RER9aLMCBXBH0V0Hep2lF50=
-
 ansi-colors@4.1.1, ansi-colors@^4.1.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/ansi-colors/-/ansi-colors-4.1.1.tgz#cbb9ae256bf750af1eab344f229aa27fe94ba348"
@@ -2761,11 +2756,6 @@ di@^0.0.1:
   resolved "https://registry.yarnpkg.com/di/-/di-0.0.1.tgz#806649326ceaa7caa3306d75d985ea2748ba913c"
   integrity sha1-gGZJMmzqp8qjMG112YXqJ0i6kTw=
 
-diff-match-patch@^1.0.0:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/diff-match-patch/-/diff-match-patch-1.0.5.tgz#abb584d5f10cd1196dfc55aa03701592ae3f7b37"
-  integrity sha512-IayShXAgj/QMXgB0IWmKx+rOPuGMhqm5w6jvFxmVenXKIzRqTAAsbBPT3kWQeGANj3jGgvcvv4yK6SxqYmikgw==
-
 diff@4.0.2, diff@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/diff/-/diff-4.0.2.tgz#60f3aecb89d5fae520c11aa19efc2bb982aade7d"
@@ -2803,35 +2793,6 @@ doctrine@^3.0.0:
   integrity sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==
   dependencies:
     esutils "^2.0.2"
-
-dom-anchor-text-position@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/dom-anchor-text-position/-/dom-anchor-text-position-4.0.0.tgz#4c839b3bded94f0cab0f06a0189468f3f1ec2bb2"
-  integrity sha1-TIObO97ZTwyrDwagGJRo8/HsK7I=
-  dependencies:
-    dom-node-iterator "^3.5.0"
-    dom-seek "^4.0.1"
-
-dom-anchor-text-quote@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/dom-anchor-text-quote/-/dom-anchor-text-quote-4.0.2.tgz#2a1e0cd4e06c79b0bfa1284aecbf7062028fc2d7"
-  integrity sha1-Kh4M1OBsebC/oShK7L9wYgKPwtc=
-  dependencies:
-    diff-match-patch "^1.0.0"
-    dom-anchor-text-position "^4.0.0"
-
-dom-node-iterator@^3.5.0:
-  version "3.5.3"
-  resolved "https://registry.yarnpkg.com/dom-node-iterator/-/dom-node-iterator-3.5.3.tgz#32b68aa440962f1734487029f544a3db704637b7"
-  integrity sha1-MraKpECWLxc0SHAp9USj23BGN7c=
-
-dom-seek@^4.0.1:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/dom-seek/-/dom-seek-4.0.3.tgz#f14dddf04b3fb062d901c7b00b0c142a06e0a94b"
-  integrity sha1-8U3d8Es/sGLZAcewCwwUKgbgqUs=
-  dependencies:
-    ancestors "0.0.3"
-    index-of "^0.2.0"
 
 dom-serialize@^2.2.1:
   version "2.2.1"
@@ -4303,11 +4264,6 @@ imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
   integrity sha1-khi5srkoojixPcT7a21XbyMUU+o=
-
-index-of@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/index-of/-/index-of-0.2.0.tgz#38c1e2367ea55dffad3b6eb592ec1cc3090d7d65"
-  integrity sha1-OMHiNn6lXf+tO261kuwcwwkNfWU=
 
 indexof@0.0.1:
   version "0.0.1"

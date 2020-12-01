@@ -31,7 +31,6 @@
     "core-js": "^3.4.1",
     "cross-env": "^7.0.0",
     "diff": "^5.0.0",
-    "dom-anchor-text-quote": "^4.0.2",
     "dompurify": "^2.0.1",
     "enzyme": "^3.8.0",
     "enzyme-adapter-preact-pure": "^2.0.0",
