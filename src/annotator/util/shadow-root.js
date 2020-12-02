@@ -2,9 +2,13 @@
  * Load stylesheets for annotator UI components into the shadow DOM root.
  */
 function loadStyles(shadowRoot) {
-  const adderStyles = Array.from(document.styleSheets)
-    .map(sheet => sheet.href)
-    .filter(url => (url || '').match(/annotator\.css/));
+  const url = /** @type {HTMLLinkElement|undefined} */ (document.querySelector(
+    'link[rel="stylesheet"][href*="/build/styles/annotator.css"]'
+  ))?.href;
+
+  if (!url) {
+    return;
+  }
 
   // Stylesheet <link> elements are inert inside shadow roots [1]. Until
   // Shadow DOM implementations support external stylesheets [2], grab the
@@ -18,7 +22,7 @@ function loadStyles(shadowRoot) {
   // get a usable adder, albeit one that uses browser default styles for the
   // toolbar.
   const styleEl = document.createElement('style');
-  styleEl.textContent = adderStyles.map(url => `@import "${url}";`).join('\n');
+  styleEl.textContent = `@import "${url}";`;
   shadowRoot.appendChild(styleEl);
 }
 
