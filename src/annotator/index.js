@@ -73,9 +73,13 @@ function init() {
   const annotator = new Klass(document.body, config);
   const notebook = new Notebook(document.body, config);
   appLinkEl.addEventListener('destroy', function () {
-    appLinkEl.remove();
     annotator.destroy();
     notebook.destroy();
+
+    // Remove all the `<link>`, `<script>` and `<style>` elements added to the
+    // page by the boot script.
+    const clientAssets = document.querySelectorAll('[hypothesis-asset]');
+    clientAssets.forEach(el => el.remove());
   });
 }
 
