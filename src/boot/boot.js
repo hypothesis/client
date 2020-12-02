@@ -28,6 +28,18 @@ const commonPolyfills = [
  */
 
 /**
+ * Mark an element as having been added by the boot script.
+ *
+ * This marker is later used to know which elements to remove when unloading
+ * the client.
+ *
+ * @param {HTMLElement} el
+ */
+function tagElement(el) {
+  el.setAttribute('hypothesis-asset', '');
+}
+
+/**
  * @param {Document} doc
  * @param {string} href
  */
@@ -36,6 +48,8 @@ function injectStylesheet(doc, href) {
   link.rel = 'stylesheet';
   link.type = 'text/css';
   link.href = href;
+
+  tagElement(link);
   doc.head.appendChild(link);
 }
 
@@ -51,7 +65,25 @@ function injectScript(doc, src) {
   // Set 'async' to false to maintain execution order of scripts.
   // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script
   script.async = false;
+
+  tagElement(script);
   doc.head.appendChild(script);
+}
+
+/**
+ * @param {Document} doc
+ * @param {string} rel
+ * @param {'html'|'javascript'} type
+ * @param {string} url
+ */
+function injectLink(doc, rel, type, url) {
+  const link = doc.createElement('link');
+  link.rel = rel;
+  link.href = url;
+  link.type = 'application/annotator+' + type;
+
+  tagElement(link);
+  doc.head.appendChild(link);
 }
 
 /**
@@ -96,26 +128,19 @@ export function bootHypothesisClient(doc, config) {
   // Register the URL of the sidebar app which the Hypothesis client should load.
   // The <link> tag is also used by browser extensions etc. to detect the
   // presence of the Hypothesis client on the page.
-  const sidebarUrl = doc.createElement('link');
-  sidebarUrl.rel = 'sidebar';
-  sidebarUrl.href = config.sidebarAppUrl;
-  sidebarUrl.type = 'application/annotator+html';
-  doc.head.appendChild(sidebarUrl);
+  injectLink(doc, 'sidebar', 'html', config.sidebarAppUrl);
 
   // Register the URL of the notebook app which the Hypothesis client should load.
-  const notebookUrl = doc.createElement('link');
-  notebookUrl.rel = 'notebook';
-  notebookUrl.href = config.notebookAppUrl;
-  notebookUrl.type = 'application/annotator+html';
-  doc.head.appendChild(notebookUrl);
+  injectLink(doc, 'notebook', 'html', config.notebookAppUrl);
 
   // Register the URL of the annotation client which is currently being used to drive
   // annotation interactions.
-  const clientUrl = doc.createElement('link');
-  clientUrl.rel = 'hypothesis-client';
-  clientUrl.href = config.assetRoot + 'build/boot.js';
-  clientUrl.type = 'application/annotator+javascript';
-  doc.head.appendChild(clientUrl);
+  injectLink(
+    doc,
+    'hypothesis-client',
+    'javascript',
+    config.assetRoot + 'build/boot.js'
+  );
 
   const polyfills = polyfillBundles(commonPolyfills);
 

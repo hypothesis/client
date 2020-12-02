@@ -68,14 +68,14 @@ describe('bootstrap', function () {
   }
 
   function findAssets(doc_) {
-    const scripts = Array.from(doc_.querySelectorAll('script')).map(function (
-      el
-    ) {
+    const scripts = Array.from(
+      doc_.querySelectorAll('script[hypothesis-asset]')
+    ).map(function (el) {
       return el.src;
     });
 
     const styles = Array.from(
-      doc_.querySelectorAll('link[rel="stylesheet"]')
+      doc_.querySelectorAll('link[rel="stylesheet"][hypothesis-asset]')
     ).map(function (el) {
       return el.href;
     });
@@ -102,6 +102,7 @@ describe('bootstrap', function () {
         'link[type="application/annotator+html"]'
       );
       assert.ok(sidebarAppLink);
+      assert.isTrue(sidebarAppLink.hasAttribute('hypothesis-asset'));
       assert.equal(sidebarAppLink.href, 'https://marginal.ly/app.html');
     });
 
