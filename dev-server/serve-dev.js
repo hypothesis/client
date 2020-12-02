@@ -29,19 +29,22 @@ function renderScript(context) {
   const scriptTemplate = `
     {{{hypothesisConfig}}}
     <script>
-    const toggleClientButton = document.querySelector('#toggleClient');
+
+    // Button to load/unload the client. Not present on all pages so we create
+    // a dummy one if missing.
+    const toggleClientButton = document.querySelector('.js-toggle-client') || document.createElement('button');
 
     function loadClient() {
       const embedScript = document.createElement('script');
       embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
       document.body.appendChild(embedScript);
-      toggleClient.textContent = 'Unload client';
+      toggleClientButton.textContent = 'Unload client';
     }
 
     function unloadClient() {
       const annotatorLink = document.querySelector('link[type="application/annotator+html"]');
       annotatorLink?.dispatchEvent(new Event('destroy'));
-      toggleClient.textContent = 'Load client';
+      toggleClientButton.textContent = 'Load client';
     }
 
     toggleClientButton.onclick = () => {
