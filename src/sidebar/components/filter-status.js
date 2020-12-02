@@ -9,7 +9,7 @@ import useRootThread from './hooks/use-root-thread';
 import useStore from '../store/use-store';
 
 /**
- * @typedef {import('../store/modules/selection').FilterState} FilterState
+ * @typedef {import('../store/modules/filters').FilterState} FilterState
  * @typedef {import('../util/build-thread').Thread} Thread
  */
 

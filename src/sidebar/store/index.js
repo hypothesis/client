@@ -36,6 +36,7 @@ import annotations from './modules/annotations';
 import defaults from './modules/defaults';
 import directLinked from './modules/direct-linked';
 import drafts from './modules/drafts';
+import filters from './modules/filters';
 import frames from './modules/frames';
 import groups from './modules/groups';
 import links from './modules/links';
@@ -57,6 +58,7 @@ import viewer from './modules/viewer';
  * @typedef {import("./modules/defaults").DefaultsStore} DefaultsStore
  * @typedef {import("./modules/direct-linked").DirectLinkedStore} DirectLinkedStore
  * @typedef {import("./modules/drafts").DraftsStore} DraftsStore
+ * @typedef {import("./modules/filters").FiltersStore} FiltersStore
  * @typedef {import("./modules/frames").FramesStore} FramesStore
  * @typedef {import("./modules/groups").GroupsStore} GroupsStore
  * @typedef {import("./modules/links").LinksStore} LinksStore
@@ -76,6 +78,7 @@ import viewer from './modules/viewer';
  *  DefaultsStore &
  *  DirectLinkedStore &
  *  DraftsStore &
+ *  FiltersStore &
  *  FramesStore &
  *  GroupsStore &
  *  LinksStore &
@@ -109,6 +112,7 @@ export default function store(settings) {
     defaults,
     directLinked,
     drafts,
+    filters,
     frames,
     links,
     groups,
