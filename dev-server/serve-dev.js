@@ -29,9 +29,31 @@ function renderScript(context) {
   const scriptTemplate = `
     {{{hypothesisConfig}}}
     <script>
-    const embedScript = document.createElement('script');
-    embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
-    document.body.appendChild(embedScript);
+    const toggleClientButton = document.querySelector('#toggleClient');
+
+    function loadClient() {
+      const embedScript = document.createElement('script');
+      embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
+      document.body.appendChild(embedScript);
+      toggleClient.textContent = 'Unload client';
+    }
+
+    function unloadClient() {
+      const annotatorLink = document.querySelector('link[type="application/annotator+html"]');
+      annotatorLink?.dispatchEvent(new Event('destroy'));
+      toggleClient.textContent = 'Load client';
+    }
+
+    toggleClientButton.onclick = () => {
+      const isLoaded = document.querySelector('link[type="application/annotator+html"]');
+      if (isLoaded) {
+        unloadClient();
+      } else {
+        loadClient();
+      }
+    };
+
+    loadClient();
     </script>
   `;
   return Mustache.render(scriptTemplate, context);
