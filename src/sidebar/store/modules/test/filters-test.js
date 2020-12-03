@@ -1,8 +1,6 @@
-// import uiConstants from '../../../ui-constants';
 import createStore from '../../create-store';
 import filters from '../filters';
 import selection from '../selection';
-// import * as fixtures from '../../../test/annotation-fixtures';
 
 describe('sidebar/store/modules/filters', () => {
   let store;
@@ -113,6 +111,20 @@ describe('sidebar/store/modules/filters', () => {
         assert.isFalse(focusState.configured);
         assert.isEmpty(focusState.displayName);
       });
+    });
+  });
+
+  describe('userFilter', () => {
+    it('returns null if user focus inactive', () => {
+      assert.isNull(store.userFilter());
+    });
+
+    it('returns current user filter when user focus active', () => {
+      store.changeFocusModeUser({
+        username: 'filbert',
+        displayName: 'Pantomime Nutball',
+      });
+      assert.equal(store.userFilter(), 'filbert');
     });
   });
 });

@@ -7,7 +7,11 @@ describe('sidebar/components/hooks/use-root-thread', () => {
 
   beforeEach(() => {
     fakeStore = {
-      threadState: sinon.stub(),
+      allAnnotations: sinon.stub().returns(['1', '2']),
+      filterQuery: sinon.stub().returns('itchy'),
+      route: sinon.stub().returns('66'),
+      selectionState: sinon.stub().returns({ hi: 'there' }),
+      userFilter: sinon.stub().returns('hotspur'),
     };
     fakeThreadAnnotations = sinon.stub();
 
@@ -23,11 +27,14 @@ describe('sidebar/components/hooks/use-root-thread', () => {
 
   it('should return results of `threadAnnotations` with current thread state', () => {
     fakeThreadAnnotations.returns('a tisket, a tasket');
-    fakeStore.threadState.returns('current-thread-state');
 
     const results = useRootThread();
 
-    assert.calledWith(fakeThreadAnnotations, 'current-thread-state');
+    const threadState = fakeThreadAnnotations.getCall(0).args[0];
+    assert.deepEqual(threadState.annotations, ['1', '2']);
+    assert.equal(threadState.selection.filterQuery, 'itchy');
+    assert.equal(threadState.route, '66');
+    assert.equal(threadState.selection.filters.user, 'hotspur');
     assert.equal(results, 'a tisket, a tasket');
   });
 });

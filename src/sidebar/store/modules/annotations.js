@@ -413,6 +413,15 @@ const annotationCount = createSelector(
 );
 
 /**
+ * Retrieve all annotations currently in the store
+ *
+ * @type {(state: any) => Annotation[]}
+ */
+function allAnnotations(state) {
+  return state.annotations;
+}
+
+/**
  * Does the annotation indicated by `id` exist in the collection?
  *
  * @param {string} id
@@ -556,9 +565,10 @@ function savedAnnotations(state) {
  * @prop {typeof unhideAnnotation} unhideAnnotation
  * @prop {typeof updateAnchorStatus} updateAnchorStatus
  * @prop {typeof updateFlagStatus} updateFlagStatus
- 
+
  *
  * // Selectors
+ * @prop {() => Annotation[]} allAnnotations
  * @prop {() => number} annotationCount
  * @prop {(id: string) => boolean} annotationExists
  * @prop {(id: string) => Annotation} findAnnotationByID
@@ -591,6 +601,7 @@ export default {
   },
 
   selectors: {
+    allAnnotations,
     annotationCount,
     annotationExists,
     findAnnotationByID,

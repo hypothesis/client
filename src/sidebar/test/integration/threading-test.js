@@ -1,10 +1,14 @@
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+import { act } from 'preact/test-utils';
+
 import { Injector } from '../../../shared/injector';
-
 import storeFactory from '../../store';
-import immutable from '../../util/immutable';
-import threadAnnotations from '../../util/thread-annotations';
 
-const fixtures = immutable({
+import { ServiceContext } from '../../util/service-context';
+import useRootThread from '../../components/hooks/use-root-thread';
+
+const fixtures = {
   annotations: [
     {
       $orphan: false,
@@ -30,9 +34,10 @@ const fixtures = immutable({
       updated: 100,
     },
   ],
-});
+};
 
-describe('annotation threading', function () {
+describe('integration: annotation threading', () => {
+  let lastRootThread;
   let store;
 
   beforeEach(function () {
@@ -46,25 +51,46 @@ describe('annotation threading', function () {
       .register('features', { value: fakeFeatures })
       .register('settings', { value: {} });
 
+    // Mount a dummy component to be able to use the `useRootThread` hook
+    // Do things that cause `useRootThread` to recalculate in the store and
+    // test them (hint: use `act`)
+    function DummyComponent() {
+      lastRootThread = useRootThread();
+    }
+
     store = container.get('store');
+    // Wrap the dummy component in a context so that it has access to the store
+    mount(
+      <ServiceContext.Provider value={container}>
+        <DummyComponent />
+      </ServiceContext.Provider>
+    );
   });
 
-  it('should display newly loaded annotations', function () {
-    store.addAnnotations(fixtures.annotations);
-    assert.equal(threadAnnotations(store.threadState()).children.length, 2);
+  it('should display newly loaded annotations', () => {
+    act(() => {
+      store.addAnnotations(fixtures.annotations);
+    });
+
+    assert.equal(lastRootThread.children.length, 2);
   });
 
-  it('should not display unloaded annotations', function () {
-    store.addAnnotations(fixtures.annotations);
-    store.removeAnnotations(fixtures.annotations);
-    assert.equal(threadAnnotations(store.threadState()).children.length, 0);
+  it('should not display unloaded annotations', () => {
+    act(() => {
+      store.addAnnotations(fixtures.annotations);
+      store.removeAnnotations(fixtures.annotations);
+    });
+    assert.equal(lastRootThread.children.length, 0);
   });
 
-  it('should filter annotations when a search is set', function () {
-    store.addAnnotations(fixtures.annotations);
-    store.setFilterQuery('second');
-    assert.equal(threadAnnotations(store.threadState()).children.length, 1);
-    assert.equal(threadAnnotations(store.threadState()).children[0].id, '2');
+  it('should filter annotations when a search is set', () => {
+    act(() => {
+      store.addAnnotations(fixtures.annotations);
+      store.setFilterQuery('second');
+    });
+
+    assert.equal(lastRootThread.children.length, 1);
+    assert.equal(lastRootThread.children[0].id, '2');
   });
 
   [
@@ -77,14 +103,15 @@ describe('annotation threading', function () {
       expectedOrder: ['2', '1'],
     },
   ].forEach(testCase => {
-    it(`should sort annotations by ${testCase.mode}`, () => {
-      store.addAnnotations(fixtures.annotations);
-      store.setSortKey(testCase.sortKey);
-      const actualOrder = threadAnnotations(store.threadState()).children.map(
-        function (thread) {
-          return thread.annotation.id;
-        }
-      );
+    it(`should sort annotations by ${testCase.sortKey}`, () => {
+      act(() => {
+        store.addAnnotations(fixtures.annotations);
+        store.setSortKey(testCase.sortKey);
+      });
+
+      const actualOrder = lastRootThread.children.map(thread => {
+        return thread.annotation.id;
+      });
       assert.deepEqual(actualOrder, testCase.expectedOrder);
     });
   });

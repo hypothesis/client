@@ -318,6 +318,19 @@ describe('sidebar/store/modules/annotations', function () {
     });
   });
 
+  describe('allAnnotations', () => {
+    it('returns all the annotations in the store', () => {
+      const store = createTestStore();
+      const annotation1 = fixtures.oldPageNote();
+      const annotation2 = fixtures.defaultAnnotation();
+      store.addAnnotations([annotation1, annotation2]);
+      assert.deepEqual(store.allAnnotations(), [
+        store.findAnnotationByID(annotation1.id),
+        store.findAnnotationByID(annotation2.id),
+      ]);
+    });
+  });
+
   describe('orphanCount', () => {
     it('returns number of orphaned annotations', () => {
       const orphan = Object.assign(fixtures.oldAnnotation(), { $orphan: true });
