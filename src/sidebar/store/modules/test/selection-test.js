@@ -120,28 +120,12 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('threadState', () => {
-    it('returns the current annotations in rootState', () => {
-      const myAnnotation = fixtures.defaultAnnotation();
-      store.addAnnotations([myAnnotation]);
-
-      // `addAnnotations` injects some additional properties to annotations,
-      // so we can't compare objects
-      assert.equal(store.threadState().annotations[0].id, myAnnotation.id);
-      assert.lengthOf(store.threadState().annotations, 1);
-    });
-
-    it('returns the current route name from rootState', () => {
-      store.changeRoute('kamchatka');
-
-      assert.equal(store.threadState().route, 'kamchatka');
-    });
-
+  describe('selectionState', () => {
     it('returns relevant state about tab and sort', () => {
       store.selectTab('orphan');
       store.setSortKey('pyrrhic');
 
-      const selection = store.threadState().selection;
+      const selection = store.selectionState();
 
       assert.equal(selection.selectedTab, 'orphan');
       assert.equal(selection.sortKey, 'pyrrhic');
@@ -151,30 +135,14 @@ describe('sidebar/store/modules/selection', () => {
       store.selectAnnotations(['1', '2']);
       store.setExpanded('3', true);
       store.setExpanded('4', false);
+      store.setForcedVisible('5', true);
+      store.setForcedVisible('6', true);
 
-      const selection = store.threadState().selection;
+      const selection = store.selectionState();
 
       assert.deepEqual(selection.expanded, { 3: true, 4: false });
       assert.deepEqual(selection.selected, ['1', '2']);
-    });
-
-    it('returns the relevant state when user-focus mode is applied', () => {
-      store.changeFocusModeUser({
-        username: 'testuser',
-        displayName: 'Test User',
-      });
-
-      const selection = store.threadState().selection;
-
-      assert.deepEqual(selection.filters, { user: 'testuser' });
-    });
-
-    it('returns the relevant state when a filter query is applied', () => {
-      store.setFilterQuery('frappe');
-
-      const selection = store.threadState().selection;
-
-      assert.equal(selection.filterQuery, 'frappe');
+      assert.deepEqual(selection.forcedVisible, ['5', '6']);
     });
   });
 

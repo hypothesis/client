@@ -5,9 +5,23 @@ import { generateFacetedFilter } from './search-filter';
 import filterAnnotations from './view-filter';
 import { shouldShowInTab } from './tabs';
 
+/** @typedef {import('../../types/api').Annotation} Annotation */
 /** @typedef {import('./build-thread').Thread} Thread */
 /** @typedef {import('./build-thread').Options} BuildThreadOptions */
-/** @typedef {import('../store/modules/selection').ThreadState} ThreadState */
+
+/**
+ * @typedef ThreadState
+ * @prop {Annotation[]} annotations
+ * @prop {Object} selection
+ *   @prop {Object<string,boolean>} selection.expanded
+ *   @prop {string|null} selection.filterQuery
+ *   @prop {Object<string,string>} selection.filters
+ *   @prop {string[]} selection.forcedVisible
+ *   @prop {string[]} selection.selected
+ *   @prop {string} selection.sortKey
+ *   @prop {'annotation'|'note'|'orphan'} selection.selectedTab
+ * @prop {string|null} route
+ */
 
 // Sort functions keyed on sort option
 const sortFns = {

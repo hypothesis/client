@@ -8,17 +8,12 @@
  */
 
 /**
- * @typedef ThreadState
- * @prop {Annotation[]} annotations
- * @prop {Object} selection
- *   @prop {Object<string,boolean>} selection.expanded
- *   @prop {string|null} selection.filterQuery
- *   @prop {Object<string,string>} selection.filters
- *   @prop {string[]} selection.forcedVisible
- *   @prop {string[]} selection.selected
- *   @prop {string} selection.sortKey
- *   @prop {'annotation'|'note'|'orphan'} selection.selectedTab
- * @prop {string} route
+ * @typedef SelectionState
+ *   @prop {Object<string,boolean>} expanded
+ *   @prop {string[]} forcedVisible
+ *   @prop {string[]} selected
+ *   @prop {string} sortKey
+ *   @prop {'annotation'|'note'|'orphan'} selectedTab
  */
 
 import { createSelector } from 'reselect';
@@ -357,6 +352,17 @@ function selectedTab(state) {
   return state.selectedTab;
 }
 
+function selectionState(state) {
+  const selectionState = {
+    expanded: expandedMap(state),
+    forcedVisible: forcedVisibleAnnotations(state),
+    selected: selectedAnnotations(state),
+    sortKey: sortKey(state),
+    selectedTab: selectedTab(state),
+  };
+  return selectionState;
+}
+
 /**
  * Retrieve the current sort option key
  *
@@ -381,44 +387,6 @@ function sortKeys(state) {
 }
 
 /* Selectors that take root state */
-
-/**
- * Retrieve state needed to calculate the root thread
- *
- * TODO: Refactor
- *  - Remove route entirely and make that logic the responsibility of a caller
- *  - Remove all filter-related properties. Those should come from `filterState`
- *  - Likely remove `annotations` as well
- *  - Likely rename this to `selectionState`, and it may not need to be a
- *    `rootSelector`
- *
- * @type {(rootState: any) => ThreadState}
- */
-const threadState = createSelector(
-  rootState => rootState.annotations.annotations,
-  rootState => rootState.route.name,
-  rootState => rootState.selection,
-  rootState => rootState.filters,
-  (annotations, routeName, selection, filters) => {
-    const setFilters = /** @type {Object.<string,string>} */ ({});
-    // TODO FIXME
-    const userFilter = filters.focus.active && filters.focus.user.filter;
-    if (userFilter) {
-      setFilters.user = userFilter;
-    }
-    // TODO remove filterQuery, filters from this returned object
-    const selectionState = {
-      expanded: expandedMap(selection),
-      filterQuery: filters.query,
-      filters: setFilters,
-      forcedVisible: forcedVisibleAnnotations(selection),
-      selected: selectedAnnotations(selection),
-      sortKey: sortKey(selection),
-      selectedTab: selectedTab(selection),
-    };
-    return { annotations, route: routeName, selection: selectionState };
-  }
-);
 
 /**
  * Is any sort of filtering currently applied to the list of annotations? This
@@ -462,12 +430,12 @@ const hasAppliedFilter = createSelector(
  * @prop {() => boolean} hasSelectedAnnotations
  * @prop {() => string[]} selectedAnnotations
  * @prop {() => string} selectedTab
+ * @prop {() => SelectionState} selectionState
  * @prop {() => string} sortKey
  * @prop {() => string[]} sortKeys
  *
  * // Root Selectors
  * @prop {() => boolean} hasAppliedFilter
- * @prop {() => ThreadState} threadState
  *
  */
 
@@ -493,12 +461,12 @@ export default {
     hasSelectedAnnotations,
     selectedAnnotations,
     selectedTab,
+    selectionState,
     sortKey,
     sortKeys,
   },
 
   rootSelectors: {
     hasAppliedFilter,
-    threadState,
   },
 };

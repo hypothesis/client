@@ -183,6 +183,13 @@ const focusState = createSelector(
 );
 
 /**
+ * Retrieve any applied user filter
+ */
+function userFilter(state) {
+  return state.focus.active ? state.focus.user.filter : null;
+}
+
+/**
  * @typedef FiltersStore
  *
  * // Actions
@@ -193,6 +200,7 @@ const focusState = createSelector(
  * // Selectors
  * @prop {() => string|null} filterQuery
  * @prop {() => FocusState} focusState
+ * @prop {() => string|null} userFilter
  *
  */
 
@@ -208,5 +216,6 @@ export default {
   selectors: {
     filterQuery,
     focusState,
+    userFilter,
   },
 };
