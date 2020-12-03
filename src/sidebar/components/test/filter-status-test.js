@@ -16,6 +16,14 @@ function getFilterState() {
   };
 }
 
+function getFocusState() {
+  return {
+    active: false,
+    configured: false,
+    focusDisplayName: '',
+  };
+}
+
 describe('FilterStatus', () => {
   let fakeStore;
   let fakeUseRootThread;
@@ -33,7 +41,11 @@ describe('FilterStatus', () => {
       annotationCount: sinon.stub(),
       clearSelection: sinon.stub(),
       directLinkedAnnotationId: sinon.stub(),
+      filterQuery: sinon.stub().returns(null),
       filterState: sinon.stub().returns(getFilterState()),
+      focusState: sinon.stub().returns(getFocusState()),
+      forcedVisibleAnnotations: sinon.stub().returns([]),
+      selectedAnnotations: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
     };
 
@@ -77,11 +89,8 @@ describe('FilterStatus', () => {
   });
 
   context('(State 2): filtered by query', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = { ...getFilterState(), filterQuery: 'foobar' };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.filterQuery.returns('foobar');
       fakeThreadUtil.countVisible.returns(1);
     });
 
@@ -105,15 +114,9 @@ describe('FilterStatus', () => {
   });
 
   context('(State 3): filtered by query with force-expanded threads', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = {
-        ...getFilterState(),
-        filterQuery: 'foobar',
-        forcedVisibleCount: 3,
-      };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.filterQuery.returns('foobar');
+      fakeStore.forcedVisibleAnnotations.returns([1, 2, 3]);
       fakeThreadUtil.countVisible.returns(5);
     });
 
@@ -130,14 +133,8 @@ describe('FilterStatus', () => {
   });
 
   context('(State 4): selected annotations', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = {
-        ...getFilterState(),
-        selectedCount: 1,
-      };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.selectedAnnotations.returns([1]);
     });
 
     it('should show the count of annotations', () => {
@@ -145,8 +142,7 @@ describe('FilterStatus', () => {
     });
 
     it('should pluralize annotations when necessary', () => {
-      filterState.selectedCount = 4;
-      fakeStore.filterState.returns(filterState);
+      fakeStore.selectedAnnotations.returns([1, 2, 3, 4]);
 
       assertFilterText(createComponent(), 'Showing 4 annotations');
     });
@@ -198,16 +194,12 @@ describe('FilterStatus', () => {
   });
 
   context('(State 5): user-focus mode active', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = {
-        ...getFilterState(),
-        focusActive: true,
-        focusConfigured: true,
-        focusDisplayName: 'Ebenezer Studentolog',
-      };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.focusState.returns({
+        active: true,
+        configured: true,
+        displayName: 'Ebenezer Studentolog',
+      });
       fakeThreadUtil.countVisible.returns(1);
     });
 
@@ -244,17 +236,13 @@ describe('FilterStatus', () => {
   });
 
   context('(State 6): user-focus mode active, filtered by query', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = {
-        ...getFilterState(),
-        focusActive: true,
-        focusConfigured: true,
-        focusDisplayName: 'Ebenezer Studentolog',
-        filterQuery: 'biscuits',
-      };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.focusState.returns({
+        active: true,
+        configured: true,
+        displayName: 'Ebenezer Studentolog',
+      });
+      fakeStore.filterQuery.returns('biscuits');
       fakeThreadUtil.countVisible.returns(1);
     });
 
@@ -289,18 +277,14 @@ describe('FilterStatus', () => {
   context(
     '(State 7): user-focus mode active, filtered by query, force-expanded threads',
     () => {
-      let filterState;
-
       beforeEach(() => {
-        filterState = {
-          ...getFilterState(),
-          focusActive: true,
-          focusConfigured: true,
-          focusDisplayName: 'Ebenezer Studentolog',
-          filterQuery: 'biscuits',
-          forcedVisibleCount: 2,
-        };
-        fakeStore.filterState.returns(filterState);
+        fakeStore.focusState.returns({
+          active: true,
+          configured: true,
+          displayName: 'Ebenezer Studentolog',
+        });
+        fakeStore.filterQuery.returns('biscuits');
+        fakeStore.forcedVisibleAnnotations.returns([1, 2]);
         fakeThreadUtil.countVisible.returns(3);
       });
 
@@ -318,17 +302,13 @@ describe('FilterStatus', () => {
   );
 
   context('(State 8): user-focus mode active, selected annotations', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = {
-        ...getFilterState(),
-        focusActive: true,
-        focusConfigured: true,
-        focusDisplayName: 'Ebenezer Studentolog',
-        selectedCount: 2,
-      };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.focusState.returns({
+        active: true,
+        configured: true,
+        displayName: 'Ebenezer Studentolog',
+      });
+      fakeStore.selectedAnnotations.returns([1, 2]);
     });
 
     it('should ignore user and display selected annotations', () => {
@@ -345,17 +325,13 @@ describe('FilterStatus', () => {
   });
 
   context('(State 9): user-focus mode active, force-expanded threads', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = {
-        ...getFilterState(),
-        focusActive: true,
-        focusConfigured: true,
-        focusDisplayName: 'Ebenezer Studentolog',
-        forcedVisibleCount: 3,
-      };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.focusState.returns({
+        active: true,
+        configured: true,
+        displayName: 'Ebenezer Studentolog',
+      });
+      fakeStore.forcedVisibleAnnotations.returns([1, 2, 3]);
       fakeThreadUtil.countVisible.returns(7);
     });
 
@@ -367,8 +343,7 @@ describe('FilterStatus', () => {
     });
 
     it('should handle cases when there are no focused-user annotations', () => {
-      filterState = { ...filterState, forcedVisibleCount: 7 };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.forcedVisibleAnnotations.returns([1, 2, 3, 4, 5, 6, 7]);
       assertFilterText(
         createComponent(),
         'No annotations by Ebenezer Studentolog (and 7 more)'
@@ -385,16 +360,12 @@ describe('FilterStatus', () => {
   });
 
   context('(State 10): user-focus mode configured but inactive', () => {
-    let filterState;
-
     beforeEach(() => {
-      filterState = {
-        ...getFilterState(),
-        focusActive: false,
-        focusConfigured: true,
-        focusDisplayName: 'Ebenezer Studentolog',
-      };
-      fakeStore.filterState.returns(filterState);
+      fakeStore.focusState.returns({
+        active: false,
+        configured: true,
+        displayName: 'Ebenezer Studentolog',
+      });
       fakeThreadUtil.countVisible.returns(7);
     });
 

@@ -1,4 +1,5 @@
 import { createElement } from 'preact';
+import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { countVisible } from '../util/thread';
@@ -9,8 +10,17 @@ import useRootThread from './hooks/use-root-thread';
 import useStore from '../store/use-store';
 
 /**
- * @typedef {import('../store/modules/filters').FilterState} FilterState
  * @typedef {import('../util/build-thread').Thread} Thread
+ */
+
+/**
+ * @typedef FilterState
+ * @prop {string|null} filterQuery
+ * @prop {boolean} focusActive
+ * @prop {boolean} focusConfigured
+ * @prop {string|null} focusDisplayName
+ * @prop {number} forcedVisibleCount
+ * @prop {number} selectedCount
  */
 
 /**
@@ -267,7 +277,26 @@ FocusFilterStatus.propTypes = {
  */
 export default function FilterStatus() {
   const rootThread = useRootThread();
-  const filterState = useStore(store => store.filterState());
+
+  const focusState = useStore(store => store.focusState());
+  const forcedVisibleCount = useStore(
+    store => store.forcedVisibleAnnotations().length
+  );
+  const filterQuery = useStore(store => store.filterQuery());
+  const selectedCount = useStore(store => store.selectedAnnotations().length);
+
+  // Build a memoized state object with filter and selection details
+  // This will be used by the FilterStatus subcomponents
+  const filterState = useMemo(() => {
+    return {
+      filterQuery,
+      focusActive: focusState.active,
+      focusConfigured: focusState.configured,
+      focusDisplayName: focusState.displayName,
+      forcedVisibleCount,
+      selectedCount,
+    };
+  }, [focusState, forcedVisibleCount, filterQuery, selectedCount]);
 
   if (filterState.selectedCount > 0) {
     return (

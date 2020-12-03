@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect';
 
 import { actionTypes } from '../util';
-import { trueKeys } from '../../util/collections';
 
 /**
  * @typedef FocusConfig
@@ -24,7 +23,7 @@ import { trueKeys } from '../../util/collections';
  */
 
 /**
- * @typedef FocusState
+ * @typedef Focus
  * @prop {boolean} configured - Focus config contains valid `user` and
  *           is good to go
  * @prop {boolean} active - Focus mode is currently applied
@@ -32,14 +31,10 @@ import { trueKeys } from '../../util/collections';
  */
 
 /**
- * TODO potentially split into `FilterState` and `FocusState`?
- * @typedef FilterState
- * @prop {string|null} filterQuery
- * @prop {boolean} focusActive
- * @prop {boolean} focusConfigured
- * @prop {string|null} focusDisplayName
- * @prop {number} forcedVisibleCount
- * @prop {number} selectedCount
+ * @typedef FocusState
+ * @prop {boolean} active
+ * @prop {boolean} configured
+ * @prop {string} displayName
  */
 
 /**
@@ -54,7 +49,7 @@ import { trueKeys } from '../../util/collections';
  * and may be toggled via `toggleFocusMode`.
  *
  * @param {FocusConfig} focusConfig
- * @return {FocusState}
+ * @return {Focus}
  */
 function setFocus(focusConfig) {
   const focusDefaultState = {
@@ -172,39 +167,17 @@ function filterQuery(state) {
 }
 
 /**
- * Returns the display name for a user or the userid
- * if display name is not present. If both are missing
- * then this returns an empty string.
+ * Summary of focus state
  *
- * @return {string}
+ * @type {(state: any) => FocusState}
  */
-function focusModeUserPrettyName(state) {
-  if (!state.focus.configured) {
-    return '';
-  }
-  return state.focus.user.displayName;
-}
-
-/**
- * Summary of applied filters
- *
- * @type {(state: any) => FilterState}
- */
-const filterState = createSelector(
-  rootState => rootState.selection,
-  rootState => rootState.filters,
-  (selection, filters) => {
-    // TODO FIXME
-    const forcedVisibleCount = trueKeys(selection.forcedVisible).length;
-    // TODO FIXME
-    const selectedCount = trueKeys(selection.selected).length;
+const focusState = createSelector(
+  state => state.focus,
+  focus => {
     return {
-      filterQuery: filters.query,
-      focusActive: filters.focus.active,
-      focusConfigured: filters.focus.configured,
-      focusDisplayName: focusModeUserPrettyName(filters),
-      forcedVisibleCount,
-      selectedCount,
+      active: focus.active,
+      configured: focus.configured,
+      displayName: focus.configured ? focus.user.displayName : '',
     };
   }
 );
@@ -219,9 +192,7 @@ const filterState = createSelector(
  *
  * // Selectors
  * @prop {() => string|null} filterQuery
- *
- * // Root Selectors
- * @prop {() => FilterState} filterState
+ * @prop {() => FocusState} focusState
  *
  */
 
@@ -236,8 +207,6 @@ export default {
   },
   selectors: {
     filterQuery,
-  },
-  rootSelectors: {
-    filterState,
+    focusState,
   },
 };
