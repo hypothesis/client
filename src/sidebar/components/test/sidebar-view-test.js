@@ -134,6 +134,16 @@ describe('SidebarView', () => {
         assert.calledWith(fakeStore.selectTab, 'annotation');
       });
 
+      it('selects the correct tab for direct-linked orphaned annotations', () => {
+        fakeStore.findAnnotationByID
+          .withArgs('someId')
+          .returns({ $orphan: true, $tag: 'myTag' });
+        fakeTabsUtil.tabForAnnotation.returns('orphan');
+        createComponent();
+        assert.calledOnce(fakeStore.selectTab);
+        assert.calledWith(fakeStore.selectTab, 'orphan');
+      });
+
       it('renders a logged-out message CTA if user is not logged in', () => {
         fakeStore.isLoggedIn.returns(false);
         const wrapper = createComponent();

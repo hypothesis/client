@@ -42,6 +42,7 @@ function SidebarView({
   const hasAppliedFilter = useStore(store => store.hasAppliedFilter());
   const isLoading = useStore(store => store.isLoading());
   const isLoggedIn = useStore(store => store.isLoggedIn());
+
   const linkedAnnotationId = useStore(store =>
     store.directLinkedAnnotationId()
   );
@@ -53,6 +54,7 @@ function SidebarView({
   const directLinkedTab = linkedAnnotation
     ? tabForAnnotation(linkedAnnotation)
     : 'annotation';
+
   const searchUris = useStore(store => store.searchUris());
   const sidebarHasOpened = useStore(store => store.hasSidebarOpened());
   const userId = useStore(store => store.profile().userid);
@@ -122,8 +124,17 @@ function SidebarView({
       frameSync.focusAnnotations([linkedAnnotationAnchorTag]);
       frameSync.scrollToAnnotation(linkedAnnotationAnchorTag);
       selectTab(directLinkedTab);
+    } else if (linkedAnnotation) {
+      // Make sure to allow for orphaned annotations (which won't have an anchor)
+      selectTab(directLinkedTab);
     }
-  }, [directLinkedTab, frameSync, linkedAnnotationAnchorTag, selectTab]);
+  }, [
+    directLinkedTab,
+    frameSync,
+    linkedAnnotation,
+    linkedAnnotationAnchorTag,
+    selectTab,
+  ]);
 
   // Connect to the streamer when the sidebar has opened or if user is logged in
   useEffect(() => {
