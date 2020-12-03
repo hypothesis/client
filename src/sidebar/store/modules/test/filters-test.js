@@ -94,44 +94,24 @@ describe('sidebar/store/modules/filters', () => {
   });
 
   describe('selectors', () => {
-    describe('filterState', () => {
-      it('returns the current filter query', () => {
-        store.setFilterQuery('doodah, doodah');
-        assert.equal(store.filterState().filterQuery, 'doodah, doodah');
-      });
-
+    describe('focusState', () => {
       it('returns user focus information', () => {
         store.changeFocusModeUser({
           username: 'filbert',
           displayName: 'Pantomime Nutball',
         });
 
-        const filterState = store.filterState();
-        assert.isTrue(filterState.focusActive);
-        assert.isTrue(filterState.focusConfigured);
-        assert.equal(filterState.focusDisplayName, 'Pantomime Nutball');
+        const focusState = store.focusState();
+        assert.isTrue(focusState.active);
+        assert.isTrue(focusState.configured);
+        assert.equal(focusState.displayName, 'Pantomime Nutball');
       });
 
-      it('returns a count of forced-visible annotations', () => {
-        store.setForcedVisible('kaboodle', true);
-        store.setForcedVisible('stampy', false);
-
-        assert.equal(store.filterState().forcedVisibleCount, 1);
-      });
-
-      it('returns a count of selected annotations', () => {
-        store.selectAnnotations(['tabulature', 'felonious']);
-        assert.equal(store.filterState().selectedCount, 2);
-      });
-
-      it('returns empty filter states when no filters active', () => {
-        const filterState = store.filterState();
-        assert.isFalse(filterState.focusActive);
-        assert.isFalse(filterState.focusConfigured);
-        assert.isEmpty(filterState.focusDisplayName);
-        assert.isNull(filterState.filterQuery);
-        assert.equal(filterState.forcedVisibleCount, 0);
-        assert.equal(filterState.selectedCount, 0);
+      it('returns empty focus values when no focus is configured or set', () => {
+        const focusState = store.focusState();
+        assert.isFalse(focusState.active);
+        assert.isFalse(focusState.configured);
+        assert.isEmpty(focusState.displayName);
       });
     });
   });
