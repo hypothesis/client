@@ -36,7 +36,7 @@ const commonPolyfills = [
  * @param {HTMLElement} el
  */
 function tagElement(el) {
-  el.setAttribute('hypothesis-asset', '');
+  el.setAttribute('data-hypothesis-asset', '');
 }
 
 /**
