@@ -32,6 +32,7 @@ describe('FilterStatus', () => {
     fakeStore = {
       annotationCount: sinon.stub(),
       clearSelection: sinon.stub(),
+      directLinkedAnnotationId: sinon.stub(),
       filterState: sinon.stub().returns(getFilterState()),
       toggleFocusMode: sinon.stub(),
     };
@@ -180,6 +181,16 @@ describe('FilterStatus', () => {
       fakeStore.annotationCount.returns(5);
       assertButton(createComponent(), {
         text: 'Show all (5)',
+        icon: 'cancel',
+        callback: fakeStore.clearSelection,
+      });
+    });
+
+    it('should not show count of annotations on "Show All" button if direct-linked annotation present', () => {
+      fakeStore.annotationCount.returns(5);
+      fakeStore.directLinkedAnnotationId.returns(1);
+      assertButton(createComponent(), {
+        text: 'Show all',
         icon: 'cancel',
         callback: fakeStore.clearSelection,
       });

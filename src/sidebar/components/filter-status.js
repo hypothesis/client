@@ -118,6 +118,7 @@ FilterStatusPanel.propTypes = {
  */
 function SelectionFilterStatus({ filterState, rootThread }) {
   const clearSelection = useStore(store => store.clearSelection);
+  const directLinkedId = useStore(store => store.directLinkedAnnotationId());
   // The total number of top-level annotations (visible or not)
   const totalCount = useStore(store => store.annotationCount());
   // Count the number of visible annotations—top-level only
@@ -134,9 +135,9 @@ function SelectionFilterStatus({ filterState, rootThread }) {
   // Because of the confusion between counts of entities between selected
   // annotations and filtered annotations, don't display the total number
   // when in user-focus mode because the numbers won't appear to make sense.
-  const buttonText = filterState.focusConfigured
-    ? 'Show all'
-    : `Show all (${totalCount})`;
+  // Don't display total count, either, when viewing a direct-linked annotation.
+  const showCount = !filterState.focusConfigured && !directLinkedId;
+  const buttonText = showCount ? `Show all (${totalCount})` : 'Show all';
 
   const button = (
     <Button
