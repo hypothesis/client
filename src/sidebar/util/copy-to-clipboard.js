@@ -10,10 +10,13 @@
  * @param {string} text
  */
 export function copyText(text) {
-  const temp = document.createElement('pre');
-  temp.className = 'copy-text';
-  temp.textContent = text;
+  const temp = document.createElement('input');
+  temp.value = text;
+  temp.setAttribute('data-testid', 'copy-text');
+  // Recipe from https://stackoverflow.com/a/34046084/14463679
+  temp.contentEditable = 'true';
   document.body.appendChild(temp);
+  temp.focus();
 
   try {
     const range = document.createRange();
@@ -22,6 +25,7 @@ export function copyText(text) {
     selection.removeAllRanges();
     range.selectNodeContents(temp);
     selection.addRange(range);
+    temp.setSelectionRange(0, temp.value.length);
     document.execCommand('copy');
   } finally {
     temp.remove();
