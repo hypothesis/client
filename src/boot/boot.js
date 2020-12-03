@@ -80,7 +80,7 @@ function injectLink(doc, rel, type, url) {
   const link = doc.createElement('link');
   link.rel = rel;
   link.href = url;
-  link.type = 'application/annotator+' + type;
+  link.type = `application/annotator+${type}`;
 
   tagElement(link);
   doc.head.appendChild(link);
