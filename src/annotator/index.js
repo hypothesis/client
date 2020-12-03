@@ -78,7 +78,7 @@ function init() {
 
     // Remove all the `<link>`, `<script>` and `<style>` elements added to the
     // page by the boot script.
-    const clientAssets = document.querySelectorAll('[hypothesis-asset]');
+    const clientAssets = document.querySelectorAll('[data-hypothesis-asset]');
     clientAssets.forEach(el => el.remove());
   });
 }
