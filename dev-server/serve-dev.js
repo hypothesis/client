@@ -28,35 +28,12 @@ const TEMPLATE_PATH = `${__dirname}/templates/`;
 function renderScript(context) {
   const scriptTemplate = `
     {{{hypothesisConfig}}}
-    <script>
 
-    // Button to load/unload the client. Not present on all pages so we create
-    // a dummy one if missing.
-    const toggleClientButton = document.querySelector('.js-toggle-client') || document.createElement('button');
+    <script type="module">
+      import { loadClient } from '/scripts/util.js';
 
-    function loadClient() {
-      const embedScript = document.createElement('script');
-      embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
-      document.body.appendChild(embedScript);
-      toggleClientButton.textContent = 'Unload client';
-    }
-
-    function unloadClient() {
-      const annotatorLink = document.querySelector('link[type="application/annotator+html"]');
-      annotatorLink?.dispatchEvent(new Event('destroy'));
-      toggleClientButton.textContent = 'Load client';
-    }
-
-    toggleClientButton.onclick = () => {
-      const isLoaded = document.querySelector('link[type="application/annotator+html"]');
-      if (isLoaded) {
-        unloadClient();
-      } else {
-        loadClient();
-      }
-    };
-
-    loadClient();
+      const clientUrl = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
+      loadClient(clientUrl);
     </script>
   `;
   return Mustache.render(scriptTemplate, context);
