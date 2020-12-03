@@ -1,3 +1,5 @@
+// Code for controls on the dev server homepage.
+
 import { activeClientUrl, loadClient, unloadClient } from './util.js';
 
 const toggleClientButton = document.querySelector('.js-toggle-client');
