@@ -39,7 +39,9 @@ function SidebarView({
 
   // Store state values
   const focusedGroupId = useStore(store => store.focusedGroupId());
-  const hasAppliedFilter = useStore(store => store.hasAppliedFilter());
+  const hasAppliedFilter = useStore(store => {
+    return store.hasAppliedFilter() || store.hasSelectedAnnotations();
+  });
   const isLoading = useStore(store => store.isLoading());
   const isLoggedIn = useStore(store => store.isLoggedIn());
 

@@ -51,6 +51,7 @@ describe('SidebarView', () => {
       focusedGroupId: sinon.stub(),
       hasAppliedFilter: sinon.stub(),
       hasFetchedAnnotations: sinon.stub(),
+      hasSelectedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
       isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
@@ -252,6 +253,14 @@ describe('SidebarView', () => {
 
     it('does not render tabs if there is an applied filter', () => {
       fakeStore.hasAppliedFilter.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('SelectionTabs').exists());
+    });
+
+    it('does not render tabs if there are selected annotations', () => {
+      fakeStore.hasSelectedAnnotations.returns(true);
 
       const wrapper = createComponent();
 

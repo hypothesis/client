@@ -112,6 +112,33 @@ describe('sidebar/store/modules/filters', () => {
         assert.isEmpty(focusState.displayName);
       });
     });
+
+    describe('hasAppliedFilter', () => {
+      it('returns true if there is a search query set', () => {
+        store.setFilterQuery('foobar');
+
+        assert.isTrue(store.hasAppliedFilter());
+      });
+
+      it('returns true if user-focused mode is active', () => {
+        store = createStore(
+          [filters],
+          [{ focus: { user: { username: 'somebody' } } }]
+        );
+
+        assert.isTrue(store.hasAppliedFilter());
+      });
+
+      it('returns false if user-focused mode is configured but inactive', () => {
+        store = createStore(
+          [filters],
+          [{ focus: { user: { username: 'somebody' } } }]
+        );
+        store.toggleFocusMode(false);
+
+        assert.isFalse(store.hasAppliedFilter());
+      });
+    });
   });
 
   describe('userFilter', () => {
