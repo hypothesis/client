@@ -127,16 +127,6 @@ const actions = actionTypes(update);
 
 // Action creators
 
-/** Set the query used to filter displayed annotations. */
-function setFilterQuery(query) {
-  return dispatch => {
-    dispatch({
-      type: actions.SET_FILTER_QUERY,
-      query: query,
-    });
-  };
-}
-
 /**
  * Clears any applied filters, changes the focused user and sets
  * focused enabled to `true`.
@@ -145,6 +135,14 @@ function setFilterQuery(query) {
  */
 function changeFocusModeUser(user) {
   return { type: actions.CHANGE_FOCUS_MODE_USER, user };
+}
+
+/** Set the query used to filter displayed annotations. */
+function setFilterQuery(query) {
+  return {
+    type: actions.SET_FILTER_QUERY,
+    query: query,
+  };
 }
 
 /**

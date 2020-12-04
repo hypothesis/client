@@ -18,18 +18,6 @@ describe('sidebar/store/modules/selection', () => {
     store = createStore([annotations, filters, selection, route], fakeSettings);
   });
 
-  describe('getFirstSelectedAnnotationId', function () {
-    it('returns the first selected annotation id it finds', function () {
-      store.selectAnnotations([1, 2]);
-      assert.equal(store.getFirstSelectedAnnotationId(), 1);
-    });
-
-    it('returns null if no selected annotation ids are found', function () {
-      store.selectAnnotations([]);
-      assert.isNull(store.getFirstSelectedAnnotationId());
-    });
-  });
-
   describe('setForcedVisible', function () {
     it('sets the visibility of the annotation', function () {
       store.setForcedVisible('id1', true);
