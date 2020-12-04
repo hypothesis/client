@@ -87,10 +87,6 @@ const setTab = (newTab, oldTab) => {
   };
 };
 
-/**
- * Return state object representing a reset selection. This
- * resets user-set filters (but leaves focus mode intact)
- */
 const resetSelection = () => {
   return {
     forcedVisible: {},
@@ -312,20 +308,6 @@ const forcedVisibleAnnotations = createSelector(
 );
 
 /**
- * Returns the annotation ID of the first annotation in the selection that is
- * selected (`true`) or `null` if there are none.
- *
- * @type {(state: any) => string|null}
- */
-const getFirstSelectedAnnotationId = createSelector(
-  state => state.selected,
-  selection => {
-    const selectedIds = trueKeys(selection);
-    return selectedIds.length ? selectedIds[0] : null;
-  }
-);
-
-/**
  * Are any annotations currently selected?
  *
  * @type {(state: any) => boolean}
@@ -352,6 +334,9 @@ function selectedTab(state) {
   return state.selectedTab;
 }
 
+/**
+ * @return {SelectionState}
+ */
 function selectionState(state) {
   const selectionState = {
     expanded: expandedMap(state),
@@ -401,7 +386,6 @@ function sortKeys(state) {
  * // Selectors
  * @prop {() => Object<string,boolean>} expandedMap
  * @prop {() => string[]} forcedVisibleAnnotations
- * @prop {() => string|null} getFirstSelectedAnnotationId
  * @prop {() => boolean} hasSelectedAnnotations
  * @prop {() => string[]} selectedAnnotations
  * @prop {() => string} selectedTab
@@ -429,7 +413,6 @@ export default {
   selectors: {
     expandedMap,
     forcedVisibleAnnotations,
-    getFirstSelectedAnnotationId,
     hasSelectedAnnotations,
     selectedAnnotations,
     selectedTab,
