@@ -386,31 +386,6 @@ function sortKeys(state) {
   return sortKeysForTab;
 }
 
-/* Selectors that take root state */
-
-/**
- * Is any sort of filtering currently applied to the list of annotations? This
- * includes a search query, but also if annotations are selected or a user
- * is focused.
- *
- * TODO: FIXME/refactor — this may need to be split into two selectors across
- *   two store modules that calling code needs to combine. It also may be
- *   logic that doesn't belong at all at the store level
- *
- * @type {(state: any) => boolean}
- */
-const hasAppliedFilter = createSelector(
-  rootState => rootState.selection,
-  rootState => rootState.filters,
-  (selection, filters) => {
-    return (
-      !!filters.query ||
-      filters.focus.active ||
-      hasSelectedAnnotations(selection)
-    );
-  }
-);
-
 /**
  * @typedef SelectionStore
  *
@@ -433,9 +408,6 @@ const hasAppliedFilter = createSelector(
  * @prop {() => SelectionState} selectionState
  * @prop {() => string} sortKey
  * @prop {() => string[]} sortKeys
- *
- * // Root Selectors
- * @prop {() => boolean} hasAppliedFilter
  *
  */
 
@@ -464,9 +436,5 @@ export default {
     selectionState,
     sortKey,
     sortKeys,
-  },
-
-  rootSelectors: {
-    hasAppliedFilter,
   },
 };

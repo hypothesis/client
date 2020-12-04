@@ -58,46 +58,6 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('hasAppliedFilter', () => {
-    it('returns true if there is a search query set', () => {
-      store.setFilterQuery('foobar');
-
-      assert.isTrue(store.hasAppliedFilter());
-    });
-
-    it('returns true if user-focused mode is active', () => {
-      store = createStore(
-        [filters, selection],
-        [{ focus: { user: { username: 'somebody' } } }]
-      );
-
-      assert.isTrue(store.hasAppliedFilter());
-    });
-
-    it('returns false if user-focused mode is configured but inactive', () => {
-      store = createStore(
-        [filters, selection],
-        [{ focus: { user: { username: 'somebody' } } }]
-      );
-      store.toggleFocusMode(false);
-
-      assert.isFalse(store.hasAppliedFilter());
-    });
-
-    it('returns true if there are selected annotations', () => {
-      store.selectAnnotations([1]);
-
-      assert.isTrue(store.hasAppliedFilter());
-    });
-
-    it('returns false after selection is cleared', () => {
-      store.setFilterQuery('foobar');
-      store.clearSelection();
-
-      assert.isFalse(store.hasAppliedFilter());
-    });
-  });
-
   describe('hasSelectedAnnotations', function () {
     it('returns true if there are any selected annotations', function () {
       store.selectAnnotations([1]);
