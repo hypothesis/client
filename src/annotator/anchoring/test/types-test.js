@@ -28,26 +28,11 @@ describe('annotator/anchoring/types', () => {
   });
 
   describe('RangeAnchor', () => {
-    let fakeSniff;
-    let fakeSerializedRange;
-    let fakeNormalize;
-    let fakeSerialize;
+    let container;
 
     beforeEach(() => {
-      fakeSerializedRange = sinon.stub();
-      fakeSerialize = sinon.stub();
-      fakeNormalize = sinon.stub().returns({
-        serialize: fakeSerialize,
-      });
-      fakeSniff = sinon.stub().returns({
-        normalize: fakeNormalize,
-      });
-      $imports.$mock({
-        './range': {
-          sniff: fakeSniff,
-          SerializedRange: fakeSerializedRange,
-        },
-      });
+      container = document.createElement('div');
+      container.innerHTML = `<main><article><empty></empty><p>This is </p><p>a test article</p></article><empty-b></empty-b></main>`;
     });
 
     afterEach(() => {
@@ -56,10 +41,14 @@ describe('annotator/anchoring/types', () => {
 
     describe('#fromRange', () => {
       it('returns a RangeAnchor instance', () => {
-        const anchor = RangeAnchor.fromRange(container, new Range());
-        assert.calledOnce(fakeNormalize);
+        const range = new Range();
+        range.selectNodeContents(container);
+
+        const anchor = RangeAnchor.fromRange(container, range);
+
         assert.instanceOf(anchor, RangeAnchor);
-        assert.deepEqual(anchor.range, fakeNormalize());
+        assert.equal(anchor.root, container);
+        assert.equal(anchor.range, range);
       });
     });
 
@@ -67,54 +56,114 @@ describe('annotator/anchoring/types', () => {
       it('returns a RangeAnchor instance', () => {
         const anchor = RangeAnchor.fromSelector(container, {
           type: 'RangeSelector',
-          startContainer: '/div[1]',
+          startContainer: '/main[1]/article[1]',
           startOffset: 0,
-          endContainer: '/div[1]',
+          endContainer: '/main[1]/article[1]/p[2]',
           endOffset: 1,
         });
-        assert.calledOnce(fakeSerializedRange);
         assert.instanceOf(anchor, RangeAnchor);
+        assert.equal(anchor.range.toString(), 'This is a');
+      });
+
+      [
+        // Invalid `startContainer`
+        [
+          {
+            type: 'RangeSelector',
+            startContainer: '/main[1]/invalid[1]',
+            startOffset: 0,
+            endContainer: '/main[1]/article[1]',
+            endOffset: 1,
+          },
+          'Failed to resolve startContainer XPath',
+        ],
+
+        // Invalid `endContainer`
+        [
+          {
+            type: 'RangeSelector',
+            startContainer: '/main[1]/article[1]',
+            startOffset: 0,
+            endContainer: '/main[1]/invalid[1]',
+            endOffset: 1,
+          },
+          'Failed to resolve endContainer XPath',
+        ],
+
+        // Invalid `startOffset`
+        [
+          {
+            type: 'RangeSelector',
+            startContainer: '/main[1]/article[1]',
+            startOffset: 50,
+            endContainer: '/main[1]/article[1]',
+            endOffset: 1,
+          },
+          'Offset exceeds text length',
+        ],
+
+        // Invalid `endOffset`
+        [
+          {
+            type: 'RangeSelector',
+            startContainer: '/main[1]/article[1]',
+            startOffset: 0,
+            endContainer: '/main[1]/article[1]',
+            endOffset: 50,
+          },
+          'Offset exceeds text length',
+        ],
+      ].forEach(([selector, expectedError], i) => {
+        it(`throws if selector fails to resolve (${i})`, () => {
+          assert.throws(() => {
+            RangeAnchor.fromSelector(container, selector);
+          }, expectedError);
+        });
       });
     });
 
     describe('#toRange', () => {
-      it('returns a normalized range result', () => {
-        fakeNormalize.returns({
-          toRange: sinon.stub().returns('normalized range'),
-        });
-        const range = new RangeAnchor(container, new Range());
-        assert.equal(range.toRange(), 'normalized range');
+      it('returns the range', () => {
+        const range = new Range();
+        const anchor = new RangeAnchor(container, range);
+        assert.equal(anchor.toRange(), range);
       });
     });
 
     describe('#toSelector', () => {
-      beforeEach(() => {
-        fakeSerialize.returns({
-          start: '/div[1]',
+      it('returns a valid `RangeSelector` selector', () => {
+        const range = new Range();
+        range.setStart(container.querySelector('p'), 0);
+        range.setEnd(container.querySelector('p:nth-of-type(2)').firstChild, 1);
+
+        const anchor = new RangeAnchor(container, range);
+
+        assert.deepEqual(anchor.toSelector(), {
+          type: 'RangeSelector',
+          startContainer: '/main[1]/article[1]/p[1]',
           startOffset: 0,
-          end: '/div[1]',
+          endContainer: '/main[1]/article[1]/p[2]',
           endOffset: 1,
         });
       });
 
-      function rangeSelectorResult() {
-        return {
+      it('returns a selector which references the closest elements to the text', () => {
+        const range = new Range();
+        range.setStart(container.querySelector('empty'), 0);
+        range.setEnd(container.querySelector('empty-b'), 0);
+
+        const anchor = new RangeAnchor(container, range);
+
+        // Even though the range starts and ends in `empty*` elements, the
+        // returned selector should reference the elements which most closely
+        // wrap the text.
+        assert.deepEqual(anchor.toSelector(), {
           type: 'RangeSelector',
-          startContainer: '/div[1]',
+          startContainer: '/main[1]/article[1]/p[1]',
           startOffset: 0,
-          endContainer: '/div[1]',
-          endOffset: 1,
-        };
-      }
-
-      it('returns a RangeSelector', () => {
-        const range = new RangeAnchor(container, new Range());
-        assert.deepEqual(range.toSelector({}), rangeSelectorResult());
-      });
-
-      it('returns a RangeSelector if options are missing', () => {
-        const range = new RangeAnchor(container, new Range());
-        assert.deepEqual(range.toSelector(), rangeSelectorResult());
+          endContainer: '/main[1]/article[1]/p[2]',
+          endOffset: 14,
+        });
       });
     });
   });
