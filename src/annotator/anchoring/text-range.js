@@ -171,10 +171,29 @@ export class TextPosition {
   }
 
   /**
-   * Construct a `TextPosition` representing the range start or end point (node, offset).
+   * Construct a `TextPosition` that refers to the `offset`th character within
+   * `node`.
    *
    * @param {Node} node
    * @param {number} offset
+   * @return {TextPosition}
+   */
+  static fromCharOffset(node, offset) {
+    switch (node.nodeType) {
+      case Node.TEXT_NODE:
+        return TextPosition.fromPoint(node, offset);
+      case Node.ELEMENT_NODE:
+        return new TextPosition(/** @type {Element} */ (node), offset);
+      default:
+        throw new Error('Node is not an element or text node');
+    }
+  }
+
+  /**
+   * Construct a `TextPosition` representing the range start or end point (node, offset).
+   *
+   * @param {Node} node - Text or Element node
+   * @param {number} offset - Offset within the node.
    * @return {TextPosition}
    */
   static fromPoint(node, offset) {
