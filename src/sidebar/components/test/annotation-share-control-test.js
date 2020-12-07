@@ -16,6 +16,7 @@ describe('AnnotationShareControl', () => {
   let fakeGroup;
   let fakeIsPrivate;
   let fakeShareUri;
+  let fakeIsIOS;
 
   let container;
 
@@ -42,6 +43,13 @@ describe('AnnotationShareControl', () => {
       wrapper.find('Button').props().onClick();
     });
     wrapper.update();
+  }
+
+  function isLinkInputFocused() {
+    return (
+      document.activeElement.getAttribute('aria-label') ===
+      'Use this URL to share this annotation'
+    );
   }
 
   beforeEach(() => {
@@ -74,17 +82,20 @@ describe('AnnotationShareControl', () => {
     };
     fakeIsPrivate = sinon.stub().returns(false);
     fakeShareUri = 'https://www.example.com';
+    fakeIsIOS = sinon.stub().returns(false);
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/copy-to-clipboard': fakeCopyToClipboard,
       '../util/permissions': { isPrivate: fakeIsPrivate },
       './hooks/use-element-should-close': sinon.stub(),
+      '../../shared/user-agent': { isIOS: fakeIsIOS },
     });
   });
 
   afterEach(() => {
     $imports.$restore();
+    container.remove();
   });
 
   it('does not render component if `group` prop not OK', () => {
@@ -191,17 +202,21 @@ describe('AnnotationShareControl', () => {
     });
   });
 
-  it('focuses the share-URI input when opened', () => {
-    document.body.focus();
-
+  it('focuses the share-URI input when opened on non-iOS', () => {
     const wrapper = createComponent();
     openElement(wrapper);
     wrapper.update();
 
-    assert.equal(
-      document.activeElement.getAttribute('aria-label'),
-      'Use this URL to share this annotation'
-    );
+    assert.isTrue(isLinkInputFocused());
+  });
+
+  it("doesn't focuses the share-URI input when opened on iOS", () => {
+    fakeIsIOS.returns(true);
+    const wrapper = createComponent();
+    openElement(wrapper);
+    wrapper.update();
+
+    assert.isFalse(isLinkInputFocused());
   });
 
   it(
