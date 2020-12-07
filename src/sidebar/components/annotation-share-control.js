@@ -10,6 +10,7 @@ import Button from './button';
 import useElementShouldClose from './hooks/use-element-should-close';
 import ShareLinks from './share-links';
 import SvgIcon from '../../shared/components/svg-icon';
+import { isIOS } from '../../shared/user-agent';
 
 /**
  * @typedef {import('../../types/api').Annotation} Annotation
@@ -27,6 +28,12 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @prop {Object} analytics - Injected service
  * @prop {Object} toastMessenger - Injected service
  */
+
+function selectionOverflowsInputElement() {
+  // On iOS the selection overflows the input element
+  // See: https://github.com/hypothesis/client/pull/2799
+  return isIOS();
+}
 
 /**
  * "Popup"-style component for sharing a single annotation.
@@ -56,7 +63,8 @@ function AnnotationShareControl({
   useEffect(() => {
     if (wasOpen.current !== isOpen) {
       wasOpen.current = isOpen;
-      if (isOpen) {
+
+      if (isOpen && !selectionOverflowsInputElement()) {
         // Panel was just opened: select and focus the share URI for convenience
         inputRef.current.focus();
         inputRef.current.select();
