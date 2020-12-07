@@ -1,4 +1,9 @@
-import { TextPosition, TextRange } from '../text-range';
+import {
+  TextPosition,
+  TextRange,
+  RESOLVE_FORWARDS,
+  RESOLVE_BACKWARDS,
+} from '../text-range';
 
 import { assertNodesEqual } from '../../../test-util/compare-dom';
 
@@ -99,6 +104,56 @@ describe('annotator/anchoring/text-range', () => {
         assert.throws(() => {
           pos.resolve();
         }, 'Offset exceeds text length');
+      });
+
+      it('throws if offset is 0 and `dir` option is not specified', () => {
+        const el = document.createElement('div');
+        const pos = new TextPosition(el, 0);
+        assert.throws(() => {
+          pos.resolve();
+        });
+      });
+
+      describe('when `dir` is `RESOLVE_FORWARDS`', () => {
+        it('resolves to next text node if needed', () => {
+          const el = document.createElement('div');
+          el.innerHTML = '<b></b>bar';
+
+          const pos = new TextPosition(el.querySelector('b'), 0);
+          const resolved = pos.resolve({ dir: RESOLVE_FORWARDS });
+
+          assert.equal(resolved.node, el.childNodes[1]);
+          assert.equal(resolved.offset, 0);
+        });
+
+        it('throws if there is no next text node', () => {
+          const el = document.createElement('div');
+          const pos = new TextPosition(el, 0);
+          assert.throws(() => {
+            pos.resolve({ dir: RESOLVE_FORWARDS });
+          });
+        });
+      });
+
+      describe('when `dir` is `RESOLVE_BACKWARDS`', () => {
+        it('resolves to previous text node if needed', () => {
+          const el = document.createElement('div');
+          el.innerHTML = 'bar<b></b>';
+
+          const pos = new TextPosition(el.querySelector('b'), 0);
+          const resolved = pos.resolve({ dir: RESOLVE_BACKWARDS });
+
+          assert.equal(resolved.node, el.childNodes[0]);
+          assert.equal(resolved.offset, el.childNodes[0].data.length);
+        });
+
+        it('throws if there is no previous text node', () => {
+          const el = document.createElement('div');
+          const pos = new TextPosition(el, 0);
+          assert.throws(() => {
+            pos.resolve({ dir: RESOLVE_BACKWARDS });
+          });
+        });
       });
     });
 
@@ -273,7 +328,7 @@ describe('annotator/anchoring/text-range', () => {
         assert.equal(range.toString(), 'foobar');
       });
 
-      it('throws if start point cannot be resolved', () => {
+      it('throws if start point in same element as end point cannot be resolved', () => {
         const el = document.createElement('div');
         el.textContent = 'one two three';
 
@@ -287,7 +342,7 @@ describe('annotator/anchoring/text-range', () => {
         }, 'Offset exceeds text length');
       });
 
-      it('throws if end point cannot be resolved', () => {
+      it('throws if end point in same element as start point cannot be resolved', () => {
         const el = document.createElement('div');
         el.textContent = 'one two three';
 
@@ -299,6 +354,28 @@ describe('annotator/anchoring/text-range', () => {
         assert.throws(() => {
           textRange.toRange();
         }, 'Offset exceeds text length');
+      });
+
+      it('handles start or end point in element with no text', () => {
+        const el = document.createElement('div');
+        el.innerHTML = '<b></b><i>Foobar</i><u></u>';
+
+        const textRange = new TextRange(
+          new TextPosition(el.querySelector('b'), 0),
+          new TextPosition(el.querySelector('u'), 0)
+        );
+        const range = textRange.toRange();
+
+        assert.equal(range.toString(), 'Foobar');
+
+        // Start position is not in `textRange.start.element` but the subsequent
+        // text node.
+        assert.isTrue(
+          range.startContainer === el.querySelector('i').firstChild
+        );
+        // End position is not in `textRange.end.element` but the preceding
+        // text node.
+        assert.isTrue(range.endContainer === el.querySelector('i').firstChild);
       });
     });
 

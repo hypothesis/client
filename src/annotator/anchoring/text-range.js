@@ -77,6 +77,9 @@ function resolveOffsets(element, ...offsets) {
   return results;
 }
 
+export let RESOLVE_FORWARDS = 1;
+export let RESOLVE_BACKWARDS = 2;
+
 /**
  * Represents an offset within the text content of an element.
  *
@@ -128,15 +131,43 @@ export class TextPosition {
   /**
    * Resolve the position to a specific text node and offset within that node.
    *
-   * Throws if `this.offset` exceeds the length of the element's text or if
-   * the element has no text. Offsets at the boundary between two nodes are
-   * resolved to the start of the node that begins at the boundary.
+   * Throws if `this.offset` exceeds the length of the element's text. In the
+   * case where the element has no text and `this.offset` is 0, the `dir` option
+   * determines what happens.
    *
+   * Offsets at the boundary between two nodes are resolved to the start of the
+   * node that begins at the boundary.
+   *
+   * @param {Object} [options]
+   *   @param {RESOLVE_FORWARDS|RESOLVE_BACKWARDS} [options.dir] -
+   *     Specifies in which direction to search for the nearest text node if
+   *     `this.offset` is `0` and `this.element` has no text. If not specified
+   *     an error is thrown.
    * @return {{ node: Text, offset: number }}
    * @throws {RangeError}
    */
-  resolve() {
-    return resolveOffsets(this.element, this.offset)[0];
+  resolve(options = {}) {
+    try {
+      return resolveOffsets(this.element, this.offset)[0];
+    } catch (err) {
+      if (this.offset === 0 && options.dir !== undefined) {
+        const tw = document.createTreeWalker(
+          this.element.getRootNode(),
+          NodeFilter.SHOW_TEXT
+        );
+        tw.currentNode = this.element;
+        const forwards = options.dir === RESOLVE_FORWARDS;
+        const text = /** @type {Text|null} */ (forwards
+          ? tw.nextNode()
+          : tw.previousNode());
+        if (!text) {
+          throw err;
+        }
+        return { node: text, offset: forwards ? 0 : text.data.length };
+      } else {
+        throw err;
+      }
+    }
   }
 
   /**
@@ -239,8 +270,8 @@ export class TextRange {
         this.end.offset
       );
     } else {
-      start = this.start.resolve();
-      end = this.end.resolve();
+      start = this.start.resolve({ dir: RESOLVE_FORWARDS });
+      end = this.end.resolve({ dir: RESOLVE_BACKWARDS });
     }
 
     const range = new Range();
