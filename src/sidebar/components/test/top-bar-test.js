@@ -22,11 +22,7 @@ describe('TopBar', () => {
 
     fakeStore = {
       filterQuery: sinon.stub().returns(null),
-      getState: sinon.stub().returns({
-        sidebarPanels: {
-          activePanelName: null,
-        },
-      }),
+      isSidebarPanelOpen: sinon.stub().returns(false),
       pendingUpdateCount: sinon.stub().returns(0),
       setFilterQuery: sinon.stub(),
       toggleSidebarPanel: sinon.stub(),
@@ -108,12 +104,9 @@ describe('TopBar', () => {
       });
 
       it('displays a help icon active state when help panel active', () => {
-        // state returning active sidebar panel as `PANEL_HELP` triggers active class
-        fakeStore.getState = sinon.stub().returns({
-          sidebarPanels: {
-            activePanelName: uiConstants.PANEL_HELP,
-          },
-        });
+        fakeStore.isSidebarPanelOpen
+          .withArgs(uiConstants.PANEL_HELP)
+          .returns(true);
         const wrapper = createTopBar();
         const helpButton = getButton(wrapper, 'help');
 
@@ -220,11 +213,9 @@ describe('TopBar', () => {
   });
 
   it('adds an active-state class to the "Share" icon when the panel is open', () => {
-    fakeStore.getState.returns({
-      sidebarPanels: {
-        activePanelName: uiConstants.PANEL_SHARE_ANNOTATIONS,
-      },
-    });
+    fakeStore.isSidebarPanelOpen
+      .withArgs(uiConstants.PANEL_SHARE_ANNOTATIONS)
+      .returns(true);
     const wrapper = createTopBar();
     const shareButton = getButton(wrapper, 'share');
 
