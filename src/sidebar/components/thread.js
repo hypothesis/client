@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { createElement, Fragment } from 'preact';
 
 import propTypes from 'prop-types';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 import { countHidden, countVisible } from '../util/thread';
 
@@ -27,8 +27,6 @@ import ModerationBanner from './moderation-banner';
  * @param {ThreadProps} props
  */
 function Thread({ showDocumentInfo = false, thread, threadsService }) {
-  const setExpanded = useStore(store => store.setExpanded);
-
   // Only render this thread's annotation if it exists and the thread is `visible`
   const showAnnotation = thread.annotation && thread.visible;
 
@@ -51,7 +49,10 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
     child => countVisible(child) > 0
   );
 
-  const onToggleReplies = () => setExpanded(thread.id, !!thread.collapsed);
+  const store = useStoreProxy();
+  const onToggleReplies = () =>
+    store.setExpanded(thread.id, !!thread.collapsed);
+
   return (
     <section
       className={classnames('thread', {

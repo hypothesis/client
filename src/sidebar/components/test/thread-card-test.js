@@ -38,7 +38,7 @@ describe('ThreadCard', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       'lodash.debounce': fakeDebounce,
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

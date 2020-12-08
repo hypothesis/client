@@ -26,7 +26,7 @@ describe('SidebarContentError', () => {
       isLoggedIn: sinon.stub().returns(true),
     };
     $imports.$mock({
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
     $imports.$mock(mockImportedComponents());
   });
@@ -52,7 +52,9 @@ describe('SidebarContentError', () => {
 
     const clearButton = findButtonByText(wrapper, 'Show all annotations');
     assert.isTrue(clearButton.exists());
-    assert.equal(clearButton.props().onClick, fakeStore.clearSelection);
+
+    clearButton.props().onClick();
+    assert.called(fakeStore.clearSelection);
   });
 
   context('unavailable annotation, logged out', () => {

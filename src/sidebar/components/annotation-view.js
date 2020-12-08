@@ -2,7 +2,7 @@ import { Fragment, createElement } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 import useRootThread from './hooks/use-root-thread';
 
@@ -21,18 +21,16 @@ import SidebarContentError from './sidebar-content-error';
  * @param {AnnotationViewProps} props
  */
 function AnnotationView({ loadAnnotationsService, onLogin }) {
-  const annotationId = useStore(store => store.routeParams().id);
-  const clearAnnotations = useStore(store => store.clearAnnotations);
-  const highlightAnnotations = useStore(store => store.highlightAnnotations);
+  const store = useStoreProxy();
+  const annotationId = store.routeParams().id;
   const rootThread = useRootThread();
-  const setExpanded = useStore(store => store.setExpanded);
-  const userid = useStore(store => store.profile().userid);
+  const userid = store.profile().userid;
 
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     setFetchError(false);
-    clearAnnotations();
+    store.clearAnnotations();
 
     loadAnnotationsService
       .loadThread(annotationId)
@@ -60,12 +58,12 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
 
         // Make the full thread of annotations visible. By default replies are
         // not shown until the user expands the thread.
-        annots.forEach(annot => setExpanded(annot.id, true));
+        annots.forEach(annot => store.setExpanded(annot.id, true));
 
         // FIXME - This should show a visual indication of which reply the
         // annotation ID in the URL refers to. That isn't currently working.
         if (topLevelAnnot.id !== annotationId) {
-          highlightAnnotations([annotationId]);
+          store.highlightAnnotations([annotationId]);
         }
       })
       .catch(() => {
@@ -79,10 +77,8 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
     userid,
 
     // Static dependencies.
-    clearAnnotations,
-    highlightAnnotations,
     loadAnnotationsService,
-    setExpanded,
+    store,
   ]);
 
   return (

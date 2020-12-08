@@ -93,7 +93,7 @@ describe('AnnotationActionBar', () => {
         shareURI: sinon.stub().returns('http://share.me'),
       },
       '../util/permissions': { permits: fakePermits },
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
     sinon.stub(window, 'confirm').returns(false);
   });

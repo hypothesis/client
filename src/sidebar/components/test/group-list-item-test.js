@@ -72,7 +72,7 @@ describe('GroupListItem', () => {
         copyText: fakeCopyText,
       },
       '../util/group-list-item-common': fakeGroupListItemCommon,
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
 
     sinon.stub(window, 'confirm').returns(false);

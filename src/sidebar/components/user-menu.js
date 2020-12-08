@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../service-config';
 import { isThirdPartyUser } from '../util/account-id';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 
 import Menu from './menu';
@@ -42,12 +42,10 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @param {UserMenuProps} props
  */
 function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
-  const focusedGroupId = useStore(store => store.focusedGroupId);
+  const store = useStoreProxy();
   const isThirdParty = isThirdPartyUser(auth.userid, settings.authDomain);
   const service = serviceConfig(settings);
-  const isNotebookEnabled = useStore(store =>
-    store.isFeatureEnabled('notebook_launch')
-  );
+  const isNotebookEnabled = store.isFeatureEnabled('notebook_launch');
 
   const serviceSupports = feature => service && !!service[feature];
 
@@ -57,7 +55,7 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
 
   const onSelectNotebook = () => {
-    bridge.call('showNotebook', focusedGroupId());
+    bridge.call('showNotebook', store.focusedGroupId());
   };
 
   const onProfileSelected = () =>

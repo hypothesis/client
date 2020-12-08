@@ -3,7 +3,7 @@ import { useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import serviceConfig from '../service-config';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isThirdPartyUser } from '../util/account-id';
 import { orgName } from '../util/group-list-item-common';
 import groupsByOrganization from '../util/group-organizations';
@@ -42,11 +42,12 @@ function publisherProvidedIcon(settings) {
  * @param {GroupListProps} props
  */
 function GroupList({ serviceUrl, settings }) {
-  const currentGroups = useStore(store => store.getCurrentlyViewingGroups());
-  const featuredGroups = useStore(store => store.getFeaturedGroups());
-  const myGroups = useStore(store => store.getMyGroups());
-  const focusedGroup = useStore(store => store.focusedGroup());
-  const userid = useStore(store => store.profile().userid);
+  const store = useStoreProxy();
+  const currentGroups = store.getCurrentlyViewingGroups();
+  const featuredGroups = store.getFeaturedGroups();
+  const myGroups = store.getMyGroups();
+  const focusedGroup = store.focusedGroup();
+  const userid = store.profile().userid;
 
   const myGroupsSorted = useMemo(() => groupsByOrganization(myGroups), [
     myGroups,

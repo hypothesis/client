@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../service-config';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import { parseAccountID } from '../util/account-id';
 import { shouldAutoDisplayTutorial } from '../util/session';
@@ -79,16 +79,10 @@ function HypothesisApp({
   session,
   toastMessenger,
 }) {
-  const clearGroups = useStore(store => store.clearGroups);
-  const closeSidebarPanel = useStore(store => store.closeSidebarPanel);
-  const countDrafts = useStore(store => store.countDrafts);
-  const discardAllDrafts = useStore(store => store.discardAllDrafts);
-  const hasFetchedProfile = useStore(store => store.hasFetchedProfile());
-  const openSidebarPanel = useStore(store => store.openSidebarPanel);
-  const profile = useStore(store => store.profile());
-  const removeAnnotations = useStore(store => store.removeAnnotations);
-  const route = useStore(store => store.route());
-  const unsavedAnnotations = useStore(store => store.unsavedAnnotations);
+  const store = useStoreProxy();
+  const hasFetchedProfile = store.hasFetchedProfile();
+  const profile = store.profile();
+  const route = store.route();
 
   const authState = useMemo(() => {
     if (!hasFetchedProfile) {
@@ -107,9 +101,9 @@ function HypothesisApp({
 
   useEffect(() => {
     if (shouldAutoDisplayTutorial(isSidebar, profile, settings)) {
-      openSidebarPanel(uiConstants.PANEL_HELP);
+      store.openSidebarPanel(uiConstants.PANEL_HELP);
     }
-  }, [isSidebar, profile, openSidebarPanel, settings]);
+  }, [isSidebar, profile, settings, store]);
 
   const login = async () => {
     if (serviceConfig(settings)) {
@@ -121,8 +115,8 @@ function HypothesisApp({
     try {
       await auth.login();
 
-      closeSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
-      clearGroups();
+      store.closeSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      store.clearGroups();
       session.reload();
     } catch (err) {
       toastMessenger.error(err.message);
@@ -141,7 +135,7 @@ function HypothesisApp({
   const promptToLogout = () => {
     // TODO - Replace this with a UI which doesn't look terrible.
     let text = '';
-    const drafts = countDrafts();
+    const drafts = store.countDrafts();
     if (drafts === 1) {
       text =
         'You have an unsaved annotation.\n' +
@@ -160,9 +154,9 @@ function HypothesisApp({
     if (!promptToLogout()) {
       return;
     }
-    clearGroups();
-    removeAnnotations(unsavedAnnotations());
-    discardAllDrafts();
+    store.clearGroups();
+    store.removeAnnotations(store.unsavedAnnotations());
+    store.discardAllDrafts();
 
     if (serviceConfig(settings)) {
       bridge.call(bridgeEvents.LOGOUT_REQUESTED);

@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
 import useRootThread from './hooks/use-root-thread';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
 import ThreadList from './thread-list';
 
@@ -19,21 +19,21 @@ import ThreadList from './thread-list';
  * @param {NotebookViewProps} props
  */
 function NotebookView({ loadAnnotationsService }) {
-  const focusedGroup = useStore(store => store.focusedGroup());
-  const setSortKey = useStore(store => store.setSortKey);
+  const store = useStoreProxy();
+  const focusedGroup = store.focusedGroup();
 
   // Reload annotations if focused group changes
   useEffect(() => {
     // Load all annotations in the group, unless there are more than 5000
     // of them: this is a performance safety valve
-    setSortKey('Newest');
+    store.setSortKey('Newest');
     if (focusedGroup) {
       loadAnnotationsService.load({
         groupId: focusedGroup.id,
         maxResults: 5000,
       });
     }
-  }, [loadAnnotationsService, focusedGroup, setSortKey]);
+  }, [loadAnnotationsService, focusedGroup, store]);
 
   const rootThread = useRootThread();
   const groupName = focusedGroup?.name ?? '…';

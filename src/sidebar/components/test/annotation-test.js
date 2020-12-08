@@ -62,7 +62,7 @@ describe('Annotation', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/annotation-metadata': fakeMetadata,
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

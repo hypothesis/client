@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../util/service-context';
@@ -27,8 +27,9 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @param {ShareAnnotationsPanelProps} props
  */
 function ShareAnnotationsPanel({ analytics, toastMessenger }) {
-  const mainFrame = useStore(store => store.mainFrame());
-  const focusedGroup = useStore(store => store.focusedGroup());
+  const store = useStoreProxy();
+  const mainFrame = store.mainFrame();
+  const focusedGroup = store.focusedGroup();
 
   const groupName = (focusedGroup && focusedGroup.name) || '...';
   const panelTitle = `Share Annotations in ${groupName}`;

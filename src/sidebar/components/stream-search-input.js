@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 
 import SearchInput from './search-input';
@@ -19,7 +19,8 @@ import SearchInput from './search-input';
  * @param {StreamSearchInputProps} props
  */
 function StreamSearchInput({ router }) {
-  const query = useStore(store => store.routeParams().q);
+  const store = useStoreProxy();
+  const query = store.routeParams().q;
   const setQuery = query => {
     // Re-route the user to `/stream` if they are on `/a/:id` and then set
     // the search query.

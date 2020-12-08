@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isPrivate } from '../util/permissions';
 
 import SvgIcon from '../../shared/components/svg-icon';
@@ -23,7 +23,8 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @param {AnnotationShareInfoProps} props
  */
 function AnnotationShareInfo({ annotation }) {
-  const group = useStore(store => store.getGroup(annotation.group));
+  const store = useStoreProxy();
+  const group = store.getGroup(annotation.group);
 
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links

@@ -55,7 +55,7 @@ describe('AnnotationBody', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/theme': { applyTheme: fakeApplyTheme },
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

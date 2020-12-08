@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isHighlight } from '../util/annotation-metadata';
 import { getElementHeightWithMargins } from '../util/dom';
 import {
@@ -44,8 +44,6 @@ function getScrollContainer() {
  * @param {ThreadListProps} props
  */
 function ThreadList({ thread }) {
-  const setForcedVisible = useStore(store => store.setForcedVisible);
-
   // Height of the visible area of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(
     getScrollContainer().clientHeight
@@ -85,8 +83,10 @@ function ThreadList({ thread }) {
     [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
   );
 
+  const store = useStoreProxy();
+
   // Get the `$tag` of the most recently created unsaved annotation.
-  const newAnnotationTag = useStore(store => {
+  const newAnnotationTag = (() => {
     // If multiple unsaved annotations exist, assume that the last one in the
     // list is the most recently created one.
     const newAnnotations = store
@@ -96,7 +96,7 @@ function ThreadList({ thread }) {
       return null;
     }
     return newAnnotations[newAnnotations.length - 1].$tag;
-  });
+  })();
 
   // Scroll to newly created annotations and replies.
   //
@@ -105,10 +105,10 @@ function ThreadList({ thread }) {
   // and the thread list will scroll to that.
   useEffect(() => {
     if (newAnnotationTag) {
-      setForcedVisible(newAnnotationTag, true);
+      store.setForcedVisible(newAnnotationTag, true);
       setScrollToId(newAnnotationTag);
     }
-  }, [setForcedVisible, newAnnotationTag]);
+  }, [store, newAnnotationTag]);
 
   // Effect to scroll a particular thread into view. This is mainly used to
   // scroll a newly created annotation into view.

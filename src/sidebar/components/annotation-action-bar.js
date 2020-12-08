@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import uiConstants from '../ui-constants';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isShareable, shareURI } from '../util/annotation-sharing';
 import { isPrivate, permits } from '../util/permissions';
 import { withServices } from '../util/service-context';
@@ -37,11 +37,11 @@ function AnnotationActionBar({
   settings,
   toastMessenger,
 }) {
-  const userProfile = useStore(store => store.profile());
-  const annotationGroup = useStore(store => store.getGroup(annotation.group));
-  const isLoggedIn = useStore(store => store.isLoggedIn());
+  const store = useStoreProxy();
+  const userProfile = store.profile();
+  const annotationGroup = store.getGroup(annotation.group);
+  const isLoggedIn = store.isLoggedIn();
 
-  const openSidebarPanel = useStore(store => store.openSidebarPanel);
   // Is the current user allowed to take the given `action` on this annotation?
   const userIsAuthorizedTo = action => {
     return permits(annotation.permissions, action, userProfile.userid);
@@ -55,8 +55,6 @@ function AnnotationActionBar({
   const showFlagAction = userProfile.userid !== annotation.user;
   const showShareAction = isShareable(annotation, settings);
 
-  const createDraft = useStore(store => store.createDraft);
-
   const onDelete = () => {
     if (window.confirm('Are you sure you want to delete this annotation?')) {
       annotationsService.delete(annotation).catch(err => {
@@ -66,7 +64,7 @@ function AnnotationActionBar({
   };
 
   const onEdit = () => {
-    createDraft(annotation, {
+    store.createDraft(annotation, {
       tags: annotation.tags,
       text: annotation.text,
       isPrivate: isPrivate(annotation.permissions),
@@ -85,7 +83,7 @@ function AnnotationActionBar({
 
   const onReplyClick = () => {
     if (!isLoggedIn) {
-      openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      store.openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
       return;
     }
     onReply();

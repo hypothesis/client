@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import {
   isHighlight,
   isReply,
@@ -46,8 +46,8 @@ export default function AnnotationHeader({
   showDocumentInfo,
   threadIsCollapsed,
 }) {
+  const store = useStoreProxy();
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
-  const setExpanded = useStore(store => store.setExpanded);
 
   const annotationIsPrivate = isPrivate(annotation.permissions);
 
@@ -64,7 +64,7 @@ export default function AnnotationHeader({
   const onReplyCountClick = () =>
     // If an annotation has replies it must have been saved and therefore have
     // an ID.
-    setExpanded(/** @type {string} */ (annotation.id), true);
+    store.setExpanded(/** @type {string} */ (annotation.id), true);
 
   return (
     <header className="annotation-header">

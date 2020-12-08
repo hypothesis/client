@@ -1,6 +1,6 @@
 import { createElement } from 'preact';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
 import Menu from './menu';
 import MenuItem from './menu-item';
@@ -10,21 +10,19 @@ import SvgIcon from '../../shared/components/svg-icon';
  * A drop-down menu of sorting options for a collection of annotations.
  */
 export default function SortMenu() {
-  const actions = useStore(store => ({
-    setSortKey: store.setSortKey,
-  }));
+  const store = useStoreProxy();
   // The currently-applied sort order
-  const sortKey = useStore(store => store.sortKey());
+  const sortKey = store.sortKey();
   // All available sorting options. These change depending on current
   // "tab" or context.
-  const sortKeysAvailable = useStore(store => store.sortKeys());
+  const sortKeysAvailable = store.sortKeys();
 
   const menuItems = sortKeysAvailable.map(sortOption => {
     return (
       <MenuItem
         key={sortOption}
         label={sortOption}
-        onClick={() => actions.setSortKey(sortOption)}
+        onClick={() => store.setSortKey(sortOption)}
         isSelected={sortOption === sortKey}
       />
     );

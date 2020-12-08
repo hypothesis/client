@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import * as annotationMetadata from '../util/annotation-metadata';
 import { withServices } from '../util/service-context';
 
@@ -26,12 +26,7 @@ import { withServices } from '../util/service-context';
  * @param {ModerationBannerProps} props
  */
 function ModerationBanner({ annotation, api, toastMessenger }) {
-  // actions
-  const store = useStore(store => ({
-    hide: store.hideAnnotation,
-    unhide: store.unhideAnnotation,
-  }));
-
+  const store = useStoreProxy();
   const flagCount = annotationMetadata.flagCount(annotation);
 
   const isHiddenOrFlagged =
@@ -44,7 +39,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
     api.annotation
       .hide({ id: annotation.id })
       .then(() => {
-        store.hide(annotation.id);
+        store.hideAnnotation(annotation.id);
       })
       .catch(() => {
         toastMessenger.error('Failed to hide annotation');
@@ -58,7 +53,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
     api.annotation
       .unhide({ id: annotation.id })
       .then(() => {
-        store.unhide(annotation.id);
+        store.unhideAnnotation(annotation.id);
       })
       .catch(() => {
         toastMessenger.error('Failed to unhide annotation');
