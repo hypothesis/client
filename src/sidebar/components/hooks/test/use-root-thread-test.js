@@ -1,9 +1,13 @@
+import { mount } from 'enzyme';
+import { createElement } from 'preact';
+
 import useRootThread from '../use-root-thread';
 import { $imports } from '../use-root-thread';
 
 describe('sidebar/components/hooks/use-root-thread', () => {
   let fakeStore;
   let fakeThreadAnnotations;
+  let lastRootThread;
 
   beforeEach(() => {
     fakeStore = {
@@ -13,12 +17,20 @@ describe('sidebar/components/hooks/use-root-thread', () => {
       selectionState: sinon.stub().returns({ hi: 'there' }),
       userFilter: sinon.stub().returns('hotspur'),
     };
-    fakeThreadAnnotations = sinon.stub();
+    fakeThreadAnnotations = sinon.stub().returns('fakeThreadAnnotations');
 
     $imports.$mock({
       '../../store/use-store': callback => callback(fakeStore),
       '../../util/thread-annotations': fakeThreadAnnotations,
     });
+
+    // Mount a dummy component to be able to use the `useRootThread` hook
+    // Do things that cause `useRootThread` to recalculate in the store and
+    // test them (hint: use `act`)
+    function DummyComponent() {
+      lastRootThread = useRootThread();
+    }
+    mount(<DummyComponent />);
   });
 
   afterEach(() => {
@@ -26,15 +38,13 @@ describe('sidebar/components/hooks/use-root-thread', () => {
   });
 
   it('should return results of `threadAnnotations` with current thread state', () => {
-    fakeThreadAnnotations.returns('a tisket, a tasket');
-
-    const results = useRootThread();
-
     const threadState = fakeThreadAnnotations.getCall(0).args[0];
+
     assert.deepEqual(threadState.annotations, ['1', '2']);
     assert.equal(threadState.selection.filterQuery, 'itchy');
     assert.equal(threadState.route, '66');
     assert.equal(threadState.selection.filters.user, 'hotspur');
-    assert.equal(results, 'a tisket, a tasket');
+
+    assert.equal(lastRootThread, 'fakeThreadAnnotations');
   });
 });
