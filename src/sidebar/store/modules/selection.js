@@ -558,16 +558,19 @@ function sortKey(state) {
 /**
  * Retrieve applicable sort options for the currently-selected tab.
  *
- * @return {string[]}
+ * @type {(state: any) => string[]}
  */
-function sortKeys(state) {
-  const sortKeysForTab = ['Newest', 'Oldest'];
-  if (state.selectedTab !== uiConstants.TAB_NOTES) {
-    // Location is inapplicable to Notes tab
-    sortKeysForTab.push('Location');
+const sortKeys = createSelector(
+  state => state.selectedTab,
+  selectedTab => {
+    const sortKeysForTab = ['Newest', 'Oldest'];
+    if (selectedTab !== uiConstants.TAB_NOTES) {
+      // Location is inapplicable to Notes tab
+      sortKeysForTab.push('Location');
+    }
+    return sortKeysForTab;
   }
-  return sortKeysForTab;
-}
+);
 
 /**
  * Summary of applied filters
