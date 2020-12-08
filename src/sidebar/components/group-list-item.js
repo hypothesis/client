@@ -1,7 +1,7 @@
 import { Fragment, createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { copyText } from '../util/copy-to-clipboard';
 import { orgName } from '../util/group-list-item-common';
 import { withServices } from '../util/service-context';
@@ -44,18 +44,14 @@ function GroupListItem({
   const isSelectable =
     (group.scopes && !group.scopes.enforced) || group.isScopedToUri;
 
-  const focusedGroupId = useStore(store => store.focusedGroupId());
+  const store = useStoreProxy();
+  const focusedGroupId = store.focusedGroupId();
   const isSelected = group.id === focusedGroupId;
-
-  const actions = useStore(store => ({
-    clearDirectLinkedGroupFetchFailed: store.clearDirectLinkedGroupFetchFailed,
-    clearDirectLinkedIds: store.clearDirectLinkedIds,
-  }));
 
   const focusGroup = () => {
     analytics.track(analytics.events.GROUP_SWITCH);
-    actions.clearDirectLinkedGroupFetchFailed();
-    actions.clearDirectLinkedIds();
+    store.clearDirectLinkedGroupFetchFailed();
+    store.clearDirectLinkedIds();
     groupsService.focus(group.id);
   };
 

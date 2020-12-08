@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import { withServices } from '../util/service-context';
 
@@ -91,18 +91,12 @@ Tab.propTypes = {
  * @param {SelectionTabsProps} props
  */
 function SelectionTabs({ isLoading, settings }) {
-  const selectedTab = useStore(store => store.selectedTab());
-  const noteCount = useStore(store => store.noteCount());
-  const annotationCount = useStore(store => store.annotationCount());
-  const orphanCount = useStore(store => store.orphanCount());
-  const isWaitingToAnchorAnnotations = useStore(store =>
-    store.isWaitingToAnchorAnnotations()
-  );
-  // actions
-  const store = useStore(store => ({
-    clearSelection: store.clearSelection,
-    selectTab: store.selectTab,
-  }));
+  const store = useStoreProxy();
+  const selectedTab = store.selectedTab();
+  const noteCount = store.noteCount();
+  const annotationCount = store.annotationCount();
+  const orphanCount = store.orphanCount();
+  const isWaitingToAnchorAnnotations = store.isWaitingToAnchorAnnotations();
 
   const selectTab = tabId => {
     store.clearSelection();

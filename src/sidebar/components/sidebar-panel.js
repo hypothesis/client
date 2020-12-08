@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 import scrollIntoView from 'scroll-into-view';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
 import Button from './button';
 import Slider from './slider';
@@ -37,8 +37,8 @@ export default function SidebarPanel({
   title,
   onActiveChanged,
 }) {
-  const panelIsActive = useStore(store => store.isSidebarPanelOpen(panelName));
-  const togglePanelFn = useStore(store => store.toggleSidebarPanel);
+  const store = useStoreProxy();
+  const panelIsActive = store.isSidebarPanelOpen(panelName);
 
   const panelElement = useRef(/** @type {HTMLDivElement|null}*/ (null));
   const panelWasActive = useRef(panelIsActive);
@@ -57,7 +57,7 @@ export default function SidebarPanel({
   }, [panelIsActive, onActiveChanged]);
 
   const closePanel = () => {
-    togglePanelFn(panelName, false);
+    store.toggleSidebarPanel(panelName, false);
   };
 
   return (

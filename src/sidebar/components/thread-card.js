@@ -4,7 +4,7 @@ import { createElement } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 
 import Thread from './thread';
@@ -26,9 +26,10 @@ import Thread from './thread';
  * @param {ThreadCardProps} props
  */
 function ThreadCard({ frameSync, thread }) {
+  const store = useStoreProxy();
   const threadTag = thread.annotation && thread.annotation.$tag;
-  const isFocused = useStore(store => store.isAnnotationFocused(threadTag));
-  const showDocumentInfo = useStore(store => store.route() !== 'sidebar');
+  const isFocused = store.isAnnotationFocused(threadTag);
+  const showDocumentInfo = store.route() !== 'sidebar';
   const focusThreadAnnotation = useMemo(
     () =>
       debounce(tag => {

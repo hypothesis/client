@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../service-config';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import isThirdPartyService from '../util/is-third-party-service';
 import { withServices } from '../util/service-context';
@@ -51,24 +51,19 @@ function TopBar({
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
-  const filterQuery = useStore(store => store.filterQuery());
-  const setFilterQuery = useStore(store => store.setFilterQuery);
-
-  const pendingUpdateCount = useStore(store => store.pendingUpdateCount());
-
-  const togglePanelFn = useStore(store => store.toggleSidebarPanel);
+  const store = useStoreProxy();
+  const filterQuery = store.filterQuery();
+  const pendingUpdateCount = store.pendingUpdateCount();
 
   const applyPendingUpdates = () => streamer.applyPendingUpdates();
 
   const toggleSharePanel = () => {
-    togglePanelFn(uiConstants.PANEL_SHARE_ANNOTATIONS);
+    store.toggleSidebarPanel(uiConstants.PANEL_SHARE_ANNOTATIONS);
   };
 
-  const isHelpPanelOpen = useStore(store =>
-    store.isSidebarPanelOpen(uiConstants.PANEL_HELP)
-  );
-  const isAnnotationsPanelOpen = useStore(store =>
-    store.isSidebarPanelOpen(uiConstants.PANEL_SHARE_ANNOTATIONS)
+  const isHelpPanelOpen = store.isSidebarPanelOpen(uiConstants.PANEL_HELP);
+  const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
+    uiConstants.PANEL_SHARE_ANNOTATIONS
   );
 
   /**
@@ -80,7 +75,7 @@ function TopBar({
     if (service && service.onHelpRequestProvided) {
       bridge.call(bridgeEvents.HELP_REQUESTED);
     } else {
-      togglePanelFn(uiConstants.PANEL_HELP);
+      store.toggleSidebarPanel(uiConstants.PANEL_HELP);
     }
   };
 
@@ -144,7 +139,10 @@ function TopBar({
               }`}
             />
           )}
-          <SearchInput query={filterQuery || null} onSearch={setFilterQuery} />
+          <SearchInput
+            query={filterQuery || null}
+            onSearch={store.setFilterQuery}
+          />
           <SortMenu />
           {showSharePageButton && (
             <Button

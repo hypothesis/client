@@ -61,7 +61,7 @@ describe('UserMenu', () => {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
       '../service-config': fakeServiceConfig,
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

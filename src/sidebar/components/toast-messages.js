@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 
 import SvgIcon from '../../shared/components/svg-icon';
@@ -94,7 +94,8 @@ ToastMessage.propTypes = {
  * @param {ToastMessagesProps} props
  */
 function ToastMessages({ toastMessenger }) {
-  const messages = useStore(store => store.getToastMessages());
+  const store = useStoreProxy();
+  const messages = store.getToastMessages();
   return (
     <div>
       <ul

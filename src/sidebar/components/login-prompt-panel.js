@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 
 import Button from './button';
@@ -19,7 +19,8 @@ import SidebarPanel from './sidebar-panel';
  * @param {LoginPromptPanelProps} props
  */
 export default function LoginPromptPanel({ onLogin, onSignUp }) {
-  const isLoggedIn = useStore(store => store.isLoggedIn());
+  const store = useStoreProxy();
+  const isLoggedIn = store.isLoggedIn();
   if (isLoggedIn) {
     return null;
   }

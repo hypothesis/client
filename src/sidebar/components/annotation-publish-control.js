@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isNew, isReply } from '../util/annotation-metadata';
 import { isShared } from '../util/permissions';
 import { withServices } from '../util/service-context';
@@ -39,13 +39,9 @@ function AnnotationPublishControl({
   onSave,
   settings,
 }) {
-  const draft = useStore(store => store.getDraft(annotation));
-  const group = useStore(store => store.getGroup(annotation.group));
-
-  const createDraft = useStore(store => store.createDraft);
-  const removeDraft = useStore(store => store.removeDraft);
-  const setDefault = useStore(store => store.setDefault);
-  const removeAnnotations = useStore(store => store.removeAnnotations);
+  const store = useStoreProxy();
+  const draft = store.getDraft(annotation);
+  const group = store.getGroup(annotation.group);
 
   if (!group) {
     // If there is no group, then don't render anything as a missing group
@@ -59,17 +55,17 @@ function AnnotationPublishControl({
 
   // Revert changes to this annotation
   const onCancel = () => {
-    removeDraft(annotation);
+    store.removeDraft(annotation);
     if (isNew(annotation)) {
-      removeAnnotations([annotation]);
+      store.removeAnnotations([annotation]);
     }
   };
 
   const onSetPrivacy = level => {
-    createDraft(annotation, { ...draft, isPrivate: level === 'private' });
+    store.createDraft(annotation, { ...draft, isPrivate: level === 'private' });
     // Persist this as privacy default for future annotations unless this is a reply
     if (!isReply(annotation)) {
-      setDefault('annotationPrivacy', level);
+      store.setDefault('annotationPrivacy', level);
     }
   };
 

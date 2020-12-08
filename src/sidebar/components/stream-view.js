@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import * as searchFilter from '../util/search-filter';
 import { withServices } from '../util/service-context';
 import useRootThread from './hooks/use-root-thread';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
 import ThreadList from './thread-list';
 
@@ -21,16 +21,8 @@ import ThreadList from './thread-list';
  * @param {StreamViewProps} props
  */
 function StreamView({ api, toastMessenger }) {
-  const addAnnotations = useStore(store => store.addAnnotations);
-  const annotationFetchStarted = useStore(
-    store => store.annotationFetchStarted
-  );
-  const annotationFetchFinished = useStore(
-    store => store.annotationFetchFinished
-  );
-  const clearAnnotations = useStore(store => store.clearAnnotations);
-  const currentQuery = useStore(store => store.routeParams().q);
-  const setSortKey = useStore(store => store.setSortKey);
+  const store = useStoreProxy();
+  const currentQuery = store.routeParams().q;
 
   /**
    * Fetch annotations from the API and display them in the stream.
@@ -50,32 +42,26 @@ function StreamView({ api, toastMessenger }) {
         ...searchFilter.toObject(query),
       };
       try {
-        annotationFetchStarted();
+        store.annotationFetchStarted();
         const results = await api.search(queryParams);
-        addAnnotations([...results.rows, ...results.replies]);
+        store.addAnnotations([...results.rows, ...results.replies]);
       } finally {
-        annotationFetchFinished();
+        store.annotationFetchFinished();
       }
     },
-    [addAnnotations, annotationFetchStarted, annotationFetchFinished, api]
+    [api, store]
   );
 
   // Update the stream when this route is initially displayed and whenever
   // the search query is updated.
   useEffect(() => {
     // Sort the stream so that the newest annotations are at the top
-    setSortKey('Newest');
-    clearAnnotations();
+    store.setSortKey('Newest');
+    store.clearAnnotations();
     loadAnnotations(currentQuery).catch(err => {
       toastMessenger.error(`Unable to fetch annotations: ${err.message}`);
     });
-  }, [
-    clearAnnotations,
-    currentQuery,
-    loadAnnotations,
-    setSortKey,
-    toastMessenger,
-  ]);
+  }, [currentQuery, loadAnnotations, store, toastMessenger]);
 
   const rootThread = useRootThread();
 
