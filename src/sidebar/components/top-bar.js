@@ -64,8 +64,11 @@ function TopBar({
     togglePanelFn(uiConstants.PANEL_SHARE_ANNOTATIONS);
   };
 
-  const currentActivePanel = useStore(
-    store => store.getState().sidebarPanels.activePanelName
+  const isHelpPanelOpen = useStore(store =>
+    store.isSidebarPanelOpen(uiConstants.PANEL_HELP)
+  );
+  const isAnnotationsPanelOpen = useStore(store =>
+    store.isSidebarPanelOpen(uiConstants.PANEL_SHARE_ANNOTATIONS)
   );
 
   /**
@@ -119,7 +122,7 @@ function TopBar({
           <Button
             className="top-bar__icon-button"
             icon="help"
-            isExpanded={currentActivePanel === uiConstants.PANEL_HELP}
+            isExpanded={isHelpPanelOpen}
             onClick={requestHelp}
             title="Help"
           />
@@ -147,9 +150,7 @@ function TopBar({
             <Button
               className="top-bar__icon-button"
               icon="share"
-              isExpanded={
-                currentActivePanel === uiConstants.PANEL_SHARE_ANNOTATIONS
-              }
+              isExpanded={isAnnotationsPanelOpen}
               onClick={toggleSharePanel}
               title="Share annotations on this page"
             />
@@ -157,7 +158,7 @@ function TopBar({
           <Button
             className="top-bar__icon-button"
             icon="help"
-            isExpanded={currentActivePanel === uiConstants.PANEL_HELP}
+            isExpanded={isHelpPanelOpen}
             onClick={requestHelp}
             title="Help"
           />

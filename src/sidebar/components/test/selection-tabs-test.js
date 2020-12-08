@@ -35,11 +35,7 @@ describe('SelectionTabs', function () {
       noteCount: sinon.stub().returns(456),
       orphanCount: sinon.stub().returns(0),
       isWaitingToAnchorAnnotations: sinon.stub().returns(false),
-      getState: sinon.stub().returns({
-        selection: {
-          selectedTab: uiConstants.TAB_ANNOTATIONS,
-        },
-      }),
+      selectedTab: sinon.stub().returns(uiConstants.TAB_ANNOTATIONS),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -74,9 +70,7 @@ describe('SelectionTabs', function () {
     });
 
     it('should display notes tab as selected', function () {
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_NOTES },
-      });
+      fakeStore.selectedTab.returns(uiConstants.TAB_NOTES);
       const wrapper = createComponent({});
       const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(1).hasClass('is-selected'));
@@ -85,9 +79,7 @@ describe('SelectionTabs', function () {
     });
 
     it('should display orphans tab as selected if there is 1 or more orphans', function () {
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_ORPHANS },
-      });
+      fakeStore.selectedTab.returns(uiConstants.TAB_ORPHANS);
       fakeStore.orphanCount.returns(1);
       const wrapper = createComponent({});
       const tabs = wrapper.find('button');
@@ -98,9 +90,7 @@ describe('SelectionTabs', function () {
     });
 
     it('should not display orphans tab if there are 0 orphans', function () {
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_ORPHANS },
-      });
+      fakeStore.selectedTab.returns(uiConstants.TAB_ORPHANS);
       const wrapper = createComponent({});
       const tabs = wrapper.find('button');
       assert.equal(tabs.length, 2);
@@ -140,18 +130,14 @@ describe('SelectionTabs', function () {
     });
 
     it('should not display the new-note-btn when the notes tab is active and the new-note-btn is disabled', function () {
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_NOTES },
-      });
+      fakeStore.selectedTab.returns(uiConstants.TAB_NOTES);
       const wrapper = createComponent({});
       assert.equal(wrapper.find('NewNoteButton').length, 0);
     });
 
     it('should display the new-note-btn when the notes tab is active and the new-note-btn is enabled', function () {
       fakeSettings.enableExperimentalNewNoteButton = true;
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_NOTES },
-      });
+      fakeStore.selectedTab.returns(uiConstants.TAB_NOTES);
       const wrapper = createComponent({});
       assert.equal(wrapper.find('NewNoteButton').length, 1);
     });
@@ -165,9 +151,7 @@ describe('SelectionTabs', function () {
     });
 
     it('should not display a message when its loading notes count is 0', function () {
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_NOTES },
-      });
+      fakeStore.selectedTab.returns(uiConstants.TAB_NOTES);
       fakeStore.noteCount.returns(0);
       const wrapper = createComponent({
         isLoading: true,
@@ -185,9 +169,7 @@ describe('SelectionTabs', function () {
     });
 
     it('should display the longer version of the no notes message when there are no notes', function () {
-      fakeStore.getState.returns({
-        selection: { selectedTab: uiConstants.TAB_NOTES },
-      });
+      fakeStore.selectedTab.returns(uiConstants.TAB_NOTES);
       fakeStore.noteCount.returns(0);
       const wrapper = createComponent({});
       assert.include(
@@ -222,11 +204,7 @@ describe('SelectionTabs', function () {
   ].forEach(({ label, tab }) => {
     it(`should change the selected tab when "${label}" tab is clicked`, () => {
       // Pre-select a different tab than the one we are about to click.
-      fakeStore.getState.returns({
-        selection: {
-          selectedTab: 'other-tab',
-        },
-      });
+      fakeStore.selectedTab.returns('other-tab');
 
       // Make the "Orphans" tab appear.
       fakeStore.orphanCount.returns(1);
@@ -240,11 +218,7 @@ describe('SelectionTabs', function () {
   });
 
   it('does not change the selected tab if it is already selected', () => {
-    fakeStore.getState.returns({
-      selection: {
-        selectedTab: uiConstants.TAB_NOTES,
-      },
-    });
+    fakeStore.selectedTab.returns(uiConstants.TAB_NOTES);
     const wrapper = createComponent({});
 
     findButton(wrapper, 'Page Notes').simulate('click');
