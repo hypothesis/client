@@ -1,5 +1,6 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
+import { useReducer } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 
 import { Injector } from '../../../shared/injector';
@@ -39,6 +40,7 @@ const fixtures = {
 describe('integration: annotation threading', () => {
   let lastRootThread;
   let store;
+  let forceUpdate;
 
   beforeEach(function () {
     const fakeFeatures = {
@@ -56,6 +58,7 @@ describe('integration: annotation threading', () => {
     // test them (hint: use `act`)
     function DummyComponent() {
       lastRootThread = useRootThread();
+      [, forceUpdate] = useReducer(x => x + 1, 0);
     }
 
     store = container.get('store');
@@ -65,6 +68,24 @@ describe('integration: annotation threading', () => {
         <DummyComponent />
       </ServiceContext.Provider>
     );
+  });
+
+  it('should update root thread only when relevant state changes', () => {
+    let prevRootThread = lastRootThread;
+
+    // Make a change which affects the thread.
+    act(() => {
+      store.addAnnotations(fixtures.annotations);
+    });
+
+    assert.notEqual(lastRootThread, prevRootThread);
+    prevRootThread = lastRootThread;
+
+    // Re-render the UI without changing any of the data that affects the thread.
+    act(() => {
+      forceUpdate();
+    });
+    assert.equal(lastRootThread, prevRootThread);
   });
 
   it('should display newly loaded annotations', () => {
@@ -109,9 +130,9 @@ describe('integration: annotation threading', () => {
         store.setSortKey(testCase.sortKey);
       });
 
-      const actualOrder = lastRootThread.children.map(thread => {
-        return thread.annotation.id;
-      });
+      const actualOrder = lastRootThread.children.map(
+        thread => thread.annotation.id
+      );
       assert.deepEqual(actualOrder, testCase.expectedOrder);
     });
   });

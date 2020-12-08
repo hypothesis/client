@@ -337,16 +337,18 @@ function selectedTab(state) {
 /**
  * @return {SelectionState}
  */
-function selectionState(state) {
-  const selectionState = {
-    expanded: expandedMap(state),
-    forcedVisible: forcedVisibleAnnotations(state),
-    selected: selectedAnnotations(state),
-    sortKey: sortKey(state),
-    selectedTab: selectedTab(state),
-  };
-  return selectionState;
-}
+const selectionState = createSelector(
+  state => state,
+  selection => {
+    return {
+      expanded: expandedMap(selection),
+      forcedVisible: forcedVisibleAnnotations(selection),
+      selected: selectedAnnotations(selection),
+      sortKey: sortKey(selection),
+      selectedTab: selectedTab(selection),
+    };
+  }
+);
 
 /**
  * Retrieve the current sort option key

@@ -1,3 +1,5 @@
+import { useMemo } from 'preact/hooks';
+
 import useStore from '../../store/use-store';
 import threadAnnotations from '../../util/thread-annotations';
 
@@ -14,19 +16,22 @@ export default function useRootThread() {
   const query = useStore(store => store.filterQuery());
   const route = useStore(store => store.route());
   const selectionState = useStore(store => store.selectionState());
-  const filters = useStore(store => {
+  const userFilter = useStore(store => store.userFilter());
+
+  const threadState = useMemo(() => {
     /** @type {Object.<string,string>} */
     const filters = {};
-    const userFilter = store.userFilter();
     if (userFilter) {
       filters.user = userFilter;
     }
-    return filters;
-  });
+    return {
+      annotations,
+      filters,
+      query,
+      route,
+      selection: { ...selectionState, filterQuery: query, filters },
+    };
+  }, [annotations, query, route, selectionState, userFilter]);
 
-  return threadAnnotations({
-    annotations,
-    route,
-    selection: { ...selectionState, filterQuery: query, filters },
-  });
+  return threadAnnotations(threadState);
 }
