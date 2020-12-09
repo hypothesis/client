@@ -131,8 +131,8 @@ class CacheEntry {
  * extract data from the store and call actions on it.
  *
  * Unlike using the `store` service directly, the wrapper tracks what data from
- * the store the current component uses and re-renders the component when it
- * changes.
+ * the store the current component uses, via selector methods, and re-renders the
+ * component when that data changes.
  *
  * The returned wrapper has the same API as the store itself.
  *
@@ -158,9 +158,11 @@ export function useStoreProxy() {
   const [, forceUpdate] = useReducer(x => x + 1, 0);
 
   // Cache of store method calls made by the current UI component and associated
-  // results. This is currently just an array on the assumption that it will
+  // results. There is one entry per combination of method and arguments.
+  //
+  // This is currently just an array on the assumption that it will
   // only have a small number of entries. It could be changed to a map keyed
-  // by method name to handle many entries better.
+  // by method to handle many entries better.
   const cacheRef = useRef(/** @type {CacheEntry[]} */ ([]));
   const cache = cacheRef.current;
 
@@ -171,13 +173,13 @@ export function useStoreProxy() {
     const wrappedMethods = {};
 
     /**
-     * @param {typeof store} target
+     * @param {typeof store} store
      * @param {string} prop
      */
-    const get = (target, prop) => {
-      const original = target[prop];
-      if (typeof original !== 'function') {
-        return original;
+    const get = (store, prop) => {
+      const method = store[prop];
+      if (typeof method !== 'function') {
+        return method;
       }
 
       // Check for pre-existing method wrapper.
@@ -196,11 +198,11 @@ export function useStoreProxy() {
         // Call the original method. It may be a selector that does not modify
         // the store but returns a result, or an action that modifies the state.
         const prevState = store.getState();
-        const result = original.apply(target, args);
+        const result = method.apply(store, args);
         const newState = store.getState();
 
         if (prevState === newState) {
-          cache.push(new CacheEntry(prop, original, args, result));
+          cache.push(new CacheEntry(prop, method, args, result));
         }
         return result;
       };

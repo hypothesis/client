@@ -179,8 +179,6 @@ describe('sidebar/store/use-store', () => {
 
       const { proxy } = renderTestComponent();
 
-      assert.ok(proxy);
-
       // Test proxied selector method.
       assert.deepEqual(proxy.getThing('foo'), { id: 'foo' });
       assert.deepEqual(proxy.getThing('bar'), { id: 'bar' });
