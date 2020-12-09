@@ -77,8 +77,6 @@ describe('Guest', () => {
     };
     notifySelectionChanged = null;
 
-    sinon.stub(window, 'requestAnimationFrame').yields();
-
     fakeCrossFrame = {
       onConnect: sinon.stub(),
       on: sinon.stub(),
@@ -114,7 +112,6 @@ describe('Guest', () => {
   });
 
   afterEach(() => {
-    window.requestAnimationFrame.restore();
     sandbox.restore();
     $imports.$restore();
   });

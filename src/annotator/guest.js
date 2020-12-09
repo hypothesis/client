@@ -510,7 +510,7 @@ export default class Guest extends Delegator {
     }
 
     // Remove all the highlights that have no corresponding target anymore.
-    requestAnimationFrame(() => removeHighlights(deadHighlights));
+    removeHighlights(deadHighlights);
 
     // Anchor any targets of this annotation that are not anchored already.
     for (let target of annotation.target) {
@@ -542,10 +542,8 @@ export default class Guest extends Delegator {
 
     this.anchors = anchors;
 
-    requestAnimationFrame(() => {
-      removeHighlights(unhighlight);
-      this.plugins.BucketBar?.update();
-    });
+    removeHighlights(unhighlight);
+    this.plugins.BucketBar?.update();
   }
 
   /**
