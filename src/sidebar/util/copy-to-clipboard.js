@@ -1,5 +1,21 @@
 /**
- * Copy the string `text` to the clipboard.
+ * Copy the string `text` using clipboard API. If it fails use the legacy hack.
+ *
+ * If clipboard.writeText is been called from an iframe, the iframe must allow `clipboard-write`
+ *
+ * @param {string} text
+ * @return {Promise<void>}
+ */
+export function copyText(text) {
+  try {
+    return navigator.clipboard.writeText(text);
+  } catch {
+    return copyTextAlternative(text);
+  }
+}
+
+/**
+ * Copy the string `text` to the clipboard (legacy)
  *
  * In most browsers, this function can only be called in response to a user
  * gesture. For example in response to a "click" event.
@@ -8,8 +24,9 @@
  *   This function may throw an exception if the browser rejects the attempt
  *   to copy text.
  * @param {string} text
+ * @return {Promise<void>}
  */
-export function copyText(text) {
+function copyTextAlternative(text) {
   const temp = document.createElement('input');
   temp.value = text;
   temp.setAttribute('data-testid', 'copy-text');
@@ -30,4 +47,5 @@ export function copyText(text) {
   } finally {
     temp.remove();
   }
+  return Promise.resolve();
 }

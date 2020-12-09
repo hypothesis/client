@@ -44,9 +44,9 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
       : '';
   })(mainFrame, focusedGroup);
 
-  const copyShareLink = () => {
+  const copyShareLink = async () => {
     try {
-      copyText(shareURI);
+      await copyText(shareURI);
       toastMessenger.success('Copied share link to clipboard');
     } catch (err) {
       toastMessenger.error('Unable to copy link');

@@ -40,6 +40,7 @@ function createSidebarIframe(config) {
 
   // Enable media in annotations to be shown fullscreen
   sidebarFrame.setAttribute('allowfullscreen', '');
+  sidebarFrame.setAttribute('allow', 'clipboard-write');
 
   sidebarFrame.src = sidebarAppSrc;
   sidebarFrame.title = 'Hypothesis annotation viewer';

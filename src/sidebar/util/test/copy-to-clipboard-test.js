@@ -1,15 +1,35 @@
 import { copyText } from '../copy-to-clipboard';
-
 describe('copy-to-clipboard', () => {
-  beforeEach(() => {
-    sinon.stub(document, 'execCommand');
+  let clipboardBackup = navigator.clipboard;
+
+  function setClipboard(customClipboard) {
+    Object.defineProperty(navigator, 'clipboard', {
+      get: function () {
+        return customClipboard;
+      },
+      configurable: true,
+    });
+  }
+
+  describe('copyText (modern)', () => {
+    let fakeWriteText = sinon.stub();
+
+    beforeEach(() => {
+      setClipboard({ writeText: fakeWriteText });
+    });
+
+    afterEach(() => {
+      setClipboard(clipboardBackup);
+    });
+
+    it('copies text via clipboard API', async () => {
+      const text = 'test string';
+      await copyText(text);
+      assert.called(fakeWriteText);
+    });
   });
 
-  afterEach(() => {
-    document.execCommand.restore();
-  });
-
-  describe('copyText', () => {
+  describe('copyText (legacy)', () => {
     /**
      * Returns the temporary element used to hold text being copied.
      */
@@ -18,6 +38,9 @@ describe('copy-to-clipboard', () => {
     }
 
     beforeEach(() => {
+      setClipboard(undefined);
+      sinon.stub(document, 'execCommand');
+
       // Make no hidden element created for copying text has been left over
       // from a previous test.
       assert.isNull(tempSpan());
@@ -26,25 +49,30 @@ describe('copy-to-clipboard', () => {
       window.getSelection().removeAllRanges();
     });
 
-    it('copies the passed text to the clipboard', () => {
+    afterEach(() => {
+      setClipboard(clipboardBackup);
+      document.execCommand.restore();
+    });
+
+    it('copies the passed text to the clipboard (legacy)', async () => {
       // We can't actually copy to the clipboard due to security restrictions,
       // but we can verify that `execCommand("copy")` was called and that the
       // passed text was selected at the time.
       document.execCommand.callsFake(() => {
         assert.equal(document.getSelection().toString(), 'test string');
       });
-      copyText('test string');
+      await copyText('test string');
       assert.calledWith(document.execCommand, 'copy');
       assert.isNull(tempSpan());
     });
 
-    it('removes temporary span if copying fails', () => {
+    it('removes temporary input if copying fails', async () => {
       document.execCommand.callsFake(() => {
         assert.ok(tempSpan());
         throw new Error('No clipboard access for you!');
       });
       try {
-        copyText('fibble-wobble');
+        await copyText('fibble-wobble');
       } catch (e) {
         assert.equal(e.message, 'No clipboard access for you!');
       }

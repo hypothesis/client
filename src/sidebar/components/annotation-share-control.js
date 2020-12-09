@@ -69,9 +69,9 @@ function AnnotationShareControl({
     return null;
   }
 
-  const copyShareLink = () => {
+  const copyShareLink = async () => {
     try {
-      copyText(shareUri);
+      await copyText(shareUri);
       toastMessenger.success('Copied share link to clipboard');
     } catch (err) {
       toastMessenger.error('Unable to copy link');

@@ -18,9 +18,9 @@ import Button from './button';
  * @param {VersionInfoProps} props
  */
 function VersionInfo({ toastMessenger, versionData }) {
-  const copyVersionData = () => {
+  const copyVersionData = async () => {
     try {
-      copyText(versionData.asFormattedString());
+      await copyText(versionData.asFormattedString());
       toastMessenger.success('Copied version info to clipboard');
     } catch (err) {
       toastMessenger.error('Unable to copy version info');

@@ -62,7 +62,7 @@ describe('AnnotationShareControl', () => {
       },
     };
     fakeCopyToClipboard = {
-      copyText: sinon.stub(),
+      copyText: sinon.stub().resolves(),
     };
     fakeToastMessenger = {
       success: sinon.stub(),
@@ -133,11 +133,12 @@ describe('AnnotationShareControl', () => {
       );
     });
 
-    it('confirms link copy when successful', () => {
+    it('confirms link copy when successful', async () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
       getButton(wrapper, 'copy').props().onClick();
+      await fakeCopyToClipboard;
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -145,12 +146,13 @@ describe('AnnotationShareControl', () => {
       );
     });
 
-    it('flashes an error if link copying unsuccessful', () => {
-      fakeCopyToClipboard.copyText.throws();
+    it('flashes an error if link copying unsuccessful', async () => {
+      fakeCopyToClipboard.copyText.rejects();
       const wrapper = createComponent();
       openElement(wrapper);
 
       getButton(wrapper, 'copy').props().onClick();
+      await fakeCopyToClipboard;
 
       assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
     });

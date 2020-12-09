@@ -85,9 +85,9 @@ function GroupListItem({
   /**
    * @param {string} url
    */
-  const copyLink = url => {
+  const copyLink = async url => {
     try {
-      copyText(url);
+      await copyText(url);
       toastMessenger.success(`Copied link for "${group.name}"`);
     } catch (err) {
       toastMessenger.error('Unable to copy link');

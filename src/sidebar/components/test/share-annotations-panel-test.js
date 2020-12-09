@@ -36,7 +36,7 @@ describe('ShareAnnotationsPanel', () => {
       track: sinon.stub(),
     };
     fakeCopyToClipboard = {
-      copyText: sinon.stub(),
+      copyText: sinon.stub().resolves(),
     };
     fakeToastMessenger = {
       success: sinon.stub(),
@@ -158,21 +158,24 @@ describe('ShareAnnotationsPanel', () => {
         );
       });
 
-      it('confirms link copy when successful', () => {
+      it('confirms link copy when successful', async () => {
         const wrapper = createShareAnnotationsPanel();
 
         wrapper.find('Button').props().onClick();
+        await fakeCopyToClipboard;
 
         assert.calledWith(
           fakeToastMessenger.success,
           'Copied share link to clipboard'
         );
       });
-      it('flashes an error if link copying unsuccessful', () => {
+
+      it('flashes an error if link copying unsuccessful', async () => {
         fakeCopyToClipboard.copyText.throws();
         const wrapper = createShareAnnotationsPanel();
 
         wrapper.find('Button').props().onClick();
+        await fakeCopyToClipboard;
 
         assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
       });

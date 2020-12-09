@@ -54,7 +54,7 @@ describe('GroupListItem', () => {
       leave: sinon.stub(),
     };
 
-    fakeCopyText = sinon.stub();
+    fakeCopyText = sinon.stub().resolves();
 
     function FakeMenuItem() {
       return null;
@@ -363,21 +363,23 @@ describe('GroupListItem', () => {
     });
   });
 
-  it('copies activity URL if "Copy link" action is clicked', () => {
+  it('copies activity URL if "Copy link" action is clicked', async () => {
     const wrapper = createGroupListItem(fakeGroup, {
       isExpanded: true,
     });
     clickMenuItem(getSubmenu(wrapper), 'Copy invite link');
+    await fakeCopyText;
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
     assert.calledWith(fakeToastMessenger.success, 'Copied link for "Test"');
   });
 
-  it('reports an error if "Copy link" action fails', () => {
-    fakeCopyText.throws(new Error('Something went wrong'));
+  it('reports an error if "Copy link" action fails', async () => {
+    fakeCopyText.rejects();
     const wrapper = createGroupListItem(fakeGroup, {
       isExpanded: true,
     });
     clickMenuItem(getSubmenu(wrapper), 'Copy invite link');
+    await fakeCopyText;
     assert.calledWith(fakeCopyText, 'https://annotate.com/groups/groupid');
     assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
   });
