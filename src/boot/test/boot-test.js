@@ -1,4 +1,4 @@
-import boot from '../boot';
+import { bootHypothesisClient, bootSidebarApp } from '../boot';
 import { $imports } from '../boot';
 
 function assetUrl(url) {
@@ -27,7 +27,7 @@ describe('bootstrap', function () {
     iframe.remove();
   });
 
-  function runBoot() {
+  function runBoot(app = 'annotator') {
     const assetNames = [
       // Polyfills
       'scripts/polyfills-es2017.bundle.js',
@@ -53,22 +53,29 @@ describe('bootstrap', function () {
       return manifest;
     }, {});
 
-    boot(iframe.contentDocument, {
+    let bootApp;
+    if (app === 'annotator') {
+      bootApp = bootHypothesisClient;
+    } else if (app === 'sidebar') {
+      bootApp = bootSidebarApp;
+    }
+
+    bootApp(iframe.contentDocument, {
       sidebarAppUrl: 'https://marginal.ly/app.html',
       assetRoot: 'https://marginal.ly/client/',
-      manifest: manifest,
+      manifest,
     });
   }
 
   function findAssets(doc_) {
-    const scripts = Array.from(doc_.querySelectorAll('script')).map(function (
-      el
-    ) {
+    const scripts = Array.from(
+      doc_.querySelectorAll('script[data-hypothesis-asset]')
+    ).map(function (el) {
       return el.src;
     });
 
     const styles = Array.from(
-      doc_.querySelectorAll('link[rel="stylesheet"]')
+      doc_.querySelectorAll('link[rel="stylesheet"][data-hypothesis-asset]')
     ).map(function (el) {
       return el.href;
     });
@@ -76,9 +83,9 @@ describe('bootstrap', function () {
     return scripts.concat(styles).sort();
   }
 
-  context('in the host page', function () {
+  describe('bootHypothesisClient', function () {
     it('loads assets for the annotation layer', function () {
-      runBoot();
+      runBoot('annotator');
       const expectedAssets = [
         'scripts/annotator.bundle.1234.js',
         'styles/annotator.1234.css',
@@ -89,12 +96,13 @@ describe('bootstrap', function () {
     });
 
     it('creates the link to the sidebar iframe', function () {
-      runBoot();
+      runBoot('annotator');
 
       const sidebarAppLink = iframe.contentDocument.querySelector(
         'link[type="application/annotator+html"]'
       );
       assert.ok(sidebarAppLink);
+      assert.isTrue(sidebarAppLink.hasAttribute('data-hypothesis-asset'));
       assert.equal(sidebarAppLink.href, 'https://marginal.ly/app.html');
     });
 
@@ -103,7 +111,7 @@ describe('bootstrap', function () {
       link.type = 'application/annotator+html';
       iframe.contentDocument.head.appendChild(link);
 
-      runBoot();
+      runBoot('annotator');
 
       assert.deepEqual(findAssets(iframe.contentDocument), []);
     });
@@ -113,7 +121,7 @@ describe('bootstrap', function () {
         sets.filter(s => s.match(/es2017/))
       );
 
-      runBoot();
+      runBoot('annotator');
 
       const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
         a.match(/polyfills/)
@@ -125,20 +133,9 @@ describe('bootstrap', function () {
     });
   });
 
-  context('in the sidebar application', function () {
-    let appRootElement;
-
-    beforeEach(function () {
-      appRootElement = iframe.contentDocument.createElement('hypothesis-app');
-      iframe.contentDocument.body.appendChild(appRootElement);
-    });
-
-    afterEach(function () {
-      appRootElement.remove();
-    });
-
+  describe('bootSidebarApp', function () {
     it('loads assets for the sidebar application', function () {
-      runBoot();
+      runBoot('sidebar');
       const expectedAssets = [
         'scripts/katex.bundle.1234.js',
         'scripts/sentry.bundle.1234.js',
@@ -156,7 +153,7 @@ describe('bootstrap', function () {
         sets.filter(s => s.match(/es2017/))
       );
 
-      runBoot();
+      runBoot('sidebar');
 
       const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
         a.match(/polyfills/)

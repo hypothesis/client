@@ -98,17 +98,18 @@ export default class Bridge {
       const p = new Promise(function (resolve, reject) {
         const timeout = setTimeout(() => resolve(null), 1000);
         try {
-          return l.channel.call(method, ...Array.from(args), function (
-            err,
-            result
-          ) {
-            clearTimeout(timeout);
-            if (err) {
-              return reject(err);
-            } else {
-              return resolve(result);
+          return l.channel.call(
+            method,
+            ...Array.from(args),
+            function (err, result) {
+              clearTimeout(timeout);
+              if (err) {
+                return reject(err);
+              } else {
+                return resolve(result);
+              }
             }
-          });
+          );
         } catch (error) {
           const err = error;
           return reject(err);

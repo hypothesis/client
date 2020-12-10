@@ -15,6 +15,7 @@ describe('UserMenu', () => {
   let fakeServiceConfig;
   let fakeServiceUrl;
   let fakeSettings;
+  let fakeStore;
 
   const createUserMenu = () => {
     return mount(
@@ -49,6 +50,10 @@ describe('UserMenu', () => {
     fakeSettings = {
       authDomain: 'hypothes.is',
     };
+    fakeStore = {
+      focusedGroupId: sinon.stub().returns('mygroup'),
+      isFeatureEnabled: sinon.stub().returns(false),
+    };
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
@@ -56,6 +61,7 @@ describe('UserMenu', () => {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
       '../service-config': fakeServiceConfig,
+      '../store/use-store': callback => callback(fakeStore),
     });
   });
 
@@ -179,6 +185,38 @@ describe('UserMenu', () => {
 
       const accountMenuItem = findMenuItem(wrapper, 'Account settings');
       assert.isFalse(accountMenuItem.exists());
+    });
+  });
+
+  describe('open notebook item', () => {
+    context('notebook feature is enabled', () => {
+      it('includes the open notebook item', () => {
+        fakeStore.isFeatureEnabled.withArgs('notebook_launch').returns(true);
+        const wrapper = createUserMenu();
+
+        const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
+        assert.isTrue(openNotebookItem.exists());
+      });
+
+      it('triggers a message when open-notebook item is clicked', () => {
+        fakeStore.isFeatureEnabled.withArgs('notebook_launch').returns(true);
+        const wrapper = createUserMenu();
+
+        const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
+        openNotebookItem.props().onClick();
+        assert.calledOnce(fakeBridge.call);
+        assert.calledWith(fakeBridge.call, 'showNotebook', 'mygroup');
+      });
+    });
+
+    context('notebook feature is not enabled', () => {
+      it('does not include the open notebook item', () => {
+        fakeStore.isFeatureEnabled.withArgs('notebook_launch').returns(false);
+        const wrapper = createUserMenu();
+
+        const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
+        assert.isFalse(openNotebookItem.exists());
+      });
     });
   });
 

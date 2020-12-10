@@ -234,6 +234,32 @@ describe('Sidebar', () => {
         assert.called(target);
       }));
 
+    describe('on "showNotebook" event', () => {
+      it('hides itself and republishes the event', () => {
+        const sidebar = createSidebar();
+        sinon.stub(sidebar, 'publish');
+        sinon.stub(sidebar, 'hide');
+        emitEvent('showNotebook', 'mygroup');
+        assert.calledWith(
+          sidebar.publish,
+          'showNotebook',
+          sinon.match(['mygroup'])
+        );
+        assert.calledOnce(sidebar.hide);
+      });
+    });
+
+    describe('on "hideNotebook" event', () => {
+      it('shows itself and republishes the event', () => {
+        const sidebar = createSidebar();
+        sinon.stub(sidebar, 'publish');
+        sinon.stub(sidebar, 'show');
+        emitEvent('hideNotebook');
+        assert.calledWith(sidebar.publish, 'hideNotebook');
+        assert.calledOnce(sidebar.show);
+      });
+    });
+
     describe('on LOGIN_REQUESTED event', () => {
       it('calls the onLoginRequest callback function if one was provided', () => {
         const onLoginRequest = sandbox.stub();
@@ -578,19 +604,20 @@ describe('Sidebar', () => {
         sinon.stub(sidebar, 'publish');
         sidebar.show();
         assert.calledOnce(layoutChangeHandlerSpy);
-        assert.calledOnce(sidebar.publish);
         assert.calledWith(
           sidebar.publish,
           'sidebarLayoutChanged',
           sinon.match.any
         );
+        assert.calledWith(sidebar.publish, 'sidebarOpened');
+        assert.calledTwice(sidebar.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: true,
         });
 
         sidebar.hide();
         assert.calledTwice(layoutChangeHandlerSpy);
-        assert.calledTwice(sidebar.publish);
+        assert.calledThrice(sidebar.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: false,
           width: fakeToolbar.getWidth(),

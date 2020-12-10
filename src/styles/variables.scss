@@ -79,6 +79,8 @@ $font-size--xsmall: 10px;
 $font-size--small: 11px;
 $font-size--medium: 13px;
 $font-size--large: 14px;
+$font-size--subheading: 16px;
+$font-size--heading: 18px;
 $line-height: 1.4;
 
 // Minimum font size for <input> fields on iOS. If the font size is smaller than
@@ -92,6 +94,8 @@ $layout-space--xxsmall: $layout-space * (1/4);
 $layout-space--xsmall: $layout-space * (1/2);
 $layout-space--small: $layout-space * (3/4);
 $layout-space--medium: $layout-space;
+$layout-space--large: $layout-space * 2;
+$layout-space--xlarge: $layout-space * 4;
 
 // Minimum recommended size for tap targets on mobile.
 // This value originated from Apple's Human Interface Guidelines.

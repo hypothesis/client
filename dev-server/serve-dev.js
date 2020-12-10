@@ -28,10 +28,12 @@ const TEMPLATE_PATH = `${__dirname}/templates/`;
 function renderScript(context) {
   const scriptTemplate = `
     {{{hypothesisConfig}}}
-    <script>
-    const embedScript = document.createElement('script');
-    embedScript.src = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
-    document.body.appendChild(embedScript);
+
+    <script type="module">
+      import { loadClient } from '/scripts/util.js';
+
+      const clientUrl = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
+      loadClient(clientUrl);
     </script>
   `;
   return Mustache.render(scriptTemplate, context);

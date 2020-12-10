@@ -8,33 +8,33 @@ export default function settingsFrom(window_) {
   const configFuncSettings = configFuncSettingsFrom(window_);
 
   /**
-   * Return the href URL of the first annotator sidebar link in the given document.
+   * Return the href of the first annotator link in the given
+   * document with this `rel` attribute.
    *
    * Return the value of the href attribute of the first
-   * `<link type="application/annotator+html" rel="sidebar">` element in the given document.
+   * `<link type="application/annotator+html" rel="${rel}">`
+   * element in the given document. This URL is used as the `src` for sidebar
+   * or notebook iframes.
    *
-   * This URL is used as the src of the sidebar's iframe.
-   *
-   * @return {string} - The URL to use for the sidebar's iframe.
-   *
-   * @throws {Error} - If there's no annotator link or the first annotator has
-   *   no href.
-   *
+   * @param {string} rel - The `rel` attribute to match
+   * @return {string} - The URL to use for the iframe
+   * @throws {Error} - If there's no link with the `rel` indicated, or the first
+   *   matching link has no `href`
    */
-  function sidebarAppUrl() {
+  function urlFromLinkTag(rel) {
     const link = window_.document.querySelector(
-      'link[type="application/annotator+html"][rel="sidebar"]'
+      `link[type="application/annotator+html"][rel="${rel}"]`
     );
 
     if (!link) {
       throw new Error(
-        'No application/annotator+html (rel="sidebar") link in the document'
+        `No application/annotator+html (rel="${rel}") link in the document`
       );
     }
 
     if (!link.href) {
       throw new Error(
-        'application/annotator+html (rel="sidebar") link has no href'
+        `application/annotator+html (rel="${rel}") link has no href`
       );
     }
 
@@ -45,13 +45,13 @@ export default function settingsFrom(window_) {
    * Return the href URL of the first annotator client link in the given document.
    *
    * Return the value of the href attribute of the first
-   * `<link type="application/annotator+html" rel="hypothesis-client">` element in the given document.
+   * `<link type="application/annotator+javascript" rel="hypothesis-client">`
+   * element in the given document.
    *
-   * This URL is used to identify where the client is from and what url should be
-   *    used inside of subframes
+   * This URL is used to identify where the client is from and what url should
+   * be used inside of subframes.
    *
    * @return {string} - The URL that the client is hosted from
-   *
    * @throws {Error} - If there's no annotator link or the first annotator has
    *   no href.
    *
@@ -177,7 +177,7 @@ export default function settingsFrom(window_) {
     const coerceValue =
       typeof options.coerce === 'function' ? options.coerce : name => name;
 
-    if (!allowInBrowserExt && isBrowserExtension(sidebarAppUrl())) {
+    if (!allowInBrowserExt && isBrowserExtension(urlFromLinkTag('sidebar'))) {
       return hasDefaultValue ? options.defaultValue : null;
     }
 
@@ -206,11 +206,14 @@ export default function settingsFrom(window_) {
     get group() {
       return group();
     },
+    get notebookAppUrl() {
+      return urlFromLinkTag('notebook');
+    },
     get showHighlights() {
       return showHighlights();
     },
     get sidebarAppUrl() {
-      return sidebarAppUrl();
+      return urlFromLinkTag('sidebar');
     },
     get query() {
       return query();

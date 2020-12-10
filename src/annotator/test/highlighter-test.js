@@ -1,7 +1,5 @@
 import { createElement, render } from 'preact';
 
-import { NormalizedRange } from '../anchoring/range';
-
 import {
   getBoundingClientRect,
   getHighlightsContainingNode,
@@ -54,12 +52,10 @@ function PdfPage({ showPlaceholder = false }) {
  */
 function highlightPdfRange(pageContainer) {
   const textSpan = pageContainer.querySelector('.testText');
-  const r = new NormalizedRange({
-    commonAncestor: textSpan,
-    start: textSpan.childNodes[0],
-    end: textSpan.childNodes[0],
-  });
-  return highlightRange(r);
+  const range = new Range();
+  range.setStartBefore(textSpan.childNodes[0]);
+  range.setEndAfter(textSpan.childNodes[0]);
+  return highlightRange(range);
 }
 
 /**
@@ -79,21 +75,100 @@ function createPdfPageWithHighlight() {
 describe('annotator/highlighter', () => {
   describe('highlightRange', () => {
     it('wraps a highlight span around the given range', () => {
-      const txt = document.createTextNode('test highlight span');
+      const text = document.createTextNode('test highlight span');
       const el = document.createElement('span');
-      el.appendChild(txt);
-      const r = new NormalizedRange({
-        commonAncestor: el,
-        start: txt,
-        end: txt,
-      });
+      el.appendChild(text);
+      const range = new Range();
+      range.setStartBefore(text);
+      range.setEndAfter(text);
 
-      const result = highlightRange(r);
+      const result = highlightRange(range);
 
       assert.equal(result.length, 1);
       assert.strictEqual(el.childNodes[0], result[0]);
       assert.equal(result[0].nodeName, 'HYPOTHESIS-HIGHLIGHT');
       assert.isTrue(result[0].classList.contains('hypothesis-highlight'));
+    });
+
+    const testText = 'one two three';
+
+    [
+      // Range starting at the start of text node and ending in the middle.
+      [0, 5],
+      // Range starting in the middle of text node and ending in the middle.
+      [4, 7],
+      // Range starting in the middle of text node and ending at the end.
+      [4, testText.length],
+      // Empty ranges.
+      [0, 0],
+      [5, 5],
+      [testText.length, testText.length],
+    ].forEach(([startPos, endPos]) => {
+      it('splits text nodes when only part of one should be highlighted', () => {
+        const el = document.createElement('span');
+        el.append(testText);
+
+        const range = new Range();
+        range.setStart(el.firstChild, startPos);
+        range.setEnd(el.firstChild, endPos);
+        const result = highlightRange(range);
+
+        const highlightedText = result.reduce(
+          (str, el) => str + el.textContent,
+          ''
+        );
+        assert.equal(highlightedText, testText.slice(startPos, endPos));
+        assert.equal(el.textContent, testText);
+      });
+    });
+
+    it('generates correct highlights when the start text node is split', () => {
+      const el = document.createElement('span');
+      el.append('foo bar baz');
+
+      // nb. It is important for this test case that the start is in the middle
+      // of a text node and the end is a point _after_ the text node. eg:
+      //
+      // ```
+      // <div>
+      //   some [text
+      //   <b>]foo</b>
+      // </div>
+      // ```
+      //
+      // (Where the `[` and `]` denote the endpoints of the range)
+
+      const range = new Range();
+      range.setStart(el.firstChild, 4);
+      range.setEnd(el, 1);
+      highlightRange(range, '' /* cssClass */);
+
+      assert.equal(
+        el.innerHTML,
+        'foo <hypothesis-highlight class="">bar baz</hypothesis-highlight>'
+      );
+    });
+
+    it('handles a range with no text nodes', () => {
+      const el = document.createElement('span');
+
+      const range = new Range();
+      range.setStart(el, 0);
+      range.setEnd(el, 0);
+      const highlights = highlightRange(range);
+
+      assert.deepEqual(highlights, []);
+    });
+
+    it('handles a range with no parent element', () => {
+      const text = document.createTextNode('foobar');
+
+      const range = new Range();
+      range.setStart(text, 0);
+      range.setEnd(text, text.data.length);
+      const highlights = highlightRange(range);
+
+      assert.deepEqual(highlights, []);
     });
 
     it('wraps multiple text nodes which are not adjacent', () => {
@@ -107,12 +182,10 @@ describe('annotator/highlighter', () => {
         el.append(childEl);
       });
 
-      const r = new NormalizedRange({
-        commonAncestor: el,
-        start: textNodes[0],
-        end: textNodes[textNodes.length - 1],
-      });
-      const result = highlightRange(r);
+      const range = new Range();
+      range.setStartBefore(textNodes[0]);
+      range.setEndAfter(textNodes[textNodes.length - 1]);
+      const result = highlightRange(range);
 
       assert.equal(result.length, textNodes.length);
       result.forEach((highlight, i) => {
@@ -128,12 +201,10 @@ describe('annotator/highlighter', () => {
       const el = document.createElement('span');
       textNodes.forEach(n => el.append(n));
 
-      const r = new NormalizedRange({
-        commonAncestor: el,
-        start: textNodes[0],
-        end: textNodes[textNodes.length - 1],
-      });
-      const result = highlightRange(r);
+      const range = new Range();
+      range.setStartBefore(textNodes[0]);
+      range.setEndAfter(textNodes[textNodes.length - 1]);
+      const result = highlightRange(range);
 
       assert.equal(result.length, 1);
       assert.equal(el.childNodes.length, 1);
@@ -149,13 +220,11 @@ describe('annotator/highlighter', () => {
       el.appendChild(txt);
       el.appendChild(blank);
       el.appendChild(txt2);
-      const r = new NormalizedRange({
-        commonAncestor: el,
-        start: txt,
-        end: txt2,
-      });
 
-      const result = highlightRange(r);
+      const range = new Range();
+      range.setStartBefore(txt);
+      range.setEndAfter(txt2);
+      const result = highlightRange(range);
 
       assert.equal(result.length, 1);
       assert.equal(result[0].textContent, 'one two');
@@ -166,13 +235,11 @@ describe('annotator/highlighter', () => {
       el.appendChild(document.createTextNode(' '));
       el.appendChild(document.createTextNode(''));
       el.appendChild(document.createTextNode('   '));
-      const r = new NormalizedRange({
-        commonAncestor: el,
-        start: el.childNodes[0],
-        end: el.childNodes[2],
-      });
+      const range = new Range();
+      range.setStartBefore(el.childNodes[0]);
+      range.setEndAfter(el.childNodes[2]);
 
-      const result = highlightRange(r);
+      const result = highlightRange(range);
 
       assert.equal(result.length, 0);
     });
@@ -348,11 +415,9 @@ describe('annotator/highlighter', () => {
     for (let i = 0; i < 3; i++) {
       const span = document.createElement('span');
       span.textContent = 'Test text';
-      const range = new NormalizedRange({
-        commonAncestor: span,
-        start: span.childNodes[0],
-        end: span.childNodes[0],
-      });
+      const range = new Range();
+      range.setStartBefore(span.childNodes[0]);
+      range.setEndAfter(span.childNodes[0]);
       root.appendChild(span);
       highlights.push(...highlightRange(range));
     }
@@ -430,12 +495,12 @@ describe('annotator/highlighter', () => {
   });
 
   describe('getHighlightsContainingNode', () => {
-    const makeRange = (start, end = start) =>
-      new NormalizedRange({
-        commonAncestor: start.parentNode,
-        start,
-        end,
-      });
+    const makeRange = (start, end = start) => {
+      const range = new Range();
+      range.setStartBefore(start);
+      range.setEndAfter(end);
+      return range;
+    };
 
     it('returns all the highlights containing the node', () => {
       const root = document.createElement('div');

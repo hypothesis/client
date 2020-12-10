@@ -1,4 +1,5 @@
 import { createElement } from 'preact';
+import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { countVisible } from '../util/thread';
@@ -9,8 +10,17 @@ import useRootThread from './hooks/use-root-thread';
 import useStore from '../store/use-store';
 
 /**
- * @typedef {import('../store/modules/selection').FilterState} FilterState
  * @typedef {import('../util/build-thread').Thread} Thread
+ */
+
+/**
+ * @typedef FilterState
+ * @prop {string|null} filterQuery
+ * @prop {boolean} focusActive
+ * @prop {boolean} focusConfigured
+ * @prop {string|null} focusDisplayName
+ * @prop {number} forcedVisibleCount
+ * @prop {number} selectedCount
  */
 
 /**
@@ -118,6 +128,7 @@ FilterStatusPanel.propTypes = {
  */
 function SelectionFilterStatus({ filterState, rootThread }) {
   const clearSelection = useStore(store => store.clearSelection);
+  const directLinkedId = useStore(store => store.directLinkedAnnotationId());
   // The total number of top-level annotations (visible or not)
   const totalCount = useStore(store => store.annotationCount());
   // Count the number of visible annotations—top-level only
@@ -134,9 +145,9 @@ function SelectionFilterStatus({ filterState, rootThread }) {
   // Because of the confusion between counts of entities between selected
   // annotations and filtered annotations, don't display the total number
   // when in user-focus mode because the numbers won't appear to make sense.
-  const buttonText = filterState.focusConfigured
-    ? 'Show all'
-    : `Show all (${totalCount})`;
+  // Don't display total count, either, when viewing a direct-linked annotation.
+  const showCount = !filterState.focusConfigured && !directLinkedId;
+  const buttonText = showCount ? `Show all (${totalCount})` : 'Show all';
 
   const button = (
     <Button
@@ -266,7 +277,26 @@ FocusFilterStatus.propTypes = {
  */
 export default function FilterStatus() {
   const rootThread = useRootThread();
-  const filterState = useStore(store => store.filterState());
+
+  const focusState = useStore(store => store.focusState());
+  const forcedVisibleCount = useStore(
+    store => store.forcedVisibleAnnotations().length
+  );
+  const filterQuery = useStore(store => store.filterQuery());
+  const selectedCount = useStore(store => store.selectedAnnotations().length);
+
+  // Build a memoized state object with filter and selection details
+  // This will be used by the FilterStatus subcomponents
+  const filterState = useMemo(() => {
+    return {
+      filterQuery,
+      focusActive: focusState.active,
+      focusConfigured: focusState.configured,
+      focusDisplayName: focusState.displayName,
+      forcedVisibleCount,
+      selectedCount,
+    };
+  }, [focusState, forcedVisibleCount, filterQuery, selectedCount]);
 
   if (filterState.selectedCount > 0) {
     return (

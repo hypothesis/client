@@ -1,44 +1,71 @@
 /* global PDFViewerApplication */
 
-import seek from 'dom-seek';
-
 import RenderingStates from '../pdfjs-rendering-states';
 
-import { BrowserRange } from './range';
-import { toRange as textPositionToRange } from './text-position';
-import { TextPositionAnchor, TextQuoteAnchor } from './types';
+import { TextPosition, TextRange } from './text-range';
+import { TextQuoteAnchor } from './types';
 
 /**
  * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
  * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
+ * @typedef {import('../../types/api').Selector} Selector
  *
  * @typedef {import('../../types/pdfjs').PDFPageView} PDFPageView
  * @typedef {import('../../types/pdfjs').PDFViewer} PDFViewer
  */
 
+/**
+ * @typedef PdfTextRange
+ * @prop {number} pageIndex
+ * @prop {Object} anchor
+ * @prop {number} anchor.start - Start character offset within the page's text
+ * @prop {number} anchor.end - End character offset within the page's text
+ */
+
 // Caches for performance.
 
 /**
- * Map of page index to page text content as a `Promise<string>`.
+ * Map of page index to page text content.
+ *
+ * @type {Object<number,Promise<string>>}
  */
 let pageTextCache = {};
 
 /**
- * 2D map from `[quote][position]` to `{pageIndex, anchor}` intended to optimize
- * re-anchoring of a pair of quote and position selectors if the position
- * selector fails to anchor on its own.
+ * A cache that maps a `(quote, text offset in document)` key to a specific
+ * location in the document.
+ *
+ * The components of the key come from an annotation's selectors. This is used
+ * to speed up re-anchoring an annotation that was previously anchored in the
+ * current session.
+ *
+ * @type {Object<string, Object<number, PdfTextRange>>}
  */
 let quotePositionCache = {};
 
+/**
+ * Return offset of `node` among its siblings
+ *
+ * @param {Node} node
+ */
 function getSiblingIndex(node) {
-  return Array.from(node.parentNode.childNodes).indexOf(node);
+  let index = 0;
+  while (node.previousSibling) {
+    ++index;
+    node = node.previousSibling;
+  }
+  return index;
 }
 
+/**
+ * Return the text layer element of the PDF page containing `node`.
+ *
+ * @param {Node|Element} node
+ * @return {Element|null}
+ */
 function getNodeTextLayer(node) {
-  while (!node.classList || !node.classList.contains('page')) {
-    node = node.parentNode;
-  }
-  return node.getElementsByClassName('textLayer')[0];
+  const el = 'closest' in node ? node : node.parentElement;
+  return el?.closest('.textLayer') ?? null;
 }
 
 /**
@@ -249,10 +276,11 @@ function findPage(offset) {
  * scrolled into view.
  *
  * @param {number} pageIndex - The PDF page index
- * @param {TextPositionAnchor} anchor - Anchor to locate in page
+ * @param {number} start - Character offset within the page's text
+ * @param {number} end - Character offset within the page's text
  * @return {Promise<Range>}
  */
-async function anchorByPosition(pageIndex, anchor) {
+async function anchorByPosition(pageIndex, start, end) {
   const page = await getPageView(pageIndex);
 
   if (
@@ -262,7 +290,9 @@ async function anchorByPosition(pageIndex, anchor) {
   ) {
     // The page has been rendered. Locate the position in the text layer.
     const root = page.textLayer.textLayerDiv;
-    return textPositionToRange(root, anchor.start, anchor.end);
+    const startPos = new TextPosition(root, start);
+    const endPos = new TextPosition(root, end);
+    return new TextRange(startPos, endPos).toRange();
   }
 
   // The page has not been rendered yet. Create a placeholder element and
@@ -300,7 +330,8 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
   const offset = getPageOffset(pageIndex);
 
   const attempt = ([content, offset]) => {
-    const root = { textContent: content };
+    const root = document.createElement('div');
+    root.textContent = content;
     const anchor = TextQuoteAnchor.fromSelector(root, quoteSelector);
     if (positionHint) {
       let hint = positionHint.start - offset;
@@ -323,7 +354,7 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
         anchor,
       };
     }
-    return anchorByPosition(pageIndex, anchor);
+    return anchorByPosition(pageIndex, anchor.start, anchor.end);
   };
 
   // First, get the text offset and other details of the current page.
@@ -344,7 +375,7 @@ function findInPages(pageIndexes, quoteSelector, positionHint) {
  * When a position anchor is available, quote search can be optimized by
  * searching pages nearest the expected position first.
  *
- * @param {TextPositionAnchor} position
+ * @param {number} position - Text offset from start of document
  * @return {Promise<number[]>}
  */
 function prioritizePages(position) {
@@ -377,19 +408,23 @@ function prioritizePages(position) {
     return result;
   }
 
-  return findPage(position.start).then(({ index }) => sortPages(index));
+  return findPage(position).then(({ index }) => sortPages(index));
 }
 
 /**
  * Anchor a set of selectors to a DOM Range.
  *
  * @param {HTMLElement} root
- * @param {Array} selectors - Selector objects to anchor
+ * @param {Selector[]} selectors - Selector objects to anchor
  * @return {Promise<Range>}
  */
 export function anchor(root, selectors) {
-  const position = selectors.find(s => s.type === 'TextPositionSelector');
-  const quote = selectors.find(s => s.type === 'TextQuoteSelector');
+  const position = /** @type {TextPositionSelector|undefined} */ (selectors.find(
+    s => s.type === 'TextPositionSelector'
+  ));
+  const quote = /** @type {TextQuoteSelector|undefined} */ (selectors.find(
+    s => s.type === 'TextQuoteSelector'
+  ));
 
   /** @type {Promise<Range>} */
   let result = Promise.reject('unable to anchor');
@@ -410,8 +445,7 @@ export function anchor(root, selectors) {
 
         checkQuote(textContent.substr(start, length));
 
-        const anchor = new TextPositionAnchor(root, start, end);
-        return anchorByPosition(index, anchor);
+        return anchorByPosition(index, start, end);
       });
     });
   }
@@ -426,10 +460,10 @@ export function anchor(root, selectors) {
         const { pageIndex, anchor } = quotePositionCache[quote.exact][
           position.start
         ];
-        return anchorByPosition(pageIndex, anchor);
+        return anchorByPosition(pageIndex, anchor.start, anchor.end);
       }
 
-      return prioritizePages(position).then(pageIndices => {
+      return prioritizePages(position?.start ?? 0).then(pageIndices => {
         return findInPages(pageIndices, quote, position);
       });
     });
@@ -447,56 +481,53 @@ export function anchor(root, selectors) {
  *
  * @param {HTMLElement} root - The root element
  * @param {Range} range
+ * @return {Promise<Selector[]>}
  */
-export function describe(root, range) {
-  const normalizedRange = new BrowserRange(range).normalize();
+export async function describe(root, range) {
+  // "Shrink" the range so that the start and endpoints are at offsets within
+  // text nodes rather than any containing nodes.
+  try {
+    range = TextRange.fromRange(range).toRange();
+  } catch {
+    throw new Error('Selection does not contain text');
+  }
 
-  const startTextLayer = getNodeTextLayer(normalizedRange.start);
-  const endTextLayer = getNodeTextLayer(normalizedRange.end);
+  const startTextLayer = getNodeTextLayer(range.startContainer);
+  const endTextLayer = getNodeTextLayer(range.endContainer);
+
+  if (!startTextLayer || !endTextLayer) {
+    throw new Error('Selection is outside page text');
+  }
 
   if (startTextLayer !== endTextLayer) {
-    return Promise.reject(
-      new Error('selecting across page breaks is not supported')
-    );
+    throw new Error('Selecting across page breaks is not supported');
   }
 
-  const startRange = normalizedRange.limit(startTextLayer);
-  const endRange = normalizedRange.limit(endTextLayer);
+  const startPos = TextPosition.fromPoint(
+    range.startContainer,
+    range.startOffset
+  ).relativeTo(startTextLayer);
 
-  if (!startRange || !endRange) {
-    return Promise.reject(new Error('range is outside text layer'));
-  }
+  const endPos = TextPosition.fromPoint(
+    range.endContainer,
+    range.endOffset
+  ).relativeTo(endTextLayer);
 
-  const startPageIndex = getSiblingIndex(startTextLayer.parentNode);
-
-  const iter = root.ownerDocument.createNodeIterator(
-    startTextLayer,
-    NodeFilter.SHOW_TEXT
+  const startPageIndex = getSiblingIndex(
+    /** @type {Node} */ (startTextLayer.parentNode)
   );
-  let startPos = seek(iter, normalizedRange.start);
-  let endPos =
-    seek(iter, normalizedRange.end) +
-    startPos +
-    normalizedRange.end.textContent.length;
+  const pageOffset = await getPageOffset(startPageIndex);
 
-  return getPageOffset(startPageIndex).then(pageOffset => {
-    startPos += pageOffset;
-    endPos += pageOffset;
+  /** @type {TextPositionSelector} */
+  const position = {
+    type: 'TextPositionSelector',
+    start: pageOffset + startPos.offset,
+    end: pageOffset + endPos.offset,
+  };
 
-    const position = new TextPositionAnchor(
-      root,
-      startPos,
-      endPos
-    ).toSelector();
+  const quote = TextQuoteAnchor.fromRange(root, range).toSelector();
 
-    const quoteRange = document.createRange();
-    quoteRange.setStartBefore(startRange.start);
-    quoteRange.setEndAfter(endRange.end);
-
-    const quote = TextQuoteAnchor.fromRange(root, quoteRange).toSelector();
-
-    return Promise.all([position, quote]);
-  });
+  return [position, quote];
 }
 
 /**

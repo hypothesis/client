@@ -4,6 +4,7 @@ import propTypes from 'prop-types';
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../service-config';
 import { isThirdPartyUser } from '../util/account-id';
+import useStore from '../store/use-store';
 import { withServices } from '../util/service-context';
 
 import Menu from './menu';
@@ -41,8 +42,12 @@ import SvgIcon from '../../shared/components/svg-icon';
  * @param {UserMenuProps} props
  */
 function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
+  const focusedGroupId = useStore(store => store.focusedGroupId);
   const isThirdParty = isThirdPartyUser(auth.userid, settings.authDomain);
   const service = serviceConfig(settings);
+  const isNotebookEnabled = useStore(store =>
+    store.isFeatureEnabled('notebook_launch')
+  );
 
   const serviceSupports = feature => service && !!service[feature];
 
@@ -50,6 +55,10 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     !isThirdParty || serviceSupports('onProfileRequestProvided');
   const isLogoutEnabled =
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
+
+  const onSelectNotebook = () => {
+    bridge.call('showNotebook', focusedGroupId());
+  };
 
   const onProfileSelected = () =>
     isThirdParty && bridge.call(bridgeEvents.PROFILE_REQUESTED);
@@ -84,6 +93,12 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
             <MenuItem
               label="Account settings"
               href={serviceUrl('account.settings')}
+            />
+          )}
+          {isNotebookEnabled && (
+            <MenuItem
+              label="Open notebook"
+              onClick={() => onSelectNotebook()}
             />
           )}
         </MenuSection>

@@ -4,9 +4,9 @@ import propTypes from 'prop-types';
 
 import useStore from '../store/use-store';
 import {
-  hasBeenEdited,
   isHighlight,
   isReply,
+  hasBeenEdited,
 } from '../util/annotation-metadata';
 import { isPrivate } from '../util/permissions';
 
@@ -15,7 +15,7 @@ import AnnotationShareInfo from './annotation-share-info';
 import AnnotationUser from './annotation-user';
 import Button from './button';
 import SvgIcon from '../../shared/components/svg-icon';
-import Timestamp from './timestamp';
+import AnnotationTimestamps from './annotation-timestamps';
 
 /**
  * @typedef {import("../../types/api").Annotation} Annotation
@@ -50,9 +50,8 @@ export default function AnnotationHeader({
   const setExpanded = useStore(store => store.setExpanded);
 
   const annotationIsPrivate = isPrivate(annotation.permissions);
-  const annotationLink = annotation.links ? annotation.links.html : '';
 
-  const showTimestamp = !isEditing && annotation.created;
+  const showTimestamps = !isEditing && annotation.created;
   const showEditedTimestamp = useMemo(() => {
     return hasBeenEdited(annotation) && !isCollapsedReply;
   }, [annotation, isCollapsedReply]);
@@ -87,25 +86,12 @@ export default function AnnotationHeader({
           />
         )}
 
-        {showTimestamp && (
-          <div className="annotation-header__timestamp">
-            {showEditedTimestamp && (
-              <span className="annotation-header__timestamp-edited">
-                (edited{' '}
-                <Timestamp
-                  className="annotation-header__timestamp-edited-link"
-                  timestamp={annotation.updated}
-                />
-                ){' '}
-              </span>
-            )}
-            <span className="annotation-header__timestamp-created">
-              <Timestamp
-                className="annotation-header__timestamp-created-link u-color-text--muted"
-                href={annotationLink}
-                timestamp={annotation.created}
-              />
-            </span>
+        {showTimestamps && (
+          <div className="annotation-header__timestamps">
+            <AnnotationTimestamps
+              annotation={annotation}
+              withEditedTimestamp={showEditedTimestamp}
+            />
           </div>
         )}
       </div>

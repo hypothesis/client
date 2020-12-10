@@ -98,9 +98,10 @@ describe('HypothesisApp', () => {
     const wrapper = createComponent();
     [
       'main',
-      'AnnotationViewerContent',
-      'StreamContent',
-      'SidebarContent',
+      'AnnotationView',
+      'NotebookView',
+      'StreamView',
+      'SidebarView',
     ].forEach(contentComponent => {
       assert.isFalse(wrapper.exists(contentComponent));
     });
@@ -109,15 +110,19 @@ describe('HypothesisApp', () => {
   [
     {
       route: 'annotation',
-      contentComponent: 'AnnotationViewerContent',
+      contentComponent: 'AnnotationView',
     },
     {
       route: 'sidebar',
-      contentComponent: 'SidebarContent',
+      contentComponent: 'SidebarView',
+    },
+    {
+      route: 'notebook',
+      contentComponent: 'NotebookView',
     },
     {
       route: 'stream',
-      contentComponent: 'StreamContent',
+      contentComponent: 'StreamView',
     },
   ].forEach(({ route, contentComponent }) => {
     it('renders app content for route', () => {

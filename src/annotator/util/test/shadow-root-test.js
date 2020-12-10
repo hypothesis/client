@@ -29,5 +29,21 @@ describe('annotator/util/shadow-root', () => {
       assert.ok(styleEl);
       assert.match(styleEl.textContent, /@import ".*annotator\.css.*"/);
     });
+
+    it('does not inject stylesheets into the shadow root if style is not found', () => {
+      const container = document.createElement('div');
+
+      const link = document.querySelector(
+        'link[rel="stylesheet"][href*="/build/styles/annotator.css"]'
+      );
+      // Removing the `rel` attribute is enough for the URL to not be found
+      link.removeAttribute('rel');
+
+      createShadowRoot(container);
+
+      const styleEl = container.shadowRoot.querySelector('style');
+      assert.isNull(styleEl);
+      link.setAttribute('rel', 'stylesheet');
+    });
   });
 });

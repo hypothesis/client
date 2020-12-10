@@ -118,6 +118,7 @@ node {
                     // the sidebar from the qa h deployment.
                     sh """
                     export SIDEBAR_APP_URL=https://qa.hypothes.is/app.html
+                    export NOTEBOOK_APP_URL=https://qa.hypothes.is/notebook
                     yarn version --no-git-tag-version --new-version ${qaVersion}
                     """
 
@@ -187,15 +188,13 @@ stage('Publish') {
                     // Bump the package version and create the GitHub release.
                     sh """
                     export SIDEBAR_APP_URL=https://hypothes.is/app.html
+                    export NOTEBOOK_APP_URL=https://hypothes.is/notebook
                     yarn version --no-git-tag-version --new-version ${newPkgVersion}
                     """
                     sh "scripts/create-github-release.js"
 
-                    // Publish the updated package to the npm registry.
-                    // Use `npm` rather than `yarn` for publishing.
-                    // See https://github.com/yarnpkg/yarn/pull/3391.
                     sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
-                    sh "npm publish --tag ${npmTag}"
+                    sh "yarn publish --no-interactive --tag ${npmTag} --new-version=${newPkgVersion}"
                     sh "scripts/wait-for-npm-release.sh ${npmTag}"
 
                     // Deploy the client to cdn.hypothes.is, where the embedded

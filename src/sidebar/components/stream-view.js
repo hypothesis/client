@@ -10,7 +10,7 @@ import useStore from '../store/use-store';
 import ThreadList from './thread-list';
 
 /**
- * @typedef StreamContentProps
+ * @typedef StreamViewProps
  * @prop {Object} [api] - Injected service
  * @prop {Object} [toastMessenger] - Injected service
  */
@@ -18,9 +18,9 @@ import ThreadList from './thread-list';
 /**
  * The main content of the "stream" route (https://hypothes.is/stream)
  *
- * @param {StreamContentProps} props
+ * @param {StreamViewProps} props
  */
-function StreamContent({ api, toastMessenger }) {
+function StreamView({ api, toastMessenger }) {
   const addAnnotations = useStore(store => store.addAnnotations);
   const annotationFetchStarted = useStore(
     store => store.annotationFetchStarted
@@ -82,11 +82,11 @@ function StreamContent({ api, toastMessenger }) {
   return <ThreadList thread={rootThread} />;
 }
 
-StreamContent.propTypes = {
+StreamView.propTypes = {
   api: propTypes.object,
   toastMessenger: propTypes.object,
 };
 
-StreamContent.injectedProps = ['api', 'toastMessenger'];
+StreamView.injectedProps = ['api', 'toastMessenger'];
 
-export default withServices(StreamContent);
+export default withServices(StreamView);

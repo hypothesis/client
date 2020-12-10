@@ -38,11 +38,6 @@ if (appConfig.googleAnalytics) {
   addAnalytics(appConfig.googleAnalytics);
 }
 
-const isSidebar = !(
-  window.location.pathname.startsWith('/stream') ||
-  window.location.pathname.startsWith('/a/')
-);
-
 // Install Preact renderer options to work around browser quirks
 rendererOptions.setupBrowserFixes();
 
@@ -91,9 +86,9 @@ function autosave(autosaveService) {
 }
 
 // @inject
-function setupFrameSync(frameSync) {
+function setupFrameSync(frameSync, isSidebar) {
   if (isSidebar) {
-    frameSync.connect();
+    frameSync.connect(true);
   }
 }
 
@@ -139,6 +134,12 @@ import { Injector } from '../shared/injector';
 
 function startApp(config) {
   const container = new Injector();
+
+  const isSidebar = !(
+    window.location.pathname.startsWith('/stream') ||
+    window.location.pathname.startsWith('/a/') ||
+    window.location.pathname.startsWith('/notebook')
+  );
 
   // Register services.
   container

@@ -1,6 +1,7 @@
 import uiConstants from '../../../ui-constants';
 import createStore from '../../create-store';
 import annotations from '../annotations';
+import filters from '../filters';
 import selection from '../selection';
 import route from '../route';
 import * as fixtures from '../../../test/annotation-fixtures';
@@ -14,19 +15,7 @@ describe('sidebar/store/modules/selection', () => {
   };
 
   beforeEach(() => {
-    store = createStore([annotations, selection, route], fakeSettings);
-  });
-
-  describe('getFirstSelectedAnnotationId', function () {
-    it('returns the first selected annotation id it finds', function () {
-      store.selectAnnotations([1, 2]);
-      assert.equal(store.getFirstSelectedAnnotationId(), 1);
-    });
-
-    it('returns null if no selected annotation ids are found', function () {
-      store.selectAnnotations([]);
-      assert.isNull(store.getFirstSelectedAnnotationId());
-    });
+    store = createStore([annotations, filters, selection, route], fakeSettings);
   });
 
   describe('setForcedVisible', function () {
@@ -57,46 +46,6 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('hasAppliedFilter', () => {
-    it('returns true if there is a search query set', () => {
-      store.setFilterQuery('foobar');
-
-      assert.isTrue(store.hasAppliedFilter());
-    });
-
-    it('returns true if user-focused mode is active', () => {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { username: 'somebody' } } }]
-      );
-
-      assert.isTrue(store.hasAppliedFilter());
-    });
-
-    it('returns false if user-focused mode is configured but inactive', () => {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { username: 'somebody' } } }]
-      );
-      store.toggleFocusMode(false);
-
-      assert.isFalse(store.hasAppliedFilter());
-    });
-
-    it('returns true if there are selected annotations', () => {
-      store.selectAnnotations([1]);
-
-      assert.isTrue(store.hasAppliedFilter());
-    });
-
-    it('returns false after selection is cleared', () => {
-      store.setFilterQuery('foobar');
-      store.clearSelection();
-
-      assert.isFalse(store.hasAppliedFilter());
-    });
-  });
-
   describe('hasSelectedAnnotations', function () {
     it('returns true if there are any selected annotations', function () {
       store.selectAnnotations([1]);
@@ -119,69 +68,12 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('filterState', () => {
-    it('returns the current filter query', () => {
-      store.setFilterQuery('doodah, doodah');
-      assert.equal(store.filterState().filterQuery, 'doodah, doodah');
-    });
-
-    it('returns user focus information', () => {
-      store.changeFocusModeUser({
-        username: 'filbert',
-        displayName: 'Pantomime Nutball',
-      });
-
-      const filterState = store.filterState();
-      assert.isTrue(filterState.focusActive);
-      assert.isTrue(filterState.focusConfigured);
-      assert.equal(filterState.focusDisplayName, 'Pantomime Nutball');
-    });
-
-    it('returns a count of forced-visible annotations', () => {
-      store.setForcedVisible('kaboodle', true);
-      store.setForcedVisible('stampy', false);
-
-      assert.equal(store.filterState().forcedVisibleCount, 1);
-    });
-
-    it('returns a count of selected annotations', () => {
-      store.selectAnnotations(['tabulature', 'felonious']);
-      assert.equal(store.filterState().selectedCount, 2);
-    });
-
-    it('returns empty filter states when no filters active', () => {
-      const filterState = store.filterState();
-      assert.isFalse(filterState.focusActive);
-      assert.isFalse(filterState.focusConfigured);
-      assert.isEmpty(filterState.focusDisplayName);
-      assert.isNull(filterState.filterQuery);
-      assert.equal(filterState.forcedVisibleCount, 0);
-      assert.equal(filterState.selectedCount, 0);
-    });
-  });
-
-  describe('threadState', () => {
-    it('returns the current annotations in rootState', () => {
-      const myAnnotation = fixtures.defaultAnnotation();
-      store.addAnnotations([myAnnotation]);
-
-      // `addAnnotations` injects some additional properties to annotations,
-      // so we can't compare objects
-      assert.equal(store.threadState().annotations[0].id, myAnnotation.id);
-      assert.lengthOf(store.threadState().annotations, 1);
-    });
-
-    it('returns the current route name from rootState', () => {
-      store.changeRoute('kamchatka');
-
-      assert.equal(store.threadState().route, 'kamchatka');
-    });
-
+  describe('selectionState', () => {
     it('returns relevant state about tab and sort', () => {
       store.selectTab('orphan');
       store.setSortKey('pyrrhic');
 
-      const selection = store.threadState().selection;
+      const selection = store.selectionState();
 
       assert.equal(selection.selectedTab, 'orphan');
       assert.equal(selection.sortKey, 'pyrrhic');
@@ -191,30 +83,14 @@ describe('sidebar/store/modules/selection', () => {
       store.selectAnnotations(['1', '2']);
       store.setExpanded('3', true);
       store.setExpanded('4', false);
+      store.setForcedVisible('5', true);
+      store.setForcedVisible('6', true);
 
-      const selection = store.threadState().selection;
+      const selection = store.selectionState();
 
       assert.deepEqual(selection.expanded, { 3: true, 4: false });
       assert.deepEqual(selection.selected, ['1', '2']);
-    });
-
-    it('returns the relevant state when user-focus mode is applied', () => {
-      store.changeFocusModeUser({
-        username: 'testuser',
-        displayName: 'Test User',
-      });
-
-      const selection = store.threadState().selection;
-
-      assert.deepEqual(selection.filters, { user: 'testuser' });
-    });
-
-    it('returns the relevant state when a filter query is applied', () => {
-      store.setFilterQuery('frappe');
-
-      const selection = store.threadState().selection;
-
-      assert.equal(selection.filterQuery, 'frappe');
+      assert.deepEqual(selection.forcedVisible, ['5', '6']);
     });
   });
 
@@ -268,6 +144,45 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
+  describe('CHANGE_FOCUS_MODE_USER', () => {
+    it('clears selection', () => {
+      store.selectAnnotations([1, 2, 3]);
+      store.setForcedVisible(2, true);
+
+      store.changeFocusModeUser({
+        username: 'testuser',
+        displayName: 'Test User',
+      });
+
+      assert.isEmpty(store.selectedAnnotations());
+      assert.isEmpty(store.forcedVisibleAnnotations());
+    });
+  });
+
+  describe('SET_FILTER_QUERY', () => {
+    it('clears selection', () => {
+      store.selectAnnotations([1, 2, 3]);
+      store.setForcedVisible(2, true);
+
+      store.setFilterQuery('foobar');
+
+      assert.isEmpty(store.selectedAnnotations());
+      assert.isEmpty(store.forcedVisibleAnnotations());
+    });
+  });
+
+  describe('SET_FOCUS_MODE', () => {
+    it('clears selection', () => {
+      store.selectAnnotations([1, 2, 3]);
+      store.setForcedVisible(2, true);
+
+      store.toggleFocusMode(true);
+
+      assert.isEmpty(store.selectedAnnotations());
+      assert.isEmpty(store.forcedVisibleAnnotations());
+    });
+  });
+
   describe('#REMOVE_ANNOTATIONS', function () {
     it('removing an annotation should also remove it from the selection', function () {
       store.selectAnnotations([1, 2, 3]);
@@ -282,185 +197,6 @@ describe('sidebar/store/modules/selection', () => {
       });
       assert.deepEqual(store.forcedVisibleAnnotations(), ['1']);
       assert.deepEqual(store.expandedMap(), { 1: true });
-    });
-  });
-
-  describe('setFilterQuery()', function () {
-    it('sets the filter query', function () {
-      store.setFilterQuery('a-query');
-      assert.equal(getSelectionState().filterQuery, 'a-query');
-    });
-
-    it('resets the force-visible and expanded sets', function () {
-      store.setForcedVisible('123', true);
-      store.setExpanded('456', true);
-      store.setFilterQuery('some-query');
-      assert.deepEqual(getSelectionState().forcedVisible, {});
-      assert.deepEqual(getSelectionState().expanded, {});
-    });
-  });
-
-  describe('changeFocusModeUser', function () {
-    it('sets the focused user and enables focus mode', function () {
-      store.toggleFocusMode(false);
-      store.changeFocusModeUser({
-        username: 'testuser',
-        displayName: 'Test User',
-      });
-      assert.equal(store.focusModeUserFilter(), 'testuser');
-      assert.equal(store.focusModeUserPrettyName(), 'Test User');
-      assert.equal(store.focusModeActive(), true);
-      assert.equal(store.focusModeConfigured(), true);
-    });
-
-    // When the LMS app wants the client to disable focus mode it sends a
-    // changeFocusModeUser() RPC call with {username: undefined, displayName:
-    // undefined}:
-    //
-    // https://github.com/hypothesis/lms/blob/d6b88fd7e375a4b23899117556b3e39cfe18986b/lms/static/scripts/frontend_apps/components/LMSGrader.js#L46
-    //
-    // This is the LMS app's way of asking the client to disable focus mode.
-    it('disables focus mode if username is undefined', function () {
-      store.toggleFocusMode(true);
-      store.changeFocusModeUser({
-        username: undefined,
-        displayName: undefined,
-      });
-      assert.equal(store.focusModeActive(), false);
-      assert.equal(store.focusModeConfigured(), false);
-    });
-
-    it('clears other applied selections', () => {
-      store.toggleFocusMode(true);
-      store.setForcedVisible('someAnnotationId');
-      store.setFilterQuery('somequery');
-      store.changeFocusModeUser({
-        username: 'testuser',
-        displayName: 'Test User',
-      });
-
-      assert.isEmpty(getSelectionState().forcedVisible);
-      assert.isNull(store.filterQuery());
-    });
-  });
-
-  describe('toggleFocusMode', function () {
-    it('toggles the current active state if called without arguments', function () {
-      store.toggleFocusMode(false);
-      store.toggleFocusMode();
-      assert.isTrue(store.focusModeActive());
-    });
-
-    it('toggles the current active state to designated state', function () {
-      store.toggleFocusMode(true);
-      store.toggleFocusMode(false);
-      assert.isFalse(store.focusModeActive());
-    });
-  });
-
-  describe('focusModeConfigured', function () {
-    it('should be true when the focus setting is present and user valid', function () {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { username: 'anybody' } } }]
-      );
-      assert.isTrue(store.focusModeConfigured());
-    });
-
-    it('should be false when the focus setting is present but user object invalid', function () {
-      store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.isFalse(store.focusModeConfigured());
-    });
-
-    it('should be false when the focus setting is not present', function () {
-      assert.equal(store.focusModeConfigured(), false);
-    });
-  });
-
-  describe('focusModeActive', function () {
-    it('should return true by default when focus mode is active', function () {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { username: 'anybody' } } }]
-      );
-      assert.equal(getSelectionState().focusMode.configured, true);
-      assert.equal(getSelectionState().focusMode.active, true);
-      assert.equal(store.focusModeActive(), true);
-    });
-
-    it('should return false when focus config is not valid', () => {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { blerp: 'anybody' } } }]
-      );
-      assert.isFalse(store.focusModeActive());
-    });
-
-    it('should return false by default when focus mode is not active', function () {
-      assert.equal(store.focusModeActive(), false);
-    });
-  });
-
-  describe('focusModeUserPrettyName', function () {
-    it('returns `displayName` when available', function () {
-      store = createStore(
-        [selection],
-        [
-          {
-            focus: {
-              user: { username: 'anybody', displayName: 'FakeDisplayName' },
-            },
-          },
-        ]
-      );
-      assert.equal(store.focusModeUserPrettyName(), 'FakeDisplayName');
-    });
-
-    it('returns the `username` when `displayName` is missing', function () {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { username: 'anybody', userid: 'nobody' } } }]
-      );
-      assert.equal(store.focusModeUserPrettyName(), 'anybody');
-    });
-
-    it('returns the `userid` if `displayName` and `username` are missing', () => {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { userid: 'nobody' } } }]
-      );
-      assert.equal(store.focusModeUserPrettyName(), 'nobody');
-    });
-
-    it('returns empty string if focus mode is not configured', () => {
-      store = createStore([selection], [{ focus: {} }]);
-      assert.equal(store.focusModeUserPrettyName(), '');
-    });
-  });
-
-  describe('focusModeUserFilter', function () {
-    it('should return the user identifier when present', function () {
-      store = createStore(
-        [selection],
-        [{ focus: { user: { userid: 'acct:userid@authority' } } }]
-      );
-      assert.equal(store.focusModeUserFilter(), 'acct:userid@authority');
-    });
-    it('should return null when no filter available', function () {
-      store = createStore([selection], [{ focus: { user: {} } }]);
-      assert.isNull(store.focusModeUserFilter());
-    });
-    it('should return null when the user object is not present', function () {
-      assert.isNull(store.focusModeUserFilter());
-    });
-    it('should return the username when present but no userid', function () {
-      // remove once LMS no longer sends username in RPC or config
-      // https://github.com/hypothesis/client/issues/1516
-      store = createStore(
-        [selection],
-        [{ focus: { user: { username: 'fake_user_name' } } }]
-      );
-      assert.equal(store.focusModeUserFilter(), 'fake_user_name');
     });
   });
 

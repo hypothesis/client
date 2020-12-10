@@ -122,4 +122,34 @@ describe('SearchClient', () => {
       assert.calledWith(onError, err);
     });
   });
+
+  context('`maxResults` option present', () => {
+    it('emits error if results size exceeds `maxResults`', () => {
+      const client = new SearchClient(fakeSearchFn, { maxResults: 2 });
+      const onError = sinon.stub();
+      client.on('error', onError);
+
+      client.get({ uri: 'http://example.com' });
+
+      return awaitEvent(client, 'end').then(() => {
+        assert.calledOnce(onError);
+        assert.equal(
+          onError.getCall(0).args[0].message,
+          'Results size exceeds maximum allowed annotations'
+        );
+      });
+    });
+
+    it('does not emit an error if results size is <= `maxResults`', () => {
+      const client = new SearchClient(fakeSearchFn, { maxResults: 20 });
+      const onError = sinon.stub();
+      client.on('error', onError);
+
+      client.get({ uri: 'http://example.com' });
+
+      return awaitEvent(client, 'end').then(() => {
+        assert.notCalled(onError);
+      });
+    });
+  });
 });

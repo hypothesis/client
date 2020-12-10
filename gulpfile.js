@@ -224,6 +224,10 @@ let isFirstBuild = true;
 function generateBootScript(manifest, { usingDevServer = false } = {}) {
   const { version } = require('./package.json');
 
+  const defaultNotebookAppUrl = process.env.NOTEBOOK_APP_URL
+    ? `${process.env.NOTEBOOK_APP_URL}`
+    : '{current_scheme}://{current_host}:5000/notebook';
+
   const defaultSidebarAppUrl = process.env.SIDEBAR_APP_URL
     ? `${process.env.SIDEBAR_APP_URL}`
     : '{current_scheme}://{current_host}:5000/app.html';
@@ -239,6 +243,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
 
   if (isFirstBuild) {
     log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
+    log(`Notebook app URL: ${defaultNotebookAppUrl}`);
     log(`Client asset root URL: ${defaultAssetRoot}`);
     isFirstBuild = false;
   }
@@ -247,6 +252,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
     .src('build/scripts/boot.bundle.js')
     .pipe(replace('__MANIFEST__', JSON.stringify(manifest)))
     .pipe(replace('__ASSET_ROOT__', defaultAssetRoot))
+    .pipe(replace('__NOTEBOOK_APP_URL__', defaultNotebookAppUrl))
     .pipe(replace('__SIDEBAR_APP_URL__', defaultSidebarAppUrl))
     // Strip sourcemap link. It will have been invalidated by the previous
     // replacements and the bundle is so small that it isn't really valuable.

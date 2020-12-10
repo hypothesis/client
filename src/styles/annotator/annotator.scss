@@ -15,6 +15,7 @@
 @use './components/toolbar';
 @use './bucket-bar';
 @use './highlights';
+@use './notebook';
 
 // Sidebar
 .annotator-frame {
@@ -101,7 +102,6 @@
 /*
   Mobile layout
   240-479 px
-  Zoomed out below 320 px
 */
 
 @media screen and (min-width: 15em) {
@@ -113,8 +113,7 @@
 
 /*
   Wide mobile layout
-  480-767 px
-  Zoomed in above 480 px
+  480-599 px
 */
 
 @media screen and (min-width: 30em) {
@@ -126,8 +125,7 @@
 
 /*
   Tablet layout
-  600-911 px
-  Zoomed in above 600 px
+  600-above px
 */
 
 @media screen and (min-width: 37.5em) {

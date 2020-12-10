@@ -1,13 +1,13 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
-import SidebarContent from '../sidebar-content';
-import { $imports } from '../sidebar-content';
+import SidebarView from '../sidebar-view';
+import { $imports } from '../sidebar-view';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('SidebarContent', () => {
+describe('SidebarView', () => {
   let fakeFrameSync;
   let fakeLoadAnnotationsService;
   let fakeUseRootThread;
@@ -17,7 +17,7 @@ describe('SidebarContent', () => {
 
   const createComponent = props =>
     mount(
-      <SidebarContent
+      <SidebarView
         onLogin={() => null}
         onSignUp={() => null}
         frameSync={fakeFrameSync}
@@ -51,6 +51,7 @@ describe('SidebarContent', () => {
       focusedGroupId: sinon.stub(),
       hasAppliedFilter: sinon.stub(),
       hasFetchedAnnotations: sinon.stub(),
+      hasSelectedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
       isLoading: sinon.stub().returns(false),
       isLoggedIn: sinon.stub(),
@@ -132,6 +133,16 @@ describe('SidebarContent', () => {
         createComponent();
         assert.calledOnce(fakeStore.selectTab);
         assert.calledWith(fakeStore.selectTab, 'annotation');
+      });
+
+      it('selects the correct tab for direct-linked orphaned annotations', () => {
+        fakeStore.findAnnotationByID
+          .withArgs('someId')
+          .returns({ $orphan: true, $tag: 'myTag' });
+        fakeTabsUtil.tabForAnnotation.returns('orphan');
+        createComponent();
+        assert.calledOnce(fakeStore.selectTab);
+        assert.calledWith(fakeStore.selectTab, 'orphan');
       });
 
       it('renders a logged-out message CTA if user is not logged in', () => {
@@ -242,6 +253,14 @@ describe('SidebarContent', () => {
 
     it('does not render tabs if there is an applied filter', () => {
       fakeStore.hasAppliedFilter.returns(true);
+
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('SelectionTabs').exists());
+    });
+
+    it('does not render tabs if there are selected annotations', () => {
+      fakeStore.hasSelectedAnnotations.returns(true);
 
       const wrapper = createComponent();
 

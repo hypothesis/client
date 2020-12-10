@@ -11,20 +11,34 @@
 
 import { parseJsonConfig } from './parse-json-config';
 
-import boot from './boot';
+import { bootHypothesisClient, bootSidebarApp } from './boot';
 import processUrlTemplate from './url-template';
 import { isBrowserSupported } from './browser-check';
 
 if (isBrowserSupported()) {
   const settings = parseJsonConfig(document);
-  boot(document, {
-    assetRoot: processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__'),
-    // @ts-ignore - `__MANIFEST__` is injected by the build script
-    manifest: __MANIFEST__,
-    sidebarAppUrl: processUrlTemplate(
+  const assetRoot = processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__');
+  // @ts-ignore - `__MANIFEST__` is injected by the build script
+  const manifest = __MANIFEST__;
+
+  // Check whether this is the sidebar app (indicated by the presence of a
+  // `<hypothesis-app>` element) and load the appropriate part of the client.
+  if (document.querySelector('hypothesis-app')) {
+    bootSidebarApp(document, { assetRoot, manifest });
+  } else {
+    const notebookAppUrl = processUrlTemplate(
+      settings.notebookAppUrl || '__NOTEBOOK_APP_URL__'
+    );
+    const sidebarAppUrl = processUrlTemplate(
       settings.sidebarAppUrl || '__SIDEBAR_APP_URL__'
-    ),
-  });
+    );
+    bootHypothesisClient(document, {
+      assetRoot,
+      manifest,
+      notebookAppUrl,
+      sidebarAppUrl,
+    });
+  }
 } else {
   // Show a "quiet" warning to avoid being disruptive on non-Hypothesis sites
   // that embed the client.

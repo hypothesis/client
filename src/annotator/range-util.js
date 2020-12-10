@@ -14,41 +14,36 @@ export function isSelectionBackwards(selection) {
 }
 
 /**
- * Returns true if `node` lies within a range.
- *
- * This is a simplified version of `Range.isPointInRange()` for compatibility
- * with IE.
+ * Returns true if any part of `node` lies within `range`.
  *
  * @param {Range} range
  * @param {Node} node
  */
 export function isNodeInRange(range, node) {
-  if (node === range.startContainer || node === range.endContainer) {
-    return true;
+  try {
+    const length = node.nodeValue?.length ?? node.childNodes.length;
+    return (
+      // Check start of node is before end of range.
+      range.comparePoint(node, 0) <= 0 &&
+      // Check end of node is after start of range.
+      range.comparePoint(node, length) >= 0
+    );
+  } catch (e) {
+    // `comparePoint` may fail if the `range` and `node` do not share a common
+    // ancestor or `node` is a doctype.
+    return false;
   }
-
-  const nodeRange = /** @type {Document} */ (node.ownerDocument).createRange();
-  nodeRange.selectNode(node);
-  const isAtOrBeforeStart =
-    range.compareBoundaryPoints(Range.START_TO_START, nodeRange) <= 0;
-  const isAtOrAfterEnd =
-    range.compareBoundaryPoints(Range.END_TO_END, nodeRange) >= 0;
-  nodeRange.detach();
-  return isAtOrBeforeStart && isAtOrAfterEnd;
 }
 
 /**
- * Iterate over all Node(s) in `range` in document order and invoke `callback`
- * for each of them.
+ * Iterate over all Node(s) which overlap `range` in document order and invoke
+ * `callback` for each of them.
  *
  * @param {Range} range
  * @param {(n: Node) => any} callback
  */
-function forEachNodeInRange(range, callback) {
+export function forEachNodeInRange(range, callback) {
   const root = range.commonAncestorContainer;
-
-  // The `whatToShow`, `filter` and `expandEntityReferences` arguments are
-  // mandatory in IE although optional according to the spec.
   const nodeIter = /** @type {Document} */ (root.ownerDocument).createNodeIterator(
     root,
     NodeFilter.SHOW_ALL
@@ -56,7 +51,6 @@ function forEachNodeInRange(range, callback) {
 
   let currentNode;
   while ((currentNode = nodeIter.nextNode())) {
-    // eslint-disable-line no-cond-assign
     if (isNodeInRange(range, currentNode)) {
       callback(currentNode);
     }

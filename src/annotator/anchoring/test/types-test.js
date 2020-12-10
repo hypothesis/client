@@ -118,16 +118,26 @@ describe('annotator/anchoring/types', () => {
   });
 
   describe('TextPositionAnchor', () => {
-    let fakePosFromRange;
-    let fakePosToRange;
+    let FakeTextRange;
 
     beforeEach(() => {
-      fakePosFromRange = sinon.stub();
-      fakePosToRange = sinon.stub();
+      const textRange = {
+        start: { element: container, offset: 0 },
+        end: { element: container, offset: 1 },
+
+        relativeTo: sinon.stub(),
+        toRange: sinon.stub(),
+      };
+
+      FakeTextRange = {
+        fromOffsets: sinon.stub().returns(textRange),
+        fromRange: sinon.stub().returns(textRange),
+        instance: textRange,
+      };
+
       $imports.$mock({
-        'dom-anchor-text-position': {
-          fromRange: fakePosFromRange,
-          toRange: fakePosToRange,
+        './text-range': {
+          TextRange: FakeTextRange,
         },
       });
     });
@@ -142,13 +152,15 @@ describe('annotator/anchoring/types', () => {
 
     describe('#fromRange', () => {
       it('returns a TextPositionAnchor instance', () => {
-        fakePosFromRange.returns({
-          start: 0,
-          end: 1,
-        });
-        const anchor = TextPositionAnchor.fromRange(container, new Range());
-        assert.calledOnce(fakePosFromRange);
-        assert.instanceOf(anchor, TextPositionAnchor);
+        FakeTextRange.instance.relativeTo.returns(FakeTextRange.instance);
+        const range = new Range();
+
+        const anchor = TextPositionAnchor.fromRange(container, range);
+
+        assert.calledWith(FakeTextRange.fromRange, range);
+        assert.calledWith(FakeTextRange.instance.relativeTo, container);
+        assert.equal(anchor.start, FakeTextRange.instance.start.offset);
+        assert.equal(anchor.end, FakeTextRange.instance.end.offset);
       });
     });
 
@@ -156,9 +168,10 @@ describe('annotator/anchoring/types', () => {
       it('returns a TextPositionAnchor instance', () => {
         const anchor = TextPositionAnchor.fromSelector(container, {
           start: 0,
-          end: 0,
+          end: 1,
         });
-        assert.instanceOf(anchor, TextPositionAnchor);
+        assert.equal(anchor.start, 0);
+        assert.equal(anchor.end, 1);
       });
     });
 
@@ -175,18 +188,22 @@ describe('annotator/anchoring/types', () => {
 
     describe('#toRange', () => {
       it('returns a range object', () => {
+        FakeTextRange.instance.toRange.returns('fake range');
         const anchor = createTextPositionAnchor();
-        fakePosToRange.returns('fake range');
         assert.equal(anchor.toRange(), 'fake range');
-        assert.calledWith(fakePosToRange, container, { start: 0, end: 0 });
+        assert.calledWith(
+          FakeTextRange.fromOffsets,
+          container,
+          anchor.start,
+          anchor.end
+        );
       });
     });
 
     describe('integration tests', () => {
       beforeEach(() => {
-        // restore dom-anchor-text-position to test third party lib integration
         $imports.$restore({
-          'dom-anchor-text-position': true,
+          './text-range': true,
         });
       });
 

@@ -12,11 +12,13 @@ import { shouldAutoDisplayTutorial } from '../util/session';
 import { applyTheme } from '../util/theme';
 import { withServices } from '../util/service-context';
 
-import AnnotationViewerContent from './annotation-viewer-content';
+import AnnotationView from './annotation-view';
+import SidebarView from './sidebar-view';
+import StreamView from './stream-view';
+
 import HelpPanel from './help-panel';
+import NotebookView from './notebook-view';
 import ShareAnnotationsPanel from './share-annotations-panel';
-import SidebarContent from './sidebar-content';
-import StreamContent from './stream-content';
 import ToastMessages from './toast-messages';
 import TopBar from './top-bar';
 
@@ -174,16 +176,19 @@ function HypothesisApp({
     <div
       className={classnames('hypothesis-app', 'js-thread-list-scroll-root', {
         'theme-clean': isThemeClean,
+        'hypothesis-app--notebook': route === 'notebook',
       })}
       style={backgroundStyle}
     >
-      <TopBar
-        auth={authState}
-        onLogin={login}
-        onSignUp={signUp}
-        onLogout={logout}
-        isSidebar={isSidebar}
-      />
+      {route !== 'notebook' && (
+        <TopBar
+          auth={authState}
+          onLogin={login}
+          onSignUp={signUp}
+          onLogout={logout}
+          isSidebar={isSidebar}
+        />
+      )}
       <div className="hypothesis-app__content">
         <ToastMessages />
         <HelpPanel auth={authState} />
@@ -191,12 +196,11 @@ function HypothesisApp({
 
         {route && (
           <main>
-            {route === 'annotation' && (
-              <AnnotationViewerContent onLogin={login} />
-            )}
-            {route === 'stream' && <StreamContent />}
+            {route === 'annotation' && <AnnotationView onLogin={login} />}
+            {route === 'notebook' && <NotebookView />}
+            {route === 'stream' && <StreamView />}
             {route === 'sidebar' && (
-              <SidebarContent onLogin={login} onSignUp={signUp} />
+              <SidebarView onLogin={login} onSignUp={signUp} />
             )}
           </main>
         )}

@@ -15,7 +15,7 @@ import SidebarContentError from './sidebar-content-error';
 import ThreadList from './thread-list';
 
 /**
- * @typedef SidebarContentProps
+ * @typedef SidebarViewProps
  * @prop {() => any} onLogin
  * @prop {() => any} onSignUp
  * @prop {Object} [frameSync] - Injected service
@@ -26,9 +26,9 @@ import ThreadList from './thread-list';
 /**
  * Render the sidebar and its components
  *
- * @param {SidebarContentProps} props
+ * @param {SidebarViewProps} props
  */
-function SidebarContent({
+function SidebarView({
   frameSync,
   onLogin,
   onSignUp,
@@ -39,9 +39,12 @@ function SidebarContent({
 
   // Store state values
   const focusedGroupId = useStore(store => store.focusedGroupId());
-  const hasAppliedFilter = useStore(store => store.hasAppliedFilter());
+  const hasAppliedFilter = useStore(store => {
+    return store.hasAppliedFilter() || store.hasSelectedAnnotations();
+  });
   const isLoading = useStore(store => store.isLoading());
   const isLoggedIn = useStore(store => store.isLoggedIn());
+
   const linkedAnnotationId = useStore(store =>
     store.directLinkedAnnotationId()
   );
@@ -53,6 +56,7 @@ function SidebarContent({
   const directLinkedTab = linkedAnnotation
     ? tabForAnnotation(linkedAnnotation)
     : 'annotation';
+
   const searchUris = useStore(store => store.searchUris());
   const sidebarHasOpened = useStore(store => store.hasSidebarOpened());
   const userId = useStore(store => store.profile().userid);
@@ -102,7 +106,10 @@ function SidebarContent({
       prevGroupId.current = focusedGroupId;
     }
     if (focusedGroupId && searchUris.length) {
-      loadAnnotationsService.load(searchUris, focusedGroupId);
+      loadAnnotationsService.load({
+        groupId: focusedGroupId,
+        uris: searchUris,
+      });
     }
   }, [
     clearSelection,
@@ -119,8 +126,17 @@ function SidebarContent({
       frameSync.focusAnnotations([linkedAnnotationAnchorTag]);
       frameSync.scrollToAnnotation(linkedAnnotationAnchorTag);
       selectTab(directLinkedTab);
+    } else if (linkedAnnotation) {
+      // Make sure to allow for orphaned annotations (which won't have an anchor)
+      selectTab(directLinkedTab);
     }
-  }, [directLinkedTab, frameSync, linkedAnnotationAnchorTag, selectTab]);
+  }, [
+    directLinkedTab,
+    frameSync,
+    linkedAnnotation,
+    linkedAnnotationAnchorTag,
+    selectTab,
+  ]);
 
   // Connect to the streamer when the sidebar has opened or if user is logged in
   useEffect(() => {
@@ -151,7 +167,7 @@ function SidebarContent({
   );
 }
 
-SidebarContent.propTypes = {
+SidebarView.propTypes = {
   onLogin: propTypes.func.isRequired,
   onSignUp: propTypes.func.isRequired,
   frameSync: propTypes.object,
@@ -159,10 +175,6 @@ SidebarContent.propTypes = {
   streamer: propTypes.object,
 };
 
-SidebarContent.injectedProps = [
-  'frameSync',
-  'loadAnnotationsService',
-  'streamer',
-];
+SidebarView.injectedProps = ['frameSync', 'loadAnnotationsService', 'streamer'];
 
-export default withServices(SidebarContent);
+export default withServices(SidebarView);

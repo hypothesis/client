@@ -7,6 +7,10 @@
  * in enumerable fields.
  */
 function deepFreeze(object) {
+  if (Object.isFrozen(object)) {
+    return object;
+  }
+
   Object.freeze(object);
 
   Object.values(object).forEach(val => {

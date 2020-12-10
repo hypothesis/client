@@ -1,0 +1,50 @@
+@use "../../mixins/responsive";
+@use "../../mixins/utils";
+@use "../../variables" as var;
+
+.notebook-view {
+  display: grid;
+  row-gap: var.$layout-space--xsmall;
+  grid-template-areas:
+    'heading'
+    'results'
+    'items';
+
+  h1 {
+    display: inline;
+    font-size: var.$font-size--heading;
+    font-weight: bold;
+  }
+
+  h2 {
+    display: inline;
+    font-size: var.$font-size--subheading;
+    font-weight: bold;
+  }
+
+  &__heading {
+    grid-area: heading;
+    font-size: var.$font-size--heading;
+    font-weight: bold;
+  }
+
+  &__results {
+    grid-area: results;
+  }
+
+  &__items {
+    grid-area: items;
+  }
+
+  @include responsive.tablet-and-up {
+    grid-template-areas:
+      'heading results'
+      'items items';
+
+    &__results {
+      // Right-aligned when sharing a row with the heading
+      text-align: right;
+      align-self: end;
+    }
+  }
+}

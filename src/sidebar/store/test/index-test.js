@@ -61,7 +61,7 @@ describe('store', function () {
 
     it('sets `filterQuery` to null', () => {
       store.clearSelection();
-      assert.isNull(store.getState().selection.filterQuery);
+      assert.isNull(store.getState().filters.query);
     });
 
     it('sets `directLinkedGroupFetchFailed` to false', () => {

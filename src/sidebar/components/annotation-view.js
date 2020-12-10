@@ -10,7 +10,7 @@ import ThreadList from './thread-list';
 import SidebarContentError from './sidebar-content-error';
 
 /**
- * @typedef AnnotationViewerContentProps
+ * @typedef AnnotationViewProps
  * @prop {() => any} onLogin
  * @prop {Object} [loadAnnotationsService] - Injected service
  */
@@ -18,9 +18,9 @@ import SidebarContentError from './sidebar-content-error';
 /**
  * The main content for the single annotation page (aka. https://hypothes.is/a/<annotation ID>)
  *
- * @param {AnnotationViewerContentProps} props
+ * @param {AnnotationViewProps} props
  */
-function AnnotationViewerContent({ loadAnnotationsService, onLogin }) {
+function AnnotationView({ loadAnnotationsService, onLogin }) {
   const annotationId = useStore(store => store.routeParams().id);
   const clearAnnotations = useStore(store => store.clearAnnotations);
   const highlightAnnotations = useStore(store => store.highlightAnnotations);
@@ -98,11 +98,11 @@ function AnnotationViewerContent({ loadAnnotationsService, onLogin }) {
   );
 }
 
-AnnotationViewerContent.propTypes = {
+AnnotationView.propTypes = {
   onLogin: propTypes.func.isRequired,
   loadAnnotationsService: propTypes.object,
 };
 
-AnnotationViewerContent.injectedProps = ['loadAnnotationsService'];
+AnnotationView.injectedProps = ['loadAnnotationsService'];
 
-export default withServices(AnnotationViewerContent);
+export default withServices(AnnotationView);

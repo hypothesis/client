@@ -6,6 +6,14 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function awaitEvent(target, eventName) {
+  return new Promise(resolve => {
+    target.addEventListener(eventName, event => resolve(event), {
+      once: true,
+    });
+  });
+}
+
 describe('annotator/plugin/pdf', () => {
   let container;
   let fakeAnnotator;
@@ -61,15 +69,45 @@ describe('annotator/plugin/pdf', () => {
     $imports.$restore();
   });
 
+  function pdfViewerHasClass(className) {
+    return fakePDFViewerApplication.pdfViewer.viewer.classList.contains(
+      className
+    );
+  }
+
   describe('#constructor', () => {
     it('adds CSS classes to override PDF.js styles', () => {
       pdfPlugin = createPDFPlugin();
-      assert.isTrue(
-        fakePDFViewerApplication.pdfViewer.viewer.classList.contains(
-          'has-transparent-text-layer'
-        )
-      );
+      assert.isTrue(pdfViewerHasClass('has-transparent-text-layer'));
     });
+  });
+
+  it('hides annotation layers when there is a text selection', async () => {
+    // This tests checks for a CSS class on the root PDF viewer element.
+    // The annotation layers are hidden by a CSS rule that uses this class.
+
+    // Start with an empty selection.
+    const selection = window.getSelection();
+    if (!selection.isCollapsed) {
+      selection.collapseToStart();
+    }
+    pdfPlugin = createPDFPlugin();
+    assert.isFalse(pdfViewerHasClass('is-selecting'));
+
+    // Make the selection non-empty.
+    selection.selectAllChildren(document.body);
+    await awaitEvent(document, 'selectionchange');
+    assert.isTrue(pdfViewerHasClass('is-selecting'));
+
+    // Then make the selection empty again.
+    selection.collapseToStart();
+    await awaitEvent(document, 'selectionchange');
+    assert.isFalse(pdfViewerHasClass('is-selecting'));
+
+    // Finally, remove the selection entirely.
+    selection.removeAllRanges();
+    await awaitEvent(document, 'selectionchange');
+    assert.isFalse(pdfViewerHasClass('is-selecting'));
   });
 
   describe('#destroy', () => {

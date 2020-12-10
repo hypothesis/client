@@ -17,4 +17,11 @@ describe('immutable', () => {
     assert.isTrue(Object.isFrozen(obj.objectValue));
     assert.isTrue(Object.isFrozen(obj.arrayValue));
   });
+
+  it('does nothing if object is already frozen', () => {
+    const obj = { child: {} };
+
+    assert.equal(immutable(obj), obj); // Freezes object and returns it.
+    assert.equal(immutable(obj), obj); // Just returns input.
+  });
 });

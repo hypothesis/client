@@ -19,7 +19,7 @@ fi
 expected_version=$(node -p "require('./package.json').version")
 while [ true ]
 do
-  released_version=$(npm show hypothesis dist-tags.$dist_tag)
+  released_version=$(yarn info -s hypothesis dist-tags.$dist_tag)
   if [ "$released_version" = "$expected_version" ]; then
     break
   fi

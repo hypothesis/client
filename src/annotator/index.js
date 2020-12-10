@@ -22,6 +22,7 @@ import BucketBarPlugin from './plugin/bucket-bar';
 import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import Guest from './guest';
+import Notebook from './notebook';
 import PDFPlugin from './plugin/pdf';
 import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
@@ -70,15 +71,22 @@ function init() {
   config.pluginClasses = pluginClasses;
 
   const annotator = new Klass(document.body, config);
+  const notebook = new Notebook(document.body, config);
   appLinkEl.addEventListener('destroy', function () {
-    appLinkEl.remove();
     annotator.destroy();
+    notebook.destroy();
+
+    // Remove all the `<link>`, `<script>` and `<style>` elements added to the
+    // page by the boot script.
+    const clientAssets = document.querySelectorAll('[data-hypothesis-asset]');
+    clientAssets.forEach(el => el.remove());
   });
 }
 
 /**
  * Returns a Promise that resolves when the document has loaded (but subresources
  * may still be loading).
+ * @returns {Promise<void>}
  */
 function documentReady() {
   return new Promise(resolve => {
@@ -87,7 +95,7 @@ function documentReady() {
     }
     // nb. `readystatechange` may be emitted twice, but `resolve` only resolves
     // on the first call.
-    document.addEventListener('readystatechange', resolve);
+    document.addEventListener('readystatechange', () => resolve());
   });
 }
 

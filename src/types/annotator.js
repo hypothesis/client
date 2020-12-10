@@ -3,6 +3,22 @@
  */
 
 /**
+ * Object representing a region of a document that an annotation
+ * has been anchored to.
+ *
+ * This representation of anchor ranges allows for certain document mutations
+ * in between anchoring an annotation and later making use of the anchored range,
+ * such as inserting highlights for other anchors. Compared to the initial
+ * anchoring of serialized selectors, resolving these ranges should be a
+ * cheap operation.
+ *
+ * @typedef AbstractRange
+ * @prop {() => Range} toRange -
+ *   Resolve the abstract range to a concrete live `Range`. The implementation
+ *   may or may not return the same `Range` each time.
+ */
+
+/**
  * @typedef {import("./api").Selector} Selector
  * @typedef {import("./api").Target} Target
  */
@@ -30,8 +46,10 @@
  *
  * @typedef Anchor
  * @prop {AnnotationData} annotation
- * @prop {HTMLElement[]} [highlights]
- * @prop {Range} [range]
+ * @prop {HTMLElement[]} [highlights] -
+ *   The HTML elements that create the highlight for this annotation.
+ * @prop {AbstractRange} [range] -
+ *   Region of the document that this annotation's selectors were resolved to.
  * @prop {Target} target
  */
 

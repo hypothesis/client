@@ -1,0 +1,17 @@
+@use "../../variables" as var;
+@use "../../mixins/utils";
+
+.annotation-timestamps {
+  &__edited {
+    @include utils.font--small;
+    font-style: italic;
+    color: var.$color-text--light;
+  }
+
+  &__created {
+    color: var.$color-text--light;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

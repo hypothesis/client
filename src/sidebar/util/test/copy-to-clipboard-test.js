@@ -14,7 +14,7 @@ describe('copy-to-clipboard', () => {
      * Returns the temporary element used to hold text being copied.
      */
     function tempSpan() {
-      return document.querySelector('.copy-text');
+      return document.querySelector('[data-testid=copy-text]');
     }
 
     beforeEach(() => {

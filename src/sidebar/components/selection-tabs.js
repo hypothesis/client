@@ -91,7 +91,7 @@ Tab.propTypes = {
  * @param {SelectionTabsProps} props
  */
 function SelectionTabs({ isLoading, settings }) {
-  const selectedTab = useStore(store => store.getState().selection.selectedTab);
+  const selectedTab = useStore(store => store.selectedTab());
   const noteCount = useStore(store => store.noteCount());
   const annotationCount = useStore(store => store.annotationCount());
   const orphanCount = useStore(store => store.orphanCount());

@@ -12,12 +12,32 @@ const commonPolyfills = [
 ];
 
 /**
- * @typedef Config
+ * @typedef SidebarAppConfig
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
+ * @prop {Object.<string,string>} manifest -
+ *   A mapping from canonical asset path to cache-busted asset path
+ */
+
+/**
+ * @typedef AnnotatorConfig
+ * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
+ * @prop {string} notebookAppUrl - The URL of the sidebar's notebook
  * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
  * @prop {Object.<string,string>} manifest -
  *   A mapping from canonical asset path to cache-busted asset path
  */
+
+/**
+ * Mark an element as having been added by the boot script.
+ *
+ * This marker is later used to know which elements to remove when unloading
+ * the client.
+ *
+ * @param {HTMLElement} el
+ */
+function tagElement(el) {
+  el.setAttribute('data-hypothesis-asset', '');
+}
 
 /**
  * @param {Document} doc
@@ -28,6 +48,8 @@ function injectStylesheet(doc, href) {
   link.rel = 'stylesheet';
   link.type = 'text/css';
   link.href = href;
+
+  tagElement(link);
   doc.head.appendChild(link);
 }
 
@@ -43,12 +65,30 @@ function injectScript(doc, src) {
   // Set 'async' to false to maintain execution order of scripts.
   // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script
   script.async = false;
+
+  tagElement(script);
   doc.head.appendChild(script);
 }
 
 /**
  * @param {Document} doc
- * @param {Config} config
+ * @param {string} rel
+ * @param {'html'|'javascript'} type
+ * @param {string} url
+ */
+function injectLink(doc, rel, type, url) {
+  const link = doc.createElement('link');
+  link.rel = rel;
+  link.href = url;
+  link.type = `application/annotator+${type}`;
+
+  tagElement(link);
+  doc.head.appendChild(link);
+}
+
+/**
+ * @param {Document} doc
+ * @param {SidebarAppConfig|AnnotatorConfig} config
  * @param {string[]} assets
  */
 function injectAssets(doc, config, assets) {
@@ -74,9 +114,9 @@ function polyfillBundles(needed) {
  * This triggers loading of the necessary resources for the client
  *
  * @param {Document} doc
- * @param {Config} config
+ * @param {AnnotatorConfig} config
  */
-function bootHypothesisClient(doc, config) {
+export function bootHypothesisClient(doc, config) {
   // Detect presence of Hypothesis in the page
   const appLinkEl = doc.querySelector(
     'link[type="application/annotator+html"]'
@@ -88,19 +128,19 @@ function bootHypothesisClient(doc, config) {
   // Register the URL of the sidebar app which the Hypothesis client should load.
   // The <link> tag is also used by browser extensions etc. to detect the
   // presence of the Hypothesis client on the page.
-  const sidebarUrl = doc.createElement('link');
-  sidebarUrl.rel = 'sidebar';
-  sidebarUrl.href = config.sidebarAppUrl;
-  sidebarUrl.type = 'application/annotator+html';
-  doc.head.appendChild(sidebarUrl);
+  injectLink(doc, 'sidebar', 'html', config.sidebarAppUrl);
+
+  // Register the URL of the notebook app which the Hypothesis client should load.
+  injectLink(doc, 'notebook', 'html', config.notebookAppUrl);
 
   // Register the URL of the annotation client which is currently being used to drive
   // annotation interactions.
-  const clientUrl = doc.createElement('link');
-  clientUrl.rel = 'hypothesis-client';
-  clientUrl.href = config.assetRoot + 'build/boot.js';
-  clientUrl.type = 'application/annotator+javascript';
-  doc.head.appendChild(clientUrl);
+  injectLink(
+    doc,
+    'hypothesis-client',
+    'javascript',
+    config.assetRoot + 'build/boot.js'
+  );
 
   const polyfills = polyfillBundles(commonPolyfills);
 
@@ -120,9 +160,9 @@ function bootHypothesisClient(doc, config) {
  * Bootstrap the sidebar application which displays annotations.
  *
  * @param {Document} doc
- * @param {Config} config
+ * @param {SidebarAppConfig} config
  */
-function bootSidebarApp(doc, config) {
+export function bootSidebarApp(doc, config) {
   const polyfills = polyfillBundles(commonPolyfills);
 
   injectAssets(doc, config, [
@@ -139,19 +179,4 @@ function bootSidebarApp(doc, config) {
     'styles/katex.min.css',
     'styles/sidebar.css',
   ]);
-}
-
-/**
- * Initialize the "sidebar" application if run in the sidebar's stub HTML
- * page or the "annotator" application otherwise.
- *
- * @param {Document} document_
- * @param {Config} config
- */
-export default function boot(document_, config) {
-  if (document_.querySelector('hypothesis-app')) {
-    bootSidebarApp(document_, config);
-  } else {
-    bootHypothesisClient(document_, config);
-  }
 }

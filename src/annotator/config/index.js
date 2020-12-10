@@ -39,6 +39,7 @@ export default function configFrom(window_) {
     requestConfigFromFrame: settings.hostPageSetting('requestConfigFromFrame'),
     services: settings.hostPageSetting('services'),
     showHighlights: settings.showHighlights,
+    notebookAppUrl: settings.notebookAppUrl,
     sidebarAppUrl: settings.sidebarAppUrl,
     // Subframe identifier given when a frame is being embedded into
     // by a top level client

@@ -9,6 +9,12 @@
   color: var.$grey-mid;
   background: var.$white;
   height: var.$top-bar-height;
+  @media (pointer: coarse) {
+    // Nov-23-2020: removing 4px is an interim solution to increase the size
+    // of the annotator-bar buttons without affecting the size of the sidebar
+    // https://github.com/hypothesis/client/pull/2745/files#r527824220
+    height: var.$touch-target-size - 4px;
+  }
   position: absolute;
   left: 0;
   right: 0;

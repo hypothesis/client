@@ -4,7 +4,7 @@ import Delegator from './delegator';
 import { Adder } from './adder';
 
 import * as htmlAnchoring from './anchoring/html';
-import { sniff } from './anchoring/range';
+import { TextRange } from './anchoring/text-range';
 import {
   getHighlightsContainingNode,
   highlightRange,
@@ -14,7 +14,7 @@ import {
   setHighlightsVisible,
 } from './highlighter';
 import * as rangeUtil from './range-util';
-import selections from './selections';
+import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
 
 /**
@@ -59,6 +59,26 @@ function annotationsAt(node) {
     .map(h => /** @type {AnnotationHighlight} */ (h)._annotation)
     .filter(ann => ann !== undefined);
   return /** @type {AnnotationData[]} */ (items);
+}
+
+/**
+ * Resolve an anchor's associated document region to a concrete `Range`.
+ *
+ * This may fail if anchoring failed or if the document has been mutated since
+ * the anchor was created in a way that invalidates the anchor.
+ *
+ * @param {Anchor} anchor
+ * @return {Range|null}
+ */
+function resolveAnchor(anchor) {
+  if (!anchor.range) {
+    return null;
+  }
+  try {
+    return anchor.range.toRange();
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -121,14 +141,13 @@ export default class Guest extends Delegator {
         this.selectAnnotations(anns);
       },
     });
-    this.selections = selections(document).subscribe({
-      next: range => {
-        if (range) {
-          this._onSelection(range);
-        } else {
-          this._onClearSelection();
-        }
-      },
+
+    this.selectionObserver = new SelectionObserver(range => {
+      if (range) {
+        this._onSelection(range);
+      } else {
+        this._onClearSelection();
+      }
     });
 
     this.plugins = {};
@@ -302,10 +321,15 @@ export default class Guest extends Delegator {
       for (let anchor of this.anchors) {
         if (anchor.highlights) {
           if (anchor.annotation.$tag === tag) {
+            const range = resolveAnchor(anchor);
+            if (!range) {
+              continue;
+            }
+
             const event = new CustomEvent('scrolltorange', {
               bubbles: true,
               cancelable: true,
-              detail: anchor.range,
+              detail: range,
             });
             const defaultNotPrevented = this.element.dispatchEvent(event);
             if (defaultNotPrevented) {
@@ -329,7 +353,8 @@ export default class Guest extends Delegator {
 
   destroy() {
     this._removeElementEvents();
-    this.selections.unsubscribe();
+
+    this.selectionObserver.disconnect();
     this.adderToolbar.remove();
 
     removeAllHighlights(this.element);
@@ -397,7 +422,12 @@ export default class Guest extends Delegator {
         .then(range => ({
           annotation,
           target,
-          range,
+
+          // Convert the `Range` to a `TextRange` which can be converted back to
+          // a `Range` later. The `TextRange` representation allows for highlights
+          // to be inserted during anchoring other annotations without "breaking"
+          // this anchor.
+          range: TextRange.fromRange(range),
         }))
         .catch(() => ({
           annotation,
@@ -411,13 +441,13 @@ export default class Guest extends Delegator {
      * @param {Anchor} anchor
      */
     const highlight = anchor => {
-      if (!anchor.range) {
+      const range = resolveAnchor(anchor);
+      if (!range) {
         return anchor;
       }
-      const range = sniff(anchor.range);
-      const normedRange = range.normalize(root);
+
       const highlights = /** @type {AnnotationHighlight[]} */ (highlightRange(
-        normedRange
+        range
       ));
       highlights.forEach(h => {
         h._annotation = anchor.annotation;
@@ -480,7 +510,7 @@ export default class Guest extends Delegator {
     }
 
     // Remove all the highlights that have no corresponding target anymore.
-    requestAnimationFrame(() => removeHighlights(deadHighlights));
+    removeHighlights(deadHighlights);
 
     // Anchor any targets of this annotation that are not anchored already.
     for (let target of annotation.target) {
@@ -512,10 +542,8 @@ export default class Guest extends Delegator {
 
     this.anchors = anchors;
 
-    requestAnimationFrame(() => {
-      removeHighlights(unhighlight);
-      this.plugins.BucketBar?.update();
-    });
+    removeHighlights(unhighlight);
+    this.plugins.BucketBar?.update();
   }
 
   /**
