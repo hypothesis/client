@@ -93,7 +93,8 @@ function injectLink(doc, rel, type, url) {
  */
 function injectAssets(doc, config, assets) {
   assets.forEach(function (path) {
-    const url = config.assetRoot + 'build/' + config.manifest[path];
+    // const url = config.assetRoot + 'build/' + config.manifest[path];
+    const url = config.assetRoot + config.manifest[path];
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);
     } else {
@@ -139,7 +140,8 @@ export function bootHypothesisClient(doc, config) {
     doc,
     'hypothesis-client',
     'javascript',
-    config.assetRoot + 'build/boot.js'
+    // config.assetRoot + 'build/boot.js'
+    config.assetRoot + 'boot.js'
   );
 
   const polyfills = polyfillBundles(commonPolyfills);

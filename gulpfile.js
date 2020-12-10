@@ -239,7 +239,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
   } else {
     defaultAssetRoot = '{current_scheme}://{current_host}:3001/hypothesis';
   }
-  defaultAssetRoot = `${defaultAssetRoot}/${version}/`;
+  defaultAssetRoot = `${defaultAssetRoot}/`;
 
   if (isFirstBuild) {
     log(`Sidebar app URL: ${defaultSidebarAppUrl}`);
