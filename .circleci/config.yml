@@ -15,7 +15,7 @@ jobs:
     steps:
       - checkout
       - run: yarn
-      - run: cross-env NODE_ENV=production gulp build
+      - run: NODE_ENV=production gulp build
       - run: sudo apt-get install python-dev
       - run:
           name: Install AWS CLI
