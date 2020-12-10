@@ -235,7 +235,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
   let defaultAssetRoot;
 
   if (process.env.NODE_ENV === 'production' && !usingDevServer) {
-    defaultAssetRoot = 'https://cdn.hypothes.is/hypothesis';
+    defaultAssetRoot = 'https://d18kn4sm9pon1r.cloudfront.net';
   } else {
     defaultAssetRoot = '{current_scheme}://{current_host}:3001/hypothesis';
   }
