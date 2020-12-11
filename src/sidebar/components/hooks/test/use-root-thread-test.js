@@ -15,7 +15,7 @@ describe('sidebar/components/hooks/use-root-thread', () => {
       filterQuery: sinon.stub().returns('itchy'),
       route: sinon.stub().returns('66'),
       selectionState: sinon.stub().returns({ hi: 'there' }),
-      userFilter: sinon.stub().returns('hotspur'),
+      getFilterValues: sinon.stub().returns({ user: 'hotspur' }),
     };
     fakeThreadAnnotations = sinon.stub().returns('fakeThreadAnnotations');
 
