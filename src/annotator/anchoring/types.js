@@ -134,6 +134,11 @@ export class TextPositionAnchor {
 }
 
 /**
+ * @typedef QuoteMatchOptions
+ * @prop {number} [hint] - Expected position of match in text. See `matchQuote`.
+ */
+
+/**
  * Converts between `TextQuoteSelector` selectors and `Range` objects.
  */
 export class TextQuoteAnchor {
@@ -151,6 +156,10 @@ export class TextQuoteAnchor {
   }
 
   /**
+   * Create a `TextQuoteAnchor` from a range.
+   *
+   * Will throw if `range` does not contain any text nodes.
+   *
    * @param {Element} root
    * @param {Range} range
    */
@@ -200,21 +209,16 @@ export class TextQuoteAnchor {
   }
 
   /**
-   * @param {Object} [options]
-   *   @param {number} [options.hint] -
-   *     Offset hint to disambiguate matches
+   * @param {QuoteMatchOptions} [options]
    */
   toRange(options = {}) {
     return this.toPositionAnchor(options).toRange();
   }
 
   /**
-   * @param {Object} [options]
-   *   @param {number} [options.hint] -
-   *     Character offset hint to disambiguate matches.
+   * @param {QuoteMatchOptions} [options]
    */
   toPositionAnchor(options = {}) {
-    // eslint-disable-line no-unused-vars
     const text = /** @type {string} */ (this.root.textContent);
     const match = matchQuote(text, this.exact, {
       ...this.context,
