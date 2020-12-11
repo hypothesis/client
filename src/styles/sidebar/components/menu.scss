@@ -1,3 +1,4 @@
+@use "../../mixins/buttons";
 @use "../../mixins/focus";
 @use "../../mixins/layout";
 @use "../../mixins/molecules";
@@ -10,26 +11,16 @@
 
 // Toggle button that opens the menu.
 .menu__toggle {
-  @include focus.outline-on-keyboard-focus;
+  @include buttons.button--icon-only;
 
   appearance: none;
-  border: none;
   background: none;
   padding: 0;
-  color: inherit;
   // "block" display is needed so it can take up the
   //  full height of its parent container
   display: block;
   height: 100%;
   align-items: center;
-  &:hover {
-    transition: 0.2s ease-out;
-    color: var.$color-text;
-  }
-  &[aria-expanded='true'],
-  &:hover[aria-expanded='true'] {
-    color: var.$color-brand;
-  }
 }
 
 .menu__toggle-wrapper {
@@ -72,6 +63,7 @@
   @include utils.font--large;
   @include utils.border;
   @include utils.shadow;
+  @include focus.outline-on-keyboard-focus;
   background-color: white;
   position: absolute;
   top: calc(100% + 5px);
