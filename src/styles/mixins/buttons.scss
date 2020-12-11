@@ -34,7 +34,6 @@
 @mixin button-hover {
   &:hover:not([disabled]),
   &:focus:not([disabled]) {
-    transition: 0.2s ease-out;
     color: var.$grey-7;
   }
 }
@@ -48,6 +47,8 @@
   padding: 0.5em;
   border-radius: var.$border-radius;
   border: none;
+  transition: color 0.2s ease-out, background-color 0.2s ease-out,
+    opacity 0.2s ease-out;
 
   // Icon
   svg {
