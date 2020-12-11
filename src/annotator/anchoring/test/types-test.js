@@ -250,7 +250,7 @@ describe('annotator/anchoring/types', () => {
     }
 
     describe('#fromRange', () => {
-      it('returns a TextQuoteAnchor instance', () => {
+      it('returns expected TextQuoteAnchor', () => {
         const quote = 'our fathers';
         const text = container.textContent;
         const pos = text.indexOf(quote);
@@ -272,14 +272,22 @@ describe('annotator/anchoring/types', () => {
     });
 
     describe('#fromSelector', () => {
-      it('returns a TextQuoteAnchor instance', () => {
-        const anchor = TextQuoteAnchor.fromSelector(container, {
+      it('returns expected TextQuoteAnchor', () => {
+        const selector = {
           type: 'TextQuoteSelector',
           exact: 'Liberty',
           prefix: 'a new nation, conceived in ',
           suffix: ', and dedicated to the proposition that',
-        });
+        };
+
+        const anchor = TextQuoteAnchor.fromSelector(container, selector);
+
         assert.instanceOf(anchor, TextQuoteAnchor);
+        assert.equal(anchor.exact, selector.exact);
+        assert.deepEqual(anchor.context, {
+          prefix: selector.prefix,
+          suffix: selector.suffix,
+        });
       });
     });
 
@@ -296,14 +304,38 @@ describe('annotator/anchoring/types', () => {
     });
 
     describe('#toRange', () => {
-      it('returns a valid DOM Range', () => {
-        $imports.$restore({
-          './match-quote': true,
+      it('calls `matchQuote` with expected arguments', () => {
+        fakeMatchQuote.returns({
+          start: 10,
+          end: 20,
+          score: 1.0,
+        });
+        const quoteAnchor = new TextQuoteAnchor(container, 'Liberty', {
+          prefix: 'expected-prefix',
+          suffix: 'expected-suffix',
+        });
+
+        quoteAnchor.toRange({ hint: 42 });
+
+        assert.calledWith(fakeMatchQuote, container.textContent, 'Liberty', {
+          hint: 42,
+          prefix: 'expected-prefix',
+          suffix: 'expected-suffix',
+        });
+      });
+
+      it('returns `Range` representing match found by `matchQuote`', () => {
+        fakeMatchQuote.returns({
+          start: 10,
+          end: 20,
+          score: 1.0,
         });
         const quoteAnchor = new TextQuoteAnchor(container, 'Liberty');
+
         const range = quoteAnchor.toRange();
+
         assert.instanceOf(range, Range);
-        assert.equal(range.toString(), 'Liberty');
+        assert.equal(range.toString(), container.textContent.slice(10, 20));
       });
 
       it('throws if the quote is not found', () => {
@@ -314,31 +346,33 @@ describe('annotator/anchoring/types', () => {
         );
         assert.throws(() => {
           quoteAnchor.toRange();
-        });
+        }, 'Quote not found');
       });
     });
 
     describe('#toPositionAnchor', () => {
-      it('returns a TextPositionAnchor instance', () => {
-        $imports.$restore({
-          './match-quote': true,
+      it('returns expected TextPositionAnchor', () => {
+        fakeMatchQuote.returns({
+          start: 10,
+          end: 100,
+          score: 1.0,
         });
         const quoteAnchor = new TextQuoteAnchor(container, 'Liberty');
+
         const pos = quoteAnchor.toPositionAnchor();
-        assert.instanceOf(pos, TextPositionAnchor);
+
+        assert.deepEqual(pos, new TextPositionAnchor(container, 10, 100));
       });
 
       it('throws if the quote is not found', () => {
-        $imports.$restore({
-          './match-quote': true,
-        });
+        fakeMatchQuote.returns(null);
         const quoteAnchor = new TextQuoteAnchor(
           container,
-          'some are more equal than others'
+          'five score and nine years ago'
         );
         assert.throws(() => {
           quoteAnchor.toPositionAnchor();
-        });
+        }, 'Quote not found');
       });
     });
 
@@ -353,6 +387,7 @@ describe('annotator/anchoring/types', () => {
         const range = document.createRange();
         range.setStart(container.firstChild, 0);
         range.setEnd(container.firstChild, 4);
+
         const anchor = TextQuoteAnchor.fromRange(container, range);
         assert.deepEqual(anchor.toSelector(), {
           type: 'TextQuoteSelector',
@@ -360,6 +395,7 @@ describe('annotator/anchoring/types', () => {
           suffix: ' score and seven years ago our f',
           exact: 'Four',
         });
+
         const newRange = anchor.toRange();
         assert.equal(newRange.toString(), 'Four');
       });
