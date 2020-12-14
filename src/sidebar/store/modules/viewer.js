@@ -1,5 +1,7 @@
 import * as util from '../util';
 
+import { storeModule } from '../create-store';
+
 /**
  * This module defines actions and state related to the display mode of the
  * sidebar.
@@ -53,18 +55,7 @@ function hasSidebarOpened(state) {
   return state.sidebarHasOpened;
 }
 
-/**
- * @typedef ViewerStore
- *
- * // Actions
- * @prop {typeof setShowHighlights} setShowHighlights
- * @prop {typeof setSidebarOpened} setSidebarOpened
- *
- * // Selectors
- * @prop {() => boolean} hasSidebarOpened
- */
-
-export default {
+export default storeModule({
   init: init,
   namespace: 'viewer',
   update: update,
@@ -75,4 +66,4 @@ export default {
   selectors: {
     hasSidebarOpened,
   },
-};
+});

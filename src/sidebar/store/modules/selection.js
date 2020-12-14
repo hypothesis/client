@@ -22,6 +22,7 @@ import uiConstants from '../../ui-constants';
 import * as metadata from '../../util/annotation-metadata';
 import { countIf, trueKeys, toTrueMap } from '../../util/collections';
 import * as util from '../util';
+import { storeModule } from '../create-store';
 
 /**
  * Default sort keys for each tab.
@@ -376,31 +377,7 @@ const sortKeys = createSelector(
   }
 );
 
-/**
- * @typedef SelectionStore
- *
- * // Actions
- * @prop {typeof clearSelection} clearSelection
- * @prop {typeof selectAnnotations} selectAnnotations
- * @prop {typeof selectTab} selectTab
- * @prop {typeof setExpanded} setExpanded
- * @prop {typeof setForcedVisible} setForcedVisible
- * @prop {typeof setSortKey} setSortKey
- * @prop {typeof toggleSelectedAnnotations} toggleSelectedAnnotations
- *
- * // Selectors
- * @prop {() => Object<string,boolean>} expandedMap
- * @prop {() => string[]} forcedVisibleAnnotations
- * @prop {() => boolean} hasSelectedAnnotations
- * @prop {() => string[]} selectedAnnotations
- * @prop {() => string} selectedTab
- * @prop {() => SelectionState} selectionState
- * @prop {() => string} sortKey
- * @prop {() => string[]} sortKeys
- *
- */
-
-export default {
+export default storeModule({
   init: init,
   namespace: 'selection',
   update: update,
@@ -425,4 +402,4 @@ export default {
     sortKey,
     sortKeys,
   },
-};
+});

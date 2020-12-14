@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { actionTypes } from '../util';
+import { storeModule } from '../create-store';
 
 /**
  * Manage state pertaining to the filtering of annotations in the UI.
@@ -270,25 +271,7 @@ function hasAppliedFilter(state) {
   return !!(state.query || Object.keys(getFilters(state)).length);
 }
 
-/**
- * @typedef FiltersStore
- *
- * // Actions
- * @prop {typeof changeFocusModeUser} changeFocusModeUser
- * @prop {typeof setFilter} setFilter
- * @prop {typeof setFilterQuery} setFilterQuery
- * @prop {typeof toggleFocusMode} toggleFocusMode
- *
- * // Selectors
- * @prop {() => string|null} filterQuery
- * @prop {() => FocusState} focusState
- * @prop {(filterName: string) => FilterOption|undefined} getFilter
- * @prop {() => Object<string,FilterOption>} getFilters
- * @prop {() => Object<string,string>} getFilterValues
- * @prop {() => boolean} hasAppliedFilter
- */
-
-export default {
+export default storeModule({
   init,
   namespace: 'filters',
   update,
@@ -306,4 +289,4 @@ export default {
     getFilterValues,
     hasAppliedFilter,
   },
-};
+});

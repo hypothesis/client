@@ -4,6 +4,7 @@
  */
 
 import { actionTypes } from '../util';
+import { storeModule } from '../create-store';
 
 function init() {
   return {
@@ -169,25 +170,7 @@ function isSavingAnnotation(state, annotation) {
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
-/**
- * @typedef ActivityStore
- *
- * // Actions
- * @prop {typeof annotationFetchStarted} annotationFetchStarted
- * @prop {typeof annotationFetchFinished} annotationFetchFinished
- * @prop {typeof annotationSaveStarted} annotationSaveStarted
- * @prop {typeof annotationSaveFinished} annotationSaveFinished
- * @prop {typeof apiRequestStarted} apiRequestStarted
- * @prop {typeof apiRequestFinished} apiRequestFinished
- *
- * // Selectors
- * @prop {() => boolean} hasFetchedAnnotations
- * @prop {() => boolean} isLoading
- * @prop {() => boolean} isFetchingAnnotations
- * @prop {(a: Annotation) => boolean} isSavingAnnotation
- */
-
-export default {
+export default storeModule({
   init,
   update,
   namespace: 'activity',
@@ -207,4 +190,4 @@ export default {
     isFetchingAnnotations,
     isSavingAnnotation,
   },
-};
+});
