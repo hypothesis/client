@@ -2,6 +2,7 @@ import { createSelector } from 'reselect';
 
 import * as metadata from '../../util/annotation-metadata';
 import * as util from '../util';
+import { storeModule } from '../create-store';
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
@@ -98,7 +99,7 @@ function createDraft(annotation, changes) {
  */
 
 function deleteNewAndEmptyDrafts() {
-  const { default: annotations } = require('./annotations');
+  const { removeAnnotations } = require('./annotations');
 
   return (dispatch, getState) => {
     const newDrafts = getState().drafts.filter(draft => {
@@ -111,7 +112,7 @@ function deleteNewAndEmptyDrafts() {
       dispatch(removeDraft(draft.annotation));
       return draft.annotation;
     });
-    dispatch(annotations.actions.removeAnnotations(removedAnnotations));
+    dispatch(removeAnnotations(removedAnnotations));
   };
 }
 
@@ -187,23 +188,7 @@ const unsavedAnnotations = createSelector(
   drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );
 
-/**
- * @typedef DraftsStore
- *
- * // Actions
- * @prop {typeof createDraft} createDraft
- * @prop {typeof deleteNewAndEmptyDrafts} deleteNewAndEmptyDrafts
- * @prop {typeof discardAllDrafts} discardAllDrafts
- * @prop {typeof removeDraft} removeDraft
- *
- * // Selectors
- * @prop {() => number} countDrafts
- * @prop {(a: Annotation) => Draft|null} getDraft
- * @prop {(a: Annotation) => Draft|null} getDraftIfNotEmpty
- * @prop {() => Annotation[]} unsavedAnnotations
- */
-
-export default {
+export default storeModule({
   init,
   namespace: 'drafts',
   update,
@@ -220,4 +205,4 @@ export default {
     getDraftIfNotEmpty,
     unsavedAnnotations,
   },
-};
+});

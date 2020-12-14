@@ -8,6 +8,85 @@ import immutable from '../util/immutable';
 import { createReducer, bindSelectors } from './util';
 
 /**
+ * Helper that strips the first argument from a function type.
+ *
+ * @template F
+ * @typedef {F extends (x: any, ...args: infer P) => infer R ? (...args: P) => R : never} OmitFirstArg
+ */
+
+/**
+ * Helper that converts an object of selector functions, which take a `state`
+ * parameter plus zero or more arguments, into selector methods, with no `state` parameter.
+ *
+ * @template T
+ * @typedef {{ [K in keyof T]: OmitFirstArg<T[K]> }} SelectorMethods
+ */
+
+/**
+ * Map of action name to reducer function.
+ *
+ * @template State
+ * @typedef {{ [action: string]: (s: State, action: any) => Partial<State> }} Reducers
+ */
+
+/**
+ * Configuration for a store module.
+ *
+ * @template State
+ * @template {object} Actions
+ * @template {object} Selectors
+ * @template {object} RootSelectors
+ * @typedef Module
+ * @prop {(...args: any[]) => State} init -
+ *   Function that returns the initial state for the module
+ * @prop {string} namespace -
+ *   The key under which this module's state will live in the store's root state
+ * @prop {Reducers<State>} update -
+ *   Map of action types to "reducer" functions that process an action and return
+ *   the changes to the state
+ * @prop {Actions} actions
+ *   Object containing action creator functions
+ * @prop {Selectors} selectors
+ *   Object containing selector functions
+ * @prop {RootSelectors} [rootSelectors]
+ */
+
+/**
+ * Replace a type `T` with `Fallback` if `T` is `any`.
+ *
+ * Based on https://stackoverflow.com/a/61626123/434243.
+ *
+ * @template T
+ * @template Fallback
+ * @typedef {0 extends (1 & T) ? Fallback : T} DefaultIfAny
+ */
+
+/**
+ * Helper for getting the type of store produced by `createStore` when
+ * passed a given module.
+ *
+ * To get the type for a store created from several modules, use `&`:
+ *
+ * `StoreFromModule<firstModule> & StoreFromModule<secondModule>`
+ *
+ * @template T
+ * @typedef {T extends Module<any, infer Actions, infer Selectors, infer RootSelectors> ?
+ *   Store<Actions,Selectors,DefaultIfAny<RootSelectors,{}>> : never} StoreFromModule
+ */
+
+/**
+ * Redux store augmented with methods to dispatch actions and select state.
+ *
+ * @template {object} Actions
+ * @template {object} Selectors
+ * @template {object} RootSelectors
+ * @typedef {redux.Store &
+ *   Actions &
+ *   SelectorMethods<Selectors> &
+ *   SelectorMethods<RootSelectors>} Store
+ */
+
+/**
  * Create a Redux store from a set of _modules_.
  *
  * Each module defines the logic related to a particular piece of the application
@@ -22,9 +101,10 @@ import { createReducer, bindSelectors } from './util';
  * each action and selector from the input modules as a method which operates on
  * the store.
  *
- * @param {Object[]} modules
+ * @param {Module<any,any,any,any>[]} modules
  * @param {any[]} [initArgs] - Arguments to pass to each state module's `init` function
  * @param {any[]} [middleware] - List of additional Redux middlewares to use
+ * @return Store<any,any,any>
  */
 export default function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
@@ -89,4 +169,22 @@ export default function createStore(modules, initArgs = [], middleware = []) {
   Object.assign(store, boundActions, boundSelectors);
 
   return store;
+}
+
+/**
+ * Helper to validate a store module configuration before it is passed to
+ * `createStore`.
+ *
+ * @template State
+ * @template Actions
+ * @template Selectors
+ * @template RootSelectors
+ * @param {Module<State,Actions,Selectors,RootSelectors>} config
+ * @return {Module<State,Actions,Selectors,RootSelectors>}
+ */
+export function storeModule(config) {
+  // This helper doesn't currently do anything at runtime. It does ensure more
+  // helpful error messages when typechecking if there is something incorrect
+  // in the configuration.
+  return config;
 }

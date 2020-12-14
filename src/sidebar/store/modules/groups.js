@@ -1,6 +1,7 @@
 import { createSelector } from 'reselect';
 
 import * as util from '../util';
+import { storeModule } from '../create-store';
 
 import session from './session';
 
@@ -196,28 +197,7 @@ const getCurrentlyViewingGroups = createSelector(
   }
 );
 
-/**
- * @typedef GroupsStore
- *
- * // Actions
- * @prop {typeof focusGroup} focusGroup
- * @prop {typeof loadGroups} loadGroups
- * @prop {typeof clearGroups} clearGroups
- *
- * // Selectors
- * @prop {() => Group[]} allGroups
- * @prop {() => Group|undefined|null} focusedGroup
- * @prop {() => string|null} focusedGroupId
- * @prop {() => Group[]} getFeaturedGroups
- * @prop {(id: string) => Group|undefined} getGroup
- * @prop {() => Group[]} getInScopeGroups
- *
- * // Root selectors
- * @prop {() => Group[]} getCurrentlyViewingGroups,
- * @prop {() => Group[]} getMyGroups,
- */
-
-export default {
+export default storeModule({
   init,
   namespace: 'groups',
   update,
@@ -238,4 +218,4 @@ export default {
     getCurrentlyViewingGroups,
     getMyGroups,
   },
-};
+});

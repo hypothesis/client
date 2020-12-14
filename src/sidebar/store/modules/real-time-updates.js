@@ -9,6 +9,7 @@
 
 import { createSelector } from 'reselect';
 
+import { storeModule } from '../create-store';
 import { actionTypes } from '../util';
 
 import annotations from './annotations';
@@ -182,21 +183,7 @@ function hasPendingDeletion(state, id) {
   return state.pendingDeletions.hasOwnProperty(id);
 }
 
-/**
- * @typedef RealTimeUpdatesStore
- *
- * // Actions
- * @prop {typeof receiveRealTimeUpdates} receiveRealTimeUpdates
- * @prop {typeof clearPendingUpdates} clearPendingUpdates
- *
- * // Selectors
- * @prop {() => boolean} hasPendingDeletion
- * @prop {() => Object.<string, boolean>} pendingDeletions
- * @prop {() => Object.<string, Annotation>} pendingUpdates
- * @prop {() => number} pendingUpdateCount
- */
-
-export default {
+export default storeModule({
   init,
   namespace: 'realTimeUpdates',
   update,
@@ -210,4 +197,4 @@ export default {
     pendingUpdates,
     pendingUpdateCount,
   },
-};
+});
