@@ -23,6 +23,11 @@
   // To allow absolute menu alignment
   position: relative;
 
+  // Necessary to truncate the text in the primary button
+  // https://css-tricks.com/flexbox-truncated-text/
+  min-width: 0;
+  flex-shrink: 2;
+
   // Align the menu (upward) arrow correctly with the ▼ in the menu label icon
   // Note the extra `&` needed for specificity against `Menu`'s own arrow styling
   & &__menu-arrow {
@@ -39,6 +44,12 @@
   &__primary {
     @include buttons.button--primary;
     padding: var.$layout-space--small;
+
+    // Necessary to truncate the text in the button
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     // Turn off right-side border radius for alignment with the right side of
     // the control

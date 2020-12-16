@@ -146,7 +146,7 @@ function AnnotationEditor({
         onTagInput={setPendingTag}
         tagList={tags}
       />
-      <div className="annotation__form-actions u-layout-row">
+      <div className="annotation__form-actions">
         <AnnotationPublishControl
           annotation={annotation}
           isDisabled={isEmpty}
