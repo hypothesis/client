@@ -1,5 +1,5 @@
 import { createElement } from 'preact';
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 
@@ -27,6 +27,11 @@ function getScrollContainer() {
   return container;
 }
 
+/** @param {number} pos */
+function roundScrollPosition(pos) {
+  return Math.max(pos - (pos % SCROLL_PRECISION), 0);
+}
+
 /**
  * @typedef ThreadListProps
  * @prop {Thread} thread
@@ -46,16 +51,20 @@ function getScrollContainer() {
 function ThreadList({ thread }) {
   // Height of the visible area of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(
-    getScrollContainer().clientHeight
+    window.innerHeight
   );
 
   // Scroll offset of scroll container. This is updated after the scroll
   // container is scrolled, with debouncing to limit update frequency.
   // These values are in multiples of `SCROLL_PRECISION` to optimize
   // for performance.
-  const [scrollPosition, setScrollPosition] = useState(
-    getScrollContainer().scrollTop
-  );
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  useLayoutEffect(() => {
+    const scrollContainer = getScrollContainer();
+    setScrollContainerHeight(scrollContainer.clientHeight);
+    setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
+  }, []);
 
   // Map of thread ID to measured height of thread.
   const [threadHeights, setThreadHeights] = useState({});
@@ -145,14 +154,8 @@ function ThreadList({ thread }) {
 
     const updateScrollPosition = debounce(
       () => {
-        const exactScrollPosition = scrollContainer.scrollTop;
-        // Get scroll position to the nearest `SCROLL_PRECISION` multiple
-        const roundedScrollPosition = Math.max(
-          exactScrollPosition - (exactScrollPosition % SCROLL_PRECISION),
-          0
-        );
         setScrollContainerHeight(scrollContainer.clientHeight);
-        setScrollPosition(roundedScrollPosition);
+        setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
       },
       10,
       { maxWait: 100 }
