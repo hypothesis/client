@@ -239,9 +239,9 @@ describe('ThreadList', () => {
       const wrapper = createComponent();
       const renderedThreads = wrapper.find('ThreadCard');
 
-      // "5" is the current expected value given the thread heights, scroll
+      // "7" is the current expected value given the thread heights, scroll
       // container size and constants in `../util/visible-threads`.
-      assert.equal(renderedThreads.length, 5);
+      assert.equal(renderedThreads.length, 7);
     });
 
     it('updates thread heights as the list is scrolled', () => {
