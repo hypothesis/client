@@ -6,7 +6,7 @@ import { withServices } from '../util/service-context';
 
 import AutocompleteList from './autocomplete-list';
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 import useElementShouldClose from './hooks/use-element-should-close';
 
 /** @typedef {import("preact").JSX.Element} JSXElement */

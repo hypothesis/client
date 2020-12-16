@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 import MenuKeyboardNavigation from './menu-keyboard-navigation';
 import Slider from './slider';
 

@@ -6,7 +6,7 @@ import propTypes from 'prop-types';
 import useElementShouldClose from './hooks/use-element-should-close';
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 import MenuKeyboardNavigation from './menu-keyboard-navigation';
 
 // The triangular indicator below the menu toggle button that visually links it

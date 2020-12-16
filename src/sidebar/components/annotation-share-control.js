@@ -9,7 +9,7 @@ import { withServices } from '../util/service-context';
 import Button from './button';
 import useElementShouldClose from './hooks/use-element-should-close';
 import ShareLinks from './share-links';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 import { isIOS } from '../../shared/user-agent';
 
 /**

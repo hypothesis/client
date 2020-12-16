@@ -7,7 +7,7 @@ import { useStoreProxy } from '../store/use-store';
 
 import Button from './button';
 import Slider from './slider';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @typedef SidebarPanelProps

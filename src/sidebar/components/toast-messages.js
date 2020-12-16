@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @typedef {import('../store/modules/toast-messages').ToastMessage} ToastMessage

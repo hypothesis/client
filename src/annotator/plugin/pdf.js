@@ -6,7 +6,7 @@ import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
 
 import PDFMetadata from './pdf-metadata';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor

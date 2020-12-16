@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import { withServices } from '../util/service-context';
 
 import Button from './button';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /** @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter */
 

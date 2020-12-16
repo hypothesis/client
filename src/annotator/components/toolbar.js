@@ -1,7 +1,7 @@
 import propTypes from 'prop-types';
 import { createElement } from 'preact';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @param {Object} props

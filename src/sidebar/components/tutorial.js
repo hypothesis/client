@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import isThirdPartyService from '../util/is-third-party-service';
 import { withServices } from '../util/service-context';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * Subcomponent: an "instruction" within the tutorial step that includes an

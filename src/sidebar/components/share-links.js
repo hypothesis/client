@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * A single sharing link as a list item

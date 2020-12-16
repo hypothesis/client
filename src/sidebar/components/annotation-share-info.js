@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 import { isPrivate } from '../util/permissions';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @typedef {import("../../types/api").Annotation} Annotation

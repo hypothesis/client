@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Load icons.
-import { registerIcons } from '../shared/components/svg-icon';
+import { registerIcons } from 'frontend-shared/components/svg-icon';
 import iconSet from './icons';
 registerIcons(iconSet);
 

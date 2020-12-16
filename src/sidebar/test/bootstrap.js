@@ -18,7 +18,7 @@ configure({ adapter: new Adapter() });
 // `SvgIcon`.
 import sidebarIcons from '../icons';
 import annotatorIcons from '../../annotator/icons';
-import { registerIcons } from '../../shared/components/svg-icon';
+import { registerIcons } from 'frontend-shared/components/svg-icon';
 registerIcons({
   ...sidebarIcons,
   ...annotatorIcons,

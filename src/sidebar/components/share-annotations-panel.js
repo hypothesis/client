@@ -9,7 +9,7 @@ import { withServices } from '../util/service-context';
 import Button from './button';
 import ShareLinks from './share-links';
 import SidebarPanel from './sidebar-panel';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @typedef ShareAnnotationsPanelProps

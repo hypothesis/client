@@ -54,7 +54,7 @@ if (process.env.RUNNING_IN_DOCKER) {
 }
 
 module.exports = function (config) {
-  let testFiles = ['**/test/*-test.js', '**/integration/*-test.js'];
+  let testFiles = ['**/test/*-test.js', '**/integration/*-test.js', '../frontend-shared/**/test/*-test.js'];
 
   if (config.grep) {
     const allFiles = testFiles

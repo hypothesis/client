@@ -7,7 +7,7 @@ import uiConstants from '../ui-constants';
 import { withServices } from '../util/service-context';
 
 import NewNoteBtn from './new-note-btn';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @typedef {import('../../types/config').MergedConfig} MergedConfig

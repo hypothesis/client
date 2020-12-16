@@ -10,7 +10,7 @@ import { applyTheme } from '../util/theme';
 import Button from './button';
 import Menu from './menu';
 import MenuItem from './menu-item';
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from 'frontend-shared/components/svg-icon';
 
 /**
  * @typedef {import('../../types/api').Annotation} Annotation

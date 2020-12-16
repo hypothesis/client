@@ -93,7 +93,7 @@ function setupFrameSync(frameSync, isSidebar) {
 }
 
 // Register icons used by the sidebar app (and maybe other assets in future).
-import { registerIcons } from '../shared/components/svg-icon';
+import { registerIcons } from 'frontend-shared/components/svg-icon';
 import iconSet from './icons';
 registerIcons(iconSet);
 
