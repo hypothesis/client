@@ -250,12 +250,11 @@ function getFilter(state, filterName) {
 
 /**
  * Retrieve the (string) values of all currently-applied filters.
- *
- * @return {Object<string,string>}
  */
 const getFilterValues = createSelector(
   state => getFilters(state),
   allFilters => {
+    /** @type {Object.<string,string>} */
     const filterValues = {};
     Object.keys(allFilters).forEach(
       filterKey => (filterValues[filterKey] = allFilters[filterKey].value)
