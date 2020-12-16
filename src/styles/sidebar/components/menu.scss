@@ -21,14 +21,17 @@
   display: block;
   height: 100%;
   align-items: center;
+
+  // nb. This selector is nested to ensure it has higher specificity than the
+  // default icon size set by the `buttons.button--icon-only` mixin above.
+  .menu__toggle-icon {
+    @include utils.icon--xsmall;
+  }
 }
 
 .menu__toggle-wrapper {
   @include layout.row($align: center);
   height: 100%;
-}
-.menu__toggle-icon {
-  @include utils.icon--xsmall;
 }
 
 // Triangular indicator next to the toggle button indicating that there is
