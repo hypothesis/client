@@ -51,6 +51,7 @@ describe('SidebarView', () => {
       focusedGroupId: sinon.stub(),
       hasAppliedFilter: sinon.stub(),
       hasFetchedAnnotations: sinon.stub(),
+      hasFetchedProfile: sinon.stub().returns(true),
       hasSelectedAnnotations: sinon.stub(),
       hasSidebarOpened: sinon.stub(),
       isLoading: sinon.stub().returns(false),
