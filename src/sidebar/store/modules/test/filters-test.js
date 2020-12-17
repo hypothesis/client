@@ -74,6 +74,26 @@ describe('sidebar/store/modules/filters', () => {
         assert.isUndefined(filters.whatever);
       });
 
+      it('disables focus mode if there is a conflicting filter key', () => {
+        store = createStore(
+          [filters],
+          [{ focus: { user: { username: 'somebody' } } }]
+        );
+
+        assert.isTrue(store.focusState().active);
+
+        // No conflict in focusFilters on `elephant`
+        store.setFilter('elephant', {
+          value: 'pink',
+          display: 'Pink Elephant',
+        });
+
+        assert.isTrue(store.focusState().active);
+
+        store.setFilter('user', { value: '', display: 'Everybody' });
+        assert.isFalse(store.focusState().active);
+      });
+
       it('replaces pre-existing filter with the same key', () => {
         store.setFilter('whatever', {
           value: 'anyOldThing',
@@ -248,6 +268,27 @@ describe('sidebar/store/modules/filters', () => {
         const filterValues = store.getFilterValues();
 
         assert.equal(filterValues.user, 'filbert');
+      });
+    });
+
+    describe('getFocusFilters', () => {
+      it('returns any set focus filters', () => {
+        store = createStore(
+          [filters],
+          [
+            {
+              focus: {
+                user: { username: 'somebody', displayName: 'Ding Bat' },
+              },
+            },
+          ]
+        );
+        const focusFilters = store.getFocusFilters();
+        assert.exists(focusFilters.user);
+        assert.deepEqual(focusFilters.user, {
+          value: 'somebody',
+          display: 'Ding Bat',
+        });
       });
     });
 
