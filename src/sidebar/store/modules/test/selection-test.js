@@ -159,6 +159,18 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
+  describe('SET_FILTER', () => {
+    it('clears selection', () => {
+      store.selectAnnotations([1, 2, 3]);
+      store.setForcedVisible(2, true);
+
+      store.setFilter('user', { value: 'dingbat', display: 'Ding Bat' });
+
+      assert.isEmpty(store.selectedAnnotations());
+      assert.isEmpty(store.forcedVisibleAnnotations());
+    });
+  });
+
   describe('SET_FILTER_QUERY', () => {
     it('clears selection', () => {
       store.selectAnnotations([1, 2, 3]);
