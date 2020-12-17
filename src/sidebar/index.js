@@ -52,9 +52,9 @@ function setupApi(api, streamer) {
  */
 // @inject
 function setupRoute(groups, session, router) {
-  Promise.all([groups.load(), session.load()]).finally(() => {
-    router.sync();
-  });
+  groups.load();
+  session.load();
+  router.sync();
 }
 
 /**
