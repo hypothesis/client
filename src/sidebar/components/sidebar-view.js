@@ -123,11 +123,12 @@ function SidebarView({
   ]);
 
   // Connect to the streamer when the sidebar has opened or if user is logged in
+  const hasFetchedProfile = store.hasFetchedProfile();
   useEffect(() => {
-    if (sidebarHasOpened || isLoggedIn) {
+    if (hasFetchedProfile && (sidebarHasOpened || isLoggedIn)) {
       streamer.connect();
     }
-  }, [streamer, sidebarHasOpened, isLoggedIn]);
+  }, [hasFetchedProfile, isLoggedIn, sidebarHasOpened, streamer]);
 
   return (
     <div>
