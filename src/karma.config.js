@@ -54,7 +54,11 @@ if (process.env.RUNNING_IN_DOCKER) {
 }
 
 module.exports = function (config) {
-  let testFiles = ['**/test/*-test.js', '**/integration/*-test.js'];
+  let testFiles = [
+    '**/test/*-test.js',
+    '**/integration/*-test.js',
+    '../frontend-shared/**/test/*-test.js',
+  ];
 
   if (config.grep) {
     const allFiles = testFiles
@@ -109,6 +113,7 @@ module.exports = function (config) {
       './boot/polyfills/*.js': ['browserify'],
       './sidebar/test/bootstrap.js': ['browserify'],
       '**/*-test.js': ['browserify'],
+      '../frontend-shared/**/*-test.js': ['browserify'],
       '**/*-it.js': ['browserify'],
     },
 
@@ -118,6 +123,15 @@ module.exports = function (config) {
         [
           'babelify',
           {
+            presets: [
+              '@babel/preset-env',
+              [
+                '@babel/preset-react',
+                {
+                  pragma: 'createElement',
+                },
+              ],
+            ],
             extensions: ['.js'],
             plugins: [
               'mockable-imports',

@@ -23,6 +23,16 @@
             }]
           ]
         }
+      ], [
+        "stringify",
+        {
+          "appliesTo": {
+            "includeExtensions": [
+              ".html",
+              ".svg"
+            ]
+          }
+        }
       ]
     ]
   }
