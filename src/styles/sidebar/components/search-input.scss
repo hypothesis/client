@@ -10,6 +10,7 @@
 
 .search-input__icon-button {
   order: 0;
+  background-color: #ffffff !important;
 }
 
 .search-input__input {
@@ -39,7 +40,7 @@
   // on the search icon) or when `is-expanded` is applied.
   &:focus,
   &.is-expanded {
-    max-width: 150px;
+    max-width: 145px;
     padding-left: 6px;
   }
 }

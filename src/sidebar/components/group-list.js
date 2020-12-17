@@ -89,7 +89,7 @@ function GroupList({ serviceUrl, settings }) {
         {icon && (
           <img className="group-list__menu-icon" src={icon} alt={altName} />
         )}
-        {focusedGroup.name}
+        <div className="group-list__menu-title">{focusedGroup.name}</div>
       </span>
     );
   } else {

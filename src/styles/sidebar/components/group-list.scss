@@ -11,9 +11,10 @@
   color: var.$color-text;
   display: flex;
 
-  // Prevent label from wrapping if top bar is too narrow to fit all of its
-  // items.
-  flex-shrink: 0;
+  // Allow to shrink and truncate the menu-title
+  flex-shrink: 1;
+  min-width: 0;
+
   font-weight: bold;
 }
 
@@ -25,4 +26,12 @@
   // better with the text.
   position: relative;
   top: 1px;
+}
+
+.group-list__menu-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  // Prevent label from wrapping if top bar is too narrow to fit all of its
+  // items.
+  white-space: nowrap;
 }
