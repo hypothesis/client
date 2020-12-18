@@ -100,6 +100,16 @@ describe('SidebarView', () => {
       assert.calledOnce(fakeStore.clearSelection);
     });
 
+    it('does not clear selected annotations when group ID is first set on startup', () => {
+      fakeStore.focusedGroupId.returns(null);
+      wrapper = createComponent();
+      fakeStore.focusedGroupId.returns('foobar');
+
+      wrapper.setProps({});
+
+      assert.notCalled(fakeStore.clearSelection);
+    });
+
     it('loads annotations when searchURIs change', () => {
       fakeStore.searchUris.returns(['abandon-ship']);
       wrapper.setProps({});
