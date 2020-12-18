@@ -10,6 +10,7 @@
     'results'
     'items';
 
+  /* TODO: find a better place for these heading styles */
   h1 {
     display: inline;
     font-size: var.$font-size--heading;
@@ -28,6 +29,10 @@
     font-weight: bold;
   }
 
+  &__filters {
+    grid-area: filters;
+  }
+
   &__results {
     grid-area: results;
   }
@@ -38,13 +43,16 @@
 
   @include responsive.tablet-and-up {
     grid-template-areas:
-      'heading results'
+      'heading heading'
+      'filters results'
       'items items';
 
+    &__filters {
+      justify-self: start;
+    }
+
     &__results {
-      // Right-aligned when sharing a row with the heading
-      text-align: right;
-      align-self: end;
+      justify-self: end;
     }
   }
 }

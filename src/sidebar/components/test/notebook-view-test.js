@@ -68,5 +68,9 @@ describe('NotebookView', () => {
     const wrapper = createComponent();
     assert.isTrue(wrapper.find('NotebookResultCount').exists());
   });
+
+  it('renders filters', () => {
+    const wrapper = createComponent();
+    assert.isTrue(wrapper.find('NotebookFilters').exists());
   });
 });
