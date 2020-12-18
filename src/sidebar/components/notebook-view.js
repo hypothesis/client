@@ -6,6 +6,7 @@ import { withServices } from '../util/service-context';
 import useRootThread from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
 
+import NotebookFilters from './notebook-filters';
 import NotebookResultCount from './notebook-result-count';
 import ThreadList from './thread-list';
 
@@ -44,6 +45,9 @@ function NotebookView({ loadAnnotationsService }) {
       <header className="notebook-view__heading">
         <h1>{groupName}</h1>
       </header>
+      <div className="notebook-view__filters">
+        <NotebookFilters />
+      </div>
       <div className="notebook-view__results">
         <NotebookResultCount />
       </div>
