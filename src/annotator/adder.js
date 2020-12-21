@@ -1,6 +1,7 @@
 import { createElement, render } from 'preact';
 
 import AdderToolbar from './components/adder-toolbar';
+import { isTouchDevice } from '../shared/user-agent';
 import { createShadowRoot } from './util/shadow-root';
 
 /**
@@ -180,9 +181,12 @@ export class Adder {
     // Set the initial arrow direction based on whether the selection was made
     // forwards/upwards or downwards/backwards.
     /** @type {ArrowDirection} */ let arrowDirection;
-    if (isRTLselection) {
+    if (isRTLselection && !isTouchDevice()) {
       arrowDirection = ARROW_POINTING_DOWN;
     } else {
+      // Render the adder below the selection for touch devices due to competing
+      // space with the native copy/paste bar that typical (not always) renders above
+      // the selection.
       arrowDirection = ARROW_POINTING_UP;
     }
     let top;
@@ -192,6 +196,9 @@ export class Adder {
     // and close to the end.
     const hMargin = Math.min(ARROW_H_MARGIN, selectionRect.width);
     const adderWidth = this._width();
+    // Render the adder a little lower on touch devices to provide room for the native
+    // selection handles so that the interactions with selection don't compete with the adder.
+    const touchScreenOffset = isTouchDevice() ? 10 : 0;
     const adderHeight = this._height();
     if (isRTLselection) {
       left = selectionRect.left - adderWidth / 2 + hMargin;
@@ -212,7 +219,11 @@ export class Adder {
     }
 
     if (arrowDirection === ARROW_POINTING_UP) {
-      top = selectionRect.top + selectionRect.height + ARROW_HEIGHT;
+      top =
+        selectionRect.top +
+        selectionRect.height +
+        ARROW_HEIGHT +
+        touchScreenOffset;
     } else {
       top = selectionRect.top - adderHeight - ARROW_HEIGHT;
     }
