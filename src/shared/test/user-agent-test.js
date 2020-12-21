@@ -1,4 +1,4 @@
-import { isMacOS, isIOS } from '../user-agent';
+import { isMacOS, isIOS, isTouchDevice } from '../user-agent';
 
 describe('shared/user-agent', () => {
   describe('isMacOS', () => {
@@ -16,6 +16,23 @@ describe('shared/user-agent', () => {
           'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.92 Safari/537.36 Edg/80.0.361.109'
         )
       );
+    });
+  });
+
+  describe('isTouchDevice', () => {
+    let matchMedia;
+
+    beforeEach(() => {
+      matchMedia = sinon.spy(window, 'matchMedia');
+    });
+
+    afterEach(() => {
+      window.matchMedia.restore();
+    });
+
+    it('calls `window.matchMedia` with the query string "(pointer: coarse)"', () => {
+      isTouchDevice(window);
+      assert.calledWith(matchMedia, '(pointer: coarse)');
     });
   });
 

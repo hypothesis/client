@@ -35,3 +35,14 @@ export const isIOS = (
     (_navigator.userAgent.includes('Mac') && _ontouchend)
   );
 };
+
+/**
+ * Returns true when the device is a touch device such
+ * as android or iOS.
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer#browser_compatibility
+ *
+ * @param _window {Window} - Test seam
+ */
+export const isTouchDevice = (_window = window) => {
+  return _window.matchMedia('(pointer: coarse)').matches;
+};

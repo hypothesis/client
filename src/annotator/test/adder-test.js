@@ -2,7 +2,12 @@ import { act } from 'preact/test-utils';
 import { createElement } from 'preact';
 import { mount } from 'enzyme';
 
-import { Adder, ARROW_POINTING_UP, ARROW_POINTING_DOWN } from '../adder';
+import {
+  Adder,
+  ARROW_POINTING_UP,
+  ARROW_POINTING_DOWN,
+  $imports,
+} from '../adder';
 
 function rect(left, top, width, height) {
   return { left, top, width, height };
@@ -50,6 +55,7 @@ describe('Adder', () => {
   afterEach(() => {
     adderCtrl.hide();
     adderEl.remove();
+    $imports.$restore();
   });
 
   function windowSize() {
@@ -199,6 +205,12 @@ describe('Adder', () => {
       assert.equal(target.arrowDirection, ARROW_POINTING_UP);
     });
 
+    it('does not position the adder above the top of the viewport even when selection is backwards', () => {
+      const target = adderCtrl._calculateTarget(rect(100, -100, 100, 20), true);
+      assert.isAtLeast(target.top, 0);
+      assert.equal(target.arrowDirection, ARROW_POINTING_UP);
+    });
+
     it('does not position the adder below the bottom of the viewport', () => {
       const viewSize = windowSize();
       const target = adderCtrl._calculateTarget(
@@ -220,6 +232,22 @@ describe('Adder', () => {
     it('does not positon the adder beyond the left edge of the viewport', () => {
       const target = adderCtrl._calculateTarget(rect(-100, 100, 10, 10), false);
       assert.isAtLeast(target.left, 0);
+    });
+
+    context('touch device', () => {
+      it('positions the adder below the selection even if the selection is backwards', () => {
+        $imports.$mock({
+          '../shared/user-agent': {
+            isTouchDevice: sinon.stub().returns(true),
+          },
+        });
+        const target = adderCtrl._calculateTarget(
+          rect(100, 200, 100, 20),
+          true
+        );
+        assert.isAbove(target.top, 220);
+        assert.equal(target.arrowDirection, ARROW_POINTING_UP);
+      });
     });
   });
 
