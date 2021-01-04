@@ -50,9 +50,9 @@ function AnnotationActionBar({
   const showDeleteAction = userIsAuthorizedTo('delete');
   const showEditAction = userIsAuthorizedTo('update');
 
-  // Anyone may flag an annotation except the annotation's author.
-  // This option is even presented to anonymous users
-  const showFlagAction = userProfile.userid !== annotation.user;
+  //  Only authenticated users can flag an annotation, except the annotation's author.
+  const showFlagAction =
+    !!userProfile.userid && userProfile.userid !== annotation.user;
   const showShareAction = isShareable(annotation, settings);
 
   const onDelete = () => {
@@ -72,10 +72,6 @@ function AnnotationActionBar({
   };
 
   const onFlag = () => {
-    if (!userProfile.userid) {
-      toastMessenger.error('You must be logged in to report an annotation');
-      return;
-    }
     annotationsService
       .flag(annotation)
       .catch(() => toastMessenger.error('Flagging annotation failed'));
