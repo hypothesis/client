@@ -1,8 +1,46 @@
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/config').HostConfig} HostConfig
  */
 
 import serviceConfig from '../service-config';
+
+/**
+ * Generate a URI for sharing: a bouncer link built to share annotations in
+ * a specific group (groupID) on a specific document (documentURI).
+ *
+ * @param {string} documentURI
+ * @param {string} groupID
+ * @return {string}
+ */
+export function getSharingLink(documentURI, groupID) {
+  return `https://hyp.is/go?url=${encodeURIComponent(
+    documentURI
+  )}&group=${groupID}`;
+}
+
+/**
+ * Are annotations made against `uri` meaningfully shareable? The
+ * target URI needs to be available on the web, which here is determined by
+ * a protocol of `http` or `https`.
+ *
+ * @param {string} uri
+ * @return {boolean}
+ */
+export function isShareableURI(uri) {
+  return /^http(s?):/.test(uri);
+}
+
+/**
+ * Return the service-provided sharing URI for an annotation. Prefer the
+ * `incontext` link when available; fallback to `html` if not present.
+ *
+ * @param {Annotation} annotation
+ * @return {string|undefined}
+ */
+export function shareURI(annotation) {
+  return annotation.links?.incontext ?? annotation.links?.html;
+}
 
 /**
  * Is the sharing of annotations enabled? Check for any defined `serviceConfig`,
@@ -20,28 +58,4 @@ export function sharingEnabled(settings) {
     return true;
   }
   return serviceConfig_.enableShareLinks;
-}
-
-/**
- * Return any defined standalone URI for this `annotation`, preferably the
- * `incontext` URI, but fallback to `html` link if not present.
- *
- * @param {object} annotation
- * @return {string|undefined}
- */
-export function shareURI(annotation) {
-  const links = annotation.links;
-  return links && (links.incontext || links.html);
-}
-
-/**
- * For an annotation to be "shareable", sharing links need to be enabled overall
- * and the annotation itself needs to have a sharing URI.
- *
- * @param {object} annotation
- * @param {HostConfig} settings
- * @return {boolean}
- */
-export function isShareable(annotation, settings) {
-  return !!(sharingEnabled(settings) && shareURI(annotation));
 }

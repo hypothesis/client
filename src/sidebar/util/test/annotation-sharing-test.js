@@ -24,7 +24,44 @@ describe('sidebar.util.annotation-sharing', () => {
     sharingUtil.$imports.$restore();
   });
 
-  describe('#annotationSharingEnabled', () => {
+  describe('getSharingLink', () => {
+    it('generates a bouncer link based on the document URI and group id', () => {
+      assert.equal(
+        sharingUtil.getSharingLink('https://www.example.com', 'testprivate'),
+        'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
+      );
+    });
+  });
+
+  describe('isShareableURI', () => {
+    [
+      'http://www.example.com',
+      'http://www.foo.bar',
+      'http://hi',
+      'http:foo',
+      'https://www.foo.bar/baz/ding.html',
+    ].forEach(validURI => {
+      it('returns true for URLs with http and https protocols', () => {
+        assert.isTrue(sharingUtil.isShareableURI(validURI));
+      });
+    });
+
+    [
+      'httf://www.example.com',
+      'htt://whatever',
+      'ftp://warez.napster.nostalgia',
+      'file://hithere',
+      'chrome://extensions',
+      'http//www.wrong',
+      'www.example.com',
+    ].forEach(invalidURI => {
+      it('returns false for any URL not beginning with http or https', () => {
+        assert.isFalse(sharingUtil.isShareableURI(invalidURI));
+      });
+    });
+  });
+
+  describe('sharingEnabled', () => {
     it('returns true if no service settings present', () => {
       fakeServiceConfig.returns(null);
       assert.isTrue(sharingUtil.sharingEnabled({}));
@@ -46,7 +83,7 @@ describe('sidebar.util.annotation-sharing', () => {
     });
   });
 
-  describe('#shareURI', () => {
+  describe('shareURI', () => {
     it('returns `incontext` link if set on annotation', () => {
       assert.equal(
         sharingUtil.shareURI(fakeAnnotation),
@@ -74,25 +111,6 @@ describe('sidebar.util.annotation-sharing', () => {
       delete fakeAnnotation.links;
 
       assert.isUndefined(sharingUtil.shareURI(fakeAnnotation));
-    });
-  });
-
-  describe('#isShareable', () => {
-    it('returns `true` if sharing enabled and there is a share link available', () => {
-      fakeServiceConfig.returns(null);
-      assert.isTrue(sharingUtil.isShareable(fakeAnnotation, {}));
-    });
-
-    it('returns `false` if sharing not enabled', () => {
-      fakeServiceConfig.returns({ enableShareLinks: false });
-      assert.isFalse(sharingUtil.isShareable(fakeAnnotation, {}));
-    });
-
-    it('returns `false` if no sharing link available on annotation', () => {
-      fakeServiceConfig.returns(null);
-      delete fakeAnnotation.links;
-
-      assert.isFalse(sharingUtil.isShareable(fakeAnnotation, {}));
     });
   });
 });

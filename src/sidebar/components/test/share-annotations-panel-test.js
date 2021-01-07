@@ -10,6 +10,8 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('ShareAnnotationsPanel', () => {
   let fakeStore;
   let fakeAnalytics;
+  let fakeGetSharingLink;
+  let fakeIsShareableURI;
   let fakeToastMessenger;
   let fakeCopyToClipboard;
 
@@ -38,6 +40,9 @@ describe('ShareAnnotationsPanel', () => {
     fakeCopyToClipboard = {
       copyText: sinon.stub(),
     };
+
+    fakeGetSharingLink = sinon.stub().returns('bouncer-link');
+    fakeIsShareableURI = sinon.stub().returns(true);
     fakeToastMessenger = {
       success: sinon.stub(),
       error: sinon.stub(),
@@ -53,6 +58,10 @@ describe('ShareAnnotationsPanel', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../util/annotation-sharing': {
+        getSharingLink: fakeGetSharingLink,
+        isShareableURI: fakeIsShareableURI,
+      },
       '../util/copy-to-clipboard': fakeCopyToClipboard,
     });
   });
@@ -132,6 +141,17 @@ describe('ShareAnnotationsPanel', () => {
         testCase.visibilityPattern
       );
     });
+
+    context('document URI cannot be shared', () => {
+      it('renders explanatory text about inability to share', () => {
+        fakeIsShareableURI.returns(false);
+
+        const wrapper = createShareAnnotationsPanel();
+
+        const panelEl = wrapper.find('.share-annotations-panel');
+        assert.include(panelEl.text(), 'These annotations cannot be shared');
+      });
+    });
   });
 
   describe('web share link', () => {
@@ -139,11 +159,22 @@ describe('ShareAnnotationsPanel', () => {
       const wrapper = createShareAnnotationsPanel();
 
       const inputEl = wrapper.find('input');
-      assert.equal(
-        inputEl.prop('value'),
-        'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
-      );
+      // assert.equal(
+      //   inputEl.prop('value'),
+      //   'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
+      // );
+      assert.equal(inputEl.prop('value'), 'bouncer-link');
       assert.equal(inputEl.prop('readOnly'), true);
+    });
+
+    context('document URI cannot be shared', () => {
+      it('does not render an input field with share link', () => {
+        fakeIsShareableURI.returns(false);
+        const wrapper = createShareAnnotationsPanel();
+
+        const inputEl = wrapper.find('input');
+        assert.isFalse(inputEl.exists());
+      });
     });
 
     describe('copy link to clipboard', () => {
@@ -152,10 +183,7 @@ describe('ShareAnnotationsPanel', () => {
 
         wrapper.find('Button').props().onClick();
 
-        assert.calledWith(
-          fakeCopyToClipboard.copyText,
-          'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
-        );
+        assert.calledWith(fakeCopyToClipboard.copyText, 'bouncer-link');
       });
 
       it('confirms link copy when successful', () => {
@@ -168,6 +196,7 @@ describe('ShareAnnotationsPanel', () => {
           'Copied share link to clipboard'
         );
       });
+
       it('flashes an error if link copying unsuccessful', () => {
         fakeCopyToClipboard.copyText.throws();
         const wrapper = createShareAnnotationsPanel();

@@ -3,6 +3,7 @@ import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
+import { getSharingLink, isShareableURI } from '../util/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../util/service-context';
 
@@ -18,7 +19,7 @@ import SvgIcon from '../../shared/components/svg-icon';
  */
 
 /**
- * A panel for sharing the current group's annotations.
+ * A panel for sharing the current group's annotations on the current document.
  *
  * Links within this component allow a user to share the set of annotations that
  * are on the current page (as defined by the main frame's URI) and contained
@@ -30,24 +31,24 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   const store = useStoreProxy();
   const mainFrame = store.mainFrame();
   const focusedGroup = store.focusedGroup();
-
   const groupName = (focusedGroup && focusedGroup.name) || '...';
   const panelTitle = `Share Annotations in ${groupName}`;
 
-  // Generate bouncer sharing link for annotations in the current group.
+  // Not all URIs are valid to share: the document needs to be available
+  // on the web.
+  const uriShareable = mainFrame?.uri && isShareableURI(mainFrame?.uri);
+
+  // Generate bouncer sharing link.
   // This is the URI format for the web-sharing link shown in the input
-  // and is available to be copied to clipboard
-  const shareURI = ((frame, group) => {
-    return group && frame
-      ? `https://hyp.is/go?url=${encodeURIComponent(frame.uri)}&group=${
-          group.id
-        }`
-      : '';
-  })(mainFrame, focusedGroup);
+  // and is available to be copied to clipboard. We need the frame's URI
+  // (document URL) and the focused group to be available before this link
+  // can be generated.
+  const shareURI =
+    focusedGroup && mainFrame && getSharingLink(mainFrame.uri, focusedGroup.id);
 
   const copyShareLink = () => {
     try {
-      copyText(shareURI);
+      copyText(shareURI ?? '');
       toastMessenger.success('Copied share link to clipboard');
     } catch (err) {
       toastMessenger.error('Unable to copy link');
@@ -59,10 +60,10 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
       title={panelTitle}
       panelName={uiConstants.PANEL_SHARE_ANNOTATIONS}
     >
-      {focusedGroup && mainFrame && (
+      {shareURI && uriShareable && (
         <div className="share-annotations-panel">
           <div className="share-annotations-panel__intro">
-            {focusedGroup.type === 'private' ? (
+            {focusedGroup?.type === 'private' ? (
               <p>
                 Use this link to share these annotations with other group
                 members:
@@ -87,7 +88,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
             />
           </div>
           <p>
-            {focusedGroup.type === 'private' ? (
+            {focusedGroup?.type === 'private' ? (
               <span>
                 Annotations in the private group <em>{focusedGroup.name}</em>{' '}
                 are only visible to group members.
@@ -95,7 +96,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
             ) : (
               <span>
                 Anyone using this link may view the annotations in the group{' '}
-                <em>{focusedGroup.name}</em>.
+                <em>{focusedGroup?.name}</em>.
               </span>
             )}{' '}
             <span>
@@ -108,6 +109,14 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
             shareURI={shareURI}
             analyticsEventName={analytics.events.DOCUMENT_SHARED}
           />
+        </div>
+      )}
+      {shareURI && !uriShareable && (
+        <div className="share-annotations-panel">
+          <p>
+            These annotations cannot be shared because this document is not
+            available on the web.
+          </p>
         </div>
       )}
     </SidebarPanel>

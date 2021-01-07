@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 
 import uiConstants from '../ui-constants';
 import { useStoreProxy } from '../store/use-store';
-import { isShareable, shareURI } from '../util/annotation-sharing';
+import { sharingEnabled, shareURI } from '../util/annotation-sharing';
 import { isPrivate, permits } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
@@ -53,7 +53,7 @@ function AnnotationActionBar({
   //  Only authenticated users can flag an annotation, except the annotation's author.
   const showFlagAction =
     !!userProfile.userid && userProfile.userid !== annotation.user;
-  const showShareAction = isShareable(annotation, settings);
+  const showShareAction = sharingEnabled(settings) && shareURI(annotation);
 
   const onDelete = () => {
     if (window.confirm('Are you sure you want to delete this annotation?')) {

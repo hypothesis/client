@@ -1,7 +1,9 @@
 import { createElement } from 'preact';
+import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import { isShareableURI } from '../util/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { isPrivate } from '../util/permissions';
 import { withServices } from '../util/service-context';
@@ -48,6 +50,7 @@ function AnnotationShareControl({
   shareUri,
 }) {
   const annotationIsPrivate = isPrivate(annotation.permissions);
+  const allowSharing = isShareableURI(annotation.uri);
   const shareRef = useRef(/** @type {HTMLDivElement|null} */ (null));
   const inputRef = useRef(/** @type {HTMLInputElement|null} */ (null));
 
@@ -66,8 +69,8 @@ function AnnotationShareControl({
 
       if (isOpen && !selectionOverflowsInputElement()) {
         // Panel was just opened: select and focus the share URI for convenience
-        inputRef.current.focus();
-        inputRef.current.select();
+        inputRef.current?.focus();
+        inputRef.current?.select();
       }
     }
   }, [isOpen]);
@@ -118,38 +121,50 @@ function AnnotationShareControl({
         isExpanded={isOpen}
       />
       {isOpen && (
-        <div className="annotation-share-panel">
+        <div
+          className={classnames('annotation-share-panel', {
+            'annotation-share-panel--shareable': allowSharing,
+          })}
+        >
           <div className="annotation-share-panel__header">
             <div className="annotation-share-panel__title">
               Share this annotation
             </div>
           </div>
-          <div className="annotation-share-panel__content">
-            <div className="u-layout-row">
-              <input
-                aria-label="Use this URL to share this annotation"
-                className="annotation-share-panel__form-input"
-                type="text"
-                value={shareUri}
-                readOnly
-                ref={inputRef}
-              />
-              <Button
-                icon="copy"
-                title="Copy share link to clipboard"
-                onClick={copyShareLink}
-                className="annotation-share-panel__icon-button"
+          {allowSharing ? (
+            <div className="annotation-share-panel__content">
+              <div className="u-layout-row">
+                <input
+                  aria-label="Use this URL to share this annotation"
+                  className="annotation-share-panel__form-input"
+                  type="text"
+                  value={shareUri}
+                  readOnly
+                  ref={inputRef}
+                />
+                <Button
+                  icon="copy"
+                  title="Copy share link to clipboard"
+                  onClick={copyShareLink}
+                  className="annotation-share-panel__icon-button"
+                />
+              </div>
+              <div className="annotation-share-panel__details">
+                {annotationSharingInfo}
+              </div>
+              <ShareLinks
+                shareURI={shareUri}
+                analyticsEventName={analytics.events.ANNOTATION_SHARED}
               />
             </div>
-            <div className="annotation-share-panel__permissions">
-              {annotationSharingInfo}
+          ) : (
+            <div className="annotation-share-panel__content">
+              <div className="annotation-share-panel__details">
+                This annotation cannot be shared because it was made on a
+                document that is not available on the web.
+              </div>
             </div>
-            <ShareLinks
-              shareURI={shareUri}
-              analyticsEventName={analytics.events.ANNOTATION_SHARED}
-              className="annotation-share-control__links"
-            />
-          </div>
+          )}
           <SvgIcon
             name="pointer"
             inline={true}
