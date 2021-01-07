@@ -57,13 +57,21 @@
   @include button-hover;
 }
 
-/* A button with an icon and no displayed text */
-@mixin button--icon-only($with-active-state: true) {
+/*
+ * A button with an icon and no displayed text.
+ *
+ * @param {boolean} [$with-active-state] - Adds an active state color when pressed / expanded
+ * @param {boolean} [$coarse-min-size] - Overrides the minimum height and width in mobile view.
+ */
+@mixin button--icon-only(
+  $with-active-state: true,
+  $coarse-min-size: var.$touch-target-size
+) {
   @include button;
   color: var.$grey-mid;
   @media (pointer: coarse) {
-    min-width: var.$touch-target-size;
-    min-height: var.$touch-target-size;
+    min-width: $coarse-min-size;
+    min-height: $coarse-min-size;
   }
   @if $with-active-state == true {
     &[aria-expanded='true'],

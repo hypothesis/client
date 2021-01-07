@@ -11,8 +11,8 @@
 
 // Toggle button that opens the menu.
 .menu__toggle {
-  @include buttons.button--icon-only;
-
+  // Override $coarse-min-size so the button's size won't change in mobile view.
+  @include buttons.button--icon-only($coarse-min-size: inherit);
   appearance: none;
   background: none;
   padding: 0;
