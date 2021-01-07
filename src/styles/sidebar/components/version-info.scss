@@ -30,7 +30,7 @@
       margin-left: 1em; // Space between key and value
       flex-basis: 70%;
       flex-grow: 1;
-      overflow-wrap: break-word; // Keep really long userids from overflowing
+      overflow-wrap: anywhere; // Keep long userids and urls from overflowing
     }
   }
 }
