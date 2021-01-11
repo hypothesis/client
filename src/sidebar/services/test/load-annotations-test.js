@@ -19,6 +19,8 @@ class FakeSearchClient extends EventEmitter {
         query.uri = ['http://www.example.com'];
       }
 
+      this.emit('resultCount', 2);
+
       for (let i = 0; i < query.uri.length; i++) {
         const uri = query.uri[i];
         this.emit('results', [{ id: uri + '123', group: query.group }]);
@@ -60,6 +62,7 @@ describe('loadAnnotationsService', () => {
       frames: sinon.stub(),
       removeAnnotations: sinon.stub(),
       savedAnnotations: sinon.stub(),
+      setAnnotationResultCount: sinon.stub(),
       updateFrameAnnotationFetchStatus: sinon.stub(),
     };
 
@@ -194,6 +197,16 @@ describe('loadAnnotationsService', () => {
       ].forEach(uri => {
         assert.calledWith(fakeStore.addAnnotations, [sinon.match({ id: uri })]);
       });
+    });
+
+    it('updates the expected result count in the store', () => {
+      fakeUris = ['http://example.com'];
+      const svc = createService();
+
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
+
+      assert.calledOnce(fakeStore.setAnnotationResultCount);
+      assert.calledWith(fakeStore.setAnnotationResultCount, 2);
     });
 
     it('updates annotation fetch status for all frames', () => {

@@ -47,6 +47,7 @@ export default class SearchClient extends TinyEmitter {
     this._canceled = false;
     /** @type {Annotation[]} */
     this._results = [];
+    this._resultCount = null;
   }
 
   _getBatch(query, offset) {
@@ -90,6 +91,11 @@ export default class SearchClient extends TinyEmitter {
         }
 
         const chunk = results.rows.concat(results.replies || []);
+        if (self._resultCount === null) {
+          // Emit the result count (total) on first encountering it
+          self._resultCount = results.total;
+          self.emit('resultCount', self._resultCount);
+        }
         if (self._incremental) {
           self.emit('results', chunk);
         } else {
@@ -133,6 +139,7 @@ export default class SearchClient extends TinyEmitter {
    */
   get(query) {
     this._results = [];
+    this._resultCount = null;
     this._getBatch(query, 0);
   }
 

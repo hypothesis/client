@@ -24,6 +24,11 @@ function init() {
      * Have annotations ever been fetched?
      */
     hasFetchedAnnotations: false,
+    /**
+     * The number of total annotation results the service reported as
+     * matching the most recent load/search request
+     */
+    annotationResultCount: null,
   };
 }
 
@@ -95,6 +100,12 @@ const update = {
       activeAnnotationFetches: state.activeAnnotationFetches - 1,
     };
   },
+
+  SET_ANNOTATION_RESULT_COUNT(state, action) {
+    return {
+      annotationResultCount: action.resultCount,
+    };
+  },
 };
 
 const actions = actionTypes(update);
@@ -131,7 +142,15 @@ function apiRequestFinished() {
   return { type: actions.API_REQUEST_FINISHED };
 }
 
+function setAnnotationResultCount(resultCount) {
+  return { type: actions.SET_ANNOTATION_RESULT_COUNT, resultCount };
+}
+
 /** Selectors */
+
+function annotationResultCount(state) {
+  return state.annotationResultCount;
+}
 
 function hasFetchedAnnotations(state) {
   return state.hasFetchedAnnotations;
@@ -182,6 +201,7 @@ export default storeModule({
     annotationSaveFinished,
     apiRequestStarted,
     apiRequestFinished,
+    setAnnotationResultCount,
   },
 
   selectors: {
@@ -189,5 +209,6 @@ export default storeModule({
     isLoading,
     isFetchingAnnotations,
     isSavingAnnotation,
+    annotationResultCount,
   },
 });

@@ -215,4 +215,12 @@ describe('sidebar/store/modules/activity', () => {
       });
     });
   });
+
+  describe('#annotationResultCount', () => {
+    it('returns the result count from the last API search/load', () => {
+      assert.isNull(store.annotationResultCount());
+      store.setAnnotationResultCount(5);
+      assert.equal(store.annotationResultCount(), 5);
+    });
+  });
 });

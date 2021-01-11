@@ -10,23 +10,8 @@
     'results'
     'items';
 
-  /* TODO: find a better place for these heading styles */
-  h1 {
-    display: inline;
-    font-size: var.$font-size--heading;
-    font-weight: bold;
-  }
-
-  h2 {
-    display: inline;
-    font-size: var.$font-size--subheading;
-    font-weight: bold;
-  }
-
   &__heading {
     grid-area: heading;
-    font-size: var.$font-size--heading;
-    font-weight: bold;
   }
 
   &__filters {
@@ -41,6 +26,11 @@
     grid-area: items;
   }
 
+  &__group-name {
+    font-size: var.$font-size--heading;
+    font-weight: bold;
+  }
+
   @include responsive.tablet-and-up {
     grid-template-areas:
       'heading heading'
@@ -52,7 +42,9 @@
     }
 
     &__results {
+      // Align right and bottom
       justify-self: end;
+      align-self: flex-end;
     }
   }
 }
