@@ -43,7 +43,7 @@ function NotebookView({ loadAnnotationsService }) {
   return (
     <div className="notebook-view">
       <header className="notebook-view__heading">
-        <h1>{groupName}</h1>
+        <h1 className="notebook-view__group-name">{groupName}</h1>
       </header>
       <div className="notebook-view__filters">
         <NotebookFilters />

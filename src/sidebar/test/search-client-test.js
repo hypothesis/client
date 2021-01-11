@@ -35,6 +35,16 @@ describe('SearchClient', () => {
     });
   });
 
+  it('emits "resultCount"', () => {
+    const client = new SearchClient(fakeSearchFn);
+    const onResultCount = sinon.stub();
+    client.on('resultCount', onResultCount);
+    client.get({ uri: 'http://example.com' });
+    return awaitEvent(client, 'end').then(() => {
+      assert.calledWith(onResultCount, RESULTS.length);
+    });
+  });
+
   it('emits "end" only once', () => {
     const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
     client.on('results', sinon.stub());
@@ -54,6 +64,17 @@ describe('SearchClient', () => {
     return awaitEvent(client, 'end').then(() => {
       assert.calledWith(onResults, RESULTS.slice(0, 2));
       assert.calledWith(onResults, RESULTS.slice(2, 4));
+    });
+  });
+
+  it('emits "resultCount" only once in incremental mode', () => {
+    const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
+    const onResultCount = sinon.stub();
+    client.on('resultCount', onResultCount);
+    client.get({ uri: 'http://example.com' });
+    return awaitEvent(client, 'end').then(() => {
+      assert.calledWith(onResultCount, RESULTS.length);
+      assert.calledOnce(onResultCount);
     });
   });
 

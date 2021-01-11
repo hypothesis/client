@@ -1,0 +1,17 @@
+@use "../../variables" as var;
+@use "../../mixins/layout";
+
+.notebook-result-count {
+  @include layout.horizontal-rhythm;
+  font-size: var.$font-size--large;
+  // Normalize line height to ensure vertical stability (no jumping around)
+  line-height: 1;
+
+  & h2 {
+    font-weight: bold;
+  }
+
+  & h3 {
+    font-style: italic;
+  }
+}
