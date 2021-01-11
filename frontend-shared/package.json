@@ -1,0 +1,6 @@
+{
+  "name": "@hypothesis/frontend-shared",
+  "version": "1.0.0",
+  "repository": "hypothesis/client/frontend-shared",
+  "dependencies": {}
+}

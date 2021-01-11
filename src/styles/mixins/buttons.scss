@@ -17,7 +17,7 @@
  *
  * And pass 'my-component-button' as the `className` prop to `Button`.
  */
-@use "./focus";
+@use "@hypothesis/frontend-shared/styles/mixins/focus";
 @use "./layout";
 @use "./utils";
 @use "../variables" as var;
