@@ -3070,13 +3070,12 @@ entities@^2.0.0:
   resolved "https://registry.yarnpkg.com/entities/-/entities-2.1.0.tgz#992d3129cf7df6870b96c57858c249a120f8b8b5"
   integrity sha512-hCx1oky9PFrJ611mf0ifBLBRW8lUUVRlFolb5gWRfIELabBlbp9xZvrqZLZAs+NxFnbfQoeGd8wDkygjg7U85w==
 
-enzyme-adapter-preact-pure@^2.0.0:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/enzyme-adapter-preact-pure/-/enzyme-adapter-preact-pure-2.2.3.tgz#b77c6272e7516cb952011047ddc754e1bce3f1b3"
-  integrity sha512-8BkTQRUDDCNe8/UDACU2wXoZNpUP2biq6sYvL9haN+UoKPfEVT1J4C8+gSvblNe4kcJZUMP48SltJQW47oia4w==
+enzyme-adapter-preact-pure@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/enzyme-adapter-preact-pure/-/enzyme-adapter-preact-pure-3.0.0.tgz#ca696ad106549cfc95eef376e0154fff5591561c"
+  integrity sha512-xFmANLdbTWJ3sSup15Dvl479XS1gPaFYQM6zpDJ6LfGv6PUAP0WOyWx4P5xZJG4DrrVu0ltSiD5JwWrica4J1w==
   dependencies:
     array.prototype.flatmap "^1.2.1"
-    preact-render-to-string "^4.1.0"
 
 enzyme-shallow-equal@^1.0.1:
   version "1.0.4"
@@ -6144,13 +6143,6 @@ postcss@^8.0.3:
     nanoid "^3.1.20"
     source-map "^0.6.1"
 
-preact-render-to-string@^4.1.0:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/preact-render-to-string/-/preact-render-to-string-4.1.0.tgz#70d98a8385cb86558366c558aad7311ebecb881d"
-  integrity sha512-FlFBJRxo8z4cp6VsDmeYjIEx4ZK2clFJnKIvIj8K1IQCRm7ZgJ/SZ1+BotT86/Nc+V1pNtFabHoUi6gpjx5Pug==
-  dependencies:
-    pretty-format "^3.8.0"
-
 preact@^10.4.0:
   version "10.5.9"
   resolved "https://registry.yarnpkg.com/preact/-/preact-10.5.9.tgz#8caba9288b4db1d593be2317467f8735e43cda0b"
@@ -6165,11 +6157,6 @@ prettier@2.2.1:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.2.1.tgz#795a1a78dd52f073da0cd42b21f9c91381923ff5"
   integrity sha512-PqyhM2yCjg/oKkFPtTGUojv7gnZAoG80ttl45O6x2Ug/rMJw4wcc9k6aaf2hibP7BGVCCM33gZoGjyvt9mm16Q==
-
-pretty-format@^3.8.0:
-  version "3.8.0"
-  resolved "https://registry.yarnpkg.com/pretty-format/-/pretty-format-3.8.0.tgz#bfbed56d5e9a776645f4b1ff7aa1a3ac4fa3c385"
-  integrity sha1-v77VbV6ad2ZF9LH/eqGjrE+jw4U=
 
 pretty-hrtime@^1.0.0:
   version "1.0.3"
