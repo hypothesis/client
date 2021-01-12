@@ -74,8 +74,10 @@
  *   @prop {number} moderation.flagCount
  *
  * @prop {Object} links
- *   @prop {string} [links.incontext]
- *   @prop {string} [links.html]
+ *   @prop {string} [links.incontext] - A "bouncer" URL to the annotation in
+ *     context on its target document
+ *   @prop {string} [links.html] - An `h`-website URL to view the annotation
+ *     by itself
  *
  * @prop {Object} [user_info]
  *   @prop {string|null} user_info.display_name
