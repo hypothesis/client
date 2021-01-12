@@ -15,6 +15,7 @@ describe('AnnotationShareControl', () => {
   let fakeToastMessenger;
   let fakeGroup;
   let fakeIsPrivate;
+  let fakeIsShareableURI;
   let fakeShareUri;
   let fakeIsIOS;
 
@@ -62,6 +63,7 @@ describe('AnnotationShareControl', () => {
       group: 'fakegroup',
       permissions: {},
       user: 'acct:bar@foo.com',
+      uri: 'http://www.example.com',
     };
 
     fakeAnalytics = {
@@ -81,11 +83,13 @@ describe('AnnotationShareControl', () => {
       type: 'private',
     };
     fakeIsPrivate = sinon.stub().returns(false);
+    fakeIsShareableURI = sinon.stub().returns(true);
     fakeShareUri = 'https://www.example.com';
     fakeIsIOS = sinon.stub().returns(false);
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '../util/annotation-sharing': { isShareableURI: fakeIsShareableURI },
       '../util/copy-to-clipboard': fakeCopyToClipboard,
       '../util/permissions': { isPrivate: fakeIsPrivate },
       './hooks/use-element-should-close': sinon.stub(),
@@ -195,11 +199,36 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent({ isPrivate: testcase.isPrivate });
       openElement(wrapper);
 
-      const permissionsEl = wrapper.find(
-        '.annotation-share-panel__permissions'
-      );
+      const permissionsEl = wrapper.find('.annotation-share-panel__details');
       assert.equal(permissionsEl.text(), testcase.expected);
     });
+  });
+
+  it('renders an explanation if annotation cannot be shared in context', () => {
+    fakeIsShareableURI.returns(false);
+    const wrapper = createComponent();
+    openElement(wrapper);
+
+    const detailsEl = wrapper.find('.annotation-share-panel__details');
+    assert.include(
+      detailsEl.text(),
+      'This annotation cannot be shared in its original context'
+    );
+  });
+
+  it('renders share links if annotation can be shared in context', () => {
+    const wrapper = createComponent();
+    openElement(wrapper);
+
+    assert.isTrue(wrapper.find('ShareLinks').exists());
+  });
+
+  it('does not render share links if annotation cannot be shared in context', () => {
+    fakeIsShareableURI.returns(false);
+    const wrapper = createComponent();
+    openElement(wrapper);
+
+    assert.isFalse(wrapper.find('ShareLinks').exists());
   });
 
   it('focuses the share-URI input when opened on non-iOS', () => {
