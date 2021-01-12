@@ -20,9 +20,9 @@
  * annotation (thread) cards. Will vertically-space its children. Adds a
  * hover/active intensified box shadow and accounts for "theme-clean" affordances.
  */
-@mixin card {
+@mixin card($rhythm: var.$layout-space) {
   @include card-frame;
-  @include layout.vertical-rhythm;
+  @include layout.vertical-rhythm($rhythm);
   padding: var.$layout-space;
 
   &:hover,
@@ -114,9 +114,12 @@
 /**
  * Base styles for a "panel"-like element, with appropriate
  * padding, heading and close-button styles.
+ *
+ * @param {length} [$rhythm] - An optional value to use for vertical rhythm
+ *   (spacing, vertically)
  */
-@mixin panel {
-  @include card;
+@mixin panel($rhythm: var.$layout-space) {
+  @include card($rhythm);
 
   &__header {
     @include layout.row($align: center);
@@ -152,16 +155,15 @@
  * `panel` with tighter margins and padding, for use in more confined spaces
  */
 @mixin panel--compact {
-  @include panel;
-  width: 20em;
+  @include panel($rhythm: var.$layout-space--xsmall);
+  width: 24em;
   // Keep panel constrained within annotation card boundaries and not cut off
   // on left side when sidebar is extremely narrow
   max-width: 85vw;
   padding: var.$layout-space--small;
 
   &__header {
-    padding: 0;
-    border-bottom: none;
+    padding-bottom: var.$layout-space--xsmall;
   }
 }
 

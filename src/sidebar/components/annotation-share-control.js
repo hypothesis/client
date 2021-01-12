@@ -2,6 +2,7 @@ import { createElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
+import { isShareableURI } from '../util/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { isPrivate } from '../util/permissions';
 import { withServices } from '../util/service-context';
@@ -48,6 +49,7 @@ function AnnotationShareControl({
   shareUri,
 }) {
   const annotationIsPrivate = isPrivate(annotation.permissions);
+  const inContextAvailable = isShareableURI(annotation.uri);
   const shareRef = useRef(/** @type {HTMLDivElement|null} */ (null));
   const inputRef = useRef(/** @type {HTMLInputElement|null} */ (null));
 
@@ -66,8 +68,8 @@ function AnnotationShareControl({
 
       if (isOpen && !selectionOverflowsInputElement()) {
         // Panel was just opened: select and focus the share URI for convenience
-        inputRef.current.focus();
-        inputRef.current.select();
+        inputRef.current?.focus();
+        inputRef.current?.select();
       }
     }
   }, [isOpen]);
@@ -76,6 +78,17 @@ function AnnotationShareControl({
   if (!group) {
     return null;
   }
+
+  // NB: Sharing links (social media/email) are not currently shown for `html`
+  // links. There are two reasons for this:
+  // - Lack of vertical real estate available. The explanatory text about `html`
+  //   links takes up several lines. Adding the sharing links below this runs
+  //   the risk of interfering with the top bar or other elements outside of the
+  //   annotation's card. This may be rectified with a design tweak, perhaps.
+  // - Possible confusion about what the sharing link does. The difference
+  //   between an `incontext` and `html` link likely isn't clear to users. This
+  //   bears further discussion.
+  const showShareLinks = inContextAvailable;
 
   const copyShareLink = () => {
     try {
@@ -141,14 +154,23 @@ function AnnotationShareControl({
                 className="annotation-share-panel__icon-button"
               />
             </div>
-            <div className="annotation-share-panel__permissions">
-              {annotationSharingInfo}
-            </div>
-            <ShareLinks
-              shareURI={shareUri}
-              analyticsEventName={analytics.events.ANNOTATION_SHARED}
-              className="annotation-share-control__links"
-            />
+            {inContextAvailable ? (
+              <div className="annotation-share-panel__details">
+                {annotationSharingInfo}
+              </div>
+            ) : (
+              <div className="annotation-share-panel__details">
+                This annotation cannot be shared in its original context because
+                it was made on a document that is not available on the web. This
+                link shares the annotation by itself.
+              </div>
+            )}
+            {showShareLinks && (
+              <ShareLinks
+                shareURI={shareUri}
+                analyticsEventName={analytics.events.ANNOTATION_SHARED}
+              />
+            )}
           </div>
           <SvgIcon
             name="pointer"

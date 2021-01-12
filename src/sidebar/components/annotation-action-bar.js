@@ -3,7 +3,10 @@ import propTypes from 'prop-types';
 
 import uiConstants from '../ui-constants';
 import { useStoreProxy } from '../store/use-store';
-import { isShareable, shareURI } from '../util/annotation-sharing';
+import {
+  sharingEnabled,
+  annotationSharingLink,
+} from '../util/annotation-sharing';
 import { isPrivate, permits } from '../util/permissions';
 import { withServices } from '../util/service-context';
 
@@ -53,7 +56,9 @@ function AnnotationActionBar({
   //  Only authenticated users can flag an annotation, except the annotation's author.
   const showFlagAction =
     !!userProfile.userid && userProfile.userid !== annotation.user;
-  const showShareAction = isShareable(annotation, settings);
+
+  const shareLink =
+    sharingEnabled(settings) && annotationSharingLink(annotation);
 
   const onDelete = () => {
     if (window.confirm('Are you sure you want to delete this annotation?')) {
@@ -92,11 +97,11 @@ function AnnotationActionBar({
         <Button icon="trash" title="Delete" onClick={onDelete} />
       )}
       <Button icon="reply" title="Reply" onClick={onReplyClick} />
-      {showShareAction && (
+      {shareLink && (
         <AnnotationShareControl
           annotation={annotation}
           group={annotationGroup}
-          shareUri={shareURI(annotation)}
+          shareUri={shareLink}
         />
       )}
       {showFlagAction && !annotation.flagged && (

@@ -10,6 +10,8 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 describe('ShareAnnotationsPanel', () => {
   let fakeStore;
   let fakeAnalytics;
+  let fakeBouncerLink;
+  let fakePageSharingLink;
   let fakeToastMessenger;
   let fakeCopyToClipboard;
 
@@ -35,9 +37,12 @@ describe('ShareAnnotationsPanel', () => {
       },
       track: sinon.stub(),
     };
+    fakeBouncerLink = 'http://hyp.is/go?url=http%3A%2F%2Fwww.example.com';
     fakeCopyToClipboard = {
       copyText: sinon.stub(),
     };
+
+    fakePageSharingLink = sinon.stub().returns(fakeBouncerLink);
     fakeToastMessenger = {
       success: sinon.stub(),
       error: sinon.stub(),
@@ -53,6 +58,9 @@ describe('ShareAnnotationsPanel', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../util/annotation-sharing': {
+        pageSharingLink: fakePageSharingLink,
+      },
       '../util/copy-to-clipboard': fakeCopyToClipboard,
     });
   });
@@ -83,16 +91,24 @@ describe('ShareAnnotationsPanel', () => {
   });
 
   describe('panel content', () => {
-    it('renders panel content if needed info available', () => {
-      const wrapper = createShareAnnotationsPanel();
-      assert.isTrue(wrapper.exists('.share-annotations-panel'));
-    });
-
     it('does not render panel content if needed info not available', () => {
       fakeStore.focusedGroup.returns(undefined);
 
       const wrapper = createShareAnnotationsPanel();
       assert.isFalse(wrapper.exists('.share-annotations-panel'));
+    });
+
+    it('renders a spinner if focused group not available yet', () => {
+      fakeStore.focusedGroup.returns(undefined);
+
+      const wrapper = createShareAnnotationsPanel();
+      assert.isTrue(wrapper.find('Spinner').exists());
+    });
+
+    it('renders panel content if needed info available', () => {
+      const wrapper = createShareAnnotationsPanel();
+      assert.isTrue(wrapper.exists('.share-annotations-panel'));
+      assert.isFalse(wrapper.find('Spinner').exists());
     });
   });
 
@@ -132,6 +148,17 @@ describe('ShareAnnotationsPanel', () => {
         testCase.visibilityPattern
       );
     });
+
+    context('document URI cannot be shared', () => {
+      it('renders explanatory text about inability to share', () => {
+        fakePageSharingLink.returns(null);
+
+        const wrapper = createShareAnnotationsPanel();
+
+        const panelEl = wrapper.find('.share-annotations-panel');
+        assert.include(panelEl.text(), 'These annotations cannot be shared');
+      });
+    });
   });
 
   describe('web share link', () => {
@@ -139,11 +166,18 @@ describe('ShareAnnotationsPanel', () => {
       const wrapper = createShareAnnotationsPanel();
 
       const inputEl = wrapper.find('input');
-      assert.equal(
-        inputEl.prop('value'),
-        'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
-      );
+      assert.equal(inputEl.prop('value'), fakeBouncerLink);
       assert.equal(inputEl.prop('readOnly'), true);
+    });
+
+    context('document URI cannot be shared', () => {
+      it('does not render an input field with share link', () => {
+        fakePageSharingLink.returns(null);
+        const wrapper = createShareAnnotationsPanel();
+
+        const inputEl = wrapper.find('input');
+        assert.isFalse(inputEl.exists());
+      });
     });
 
     describe('copy link to clipboard', () => {
@@ -152,10 +186,7 @@ describe('ShareAnnotationsPanel', () => {
 
         wrapper.find('Button').props().onClick();
 
-        assert.calledWith(
-          fakeCopyToClipboard.copyText,
-          'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate'
-        );
+        assert.calledWith(fakeCopyToClipboard.copyText, fakeBouncerLink);
       });
 
       it('confirms link copy when successful', () => {
@@ -168,6 +199,7 @@ describe('ShareAnnotationsPanel', () => {
           'Copied share link to clipboard'
         );
       });
+
       it('flashes an error if link copying unsuccessful', () => {
         fakeCopyToClipboard.copyText.throws();
         const wrapper = createShareAnnotationsPanel();
