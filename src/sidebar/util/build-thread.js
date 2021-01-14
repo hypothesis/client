@@ -171,43 +171,15 @@ function mapThread(thread, mapFn) {
 }
 
 /**
- * Return a sorted copy of an array of threads.
- *
- * @param {Thread[]} threads - The list of threads to sort
- * @param {(a: Annotation, b: Annotation) => boolean} compareFn
- * @return {Thread[]} Sorted list of threads
- */
-function sort(threads, compareFn) {
-  return threads.slice().sort((a, b) => {
-    // Threads with no annotation always sort to the top
-    if (!a.annotation || !b.annotation) {
-      if (!a.annotation && !b.annotation) {
-        return 0;
-      } else {
-        return !a.annotation ? -1 : 1;
-      }
-    }
-
-    if (compareFn(a.annotation, b.annotation)) {
-      return -1;
-    } else if (compareFn(b.annotation, a.annotation)) {
-      return 1;
-    } else {
-      return 0;
-    }
-  });
-}
-
-/**
  * Return a new `Thread` object with all (recursive) `children` arrays sorted.
  * Sort the children of top-level threads using `compareFn` and all other
  * children using `replyCompareFn`.
  *
  * @param {Thread} thread
- * @param {(a: Annotation, b: Annotation) => boolean} compareFn - Less-than
- *         comparison function for sorting top-level annotations
- * @param {(a: Annotation, b: Annotation) => boolean} replyCompareFn - Less-than
- *       comparison function for sorting replies
+ * @param {(a: Thread, b: Thread) => number} compareFn - comparison function
+ *   for sorting top-level annotations
+ * @param {(a: Thread, b: Thread) => number} replyCompareFn - comparison
+ *   function for sorting replies
  * @return {Thread}
  */
 function sortThread(thread, compareFn, replyCompareFn) {
@@ -215,7 +187,9 @@ function sortThread(thread, compareFn, replyCompareFn) {
     sortThread(child, replyCompareFn, replyCompareFn)
   );
 
-  return { ...thread, children: sort(children, compareFn) };
+  const sortedChildren = children.slice().sort(compareFn);
+
+  return { ...thread, children: sortedChildren };
 }
 
 /**
@@ -253,38 +227,38 @@ function hasVisibleChildren(thread) {
 }
 
 /**
- * @typedef Options
- * @prop {string[]} selected - List of currently-selected annotation ids, from
- *       the data store
+ * @typedef BuildThreadOptions
+ * @prop {Object.<string, boolean>} expanded - Map of thread id => expansion state
  * @prop {string[]} forcedVisible - List of $tags of annotations that have
  *       been explicitly expanded by the user, even if they don't
  *       match current filters
+ * @prop {string[]} selected - List of currently-selected annotation ids, from
+ *       the data store
+ * @prop {(a: Thread, b: Thread) => number} sortCompareFn - comparison
+ *       function for sorting top-level annotations
  * @prop {(a: Annotation) => boolean} [filterFn] - Predicate function that
  *       returns `true` if annotation should be visible
  * @prop {(t: Thread) => boolean} [threadFilterFn] - Predicate function that
  *       returns `true` if the annotation should be included in the thread tree
- * @prop {Object.<string, boolean>} expanded - Map of thread id => expansion state
- * @prop {(a: Annotation, b: Annotation) => boolean} sortCompareFn - Less-than
- *       comparison function for sorting top-level annotations
- * @prop {(a: Annotation, b: Annotation) => boolean} replySortCompareFn - Less-than
- *       comparison function for sorting replies
  */
 
 /**
- * Default options for buildThread()
+ * Sort by reply (Annotation) `created` date
  *
- * @type {Options}
+ * @param {Thread} a
+ * @param {Thread} b
+ * @return {number}
  */
-const defaultOpts = {
-  selected: [],
-  expanded: {},
-  forcedVisible: [],
-  sortCompareFn: (a, b) => {
-    return a.$tag < b.$tag;
-  },
-  replySortCompareFn: (a, b) => {
-    return a.created < b.created;
-  },
+const replySortCompareFn = (a, b) => {
+  if (!a.annotation || !b.annotation) {
+    return 0;
+  }
+  if (a.annotation.created < b.annotation.created) {
+    return -1;
+  } else if (a.annotation.created > b.annotation.created) {
+    return 1;
+  }
+  return 0;
 };
 
 /**
@@ -306,15 +280,13 @@ const defaultOpts = {
  * a user).
  *
  * @param {Annotation[]} annotations - A list of annotations and replies
- * @param {Partial<Options>} options
+ * @param {BuildThreadOptions} options
  * @return {Thread} - The root thread, whose children are the top-level
  *                    annotations to display.
  */
 export default function buildThread(annotations, options) {
-  const opts = { ...defaultOpts, ...options };
-
-  const hasSelection = opts.selected.length > 0;
-  const hasForcedVisible = opts.forcedVisible.length > 0;
+  const hasSelection = options.selected.length > 0;
+  const hasForcedVisible = options.forcedVisible.length > 0;
 
   let thread = threadAnnotations(annotations);
 
@@ -322,18 +294,18 @@ export default function buildThread(annotations, options) {
     // Remove threads (annotations) that are not selected or
     // are not forced-visible
     thread.children = thread.children.filter(child => {
-      const isSelected = opts.selected.includes(child.id);
+      const isSelected = options.selected.includes(child.id);
       const isForcedVisible =
         hasForcedVisible &&
         child.annotation &&
-        opts.forcedVisible.includes(child.annotation.$tag);
+        options.forcedVisible.includes(child.annotation.$tag);
       return isSelected || isForcedVisible;
     });
   }
 
-  if (opts.threadFilterFn) {
+  if (options.threadFilterFn) {
     // Remove threads not matching thread-level filters
-    thread.children = thread.children.filter(opts.threadFilterFn);
+    thread.children = thread.children.filter(options.threadFilterFn);
   }
 
   // Set visibility for threads
@@ -342,17 +314,17 @@ export default function buildThread(annotations, options) {
 
     if (!thread.annotation) {
       threadIsVisible = false; // Nothing to show
-    } else if (opts.filterFn) {
+    } else if (options.filterFn) {
       if (
         hasForcedVisible &&
-        opts.forcedVisible.includes(thread.annotation.$tag)
+        options.forcedVisible.includes(thread.annotation.$tag)
       ) {
         // This annotation may or may not match the filter, but we should
         // make sure it is visible because it has been forced visible by user
         threadIsVisible = true;
       } else {
         // Otherwise, visibility depends on whether it matches the filter
-        threadIsVisible = !!opts.filterFn(thread.annotation);
+        threadIsVisible = !!options.filterFn(thread.annotation);
       }
     }
     return { ...thread, visible: threadIsVisible };
@@ -369,20 +341,22 @@ export default function buildThread(annotations, options) {
       collapsed: thread.collapsed,
     };
 
-    if (opts.expanded.hasOwnProperty(thread.id)) {
+    if (options.expanded.hasOwnProperty(thread.id)) {
       // This thread has been explicitly expanded/collapsed by user
-      threadStates.collapsed = !opts.expanded[thread.id];
+      threadStates.collapsed = !options.expanded[thread.id];
     } else {
       // If annotations are filtered, and at least one child matches
       // those filters, make sure thread is not collapsed
-      const hasUnfilteredChildren = opts.filterFn && hasVisibleChildren(thread);
+      const hasUnfilteredChildren =
+        options.filterFn && hasVisibleChildren(thread);
       threadStates.collapsed = thread.collapsed && !hasUnfilteredChildren;
     }
     return { ...thread, ...threadStates };
   });
 
   // Sort the root thread according to the current search criteria
-  thread = sortThread(thread, opts.sortCompareFn, opts.replySortCompareFn);
+  //const compareFn = options.sortCompareFn ?? defaultSortCompareFn;
+  thread = sortThread(thread, options.sortCompareFn, replySortCompareFn);
 
   // Update `replyCount` and `depth` properties
   thread = countRepliesAndDepth(thread, -1);

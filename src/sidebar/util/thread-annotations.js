@@ -1,13 +1,13 @@
 import buildThread from './build-thread';
 import memoize from './memoize';
-import * as metadata from './annotation-metadata';
 import { generateFacetedFilter } from './search-filter';
 import filterAnnotations from './view-filter';
 import { shouldShowInTab } from './tabs';
+import { sorters } from './thread-sorters';
 
 /** @typedef {import('../../types/api').Annotation} Annotation */
 /** @typedef {import('./build-thread').Thread} Thread */
-/** @typedef {import('./build-thread').Options} BuildThreadOptions */
+/** @typedef {import('./build-thread').BuildThreadOptions} BuildThreadOptions */
 
 /**
  * @typedef ThreadState
@@ -23,19 +23,6 @@ import { shouldShowInTab } from './tabs';
  * @prop {string|null} route
  */
 
-// Sort functions keyed on sort option
-const sortFns = {
-  Newest: function (a, b) {
-    return a.updated > b.updated;
-  },
-  Oldest: function (a, b) {
-    return a.updated < b.updated;
-  },
-  Location: function (a, b) {
-    return metadata.location(a) < metadata.location(b);
-  },
-};
-
 /**
  * Cobble together the right set of options and filters based on current
  * `threadState` to build the root thread.
@@ -46,12 +33,11 @@ const sortFns = {
 function buildRootThread(threadState) {
   const selection = threadState.selection;
 
-  /** @type {Partial<BuildThreadOptions>} */
   const options = {
     expanded: selection.expanded,
     forcedVisible: selection.forcedVisible,
     selected: selection.selected,
-    sortCompareFn: sortFns[selection.sortKey],
+    sortCompareFn: sorters[selection.sortKey],
   };
 
   // Is there a filter query present, or an applied user (focus) filter?

@@ -51,4 +51,45 @@ describe('sidebar/util/thread', () => {
       assert.equal(threadUtil.countHidden(thread), 3);
     });
   });
+
+  describe('rootAnnotations', () => {
+    it("returns all of the annotations in the thread's child threads if there is at least one annotation present", () => {
+      const fixture = {
+        children: [
+          { annotation: 1, children: [] },
+          { children: [] },
+          { annotation: 2, children: [] },
+        ],
+      };
+      assert.deepEqual(threadUtil.rootAnnotations(fixture.children), [1, 2]);
+    });
+
+    it('returns all of the annotations at the first depth that has any annotations', () => {
+      const fixture = {
+        children: [
+          {
+            children: [
+              { annotation: 1, children: [] },
+              { children: [] },
+              { annotation: 2, children: [] },
+            ],
+          },
+          { children: [{ children: [{ annotation: 3, children: [] }] }] },
+          { children: [{ annotation: 4, children: [] }] },
+        ],
+      };
+
+      assert.deepEqual(threadUtil.rootAnnotations(fixture.children), [1, 2, 4]);
+    });
+
+    it('throws an exception if fed a thread hierarchy with no annotations', () => {
+      const fixture = {
+        children: [{ children: [{ children: [] }] }],
+      };
+
+      assert.throws(() => {
+        threadUtil.rootAnnotations(fixture.children);
+      }, /Thread contains no annotations/);
+    });
+  });
 });
