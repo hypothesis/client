@@ -1,6 +1,7 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
 import threadAnnotations from '../thread-annotations';
+import { sorters } from '../thread-sorters';
 import { $imports } from '../thread-annotations';
 import immutable from '../immutable';
 
@@ -100,71 +101,15 @@ describe('sidebar/utils/thread-annotations', () => {
     });
 
     describe('when sort order changes', () => {
-      function sortBy(annotations, sortCompareFn) {
-        return annotations.slice().sort((a, b) => {
-          if (sortCompareFn(a, b)) {
-            return -1;
-          }
-          return sortCompareFn(b, a) ? 1 : 0;
-        });
-      }
-
-      // Format TextPositionSelector for the given position `pos`
-      function targetWithPos(pos) {
-        return [
-          {
-            selector: [{ type: 'TextPositionSelector', start: pos }],
-          },
-        ];
-      }
-
-      const annotations = [
-        {
-          target: targetWithPos(1),
-          updated: 20,
-        },
-        {
-          target: targetWithPos(100),
-          updated: 100,
-        },
-        {
-          target: targetWithPos(50),
-          updated: 50,
-        },
-        {
-          target: targetWithPos(20),
-          updated: 10,
-        },
-      ];
-
-      [
-        {
-          order: 'Location',
-          expectedOrder: [0, 3, 2, 1],
-        },
-        {
-          order: 'Oldest',
-          expectedOrder: [3, 0, 2, 1],
-        },
-        {
-          order: 'Newest',
-          expectedOrder: [1, 2, 0, 3],
-        },
-      ].forEach(testCase => {
-        it(`sorts correctly when sorting by ${testCase.order}`, () => {
-          fakeThreadState.selection.sortKey = testCase.order;
+      ['Location', 'Oldest', 'Newest'].forEach(testCase => {
+        it(`uses the appropriate sorting function when sorting by ${testCase}`, () => {
+          fakeThreadState.selection.sortKey = testCase;
 
           threadAnnotations(fakeThreadState);
 
           // The sort compare fn passed to `buildThread`
           const sortCompareFn = fakeBuildThread.args[0][1].sortCompareFn;
-
-          // Sort the test annotations by the sort compare fn that would be
-          // used by `build-thread` and make sure it's as expected
-          const actualOrder = sortBy(annotations, sortCompareFn).map(annot =>
-            annotations.indexOf(annot)
-          );
-          assert.deepEqual(actualOrder, testCase.expectedOrder);
+          assert.equal(sortCompareFn, sorters[testCase]);
         });
       });
     });
