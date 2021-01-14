@@ -18,7 +18,6 @@ import iconSet from './icons';
 registerIcons(iconSet);
 
 import configFrom from './config/index';
-import BucketBarPlugin from './plugin/bucket-bar';
 import CrossFramePlugin from './plugin/cross-frame';
 import DocumentPlugin from './plugin/document';
 import Guest from './guest';
@@ -28,9 +27,6 @@ import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
 
 const pluginClasses = {
-  // UI plugins
-  BucketBar: BucketBarPlugin,
-
   // Document type plugins
   PDF: PDFPlugin,
   Document: DocumentPlugin,

@@ -28,7 +28,7 @@ export default class Delegator {
    * Construct the `Delegator` instance.
    *
    * @param {HTMLElement} element
-   * @param {Object} [config]
+   * @param {Record<string, any>} [config]
    */
   constructor(element, config) {
     this.options = { ...config };
