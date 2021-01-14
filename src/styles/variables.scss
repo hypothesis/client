@@ -2,7 +2,8 @@
 
 // Greys (layout colors)
 // These may be used for non-textual styling of components and elements
-$white: #fff !default;
+// $white: #fff !default;
+$white: #f9f9f9 !default;
 
 // Interim color variable for migration purposes.
 // Used as very-subtle background color for form fields. $grey-1 is too dark.
@@ -35,7 +36,8 @@ $grey-6: #3f3f3f;
 $grey-7: #202020;
 
 // Text colors
-$color-text: $grey-7;
+// $color-text: $grey-7;
+$color-text: #7a7a7a;
 $color-text--light: $grey-5;
 // Text color when used on a dark background
 $color-text--inverted: $grey-1;
@@ -45,7 +47,7 @@ $color-success: #00a36d;
 $color-notice: #fbc168;
 $color-error: #d93c3f;
 
-$color-brand: #bd1c2b;
+$color-brand: #009be6; // #bd1c2b;
 $color-quote: #58cef4;
 
 $color-shadow: #000000;
@@ -67,13 +69,14 @@ $color-background: $white;
 // Links
 // -------------------------
 $color-link: $color-brand !default;
-$color-link-hover: #84141e !default;
+// $color-link-hover: #84141e !default;
+$color-link-hover: #ffa900 !default;
 
 // Typography
 // -------------------------
-$sans-font-family: 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande',
+$sans-font-family: 'Poppins', 'Helvetica Neue', Helvetica, Arial, 'Lucida Grande',
   sans-serif !default;
-$mono-font-family: Open Sans Mono, Menlo, DejaVu Sans Mono, monospace !default;
+$mono-font-family: 'Poppins', Open Sans Mono, Menlo, DejaVu Sans Mono, monospace !default;
 
 $font-size--xsmall: 10px;
 $font-size--small: 11px;

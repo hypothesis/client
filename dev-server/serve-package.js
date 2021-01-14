@@ -39,7 +39,7 @@ function servePackage(port) {
   // cdn.hypothes.is' structure.
   app.get('/hypothesis', serveBootScript);
   app.get(`/hypothesis/${version}`, serveBootScript);
-  app.use(`/hypothesis/${version}/`, express.static('.'));
+  app.use(`/hypothesis/`, express.static('./build'));
 
   createServer(app).listen(port, () => {
     const scheme = useSsl ? 'https' : 'http';

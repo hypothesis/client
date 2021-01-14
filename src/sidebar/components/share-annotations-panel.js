@@ -38,7 +38,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   // and is available to be copied to clipboard
   const shareURI = ((frame, group) => {
     return group && frame
-      ? `https://hyp.is/go?url=${encodeURIComponent(frame.uri)}&group=${
+      ? `https://ec2co-ecsel-dii7haomvslr-157781352.eu-west-2.elb.amazonaws.com/go?url=${encodeURIComponent(frame.uri)}&group=${
           group.id
         }`
       : '';
