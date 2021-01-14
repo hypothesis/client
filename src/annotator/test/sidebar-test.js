@@ -15,6 +15,7 @@ describe('Sidebar', () => {
 
   // `Sidebar` instances created by current test.
   let sidebars;
+  let sidebarContainer;
 
   let FakeToolbarController;
   let fakeToolbar;
@@ -25,6 +26,7 @@ describe('Sidebar', () => {
 
   after(() => {
     window.requestAnimationFrame.restore();
+    sidebarContainer?.remove();
   });
 
   const createSidebar = (config = {}) => {
@@ -36,9 +38,10 @@ describe('Sidebar', () => {
       sidebarConfig,
       config
     );
-    const element = document.createElement('div');
-    const sidebar = new Sidebar(element, config);
+    sidebarContainer = document.createElement('div');
+    const sidebar = new Sidebar(sidebarContainer, config);
 
+    document.body.appendChild(sidebarContainer);
     sidebars.push(sidebar);
 
     return sidebar;
@@ -98,6 +101,13 @@ describe('Sidebar', () => {
   });
 
   describe('sidebar container frame', () => {
+    it('creates shadow DOM', () => {
+      createSidebar();
+      const sidebar = sidebarContainer.querySelector('hypothesis-sidebar');
+      assert.exists(sidebar);
+      assert.exists(sidebar.shadowRoot);
+    });
+
     it('starts hidden', () => {
       const sidebar = createSidebar();
       assert.equal(sidebar.frame.style.display, 'none');
@@ -477,15 +487,19 @@ describe('Sidebar', () => {
   });
 
   describe('destruction', () => {
-    let sidebar;
-
-    beforeEach(() => {
-      sidebar = createSidebar({});
-    });
-
-    it('the sidebar is destroyed and the frame is detached', () => {
+    it('the (shadow DOMed) sidebar is destroyed and the frame is detached', () => {
+      const sidebar = createSidebar();
       sidebar.destroy();
       assert.called(fakeCrossFrame.destroy);
+      assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
+      assert.equal(sidebar.frame.parentElement, null);
+    });
+
+    it('the (non-shadow DOMed) sidebar is destroyed and the frame is detached', () => {
+      const sidebar = createSidebar({ disableShadowSidebar: true });
+      sidebar.destroy();
+      assert.called(fakeCrossFrame.destroy);
+      assert.notExists(sidebarContainer.querySelector('.annotator-frame'));
       assert.equal(sidebar.frame.parentElement, null);
     });
   });
@@ -661,7 +675,7 @@ describe('Sidebar', () => {
         const layoutChangeExternalConfig = {
           onLayoutChange: layoutChangeHandlerSpy,
           sidebarAppUrl: '/',
-          externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR,
+          externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
         };
         sidebar = createSidebar(layoutChangeExternalConfig);
 
@@ -700,7 +714,7 @@ describe('Sidebar', () => {
       document.body.appendChild(externalFrame);
 
       sidebar = createSidebar({
-        externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR,
+        externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
     });
 
@@ -724,9 +738,19 @@ describe('Sidebar', () => {
 
     it('does not have the BucketBar if an external container is provided', () => {
       const sidebar = createSidebar({
-        externalContainerSelector: '.' + EXTERNAL_CONTAINER_SELECTOR,
+        externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
       assert.isUndefined(sidebar.plugins.BucketBar);
+    });
+
+    it('disables shadow DOM if `disableShadowSidebar` flag is set', () => {
+      createSidebar({
+        disableShadowSidebar: true,
+      });
+      assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
+      const sidebar = sidebarContainer.querySelector('.annotator-frame');
+      assert.exists(sidebar);
+      assert.notExists(sidebar.shadowRoot);
     });
   });
 });

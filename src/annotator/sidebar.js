@@ -8,6 +8,8 @@ import features from './features';
 
 import Guest from './guest';
 import { ToolbarController } from './toolbar';
+import { createShadowRoot } from './util/shadow-root';
+import BucketBar from './plugin/bucket-bar';
 
 /**
  * @typedef LayoutState
@@ -18,12 +20,6 @@ import { ToolbarController } from './toolbar';
 
 // Minimum width to which the frame can be resized.
 const MIN_RESIZE = 280;
-
-const defaultConfig = {
-  BucketBar: {
-    container: '.annotator-frame',
-  },
-};
 
 /**
  * Create the iframe that will load the sidebar application.
@@ -53,24 +49,20 @@ function createSidebarIframe(config) {
  * as well as the adjacent controls.
  */
 export default class Sidebar extends Guest {
+  /**
+   * @param {HTMLElement} element
+   * @param {Record<string, any>} config
+   */
   constructor(element, config) {
-    if (config.theme === 'clean' || config.externalContainerSelector) {
-      delete config.pluginClasses.BucketBar;
-    }
-
-    let externalContainer = null;
-
-    if (config.externalContainerSelector) {
-      externalContainer = document.querySelector(
-        config.externalContainerSelector
-      );
-    }
+    super(element, config);
 
     let externalFrame;
     let frame;
+    let hypothesisSidebar; // refers to <hypothesis-sidebar> element
 
-    if (externalContainer) {
-      externalFrame = externalContainer;
+    if (config.externalContainerSelector) {
+      externalFrame =
+        document.querySelector(config.externalContainerSelector) || element;
     } else {
       frame = document.createElement('div');
       frame.style.display = 'none';
@@ -78,18 +70,32 @@ export default class Sidebar extends Guest {
 
       if (config.theme === 'clean') {
         frame.classList.add('annotator-frame--theme-clean');
+      } else {
+        // BucketBar is a "plugin" for legacy reasons and is now constructed here so
+        // that the parent element can be passed into the constructor.
+        this.plugins.BucketBar = new BucketBar(frame, {}, this);
       }
 
-      element.appendChild(frame);
+      // Undocumented switch to enable/disable the wrapping of the sidebar inside a shadow DOM
+      // 2021-01-22: remove this switch after the 2021-02-05
+      if (config.disableShadowSidebar) {
+        element.appendChild(frame);
+      } else {
+        // Wrap up the 'frame' element into a shadow DOM so it is not affected by host CSS styles
+        hypothesisSidebar = document.createElement('hypothesis-sidebar');
+        const shadowDom = createShadowRoot(hypothesisSidebar);
+        shadowDom.appendChild(frame);
+
+        element.appendChild(hypothesisSidebar);
+      }
     }
 
     const sidebarFrame = createSidebarIframe(config);
-
-    super(element, { ...defaultConfig, ...config });
+    (frame || externalFrame).appendChild(sidebarFrame);
 
     this.externalFrame = externalFrame;
     this.frame = frame;
-    (frame || externalFrame).appendChild(sidebarFrame);
+    this.hypothesisSidebar = hypothesisSidebar;
 
     this.subscribe('panelReady', () => {
       // Show the UI
@@ -171,6 +177,7 @@ export default class Sidebar extends Guest {
   destroy() {
     this._hammerManager?.destroy();
     this.frame?.remove();
+    this.hypothesisSidebar?.remove();
     super.destroy();
   }
 

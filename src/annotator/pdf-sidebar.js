@@ -8,7 +8,6 @@ import Sidebar from './sidebar';
 const defaultConfig = {
   PDF: {},
   BucketBar: {
-    container: '.annotator-frame',
     scrollables: ['#viewerContainer'],
   },
 };
@@ -19,6 +18,10 @@ const defaultConfig = {
 const MIN_PDF_WIDTH = 680;
 
 export default class PdfSidebar extends Sidebar {
+  /**
+   * @param {HTMLElement} element
+   * @param {Record<string, any>} config
+   */
   constructor(element, config) {
     super(element, { ...defaultConfig, ...config });
 

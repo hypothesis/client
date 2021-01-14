@@ -107,7 +107,7 @@ export default class Guest extends Delegator {
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {Object} config
+   * @param {Record<string, any>} config
    * @param {typeof htmlAnchoring} anchoring - Anchoring implementation
    */
   constructor(element, config, anchoring = htmlAnchoring) {
