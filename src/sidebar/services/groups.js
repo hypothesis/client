@@ -24,7 +24,6 @@ const DEFAULT_ORGANIZATION = {
 export default function groups(
   store,
   api,
-  isSidebar,
   serviceUrl,
   session,
   settings,
@@ -216,7 +215,7 @@ export default function groups(
     // Step 1: Get the URI of the active document, so we can fetch groups
     // associated with that document.
     let documentUri;
-    if (isSidebar) {
+    if (store.route() === 'sidebar') {
       documentUri = await getDocumentUriForGroupSearch();
     }
 

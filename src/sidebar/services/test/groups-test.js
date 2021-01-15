@@ -40,7 +40,6 @@ const dummyGroups = [
 describe('groups', function () {
   let fakeAuth;
   let fakeStore;
-  let fakeIsSidebar;
   let fakeSession;
   let fakeSettings;
   let fakeApi;
@@ -97,10 +96,10 @@ describe('groups', function () {
         setDirectLinkedGroupFetchFailed: sinon.stub(),
         clearDirectLinkedGroupFetchFailed: sinon.stub(),
         profile: sinon.stub().returns({ userid: null }),
+        route: sinon.stub().returns('sidebar'),
       }
     );
     fakeSession = sessionWithThreeGroups();
-    fakeIsSidebar = true;
     fakeApi = {
       annotation: {
         get: sinon.stub(),
@@ -137,7 +136,6 @@ describe('groups', function () {
     return groups(
       fakeStore,
       fakeApi,
-      fakeIsSidebar,
       fakeServiceUrl,
       fakeSession,
       fakeSettings,
@@ -482,7 +480,7 @@ describe('groups', function () {
 
     context('in the stream and single annotation page', () => {
       beforeEach(() => {
-        fakeIsSidebar = false;
+        fakeStore.route.returns('stream');
       });
 
       it('does not wait for the document URL', () => {
