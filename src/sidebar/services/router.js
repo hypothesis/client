@@ -14,9 +14,21 @@ export default function router($window, store) {
     const pathSegments = path.slice(1).split('/');
     const params = queryString.parse($window.location.search);
 
+    // The extension puts client resources under `/client/` to separate them
+    // from extension-specific resources. Ignore this part.
+    if (pathSegments[0] === 'client') {
+      pathSegments.shift();
+    }
+
+    // Routes loaded from h have no file extensions (eg. `/a/:id`, `/notebook`).
+    //
+    // Routes loaded from custom builds or the Chrome extension may have a '.html'
+    // extension.
+    const mainSegment = pathSegments[0].replace(/\.html$/, '');
+
     let route;
 
-    switch (pathSegments[0]) {
+    switch (mainSegment) {
       case 'a':
         route = 'annotation';
         params.id = pathSegments[1] || '';
