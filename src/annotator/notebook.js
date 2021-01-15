@@ -34,7 +34,7 @@ export default class Notebook extends Delegator {
     this._groupId = null;
     this._prevGroupId = null;
 
-    this.container = document.createElement('div');
+    this.container = document.createElement('hypothesis-notebook');
     this.container.style.display = 'none';
     this.container.className = 'notebook-outer';
 
