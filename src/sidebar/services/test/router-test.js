@@ -2,11 +2,14 @@ import EventEmitter from 'tiny-emitter';
 import router from '../router';
 
 const fixtures = [
+  // Sidebar for the embedded Hypothesis client.
   {
     path: '/app.html',
     route: 'sidebar',
     params: {},
   },
+
+  // Pages in "h" where the content is the client app.
   {
     path: '/notebook',
     route: 'notebook',
@@ -22,6 +25,18 @@ const fixtures = [
     search: 'q=foobar',
     route: 'stream',
     params: { q: 'foobar' },
+  },
+
+  // Browser extension.
+  {
+    path: '/client/app.html',
+    route: 'sidebar',
+    params: {},
+  },
+  {
+    path: '/client/notebook.html',
+    route: 'notebook',
+    params: {},
   },
 ];
 
@@ -71,8 +86,9 @@ describe('router', () => {
 
   describe('#navigate', () => {
     fixtures.forEach(({ path, search, route, params }) => {
-      if (route === 'sidebar') {
-        // You can't navigate _to_ the sidebar from another route.
+      // Skip scenarios where the app launches with a single route and cannot
+      // be navigated elsewhere afterwards.
+      if (route === 'sidebar' || path.startsWith('/client/')) {
         return;
       }
 
