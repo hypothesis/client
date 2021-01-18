@@ -56,6 +56,13 @@ function ThreadCard({ frameSync, thread }) {
     return !!target.closest('button') || !!target.closest('a');
   };
 
+  // Memoize threads to reduce avoid re-rendering when something changes in a
+  // parent component but the `Thread` itself has not changed.
+  const threadContent = useMemo(
+    () => <Thread thread={thread} showDocumentInfo={showDocumentInfo} />,
+    [thread, showDocumentInfo]
+  );
+
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <div
@@ -73,7 +80,7 @@ function ThreadCard({ frameSync, thread }) {
         'is-focused': isFocused,
       })}
     >
-      <Thread thread={thread} showDocumentInfo={showDocumentInfo} />
+      {threadContent}
     </div>
   );
 }

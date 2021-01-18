@@ -1,5 +1,6 @@
 import classnames from 'classnames';
 import { createElement, Fragment } from 'preact';
+import { useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
@@ -53,6 +54,30 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
   const onToggleReplies = () =>
     store.setExpanded(thread.id, !!thread.collapsed);
 
+  // Memoize annotation content to avoid re-rendering an annotation when content
+  // in other annotations/threads change.
+  const annotationContent = useMemo(
+    () =>
+      showAnnotation && (
+        <Fragment>
+          <ModerationBanner annotation={thread.annotation} />
+          <Annotation
+            annotation={thread.annotation}
+            replyCount={thread.replyCount}
+            showDocumentInfo={showDocumentInfo}
+            threadIsCollapsed={thread.collapsed}
+          />
+        </Fragment>
+      ),
+    [
+      showAnnotation,
+      thread.annotation,
+      thread.replyCount,
+      showDocumentInfo,
+      thread.collapsed,
+    ]
+  );
+
   return (
     <section
       className={classnames('thread', {
@@ -72,17 +97,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
       )}
 
       <div className="thread__content">
-        {showAnnotation && (
-          <Fragment>
-            <ModerationBanner annotation={thread.annotation} />
-            <Annotation
-              annotation={thread.annotation}
-              replyCount={thread.replyCount}
-              showDocumentInfo={showDocumentInfo}
-              threadIsCollapsed={thread.collapsed}
-            />
-          </Fragment>
-        )}
+        {annotationContent}
 
         {!thread.annotation && (
           <div className="thread__unavailable-message">
