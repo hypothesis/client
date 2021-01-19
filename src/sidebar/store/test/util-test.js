@@ -1,3 +1,5 @@
+import fakeStore from '../../test/fake-redux-store';
+
 import * as util from '../util';
 
 const fixtures = {
@@ -184,6 +186,46 @@ describe('sidebar/store/util', function () {
           },
           getState
         );
+      });
+    });
+  });
+
+  describe('awaitStateChange()', () => {
+    let store;
+
+    beforeEach(() => {
+      store = fakeStore({
+        fake: { val: 0 },
+      });
+    });
+
+    function getValWhenGreaterThanTwo(store) {
+      if (store.getState().val < 3) {
+        return null;
+      }
+      return store.getState().val;
+    }
+
+    it('should return promise that resolves to a non-null value', () => {
+      const expected = 5;
+      store.setState({ val: 5 });
+      return util
+        .awaitStateChange(store, getValWhenGreaterThanTwo)
+        .then(function (actual) {
+          assert.equal(actual, expected);
+        });
+    });
+
+    it('should wait for awaitStateChange to return a non-null value', () => {
+      let valPromise;
+      const expected = 5;
+
+      store.setState({ val: 2 });
+      valPromise = util.awaitStateChange(store, getValWhenGreaterThanTwo);
+      store.setState({ val: 5 });
+
+      return valPromise.then(actual => {
+        assert.equal(actual, expected);
       });
     });
   });
