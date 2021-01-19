@@ -5,13 +5,13 @@ import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
-import { countHidden, countVisible } from '../util/thread';
+import { countHidden, countVisible } from '../helpers/thread';
 
 import Annotation from './annotation';
 import Button from './button';
 import ModerationBanner from './moderation-banner';
 
-/** @typedef {import('../util/build-thread').Thread} Thread */
+/** @typedef {import('../helpers/build-thread').Thread} Thread */
 
 /**
  * @typedef ThreadProps

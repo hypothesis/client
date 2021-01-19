@@ -3,7 +3,7 @@ import debounce from 'lodash.debounce';
 import bridgeEvents from '../../shared/bridge-events';
 import Discovery from '../../shared/discovery';
 import uiConstants from '../ui-constants';
-import * as metadata from '../util/annotation-metadata';
+import * as metadata from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
 /**

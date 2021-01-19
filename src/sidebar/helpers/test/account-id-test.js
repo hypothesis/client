@@ -1,6 +1,6 @@
 import { parseAccountID, username, isThirdPartyUser } from '../account-id';
 
-describe('sidebar.util.account-id', function () {
+describe('sidebar/helpers/account-id', function () {
   const term = 'acct:hacker@example.com';
 
   describe('parseAccountID', function () {

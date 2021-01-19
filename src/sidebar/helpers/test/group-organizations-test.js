@@ -1,7 +1,7 @@
 import * as orgFixtures from '../../test/group-fixtures';
 import groupsByOrganization from '../group-organizations';
 
-describe('group-organizations', function () {
+describe('sidebar/helpers/group-organizations', function () {
   context('when sorting organizations and their contained groups', function () {
     it('should put the default organization groups last', function () {
       const defaultOrg = orgFixtures.defaultOrganization();

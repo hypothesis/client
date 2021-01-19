@@ -17,7 +17,7 @@ const poem = {
           Only this and nothing more.”`,
 };
 
-describe('sidebar/util/view-filter', () => {
+describe('sidebar/helpers/view-filter', () => {
   let fakeUnicode;
 
   beforeEach(() => {
@@ -27,7 +27,7 @@ describe('sidebar/util/view-filter', () => {
     };
 
     $imports.$mock({
-      './unicode': fakeUnicode,
+      '../util/unicode': fakeUnicode,
     });
   });
 

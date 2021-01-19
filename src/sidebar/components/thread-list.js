@@ -4,16 +4,16 @@ import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 
 import { useStoreProxy } from '../store/use-store';
-import { isHighlight } from '../util/annotation-metadata';
+import { isHighlight } from '../helpers/annotation-metadata';
 import { getElementHeightWithMargins } from '../util/dom';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
-} from '../util/visible-threads';
+} from '../helpers/visible-threads';
 
 import ThreadCard from './thread-card';
 
-/** @typedef {import('../util/build-thread').Thread} Thread */
+/** @typedef {import('../helpers/build-thread').Thread} Thread */
 
 // The precision of the `scrollPosition` value in pixels; values will be rounded
 // down to the nearest multiple of this scale value

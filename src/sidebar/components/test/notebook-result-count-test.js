@@ -31,7 +31,7 @@ describe('NotebookResultCount', () => {
     $imports.$mock({
       './hooks/use-root-thread': fakeUseRootThread,
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/thread': { countVisible: fakeCountVisible },
+      '../helpers/thread': { countVisible: fakeCountVisible },
     });
   });
 

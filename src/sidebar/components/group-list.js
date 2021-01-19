@@ -4,10 +4,10 @@ import propTypes from 'prop-types';
 
 import serviceConfig from '../service-config';
 import { useStoreProxy } from '../store/use-store';
-import { isThirdPartyUser } from '../util/account-id';
-import { orgName } from '../util/group-list-item-common';
-import groupsByOrganization from '../util/group-organizations';
-import isThirdPartyService from '../util/is-third-party-service';
+import { isThirdPartyUser } from '../helpers/account-id';
+import { orgName } from '../helpers/group-list-item-common';
+import groupsByOrganization from '../helpers/group-organizations';
+import isThirdPartyService from '../helpers/is-third-party-service';
 import { withServices } from '../util/service-context';
 
 import GroupListSection from './group-list-section';

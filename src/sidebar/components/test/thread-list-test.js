@@ -69,9 +69,9 @@ describe('ThreadList', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/annotation-metadata': fakeMetadata,
+      '../helpers/annotation-metadata': fakeMetadata,
       '../util/dom': fakeDomUtil,
-      '../util/visible-threads': fakeVisibleThreadsUtil,
+      '../helpers/visible-threads': fakeVisibleThreadsUtil,
     });
   });
 
@@ -231,7 +231,7 @@ describe('ThreadList', () => {
       // For these tests, don't mock element height or visible thread calculation.
       $imports.$restore({
         '../util/dom': true,
-        '../util/visible-threads': true,
+        '../helpers/visible-threads': true,
       });
     });
 
@@ -240,7 +240,7 @@ describe('ThreadList', () => {
       const renderedThreads = wrapper.find('ThreadCard');
 
       // "7" is the current expected value given the thread heights, scroll
-      // container size and constants in `../util/visible-threads`.
+      // container size and constants in `../helpers/visible-threads`.
       assert.equal(renderedThreads.length, 7);
     });
 

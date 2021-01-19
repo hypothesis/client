@@ -19,7 +19,7 @@ describe('Tutorial', function () {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../util/is-third-party-service': fakeIsThirdPartyService,
+      '../helpers/is-third-party-service': fakeIsThirdPartyService,
     });
   });
 

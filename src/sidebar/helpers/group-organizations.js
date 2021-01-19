@@ -1,4 +1,4 @@
-import immutable from './immutable';
+import immutable from '../util/immutable';
 
 /**
  * @typedef {import('../../types/api').Group} Group

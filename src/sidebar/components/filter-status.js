@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { countVisible } from '../util/thread';
+import { countVisible } from '../helpers/thread';
 
 import Button from './button';
 
@@ -10,7 +10,7 @@ import useRootThread from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
 
 /**
- * @typedef {import('../util/build-thread').Thread} Thread
+ * @typedef {import('../helpers/build-thread').Thread} Thread
  */
 
 /**

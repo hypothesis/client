@@ -7,8 +7,8 @@ import {
   isHighlight,
   isReply,
   hasBeenEdited,
-} from '../util/annotation-metadata';
-import { isPrivate } from '../util/permissions';
+} from '../helpers/annotation-metadata';
+import { isPrivate } from '../helpers/permissions';
 
 import AnnotationDocumentInfo from './annotation-document-info';
 import AnnotationShareInfo from './annotation-share-info';

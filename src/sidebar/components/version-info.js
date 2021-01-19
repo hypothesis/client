@@ -8,7 +8,7 @@ import Button from './button';
 
 /**
  * @typedef VersionInfoProps
- * @prop {import('../util/version-data').default} versionData - Object with version information
+ * @prop {import('../helpers/version-data').default} versionData - Object with version information
  * @prop {Object} toastMessenger - Injected service
  */
 

@@ -55,7 +55,7 @@ describe('FilterStatus', () => {
     $imports.$mock({
       './hooks/use-root-thread': fakeUseRootThread,
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/thread': fakeThreadUtil,
+      '../helpers/thread': fakeThreadUtil,
     });
   });
 

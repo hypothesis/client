@@ -27,7 +27,7 @@ describe('AnnotationDocumentInfo', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../util/annotation-metadata': fakeMetadata,
+      '../helpers/annotation-metadata': fakeMetadata,
     });
   });
 

@@ -54,8 +54,8 @@ describe('annotationsService', () => {
     };
 
     $imports.$mock({
-      '../util/annotation-metadata': fakeMetadata,
-      '../util/permissions': {
+      '../helpers/annotation-metadata': fakeMetadata,
+      '../helpers/permissions': {
         defaultPermissions: fakeDefaultPermissions,
         privatePermissions: fakePrivatePermissions,
         sharedPermissions: fakeSharedPermissions,

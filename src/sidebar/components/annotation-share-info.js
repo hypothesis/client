@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import { isPrivate } from '../util/permissions';
+import { isPrivate } from '../helpers/permissions';
 
 import SvgIcon from '../../shared/components/svg-icon';
 

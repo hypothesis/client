@@ -1,6 +1,6 @@
 import * as sharingUtil from '../annotation-sharing';
 
-describe('sidebar.util.annotation-sharing', () => {
+describe('sidebar/helpers/annotation-sharing', () => {
   let fakeAnnotation;
   let fakeServiceConfig;
   let fakeServiceSettings;

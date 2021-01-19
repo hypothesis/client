@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import { withServices } from '../util/service-context';
-import VersionData from '../util/version-data';
+import VersionData from '../helpers/version-data';
 
 import SidebarPanel from './sidebar-panel';
 import SvgIcon from '../../shared/components/svg-icon';

@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import { withServices } from '../util/service-context';
-import { applyTheme } from '../util/theme';
+import { applyTheme } from '../helpers/theme';
 import { useStoreProxy } from '../store/use-store';
 
 import AnnotationLicense from './annotation-license';

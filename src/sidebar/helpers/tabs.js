@@ -1,6 +1,6 @@
 // Functions that determine which tab an annotation should be displayed in.
 
-import * as metadata from './annotation-metadata';
+import * as metadata from '../helpers/annotation-metadata';
 
 /**
  * @typedef {import('../../types/api').Annotation} Annotation

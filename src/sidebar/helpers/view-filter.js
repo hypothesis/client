@@ -12,7 +12,7 @@
  */
 
 import { quote } from './annotation-metadata';
-import * as unicodeUtils from './unicode';
+import * as unicodeUtils from '../util/unicode';
 
 /**
  * @typedef Filter

@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { isThirdPartyUser, username } from '../util/account-id';
+import { isThirdPartyUser, username } from '../helpers/account-id';
 import { withServices } from '../util/service-context';
 
 /**

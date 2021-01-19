@@ -1,6 +1,6 @@
 import { applyTheme } from '../theme';
 
-describe('sidebar/util/theme/applyTheme', () => {
+describe('sidebar/helpers/theme', () => {
   let fakeSettings;
 
   beforeEach(() => {

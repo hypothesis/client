@@ -1,6 +1,6 @@
 import serviceConfig from '../service-config';
-import { isReply } from '../util/annotation-metadata';
-import { combineGroups } from '../util/groups';
+import { isReply } from '../helpers/annotation-metadata';
+import { combineGroups } from '../helpers/groups';
 import { awaitStateChange } from '../util/state';
 import { watch } from '../util/watch';
 

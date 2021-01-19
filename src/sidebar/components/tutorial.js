@@ -1,7 +1,7 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import isThirdPartyService from '../util/is-third-party-service';
+import isThirdPartyService from '../helpers/is-third-party-service';
 import { withServices } from '../util/service-context';
 
 import SvgIcon from '../../shared/components/svg-icon';

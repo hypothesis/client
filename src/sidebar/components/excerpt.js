@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 
 import observeElementSize from '../util/observe-element-size';
 import { withServices } from '../util/service-context';
-import { applyTheme } from '../util/theme';
+import { applyTheme } from '../helpers/theme';
 
 /**
  * @typedef InlineControlsProps
