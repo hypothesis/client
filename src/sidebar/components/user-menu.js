@@ -5,7 +5,7 @@ import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../service-config';
 import { isThirdPartyUser } from '../helpers/account-id';
 import { useStoreProxy } from '../store/use-store';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import Menu from './menu';
 import MenuItem from './menu-item';

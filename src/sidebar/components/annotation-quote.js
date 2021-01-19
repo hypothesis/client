@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { isOrphan, quote } from '../helpers/annotation-metadata';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
 import Excerpt from './excerpt';

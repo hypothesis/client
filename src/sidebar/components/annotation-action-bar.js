@@ -8,7 +8,7 @@ import {
   annotationSharingLink,
 } from '../helpers/annotation-sharing';
 import { isPrivate, permits } from '../helpers/permissions';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import AnnotationShareControl from './annotation-share-control';
 import Button from './button';

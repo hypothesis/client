@@ -6,7 +6,7 @@ import serviceConfig from '../service-config';
 import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import isThirdPartyService from '../helpers/is-third-party-service';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
 import Button from './button';

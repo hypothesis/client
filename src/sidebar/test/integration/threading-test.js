@@ -6,7 +6,7 @@ import { act } from 'preact/test-utils';
 import { Injector } from '../../../shared/injector';
 import storeFactory from '../../store';
 
-import { ServiceContext } from '../../util/service-context';
+import { ServiceContext } from '../../service-context';
 import useRootThread from '../../components/hooks/use-root-thread';
 
 const fixtures = {

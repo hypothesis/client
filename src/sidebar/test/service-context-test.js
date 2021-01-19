@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 
 import { ServiceContext, withServices, useService } from '../service-context';
 
-describe('service-context', () => {
+describe('sidebar/service-context', () => {
   describe('withServices', () => {
     let container;
     let lastProps;
