@@ -4,7 +4,7 @@ coverage/
 docs/_build/
 
 # The client uses Yarn rather than npm to manage the lockfile.
-package-lock.json
+./package-lock.json
 
 # SSL certificate and key.
 .tlscert.pem

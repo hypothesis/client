@@ -1,5 +1,6 @@
-@use "sass:color";
 @use "@hypothesis/frontend-shared/styles/mixins/focus";
+
+@use "sass:color";
 @use "../../mixins/layout";
 @use "../../mixins/utils";
 @use "../../variables" as var;

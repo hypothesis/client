@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -8,7 +9,6 @@ import { withServices } from '../service-context';
 import VersionData from '../helpers/version-data';
 
 import SidebarPanel from './sidebar-panel';
-import SvgIcon from '../../shared/components/svg-icon';
 import Tutorial from './tutorial';
 import VersionInfo from './version-info';
 

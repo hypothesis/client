@@ -93,8 +93,11 @@ function setupFrameSync(frameSync, store) {
 }
 
 // Register icons used by the sidebar app (and maybe other assets in future).
-import { registerIcons } from '../shared/components/svg-icon';
+import { registerIcons as registerIconsDeprecated } from '../shared/components/svg-icon';
+import { registerIcons } from '@hypothesis/frontend-shared';
 import iconSet from './icons';
+
+registerIconsDeprecated(iconSet); // Temporary until we replace this module
 registerIcons(iconSet);
 
 // The entry point component for the app.
