@@ -4,3 +4,4 @@ build/
 coverage/
 docs/
 dev-server/static/*
+lib/

@@ -15,6 +15,10 @@ const through = require('through2');
 
 const createBundle = require('./scripts/gulp/create-bundle');
 const createStyleBundle = require('./scripts/gulp/create-style-bundle');
+const {
+  buildFrontendSharedJs,
+  linkFrontendShared,
+} = require('./scripts/gulp/frontend-shared');
 const manifest = require('./scripts/gulp/manifest');
 const serveDev = require('./dev-server/serve-dev');
 const servePackage = require('./dev-server/serve-package');
@@ -141,6 +145,19 @@ gulp.task(
     });
   })
 );
+
+gulp.task('build-frontend-shared-js', buildFrontendSharedJs);
+
+gulp.task('link-frontend-shared', linkFrontendShared);
+
+gulp.task(
+  'build-frontend-shared',
+  gulp.series('build-frontend-shared-js', 'link-frontend-shared')
+);
+
+gulp.task('watch-frontend-shared', () => {
+  gulp.watch('./frontend-shared/src/**', gulp.series(buildFrontendSharedJs));
+});
 
 const cssBundles = [
   // H
@@ -314,7 +331,9 @@ gulp.task(
     'watch-css',
     'watch-fonts',
     'watch-images',
-    'watch-manifest'
+    'watch-manifest',
+    'watch-frontend-shared',
+    'link-frontend-shared'
   )
 );
 

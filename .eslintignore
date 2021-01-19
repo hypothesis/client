@@ -3,3 +3,4 @@ build/**
 **/coverage/**
 docs/_build/*
 dev-server/static/**/*.js
+frontend-shared/lib/**

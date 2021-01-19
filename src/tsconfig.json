@@ -12,12 +12,14 @@
     "target": "ES2020"
   },
   "include": [
-    "**/*.js"
+    "**/*.js",
+    "../frontend-shared/src/**/*.js",
   ],
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",
     "test-util/**/*.js",
     "karma.config.js",
+    "../frontend-shared/src/test/**/*.js",
   ]
 }
