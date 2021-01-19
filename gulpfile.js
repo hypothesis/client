@@ -137,15 +137,6 @@ gulp.task(
   })
 );
 
-gulp.task(
-  'watch-js',
-  gulp.series('build-vendor-js', function watchJS() {
-    appBundleConfigs.forEach(function (config) {
-      createBundle(config, { watch: true });
-    });
-  })
-);
-
 gulp.task('build-frontend-shared-js', buildFrontendSharedJs);
 
 gulp.task('link-frontend-shared', linkFrontendShared);
@@ -158,6 +149,18 @@ gulp.task(
 gulp.task('watch-frontend-shared', () => {
   gulp.watch('./frontend-shared/src/**', gulp.series(buildFrontendSharedJs));
 });
+
+gulp.task(
+  'watch-js',
+  gulp.series(
+    gulp.parallel('build-vendor-js', 'build-frontend-shared-js'),
+    function watchJS() {
+      appBundleConfigs.forEach(function (config) {
+        createBundle(config, { watch: true });
+      });
+    }
+  )
+);
 
 const cssBundles = [
   // H
@@ -185,7 +188,10 @@ gulp.task(
   'watch-css',
   gulp.series('build-css', function watchCSS() {
     const vendorCSS = cssBundles.filter(path => path.endsWith('.css'));
-    const styleFileGlobs = vendorCSS.concat('./src/styles/**/*.scss');
+    const frontendSharedGlobs = vendorCSS.concat(
+      './frontend-shared/styles/**/*.scss'
+    );
+    const styleFileGlobs = frontendSharedGlobs.concat('./src/styles/**/*.scss');
 
     gulp.watch(styleFileGlobs, gulp.task('build-css'));
   })
@@ -324,16 +330,18 @@ gulp.task('build', gulp.series(buildAssets, generateManifest));
 
 gulp.task(
   'watch',
-  gulp.parallel(
-    'serve-package',
-    'serve-test-pages',
-    'watch-js',
-    'watch-css',
-    'watch-fonts',
-    'watch-images',
-    'watch-manifest',
-    'watch-frontend-shared',
-    'link-frontend-shared'
+  gulp.series(
+    'link-frontend-shared',
+    gulp.parallel(
+      'serve-package',
+      'serve-test-pages',
+      'watch-js',
+      'watch-css',
+      'watch-fonts',
+      'watch-images',
+      'watch-manifest',
+      'watch-frontend-shared'
+    )
   )
 );
 
