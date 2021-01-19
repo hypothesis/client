@@ -2,6 +2,11 @@
 
 A package of resources for Hypothesis front-end applications.
 
+#### Requirements
+
+- preact
+- browserify
+
 ### Usage
 
 ```
@@ -12,6 +17,12 @@ $ npm install @hypothesis/frontend-shared --save
 
 ```sass
 @use "@hypothesis/frontend-shared/styles/mixins" as mixins;
+```
+
+#### In JS
+
+```js
+import { SvgIcon } from '@hypothesis/frontend-shared';
 ```
 
 License

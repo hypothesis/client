@@ -2,5 +2,34 @@
   "name": "@hypothesis/frontend-shared",
   "version": "1.0.0",
   "repository": "hypothesis/client/frontend-shared",
-  "dependencies": {}
+  "devDependencies": {
+    "@babel/cli": "^7.1.6",
+    "@babel/core": "^7.1.6",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0"
+  },
+  "scripts": {
+    "build": "npx babel src --out-dir lib --source-maps --ignore '**/test'"
+  },
+  "files": [
+    "lib",
+    "styles",
+    "images"
+  ],
+  "main": "./lib/index.js",
+  "browserify": {
+    "transform": [
+      [
+        "stringify",
+        {
+          "appliesTo": {
+            "includeExtensions": [
+              ".html",
+              ".svg"
+            ]
+          }
+        }
+      ]
+    ]
+  }
 }
