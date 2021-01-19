@@ -6,12 +6,12 @@
  * application-store representations. Interacts with API services as needed.
  */
 
-import * as metadata from '../util/annotation-metadata';
+import * as metadata from '../helpers/annotation-metadata';
 import {
   defaultPermissions,
   privatePermissions,
   sharedPermissions,
-} from '../util/permissions';
+} from '../helpers/permissions';
 import { generateHexString } from '../util/random';
 import uiConstants from '../ui-constants';
 

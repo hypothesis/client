@@ -1,7 +1,7 @@
 import { useMemo } from 'preact/hooks';
 
 import { useStoreProxy } from '../../store/use-store';
-import { username } from '../../util/account-id';
+import { username } from '../../helpers/account-id';
 
 /** @typedef {import('../../store/modules/filters').FilterOption} FilterOption */
 

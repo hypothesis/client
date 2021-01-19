@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import uiConstants from '../ui-constants';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
-import { applyTheme } from '../util/theme';
+import { applyTheme } from '../helpers/theme';
 
 import Button from './button';
 

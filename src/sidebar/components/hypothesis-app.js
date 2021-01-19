@@ -7,9 +7,9 @@ import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../service-config';
 import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
-import { parseAccountID } from '../util/account-id';
-import { shouldAutoDisplayTutorial } from '../util/session';
-import { applyTheme } from '../util/theme';
+import { parseAccountID } from '../helpers/account-id';
+import { shouldAutoDisplayTutorial } from '../helpers/session';
+import { applyTheme } from '../helpers/theme';
 import { withServices } from '../util/service-context';
 
 import AnnotationView from './annotation-view';

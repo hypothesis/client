@@ -1,6 +1,6 @@
 import * as sessionUtil from '../session';
 
-describe('sidebar/util/session', () => {
+describe('sidebar/helpers/session', () => {
   describe('#shouldShowSidebarTutorial', () => {
     it('shows sidebar tutorial if the settings object has the show_sidebar_tutorial key set', function () {
       const sessionState = {

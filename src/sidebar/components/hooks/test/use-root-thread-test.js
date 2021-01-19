@@ -21,7 +21,7 @@ describe('sidebar/components/hooks/use-root-thread', () => {
 
     $imports.$mock({
       '../../store/use-store': { useStoreProxy: () => fakeStore },
-      '../../util/thread-annotations': fakeThreadAnnotations,
+      '../../helpers/thread-annotations': fakeThreadAnnotations,
     });
 
     // Mount a dummy component to be able to use the `useRootThread` hook

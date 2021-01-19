@@ -12,7 +12,7 @@
 
 import SearchClient from '../search-client';
 
-import { isReply } from '../util/annotation-metadata';
+import { isReply } from '../helpers/annotation-metadata';
 
 // @inject
 export default function loadAnnotationsService(

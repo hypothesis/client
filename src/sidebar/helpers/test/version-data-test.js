@@ -1,6 +1,6 @@
 import VersionData from '../version-data';
 
-describe('VersionData', () => {
+describe('sidebar/helpers/version-data', () => {
   let clock;
 
   beforeEach(() => {

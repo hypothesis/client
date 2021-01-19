@@ -1,7 +1,7 @@
-import { notNull } from './typing';
+import { notNull } from '../util/typing';
 
 /** @typedef {import('../../types/api').Annotation} Annotation */
-/** @typedef {import('../util/build-thread').Thread} Thread */
+/** @typedef {import('./build-thread').Thread} Thread */
 
 /**
  * Count the number of annotations/replies in the `thread` whose `visible`

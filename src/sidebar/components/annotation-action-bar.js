@@ -6,8 +6,8 @@ import { useStoreProxy } from '../store/use-store';
 import {
   sharingEnabled,
   annotationSharingLink,
-} from '../util/annotation-sharing';
-import { isPrivate, permits } from '../util/permissions';
+} from '../helpers/annotation-sharing';
+import { isPrivate, permits } from '../helpers/permissions';
 import { withServices } from '../util/service-context';
 
 import AnnotationShareControl from './annotation-share-control';

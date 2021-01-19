@@ -31,7 +31,7 @@ const addChildThread = parent => {
   return childThread;
 };
 
-// NB: This logic lifted from `util/build-thread.js`
+// NB: This logic lifted from `helpers/build-thread.js`
 function countRepliesAndDepth(thread, depth) {
   const children = thread.children.map(child => {
     return countRepliesAndDepth(child, depth + 1);
@@ -96,7 +96,7 @@ describe('Thread', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/thread': fakeThreadUtil,
+      '../helpers/thread': fakeThreadUtil,
     });
   });
 

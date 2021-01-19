@@ -57,7 +57,7 @@ describe('UserMenu', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../util/account-id': {
+      '../helpers/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
       '../service-config': fakeServiceConfig,
