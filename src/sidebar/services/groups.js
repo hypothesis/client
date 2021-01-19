@@ -1,7 +1,7 @@
 import serviceConfig from '../service-config';
 import { isReply } from '../helpers/annotation-metadata';
 import { combineGroups } from '../helpers/groups';
-import { awaitStateChange } from '../util/state';
+import { awaitStateChange } from '../store/util';
 import { watch } from '../util/watch';
 
 /** @typedef {import('../../types/api').Group} Group */
