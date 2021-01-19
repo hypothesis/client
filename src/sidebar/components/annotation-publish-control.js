@@ -2,10 +2,10 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import { isNew, isReply } from '../util/annotation-metadata';
-import { isShared } from '../util/permissions';
+import { isNew, isReply } from '../helpers/annotation-metadata';
+import { isShared } from '../helpers/permissions';
 import { withServices } from '../util/service-context';
-import { applyTheme } from '../util/theme';
+import { applyTheme } from '../helpers/theme';
 
 import Button from './button';
 import Menu from './menu';

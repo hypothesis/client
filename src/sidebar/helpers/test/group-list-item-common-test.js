@@ -1,6 +1,6 @@
 import * as groupListItemCommon from '../group-list-item-common';
 
-describe('sidebar/util/groupListItemCommon', () => {
+describe('sidebar/helpers/group-list-item-common', () => {
   describe('orgName', () => {
     it('returns the organization name if it exists', () => {
       const fakeGroup = { id: 'groupid', organization: { name: 'org' } };

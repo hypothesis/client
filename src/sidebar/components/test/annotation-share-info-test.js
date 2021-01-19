@@ -38,7 +38,7 @@ describe('AnnotationShareInfo', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/permissions': { isPrivate: fakeIsPrivate },
+      '../helpers/permissions': { isPrivate: fakeIsPrivate },
     });
   });
 

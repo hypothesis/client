@@ -58,7 +58,7 @@ describe('ShareAnnotationsPanel', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/annotation-sharing': {
+      '../helpers/annotation-sharing': {
         pageSharingLink: fakePageSharingLink,
       },
       '../util/copy-to-clipboard': fakeCopyToClipboard,

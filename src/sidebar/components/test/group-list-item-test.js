@@ -71,7 +71,7 @@ describe('GroupListItem', () => {
       '../util/copy-to-clipboard': {
         copyText: fakeCopyText,
       },
-      '../util/group-list-item-common': fakeGroupListItemCommon,
+      '../helpers/group-list-item-common': fakeGroupListItemCommon,
       '../store/use-store': { useStoreProxy: () => fakeStore },
     });
 

@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'preact/hooks';
 import useRootThread from './hooks/use-root-thread';
 import { withServices } from '../util/service-context';
 import { useStoreProxy } from '../store/use-store';
-import { tabForAnnotation } from '../util/tabs';
+import { tabForAnnotation } from '../helpers/tabs';
 
 import FilterStatus from './filter-status';
 import LoggedOutMessage from './logged-out-message';

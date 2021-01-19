@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../util/build-thread').Thread} Thread
+ * @typedef {import('../helpers/build-thread').Thread} Thread
  */
 
 // @inject

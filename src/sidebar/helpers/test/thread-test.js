@@ -1,6 +1,6 @@
 import * as threadUtil from '../thread';
 
-describe('sidebar/util/thread', () => {
+describe('sidebar/helpers/thread', () => {
   const fakeThread = () => {
     return {
       annotation: {},

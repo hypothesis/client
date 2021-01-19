@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import * as annotationMetadata from '../util/annotation-metadata';
+import * as annotationMetadata from '../helpers/annotation-metadata';
 import { withServices } from '../util/service-context';
 
 /**

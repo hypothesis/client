@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import { isReply, quote } from '../util/annotation-metadata';
+import { isReply, quote } from '../helpers/annotation-metadata';
 import { withServices } from '../util/service-context';
 
 import AnnotationActionBar from './annotation-action-bar';

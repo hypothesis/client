@@ -82,10 +82,10 @@ describe('HypothesisApp', () => {
     $imports.$mock({
       '../service-config': fakeServiceConfig,
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/session': {
+      '../helpers/session': {
         shouldAutoDisplayTutorial: fakeShouldAutoDisplayTutorial,
       },
-      '../util/theme': { applyTheme: fakeApplyTheme },
+      '../helpers/theme': { applyTheme: fakeApplyTheme },
     });
   });
 

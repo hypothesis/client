@@ -2,7 +2,7 @@ import * as permissions from '../permissions';
 
 const userid = 'acct:flash@gord.on';
 
-describe('sidebar/util/permissions', () => {
+describe('sidebar/helpers/permissions', () => {
   describe('#privatePermissions', () => {
     it('only allows the user to read the annotation', () => {
       assert.deepEqual(permissions.privatePermissions(userid), {

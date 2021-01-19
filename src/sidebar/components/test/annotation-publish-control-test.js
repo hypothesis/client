@@ -59,8 +59,8 @@ describe('AnnotationPublishControl', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/annotation-metadata': fakeMetadata,
-      '../util/theme': {
+      '../helpers/annotation-metadata': fakeMetadata,
+      '../helpers/theme': {
         applyTheme: fakeApplyTheme,
       },
     });

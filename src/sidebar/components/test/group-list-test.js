@@ -119,7 +119,7 @@ describe('GroupList', () => {
     const fakeGroupOrganizations = groups =>
       groups.sort((a, b) => a.id.localeCompare(b.id));
     $imports.$mock({
-      '../util/group-organizations': fakeGroupOrganizations,
+      '../helpers/group-organizations': fakeGroupOrganizations,
     });
 
     const wrapper = createGroupList();
@@ -171,7 +171,7 @@ describe('GroupList', () => {
   context('when `isThirdPartyService` is true', () => {
     beforeEach(() => {
       $imports.$mock({
-        '../util/is-third-party-service': () => true,
+        '../helpers/is-third-party-service': () => true,
       });
     });
 

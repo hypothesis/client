@@ -4,7 +4,7 @@ import * as annotationMetadata from '../annotation-metadata';
 const documentMetadata = annotationMetadata.documentMetadata;
 const domainAndTitle = annotationMetadata.domainAndTitle;
 
-describe('sidebar/util/annotation-metadata', () => {
+describe('sidebar/helpers/annotation-metadata', () => {
   const fakeAnnotation = (props = {}) => {
     return {
       document: {},

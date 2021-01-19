@@ -124,7 +124,7 @@ describe('groups', function () {
     fakeSettings = { group: null };
 
     $imports.$mock({
-      '../util/annotation-metadata': fakeMetadata,
+      '../helpers/annotation-metadata': fakeMetadata,
     });
   });
 

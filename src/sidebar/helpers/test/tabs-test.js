@@ -2,7 +2,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import uiConstants from '../../ui-constants';
 import * as tabs from '../tabs';
 
-describe('tabs', function () {
+describe('sidebar/helpers/tabs', function () {
   describe('tabForAnnotation', function () {
     [
       {

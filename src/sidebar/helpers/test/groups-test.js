@@ -1,6 +1,6 @@
 import { combineGroups, $imports } from '../groups';
 
-describe('sidebar.util.groups', () => {
+describe('sidebar/helpers/groups', () => {
   let fakeServiceConfig;
   describe('combineGroups', () => {
     beforeEach(() => {

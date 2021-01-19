@@ -2,9 +2,9 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { isOrphan, quote } from '../util/annotation-metadata';
+import { isOrphan, quote } from '../helpers/annotation-metadata';
 import { withServices } from '../util/service-context';
-import { applyTheme } from '../util/theme';
+import { applyTheme } from '../helpers/theme';
 
 import Excerpt from './excerpt';
 

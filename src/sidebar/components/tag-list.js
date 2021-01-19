@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { isThirdPartyUser } from '../util/account-id';
+import { isThirdPartyUser } from '../helpers/account-id';
 import { withServices } from '../util/service-context';
 
 /** @typedef {import('../../types/api').Annotation} Annotation */

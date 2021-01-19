@@ -33,7 +33,7 @@ describe('AnnotationQuote', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../util/annotation-metadata': {
+      '../helpers/annotation-metadata': {
         quote: fakeQuote,
         isOrphan: fakeIsOrphan,
       },

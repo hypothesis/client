@@ -1,6 +1,6 @@
 import { calculateVisibleThreads } from '../visible-threads';
 
-describe('sidebar/util/visible-threads', () => {
+describe('sidebar/helpers/visible-threads', () => {
   let fakeThreads;
   let fakeThreadHeights;
   let fakeWindowHeight;

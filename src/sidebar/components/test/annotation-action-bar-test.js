@@ -90,11 +90,11 @@ describe('AnnotationActionBar', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../util/annotation-sharing': {
+      '../helpers/annotation-sharing': {
         sharingEnabled: fakeSharingEnabled,
         annotationSharingLink: fakeAnnotationSharingLink,
       },
-      '../util/permissions': { permits: fakePermits },
+      '../helpers/permissions': { permits: fakePermits },
       '../store/use-store': { useStoreProxy: () => fakeStore },
     });
     sinon.stub(window, 'confirm').returns(false);

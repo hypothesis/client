@@ -3,7 +3,7 @@ import uiConstants from '../../ui-constants';
 import threadAnnotations from '../thread-annotations';
 import { sorters } from '../thread-sorters';
 import { $imports } from '../thread-annotations';
-import immutable from '../immutable';
+import immutable from '../../util/immutable';
 
 const fixtures = immutable({
   emptyThread: {
@@ -17,7 +17,7 @@ const fixtures = immutable({
   },
 });
 
-describe('sidebar/utils/thread-annotations', () => {
+describe('sidebar/helpers/thread-annotations', () => {
   let fakeBuildThread;
   let fakeFilterAnnotations;
   let fakeSearchFilter;
@@ -46,7 +46,7 @@ describe('sidebar/utils/thread-annotations', () => {
 
     $imports.$mock({
       './build-thread': fakeBuildThread,
-      './search-filter': fakeSearchFilter,
+      '../util/search-filter': fakeSearchFilter,
       './view-filter': fakeFilterAnnotations,
     });
   });

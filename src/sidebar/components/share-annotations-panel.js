@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
-import { pageSharingLink } from '../util/annotation-sharing';
+import { pageSharingLink } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../util/service-context';
 import { notNull } from '../util/typing';

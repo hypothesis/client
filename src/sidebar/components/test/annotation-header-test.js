@@ -41,12 +41,12 @@ describe('AnnotationHeader', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../util/annotation-metadata': {
+      '../helpers/annotation-metadata': {
         isHighlight: fakeIsHighlight,
         isReply: fakeIsReply,
         hasBeenEdited: fakeHasBeenEdited,
       },
-      '../util/permissions': {
+      '../helpers/permissions': {
         isPrivate: fakeIsPrivate,
       },
     });

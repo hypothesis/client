@@ -1,6 +1,6 @@
 import { createSelector } from 'reselect';
 
-import * as metadata from '../../util/annotation-metadata';
+import * as metadata from '../../helpers/annotation-metadata';
 import * as util from '../util';
 import { storeModule } from '../create-store';
 

@@ -3,9 +3,9 @@ import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import { isHidden } from '../util/annotation-metadata';
+import { isHidden } from '../helpers/annotation-metadata';
 import { withServices } from '../util/service-context';
-import { applyTheme } from '../util/theme';
+import { applyTheme } from '../helpers/theme';
 
 import Button from './button';
 import Excerpt from './excerpt';

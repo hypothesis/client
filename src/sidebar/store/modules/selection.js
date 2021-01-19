@@ -19,7 +19,7 @@
 import { createSelector } from 'reselect';
 
 import uiConstants from '../../ui-constants';
-import * as metadata from '../../util/annotation-metadata';
+import * as metadata from '../../helpers/annotation-metadata';
 import { countIf, trueKeys, toTrueMap } from '../../util/collections';
 import * as util from '../util';
 import { storeModule } from '../create-store';

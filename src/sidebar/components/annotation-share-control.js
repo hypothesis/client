@@ -2,9 +2,9 @@ import { createElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { isShareableURI } from '../util/annotation-sharing';
+import { isShareableURI } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
-import { isPrivate } from '../util/permissions';
+import { isPrivate } from '../helpers/permissions';
 import { withServices } from '../util/service-context';
 
 import Button from './button';
