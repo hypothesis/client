@@ -13,6 +13,8 @@ jobs:
         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
     - name: Install
       run: yarn install --frozen-lockfile
+    - name: Set up frontend-shared
+      run: yarn setup-frontend-shared
     - name: Format
       run: yarn checkformatting
     - name: Lint

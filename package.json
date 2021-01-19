@@ -6,10 +6,12 @@
   "homepage": "https://hypothes.is",
   "bugs": "https://github.com/hypothesis/client/issues",
   "repository": "hypothesis/client",
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
+    "@hypothesis/frontend-shared": "^1.4.0",
     "@octokit/rest": "^18.0.0",
     "@sentry/browser": "^5.6.2",
     "approx-string-match": "^1.1.0",
@@ -122,6 +124,7 @@
     "test": "gulp test",
     "typecheck": "tsc --build src/tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
-    "version": "make clean build"
+    "version": "make clean build",
+    "setup-frontend-shared": "gulp build-frontend-shared"
   }
 }

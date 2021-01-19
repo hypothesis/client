@@ -25,8 +25,7 @@ $ npm install @hypothesis/frontend-shared --save
 import { SvgIcon } from '@hypothesis/frontend-shared';
 ```
 
-License
--------
+### License
 
 The Hypothesis client is released under the [2-Clause BSD License][bsd2c],
 sometimes referred to as the "Simplified BSD License". Some third-party
