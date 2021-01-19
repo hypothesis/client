@@ -4,7 +4,7 @@ import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import observeElementSize from '../util/observe-element-size';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
 /**

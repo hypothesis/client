@@ -4,7 +4,7 @@ import sinon from 'sinon';
 
 import OAuthClient from '../oauth-client';
 
-import FakeWindow from './fake-window';
+import FakeWindow from '../../test/fake-window';
 
 const fixtures = {
   tokenResponse: {
@@ -23,7 +23,7 @@ const fixtures = {
   },
 };
 
-describe('sidebar.util.oauth-client', () => {
+describe('sidebar/util/oauth-client', () => {
   let client;
   let clock;
   const config = {

@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { copyText } from '../util/copy-to-clipboard';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import Button from './button';
 

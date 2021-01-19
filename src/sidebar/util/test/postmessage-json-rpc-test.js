@@ -10,7 +10,7 @@ class FakeWindow {
   }
 }
 
-describe('sidebar.util.postmessage-json-rpc', () => {
+describe('sidebar/util/postmessage-json-rpc', () => {
   const origin = 'https://embedder.com';
   const messageId = 42;
 

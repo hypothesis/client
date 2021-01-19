@@ -10,7 +10,7 @@ import uiConstants from '../ui-constants';
 import { parseAccountID } from '../helpers/account-id';
 import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import AnnotationView from './annotation-view';
 import SidebarView from './sidebar-view';

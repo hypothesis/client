@@ -9,7 +9,7 @@ import {
 } from './cross-origin-rpc.js';
 import addAnalytics from './ga';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
-import { fetchConfig } from './util/fetch-config';
+import { fetchConfig } from './fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
@@ -100,7 +100,7 @@ registerIcons(iconSet);
 // The entry point component for the app.
 import { createElement, render } from 'preact';
 import HypothesisApp from './components/hypothesis-app';
-import { ServiceContext } from './util/service-context';
+import { ServiceContext } from './service-context';
 
 // Services.
 import bridgeService from '../shared/bridge';

@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import SearchInput from './search-input';
 

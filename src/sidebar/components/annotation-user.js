@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { isThirdPartyUser, username } from '../helpers/account-id';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 /**
  * @typedef {import("../../types/api").Annotation} Annotation

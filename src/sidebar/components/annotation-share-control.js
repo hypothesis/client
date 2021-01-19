@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import { isShareableURI } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { isPrivate } from '../helpers/permissions';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import Button from './button';
 import useElementShouldClose from './hooks/use-element-should-close';

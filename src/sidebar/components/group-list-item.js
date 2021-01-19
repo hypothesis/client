@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 import { copyText } from '../util/copy-to-clipboard';
 import { orgName } from '../helpers/group-list-item-common';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import MenuItem from './menu-item';
 

@@ -8,7 +8,7 @@ import { isThirdPartyUser } from '../helpers/account-id';
 import { orgName } from '../helpers/group-list-item-common';
 import groupsByOrganization from '../helpers/group-organizations';
 import isThirdPartyService from '../helpers/is-third-party-service';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import GroupListSection from './group-list-section';
 import Menu from './menu';
