@@ -29,11 +29,12 @@ function renderScript(context) {
   const scriptTemplate = `
     {{{hypothesisConfig}}}
 
-    <script type="module">
-      import { loadClient } from '/scripts/util.js';
-
-      const clientUrl = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
-      loadClient(clientUrl);
+    <script src="/scripts/util.js"></script>
+    <script>
+      (function(){
+        let clientUrl = '{{{clientUrl}}}'.replace('{current_host}', document.location.hostname);
+        loadClient(clientUrl);
+      })();
     </script>
   `;
   return Mustache.render(scriptTemplate, context);
