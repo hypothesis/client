@@ -56,7 +56,7 @@ describe('sidebar/store/use-store', () => {
       store.addThing('bar');
 
       $imports.$mock({
-        '../util/service-context': {
+        '../service-context': {
           useService: name => (name === 'store' ? store : null),
         },
       });

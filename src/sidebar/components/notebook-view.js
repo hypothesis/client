@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import { useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 import useRootThread from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
 

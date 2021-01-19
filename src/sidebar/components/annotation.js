@@ -4,7 +4,7 @@ import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import { isReply, quote } from '../helpers/annotation-metadata';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 
 import AnnotationActionBar from './annotation-action-bar';
 import AnnotationBody from './annotation-body';

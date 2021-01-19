@@ -1,6 +1,6 @@
 import * as mediaEmbedder from '../media-embedder.js';
 
-describe('media-embedder', function () {
+describe('sidebar/media-embedder', function () {
   function domElement(html) {
     const element = document.createElement('div');
     element.innerHTML = html;

@@ -5,7 +5,7 @@ import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import { pageSharingLink } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
-import { withServices } from '../util/service-context';
+import { withServices } from '../service-context';
 import { notNull } from '../util/typing';
 
 import Button from './button';

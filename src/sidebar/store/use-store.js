@@ -1,6 +1,6 @@
 import { useEffect, useRef, useReducer } from 'preact/hooks';
 
-import { useService } from '../util/service-context';
+import { useService } from '../service-context';
 
 /** @typedef {import("redux").Store} Store */
 
