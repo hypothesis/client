@@ -129,7 +129,7 @@ module.exports = function (config) {
 
     // Use https://www.npmjs.com/package/karma-mocha-reporter
     // for more helpful rendering of test failures
-    reporters: ['mocha', 'coverage-istanbul'],
+    reporters: ['progress', 'mocha', 'coverage-istanbul'],
 
     // web server port
     port: 9876,
