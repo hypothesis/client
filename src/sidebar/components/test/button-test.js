@@ -127,8 +127,8 @@ describe('Button', () => {
     const wrapper = createComponent({ className: 'my-class' });
 
     assert.isTrue(wrapper.find('button').hasClass('my-class'));
-    assert.isFalse(wrapper.hasClass('button--icon-only'));
-    assert.isFalse(wrapper.hasClass('button--labeled'));
+    assert.isFalse(wrapper.find('button').hasClass('button--icon-only'));
+    assert.isFalse(wrapper.find('button').hasClass('button--labeled'));
   });
 
   it('disables the button when `disabled` prop is true', () => {
