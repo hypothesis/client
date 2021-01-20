@@ -75,8 +75,13 @@ export default function AutocompleteList({
 
   const props = id ? { id } : {}; // only add the id if its passed
   const isHidden = list.length === 0 || !open;
-  return (
-    <div
+  return (//TODO needs refactoring
+    <div style="background-color: #ffffff;
+                height: 300px;
+                overflow-x: hidden;
+                overflow-y: auto;
+                text-align: left;
+                padding: 20px;"
       className={classnames(
         {
           'is-hidden': isHidden,
