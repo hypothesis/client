@@ -74,7 +74,7 @@ export default class Sidebar extends Guest {
     } else {
       frame = document.createElement('div');
       frame.style.display = 'none';
-      frame.className = 'annotator-frame annotator-outer';
+      frame.className = 'annotator-frame';
 
       if (config.theme === 'clean') {
         frame.classList.add('annotator-frame--theme-clean');
