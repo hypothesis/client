@@ -56,7 +56,7 @@ describe('sidebar/services/session', function () {
     fakeToastMessenger = { error: sandbox.spy() };
 
     $imports.$mock({
-      '../service-config': fakeServiceConfig,
+      '../config/service-config': fakeServiceConfig,
       '../util/sentry': fakeSentry,
     });
 

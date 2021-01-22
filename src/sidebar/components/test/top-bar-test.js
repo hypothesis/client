@@ -42,7 +42,7 @@ describe('TopBar', () => {
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
       '../helpers/is-third-party-service': fakeIsThirdPartyService,
-      '../service-config': fakeServiceConfig,
+      '../config/service-config': fakeServiceConfig,
     });
   });
 

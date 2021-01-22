@@ -64,7 +64,7 @@ describe('GroupList', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../service-config': fakeServiceConfig,
+      '../config/service-config': fakeServiceConfig,
     });
   });
 

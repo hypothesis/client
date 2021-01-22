@@ -3,7 +3,7 @@
  * @typedef {import('../../types/config').HostConfig} HostConfig
  */
 
-import serviceConfig from '../service-config';
+import serviceConfig from '../config/service-config';
 
 /**
  * Retrieve an appropriate sharing link for this annotation.

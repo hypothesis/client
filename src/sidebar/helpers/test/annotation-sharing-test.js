@@ -17,7 +17,7 @@ describe('sidebar/helpers/annotation-sharing', () => {
     };
 
     sharingUtil.$imports.$mock({
-      '../service-config': fakeServiceConfig,
+      '../config/service-config': fakeServiceConfig,
     });
   });
 

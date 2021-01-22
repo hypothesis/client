@@ -1,4 +1,4 @@
-import serviceConfig from '../service-config';
+import serviceConfig from '../config/service-config';
 import { isReply } from '../helpers/annotation-metadata';
 import { combineGroups } from '../helpers/groups';
 import { awaitStateChange } from '../store/util';

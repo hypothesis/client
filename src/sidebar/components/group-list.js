@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import serviceConfig from '../service-config';
+import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
 import { isThirdPartyUser } from '../helpers/account-id';
 import { orgName } from '../helpers/group-list-item-common';
