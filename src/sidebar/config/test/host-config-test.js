@@ -8,7 +8,7 @@ function fakeWindow(config) {
   };
 }
 
-describe('sidebar/host-config', function () {
+describe('sidebar/config/host-config', function () {
   it('parses config from location string and returns whitelisted params', function () {
     const window_ = fakeWindow({
       annotations: '1234',

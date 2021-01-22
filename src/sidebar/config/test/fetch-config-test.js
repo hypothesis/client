@@ -14,7 +14,7 @@ describe('sidebar/config/fetch-config', () => {
     };
     fakeApiUrl = sinon.stub().returns('https://dev.hypothes.is/api/');
     $imports.$mock({
-      '../host-config': fakeHostConfig,
+      './host-config': fakeHostConfig,
       '../util/postmessage-json-rpc': fakeJsonRpc,
       './get-api-url': fakeApiUrl,
     });

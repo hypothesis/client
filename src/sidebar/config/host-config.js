@@ -4,9 +4,9 @@ import {
   toInteger,
   toObject,
   toString,
-} from '../shared/type-coercions';
+} from '../../shared/type-coercions';
 
-/** @typedef {import('../types/config').HostConfig} HostConfig */
+/** @typedef {import('../../types/config').HostConfig} HostConfig */
 
 /**
  * Return the app configuration specified by the frame embedding the Hypothesis
