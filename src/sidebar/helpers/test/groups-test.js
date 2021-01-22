@@ -6,7 +6,7 @@ describe('sidebar/helpers/groups', () => {
     beforeEach(() => {
       fakeServiceConfig = sinon.stub().returns(null);
       $imports.$mock({
-        '../service-config': fakeServiceConfig,
+        '../config/service-config': fakeServiceConfig,
       });
     });
 

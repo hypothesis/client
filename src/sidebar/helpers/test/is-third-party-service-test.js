@@ -10,7 +10,7 @@ describe('sidebar/helpers/is-third-party-service', () => {
     fakeSettings = { authDomain: 'hypothes.is' };
 
     $imports.$mock({
-      '../service-config': fakeServiceConfig,
+      '../config/service-config': fakeServiceConfig,
     });
   });
 

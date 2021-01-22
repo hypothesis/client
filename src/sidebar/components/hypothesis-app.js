@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
-import serviceConfig from '../service-config';
+import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import { parseAccountID } from '../helpers/account-id';

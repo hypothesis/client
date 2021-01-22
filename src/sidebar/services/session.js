@@ -1,4 +1,4 @@
-import serviceConfig from '../service-config';
+import serviceConfig from '../config/service-config';
 import * as retryUtil from '../util/retry';
 import * as sentry from '../util/sentry';
 

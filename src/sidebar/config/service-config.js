@@ -1,6 +1,6 @@
 /**
- * @typedef {import('../types/config').HostConfig} HostConfig
- * @typedef {import('../types/config').Service} Service
+ * @typedef {import('../../types/config').HostConfig} HostConfig
+ * @typedef {import('../../types/config').Service} Service
  */
 
 /**
