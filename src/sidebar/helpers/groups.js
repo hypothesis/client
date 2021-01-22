@@ -4,7 +4,7 @@
  */
 
 import escapeStringRegexp from 'escape-string-regexp';
-import serviceConfig from '../service-config';
+import serviceConfig from '../config/service-config';
 
 /**
  * Should users be able to leave private groups of which they

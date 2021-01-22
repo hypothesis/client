@@ -2,7 +2,7 @@ import { Fragment, createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
-import serviceConfig from '../service-config';
+import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import isThirdPartyService from '../helpers/is-third-party-service';

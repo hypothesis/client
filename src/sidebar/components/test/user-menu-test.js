@@ -60,7 +60,7 @@ describe('UserMenu', () => {
       '../helpers/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
-      '../service-config': fakeServiceConfig,
+      '../config/service-config': fakeServiceConfig,
       '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
