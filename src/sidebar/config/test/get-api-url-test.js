@@ -1,8 +1,8 @@
 import getApiUrl from '../get-api-url';
 
-describe('sidebar/get-api-url', function () {
-  context('when there is a service object in settings', function () {
-    it('returns apiUrl from the service object', function () {
+describe('sidebar/config/get-api-url', () => {
+  context('when there is a service object in settings', () => {
+    it('returns apiUrl from the service object', () => {
       const settings = {
         apiUrl: 'someApiUrl',
         services: [
@@ -15,8 +15,8 @@ describe('sidebar/get-api-url', function () {
     });
   });
 
-  context('when there is no service object in settings', function () {
-    it('returns apiUrl from the settings object', function () {
+  context('when there is no service object in settings', () => {
+    it('returns apiUrl from the settings object', () => {
       const settings = {
         apiUrl: 'someApiUrl',
       };
@@ -27,7 +27,7 @@ describe('sidebar/get-api-url', function () {
   context(
     'when there is a service object in settings but does not contain an apiUrl key',
     function () {
-      it('throws error', function () {
+      it('throws error', () => {
         const settings = {
           apiUrl: 'someApiUrl',
           services: [{}],

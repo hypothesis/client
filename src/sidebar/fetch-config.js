@@ -1,4 +1,4 @@
-import getApiUrl from './get-api-url';
+import getApiUrl from './config/get-api-url';
 import hostConfig from './host-config';
 import * as postMessageJsonRpc from './util/postmessage-json-rpc';
 
