@@ -16,7 +16,7 @@ describe('sidebar/fetch-config', () => {
     $imports.$mock({
       './host-config': fakeHostConfig,
       './util/postmessage-json-rpc': fakeJsonRpc,
-      './get-api-url': fakeApiUrl,
+      './config/get-api-url': fakeApiUrl,
     });
 
     // By default, embedder provides no custom config.
