@@ -8,6 +8,7 @@ import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
 
 import Annotation from './annotation';
+import AnnotationMissing from './annotation-missing';
 import Button from './button';
 import ModerationBanner from './moderation-banner';
 
@@ -30,6 +31,7 @@ import ModerationBanner from './moderation-banner';
 function Thread({ showDocumentInfo = false, thread, threadsService }) {
   // Only render this thread's annotation if it exists and the thread is `visible`
   const showAnnotation = thread.annotation && thread.visible;
+  const showMissingAnnotation = thread.visible && !thread.annotation;
 
   // Render this thread's replies only if the thread is expanded
   const showChildren = !thread.collapsed;
@@ -56,9 +58,9 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
 
   // Memoize annotation content to avoid re-rendering an annotation when content
   // in other annotations/threads change.
-  const annotationContent = useMemo(
-    () =>
-      showAnnotation && (
+  const annotationContent = useMemo(() => {
+    if (showAnnotation) {
+      return (
         <Fragment>
           <ModerationBanner annotation={thread.annotation} />
           <Annotation
@@ -68,15 +70,29 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
             threadIsCollapsed={thread.collapsed}
           />
         </Fragment>
-      ),
-    [
-      showAnnotation,
-      thread.annotation,
-      thread.replyCount,
-      showDocumentInfo,
-      thread.collapsed,
-    ]
-  );
+      );
+    } else if (showMissingAnnotation) {
+      return (
+        <AnnotationMissing
+          threadId={thread.id}
+          replyCount={thread.replyCount}
+          threadIsCollapsed={thread.collapsed}
+          isReply={!!thread.parent}
+        />
+      );
+    } else {
+      return null;
+    }
+  }, [
+    showAnnotation,
+    showMissingAnnotation,
+    showDocumentInfo,
+    thread.annotation,
+    thread.id,
+    thread.parent,
+    thread.replyCount,
+    thread.collapsed,
+  ]);
 
   return (
     <section
@@ -98,12 +114,6 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
 
       <div className="thread__content">
         {annotationContent}
-
-        {!thread.annotation && (
-          <div className="thread__unavailable-message">
-            <em>Message not available.</em>
-          </div>
-        )}
 
         {showHiddenToggle && (
           <Button

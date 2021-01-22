@@ -11,7 +11,7 @@ import AnnotationBody from './annotation-body';
 import AnnotationEditor from './annotation-editor';
 import AnnotationHeader from './annotation-header';
 import AnnotationQuote from './annotation-quote';
-import Button from './button';
+import AnnotationReplyToggle from './annotation-reply-toggle';
 
 /**
  * @typedef {import("../../types/api").Annotation} Annotation
@@ -53,21 +53,11 @@ function Annotation({
 
   const isEditing = !!draft && !isSaving;
 
-  const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
-  const toggleText = `${toggleAction} (${replyCount})`;
-
   const shouldShowActions = !isSaving && !isEditing;
-  const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
+  const threadId = /** @type {string} */ (annotation.id);
+  const shouldShowReplyToggle = !isReply(annotation) && threadId;
 
   const onReply = () => annotationsService.reply(annotation, userid);
-
-  const onToggleReplies = () =>
-    // nb. We assume the annotation has an ID here because it is not possible
-    // to create replies until the annotation has been saved.
-    store.setExpanded(
-      /** @type {string} */ (annotation.id),
-      !!threadIsCollapsed
-    );
 
   return (
     <article
@@ -99,10 +89,10 @@ function Annotation({
         <footer className="annotation__footer">
           <div className="annotation__controls u-layout-row">
             {shouldShowReplyToggle && (
-              <Button
-                className="annotation__reply-toggle"
-                onClick={onToggleReplies}
-                buttonText={toggleText}
+              <AnnotationReplyToggle
+                threadId={threadId}
+                threadIsCollapsed={threadIsCollapsed}
+                replyCount={replyCount}
               />
             )}
             {isSaving && <div className="annotation__actions">Saving...</div>}
