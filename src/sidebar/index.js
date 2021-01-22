@@ -9,7 +9,7 @@ import {
 } from './cross-origin-rpc.js';
 import addAnalytics from './ga';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
-import { fetchConfig } from './fetch-config';
+import { fetchConfig } from './config/fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
