@@ -50,6 +50,10 @@ export default function loadAnnotationsService(
 
     searchClient = new SearchClient(api.search, searchOptions);
 
+    searchClient.on('resultCount', resultCount => {
+      store.setAnnotationResultCount(resultCount);
+    });
+
     searchClient.on('results', results => {
       if (results.length) {
         store.addAnnotations(results);

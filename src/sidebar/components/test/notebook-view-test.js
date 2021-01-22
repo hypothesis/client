@@ -25,7 +25,7 @@ describe('NotebookView', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       './hooks/use-root-thread': fakeUseRootThread,
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 
@@ -64,34 +64,13 @@ describe('NotebookView', () => {
     assert.equal(wrapper.find('.notebook-view__heading').text(), '…');
   });
 
-  describe('results count', () => {
-    [
-      {
-        rootThread: { totalChildren: 5, replyCount: 15 },
-        expected: '5 threads (15 annotations)',
-      },
-      {
-        rootThread: { totalChildren: 0, replyCount: 0 },
-        expected: 'No results',
-      },
-      {
-        rootThread: { totalChildren: 0, replyCount: 15 },
-        expected: 'No results',
-      },
-      {
-        rootThread: { totalChildren: 1, replyCount: 1 },
-        expected: '1 thread (1 annotation)',
-      },
-    ].forEach(test => {
-      it('renders number of threads and annotations', () => {
-        fakeUseRootThread.returns(test.rootThread);
-        const wrapper = createComponent();
+  it('renders results (counts)', () => {
+    const wrapper = createComponent();
+    assert.isTrue(wrapper.find('NotebookResultCount').exists());
+  });
 
-        assert.equal(
-          wrapper.find('.notebook-view__results').text(),
-          test.expected
-        );
-      });
-    });
+  it('renders filters', () => {
+    const wrapper = createComponent();
+    assert.isTrue(wrapper.find('NotebookFilters').exists());
   });
 });

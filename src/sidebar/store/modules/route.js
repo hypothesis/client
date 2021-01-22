@@ -1,5 +1,7 @@
 import { actionTypes } from '../util';
 
+import { storeModule } from '../create-store';
+
 function init() {
   return {
     /**
@@ -56,18 +58,7 @@ function routeParams(state) {
   return state.params;
 }
 
-/**
- * @typedef RouteStore
- *
- * // Actions
- * @prop {typeof changeRoute} changeRoute
- *
- * // Selectors
- * @prop {() => string|null} route
- * @prop {() => Object.<string,string>} routeParams
- */
-
-export default {
+export default storeModule({
   init,
   namespace: 'route',
   update,
@@ -78,4 +69,4 @@ export default {
     route,
     routeParams,
   },
-};
+});

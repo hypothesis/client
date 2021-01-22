@@ -204,6 +204,37 @@ describe('annotator/anchoring/text-range', () => {
       });
     });
 
+    describe('fromCharOffset', () => {
+      let el;
+      beforeEach(() => {
+        el = document.createElement('div');
+        el.append('hello', 'world');
+      });
+
+      it('returns TextPosition for offset in Text node', () => {
+        assert.deepEqual(
+          TextPosition.fromCharOffset(el.firstChild, 1),
+          TextPosition.fromPoint(el.firstChild, 1)
+        );
+      });
+
+      it('returns TextPosition for offset in Element node', () => {
+        assert.deepEqual(
+          TextPosition.fromCharOffset(el, 5),
+          new TextPosition(el, 5)
+        );
+      });
+
+      it('throws for an offset in a non-Text/Element node', () => {
+        const comment = document.createComment('This is a test');
+        el.append(comment);
+
+        assert.throws(() => {
+          TextPosition.fromCharOffset(comment, 3);
+        }, 'Node is not an element or text node');
+      });
+    });
+
     describe('fromPoint', () => {
       it('returns TextPosition for offset in Text node', () => {
         const el = document.createElement('div');

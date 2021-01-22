@@ -23,7 +23,8 @@ describe('AnnotationActionBar', () => {
   let fakePermits;
   let fakeSettings;
   // Fake dependencies
-  let fakeIsShareable;
+  let fakeAnnotationSharingLink;
+  let fakeSharingEnabled;
   let fakeStore;
 
   function createComponent(props = {}) {
@@ -76,7 +77,8 @@ describe('AnnotationActionBar', () => {
     fakePermits = sinon.stub().returns(true);
     fakeSettings = {};
 
-    fakeIsShareable = sinon.stub().returns(true);
+    fakeSharingEnabled = sinon.stub().returns(true);
+    fakeAnnotationSharingLink = sinon.stub().returns('http://share.me');
 
     fakeStore = {
       createDraft: sinon.stub(),
@@ -89,11 +91,11 @@ describe('AnnotationActionBar', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../util/annotation-sharing': {
-        isShareable: fakeIsShareable,
-        shareURI: sinon.stub().returns('http://share.me'),
+        sharingEnabled: fakeSharingEnabled,
+        annotationSharingLink: fakeAnnotationSharingLink,
       },
       '../util/permissions': { permits: fakePermits },
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
     sinon.stub(window, 'confirm').returns(false);
   });
@@ -236,8 +238,15 @@ describe('AnnotationActionBar', () => {
       assert.isTrue(wrapper.find('AnnotationShareControl').exists());
     });
 
-    it('does not show share action button if annotation is not shareable', () => {
-      fakeIsShareable.returns(false);
+    it('does not show share action button if sharing is not enabled', () => {
+      fakeSharingEnabled.returns(false);
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('AnnotationShareControl').exists());
+    });
+
+    it('does not show share action button if annotation lacks sharing URI', () => {
+      fakeAnnotationSharingLink.returns(undefined);
       const wrapper = createComponent();
 
       assert.isFalse(wrapper.find('AnnotationShareControl').exists());
@@ -245,25 +254,28 @@ describe('AnnotationActionBar', () => {
   });
 
   describe('flag action button', () => {
-    it('shows flag button if user is not author', () => {
-      const wrapper = createComponent();
-
-      assert.isTrue(getButton(wrapper, 'flag').exists());
-    });
-
-    it('sets a flash error when clicked if user is not logged in', () => {
+    it('hides flag button if user is not authenticated', () => {
       fakeStore.profile.returns({
         userid: null,
       });
 
-      const button = getButton(createComponent(), 'flag');
+      const wrapper = createComponent();
 
-      act(() => {
-        button.props().onClick();
-      });
+      assert.isFalse(getButton(wrapper, 'flag').exists());
+    });
 
-      assert.calledOnce(fakeToastMessenger.error);
-      assert.notCalled(fakeAnnotationsService.flag);
+    it('hides flag button if user is author', () => {
+      fakeAnnotation.user = fakeUserProfile.userid;
+
+      const wrapper = createComponent();
+
+      assert.isFalse(getButton(wrapper, 'flag').exists());
+    });
+
+    it('shows flag button if user is not author', () => {
+      const wrapper = createComponent();
+
+      assert.isTrue(getButton(wrapper, 'flag').exists());
     });
 
     it('invokes flag on service when clicked', () => {
@@ -289,14 +301,6 @@ describe('AnnotationActionBar', () => {
       });
 
       await waitFor(() => fakeToastMessenger.error.called);
-    });
-
-    it('does not show flag action button if user is author', () => {
-      fakeAnnotation.user = fakeUserProfile.userid;
-
-      const wrapper = createComponent();
-
-      assert.isFalse(getButton(wrapper, 'flag').exists());
     });
 
     context('previously-flagged annotation', () => {

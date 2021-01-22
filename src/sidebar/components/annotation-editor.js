@@ -5,7 +5,7 @@ import propTypes from 'prop-types';
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import { withServices } from '../util/service-context';
 import { applyTheme } from '../util/theme';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
 import AnnotationLicense from './annotation-license';
 import AnnotationPublishControl from './annotation-publish-control';
@@ -43,9 +43,9 @@ function AnnotationEditor({
     /** @type {string|null} */ (null)
   );
 
-  const draft = useStore(store => store.getDraft(annotation));
-  const createDraft = useStore(store => store.createDraft);
-  const group = useStore(store => store.getGroup(annotation.group));
+  const store = useStoreProxy();
+  const draft = store.getDraft(annotation);
+  const group = store.getGroup(annotation.group);
 
   if (!draft) {
     // If there's no draft, we can't be in editing mode
@@ -60,7 +60,7 @@ function AnnotationEditor({
   const isEmpty = !text && !tags.length;
 
   const onEditTags = ({ tags }) => {
-    createDraft(draft.annotation, { ...draft, tags });
+    store.createDraft(draft.annotation, { ...draft, tags });
   };
 
   /**
@@ -99,7 +99,7 @@ function AnnotationEditor({
   };
 
   const onEditText = ({ text }) => {
-    createDraft(draft.annotation, { ...draft, text });
+    store.createDraft(draft.annotation, { ...draft, text });
   };
 
   const onSave = async () => {

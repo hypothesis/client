@@ -53,17 +53,20 @@ describe('bootstrap', function () {
       return manifest;
     }, {});
 
+    let extraSettings = {};
     let bootApp;
     if (app === 'annotator') {
       bootApp = bootHypothesisClient;
     } else if (app === 'sidebar') {
       bootApp = bootSidebarApp;
+      extraSettings.apiUrl = 'https://marginal.ly/api/';
     }
 
     bootApp(iframe.contentDocument, {
       sidebarAppUrl: 'https://marginal.ly/app.html',
       assetRoot: 'https://marginal.ly/client/',
       manifest,
+      ...extraSettings,
     });
   }
 
@@ -146,6 +149,25 @@ describe('bootstrap', function () {
       ].map(assetUrl);
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
+    });
+
+    it('preloads /api/ and /api/links responses from Hypothesis API', () => {
+      runBoot('sidebar');
+
+      const preloadLinks = [
+        ...iframe.contentDocument.querySelectorAll('link[rel=preload]'),
+      ];
+      preloadLinks.sort((a, b) => a.href.localeCompare(b.href));
+
+      assert.equal(preloadLinks.length, 2);
+
+      assert.equal(preloadLinks[0].href, 'https://marginal.ly/api/');
+      assert.equal(preloadLinks[0].as, 'fetch');
+      assert.equal(preloadLinks[0].crossOrigin, 'anonymous');
+
+      assert.equal(preloadLinks[1].href, 'https://marginal.ly/api/links');
+      assert.equal(preloadLinks[1].as, 'fetch');
+      assert.equal(preloadLinks[1].crossOrigin, 'anonymous');
     });
 
     it('loads polyfills if required', () => {

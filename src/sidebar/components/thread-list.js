@@ -1,9 +1,9 @@
 import { createElement } from 'preact';
-import { useEffect, useMemo, useState } from 'preact/hooks';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isHighlight } from '../util/annotation-metadata';
 import { getElementHeightWithMargins } from '../util/dom';
 import {
@@ -27,6 +27,11 @@ function getScrollContainer() {
   return container;
 }
 
+/** @param {number} pos */
+function roundScrollPosition(pos) {
+  return Math.max(pos - (pos % SCROLL_PRECISION), 0);
+}
+
 /**
  * @typedef ThreadListProps
  * @prop {Thread} thread
@@ -44,20 +49,22 @@ function getScrollContainer() {
  * @param {ThreadListProps} props
  */
 function ThreadList({ thread }) {
-  const setForcedVisible = useStore(store => store.setForcedVisible);
-
   // Height of the visible area of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(
-    getScrollContainer().clientHeight
+    window.innerHeight
   );
 
   // Scroll offset of scroll container. This is updated after the scroll
   // container is scrolled, with debouncing to limit update frequency.
   // These values are in multiples of `SCROLL_PRECISION` to optimize
   // for performance.
-  const [scrollPosition, setScrollPosition] = useState(
-    getScrollContainer().scrollTop
-  );
+  const [scrollPosition, setScrollPosition] = useState(0);
+
+  useLayoutEffect(() => {
+    const scrollContainer = getScrollContainer();
+    setScrollContainerHeight(scrollContainer.clientHeight);
+    setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
+  }, []);
 
   // Map of thread ID to measured height of thread.
   const [threadHeights, setThreadHeights] = useState({});
@@ -85,8 +92,10 @@ function ThreadList({ thread }) {
     [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
   );
 
+  const store = useStoreProxy();
+
   // Get the `$tag` of the most recently created unsaved annotation.
-  const newAnnotationTag = useStore(store => {
+  const newAnnotationTag = (() => {
     // If multiple unsaved annotations exist, assume that the last one in the
     // list is the most recently created one.
     const newAnnotations = store
@@ -96,7 +105,7 @@ function ThreadList({ thread }) {
       return null;
     }
     return newAnnotations[newAnnotations.length - 1].$tag;
-  });
+  })();
 
   // Scroll to newly created annotations and replies.
   //
@@ -105,10 +114,10 @@ function ThreadList({ thread }) {
   // and the thread list will scroll to that.
   useEffect(() => {
     if (newAnnotationTag) {
-      setForcedVisible(newAnnotationTag, true);
+      store.setForcedVisible(newAnnotationTag, true);
       setScrollToId(newAnnotationTag);
     }
-  }, [setForcedVisible, newAnnotationTag]);
+  }, [store, newAnnotationTag]);
 
   // Effect to scroll a particular thread into view. This is mainly used to
   // scroll a newly created annotation into view.
@@ -145,14 +154,8 @@ function ThreadList({ thread }) {
 
     const updateScrollPosition = debounce(
       () => {
-        const exactScrollPosition = scrollContainer.scrollTop;
-        // Get scroll position to the nearest `SCROLL_PRECISION` multiple
-        const roundedScrollPosition = Math.max(
-          exactScrollPosition - (exactScrollPosition % SCROLL_PRECISION),
-          0
-        );
         setScrollContainerHeight(scrollContainer.clientHeight);
-        setScrollPosition(roundedScrollPosition);
+        setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
       },
       10,
       { maxWait: 100 }

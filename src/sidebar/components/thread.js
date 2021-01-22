@@ -1,8 +1,9 @@
 import classnames from 'classnames';
 import { createElement, Fragment } from 'preact';
+import { useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../util/service-context';
 import { countHidden, countVisible } from '../util/thread';
 
@@ -27,8 +28,6 @@ import ModerationBanner from './moderation-banner';
  * @param {ThreadProps} props
  */
 function Thread({ showDocumentInfo = false, thread, threadsService }) {
-  const setExpanded = useStore(store => store.setExpanded);
-
   // Only render this thread's annotation if it exists and the thread is `visible`
   const showAnnotation = thread.annotation && thread.visible;
 
@@ -51,7 +50,34 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
     child => countVisible(child) > 0
   );
 
-  const onToggleReplies = () => setExpanded(thread.id, !!thread.collapsed);
+  const store = useStoreProxy();
+  const onToggleReplies = () =>
+    store.setExpanded(thread.id, !!thread.collapsed);
+
+  // Memoize annotation content to avoid re-rendering an annotation when content
+  // in other annotations/threads change.
+  const annotationContent = useMemo(
+    () =>
+      showAnnotation && (
+        <Fragment>
+          <ModerationBanner annotation={thread.annotation} />
+          <Annotation
+            annotation={thread.annotation}
+            replyCount={thread.replyCount}
+            showDocumentInfo={showDocumentInfo}
+            threadIsCollapsed={thread.collapsed}
+          />
+        </Fragment>
+      ),
+    [
+      showAnnotation,
+      thread.annotation,
+      thread.replyCount,
+      showDocumentInfo,
+      thread.collapsed,
+    ]
+  );
+
   return (
     <section
       className={classnames('thread', {
@@ -71,17 +97,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
       )}
 
       <div className="thread__content">
-        {showAnnotation && (
-          <Fragment>
-            <ModerationBanner annotation={thread.annotation} />
-            <Annotation
-              annotation={thread.annotation}
-              replyCount={thread.replyCount}
-              showDocumentInfo={showDocumentInfo}
-              threadIsCollapsed={thread.collapsed}
-            />
-          </Fragment>
-        )}
+        {annotationContent}
 
         {!thread.annotation && (
           <div className="thread__unavailable-message">

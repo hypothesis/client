@@ -4,8 +4,10 @@ import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
 import useRootThread from './hooks/use-root-thread';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
+import NotebookFilters from './notebook-filters';
+import NotebookResultCount from './notebook-result-count';
 import ThreadList from './thread-list';
 
 /**
@@ -19,50 +21,35 @@ import ThreadList from './thread-list';
  * @param {NotebookViewProps} props
  */
 function NotebookView({ loadAnnotationsService }) {
-  const focusedGroup = useStore(store => store.focusedGroup());
-  const setSortKey = useStore(store => store.setSortKey);
+  const store = useStoreProxy();
+  const focusedGroup = store.focusedGroup();
 
   // Reload annotations if focused group changes
   useEffect(() => {
     // Load all annotations in the group, unless there are more than 5000
     // of them: this is a performance safety valve
-    setSortKey('Newest');
+    store.setSortKey('Newest');
     if (focusedGroup) {
       loadAnnotationsService.load({
         groupId: focusedGroup.id,
         maxResults: 5000,
       });
     }
-  }, [loadAnnotationsService, focusedGroup, setSortKey]);
+  }, [loadAnnotationsService, focusedGroup, store]);
 
   const rootThread = useRootThread();
   const groupName = focusedGroup?.name ?? '…';
 
-  const hasResults = rootThread.totalChildren > 0;
-  const threadCount =
-    rootThread.totalChildren === 1
-      ? '1 thread'
-      : `${rootThread.totalChildren} threads`;
-  const annotationCount =
-    rootThread.replyCount === 1
-      ? '1 annotation'
-      : `${rootThread.replyCount} annotations`;
-
   return (
     <div className="notebook-view">
       <header className="notebook-view__heading">
-        <h1>{groupName}</h1>
+        <h1 className="notebook-view__group-name">{groupName}</h1>
       </header>
+      <div className="notebook-view__filters">
+        <NotebookFilters />
+      </div>
       <div className="notebook-view__results">
-        {hasResults ? (
-          <span>
-            <h2>{threadCount}</h2> ({annotationCount})
-          </span>
-        ) : (
-          <span>
-            <h2>No results</h2>
-          </span>
-        )}
+        <NotebookResultCount />
       </div>
       <div className="notebook-view__items">
         <ThreadList thread={rootThread} />

@@ -24,7 +24,7 @@ if (isBrowserSupported()) {
   // Check whether this is the sidebar app (indicated by the presence of a
   // `<hypothesis-app>` element) and load the appropriate part of the client.
   if (document.querySelector('hypothesis-app')) {
-    bootSidebarApp(document, { assetRoot, manifest });
+    bootSidebarApp(document, { assetRoot, manifest, apiUrl: settings.apiUrl });
   } else {
     const notebookAppUrl = processUrlTemplate(
       settings.notebookAppUrl || '__NOTEBOOK_APP_URL__'

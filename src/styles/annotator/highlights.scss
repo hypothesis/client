@@ -34,7 +34,7 @@
       @include a11y.screen-reader-only;
 
       // nb. The leading/trailing spaces are intended to ensure the text is treated
-      // as separate words by assisitve technologies from the content before/after it.
+      // as separate words by assistive technologies from the content before/after it.
       content: ' annotation start ';
     }
     &::after {

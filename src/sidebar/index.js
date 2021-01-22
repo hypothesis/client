@@ -52,9 +52,9 @@ function setupApi(api, streamer) {
  */
 // @inject
 function setupRoute(groups, session, router) {
-  Promise.all([groups.load(), session.load()]).finally(() => {
-    router.sync();
-  });
+  groups.load();
+  session.load();
+  router.sync();
 }
 
 /**
@@ -86,8 +86,8 @@ function autosave(autosaveService) {
 }
 
 // @inject
-function setupFrameSync(frameSync, isSidebar) {
-  if (isSidebar) {
+function setupFrameSync(frameSync, store) {
+  if (store.route() === 'sidebar') {
     frameSync.connect(true);
   }
 }
@@ -135,12 +135,6 @@ import { Injector } from '../shared/injector';
 function startApp(config) {
   const container = new Injector();
 
-  const isSidebar = !(
-    window.location.pathname.startsWith('/stream') ||
-    window.location.pathname.startsWith('/a/') ||
-    window.location.pathname.startsWith('/notebook')
-  );
-
   // Register services.
   container
     .register('analytics', analyticsService)
@@ -172,7 +166,6 @@ function startApp(config) {
   // that use them, since they don't depend on instances of other services.
   container
     .register('$window', { value: window })
-    .register('isSidebar', { value: isSidebar })
     .register('settings', { value: config });
 
   // Initialize services.

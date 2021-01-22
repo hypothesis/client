@@ -25,8 +25,14 @@
     bottom: 40px;
   }
 
-  // Override the pointer cursor that applies to the entire annotation card
+  // Override the pointer cursor that applies to the entire card
   cursor: default;
+
+  // Hide the bottom border on the panel's header if displaying
+  // input (with sharing link) directly below
+  &__header {
+    border-bottom: none;
+  }
 
   &__form-input {
     @include forms.form-input--with-button($compact: true);
@@ -36,7 +42,7 @@
     @include buttons.button--input($compact: true);
   }
 
-  &__permissions {
+  &__details {
     @include utils.font--small;
     padding: var.$layout-space--xsmall 0;
   }

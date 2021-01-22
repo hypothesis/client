@@ -1,3 +1,5 @@
+import { storeModule } from '../create-store';
+
 import { actionTypes } from '../util';
 
 /**
@@ -32,19 +34,12 @@ function updateLinks(newLinks) {
   };
 }
 
-/**
- * @typedef LinksStore
- *
- * // Actions
- * @prop {typeof updateLinks} updateLinks
- */
-
-export default {
-  init: init,
+export default storeModule({
+  init,
   namespace: 'links',
   update,
   actions: {
     updateLinks,
   },
   selectors: {},
-};
+});

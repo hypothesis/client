@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isHidden } from '../util/annotation-metadata';
 import { withServices } from '../util/service-context';
 import { applyTheme } from '../util/theme';
@@ -37,7 +37,8 @@ function AnnotationBody({ annotation, settings }) {
   // collapsing/expanding is relevant?
   const [isCollapsible, setIsCollapsible] = useState(false);
 
-  const draft = useStore(store => store.getDraft(annotation));
+  const store = useStoreProxy();
+  const draft = store.getDraft(annotation);
 
   const toggleText = isCollapsed ? 'More' : 'Less';
 

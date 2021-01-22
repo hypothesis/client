@@ -36,13 +36,14 @@ describe('ModerationBanner', () => {
       },
     };
 
+    const fakeStore = {
+      hideAnnotation: sinon.stub(),
+      unhideAnnotation: sinon.stub(),
+    };
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': callback =>
-        callback({
-          hide: sinon.stub(),
-          unhide: sinon.stub(),
-        }),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

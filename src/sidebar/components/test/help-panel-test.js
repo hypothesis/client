@@ -37,7 +37,7 @@ describe('HelpPanel', function () {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
       '../util/version-data': fakeVersionData,
     });
   });

@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import uiConstants from '../ui-constants';
 import { withServices } from '../util/service-context';
 import VersionData from '../util/version-data';
@@ -60,15 +60,15 @@ HelpPanelTab.propTypes = {
  * @param {HelpPanelProps} props
  */
 function HelpPanel({ auth, session }) {
-  const mainFrame = useStore(store => store.mainFrame());
+  const store = useStoreProxy();
+  const mainFrame = store.mainFrame();
 
   // Should this panel be auto-opened at app launch? Note that the actual
   // auto-open triggering of this panel is owned by the `hypothesis-app` component.
   // This reference is such that we know whether we should "dismiss" the tutorial
   // (permanently for this user) when it is closed.
-  const hasAutoDisplayPreference = useStore(
-    store => !!store.profile().preferences.show_sidebar_tutorial
-  );
+  const hasAutoDisplayPreference = !!store.profile().preferences
+    .show_sidebar_tutorial;
 
   // The "Tutorial" (getting started) subpanel is the default panel shown
   const [activeSubPanel, setActiveSubPanel] = useState('tutorial');

@@ -4,6 +4,7 @@
  */
 
 import { actionTypes } from '../util';
+import { storeModule } from '../create-store';
 
 function init() {
   return {
@@ -23,6 +24,11 @@ function init() {
      * Have annotations ever been fetched?
      */
     hasFetchedAnnotations: false,
+    /**
+     * The number of total annotation results the service reported as
+     * matching the most recent load/search request
+     */
+    annotationResultCount: null,
   };
 }
 
@@ -94,6 +100,12 @@ const update = {
       activeAnnotationFetches: state.activeAnnotationFetches - 1,
     };
   },
+
+  SET_ANNOTATION_RESULT_COUNT(state, action) {
+    return {
+      annotationResultCount: action.resultCount,
+    };
+  },
 };
 
 const actions = actionTypes(update);
@@ -130,7 +142,15 @@ function apiRequestFinished() {
   return { type: actions.API_REQUEST_FINISHED };
 }
 
+function setAnnotationResultCount(resultCount) {
+  return { type: actions.SET_ANNOTATION_RESULT_COUNT, resultCount };
+}
+
 /** Selectors */
+
+function annotationResultCount(state) {
+  return state.annotationResultCount;
+}
 
 function hasFetchedAnnotations(state) {
   return state.hasFetchedAnnotations;
@@ -169,25 +189,7 @@ function isSavingAnnotation(state, annotation) {
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
-/**
- * @typedef ActivityStore
- *
- * // Actions
- * @prop {typeof annotationFetchStarted} annotationFetchStarted
- * @prop {typeof annotationFetchFinished} annotationFetchFinished
- * @prop {typeof annotationSaveStarted} annotationSaveStarted
- * @prop {typeof annotationSaveFinished} annotationSaveFinished
- * @prop {typeof apiRequestStarted} apiRequestStarted
- * @prop {typeof apiRequestFinished} apiRequestFinished
- *
- * // Selectors
- * @prop {() => boolean} hasFetchedAnnotations
- * @prop {() => boolean} isLoading
- * @prop {() => boolean} isFetchingAnnotations
- * @prop {(a: Annotation) => boolean} isSavingAnnotation
- */
-
-export default {
+export default storeModule({
   init,
   update,
   namespace: 'activity',
@@ -199,6 +201,7 @@ export default {
     annotationSaveFinished,
     apiRequestStarted,
     apiRequestFinished,
+    setAnnotationResultCount,
   },
 
   selectors: {
@@ -206,5 +209,6 @@ export default {
     isLoading,
     isFetchingAnnotations,
     isSavingAnnotation,
+    annotationResultCount,
   },
-};
+});

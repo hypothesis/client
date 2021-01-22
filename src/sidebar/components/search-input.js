@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
 import Button from './button';
 import Spinner from './spinner';
@@ -30,7 +30,8 @@ import Spinner from './spinner';
  * @param {SearchInputProps} props
  */
 export default function SearchInput({ alwaysExpanded, query, onSearch }) {
-  const isLoading = useStore(store => store.isLoading());
+  const store = useStoreProxy();
+  const isLoading = store.isLoading();
   const input = useRef(/** @type {HTMLInputElement|null} */ (null));
 
   // The active filter query from the previous render.

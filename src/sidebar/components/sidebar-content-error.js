@@ -2,7 +2,7 @@ import { createElement } from 'preact';
 import classnames from 'classnames';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 
 import Button from './button';
 import SvgIcon from '../../shared/components/svg-icon';
@@ -25,8 +25,8 @@ export default function SidebarContentError({
   onLoginRequest,
   showClearSelection = false,
 }) {
-  const clearSelection = useStore(store => store.clearSelection);
-  const isLoggedIn = useStore(store => store.isLoggedIn());
+  const store = useStoreProxy();
+  const isLoggedIn = store.isLoggedIn();
 
   const errorTitle =
     errorType === 'annotation' ? 'Annotation unavailable' : 'Group unavailable';
@@ -64,7 +64,7 @@ export default function SidebarContentError({
                 'sidebar-content-error__button': !isLoggedIn,
                 'sidebar-content-error__button--primary': isLoggedIn,
               })}
-              onClick={clearSelection}
+              onClick={() => store.clearSelection()}
             />
           )}
           {!isLoggedIn && (

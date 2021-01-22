@@ -10,6 +10,8 @@
 
 import * as util from '../util';
 
+import { storeModule } from '../create-store';
+
 function init() {
   return {
     /*
@@ -112,19 +114,7 @@ function isSidebarPanelOpen(state, panelName) {
   return state.activePanelName === panelName;
 }
 
-/**
- * @typedef SidebarPanelsStore
- *
- * // Actions
- * @prop {typeof openSidebarPanel} openSidebarPanel
- * @prop {typeof closeSidebarPanel} closeSidebarPanel
- * @prop {typeof toggleSidebarPanel} toggleSidebarPanel
- *
- * // Selectors
- * @prop {(name: string) => boolean} isSidebarPanelOpen
- */
-
-export default {
+export default storeModule({
   namespace: 'sidebarPanels',
   init: init,
   update: update,
@@ -138,4 +128,4 @@ export default {
   selectors: {
     isSidebarPanelOpen,
   },
-};
+});

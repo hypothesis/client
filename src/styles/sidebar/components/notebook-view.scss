@@ -10,22 +10,12 @@
     'results'
     'items';
 
-  h1 {
-    display: inline;
-    font-size: var.$font-size--heading;
-    font-weight: bold;
-  }
-
-  h2 {
-    display: inline;
-    font-size: var.$font-size--subheading;
-    font-weight: bold;
-  }
-
   &__heading {
     grid-area: heading;
-    font-size: var.$font-size--heading;
-    font-weight: bold;
+  }
+
+  &__filters {
+    grid-area: filters;
   }
 
   &__results {
@@ -36,15 +26,25 @@
     grid-area: items;
   }
 
+  &__group-name {
+    font-size: var.$font-size--heading;
+    font-weight: bold;
+  }
+
   @include responsive.tablet-and-up {
     grid-template-areas:
-      'heading results'
+      'heading heading'
+      'filters results'
       'items items';
 
+    &__filters {
+      justify-self: start;
+    }
+
     &__results {
-      // Right-aligned when sharing a row with the heading
-      text-align: right;
-      align-self: end;
+      // Align right and bottom
+      justify-self: end;
+      align-self: flex-end;
     }
   }
 }

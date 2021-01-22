@@ -16,6 +16,7 @@ const commonPolyfills = [
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
  * @prop {Object.<string,string>} manifest -
  *   A mapping from canonical asset path to cache-busted asset path
+ * @prop {string} apiUrl
  */
 
 /**
@@ -81,6 +82,27 @@ function injectLink(doc, rel, type, url) {
   link.rel = rel;
   link.href = url;
   link.type = `application/annotator+${type}`;
+
+  tagElement(link);
+  doc.head.appendChild(link);
+}
+
+/**
+ * Preload a URL using a `<link rel="preload" as="<type>" ...>` element
+ *
+ * This can be used to preload an API request or other resource which we know
+ * that the client will load.
+ *
+ * @param {Document} doc
+ * @param {string} type - Type of resource
+ * @param {string} url
+ */
+function preloadUrl(doc, type, url) {
+  const link = doc.createElement('link');
+  link.rel = 'preload';
+  link.as = type;
+  link.crossOrigin = 'anonymous';
+  link.href = url;
 
   tagElement(link);
   doc.head.appendChild(link);
@@ -165,6 +187,10 @@ export function bootHypothesisClient(doc, config) {
  * @param {SidebarAppConfig} config
  */
 export function bootSidebarApp(doc, config) {
+  // Preload `/api/` and `/api/links` API responses.
+  preloadUrl(doc, 'fetch', config.apiUrl);
+  preloadUrl(doc, 'fetch', config.apiUrl + 'links');
+
   const polyfills = polyfillBundles(commonPolyfills);
 
   injectAssets(doc, config, [

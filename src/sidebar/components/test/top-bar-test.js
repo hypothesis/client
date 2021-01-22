@@ -40,7 +40,7 @@ describe('TopBar', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': callback => callback(fakeStore),
+      '../store/use-store': { useStoreProxy: () => fakeStore },
       '../util/is-third-party-service': fakeIsThirdPartyService,
       '../service-config': fakeServiceConfig,
     });

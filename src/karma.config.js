@@ -17,30 +17,6 @@ process.env.CHROME_BIN = require('puppeteer').executablePath();
 if (process.env.RUNNING_IN_DOCKER) {
   chromeFlags.push('--no-sandbox');
 
-  // Enable debug logging from Chrome to help track down a cause of frequent
-  // build failures in Jenkins. The log files are written to `chrome_debug.log`
-  // in the workspace for the current build.
-  chromeFlags.push('--enable-logging');
-  chromeFlags.push('--v=1');
-  process.env.CHROME_LOG_FILE = path.resolve(
-    __dirname + '/../',
-    'chrome_debug.log'
-  );
-
-  // Enable even more debug logging from Chrome to help track down build
-  // failures in Jenkins. This generates a large (~40MB+) JSON file detailing
-  // events that happen during browser startup.
-  //
-  // See https://www.chromium.org/developers/how-tos/trace-event-profiling-tool/recording-tracing-runs#TOC-Capturing-chrome-desktop-startup
-  const traceFile = path.resolve(__dirname + '/../', 'chrome_trace.json');
-  chromeFlags.push('--trace-startup');
-  chromeFlags.push('--trace-startup-duration=7');
-  chromeFlags.push(`--trace-startup-file=${traceFile}`);
-
-  // Log test details as they are executed so we can tell where test execution
-  // got to if a failure happens.
-  mochaOutputMode = 'full';
-
   // Disable `/dev/shm` usage as this can cause Chrome to fail to load large
   // HTML pages, such as the one Karma creates with all the tests loaded.
   //
@@ -153,7 +129,7 @@ module.exports = function (config) {
 
     // Use https://www.npmjs.com/package/karma-mocha-reporter
     // for more helpful rendering of test failures
-    reporters: ['mocha', 'coverage-istanbul'],
+    reporters: ['progress', 'mocha', 'coverage-istanbul'],
 
     // web server port
     port: 9876,

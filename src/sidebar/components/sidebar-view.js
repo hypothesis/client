@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'preact/hooks';
 
 import useRootThread from './hooks/use-root-thread';
 import { withServices } from '../util/service-context';
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { tabForAnnotation } from '../util/tabs';
 
 import FilterStatus from './filter-status';
@@ -38,28 +38,24 @@ function SidebarView({
   const rootThread = useRootThread();
 
   // Store state values
-  const focusedGroupId = useStore(store => store.focusedGroupId());
-  const hasAppliedFilter = useStore(store => {
-    return store.hasAppliedFilter() || store.hasSelectedAnnotations();
-  });
-  const isLoading = useStore(store => store.isLoading());
-  const isLoggedIn = useStore(store => store.isLoggedIn());
+  const store = useStoreProxy();
+  const focusedGroupId = store.focusedGroupId();
+  const hasAppliedFilter =
+    store.hasAppliedFilter() || store.hasSelectedAnnotations();
+  const isLoading = store.isLoading();
+  const isLoggedIn = store.isLoggedIn();
 
-  const linkedAnnotationId = useStore(store =>
-    store.directLinkedAnnotationId()
-  );
-  const linkedAnnotation = useStore(store => {
-    return linkedAnnotationId
-      ? store.findAnnotationByID(linkedAnnotationId)
-      : undefined;
-  });
+  const linkedAnnotationId = store.directLinkedAnnotationId();
+  const linkedAnnotation = linkedAnnotationId
+    ? store.findAnnotationByID(linkedAnnotationId)
+    : undefined;
   const directLinkedTab = linkedAnnotation
     ? tabForAnnotation(linkedAnnotation)
     : 'annotation';
 
-  const searchUris = useStore(store => store.searchUris());
-  const sidebarHasOpened = useStore(store => store.hasSidebarOpened());
-  const userId = useStore(store => store.profile().userid);
+  const searchUris = store.searchUris();
+  const sidebarHasOpened = store.hasSidebarOpened();
+  const userId = store.profile().userid;
 
   // The local `$tag` of a direct-linked annotation; populated once it
   // has anchored: meaning that it's ready to be focused and scrolled to
@@ -68,18 +64,12 @@ function SidebarView({
       ? linkedAnnotation.$tag
       : null;
 
-  // Actions
-  const clearSelection = useStore(store => store.clearSelection);
-  const selectTab = useStore(store => store.selectTab);
-
   // If, after loading completes, no `linkedAnnotation` object is present when
   // a `linkedAnnotationId` is set, that indicates an error
   const hasDirectLinkedAnnotationError =
     !isLoading && linkedAnnotationId ? !linkedAnnotation : false;
 
-  const hasDirectLinkedGroupError = useStore(store =>
-    store.directLinkedGroupFetchFailed()
-  );
+  const hasDirectLinkedGroupError = store.directLinkedGroupFetchFailed();
 
   const hasContentError =
     hasDirectLinkedAnnotationError || hasDirectLinkedGroupError;
@@ -101,8 +91,15 @@ function SidebarView({
   // Reload annotations when group, user or document search URIs change
   useEffect(() => {
     if (!prevGroupId.current || prevGroupId.current !== focusedGroupId) {
-      // Clear any selected annotations when the group ID changes
-      clearSelection();
+      // Clear any selected annotations and filters when the group ID changes.
+      //
+      // We don't clear the selection/filters on the initial load when
+      // the focused group transitions from null to non-null, as this would clear
+      // any filters intended to be used for the initial display (eg. to focus
+      // on a particular user).
+      if (prevGroupId.current) {
+        store.clearSelection();
+      }
       prevGroupId.current = focusedGroupId;
     }
     if (focusedGroupId && searchUris.length) {
@@ -111,13 +108,7 @@ function SidebarView({
         uris: searchUris,
       });
     }
-  }, [
-    clearSelection,
-    loadAnnotationsService,
-    focusedGroupId,
-    userId,
-    searchUris,
-  ]);
+  }, [store, loadAnnotationsService, focusedGroupId, userId, searchUris]);
 
   // When a `linkedAnnotationAnchorTag` becomes available, scroll to it
   // and focus it
@@ -125,25 +116,26 @@ function SidebarView({
     if (linkedAnnotationAnchorTag) {
       frameSync.focusAnnotations([linkedAnnotationAnchorTag]);
       frameSync.scrollToAnnotation(linkedAnnotationAnchorTag);
-      selectTab(directLinkedTab);
+      store.selectTab(directLinkedTab);
     } else if (linkedAnnotation) {
       // Make sure to allow for orphaned annotations (which won't have an anchor)
-      selectTab(directLinkedTab);
+      store.selectTab(directLinkedTab);
     }
   }, [
     directLinkedTab,
     frameSync,
     linkedAnnotation,
     linkedAnnotationAnchorTag,
-    selectTab,
+    store,
   ]);
 
   // Connect to the streamer when the sidebar has opened or if user is logged in
+  const hasFetchedProfile = store.hasFetchedProfile();
   useEffect(() => {
-    if (sidebarHasOpened || isLoggedIn) {
+    if (hasFetchedProfile && (sidebarHasOpened || isLoggedIn)) {
       streamer.connect();
     }
-  }, [streamer, sidebarHasOpened, isLoggedIn]);
+  }, [hasFetchedProfile, isLoggedIn, sidebarHasOpened, streamer]);
 
   return (
     <div>

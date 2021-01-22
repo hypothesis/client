@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import useStore from '../store/use-store';
+import { useStoreProxy } from '../store/use-store';
 import { isReply, quote } from '../util/annotation-metadata';
 import { withServices } from '../util/service-context';
 
@@ -39,15 +39,13 @@ function Annotation({
   showDocumentInfo,
   threadIsCollapsed,
 }) {
-  const isFocused = useStore(store =>
-    store.isAnnotationFocused(annotation.$tag)
-  );
-  const setExpanded = useStore(store => store.setExpanded);
+  const store = useStoreProxy();
+  const isFocused = store.isAnnotationFocused(annotation.$tag);
 
   // An annotation will have a draft if it is being edited
-  const draft = useStore(store => store.getDraft(annotation));
-  const userid = useStore(store => store.profile().userid);
-  const isSaving = useStore(store => store.isSavingAnnotation(annotation));
+  const draft = store.getDraft(annotation);
+  const userid = store.profile().userid;
+  const isSaving = store.isSavingAnnotation(annotation);
 
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
 
@@ -66,7 +64,10 @@ function Annotation({
   const onToggleReplies = () =>
     // nb. We assume the annotation has an ID here because it is not possible
     // to create replies until the annotation has been saved.
-    setExpanded(/** @type {string} */ (annotation.id), !!threadIsCollapsed);
+    store.setExpanded(
+      /** @type {string} */ (annotation.id),
+      !!threadIsCollapsed
+    );
 
   return (
     <article

@@ -1,5 +1,7 @@
 import * as util from '../util';
 
+import { storeModule } from '../create-store';
+
 function init(settings) {
   return {
     /**
@@ -11,7 +13,7 @@ function init(settings) {
      * from the group or clears the selection, the direct link is "consumed"
      * and no longer used.
      *
-     * @type {string}
+     * @type {string|null}
      */
     directLinkedGroupId: settings.group || null,
 
@@ -24,7 +26,7 @@ function init(settings) {
      * switches to a different group manually, the direct link is "consumed"
      * and no longer used.
      *
-     * @type {string}
+     * @type {string|null}
      */
     directLinkedAnnotationId: settings.annotations || null,
 
@@ -140,23 +142,7 @@ function directLinkedGroupFetchFailed(state) {
   return state.directLinkedGroupFetchFailed;
 }
 
-/**
- * @typedef DirectLinkedStore
- *
- * // Actions
- * @prop {typeof setDirectLinkedGroupFetchFailed} setDirectLinkedGroupFetchFailed
- * @prop {typeof setDirectLinkedGroupId} setDirectLinkedGroupId
- * @prop {typeof setDirectLinkedAnnotationId} setDirectLinkedAnnotationId
- * @prop {typeof clearDirectLinkedGroupFetchFailed} clearDirectLinkedGroupFetchFailed
- * @prop {typeof clearDirectLinkedIds} clearDirectLinkedIds
- *
- * // Selectors
- * @prop {() => string|null} directLinkedAnnotationId
- * @prop {() => boolean} directLinkedGroupFetchFailed
- * @prop {() => string|null} directLinkedGroupId
- */
-
-export default {
+export default storeModule({
   init,
   namespace: 'directLinked',
   update,
@@ -172,4 +158,4 @@ export default {
     directLinkedGroupFetchFailed,
     directLinkedGroupId,
   },
-};
+});

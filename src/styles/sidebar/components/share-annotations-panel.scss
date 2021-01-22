@@ -19,4 +19,12 @@
   &__icon-button {
     @include buttons.button--input;
   }
+
+  // FIXME: Centralize styling of different sizes of Spinner in a reusable
+  // class or mixin.
+  // Spinner uses `em`-sizing; make the font-size of the containing element
+  // larger to make spinner larger
+  &__spinner {
+    font-size: (var.$layout-space * 2);
+  }
 }
