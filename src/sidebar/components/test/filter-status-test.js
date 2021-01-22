@@ -84,7 +84,7 @@ describe('FilterStatus', () => {
   context('(State 1): no search filters active', () => {
     it('should return null if filter state indicates no active filters', () => {
       const wrapper = createComponent();
-      assert.isEmpty(wrapper);
+      assert.equal(wrapper.children().length, 0);
     });
   });
 
