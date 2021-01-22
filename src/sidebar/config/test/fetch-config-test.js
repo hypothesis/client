@@ -1,6 +1,6 @@
 import { fetchConfig, $imports } from '../fetch-config';
 
-describe('sidebar/fetch-config', () => {
+describe('sidebar/config/fetch-config', () => {
   let fakeHostConfig;
   let fakeJsonRpc;
   let fakeWindow;
@@ -14,9 +14,9 @@ describe('sidebar/fetch-config', () => {
     };
     fakeApiUrl = sinon.stub().returns('https://dev.hypothes.is/api/');
     $imports.$mock({
-      './host-config': fakeHostConfig,
-      './util/postmessage-json-rpc': fakeJsonRpc,
-      './config/get-api-url': fakeApiUrl,
+      '../host-config': fakeHostConfig,
+      '../util/postmessage-json-rpc': fakeJsonRpc,
+      './get-api-url': fakeApiUrl,
     });
 
     // By default, embedder provides no custom config.
@@ -39,7 +39,7 @@ describe('sidebar/fetch-config', () => {
     $imports.$restore();
   });
 
-  describe('fetchConfig', () => {
+  describe('config/fetch-config', () => {
     context('direct embed', () => {
       // no `requestConfigFromFrame` variable
       //
