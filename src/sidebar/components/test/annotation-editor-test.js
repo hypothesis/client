@@ -68,7 +68,7 @@ describe('AnnotationEditor', () => {
 
     const wrapper = createComponent();
 
-    assert.isEmpty(wrapper);
+    assert.equal(wrapper.html(), '');
   });
 
   describe('markdown content editor', () => {
