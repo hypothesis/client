@@ -8,9 +8,9 @@ import { $imports } from '../excerpt';
 import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Excerpt', () => {
-  const SHORT_DIV = <div id="foo" style="height: 5px;" />;
+  const SHORT_DIV = <div id="foo" style={{ height: 5 }} />;
   const TALL_DIV = (
-    <div id="foo" style="height: 200px;">
+    <div id="foo" style={{ height: 200 }}>
       foo bar
     </div>
   );
