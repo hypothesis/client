@@ -87,9 +87,10 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('is updated after time passes', () => {
-    fakeTime.decayingInterval.callsFake((date, callback) =>
-      setTimeout(callback, 10)
-    );
+    fakeTime.decayingInterval.callsFake((date, callback) => {
+      const id = setTimeout(callback, 10);
+      return () => clearTimeout(id);
+    });
     const wrapper = createComponent();
     fakeTime.toFuzzyString.returns('60 jiffies');
 
