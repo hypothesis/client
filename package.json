@@ -11,7 +11,7 @@
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
     "@octokit/rest": "^18.0.0",
-    "@sentry/browser": "^5.6.2",
+    "@sentry/browser": "^6.0.1",
     "approx-string-match": "^1.1.0",
     "autoprefixer": "^10.0.1",
     "aws-sdk": "^2.345.0",
