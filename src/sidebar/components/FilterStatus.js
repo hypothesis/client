@@ -279,7 +279,7 @@ export default function FilterStatus() {
 
   const store = useStoreProxy();
   const focusState = store.focusState();
-  const forcedVisibleCount = store.forcedVisibleAnnotations().length;
+  const forcedVisibleCount = store.forcedVisibleThreads().length;
   const filterQuery = store.filterQuery();
   const selectedCount = store.selectedAnnotations().length;
 

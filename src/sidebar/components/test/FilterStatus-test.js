@@ -44,7 +44,7 @@ describe('FilterStatus', () => {
       filterQuery: sinon.stub().returns(null),
       filterState: sinon.stub().returns(getFilterState()),
       focusState: sinon.stub().returns(getFocusState()),
-      forcedVisibleAnnotations: sinon.stub().returns([]),
+      forcedVisibleThreads: sinon.stub().returns([]),
       selectedAnnotations: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
     };
@@ -116,7 +116,7 @@ describe('FilterStatus', () => {
   context('(State 3): filtered by query with force-expanded threads', () => {
     beforeEach(() => {
       fakeStore.filterQuery.returns('foobar');
-      fakeStore.forcedVisibleAnnotations.returns([1, 2, 3]);
+      fakeStore.forcedVisibleThreads.returns([1, 2, 3]);
       fakeThreadUtil.countVisible.returns(5);
     });
 
@@ -284,7 +284,7 @@ describe('FilterStatus', () => {
           displayName: 'Ebenezer Studentolog',
         });
         fakeStore.filterQuery.returns('biscuits');
-        fakeStore.forcedVisibleAnnotations.returns([1, 2]);
+        fakeStore.forcedVisibleThreads.returns([1, 2]);
         fakeThreadUtil.countVisible.returns(3);
       });
 
@@ -331,7 +331,7 @@ describe('FilterStatus', () => {
         configured: true,
         displayName: 'Ebenezer Studentolog',
       });
-      fakeStore.forcedVisibleAnnotations.returns([1, 2, 3]);
+      fakeStore.forcedVisibleThreads.returns([1, 2, 3]);
       fakeThreadUtil.countVisible.returns(7);
     });
 
@@ -343,7 +343,7 @@ describe('FilterStatus', () => {
     });
 
     it('should handle cases when there are no focused-user annotations', () => {
-      fakeStore.forcedVisibleAnnotations.returns([1, 2, 3, 4, 5, 6, 7]);
+      fakeStore.forcedVisibleThreads.returns([1, 2, 3, 4, 5, 6, 7]);
       assertFilterText(
         createComponent(),
         'No annotations by Ebenezer Studentolog (and 7 more)'

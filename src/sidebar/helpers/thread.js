@@ -13,8 +13,7 @@ import { notNull } from '../util/typing';
  * @return {number}
  */
 function countByVisibility(thread, visibility) {
-  const matchesVisibility =
-    !!thread.annotation && thread.visible === visibility;
+  const matchesVisibility = thread.visible === visibility;
   return thread.children.reduce(
     (count, reply) => count + countByVisibility(reply, visibility),
     matchesVisibility ? 1 : 0

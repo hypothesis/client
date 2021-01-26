@@ -30,7 +30,7 @@ describe('sidebar/store/modules/selection', () => {
         id1: true,
         id2: false,
       });
-      assert.deepEqual(store.forcedVisibleAnnotations(), ['id1']);
+      assert.deepEqual(store.forcedVisibleThreads(), ['id1']);
     });
   });
 
@@ -154,7 +154,7 @@ describe('sidebar/store/modules/selection', () => {
       });
 
       assert.isEmpty(store.selectedAnnotations());
-      assert.isEmpty(store.forcedVisibleAnnotations());
+      assert.isEmpty(store.forcedVisibleThreads());
     });
   });
 
@@ -166,7 +166,7 @@ describe('sidebar/store/modules/selection', () => {
       store.setFilter('user', { value: 'dingbat', display: 'Ding Bat' });
 
       assert.isEmpty(store.selectedAnnotations());
-      assert.isEmpty(store.forcedVisibleAnnotations());
+      assert.isEmpty(store.forcedVisibleThreads());
     });
   });
 
@@ -178,7 +178,7 @@ describe('sidebar/store/modules/selection', () => {
       store.setFilterQuery('foobar');
 
       assert.isEmpty(store.selectedAnnotations());
-      assert.isEmpty(store.forcedVisibleAnnotations());
+      assert.isEmpty(store.forcedVisibleThreads());
     });
   });
 
@@ -190,7 +190,7 @@ describe('sidebar/store/modules/selection', () => {
       store.toggleFocusMode(true);
 
       assert.isEmpty(store.selectedAnnotations());
-      assert.isEmpty(store.forcedVisibleAnnotations());
+      assert.isEmpty(store.forcedVisibleThreads());
     });
   });
 
@@ -206,7 +206,7 @@ describe('sidebar/store/modules/selection', () => {
         1: true,
         3: true,
       });
-      assert.deepEqual(store.forcedVisibleAnnotations(), ['1']);
+      assert.deepEqual(store.forcedVisibleThreads(), ['1']);
       assert.deepEqual(store.expandedMap(), { 1: true });
     });
   });

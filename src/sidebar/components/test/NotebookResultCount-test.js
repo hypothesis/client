@@ -22,7 +22,7 @@ describe('NotebookResultCount', () => {
     fakeAnnotationResultCount = sinon.stub().returns(0);
 
     fakeStore = {
-      forcedVisibleAnnotations: sinon.stub().returns([]),
+      forcedVisibleThreads: sinon.stub().returns([]),
       hasAppliedFilter: sinon.stub().returns(false),
       isLoading: fakeIsLoading,
       annotationResultCount: fakeAnnotationResultCount,
@@ -111,7 +111,7 @@ describe('NotebookResultCount', () => {
     ].forEach(test => {
       it('should render a count of results', () => {
         fakeStore.hasAppliedFilter.returns(true);
-        fakeStore.forcedVisibleAnnotations.returns(test.forcedVisible);
+        fakeStore.forcedVisibleThreads.returns(test.forcedVisible);
         fakeUseRootThread.returns(test.thread);
         fakeCountVisible.returns(test.visibleCount);
 
