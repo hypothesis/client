@@ -2,32 +2,30 @@ import threadsService from '../threads';
 
 const NESTED_THREADS = {
   id: 'top',
-  annotation: { $tag: 'top-tag' },
+  annotation: {},
   children: [
     {
       id: '1',
-      annotation: { $tag: '1-tag' },
+      annotation: {},
       children: [
         {
           id: '1a',
-          annotation: { $tag: '1a-tag' },
-          children: [
-            { annotation: { $tag: '1ai-tag' }, id: '1ai', children: [] },
-          ],
+          annotation: {},
+          children: [{ annotation: {}, id: '1ai', children: [] }],
         },
         {
           id: '1b',
-          annotation: { $tag: '1b-tag' },
+          annotation: {},
           children: [],
           visible: true,
         },
         {
           id: '1c',
-          annotation: { $tag: '1c-tag' },
+          annotation: {},
           children: [
             {
               id: '1ci',
-              annotation: { $tag: '1ci-tag' },
+              annotation: {},
               children: [],
               visible: false,
             },
@@ -37,32 +35,32 @@ const NESTED_THREADS = {
     },
     {
       id: '2',
-      annotation: { $tag: '2-tag' },
+      annotation: {},
       children: [
-        { id: '2a', annotation: { $tag: '2a-tag' }, children: [] },
+        { id: '2a', annotation: {}, children: [] },
         {
           id: '2b',
           children: [
             {
               id: '2bi',
-              annotation: { $tag: '2bi-tag' },
+              annotation: {},
               children: [],
               visible: true,
             },
-            { id: '2bii', annotation: { $tag: '2bii-tag' }, children: [] },
+            { id: '2bii', annotation: {}, children: [] },
           ],
         },
       ],
     },
     {
       id: '3',
-      annotation: { $tag: '3-tag' },
+      annotation: {},
       children: [],
     },
   ],
 };
 
-describe('threadsService', function () {
+describe('threadsService', () => {
   let fakeStore;
   let service;
 
@@ -77,17 +75,17 @@ describe('threadsService', function () {
     let nonVisibleThreadIds;
     beforeEach(() => {
       nonVisibleThreadIds = [
-        'top-tag',
-        '1-tag',
-        '2-tag',
-        '3-tag',
-        '1a-tag',
-        '1c-tag',
-        '2a-tag',
-        //'2b-tag',  Not visible, but also does not have an annotation
-        '1ai-tag',
-        '1ci-tag',
-        '2bii-tag',
+        'top',
+        '1',
+        '2',
+        '3',
+        '1a',
+        '1c',
+        '2a',
+        '2b',
+        '1ai',
+        '1ci',
+        '2bii',
       ];
     });
     it('should set the thread and its children force-visible in the store', () => {
@@ -109,13 +107,7 @@ describe('threadsService', function () {
       for (let i = 0; i < fakeStore.setForcedVisible.callCount; i++) {
         calledWithThreadIds.push(fakeStore.setForcedVisible.getCall(i).args[0]);
       }
-      assert.deepEqual(calledWithThreadIds, [
-        '1ai-tag',
-        '1a-tag',
-        '1ci-tag',
-        '1c-tag',
-        '1-tag',
-      ]);
+      assert.deepEqual(calledWithThreadIds, ['1ai', '1a', '1ci', '1c', '1']);
     });
   });
 });

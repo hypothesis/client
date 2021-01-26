@@ -18,7 +18,7 @@ import Spinner from './Spinner';
 function NotebookResultCount() {
   const store = useStoreProxy();
 
-  const forcedVisibleCount = store.forcedVisibleAnnotations().length;
+  const forcedVisibleCount = store.forcedVisibleThreads().length;
   const hasAppliedFilter = store.hasAppliedFilter();
   const resultCount = store.annotationResultCount();
   const isLoading = store.isLoading();
