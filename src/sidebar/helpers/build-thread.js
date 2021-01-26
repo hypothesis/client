@@ -296,9 +296,7 @@ export default function buildThread(annotations, options) {
     thread.children = thread.children.filter(child => {
       const isSelected = options.selected.includes(child.id);
       const isForcedVisible =
-        hasForcedVisible &&
-        child.annotation &&
-        options.forcedVisible.includes(child.annotation.$tag);
+        hasForcedVisible && options.forcedVisible.includes(child.id);
       return isSelected || isForcedVisible;
     });
   }
@@ -312,19 +310,16 @@ export default function buildThread(annotations, options) {
   thread = mapThread(thread, thread => {
     let threadIsVisible = thread.visible;
 
-    if (!thread.annotation) {
-      threadIsVisible = false; // Nothing to show
-    } else if (options.filterFn) {
-      if (
-        hasForcedVisible &&
-        options.forcedVisible.includes(thread.annotation.$tag)
-      ) {
-        // This annotation may or may not match the filter, but we should
+    if (options.filterFn) {
+      if (hasForcedVisible && options.forcedVisible.includes(thread.id)) {
+        // This thread may or may not match the filter, but we should
         // make sure it is visible because it has been forced visible by user
         threadIsVisible = true;
-      } else {
-        // Otherwise, visibility depends on whether it matches the filter
+      } else if (thread.annotation) {
+        // Otherwise, visibility depends on whether its annotation matches the filter
         threadIsVisible = !!options.filterFn(thread.annotation);
+      } else {
+        threadIsVisible = false;
       }
     }
     return { ...thread, visible: threadIsVisible };

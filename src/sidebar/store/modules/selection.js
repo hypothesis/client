@@ -65,7 +65,7 @@ function init(settings) {
     // until explicitly expanded.
     expanded: initialSelection(settings) || {},
 
-    // Set of annotations that have been "forced" visible by the user
+    // Set of threads that have been "forced" visible by the user
     // (e.g. by clicking on "Show x more" button) even though they may not
     // match the currently-applied filters
     forcedVisible: {},
@@ -256,11 +256,11 @@ function setExpanded(id, expanded) {
 }
 
 /**
- * A user may "force" an annotation to be visible, even if it would be otherwise
+ * A user may "force" an thread to be visible, even if it would be otherwise
  * not be visible because of applied filters. Set the force-visibility for a
- * single annotation, without affecting other forced-visible annotations.
+ * single thread, without affecting other forced-visible threads.
  *
- * @param {string} id
+ * @param {string} id - Thread id
  * @param {boolean} visible - Should this annotation be visible, even if it
  *        conflicts with current filters?
  */
@@ -307,7 +307,7 @@ function expandedMap(state) {
 /**
  * @type {(state: any) => string[]}
  */
-const forcedVisibleAnnotations = createSelector(
+const forcedVisibleThreads = createSelector(
   state => state.forcedVisible,
   forcedVisible => trueKeys(forcedVisible)
 );
@@ -347,7 +347,7 @@ const selectionState = createSelector(
   selection => {
     return {
       expanded: expandedMap(selection),
-      forcedVisible: forcedVisibleAnnotations(selection),
+      forcedVisible: forcedVisibleThreads(selection),
       selected: selectedAnnotations(selection),
       sortKey: sortKey(selection),
       selectedTab: selectedTab(selection),
@@ -398,7 +398,7 @@ export default storeModule({
 
   selectors: {
     expandedMap,
-    forcedVisibleAnnotations,
+    forcedVisibleThreads,
     hasSelectedAnnotations,
     selectedAnnotations,
     selectedTab,
