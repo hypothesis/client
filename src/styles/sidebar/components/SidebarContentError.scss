@@ -1,0 +1,8 @@
+@use "../../mixins/molecules";
+@use "../../variables" as var;
+
+.SidebarContentError {
+  @include molecules.panel;
+  position: relative;
+  margin-bottom: 0.75em;
+}

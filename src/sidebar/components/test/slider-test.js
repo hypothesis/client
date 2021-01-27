@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
-import Slider from '../slider';
+import Slider from '../Slider';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
@@ -88,7 +88,7 @@ describe('Slider', () => {
     assert.equal(containerStyle.overflow, 'hidden');
 
     // When fully visible, we make overflow visible to make focus rings or
-    // other content which extends beyond the bounds of the slider visible.
+    // other content which extends beyond the bounds of the Slider visible.
     wrapper.find('div').first().simulate('transitionend');
     containerStyle = wrapper.getDOMNode().style;
     assert.equal(containerStyle.overflow, 'visible');
