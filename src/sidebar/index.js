@@ -100,7 +100,7 @@ registerIcons(iconSet);
 
 // The entry point component for the app.
 import { createElement, render } from 'preact';
-import HypothesisApp from './components/hypothesis-app';
+import HypothesisApp from './components/HypothesisApp';
 import { ServiceContext } from './service-context';
 
 // Services.

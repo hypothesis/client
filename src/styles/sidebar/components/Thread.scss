@@ -1,0 +1,74 @@
+@use "../../mixins/buttons";
+@use "../../mixins/layout";
+@use "../../variables" as var;
+
+.Thread {
+  @include layout.row;
+
+  &--reply {
+    margin-top: var.$layout-space--xsmall;
+  }
+
+  &--reply &__content {
+    margin-left: var.$layout-space;
+  }
+
+  &__children {
+    margin-left: -1 * var.$layout-space;
+  }
+
+  &__unavailable-message {
+    margin: 0 var.$layout-space;
+  }
+
+  // Left "channel" of thread
+  &__collapse {
+    margin-right: 1em;
+    border-right: 1px dashed var.$color-border;
+    // The entire channel is NOT clickable so don't make it look like it is
+    // (overrides `pointer` cursor applied to entire card)
+    cursor: auto;
+
+    // Darken thread line on hover as a visual cue to show related thread items
+    &:hover {
+      border-color: var.$grey-4;
+    }
+
+    .is-collapsed & {
+      border-right: none;
+    }
+  }
+
+  &__collapse-button {
+    @include buttons.button;
+    color: var.$grey-mid;
+    margin-right: -1.25em;
+    padding: 0.25em 0.75em 0.75em 0.75em;
+    // Need a non-transparent background so that the dashed border line
+    // does not show through the button
+    background-color: var.$white;
+
+    svg {
+      // This is not an icon and as such does not use a mixin
+      width: 12px;
+      height: 12px;
+      color: var.$grey-4;
+    }
+
+    &:hover &__icon {
+      color: var.$grey-6;
+    }
+  }
+  &__hidden-toggle-button {
+    // This makes the vertical alignment with thread-collapse chevrons
+    // more precise
+    @include buttons.button--labeled;
+    margin-top: -0.25em;
+  }
+
+  &__content {
+    flex-grow: 1;
+    // Prevent annotation content from overflowing the container
+    max-width: 100%;
+  }
+}
