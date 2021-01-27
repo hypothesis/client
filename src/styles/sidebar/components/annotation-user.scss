@@ -1,8 +1,0 @@
-@use "../../variables" as var;
-
-.annotation-user {
-  &__user-name {
-    color: var.$color-text;
-    font-weight: bold;
-  }
-}

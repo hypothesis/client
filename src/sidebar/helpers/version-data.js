@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../components/user-menu').AuthState} AuthState
+ * @typedef {import('../components/UserMenu').AuthState} AuthState
  */
 
 /**
