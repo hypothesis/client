@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement, createRef } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -13,7 +14,6 @@ import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import { isMacOS } from '../../shared/user-agent';
 
 import MarkdownView from './markdown-view';
-import SvgIcon from '../../shared/components/svg-icon';
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.

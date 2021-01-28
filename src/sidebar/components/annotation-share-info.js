@@ -1,10 +1,9 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import { isPrivate } from '../helpers/permissions';
-
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef {import("../../types/api").Annotation} Annotation

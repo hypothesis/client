@@ -1,9 +1,9 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import Menu from './menu';
 import MenuItem from './menu-item';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef {import('../store/modules/filters').FilterOption} FilterOption

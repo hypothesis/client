@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -10,7 +11,6 @@ import { withServices } from '../service-context';
 import Button from './button';
 import useElementShouldClose from './hooks/use-element-should-close';
 import ShareLinks from './share-links';
-import SvgIcon from '../../shared/components/svg-icon';
 import { isIOS } from '../../shared/user-agent';
 
 /**

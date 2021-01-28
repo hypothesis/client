@@ -1,4 +1,5 @@
 import { createElement, Fragment } from 'preact';
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
@@ -12,7 +13,6 @@ import Button from './button';
 import ShareLinks from './share-links';
 import SidebarPanel from './sidebar-panel';
 import Spinner from './spinner';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef ShareAnnotationsPanelProps

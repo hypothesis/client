@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -14,7 +15,6 @@ import AnnotationDocumentInfo from './annotation-document-info';
 import AnnotationShareInfo from './annotation-share-info';
 import AnnotationUser from './annotation-user';
 import Button from './button';
-import SvgIcon from '../../shared/components/svg-icon';
 import AnnotationTimestamps from './annotation-timestamps';
 
 /**
