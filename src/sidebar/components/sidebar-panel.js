@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -7,7 +8,6 @@ import { useStoreProxy } from '../store/use-store';
 
 import Button from './button';
 import Slider from './slider';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef SidebarPanelProps

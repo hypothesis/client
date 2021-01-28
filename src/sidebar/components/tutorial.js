@@ -1,10 +1,9 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import isThirdPartyService from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
-
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * Subcomponent: an "instruction" within the tutorial step that includes an

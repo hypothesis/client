@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import classnames from 'classnames';
 import propTypes from 'prop-types';
@@ -5,7 +6,6 @@ import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 
 import Button from './button';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef SidebarContentErrorProps

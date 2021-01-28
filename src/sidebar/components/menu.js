@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { Fragment, createElement } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -6,7 +7,6 @@ import propTypes from 'prop-types';
 import useElementShouldClose from './hooks/use-element-should-close';
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 
-import SvgIcon from '../../shared/components/svg-icon';
 import MenuKeyboardNavigation from './menu-keyboard-navigation';
 
 // The triangular indicator below the menu toggle button that visually links it

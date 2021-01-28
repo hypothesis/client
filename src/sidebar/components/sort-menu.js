@@ -1,10 +1,10 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 
 import { useStoreProxy } from '../store/use-store';
 
 import Menu from './menu';
 import MenuItem from './menu-item';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * A drop-down menu of sorting options for a collection of annotations.

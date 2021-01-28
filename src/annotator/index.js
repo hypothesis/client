@@ -13,7 +13,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Load icons.
-import { registerIcons } from '../shared/components/svg-icon';
+import { registerIcons } from '@hypothesis/frontend-shared';
 import iconSet from './icons';
 registerIcons(iconSet);
 
