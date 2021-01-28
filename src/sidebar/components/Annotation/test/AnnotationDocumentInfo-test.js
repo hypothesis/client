@@ -1,12 +1,12 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
-import * as fixtures from '../../test/annotation-fixtures';
+import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationDocumentInfo from '../AnnotationDocumentInfo';
 import { $imports } from '../AnnotationDocumentInfo';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('AnnotationDocumentInfo', () => {
   let fakeDomainAndTitle;
@@ -27,7 +27,7 @@ describe('AnnotationDocumentInfo', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/annotation-metadata': fakeMetadata,
+      '../../helpers/annotation-metadata': fakeMetadata,
     });
   });
 

@@ -2,19 +2,19 @@ import { createElement } from 'preact';
 import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
-import { isHidden } from '../helpers/annotation-metadata';
-import { withServices } from '../service-context';
-import { applyTheme } from '../helpers/theme';
+import { useStoreProxy } from '../../store/use-store';
+import { isHidden } from '../../helpers/annotation-metadata';
+import { withServices } from '../../service-context';
+import { applyTheme } from '../../helpers/theme';
 
-import Button from './Button';
-import Excerpt from './Excerpt';
-import MarkdownView from './MarkdownView';
-import TagList from './TagList';
+import Button from '../Button';
+import Excerpt from '../Excerpt';
+import MarkdownView from '../MarkdownView';
+import TagList from '../TagList';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import("../../types/config").MergedConfig} MergedConfig
+ * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import("../../../types/config").MergedConfig} MergedConfig
  */
 
 /**

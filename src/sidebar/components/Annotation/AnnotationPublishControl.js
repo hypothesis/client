@@ -1,20 +1,20 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
-import { isNew, isReply } from '../helpers/annotation-metadata';
-import { isShared } from '../helpers/permissions';
-import { withServices } from '../service-context';
-import { applyTheme } from '../helpers/theme';
+import { useStoreProxy } from '../../store/use-store';
+import { isNew, isReply } from '../../helpers/annotation-metadata';
+import { isShared } from '../../helpers/permissions';
+import { withServices } from '../../service-context';
+import { applyTheme } from '../../helpers/theme';
 
-import Button from './Button';
-import Menu from './Menu';
-import MenuItem from './MenuItem';
-import SvgIcon from '../../shared/components/svg-icon';
+import Button from '../Button';
+import Menu from '../Menu';
+import MenuItem from '../MenuItem';
+import SvgIcon from '../../../shared/components/svg-icon';
 
 /**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ * @typedef {import('../../../types/config').MergedConfig} MergedConfig
  */
 
 /**

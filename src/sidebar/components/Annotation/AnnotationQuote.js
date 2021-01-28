@@ -2,15 +2,15 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { isOrphan, quote } from '../helpers/annotation-metadata';
-import { withServices } from '../service-context';
-import { applyTheme } from '../helpers/theme';
+import { isOrphan, quote } from '../../helpers/annotation-metadata';
+import { withServices } from '../../service-context';
+import { applyTheme } from '../../helpers/theme';
 
-import Excerpt from './Excerpt';
+import Excerpt from '../Excerpt';
 
 /**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ * @typedef {import('../../../types/config').MergedConfig} MergedConfig
  */
 
 /**

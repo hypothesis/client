@@ -2,20 +2,21 @@ import classnames from 'classnames';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
-import { isReply, quote } from '../helpers/annotation-metadata';
-import { withServices } from '../service-context';
+import { useStoreProxy } from '../../store/use-store';
+import { isReply, quote } from '../../helpers/annotation-metadata';
+import { withServices } from '../../service-context';
+
+import Button from '../Button';
 
 import AnnotationActionBar from './AnnotationActionBar';
 import AnnotationBody from './AnnotationBody';
 import AnnotationEditor from './AnnotationEditor';
 import AnnotationHeader from './AnnotationHeader';
 import AnnotationQuote from './AnnotationQuote';
-import Button from './Button';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**

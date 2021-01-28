@@ -2,23 +2,24 @@ import { createElement } from 'preact';
 import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
+import { useStoreProxy } from '../../store/use-store';
 import {
   isHighlight,
   isReply,
   hasBeenEdited,
-} from '../helpers/annotation-metadata';
-import { isPrivate } from '../helpers/permissions';
+} from '../../helpers/annotation-metadata';
+import { isPrivate } from '../../helpers/permissions';
+
+import Button from '../Button';
+import SvgIcon from '../../../shared/components/svg-icon';
 
 import AnnotationDocumentInfo from './AnnotationDocumentInfo';
 import AnnotationShareInfo from './AnnotationShareInfo';
-import AnnotationUser from './AnnotationUser';
-import Button from './Button';
-import SvgIcon from '../../shared/components/svg-icon';
 import AnnotationTimestamps from './AnnotationTimestamps';
+import AnnotationUser from './AnnotationUser';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
+ * @typedef {import("../../../types/api").Annotation} Annotation
  */
 
 /**

@@ -2,13 +2,13 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 import { act } from 'preact/test-utils';
 
-import * as fixtures from '../../test/annotation-fixtures';
+import * as fixtures from '../../../test/annotation-fixtures';
 
 import AnnotationBody from '../AnnotationBody';
 import { $imports } from '../AnnotationBody';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('AnnotationBody', () => {
   let fakeAnnotation;
@@ -54,8 +54,8 @@ describe('AnnotationBody', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/theme': { applyTheme: fakeApplyTheme },
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/theme': { applyTheme: fakeApplyTheme },
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

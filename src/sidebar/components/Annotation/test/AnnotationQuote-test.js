@@ -4,8 +4,8 @@ import { createElement } from 'preact';
 import AnnotationQuote from '../AnnotationQuote';
 import { $imports } from '../AnnotationQuote';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('AnnotationQuote', () => {
   let fakeAnnotation;
@@ -33,7 +33,7 @@ describe('AnnotationQuote', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/annotation-metadata': {
+      '../../helpers/annotation-metadata': {
         quote: fakeQuote,
         isOrphan: fakeIsOrphan,
       },

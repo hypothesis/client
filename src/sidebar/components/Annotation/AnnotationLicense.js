@@ -1,6 +1,6 @@
 import { createElement } from 'preact';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from '../../../shared/components/svg-icon';
 
 /**
  * Render information about CC licensing

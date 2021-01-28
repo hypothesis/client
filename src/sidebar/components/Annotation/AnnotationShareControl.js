@@ -2,20 +2,21 @@ import { createElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { isShareableURI } from '../helpers/annotation-sharing';
-import { copyText } from '../util/copy-to-clipboard';
-import { isPrivate } from '../helpers/permissions';
-import { withServices } from '../service-context';
+import { isShareableURI } from '../../helpers/annotation-sharing';
+import { copyText } from '../../util/copy-to-clipboard';
+import { isIOS } from '../../../shared/user-agent';
+import { isPrivate } from '../../helpers/permissions';
+import { withServices } from '../../service-context';
 
-import Button from './Button';
-import useElementShouldClose from './hooks/use-element-should-close';
-import ShareLinks from './ShareLinks';
-import SvgIcon from '../../shared/components/svg-icon';
-import { isIOS } from '../../shared/user-agent';
+import useElementShouldClose from '../hooks/use-element-should-close';
+
+import Button from '../Button';
+import ShareLinks from '../ShareLinks';
+import SvgIcon from '../../../shared/components/svg-icon';
 
 /**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**

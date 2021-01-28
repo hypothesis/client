@@ -1,12 +1,12 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
-import * as fixtures from '../../test/annotation-fixtures';
+import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationHeader from '../AnnotationHeader';
 import { $imports } from '../AnnotationHeader';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('AnnotationHeader', () => {
   let fakeIsHighlight;
@@ -40,13 +40,13 @@ describe('AnnotationHeader', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../helpers/annotation-metadata': {
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/annotation-metadata': {
         isHighlight: fakeIsHighlight,
         isReply: fakeIsReply,
         hasBeenEdited: fakeHasBeenEdited,
       },
-      '../helpers/permissions': {
+      '../../helpers/permissions': {
         isPrivate: fakeIsPrivate,
       },
     });

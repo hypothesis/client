@@ -5,8 +5,8 @@ import { act } from 'preact/test-utils';
 import AnnotationShareControl from '../AnnotationShareControl';
 import { $imports } from '../AnnotationShareControl';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('AnnotationShareControl', () => {
   let fakeAnnotation;
@@ -89,11 +89,13 @@ describe('AnnotationShareControl', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/annotation-sharing': { isShareableURI: fakeIsShareableURI },
-      '../util/copy-to-clipboard': fakeCopyToClipboard,
-      '../helpers/permissions': { isPrivate: fakeIsPrivate },
-      './hooks/use-element-should-close': sinon.stub(),
-      '../../shared/user-agent': { isIOS: fakeIsIOS },
+      '../../helpers/annotation-sharing': {
+        isShareableURI: fakeIsShareableURI,
+      },
+      '../../util/copy-to-clipboard': fakeCopyToClipboard,
+      '../../helpers/permissions': { isPrivate: fakeIsPrivate },
+      '../hooks/use-element-should-close': sinon.stub(),
+      '../../../shared/user-agent': { isIOS: fakeIsIOS },
     });
   });
 

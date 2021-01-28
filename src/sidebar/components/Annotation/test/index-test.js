@@ -2,13 +2,13 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 import { act } from 'preact/test-utils';
 
-import * as fixtures from '../../test/annotation-fixtures';
+import * as fixtures from '../../../test/annotation-fixtures';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
-import Annotation from '../Annotation';
-import { $imports } from '../Annotation';
+import Annotation from '../';
+import { $imports } from '../';
 
 describe('Annotation', () => {
   // Dependency Mocks
@@ -61,8 +61,8 @@ describe('Annotation', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/annotation-metadata': fakeMetadata,
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/annotation-metadata': fakeMetadata,
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

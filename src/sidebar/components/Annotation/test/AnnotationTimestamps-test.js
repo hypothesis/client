@@ -1,12 +1,13 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
-import * as fixtures from '../../test/annotation-fixtures';
 import { act } from 'preact/test-utils';
+
+import * as fixtures from '../../../test/annotation-fixtures';
 
 import AnnotationTimestamps from '../AnnotationTimestamps';
 import { $imports } from '../AnnotationTimestamps';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
+import { checkAccessibility } from '../../../../test-util/accessibility';
 
 describe('AnnotationTimestamps', () => {
   let clock;
@@ -34,8 +35,8 @@ describe('AnnotationTimestamps', () => {
     };
 
     $imports.$mock({
-      '../util/date': { format: fakeFormatDate },
-      '../util/time': fakeTime,
+      '../../util/date': { format: fakeFormatDate },
+      '../../util/time': fakeTime,
     });
   });
 

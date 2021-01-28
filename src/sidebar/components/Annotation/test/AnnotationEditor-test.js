@@ -2,14 +2,14 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 import { act } from 'preact/test-utils';
 
-import * as fixtures from '../../test/annotation-fixtures';
-import { waitFor } from '../../../test-util/wait';
+import * as fixtures from '../../../test/annotation-fixtures';
+import { waitFor } from '../../../../test-util/wait';
 
 import AnnotationEditor from '../AnnotationEditor';
 import { $imports } from '../AnnotationEditor';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('AnnotationEditor', () => {
   let fakeApplyTheme;
@@ -54,8 +54,8 @@ describe('AnnotationEditor', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../helpers/theme': { applyTheme: fakeApplyTheme },
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/theme': { applyTheme: fakeApplyTheme },
     });
   });
 

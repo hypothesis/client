@@ -1,14 +1,14 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
-import { isPrivate } from '../helpers/permissions';
+import { useStoreProxy } from '../../store/use-store';
+import { isPrivate } from '../../helpers/permissions';
 
-import SvgIcon from '../../shared/components/svg-icon';
+import SvgIcon from '../../../shared/components/svg-icon';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**

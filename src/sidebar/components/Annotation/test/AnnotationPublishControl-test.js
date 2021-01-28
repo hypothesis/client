@@ -1,12 +1,12 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
-import * as fixtures from '../../test/annotation-fixtures';
+import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationPublishControl from '../AnnotationPublishControl';
 import { $imports } from '../AnnotationPublishControl';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('AnnotationPublishControl', () => {
   let fakeGroup;
@@ -58,9 +58,9 @@ describe('AnnotationPublishControl', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../helpers/annotation-metadata': fakeMetadata,
-      '../helpers/theme': {
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/annotation-metadata': fakeMetadata,
+      '../../helpers/theme': {
         applyTheme: fakeApplyTheme,
       },
     });
