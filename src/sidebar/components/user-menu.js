@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
@@ -10,7 +11,6 @@ import { withServices } from '../service-context';
 import Menu from './menu';
 import MenuItem from './menu-item';
 import MenuSection from './menu-section';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter

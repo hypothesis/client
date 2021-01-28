@@ -1,11 +1,11 @@
 import classnames from 'classnames';
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { Fragment, createElement } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 
-import SvgIcon from '../../shared/components/svg-icon';
 import MenuKeyboardNavigation from './menu-keyboard-navigation';
 import Slider from './slider';
 

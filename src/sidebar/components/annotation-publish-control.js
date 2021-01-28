@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
@@ -10,7 +11,6 @@ import { applyTheme } from '../helpers/theme';
 import Button from './button';
 import Menu from './menu';
 import MenuItem from './menu-item';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef {import('../../types/api').Annotation} Annotation

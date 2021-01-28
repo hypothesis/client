@@ -1,3 +1,4 @@
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
 import { Fragment, createElement, render } from 'preact';
 
@@ -6,7 +7,6 @@ import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
 
 import PDFMetadata from './pdf-metadata';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor

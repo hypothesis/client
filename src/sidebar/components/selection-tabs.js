@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { SvgIcon } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
@@ -7,7 +8,6 @@ import uiConstants from '../ui-constants';
 import { withServices } from '../service-context';
 
 import NewNoteBtn from './new-note-btn';
-import SvgIcon from '../../shared/components/svg-icon';
 
 /**
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
