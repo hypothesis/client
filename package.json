@@ -8,6 +8,7 @@
   "repository": "hypothesis/client",
   "dependencies": {},
   "devDependencies": {
+    "@actions/core": "^1.2.6",
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
@@ -118,7 +119,7 @@
   "main": "./build/boot.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
-    "lint": "eslint .",
+    "lint": "eslint . .github",
     "checkformatting": "prettier --check '**/*.{js,scss}'",
     "format": "prettier --list-different --write '**/*.{js,scss}'",
     "test": "gulp test",
