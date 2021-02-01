@@ -4,15 +4,14 @@ import * as metadata from '../helpers/annotation-metadata';
 
 /**
  * @typedef {import('../../types/api').Annotation} Annotation
- *
- * @typedef {'annotation'|'note'|'orphan'} Tab
+ * @typedef {import('../../types/sidebar').TabName} TabName
  */
 
 /**
  * Return the tab in which an annotation should be displayed.
  *
  * @param {Annotation} ann
- * @return {Tab}
+ * @return {TabName}
  */
 export function tabForAnnotation(ann) {
   if (metadata.isOrphan(ann)) {
@@ -28,7 +27,7 @@ export function tabForAnnotation(ann) {
  * Return true if an annotation should be displayed in a given tab.
  *
  * @param {Annotation} ann
- * @param {Tab} tab
+ * @param {TabName} tab
  */
 export function shouldShowInTab(ann, tab) {
   if (metadata.isWaitingToAnchor(ann)) {

@@ -5,7 +5,6 @@ import { act } from 'preact/test-utils';
 import AnnotationActionBar from '../AnnotationActionBar';
 import { $imports } from '../AnnotationActionBar';
 import * as fixtures from '../../test/annotation-fixtures';
-import uiConstants from '../../ui-constants';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
@@ -210,10 +209,7 @@ describe('AnnotationActionBar', () => {
           button.props().onClick();
         });
 
-        assert.calledWith(
-          fakeStore.openSidebarPanel,
-          uiConstants.PANEL_LOGIN_PROMPT
-        );
+        assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
         assert.notCalled(fakeOnReply);
       });
 

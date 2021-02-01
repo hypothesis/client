@@ -1,7 +1,6 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import uiConstants from '../ui-constants';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
@@ -25,7 +24,7 @@ function NewNoteButton({ annotationsService, settings }) {
 
   const onNewNoteBtnClick = function () {
     if (!isLoggedIn) {
-      store.openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      store.openSidebarPanel('loginPrompt');
       return;
     }
     if (!topLevelFrame) {

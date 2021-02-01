@@ -10,10 +10,14 @@ import Button from './Button';
 import Slider from './Slider';
 
 /**
+ * @typedef {import("../../types/sidebar").PanelName} PanelName
+ */
+
+/**
  * @typedef SidebarPanelProps
  * @prop {Object} [children]
  * @prop {string} [icon] - An optional icon name for display next to the panel's title
- * @prop {string} panelName -
+ * @prop {PanelName} panelName -
  *   A string identifying this panel. Only one `panelName` may be active at any time.
  *   Multiple panels with the same `panelName` would be "in sync", opening and closing together.
  * @prop {string} title - The panel's title: rendered in its containing visual "frame"

@@ -2,7 +2,6 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 
 import bridgeEvents from '../../../shared/bridge-events';
-import uiConstants from '../../ui-constants';
 import TopBar from '../TopBar';
 import { $imports } from '../TopBar';
 
@@ -100,13 +99,11 @@ describe('TopBar', () => {
 
         helpButton.props().onClick();
 
-        assert.calledWith(fakeStore.toggleSidebarPanel, uiConstants.PANEL_HELP);
+        assert.calledWith(fakeStore.toggleSidebarPanel, 'help');
       });
 
       it('displays a help icon active state when help panel active', () => {
-        fakeStore.isSidebarPanelOpen
-          .withArgs(uiConstants.PANEL_HELP)
-          .returns(true);
+        fakeStore.isSidebarPanelOpen.withArgs('help').returns(true);
         const wrapper = createTopBar();
         const helpButton = getButton(wrapper, 'help');
 
@@ -206,15 +203,12 @@ describe('TopBar', () => {
 
     shareButton.props().onClick();
 
-    assert.calledWith(
-      fakeStore.toggleSidebarPanel,
-      uiConstants.PANEL_SHARE_ANNOTATIONS
-    );
+    assert.calledWith(fakeStore.toggleSidebarPanel, 'shareGroupAnnotations');
   });
 
   it('adds an active-state class to the "Share" icon when the panel is open', () => {
     fakeStore.isSidebarPanelOpen
-      .withArgs(uiConstants.PANEL_SHARE_ANNOTATIONS)
+      .withArgs('shareGroupAnnotations')
       .returns(true);
     const wrapper = createTopBar();
     const shareButton = getButton(wrapper, 'share');

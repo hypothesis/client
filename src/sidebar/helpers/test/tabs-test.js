@@ -1,5 +1,4 @@
 import * as fixtures from '../../test/annotation-fixtures';
-import uiConstants from '../../ui-constants';
 import * as tabs from '../tabs';
 
 describe('sidebar/helpers/tabs', function () {
@@ -7,15 +6,15 @@ describe('sidebar/helpers/tabs', function () {
     [
       {
         ann: fixtures.defaultAnnotation(),
-        expectedTab: uiConstants.TAB_ANNOTATIONS,
+        expectedTab: 'annotation',
       },
       {
         ann: fixtures.oldPageNote(),
-        expectedTab: uiConstants.TAB_NOTES,
+        expectedTab: 'note',
       },
       {
         ann: Object.assign(fixtures.defaultAnnotation(), { $orphan: true }),
-        expectedTab: uiConstants.TAB_ORPHANS,
+        expectedTab: 'orphan',
       },
     ].forEach(testCase => {
       it(`shows annotation in correct tab (${testCase.expectedTab})`, () => {
@@ -38,26 +37,26 @@ describe('sidebar/helpers/tabs', function () {
         // Anchoring succeeded.
         anchorTimeout: false,
         orphan: false,
-        expectedTab: uiConstants.TAB_ANNOTATIONS,
+        expectedTab: 'annotation',
       },
       {
         // Anchoring failed.
         anchorTimeout: false,
         orphan: true,
-        expectedTab: uiConstants.TAB_ORPHANS,
+        expectedTab: 'orphan',
       },
       {
         // Anchoring timed out.
         anchorTimeout: true,
         orphan: undefined,
-        expectedTab: uiConstants.TAB_ANNOTATIONS,
+        expectedTab: 'annotation',
       },
       {
         // Anchoring initially timed out but eventually
         // failed.
         anchorTimeout: true,
         orphan: true,
-        expectedTab: uiConstants.TAB_ORPHANS,
+        expectedTab: 'orphan',
       },
     ].forEach(testCase => {
       it('returns true if the annotation should be shown', () => {
@@ -66,12 +65,12 @@ describe('sidebar/helpers/tabs', function () {
         ann.$orphan = testCase.orphan;
 
         assert.equal(
-          tabs.shouldShowInTab(ann, uiConstants.TAB_ANNOTATIONS),
-          testCase.expectedTab === uiConstants.TAB_ANNOTATIONS
+          tabs.shouldShowInTab(ann, 'annotation'),
+          testCase.expectedTab === 'annotation'
         );
         assert.equal(
-          tabs.shouldShowInTab(ann, uiConstants.TAB_ORPHANS),
-          testCase.expectedTab === uiConstants.TAB_ORPHANS
+          tabs.shouldShowInTab(ann, 'orphan'),
+          testCase.expectedTab === 'orphan'
         );
       });
     });

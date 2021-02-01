@@ -8,6 +8,10 @@
  * may be "active" (open) at one time.
  */
 
+/**
+ * @typedef {import("../../../types/sidebar").PanelName} PanelName
+ */
+
 import * as util from '../util';
 
 import { storeModule } from '../create-store';
@@ -76,6 +80,8 @@ const actions = util.actionTypes(update);
 
 /**
  * Designate `panelName` as the currently-active panel name
+ *
+ * @param {PanelName} panelName
  */
 function openSidebarPanel(panelName) {
   return { type: actions.OPEN_SIDEBAR_PANEL, panelName: panelName };
@@ -83,6 +89,8 @@ function openSidebarPanel(panelName) {
 
 /**
  * `panelName` should not be the active panel
+ *
+ * @param {PanelName} panelName
  */
 function closeSidebarPanel(panelName) {
   return { type: actions.CLOSE_SIDEBAR_PANEL, panelName: panelName };
@@ -92,7 +100,7 @@ function closeSidebarPanel(panelName) {
  * Toggle a sidebar panel from its current state, or set it to the
  * designated `panelState`.
  *
- * @param {string} panelName
+ * @param {PanelName} panelName
  * @param {boolean} [panelState] -
  *   Should the panel be active? Omit this prop to simply toggle the value.
  */
@@ -107,7 +115,7 @@ function toggleSidebarPanel(panelName, panelState) {
 /**
  * Is the panel indicated by `panelName` currently active (open)?
  *
- * @param {string} panelName
+ * @param {PanelName} panelName
  * @return {boolean} - `true` if `panelName` is the currently-active panel
  */
 function isSidebarPanelOpen(state, panelName) {
