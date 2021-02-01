@@ -1,5 +1,5 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
-import uiConstants from '../../ui-constants';
+
 import threadAnnotations from '../thread-annotations';
 import { sorters } from '../thread-sorters';
 import { $imports } from '../thread-annotations';
@@ -34,7 +34,7 @@ describe('sidebar/helpers/thread-annotations', () => {
         filterQuery: null,
         selected: [],
         sortKey: 'Location',
-        selectedTab: uiConstants.TAB_ANNOTATION,
+        selectedTab: 'annotation',
       },
     };
 
@@ -116,28 +116,24 @@ describe('sidebar/helpers/thread-annotations', () => {
 
     describe('annotation and thread filtering', () => {
       context('sidebar route', () => {
-        [
-          uiConstants.TAB_NOTES,
-          uiConstants.TAB_ANNOTATIONS,
-          uiConstants.TAB_ORPHANS,
-        ].forEach(selectedTab => {
+        ['note', 'annotation', 'orphan'].forEach(selectedTab => {
           it(`should filter the thread for the tab '${selectedTab}'`, () => {
             const annotations = {
-              [uiConstants.TAB_ANNOTATIONS]: {
+              ['annotation']: {
                 ...annotationFixtures.defaultAnnotation(),
                 $orphan: false,
               },
-              [uiConstants.TAB_NOTES]: annotationFixtures.oldPageNote(),
-              [uiConstants.TAB_ORPHANS]: {
+              ['note']: annotationFixtures.oldPageNote(),
+              ['orphan']: {
                 ...annotationFixtures.defaultAnnotation(),
                 $orphan: true,
               },
             };
             const fakeThreads = [
               {},
-              { annotation: annotations[uiConstants.TAB_ANNOTATIONS] },
-              { annotation: annotations[uiConstants.TAB_NOTES] },
-              { annotation: annotations[uiConstants.TAB_ORPHANS] },
+              { annotation: annotations.annotation },
+              { annotation: annotations.note },
+              { annotation: annotations.orphan },
             ];
             fakeThreadState.selection.selectedTab = selectedTab;
 

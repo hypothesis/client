@@ -1,5 +1,4 @@
 import * as fixtures from '../../test/annotation-fixtures';
-import uiConstants from '../../ui-constants';
 
 import annotationsService, { $imports } from '../annotations';
 
@@ -192,7 +191,7 @@ describe('annotationsService', () => {
         svc.create(fixtures.newAnnotation(), now);
 
         assert.calledOnce(fakeStore.selectTab);
-        assert.calledWith(fakeStore.selectTab, uiConstants.TAB_NOTES);
+        assert.calledWith(fakeStore.selectTab, 'note');
       });
 
       it('sets the active tab to "Annotations" if the annotation is an annotation', () => {
@@ -201,7 +200,7 @@ describe('annotationsService', () => {
         svc.create(fixtures.newAnnotation(), now);
 
         assert.calledOnce(fakeStore.selectTab);
-        assert.calledWith(fakeStore.selectTab, uiConstants.TAB_ANNOTATIONS);
+        assert.calledWith(fakeStore.selectTab, 'annotation');
       });
 
       it('does nothing if the annotation is neither an annotation nor a page note (e.g. reply)', () => {

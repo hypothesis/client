@@ -13,7 +13,6 @@ import {
   sharedPermissions,
 } from '../helpers/permissions';
 import { generateHexString } from '../util/random';
-import uiConstants from '../ui-constants';
 
 // @inject
 export default function annotationsService(api, store) {
@@ -116,9 +115,9 @@ export default function annotationsService(api, store) {
     // the appropriate tab is selected. If it is of type reply, user
     // stays in the selected tab.
     if (metadata.isPageNote(annotation)) {
-      store.selectTab(uiConstants.TAB_NOTES);
+      store.selectTab('note');
     } else if (metadata.isAnnotation(annotation)) {
-      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+      store.selectTab('annotation');
     }
 
     (annotation.references || []).forEach(parent => {

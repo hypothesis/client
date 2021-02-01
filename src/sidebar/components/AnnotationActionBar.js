@@ -1,7 +1,6 @@
 import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
-import uiConstants from '../ui-constants';
 import { useStoreProxy } from '../store/use-store';
 import {
   sharingEnabled,
@@ -84,7 +83,7 @@ function AnnotationActionBar({
 
   const onReplyClick = () => {
     if (!isLoggedIn) {
-      store.openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      store.openSidebarPanel('loginPrompt');
       return;
     }
     onReply();

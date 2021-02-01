@@ -4,7 +4,6 @@ import { act } from 'preact/test-utils';
 
 import NewNoteButton from '../NewNoteBtn';
 import { $imports } from '../NewNoteBtn';
-import uiConstants from '../../ui-constants';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
@@ -65,10 +64,7 @@ describe('NewNoteButton', function () {
       wrapper.find('Button').props().onClick();
     });
 
-    assert.calledWith(
-      fakeStore.openSidebarPanel,
-      uiConstants.PANEL_LOGIN_PROMPT
-    );
+    assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
   });
 
   it('should not add a new annotation if mainFrame() is null', () => {

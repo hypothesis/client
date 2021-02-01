@@ -1,5 +1,4 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
-import uiConstants from '../../ui-constants';
 import storeFactory from '../index';
 import immutable from '../../util/immutable';
 
@@ -82,18 +81,15 @@ describe('store', function () {
     });
 
     it('sets `sortKey` to default annotation sort key if set to Orphans', () => {
-      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.selectTab('orphan');
       store.clearSelection();
       assert.equal(store.getState().selection.sortKey, 'Location');
     });
 
     it('does not change `selectedTab` if set to something other than Orphans', () => {
-      store.selectTab(uiConstants.TAB_NOTES);
+      store.selectTab('note');
       store.clearSelection();
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_NOTES
-      );
+      assert.equal(store.getState().selection.selectedTab, 'note');
     });
   });
 
@@ -128,12 +124,9 @@ describe('store', function () {
     it('switches back to the Annotations tab when the last orphan is removed', function () {
       const orphan = Object.assign(defaultAnnotation(), { $orphan: true });
       store.addAnnotations([orphan]);
-      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.selectTab('orphan');
       store.removeAnnotations([orphan]);
-      assert.equal(
-        store.getState().selection.selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      assert.equal(store.getState().selection.selectedTab, 'annotation');
     });
   });
 

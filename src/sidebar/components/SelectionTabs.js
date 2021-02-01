@@ -4,13 +4,13 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import uiConstants from '../ui-constants';
 import { withServices } from '../service-context';
 
 import NewNoteBtn from './NewNoteBtn';
 
 /**
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/sidebar').TabName} TabName
  */
 
 /**
@@ -98,18 +98,20 @@ function SelectionTabs({ isLoading, settings }) {
   const orphanCount = store.orphanCount();
   const isWaitingToAnchorAnnotations = store.isWaitingToAnchorAnnotations();
 
+  /**
+   * @param {TabName} tabId
+   */
   const selectTab = tabId => {
     store.clearSelection();
     store.selectTab(tabId);
   };
 
   const showAnnotationsUnavailableMessage =
-    selectedTab === uiConstants.TAB_ANNOTATIONS &&
+    selectedTab === 'annotation' &&
     annotationCount === 0 &&
     !isWaitingToAnchorAnnotations;
 
-  const showNotesUnavailableMessage =
-    selectedTab === uiConstants.TAB_NOTES && noteCount === 0;
+  const showNotesUnavailableMessage = selectedTab === 'note' && noteCount === 0;
 
   return (
     <div className="SelectionTabs-container">
@@ -117,18 +119,18 @@ function SelectionTabs({ isLoading, settings }) {
         <Tab
           count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
-          isSelected={selectedTab === uiConstants.TAB_ANNOTATIONS}
+          isSelected={selectedTab === 'annotation'}
           label="Annotations"
-          onSelect={() => selectTab(uiConstants.TAB_ANNOTATIONS)}
+          onSelect={() => selectTab('annotation')}
         >
           Annotations
         </Tab>
         <Tab
           count={noteCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
-          isSelected={selectedTab === uiConstants.TAB_NOTES}
+          isSelected={selectedTab === 'note'}
           label="Page notes"
-          onSelect={() => selectTab(uiConstants.TAB_NOTES)}
+          onSelect={() => selectTab('note')}
         >
           Page Notes
         </Tab>
@@ -136,16 +138,17 @@ function SelectionTabs({ isLoading, settings }) {
           <Tab
             count={orphanCount}
             isWaitingToAnchor={isWaitingToAnchorAnnotations}
-            isSelected={selectedTab === uiConstants.TAB_ORPHANS}
+            isSelected={selectedTab === 'orphan'}
             label="Orphans"
-            onSelect={() => selectTab(uiConstants.TAB_ORPHANS)}
+            onSelect={() => selectTab('orphan')}
           >
             Orphans
           </Tab>
         )}
       </div>
-      {selectedTab === uiConstants.TAB_NOTES &&
-        settings.enableExperimentalNewNoteButton && <NewNoteBtn />}
+      {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
+        <NewNoteBtn />
+      )}
       {!isLoading && showNotesUnavailableMessage && (
         <div className="SelectionTabs__message">
           There are no page notes in this group.

@@ -3,7 +3,7 @@ import EventEmitter from 'tiny-emitter';
 import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
-import uiConstants from '../../ui-constants';
+
 import FrameSync, { $imports, formatAnnot } from '../frame-sync';
 
 const fixtures = {
@@ -250,10 +250,7 @@ describe('sidebar/services/frame-sync', function () {
         const ann = { target: [] };
         fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.calledWith(
-          fakeStore.openSidebarPanel,
-          uiConstants.PANEL_LOGIN_PROMPT
-        );
+        assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
       });
 
       it('should send a "deleteAnnotation" message to the frame', () => {
@@ -340,7 +337,7 @@ describe('sidebar/services/frame-sync', function () {
       fakeBridge.emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
 
       assert.calledWith(fakeStore.selectAnnotations, ['id1', 'id2', 'id3']);
-      assert.calledWith(fakeStore.selectTab, uiConstants.TAB_ANNOTATIONS);
+      assert.calledWith(fakeStore.selectTab, 'annotation');
     });
   });
 
