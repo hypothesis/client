@@ -81,6 +81,7 @@ describe('Thread', () => {
 
   beforeEach(() => {
     fakeStore = {
+      hasAppliedFilter: sinon.stub().returns(false),
       setExpanded: sinon.stub(),
     };
 
@@ -189,7 +190,7 @@ describe('Thread', () => {
     });
   });
 
-  context('thread annotation has been deleted', () => {
+  context('visible thread whose annotation has been deleted', () => {
     let noAnnotationThread;
 
     beforeEach(() => {
@@ -204,10 +205,29 @@ describe('Thread', () => {
       assert.isFalse(wrapper.find('ModerationBanner').exists());
     });
 
-    it('renders an unavailable message', () => {
+    it('renders a missing annotation component', () => {
       const wrapper = createComponent({ thread: noAnnotationThread });
 
-      assert.isTrue(wrapper.find('.Thread__unavailable-message').exists());
+      const annotationMissing = wrapper.find('AnnotationMissing');
+
+      assert.isTrue(annotationMissing.exists());
+    });
+  });
+
+  context('non-visible thread whose annotation has been deleted', () => {
+    let noAnnotationThread;
+
+    beforeEach(() => {
+      noAnnotationThread = createThread();
+      noAnnotationThread.annotation = undefined;
+      noAnnotationThread.visible = false;
+    });
+
+    it('does not render any kind of annotation component', () => {
+      const wrapper = createComponent({ thread: noAnnotationThread });
+
+      assert.isFalse(wrapper.find('Annotation').exists());
+      assert.isFalse(wrapper.find('AnnotationMissing').exists());
     });
   });
 

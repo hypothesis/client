@@ -28,7 +28,7 @@ function NotebookResultCount() {
 
   const hasResults = rootThread.children.length > 0;
 
-  const hasForcedVisible = forcedVisibleCount > 0;
+  const hasForcedVisible = hasAppliedFilter && forcedVisibleCount > 0;
   const matchCount = visibleCount - forcedVisibleCount;
   const threadCount = rootThread.children.length;
 

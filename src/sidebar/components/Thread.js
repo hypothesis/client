@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { createElement, Fragment } from 'preact';
-import { useMemo } from 'preact/hooks';
+import { useCallback, useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
@@ -8,6 +8,7 @@ import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
 
 import Annotation from './Annotation';
+import AnnotationMissing from './AnnotationMissing';
 import Button from './Button';
 import ModerationBanner from './ModerationBanner';
 
@@ -30,6 +31,7 @@ import ModerationBanner from './ModerationBanner';
 function Thread({ showDocumentInfo = false, thread, threadsService }) {
   // Only render this thread's annotation if it exists and the thread is `visible`
   const showAnnotation = thread.annotation && thread.visible;
+  const showMissingAnnotation = thread.visible && !thread.annotation;
 
   // Render this thread's replies only if the thread is expanded
   const showChildren = !thread.collapsed;
@@ -51,32 +53,54 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
   );
 
   const store = useStoreProxy();
-  const onToggleReplies = () =>
-    store.setExpanded(thread.id, !!thread.collapsed);
+  const hasAppliedFilter = store.hasAppliedFilter();
+  const onToggleReplies = useCallback(
+    () => store.setExpanded(thread.id, !!thread.collapsed),
+    [store, thread.id, thread.collapsed]
+  );
 
   // Memoize annotation content to avoid re-rendering an annotation when content
   // in other annotations/threads change.
-  const annotationContent = useMemo(
-    () =>
-      showAnnotation && (
+  const annotationContent = useMemo(() => {
+    if (showAnnotation) {
+      return (
         <Fragment>
           <ModerationBanner annotation={thread.annotation} />
           <Annotation
             annotation={thread.annotation}
+            hasAppliedFilter={hasAppliedFilter}
+            isReply={!!thread.parent}
+            onToggleReplies={onToggleReplies}
             replyCount={thread.replyCount}
             showDocumentInfo={showDocumentInfo}
             threadIsCollapsed={thread.collapsed}
           />
         </Fragment>
-      ),
-    [
-      showAnnotation,
-      thread.annotation,
-      thread.replyCount,
-      showDocumentInfo,
-      thread.collapsed,
-    ]
-  );
+      );
+    } else if (showMissingAnnotation) {
+      return (
+        <AnnotationMissing
+          hasAppliedFilter={hasAppliedFilter}
+          isReply={!!thread.parent}
+          onToggleReplies={onToggleReplies}
+          replyCount={thread.replyCount}
+          threadIsCollapsed={thread.collapsed}
+        />
+      );
+    } else {
+      return null;
+    }
+  }, [
+    hasAppliedFilter,
+    onToggleReplies,
+    showAnnotation,
+    showMissingAnnotation,
+    showDocumentInfo,
+    thread.annotation,
+    thread.parent,
+    thread.replyCount,
+    thread.collapsed,
+  ]);
 
   return (
     <section
@@ -98,12 +122,6 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
 
       <div className="Thread__content">
         {annotationContent}
-
-        {!thread.annotation && (
-          <div className="Thread__unavailable-message">
-            <em>Message not available.</em>
-          </div>
-        )}
 
         {showHiddenToggle && (
           <Button
