@@ -1,6 +1,5 @@
 import { mount } from 'enzyme';
 import { createElement } from 'preact';
-import { act } from 'preact/test-utils';
 
 import * as fixtures from '../../test/annotation-fixtures';
 
@@ -11,6 +10,8 @@ import Annotation from '../Annotation';
 import { $imports } from '../Annotation';
 
 describe('Annotation', () => {
+  let fakeOnToggleReplies;
+
   // Dependency Mocks
   let fakeMetadata;
 
@@ -32,6 +33,9 @@ describe('Annotation', () => {
       <Annotation
         annotation={fixtures.defaultAnnotation()}
         annotationsService={fakeAnnotationsService}
+        hasAppliedFilter={false}
+        isReply={false}
+        onToggleReplies={fakeOnToggleReplies}
         replyCount={0}
         showDocumentInfo={false}
         threadIsCollapsed={true}
@@ -41,13 +45,14 @@ describe('Annotation', () => {
   };
 
   beforeEach(() => {
+    fakeOnToggleReplies = sinon.stub();
+
     fakeAnnotationsService = {
       reply: sinon.stub(),
       save: sinon.stub().resolves(),
     };
 
     fakeMetadata = {
-      isReply: sinon.stub(),
       quote: sinon.stub(),
     };
 
@@ -72,9 +77,10 @@ describe('Annotation', () => {
 
   describe('annotation classnames', () => {
     it('should assign a reply class if the annotation is a reply', () => {
-      fakeMetadata.isReply.returns(true);
-
-      const wrapper = createComponent({ threadIsCollapsed: false });
+      const wrapper = createComponent({
+        isReply: true,
+        threadIsCollapsed: false,
+      });
       const annot = wrapper.find('.Annotation');
 
       assert.isTrue(annot.hasClass('Annotation--reply'));
@@ -132,61 +138,50 @@ describe('Annotation', () => {
     assert.include(wrapper.find('.Annotation__actions').text(), 'Saving...');
   });
 
-  describe('reply thread toggle button', () => {
-    const findRepliesButton = wrapper =>
-      wrapper.find('Button').filter('.Annotation__reply-toggle');
-
+  describe('reply thread toggle', () => {
     it('should render a toggle button if the annotation has replies', () => {
-      fakeMetadata.isReply.returns(false);
       const wrapper = createComponent({
         replyCount: 5,
         threadIsCollapsed: true,
       });
 
-      assert.isTrue(findRepliesButton(wrapper).exists());
-      assert.equal(
-        findRepliesButton(wrapper).props().buttonText,
-        'Show replies (5)'
-      );
+      const toggle = wrapper.find('AnnotationReplyToggle');
+
+      assert.isTrue(toggle.exists());
+      assert.equal(toggle.props().onToggleReplies, fakeOnToggleReplies);
+      assert.equal(toggle.props().replyCount, 5);
+      assert.equal(toggle.props().threadIsCollapsed, true);
     });
 
-    it('should not render a toggle button if the annotation has no replies', () => {
-      fakeMetadata.isReply.returns(false);
+    it('should not render a reply toggle if the annotation has no replies', () => {
       const wrapper = createComponent({
+        isReply: false,
         replyCount: 0,
         threadIsCollapsed: true,
       });
 
-      assert.isFalse(findRepliesButton(wrapper).exists());
+      assert.isFalse(wrapper.find('AnnotationReplyToggle').exists());
     });
 
-    it('should not render a toggle button if the annotation itself is a reply', () => {
-      fakeMetadata.isReply.returns(true);
+    it('should not render a reply toggle if there are applied filters', () => {
       const wrapper = createComponent({
+        hasAppliedFilter: true,
+        isReply: false,
         replyCount: 5,
         threadIsCollapsed: true,
       });
 
-      assert.isFalse(findRepliesButton(wrapper).exists());
+      assert.isFalse(wrapper.find('AnnotationReplyToggle').exists());
     });
 
-    it('should toggle the collapsed state of the thread on click', () => {
-      fakeMetadata.isReply.returns(false);
+    it('should not render a reply toggle if the annotation itself is a reply', () => {
       const wrapper = createComponent({
+        isReply: true,
         replyCount: 5,
         threadIsCollapsed: true,
       });
 
-      act(() => {
-        findRepliesButton(wrapper).props().onClick();
-      });
-      wrapper.setProps({ threadIsCollapsed: false });
-
-      assert.calledOnce(fakeStore.setExpanded);
-      assert.equal(
-        findRepliesButton(wrapper).props().buttonText,
-        'Hide replies (5)'
-      );
+      assert.isFalse(wrapper.find('AnnotationReplyToggle').exists());
     });
   });
 
@@ -224,19 +219,21 @@ describe('Annotation', () => {
 
   context('annotation thread is collapsed', () => {
     context('collapsed reply', () => {
-      beforeEach(() => {
-        fakeMetadata.isReply.returns(true);
-      });
-
       it('should not render body or footer', () => {
-        const wrapper = createComponent({ threadIsCollapsed: true });
+        const wrapper = createComponent({
+          isReply: true,
+          threadIsCollapsed: true,
+        });
 
         assert.isFalse(wrapper.find('AnnotationBody').exists());
         assert.isFalse(wrapper.find('footer').exists());
       });
 
       it('should not show actions', () => {
-        const wrapper = createComponent({ threadIsCollapsed: true });
+        const wrapper = createComponent({
+          isReply: true,
+          threadIsCollapsed: true,
+        });
 
         assert.isFalse(wrapper.find('AnnotationActionBar').exists());
       });
@@ -244,8 +241,10 @@ describe('Annotation', () => {
 
     context('collapsed top-level annotation', () => {
       it('should render body and footer', () => {
-        fakeMetadata.isReply.returns(false);
-        const wrapper = createComponent({ threadIsCollapsed: true });
+        const wrapper = createComponent({
+          isReply: false,
+          threadIsCollapsed: true,
+        });
 
         assert.isTrue(wrapper.find('AnnotationBody').exists());
         assert.isTrue(wrapper.find('footer').exists());
@@ -269,15 +268,13 @@ describe('Annotation', () => {
       {
         name: 'when a collapsed top-level thread',
         content: () => {
-          fakeMetadata.isReply.returns(false);
-          return createComponent({ threadIsCollapsed: true });
+          return createComponent({ isReply: false, threadIsCollapsed: true });
         },
       },
       {
         name: 'when a collapsed reply',
         content: () => {
-          fakeMetadata.isReply.returns(true);
-          return createComponent({ threadIsCollapsed: true });
+          return createComponent({ isReply: true, threadIsCollapsed: true });
         },
       },
     ])

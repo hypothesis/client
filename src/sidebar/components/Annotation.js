@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import { isReply, quote } from '../helpers/annotation-metadata';
+import { quote } from '../helpers/annotation-metadata';
 import { withServices } from '../service-context';
 
 import AnnotationActionBar from './AnnotationActionBar';
@@ -11,7 +11,7 @@ import AnnotationBody from './AnnotationBody';
 import AnnotationEditor from './AnnotationEditor';
 import AnnotationHeader from './AnnotationHeader';
 import AnnotationQuote from './AnnotationQuote';
-import Button from './Button';
+import AnnotationReplyToggle from './AnnotationReplyToggle';
 
 /**
  * @typedef {import("../../types/api").Annotation} Annotation
@@ -21,7 +21,10 @@ import Button from './Button';
 /**
  * @typedef AnnotationProps
  * @prop {Annotation} annotation
- * @prop {number} replyCount - Number of replies to this annotation (thread)
+ * @prop {boolean} hasAppliedFilter - Is any filter applied currently?
+ * @prop {boolean} isReply
+ * @prop {VoidFunction} onToggleReplies - Callback to expand/collapse reply threads
+ * @prop {number} replyCount - Number of replies to this annotation's thread
  * @prop {boolean} showDocumentInfo - Should extended document info be rendered (e.g. in non-sidebar contexts)?
  * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
  * @prop {Object} annotationsService - Injected service
@@ -34,10 +37,13 @@ import Button from './Button';
  */
 function Annotation({
   annotation,
-  annotationsService,
+  hasAppliedFilter,
+  isReply,
+  onToggleReplies,
   replyCount,
   showDocumentInfo,
   threadIsCollapsed,
+  annotationsService,
 }) {
   const store = useStoreProxy();
   const isFocused = store.isAnnotationFocused(annotation.$tag);
@@ -47,32 +53,21 @@ function Annotation({
   const userid = store.profile().userid;
   const isSaving = store.isSavingAnnotation(annotation);
 
-  const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
+  const isCollapsedReply = isReply && threadIsCollapsed;
 
   const hasQuote = !!quote(annotation);
 
   const isEditing = !!draft && !isSaving;
 
-  const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
-  const toggleText = `${toggleAction} (${replyCount})`;
-
-  const shouldShowActions = !isSaving && !isEditing;
-  const shouldShowReplyToggle = replyCount > 0 && !isReply(annotation);
+  const showActions = !isSaving && !isEditing;
+  const showReplyToggle = !isReply && !hasAppliedFilter && replyCount > 0;
 
   const onReply = () => annotationsService.reply(annotation, userid);
-
-  const onToggleReplies = () =>
-    // nb. We assume the annotation has an ID here because it is not possible
-    // to create replies until the annotation has been saved.
-    store.setExpanded(
-      /** @type {string} */ (annotation.id),
-      !!threadIsCollapsed
-    );
 
   return (
     <article
       className={classnames('Annotation', {
-        'Annotation--reply': isReply(annotation),
+        'Annotation--reply': isReply,
         'is-collapsed': threadIsCollapsed,
         'is-focused': isFocused,
       })}
@@ -98,15 +93,15 @@ function Annotation({
       {!isCollapsedReply && (
         <footer className="Annotation__footer">
           <div className="Annotation__controls u-layout-row">
-            {shouldShowReplyToggle && (
-              <Button
-                className="Annotation__reply-toggle"
-                onClick={onToggleReplies}
-                buttonText={toggleText}
+            {showReplyToggle && (
+              <AnnotationReplyToggle
+                onToggleReplies={onToggleReplies}
+                replyCount={replyCount}
+                threadIsCollapsed={threadIsCollapsed}
               />
             )}
             {isSaving && <div className="Annotation__actions">Saving...</div>}
-            {shouldShowActions && (
+            {showActions && (
               <div className="Annotation__actions">
                 <AnnotationActionBar
                   annotation={annotation}
@@ -123,6 +118,9 @@ function Annotation({
 
 Annotation.propTypes = {
   annotation: propTypes.object.isRequired,
+  hasAppliedFilter: propTypes.bool.isRequired,
+  isReply: propTypes.bool,
+  onToggleReplies: propTypes.func,
   replyCount: propTypes.number.isRequired,
   showDocumentInfo: propTypes.bool.isRequired,
   threadIsCollapsed: propTypes.bool.isRequired,
