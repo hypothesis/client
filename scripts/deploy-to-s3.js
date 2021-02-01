@@ -154,12 +154,14 @@ commander
   .option('--no-cache-entry', 'Prevent CDN/browser caching of entry point')
   .parse(process.argv);
 
+const cliOpts = commander.opts();
+
 const options = {
-  tag: commander.tag,
-  cacheEntry: commander.cacheEntry,
+  tag: cliOpts.tag,
+  cacheEntry: cliOpts.cacheEntry,
 };
 
-uploadPackageToS3(commander.bucket, options).catch(err => {
+uploadPackageToS3(cliOpts.bucket, options).catch(err => {
   console.error('Failed to upload S3 package', err);
   process.exit(1);
 });

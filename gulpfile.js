@@ -39,7 +39,7 @@ function parseCommandLine() {
     .parse(process.argv);
 
   return {
-    grep: commander.grep,
+    grep: commander.opts().grep,
   };
 }
 
