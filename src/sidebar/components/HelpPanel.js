@@ -4,7 +4,6 @@ import { useCallback, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import uiConstants from '../ui-constants';
 import { withServices } from '../service-context';
 import VersionData from '../helpers/version-data';
 
@@ -110,7 +109,7 @@ function HelpPanel({ auth, session }) {
   return (
     <SidebarPanel
       title="Help"
-      panelName={uiConstants.PANEL_HELP}
+      panelName="help"
       onActiveChanged={onActiveChanged}
     >
       <div className="HelpPanel__content u-vertical-rhythm">

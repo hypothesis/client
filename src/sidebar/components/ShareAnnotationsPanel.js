@@ -3,7 +3,6 @@ import { SvgIcon } from '@hypothesis/frontend-shared';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import uiConstants from '../ui-constants';
 import { pageSharingLink } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
@@ -54,10 +53,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   };
 
   return (
-    <SidebarPanel
-      title={panelTitle}
-      panelName={uiConstants.PANEL_SHARE_ANNOTATIONS}
-    >
+    <SidebarPanel title={panelTitle} panelName="shareGroupAnnotations">
       {!sharingReady && (
         <div className="ShareAnnotationsPanel__spinner">
           <Spinner />

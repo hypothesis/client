@@ -2,7 +2,6 @@ import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import uiConstants from '../ui-constants';
 
 import Button from './Button';
 import SidebarPanel from './SidebarPanel';
@@ -28,7 +27,7 @@ export default function LoginPromptPanel({ onLogin, onSignUp }) {
     <SidebarPanel
       icon="restricted"
       title="Login needed"
-      panelName={uiConstants.PANEL_LOGIN_PROMPT}
+      panelName="loginPrompt"
     >
       <p>Please log in to create annotations or highlights.</p>
       <div className="SidebarPanel__actions">

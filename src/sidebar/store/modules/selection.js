@@ -5,6 +5,7 @@
 
 /**
  * @typedef {import('../../../types/api').Annotation} Annotation
+ * @typedef {import("../../../types/sidebar").TabName} TabName
  */
 
 /**
@@ -18,7 +19,6 @@
 
 import { createSelector } from 'reselect';
 
-import uiConstants from '../../ui-constants';
 import * as metadata from '../../helpers/annotation-metadata';
 import { countIf, trueKeys, toTrueMap } from '../../util/collections';
 import * as util from '../util';
@@ -28,9 +28,9 @@ import { storeModule } from '../create-store';
  * Default sort keys for each tab.
  */
 const TAB_SORTKEY_DEFAULT = {
-  [uiConstants.TAB_ANNOTATIONS]: 'Location',
-  [uiConstants.TAB_NOTES]: 'Oldest',
-  [uiConstants.TAB_ORPHANS]: 'Location',
+  annotation: 'Location',
+  note: 'Oldest',
+  orphan: 'Location',
 };
 
 function initialSelection(settings) {
@@ -70,16 +70,21 @@ function init(settings) {
     // match the currently-applied filters
     forcedVisible: {},
 
-    selectedTab: uiConstants.TAB_ANNOTATIONS,
+    selectedTab: 'annotation',
     // Key by which annotations are currently sorted.
-    sortKey: TAB_SORTKEY_DEFAULT[uiConstants.TAB_ANNOTATIONS],
+    sortKey: TAB_SORTKEY_DEFAULT.annotation,
   };
 }
 
+/**
+ *
+ * @param {TabName} newTab
+ * @param {TabName} oldTab
+ */
 const setTab = (newTab, oldTab) => {
-  // Do nothing if the "new tab" is not a valid tab or is the same as the
-  // tab already selected. This will avoid resetting the `sortKey`, too.
-  if (!uiConstants.TABS.includes(newTab) || oldTab === newTab) {
+  // Do nothing if the "new tab" is the same as the tab already selected.
+  // This will avoid resetting the `sortKey`, too.
+  if (oldTab === newTab) {
     return {};
   }
   return {
@@ -147,7 +152,7 @@ const update = {
 
     const haveOnlyPageNotes = noteCount === topLevelAnnotations.length;
     if (action.currentAnnotationCount === 0 && haveOnlyPageNotes) {
-      return setTab(uiConstants.TAB_NOTES, state.selectedTab);
+      return setTab('note', state.selectedTab);
     }
     return {};
   },
@@ -173,10 +178,10 @@ const update = {
     // If the orphans tab is selected but no remaining annotations are orphans,
     // switch back to annotations tab
     if (
-      newTab === uiConstants.TAB_ORPHANS &&
+      newTab === 'orphan' &&
       countIf(action.remainingAnnotations, metadata.isOrphan) === 0
     ) {
-      newTab = uiConstants.TAB_ANNOTATIONS;
+      newTab = 'annotation';
     }
 
     const removeAnns = collection => {
@@ -232,7 +237,7 @@ function selectAnnotations(ids) {
 /**
  * Set the currently-selected tab to `tabKey`.
  *
- * @param {'annotation'|'note'|'orphan'} tabKey
+ * @param {TabName} tabKey
  */
 function selectTab(tabKey) {
   return {
@@ -333,7 +338,7 @@ const selectedAnnotations = createSelector(
 /**
  * Return the currently-selected tab
  *
- * @return {'annotation'|'note'|'orphan'}
+ * @return {TabName}
  */
 function selectedTab(state) {
   return state.selectedTab;
@@ -357,6 +362,7 @@ const selectionState = createSelector(
 
 /**
  * Retrieve the current sort option key
+ * TODO: sortKey could be typedef'd
  *
  * @return {string}
  */
@@ -373,7 +379,7 @@ const sortKeys = createSelector(
   state => state.selectedTab,
   selectedTab => {
     const sortKeysForTab = ['Newest', 'Oldest'];
-    if (selectedTab !== uiConstants.TAB_NOTES) {
+    if (selectedTab !== 'note') {
       // Location is inapplicable to Notes tab
       sortKeysForTab.push('Location');
     }

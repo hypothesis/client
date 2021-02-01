@@ -1,4 +1,3 @@
-import uiConstants from '../../../ui-constants';
 import createStore from '../../create-store';
 import annotations from '../annotations';
 import filters from '../filters';
@@ -214,58 +213,47 @@ describe('sidebar/store/modules/selection', () => {
 
   describe('selectTab()', function () {
     it('sets the selected tab', function () {
-      store.selectTab(uiConstants.TAB_ANNOTATIONS);
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
-    });
-
-    it('ignores junk tag names', function () {
-      store.selectTab('flibbertigibbert');
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      store.selectTab('annotation');
+      assert.equal(getSelectionState().selectedTab, 'annotation');
     });
 
     it('allows sorting annotations by time and document location', function () {
-      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+      store.selectTab('annotation');
       assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
     });
 
     it('allows sorting page notes by time', function () {
-      store.selectTab(uiConstants.TAB_NOTES);
+      store.selectTab('note');
       assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest']);
     });
 
     it('allows sorting orphans by time and document location', function () {
-      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.selectTab('orphan');
       assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
     });
 
     it('sorts annotations by document location by default', function () {
-      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+      store.selectTab('annotation');
       assert.deepEqual(getSelectionState().sortKey, 'Location');
     });
 
     it('sorts page notes from oldest to newest by default', function () {
-      store.selectTab(uiConstants.TAB_NOTES);
+      store.selectTab('note');
       assert.deepEqual(getSelectionState().sortKey, 'Oldest');
     });
 
     it('sorts orphans by document location by default', function () {
-      store.selectTab(uiConstants.TAB_ORPHANS);
+      store.selectTab('orphan');
       assert.deepEqual(getSelectionState().sortKey, 'Location');
     });
 
     it('does not reset the sort key unless necessary', function () {
       // Select the tab, setting sort key to 'Oldest', and then manually
       // override the sort key.
-      store.selectTab(uiConstants.TAB_NOTES);
+      store.selectTab('note');
       store.setSortKey('Newest');
 
-      store.selectTab(uiConstants.TAB_NOTES);
+      store.selectTab('note');
 
       assert.equal(getSelectionState().sortKey, 'Newest');
     });
@@ -273,8 +261,8 @@ describe('sidebar/store/modules/selection', () => {
 
   describe('selectedTab', () => {
     it('should return the currently-selected tab', () => {
-      store.selectTab(uiConstants.TAB_NOTES);
-      assert.equal(store.selectedTab(), uiConstants.TAB_NOTES);
+      store.selectTab('note');
+      assert.equal(store.selectedTab(), 'note');
     });
   });
 
@@ -294,7 +282,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 0,
       });
 
-      assert.equal(getSelectionState().selectedTab, uiConstants.TAB_NOTES);
+      assert.equal(getSelectionState().selectedTab, 'note');
     });
 
     it('should select the page notes tab if page notes have replies', () => {
@@ -307,7 +295,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 0,
       });
 
-      assert.equal(getSelectionState().selectedTab, uiConstants.TAB_NOTES);
+      assert.equal(getSelectionState().selectedTab, 'note');
     });
 
     it('should not select the page notes tab if there were previously annotations in the store', () => {
@@ -317,10 +305,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 4,
       });
 
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      assert.equal(getSelectionState().selectedTab, 'annotation');
     });
 
     it('should not select the page notes tab if there are non-page-note annotations at the top level', () => {
@@ -334,10 +319,7 @@ describe('sidebar/store/modules/selection', () => {
         currentAnnotationCount: 0,
       });
 
-      assert.equal(
-        getSelectionState().selectedTab,
-        uiConstants.TAB_ANNOTATIONS
-      );
+      assert.equal(getSelectionState().selectedTab, 'annotation');
     });
   });
 });

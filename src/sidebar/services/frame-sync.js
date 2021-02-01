@@ -2,7 +2,6 @@ import debounce from 'lodash.debounce';
 
 import bridgeEvents from '../../shared/bridge-events';
 import Discovery from '../../shared/discovery';
-import uiConstants from '../ui-constants';
 import * as metadata from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
@@ -116,7 +115,7 @@ export default function FrameSync(annotationsService, bridge, store) {
       // target document
       if (!store.isLoggedIn()) {
         bridge.call('showSidebar');
-        store.openSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+        store.openSidebarPanel('loginPrompt');
         bridge.call('deleteAnnotation', formatAnnot(annot));
         return;
       }
@@ -152,7 +151,7 @@ export default function FrameSync(annotationsService, bridge, store) {
 
     bridge.on('showAnnotations', function (tags) {
       store.selectAnnotations(store.findIDsForTags(tags));
-      store.selectTab(uiConstants.TAB_ANNOTATIONS);
+      store.selectTab('annotation');
     });
 
     bridge.on('focusAnnotations', function (tags) {

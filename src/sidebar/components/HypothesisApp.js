@@ -6,7 +6,6 @@ import propTypes from 'prop-types';
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
-import uiConstants from '../ui-constants';
 import { parseAccountID } from '../helpers/account-id';
 import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
@@ -101,7 +100,7 @@ function HypothesisApp({
 
   useEffect(() => {
     if (shouldAutoDisplayTutorial(isSidebar, profile, settings)) {
-      store.openSidebarPanel(uiConstants.PANEL_HELP);
+      store.openSidebarPanel('help');
     }
   }, [isSidebar, profile, settings, store]);
 
@@ -115,7 +114,7 @@ function HypothesisApp({
     try {
       await auth.login();
 
-      store.closeSidebarPanel(uiConstants.PANEL_LOGIN_PROMPT);
+      store.closeSidebarPanel('loginPrompt');
       store.clearGroups();
       session.reload();
     } catch (err) {

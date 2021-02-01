@@ -4,7 +4,6 @@ import propTypes from 'prop-types';
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
-import uiConstants from '../ui-constants';
 import isThirdPartyService from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
@@ -58,12 +57,12 @@ function TopBar({
   const applyPendingUpdates = () => streamer.applyPendingUpdates();
 
   const toggleSharePanel = () => {
-    store.toggleSidebarPanel(uiConstants.PANEL_SHARE_ANNOTATIONS);
+    store.toggleSidebarPanel('shareGroupAnnotations');
   };
 
-  const isHelpPanelOpen = store.isSidebarPanelOpen(uiConstants.PANEL_HELP);
+  const isHelpPanelOpen = store.isSidebarPanelOpen('help');
   const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
-    uiConstants.PANEL_SHARE_ANNOTATIONS
+    'shareGroupAnnotations'
   );
 
   /**
@@ -75,7 +74,7 @@ function TopBar({
     if (service && service.onHelpRequestProvided) {
       bridge.call(bridgeEvents.HELP_REQUESTED);
     } else {
-      store.toggleSidebarPanel(uiConstants.PANEL_HELP);
+      store.toggleSidebarPanel('help');
     }
   };
 
