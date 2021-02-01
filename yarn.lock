@@ -2713,17 +2713,17 @@ debug@3.X:
   dependencies:
     ms "^2.1.1"
 
-debug@4, debug@4.2.0, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1:
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.2.0.tgz#7f150f93920e94c58f5574c2fd01a3110effe7f1"
-  integrity sha512-IX2ncY78vDTjZMFUdmsvIRFY2Cf4FnD0wRs+nQwJU8Lu99/tPFdb0VybiiMTPe3I6rQmwsqQqRBvxU+bZ/I8sg==
-  dependencies:
-    ms "2.1.2"
-
-debug@~4.3.1:
+debug@4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@~4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.1.tgz#f0d229c505e0c6d8c49ac553d1b13dc183f6b2ee"
   integrity sha512-doEwdvm4PCeK4K3RQN2ZC2BYUBaxwLARCqZmMjtF8a51J2Rb0xpVloFRnCODwqjpwnAoao4pelN8l3RJdv3gRQ==
+  dependencies:
+    ms "2.1.2"
+
+debug@4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.2.0.tgz#7f150f93920e94c58f5574c2fd01a3110effe7f1"
+  integrity sha512-IX2ncY78vDTjZMFUdmsvIRFY2Cf4FnD0wRs+nQwJU8Lu99/tPFdb0VybiiMTPe3I6rQmwsqQqRBvxU+bZ/I8sg==
   dependencies:
     ms "2.1.2"
 
@@ -3319,9 +3319,9 @@ eslint-visitor-keys@^2.0.0:
   integrity sha512-QudtT6av5WXels9WjIM7qz1XD1cWGvX4gGXvp/zBn9nXG02D0utdU3Em2m/QjTnrsk6bBjmCygl3rmj118msQQ==
 
 eslint@^7.3.1:
-  version "7.18.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-7.18.0.tgz#7fdcd2f3715a41fe6295a16234bd69aed2c75e67"
-  integrity sha512-fbgTiE8BfUJZuBeq2Yi7J3RB3WGUQ9PNuNbmgi6jt9Iv8qrkxfy19Ds3OpL1Pm7zg3BtTVhvcUZbIRQ0wmSjAQ==
+  version "7.19.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-7.19.0.tgz#6719621b196b5fad72e43387981314e5d0dc3f41"
+  integrity sha512-CGlMgJY56JZ9ZSYhJuhow61lMPPjUzWmChFya71Z/jilVos7mR/jPgaEfVGgMBY5DshbKdG8Ezb8FDCHcoMEMg==
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@eslint/eslintrc" "^0.3.0"
