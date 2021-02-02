@@ -1,8 +1,18 @@
+import propTypes from 'prop-types';
+
 import useRootThread from './hooks/use-root-thread';
-import { useStoreProxy } from '../store/use-store';
 import { countVisible } from '../helpers/thread';
 
 import Spinner from './Spinner';
+
+/**
+ * @typedef NotebookResultCountProps
+ * @prop {number} currentPage
+ * @prop {number} forcedVisibleCount
+ * @prop {boolean} isFiltered
+ * @prop {boolean} isLoading
+ * @prop {number} resultCount
+ */
 
 /**
  * Render count of annotations (or filtered results) visible in the notebook view
@@ -12,21 +22,22 @@ import Spinner from './Spinner';
  * - Annotations are unfiltered: "X threads (Y annotations)"
  *     Thread count does not render until all annotations are loaded
  * - Annotations are filtered: "X results [(and Y more)]"
+ *
+ * @param {NotebookResultCountProps} props
  */
-function NotebookResultCount() {
-  const store = useStoreProxy();
-
-  const forcedVisibleCount = store.forcedVisibleThreads().length;
-  const hasAppliedFilter = store.hasAppliedFilter();
-  const resultCount = store.annotationResultCount();
-  const isLoading = store.isLoading();
-
+function NotebookResultCount({
+  currentPage,
+  forcedVisibleCount,
+  isFiltered,
+  isLoading,
+  resultCount,
+}) {
   const rootThread = useRootThread();
   const visibleCount = isLoading ? resultCount : countVisible(rootThread);
 
   const hasResults = rootThread.children.length > 0;
 
-  const hasForcedVisible = hasAppliedFilter && forcedVisibleCount > 0;
+  const hasForcedVisible = isFiltered && forcedVisibleCount > 0;
   const matchCount = visibleCount - forcedVisibleCount;
   const threadCount = rootThread.children.length;
 
@@ -35,21 +46,22 @@ function NotebookResultCount() {
       {isLoading && <Spinner />}
       {!isLoading && (
         <h2>
-          {!hasResults && <span>No results</span>}
-          {hasResults && hasAppliedFilter && (
-            <span>
+          {currentPage > 1 && <span>Page {currentPage} of </span>}
+          {!hasResults && <em>No results</em>}
+          {hasResults && isFiltered && (
+            <em>
               {matchCount} {matchCount === 1 ? 'result' : 'results'}
-            </span>
+            </em>
           )}
-          {hasResults && !hasAppliedFilter && (
-            <span>
+          {hasResults && !isFiltered && (
+            <em>
               {threadCount} {threadCount === 1 ? 'thread' : 'threads'}
-            </span>
+            </em>
           )}
         </h2>
       )}
       {hasForcedVisible && <h3>(and {forcedVisibleCount} more)</h3>}
-      {!hasAppliedFilter && hasResults && (
+      {!isFiltered && hasResults && (
         <h3>
           ({visibleCount} {visibleCount === 1 ? 'annotation' : 'annotations'})
         </h3>
@@ -58,6 +70,12 @@ function NotebookResultCount() {
   );
 }
 
-NotebookResultCount.propTypes = {};
+NotebookResultCount.propTypes = {
+  currentPage: propTypes.number,
+  forcedVisibleCount: propTypes.number,
+  isFiltered: propTypes.bool,
+  isLoading: propTypes.bool,
+  resultCount: propTypes.number,
+};
 
 export default NotebookResultCount;

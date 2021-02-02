@@ -14,6 +14,8 @@ import propTypes from 'prop-types';
  *   See `buttons` SCSS mixins module for more details.
  * @prop {string} [icon] -
  *   The name of the SVGIcon to render. This is optional if a `buttonText` is provided.
+ * @prop {'left'|'right'} [iconPosition] - Whether icon should render to the left or
+ *   to the right of label text
  * @prop {boolean} [isExpanded] -
  *   Is the expandable element controlled by this button currently expanded?
  * @prop {boolean} [isPressed] -
@@ -40,6 +42,7 @@ export default function Button({
   className = '',
   disabled = false,
   icon = '',
+  iconPosition = 'left',
   isExpanded,
   isPressed,
   onClick = () => {},
@@ -78,8 +81,9 @@ export default function Button({
       disabled={disabled}
       {...extraProps}
     >
-      {icon && <SvgIcon name={icon} />}
+      {icon && iconPosition === 'left' && <SvgIcon name={icon} />}
       {buttonText}
+      {icon && iconPosition === 'right' && <SvgIcon name={icon} />}
     </button>
   );
 }
@@ -108,6 +112,7 @@ Button.propTypes = {
   buttonText: propTypes.string,
   className: propTypes.string,
   icon: requiredStringIfButtonTextMissing,
+  iconPosition: propTypes.string,
   isExpanded: propTypes.bool,
   isPressed: propTypes.bool,
   onClick: propTypes.func,
