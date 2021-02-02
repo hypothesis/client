@@ -9,15 +9,6 @@ import { listen } from '../../util/dom';
  */
 
 /**
- * @typedef PreactElement
- * @prop {Node} base
- */
-
-/**
- * @typedef {Ref<HTMLElement> | Ref<PreactElement>} PreactRef
- */
-
-/**
  * This hook adds appropriate `eventListener`s to the document when a target
  * element (`closeableEl`) is open. Events such as `click` and `focus` on
  * elements that fall outside of `closeableEl` in the document, or keydown
@@ -25,13 +16,9 @@ import { listen } from '../../util/dom';
  * to indicate that `closeableEl` should be closed. This hook also performs
  * cleanup to remove `eventListener`s when appropriate.
  *
- * Limitation: This will not work when attached to a custom component that has
- * more than one element nested under a root <Fragment>
- *
- * @param {PreactRef} closeableEl - ref object:
- *                                Reference to a DOM element or preat component
- *                                that should be closed when DOM elements external
- *                                to it are interacted with or `Esc` is pressed
+ * @param {Ref<HTMLElement>} closeableEl -
+ *   Reference to a DOM element that should be closed when DOM elements external
+ *   to it are interacted with or `Esc` is pressed
  * @param {boolean} isOpen - Whether the element is currently open. This hook does
  *                        not attach event listeners/do anything if it's not.
  * @param {() => void} handleClose - A function that will do the actual closing
@@ -42,25 +29,6 @@ export default function useElementShouldClose(
   isOpen,
   handleClose
 ) {
-  /**
-   *  Helper to return the underlying node object whether
-   *  `closeableEl` is attached to an HTMLNode or Preact component.
-   *
-   *  @param {PreactRef} closeableEl
-   *  @returns {Node}
-   */
-
-  const getCurrentNode = closeableEl => {
-    // if base is present, assume its a preact component
-    const node = /** @type {PreactElement} */ (closeableEl.current).base
-      ? /** @type {PreactElement} */ (closeableEl.current).base
-      : closeableEl.current;
-    if (typeof node !== 'object') {
-      throw new Error('useElementShouldClose can not find a node reference');
-    }
-    return /** @type {Node} */ (node);
-  };
-
   useEffect(() => {
     if (!isOpen) {
       return () => {};
@@ -80,8 +48,7 @@ export default function useElementShouldClose(
       document.body,
       'focus',
       event => {
-        const current = getCurrentNode(closeableEl);
-        if (!current.contains(/** @type {Node} */ (event.target))) {
+        if (!closeableEl.current.contains(/** @type {Node} */ (event.target))) {
           handleClose();
         }
       },
@@ -94,8 +61,7 @@ export default function useElementShouldClose(
       document.body,
       ['mousedown', 'click'],
       event => {
-        const current = getCurrentNode(closeableEl);
-        if (!current.contains(/** @type {Node} */ (event.target))) {
+        if (!closeableEl.current.contains(/** @type {Node} */ (event.target))) {
           handleClose();
         }
       },

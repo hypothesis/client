@@ -2,21 +2,27 @@ import { mount } from 'enzyme';
 import { createElement } from 'preact';
 import { useRef } from 'preact/hooks';
 import { act } from 'preact/test-utils';
-import propTypes from 'prop-types';
 
 import useElementShouldClose from '../use-element-should-close';
 
-describe('hooks.useElementShouldClose', () => {
+describe('useElementShouldClose', () => {
   let handleClose;
-  let e;
+
+  const createEvent = (name, props) => {
+    const event = new Event(name);
+    Object.assign(event, props);
+    return event;
+  };
+
   const events = [
     new Event('mousedown'),
     new Event('click'),
-    ((e = new Event('keydown')), (e.key = 'Escape'), e),
+    createEvent('keydown', { key: 'Escape' }),
     new Event('focus'),
   ];
 
   // Create a fake component to mount in tests that uses the hook
+  // eslint-disable-next-line react/prop-types
   function FakeComponent({ isOpen = true }) {
     const myRef = useRef();
     useElementShouldClose(myRef, isOpen, handleClose);
@@ -27,103 +33,62 @@ describe('hooks.useElementShouldClose', () => {
     );
   }
 
-  FakeComponent.propTypes = {
-    isOpen: propTypes.bool,
-  };
-
-  // Tests useElementShouldClose on a custom component directly
-  function FakeCompoundComponent({ isOpen = true }) {
-    function FakeCustomComponent() {
-      return (
-        <div>
-          <button>Hi</button>
-        </div>
-      );
-    }
-    const myRef = useRef();
-    useElementShouldClose(myRef, isOpen, handleClose);
-    return <FakeCustomComponent ref={myRef} />;
-  }
-
-  FakeCompoundComponent.propTypes = {
-    isOpen: propTypes.bool,
-  };
-
   function createComponent(props) {
     return mount(<FakeComponent isOpen={true} {...props} />);
-  }
-
-  function createCompoundComponent(props) {
-    return mount(<FakeCompoundComponent isOpen={true} {...props} />);
   }
 
   beforeEach(() => {
     handleClose = sinon.stub();
   });
 
-  // Run each set of tests twice, once for a regular node and a second
-  // time for a custom preact component
-  [
-    {
-      createWrapper: createComponent,
-      description: 'useElementShouldClose attached to a html node',
-    },
-    {
-      createWrapper: createCompoundComponent,
-      description: 'useElementShouldClose attached to a preact component',
-    },
-  ].forEach(test => {
-    context(test.description, () => {
-      events.forEach(event => {
-        it(`should invoke close callback once for events outside of element (${event.type})`, () => {
-          const wrapper = test.createWrapper();
+  events.forEach(event => {
+    it(`should invoke close callback once for events outside of element (${event.type})`, () => {
+      const wrapper = createComponent();
 
-          act(() => {
-            document.body.dispatchEvent(event);
-          });
-          wrapper.update();
+      act(() => {
+        document.body.dispatchEvent(event);
+      });
+      wrapper.update();
 
-          assert.calledOnce(handleClose);
+      assert.calledOnce(handleClose);
 
-          // Update the component to change it and re-execute the hook
-          wrapper.setProps({ isOpen: false });
+      // Update the component to change it and re-execute the hook
+      wrapper.setProps({ isOpen: false });
 
-          act(() => {
-            document.body.dispatchEvent(event);
-          });
-
-          // Cleanup of hook should have removed eventListeners, so the callback
-          // is not called again
-          assert.calledOnce(handleClose);
-        });
+      act(() => {
+        document.body.dispatchEvent(event);
       });
 
-      events.forEach(event => {
-        it(`should not invoke close callback on events outside of element if element closed (${event.type})`, () => {
-          const wrapper = test.createWrapper({ isOpen: false });
+      // Cleanup of hook should have removed eventListeners, so the callback
+      // is not called again
+      assert.calledOnce(handleClose);
+    });
+  });
 
-          act(() => {
-            document.body.dispatchEvent(event);
-          });
-          wrapper.update();
+  events.forEach(event => {
+    it(`should not invoke close callback on events outside of element if element closed (${event.type})`, () => {
+      const wrapper = createComponent({ isOpen: false });
 
-          assert.equal(handleClose.callCount, 0);
-        });
+      act(() => {
+        document.body.dispatchEvent(event);
       });
+      wrapper.update();
 
-      events.forEach(event => {
-        it(`should not invoke close callback on events inside of element (${event.type})`, () => {
-          const wrapper = test.createWrapper();
-          const button = wrapper.find('button');
+      assert.equal(handleClose.callCount, 0);
+    });
+  });
 
-          act(() => {
-            button.getDOMNode().dispatchEvent(event);
-          });
-          wrapper.update();
+  events.forEach(event => {
+    it(`should not invoke close callback on events inside of element (${event.type})`, () => {
+      const wrapper = createComponent();
+      const button = wrapper.find('button');
 
-          assert.equal(handleClose.callCount, 0);
-        });
+      act(() => {
+        button.getDOMNode().dispatchEvent(event);
       });
+      wrapper.update();
+
+      assert.equal(handleClose.callCount, 0);
     });
   });
 });
