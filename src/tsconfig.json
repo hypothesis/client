@@ -20,6 +20,6 @@
     "**/test/**/*.js",
     "test-util/**/*.js",
     "karma.config.js",
-    "../frontend-shared/src/test/**/*.js",
+    "../frontend-shared/src/**/test/*.js",
   ]
 }
