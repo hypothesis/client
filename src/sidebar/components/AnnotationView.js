@@ -88,7 +88,7 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
         // for this scenario as well.
         <SidebarContentError errorType="annotation" onLoginRequest={onLogin} />
       )}
-      <ThreadList thread={rootThread} />
+      <ThreadList threads={rootThread.children} />
     </>
   );
 }
