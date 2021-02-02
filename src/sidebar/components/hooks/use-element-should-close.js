@@ -9,20 +9,18 @@ import { listen } from '../../util/dom';
  */
 
 /**
- * This hook adds appropriate `eventListener`s to the document when a target
- * element (`closeableEl`) is open. Events such as `click` and `focus` on
- * elements that fall outside of `closeableEl` in the document, or keydown
- * events for the `esc` key, will invoke the provided `handleClose` function
- * to indicate that `closeableEl` should be closed. This hook also performs
- * cleanup to remove `eventListener`s when appropriate.
+ * This hook provides a way to close or hide an element when a user interacts
+ * with elements outside of it or presses the Esc key. It can be used to
+ * create non-modal popups (eg. for menus, autocomplete lists and non-modal dialogs)
+ * that automatically close when appropriate.
  *
- * @param {Ref<HTMLElement>} closeableEl -
- *   Reference to a DOM element that should be closed when DOM elements external
- *   to it are interacted with or `Esc` is pressed
- * @param {boolean} isOpen - Whether the element is currently open. This hook does
- *                        not attach event listeners/do anything if it's not.
- * @param {() => void} handleClose - A function that will do the actual closing
- *                                   of `closeableEl`
+ * When the element is visible/open, this hook monitors for document interactions
+ * that should close it - such as clicks outside the element or Esc key presses.
+ * When such an interaction happens, the `handleClose` callback is invoked.
+ *
+ * @param {Ref<HTMLElement>} closeableEl - Outer DOM element for the popup
+ * @param {boolean} isOpen - Whether the popup is currently visible/open
+ * @param {() => void} handleClose - Callback invoked to close the popup
  */
 export default function useElementShouldClose(
   closeableEl,
