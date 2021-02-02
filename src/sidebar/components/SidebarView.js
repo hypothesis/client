@@ -152,7 +152,7 @@ function SidebarView({
         <SidebarContentError errorType="group" onLoginRequest={onLogin} />
       )}
       {showTabs && <SelectionTabs isLoading={isLoading} />}
-      <ThreadList thread={rootThread} />
+      <ThreadList threads={rootThread.children} />
       {showLoggedOutMessage && <LoggedOutMessage onLogin={onLogin} />}
     </div>
   );
