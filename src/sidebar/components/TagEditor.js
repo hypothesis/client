@@ -49,7 +49,6 @@ function TagEditor({
 
   // Set up callback to monitor outside click events to close the AutocompleteList
   const closeWrapperRef = useRef(/** @type {HTMLElement|null} */ (null));
-  /** @ts-ignore - TODO: fix useElementShouldClose Ref types */
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
