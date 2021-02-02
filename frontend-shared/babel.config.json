@@ -2,7 +2,9 @@
   "presets": [
     [
       "@babel/preset-react", {
-        "pragma": "createElement"
+        "pragma": "createElement",
+        "pragmaFrag": "Fragment"
+
     }],
     ["@babel/preset-env", {
         "bugfixes": true,
@@ -19,7 +21,8 @@
       "presets": [
         ["@babel/preset-react", {
           "development": true,
-          "pragma": "createElement"
+          "pragma": "createElement",
+          "pragmaFrag": "Fragment"
         }]
       ]
     }

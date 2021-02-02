@@ -1,23 +1,34 @@
 {
   "presets": [
-    ["@babel/preset-react", {
-      "pragma": "createElement"
-    }],
+    [
+      "@babel/preset-react",
+      {
+        "pragma": "createElement",
+        "pragmaFrag": "Fragment"
+      }
+    ],
 
     // Compile JS for browser targets set by `browserslist` key in package.json.
-    ["@babel/preset-env", {
-       "bugfixes": true
-    }]
+    [
+      "@babel/preset-env",
+      {
+        "bugfixes": true
+      }
+    ]
   ],
   "plugins": ["inject-args"],
   "ignore": ["**/vendor/*"],
   "env": {
     "development": {
       "presets": [
-        ["@babel/preset-react", {
-          "development": true,
-          "pragma": "createElement"
-        }]
+        [
+          "@babel/preset-react",
+          {
+            "development": true,
+            "pragma": "createElement",
+            "pragmaFrag": "Fragment"
+          }
+        ]
       ]
     }
   }
