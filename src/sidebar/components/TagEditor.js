@@ -1,4 +1,8 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import {
+  SvgIcon,
+  normalizeKeyName,
+  useElementShouldClose,
+} from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -6,8 +10,6 @@ import propTypes from 'prop-types';
 import { withServices } from '../service-context';
 
 import AutocompleteList from './AutocompleteList';
-import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
-import useElementShouldClose from './hooks/use-element-should-close';
 
 /** @typedef {import("preact").JSX.Element} JSXElement */
 

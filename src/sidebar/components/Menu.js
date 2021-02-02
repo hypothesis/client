@@ -1,11 +1,12 @@
 import classnames from 'classnames';
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import {
+  SvgIcon,
+  normalizeKeyName,
+  useElementShouldClose,
+} from '@hypothesis/frontend-shared';
 import { Fragment, createElement } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
-
-import useElementShouldClose from './hooks/use-element-should-close';
-import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 

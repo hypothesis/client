@@ -3,7 +3,7 @@ import { createElement } from 'preact';
 import { useRef } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 
-import useElementShouldClose from '../use-element-should-close';
+import { useElementShouldClose } from '../use-element-should-close';
 
 describe('useElementShouldClose', () => {
   let handleClose;

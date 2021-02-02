@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { SvgIcon, normalizeKeyName } from '@hypothesis/frontend-shared';
 import { createElement, createRef } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -10,7 +10,6 @@ import {
   toggleBlockStyle,
   toggleSpanStyle,
 } from '../markdown-commands';
-import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import { isMacOS } from '../../shared/user-agent';
 
 import MarkdownView from './MarkdownView';
