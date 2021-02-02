@@ -109,7 +109,11 @@ module.exports = function (config) {
               [
                 'babel-plugin-istanbul',
                 {
-                  exclude: ['**/test/**/*.js', '**/test-util/**'],
+                  exclude: [
+                    '**/test/**/*.js',
+                    '**/test-util/**',
+                    'frontend-shared/lib',
+                  ],
                 },
               ],
             ],
