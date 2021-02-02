@@ -1,7 +1,28 @@
 import { useEffect } from 'preact/hooks';
 
-import { normalizeKeyName } from '../../../shared/browser-compatibility-utils';
-import { listen } from '../../util/dom';
+import { normalizeKeyName } from '../browser-compatibility-utils';
+
+/**
+ * Attach listeners for one or multiple events to an element and return a
+ * function that removes the listeners.
+ *
+ * @param {HTMLElement} element
+ * @param {string[]} events
+ * @param {EventListener} listener
+ * @param {Object} options
+ *   @param {boolean} [options.useCapture]
+ * @return {() => void} Function which removes the event listeners.
+ */
+function listen(element, events, listener, { useCapture = false } = {}) {
+  events.forEach(event =>
+    element.addEventListener(event, listener, useCapture)
+  );
+  return () => {
+    events.forEach(event =>
+      element.removeEventListener(event, listener, useCapture)
+    );
+  };
+}
 
 /**
  * @template T
@@ -22,11 +43,7 @@ import { listen } from '../../util/dom';
  * @param {boolean} isOpen - Whether the popup is currently visible/open
  * @param {() => void} handleClose - Callback invoked to close the popup
  */
-export default function useElementShouldClose(
-  closeableEl,
-  isOpen,
-  handleClose
-) {
+export function useElementShouldClose(closeableEl, isOpen, handleClose) {
   useEffect(() => {
     if (!isOpen) {
       return () => {};
@@ -44,7 +61,7 @@ export default function useElementShouldClose(
     // (key press, programmatic focus change).
     const removeFocusListener = listen(
       document.body,
-      'focus',
+      ['focus'],
       event => {
         if (!closeableEl.current.contains(/** @type {Node} */ (event.target))) {
           handleClose();

@@ -1,4 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { SvgIcon, useElementShouldClose } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
@@ -11,7 +11,6 @@ import { isIOS } from '../../shared/user-agent';
 
 import Button from './Button';
 import ShareLinks from './ShareLinks';
-import useElementShouldClose from './hooks/use-element-should-close';
 
 /**
  * @typedef {import('../../types/api').Annotation} Annotation

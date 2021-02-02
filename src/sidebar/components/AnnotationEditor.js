@@ -1,8 +1,8 @@
+import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { createElement } from 'preact';
 import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { normalizeKeyName } from '../../shared/browser-compatibility-utils';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 import { useStoreProxy } from '../store/use-store';

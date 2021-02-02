@@ -1,6 +1,6 @@
-import { useEffect } from 'preact/hooks';
+import { normalizeKeyName } from '@hypothesis/frontend-shared';
 
-import { normalizeKeyName } from './browser-compatibility-utils.js';
+import { useEffect } from 'preact/hooks';
 
 // Bit flags indicating modifiers required by a shortcut or pressed in a key event.
 const modifiers = {

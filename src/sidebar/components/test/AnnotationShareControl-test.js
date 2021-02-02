@@ -89,10 +89,12 @@ describe('AnnotationShareControl', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '@hypothesis/frontend-shared': {
+        useElementShouldClose: sinon.stub(),
+      },
       '../helpers/annotation-sharing': { isShareableURI: fakeIsShareableURI },
       '../util/copy-to-clipboard': fakeCopyToClipboard,
       '../helpers/permissions': { isPrivate: fakeIsPrivate },
-      './hooks/use-element-should-close': sinon.stub(),
       '../../shared/user-agent': { isIOS: fakeIsIOS },
     });
   });
