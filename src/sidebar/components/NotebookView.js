@@ -51,7 +51,7 @@ function NotebookView({ loadAnnotationsService }) {
         <NotebookResultCount />
       </div>
       <div className="NotebookView__items">
-        <ThreadList thread={rootThread} />
+        <ThreadList threads={rootThread.children} />
       </div>
     </div>
   );

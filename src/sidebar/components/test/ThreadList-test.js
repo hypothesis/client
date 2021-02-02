@@ -17,9 +17,12 @@ describe('ThreadList', () => {
   let wrappers;
 
   function createComponent(props) {
-    const wrapper = mount(<ThreadList thread={fakeTopThread} {...props} />, {
-      attachTo: fakeScrollContainer,
-    });
+    const wrapper = mount(
+      <ThreadList threads={fakeTopThread.children} {...props} />,
+      {
+        attachTo: fakeScrollContainer,
+      }
+    );
     wrappers.push(wrapper);
     return wrapper;
   }

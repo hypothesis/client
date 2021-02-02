@@ -33,7 +33,7 @@ function roundScrollPosition(pos) {
 
 /**
  * @typedef ThreadListProps
- * @prop {Thread} thread
+ * @prop {Thread[]} threads
  */
 
 /**
@@ -47,7 +47,7 @@ function roundScrollPosition(pos) {
  *
  * @param {ThreadListProps} props
  */
-function ThreadList({ thread }) {
+function ThreadList({ threads }) {
   // Height of the visible area of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(
     window.innerHeight
@@ -74,7 +74,7 @@ function ThreadList({ thread }) {
     /** @type {string|null} */ (null)
   );
 
-  const topLevelThreads = thread.children;
+  const topLevelThreads = threads;
 
   const {
     offscreenLowerHeight,
@@ -210,7 +210,7 @@ function ThreadList({ thread }) {
 
 ThreadList.propTypes = {
   /** Should annotations render extra document metadata? */
-  thread: propTypes.object.isRequired,
+  threads: propTypes.array.isRequired,
 };
 
 export default ThreadList;

@@ -64,7 +64,7 @@ function StreamView({ api, toastMessenger }) {
 
   const rootThread = useRootThread();
 
-  return <ThreadList thread={rootThread} />;
+  return <ThreadList threads={rootThread.children} />;
 }
 
 StreamView.propTypes = {
