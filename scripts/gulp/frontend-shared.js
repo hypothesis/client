@@ -15,7 +15,7 @@ const buildFrontendSharedJs = () => {
 
   return (
     gulp
-      .src('frontend-shared/src/**/*.js')
+      .src(['frontend-shared/src/**/*.js', '!**/test/*.js'])
       // Transpile the js source files and write the output in the frontend-shared/lib dir.
       // Additionally, add the sourcemaps into the same dir.
       .pipe(sourcemaps.init())
