@@ -1,6 +1,8 @@
 {
   "name": "@hypothesis/frontend-shared",
   "version": "1.0.0",
+  "description": "Shared components, styles and utilities for Hypothesis projects",
+  "license": "BSD-2-Clause",
   "repository": "hypothesis/client",
   "devDependencies": {
     "@babel/cli": "^7.1.6",
