@@ -1,10 +1,12 @@
 'use strict';
 
-const cp = require('child_process');
 const fs = require('fs');
+
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const sourcemaps = require('gulp-sourcemaps');
+
+const { run } = require('./run');
 
 const buildFrontendSharedJs = () => {
   // There does not appear to be a simple way of forcing gulp-babel to use a config
@@ -25,22 +27,29 @@ const buildFrontendSharedJs = () => {
   );
 };
 
-const linkFrontendShared = done => {
-  // Setup a symlink from the client to the frontend-shared package.
-  cp.spawn('yarn', ['link'], {
-    env: process.env,
-    cwd: './frontend-shared',
-  }).on('exit', () => {
-    cp.spawn('yarn', ['link', '@hypothesis/frontend-shared'], {
-      env: process.env,
-      stdio: 'inherit',
-    }).on('exit', () => {
-      done();
-    });
-  });
+const buildFrontendSharedTypes = async () => {
+  // nb. If the options get significantly more complex, they should be moved to
+  // a `tsconfig.json` file.
+  await run('node_modules/.bin/tsc', [
+    '--allowJs',
+    '--declaration',
+    '--emitDeclarationOnly',
+    '--outDir',
+    'frontend-shared/lib',
+    'frontend-shared/src/index.js',
+  ]);
+};
+
+const linkFrontendShared = async () => {
+  // Make @hypothesis/frontend-shared available for linking in other projects.
+  await run('yarn', ['link'], { cwd: './frontend-shared' });
+
+  // Link it in the parent `client` repo.
+  await run('yarn', ['link', '@hypothesis/frontend-shared']);
 };
 
 module.exports = {
   buildFrontendSharedJs,
+  buildFrontendSharedTypes,
   linkFrontendShared,
 };
