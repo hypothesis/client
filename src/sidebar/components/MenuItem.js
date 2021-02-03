@@ -215,7 +215,7 @@ export default function MenuItem({
     );
   }
   return (
-    <Fragment>
+    <>
       {menuItem}
       {hasSubmenuVisible && (
         <Slider visible={/** @type {boolean} */ (isSubmenuVisible)}>
@@ -228,7 +228,7 @@ export default function MenuItem({
           </MenuKeyboardNavigation>
         </Slider>
       )}
-    </Fragment>
+    </>
   );
 }
 

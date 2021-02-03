@@ -186,7 +186,7 @@ export default function Menu({
         </span>
       </button>
       {isOpen && (
-        <Fragment>
+        <>
           {menuArrow(arrowClass)}
           <div
             className={classnames(
@@ -203,7 +203,7 @@ export default function Menu({
               {children}
             </MenuKeyboardNavigation>
           </div>
-        </Fragment>
+        </>
       )}
     </div>
   );

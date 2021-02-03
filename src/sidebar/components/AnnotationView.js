@@ -82,7 +82,7 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
   ]);
 
   return (
-    <Fragment>
+    <>
       {fetchError && (
         // This is the same error shown if a direct-linked annotation cannot
         // be fetched in the sidebar. Fortunately the error message makes sense
@@ -90,7 +90,7 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
         <SidebarContentError errorType="annotation" onLoginRequest={onLogin} />
       )}
       <ThreadList thread={rootThread} />
-    </Fragment>
+    </>
   );
 }
 

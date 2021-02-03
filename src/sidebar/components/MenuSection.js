@@ -28,14 +28,14 @@ import propTypes from 'prop-types';
  */
 export default function MenuSection({ heading, children }) {
   return (
-    <Fragment>
+    <>
       {heading && <h2 className="MenuSection__heading">{heading}</h2>}
       <ul className="MenuSection__content">
         {toChildArray(children).map(child => (
           <li key={/** @type {JSXElement} **/ (child).key}>{child}</li>
         ))}
       </ul>
-    </Fragment>
+    </>
   );
 }
 

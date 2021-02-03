@@ -79,7 +79,7 @@ function TopBar({
   };
 
   const loginControl = (
-    <Fragment>
+    <>
       {auth.status === 'unknown' && (
         <span className="TopBar__login-links">⋯</span>
       )}
@@ -103,7 +103,7 @@ function TopBar({
       {auth.status === 'logged-in' && (
         <UserMenu auth={auth} onLogout={onLogout} />
       )}
-    </Fragment>
+    </>
   );
 
   return (

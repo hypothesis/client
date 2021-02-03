@@ -20,7 +20,7 @@ import PDFMetadata from './pdf-metadata';
  */
 function WarningBanner() {
   return (
-    <Fragment>
+    <>
       <div className="annotator-pdf-warning-banner__type">
         <SvgIcon
           name="caution"
@@ -38,7 +38,7 @@ function WarningBanner() {
         </a>{' '}
         in order to annotate with Hypothesis.
       </div>
-    </Fragment>
+    </>
   );
 }
 
