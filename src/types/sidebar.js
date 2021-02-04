@@ -5,7 +5,7 @@
 /**
  * Defined panel components available in the sidebar.
  *
- * @typedef {'help'| 'loginPrompt'|'shareGroupAnnotations'} PanelName
+ * @typedef {'help'|'loginPrompt'|'shareGroupAnnotations'} PanelName
  */
 
 /**
