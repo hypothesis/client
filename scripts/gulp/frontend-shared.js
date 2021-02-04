@@ -1,7 +1,5 @@
 'use strict';
 
-const fs = require('fs');
-
 const gulp = require('gulp');
 const babel = require('gulp-babel');
 const sourcemaps = require('gulp-sourcemaps');
@@ -10,10 +8,8 @@ const { run } = require('./run');
 
 const buildFrontendSharedJs = () => {
   // There does not appear to be a simple way of forcing gulp-babel to use a config
-  // file. Load it up as JSON and pass it in manually.
-  const babelConfig = JSON.parse(
-    fs.readFileSync('./frontend-shared/babel.config.json')
-  );
+  // file. Load it up and pass it in manually.
+  const babelConfig = require('../../frontend-shared/.babelrc.cjs');
 
   return (
     gulp
