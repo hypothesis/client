@@ -1,10 +1,15 @@
 {
   "presets": [
     [
-      "@babel/preset-react", {
-        "pragma": "createElement"
-    }],
-    ["@babel/preset-env", {
+      "@babel/preset-react",
+      {
+        "runtime": "automatic",
+        "importSource": "preact"
+      }
+    ],
+    [
+      "@babel/preset-env",
+      {
         "bugfixes": true,
         "targets": {
           "chrome": "57",
@@ -12,15 +17,20 @@
           "safari": "10.1",
           "edge": "17"
         }
-    }]
+      }
+    ]
   ],
   "env": {
     "development": {
       "presets": [
-        ["@babel/preset-react", {
-          "development": true,
-          "pragma": "createElement"
-        }]
+        [
+          "@babel/preset-react",
+          {
+            "development": true,
+            "runtime": "automatic",
+            "importSource": "preact/compat"
+          }
+        ]
       ]
     }
   }
