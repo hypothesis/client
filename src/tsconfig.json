@@ -3,23 +3,20 @@
     "allowJs": true,
     "checkJs": true,
     "lib": ["es2018", "dom"],
-    "jsx": "react",
-    "jsxFactory": "createElement",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "module": "commonjs",
     "noEmit": true,
     "strict": true,
     "noImplicitAny": false,
     "target": "ES2020"
   },
-  "include": [
-    "**/*.js",
-    "../frontend-shared/src/**/*.js",
-  ],
+  "include": ["**/*.js", "../frontend-shared/src/**/*.js"],
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",
     "test-util/**/*.js",
     "karma.config.js",
-    "../frontend-shared/src/**/test/*.js",
+    "../frontend-shared/src/**/test/*.js"
   ]
 }
