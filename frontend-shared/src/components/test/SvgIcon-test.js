@@ -1,6 +1,6 @@
 import { render } from 'preact';
 
-import { SvgIcon, availableIcons, registerIcons } from '../svg-icon';
+import { SvgIcon, availableIcons, registerIcons } from '../SvgIcon';
 
 describe('SvgIcon', () => {
   // Tests here use DOM APIs rather than Enzyme because SvgIcon uses
@@ -15,8 +15,8 @@ describe('SvgIcon', () => {
 
     registerIcons(
       {
-        'arrow-left': require('../../images/icons/arrow-left.svg'),
-        'arrow-right': require('../../images/icons/arrow-right.svg'),
+        'arrow-left': require('../../../images/icons/arrow-left.svg'),
+        'arrow-right': require('../../../images/icons/arrow-right.svg'),
       },
       { reset: true }
     );
