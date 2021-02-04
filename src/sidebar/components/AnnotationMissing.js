@@ -4,9 +4,8 @@ import propTypes from 'prop-types';
 
 import AnnotationReplyToggle from './AnnotationReplyToggle';
 
-/** @typedef {import('./Annotation').AnnotationProps} AnnotationProps */
-
 /**
+ * @typedef {import('./Annotation').AnnotationProps} AnnotationProps
  * @typedef {Omit<AnnotationProps, 'annotation'|'showDocumentInfo'|'annotationsService'>} AnnotationMissingProps
  */
 
