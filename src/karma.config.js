@@ -102,7 +102,7 @@ module.exports = function (config) {
             // The existence of this preset option is due to a config issue with frontend-shared/
             // where jsx modules are not transpiled to js.
             // See https://github.com/hypothesis/client/issues/2929
-            presets: require('../frontend-shared/babel.config.json').presets,
+            presets: require('../frontend-shared/.babelrc.cjs').presets,
             extensions: ['.js'],
             plugins: [
               'mockable-imports',
