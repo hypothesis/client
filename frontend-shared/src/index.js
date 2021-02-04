@@ -1,5 +1,5 @@
 // Components
-export { SvgIcon, registerIcons } from './svg-icon';
+export { SvgIcon, registerIcons } from './components/SvgIcon';
 
 // Hooks
 export { useElementShouldClose } from './hooks/use-element-should-close';
