@@ -1,4 +1,7 @@
-{
+'use strict';
+
+// This babel configuration is atypical because it is consumed via  node `require`
+module.exports = {
   "presets": [
     [
       "@babel/preset-react",
@@ -6,17 +9,19 @@
         "pragma": "createElement"
       }
     ],
-
-    // Compile JS for browser targets set by `browserslist` key in package.json.
     [
       "@babel/preset-env",
       {
-        "bugfixes": true
+        "bugfixes": true,
+        "targets": {
+          "chrome": "57",
+          "firefox": "53",
+          "safari": "10.1",
+          "edge": "17"
+        }
       }
     ]
   ],
-  "plugins": ["inject-args"],
-  "ignore": ["**/vendor/*"],
   "env": {
     "development": {
       "presets": [
