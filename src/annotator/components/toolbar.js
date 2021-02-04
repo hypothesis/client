@@ -133,6 +133,11 @@ export default function Toolbar({
             icon={newAnnotationType === 'note' ? 'note' : 'annotate'}
             onClick={createAnnotation}
           />
+          <ToolbarButton
+            label={'New Doodle'}
+            icon={'doodle'}
+            onClick={() => {alert("this would create a doodle!")}}
+          />
         </div>
       )}
     </div>
