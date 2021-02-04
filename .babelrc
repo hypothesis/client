@@ -1,23 +1,36 @@
 {
   "presets": [
-    ["@babel/preset-react", {
-      "pragma": "createElement"
-    }],
+    [
+      "@babel/preset-react",
+      {
+        "runtime": "automatic",
+        "importSource": "preact"
+      }
+    ],
 
     // Compile JS for browser targets set by `browserslist` key in package.json.
-    ["@babel/preset-env", {
-       "bugfixes": true
-    }]
+    [
+      "@babel/preset-env",
+      {
+        "bugfixes": true
+      }
+    ]
   ],
   "plugins": ["inject-args"],
   "ignore": ["**/vendor/*"],
   "env": {
     "development": {
       "presets": [
-        ["@babel/preset-react", {
-          "development": true,
-          "pragma": "createElement"
-        }]
+        [
+          "@babel/preset-react",
+          {
+            "development": true,
+            "runtime": "automatic",
+            // Use `preact/compat/jsx-dev-runtime` which is an alias for `preact/jsx-runtime`.
+            // See https://github.com/preactjs/preact/issues/2974.
+            "importSource": "preact/compat"
+          }
+        ]
       ]
     }
   }
