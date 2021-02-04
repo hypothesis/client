@@ -113,6 +113,10 @@
       ]
     ]
   },
+  "prettier": {
+    "arrowParens": "avoid",
+    "singleQuote": true
+  },
   "browser": {
     "fetch-mock": "./node_modules/fetch-mock/cjs/client.js"
   },
