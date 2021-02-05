@@ -47,6 +47,7 @@ export function createShadowRoot(container) {
   loadStyles(shadowRoot);
 
   // @ts-ignore The window doesn't know about the polyfill
+  // applyFocusVisiblePolyfill comes from the `focus-visible` package.
   const applyFocusVisible = window.applyFocusVisiblePolyfill;
   if (applyFocusVisible) {
     applyFocusVisible(shadowRoot);
