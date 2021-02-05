@@ -98,7 +98,7 @@ export default function Toolbar({
   useMinimalControls = false,
 }) {
   return (
-    <div>
+    <>
       {useMinimalControls && isSidebarOpen && (
         <ToolbarButton
           className="annotator-toolbar__sidebar-close"
@@ -134,7 +134,7 @@ export default function Toolbar({
           />
         </div>
       )}
-    </div>
+    </>
   );
 }
 

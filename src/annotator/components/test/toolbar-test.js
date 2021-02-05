@@ -9,17 +9,19 @@ const noop = () => {};
 describe('Toolbar', () => {
   const createToolbar = props =>
     mount(
-      <Toolbar
-        closeSidebar={noop}
-        createAnnotation={noop}
-        toggleHighlights={noop}
-        toggleSidebar={noop}
-        isSidebarOpen={false}
-        showHighlights={false}
-        newAnnotationType="note"
-        useMinimalControls={false}
-        {...props}
-      />
+      <div>
+        <Toolbar
+          closeSidebar={noop}
+          createAnnotation={noop}
+          toggleHighlights={noop}
+          toggleSidebar={noop}
+          isSidebarOpen={false}
+          showHighlights={false}
+          newAnnotationType="note"
+          useMinimalControls={false}
+          {...props}
+        />
+      </div>
     );
 
   const findButton = (wrapper, label) =>
