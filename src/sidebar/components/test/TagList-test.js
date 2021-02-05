@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import TagList from '../TagList';
 import { $imports } from '../TagList';

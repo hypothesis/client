@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useShortcut } from '../../shared/shortcut';

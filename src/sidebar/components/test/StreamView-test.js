@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { waitFor } from '../../../test-util/wait';

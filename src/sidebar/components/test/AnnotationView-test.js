@@ -1,4 +1,3 @@
-import { createElement } from 'preact';
 import { mount } from 'enzyme';
 
 import { waitFor } from '../../../test-util/wait';

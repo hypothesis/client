@@ -1,5 +1,3 @@
-import { createElement } from 'preact';
-
 import useRootThread from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
 import { countVisible } from '../helpers/thread';

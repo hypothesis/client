@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import ShareAnnotationsPanel from '../ShareAnnotationsPanel';
 import { $imports } from '../ShareAnnotationsPanel';

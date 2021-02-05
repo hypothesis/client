@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import { createElement } from 'preact';
 import { useLayoutEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 

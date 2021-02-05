@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import { createElement } from 'preact';
 
 /**
  * Render information about CC licensing

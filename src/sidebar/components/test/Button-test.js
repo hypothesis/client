@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import Button from '../Button';
 import { $imports } from '../Button';

@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import { createElement } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 import scrollIntoView from 'scroll-into-view';

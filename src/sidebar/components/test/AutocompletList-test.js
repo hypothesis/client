@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import AutocompleteList from '../AutocompleteList';
 import { $imports } from '../AutocompleteList';

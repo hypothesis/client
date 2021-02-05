@@ -1,4 +1,3 @@
-import { Fragment, createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
@@ -79,7 +78,7 @@ function TopBar({
   };
 
   const loginControl = (
-    <Fragment>
+    <>
       {auth.status === 'unknown' && (
         <span className="TopBar__login-links">⋯</span>
       )}
@@ -103,7 +102,7 @@ function TopBar({
       {auth.status === 'logged-in' && (
         <UserMenu auth={auth} onLogout={onLogout} />
       )}
-    </Fragment>
+    </>
   );
 
   return (

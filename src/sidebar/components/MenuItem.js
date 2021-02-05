@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { SvgIcon, normalizeKeyName } from '@hypothesis/frontend-shared';
-import { Fragment, createElement } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 
@@ -215,7 +214,7 @@ export default function MenuItem({
     );
   }
   return (
-    <Fragment>
+    <>
       {menuItem}
       {hasSubmenuVisible && (
         <Slider visible={/** @type {boolean} */ (isSubmenuVisible)}>
@@ -228,7 +227,7 @@ export default function MenuItem({
           </MenuKeyboardNavigation>
         </Slider>
       )}
-    </Fragment>
+    </>
   );
 }
 

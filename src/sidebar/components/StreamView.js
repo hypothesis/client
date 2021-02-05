@@ -1,4 +1,3 @@
-import { createElement } from 'preact';
 import { useCallback, useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 

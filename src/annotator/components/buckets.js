@@ -1,4 +1,3 @@
-import { createElement } from 'preact';
 import classnames from 'classnames';
 import propTypes from 'prop-types';
 import scrollIntoView from 'scroll-into-view';

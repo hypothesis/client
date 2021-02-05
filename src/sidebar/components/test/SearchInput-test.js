@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import SearchInput from '../SearchInput';
 import { $imports } from '../SearchInput';

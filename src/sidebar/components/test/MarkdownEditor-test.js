@@ -1,5 +1,5 @@
 import { mount } from 'enzyme';
-import { createElement, render } from 'preact';
+import { render } from 'preact';
 import { act } from 'preact/test-utils';
 
 import { LinkType } from '../../markdown-commands';

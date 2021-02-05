@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import { createElement } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 

@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 import { act } from 'preact/test-utils';
 
 import ThreadList from '../ThreadList';

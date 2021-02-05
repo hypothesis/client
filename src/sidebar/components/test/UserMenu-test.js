@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import bridgeEvents from '../../../shared/bridge-events';
 import UserMenu from '../UserMenu';

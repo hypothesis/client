@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import SidebarContentError from '../SidebarContentError';
 import { $imports } from '../SidebarContentError';

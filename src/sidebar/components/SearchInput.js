@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import { createElement } from 'preact';
 import { useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 

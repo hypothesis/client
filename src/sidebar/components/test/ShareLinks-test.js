@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import ShareLinks from '../ShareLinks';
 import { $imports } from '../ShareLinks';
