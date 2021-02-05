@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import { SvgIcon, normalizeKeyName } from '@hypothesis/frontend-shared';
-import { createElement, createRef } from 'preact';
+import { createRef } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 

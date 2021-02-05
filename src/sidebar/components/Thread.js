@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import { createElement, Fragment } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';
@@ -64,7 +63,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
   const annotationContent = useMemo(() => {
     if (showAnnotation) {
       return (
-        <Fragment>
+        <>
           <ModerationBanner annotation={thread.annotation} />
           <Annotation
             annotation={thread.annotation}
@@ -75,7 +74,7 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
             showDocumentInfo={showDocumentInfo}
             threadIsCollapsed={thread.collapsed}
           />
-        </Fragment>
+        </>
       );
     } else if (showMissingAnnotation) {
       return (

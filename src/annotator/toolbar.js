@@ -1,4 +1,4 @@
-import { createElement, createRef, render } from 'preact';
+import { createRef, render } from 'preact';
 
 import Toolbar from './components/toolbar';
 

@@ -1,5 +1,4 @@
 import { SvgIcon, useElementShouldClose } from '@hypothesis/frontend-shared';
-import { createElement } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 

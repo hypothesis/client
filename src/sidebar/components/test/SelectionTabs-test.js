@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import SelectionTabs from '../SelectionTabs';
 import { $imports } from '../SelectionTabs';

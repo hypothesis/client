@@ -1,5 +1,3 @@
-import { createElement } from 'preact';
-
 import { useStoreProxy } from '../store/use-store';
 import { useUserFilterOptions } from './hooks/use-filter-options';
 

@@ -1,5 +1,5 @@
 import { mount } from 'enzyme';
-import { createElement, render } from 'preact';
+import { render } from 'preact';
 import propTypes from 'prop-types';
 
 import { ServiceContext, withServices, useService } from '../service-context';

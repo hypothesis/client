@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import LoggedOutMessage from '../LoggedOutMessage';
 import { $imports } from '../LoggedOutMessage';

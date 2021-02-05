@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { isOrphan, quote } from '../helpers/annotation-metadata';

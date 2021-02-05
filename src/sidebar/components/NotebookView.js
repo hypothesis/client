@@ -1,4 +1,3 @@
-import { createElement } from 'preact';
 import { useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 

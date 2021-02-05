@@ -1,4 +1,3 @@
-import { createElement } from 'preact';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 import propTypes from 'prop-types';

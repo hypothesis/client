@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import SidebarView from '../SidebarView';
 import { $imports } from '../SidebarView';

@@ -1,4 +1,3 @@
-import { Fragment, createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
@@ -105,7 +104,7 @@ function GroupListItem({
       onClick={isSelectable ? focusGroup : toggleSubmenu}
       onToggleSubmenu={toggleSubmenu}
       submenu={
-        <Fragment>
+        <>
           <ul>
             {activityUrl && (
               <li>
@@ -143,7 +142,7 @@ function GroupListItem({
               This group is restricted to specific URLs.
             </p>
           )}
-        </Fragment>
+        </>
       }
     />
   );
