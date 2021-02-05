@@ -1,5 +1,3 @@
-import { createElement } from 'preact';
-
 /**
  * Loading indicator.
  */

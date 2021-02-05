@@ -1,6 +1,6 @@
 import Delegator from '../delegator';
 
-import { createElement, render } from 'preact';
+import { render } from 'preact';
 import Buckets from '../components/buckets';
 
 import { anchorBuckets } from '../util/buckets';

@@ -1,4 +1,3 @@
-import { createElement, Fragment } from 'preact';
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import propTypes from 'prop-types';
 
@@ -62,7 +61,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
       {sharingReady && (
         <div className="ShareAnnotationsPanel">
           {shareURI ? (
-            <Fragment>
+            <>
               <div className="ShareAnnotationsPanel__intro">
                 {notNull(focusedGroup).type === 'private' ? (
                   <p>
@@ -111,7 +110,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
                 shareURI={shareURI}
                 analyticsEventName={analytics.events.DOCUMENT_SHARED}
               />
-            </Fragment>
+            </>
           ) : (
             <p>
               These annotations cannot be shared because this document is not

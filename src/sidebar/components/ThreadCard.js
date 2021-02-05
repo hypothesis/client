@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
-import { createElement } from 'preact';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import propTypes from 'prop-types';

@@ -4,7 +4,6 @@ import {
   normalizeKeyName,
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
-import { Fragment, createElement } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
@@ -186,7 +185,7 @@ export default function Menu({
         </span>
       </button>
       {isOpen && (
-        <Fragment>
+        <>
           {menuArrow(arrowClass)}
           <div
             className={classnames(
@@ -203,7 +202,7 @@ export default function Menu({
               {children}
             </MenuKeyboardNavigation>
           </div>
-        </Fragment>
+        </>
       )}
     </div>
   );

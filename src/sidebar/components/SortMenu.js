@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import { createElement } from 'preact';
 
 import { useStoreProxy } from '../store/use-store';
 

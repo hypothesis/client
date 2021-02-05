@@ -1,4 +1,3 @@
-import { createElement } from 'preact';
 import propTypes from 'prop-types';
 
 import GroupListItem from './GroupListItem';

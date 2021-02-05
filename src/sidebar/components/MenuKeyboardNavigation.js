@@ -1,5 +1,4 @@
 import { normalizeKeyName } from '@hypothesis/frontend-shared';
-import { createElement } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 import propTypes from 'prop-types';
 

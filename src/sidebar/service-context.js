@@ -12,7 +12,7 @@
  * @typedef {import("redux").Store} Store
  */
 
-import { createContext, createElement } from 'preact';
+import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 
 /**

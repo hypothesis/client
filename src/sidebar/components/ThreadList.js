@@ -1,4 +1,3 @@
-import { createElement } from 'preact';
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';

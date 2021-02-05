@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import NotebookFilters from '../NotebookFilters';
 import { $imports } from '../NotebookFilters';

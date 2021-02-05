@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import { useUserFilterOptions } from '../use-filter-options';
 import { $imports } from '../use-filter-options';

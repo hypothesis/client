@@ -1,6 +1,6 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
-import { Fragment, createElement, render } from 'preact';
+import { render } from 'preact';
 
 import * as pdfAnchoring from '../anchoring/pdf';
 import Delegator from '../delegator';
@@ -20,7 +20,7 @@ import PDFMetadata from './pdf-metadata';
  */
 function WarningBanner() {
   return (
-    <Fragment>
+    <>
       <div className="annotator-pdf-warning-banner__type">
         <SvgIcon
           name="caution"
@@ -38,7 +38,7 @@ function WarningBanner() {
         </a>{' '}
         in order to annotate with Hypothesis.
       </div>
-    </Fragment>
+    </>
   );
 }
 

@@ -1,4 +1,4 @@
-import { createElement, render } from 'preact';
+import { render } from 'preact';
 
 import { SvgIcon, availableIcons, registerIcons } from '../svg-icon';
 

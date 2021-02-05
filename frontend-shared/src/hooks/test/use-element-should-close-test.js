@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 import { useRef } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 

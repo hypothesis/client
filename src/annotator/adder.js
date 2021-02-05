@@ -1,4 +1,4 @@
-import { createElement, render } from 'preact';
+import { render } from 'preact';
 
 import AdderToolbar from './components/adder-toolbar';
 import { isTouchDevice } from '../shared/user-agent';

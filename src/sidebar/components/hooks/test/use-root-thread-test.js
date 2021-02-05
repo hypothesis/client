@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import { createElement } from 'preact';
 
 import useRootThread from '../use-root-thread';
 import { $imports } from '../use-root-thread';

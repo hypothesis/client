@@ -1,5 +1,4 @@
 import { createElement } from 'preact';
-
 import { setupBrowserFixes } from '../renderer-options';
 
 describe('shared/renderer-options', () => {
