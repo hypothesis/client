@@ -1,3 +1,25 @@
+@use '../variables' as var;
+
+/**
+ * Add stylized focus to interactive elements such <input> or <textarea>
+ *
+ * @param {boolean} $inset -
+ *   The focus style is implemented with a box-shadow and this parameter determines whether
+ *   the box-shadow should be inset on the element. Set this to true when the element
+ *   may be adjacent to another in order to prevent part of the outline from being obscured.
+ */
+@mixin outline($inset: false) {
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var.$color-focus-outline if($inset, inset, null);
+  }
+}
+
+@mixin outline--hide {
+  outline: none;
+  box-shadow: none;
+}
+
 /**
  * Display an outline on an element only when it has keyboard focus.
  *
@@ -6,18 +28,21 @@
  *
  * [1] https://developer.mozilla.org/en-US/docs/Web/CSS/:focus-visible
  * [2] https://github.com/WICG/focus-visible
+ *
+ * @param {boolean} $inset - Does the outline render inset or not
  */
-@mixin outline-on-keyboard-focus {
+@mixin outline-on-keyboard-focus($inset: false) {
+  @include outline($inset);
   // Selector for browsers using JS polyfill, which adds the "focus-visible"
   // class to a keyboard-focused element.
   &:focus:not(.focus-visible) {
-    outline: none;
+    @include outline--hide;
   }
 
   // Selector for browsers with native :focus-visible support.
   // (Do not combine with above, as an unsupported pseudo-class disables the
   // entire selector)
   &:focus:not(:focus-visible) {
-    outline: none;
+    @include outline--hide;
   }
 }

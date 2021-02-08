@@ -1,9 +1,16 @@
+@use "@hypothesis/frontend-shared/styles/mixins/focus";
+
 @use "../variables" as var;
 
 // basic standard styling for elements
 a {
+  @include focus.outline-on-keyboard-focus;
+  // Ensure the tag has width in order for :focus styling to render correctly.
+  display: inline-block;
   color: var.$color-link;
   text-decoration: none;
+  // Give links a radius to allow :focus styling to appear similar to that of buttons
+  border-radius: var.$border-radius;
 }
 
 a:active,
