@@ -18,7 +18,7 @@ a.MenuItem:hover {
 }
 
 .MenuItem {
-  @include focus.outline-on-keyboard-focus;
+  @include focus.outline-on-keyboard-focus($inset: true);
   @include layout.row($align: center);
   align-self: stretch;
   flex-grow: 1;

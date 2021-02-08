@@ -16,17 +16,9 @@
   }
 }
 
-@mixin focus-outline {
-  border-color: var.$color-focus-outline;
-  box-shadow: 0px 1px 2px var.$color-shadow--base inset,
-    0px 0px 5px var.$color-focus-shadow;
-}
-
 @mixin form-input-focus {
-  outline: none;
   background-color: var.$white;
 
-  @include focus-outline;
   @include placeholder {
     color: var.$color-text--light;
   }
@@ -47,6 +39,7 @@
   }
 
   @include utils.border;
+  @include focus.outline;
   border-radius: var.$border-radius;
   color: var.$color-text--light;
   background-color: var.$grey-0;
