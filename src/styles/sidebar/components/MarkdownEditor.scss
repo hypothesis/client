@@ -28,26 +28,24 @@
 }
 
 .MarkdownEditor__toolbar-button {
-  @include buttons.reset-native-btn-styles;
-  @include layout.row(center, center);
-  appearance: none;
+  @include buttons.button--icon-only($with-active-state: false);
   min-width: 24px;
   min-height: 24px;
 
-  color: var.$grey-5;
+  padding-top: 0;
+  padding-bottom: 0;
 
-  &:hover,
-  &:focus {
-    color: var.$grey-7;
-  }
+  color: var.$grey-5;
+  transition: none;
 
   &:disabled {
     color: var.$grey-3;
   }
+}
 
-  &-icon {
-    @include utils.icon--xsmall;
-  }
+svg.MarkdownEditor__toolbar-button-icon {
+  // Stronger specificity to override mixin button styling
+  @include utils.icon--xsmall;
 }
 
 .MarkdownEditor__preview {
@@ -91,9 +89,10 @@
   .MarkdownEditor__toolbar-button {
     min-width: var.$touch-target-size;
     min-height: var.$touch-target-size;
+  }
 
-    &-icon {
-      @include utils.icon--small;
-    }
+  svg.MarkdownEditor__toolbar-button-icon {
+    // Stronger specificity to override mixin button styling
+    @include utils.icon--small;
   }
 }
