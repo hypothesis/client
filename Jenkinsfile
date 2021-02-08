@@ -3,7 +3,11 @@
 // `color` can be a color code or one of "good", "warning" or "danger".
 // See https://www.jenkins.io/doc/pipeline/steps/slack/.
 def postSlack(color, message) {
-    slackSend channel: "#eng-frontend", color: color, message: message
+    slackSend channel: "#eng-ci", color: color, message: message
+    if (color != "good") {
+      // Post failures to #eng-frontend for added visibility.
+      slackSend channel: "#eng-frontend", color: color, message: message
+    }
 }
 
 // Enable concurrent builds of this project to be throttled using the
