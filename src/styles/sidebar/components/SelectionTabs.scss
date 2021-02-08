@@ -33,6 +33,8 @@
   cursor: pointer;
   min-width: 85px;
   min-height: 18px;
+  // Give the tab a radius to allow :focus styling to appear similar to that of buttons
+  border-radius: var.$border-radius;
 
   user-select: none;
 
