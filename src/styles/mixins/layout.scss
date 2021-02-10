@@ -76,7 +76,7 @@
  * @FIXME Find workaround for SvgIcon exception
  */
 @mixin vertical-rhythm($size: var.$layout-space) {
-  & > * + *:not([class*='svg-icon--inline']) {
+  & > * + *:not([class*='SvgIcon--inline']) {
     margin-top: $size;
   }
 }
