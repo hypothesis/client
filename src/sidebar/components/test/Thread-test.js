@@ -197,19 +197,12 @@ describe('Thread', () => {
       noAnnotationThread.annotation = undefined;
     });
 
-    it('does not render an annotation or a moderation banner', () => {
+    it('renders an annotation component', () => {
       const wrapper = createComponent({ thread: noAnnotationThread });
 
-      assert.isFalse(wrapper.find('Annotation').exists());
-      assert.isFalse(wrapper.find('ModerationBanner').exists());
-    });
+      const annotation = wrapper.find('Annotation');
 
-    it('renders a missing annotation component', () => {
-      const wrapper = createComponent({ thread: noAnnotationThread });
-
-      const annotationMissing = wrapper.find('AnnotationMissing');
-
-      assert.isTrue(annotationMissing.exists());
+      assert.isTrue(annotation.exists());
     });
   });
 
@@ -226,7 +219,6 @@ describe('Thread', () => {
       const wrapper = createComponent({ thread: noAnnotationThread });
 
       assert.isFalse(wrapper.find('Annotation').exists());
-      assert.isFalse(wrapper.find('AnnotationMissing').exists());
     });
   });
 

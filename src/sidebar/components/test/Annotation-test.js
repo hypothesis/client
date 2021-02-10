@@ -249,6 +249,54 @@ describe('Annotation', () => {
         assert.isTrue(wrapper.find('footer').exists());
       });
     });
+
+    context('missing annotation', () => {
+      it('should render a message about annotation unavailability', () => {
+        const wrapper = createComponent({ annotation: undefined });
+
+        assert.equal(wrapper.text(), 'Message not available.');
+      });
+
+      it('should not render a message if collapsed reply', () => {
+        const wrapper = createComponent({
+          annotation: undefined,
+          isReply: true,
+          threadIsCollapsed: true,
+        });
+
+        assert.equal(wrapper.text(), '');
+      });
+
+      it('should render reply toggle controls if there are replies', () => {
+        const wrapper = createComponent({
+          annotation: undefined,
+          replyCount: 5,
+          threadIsCollapsed: true,
+        });
+
+        const toggle = wrapper.find('AnnotationReplyToggle');
+
+        assert.isTrue(toggle.exists());
+        assert.equal(toggle.props().onToggleReplies, fakeOnToggleReplies);
+        assert.equal(toggle.props().replyCount, 5);
+        assert.equal(toggle.props().threadIsCollapsed, true);
+      });
+
+      it('should not render reply toggle controls if collapsed reply', () => {
+        const wrapper = createComponent({
+          annotation: undefined,
+          isReply: true,
+          replyCount: 5,
+          threadIsCollapsed: true,
+        });
+
+        const toggle = wrapper.find('AnnotationReplyToggle');
+
+        assert.isFalse(toggle.exists());
+      });
+
+      it('should not render other annotation sub-components');
+    });
   });
 
   it(

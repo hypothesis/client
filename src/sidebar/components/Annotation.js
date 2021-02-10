@@ -19,7 +19,9 @@ import AnnotationReplyToggle from './AnnotationReplyToggle';
 
 /**
  * @typedef AnnotationProps
- * @prop {Annotation} annotation
+ * @prop {Annotation} [annotation] - The annotation to render. If undefined,
+ *   this Annotation will render as a "missing annotation" and will stand in
+ *   as an Annotation for threads that lack an annotation.
  * @prop {boolean} hasAppliedFilter - Is any filter applied currently?
  * @prop {boolean} isReply
  * @prop {VoidFunction} onToggleReplies - Callback to expand/collapse reply threads
@@ -44,21 +46,17 @@ function Annotation({
   threadIsCollapsed,
   annotationsService,
 }) {
-  const store = useStoreProxy();
-  const isFocused = store.isAnnotationFocused(annotation.$tag);
-
-  // An annotation will have a draft if it is being edited
-  const draft = store.getDraft(annotation);
-  const userid = store.profile().userid;
-  const isSaving = store.isSavingAnnotation(annotation);
-
   const isCollapsedReply = isReply && threadIsCollapsed;
 
-  const hasQuote = !!quote(annotation);
+  const store = useStoreProxy();
 
-  const isEditing = !!draft && !isSaving;
+  const hasQuote = annotation && !!quote(annotation);
+  const isFocused = annotation && store.isAnnotationFocused(annotation.$tag);
+  const isSaving = annotation && store.isSavingAnnotation(annotation);
+  const isEditing = annotation && !!store.getDraft(annotation) && !isSaving;
 
-  const showActions = !isSaving && !isEditing;
+  const userid = store.profile().userid;
+  const showActions = annotation && !isSaving && !isEditing;
   const showReplyToggle = !isReply && !hasAppliedFilter && replyCount > 0;
 
   const onReply = () => annotationsService.reply(annotation, userid);
@@ -66,28 +64,39 @@ function Annotation({
   return (
     <article
       className={classnames('Annotation', {
+        'Annotation--missing': !annotation,
         'Annotation--reply': isReply,
         'is-collapsed': threadIsCollapsed,
         'is-focused': isFocused,
       })}
     >
-      <AnnotationHeader
-        annotation={annotation}
-        isEditing={isEditing}
-        replyCount={replyCount}
-        showDocumentInfo={showDocumentInfo}
-        threadIsCollapsed={threadIsCollapsed}
-      />
+      {annotation && (
+        <>
+          <AnnotationHeader
+            annotation={annotation}
+            isEditing={isEditing}
+            replyCount={replyCount}
+            showDocumentInfo={showDocumentInfo}
+            threadIsCollapsed={threadIsCollapsed}
+          />
 
-      {hasQuote && (
-        <AnnotationQuote annotation={annotation} isFocused={isFocused} />
+          {hasQuote && (
+            <AnnotationQuote annotation={annotation} isFocused={isFocused} />
+          )}
+
+          {!isCollapsedReply && !isEditing && (
+            <AnnotationBody annotation={annotation} />
+          )}
+
+          {isEditing && <AnnotationEditor annotation={annotation} />}
+        </>
       )}
 
-      {!isCollapsedReply && !isEditing && (
-        <AnnotationBody annotation={annotation} />
+      {!annotation && !isCollapsedReply && (
+        <div>
+          <em>Message not available.</em>
+        </div>
       )}
-
-      {isEditing && <AnnotationEditor annotation={annotation} />}
 
       {!isCollapsedReply && (
         <footer className="Annotation__footer">
@@ -116,7 +125,7 @@ function Annotation({
 }
 
 Annotation.propTypes = {
-  annotation: propTypes.object.isRequired,
+  annotation: propTypes.object,
   hasAppliedFilter: propTypes.bool.isRequired,
   isReply: propTypes.bool,
   onToggleReplies: propTypes.func,
