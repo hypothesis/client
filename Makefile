@@ -23,18 +23,18 @@ dev: node_modules/.uptodate
 
 .PHONY: test
 test: node_modules/.uptodate
-ifdef FILTER
-	yarn test --grep $(FILTER)
+ifdef ARGS
+	yarn test $(ARGS)
 else
 	yarn test
 endif
 
 .PHONY: servetests
 servetests: node_modules/.uptodate
-ifdef FILTER
-	node_modules/.bin/gulp test-watch --grep $(FILTER)
+ifdef ARGS
+	node_modules/.bin/gulp --watch $(ARGS)
 else
-	node_modules/.bin/gulp test-watch
+	node_modules/.bin/gulp --watch
 endif
 
 .PHONY: lint

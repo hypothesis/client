@@ -34,17 +34,34 @@ const IMAGES_DIR = 'build/images';
 function parseCommandLine() {
   commander
     .option(
-      '--grep [pattern]',
-      'Run only tests where filename matches a pattern'
+      '--grep <pattern>',
+      'Run only tests where filename matches a regex pattern'
+    )
+    .option('--watch', 'Continuously run tests (default: false)', false)
+    .option('--browser <browser>', 'Run tests in browser of choice.')
+    .option(
+      '--no-browser',
+      "Don't launch default browser. Instead, navigate to http://localhost:9876/ to run the tests."
     )
     .parse(process.argv);
 
-  return {
-    grep: commander.opts().grep,
+  const { grep, watch, browser } = commander.opts();
+  const karmaOptions = {
+    grep: grep,
+    singleRun: !watch,
   };
+
+  // browser option can be either false | undefined | string
+  if (browser === false) {
+    karmaOptions.browsers = null;
+  } else if (browser) {
+    karmaOptions.browsers = [browser];
+  }
+
+  return karmaOptions;
 }
 
-const taskArgs = parseCommandLine();
+const karmaOptions = parseCommandLine();
 
 /** A list of all modules included in vendor bundles. */
 const vendorModules = Object.keys(vendorBundles.bundles).reduce(function (
@@ -352,13 +369,12 @@ gulp.task(
   )
 );
 
-function runKarma({ singleRun }, done) {
+function runKarma(done) {
   const karma = require('karma');
   new karma.Server(
     {
       configFile: path.resolve(__dirname, './src/karma.config.js'),
-      grep: taskArgs.grep,
-      singleRun,
+      ...karmaOptions,
     },
     done
   ).start();
@@ -368,9 +384,5 @@ function runKarma({ singleRun }, done) {
 // Some (eg. a11y) tests rely on CSS bundles, so build these first.
 gulp.task(
   'test',
-  gulp.series('build-css', done => runKarma({ singleRun: true }, done))
-);
-gulp.task(
-  'test-watch',
-  gulp.series('build-css', done => runKarma({ singleRun: false }, done))
+  gulp.series('build-css', done => runKarma(done))
 );
