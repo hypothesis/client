@@ -132,12 +132,6 @@ export default class Sidebar extends Guest {
       this.subscribe('panelReady', () => this.show());
     }
 
-    if (this.plugins.BucketBar) {
-      this._registerEvent(this.plugins.BucketBar.element, 'click', () =>
-        this.show()
-      );
-    }
-
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
