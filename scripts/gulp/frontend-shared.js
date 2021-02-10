@@ -6,21 +6,28 @@ const sourcemaps = require('gulp-sourcemaps');
 
 const { run } = require('./run');
 
+const IS_PRODUCTION_BUILD = process.env.NODE_ENV === 'production';
+
 const buildFrontendSharedJs = () => {
   // There does not appear to be a simple way of forcing gulp-babel to use a config
   // file. Load it up and pass it in manually.
   const babelConfig = require('../../frontend-shared/.babelrc.cjs');
 
-  return (
-    gulp
-      .src(['frontend-shared/src/**/*.js', '!**/test/*.js'])
-      // Transpile the js source files and write the output in the frontend-shared/lib dir.
-      // Additionally, add the sourcemaps into the same dir.
+  // Transpile the js source files and write the output in the frontend-shared/lib dir.
+  console.log(IS_PRODUCTION_BUILD);
+  let stream = gulp.src(['frontend-shared/src/**/*.js', '!**/test/*.js']);
+  if (!IS_PRODUCTION_BUILD) {
+    // Build the sourcemaps (non-production)
+    stream = stream
       .pipe(sourcemaps.init())
       .pipe(babel(babelConfig))
-      .pipe(sourcemaps.write('.'))
-      .pipe(gulp.dest('frontend-shared/lib'))
-  );
+      .pipe(sourcemaps.write('.'));
+  } else {
+    // No sourcemaps (production)
+    stream = stream.pipe(babel(babelConfig));
+  }
+  stream.pipe(gulp.dest('frontend-shared/lib'));
+  return stream;
 };
 
 const buildFrontendSharedTypes = async () => {
