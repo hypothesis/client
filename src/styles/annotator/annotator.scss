@@ -7,8 +7,9 @@
 @use '../mixins/molecules';
 @use '../mixins/reset';
 
-// Shared components.
-@use '../components/svg-icon';
+// Shared styles
+// -----------------
+@use '@hypothesis/frontend-shared/styles';
 
 // Annotator-specific components.
 @use './components/adder';

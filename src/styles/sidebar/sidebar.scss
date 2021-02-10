@@ -7,9 +7,9 @@
 @use '../util';
 @use './elements';
 
-// Shared components
+// Shared styles
 // -----------------
-@use '../components/svg-icon';
+@use '@hypothesis/frontend-shared/styles';
 
 // Components
 // ----------
