@@ -65,16 +65,16 @@ describe('SvgIcon', () => {
     const container = document.createElement('div');
     render(<SvgIcon name="arrow-left" />, container);
     const wrapper = container.querySelector('span');
-    assert.isTrue(wrapper.classList.contains('svg-icon'));
-    assert.isFalse(wrapper.classList.contains('svg-icon--inline'));
+    assert.isTrue(wrapper.classList.contains('SvgIcon'));
+    assert.isFalse(wrapper.classList.contains('SvgIcon--inline'));
   });
 
   it('appends an inline class to wrapper if `inline` prop is `true`', () => {
     const container = document.createElement('div');
     render(<SvgIcon name="arrow-left" inline={true} />, container);
     const wrapper = container.querySelector('span');
-    assert.isTrue(wrapper.classList.contains('svg-icon'));
-    assert.isTrue(wrapper.classList.contains('svg-icon--inline'));
+    assert.isTrue(wrapper.classList.contains('SvgIcon'));
+    assert.isTrue(wrapper.classList.contains('SvgIcon--inline'));
   });
 
   it('sets a title to the containing `span` element if `title` is present', () => {

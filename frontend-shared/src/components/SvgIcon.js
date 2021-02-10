@@ -68,7 +68,7 @@ export function SvgIcon({ name, className = '', inline = false, title = '' }) {
 
   return (
     <span
-      className={classnames('svg-icon', { 'svg-icon--inline': inline })}
+      className={classnames('SvgIcon', { 'SvgIcon--inline': inline })}
       dangerouslySetInnerHTML={{ __html: markup }}
       ref={element}
       {...spanProps}
