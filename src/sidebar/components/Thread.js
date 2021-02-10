@@ -7,7 +7,6 @@ import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
 
 import Annotation from './Annotation';
-import AnnotationMissing from './AnnotationMissing';
 import Button from './Button';
 import ModerationBanner from './ModerationBanner';
 
@@ -28,10 +27,6 @@ import ModerationBanner from './ModerationBanner';
  * @param {ThreadProps} props
  */
 function Thread({ showDocumentInfo = false, thread, threadsService }) {
-  // Only render this thread's annotation if it exists and the thread is `visible`
-  const showAnnotation = thread.annotation && thread.visible;
-  const showMissingAnnotation = thread.visible && !thread.annotation;
-
   // Render this thread's replies only if the thread is expanded
   const showChildren = !thread.collapsed;
 
@@ -60,11 +55,13 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
 
   // Memoize annotation content to avoid re-rendering an annotation when content
   // in other annotations/threads change.
-  const annotationContent = useMemo(() => {
-    if (showAnnotation) {
-      return (
+  const annotationContent = useMemo(
+    () =>
+      thread.visible && (
         <>
-          <ModerationBanner annotation={thread.annotation} />
+          {thread.annotation && (
+            <ModerationBanner annotation={thread.annotation} />
+          )}
           <Annotation
             annotation={thread.annotation}
             hasAppliedFilter={hasAppliedFilter}
@@ -75,31 +72,18 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
             threadIsCollapsed={thread.collapsed}
           />
         </>
-      );
-    } else if (showMissingAnnotation) {
-      return (
-        <AnnotationMissing
-          hasAppliedFilter={hasAppliedFilter}
-          isReply={!!thread.parent}
-          onToggleReplies={onToggleReplies}
-          replyCount={thread.replyCount}
-          threadIsCollapsed={thread.collapsed}
-        />
-      );
-    } else {
-      return null;
-    }
-  }, [
-    hasAppliedFilter,
-    onToggleReplies,
-    showAnnotation,
-    showMissingAnnotation,
-    showDocumentInfo,
-    thread.annotation,
-    thread.parent,
-    thread.replyCount,
-    thread.collapsed,
-  ]);
+      ),
+    [
+      hasAppliedFilter,
+      onToggleReplies,
+      showDocumentInfo,
+      thread.annotation,
+      thread.parent,
+      thread.replyCount,
+      thread.collapsed,
+      thread.visible,
+    ]
+  );
 
   return (
     <section
