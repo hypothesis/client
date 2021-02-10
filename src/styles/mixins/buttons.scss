@@ -87,17 +87,27 @@
   }
 }
 
-/* A button with displayed text. It may or may not have an icon. */
-@mixin button--labeled {
+/**
+ * A button with displayed text. It may or may not have an icon. The default
+ * colors assume the button is displayed on a white background.
+ *
+ * @param {CSSColor} [$background-color] - The button's background color when
+ *   neither hovered nor active.
+ * @param {CSSColor} [$active-background-color]
+ */
+@mixin button--labeled(
+  $background-color: var.$grey-1,
+  $active-background-color: var.$grey-2
+) {
   @include button;
   white-space: nowrap; // Keep multi-word button labels from wrapping
   color: var.$grey-mid;
   font-weight: 700;
-  background-color: var.$grey-1;
+  background-color: $background-color;
 
   &:hover:not([disabled]),
   &:focus:not([disabled]) {
-    background-color: var.$grey-2;
+    background-color: $active-background-color;
   }
 
   // Icon
