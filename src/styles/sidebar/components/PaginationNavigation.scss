@@ -1,0 +1,50 @@
+@use '../../mixins/buttons';
+@use "../../mixins/layout";
+@use "../../mixins/utils";
+@use "../../variables" as var;
+
+.PaginationNavigation {
+  @include utils.font--large;
+  @include layout.row;
+
+  &__relative {
+    // Set a minimum width for the previous and next button containers so that
+    // there is no jumping around as they appear and disappear.
+    min-width: 5em;
+  }
+
+  &__next {
+    // Make sure "next" button is flush right
+    @include layout.row($justify: flex-end);
+  }
+
+  &__pages {
+    @include layout.row($justify: center, $align: center);
+    flex-grow: 1;
+  }
+
+  &__button,
+  &__page-button {
+    @include buttons.button--labeled(
+      $background-color: transparent,
+      $active-background-color: var.$grey-3
+    );
+  }
+
+  &__page-button {
+    margin: var.$layout-space--xxsmall;
+    padding: var.$layout-space--small var.$layout-space;
+  }
+
+  &__button-right {
+    // TODO TEMPORARY adjustment until we can adjust the actual icon
+    svg {
+      margin-left: var.$layout-space--xxsmall;
+    }
+    padding-right: var.$layout-space--xxsmall;
+  }
+
+  &__page-button[aria-pressed='true'] {
+    background-color: var.$grey-3;
+  }
+}
