@@ -32,7 +32,7 @@ function revertOffsetElement(el) {
 
 // nb. These tests currently cover the `AdderToolbar` Preact component as well
 // as the `Adder` container. The tests for `AdderToolbar` should be moved into
-// `adder-toolbar-test.js`.
+// `AdderToolbar-test.js`.
 describe('Adder', () => {
   let adderCtrl;
   let adderCallbacks;
