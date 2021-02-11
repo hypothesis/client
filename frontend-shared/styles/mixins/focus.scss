@@ -12,6 +12,9 @@
   &:focus {
     outline: none;
     box-shadow: 0 0 0 2px var.$color-focus-outline if($inset, inset, null);
+    // In the case where $inset is false, a z-index > 0 ensures that adjacent sibling
+    // items don't obscure the box-shadow outline.
+    z-index: if($inset, inherit, 1);
   }
 }
 
