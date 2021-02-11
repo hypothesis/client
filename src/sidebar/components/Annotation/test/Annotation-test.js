@@ -1,12 +1,11 @@
 import { mount } from 'enzyme';
 
-import * as fixtures from '../../test/annotation-fixtures';
+import * as fixtures from '../../../test/annotation-fixtures';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
-import Annotation from '../Annotation';
-import { $imports } from '../Annotation';
+import Annotation, { $imports } from '../Annotation';
 
 describe('Annotation', () => {
   let fakeOnToggleReplies;
@@ -65,8 +64,8 @@ describe('Annotation', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/annotation-metadata': fakeMetadata,
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/annotation-metadata': fakeMetadata,
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 

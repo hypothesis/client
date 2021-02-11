@@ -1,6 +1,6 @@
 import propTypes from 'prop-types';
 
-import Button from './Button';
+import Button from '../Button';
 
 /**
  * @typedef AnnotationReplyToggleProps

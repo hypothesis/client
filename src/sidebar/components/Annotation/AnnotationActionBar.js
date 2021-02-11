@@ -1,19 +1,20 @@
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
+import { useStoreProxy } from '../../store/use-store';
 import {
   sharingEnabled,
   annotationSharingLink,
-} from '../helpers/annotation-sharing';
-import { isPrivate, permits } from '../helpers/permissions';
-import { withServices } from '../service-context';
+} from '../../helpers/annotation-sharing';
+import { isPrivate, permits } from '../../helpers/permissions';
+import { withServices } from '../../service-context';
+
+import Button from '../Button';
 
 import AnnotationShareControl from './AnnotationShareControl';
-import Button from './Button';
 
 /**
- *  @typedef {import("../../types/api").Annotation} Annotation
- *  @typedef {import('../../types/config').HostConfig} HostConfig
+ *  @typedef {import("../../../types/api").Annotation} Annotation
+ *  @typedef {import('../../../types/config').HostConfig} HostConfig
  */
 
 /**
