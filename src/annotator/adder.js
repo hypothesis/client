@@ -1,6 +1,6 @@
 import { render } from 'preact';
 
-import AdderToolbar from './components/adder-toolbar';
+import AdderToolbar from './components/AdderToolbar';
 import { isTouchDevice } from '../shared/user-agent';
 import { createShadowRoot } from './util/shadow-root';
 
