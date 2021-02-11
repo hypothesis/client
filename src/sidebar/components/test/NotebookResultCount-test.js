@@ -5,31 +5,26 @@ import { $imports } from '../NotebookResultCount';
 
 describe('NotebookResultCount', () => {
   let fakeCountVisible;
-  let fakeIsLoading;
-  let fakeAnnotationResultCount;
   let fakeUseRootThread;
-  let fakeStore;
 
-  const createComponent = () => {
-    return mount(<NotebookResultCount />);
+  const createComponent = (props = {}) => {
+    return mount(
+      <NotebookResultCount
+        forcedVisibleCount={0}
+        isFiltered={false}
+        isLoading={false}
+        resultCount={0}
+        {...props}
+      />
+    );
   };
 
   beforeEach(() => {
     fakeCountVisible = sinon.stub().returns(0);
     fakeUseRootThread = sinon.stub().returns({ children: [] });
-    fakeIsLoading = sinon.stub().returns(false);
-    fakeAnnotationResultCount = sinon.stub().returns(0);
-
-    fakeStore = {
-      forcedVisibleThreads: sinon.stub().returns([]),
-      hasAppliedFilter: sinon.stub().returns(false),
-      isLoading: fakeIsLoading,
-      annotationResultCount: fakeAnnotationResultCount,
-    };
 
     $imports.$mock({
       './hooks/use-root-thread': fakeUseRootThread,
-      '../store/use-store': { useStoreProxy: () => fakeStore },
       '../helpers/thread': { countVisible: fakeCountVisible },
     });
   });
@@ -40,19 +35,17 @@ describe('NotebookResultCount', () => {
 
   context('when there are no results', () => {
     it('should show "No Results" if no filters are applied', () => {
-      fakeStore.hasAppliedFilter.returns(false);
       fakeUseRootThread.returns({ children: [] });
 
-      const wrapper = createComponent();
+      const wrapper = createComponent({ isFiltered: false });
 
       assert.equal(wrapper.text(), 'No results');
     });
 
     it('should show "No Results" if filters are applied', () => {
-      fakeStore.hasAppliedFilter.returns(true);
       fakeUseRootThread.returns({ children: [] });
 
-      const wrapper = createComponent();
+      const wrapper = createComponent({ isFiltered: true });
 
       assert.equal(wrapper.text(), 'No results');
     });
@@ -90,31 +83,32 @@ describe('NotebookResultCount', () => {
   context('with one or more applied filters', () => {
     [
       {
-        forcedVisible: [],
+        forcedVisibleCount: 0,
         thread: { children: [1] },
         visibleCount: 1,
         expected: '1 result',
       },
       {
-        forcedVisible: [],
+        forcedVisibleCount: 0,
         thread: { children: [1] },
         visibleCount: 2,
         expected: '2 results',
       },
       {
-        forcedVisible: [1],
+        forcedVisibleCount: 1,
         thread: { children: [1] },
         visibleCount: 3,
         expected: '2 results(and 1 more)',
       },
     ].forEach(test => {
       it('should render a count of results', () => {
-        fakeStore.hasAppliedFilter.returns(true);
-        fakeStore.forcedVisibleThreads.returns(test.forcedVisible);
         fakeUseRootThread.returns(test.thread);
         fakeCountVisible.returns(test.visibleCount);
 
-        const wrapper = createComponent();
+        const wrapper = createComponent({
+          forcedVisibleCount: test.forcedVisibleCount,
+          isFiltered: true,
+        });
 
         assert.equal(wrapper.text(), test.expected);
       });
@@ -122,12 +116,8 @@ describe('NotebookResultCount', () => {
   });
 
   context('when loading', () => {
-    beforeEach(() => {
-      fakeIsLoading.returns(true);
-    });
-
     it('shows a loading spinner', () => {
-      const wrapper = createComponent();
+      const wrapper = createComponent({ isLoading: true });
       assert.isTrue(wrapper.find('Spinner').exists());
     });
 
@@ -136,9 +126,8 @@ describe('NotebookResultCount', () => {
       // Setting countVisible to something different to demonstrate that
       // resultCount is used while loading
       fakeCountVisible.returns(5);
-      fakeAnnotationResultCount.returns(2);
 
-      const wrapper = createComponent();
+      const wrapper = createComponent({ isLoading: true, resultCount: 2 });
 
       assert.equal(wrapper.text(), '(2 annotations)');
     });
