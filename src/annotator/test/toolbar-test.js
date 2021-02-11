@@ -20,7 +20,7 @@ describe('ToolbarController', () => {
     };
 
     $imports.$mock({
-      './components/toolbar': FakeToolbar,
+      './components/Toolbar': FakeToolbar,
     });
   });
 
