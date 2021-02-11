@@ -8,7 +8,10 @@
   line-height: 1;
 
   & h2 {
-    font-weight: bold;
+    strong {
+      font-weight: bold;
+      font-style: normal;
+    }
   }
 
   & h3 {
