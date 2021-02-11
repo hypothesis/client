@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { format as formatDate } from '../util/date';
-import { decayingInterval, toFuzzyString } from '../util/time';
+import { format as formatDate } from '../../util/date';
+import { decayingInterval, toFuzzyString } from '../../util/time';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
+ * @typedef {import("../../../types/api").Annotation} Annotation
  */
 
 /**

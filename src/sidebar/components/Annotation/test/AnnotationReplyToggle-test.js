@@ -1,9 +1,9 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import AnnotationReplyToggle from '../AnnotationReplyToggle';
+import { checkAccessibility } from '../../../../test-util/accessibility';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
+import AnnotationReplyToggle from '../AnnotationReplyToggle';
 
 describe('AnnotationReplyToggle', () => {
   let fakeOnToggleReplies;

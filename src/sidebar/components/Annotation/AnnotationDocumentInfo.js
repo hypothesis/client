@@ -1,8 +1,8 @@
 import propTypes from 'prop-types';
 
-import * as annotationMetadata from '../helpers/annotation-metadata';
+import * as annotationMetadata from '../../helpers/annotation-metadata';
 
-/** @typedef {import("../../types/api").Annotation} Annotation */
+/** @typedef {import("../../../types/api").Annotation} Annotation */
 
 /**
  * @typedef AnnotationDocumentInfoProps

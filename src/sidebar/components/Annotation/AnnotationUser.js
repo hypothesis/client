@@ -1,12 +1,12 @@
 import propTypes from 'prop-types';
 
-import { isThirdPartyUser, username } from '../helpers/account-id';
-import { withServices } from '../service-context';
+import { isThirdPartyUser, username } from '../../helpers/account-id';
+import { withServices } from '../../service-context';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
- * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
+ * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import('../../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../services/service-url').ServiceUrlGetter} ServiceUrlGetter
  */
 
 /**

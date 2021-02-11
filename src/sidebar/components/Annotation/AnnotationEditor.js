@@ -2,18 +2,19 @@ import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { withServices } from '../service-context';
-import { applyTheme } from '../helpers/theme';
-import { useStoreProxy } from '../store/use-store';
+import { withServices } from '../../service-context';
+import { applyTheme } from '../../helpers/theme';
+import { useStoreProxy } from '../../store/use-store';
+
+import MarkdownEditor from '../MarkdownEditor';
+import TagEditor from '../TagEditor';
 
 import AnnotationLicense from './AnnotationLicense';
 import AnnotationPublishControl from './AnnotationPublishControl';
-import MarkdownEditor from './MarkdownEditor';
-import TagEditor from './TagEditor';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import("../../types/config").MergedConfig} MergedConfig
+ * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import("../../../types/config").MergedConfig} MergedConfig
  */
 
 /**

@@ -1,9 +1,9 @@
 import classnames from 'classnames';
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
-import { quote } from '../helpers/annotation-metadata';
-import { withServices } from '../service-context';
+import { useStoreProxy } from '../../store/use-store';
+import { quote } from '../../helpers/annotation-metadata';
+import { withServices } from '../../service-context';
 
 import AnnotationActionBar from './AnnotationActionBar';
 import AnnotationBody from './AnnotationBody';
@@ -13,8 +13,8 @@ import AnnotationQuote from './AnnotationQuote';
 import AnnotationReplyToggle from './AnnotationReplyToggle';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**

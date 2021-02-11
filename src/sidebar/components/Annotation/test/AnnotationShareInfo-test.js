@@ -1,11 +1,11 @@
 import { mount } from 'enzyme';
 
-import * as fixtures from '../../test/annotation-fixtures';
-import AnnotationShareInfo from '../AnnotationShareInfo';
-import { $imports } from '../AnnotationShareInfo';
+import * as fixtures from '../../../test/annotation-fixtures';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
+
+import AnnotationShareInfo, { $imports } from '../AnnotationShareInfo';
 
 describe('AnnotationShareInfo', () => {
   let fakeGroup;
@@ -36,8 +36,8 @@ describe('AnnotationShareInfo', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../helpers/permissions': { isPrivate: fakeIsPrivate },
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/permissions': { isPrivate: fakeIsPrivate },
     });
   });
 

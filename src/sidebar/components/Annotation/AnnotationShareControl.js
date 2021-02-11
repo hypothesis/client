@@ -2,18 +2,18 @@ import { SvgIcon, useElementShouldClose } from '@hypothesis/frontend-shared';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-import { isShareableURI } from '../helpers/annotation-sharing';
-import { copyText } from '../util/copy-to-clipboard';
-import { isPrivate } from '../helpers/permissions';
-import { withServices } from '../service-context';
-import { isIOS } from '../../shared/user-agent';
+import { isShareableURI } from '../../helpers/annotation-sharing';
+import { copyText } from '../../util/copy-to-clipboard';
+import { isPrivate } from '../../helpers/permissions';
+import { withServices } from '../../service-context';
+import { isIOS } from '../../../shared/user-agent';
 
-import Button from './Button';
-import ShareLinks from './ShareLinks';
+import Button from '../Button';
+import ShareLinks from '../ShareLinks';
 
 /**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**

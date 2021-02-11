@@ -1,10 +1,9 @@
 import { mount } from 'enzyme';
 
-import AnnotationUser from '../AnnotationUser';
-import { $imports } from '../AnnotationUser';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import AnnotationUser, { $imports } from '../AnnotationUser';
 
 describe('AnnotationUser', () => {
   let fakeAnnotation;
@@ -37,7 +36,7 @@ describe('AnnotationUser', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/account-id': {
+      '../../helpers/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
         username: fakeUsername,
       },

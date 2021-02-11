@@ -1,12 +1,12 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import propTypes from 'prop-types';
 
-import { useStoreProxy } from '../store/use-store';
-import { isPrivate } from '../helpers/permissions';
+import { useStoreProxy } from '../../store/use-store';
+import { isPrivate } from '../../helpers/permissions';
 
 /**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**

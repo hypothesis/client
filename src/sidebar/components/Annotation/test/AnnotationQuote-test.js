@@ -1,10 +1,9 @@
 import { mount } from 'enzyme';
 
-import AnnotationQuote from '../AnnotationQuote';
-import { $imports } from '../AnnotationQuote';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import AnnotationQuote, { $imports } from '../AnnotationQuote';
 
 describe('AnnotationQuote', () => {
   let fakeAnnotation;
@@ -32,7 +31,7 @@ describe('AnnotationQuote', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/annotation-metadata': {
+      '../../helpers/annotation-metadata': {
         quote: fakeQuote,
         isOrphan: fakeIsOrphan,
       },
