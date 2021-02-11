@@ -2,8 +2,7 @@ import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
-import Buckets from '../buckets';
-import { $imports } from '../buckets';
+import Buckets, { $imports } from '../Buckets';
 
 describe('Buckets', () => {
   let fakeBucketsUtil;

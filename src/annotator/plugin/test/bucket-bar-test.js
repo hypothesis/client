@@ -30,7 +30,7 @@ describe('BucketBar', () => {
     };
 
     $imports.$mock({
-      '../components/buckets': FakeBuckets,
+      '../components/Buckets': FakeBuckets,
       '../util/buckets': fakeBucketUtil,
     });
 
