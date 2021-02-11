@@ -13,9 +13,9 @@ describe('Sidebar', () => {
   let fakeCrossFrame;
   const sidebarConfig = { pluginClasses: {} };
 
-  // `Sidebar` instances created by current test.
+  // Containers and Sidebar instances created by current test.
+  let containers;
   let sidebars;
-  let sidebarContainer;
 
   let FakeToolbarController;
   let fakeToolbar;
@@ -26,7 +26,6 @@ describe('Sidebar', () => {
 
   after(() => {
     window.requestAnimationFrame.restore();
-    sidebarContainer?.remove();
   });
 
   const createSidebar = (config = {}) => {
@@ -38,10 +37,11 @@ describe('Sidebar', () => {
       sidebarConfig,
       config
     );
-    sidebarContainer = document.createElement('div');
-    const sidebar = new Sidebar(sidebarContainer, config);
+    const container = document.createElement('div');
+    document.body.appendChild(container);
+    containers.push(container);
 
-    document.body.appendChild(sidebarContainer);
+    const sidebar = new Sidebar(container, config);
     sidebars.push(sidebar);
 
     return sidebar;
@@ -49,13 +49,19 @@ describe('Sidebar', () => {
 
   const createExternalContainer = () => {
     const externalFrame = document.createElement('div');
+    document.body.appendChild(externalFrame);
+    containers.push(externalFrame);
+
     externalFrame.className = EXTERNAL_CONTAINER_SELECTOR;
     externalFrame.style.width = DEFAULT_WIDTH + 'px';
     externalFrame.style.height = DEFAULT_HEIGHT + 'px';
+
     return externalFrame;
   };
 
   beforeEach(() => {
+    sidebars = [];
+    containers = [];
     fakeCrossFrame = {};
     fakeCrossFrame.onConnect = sandbox.stub().returns(fakeCrossFrame);
     fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame);
@@ -96,6 +102,7 @@ describe('Sidebar', () => {
 
   afterEach(() => {
     sidebars.forEach(s => s.destroy());
+    containers.forEach(c => c.remove());
     sandbox.restore();
     $imports.$restore();
   });
@@ -103,6 +110,7 @@ describe('Sidebar', () => {
   describe('sidebar container frame', () => {
     it('creates shadow DOM', () => {
       createSidebar();
+      const sidebarContainer = containers[0];
       const sidebar = sidebarContainer.querySelector('hypothesis-sidebar');
       assert.exists(sidebar);
       assert.exists(sidebar.shadowRoot);
@@ -489,6 +497,7 @@ describe('Sidebar', () => {
   describe('destruction', () => {
     it('the (shadow DOMed) sidebar is destroyed and the frame is detached', () => {
       const sidebar = createSidebar();
+      const sidebarContainer = containers[0];
       sidebar.destroy();
       assert.called(fakeCrossFrame.destroy);
       assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
@@ -497,6 +506,7 @@ describe('Sidebar', () => {
 
     it('the (non-shadow DOMed) sidebar is destroyed and the frame is detached', () => {
       const sidebar = createSidebar({ disableShadowSidebar: true });
+      const sidebarContainer = containers[0];
       sidebar.destroy();
       assert.called(fakeCrossFrame.destroy);
       assert.notExists(sidebarContainer.querySelector('.annotator-frame'));
@@ -669,7 +679,6 @@ describe('Sidebar', () => {
           top: 0,
           left: 0,
         });
-        document.body.appendChild(externalFrame);
 
         layoutChangeHandlerSpy = sandbox.stub();
         const layoutChangeExternalConfig = {
@@ -711,7 +720,6 @@ describe('Sidebar', () => {
 
     beforeEach(() => {
       externalFrame = createExternalContainer();
-      document.body.appendChild(externalFrame);
 
       sidebar = createSidebar({
         externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
@@ -747,6 +755,7 @@ describe('Sidebar', () => {
       createSidebar({
         disableShadowSidebar: true,
       });
+      const sidebarContainer = containers[0];
       assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
       const sidebar = sidebarContainer.querySelector('.annotator-frame');
       assert.exists(sidebar);
