@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 
-import Toolbar from '../toolbar';
+import Toolbar from '../Toolbar';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
