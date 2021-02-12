@@ -2,7 +2,6 @@
 @use '../mixins/molecules';
 
 .notebook-outer {
-  // TODO: CSS namespace conflicts?
   box-sizing: border-box;
   position: fixed;
   top: 0;
