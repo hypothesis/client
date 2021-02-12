@@ -1,4 +1,5 @@
 import Hammer from 'hammerjs';
+import debounce from 'lodash.debounce';
 
 import annotationCounts from './annotation-counts';
 import sidebarTrigger from './sidebar-trigger';
@@ -151,7 +152,11 @@ export default class Sidebar extends Guest {
       this.toolbarWidth = 0;
     }
 
-    this._registerEvent(window, 'resize', () => this._onResize());
+    this._registerEvent(
+      window,
+      'resize',
+      debounce(() => this._onResize(), 10)
+    );
 
     this._gestureState = {
       // Initial position at the start of a drag/pan resize event (in pixels).

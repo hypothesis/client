@@ -97,6 +97,9 @@ describe('Sidebar', () => {
       './toolbar': {
         ToolbarController: FakeToolbarController,
       },
+
+      // Disable debouncing of updates.
+      'lodash.debounce': callback => callback,
     });
   });
 
