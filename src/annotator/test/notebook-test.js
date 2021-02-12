@@ -23,10 +23,18 @@ describe('Notebook', () => {
   });
 
   describe('notebook container frame', () => {
-    it('starts hidden', () => {
+    it('is not created until the notebook is shown', () => {
       const notebook = createNotebook();
+      assert.isNull(notebook.container);
 
-      assert.equal(notebook.container.style.display, 'none');
+      notebook.show();
+      assert.isNotNull(notebook.container);
+    });
+
+    it('is not created if `hide` is called before notebook is first shown', () => {
+      const notebook = createNotebook();
+      notebook.hide();
+      assert.isNull(notebook.container);
     });
 
     it('displays when opened', () => {
@@ -137,12 +145,15 @@ describe('Notebook', () => {
   describe('destruction', () => {
     it('should remove the frame', () => {
       const notebook = createNotebook();
+      const hostDocument = notebook.element;
+
       // Make sure the frame is created
       notebook.show();
+      assert.isNotNull(hostDocument.querySelector('hypothesis-notebook'));
 
       notebook.destroy();
 
-      assert.equal(notebook.frame.parentElement, null);
+      assert.isNull(hostDocument.querySelector('hypothesis-notebook'));
     });
   });
 });

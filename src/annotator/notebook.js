@@ -1,5 +1,6 @@
 import Delegator from './delegator';
 import { createSidebarConfig } from './config/sidebar';
+import { createShadowRoot } from './util/shadow-root';
 
 /**
  * Create the iframe that will load the notebook application.
@@ -34,9 +35,21 @@ export default class Notebook extends Delegator {
     this._groupId = null;
     this._prevGroupId = null;
 
-    this.container = document.createElement('hypothesis-notebook');
-    this.container.style.display = 'none';
-    this.container.className = 'notebook-outer';
+    /**
+     * Un-styled shadow host for the notebook content.
+     *
+     * This isolates the notebook from the page's styles.
+     */
+    this._outerContainer = document.createElement('hypothesis-notebook');
+    this.element.appendChild(this._outerContainer);
+
+    /**
+     * Lazily-initialized container for the notebook iframe. This is only created
+     * when the notebook is actually used.
+     *
+     * @type {HTMLElement|null}
+     */
+    this.container = null;
 
     this.subscribe('showNotebook', groupId => {
       this._groupId = groupId;
@@ -48,6 +61,8 @@ export default class Notebook extends Delegator {
   }
 
   _update() {
+    const container = this._initContainer();
+
     // Create a new iFrame if we don't have one at all yet, or if the
     // groupId has changed since last use
     const needIframe =
@@ -57,23 +72,39 @@ export default class Notebook extends Delegator {
     if (needIframe) {
       this.frame?.remove();
       this.frame = createNotebookFrame(this.options, this._groupId);
-      this.container.appendChild(this.frame);
-      this.element.appendChild(this.container);
+      container.appendChild(this.frame);
     }
   }
 
   show() {
+    const container = this._initContainer();
     this._update();
-    this.container.classList.add('is-open');
-    this.container.style.display = '';
+    container.classList.add('is-open');
+    container.style.display = '';
   }
 
   hide() {
-    this.container.classList.remove('is-open');
-    this.container.style.display = 'none';
+    if (this.container) {
+      this.container.classList.remove('is-open');
+      this.container.style.display = 'none';
+    }
   }
 
   destroy() {
-    this.frame?.remove();
+    this._outerContainer.remove();
+  }
+
+  _initContainer() {
+    if (this.container) {
+      return this.container;
+    }
+
+    const shadowRoot = createShadowRoot(this._outerContainer);
+    this.container = document.createElement('div');
+    this.container.style.display = 'none';
+    this.container.className = 'notebook-outer';
+    shadowRoot.appendChild(this.container);
+
+    return this.container;
   }
 }
