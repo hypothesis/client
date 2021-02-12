@@ -12,8 +12,8 @@
 @use '@hypothesis/frontend-shared/styles';
 
 // Annotator-specific components.
-@use './components/adder';
-@use './components/toolbar';
+@use './components/Adder';
+@use './components/Toolbar';
 @use './bucket-bar';
 @use './highlights';
 @use './notebook';
