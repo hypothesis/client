@@ -32,9 +32,9 @@ describe('annotator/util/shadow-root', () => {
     it('injects stylesheets into the shadow root', () => {
       createShadowRoot(container);
 
-      const styleEl = container.shadowRoot.querySelector('style');
-      assert.ok(styleEl);
-      assert.match(styleEl.textContent, /@import ".*annotator\.css.*"/);
+      const linkEl = container.shadowRoot.querySelector('link[rel=stylesheet]');
+      assert.ok(linkEl);
+      assert.include(linkEl.href, 'annotator.css');
     });
 
     it('applies the applyFocusVisiblePolyfill if exists', () => {
@@ -52,8 +52,8 @@ describe('annotator/util/shadow-root', () => {
 
       createShadowRoot(container);
 
-      const styleEl = container.shadowRoot.querySelector('style');
-      assert.isNull(styleEl);
+      const linkEl = container.shadowRoot.querySelector('link[rel=stylesheet]');
+      assert.isNull(linkEl);
       link.setAttribute('rel', 'stylesheet');
     });
   });
