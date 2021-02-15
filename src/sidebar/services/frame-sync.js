@@ -114,7 +114,7 @@ export default function FrameSync(annotationsService, bridge, store) {
       // and delete the (unsaved) annotation so it gets un-selected in the
       // target document
       if (!store.isLoggedIn()) {
-        bridge.call('showSidebar');
+        bridge.call('openSidebar');
         store.openSidebarPanel('loginPrompt');
         bridge.call('deleteAnnotation', formatAnnot(annot));
         return;
@@ -167,11 +167,11 @@ export default function FrameSync(annotationsService, bridge, store) {
     });
 
     // These invoke the matching methods by name on the Guests
-    bridge.on('showSidebar', function () {
-      bridge.call('showSidebar');
+    bridge.on('openSidebar', function () {
+      bridge.call('openSidebar');
     });
-    bridge.on('hideSidebar', function () {
-      bridge.call('hideSidebar');
+    bridge.on('closeSidebar', function () {
+      bridge.call('closeSidebar');
     });
     bridge.on('setVisibleHighlights', function (state) {
       bridge.call('setVisibleHighlights', state);
