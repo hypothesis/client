@@ -129,14 +129,14 @@ export default class Sidebar extends Guest {
       config.query ||
       config.group
     ) {
-      this.subscribe('panelReady', () => this.show());
+      this.subscribe('panelReady', () => this.open());
     }
 
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
       createAnnotation: () => this.createAnnotation(),
-      setSidebarOpen: open => (open ? this.show() : this.hide()),
+      setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setAllVisibleHighlights(show),
     });
     this.toolbar.useMinimalControls = config.theme === 'clean';
@@ -161,7 +161,7 @@ export default class Sidebar extends Guest {
       final: /** @type {number|null} */ (null),
     };
     this._setupGestures();
-    this.hide();
+    this.close();
 
     // Publisher-provided callback functions
     const [serviceConfig] = config.services || [];
@@ -207,21 +207,21 @@ export default class Sidebar extends Guest {
 
   _setupSidebarEvents() {
     annotationCounts(document.body, this.crossframe);
-    sidebarTrigger(document.body, () => this.show());
+    sidebarTrigger(document.body, () => this.open());
     features.init(this.crossframe);
 
-    this.crossframe.on('showSidebar', () => this.show());
-    this.crossframe.on('hideSidebar', () => this.hide());
+    this.crossframe.on('openSidebar', () => this.open());
+    this.crossframe.on('closeSidebar', () => this.close());
 
     // Re-publish the crossframe event so that anything extending Delegator
     // can subscribe to it (without need for crossframe)
-    this.crossframe.on('showNotebook', groupId => {
-      this.hide();
-      this.publish('showNotebook', [groupId]);
+    this.crossframe.on('openNotebook', groupId => {
+      this.close();
+      this.publish('openNotebook', [groupId]);
     });
-    this.crossframe.on('hideNotebook', () => {
-      this.show();
-      this.publish('hideNotebook');
+    this.crossframe.on('closeNotebook', () => {
+      this.open();
+      this.publish('closeNotebook');
     });
 
     const eventHandlers = [
@@ -347,9 +347,9 @@ export default class Sidebar extends Guest {
   _onResize() {
     if (this.toolbar.sidebarOpen === true) {
       if (window.innerWidth < MIN_RESIZE) {
-        this.hide();
+        this.close();
       } else {
-        this.show();
+        this.open();
       }
     }
   }
@@ -386,9 +386,9 @@ export default class Sidebar extends Guest {
           this._gestureState.final === null ||
           this._gestureState.final <= -MIN_RESIZE
         ) {
-          this.show();
+          this.open();
         } else {
-          this.hide();
+          this.close();
         }
         this._resetGestureState();
         break;
@@ -407,7 +407,7 @@ export default class Sidebar extends Guest {
     }
   }
 
-  show() {
+  open() {
     this.crossframe.call('sidebarOpened');
     this.publish('sidebarOpened');
 
@@ -426,7 +426,7 @@ export default class Sidebar extends Guest {
     this._notifyOfLayoutChange(true);
   }
 
-  hide() {
+  close() {
     if (this.frame) {
       this.frame.style.marginLeft = '';
       this.frame.classList.add('annotator-collapsed');
