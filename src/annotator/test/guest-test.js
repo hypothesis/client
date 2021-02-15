@@ -450,7 +450,7 @@ describe('Guest', () => {
     it('hides sidebar when the user taps or clicks in the page', () => {
       for (let event of ['click', 'touchstart']) {
         rootElement.dispatchEvent(new Event(event));
-        assert.calledWith(guest.plugins.CrossFrame.call, 'hideSidebar');
+        assert.calledWith(guest.plugins.CrossFrame.call, 'closeSidebar');
       }
     });
 
@@ -565,7 +565,7 @@ describe('Guest', () => {
 
       FakeAdder.instance.options.onShowAnnotations([{ $tag: 'ann1' }]);
 
-      assert.calledWith(fakeCrossFrame.call, 'showSidebar');
+      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
       assert.calledWith(fakeCrossFrame.call, 'showAnnotations', ['ann1']);
     }));
 

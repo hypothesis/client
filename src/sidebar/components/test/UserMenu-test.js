@@ -204,7 +204,7 @@ describe('UserMenu', () => {
         const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
         openNotebookItem.props().onClick();
         assert.calledOnce(fakeBridge.call);
-        assert.calledWith(fakeBridge.call, 'showNotebook', 'mygroup');
+        assert.calledWith(fakeBridge.call, 'openNotebook', 'mygroup');
       });
     });
 
