@@ -2,14 +2,6 @@ import { isNodeInRange } from './range-util';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
 
-function isCSSPropertySupported(property, value) {
-  if (typeof CSS !== 'function' || typeof CSS.supports !== 'function') {
-    /* istanbul ignore next */
-    return false;
-  }
-  return CSS.supports(property, value);
-}
-
 /**
  * Return the canvas element underneath a highlight element in a PDF page's
  * text layer.
@@ -71,10 +63,7 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
     '.hypothesis-highlight-layer'
   );
 
-  const isCssBlendSupported = isCSSPropertySupported(
-    'mix-blend-mode',
-    'multiply'
-  );
+  const isCssBlendSupported = CSS.supports('mix-blend-mode', 'multiply');
 
   if (!svgHighlightLayer) {
     // Create SVG layer. This must be in the same stacking context as
