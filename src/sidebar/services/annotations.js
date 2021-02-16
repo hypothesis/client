@@ -188,6 +188,8 @@ export default function annotationsService(api, store) {
       store.annotationSaveFinished(annotation);
     }
 
+    console.log('SiteSettings---', (window || global || self || {SiteSettings: undefined}).SiteSettings);
+
     Object.keys(annotation).forEach(key => {
       if (key[0] === '$') {
         savedAnnotation[key] = annotation[key];
