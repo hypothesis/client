@@ -65,28 +65,3 @@
   width: 100%;
   border-radius: 0;
 }
-
-// TODO: Deprecate
-@mixin primary-action-btn {
-  @include focus.outline-on-keyboard-focus;
-  @include utils.font--medium;
-  color: var.$grey-1;
-  background-color: var.$grey-mid;
-  height: 35px;
-  border: none;
-  border-radius: var.$border-radius;
-
-  font-weight: bold;
-
-  padding-left: 12px;
-  padding-right: 12px;
-
-  &:disabled {
-    // NB: This doesn't allow for enough contrast ratio to meet WCAG AA requirements
-    color: var.$grey-semi;
-  }
-
-  &:hover:enabled {
-    background-color: var.$grey-6;
-  }
-}
