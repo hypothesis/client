@@ -187,14 +187,14 @@ export default function annotationsService(api, store) {
     } finally {
       store.annotationSaveFinished(annotation);
     }
+    /*eslint-disable */
     // @ts-ignore
     console.log(
-      // eslint-disable-line
       'SiteSettings---',
       // @ts-ignore
-      (window || global || self || { SiteSettings: undefined }).SiteSettings // eslint-disable-line
-    ); // eslint-disable-line
-
+      (window || global || self || { SiteSettings: undefined }).SiteSettings
+    );
+    /*eslint-enable */
     Object.keys(annotation).forEach(key => {
       if (key[0] === '$') {
         savedAnnotation[key] = annotation[key];
