@@ -1,7 +1,8 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../variables" as var;
 @use "./buttons";
 @use "./layout";
-@use "./utils";
 
 /**
  * A straightforward "frame" that serves as a basis for other card-like

@@ -1,7 +1,8 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../mixins/buttons";
 @use "../mixins/layout";
 @use "../mixins/molecules";
-@use "../mixins/utils";
 @use '../variables' as var;
 
 $adder-transition-duration: 80ms;

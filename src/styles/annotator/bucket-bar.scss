@@ -1,6 +1,7 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../mixins/buttons";
 @use "../mixins/reset";
-@use "../mixins/utils";
 @use "../variables" as var;
 
 // Bucket-bar styles are nested inside `.annotator-frame` to ensure they take

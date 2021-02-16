@@ -58,8 +58,9 @@
 
 // Top-level styles
 // ----------------
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use '../variables' as var;
-@use '../mixins/utils';
 
 body {
   @include utils.font--medium;

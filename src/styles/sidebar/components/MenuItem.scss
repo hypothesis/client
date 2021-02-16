@@ -1,8 +1,8 @@
 @use "@hypothesis/frontend-shared/styles/mixins/focus";
-
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
 @use "sass:color";
+
 @use "../../mixins/layout";
-@use "../../mixins/utils";
 @use "../../variables" as var;
 
 $MenuItem-padding: 10px;

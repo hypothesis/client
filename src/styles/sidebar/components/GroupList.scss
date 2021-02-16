@@ -1,5 +1,6 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../../variables" as var;
-@use "../../mixins/utils";
 
 .GroupList__content {
   min-width: 250px;

@@ -1,5 +1,6 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../../mixins/responsive";
-@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .NotebookView {

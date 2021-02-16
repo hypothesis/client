@@ -1,7 +1,8 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../mixins/layout";
-@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .AnnotationHeader {

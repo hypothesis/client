@@ -1,8 +1,9 @@
-@use "../../variables" as var;
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../../mixins/buttons";
 @use "../../mixins/forms";
 @use "../../mixins/molecules";
-@use "../../mixins/utils";
+@use "../../variables" as var;
 
 .ShareAnnotationsPanel {
   color: var.$color-text--light;

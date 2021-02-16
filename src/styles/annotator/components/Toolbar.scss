@@ -1,10 +1,9 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
 @use "sass:color";
 
 @use '../variables' as var;
-
 @use '../mixins/buttons';
 @use '../mixins/layout';
-@use '../mixins/utils';
 
 // note: These components CSS classes are nested inside
 // .annotator-frame to avoid being overridden by the

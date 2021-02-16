@@ -1,6 +1,6 @@
 @use "@hypothesis/frontend-shared/styles/mixins/focus";
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
 
-@use "./utils";
 @use "../variables" as var;
 
 /* Style input placeholders */

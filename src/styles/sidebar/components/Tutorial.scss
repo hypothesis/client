@@ -1,6 +1,7 @@
+@use "@hypothesis/frontend-shared/styles/mixins/utils";
+
 @use "../../variables" as var;
 @use "../../mixins/layout";
-@use "../../mixins/utils";
 
 .Tutorial {
   &__list {
