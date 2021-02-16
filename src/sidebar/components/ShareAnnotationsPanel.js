@@ -2,7 +2,7 @@ import { SvgIcon } from '@hypothesis/frontend-shared';
 import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
-import { pageSharingLink } from '../helpers/annotation-sharing';
+// import { pageSharingLink } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
 import { notNull } from '../util/typing';
@@ -39,9 +39,9 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   // and is available to be copied to clipboard
   const shareURI = ((frame, group) => {
     return group && frame
-      ? `https://ec2co-ecsel-dii7haomvslr-157781352.eu-west-2.elb.amazonaws.com/go?url=${encodeURIComponent(frame.uri)}&group=${
-          group.id
-        }`
+      ? `https://ec2co-ecsel-dii7haomvslr-157781352.eu-west-2.elb.amazonaws.com/go?url=${encodeURIComponent(
+          frame.uri
+        )}&group=${group.id}`
       : '';
   })(mainFrame, focusedGroup);
   // To be able to concoct a sharing link, a focused group and frame need to
@@ -51,7 +51,6 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   // const shareURI =
   //   sharingReady &&
   //   pageSharingLink(notNull(mainFrame).uri, notNull(focusedGroup).id);
-
 
   const copyShareLink = () => {
     try {

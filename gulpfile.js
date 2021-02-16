@@ -252,7 +252,7 @@ let isFirstBuild = true;
  * @param {Object} options - Options for generating the boot script
  */
 function generateBootScript(manifest, { usingDevServer = false } = {}) {
-  const { version } = require('./package.json');
+  // const { version } = require('./package.json');
 
   const defaultNotebookAppUrl = process.env.NOTEBOOK_APP_URL
     ? `${process.env.NOTEBOOK_APP_URL}`
