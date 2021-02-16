@@ -188,7 +188,8 @@ export default function annotationsService(api, store) {
       store.annotationSaveFinished(annotation);
     }
     // @ts-ignore
-    console.log( // eslint-disable-line
+    console.log(
+      // eslint-disable-line
       'SiteSettings---',
       // @ts-ignore
       (window || global || self || { SiteSettings: undefined }).SiteSettings // eslint-disable-line
