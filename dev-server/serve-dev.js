@@ -119,6 +119,14 @@ function serveDev(port, config) {
     }
   });
 
+  // Serve UI component playground
+  app.get('/ui-playground/:path?', (req, res) => {
+    res.render('ui-playground', {
+      resourceRoot:
+        'http://localhost:3001/hypothesis/1.0.0-dummy-version/build',
+    });
+  });
+
   // Nothing else matches: this is a 404
   app.use((req, res) => {
     res.render('404', templateContext(config));

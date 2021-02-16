@@ -1,0 +1,52 @@
+$title-font: 20pt;
+$background-color: #ededed;
+
+// Utilities
+.u-center {
+  align-self: center;
+}
+
+// Component styles
+.PlaygroundApp {
+  display: flex;
+  flex-direction: row;
+
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  min-height: 90vh;
+}
+
+.PlaygroundApp__sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: $background-color;
+  border-radius: 3px;
+  margin-right: 10px;
+}
+
+.PlaygroundApp__nav-link {
+  padding: 5px;
+  font-size: 12pt;
+
+  &:hover {
+    background-color: #ddd;
+  }
+}
+
+.PlaygroundApp__content {
+  flex-grow: 1;
+}
+
+.heading {
+  font-size: $title-font;
+  border-bottom: 2px solid $background-color;
+  margin-bottom: 20px;
+}
+
+// Element styles
+body {
+  font-family: sans-serif;
+}

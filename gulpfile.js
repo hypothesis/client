@@ -101,6 +101,12 @@ const appBundles = [
     entry: './src/annotator/index',
     transforms: ['babel'],
   },
+  {
+    // A web app to assist with testing UI components.
+    name: 'ui-playground',
+    entry: './dev-server/ui-playground/index',
+    transforms: ['babel'],
+  },
 ];
 
 // Polyfill bundles. Polyfills are grouped into "sets" (one bundle per set)
@@ -170,13 +176,16 @@ gulp.task(
 );
 
 const cssBundles = [
-  // H
+  // Hypothesis client
   './src/styles/annotator/annotator.scss',
   './src/styles/annotator/pdfjs-overrides.scss',
   './src/styles/sidebar/sidebar.scss',
 
   // Vendor
   './node_modules/katex/dist/katex.min.css',
+
+  // Development tools
+  './src/styles/ui-playground/ui-playground.scss',
 ];
 
 gulp.task('build-css', function () {
