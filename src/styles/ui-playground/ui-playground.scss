@@ -1,6 +1,34 @@
-$title-font: 20pt;
-$background-color: #ededed;
+@use '../reset';
+@use '../sidebar/elements';
+@use '../mixins/layout';
+@use '../variables' as var;
 
+@use '../sidebar/components/Buttons';
+
+$title-font: 20pt;
+$background-color: #9b9595;
+
+body {
+  font-size: 100%;
+}
+
+h1 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+h2 {
+  font-size: 1.25em;
+  font-weight: bold;
+  margin: 1em 0;
+}
+
+h3 {
+  font-size: 1.125em;
+  font-weight: bold;
+  margin: 1em 0;
+}
 // Utilities
 .u-center {
   align-self: center;
@@ -8,45 +36,92 @@ $background-color: #ededed;
 
 // Component styles
 .PlaygroundApp {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-areas:
+    'navigation'
+    'content';
 
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  min-height: 90vh;
-}
+  &__content {
+    padding: var.$layout-space;
+  }
 
-.PlaygroundApp__sidebar {
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  background-color: $background-color;
-  border-radius: 3px;
-  margin-right: 10px;
-}
+  &__sidebar {
+    grid-area: 'navigation';
+    max-height: 20em;
+    overflow: scroll;
+    background-color: var.$grey-2;
+  }
 
-.PlaygroundApp__nav-link {
-  padding: 5px;
-  font-size: 12pt;
+  &__sidebar-home {
+    text-align: center;
+    padding: var.$layout-space;
+  }
 
-  &:hover {
-    background-color: #ddd;
+  &__content {
+    grid-area: 'content';
   }
 }
 
-.PlaygroundApp__content {
-  flex-grow: 1;
+.PlaygroundApp__nav-link {
+  width: 100%;
+  padding: var.$layout-space;
+  font-size: var.$font-size--subheading;
+  border-left: 5px solid transparent;
+  &:hover {
+    background-color: var.$grey-3;
+    border-left: 5px solid var.$color-brand;
+  }
 }
 
-.heading {
-  font-size: $title-font;
-  border-bottom: 2px solid $background-color;
-  margin-bottom: 20px;
+// Temporarily enforce the body font size of the client to demonstrate how
+// components would scale in-situ
+.ComponentSection__wrapper {
+  font-size: 13px;
+}
+
+.ComponentTable {
+  display: grid;
+  border-collapse: collapse;
+
+  grid-template-columns:
+    minmax(auto, auto)
+    minmax(20em, 1.67fr);
+
+  thead,
+  tbody,
+  tr {
+    display: contents;
+  }
+
+  th,
+  td {
+    padding: 0.5em;
+  }
+
+  td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  tr:nth-child(even) td {
+    background: var.$grey-0;
+  }
 }
 
 // Element styles
 body {
   font-family: sans-serif;
+}
+
+@media screen and (min-width: 60em) {
+  .PlaygroundApp {
+    height: 100vh;
+    grid-template-columns: 20em auto;
+    column-gap: 1em;
+    grid-template-areas: 'navigation content';
+
+    &__sidebar {
+      max-height: none;
+    }
+  }
 }
