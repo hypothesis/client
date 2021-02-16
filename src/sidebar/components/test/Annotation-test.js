@@ -294,8 +294,6 @@ describe('Annotation', () => {
 
         assert.isFalse(toggle.exists());
       });
-
-      it('should not render other annotation sub-components');
     });
   });
 
