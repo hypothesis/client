@@ -1,6 +1,3 @@
-@use '../variables' as var;
-@use '../mixins/utils';
-
 // Base styles
 // -----------
 @use '../reset';
@@ -61,6 +58,8 @@
 
 // Top-level styles
 // ----------------
+@use '../variables' as var;
+@use '../mixins/utils';
 
 body {
   @include utils.font--medium;
