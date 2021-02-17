@@ -1,0 +1,57 @@
+@use '../../mixins/buttons';
+@use "../../mixins/layout";
+@use "../../mixins/utils";
+@use "../../variables" as var;
+
+.PaginationNavigation {
+  @include utils.font--large;
+
+  // Lay out page navigation buttons horizontally as:
+  // | prevPage  |       numberedPages          | nextPage
+  //
+  // e.g.
+  // | [<- prev] | [2] ... [5] [6] [7] ... [10] | [next ->] |
+  display: grid;
+  grid-template-columns: 8em auto 8em;
+  align-items: center;
+  grid-template-areas: 'prevPage numberedPages nextPage';
+
+  &__prev {
+    grid-area: prevPage;
+  }
+
+  &__next {
+    grid-area: nextPage;
+    justify-self: end;
+  }
+
+  &__pages {
+    grid-area: numberedPages;
+    @include layout.row($justify: center, $align: center);
+  }
+
+  &__button,
+  &__page-button {
+    @include buttons.button--labeled(
+      $background-color: transparent,
+      $active-background-color: var.$grey-3
+    );
+  }
+
+  &__page-button {
+    margin: var.$layout-space--xxsmall;
+    padding: var.$layout-space--small var.$layout-space;
+
+    &[aria-pressed='true'] {
+      background-color: var.$grey-3;
+    }
+  }
+
+  &__button-right {
+    // FIXME Button SVG margins assume that the icon is on the left
+    svg {
+      margin-left: var.$layout-space--xxsmall;
+    }
+    padding-right: var.$layout-space--xxsmall;
+  }
+}

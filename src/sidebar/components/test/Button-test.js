@@ -34,6 +34,23 @@ describe('Button', () => {
     assert.equal(wrapper.find('SvgIcon').prop('name'), 'fakeIcon');
   });
 
+  it('positions `SvgIcon` left (first) by default', () => {
+    const wrapper = createComponent({ buttonText: 'My Button' });
+
+    assert.isTrue(wrapper.find('button').childAt(0).is('SvgIcon'));
+    assert.equal(wrapper.find('button').childAt(1).text(), 'My Button');
+  });
+
+  it('positions `SvgIcon` right (second) with `iconPosition` prop', () => {
+    const wrapper = createComponent({
+      buttonText: 'My Button',
+      iconPosition: 'right',
+    });
+
+    assert.equal(wrapper.find('button').childAt(0).text(), 'My Button');
+    assert.isTrue(wrapper.find('button').childAt(1).is('SvgIcon'));
+  });
+
   [true, false].forEach(isExpanded => {
     it('sets `aria-expanded` attribute if `isExpanded` is a boolean', () => {
       const wrapper = createComponent({ isExpanded });

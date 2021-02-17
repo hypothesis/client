@@ -1,6 +1,6 @@
 import { createRef, render } from 'preact';
 
-import Toolbar from './components/toolbar';
+import Toolbar from './components/Toolbar';
 
 /**
  * @typedef ToolbarOptions
