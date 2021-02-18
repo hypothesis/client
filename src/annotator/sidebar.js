@@ -237,13 +237,14 @@ export default class Sidebar extends Delegator {
 
     // Re-publish the crossframe event so that anything extending Delegator
     // can subscribe to it (without need for crossframe)
-    this.guest.crossframe.on('openNotebook', groupId => {
-      this.close();
+    this.guest.crossframe.on('openNotebook', (
+      /** @type {string} */ groupId
+    ) => {
+      this.hide();
       this.publish('openNotebook', [groupId]);
     });
-    this.guest.crossframe.on('closeNotebook', () => {
-      this.open();
-      this.publish('closeNotebook');
+    this.subscribe('closeNotebook', () => {
+      this.show();
     });
 
     const eventHandlers = [
@@ -471,5 +472,23 @@ export default class Sidebar extends Delegator {
    */
   setAllVisibleHighlights(shouldShowHighlights) {
     this.guest.crossframe.call('setVisibleHighlights', shouldShowHighlights);
+  }
+
+  /**
+   * Shows the sidebar's controls
+   */
+  show() {
+    if (this.iframeContainer) {
+      this.iframeContainer.classList.remove('is-hidden');
+    }
+  }
+
+  /**
+   * Hides the sidebar's controls
+   */
+  hide() {
+    if (this.iframeContainer) {
+      this.iframeContainer.classList.add('is-hidden');
+    }
   }
 }
