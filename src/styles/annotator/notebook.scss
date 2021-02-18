@@ -1,16 +1,19 @@
 @use '../variables' as var;
 @use '../mixins/molecules';
+@use "../mixins/buttons";
 
 .notebook-outer {
   box-sizing: border-box;
   position: fixed;
+  // This large zIndex is used to bring the notebook to the front, so it is not
+  // hidden by other elements from the host page. It is the same value used by
+  // the sidebar
+  z-index: 2147483647;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   padding: var.$layout-space;
-  // Leave explicitly the right amount of room for closed-sidebar affordances
-  padding-right: var.$annotator-toolbar-width + 5px;
 
   &.is-open {
     // TBD: Actual opacity/overlay we'd like to use
@@ -24,4 +27,30 @@
   padding: 0;
   width: 100%;
   height: 100%;
+
+  // FIXME: these properties produce a visual break between the Notebook__controller-bar and the iframe.
+  // A better approach would be if the Notebook__controller-bar and iframe could be children of notebook-inner.
+  border: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+// This container element has the purpose of pushing children to the right side.
+.Notebook__controller-bar {
+  font-size: var.$font-size--large;
+  display: flex;
+  justify-content: flex-end;
+  background-color: var.$grey-2;
+  padding: var.$layout-space--xsmall;
+
+  // FIXME: these properties emulates as if the Notebook__controller-bar would be part of the iframe.
+  border-top-left-radius: var.$border-radius;
+  border-top-right-radius: var.$border-radius;
+}
+
+.Notebook__close-button {
+  @include buttons.button--labeled(
+    $background-color: var.$grey-2,
+    $active-background-color: var.$grey-3
+  );
 }

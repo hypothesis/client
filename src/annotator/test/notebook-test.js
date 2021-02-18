@@ -114,6 +114,20 @@ describe('Notebook', () => {
     });
   });
 
+  describe('responding to user input', () => {
+    it('closes the notebook when close button clicked', () => {
+      const notebook = createNotebook();
+
+      notebook.open();
+
+      const button = notebook.container.getElementsByClassName(
+        'Notebook__close-button'
+      )[0];
+      button.click();
+      assert.equal(notebook.container.style.display, 'none');
+    });
+  });
+
   describe('responding to events', () => {
     it('opens on `openNotebook`', () => {
       const notebook = createNotebook();
@@ -121,15 +135,6 @@ describe('Notebook', () => {
       notebook.publish('openNotebook');
 
       assert.equal(notebook.container.style.display, '');
-    });
-
-    it('closes on `closeNotebook`', () => {
-      const notebook = createNotebook();
-
-      notebook.open();
-      notebook.publish('closeNotebook');
-
-      assert.equal(notebook.container.style.display, 'none');
     });
 
     it('closes on "sidebarOpened"', () => {
