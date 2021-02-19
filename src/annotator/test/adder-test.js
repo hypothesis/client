@@ -84,7 +84,7 @@ describe('Adder', () => {
     new Adder(adderEl, adderCallbacks);
 
     assert.called(adderEl.attachShadow);
-    assert.isTrue(shadowEl.childNodes[0].classList.contains('annotator-adder'));
+    assert.isTrue(shadowEl.childNodes[0].classList.contains('AdderToolbar'));
 
     adderEl.remove();
   });

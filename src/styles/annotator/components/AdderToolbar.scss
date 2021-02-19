@@ -8,7 +8,7 @@ $adder-transition-duration: 80ms;
 
 // Main class for the root element of the "adder" toolbar that appears when the
 // user makes a text selection.
-.annotator-adder {
+.AdderToolbar {
   // Reset all inherited properties to their initial values. This prevents CSS
   // property values from the host page being inherited by elements of the
   // Adder, even when using Shadow DOM.
@@ -49,7 +49,7 @@ $adder-transition-duration: 80ms;
   }
 }
 
-.annotator-adder-arrow {
+.AdderToolbar__arrow {
   @include molecules.menu-arrow;
   // Horizontal centering, part 1
   left: 50%;
@@ -74,11 +74,11 @@ $adder-transition-duration: 80ms;
   }
 }
 
-.annotator-adder-actions {
+.AdderToolbar__actions {
   @include layout.row;
 }
 
-.annotator-adder-button {
+.AdderToolbar__button {
   @include layout.column($align: center);
   @include buttons.reset-native-btn-styles;
 
@@ -88,25 +88,25 @@ $adder-transition-duration: 80ms;
   line-height: var.$annotator-adder-line-height;
   padding: var.$layout-space--small;
   transition: color $adder-transition-duration;
-
-  &__label {
-    margin-top: var.$layout-space--xxsmall;
-    transition: color $adder-transition-duration;
-  }
-
-  &__badge {
-    // The badge should be vertically aligned with icons in other toolbar buttons
-    // and the label underneath should also align with labels in other buttons.
-    background-color: var.$grey-mid;
-    border-radius: var.$annotator-border-radius;
-    color: var.$color-text--inverted;
-    font-weight: bold;
-    // For positioning the number appropriately withint the badge background
-    padding: 2px 4px;
-  }
 }
 
-.annotator-adder-actions__separator {
+.AdderToolbar__label {
+  margin-top: var.$layout-space--xxsmall;
+  transition: color $adder-transition-duration;
+}
+
+.AdderToolbar__badge {
+  // The badge should be vertically aligned with icons in other toolbar buttons
+  // and the label underneath should also align with labels in other buttons.
+  background-color: var.$grey-mid;
+  border-radius: var.$annotator-border-radius;
+  color: var.$color-text--inverted;
+  font-weight: bold;
+  // For positioning the number appropriately withint the badge background
+  padding: 2px 4px;
+}
+
+.AdderToolbar__separator {
   margin: var.$layout-space--xxsmall;
   @include utils.border--right;
   // Override border color to be a little darker
@@ -115,11 +115,11 @@ $adder-transition-duration: 80ms;
 
 // The toolbar has full contrast when not hovered. When the toolbar is hovered,
 // the buttons are dimmed except for the one which is currently hovered.
-.annotator-adder-actions:hover {
-  .annotator-adder-button:not(:hover) {
+.AdderToolbar__actions:hover {
+  .AdderToolbar__button:not(:hover) {
     color: var.$grey-semi;
 
-    .annotator-adder-button__badge {
+    .AdderToolbar__badge {
       background-color: var.$grey-semi;
     }
   }
