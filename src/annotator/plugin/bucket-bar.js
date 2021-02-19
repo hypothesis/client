@@ -5,10 +5,18 @@ import Buckets from '../components/Buckets';
 
 import { anchorBuckets } from '../util/buckets';
 
+/**
+ * @typedef RegisteredListener
+ * @prop {Window|HTMLElement} eventTarget
+ * @prop {string} eventType
+ * @prop {(event: any) => void} listener
+ */
+
 export default class BucketBar extends Delegator {
   constructor(element, options, annotator) {
     const defaultOptions = {
       // Selectors for the scrollable elements on the page
+      /** @type {string[]} */
       scrollables: [],
     };
 
@@ -41,27 +49,38 @@ export default class BucketBar extends Delegator {
     }
     container.appendChild(this.element);
 
-    this.updateFunc = () => this.update();
+    /** @type {RegisteredListener[]} */
+    this.registeredListeners = [];
 
-    window.addEventListener('resize', this.updateFunc);
-    window.addEventListener('scroll', this.updateFunc);
-    this.options.scrollables.forEach(scrollable => {
-      const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
-        scrollable
-      ));
-      scrollableElement?.addEventListener('scroll', this.updateFunc);
-    });
+    this._registerEvent(window, 'resize', () => this.update());
+    this._registerEvent(window, 'scroll', () => this.update());
+    this.options.scrollables
+      .map((/** @type {string} */ selector) => document.querySelector(selector))
+      .filter(Boolean)
+      .map(scrollableElement =>
+        this._registerEvent(scrollableElement, 'scroll', () => this.update())
+      );
   }
 
   destroy() {
-    window.removeEventListener('resize', this.updateFunc);
-    window.removeEventListener('scroll', this.updateFunc);
-    this.options.scrollables.forEach(scrollable => {
-      const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
-        scrollable
-      ));
-      scrollableElement?.removeEventListener('scroll', this.updateFunc);
+    this._unregisterEvents();
+  }
+
+  /**
+   * @param {Window|HTMLElement} eventTarget
+   * @param {string} eventType
+   * @param {(event: any) => void} listener
+   */
+  _registerEvent(eventTarget, eventType, listener) {
+    eventTarget.addEventListener(eventType, listener);
+    this.registeredListeners.push({ eventTarget, eventType, listener });
+  }
+
+  _unregisterEvents() {
+    this.registeredListeners.forEach(({ eventTarget, eventType, listener }) => {
+      eventTarget.removeEventListener(eventType, listener);
     });
+    this.registeredListeners = [];
   }
 
   update() {
