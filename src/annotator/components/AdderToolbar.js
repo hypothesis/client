@@ -19,16 +19,16 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
 
   return (
     <button
-      className="annotator-adder-button"
+      className="AdderToolbar__button"
       onClick={onClick}
       aria-label={title}
       title={title}
     >
-      {icon && <SvgIcon name={icon} className="annotator-adder-button__icon" />}
+      {icon && <SvgIcon name={icon} className="AdderToolbar__icon" />}
       {typeof badgeCount === 'number' && (
-        <span className="annotator-adder-button__badge">{badgeCount}</span>
+        <span className="AdderToolbar__badge">{badgeCount}</span>
       )}
-      <span className="annotator-adder-button__label">{label}</span>
+      <span className="AdderToolbar__label">{label}</span>
     </button>
   );
 }
@@ -91,14 +91,14 @@ export default function AdderToolbar({
   // so that we can compute its size in order to position it before display.
   return (
     <div
-      className={classnames('annotator-adder', {
-        'annotator-adder--down': arrowDirection === 'up',
-        'annotator-adder--up': arrowDirection === 'down',
+      className={classnames('AdderToolbar', {
+        'AdderToolbar--down': arrowDirection === 'up',
+        'AdderToolbar--up': arrowDirection === 'down',
         'is-active': isVisible,
       })}
       style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
-      <div className="annotator-adder-actions">
+      <div className="AdderToolbar__actions">
         <ToolbarButton
           icon="annotate"
           onClick={e => handleCommand(e, 'annotate')}
@@ -111,9 +111,7 @@ export default function AdderToolbar({
           label="Highlight"
           shortcut={highlightShortcut}
         />
-        {annotationCount > 0 && (
-          <div className="annotator-adder-actions__separator" />
-        )}
+        {annotationCount > 0 && <div className="AdderToolbar__separator" />}
         {annotationCount > 0 && (
           <ToolbarButton
             badgeCount={annotationCount}
@@ -126,9 +124,9 @@ export default function AdderToolbar({
       <SvgIcon
         name="pointer"
         inline={true}
-        className={classnames('annotator-adder-arrow', {
-          'annotator-adder-arrow--down': arrowDirection === 'down',
-          'annotator-adder-arrow--up': arrowDirection === 'up',
+        className={classnames('AdderToolbar__arrow', {
+          'AdderToolbar__arrow--down': arrowDirection === 'down',
+          'AdderToolbar__arrow--up': arrowDirection === 'up',
         })}
       />
     </div>
