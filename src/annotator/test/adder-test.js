@@ -84,10 +84,7 @@ describe('Adder', () => {
     new Adder(adderEl, adderCallbacks);
 
     assert.called(adderEl.attachShadow);
-    assert.equal(
-      shadowEl.childNodes[0].tagName.toLowerCase(),
-      'hypothesis-adder-toolbar'
-    );
+    assert.isTrue(shadowEl.childNodes[0].classList.contains('annotator-adder'));
 
     adderEl.remove();
   });
