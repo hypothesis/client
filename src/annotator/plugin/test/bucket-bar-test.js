@@ -43,34 +43,6 @@ describe('BucketBar', () => {
     sandbox.restore();
   });
 
-  describe('initializing and attaching to the DOM', () => {
-    let containerEl;
-
-    beforeEach(() => {
-      // Any element referenced by `options.container` selector needs to be
-      // present on the `document` before initialization
-      containerEl = document.createElement('div');
-      containerEl.className = 'bucket-bar-container';
-      document.body.appendChild(containerEl);
-      sandbox.stub(console, 'warn'); // Restored in test-global `afterEach`
-    });
-
-    afterEach(() => {
-      containerEl.remove();
-    });
-
-    it('will append its element to any supplied `options.container` selector', () => {
-      bucketBar = createBucketBar({ container: '.bucket-bar-container' });
-      assert.exists(containerEl.querySelector('.annotator-bucket-bar'));
-    });
-
-    it('will append itself to the element passed to constructor if `options.container` non-existent', () => {
-      bucketBar = createBucketBar({ container: '.bucket-bar-nope' });
-      assert.notExists(containerEl.querySelector('.annotator-bucket-bar'));
-      assert.calledOnce(console.warn);
-    });
-  });
-
   describe('updating buckets', () => {
     it('should update buckets when the window is resized', () => {
       bucketBar = createBucketBar();
