@@ -6,7 +6,7 @@ import Buckets from '../components/Buckets';
 import { anchorBuckets } from '../util/buckets';
 
 export default class BucketBar extends Delegator {
-  constructor(element, options, annotator) {
+  constructor(container, options, annotator) {
     const defaultOptions = {
       // Selectors for the scrollable elements on the page
       scrollables: [],
@@ -19,26 +19,6 @@ export default class BucketBar extends Delegator {
     super(el, opts);
 
     this.annotator = annotator;
-
-    // The element to append this plugin's element to; defaults to the provided
-    // `element` unless a `container` option was provided
-    let container = /** @type {HTMLElement} */ (element);
-
-    if (this.options.container) {
-      // If a container element selector has been provided, and there is an
-      // element corresponding to that container — use it
-      const containerEl = /** @type {HTMLElement | null } */ (document.querySelector(
-        this.options.container
-      ));
-      if (containerEl) {
-        container = containerEl;
-      } else {
-        // A container selector has been supplied, but it didn't pan out...
-        console.warn(
-          `Unable to find container element for selector '${this.options.container}'`
-        );
-      }
-    }
     container.appendChild(this.element);
 
     this.updateFunc = () => this.update();
