@@ -90,17 +90,15 @@ export default function AdderToolbar({
   // nb. The adder is hidden using the `visibility` property rather than `display`
   // so that we can compute its size in order to position it before display.
   return (
-    // @ts-ignore - TS doesn't know about our custom element types.
-    <hypothesis-adder-toolbar
-      class={classnames('annotator-adder', {
+    <div
+      className={classnames('annotator-adder', {
         'annotator-adder--down': arrowDirection === 'up',
         'annotator-adder--up': arrowDirection === 'down',
         'is-active': isVisible,
       })}
       style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
-      {/* @ts-ignore */}
-      <hypothesis-adder-actions className="annotator-adder-actions">
+      <div className="annotator-adder-actions">
         <ToolbarButton
           icon="annotate"
           onClick={e => handleCommand(e, 'annotate')}
@@ -124,8 +122,7 @@ export default function AdderToolbar({
             shortcut={showShortcut}
           />
         )}
-        {/* @ts-ignore */}
-      </hypothesis-adder-actions>
+      </div>
       <SvgIcon
         name="pointer"
         inline={true}
@@ -134,8 +131,7 @@ export default function AdderToolbar({
           'annotator-adder-arrow--up': arrowDirection === 'up',
         })}
       />
-      {/* @ts-ignore */}
-    </hypothesis-adder-toolbar>
+    </div>
   );
 }
 
