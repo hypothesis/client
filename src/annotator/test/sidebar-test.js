@@ -117,25 +117,27 @@ describe('Sidebar', () => {
 
     it('starts hidden', () => {
       const sidebar = createSidebar();
-      assert.equal(sidebar.frame.style.display, 'none');
+      assert.equal(sidebar.iframeContainer.style.display, 'none');
     });
 
     it('applies a style if theme is configured as "clean"', () => {
       const sidebar = createSidebar({ theme: 'clean' });
       assert.isTrue(
-        sidebar.frame.classList.contains('annotator-frame--theme-clean')
+        sidebar.iframeContainer.classList.contains(
+          'annotator-frame--theme-clean'
+        )
       );
     });
 
     it('becomes visible when the "panelReady" event fires', () => {
       const sidebar = createSidebar();
       sidebar.publish('panelReady');
-      assert.equal(sidebar.frame.style.display, '');
+      assert.equal(sidebar.iframeContainer.style.display, '');
     });
   });
 
   function getConfigString(sidebar) {
-    return sidebar.frame.querySelector('iframe').src;
+    return sidebar.iframe.src;
   }
 
   function configFragment(config) {
@@ -156,7 +158,7 @@ describe('Sidebar', () => {
 
   context('when a new annotation is created', () => {
     function stubIframeWindow(sidebar) {
-      const iframe = sidebar.frame.querySelector('iframe');
+      const iframe = sidebar.iframe;
       const fakeIframeWindow = { focus: sinon.stub() };
       sinon.stub(iframe, 'contentWindow').get(() => fakeIframeWindow);
       return iframe;
@@ -397,9 +399,9 @@ describe('Sidebar', () => {
         sidebar._onPan({ type: 'panstart' });
 
         assert.isTrue(
-          sidebar.frame.classList.contains('annotator-no-transition')
+          sidebar.iframeContainer.classList.contains('annotator-no-transition')
         );
-        assert.equal(sidebar.frame.style.pointerEvents, 'none');
+        assert.equal(sidebar.iframeContainer.style.pointerEvents, 'none');
       });
 
       it('captures the left margin as the gesture initial state', () => {
@@ -416,9 +418,9 @@ describe('Sidebar', () => {
         sidebar._gestureState = { final: 0 };
         sidebar._onPan({ type: 'panend' });
         assert.isFalse(
-          sidebar.frame.classList.contains('annotator-no-transition')
+          sidebar.iframeContainer.classList.contains('annotator-no-transition')
         );
-        assert.equal(sidebar.frame.style.pointerEvents, '');
+        assert.equal(sidebar.iframeContainer.style.pointerEvents, '');
       });
 
       it('calls `show` if the widget is fully visible', () => {
@@ -500,7 +502,7 @@ describe('Sidebar', () => {
       sidebar.destroy();
       assert.called(fakeCrossFrame.destroy);
       assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
-      assert.equal(sidebar.frame.parentElement, null);
+      assert.equal(sidebar.iframeContainer.parentElement, null);
     });
 
     it('the (non-shadow DOMed) sidebar is destroyed and the frame is detached', () => {
@@ -509,7 +511,7 @@ describe('Sidebar', () => {
       sidebar.destroy();
       assert.called(fakeCrossFrame.destroy);
       assert.notExists(sidebarContainer.querySelector('.annotator-frame'));
-      assert.equal(sidebar.frame.parentElement, null);
+      assert.equal(sidebar.iframeContainer.parentElement, null);
     });
   });
 
@@ -651,7 +653,7 @@ describe('Sidebar', () => {
         // remove info about call that happens on creation of sidebar
         layoutChangeHandlerSpy.reset();
 
-        frame = sidebar.frame;
+        frame = sidebar.iframeContainer;
         Object.assign(frame.style, {
           display: 'block',
           width: DEFAULT_WIDTH + 'px',
@@ -759,6 +761,21 @@ describe('Sidebar', () => {
           width: 0,
         });
       });
+
+      it('removes the iframe from the container when destroyed', () => {
+        sidebar.show();
+        assert.exists(sidebar.iframe.parentElement);
+        sidebar.destroy();
+        assert.notExists(sidebar.iframe.parentElement);
+      });
+
+      it('ignores pan events', () => {
+        sandbox
+          .stub(window, 'getComputedStyle')
+          .returns({ marginLeft: '100px' });
+        sidebar._onPan({ type: 'panstart' });
+        assert.isNull(sidebar._gestureState.initial);
+      });
     });
   });
 
@@ -779,7 +796,7 @@ describe('Sidebar', () => {
     });
 
     it('uses the configured external container as the frame', () => {
-      assert.equal(sidebar.frame, undefined);
+      assert.equal(sidebar.iframeContainer, undefined);
       assert.isDefined(sidebar.externalFrame);
       assert.equal(sidebar.externalFrame, externalFrame);
       assert.equal(externalFrame.childNodes.length, 1);
@@ -802,17 +819,6 @@ describe('Sidebar', () => {
         externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
       assert.isNull(sidebar.bucketBar);
-    });
-
-    it('disables shadow DOM if `disableShadowSidebar` flag is set', () => {
-      createSidebar({
-        disableShadowSidebar: true,
-      });
-      const sidebarContainer = containers[0];
-      assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
-      const sidebar = sidebarContainer.querySelector('.annotator-frame');
-      assert.exists(sidebar);
-      assert.notExists(sidebar.shadowRoot);
     });
   });
 });

@@ -25,7 +25,7 @@ import BucketBar from './bucket-bar';
  * @prop {(event: any) => void} listener
  */
 
-// Minimum width to which the frame can be resized.
+// Minimum width to which the iframeContainer can be resized.
 export const MIN_RESIZE = 280;
 
 /**
@@ -63,52 +63,54 @@ export default class Sidebar extends Guest {
   constructor(element, config) {
     super(element, config);
 
-    let externalFrame;
-    let frame;
-    let hypothesisSidebar; // refers to <hypothesis-sidebar> element
+    this.iframe = createSidebarIframe(config);
 
-    if (config.externalContainerSelector) {
-      externalFrame =
-        document.querySelector(config.externalContainerSelector) || element;
+    const {
+      externalContainerSelector,
+      theme,
+      openSidebar,
+      annotations,
+      query,
+      group,
+    } = config;
+
+    if (externalContainerSelector) {
+      this.externalFrame =
+        /** @type {HTMLElement} */
+        (document.querySelector(externalContainerSelector)) ?? element;
+      this.externalFrame.appendChild(this.iframe);
     } else {
-      frame = document.createElement('div');
-      frame.style.display = 'none';
-      frame.className = 'annotator-frame';
+      this.iframeContainer = document.createElement('div');
+      this.iframeContainer.style.display = 'none';
+      this.iframeContainer.className = 'annotator-frame';
 
-      if (config.theme === 'clean') {
-        frame.classList.add('annotator-frame--theme-clean');
+      if (theme === 'clean') {
+        this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
-        this.bucketBar = new BucketBar(frame, this, config.BucketBar);
+        this.bucketBar = new BucketBar(
+          this.iframeContainer,
+          this,
+          config.BucketBar
+        );
       }
 
-      // Undocumented switch to enable/disable the wrapping of the sidebar inside a shadow DOM
-      // 2021-01-22: remove this switch after the 2021-02-05
-      if (config.disableShadowSidebar) {
-        element.appendChild(frame);
-      } else {
-        // Wrap up the 'frame' element into a shadow DOM so it is not affected by host CSS styles
-        hypothesisSidebar = document.createElement('hypothesis-sidebar');
-        const shadowDom = createShadowRoot(hypothesisSidebar);
-        shadowDom.appendChild(frame);
+      this.iframeContainer.appendChild(this.iframe);
 
-        element.appendChild(hypothesisSidebar);
-      }
+      // Wrap up the 'iframeContainer' element into a shadow DOM so it is not affected by host CSS styles
+      this.hypothesisSidebar = document.createElement('hypothesis-sidebar');
+      const shadowDom = createShadowRoot(this.hypothesisSidebar);
+      shadowDom.appendChild(this.iframeContainer);
+
+      element.appendChild(this.hypothesisSidebar);
     }
-
-    const sidebarFrame = createSidebarIframe(config);
-    (frame || externalFrame).appendChild(sidebarFrame);
 
     /** @type {RegisteredListener[]} */
     this.registeredListeners = [];
 
-    this.externalFrame = externalFrame;
-    this.frame = frame;
-    this.hypothesisSidebar = hypothesisSidebar;
-
     this.subscribe('panelReady', () => {
       // Show the UI
-      if (this.frame) {
-        this.frame.style.display = '';
+      if (this.iframeContainer) {
+        this.iframeContainer.style.display = '';
       }
     });
 
@@ -117,16 +119,11 @@ export default class Sidebar extends Guest {
       // the sidebar so that the text editor can be focused as
       // soon as the annotation card appears
       if (!annotation.$highlight) {
-        /** @type {Window} */ (sidebarFrame.contentWindow).focus();
+        /** @type {Window} */ (this.iframe.contentWindow).focus();
       }
     });
 
-    if (
-      config.openSidebar ||
-      config.annotations ||
-      config.query ||
-      config.group
-    ) {
+    if (openSidebar || annotations || query || group) {
       this.subscribe('panelReady', () => this.show());
     }
 
@@ -137,11 +134,11 @@ export default class Sidebar extends Guest {
       setSidebarOpen: open => (open ? this.show() : this.hide()),
       setHighlightsVisible: show => this.setAllVisibleHighlights(show),
     });
-    this.toolbar.useMinimalControls = config.theme === 'clean';
+    this.toolbar.useMinimalControls = theme === 'clean';
 
-    if (this.frame) {
+    if (this.iframeContainer) {
       // If using our own container frame for the sidebar, add the toolbar to it.
-      this.frame.prepend(toolbarContainer);
+      this.iframeContainer.prepend(toolbarContainer);
       this.toolbarWidth = this.toolbar.getWidth();
     } else {
       // If using a host-page provided container for the sidebar, the toolbar is
@@ -181,8 +178,11 @@ export default class Sidebar extends Guest {
   destroy() {
     this._unregisterEvents();
     this._hammerManager?.destroy();
-    this.frame?.remove();
-    this.hypothesisSidebar?.remove();
+    if (this.hypothesisSidebar) {
+      this.hypothesisSidebar.remove();
+    } else {
+      this.iframe.remove();
+    }
     super.destroy();
   }
 
@@ -270,13 +270,13 @@ export default class Sidebar extends Guest {
 
       if (
         this._gestureState.final !== this._gestureState.initial &&
-        this.frame
+        this.iframeContainer
       ) {
         const margin = /** @type {number} */ (this._gestureState.final);
         const width = -margin;
-        this.frame.style.marginLeft = `${margin}px`;
+        this.iframeContainer.style.marginLeft = `${margin}px`;
         if (width >= MIN_RESIZE) {
-          this.frame.style.width = `${width}px`;
+          this.iframeContainer.style.width = `${width}px`;
         }
         this._notifyOfLayoutChange();
       }
@@ -300,8 +300,9 @@ export default class Sidebar extends Guest {
     // The sidebar iframe is hidden or shown by adjusting the left margin of
     // its container.
 
-    const toolbarWidth = (this.frame && this.toolbar.getWidth()) || 0;
-    const frame = this.frame || this.externalFrame;
+    const toolbarWidth = (this.iframeContainer && this.toolbar.getWidth()) || 0;
+    const frame = /** @type {HTMLElement} */ (this.iframeContainer ??
+      this.externalFrame);
     const rect = frame.getBoundingClientRect();
     const computedStyle = window.getComputedStyle(frame);
     const width = parseInt(computedStyle.width);
@@ -353,7 +354,7 @@ export default class Sidebar extends Guest {
   }
 
   _onPan(event) {
-    const frame = this.frame;
+    const frame = this.iframeContainer;
     if (!frame) {
       return;
     }
@@ -409,10 +410,10 @@ export default class Sidebar extends Guest {
     this.crossframe.call('sidebarOpened');
     this.publish('sidebarOpened');
 
-    if (this.frame) {
-      const width = this.frame.getBoundingClientRect().width;
-      this.frame.style.marginLeft = `${-1 * width}px`;
-      this.frame.classList.remove('annotator-collapsed');
+    if (this.iframeContainer) {
+      const width = this.iframeContainer.getBoundingClientRect().width;
+      this.iframeContainer.style.marginLeft = `${-1 * width}px`;
+      this.iframeContainer.classList.remove('annotator-collapsed');
     }
 
     this.toolbar.sidebarOpen = true;
@@ -425,9 +426,9 @@ export default class Sidebar extends Guest {
   }
 
   hide() {
-    if (this.frame) {
-      this.frame.style.marginLeft = '';
-      this.frame.classList.add('annotator-collapsed');
+    if (this.iframeContainer) {
+      this.iframeContainer.style.marginLeft = '';
+      this.iframeContainer.classList.add('annotator-collapsed');
     }
 
     this.toolbar.sidebarOpen = false;
