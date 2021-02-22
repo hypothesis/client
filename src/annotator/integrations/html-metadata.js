@@ -130,46 +130,46 @@ export class HTMLMetadata {
   }
 
   _getHighwire() {
-    this.metadata.highwire = this._getMetaTags('citation', 'name', '_');
+    this.metadata.highwire = this._getMetaTags('name', 'citation', '_');
   }
 
   _getFacebook() {
-    this.metadata.facebook = this._getMetaTags('og', 'property', ':');
+    this.metadata.facebook = this._getMetaTags('property', 'og', ':');
   }
 
   _getTwitter() {
-    this.metadata.twitter = this._getMetaTags('twitter', 'name', ':');
+    this.metadata.twitter = this._getMetaTags('name', 'twitter', ':');
   }
 
   _getDublinCore() {
-    this.metadata.dc = this._getMetaTags('dc', 'name', '.');
+    this.metadata.dc = this._getMetaTags('name', 'dc', '.');
   }
 
   _getPrism() {
-    this.metadata.prism = this._getMetaTags('prism', 'name', '.');
+    this.metadata.prism = this._getMetaTags('name', 'prism', '.');
   }
 
   _getEprints() {
-    this.metadata.eprints = this._getMetaTags('eprints', 'name', '.');
+    this.metadata.eprints = this._getMetaTags('name', 'eprints', '.');
   }
 
   /**
    * Return an array of all the `content` values of `<meta>` tags on the page
    * where the attribute named `attribute` begins with `<prefix><delimiter>`.
    *
+   * @param {string} attribute - name of the attribute
    * @param {string} prefix
-   * @param {string} attribute
-   * @param {string} delimiter
+   * @param {string} delimiter - delimiter will be interpreted in a regex context
    * @return {Object.<string,string[]>}
    */
-  _getMetaTags(prefix, attribute, delimiter) {
+  _getMetaTags(attribute, prefix, delimiter) {
     /** @type {Object.<string,string[]>} */
     const tags = {};
     for (let meta of Array.from(this.document.querySelectorAll('meta'))) {
-      const name = meta.getAttribute(attribute);
+      const name = meta.getAttribute(attribute)?.toLowerCase();
       const { content } = meta;
       if (name) {
-        const match = name.match(RegExp(`^${prefix}${delimiter}(.+)$`, 'i'));
+        const match = name.match(RegExp(`^${prefix}${delimiter}(.+)$`));
         if (match) {
           const n = match[1];
           if (tags[n]) {

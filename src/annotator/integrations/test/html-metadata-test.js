@@ -38,32 +38,35 @@ describe('HTMLMetadata', function () {
   describe('annotation should have some metadata', function () {
     let metadata = null;
 
-    beforeEach(() => {
-      // Add some metadata to the page
-      tempDocumentHead.innerHTML = `
-        <link rel="alternate" href="foo.pdf" type="application/pdf"></link>
-        <link rel="alternate" href="foo.doc" type="application/msword"></link>
-        <link rel="bookmark" href="http://example.com/bookmark"></link>
-        <link rel="shortlink" href="http://example.com/bookmark/short"></link>
-        <link rel="alternate" href="es/foo.html" hreflang="es" type="text/html"></link>
-        <meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">
-        <meta name="citation_title" content="Foo">
-        <meta name="citation_pdf_url" content="foo.pdf">
-        <meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">
-        <meta name="dc:identifier" content="foobar-abcxyz">
-        <meta name="dc.relation.ispartof" content="isbn:123456789">
-        <meta name="DC.type" content="Article">
-        <meta property="og:url" content="http://example.com">
-        <meta name="twitter:site" content="@okfn">
-        <link rel="icon" href="http://example.com/images/icon.ico"></link>
-        <meta name="eprints.title" content="Computer Lib / Dream Machines">
-        <meta name="prism.title" content="Literary Machines">
-        <link rel="alternate" href="feed" type="application/rss+xml"></link>
-        <link rel="canonical" href="http://example.com/canonical"></link>
-      `;
-
+    const insertToDocumentHead = content => {
+      tempDocumentHead.innerHTML = content;
       testDocument.getDocumentMetadata();
       metadata = testDocument.metadata;
+    };
+
+    beforeEach(() => {
+      // Add some metadata to the page
+      insertToDocumentHead(`
+      <link rel="alternate" href="foo.pdf" type="application/pdf"></link>
+      <link rel="alternate" href="foo.doc" type="application/msword"></link>
+      <link rel="bookmark" href="http://example.com/bookmark"></link>
+      <link rel="shortlink" href="http://example.com/bookmark/short"></link>
+      <link rel="alternate" href="es/foo.html" hreflang="es" type="text/html"></link>
+      <meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">
+      <meta name="citation_title" content="Foo">
+      <meta name="citation_pdf_url" content="foo.pdf">
+      <meta name="dc:identifier" content="doi:10.1175/JCLI-D-11-00015.1">
+      <meta name="dc:identifier" content="foobar-abcxyz">
+      <meta name="dc:relation.ispartof" content="isbn:123456789">
+      <meta name="dc:type" content="Article">
+      <meta property="og:url" content="http://example.com">
+      <meta name="twitter:site" content="@okfn">
+      <link rel="icon" href="http://example.com/images/icon.ico"></link>
+      <meta name="eprints.title" content="Computer Lib / Dream Machines">
+      <meta name="prism.title" content="Literary Machines">
+      <link rel="alternate" href="feed" type="application/rss+xml"></link>
+      <link rel="canonical" href="http://example.com/canonical"></link>
+    `);
     });
 
     it('should have metadata', () => assert.ok(metadata));
@@ -162,40 +165,54 @@ describe('HTMLMetadata', function () {
     });
 
     it('should ignore `<link>` tags with invalid URIs', () => {
-      tempDocumentHead.innerHTML = `
+      insertToDocumentHead(`
         <link rel="alternate" href="https://example.com/foo">
         <link rel="alternate" href="http://a:b:c">
-      `;
-
-      testDocument.getDocumentMetadata();
+      `);
 
       // There should be one link with the document location and one for the
       // valid `<link>` tag.
-      assert.deepEqual(testDocument.metadata.link.length, 2);
-      assert.deepEqual(testDocument.metadata.link[1], {
+      assert.deepEqual(metadata.link.length, 2);
+      assert.deepEqual(metadata.link[1], {
         rel: 'alternate',
         href: 'https://example.com/foo',
         type: '',
       });
+
+      it('should ignore casing of the attribute in the meta element', () => {
+        insertToDocumentHead(`
+          <meta name="dc.identifier" content="1">
+          <META NAME="DC.IDENTIFIER" CONTENT="2">
+        `);
+        assert.deepEqual(metadata.dc.identifier, ['1', '2']);
+      });
+
+      it('should treat the delimiter as a regex pattern', () => {
+        insertToDocumentHead(`
+          <meta name="dc.identifier" content="1">
+          <meta name="dc-identifier" content="2">
+          <meta name="dc:identifier" content="3">
+          <meta name="dc identifier" content="4">
+          <meta name="dc..identifier" content="ignored">
+          <meta name="dc  identifier" content="ignored">
+        `);
+        assert.deepEqual(metadata.dc.identifier, ['1', '2', '3', '4']);
+      });
     });
 
     it('should ignore favicons with invalid URIs', () => {
-      tempDocumentHead.innerHTML = `
-        <link rel="favicon" href="http://a:b:c">
-      `;
-      testDocument.getDocumentMetadata();
-      assert.isUndefined(testDocument.metadata.favicon);
+      insertToDocumentHead('<link rel="favicon" href="http://a:b:c">');
+      assert.isUndefined(metadata.favicon);
     });
 
     it('should ignore `<meta>` PDF links with invalid URIs', () => {
-      tempDocumentHead.innerHTML = `
-        <meta name="citation_pdf_url" content="http://a:b:c">
-      `;
-      testDocument.getDocumentMetadata();
+      insertToDocumentHead(
+        '<meta name="citation_pdf_url" content="http://a:b:c">'
+      );
 
       // There should only be one link for the document's location.
       // The invalid PDF link should be ignored.
-      assert.equal(testDocument.metadata.link.length, 1);
+      assert.equal(metadata.link.length, 1);
     });
   });
 
