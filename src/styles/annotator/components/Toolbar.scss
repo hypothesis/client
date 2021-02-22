@@ -15,7 +15,7 @@
   // which provides controls for toggling the sidebar,
   // toggling highlights etc.
 
-  .annotator-toolbar {
+  .Toolbar {
     position: absolute;
     left: -(var.$annotator-toolbar-width);
     width: var.$annotator-toolbar-width;
@@ -29,7 +29,7 @@
     z-index: 2;
   }
 
-  .annotator-toolbar-buttonbar {
+  .Toolbar__buttonbar {
     @include layout.vertical-rhythm(5px);
     margin-top: var.$layout-space--small;
   }
@@ -51,7 +51,7 @@
   }
 
   // Toolbar button with icon
-  .annotator-toolbar-button {
+  .Toolbar__button {
     @include annotator-button;
     @include utils.shadow;
     @include utils.border;
@@ -59,7 +59,7 @@
   }
 
   // Control to collapse/expand the sidebar
-  .annotator-toolbar__sidebar-toggle {
+  .Toolbar__sidebar-toggle {
     @include annotator-button;
     @include utils.border--left;
     @include utils.border--bottom;
@@ -74,7 +74,7 @@
   }
 
   /** Visible with clean theme */
-  .annotator-toolbar__sidebar-close {
+  .Toolbar__sidebar-close {
     @include buttons.reset-native-btn-styles;
     @include buttons.button-hover;
     @include utils.border;
