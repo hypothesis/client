@@ -4,18 +4,21 @@
 
 .NotebookView {
   display: grid;
-  row-gap: var.$layout-space--xsmall;
+  row-gap: var.$layout-space--small;
   grid-template-areas:
     'heading'
+    'filters'
     'results'
     'items';
 
   &__heading {
+    line-height: 1;
     grid-area: heading;
   }
 
   &__filters {
     grid-area: filters;
+    justify-self: start;
   }
 
   &__results {
@@ -32,6 +35,7 @@
   }
 
   @include responsive.tablet-and-up {
+    row-gap: var.$layout-space--xsmall;
     grid-template-areas:
       'heading heading'
       'filters results'
