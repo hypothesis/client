@@ -1,31 +1,32 @@
-import Delegator from '../delegator';
-
 import { render } from 'preact';
-import Buckets from '../components/Buckets';
+import Buckets from './components/Buckets';
 
-import { anchorBuckets } from '../util/buckets';
+import { anchorBuckets } from './util/buckets';
 
-export default class BucketBar extends Delegator {
-  constructor(container, options, annotator) {
-    const defaultOptions = {
-      // Selectors for the scrollable elements on the page
-      scrollables: [],
-    };
+/**
+ * @typedef BucketBarOptions
+ * @prop {string[]} [scrollables] - Selectors for the scrollable elements on the page
+ */
 
-    const opts = { ...defaultOptions, ...options };
+export default class BucketBar {
+  /**
+   * @param {HTMLElement} container
+   * @param {Pick<import('./guest').default, 'anchors'|'selectAnnotations'>} guest
+   * @param {BucketBarOptions} [options]
+   */
+  constructor(container, guest, options = {}) {
+    this.options = options;
+    this.element = document.createElement('div');
+    this.element.className = 'annotator-bucket-bar';
 
-    const el = document.createElement('div');
-    el.className = 'annotator-bucket-bar';
-    super(el, opts);
-
-    this.annotator = annotator;
+    this.guest = guest;
     container.appendChild(this.element);
 
     this.updateFunc = () => this.update();
 
     window.addEventListener('resize', this.updateFunc);
     window.addEventListener('scroll', this.updateFunc);
-    this.options.scrollables.forEach(scrollable => {
+    this.options.scrollables?.forEach(scrollable => {
       const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
         scrollable
       ));
@@ -36,7 +37,7 @@ export default class BucketBar extends Delegator {
   destroy() {
     window.removeEventListener('resize', this.updateFunc);
     window.removeEventListener('scroll', this.updateFunc);
-    this.options.scrollables.forEach(scrollable => {
+    this.options.scrollables?.forEach(scrollable => {
       const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
         scrollable
       ));
@@ -56,14 +57,14 @@ export default class BucketBar extends Delegator {
   }
 
   _update() {
-    const buckets = anchorBuckets(this.annotator.anchors);
+    const buckets = anchorBuckets(this.guest.anchors);
     render(
       <Buckets
         above={buckets.above}
         below={buckets.below}
         buckets={buckets.buckets}
         onSelectAnnotations={(annotations, toggle) =>
-          this.annotator.selectAnnotations(annotations, toggle)
+          this.guest.selectAnnotations(annotations, toggle)
         }
       />,
       this.element
