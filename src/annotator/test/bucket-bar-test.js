@@ -10,7 +10,7 @@ describe('BucketBar', () => {
 
   const createBucketBar = function (options) {
     const element = document.createElement('div');
-    return new BucketBar(element, options || {}, fakeAnnotator);
+    return new BucketBar(element, fakeAnnotator, options);
   };
 
   beforeEach(() => {
@@ -30,8 +30,8 @@ describe('BucketBar', () => {
     };
 
     $imports.$mock({
-      '../components/Buckets': FakeBuckets,
-      '../util/buckets': fakeBucketUtil,
+      './components/Buckets': FakeBuckets,
+      './util/buckets': fakeBucketUtil,
     });
 
     sandbox.stub(window, 'requestAnimationFrame').yields();

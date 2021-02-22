@@ -9,7 +9,7 @@ import features from './features';
 import Guest from './guest';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
-import BucketBar from './plugin/bucket-bar';
+import BucketBar from './bucket-bar';
 
 /**
  * @typedef LayoutState
@@ -78,9 +78,7 @@ export default class Sidebar extends Guest {
       if (config.theme === 'clean') {
         frame.classList.add('annotator-frame--theme-clean');
       } else {
-        // BucketBar is a "plugin" for legacy reasons and is now constructed here so
-        // that the parent element can be passed into the constructor.
-        this.plugins.BucketBar = new BucketBar(frame, config.BucketBar, this);
+        this.plugins.BucketBar = new BucketBar(frame, this, config.BucketBar);
       }
 
       // Undocumented switch to enable/disable the wrapping of the sidebar inside a shadow DOM
