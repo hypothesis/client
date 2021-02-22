@@ -8,7 +8,7 @@ import {
 import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 
-import Button from '../Button';
+import { IconButton } from '../Buttons';
 
 import AnnotationShareControl from './AnnotationShareControl';
 
@@ -91,11 +91,13 @@ function AnnotationActionBar({
 
   return (
     <div className="AnnotationActionBar u-layout-row">
-      {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
-      {showDeleteAction && (
-        <Button icon="trash" title="Delete" onClick={onDelete} />
+      {showEditAction && (
+        <IconButton icon="edit" title="Edit" onClick={onEdit} />
       )}
-      <Button icon="reply" title="Reply" onClick={onReplyClick} />
+      {showDeleteAction && (
+        <IconButton icon="trash" title="Delete" onClick={onDelete} />
+      )}
+      <IconButton icon="reply" title="Reply" onClick={onReplyClick} />
       {shareLink && (
         <AnnotationShareControl
           annotation={annotation}
@@ -104,14 +106,14 @@ function AnnotationActionBar({
         />
       )}
       {showFlagAction && !annotation.flagged && (
-        <Button
+        <IconButton
           icon="flag"
           title="Report this annotation to moderators"
           onClick={onFlag}
         />
       )}
       {showFlagAction && annotation.flagged && (
-        <Button
+        <IconButton
           isPressed={true}
           icon="flag--active"
           title="Annotation has been reported to the moderators"
