@@ -80,7 +80,7 @@ export default class Sidebar extends Guest {
       } else {
         // BucketBar is a "plugin" for legacy reasons and is now constructed here so
         // that the parent element can be passed into the constructor.
-        this.plugins.BucketBar = new BucketBar(frame, {}, this);
+        this.plugins.BucketBar = new BucketBar(frame, config.BucketBar, this);
       }
 
       // Undocumented switch to enable/disable the wrapping of the sidebar inside a shadow DOM
