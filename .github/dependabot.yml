@@ -1,0 +1,60 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "10:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: angulartics
+    versions:
+    - "> 0.17.2"
+  - dependency-name: angulartics
+    versions:
+    - "< 2"
+    - ">= 1.a"
+  - dependency-name: browserify-istanbul
+    versions:
+    - "< 4"
+    - ">= 3.a"
+  - dependency-name: coffeeify
+    versions:
+    - "> 2.1.0"
+  - dependency-name: escape-string-regexp
+    versions:
+    - "> 1.0.5"
+  - dependency-name: escape-string-regexp
+    versions:
+    - ">= 2.a"
+    - "< 3"
+  - dependency-name: escape-string-regexp
+    versions:
+    - ">= 3.a"
+    - "< 4"
+  - dependency-name: fetch-mock
+    versions:
+    - ">= 7.a"
+    - "< 8"
+  - dependency-name: "@hypothesis/frontend-shared"
+    versions:
+    - "> 1.7.0"
+    - "< 2"
+  - dependency-name: isparta
+    versions:
+    - "< 4.2"
+    - ">= 4.1.a"
+  - dependency-name: query-string
+    versions:
+    - "> 3.0.3"
+  - dependency-name: sinon
+    versions:
+    - ">= 7.2.5.a"
+    - "< 7.2.6"
+  - dependency-name: terser
+    versions:
+    - "> 5.5.1"
+    - "< 6"
+  - dependency-name: zen-observable
+    versions:
+    - "> 0.3.0"
