@@ -24,7 +24,6 @@ export class ToolbarController {
     const { createAnnotation, setSidebarOpen, setHighlightsVisible } = options;
 
     this._container = container;
-    this._container.className = 'annotator-toolbar';
 
     this._useMinimalControls = false;
 

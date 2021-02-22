@@ -14,7 +14,7 @@ import propTypes from 'prop-types';
 function ToolbarButton({
   buttonRef,
   expanded,
-  className = 'annotator-toolbar-button',
+  className = 'Toolbar__button',
   label,
   icon,
   onClick,
@@ -98,10 +98,10 @@ export default function Toolbar({
   useMinimalControls = false,
 }) {
   return (
-    <>
+    <div className="Toolbar">
       {useMinimalControls && isSidebarOpen && (
         <ToolbarButton
-          className="annotator-toolbar__sidebar-close"
+          className="Toolbar__sidebar-close"
           label="Close annotation sidebar"
           icon="cancel"
           onClick={closeSidebar}
@@ -109,7 +109,7 @@ export default function Toolbar({
       )}
       {!useMinimalControls && (
         <ToolbarButton
-          className="annotator-toolbar__sidebar-toggle"
+          className="Toolbar__sidebar-toggle"
           buttonRef={toggleSidebarRef}
           label="Annotation sidebar"
           icon={isSidebarOpen ? 'caret-right' : 'caret-left'}
@@ -118,7 +118,7 @@ export default function Toolbar({
         />
       )}
       {!useMinimalControls && (
-        <div className="annotator-toolbar-buttonbar">
+        <div className="Toolbar__buttonbar">
           <ToolbarButton
             label="Show highlights"
             icon={showHighlights ? 'show' : 'hide'}
@@ -134,7 +134,7 @@ export default function Toolbar({
           />
         </div>
       )}
-    </>
+    </div>
   );
 }
 
