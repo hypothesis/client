@@ -8,6 +8,7 @@ import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
 import Button from './Button';
+import { CompactIconButton } from './Buttons';
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
 import SortMenu from './SortMenu';
@@ -112,8 +113,7 @@ function TopBar({
         <div className="TopBar__inner content">
           <StreamSearchInput />
           <div className="u-stretch" />
-          <Button
-            className="TopBar__icon-button"
+          <CompactIconButton
             icon="help"
             isExpanded={isHelpPanelOpen}
             onClick={requestHelp}
@@ -128,13 +128,13 @@ function TopBar({
           <GroupList className="GroupList" auth={auth} />
           <div className="u-stretch" />
           {pendingUpdateCount > 0 && (
-            <Button
-              className="TopBar__icon-button TopBar__icon-button--refresh"
+            <CompactIconButton
               icon="refresh"
               onClick={applyPendingUpdates}
               title={`Show ${pendingUpdateCount} new/updated ${
                 pendingUpdateCount === 1 ? 'annotation' : 'annotations'
               }`}
+              variant="primary"
             />
           )}
           <SearchInput
@@ -143,16 +143,14 @@ function TopBar({
           />
           <SortMenu />
           {showSharePageButton && (
-            <Button
-              className="TopBar__icon-button"
+            <CompactIconButton
               icon="share"
               isExpanded={isAnnotationsPanelOpen}
               onClick={toggleSharePanel}
               title="Share annotations on this page"
             />
           )}
-          <Button
-            className="TopBar__icon-button"
+          <CompactIconButton
             icon="help"
             isExpanded={isHelpPanelOpen}
             onClick={requestHelp}
