@@ -1,6 +1,6 @@
 import propTypes from 'prop-types';
 
-import Button from '../Button';
+import { LinkButton } from '../Buttons';
 
 /**
  * @typedef AnnotationReplyToggleProps
@@ -23,13 +23,7 @@ function AnnotationReplyToggle({
   const toggleAction = threadIsCollapsed ? 'Show replies' : 'Hide replies';
   const toggleText = `${toggleAction} (${replyCount})`;
 
-  return (
-    <Button
-      className="Annotation__reply-toggle"
-      onClick={onToggleReplies}
-      buttonText={toggleText}
-    />
-  );
+  return <LinkButton onClick={onToggleReplies}>{toggleText}</LinkButton>;
 }
 
 AnnotationReplyToggle.propTypes = {
