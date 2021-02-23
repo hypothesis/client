@@ -35,7 +35,7 @@ function BucketButton({ bucket, onSelectAnnotations }) {
 
   return (
     <button
-      className="bucket-button bucket-button--left"
+      className="Buckets__button Buckets__button--left"
       onClick={event => selectAnnotations(event)}
       onMouseMove={() => setFocus(true)}
       onMouseOut={() => setFocus(false)}
@@ -73,7 +73,7 @@ function NavigationBucketButton({ bucket, direction }) {
   }
   return (
     <button
-      className={classnames('bucket-button', `bucket-button--${direction}`)}
+      className={classnames('Buckets__button', `Buckets__button--${direction}`)}
       onClick={event => scrollToClosest(event)}
       title={buttonTitle}
       aria-label={buttonTitle}
@@ -108,14 +108,18 @@ export default function Buckets({
   const showDownNavigation = below.anchors.length > 0;
 
   return (
-    <ul className="buckets">
+    <ul className="Buckets__list">
       {showUpNavigation && (
-        <li className="bucket" style={{ top: above.position }}>
+        <li className="Buckets__bucket" style={{ top: above.position }}>
           <NavigationBucketButton bucket={above} direction="up" />
         </li>
       )}
       {buckets.map((bucket, index) => (
-        <li className="bucket" style={{ top: bucket.position }} key={index}>
+        <li
+          className="Buckets__bucket"
+          style={{ top: bucket.position }}
+          key={index}
+        >
           <BucketButton
             bucket={bucket}
             onSelectAnnotations={onSelectAnnotations}
@@ -123,7 +127,7 @@ export default function Buckets({
         </li>
       ))}
       {showDownNavigation && (
-        <li className="bucket" style={{ top: below.position }}>
+        <li className="Buckets__bucket" style={{ top: below.position }}>
           <NavigationBucketButton bucket={below} direction="down" />
         </li>
       )}

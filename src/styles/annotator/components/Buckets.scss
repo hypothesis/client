@@ -1,12 +1,10 @@
 @use "../mixins/buttons";
-@use "../mixins/reset";
-@use "../mixins/utils";
 @use "../variables" as var;
 
 // Bucket-bar styles are nested inside `.annotator-frame` to ensure they take
 // precedence over the CSS reset applied to `.annotator-frame`.
 .annotator-frame {
-  .annotator-bucket-bar {
+  .Buckets__list {
     background: var.$grey-2; // When sidebar is unfolded, remove the background transparency
     pointer-events: none;
     position: absolute;
@@ -19,35 +17,34 @@
 
   // When the sidebar is collapsed, make the background semi-transparent so the
   // text is visible throughout (useful for pages with tight margins)
-  &.annotator-collapsed .annotator-bucket-bar {
+  &.annotator-collapsed .Buckets__list {
     background: rgba(0, 0, 0, 0.08);
   }
 
-  .buckets,
-  .bucket {
+  .Buckets__bucket {
     position: absolute;
     right: 0;
   }
 
-  .bucket-button {
+  .Buckets__button {
     // Need pointer events again. Necessary because of `pointer-events` rule
-    // in `.annotator-bucket-bar`
+    // in `.Buckets__list`
     pointer-events: all;
   }
 
-  .bucket-button--left {
+  .Buckets__button--left {
     // Center the indicator vertically (the element is 16px tall)
     margin-top: -8px;
     @include buttons.indicator--left;
   }
 
-  .bucket-button--up {
+  .Buckets__button--up {
     @include buttons.indicator--up;
     // Vertically center the element (which is 22px high)
     margin-top: -11px;
   }
 
-  .bucket-button--down {
+  .Buckets__button--down {
     @include buttons.indicator--down;
   }
 }

@@ -17,7 +17,6 @@ export default class BucketBar {
   constructor(container, guest, options = {}) {
     this.options = options;
     this.element = document.createElement('div');
-    this.element.className = 'annotator-bucket-bar';
 
     this.guest = guest;
     container.appendChild(this.element);
