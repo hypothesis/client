@@ -3,7 +3,7 @@ import propTypes from 'prop-types';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
 
-import Button from './Button';
+import { LabeledIconButton } from './Buttons';
 
 /**
  * @typedef VersionInfoProps
@@ -43,11 +43,13 @@ function VersionInfo({ toastMessenger, versionData }) {
         <dd className="VersionInfo__value">{versionData.timestamp}</dd>
       </dl>
       <div className="u-layout-row--justify-center">
-        <Button
-          buttonText="Copy version details"
+        <LabeledIconButton
+          title="Copy version details"
           onClick={copyVersionData}
           icon="copy"
-        />
+        >
+          Copy version details
+        </LabeledIconButton>
       </div>
     </div>
   );
