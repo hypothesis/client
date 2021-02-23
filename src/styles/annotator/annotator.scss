@@ -13,8 +13,8 @@
 
 // Annotator-specific components.
 @use './components/AdderToolbar';
+@use './components/Buckets';
 @use './components/Toolbar';
-@use './bucket-bar';
 @use './highlights';
 @use './notebook';
 
