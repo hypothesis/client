@@ -43,7 +43,7 @@ function FilterSelect({
   );
 
   return (
-    <Menu label={menuLabel} title={title}>
+    <Menu label={menuLabel} title={title} contentClass="FilterSelect__menu">
       {filterOptions.map(filterOption => (
         <MenuItem
           onClick={() => onSelect(filterOption)}
