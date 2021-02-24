@@ -82,7 +82,7 @@ function ButtonBase({
  * An icon-only button
  * @param {IconButtonProps} props
  */
-export function IconButton(props) {
+function IconButton(props) {
   const { icon } = props;
   return (
     <ButtonBase className="IconButton" {...props}>
@@ -95,7 +95,7 @@ export function IconButton(props) {
  * An icon-only button, styled in a compact fashion
  * @param {IconButtonProps} props
  */
-export function CompactIconButton(props) {
+function CompactIconButton(props) {
   const { icon } = props;
   return (
     <ButtonBase className="CompactIconButton" {...props}>
@@ -166,7 +166,7 @@ export function IconInputButton(props) {
  * A button styled to appear as an HTML link (<a>)
  * @param {ButtonProps} props
  */
-export function LinkButton(props) {
+function LinkButton(props) {
   const { children } = props;
   return (
     <ButtonBase className="LinkButton" {...props}>
@@ -183,5 +183,33 @@ export function LinkButton(props) {
  */
 export function CustomButton(props) {
   const { children } = props;
+  return <ButtonBase {...props}>{children}</ButtonBase>;
+}
+
+/**
+ * @typedef {{iconButton: boolean} & IconButtonProps} GuardedIconButton
+ * @typedef {{compactIconButton: boolean} & IconButtonProps} GuardedCompactIconButton
+ * @typedef {{linkButton: boolean} & ButtonProps} GuardedLinkButton
+ * @param {GuardedIconButton|GuardedCompactIconButton|GuardedLinkButton|ButtonBaseProps|any} props
+ */
+export default function Button({
+  iconButton,
+  compactIconButton,
+  linkButton,
+  children,
+  ...props
+}) {
+  if (iconButton) {
+    return <IconButton {...props} />;
+  }
+
+  if (compactIconButton) {
+    return <CompactIconButton {...props} />;
+  }
+
+  if (linkButton) {
+    return <LinkButton {...props}>{children}</LinkButton>;
+  }
+
   return <ButtonBase {...props}>{children}</ButtonBase>;
 }

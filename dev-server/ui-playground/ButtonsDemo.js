@@ -1,14 +1,11 @@
 import ComponentSection from './ComponentSection';
 import jsxToString from './jsxToString';
 
-import {
-  IconButton,
-  CompactIconButton,
+import Button, {
   CustomButton,
   IconInputButton,
   LabeledButton,
   LabeledIconButton,
-  LinkButton,
   CompactLabeledIconButton,
 } from '../../src/sidebar/components/Buttons';
 
@@ -34,31 +31,46 @@ export default function ButtonDemo() {
         </tr>
 
         <ComponentTableRow>
-          <IconButton icon="edit" size="large" title="Edit" />
+          <Button iconButton icon="edit" size="large" title="Edit" />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <IconButton icon="edit" title="Edit" />
+          <Button iconButton icon="edit" title="Edit" />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <IconButton icon="edit" size="small" title="Edit" />
+          <Button iconButton icon="edit" size="small" title="Edit" />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <IconButton icon="trash" title="Delete annotation" isPressed />
+          <Button iconButton icon="trash" title="Delete annotation" isPressed />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <IconButton icon="trash" title="Delete annotation" isExpanded />
+          <Button
+            iconButton
+            icon="trash"
+            title="Delete annotation"
+            isExpanded
+          />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <IconButton icon="trash" title="Delete annotation" isDisabled />
+          <Button
+            iconButton
+            icon="trash"
+            title="Delete annotation"
+            isDisabled
+          />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <IconButton icon="profile" title="User info" variant="primary" />
+          <Button
+            iconButton
+            icon="profile"
+            title="User info"
+            variant="primary"
+          />
         </ComponentTableRow>
       </table>
 
@@ -70,23 +82,29 @@ export default function ButtonDemo() {
         </tr>
 
         <ComponentTableRow>
-          <CompactIconButton icon="edit" size="large" title="Edit" />
+          <Button compactIconButton icon="edit" size="large" title="Edit" />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <CompactIconButton icon="edit" title="Edit" />
+          <Button compactIconButton icon="edit" title="Edit" />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <CompactIconButton icon="edit" size="small" title="Edit" />
+          <Button compactIconButton icon="edit" size="small" title="Edit" />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <CompactIconButton icon="trash" title="Delete annotation" isPressed />
+          <Button
+            compactIconButton
+            icon="trash"
+            title="Delete annotation"
+            isPressed
+          />
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <CompactIconButton
+          <Button
+            compactIconButton
             icon="trash"
             title="Delete annotation"
             isExpanded
@@ -94,7 +112,8 @@ export default function ButtonDemo() {
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <CompactIconButton
+          <Button
+            compactIconButton
             icon="trash"
             title="Delete annotation"
             isDisabled
@@ -102,7 +121,8 @@ export default function ButtonDemo() {
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <CompactIconButton
+          <Button
+            compactIconButton
             icon="profile"
             title="User info"
             variant="primary"
@@ -264,31 +284,43 @@ export default function ButtonDemo() {
         </tr>
 
         <ComponentTableRow>
-          <LinkButton size="large">Show replies (10)</LinkButton>
+          <Button linkButton size="large">
+            Show replies (10)
+          </Button>
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <LinkButton>Show replies (10)</LinkButton>
+          <Button linkButton>Show replies (10)</Button>
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <LinkButton size="small">Show replies (10)</LinkButton>
+          <Button linkButton size="small">
+            Show replies (10)
+          </Button>
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <LinkButton isPressed>Show replies (10)</LinkButton>
+          <Button linkButton isPressed>
+            Show replies (10)
+          </Button>
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <LinkButton isExpanded>Show replies (10)</LinkButton>
+          <Button linkButton isExpanded>
+            Show replies (10)
+          </Button>
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <LinkButton isDisabled>Show replies (10)</LinkButton>
+          <Button linkButton isDisabled>
+            Show replies (10)
+          </Button>
         </ComponentTableRow>
 
         <ComponentTableRow>
-          <LinkButton variant="primary">Show replies (10)</LinkButton>
+          <Button linkButton variant="primary">
+            Show replies (10)
+          </Button>
         </ComponentTableRow>
       </table>
 

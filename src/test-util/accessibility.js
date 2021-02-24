@@ -2,6 +2,7 @@ import { run } from 'axe-core';
 import { ReactWrapper, mount } from 'enzyme';
 import { isValidElement } from 'preact';
 
+/**@typedef {import('preact').VNode}  a*/
 /**
  * @typedef {Scenario}
  * @prop {string} [name] -
