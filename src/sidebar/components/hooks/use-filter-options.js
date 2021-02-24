@@ -16,6 +16,7 @@ export function useUserFilterOptions() {
   const annotations = store.allAnnotations();
   const focusFilters = store.getFocusFilters();
   const showDisplayNames = store.isFeatureEnabled('client_display_names');
+  const currentUsername = username(store.profile().userid);
 
   return useMemo(() => {
     // Determine unique users (authors) in annotation collection
@@ -39,13 +40,25 @@ export function useUserFilterOptions() {
       users[username_] = focusFilters.user.display;
     }
 
-    // Convert to `FilterOption` objects
+    // Convert to an array of `FilterOption` objects
     const userOptions = Object.keys(users).map(user => {
-      return { display: users[user], value: user };
+      // If the user is the current user, add "(Me)" to the displayed name
+      const display =
+        user === currentUsername ? `${users[user]} (Me)` : users[user];
+      return { display, value: user };
     });
 
-    userOptions.sort((a, b) => a.display.localeCompare(b.display));
+    userOptions.sort((a, b) => {
+      // Ensure that the current user "Me" resides at the front of the list
+      if (currentUsername === a.value) {
+        return -1;
+      } else if (currentUsername === b.value) {
+        return 1;
+      } else {
+        return a.display.localeCompare(b.display);
+      }
+    });
 
     return userOptions;
-  }, [annotations, focusFilters, showDisplayNames]);
+  }, [annotations, currentUsername, focusFilters.user, showDisplayNames]);
 }
