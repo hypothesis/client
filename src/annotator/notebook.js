@@ -1,7 +1,6 @@
 import Delegator from './delegator';
 import { createSidebarConfig } from './config/sidebar';
 import { createShadowRoot } from './util/shadow-root';
-import { render } from 'preact';
 
 /**
  * Create the iframe that will load the notebook application.
@@ -52,13 +51,13 @@ export default class Notebook extends Delegator {
      */
     this.container = null;
 
-    this.subscribe('openNotebook', groupId => {
+    this.subscribe('showNotebook', groupId => {
       this._groupId = groupId;
-      this.open();
+      this.show();
     });
-    this.subscribe('closeNotebook', () => this.close());
+    this.subscribe('hideNotebook', () => this.hide());
     // If the sidebar has opened, get out of the way
-    this.subscribe('sidebarOpened', () => this.close());
+    this.subscribe('sidebarOpened', () => this.hide());
   }
 
   _update() {
@@ -77,14 +76,14 @@ export default class Notebook extends Delegator {
     }
   }
 
-  open() {
+  show() {
     const container = this._initContainer();
     this._update();
     container.classList.add('is-open');
     container.style.display = '';
   }
 
-  close() {
+  hide() {
     if (this.container) {
       this.container.classList.remove('is-open');
       this.container.style.display = 'none';

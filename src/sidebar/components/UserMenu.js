@@ -54,7 +54,7 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
 
   const onSelectNotebook = () => {
-    bridge.call('openNotebook', store.focusedGroupId());
+    bridge.call('showNotebook', store.focusedGroupId());
   };
 
   const onProfileSelected = () =>

@@ -243,7 +243,7 @@ describe('sidebar/services/frame-sync', function () {
         const ann = { target: [] };
         fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.calledWith(fakeBridge.call, 'openSidebar');
+        assert.calledWith(fakeBridge.call, 'showSidebar');
       });
 
       it('should open the login prompt panel', () => {
@@ -369,16 +369,16 @@ describe('sidebar/services/frame-sync', function () {
   });
 
   describe('on a relayed bridge call', function () {
-    it('calls "openSidebar"', function () {
-      fakeBridge.emit('openSidebar');
+    it('calls "showSidebar"', function () {
+      fakeBridge.emit('showSidebar');
 
-      assert.calledWith(fakeBridge.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, 'showSidebar');
     });
 
-    it('calls "closeSidebar"', function () {
-      fakeBridge.emit('closeSidebar');
+    it('calls "hideSidebar"', function () {
+      fakeBridge.emit('hideSidebar');
 
-      assert.calledWith(fakeBridge.call, 'closeSidebar');
+      assert.calledWith(fakeBridge.call, 'hideSidebar');
     });
 
     it('calls "setVisibleHighlights"', function () {
