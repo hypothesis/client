@@ -206,14 +206,14 @@ export default class Guest extends Delegator {
 
     // Hide the sidebar in response to a document click or tap, so it doesn't obscure
     // the document content.
-    const maybeCloseSidebar = event => {
+    const maybeHideSidebar = event => {
       if (!this.closeSidebarOnDocumentClick || this.isEventInAnnotator(event)) {
         // Don't hide the sidebar if event occurred inside Hypothesis UI, or
         // the user is making a selection, or the behavior was disabled because
         // the sidebar doesn't overlap the content.
         return;
       }
-      this.crossframe?.call('closeSidebar');
+      this.crossframe?.call('hideSidebar');
     };
 
     addListener('click', event => {
@@ -222,7 +222,7 @@ export default class Guest extends Delegator {
         const toggle = event.metaKey || event.ctrlKey;
         this.selectAnnotations(annotations, toggle);
       } else {
-        maybeCloseSidebar(event);
+        maybeHideSidebar(event);
       }
     });
 
@@ -230,7 +230,7 @@ export default class Guest extends Delegator {
     // on touch-input devices, not all elements will generate a "click" event.
     addListener('touchstart', event => {
       if (!annotationsAt(event.target).length) {
-        maybeCloseSidebar(event);
+        maybeHideSidebar(event);
       }
     });
 
@@ -593,7 +593,7 @@ export default class Guest extends Delegator {
     targets.then(() => this.anchor(/** @type {AnnotationData} */ (annotation)));
 
     if (!annotation.$highlight) {
-      this.crossframe?.call('openSidebar');
+      this.crossframe?.call('showSidebar');
     }
     return annotation;
   }
@@ -617,7 +617,7 @@ export default class Guest extends Delegator {
   showAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
     this.crossframe?.call('showAnnotations', tags);
-    this.crossframe?.call('openSidebar');
+    this.crossframe?.call('showSidebar');
   }
 
   /**

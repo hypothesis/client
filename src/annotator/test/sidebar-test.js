@@ -190,16 +190,16 @@ describe('Sidebar', () => {
   });
 
   describe('toolbar buttons', () => {
-    it('opens and closes sidebar when toolbar button is clicked', () => {
+    it('shows or hides sidebar when toolbar button is clicked', () => {
       const sidebar = createSidebar();
-      sinon.stub(sidebar, 'open');
-      sinon.stub(sidebar, 'close');
+      sinon.stub(sidebar, 'show');
+      sinon.stub(sidebar, 'hide');
 
       FakeToolbarController.args[0][1].setSidebarOpen(true);
-      assert.called(sidebar.open);
+      assert.called(sidebar.show);
 
       FakeToolbarController.args[0][1].setSidebarOpen(false);
-      assert.called(sidebar.close);
+      assert.called(sidebar.hide);
     });
 
     it('shows or hides highlights when toolbar button is clicked', () => {
@@ -235,45 +235,45 @@ describe('Sidebar', () => {
       return result;
     };
 
-    describe('on "open" event', () =>
-      it('opens the frame', () => {
-        const target = sandbox.stub(Sidebar.prototype, 'open');
+    describe('on "show" event', () =>
+      it('shows the frame', () => {
+        const target = sandbox.stub(Sidebar.prototype, 'show');
         createSidebar();
-        emitEvent('openSidebar');
+        emitEvent('showSidebar');
         assert.called(target);
       }));
 
-    describe('on "close" event', () =>
-      it('closes the frame', () => {
-        const target = sandbox.stub(Sidebar.prototype, 'close');
+    describe('on "hide" event', () =>
+      it('hides the frame', () => {
+        const target = sandbox.stub(Sidebar.prototype, 'hide');
         createSidebar();
-        emitEvent('closeSidebar');
+        emitEvent('hideSidebar');
         assert.called(target);
       }));
 
-    describe('on "openNotebook" event', () => {
+    describe('on "showNotebook" event', () => {
       it('hides itself and republishes the event', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'publish');
-        sinon.stub(sidebar, 'close');
-        emitEvent('openNotebook', 'mygroup');
+        sinon.stub(sidebar, 'hide');
+        emitEvent('showNotebook', 'mygroup');
         assert.calledWith(
           sidebar.publish,
-          'openNotebook',
+          'showNotebook',
           sinon.match(['mygroup'])
         );
-        assert.calledOnce(sidebar.close);
+        assert.calledOnce(sidebar.hide);
       });
     });
 
-    describe('on "closeNotebook" event', () => {
-      it('opens itself and republishes the event', () => {
+    describe('on "hideNotebook" event', () => {
+      it('shows itself and republishes the event', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'publish');
-        sinon.stub(sidebar, 'open');
-        emitEvent('closeNotebook');
-        assert.calledWith(sidebar.publish, 'closeNotebook');
-        assert.calledOnce(sidebar.open);
+        sinon.stub(sidebar, 'show');
+        emitEvent('hideNotebook');
+        assert.calledWith(sidebar.publish, 'hideNotebook');
+        assert.calledOnce(sidebar.show);
       });
     });
 
@@ -421,18 +421,18 @@ describe('Sidebar', () => {
         assert.equal(sidebar.frame.style.pointerEvents, '');
       });
 
-      it('calls `open` if the widget is fully visible', () => {
+      it('calls `show` if the widget is fully visible', () => {
         sidebar._gestureState = { final: -500 };
-        const open = sandbox.stub(sidebar, 'open');
+        const show = sandbox.stub(sidebar, 'show');
         sidebar._onPan({ type: 'panend' });
-        assert.calledOnce(open);
+        assert.calledOnce(show);
       });
 
-      it('calls `close` if the widget is not fully visible', () => {
+      it('calls `hide` if the widget is not fully visible', () => {
         sidebar._gestureState = { final: -100 };
-        const close = sandbox.stub(sidebar, 'close');
+        const hide = sandbox.stub(sidebar, 'hide');
         sidebar._onPan({ type: 'panend' });
-        assert.calledOnce(close);
+        assert.calledOnce(hide);
       });
     });
 
@@ -453,43 +453,43 @@ describe('Sidebar', () => {
       const sidebar = createSidebar({
         annotations: 'ann-id',
       });
-      const open = sandbox.stub(sidebar, 'open');
+      const show = sandbox.stub(sidebar, 'show');
       sidebar.publish('panelReady');
-      assert.calledOnce(open);
+      assert.calledOnce(show);
     });
 
     it('opens the sidebar when a direct-linked group is present.', () => {
       const sidebar = createSidebar({
         group: 'group-id',
       });
-      const open = sandbox.stub(sidebar, 'open');
+      const show = sandbox.stub(sidebar, 'show');
       sidebar.publish('panelReady');
-      assert.calledOnce(open);
+      assert.calledOnce(show);
     });
 
     it('opens the sidebar when a direct-linked query is present.', () => {
       const sidebar = createSidebar({
         query: 'tag:foo',
       });
-      const open = sandbox.stub(sidebar, 'open');
+      const show = sandbox.stub(sidebar, 'show');
       sidebar.publish('panelReady');
-      assert.calledOnce(open);
+      assert.calledOnce(show);
     });
 
     it('opens the sidebar when openSidebar is set to true.', () => {
       const sidebar = createSidebar({
         openSidebar: true,
       });
-      const open = sandbox.stub(sidebar, 'open');
+      const show = sandbox.stub(sidebar, 'show');
       sidebar.publish('panelReady');
-      assert.calledOnce(open);
+      assert.calledOnce(show);
     });
 
-    it('does not open the sidebar if not configured to.', () => {
+    it('does not show the sidebar if not configured to.', () => {
       const sidebar = createSidebar();
-      const open = sandbox.stub(sidebar, 'open');
+      const show = sandbox.stub(sidebar, 'show');
       sidebar.publish('panelReady');
-      assert.notCalled(open);
+      assert.notCalled(show);
     });
   });
 
@@ -513,24 +513,24 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('#open', () => {
+  describe('#show', () => {
     it('shows highlights if "showHighlights" is set to "whenSidebarOpen"', () => {
       const sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' });
       assert.isFalse(sidebar.visibleHighlights);
-      sidebar.open();
+      sidebar.show();
       assert.isTrue(sidebar.visibleHighlights);
     });
 
     it('does not show highlights otherwise', () => {
       const sidebar = createSidebar({ showHighlights: 'never' });
       assert.isFalse(sidebar.visibleHighlights);
-      sidebar.open();
+      sidebar.show();
       assert.isFalse(sidebar.visibleHighlights);
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
       const sidebar = createSidebar();
-      sidebar.open();
+      sidebar.show();
       assert.equal(fakeToolbar.sidebarOpen, true);
     });
   });
@@ -539,8 +539,8 @@ describe('Sidebar', () => {
     it('hides highlights if "showHighlights" is set to "whenSidebarOpen"', () => {
       const sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' });
 
-      sidebar.open();
-      sidebar.close();
+      sidebar.show();
+      sidebar.hide();
 
       assert.isFalse(sidebar.visibleHighlights);
     });
@@ -548,8 +548,8 @@ describe('Sidebar', () => {
     it('updates the `sidebarOpen` property of the toolbar', () => {
       const sidebar = createSidebar();
 
-      sidebar.open();
-      sidebar.close();
+      sidebar.show();
+      sidebar.hide();
 
       assert.equal(fakeToolbar.sidebarOpen, false);
     });
@@ -582,21 +582,21 @@ describe('Sidebar', () => {
       assert.equal(fakeToolbar.sidebarOpen, false);
     });
 
-    it('invokes the "open" method when window is resized', () => {
-      // Calling the 'open' methods adjust the marginLeft at different screen sizes
+    it('invokes the "show" method when window is resized', () => {
+      // Calling the 'show' methods adjust the marginLeft at different screen sizes
       const sidebar = createSidebar({ openSidebar: true });
       sidebar.publish('panelReady');
-      sinon.stub(sidebar, 'open');
+      sinon.stub(sidebar, 'show');
 
       // Make the window very small
       window.innerWidth = MIN_RESIZE;
       window.dispatchEvent(new Event('resize'));
-      assert.calledOnce(sidebar.open);
+      assert.calledOnce(sidebar.show);
 
       // Make the window very large
       window.innerWidth = MIN_RESIZE * 10;
       window.dispatchEvent(new Event('resize'));
-      assert.calledTwice(sidebar.open);
+      assert.calledTwice(sidebar.show);
     });
   });
 
@@ -674,7 +674,7 @@ describe('Sidebar', () => {
 
       it('notifies when sidebar changes expanded state', () => {
         sinon.stub(sidebar, 'publish');
-        sidebar.open();
+        sidebar.show();
         assert.calledOnce(layoutChangeHandlerSpy);
         assert.calledWith(
           sidebar.publish,
@@ -687,7 +687,7 @@ describe('Sidebar', () => {
           expanded: true,
         });
 
-        sidebar.close();
+        sidebar.hide();
         assert.calledTwice(layoutChangeHandlerSpy);
         assert.calledThrice(sidebar.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
@@ -745,14 +745,14 @@ describe('Sidebar', () => {
       });
 
       it('notifies when sidebar changes expanded state', () => {
-        sidebar.open();
+        sidebar.show();
         assert.calledOnce(layoutChangeHandlerSpy);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: true,
           width: DEFAULT_WIDTH,
         });
 
-        sidebar.close();
+        sidebar.hide();
         assert.calledTwice(layoutChangeHandlerSpy);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: false,

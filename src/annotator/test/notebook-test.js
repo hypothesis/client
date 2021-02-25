@@ -27,20 +27,20 @@ describe('Notebook', () => {
       const notebook = createNotebook();
       assert.isNull(notebook.container);
 
-      notebook.open();
+      notebook.show();
       assert.isNotNull(notebook.container);
     });
 
     it('is not created if `hide` is called before notebook is first shown', () => {
       const notebook = createNotebook();
-      notebook.close();
+      notebook.hide();
       assert.isNull(notebook.container);
     });
 
     it('displays when opened', () => {
       const notebook = createNotebook();
 
-      notebook.open();
+      notebook.show();
 
       assert.equal(notebook.container.style.display, '');
       assert.isTrue(notebook.container.classList.contains('is-open'));
@@ -49,8 +49,8 @@ describe('Notebook', () => {
     it('hides when closed', () => {
       const notebook = createNotebook();
 
-      notebook.open();
-      notebook.close();
+      notebook.show();
+      notebook.hide();
 
       assert.equal(notebook.container.style.display, 'none');
       assert.isFalse(notebook.container.classList.contains('is-open'));
@@ -58,12 +58,12 @@ describe('Notebook', () => {
   });
 
   describe('creating the notebook iframe', () => {
-    it('creates the iframe when the notebook is opened for the first time', () => {
+    it('creates the iframe when the notebook is shown for the first time', () => {
       const notebook = createNotebook();
 
       assert.isNull(notebook.frame);
 
-      notebook.open();
+      notebook.show();
 
       assert.isTrue(notebook.frame instanceof Element);
     });
@@ -73,7 +73,7 @@ describe('Notebook', () => {
         notebookAppUrl: 'http://www.example.com/foo/bar',
       });
 
-      notebook.open();
+      notebook.show();
 
       // The rest of the config gets added as a hash to the end of the src,
       // so split that off and look at the string before it
@@ -83,16 +83,16 @@ describe('Notebook', () => {
       );
     });
 
-    it('does not create a new iframe if opened again with same group ID', () => {
+    it('does not create a new iframe if shown again with same group ID', () => {
       const notebook = createNotebook();
       notebook._groupId = 'mygroup';
 
-      // The first opening will create a new iFrame
-      notebook.publish('openNotebook', ['myGroup']);
+      // The first showing will create a new iFrame
+      notebook.publish('showNotebook', ['myGroup']);
       const removeSpy = sinon.spy(notebook.frame, 'remove');
-      // Open it again — the group hasn't changed so the iframe won't be
+      // Show it again — the group hasn't changed so the iframe won't be
       // replaced
-      notebook.publish('openNotebook', ['myGroup']);
+      notebook.publish('showNotebook', ['myGroup']);
 
       assert.notCalled(removeSpy);
     });
@@ -101,41 +101,41 @@ describe('Notebook', () => {
       const notebook = createNotebook();
       notebook._groupId = 'mygroup';
 
-      // First open: creates an iframe
-      notebook.publish('openNotebook', ['myGroup']);
+      // First show: creates an iframe
+      notebook.publish('showNotebook', ['myGroup']);
       const removeSpy = sinon.spy(notebook.frame, 'remove');
 
-      // Open again with another group
-      notebook.publish('openNotebook', ['anotherGroup']);
+      // Show again with another group
+      notebook.publish('showNotebook', ['anotherGroup']);
 
-      // Open again, which will remove the first iframe and create a new one
-      notebook.open();
+      // Show again, which will remove the first iframe and create a new one
+      notebook.show();
       assert.calledOnce(removeSpy);
     });
   });
 
   describe('responding to events', () => {
-    it('opens on `openNotebook`', () => {
+    it('shows on `showNotebook`', () => {
       const notebook = createNotebook();
 
-      notebook.publish('openNotebook');
+      notebook.publish('showNotebook');
 
       assert.equal(notebook.container.style.display, '');
     });
 
-    it('closes on `closeNotebook`', () => {
+    it('hides on `hideNotebook`', () => {
       const notebook = createNotebook();
 
-      notebook.open();
-      notebook.publish('closeNotebook');
+      notebook.show();
+      notebook.publish('hideNotebook');
 
       assert.equal(notebook.container.style.display, 'none');
     });
 
-    it('closes on "sidebarOpened"', () => {
+    it('hides on "sidebarOpened"', () => {
       const notebook = createNotebook();
 
-      notebook.open();
+      notebook.show();
       notebook.publish('sidebarOpened');
 
       assert.equal(notebook.container.style.display, 'none');
@@ -148,7 +148,7 @@ describe('Notebook', () => {
       const hostDocument = notebook.element;
 
       // Make sure the frame is created
-      notebook.open();
+      notebook.show();
       assert.isNotNull(hostDocument.querySelector('hypothesis-notebook'));
 
       notebook.destroy();
