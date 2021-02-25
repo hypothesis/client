@@ -78,7 +78,7 @@ export default class Sidebar extends Guest {
       if (config.theme === 'clean') {
         frame.classList.add('annotator-frame--theme-clean');
       } else {
-        this.plugins.BucketBar = new BucketBar(frame, this, config.BucketBar);
+        this.bucketbar = new BucketBar(frame, this, config.BucketBar);
       }
 
       // Undocumented switch to enable/disable the wrapping of the sidebar inside a shadow DOM
