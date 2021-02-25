@@ -787,6 +787,11 @@ describe('Sidebar', () => {
   });
 
   describe('config', () => {
+    it('does have the BucketBar', () => {
+      const sidebar = createSidebar();
+      assert.isNotNull(sidebar.bucketBar);
+    });
+
     it('does not have the BucketBar if the clean theme is enabled', () => {
       const sidebar = createSidebar({ theme: 'clean' });
       assert.isNull(sidebar.bucketBar);
