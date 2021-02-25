@@ -152,6 +152,9 @@ export default class Guest extends Delegator {
 
     this.plugins = {};
 
+    /** @typedef {import('./bucket-bar').default|null} */
+    this.bucketBar = null;
+
     /** @type {Anchor[]} */
     this.anchors = [];
 
@@ -483,7 +486,7 @@ export default class Guest extends Delegator {
       this.anchors = this.anchors.concat(anchors);
 
       // Let plugins know about the new information.
-      this.plugins.BucketBar?.update();
+      this.bucketBar?.update();
       this.plugins.CrossFrame?.sync([annotation]);
 
       return anchors;
@@ -543,7 +546,7 @@ export default class Guest extends Delegator {
     this.anchors = anchors;
 
     removeHighlights(unhighlight);
-    this.plugins.BucketBar?.update();
+    this.bucketBar?.update();
   }
 
   /**

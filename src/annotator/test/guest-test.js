@@ -770,10 +770,10 @@ describe('Guest', () => {
     it('updates the cross frame and bucket bar plugins', () => {
       const guest = createGuest();
       guest.plugins.CrossFrame = { sync: sinon.stub() };
-      guest.plugins.BucketBar = { update: sinon.stub() };
+      guest.bucketBar = { update: sinon.stub() };
       const annotation = {};
       return guest.anchor(annotation).then(() => {
-        assert.called(guest.plugins.BucketBar.update);
+        assert.called(guest.bucketBar.update);
         assert.called(guest.plugins.CrossFrame.sync);
       });
     });
@@ -852,13 +852,13 @@ describe('Guest', () => {
 
     it('updates the bucket bar plugin', () => {
       const guest = createGuest();
-      guest.plugins.BucketBar = { update: sinon.stub() };
+      guest.bucketBar = { update: sinon.stub() };
       const annotation = {};
       guest.anchors.push({ annotation });
 
       guest.detach(annotation);
 
-      assert.calledOnce(guest.plugins.BucketBar.update);
+      assert.calledOnce(guest.bucketBar.update);
     });
 
     it('removes any highlights associated with the annotation', () => {

@@ -81,15 +81,13 @@ describe('Sidebar', () => {
     const fakeBucketBar = {};
     fakeBucketBar.element = document.createElement('div');
     fakeBucketBar.destroy = sandbox.stub();
+    const BucketBar = sandbox.stub();
+    BucketBar.returns(fakeBucketBar);
 
     CrossFrame = sandbox.stub();
     CrossFrame.returns(fakeCrossFrame);
 
-    const BucketBar = sandbox.stub();
-    BucketBar.returns(fakeBucketBar);
-
     sidebarConfig.pluginClasses.CrossFrame = CrossFrame;
-    sidebarConfig.pluginClasses.BucketBar = BucketBar;
 
     sidebars = [];
 
@@ -97,6 +95,7 @@ describe('Sidebar', () => {
       './toolbar': {
         ToolbarController: FakeToolbarController,
       },
+      './bucket-bar': { default: BucketBar },
     });
   });
 
@@ -788,16 +787,16 @@ describe('Sidebar', () => {
   });
 
   describe('config', () => {
-    it('does not have the BucketBar plugin if the clean theme is enabled', () => {
+    it('does not have the BucketBar if the clean theme is enabled', () => {
       const sidebar = createSidebar({ theme: 'clean' });
-      assert.isUndefined(sidebar.plugins.BucketBar);
+      assert.isNull(sidebar.bucketBar);
     });
 
     it('does not have the BucketBar if an external container is provided', () => {
       const sidebar = createSidebar({
         externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
-      assert.isUndefined(sidebar.plugins.BucketBar);
+      assert.isNull(sidebar.bucketBar);
     });
 
     it('disables shadow DOM if `disableShadowSidebar` flag is set', () => {
