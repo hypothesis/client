@@ -65,26 +65,17 @@ export default class Sidebar extends Guest {
 
     this.iframe = createSidebarIframe(config);
 
-    const {
-      externalContainerSelector,
-      theme,
-      openSidebar,
-      annotations,
-      query,
-      group,
-    } = config;
-
-    if (externalContainerSelector) {
+    if (config.externalContainerSelector) {
       this.externalFrame =
         /** @type {HTMLElement} */
-        (document.querySelector(externalContainerSelector)) ?? element;
+        (document.querySelector(config.externalContainerSelector)) ?? element;
       this.externalFrame.appendChild(this.iframe);
     } else {
       this.iframeContainer = document.createElement('div');
       this.iframeContainer.style.display = 'none';
       this.iframeContainer.className = 'annotator-frame';
 
-      if (theme === 'clean') {
+      if (config.theme === 'clean') {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
         this.bucketBar = new BucketBar(
@@ -123,7 +114,12 @@ export default class Sidebar extends Guest {
       }
     });
 
-    if (openSidebar || annotations || query || group) {
+    if (
+      config.openSidebar ||
+      config.annotations ||
+      config.query ||
+      config.group
+    ) {
       this.subscribe('panelReady', () => this.show());
     }
 
@@ -134,7 +130,12 @@ export default class Sidebar extends Guest {
       setSidebarOpen: open => (open ? this.show() : this.hide()),
       setHighlightsVisible: show => this.setAllVisibleHighlights(show),
     });
-    this.toolbar.useMinimalControls = theme === 'clean';
+
+    if (config.theme === 'clean') {
+      this.toolbar.useMinimalControls = true;
+    } else {
+      this.toolbar.useMinimalControls = false;
+    }
 
     if (this.iframeContainer) {
       // If using our own container frame for the sidebar, add the toolbar to it.
