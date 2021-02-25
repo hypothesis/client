@@ -40,8 +40,6 @@
   font-size: var.$font-size--large;
   display: flex;
   justify-content: flex-end;
-  background-color: var.$grey-2;
-  padding: var.$layout-space--xsmall;
 
   // FIXME: these properties emulates as if the Notebook__controller-bar would be part of the iframe.
   border-top-left-radius: var.$border-radius;
@@ -49,8 +47,10 @@
 }
 
 .Notebook__close-button {
+  position: absolute;
   @include buttons.button--labeled(
     $background-color: var.$grey-2,
     $active-background-color: var.$grey-3
   );
+  margin: var.$layout-space--xsmall;
 }

@@ -61,8 +61,6 @@ export default class Notebook extends Delegator {
       this._groupId = groupId;
       this.open();
     });
-    // Defensive programming: if the sidebar has opened, get out of the way
-    this.subscribe('sidebarOpened', () => this.close());
   }
 
   _update() {
@@ -110,20 +108,22 @@ export default class Notebook extends Delegator {
     this.container.className = 'notebook-outer';
     shadowRoot.appendChild(this.container);
 
+    const close = event => {
+      // Guest 'component' captures all click or touchstart events in the host page and opens the sidebar.
+      // We stop the propagation of the event to prevent the sidebar to be opened.
+      event.stopPropagation();
+      this.close();
+      this.publish('closeNotebook');
+    };
+
     render(
-      <div className="Notebook__controller-bar">
+      <div className="Notebook__controller-bar" onTouchStart={close}>
         <Button
           icon="cancel"
           className="Notebook__close-button"
           buttonText="Close"
           title="Close the Notebook"
-          onClick={event => {
-            // Guest 'component' captures all click events in the host page and opens the sidebar.
-            // We stop the propagation of the event to prevent the sidebar to be opened.
-            event.stopPropagation();
-            this.close();
-            this.publish('closeNotebook');
-          }}
+          onClick={close}
         />
       </div>,
       this.container

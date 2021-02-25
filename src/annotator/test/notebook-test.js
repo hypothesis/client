@@ -136,15 +136,6 @@ describe('Notebook', () => {
 
       assert.equal(notebook.container.style.display, '');
     });
-
-    it('closes on "sidebarOpened"', () => {
-      const notebook = createNotebook();
-
-      notebook.open();
-      notebook.publish('sidebarOpened');
-
-      assert.equal(notebook.container.style.display, 'none');
-    });
   });
 
   describe('destruction', () => {
