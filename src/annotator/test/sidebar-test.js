@@ -251,29 +251,29 @@ describe('Sidebar', () => {
         assert.called(target);
       }));
 
-    describe('on "openNotebook" crossframe event', () => {
-      it('hides the sidebar', () => {
+    describe('on "openNotebook" event', () => {
+      it('hides itself and republishes the event', () => {
         const sidebar = createSidebar();
-        sinon.stub(sidebar, 'hide').callThrough();
         sinon.stub(sidebar, 'publish');
+        sinon.stub(sidebar, 'close');
         emitEvent('openNotebook', 'mygroup');
         assert.calledWith(
           sidebar.publish,
           'openNotebook',
           sinon.match(['mygroup'])
         );
-        assert.calledOnce(sidebar.hide);
-        assert.notEqual(sidebar.frame.style.visibility, 'hidden');
+        assert.calledOnce(sidebar.close);
       });
     });
 
-    describe('on "closeNotebook" internal event', () => {
-      it('shows the sidebar', () => {
+    describe('on "closeNotebook" event', () => {
+      it('opens itself and republishes the event', () => {
         const sidebar = createSidebar();
-        sinon.stub(sidebar, 'show').callThrough();
-        sidebar.publish('closeNotebook');
-        assert.calledOnce(sidebar.show);
-        assert.equal(sidebar.frame.style.visibility, '');
+        sinon.stub(sidebar, 'publish');
+        sinon.stub(sidebar, 'open');
+        emitEvent('closeNotebook');
+        assert.calledWith(sidebar.publish, 'closeNotebook');
+        assert.calledOnce(sidebar.open);
       });
     });
 

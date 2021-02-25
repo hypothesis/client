@@ -47,11 +47,6 @@
   user-select: none;
   -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
 
-  &.is-hidden {
-    visibility: hidden;
-    transition: visibility var.$annotator-timing--sidebar-collapse-transition;
-  }
-
   &.annotator-collapsed {
     margin-left: 0;
 

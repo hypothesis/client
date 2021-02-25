@@ -3,9 +3,6 @@ import { createSidebarConfig } from './config/sidebar';
 import { createShadowRoot } from './util/shadow-root';
 import { render } from 'preact';
 
-// FIXME: use the button from the frontend shared package once this is stable.
-import Button from '../sidebar/components/Button';
-
 /**
  * Create the iframe that will load the notebook application.
  *
@@ -36,9 +33,7 @@ export default class Notebook extends Delegator {
     super(element, config);
     this.frame = null;
 
-    /** @type {null|string} */
     this._groupId = null;
-    /** @type {null|string} */
     this._prevGroupId = null;
 
     /**
@@ -61,7 +56,8 @@ export default class Notebook extends Delegator {
       this._groupId = groupId;
       this.open();
     });
-    // Defensive programming: if the sidebar has opened, get out of the way
+    this.subscribe('closeNotebook', () => this.close());
+    // If the sidebar has opened, get out of the way
     this.subscribe('sidebarOpened', () => this.close());
   }
 
@@ -109,25 +105,6 @@ export default class Notebook extends Delegator {
     this.container.style.display = 'none';
     this.container.className = 'notebook-outer';
     shadowRoot.appendChild(this.container);
-
-    render(
-      <div className="Notebook__controller-bar">
-        <Button
-          icon="cancel"
-          className="Notebook__close-button"
-          buttonText="Close"
-          title="Close the Notebook"
-          onClick={event => {
-            // Guest 'component' captures all click events in the host page and opens the sidebar.
-            // We stop the propagation of the event to prevent the sidebar to be opened.
-            event.stopPropagation();
-            this.close();
-            this.publish('closeNotebook');
-          }}
-        />
-      </div>,
-      this.container
-    );
 
     return this.container;
   }
