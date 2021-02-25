@@ -5,6 +5,8 @@
 .NotebookView {
   display: grid;
   row-gap: var.$layout-space--small;
+  // See https://css-tricks.com/preventing-a-grid-blowout/
+  grid-template-columns: minmax(0, auto);
   grid-template-areas:
     'heading'
     'filters'
