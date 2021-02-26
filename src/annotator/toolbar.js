@@ -49,7 +49,8 @@ export class ToolbarController {
   }
 
   getWidth() {
-    return this._container.getBoundingClientRect().width;
+    const content = /** @type {HTMLElement} */ (this._container.firstChild);
+    return content.getBoundingClientRect().width;
   }
 
   /**

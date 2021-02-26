@@ -16,7 +16,7 @@ describe('ToolbarController', () => {
 
     const FakeToolbar = props => {
       toolbarProps = props;
-      return null;
+      return <div style={{ width: '150px' }} />;
     };
 
     $imports.$mock({
@@ -26,6 +26,7 @@ describe('ToolbarController', () => {
 
   afterEach(() => {
     $imports.$restore();
+    container.remove();
   });
 
   it('has expected default state', () => {
@@ -135,7 +136,11 @@ describe('ToolbarController', () => {
 
   describe('#getWidth', () => {
     it(`returns the toolbar's width`, () => {
-      assert.isNumber(createToolbar().getWidth());
+      // For the measured width to return the correct value, the toolbar must be rendered
+      // into a document.
+      document.body.appendChild(container);
+      const toolbar = createToolbar();
+      assert.equal(toolbar.getWidth(), 150);
     });
   });
 
