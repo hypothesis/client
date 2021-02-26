@@ -1,10 +1,11 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
 import { render } from 'preact';
 
 import * as pdfAnchoring from '../anchoring/pdf';
+import WarningBanner from '../components/WarningBanner';
 import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
+import { createShadowRoot } from '../util/shadow-root';
 
 import PDFMetadata from './pdf-metadata';
 
@@ -13,34 +14,6 @@ import PDFMetadata from './pdf-metadata';
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  */
-
-/**
- * A banner shown at the top of the PDF viewer if the PDF cannot be annotated
- * by Hypothesis.
- */
-function WarningBanner() {
-  return (
-    <>
-      <div className="annotator-pdf-warning-banner__type">
-        <SvgIcon
-          name="caution"
-          className="annotator-pdf-warning-banner__icon"
-        />
-      </div>
-      <div className="annotator-pdf-warning-banner__message">
-        <strong>This PDF does not contain selectable text:</strong>{' '}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://web.hypothes.is/help/how-to-ocr-optimize-pdfs/"
-        >
-          Learn how to fix this
-        </a>{' '}
-        in order to annotate with Hypothesis.
-      </div>
-    </>
-  );
-}
 
 export default class PDF extends Delegator {
   /**
@@ -164,11 +137,21 @@ export default class PDF extends Delegator {
       this._warningBanner.style.top = -rect.height + 'px';
     };
 
-    this._warningBanner = document.createElement('div');
-    this._warningBanner.className =
-      'annotator-pdf-warning-banner annotator-pdf-warning-banner--notice';
+    this._warningBanner = document.createElement('hypothesis-banner');
+    Object.assign(this._warningBanner.style, {
+      // Position the banner at the top of the viewer and make it span the full width.
+      position: 'absolute',
+      left: '0',
+      right: '0',
+
+      // The Z-index is necessary to raise the banner above the toolbar at the
+      // top of the PDF.js viewer.
+      zIndex: '10000',
+    });
     mainContainer.appendChild(this._warningBanner);
-    render(<WarningBanner />, this._warningBanner);
+
+    const warningBannerContent = createShadowRoot(this._warningBanner);
+    render(<WarningBanner />, warningBannerContent);
 
     // nb. In browsers that don't support `ResizeObserver` the banner height
     // will simply be static and not adjust if the window is resized.

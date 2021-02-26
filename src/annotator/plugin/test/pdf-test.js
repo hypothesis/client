@@ -126,7 +126,7 @@ describe('annotator/plugin/pdf', () => {
   });
 
   function getWarningBanner() {
-    return document.querySelector('.annotator-pdf-warning-banner');
+    return document.querySelector('hypothesis-banner');
   }
 
   it('does not show a warning when PDF has selectable text', async () => {
@@ -163,7 +163,7 @@ describe('annotator/plugin/pdf', () => {
     assert.isNotNull(banner);
     assert.isTrue(mainContainer.contains(banner));
     assert.include(
-      banner.textContent,
+      banner.shadowRoot.textContent,
       'This PDF does not contain selectable text'
     );
 

@@ -4,7 +4,6 @@
 @use "sass:color" as color;
 
 @use '../variables' as var;
-@use '../mixins/molecules';
 @use '../mixins/reset';
 
 // Shared styles
@@ -15,6 +14,7 @@
 @use './components/AdderToolbar';
 @use './components/Buckets';
 @use './components/Toolbar';
+@use './components/WarningBanner';
 @use './highlights';
 @use './notebook';
 
@@ -84,20 +84,6 @@
 // it is manually resized by dragging
 .annotator-no-transition {
   transition: none !important;
-}
-
-.annotator-pdf-warning-banner {
-  @include molecules.banner;
-  position: absolute;
-  left: 0;
-  top: 0;
-  right: 0;
-
-  font-size: var.$annotator-adder-font-size;
-
-  // The Z-index is necessary to raise the banner above the toolbar at the
-  // top of the PDF.js viewer.
-  z-index: 10000;
 }
 
 /** Affordances for clean theme */
