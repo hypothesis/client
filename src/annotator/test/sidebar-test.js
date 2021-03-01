@@ -496,21 +496,12 @@ describe('Sidebar', () => {
   });
 
   describe('destruction', () => {
-    it('the (shadow DOMed) sidebar is destroyed and the frame is detached', () => {
+    it('the sidebar is destroyed and the frame is detached', () => {
       const sidebar = createSidebar();
       const sidebarContainer = containers[0];
       sidebar.destroy();
       assert.called(fakeCrossFrame.destroy);
       assert.notExists(sidebarContainer.querySelector('hypothesis-sidebar'));
-      assert.equal(sidebar.iframeContainer.parentElement, null);
-    });
-
-    it('the (non-shadow DOMed) sidebar is destroyed and the frame is detached', () => {
-      const sidebar = createSidebar({ disableShadowSidebar: true });
-      const sidebarContainer = containers[0];
-      sidebar.destroy();
-      assert.called(fakeCrossFrame.destroy);
-      assert.notExists(sidebarContainer.querySelector('.annotator-frame'));
       assert.equal(sidebar.iframeContainer.parentElement, null);
     });
   });
