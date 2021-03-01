@@ -56,11 +56,11 @@ clean:
 	rm -rf build
 
 .PHONY: format
-format:
+format: node_modules/.uptodate
 	yarn run format
 
 .PHONY: checkformatting
-checkformatting:
+checkformatting: node_modules/.uptodate
 	yarn run checkformatting
 
 .PHONY: sure
