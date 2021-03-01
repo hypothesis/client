@@ -52,10 +52,6 @@ function init() {
   let SidebarClass = isPDF ? PdfSidebar : Sidebar;
 
   if (config.subFrameIdentifier) {
-    // Make sure the PDF plugin is loaded if the subframe contains the PDF.js viewer.
-    if (isPDF) {
-      config.PDF = {};
-    }
     SidebarClass = null;
 
     // Other modules use this to detect if this
@@ -65,6 +61,11 @@ function init() {
   }
 
   config.pluginClasses = pluginClasses;
+
+  // Load the PDF anchoring/metadata integration.
+  if (isPDF) {
+    config.PDF = {};
+  }
 
   const guest = new Guest(document.body, config);
   const sidebar = SidebarClass
