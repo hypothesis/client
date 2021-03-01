@@ -24,7 +24,7 @@ describe('PdfSidebar', () => {
   const createPdfSidebar = config => {
     const fakeGuest = {};
     const element = document.createElement('div');
-    return new PdfSidebar(element, config, fakeGuest);
+    return new PdfSidebar(element, fakeGuest, config);
   };
 
   let unmockSidebar;

@@ -21,11 +21,11 @@ const MIN_PDF_WIDTH = 680;
 export default class PdfSidebar extends Sidebar {
   /**
    * @param {HTMLElement} element
-   * @param {Record<string, any>} config
    * @param {Guest} guest
+   * @param {Record<string, any>} [config]
    */
-  constructor(element, config, guest) {
-    super(element, { ...defaultConfig, ...config }, guest);
+  constructor(element, guest, config = {}) {
+    super(element, guest, { ...defaultConfig, ...config });
 
     this._lastSidebarLayoutState = {
       expanded: false,

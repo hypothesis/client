@@ -62,13 +62,13 @@ export default class Sidebar extends Delegator {
    * Create the sidebar iframe, its container and adjacent controls.
    *
    * @param {HTMLElement} element
-   * @param {Record<string, any>} config
    * @param {Guest} guest -
    *   The `Guest` instance for the current frame. It is currently assumed that
    *   it is always possible to annotate in the frame where the sidebar is
    *   displayed.
+   * @param {Record<string, any>} [config]
    */
-  constructor(element, config, guest) {
+  constructor(element, guest, config = {}) {
     super(element, config);
 
     this.iframe = createSidebarIframe(config);
