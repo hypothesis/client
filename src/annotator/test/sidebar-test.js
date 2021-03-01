@@ -41,7 +41,7 @@ describe('Sidebar', () => {
     document.body.appendChild(container);
     containers.push(container);
 
-    const sidebar = new Sidebar(container, config, fakeGuest);
+    const sidebar = new Sidebar(container, fakeGuest, config);
     sidebars.push(sidebar);
 
     return sidebar;

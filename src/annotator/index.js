@@ -48,7 +48,7 @@ const config = configFrom(window);
 function init() {
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
-  /** @type {(new (e: HTMLElement, config: any, guest: Guest) => Sidebar)|null} */
+  /** @type {(new (e: HTMLElement, guest: Guest, config: Record<string,any>) => Sidebar)|null} */
   let SidebarClass = isPDF ? PdfSidebar : Sidebar;
 
   if (config.subFrameIdentifier) {
@@ -68,7 +68,7 @@ function init() {
 
   const guest = new Guest(document.body, config);
   const sidebar = SidebarClass
-    ? new SidebarClass(document.body, config, guest)
+    ? new SidebarClass(document.body, guest, config)
     : null;
   const notebook = new Notebook(document.body, config);
 
