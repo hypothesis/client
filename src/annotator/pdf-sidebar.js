@@ -7,7 +7,6 @@ import Sidebar from './sidebar';
  */
 
 const defaultConfig = {
-  PDF: {},
   BucketBar: {
     scrollables: ['#viewerContainer'],
   },
