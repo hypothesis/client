@@ -10,7 +10,6 @@ help:
 	@echo "make checkformatting   Check code formatting"
 	@echo "make format            Automatically format code"
 	@echo "make test              Run the unit tests once"
-	@echo "make servetests        Start the unit test server on localhost"
 	@echo "make sure              Make sure that the formatter, linter, tests, etc all pass"
 	@echo "make docs              Build docs website and serve it locally"
 	@echo "make checkdocs         Crash if building the docs website fails"
@@ -27,14 +26,6 @@ ifdef ARGS
 	yarn test $(ARGS)
 else
 	yarn test
-endif
-
-.PHONY: servetests
-servetests: node_modules/.uptodate
-ifdef ARGS
-	node_modules/.bin/gulp --watch $(ARGS)
-else
-	node_modules/.bin/gulp --watch
 endif
 
 .PHONY: lint
