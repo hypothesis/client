@@ -15,11 +15,6 @@ const through = require('through2');
 
 const createBundle = require('./scripts/gulp/create-bundle');
 const createStyleBundle = require('./scripts/gulp/create-style-bundle');
-const {
-  buildFrontendSharedJs,
-  buildFrontendSharedTypes,
-  linkFrontendShared,
-} = require('./scripts/gulp/frontend-shared');
 const manifest = require('./scripts/gulp/manifest');
 const serveDev = require('./dev-server/serve-dev');
 const servePackage = require('./dev-server/serve-package');
@@ -162,34 +157,12 @@ gulp.task(
 );
 
 gulp.task(
-  'build-frontend-shared-js',
-  gulp.parallel(buildFrontendSharedJs, buildFrontendSharedTypes)
-);
-
-gulp.task('link-frontend-shared', linkFrontendShared);
-
-gulp.task(
-  'build-frontend-shared',
-  gulp.series('build-frontend-shared-js', 'link-frontend-shared')
-);
-
-gulp.task('watch-frontend-shared', () => {
-  gulp.watch(
-    './frontend-shared/src/**',
-    gulp.series('build-frontend-shared-js')
-  );
-});
-
-gulp.task(
   'watch-js',
-  gulp.series(
-    gulp.parallel('build-vendor-js', 'build-frontend-shared-js'),
-    function watchJS() {
-      appBundleConfigs.forEach(function (config) {
-        createBundle(config, { watch: true });
-      });
-    }
-  )
+  gulp.series('build-vendor-js', function watchJS() {
+    appBundleConfigs.forEach(function (config) {
+      createBundle(config, { watch: true });
+    });
+  })
 );
 
 const cssBundles = [
@@ -221,11 +194,7 @@ gulp.task(
   'watch-css',
   gulp.series('build-css', function watchCSS() {
     const vendorCSS = cssBundles.filter(path => path.endsWith('.css'));
-    const frontendSharedGlobs = vendorCSS.concat(
-      './frontend-shared/styles/**/*.scss'
-    );
-    const styleFileGlobs = frontendSharedGlobs.concat('./src/styles/**/*.scss');
-
+    const styleFileGlobs = vendorCSS.concat('./src/styles/**/*.scss');
     gulp.watch(styleFileGlobs, gulp.task('build-css'));
   })
 );
@@ -363,18 +332,14 @@ gulp.task('build', gulp.series(buildAssets, generateManifest));
 
 gulp.task(
   'watch',
-  gulp.series(
-    'link-frontend-shared',
-    gulp.parallel(
-      'serve-package',
-      'serve-test-pages',
-      'watch-js',
-      'watch-css',
-      'watch-fonts',
-      'watch-images',
-      'watch-manifest',
-      'watch-frontend-shared'
-    )
+  gulp.parallel(
+    'serve-package',
+    'serve-test-pages',
+    'watch-js',
+    'watch-css',
+    'watch-fonts',
+    'watch-images',
+    'watch-manifest'
   )
 );
 

@@ -76,7 +76,6 @@ node {
     stage('Setup') {
       nodeEnv.inside("-e HOME=${workspace}") {
         sh "yarn install"
-        sh "yarn setup-frontend-shared"
       }
     }
 

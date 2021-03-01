@@ -30,11 +30,7 @@ if (process.env.RUNNING_IN_DOCKER) {
 }
 
 module.exports = function (config) {
-  let testFiles = [
-    '**/test/*-test.js',
-    '**/integration/*-test.js',
-    '../frontend-shared/**/test/*-test.js',
-  ];
+  let testFiles = ['**/test/*-test.js', '**/integration/*-test.js'];
 
   if (config.grep) {
     const allFiles = testFiles
@@ -89,7 +85,6 @@ module.exports = function (config) {
       './boot/polyfills/*.js': ['browserify'],
       './sidebar/test/bootstrap.js': ['browserify'],
       '**/*-test.js': ['browserify'],
-      '../frontend-shared/**/*-test.js': ['browserify'],
       '**/*-it.js': ['browserify'],
     },
 
@@ -99,21 +94,13 @@ module.exports = function (config) {
         [
           'babelify',
           {
-            // The existence of this preset option is due to a config issue with frontend-shared/
-            // where jsx modules are not transpiled to js.
-            // See https://github.com/hypothesis/client/issues/2929
-            presets: require('../frontend-shared/.babelrc.cjs').presets,
             extensions: ['.js'],
             plugins: [
               'mockable-imports',
               [
                 'babel-plugin-istanbul',
                 {
-                  exclude: [
-                    '**/test/**/*.js',
-                    '**/test-util/**',
-                    'frontend-shared/lib',
-                  ],
+                  exclude: ['**/test/**/*.js', '**/test-util/**'],
                 },
               ],
             ],
