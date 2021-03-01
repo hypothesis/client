@@ -172,12 +172,9 @@ export default class PDF extends Delegator {
 
     // nb. In browsers that don't support `ResizeObserver` the banner height
     // will simply be static and not adjust if the window is resized.
-    //
-    // @ts-expect-error - TS is missing `ResizeObserver`
     if (typeof ResizeObserver !== 'undefined') {
       // Update the banner when the window is resized or the Hypothesis
       // sidebar is opened.
-      // @ts-ignore
       new ResizeObserver(updateBannerHeight).observe(this._warningBanner);
     }
     updateBannerHeight();
