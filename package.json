@@ -123,13 +123,12 @@
   "main": "./build/boot.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
-    "lint": "eslint . .github",
+    "lint": "eslint .",
     "checkformatting": "prettier --check '**/*.{js,scss}'",
     "format": "prettier --list-different --write '**/*.{js,scss}'",
     "test": "gulp test",
     "typecheck": "tsc --build src/tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
-    "version": "make clean build",
-    "setup-frontend-shared": "gulp build-frontend-shared"
+    "version": "make clean build"
   }
 }
