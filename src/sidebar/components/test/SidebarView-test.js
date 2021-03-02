@@ -34,7 +34,9 @@ describe('SidebarView', () => {
     fakeLoadAnnotationsService = {
       load: sinon.stub(),
     };
-    fakeUseRootThread = sinon.stub().returns({});
+    fakeUseRootThread = sinon.stub().returns({
+      children: [],
+    });
     fakeStreamer = {
       connect: sinon.stub(),
     };
