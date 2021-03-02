@@ -17,7 +17,9 @@ describe('StreamView', () => {
       search: sinon.stub().resolves({ rows: [], replies: [], total: 0 }),
     };
 
-    fakeUseRootThread = sinon.stub().returns({});
+    fakeUseRootThread = sinon.stub().returns({
+      children: [],
+    });
 
     fakeSearchFilter = {
       toObject: sinon.stub().returns({}),
