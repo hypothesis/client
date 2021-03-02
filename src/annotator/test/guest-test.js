@@ -63,6 +63,7 @@ describe('Guest', () => {
     };
     htmlAnchoring = {
       anchor: sinon.stub(),
+      describe: sinon.stub(),
     };
     rangeUtil = {
       itemsForRange: sinon.stub().returns([]),
@@ -626,7 +627,7 @@ describe('Guest', () => {
   });
 
   describe('#createAnnotation', () => {
-    it('adds metadata to the annotation object', async () => {
+    it('adds document metadata to the annotation', async () => {
       const guest = createGuest();
       const annotation = {};
 
@@ -634,6 +635,27 @@ describe('Guest', () => {
 
       assert.equal(annotation.uri, fakeDocumentMeta.uri());
       assert.deepEqual(annotation.document, fakeDocumentMeta.metadata);
+    });
+
+    it('adds selectors for selected ranges to the annotation', async () => {
+      const guest = createGuest();
+      const fakeRange = {};
+      guest.selectedRanges = [fakeRange];
+
+      const selectorA = { type: 'TextPositionSelector', start: 0, end: 10 };
+      const selectorB = { type: 'TextQuoteSelector', exact: 'foobar' };
+      htmlAnchoring.anchor.resolves({});
+      htmlAnchoring.describe.returns([selectorA, selectorB]);
+
+      const annotation = await guest.createAnnotation({});
+
+      assert.calledWith(htmlAnchoring.describe, guest.element, fakeRange);
+      assert.deepEqual(annotation.target, [
+        {
+          source: fakeDocumentMeta.uri(),
+          selector: [selectorA, selectorB],
+        },
+      ]);
     });
 
     it('merges properties of input object into returned annotation', async () => {
