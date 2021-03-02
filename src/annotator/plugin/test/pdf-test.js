@@ -23,7 +23,7 @@ describe('annotator/plugin/pdf', () => {
   let pdfPlugin;
 
   function createPDFPlugin() {
-    return new PDF(document.body, {}, fakeAnnotator);
+    return new PDF(document.body, fakeAnnotator);
   }
 
   beforeEach(() => {

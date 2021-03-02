@@ -15,15 +15,6 @@ class FakeAdder {
 }
 FakeAdder.instance = null;
 
-class FakePlugin extends Delegator {
-  constructor(element, config, annotator) {
-    super(element, config);
-    this.annotator = annotator;
-    FakePlugin.instance = this;
-  }
-}
-FakePlugin.instance = null;
-
 class FakeTextRange {
   constructor(range) {
     this.range = range;
@@ -59,7 +50,7 @@ describe('Guest', () => {
 
   beforeEach(() => {
     FakeAdder.instance = null;
-    guestConfig = { pluginClasses: {} };
+    guestConfig = {};
     highlighter = {
       highlightRange: sinon.stub().returns([]),
       removeHighlights: sinon.stub(),
@@ -93,7 +84,6 @@ describe('Guest', () => {
     }
 
     CrossFrame = sandbox.stub().returns(fakeCrossFrame);
-    guestConfig.pluginClasses.CrossFrame = CrossFrame;
 
     $imports.$mock({
       './adder': { Adder: FakeAdder },
@@ -103,6 +93,7 @@ describe('Guest', () => {
       },
       './highlighter': highlighter,
       './range-util': rangeUtil,
+      './plugin/cross-frame': CrossFrame,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
@@ -114,28 +105,6 @@ describe('Guest', () => {
   afterEach(() => {
     sandbox.restore();
     $imports.$restore();
-  });
-
-  describe('plugins', () => {
-    let fakePlugin;
-    let guest;
-
-    beforeEach(() => {
-      FakePlugin.instance = null;
-      guestConfig.pluginClasses.FakePlugin = FakePlugin;
-      guest = createGuest({ FakePlugin: {} });
-      fakePlugin = FakePlugin.instance;
-    });
-
-    it('passes guest reference to constructor', () => {
-      assert.equal(fakePlugin.annotator, guest);
-    });
-
-    it('calls `destroy` method of plugins when guest is destroyed', () => {
-      sandbox.spy(fakePlugin, 'destroy');
-      guest.destroy();
-      assert.called(fakePlugin.destroy);
-    });
   });
 
   describe('cross frame', () => {
@@ -361,9 +330,9 @@ describe('Guest', () => {
       beforeEach(() => {
         document.title = 'hi';
         guest = createGuest();
-        guest.plugins.PDF = {
-          uri: sandbox.stub().returns(window.location.href),
-          getMetadata: sandbox.stub(),
+        guest.pdfIntegration = {
+          uri: sinon.stub().resolves(window.location.href),
+          getMetadata: sinon.stub().resolves({}),
         };
       });
 
@@ -384,7 +353,7 @@ describe('Guest', () => {
         };
 
         const promise = Promise.resolve(metadata);
-        guest.plugins.PDF.getMetadata.returns(promise);
+        guest.pdfIntegration.getMetadata.returns(promise);
 
         emitGuestEvent('getDocumentInfo', assertComplete);
       });
@@ -405,7 +374,7 @@ describe('Guest', () => {
         };
 
         const promise = Promise.reject(new Error('Not a PDF document'));
-        guest.plugins.PDF.getMetadata.returns(promise);
+        guest.pdfIntegration.getMetadata.returns(promise);
 
         emitGuestEvent('getDocumentInfo', assertComplete);
       });
@@ -450,7 +419,7 @@ describe('Guest', () => {
     it('hides sidebar when the user taps or clicks in the page', () => {
       for (let event of ['click', 'touchstart']) {
         rootElement.dispatchEvent(new Event(event));
-        assert.calledWith(guest.plugins.CrossFrame.call, 'closeSidebar');
+        assert.calledWith(guest.crossframe.call, 'closeSidebar');
       }
     });
 
@@ -458,7 +427,7 @@ describe('Guest', () => {
       for (let event of ['click', 'touchstart']) {
         guest.closeSidebarOnDocumentClick = false;
         rootElement.dispatchEvent(new Event(event));
-        assert.notCalled(guest.plugins.CrossFrame.call);
+        assert.notCalled(guest.crossframe.call);
       }
     });
 
@@ -469,7 +438,7 @@ describe('Guest', () => {
 
       for (let event of ['click', 'touchstart']) {
         fakeSidebarFrame.dispatchEvent(new Event(event, { bubbles: true }));
-        assert.notCalled(guest.plugins.CrossFrame.call);
+        assert.notCalled(guest.crossframe.call);
       }
     });
   });
@@ -574,17 +543,15 @@ describe('Guest', () => {
 
     beforeEach(() => {
       guest = createGuest();
-      guest.plugins.PDF = {
-        uri() {
-          return 'urn:x-pdf:001122';
-        },
-        getMetadata: sandbox.stub(),
+      guest.pdfIntegration = {
+        uri: sandbox.stub().resolves('urn:x-pdf:001122'),
+        getMetadata: sandbox.stub().resolves({}),
       };
     });
 
     it('preserves the components of the URI other than the fragment', () => {
-      guest.plugins.PDF = null;
-      guest.plugins.Document = {
+      guest.pdfIntegration = null;
+      guest.documentMeta = {
         uri() {
           return 'http://foobar.com/things?id=42';
         },
@@ -596,7 +563,7 @@ describe('Guest', () => {
     });
 
     it('removes the fragment identifier from URIs', () => {
-      guest.plugins.PDF.uri = () => 'urn:x-pdf:aabbcc#ignoreme';
+      guest.pdfIntegration.uri.resolves('urn:x-pdf:aabbcc#ignoreme');
       return guest
         .getDocumentInfo()
         .then(({ uri }) => assert.equal(uri, 'urn:x-pdf:aabbcc'));
@@ -605,13 +572,18 @@ describe('Guest', () => {
 
   describe('#createAnnotation', () => {
     it('adds metadata to the annotation object', () => {
+      class FakeDocumentMeta {
+        get metadata() {
+          return { title: 'hello' };
+        }
+
+        uri() {
+          return 'http://example.com';
+        }
+      }
+      $imports.$mock({ './plugin/document': FakeDocumentMeta });
+
       const guest = createGuest();
-      sinon.stub(guest, 'getDocumentInfo').returns(
-        Promise.resolve({
-          metadata: { title: 'hello' },
-          uri: 'http://example.com/',
-        })
-      );
       const annotation = {};
 
       guest.createAnnotation(annotation);
@@ -769,12 +741,12 @@ describe('Guest', () => {
         .then(() => assert.notCalled(htmlAnchoring.anchor));
     });
 
-    it('updates the cross frame plugin', () => {
+    it('syncs annotations to the sidebar', () => {
       const guest = createGuest();
-      guest.plugins.CrossFrame = { sync: sinon.stub() };
+      guest.crossframe = { sync: sinon.stub() };
       const annotation = {};
       return guest.anchor(annotation).then(() => {
-        assert.called(guest.plugins.CrossFrame.sync);
+        assert.called(guest.crossframe.sync);
       });
     });
 

@@ -2,6 +2,7 @@
 // with various combinations of selector are anchored.
 
 import Guest from '../../guest';
+import { $imports as guestImports } from '../../guest';
 
 function quoteSelector(quote) {
   return {
@@ -47,22 +48,27 @@ function FakeCrossFrame() {
 
 describe('anchoring', function () {
   let guest;
-  let guestConfig;
   let container;
 
-  before(function () {
-    guestConfig = { pluginClasses: { CrossFrame: FakeCrossFrame } };
+  before(() => {
+    guestImports.$mock({
+      './plugin/cross-frame': FakeCrossFrame,
+    });
   });
 
-  beforeEach(function () {
+  after(() => {
+    guestImports.$restore({ './plugins/cross-frame': true });
+  });
+
+  beforeEach(() => {
     sinon.stub(console, 'warn');
     container = document.createElement('div');
     container.innerHTML = require('./test-page.html');
     document.body.appendChild(container);
-    guest = new Guest(container, guestConfig);
+    guest = new Guest(container);
   });
 
-  afterEach(function () {
+  afterEach(() => {
     guest.destroy();
     container.parentNode.removeChild(container);
     console.warn.restore();

@@ -18,22 +18,10 @@ import iconSet from './icons';
 registerIcons(iconSet);
 
 import configFrom from './config/index';
-import CrossFramePlugin from './plugin/cross-frame';
-import DocumentPlugin from './plugin/document';
 import Guest from './guest';
 import Notebook from './notebook';
-import PDFPlugin from './plugin/pdf';
 import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
-
-const pluginClasses = {
-  // Document type plugins
-  PDF: PDFPlugin,
-  Document: DocumentPlugin,
-
-  // Cross-frame communication
-  CrossFrame: CrossFramePlugin,
-};
 
 const window_ = /** @type {HypothesisWindow} */ (window);
 
@@ -60,12 +48,8 @@ function init() {
     window_.__hypothesis_frame = true;
   }
 
-  config.pluginClasses = pluginClasses;
-
   // Load the PDF anchoring/metadata integration.
-  if (isPDF) {
-    config.PDF = {};
-  }
+  config.documentType = isPDF ? 'pdf' : 'html';
 
   const guest = new Guest(document.body, config);
   const sidebar = SidebarClass

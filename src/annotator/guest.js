@@ -2,6 +2,9 @@ import scrollIntoView from 'scroll-into-view';
 
 import Delegator from './delegator';
 import { Adder } from './adder';
+import CrossFrame from './plugin/cross-frame';
+import DocumentMeta from './plugin/document';
+import PDFIntegration from './plugin/pdf';
 
 import * as htmlAnchoring from './anchoring/html';
 import { TextRange } from './anchoring/text-range';
@@ -106,16 +109,11 @@ export default class Guest extends Delegator {
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {Record<string, any>} config
-   * @param {typeof htmlAnchoring} anchoring - Anchoring implementation
+   * @param {Record<string, any>} [config]
+   * @param {typeof htmlAnchoring} [anchoring] - Anchoring implementation
    */
-  constructor(element, config, anchoring = htmlAnchoring) {
-    const defaultConfig = {
-      // This causes the `Document` plugin to be initialized.
-      Document: {},
-    };
-
-    super(element, { ...defaultConfig, ...config });
+  constructor(element, config = {}, anchoring = htmlAnchoring) {
+    super(element, config);
 
     this.visibleHighlights = false;
 
@@ -146,7 +144,14 @@ export default class Guest extends Delegator {
       }
     });
 
-    this.plugins = {};
+    // Set the initial anchoring module. Note that for PDFs this is replaced by
+    // `PDFIntegration` below.
+    this.anchoring = anchoring;
+
+    this.documentMeta = new DocumentMeta(this.element);
+    if (config.documentType === 'pdf') {
+      this.pdfIntegration = new PDFIntegration(this.element, this);
+    }
 
     /** @type {Anchor[]} */
     this.anchors = [];
@@ -154,8 +159,6 @@ export default class Guest extends Delegator {
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this.frameIdentifier = config.subFrameIdentifier || null;
-
-    this.anchoring = anchoring;
 
     const cfOptions = {
       config,
@@ -167,22 +170,13 @@ export default class Guest extends Delegator {
       },
     };
 
-    this.addPlugin('CrossFrame', cfOptions);
-    this.crossframe = this.plugins.CrossFrame;
+    this.crossframe = new CrossFrame(this.element, cfOptions);
     this.crossframe.onConnect(() => this._setupInitialState(config));
 
     // Whether clicks on non-highlighted text should close the sidebar
     this.closeSidebarOnDocumentClick = true;
     this._connectAnnotationSync();
     this._connectAnnotationUISync(this.crossframe);
-
-    // Load plugins
-    for (let name of Object.keys(this.options)) {
-      const opts = this.options[name];
-      if (!this.plugins[name] && this.options.pluginClasses[name]) {
-        this.addPlugin(name, opts);
-      }
-    }
 
     // Setup event handlers on the root element
     this._elementEventListeners = [];
@@ -247,26 +241,19 @@ export default class Guest extends Delegator {
     });
   }
 
-  addPlugin(name, options) {
-    const Klass = this.options.pluginClasses[name];
-    this.plugins[name] = new Klass(this.element, options, this);
-  }
-
   /**
    * Retrieve metadata for the current document.
    */
   getDocumentInfo() {
     let metadataPromise;
     let uriPromise;
-    if (this.plugins.PDF) {
-      metadataPromise = Promise.resolve(this.plugins.PDF.getMetadata());
-      uriPromise = Promise.resolve(this.plugins.PDF.uri());
-    } else if (this.plugins.Document) {
-      uriPromise = Promise.resolve(this.plugins.Document.uri());
-      metadataPromise = Promise.resolve(this.plugins.Document.metadata);
+
+    if (this.pdfIntegration) {
+      metadataPromise = this.pdfIntegration.getMetadata();
+      uriPromise = this.pdfIntegration.uri();
     } else {
-      uriPromise = Promise.reject();
-      metadataPromise = Promise.reject();
+      uriPromise = Promise.resolve(this.documentMeta.uri());
+      metadataPromise = Promise.resolve(this.documentMeta.metadata);
     }
 
     uriPromise = uriPromise.catch(() =>
@@ -355,9 +342,8 @@ export default class Guest extends Delegator {
 
     removeAllHighlights(this.element);
 
-    for (let name of Object.keys(this.plugins)) {
-      this.plugins[name].destroy();
-    }
+    this.documentMeta.destroy();
+    this.pdfIntegration?.destroy();
 
     super.destroy();
   }
@@ -478,8 +464,8 @@ export default class Guest extends Delegator {
       // Add the anchors for this annotation to instance storage.
       this._updateAnchors(this.anchors.concat(anchors));
 
-      // Let plugins know about the new information.
-      this.plugins.CrossFrame?.sync([annotation]);
+      // Let the sidebar know about the new annotation.
+      this.crossframe.sync([annotation]);
 
       return anchors;
     };

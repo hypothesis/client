@@ -63,7 +63,7 @@ function createMetadata() {
  * populates the `document` property of new annotations.
  */
 export default class DocumentMeta extends Delegator {
-  constructor(element, options) {
+  constructor(element, options = {}) {
     super(element, options);
 
     this.metadata = createMetadata();
