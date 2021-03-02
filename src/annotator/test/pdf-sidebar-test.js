@@ -4,7 +4,7 @@ import Delegator from '../delegator';
 import { mockBaseClass } from '../../test-util/mock-base';
 
 class FakeSidebar extends Delegator {
-  constructor(element, config, guest) {
+  constructor(element, guest, config) {
     super(element, config);
     this.guest = guest;
   }
@@ -17,12 +17,12 @@ class FakeSidebar extends Delegator {
 describe('PdfSidebar', () => {
   const sandbox = sinon.createSandbox();
 
+  let fakeGuest;
   let fakePDFViewerApplication;
   let fakePDFContainer;
   let fakePDFViewerUpdate;
 
   const createPdfSidebar = config => {
-    const fakeGuest = {};
     const element = document.createElement('div');
     return new PdfSidebar(element, fakeGuest, config);
   };
@@ -45,6 +45,10 @@ describe('PdfSidebar', () => {
     // See https://github.com/sinonjs/sinon/issues/1537
     // Can't stub an undefined property in a sandbox
     window.PDFViewerApplication = fakePDFViewerApplication;
+
+    fakeGuest = {
+      closeSidebarOnDocumentClick: true,
+    };
 
     unmockSidebar = mockBaseClass(PdfSidebar, FakeSidebar);
   });
@@ -88,6 +92,18 @@ describe('PdfSidebar', () => {
         assert.isTrue(sidebar.sideBySideActive);
         assert.calledOnce(fakePDFViewerUpdate);
         assert.equal(fakePDFContainer.style.width, 1300 - 428 + 'px');
+      });
+
+      it('disables closing sidebar on document click when side-by-side is active', () => {
+        const sidebar = createPdfSidebar();
+        sidebar.activateSideBySide();
+        assert.isFalse(fakeGuest.closeSidebarOnDocumentClick);
+      });
+
+      it('enables closing sidebar on document click when side-by-side is inactive', () => {
+        const sidebar = createPdfSidebar();
+        sidebar.deactivateSideBySide();
+        assert.isTrue(fakeGuest.closeSidebarOnDocumentClick);
       });
 
       it('does not activate side-by-side mode if there is not enough room', () => {
