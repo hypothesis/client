@@ -84,6 +84,10 @@ export default class Notebook extends Delegator {
     this._update();
     container.classList.add('is-open');
     container.style.display = '';
+
+    // The overflow CSS property is set to hidden to prevent scrolling of the guest page,
+    // while the notebook is shown as modal. It is restored on the close method.
+    // I believe this hack only works if this.element points to document.body of the guest page.
     this.originalOverflowStyle = this.element.style.overflow;
     this.element.style.overflow = 'hidden';
   }
