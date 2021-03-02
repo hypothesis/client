@@ -51,7 +51,7 @@ export default class PdfSidebar extends Sidebar {
    */
   activateSideBySide(width) {
     this.sideBySideActive = true;
-    this.closeSidebarOnDocumentClick = false;
+    this.guest.closeSidebarOnDocumentClick = false;
     this.pdfContainer.style.width = width + 'px';
     this.pdfContainer.classList.add('hypothesis-side-by-side');
   }
@@ -62,7 +62,7 @@ export default class PdfSidebar extends Sidebar {
    */
   deactivateSideBySide() {
     this.sideBySideActive = false;
-    this.closeSidebarOnDocumentClick = true;
+    this.guest.closeSidebarOnDocumentClick = true;
     this.pdfContainer.style.width = 'auto';
     this.pdfContainer.classList.remove('hypothesis-side-by-side');
   }
