@@ -546,15 +546,16 @@ export default class Guest extends Delegator {
     annotation.document = info.metadata;
     annotation.uri = info.uri;
 
-    // `selectors` is an array of arrays: each item is an array of selectors
-    // identifying a distinct target.
     const root = this.element;
-    const selectors = await Promise.all(
+    const rangeSelectors = await Promise.all(
       ranges.map(range => this.anchoring.describe(root, range))
     );
-    annotation.target = selectors.map(selector => ({
+    annotation.target = rangeSelectors.map(selectors => ({
       source: info.uri,
-      selector,
+
+      // In the Hypothesis API the field containing the selectors is called
+      // `selector`, despite being a list.
+      selector: selectors,
     }));
 
     this.publish('beforeAnnotationCreated', [annotation]);
