@@ -29,10 +29,6 @@ class FakeTextRange {
   }
 }
 
-// A little helper which returns a promise that resolves after a timeout
-const timeoutPromise = (millis = 0) =>
-  new Promise(resolve => setTimeout(resolve, millis));
-
 describe('Guest', () => {
   const sandbox = sinon.createSandbox();
   let highlighter;
@@ -609,29 +605,34 @@ describe('Guest', () => {
   });
 
   describe('#createAnnotation', () => {
-    it('adds metadata to the annotation object', () => {
+    it('adds metadata to the annotation object', async () => {
       const guest = createGuest();
       const annotation = {};
 
-      guest.createAnnotation(annotation);
+      await guest.createAnnotation(annotation);
 
-      return timeoutPromise().then(() => {
-        assert.equal(annotation.uri, fakeDocumentMeta.uri());
-        assert.deepEqual(annotation.document, fakeDocumentMeta.metadata);
-      });
+      assert.equal(annotation.uri, fakeDocumentMeta.uri());
+      assert.deepEqual(annotation.document, fakeDocumentMeta.metadata);
     });
 
-    it('merges properties of input object into returned annotation', () => {
+    it('merges properties of input object into returned annotation', async () => {
       const guest = createGuest();
       let annotation = { foo: 'bar' };
-      annotation = guest.createAnnotation(annotation);
+
+      annotation = await guest.createAnnotation(annotation);
+
       assert.equal(annotation.foo, 'bar');
     });
 
-    it('triggers a "beforeAnnotationCreated" event', done => {
+    it('triggers a "beforeAnnotationCreated" event', async () => {
       const guest = createGuest();
-      guest.subscribe('beforeAnnotationCreated', () => done());
-      guest.createAnnotation();
+      const callback = sinon.stub();
+      guest.subscribe('beforeAnnotationCreated', callback);
+      const annotation = {};
+
+      await guest.createAnnotation(annotation);
+
+      assert.calledWith(callback, annotation);
     });
   });
 
