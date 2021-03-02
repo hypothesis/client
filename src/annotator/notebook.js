@@ -84,6 +84,8 @@ export default class Notebook extends Delegator {
     this._update();
     container.classList.add('is-open');
     container.style.display = '';
+    this.originalOverflowStyle = this.element.style.overflow;
+    this.element.style.overflow = 'hidden';
   }
 
   close() {
@@ -91,6 +93,8 @@ export default class Notebook extends Delegator {
       this.container.classList.remove('is-open');
       this.container.style.display = 'none';
     }
+    this.element.style.overflow = /** @type {string} */ (this
+      .originalOverflowStyle);
   }
 
   destroy() {
