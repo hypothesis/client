@@ -46,8 +46,8 @@ export default class PDF extends Delegator {
   /**
    * @param {Annotator} annotator
    */
-  constructor(element, config, annotator) {
-    super(element, config);
+  constructor(element, annotator) {
+    super(element);
 
     this.annotator = annotator;
     annotator.anchoring = pdfAnchoring;

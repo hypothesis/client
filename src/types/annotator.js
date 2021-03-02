@@ -61,7 +61,7 @@
  *
  * @typedef AnchoringImpl
  * @prop {(root: HTMLElement, selectors: Selector[], options: any) => Promise<Range>} anchor
- * @prop {(root: HTMLElement, range: Range, options: any) => Promise<Selector[]>} describe
+ * @prop {(root: HTMLElement, range: Range, options: any) => Selector[]|Promise<Selector[]>} describe
  */
 
 /**
