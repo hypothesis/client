@@ -43,12 +43,6 @@ describe('DocumentMeta', function () {
     testDocument.destroy();
   });
 
-  it('attaches document metadata to new annotations', () => {
-    const annotation = {};
-    testDocument.publish('beforeAnnotationCreated', [annotation]);
-    assert.equal(annotation.document, testDocument.metadata);
-  });
-
   describe('annotation should have some metadata', function () {
     let metadata = null;
 

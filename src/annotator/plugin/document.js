@@ -72,19 +72,7 @@ export default class DocumentMeta extends Delegator {
     this.document = options.document || document;
     this.normalizeURI = options.normalizeURI || normalizeURI;
 
-    /**
-     * Event handler that adds document metadata to new annotations.
-     */
-    this.beforeAnnotationCreated = annotation => {
-      annotation.document = this.metadata;
-    };
-    this.subscribe('beforeAnnotationCreated', this.beforeAnnotationCreated);
-
     this.getDocumentMetadata();
-  }
-
-  destroy() {
-    this.unsubscribe('beforeAnnotationCreated', this.beforeAnnotationCreated);
   }
 
   /**
