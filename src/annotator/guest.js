@@ -535,46 +535,36 @@ export default class Guest extends Delegator {
    * @param {Partial<AnnotationData>} annotation - Initial properties of the
    *   new annotation, other than `target`, `document` and `uri` which are
    *   set by this method.
+   * @return {Promise<AnnotationData>} - The updated annotation with selectors
+   *   and metadata populated.
    */
-  createAnnotation(annotation = {}) {
-    const root = this.element;
-
+  async createAnnotation(annotation = {}) {
     const ranges = this.selectedRanges ?? [];
     this.selectedRanges = null;
 
-    const getSelectors = range => {
-      // Returns an array of selectors for the passed range.
-      return this.anchoring.describe(root, range);
-    };
+    const info = await this.getDocumentInfo();
+    annotation.document = info.metadata;
+    annotation.uri = info.uri;
 
-    const setDocumentInfo = info => {
-      annotation.document = info.metadata;
-      annotation.uri = info.uri;
-    };
+    // `selectors` is an array of arrays: each item is an array of selectors
+    // identifying a distinct target.
+    const root = this.element;
+    const selectors = await Promise.all(
+      ranges.map(range => this.anchoring.describe(root, range))
+    );
+    annotation.target = selectors.map(selector => ({
+      source: info.uri,
+      selector,
+    }));
 
-    const setTargets = ([info, selectors]) => {
-      // `selectors` is an array of arrays: each item is an array of selectors
-      // identifying a distinct target.
-      const source = info.uri;
-      annotation.target = selectors.map(selector => ({
-        source,
-        selector,
-      }));
-    };
-
-    const info = this.getDocumentInfo();
-    info.then(setDocumentInfo);
-
-    const selectors = Promise.all(ranges.map(getSelectors));
-    const targets = Promise.all([info, selectors]).then(setTargets);
-
-    targets.then(() => this.publish('beforeAnnotationCreated', [annotation]));
-    targets.then(() => this.anchor(/** @type {AnnotationData} */ (annotation)));
+    this.publish('beforeAnnotationCreated', [annotation]);
+    this.anchor(/** @type {AnnotationData} */ (annotation));
 
     if (!annotation.$highlight) {
       this.crossframe?.call('openSidebar');
     }
-    return annotation;
+
+    return /** @type {AnnotationData} */ (annotation);
   }
 
   /**
