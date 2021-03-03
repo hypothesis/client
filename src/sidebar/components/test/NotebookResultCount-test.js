@@ -56,20 +56,20 @@ describe('NotebookResultCount', () => {
       {
         thread: { children: [1] },
         visibleCount: 1,
-        expected: '1 thread(1 annotation)',
+        expected: '1 result',
       },
       {
         thread: { children: [1] },
         visibleCount: 2,
-        expected: '1 thread(2 annotations)',
+        expected: '1 result',
       },
       {
         thread: { children: [1, 2] },
         visibleCount: 2,
-        expected: '2 threads(2 annotations)',
+        expected: '2 results',
       },
     ].forEach(test => {
-      it('should render a count of threads and annotations', () => {
+      it('should render a count of top-level threads', () => {
         fakeCountVisible.returns(test.visibleCount);
         fakeUseRootThread.returns(test.thread);
 
@@ -119,17 +119,6 @@ describe('NotebookResultCount', () => {
     it('shows a loading spinner', () => {
       const wrapper = createComponent({ isLoading: true });
       assert.isTrue(wrapper.find('Spinner').exists());
-    });
-
-    it('shows annotation count if there are any matching annotations being fetched', () => {
-      fakeUseRootThread.returns({ children: [1, 2] });
-      // Setting countVisible to something different to demonstrate that
-      // resultCount is used while loading
-      fakeCountVisible.returns(5);
-
-      const wrapper = createComponent({ isLoading: true, resultCount: 2 });
-
-      assert.equal(wrapper.text(), '(2 annotations)');
     });
   });
 });

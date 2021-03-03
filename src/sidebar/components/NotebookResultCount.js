@@ -39,30 +39,25 @@ function NotebookResultCount({
   const matchCount = visibleCount - forcedVisibleCount;
   const threadCount = rootThread.children.length;
 
+  // When filters are applied, display a count of matching annotations.
+  // When not filtered, display a count of top-level threads.
+  // This is consistent with the sidebar
+  const displayCount = isFiltered ? matchCount : threadCount;
+
   return (
     <div className="NotebookResultCount u-layout-row">
       {isLoading && <Spinner />}
       {!isLoading && (
         <h2>
           {!hasResults && <strong>No results</strong>}
-          {hasResults && isFiltered && (
+          {hasResults && (
             <strong>
-              {matchCount} {matchCount === 1 ? 'result' : 'results'}
-            </strong>
-          )}
-          {hasResults && !isFiltered && (
-            <strong>
-              {threadCount} {threadCount === 1 ? 'thread' : 'threads'}
+              {displayCount} {displayCount === 1 ? 'result' : 'results'}
             </strong>
           )}
         </h2>
       )}
       {hasForcedVisible && <h3>(and {forcedVisibleCount} more)</h3>}
-      {!isFiltered && hasResults && (
-        <h3>
-          ({visibleCount} {visibleCount === 1 ? 'annotation' : 'annotations'})
-        </h3>
-      )}
     </div>
   );
 }
