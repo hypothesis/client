@@ -31,6 +31,9 @@ export default class BucketBar {
       ));
       scrollableElement?.addEventListener('scroll', this.updateFunc);
     });
+
+    // Immediately render the buckets for the current anchors.
+    this._update();
   }
 
   destroy() {

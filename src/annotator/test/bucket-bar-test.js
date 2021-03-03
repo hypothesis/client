@@ -26,7 +26,7 @@ describe('BucketBar', () => {
 
     const FakeBuckets = props => {
       bucketProps = props;
-      return null;
+      return <div className="FakeBuckets" />;
     };
 
     $imports.$mock({
@@ -43,18 +43,28 @@ describe('BucketBar', () => {
     sandbox.restore();
   });
 
+  it('should render buckets for existing anchors when constructed', () => {
+    bucketBar = createBucketBar();
+    assert.calledWith(fakeBucketUtil.anchorBuckets, fakeAnnotator.anchors);
+    assert.ok(bucketBar.element.querySelector('.FakeBuckets'));
+  });
+
   describe('updating buckets', () => {
     it('should update buckets when the window is resized', () => {
       bucketBar = createBucketBar();
-      assert.notCalled(fakeBucketUtil.anchorBuckets);
+      fakeBucketUtil.anchorBuckets.resetHistory();
+
       window.dispatchEvent(new Event('resize'));
+
       assert.calledOnce(fakeBucketUtil.anchorBuckets);
     });
 
     it('should update buckets when the window is scrolled', () => {
       bucketBar = createBucketBar();
-      assert.notCalled(fakeBucketUtil.anchorBuckets);
+      fakeBucketUtil.anchorBuckets.resetHistory();
+
       window.dispatchEvent(new Event('scroll'));
+
       assert.calledOnce(fakeBucketUtil.anchorBuckets);
     });
 
@@ -94,7 +104,7 @@ describe('BucketBar', () => {
         bucketBar = createBucketBar({
           scrollables: ['.scrollable-1', '.scrollable-2'],
         });
-        assert.notCalled(fakeBucketUtil.anchorBuckets);
+        fakeBucketUtil.anchorBuckets.resetHistory();
         scrollableEls[0].dispatchEvent(new Event('scroll'));
         assert.calledOnce(fakeBucketUtil.anchorBuckets);
         scrollableEls[1].dispatchEvent(new Event('scroll'));
