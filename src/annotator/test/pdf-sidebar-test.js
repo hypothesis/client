@@ -2,15 +2,13 @@ import PdfSidebar from '../pdf-sidebar';
 import Delegator from '../delegator';
 
 import { mockBaseClass } from '../../test-util/mock-base';
+import { ListenerCollection } from '../util/listener-collection';
 
 class FakeSidebar extends Delegator {
   constructor(element, guest, config) {
     super(element, config);
     this.guest = guest;
-  }
-
-  _registerEvent(target, event, callback) {
-    target.addEventListener(event, callback);
+    this._listeners = new ListenerCollection();
   }
 }
 

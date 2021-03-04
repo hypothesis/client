@@ -10,6 +10,7 @@ import {
 } from '../helpers/visible-threads';
 
 import ThreadCard from './ThreadCard';
+import { ListenerCollection } from '../../annotator/util/listener-collection';
 
 /** @typedef {import('../helpers/build-thread').Thread} Thread */
 
@@ -148,6 +149,7 @@ function ThreadList({ threads }) {
   // Attach listeners such that whenever the scroll container is scrolled or the
   // window resized, a recalculation of visible threads is triggered
   useEffect(() => {
+    const listeners = new ListenerCollection();
     const scrollContainer = getScrollContainer();
 
     const updateScrollPosition = debounce(
@@ -159,12 +161,11 @@ function ThreadList({ threads }) {
       { maxWait: 100 }
     );
 
-    scrollContainer.addEventListener('scroll', updateScrollPosition);
-    window.addEventListener('resize', updateScrollPosition);
+    listeners.add(scrollContainer, 'scroll', updateScrollPosition);
+    listeners.add(window, 'resize', updateScrollPosition);
 
     return () => {
-      scrollContainer.removeEventListener('scroll', updateScrollPosition);
-      window.removeEventListener('resize', updateScrollPosition);
+      listeners.removeAll();
       updateScrollPosition.cancel();
     };
   }, []);

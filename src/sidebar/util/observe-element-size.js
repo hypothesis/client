@@ -1,3 +1,5 @@
+import { ListenerCollection } from '../../annotator/util/listener-collection';
+
 /**
  * Watch for changes in the size (`clientWidth` and `clientHeight`) of
  * an element.
@@ -19,6 +21,7 @@ export default function observeElementSize(element, onSizeChanged) {
     observer.observe(element);
     return () => observer.disconnect();
   }
+  const listeners = new ListenerCollection();
 
   // Fallback method which listens for the most common events that result in
   // element size changes:
@@ -44,8 +47,8 @@ export default function observeElementSize(element, onSizeChanged) {
     }
   };
 
-  element.addEventListener('load', check);
-  window.addEventListener('resize', check);
+  listeners.add(element, 'load', check);
+  listeners.add(window, 'resize', check);
   const observer = new MutationObserver(check);
   observer.observe(element, {
     characterData: true,
@@ -54,8 +57,7 @@ export default function observeElementSize(element, onSizeChanged) {
   });
 
   return () => {
-    element.removeEventListener('load', check);
-    window.removeEventListener('resize', check);
+    listeners.removeAll();
     observer.disconnect();
   };
 }

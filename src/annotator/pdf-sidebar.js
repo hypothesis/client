@@ -36,7 +36,7 @@ export default class PdfSidebar extends Sidebar {
     this.sideBySideActive = false;
 
     this.subscribe('sidebarLayoutChanged', state => this.fitSideBySide(state));
-    this._registerEvent(window, 'resize', () => this.fitSideBySide());
+    this._listeners.add(window, 'resize', () => this.fitSideBySide());
   }
 
   /**
