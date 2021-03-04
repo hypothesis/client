@@ -35,7 +35,6 @@ describe('Annotation', () => {
         isReply={false}
         onToggleReplies={fakeOnToggleReplies}
         replyCount={0}
-        showDocumentInfo={false}
         threadIsCollapsed={true}
         {...props}
       />

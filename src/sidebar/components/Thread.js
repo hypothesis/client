@@ -14,7 +14,6 @@ import ModerationBanner from './ModerationBanner';
 
 /**
  * @typedef ThreadProps
- * @prop {boolean} [showDocumentInfo]
  * @prop {Thread} thread
  * @prop {Object} threadsService - Injected service
  */
@@ -26,7 +25,7 @@ import ModerationBanner from './ModerationBanner';
  *
  * @param {ThreadProps} props
  */
-function Thread({ showDocumentInfo = false, thread, threadsService }) {
+function Thread({ thread, threadsService }) {
   // Render this thread's replies only if the thread is expanded
   const showChildren = !thread.collapsed;
 
@@ -68,7 +67,6 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
             isReply={!!thread.parent}
             onToggleReplies={onToggleReplies}
             replyCount={thread.replyCount}
-            showDocumentInfo={showDocumentInfo}
             threadIsCollapsed={thread.collapsed}
           />
         </>
@@ -76,7 +74,6 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
     [
       hasAppliedFilter,
       onToggleReplies,
-      showDocumentInfo,
       thread.annotation,
       thread.parent,
       thread.replyCount,
@@ -129,7 +126,6 @@ function Thread({ showDocumentInfo = false, thread, threadsService }) {
 }
 
 Thread.propTypes = {
-  showDocumentInfo: propTypes.bool,
   thread: propTypes.object.isRequired,
 
   // Injected

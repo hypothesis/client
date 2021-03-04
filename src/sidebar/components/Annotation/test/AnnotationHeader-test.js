@@ -8,6 +8,7 @@ import mockImportedComponents from '../../../../test-util/mock-imported-componen
 import AnnotationHeader, { $imports } from '../AnnotationHeader';
 
 describe('AnnotationHeader', () => {
+  let fakeDomainAndTitle;
   let fakeIsHighlight;
   let fakeIsReply;
   let fakeHasBeenEdited;
@@ -20,7 +21,6 @@ describe('AnnotationHeader', () => {
         annotation={fixtures.defaultAnnotation()}
         isEditing={false}
         replyCount={0}
-        showDocumentInfo={false}
         threadIsCollapsed={false}
         {...props}
       />
@@ -28,12 +28,14 @@ describe('AnnotationHeader', () => {
   };
 
   beforeEach(() => {
+    fakeDomainAndTitle = sinon.stub().returns({});
     fakeIsHighlight = sinon.stub().returns(false);
     fakeIsReply = sinon.stub().returns(false);
     fakeHasBeenEdited = sinon.stub().returns(false);
     fakeIsPrivate = sinon.stub();
 
     fakeStore = {
+      route: sinon.stub().returns('sidebar'),
       setExpanded: sinon.stub(),
     };
 
@@ -41,6 +43,7 @@ describe('AnnotationHeader', () => {
     $imports.$mock({
       '../../store/use-store': { useStoreProxy: () => fakeStore },
       '../../helpers/annotation-metadata': {
+        domainAndTitle: fakeDomainAndTitle,
         isHighlight: fakeIsHighlight,
         isReply: fakeIsReply,
         hasBeenEdited: fakeHasBeenEdited,
@@ -251,20 +254,83 @@ describe('AnnotationHeader', () => {
     });
 
     describe('annotation document info', () => {
-      it('should render document info if `showDocumentInfo` is enabled', () => {
-        const wrapper = createAnnotationHeader({ showDocumentInfo: true });
+      const fakeDocumentInfo = {
+        titleText: 'This document',
+        titleLink: 'http://www.example.com',
+        domain: 'www.foo.com',
+      };
 
-        const documentInfo = wrapper.find('AnnotationDocumentInfo');
-
-        assert.isTrue(documentInfo.exists());
+      beforeEach(() => {
+        fakeDomainAndTitle.returns(fakeDocumentInfo);
       });
 
-      it('should not render document info if `showDocumentInfo` is not enabled', () => {
-        const wrapper = createAnnotationHeader({ showDocumentInfo: false });
+      it('should not render document info if on sidebar route', () => {
+        fakeStore.route.returns('sidebar');
+        const wrapper = createAnnotationHeader();
 
         const documentInfo = wrapper.find('AnnotationDocumentInfo');
 
         assert.isFalse(documentInfo.exists());
+      });
+
+      it('should not render document info if document does not have a title', () => {
+        fakeStore.route.returns('notebook');
+        fakeDomainAndTitle.returns({});
+
+        const wrapper = createAnnotationHeader();
+
+        const documentInfo = wrapper.find('AnnotationDocumentInfo');
+
+        assert.isFalse(documentInfo.exists());
+      });
+
+      [
+        {
+          route: 'notebook',
+          documentInfo: fakeDocumentInfo,
+          expectedPresence: true,
+        },
+        { route: 'notebook', documentInfo: {}, expectedPresence: false },
+        {
+          route: 'sidebar',
+          documentInfo: fakeDocumentInfo,
+          expectedPresence: false,
+        },
+      ].forEach(testCase => {
+        it('should render document info if document info available and not on sidebar route', () => {
+          fakeStore.route.returns(testCase.route);
+          fakeDomainAndTitle.returns(testCase.documentInfo);
+
+          const wrapper = createAnnotationHeader();
+          const documentInfo = wrapper.find('AnnotationDocumentInfo');
+
+          assert.equal(documentInfo.exists(), testCase.expectedPresence);
+        });
+      });
+
+      it('should set document properties as props to `AnnotationDocumentInfo`', () => {
+        fakeStore.route.returns('notebook');
+        const wrapper = createAnnotationHeader();
+
+        const documentInfo = wrapper.find('AnnotationDocumentInfo');
+
+        assert.isTrue(documentInfo.exists());
+        assert.equal(documentInfo.props().title, 'This document');
+        // Link is not set because Annotation prop (default fixture) doesn't
+        // have a URL (html link)
+        assert.equal(documentInfo.props().link, '');
+        assert.equal(documentInfo.props().domain, 'www.foo.com');
+      });
+
+      it('should provide document link for document info if annotation has an HTML link/URL', () => {
+        const annotation = fixtures.defaultAnnotation();
+        annotation.links = { html: 'http://www.whatever' };
+        fakeStore.route.returns('notebook');
+        const wrapper = createAnnotationHeader({ annotation });
+
+        const documentInfo = wrapper.find('AnnotationDocumentInfo');
+
+        assert.equal(documentInfo.props().link, 'http://www.example.com');
       });
     });
   });

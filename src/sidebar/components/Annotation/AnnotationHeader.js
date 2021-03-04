@@ -4,6 +4,7 @@ import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../../store/use-store';
 import {
+  domainAndTitle,
   isHighlight,
   isReply,
   hasBeenEdited,
@@ -26,9 +27,6 @@ import AnnotationUser from './AnnotationUser';
  * @prop {Annotation} annotation
  * @prop {boolean} [isEditing] - Whether the annotation is actively being edited
  * @prop {number} replyCount - How many replies this annotation currently has
- * @prop {boolean} [showDocumentInfo] -
- *   Should document metadata be rendered? Hint: this is enabled for single annotation
- *   and stream views.
  * @prop {boolean} threadIsCollapsed - Is this thread currently collapsed?
  */
 
@@ -43,7 +41,6 @@ export default function AnnotationHeader({
   annotation,
   isEditing,
   replyCount,
-  showDocumentInfo,
   threadIsCollapsed,
 }) {
   const store = useStoreProxy();
@@ -60,6 +57,13 @@ export default function AnnotationHeader({
   const replyButtonText = `${replyCount} ${replyPluralized}`;
   const showReplyButton = replyCount > 0 && isCollapsedReply;
   const showExtendedInfo = !isReply(annotation);
+
+  const annotationUrl = annotation.links?.html || '';
+  const documentInfo = domainAndTitle(annotation);
+  const documentLink =
+    annotationUrl && documentInfo.titleLink ? documentInfo.titleLink : '';
+  const showDocumentInfo =
+    store.route() !== 'sidebar' && documentInfo.titleText;
 
   const onReplyCountClick = () =>
     // If an annotation has replies it must have been saved and therefore have
@@ -110,7 +114,11 @@ export default function AnnotationHeader({
             </div>
           )}
           {showDocumentInfo && (
-            <AnnotationDocumentInfo annotation={annotation} />
+            <AnnotationDocumentInfo
+              domain={documentInfo.domain}
+              link={documentLink}
+              title={documentInfo.titleText}
+            />
           )}
         </div>
       )}
@@ -122,6 +130,5 @@ AnnotationHeader.propTypes = {
   annotation: propTypes.object.isRequired,
   isEditing: propTypes.bool,
   replyCount: propTypes.number,
-  showDocumentInfo: propTypes.bool,
   threadIsCollapsed: propTypes.bool.isRequired,
 };

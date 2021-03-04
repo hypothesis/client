@@ -58,22 +58,6 @@ describe('ThreadCard', () => {
     assert(wrapper.find('.ThreadCard').hasClass('is-focused'));
   });
 
-  it('shows document info if current route is not sidebar', () => {
-    fakeStore.route.returns('whatever');
-
-    const wrapper = createComponent();
-
-    assert.isTrue(wrapper.find('Thread').props().showDocumentInfo);
-  });
-
-  it('does not show document info if current route is sidebar', () => {
-    fakeStore.route.returns('sidebar');
-
-    const wrapper = createComponent();
-
-    assert.isFalse(wrapper.find('Thread').props().showDocumentInfo);
-  });
-
   describe('mouse and click events', () => {
     it('scrolls to the annotation when the `ThreadCard` is clicked', () => {
       const wrapper = createComponent();

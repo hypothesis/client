@@ -1,12 +1,12 @@
 import propTypes from 'prop-types';
 
-import * as annotationMetadata from '../../helpers/annotation-metadata';
-
 /** @typedef {import("../../../types/api").Annotation} Annotation */
 
 /**
  * @typedef AnnotationDocumentInfoProps
- * @prop {Annotation} annotation - Annotation for which the document metadata will be rendered
+ * @prop {string} [domain] - The domain associated with the document
+ * @prop {string} [link] - A link to the document (directly)
+ * @prop {string} title - The document's title
  */
 
 /**
@@ -15,27 +15,17 @@ import * as annotationMetadata from '../../helpers/annotation-metadata';
  *
  * @param {AnnotationDocumentInfoProps} props
  */
-export default function AnnotationDocumentInfo({ annotation }) {
-  const documentInfo = annotationMetadata.domainAndTitle(annotation);
-  // If there's no document title, nothing to do here
-  if (!documentInfo.titleText) {
-    return null;
-  }
-
+export default function AnnotationDocumentInfo({ domain, link, title }) {
   return (
     <div className="AnnotationDocumentInfo u-layout-row u-horizontal-rhythm">
       <div className="AnnotationDocumentInfo__title u-color-text--muted">
         on &quot;
-        {documentInfo.titleLink ? (
-          <a href={documentInfo.titleLink}>{documentInfo.titleText}</a>
-        ) : (
-          <span>{documentInfo.titleText}</span>
-        )}
+        {link ? <a href={link}>{title}</a> : <span>{title}</span>}
         &quot;
       </div>
-      {documentInfo.domain && (
+      {domain && (
         <div className="AnnotationDocumentInfo__domain u-color-text--muted">
-          ({documentInfo.domain})
+          ({domain})
         </div>
       )}
     </div>
@@ -43,5 +33,7 @@ export default function AnnotationDocumentInfo({ annotation }) {
 }
 
 AnnotationDocumentInfo.propTypes = {
-  annotation: propTypes.object.isRequired,
+  domain: propTypes.string,
+  link: propTypes.string,
+  title: propTypes.string.isRequired,
 };
