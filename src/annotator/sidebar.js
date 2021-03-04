@@ -10,6 +10,7 @@ import Delegator from './delegator';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
 import BucketBar from './bucket-bar';
+import { ListenerCollection } from './util/listener-collection';
 
 /**
  * @typedef {import('./guest').default} Guest
@@ -18,13 +19,6 @@ import BucketBar from './bucket-bar';
  * @prop {boolean} expanded
  * @prop {number} width
  * @prop {number} height
- */
-
-/**
- * @typedef RegisteredListener
- * @prop {Window|HTMLElement} eventTarget
- * @prop {string} eventType
- * @prop {(event: any) => void} listener
  */
 
 // Minimum width to which the iframeContainer can be resized.
@@ -108,8 +102,7 @@ export default class Sidebar extends Delegator {
 
     this.guest = guest;
 
-    /** @type {RegisteredListener[]} */
-    this.registeredListeners = [];
+    this._listeners = new ListenerCollection();
 
     this.subscribe('panelReady', () => {
       // Show the UI
@@ -167,7 +160,7 @@ export default class Sidebar extends Delegator {
       this.toolbarWidth = 0;
     }
 
-    this._registerEvent(window, 'resize', () => this._onResize());
+    this._listeners.add(window, 'resize', () => this._onResize());
 
     this._gestureState = {
       // Initial position at the start of a drag/pan resize event (in pixels).
@@ -198,7 +191,7 @@ export default class Sidebar extends Delegator {
 
   destroy() {
     this.bucketBar?.destroy();
-    this._unregisterEvents();
+    this._listeners.removeAll();
     this._hammerManager?.destroy();
     if (this.hypothesisSidebar) {
       this.hypothesisSidebar.remove();
@@ -206,23 +199,6 @@ export default class Sidebar extends Delegator {
       this.iframe.remove();
     }
     super.destroy();
-  }
-
-  /**
-   * @param {Window|HTMLElement} eventTarget
-   * @param {string} eventType
-   * @param {(event: any) => void} listener
-   */
-  _registerEvent(eventTarget, eventType, listener) {
-    eventTarget.addEventListener(eventType, listener);
-    this.registeredListeners.push({ eventTarget, eventType, listener });
-  }
-
-  _unregisterEvents() {
-    this.registeredListeners.forEach(({ eventTarget, eventType, listener }) => {
-      eventTarget.removeEventListener(eventType, listener);
-    });
-    this.registeredListeners = [];
   }
 
   _setupSidebarEvents() {
@@ -267,7 +243,7 @@ export default class Sidebar extends Delegator {
     const toggleButton = this.toolbar.sidebarToggleButton;
     if (toggleButton) {
       // Prevent any default gestures on the handle.
-      this._registerEvent(toggleButton, 'touchmove', e => e.preventDefault());
+      this._listeners.add(toggleButton, 'touchmove', e => e.preventDefault());
 
       this._hammerManager = new Hammer.Manager(toggleButton).on(
         'panstart panend panleft panright',

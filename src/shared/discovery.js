@@ -8,6 +8,8 @@
  * @param {string} token - A random identifier used by this frame.
  */
 
+import { ListenerCollection } from '../annotator/util/listener-collection';
+
 /**
  * Discovery finds frames in the current tab/window that can be annotated (the
  * "clients") or can fetch annotations from the backend (the "server").
@@ -65,6 +67,7 @@ export default class Discovery {
     }
 
     this._onMessage = this._onMessage.bind(this);
+    this._listeners = new ListenerCollection();
   }
 
   /**
@@ -86,7 +89,7 @@ export default class Discovery {
     this.onDiscovery = onDiscovery;
 
     // Listen for messages from other frames.
-    this.target.addEventListener('message', this._onMessage, false);
+    this._listeners.add(this.target, 'message', this._onMessage);
     this._beacon();
   }
 
@@ -95,7 +98,7 @@ export default class Discovery {
    */
   stopDiscovery() {
     this.onDiscovery = null;
-    this.target.removeEventListener('message', this._onMessage);
+    this._listeners.removeAll();
   }
 
   /**

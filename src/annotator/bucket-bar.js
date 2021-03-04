@@ -2,6 +2,7 @@ import { render } from 'preact';
 import Buckets from './components/Buckets';
 
 import { anchorBuckets } from './util/buckets';
+import { ListenerCollection } from './util/listener-collection';
 
 /**
  * @typedef BucketBarOptions
@@ -23,20 +24,18 @@ export default class BucketBar {
     this.guest = guest;
     container.appendChild(this.element);
 
-    this.updateFunc = () => this.update();
+    this._listeners = new ListenerCollection();
 
-    window.addEventListener('resize', this.updateFunc);
-    window.addEventListener('scroll', this.updateFunc);
-    contentContainer.addEventListener('scroll', this.updateFunc);
+    this._listeners.add(window, 'resize', () => this.update());
+    this._listeners.add(window, 'scroll', () => this.update());
+    this._listeners.add(contentContainer, 'scroll', () => this.update());
 
     // Immediately render the buckets for the current anchors.
     this._update();
   }
 
   destroy() {
-    window.removeEventListener('resize', this.updateFunc);
-    window.removeEventListener('scroll', this.updateFunc);
-    this._contentContainer.removeEventListener('scroll', this.updateFunc);
+    this._listeners.removeAll();
     this.element.remove();
   }
 

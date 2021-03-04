@@ -6,6 +6,7 @@ import WarningBanner from '../components/WarningBanner';
 import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
 import { createShadowRoot } from '../util/shadow-root';
+import { ListenerCollection } from '../util/listener-collection';
 
 import PDFMetadata from './pdf-metadata';
 
@@ -63,17 +64,16 @@ export default class PDF extends Delegator {
       );
     };
 
-    document.addEventListener(
+    this._listeners = new ListenerCollection();
+    this._listeners.add(
+      document,
       'selectionchange',
       this._updateAnnotationLayerVisibility
     );
   }
 
   destroy() {
-    document.removeEventListener(
-      'selectionchange',
-      this._updateAnnotationLayerVisibility
-    );
+    this._listeners.removeAll();
     this.pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this.observer.disconnect();
   }

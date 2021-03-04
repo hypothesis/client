@@ -1,3 +1,5 @@
+import { ListenerCollection } from './util/listener-collection';
+
 /**
  * Return the current selection or `null` if there is no selection or it is empty.
  *
@@ -73,9 +75,10 @@ export class SelectionObserver {
     };
 
     this._document = document_;
+    this._listeners = new ListenerCollection();
     this._events = ['mousedown', 'mouseup', 'selectionchange'];
     for (let event of this._events) {
-      document_.addEventListener(event, this._eventHandler);
+      this._listeners.add(document_, event, this._eventHandler);
     }
 
     // Report the initial selection.
@@ -83,9 +86,7 @@ export class SelectionObserver {
   }
 
   disconnect() {
-    for (let event of this._events) {
-      this._document.removeEventListener(event, this._eventHandler);
-    }
+    this._listeners.removeAll();
     this._cancelPendingCallback();
   }
 

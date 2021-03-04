@@ -625,27 +625,6 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('register/unregister events', () => {
-    it('triggers registered event listener', () => {
-      const sidebar = createSidebar();
-      const listener = sinon.stub();
-      sidebar._registerEvent(window, 'resize', listener);
-
-      window.dispatchEvent(new Event('resize'));
-      assert.calledOnce(listener);
-    });
-
-    it('unregisters event listeners', () => {
-      const sidebar = createSidebar();
-      const listener = sinon.stub();
-      sidebar._registerEvent(window, 'resize', listener);
-      sidebar.destroy();
-
-      window.dispatchEvent(new Event('resize'));
-      assert.notCalled(listener);
-    });
-  });
-
   describe('layout change notifier', () => {
     let layoutChangeHandlerSpy;
 

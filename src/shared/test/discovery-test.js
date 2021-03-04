@@ -32,8 +32,7 @@ describe('shared/discovery', () => {
       assert.calledWith(
         fakeTopWindow.addEventListener,
         'message',
-        sinon.match.func,
-        false
+        sinon.match.func
       );
     });
   });
