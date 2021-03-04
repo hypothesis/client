@@ -144,33 +144,32 @@ export default class Guest extends Delegator {
       }
     });
 
-    // Set the initial anchoring module. Note that for PDFs this is replaced by
-    // `PDFIntegration` below.
-    this.anchoring = anchoring;
+    /** @type {Anchor[]} */
+    this.anchors = [];
 
+    // Setup the document type-specific integration consisting of metadata extraction,
+    // anchoring module and logic to respond to activity (eg. scrolling) in the page.
+    //
+    // In future the plan is to put these behind a common interface so that the
+    // `Guest` class doesn't need different code paths depending on the document type.
+
+    // nb. The `anchoring` field defaults to HTML anchoring and in PDFs is replaced
+    // by `PDFIntegration` below.
+    this.anchoring = anchoring;
     this.documentMeta = new DocumentMeta(this.element);
     if (config.documentType === 'pdf') {
       this.pdfIntegration = new PDFIntegration(this.element, this);
     }
 
-    /** @type {Anchor[]} */
-    this.anchors = [];
-
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this.frameIdentifier = config.subFrameIdentifier || null;
 
-    const cfOptions = {
+    this.crossframe = new CrossFrame(this.element, {
       config,
-      on: (event, handler) => {
-        this.subscribe(event, handler);
-      },
-      emit: (event, ...args) => {
-        this.publish(event, args);
-      },
-    };
-
-    this.crossframe = new CrossFrame(this.element, cfOptions);
+      on: (event, handler) => this.subscribe(event, handler),
+      emit: (event, ...args) => this.publish(event, args),
+    });
     this.crossframe.onConnect(() => this._setupInitialState(config));
 
     // Whether clicks on non-highlighted text should close the sidebar

@@ -35,13 +35,20 @@ const timeoutPromise = (millis = 0) =>
 
 describe('Guest', () => {
   const sandbox = sinon.createSandbox();
-  let CrossFrame;
-  let fakeCrossFrame;
   let highlighter;
   let guestConfig;
   let htmlAnchoring;
   let rangeUtil;
   let notifySelectionChanged;
+
+  let CrossFrame;
+  let fakeCrossFrame;
+
+  let DocumentMeta;
+  let fakeDocumentMeta;
+
+  let PdfIntegration;
+  let fakePdfIntegration;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -75,6 +82,23 @@ describe('Guest', () => {
       sync: sinon.stub(),
       destroy: sinon.stub(),
     };
+    CrossFrame = sandbox.stub().returns(fakeCrossFrame);
+
+    fakeDocumentMeta = {
+      destroy: sinon.stub(),
+      metadata: { title: 'Test title' },
+      uri: sinon.stub().returns('https://example.com/test.html'),
+    };
+    DocumentMeta = sandbox.stub().returns(fakeDocumentMeta);
+
+    fakePdfIntegration = {
+      destroy: sinon.stub(),
+      getMetadata: sinon
+        .stub()
+        .resolves({ documentFingerprint: 'test-fingerprint' }),
+      uri: sinon.stub().resolves('https://example.com/test.pdf'),
+    };
+    PdfIntegration = sinon.stub().returns(fakePdfIntegration);
 
     class FakeSelectionObserver {
       constructor(callback) {
@@ -82,8 +106,6 @@ describe('Guest', () => {
         this.disconnect = sinon.stub();
       }
     }
-
-    CrossFrame = sandbox.stub().returns(fakeCrossFrame);
 
     $imports.$mock({
       './adder': { Adder: FakeAdder },
@@ -94,6 +116,8 @@ describe('Guest', () => {
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './plugin/cross-frame': CrossFrame,
+      './plugin/document': DocumentMeta,
+      './plugin/pdf': PdfIntegration,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
@@ -327,56 +351,80 @@ describe('Guest', () => {
     describe('on "getDocumentInfo" event', () => {
       let guest;
 
-      beforeEach(() => {
-        document.title = 'hi';
-        guest = createGuest();
-        guest.pdfIntegration = {
-          uri: sinon.stub().resolves(window.location.href),
-          getMetadata: sinon.stub().resolves({}),
-        };
-      });
-
       afterEach(() => {
+        guest.destroy();
         sandbox.restore();
       });
 
-      it('calls the callback with the href and pdf metadata', done => {
-        const metadata = { title: 'hi' };
-        const assertComplete = (err, payload) => {
+      function createCallback(expectedUri, expectedMetadata, done) {
+        return (err, result) => {
+          assert.strictEqual(err, null);
           try {
-            assert.equal(payload.uri, document.location.href);
-            assert.equal(payload.metadata, metadata);
+            assert.equal(result.uri, expectedUri);
+            assert.deepEqual(result.metadata, expectedMetadata);
             done();
           } catch (e) {
             done(e);
           }
         };
+      }
 
-        const promise = Promise.resolve(metadata);
-        guest.pdfIntegration.getMetadata.returns(promise);
+      context('in an HTML document', () => {
+        it('calls the callback with HTML URL and metadata', done => {
+          guest = createGuest();
 
-        emitGuestEvent('getDocumentInfo', assertComplete);
+          emitGuestEvent(
+            'getDocumentInfo',
+            createCallback(
+              fakeDocumentMeta.uri(),
+              fakeDocumentMeta.metadata,
+              done
+            )
+          );
+        });
       });
 
-      it('calls the callback with the href and basic metadata if pdf fails', done => {
-        const metadata = {
-          title: 'hi',
-          link: [{ href: window.location.href }],
-        };
-        const assertComplete = (err, payload) => {
-          try {
-            assert.equal(payload.uri, window.location.href);
-            assert.deepEqual(payload.metadata, metadata);
-            done();
-          } catch (e) {
-            done(e);
-          }
-        };
+      context('in a PDF document', () => {
+        it('calls the callback with PDF URL and metadata', done => {
+          guest = createGuest({ documentType: 'pdf' });
+          const metadata = { title: 'hi' };
 
-        const promise = Promise.reject(new Error('Not a PDF document'));
-        guest.pdfIntegration.getMetadata.returns(promise);
+          fakePdfIntegration.getMetadata.resolves(metadata);
 
-        emitGuestEvent('getDocumentInfo', assertComplete);
+          emitGuestEvent(
+            'getDocumentInfo',
+            createCallback('https://example.com/test.pdf', metadata, done)
+          );
+        });
+
+        it('calls the callback with fallback URL if PDF URL cannot be determined', done => {
+          guest = createGuest({ documentType: 'pdf' });
+
+          fakePdfIntegration.getMetadata.resolves({});
+          fakePdfIntegration.uri.rejects(new Error('Not a PDF document'));
+
+          emitGuestEvent(
+            'getDocumentInfo',
+            createCallback(window.location.href, {}, done)
+          );
+        });
+
+        it('calls the callback with fallback metadata if PDF metadata extraction fails', done => {
+          guest = createGuest({ documentType: 'pdf' });
+          const metadata = {
+            title: document.title,
+            link: [{ href: window.location.href }],
+          };
+
+          fakePdfIntegration.getMetadata.rejects(
+            new Error('Not a PDF document')
+          );
+
+          emitGuestEvent(
+            'getDocumentInfo',
+            createCallback('https://example.com/test.pdf', metadata, done)
+          );
+        });
       });
     });
 
@@ -543,54 +591,33 @@ describe('Guest', () => {
 
     beforeEach(() => {
       guest = createGuest();
-      guest.pdfIntegration = {
-        uri: sandbox.stub().resolves('urn:x-pdf:001122'),
-        getMetadata: sandbox.stub().resolves({}),
-      };
     });
 
     it('preserves the components of the URI other than the fragment', () => {
-      guest.pdfIntegration = null;
-      guest.documentMeta = {
-        uri() {
-          return 'http://foobar.com/things?id=42';
-        },
-        metadata: {},
-      };
+      fakeDocumentMeta.uri.returns('http://foobar.com/things?id=42');
       return guest
         .getDocumentInfo()
         .then(({ uri }) => assert.equal(uri, 'http://foobar.com/things?id=42'));
     });
 
     it('removes the fragment identifier from URIs', () => {
-      guest.pdfIntegration.uri.resolves('urn:x-pdf:aabbcc#ignoreme');
+      fakeDocumentMeta.uri.returns('http://foobar.com/things?id=42#ignoreme');
       return guest
         .getDocumentInfo()
-        .then(({ uri }) => assert.equal(uri, 'urn:x-pdf:aabbcc'));
+        .then(({ uri }) => assert.equal(uri, 'http://foobar.com/things?id=42'));
     });
   });
 
   describe('#createAnnotation', () => {
     it('adds metadata to the annotation object', () => {
-      class FakeDocumentMeta {
-        get metadata() {
-          return { title: 'hello' };
-        }
-
-        uri() {
-          return 'http://example.com';
-        }
-      }
-      $imports.$mock({ './plugin/document': FakeDocumentMeta });
-
       const guest = createGuest();
       const annotation = {};
 
       guest.createAnnotation(annotation);
 
       return timeoutPromise().then(() => {
-        assert.equal(annotation.uri, 'http://example.com/');
-        assert.deepEqual(annotation.document, { title: 'hello' });
+        assert.equal(annotation.uri, fakeDocumentMeta.uri());
+        assert.deepEqual(annotation.document, fakeDocumentMeta.metadata);
       });
     });
 
