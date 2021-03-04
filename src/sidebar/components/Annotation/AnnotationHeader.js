@@ -48,6 +48,11 @@ export default function AnnotationHeader({
 
   const annotationIsPrivate = isPrivate(annotation.permissions);
 
+  // Link (URL) to single-annotation view for this annotation, if it has
+  // been provided by the service. Note: this property is not currently
+  // present on third-party annotations.
+  const annotationUrl = annotation.links?.html || '';
+
   const showTimestamps = !isEditing && annotation.created;
   const showEditedTimestamp = useMemo(() => {
     return hasBeenEdited(annotation) && !isCollapsedReply;
@@ -58,10 +63,22 @@ export default function AnnotationHeader({
   const showReplyButton = replyCount > 0 && isCollapsedReply;
   const showExtendedInfo = !isReply(annotation);
 
-  const annotationUrl = annotation.links?.html || '';
+  // Pull together some document metadata related to this annotation
   const documentInfo = domainAndTitle(annotation);
+  // There are some cases at present in which linking directly to an
+  // annotation's document is not immediately feasible—e.g in an LMS context
+  // where the original document might not be available outside of an
+  // assignment (e.g. Canvas files), and/or wouldn't be able to present
+  // any associated annotations.
+  // For the present, disable links to annotation documents for all third-party
+  // annotations until we have a more nuanced way of making linking determinations.
+  // The absence of a link to a single-annotation view is a signal that this
+  // is a third-party annotation.
+  // Also, of course, verify that there is a URL to the document (titleLink)
   const documentLink =
     annotationUrl && documentInfo.titleLink ? documentInfo.titleLink : '';
+  // Show document information on non-sidebar routes, assuming there is a title
+  // to show, at the least
   const showDocumentInfo =
     store.route() !== 'sidebar' && documentInfo.titleText;
 
@@ -93,7 +110,9 @@ export default function AnnotationHeader({
         {showTimestamps && (
           <div className="AnnotationHeader__timestamps">
             <AnnotationTimestamps
-              annotation={annotation}
+              annotationCreated={annotation.created}
+              annotationUpdated={annotation.updated}
+              annotationUrl={annotationUrl}
               withEditedTimestamp={showEditedTimestamp}
             />
           </div>
