@@ -5,15 +5,18 @@ describe('BucketBar', () => {
   const sandbox = sinon.createSandbox();
   let fakeAnnotator;
   let fakeBucketUtil;
-  let bucketBar;
+  let bucketBars;
   let bucketProps;
 
   const createBucketBar = function (options) {
     const element = document.createElement('div');
-    return new BucketBar(element, fakeAnnotator, options);
+    const bucketBar = new BucketBar(element, fakeAnnotator, options);
+    bucketBars.push(bucketBar);
+    return bucketBar;
   };
 
   beforeEach(() => {
+    bucketBars = [];
     bucketProps = {};
     fakeAnnotator = {
       anchors: [],
@@ -38,20 +41,20 @@ describe('BucketBar', () => {
   });
 
   afterEach(() => {
-    bucketBar?.destroy();
+    bucketBars.forEach(bucketBar => bucketBar.destroy());
     $imports.$restore();
     sandbox.restore();
   });
 
   it('should render buckets for existing anchors when constructed', () => {
-    bucketBar = createBucketBar();
+    const bucketBar = createBucketBar();
     assert.calledWith(fakeBucketUtil.anchorBuckets, fakeAnnotator.anchors);
     assert.ok(bucketBar.element.querySelector('.FakeBuckets'));
   });
 
   describe('updating buckets', () => {
     it('should update buckets when the window is resized', () => {
-      bucketBar = createBucketBar();
+      createBucketBar();
       fakeBucketUtil.anchorBuckets.resetHistory();
 
       window.dispatchEvent(new Event('resize'));
@@ -60,7 +63,7 @@ describe('BucketBar', () => {
     });
 
     it('should update buckets when the window is scrolled', () => {
-      bucketBar = createBucketBar();
+      createBucketBar();
       fakeBucketUtil.anchorBuckets.resetHistory();
 
       window.dispatchEvent(new Event('scroll'));
@@ -69,10 +72,10 @@ describe('BucketBar', () => {
     });
 
     it('should select annotations when Buckets component invokes callback', () => {
-      const fakeAnnotations = ['hi', 'there'];
-      bucketBar = createBucketBar();
+      const bucketBar = createBucketBar();
       bucketBar._update();
 
+      const fakeAnnotations = ['hi', 'there'];
       bucketProps.onSelectAnnotations(fakeAnnotations, true);
       assert.calledWith(fakeAnnotator.selectAnnotations, fakeAnnotations, true);
     });
@@ -89,19 +92,11 @@ describe('BucketBar', () => {
         document.body.appendChild(scrollableEls1);
         document.body.appendChild(scrollableEls2);
       });
-
       afterEach(() => {
-        // Explicitly call `destroy` before removing scrollable elements
-        // from document to test the scrollable-remove-events path of
-        // the `destroy` method. Otherwise, this afterEach will execute
-        // before the test-global one that calls `destroy`, and there will
-        // be no scrollable elements left in the document.
-        bucketBar.destroy();
         scrollableEls.forEach(el => el.remove());
       });
-
       it('should update buckets when any scrollable scrolls', () => {
-        bucketBar = createBucketBar({
+        createBucketBar({
           scrollables: ['.scrollable-1', '.scrollable-2'],
         });
         fakeBucketUtil.anchorBuckets.resetHistory();
@@ -113,6 +108,7 @@ describe('BucketBar', () => {
     });
 
     it('should not update if another update is pending', () => {
+      const bucketBar = createBucketBar();
       bucketBar._updatePending = true;
       bucketBar.update();
       assert.notCalled(window.requestAnimationFrame);
