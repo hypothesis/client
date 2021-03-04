@@ -212,8 +212,8 @@ export default class Guest extends Delegator {
       }
     });
 
-    // Allow taps on the document to hide the sidebar as well as clicks, because
-    // on touch-input devices, not all elements will generate a "click" event.
+    // Allow taps on the document to hide the sidebar as well as clicks.
+    // On iOS < 13 (2019), elements like h2 or div don't emit 'click' events.
     addListener('touchstart', event => {
       if (!annotationsAt(event.target).length) {
         maybeCloseSidebar(event);

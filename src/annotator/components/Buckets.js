@@ -22,7 +22,6 @@ function BucketButton({ bucket, onSelectAnnotations }) {
   const buttonTitle = `Select nearby annotations (${bucket.anchors.length})`;
 
   function selectAnnotations(event) {
-    event.stopPropagation();
     onSelectAnnotations(annotations, event.metaKey || event.ctrlKey);
   }
 
@@ -58,17 +57,17 @@ function BucketButton({ bucket, onSelectAnnotations }) {
 function NavigationBucketButton({ bucket, direction }) {
   const buttonTitle = `Go ${direction} to next annotations (${bucket.anchors.length})`;
 
-  function scrollToClosest(event) {
-    event.stopPropagation();
+  function scrollToClosest() {
     const closest = findClosestOffscreenAnchor(bucket.anchors, direction);
     if (closest?.highlights?.length) {
       scrollIntoView(closest.highlights[0]);
     }
   }
+
   return (
     <button
       className={classnames('Buckets__button', `Buckets__button--${direction}`)}
-      onClick={event => scrollToClosest(event)}
+      onClick={scrollToClosest}
       title={buttonTitle}
       aria-label={buttonTitle}
     >

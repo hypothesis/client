@@ -19,20 +19,13 @@ function ToolbarButton({
   onClick,
   selected = false,
 }) {
-  const handleClick = event => {
-    // Stop event from propagating up to the document and being treated as a
-    // click on document content, causing the sidebar to close.
-    event.stopPropagation();
-    onClick();
-  };
-
   return (
     <button
       className={className}
       aria-label={label}
       aria-expanded={expanded}
       aria-pressed={selected}
-      onClick={handleClick}
+      onClick={onClick}
       ref={buttonRef}
       title={label}
     >
