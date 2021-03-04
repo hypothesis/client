@@ -80,13 +80,16 @@ export default function AnnotationTimestamps({
   return (
     <div className="AnnotationTimestamps">
       {withEditedTimestamp && (
-        <span className="AnnotationTimestamps__edited" title={updated.absolute}>
+        <span
+          className="AnnotationTimestamps__timestamp AnnotationTimestamps__edited"
+          title={updated.absolute}
+        >
           ({editedString}){' '}
         </span>
       )}
       {annotationUrl ? (
         <a
-          className="AnnotationTimestamps__created"
+          className="AnnotationTimestamps__timestamp AnnotationTimestamps__timestamp--linked"
           target="_blank"
           rel="noopener noreferrer"
           title={created.absolute}
@@ -96,7 +99,7 @@ export default function AnnotationTimestamps({
         </a>
       ) : (
         <span
-          className="AnnotationTimestamps__created"
+          className="AnnotationTimestamps__timestamp AnnotationTimestamps__created"
           title={created.absolute}
         >
           {created.relative}

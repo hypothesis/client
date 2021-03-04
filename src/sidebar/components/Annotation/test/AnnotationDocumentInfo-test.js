@@ -18,23 +18,21 @@ describe('AnnotationDocumentInfo', () => {
 
   it('should render the document title', () => {
     const wrapper = createAnnotationDocumentInfo();
-    const info = wrapper.find('.AnnotationDocumentInfo__title');
 
-    assert.equal(info.text(), 'on "Turtles"');
+    assert.include(wrapper.text(), '"Turtles"');
   });
 
   it('should render a link if available', () => {
     const wrapper = createAnnotationDocumentInfo();
-    const link = wrapper.find('.AnnotationDocumentInfo__title a');
+    const link = wrapper.find('a');
 
     assert.equal(link.prop('href'), 'http://www.baz');
   });
 
   it('should render domain if available', () => {
     const wrapper = createAnnotationDocumentInfo();
-    const domain = wrapper.find('.AnnotationDocumentInfo__domain');
 
-    assert.equal(domain.text(), '(www.foo.bar)');
+    assert.include(wrapper.text(), '(www.foo.bar)');
   });
 
   it(
