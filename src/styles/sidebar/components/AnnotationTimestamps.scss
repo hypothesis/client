@@ -2,16 +2,19 @@
 @use "../../mixins/utils";
 
 .AnnotationTimestamps {
+  &__timestamp {
+    color: var.$color-text--light;
+
+    &--linked {
+      &:hover {
+        color: var.$color-text--light;
+        text-decoration: underline;
+      }
+    }
+  }
+
   &__edited {
     @include utils.font--small;
     font-style: italic;
-    color: var.$color-text--light;
-  }
-
-  &__created {
-    color: var.$color-text--light;
-    &:hover {
-      text-decoration: underline;
-    }
   }
 }

@@ -17,17 +17,13 @@ import propTypes from 'prop-types';
  */
 export default function AnnotationDocumentInfo({ domain, link, title }) {
   return (
-    <div className="AnnotationDocumentInfo u-layout-row u-horizontal-rhythm">
-      <div className="AnnotationDocumentInfo__title u-color-text--muted">
+    <div className="u-layout-row u-horizontal-rhythm">
+      <div className="u-color-text--muted">
         on &quot;
         {link ? <a href={link}>{title}</a> : <span>{title}</span>}
         &quot;
       </div>
-      {domain && (
-        <div className="AnnotationDocumentInfo__domain u-color-text--muted">
-          ({domain})
-        </div>
-      )}
+      {domain && <span className="u-color-text--muted">({domain})</span>}
     </div>
   );
 }

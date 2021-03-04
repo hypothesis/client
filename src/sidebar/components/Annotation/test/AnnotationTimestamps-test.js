@@ -46,7 +46,7 @@ describe('AnnotationTimestamps', () => {
   it('renders a linked created timestamp if annotation has a link', () => {
     const wrapper = createComponent();
 
-    const link = wrapper.find('a.AnnotationTimestamps__created');
+    const link = wrapper.find('a');
     assert.equal(link.prop('href'), 'http://www.example.com');
     assert.equal(link.prop('title'), 'absolute date');
     assert.equal(link.text(), 'fuzzy string');
@@ -55,7 +55,7 @@ describe('AnnotationTimestamps', () => {
   it('renders an unlinked created timestamp if annotation does not have a link', () => {
     const wrapper = createComponent({ annotationUrl: '' });
 
-    const link = wrapper.find('a.AnnotationTimestamps__created');
+    const link = wrapper.find('a');
     const span = wrapper.find('span.AnnotationTimestamps__created');
     assert.isFalse(link.exists());
     assert.isTrue(span.exists());
