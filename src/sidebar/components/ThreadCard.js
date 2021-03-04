@@ -28,7 +28,6 @@ function ThreadCard({ frameSync, thread }) {
   const store = useStoreProxy();
   const threadTag = thread.annotation && thread.annotation.$tag;
   const isFocused = store.isAnnotationFocused(threadTag);
-  const showDocumentInfo = store.route() !== 'sidebar';
   const focusThreadAnnotation = useMemo(
     () =>
       debounce(tag => {
@@ -57,10 +56,7 @@ function ThreadCard({ frameSync, thread }) {
 
   // Memoize threads to reduce avoid re-rendering when something changes in a
   // parent component but the `Thread` itself has not changed.
-  const threadContent = useMemo(
-    () => <Thread thread={thread} showDocumentInfo={showDocumentInfo} />,
-    [thread, showDocumentInfo]
-  );
+  const threadContent = useMemo(() => <Thread thread={thread} />, [thread]);
 
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */

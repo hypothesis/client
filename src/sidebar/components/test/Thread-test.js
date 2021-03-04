@@ -70,7 +70,6 @@ describe('Thread', () => {
   const createComponent = props => {
     return mount(
       <Thread
-        showDocumentInfo={false}
         thread={createThread()}
         threadsService={fakeThreadsService}
         {...props}

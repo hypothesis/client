@@ -26,7 +26,6 @@ import AnnotationReplyToggle from './AnnotationReplyToggle';
  * @prop {boolean} isReply
  * @prop {VoidFunction} onToggleReplies - Callback to expand/collapse reply threads
  * @prop {number} replyCount - Number of replies to this annotation's thread
- * @prop {boolean} showDocumentInfo - Should extended document info be rendered (e.g. in non-sidebar contexts)?
  * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
  * @prop {Object} annotationsService - Injected service
  */
@@ -42,7 +41,6 @@ function Annotation({
   isReply,
   onToggleReplies,
   replyCount,
-  showDocumentInfo,
   threadIsCollapsed,
   annotationsService,
 }) {
@@ -76,7 +74,6 @@ function Annotation({
             annotation={annotation}
             isEditing={isEditing}
             replyCount={replyCount}
-            showDocumentInfo={showDocumentInfo}
             threadIsCollapsed={threadIsCollapsed}
           />
 
@@ -130,7 +127,6 @@ Annotation.propTypes = {
   isReply: propTypes.bool,
   onToggleReplies: propTypes.func,
   replyCount: propTypes.number.isRequired,
-  showDocumentInfo: propTypes.bool.isRequired,
   threadIsCollapsed: propTypes.bool.isRequired,
   annotationsService: propTypes.object.isRequired,
 };
