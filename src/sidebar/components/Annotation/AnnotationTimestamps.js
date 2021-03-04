@@ -10,7 +10,9 @@ import { decayingInterval, toFuzzyString } from '../../util/time';
 
 /**
  * @typedef AnnotationTimestampsProps
- * @prop {Annotation} annotation
+ * @prop {string} annotationCreated
+ * @prop {string} annotationUpdated
+ * @prop {string} [annotationUrl]
  * @prop {boolean} [withEditedTimestamp] - Should a timestamp for when this
  *   annotation was last edited be rendered?
  */
@@ -26,17 +28,19 @@ import { decayingInterval, toFuzzyString } from '../../util/time';
  * @param {AnnotationTimestampsProps} props
  */
 export default function AnnotationTimestamps({
-  annotation,
+  annotationCreated,
+  annotationUpdated,
+  annotationUrl,
   withEditedTimestamp,
 }) {
   // "Current" time, used when calculating the relative age of `timestamp`.
   const [now, setNow] = useState(() => new Date());
-  const createdDate = useMemo(() => new Date(annotation.created), [
-    annotation.created,
+  const createdDate = useMemo(() => new Date(annotationCreated), [
+    annotationCreated,
   ]);
   const updatedDate = useMemo(
-    () => withEditedTimestamp && new Date(annotation.updated),
-    [annotation.updated, withEditedTimestamp]
+    () => withEditedTimestamp && new Date(annotationUpdated),
+    [annotationUpdated, withEditedTimestamp]
   );
 
   const created = useMemo(() => {
@@ -61,10 +65,10 @@ export default function AnnotationTimestamps({
     // Determine which of the two Dates to use for the `decayingInterval`
     // It should be the latest relevant date, as the interval will be
     // shorter the closer the date is to "now"
-    const laterDate = updatedDate ? annotation.updated : annotation.created;
+    const laterDate = updatedDate ? annotationUpdated : annotationCreated;
     const cancelRefresh = decayingInterval(laterDate, () => setNow(new Date()));
     return cancelRefresh;
-  }, [annotation, createdDate, updatedDate, now]);
+  }, [annotationCreated, annotationUpdated, createdDate, updatedDate, now]);
 
   // Do not show the relative timestamp for the edited date if it is the same
   // as the relative timestamp for the created date
@@ -72,8 +76,6 @@ export default function AnnotationTimestamps({
     updated && updated.relative !== created.relative
       ? `edited ${updated.relative}`
       : 'edited';
-
-  const annotationUrl = annotation.links?.html || '';
 
   return (
     <div className="AnnotationTimestamps">
@@ -105,6 +107,8 @@ export default function AnnotationTimestamps({
 }
 
 AnnotationTimestamps.propTypes = {
-  annotation: propTypes.object.isRequired,
+  annotationCreated: propTypes.string,
+  annotationUpdated: propTypes.string,
+  annotationUrl: propTypes.string,
   withEditedTimestamp: propTypes.bool,
 };

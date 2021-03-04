@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-import * as fixtures from '../../../test/annotation-fixtures';
 import { act } from 'preact/test-utils';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
@@ -15,7 +14,9 @@ describe('AnnotationTimestamps', () => {
   const createComponent = props =>
     mount(
       <AnnotationTimestamps
-        annotation={fixtures.defaultAnnotation()}
+        annotationCreated="2015-05-10T20:18:56.613388+00:00"
+        annotationUpdated="2015-05-10T20:18:56.613388+00:00"
+        annotationUrl="http://www.example.com"
         withEditedTimestamp={false}
         {...props}
       />
@@ -43,10 +44,7 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('renders a linked created timestamp if annotation has a link', () => {
-    const annotation = fixtures.defaultAnnotation();
-    annotation.links = { html: 'http://www.example.com' };
-
-    const wrapper = createComponent({ annotation });
+    const wrapper = createComponent();
 
     const link = wrapper.find('a.AnnotationTimestamps__created');
     assert.equal(link.prop('href'), 'http://www.example.com');
@@ -55,7 +53,7 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('renders an unlinked created timestamp if annotation does not have a link', () => {
-    const wrapper = createComponent();
+    const wrapper = createComponent({ annotationUrl: '' });
 
     const link = wrapper.find('a.AnnotationTimestamps__created');
     const span = wrapper.find('span.AnnotationTimestamps__created');
