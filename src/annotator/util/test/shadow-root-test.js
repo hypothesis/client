@@ -14,6 +14,7 @@ describe('annotator/util/shadow-root', () => {
     container.remove();
     window.applyFocusVisiblePolyfill = applyFocusVisiblePolyfill;
   });
+
   describe('createShadowRoot', () => {
     it('attaches a shadow root to the container', () => {
       const shadowRoot = createShadowRoot(container);
@@ -55,6 +56,38 @@ describe('annotator/util/shadow-root', () => {
       const linkEl = container.shadowRoot.querySelector('link[rel=stylesheet]');
       assert.isNull(linkEl);
       link.setAttribute('rel', 'stylesheet');
+    });
+
+    it('stops propagation of click events', () => {
+      const onClick = sinon.stub();
+      container.addEventListener('click', onClick);
+
+      const shadowRoot = createShadowRoot(container);
+      const innerElement = document.createElement('div');
+      shadowRoot.appendChild(innerElement);
+      innerElement.dispatchEvent(
+        // `composed` property is necessary to bubble up the event out of the shadow DOM.
+        // browser generated events, have this property set to true.
+        new Event('click', { bubbles: true, composed: true })
+      );
+
+      assert.notCalled(onClick);
+    });
+
+    it('stops propagation of touchstart events', () => {
+      const onTouch = sinon.stub();
+      container.addEventListener('touchstart', onTouch);
+
+      const shadowRoot = createShadowRoot(container);
+      const innerElement = document.createElement('div');
+      shadowRoot.appendChild(innerElement);
+      // `composed` property is necessary to bubble up the event out of the shadow DOM.
+      // browser generated events, have this property set to true.
+      innerElement.dispatchEvent(
+        new Event('touchstart', { bubbles: true, composed: true })
+      );
+
+      assert.notCalled(onTouch);
     });
   });
 });

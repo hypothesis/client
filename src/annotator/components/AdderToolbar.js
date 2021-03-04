@@ -64,13 +64,6 @@ export default function AdderToolbar({
   onCommand,
   annotationCount = 0,
 }) {
-  const handleCommand = (event, command) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    onCommand(command);
-  };
-
   // Since the selection toolbar is only shown when there is a selection
   // of static text, we can use a plain key without any modifier as
   // the shortcut. This avoids conflicts with browser/OS shortcuts.
@@ -92,13 +85,13 @@ export default function AdderToolbar({
       <div className="AdderToolbar__actions">
         <ToolbarButton
           icon="annotate"
-          onClick={e => handleCommand(e, 'annotate')}
+          onClick={() => onCommand('annotate')}
           label="Annotate"
           shortcut={annotateShortcut}
         />
         <ToolbarButton
           icon="highlight"
-          onClick={e => handleCommand(e, 'highlight')}
+          onClick={() => onCommand('highlight')}
           label="Highlight"
           shortcut={highlightShortcut}
         />
@@ -106,7 +99,7 @@ export default function AdderToolbar({
         {annotationCount > 0 && (
           <ToolbarButton
             badgeCount={annotationCount}
-            onClick={e => handleCommand(e, 'show')}
+            onClick={() => onCommand('show')}
             label="Show"
             shortcut={showShortcut}
           />

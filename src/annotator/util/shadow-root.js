@@ -30,6 +30,7 @@ function loadStyles(shadowRoot) {
  */
 export function createShadowRoot(container) {
   if (!container.attachShadow) {
+    stopEventPropagation(container);
     return container;
   }
 
@@ -43,5 +44,24 @@ export function createShadowRoot(container) {
     applyFocusVisible(shadowRoot);
   }
 
+  stopEventPropagation(shadowRoot);
   return shadowRoot;
+}
+
+/**
+ * Stop bubbling up of 'click' and 'touchstart' events.
+ *
+ * This makes the host page a little bit less aware of the annotator activity.
+ * It is still possible for the host page to manipulate the events on the capturing
+ * face.
+ *
+ * Another benefit is that click and touchstart typically causes the sidebar to close.
+ * By preventing the bubble up of these events, we don't have to individually stop
+ * the propagation.
+ *
+ * @param {HTMLElement|ShadowRoot} element
+ */
+function stopEventPropagation(element) {
+  element.addEventListener('click', event => event.stopPropagation());
+  element.addEventListener('touchstart', event => event.stopPropagation());
 }
