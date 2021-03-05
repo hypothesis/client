@@ -11,3 +11,7 @@ package-lock.json
 .tlskey.pem
 
 .tox
+
+# yalc related files
+yalc.lock
+.yalc/
