@@ -122,13 +122,13 @@ export default class Guest extends Delegator {
     this.element.appendChild(this.adderToolbar);
 
     this.adderCtrl = new Adder(this.adderToolbar, {
-      onAnnotate: () => {
-        this.createAnnotation();
+      onAnnotate: async () => {
+        await this.createAnnotation();
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
       },
-      onHighlight: () => {
+      onHighlight: async () => {
         this.setVisibleHighlights(true);
-        this.createHighlight();
+        await this.createHighlight();
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
       },
       onShowAnnotations: anns => {
@@ -572,6 +572,8 @@ export default class Guest extends Delegator {
    *
    * This flag indicates that the sidebar should save the new annotation
    * automatically and not show a form for the user to enter a comment about it.
+   *
+   * @return {Promise<AnnotationData>}
    */
   createHighlight() {
     return this.createAnnotation({ $highlight: true });
