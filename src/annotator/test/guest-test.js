@@ -570,8 +570,28 @@ describe('Guest', () => {
     });
   });
 
-  describe('when adder toolbar buttons are clicked', () =>
-    // TODO - Add tests for "Annotate" and "Highlight" buttons.
+  describe('when adder toolbar buttons are clicked', () => {
+    // nb. Detailed tests for properties of new annotations are in the
+    // `createAnnotation` tests.
+    it('creates a new annotation if "Annotate" is clicked', async () => {
+      const guest = createGuest();
+      const callback = sinon.stub();
+      guest.subscribe('beforeAnnotationCreated', callback);
+
+      await FakeAdder.instance.options.onAnnotate();
+
+      assert.called(callback);
+    });
+
+    it('creates a new highlight if "Highlight" is clicked', async () => {
+      const guest = createGuest();
+      const callback = sinon.stub();
+      guest.subscribe('beforeAnnotationCreated', callback);
+
+      await FakeAdder.instance.options.onHighlight();
+
+      assert.calledWith(callback, sinon.match({ $highlight: true }));
+    });
 
     it('shows annotations if "Show" is clicked', () => {
       createGuest();
@@ -580,7 +600,8 @@ describe('Guest', () => {
 
       assert.calledWith(fakeCrossFrame.call, 'openSidebar');
       assert.calledWith(fakeCrossFrame.call, 'showAnnotations', ['ann1']);
-    }));
+    });
+  });
 
   describe('#getDocumentInfo', () => {
     let guest;
