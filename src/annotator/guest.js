@@ -463,7 +463,7 @@ export default class Guest extends Delegator {
       // Add the anchors for this annotation to instance storage.
       this._updateAnchors(this.anchors.concat(anchors));
 
-      // Let the sidebar know about the new annotation.
+      // Let other frames (eg. the sidebar) know about the new annotation.
       this.crossframe.sync([annotation]);
 
       return anchors;
