@@ -37,6 +37,7 @@ export default class BucketBar {
     window.removeEventListener('resize', this.updateFunc);
     window.removeEventListener('scroll', this.updateFunc);
     this._contentContainer.removeEventListener('scroll', this.updateFunc);
+    this.element.remove();
   }
 
   update() {

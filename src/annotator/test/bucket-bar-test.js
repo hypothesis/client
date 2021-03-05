@@ -7,15 +7,16 @@ describe('BucketBar', () => {
   let fakeBucketUtil;
   let bucketBars;
   let bucketProps;
+  let container;
 
   const createBucketBar = function (options) {
-    const element = document.createElement('div');
-    const bucketBar = new BucketBar(element, fakeAnnotator, options);
+    const bucketBar = new BucketBar(container, fakeAnnotator, options);
     bucketBars.push(bucketBar);
     return bucketBar;
   };
 
   beforeEach(() => {
+    container = document.createElement('div');
     bucketBars = [];
     bucketProps = {};
     fakeAnnotator = {
@@ -44,6 +45,7 @@ describe('BucketBar', () => {
     bucketBars.forEach(bucketBar => bucketBar.destroy());
     $imports.$restore();
     sandbox.restore();
+    container.remove();
   });
 
   it('should render buckets for existing anchors when constructed', () => {
@@ -81,22 +83,22 @@ describe('BucketBar', () => {
     });
 
     context('when `contentContainer` is specified', () => {
-      let container;
+      let contentContainer;
 
       beforeEach(() => {
-        container = document.createElement('div');
-        document.body.appendChild(container);
+        contentContainer = document.createElement('div');
+        document.body.appendChild(contentContainer);
       });
 
       afterEach(() => {
-        container.remove();
+        contentContainer.remove();
       });
 
       it('should update buckets when any scrollable scrolls', () => {
-        createBucketBar({ contentContainer: container });
+        createBucketBar({ contentContainer });
         fakeBucketUtil.anchorBuckets.resetHistory();
 
-        container.dispatchEvent(new Event('scroll'));
+        contentContainer.dispatchEvent(new Event('scroll'));
 
         assert.calledOnce(fakeBucketUtil.anchorBuckets);
       });
@@ -118,6 +120,12 @@ describe('BucketBar', () => {
       bucketBar._updatePending = true;
       bucketBar.update();
       assert.notCalled(window.requestAnimationFrame);
+    });
+
+    it('deletes the bucketbar element after destroy method is called', () => {
+      const bucketBar = createBucketBar();
+      bucketBar.destroy();
+      assert.isFalse(container.hasChildNodes());
     });
   });
 
