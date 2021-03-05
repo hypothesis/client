@@ -22,17 +22,22 @@ describe('AnnotationDocumentInfo', () => {
     assert.include(wrapper.text(), '"Turtles"');
   });
 
-  it('should render a link if available', () => {
+  it('links to document in new tab/window when link available', () => {
     const wrapper = createAnnotationDocumentInfo();
     const link = wrapper.find('a');
 
     assert.equal(link.prop('href'), 'http://www.baz');
+    assert.equal(link.prop('target'), '_blank');
   });
 
-  it('should render domain if available', () => {
-    const wrapper = createAnnotationDocumentInfo();
+  it('does not link to document when no link available', () => {});
 
-    assert.include(wrapper.text(), '(www.foo.bar)');
+  it('should render domain if available', () => {
+    const wrapper = createAnnotationDocumentInfo({ link: '' });
+
+    const link = wrapper.find('a');
+    assert.include(wrapper.text(), '"Turtles"');
+    assert.isFalse(link.exists());
   });
 
   it(
