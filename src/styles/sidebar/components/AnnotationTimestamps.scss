@@ -15,6 +15,7 @@
 
   &__edited {
     @include utils.font--small;
+    color: var.$color-text--light;
     font-style: italic;
   }
 }
