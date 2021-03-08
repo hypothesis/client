@@ -114,7 +114,9 @@ describe('AnnotationSync', function () {
 
     context('when "beforeAnnotationCreated" is emitted', function () {
       it('calls bridge.call() passing the event', function () {
-        const ann = { id: 1 };
+        // nb. Setting an empty `$tag` here matches what `Guest#createAnnotation`
+        // does.
+        const ann = { id: 1, $tag: '' };
         createAnnotationSync();
 
         options.emit('beforeAnnotationCreated', ann);
@@ -126,7 +128,16 @@ describe('AnnotationSync', function () {
         });
       });
 
-      context('if the annotation has a $tag', function () {
+      it('assigns a non-empty tag to the annotation', () => {
+        const ann = { id: 1, $tag: '' };
+        createAnnotationSync();
+
+        options.emit('beforeAnnotationCreated', ann);
+
+        assert.notEmpty(ann.$tag);
+      });
+
+      context('if the annotation already has a $tag', function () {
         it('does not call bridge.call()', function () {
           const ann = { id: 1, $tag: 'tag1' };
           createAnnotationSync();
@@ -134,6 +145,15 @@ describe('AnnotationSync', function () {
           options.emit('beforeAnnotationCreated', ann);
 
           assert.notCalled(fakeBridge.call);
+        });
+
+        it('does not modify the tag', () => {
+          const ann = { id: 1, $tag: 'sometag' };
+          createAnnotationSync();
+
+          options.emit('beforeAnnotationCreated', ann);
+
+          assert.equal(ann.$tag, 'sometag');
         });
       });
     });
