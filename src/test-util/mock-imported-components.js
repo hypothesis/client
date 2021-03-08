@@ -72,9 +72,6 @@ export default function mockImportedComponents() {
     // is an Enzyme wrapper.
     mock.displayName = getDisplayName(value);
 
-    // Mocked components validate props in the same way as the real component.
-    mock.propTypes = value.propTypes;
-
     return mock;
   };
 }
