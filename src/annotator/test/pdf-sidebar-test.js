@@ -59,6 +59,17 @@ describe('PdfSidebar', () => {
     unmockSidebar();
   });
 
+  it(`sets the content container for use by the BucketBar`, () => {
+    const container = document.createElement('div');
+    container.id = 'viewerContainer';
+    document.body.appendChild(container);
+
+    const sidebar = createPdfSidebar();
+    assert.equal(sidebar.options.contentContainer, container);
+
+    container.remove();
+  });
+
   context('side-by-side mode configured', () => {
     describe('when window is resized', () => {
       it('attempts to lay out side-by-side', () => {

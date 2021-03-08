@@ -17,8 +17,10 @@ describe('Sidebar', () => {
   let containers;
   let sidebars;
 
-  let FakeToolbarController;
+  let FakeBucketBar;
   let fakeBucketBar;
+
+  let FakeToolbarController;
   let fakeToolbar;
 
   before(() => {
@@ -93,7 +95,7 @@ describe('Sidebar', () => {
       destroy: sinon.stub(),
       update: sinon.stub(),
     };
-    const BucketBar = sandbox.stub().returns(fakeBucketBar);
+    FakeBucketBar = sandbox.stub().returns(fakeBucketBar);
 
     sidebars = [];
 
@@ -101,7 +103,7 @@ describe('Sidebar', () => {
       './toolbar': {
         ToolbarController: FakeToolbarController,
       },
-      './bucket-bar': { default: BucketBar },
+      './bucket-bar': { default: FakeBucketBar },
     });
   });
 
@@ -824,7 +826,7 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('bucket bar state', () => {
+  describe('bucket bar', () => {
     it('displays the bucket bar by default', () => {
       const sidebar = createSidebar();
       assert.isNotNull(sidebar.bucketBar);
@@ -840,6 +842,27 @@ describe('Sidebar', () => {
         externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
       assert.isNull(sidebar.bucketBar);
+    });
+
+    it('configures bucket bar to observe `contentContainer` scrolling if specified', () => {
+      const contentContainer = document.createElement('div');
+      const sidebar = createSidebar({ contentContainer });
+      assert.calledWith(
+        FakeBucketBar,
+        sidebar.iframeContainer,
+        fakeGuest,
+        sinon.match({ contentContainer })
+      );
+    });
+
+    it('configures bucket bar to observe body scrolling if no `contentContainer` is specified', () => {
+      const sidebar = createSidebar();
+      assert.calledWith(
+        FakeBucketBar,
+        sidebar.iframeContainer,
+        fakeGuest,
+        sinon.match({ contentContainer: document.body })
+      );
     });
 
     it('updates the bucket bar when an `anchorsChanged` event is received', () => {
