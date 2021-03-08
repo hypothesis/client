@@ -132,7 +132,6 @@ describe('shared/shortcut', () => {
   });
 
   describe('useShortcut', () => {
-    // eslint-disable-next-line react/prop-types
     function Button({ shortcut = null, onClick }) {
       useShortcut(shortcut, onClick);
       return <button onClick={onClick}>Shortcut test</button>;

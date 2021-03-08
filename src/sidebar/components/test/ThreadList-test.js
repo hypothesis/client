@@ -208,9 +208,7 @@ describe('ThreadList', () => {
         fakeTopThread.children.push({ id });
       }
 
-      // eslint-disable-next-line react/prop-types
       const FakeThreadCard = ({ thread }) => {
-        // eslint-disable-next-line react/prop-types
         const height = threadHeights[thread.id];
         return <div className="fake-ThreadCard" style={{ height }} />;
       };

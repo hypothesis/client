@@ -16,7 +16,6 @@ import {
  *
  * This is used to test PDF-specific highlighting behavior.
  */
-// eslint-disable-next-line react/prop-types
 function PdfPage({ showPlaceholder = false }) {
   return (
     <div className="page">
