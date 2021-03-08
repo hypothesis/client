@@ -1,4 +1,3 @@
-import propTypes from 'prop-types';
 import { useEffect, useRef } from 'preact/hooks';
 
 import useRootThread from './hooks/use-root-thread';
@@ -157,14 +156,6 @@ function SidebarView({
     </div>
   );
 }
-
-SidebarView.propTypes = {
-  onLogin: propTypes.func.isRequired,
-  onSignUp: propTypes.func.isRequired,
-  frameSync: propTypes.object,
-  loadAnnotationsService: propTypes.object,
-  streamer: propTypes.object,
-};
 
 SidebarView.injectedProps = ['frameSync', 'loadAnnotationsService', 'streamer'];
 

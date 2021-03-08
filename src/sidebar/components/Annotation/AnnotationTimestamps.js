@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { format as formatDate } from '../../util/date';
 import { decayingInterval, toFuzzyString } from '../../util/time';
@@ -108,10 +107,3 @@ export default function AnnotationTimestamps({
     </div>
   );
 }
-
-AnnotationTimestamps.propTypes = {
-  annotationCreated: propTypes.string,
-  annotationUpdated: propTypes.string,
-  annotationUrl: propTypes.string,
-  withEditedTimestamp: propTypes.bool,
-};

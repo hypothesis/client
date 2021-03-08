@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 /**
  * @typedef SliderProps
@@ -102,8 +101,3 @@ export default function Slider({ children, visible }) {
     </div>
   );
 }
-
-Slider.propTypes = {
-  children: propTypes.any,
-  visible: propTypes.bool,
-};

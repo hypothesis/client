@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { useShortcut } from '../../shared/shortcut';
 
@@ -32,14 +31,6 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
     </button>
   );
 }
-
-ToolbarButton.propTypes = {
-  badgeCount: propTypes.number,
-  icon: propTypes.string,
-  label: propTypes.string.isRequired,
-  onClick: propTypes.func.isRequired,
-  shortcut: propTypes.string,
-};
 
 /**
  * Union of possible toolbar commands.
@@ -132,10 +123,3 @@ export default function AdderToolbar({
     </div>
   );
 }
-
-AdderToolbar.propTypes = {
-  arrowDirection: propTypes.oneOf(['up', 'down']).isRequired,
-  isVisible: propTypes.bool.isRequired,
-  onCommand: propTypes.func.isRequired,
-  annotationCount: propTypes.number,
-};

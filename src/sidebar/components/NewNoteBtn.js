@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
@@ -48,10 +46,6 @@ function NewNoteButton({ annotationsService, settings }) {
     </div>
   );
 }
-NewNoteButton.propTypes = {
-  annotationsService: propTypes.object.isRequired,
-  settings: propTypes.object.isRequired,
-};
 
 NewNoteButton.injectedProps = ['annotationsService', 'settings'];
 

@@ -1,6 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 
@@ -76,9 +75,3 @@ export default function SidebarContentError({
     </div>
   );
 }
-
-SidebarContentError.propTypes = {
-  errorType: propTypes.oneOf(['annotation', 'group']).isRequired,
-  showClearSelection: propTypes.bool,
-  onLoginRequest: propTypes.func.isRequired,
-};

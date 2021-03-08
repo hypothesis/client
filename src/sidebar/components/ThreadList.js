@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 import debounce from 'lodash.debounce';
 
 import { useStoreProxy } from '../store/use-store';
@@ -207,10 +206,5 @@ function ThreadList({ threads }) {
     </div>
   );
 }
-
-ThreadList.propTypes = {
-  /** Should annotations render extra document metadata? */
-  threads: propTypes.array.isRequired,
-};
 
 export default ThreadList;

@@ -2,7 +2,6 @@ import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 
@@ -79,11 +78,6 @@ function ThreadCard({ frameSync, thread }) {
     </div>
   );
 }
-
-ThreadCard.propTypes = {
-  thread: propTypes.object.isRequired,
-  frameSync: propTypes.object.isRequired,
-};
 
 ThreadCard.injectedProps = ['frameSync'];
 

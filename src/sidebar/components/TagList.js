@@ -1,5 +1,4 @@
 import { useMemo } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { isThirdPartyUser } from '../helpers/account-id';
 import { withServices } from '../service-context';
@@ -61,13 +60,6 @@ function TagList({ annotation, serviceUrl, settings, tags }) {
     </ul>
   );
 }
-
-TagList.propTypes = {
-  annotation: propTypes.object.isRequired,
-  tags: propTypes.array.isRequired,
-  serviceUrl: propTypes.func,
-  settings: propTypes.object,
-};
 
 TagList.injectedProps = ['serviceUrl', 'settings'];
 

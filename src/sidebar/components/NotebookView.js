@@ -1,5 +1,4 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 import scrollIntoView from 'scroll-into-view';
 
 import { withServices } from '../service-context';
@@ -104,10 +103,6 @@ function NotebookView({ loadAnnotationsService }) {
     </div>
   );
 }
-
-NotebookView.propTypes = {
-  loadAnnotationsService: propTypes.object,
-};
 
 NotebookView.injectedProps = ['loadAnnotationsService'];
 

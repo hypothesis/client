@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import Button from '../Button';
 
 /**
@@ -31,11 +29,5 @@ function AnnotationReplyToggle({
     />
   );
 }
-
-AnnotationReplyToggle.propTypes = {
-  onToggleReplies: propTypes.func,
-  replyCount: propTypes.number,
-  threadIsCollapsed: propTypes.bool.isRequired,
-};
 
 export default AnnotationReplyToggle;

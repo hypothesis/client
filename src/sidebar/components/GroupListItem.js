@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { useStoreProxy } from '../store/use-store';
 import { copyText } from '../util/copy-to-clipboard';
 import { orgName } from '../helpers/group-list-item-common';
@@ -147,15 +145,6 @@ function GroupListItem({
     />
   );
 }
-
-GroupListItem.propTypes = {
-  group: propTypes.object.isRequired,
-  isExpanded: propTypes.bool,
-  onExpand: propTypes.func,
-  analytics: propTypes.object.isRequired,
-  groups: propTypes.object.isRequired,
-  toastMessenger: propTypes.object.isRequired,
-};
 
 GroupListItem.injectedProps = ['analytics', 'groups', 'toastMessenger'];
 

@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import GroupListItem from './GroupListItem';
 import MenuSection from './MenuSection';
 
@@ -42,10 +40,3 @@ export default function GroupListSection({
     </MenuSection>
   );
 }
-
-GroupListSection.propTypes = {
-  expandedGroup: propTypes.object,
-  groups: propTypes.arrayOf(propTypes.object),
-  heading: propTypes.string,
-  onExpandGroup: propTypes.func,
-};

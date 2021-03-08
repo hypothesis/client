@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { isThirdPartyUser, username } from '../../helpers/account-id';
 import { withServices } from '../../service-context';
 
@@ -67,12 +65,6 @@ function AnnotationUser({ annotation, features, serviceUrl, settings }) {
   );
 }
 
-AnnotationUser.propTypes = {
-  annotation: propTypes.object.isRequired,
-  features: propTypes.object.isRequired,
-  serviceUrl: propTypes.func.isRequired,
-  settings: propTypes.object.isRequired,
-};
-
 AnnotationUser.injectedProps = ['features', 'serviceUrl', 'settings'];
+
 export default withServices(AnnotationUser);

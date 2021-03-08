@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
@@ -164,23 +162,6 @@ function TopBar({
     </div>
   );
 }
-
-TopBar.propTypes = {
-  auth: propTypes.shape({
-    status: propTypes.string.isRequired,
-    // Additional properties when user is logged in.
-    displayName: propTypes.string,
-    userid: propTypes.string,
-    username: propTypes.string,
-  }),
-  bridge: propTypes.object.isRequired,
-  isSidebar: propTypes.bool,
-  onLogin: propTypes.func,
-  onLogout: propTypes.func,
-  onSignUp: propTypes.func,
-  settings: propTypes.object,
-  streamer: propTypes.object,
-};
 
 TopBar.injectedProps = ['bridge', 'settings', 'streamer'];
 

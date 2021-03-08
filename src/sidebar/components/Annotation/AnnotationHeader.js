@@ -1,6 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../../store/use-store';
 import {
@@ -144,10 +143,3 @@ export default function AnnotationHeader({
     </header>
   );
 }
-
-AnnotationHeader.propTypes = {
-  annotation: propTypes.object.isRequired,
-  isEditing: propTypes.bool,
-  replyCount: propTypes.number,
-  threadIsCollapsed: propTypes.bool.isRequired,
-};

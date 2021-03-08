@@ -5,7 +5,6 @@ import {
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 
@@ -207,19 +206,3 @@ export default function Menu({
     </div>
   );
 }
-
-Menu.propTypes = {
-  align: propTypes.oneOf(['left', 'right']),
-  arrowClass: propTypes.string,
-  label: propTypes.oneOfType([
-    propTypes.object.isRequired,
-    propTypes.string.isRequired,
-  ]),
-  children: propTypes.any,
-  containerPositioned: propTypes.bool,
-  contentClass: propTypes.string,
-  defaultOpen: propTypes.bool,
-  onOpenChanged: propTypes.func,
-  title: propTypes.string.isRequired,
-  menuIndicator: propTypes.bool,
-};

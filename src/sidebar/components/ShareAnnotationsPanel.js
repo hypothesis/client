@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
@@ -122,11 +121,6 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
     </SidebarPanel>
   );
 }
-
-ShareAnnotationsPanel.propTypes = {
-  analytics: propTypes.object.isRequired,
-  toastMessenger: propTypes.object.isRequired,
-};
 
 ShareAnnotationsPanel.injectedProps = ['analytics', 'toastMessenger'];
 

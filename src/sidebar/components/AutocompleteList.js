@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 const defaultListFormatter = item => item;
 
@@ -95,13 +94,3 @@ export default function AutocompleteList({
     </div>
   );
 }
-
-AutocompleteList.propTypes = {
-  activeItem: propTypes.number,
-  id: propTypes.string,
-  itemPrefixId: propTypes.string,
-  list: propTypes.array.isRequired,
-  listFormatter: propTypes.func,
-  onSelectItem: propTypes.func.isRequired,
-  open: propTypes.bool,
-};

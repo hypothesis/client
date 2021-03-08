@@ -1,5 +1,4 @@
 import { useMemo } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { countVisible } from '../helpers/thread';
 
@@ -56,13 +55,5 @@ function PaginatedThreadList({
     </>
   );
 }
-
-PaginatedThreadList.propTypes = {
-  isLoading: propTypes.bool,
-  threads: propTypes.array,
-  currentPage: propTypes.number,
-  onChangePage: propTypes.func,
-  pageSize: propTypes.number,
-};
 
 export default PaginatedThreadList;

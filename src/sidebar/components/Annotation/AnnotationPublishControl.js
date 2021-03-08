@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isNew, isReply } from '../../helpers/annotation-metadata';
@@ -131,13 +130,6 @@ function AnnotationPublishControl({
     </div>
   );
 }
-
-AnnotationPublishControl.propTypes = {
-  annotation: propTypes.object.isRequired,
-  isDisabled: propTypes.bool,
-  onSave: propTypes.func.isRequired,
-  settings: propTypes.object.isRequired,
-};
 
 AnnotationPublishControl.injectedProps = ['settings'];
 

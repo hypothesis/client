@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
@@ -148,11 +147,6 @@ function GroupList({ serviceUrl, settings }) {
     </Menu>
   );
 }
-
-GroupList.propTypes = {
-  serviceUrl: propTypes.func,
-  settings: propTypes.object,
-};
 
 GroupList.injectedProps = ['serviceUrl', 'settings'];
 

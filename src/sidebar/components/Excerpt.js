@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import observeElementSize from '../util/observe-element-size';
 import { withServices } from '../service-context';
@@ -38,12 +37,6 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
     </div>
   );
 }
-
-InlineControls.propTypes = {
-  isCollapsed: propTypes.bool,
-  setCollapsed: propTypes.func,
-  linkStyle: propTypes.object,
-};
 
 const noop = () => {};
 
@@ -162,17 +155,6 @@ function Excerpt({
     </div>
   );
 }
-
-Excerpt.propTypes = {
-  children: propTypes.object,
-  inlineControls: propTypes.bool,
-  collapse: propTypes.bool,
-  collapsedHeight: propTypes.number,
-  overflowThreshold: propTypes.number,
-  onCollapsibleChanged: propTypes.func,
-  onToggleCollapsed: propTypes.func,
-  settings: propTypes.object,
-};
 
 Excerpt.injectedProps = ['settings'];
 

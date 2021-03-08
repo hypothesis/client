@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { useStoreProxy } from '../../store/use-store';
 import {
   sharingEnabled,
@@ -120,14 +118,6 @@ function AnnotationActionBar({
     </div>
   );
 }
-
-AnnotationActionBar.propTypes = {
-  annotation: propTypes.object.isRequired,
-  onReply: propTypes.func.isRequired,
-  annotationsService: propTypes.object.isRequired,
-  settings: propTypes.object.isRequired,
-  toastMessenger: propTypes.object.isRequired,
-};
 
 AnnotationActionBar.injectedProps = [
   'annotationsService',

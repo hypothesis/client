@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 /** @typedef {import("../../../types/api").Annotation} Annotation */
 
 /**
@@ -33,9 +31,3 @@ export default function AnnotationDocumentInfo({ domain, link, title }) {
     </div>
   );
 }
-
-AnnotationDocumentInfo.propTypes = {
-  domain: propTypes.string,
-  link: propTypes.string,
-  title: propTypes.string.isRequired,
-};

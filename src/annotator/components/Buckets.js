@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import propTypes from 'prop-types';
 import scrollIntoView from 'scroll-into-view';
 
 import { setHighlightsFocused } from '../highlighter';
@@ -48,11 +47,6 @@ function BucketButton({ bucket, onSelectAnnotations }) {
   );
 }
 
-BucketButton.propTypes = {
-  bucket: propTypes.object.isRequired,
-  onSelectAnnotations: propTypes.func.isRequired,
-};
-
 /**
  * An up- or down-pointing button that will scroll to the next closest bucket
  * of annotations in the given direction.
@@ -82,11 +76,6 @@ function NavigationBucketButton({ bucket, direction }) {
     </button>
   );
 }
-
-NavigationBucketButton.propTypes = {
-  bucket: propTypes.object.isRequired,
-  direction: propTypes.string,
-};
 
 /**
  * A list of buckets, including up and down navigation (when applicable) and
@@ -134,10 +123,3 @@ export default function Buckets({
     </ul>
   );
 }
-
-Buckets.propTypes = {
-  above: propTypes.object.isRequired,
-  below: propTypes.object.isRequired,
-  buckets: propTypes.array.isRequired,
-  onSelectAnnotations: propTypes.func.isRequired,
-};

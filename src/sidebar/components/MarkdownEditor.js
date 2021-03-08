@@ -2,7 +2,6 @@ import classnames from 'classnames';
 import { SvgIcon, normalizeKeyName } from '@hypothesis/frontend-shared';
 import { createRef } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import {
   LinkType,
@@ -146,17 +145,6 @@ function ToolbarButton({
     </button>
   );
 }
-
-ToolbarButton.propTypes = {
-  buttonRef: propTypes.object.isRequired,
-  disabled: propTypes.bool,
-  iconName: propTypes.string,
-  label: propTypes.string,
-  onClick: propTypes.func.isRequired,
-  shortcutKey: propTypes.string,
-  tabIndex: propTypes.number.isRequired,
-  title: propTypes.string,
-};
 
 /**
  * @typedef {'bold'|'italic'|'quote'|'link'|'image'|'math'|'numlist'|'list'|'preview'|'help'} ButtonID
@@ -383,12 +371,6 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
   );
 }
 
-Toolbar.propTypes = {
-  isPreviewing: propTypes.bool,
-  onCommand: propTypes.func,
-  onTogglePreview: propTypes.func,
-};
-
 /**
  * @typedef MarkdownEditorProps
  * @prop {string} label - An accessible label for the input field.
@@ -478,10 +460,3 @@ export default function MarkdownEditor({
     </div>
   );
 }
-
-MarkdownEditor.propTypes = {
-  textStyle: propTypes.object,
-  label: propTypes.string.isRequired,
-  text: propTypes.string,
-  onEditText: propTypes.func,
-};

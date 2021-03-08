@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 /**
  * @param {Object} props
@@ -41,16 +40,6 @@ function ToolbarButton({
     </button>
   );
 }
-
-ToolbarButton.propTypes = {
-  buttonRef: propTypes.any,
-  expanded: propTypes.bool,
-  className: propTypes.string,
-  label: propTypes.string.isRequired,
-  icon: propTypes.string.isRequired,
-  onClick: propTypes.func.isRequired,
-  selected: propTypes.bool,
-};
 
 /**
  * @typedef ToolbarProps
@@ -137,15 +126,3 @@ export default function Toolbar({
     </div>
   );
 }
-
-Toolbar.propTypes = {
-  closeSidebar: propTypes.func.isRequired,
-  createAnnotation: propTypes.func.isRequired,
-  isSidebarOpen: propTypes.bool.isRequired,
-  newAnnotationType: propTypes.oneOf(['annotation', 'note']).isRequired,
-  showHighlights: propTypes.bool.isRequired,
-  toggleHighlights: propTypes.func.isRequired,
-  toggleSidebar: propTypes.func.isRequired,
-  toggleSidebarRef: propTypes.any,
-  useMinimalControls: propTypes.bool,
-};

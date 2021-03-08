@@ -1,7 +1,6 @@
 import classnames from 'classnames';
 import { SvgIcon, normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useEffect, useRef } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 import Slider from './Slider';
@@ -230,18 +229,3 @@ export default function MenuItem({
     </>
   );
 }
-
-MenuItem.propTypes = {
-  href: propTypes.string,
-  iconAlt: propTypes.string,
-  icon: propTypes.string,
-  isDisabled: propTypes.bool,
-  isExpanded: propTypes.bool,
-  isSelected: propTypes.bool,
-  isSubmenuItem: propTypes.bool,
-  isSubmenuVisible: propTypes.bool,
-  label: propTypes.string.isRequired,
-  onClick: propTypes.func,
-  onToggleSubmenu: propTypes.func,
-  submenu: propTypes.any,
-};

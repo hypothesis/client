@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 
@@ -90,9 +89,3 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
     </form>
   );
 }
-
-SearchInput.propTypes = {
-  alwaysExpanded: propTypes.bool,
-  query: propTypes.string,
-  onSearch: propTypes.func,
-};
