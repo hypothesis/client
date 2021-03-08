@@ -1,6 +1,5 @@
 import { mount } from 'enzyme';
 import { render } from 'preact';
-import propTypes from 'prop-types';
 
 import { ServiceContext, withServices, useService } from '../service-context';
 
@@ -38,20 +37,6 @@ describe('sidebar/service-context', () => {
       );
       assert.deepEqual(lastProps, { aService: testService });
       assert.calledWith(injector.get, 'aService');
-    });
-
-    it('copies propTypes except for injected properties to wrapper', () => {
-      function TestComponent() {}
-      TestComponent.propTypes = {
-        notInjected: propTypes.string,
-        injected: propTypes.string,
-      };
-      TestComponent.injectedProps = ['injected'];
-
-      const Wrapped = withServices(TestComponent);
-
-      assert.deepEqual(Wrapped.propTypes, { notInjected: propTypes.string });
-      assert.isUndefined(Wrapped.injectedProps);
     });
 
     it('does not look up services if they are passed as props', () => {
