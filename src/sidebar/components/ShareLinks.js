@@ -1,10 +1,19 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { withServices } from '../service-context';
 
 /**
+ * @typedef ShareLinkProps
+ * @prop {string} iconName - The name of the SVG icon to use for this link
+ * @prop {string} label - Accessible label/tooltip for link
+ * @prop {string} uri - URI for sharing this annotation
+ * @prop {() => void} onClick - Callback for analytics tracking
+ */
+
+/**
  * A single sharing link as a list item
+ *
+ * @param {ShareLinkProps} props
  */
 function ShareLink({ label, iconName, uri, onClick }) {
   return (
@@ -23,16 +32,12 @@ function ShareLink({ label, iconName, uri, onClick }) {
   );
 }
 
-ShareLink.propTypes = {
-  /** The name of the SVG icon to use for this link */
-  iconName: propTypes.string.isRequired,
-  /** Accessible label / tooltip for link. */
-  label: propTypes.string.isRequired,
-  /** URI for sharing this annotation on the given social service */
-  uri: propTypes.string.isRequired,
-  /** click callback (for analytics tracking) */
-  onClick: propTypes.func.isRequired,
-};
+/**
+ * @typedef ShareLinksProps
+ * @prop {object} analytics
+ * @prop {string} analyticsEventName
+ * @prop {string} shareURI - The URL to share
+ */
 
 /**
  * A list of share links to social-media platforms.
@@ -77,16 +82,6 @@ function ShareLinks({ analytics, analyticsEventName, shareURI }) {
     </ul>
   );
 }
-
-ShareLinks.propTypes = {
-  /** Analytics event to track when share links are clicked */
-  analyticsEventName: propTypes.string.isRequired,
-  /** URI to shared resource(s), e.g. an annotation or collection of annotations */
-  shareURI: propTypes.string.isRequired,
-
-  // Services/injected
-  analytics: propTypes.object.isRequired,
-};
 
 ShareLinks.injectedProps = ['analytics'];
 
