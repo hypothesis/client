@@ -128,7 +128,7 @@ export default class Guest extends Delegator {
       },
       onHighlight: async () => {
         this.setVisibleHighlights(true);
-        await this.createHighlight();
+        await this.createAnnotation({ highlight: true });
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
       },
       onShowAnnotations: anns => {
@@ -532,25 +532,22 @@ export default class Guest extends Delegator {
    * Create a new annotation that is associated with the selected region of
    * the current document.
    *
-   * @param {Partial<AnnotationData>} annotation - Initial properties of the
-   *   new annotation, other than `target`, `document` and `uri` which are
-   *   set by this method.
-   * @return {Promise<AnnotationData>} - The updated annotation with selectors
-   *   and metadata populated.
+   * @param {object} options
+   *   @param {boolean} [options.highlight] - If true, the new annotation has
+   *     the `$highlight` flag set, causing it to be saved immediately without
+   *     prompting for a comment.
+   * @return {Promise<AnnotationData>} - The new annotation
    */
-  async createAnnotation(annotation = {}) {
+  async createAnnotation({ highlight = false } = {}) {
     const ranges = this.selectedRanges ?? [];
     this.selectedRanges = null;
 
     const info = await this.getDocumentInfo();
-    annotation.document = info.metadata;
-    annotation.uri = info.uri;
-
     const root = this.element;
     const rangeSelectors = await Promise.all(
       ranges.map(range => this.anchoring.describe(root, range))
     );
-    annotation.target = rangeSelectors.map(selectors => ({
+    const target = rangeSelectors.map(selectors => ({
       source: info.uri,
 
       // In the Hypothesis API the field containing the selectors is called
@@ -558,26 +555,25 @@ export default class Guest extends Delegator {
       selector: selectors,
     }));
 
+    /** @type {AnnotationData} */
+    const annotation = {
+      uri: info.uri,
+      document: info.metadata,
+      target,
+      $highlight: highlight,
+
+      // nb. `$tag` is assigned by `AnnotationSync`.
+      $tag: '',
+    };
+
     this.publish('beforeAnnotationCreated', [annotation]);
-    this.anchor(/** @type {AnnotationData} */ (annotation));
+    this.anchor(annotation);
 
     if (!annotation.$highlight) {
       this.crossframe?.call('openSidebar');
     }
 
-    return /** @type {AnnotationData} */ (annotation);
-  }
-
-  /**
-   * Create a new annotation with the `$highlight` flag set.
-   *
-   * This flag indicates that the sidebar should save the new annotation
-   * automatically and not show a form for the user to enter a comment about it.
-   *
-   * @return {Promise<AnnotationData>}
-   */
-  createHighlight() {
-    return this.createAnnotation({ $highlight: true });
+    return annotation;
   }
 
   /**

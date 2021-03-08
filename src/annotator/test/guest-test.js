@@ -629,9 +629,8 @@ describe('Guest', () => {
   describe('#createAnnotation', () => {
     it('adds document metadata to the annotation', async () => {
       const guest = createGuest();
-      const annotation = {};
 
-      await guest.createAnnotation(annotation);
+      const annotation = await guest.createAnnotation();
 
       assert.equal(annotation.uri, fakeDocumentMeta.uri());
       assert.deepEqual(annotation.document, fakeDocumentMeta.metadata);
@@ -658,22 +657,42 @@ describe('Guest', () => {
       ]);
     });
 
-    it('merges properties of input object into returned annotation', async () => {
+    it('sets `$tag` to a falsey value', async () => {
       const guest = createGuest();
-      let annotation = { foo: 'bar' };
+      const annotation = await guest.createAnnotation();
+      assert.notOk(annotation.$tag);
+    });
 
-      annotation = await guest.createAnnotation(annotation);
+    it('sets falsey `$highlight` if `highlight` is false', async () => {
+      const guest = createGuest();
+      const annotation = await guest.createAnnotation();
+      assert.notOk(annotation.$highlight);
+    });
 
-      assert.equal(annotation.foo, 'bar');
+    it('sets `$highlight` to true if `highlight` is true', async () => {
+      const guest = createGuest();
+      const annotation = await guest.createAnnotation({ highlight: true });
+      assert.equal(annotation.$highlight, true);
+    });
+
+    it('opens sidebar if `highlight` is false', async () => {
+      const guest = createGuest();
+      await guest.createAnnotation();
+      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
+    });
+
+    it('does not open sidebar if `highlight` is true', async () => {
+      const guest = createGuest();
+      await guest.createAnnotation({ highlight: true });
+      assert.notCalled(fakeCrossFrame.call);
     });
 
     it('triggers a "beforeAnnotationCreated" event', async () => {
       const guest = createGuest();
       const callback = sinon.stub();
       guest.subscribe('beforeAnnotationCreated', callback);
-      const annotation = {};
 
-      await guest.createAnnotation(annotation);
+      const annotation = await guest.createAnnotation();
 
       assert.calledWith(callback, annotation);
     });
