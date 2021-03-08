@@ -1,11 +1,19 @@
 /**
- * Return true if `value` "looks like" a React/Preact component.
+ * Return true if an imported `value` "looks like" a Preact function component.
+ *
+ * This check can have false positives (ie. match values which are not really components).
+ * That's OK because typical usage in a test is to first mock all components with
+ * `$imports.$mock(mockImportedComponents())` and then mock other things with
+ * `$imports.$mock(...)`. The more specific mocks will override the generic
+ * component mocks.
  */
 function isComponent(value) {
   return (
     typeof value === 'function' &&
-    value.hasOwnProperty('propTypes') &&
-    value.name.match(/^[A-Z]/)
+    value.name.match(/^[A-Z]/) &&
+    // Check that function is not an ES class. Note this only works with real
+    // ES classes and may not work with ones transpiled to ES5.
+    !value.toString().match(/^class\b/)
   );
 }
 
