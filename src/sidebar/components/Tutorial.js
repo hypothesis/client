@@ -7,6 +7,10 @@ import { withServices } from '../service-context';
  * Subcomponent: an "instruction" within the tutorial step that includes an
  * icon and a "command" associated with that icon. Encapsulating these together
  * allows for styling to keep them from having a line break between them.
+ *
+ * @param {object} props
+ *   @param {string} props.commandName - Name of the "command" the instruction represents
+ *   @param {string} props.iconName - Name of the icon to display
  */
 function TutorialInstruction({ commandName, iconName }) {
   return (
@@ -16,13 +20,6 @@ function TutorialInstruction({ commandName, iconName }) {
     </span>
   );
 }
-
-TutorialInstruction.propTypes = {
-  /* the name of the "command" the instruction represents, e.g. "Annotate" */
-  commandName: propTypes.string.isRequired,
-  /* the name of the SVGIcon to display with this instruction */
-  iconName: propTypes.string.isRequired,
-};
 
 /**
  * Tutorial for using the sidebar app
