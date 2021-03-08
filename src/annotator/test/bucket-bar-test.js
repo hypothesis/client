@@ -80,30 +80,37 @@ describe('BucketBar', () => {
       assert.calledWith(fakeAnnotator.selectAnnotations, fakeAnnotations, true);
     });
 
-    context('when scrollables provided', () => {
-      let scrollableEls = [];
+    context('when `contentContainer` is specified', () => {
+      let container;
 
       beforeEach(() => {
-        const scrollableEls1 = document.createElement('div');
-        scrollableEls1.className = 'scrollable-1';
-        const scrollableEls2 = document.createElement('div');
-        scrollableEls2.className = 'scrollable-2';
-        scrollableEls.push(scrollableEls1, scrollableEls2);
-        document.body.appendChild(scrollableEls1);
-        document.body.appendChild(scrollableEls2);
+        container = document.createElement('div');
+        container.className = 'scrollable-1';
+        document.body.appendChild(container);
       });
+
       afterEach(() => {
-        scrollableEls.forEach(el => el.remove());
+        container.remove();
       });
+
       it('should update buckets when any scrollable scrolls', () => {
-        createBucketBar({
-          scrollables: ['.scrollable-1', '.scrollable-2'],
-        });
+        createBucketBar({ contentContainer: container });
         fakeBucketUtil.anchorBuckets.resetHistory();
-        scrollableEls[0].dispatchEvent(new Event('scroll'));
+
+        container.dispatchEvent(new Event('scroll'));
+
         assert.calledOnce(fakeBucketUtil.anchorBuckets);
-        scrollableEls[1].dispatchEvent(new Event('scroll'));
-        assert.calledTwice(fakeBucketUtil.anchorBuckets);
+      });
+    });
+
+    context('when no `contentContainer` is specified', () => {
+      it('should update buckets when body is scrolled', () => {
+        createBucketBar();
+        fakeBucketUtil.anchorBuckets.resetHistory();
+
+        document.body.dispatchEvent(new Event('scroll'));
+
+        assert.calledOnce(fakeBucketUtil.anchorBuckets);
       });
     });
 
@@ -113,5 +120,19 @@ describe('BucketBar', () => {
       bucketBar.update();
       assert.notCalled(window.requestAnimationFrame);
     });
+  });
+
+  it('should stop listening for scroll events when destroyed', () => {
+    const container = document.createElement('div');
+    const bucketBar = createBucketBar({ contentContainer: container });
+    fakeBucketUtil.anchorBuckets.resetHistory();
+
+    bucketBar.destroy();
+
+    container.dispatchEvent(new Event('scroll'));
+    window.dispatchEvent(new Event('resize'));
+    window.dispatchEvent(new Event('scroll'));
+
+    assert.notCalled(fakeBucketUtil.anchorBuckets);
   });
 });

@@ -6,12 +6,6 @@ import Sidebar from './sidebar';
  * @typedef {import('./sidebar').LayoutState} LayoutState
  */
 
-const defaultConfig = {
-  BucketBar: {
-    scrollables: ['#viewerContainer'],
-  },
-};
-
 // The viewport and controls for PDF.js start breaking down below about 670px
 // of available space, so only render PDF and sidebar side-by-side if there
 // is enough room. Otherwise, allow sidebar to overlap PDF
@@ -24,7 +18,9 @@ export default class PdfSidebar extends Sidebar {
    * @param {Record<string, any>} [config]
    */
   constructor(element, guest, config = {}) {
-    super(element, guest, { ...defaultConfig, ...config });
+    const contentContainer = document.querySelector('#viewerContainer');
+
+    super(element, guest, { contentContainer, ...config });
 
     this._lastSidebarLayoutState = {
       expanded: false,

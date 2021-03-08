@@ -89,11 +89,9 @@ export default class Sidebar extends Delegator {
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
-        const bucketBar = new BucketBar(
-          this.iframeContainer,
-          guest,
-          config.BucketBar
-        );
+        const bucketBar = new BucketBar(this.iframeContainer, guest, {
+          contentContainer: config.contentContainer || document.body,
+        });
         guest.subscribe('anchorsChanged', () => bucketBar.update());
         this.bucketBar = bucketBar;
       }

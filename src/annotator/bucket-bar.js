@@ -5,7 +5,8 @@ import { anchorBuckets } from './util/buckets';
 
 /**
  * @typedef BucketBarOptions
- * @prop {string[]} [scrollables] - Selectors for the scrollable elements on the page
+ * @prop {Element} [contentContainer] - The scrollable container element for the
+ *   highlights that the bucket bar's buckets will point at
  */
 
 export default class BucketBar {
@@ -14,8 +15,8 @@ export default class BucketBar {
    * @param {Pick<import('./guest').default, 'anchors'|'selectAnnotations'>} guest
    * @param {BucketBarOptions} [options]
    */
-  constructor(container, guest, options = {}) {
-    this.options = options;
+  constructor(container, guest, { contentContainer = document.body } = {}) {
+    this._contentContainer = contentContainer;
     this.element = document.createElement('div');
 
     this.guest = guest;
@@ -25,12 +26,7 @@ export default class BucketBar {
 
     window.addEventListener('resize', this.updateFunc);
     window.addEventListener('scroll', this.updateFunc);
-    this.options.scrollables?.forEach(scrollable => {
-      const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
-        scrollable
-      ));
-      scrollableElement?.addEventListener('scroll', this.updateFunc);
-    });
+    contentContainer.addEventListener('scroll', this.updateFunc);
 
     // Immediately render the buckets for the current anchors.
     this._update();
@@ -39,12 +35,7 @@ export default class BucketBar {
   destroy() {
     window.removeEventListener('resize', this.updateFunc);
     window.removeEventListener('scroll', this.updateFunc);
-    this.options.scrollables?.forEach(scrollable => {
-      const scrollableElement = /** @type {HTMLElement | null} */ (document.querySelector(
-        scrollable
-      ));
-      scrollableElement?.removeEventListener('scroll', this.updateFunc);
-    });
+    this._contentContainer.removeEventListener('scroll', this.updateFunc);
   }
 
   update() {
