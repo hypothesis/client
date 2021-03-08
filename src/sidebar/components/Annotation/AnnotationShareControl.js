@@ -1,6 +1,5 @@
 import { SvgIcon, useElementShouldClose } from '@hypothesis/frontend-shared';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { isShareableURI } from '../../helpers/annotation-sharing';
 import { copyText } from '../../util/copy-to-clipboard';
@@ -180,14 +179,6 @@ function AnnotationShareControl({
     </div>
   );
 }
-
-AnnotationShareControl.propTypes = {
-  annotation: propTypes.object.isRequired,
-  group: propTypes.object,
-  shareUri: propTypes.string.isRequired,
-  analytics: propTypes.object.isRequired,
-  toastMessenger: propTypes.object.isRequired,
-};
 
 AnnotationShareControl.injectedProps = ['analytics', 'toastMessenger'];
 

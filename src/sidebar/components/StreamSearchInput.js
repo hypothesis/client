@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 
@@ -30,10 +28,6 @@ function StreamSearchInput({ router }) {
     <SearchInput query={query} onSearch={setQuery} alwaysExpanded={true} />
   );
 }
-
-StreamSearchInput.propTypes = {
-  router: propTypes.object,
-};
 
 StreamSearchInput.injectedProps = ['router'];
 

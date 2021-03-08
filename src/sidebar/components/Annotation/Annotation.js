@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../../store/use-store';
 import { quote } from '../../helpers/annotation-metadata';
@@ -120,16 +119,6 @@ function Annotation({
     </article>
   );
 }
-
-Annotation.propTypes = {
-  annotation: propTypes.object,
-  hasAppliedFilter: propTypes.bool.isRequired,
-  isReply: propTypes.bool,
-  onToggleReplies: propTypes.func,
-  replyCount: propTypes.number.isRequired,
-  threadIsCollapsed: propTypes.bool.isRequired,
-  annotationsService: propTypes.object.isRequired,
-};
 
 Annotation.injectedProps = ['annotationsService'];
 

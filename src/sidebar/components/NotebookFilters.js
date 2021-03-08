@@ -28,6 +28,4 @@ function NotebookFilters() {
   );
 }
 
-NotebookFilters.propTypes = {};
-
 export default NotebookFilters;

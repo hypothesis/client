@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { withServices } from '../service-context';
 
@@ -54,11 +53,6 @@ function LoggedOutMessage({ onLogin, serviceUrl }) {
     </div>
   );
 }
-
-LoggedOutMessage.propTypes = {
-  onLogin: propTypes.func.isRequired,
-  serviceUrl: propTypes.func.isRequired,
-};
 
 LoggedOutMessage.injectedProps = ['serviceUrl'];
 

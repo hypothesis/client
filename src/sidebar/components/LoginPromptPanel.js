@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { useStoreProxy } from '../store/use-store';
 
 import Button from './Button';
@@ -44,8 +42,3 @@ export default function LoginPromptPanel({ onLogin, onSignUp }) {
     </SidebarPanel>
   );
 }
-
-LoginPromptPanel.propTypes = {
-  onLogin: propTypes.func.isRequired,
-  onSignUp: propTypes.func.isRequired,
-};

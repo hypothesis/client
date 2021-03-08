@@ -1,5 +1,4 @@
 import { useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isHidden } from '../../helpers/annotation-metadata';
@@ -89,11 +88,6 @@ function AnnotationBody({ annotation, settings }) {
     </div>
   );
 }
-
-AnnotationBody.propTypes = {
-  annotation: propTypes.object.isRequired,
-  settings: propTypes.object,
-};
 
 AnnotationBody.injectedProps = ['settings'];
 

@@ -1,5 +1,4 @@
 import { useCallback, useEffect } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import * as searchFilter from '../util/search-filter';
 import { withServices } from '../service-context';
@@ -66,11 +65,6 @@ function StreamView({ api, toastMessenger }) {
 
   return <ThreadList threads={rootThread.children} />;
 }
-
-StreamView.propTypes = {
-  api: propTypes.object,
-  toastMessenger: propTypes.object,
-};
 
 StreamView.injectedProps = ['api', 'toastMessenger'];
 

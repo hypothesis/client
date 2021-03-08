@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
@@ -68,15 +67,6 @@ function Tab({
     </div>
   );
 }
-
-Tab.propTypes = {
-  children: propTypes.node.isRequired,
-  count: propTypes.number.isRequired,
-  isSelected: propTypes.bool.isRequired,
-  isWaitingToAnchor: propTypes.bool.isRequired,
-  label: propTypes.string.isRequired,
-  onSelect: propTypes.func.isRequired,
-};
 
 /**
  * @typedef SelectionTabsProps
@@ -169,10 +159,6 @@ function SelectionTabs({ isLoading, settings }) {
     </div>
   );
 }
-SelectionTabs.propTypes = {
-  isLoading: propTypes.bool.isRequired,
-  settings: propTypes.object.isRequired,
-};
 
 SelectionTabs.injectedProps = ['settings'];
 

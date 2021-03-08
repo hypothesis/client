@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
@@ -75,11 +74,6 @@ function ToastMessage({ message, onDismiss }) {
   );
 }
 
-ToastMessage.propTypes = {
-  message: propTypes.object.isRequired,
-  onDismiss: propTypes.func,
-};
-
 /**
  * @typedef ToastMessagesProps
  * @prop {Object} toastMessenger - Injected service
@@ -112,10 +106,6 @@ function ToastMessages({ toastMessenger }) {
     </div>
   );
 }
-
-ToastMessages.propTypes = {
-  toastMessenger: propTypes.object.isRequired,
-};
 
 ToastMessages.injectedProps = ['toastMessenger'];
 

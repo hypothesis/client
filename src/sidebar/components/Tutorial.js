@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import isThirdPartyService from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
@@ -71,10 +70,6 @@ function Tutorial({ settings }) {
     </ol>
   );
 }
-
-Tutorial.propTypes = {
-  settings: propTypes.object.isRequired,
-};
 
 Tutorial.injectedProps = ['settings'];
 

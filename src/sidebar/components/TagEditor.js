@@ -4,7 +4,6 @@ import {
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
 import { useRef, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { withServices } from '../service-context';
 
@@ -338,14 +337,6 @@ function TagEditor({
     </div>
   );
 }
-
-TagEditor.propTypes = {
-  onAddTag: propTypes.func.isRequired,
-  onRemoveTag: propTypes.func.isRequired,
-  onTagInput: propTypes.func,
-  tagList: propTypes.array.isRequired,
-  tags: propTypes.object.isRequired,
-};
 
 TagEditor.injectedProps = ['tags'];
 

@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import renderMarkdown from '../render-markdown';
@@ -52,9 +51,3 @@ export default function MarkdownView({
     />
   );
 }
-
-MarkdownView.propTypes = {
-  markdown: propTypes.string,
-  textClass: propTypes.object,
-  textStyle: propTypes.object,
-};

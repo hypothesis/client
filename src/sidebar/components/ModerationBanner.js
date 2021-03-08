@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import * as annotationMetadata from '../helpers/annotation-metadata';
@@ -96,12 +95,6 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
     </div>
   );
 }
-
-ModerationBanner.propTypes = {
-  annotation: propTypes.object.isRequired,
-  api: propTypes.object.isRequired,
-  toastMessenger: propTypes.object.isRequired,
-};
 
 ModerationBanner.injectedProps = ['api', 'toastMessenger'];
 

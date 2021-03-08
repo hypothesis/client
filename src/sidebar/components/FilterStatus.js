@@ -1,5 +1,4 @@
 import { useMemo } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { countVisible } from '../helpers/thread';
 
@@ -104,16 +103,6 @@ function FilterStatusPanel({
   );
 }
 
-FilterStatusPanel.propTypes = {
-  resultCount: propTypes.number.isRequired,
-  actionButton: propTypes.object.isRequired,
-  additionalCount: propTypes.number,
-  entitySingular: propTypes.string,
-  entityPlural: propTypes.string,
-  filterQuery: propTypes.string,
-  focusDisplayName: propTypes.string,
-};
-
 /**
  * This status is used when there are selected annotations (including direct-
  * linked annotations). This status takes precedence over others.
@@ -165,11 +154,6 @@ function SelectionFilterStatus({ filterState, rootThread }) {
   );
 }
 
-SelectionFilterStatus.propTypes = {
-  filterState: propTypes.object.isRequired,
-  rootThread: propTypes.object.isRequired,
-};
-
 /**
  * This status is used when there is an applied filter query and
  * `SelectionFilterStatus` does not apply.
@@ -209,11 +193,6 @@ function QueryFilterStatus({ filterState, rootThread }) {
     />
   );
 }
-
-QueryFilterStatus.propTypes = {
-  filterState: propTypes.object.isRequired,
-  rootThread: propTypes.object.isRequired,
-};
 
 /**
  * This status is used if user-focus mode is configured and neither
@@ -263,11 +242,6 @@ function FocusFilterStatus({ filterState, rootThread }) {
   );
 }
 
-FocusFilterStatus.propTypes = {
-  filterState: propTypes.object.isRequired,
-  rootThread: propTypes.object.isRequired,
-};
-
 /**
  * Determine which (if any) of the filter status variants to render depending
  * on current `filterState`. Only one filter status panel is displayed at a time:
@@ -313,5 +287,3 @@ export default function FilterStatus() {
   }
   return null;
 }
-
-FilterStatus.propTypes = {};

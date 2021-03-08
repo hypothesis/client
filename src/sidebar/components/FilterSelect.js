@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import Menu from './Menu';
 import MenuItem from './MenuItem';
@@ -55,14 +54,5 @@ function FilterSelect({
     </Menu>
   );
 }
-
-FilterSelect.propTypes = {
-  defaultOption: propTypes.object,
-  icon: propTypes.string,
-  onSelect: propTypes.func,
-  options: propTypes.array,
-  selectedOption: propTypes.object,
-  title: propTypes.string,
-};
 
 export default FilterSelect;

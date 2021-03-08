@@ -1,7 +1,6 @@
 import classnames from 'classnames';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import propTypes from 'prop-types';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
@@ -124,13 +123,6 @@ function Thread({ thread, threadsService }) {
     </section>
   );
 }
-
-Thread.propTypes = {
-  thread: propTypes.object.isRequired,
-
-  // Injected
-  threadsService: propTypes.object.isRequired,
-};
 
 Thread.injectedProps = ['threadsService'];
 

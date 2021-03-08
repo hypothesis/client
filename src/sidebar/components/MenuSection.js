@@ -1,5 +1,4 @@
 import { toChildArray } from 'preact';
-import propTypes from 'prop-types';
 
 /** @typedef {import("preact").JSX.Element} JSXElement */
 
@@ -38,8 +37,3 @@ export default function MenuSection({ heading, children }) {
     </>
   );
 }
-
-MenuSection.propTypes = {
-  heading: propTypes.string,
-  children: propTypes.any.isRequired,
-};

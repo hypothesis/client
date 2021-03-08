@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isPrivate } from '../../helpers/permissions';
@@ -55,9 +54,5 @@ function AnnotationShareInfo({ annotation }) {
     </div>
   );
 }
-
-AnnotationShareInfo.propTypes = {
-  annotation: propTypes.object.isRequired,
-};
 
 export default AnnotationShareInfo;

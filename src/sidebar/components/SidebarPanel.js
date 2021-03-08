@@ -1,6 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import { useEffect, useRef } from 'preact/hooks';
-import propTypes from 'prop-types';
 import scrollIntoView from 'scroll-into-view';
 
 import { useStoreProxy } from '../store/use-store';
@@ -82,11 +81,3 @@ export default function SidebarPanel({
     </Slider>
   );
 }
-
-SidebarPanel.propTypes = {
-  children: propTypes.any,
-  icon: propTypes.string,
-  panelName: propTypes.string.isRequired,
-  title: propTypes.string.isRequired,
-  onActiveChanged: propTypes.func,
-};

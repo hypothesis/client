@@ -22,5 +22,3 @@ export default function AnnotationLicense() {
     </div>
   );
 }
-
-AnnotationLicense.propTypes = {};

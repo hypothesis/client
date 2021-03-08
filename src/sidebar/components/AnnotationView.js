@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
@@ -92,11 +91,6 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
     </>
   );
 }
-
-AnnotationView.propTypes = {
-  onLogin: propTypes.func.isRequired,
-  loadAnnotationsService: propTypes.object,
-};
 
 AnnotationView.injectedProps = ['loadAnnotationsService'];
 

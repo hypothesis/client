@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import useRootThread from './hooks/use-root-thread';
 import { countVisible } from '../helpers/thread';
 
@@ -66,12 +64,5 @@ function NotebookResultCount({
     </div>
   );
 }
-
-NotebookResultCount.propTypes = {
-  forcedVisibleCount: propTypes.number,
-  isFiltered: propTypes.bool,
-  isLoading: propTypes.bool,
-  resultCount: propTypes.number,
-};
 
 export default NotebookResultCount;

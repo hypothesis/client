@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
 
@@ -52,11 +50,6 @@ function VersionInfo({ toastMessenger, versionData }) {
     </div>
   );
 }
-
-VersionInfo.propTypes = {
-  versionData: propTypes.object.isRequired,
-  toastMessenger: propTypes.object.isRequired,
-};
 
 VersionInfo.injectedProps = ['toastMessenger'];
 

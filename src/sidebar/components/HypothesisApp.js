@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 import { useEffect, useMemo } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../config/service-config';
@@ -200,15 +199,6 @@ function HypothesisApp({
     </div>
   );
 }
-
-HypothesisApp.propTypes = {
-  auth: propTypes.object,
-  bridge: propTypes.object,
-  serviceUrl: propTypes.func,
-  settings: propTypes.object,
-  session: propTypes.object,
-  toastMessenger: propTypes.object,
-};
 
 HypothesisApp.injectedProps = [
   'auth',

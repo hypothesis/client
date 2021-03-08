@@ -1,6 +1,5 @@
 import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useEffect, useRef } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 function isElementVisible(element) {
   return element.offsetParent !== null;
@@ -110,18 +109,3 @@ export default function MenuKeyboardNavigation({
     </div>
   );
 }
-
-MenuKeyboardNavigation.propTypes = {
-  className: propTypes.string,
-
-  // Callback when the menu is closed via keyboard input
-  closeMenu: propTypes.func,
-
-  // When  true`, sets focus on the first item in the list
-  // which has a role="menuitem" attribute.
-  visible: propTypes.bool,
-
-  // Array of nodes which may contain <MenuItems> or any nodes
-  // that have role set to 'menuitem', 'menuitemradio', or 'menuitemcheckbox'
-  children: propTypes.any.isRequired,
-};

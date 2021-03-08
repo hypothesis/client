@@ -1,6 +1,5 @@
 import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
@@ -157,14 +156,6 @@ function AnnotationEditor({
     </div>
   );
 }
-
-AnnotationEditor.propTypes = {
-  annotation: propTypes.object.isRequired,
-  annotationsService: propTypes.object,
-  settings: propTypes.object,
-  tags: propTypes.object.isRequired,
-  toastMessenger: propTypes.object,
-};
 
 AnnotationEditor.injectedProps = [
   'annotationsService',

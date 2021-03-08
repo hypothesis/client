@@ -1,5 +1,3 @@
-import propTypes from 'prop-types';
-
 import { pageNumberOptions } from '../util/pagination';
 
 import Button from './Button';
@@ -79,11 +77,5 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
     </div>
   );
 }
-
-PaginationNavigation.propTypes = {
-  currentPage: propTypes.number,
-  onChangePage: propTypes.func,
-  totalPages: propTypes.number,
-};
 
 export default PaginationNavigation;

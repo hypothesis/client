@@ -1,6 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import { useCallback, useMemo, useState } from 'preact/hooks';
-import propTypes from 'prop-types';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
@@ -40,11 +39,6 @@ function HelpPanelTab({ linkText, url }) {
     </div>
   );
 }
-
-HelpPanelTab.propTypes = {
-  linkText: propTypes.string.isRequired,
-  url: propTypes.string.isRequired,
-};
 
 /**
  * @typedef HelpPanelProps
@@ -160,10 +154,6 @@ function HelpPanel({ auth, session }) {
   );
 }
 
-HelpPanel.propTypes = {
-  auth: propTypes.object.isRequired,
-  session: propTypes.object.isRequired,
-};
-
 HelpPanel.injectedProps = ['session'];
+
 export default withServices(HelpPanel);

@@ -46,5 +46,3 @@ export default function SortMenu() {
     </div>
   );
 }
-
-SortMenu.propTypes = {};

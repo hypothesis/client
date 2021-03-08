@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 /**
  * @typedef ButtonProps
@@ -87,36 +86,3 @@ export default function Button({
     </button>
   );
 }
-
-/**
- * Validation callback for `propTypes`. The given `propName` is conditionally
- * required depending on the presence or absence of the `buttonText` property. Return
- * an `Error` on validation failure, per propTypes API.
- *
- * @return {Error|undefined}
- */
-function requiredStringIfButtonTextMissing(props, propName, componentName) {
-  if (
-    typeof props.buttonText !== 'string' &&
-    typeof props[propName] !== 'string'
-  ) {
-    return new Error(
-      `string property '${propName}' must be supplied to component '${componentName}'\
-if string property 'buttonText' omitted`
-    );
-  }
-  return undefined;
-}
-
-Button.propTypes = {
-  buttonText: propTypes.string,
-  className: propTypes.string,
-  icon: requiredStringIfButtonTextMissing,
-  iconPosition: propTypes.string,
-  isExpanded: propTypes.bool,
-  isPressed: propTypes.bool,
-  onClick: propTypes.func,
-  disabled: propTypes.bool,
-  style: propTypes.object,
-  title: requiredStringIfButtonTextMissing,
-};

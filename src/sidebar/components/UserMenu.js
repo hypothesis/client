@@ -1,5 +1,4 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
-import propTypes from 'prop-types';
 
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../config/service-config';
@@ -108,14 +107,6 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     </div>
   );
 }
-
-UserMenu.propTypes = {
-  auth: propTypes.object.isRequired,
-  onLogout: propTypes.func.isRequired,
-  bridge: propTypes.object.isRequired,
-  serviceUrl: propTypes.func.isRequired,
-  settings: propTypes.object.isRequired,
-};
 
 UserMenu.injectedProps = ['bridge', 'serviceUrl', 'settings'];
 

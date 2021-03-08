@@ -1,5 +1,4 @@
 import classnames from 'classnames';
-import propTypes from 'prop-types';
 
 import { isOrphan, quote } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
@@ -60,12 +59,6 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
     </div>
   );
 }
-
-AnnotationQuote.propTypes = {
-  annotation: propTypes.object.isRequired,
-  isFocused: propTypes.bool,
-  settings: propTypes.object,
-};
 
 AnnotationQuote.injectedProps = ['settings'];
 
