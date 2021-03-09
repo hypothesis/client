@@ -136,3 +136,6 @@ $annotator-border-radius: 4px;
 
 $annotator-shadow--sidebar: 0px 1px 4px color.scale($color-shadow, $alpha: -50%);
 $annotator-timing--sidebar-collapse-transition: 150ms;
+
+//test for highlight colors per user
+$user-colors: #ff0a0a, #20e9ff, #447fff, #fff400, #8335ff, #2fffa2;

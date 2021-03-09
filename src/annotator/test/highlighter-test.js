@@ -141,7 +141,7 @@ describe('annotator/highlighter', () => {
       const range = new Range();
       range.setStart(el.firstChild, 4);
       range.setEnd(el, 1);
-      highlightRange(range, '' /* cssClass */);
+      highlightRange(range, -1, '' /* cssClass */);
 
       assert.equal(
         el.innerHTML,

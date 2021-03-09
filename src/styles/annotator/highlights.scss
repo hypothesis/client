@@ -18,7 +18,7 @@
   }
 
   .hypothesis-highlight {
-    background-color: var.$color-highlight;
+    background-color: var.$user-colors;
 
     // For PDFs, we still create highlight elements to wrap the text but the
     // highlight effect is created by another element.
@@ -71,6 +71,24 @@
       .hypothesis-highlight {
         background-color: transparent !important;
       }
+    }
+    &.user-color1 {
+      background-color: nth(var.$user-colors, 1);
+    }
+    &.user-color2 {
+      background-color: nth(var.$user-colors, 2);
+    }
+    &.user-color3 {
+      background-color: nth(var.$user-colors, 3);
+    }
+    &.user-color4 {
+      background-color: nth(var.$user-colors, 4);
+    }
+    &.user-color5 {
+      background-color: nth(var.$user-colors, 5);
+    }
+    &.user-color6 {
+      background-color: nth(var.$user-colors, 6);
     }
   }
 }

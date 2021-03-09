@@ -212,10 +212,15 @@ function wholeTextNodesInRange(range) {
  * element of the specified class and returns the highlight Elements.
  *
  * @param {Range} range - Range to be highlighted
+ * @param {Number} colorNum - number to index color list
  * @param {string} cssClass - A CSS class to use for the highlight
  * @return {HighlightElement[]} - Elements wrapping text in `normedRange` to add a highlight effect
  */
-export function highlightRange(range, cssClass = 'hypothesis-highlight') {
+export function highlightRange(
+  range,
+  colorNum,
+  cssClass = 'hypothesis-highlight'
+) {
   const textNodes = wholeTextNodesInRange(range);
 
   // Check if this range refers to a placeholder for not-yet-rendered text in
@@ -260,6 +265,11 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
     /** @type {HighlightElement} */
     const highlightEl = document.createElement('hypothesis-highlight');
     highlightEl.className = cssClass;
+    //here is where we can call another function to get the color for the user
+    //color-->index number in the 'user-color' class
+    if (colorNum !== -1) {
+      highlightEl.classList.toggle('user-color' + Math.round(colorNum), true);
+    }
 
     nodes[0].parentNode.replaceChild(highlightEl, nodes[0]);
     nodes.forEach(node => highlightEl.appendChild(node));
