@@ -15,7 +15,12 @@ function awaitEvent(target, eventName) {
 }
 
 describe('annotator/plugin/pdf', () => {
-  let container;
+  // Fake for the top-level `#outerContainer` DOM element created by PDF.js.
+  let outerContainer;
+  // Fake for the `#viewerContainer` DOM element created by PDF.js that contains
+  // the actual PDF content.
+  let viewerContainer;
+
   let fakeAnnotator;
   let fakePdfAnchoring;
   let fakePDFMetadata;
@@ -28,10 +33,15 @@ describe('annotator/plugin/pdf', () => {
 
   beforeEach(() => {
     // Setup fake PDF.js viewer.
-    container = document.createElement('div');
-    document.body.appendChild(container);
+    outerContainer = document.createElement('div');
+    outerContainer.id = 'outerContainer';
+    document.body.appendChild(outerContainer);
+
+    viewerContainer = document.createElement('div');
+    outerContainer.appendChild(viewerContainer);
+
     fakePDFViewerApplication = new FakePDFViewerApplication({
-      container,
+      container: viewerContainer,
       content: ['First page', 'Second page'],
     });
     fakePDFViewerApplication.pdfViewer.setCurrentPage(0);
@@ -62,10 +72,9 @@ describe('annotator/plugin/pdf', () => {
   });
 
   afterEach(() => {
-    container.remove();
     pdfPlugin?.destroy();
     delete window.PDFViewerApplication;
-
+    outerContainer.remove();
     $imports.$restore();
   });
 
@@ -150,9 +159,6 @@ describe('annotator/plugin/pdf', () => {
   });
 
   it('shows a warning when PDF has no selectable text', async () => {
-    const mainContainer = document.createElement('div');
-    mainContainer.id = 'mainContainer';
-    document.body.appendChild(mainContainer);
     fakePdfAnchoring.documentHasText.resolves(false);
 
     pdfPlugin = createPDFPlugin();
@@ -161,13 +167,10 @@ describe('annotator/plugin/pdf', () => {
     assert.called(fakePdfAnchoring.documentHasText);
     const banner = getWarningBanner();
     assert.isNotNull(banner);
-    assert.isTrue(mainContainer.contains(banner));
     assert.include(
       banner.shadowRoot.textContent,
       'This PDF does not contain selectable text'
     );
-
-    mainContainer.remove();
   });
 
   context('when the PDF viewer content changes', () => {

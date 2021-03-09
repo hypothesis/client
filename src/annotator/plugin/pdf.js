@@ -113,54 +113,38 @@ export default class PDF extends Delegator {
    * @param {boolean} showWarning
    */
   _showNoSelectableTextWarning(showWarning) {
+    // Get a reference to the top-level DOM element associated with the PDF.js
+    // viewer.
+    const outerContainer = /** @type {HTMLElement} */ (document.querySelector(
+      '#outerContainer'
+    ));
+
     if (!showWarning) {
       this._warningBanner?.remove();
       this._warningBanner = null;
+
+      // Undo inline styles applied when the banner is shown. The banner will
+      // then gets its normal 100% height set by PDF.js's CSS.
+      outerContainer.style.height = '';
+
       return;
     }
 
-    // Get a reference to the root element of the main content area in
-    // PDF.js.
-    const mainContainer = /** @type {HTMLElement} */ (document.querySelector(
-      '#mainContainer'
-    ));
-
-    // Update the position of the warning banner and `mainContainer` element
-    // below it when the size of the banner changes, eg. due to a window resize.
-    const updateBannerHeight = () => {
-      /* istanbul ignore next */
-      if (!this._warningBanner) {
-        return;
-      }
-      const rect = this._warningBanner.getBoundingClientRect();
-      mainContainer.style.top = rect.height + 'px';
-      this._warningBanner.style.top = -rect.height + 'px';
-    };
-
     this._warningBanner = document.createElement('hypothesis-banner');
-    Object.assign(this._warningBanner.style, {
-      // Position the banner at the top of the viewer and make it span the full width.
-      position: 'absolute',
-      left: '0',
-      right: '0',
-
-      // The Z-index is necessary to raise the banner above the toolbar at the
-      // top of the PDF.js viewer.
-      zIndex: '10000',
-    });
-    mainContainer.appendChild(this._warningBanner);
+    document.body.prepend(this._warningBanner);
 
     const warningBannerContent = createShadowRoot(this._warningBanner);
     render(<WarningBanner />, warningBannerContent);
 
-    // nb. In browsers that don't support `ResizeObserver` the banner height
-    // will simply be static and not adjust if the window is resized.
-    if (typeof ResizeObserver !== 'undefined') {
-      // Update the banner when the window is resized or the Hypothesis
-      // sidebar is opened.
-      new ResizeObserver(updateBannerHeight).observe(this._warningBanner);
-    }
-    updateBannerHeight();
+    const bannerHeight = this._warningBanner.getBoundingClientRect().height;
+
+    // The `#outerContainer` element normally has height set to 100% of the body.
+    //
+    // Reduce this by the height of the banner so that it doesn't extend beyond
+    // the bottom of the viewport.
+    //
+    // We don't currently handle the height of the banner changing here.
+    outerContainer.style.height = `calc(100% - ${bannerHeight}px)`;
   }
 
   // This method (re-)anchors annotations when pages are rendered and destroyed.
