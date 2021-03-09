@@ -6,7 +6,8 @@ import { anchorBuckets } from './util/buckets';
 /**
  * @typedef BucketBarOptions
  * @prop {Element} [contentContainer] - The scrollable container element for the
- *   highlights that the bucket bar's buckets will point at
+ *   document content. All of the highlights that the bucket bar's buckets point
+ *   at should be contained within this element.
  */
 
 export default class BucketBar {
