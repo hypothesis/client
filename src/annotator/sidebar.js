@@ -6,7 +6,6 @@ import { createSidebarConfig } from './config/sidebar';
 import events from '../shared/bridge-events';
 import features from './features';
 
-import Delegator from './delegator';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
 import BucketBar from './bucket-bar';
@@ -48,24 +47,24 @@ function createSidebarIframe(config) {
 }
 
 /**
- * The `Sidebar` class creates the sidebar application iframe and its container,
- * as well as the adjacent controls.
+ * The `Sidebar` class creates (1) the sidebar application iframe, (2) its container,
+ * as well as (3) the adjacent controls.
  */
-export default class Sidebar extends Delegator {
+export default class Sidebar {
   /**
-   * Create the sidebar iframe, its container and adjacent controls.
-   *
    * @param {HTMLElement} element
+   * @param {import('./util/emitter').EventBus} eventBus -
+   *   Enables communication between components sharing the same eventBus
    * @param {Guest} guest -
    *   The `Guest` instance for the current frame. It is currently assumed that
    *   it is always possible to annotate in the frame where the sidebar is
    *   displayed.
    * @param {Record<string, any>} [config]
    */
-  constructor(element, guest, config = {}) {
-    super(element, config);
-
+  constructor(element, eventBus, guest, config = {}) {
+    this._emitter = eventBus.createEmitter();
     this.iframe = createSidebarIframe(config);
+    this.options = config;
 
     /** @type {BucketBar|null} */
     this.bucketBar = null;
@@ -86,7 +85,7 @@ export default class Sidebar extends Delegator {
         const bucketBar = new BucketBar(this.iframeContainer, guest, {
           contentContainer: config.contentContainer,
         });
-        guest.subscribe('anchorsChanged', () => bucketBar.update());
+        this._emitter.subscribe('anchorsChanged', () => bucketBar.update());
         this.bucketBar = bucketBar;
       }
 
@@ -104,14 +103,14 @@ export default class Sidebar extends Delegator {
 
     this._listeners = new ListenerCollection();
 
-    this.subscribe('panelReady', () => {
+    this._emitter.subscribe('panelReady', () => {
       // Show the UI
       if (this.iframeContainer) {
         this.iframeContainer.style.display = '';
       }
     });
 
-    this.subscribe('beforeAnnotationCreated', annotation => {
+    this._emitter.subscribe('beforeAnnotationCreated', annotation => {
       // When a new non-highlight annotation is created, focus
       // the sidebar so that the text editor can be focused as
       // soon as the annotation card appears
@@ -126,7 +125,7 @@ export default class Sidebar extends Delegator {
       config.query ||
       config.group
     ) {
-      this.subscribe('panelReady', () => this.open());
+      this._emitter.subscribe('panelReady', () => this.open());
     }
 
     // Set up the toolbar on the left edge of the sidebar.
@@ -143,10 +142,10 @@ export default class Sidebar extends Delegator {
       this.toolbar.useMinimalControls = false;
     }
 
-    this.subscribe('highlightsVisibleChanged', visible => {
+    this._emitter.subscribe('highlightsVisibleChanged', visible => {
       this.toolbar.highlightsVisible = visible;
     });
-    this.subscribe('hasSelectionChanged', hasSelection => {
+    this._emitter.subscribe('hasSelectionChanged', hasSelection => {
       this.toolbar.newAnnotationType = hasSelection ? 'annotation' : 'note';
     });
 
@@ -198,7 +197,7 @@ export default class Sidebar extends Delegator {
     } else {
       this.iframe.remove();
     }
-    super.destroy();
+    this._emitter.destroy();
   }
 
   _setupSidebarEvents() {
@@ -215,9 +214,9 @@ export default class Sidebar extends Delegator {
       /** @type {string} */ groupId
     ) => {
       this.hide();
-      this.publish('openNotebook', [groupId]);
+      this._emitter.publish('openNotebook', groupId);
     });
-    this.subscribe('closeNotebook', () => {
+    this._emitter.subscribe('closeNotebook', () => {
       this.show();
     });
 
@@ -336,7 +335,7 @@ export default class Sidebar extends Delegator {
     if (this.onLayoutChange) {
       this.onLayoutChange(layoutState);
     }
-    this.publish('sidebarLayoutChanged', [layoutState]);
+    this._emitter.publish('sidebarLayoutChanged', layoutState);
   }
 
   /**
@@ -407,7 +406,7 @@ export default class Sidebar extends Delegator {
 
   open() {
     this.guest.crossframe.call('sidebarOpened');
-    this.publish('sidebarOpened');
+    this._emitter.publish('sidebarOpened');
 
     if (this.iframeContainer) {
       const width = this.iframeContainer.getBoundingClientRect().width;

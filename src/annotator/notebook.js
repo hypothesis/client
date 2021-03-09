@@ -1,4 +1,3 @@
-import Delegator from './delegator';
 import { createSidebarConfig } from './config/sidebar';
 import { createShadowRoot } from './util/shadow-root';
 import { render } from 'preact';
@@ -31,9 +30,17 @@ function createNotebookFrame(config, groupId) {
   return notebookFrame;
 }
 
-export default class Notebook extends Delegator {
-  constructor(element, config) {
-    super(element, config);
+export default class Notebook {
+  /**
+   * @param {HTMLElement} element
+   * @param {import('./util/emitter').EventBus} eventBus -
+   *   Enables communication between components sharing the same eventBus
+   * @param {Record<string, any>} config
+   */
+  constructor(element, eventBus, config = {}) {
+    this.element = element;
+    this._emitter = eventBus.createEmitter();
+    this.options = config;
     this.frame = null;
 
     /** @type {null|string} */
@@ -57,7 +64,7 @@ export default class Notebook extends Delegator {
      */
     this.container = null;
 
-    this.subscribe('openNotebook', groupId => {
+    this._emitter.subscribe('openNotebook', groupId => {
       this._groupId = groupId;
       this.open();
     });
@@ -103,6 +110,7 @@ export default class Notebook extends Delegator {
 
   destroy() {
     this._outerContainer.remove();
+    this._emitter.destroy();
   }
 
   _initContainer() {
@@ -118,7 +126,7 @@ export default class Notebook extends Delegator {
 
     const onClose = () => {
       this.close();
-      this.publish('closeNotebook');
+      this._emitter.publish('closeNotebook');
     };
 
     render(

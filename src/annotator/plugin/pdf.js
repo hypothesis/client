@@ -3,7 +3,6 @@ import { render } from 'preact';
 
 import * as pdfAnchoring from '../anchoring/pdf';
 import WarningBanner from '../components/WarningBanner';
-import Delegator from '../delegator';
 import RenderingStates from '../pdfjs-rendering-states';
 import { createShadowRoot } from '../util/shadow-root';
 import { ListenerCollection } from '../util/listener-collection';
@@ -16,13 +15,11 @@ import PDFMetadata from './pdf-metadata';
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  */
 
-export default class PDF extends Delegator {
+export default class PDF {
   /**
    * @param {Annotator} annotator
    */
-  constructor(element, annotator) {
-    super(element);
-
+  constructor(annotator) {
     this.annotator = annotator;
     annotator.anchoring = pdfAnchoring;
 

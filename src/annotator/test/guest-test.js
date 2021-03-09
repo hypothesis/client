@@ -1,5 +1,5 @@
-import Delegator from '../delegator';
 import Guest from '../guest';
+import { EventBus } from '../util/emitter';
 import { $imports } from '../guest';
 
 const scrollIntoView = sinon.stub();
@@ -48,7 +48,8 @@ describe('Guest', () => {
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
-    return new Guest(element, { ...guestConfig, ...config });
+    const eventBus = new EventBus();
+    return new Guest(element, eventBus, { ...guestConfig, ...config });
   };
 
   beforeEach(() => {
@@ -118,7 +119,6 @@ describe('Guest', () => {
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
-      './delegator': Delegator,
       'scroll-into-view': scrollIntoView,
     });
   });
@@ -139,7 +139,7 @@ describe('Guest', () => {
     it('publishes the "panelReady" event when a connection is established', () => {
       const handler = sandbox.stub();
       const guest = createGuest();
-      guest.subscribe('panelReady', handler);
+      guest._emitter.subscribe('panelReady', handler);
       fakeCrossFrame.onConnect.yield();
       assert.called(handler);
     });
@@ -160,8 +160,8 @@ describe('Guest', () => {
         options.on('foo', fooHandler);
         options.on('bar', barHandler);
 
-        guest.publish('foo', ['1', '2']);
-        guest.publish('bar', ['1', '2']);
+        guest._emitter.publish('foo', '1', '2');
+        guest._emitter.publish('bar', '1', '2');
 
         assert.calledWith(fooHandler, '1', '2');
         assert.calledWith(barHandler, '1', '2');
@@ -199,8 +199,8 @@ describe('Guest', () => {
         const fooHandler = sandbox.stub();
         const barHandler = sandbox.stub();
 
-        guest.subscribe('foo', fooHandler);
-        guest.subscribe('bar', barHandler);
+        guest._emitter.subscribe('foo', fooHandler);
+        guest._emitter.subscribe('bar', barHandler);
 
         options.emit('foo', '1', '2');
         options.emit('bar', '1', '2');
@@ -553,7 +553,7 @@ describe('Guest', () => {
     it('emits `hasSelectionChanged` event with argument `true` if selection is non-empty', () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('hasSelectionChanged', callback);
+      guest._emitter.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithText();
 
@@ -563,7 +563,7 @@ describe('Guest', () => {
     it('emits `hasSelectionChanged` event with argument `false` if selection is empty', () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('hasSelectionChanged', callback);
+      guest._emitter.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithoutText();
 
@@ -577,7 +577,7 @@ describe('Guest', () => {
     it('creates a new annotation if "Annotate" is clicked', async () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('beforeAnnotationCreated', callback);
+      guest._emitter.subscribe('beforeAnnotationCreated', callback);
 
       await FakeAdder.instance.options.onAnnotate();
 
@@ -587,7 +587,7 @@ describe('Guest', () => {
     it('creates a new highlight if "Highlight" is clicked', async () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('beforeAnnotationCreated', callback);
+      guest._emitter.subscribe('beforeAnnotationCreated', callback);
 
       await FakeAdder.instance.options.onHighlight();
 
@@ -690,7 +690,7 @@ describe('Guest', () => {
     it('triggers a "beforeAnnotationCreated" event', async () => {
       const guest = createGuest();
       const callback = sinon.stub();
-      guest.subscribe('beforeAnnotationCreated', callback);
+      guest._emitter.subscribe('beforeAnnotationCreated', callback);
 
       const annotation = await guest.createAnnotation();
 
@@ -844,7 +844,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const annotation = {};
       const anchorsChanged = sinon.stub();
-      guest.subscribe('anchorsChanged', anchorsChanged);
+      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
 
       await guest.anchor(annotation);
 
@@ -928,7 +928,7 @@ describe('Guest', () => {
       const annotation = {};
       guest.anchors.push({ annotation });
       const anchorsChanged = sinon.stub();
-      guest.subscribe('anchorsChanged', anchorsChanged);
+      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
 
       guest.detach(annotation);
 

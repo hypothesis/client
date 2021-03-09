@@ -1,13 +1,14 @@
 import PdfSidebar from '../pdf-sidebar';
-import Delegator from '../delegator';
 
 import { mockBaseClass } from '../../test-util/mock-base';
 import { ListenerCollection } from '../util/listener-collection';
+import { EventBus } from '../util/emitter';
 
-class FakeSidebar extends Delegator {
-  constructor(element, guest, config) {
-    super(element, config);
+class FakeSidebar {
+  constructor(element, eventBus, guest, config) {
+    this._emitter = eventBus.createEmitter();
     this.guest = guest;
+    this.options = config;
     this._listeners = new ListenerCollection();
   }
 }
@@ -22,7 +23,8 @@ describe('PdfSidebar', () => {
 
   const createPdfSidebar = config => {
     const element = document.createElement('div');
-    return new PdfSidebar(element, fakeGuest, config);
+    const eventBus = new EventBus();
+    return new PdfSidebar(element, eventBus, fakeGuest, config);
   };
 
   let unmockSidebar;
@@ -139,9 +141,11 @@ describe('PdfSidebar', () => {
         sandbox.stub(window, 'innerWidth').value(1350);
         const sidebar = createPdfSidebar();
 
-        sidebar.publish('sidebarLayoutChanged', [
-          { expanded: true, width: 428, height: 728 },
-        ]);
+        sidebar._emitter.publish('sidebarLayoutChanged', {
+          expanded: true,
+          width: 428,
+          height: 728,
+        });
 
         assert.isTrue(sidebar.sideBySideActive);
         assert.calledOnce(fakePDFViewerUpdate);
@@ -161,9 +165,11 @@ describe('PdfSidebar', () => {
           sandbox.stub(window, 'innerWidth').value(1350);
           const sidebar = createPdfSidebar();
 
-          sidebar.publish('sidebarLayoutChanged', [
-            { expanded: true, width: 428, height: 728 },
-          ]);
+          sidebar._emitter.publish('sidebarLayoutChanged', {
+            expanded: true,
+            width: 428,
+            height: 728,
+          });
 
           assert.isTrue(sidebar.sideBySideActive);
           assert.calledOnce(fakePDFViewerUpdate);
@@ -175,9 +181,11 @@ describe('PdfSidebar', () => {
         sandbox.stub(window, 'innerWidth').value(1350);
         const sidebar = createPdfSidebar();
 
-        sidebar.publish('sidebarLayoutChanged', [
-          { expanded: false, width: 428, height: 728 },
-        ]);
+        sidebar._emitter.publish('sidebarLayoutChanged', {
+          expanded: false,
+          width: 428,
+          height: 728,
+        });
 
         assert.isFalse(sidebar.sideBySideActive);
         assert.equal(fakePDFContainer.style.width, 'auto');
@@ -187,9 +195,11 @@ describe('PdfSidebar', () => {
         sandbox.stub(window, 'innerWidth').value(800);
         const sidebar = createPdfSidebar();
 
-        sidebar.publish('sidebarLayoutChanged', [
-          { expanded: true, width: 428, height: 728 },
-        ]);
+        sidebar._emitter.publish('sidebarLayoutChanged', {
+          expanded: true,
+          width: 428,
+          height: 728,
+        });
 
         assert.isFalse(sidebar.sideBySideActive);
         assert.calledOnce(fakePDFViewerUpdate);

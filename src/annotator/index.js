@@ -22,6 +22,7 @@ import Guest from './guest';
 import Notebook from './notebook';
 import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
+import { EventBus } from './util/emitter';
 
 const window_ = /** @type {HypothesisWindow} */ (window);
 
@@ -36,7 +37,7 @@ const config = configFrom(window);
 function init() {
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
-  /** @type {(new (e: HTMLElement, guest: Guest, config: Record<string,any>) => Sidebar)|null} */
+  /** @type {typeof Sidebar|null} */
   let SidebarClass = isPDF ? PdfSidebar : Sidebar;
 
   if (config.subFrameIdentifier) {
@@ -51,11 +52,12 @@ function init() {
   // Load the PDF anchoring/metadata integration.
   config.documentType = isPDF ? 'pdf' : 'html';
 
-  const guest = new Guest(document.body, config);
+  const eventBus = new EventBus();
+  const guest = new Guest(document.body, eventBus, config);
   const sidebar = SidebarClass
-    ? new SidebarClass(document.body, guest, config)
+    ? new SidebarClass(document.body, eventBus, guest, config)
     : null;
-  const notebook = new Notebook(document.body, config);
+  const notebook = new Notebook(document.body, eventBus, config);
 
   appLinkEl.addEventListener('destroy', () => {
     sidebar?.destroy();

@@ -29,18 +29,10 @@ describe('DocumentMeta', function () {
       return normalizeURI(url, base);
     });
 
-    // Root element to use for the `Delegator` event bus. This can be different
-    // than the document from which metadata is gathered.
-    const rootElement = document.body;
-
-    testDocument = new DocumentMeta(rootElement, {
+    testDocument = new DocumentMeta({
       document: tempDocument,
       normalizeURI: fakeNormalizeURI,
     });
-  });
-
-  afterEach(() => {
-    testDocument.destroy();
   });
 
   describe('annotation should have some metadata', function () {
@@ -266,8 +258,7 @@ describe('DocumentMeta', function () {
           href,
         },
       };
-      const divEl = document.createElement('div');
-      const doc = new DocumentMeta(divEl, {
+      const doc = new DocumentMeta({
         document: fakeDocument,
         baseURI,
       });
