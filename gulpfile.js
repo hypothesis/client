@@ -352,6 +352,15 @@ function runKarma(done) {
     },
     done
   ).start();
+
+  process.on('SIGINT', () => {
+    // Give Karma a chance to handle SIGINT and cleanup, but forcibly
+    // exit if it takes too long.
+    setTimeout(() => {
+      done();
+      process.exit(1);
+    }, 5000);
+  });
 }
 
 // Unit and integration testing tasks.
