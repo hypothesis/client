@@ -41,15 +41,21 @@ let ignoreNextClick = false;
  *   `false`, the consumer is responsible for positioning.
  * @prop {string} [contentClass] - Additional CSS classes to apply to the menu.
  * @prop {boolean} [defaultOpen] - Whether the menu is open or closed when initially rendered.
+ *   Ignored if `open` is present.
  * @prop {(open: boolean) => any} [onOpenChanged] - Callback invoked when the menu is
  *   opened or closed.  This can be used, for example, to reset any ephemeral state that the
  *   menu content may have.
+ * @prop {boolean} [open] - Whether the menu is currently open; overrides internal state
+ *   management for openness. External components managing state in this way should
+ *   also pass an `onOpenChanged` handler to respond when the user closes the menu.
  * @prop {string} title -
  *   A title for the menu. This is important for accessibility if the menu's toggle button
  *   has only an icon as a label.
  * @prop {boolean} [menuIndicator] -
  *   Whether to display an indicator next to the label that there is a dropdown menu.
  */
+
+const noop = () => {};
 
 /**
  * A drop-down menu.
@@ -79,11 +85,17 @@ export default function Menu({
   contentClass,
   defaultOpen = false,
   label,
+  open,
   onOpenChanged,
   menuIndicator = true,
   title,
 }) {
-  const [isOpen, setOpen] = useState(defaultOpen);
+  /** @type {[boolean, (open: boolean) => void]} */
+  let [isOpen, setOpen] = useState(defaultOpen);
+  if (typeof open === 'boolean') {
+    isOpen = open;
+    setOpen = onOpenChanged || noop;
+  }
 
   // Notify parent when menu is opened or closed.
   const wasOpen = useRef(isOpen);
@@ -109,6 +121,7 @@ export default function Menu({
       event.preventDefault();
       return;
     }
+
     setOpen(!isOpen);
   };
   const closeMenu = useCallback(() => setOpen(false), [setOpen]);

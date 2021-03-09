@@ -54,6 +54,17 @@ describe('Menu', () => {
     assert.isFalse(isOpen(wrapper));
   });
 
+  it('leaves the management of open/closed state to parent component if `open` prop present', () => {
+    // When `open` is present, `Menu` will invoke `onOpenChanged` on interactions
+    // but will not modify the its open state directly.
+    const wrapper = createMenu({ open: true });
+
+    assert.isTrue(isOpen(wrapper));
+
+    wrapper.find('button').simulate('click');
+    assert.isTrue(isOpen(wrapper));
+  });
+
   it('calls `onOpenChanged` prop when menu is opened or closed', () => {
     const onOpenChanged = sinon.stub();
     const wrapper = createMenu({ onOpenChanged });
@@ -70,6 +81,12 @@ describe('Menu', () => {
     wrapper.find('button').simulate('mousedown');
     // Make sure the follow-up click doesn't close the menu.
     wrapper.find('button').simulate('click');
+
+    assert.isTrue(isOpen(wrapper));
+  });
+
+  it('gives precedence to `open` over `defaultOpen`', () => {
+    const wrapper = createMenu({ open: true, defaultOpen: false });
 
     assert.isTrue(isOpen(wrapper));
   });
