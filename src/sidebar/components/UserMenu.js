@@ -1,4 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
+import { useState } from 'preact/hooks';
 
 import bridgeEvents from '../../shared/bridge-events';
 import serviceConfig from '../config/service-config';
@@ -44,6 +45,7 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
   const isThirdParty = isThirdPartyUser(auth.userid, settings.authDomain);
   const service = serviceConfig(settings);
   const isNotebookEnabled = store.isFeatureEnabled('notebook_launch');
+  const [isOpen, setOpen] = useState(false);
 
   const serviceSupports = feature => service && !!service[feature];
 
@@ -54,6 +56,15 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
 
   const onSelectNotebook = () => {
     bridge.call('openNotebook', store.focusedGroupId());
+  };
+
+  // Temporary access to the Notebook without feature flag:
+  // type the key 'n' when user menu is focused/open
+  const onKeyDown = event => {
+    if (event.key === 'n') {
+      onSelectNotebook();
+      setOpen(false);
+    }
   };
 
   const onProfileSelected = () =>
@@ -77,8 +88,16 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     </span>
   );
   return (
-    <div className="UserMenu">
-      <Menu label={menuLabel} title={auth.displayName} align="right">
+    // FIXME: KeyDown handling is temporary for Notebook "easter egg"
+    /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
+    <div className="UserMenu" onKeyDown={onKeyDown}>
+      <Menu
+        label={menuLabel}
+        title={auth.displayName}
+        align="right"
+        open={isOpen}
+        onOpenChanged={setOpen}
+      >
         <MenuSection>
           <MenuItem
             label={auth.displayName}
