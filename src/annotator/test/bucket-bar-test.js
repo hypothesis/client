@@ -85,7 +85,6 @@ describe('BucketBar', () => {
 
       beforeEach(() => {
         container = document.createElement('div');
-        container.className = 'scrollable-1';
         document.body.appendChild(container);
       });
 
