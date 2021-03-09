@@ -14,13 +14,15 @@ const MIN_PDF_WIDTH = 680;
 export default class PdfSidebar extends Sidebar {
   /**
    * @param {HTMLElement} element
+   * @param {import('./util/emitter').EventBus} eventBus -
+   *   Enables communication between components sharing the same eventBus
    * @param {Guest} guest
    * @param {Record<string, any>} [config]
    */
-  constructor(element, guest, config = {}) {
+  constructor(element, eventBus, guest, config = {}) {
     const contentContainer = document.querySelector('#viewerContainer');
 
-    super(element, guest, { contentContainer, ...config });
+    super(element, eventBus, guest, { contentContainer, ...config });
 
     this._lastSidebarLayoutState = {
       expanded: false,
@@ -35,7 +37,9 @@ export default class PdfSidebar extends Sidebar {
     // Is the PDF currently displayed side-by-side with the sidebar?
     this.sideBySideActive = false;
 
-    this.subscribe('sidebarLayoutChanged', state => this.fitSideBySide(state));
+    this._emitter.subscribe('sidebarLayoutChanged', state =>
+      this.fitSideBySide(state)
+    );
     this._listeners.add(window, 'resize', () => this.fitSideBySide());
   }
 

@@ -17,8 +17,6 @@
  * @typedef {import('../../types/annotator').DocumentMetadata} Metadata
  */
 
-import Delegator from '../delegator';
-
 import { normalizeURI } from '../util/url';
 
 /**
@@ -62,14 +60,18 @@ function createMetadata() {
  * DocumentMeta reads metadata/links from the current HTML document and
  * populates the `document` property of new annotations.
  */
-export default class DocumentMeta extends Delegator {
-  constructor(element, options = {}) {
-    super(element, options);
-
+export default class DocumentMeta {
+  /**
+   * @param {object} [options]
+   *   @param {Document} [options.document]
+   *   @param {string} [options.baseURI]
+   *   @param {normalizeURI} [options.normalizeURI]
+   */
+  constructor(options = {}) {
     this.metadata = createMetadata();
 
-    this.baseURI = options.baseURI || document.baseURI;
     this.document = options.document || document;
+    this.baseURI = options.baseURI || this.document.baseURI;
     this.normalizeURI = options.normalizeURI || normalizeURI;
 
     this.getDocumentMetadata();

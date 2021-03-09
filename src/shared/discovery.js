@@ -35,7 +35,9 @@ import { ListenerCollection } from '../annotator/util/listener-collection';
 export default class Discovery {
   /**
    * @param {Window} target
-   * @param {Object} options
+   * @param {object} [options]
+   *   @param {boolean} [options.server]
+   *   @param {string} [options.origin]
    */
   constructor(target, options = {}) {
     /** The window to send and listen for messages with. */

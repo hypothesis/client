@@ -1,4 +1,5 @@
 import Notebook from '../notebook';
+import { EventBus } from '../util/emitter';
 
 describe('Notebook', () => {
   // `Notebook` instances created by current test
@@ -7,7 +8,8 @@ describe('Notebook', () => {
   const createNotebook = (config = {}) => {
     config = { notebookAppUrl: '/base/annotator/test/empty.html', ...config };
     const element = document.createElement('div');
-    const notebook = new Notebook(element, config);
+    const eventBus = new EventBus();
+    const notebook = new Notebook(element, eventBus, config);
 
     notebooks.push(notebook);
 
@@ -88,11 +90,11 @@ describe('Notebook', () => {
       notebook._groupId = 'mygroup';
 
       // The first opening will create a new iFrame
-      notebook.publish('openNotebook', ['myGroup']);
+      notebook._emitter.publish('openNotebook', 'myGroup');
       const removeSpy = sinon.spy(notebook.frame, 'remove');
       // Open it again — the group hasn't changed so the iframe won't be
       // replaced
-      notebook.publish('openNotebook', ['myGroup']);
+      notebook._emitter.publish('openNotebook', 'myGroup');
 
       assert.notCalled(removeSpy);
     });
@@ -102,11 +104,11 @@ describe('Notebook', () => {
       notebook._groupId = 'mygroup';
 
       // First open: creates an iframe
-      notebook.publish('openNotebook', ['myGroup']);
+      notebook._emitter.publish('openNotebook', 'myGroup');
       const removeSpy = sinon.spy(notebook.frame, 'remove');
 
       // Open again with another group
-      notebook.publish('openNotebook', ['anotherGroup']);
+      notebook._emitter.publish('openNotebook', 'anotherGroup');
 
       // Open again, which will remove the first iframe and create a new one
       notebook.open();
@@ -132,7 +134,7 @@ describe('Notebook', () => {
     it('opens on `openNotebook`', () => {
       const notebook = createNotebook();
 
-      notebook.publish('openNotebook');
+      notebook._emitter.publish('openNotebook');
 
       assert.equal(notebook.container.style.display, '');
     });

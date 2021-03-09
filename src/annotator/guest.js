@@ -1,6 +1,5 @@
 import scrollIntoView from 'scroll-into-view';
 
-import Delegator from './delegator';
 import { Adder } from './adder';
 import CrossFrame from './plugin/cross-frame';
 import DocumentMeta from './plugin/document';
@@ -21,6 +20,7 @@ import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
 
 /**
+ * @typedef {import('./util/emitter').EventBus} EventBus
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Anchor} Anchor
  * @typedef {import('../types/api').Target} Target
@@ -102,21 +102,20 @@ function resolveAnchor(anchor) {
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
  */
-export default class Guest extends Delegator {
+export default class Guest {
   /**
-   * Initialize the Guest.
-   *
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
+   * @param {EventBus} eventBus -
+   *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
    * @param {typeof htmlAnchoring} [anchoring] - Anchoring implementation
    */
-  constructor(element, config = {}, anchoring = htmlAnchoring) {
-    super(element, config);
-
+  constructor(element, eventBus, config = {}, anchoring = htmlAnchoring) {
+    this.element = element;
+    this._emitter = eventBus.createEmitter();
     this.visibleHighlights = false;
-
     this.adderToolbar = document.createElement('hypothesis-adder');
     this.adderToolbar.style.display = 'none';
     this.element.appendChild(this.adderToolbar);
@@ -156,9 +155,9 @@ export default class Guest extends Delegator {
     // nb. The `anchoring` field defaults to HTML anchoring and in PDFs is replaced
     // by `PDFIntegration` below.
     this.anchoring = anchoring;
-    this.documentMeta = new DocumentMeta(this.element);
+    this.documentMeta = new DocumentMeta();
     if (config.documentType === 'pdf') {
-      this.pdfIntegration = new PDFIntegration(this.element, this);
+      this.pdfIntegration = new PDFIntegration(this);
     }
 
     // Set the frame identifier if it's available.
@@ -167,8 +166,8 @@ export default class Guest extends Delegator {
 
     this.crossframe = new CrossFrame(this.element, {
       config,
-      on: (event, handler) => this.subscribe(event, handler),
-      emit: (event, ...args) => this.publish(event, args),
+      on: (event, handler) => this._emitter.subscribe(event, handler),
+      emit: (event, ...args) => this._emitter.publish(event, ...args),
     });
     this.crossframe.onConnect(() => this._setupInitialState(config));
 
@@ -199,7 +198,7 @@ export default class Guest extends Delegator {
         // the sidebar doesn't overlap the content.
         return;
       }
-      this.crossframe?.call('closeSidebar');
+      this.crossframe.call('closeSidebar');
     };
 
     addListener('click', event => {
@@ -275,16 +274,16 @@ export default class Guest extends Delegator {
   }
 
   _setupInitialState(config) {
-    this.publish('panelReady');
+    this._emitter.publish('panelReady');
     this.setVisibleHighlights(config.showHighlights === 'always');
   }
 
   _connectAnnotationSync() {
-    this.subscribe('annotationDeleted', annotation => {
+    this._emitter.subscribe('annotationDeleted', annotation => {
       this.detach(annotation);
     });
 
-    this.subscribe('annotationsLoaded', annotations => {
+    this._emitter.subscribe('annotationsLoaded', annotations => {
       annotations.map(annotation => this.anchor(annotation));
     });
   }
@@ -341,10 +340,8 @@ export default class Guest extends Delegator {
 
     removeAllHighlights(this.element);
 
-    this.documentMeta.destroy();
     this.pdfIntegration?.destroy();
-
-    super.destroy();
+    this._emitter.destroy();
   }
 
   /**
@@ -525,7 +522,7 @@ export default class Guest extends Delegator {
 
   _updateAnchors(anchors) {
     this.anchors = anchors;
-    this.publish('anchorsChanged', [this.anchors]);
+    this._emitter.publish('anchorsChanged', this.anchors);
   }
 
   /**
@@ -566,11 +563,11 @@ export default class Guest extends Delegator {
       $tag: '',
     };
 
-    this.publish('beforeAnnotationCreated', [annotation]);
+    this._emitter.publish('beforeAnnotationCreated', annotation);
     this.anchor(annotation);
 
     if (!annotation.$highlight) {
-      this.crossframe?.call('openSidebar');
+      this.crossframe.call('openSidebar');
     }
 
     return annotation;
@@ -584,8 +581,8 @@ export default class Guest extends Delegator {
    */
   showAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
-    this.crossframe?.call('showAnnotations', tags);
-    this.crossframe?.call('openSidebar');
+    this.crossframe.call('showAnnotations', tags);
+    this.crossframe.call('openSidebar');
   }
 
   /**
@@ -596,7 +593,7 @@ export default class Guest extends Delegator {
    */
   toggleAnnotationSelection(annotations) {
     const tags = annotations.map(a => a.$tag);
-    this.crossframe?.call('toggleAnnotationSelection', tags);
+    this.crossframe.call('toggleAnnotationSelection', tags);
   }
 
   /**
@@ -607,7 +604,7 @@ export default class Guest extends Delegator {
    */
   focusAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
-    this.crossframe?.call('focusAnnotations', tags);
+    this.crossframe.call('focusAnnotations', tags);
   }
 
   /**
@@ -626,7 +623,7 @@ export default class Guest extends Delegator {
     }
 
     this.selectedRanges = [range];
-    this.publish('hasSelectionChanged', [true]);
+    this._emitter.publish('hasSelectionChanged', true);
 
     this.adderCtrl.annotationsForSelection = annotationsForSelection();
     this.adderCtrl.show(focusRect, isBackwards);
@@ -635,7 +632,7 @@ export default class Guest extends Delegator {
   _onClearSelection() {
     this.adderCtrl.hide();
     this.selectedRanges = [];
-    this.publish('hasSelectionChanged', [false]);
+    this._emitter.publish('hasSelectionChanged', false);
   }
 
   /**
@@ -672,6 +669,6 @@ export default class Guest extends Delegator {
   setVisibleHighlights(shouldShowHighlights) {
     setHighlightsVisible(this.element, shouldShowHighlights);
     this.visibleHighlights = shouldShowHighlights;
-    this.publish('highlightsVisibleChanged', [shouldShowHighlights]);
+    this._emitter.publish('highlightsVisibleChanged', shouldShowHighlights);
   }
 }

@@ -3,6 +3,7 @@
 
 import Guest from '../../guest';
 import { $imports as guestImports } from '../../guest';
+import { EventBus } from '../../util/emitter';
 
 function quoteSelector(quote) {
   return {
@@ -65,7 +66,8 @@ describe('anchoring', function () {
     container = document.createElement('div');
     container.innerHTML = require('./test-page.html');
     document.body.appendChild(container);
-    guest = new Guest(container);
+    const eventBus = new EventBus();
+    guest = new Guest(container, eventBus);
   });
 
   afterEach(() => {
