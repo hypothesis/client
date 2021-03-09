@@ -105,7 +105,7 @@ describe('BucketBar', () => {
 
     context('when no `contentContainer` is specified', () => {
       it('should update buckets when body is scrolled', () => {
-        createBucketBar();
+        createBucketBar({ contentContainer: undefined });
         fakeBucketUtil.anchorBuckets.resetHistory();
 
         document.body.dispatchEvent(new Event('scroll'));

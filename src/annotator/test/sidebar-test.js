@@ -861,7 +861,7 @@ describe('Sidebar', () => {
         FakeBucketBar,
         sidebar.iframeContainer,
         fakeGuest,
-        sinon.match({ contentContainer: document.body })
+        sinon.match({ contentContainer: undefined })
       );
     });
 
