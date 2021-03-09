@@ -1,4 +1,5 @@
 import { mount } from 'enzyme';
+import { act } from 'preact/test-utils';
 
 import bridgeEvents from '../../../shared/bridge-events';
 import UserMenu from '../UserMenu';
@@ -205,6 +206,22 @@ describe('UserMenu', () => {
         openNotebookItem.props().onClick();
         assert.calledOnce(fakeBridge.call);
         assert.calledWith(fakeBridge.call, 'openNotebook', 'mygroup');
+      });
+
+      it('opens the notebook and closes itself when `n` is typed', () => {
+        const wrapper = createUserMenu();
+        // Make the menu "open"
+        act(() => {
+          wrapper.find('Menu').props().onOpenChanged(true);
+        });
+        wrapper.update();
+        assert.isTrue(wrapper.find('Menu').props().open);
+
+        wrapper.find('.UserMenu').simulate('keydown', { key: 'n' });
+        assert.calledOnce(fakeBridge.call);
+        assert.calledWith(fakeBridge.call, 'openNotebook', 'mygroup');
+        // Now the menu is "closed" again
+        assert.isFalse(wrapper.find('Menu').props().open);
       });
     });
 
