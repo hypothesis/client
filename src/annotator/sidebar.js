@@ -10,6 +10,7 @@ import Guest from './guest';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
 import BucketBar from './plugin/bucket-bar';
+import { DoodleController } from '../doodle/doodleController';
 
 /**
  * @typedef LayoutState
@@ -134,8 +135,17 @@ export default class Sidebar extends Guest {
       createAnnotation: () => this.createAnnotation(),
       setSidebarOpen: open => (open ? this.show() : this.hide()),
       setHighlightsVisible: show => this.setAllVisibleHighlights(show),
+      setUserCanDoodle: show => this.setAllDoodleability(show),
     });
     this.toolbar.useMinimalControls = config.theme === 'clean';
+
+    this.doodleCanvasController = new DoodleController(
+      document.getElementById('main-content'),
+      {
+        tool: 'pen',
+        size: 5,
+      }
+    );
 
     if (this.frame) {
       // If using our own container frame for the sidebar, add the toolbar to it.
@@ -409,5 +419,14 @@ export default class Sidebar extends Guest {
    */
   setAllVisibleHighlights(shouldShowHighlights) {
     this.crossframe.call('setVisibleHighlights', shouldShowHighlights);
+  }
+
+  /**
+   * (CreativeNTR) Toggle doodle ability on and off
+   *
+   * @param {boolean} shouldBeDoodleable
+   */
+  setAllDoodleability(shouldBeDoodleable) {
+    this.crossframe.call('setDoodleability', shouldBeDoodleable);
   }
 }

@@ -72,6 +72,8 @@ ToolbarButton.propTypes = {
  *   Callback to toggle visibility of highlights in the document.
  * @prop {() => any} toggleSidebar -
  *   Callback to toggle the visibility of the sidebar.
+ * @prop {() => any} toggleDoodleability -
+ *   Callback to toggle visibility of highlights in the document.
  * @prop {import("preact").Ref<HTMLButtonElement>} [toggleSidebarRef] -
  *   Ref that gets set to the toolbar button for toggling the sidebar.
  *   This is exposed to enable the drag-to-resize functionality of this
@@ -95,6 +97,7 @@ export default function Toolbar({
   showHighlights,
   toggleHighlights,
   toggleSidebar,
+  toggleDoodleability,
   toggleSidebarRef,
   useMinimalControls = false,
 }) {
@@ -136,7 +139,7 @@ export default function Toolbar({
           <ToolbarButton
             label={'New Doodle'}
             icon={'doodle'}
-            onClick={() => {alert("this would create a doodle!")}}
+            onClick={toggleDoodleability}
           />
         </div>
       )}
@@ -152,6 +155,7 @@ Toolbar.propTypes = {
   showHighlights: propTypes.bool.isRequired,
   toggleHighlights: propTypes.func.isRequired,
   toggleSidebar: propTypes.func.isRequired,
+  toggleDoodleability: propTypes.func.isRequired,
   toggleSidebarRef: propTypes.any,
   useMinimalControls: propTypes.bool,
 };

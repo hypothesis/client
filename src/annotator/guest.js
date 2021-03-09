@@ -123,6 +123,9 @@ export default class Guest extends Delegator {
     /** @type {ToolbarController|null} */
     this.toolbar = null;
 
+    /** TODO add this type back while still passing linter {DoodleController|null}* } */
+    this.doodleCanvasController = null;
+
     this.adderToolbar = document.createElement('hypothesis-adder');
     this.adderToolbar.style.display = 'none';
     this.element.appendChild(this.adderToolbar);
@@ -348,6 +351,10 @@ export default class Guest extends Delegator {
 
     crossframe.on('setVisibleHighlights', state => {
       this.setVisibleHighlights(state);
+    });
+
+    crossframe.on('setDoodleability', state => {
+      this.setDoodleability(state);
     });
   }
 
@@ -708,6 +715,17 @@ export default class Guest extends Delegator {
     this.visibleHighlights = shouldShowHighlights;
     if (this.toolbar) {
       this.toolbar.highlightsVisible = shouldShowHighlights;
+    }
+  }
+
+  /**
+   * Set whether the document can be doodled on
+   *
+   * @param {boolean} shouldBeDoodleable
+   */
+  setDoodleability(shouldBeDoodleable) {
+    if (this.doodleCanvasController) {
+      this.doodleCanvasController.doodleable = shouldBeDoodleable;
     }
   }
 }

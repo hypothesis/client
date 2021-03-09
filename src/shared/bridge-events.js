@@ -43,6 +43,11 @@ export default {
    */
   SIGNUP_REQUESTED: 'signupRequested',
 
+  /**
+   * CreativeNTR event that doodles have been toggled
+   */
+  DOODLES_TOGGLED: 'doodlesToggled',
+
   // Events that the annotator sends to the sidebar
   // ----------------------------------------------
 };
