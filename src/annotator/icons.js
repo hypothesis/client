@@ -16,4 +16,7 @@ export default {
   pointer: require('../images/icons/pointer.svg'),
   show: require('../images/icons/show.svg'),
   doodle: require('../images/icons/doodle.svg'),
+  close: require('../images/icons/close.svg'),
+  pen: require('../images/icons/pen.svg'),
+  erase: require('../images/icons/erase.svg'),
 };

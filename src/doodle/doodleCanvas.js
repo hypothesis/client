@@ -59,6 +59,7 @@ const DoodleCanvas = ({ tool, size, active, attachedElement }) => {
     const newLine = {
       tool: curLine.tool,
       color: curLine.color,
+      size: curLine.size,
       points: [[xPos, yPos], ...curLine.points],
     };
 

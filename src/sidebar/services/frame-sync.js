@@ -179,6 +179,9 @@ export default function FrameSync(annotationsService, bridge, store) {
     bridge.on('setDoodleability', function (state) {
       bridge.call('setDoodleability', state);
     });
+    bridge.on('setDoodleOptions', function (state) {
+      bridge.call('setDoodleOptions', state);
+    });
   }
 
   /**

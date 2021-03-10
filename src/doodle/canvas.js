@@ -2,13 +2,6 @@ import { createElement } from 'preact';
 import { useRef, useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 
-//TODO not sure how to enforce this type...
-/**
- * @typedef Line
- * @property {string} tool - The tool used to draw this line.
- * @property {any} points
- */
-
 const Canvas = ({
   width,
   height,
@@ -28,14 +21,13 @@ const Canvas = ({
     // Move to the first point, begin the line
     ctx.beginPath();
     ctx.moveTo(startX, startY);
+    ctx.lineWidth = line.size;
 
     if (line.tool === 'pen') {
       ctx.globalCompositeOperation = 'source-over';
-      ctx.lineWidth = line.size;
       ctx.strokeStyle = line.color;
     } else {
       ctx.globalCompositeOperation = 'destination-out';
-      ctx.lineWidth = 25;
     }
 
     // Draw the rest of the lines
@@ -48,7 +40,6 @@ const Canvas = ({
   };
 
   useEffect(() => {
-    // for testing
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 

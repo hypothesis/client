@@ -356,6 +356,10 @@ export default class Guest extends Delegator {
     crossframe.on('setDoodleability', state => {
       this.setDoodleability(state);
     });
+
+    crossframe.on('setDoodleOptions', state => {
+      this.setDoodleOptions(state);
+    });
   }
 
   destroy() {
@@ -727,6 +731,22 @@ export default class Guest extends Delegator {
   setDoodleability(shouldBeDoodleable) {
     if (this.doodleCanvasController) {
       this.doodleCanvasController.doodleable = shouldBeDoodleable;
+    }
+  }
+
+  /**
+   * Set the brush options for doodlin
+   *
+   * @param {object} options
+   */
+  setDoodleOptions(options) {
+    if (this.doodleCanvasController) {
+      if (options.hasOwnProperty('tool')) {
+        this.doodleCanvasController.tool = options.tool;
+      }
+      if (options.hasOwnProperty('size')) {
+        this.doodleCanvasController.size = options.size;
+      }
     }
   }
 }

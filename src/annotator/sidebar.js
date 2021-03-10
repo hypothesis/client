@@ -136,6 +136,7 @@ export default class Sidebar extends Guest {
       setSidebarOpen: open => (open ? this.show() : this.hide()),
       setHighlightsVisible: show => this.setAllVisibleHighlights(show),
       setUserCanDoodle: show => this.setAllDoodleability(show),
+      setDoodleOptions: options => this.setAllDoodleOptions(options),
     });
     this.toolbar.useMinimalControls = config.theme === 'clean';
 
@@ -428,5 +429,14 @@ export default class Sidebar extends Guest {
    */
   setAllDoodleability(shouldBeDoodleable) {
     this.crossframe.call('setDoodleability', shouldBeDoodleable);
+  }
+
+  /**
+   * (CreativeNTR) Set the doodle options
+   *
+   * @param {object} options
+   */
+  setAllDoodleOptions(options) {
+    this.crossframe.call('setDoodleOptions', options);
   }
 }

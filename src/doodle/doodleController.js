@@ -23,6 +23,7 @@ export class DoodleController {
    */
   set tool(toolType) {
     this._tool = toolType;
+    this.render();
   }
 
   get tool() {
@@ -36,6 +37,7 @@ export class DoodleController {
    */
   set size(newSize) {
     this._size = newSize;
+    this.render();
   }
 
   get size() {
