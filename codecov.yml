@@ -4,3 +4,11 @@ coverage:
       default:
         # prevent spurious codecov errors resulting from tiny fluctuations
         threshold: 0.1%
+    patch:
+      default:
+        # basic
+        target: 100%
+        threshold: 0%
+        # advanced
+        if_ci_failed: error
+        only_pulls: false
