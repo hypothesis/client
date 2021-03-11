@@ -1,6 +1,8 @@
 /**
  * Create the JSON-serializable subset of annotator configuration that should
  * be passed to the sidebar application.
+ *
+ * @param {Record<string, any>} config
  */
 export function createSidebarConfig(config) {
   const sidebarConfig = { ...config };
