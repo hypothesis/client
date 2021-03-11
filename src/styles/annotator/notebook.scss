@@ -2,7 +2,7 @@
 @use '../mixins/molecules';
 @use "../mixins/buttons";
 
-.notebook-outer {
+.Notebook__outer {
   box-sizing: border-box;
   position: fixed;
   // This large zIndex is used to bring the notebook to the front, so it is not
@@ -11,46 +11,40 @@
   z-index: 2147483647;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  right: 0;
+  bottom: 0;
   padding: var.$layout-space;
 
-  &.is-open {
-    // TBD: Actual opacity/overlay we'd like to use
-    background-color: rgba(0, 0, 0, 0.5);
+  // TBD: Actual opacity/overlay we'd like to use
+  background-color: rgba(0, 0, 0, 0.5);
+
+  &.is-hidden {
+    display: none;
   }
 }
 
-.notebook-inner {
+.Notebook__inner {
+  position: relative;
   box-sizing: border-box;
   @include molecules.panel;
   padding: 0;
   width: 100%;
   height: 100%;
-
-  // FIXME: these properties produce a visual break between the Notebook__controller-bar and the iframe.
-  // A better approach would be if the Notebook__controller-bar and iframe could be children of notebook-inner.
-  border: none;
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
+  border: 0;
 }
 
-// This container element has the purpose of pushing children to the right side.
-.Notebook__controller-bar {
-  font-size: var.$font-size--large;
-  display: flex;
-  justify-content: flex-end;
-
-  // FIXME: these properties emulates as if the Notebook__controller-bar would be part of the iframe.
-  border-top-left-radius: var.$border-radius;
-  border-top-right-radius: var.$border-radius;
+.Notebook__iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  margin-top: 0 !important; // disables the margin-top set by vertical-rhythm mixin
 }
 
 .Notebook__close-button {
   position: absolute;
-  @include buttons.button--labeled(
-    $background-color: var.$grey-2,
-    $active-background-color: var.$grey-3
-  );
+  right: 0;
+  font-size: var.$font-size--large;
+  @include buttons.button--primary;
   margin: var.$layout-space--xsmall;
+  cursor: pointer;
 }
