@@ -52,6 +52,19 @@ function NotebookView({ loadAnnotationsService }) {
       loadAnnotationsService.load({
         groupId: focusedGroup.id,
         maxResults: 5000,
+
+        // Load annotations in reverse-chronological order because that is how
+        // threads are sorted in the notebook view. By aligning the fetch
+        // order with the thread display order we reduce the changes in visible
+        // content as annotations are loaded. This reduces the amount of time
+        // the user has to wait for the content to load before they can start
+        // reading it.
+        //
+        // Fetching is still suboptimal because we fetch both annotations and
+        // replies together from the backend, but the user initially sees only
+        // the top-level threads.
+        sortBy: 'updated',
+        sortOrder: 'desc',
       });
     }
   }, [loadAnnotationsService, focusedGroup, store]);

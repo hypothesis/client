@@ -13,6 +13,8 @@ class FakeSearchClient extends EventEmitter {
     this.cancel = sinon.stub();
     this.incremental = !!opts.incremental;
     this.separateReplies = !!opts.separateReplies;
+    this.sortBy = opts.sortBy;
+    this.sortOrder = opts.sortOrder;
 
     this.get = sinon.spy(query => {
       if (!query.uri) {
@@ -248,6 +250,29 @@ describe('loadAnnotationsService', () => {
 
       svc.load({ groupId: fakeGroupId, uris: fakeUris });
       assert.isFalse(searchClients[0].separateReplies);
+    });
+
+    it('loads annotations with default sort order', () => {
+      const svc = createService();
+
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
+
+      assert.equal(searchClients[0].sortBy, 'created');
+      assert.equal(searchClients[0].sortOrder, 'asc');
+    });
+
+    it('loads annotations with custom sort order', () => {
+      const svc = createService();
+
+      svc.load({
+        groupId: fakeGroupId,
+        uris: fakeUris,
+        sortBy: 'updated',
+        sortOrder: 'desc',
+      });
+
+      assert.equal(searchClients[0].sortBy, 'updated');
+      assert.equal(searchClients[0].sortOrder, 'desc');
     });
 
     it("cancels previously search client if it's still running", () => {
