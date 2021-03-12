@@ -1,13 +1,16 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
+import { withServices } from '../../service-context';
 
 import { useStoreProxy } from '../../store/use-store';
+import { isThirdPartyUser, username } from '../../helpers/account-id';
 import {
   domainAndTitle,
   isHighlight,
   isReply,
   hasBeenEdited,
 } from '../../helpers/annotation-metadata';
+import { annotationDisplayName } from '../../helpers/annotation-user';
 import { isPrivate } from '../../helpers/permissions';
 
 import Button from '../Button';
@@ -19,6 +22,8 @@ import AnnotationUser from './AnnotationUser';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import('../../services/service-url').ServiceUrlGetter} ServiceUrlGetter
+ * @typedef {import('../../../types/config').MergedConfig} MergedConfig
  */
 
 /**
@@ -27,6 +32,9 @@ import AnnotationUser from './AnnotationUser';
  * @prop {boolean} [isEditing] - Whether the annotation is actively being edited
  * @prop {number} replyCount - How many replies this annotation currently has
  * @prop {boolean} threadIsCollapsed - Is this thread currently collapsed?
+ * @prop {ServiceUrlGetter} serviceUrl - Injected service
+ * @prop {MergedConfig} settings - Injected
+ *
  */
 
 /**
@@ -36,13 +44,37 @@ import AnnotationUser from './AnnotationUser';
  *
  * @param {AnnotationHeaderProps} props
  */
-export default function AnnotationHeader({
+function AnnotationHeader({
   annotation,
   isEditing,
   replyCount,
   threadIsCollapsed,
+  serviceUrl,
+  settings,
 }) {
   const store = useStoreProxy();
+  const authDomain = store.authDomain();
+  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
+
+  const isThirdParty = isThirdPartyUser(annotation.user, authDomain);
+  const authorDisplayName = annotationDisplayName(
+    annotation,
+    isThirdParty,
+    displayNamesEnabled
+  );
+
+  const authorLink = (() => {
+    if (!isThirdParty) {
+      return serviceUrl('user', { user: annotation.user });
+    } else {
+      return (
+        (settings.usernameUrl &&
+          `${settings.usernameUrl}${username(annotation.user)}`) ??
+        undefined
+      );
+    }
+  })();
+
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
 
   const annotationIsPrivate = isPrivate(annotation.permissions);
@@ -96,7 +128,10 @@ export default function AnnotationHeader({
             title="This annotation is visible only to you"
           />
         )}
-        <AnnotationUser annotation={annotation} />
+        <AnnotationUser
+          authorLink={authorLink}
+          displayName={authorDisplayName}
+        />
         {showReplyButton && (
           <Button
             className="AnnotationHeader__reply-toggle"
@@ -143,3 +178,7 @@ export default function AnnotationHeader({
     </header>
   );
 }
+
+AnnotationHeader.injectedProps = ['serviceUrl', 'settings'];
+
+export default withServices(AnnotationHeader);

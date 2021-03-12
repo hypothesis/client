@@ -1,19 +1,11 @@
-import { isThirdPartyUser, username } from '../../helpers/account-id';
-import { annotationDisplayName } from '../../helpers/annotation-user';
-import { withServices } from '../../service-context';
-
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import('../../../types/config').MergedConfig} MergedConfig
- * @typedef {import('../../services/service-url').ServiceUrlGetter} ServiceUrlGetter
  */
 
 /**
  * @typedef AnnotationUserProps
- * @prop {Annotation} annotation - The annotation whose user is relevant
- * @prop {Object} features - Injected service
- * @prop {ServiceUrlGetter} serviceUrl - Injected service
- * @prop {MergedConfig} settings - Injected service
+ * @prop {string} [authorLink]
+ * @prop {string} displayName
  */
 
 /**
@@ -22,30 +14,13 @@ import { withServices } from '../../service-context';
  *
  * @param {AnnotationUserProps} props
  */
-function AnnotationUser({ annotation, features, serviceUrl, settings }) {
-  const user = annotation.user;
-  const isFirstPartyUser = !isThirdPartyUser(user, settings.authDomain);
-  const username_ = username(user);
-
-  // How should the user's name be displayed?
-  const displayName = annotationDisplayName(
-    annotation,
-    !isFirstPartyUser,
-    features.flagEnabled('client_display_names')
-  );
-
-  const shouldLinkToActivity = isFirstPartyUser || settings.usernameUrl;
-
-  if (shouldLinkToActivity) {
+function AnnotationUser({ authorLink, displayName }) {
+  if (authorLink) {
     return (
       <div className="AnnotationUser">
         <a
           className="AnnotationUser__link"
-          href={
-            isFirstPartyUser
-              ? serviceUrl('user', { user })
-              : `${settings.usernameUrl}${username_}`
-          }
+          href={authorLink}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -62,6 +37,4 @@ function AnnotationUser({ annotation, features, serviceUrl, settings }) {
   );
 }
 
-AnnotationUser.injectedProps = ['features', 'serviceUrl', 'settings'];
-
-export default withServices(AnnotationUser);
+export default AnnotationUser;

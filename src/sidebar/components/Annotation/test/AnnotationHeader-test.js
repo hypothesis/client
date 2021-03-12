@@ -8,11 +8,15 @@ import mockImportedComponents from '../../../../test-util/mock-imported-componen
 import AnnotationHeader, { $imports } from '../AnnotationHeader';
 
 describe('AnnotationHeader', () => {
+  let fakeAccountId;
+  let fakeAnnotationDisplayName;
   let fakeDomainAndTitle;
   let fakeIsHighlight;
   let fakeIsReply;
   let fakeHasBeenEdited;
   let fakeIsPrivate;
+  let fakeServiceUrl;
+  let fakeSettings;
   let fakeStore;
 
   const createAnnotationHeader = props => {
@@ -22,6 +26,8 @@ describe('AnnotationHeader', () => {
         isEditing={false}
         replyCount={0}
         threadIsCollapsed={false}
+        serviceUrl={fakeServiceUrl}
+        settings={fakeSettings}
         {...props}
       />
     );
@@ -34,7 +40,19 @@ describe('AnnotationHeader', () => {
     fakeHasBeenEdited = sinon.stub().returns(false);
     fakeIsPrivate = sinon.stub();
 
+    fakeAccountId = {
+      isThirdPartyUser: sinon.stub().returns(false),
+      username: sinon.stub().returnsArg(0),
+    };
+
+    fakeAnnotationDisplayName = sinon.stub().returns('Robbie Burns');
+
+    fakeServiceUrl = sinon.stub().returns('http://example.com');
+    fakeSettings = { usernameUrl: 'http://foo.bar/' };
+
     fakeStore = {
+      authDomain: sinon.stub().returns('foo.com'),
+      isFeatureEnabled: sinon.stub().returns(false),
       route: sinon.stub().returns('sidebar'),
       setExpanded: sinon.stub(),
     };
@@ -42,11 +60,15 @@ describe('AnnotationHeader', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/account-id': fakeAccountId,
       '../../helpers/annotation-metadata': {
         domainAndTitle: fakeDomainAndTitle,
         isHighlight: fakeIsHighlight,
         isReply: fakeIsReply,
         hasBeenEdited: fakeHasBeenEdited,
+      },
+      '../../helpers/annotation-user': {
+        annotationDisplayName: fakeAnnotationDisplayName,
       },
       '../../helpers/permissions': {
         isPrivate: fakeIsPrivate,
@@ -81,6 +103,47 @@ describe('AnnotationHeader', () => {
       const wrapper = createAnnotationHeader();
 
       assert.isFalse(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
+    });
+  });
+
+  describe('annotation author (user) information', () => {
+    it('should link to author activity if first-party', () => {
+      fakeAccountId.isThirdPartyUser.returns(false);
+
+      const wrapper = createAnnotationHeader();
+
+      assert.equal(
+        wrapper.find('AnnotationUser').props().authorLink,
+        'http://example.com'
+      );
+    });
+
+    it('should link to author activity if third-party and has settings URL', () => {
+      fakeAccountId.isThirdPartyUser.returns(true);
+      const fakeAnnotation = fixtures.defaultAnnotation();
+
+      const wrapper = createAnnotationHeader({ annotation: fakeAnnotation });
+
+      assert.equal(
+        wrapper.find('AnnotationUser').props().authorLink,
+        `http://foo.bar/${fakeAnnotation.user}`
+      );
+    });
+
+    it('should not link to author if third-party and no settings URL', () => {
+      fakeAccountId.isThirdPartyUser.returns(true);
+
+      const wrapper = createAnnotationHeader({ settings: {} });
+
+      assert.isUndefined(wrapper.find('AnnotationUser').props().authorLink);
+    });
+
+    it('should pass the display name to AnnotationUser', () => {
+      const wrapper = createAnnotationHeader();
+      assert.equal(
+        wrapper.find('AnnotationUser').props().displayName,
+        'Robbie Burns'
+      );
     });
   });
 
