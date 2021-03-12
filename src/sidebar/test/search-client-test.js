@@ -6,6 +6,10 @@ function awaitEvent(emitter, event) {
   });
 }
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('SearchClient', () => {
   const RESULTS = [
     { id: 'one' },
@@ -142,6 +146,19 @@ describe('SearchClient', () => {
     return awaitEvent(client, 'end').then(() => {
       assert.calledWith(onError, err);
     });
+  });
+
+  it('does not emit "error" event if search is canceled before it fails', async () => {
+    fakeSearchFn = () => Promise.reject(new Error('search failed'));
+    const client = new SearchClient(fakeSearchFn);
+    const onError = sinon.stub();
+    client.on('error', onError);
+
+    client.get({ uri: 'http://example.com' });
+    client.cancel();
+    await delay(0);
+
+    assert.notCalled(onError);
   });
 
   context('`maxResults` option present', () => {
