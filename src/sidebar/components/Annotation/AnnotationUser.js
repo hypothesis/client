@@ -1,4 +1,5 @@
 import { isThirdPartyUser, username } from '../../helpers/account-id';
+import { annotationDisplayName } from '../../helpers/annotation-user';
 import { withServices } from '../../service-context';
 
 /**
@@ -27,15 +28,11 @@ function AnnotationUser({ annotation, features, serviceUrl, settings }) {
   const username_ = username(user);
 
   // How should the user's name be displayed?
-  const displayName = (() => {
-    if (isFirstPartyUser && !features.flagEnabled('client_display_names')) {
-      return username_;
-    }
-    if (annotation.user_info && annotation.user_info.display_name) {
-      return annotation.user_info.display_name;
-    }
-    return username_;
-  })();
+  const displayName = annotationDisplayName(
+    annotation,
+    !isFirstPartyUser,
+    features.flagEnabled('client_display_names')
+  );
 
   const shouldLinkToActivity = isFirstPartyUser || settings.usernameUrl;
 

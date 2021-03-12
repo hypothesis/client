@@ -1,7 +1,8 @@
 import { useMemo } from 'preact/hooks';
 
 import { useStoreProxy } from '../../store/use-store';
-import { username } from '../../helpers/account-id';
+import { isThirdPartyUser, username } from '../../helpers/account-id';
+import { annotationDisplayName } from '../../helpers/annotation-user';
 
 /** @typedef {import('../../store/modules/filters').FilterOption} FilterOption */
 
@@ -14,8 +15,9 @@ import { username } from '../../helpers/account-id';
 export function useUserFilterOptions() {
   const store = useStoreProxy();
   const annotations = store.allAnnotations();
+  const authDomain = store.authDomain();
+  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
   const focusFilters = store.getFocusFilters();
-  const showDisplayNames = store.isFeatureEnabled('client_display_names');
   const currentUsername = username(store.profile().userid);
 
   return useMemo(() => {
@@ -23,11 +25,11 @@ export function useUserFilterOptions() {
     const users = {};
     annotations.forEach(annotation => {
       const username_ = username(annotation.user);
-      const displayValue =
-        showDisplayNames && annotation.user_info?.display_name
-          ? annotation.user_info.display_name
-          : username_;
-      users[username_] = displayValue;
+      users[username_] = annotationDisplayName(
+        annotation,
+        isThirdPartyUser(annotation.user, authDomain),
+        displayNamesEnabled
+      );
     });
 
     // If user-focus is configured (even if not applied) add a filter
@@ -60,5 +62,11 @@ export function useUserFilterOptions() {
     });
 
     return userOptions;
-  }, [annotations, currentUsername, focusFilters.user, showDisplayNames]);
+  }, [
+    annotations,
+    authDomain,
+    currentUsername,
+    displayNamesEnabled,
+    focusFilters.user,
+  ]);
 }

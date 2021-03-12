@@ -4,8 +4,16 @@ import { useUserFilterOptions } from '../use-filter-options';
 import { $imports } from '../use-filter-options';
 
 describe('sidebar/components/hooks/use-user-filter-options', () => {
+  let fakeAccountId;
   let fakeStore;
+  let fakeAnnotationUser;
   let lastUserOptions;
+
+  // Mock `annotationDisplayName` as if it's returning display names
+  let fakeAnnotationUserDisplay = annotation =>
+    annotation.user_info.display_name;
+  // Mock `annotationDisplayName` as if it's returning usernames
+  let fakeAnnotationUserUsername = annotation => annotation.user;
 
   // Mount a dummy component to be able to use the hook
   function DummyComponent() {
@@ -15,33 +23,44 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
   function annotationFixtures() {
     return [
       {
-        user: 'acct:dingbat@localhost',
+        user: 'dingbat',
         user_info: { display_name: 'Ding Bat' },
       },
       {
-        user: 'acct:abalone@localhost',
+        user: 'abalone',
         user_info: { display_name: 'Aba Lone' },
       },
       {
-        user: 'acct:bananagram@localhost',
+        user: 'bananagram',
         user_info: { display_name: 'Zerk' },
       },
       {
-        user: 'acct:dingbat@localhost',
+        user: 'dingbat',
         user_info: { display_name: 'Ding Bat' },
       },
     ];
   }
 
   beforeEach(() => {
+    fakeAccountId = {
+      username: sinon.stub().returnsArg(0),
+    };
+
+    fakeAnnotationUser = {
+      annotationDisplayName: sinon.stub().callsFake(fakeAnnotationUserUsername),
+    };
+
     fakeStore = {
       allAnnotations: sinon.stub().returns([]),
+      authDomain: sinon.stub().returns('foo.com'),
       getFocusFilters: sinon.stub().returns({}),
       isFeatureEnabled: sinon.stub().returns(false),
       profile: sinon.stub().returns({}),
     };
 
     $imports.$mock({
+      '../../helpers/account-id': fakeAccountId,
+      '../../helpers/annotation-user': fakeAnnotationUser,
       '../../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
@@ -62,23 +81,10 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
     ]);
   });
 
-  it('should use display names if feature flag enabled', () => {
-    fakeStore.allAnnotations.returns(annotationFixtures());
-    fakeStore.isFeatureEnabled.withArgs('client_display_names').returns(true);
-
-    mount(<DummyComponent />);
-
-    assert.deepEqual(lastUserOptions, [
-      { value: 'abalone', display: 'Aba Lone' },
-      { value: 'dingbat', display: 'Ding Bat' },
-      { value: 'bananagram', display: 'Zerk' },
-    ]);
-  });
-
   it('sorts the current user to the front with " (Me)" suffix', () => {
     fakeStore.allAnnotations.returns(annotationFixtures());
     fakeStore.profile.returns({
-      userid: 'acct:bananagram@localhost',
+      userid: 'bananagram',
     });
 
     mount(<DummyComponent />);
@@ -114,7 +120,9 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
 
     it('should add focused-user filter information', () => {
       fakeStore.allAnnotations.returns(annotationFixtures());
-      fakeStore.isFeatureEnabled.withArgs('client_display_names').returns(true);
+      fakeAnnotationUser.annotationDisplayName.callsFake(
+        fakeAnnotationUserDisplay
+      );
 
       mount(<DummyComponent />);
 
@@ -128,9 +136,6 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
 
     it('always uses display name for focused user', () => {
       fakeStore.allAnnotations.returns(annotationFixtures());
-      fakeStore.isFeatureEnabled
-        .withArgs('client_display_names')
-        .returns(false);
       fakeStore.getFocusFilters.returns({
         user: { value: 'carrotNumberOne', display: 'Numero Uno Zanahoria' },
       });
@@ -146,10 +151,12 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
     });
 
     it('sorts the current user to the front with " (Me)" suffix', () => {
+      fakeAnnotationUser.annotationDisplayName.callsFake(
+        fakeAnnotationUserDisplay
+      );
       fakeStore.allAnnotations.returns(annotationFixtures());
-      fakeStore.isFeatureEnabled.withArgs('client_display_names').returns(true);
       fakeStore.profile.returns({
-        userid: 'acct:bananagram@localhost',
+        userid: 'bananagram',
       });
 
       mount(<DummyComponent />);
@@ -164,9 +171,11 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
 
     it('does not add (Me)" suffix if user has no annotations', () => {
       fakeStore.allAnnotations.returns(annotationFixtures());
-      fakeStore.isFeatureEnabled.withArgs('client_display_names').returns(true);
+      fakeAnnotationUser.annotationDisplayName.callsFake(
+        fakeAnnotationUserDisplay
+      );
       fakeStore.profile.returns({
-        userid: 'acct:fakeid@localhost',
+        userid: 'fakeid',
       });
 
       mount(<DummyComponent />);
