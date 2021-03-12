@@ -71,7 +71,9 @@ describe('sidebar/store/modules/groups', () => {
   let store;
 
   beforeEach(() => {
-    store = createStore([groups, session]);
+    // The empty second argument (settings) needed here because of the
+    // dependency on the `session` module
+    store = createStore([groups, session], [{}]);
   });
 
   describe('focusGroup', () => {

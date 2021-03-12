@@ -1,18 +1,29 @@
 import createStore from '../../create-store';
 import session from '../session';
 
-describe('sidebar/store/modules/session', function () {
+describe('sidebar/store/modules/session', () => {
+  let fakeSettings;
   let store;
 
   beforeEach(() => {
-    store = createStore([session]);
+    fakeSettings = {};
+    store = createStore([session], [fakeSettings]);
   });
 
-  describe('#updateProfile', function () {
-    it('updates the profile data', function () {
+  describe('#updateProfile', () => {
+    it('updates the profile data', () => {
       const newProfile = Object.assign({ userid: 'john' });
       store.updateProfile({ userid: 'john' });
       assert.deepEqual(store.profile(), newProfile);
+    });
+  });
+
+  describe('#authDomain', () => {
+    it('returns the authDomain from the settings', () => {
+      fakeSettings.authDomain = 'foo.com';
+      store = createStore([session], [fakeSettings]);
+
+      assert.equal(store.authDomain(), 'foo.com');
     });
   });
 

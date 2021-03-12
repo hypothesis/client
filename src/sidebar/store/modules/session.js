@@ -23,8 +23,16 @@ const initialProfile = {
   userid: null,
 };
 
-function init() {
+function init(settings) {
   return {
+    /**
+     * The app's authentication domain, from settings
+     * FIXME: This returns an empty string when `authDomain` is missing
+     * because other app logic has long assumed its string-y presence:
+     * behavior when it's missing is undefined. This setting should be
+     * enforced similarly to how `apiUrl` is enforced.
+     */
+    authDomain: settings?.authDomain ?? '',
     /**
      * Profile object fetched from the `/api/profile` endpoint.
      */
@@ -50,6 +58,14 @@ function updateProfile(profile) {
     type: actions.UPDATE_PROFILE,
     profile,
   };
+}
+
+/**
+ *
+ * @returns {string}
+ */
+function authDomain(state) {
+  return state.authDomain;
 }
 
 /**
@@ -103,6 +119,7 @@ export default storeModule({
   },
 
   selectors: {
+    authDomain,
     hasFetchedProfile,
     isFeatureEnabled,
     isLoggedIn,
