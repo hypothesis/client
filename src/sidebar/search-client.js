@@ -2,6 +2,8 @@ import { TinyEmitter } from 'tiny-emitter';
 
 /**
  * @typedef {import('../types/api').Annotation} Annotation
+ * @typedef {import('../types/api').SearchQuery} SearchQuery
+ * @typedef {import('../types/api').SearchResult} SearchResult
  */
 
 /**
@@ -10,13 +12,15 @@ import { TinyEmitter } from 'tiny-emitter';
  */
 
 /**
- * Client for the Hypothesis search API.
+ * Client for the Hypothesis search API [1]
  *
  * SearchClient handles paging through results, canceling search etc.
+ *
+ * [1] https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
  */
 export default class SearchClient extends TinyEmitter {
   /**
-   * @param {Object} searchFn - Function for querying the search API
+   * @param {(query: SearchQuery) => Promise<SearchResult>} searchFn - Function for querying the search API
    * @param {Object} options
    *   @param {number} [options.chunkSize] - page size/number of annotations
    *   per batch
@@ -62,81 +66,84 @@ export default class SearchClient extends TinyEmitter {
     this._resultCount = null;
   }
 
-  _getBatch(query, offset) {
-    const searchQuery = Object.assign(
-      {
-        limit: this._chunkSize,
-        offset: offset,
-        sort: this._sortBy,
-        order: this._sortOrder,
-        _separate_replies: this._separateReplies,
-      },
-      query
-    );
+  /**
+   * Fetch a batch of annotations starting from `offset`.
+   *
+   * @param {SearchQuery} query
+   * @param {number} offset
+   */
+  async _getBatch(query, offset) {
+    const searchQuery = {
+      limit: this._chunkSize,
+      offset: offset,
+      sort: this._sortBy,
+      order: this._sortOrder,
+      _separate_replies: this._separateReplies,
 
-    const self = this;
-    this._searchFn(searchQuery)
-      .then(function (results) {
-        if (self._canceled) {
-          return;
-        }
+      ...query,
+    };
 
-        // For now, abort loading of annotations if `maxResults` is set and the
-        // number of annotations in the results set exceeds that value.
-        //
-        // NB: We can’t currently, reliably load a subset of a group’s
-        // annotations, as replies are mixed in with top-level annotations—when
-        // `separateReplies` is false, which it is in most or all cases—so we’d
-        // end up with partially-loaded threads.
-        //
-        // This change has no effect on loading annotations in the SidebarView,
-        // where the `maxResults` option is not used.
-        //
-        // TODO: Implement pagination
-        if (self._maxResults && results.total > self._maxResults) {
-          self.emit(
-            'error',
-            new Error('Results size exceeds maximum allowed annotations')
-          );
-          self.emit('end');
-          return;
-        }
+    try {
+      const results = await this._searchFn(searchQuery);
+      if (this._canceled) {
+        return;
+      }
 
-        const chunk = results.rows.concat(results.replies || []);
-        if (self._resultCount === null) {
-          // Emit the result count (total) on first encountering it
-          self._resultCount = results.total;
-          self.emit('resultCount', self._resultCount);
-        }
-        if (self._incremental) {
-          self.emit('results', chunk);
-        } else {
-          self._results = self._results.concat(chunk);
-        }
+      // For now, abort loading of annotations if `maxResults` is set and the
+      // number of annotations in the results set exceeds that value.
+      //
+      // NB: We can’t currently, reliably load a subset of a group’s
+      // annotations, as replies are mixed in with top-level annotations—when
+      // `separateReplies` is false, which it is in most or all cases—so we’d
+      // end up with partially-loaded threads.
+      //
+      // This change has no effect on loading annotations in the SidebarView,
+      // where the `maxResults` option is not used.
+      //
+      // TODO: Implement pagination
+      if (this._maxResults && results.total > this._maxResults) {
+        this.emit(
+          'error',
+          new Error('Results size exceeds maximum allowed annotations')
+        );
+        this.emit('end');
+        return;
+      }
 
-        // Check if there are additional pages of results to fetch. In addition to
-        // checking the `total` figure from the server, we also require that at
-        // least one result was returned in the current page, otherwise we would
-        // end up repeating the same query for the next page. If the server's
-        // `total` count is incorrect for any reason, that will lead to the client
-        // polling the server indefinitely.
-        const nextOffset = offset + results.rows.length;
-        if (results.total > nextOffset && chunk.length > 0) {
-          self._getBatch(query, nextOffset);
-        } else {
-          if (!self._incremental) {
-            self.emit('results', self._results);
-          }
-          self.emit('end');
+      const chunk = results.rows.concat(results.replies || []);
+      if (this._resultCount === null) {
+        // Emit the result count (total) on first encountering it
+        this._resultCount = results.total;
+        this.emit('resultCount', this._resultCount);
+      }
+      if (this._incremental) {
+        this.emit('results', chunk);
+      } else {
+        this._results = this._results.concat(chunk);
+      }
+
+      // Check if there are additional pages of results to fetch. In addition to
+      // checking the `total` figure from the server, we also require that at
+      // least one result was returned in the current page, otherwise we would
+      // end up repeating the same query for the next page. If the server's
+      // `total` count is incorrect for any reason, that will lead to the client
+      // polling the server indefinitely.
+      const nextOffset = offset + results.rows.length;
+      if (results.total > nextOffset && chunk.length > 0) {
+        this._getBatch(query, nextOffset);
+      } else {
+        if (!this._incremental) {
+          this.emit('results', this._results);
         }
-      })
-      .catch(function (err) {
-        if (self._canceled) {
-          return;
-        }
-        self.emit('error', err);
-        self.emit('end');
-      });
+        this.emit('end');
+      }
+    } catch (err) {
+      if (this._canceled) {
+        return;
+      }
+      this.emit('error', err);
+      this.emit('end');
+    }
   }
 
   /**
@@ -148,6 +155,8 @@ export default class SearchClient extends TinyEmitter {
    *
    * Emits an 'error' event if the search fails.
    * Emits an 'end' event once the search completes.
+   *
+   * @param {SearchQuery} query
    */
   get(query) {
     this._results = [];

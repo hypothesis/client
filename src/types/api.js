@@ -136,5 +136,34 @@
  * @prop {boolean} canLeave
  */
 
+/**
+ * Query parameters for an `/api/search` API call.
+ *
+ * This type currently includes params that we've actually used.
+ *
+ * See https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
+ * for the complete list and usage of each.
+ *
+ * @typedef SearchQuery
+ * @prop {string[]} [uri]
+ * @prop {string} [group]
+ * @prop {string} [references]
+ * @prop {number} [offset]
+ * @prop {number} [limit]
+ * @prop {string} [order]
+ * @prop {string} [sort]
+ */
+
+/**
+ * Response to an `/api/search` API call.
+ *
+ * See https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
+ *
+ * @typedef SearchResult
+ * @prop {number} total
+ * @prop {Annotation[]} rows
+ * @prop {Annotation[]} [replies]
+ */
+
 // Make TypeScript treat this file as a module.
 export const unused = {};
