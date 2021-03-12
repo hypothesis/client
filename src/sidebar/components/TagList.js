@@ -1,4 +1,5 @@
 import { useMemo } from 'preact/hooks';
+import { useStoreProxy } from '../store/use-store';
 
 import { isThirdPartyUser } from '../helpers/account-id';
 import { withServices } from '../service-context';
@@ -10,18 +11,19 @@ import { withServices } from '../service-context';
  * @prop {Annotation} annotation - Annotation that owns the tags.
  * @prop {string[]} tags - List of tags as strings.
  * @prop {(a: string, b: Object<'tag', string>) => any} serviceUrl - Services
- * @prop {{ authDomain: string }} settings
  */
 
 /**
  * Component to render an annotation's tags.
  * @param {TagListProps} props
  */
-function TagList({ annotation, serviceUrl, settings, tags }) {
+function TagList({ annotation, serviceUrl, tags }) {
+  const store = useStoreProxy();
+  const defaultAuthority = store.defaultAuthority();
   const renderLink = useMemo(
     // Show a link if the authority of the user is not 3rd party
-    () => !isThirdPartyUser(annotation.user, settings.authDomain),
-    [annotation, settings]
+    () => !isThirdPartyUser(annotation.user, defaultAuthority),
+    [annotation, defaultAuthority]
   );
 
   /**
@@ -61,6 +63,6 @@ function TagList({ annotation, serviceUrl, settings, tags }) {
   );
 }
 
-TagList.injectedProps = ['serviceUrl', 'settings'];
+TagList.injectedProps = ['serviceUrl'];
 
 export default withServices(TagList);

@@ -42,7 +42,9 @@ import MenuSection from './MenuSection';
  */
 function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
   const store = useStoreProxy();
-  const isThirdParty = isThirdPartyUser(auth.userid, settings.authDomain);
+  const defaultAuthority = store.defaultAuthority();
+
+  const isThirdParty = isThirdPartyUser(auth.userid, defaultAuthority);
   const service = serviceConfig(settings);
   const isNotebookEnabled = store.isFeatureEnabled('notebook_launch');
   const [isOpen, setOpen] = useState(false);

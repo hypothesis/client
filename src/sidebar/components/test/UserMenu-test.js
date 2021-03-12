@@ -47,10 +47,9 @@ describe('UserMenu', () => {
     fakeOnLogout = sinon.stub();
     fakeServiceConfig = sinon.stub();
     fakeServiceUrl = sinon.stub();
-    fakeSettings = {
-      authDomain: 'hypothes.is',
-    };
+    fakeSettings = {};
     fakeStore = {
+      defaultAuthority: sinon.stub().returns('hypothes.is'),
       focusedGroupId: sinon.stub().returns('mygroup'),
       isFeatureEnabled: sinon.stub().returns(false),
     };
