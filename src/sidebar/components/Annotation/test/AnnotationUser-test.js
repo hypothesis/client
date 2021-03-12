@@ -7,6 +7,7 @@ import AnnotationUser, { $imports } from '../AnnotationUser';
 
 describe('AnnotationUser', () => {
   let fakeAnnotation;
+  let fakeAnnotationUser;
   let fakeFeatures;
   let fakeIsThirdPartyUser;
   let fakeServiceUrl;
@@ -28,6 +29,11 @@ describe('AnnotationUser', () => {
     fakeAnnotation = {
       user: 'someone@hypothes.is',
     };
+    fakeAnnotationUser = {
+      annotationDisplayName: sinon
+        .stub()
+        .callsFake(annotation => annotation.user),
+    };
     fakeFeatures = { flagEnabled: sinon.stub() };
     fakeIsThirdPartyUser = sinon.stub().returns(false);
     fakeServiceUrl = sinon.stub();
@@ -40,6 +46,7 @@ describe('AnnotationUser', () => {
         isThirdPartyUser: fakeIsThirdPartyUser,
         username: fakeUsername,
       },
+      '../../helpers/annotation-user': fakeAnnotationUser,
     });
   });
 
@@ -89,58 +96,17 @@ describe('AnnotationUser', () => {
     });
   });
 
-  describe('rendered user name', () => {
-    context('feature flag on', () => {
-      beforeEach(() => {
-        fakeFeatures.flagEnabled.withArgs('client_display_names').returns(true);
-      });
-      it('should render a display name when feature flag on and info available', () => {
-        fakeAnnotation.user_info = {
-          display_name: 'Maple Oaks',
-        };
+  it('renders the annotation author name', () => {
+    fakeFeatures.flagEnabled.withArgs('client_display_names').returns(true);
 
-        const wrapper = createAnnotationUser();
-        const linkEl = wrapper.find('a');
+    createAnnotationUser();
 
-        assert.equal(linkEl.text(), 'Maple Oaks');
-      });
-
-      it('should render a username when feature flag on but info not present', () => {
-        fakeUsername.returns('myusername');
-
-        const wrapper = createAnnotationUser();
-        const linkEl = wrapper.find('a');
-
-        assert.equal(linkEl.text(), 'myusername');
-      });
-    });
-
-    context('feature flag off', () => {
-      it('should render a username for first-party users when feature flag off', () => {
-        fakeFeatures.flagEnabled.returns(false);
-        fakeUsername.returns('myusername');
-        fakeAnnotation.user_info = {
-          display_name: 'Maple Oaks',
-        };
-
-        const wrapper = createAnnotationUser();
-        const linkEl = wrapper.find('a');
-
-        assert.equal(linkEl.text(), 'myusername');
-      });
-
-      it('should render a display name for third-party users', () => {
-        fakeAnnotation.user_info = {
-          display_name: 'Maple Oaks',
-        };
-        fakeIsThirdPartyUser.returns(true);
-        fakeFeatures.flagEnabled.returns(false);
-
-        const wrapper = createAnnotationUser();
-
-        assert.equal(wrapper.text(), 'Maple Oaks');
-      });
-    });
+    assert.calledWith(
+      fakeAnnotationUser.annotationDisplayName,
+      fakeAnnotation,
+      false,
+      true
+    );
   });
 
   it(
