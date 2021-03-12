@@ -53,10 +53,10 @@ function AnnotationHeader({
   settings,
 }) {
   const store = useStoreProxy();
-  const authDomain = store.authDomain();
+  const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
 
-  const isThirdParty = isThirdPartyUser(annotation.user, authDomain);
+  const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
   const authorDisplayName = annotationDisplayName(
     annotation,
     isThirdParty,
