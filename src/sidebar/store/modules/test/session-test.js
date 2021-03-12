@@ -18,12 +18,12 @@ describe('sidebar/store/modules/session', () => {
     });
   });
 
-  describe('#authDomain', () => {
-    it('returns the authDomain from the settings', () => {
+  describe('#defaultAuthority', () => {
+    it('returns the default authority from the settings', () => {
       fakeSettings.authDomain = 'foo.com';
       store = createStore([session], [fakeSettings]);
 
-      assert.equal(store.authDomain(), 'foo.com');
+      assert.equal(store.defaultAuthority(), 'foo.com');
     });
   });
 

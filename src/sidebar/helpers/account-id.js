@@ -31,17 +31,19 @@ export function username(user) {
 }
 
 /**
- * Returns true if the authority is of a 3rd party user.
+ * Returns true if the user's provider (authority) differs from the default
+ * authority for the application.
  *
  * @param {string} user
- * @param {string} authDomain
+ * @param {string} defaultAuthority - The application's default authority
+ *   (user identity provider)
  */
-export function isThirdPartyUser(user, authDomain) {
+export function isThirdPartyUser(user, defaultAuthority) {
   const account = parseAccountID(user);
 
   if (!account) {
     return false;
   }
 
-  return account.provider !== authDomain;
+  return account.provider !== defaultAuthority;
 }

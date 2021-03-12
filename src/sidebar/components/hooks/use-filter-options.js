@@ -15,7 +15,7 @@ import { annotationDisplayName } from '../../helpers/annotation-user';
 export function useUserFilterOptions() {
   const store = useStoreProxy();
   const annotations = store.allAnnotations();
-  const authDomain = store.authDomain();
+  const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
   const focusFilters = store.getFocusFilters();
   const currentUsername = username(store.profile().userid);
@@ -27,7 +27,7 @@ export function useUserFilterOptions() {
       const username_ = username(annotation.user);
       users[username_] = annotationDisplayName(
         annotation,
-        isThirdPartyUser(annotation.user, authDomain),
+        isThirdPartyUser(annotation.user, defaultAuthority),
         displayNamesEnabled
       );
     });
@@ -64,8 +64,8 @@ export function useUserFilterOptions() {
     return userOptions;
   }, [
     annotations,
-    authDomain,
     currentUsername,
+    defaultAuthority,
     displayNamesEnabled,
     focusFilters.user,
   ]);

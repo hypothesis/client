@@ -51,7 +51,7 @@ describe('AnnotationHeader', () => {
     fakeSettings = { usernameUrl: 'http://foo.bar/' };
 
     fakeStore = {
-      authDomain: sinon.stub().returns('foo.com'),
+      defaultAuthority: sinon.stub().returns('foo.com'),
       isFeatureEnabled: sinon.stub().returns(false),
       route: sinon.stub().returns('sidebar'),
       setExpanded: sinon.stub(),
