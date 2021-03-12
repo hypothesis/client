@@ -69,9 +69,9 @@ function createThread(fixture, options, keys) {
   return rootThread.children;
 }
 
-describe('sidebar/helpers/build-thread', function () {
-  describe('threading', function () {
-    it('arranges parents and children as a thread', function () {
+describe('sidebar/helpers/build-thread', () => {
+  describe('threading', () => {
+    it('arranges parents and children as a thread', () => {
       const thread = createThread(SIMPLE_FIXTURE);
       assert.deepEqual(thread, [
         {
@@ -376,6 +376,15 @@ describe('sidebar/helpers/build-thread', function () {
             visible: true,
           },
         ]);
+      });
+
+      it('sets root thread visible:false so it does not get counted as a visible thread', () => {
+        // Always set the root-level thread `visible:false` such that it is
+        // not inadvertently counted as a visible thread. It doesn't contain
+        // any thread content itself; its children are top-level threads.
+        const thread = buildThread(SIMPLE_FIXTURE, defaultBuildThreadOpts);
+
+        assert.isFalse(thread.visible);
       });
 
       it('shows threads containing replies that match the filter', () => {

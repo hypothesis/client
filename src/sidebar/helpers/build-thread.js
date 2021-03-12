@@ -306,7 +306,11 @@ export default function buildThread(annotations, options) {
     thread.children = thread.children.filter(options.threadFilterFn);
   }
 
-  // Set visibility for threads
+  // Set visibility for threads.
+  // The root thread itself should be set as non-visible, to avoid confusion
+  // when counting visible threads. It's a container thread: its children
+  // are the top-level annotations.
+  thread.visible = false;
   thread = mapThread(thread, thread => {
     let threadIsVisible = thread.visible;
 
