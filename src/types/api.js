@@ -152,6 +152,8 @@
  * @prop {number} [limit]
  * @prop {string} [order]
  * @prop {string} [sort]
+ * @prop {boolean} [_separate_replies] - Unofficial param that causes replies
+ *   to be returned in a separate `replies` field
  */
 
 /**
@@ -162,7 +164,8 @@
  * @typedef SearchResult
  * @prop {number} total
  * @prop {Annotation[]} rows
- * @prop {Annotation[]} [replies]
+ * @prop {Annotation[]} [replies] - Unofficial property that is populated if
+ *   `_separate_replies` query param was specified
  */
 
 // Make TypeScript treat this file as a module.
