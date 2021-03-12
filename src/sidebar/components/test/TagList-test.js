@@ -6,9 +6,10 @@ import { $imports } from '../TagList';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('TagList', function () {
+describe('TagList', () => {
   let fakeServiceUrl;
   let fakeIsThirdPartyUser;
+  let fakeStore;
   const fakeTags = ['tag1', 'tag2'];
 
   function createComponent(props) {
@@ -19,21 +20,25 @@ describe('TagList', function () {
         tags={fakeTags}
         // service props
         serviceUrl={fakeServiceUrl}
-        settings={{}}
         {...props}
       />
     );
   }
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeIsThirdPartyUser = sinon.stub().returns(false);
+
+    fakeStore = {
+      defaultAuthority: sinon.stub().returns('hypothes.is'),
+    };
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../helpers/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
+      '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });
 
@@ -69,7 +74,7 @@ describe('TagList', function () {
   });
 
   context('when `isThirdPartyUser` returns true', () => {
-    beforeEach(function () {
+    beforeEach(() => {
       fakeIsThirdPartyUser.returns(true);
     });
 

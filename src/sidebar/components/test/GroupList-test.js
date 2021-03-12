@@ -48,10 +48,9 @@ describe('GroupList', () => {
     };
 
     fakeServiceUrl = sinon.stub();
-    fakeSettings = {
-      authDomain: 'hypothes.is',
-    };
+    fakeSettings = {};
     fakeStore = {
+      defaultAuthority: sinon.stub().returns('hypothes.is'),
       getCurrentlyViewingGroups: sinon.stub().returns([]),
       getFeaturedGroups: sinon.stub().returns([]),
       getMyGroups: sinon.stub().returns([]),

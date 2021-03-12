@@ -61,8 +61,9 @@ function GroupList({ serviceUrl, settings }) {
     [currentGroups]
   );
 
-  const { authDomain } = settings;
-  const canCreateNewGroup = userid && !isThirdPartyUser(userid, authDomain);
+  const defaultAuthority = store.defaultAuthority();
+  const canCreateNewGroup =
+    userid && !isThirdPartyUser(userid, defaultAuthority);
   const newGroupLink = serviceUrl('groups.new');
 
   // The group whose submenu is currently open, or `null` if no group item is
