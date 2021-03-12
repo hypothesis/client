@@ -3,11 +3,22 @@
  */
 
 /**
+ * @typedef {import('../search-client').SortBy} SortBy
+ * @typedef {import('../search-client').SortOrder} SortOrder
+ */
+
+/**
  * @typedef LoadAnnotationOptions
  * @prop {string} groupId
  * @prop {string[]} [uris]
  * @prop {number} [maxResults] - If number of annotations in search results
  *   exceeds this value, do not load annotations (see: `SearchClient`)
+ * @prop {SortBy} [sortBy] - Together with `sortOrder`, this controls in what
+ *   order annotations are loaded. To minimize visible content changing as
+ *   annotations load, `sortBy` and `sortOrder` should be chosen to correlate
+ *   with the expected presentation order of annotations/threads in the current
+ *   view.
+ * @prop {SortOrder} [sortOrder]
  */
 
 import SearchClient from '../search-client';
@@ -46,6 +57,20 @@ export default function loadAnnotationsService(
       incremental: true,
       maxResults: options.maxResults ?? null,
       separateReplies: false,
+
+      // Annotations are fetched in order of creation by default. This is expected
+      // to roughly correspond to the order in which threads end up being sorted
+      // because:
+      //
+      // 1. The default thread sort order in the sidebar is by document location
+      // 2. When users annotate a document, they will tend to annotate content in
+      //    document order. Annotations near the top of the document will
+      //    tend to have earlier creation dates.
+      //
+      // If the backend would allow us to sort on document location, we could do even better.
+
+      sortBy: /** @type {SortBy} */ (options.sortBy ?? 'created'),
+      sortOrder: /** @type {SortOrder} */ (options.sortOrder ?? 'asc'),
     };
 
     searchClient = new SearchClient(api.search, searchOptions);

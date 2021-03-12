@@ -54,7 +54,12 @@ describe('NotebookView', () => {
 
     assert.calledWith(
       fakeLoadAnnotationsService.load,
-      sinon.match({ groupId: 'hallothere', maxResults: 5000 })
+      sinon.match({
+        groupId: 'hallothere',
+        maxResults: 5000,
+        sortBy: 'updated',
+        sortOrder: 'desc',
+      })
     );
     assert.calledWith(fakeStore.setSortKey, 'Newest');
   });

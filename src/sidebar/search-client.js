@@ -5,6 +5,11 @@ import { TinyEmitter } from 'tiny-emitter';
  */
 
 /**
+ * @typedef {'created'|'updated'} SortOrder
+ * @typedef {'asc'|'desc'} SortBy
+ */
+
+/**
  * Client for the Hypothesis search API.
  *
  * SearchClient handles paging through results, canceling search etc.
@@ -27,6 +32,9 @@ export default class SearchClient extends TinyEmitter {
    *   annotations, it could cause rendering and network misery in the browser.
    *   When present, do not load annotations if the result set size exceeds
    *   this value.
+   *   @param {SortBy} [options.sortBy] - Together with `sortOrder`, specifies in
+   *     what order annotations are fetched from the backend.
+   *   @param {SortOrder} [options.sortOrder]
    */
   constructor(
     searchFn,
@@ -35,6 +43,8 @@ export default class SearchClient extends TinyEmitter {
       separateReplies = true,
       incremental = true,
       maxResults = null,
+      sortBy = /** @type {SortBy} */ ('created'),
+      sortOrder = /** @type {SortOrder} */ ('asc'),
     } = {}
   ) {
     super();
@@ -43,6 +53,8 @@ export default class SearchClient extends TinyEmitter {
     this._separateReplies = separateReplies;
     this._incremental = incremental;
     this._maxResults = maxResults;
+    this._sortBy = sortBy;
+    this._sortOrder = sortOrder;
 
     this._canceled = false;
     /** @type {Annotation[]} */
@@ -55,8 +67,8 @@ export default class SearchClient extends TinyEmitter {
       {
         limit: this._chunkSize,
         offset: offset,
-        sort: 'created',
-        order: 'asc',
+        sort: this._sortBy,
+        order: this._sortOrder,
         _separate_replies: this._separateReplies,
       },
       query

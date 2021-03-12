@@ -173,4 +173,29 @@ describe('SearchClient', () => {
       });
     });
   });
+
+  it('fetches annotations by earliest creation date if `sortBy` and `sortOrder` not set', async () => {
+    const client = new SearchClient(fakeSearchFn);
+
+    client.get({ uri: 'http://example.com' });
+    await awaitEvent(client, 'end');
+
+    const params = fakeSearchFn.getCall(0).args[0];
+    assert.equal(params.sort, 'created');
+    assert.equal(params.order, 'asc');
+  });
+
+  it('fetches annotations in specified order if `sortBy` and `sortOrder` are set', async () => {
+    const client = new SearchClient(fakeSearchFn, {
+      sortBy: 'updated',
+      sortOrder: 'desc',
+    });
+
+    client.get({ uri: 'http://example.com' });
+    await awaitEvent(client, 'end');
+
+    const params = fakeSearchFn.getCall(0).args[0];
+    assert.equal(params.sort, 'updated');
+    assert.equal(params.order, 'desc');
+  });
 });
