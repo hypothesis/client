@@ -145,12 +145,13 @@
  * for the complete list and usage of each.
  *
  * @typedef SearchQuery
+ * @prop {number} [limit]
+ * @prop {number} [offset]
  * @prop {string[]} [uri]
  * @prop {string} [group]
- * @prop {string} [references]
- * @prop {number} [offset]
- * @prop {number} [limit]
  * @prop {string} [order]
+ * @prop {string} [references]
+ * @prop {string} [search_after]
  * @prop {string} [sort]
  * @prop {boolean} [_separate_replies] - Unofficial param that causes replies
  *   to be returned in a separate `replies` field

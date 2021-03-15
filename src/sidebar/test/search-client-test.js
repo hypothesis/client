@@ -10,23 +10,59 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-describe('SearchClient', () => {
-  const RESULTS = [
-    { id: 'one' },
-    { id: 'two' },
-    { id: 'three' },
-    { id: 'four' },
-  ];
+const RESULTS = [
+  { id: 'one', created: '2020-01-01', updated: '2020-01-01' },
+  { id: 'two', created: '2020-01-02', updated: '2020-01-02' },
+  { id: 'three', created: '2020-01-03', updated: '2020-01-03' },
+  { id: 'four', created: '2020-01-04', updated: '2020-01-04' },
+];
 
+/**
+ * Fake implementation of the `/api/search` API
+ */
+async function executeSearch(params) {
+  assert.isTrue(['asc', 'desc'].includes(params.order));
+  assert.isTrue(['created', 'updated'].includes(params.sort));
+  assert.typeOf(params.limit, 'number');
+
+  let rows = params.search_after
+    ? RESULTS.filter(ann => {
+        if (params.order === 'asc') {
+          return ann[params.sort] > params.search_after;
+        } else {
+          return ann[params.sort] < params.search_after;
+        }
+      })
+    : RESULTS.slice();
+
+  rows = rows
+    .sort((a, b) => {
+      const keyA = a[params.sort];
+      const keyB = b[params.sort];
+
+      if (keyA === keyB) {
+        return 0;
+      }
+
+      if (params.order === 'asc') {
+        return keyA < keyB ? -1 : 1;
+      } else {
+        return keyA > keyB ? -1 : 1;
+      }
+    })
+    .slice(0, params.limit);
+
+  return {
+    rows,
+    total: RESULTS.length,
+  };
+}
+
+describe('SearchClient', () => {
   let fakeSearchFn;
 
   beforeEach(() => {
-    fakeSearchFn = sinon.spy(function (params) {
-      return Promise.resolve({
-        rows: RESULTS.slice(params.offset, params.offset + params.limit),
-        total: RESULTS.length,
-      });
-    });
+    fakeSearchFn = sinon.spy(executeSearch);
   });
 
   it('emits "results"', () => {
@@ -79,30 +115,6 @@ describe('SearchClient', () => {
     return awaitEvent(client, 'end').then(() => {
       assert.calledWith(onResultCount, RESULTS.length);
       assert.calledOnce(onResultCount);
-    });
-  });
-
-  it('stops fetching chunks if the results array is empty', () => {
-    // Simulate a situation where the `total` count for the server is incorrect
-    // and we appear to have reached the end of the result list even though
-    // `total` implies that there should be more results available.
-    //
-    // In that case the client should stop trying to fetch additional pages.
-    fakeSearchFn = sinon.spy(() => {
-      return Promise.resolve({
-        rows: [],
-        total: 1000,
-      });
-    });
-    const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
-    const onResults = sinon.stub();
-    client.on('results', onResults);
-
-    client.get({ uri: 'http://example.com' });
-
-    return awaitEvent(client, 'end').then(() => {
-      assert.calledWith(onResults, []);
-      assert.calledOnce(fakeSearchFn);
     });
   });
 
