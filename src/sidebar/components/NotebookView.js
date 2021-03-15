@@ -34,6 +34,13 @@ function NotebookView({ loadAnnotationsService }) {
 
   const groupName = focusedGroup?.name ?? '…';
 
+  // Get the ID of the group to fetch annotations from. Once groups are fetched
+  // this is the same as the focused group ID. In the case where the notebook
+  // is configured to open with a specific group we can start fetching annotations
+  // sooner, without waiting for the group fetch to complete, by falling back
+  // to the initially-configured group.
+  const groupId = focusedGroup?.id || store.directLinkedGroupId();
+
   const lastPaginationPage = useRef(1);
   const [paginationPage, setPaginationPage] = useState(1);
 
@@ -48,9 +55,9 @@ function NotebookView({ loadAnnotationsService }) {
     // is changed within the sidebar and the Notebook re-opened, an entirely
     // new iFrame/app is created. This will need to be revisited.
     store.setSortKey('Newest');
-    if (focusedGroup) {
+    if (groupId) {
       loadAnnotationsService.load({
-        groupId: focusedGroup.id,
+        groupId,
         maxResults: 5000,
 
         // Load annotations in reverse-chronological order because that is how
@@ -67,7 +74,7 @@ function NotebookView({ loadAnnotationsService }) {
         sortOrder: 'desc',
       });
     }
-  }, [loadAnnotationsService, focusedGroup, store]);
+  }, [loadAnnotationsService, groupId, store]);
 
   // Pagination-page-changing callback
   const onChangePage = newPage => {

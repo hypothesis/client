@@ -21,6 +21,7 @@ describe('NotebookView', () => {
     fakeScrollIntoView = sinon.stub();
 
     fakeStore = {
+      directLinkedGroupId: sinon.stub().returns(null),
       focusedGroup: sinon.stub().returns({}),
       forcedVisibleThreads: sinon.stub().returns([]),
       getFilterValues: sinon.stub().returns({}),
@@ -62,6 +63,32 @@ describe('NotebookView', () => {
       })
     );
     assert.calledWith(fakeStore.setSortKey, 'Newest');
+  });
+
+  it('loads annotations for the direct-linked group if there is no focused group', () => {
+    fakeStore.focusedGroup.returns(null);
+    fakeStore.directLinkedGroupId.returns('direct123');
+
+    createComponent();
+
+    assert.calledWith(
+      fakeLoadAnnotationsService.load,
+      sinon.match({
+        groupId: 'direct123',
+        maxResults: 5000,
+        sortBy: 'updated',
+        sortOrder: 'desc',
+      })
+    );
+  });
+
+  it('does not load annotations if there is no focused or direct-linked group', () => {
+    fakeStore.focusedGroup.returns(null);
+    fakeStore.directLinkedGroupId.returns(null);
+
+    createComponent();
+
+    assert.notCalled(fakeLoadAnnotationsService.load);
   });
 
   it('renders the current group name', () => {
