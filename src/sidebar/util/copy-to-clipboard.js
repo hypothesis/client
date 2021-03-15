@@ -10,7 +10,7 @@
  * @param {string} text
  */
 export function copyText(text) {
-  const temp = document.createElement('textarea'); // use textarea instead of input to preserve line breaks
+  const temp = document.createElement('input');
   temp.value = text;
   temp.setAttribute('data-testid', 'copy-text');
   // Recipe from https://stackoverflow.com/a/34046084/14463679
