@@ -11,10 +11,12 @@ function delay(ms) {
 }
 
 const RESULTS = [
-  { id: 'one', created: '2020-01-01', updated: '2020-01-01' },
-  { id: 'two', created: '2020-01-02', updated: '2020-01-02' },
-  { id: 'three', created: '2020-01-03', updated: '2020-01-03' },
-  { id: 'four', created: '2020-01-04', updated: '2020-01-04' },
+  // nb. `created` and `updated` dates are in opposite order and different months
+  // to make it easy to check in tests that correct field was used for searching/sorting.
+  { id: 'one', created: '2020-01-01', updated: '2020-02-04' },
+  { id: 'two', created: '2020-01-02', updated: '2020-02-03' },
+  { id: 'three', created: '2020-01-03', updated: '2020-02-02' },
+  { id: 'four', created: '2020-01-04', updated: '2020-02-01' },
 ];
 
 /**
@@ -257,5 +259,39 @@ describe('SearchClient', () => {
     const params = fakeSearchFn.getCall(0).args[0];
     assert.equal(params.sort, 'updated');
     assert.equal(params.order, 'desc');
+  });
+
+  [
+    {
+      sortBy: 'updated',
+      sortOrder: 'desc',
+      expectedSearchAfter: [undefined, '2020-02-03', '2020-02-01'],
+    },
+    {
+      sortBy: 'updated',
+      sortOrder: 'asc',
+      expectedSearchAfter: [undefined, '2020-02-02', '2020-02-04'],
+    },
+    {
+      sortBy: 'created',
+      sortOrder: 'desc',
+      expectedSearchAfter: [undefined, '2020-01-03', '2020-01-01'],
+    },
+  ].forEach(({ sortBy, sortOrder, expectedSearchAfter }) => {
+    it('sets correct "search_after" query parameter depending on `sortBy` and `sortOrder`', async () => {
+      const client = new SearchClient(fakeSearchFn, {
+        chunkSize: 2,
+        sortBy,
+        sortOrder,
+      });
+
+      client.get({ uri: 'http://example.com' });
+      await awaitEvent(client, 'end');
+
+      const searchAfterParams = fakeSearchFn
+        .getCalls()
+        .map(call => call.args[0].search_after);
+      assert.deepEqual(searchAfterParams, expectedSearchAfter);
+    });
   });
 });
