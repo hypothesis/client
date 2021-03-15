@@ -35,7 +35,10 @@ export default function loadAnnotationsService(
   let searchClient = null;
 
   /**
-   * Load annotations
+   * Load annotations from Hypothesis.
+   *
+   * The existing set of loaded annotations is cleared before the new set
+   * is fetched. If an existing annotation fetch is in progress it is canceled.
    *
    * @param {LoadAnnotationOptions} options
    */
@@ -44,6 +47,10 @@ export default function loadAnnotationsService(
     store.removeAnnotations(store.savedAnnotations());
 
     // Cancel previously running search client.
+    //
+    // This will emit the "end" event for the existing client and trigger cleanup
+    // associated with that client (eg. resetting the count of in-flight
+    // annotation fetches).
     if (searchClient) {
       searchClient.cancel();
     }
