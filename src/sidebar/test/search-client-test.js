@@ -65,88 +65,120 @@ describe('SearchClient', () => {
     fakeSearchFn = sinon.spy(executeSearch);
   });
 
-  it('emits "results"', () => {
+  it('fetches pages of results for a single URI', async () => {
+    const client = new SearchClient(fakeSearchFn, { chunkSize: 3 });
+
+    client.get({ uri: 'http://example.com' });
+    await awaitEvent(client, 'end');
+
+    const searchCalls = fakeSearchFn.getCalls();
+    assert.equal(searchCalls.length, 2);
+    assert.deepEqual(searchCalls[0].args[0], {
+      _separate_replies: true,
+      limit: 3,
+      order: 'asc',
+      sort: 'created',
+      uri: 'http://example.com',
+    });
+    assert.deepEqual(searchCalls[1].args[0], {
+      _separate_replies: true,
+      limit: 3,
+      order: 'asc',
+      search_after: '2020-01-03',
+      sort: 'created',
+      uri: 'http://example.com',
+    });
+  });
+
+  it('emits "results"', async () => {
     const client = new SearchClient(fakeSearchFn);
     const onResults = sinon.stub();
     client.on('results', onResults);
+
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(() => {
-      assert.calledWith(onResults, RESULTS);
-    });
+    await awaitEvent(client, 'end');
+
+    assert.calledWith(onResults, RESULTS);
   });
 
-  it('emits "resultCount"', () => {
+  it('emits "resultCount"', async () => {
     const client = new SearchClient(fakeSearchFn);
     const onResultCount = sinon.stub();
     client.on('resultCount', onResultCount);
+
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(() => {
-      assert.calledWith(onResultCount, RESULTS.length);
-    });
+    await awaitEvent(client, 'end');
+
+    assert.calledWith(onResultCount, RESULTS.length);
   });
 
-  it('emits "end" only once', () => {
+  it('emits "end" only once', done => {
     const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
     client.on('results', sinon.stub());
     let emitEndCounter = 0;
     client.on('end', () => {
       emitEndCounter += 1;
       assert.equal(emitEndCounter, 1);
+      done();
     });
     client.get({ uri: 'http://example.com' });
   });
 
-  it('emits "results" with chunks in incremental mode', () => {
+  it('emits "results" with chunks in incremental mode', async () => {
     const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
     const onResults = sinon.stub();
     client.on('results', onResults);
+
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(() => {
-      assert.calledWith(onResults, RESULTS.slice(0, 2));
-      assert.calledWith(onResults, RESULTS.slice(2, 4));
-    });
+    await awaitEvent(client, 'end');
+
+    assert.calledWith(onResults, RESULTS.slice(0, 2));
+    assert.calledWith(onResults, RESULTS.slice(2, 4));
   });
 
-  it('emits "resultCount" only once in incremental mode', () => {
+  it('emits "resultCount" only once in incremental mode', async () => {
     const client = new SearchClient(fakeSearchFn, { chunkSize: 2 });
     const onResultCount = sinon.stub();
     client.on('resultCount', onResultCount);
+
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(() => {
-      assert.calledWith(onResultCount, RESULTS.length);
-      assert.calledOnce(onResultCount);
-    });
+    await awaitEvent(client, 'end');
+
+    assert.calledWith(onResultCount, RESULTS.length);
+    assert.calledOnce(onResultCount);
   });
 
-  it('emits "results" once in non-incremental mode', () => {
+  it('emits "results" once in non-incremental mode', async () => {
     const client = new SearchClient(fakeSearchFn, {
       chunkSize: 2,
       incremental: false,
     });
     const onResults = sinon.stub();
     client.on('results', onResults);
+
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(() => {
-      assert.calledOnce(onResults);
-      assert.calledWith(onResults, RESULTS);
-    });
+    await awaitEvent(client, 'end');
+
+    assert.calledOnce(onResults);
+    assert.calledWith(onResults, RESULTS);
   });
 
-  it('does not emit "results" if canceled', () => {
+  it('does not emit "results" if canceled', async () => {
     const client = new SearchClient(fakeSearchFn);
     const onResults = sinon.stub();
     const onEnd = sinon.stub();
     client.on('results', onResults);
     client.on('end', onEnd);
+
     client.get({ uri: 'http://example.com' });
     client.cancel();
-    return Promise.resolve().then(() => {
-      assert.notCalled(onResults);
-      assert.called(onEnd);
-    });
+    await delay(0);
+
+    assert.notCalled(onResults);
+    assert.called(onEnd);
   });
 
-  it('emits "error" event if search fails', () => {
+  it('emits "error" event if search fails', async () => {
     const err = new Error('search failed');
     fakeSearchFn = () => {
       return Promise.reject(err);
@@ -154,10 +186,11 @@ describe('SearchClient', () => {
     const client = new SearchClient(fakeSearchFn);
     const onError = sinon.stub();
     client.on('error', onError);
+
     client.get({ uri: 'http://example.com' });
-    return awaitEvent(client, 'end').then(() => {
-      assert.calledWith(onError, err);
-    });
+    await awaitEvent(client, 'end');
+
+    assert.calledWith(onError, err);
   });
 
   it('does not emit "error" event if search is canceled before it fails', async () => {
@@ -174,32 +207,30 @@ describe('SearchClient', () => {
   });
 
   context('`maxResults` option present', () => {
-    it('emits error if results size exceeds `maxResults`', () => {
+    it('emits error if results size exceeds `maxResults`', async () => {
       const client = new SearchClient(fakeSearchFn, { maxResults: 2 });
       const onError = sinon.stub();
       client.on('error', onError);
 
       client.get({ uri: 'http://example.com' });
+      await awaitEvent(client, 'end');
 
-      return awaitEvent(client, 'end').then(() => {
-        assert.calledOnce(onError);
-        assert.equal(
-          onError.getCall(0).args[0].message,
-          'Results size exceeds maximum allowed annotations'
-        );
-      });
+      assert.calledOnce(onError);
+      assert.equal(
+        onError.getCall(0).args[0].message,
+        'Results size exceeds maximum allowed annotations'
+      );
     });
 
-    it('does not emit an error if results size is <= `maxResults`', () => {
+    it('does not emit an error if results size is <= `maxResults`', async () => {
       const client = new SearchClient(fakeSearchFn, { maxResults: 20 });
       const onError = sinon.stub();
       client.on('error', onError);
 
       client.get({ uri: 'http://example.com' });
+      await awaitEvent(client, 'end');
 
-      return awaitEvent(client, 'end').then(() => {
-        assert.notCalled(onError);
-      });
+      assert.notCalled(onError);
     });
   });
 
