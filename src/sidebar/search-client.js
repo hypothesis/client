@@ -70,18 +70,22 @@ export default class SearchClient extends TinyEmitter {
    * Fetch a batch of annotations starting from `offset`.
    *
    * @param {SearchQuery} query
-   * @param {number} offset
+   * @param {string} [searchAfter]
    */
-  async _getBatch(query, offset) {
+  async _getBatch(query, searchAfter) {
+    /** @type {SearchQuery} */
     const searchQuery = {
       limit: this._chunkSize,
-      offset: offset,
       sort: this._sortBy,
       order: this._sortOrder,
       _separate_replies: this._separateReplies,
 
       ...query,
     };
+
+    if (searchAfter) {
+      searchQuery.search_after = searchAfter;
+    }
 
     try {
       const results = await this._searchFn(searchQuery);
@@ -122,15 +126,15 @@ export default class SearchClient extends TinyEmitter {
         this._results = this._results.concat(chunk);
       }
 
-      // Check if there are additional pages of results to fetch. In addition to
-      // checking the `total` figure from the server, we also require that at
-      // least one result was returned in the current page, otherwise we would
-      // end up repeating the same query for the next page. If the server's
-      // `total` count is incorrect for any reason, that will lead to the client
-      // polling the server indefinitely.
-      const nextOffset = offset + results.rows.length;
-      if (results.total > nextOffset && chunk.length > 0) {
-        this._getBatch(query, nextOffset);
+      // If the current batch was full, there might be additional batches available.
+      const nextBatchAvailable = chunk.length === this._chunkSize;
+
+      // Get the cursor for the start of the next batch.
+      const nextSearchAfter =
+        chunk.length > 0 ? chunk[chunk.length - 1][this._sortBy] : null;
+
+      if (nextBatchAvailable && nextSearchAfter) {
+        this._getBatch(query, nextSearchAfter);
       } else {
         if (!this._incremental) {
           this.emit('results', this._results);
@@ -161,7 +165,7 @@ export default class SearchClient extends TinyEmitter {
   get(query) {
     this._results = [];
     this._resultCount = null;
-    this._getBatch(query, 0);
+    this._getBatch(query);
   }
 
   /**
