@@ -12,6 +12,19 @@ import { TinyEmitter } from 'tiny-emitter';
  */
 
 /**
+ * Default callback used to get the page size for iterating through annotations.
+ *
+ * This uses a small number for the first page to reduce the time until some
+ * results are displayed and a larger number for remaining pages to lower the
+ * total fetch time.
+ *
+ * @param {number} index
+ */
+function defaultPageSize(index) {
+  return index === 0 ? 50 : 200;
+}
+
+/**
  * Client for the Hypothesis search API [1]
  *
  * SearchClient handles paging through results, canceling search etc.
@@ -22,7 +35,13 @@ export default class SearchClient extends TinyEmitter {
   /**
    * @param {(query: SearchQuery) => Promise<SearchResult>} searchFn - Function for querying the search API
    * @param {Object} options
-   *   @param {number} [options.pageSize] - page size to use when fetching results
+   *   @param {(index: number) => number} [options.pageSize] - Callback that returns
+   *     the page size to use when fetching the index'th page of results.
+   *     Callers can vary this to balance the latency of getting some results
+   *     against the time taken to fetch all results.
+   *
+   *     The returned page size must be at least 1 and no more than the maximum
+   *     value of the `limit` query param for the search API.
    *   @param {boolean} [options.separateReplies] - When `true`, request that
    *   top-level annotations and replies be returned separately.
    *   NOTE: This has issues with annotations that have large numbers of
@@ -42,7 +61,7 @@ export default class SearchClient extends TinyEmitter {
   constructor(
     searchFn,
     {
-      pageSize = 200,
+      pageSize = defaultPageSize,
       separateReplies = true,
       incremental = true,
       maxResults = null,
@@ -72,11 +91,14 @@ export default class SearchClient extends TinyEmitter {
    * @param {string} [searchAfter] - Cursor value to use when paginating
    *   through results. Omitted for the first page. See docs for `search_after`
    *   query param for /api/search API.
+   * @param {number} [pageIndex]
    */
-  async _getPage(query, searchAfter) {
+  async _getPage(query, searchAfter, pageIndex = 0) {
+    const pageSize = this._pageSize(pageIndex);
+
     /** @type {SearchQuery} */
     const searchQuery = {
-      limit: this._pageSize,
+      limit: pageSize,
       sort: this._sortBy,
       order: this._sortOrder,
       _separate_replies: this._separateReplies,
@@ -128,7 +150,7 @@ export default class SearchClient extends TinyEmitter {
       }
 
       // If the current page was full, there might be additional pages available.
-      const nextPageAvailable = page.length === this._pageSize;
+      const nextPageAvailable = page.length === pageSize;
 
       // Get the cursor for the start of the next page. This is the last
       // value for whatever field results are sorted by from the current page.
@@ -136,7 +158,7 @@ export default class SearchClient extends TinyEmitter {
         page.length > 0 ? page[page.length - 1][this._sortBy] : null;
 
       if (nextPageAvailable && nextSearchAfter) {
-        this._getPage(query, nextSearchAfter);
+        this._getPage(query, nextSearchAfter, pageIndex + 1);
       } else {
         if (!this._incremental) {
           this.emit('results', this._results);
