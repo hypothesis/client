@@ -35,10 +35,10 @@ export default class SearchClient extends TinyEmitter {
   /**
    * @param {(query: SearchQuery) => Promise<SearchResult>} searchFn - Function for querying the search API
    * @param {Object} options
-   *   @param {(index: number) => number} [options.pageSize] - Callback that returns
-   *     the page size to use when fetching the index'th page of results.
-   *     Callers can vary this to balance the latency of getting some results
-   *     against the time taken to fetch all results.
+   *   @param {(index: number) => number} [options.getPageSize] -
+   *     Callback that returns the page size to use when fetching the index'th
+   *     page of results.  Callers can vary this to balance the latency of
+   *     getting some results against the time taken to fetch all results.
    *
    *     The returned page size must be at least 1 and no more than the maximum
    *     value of the `limit` query param for the search API.
@@ -61,7 +61,7 @@ export default class SearchClient extends TinyEmitter {
   constructor(
     searchFn,
     {
-      pageSize = defaultPageSize,
+      getPageSize = defaultPageSize,
       separateReplies = true,
       incremental = true,
       maxResults = null,
@@ -71,7 +71,7 @@ export default class SearchClient extends TinyEmitter {
   ) {
     super();
     this._searchFn = searchFn;
-    this._pageSize = pageSize;
+    this._getPageSize = getPageSize;
     this._separateReplies = separateReplies;
     this._incremental = incremental;
     this._maxResults = maxResults;
@@ -94,7 +94,7 @@ export default class SearchClient extends TinyEmitter {
    * @param {number} [pageIndex]
    */
   async _getPage(query, searchAfter, pageIndex = 0) {
-    const pageSize = this._pageSize(pageIndex);
+    const pageSize = this._getPageSize(pageIndex);
 
     /** @type {SearchQuery} */
     const searchQuery = {
