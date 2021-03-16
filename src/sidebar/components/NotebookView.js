@@ -34,11 +34,13 @@ function NotebookView({ loadAnnotationsService }) {
 
   const groupName = focusedGroup?.name ?? '…';
 
-  // Get the ID of the group to fetch annotations from. Once groups are fetched
-  // this is the same as the focused group ID. In the case where the notebook
-  // is configured to open with a specific group we can start fetching annotations
-  // sooner, without waiting for the group fetch to complete, by falling back
-  // to the initially-configured group.
+  // Get the ID of the group to fetch annotations from.
+  //
+  // Once groups have been fetched and one has been focused, use its ID. If
+  // groups haven't been fetched yet but we know the ID of the group that is
+  // likely to be focused (eg. because the notebook has been configured to
+  // display a particular group when launched), we can optimistically fetch
+  // annotations from that group.
   const groupId = focusedGroup?.id || store.directLinkedGroupId();
 
   const lastPaginationPage = useRef(1);
