@@ -1,10 +1,9 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
-import { useEffect, useRef } from 'preact/hooks';
+import { useCallback, useEffect, useRef } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
 import { useStoreProxy } from '../store/use-store';
 
-import Button from './Button';
+import Panel from './Panel';
 import Slider from './Slider';
 
 /**
@@ -13,22 +12,19 @@ import Slider from './Slider';
 
 /**
  * @typedef SidebarPanelProps
- * @prop {Object} [children]
+ * @prop {import("preact").ComponentChildren} children
  * @prop {string} [icon] - An optional icon name for display next to the panel's title
  * @prop {PanelName} panelName -
  *   A string identifying this panel. Only one `panelName` may be active at any time.
  *   Multiple panels with the same `panelName` would be "in sync", opening and closing together.
- * @prop {string} title - The panel's title: rendered in its containing visual "frame"
+ * @prop {string} title - The panel's title
  * @prop {(active: boolean) => any} [onActiveChanged] -
  *   Optional callback to invoke when this panel's active status changes
  */
 
 /**
- * Base component for a sidebar panel.
- *
- * This component provides a basic visual container for sidebar panels, as well
- * as providing a close button. Only one sidebar panel (as defined by the panel's
- * `panelName`) is active at one time.
+ * Base component for a sidebar panel. Only one sidebar panel
+ * (as defined by the panel's `panelName`) is active (visible) at one time.
  *
  * @param {SidebarPanelProps} props
  */
@@ -58,25 +54,16 @@ export default function SidebarPanel({
     }
   }, [panelIsActive, onActiveChanged]);
 
-  const closePanel = () => {
+  const closePanel = useCallback(() => {
     store.toggleSidebarPanel(panelName, false);
-  };
+  }, [store, panelName]);
 
   return (
     <Slider visible={panelIsActive}>
-      <div className="SidebarPanel" ref={panelElement}>
-        <div className="SidebarPanel__header">
-          {icon && (
-            <div className="SidebarPanel__header-icon">
-              <SvgIcon name={icon} title={title} />
-            </div>
-          )}
-          <h2 className="SidebarPanel__title u-stretch">{title}</h2>
-          <div>
-            <Button icon="cancel" buttonText="Close" onClick={closePanel} />
-          </div>
-        </div>
-        <div className="SidebarPanel__content">{children}</div>
+      <div ref={panelElement}>
+        <Panel title={title} icon={icon} onClose={closePanel}>
+          {children}
+        </Panel>
       </div>
     </Slider>
   );

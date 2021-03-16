@@ -37,24 +37,22 @@ describe('SidebarPanel', () => {
     $imports.$restore();
   });
 
-  it('renders the provided title', () => {
-    const wrapper = createSidebarPanel({ title: 'My Panel' });
-    const titleEl = wrapper.find('.SidebarPanel__title');
-    assert.equal(titleEl.text(), 'My Panel');
+  it('renders a panel with provided title and icon', () => {
+    const wrapper = createSidebarPanel({
+      title: 'My Panel',
+      icon: 'restricted',
+    });
+
+    const panel = wrapper.find('Panel');
+
+    assert.equal(panel.props().icon, 'restricted');
+    assert.equal(panel.props().title, 'My Panel');
   });
 
-  it('renders an icon if provided', () => {
-    const wrapper = createSidebarPanel({ icon: 'restricted' });
-
-    const icon = wrapper.find('SvgIcon').filter({ name: 'restricted' });
-
-    assert.isTrue(icon.exists());
-  });
-
-  it('closes the panel when close button is clicked', () => {
+  it('provides an `onClose` handler that closes the panel', () => {
     const wrapper = createSidebarPanel({ panelName: 'flibberty' });
 
-    wrapper.find('Button').props().onClick();
+    wrapper.find('Panel').props().onClose();
 
     assert.calledWith(fakeStore.toggleSidebarPanel, 'flibberty', false);
   });
