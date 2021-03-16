@@ -19,9 +19,11 @@
  *   with the expected presentation order of annotations/threads in the current
  *   view.
  * @prop {SortOrder} [sortOrder]
+ * @prop {(error: Error) => any} [onError] - Optional error handler for
+ *   SearchClient. Default error handling logs errors to console.
  */
 
-import SearchClient from '../search-client';
+import { SearchClient } from '../search-client';
 
 import { isReply } from '../helpers/annotation-metadata';
 
@@ -43,7 +45,7 @@ export default function loadAnnotationsService(
    * @param {LoadAnnotationOptions} options
    */
   function load(options) {
-    const { groupId, uris } = options;
+    const { groupId, onError, uris } = options;
     store.removeAnnotations(store.savedAnnotations());
 
     // Cancel previously running search client.
@@ -93,7 +95,11 @@ export default function loadAnnotationsService(
     });
 
     searchClient.on('error', error => {
-      console.error(error);
+      if (typeof onError === 'function') {
+        onError(error);
+      } else {
+        console.error(error);
+      }
     });
 
     searchClient.on('end', () => {

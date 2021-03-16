@@ -85,7 +85,9 @@ describe('loadAnnotationsService', () => {
 
     fakeUris = ['http://example.com'];
     $imports.$mock({
-      '../search-client': FakeSearchClient,
+      '../search-client': {
+        SearchClient: FakeSearchClient,
+      },
     });
   });
 
@@ -304,7 +306,7 @@ describe('loadAnnotationsService', () => {
       assert.calledOnce(fakeStore.annotationFetchFinished);
     });
 
-    it('logs an error to the console if the search client runs into an error', () => {
+    it('logs an error by default to the console if the search client emits an error', () => {
       const svc = createService();
       const error = new Error('search for annotations failed');
 
@@ -312,6 +314,17 @@ describe('loadAnnotationsService', () => {
       searchClients[0].emit('error', error);
 
       assert.calledWith(console.error, error);
+    });
+
+    it('invokes error callback, if provided, when search client emits an error', () => {
+      const svc = createService();
+      const onError = sinon.stub();
+      const error = new Error('Something went wrong');
+
+      svc.load({ groupId: fakeGroupId, uris: fakeUris, onError });
+      searchClients[0].emit('error', error);
+
+      assert.calledWith(onError, error);
     });
   });
 
