@@ -67,10 +67,12 @@ export default class SearchClient extends TinyEmitter {
   }
 
   /**
-   * Fetch a batch of annotations starting from `offset`.
+   * Fetch a batch of annotations.
    *
-   * @param {SearchQuery} query
-   * @param {string} [searchAfter]
+   * @param {SearchQuery} query - Query params for /api/search call
+   * @param {string} [searchAfter] - Cursor value to use when paginating
+   *   through results. Omitted for the first page. See docs for `search_after`
+   *   query param for /api/search API.
    */
   async _getBatch(query, searchAfter) {
     /** @type {SearchQuery} */
@@ -129,7 +131,8 @@ export default class SearchClient extends TinyEmitter {
       // If the current batch was full, there might be additional batches available.
       const nextBatchAvailable = chunk.length === this._chunkSize;
 
-      // Get the cursor for the start of the next batch.
+      // Get the cursor for the start of the next batch. This is the last
+      // value for whatever field results are sorted by from the current batch.
       const nextSearchAfter =
         chunk.length > 0 ? chunk[chunk.length - 1][this._sortBy] : null;
 

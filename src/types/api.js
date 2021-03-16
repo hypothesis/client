@@ -146,7 +146,6 @@
  *
  * @typedef SearchQuery
  * @prop {number} [limit]
- * @prop {number} [offset]
  * @prop {string[]} [uri]
  * @prop {string} [group]
  * @prop {string} [order]
