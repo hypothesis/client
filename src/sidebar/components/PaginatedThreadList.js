@@ -29,7 +29,7 @@ function PaginatedThreadList({
   isLoading,
   onChangePage,
   threads,
-  pageSize = 10,
+  pageSize = 25,
 }) {
   const { paginatedThreads, totalPages } = useMemo(() => {
     const visibleThreads = threads.filter(thread => countVisible(thread) > 0);

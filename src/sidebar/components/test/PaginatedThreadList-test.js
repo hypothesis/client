@@ -87,6 +87,13 @@ describe('PaginatedThreadList', () => {
       pageCount: 46,
       pageThreads: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30],
     },
+    {
+      currentPage: 3,
+      visibleThreads: 51,
+      pageSize: 25,
+      pageCount: 3,
+      pageThreads: [51],
+    },
   ];
 
   testCases.forEach(testCase => {
@@ -94,7 +101,8 @@ describe('PaginatedThreadList', () => {
       const threads = getNThreads(testCase.visibleThreads);
       const componentProps = { currentPage: testCase.currentPage, threads };
       // This is to make sure the default-page-size code path is exercised in tests
-      if (testCase.pageSize !== 10) {
+      // (there must be a test with the specific pageSize)
+      if (testCase.pageSize !== 25) {
         componentProps.pageSize = testCase.pageSize;
       }
       const wrapper = createComponent(componentProps);
