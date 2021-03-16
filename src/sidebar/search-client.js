@@ -22,14 +22,13 @@ export default class SearchClient extends TinyEmitter {
   /**
    * @param {(query: SearchQuery) => Promise<SearchResult>} searchFn - Function for querying the search API
    * @param {Object} options
-   *   @param {number} [options.chunkSize] - page size/number of annotations
-   *   per batch
+   *   @param {number} [options.pageSize] - page size to use when fetching results
    *   @param {boolean} [options.separateReplies] - When `true`, request that
    *   top-level annotations and replies be returned separately.
    *   NOTE: This has issues with annotations that have large numbers of
    *   replies.
    *   @param {boolean} [options.incremental] - Emit `results` events incrementally
-   *   as batches of annotations are available
+   *   as pages of annotations are fetched
    *   @param {number|null} [options.maxResults] - Safety valve for protection when
    *   loading all annotations in a group in the NotebookView. If the Notebook
    *   is opened while focused on a group that contains many thousands of
@@ -43,7 +42,7 @@ export default class SearchClient extends TinyEmitter {
   constructor(
     searchFn,
     {
-      chunkSize = 200,
+      pageSize = 200,
       separateReplies = true,
       incremental = true,
       maxResults = null,
@@ -53,7 +52,7 @@ export default class SearchClient extends TinyEmitter {
   ) {
     super();
     this._searchFn = searchFn;
-    this._chunkSize = chunkSize;
+    this._pageSize = pageSize;
     this._separateReplies = separateReplies;
     this._incremental = incremental;
     this._maxResults = maxResults;
@@ -67,17 +66,17 @@ export default class SearchClient extends TinyEmitter {
   }
 
   /**
-   * Fetch a batch of annotations.
+   * Fetch a page of annotations.
    *
    * @param {SearchQuery} query - Query params for /api/search call
    * @param {string} [searchAfter] - Cursor value to use when paginating
    *   through results. Omitted for the first page. See docs for `search_after`
    *   query param for /api/search API.
    */
-  async _getBatch(query, searchAfter) {
+  async _getPage(query, searchAfter) {
     /** @type {SearchQuery} */
     const searchQuery = {
-      limit: this._chunkSize,
+      limit: this._pageSize,
       sort: this._sortBy,
       order: this._sortOrder,
       _separate_replies: this._separateReplies,
@@ -116,28 +115,28 @@ export default class SearchClient extends TinyEmitter {
         return;
       }
 
-      const chunk = results.rows.concat(results.replies || []);
+      const page = results.rows.concat(results.replies || []);
       if (this._resultCount === null) {
         // Emit the result count (total) on first encountering it
         this._resultCount = results.total;
         this.emit('resultCount', this._resultCount);
       }
       if (this._incremental) {
-        this.emit('results', chunk);
+        this.emit('results', page);
       } else {
-        this._results = this._results.concat(chunk);
+        this._results = this._results.concat(page);
       }
 
-      // If the current batch was full, there might be additional batches available.
-      const nextBatchAvailable = chunk.length === this._chunkSize;
+      // If the current page was full, there might be additional pages available.
+      const nextPageAvailable = page.length === this._pageSize;
 
-      // Get the cursor for the start of the next batch. This is the last
-      // value for whatever field results are sorted by from the current batch.
+      // Get the cursor for the start of the next page. This is the last
+      // value for whatever field results are sorted by from the current page.
       const nextSearchAfter =
-        chunk.length > 0 ? chunk[chunk.length - 1][this._sortBy] : null;
+        page.length > 0 ? page[page.length - 1][this._sortBy] : null;
 
-      if (nextBatchAvailable && nextSearchAfter) {
-        this._getBatch(query, nextSearchAfter);
+      if (nextPageAvailable && nextSearchAfter) {
+        this._getPage(query, nextSearchAfter);
       } else {
         if (!this._incremental) {
           this.emit('results', this._results);
@@ -168,7 +167,7 @@ export default class SearchClient extends TinyEmitter {
   get(query) {
     this._results = [];
     this._resultCount = null;
-    this._getBatch(query);
+    this._getPage(query);
   }
 
   /**
