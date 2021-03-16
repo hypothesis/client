@@ -68,7 +68,7 @@ describe('SearchClient', () => {
   });
 
   it('fetches pages of results for a single URI', async () => {
-    const client = new SearchClient(fakeSearchFn, { pageSize: 3 });
+    const client = new SearchClient(fakeSearchFn, { pageSize: () => 3 });
 
     client.get({ uri: 'http://example.com' });
     await awaitEvent(client, 'end');
@@ -115,7 +115,7 @@ describe('SearchClient', () => {
   });
 
   it('emits "end" only once', done => {
-    const client = new SearchClient(fakeSearchFn, { pageSize: 2 });
+    const client = new SearchClient(fakeSearchFn, { pageSize: () => 2 });
     client.on('results', sinon.stub());
     let emitEndCounter = 0;
     client.on('end', () => {
@@ -127,7 +127,7 @@ describe('SearchClient', () => {
   });
 
   it('emits "results" with pages in incremental mode', async () => {
-    const client = new SearchClient(fakeSearchFn, { pageSize: 2 });
+    const client = new SearchClient(fakeSearchFn, { pageSize: () => 2 });
     const onResults = sinon.stub();
     client.on('results', onResults);
 
@@ -139,7 +139,7 @@ describe('SearchClient', () => {
   });
 
   it('emits "resultCount" only once in incremental mode', async () => {
-    const client = new SearchClient(fakeSearchFn, { pageSize: 2 });
+    const client = new SearchClient(fakeSearchFn, { pageSize: () => 2 });
     const onResultCount = sinon.stub();
     client.on('resultCount', onResultCount);
 
@@ -152,7 +152,7 @@ describe('SearchClient', () => {
 
   it('emits "results" once in non-incremental mode', async () => {
     const client = new SearchClient(fakeSearchFn, {
-      pageSize: 2,
+      pageSize: () => 2,
       incremental: false,
     });
     const onResults = sinon.stub();
@@ -280,7 +280,7 @@ describe('SearchClient', () => {
   ].forEach(({ sortBy, sortOrder, expectedSearchAfter }) => {
     it('sets correct "search_after" query parameter depending on `sortBy` and `sortOrder`', async () => {
       const client = new SearchClient(fakeSearchFn, {
-        pageSize: 2,
+        pageSize: () => 2,
         sortBy,
         sortOrder,
       });
@@ -293,5 +293,22 @@ describe('SearchClient', () => {
         .map(call => call.args[0].search_after);
       assert.deepEqual(searchAfterParams, expectedSearchAfter);
     });
+  });
+
+  it('fetches pages in sizes specified by `pageSize` callback', async () => {
+    const pageSizes = [1, 2, 10];
+    const pageSizeCallback = sinon.spy(index => pageSizes[index]);
+
+    const client = new SearchClient(fakeSearchFn, {
+      pageSize: pageSizeCallback,
+    });
+
+    client.get({ uri: 'http://example.com' });
+    await awaitEvent(client, 'end');
+
+    const limitParams = fakeSearchFn.getCalls().map(call => call.args[0].limit);
+    assert.deepEqual(limitParams, pageSizes);
+    const pageIndexes = pageSizeCallback.getCalls().map(call => call.args[0]);
+    assert.deepEqual(pageIndexes, [0, 1, 2]);
   });
 });
