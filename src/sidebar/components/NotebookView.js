@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
+import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
 import useRootThread from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
@@ -8,6 +9,7 @@ import { useStoreProxy } from '../store/use-store';
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
 
+import Panel from './Panel';
 import PaginatedThreadList from './PaginatedThreadList';
 
 /**
@@ -46,11 +48,22 @@ function NotebookView({ loadAnnotationsService }) {
   const lastPaginationPage = useRef(1);
   const [paginationPage, setPaginationPage] = useState(1);
 
+  const [hasTooManyAnnotationsError, setHasTooManyAnnotationsError] = useState(
+    false
+  );
+
+  // Load all annotations in the group, unless there are more than 5000
+  // of them: this is a performance safety valve.
+  const maxResults = 5000;
+
+  const onLoadError = error => {
+    if (error instanceof ResultSizeError) {
+      setHasTooManyAnnotationsError(true);
+    }
+  };
+
   // Load all annotations; re-load if `focusedGroup` changes
   useEffect(() => {
-    // Load all annotations in the group, unless there are more than 5000
-    // of them: this is a performance safety valve.
-
     // NB: In current implementation, this will only happen/load once (initial
     // annotation fetch on application startup), as there is no mechanism
     // within the Notebook to change the `focusedGroup`. If the focused group
@@ -60,8 +73,6 @@ function NotebookView({ loadAnnotationsService }) {
     if (groupId) {
       loadAnnotationsService.load({
         groupId,
-        maxResults: 5000,
-
         // Load annotations in reverse-chronological order because that is how
         // threads are sorted in the notebook view. By aligning the fetch
         // order with the thread display order we reduce the changes in visible
@@ -74,6 +85,8 @@ function NotebookView({ loadAnnotationsService }) {
         // the top-level threads.
         sortBy: 'updated',
         sortOrder: 'desc',
+        maxResults,
+        onError: onLoadError,
       });
     }
   }, [loadAnnotationsService, groupId, store]);
@@ -115,6 +128,20 @@ function NotebookView({ loadAnnotationsService }) {
         />
       </div>
       <div className="NotebookView__items">
+        {hasTooManyAnnotationsError && (
+          <div className="NotebookView__messages">
+            <Panel title="Too many results to show">
+              This preview of the Notebook can show{' '}
+              <strong>up to {maxResults} results</strong> at a time (there are{' '}
+              {resultCount} to show here).{' '}
+              <a href="mailto:support@hypothes.is?subject=Hypothesis%20Notebook&body=Please%20notify%20me%20when%20the%20Hypothesis%20Notebook%20is%20updated%20to%20support%20more%20than%205000%20annotations">
+                Contact us
+              </a>{' '}
+              if you would like to be notified when support for more annotations
+              is available.
+            </Panel>
+          </div>
+        )}
         <PaginatedThreadList
           currentPage={paginationPage}
           isLoading={isLoading}

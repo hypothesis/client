@@ -1,4 +1,4 @@
-import SearchClient from '../search-client';
+import { ResultSizeError, SearchClient } from '../search-client';
 
 function awaitEvent(emitter, event) {
   return new Promise(function (resolve) {
@@ -218,10 +218,7 @@ describe('SearchClient', () => {
       await awaitEvent(client, 'end');
 
       assert.calledOnce(onError);
-      assert.equal(
-        onError.getCall(0).args[0].message,
-        'Results size exceeds maximum allowed annotations'
-      );
+      assert.instanceOf(onError.getCall(0).args[0], ResultSizeError);
     });
 
     it('does not emit an error if results size is <= `maxResults`', async () => {

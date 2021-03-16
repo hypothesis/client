@@ -4,13 +4,27 @@ import { TinyEmitter } from 'tiny-emitter';
  * @typedef {import('../types/api').Annotation} Annotation
  * @typedef {import('../types/api').SearchQuery} SearchQuery
  * @typedef {import('../types/api').SearchResult} SearchResult
+ *
  */
+
+/**
+ * Indicates that there are more annotations matching the current API
+ * search request than the interface can currently handle displaying
+ * (Notebook).
+ */
+export class ResultSizeError extends Error {
+  /**
+   * @param {number} limit
+   */
+  constructor(limit) {
+    super(`Results size exceeds ${limit}`);
+  }
+}
 
 /**
  * @typedef {'created'|'updated'} SortOrder
  * @typedef {'asc'|'desc'} SortBy
  */
-
 /**
  * Default callback used to get the page size for iterating through annotations.
  *
@@ -31,7 +45,7 @@ function defaultPageSize(index) {
  *
  * [1] https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
  */
-export default class SearchClient extends TinyEmitter {
+export class SearchClient extends TinyEmitter {
   /**
    * @param {(query: SearchQuery) => Promise<SearchResult>} searchFn - Function for querying the search API
    * @param {Object} options
@@ -116,6 +130,12 @@ export default class SearchClient extends TinyEmitter {
         return;
       }
 
+      if (this._resultCount === null) {
+        // Emit the result count (total) on first encountering it
+        this._resultCount = results.total;
+        this.emit('resultCount', this._resultCount);
+      }
+
       // For now, abort loading of annotations if `maxResults` is set and the
       // number of annotations in the results set exceeds that value.
       //
@@ -126,23 +146,14 @@ export default class SearchClient extends TinyEmitter {
       //
       // This change has no effect on loading annotations in the SidebarView,
       // where the `maxResults` option is not used.
-      //
-      // TODO: Implement pagination
       if (this._maxResults && results.total > this._maxResults) {
-        this.emit(
-          'error',
-          new Error('Results size exceeds maximum allowed annotations')
-        );
+        this.emit('error', new ResultSizeError(this._maxResults));
         this.emit('end');
         return;
       }
 
       const page = results.rows.concat(results.replies || []);
-      if (this._resultCount === null) {
-        // Emit the result count (total) on first encountering it
-        this._resultCount = results.total;
-        this.emit('resultCount', this._resultCount);
-      }
+
       if (this._incremental) {
         this.emit('results', page);
       } else {
