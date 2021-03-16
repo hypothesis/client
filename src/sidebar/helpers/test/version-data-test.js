@@ -79,22 +79,38 @@ describe('sidebar/helpers/version-data', () => {
   });
 
   describe('#asFormattedString', () => {
-    ['timestamp', 'account', 'url'].forEach(prop => {
-      it(`includes a line for the value of ${prop} in the string`, () => {
+    [
+      ['Version', 'version'],
+      ['User Agent', 'userAgent'],
+      ['URL', 'url'],
+      ['Fingerprint', 'fingerprint'],
+      ['Account', 'account'],
+      ['Date', 'timestamp'],
+    ].forEach(prop => {
+      it(`includes a line for the value of ${prop[1]} in the string`, () => {
         const versionData = new VersionData({}, {});
         const formatted = versionData.asFormattedString();
-        const subStr = `${prop}: ${versionData[prop]}\r\n`;
+        const subStr = `${prop[0]}: ${versionData[prop[1]]}\n`;
         assert.include(formatted, subStr);
       });
     });
   });
 
   describe('#asEncodedURLString', () => {
-    ['timestamp', 'account'].forEach(prop => {
-      it(`includes encoded value for ${prop} in URL string`, () => {
+    [
+      ['Version', 'version'],
+      ['User Agent', 'userAgent'],
+      ['URL', 'url'],
+      ['Fingerprint', 'fingerprint'],
+      ['Account', 'account'],
+      ['Date', 'timestamp'],
+    ].forEach(prop => {
+      it(`includes encoded value for ${prop[1]} in URL string`, () => {
         const versionData = new VersionData({}, {});
         const encoded = versionData.asEncodedURLString();
-        const subStr = encodeURIComponent(`${prop}: ${versionData[prop]}\r\n`);
+        const subStr = encodeURIComponent(
+          `${prop[0]}: ${versionData[prop[1]]}\n`
+        );
         assert.include(encoded, subStr);
       });
     });

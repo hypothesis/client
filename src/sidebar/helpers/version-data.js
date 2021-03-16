@@ -35,15 +35,15 @@ export default class VersionData {
       }
     }
 
-    this.timestamp = new Date().toString();
+    this.version = '__VERSION__'; // replaced by versionify
+    this.userAgent = window_.navigator.userAgent;
     this.url = documentInfo.uri || noValueString;
     this.fingerprint =
       docMeta && docMeta.documentFingerprint
         ? docMeta.documentFingerprint
         : noValueString;
     this.account = accountString;
-    this.userAgent = window_.navigator.userAgent;
-    this.version = '__VERSION__';
+    this.timestamp = new Date().toString();
   }
 
   /**
@@ -53,13 +53,13 @@ export default class VersionData {
    * @return {string} - Single, multiline string representing current version data
    */
   asFormattedString() {
-    let versionString = '';
-    for (let prop in this) {
-      if (Object.prototype.hasOwnProperty.call(this, prop)) {
-        versionString += `${prop}: ${this[prop]}\r\n`;
-      }
-    }
-    return versionString;
+    return `Version: ${this.version}
+User Agent: ${this.userAgent}
+URL: ${this.url}
+Fingerprint: ${this.fingerprint}
+Account: ${this.account}
+Date: ${this.timestamp}
+`;
   }
 
   /**
