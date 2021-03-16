@@ -3,6 +3,7 @@ import { act } from 'preact/test-utils';
 
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
+import { ResultSizeError } from '../../search-client';
 import NotebookView, { $imports } from '../NotebookView';
 
 describe('NotebookView', () => {
@@ -60,6 +61,7 @@ describe('NotebookView', () => {
         maxResults: 5000,
         sortBy: 'updated',
         sortOrder: 'desc',
+        onError: sinon.match.func,
       })
     );
     assert.calledWith(fakeStore.setSortKey, 'Newest');
@@ -78,6 +80,7 @@ describe('NotebookView', () => {
         maxResults: 5000,
         sortBy: 'updated',
         sortOrder: 'desc',
+        onError: sinon.match.func,
       })
     );
   });
@@ -89,6 +92,20 @@ describe('NotebookView', () => {
     createComponent();
 
     assert.notCalled(fakeLoadAnnotationsService.load);
+  });
+
+  it('shows a message if too many annotations to load', () => {
+    // Simulate the loading service emitting an error indicating
+    // too many annotations to load
+    fakeLoadAnnotationsService.load.callsFake(options => {
+      options.onError(new ResultSizeError(5000));
+    });
+    fakeStore.focusedGroup.returns({ id: 'hallothere', name: 'Hallo' });
+    const wrapper = createComponent();
+
+    const message = wrapper.find('.NotebookView__messages');
+    assert.include(message.text(), 'up to 5000 results at a time');
+    assert.isTrue(message.exists());
   });
 
   it('renders the current group name', () => {
