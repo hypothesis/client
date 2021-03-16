@@ -1,7 +1,0 @@
-@use "../../mixins/molecules";
-
-.SidebarPanel {
-  @include molecules.panel;
-  position: relative;
-  margin-bottom: 0.75em;
-}
