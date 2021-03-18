@@ -23,7 +23,6 @@ import ShareLinks from '../ShareLinks';
  *  FIXME: Refactor after root cause is addressed.
  *  See https://github.com/hypothesis/client/issues/1542
  * @prop {string} shareUri - The URI to view the annotation on its own
- * @prop {Object} analytics - Injected service
  * @prop {Object} toastMessenger - Injected service
  */
 
@@ -40,7 +39,6 @@ function selectionOverflowsInputElement() {
  */
 function AnnotationShareControl({
   annotation,
-  analytics,
   toastMessenger,
   group,
   shareUri,
@@ -162,12 +160,7 @@ function AnnotationShareControl({
                 link shares the annotation by itself.
               </div>
             )}
-            {showShareLinks && (
-              <ShareLinks
-                shareURI={shareUri}
-                analyticsEventName={analytics.events.ANNOTATION_SHARED}
-              />
-            )}
+            {showShareLinks && <ShareLinks shareURI={shareUri} />}
           </div>
           <SvgIcon
             name="pointer"
@@ -180,6 +173,6 @@ function AnnotationShareControl({
   );
 }
 
-AnnotationShareControl.injectedProps = ['analytics', 'toastMessenger'];
+AnnotationShareControl.injectedProps = ['toastMessenger'];
 
 export default withServices(AnnotationShareControl);

@@ -14,14 +14,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  *
  * @inject
  */
-export default function session(
-  analytics,
-  store,
-  api,
-  auth,
-  settings,
-  toastMessenger
-) {
+export default function session(store, api, auth, settings, toastMessenger) {
   // Cache the result of load()
   let lastLoad;
   let lastLoadTime;
@@ -129,15 +122,10 @@ export default function session(
       return reload();
     });
 
-    return loggedOut
-      .catch(function (err) {
-        toastMessenger.error('Log out failed');
-        analytics.track(analytics.events.LOGOUT_FAILURE);
-        throw new Error(err);
-      })
-      .then(function () {
-        analytics.track(analytics.events.LOGOUT_SUCCESS);
-      });
+    return loggedOut.catch(err => {
+      toastMessenger.error('Log out failed');
+      throw new Error(err);
+    });
   }
 
   /**

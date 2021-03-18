@@ -8,7 +8,6 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 
 describe('ShareAnnotationsPanel', () => {
   let fakeStore;
-  let fakeAnalytics;
   let fakeBouncerLink;
   let fakePageSharingLink;
   let fakeToastMessenger;
@@ -22,20 +21,10 @@ describe('ShareAnnotationsPanel', () => {
 
   const createShareAnnotationsPanel = props =>
     mount(
-      <ShareAnnotationsPanel
-        analytics={fakeAnalytics}
-        toastMessenger={fakeToastMessenger}
-        {...props}
-      />
+      <ShareAnnotationsPanel toastMessenger={fakeToastMessenger} {...props} />
     );
 
   beforeEach(() => {
-    fakeAnalytics = {
-      events: {
-        DOCUMENT_SHARED: 'whatever',
-      },
-      track: sinon.stub(),
-    };
     fakeBouncerLink = 'http://hyp.is/go?url=http%3A%2F%2Fwww.example.com';
     fakeCopyToClipboard = {
       copyText: sinon.stub(),

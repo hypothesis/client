@@ -8,7 +8,6 @@ import AnnotationShareControl, { $imports } from '../AnnotationShareControl';
 
 describe('AnnotationShareControl', () => {
   let fakeAnnotation;
-  let fakeAnalytics;
   let fakeCopyToClipboard;
   let fakeToastMessenger;
   let fakeGroup;
@@ -27,7 +26,6 @@ describe('AnnotationShareControl', () => {
     return mount(
       <AnnotationShareControl
         annotation={fakeAnnotation}
-        analytics={fakeAnalytics}
         toastMessenger={fakeToastMessenger}
         group={fakeGroup}
         shareUri={fakeShareUri}
@@ -64,11 +62,6 @@ describe('AnnotationShareControl', () => {
       uri: 'http://www.example.com',
     };
 
-    fakeAnalytics = {
-      events: {
-        ANNOTATION_SHARED: 'whatever',
-      },
-    };
     fakeCopyToClipboard = {
       copyText: sinon.stub(),
     };

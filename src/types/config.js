@@ -46,7 +46,6 @@
  * @typedef SidebarConfig
  * @prop {string} apiUrl
  * @prop {string} authDomain
- * @prop {string} [googleAnalytics]
  * @prop {string} oauthClientId
  * @prop {string[]} rpcAllowedOrigins
  * @prop {SentryConfig} [sentry]
