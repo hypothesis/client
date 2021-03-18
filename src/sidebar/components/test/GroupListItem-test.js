@@ -1,12 +1,10 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import { events } from '../../services/analytics';
 import GroupListItem from '../GroupListItem';
 import { $imports } from '../GroupListItem';
 
 describe('GroupListItem', () => {
-  let fakeAnalytics;
   let fakeCopyText;
   let fakeToastMessenger;
   let fakeGroupsService;
@@ -32,11 +30,6 @@ describe('GroupListItem', () => {
       focusedGroupId: sinon.stub().returns('groupid'),
       clearDirectLinkedIds: sinon.stub(),
       clearDirectLinkedGroupFetchFailed: sinon.stub(),
-    };
-
-    fakeAnalytics = {
-      track: sinon.stub(),
-      events,
     };
 
     fakeToastMessenger = {
@@ -88,7 +81,6 @@ describe('GroupListItem', () => {
         toastMessenger={fakeToastMessenger}
         group={fakeGroup}
         groups={fakeGroupsService}
-        analytics={fakeAnalytics}
         {...props}
       />
     );
@@ -106,7 +98,6 @@ describe('GroupListItem', () => {
     wrapper.find('MenuItem').props().onClick();
 
     assert.calledWith(fakeGroupsService.focus, fakeGroup.id);
-    assert.calledWith(fakeAnalytics.track, fakeAnalytics.events.GROUP_SWITCH);
   });
 
   it('clears the direct linked ids from the store when the group is clicked', () => {

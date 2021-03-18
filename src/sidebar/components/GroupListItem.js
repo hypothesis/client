@@ -15,7 +15,6 @@ import MenuItem from './MenuItem';
  * @prop {boolean} [isExpanded] - Whether the submenu for this group is expanded
  * @prop {(expand: boolean) => any} onExpand -
  *   Callback invoked to expand or collapse the current group
- * @prop {Object} analytics - Injected service
  * @prop {Object} groups - Injected service
  * @prop {Object} toastMessenger - Injected service
  */
@@ -29,7 +28,6 @@ import MenuItem from './MenuItem';
  * @param {GroupListItemProps} props
  */
 function GroupListItem({
-  analytics,
   isExpanded,
   group,
   groups: groupsService,
@@ -46,7 +44,6 @@ function GroupListItem({
   const isSelected = group.id === focusedGroupId;
 
   const focusGroup = () => {
-    analytics.track(analytics.events.GROUP_SWITCH);
     store.clearDirectLinkedGroupFetchFailed();
     store.clearDirectLinkedIds();
     groupsService.focus(group.id);
@@ -55,7 +52,6 @@ function GroupListItem({
   const leaveGroup = () => {
     const message = `Are you sure you want to leave the group "${group.name}"?`;
     if (window.confirm(message)) {
-      analytics.track(analytics.events.GROUP_LEAVE);
       groupsService.leave(group.id);
     }
   };
@@ -146,6 +142,6 @@ function GroupListItem({
   );
 }
 
-GroupListItem.injectedProps = ['analytics', 'groups', 'toastMessenger'];
+GroupListItem.injectedProps = ['groups', 'toastMessenger'];
 
 export default withServices(GroupListItem);

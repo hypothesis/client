@@ -7,25 +7,13 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('ShareLinks', () => {
-  let fakeAnalytics;
   const shareLink =
     'https://hyp.is/go?url=https%3A%2F%2Fwww.example.com&group=testprivate';
 
   const createComponent = props =>
-    mount(
-      <ShareLinks
-        analyticsEventName="potato-peeling"
-        analytics={fakeAnalytics}
-        shareURI={shareLink}
-        {...props}
-      />
-    );
+    mount(<ShareLinks shareURI={shareLink} {...props} />);
 
   beforeEach(() => {
-    fakeAnalytics = {
-      track: sinon.stub(),
-    };
-
     $imports.$mock(mockImportedComponents());
   });
 
@@ -53,25 +41,12 @@ describe('ShareLinks', () => {
       title: 'Share via email',
     },
   ].forEach(testCase => {
-    it(`creates a share link for ${testCase.service} and tracks clicks`, () => {
+    it(`creates a share link for ${testCase.service}`, () => {
       const wrapper = createComponent({ shareURI: shareLink });
 
       const link = wrapper.find(`a[title="${testCase.title}"]`);
 
       assert.equal(link.prop('href'), testCase.expectedURI);
-
-      // Assure tracking doesn't happen until clicked
-      // See https://github.com/hypothesis/client/issues/1566
-      assert.notCalled(fakeAnalytics.track);
-
-      // Now click...
-      link.simulate('click');
-
-      assert.calledWith(
-        fakeAnalytics.track,
-        'potato-peeling',
-        testCase.service
-      );
     });
   });
 

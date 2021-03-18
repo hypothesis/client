@@ -7,7 +7,6 @@ import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
 } from './cross-origin-rpc.js';
-import addAnalytics from './ga';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
 import { fetchConfig } from './config/fetch-config';
 import * as sentry from './util/sentry';
@@ -34,10 +33,6 @@ if (process.env.NODE_ENV !== 'production') {
   require('preact/debug');
 }
 
-if (appConfig.googleAnalytics) {
-  addAnalytics(appConfig.googleAnalytics);
-}
-
 // Install Preact renderer options to work around browser quirks
 rendererOptions.setupBrowserFixes();
 
@@ -55,17 +50,6 @@ function setupRoute(groups, session, router) {
   groups.load();
   session.load();
   router.sync();
-}
-
-/**
- * Send a page view event when the app starts up.
- *
- * We don't bother tracking route changes later because the client only uses a
- * single route in a given session.
- */
-// @inject
-function sendPageView(analytics) {
-  analytics.sendPageView();
 }
 
 /**
@@ -107,7 +91,6 @@ import { ServiceContext } from './service-context';
 // Services.
 import bridgeService from '../shared/bridge';
 
-import analyticsService from './services/analytics';
 import annotationsService from './services/annotations';
 import apiService from './services/api';
 import apiRoutesService from './services/api-routes';
@@ -145,7 +128,6 @@ function startApp(config, appEl) {
 
   // Register services.
   container
-    .register('analytics', analyticsService)
     .register('annotationsService', annotationsService)
     .register('api', apiService)
     .register('apiRoutes', apiRoutesService)
@@ -179,7 +161,6 @@ function startApp(config, appEl) {
   // Initialize services.
   container.run(persistDefaults);
   container.run(autosave);
-  container.run(sendPageView);
   container.run(setupApi);
   container.run(setupRoute);
   container.run(startRPCServer);

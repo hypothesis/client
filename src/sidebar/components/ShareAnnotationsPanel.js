@@ -13,7 +13,6 @@ import Spinner from './Spinner';
 
 /**
  * @typedef ShareAnnotationsPanelProps
- * @prop {Object} analytics - Injected service
  * @prop {Object} toastMessenger - Injected service
  */
 
@@ -26,7 +25,7 @@ import Spinner from './Spinner';
  *
  * @param {ShareAnnotationsPanelProps} props
  */
-function ShareAnnotationsPanel({ analytics, toastMessenger }) {
+function ShareAnnotationsPanel({ toastMessenger }) {
   const store = useStoreProxy();
   const mainFrame = store.mainFrame();
   const focusedGroup = store.focusedGroup();
@@ -105,10 +104,7 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
                   <em>Only Me</em>) annotations are only visible to you.
                 </span>
               </p>
-              <ShareLinks
-                shareURI={shareURI}
-                analyticsEventName={analytics.events.DOCUMENT_SHARED}
-              />
+              <ShareLinks shareURI={shareURI} />
             </>
           ) : (
             <p>
@@ -122,6 +118,6 @@ function ShareAnnotationsPanel({ analytics, toastMessenger }) {
   );
 }
 
-ShareAnnotationsPanel.injectedProps = ['analytics', 'toastMessenger'];
+ShareAnnotationsPanel.injectedProps = ['toastMessenger'];
 
 export default withServices(ShareAnnotationsPanel);

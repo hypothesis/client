@@ -1,12 +1,10 @@
 import EventEmitter from 'tiny-emitter';
 
-import { events as analyticsEvents } from '../analytics';
 import sessionFactory from '../session';
 import { $imports } from '../session';
 import { Injector } from '../../../shared/injector';
 
 describe('sidebar/services/session', function () {
-  let fakeAnalytics;
   let fakeAuth;
   let fakeSentry;
   let fakeServiceConfig;
@@ -26,10 +24,6 @@ describe('sidebar/services/session', function () {
       userid: null,
     };
 
-    fakeAnalytics = {
-      track: sinon.stub(),
-      events: analyticsEvents,
-    };
     fakeStore = {
       profile: sinon.stub().returns(currentProfile),
       updateProfile: sinon.stub().callsFake(newProfile => {
@@ -61,7 +55,6 @@ describe('sidebar/services/session', function () {
     });
 
     session = new Injector()
-      .register('analytics', { value: fakeAnalytics })
       .register('store', { value: fakeStore })
       .register('api', { value: fakeApi })
       .register('auth', { value: fakeAuth })
@@ -271,15 +264,6 @@ describe('sidebar/services/session', function () {
     it('logs the user out', () => {
       return session.logout().then(() => {
         assert.called(fakeAuth.logout);
-      });
-    });
-
-    it('tracks successful logout actions in analytics', () => {
-      return session.logout().then(() => {
-        assert.calledWith(
-          fakeAnalytics.track,
-          fakeAnalytics.events.LOGOUT_SUCCESS
-        );
       });
     });
 
