@@ -101,6 +101,7 @@ registerIcons(iconSet);
 // The entry point component for the app.
 import { render } from 'preact';
 import HypothesisApp from './components/HypothesisApp';
+import LaunchErrorPanel from './components/LaunchErrorPanel';
 import { ServiceContext } from './service-context';
 
 // Services.
@@ -133,7 +134,7 @@ import store from './store';
 // Utilities.
 import { Injector } from '../shared/injector';
 
-function startApp(config) {
+function startApp(config, appEl) {
   const container = new Injector();
 
   // Register services.
@@ -179,9 +180,6 @@ function startApp(config) {
   container.run(setupFrameSync);
 
   // Render the UI.
-  const appEl = /** @type {HTMLElement} */ (document.querySelector(
-    'hypothesis-app'
-  ));
   render(
     <ServiceContext.Provider value={container}>
       <HypothesisApp />
@@ -190,15 +188,23 @@ function startApp(config) {
   );
 }
 
+const appEl = /** @type {HTMLElement} */ (document.querySelector(
+  'hypothesis-app'
+));
+
 // Start capturing RPC requests before we start the RPC server (startRPCServer)
 preStartRPCServer();
 
 fetchConfig(appConfig)
   .then(config => {
-    startApp(config);
+    startApp(config, appEl);
   })
   .catch(err => {
-    // Report error. This will be the only notice that the user gets because the
-    // sidebar does not currently appear at all if the app fails to start.
+    // Report error. In the sidebar the console log is the only notice the user
+    // gets because the sidebar does not appear at all if the app fails to start.
     console.error('Failed to start Hypothesis client: ', err);
+
+    // For apps where the UI is visible (eg. notebook, single-annotation view),
+    // show an error notice.
+    render(<LaunchErrorPanel error={err} />, appEl);
   });
