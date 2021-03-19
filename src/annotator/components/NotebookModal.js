@@ -26,7 +26,6 @@ function NotebookIframe({ config, groupId }) {
 
   return (
     <iframe
-      key={groupId} // force re-rendering on group change
       title={'Hypothesis annotation notebook'}
       className="Notebook__iframe"
       // Enable media in annotations to be shown fullscreen
@@ -48,6 +47,11 @@ function NotebookIframe({ config, groupId }) {
  * @param {NotebookModalProps} props
  */
 export default function NotebookModal({ eventBus, config }) {
+  // Temporary solution: while there is no mechanism to sync new annotations in
+  // the notebook, we force re-rendering of the iframe on every 'openNotebook'
+  // event, so that the new annotations are displayed.
+  // https://github.com/hypothesis/client/issues/3182
+  const [iframeKey, setIframeKey] = useState(0);
   const [isHidden, setIsHidden] = useState(true);
   const [groupId, setGroupId] = useState(/** @type {string|null} */ (null));
   const originalDocumentOverflowStyle = useRef('');
@@ -81,6 +85,7 @@ export default function NotebookModal({ eventBus, config }) {
       /** @type {string} */ groupId
     ) => {
       setIsHidden(false);
+      setIframeKey(iframeKey => iframeKey + 1);
       setGroupId(groupId);
     });
 
@@ -105,7 +110,7 @@ export default function NotebookModal({ eventBus, config }) {
           onClick={onClose}
         />
         {groupId !== null && (
-          <NotebookIframe config={config} groupId={groupId} />
+          <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
         )}
       </div>
     </div>
