@@ -1,0 +1,111 @@
+@use "sass:map";
+@use "@hypothesis/frontend-shared/styles/mixins/focus";
+
+// Reset browser native styles. This can be used in conjunction with other
+// styles via `base` or standalone for starting a custom button's styles
+// from relative scratch
+@mixin reset {
+  @include focus.outline-on-keyboard-focus;
+  // Reset native styles
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border-style: none;
+}
+
+// Set colors for a button
+@mixin _colors($colormap) {
+  color: map.get($colormap, 'foreground');
+  background-color: map.get($colormap, 'background');
+
+  &:disabled {
+    color: map.get($colormap, 'disabled-foreground');
+  }
+}
+
+// Set hover colors and transition for a button
+@mixin hover-state($colormap) {
+  &:hover:not([disabled]),
+  &:focus:not([disabled]) {
+    color: map.get($colormap, 'hover-foreground');
+    background-color: map.get($colormap, 'hover-background');
+    @content;
+  }
+  transition: color 0.2s ease-out, background-color 0.2s ease-out,
+    opacity 0.2s ease-out;
+}
+
+// Set active state colors for a button
+@mixin active-state($colormap) {
+  &[aria-expanded='true'],
+  &[aria-pressed='true'] {
+    color: map.get($colormap, 'active-foreground');
+    background-color: map.get($colormap, 'active-background');
+    @content;
+
+    &:hover:not([disabled]),
+    &:focus:not([disabled]) {
+      color: map.get($colormap, 'active-foreground');
+      background-color: map.get($colormap, 'active-background');
+      @content;
+    }
+  }
+}
+
+// Variant mixin: may be be used by variants (BEM modifier classes)
+@mixin variant($colormap, $withStates: false) {
+  @include _colors($colormap);
+  @if $withStates {
+    @include active-state($colormap);
+    @include hover-state($colormap);
+  }
+}
+
+// Base mixin for buttons. Should only be used once per block-level class (BEM blocks)
+@mixin button($colormap, $settings, $withLayout: false, $withStates: false) {
+  @include reset;
+  @include _colors($colormap);
+
+  @if $withStates {
+    @include active-state($colormap);
+    @include hover-state($colormap);
+  }
+
+  border-radius: map.get($settings, 'border-radius');
+  border: none;
+  padding: 0.5em;
+
+  font-size: 1em;
+  font-weight: 700;
+  white-space: nowrap; // Keep multi-word button labels from wrapping
+
+  @if $withLayout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &--icon-left svg {
+      margin-right: map.get($settings, 'margin');
+    }
+
+    &--icon-right svg {
+      margin-left: map.get($settings, 'margin');
+    }
+  }
+
+  &--size-small {
+    font-size: 0.825em;
+  }
+
+  &--size-large {
+    font-size: 1.25em;
+  }
+
+  // (icon) SVG sizing is relevant
+  svg {
+    width: 1.25em;
+    height: 1.25em;
+  }
+
+  @content;
+}

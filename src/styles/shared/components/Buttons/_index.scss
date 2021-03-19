@@ -1,0 +1,166 @@
+@use "sass:map";
+@use "@hypothesis/frontend-shared/styles/mixins/focus";
+@use './mixins';
+@use "../../variables" as var;
+
+// Design tokens from variables
+$-settings: (
+  'border-radius': var.$border-radius,
+  // Internal margin between elements, e.g. SVG and label
+  'margin': 0.5em,
+  'touch-target-size': var.$touch-target-size,
+  'color-g1': var.$color-grey-1,
+  'color-g2': var.$color-grey-2,
+  'color-g3': var.$color-grey-3,
+  'color-gsemi': var.$color-grey-semi,
+  'color-gmid': var.$color-grey-mid,
+  'color-g6': var.$color-grey-6,
+  'color-g7': var.$color-grey-7,
+  'color-brand': var.$color-brand,
+  'color-link-hover': var.$color-link-hover,
+);
+
+// Configure this module to override any of the default settings values
+@mixin configure($settings: null) {
+  @if $settings {
+    $-settings: map.merge($-settings, $settings) !global;
+  }
+}
+
+$colors: (
+  'foreground': map.get($-settings, 'color-gmid'),
+  'background': map.get($-settings, 'color-g1'),
+  'hover-foreground': map.get($-settings, 'color-g7'),
+  'hover-background': map.get($-settings, 'color-g2'),
+  'active-foreground': map.get($-settings, 'color-g7'),
+  'active-background': map.get($-settings, 'color-g1'),
+  'border': transparent,
+  'disabled-foreground': map.get($-settings, 'color-gmid'),
+);
+
+// Icon-only buttons have a transparent background by default, and a more
+// visible active (pressed) state
+$IconButton-colors: map.merge(
+  $colors,
+  (
+    'background': transparent,
+    'hover-background': transparent,
+    'active-foreground': map.get($-settings, 'color-brand'),
+    'active-background': transparent,
+  )
+);
+
+$IconButton-colors--primary: map.merge(
+  $IconButton-colors,
+  (
+    'foreground': map.get($-settings, 'color-brand'),
+    'hover-foreground': map.get($-settings, 'color-brand'),
+    'active-foreground': map.get($-settings, 'color-brand'),
+  )
+);
+
+// LABELED BUTTON colors
+$LabeledButton-colors: $colors;
+
+// This set of colors is light text on dark background
+$LabeledButton-colors--primary: map.merge(
+  $colors,
+  (
+    'foreground': map.get($-settings, 'color-g1'),
+    'background': map.get($-settings, 'color-gmid'),
+    'hover-foreground': map.get($-settings, 'color-g1'),
+    'hover-background': map.get($-settings, 'color-g6'),
+    'disabled-foreground': map.get($-settings, 'color-gsemi'),
+  )
+);
+
+// This set of colors is for buttons styled as links on a white background
+$LinkButton-colors: map.merge(
+  $colors,
+  (
+    'background': transparent,
+    'hover-background': transparent,
+    'active-background': transparent,
+    'hover-foreground': map.get($-settings, 'color-link-hover'),
+  )
+);
+
+// MIXINS ////////////////////////////////
+// Button base block element mixin
+@mixin Button(
+  $colormap: $colors,
+  $settings: $-settings,
+  $withStates: true,
+  $withLayout: false
+) {
+  @include mixins.button(
+    $colormap: $colormap,
+    $settings: $settings,
+    $withStates: $withStates,
+    $withLayout: $withLayout
+  ) {
+    @content;
+  }
+}
+
+// Mixin for --modifier variants on Buttons, e.g. `.MyButton--primary`
+@mixin Button--variant($colormap: $colors, $withStates: false) {
+  @include mixins.variant($colormap: $colormap, $withStates: $withStates);
+}
+
+// Block mixin for a button with an icon and nothing else
+@mixin IconButton {
+  @include Button($colormap: $IconButton-colors, $withStates: true) {
+    @media (pointer: coarse) {
+      min-width: map.get($-settings, 'touch-target-size');
+      min-height: map.get($-settings, 'touch-target-size');
+    }
+  }
+  &--primary {
+    @include Button--variant($IconButton-colors--primary, $withStates: true);
+  }
+  @content;
+}
+
+// Block mixin for a button with a text label and (optional) icon
+@mixin LabeledButton {
+  @include Button(
+    $colormap: $LabeledButton-colors,
+    $withLayout: true,
+    $withStates: true
+  );
+  &--primary {
+    @include Button--variant($LabeledButton-colors--primary, $withStates: true);
+  }
+  @content;
+}
+
+// Block mixin for a button styled to look like a link
+@mixin LinkButton {
+  @include Button($LinkButton-colors) {
+    // Override base font-weight
+    font-weight: 400;
+  }
+  // No active states
+  @include mixins.hover-state($LinkButton-colors) {
+    text-decoration: underline;
+  }
+  @content;
+}
+
+@mixin styles {
+  // A button with only an icon and no text (label)
+  .IconButton {
+    @include IconButton;
+  }
+
+  // A button with text and optionally an icon
+  .LabeledButton {
+    @include LabeledButton;
+  }
+
+  // A button styled to appear as a link, with underline on hover
+  .LinkButton {
+    @include LinkButton;
+  }
+}
