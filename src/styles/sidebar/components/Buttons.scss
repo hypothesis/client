@@ -1,0 +1,68 @@
+@use "sass:map";
+@use "../../variables" as var;
+@use '../../shared/components/Buttons' as buttons;
+
+// An icon-only button with tighter padding (e.g. TopBar icons)
+.CompactIconButton {
+  // Override larger touch-target min size
+  @include buttons.configure(
+    $settings: (
+      'touch-target-size': auto,
+    )
+  );
+  @include buttons.IconButton {
+    // Smaller Icon
+    & svg {
+      width: 1em;
+      height: 1em;
+    }
+    // Tighter padding
+    padding: 0.25em;
+  }
+}
+
+// A button with text and/or icon,
+// with tighter padding/internal margins
+.CompactLabeledButton {
+  // Reduce margin on internal SVG
+  @include buttons.configure(
+    $settings: (
+      'margin': 0.25em,
+    )
+  );
+  @include buttons.LabeledButton {
+    // tighter padding overall
+    padding: 0.25em 0.5em;
+  }
+}
+
+//An icon-only button rendered to the right of a text input field
+.IconInputButton {
+  @include buttons.configure(
+    $settings: (
+      // Sharp edges to assimilate with input field
+      'border-radius': 0,
+    )
+  );
+
+  @include buttons.Button($withStates: true) {
+    // Add a border to line up with input field
+    border: 1px solid var.$grey-3;
+    // No border on the left because that's the side adjacent to input field
+    border-left: none;
+  }
+}
+
+// EXAMPLE of Custom Button styling
+.TestCustomButton {
+  // Custom Button components can define their own color maps
+  $custom-colormap: map.merge(
+    buttons.$colors,
+    (
+      'background': transparent,
+      'hover-background': var.$grey-3,
+      'active-background': var.$grey-3,
+    )
+  );
+  @include buttons.Button($custom-colormap, $withStates: true);
+}
