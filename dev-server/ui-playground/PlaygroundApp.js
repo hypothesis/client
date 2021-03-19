@@ -1,43 +1,9 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 
-import Button from '../../src/sidebar/components/Button';
-import Menu from '../../src/sidebar/components/Menu';
-import MenuItem from '../../src/sidebar/components/MenuItem';
+import ButtonsSharedDemo from './ButtonsSharedDemo';
+import ButtonsSidebarDemo from './ButtonsSidebarDemo';
 
 import { useRoute } from './router';
-
-function ComponentDemo({ title, children }) {
-  return (
-    <section>
-      <h1 className="heading">{title}</h1>
-      {children}
-    </section>
-  );
-}
-
-function ButtonDemo() {
-  return (
-    <ComponentDemo title="Button">
-      <Button buttonText="Text button" />
-      <Button icon="edit" title="Icon button" />
-      <Button icon="trash" buttonText="Icon + text button" />
-      <Button disabled={true} buttonText="Disabled button" />
-    </ComponentDemo>
-  );
-}
-
-function MenuDemo() {
-  return (
-    <ComponentDemo title="Menu">
-      <Menu label="Edit">
-        <MenuItem label="Zoom in" />
-        <MenuItem label="Zoom out" />
-        <MenuItem label="Undo" />
-        <MenuItem label="Redo" />
-      </Menu>
-    </ComponentDemo>
-  );
-}
 
 function HomeRoute() {
   return (
@@ -55,14 +21,14 @@ const routes = [
     component: HomeRoute,
   },
   {
-    route: '/button',
-    title: 'Button',
-    component: ButtonDemo,
+    route: '/buttons',
+    title: 'Buttons (Shared)',
+    component: ButtonsSharedDemo,
   },
   {
-    route: '/menu',
-    title: 'Menu',
-    component: MenuDemo,
+    route: '/sidebar-buttons',
+    title: 'Buttons (Sidebar)',
+    component: ButtonsSidebarDemo,
   },
 ];
 
@@ -83,23 +49,25 @@ export default function PlaygroundApp() {
   return (
     <main className="PlaygroundApp">
       <div className="PlaygroundApp__sidebar">
-        <a
-          className="PlaygroundApp__nav-link u-center"
-          href={baseUrl}
-          onClick={e => navigate(e, '/')}
-        >
-          <SvgIcon name="logo" />
-        </a>
-        {demoRoutes.map(c => (
-          <a
-            className="PlaygroundApp__nav-link"
-            key={c.route}
-            href={c.route}
-            onClick={e => navigate(e, c.route)}
-          >
-            {c.title}
+        <div className="PlaygroundApp__sidebar-home">
+          <a href={baseUrl} onClick={e => navigate(e, '/')}>
+            <SvgIcon name="logo" />
           </a>
-        ))}
+        </div>
+        <ul>
+          {demoRoutes.map(c => (
+            <li key={c.route}>
+              <a
+                className="PlaygroundApp__nav-link"
+                key={c.route}
+                href={c.route}
+                onClick={e => navigate(e, c.route)}
+              >
+                {c.title}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
       <div className="PlaygroundApp__content">{content}</div>
     </main>

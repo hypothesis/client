@@ -1,5 +1,37 @@
+@use '../reset';
+@use '../sidebar/elements';
+@use '../mixins/layout';
+@use '../variables' as var;
+
+@use '../shared';
+@use '../sidebar/components/Buttons';
+
 $title-font: 20pt;
-$background-color: #ededed;
+$background-color: #9b9595;
+
+body {
+  font-size: 100%;
+}
+
+h1 {
+  font-size: 1.75em;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 1.5em;
+  width: 100%;
+  border-left: 6px solid var.$color-brand;
+  font-weight: bold;
+  padding-left: 0.5em;
+}
+
+h3 {
+  width: 100%;
+  font-size: 1.125em;
+  font-weight: normal;
+  font-style: italic;
+}
 
 // Utilities
 .u-center {
@@ -8,45 +40,114 @@ $background-color: #ededed;
 
 // Component styles
 .PlaygroundApp {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-areas:
+    'navigation'
+    'content';
 
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-  margin-top: 10px;
-  min-height: 90vh;
-}
+  &__content {
+    padding: var.$layout-space;
+  }
 
-.PlaygroundApp__sidebar {
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  background-color: $background-color;
-  border-radius: 3px;
-  margin-right: 10px;
-}
+  &__sidebar {
+    grid-area: 'navigation';
+    max-height: 20em;
+    overflow: scroll;
+    background-color: var.$grey-2;
+  }
 
-.PlaygroundApp__nav-link {
-  padding: 5px;
-  font-size: 12pt;
+  &__sidebar-home {
+    text-align: center;
+    padding: var.$layout-space;
+  }
 
-  &:hover {
-    background-color: #ddd;
+  &__content {
+    grid-area: 'content';
   }
 }
 
-.PlaygroundApp__content {
-  flex-grow: 1;
+.PlaygroundApp__nav-link {
+  width: 100%;
+  padding: var.$layout-space;
+  font-size: var.$font-size--subheading;
+  border-left: 5px solid transparent;
+  &:hover {
+    background-color: var.$grey-3;
+    border-left: 5px solid var.$color-brand;
+  }
 }
 
-.heading {
-  font-size: $title-font;
-  border-bottom: 2px solid $background-color;
-  margin-bottom: 20px;
+// Temporarily enforce the body font size of the client to demonstrate how
+// components would scale in-situ
+.PatternPage {
+  font-size: 13px;
+  &__content {
+    padding: 2em 0;
+  }
+}
+
+.Pattern {
+  margin-bottom: 4em;
+  p {
+    margin: 1em;
+  }
+}
+
+.PatternExamples {
+  border: 1px solid var.$grey-3;
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 2em;
+
+  th,
+  td {
+    padding: 0.5em;
+  }
+
+  th {
+    background-color: var.$grey-1;
+    border-bottom: 1px solid var.$grey-3;
+    text-align: left;
+  }
+
+  td {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  tr:nth-child(even) td {
+    background: var.$grey-0;
+  }
+
+  code {
+    color: var.$grey-mid;
+  }
+}
+
+.PatternExample {
+  &__example {
+    display: flex;
+    align-items: center;
+    & > * + * {
+      margin-left: 1em;
+    }
+  }
 }
 
 // Element styles
 body {
   font-family: sans-serif;
+}
+
+@media screen and (min-width: 60em) {
+  .PlaygroundApp {
+    height: 100vh;
+    grid-template-columns: 20em auto;
+    column-gap: 1em;
+    grid-template-areas: 'navigation content';
+
+    &__sidebar {
+      max-height: none;
+    }
+  }
 }
