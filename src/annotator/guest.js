@@ -342,6 +342,7 @@ export default class Guest {
 
     this.pdfIntegration?.destroy();
     this._emitter.destroy();
+    this.crossframe.destroy();
   }
 
   /**
