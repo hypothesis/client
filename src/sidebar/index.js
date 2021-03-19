@@ -134,6 +134,12 @@ import store from './store';
 // Utilities.
 import { Injector } from '../shared/injector';
 
+/**
+ * Launch the client application corresponding to the current URL.
+ *
+ * @param {object} config
+ * @param {HTMLElement} appEl - Root HTML container for the app
+ */
 function startApp(config, appEl) {
   const container = new Injector();
 
