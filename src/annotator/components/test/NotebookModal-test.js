@@ -58,7 +58,7 @@ describe('NotebookModal', () => {
     );
   });
 
-  it('creates a new iframe element if the group is changed', () => {
+  it('creates a new iframe element on every "openNotebook" event', () => {
     const wrapper = createComponent();
 
     emitter.publish('openNotebook', '1');
@@ -78,7 +78,7 @@ describe('NotebookModal', () => {
       iframe2.prop('src'),
       `/notebook#config=${encodeURIComponent('{"group":"1"}')}`
     );
-    assert.equal(iframe1.getDOMNode(), iframe2.getDOMNode());
+    assert.notEqual(iframe1.getDOMNode(), iframe2.getDOMNode());
 
     emitter.publish('openNotebook', '2');
     wrapper.update();
@@ -91,7 +91,7 @@ describe('NotebookModal', () => {
     assert.notEqual(iframe1.getDOMNode(), iframe3.getDOMNode());
   });
 
-  it('makes the document unscrollable on openNotebook event', () => {
+  it('makes the document unscrollable on "openNotebook" event', () => {
     createComponent();
     act(() => {
       emitter.publish('openNotebook', 'myGroup');
