@@ -948,4 +948,34 @@ describe('Guest', () => {
       assert.calledWith(removeHighlights, highlights);
     });
   });
+
+  describe('#destroy', () => {
+    it('disconnects from sidebar events', () => {
+      const guest = createGuest();
+      guest.destroy();
+      assert.calledOnce(fakeCrossFrame.destroy);
+    });
+
+    it('removes the adder toolbar', () => {
+      const guest = createGuest();
+      const adder = guest.element.querySelector('hypothesis-adder');
+      assert.equal(adder.parentElement, guest.element);
+
+      guest.destroy();
+
+      assert.isNull(adder.parentElement);
+    });
+
+    it('cleans up PDF integration', () => {
+      const guest = createGuest({ documentType: 'pdf' });
+      guest.destroy();
+      assert.calledOnce(fakePdfIntegration.destroy);
+    });
+
+    it('removes all highlights', () => {
+      const guest = createGuest();
+      guest.destroy();
+      assert.calledWith(highlighter.removeAllHighlights, guest.element);
+    });
+  });
 });
