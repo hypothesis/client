@@ -1,6 +1,8 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+
 import PaginationNavigation, { $imports } from '../PaginationNavigation';
 
 describe('PaginationNavigation', () => {
@@ -148,4 +150,11 @@ describe('PaginationNavigation', () => {
       });
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility({
+      content: () => createComponent({ currentPage: 2 }),
+    })
+  );
 });

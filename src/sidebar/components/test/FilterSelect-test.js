@@ -3,6 +3,8 @@ import { mount } from 'enzyme';
 import FilterSelect from '../FilterSelect';
 import { $imports } from '../FilterSelect';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('FilterSelect', () => {
@@ -88,4 +90,27 @@ describe('FilterSelect', () => {
     assert.isFalse(wrapper.find('MenuItem').at(1).props().isSelected);
     assert.isTrue(wrapper.find('MenuItem').at(2).props().isSelected);
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () => {
+          $imports.$restore();
+          return createComponent();
+        },
+      },
+      {
+        name: 'with icon',
+        content: () => {
+          $imports.$restore();
+          return createComponent({
+            icon: 'profile',
+            title: 'Select something',
+            selectedOption: { value: 'twovalue', display: 'Two Value' },
+          });
+        },
+      },
+    ])
+  );
 });

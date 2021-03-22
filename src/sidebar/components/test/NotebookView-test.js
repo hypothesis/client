@@ -1,6 +1,8 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 import { ResultSizeError } from '../../search-client';
@@ -185,4 +187,26 @@ describe('NotebookView', () => {
       assert.equal(wrapper.find('PaginatedThreadList').props().currentPage, 1);
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        content: () => {
+          fakeStore.focusedGroup.returns({ id: 'hallothere', name: 'Hallo' });
+          return createComponent();
+        },
+      },
+      {
+        name: 'with message warning',
+        content: () => {
+          fakeLoadAnnotationsService.load.callsFake(options => {
+            options.onError(new ResultSizeError(5000));
+          });
+          fakeStore.focusedGroup.returns({ id: 'hallothere', name: 'Hallo' });
+          return createComponent();
+        },
+      },
+    ])
+  );
 });
