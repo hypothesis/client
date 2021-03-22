@@ -1,5 +1,7 @@
 import { mount } from 'enzyme';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+
 import NotebookResultCount from '../NotebookResultCount';
 import { $imports } from '../NotebookResultCount';
 
@@ -132,4 +134,36 @@ describe('NotebookResultCount', () => {
       assert.equal(wrapper.text(), '(2 annotations)');
     });
   });
+
+  it(
+    'should pass a11y checks',
+    checkAccessibility([
+      {
+        name: 'no results',
+        content: () => createComponent({ isFiltered: true }),
+      },
+      {
+        name: 'with results',
+        content: () => {
+          fakeCountVisible.returns(2);
+          fakeUseRootThread.returns({ children: [1, 2] });
+          return createComponent();
+        },
+      },
+      {
+        name: 'with results and filters applied',
+        content: () => {
+          fakeCountVisible.returns(3);
+          fakeUseRootThread.returns({ children: [1] });
+          return createComponent({ forcedVisibleCount: 1, isFiltered: true });
+        },
+      },
+      {
+        name: 'loading spinner',
+        content: () => {
+          return createComponent({ isLoading: true });
+        },
+      },
+    ])
+  );
 });
