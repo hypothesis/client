@@ -72,13 +72,11 @@ function TagEditor({
    * @return {string[]}
    */
   const removeDuplicates = (suggestions, duplicates) => {
-    const suggestionsSet = [];
-    suggestions.forEach(suggestion => {
-      if (duplicates.indexOf(suggestion) < 0) {
-        suggestionsSet.push(suggestion);
-      }
-    });
-    return suggestionsSet.sort();
+    // suggestions already sorted the way the service wants
+
+    // only remove duplicates
+    // (array.filter returns a new array and preserves original input order)
+    return suggestions.filter(suggestion => duplicates.indexOf(suggestion) < 0);
   };
 
   /**

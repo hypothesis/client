@@ -99,8 +99,8 @@ describe('TagEditor', function () {
     const wrapper = createComponent();
     wrapper.find('input').instance().value = 'non-empty';
     typeInput(wrapper);
-    assert.equal(wrapper.find('AutocompleteList').prop('list')[0], 'tag3');
-    assert.equal(wrapper.find('AutocompleteList').prop('list')[1], 'tag4');
+    assert.equal(wrapper.find('AutocompleteList').prop('list')[0], 'tag4');
+    assert.equal(wrapper.find('AutocompleteList').prop('list')[1], 'tag3');
   });
 
   it('shows case-insensitive matches to suggested tags', () => {
@@ -121,8 +121,32 @@ describe('TagEditor', function () {
 
     // Even though the entered text was lower case ('aa'), the suggested tag
     // should be rendered with its original casing (upper-case here)
-    assert.equal(firstSuggestedTag, 'AAArgh');
-    assert.equal(secondSuggestedTag, 'fine AArdvark');
+    assert.equal(firstSuggestedTag, 'fine AArdvark');
+    assert.equal(secondSuggestedTag, 'AAArgh');
+  });
+
+  it('preserves order of tag-suggestions returned from filter()', () => {
+    fakeTagsService.filter.returns(['aabbcc', 'aabb', 'aa']);
+    const wrapper = createComponent();
+    wrapper.find('input').instance().value = 'aa';
+    typeInput(wrapper);
+
+    const formattingFn = wrapper.find('AutocompleteList').prop('listFormatter');
+    const tagList = wrapper.find('AutocompleteList').prop('list');
+
+    const firstSuggestedTag = mount(formattingFn(tagList[0]))
+      .find('span')
+      .text();
+    const secondSuggestedTag = mount(formattingFn(tagList[1]))
+      .find('span')
+      .text();
+    const thirdSuggestedTag = mount(formattingFn(tagList[2]))
+      .find('span')
+      .text();
+
+    assert.equal(firstSuggestedTag, 'aabbcc');
+    assert.equal(secondSuggestedTag, 'aabb');
+    assert.equal(thirdSuggestedTag, 'aa');
   });
 
   it('shows suggested tags as-is if they do not seem to match the input', () => {
@@ -149,8 +173,8 @@ describe('TagEditor', function () {
       .text();
 
     // Obviously, these don't have a `bb` substring; we'll just render them...
-    assert.equal(firstSuggestedTag, 'AAArgh');
-    assert.equal(secondSuggestedTag, 'fine AArdvark');
+    assert.equal(firstSuggestedTag, 'fine AArdvark');
+    assert.equal(secondSuggestedTag, 'AAArgh');
   });
 
   it('passes the text value to filter() after receiving input', () => {
@@ -302,10 +326,10 @@ describe('TagEditor', function () {
         const wrapper = createComponent();
         wrapper.find('input').instance().value = 't';
         typeInput(wrapper);
-        // suggestions: [tag3, tag4]
+        // suggestions: [tag4, tag3]
         navigateDown(wrapper);
         keyAction[0](wrapper);
-        assertAddTagsSuccess(wrapper, 'tag3');
+        assertAddTagsSuccess(wrapper, 'tag4');
         // ensure focus is still on the input field
         assert.equal(document.activeElement.nodeName, 'INPUT');
       });
