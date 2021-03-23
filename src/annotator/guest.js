@@ -116,11 +116,8 @@ export default class Guest {
     this.element = element;
     this._emitter = eventBus.createEmitter();
     this.visibleHighlights = false;
-    this.adderToolbar = document.createElement('hypothesis-adder');
-    this.adderToolbar.style.display = 'none';
-    this.element.appendChild(this.adderToolbar);
 
-    this.adderCtrl = new Adder(this.adderToolbar, {
+    this.adder = new Adder(this.element, {
       onAnnotate: async () => {
         await this.createAnnotation();
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
@@ -336,7 +333,7 @@ export default class Guest {
     this._removeElementEvents();
 
     this.selectionObserver.disconnect();
-    this.adderToolbar.remove();
+    this.adder.destroy();
 
     removeAllHighlights(this.element);
 
@@ -626,12 +623,12 @@ export default class Guest {
     this.selectedRanges = [range];
     this._emitter.publish('hasSelectionChanged', true);
 
-    this.adderCtrl.annotationsForSelection = annotationsForSelection();
-    this.adderCtrl.show(focusRect, isBackwards);
+    this.adder.annotationsForSelection = annotationsForSelection();
+    this.adder.show(focusRect, isBackwards);
   }
 
   _onClearSelection() {
-    this.adderCtrl.hide();
+    this.adder.hide();
     this.selectedRanges = [];
     this._emitter.publish('hasSelectionChanged', false);
   }

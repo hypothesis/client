@@ -83,24 +83,23 @@ export class Adder {
    *
    * The adder is initially hidden.
    *
-   * @param {HTMLElement} container - The DOM element into which the adder will be created
+   * @param {HTMLElement} element - The DOM element into which the adder will be created
    * @param {AdderOptions} options - Options object specifying `onAnnotate` and `onHighlight`
    *        event handlers.
    */
-  constructor(container, options) {
-    this._container = container;
-    this._shadowRoot = createShadowRoot(container);
+  constructor(element, options) {
+    this._outerContainer = document.createElement('hypothesis-adder');
+    element.appendChild(this._outerContainer);
+    this._shadowRoot = createShadowRoot(this._outerContainer);
 
     // Set initial style
-    Object.assign(container.style, {
-      display: 'block',
-
+    Object.assign(this._outerContainer.style, {
       // take position out of layout flow initially
       position: 'absolute',
       top: 0,
     });
 
-    this._view = /** @type {Window} */ (container.ownerDocument.defaultView);
+    this._view = /** @type {Window} */ (element.ownerDocument.defaultView);
 
     this._width = () => {
       const firstChild = /** @type {Element} */ (this._shadowRoot.firstChild);
@@ -137,6 +136,11 @@ export class Adder {
   hide() {
     this._isVisible = false;
     this._render();
+  }
+
+  destroy() {
+    render(null, this._shadowRoot); // First, unload the Preact component
+    this._outerContainer.remove();
   }
 
   /**
@@ -297,12 +301,12 @@ export class Adder {
     // Typically the adder is a child of the `<body>` and the NPA is the root
     // `<html>` element. However page styling may make the `<body>` positioned.
     // See https://github.com/hypothesis/client/issues/487.
-    const positionedAncestor = nearestPositionedAncestor(this._container);
+    const positionedAncestor = nearestPositionedAncestor(this._outerContainer);
     const parentRect = positionedAncestor.getBoundingClientRect();
 
     const zIndex = this._findZindex(left, top);
 
-    Object.assign(this._container.style, {
+    Object.assign(this._outerContainer.style, {
       left: toPx(left - parentRect.left),
       top: toPx(top - parentRect.top),
       zIndex,
