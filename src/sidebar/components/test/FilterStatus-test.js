@@ -64,9 +64,9 @@ describe('FilterStatus', () => {
   }
 
   function assertButton(wrapper, expected) {
-    const buttonProps = wrapper.find('Button').props();
+    const buttonProps = wrapper.find('LabeledButton').props();
 
-    assert.equal(buttonProps.buttonText, expected.text);
+    assert.equal(buttonProps.title, expected.text);
     assert.equal(buttonProps.icon, expected.icon);
     buttonProps.onClick();
     assert.calledOnce(expected.callback);

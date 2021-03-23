@@ -22,7 +22,7 @@ describe('AnnotationReplyToggle', () => {
   beforeEach(() => {
     fakeOnToggleReplies = sinon.stub();
     // Note that this component does not mock imported components
-    // because it entirely consists of a `Button`
+    // because it entirely consists of a `LinkButton`
   });
 
   it('renders expand wording if thread is collapsed', () => {
@@ -44,7 +44,7 @@ describe('AnnotationReplyToggle', () => {
 
   it('invokes the toggle callback when clicked', () => {
     const wrapper = createComponent();
-    const button = wrapper.find('Button');
+    const button = wrapper.find('LinkButton');
 
     act(() => {
       button.props().onClick();

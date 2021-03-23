@@ -22,6 +22,10 @@ describe('AnnotationShareControl', () => {
     return wrapper.find('Button').filter({ icon: iconName });
   };
 
+  const getIconButton = (wrapper, iconName) => {
+    return wrapper.find('IconButton').filter({ icon: iconName });
+  };
+
   function createComponent(props = {}) {
     return mount(
       <AnnotationShareControl
@@ -37,7 +41,7 @@ describe('AnnotationShareControl', () => {
 
   function openElement(wrapper) {
     act(() => {
-      wrapper.find('Button').props().onClick();
+      wrapper.find('IconButton').props().onClick();
     });
     wrapper.update();
   }
@@ -111,7 +115,7 @@ describe('AnnotationShareControl', () => {
 
   it('toggles the share control element when the button is clicked', () => {
     const wrapper = createComponent();
-    const button = getButton(wrapper, 'share');
+    const button = getIconButton(wrapper, 'share');
 
     act(() => {
       button.props().onClick();

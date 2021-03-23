@@ -1,6 +1,6 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 
-import Button from './Button';
+import { LabeledButton } from '../../shared/components/buttons';
 
 /**
  * @typedef PanelProps
@@ -29,7 +29,9 @@ export default function Panel({ children, icon, onClose, title }) {
         <h2 className="Panel__title u-stretch">{title}</h2>
         {withCloseButton && (
           <div>
-            <Button icon="cancel" buttonText="Close" onClick={onClose} />
+            <LabeledButton icon="cancel" title="Close" onClick={onClose}>
+              Close
+            </LabeledButton>
           </div>
         )}
       </div>

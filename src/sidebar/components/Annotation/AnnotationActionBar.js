@@ -6,7 +6,7 @@ import {
 import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 
-import Button from '../Button';
+import { IconButton } from '../../../shared/components/buttons';
 
 import AnnotationShareControl from './AnnotationShareControl';
 
@@ -25,7 +25,7 @@ import AnnotationShareControl from './AnnotationShareControl';
  */
 
 /**
- * A collection of `Button`s in the footer area of an annotation that take
+ * A collection of buttons in the footer area of an annotation that take
  * actions on the annotation.
  *
  * @param {AnnotationActionBarProps} props
@@ -89,11 +89,13 @@ function AnnotationActionBar({
 
   return (
     <div className="AnnotationActionBar u-layout-row">
-      {showEditAction && <Button icon="edit" title="Edit" onClick={onEdit} />}
-      {showDeleteAction && (
-        <Button icon="trash" title="Delete" onClick={onDelete} />
+      {showEditAction && (
+        <IconButton icon="edit" title="Edit" onClick={onEdit} />
       )}
-      <Button icon="reply" title="Reply" onClick={onReplyClick} />
+      {showDeleteAction && (
+        <IconButton icon="trash" title="Delete" onClick={onDelete} />
+      )}
+      <IconButton icon="reply" title="Reply" onClick={onReplyClick} />
       {shareLink && (
         <AnnotationShareControl
           annotation={annotation}
@@ -102,15 +104,15 @@ function AnnotationActionBar({
         />
       )}
       {showFlagAction && !annotation.flagged && (
-        <Button
+        <IconButton
           icon="flag"
           title="Report this annotation to moderators"
           onClick={onFlag}
         />
       )}
       {showFlagAction && annotation.flagged && (
-        <Button
-          isPressed={true}
+        <IconButton
+          pressed={true}
           icon="flag--active"
           title="Annotation has been reported to the moderators"
         />

@@ -1,6 +1,6 @@
 import { useStoreProxy } from '../store/use-store';
 
-import Button from './Button';
+import { LabeledButton } from '../../shared/components/buttons';
 import SidebarPanel from './SidebarPanel';
 
 /**
@@ -27,17 +27,13 @@ export default function LoginPromptPanel({ onLogin, onSignUp }) {
       panelName="loginPrompt"
     >
       <p>Please log in to create annotations or highlights.</p>
-      <div className="SidebarPanel__actions">
-        <Button
-          buttonText="Sign up"
-          className="SidebarPanel__button"
-          onClick={onSignUp}
-        />
-        <Button
-          buttonText="Log in"
-          className="SidebarPanel__button--primary"
-          onClick={onLogin}
-        />
+      <div className="LoginPromptPanel__buttons">
+        <LabeledButton title="Sign up" onClick={onSignUp}>
+          Sign up
+        </LabeledButton>
+        <LabeledButton title="Log in" variant="primary" onClick={onLogin}>
+          Log in
+        </LabeledButton>
       </div>
     </SidebarPanel>
   );
