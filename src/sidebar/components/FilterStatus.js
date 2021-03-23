@@ -2,7 +2,7 @@ import { useMemo } from 'preact/hooks';
 
 import { countVisible } from '../helpers/thread';
 
-import Button from './Button';
+import { LabeledButton } from '../../shared/components/buttons';
 
 import useRootThread from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
@@ -138,12 +138,14 @@ function SelectionFilterStatus({ filterState, rootThread }) {
   const buttonText = showCount ? `Show all (${totalCount})` : 'Show all';
 
   const button = (
-    <Button
-      buttonText={buttonText}
-      className="Button--primary"
+    <LabeledButton
+      title={buttonText}
+      variant="primary"
       onClick={() => store.clearSelection()}
       icon="cancel"
-    />
+    >
+      {buttonText}
+    </LabeledButton>
   );
   return (
     <FilterStatusPanel
@@ -173,12 +175,14 @@ function QueryFilterStatus({ filterState, rootThread }) {
   const resultCount = visibleCount - filterState.forcedVisibleCount;
 
   const button = (
-    <Button
+    <LabeledButton
       icon="cancel"
-      className="Button--primary"
-      buttonText="Clear search"
+      variant="primary"
+      title="Clear search"
       onClick={() => store.clearSelection()}
-    />
+    >
+      Clear search
+    </LabeledButton>
   );
 
   return (
@@ -218,10 +222,10 @@ function FocusFilterStatus({ filterState, rootThread }) {
 
   if (filterState.forcedVisibleCount > 0) {
     buttonProps.onClick = () => store.clearSelection();
-    buttonProps.buttonText = 'Reset filters';
+    buttonProps.title = 'Reset filters';
   } else {
     buttonProps.onClick = () => store.toggleFocusMode();
-    buttonProps.buttonText = filterState.focusActive
+    buttonProps.title = filterState.focusActive
       ? 'Show all'
       : `Show only ${filterState.focusDisplayName}`;
   }
@@ -229,7 +233,11 @@ function FocusFilterStatus({ filterState, rootThread }) {
     ? filterState.focusDisplayName
     : '';
 
-  const button = <Button className="Button--primary" {...buttonProps} />;
+  const button = (
+    <LabeledButton variant="primary" {...buttonProps}>
+      {buttonProps.title}
+    </LabeledButton>
+  );
 
   return (
     <FilterStatusPanel

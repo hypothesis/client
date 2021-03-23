@@ -42,9 +42,9 @@ describe('Panel', () => {
         onClose: sinon.stub(),
       });
 
-      const closeButton = wrapper.find('Button');
+      const closeButton = wrapper.find('LabeledButton');
       assert.isTrue(closeButton.exists());
-      assert.equal(closeButton.props().buttonText, 'Close');
+      assert.equal(closeButton.props().title, 'Close');
     });
 
     it('invokes `onClose` handler when close button is clicked', () => {
@@ -53,7 +53,7 @@ describe('Panel', () => {
         onClose,
       });
 
-      wrapper.find('Button').props().onClick();
+      wrapper.find('LabeledButton').props().onClick();
 
       assert.calledOnce(onClose);
     });

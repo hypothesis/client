@@ -6,7 +6,7 @@ import { $imports } from '../VersionInfo';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 import { checkAccessibility } from '../../../test-util/accessibility';
 
-describe('VersionInfo', function () {
+describe('VersionInfo', () => {
   let fakeVersionData;
   // Services
   let fakeToastMessenger;
@@ -66,7 +66,7 @@ describe('VersionInfo', function () {
     it('copies version info to clipboard when copy button clicked', () => {
       const wrapper = createComponent();
 
-      wrapper.find('Button').props().onClick();
+      wrapper.find('LabeledButton').props().onClick();
 
       assert.calledWith(fakeCopyToClipboard.copyText, 'fakeString');
     });
@@ -74,7 +74,7 @@ describe('VersionInfo', function () {
     it('confirms info copy when successful', () => {
       const wrapper = createComponent();
 
-      wrapper.find('Button').props().onClick();
+      wrapper.find('LabeledButton').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -86,7 +86,7 @@ describe('VersionInfo', function () {
       fakeCopyToClipboard.copyText.throws();
       const wrapper = createComponent();
 
-      wrapper.find('Button').props().onClick();
+      wrapper.find('LabeledButton').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.error,

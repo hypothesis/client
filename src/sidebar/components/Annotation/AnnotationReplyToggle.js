@@ -1,4 +1,4 @@
-import Button from '../Button';
+import { LinkButton } from '../../../shared/components/buttons';
 
 /**
  * @typedef AnnotationReplyToggleProps
@@ -22,11 +22,9 @@ function AnnotationReplyToggle({
   const toggleText = `${toggleAction} (${replyCount})`;
 
   return (
-    <Button
-      className="Annotation__reply-toggle"
-      onClick={onToggleReplies}
-      buttonText={toggleText}
-    />
+    <LinkButton onClick={onToggleReplies} title={toggleText}>
+      {toggleText}
+    </LinkButton>
   );
 }
 

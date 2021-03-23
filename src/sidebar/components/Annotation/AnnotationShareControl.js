@@ -7,6 +7,8 @@ import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import { isIOS } from '../../../shared/user-agent';
 
+import { IconButton } from '../../../shared/components/buttons';
+
 import Button from '../Button';
 import ShareLinks from '../ShareLinks';
 
@@ -119,11 +121,11 @@ function AnnotationShareControl({
 
   return (
     <div className="AnnotationShareControl" ref={shareRef}>
-      <Button
+      <IconButton
         icon="share"
         title="Share"
         onClick={toggleSharePanel}
-        isExpanded={isOpen}
+        expanded={isOpen}
       />
       {isOpen && (
         <div className="annotation-share-panel">
