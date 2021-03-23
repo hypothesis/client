@@ -10,6 +10,7 @@ class FakeAdder {
 
     this.hide = sinon.stub();
     this.show = sinon.stub();
+    this.destroy = sinon.stub();
     this.options = options;
   }
 }
@@ -958,12 +959,9 @@ describe('Guest', () => {
 
     it('removes the adder toolbar', () => {
       const guest = createGuest();
-      const adder = guest.element.querySelector('hypothesis-adder');
-      assert.equal(adder.parentElement, guest.element);
-
       guest.destroy();
 
-      assert.isNull(adder.parentElement);
+      assert.calledOnce(FakeAdder.instance.destroy);
     });
 
     it('cleans up PDF integration', () => {
