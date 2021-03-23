@@ -11,6 +11,10 @@
 // -----------------
 @use '@hypothesis/frontend-shared/styles';
 
+// Temporary shared styles
+// FIXME: Replace with shared-package variant when available
+@use '../shared';
+
 // Components
 // ----------
 @use './components/Annotation';
