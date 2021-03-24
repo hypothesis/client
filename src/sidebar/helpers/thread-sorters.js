@@ -21,7 +21,7 @@ function compareHeadlessThreads(a, b) {
 }
 
 /**
- * Find the most recent updated date amongst a thread's root annotation set
+ * Find the most recent created date amongst a thread's root annotation set
  *
  * @param {Thread} thread
  * @return {string}
@@ -30,13 +30,13 @@ function newestRootAnnotationDate(thread) {
   const annotations = rootAnnotations([thread]);
   return annotations.reduce(
     (newestDate, annotation) =>
-      annotation.updated > newestDate ? annotation.updated : newestDate,
+      annotation.created > newestDate ? annotation.created : newestDate,
     ''
   );
 }
 
 /**
- * Find the oldest updated date amongst a thread's root annotation set
+ * Find the oldest created date amongst a thread's root annotation set
  *
  * @param {Thread} thread
  * @return {string}
@@ -45,9 +45,9 @@ function oldestRootAnnotationDate(thread) {
   const annotations = rootAnnotations([thread]);
   return annotations.reduce((oldestDate, annotation) => {
     if (!oldestDate) {
-      oldestDate = annotation.updated;
+      oldestDate = annotation.created;
     }
-    return annotation.updated < oldestDate ? annotation.updated : oldestDate;
+    return annotation.created < oldestDate ? annotation.created : oldestDate;
   }, '');
 }
 

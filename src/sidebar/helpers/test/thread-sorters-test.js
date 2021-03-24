@@ -25,22 +25,22 @@ describe('sidebar/util/thread-sorters', () => {
   describe('sorting by newest annotation thread first', () => {
     [
       {
-        a: [{ updated: 40 }, { updated: 5 }],
-        b: [{ updated: 20 }, { updated: 3 }],
+        a: [{ created: 40 }, { created: 5 }],
+        b: [{ created: 20 }, { created: 3 }],
         expected: -1,
       },
       {
-        a: [{ updated: 20 }, { updated: 3 }],
-        b: [{ updated: 20 }, { updated: 3 }],
+        a: [{ created: 20 }, { created: 3 }],
+        b: [{ created: 20 }, { created: 3 }],
         expected: 0,
       },
       {
-        a: [{ updated: 20 }, { updated: 3 }],
-        b: [{ updated: 40 }, { updated: 5 }],
+        a: [{ created: 20 }, { created: 3 }],
+        b: [{ created: 40 }, { created: 5 }],
         expected: 1,
       },
     ].forEach(testCase => {
-      it('sorts by newest updated root annotation', () => {
+      it('sorts by newest created root annotation', () => {
         // Disable eslint: `sorters` properties start with capital letters
         // to match their displayed sort option values
         /* eslint-disable-next-line new-cap */
@@ -52,22 +52,22 @@ describe('sidebar/util/thread-sorters', () => {
   describe('sorting by oldest annotation thread first', () => {
     [
       {
-        a: [{ updated: 20 }, { updated: 5 }],
-        b: [{ updated: 40 }, { updated: 3 }],
+        a: [{ created: 20 }, { created: 5 }],
+        b: [{ created: 40 }, { created: 3 }],
         expected: 1,
       },
       {
-        a: [{ updated: 20 }, { updated: 3 }],
-        b: [{ updated: 20 }, { updated: 3 }],
+        a: [{ created: 20 }, { created: 3 }],
+        b: [{ created: 20 }, { created: 3 }],
         expected: 0,
       },
       {
-        a: [{ updated: 40 }, { updated: 3 }],
-        b: [{ updated: 20 }, { updated: 5 }],
+        a: [{ created: 40 }, { created: 3 }],
+        b: [{ created: 20 }, { created: 5 }],
         expected: -1,
       },
     ].forEach(testCase => {
-      it('sorts by oldest updated root annotation', () => {
+      it('sorts by oldest created root annotation', () => {
         // Disable eslint: `sorters` properties start with capital letters
         // to match their displayed sort option values
         /* eslint-disable-next-line new-cap */
