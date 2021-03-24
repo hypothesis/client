@@ -12,14 +12,16 @@ const fixtures = {
   annotations: [
     {
       $orphan: false,
+      created: 50,
       id: '1',
       references: [],
       target: [{ selector: [] }],
       text: 'first annotation',
-      updated: 50,
+      updated: 300,
     },
     {
       $orphan: false,
+      created: 200,
       id: '2',
       references: [],
       text: 'second annotation',
@@ -28,6 +30,7 @@ const fixtures = {
     },
     {
       $orphan: false,
+      created: 100,
       id: '3',
       references: ['2'],
       text: 'reply to first annotation',
