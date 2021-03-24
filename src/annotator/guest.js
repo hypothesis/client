@@ -17,6 +17,7 @@ import {
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
+import { ListenerCollection } from './util/listener-collection';
 
 /**
  * @typedef {import('./util/emitter').EventBus} EventBus
@@ -166,20 +167,16 @@ export default class Guest {
     this._connectAnnotationUISync(this.crossframe);
 
     // Setup event handlers on the root element
-    this._elementEventListeners = [];
+    this._listeners = new ListenerCollection();
     this._setupElementEvents();
   }
 
   // Add DOM event listeners for clicks, taps etc. on the document and
   // highlights.
   _setupElementEvents() {
-    const addListener = (event, callback) => {
-      this.element.addEventListener(event, callback);
-      this._elementEventListeners.push({ event, callback });
-    };
-
     // Hide the sidebar in response to a document click or tap, so it doesn't obscure
     // the document content.
+    /** @param {Element} element */
     const maybeCloseSidebar = element => {
       if (!this.closeSidebarOnDocumentClick) {
         // Don't hide the sidebar if event was disabled because the sidebar
@@ -193,41 +190,36 @@ export default class Guest {
       this.crossframe.call('closeSidebar');
     };
 
-    addListener('mouseup', event => {
-      const annotations = annotationsAt(event.target);
+    this._listeners.add(this.element, 'mouseup', event => {
+      const { target, metaKey, ctrlKey } = /** @type {MouseEvent} */ (event);
+      const annotations = annotationsAt(/** @type {Element} */ (target));
       if (annotations.length && this.visibleHighlights) {
-        const toggle = event.metaKey || event.ctrlKey;
+        const toggle = metaKey || ctrlKey;
         this.selectAnnotations(annotations, toggle);
       }
     });
 
-    addListener('mousedown', event => {
-      maybeCloseSidebar(event.target);
+    this._listeners.add(this.element, 'mousedown', ({ target }) => {
+      maybeCloseSidebar(/** @type {Element} */ (target));
     });
 
     // Allow taps on the document to hide the sidebar as well as clicks.
     // On iOS < 13 (2019), elements like h2 or div don't emit 'click' events.
-    addListener('touchstart', event => {
-      maybeCloseSidebar(event.target);
+    this._listeners.add(this.element, 'touchstart', ({ target }) => {
+      maybeCloseSidebar(/** @type {Element} */ (target));
     });
 
-    addListener('mouseover', event => {
-      const annotations = annotationsAt(event.target);
+    this._listeners.add(this.element, 'mouseover', ({ target }) => {
+      const annotations = annotationsAt(/** @type {Element} */ (target));
       if (annotations.length && this.visibleHighlights) {
         this.focusAnnotations(annotations);
       }
     });
 
-    addListener('mouseout', () => {
+    this._listeners.add(this.element, 'mouseout', () => {
       if (this.visibleHighlights) {
         this.focusAnnotations([]);
       }
-    });
-  }
-
-  _removeElementEvents() {
-    this._elementEventListeners.forEach(({ event, callback }) => {
-      this.element.removeEventListener(event, callback);
     });
   }
 
@@ -314,7 +306,7 @@ export default class Guest {
   }
 
   destroy() {
-    this._removeElementEvents();
+    this._listeners.removeAll();
 
     this.selectionObserver.disconnect();
     this.adder.destroy();
