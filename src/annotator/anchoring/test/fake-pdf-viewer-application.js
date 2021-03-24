@@ -129,6 +129,11 @@ class FakePDFViewer {
     this.viewer = this._container;
 
     this.eventBus = new EventEmitter();
+
+    /** @type {'auto'|'page-fit'|'page-width'} */
+    this.currentScaleValue = 'auto';
+
+    this.update = sinon.stub();
   }
 
   get pagesCount() {
@@ -215,6 +220,11 @@ export default class FakePDFViewerApplication {
    * @param {Options} options
    */
   constructor(options) {
+    this.appConfig = {
+      // The root element which contains all of the PDF.js UI. In the real PDF.js
+      // viewer this is generally `document.body`.
+      appContainer: document.createElement('div'),
+    };
     this.pdfViewer = new FakePDFViewer({
       content: options.content,
       container: options.container,

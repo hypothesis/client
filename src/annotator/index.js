@@ -20,7 +20,6 @@ registerIcons(iconSet);
 import configFrom from './config/index';
 import Guest from './guest';
 import Notebook from './notebook';
-import PdfSidebar from './pdf-sidebar';
 import Sidebar from './sidebar';
 import { EventBus } from './util/emitter';
 
@@ -37,12 +36,7 @@ const config = configFrom(window);
 function init() {
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
-  /** @type {typeof Sidebar|null} */
-  let SidebarClass = isPDF ? PdfSidebar : Sidebar;
-
   if (config.subFrameIdentifier) {
-    SidebarClass = null;
-
     // Other modules use this to detect if this
     // frame context belongs to hypothesis.
     // Needs to be a global property that's set.
@@ -54,8 +48,8 @@ function init() {
 
   const eventBus = new EventBus();
   const guest = new Guest(document.body, eventBus, config);
-  const sidebar = SidebarClass
-    ? new SidebarClass(document.body, eventBus, guest, config)
+  const sidebar = !config.subFrameIdentifier
+    ? new Sidebar(document.body, eventBus, guest, config)
     : null;
   const notebook = new Notebook(document.body, eventBus, config);
 

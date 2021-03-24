@@ -13,7 +13,13 @@ import PDFMetadata from './pdf-metadata';
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
+ * @typedef {import('../sidebar').LayoutState} LayoutState
  */
+
+// The viewport and controls for PDF.js start breaking down below about 670px
+// of available space, so only render PDF and sidebar side-by-side if there
+// is enough room. Otherwise, allow sidebar to overlap PDF
+const MIN_PDF_WIDTH = 680;
 
 export default class PDF {
   /**
@@ -26,6 +32,10 @@ export default class PDF {
     const window_ = /** @type {HypothesisWindow} */ (window);
     this.pdfViewer = window_.PDFViewerApplication.pdfViewer;
     this.pdfViewer.viewer.classList.add('has-transparent-text-layer');
+
+    // Get the element that contains all of the PDF.js UI. This is typically
+    // `document.body`.
+    this.pdfContainer = window_.PDFViewerApplication?.appConfig?.appContainer;
 
     this.pdfMetadata = new PDFMetadata(window_.PDFViewerApplication);
 
@@ -44,7 +54,6 @@ export default class PDF {
      * @type {HTMLElement|null}
      */
     this._warningBanner = null;
-
     this._checkForSelectableText();
 
     // Hide annotation layer when the user is making a selection. The annotation
@@ -67,12 +76,17 @@ export default class PDF {
       'selectionchange',
       this._updateAnnotationLayerVisibility
     );
+
+    // A flag that indicates whether `destroy` has been called. Used to handle
+    // `destroy` being called during async code elsewhere in the class.
+    this._destroyed = false;
   }
 
   destroy() {
     this._listeners.removeAll();
     this.pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this.observer.disconnect();
+    this._destroyed = true;
   }
 
   uri() {
@@ -91,6 +105,12 @@ export default class PDF {
     try {
       await this.uri();
     } catch (e) {
+      return;
+    }
+
+    // Handle `PDF` instance being destroyed while URI is fetched. This is only
+    // expected to happen in synchronous tests.
+    if (this._destroyed) {
       return;
     }
 
@@ -202,5 +222,50 @@ export default class PDF {
     }
 
     refreshAnnotations.map(annotation => this.annotator.anchor(annotation));
+  }
+
+  /**
+   * Return the scrollable element which contains the document content.
+   *
+   * @return {HTMLElement}
+   */
+  contentContainer() {
+    return /** @type {HTMLElement} */ (document.querySelector(
+      '#viewerContainer'
+    ));
+  }
+
+  /**
+   * Attempt to make the PDF viewer and the sidebar fit side-by-side without
+   * overlap if there is enough room in the viewport to do so reasonably.
+   * Resize the PDF viewer container element to leave the right amount of room
+   * for the sidebar, and prompt PDF.js to re-render the PDF pages to scale
+   * within that resized container.
+   *
+   * @param {LayoutState} sidebarLayout
+   * @return {boolean} - True if side-by-side mode was activated
+   */
+  fitSideBySide(sidebarLayout) {
+    const maximumWidthToFit = window.innerWidth - sidebarLayout.width;
+    const active = sidebarLayout.expanded && maximumWidthToFit >= MIN_PDF_WIDTH;
+
+    this.pdfContainer.style.width = active ? maximumWidthToFit + 'px' : 'auto';
+    this.pdfContainer.classList.toggle('hypothesis-side-by-side', active);
+
+    // The following logic is pulled from PDF.js `webViewerResize`
+    const currentScaleValue = this.pdfViewer.currentScaleValue;
+    if (
+      currentScaleValue === 'auto' ||
+      currentScaleValue === 'page-fit' ||
+      currentScaleValue === 'page-width'
+    ) {
+      // NB: There is logic within the setter for `currentScaleValue`
+      // Setting this scale value will prompt PDF.js to recalculate viewport
+      this.pdfViewer.currentScaleValue = currentScaleValue;
+    }
+    // This will cause PDF pages to re-render if their scaling has changed
+    this.pdfViewer.update();
+
+    return active;
   }
 }

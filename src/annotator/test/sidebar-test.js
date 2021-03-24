@@ -73,8 +73,10 @@ describe('Sidebar', () => {
     class FakeGuest {
       constructor() {
         this.element = document.createElement('div');
+        this.contentContainer = sinon.stub().returns(document.body);
         this.createAnnotation = sinon.stub();
         this.crossframe = fakeCrossFrame;
+        this.fitSideBySide = sinon.stub();
         this.setVisibleHighlights = sinon.stub();
       }
     }
@@ -691,6 +693,28 @@ describe('Sidebar', () => {
         });
       });
 
+      it('attempts to fit the content alongside the sidebar', () => {
+        fakeGuest.fitSideBySide.resetHistory();
+        sidebar.open();
+        assert.calledWith(
+          fakeGuest.fitSideBySide,
+          sinon.match({
+            expanded: true,
+            width: DEFAULT_WIDTH + fakeToolbar.getWidth(),
+          })
+        );
+
+        fakeGuest.fitSideBySide.resetHistory();
+        sidebar.close();
+        assert.calledWith(
+          fakeGuest.fitSideBySide,
+          sinon.match({
+            expanded: false,
+            width: fakeToolbar.getWidth(),
+          })
+        );
+      });
+
       it('notifies when sidebar is panned left', () => {
         sidebar._gestureState = { initial: -DEFAULT_WIDTH };
         sidebar._onPan({ type: 'panleft', deltaX: -50 });
@@ -816,22 +840,15 @@ describe('Sidebar', () => {
 
     it('configures bucket bar to observe `contentContainer` scrolling if specified', () => {
       const contentContainer = document.createElement('div');
-      const sidebar = createSidebar({ contentContainer });
+      fakeGuest.contentContainer.returns(contentContainer);
+
+      const sidebar = createSidebar();
+
       assert.calledWith(
         FakeBucketBar,
         sidebar.iframeContainer,
         fakeGuest,
         sinon.match({ contentContainer })
-      );
-    });
-
-    it('configures bucket bar to observe body scrolling if no `contentContainer` is specified', () => {
-      const sidebar = createSidebar();
-      assert.calledWith(
-        FakeBucketBar,
-        sidebar.iframeContainer,
-        fakeGuest,
-        sinon.match({ contentContainer: undefined })
       );
     });
 

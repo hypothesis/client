@@ -83,7 +83,7 @@ export default class Sidebar {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
         const bucketBar = new BucketBar(this.iframeContainer, guest, {
-          contentContainer: config.contentContainer,
+          contentContainer: guest.contentContainer(),
         });
         this._emitter.subscribe('anchorsChanged', () => bucketBar.update());
         this.bucketBar = bucketBar;
@@ -335,6 +335,9 @@ export default class Sidebar {
     if (this.onLayoutChange) {
       this.onLayoutChange(layoutState);
     }
+
+    this.guest.fitSideBySide(layoutState);
+
     this._emitter.publish('sidebarLayoutChanged', layoutState);
   }
 
