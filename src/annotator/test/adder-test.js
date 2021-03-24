@@ -65,9 +65,8 @@ describe('Adder', () => {
     return adder._shadowRoot;
   }
 
-  function adderSize() {
-    const rect = getContent(adder).firstChild.getBoundingClientRect();
-    return { width: rect.width, height: rect.height };
+  function adderRect() {
+    return getContent(adder).firstChild.getBoundingClientRect();
   }
 
   it('renders the adder toolbar into a shadow root', () => {
@@ -197,7 +196,7 @@ describe('Adder', () => {
         rect(0, viewSize.height + 100, 10, 20),
         false
       );
-      assert.isAtMost(target.top, viewSize.height - adderSize().height);
+      assert.isAtMost(target.top, viewSize.height - adderRect().height);
     });
 
     it('does not position the adder beyond the right edge of the viewport', () => {
@@ -310,7 +309,7 @@ describe('Adder', () => {
       it('shows adder at target position', () => {
         adder._showAt(100, 100, ARROW_POINTING_UP);
 
-        const { left, top } = adder._outerContainer.getBoundingClientRect();
+        const { left, top } = adderRect();
         assert.equal(left, 100);
         assert.equal(top, 100);
       });
@@ -328,7 +327,7 @@ describe('Adder', () => {
       it('shows adder at target position', () => {
         adder._showAt(100, 100, ARROW_POINTING_UP);
 
-        const { left, top } = adder._outerContainer.getBoundingClientRect();
+        const { left, top } = adderRect();
         assert.equal(left, 100);
         assert.equal(top, 100);
       });
@@ -346,7 +345,7 @@ describe('Adder', () => {
       it('shows adder at target position when document element is offset', () => {
         adder._showAt(100, 100, ARROW_POINTING_UP);
 
-        const { left, top } = adder._outerContainer.getBoundingClientRect();
+        const { left, top } = adderRect();
         assert.equal(left, 100);
         assert.equal(top, 100);
       });
@@ -365,6 +364,22 @@ describe('Adder', () => {
         document.elementFromPoint(250, 150).tagName,
         'HYPOTHESIS-ADDER'
       );
+    });
+  });
+
+  describe('#hide', () => {
+    it('shows the container in the correct location', () => {
+      adder._showAt(100, 100, ARROW_POINTING_UP);
+
+      let pos = adderRect();
+      assert.equal(pos.left, 100);
+      assert.equal(pos.top, 100);
+
+      adder.hide();
+
+      pos = adderRect();
+      assert.equal(pos.left, 0);
+      assert.equal(pos.top, 0);
     });
   });
 });
