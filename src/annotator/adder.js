@@ -97,6 +97,7 @@ export class Adder {
       // take position out of layout flow initially
       position: 'absolute',
       top: 0,
+      left: 0,
     });
 
     this._view = /** @type {Window} */ (element.ownerDocument.defaultView);
@@ -136,6 +137,12 @@ export class Adder {
   hide() {
     this._isVisible = false;
     this._render();
+    // Reposition the outerContainer because it affects the responsiveness of host page
+    // https://github.com/hypothesis/client/issues/3193
+    Object.assign(this._outerContainer.style, {
+      top: 0,
+      left: 0,
+    });
   }
 
   destroy() {
