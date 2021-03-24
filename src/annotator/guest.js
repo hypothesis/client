@@ -24,6 +24,7 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Anchor} Anchor
  * @typedef {import('../types/api').Target} Target
+ * @typedef {import('./sidebar').LayoutState} LayoutState
  */
 
 /**
@@ -671,5 +672,32 @@ export default class Guest {
     setHighlightsVisible(this.element, shouldShowHighlights);
     this.visibleHighlights = shouldShowHighlights;
     this._emitter.publish('highlightsVisibleChanged', shouldShowHighlights);
+  }
+
+  /**
+   * Return the scrollable element that contains the main document content.
+   *
+   * @return {HTMLElement}
+   */
+  contentContainer() {
+    if (this.pdfIntegration) {
+      return this.pdfIntegration.contentContainer();
+    } else {
+      return this.element;
+    }
+  }
+
+  /**
+   * Attempt to fit the document content alongside the sidebar.
+   *
+   * @param {LayoutState} sidebarLayout
+   */
+  fitSideBySide(sidebarLayout) {
+    if (!this.pdfIntegration) {
+      // Side-by-side mode is not yet implemented for HTML documents.
+      return;
+    }
+    const active = this.pdfIntegration.fitSideBySide(sidebarLayout);
+    this.closeSidebarOnDocumentClick = !active;
   }
 }

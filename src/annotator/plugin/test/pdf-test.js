@@ -215,4 +215,101 @@ describe('annotator/plugin/pdf', () => {
       assert.notCalled(fakeAnnotator.anchor);
     });
   });
+
+  describe('#contentContainer', () => {
+    let container;
+    afterEach(() => {
+      container?.remove();
+    });
+
+    it('returns main PDF viewer content element', () => {
+      container = document.createElement('div');
+      container.id = 'viewerContainer';
+      document.body.appendChild(container);
+
+      pdfPlugin = createPDFPlugin();
+
+      assert.equal(pdfPlugin.contentContainer(), container);
+    });
+  });
+
+  describe('#fitSideBySide', () => {
+    const sandbox = sinon.createSandbox();
+    afterEach(() => {
+      sandbox.restore();
+    });
+
+    function pdfContainer() {
+      return fakePDFViewerApplication.appConfig.appContainer;
+    }
+
+    it('resizes and activates side-by-side mode when sidebar expanded', () => {
+      sandbox.stub(window, 'innerWidth').value(1350);
+      pdfPlugin = createPDFPlugin();
+
+      const active = pdfPlugin.fitSideBySide({
+        expanded: true,
+        width: 428,
+        height: 728,
+      });
+
+      assert.isTrue(active);
+      assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
+      assert.equal(pdfContainer().style.width, 1350 - 428 + 'px');
+    });
+
+    /**
+     * For each of the relative zoom modes supported by PDF.js, PDFSidebar
+     * should re-set the `currentScale` value, which will prompt PDF.js
+     * to re-calculate the zoom/viewport. Then, `pdfViewer.update()` will
+     * re-render the PDF pages as needed for the dirtied viewport/scaling.
+     * These tests are primarily for test coverage of these zoom modes.
+     */
+    ['auto', 'page-fit', 'page-width'].forEach(zoomMode => {
+      it('activates side-by-side mode for each relative zoom mode', () => {
+        fakePDFViewerApplication.pdfViewer.currentScaleValue = zoomMode;
+        sandbox.stub(window, 'innerWidth').value(1350);
+        pdfPlugin = createPDFPlugin();
+
+        const active = pdfPlugin.fitSideBySide({
+          expanded: true,
+          width: 428,
+          height: 728,
+        });
+
+        assert.isTrue(active);
+        assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
+        assert.equal(pdfContainer().style.width, 1350 - 428 + 'px');
+      });
+    });
+
+    it('deactivates side-by-side mode when sidebar collapsed', () => {
+      sandbox.stub(window, 'innerWidth').value(1350);
+      pdfPlugin = createPDFPlugin();
+
+      const active = pdfPlugin.fitSideBySide({
+        expanded: false,
+        width: 428,
+        height: 728,
+      });
+
+      assert.isFalse(active);
+      assert.equal(pdfContainer().style.width, 'auto');
+    });
+
+    it('does not activate side-by-side mode if there is not enough room', () => {
+      sandbox.stub(window, 'innerWidth').value(800);
+      pdfPlugin = createPDFPlugin();
+
+      const active = pdfPlugin.fitSideBySide({
+        expanded: true,
+        width: 428,
+        height: 728,
+      });
+
+      assert.isFalse(active);
+      assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
+      assert.equal(pdfContainer().style.width, 'auto');
+    });
+  });
 });

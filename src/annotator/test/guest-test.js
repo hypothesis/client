@@ -90,7 +90,9 @@ describe('Guest', () => {
     DocumentMeta = sandbox.stub().returns(fakeDocumentMeta);
 
     fakePdfIntegration = {
+      contentContainer: sinon.stub().returns({}),
       destroy: sinon.stub(),
+      fitSideBySide: sinon.stub().returns(false),
       getMetadata: sinon
         .stub()
         .resolves({ documentFingerprint: 'test-fingerprint' }),
@@ -976,6 +978,52 @@ describe('Guest', () => {
       const guest = createGuest();
       guest.destroy();
       assert.calledWith(highlighter.removeAllHighlights, guest.element);
+    });
+  });
+
+  describe('#contentContainer', () => {
+    it('returns root element in HTML document', () => {
+      const guest = createGuest();
+      assert.equal(guest.contentContainer(), guest.element);
+    });
+
+    it('returns PDF viewer content container in PDF documents', () => {
+      const guest = createGuest({ documentType: 'pdf' });
+      assert.equal(
+        guest.contentContainer(),
+        fakePdfIntegration.contentContainer()
+      );
+    });
+  });
+
+  describe('#fitSideBySide', () => {
+    it('does nothing in HTML documents', () => {
+      const guest = createGuest();
+      guest.fitSideBySide({ expanded: true, width: 100 });
+      assert.isTrue(guest.closeSidebarOnDocumentClick);
+    });
+
+    it('attempts to fit content alongside sidebar in PDF documents', () => {
+      const guest = createGuest({ documentType: 'pdf' });
+      fakePdfIntegration.fitSideBySide.returns(false);
+      const layout = { expanded: true, width: 100 };
+
+      guest.fitSideBySide(layout);
+
+      assert.calledWith(fakePdfIntegration.fitSideBySide, layout);
+    });
+
+    it('enables closing sidebar on document click if side-by-side is not activated', () => {
+      const guest = createGuest({ documentType: 'pdf' });
+      fakePdfIntegration.fitSideBySide.returns(false);
+      const layout = { expanded: true, width: 100 };
+
+      guest.fitSideBySide(layout);
+      assert.isTrue(guest.closeSidebarOnDocumentClick);
+
+      fakePdfIntegration.fitSideBySide.returns(true);
+      guest.fitSideBySide(layout);
+      assert.isFalse(guest.closeSidebarOnDocumentClick);
     });
   });
 });
