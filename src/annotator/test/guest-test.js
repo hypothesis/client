@@ -45,14 +45,18 @@ describe('Guest', () => {
 
   let PDFIntegration;
   let fakePDFIntegration;
+  let guests;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
     const eventBus = new EventBus();
-    return new Guest(element, eventBus, { ...guestConfig, ...config });
+    const guest = new Guest(element, eventBus, { ...guestConfig, ...config });
+    guests.push(guest);
+    return guest;
   };
 
   beforeEach(() => {
+    guests = [];
     FakeAdder.instance = null;
     guestConfig = {};
     highlighter = {
@@ -125,6 +129,7 @@ describe('Guest', () => {
   });
 
   afterEach(() => {
+    guests.forEach(guest => guest.destroy());
     sandbox.restore();
     $imports.$restore();
   });
@@ -307,7 +312,7 @@ describe('Guest', () => {
       it('allows the default scroll behaviour to be prevented', () => {
         const highlight = document.createElement('span');
         const guest = createGuest();
-        const fakeRange = sinon.stub();
+        const fakeRange = sandbox.stub();
         guest.anchors = [
           {
             annotation: { $tag: 'tag1' },
@@ -332,11 +337,11 @@ describe('Guest', () => {
             annotation: { $tag: 'tag1' },
             highlights: [highlight],
             range: {
-              toRange: sinon.stub().throws(new Error('Something went wrong')),
+              toRange: sandbox.stub().throws(new Error('Something went wrong')),
             },
           },
         ];
-        const eventEmitted = sinon.stub();
+        const eventEmitted = sandbox.stub();
         guest.element.addEventListener('scrolltorange', eventEmitted);
 
         emitGuestEvent('scrollToAnnotation', 'tag1');
@@ -478,6 +483,25 @@ describe('Guest', () => {
         guest.crossframe.call.resetHistory();
       }
     });
+
+    it('does not reposition the adder on window "resize" event if the adder is hidden', () => {
+      sandbox.stub(guest, '_repositionAdder').callThrough();
+      sandbox.stub(guest, '_onSelection'); // Calling _onSelect makes the adder to reposition
+
+      window.dispatchEvent(new Event('resize'));
+      assert.called(guest._repositionAdder);
+      assert.notCalled(guest._onSelection);
+    });
+
+    it('reposition the adder on window "resize" event if the adder is shown', () => {
+      sandbox.stub(guest, '_repositionAdder').callThrough();
+      sandbox.stub(guest, '_onSelection'); // Calling _onSelect makes the adder to reposition
+
+      guest._isAdderVisible = true;
+      sandbox.stub(window, 'getSelection').returns({ getRangeAt: () => true });
+      window.dispatchEvent(new Event('resize'));
+      assert.called(guest._onSelection);
+    });
   });
 
   describe('when the selection changes', () => {
@@ -544,7 +568,7 @@ describe('Guest', () => {
 
     it('emits `hasSelectionChanged` event with argument `true` if selection is non-empty', () => {
       const guest = createGuest();
-      const callback = sinon.stub();
+      const callback = sandbox.stub();
       guest._emitter.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithText();
@@ -554,7 +578,7 @@ describe('Guest', () => {
 
     it('emits `hasSelectionChanged` event with argument `false` if selection is empty', () => {
       const guest = createGuest();
-      const callback = sinon.stub();
+      const callback = sandbox.stub();
       guest._emitter.subscribe('hasSelectionChanged', callback);
 
       simulateSelectionWithoutText();
@@ -568,7 +592,7 @@ describe('Guest', () => {
     // `createAnnotation` tests.
     it('creates a new annotation if "Annotate" is clicked', async () => {
       const guest = createGuest();
-      const callback = sinon.stub();
+      const callback = sandbox.stub();
       guest._emitter.subscribe('beforeAnnotationCreated', callback);
 
       await FakeAdder.instance.options.onAnnotate();
@@ -578,7 +602,7 @@ describe('Guest', () => {
 
     it('creates a new highlight if "Highlight" is clicked', async () => {
       const guest = createGuest();
-      const callback = sinon.stub();
+      const callback = sandbox.stub();
       guest._emitter.subscribe('beforeAnnotationCreated', callback);
 
       await FakeAdder.instance.options.onHighlight();
@@ -686,7 +710,7 @@ describe('Guest', () => {
 
     it('triggers a "beforeAnnotationCreated" event', async () => {
       const guest = createGuest();
-      const callback = sinon.stub();
+      const callback = sandbox.stub();
       guest._emitter.subscribe('beforeAnnotationCreated', callback);
 
       const annotation = await guest.createAnnotation();
@@ -830,7 +854,6 @@ describe('Guest', () => {
 
     it('syncs annotations to the sidebar', () => {
       const guest = createGuest();
-      guest.crossframe = { sync: sinon.stub() };
       const annotation = {};
       return guest.anchor(annotation).then(() => {
         assert.called(guest.crossframe.sync);
@@ -840,7 +863,7 @@ describe('Guest', () => {
     it('emits an `anchorsChanged` event', async () => {
       const guest = createGuest();
       const annotation = {};
-      const anchorsChanged = sinon.stub();
+      const anchorsChanged = sandbox.stub();
       guest._emitter.subscribe('anchorsChanged', anchorsChanged);
 
       await guest.anchor(annotation);
@@ -924,7 +947,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const annotation = {};
       guest.anchors.push({ annotation });
-      const anchorsChanged = sinon.stub();
+      const anchorsChanged = sandbox.stub();
       guest._emitter.subscribe('anchorsChanged', anchorsChanged);
 
       guest.detach(annotation);
