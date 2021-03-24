@@ -117,6 +117,7 @@ export default class Guest {
     this.element = element;
     this._emitter = eventBus.createEmitter();
     this.visibleHighlights = false;
+    this._isAdderVisible = false;
 
     this.adder = new Adder(this.element, {
       onAnnotate: async () => {
@@ -221,6 +222,8 @@ export default class Guest {
         this.focusAnnotations([]);
       }
     });
+
+    this._listeners.add(window, 'resize', () => this._repositionAdder());
   }
 
   /**
@@ -244,6 +247,19 @@ export default class Guest {
         };
       }
     );
+  }
+
+  /**
+   * Shift the position of the adder on window 'resize' events
+   */
+  _repositionAdder() {
+    if (this._isAdderVisible === false) {
+      return;
+    }
+    const range = window.getSelection()?.getRangeAt(0);
+    if (range) {
+      this._onSelection(range);
+    }
   }
 
   _setupInitialState(config) {
@@ -600,10 +616,12 @@ export default class Guest {
     this._emitter.publish('hasSelectionChanged', true);
 
     this.adder.annotationsForSelection = annotationsForSelection();
+    this._isAdderVisible = true;
     this.adder.show(focusRect, isBackwards);
   }
 
   _onClearSelection() {
+    this._isAdderVisible = false;
     this.adder.hide();
     this.selectedRanges = [];
     this._emitter.publish('hasSelectionChanged', false);
