@@ -31,6 +31,7 @@ function NotebookView({ loadAnnotationsService }) {
   const hasAppliedFilter = store.hasAppliedFilter();
   const isLoading = store.isLoading();
   const resultCount = store.annotationResultCount();
+  const selectAnnotations = store.selectAnnotations;
 
   const rootThread = useRootThread();
 
@@ -100,6 +101,11 @@ function NotebookView({ loadAnnotationsService }) {
   useEffect(() => {
     onChangePage(1);
   }, [filters, focusedGroup]);
+
+  useEffect(() => {
+    // The notebook ignores any direct linked annotations
+    selectAnnotations([]);
+  }, [selectAnnotations]);
 
   // Scroll back to here when pagination page changes
   const threadListScrollTop = useRef(/** @type {HTMLElement|null}*/ (null));
