@@ -462,29 +462,20 @@ describe('Guest', () => {
       fakeSidebarFrame?.remove();
     });
 
-    it('hides sidebar when the user taps or clicks in the page', () => {
-      for (let event of ['click', 'touchstart']) {
+    it('hides sidebar on user "mousedown" or "touchstart" events in the document', () => {
+      for (let event of ['mousedown', 'touchstart']) {
         rootElement.dispatchEvent(new Event(event));
         assert.calledWith(guest.crossframe.call, 'closeSidebar');
+        guest.crossframe.call.resetHistory();
       }
     });
 
-    it('does not hide sidebar if configured not to close sidebar on document click', () => {
-      for (let event of ['click', 'touchstart']) {
+    it('does not hide sidebar if configured not to close sidebar', () => {
+      for (let event of ['mousedown', 'touchstart']) {
         guest.closeSidebarOnDocumentClick = false;
         rootElement.dispatchEvent(new Event(event));
         assert.notCalled(guest.crossframe.call);
-      }
-    });
-
-    it('does not hide sidebar if event occurs inside annotator UI', () => {
-      fakeSidebarFrame = document.createElement('div');
-      fakeSidebarFrame.className = 'annotator-frame';
-      rootElement.appendChild(fakeSidebarFrame);
-
-      for (let event of ['click', 'touchstart']) {
-        fakeSidebarFrame.dispatchEvent(new Event(event, { bubbles: true }));
-        assert.notCalled(guest.crossframe.call);
+        guest.crossframe.call.resetHistory();
       }
     });
   });

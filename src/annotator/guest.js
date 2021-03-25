@@ -180,32 +180,35 @@ export default class Guest {
 
     // Hide the sidebar in response to a document click or tap, so it doesn't obscure
     // the document content.
-    const maybeCloseSidebar = event => {
-      if (!this.closeSidebarOnDocumentClick || this.isEventInAnnotator(event)) {
-        // Don't hide the sidebar if event occurred inside Hypothesis UI, or
-        // the user is making a selection, or the behavior was disabled because
-        // the sidebar doesn't overlap the content.
+    const maybeCloseSidebar = element => {
+      if (!this.closeSidebarOnDocumentClick) {
+        // Don't hide the sidebar if event was disabled because the sidebar
+        // doesn't overlap the content.
+        return;
+      }
+      if (annotationsAt(element).length) {
+        // Don't hide the sidebar if the event comes from an element that contains a highlight
         return;
       }
       this.crossframe.call('closeSidebar');
     };
 
-    addListener('click', event => {
+    addListener('mouseup', event => {
       const annotations = annotationsAt(event.target);
       if (annotations.length && this.visibleHighlights) {
         const toggle = event.metaKey || event.ctrlKey;
         this.selectAnnotations(annotations, toggle);
-      } else {
-        maybeCloseSidebar(event);
       }
+    });
+
+    addListener('mousedown', event => {
+      maybeCloseSidebar(event.target);
     });
 
     // Allow taps on the document to hide the sidebar as well as clicks.
     // On iOS < 13 (2019), elements like h2 or div don't emit 'click' events.
     addListener('touchstart', event => {
-      if (!annotationsAt(event.target).length) {
-        maybeCloseSidebar(event);
-      }
+      maybeCloseSidebar(event.target);
     });
 
     addListener('mouseover', event => {
@@ -626,18 +629,6 @@ export default class Guest {
     } else {
       this.showAnnotations(annotations);
     }
-  }
-
-  /**
-   * Did an event originate from an element in the sidebar UI? (eg. the sidebar
-   * iframe, or its toolbar)
-   *
-   * @param {Event} event
-   */
-  isEventInAnnotator(event) {
-    return (
-      /** @type {Element} */ (event.target).closest('.annotator-frame') !== null
-    );
   }
 
   /**
