@@ -70,7 +70,6 @@
  * @typedef Annotator
  * @prop {Anchor[]} anchors
  * @prop {(ann: AnnotationData) => Promise<Anchor[]>} anchor
- * @prop {AnchoringImpl} anchoring - Anchoring implementation for the current document type
  */
 
 /**

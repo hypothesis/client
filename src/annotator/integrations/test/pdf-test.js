@@ -54,11 +54,15 @@ describe('PDFIntegration', () => {
     };
 
     fakePdfAnchoring = {
+      anchor: sinon.stub(),
+      describe: sinon.stub(),
       documentHasText: sinon.stub().resolves(true),
     };
 
     fakePDFMetadata = {
-      getMetadata: sinon.stub().resolves({}),
+      getMetadata: sinon
+        .stub()
+        .resolves({ title: 'Dummy PDF', documentFingerprint: 'abc' }),
       getUri: sinon.stub().resolves('https://example.com/test.pdf'),
     };
 
@@ -117,6 +121,49 @@ describe('PDFIntegration', () => {
     selection.removeAllRanges();
     await awaitEvent(document, 'selectionchange');
     assert.isFalse(pdfViewerHasClass('is-selecting'));
+  });
+
+  describe('#uri', () => {
+    it('returns current PDF document URI', async () => {
+      const uri = await createPDFIntegration().uri();
+      assert.equal(uri, 'https://example.com/test.pdf');
+    });
+  });
+
+  describe('#getMetadata', () => {
+    it('returns current PDF document metadata', async () => {
+      const metadata = await createPDFIntegration().getMetadata();
+      assert.deepEqual(metadata, {
+        title: 'Dummy PDF',
+        documentFingerprint: 'abc',
+      });
+    });
+  });
+
+  describe('#anchor', () => {
+    it('anchors provided selectors', async () => {
+      pdfIntegration = createPDFIntegration();
+      fakePdfAnchoring.anchor.returns({});
+      const selectors = [];
+
+      const range = await pdfIntegration.anchor({}, selectors);
+
+      assert.calledWith(fakePdfAnchoring.anchor, sinon.match.any, selectors);
+      assert.equal(range, fakePdfAnchoring.anchor());
+    });
+  });
+
+  describe('#describe', () => {
+    it('generates selectors for passed range', async () => {
+      pdfIntegration = createPDFIntegration();
+      const range = {};
+      fakePdfAnchoring.describe.returns([]);
+
+      const selectors = await pdfIntegration.describe({}, range);
+
+      assert.calledWith(fakePdfAnchoring.describe, sinon.match.any, range);
+      assert.equal(selectors, fakePdfAnchoring.describe());
+    });
   });
 
   describe('#destroy', () => {
