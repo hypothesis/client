@@ -1,11 +1,10 @@
 import scrollIntoView from 'scroll-into-view';
 
 import { Adder } from './adder';
+import { HTMLIntegration } from './integrations/html';
 import { PDFIntegration } from './integrations/pdf';
 import CrossFrame from './plugin/cross-frame';
-import DocumentMeta from './plugin/document';
 
-import * as htmlAnchoring from './anchoring/html';
 import { TextRange } from './anchoring/text-range';
 import {
   getHighlightsContainingNode,
@@ -148,16 +147,7 @@ export default class Guest {
     if (config.documentType === 'pdf') {
       this.integration = new PDFIntegration(this);
     } else {
-      const documentMeta = new DocumentMeta();
-      this.integration = {
-        anchor: htmlAnchoring.anchor,
-        contentContainer: () => this.element,
-        describe: htmlAnchoring.describe,
-        destroy: () => {},
-        fitSideBySide: () => false,
-        getMetadata: () => Promise.resolve(documentMeta.getDocumentMetadata()),
-        uri: () => Promise.resolve(documentMeta.uri()),
-      };
+      this.integration = new HTMLIntegration(this.element);
     }
 
     // Set the frame identifier if it's available.

@@ -57,10 +57,9 @@ function createMetadata() {
 }
 
 /**
- * DocumentMeta reads metadata/links from the current HTML document and
- * populates the `document` property of new annotations.
+ * HTMLMetadata reads metadata/links from the current HTML document.
  */
-export default class DocumentMeta {
+export class HTMLMetadata {
   /**
    * @param {object} [options]
    *   @param {Document} [options.document]

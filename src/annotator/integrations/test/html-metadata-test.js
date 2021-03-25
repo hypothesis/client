@@ -11,9 +11,9 @@
  */
 
 import { normalizeURI } from '../../util/url';
-import DocumentMeta from '../document';
+import { HTMLMetadata } from '../html-metadata';
 
-describe('DocumentMeta', function () {
+describe('HTMLMetadata', function () {
   let fakeNormalizeURI;
   let tempDocument;
   let tempDocumentHead;
@@ -29,7 +29,7 @@ describe('DocumentMeta', function () {
       return normalizeURI(url, base);
     });
 
-    testDocument = new DocumentMeta({
+    testDocument = new HTMLMetadata({
       document: tempDocument,
       normalizeURI: fakeNormalizeURI,
     });
@@ -258,7 +258,7 @@ describe('DocumentMeta', function () {
           href,
         },
       };
-      const doc = new DocumentMeta({
+      const doc = new HTMLMetadata({
         document: fakeDocument,
         baseURI,
       });

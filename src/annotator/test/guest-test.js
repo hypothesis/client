@@ -34,15 +34,14 @@ describe('Guest', () => {
   const sandbox = sinon.createSandbox();
   let highlighter;
   let guestConfig;
-  let htmlAnchoring;
   let rangeUtil;
   let notifySelectionChanged;
 
   let CrossFrame;
   let fakeCrossFrame;
 
-  let DocumentMeta;
-  let fakeDocumentMeta;
+  let HTMLIntegration;
+  let fakeHTMLIntegration;
 
   let PDFIntegration;
   let fakePDFIntegration;
@@ -63,10 +62,6 @@ describe('Guest', () => {
       setHighlightsFocused: sinon.stub(),
       setHighlightsVisible: sinon.stub(),
     };
-    htmlAnchoring = {
-      anchor: sinon.stub(),
-      describe: sinon.stub(),
-    };
     rangeUtil = {
       itemsForRange: sinon.stub().returns([]),
       isSelectionBackwards: sinon.stub(),
@@ -83,12 +78,16 @@ describe('Guest', () => {
     };
     CrossFrame = sandbox.stub().returns(fakeCrossFrame);
 
-    fakeDocumentMeta = {
+    fakeHTMLIntegration = {
+      anchor: sinon.stub(),
+      contentContainer: sinon.stub().returns({}),
+      describe: sinon.stub(),
       destroy: sinon.stub(),
-      getDocumentMetadata: sinon.stub().returns({ title: 'Test title' }),
-      uri: sinon.stub().returns('https://example.com/test.html'),
+      fitSideBySide: sinon.stub(),
+      getMetadata: sinon.stub().resolves({ title: 'Test title' }),
+      uri: sinon.stub().resolves('https://example.com/test.html'),
     };
-    DocumentMeta = sandbox.stub().returns(fakeDocumentMeta);
+    HTMLIntegration = sinon.stub().returns(fakeHTMLIntegration);
 
     fakePDFIntegration = {
       contentContainer: sinon.stub().returns({}),
@@ -110,15 +109,14 @@ describe('Guest', () => {
 
     $imports.$mock({
       './adder': { Adder: FakeAdder },
-      './anchoring/html': htmlAnchoring,
       './anchoring/text-range': {
         TextRange: FakeTextRange,
       },
+      './integrations/html': { HTMLIntegration },
       './integrations/pdf': { PDFIntegration },
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './plugin/cross-frame': CrossFrame,
-      './plugin/document': DocumentMeta,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
@@ -371,15 +369,15 @@ describe('Guest', () => {
 
       context('in an HTML document', () => {
         it('calls the callback with HTML URL and metadata', done => {
+          fakeHTMLIntegration.uri.resolves('https://example.com/');
+          const metadata = { title: 'Example site' };
+          fakeHTMLIntegration.getMetadata.resolves(metadata);
+
           guest = createGuest();
 
           emitGuestEvent(
             'getDocumentInfo',
-            createCallback(
-              fakeDocumentMeta.uri(),
-              fakeDocumentMeta.getDocumentMetadata(),
-              done
-            )
+            createCallback('https://example.com/', metadata, done)
           );
         });
       });
@@ -615,14 +613,16 @@ describe('Guest', () => {
     });
 
     it('preserves the components of the URI other than the fragment', () => {
-      fakeDocumentMeta.uri.returns('http://foobar.com/things?id=42');
+      fakeHTMLIntegration.uri.resolves('http://foobar.com/things?id=42');
       return guest
         .getDocumentInfo()
         .then(({ uri }) => assert.equal(uri, 'http://foobar.com/things?id=42'));
     });
 
     it('removes the fragment identifier from URIs', () => {
-      fakeDocumentMeta.uri.returns('http://foobar.com/things?id=42#ignoreme');
+      fakeHTMLIntegration.uri.resolves(
+        'http://foobar.com/things?id=42#ignoreme'
+      );
       return guest
         .getDocumentInfo()
         .then(({ uri }) => assert.equal(uri, 'http://foobar.com/things?id=42'));
@@ -635,10 +635,10 @@ describe('Guest', () => {
 
       const annotation = await guest.createAnnotation();
 
-      assert.equal(annotation.uri, fakeDocumentMeta.uri());
+      assert.equal(annotation.uri, await fakeHTMLIntegration.uri());
       assert.deepEqual(
         annotation.document,
-        fakeDocumentMeta.getDocumentMetadata()
+        await fakeHTMLIntegration.getMetadata()
       );
     });
 
@@ -649,15 +649,15 @@ describe('Guest', () => {
 
       const selectorA = { type: 'TextPositionSelector', start: 0, end: 10 };
       const selectorB = { type: 'TextQuoteSelector', exact: 'foobar' };
-      htmlAnchoring.anchor.resolves({});
-      htmlAnchoring.describe.returns([selectorA, selectorB]);
+      fakeHTMLIntegration.anchor.resolves({});
+      fakeHTMLIntegration.describe.returns([selectorA, selectorB]);
 
       const annotation = await guest.createAnnotation({});
 
-      assert.calledWith(htmlAnchoring.describe, guest.element, fakeRange);
+      assert.calledWith(fakeHTMLIntegration.describe, guest.element, fakeRange);
       assert.deepEqual(annotation.target, [
         {
-          source: fakeDocumentMeta.uri(),
+          source: await fakeHTMLIntegration.uri(),
           selector: [selectorA, selectorB],
         },
       ]);
@@ -753,7 +753,7 @@ describe('Guest', () => {
       const annotation = {
         target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
       };
-      htmlAnchoring.anchor.returns(Promise.resolve(range));
+      fakeHTMLIntegration.anchor.returns(Promise.resolve(range));
 
       return guest
         .anchor(annotation)
@@ -768,7 +768,7 @@ describe('Guest', () => {
           { selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] },
         ],
       };
-      htmlAnchoring.anchor
+      fakeHTMLIntegration.anchor
         .onFirstCall()
         .returns(Promise.reject())
         .onSecondCall()
@@ -786,7 +786,7 @@ describe('Guest', () => {
           { selector: [{ type: 'TextQuoteSelector', exact: 'notinhere' }] },
         ],
       };
-      htmlAnchoring.anchor.returns(Promise.reject());
+      fakeHTMLIntegration.anchor.returns(Promise.reject());
 
       return guest
         .anchor(annotation)
@@ -801,7 +801,7 @@ describe('Guest', () => {
           { selector: [{ type: 'TextQuoteSelector', exact: 'neitherami' }] },
         ],
       };
-      htmlAnchoring.anchor.returns(Promise.reject());
+      fakeHTMLIntegration.anchor.returns(Promise.reject());
 
       return guest
         .anchor(annotation)
@@ -817,7 +817,7 @@ describe('Guest', () => {
       };
       // This shouldn't be called, but if it is, we successfully anchor so that
       // this test is guaranteed to fail.
-      htmlAnchoring.anchor.returns(Promise.resolve(range));
+      fakeHTMLIntegration.anchor.returns(Promise.resolve(range));
 
       return guest
         .anchor(annotation)
@@ -834,7 +834,7 @@ describe('Guest', () => {
 
       return guest
         .anchor(annotation)
-        .then(() => assert.notCalled(htmlAnchoring.anchor));
+        .then(() => assert.notCalled(fakeHTMLIntegration.anchor));
     });
 
     it('syncs annotations to the sidebar', () => {
@@ -860,7 +860,7 @@ describe('Guest', () => {
     it('returns a promise of the anchors for the annotation', () => {
       const guest = createGuest();
       const highlights = [document.createElement('span')];
-      htmlAnchoring.anchor.returns(Promise.resolve(range));
+      fakeHTMLIntegration.anchor.returns(Promise.resolve(range));
       highlighter.highlightRange.returns(highlights);
       const target = {
         selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
@@ -873,7 +873,7 @@ describe('Guest', () => {
     it('adds the anchor to the "anchors" instance property"', () => {
       const guest = createGuest();
       const highlights = [document.createElement('span')];
-      htmlAnchoring.anchor.returns(Promise.resolve(range));
+      fakeHTMLIntegration.anchor.returns(Promise.resolve(range));
       highlighter.highlightRange.returns(highlights);
       const target = {
         selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
@@ -908,11 +908,11 @@ describe('Guest', () => {
       const annotation = {
         target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
       };
-      htmlAnchoring.anchor.returns(Promise.resolve(range));
+      fakeHTMLIntegration.anchor.returns(Promise.resolve(range));
       return guest.anchor(annotation).then(() =>
         guest.anchor(annotation).then(() => {
           assert.equal(guest.anchors.length, 1);
-          assert.calledOnce(htmlAnchoring.anchor);
+          assert.calledOnce(fakeHTMLIntegration.anchor);
         })
       );
     });
@@ -983,9 +983,12 @@ describe('Guest', () => {
   });
 
   describe('#contentContainer', () => {
-    it('returns root element in HTML document', () => {
+    it('returns root HTML element in HTML document', () => {
       const guest = createGuest();
-      assert.equal(guest.contentContainer(), guest.element);
+      assert.equal(
+        guest.contentContainer(),
+        fakeHTMLIntegration.contentContainer()
+      );
     });
 
     it('returns PDF viewer content container in PDF documents', () => {
@@ -998,33 +1001,34 @@ describe('Guest', () => {
   });
 
   describe('#fitSideBySide', () => {
-    it('does nothing in HTML documents', () => {
-      const guest = createGuest();
-      guest.fitSideBySide({ expanded: true, width: 100 });
-      assert.isTrue(guest.closeSidebarOnDocumentClick);
-    });
+    ['html', 'pdf'].forEach(documentType => {
+      const getIntegration = () =>
+        documentType === 'html' ? fakeHTMLIntegration : fakePDFIntegration;
 
-    it('attempts to fit content alongside sidebar in PDF documents', () => {
-      const guest = createGuest({ documentType: 'pdf' });
-      fakePDFIntegration.fitSideBySide.returns(false);
-      const layout = { expanded: true, width: 100 };
+      context(`in a ${documentType} document`, () => {
+        it('attempts to fit content alongside sidebar', () => {
+          const guest = createGuest({ documentType });
+          getIntegration().fitSideBySide.returns(false);
+          const layout = { expanded: true, width: 100 };
 
-      guest.fitSideBySide(layout);
+          guest.fitSideBySide(layout);
 
-      assert.calledWith(fakePDFIntegration.fitSideBySide, layout);
-    });
+          assert.calledWith(getIntegration().fitSideBySide, layout);
+        });
 
-    it('enables closing sidebar on document click if side-by-side is not activated', () => {
-      const guest = createGuest({ documentType: 'pdf' });
-      fakePDFIntegration.fitSideBySide.returns(false);
-      const layout = { expanded: true, width: 100 };
+        it('enables closing sidebar on document click if side-by-side is not activated', () => {
+          const guest = createGuest({ documentType });
+          getIntegration().fitSideBySide.returns(false);
+          const layout = { expanded: true, width: 100 };
 
-      guest.fitSideBySide(layout);
-      assert.isTrue(guest.closeSidebarOnDocumentClick);
+          guest.fitSideBySide(layout);
+          assert.isTrue(guest.closeSidebarOnDocumentClick);
 
-      fakePDFIntegration.fitSideBySide.returns(true);
-      guest.fitSideBySide(layout);
-      assert.isFalse(guest.closeSidebarOnDocumentClick);
+          getIntegration().fitSideBySide.returns(true);
+          guest.fitSideBySide(layout);
+          assert.isFalse(guest.closeSidebarOnDocumentClick);
+        });
+      });
     });
   });
 });
