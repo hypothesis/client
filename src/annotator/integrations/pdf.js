@@ -1,7 +1,7 @@
 import debounce from 'lodash.debounce';
 import { render } from 'preact';
 
-import * as pdfAnchoring from '../anchoring/pdf';
+import { anchor, describe, documentHasText } from '../anchoring/pdf';
 import WarningBanner from '../components/WarningBanner';
 import RenderingStates from '../pdfjs-rendering-states';
 import { createShadowRoot } from '../util/shadow-root';
@@ -13,6 +13,7 @@ import { PDFMetadata } from './pdf-metadata';
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
+ * @typedef {import('../../types/api').Selector} Selector
  * @typedef {import('../sidebar').LayoutState} LayoutState
  */
 
@@ -27,7 +28,6 @@ export class PDFIntegration {
    */
   constructor(annotator) {
     this.annotator = annotator;
-    annotator.anchoring = pdfAnchoring;
 
     const window_ = /** @type {HypothesisWindow} */ (window);
     this.pdfViewer = window_.PDFViewerApplication.pdfViewer;
@@ -89,12 +89,44 @@ export class PDFIntegration {
     this._destroyed = true;
   }
 
+  /**
+   * Return the URL of the currently loaded PDF document.
+   */
   uri() {
     return this.pdfMetadata.getUri();
   }
 
+  /**
+   * Return the metadata (eg. title) for the currently loaded PDF document.
+   */
   getMetadata() {
     return this.pdfMetadata.getMetadata();
+  }
+
+  /**
+   * Resolve serialized `selectors` from an annotation to a range.
+   *
+   * @param {HTMLElement} root
+   * @param {Selector[]} selectors
+   * @return {Promise<Range>}
+   */
+  anchor(root, selectors) {
+    // nb. The `root` argument is not really used by `anchor`. It existed for
+    // consistency between HTML and PDF anchoring and could be removed.
+    return anchor(root, selectors);
+  }
+
+  /**
+   * Generate selectors for the text in `range`.
+   *
+   * @param {HTMLElement} root
+   * @param {Range} range
+   * @return {Promise<Selector[]>}
+   */
+  describe(root, range) {
+    // nb. The `root` argument is not really used by `anchor`. It existed for
+    // consistency between HTML and PDF anchoring and could be removed.
+    return describe(root, range);
   }
 
   /**
@@ -115,7 +147,7 @@ export class PDFIntegration {
     }
 
     try {
-      const hasText = await pdfAnchoring.documentHasText();
+      const hasText = await documentHasText();
       this._showNoSelectableTextWarning(!hasText);
     } catch (err) {
       /* istanbul ignore next */

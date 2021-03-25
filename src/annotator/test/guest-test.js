@@ -85,7 +85,7 @@ describe('Guest', () => {
 
     fakeDocumentMeta = {
       destroy: sinon.stub(),
-      metadata: { title: 'Test title' },
+      getDocumentMetadata: sinon.stub().returns({ title: 'Test title' }),
       uri: sinon.stub().returns('https://example.com/test.html'),
     };
     DocumentMeta = sandbox.stub().returns(fakeDocumentMeta);
@@ -377,7 +377,7 @@ describe('Guest', () => {
             'getDocumentInfo',
             createCallback(
               fakeDocumentMeta.uri(),
-              fakeDocumentMeta.metadata,
+              fakeDocumentMeta.getDocumentMetadata(),
               done
             )
           );
@@ -636,7 +636,10 @@ describe('Guest', () => {
       const annotation = await guest.createAnnotation();
 
       assert.equal(annotation.uri, fakeDocumentMeta.uri());
-      assert.deepEqual(annotation.document, fakeDocumentMeta.metadata);
+      assert.deepEqual(
+        annotation.document,
+        fakeDocumentMeta.getDocumentMetadata()
+      );
     });
 
     it('adds selectors for selected ranges to the annotation', async () => {

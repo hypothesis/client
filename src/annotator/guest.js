@@ -111,9 +111,8 @@ export default class Guest {
    * @param {EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
-   * @param {typeof htmlAnchoring} [anchoring] - Anchoring implementation
    */
-  constructor(element, eventBus, config = {}, anchoring = htmlAnchoring) {
+  constructor(element, eventBus, config = {}) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
     this.visibleHighlights = false;
@@ -146,16 +145,19 @@ export default class Guest {
 
     // Setup the document type-specific integration consisting of metadata extraction,
     // anchoring module and logic to respond to activity (eg. scrolling) in the page.
-    //
-    // In future the plan is to put these behind a common interface so that the
-    // `Guest` class doesn't need different code paths depending on the document type.
-
-    // nb. The `anchoring` field defaults to HTML anchoring and in PDFs is replaced
-    // by `PDFIntegration` below.
-    this.anchoring = anchoring;
-    this.documentMeta = new DocumentMeta();
     if (config.documentType === 'pdf') {
-      this.pdfIntegration = new PDFIntegration(this);
+      this.integration = new PDFIntegration(this);
+    } else {
+      const documentMeta = new DocumentMeta();
+      this.integration = {
+        anchor: htmlAnchoring.anchor,
+        contentContainer: () => this.element,
+        describe: htmlAnchoring.describe,
+        destroy: () => {},
+        fitSideBySide: () => false,
+        getMetadata: () => Promise.resolve(documentMeta.getDocumentMetadata()),
+        uri: () => Promise.resolve(documentMeta.uri()),
+      };
     }
 
     // Set the frame identifier if it's available.
@@ -241,21 +243,10 @@ export default class Guest {
    * Retrieve metadata for the current document.
    */
   getDocumentInfo() {
-    let metadataPromise;
-    let uriPromise;
-
-    if (this.pdfIntegration) {
-      metadataPromise = this.pdfIntegration.getMetadata();
-      uriPromise = this.pdfIntegration.uri();
-    } else {
-      uriPromise = Promise.resolve(this.documentMeta.uri());
-      metadataPromise = Promise.resolve(this.documentMeta.metadata);
-    }
-
-    uriPromise = uriPromise.catch(() =>
-      decodeURIComponent(window.location.href)
-    );
-    metadataPromise = metadataPromise.catch(() => ({
+    const uriPromise = this.integration
+      .uri()
+      .catch(() => decodeURIComponent(window.location.href));
+    const metadataPromise = this.integration.getMetadata().catch(() => ({
       title: document.title,
       link: [{ href: decodeURIComponent(window.location.href) }],
     }));
@@ -338,7 +329,7 @@ export default class Guest {
 
     removeAllHighlights(this.element);
 
-    this.pdfIntegration?.destroy();
+    this.integration.destroy();
     this._emitter.destroy();
     this.crossframe.destroy();
   }
@@ -394,7 +385,7 @@ export default class Guest {
       }
 
       // Find a target using the anchoring module.
-      return this.anchoring
+      return this.integration
         .anchor(root, target.selector)
         .then(range => ({
           annotation,
@@ -541,7 +532,7 @@ export default class Guest {
     const info = await this.getDocumentInfo();
     const root = this.element;
     const rangeSelectors = await Promise.all(
-      ranges.map(range => this.anchoring.describe(root, range))
+      ranges.map(range => this.integration.describe(root, range))
     );
     const target = rangeSelectors.map(selectors => ({
       source: info.uri,
@@ -677,11 +668,7 @@ export default class Guest {
    * @return {HTMLElement}
    */
   contentContainer() {
-    if (this.pdfIntegration) {
-      return this.pdfIntegration.contentContainer();
-    } else {
-      return this.element;
-    }
+    return this.integration.contentContainer();
   }
 
   /**
@@ -690,11 +677,7 @@ export default class Guest {
    * @param {LayoutState} sidebarLayout
    */
   fitSideBySide(sidebarLayout) {
-    if (!this.pdfIntegration) {
-      // Side-by-side mode is not yet implemented for HTML documents.
-      return;
-    }
-    const active = this.pdfIntegration.fitSideBySide(sidebarLayout);
+    const active = this.integration.fitSideBySide(sidebarLayout);
     this.closeSidebarOnDocumentClick = !active;
   }
 }
