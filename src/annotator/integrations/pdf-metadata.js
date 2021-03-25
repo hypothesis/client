@@ -59,7 +59,7 @@ function pdfViewerInitialized(app) {
  *    // Do something with the URL of the PDF.
  * })
  */
-export default class PDFMetadata {
+export class PDFMetadata {
   /**
    * Construct a `PDFMetadata` that returns URIs/metadata associated with a
    * given PDF viewer.

@@ -1,9 +1,9 @@
 import scrollIntoView from 'scroll-into-view';
 
 import { Adder } from './adder';
+import { PDFIntegration } from './integrations/pdf';
 import CrossFrame from './plugin/cross-frame';
 import DocumentMeta from './plugin/document';
-import PDFIntegration from './plugin/pdf';
 
 import * as htmlAnchoring from './anchoring/html';
 import { TextRange } from './anchoring/text-range';

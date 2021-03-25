@@ -1,6 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
-import PDFMetadata from '../pdf-metadata';
+import { PDFMetadata } from '../pdf-metadata';
 
 /**
  * Fake implementation of PDF.js `window.PDFViewerApplication.metadata`.
@@ -126,7 +126,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-describe('annotator/plugin/pdf-metadata', function () {
+describe('PDFMetadata', function () {
   [
     {
       // PDF.js < 1.6.210: `documentload` event dispatched via DOM.

@@ -7,7 +7,7 @@ import RenderingStates from '../pdfjs-rendering-states';
 import { createShadowRoot } from '../util/shadow-root';
 import { ListenerCollection } from '../util/listener-collection';
 
-import PDFMetadata from './pdf-metadata';
+import { PDFMetadata } from './pdf-metadata';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -21,7 +21,7 @@ import PDFMetadata from './pdf-metadata';
 // is enough room. Otherwise, allow sidebar to overlap PDF
 const MIN_PDF_WIDTH = 680;
 
-export default class PDF {
+export class PDFIntegration {
   /**
    * @param {Annotator} annotator
    */
