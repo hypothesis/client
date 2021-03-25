@@ -1,4 +1,4 @@
-import PDF, { $imports } from '../pdf';
+import { PDFIntegration, $imports } from '../pdf';
 
 import FakePDFViewerApplication from '../../anchoring/test/fake-pdf-viewer-application';
 
@@ -14,7 +14,7 @@ function awaitEvent(target, eventName) {
   });
 }
 
-describe('annotator/plugin/pdf', () => {
+describe('PDFIntegration', () => {
   // Fake for the top-level `#outerContainer` DOM element created by PDF.js.
   let outerContainer;
   // Fake for the `#viewerContainer` DOM element created by PDF.js that contains
@@ -25,10 +25,10 @@ describe('annotator/plugin/pdf', () => {
   let fakePdfAnchoring;
   let fakePDFMetadata;
   let fakePDFViewerApplication;
-  let pdfPlugin;
+  let pdfIntegration;
 
-  function createPDFPlugin() {
-    return new PDF(fakeAnnotator);
+  function createPDFIntegration() {
+    return new PDFIntegration(fakeAnnotator);
   }
 
   beforeEach(() => {
@@ -63,7 +63,7 @@ describe('annotator/plugin/pdf', () => {
     };
 
     $imports.$mock({
-      './pdf-metadata': sinon.stub().returns(fakePDFMetadata),
+      './pdf-metadata': { PDFMetadata: sinon.stub().returns(fakePDFMetadata) },
       '../anchoring/pdf': fakePdfAnchoring,
 
       // Disable debouncing of updates.
@@ -72,7 +72,7 @@ describe('annotator/plugin/pdf', () => {
   });
 
   afterEach(() => {
-    pdfPlugin?.destroy();
+    pdfIntegration?.destroy();
     delete window.PDFViewerApplication;
     outerContainer.remove();
     $imports.$restore();
@@ -86,7 +86,7 @@ describe('annotator/plugin/pdf', () => {
 
   describe('#constructor', () => {
     it('adds CSS classes to override PDF.js styles', () => {
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
       assert.isTrue(pdfViewerHasClass('has-transparent-text-layer'));
     });
   });
@@ -100,7 +100,7 @@ describe('annotator/plugin/pdf', () => {
     if (!selection.isCollapsed) {
       selection.collapseToStart();
     }
-    pdfPlugin = createPDFPlugin();
+    pdfIntegration = createPDFIntegration();
     assert.isFalse(pdfViewerHasClass('is-selecting'));
 
     // Make the selection non-empty.
@@ -121,10 +121,10 @@ describe('annotator/plugin/pdf', () => {
 
   describe('#destroy', () => {
     it('removes CSS classes to override PDF.js styles', () => {
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
 
-      pdfPlugin.destroy();
-      pdfPlugin = null;
+      pdfIntegration.destroy();
+      pdfIntegration = null;
 
       assert.isFalse(
         fakePDFViewerApplication.pdfViewer.viewer.classList.contains(
@@ -141,7 +141,7 @@ describe('annotator/plugin/pdf', () => {
   it('does not show a warning when PDF has selectable text', async () => {
     fakePdfAnchoring.documentHasText.resolves(true);
 
-    pdfPlugin = createPDFPlugin();
+    pdfIntegration = createPDFIntegration();
     await delay(0); // Wait for text check to complete.
 
     assert.called(fakePdfAnchoring.documentHasText);
@@ -151,7 +151,7 @@ describe('annotator/plugin/pdf', () => {
   it('does not show a warning if PDF does not load', async () => {
     fakePDFMetadata.getUri.rejects(new Error('Something went wrong'));
 
-    pdfPlugin = createPDFPlugin();
+    pdfIntegration = createPDFIntegration();
     await delay(0); // Wait for text check to complete.
 
     assert.notCalled(fakePdfAnchoring.documentHasText);
@@ -161,7 +161,7 @@ describe('annotator/plugin/pdf', () => {
   it('shows a warning when PDF has no selectable text', async () => {
     fakePdfAnchoring.documentHasText.resolves(false);
 
-    pdfPlugin = createPDFPlugin();
+    pdfIntegration = createPDFIntegration();
     await delay(0); // Wait for text check to complete.
 
     assert.called(fakePdfAnchoring.documentHasText);
@@ -194,7 +194,7 @@ describe('annotator/plugin/pdf', () => {
 
     it('re-anchors annotations whose highlights are no longer in the page', async () => {
       const anchor = createAnchor();
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
 
       await triggerUpdate();
 
@@ -205,7 +205,7 @@ describe('annotator/plugin/pdf', () => {
 
     it('does not re-anchor annotations whose highlights are still in the page', async () => {
       const anchor = createAnchor();
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
 
       document.body.appendChild(anchor.highlights[0]);
       await triggerUpdate();
@@ -227,9 +227,9 @@ describe('annotator/plugin/pdf', () => {
       container.id = 'viewerContainer';
       document.body.appendChild(container);
 
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
 
-      assert.equal(pdfPlugin.contentContainer(), container);
+      assert.equal(pdfIntegration.contentContainer(), container);
     });
   });
 
@@ -245,9 +245,9 @@ describe('annotator/plugin/pdf', () => {
 
     it('resizes and activates side-by-side mode when sidebar expanded', () => {
       sandbox.stub(window, 'innerWidth').value(1350);
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
 
-      const active = pdfPlugin.fitSideBySide({
+      const active = pdfIntegration.fitSideBySide({
         expanded: true,
         width: 428,
         height: 728,
@@ -269,9 +269,9 @@ describe('annotator/plugin/pdf', () => {
       it('activates side-by-side mode for each relative zoom mode', () => {
         fakePDFViewerApplication.pdfViewer.currentScaleValue = zoomMode;
         sandbox.stub(window, 'innerWidth').value(1350);
-        pdfPlugin = createPDFPlugin();
+        pdfIntegration = createPDFIntegration();
 
-        const active = pdfPlugin.fitSideBySide({
+        const active = pdfIntegration.fitSideBySide({
           expanded: true,
           width: 428,
           height: 728,
@@ -285,9 +285,9 @@ describe('annotator/plugin/pdf', () => {
 
     it('deactivates side-by-side mode when sidebar collapsed', () => {
       sandbox.stub(window, 'innerWidth').value(1350);
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
 
-      const active = pdfPlugin.fitSideBySide({
+      const active = pdfIntegration.fitSideBySide({
         expanded: false,
         width: 428,
         height: 728,
@@ -299,9 +299,9 @@ describe('annotator/plugin/pdf', () => {
 
     it('does not activate side-by-side mode if there is not enough room', () => {
       sandbox.stub(window, 'innerWidth').value(800);
-      pdfPlugin = createPDFPlugin();
+      pdfIntegration = createPDFIntegration();
 
-      const active = pdfPlugin.fitSideBySide({
+      const active = pdfIntegration.fitSideBySide({
         expanded: true,
         width: 428,
         height: 728,

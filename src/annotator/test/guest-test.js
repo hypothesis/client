@@ -114,11 +114,11 @@ describe('Guest', () => {
       './anchoring/text-range': {
         TextRange: FakeTextRange,
       },
+      './integrations/pdf': { PDFIntegration: PdfIntegration },
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './plugin/cross-frame': CrossFrame,
       './plugin/document': DocumentMeta,
-      './plugin/pdf': PdfIntegration,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
