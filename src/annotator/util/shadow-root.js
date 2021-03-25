@@ -62,6 +62,7 @@ export function createShadowRoot(container) {
  * @param {HTMLElement|ShadowRoot} element
  */
 function stopEventPropagation(element) {
-  element.addEventListener('click', event => event.stopPropagation());
+  element.addEventListener('mouseup', event => event.stopPropagation());
+  element.addEventListener('mousedown', event => event.stopPropagation());
   element.addEventListener('touchstart', event => event.stopPropagation());
 }
