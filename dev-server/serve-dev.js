@@ -101,11 +101,16 @@ function serveDev(port, config) {
     }
   });
 
-  // Serve PDF documents with PDFJS viewer and client script
-  app.get('/pdf/:pdf', (req, res, next) => {
+  // Serve PDF documents with PDFJS viewer and client script.
+  //
+  // The optional suffix allows the same PDF to be accessed at different URLs.
+  // This is helpful for testing that annotations/real-time updates etc. work
+  // based on the document fingerprint as well as the URL.
+  app.get('/pdf/:pdf/:suffix?', (req, res, next) => {
     if (fs.existsSync(`${PDF_PATH}${req.params.pdf}.pdf`)) {
       const relativeSourceUrl = `/pdf-source/${req.params.pdf}.pdf`;
-      const fullUrl = `${req.protocol}://${req.hostname}:${port}${req.originalUrl}`;
+      const suffix = req.params.suffix ? `?suffix=${req.params.suffix}` : '';
+      const fullUrl = `${req.protocol}://${req.hostname}:${port}${req.originalUrl}${suffix}`;
       const context = templateContext(config);
 
       res.render('pdfjs-viewer', {
