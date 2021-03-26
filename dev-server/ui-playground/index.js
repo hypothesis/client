@@ -7,4 +7,4 @@ import sidebarIcons from '../../src/sidebar/icons';
 registerIcons(sidebarIcons);
 
 const container = document.querySelector('#app');
-render(<PlaygroundApp />, container);
+render(<PlaygroundApp />, /** @type Element */ (container));

@@ -127,7 +127,7 @@
     "checkformatting": "prettier --check '**/*.{js,scss}'",
     "format": "prettier --list-different --write '**/*.{js,scss}'",
     "test": "gulp test",
-    "typecheck": "tsc --build src/tsconfig.json",
+    "typecheck": "tsc --build tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build"
   }

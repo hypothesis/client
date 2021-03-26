@@ -91,7 +91,7 @@ export function PatternExamples({ children, title }) {
     <table className="PatternExamples">
       {title && (
         <tr>
-          <th colSpan="3">
+          <th colSpan={3}>
             <h3>{title}</h3>
           </th>
         </tr>

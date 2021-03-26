@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "lib": ["es2018", "dom"],
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "module": "commonjs",
+    "noEmit": true,
+    "strict": true,
+    "noImplicitAny": false,
+    "target": "ES2020"
+  },
+  "include": ["ui-playground/**/*.js"]
+}

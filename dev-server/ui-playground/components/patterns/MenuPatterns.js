@@ -15,7 +15,7 @@ export default function MenuPatterns() {
         <p>A simple Menu usage example</p>
         <PatternExamples>
           <PatternExample details="Menu">
-            <Menu label="Edit">
+            <Menu title="Example Menu" label="Edit">
               <MenuItem label="Zoom in" />
               <MenuItem label="Zoom out" />
               <MenuItem label="Undo" />
