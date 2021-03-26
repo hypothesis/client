@@ -44,8 +44,8 @@ describe('Guest', () => {
   let DocumentMeta;
   let fakeDocumentMeta;
 
-  let PdfIntegration;
-  let fakePdfIntegration;
+  let PDFIntegration;
+  let fakePDFIntegration;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -90,7 +90,7 @@ describe('Guest', () => {
     };
     DocumentMeta = sandbox.stub().returns(fakeDocumentMeta);
 
-    fakePdfIntegration = {
+    fakePDFIntegration = {
       contentContainer: sinon.stub().returns({}),
       destroy: sinon.stub(),
       fitSideBySide: sinon.stub().returns(false),
@@ -99,7 +99,7 @@ describe('Guest', () => {
         .resolves({ documentFingerprint: 'test-fingerprint' }),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     };
-    PdfIntegration = sinon.stub().returns(fakePdfIntegration);
+    PDFIntegration = sinon.stub().returns(fakePDFIntegration);
 
     class FakeSelectionObserver {
       constructor(callback) {
@@ -114,7 +114,7 @@ describe('Guest', () => {
       './anchoring/text-range': {
         TextRange: FakeTextRange,
       },
-      './integrations/pdf': { PDFIntegration: PdfIntegration },
+      './integrations/pdf': { PDFIntegration },
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './plugin/cross-frame': CrossFrame,
@@ -389,7 +389,7 @@ describe('Guest', () => {
           guest = createGuest({ documentType: 'pdf' });
           const metadata = { title: 'hi' };
 
-          fakePdfIntegration.getMetadata.resolves(metadata);
+          fakePDFIntegration.getMetadata.resolves(metadata);
 
           emitGuestEvent(
             'getDocumentInfo',
@@ -400,8 +400,8 @@ describe('Guest', () => {
         it('calls the callback with fallback URL if PDF URL cannot be determined', done => {
           guest = createGuest({ documentType: 'pdf' });
 
-          fakePdfIntegration.getMetadata.resolves({});
-          fakePdfIntegration.uri.rejects(new Error('Not a PDF document'));
+          fakePDFIntegration.getMetadata.resolves({});
+          fakePDFIntegration.uri.rejects(new Error('Not a PDF document'));
 
           emitGuestEvent(
             'getDocumentInfo',
@@ -416,7 +416,7 @@ describe('Guest', () => {
             link: [{ href: window.location.href }],
           };
 
-          fakePdfIntegration.getMetadata.rejects(
+          fakePDFIntegration.getMetadata.rejects(
             new Error('Not a PDF document')
           );
 
@@ -969,7 +969,7 @@ describe('Guest', () => {
     it('cleans up PDF integration', () => {
       const guest = createGuest({ documentType: 'pdf' });
       guest.destroy();
-      assert.calledOnce(fakePdfIntegration.destroy);
+      assert.calledOnce(fakePDFIntegration.destroy);
     });
 
     it('removes all highlights', () => {
@@ -989,7 +989,7 @@ describe('Guest', () => {
       const guest = createGuest({ documentType: 'pdf' });
       assert.equal(
         guest.contentContainer(),
-        fakePdfIntegration.contentContainer()
+        fakePDFIntegration.contentContainer()
       );
     });
   });
@@ -1003,23 +1003,23 @@ describe('Guest', () => {
 
     it('attempts to fit content alongside sidebar in PDF documents', () => {
       const guest = createGuest({ documentType: 'pdf' });
-      fakePdfIntegration.fitSideBySide.returns(false);
+      fakePDFIntegration.fitSideBySide.returns(false);
       const layout = { expanded: true, width: 100 };
 
       guest.fitSideBySide(layout);
 
-      assert.calledWith(fakePdfIntegration.fitSideBySide, layout);
+      assert.calledWith(fakePDFIntegration.fitSideBySide, layout);
     });
 
     it('enables closing sidebar on document click if side-by-side is not activated', () => {
       const guest = createGuest({ documentType: 'pdf' });
-      fakePdfIntegration.fitSideBySide.returns(false);
+      fakePDFIntegration.fitSideBySide.returns(false);
       const layout = { expanded: true, width: 100 };
 
       guest.fitSideBySide(layout);
       assert.isTrue(guest.closeSidebarOnDocumentClick);
 
-      fakePdfIntegration.fitSideBySide.returns(true);
+      fakePDFIntegration.fitSideBySide.returns(true);
       guest.fitSideBySide(layout);
       assert.isFalse(guest.closeSidebarOnDocumentClick);
     });
