@@ -22,8 +22,9 @@ import { normalizeURI } from './util/url';
  * @typedef {import('./util/emitter').EventBus} EventBus
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Anchor} Anchor
+ * @typedef {import('../types/annotator').Integration} Integration
+ * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
- * @typedef {import('./sidebar').LayoutState} LayoutState
  */
 
 /**
@@ -142,13 +143,11 @@ export default class Guest {
     /** @type {Anchor[]} */
     this.anchors = [];
 
-    // Setup the document type-specific integration consisting of metadata extraction,
-    // anchoring module and logic to respond to activity (eg. scrolling) in the page.
-    if (config.documentType === 'pdf') {
-      this.integration = new PDFIntegration(this);
-    } else {
-      this.integration = new HTMLIntegration(this.element);
-    }
+    /** @type {Integration} */
+    this.integration =
+      config.documentType === 'pdf'
+        ? new PDFIntegration(this)
+        : new HTMLIntegration(this.element);
 
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
@@ -664,7 +663,7 @@ export default class Guest {
   /**
    * Attempt to fit the document content alongside the sidebar.
    *
-   * @param {LayoutState} sidebarLayout
+   * @param {SidebarLayout} sidebarLayout
    */
   fitSideBySide(sidebarLayout) {
     const active = this.integration.fitSideBySide(sidebarLayout);
