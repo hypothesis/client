@@ -83,11 +83,11 @@
   font-weight: 700;
   white-space: nowrap; // Keep multi-word button labels from wrapping
 
-  @if map.get($options, 'withLayout') {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
+  @if map.get($options, 'withLayout') {
     &--icon-left svg {
       margin-right: map.get($options, 'margin');
     }
