@@ -1,0 +1,137 @@
+@use "sass:map";
+
+@use "@hypothesis/frontend-shared/styles/mixins/focus";
+
+@use './_config' as *;
+
+// Reset browser native styles. This can be used in conjunction with other
+// styles via `base` or standalone for starting a custom button's styles
+// from relative scratch
+@mixin reset {
+  @include focus.outline-on-keyboard-focus;
+  // Reset native styles
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border-style: none;
+}
+
+// Set colors for a button
+@mixin _colors($colormap) {
+  color: map.get($colormap, 'foreground');
+  background-color: map.get($colormap, 'background');
+
+  &:disabled {
+    color: map.get($colormap, 'disabled-foreground');
+  }
+}
+
+// Set hover colors and transition for a button
+@mixin hover-state($colormap) {
+  &:hover:not([disabled]),
+  &:focus:not([disabled]) {
+    color: map.get($colormap, 'hover-foreground');
+    background-color: map.get($colormap, 'hover-background');
+    @content;
+  }
+  transition: color 0.2s ease-out, background-color 0.2s ease-out,
+    opacity 0.2s ease-out;
+}
+
+// Set active state colors for a button
+@mixin active-state($colormap) {
+  &[aria-expanded='true'],
+  &[aria-pressed='true'] {
+    color: map.get($colormap, 'active-foreground');
+    background-color: map.get($colormap, 'active-background');
+    @content;
+
+    &:hover:not([disabled]),
+    &:focus:not([disabled]) {
+      color: map.get($colormap, 'active-foreground');
+      background-color: map.get($colormap, 'active-background');
+      @content;
+    }
+  }
+}
+
+// Variant mixin: may be be used by variants (BEM modifier classes)
+@mixin _variant($options) {
+  @include _colors(map.get($options, 'colormap'));
+  @if map.get($options, 'withStates') {
+    @include active-state(map.get($options, 'colormap'));
+    @include hover-state(map.get($options, 'colormap'));
+  }
+  @content;
+}
+
+// Base mixin for buttons.
+@mixin _button($options) {
+  @include reset;
+  @include _colors(map.get($options, 'colormap'));
+
+  @if map.get($options, 'withStates') {
+    @include active-state(map.get($options, 'colormap'));
+    @include hover-state(map.get($options, 'colormap'));
+  }
+
+  border-radius: map.get($options, 'border-radius');
+  border: none;
+  padding: 0.5em;
+
+  font-size: 1em;
+  font-weight: 700;
+  white-space: nowrap; // Keep multi-word button labels from wrapping
+
+  @if map.get($options, 'withLayout') {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &--icon-left svg {
+      margin-right: map.get($options, 'margin');
+    }
+
+    &--icon-right svg {
+      margin-left: map.get($options, 'margin');
+    }
+  }
+
+  // (icon) SVG sizing is relevant
+  svg {
+    width: 1.25em;
+    height: 1.25em;
+  }
+}
+
+// Base mixin for <button> elements. Start here for new <button> classes
+@mixin Button($options: ()) {
+  $defaultOptions: (
+    // What colors should be used for this button's styling?
+    'colormap': $colors,
+    // Should styling be added for "active" and "hover" states for this <button>?
+    'withStates': true,
+    // Should styling be added to support the layout of multiple sub-elements
+    // of this <button>? Not needed if <button> contains only one child.
+    'withLayout': false,
+    // Internal margin around SVG icon
+    'margin': 0.5em,
+    'border-radius': 2px
+  );
+  $-options: map.merge($defaultOptions, $options);
+  @include _button($options: $-options);
+  @content;
+}
+
+// Mixin for --modifier variants on buttons, e.g. `.MyButton--primary`
+@mixin Button--variant($options: ()) {
+  $defaultOptions: (
+    // Colors to use when styling this variant
+    'colormap': $colors,
+    // Should this variant have styling for "active" and "hover" states?
+    'withStates': true
+  );
+  $-options: map.merge($defaultOptions, $options);
+  @include _variant($options: $-options);
+  @content;
+}
