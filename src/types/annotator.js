@@ -73,6 +73,36 @@
  */
 
 /**
+ * @typedef SidebarLayout
+ * @prop {boolean} expanded
+ * @prop {number} width
+ */
+
+/**
+ * Interface for document type/viewer integrations that handle all the details
+ * of supporting a specific document type (web page, PDF, ebook etc.).
+ *
+ * @typedef Integration
+ * @prop {(root: HTMLElement, selectors: Selector[]) => Promise<Range>} anchor -
+ *   Attempt to resolve a set of serialized selectors to the corresponding content in the
+ *   current document.
+ * @prop {(root: HTMLElement, range: Range) => Selector[]|Promise<Selector[]>} describe -
+ *   Generate a list of serializable selectors which represent the content in
+ *   `range`.
+ * @prop {() => HTMLElement} contentContainer -
+ *   Return the main element that contains the document content. This is used
+ *   by controls such as the bucket bar to know when the content might have scrolled.
+ * @prop {() => void} destroy -
+ *   Clean up the integration and remove any event listeners, caches etc.
+ * @prop {(layout: SidebarLayout) => boolean} fitSideBySide -
+ *   Attempt to resize the content so that it is visible alongside the sidebar.
+ *   Returns `true` if the sidebar and content are displayed side-by-side or
+ *   false otherwise.
+ * @prop {() => Promise<object>} getMetadata
+ * @prop {() => Promise<string>} uri - Return the URL of the currently loaded document
+ */
+
+/**
  * @typedef DocumentMetadata
  * @prop {string} title
  * @prop {Object[]} link

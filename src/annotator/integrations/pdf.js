@@ -13,8 +13,9 @@ import { PDFMetadata } from './pdf-metadata';
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
+ * @typedef {import('../../types/annotator').Integration} Integration
+ * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../../types/api').Selector} Selector
- * @typedef {import('../sidebar').LayoutState} LayoutState
  */
 
 // The viewport and controls for PDF.js start breaking down below about 670px
@@ -22,6 +23,11 @@ import { PDFMetadata } from './pdf-metadata';
 // is enough room. Otherwise, allow sidebar to overlap PDF
 const MIN_PDF_WIDTH = 680;
 
+/**
+ * Integration that works with PDF.js
+ *
+ * @implements {Integration}
+ */
 export class PDFIntegration {
   /**
    * @param {Annotator} annotator
@@ -274,7 +280,7 @@ export class PDFIntegration {
    * for the sidebar, and prompt PDF.js to re-render the PDF pages to scale
    * within that resized container.
    *
-   * @param {LayoutState} sidebarLayout
+   * @param {SidebarLayout} sidebarLayout
    * @return {boolean} - True if side-by-side mode was activated
    */
   fitSideBySide(sidebarLayout) {
