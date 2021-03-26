@@ -3,6 +3,7 @@
 @use '../mixins/layout';
 @use '../variables' as var;
 
+@use '../shared';
 @use '../sidebar/components/Menu';
 @use '../sidebar/components/MenuItem';
 
