@@ -54,7 +54,7 @@ export default function PlaygroundApp() {
               <a
                 className="PlaygroundApp__nav-link"
                 key={c.route}
-                href={c.route}
+                href={/** @type string */ (c.route)}
                 onClick={e => navigate(e, c.route)}
               >
                 {c.title}
