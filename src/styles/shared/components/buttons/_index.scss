@@ -1,0 +1,63 @@
+@use "sass:map";
+
+@use "../../variables" as var;
+
+@use './_config' as *; // Bring variables into scope
+@use './mixins';
+
+// A button with only an icon and no label/text
+.IconButton {
+  @include mixins.Button(
+    $options: (
+      'colormap': $IconButton-colors,
+    )
+  ) {
+    @media (pointer: coarse) {
+      min-width: $touch-target-size;
+      min-height: $touch-target-size;
+    }
+  }
+  &--primary {
+    @include mixins.Button--variant(
+      $options: (
+        'colormap': $IconButton-colors--primary,
+      )
+    );
+  }
+}
+
+// A button with text, and optionally an icon
+.LabeledButton {
+  @include mixins.Button(
+    $options: (
+      'colormap': $LabeledButton-colors,
+      'withLayout': true,
+    )
+  );
+  &--primary {
+    @include mixins.Button--variant(
+      $options: (
+        'colormap': $LabeledButton-colors--primary,
+      )
+    );
+  }
+}
+
+// A button styled to appear as a link, with underline on hover
+.LinkButton {
+  @include mixins.Button(
+    $options: (
+      'colormap': $LinkButton-colors,
+      'withStates': false,
+    )
+  ) {
+    // Override base font-weight
+    font-weight: 400;
+  }
+  // No active states, but we do want a hover state
+  @include mixins.hover-state($LinkButton-colors) {
+    text-decoration: underline;
+  }
+  // Remove horizontal padding to allow button to appear flush-left or -right
+  padding: 0.5em 0;
+}
