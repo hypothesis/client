@@ -1,5 +1,4 @@
-import CrossFrame from '../cross-frame';
-import { $imports } from '../cross-frame';
+import { CrossFrame, $imports } from '../cross-frame';
 
 describe('CrossFrame', () => {
   let fakeDiscovery;
@@ -41,9 +40,9 @@ describe('CrossFrame', () => {
     proxyBridge = sinon.stub().returns(fakeBridge);
 
     $imports.$mock({
-      '../annotation-sync': proxyAnnotationSync,
-      '../../shared/bridge': proxyBridge,
-      '../../shared/discovery': proxyDiscovery,
+      './annotation-sync': proxyAnnotationSync,
+      '../shared/bridge': proxyBridge,
+      '../shared/discovery': proxyDiscovery,
     });
   });
 

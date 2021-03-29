@@ -116,7 +116,7 @@ describe('Guest', () => {
       './integrations/pdf': { PDFIntegration },
       './highlighter': highlighter,
       './range-util': rangeUtil,
-      './plugin/cross-frame': CrossFrame,
+      './cross-frame': { CrossFrame },
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },

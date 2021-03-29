@@ -53,12 +53,12 @@ describe('anchoring', function () {
 
   before(() => {
     guestImports.$mock({
-      './plugin/cross-frame': FakeCrossFrame,
+      './cross-frame': { CrossFrame: FakeCrossFrame },
     });
   });
 
   after(() => {
-    guestImports.$restore({ './plugins/cross-frame': true });
+    guestImports.$restore({ './cross-frame': true });
   });
 
   beforeEach(() => {
