@@ -1,23 +1,23 @@
 import { HTMLIntegration, $imports } from '../html';
 
 describe('HTMLIntegration', () => {
-  let fakeHtmlAnchoring;
-  let fakeHtmlMetadata;
+  let fakeHTMLAnchoring;
+  let fakeHTMLMetadata;
 
   beforeEach(() => {
-    fakeHtmlAnchoring = {
+    fakeHTMLAnchoring = {
       anchor: sinon.stub(),
       describe: sinon.stub(),
     };
 
-    fakeHtmlMetadata = {
+    fakeHTMLMetadata = {
       getDocumentMetadata: sinon.stub().returns({ title: 'Example site' }),
       uri: sinon.stub().returns('https://example.com/'),
     };
 
-    const HTMLMetadata = sinon.stub().returns(fakeHtmlMetadata);
+    const HTMLMetadata = sinon.stub().returns(fakeHTMLMetadata);
     $imports.$mock({
-      '../anchoring/html': fakeHtmlAnchoring,
+      '../anchoring/html': fakeHTMLAnchoring,
       './html-metadata': { HTMLMetadata },
     });
   });
@@ -28,8 +28,8 @@ describe('HTMLIntegration', () => {
 
   it('implements `anchor` and `destroy` using HTML anchoring', () => {
     const integration = new HTMLIntegration();
-    assert.equal(integration.anchor, fakeHtmlAnchoring.anchor);
-    assert.equal(integration.describe, fakeHtmlAnchoring.describe);
+    assert.equal(integration.anchor, fakeHTMLAnchoring.anchor);
+    assert.equal(integration.describe, fakeHTMLAnchoring.describe);
   });
 
   describe('#contentContainer', () => {
@@ -40,7 +40,7 @@ describe('HTMLIntegration', () => {
   });
 
   describe('#destroy', () => {
-    it('cleans up integration', () => {
+    it('does nothing', () => {
       new HTMLIntegration().destroy();
     });
   });
