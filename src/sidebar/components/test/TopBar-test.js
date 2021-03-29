@@ -50,7 +50,7 @@ describe('TopBar', () => {
 
   // Helper to retrieve an `Button` by icon name, for convenience
   function getButton(wrapper, iconName) {
-    return wrapper.find('Button').filter({ icon: iconName });
+    return wrapper.find('IconButton').filter({ icon: iconName });
   }
 
   function createTopBar(props = {}) {
@@ -108,7 +108,7 @@ describe('TopBar', () => {
 
         wrapper.update();
 
-        assert.isTrue(helpButton.props().isExpanded);
+        assert.isTrue(helpButton.props().expanded);
       });
 
       context('help service handler configured in services', () => {
@@ -212,7 +212,7 @@ describe('TopBar', () => {
     const wrapper = createTopBar();
     const shareButton = getButton(wrapper, 'share');
 
-    assert.isTrue(shareButton.prop('isExpanded'));
+    assert.isTrue(shareButton.prop('expanded'));
   });
 
   it('displays search input in the sidebar', () => {

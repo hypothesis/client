@@ -5,6 +5,8 @@ import isThirdPartyService from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
+import { IconButton } from '../../shared/components/buttons';
+
 import Button from './Button';
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
@@ -110,10 +112,10 @@ function TopBar({
         <div className="TopBar__inner content">
           <StreamSearchInput />
           <div className="u-stretch" />
-          <Button
-            className="TopBar__icon-button"
+          <IconButton
+            className="CompactIconButton"
             icon="help"
-            isExpanded={isHelpPanelOpen}
+            expanded={isHelpPanelOpen}
             onClick={requestHelp}
             title="Help"
           />
@@ -126,10 +128,11 @@ function TopBar({
           <GroupList className="GroupList" auth={auth} />
           <div className="u-stretch" />
           {pendingUpdateCount > 0 && (
-            <Button
-              className="TopBar__icon-button TopBar__icon-button--refresh"
+            <IconButton
+              className="CompactIconButton"
               icon="refresh"
               onClick={applyPendingUpdates}
+              variant="primary"
               title={`Show ${pendingUpdateCount} new/updated ${
                 pendingUpdateCount === 1 ? 'annotation' : 'annotations'
               }`}
@@ -141,18 +144,18 @@ function TopBar({
           />
           <SortMenu />
           {showSharePageButton && (
-            <Button
-              className="TopBar__icon-button"
+            <IconButton
+              className="CompactIconButton"
               icon="share"
-              isExpanded={isAnnotationsPanelOpen}
+              expanded={isAnnotationsPanelOpen}
               onClick={toggleSharePanel}
               title="Share annotations on this page"
             />
           )}
-          <Button
-            className="TopBar__icon-button"
+          <IconButton
+            className="CompactIconButton"
             icon="help"
-            isExpanded={isHelpPanelOpen}
+            expanded={isHelpPanelOpen}
             onClick={requestHelp}
             title="Help"
           />

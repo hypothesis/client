@@ -4,7 +4,7 @@
 @use "../../variables" as var;
 
 .TopBar {
-  @include utils.font--large;
+  @include utils.font--xlarge;
   @include utils.border--bottom;
   color: var.$grey-mid;
   background: var.$white;
@@ -24,38 +24,6 @@
   // Force TopBar onto a new compositor layer so that it does not judder when
   // the window is scrolled.
   transform: translate3d(0, 0, 0);
-
-  &__icon-button {
-    @include buttons.button--icon-only;
-    padding: 0.25em;
-    @media (pointer: coarse) {
-      // Until the top bar can be refactored to allow for breathing room around
-      // the search interface, we can't spare the room for comfortable tap targets
-      // on touchscreen devices. This overrides `Button`'s larger tap targets.
-      min-width: auto;
-      min-height: auto;
-    }
-  }
-
-  &__icon-button {
-    color: var.$grey-mid;
-
-    &.is-active {
-      color: var.$grey-7;
-
-      &:hover {
-        color: var.$grey-7;
-      }
-    }
-  }
-
-  &__icon-button--refresh {
-    color: var.$color-brand;
-
-    &:hover {
-      color: var.$color-brand;
-    }
-  }
 
   &__menu-label {
     padding: var.$layout-space--xxsmall;

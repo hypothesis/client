@@ -1,0 +1,22 @@
+// Button styling for the sidebar extending common button-component styles
+@use '../shared/components/buttons/mixins' as buttons;
+
+// Similar to `.IconButton`, with these changes:
+// - omit responsive minimum sizing
+// - tighten padding
+.CompactIconButton {
+  // Use icon colors for base and primary variants
+  $base-options: (
+    'colormap': buttons.colormap('icon'),
+  );
+  $primary-options: (
+    'colormap': buttons.colormap('icon--primary'),
+  );
+
+  @include buttons.Button($options: $base-options) {
+    padding: 0.25em; // Override padding
+  }
+  &--primary {
+    @include buttons.Button--variant($options: $primary-options);
+  }
+}

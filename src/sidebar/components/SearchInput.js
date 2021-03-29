@@ -3,7 +3,7 @@ import { useRef, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
 
-import Button from './Button';
+import { IconButton } from '../../shared/components/buttons';
 import Spinner from './Spinner';
 
 /**
@@ -78,12 +78,14 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         }
       />
       {!isLoading && (
-        <Button
-          className="SearchInput__icon-button TopBar__icon-button"
-          icon="search"
-          onClick={() => input.current.focus()}
-          title="Search annotations"
-        />
+        <div className="SearchInput__button-container">
+          <IconButton
+            className="CompactIconButton"
+            icon="search"
+            onClick={() => input.current.focus()}
+            title="Search annotations"
+          />
+        </div>
       )}
       {isLoading && <Spinner />}
     </form>
