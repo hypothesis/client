@@ -58,7 +58,7 @@ describe('anchoring', function () {
   });
 
   after(() => {
-    guestImports.$restore({ './cross-frame': true });
+    guestImports.$restore();
   });
 
   beforeEach(() => {
