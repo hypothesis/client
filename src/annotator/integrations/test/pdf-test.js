@@ -1,6 +1,7 @@
 import { PDFIntegration, $imports } from '../pdf';
 
 import FakePDFViewerApplication from '../../anchoring/test/fake-pdf-viewer-application';
+import { RenderingStates } from '../../anchoring/pdf';
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -54,6 +55,7 @@ describe('PDFIntegration', () => {
     };
 
     fakePDFAnchoring = {
+      RenderingStates,
       anchor: sinon.stub(),
       describe: sinon.stub(),
       documentHasText: sinon.stub().resolves(true),

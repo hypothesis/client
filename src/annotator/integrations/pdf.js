@@ -1,9 +1,13 @@
 import debounce from 'lodash.debounce';
 import { render } from 'preact';
 
-import { anchor, describe, documentHasText } from '../anchoring/pdf';
+import {
+  RenderingStates,
+  anchor,
+  describe,
+  documentHasText,
+} from '../anchoring/pdf';
 import WarningBanner from '../components/WarningBanner';
-import RenderingStates from '../pdfjs-rendering-states';
 import { createShadowRoot } from '../util/shadow-root';
 import { ListenerCollection } from '../util/listener-collection';
 
