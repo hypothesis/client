@@ -95,13 +95,51 @@
     &--icon-right svg {
       margin-left: map.get($options, 'margin');
     }
+    // When a button has "layout", that indicates it has some textual content:
+    // Size text to the contextual 1em, and adjust the icon to look balanced.
+    // H frontend app buttons tend to apply an icon:text ratio of ~1.25:1
+    svg {
+      width: 1.25em;
+      height: 1.25em;
+    }
+  } @else {
+    // In the case where an icon is the only content in a <button> element,
+    // size the icon based on contextual font-size. i.e. the icon IS
+    // the content
+    svg {
+      width: 1em;
+      height: 1em;
+    }
   }
+}
 
-  // (icon) SVG sizing is relevant
-  svg {
-    width: 1.25em;
-    height: 1.25em;
+/**
+ * Convenience function to retrieve a colormap. This obviates the need to reach
+ * into the `_config` module directly from outside and is less verbose.
+ *
+ * @param {'colors'|'icon'|'icon--primary'|'labeled'|'labeled--primary'|'link'}
+ *        [$name] - Shorthand name of colormap to retrieved. Defaults to base
+ *          $colors.
+ * @return {sass:map}
+ */
+@function colormap($name: 'colors') {
+  $result: $colors;
+  @if $name == 'icon' {
+    $result: $IconButton-colors;
   }
+  @if $name == 'icon--primary' {
+    $result: $IconButton-colors--primary;
+  }
+  @if $name == 'labeled' {
+    $result: $LabeledButton-colors;
+  }
+  @if $name == 'labeled--primary' {
+    $result: $LabeledButton-colors--primary;
+  }
+  @if $name == 'link' {
+    $result: $LinkButton-colors;
+  }
+  @return $result;
 }
 
 // Base mixin for <button> elements. Start here for new <button> classes
