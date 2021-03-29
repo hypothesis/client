@@ -22,7 +22,7 @@ describe('PDFIntegration', () => {
   let viewerContainer;
 
   let fakeAnnotator;
-  let fakePdfAnchoring;
+  let fakePDFAnchoring;
   let fakePDFMetadata;
   let fakePDFViewerApplication;
   let pdfIntegration;
@@ -53,7 +53,7 @@ describe('PDFIntegration', () => {
       anchoring: null,
     };
 
-    fakePdfAnchoring = {
+    fakePDFAnchoring = {
       anchor: sinon.stub(),
       describe: sinon.stub(),
       documentHasText: sinon.stub().resolves(true),
@@ -68,7 +68,7 @@ describe('PDFIntegration', () => {
 
     $imports.$mock({
       './pdf-metadata': { PDFMetadata: sinon.stub().returns(fakePDFMetadata) },
-      '../anchoring/pdf': fakePdfAnchoring,
+      '../anchoring/pdf': fakePDFAnchoring,
 
       // Disable debouncing of updates.
       'lodash.debounce': callback => callback,
@@ -143,13 +143,13 @@ describe('PDFIntegration', () => {
   describe('#anchor', () => {
     it('anchors provided selectors', async () => {
       pdfIntegration = createPDFIntegration();
-      fakePdfAnchoring.anchor.returns({});
+      fakePDFAnchoring.anchor.returns({});
       const selectors = [];
 
       const range = await pdfIntegration.anchor({}, selectors);
 
-      assert.calledWith(fakePdfAnchoring.anchor, sinon.match.any, selectors);
-      assert.equal(range, fakePdfAnchoring.anchor());
+      assert.calledWith(fakePDFAnchoring.anchor, sinon.match.any, selectors);
+      assert.equal(range, fakePDFAnchoring.anchor());
     });
   });
 
@@ -157,12 +157,12 @@ describe('PDFIntegration', () => {
     it('generates selectors for passed range', async () => {
       pdfIntegration = createPDFIntegration();
       const range = {};
-      fakePdfAnchoring.describe.returns([]);
+      fakePDFAnchoring.describe.returns([]);
 
       const selectors = await pdfIntegration.describe({}, range);
 
-      assert.calledWith(fakePdfAnchoring.describe, sinon.match.any, range);
-      assert.equal(selectors, fakePdfAnchoring.describe());
+      assert.calledWith(fakePDFAnchoring.describe, sinon.match.any, range);
+      assert.equal(selectors, fakePDFAnchoring.describe());
     });
   });
 
@@ -186,12 +186,12 @@ describe('PDFIntegration', () => {
   }
 
   it('does not show a warning when PDF has selectable text', async () => {
-    fakePdfAnchoring.documentHasText.resolves(true);
+    fakePDFAnchoring.documentHasText.resolves(true);
 
     pdfIntegration = createPDFIntegration();
     await delay(0); // Wait for text check to complete.
 
-    assert.called(fakePdfAnchoring.documentHasText);
+    assert.called(fakePDFAnchoring.documentHasText);
     assert.isNull(getWarningBanner());
   });
 
@@ -201,17 +201,17 @@ describe('PDFIntegration', () => {
     pdfIntegration = createPDFIntegration();
     await delay(0); // Wait for text check to complete.
 
-    assert.notCalled(fakePdfAnchoring.documentHasText);
+    assert.notCalled(fakePDFAnchoring.documentHasText);
     assert.isNull(getWarningBanner());
   });
 
   it('shows a warning when PDF has no selectable text', async () => {
-    fakePdfAnchoring.documentHasText.resolves(false);
+    fakePDFAnchoring.documentHasText.resolves(false);
 
     pdfIntegration = createPDFIntegration();
     await delay(0); // Wait for text check to complete.
 
-    assert.called(fakePdfAnchoring.documentHasText);
+    assert.called(fakePDFAnchoring.documentHasText);
     const banner = getWarningBanner();
     assert.isNotNull(banner);
     assert.include(
