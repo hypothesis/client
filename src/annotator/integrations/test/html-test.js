@@ -3,6 +3,8 @@ import { HTMLIntegration, $imports } from '../html';
 describe('HTMLIntegration', () => {
   let fakeHTMLAnchoring;
   let fakeHTMLMetadata;
+  let fakeGuessMainContentArea;
+  let fakePreserveScrollPosition;
   let fakeScrollIntoView;
 
   beforeEach(() => {
@@ -18,11 +20,18 @@ describe('HTMLIntegration', () => {
 
     fakeScrollIntoView = sinon.stub().yields();
 
+    fakeGuessMainContentArea = sinon.stub().returns(null);
+    fakePreserveScrollPosition = sinon.stub().yields();
+
     const HTMLMetadata = sinon.stub().returns(fakeHTMLMetadata);
     $imports.$mock({
       'scroll-into-view': fakeScrollIntoView,
       '../anchoring/html': fakeHTMLAnchoring,
       './html-metadata': { HTMLMetadata },
+      './html-side-by-side': {
+        guessMainContentArea: fakeGuessMainContentArea,
+        preserveScrollPosition: fakePreserveScrollPosition,
+      },
     });
   });
 
@@ -58,8 +67,101 @@ describe('HTMLIntegration', () => {
   });
 
   describe('#fitSideBySide', () => {
-    it('does nothing', () => {
+    function getMargins() {
+      const bodyStyle = document.body.style;
+      const leftMargin = bodyStyle.marginLeft
+        ? parseInt(bodyStyle.marginLeft)
+        : null;
+      const rightMargin = bodyStyle.marginRight
+        ? parseInt(bodyStyle.marginRight)
+        : null;
+      return [leftMargin, rightMargin];
+    }
+
+    const sidebarWidth = 200;
+
+    // Return a rect for content that occupies the full width of the viewport,
+    // minus space for the opened sidebar, as `fitSideBySide` only calls this
+    // after initially allocating space for the sidebar.
+    function fullWidthContentRect() {
+      return new DOMRect(
+        0,
+        0,
+        window.innerWidth - sidebarWidth,
+        window.innerHeight
+      );
+    }
+
+    function createIntegration() {
+      const integration = new HTMLIntegration();
+      integration.sideBySideEnabled = true;
+      return integration;
+    }
+
+    beforeEach(() => {
+      // By default, pretend that the content fills the page.
+      fakeGuessMainContentArea.returns(fullWidthContentRect());
+    });
+
+    afterEach(() => {
+      // Reset any styles applied by `fitSideBySide`.
+      document.body.style.marginLeft = '';
+      document.body.style.marginRight = '';
+    });
+
+    it('does nothing when disabled', () => {
       new HTMLIntegration().fitSideBySide({});
+    });
+
+    context('when enabled', () => {
+      it('sets left and right margins on body element when activated', () => {
+        const integration = createIntegration();
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+        assert.deepEqual(getMargins(), [10, 210]);
+      });
+
+      it('allows sidebar to overlap non-main content on the side of the page', () => {
+        const integration = createIntegration();
+
+        const contentRect = fullWidthContentRect();
+        // Pretend there is some content to the right of the main content
+        // in the document (eg. related stories, ads).
+        contentRect.width -= 100;
+        fakeGuessMainContentArea.returns(contentRect);
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+        assert.deepEqual(getMargins(), [10, 110]);
+      });
+
+      it('does nothing if the content area cannot be determined', () => {
+        const integration = createIntegration();
+        fakeGuessMainContentArea.returns(null);
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+        assert.deepEqual(getMargins(), [null, null]);
+      });
+
+      it('saves and restores the scroll position after adjusting margins', () => {
+        const integration = createIntegration();
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+        assert.calledOnce(fakePreserveScrollPosition);
+      });
+
+      it('resets margins on body element when side-by-side mode is deactivated', () => {
+        const integration = createIntegration();
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+        assert.notDeepEqual(getMargins(), [null, null]);
+
+        integration.fitSideBySide({ expanded: false });
+        assert.deepEqual(getMargins(), [null, null]);
+      });
     });
   });
 

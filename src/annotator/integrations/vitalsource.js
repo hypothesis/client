@@ -8,6 +8,7 @@ import { injectClient } from '../hypothesis-injector';
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').Selector} Selector
+ * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  */
 
 /**
@@ -146,6 +147,7 @@ export class VitalSourceContentIntegration {
    */
   constructor(container = document.body) {
     this._htmlIntegration = new HTMLIntegration(container);
+    this._htmlIntegration.sideBySideEnabled = true;
 
     this._listeners = new ListenerCollection();
 
@@ -223,9 +225,11 @@ export class VitalSourceContentIntegration {
     return this._htmlIntegration.contentContainer();
   }
 
-  fitSideBySide() {
-    // Not yet implemented
-    return false;
+  /**
+   * @param {SidebarLayout} layout
+   */
+  fitSideBySide(layout) {
+    return this._htmlIntegration.fitSideBySide(layout);
   }
 
   async getMetadata() {

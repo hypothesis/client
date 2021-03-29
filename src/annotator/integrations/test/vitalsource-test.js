@@ -67,7 +67,9 @@ describe('annotator/integrations/vitalsource', () => {
       contentContainer: sinon.stub(),
       describe: sinon.stub(),
       destroy: sinon.stub(),
+      fitSideBySide: sinon.stub().returns(false),
       scrollToAnchor: sinon.stub(),
+      sideBySideEnabled: false,
     };
 
     FakeHTMLIntegration = sinon.stub().returns(fakeHTMLIntegration);
@@ -189,9 +191,16 @@ describe('annotator/integrations/vitalsource', () => {
       assert.equal(integration.canAnnotate(), true);
     });
 
-    it('does not support side-by-side mode', () => {
+    it('delegates to HTMLIntegration for side-by-side mode', () => {
       const integration = createIntegration();
-      assert.equal(integration.fitSideBySide(), false);
+      fakeHTMLIntegration.fitSideBySide.returns(true);
+      assert.isTrue(fakeHTMLIntegration.sideBySideEnabled);
+
+      const layout = { expanded: true, width: 150 };
+      const isActive = integration.fitSideBySide(layout);
+
+      assert.isTrue(isActive);
+      assert.calledWith(fakeHTMLIntegration.fitSideBySide, layout);
     });
 
     it('stops mouse events from propagating to parent frame', () => {
