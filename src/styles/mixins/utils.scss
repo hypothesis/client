@@ -74,6 +74,12 @@
   font-weight: 500;
 }
 
+@mixin font--xlarge {
+  @include font-base;
+  font-size: var.$font-size--subheading;
+  font-weight: 500;
+}
+
 @mixin shadow {
   box-shadow: 0 1px 1px var.$color-shadow--base;
 }
