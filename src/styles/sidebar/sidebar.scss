@@ -15,6 +15,9 @@
 // FIXME: Replace with shared-package variant when available
 @use '../shared';
 
+// Custom button styling for the application
+@use './buttons';
+
 // Components
 // ----------
 @use './components/Annotation';

@@ -100,7 +100,7 @@ describe('SearchInput', () => {
   it('renders search button when app is not in "loading" state', () => {
     fakeStore.isLoading.returns(false);
     const wrapper = createSearchInput();
-    assert.isTrue(wrapper.exists('Button'));
+    assert.isTrue(wrapper.exists('IconButton'));
   });
 
   it(
