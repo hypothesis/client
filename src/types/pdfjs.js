@@ -53,7 +53,7 @@
  * @prop {HTMLElement} div - Container element for the PDF page
  * @prop {PDFPageProxy} pdfPage
  * @prop {TextLayer|null} textLayer
- * @prop {number} renderingState - See `src/annotator/pdfjs-rendering-states.js`
+ * @prop {number} renderingState - See `RenderingStates` enum in src/annotator/anchoring/pdf.js
  */
 
 /**

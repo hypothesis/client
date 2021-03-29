@@ -12,7 +12,7 @@
 
 import { TinyEmitter as EventEmitter } from 'tiny-emitter';
 
-import RenderingStates from '../../pdfjs-rendering-states';
+import { RenderingStates } from '../pdf';
 
 /**
  * Create the DOM structure for a page which matches the structure produced by

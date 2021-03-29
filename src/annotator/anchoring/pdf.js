@@ -1,7 +1,5 @@
 /* global PDFViewerApplication */
 
-import RenderingStates from '../pdfjs-rendering-states';
-
 import { TextPosition, TextRange } from './text-range';
 import { TextQuoteAnchor } from './types';
 
@@ -21,6 +19,20 @@ import { TextQuoteAnchor } from './types';
  * @prop {number} anchor.start - Start character offset within the page's text
  * @prop {number} anchor.end - End character offset within the page's text
  */
+
+/**
+ * Enum values for page rendering states (IRenderableView#renderingState)
+ * in PDF.js. Taken from web/pdf_rendering_queue.js in the PDF.js library.
+ *
+ * Reproduced here because this enum is not exported consistently across
+ * different versions of PDF.js
+ */
+export const RenderingStates = {
+  INITIAL: 0,
+  RUNNING: 1,
+  PAUSED: 2,
+  FINISHED: 3,
+};
 
 // Caches for performance.
 
