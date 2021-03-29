@@ -1,9 +1,9 @@
 import scrollIntoView from 'scroll-into-view';
 
 import { Adder } from './adder';
+import { CrossFrame } from './cross-frame';
 import { HTMLIntegration } from './integrations/html';
 import { PDFIntegration } from './integrations/pdf';
-import CrossFrame from './plugin/cross-frame';
 
 import { TextRange } from './anchoring/text-range';
 import {

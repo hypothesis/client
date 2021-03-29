@@ -1,6 +1,5 @@
 import { DEBOUNCE_WAIT } from '../../frame-observer';
-import CrossFrame from '../../plugin/cross-frame';
-import { $imports } from '../../plugin/cross-frame';
+import { CrossFrame, $imports } from '../../cross-frame';
 import { isLoaded } from '../../util/frame-util';
 
 describe('CrossFrame multi-frame scenario', function () {
@@ -30,8 +29,8 @@ describe('CrossFrame multi-frame scenario', function () {
     proxyBridge = sandbox.stub().returns(fakeBridge);
 
     $imports.$mock({
-      '../annotation-sync': proxyAnnotationSync,
-      '../../shared/bridge': proxyBridge,
+      './annotation-sync': proxyAnnotationSync,
+      '../shared/bridge': proxyBridge,
     });
 
     container = document.createElement('div');

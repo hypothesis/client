@@ -1,11 +1,11 @@
-import AnnotationSync from '../annotation-sync';
-import Bridge from '../../shared/bridge';
-import Discovery from '../../shared/discovery';
-import * as frameUtil from '../util/frame-util';
-import FrameObserver from '../frame-observer';
+import AnnotationSync from './annotation-sync';
+import Bridge from '../shared/bridge';
+import Discovery from '../shared/discovery';
+import * as frameUtil from './util/frame-util';
+import FrameObserver from './frame-observer';
 
 /**
- * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  */
 
 /**
@@ -17,7 +17,7 @@ import FrameObserver from '../frame-observer';
  * are added to the page if they have the `enable-annotation` attribute set
  * and are same-origin with the current document.
  */
-export default class CrossFrame {
+export class CrossFrame {
   /**
    * @param {Element} element
    * @param {object} options
