@@ -148,7 +148,7 @@ export class PDFIntegration {
 
     try {
       const hasText = await documentHasText();
-      this._showNoSelectableTextWarning(!hasText);
+      this._toggleNoSelectableTextWarning(!hasText);
     } catch (err) {
       /* istanbul ignore next */
       console.warn('Unable to check for text in PDF:', err);
@@ -161,7 +161,7 @@ export class PDFIntegration {
    *
    * @param {boolean} showWarning
    */
-  _showNoSelectableTextWarning(showWarning) {
+  _toggleNoSelectableTextWarning(showWarning) {
     // Get a reference to the top-level DOM element associated with the PDF.js
     // viewer.
     const outerContainer = /** @type {HTMLElement} */ (document.querySelector(
