@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import GroupListItem from '../GroupListItem';
-import { $imports } from '../GroupListItem';
+import GroupListItem, { $imports } from '../GroupListItem';
 
 describe('GroupListItem', () => {
   let fakeCopyText;
@@ -59,12 +58,12 @@ describe('GroupListItem', () => {
     FakeSlider.displayName = 'Slider';
 
     $imports.$mock({
-      './MenuItem': FakeMenuItem,
-      '../util/copy-to-clipboard': {
+      '../MenuItem': FakeMenuItem,
+      '../../util/copy-to-clipboard': {
         copyText: fakeCopyText,
       },
-      '../helpers/group-list-item-common': fakeGroupListItemCommon,
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../helpers/group-list-item-common': fakeGroupListItemCommon,
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
     });
 
     sinon.stub(window, 'confirm').returns(false);

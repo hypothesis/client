@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import GroupListSection from '../GroupListSection';
-import { $imports } from '../GroupListSection';
+import GroupListSection, { $imports } from '../GroupListSection';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('GroupListSection', () => {
   const testGroups = [

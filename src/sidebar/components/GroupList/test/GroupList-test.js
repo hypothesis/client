@@ -1,10 +1,9 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import GroupList from '../GroupList';
-import { $imports } from '../GroupList';
+import GroupList, { $imports } from '../GroupList';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import mockImportedComponents from '../../../../test-util/mock-imported-components';
 
 describe('GroupList', () => {
   let fakeServiceConfig;
@@ -61,8 +60,8 @@ describe('GroupList', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../config/service-config': fakeServiceConfig,
+      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../config/service-config': fakeServiceConfig,
     });
   });
 
@@ -117,7 +116,7 @@ describe('GroupList', () => {
     const fakeGroupOrganizations = groups =>
       groups.sort((a, b) => a.id.localeCompare(b.id));
     $imports.$mock({
-      '../helpers/group-organizations': fakeGroupOrganizations,
+      '../../helpers/group-organizations': fakeGroupOrganizations,
     });
 
     const wrapper = createGroupList();
@@ -169,7 +168,7 @@ describe('GroupList', () => {
   context('when `isThirdPartyService` is true', () => {
     beforeEach(() => {
       $imports.$mock({
-        '../helpers/is-third-party-service': () => true,
+        '../../helpers/is-third-party-service': () => true,
       });
     });
 

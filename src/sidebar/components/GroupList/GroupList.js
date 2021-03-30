@@ -1,21 +1,22 @@
 import { useMemo, useState } from 'preact/hooks';
 
-import serviceConfig from '../config/service-config';
-import { useStoreProxy } from '../store/use-store';
-import { isThirdPartyUser } from '../helpers/account-id';
-import { orgName } from '../helpers/group-list-item-common';
-import groupsByOrganization from '../helpers/group-organizations';
-import isThirdPartyService from '../helpers/is-third-party-service';
-import { withServices } from '../service-context';
+import serviceConfig from '../../config/service-config';
+import { isThirdPartyUser } from '../../helpers/account-id';
+import { orgName } from '../../helpers/group-list-item-common';
+import groupsByOrganization from '../../helpers/group-organizations';
+import isThirdPartyService from '../../helpers/is-third-party-service';
+import { withServices } from '../../service-context';
+import { useStoreProxy } from '../../store/use-store';
+
+import Menu from '../Menu';
+import MenuItem from '../MenuItem';
 
 import GroupListSection from './GroupListSection';
-import Menu from './Menu';
-import MenuItem from './MenuItem';
 
 /**
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
- * @typedef {import('../../types/api').Group} Group
- * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
+ * @typedef {import('../../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../../types/api').Group} Group
+ * @typedef {import('../../services/service-url').ServiceUrlGetter} ServiceUrlGetter
  */
 
 /**
