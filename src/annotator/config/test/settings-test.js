@@ -5,8 +5,21 @@ describe('annotator/config/settingsFrom', () => {
   let fakeConfigFuncSettingsFrom;
   let fakeIsBrowserExtension;
   let fakeParseJsonConfig;
+  let link;
+
+  function appendLink(href, rel) {
+    const link = document.createElement('link');
+    link.type = 'application/annotator+html';
+    link.rel = rel;
+    if (href) {
+      link.href = href;
+    }
+    document.head.appendChild(link);
+    return link;
+  }
 
   beforeEach(() => {
+    link = appendLink('http://example.com/app.html', 'sidebar');
     fakeConfigFuncSettingsFrom = sinon.stub().returns({});
     fakeIsBrowserExtension = sinon.stub().returns(false);
     fakeParseJsonConfig = sinon.stub().returns({});
@@ -19,6 +32,7 @@ describe('annotator/config/settingsFrom', () => {
   });
 
   afterEach(() => {
+    link.remove();
     $imports.$restore();
   });
 
@@ -42,7 +56,7 @@ describe('annotator/config/settingsFrom', () => {
           beforeEach(
             'add an application/annotator+html notebook <link>',
             () => {
-              link = appendLink('http://example.com/app.html', 'notebook');
+              link = appendLink('http://example.com/notebook', 'notebook');
             }
           );
 
@@ -53,7 +67,7 @@ describe('annotator/config/settingsFrom', () => {
           it('returns the href from the notebook link', () => {
             assert.equal(
               settingsFrom(window).notebookAppUrl,
-              'http://example.com/app.html'
+              'http://example.com/notebook'
             );
           });
         }
@@ -83,7 +97,6 @@ describe('annotator/config/settingsFrom', () => {
 
       context('when the annotator+html notebook link has no href', () => {
         let link;
-
         beforeEach(
           'add an application/annotator+html notebook <link> with no href',
           () => {
@@ -113,16 +126,6 @@ describe('annotator/config/settingsFrom', () => {
 
     describe('#sidebarAppUrl', () => {
       context("when there's an application/annotator+html sidebar link", () => {
-        let link;
-
-        beforeEach('add an application/annotator+html sidebar <link>', () => {
-          link = appendLink('http://example.com/app.html', 'sidebar');
-        });
-
-        afterEach('tidy up the sidebar link', () => {
-          link.remove();
-        });
-
         it('returns the href from the sidebar link', () => {
           assert.equal(
             settingsFrom(window).sidebarAppUrl,
@@ -132,39 +135,34 @@ describe('annotator/config/settingsFrom', () => {
       });
 
       context('when there are multiple annotator+html sidebar links', () => {
-        let link1;
         let link2;
 
         beforeEach('add two sidebar links to the document', () => {
-          link1 = appendLink('http://example.com/app1', 'sidebar');
           link2 = appendLink('http://example.com/app2', 'sidebar');
         });
 
         afterEach('tidy up the sidebar links', () => {
-          link1.remove();
           link2.remove();
         });
 
         it('returns the href from the first one', () => {
           assert.equal(
             settingsFrom(window).sidebarAppUrl,
-            'http://example.com/app1'
+            'http://example.com/app.html'
           );
         });
       });
 
       context('when the annotator+html sidebar link has no href', () => {
-        let link;
+        let link2;
 
-        beforeEach(
-          'add an application/annotator+html sidebar <link> with no href',
-          () => {
-            link = appendLink(null, 'sidebar');
-          }
-        );
+        beforeEach(() => {
+          link.remove(); // Remove the default link
+          link2 = appendLink(null, 'sidebar'); // Add a new link without href=""
+        });
 
         afterEach('tidy up the sidebar link', () => {
-          link.remove();
+          link2.remove();
         });
 
         it('throws an error', () => {
@@ -175,6 +173,9 @@ describe('annotator/config/settingsFrom', () => {
       });
 
       context("when there's no annotator+html sidebar link", () => {
+        beforeEach(() => {
+          link.remove(); // Remove the default link
+        });
         it('throws an error', () => {
           assert.throws(() => {
             settingsFrom(window).sidebarAppUrl; // eslint-disable-line no-unused-expressions

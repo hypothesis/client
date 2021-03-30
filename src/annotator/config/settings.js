@@ -218,6 +218,9 @@ export default function settingsFrom(window_) {
     get query() {
       return query();
     },
-    hostPageSetting: hostPageSetting,
+
+    hostPageSetting,
+
+    isBrowserExtension: isBrowserExtension(urlFromLinkTag('sidebar')),
   };
 }
