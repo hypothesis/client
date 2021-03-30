@@ -6,8 +6,9 @@ import { $imports } from '../SelectionTabs';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('SelectionTabs', function () {
+describe('SelectionTabs', () => {
   // mock services
+  let fakeAnnotationsService;
   let fakeSettings;
   let fakeStore;
 
@@ -18,11 +19,19 @@ describe('SelectionTabs', function () {
 
   function createComponent(props) {
     return mount(
-      <SelectionTabs settings={fakeSettings} {...defaultProps} {...props} />
+      <SelectionTabs
+        annotationsService={fakeAnnotationsService}
+        settings={fakeSettings}
+        {...defaultProps}
+        {...props}
+      />
     );
   }
 
   beforeEach(() => {
+    fakeAnnotationsService = {
+      createPageNote: sinon.stub(),
+    };
     fakeSettings = {
       enableExperimentalNewNoteButton: false,
     };
@@ -49,37 +58,109 @@ describe('SelectionTabs', function () {
   const unavailableMessage = wrapper =>
     wrapper.find('.SelectionTabs__message').text();
 
-  context('displays selection tabs and counts', function () {
-    it('should display the tabs and counts of annotations and notes', function () {
-      const wrapper = createComponent();
-      const tabs = wrapper.find('button');
-      assert.isTrue(tabs.at(0).contains('Annotations'));
-      assert.equal(tabs.at(0).find('.SelectionTabs__count').text(), 123);
-      assert.isTrue(tabs.at(1).contains('Page Notes'));
-      assert.equal(tabs.at(1).find('.SelectionTabs__count').text(), 456);
-    });
+  it('should display the tabs and counts of annotations and notes', () => {
+    const wrapper = createComponent();
+    const tabs = wrapper.find('button');
 
-    it('should display annotations tab as selected', function () {
+    assert.include(tabs.at(0).text(), 'Annotations');
+    assert.equal(tabs.at(0).find('.SelectionTabs__count').text(), 123);
+
+    assert.include(tabs.at(1).text(), 'Page Notes');
+    assert.equal(tabs.at(1).find('.SelectionTabs__count').text(), 456);
+  });
+
+  describe('Annotations tab', () => {
+    it('should display annotations tab as selected when it is active', () => {
       const wrapper = createComponent();
+
       const tabs = wrapper.find('button');
+
       assert.isTrue(tabs.at(0).hasClass('is-selected'));
       assert.equal(tabs.at(0).prop('aria-selected'), 'true');
       assert.equal(tabs.at(1).prop('aria-selected'), 'false');
     });
 
-    it('should display notes tab as selected', function () {
+    it('should not display the add-page-note button when the annotations tab is active', () => {
+      fakeSettings.enableExperimentalNewNoteButton = true;
+      const wrapper = createComponent();
+      assert.equal(wrapper.find('LabeledButton').length, 0);
+    });
+  });
+
+  describe('Notes tab', () => {
+    it('should display notes tab as selected when it is active', () => {
       fakeStore.selectedTab.returns('note');
-      const wrapper = createComponent({});
+      const wrapper = createComponent();
+
       const tabs = wrapper.find('button');
+
       assert.isTrue(tabs.at(1).hasClass('is-selected'));
       assert.equal(tabs.at(1).prop('aria-selected'), 'true');
       assert.equal(tabs.at(0).prop('aria-selected'), 'false');
     });
 
-    it('should display orphans tab as selected if there is 1 or more orphans', function () {
+    describe('Add Page Note button', () => {
+      it('should not display the add-page-note button if the associated setting is not enabled', () => {
+        fakeSettings.enableExperimentalNewNoteButton = false;
+        fakeStore.selectedTab.returns('note');
+
+        const wrapper = createComponent();
+
+        assert.isFalse(wrapper.find('LabeledButton').exists());
+      });
+
+      it('should display the add-page-note button when the associated setting is enabled', () => {
+        fakeSettings.enableExperimentalNewNoteButton = true;
+        fakeStore.selectedTab.returns('note');
+
+        const wrapper = createComponent();
+
+        assert.isTrue(wrapper.find('LabeledButton').exists());
+      });
+
+      it('should apply background-color styling from settings', () => {
+        fakeSettings = {
+          branding: {
+            ctaBackgroundColor: '#00f',
+          },
+          enableExperimentalNewNoteButton: true,
+        };
+        fakeStore.selectedTab.returns('note');
+
+        const wrapper = createComponent();
+
+        const button = wrapper.find('LabeledButton');
+        assert.deepEqual(button.prop('style'), { backgroundColor: '#00f' });
+      });
+
+      it('should add a new page note on click', () => {
+        fakeSettings.enableExperimentalNewNoteButton = true;
+        fakeStore.selectedTab.returns('note');
+
+        const wrapper = createComponent();
+        wrapper.find('LabeledButton').props().onClick();
+
+        assert.calledOnce(fakeAnnotationsService.createPageNote);
+      });
+    });
+  });
+
+  describe('orphans tab', () => {
+    it('should display orphans tab if there is 1 or more orphans', () => {
+      fakeStore.orphanCount.returns(1);
+
+      const wrapper = createComponent();
+
+      const tabs = wrapper.find('button');
+      assert.equal(tabs.length, 3);
+    });
+
+    it('should display orphans tab as selected when it is active', () => {
       fakeStore.selectedTab.returns('orphan');
       fakeStore.orphanCount.returns(1);
-      const wrapper = createComponent({});
+
+      const wrapper = createComponent();
+
       const tabs = wrapper.find('button');
       assert.isTrue(tabs.at(2).hasClass('is-selected'));
       assert.equal(tabs.at(2).prop('aria-selected'), 'true');
@@ -87,16 +168,20 @@ describe('SelectionTabs', function () {
       assert.equal(tabs.at(0).prop('aria-selected'), 'false');
     });
 
-    it('should not display orphans tab if there are 0 orphans', function () {
-      fakeStore.selectedTab.returns('orphan');
-      const wrapper = createComponent({});
+    it('should not display orphans tab if there are 0 orphans', () => {
+      fakeStore.orphanCount.returns(0);
+
+      const wrapper = createComponent();
+
       const tabs = wrapper.find('button');
       assert.equal(tabs.length, 2);
     });
+  });
 
+  describe('tab display and counts', () => {
     it('should render `title` and `aria-label` attributes for tab buttons, with counts', () => {
       fakeStore.orphanCount.returns(1);
-      const wrapper = createComponent({});
+      const wrapper = createComponent();
 
       const tabs = wrapper.find('button');
 
@@ -122,25 +207,7 @@ describe('SelectionTabs', function () {
       assert.equal(tabs.at(1).prop('title'), 'Page notes');
     });
 
-    it('should not display the NewNoteBtn when the annotations tab is active', function () {
-      const wrapper = createComponent();
-      assert.equal(wrapper.find('NewNoteButton').length, 0);
-    });
-
-    it('should not display the NewNoteBtn when the notes tab is active and the NewNoteBtn is disabled', function () {
-      fakeStore.selectedTab.returns('note');
-      const wrapper = createComponent({});
-      assert.equal(wrapper.find('NewNoteButton').length, 0);
-    });
-
-    it('should display the NewNoteBtn when the notes tab is active and the NewNoteBtn is enabled', function () {
-      fakeSettings.enableExperimentalNewNoteButton = true;
-      fakeStore.selectedTab.returns('note');
-      const wrapper = createComponent({});
-      assert.equal(wrapper.find('NewNoteButton').length, 1);
-    });
-
-    it('should not display a message when its loading annotation count is 0', function () {
+    it('should not display a message when its loading annotation count is 0', () => {
       fakeStore.annotationCount.returns(0);
       const wrapper = createComponent({
         isLoading: true,
@@ -148,7 +215,7 @@ describe('SelectionTabs', function () {
       assert.isFalse(wrapper.exists('.annotation-unavailable-message__label'));
     });
 
-    it('should not display a message when its loading notes count is 0', function () {
+    it('should not display a message when its loading notes count is 0', () => {
       fakeStore.selectedTab.returns('note');
       fakeStore.noteCount.returns(0);
       const wrapper = createComponent({
@@ -157,7 +224,7 @@ describe('SelectionTabs', function () {
       assert.isFalse(wrapper.exists('.SelectionTabs__message'));
     });
 
-    it('should not display the longer version of the no annotations message when there are no annotations and isWaitingToAnchorAnnotations is true', function () {
+    it('should not display the longer version of the no annotations message when there are no annotations and isWaitingToAnchorAnnotations is true', () => {
       fakeStore.annotationCount.returns(0);
       fakeStore.isWaitingToAnchorAnnotations.returns(true);
       const wrapper = createComponent({
@@ -166,7 +233,7 @@ describe('SelectionTabs', function () {
       assert.isFalse(wrapper.exists('.SelectionTabs__message'));
     });
 
-    it('should display the longer version of the no notes message when there are no notes', function () {
+    it('should display the longer version of the no notes message when there are no notes', () => {
       fakeStore.selectedTab.returns('note');
       fakeStore.noteCount.returns(0);
       const wrapper = createComponent({});
@@ -176,7 +243,7 @@ describe('SelectionTabs', function () {
       );
     });
 
-    it('should display the longer version of the no annotations message when there are no annotations', function () {
+    it('should display the longer version of the no annotations message when there are no annotations', () => {
       fakeStore.annotationCount.returns(0);
       const wrapper = createComponent({});
       assert.include(

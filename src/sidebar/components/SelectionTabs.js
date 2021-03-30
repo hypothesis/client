@@ -1,10 +1,11 @@
 import classnames from 'classnames';
 import { SvgIcon } from '@hypothesis/frontend-shared';
 
+import { applyTheme } from '../helpers/theme';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 
-import NewNoteBtn from './NewNoteBtn';
+import { LabeledButton } from '../../shared/components/buttons';
 
 /**
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
@@ -72,6 +73,7 @@ function Tab({
  * @typedef SelectionTabsProps
  * @prop {boolean} isLoading - Are we waiting on any annotations from the server?
  * @prop {MergedConfig} settings - Injected service.
+ * @prop {Object} annotationsService - Injected service.
  */
 
 /**
@@ -79,7 +81,7 @@ function Tab({
  *
  * @param {SelectionTabsProps} props
  */
-function SelectionTabs({ isLoading, settings }) {
+function SelectionTabs({ annotationsService, isLoading, settings }) {
   const store = useStoreProxy();
   const selectedTab = store.selectedTab();
   const noteCount = store.noteCount();
@@ -136,7 +138,16 @@ function SelectionTabs({ isLoading, settings }) {
         )}
       </div>
       {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
-        <NewNoteBtn />
+        <div className="u-layout-row--justify-right">
+          <LabeledButton
+            icon="add"
+            onClick={() => annotationsService.createPageNote()}
+            variant="primary"
+            style={applyTheme(['ctaBackgroundColor'], settings)}
+          >
+            New note
+          </LabeledButton>
+        </div>
       )}
       {!isLoading && showNotesUnavailableMessage && (
         <div className="SelectionTabs__message">
@@ -160,6 +171,6 @@ function SelectionTabs({ isLoading, settings }) {
   );
 }
 
-SelectionTabs.injectedProps = ['settings'];
+SelectionTabs.injectedProps = ['annotationsService', 'settings'];
 
 export default withServices(SelectionTabs);

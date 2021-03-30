@@ -44,6 +44,9 @@ describe('annotationsService', () => {
       focusedGroupId: sinon.stub(),
       getDefault: sinon.stub(),
       getDraft: sinon.stub().returns(null),
+      isLoggedIn: sinon.stub().returns(true),
+      mainFrame: sinon.stub().returns({ uri: 'http://www.example.com' }),
+      openSidebarPanel: sinon.stub(),
       profile: sinon.stub().returns({}),
       removeAnnotations: sinon.stub(),
       removeDraft: sinon.stub(),
@@ -68,16 +71,16 @@ describe('annotationsService', () => {
     $imports.$restore();
   });
 
+  const getLastAddedAnnotation = () => {
+    if (fakeStore.addAnnotations.callCount <= 0) {
+      return null;
+    }
+    const callCount = fakeStore.addAnnotations.callCount;
+    return fakeStore.addAnnotations.getCall(callCount - 1).args[0][0];
+  };
+
   describe('create', () => {
     let now;
-
-    const getLastAddedAnnotation = () => {
-      if (fakeStore.addAnnotations.callCount <= 0) {
-        return null;
-      }
-      const callCount = fakeStore.addAnnotations.callCount;
-      return fakeStore.addAnnotations.getCall(callCount - 1).args[0][0];
-    };
 
     beforeEach(() => {
       now = new Date();
@@ -223,6 +226,35 @@ describe('annotationsService', () => {
       assert.calledWith(fakeStore.setExpanded, 'aparent', true);
       assert.calledWith(fakeStore.setExpanded, 'anotherparent', true);
       assert.calledWith(fakeStore.setExpanded, 'yetanotherancestor', true);
+    });
+  });
+
+  describe('createPageNote', () => {
+    it('should open the login-prompt panel if the user is not logged in', () => {
+      fakeStore.isLoggedIn.returns(false);
+
+      svc.createPageNote();
+
+      assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
+      assert.isNull(getLastAddedAnnotation());
+    });
+
+    it('should do nothing if there is no main frame URI', () => {
+      fakeStore.mainFrame.returns(undefined);
+
+      svc.createPageNote();
+
+      assert.notCalled(fakeStore.openSidebarPanel);
+      assert.isNull(getLastAddedAnnotation());
+    });
+
+    it('should create a new unsaved annotation with page note defaults', () => {
+      svc.createPageNote();
+
+      const annotation = getLastAddedAnnotation();
+
+      assert.equal(annotation.uri, 'http://www.example.com');
+      assert.deepEqual(annotation.target, []);
     });
   });
 

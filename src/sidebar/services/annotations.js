@@ -127,6 +127,26 @@ export default function annotationsService(api, store) {
   }
 
   /**
+   * Create a new empty "page note" annotation and add it to the store. If the
+   * user is not logged in, open the `loginPrompt` panel instead.
+   */
+  function createPageNote() {
+    const topLevelFrame = store.mainFrame();
+    if (!store.isLoggedIn()) {
+      store.openSidebarPanel('loginPrompt');
+      return;
+    }
+    if (!topLevelFrame) {
+      return;
+    }
+    const pageNoteAnnotation = {
+      target: [],
+      uri: topLevelFrame.uri,
+    };
+    create(pageNoteAnnotation);
+  }
+
+  /**
    * Delete an annotation via the API and update the store.
    */
   async function delete_(annotation) {
@@ -204,6 +224,7 @@ export default function annotationsService(api, store) {
 
   return {
     create,
+    createPageNote,
     delete: delete_,
     flag,
     reply,
