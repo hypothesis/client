@@ -1,9 +1,8 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
-import classnames from 'classnames';
-
 import { useStoreProxy } from '../store/use-store';
 
-import Button from './Button';
+import { LabeledButton } from '../../shared/components/buttons';
+
+import Panel from './Panel';
 
 /**
  * @typedef SidebarContentErrorProps
@@ -43,35 +42,23 @@ export default function SidebarContentError({
   })();
 
   return (
-    <div className="SidebarContentError">
-      <div className="SidebarContentError__header">
-        <div className="SidebarContentError__header-icon">
-          <SvgIcon name="restricted" title={errorTitle} />
-        </div>
-        <div className="SidebarContentError__title u-stretch">{errorTitle}</div>
+    <Panel icon="restricted" title={errorTitle}>
+      <p>{errorMessage}</p>
+      <div className="u-layout-row--justify-right u-horizontal-rhythm">
+        {showClearSelection && (
+          <LabeledButton
+            variant={isLoggedIn ? 'primary' : undefined}
+            onClick={() => store.clearSelection()}
+          >
+            Show all annotations
+          </LabeledButton>
+        )}
+        {!isLoggedIn && (
+          <LabeledButton variant="primary" onClick={onLoginRequest}>
+            Log in
+          </LabeledButton>
+        )}
       </div>
-      <div className="SidebarContentError__content">
-        <p>{errorMessage}</p>
-        <div className="SidebarContentError__actions">
-          {showClearSelection && (
-            <Button
-              buttonText="Show all annotations"
-              className={classnames({
-                SidebarContentError__button: !isLoggedIn,
-                'SidebarContentError__button--primary': isLoggedIn,
-              })}
-              onClick={() => store.clearSelection()}
-            />
-          )}
-          {!isLoggedIn && (
-            <Button
-              buttonText="Log in"
-              className="SidebarContentError__button--primary"
-              onClick={onLoginRequest}
-            />
-          )}
-        </div>
-      </div>
-    </div>
+    </Panel>
   );
 }

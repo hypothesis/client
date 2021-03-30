@@ -35,11 +35,10 @@ describe('SidebarContentError', () => {
   });
 
   const findButtonByText = (wrapper, text) => {
-    return wrapper.find('Button').filter({ buttonText: text });
-  };
-
-  const errorText = wrapper => {
-    return wrapper.find('.SidebarContentError__content').text();
+    return wrapper
+      .find('LabeledButton')
+      .filterWhere(button => button.text() === text)
+      .at(0);
   };
 
   it('should provide a button to clear the selection (show all annotations)', () => {
@@ -50,6 +49,7 @@ describe('SidebarContentError', () => {
     });
 
     const clearButton = findButtonByText(wrapper, 'Show all annotations');
+
     assert.isTrue(clearButton.exists());
 
     clearButton.props().onClick();
@@ -63,10 +63,10 @@ describe('SidebarContentError', () => {
       const wrapper = createComponent();
 
       assert.include(
-        errorText(wrapper),
+        wrapper.text(),
         'The annotation associated with the current URL is unavailable'
       );
-      assert.include(errorText(wrapper), 'You may need to log in');
+      assert.include(wrapper.text(), 'You may need to log in');
     });
 
     it('should render a log in button', () => {
@@ -88,10 +88,10 @@ describe('SidebarContentError', () => {
       const wrapper = createComponent();
 
       assert.include(
-        errorText(wrapper),
+        wrapper.text(),
         'The current URL links to an annotation, but that annotation'
       );
-      assert.notInclude(errorText(wrapper), 'You may need to log in');
+      assert.notInclude(wrapper.text(), 'You may need to log in');
     });
 
     it('should not provide an option to log in', () => {
@@ -111,10 +111,10 @@ describe('SidebarContentError', () => {
       const wrapper = createComponent({ errorType: 'group' });
 
       assert.include(
-        errorText(wrapper),
+        wrapper.text(),
         'The group associated with the current URL is unavailable'
       );
-      assert.include(errorText(wrapper), 'You may need to log in');
+      assert.include(wrapper.text(), 'You may need to log in');
     });
 
     it('should provide option to log in', () => {
@@ -134,10 +134,10 @@ describe('SidebarContentError', () => {
       const wrapper = createComponent({ errorType: 'group' });
 
       assert.include(
-        errorText(wrapper),
+        wrapper.text(),
         'The current URL links to a group, but that group'
       );
-      assert.notInclude(errorText(wrapper), 'You may need to log in');
+      assert.notInclude(wrapper.text(), 'You may need to log in');
     });
 
     it('should not provide an option to log in', () => {
