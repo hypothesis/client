@@ -62,6 +62,15 @@ function addCommonTests({ componentName, createComponentFn, withIcon = true }) {
       assert.isFalse(wrapper.find('button').hasClass(componentName));
     });
 
+    it('adds inline styles when provided', () => {
+      const wrapper = createComponentFn({ style: { backgroundColor: 'pink' } });
+
+      assert.equal(
+        wrapper.getDOMNode().getAttribute('style'),
+        'background-color: pink;'
+      );
+    });
+
     [
       {
         propName: 'expanded',
