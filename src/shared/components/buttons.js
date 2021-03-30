@@ -15,6 +15,7 @@ import { SvgIcon } from '@hypothesis/frontend-shared';
  * @prop {boolean} [pressed] - Is this button currently "active?" (set
  *   `aria-pressed`)
  * @prop {() => any} [onClick]
+ * @prop {Object} [style] - Optional inline styles
  * @prop {string} [title] - Button title; used for `aria-label` attribute
  * @prop {'primary'} [variant] - For styling: element variant
  */
@@ -41,6 +42,7 @@ function ButtonBase({
   expanded,
   pressed,
   onClick = () => {},
+  style = {},
   title,
   variant,
 }) {
@@ -68,6 +70,7 @@ function ButtonBase({
       })}
       onClick={onClick}
       {...otherAttributes}
+      style={style}
     >
       {children}
     </button>
