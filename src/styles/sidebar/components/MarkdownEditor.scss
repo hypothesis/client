@@ -62,6 +62,7 @@ svg.MarkdownEditor__toolbar-button-icon {
 .MarkdownEditor__input {
   @include forms.form-input;
 
+  line-height: var.$line-height;
   min-height: 8em;
   resize: vertical;
   width: 100%;
