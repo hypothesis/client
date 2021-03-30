@@ -1,12 +1,12 @@
-import { useStoreProxy } from '../store/use-store';
-import { copyText } from '../util/copy-to-clipboard';
-import { orgName } from '../helpers/group-list-item-common';
-import { withServices } from '../service-context';
+import { orgName } from '../../helpers/group-list-item-common';
+import { withServices } from '../../service-context';
+import { useStoreProxy } from '../../store/use-store';
+import { copyText } from '../../util/copy-to-clipboard';
 
-import MenuItem from './MenuItem';
+import MenuItem from '../MenuItem';
 
 /**
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**

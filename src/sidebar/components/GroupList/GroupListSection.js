@@ -1,8 +1,9 @@
+import MenuSection from '../MenuSection';
+
 import GroupListItem from './GroupListItem';
-import MenuSection from './MenuSection';
 
 /**
- * @typedef {import('../../types/api').Group} Group
+ * @typedef {import('../../../types/api').Group} Group
  */
 
 /**
