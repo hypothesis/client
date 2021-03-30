@@ -60,11 +60,16 @@
  * Establish a horizontal (margin) rhythm for this element's immediate
  * children (i.e. put equal space between children).
  *
+ * This mixin uses `!important` such that it can compete with specificity
+ * of reset rules that set some of our element's margins to 0. That allows
+ * these rules—which are applied to a parent element—to be able to assert
+ * margins, as it should be able to do.
+ *
  * @param $size [5px] - Size of horizontal margin between child elements
  */
 @mixin horizontal-rhythm($size: 5px) {
   & > * + * {
-    margin-left: $size;
+    margin-left: $size !important;
   }
 }
 
@@ -72,12 +77,17 @@
  * Establish a vertical (margin) rhythm for this element's immediate
  * children (i.e. put equal space between children).
  *
+ * This mixin uses `!important` such that it can compete with specificity
+ * of reset rules that set some of our element's margins to 0. That allows
+ * these rules—which are applied to a parent element—to be able to assert
+ * margins, as it should be able to do.
+ *
  * @param $size [var.$layout-space--medium]: Spacing size (padding)
  * @FIXME Find workaround for SvgIcon exception
  */
 @mixin vertical-rhythm($size: var.$layout-space) {
   & > * + *:not([class*='SvgIcon--inline']) {
-    margin-top: $size;
+    margin-top: $size !important;
   }
 }
 
