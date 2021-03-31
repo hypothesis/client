@@ -21,6 +21,7 @@ import NotebookView from './notebook-view';
 import ShareAnnotationsPanel from './share-annotations-panel';
 import ToastMessages from './toast-messages';
 import TopBar from './top-bar';
+import CustomTagsPanel from "./custom-tags-panel";
 
 /**
  * @typedef {import('../../types/api').Profile} Profile
@@ -187,6 +188,7 @@ function HypothesisApp({
         <ToastMessages />
         <HelpPanel auth={authState} />
         <ShareAnnotationsPanel />
+        <CustomTagsPanel />
 
         {route && (
           <main>
@@ -210,6 +212,7 @@ HypothesisApp.propTypes = {
   settings: propTypes.object,
   session: propTypes.object,
   toastMessenger: propTypes.object,
+  tags: propTypes.object
 };
 
 HypothesisApp.injectedProps = [
@@ -219,6 +222,7 @@ HypothesisApp.injectedProps = [
   'session',
   'settings',
   'toastMessenger',
+  'tags'
 ];
 
 export default withServices(HypothesisApp);

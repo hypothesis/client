@@ -1,5 +1,5 @@
 import { createElement } from 'preact';
-import { useRef, useState, useEffect } from 'preact/hooks';
+import { useRef, useState } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 import { withServices } from '../util/service-context';
@@ -270,17 +270,6 @@ function TagEditor({
     activeItem >= 0
       ? `${tagEditorId}-autocomplete-list-item-${activeItem}`
       : '';
-//TODO needs refactoring
-  useEffect(() => {
-        fetchSug();
-    }, []);
-
-    const fetchSug = async () => {
-        const response = await fetch("https://raw.githubusercontent.com/MaastrichtU-IDS/cbcm-ontology/master/working_copy/cbcm_ontology_terms_flatlist.csv");
-        const responseText = await response.text();
-        const splittedText = await responseText.split('\n');
-        tagsService.store(splittedText.map(tag => ({ text: tag })));
-    };
 
     return (
     <div className="tag-editor">

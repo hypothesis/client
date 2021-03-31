@@ -3,6 +3,7 @@
  */
 
 export default {
+  CUSTOM_TAG_PANEL: 'customTags',
   PANEL_HELP: 'help',
   PANEL_LOGIN_PROMPT: 'loginPrompt',
   PANEL_SHARE_ANNOTATIONS: 'shareGroupAnnotations',

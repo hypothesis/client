@@ -61,6 +61,10 @@ function TopBar({
     store.toggleSidebarPanel(uiConstants.PANEL_SHARE_ANNOTATIONS);
   };
 
+  const toggleCustomTagsPanel = () => {
+    store.toggleSidebarPanel(uiConstants.CUSTOM_TAG_PANEL);
+  };
+
   const isHelpPanelOpen = store.isSidebarPanelOpen(uiConstants.PANEL_HELP);
   const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
     uiConstants.PANEL_SHARE_ANNOTATIONS
@@ -153,6 +157,13 @@ function TopBar({
               title="Share annotations on this page"
             />
           )}
+          <Button
+              className="top-bar__icon-button"
+              icon="upload"
+              isExpanded={isAnnotationsPanelOpen}
+              onClick={toggleCustomTagsPanel}
+              title="Specify custom annotation tags"
+          />
           <Button
             className="top-bar__icon-button"
             icon="help"

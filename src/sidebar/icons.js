@@ -51,4 +51,5 @@ export default {
   sort: require('../images/icons/sort.svg'),
   trash: require('../images/icons/trash.svg'),
   twitter: require('../images/icons/twitter.svg'),
+  upload: require('../images/icons/upload.svg')
 };
