@@ -121,5 +121,6 @@
     "typecheck": "tsc --build src/tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build"
-  }
+  },
+  "dependencies": {}
 }

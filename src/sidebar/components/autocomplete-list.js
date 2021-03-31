@@ -1,6 +1,6 @@
 import { createElement } from 'preact';
 import classnames from 'classnames';
-import { useMemo } from 'preact/hooks';
+import { useMemo, useState, useEffect } from 'preact/hooks';
 import propTypes from 'prop-types';
 
 const defaultListFormatter = item => item;
@@ -44,6 +44,18 @@ export default function AutocompleteList({
   onSelectItem,
   open = false,
 }) {
+  const [tooltips, setTooltips] = useState(['']);
+  const fetchTooltips = async () => {
+      const response = await fetch('https://raw.githubusercontent.com/MaastrichtU-IDS/cbcm-ontology/master/working_copy/tooltips1.csv');
+      const responseText = await response.text();
+      const splittedText = await responseText.split('\n');
+      setTooltips(splittedText);
+  };
+
+  useEffect(() => {
+    fetchTooltips();
+  },[]);
+
   const items = useMemo(() => {
     return list.map((item, index) => {
       // only add an id if itemPrefixId is passed
@@ -52,26 +64,27 @@ export default function AutocompleteList({
       return (
         // The parent <input> field should capture keyboard events
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events
-        <li
-          key={`autocomplete-list-${index}`}
-          role="option"
-          aria-selected={(activeItem === index).toString()}
-          className={classnames(
-            {
-              'is-selected': activeItem === index,
-            },
-            'autocomplete-list__li'
-          )}
-          onClick={() => {
-            onSelectItem(item);
-          }}
-          {...props}
-        >
-          {listFormatter(item, index)}
-        </li>
+          <li
+            key={`autocomplete-list-${index}`}
+            title={tooltips[index]}
+            role="option"
+            aria-selected={(activeItem === index).toString()}
+            className={classnames(
+              {
+                'is-selected': activeItem === index,
+              },
+              'autocomplete-list__li'
+            )}
+            onClick={() => {
+              onSelectItem(item);
+            }}
+            {...props}
+          >
+              {listFormatter(item, index)}
+          </li>
       );
     });
-  }, [activeItem, itemPrefixId, list, listFormatter, onSelectItem]);
+  }, [tooltips, activeItem, itemPrefixId, list, listFormatter, onSelectItem]);
 
   const props = id ? { id } : {}; // only add the id if its passed
   const isHidden = list.length === 0 || !open;

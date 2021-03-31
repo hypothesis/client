@@ -1,4 +1,4 @@
-/* global process */
+  /* global process */
 
 /* global __dirname */
 
