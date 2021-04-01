@@ -17,7 +17,7 @@ import { registerIcons } from '@hypothesis/frontend-shared';
 import iconSet from './icons';
 registerIcons(iconSet);
 
-import configFrom from './config/index';
+import Config from './config/index';
 import Guest from './guest';
 import Notebook from './notebook';
 import Sidebar from './sidebar';
@@ -31,12 +31,13 @@ const appLinkEl = /** @type {Element} */ (document.querySelector(
   'link[type="application/annotator+html"][rel="sidebar"]'
 ));
 
-const config = configFrom(window);
+const config = new Config(window);
+const annotatorConfig = config.getConfig('annotator');
 
 function init() {
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
-  if (config.subFrameIdentifier) {
+  if (annotatorConfig.subFrameIdentifier) {
     // Other modules use this to detect if this
     // frame context belongs to hypothesis.
     // Needs to be a global property that's set.
@@ -44,14 +45,18 @@ function init() {
   }
 
   // Load the PDF anchoring/metadata integration.
-  config.documentType = isPDF ? 'pdf' : 'html';
+  annotatorConfig.documentType = isPDF ? 'pdf' : 'html';
 
   const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, config);
-  const sidebar = !config.subFrameIdentifier
-    ? new Sidebar(document.body, eventBus, guest, config)
+  const guest = new Guest(document.body, eventBus, annotatorConfig);
+  const sidebar = !annotatorConfig.subFrameIdentifier
+    ? new Sidebar(document.body, eventBus, guest, config.getConfig('sidebar'))
     : null;
-  const notebook = new Notebook(document.body, eventBus, config);
+  const notebook = new Notebook(
+    document.body,
+    eventBus,
+    config.getConfig('notebook')
+  );
 
   appLinkEl.addEventListener('destroy', () => {
     sidebar?.destroy();
