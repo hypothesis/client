@@ -51,7 +51,14 @@ function init() {
   const sidebar = !config.subFrameIdentifier
     ? new Sidebar(document.body, eventBus, guest, config)
     : null;
-  const notebook = new Notebook(document.body, eventBus, config);
+  // Clear `annotations` value from the notebook's config to prevent direct-linked
+  // annotations from filtering the threads.
+  //
+  // TODO: Refactor configFrom() so it can export application specific configs
+  // for different usages such as the notebook.
+  const notebookConfig = { ...config };
+  notebookConfig.annotations = null;
+  const notebook = new Notebook(document.body, eventBus, notebookConfig);
 
   appLinkEl.addEventListener('destroy', () => {
     sidebar?.destroy();
