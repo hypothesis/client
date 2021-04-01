@@ -26,7 +26,7 @@
 .Notebook__inner {
   position: relative;
   box-sizing: border-box;
-  @include molecules.panel;
+  @include molecules.card-frame;
   padding: 0;
   width: 100%;
   height: 100%;
@@ -37,7 +37,6 @@
   width: 100%;
   height: 100%;
   border: none;
-  margin-top: 0 !important; // disables the margin-top set by vertical-rhythm mixin
 }
 
 .Notebook__close-button {
