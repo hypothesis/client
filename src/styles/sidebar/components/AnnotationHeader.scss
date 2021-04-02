@@ -23,7 +23,8 @@
 
   // Timestamps are right aligned in a flex row
   &__timestamps {
-    margin-left: auto;
+    flex-grow: 1;
+    text-align: right;
   }
 
   &__highlight-icon {

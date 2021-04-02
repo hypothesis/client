@@ -120,7 +120,7 @@ function AnnotationHeader({
 
   return (
     <header className="AnnotationHeader">
-      <div className="AnnotationHeader__row">
+      <div className="AnnotationHeader__row u-horizontal-rhythm">
         {annotationIsPrivate && !isEditing && (
           <SvgIcon
             className="AnnotationHeader__icon"
@@ -154,7 +154,7 @@ function AnnotationHeader({
       </div>
 
       {showExtendedInfo && (
-        <div className="AnnotationHeader__row">
+        <div className="AnnotationHeader__row u-horizontal-rhythm">
           <AnnotationShareInfo annotation={annotation} />
           {!isEditing && isHighlight(annotation) && (
             <div className="AnnotationHeader__highlight">
