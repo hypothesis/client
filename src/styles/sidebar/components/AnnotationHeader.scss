@@ -7,7 +7,6 @@
 .AnnotationHeader {
   &__row {
     @include layout.row($align: baseline);
-    @include layout.horizontal-rhythm;
     // Wrap onto multiple rows from bottom to top
     flex-wrap: wrap-reverse;
   }
