@@ -86,16 +86,9 @@ export function Pattern({ children, title }) {
  *
  * @param {PatternExamplesProps} props
  */
-export function PatternExamples({ children, title }) {
+export function PatternExamples({ children }) {
   return (
     <table className="PatternExamples">
-      {title && (
-        <tr>
-          <th colSpan={3}>
-            <h3>{title}</h3>
-          </th>
-        </tr>
-      )}
       <tr>
         <th>Example</th>
         <th>Details</th>
@@ -110,6 +103,8 @@ export function PatternExamples({ children, title }) {
  * @typedef PatternExampleProps
  * @prop {import("preact").ComponentChildren} children - Example source
  * @prop {string} details - Details about the pattern example
+ * @prop {Object} [style] - Optional additional inline styles to apply to the
+ *   table cell with the rendered example
  */
 
 /**
@@ -118,7 +113,7 @@ export function PatternExamples({ children, title }) {
  *
  * @param {PatternExampleProps} props
  */
-export function PatternExample({ children, details }) {
+export function PatternExample({ children, details, style = {} }) {
   const source = toChildArray(children).map((child, idx) => {
     return (
       <li key={idx}>
@@ -130,7 +125,9 @@ export function PatternExample({ children, details }) {
   });
   return (
     <tr>
-      <td className="PatternExample__example">{children}</td>
+      <td style={style}>
+        <div className="PatternExample__example">{children}</div>
+      </td>
       <td>{details}</td>
       <td>
         <ul>{source}</ul>

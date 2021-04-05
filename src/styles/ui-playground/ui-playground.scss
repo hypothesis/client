@@ -28,9 +28,15 @@ h2 {
 }
 
 h3 {
-  width: 100%;
   font-size: 1.125em;
   font-weight: normal;
+  font-style: italic;
+  margin: 1em 0;
+}
+
+h4 {
+  font-size: 1em;
+  font-weight: 500;
   font-style: italic;
 }
 
@@ -82,19 +88,27 @@ pre {
   }
 }
 
-// Temporarily enforce the body font size of the client to demonstrate how
-// components would scale in-situ
 .PatternPage {
-  font-size: 13px;
+  font-size: 14px;
+
   &__content {
     padding: 2em 0;
   }
 }
 
 .Pattern {
-  margin-bottom: 4em;
+  margin: 0 0 4em 1em;
   p {
     margin: 1em;
+    margin-left: 0;
+  }
+
+  & > p:first-of-type {
+    font-size: 125%;
+  }
+
+  h2 {
+    margin-left: -1em;
   }
 }
 
@@ -102,6 +116,7 @@ pre {
   border: 1px solid var.$grey-3;
   border-collapse: collapse;
   width: 100%;
+  margin-top: 1em;
   margin-bottom: 2em;
 
   th,
@@ -120,7 +135,7 @@ pre {
     padding-bottom: 10px;
   }
 
-  tr:nth-child(even) td {
+  tr:nth-child(even) {
     background: var.$grey-0;
   }
 
