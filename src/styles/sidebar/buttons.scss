@@ -1,22 +1,17 @@
 // Button styling for the sidebar extending common button-component styles
 @use '../shared/components/buttons/mixins' as buttons;
 
-// Similar to `.IconButton`, with these changes:
-// - omit responsive minimum sizing
-// - tighten padding
-.CompactIconButton {
-  // Use icon colors for base and primary variants
-  $base-options: (
-    'colormap': buttons.colormap('icon'),
+// Similar to `.LinkButton`, with inline layout (so button can be used
+// within text)
+.InlineLinkButton {
+  @include buttons.LinkButton(
+    (
+      'inline': true,
+    )
   );
-  $primary-options: (
-    'colormap': buttons.colormap('icon--primary'),
-  );
-
-  @include buttons.Button($options: $base-options) {
-    padding: 0.25em; // Override padding
-  }
-  &--primary {
-    @include buttons.Button--variant($options: $primary-options);
+  // Custom: The dark variant is used for inline, anchor-like styling and needs
+  // to be underlined at all times to match <a> styling near it
+  &--dark {
+    text-decoration: underline;
   }
 }

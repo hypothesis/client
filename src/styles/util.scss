@@ -50,6 +50,10 @@
   @include layout.vertical-rhythm;
 }
 
+.u-font--large {
+  @include utils.font--large;
+}
+
 .u-font--xlarge {
   @include utils.font--xlarge;
 }

@@ -147,13 +147,10 @@ describe('TopBar', () => {
         onSignUp,
       });
       const loginText = getLoginText(wrapper);
-      const loginButtons = loginText.find('Button');
+      const loginButtons = loginText.find('LinkButton');
       assert.equal(loginButtons.length, 2);
 
-      assert.equal(loginButtons.at(0).props().buttonText, 'Sign up');
       assert.equal(loginButtons.at(0).props().onClick, onSignUp);
-
-      assert.equal(loginButtons.at(1).props().buttonText, 'Log in');
       assert.equal(loginButtons.at(1).props().onClick, onLogin);
     });
 

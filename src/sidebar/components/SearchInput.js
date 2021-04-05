@@ -80,9 +80,9 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
       {!isLoading && (
         <div className="SearchInput__button-container">
           <IconButton
-            className="CompactIconButton"
             icon="search"
             onClick={() => input.current.focus()}
+            size="small"
             title="Search annotations"
           />
         </div>
