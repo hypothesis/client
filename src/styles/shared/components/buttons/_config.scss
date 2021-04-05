@@ -7,6 +7,7 @@ $touch-target-size: var.$touch-target-size !default;
 $color-g1: var.$color-grey-1 !default;
 $color-g2: var.$color-grey-2 !default;
 $color-g3: var.$color-grey-3 !default;
+$color-g4: var.$color-grey-4 !default;
 $color-g6: var.$color-grey-6 !default;
 $color-g7: var.$color-grey-7 !default;
 $color-gsemi: var.$color-grey-semi !default;
@@ -14,62 +15,96 @@ $color-gmid: var.$color-grey-mid !default;
 $color-brand: var.$color-brand !default;
 $color-link-hover: var.$color-link-hover !default;
 
-// The following SASS maps define color sets for each type of button
-
-// Default colors for buttons
-$colors: (
+// Colors for labeled buttons
+$LabeledButton-colors: (
   'foreground': $color-gmid,
   'background': $color-g1,
   'hover-foreground': $color-g7,
   'hover-background': $color-g2,
   'active-foreground': $color-g7,
-  'active-background': $color-g1,
-  'border': transparent,
   'disabled-foreground': $color-gmid,
 );
 
-// Icon-only buttons have a transparent background by default, and a more
-// visible active (pressed) state
-$IconButton-colors: map.merge(
-  $colors,
-  (
-    'background': transparent,
-    'hover-background': transparent,
-    'active-foreground': $color-brand,
-    'active-background': transparent,
-  )
+// Variant currently unused
+$LabeledButton-colors--light: $LabeledButton-colors;
+
+$LabeledButton-colors--primary: (
+  'foreground': $color-g1,
+  'background': $color-gmid,
+  'hover-foreground': $color-g1,
+  'hover-background': $color-g6,
+  'active-foreground': $color-g1,
+  'disabled-foreground': $color-g4,
 );
 
-$IconButton-colors--primary: map.merge(
-  $IconButton-colors,
-  (
-    'foreground': $color-brand,
-    'hover-foreground': $color-brand,
-    'active-foreground': $color-brand,
-  )
+$LabeledButton-colors--dark: (
+  'foreground': $color-gmid,
+  'background': transparent,
+  'hover-foreground': $color-g7,
+  'hover-background': $color-g3,
+  'active-foreground': $color-gmid,
+  'active-background': $color-g3,
+  'disabled-foreground': $color-gmid,
 );
 
-$LabeledButton-colors: $colors;
-
-// This set of colors is light text on dark background
-$LabeledButton-colors--primary: map.merge(
-  $colors,
-  (
-    'foreground': $color-g1,
-    'background': $color-gmid,
-    'hover-foreground': $color-g1,
-    'hover-background': $color-g6,
-    'disabled-foreground': $color-gsemi,
-  )
+// Colors for icon-only buttons
+$IconButton-colors: (
+  'foreground': $color-gmid,
+  'background': transparent,
+  'hover-foreground': $color-g7,
+  'hover-background': transparent,
+  'active-foreground': $color-brand,
+  'disabled-foreground': $color-gmid,
 );
 
-// This set of colors is for buttons styled as links on a white background
-$LinkButton-colors: map.merge(
-  $colors,
-  (
-    'background': transparent,
-    'hover-background': transparent,
-    'active-background': transparent,
-    'hover-foreground': $color-link-hover,
-  )
+$IconButton-colors--light: (
+  'foreground': $color-gsemi,
+  'background': transparent,
+  'hover-foreground': $color-g6,
+  'hover-background': transparent,
+  'active-foreground': $color-gsemi,
+  'disabled-foreground': $color-gsemi,
+);
+
+$IconButton-colors--primary: (
+  'foreground': $color-brand,
+  'background': transparent,
+  'hover-foreground': $color-brand,
+  'hover-background': transparent,
+  'active-foreground': $color-brand,
+  'disabled-foreground': $color-gmid,
+);
+
+// Variant currently unused
+$IconButton-colors--dark: $IconButton-colors;
+
+// Colors for buttons styled as "links"
+$LinkButton-colors: (
+  'foreground': $color-gmid,
+  'background': transparent,
+  'hover-foreground': $color-link-hover,
+  'hover-background': transparent,
+  'active-foreground': $color-g7,
+  'disabled-foreground': $color-gmid,
+);
+
+// Variant currently unused
+$LinkButton-colors--light: $LinkButton-colors;
+
+$LinkButton-colors--primary: (
+  'foreground': $color-brand,
+  'background': transparent,
+  'hover-foreground': $color-brand,
+  'hover-background': transparent,
+  'active-foreground': $color-brand,
+  'disabled-foreground': $color-gmid,
+);
+
+$LinkButton-colors--dark: (
+  'foreground': $color-g7,
+  'background': transparent,
+  'hover-foreground': $color-link-hover,
+  'hover-background': transparent,
+  'active-foreground': $color-g7,
+  'disabled-foreground': $color-gmid,
 );

@@ -2,174 +2,141 @@
 
 @use "@hypothesis/frontend-shared/styles/mixins/focus";
 
-@use './_config' as *;
+@use './_config' as c;
+@use './_base' as base;
 
-// Reset browser native styles. This can be used in conjunction with other
-// styles via `base` or standalone for starting a custom button's styles
-// from relative scratch
-@mixin reset {
-  @include focus.outline-on-keyboard-focus;
-  // Reset native styles
-  padding: 0;
-  margin: 0;
-  background-color: transparent;
-  border-style: none;
-}
+// Allow access to the configuration values to users of this module (esp. colors)
+@forward './_config';
 
-// Set colors for a button
-@mixin _colors($colormap) {
-  color: map.get($colormap, 'foreground');
-  background-color: map.get($colormap, 'background');
-
-  &:disabled {
-    color: map.get($colormap, 'disabled-foreground');
-  }
-}
-
-// Set hover colors and transition for a button
-@mixin hover-state($colormap) {
-  &:hover:not([disabled]),
-  &:focus:not([disabled]) {
-    color: map.get($colormap, 'hover-foreground');
-    background-color: map.get($colormap, 'hover-background');
-    @content;
-  }
-  transition: color 0.2s ease-out, background-color 0.2s ease-out,
-    opacity 0.2s ease-out;
-}
-
-// Set active state colors for a button
-@mixin active-state($colormap) {
-  &[aria-expanded='true'],
-  &[aria-pressed='true'] {
-    color: map.get($colormap, 'active-foreground');
-    background-color: map.get($colormap, 'active-background');
-    @content;
-
-    &:hover:not([disabled]),
-    &:focus:not([disabled]) {
-      color: map.get($colormap, 'active-foreground');
-      background-color: map.get($colormap, 'active-background');
-      @content;
-    }
-  }
-}
-
-// Variant mixin: may be be used by variants (BEM modifier classes)
-@mixin _variant($options) {
-  @include _colors(map.get($options, 'colormap'));
-  @if map.get($options, 'withStates') {
-    @include active-state(map.get($options, 'colormap'));
-    @include hover-state(map.get($options, 'colormap'));
-  }
-  @content;
-}
-
-// Base mixin for buttons.
-@mixin _button($options) {
-  @include reset;
-  @include _colors(map.get($options, 'colormap'));
-
-  @if map.get($options, 'withStates') {
-    @include active-state(map.get($options, 'colormap'));
-    @include hover-state(map.get($options, 'colormap'));
-  }
-
-  border-radius: map.get($options, 'border-radius');
-  border: none;
-  padding: 0.5em;
-
-  font-size: 1em;
-  font-weight: 700;
-  white-space: nowrap; // Keep multi-word button labels from wrapping
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  @if map.get($options, 'withLayout') {
-    &--icon-left svg {
-      margin-right: map.get($options, 'margin');
-    }
-
-    &--icon-right svg {
-      margin-left: map.get($options, 'margin');
-    }
-    // When a button has "layout", that indicates it has some textual content:
-    // Size text to the contextual 1em, and adjust the icon to look balanced.
-    // H frontend app buttons tend to apply an icon:text ratio of ~1.25:1
-    svg {
-      width: 1.25em;
-      height: 1.25em;
-    }
-  } @else {
-    // In the case where an icon is the only content in a <button> element,
-    // size the icon based on contextual font-size. i.e. the icon IS
-    // the content
-    svg {
-      width: 1em;
-      height: 1em;
-    }
-  }
-}
-
-/**
- * Convenience function to retrieve a colormap. This obviates the need to reach
- * into the `_config` module directly from outside and is less verbose.
- *
- * @param {'colors'|'icon'|'icon--primary'|'labeled'|'labeled--primary'|'link'}
- *        [$name] - Shorthand name of colormap to retrieved. Defaults to base
- *          $colors.
- * @return {sass:map}
- */
-@function colormap($name: 'colors') {
-  $result: $colors;
-  @if $name == 'icon' {
-    $result: $IconButton-colors;
-  }
-  @if $name == 'icon--primary' {
-    $result: $IconButton-colors--primary;
-  }
-  @if $name == 'labeled' {
-    $result: $LabeledButton-colors;
-  }
-  @if $name == 'labeled--primary' {
-    $result: $LabeledButton-colors--primary;
-  }
-  @if $name == 'link' {
-    $result: $LinkButton-colors;
-  }
-  @return $result;
-}
-
-// Base mixin for <button> elements. Start here for new <button> classes
+// Base mixin for <button> elements
 @mixin Button($options: ()) {
   $defaultOptions: (
     // What colors should be used for this button's styling?
-    'colormap': $colors,
+    'colormap': c.$LabeledButton-colors,
+    // And for its variants...needed if `withVariants` is true (true is default)
+    'colormap--primary': c.$LabeledButton-colors--primary,
+    'colormap--dark': c.$LabeledButton-colors--dark,
+    'colormap--light': c.$LabeledButton-colors--light,
+    // Should this button apply an inline layout? (default is flex)
+    'inline': false,
     // Should styling be added for "active" and "hover" states for this <button>?
     'withStates': true,
     // Should styling be added to support the layout of multiple sub-elements
     // of this <button>? Not needed if <button> contains only one child.
     'withLayout': false,
+    // Provide styling for light, primary and dark variants? If this is true,
+    // make sure all variant colormaps are provided
+    'withVariants': true,
     // Internal margin around SVG icon
     'margin': 0.5em,
     'border-radius': 2px
   );
   $-options: map.merge($defaultOptions, $options);
-  @include _button($options: $-options);
+
+  @include base.button($options: $-options);
+
+  // Add styles for supported variants as modifier classes, if `withVariants` enabled
+  @if (map.get($-options, 'withVariants')) {
+    &--light {
+      $-light-options: (
+        'colormap': map.get($-options, 'colormap--light'),
+        'withStates': map.get($-options, 'withStates'),
+      );
+      @include base.button--variant($-light-options);
+    }
+
+    &--primary {
+      $-primary-options: (
+        'colormap': map.get($-options, 'colormap--primary'),
+        'withStates': map.get($-options, 'withStates'),
+      );
+      @include base.button--variant($-primary-options);
+    }
+
+    &--dark {
+      $-dark-options: (
+        'colormap': map.get($-options, 'colormap--dark'),
+        'withStates': map.get($-options, 'withStates'),
+      );
+      @include base.button--variant($-dark-options);
+    }
+  }
   @content;
 }
 
-// Mixin for --modifier variants on buttons, e.g. `.MyButton--primary`
-@mixin Button--variant($options: ()) {
+// Base mixin for a button with an icon and no label/content. Supports
+// variants and sizes. Will assert responsive touch-target sizing in
+// --medium (default) and --large variants.
+@mixin IconButton($options: ()) {
   $defaultOptions: (
-    // Colors to use when styling this variant
-    'colormap': $colors,
-    // Should this variant have styling for "active" and "hover" states?
-    'withStates': true
+    'colormap': c.$IconButton-colors,
+    'colormap--light': c.$IconButton-colors--light,
+    'colormap--primary': c.$IconButton-colors--primary,
+    'colormap--dark': c.$IconButton-colors--dark,
+    'responsive': true,
   );
   $-options: map.merge($defaultOptions, $options);
-  @include _variant($options: $-options);
+
+  @include Button($-options) {
+    // Establish a minimum touch-target for touch devices if 'responsive'
+    // option is enabled (default). This is not applied to the `--small`
+    // size variant.
+    @if map.get($-options, 'responsive') {
+      @media (pointer: coarse) {
+        &--medium,
+        &--large {
+          min-width: c.$touch-target-size;
+          min-height: c.$touch-target-size;
+        }
+      }
+    }
+  }
+
+  @content;
+}
+
+// Base mixin for a button that has text/content and, optionally, an icon.
+// Supports variants and sizes.
+@mixin LabeledButton($options: ()) {
+  $defaultOptions: (
+    'colormap': c.$LabeledButton-colors,
+    'colormap--light': c.$LabeledButton-colors--light,
+    'colormap--primary': c.$LabeledButton-colors--primary,
+    'colormap--dark': c.$LabeledButton-colors--dark,
+    'withLayout': true,
+  );
+  $-options: map.merge($defaultOptions, $options);
+
+  @include Button($-options);
+
+  @content;
+}
+
+// Base mixin for a button styled to look like an <a> link. Supports variants
+// but not pressed/active states at present.
+@mixin LinkButton($options: ()) {
+  $defaultOptions: (
+    'colormap': c.$LinkButton-colors,
+    'colormap--light': c.$LinkButton-colors--light,
+    'colormap--primary': c.$LinkButton-colors--primary,
+    'colormap--dark': c.$LinkButton-colors--dark,
+  );
+  $-options: map.merge($defaultOptions, $options);
+  @include Button($-options) {
+    // Lighter font weight for link-styled buttons
+    font-weight: 400;
+    // Add an underline on hover
+    &:hover:not([disabled]) {
+      text-decoration: underline;
+    }
+
+    &--primary {
+      // Primary variant has bolder text (and also different colors)
+      font-weight: 500;
+    }
+  }
+
+  // Remove padding to allow button to appear flush with surrounding content
+  padding: 0;
   @content;
 }

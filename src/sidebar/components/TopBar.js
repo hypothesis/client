@@ -5,9 +5,8 @@ import isThirdPartyService from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
-import { IconButton } from '../../shared/components/buttons';
+import { IconButton, LinkButton } from '../../shared/components/buttons';
 
-import Button from './Button';
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
 import SortMenu from './SortMenu';
@@ -83,20 +82,24 @@ function TopBar({
         <span className="TopBar__login-links">⋯</span>
       )}
       {auth.status === 'logged-out' && (
-        <span className="TopBar__login-links">
-          <Button
-            className="TopBar__login-button"
-            buttonText="Sign up"
+        <span className="TopBar__login-links u-font--large u-horizontal-rhythm">
+          <LinkButton
+            className="InlineLinkButton"
             onClick={onSignUp}
             style={loginLinkStyle}
-          />{' '}
-          /
-          <Button
-            className="TopBar__login-button"
-            buttonText="Log in"
+            variant="primary"
+          >
+            Sign up
+          </LinkButton>
+          <div>/</div>
+          <LinkButton
+            className="InlineLinkButton"
             onClick={onLogin}
             style={loginLinkStyle}
-          />
+            variant="primary"
+          >
+            Log in
+          </LinkButton>
         </span>
       )}
       {auth.status === 'logged-in' && (
@@ -113,10 +116,10 @@ function TopBar({
           <StreamSearchInput />
           <div className="u-stretch" />
           <IconButton
-            className="CompactIconButton"
             icon="help"
             expanded={isHelpPanelOpen}
             onClick={requestHelp}
+            size="small"
             title="Help"
           />
           {loginControl}
@@ -129,9 +132,9 @@ function TopBar({
           <div className="u-stretch" />
           {pendingUpdateCount > 0 && (
             <IconButton
-              className="CompactIconButton"
               icon="refresh"
               onClick={applyPendingUpdates}
+              size="small"
               variant="primary"
               title={`Show ${pendingUpdateCount} new/updated ${
                 pendingUpdateCount === 1 ? 'annotation' : 'annotations'
@@ -145,18 +148,18 @@ function TopBar({
           <SortMenu />
           {showSharePageButton && (
             <IconButton
-              className="CompactIconButton"
               icon="share"
               expanded={isAnnotationsPanelOpen}
               onClick={toggleSharePanel}
+              size="small"
               title="Share annotations on this page"
             />
           )}
           <IconButton
-            className="CompactIconButton"
             icon="help"
             expanded={isHelpPanelOpen}
             onClick={requestHelp}
+            size="small"
             title="Help"
           />
           {loginControl}
