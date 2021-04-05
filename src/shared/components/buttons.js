@@ -15,9 +15,11 @@ import { SvgIcon } from '@hypothesis/frontend-shared';
  * @prop {boolean} [pressed] - Is this button currently "active?" (set
  *   `aria-pressed`)
  * @prop {() => any} [onClick]
+ * @prop {'small'|'medium'|'large'} [size='medium'] - Relative button size:
+ *   affects padding
  * @prop {Object} [style] - Optional inline styles
  * @prop {string} [title] - Button title; used for `aria-label` attribute
- * @prop {'primary'} [variant] - For styling: element variant
+ * @prop {'normal'|'primary'|'light'|'dark'} [variant='normal'] - For styling: element variant
  */
 
 /**
@@ -42,9 +44,10 @@ function ButtonBase({
   expanded,
   pressed,
   onClick = () => {},
+  size = 'medium',
   style = {},
   title,
-  variant,
+  variant = 'normal',
 }) {
   const otherAttributes = {};
   if (typeof disabled === 'boolean') {
@@ -64,10 +67,14 @@ function ButtonBase({
 
   return (
     <button
-      className={classnames(className, {
-        [`${className}--${variant}`]: variant,
-        [`${className}--icon-${iconPosition}`]: icon,
-      })}
+      className={classnames(
+        className,
+        `${className}--${size}`,
+        `${className}--${variant}`,
+        {
+          [`${className}--icon-${iconPosition}`]: icon,
+        }
+      )}
       onClick={onClick}
       {...otherAttributes}
       style={style}

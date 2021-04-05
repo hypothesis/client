@@ -41,11 +41,39 @@ function addCommonTests({ componentName, createComponentFn, withIcon = true }) {
       assert.isTrue(wrapper.find('button').hasClass(componentName));
     });
 
-    it('renders a primary variant', () => {
-      const wrapper = createComponentFn({ variant: 'primary' });
+    ['primary', 'light', 'dark'].forEach(variant => {
+      it('renders a valid variant', () => {
+        const wrapper = createComponentFn({ variant });
+
+        assert.isTrue(
+          wrapper.find('button').hasClass(`${componentName}--${variant}`)
+        );
+      });
+    });
+
+    it('sets a `normal` variant modifier class by default', () => {
+      const wrapper = createComponentFn();
 
       assert.isTrue(
-        wrapper.find('button').hasClass(`${componentName}--primary`)
+        wrapper.find('button').hasClass(`${componentName}--normal`)
+      );
+    });
+
+    ['small', 'medium', 'large'].forEach(size => {
+      it('renders a valid size', () => {
+        const wrapper = createComponentFn({ size });
+
+        assert.isTrue(
+          wrapper.find('button').hasClass(`${componentName}--${size}`)
+        );
+      });
+    });
+
+    it('sets a `medium` size modifier class by default', () => {
+      const wrapper = createComponentFn();
+
+      assert.isTrue(
+        wrapper.find('button').hasClass(`${componentName}--medium`)
       );
     });
 
