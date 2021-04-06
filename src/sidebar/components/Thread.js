@@ -5,8 +5,9 @@ import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
 
+import { IconButton, LabeledButton } from '../../shared/components/buttons';
+
 import Annotation from './Annotation';
-import Button from './Button';
 import ModerationBanner from './ModerationBanner';
 
 /** @typedef {import('../helpers/build-thread').Thread} Thread */
@@ -90,12 +91,17 @@ function Thread({ thread, threadsService }) {
     >
       {showThreadToggle && (
         <div className="Thread__collapse">
-          <Button
-            className="Thread__collapse-button"
-            icon={toggleIcon}
-            title={toggleTitle}
-            onClick={onToggleReplies}
-          />
+          <div className="Thread__collapse-button-container">
+            <IconButton
+              className="NonResponsiveIconButton"
+              expanded={!thread.collapsed}
+              icon={toggleIcon}
+              title={toggleTitle}
+              onClick={onToggleReplies}
+              size="medium"
+              variant="light"
+            />
+          </div>
         </div>
       )}
 
@@ -103,11 +109,11 @@ function Thread({ thread, threadsService }) {
         {annotationContent}
 
         {showHiddenToggle && (
-          <Button
-            buttonText={`Show ${countHidden(thread)} more in conversation`}
-            className="Thread__hidden-toggle-button"
-            onClick={() => threadsService.forceVisible(thread)}
-          />
+          <div className="Thread__hidden-toggle-button-container">
+            <LabeledButton onClick={() => threadsService.forceVisible(thread)}>
+              Show {countHidden(thread)} more in conversation
+            </LabeledButton>
+          </div>
         )}
 
         {showChildren && (

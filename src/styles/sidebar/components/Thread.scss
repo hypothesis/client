@@ -1,4 +1,3 @@
-@use "../../mixins/buttons";
 @use "../../mixins/layout";
 @use "../../variables" as var;
 
@@ -13,19 +12,17 @@
     margin-left: var.$layout-space;
   }
 
-  &__children {
-    margin-left: -1 * var.$layout-space;
-  }
-
-  &__unavailable-message {
-    margin: 0 var.$layout-space;
-  }
-
   // Left "channel" of thread
   &__collapse {
-    margin-right: 1em;
+    position: relative;
+    // Ensure that even when this thread is collapsed, it is allotted a minimal
+    // bit of vertical real estate so that the expand/collapse toggle (which is
+    // positioned absolute) has "room". This applies when collapsing a thread
+    // with a deleted annotation in it, as otherwise there is no content when
+    // collapsed.
+    min-height: 2em;
     border-right: 1px dashed var.$color-border;
-    // The entire channel is NOT clickable so don't make it look like it is
+    // The entire channel is not clickable so don't make it look like it is
     // (overrides `pointer` cursor applied to entire card)
     cursor: auto;
 
@@ -39,30 +36,23 @@
     }
   }
 
-  &__collapse-button {
-    @include buttons.button;
-    color: var.$grey-mid;
-    margin-right: -1.25em;
-    padding: 0.25em 0.75em 0.75em 0.75em;
-    // Need a non-transparent background so that the dashed border line
-    // does not show through the button
+  // Container holding the thread's collapse/expand "chevron" icon button
+  &__collapse-button-container {
+    position: absolute;
+    // Position this element (and its button) such that it is horizontally
+    // centered on the parent element's right border and aligned vertically
+    // with the content on the right
+    top: -0.25em;
+    left: -1em;
+    // Give a non-transparent background to this element so that the dashed
+    // border (vertical) on the parent element doesn't show through the
+    // child button
     background-color: var.$white;
-
-    svg {
-      // This is not an icon and as such does not use a mixin
-      width: 12px;
-      height: 12px;
-      color: var.$grey-4;
-    }
-
-    &:hover &__icon {
-      color: var.$grey-6;
-    }
   }
-  &__hidden-toggle-button {
-    // This makes the vertical alignment with thread-collapse chevrons
-    // more precise
-    @include buttons.button--labeled;
+
+  &__hidden-toggle-button-container {
+    // This makes the vertical alignment of the "Show x more in conversation"
+    // button more precise with thread-collapse chevrons
     margin-top: -0.25em;
   }
 
