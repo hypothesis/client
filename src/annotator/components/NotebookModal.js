@@ -3,8 +3,7 @@ import classnames from 'classnames';
 
 import { createSidebarConfig } from '../config/sidebar';
 
-// FIXME: use the button from the frontend shared package once this is stable.
-import Button from '../../sidebar/components/Button';
+import { LabeledButton } from '../../shared/components/buttons';
 
 /**
  * @typedef NotebookIframeProps
@@ -102,13 +101,16 @@ export default function NotebookModal({ eventBus, config }) {
   return (
     <div className={classnames('Notebook__outer', { 'is-hidden': isHidden })}>
       <div className="Notebook__inner">
-        <Button
-          icon="cancel"
-          className="Notebook__close-button"
-          buttonText="Close"
-          title="Close the Notebook"
-          onClick={onClose}
-        />
+        <div className="Notebook__close-button-container">
+          <LabeledButton
+            icon="cancel"
+            title="Close the Notebook"
+            onClick={onClose}
+            variant="dark"
+          >
+            Close
+          </LabeledButton>
+        </div>
         {groupId !== null && (
           <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
         )}

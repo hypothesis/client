@@ -1,3 +1,4 @@
+@use '../variables' as var;
 // Button styling for the sidebar extending common button-component styles
 @use '../shared/components/buttons/mixins' as buttons;
 
@@ -23,5 +24,13 @@
       border-top-right-radius: 0;
       border-bottom-right-radius: 0;
     }
+  }
+}
+
+// This button style has asymmetrical padding. Hold it here to see if
+// this kind of padding is useful in other patterns.
+.PaginationPageButton {
+  @include buttons.LabeledButton {
+    padding: var.$layout-space--small var.$layout-space;
   }
 }
