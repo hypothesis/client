@@ -77,12 +77,15 @@ describe('AnnotationPublishControl', () => {
     assert.isFalse(wrapper.find('.AnnotationPublishControl').exists());
   });
 
+  const getPublishButton = wrapper =>
+    wrapper.find('LabeledButton[title^="Publish this annotation"]');
+
   describe('theming', () => {
     it('should apply theme styles', () => {
       const fakeStyle = { foo: 'bar' };
       fakeApplyTheme.returns(fakeStyle);
       const wrapper = createAnnotationPublishControl();
-      const btnPrimary = wrapper.find('.annotation-publish-button__primary');
+      const btnPrimary = getPublishButton(wrapper);
 
       assert.calledWith(
         fakeApplyTheme,
@@ -94,12 +97,11 @@ describe('AnnotationPublishControl', () => {
   });
 
   describe('dropdown menu button (form submit button)', () => {
-    const btnClass = '.annotation-publish-button__primary';
     context('shared annotation', () => {
       it('should label the button with the group name', () => {
         const wrapper = createAnnotationPublishControl();
 
-        const btn = wrapper.find(btnClass);
+        const btn = getPublishButton(wrapper);
         assert.equal(
           btn.prop('title'),
           `Publish this annotation to ${fakeGroup.name}`
@@ -114,7 +116,7 @@ describe('AnnotationPublishControl', () => {
         fakeStore.getDraft.returns(draft);
         const wrapper = createAnnotationPublishControl();
 
-        const btn = wrapper.find(btnClass);
+        const btn = getPublishButton(wrapper);
         assert.equal(btn.prop('title'), 'Publish this annotation to Only Me');
       });
     });
@@ -122,14 +124,14 @@ describe('AnnotationPublishControl', () => {
     it('should disable the button if `isDisabled`', () => {
       const wrapper = createAnnotationPublishControl({ isDisabled: true });
 
-      const btn = wrapper.find(btnClass);
+      const btn = getPublishButton(wrapper);
       assert.isOk(btn.prop('disabled'));
     });
 
     it('should enable the button if not `isDisabled`', () => {
       const wrapper = createAnnotationPublishControl({ isDisabled: false });
 
-      const btn = wrapper.find(btnClass);
+      const btn = getPublishButton(wrapper);
       assert.isNotOk(btn.prop('disabled'));
     });
 
@@ -137,7 +139,7 @@ describe('AnnotationPublishControl', () => {
       const fakeOnSave = sinon.stub();
       const wrapper = createAnnotationPublishControl({ onSave: fakeOnSave });
 
-      const btn = wrapper.find(btnClass);
+      const btn = getPublishButton(wrapper);
 
       assert.equal(btn.prop('onClick'), fakeOnSave);
     });
@@ -257,7 +259,9 @@ describe('AnnotationPublishControl', () => {
   describe('cancel button', () => {
     it('should remove the current draft on cancel button click', () => {
       const wrapper = createAnnotationPublishControl({});
-      const cancelBtn = wrapper.find('Button').filter({ buttonText: 'Cancel' });
+      const cancelBtn = wrapper
+        .find('LabeledButton')
+        .filter({ icon: 'cancel' });
 
       cancelBtn.props().onClick();
 
@@ -269,7 +273,9 @@ describe('AnnotationPublishControl', () => {
     it('should remove the annotation from the store if it is new/unsaved', () => {
       fakeMetadata.isNew.returns(true);
       const wrapper = createAnnotationPublishControl({});
-      const cancelBtn = wrapper.find('Button').filter({ buttonText: 'Cancel' });
+      const cancelBtn = wrapper
+        .find('LabeledButton')
+        .filter({ icon: 'cancel' });
 
       cancelBtn.props().onClick();
 

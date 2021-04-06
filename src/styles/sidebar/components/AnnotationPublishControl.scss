@@ -1,21 +1,13 @@
-@use "../../mixins/buttons";
-@use "../../mixins/forms";
 @use "../../mixins/layout";
-@use "../../mixins/utils";
 @use "../../variables" as var;
 
 .AnnotationPublishControl {
   @include layout.row;
   @include layout.horizontal-rhythm(var.$layout-space);
-
-  &__cancel-button {
-    @include buttons.button--labeled;
-    padding: var.$layout-space--small;
-  }
 }
 
 // A split control with a primary submit button on the left
-// (.annotation-publish-button__primary) and a drop-down menu for changing
+// and a drop-down menu for changing
 // the annotation's privacy settings on the right
 // (within .annotation-publish-button__menu-wrapper)
 .annotation-publish-button {
@@ -33,17 +25,6 @@
   // menu arrow
   &__menu-content {
     min-width: 100%;
-  }
-
-  // The left side of the control (the publish button)
-  &__primary {
-    @include buttons.button--primary;
-    padding: var.$layout-space--small;
-
-    // Turn off right-side border radius for alignment with the right side of
-    // the control
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
   }
 
   // The right side of the control (the privacy `Menu`)

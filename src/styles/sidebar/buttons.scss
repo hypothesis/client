@@ -15,3 +15,13 @@
     text-decoration: underline;
   }
 }
+
+.PublishControlButton {
+  @include buttons.LabeledButton {
+    // Border-radius turned off
+    &--primary {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}

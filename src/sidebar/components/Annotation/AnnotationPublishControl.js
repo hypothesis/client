@@ -6,7 +6,8 @@ import { isShared } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
 
-import Button from '../Button';
+import { LabeledButton } from '../../../shared/components/buttons';
+
 import Menu from '../Menu';
 import MenuItem from '../MenuItem';
 
@@ -81,14 +82,17 @@ function AnnotationPublishControl({
   return (
     <div className="AnnotationPublishControl">
       <div className="annotation-publish-button">
-        <Button
-          className="annotation-publish-button__primary"
+        <LabeledButton
+          className="PublishControlButton"
           style={buttonStyle}
           onClick={onSave}
           disabled={isDisabled}
           title={`Publish this annotation to ${publishDestination}`}
-          buttonText={`Post to ${publishDestination}`}
-        />
+          size="large"
+          variant="primary"
+        >
+          Post to {publishDestination}
+        </LabeledButton>
         {/* This wrapper div is necessary because of peculiarities with
              Safari: see https://github.com/hypothesis/client/issues/2302 */}
         <div
@@ -120,12 +124,9 @@ function AnnotationPublishControl({
         </div>
       </div>
       <div>
-        <Button
-          icon="cancel"
-          className="AnnotationPublishControl__cancel-button"
-          buttonText="Cancel"
-          onClick={onCancel}
-        />
+        <LabeledButton icon="cancel" onClick={onCancel} size="large">
+          Cancel
+        </LabeledButton>
       </div>
     </div>
   );
