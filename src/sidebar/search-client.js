@@ -22,8 +22,8 @@ export class ResultSizeError extends Error {
 }
 
 /**
- * @typedef {'created'|'updated'} SortOrder
- * @typedef {'asc'|'desc'} SortBy
+ * @typedef {'created'|'updated'} SortBy
+ * @typedef {'asc'|'desc'} SortOrder
  */
 /**
  * Default callback used to get the page size for iterating through annotations.
@@ -79,8 +79,8 @@ export class SearchClient extends TinyEmitter {
       separateReplies = true,
       incremental = true,
       maxResults = null,
-      sortBy = /** @type {SortBy} */ ('created'),
-      sortOrder = /** @type {SortOrder} */ ('asc'),
+      sortBy = 'created',
+      sortOrder = 'asc',
     } = {}
   ) {
     super();
