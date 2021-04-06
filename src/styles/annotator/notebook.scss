@@ -39,11 +39,10 @@
   border: none;
 }
 
-.Notebook__close-button {
+.Notebook__close-button-container {
   position: absolute;
   right: 0;
   font-size: var.$font-size--large;
-  @include buttons.button--primary;
   margin: var.$layout-space--xsmall;
   cursor: pointer;
 }

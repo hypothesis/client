@@ -26,31 +26,6 @@
     display: none;
   }
 
-  &__button,
-  &__page-button {
-    @include buttons.button--labeled(
-      $background-color: transparent,
-      $active-background-color: var.$grey-3
-    );
-  }
-
-  &__page-button {
-    margin: var.$layout-space--xxsmall;
-    padding: var.$layout-space--small var.$layout-space;
-
-    &[aria-pressed='true'] {
-      background-color: var.$grey-3;
-    }
-  }
-
-  &__button-right {
-    // FIXME Button SVG margins assume that the icon is on the left
-    svg {
-      margin-left: var.$layout-space--xxsmall;
-    }
-    padding-right: var.$layout-space--xxsmall;
-  }
-
   @include responsive.wide-handheld-and-up {
     // Where there's enough horizontal space,
     // lay out page navigation buttons horizontally as:
@@ -65,6 +40,7 @@
       display: block;
       grid-area: numberedPages;
       @include layout.row($justify: center, $align: center);
+      @include layout.horizontal-rhythm(0.5em);
     }
   }
 }

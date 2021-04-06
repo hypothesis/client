@@ -10,6 +10,9 @@
 // -----------------
 @use '@hypothesis/frontend-shared/styles';
 
+// Shared button styles (TEMPORARY)
+@use '../shared';
+
 // Annotator-specific components.
 @use './components/AdderToolbar';
 @use './components/Buckets';

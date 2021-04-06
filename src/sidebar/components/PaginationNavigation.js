@@ -1,6 +1,6 @@
 import { pageNumberOptions } from '../util/pagination';
 
-import Button from './Button';
+import { LabeledButton } from '../../shared/components/buttons';
 
 /**
  * @typedef PaginationNavigationProps
@@ -35,13 +35,15 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
     <div className="PaginationNavigation">
       <div className="PaginationNavigation__relative PaginationNavigation__prev">
         {hasPreviousPage && (
-          <Button
-            className="PaginationNavigation__button"
+          <LabeledButton
+            className="PaginationPageButton"
             icon="arrow-left"
-            buttonText="prev"
             title="Go to previous page"
             onClick={e => changePageTo(currentPage - 1, e.target)}
-          />
+            variant="dark"
+          >
+            prev
+          </LabeledButton>
         )}
       </div>
       <ul className="PaginationNavigation__pages">
@@ -50,28 +52,32 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
             {page === null ? (
               <div className="PaginationNavigation__gap">...</div>
             ) : (
-              <Button
+              <LabeledButton
+                className="PaginationPageButton"
                 key={`page-${idx}`}
-                buttonText={page.toString()}
                 title={`Go to page ${page}`}
-                className="PaginationNavigation__page-button"
-                isPressed={page === currentPage}
+                pressed={page === currentPage}
                 onClick={e => changePageTo(page, e.target)}
-              />
+                variant="dark"
+              >
+                {page.toString()}
+              </LabeledButton>
             )}
           </li>
         ))}
       </ul>
       <div className="PaginationNavigation__relative PaginationNavigation__next">
         {hasNextPage && (
-          <Button
-            className="PaginationNavigation__button PaginationNavigation__button-right"
+          <LabeledButton
+            className="PaginationPageButton"
             icon="arrow-right"
-            buttonText="next"
             iconPosition="right"
             title="Go to next page"
             onClick={e => changePageTo(currentPage + 1, e.target)}
-          />
+            variant="dark"
+          >
+            next
+          </LabeledButton>
         )}
       </div>
     </div>
