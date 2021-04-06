@@ -16,11 +16,6 @@
     color: var.$color-text;
   }
 
-  &__reply-toggle {
-    @include buttons.button--link;
-    padding: 0 var.$layout-space--xsmall;
-  }
-
   // Timestamps are right aligned in a flex row
   &__timestamps {
     flex-grow: 1;

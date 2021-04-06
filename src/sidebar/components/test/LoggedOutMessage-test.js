@@ -39,7 +39,7 @@ describe('LoggedOutMessage', () => {
     const fakeOnLogin = sinon.stub();
     const wrapper = createLoggedOutMessage({ onLogin: fakeOnLogin });
 
-    const loginLink = wrapper.find('.LoggedOutMessage__link').at(1);
+    const loginLink = wrapper.find('LinkButton');
 
     assert.equal(loginLink.prop('onClick'), fakeOnLogin);
   });

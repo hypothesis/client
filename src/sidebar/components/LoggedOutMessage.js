@@ -2,7 +2,7 @@ import { SvgIcon } from '@hypothesis/frontend-shared';
 
 import { withServices } from '../service-context';
 
-import Button from './Button';
+import { LinkButton } from '../../shared/components/buttons';
 
 /** @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter */
 
@@ -34,11 +34,13 @@ function LoggedOutMessage({ onLogin, serviceUrl }) {
           create a free account
         </a>{' '}
         or{' '}
-        <Button
-          className="LoggedOutMessage__link"
+        <LinkButton
+          className="InlineLinkButton"
           onClick={onLogin}
-          buttonText="log in"
-        />
+          variant="dark"
+        >
+          log in
+        </LinkButton>
         .
       </span>
       <div className="LoggedOutMessage__logo">

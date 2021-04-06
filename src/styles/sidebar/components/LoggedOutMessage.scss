@@ -11,11 +11,13 @@
 }
 
 .LoggedOutMessage__link {
-  @include buttons.button--link;
   padding: 0;
   display: inline;
   color: var.$color-text;
   text-decoration: underline;
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .LoggedOutMessage__logo {
