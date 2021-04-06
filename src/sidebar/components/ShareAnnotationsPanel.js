@@ -6,7 +6,8 @@ import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
 import { notNull } from '../util/typing';
 
-import Button from './Button';
+import { IconButton } from '../../shared/components/buttons';
+
 import ShareLinks from './ShareLinks';
 import SidebarPanel from './SidebarPanel';
 import Spinner from './Spinner';
@@ -78,11 +79,11 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                   value={shareURI}
                   readOnly
                 />
-                <Button
+                <IconButton
+                  className="InputButton"
                   icon="copy"
                   onClick={copyShareLink}
                   title="Copy share link"
-                  className="ShareAnnotationsPanel__icon-button"
                 />
               </div>
               <p>
