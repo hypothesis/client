@@ -85,7 +85,7 @@ export function jsxToString(vnode) {
       return `<${name}${propStr}>\n${childrenStr}\n</${name}>`;
     } else {
       // No children - use a self-closing tag.
-      return `<${name}${propStr}/>`;
+      return `<${name}${propStr} />`;
     }
   } else {
     return '';
