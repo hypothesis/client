@@ -149,7 +149,7 @@ describe('AnnotationHeader', () => {
 
   describe('expand replies toggle button', () => {
     const findReplyButton = wrapper =>
-      wrapper.find('Button').filter('.AnnotationHeader__reply-toggle');
+      wrapper.find('LinkButton[title="Expand replies"]');
 
     it('should render if annotation is a collapsed reply and there are replies to show', () => {
       fakeIsReply.returns(true);
@@ -223,7 +223,7 @@ describe('AnnotationHeader', () => {
           threadIsCollapsed: true,
         });
         const replyCollapseButton = findReplyButton(wrapper);
-        assert.equal(replyCollapseButton.props().buttonText, testCase.expected);
+        assert.equal(replyCollapseButton.props().children, testCase.expected);
       });
     });
   });

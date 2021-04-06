@@ -13,7 +13,7 @@ import {
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import { isPrivate } from '../../helpers/permissions';
 
-import Button from '../Button';
+import { LinkButton } from '../../../shared/components/buttons';
 
 import AnnotationDocumentInfo from './AnnotationDocumentInfo';
 import AnnotationShareInfo from './AnnotationShareInfo';
@@ -133,12 +133,9 @@ function AnnotationHeader({
           displayName={authorDisplayName}
         />
         {showReplyButton && (
-          <Button
-            className="AnnotationHeader__reply-toggle"
-            buttonText={replyButtonText}
-            onClick={onReplyCountClick}
-            title="Expand replies"
-          />
+          <LinkButton onClick={onReplyCountClick} title="Expand replies">
+            {replyButtonText}
+          </LinkButton>
         )}
 
         {showTimestamps && (
