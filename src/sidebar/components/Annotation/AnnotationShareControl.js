@@ -9,7 +9,6 @@ import { isIOS } from '../../../shared/user-agent';
 
 import { IconButton } from '../../../shared/components/buttons';
 
-import Button from '../Button';
 import ShareLinks from '../ShareLinks';
 
 /**
@@ -144,11 +143,12 @@ function AnnotationShareControl({
                 readOnly
                 ref={inputRef}
               />
-              <Button
+              <IconButton
+                className="InputButton"
                 icon="copy"
                 title="Copy share link to clipboard"
                 onClick={copyShareLink}
-                className="annotation-share-panel__icon-button"
+                size="small"
               />
             </div>
             {inContextAvailable ? (

@@ -18,10 +18,6 @@ describe('AnnotationShareControl', () => {
 
   let container;
 
-  const getButton = (wrapper, iconName) => {
-    return wrapper.find('Button').filter({ icon: iconName });
-  };
-
   const getIconButton = (wrapper, iconName) => {
     return wrapper.find('IconButton').filter({ icon: iconName });
   };
@@ -139,7 +135,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getButton(wrapper, 'copy').props().onClick();
+      getIconButton(wrapper, 'copy').props().onClick();
 
       assert.calledWith(
         fakeCopyToClipboard.copyText,
@@ -151,7 +147,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getButton(wrapper, 'copy').props().onClick();
+      getIconButton(wrapper, 'copy').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -164,7 +160,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getButton(wrapper, 'copy').props().onClick();
+      getIconButton(wrapper, 'copy').props().onClick();
 
       assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
     });

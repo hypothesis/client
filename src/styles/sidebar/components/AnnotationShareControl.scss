@@ -38,10 +38,6 @@
     @include forms.form-input--with-button($compact: true);
   }
 
-  &__icon-button {
-    @include buttons.button--input($compact: true);
-  }
-
   &__details {
     @include utils.font--small;
     padding: var.$layout-space--xsmall 0;
