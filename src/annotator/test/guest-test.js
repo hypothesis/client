@@ -785,7 +785,7 @@ describe('Guest', () => {
       };
       fakeHTMLIntegration.anchor
         .onFirstCall()
-        .returns(Promise.reject())
+        .returns(Promise.reject(new Error('Failed to anchor')))
         .onSecondCall()
         .returns(Promise.resolve(range));
 
@@ -801,7 +801,9 @@ describe('Guest', () => {
           { selector: [{ type: 'TextQuoteSelector', exact: 'notinhere' }] },
         ],
       };
-      fakeHTMLIntegration.anchor.returns(Promise.reject());
+      fakeHTMLIntegration.anchor.returns(
+        Promise.reject(new Error('Failed to anchor'))
+      );
 
       return guest
         .anchor(annotation)
@@ -816,7 +818,9 @@ describe('Guest', () => {
           { selector: [{ type: 'TextQuoteSelector', exact: 'neitherami' }] },
         ],
       };
-      fakeHTMLIntegration.anchor.returns(Promise.reject());
+      fakeHTMLIntegration.anchor.returns(
+        Promise.reject(new Error('Failed to anchor'))
+      );
 
       return guest
         .anchor(annotation)
@@ -915,20 +919,6 @@ describe('Guest', () => {
         assert.calledOnce(removeHighlights);
         assert.calledWith(removeHighlights, highlights);
       });
-    });
-
-    it('does not reanchor targets that are already anchored', () => {
-      const guest = createGuest();
-      const annotation = {
-        target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
-      };
-      fakeHTMLIntegration.anchor.returns(Promise.resolve(range));
-      return guest.anchor(annotation).then(() =>
-        guest.anchor(annotation).then(() => {
-          assert.equal(guest.anchors.length, 1);
-          assert.calledOnce(fakeHTMLIntegration.anchor);
-        })
-      );
     });
   });
 
