@@ -5,7 +5,8 @@ import { isHidden } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
 
-import Button from '../Button';
+import { LabeledButton } from '../../../shared/components/buttons';
+
 import Excerpt from '../Excerpt';
 import MarkdownView from '../MarkdownView';
 import TagList from '../TagList';
@@ -71,17 +72,13 @@ function AnnotationBody({ annotation, settings }) {
       )}
       {isCollapsible && (
         <div className="AnnotationBody__collapse-toggle">
-          {/* @ts-ignore - TODO: Button props need to be fixed */}
-          <Button
-            buttonText={toggleText}
-            className="AnnotationBody__collapse-toggle-button"
-            isExpanded={!isCollapsed}
-            onClick={() => {
-              setIsCollapsed(!isCollapsed);
-            }}
-            aria-label="Toggle visibility of full annotation text"
-            title="Toggle visibility of full annotation text"
-          />
+          <LabeledButton
+            expanded={!isCollapsed}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            title={`Toggle visibility of full annotation text: Show ${toggleText}`}
+          >
+            {toggleText}
+          </LabeledButton>
         </div>
       )}
       {showTagList && <TagList annotation={annotation} tags={tags} />}

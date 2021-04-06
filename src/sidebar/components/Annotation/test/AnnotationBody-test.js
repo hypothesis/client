@@ -88,7 +88,7 @@ describe('AnnotationBody', () => {
 
     // By default, `isCollapsible` is `false` until changed by `Excerpt`,
     // so the expand/collapse button will not render
-    assert.isFalse(wrapper.find('Button').exists());
+    assert.isFalse(wrapper.find('LabeledButton').exists());
   });
 
   it('renders controls to expand/collapse the excerpt if it is collapsible', () => {
@@ -101,14 +101,13 @@ describe('AnnotationBody', () => {
     });
     wrapper.update();
 
-    const button = wrapper.find('Button');
+    const button = wrapper.find('LabeledButton');
     assert.isOk(button.exists());
-    assert.equal(button.props().buttonText, 'More');
     assert.equal(
       button.props().title,
-      'Toggle visibility of full annotation text'
+      'Toggle visibility of full annotation text: Show More'
     );
-    assert.isFalse(button.props().isExpanded);
+    assert.isFalse(button.props().expanded);
   });
 
   it('shows appropriate button text to collapse the Excerpt if expanded', () => {
@@ -123,18 +122,17 @@ describe('AnnotationBody', () => {
     wrapper.update();
 
     act(() => {
-      wrapper.find('Button').props().onClick();
+      wrapper.find('LabeledButton').props().onClick();
     });
     wrapper.update();
 
-    const buttonProps = wrapper.find('Button').props();
+    const buttonProps = wrapper.find('LabeledButton').props();
 
-    assert.equal(buttonProps.buttonText, 'Less');
     assert.equal(
       buttonProps.title,
-      'Toggle visibility of full annotation text'
+      'Toggle visibility of full annotation text: Show Less'
     );
-    assert.isTrue(buttonProps.isExpanded);
+    assert.isTrue(buttonProps.expanded);
   });
 
   describe('tag list and editor', () => {
