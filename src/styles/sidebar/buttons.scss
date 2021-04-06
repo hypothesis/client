@@ -34,3 +34,12 @@
     padding: var.$layout-space--small var.$layout-space;
   }
 }
+
+// An IconButton, but override minimum height/width on touch screen devices
+.NonResponsiveIconButton {
+  @include buttons.IconButton(
+    (
+      'responsive': false,
+    )
+  );
+}
