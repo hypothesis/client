@@ -335,83 +335,64 @@ export default class Guest {
   }
 
   /**
-   * Anchor (locate) an annotation's selectors in the document.
+   * Anchor an annotation's selectors in the document.
+   *
+   * _Anchoring_ resolves a set of selectors to a concrete region of the document
+   * which is then highlighted. The results of anchoring are broadcast to the
+   * rest of the application via `CrossFrame#sync`.
+   *
+   * Any existing anchors associated with `annotation` will be removed before
+   * re-anchoring the annotation.
    *
    * @param {AnnotationData} annotation
    * @return {Promise<Anchor[]>}
    */
-  anchor(annotation) {
-    let anchor;
-    const root = this.element;
-
-    // Anchors for all annotations are in the `anchors` instance property. These
-    // are anchors for this annotation only. After all the targets have been
-    // processed these will be appended to the list of anchors known to the
-    // instance. Anchors hold an annotation, a target of that annotation, a
-    // document range for that target and an Array of highlights.
-    const anchors = [];
-
-    // The targets that are already anchored. This function consults this to
-    // determine which targets can be left alone.
-    const anchoredTargets = [];
-
-    // These are the highlights for existing anchors of this annotation with
-    // targets that have since been removed from the annotation. These will
-    // be removed by this function.
-    let deadHighlights = [];
-
-    // Initialize the target array.
-    if (!annotation.target) {
-      annotation.target = [];
-    }
-
+  async anchor(annotation) {
     /**
-     * Locate the region of the current document that the annotation refers to.
+     * Resolve an annotation's selectors to a concrete range.
      *
      * @param {Target} target
+     * @return {Promise<Anchor>}
      */
-    const locate = target => {
-      // Check that the anchor has a TextQuoteSelector -- without a
-      // TextQuoteSelector we have no basis on which to verify that we have
-      // reanchored correctly and so we shouldn't even try.
-      //
-      // Returning an anchor without a range will result in this annotation being
-      // treated as an orphan (assuming no other targets anchor).
+    const locate = async target => {
+      // Only annotations with an associated quote can currently be anchored.
+      // This is because the quote is used to verify anchoring with other selector
+      // types.
       if (
         !target.selector ||
         !target.selector.some(s => s.type === 'TextQuoteSelector')
       ) {
-        return Promise.resolve({ annotation, target });
+        return { annotation, target };
       }
 
-      // Find a target using the anchoring module.
-      return this.integration
-        .anchor(root, target.selector)
-        .then(range => ({
-          annotation,
-          target,
-
-          // Convert the `Range` to a `TextRange` which can be converted back to
-          // a `Range` later. The `TextRange` representation allows for highlights
-          // to be inserted during anchoring other annotations without "breaking"
-          // this anchor.
-          range: TextRange.fromRange(range),
-        }))
-        .catch(() => ({
-          annotation,
-          target,
-        }));
+      /** @type {Anchor} */
+      let anchor;
+      try {
+        const range = await this.integration.anchor(
+          this.element,
+          target.selector
+        );
+        // Convert the `Range` to a `TextRange` which can be converted back to
+        // a `Range` later. The `TextRange` representation allows for highlights
+        // to be inserted during anchoring other annotations without "breaking"
+        // this anchor.
+        const textRange = TextRange.fromRange(range);
+        anchor = { annotation, target, range: textRange };
+      } catch (err) {
+        anchor = { annotation, target };
+      }
+      return anchor;
     };
 
     /**
-     * Highlight the range for an anchor.
+     * Highlight the text range that `anchor` refers to.
      *
      * @param {Anchor} anchor
      */
     const highlight = anchor => {
       const range = resolveAnchor(anchor);
       if (!range) {
-        return anchor;
+        return;
       }
 
       const highlights = /** @type {AnnotationHighlight[]} */ (highlightRange(
@@ -421,98 +402,62 @@ export default class Guest {
         h._annotation = anchor.annotation;
       });
       anchor.highlights = highlights;
-      return anchor;
     };
 
-    /**
-     * Inform other parts of Hypothesis (eg. the sidebar and bucket bar) about
-     * the results of anchoring.
-     *
-     * @param {Anchor[]} anchors
-     */
-    const sync = anchors => {
-      // An annotation is considered to be an orphan if it has at least one
-      // target with selectors, and all targets with selectors failed to anchor
-      // (i.e. we didn't find it in the page and thus it has no range).
-      let hasAnchorableTargets = false;
-      let hasAnchoredTargets = false;
-      for (let anchor of anchors) {
-        if (anchor.target.selector) {
-          hasAnchorableTargets = true;
-          if (anchor.range) {
-            hasAnchoredTargets = true;
-            break;
-          }
-        }
-      }
-      annotation.$orphan = hasAnchorableTargets && !hasAnchoredTargets;
+    // Remove existing anchors for this annotation.
+    this.detach(annotation, false /* notify */);
 
-      // Add the anchors for this annotation to instance storage.
-      this._updateAnchors(this.anchors.concat(anchors));
-
-      // Let other frames (eg. the sidebar) know about the new annotation.
-      this.crossframe.sync([annotation]);
-
-      return anchors;
-    };
-
-    // Remove all the anchors for this annotation from the instance storage.
-    for (anchor of this.anchors.splice(0, this.anchors.length)) {
-      if (anchor.annotation === annotation) {
-        // Anchors are valid as long as they still have a range and their target
-        // is still in the list of targets for this annotation.
-        if (anchor.range && annotation.target.includes(anchor.target)) {
-          anchors.push(anchor);
-          anchoredTargets.push(anchor.target);
-        } else if (anchor.highlights) {
-          // These highlights are no longer valid and should be removed.
-          deadHighlights = deadHighlights.concat(anchor.highlights);
-          delete anchor.highlights;
-          delete anchor.range;
-        }
-      } else {
-        // These can be ignored, so push them back onto the new list.
-        this.anchors.push(anchor);
-      }
+    // Resolve selectors to ranges and insert highlights.
+    if (!annotation.target) {
+      annotation.target = [];
+    }
+    const anchors = await Promise.all(annotation.target.map(locate));
+    for (let anchor of anchors) {
+      highlight(anchor);
     }
 
-    // Remove all the highlights that have no corresponding target anymore.
-    removeHighlights(deadHighlights);
+    // Set flag indicating whether anchoring succeeded. For each target,
+    // anchoring is successful either if there are no selectors (ie. this is a
+    // Page Note) or we successfully resolved the selectors to a range.
+    annotation.$orphan =
+      anchors.length > 0 &&
+      anchors.every(anchor => anchor.target.selector && !anchor.range);
 
-    // Anchor any targets of this annotation that are not anchored already.
-    for (let target of annotation.target) {
-      if (!anchoredTargets.includes(target)) {
-        anchor = locate(target).then(highlight);
-        anchors.push(anchor);
-      }
-    }
+    this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
-    return Promise.all(anchors).then(sync);
+    // Let other frames (eg. the sidebar) know about the new annotation.
+    this.crossframe.sync([annotation]);
+
+    return anchors;
   }
 
   /**
    * Remove the anchors and associated highlights for an annotation from the document.
    *
    * @param {AnnotationData} annotation
+   * @param {boolean} [notify] - For internal use. Whether to emit an `anchorsChanged` notification
    */
-  detach(annotation) {
+  detach(annotation, notify = true) {
     const anchors = [];
-    let unhighlight = [];
     for (let anchor of this.anchors) {
-      if (anchor.annotation === annotation) {
-        unhighlight.push(...(anchor.highlights ?? []));
-      } else {
+      if (anchor.annotation !== annotation) {
         anchors.push(anchor);
+      } else if (anchor.highlights) {
+        removeHighlights(anchor.highlights);
       }
     }
-    removeHighlights(unhighlight);
-
-    this._updateAnchors(anchors);
+    this._updateAnchors(anchors, notify);
   }
 
-  _updateAnchors(anchors) {
+  /**
+   * @param {Anchor[]} anchors
+   * @param {boolean} notify
+   */
+  _updateAnchors(anchors, notify) {
     this.anchors = anchors;
-    this._emitter.publish('anchorsChanged', this.anchors);
+    if (notify) {
+      this._emitter.publish('anchorsChanged', this.anchors);
+    }
   }
 
   /**
