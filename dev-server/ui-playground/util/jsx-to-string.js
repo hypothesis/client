@@ -1,3 +1,8 @@
+/**
+ * Escape `str` for use in a "-quoted string.
+ *
+ * @param {string} str
+ */
 function escapeQuotes(str) {
   return str.replace(/"/g, '\\"');
 }
@@ -10,21 +15,60 @@ function componentName(type) {
   }
 }
 
+/**
+ * Indent a multi-line string by `indent` spaces.
+ *
+ * @param {string} str
+ * @param {number} indent
+ */
+function indentLines(str, indent) {
+  const indentStr = ' '.repeat(indent);
+  const lines = str.split('\n');
+  return lines.map(line => indentStr + line).join('\n');
+}
+
+/**
+ * Render a JSX expression as a code string.
+ *
+ * Currently this only supports serializing props with simple types (strings,
+ * booleans, numbers).
+ *
+ * @example
+ *   jsxToString(<Widget expanded={true} label="Thing"/>) // returns `<Widget expanded label="Thing"/>`
+ *
+ * @param {import('preact').ComponentChildren} vnode
+ * @return {string}
+ */
 export function jsxToString(vnode) {
-  if (typeof vnode === 'string' || typeof vnode === 'number') {
+  if (
+    typeof vnode === 'string' ||
+    typeof vnode === 'number' ||
+    typeof vnode === 'bigint'
+  ) {
     return vnode.toString();
-  } else if (vnode?.type) {
+  } else if (typeof vnode === 'boolean') {
+    return '';
+  } else if (vnode && 'type' in vnode) {
     const name = componentName(vnode.type);
 
-    // TODO - Add in the `key` prop which is extracted off the props into `vnode.key`.
+    // nb. The special `key` and `ref` props are not included in `vnode.props`.
+    // `ref` is not serializable to a string and `key` is generally set dynamically
+    // (eg. from an index or item ID) so it doesn't make sense to include it either.
     let propStr = Object.entries(vnode.props)
       .map(([name, value]) => {
         if (name === 'children') {
           return '';
         }
-        // nb. We assume that `value` is something that can easily be stringified
-        // using `String(value)`.
-        return `${name}="${escapeQuotes(String(value))}"`;
+
+        // Boolean props are assumed to default to `false`, in which case they
+        // can be omitted.
+        if (typeof value === 'boolean') {
+          return value ? name : '';
+        }
+
+        const valueStr =
+          typeof value === 'string' ? `"${escapeQuotes(value)}"` : `{${value}}`;
+        return `${name}=${valueStr}`;
       })
       .join(' ')
       .trim();
@@ -34,11 +78,10 @@ export function jsxToString(vnode) {
 
     const children = vnode.props.children;
     if (children) {
-      // TODO - Be smart about splitting children over multiple lines
-      // and indentation
-      const childrenStr = Array.isArray(children)
+      let childrenStr = Array.isArray(children)
         ? children.map(jsxToString).join('\n')
         : jsxToString(children);
+      childrenStr = indentLines(childrenStr, 2);
       return `<${name}${propStr}>\n${childrenStr}\n</${name}>`;
     } else {
       // No children - use a self-closing tag.
