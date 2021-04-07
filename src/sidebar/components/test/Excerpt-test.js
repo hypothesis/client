@@ -115,36 +115,48 @@ describe('Excerpt', () => {
   });
 
   context('when inline controls are enabled', () => {
+    const getToggleButton = wrapper =>
+      wrapper.find(
+        'LinkButton[title="Toggle visibility of full excerpt text"]'
+      );
+
     it('displays inline controls if collapsed', () => {
       const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
-      assert.isTrue(wrapper.exists('.Excerpt__inline-controls'));
+      assert.isTrue(wrapper.exists('InlineControls'));
     });
 
     it('does not display inline controls if not collapsed', () => {
       const wrapper = createExcerpt({ inlineControls: true }, SHORT_DIV);
-      assert.isFalse(wrapper.exists('.Excerpt__inline-controls'));
+      assert.isFalse(wrapper.exists('InlineControls'));
     });
 
     it('toggles the expanded state when clicked', () => {
       const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
-      const button = wrapper.find('.Excerpt__toggle-button');
+      const button = getToggleButton(wrapper);
       assert.equal(getExcerptHeight(wrapper), 40);
-      button.simulate('click');
+      act(() => {
+        button.props().onClick();
+      });
+      wrapper.update();
       assert.equal(getExcerptHeight(wrapper), 200);
     });
 
     it("sets button's default state to un-expanded", () => {
       const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
-      const button = wrapper.find('.Excerpt__toggle-button');
-      assert.equal(button.prop('aria-expanded'), false);
+      const button = getToggleButton(wrapper);
+      assert.equal(button.prop('expanded'), false);
       assert.equal(button.text(), 'More');
     });
 
     it("changes button's state to expanded when clicked", () => {
       const wrapper = createExcerpt({ inlineControls: true }, TALL_DIV);
-      wrapper.find('.Excerpt__toggle-button').simulate('click');
-      const button = wrapper.find('.Excerpt__toggle-button');
-      assert.equal(button.prop('aria-expanded'), true);
+      let button = getToggleButton(wrapper);
+      act(() => {
+        button.props().onClick();
+      });
+      wrapper.update();
+      button = getToggleButton(wrapper);
+      assert.equal(button.prop('expanded'), true);
       assert.equal(button.text(), 'Less');
     });
   });
