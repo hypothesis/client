@@ -34,10 +34,13 @@
  */
 
 /**
- * @typedef Target
- * @prop {string} source
- * @prop {Selector[]} [selector]
+ * An entry in the `target` field of an annotation which identifies the document
+ * and region of the document that it refers to.
  *
+ * @typedef Target
+ * @prop {string} source - URI of the document
+ * @prop {Selector[]} [selector] - Region of the document
+ */
 
 /**
  * TODO - Fill out remaining properties
@@ -68,7 +71,9 @@
  *   @prop {string[]} permissions.update
  *   @prop {string[]} permissions.delete
  *
- * @prop {Target[]} target
+ * @prop {Target[]} target - Which document and region this annotation refers to.
+ *   The Hypothesis API structure allows for multiple targets, but the current
+ *   h server only allows for one target per annotation.
  *
  * @prop {Object} [moderation]
  *   @prop {number} moderation.flagCount
