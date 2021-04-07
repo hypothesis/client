@@ -5,6 +5,8 @@ import observeElementSize from '../util/observe-element-size';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
+import { LinkButton } from '../../shared/components/buttons';
+
 /**
  * @typedef InlineControlsProps
  * @prop {boolean} isCollapsed
@@ -23,17 +25,18 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
 
   return (
     <div className="Excerpt__inline-controls">
-      <span className="Excerpt__toggle-link">
-        <button
-          className="Excerpt__toggle-button"
+      <div className="Excerpt__toggle-container">
+        <LinkButton
+          className="InlineLinkButton"
           onClick={() => setCollapsed(!isCollapsed)}
-          aria-expanded={!isCollapsed}
-          aria-label="Toggle visibility of full excerpt text"
+          expanded={!isCollapsed}
+          title="Toggle visibility of full excerpt text"
           style={linkStyle}
+          variant="dark"
         >
           {toggleLabel}
-        </button>
-      </span>
+        </LinkButton>
+      </div>
     </div>
   );
 }

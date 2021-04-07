@@ -1,4 +1,3 @@
-@use "../../mixins/buttons";
 @use "../../variables" as var;
 
 // the distance by which the shadow indicating a collapsed
@@ -34,7 +33,9 @@ $expand-duration: 0.15s;
   bottom: 0;
 }
 
-.Excerpt__toggle-link {
+// A container for a button with a gradient background; this gives partial
+// opacity behind the More/Less button so that it is easier to read
+.Excerpt__toggle-container {
   padding-left: var.$layout-space;
   // See https://stackoverflow.com/a/56548711/9788954 regarding
   // rgba(255, 255, 255, 0) used here instead of `transparent` (for Safari)
@@ -43,13 +44,6 @@ $expand-duration: 0.15s;
     rgba(255, 255, 255, 0) 0px,
     var.$color-background var.$layout-space
   );
-}
-
-// TODO the tap target here is quite small
-.Excerpt__toggle-button {
-  @include buttons.reset-native-btn-styles;
-  background: transparent;
-  font-style: italic;
 }
 
 // a shadow displayed at the bottom of an <excerpt>s with inline controls
