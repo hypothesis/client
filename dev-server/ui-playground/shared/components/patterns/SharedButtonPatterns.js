@@ -9,7 +9,7 @@ import {
   IconButton,
   LabeledButton,
   LinkButton,
-} from '../../../../src/shared/components/buttons';
+} from '../../../../../src/shared/components/buttons';
 
 export default function SharedButtonPatterns() {
   return (

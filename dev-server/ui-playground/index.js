@@ -1,7 +1,7 @@
 import { registerIcons } from '@hypothesis/frontend-shared';
 import { render } from 'preact';
 
-import PlaygroundApp from './components/PlaygroundApp';
+import PlaygroundApp from './shared/components/PlaygroundApp';
 
 import sidebarIcons from '../../src/sidebar/icons';
 registerIcons(sidebarIcons);

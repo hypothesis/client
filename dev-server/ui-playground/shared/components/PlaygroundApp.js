@@ -1,6 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 
-import MenuPatterns from './patterns/MenuPatterns';
 import SharedButtonPatterns from './patterns/SharedButtonPatterns';
 
 import { useRoute } from '../router';
@@ -19,11 +18,6 @@ const routes = [
     route: /^\/?$/,
     title: 'Home',
     component: HomeRoute,
-  },
-  {
-    route: '/menu',
-    title: 'Menu',
-    component: MenuPatterns,
   },
   {
     route: '/shared-buttons',
