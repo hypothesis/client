@@ -2,11 +2,17 @@
 
 @use "@hypothesis/frontend-shared/styles/mixins/focus";
 
-@use './_config' as c;
-@use './_base' as base;
+@use 'config' as c;
+@use 'base';
 
-// Allow access to the configuration values to users of this module (esp. colors)
-@forward './_config';
+// Basic reset for browser-imposed button styles
+@mixin reset {
+  @include focus.outline-on-keyboard-focus;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border-style: none;
+}
 
 // Base mixin for <button> elements
 @mixin Button($options: ()) {
@@ -33,6 +39,7 @@
   );
   $-options: map.merge($defaultOptions, $options);
 
+  @include reset;
   @include base.button($options: $-options);
 
   // Add styles for supported variants as modifier classes, if `withVariants` enabled

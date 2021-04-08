@@ -1,16 +1,2 @@
-@use './mixins';
-
-// A button with text, and optionally an icon
-.LabeledButton {
-  @include mixins.LabeledButton;
-}
-
-// A button with only an icon and no label/text
-.IconButton {
-  @include mixins.IconButton;
-}
-
-// A button styled to appear as a link, with underline on hover
-.LinkButton {
-  @include mixins.LinkButton;
-}
+@forward 'config';
+@forward 'mixins';

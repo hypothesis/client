@@ -1,7 +1,5 @@
 @use "sass:map";
 
-@use "@hypothesis/frontend-shared/styles/mixins/focus";
-
 // Set colors for a button
 @mixin _colors($colormap) {
   color: map.get($colormap, 'foreground');
@@ -53,13 +51,6 @@
 
 // Base mixin for buttons.
 @mixin button($options) {
-  // Reset browser defaults
-  @include focus.outline-on-keyboard-focus;
-  padding: 0;
-  margin: 0;
-  background-color: transparent;
-  border-style: none;
-
   @include _colors(map.get($options, 'colormap'));
 
   @if map.get($options, 'withStates') {
