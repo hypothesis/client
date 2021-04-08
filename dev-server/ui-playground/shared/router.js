@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
-function routeFromCurrentUrl(baseUrl) {
-  return location.pathname.slice(baseUrl.length);
+function routeFromCurrentURL(baseURL) {
+  return location.pathname.slice(baseURL.length);
 }
 
-export function useRoute(baseUrl, routes) {
-  const [route, setRoute] = useState(() => routeFromCurrentUrl(baseUrl));
+export function useRoute(baseURL, routes) {
+  const [route, setRoute] = useState(() => routeFromCurrentURL(baseURL));
   const routeData = useMemo(() => routes.find(r => route.match(r.route)), [
     route,
     routes,
@@ -18,17 +18,17 @@ export function useRoute(baseUrl, routes) {
 
   useEffect(() => {
     const popstateListener = () => {
-      setRoute(routeFromCurrentUrl(baseUrl));
+      setRoute(routeFromCurrentURL(baseURL));
     };
     window.addEventListener('popstate', popstateListener);
     return () => {
       window.removeEventListener('popstate', popstateListener);
     };
-  }, [baseUrl]);
+  }, [baseURL]);
 
   const navigate = (event, route) => {
     event.preventDefault();
-    history.pushState({}, title, baseUrl + route);
+    history.pushState({}, title, baseURL + route);
     setRoute(route);
   };
 

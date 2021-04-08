@@ -4,6 +4,15 @@ import SharedButtonPatterns from './patterns/SharedButtonPatterns';
 
 import { useRoute } from '../router';
 
+/**
+ * @typedef PlaygroundRoute - Route "handler" that provides a component (function)
+ *   that should be rendered for the indicated route
+ * @prop {RegExp|string} route - Pattern or string path relative to
+ *   `baseURL`, e.g. '/my-patterns'
+ * @prop {string} title
+ * @prop {import("preact").FunctionComponent<{}>} component
+ */
+
 function HomeRoute() {
   return (
     <>
@@ -13,6 +22,7 @@ function HomeRoute() {
   );
 }
 
+/** @type {PlaygroundRoute[]} */
 const routes = [
   {
     route: /^\/?$/,
@@ -21,16 +31,33 @@ const routes = [
   },
   {
     route: '/shared-buttons',
-    title: 'Buttons (Shared)',
+    title: 'Buttons',
     component: SharedButtonPatterns,
   },
 ];
 
 const demoRoutes = routes.filter(r => r.component !== HomeRoute);
 
-export default function PlaygroundApp() {
-  const baseUrl = '/ui-playground';
-  const [route, navigate] = useRoute(baseUrl, routes);
+/**
+ * @typedef PlaygroundAppProps
+ * @prop {string} [baseURL]
+ * @prop {PlaygroundRoute[]} [extraRoutes] - Local-/application-specific routes
+ *   to add to this pattern library in addition to the shared/common routes
+ */
+
+/**
+ * Render web content for the playground application. This includes the "frame"
+ * around the page and a navigation channel, as well as the content rendered
+ * by the component handling the current route.
+ *
+ * @param {PlaygroundAppProps} props
+ */
+export default function PlaygroundApp({
+  baseURL = '/ui-playground',
+  extraRoutes = [],
+}) {
+  const allRoutes = routes.concat(extraRoutes);
+  const [route, navigate] = useRoute(baseURL, allRoutes);
   const content = route ? (
     <route.component />
   ) : (
@@ -44,10 +71,11 @@ export default function PlaygroundApp() {
     <main className="PlaygroundApp">
       <div className="PlaygroundApp__sidebar">
         <div className="PlaygroundApp__sidebar-home">
-          <a href={baseUrl} onClick={e => navigate(e, '/')}>
+          <a href={baseURL} onClick={e => navigate(e, '/')}>
             <SvgIcon name="logo" />
           </a>
         </div>
+        <h2>Common Patterns</h2>
         <ul>
           {demoRoutes.map(c => (
             <li key={c.route}>
@@ -62,6 +90,25 @@ export default function PlaygroundApp() {
             </li>
           ))}
         </ul>
+        {extraRoutes.length && (
+          <>
+            <h2>Application Patterns</h2>
+            <ul>
+              {extraRoutes.map(c => (
+                <li key={c.route}>
+                  <a
+                    className="PlaygroundApp__nav-link"
+                    key={c.route}
+                    href={/** @type string */ (c.route)}
+                    onClick={e => navigate(e, c.route)}
+                  >
+                    {c.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
       <div className="PlaygroundApp__content">{content}</div>
     </main>

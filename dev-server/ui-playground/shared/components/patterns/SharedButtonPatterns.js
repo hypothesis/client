@@ -13,7 +13,7 @@ import {
 
 export default function SharedButtonPatterns() {
   return (
-    <PatternPage title="Buttons (Shared)">
+    <PatternPage title="Buttons">
       <Pattern title="IconButton">
         <p>A button containing an icon and no other content.</p>
 
