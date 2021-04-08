@@ -17,12 +17,4 @@
 
 .Annotation {
   @include layout.vertical-rhythm;
-
-  &__reply-toggle {
-    @include buttons.button--link;
-  }
-
-  &__actions {
-    margin-left: auto;
-  }
 }

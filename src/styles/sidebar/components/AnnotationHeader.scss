@@ -16,12 +16,6 @@
     color: var.$color-text;
   }
 
-  // Timestamps are right aligned in a flex row
-  &__timestamps {
-    flex-grow: 1;
-    text-align: right;
-  }
-
   &__highlight-icon {
     @include utils.icon--small;
     color: var.$color-text--light;

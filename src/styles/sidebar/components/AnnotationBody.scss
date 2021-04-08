@@ -12,11 +12,4 @@
 .AnnotationBody__collapse-toggle {
   @include layout.row(right);
   @include layout.vertical-space(var.$layout-space--xsmall);
-
-  .AnnotationBody__collapse-toggle-button {
-    @include buttons.button--labeled;
-    // The button should not have a background color except when hovered/active:
-    // It should look like text only
-    background-color: transparent;
-  }
 }
