@@ -139,7 +139,7 @@ function AnnotationHeader({
         )}
 
         {showTimestamps && (
-          <div className="AnnotationHeader__timestamps">
+          <div className="u-layout-row--justify-right u-stretch">
             <AnnotationTimestamps
               annotationCreated={annotation.created}
               annotationUpdated={annotation.updated}
