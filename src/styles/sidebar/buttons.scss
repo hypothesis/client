@@ -2,7 +2,7 @@
 
 @use '../variables' as var;
 // Button styling for the sidebar extending common button-component styles
-@use '../shared/components/buttons/mixins' as buttons;
+@use '../shared/components/buttons';
 
 // Similar to `.LinkButton`, with inline layout (so button can be used
 // within text)
