@@ -255,10 +255,16 @@ export default class OAuthClient {
       })
       .replace(/&/g, ',');
 
-    return /** @type {Window} */ ($window.open(
+    const authWindow = $window.open(
       'about:blank',
       'Log in to Hypothesis',
       authWindowSettings
-    ));
+    );
+
+    if (!authWindow) {
+      throw new Error('Failed to open login window');
+    }
+
+    return authWindow;
   }
 }

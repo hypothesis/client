@@ -183,7 +183,7 @@ describe('sidebar/util/oauth-client', () => {
     });
   });
 
-  describe('.openAuthPopupWindow', () => {
+  describe('#openAuthPopupWindow', () => {
     it('opens a popup window', () => {
       const fakeWindow = new FakeWindow();
       const popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
@@ -194,6 +194,15 @@ describe('sidebar/util/oauth-client', () => {
         'Log in to Hypothesis',
         'height=430,left=274.5,top=169,width=475'
       );
+    });
+
+    it('throws error if popup cannot be opened', () => {
+      const fakeWindow = new FakeWindow();
+      fakeWindow.open = sinon.stub().returns(null);
+
+      assert.throws(() => {
+        OAuthClient.openAuthPopupWindow(fakeWindow);
+      }, 'Failed to open login window');
     });
   });
 
