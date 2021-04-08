@@ -15,7 +15,7 @@ h1 {
 }
 
 h2 {
-  font-size: 1.5em;
+  font-size: 1.25em;
   width: 100%;
   border-left: 6px solid var.$color-brand;
   font-weight: bold;
@@ -79,7 +79,6 @@ pre {
   border-left: 5px solid transparent;
   &:hover {
     background-color: var.$grey-3;
-    border-left: 5px solid var.$color-brand;
   }
 }
 
