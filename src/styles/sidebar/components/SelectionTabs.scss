@@ -1,6 +1,5 @@
-@use "@hypothesis/frontend-shared/styles/mixins/focus";
+@use "../../shared/components/buttons";
 
-@use "../../mixins/buttons";
 @use "../../mixins/layout";
 @use "../../mixins/utils";
 @use "../../variables" as var;
@@ -26,8 +25,7 @@
 }
 
 .SelectionTabs__type {
-  @include buttons.reset-native-btn-styles;
-  @include focus.outline-on-keyboard-focus;
+  @include buttons.reset;
 
   color: var.$color-text;
   cursor: pointer;
