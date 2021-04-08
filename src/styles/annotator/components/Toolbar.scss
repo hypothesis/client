@@ -2,6 +2,8 @@
 
 @use '../variables' as var;
 
+@use '../../shared/components/buttons' as shared-buttons;
+
 @use '../mixins/buttons';
 @use '../mixins/layout';
 @use '../mixins/utils';
@@ -75,7 +77,7 @@
 
   /** Visible with clean theme */
   .Toolbar__sidebar-close {
-    @include buttons.reset-native-btn-styles;
+    @include shared-buttons.reset;
     @include buttons.button-hover;
     @include utils.border;
     border-right-width: 0;

@@ -1,4 +1,4 @@
-@use "../mixins/buttons";
+@use "../../shared/components/buttons";
 @use "../mixins/layout";
 @use "../mixins/molecules";
 @use "../mixins/utils";
@@ -80,7 +80,7 @@ $adder-transition-duration: 80ms;
 
 .AdderToolbar__button {
   @include layout.column($align: center);
-  @include buttons.reset-native-btn-styles;
+  @include buttons.reset;
 
   cursor: pointer;
   color: var.$grey-mid;
