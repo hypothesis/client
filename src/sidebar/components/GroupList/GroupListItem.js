@@ -2,6 +2,7 @@ import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';
 import { useStoreProxy } from '../../store/use-store';
 import { copyText } from '../../util/copy-to-clipboard';
+import { confirm } from '../../../shared/prompts';
 
 import MenuItem from '../MenuItem';
 
@@ -49,9 +50,15 @@ function GroupListItem({
     groupsService.focus(group.id);
   };
 
-  const leaveGroup = () => {
+  const leaveGroup = async () => {
     const message = `Are you sure you want to leave the group "${group.name}"?`;
-    if (window.confirm(message)) {
+    if (
+      await confirm({
+        title: 'Leave group?',
+        message,
+        confirmAction: 'Leave',
+      })
+    ) {
       groupsService.leave(group.id);
     }
   };

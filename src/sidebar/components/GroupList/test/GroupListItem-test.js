@@ -3,7 +3,12 @@ import { act } from 'preact/test-utils';
 
 import GroupListItem, { $imports } from '../GroupListItem';
 
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('GroupListItem', () => {
+  let fakeConfirm;
   let fakeCopyText;
   let fakeToastMessenger;
   let fakeGroupsService;
@@ -57,6 +62,8 @@ describe('GroupListItem', () => {
     }
     FakeSlider.displayName = 'Slider';
 
+    fakeConfirm = sinon.stub().resolves(false);
+
     $imports.$mock({
       '../MenuItem': FakeMenuItem,
       '../../util/copy-to-clipboard': {
@@ -64,14 +71,12 @@ describe('GroupListItem', () => {
       },
       '../../helpers/group-list-item-common': fakeGroupListItemCommon,
       '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../../shared/prompts': { confirm: fakeConfirm },
     });
-
-    sinon.stub(window, 'confirm').returns(false);
   });
 
   afterEach(() => {
     $imports.$restore();
-    window.confirm.restore();
   });
 
   const createGroupListItem = (fakeGroup, props = {}) => {
@@ -243,28 +248,30 @@ describe('GroupListItem', () => {
     assert.isTrue(submenu.exists('MenuItem[label="Leave group"]'));
   });
 
-  it('prompts to leave group if "Leave" action is clicked', () => {
+  it('prompts to leave group if "Leave" action is clicked', async () => {
     const wrapper = createGroupListItem(fakeGroup, {
       isExpanded: true,
     });
 
     const submenu = getSubmenu(wrapper);
     clickMenuItem(submenu, 'Leave group');
+    await delay(0);
 
-    assert.called(window.confirm);
+    assert.called(fakeConfirm);
     assert.notCalled(fakeGroupsService.leave);
   });
 
-  it('leaves group if "Leave" is clicked and user confirms', () => {
+  it('leaves group if "Leave" is clicked and user confirms', async () => {
     const wrapper = createGroupListItem(fakeGroup, {
       isExpanded: true,
     });
-    window.confirm.returns(true);
+    fakeConfirm.resolves(true);
 
     const submenu = getSubmenu(wrapper);
     clickMenuItem(submenu, 'Leave group');
+    await delay(0);
 
-    assert.called(window.confirm);
+    assert.called(fakeConfirm);
     assert.calledWith(fakeGroupsService.leave, fakeGroup.id);
   });
 

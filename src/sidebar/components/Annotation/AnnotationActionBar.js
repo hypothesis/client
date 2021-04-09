@@ -7,6 +7,7 @@ import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 
 import { IconButton } from '../../../shared/components/buttons';
+import { confirm } from '../../../shared/prompts';
 
 import AnnotationShareControl from './AnnotationShareControl';
 
@@ -57,11 +58,19 @@ function AnnotationActionBar({
   const shareLink =
     sharingEnabled(settings) && annotationSharingLink(annotation);
 
-  const onDelete = () => {
-    if (window.confirm('Are you sure you want to delete this annotation?')) {
-      annotationsService.delete(annotation).catch(err => {
+  const onDelete = async () => {
+    if (
+      await confirm({
+        title: 'Delete annotation?',
+        message: 'Are you sure you want to delete this annotation?',
+        confirmAction: 'Delete',
+      })
+    ) {
+      try {
+        await annotationsService.delete(annotation);
+      } catch (err) {
         toastMessenger.error(err.message);
-      });
+      }
     }
   };
 

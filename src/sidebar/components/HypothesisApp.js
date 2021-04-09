@@ -2,6 +2,7 @@ import classnames from 'classnames';
 import { useEffect, useMemo } from 'preact/hooks';
 
 import bridgeEvents from '../../shared/bridge-events';
+import { confirm } from '../../shared/prompts';
 import serviceConfig from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
 import { parseAccountID } from '../helpers/account-id';
@@ -129,26 +130,33 @@ function HypothesisApp({
     window.open(serviceUrl('signup'));
   };
 
-  const promptToLogout = () => {
-    // TODO - Replace this with a UI which doesn't look terrible.
-    let text = '';
+  const promptToLogout = async () => {
     const drafts = store.countDrafts();
+    if (drafts === 0) {
+      return true;
+    }
+
+    let message = '';
     if (drafts === 1) {
-      text =
+      message =
         'You have an unsaved annotation.\n' +
         'Do you really want to discard this draft?';
     } else if (drafts > 1) {
-      text =
+      message =
         'You have ' +
         drafts +
         ' unsaved annotations.\n' +
         'Do you really want to discard these drafts?';
     }
-    return drafts === 0 || window.confirm(text);
+    return confirm({
+      title: 'Discard drafts?',
+      message,
+      confirmAction: 'Discard',
+    });
   };
 
-  const logout = () => {
-    if (!promptToLogout()) {
+  const logout = async () => {
+    if (!(await promptToLogout())) {
       return;
     }
     store.clearGroups();
