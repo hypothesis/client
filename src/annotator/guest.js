@@ -229,24 +229,17 @@ export default class Guest {
   /**
    * Retrieve metadata for the current document.
    */
-  getDocumentInfo() {
-    const uriPromise = this.integration
-      .uri()
-      .catch(() => decodeURIComponent(window.location.href));
-    const metadataPromise = this.integration.getMetadata().catch(() => ({
-      title: document.title,
-      link: [{ href: decodeURIComponent(window.location.href) }],
-    }));
+  async getDocumentInfo() {
+    const [uri, metadata] = await Promise.all([
+      this.integration.uri(),
+      this.integration.getMetadata(),
+    ]);
 
-    return Promise.all([metadataPromise, uriPromise]).then(
-      ([metadata, href]) => {
-        return {
-          uri: normalizeURI(href),
-          metadata,
-          frameIdentifier: this.frameIdentifier,
-        };
-      }
-    );
+    return {
+      uri: normalizeURI(uri),
+      metadata,
+      frameIdentifier: this.frameIdentifier,
+    };
   }
 
   /**

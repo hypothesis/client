@@ -399,35 +399,6 @@ describe('Guest', () => {
             createCallback('https://example.com/test.pdf', metadata, done)
           );
         });
-
-        it('calls the callback with fallback URL if PDF URL cannot be determined', done => {
-          guest = createGuest({ documentType: 'pdf' });
-
-          fakePDFIntegration.getMetadata.resolves({});
-          fakePDFIntegration.uri.rejects(new Error('Not a PDF document'));
-
-          emitGuestEvent(
-            'getDocumentInfo',
-            createCallback(window.location.href, {}, done)
-          );
-        });
-
-        it('calls the callback with fallback metadata if PDF metadata extraction fails', done => {
-          guest = createGuest({ documentType: 'pdf' });
-          const metadata = {
-            title: document.title,
-            link: [{ href: window.location.href }],
-          };
-
-          fakePDFIntegration.getMetadata.rejects(
-            new Error('Not a PDF document')
-          );
-
-          emitGuestEvent(
-            'getDocumentInfo',
-            createCallback('https://example.com/test.pdf', metadata, done)
-          );
-        });
       });
     });
 
@@ -641,6 +612,18 @@ describe('Guest', () => {
       return guest
         .getDocumentInfo()
         .then(({ uri }) => assert.equal(uri, 'http://foobar.com/things?id=42'));
+    });
+
+    it('rejects if getting the URL fails', async () => {
+      const guest = createGuest();
+      fakeHTMLIntegration.uri.rejects(new Error('Failed to get URI'));
+      await assert.rejects(guest.getDocumentInfo(), 'Failed to get URI');
+    });
+
+    it('rejects if getting the document metadata fails', async () => {
+      const guest = createGuest();
+      fakeHTMLIntegration.getMetadata.rejects(new Error('Failed to get URI'));
+      await assert.rejects(guest.getDocumentInfo(), 'Failed to get URI');
     });
   });
 
