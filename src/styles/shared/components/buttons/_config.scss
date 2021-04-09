@@ -108,3 +108,42 @@ $LinkButton-colors--dark: (
   'active-foreground': $color-g7,
   'disabled-foreground': $color-gmid,
 );
+
+$-IconButton: (
+  'normal': $IconButton-colors,
+  'primary': $IconButton-colors--primary,
+  'dark': $IconButton-colors--dark,
+  'light': $IconButton-colors--light,
+);
+
+$-LabeledButton: (
+  'normal': $LabeledButton-colors,
+  'primary': $LabeledButton-colors--primary,
+  'dark': $LabeledButton-colors--dark,
+  'light': $LabeledButton-colors--light,
+);
+
+$-LinkButton: (
+  'normal': $LinkButton-colors,
+  'primary': $LinkButton-colors--primary,
+  'dark': $LinkButton-colors--dark,
+  'light': $LinkButton-colors--light,
+);
+
+// Return a color map corresponding to a button component-variant combination
+// Defaults to `LabeledButton--normal`
+@function colors-for($button-type: 'LabeledButton', $variant: 'normal') {
+  $colors: map.get($-LabeledButton, 'normal');
+
+  @if $button-type == 'IconButton' {
+    $colors: map.get($-IconButton, $variant);
+  }
+  @if $button-type == 'LabeledButton' {
+    $colors: map.get($-LabeledButton, $variant);
+  }
+  @if $button-type == 'LinkButton' {
+    $colors: map.get($-LinkButton, $variant);
+  }
+
+  @return $colors;
+}
