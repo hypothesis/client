@@ -12,8 +12,8 @@ import { waitFor } from '../../../../test-util/wait';
 
 describe('AnnotationActionBar', () => {
   let fakeAnnotation;
+  let fakeConfirm;
   let fakeOnReply;
-
   let fakeUserProfile;
 
   // Fake services
@@ -87,6 +87,8 @@ describe('AnnotationActionBar', () => {
       profile: sinon.stub().returns(fakeUserProfile),
     };
 
+    fakeConfirm = sinon.stub().resolves(false);
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../../helpers/annotation-sharing': {
@@ -95,12 +97,11 @@ describe('AnnotationActionBar', () => {
       },
       '../../helpers/permissions': { permits: fakePermits },
       '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../../shared/prompts': { confirm: fakeConfirm },
     });
-    sinon.stub(window, 'confirm').returns(false);
   });
 
   afterEach(() => {
-    window.confirm.restore();
     $imports.$restore();
   });
 
@@ -145,25 +146,25 @@ describe('AnnotationActionBar', () => {
       assert.isTrue(getButton(wrapper, 'trash').exists());
     });
 
-    it('asks for confirmation before deletion', () => {
+    it('asks for confirmation before deletion', async () => {
       allowOnly('delete');
       const button = getButton(createComponent(), 'trash');
 
-      act(() => {
-        button.props().onClick();
+      await act(async () => {
+        await button.props().onClick();
       });
 
-      assert.calledOnce(confirm);
+      assert.calledOnce(fakeConfirm);
       assert.notCalled(fakeAnnotationsService.delete);
     });
 
-    it('invokes delete on service when confirmed', () => {
+    it('invokes delete on service when confirmed', async () => {
       allowOnly('delete');
-      window.confirm.returns(true);
+      fakeConfirm.resolves(true);
       const button = getButton(createComponent(), 'trash');
 
-      act(() => {
-        button.props().onClick();
+      await act(async () => {
+        await button.props().onClick();
       });
 
       assert.calledWith(fakeAnnotationsService.delete, fakeAnnotation);
@@ -171,12 +172,12 @@ describe('AnnotationActionBar', () => {
 
     it('sets a flash message if there is an error with deletion', async () => {
       allowOnly('delete');
-      window.confirm.returns(true);
+      fakeConfirm.resolves(true);
       fakeAnnotationsService.delete.rejects();
 
       const button = getButton(createComponent(), 'trash');
-      act(() => {
-        button.props().onClick();
+      await act(async () => {
+        await button.props().onClick();
       });
 
       await waitFor(() => fakeToastMessenger.error.called);
@@ -275,8 +276,6 @@ describe('AnnotationActionBar', () => {
     });
 
     it('invokes flag on service when clicked', () => {
-      window.confirm.returns(true);
-
       const button = getButton(createComponent(), 'flag');
 
       act(() => {
@@ -287,7 +286,6 @@ describe('AnnotationActionBar', () => {
     });
 
     it('sets flash error message if flagging fails on service', async () => {
-      window.confirm.returns(true);
       fakeAnnotationsService.flag.rejects();
 
       const button = getButton(createComponent(), 'flag');
