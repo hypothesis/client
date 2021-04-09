@@ -51,7 +51,7 @@
 // both the input and the buttons. At some point this pattern should be
 // consolidated.
 $input-button-colors: map.merge(
-  buttons.$IconButton-colors,
+  buttons.colors-for('IconButton'),
   (
     'background': var.$grey-1,
     'hover-background': var.$grey-2,
