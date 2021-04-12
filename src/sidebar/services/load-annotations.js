@@ -21,6 +21,8 @@
  * @prop {SortOrder} [sortOrder]
  * @prop {(error: Error) => any} [onError] - Optional error handler for
  *   SearchClient. Default error handling logs errors to console.
+ * @prop {'uri'|'group'} [streamFilterBy] - Set the websocket stream
+ *   to filter by either URIs or groupIds.
  */
 
 import { SearchClient } from '../search-client';
@@ -44,8 +46,15 @@ export default function loadAnnotationsService(
    *
    * @param {LoadAnnotationOptions} options
    */
-  function load(options) {
-    const { groupId, onError, uris } = options;
+  function load({
+    groupId,
+    uris,
+    onError,
+    maxResults,
+    sortBy,
+    sortOrder,
+    streamFilterBy = 'uri',
+  }) {
     store.removeAnnotations(store.savedAnnotations());
 
     // Cancel previously running search client.
@@ -57,14 +66,24 @@ export default function loadAnnotationsService(
       searchClient.cancel();
     }
 
-    if (uris && uris.length > 0) {
-      streamFilter.resetFilter().addClause('/uri', 'one_of', uris);
-      streamer.setConfig('filter', { filter: streamFilter.getFilter() });
+    // Set the filter for the websocket stream
+    switch (streamFilterBy) {
+      case 'group':
+        streamFilter.resetFilter().addClause('/group', 'equals', groupId, true);
+        streamer.setConfig('filter', { filter: streamFilter.getFilter() });
+        break;
+      case 'uri':
+      default:
+        if (uris && uris.length > 0) {
+          streamFilter.resetFilter().addClause('/uri', 'one_of', uris);
+          streamer.setConfig('filter', { filter: streamFilter.getFilter() });
+        }
+        break;
     }
 
     const searchOptions = {
       incremental: true,
-      maxResults: options.maxResults ?? null,
+      maxResults: maxResults ?? null,
       separateReplies: false,
 
       // Annotations are fetched in order of creation by default. This is expected
@@ -78,8 +97,8 @@ export default function loadAnnotationsService(
       //
       // If the backend would allow us to sort on document location, we could do even better.
 
-      sortBy: /** @type {SortBy} */ (options.sortBy ?? 'created'),
-      sortOrder: /** @type {SortOrder} */ (options.sortOrder ?? 'asc'),
+      sortBy: /** @type {SortBy} */ (sortBy ?? 'created'),
+      sortOrder: /** @type {SortOrder} */ (sortOrder ?? 'asc'),
     };
 
     searchClient = new SearchClient(api.search, searchOptions);

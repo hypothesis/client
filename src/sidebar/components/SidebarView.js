@@ -131,7 +131,7 @@ function SidebarView({
   const hasFetchedProfile = store.hasFetchedProfile();
   useEffect(() => {
     if (hasFetchedProfile && (sidebarHasOpened || isLoggedIn)) {
-      streamer.connect();
+      streamer.connect({ applyUpdatesImmediately: false });
     }
   }, [hasFetchedProfile, isLoggedIn, sidebarHasOpened, streamer]);
 

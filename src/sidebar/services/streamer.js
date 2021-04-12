@@ -18,6 +18,9 @@ export default function Streamer(store, auth, groups, session, settings) {
   // The socket instance for this Streamer instance
   let socket;
 
+  // Flag that controls when to apply pending updates
+  let updateImmediately = true;
+
   // Client configuration messages, to be sent each time a new connection is
   // established.
   const configMessages = {};
@@ -37,7 +40,7 @@ export default function Streamer(store, auth, groups, session, settings) {
         break;
     }
 
-    if (store.route() !== 'sidebar') {
+    if (updateImmediately) {
       applyPendingUpdates();
     }
   }
@@ -186,10 +189,14 @@ export default function Streamer(store, auth, groups, session, settings) {
    *
    * If the service has already connected this does nothing.
    *
-   * @return {Promise} Promise which resolves once the WebSocket connection
-   *                   process has started.
+   * @param {Object} [options]
+   * @param {boolean} [options.applyUpdatesImmediately] - true if pending updates should be applied immediately
+   *
+   * @return {Promise<void>} Promise which resolves once the WebSocket connection
+   *    process has started.
    */
-  function connect() {
+  function connect(options = {}) {
+    updateImmediately = options.applyUpdatesImmediately ?? true;
     setUpAutoReconnect();
     if (socket) {
       return Promise.resolve();

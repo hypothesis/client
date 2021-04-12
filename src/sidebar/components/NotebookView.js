@@ -1,13 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
+import { IconButton } from '../../shared/components/buttons';
 import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
-import useRootThread from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
 
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
+import useRootThread from './hooks/use-root-thread';
 
 import Panel from './Panel';
 import PaginatedThreadList from './PaginatedThreadList';
@@ -15,6 +16,7 @@ import PaginatedThreadList from './PaginatedThreadList';
 /**
  * @typedef NotebookViewProps
  * @prop {Object} [loadAnnotationsService] - Injected service
+ * @prop {Object} [streamer] - Injected service
  */
 
 /**
@@ -22,7 +24,7 @@ import PaginatedThreadList from './PaginatedThreadList';
  *
  * @param {NotebookViewProps} props
  */
-function NotebookView({ loadAnnotationsService }) {
+function NotebookView({ loadAnnotationsService, streamer }) {
   const store = useStoreProxy();
 
   const filters = store.getFilterValues();
@@ -31,6 +33,7 @@ function NotebookView({ loadAnnotationsService }) {
   const hasAppliedFilter = store.hasAppliedFilter();
   const isLoading = store.isLoading();
   const resultCount = store.annotationResultCount();
+  const pendingUpdateCount = store.pendingUpdateCount();
 
   const rootThread = useRootThread();
 
@@ -62,6 +65,15 @@ function NotebookView({ loadAnnotationsService }) {
     }
   };
 
+  const hasFetchedProfile = store.hasFetchedProfile();
+
+  // Establish websocket connection
+  useEffect(() => {
+    if (streamer && hasFetchedProfile) {
+      streamer.connect({ applyUpdatesImmediately: false });
+    }
+  }, [hasFetchedProfile, streamer]);
+
   // Load all annotations; re-load if `focusedGroup` changes
   useEffect(() => {
     // NB: In current implementation, this will only happen/load once (initial
@@ -87,6 +99,7 @@ function NotebookView({ loadAnnotationsService }) {
         sortOrder: 'desc',
         maxResults,
         onError: onLoadError,
+        streamFilterBy: 'group',
       });
     }
   }, [loadAnnotationsService, groupId, store]);
@@ -111,6 +124,10 @@ function NotebookView({ loadAnnotationsService }) {
     }
   }, [paginationPage]);
 
+  const tooltip = `Show ${pendingUpdateCount} new or updated ${
+    pendingUpdateCount > 1 ? 'annotations' : 'annotation'
+  }`;
+
   return (
     <div className="NotebookView">
       <header className="NotebookView__heading" ref={threadListScrollTop}>
@@ -119,7 +136,15 @@ function NotebookView({ loadAnnotationsService }) {
       <div className="NotebookView__filters">
         <NotebookFilters />
       </div>
-      <div className="NotebookView__results">
+      <div className="NotebookView__results u-layout-row--align-center u-font--large">
+        {pendingUpdateCount > 0 && !hasAppliedFilter && (
+          <IconButton
+            icon="refresh"
+            onClick={() => streamer.applyPendingUpdates()}
+            variant="primary"
+            title={tooltip}
+          />
+        )}
         <NotebookResultCount
           forcedVisibleCount={forcedVisibleCount}
           isFiltered={hasAppliedFilter}
@@ -153,6 +178,6 @@ function NotebookView({ loadAnnotationsService }) {
   );
 }
 
-NotebookView.injectedProps = ['loadAnnotationsService'];
+NotebookView.injectedProps = ['loadAnnotationsService', 'streamer'];
 
 export default withServices(NotebookView);
