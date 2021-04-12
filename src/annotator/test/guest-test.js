@@ -60,6 +60,7 @@ describe('Guest', () => {
     FakeAdder.instance = null;
     guestConfig = {};
     highlighter = {
+      getHighlightsContainingNode: sinon.stub().returns([]),
       highlightRange: sinon.stub().returns([]),
       removeHighlights: sinon.stub(),
       removeAllHighlights: sinon.stub(),
@@ -424,6 +425,7 @@ describe('Guest', () => {
   });
 
   describe('document events', () => {
+    let fakeHighlight;
     let fakeSidebarFrame;
     let guest;
     let rootElement;
@@ -431,7 +433,19 @@ describe('Guest', () => {
     beforeEach(() => {
       fakeSidebarFrame = null;
       guest = createGuest();
+      guest.setVisibleHighlights(true);
       rootElement = guest.element;
+
+      // Create a fake highlight as a target for hover and click events.
+      fakeHighlight = document.createElement('hypothesis-highlight');
+      const annotation = { $tag: 'highlight-ann-tag' };
+      highlighter.getHighlightsContainingNode
+        .withArgs(fakeHighlight)
+        .returns([{ _annotation: annotation }]);
+
+      // Guest relies on event listeners on the root element, so all highlights must
+      // be descendants of it.
+      rootElement.appendChild(fakeHighlight);
     });
 
     afterEach(() => {
@@ -479,6 +493,56 @@ describe('Guest', () => {
       window.dispatchEvent(new Event('resize'));
 
       assert.called(guest._onSelection);
+    });
+
+    it('focuses annotations in the sidebar when hovering highlights in the document', () => {
+      // Hover the highlight
+      fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
+      assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
+      assert.calledWith(fakeCrossFrame.call, 'focusAnnotations', [
+        'highlight-ann-tag',
+      ]);
+
+      // Un-hover the highlight
+      fakeHighlight.dispatchEvent(new Event('mouseout', { bubbles: true }));
+      assert.calledWith(fakeCrossFrame.call, 'focusAnnotations', []);
+    });
+
+    it('does not focus annotations in the sidebar when a non-highlight element is hovered', () => {
+      rootElement.dispatchEvent(new Event('mouseover', { bubbles: true }));
+
+      assert.calledWith(highlighter.getHighlightsContainingNode, rootElement);
+      assert.notCalled(fakeCrossFrame.call);
+    });
+
+    it('does not focus or select annotations in the sidebar if highlights are hidden', () => {
+      guest.setVisibleHighlights(false);
+
+      fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
+      fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
+
+      assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
+      assert.notCalled(fakeCrossFrame.call);
+    });
+
+    it('selects annotations in the sidebar when clicking on a highlight', () => {
+      fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
+
+      assert.calledWith(fakeCrossFrame.call, 'showAnnotations', [
+        'highlight-ann-tag',
+      ]);
+      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
+    });
+
+    it('toggles selected annotations in the sidebar when Ctrl/Cmd-clicking a highlight', () => {
+      fakeHighlight.dispatchEvent(
+        new MouseEvent('mouseup', { bubbles: true, ctrlKey: true })
+      );
+
+      assert.calledWith(fakeCrossFrame.call, 'toggleAnnotationSelection', [
+        'highlight-ann-tag',
+      ]);
+      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
     });
   });
 
