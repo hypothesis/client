@@ -9,8 +9,8 @@ import ThreadList from './ThreadList';
 
 /**
  * @typedef StreamViewProps
- * @prop {Object} [api] - Injected service
- * @prop {Object} [toastMessenger] - Injected service
+ * @prop {ReturnType<import('../services/api').default>} api - Injected service
+ * @prop {ReturnType<import('../services/toast-messenger').default>} toastMessenger - Injected service
  */
 
 /**

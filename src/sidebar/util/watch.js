@@ -38,7 +38,7 @@ import shallowEqual from 'shallowequal';
  *
  * Values are compared using strict equality (`===`).
  *
- * @param {(callback: Function) => Function} subscribe - Function used to
+ * @param {(callback: () => void) => Function} subscribe - Function used to
  *   subscribe to notifications of _potential_ changes in the watched values.
  * @param {Function|Array<Function>} watchFns - A function or array of functions
  *   which return the current watched values

@@ -9,6 +9,12 @@ import { watch } from '../util/watch';
  * Open a new WebSocket connection to the Hypothesis push notification service.
  * Only one websocket connection may exist at a time, any existing socket is
  * closed.
+ *
+ * @param {import('../store').SidebarStore} store
+ * @param {ReturnType<import('./oauth-auth').default>} auth
+ * @param {ReturnType<import('./groups').default>} groups
+ * @param {ReturnType<import('./session').default>} session
+ * @param {Record<string, any>} settings
  */
 // @inject
 export default function Streamer(store, auth, groups, session, settings) {

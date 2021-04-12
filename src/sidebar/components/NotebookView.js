@@ -15,8 +15,8 @@ import PaginatedThreadList from './PaginatedThreadList';
 
 /**
  * @typedef NotebookViewProps
- * @prop {Object} [loadAnnotationsService] - Injected service
- * @prop {Object} [streamer] - Injected service
+ * @prop {ReturnType<import('../services/load-annotations').default>} loadAnnotationsService - Injected service
+ * @prop {import('../services/streamer').default} streamer - Injected service
  */
 
 /**
@@ -69,7 +69,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
 
   // Establish websocket connection
   useEffect(() => {
-    if (streamer && hasFetchedProfile) {
+    if (hasFetchedProfile) {
       streamer.connect({ applyUpdatesImmediately: false });
     }
   }, [hasFetchedProfile, streamer]);

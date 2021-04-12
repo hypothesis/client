@@ -162,7 +162,7 @@ export default function groups(
     });
   }
 
-  /*
+  /**
    * Fetch a specific group.
    *
    * @param {string} id

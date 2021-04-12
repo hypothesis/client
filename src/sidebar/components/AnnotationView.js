@@ -10,7 +10,7 @@ import SidebarContentError from './SidebarContentError';
 /**
  * @typedef AnnotationViewProps
  * @prop {() => any} onLogin
- * @prop {Object} [loadAnnotationsService] - Injected service
+ * @prop {ReturnType<import('../services/load-annotations').default>} loadAnnotationsService - Injected service
  */
 
 /**

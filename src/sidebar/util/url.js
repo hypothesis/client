@@ -8,8 +8,8 @@
  *     {url: '/things/foo', params: {q: 'bar'}}
  *
  * @param {string} url
- * @param {Object} params
- * @return {{ url: string, params: Object }}
+ * @param {Record<string, any>} params
+ * @return {{ url: string, params: Record<string, any>}}
  */
 export function replaceURLParams(url, params) {
   const unusedParams = {};

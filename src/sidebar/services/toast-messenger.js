@@ -80,7 +80,7 @@ export default function toastMessenger(store) {
    * Add an error toast message with `messageText`
    *
    * @param {string} messageText
-   * @param {MessageOptions} options
+   * @param {MessageOptions} [options]
    */
   const error = (messageText, options) => {
     addMessage('error', messageText, options);
@@ -90,7 +90,7 @@ export default function toastMessenger(store) {
    * Add a success toast message with `messageText`
    *
    * @param {string} messageText
-   * @param {MessageOptions} options
+   * @param {MessageOptions} [options]
    */
   const success = (messageText, options) => {
     addMessage('success', messageText, options);
@@ -100,7 +100,7 @@ export default function toastMessenger(store) {
    * Add a warn/notice toast message with `messageText`
    *
    * @param {string} messageText
-   * @param {MessageOptions} options
+   * @param {MessageOptions} [options]
    */
   const notice = (messageText, options) => {
     addMessage('notice', messageText, options);

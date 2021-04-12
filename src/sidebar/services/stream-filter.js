@@ -1,15 +1,11 @@
 /**
- * @typedef {'equals'|'one_of'} Operator
- */
-
-/**
  * Filter clause against which annotation updates are tested before being
  * sent to the client.
  *
  * @typedef FilterClause
- * @prop {string} field
- * @prop {Operator} operator
- * @prop {any} value
+ * @prop {'/group'|'/id'|'/references'|'/uri'} field
+ * @prop {'equals'|'one_of'} operator
+ * @prop {string|string[]} value
  * @prop {boolean} case_sensitive - TODO: Backend doesn't use this at present,
  *   but it seems important for certain fields (eg. ID).
  */
@@ -56,10 +52,10 @@ export default class StreamFilter {
   /**
    * Add a matching clause to the configuration.
    *
-   * @param {string} field - Field to filter by
-   * @param {Operator} operator - How to filter
-   * @param {any} value - Value to match
-   * @param {boolean} caseSensitive - Whether matching should be case sensitive
+   * @param {FilterClause['field']} field - Field to filter by
+   * @param {FilterClause['operator']} operator - How to filter
+   * @param {FilterClause['value']} value - Value to match
+   * @param {FilterClause['case_sensitive']} caseSensitive - Whether matching should be case sensitive
    */
   addClause(field, operator, value, caseSensitive = false) {
     this.filter.clauses.push({

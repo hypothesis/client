@@ -29,6 +29,12 @@ import { SearchClient } from '../search-client';
 
 import { isReply } from '../helpers/annotation-metadata';
 
+/**
+ * @param {ReturnType<import('./api').default>} api
+ * @param {import('../store').SidebarStore} store
+ * @param {import('./streamer').default} streamer
+ * @param {import('./stream-filter').default} streamFilter
+ */
 // @inject
 export default function loadAnnotationsService(
   api,
@@ -83,7 +89,7 @@ export default function loadAnnotationsService(
 
     const searchOptions = {
       incremental: true,
-      maxResults: maxResults ?? null,
+      maxResults,
       separateReplies: false,
 
       // Annotations are fetched in order of creation by default. This is expected
@@ -97,8 +103,8 @@ export default function loadAnnotationsService(
       //
       // If the backend would allow us to sort on document location, we could do even better.
 
-      sortBy: /** @type {SortBy} */ (sortBy ?? 'created'),
-      sortOrder: /** @type {SortOrder} */ (sortOrder ?? 'asc'),
+      sortBy,
+      sortOrder,
     };
 
     searchClient = new SearchClient(api.search, searchOptions);
