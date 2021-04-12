@@ -598,6 +598,40 @@ describe('Guest', () => {
     });
   });
 
+  describe('#selectAnnotations', () => {
+    it('selects the specified annotations in the sidebar', () => {
+      const guest = createGuest();
+      const annotations = [{ $tag: 'ann1' }, { $tag: 'ann2' }];
+
+      guest.selectAnnotations(annotations);
+
+      assert.calledWith(fakeCrossFrame.call, 'showAnnotations', [
+        'ann1',
+        'ann2',
+      ]);
+    });
+
+    it('toggles the annotations if `toggle` is true', () => {
+      const guest = createGuest();
+      const annotations = [{ $tag: 'ann1' }, { $tag: 'ann2' }];
+
+      guest.selectAnnotations(annotations, true /* toggle */);
+
+      assert.calledWith(fakeCrossFrame.call, 'toggleAnnotationSelection', [
+        'ann1',
+        'ann2',
+      ]);
+    });
+
+    it('opens the sidebar', () => {
+      const guest = createGuest();
+
+      guest.selectAnnotations([]);
+
+      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
+    });
+  });
+
   describe('#getDocumentInfo', () => {
     let guest;
 
