@@ -223,13 +223,13 @@ export default class Guest {
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
       const annotations = annotationsAt(/** @type {Element} */ (target));
       if (annotations.length && this._visibleHighlights) {
-        this.focusAnnotations(annotations);
+        this._focusAnnotations(annotations);
       }
     });
 
     this._listeners.add(this.element, 'mouseout', () => {
       if (this._visibleHighlights) {
-        this.focusAnnotations([]);
+        this._focusAnnotations([]);
       }
     });
 
@@ -521,7 +521,7 @@ export default class Guest {
    *
    * @param {AnnotationData[]} annotations
    */
-  focusAnnotations(annotations) {
+  _focusAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
     this.crossframe.call('focusAnnotations', tags);
   }
