@@ -326,9 +326,13 @@ export function removeHighlights(highlights) {
  * @param {boolean} focused
  */
 export function setHighlightsFocused(highlights, focused) {
-  highlights.forEach(h =>
-    h.classList.toggle('hypothesis-highlight-focused', focused)
-  );
+  highlights.forEach(h => {
+    if (h.svgHighlight) {
+      h.svgHighlight.classList.toggle('is-focused', focused);
+    } else {
+      h.classList.toggle('hypothesis-highlight-focused', focused);
+    }
+  });
 }
 
 /**
