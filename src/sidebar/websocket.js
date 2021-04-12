@@ -60,7 +60,7 @@ export default class Socket extends TinyEmitter {
         minTimeout: RECONNECT_MIN_DELAY * 2,
         // Don't retry forever -- fail permanently after 10 retries
         retries: 10,
-        // Randomize retry times to minimise the thundering herd effect
+        // Randomize retry times to minimize the thundering herd effect
         randomize: true,
       });
 
@@ -76,7 +76,7 @@ export default class Socket extends TinyEmitter {
             return;
           }
           const err = new Error(
-            'WebSocket closed abnormally, code: ' + event.code
+            `WebSocket closed abnormally, code: ${event.code}`
           );
           console.warn(err);
           onAbnormalClose(err);

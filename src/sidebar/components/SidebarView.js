@@ -16,9 +16,9 @@ import ThreadList from './ThreadList';
  * @typedef SidebarViewProps
  * @prop {() => any} onLogin
  * @prop {() => any} onSignUp
- * @prop {Object} [frameSync] - Injected service
- * @prop {Object} [loadAnnotationsService]  - Injected service
- * @prop {Object} [streamer] - Injected service
+ * @prop {import('../services/frame-sync').default} frameSync - Injected service
+ * @prop {ReturnType<import('../services/load-annotations').default>} loadAnnotationsService  - Injected service
+ * @prop {import('../services/streamer').default} streamer - Injected service
  */
 
 /**

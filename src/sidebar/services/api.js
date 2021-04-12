@@ -56,9 +56,9 @@ function stripInternalProperties(obj) {
  * Function which makes an API request.
  *
  * @callback APICallFunction
- * @param {any} [params] - A map of URL and query string parameters to include with the request.
- * @param {any} [data] - The body of the request.
- * @param {APICallOptions} options
+ * @param {Record<string, any>} params - A map of URL and query string parameters to include with the request.
+ * @param {Object} [data] - The body of the request.
+ * @param {APICallOptions} [options]
  * @return {Promise<any|APIResponse>}
  */
 

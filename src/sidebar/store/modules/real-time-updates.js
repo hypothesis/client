@@ -83,8 +83,8 @@ const actions = actionTypes(update);
  * has been notified about but has not yet applied.
  *
  * @param {Object} args
- * @param {Annotation[]} args.updatedAnnotations
- * @param {Annotation[]} args.deletedAnnotations
+ * @param {Annotation[]} [args.updatedAnnotations]
+ * @param {Annotation[]} [args.deletedAnnotations]
  */
 function receiveRealTimeUpdates({
   updatedAnnotations = [],

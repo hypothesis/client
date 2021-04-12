@@ -342,7 +342,7 @@ function highlightAnnotations(ids) {
 /**
  * Remove annotations from the currently displayed set.
  *
- * @param {Annotation[]} annotations -
+ * @param {AnnotationStub[]} annotations -
  *   Annotations to remove. These may be complete annotations or stubs which
  *   only contain an `id` property.
  */

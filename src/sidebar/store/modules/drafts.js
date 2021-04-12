@@ -97,7 +97,6 @@ function createDraft(annotation, changes) {
  *
  * An empty draft has no text and no reference tags.
  */
-
 function deleteNewAndEmptyDrafts() {
   const { removeAnnotations } = require('./annotations');
 
