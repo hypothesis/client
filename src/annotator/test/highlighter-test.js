@@ -450,7 +450,7 @@ describe('annotator/highlighter', () => {
   });
 
   describe('setHighlightsFocused', () => {
-    it('adds class to highlights when focused is `true`', () => {
+    it('adds class to HTML highlights when focused', () => {
       const root = document.createElement('div');
       const highlights = createHighlights(root);
 
@@ -461,7 +461,7 @@ describe('annotator/highlighter', () => {
       );
     });
 
-    it('removes class from highlights when focused is `false`', () => {
+    it('removes class from HTML highlights when not focused', () => {
       const root = document.createElement('div');
       const highlights = createHighlights(root);
 
@@ -470,6 +470,31 @@ describe('annotator/highlighter', () => {
 
       highlights.forEach(h =>
         assert.isFalse(h.classList.contains('hypothesis-highlight-focused'))
+      );
+    });
+
+    it('adds class to PDF highlights when focused', () => {
+      const root = document.createElement('div');
+      render(<PdfPage />, root);
+      const highlights = highlightPdfRange(root);
+
+      setHighlightsFocused(highlights, true);
+
+      highlights.forEach(h =>
+        assert.isTrue(h.svgHighlight.classList.contains('is-focused'))
+      );
+    });
+
+    it('removes class from PDF highlights when not focused', () => {
+      const root = document.createElement('div');
+      render(<PdfPage />, root);
+      const highlights = highlightPdfRange(root);
+
+      setHighlightsFocused(highlights, true);
+      setHighlightsFocused(highlights, false);
+
+      highlights.forEach(h =>
+        assert.isFalse(h.svgHighlight.classList.contains('is-focused'))
       );
     });
   });
