@@ -475,10 +475,14 @@ describe('Guest', () => {
       }
     });
 
-    it('does not hide sidebar if configured not to close sidebar', () => {
+    it('does not hide sidebar if side-by-side mode is active', () => {
       for (let event of ['mousedown', 'touchstart']) {
-        guest.closeSidebarOnDocumentClick = false;
+        // Activate side-by-side mode
+        fakeHTMLIntegration.fitSideBySide.returns(true);
+        guest.fitSideBySide({ expanded: true, width: 100 });
+
         rootElement.dispatchEvent(new Event(event));
+
         assert.notCalled(guest.crossframe.call);
         guest.crossframe.call.resetHistory();
       }
@@ -489,6 +493,7 @@ describe('Guest', () => {
       sandbox.stub(guest, '_onSelection'); // Calling _onSelect makes the adder to reposition
 
       window.dispatchEvent(new Event('resize'));
+
       assert.called(guest._repositionAdder);
       assert.notCalled(guest._onSelection);
     });
@@ -499,7 +504,9 @@ describe('Guest', () => {
 
       guest._isAdderVisible = true;
       sandbox.stub(window, 'getSelection').returns({ getRangeAt: () => true });
+
       window.dispatchEvent(new Event('resize'));
+
       assert.called(guest._onSelection);
     });
   });
@@ -1042,11 +1049,11 @@ describe('Guest', () => {
           const layout = { expanded: true, width: 100 };
 
           guest.fitSideBySide(layout);
-          assert.isTrue(guest.closeSidebarOnDocumentClick);
+          assert.isFalse(guest.sideBySideActive);
 
           getIntegration().fitSideBySide.returns(true);
           guest.fitSideBySide(layout);
-          assert.isFalse(guest.closeSidebarOnDocumentClick);
+          assert.isTrue(guest.sideBySideActive);
         });
       });
     });
