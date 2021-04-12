@@ -116,10 +116,10 @@ export default class Guest {
   constructor(element, eventBus, config = {}) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
-    this.visibleHighlights = false;
+    this._visibleHighlights = false;
     this._isAdderVisible = false;
 
-    this.adder = new Adder(this.element, {
+    this._adder = new Adder(this.element, {
       onAnnotate: async () => {
         await this.createAnnotation();
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
@@ -134,7 +134,7 @@ export default class Guest {
       },
     });
 
-    this.selectionObserver = new SelectionObserver(range => {
+    this._selectionObserver = new SelectionObserver(range => {
       if (range) {
         this._onSelection(range);
       } else {
@@ -146,14 +146,14 @@ export default class Guest {
     this.anchors = [];
 
     /** @type {Integration} */
-    this.integration =
+    this._integration =
       config.documentType === 'pdf'
         ? new PDFIntegration(this)
         : new HTMLIntegration(this.element);
 
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
-    this.frameIdentifier = config.subFrameIdentifier || null;
+    this._frameIdentifier = config.subFrameIdentifier || null;
 
     this.crossframe = new CrossFrame(this.element, {
       config,
@@ -193,7 +193,7 @@ export default class Guest {
     this._listeners.add(this.element, 'mouseup', event => {
       const { target, metaKey, ctrlKey } = /** @type {MouseEvent} */ (event);
       const annotations = annotationsAt(/** @type {Element} */ (target));
-      if (annotations.length && this.visibleHighlights) {
+      if (annotations.length && this._visibleHighlights) {
         const toggle = metaKey || ctrlKey;
         this.selectAnnotations(annotations, toggle);
       }
@@ -211,13 +211,13 @@ export default class Guest {
 
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
       const annotations = annotationsAt(/** @type {Element} */ (target));
-      if (annotations.length && this.visibleHighlights) {
+      if (annotations.length && this._visibleHighlights) {
         this.focusAnnotations(annotations);
       }
     });
 
     this._listeners.add(this.element, 'mouseout', () => {
-      if (this.visibleHighlights) {
+      if (this._visibleHighlights) {
         this.focusAnnotations([]);
       }
     });
@@ -230,14 +230,14 @@ export default class Guest {
    */
   async getDocumentInfo() {
     const [uri, metadata] = await Promise.all([
-      this.integration.uri(),
-      this.integration.getMetadata(),
+      this._integration.uri(),
+      this._integration.getMetadata(),
     ]);
 
     return {
       uri: normalizeURI(uri),
       metadata,
-      frameIdentifier: this.frameIdentifier,
+      frameIdentifier: this._frameIdentifier,
     };
   }
 
@@ -316,12 +316,12 @@ export default class Guest {
   destroy() {
     this._listeners.removeAll();
 
-    this.selectionObserver.disconnect();
-    this.adder.destroy();
+    this._selectionObserver.disconnect();
+    this._adder.destroy();
 
     removeAllHighlights(this.element);
 
-    this.integration.destroy();
+    this._integration.destroy();
     this._emitter.destroy();
     this.crossframe.destroy();
   }
@@ -360,7 +360,7 @@ export default class Guest {
       /** @type {Anchor} */
       let anchor;
       try {
-        const range = await this.integration.anchor(
+        const range = await this._integration.anchor(
           this.element,
           target.selector
         );
@@ -469,7 +469,7 @@ export default class Guest {
     const info = await this.getDocumentInfo();
     const root = this.element;
     const rangeSelectors = await Promise.all(
-      ranges.map(range => this.integration.describe(root, range))
+      ranges.map(range => this._integration.describe(root, range))
     );
     const target = rangeSelectors.map(selectors => ({
       source: info.uri,
@@ -552,14 +552,14 @@ export default class Guest {
     this.selectedRanges = [range];
     this._emitter.publish('hasSelectionChanged', true);
 
-    this.adder.annotationsForSelection = annotationsForSelection();
+    this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
-    this.adder.show(focusRect, isBackwards);
+    this._adder.show(focusRect, isBackwards);
   }
 
   _onClearSelection() {
     this._isAdderVisible = false;
-    this.adder.hide();
+    this._adder.hide();
     this.selectedRanges = [];
     this._emitter.publish('hasSelectionChanged', false);
   }
@@ -585,7 +585,7 @@ export default class Guest {
    */
   setVisibleHighlights(shouldShowHighlights) {
     setHighlightsVisible(this.element, shouldShowHighlights);
-    this.visibleHighlights = shouldShowHighlights;
+    this._visibleHighlights = shouldShowHighlights;
     this._emitter.publish('highlightsVisibleChanged', shouldShowHighlights);
   }
 
@@ -595,7 +595,7 @@ export default class Guest {
    * @return {HTMLElement}
    */
   contentContainer() {
-    return this.integration.contentContainer();
+    return this._integration.contentContainer();
   }
 
   /**
@@ -604,7 +604,7 @@ export default class Guest {
    * @param {SidebarLayout} sidebarLayout
    */
   fitSideBySide(sidebarLayout) {
-    this._sideBySideActive = this.integration.fitSideBySide(sidebarLayout);
+    this._sideBySideActive = this._integration.fitSideBySide(sidebarLayout);
   }
 
   /**
