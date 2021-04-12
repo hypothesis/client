@@ -516,29 +516,6 @@ export default class Guest {
   }
 
   /**
-   * Open the sidebar and set the selection to `annotations` (ie. Filter the annotation
-   * list to show only these annotations).
-   *
-   * @param {AnnotationData[]} annotations
-   */
-  showAnnotations(annotations) {
-    const tags = annotations.map(a => a.$tag);
-    this.crossframe.call('showAnnotations', tags);
-    this.crossframe.call('openSidebar');
-  }
-
-  /**
-   * Toggle whether the given annotations are included in the selection in the
-   * sidebar.
-   *
-   * @param {AnnotationData[]} annotations
-   */
-  toggleAnnotationSelection(annotations) {
-    const tags = annotations.map(a => a.$tag);
-    this.crossframe.call('toggleAnnotationSelection', tags);
-  }
-
-  /**
    * Indicate in the sidebar that certain annotations are focused (ie. the
    * associated document region(s) is hovered).
    *
@@ -580,17 +557,23 @@ export default class Guest {
   }
 
   /**
-   * Set the selected annotations in the sidebar.
+   * Show the given annotations in the sidebar.
+   *
+   * This sets up a filter in the sidebar to show only the selected annotations
+   * and opens the sidebar.
    *
    * @param {AnnotationData[]} annotations
-   * @param {boolean} [toggle]
+   * @param {boolean} [toggle] - Toggle whether the annotations are selected
+   *   instead of showing them regardless of whether they are currently selected.
    */
   selectAnnotations(annotations, toggle = false) {
+    const tags = annotations.map(a => a.$tag);
     if (toggle) {
-      this.toggleAnnotationSelection(annotations);
+      this.crossframe.call('toggleAnnotationSelection', tags);
     } else {
-      this.showAnnotations(annotations);
+      this.crossframe.call('showAnnotations', tags);
     }
+    this.crossframe.call('openSidebar');
   }
 
   /**
