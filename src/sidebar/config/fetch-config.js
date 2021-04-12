@@ -106,7 +106,7 @@ function fetchConfigLegacy(appConfig, window_ = window) {
  * Merge client configuration from h service with config from the hash fragment.
  *
  * @param {Object} appConfig - App config settings rendered into `app.html` by the h service.
- * @param {Object} hostPageConfig - App configuration specified by the embedding  frame.
+ * @param {Object} hostPageConfig - App configuration specified by the embedding frame.
  * @return {Object} - The merged settings.
  */
 function fetchConfigEmbed(appConfig, hostPageConfig) {
@@ -212,11 +212,18 @@ export async function fetchConfig(appConfig, window_ = window) {
       requestConfigFromFrame.ancestorLevel,
       window_
     );
-    return await fetchConfigRpc(
+
+    const rpcMergedConfig = await fetchConfigRpc(
       appConfig,
       parentFrame,
       requestConfigFromFrame.origin
     );
+    // Add back the optional focused group id from the host page config
+    // as this is needed in the Notebook.
+    return {
+      ...rpcMergedConfig,
+      ...(hostPageConfig.group ? { group: hostPageConfig.group } : {}),
+    };
   } else {
     throw new Error(
       'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
