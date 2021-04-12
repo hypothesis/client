@@ -155,16 +155,19 @@ export default class Guest {
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this._frameIdentifier = config.subFrameIdentifier || null;
 
+    // Setup connection to sidebar.
     this.crossframe = new CrossFrame(this.element, {
       config,
       on: (event, handler) => this._emitter.subscribe(event, handler),
       emit: (event, ...args) => this._emitter.publish(event, ...args),
     });
     this.crossframe.onConnect(() => this._setupInitialState(config));
+    this._connectSidebarEvents();
 
     this._sideBySideActive = false;
+
+    // Listen for annotations being loaded or unloaded.
     this._connectAnnotationSync();
-    this._connectAnnotationUISync(this.crossframe);
 
     // Setup event handlers on the root element
     this._listeners = new ListenerCollection();
@@ -269,8 +272,10 @@ export default class Guest {
     });
   }
 
-  _connectAnnotationUISync(crossframe) {
-    crossframe.on('focusAnnotations', (tags = []) => {
+  _connectSidebarEvents() {
+    // Handlers for events sent when user hovers or clicks on an annotation card
+    // in the sidebar.
+    this.crossframe.on('focusAnnotations', (tags = []) => {
       for (let anchor of this.anchors) {
         if (anchor.highlights) {
           const toggle = tags.includes(anchor.annotation.$tag);
@@ -279,7 +284,7 @@ export default class Guest {
       }
     });
 
-    crossframe.on('scrollToAnnotation', tag => {
+    this.crossframe.on('scrollToAnnotation', tag => {
       for (let anchor of this.anchors) {
         if (anchor.highlights) {
           if (anchor.annotation.$tag === tag) {
@@ -302,14 +307,16 @@ export default class Guest {
       }
     });
 
-    crossframe.on('getDocumentInfo', cb => {
+    // Handler for when sidebar requests metadata for the current document
+    this.crossframe.on('getDocumentInfo', cb => {
       this.getDocumentInfo()
         .then(info => cb(null, info))
         .catch(reason => cb(reason));
     });
 
-    crossframe.on('setVisibleHighlights', state => {
-      this.setVisibleHighlights(state);
+    // Handler for controls on the sidebar
+    this.crossframe.on('setVisibleHighlights', showHighlights => {
+      this.setVisibleHighlights(showHighlights);
     });
   }
 
