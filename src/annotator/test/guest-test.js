@@ -923,7 +923,11 @@ describe('Guest', () => {
   });
 
   describe('#detach', () => {
-    it('removes the anchors from the "anchors" instance variable', () => {
+    function createAnchor() {
+      return { annotation: {}, highlights: [document.createElement('span')] };
+    }
+
+    it('removes anchors associated with the removed annotation', () => {
       const guest = createGuest();
       const annotation = {};
       guest.anchors.push({ annotation });
@@ -933,29 +937,41 @@ describe('Guest', () => {
       assert.equal(guest.anchors.length, 0);
     });
 
-    it('emits an `anchorsChanged` event', () => {
+    it('removes any highlights associated with the annotation', () => {
       const guest = createGuest();
-      const annotation = {};
-      guest.anchors.push({ annotation });
+      const anchor = createAnchor();
+      const { removeHighlights } = highlighter;
+      guest.anchors.push(anchor);
+
+      guest.detach(anchor.annotation);
+
+      assert.calledOnce(removeHighlights);
+      assert.calledWith(removeHighlights, anchor.highlights);
+    });
+
+    it('keeps anchors and highlights associated with other annotations', () => {
+      const guest = createGuest();
+      const anchorA = createAnchor();
+      const anchorB = createAnchor();
+      guest.anchors.push(anchorA, anchorB);
+
+      guest.detach(anchorA.annotation);
+
+      assert.include(guest.anchors, anchorB);
+      assert.isFalse(
+        highlighter.removeHighlights.calledWith(anchorB.highlights)
+      );
+    });
+
+    it('emits an `anchorsChanged` event with updated anchors', () => {
+      const guest = createGuest();
+      const anchor = createAnchor();
       const anchorsChanged = sandbox.stub();
       guest._emitter.subscribe('anchorsChanged', anchorsChanged);
 
-      guest.detach(annotation);
+      guest.detach(anchor.annotation);
 
       assert.calledWith(anchorsChanged, guest.anchors);
-    });
-
-    it('removes any highlights associated with the annotation', () => {
-      const guest = createGuest();
-      const annotation = {};
-      const highlights = [document.createElement('span')];
-      const { removeHighlights } = highlighter;
-      guest.anchors.push({ annotation, highlights });
-
-      guest.detach(annotation);
-
-      assert.calledOnce(removeHighlights);
-      assert.calledWith(removeHighlights, highlights);
     });
   });
 
