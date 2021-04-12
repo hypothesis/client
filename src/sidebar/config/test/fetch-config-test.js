@@ -277,6 +277,27 @@ describe('sidebar/config/fetch-config', () => {
           'Unable to fetch groups'
         );
       });
+
+      it('creates a merged config and also adds back the `group` value from the host config', async () => {
+        fakeHostConfig.returns({
+          requestConfigFromFrame: {
+            origin: 'https://embedder.com',
+            ancestorLevel: 2,
+          },
+          group: '1234',
+        });
+        const appConfig = { foo: 'bar', appType: 'via' };
+        fakeJsonRpc.call.resolves({ foo: 'baz' });
+
+        const result = await fetchConfig(appConfig, fakeWindow);
+
+        assert.deepEqual(result, {
+          foo: 'baz',
+          appType: 'via',
+          group: '1234',
+          apiUrl: fakeApiUrl(),
+        });
+      });
     });
 
     context('incorrect requestConfigFromFrame object', () => {
