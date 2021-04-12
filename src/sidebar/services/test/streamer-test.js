@@ -111,7 +111,6 @@ describe('Streamer', function () {
         }),
         receiveRealTimeUpdates: sinon.stub(),
         removeAnnotations: sinon.stub(),
-        route: sinon.stub().returns('sidebar'),
       }
     );
 
@@ -297,12 +296,11 @@ describe('Streamer', function () {
   describe('annotation notifications', function () {
     beforeEach(function () {
       createDefaultStreamer();
-      return activeStreamer.connect();
     });
 
     context('when the app is the stream', function () {
       beforeEach(function () {
-        fakeStore.route.returns('stream');
+        return activeStreamer.connect();
       });
 
       it('applies updates immediately', function () {
@@ -324,6 +322,10 @@ describe('Streamer', function () {
     });
 
     context('when the app is the sidebar', function () {
+      beforeEach(function () {
+        return activeStreamer.connect({ applyUpdatesImmediately: false });
+      });
+
       it('saves pending updates', function () {
         fakeWebSocket.notify(fixtures.createNotification);
         assert.calledWith(fakeStore.receiveRealTimeUpdates, {
@@ -347,17 +349,6 @@ describe('Streamer', function () {
         fakeWebSocket.notify(fixtures.createNotification);
 
         assert.notCalled(fakeStore.addAnnotations);
-      });
-
-      it('does not apply deletions immediately', function () {
-        const ann = fixtures.deleteNotification.payload;
-        fakeStore.pendingDeletions.returns({
-          [ann.id]: true,
-        });
-
-        fakeWebSocket.notify(fixtures.deleteNotification);
-
-        assert.notCalled(fakeStore.removeAnnotations);
       });
     });
   });

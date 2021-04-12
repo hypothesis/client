@@ -13,6 +13,7 @@ describe('NotebookView', () => {
   let fakeUseRootThread;
   let fakeScrollIntoView;
   let fakeStore;
+  let fakeStreamer;
 
   beforeEach(() => {
     fakeLoadAnnotationsService = {
@@ -32,6 +33,13 @@ describe('NotebookView', () => {
       isLoading: sinon.stub().returns(false),
       annotationResultCount: sinon.stub().returns(0),
       setSortKey: sinon.stub(),
+      pendingUpdateCount: sinon.stub().returns(0),
+      hasFetchedProfile: sinon.stub().returns(true),
+    };
+
+    fakeStreamer = {
+      connect: sinon.stub(),
+      applyPendingUpdates: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -48,7 +56,10 @@ describe('NotebookView', () => {
 
   function createComponent() {
     return mount(
-      <NotebookView loadAnnotationsService={fakeLoadAnnotationsService} />
+      <NotebookView
+        loadAnnotationsService={fakeLoadAnnotationsService}
+        streamer={fakeStreamer}
+      />
     );
   }
 
@@ -132,6 +143,38 @@ describe('NotebookView', () => {
   it('renders filters', () => {
     const wrapper = createComponent();
     assert.isTrue(wrapper.find('NotebookFilters').exists());
+  });
+
+  describe('synchronization of annotations', () => {
+    beforeEach(() => {
+      fakeStore.focusedGroup.returns({ id: 'hallothere', name: 'Hallo' });
+      fakeStore.pendingUpdateCount.returns(3);
+    });
+
+    it("doesn't display button to synchronize annotations if filters are applied", () => {
+      fakeStore.hasAppliedFilter.returns(true);
+      const wrapper = createComponent();
+
+      const button = wrapper.find('IconButton[icon="refresh"]');
+      assert.isFalse(button.exists());
+    });
+
+    it('shows button to synchronize annotations if no filters are applied', () => {
+      const wrapper = createComponent();
+
+      const button = wrapper.find('IconButton[icon="refresh"]');
+      assert.isTrue(button.exists());
+      assert.include(button.prop('title'), 'Show 3 new or updated annotations');
+    });
+
+    it('synchronizes pending annotations', () => {
+      const wrapper = createComponent();
+
+      const button = wrapper.find('IconButton[icon="refresh"]');
+      assert.isTrue(button.exists());
+      button.prop('onClick')();
+      assert.called(fakeStreamer.applyPendingUpdates);
+    });
   });
 
   describe('pagination', () => {

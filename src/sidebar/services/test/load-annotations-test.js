@@ -5,16 +5,19 @@ import loadAnnotationsService, { $imports } from '../load-annotations';
 let searchClients;
 let longRunningSearchClient = false;
 class FakeSearchClient extends EventEmitter {
-  constructor(searchFn, opts) {
+  constructor(
+    searchFn,
+    { incremental, separateReplies, sortBy = 'created', sortOrder = 'asc' }
+  ) {
     super();
 
     assert.ok(searchFn);
     searchClients.push(this);
     this.cancel = sinon.stub();
-    this.incremental = !!opts.incremental;
-    this.separateReplies = !!opts.separateReplies;
-    this.sortBy = opts.sortBy;
-    this.sortOrder = opts.sortOrder;
+    this.incremental = !!incremental;
+    this.separateReplies = !!separateReplies;
+    this.sortBy = sortBy;
+    this.sortOrder = sortOrder;
 
     this.get = sinon.spy(query => {
       if (!query.uri) {
@@ -325,6 +328,35 @@ describe('loadAnnotationsService', () => {
       searchClients[0].emit('error', error);
 
       assert.calledWith(onError, error);
+    });
+
+    it('configures the streamer to filter on uris (default)', () => {
+      const fakeAddClause = sinon.stub();
+      fakeStreamFilter.resetFilter.returns({ addClause: fakeAddClause });
+      const svc = createService();
+
+      // doesn't set the filtering if uris are undefined or []
+      svc.load({ groupId: fakeGroupId });
+      assert.notCalled(fakeAddClause);
+      assert.notCalled(fakeStreamer.setConfig);
+
+      svc.load({ groupId: fakeGroupId, uris: [] });
+      assert.notCalled(fakeAddClause);
+      assert.notCalled(fakeStreamer.setConfig);
+
+      svc.load({ groupId: fakeGroupId, uris: fakeUris });
+      assert.calledWith(fakeAddClause, '/uri', 'one_of', fakeUris);
+      assert.called(fakeStreamer.setConfig);
+    });
+
+    it('configures the streamer to filter on groups (if streamFilterBy is set to "group")', () => {
+      const fakeAddClause = sinon.stub();
+      fakeStreamFilter.resetFilter.returns({ addClause: fakeAddClause });
+      const svc = createService();
+
+      svc.load({ groupId: fakeGroupId, streamFilterBy: 'group' });
+      assert.calledWith(fakeAddClause, '/group', 'equals', fakeGroupId, true);
+      assert.called(fakeStreamer.setConfig);
     });
   });
 

@@ -3,7 +3,6 @@
 
 .NotebookResultCount {
   @include layout.horizontal-rhythm;
-  font-size: var.$font-size--large;
   // Normalize line height to ensure vertical stability (no jumping around)
   line-height: 1;
 
