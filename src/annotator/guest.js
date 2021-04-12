@@ -162,8 +162,7 @@ export default class Guest {
     });
     this.crossframe.onConnect(() => this._setupInitialState(config));
 
-    // Whether clicks on non-highlighted text should close the sidebar
-    this.closeSidebarOnDocumentClick = true;
+    this._sideBySideActive = false;
     this._connectAnnotationSync();
     this._connectAnnotationUISync(this.crossframe);
 
@@ -179,7 +178,7 @@ export default class Guest {
     // the document content.
     /** @param {Element} element */
     const maybeCloseSidebar = element => {
-      if (!this.closeSidebarOnDocumentClick) {
+      if (this._sideBySideActive) {
         // Don't hide the sidebar if event was disabled because the sidebar
         // doesn't overlap the content.
         return;
@@ -605,7 +604,17 @@ export default class Guest {
    * @param {SidebarLayout} sidebarLayout
    */
   fitSideBySide(sidebarLayout) {
-    const active = this.integration.fitSideBySide(sidebarLayout);
-    this.closeSidebarOnDocumentClick = !active;
+    this._sideBySideActive = this.integration.fitSideBySide(sidebarLayout);
+  }
+
+  /**
+   * Return true if side-by-side mode is currently active.
+   *
+   * Side-by-side mode is activated or de-activated when `fitSideBySide` is called
+   * depending on whether the sidebar is expanded and whether there is room for
+   * the content alongside the sidebar.
+   */
+  get sideBySideActive() {
+    return this._sideBySideActive;
   }
 }
