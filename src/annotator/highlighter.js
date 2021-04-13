@@ -327,6 +327,9 @@ export function removeHighlights(highlights) {
  */
 export function setHighlightsFocused(highlights, focused) {
   highlights.forEach(h => {
+    // In PDFs the visible highlight is created by an SVG element, so the focused
+    // effect is applied to that. In other documents the effect is applied to the
+    // `<hypothesis-highlight>` element.
     if (h.svgHighlight) {
       h.svgHighlight.classList.toggle('is-focused', focused);
     } else {
