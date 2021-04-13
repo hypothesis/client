@@ -8,10 +8,9 @@ import { useStoreProxy } from '../store/use-store';
 
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
-import useRootThread from './hooks/use-root-thread';
-
 import Panel from './Panel';
 import PaginatedThreadList from './PaginatedThreadList';
+import useRootThread from './hooks/use-root-thread';
 
 /**
  * @typedef NotebookViewProps
