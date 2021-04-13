@@ -7,7 +7,13 @@ let longRunningSearchClient = false;
 class FakeSearchClient extends EventEmitter {
   constructor(
     searchFn,
-    { incremental, separateReplies, sortBy = 'created', sortOrder = 'asc' }
+    {
+      incremental,
+      separateReplies,
+      sortBy = 'created',
+      sortOrder = 'asc',
+      maxResults = null,
+    }
   ) {
     super();
 
@@ -18,6 +24,7 @@ class FakeSearchClient extends EventEmitter {
     this.separateReplies = !!separateReplies;
     this.sortBy = sortBy;
     this.sortOrder = sortOrder;
+    this.maxResults = maxResults;
 
     this.get = sinon.spy(query => {
       if (!query.uri) {
@@ -257,16 +264,29 @@ describe('loadAnnotationsService', () => {
       assert.isFalse(searchClients[0].separateReplies);
     });
 
-    it('loads annotations with default sort order', () => {
+    it('search annotations with default SearchClient parameters', () => {
       const svc = createService();
 
       svc.load({ groupId: fakeGroupId, uris: fakeUris });
 
       assert.equal(searchClients[0].sortBy, 'created');
       assert.equal(searchClients[0].sortOrder, 'asc');
+      assert.equal(searchClients[0].maxResults, null);
+
+      svc.load({
+        groupId: fakeGroupId,
+        uris: fakeUris,
+        sortBy: undefined,
+        sortOrder: undefined,
+        maxResults: undefined,
+      });
+
+      assert.equal(searchClients[1].sortBy, 'created');
+      assert.equal(searchClients[1].sortOrder, 'asc');
+      assert.equal(searchClients[1].maxResults, null);
     });
 
-    it('loads annotations with custom sort order', () => {
+    it('search annotations with custom SearchClient parameters', () => {
       const svc = createService();
 
       svc.load({
@@ -274,10 +294,12 @@ describe('loadAnnotationsService', () => {
         uris: fakeUris,
         sortBy: 'updated',
         sortOrder: 'desc',
+        maxResults: 50,
       });
 
       assert.equal(searchClients[0].sortBy, 'updated');
       assert.equal(searchClients[0].sortOrder, 'desc');
+      assert.equal(searchClients[0].maxResults, 50);
     });
 
     it("cancels previously search client if it's still running", () => {

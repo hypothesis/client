@@ -89,8 +89,8 @@ export default function loadAnnotationsService(
 
     const searchOptions = {
       incremental: true,
-      maxResults,
       separateReplies: false,
+      maxResults,
 
       // Annotations are fetched in order of creation by default. This is expected
       // to roughly correspond to the order in which threads end up being sorted
