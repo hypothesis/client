@@ -134,7 +134,8 @@ function addCommonTests({ componentName, createComponentFn, withIcon = true }) {
 
         assert.equal(
           element.getAttribute(testCase.attributeName),
-          testCase.attributeValue
+          testCase.attributeValue,
+          `${testCase.attributeName}`
         );
       });
     });

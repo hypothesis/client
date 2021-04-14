@@ -36,34 +36,18 @@ import { SvgIcon } from '@hypothesis/frontend-shared';
  * @param {ButtonProps} props
  */
 function ButtonBase({
-  children,
   className,
   icon,
   iconPosition = 'left',
-  disabled,
+  size = 'medium',
+  variant = 'normal',
   expanded,
   pressed,
-  onClick = () => {},
-  size = 'medium',
-  style = {},
-  title,
-  variant = 'normal',
+  ...restProps
 }) {
-  const otherAttributes = {};
-  if (typeof disabled === 'boolean') {
-    otherAttributes.disabled = disabled;
-  }
-  if (typeof title !== 'undefined') {
-    otherAttributes.title = title;
-    otherAttributes['aria-label'] = title;
-  }
-
-  if (typeof expanded === 'boolean') {
-    otherAttributes['aria-expanded'] = expanded;
-  }
-  if (typeof pressed === 'boolean') {
-    otherAttributes['aria-pressed'] = pressed;
-  }
+  restProps['aria-expanded'] = expanded;
+  restProps['aria-pressed'] = pressed;
+  restProps['aria-label'] = restProps.title;
 
   return (
     <button
@@ -75,12 +59,8 @@ function ButtonBase({
           [`${className}--icon-${iconPosition}`]: icon,
         }
       )}
-      onClick={onClick}
-      {...otherAttributes}
-      style={style}
-    >
-      {children}
-    </button>
+      {...restProps}
+    />
   );
 }
 
@@ -89,9 +69,8 @@ function ButtonBase({
  *
  * @param {IconButtonProps} props
  */
-export function IconButton(props) {
-  const { className = 'IconButton', ...restProps } = props;
-  const { icon } = props;
+export function IconButton({ className = 'IconButton', ...restProps }) {
+  const { icon } = restProps;
   return (
     <ButtonBase className={className} {...restProps}>
       <SvgIcon name={icon} />
@@ -104,9 +83,12 @@ export function IconButton(props) {
  *
  * @param {ButtonProps} props
  */
-export function LabeledButton(props) {
-  const { icon, iconPosition = 'left' } = props;
-  const { children, className = 'LabeledButton', ...restProps } = props;
+export function LabeledButton({
+  children,
+  className = 'LabeledButton',
+  ...restProps
+}) {
+  const { icon, iconPosition = 'left' } = restProps;
   return (
     <ButtonBase className={className} {...restProps}>
       {icon && iconPosition === 'left' && <SvgIcon name={icon} />}
@@ -122,10 +104,5 @@ export function LabeledButton(props) {
  * @param {ButtonProps} props
  */
 export function LinkButton(props) {
-  const { children } = props;
-  return (
-    <ButtonBase className="LinkButton" {...props}>
-      {children}
-    </ButtonBase>
-  );
+  return <ButtonBase className="LinkButton" {...props} />;
 }
