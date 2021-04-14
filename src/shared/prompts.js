@@ -35,6 +35,12 @@ export async function confirm({
 
   const container = document.createElement('div');
   container.setAttribute('data-testid', 'confirm-container');
+
+  // Ensure dialog appears above any existing content. The Z-index value here
+  // is Good Enough™ for current usage.
+  container.style.position = 'relative';
+  container.style.zIndex = '10';
+
   document.body.appendChild(container);
 
   return new Promise(resolve => {
