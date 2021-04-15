@@ -32,6 +32,8 @@ import * as urlUtil from '../util/url';
  */
 
 /**
+ * @param {import('../store').SidebarStore} store
+ * @param {import('./api-routes').APIRoutesService} apiRoutes
  * @return {ServiceUrlGetter}
  * @inject
  */

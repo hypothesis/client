@@ -202,6 +202,8 @@ function createAPICall(
  * to get auth tokens. The URLs for API endpoints are fetched from the `/api`
  * endpoint, a responsibility delegated to the `apiRoutes` service which does
  * not use authentication.
+ *
+ * @param {import('./api-routes').APIRoutesService} apiRoutes
  */
 // @inject
 export default function api(apiRoutes, auth, store) {

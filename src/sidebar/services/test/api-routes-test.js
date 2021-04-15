@@ -1,4 +1,4 @@
-import apiRoutesFactory from '../api-routes';
+import { APIRoutesService } from '../api-routes';
 
 // Abridged version of the response returned by https://hypothes.is/api,
 // with the domain name changed.
@@ -34,7 +34,7 @@ const linksResponse = {
   'oauth.authorize': 'https://annotation.service/oauth/authorize',
 };
 
-describe('sidebar.api-routes', () => {
+describe('APIRoutesService', () => {
   let apiRoutes;
   let fakeSettings;
 
@@ -59,7 +59,7 @@ describe('sidebar.api-routes', () => {
       apiUrl: 'https://annotation.service/api/',
     };
 
-    apiRoutes = apiRoutesFactory(fakeSettings);
+    apiRoutes = new APIRoutesService(fakeSettings);
   });
 
   afterEach(() => {
