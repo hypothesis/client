@@ -12,6 +12,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  *
  * Access to the current profile is exposed via the `state` property.
  *
+ * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
  * @inject
  */
 export default function session(store, api, auth, settings, toastMessenger) {

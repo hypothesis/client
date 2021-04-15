@@ -25,6 +25,8 @@ import { resolve } from '../util/url';
  * Interaction with OAuth endpoints in the annotation service is delegated to
  * the `OAuthClient` class.
  *
+ * @param {Window} $window
+ * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
  * @inject
  */
 export default function auth(

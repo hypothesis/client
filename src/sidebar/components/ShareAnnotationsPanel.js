@@ -14,7 +14,7 @@ import Spinner from './Spinner';
 
 /**
  * @typedef ShareAnnotationsPanelProps
- * @prop {Object} toastMessenger - Injected service
+ * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
 /**
