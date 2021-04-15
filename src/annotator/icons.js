@@ -19,4 +19,12 @@ export default {
   close: require('../images/icons/close.svg'),
   pen: require('../images/icons/pen.svg'),
   erase: require('../images/icons/erase.svg'),
+  'circle-small': require('../images/icons/circleSmall.svg'),
+  'circle-medium': require('../images/icons/circleMedium.svg'),
+  'circle-large': require('../images/icons/circleLarge.svg'),
+  'red-icon': require('../images/icons/red.svg'),
+  'blue-icon': require('../images/icons/blue.svg'),
+  'green-icon': require('../images/icons/green.svg'),
+  'color-icon': require('../images/icons/palette.svg'),
+  'sizes-icon': require('../images/icons/sizes.svg'),
 };

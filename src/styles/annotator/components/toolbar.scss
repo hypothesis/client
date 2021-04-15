@@ -6,6 +6,15 @@
 @use '../mixins/layout';
 @use '../mixins/utils';
 
+#myPopup {
+  pointer-events: auto;
+}
+
+.popup > * {
+  pointer-events: none;
+}
+// semantic html radio button
+
 // note: These components CSS classes are nested inside
 // .annotator-frame to avoid being overridden by the
 // CSS reset styles applied to .annotator-frame, which would otherwise
@@ -14,6 +23,66 @@
   // the vertical toolbar at the left-edge of the sidebar
   // which provides controls for toggling the sidebar,
   // toggling highlights etc.
+
+  /* Popup container */
+  .popup {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  /* The actual popup (appears on top) */
+  .popup .popuptext {
+    visibility: hidden;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.2em 0.2em;
+    position: absolute;
+    z-index: 1;
+    bottom: -125%;
+    left: 145%;
+    margin-left: -80px;
+  }
+
+  /* Popup arrow */
+  .popup .popuptext::after {
+    content: '';
+    position: absolute;
+    top: 45%;
+    left: 110%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent #555;
+  }
+
+  /* Toggle this class when clicking on the popup container (hide and show the popup) */
+  .popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+  }
+
+  /* Add animation (fade in the popup) */
+  @-webkit-keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 
   .annotator-toolbar {
     position: absolute;

@@ -1,6 +1,7 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import propTypes from 'prop-types';
 import { createElement } from 'preact';
+import { useState, useEffect } from 'preact/hooks';
 
 /**
  * @param {Object} props
@@ -106,6 +107,20 @@ export default function Toolbar({
   drawingToolbarActivated,
   drawingToolbarToggle,
 }) {
+  const small = 1;
+  const medium = 5;
+  const large = 10;
+
+  const [toolSize, setToolSize] = useState(medium);
+
+  const [tool, setTool] = useState('pen');
+
+  const [color, setColor] = useState('red');
+
+  useEffect(() => {
+    setDoodleOptions({ tool: tool, size: toolSize, color: color });
+  }, [toolSize, tool, color, setDoodleOptions]);
+
   if (!drawingToolbarActivated) {
     return (
       <div>
@@ -184,13 +199,94 @@ export default function Toolbar({
             <ToolbarButton
               label="Pen"
               icon="pen"
-              onClick={() => setDoodleOptions({ tool: 'pen', size: 7 })}
+              onClick={() => {
+                setTool('pen');
+              }}
             />
             <ToolbarButton
               label="Eraser"
               icon="erase"
-              onClick={() => setDoodleOptions({ tool: 'eraser', size: 25 })}
+              onClick={() => {
+                setTool('eraser');
+              }}
             />
+            <button
+              className="popup annotator-toolbar-button size selected"
+              onClick={e => {
+                //@ts-ignore
+                e.target?.querySelector('#myPopup').classList.toggle('show');
+                //@ts-ignore
+                e.target?.parentElement
+                  .querySelector('.color')
+                  .querySelector('#myPopup')
+                  .classList.remove('show');
+              }}
+              aria-label="Brush Size"
+            >
+              <SvgIcon name="sizes-icon" className="svgicon" />
+              <span className="popuptext" id="myPopup">
+                <ToolbarButton
+                  label="Large"
+                  icon="circle-large"
+                  onClick={() => {
+                    setToolSize(large);
+                  }}
+                />
+                <ToolbarButton
+                  label="Medium"
+                  icon="circle-medium"
+                  onClick={() => {
+                    setToolSize(medium);
+                  }}
+                />
+                <ToolbarButton
+                  label="Small"
+                  icon="circle-small"
+                  className="annotator-toolbar-button smallSelector"
+                  onClick={() => {
+                    setToolSize(small);
+                  }}
+                />
+              </span>
+            </button>
+            <button
+              className="popup annotator-toolbar-button color"
+              onClick={e => {
+                //@ts-ignore
+                e.target?.querySelector('#myPopup').classList.toggle('show');
+                //@ts-ignore
+                e.target?.parentElement
+                  .querySelector('.size')
+                  .querySelector('#myPopup')
+                  .classList.remove('show');
+              }}
+              aria-label="Brush Color"
+            >
+              <SvgIcon name="color-icon" className="svgicon" />
+              <span className="popuptext" id="myPopup">
+                <ToolbarButton
+                  label="Red"
+                  icon="red-icon"
+                  onClick={() => {
+                    setColor('red');
+                  }}
+                />
+                <ToolbarButton
+                  label="Green"
+                  icon="green-icon"
+                  onClick={() => {
+                    setColor('green');
+                  }}
+                />
+                <ToolbarButton
+                  label="Blue"
+                  icon="blue-icon"
+                  onClick={() => {
+                    setColor('blue');
+                  }}
+                />
+              </span>
+            </button>
           </div>
         )}
       </div>

@@ -747,6 +747,9 @@ export default class Guest extends Delegator {
       if (options.hasOwnProperty('size')) {
         this.doodleCanvasController.size = options.size;
       }
+      if (options.hasOwnProperty('color')) {
+        this.doodleCanvasController.color = options.color;
+      }
     }
   }
 }

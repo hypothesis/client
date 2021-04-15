@@ -7,11 +7,12 @@ export class DoodleController {
    * @param {any} options
    */
   constructor(container, options) {
-    const { tool, size } = options;
+    const { tool, size, color } = options;
 
     this._container = container === null ? document.body : container;
     this._tool = tool;
     this._size = size;
+    this._color = color;
 
     this._doodleable = false;
 
@@ -40,6 +41,15 @@ export class DoodleController {
     this.render();
   }
 
+  set color(newColor) {
+    this._color = newColor;
+    this.render();
+  }
+
+  get color() {
+    return this._color;
+  }
+
   get size() {
     return this._size;
   }
@@ -63,6 +73,7 @@ export class DoodleController {
         attachedElement={this._container}
         size={this._size}
         tool={this._tool}
+        color={this._color}
         active={this._doodleable}
       />,
       document.body

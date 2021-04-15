@@ -8,6 +8,7 @@ import propTypes from 'prop-types';
  * @prop {string} tool - The name of the tool that is being used. One of {'pen'|'eraser'}.
  * @prop {number} size - The size of the brush.
  * @prop {boolean} active - Whether the canvas can be doodled on at this time
+ * @prop {string} color - The color of the brush
  * @prop {HTMLElement} attachedElement - Which element the DoodleCanvas should cover.
  */
 
@@ -20,7 +21,7 @@ import propTypes from 'prop-types';
  *
  * @param {DoodleCanvasProps} props
  */
-const DoodleCanvas = ({ tool, size, active, attachedElement }) => {
+const DoodleCanvas = ({ tool, size, active, color, attachedElement }) => {
   const [lines, setLines] = useState(/** @type {array} */ ([]));
   const [isDrawing, setIsDrawing] = useState(false);
 
@@ -29,7 +30,7 @@ const DoodleCanvas = ({ tool, size, active, attachedElement }) => {
     setLines([
       {
         tool: tool,
-        color: 'red',
+        color: color,
         size: size,
         points: [[e.offsetX, e.offsetY]],
       },
@@ -103,6 +104,7 @@ DoodleCanvas.propTypes = {
   tool: propTypes.string.isRequired,
   size: propTypes.number.isRequired,
   active: propTypes.bool.isRequired,
+  color: propTypes.string.isRequired,
   attachedElement: propTypes.any.isRequired,
 };
 
