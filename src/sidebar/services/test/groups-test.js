@@ -37,7 +37,7 @@ const dummyGroups = [
   { name: 'Group 3', id: 'id3' },
 ];
 
-describe('groups', function () {
+describe('sidebar/services/groups', function () {
   let fakeAuth;
   let fakeStore;
   let fakeSession;
@@ -812,6 +812,28 @@ describe('groups', function () {
           'Unable to fetch group configuration: Something went wrong'
         );
         assert.deepEqual(groups, []);
+      });
+
+      it('initially sets the focused group to the `directLinkedGroupId`', async () => {
+        setServiceConfigGroups(Promise.resolve(['id-a', 'id-b', 'id-c']));
+        fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
+        fakeStore.directLinkedGroupId.returns('id-c');
+
+        const svc = service();
+        await svc.load();
+
+        assert.calledWith(fakeStore.focusGroup, 'id-c');
+      });
+
+      it('does not set the focused group if no `directLinkedGroupId`', async () => {
+        setServiceConfigGroups(Promise.resolve(['id-a', 'id-b', 'id-c']));
+        fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
+        fakeStore.directLinkedGroupId.returns(null);
+
+        const svc = service();
+        await svc.load();
+
+        assert.notCalled(fakeStore.focusGroup);
       });
     });
   });
