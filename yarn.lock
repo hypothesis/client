@@ -1007,9 +1007,9 @@
     through2 "^2.0.3"
 
 "@hypothesis/frontend-shared@^1.9.0":
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-1.10.0.tgz#f6e3d095458c587fd9fc558cf032369e3a51a2a4"
-  integrity sha512-q+iPsXRj1PmjyfLCgskfJTrP9Upu2pdFntDQie4P8yG8vMktFfqjnA5YuN3JzmDCQQj1ptXrPGpbV6oxGZ2tFA==
+  version "1.11.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-1.11.0.tgz#7bcd9eb97d9045c05261021fe910285a00fde662"
+  integrity sha512-kXJnb5hSXrzGb86yZtmmxicdp7SwAB8wZrkF5kEfiRS1nxOqQzeBElEEkwRFWd0GJ2nLbBQiXPYBdDVktFuz3w==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
