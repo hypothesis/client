@@ -83,11 +83,16 @@ describe('APIRoutesService', () => {
       );
     });
 
-    it('retries the route fetch until it succeeds', () => {
-      window.fetch.onFirstCall().returns(httpResponse(500, null));
-      return apiRoutes.routes().then(routes => {
-        assert.deepEqual(routes, apiIndexResponse.links);
-      });
+    it('retries the route fetch until it succeeds', async () => {
+      window.fetch
+        .withArgs('https://annotation.service/api/')
+        .onFirstCall()
+        .returns(httpResponse(500, null));
+
+      const routes = await apiRoutes.routes();
+
+      assert.calledTwice(window.fetch);
+      assert.deepEqual(routes, apiIndexResponse.links);
     });
   });
 
