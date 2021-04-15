@@ -8,6 +8,10 @@ import { LabeledButton } from './buttons';
 let idCounter = 0;
 
 /**
+ * Return an element ID beginning with `prefix` that is unique per component instance.
+ *
+ * This avoids different instances of a component re-using the same ID.
+ *
  * @param {string} prefix
  */
 function useUniqueId(prefix) {
@@ -28,7 +32,7 @@ function useUniqueId(prefix) {
  * @prop {Children} [buttons] -
  *   Additional `Button` elements to display at the bottom of the dialog.
  *   A "Cancel" button is added automatically if the `onCancel` prop is set.
- * @prop {string} [contentClass] - e.g. <button>
+ * @prop {string} [contentClass] - CSS class to apply to the dialog's content
  * @prop {'dialog'|'alertdialog'} [role] - The aria role for the dialog (defaults to" dialog")
  * @prop {string} title - The title of the dialog.
  * @prop {() => any} [onCancel] -
@@ -97,8 +101,8 @@ export default function Dialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // If the content of the dialog contains a paragraph of text, mark it as the
-  // dialog's accessible description.
+  // Try to assign the dialog an accessible description, using the content of
+  // the first paragraph of text in it.
   //
   // A limitation of this approach is that it doesn't update if the dialog's
   // content changes after the initial render.
