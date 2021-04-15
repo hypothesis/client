@@ -1,6 +1,11 @@
 import * as queryString from 'query-string';
 
 /**
+ * @typedef {'annotation'|'notebook'|'stream'|'sidebar'} RouteName
+ * @typedef {Record<string,string>} RouteParams
+ */
+
+/**
  * A service that manages the association between the route and route parameters
  * implied by the URL and the corresponding route state in the store.
  */
@@ -18,6 +23,8 @@ export class RouterService {
 
   /**
    * Return the name and parameters of the current route.
+   *
+   * @return {{ route: RouteName, params: RouteParams }}
    */
   currentRoute() {
     const path = this._window.location.pathname;
@@ -36,6 +43,7 @@ export class RouterService {
     // extension.
     const mainSegment = pathSegments[0].replace(/\.html$/, '');
 
+    /** @type {RouteName} */
     let route;
 
     switch (mainSegment) {
@@ -60,8 +68,8 @@ export class RouterService {
   /**
    * Generate a URL for a given route.
    *
-   * @param {string} name
-   * @param {Object.<string,string>} params
+   * @param {RouteName} name
+   * @param {RouteParams} params
    */
   routeUrl(name, params = {}) {
     let url;
@@ -122,8 +130,8 @@ export class RouterService {
   /**
    * Navigate to a given route.
    *
-   * @param {string} name
-   * @param {Object.<string,string>} params
+   * @param {RouteName} name
+   * @param {RouteParams} params
    */
   navigate(name, params) {
     this._window.history.pushState({}, '', this.routeUrl(name, params));
