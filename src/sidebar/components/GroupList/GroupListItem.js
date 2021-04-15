@@ -17,7 +17,7 @@ import MenuItem from '../MenuItem';
  * @prop {(expand: boolean) => any} onExpand -
  *   Callback invoked to expand or collapse the current group
  * @prop {Object} groups - Injected service
- * @prop {Object} toastMessenger - Injected service
+ * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
 /**

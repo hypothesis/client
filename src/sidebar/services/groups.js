@@ -20,6 +20,9 @@ const DEFAULT_ORGANIZATION = {
     encodeURIComponent(require('../../images/icons/logo.svg')),
 };
 
+/**
+ * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
+ */
 // @inject
 export default function groups(
   store,

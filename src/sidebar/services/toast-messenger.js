@@ -1,8 +1,3 @@
-/**
- * A service for managing toast messages. The service will auto-dismiss and
- * remove toast messages created with `#success()` or `#error()`. Added
- * messages may be manually dismissed with the `#dismiss()` method.
- */
 import { generateHexString } from '../util/random';
 
 // How long toast messages should be displayed before they are dismissed, in ms
@@ -18,8 +13,20 @@ const MESSAGE_DISMISS_DELAY = 500;
  * @prop {string} [moreInfoURL=''] - Optional URL for users to visit for "more info"
  */
 
+/**
+ * A service for managing toast messages. The service will auto-dismiss and
+ * remove toast messages created with `#success()` or `#error()`. Added
+ * messages may be manually dismissed with the `#dismiss()` method.
+ */
 // @inject
-export default function toastMessenger(store) {
+export class ToastMessengerService {
+  /**
+   * @param {import('../store').SidebarStore} store
+   */
+  constructor(store) {
+    this._store = store;
+  }
+
   /**
    * Update a toast message's dismiss status and set a timeout to remove
    * it after a bit. This allows effects/animations to happen before the
@@ -28,15 +35,15 @@ export default function toastMessenger(store) {
    * @param {string} messageId - The value of the `id` property for the
    *                             message that is to be dismissed.
    */
-  const dismiss = messageId => {
-    const message = store.getToastMessage(messageId);
+  dismiss(messageId) {
+    const message = this._store.getToastMessage(messageId);
     if (message && !message.isDismissed) {
-      store.updateToastMessage({ ...message, isDismissed: true });
+      this._store.updateToastMessage({ ...message, isDismissed: true });
       setTimeout(() => {
-        store.removeToastMessage(messageId);
+        this._store.removeToastMessage(messageId);
       }, MESSAGE_DISMISS_DELAY);
     }
-  };
+  }
 
   /**
    * Add a new toast message to the store and set a timeout to dismiss it
@@ -48,20 +55,20 @@ export default function toastMessenger(store) {
    * @param {string} messageText - The message to be rendered
    * @param {MessageOptions} [options]
    */
-  const addMessage = (
+  _addMessage(
     type,
     messageText,
     { autoDismiss = true, moreInfoURL = '' } = {}
-  ) => {
+  ) {
     // Do not add duplicate messages (messages with the same type and text)
-    if (store.hasToastMessage(type, messageText)) {
+    if (this._store.hasToastMessage(type, messageText)) {
       return;
     }
 
     const id = generateHexString(10);
     const message = { type, id, message: messageText, moreInfoURL };
 
-    store.addToastMessage({
+    this._store.addToastMessage({
       isDismissed: false,
       ...message,
     });
@@ -71,10 +78,10 @@ export default function toastMessenger(store) {
       // have been removed by other mechanisms at this point; do not assume its
       // presence.
       setTimeout(() => {
-        dismiss(id);
+        this.dismiss(id);
       }, MESSAGE_DISPLAY_TIME);
     }
-  };
+  }
 
   /**
    * Add an error toast message with `messageText`
@@ -82,9 +89,9 @@ export default function toastMessenger(store) {
    * @param {string} messageText
    * @param {MessageOptions} [options]
    */
-  const error = (messageText, options) => {
-    addMessage('error', messageText, options);
-  };
+  error(messageText, options) {
+    this._addMessage('error', messageText, options);
+  }
 
   /**
    * Add a success toast message with `messageText`
@@ -92,9 +99,9 @@ export default function toastMessenger(store) {
    * @param {string} messageText
    * @param {MessageOptions} [options]
    */
-  const success = (messageText, options) => {
-    addMessage('success', messageText, options);
-  };
+  success(messageText, options) {
+    this._addMessage('success', messageText, options);
+  }
 
   /**
    * Add a warn/notice toast message with `messageText`
@@ -102,14 +109,7 @@ export default function toastMessenger(store) {
    * @param {string} messageText
    * @param {MessageOptions} [options]
    */
-  const notice = (messageText, options) => {
-    addMessage('notice', messageText, options);
-  };
-
-  return {
-    dismiss,
-    error,
-    success,
-    notice,
-  };
+  notice(messageText, options) {
+    this._addMessage('notice', messageText, options);
+  }
 }

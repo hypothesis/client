@@ -21,7 +21,7 @@ import AnnotationPublishControl from './AnnotationPublishControl';
  * @prop {Annotation} annotation - The annotation under edit
  * @prop {Object} annotationsService - Injected service
  * @prop {MergedConfig} settings - Injected service
- * @prop {Object} toastMessenger - Injected service
+ * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  * @prop {Object} tags - Injected service
  */
 

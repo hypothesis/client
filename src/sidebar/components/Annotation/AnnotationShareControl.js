@@ -24,7 +24,7 @@ import ShareLinks from '../ShareLinks';
  *  FIXME: Refactor after root cause is addressed.
  *  See https://github.com/hypothesis/client/issues/1542
  * @prop {string} shareUri - The URI to view the annotation on its own
- * @prop {Object} toastMessenger - Injected service
+ * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
 function selectionOverflowsInputElement() {

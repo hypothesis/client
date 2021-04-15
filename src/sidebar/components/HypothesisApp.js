@@ -58,7 +58,7 @@ function authStateFromProfile(profile) {
  * @prop {ServiceUrlGetter} serviceUrl
  * @prop {MergedConfig} settings
  * @prop {Object} session
- * @prop {Object} toastMessenger
+ * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
 /**

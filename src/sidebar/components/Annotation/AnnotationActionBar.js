@@ -22,7 +22,7 @@ import AnnotationShareControl from './AnnotationShareControl';
  * @prop {() => any} onReply - Callbacks for when action buttons are clicked/tapped
  * @prop {Object} annotationsService
  * @prop {HostConfig} settings
- * @prop {Object} toastMessenger
+ * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
 /**

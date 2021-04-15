@@ -6,7 +6,7 @@ import { LabeledButton } from '../../shared/components/buttons';
 /**
  * @typedef VersionInfoProps
  * @prop {import('../helpers/version-data').default} versionData - Object with version information
- * @prop {Object} toastMessenger - Injected service
+ * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
 /**

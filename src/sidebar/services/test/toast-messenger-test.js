@@ -1,6 +1,6 @@
-import toastMessenger from '../toast-messenger';
+import { ToastMessengerService } from '../toast-messenger';
 
-describe('toastMessenger', function () {
+describe('ToastMessengerService', function () {
   let clock;
   let fakeStore;
   let service;
@@ -15,7 +15,7 @@ describe('toastMessenger', function () {
     };
 
     clock = sinon.useFakeTimers();
-    service = toastMessenger(fakeStore);
+    service = new ToastMessengerService(fakeStore);
   });
 
   afterEach(() => {
