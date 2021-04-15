@@ -97,7 +97,7 @@ import bridgeService from '../shared/bridge';
 
 import annotationsService from './services/annotations';
 import apiService from './services/api';
-import apiRoutesService from './services/api-routes';
+import { APIRoutesService } from './services/api-routes';
 import authService from './services/oauth-auth';
 import autosaveService from './services/autosave';
 import featuresService from './services/features';
@@ -134,7 +134,7 @@ function startApp(config, appEl) {
   container
     .register('annotationsService', annotationsService)
     .register('api', apiService)
-    .register('apiRoutes', apiRoutesService)
+    .register('apiRoutes', APIRoutesService)
     .register('auth', authService)
     .register('autosaveService', autosaveService)
     .register('bridge', bridgeService)

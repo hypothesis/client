@@ -27,6 +27,7 @@ import { resolve } from '../util/url';
  *
  * @param {Window} $window
  * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
+ * @param {import('./api-routes').APIRoutesService} apiRoutes
  * @inject
  */
 export default function auth(

@@ -6,6 +6,22 @@
  */
 
 /**
+ * An entry in the API index response (`/api`) describing an API route.
+ *
+ * @typedef RouteMetadata
+ * @prop {string} method - HTTP method
+ * @prop {string} url - URL template
+ * @prop {string} desc - Description of API route
+ */
+
+/**
+ * Structure of the `links` field of the API index response (`/api`) describing
+ * available API routes.
+ *
+ * @typedef {{ [key: string]: RouteMap|RouteMetadata }} RouteMap
+ */
+
+/**
  * @typedef TextQuoteSelector
  * @prop {'TextQuoteSelector'} type
  * @prop {string} exact
