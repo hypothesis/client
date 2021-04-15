@@ -366,7 +366,10 @@ export default function groups(
       g => g !== null
     );
 
-    addGroupsToStore(groups);
+    // Optional direct linked group id. This is used in the Notebook context.
+    const focusedGroupId = store.directLinkedGroupId();
+
+    addGroupsToStore(groups, focusedGroupId);
 
     if (error) {
       // @ts-ignore - TS can't track the type of `error` here.
