@@ -21,6 +21,7 @@ const DEFAULT_ORGANIZATION = {
 };
 
 /**
+ * @param {import('../store').SidebarStore} store
  * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
  * @param {import('./auth').AuthService} auth
  */
@@ -218,7 +219,7 @@ export default function groups(
   async function loadGroupsForUserAndDocument() {
     // Step 1: Get the URI of the active document, so we can fetch groups
     // associated with that document.
-    let documentUri;
+    let documentUri = null;
     if (store.route() === 'sidebar') {
       documentUri = await getDocumentUriForGroupSearch();
     }
