@@ -1,11 +1,9 @@
+import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import { SvgIcon } from '@hypothesis/frontend-shared';
 
 import { applyTheme } from '../helpers/theme';
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
-
-import { LabeledButton } from '../../shared/components/buttons';
 
 /**
  * @typedef {import('../../types/config').MergedConfig} MergedConfig

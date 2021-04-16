@@ -1,11 +1,11 @@
+import { LabeledButton } from '@hypothesis/frontend-shared';
+
 import { useMemo } from 'preact/hooks';
 
 import { countVisible } from '../helpers/thread';
-
-import { LabeledButton } from '../../shared/components/buttons';
+import { useStoreProxy } from '../store/use-store';
 
 import useRootThread from './hooks/use-root-thread';
-import { useStoreProxy } from '../store/use-store';
 
 /**
  * @typedef {import('../helpers/build-thread').Thread} Thread

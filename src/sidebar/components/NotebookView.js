@@ -1,7 +1,7 @@
+import { IconButton } from '@hypothesis/frontend-shared';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
-import { IconButton } from '../../shared/components/buttons';
 import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';

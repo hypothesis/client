@@ -1,4 +1,4 @@
-import { LinkButton } from '../../../shared/components/buttons';
+import { LinkButton } from '@hypothesis/frontend-shared';
 
 /**
  * @typedef AnnotationReplyToggleProps

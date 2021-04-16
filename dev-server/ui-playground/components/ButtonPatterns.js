@@ -1,15 +1,15 @@
 import {
+  IconButton,
+  LabeledButton,
+  LinkButton,
+} from '@hypothesis/frontend-shared';
+
+import {
   PatternPage,
   Pattern,
   PatternExamples,
   PatternExample,
 } from '../shared/components/PatternPage';
-
-import {
-  IconButton,
-  LabeledButton,
-  LinkButton,
-} from '../../../src/shared/components/buttons';
 
 export default function ButtonPatterns() {
   return (

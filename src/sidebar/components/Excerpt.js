@@ -1,11 +1,10 @@
+import { LinkButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 
 import observeElementSize from '../util/observe-element-size';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
-
-import { LinkButton } from '../../shared/components/buttons';
 
 /**
  * @typedef InlineControlsProps

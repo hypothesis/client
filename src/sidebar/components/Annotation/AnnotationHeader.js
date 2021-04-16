@@ -1,4 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { SvgIcon, LinkButton } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
 import { withServices } from '../../service-context';
 
@@ -12,8 +12,6 @@ import {
 } from '../../helpers/annotation-metadata';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import { isPrivate } from '../../helpers/permissions';
-
-import { LinkButton } from '../../../shared/components/buttons';
 
 import AnnotationDocumentInfo from './AnnotationDocumentInfo';
 import AnnotationShareInfo from './AnnotationShareInfo';

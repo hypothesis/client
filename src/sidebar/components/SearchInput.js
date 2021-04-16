@@ -1,9 +1,9 @@
+import { IconButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
 
-import { IconButton } from '../../shared/components/buttons';
 import Spinner from './Spinner';
 
 /**

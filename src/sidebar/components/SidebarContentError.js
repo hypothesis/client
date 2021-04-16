@@ -1,6 +1,6 @@
-import { useStoreProxy } from '../store/use-store';
+import { LabeledButton } from '@hypothesis/frontend-shared';
 
-import { LabeledButton } from '../../shared/components/buttons';
+import { useStoreProxy } from '../store/use-store';
 
 import Panel from './Panel';
 

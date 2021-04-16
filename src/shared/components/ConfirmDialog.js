@@ -1,6 +1,6 @@
-import Dialog from './Dialog';
+import { LabeledButton } from '@hypothesis/frontend-shared';
 
-import { LabeledButton } from './buttons';
+import Dialog from './Dialog';
 
 /**
  * @typedef ConfirmDialogProps

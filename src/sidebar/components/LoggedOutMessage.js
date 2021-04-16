@@ -1,8 +1,6 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { LinkButton, SvgIcon } from '@hypothesis/frontend-shared';
 
 import { withServices } from '../service-context';
-
-import { LinkButton } from '../../shared/components/buttons';
 
 /** @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter */
 

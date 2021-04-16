@@ -1,9 +1,8 @@
+import { LabeledButton } from '@hypothesis/frontend-shared';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import classnames from 'classnames';
 
 import { createSidebarConfig } from '../config/sidebar';
-
-import { LabeledButton } from '../../shared/components/buttons';
 
 /**
  * @typedef NotebookIframeProps

@@ -1,4 +1,8 @@
-import { SvgIcon, useElementShouldClose } from '@hypothesis/frontend-shared';
+import {
+  IconButton,
+  SvgIcon,
+  useElementShouldClose,
+} from '@hypothesis/frontend-shared';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { isShareableURI } from '../../helpers/annotation-sharing';
@@ -6,8 +10,6 @@ import { copyText } from '../../util/copy-to-clipboard';
 import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import { isIOS } from '../../../shared/user-agent';
-
-import { IconButton } from '../../../shared/components/buttons';
 
 import ShareLinks from '../ShareLinks';
 
