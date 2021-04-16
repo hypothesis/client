@@ -11,7 +11,7 @@ import { watch } from '../util/watch';
  * closed.
  *
  * @param {import('../store').SidebarStore} store
- * @param {ReturnType<import('./oauth-auth').default>} auth
+ * @param {import('./auth').AuthService} auth
  * @param {ReturnType<import('./groups').default>} groups
  * @param {ReturnType<import('./session').default>} session
  * @param {Record<string, any>} settings
