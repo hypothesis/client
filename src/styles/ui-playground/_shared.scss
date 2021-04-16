@@ -3,6 +3,9 @@
 @use '../sidebar/elements';
 @use '../variables' as var;
 
+// Shared styles from frontend-shared package
+@use '@hypothesis/frontend-shared/styles';
+// Shared styles from components/styles temporarily still in this repository
 @use '../shared';
 
 body {
