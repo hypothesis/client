@@ -66,7 +66,7 @@ function stripInternalProperties(obj) {
  * Configuration for an API method.
  *
  * @typedef {Object} APIMethodOptions
- * @prop {() => Promise<string>} getAccessToken -
+ * @prop {() => Promise<string|null>} getAccessToken -
  *   Function which acquires a valid access token for making an API request.
  * @prop {() => string|null} getClientId -
  *   Function that returns a per-session client ID to include with the request
@@ -74,9 +74,6 @@ function stripInternalProperties(obj) {
  * @prop {() => any} onRequestStarted - Callback invoked when the API request starts.
  * @prop {() => any} onRequestFinished - Callback invoked when the API request finishes.
  */
-
-// istanbul ignore next
-const noop = () => null;
 
 function get(object, path) {
   let cursor = object;
@@ -92,18 +89,13 @@ function get(object, path) {
  * @param links - Object or promise for an object mapping named API routes to
  *                URL templates and methods
  * @param route - The dotted path of the named API route (eg. `annotation.create`)
- * @param [APIMethodOptions] - Configuration for the API method
+ * @param {APIMethodOptions} options - Configuration for the API method
  * @return {APICallFunction}
  */
 function createAPICall(
   links,
   route,
-  {
-    getAccessToken = noop,
-    getClientId = noop,
-    onRequestStarted = noop,
-    onRequestFinished = noop,
-  } = {}
+  { getAccessToken, getClientId, onRequestStarted, onRequestFinished }
 ) {
   return function (params, data, options = {}) {
     onRequestStarted();
@@ -204,6 +196,7 @@ function createAPICall(
  * not use authentication.
  *
  * @param {import('./api-routes').APIRoutesService} apiRoutes
+ * @param {import('./auth').AuthService} auth
  */
 // @inject
 export default function api(apiRoutes, auth, store) {

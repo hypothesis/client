@@ -53,7 +53,7 @@ function authStateFromProfile(profile) {
 
 /**
  * @typedef HypothesisAppProps
- * @prop {Object} auth
+ * @prop {import('../services/auth').AuthService} auth
  * @prop {Bridge} bridge
  * @prop {ServiceUrlGetter} serviceUrl
  * @prop {MergedConfig} settings

@@ -22,6 +22,7 @@ const DEFAULT_ORGANIZATION = {
 
 /**
  * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
+ * @param {import('./auth').AuthService} auth
  */
 // @inject
 export default function groups(
