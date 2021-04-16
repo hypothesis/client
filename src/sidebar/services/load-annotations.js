@@ -33,7 +33,7 @@ import { isReply } from '../helpers/annotation-metadata';
  * @param {ReturnType<import('./api').default>} api
  * @param {import('../store').SidebarStore} store
  * @param {import('./streamer').default} streamer
- * @param {import('./stream-filter').default} streamFilter
+ * @param {import('./stream-filter').StreamFilter} streamFilter
  */
 // @inject
 export default function loadAnnotationsService(

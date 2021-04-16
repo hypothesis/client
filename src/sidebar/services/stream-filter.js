@@ -44,9 +44,9 @@ function defaultFilter() {
  * See https://github.com/hypothesis/h/blob/master/h/streamer/filter.py
  * for the schema.
  */
-export default class StreamFilter {
+export class StreamFilter {
   constructor() {
-    this.filter = defaultFilter();
+    this._filter = defaultFilter();
   }
 
   /**
@@ -58,7 +58,7 @@ export default class StreamFilter {
    * @param {FilterClause['case_sensitive']} caseSensitive - Whether matching should be case sensitive
    */
   addClause(field, operator, value, caseSensitive = false) {
-    this.filter.clauses.push({
+    this._filter.clauses.push({
       field,
       operator,
       value,
@@ -69,12 +69,12 @@ export default class StreamFilter {
 
   /** Return the JSON-serializable filtering configuration. */
   getFilter() {
-    return this.filter;
+    return this._filter;
   }
 
   /** Reset the configuration to return all updates. */
   resetFilter() {
-    this.filter = defaultFilter();
+    this._filter = defaultFilter();
     return this;
   }
 }
