@@ -33,7 +33,7 @@ function allowLeavingGroups(settings) {
  *
  * @param {Group[]} userGroups - groups the user is a member of
  * @param {Group[]} featuredGroups - all other groups, may include some duplicates from the userGroups
- * @param {string} uri - uri of the current page
+ * @param {string|null} uri - uri of the current page
  * @param {HostConfig} settings
  */
 export function combineGroups(userGroups, featuredGroups, uri, settings) {
@@ -69,7 +69,7 @@ export function combineGroups(userGroups, featuredGroups, uri, settings) {
 
 /**
  * @param {Group} group
- * @param {string} uri
+ * @param {string|null} uri
  */
 function isScopedToUri(group, uri) {
   /* If a scope check cannot be performed, meaning:
