@@ -12,7 +12,7 @@
 @use '@hypothesis/frontend-shared/styles';
 
 // Temporary shared styles
-// FIXME: Replace with shared-package variant when available
+// FIXME: Currently needed for Dialog styling
 @use '../shared';
 
 // Custom button styling for the application

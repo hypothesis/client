@@ -1,4 +1,5 @@
-@use "../../shared/components/buttons";
+@use '@hypothesis/frontend-shared/styles/components/buttons';
+
 @use "../mixins/layout";
 @use "../mixins/molecules";
 @use "../mixins/utils";

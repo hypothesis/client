@@ -1,8 +1,8 @@
 @use "sass:color";
 
-@use '../variables' as var;
+@use '@hypothesis/frontend-shared/styles/components/buttons' as shared-buttons;
 
-@use '../../shared/components/buttons' as shared-buttons;
+@use '../variables' as var;
 
 @use '../mixins/buttons';
 @use '../mixins/layout';
