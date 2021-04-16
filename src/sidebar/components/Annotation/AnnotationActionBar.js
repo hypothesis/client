@@ -1,13 +1,13 @@
-import { useStoreProxy } from '../../store/use-store';
+import { IconButton } from '@hypothesis/frontend-shared';
+
+import { confirm } from '../../../shared/prompts';
 import {
   sharingEnabled,
   annotationSharingLink,
 } from '../../helpers/annotation-sharing';
 import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
-
-import { IconButton } from '../../../shared/components/buttons';
-import { confirm } from '../../../shared/prompts';
+import { useStoreProxy } from '../../store/use-store';
 
 import AnnotationShareControl from './AnnotationShareControl';
 

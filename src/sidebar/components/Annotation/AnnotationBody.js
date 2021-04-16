@@ -1,11 +1,10 @@
+import { LabeledButton } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isHidden } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
-
-import { LabeledButton } from '../../../shared/components/buttons';
 
 import Excerpt from '../Excerpt';
 import MarkdownView from '../MarkdownView';

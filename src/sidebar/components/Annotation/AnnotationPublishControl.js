@@ -1,12 +1,10 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isNew, isReply } from '../../helpers/annotation-metadata';
 import { isShared } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
-
-import { LabeledButton } from '../../../shared/components/buttons';
 
 import Menu from '../Menu';
 import MenuItem from '../MenuItem';

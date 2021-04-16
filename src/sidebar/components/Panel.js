@@ -1,6 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
-
-import { LabeledButton } from '../../shared/components/buttons';
+import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
 
 /**
  * @typedef PanelProps

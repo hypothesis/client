@@ -1,6 +1,6 @@
-import { pageNumberOptions } from '../util/pagination';
+import { LabeledButton } from '@hypothesis/frontend-shared';
 
-import { LabeledButton } from '../../shared/components/buttons';
+import { pageNumberOptions } from '../util/pagination';
 
 /**
  * @typedef PaginationNavigationProps

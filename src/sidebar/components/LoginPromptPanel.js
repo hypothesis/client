@@ -1,6 +1,7 @@
+import { LabeledButton } from '@hypothesis/frontend-shared';
+
 import { useStoreProxy } from '../store/use-store';
 
-import { LabeledButton } from '../../shared/components/buttons';
 import SidebarPanel from './SidebarPanel';
 
 /**

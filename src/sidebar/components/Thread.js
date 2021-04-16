@@ -1,11 +1,10 @@
+import { IconButton, LabeledButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useMemo } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
-
-import { IconButton, LabeledButton } from '../../shared/components/buttons';
 
 import Annotation from './Annotation';
 import ModerationBanner from './ModerationBanner';

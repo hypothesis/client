@@ -1,12 +1,10 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { IconButton, SvgIcon } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
 import { notNull } from '../util/typing';
-
-import { IconButton } from '../../shared/components/buttons';
 
 import ShareLinks from './ShareLinks';
 import SidebarPanel from './SidebarPanel';

@@ -1,7 +1,7 @@
+import { LabeledButton } from '@hypothesis/frontend-shared';
+
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
-
-import { LabeledButton } from '../../shared/components/buttons';
 
 /**
  * @typedef VersionInfoProps

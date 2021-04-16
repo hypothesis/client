@@ -1,9 +1,10 @@
-import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import {
+  LabeledButton,
+  useElementShouldClose,
+} from '@hypothesis/frontend-shared';
 import { Fragment } from 'preact';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import classNames from 'classnames';
-
-import { LabeledButton } from './buttons';
 
 let idCounter = 0;
 
