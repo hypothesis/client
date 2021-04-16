@@ -98,7 +98,7 @@ import bridgeService from '../shared/bridge';
 import { AnnotationsService } from './services/annotations';
 import apiService from './services/api';
 import { APIRoutesService } from './services/api-routes';
-import authService from './services/oauth-auth';
+import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
 import { FeaturesService } from './services/features';
 import frameSyncService from './services/frame-sync';
@@ -135,7 +135,7 @@ function startApp(config, appEl) {
     .register('annotationsService', AnnotationsService)
     .register('api', apiService)
     .register('apiRoutes', APIRoutesService)
-    .register('auth', authService)
+    .register('auth', AuthService)
     .register('autosaveService', AutosaveService)
     .register('bridge', bridgeService)
     .register('features', FeaturesService)

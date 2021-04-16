@@ -1,11 +1,11 @@
 import { Injector } from '../../../shared/injector';
 import FakeWindow from '../../test/fake-window';
-import authFactory, { $imports } from '../oauth-auth';
+import { AuthService, $imports } from '../auth';
 
 const DEFAULT_TOKEN_EXPIRES_IN_SECS = 1000;
 const TOKEN_KEY = 'hypothesis.oauth.hypothes%2Eis.token';
 
-describe('sidebar/services/oauth-auth', function () {
+describe('AuthService', function () {
   let FakeOAuthClient;
   let auth;
   let nowStub;
@@ -96,7 +96,7 @@ describe('sidebar/services/oauth-auth', function () {
       .register('localStorage', { value: fakeLocalStorage })
       .register('settings', { value: fakeSettings })
       .register('toastMessenger', { value: fakeToastMessenger })
-      .register('auth', authFactory)
+      .register('auth', AuthService)
       .get('auth');
   });
 
