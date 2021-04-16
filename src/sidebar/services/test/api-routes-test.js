@@ -1,4 +1,4 @@
-import { APIRoutesService } from '../api-routes';
+import { APIRoutesService, $imports } from '../api-routes';
 
 // Abridged version of the response returned by https://hypothes.is/api,
 // with the domain name changed.
@@ -34,6 +34,21 @@ const linksResponse = {
   'oauth.authorize': 'https://annotation.service/oauth/authorize',
 };
 
+/**
+ * Fake `retryPromiseOperation` that does not wait between retries.
+ */
+async function fakeRetryPromiseOperation(callback) {
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    try {
+      const result = await callback();
+      return result;
+    } catch {
+      // Try again
+    }
+  }
+}
+
 describe('APIRoutesService', () => {
   let apiRoutes;
   let fakeSettings;
@@ -60,9 +75,14 @@ describe('APIRoutesService', () => {
     };
 
     apiRoutes = new APIRoutesService(fakeSettings);
+
+    $imports.$mock({
+      '../util/retry': { retryPromiseOperation: fakeRetryPromiseOperation },
+    });
   });
 
   afterEach(() => {
+    $imports.$restore();
     window.fetch.restore();
   });
 
