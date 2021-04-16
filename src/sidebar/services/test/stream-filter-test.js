@@ -1,6 +1,6 @@
-import StreamFilter from '../stream-filter';
+import { StreamFilter } from '../stream-filter';
 
-describe('sidebar/services/stream-filter', () => {
+describe('StreamFilter', () => {
   describe('#addClause', () => {
     [
       {

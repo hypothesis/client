@@ -109,7 +109,7 @@ import persistedDefaultsService from './services/persisted-defaults';
 import { RouterService } from './services/router';
 import serviceUrlService from './services/service-url';
 import sessionService from './services/session';
-import streamFilterService from './services/stream-filter';
+import { StreamFilter } from './services/stream-filter';
 import streamerService from './services/streamer';
 import tagsService from './services/tags';
 import threadsService from './services/threads';
@@ -148,7 +148,7 @@ function startApp(config, appEl) {
     .register('serviceUrl', serviceUrlService)
     .register('session', sessionService)
     .register('streamer', streamerService)
-    .register('streamFilter', streamFilterService)
+    .register('streamFilter', StreamFilter)
     .register('tags', tagsService)
     .register('threadsService', threadsService)
     .register('toastMessenger', toastMessenger)
