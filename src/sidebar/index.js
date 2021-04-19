@@ -112,7 +112,7 @@ import sessionService from './services/session';
 import { StreamFilter } from './services/stream-filter';
 import streamerService from './services/streamer';
 import tagsService from './services/tags';
-import threadsService from './services/threads';
+import { ThreadsService } from './services/threads';
 import { ToastMessengerService } from './services/toast-messenger';
 
 // Redux store.
@@ -150,7 +150,7 @@ function startApp(config, appEl) {
     .register('streamer', streamerService)
     .register('streamFilter', StreamFilter)
     .register('tags', tagsService)
-    .register('threadsService', threadsService)
+    .register('threadsService', ThreadsService)
     .register('toastMessenger', ToastMessengerService)
     .register('store', store);
 

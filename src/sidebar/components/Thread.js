@@ -15,7 +15,7 @@ import ModerationBanner from './ModerationBanner';
 /**
  * @typedef ThreadProps
  * @prop {Thread} thread
- * @prop {Object} threadsService - Injected service
+ * @prop {import('../services/threads').ThreadsService} threadsService
  */
 
 /**
