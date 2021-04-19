@@ -104,7 +104,7 @@ describe('AnnotationEditor', () => {
         const storeCall = fakeTagsService.store.getCall(0);
         const draftCall = fakeStore.createDraft.getCall(0);
 
-        assert.deepEqual(storeCall.args[0], [{ text: 'newTag' }]);
+        assert.deepEqual(storeCall.args[0], ['newTag']);
         assert.deepEqual(draftCall.args[1].tags, ['newTag']);
       });
 

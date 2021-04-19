@@ -22,7 +22,7 @@ import AnnotationPublishControl from './AnnotationPublishControl';
  * @prop {import('../../services/annotations').AnnotationsService} annotationsService
  * @prop {MergedConfig} settings - Injected service
  * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
- * @prop {Object} tags - Injected service
+ * @prop {import('../../services/tags').TagsService} tags
  */
 
 /**
@@ -75,7 +75,7 @@ function AnnotationEditor({
     }
     const tagList = [...tags, newTag];
     // Update the tag locally for the suggested-tag list
-    tagsService.store(tagList.map(tag => ({ text: tag })));
+    tagsService.store(tagList);
     onEditTags({ tags: tagList });
     return true;
   };

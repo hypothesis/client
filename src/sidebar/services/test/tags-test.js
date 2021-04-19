@@ -1,4 +1,4 @@
-import tagsFactory from '../tags';
+import { TagsService } from '../tags';
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
 const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
@@ -17,7 +17,7 @@ class FakeStorage {
   }
 }
 
-describe('sidebar/services/tags', () => {
+describe('TagsService', () => {
   let fakeLocalStorage;
   let tags;
 
@@ -62,7 +62,7 @@ describe('sidebar/services/tags', () => {
     fakeLocalStorage.setObject(TAGS_MAP_KEY, savedTagsMap);
     fakeLocalStorage.setObject(TAGS_LIST_KEY, savedTagsList);
 
-    tags = tagsFactory(fakeLocalStorage);
+    tags = new TagsService(fakeLocalStorage);
   });
 
   describe('#filter', () => {
@@ -87,7 +87,7 @@ describe('sidebar/services/tags', () => {
 
   describe('#store', () => {
     it('saves new tags to storage', () => {
-      tags.store([{ text: 'new' }]);
+      tags.store(['new']);
 
       const storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);
       assert.include(storedTagsList, 'new');
@@ -104,14 +104,14 @@ describe('sidebar/services/tags', () => {
     });
 
     it('increases the count for a tag already stored', () => {
-      tags.store([{ text: 'bar' }]);
+      tags.store(['bar']);
       const storedTagsMap = fakeLocalStorage.getObject(TAGS_MAP_KEY);
       assert.equal(storedTagsMap.bar.count, 6);
     });
 
     it('orders list by count descending, lexical ascending', () => {
       for (let i = 0; i < 6; i++) {
-        tags.store([{ text: 'foo' }]);
+        tags.store(['foo']);
       }
 
       const storedTagsList = fakeLocalStorage.getObject(TAGS_LIST_KEY);

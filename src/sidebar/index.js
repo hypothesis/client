@@ -111,7 +111,7 @@ import serviceUrlService from './services/service-url';
 import sessionService from './services/session';
 import { StreamFilter } from './services/stream-filter';
 import streamerService from './services/streamer';
-import tagsService from './services/tags';
+import { TagsService } from './services/tags';
 import { ThreadsService } from './services/threads';
 import { ToastMessengerService } from './services/toast-messenger';
 
@@ -149,7 +149,7 @@ function startApp(config, appEl) {
     .register('session', sessionService)
     .register('streamer', streamerService)
     .register('streamFilter', StreamFilter)
-    .register('tags', tagsService)
+    .register('tags', TagsService)
     .register('threadsService', ThreadsService)
     .register('toastMessenger', ToastMessengerService)
     .register('store', store);
