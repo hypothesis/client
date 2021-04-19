@@ -11,6 +11,8 @@
  * The `tags` service stores metadata about recently used tags to local storage
  * and provides a `filter` method to fetch tags matching a query, ranked based
  * on frequency of usage.
+ *
+ * @param {import('./local-storage').LocalStorageService} localStorage
  */
 // @inject
 export default function tags(localStorage) {

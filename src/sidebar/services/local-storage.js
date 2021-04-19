@@ -23,43 +23,76 @@ class InMemoryStorage {
  * A wrapper around the `localStorage` API which provides a fallback to
  * in-memory storage in browsers that block access to `window.localStorage`.
  * in third-party iframes.
+ *
+ * This service also provides convenience methods set and fetch JSON-serializable
+ * values.
  */
 // @inject
-export default function localStorage($window) {
-  let storage;
-  let testKey = 'hypothesis.testKey';
+export class LocalStorageService {
+  /**
+   * @param {Window} $window
+   */
+  constructor($window) {
+    let testKey = 'hypothesis.testKey';
 
-  try {
-    // Test whether we can read/write localStorage.
-    storage = $window.localStorage;
-    $window.localStorage.setItem(testKey, testKey);
-    $window.localStorage.getItem(testKey);
-    $window.localStorage.removeItem(testKey);
-  } catch (e) {
-    storage = new InMemoryStorage();
+    try {
+      // Test whether we can read/write localStorage.
+      this._storage = $window.localStorage;
+      $window.localStorage.setItem(testKey, testKey);
+      $window.localStorage.getItem(testKey);
+      $window.localStorage.removeItem(testKey);
+    } catch (e) {
+      this._storage = new InMemoryStorage();
+    }
   }
 
-  return {
-    getItem(key) {
-      return storage.getItem(key);
-    },
+  /**
+   * Look up a value in local storage.
+   *
+   * @param {string} key
+   * @return {string|null}
+   */
+  getItem(key) {
+    return this._storage.getItem(key);
+  }
 
-    getObject(key) {
-      const item = storage.getItem(key);
-      return item ? JSON.parse(item) : null;
-    },
+  /**
+   * Look up and deserialize a value from storage.
+   *
+   * @param {string} key
+   */
+  getObject(key) {
+    const item = this._storage.getItem(key);
+    return item ? JSON.parse(item) : null;
+  }
 
-    setItem(key, value) {
-      storage.setItem(key, value);
-    },
+  /**
+   * Set a value in local storage.
+   *
+   * @param {string} key
+   * @param {string} value
+   */
+  setItem(key, value) {
+    this._storage.setItem(key, value);
+  }
 
-    setObject(key, value) {
-      const repr = JSON.stringify(value);
-      storage.setItem(key, repr);
-    },
+  /**
+   * Serialize `value` to JSON and persist it.
+   *
+   * @param {string} key
+   * @param {any} value
+   */
+  setObject(key, value) {
+    const repr = JSON.stringify(value);
+    this._storage.setItem(key, repr);
+  }
 
-    removeItem(key) {
-      storage.removeItem(key);
-    },
-  };
+  /**
+   * Remove an item from storage.
+   *
+   * @param {string} key
+   */
+  removeItem(key) {
+    this._storage.removeItem(key);
+  }
 }

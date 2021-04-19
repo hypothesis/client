@@ -10,6 +10,10 @@ const DEFAULT_KEYS = {
   focusedGroup: 'hypothesis.groups.focus',
 };
 
+/**
+ * @param {import('./local-storage').LocalStorageService} localStorage
+ * @param {import('../store').SidebarStore} store
+ */
 // @inject
 export default function persistedDefaults(localStorage, store) {
   /**

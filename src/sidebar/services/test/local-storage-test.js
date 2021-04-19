@@ -1,4 +1,4 @@
-import service from '../local-storage';
+import { LocalStorageService } from '../local-storage';
 
 function windowWithLocalStoragePropertyThatThrows() {
   const win = {};
@@ -22,7 +22,7 @@ function windowWithLocalStorageMethodsThatThrow() {
   };
 }
 
-describe('sidebar.localStorage', () => {
+describe('LocalStorageService', () => {
   let fakeWindow;
 
   [
@@ -34,7 +34,7 @@ describe('sidebar.localStorage', () => {
       let key = null;
 
       beforeEach(() => {
-        localStorage = service($window);
+        localStorage = new LocalStorageService($window);
         key = 'test.memory.key';
       });
 
@@ -78,7 +78,7 @@ describe('sidebar.localStorage', () => {
     });
 
     beforeEach(() => {
-      localStorage = service(fakeWindow);
+      localStorage = new LocalStorageService(fakeWindow);
     });
 
     it('uses window.localStorage functions to handle data', () => {

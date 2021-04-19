@@ -104,7 +104,7 @@ import featuresService from './services/features';
 import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
-import localStorageService from './services/local-storage';
+import { LocalStorageService } from './services/local-storage';
 import persistedDefaultsService from './services/persisted-defaults';
 import { RouterService } from './services/router';
 import serviceUrlService from './services/service-url';
@@ -142,7 +142,7 @@ function startApp(config, appEl) {
     .register('frameSync', frameSyncService)
     .register('groups', groupsService)
     .register('loadAnnotationsService', loadAnnotationsService)
-    .register('localStorage', localStorageService)
+    .register('localStorage', LocalStorageService)
     .register('persistedDefaults', persistedDefaultsService)
     .register('router', RouterService)
     .register('serviceUrl', serviceUrlService)
