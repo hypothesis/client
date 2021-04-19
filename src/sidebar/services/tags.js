@@ -5,29 +5,35 @@
  * @property {number} updated - The timestamp when this tag was last used.
  */
 
+const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
+const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
+
 /**
  * Service for fetching tag suggestions and storing data to generate them.
  *
  * The `tags` service stores metadata about recently used tags to local storage
  * and provides a `filter` method to fetch tags matching a query, ranked based
  * on frequency of usage.
- *
- * @param {import('./local-storage').LocalStorageService} localStorage
  */
 // @inject
-export default function tags(localStorage) {
-  const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
-  const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
+export class TagsService {
+  /**
+   * @param {import('./local-storage').LocalStorageService} localStorage -
+   *   Storage used to persist the tags
+   */
+  constructor(localStorage) {
+    this._storage = localStorage;
+  }
 
   /**
    * Return a list of tag suggestions matching `query`.
    *
    * @param {string} query
    * @param {number|null} limit - Optional limit of the results.
-   * @return {Tag[]} List of matching tags
+   * @return {string[]} List of matching tags
    */
-  function filter(query, limit = null) {
-    const savedTags = localStorage.getObject(TAGS_LIST_KEY) || [];
+  filter(query, limit = null) {
+    const savedTags = this._storage.getObject(TAGS_LIST_KEY) || [];
     let resultCount = 0;
     // query will match tag if:
     // * tag starts with query (e.g. tag "banana" matches query "ban"), OR
@@ -53,24 +59,24 @@ export default function tags(localStorage) {
    * Update the list of stored tag suggestions based on the tags that a user has
    * entered for a given annotation.
    *
-   * @param {Tag[]} tags - List of tags.
+   * @param {string[]} tags - List of tags.
    */
-  function store(tags) {
+  store(tags) {
     // Update the stored (tag, frequency) map.
-    const savedTags = localStorage.getObject(TAGS_MAP_KEY) || {};
+    const savedTags = this._storage.getObject(TAGS_MAP_KEY) || {};
     tags.forEach(tag => {
-      if (savedTags[tag.text]) {
-        savedTags[tag.text].count += 1;
-        savedTags[tag.text].updated = Date.now();
+      if (savedTags[tag]) {
+        savedTags[tag].count += 1;
+        savedTags[tag].updated = Date.now();
       } else {
-        savedTags[tag.text] = {
-          text: tag.text,
+        savedTags[tag] = {
+          text: tag,
           count: 1,
           updated: Date.now(),
         };
       }
     });
-    localStorage.setObject(TAGS_MAP_KEY, savedTags);
+    this._storage.setObject(TAGS_MAP_KEY, savedTags);
 
     // Sort tag suggestions by frequency.
     const tagsList = Object.keys(savedTags).sort((t1, t2) => {
@@ -79,11 +85,6 @@ export default function tags(localStorage) {
       }
       return t1.localeCompare(t2);
     });
-    localStorage.setObject(TAGS_LIST_KEY, tagsList);
+    this._storage.setObject(TAGS_LIST_KEY, tagsList);
   }
-
-  return {
-    filter,
-    store,
-  };
 }
