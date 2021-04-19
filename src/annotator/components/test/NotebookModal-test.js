@@ -58,39 +58,6 @@ describe('NotebookModal', () => {
     );
   });
 
-  it('creates a new iframe element on every "openNotebook" event', () => {
-    const wrapper = createComponent();
-
-    emitter.publish('openNotebook', '1');
-    wrapper.update();
-
-    const iframe1 = wrapper.find('iframe');
-    assert.equal(
-      iframe1.prop('src'),
-      `/notebook#config=${encodeURIComponent('{"group":"1"}')}`
-    );
-
-    emitter.publish('openNotebook', '1');
-    wrapper.update();
-
-    const iframe2 = wrapper.find('iframe');
-    assert.equal(
-      iframe2.prop('src'),
-      `/notebook#config=${encodeURIComponent('{"group":"1"}')}`
-    );
-    assert.notEqual(iframe1.getDOMNode(), iframe2.getDOMNode());
-
-    emitter.publish('openNotebook', '2');
-    wrapper.update();
-
-    const iframe3 = wrapper.find('iframe');
-    assert.equal(
-      iframe3.prop('src'),
-      `/notebook#config=${encodeURIComponent('{"group":"2"}')}`
-    );
-    assert.notEqual(iframe1.getDOMNode(), iframe3.getDOMNode());
-  });
-
   it('makes the document unscrollable on "openNotebook" event', () => {
     createComponent();
     act(() => {
