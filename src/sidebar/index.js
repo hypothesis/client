@@ -95,7 +95,7 @@ import { ServiceContext } from './service-context';
 // Services.
 import bridgeService from '../shared/bridge';
 
-import annotationsService from './services/annotations';
+import { AnnotationsService } from './services/annotations';
 import apiService from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import authService from './services/oauth-auth';
@@ -132,7 +132,7 @@ function startApp(config, appEl) {
 
   // Register services.
   container
-    .register('annotationsService', annotationsService)
+    .register('annotationsService', AnnotationsService)
     .register('api', apiService)
     .register('apiRoutes', APIRoutesService)
     .register('auth', authService)

@@ -28,6 +28,9 @@ export function formatAnnot(ann) {
  * This service runs in the sidebar and is responsible for keeping the set of
  * annotations displayed in connected frames in sync with the set shown in the
  * sidebar.
+ *
+ * @param {import('./annotations').AnnotationsService} annotationsService
+ * @param {import('../store').SidebarStore} store
  */
 // @inject
 export default function FrameSync(annotationsService, bridge, store) {
@@ -132,6 +135,8 @@ export default function FrameSync(annotationsService, bridge, store) {
     //
     // Updates are coalesced to reduce the overhead from processing
     // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
+
+    /** @type {Record<string,'anchored'|'orphan'|'timeout'>} */
     let anchoringStatusUpdates = {};
     const scheduleAnchoringStatusUpdate = debounce(() => {
       store.updateAnchorStatus(anchoringStatusUpdates);

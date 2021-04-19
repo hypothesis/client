@@ -71,7 +71,7 @@ function Tab({
  * @typedef SelectionTabsProps
  * @prop {boolean} isLoading - Are we waiting on any annotations from the server?
  * @prop {MergedConfig} settings - Injected service.
- * @prop {Object} annotationsService - Injected service.
+ * @prop {import('../services/annotations').AnnotationsService} annotationsService
  */
 
 /**

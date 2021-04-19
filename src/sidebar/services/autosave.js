@@ -3,6 +3,10 @@
  */
 import { retryPromiseOperation } from '../util/retry';
 
+/**
+ * @param {import('./annotations').AnnotationsService} annotationsService
+ * @param {import('../store').SidebarStore} store
+ */
 // @inject
 export default function autosaveService(annotationsService, store) {
   // A Set of annotation $tags that have save requests in-flight

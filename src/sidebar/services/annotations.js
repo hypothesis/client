@@ -1,11 +1,6 @@
 /** @typedef {import('../../types/api').Annotation} Annotation */
 /** @typedef {import('../../types/annotator').AnnotationData} AnnotationData */
 
-/**
- * A service for creating, manipulating and persisting annotations and their
- * application-store representations. Interacts with API services as needed.
- */
-
 import * as metadata from '../helpers/annotation-metadata';
 import {
   defaultPermissions,
@@ -14,17 +9,30 @@ import {
 } from '../helpers/permissions';
 import { generateHexString } from '../util/random';
 
+/**
+ * A service for creating, updating and persisting annotations both in the
+ * local store and on the backend via the API.
+ */
 // @inject
-export default function annotationsService(api, store) {
+export class AnnotationsService {
+  /**
+   * @param {ReturnType<import('./api').default>} api
+   * @param {import('../store').SidebarStore} store
+   */
+  constructor(api, store) {
+    this._api = api;
+    this._store = store;
+  }
+
   /**
    * Apply changes for the given `annotation` from its draft in the store (if
    * any) and return a new object with those changes integrated.
    *
    * @param {Annotation} annotation
    */
-  function applyDraftChanges(annotation) {
+  _applyDraftChanges(annotation) {
     const changes = {};
-    const draft = store.getDraft(annotation);
+    const draft = this._store.getDraft(annotation);
 
     if (draft) {
       changes.tags = draft.tags;
@@ -45,10 +53,14 @@ export default function annotationsService(api, store) {
    * @param {Date} now
    * @return {Annotation}
    */
-  function initialize(annotationData, now = new Date()) {
-    const defaultPrivacy = store.getDefault('annotationPrivacy');
-    const groupid = store.focusedGroupId();
-    const profile = store.profile();
+  _initialize(annotationData, now = new Date()) {
+    const defaultPrivacy = this._store.getDefault('annotationPrivacy');
+    const groupid = this._store.focusedGroupId();
+    const profile = this._store.profile();
+
+    if (!groupid) {
+      throw new Error('Cannot create annotation without a group');
+    }
 
     const userid = profile.userid;
     const userInfo = profile.user_info;
@@ -91,17 +103,17 @@ export default function annotationsService(api, store) {
    * @param {Object} annotationData
    * @param {Date} now
    */
-  function create(annotationData, now = new Date()) {
-    const annotation = initialize(annotationData, now);
+  create(annotationData, now = new Date()) {
+    const annotation = this._initialize(annotationData, now);
 
-    store.addAnnotations([annotation]);
+    this._store.addAnnotations([annotation]);
 
     // Remove other drafts that are in the way, and their annotations (if new)
-    store.deleteNewAndEmptyDrafts();
+    this._store.deleteNewAndEmptyDrafts();
 
     // Create a draft unless it's a highlight
     if (!metadata.isHighlight(annotation)) {
-      store.createDraft(annotation, {
+      this._store.createDraft(annotation, {
         tags: annotation.tags,
         text: annotation.text,
         isPrivate: !metadata.isPublic(annotation),
@@ -115,14 +127,14 @@ export default function annotationsService(api, store) {
     // the appropriate tab is selected. If it is of type reply, user
     // stays in the selected tab.
     if (metadata.isPageNote(annotation)) {
-      store.selectTab('note');
+      this._store.selectTab('note');
     } else if (metadata.isAnnotation(annotation)) {
-      store.selectTab('annotation');
+      this._store.selectTab('annotation');
     }
 
     (annotation.references || []).forEach(parent => {
       // Expand any parents of this annotation.
-      store.setExpanded(parent, true);
+      this._store.setExpanded(parent, true);
     });
   }
 
@@ -130,10 +142,10 @@ export default function annotationsService(api, store) {
    * Create a new empty "page note" annotation and add it to the store. If the
    * user is not logged in, open the `loginPrompt` panel instead.
    */
-  function createPageNote() {
-    const topLevelFrame = store.mainFrame();
-    if (!store.isLoggedIn()) {
-      store.openSidebarPanel('loginPrompt');
+  createPageNote() {
+    const topLevelFrame = this._store.mainFrame();
+    if (!this._store.isLoggedIn()) {
+      this._store.openSidebarPanel('loginPrompt');
       return;
     }
     if (!topLevelFrame) {
@@ -143,23 +155,23 @@ export default function annotationsService(api, store) {
       target: [],
       uri: topLevelFrame.uri,
     };
-    create(pageNoteAnnotation);
+    this.create(pageNoteAnnotation);
   }
 
   /**
    * Delete an annotation via the API and update the store.
    */
-  async function delete_(annotation) {
-    await api.annotation.delete({ id: annotation.id });
-    store.removeAnnotations([annotation]);
+  async delete(annotation) {
+    await this._api.annotation.delete({ id: annotation.id });
+    this._store.removeAnnotations([annotation]);
   }
 
   /**
    * Flag an annotation for review by a moderator.
    */
-  async function flag(annotation) {
-    await api.annotation.flag({ id: annotation.id });
-    store.updateFlagStatus(annotation.id, true);
+  async flag(annotation) {
+    await this._api.annotation.flag({ id: annotation.id });
+    this._store.updateFlagStatus(annotation.id, true);
   }
 
   /**
@@ -168,7 +180,7 @@ export default function annotationsService(api, store) {
    * @param {Object} annotation
    * @param {string} userid
    */
-  function reply(annotation, userid) {
+  reply(annotation, userid) {
     const replyAnnotation = {
       group: annotation.group,
       permissions: metadata.isPublic(annotation)
@@ -178,7 +190,7 @@ export default function annotationsService(api, store) {
       target: [{ source: annotation.target[0].source }],
       uri: annotation.uri,
     };
-    create(replyAnnotation);
+    this.create(replyAnnotation);
   }
 
   /**
@@ -186,26 +198,26 @@ export default function annotationsService(api, store) {
    * the annotation's `Draft` will be removed and the annotation added
    * to the store.
    */
-  async function save(annotation) {
+  async save(annotation) {
     let saved;
 
-    const annotationWithChanges = applyDraftChanges(annotation);
+    const annotationWithChanges = this._applyDraftChanges(annotation);
 
     if (metadata.isNew(annotation)) {
-      saved = api.annotation.create({}, annotationWithChanges);
+      saved = this._api.annotation.create({}, annotationWithChanges);
     } else {
-      saved = api.annotation.update(
+      saved = this._api.annotation.update(
         { id: annotation.id },
         annotationWithChanges
       );
     }
 
     let savedAnnotation;
-    store.annotationSaveStarted(annotation);
+    this._store.annotationSaveStarted(annotation);
     try {
       savedAnnotation = await saved;
     } finally {
-      store.annotationSaveFinished(annotation);
+      this._store.annotationSaveFinished(annotation);
     }
 
     Object.keys(annotation).forEach(key => {
@@ -215,19 +227,10 @@ export default function annotationsService(api, store) {
     });
 
     // Clear out any pending changes (draft)
-    store.removeDraft(annotation);
+    this._store.removeDraft(annotation);
 
     // Add (or, in effect, update) the annotation to the store's collection
-    store.addAnnotations([savedAnnotation]);
+    this._store.addAnnotations([savedAnnotation]);
     return savedAnnotation;
   }
-
-  return {
-    create,
-    createPageNote,
-    delete: delete_,
-    flag,
-    reply,
-    save,
-  };
 }

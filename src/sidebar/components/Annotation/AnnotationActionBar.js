@@ -20,7 +20,7 @@ import AnnotationShareControl from './AnnotationShareControl';
  * @typedef AnnotationActionBarProps
  * @prop {Annotation} annotation - The annotation in question
  * @prop {() => any} onReply - Callbacks for when action buttons are clicked/tapped
- * @prop {Object} annotationsService
+ * @prop {import('../../services/annotations').AnnotationsService} annotationsService
  * @prop {HostConfig} settings
  * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  */
