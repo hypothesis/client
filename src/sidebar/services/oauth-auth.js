@@ -26,8 +26,9 @@ import { resolve } from '../util/url';
  * the `OAuthClient` class.
  *
  * @param {Window} $window
- * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
  * @param {import('./api-routes').APIRoutesService} apiRoutes
+ * @param {import('./local-storage').LocalStorageService} localStorage
+ * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
  * @inject
  */
 export default function auth(
