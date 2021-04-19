@@ -2,8 +2,18 @@
  * @typedef {import('../helpers/build-thread').Thread} Thread
  */
 
+/**
+ * A service for performing operations related to the current set of threads.
+ */
 // @inject
-export default function threadsService(store) {
+export class ThreadsService {
+  /**
+   * @param {import('../store').SidebarStore} store
+   */
+  constructor(store) {
+    this._store = store;
+  }
+
   /**
    * Make this thread and all of its children "visible". This has the effect of
    * "unhiding" a thread which is currently hidden by an applied search filter
@@ -12,16 +22,12 @@ export default function threadsService(store) {
    *
    * @param {Thread} thread
    */
-  function forceVisible(thread) {
+  forceVisible(thread) {
     thread.children.forEach(child => {
-      forceVisible(child);
+      this.forceVisible(child);
     });
     if (!thread.visible) {
-      store.setForcedVisible(thread.id, true);
+      this._store.setForcedVisible(thread.id, true);
     }
   }
-
-  return {
-    forceVisible,
-  };
 }

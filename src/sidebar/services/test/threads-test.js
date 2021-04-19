@@ -1,4 +1,4 @@
-import threadsService from '../threads';
+import { ThreadsService } from '../threads';
 
 const NESTED_THREADS = {
   id: 'top',
@@ -60,7 +60,7 @@ const NESTED_THREADS = {
   ],
 };
 
-describe('threadsService', () => {
+describe('ThreadsService', () => {
   let fakeStore;
   let service;
 
@@ -68,7 +68,7 @@ describe('threadsService', () => {
     fakeStore = {
       setForcedVisible: sinon.stub(),
     };
-    service = threadsService(fakeStore);
+    service = new ThreadsService(fakeStore);
   });
 
   describe('#forceVisible', () => {
