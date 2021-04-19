@@ -2,6 +2,7 @@ import { IconButton } from '@hypothesis/frontend-shared';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
+import hostConfig from '../config/host-config';
 import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
@@ -45,7 +46,21 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   // likely to be focused (eg. because the notebook has been configured to
   // display a particular group when launched), we can optimistically fetch
   // annotations from that group.
-  const groupId = focusedGroup?.id || store.directLinkedGroupId();
+  const [groupId, setGroupId] = useState(
+    focusedGroup?.id || store.directLinkedGroupId()
+  );
+
+  window.addEventListener(
+    'hashchange',
+    () => {
+      const config = hostConfig(window);
+      if (config.group) {
+        store.focusGroup(config.group);
+        setGroupId(config.group);
+      }
+    },
+    false
+  );
 
   const lastPaginationPage = useRef(1);
   const [paginationPage, setPaginationPage] = useState(1);
