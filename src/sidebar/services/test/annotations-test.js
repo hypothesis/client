@@ -1,8 +1,8 @@
 import * as fixtures from '../../test/annotation-fixtures';
 
-import annotationsService, { $imports } from '../annotations';
+import { AnnotationsService, $imports } from '../annotations';
 
-describe('annotationsService', () => {
+describe('AnnotationsService', () => {
   let fakeApi;
   let fakeMetadata;
   let fakeStore;
@@ -41,7 +41,7 @@ describe('annotationsService', () => {
       annotationSaveStarted: sinon.stub(),
       createDraft: sinon.stub(),
       deleteNewAndEmptyDrafts: sinon.stub(),
-      focusedGroupId: sinon.stub(),
+      focusedGroupId: sinon.stub().returns('test-group'),
       getDefault: sinon.stub(),
       getDraft: sinon.stub().returns(null),
       isLoggedIn: sinon.stub().returns(true),
@@ -64,7 +64,7 @@ describe('annotationsService', () => {
       },
     });
 
-    svc = annotationsService(fakeApi, fakeStore);
+    svc = new AnnotationsService(fakeApi, fakeStore);
   });
 
   afterEach(() => {
@@ -226,6 +226,14 @@ describe('annotationsService', () => {
       assert.calledWith(fakeStore.setExpanded, 'aparent', true);
       assert.calledWith(fakeStore.setExpanded, 'anotherparent', true);
       assert.calledWith(fakeStore.setExpanded, 'yetanotherancestor', true);
+    });
+
+    it('throws an error if there is no focused group', () => {
+      fakeStore.focusedGroupId.returns(null);
+
+      assert.throws(() => {
+        svc.create(fixtures.newAnnotation(), now);
+      }, 'Cannot create annotation without a group');
     });
   });
 

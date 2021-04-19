@@ -26,7 +26,7 @@ import AnnotationReplyToggle from './AnnotationReplyToggle';
  * @prop {VoidFunction} onToggleReplies - Callback to expand/collapse reply threads
  * @prop {number} replyCount - Number of replies to this annotation's thread
  * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
- * @prop {Object} annotationsService - Injected service
+ * @prop {import('../../services/annotations').AnnotationsService} annotationsService
  */
 
 /**
