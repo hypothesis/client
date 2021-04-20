@@ -146,19 +146,35 @@ export class AuthService extends TinyEmitter {
     };
 
     /**
-     * Exchange the refresh token for a new access token and refresh token pair.
+     * Exchange a refresh token for a new access token and refresh token pair.
      *
      * @param {string} refreshToken
      * @param {RefreshOptions} options
-     * @return {Promise<TokenInfo>} Promise for the new access token
+     * @return {Promise<TokenInfo|null>} Promise for the new access token
      */
     const refreshAccessToken = async (refreshToken, options) => {
       const client = await oauthClient();
-      const tokenInfo = await client.refreshToken(refreshToken);
-      if (options.persist) {
-        saveToken(tokenInfo);
+
+      let token;
+      try {
+        token = await client.refreshToken(refreshToken);
+
+        // Sanity check that prevents an infinite loop. Mostly useful in
+        // tests.
+        if (Date.now() > token.expiresAt) {
+          /* istanbul ignore next */
+          throw new Error('Refreshed token expired in the past');
+        }
+      } catch {
+        // If refreshing the token fails, the user is simply logged out.
+        return null;
       }
-      return tokenInfo;
+
+      if (options.persist) {
+        saveToken(token);
+      }
+
+      return token;
     };
 
     /**
@@ -181,17 +197,18 @@ export class AuthService extends TinyEmitter {
      * @return {Promise<string|null>} The API access token or `null` if not logged in.
      */
     const tokenGetter = async () => {
+      // Step 1: Determine how to get an access token, depending on the login
+      // method being used.
       if (!tokenInfoPromise) {
-        const cfg = serviceConfig(settings);
-
         // Check if automatic login is being used, indicated by the presence of
         // the 'grantToken' property in the service configuration.
-        if (cfg && typeof cfg.grantToken !== 'undefined') {
-          if (cfg.grantToken) {
+        const grantToken = serviceConfig(settings)?.grantToken;
+        if (typeof grantToken !== 'undefined') {
+          if (grantToken) {
             // User is logged-in on the publisher's website.
             // Exchange the grant token for a new access token.
             tokenInfoPromise = oauthClient()
-              .then(client => client.exchangeGrantToken(cfg.grantToken))
+              .then(client => client.exchangeGrantToken(grantToken))
               .catch(err => {
                 showAccessTokenExpiredErrorMessage(
                   'You must reload the page to annotate.'
@@ -210,6 +227,7 @@ export class AuthService extends TinyEmitter {
         }
       }
 
+      // Step 2: Wait for the token to be fetched
       const origToken = tokenInfoPromise;
       const token = await tokenInfoPromise;
 
@@ -218,6 +236,7 @@ export class AuthService extends TinyEmitter {
         return null;
       }
 
+      // Step 3: Re-fetch the token if it is no longer valid
       if (origToken !== tokenInfoPromise) {
         // A token refresh has been initiated via a call to `refreshAccessToken`
         // below since `tokenGetter()` was called.
@@ -225,36 +244,20 @@ export class AuthService extends TinyEmitter {
       }
 
       if (Date.now() > token.expiresAt) {
-        let shouldPersist = true;
+        // Token has expired, so we need to fetch a new one.
+        const usingGrantToken =
+          typeof serviceConfig(settings)?.grantToken === 'string';
 
-        // If we are using automatic login via a grant token, do not persist the
-        // initial access token or refreshed tokens.
-        const cfg = serviceConfig(settings);
-        if (cfg && typeof cfg.grantToken !== 'undefined') {
-          shouldPersist = false;
-        }
-
-        // Token expired. Attempt to refresh.
         tokenInfoPromise = refreshAccessToken(token.refreshToken, {
-          persist: shouldPersist,
-        })
-          .then(token => {
-            // Sanity check that prevents an infinite loop. Mostly useful in
-            // tests.
-            if (Date.now() > token.expiresAt) {
-              /* istanbul ignore next */
-              throw new Error('Refreshed token expired in the past');
-            }
-            return token;
-          })
-          .catch(() => {
-            // If refreshing the token fails, the user is simply logged out.
-            return null;
-          });
+          // If we are using automatic login via a grant token, do not persist the
+          // initial access token or refreshed tokens.
+          persist: !usingGrantToken,
+        });
 
         return tokenGetter();
       }
 
+      // Step 4: If the token was valid, return it
       return token.accessToken;
     };
 
