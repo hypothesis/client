@@ -3,6 +3,10 @@ import * as queryString from 'query-string';
 import { replaceURLParams } from '../util/url';
 
 /**
+ * @typedef {import('../../types/api').RouteMap} RouteMap
+ */
+
+/**
  * Translate the response from a failed API call into an Error-like object.
  *
  * @param {Response} response
@@ -63,9 +67,9 @@ function stripInternalProperties(obj) {
  */
 
 /**
- * Configuration for an API method.
+ * Callbacks invoked at various points during an API call to get an access token etc.
  *
- * @typedef {Object} APIMethodOptions
+ * @typedef {Object} APIMethodCallbacks
  * @prop {() => Promise<string|null>} getAccessToken -
  *   Function which acquires a valid access token for making an API request.
  * @prop {() => string|null} getClientId -
@@ -86,10 +90,9 @@ function get(object, path) {
 /**
  * Creates a function that will make an API call to a named route.
  *
- * @param links - Object or promise for an object mapping named API routes to
- *                URL templates and methods
- * @param route - The dotted path of the named API route (eg. `annotation.create`)
- * @param {APIMethodOptions} options - Configuration for the API method
+ * @param {Promise<RouteMap>} links - API route data from API index endpoint (`/api/`)
+ * @param {string} route - The dotted path of the named API route (eg. `annotation.create`)
+ * @param {APIMethodCallbacks} callbacks
  * @return {APICallFunction}
  */
 function createAPICall(
