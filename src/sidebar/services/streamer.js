@@ -125,7 +125,7 @@ export default function Streamer(store, auth, groups, session, settings) {
     }
 
     return auth
-      .tokenGetter()
+      .getAccessToken()
       .then(function (token) {
         let url;
         if (token) {

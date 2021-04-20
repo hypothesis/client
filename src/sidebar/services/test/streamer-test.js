@@ -93,7 +93,7 @@ describe('Streamer', function () {
 
   beforeEach(function () {
     fakeAuth = {
-      tokenGetter: function () {
+      getAccessToken: function () {
         return Promise.resolve('dummy-access-token');
       },
     };
@@ -208,7 +208,7 @@ describe('Streamer', function () {
     });
 
     it('should not include credentials in the URL if the client has no access token', function () {
-      fakeAuth.tokenGetter = function () {
+      fakeAuth.getAccessToken = function () {
         return Promise.resolve(null);
       };
 

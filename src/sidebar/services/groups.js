@@ -281,7 +281,7 @@ export default function groups(
     ] = await Promise.all([
       api.profile.groups.read({ expand: expandParam }),
       api.groups.list(listParams),
-      auth.tokenGetter(),
+      auth.getAccessToken(),
       directLinkedAnnApi,
       directLinkedGroupApi,
     ]);

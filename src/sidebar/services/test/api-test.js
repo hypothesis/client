@@ -65,7 +65,7 @@ describe('sidebar.services.api', function () {
       routes: sinon.stub().returns(Promise.resolve(routes)),
     };
     fakeAuth = {
-      tokenGetter: sinon.stub().returns(Promise.resolve('faketoken')),
+      getAccessToken: sinon.stub().returns(Promise.resolve('faketoken')),
     };
     fakeStore = {
       apiRequestStarted: sinon.stub(),
@@ -235,7 +235,7 @@ describe('sidebar.services.api', function () {
   });
 
   it('omits Authorization header if no access token is available', () => {
-    fakeAuth.tokenGetter.returns(Promise.resolve(null));
+    fakeAuth.getAccessToken.returns(Promise.resolve(null));
     expectCall('get', 'profile');
     return api.profile.read().then(() => {
       const [, options] = fetchMock.lastCall();
