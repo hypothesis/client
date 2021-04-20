@@ -59,8 +59,10 @@ function setupRoute(groups, session, router) {
 /**
  * Fetch any persisted client-side defaults, and persist any app-state changes to
  * those defaults
+ *
+ * @param {import('./services/persisted-defaults').PersistedDefaultsService} persistedDefaults
+ * @inject
  */
-// @inject
 function persistDefaults(persistedDefaults) {
   persistedDefaults.init();
 }
@@ -105,7 +107,7 @@ import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
-import persistedDefaultsService from './services/persisted-defaults';
+import { PersistedDefaultsService } from './services/persisted-defaults';
 import { RouterService } from './services/router';
 import serviceUrlService from './services/service-url';
 import sessionService from './services/session';
@@ -143,7 +145,7 @@ function startApp(config, appEl) {
     .register('groups', groupsService)
     .register('loadAnnotationsService', loadAnnotationsService)
     .register('localStorage', LocalStorageService)
-    .register('persistedDefaults', persistedDefaultsService)
+    .register('persistedDefaults', PersistedDefaultsService)
     .register('router', RouterService)
     .register('serviceUrl', serviceUrlService)
     .register('session', sessionService)

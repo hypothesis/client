@@ -1,12 +1,12 @@
 import fakeReduxStore from '../../test/fake-redux-store';
-import persistedDefaults from '../persisted-defaults';
+import { PersistedDefaultsService } from '../persisted-defaults';
 
 const DEFAULT_KEYS = {
   annotationPrivacy: 'hypothesis.privacy',
   focusedGroup: 'hypothesis.groups.focus',
 };
 
-describe('sidebar/services/persisted-defaults', function () {
+describe('PersistedDefaultsService', () => {
   let fakeLocalStorage;
   let fakeGetItem;
   let fakeSetItem;
@@ -36,9 +36,13 @@ describe('sidebar/services/persisted-defaults', function () {
     };
   });
 
+  function createService() {
+    return new PersistedDefaultsService(fakeLocalStorage, fakeStore);
+  }
+
   describe('#init', () => {
     it('should retrieve persisted defaults from `localStorage`', () => {
-      const svc = persistedDefaults(fakeLocalStorage, fakeStore);
+      const svc = createService();
 
       svc.init();
 
@@ -55,7 +59,7 @@ describe('sidebar/services/persisted-defaults', function () {
 
     it('should set defaults on the store with the values returned by `localStorage`', () => {
       fakeLocalStorage.getItem.returns('bananas');
-      const svc = persistedDefaults(fakeLocalStorage, fakeStore);
+      const svc = createService();
 
       svc.init();
 
@@ -66,7 +70,7 @@ describe('sidebar/services/persisted-defaults', function () {
 
     it('should set default to `null` if key non-existent in storage', () => {
       fakeLocalStorage.getItem.returns(null);
-      const svc = persistedDefaults(fakeLocalStorage, fakeStore);
+      const svc = createService();
 
       svc.init();
 
@@ -77,7 +81,7 @@ describe('sidebar/services/persisted-defaults', function () {
 
     context('when defaults change in the store', () => {
       it('should persist changes to a known default', () => {
-        const svc = persistedDefaults(fakeLocalStorage, fakeStore);
+        const svc = createService();
         svc.init();
 
         const updatedDefaults = { annotationPrivacy: 'carrots' };
@@ -94,7 +98,7 @@ describe('sidebar/services/persisted-defaults', function () {
       });
 
       it('should persist subsequent changes to known defaults', () => {
-        const svc = persistedDefaults(fakeLocalStorage, fakeStore);
+        const svc = createService();
         svc.init();
 
         const updatedDefaults = { annotationPrivacy: 'carrots' };
@@ -123,7 +127,7 @@ describe('sidebar/services/persisted-defaults', function () {
         fakeLocalStorage.getItem.returns('carrots');
         fakeStore.getDefaults.returns(defaults);
         fakeStore.setState({ defaults: defaults });
-        const svc = persistedDefaults(fakeLocalStorage, fakeStore);
+        const svc = createService();
         svc.init();
 
         fakeStore.getDefaults.returns(defaults);
@@ -133,7 +137,7 @@ describe('sidebar/services/persisted-defaults', function () {
       });
 
       it('should not persist changes for default keys it is unaware of', () => {
-        const svc = persistedDefaults(fakeLocalStorage, fakeStore);
+        const svc = createService();
         svc.init();
 
         fakeStore.getDefaults.returns({ foople: 'grapefruit' });
