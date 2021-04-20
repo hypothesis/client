@@ -37,7 +37,7 @@ export class FeaturesService {
     watch(
       this._store.subscribe,
       [currentFlags, () => this._store.frames()],
-      () => sendFeatureFlags()
+      sendFeatureFlags
     );
   }
 }
