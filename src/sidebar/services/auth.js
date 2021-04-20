@@ -162,6 +162,20 @@ export class AuthService extends TinyEmitter {
     };
 
     /**
+     * Exchange authorization code retrieved from login popup for a new
+     * access token.
+     */
+    const exchangeAuthCodeForToken = async () => {
+      const code = /** @type {string} */ (authCode);
+      authCode = null; // Auth codes can only be used once.
+
+      const client = await oauthClient();
+      const tokenInfo = await client.exchangeAuthCode(code);
+      saveToken(tokenInfo);
+      return tokenInfo;
+    };
+
+    /**
      * Retrieve an access token for the API.
      *
      * @return {Promise<string|null>} The API access token or `null` if not logged in.
@@ -189,16 +203,7 @@ export class AuthService extends TinyEmitter {
             tokenInfoPromise = Promise.resolve(null);
           }
         } else if (authCode) {
-          // Exchange authorization code retrieved from login popup for a new
-          // access token.
-          const code = authCode;
-          authCode = null; // Auth codes can only be used once.
-          tokenInfoPromise = oauthClient()
-            .then(client => client.exchangeAuthCode(code))
-            .then(tokenInfo => {
-              saveToken(tokenInfo);
-              return tokenInfo;
-            });
+          tokenInfoPromise = exchangeAuthCodeForToken();
         } else {
           // Attempt to load the tokens from the previous session.
           tokenInfoPromise = Promise.resolve(loadToken());
