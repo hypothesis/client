@@ -117,24 +117,6 @@ export class AuthService extends TinyEmitter {
     }
 
     /**
-     * Exchange the refresh token for a new access token and refresh token pair.
-     *
-     * @param {string} refreshToken
-     * @param {RefreshOptions} options
-     * @return {Promise<TokenInfo>} Promise for the new access token
-     */
-    function refreshAccessToken(refreshToken, options) {
-      return oauthClient()
-        .then(client => client.refreshToken(refreshToken))
-        .then(tokenInfo => {
-          if (options.persist) {
-            saveToken(tokenInfo);
-          }
-          return tokenInfo;
-        });
-    }
-
-    /**
      * Listen for updated access & refresh tokens saved by other instances of the
      * client.
      */
@@ -149,27 +131,42 @@ export class AuthService extends TinyEmitter {
       });
     };
 
-    function oauthClient() {
+    const oauthClient = async () => {
       if (client) {
-        return Promise.resolve(client);
-      }
-      return apiRoutes.links().then(links => {
-        client = new OAuthClient({
-          clientId: settings.oauthClientId,
-          authorizationEndpoint: links['oauth.authorize'],
-          revokeEndpoint: links['oauth.revoke'],
-          tokenEndpoint: tokenUrl,
-        });
         return client;
+      }
+      const links = await apiRoutes.links();
+      client = new OAuthClient({
+        clientId: settings.oauthClientId,
+        authorizationEndpoint: links['oauth.authorize'],
+        revokeEndpoint: links['oauth.revoke'],
+        tokenEndpoint: tokenUrl,
       });
-    }
+      return client;
+    };
+
+    /**
+     * Exchange the refresh token for a new access token and refresh token pair.
+     *
+     * @param {string} refreshToken
+     * @param {RefreshOptions} options
+     * @return {Promise<TokenInfo>} Promise for the new access token
+     */
+    const refreshAccessToken = async (refreshToken, options) => {
+      const client = await oauthClient();
+      const tokenInfo = await client.refreshToken(refreshToken);
+      if (options.persist) {
+        saveToken(tokenInfo);
+      }
+      return tokenInfo;
+    };
 
     /**
      * Retrieve an access token for the API.
      *
      * @return {Promise<string|null>} The API access token or `null` if not logged in.
      */
-    function tokenGetter() {
+    const tokenGetter = async () => {
       if (!tokenInfoPromise) {
         const cfg = serviceConfig(settings);
 
@@ -209,55 +206,52 @@ export class AuthService extends TinyEmitter {
       }
 
       const origToken = tokenInfoPromise;
+      const token = await tokenInfoPromise;
 
-      return /** @type {Promise<TokenInfo|null>} */ (tokenInfoPromise).then(
-        token => {
-          if (!token) {
-            // No token available. User will need to log in.
-            return null;
-          }
+      if (!token) {
+        // No token available. User will need to log in.
+        return null;
+      }
 
-          if (origToken !== tokenInfoPromise) {
-            // A token refresh has been initiated via a call to `refreshAccessToken`
-            // below since `tokenGetter()` was called.
-            return tokenGetter();
-          }
+      if (origToken !== tokenInfoPromise) {
+        // A token refresh has been initiated via a call to `refreshAccessToken`
+        // below since `tokenGetter()` was called.
+        return tokenGetter();
+      }
 
-          if (Date.now() > token.expiresAt) {
-            let shouldPersist = true;
+      if (Date.now() > token.expiresAt) {
+        let shouldPersist = true;
 
-            // If we are using automatic login via a grant token, do not persist the
-            // initial access token or refreshed tokens.
-            const cfg = serviceConfig(settings);
-            if (cfg && typeof cfg.grantToken !== 'undefined') {
-              shouldPersist = false;
-            }
-
-            // Token expired. Attempt to refresh.
-            tokenInfoPromise = refreshAccessToken(token.refreshToken, {
-              persist: shouldPersist,
-            })
-              .then(token => {
-                // Sanity check that prevents an infinite loop. Mostly useful in
-                // tests.
-                if (Date.now() > token.expiresAt) {
-                  /* istanbul ignore next */
-                  throw new Error('Refreshed token expired in the past');
-                }
-                return token;
-              })
-              .catch(() => {
-                // If refreshing the token fails, the user is simply logged out.
-                return null;
-              });
-
-            return tokenGetter();
-          } else {
-            return token.accessToken;
-          }
+        // If we are using automatic login via a grant token, do not persist the
+        // initial access token or refreshed tokens.
+        const cfg = serviceConfig(settings);
+        if (cfg && typeof cfg.grantToken !== 'undefined') {
+          shouldPersist = false;
         }
-      );
-    }
+
+        // Token expired. Attempt to refresh.
+        tokenInfoPromise = refreshAccessToken(token.refreshToken, {
+          persist: shouldPersist,
+        })
+          .then(token => {
+            // Sanity check that prevents an infinite loop. Mostly useful in
+            // tests.
+            if (Date.now() > token.expiresAt) {
+              /* istanbul ignore next */
+              throw new Error('Refreshed token expired in the past');
+            }
+            return token;
+          })
+          .catch(() => {
+            // If refreshing the token fails, the user is simply logged out.
+            return null;
+          });
+
+        return tokenGetter();
+      }
+
+      return token.accessToken;
+    };
 
     /**
      * Login to the annotation service using OAuth.
@@ -266,18 +260,15 @@ export class AuthService extends TinyEmitter {
      * (if necessary) and then responds with an auth code which the client can
      * then exchange for access and refresh tokens.
      */
-    function login() {
+    async function login() {
       const authWindow = OAuthClient.openAuthPopupWindow($window);
-      return oauthClient()
-        .then(client => {
-          return client.authorize($window, authWindow);
-        })
-        .then(code => {
-          // Save the auth code. It will be exchanged for an access token when the
-          // next API request is made.
-          authCode = code;
-          tokenInfoPromise = null;
-        });
+      const client = await oauthClient();
+      const code = await client.authorize($window, authWindow);
+
+      // Save the auth code. It will be exchanged for an access token when the
+      // next API request is made.
+      authCode = code;
+      tokenInfoPromise = null;
     }
 
     /**
