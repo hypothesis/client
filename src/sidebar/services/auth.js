@@ -238,8 +238,8 @@ export class AuthService extends TinyEmitter {
 
       // Step 3: Re-fetch the token if it is no longer valid
       if (origToken !== tokenInfoPromise) {
-        // A token refresh has been initiated via a call to `refreshAccessToken`
-        // below since `getAccessToken()` was called.
+        // The token source was changed while waiting for the token to be fetched.
+        // This can happen for various reasons. We'll just need to try again.
         return getAccessToken();
       }
 
