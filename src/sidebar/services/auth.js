@@ -16,7 +16,7 @@ import { resolve } from '../util/url';
  * Authorization service.
  *
  * This service is responsible for acquiring access tokens for making API
- * requests and making them available via the `tokenGetter()` method.
+ * requests and making them available via the `getAccessToken()` method.
  *
  * Access tokens are acquired via the OAuth authorization flow, loading valid
  * tokens from a previous session or, on some websites, by exchanging a grant
@@ -124,7 +124,7 @@ export class AuthService extends TinyEmitter {
       $window.addEventListener('storage', ({ key }) => {
         if (key === storageKey()) {
           // Reset cached token information. Tokens will be reloaded from storage
-          // on the next call to `tokenGetter()`.
+          // on the next call to `getAccessToken()`.
           tokenInfoPromise = null;
           this.emit('oauthTokensChanged');
         }
@@ -196,7 +196,7 @@ export class AuthService extends TinyEmitter {
      *
      * @return {Promise<string|null>} The API access token or `null` if not logged in.
      */
-    const tokenGetter = async () => {
+    const getAccessToken = async () => {
       // Step 1: Determine how to get an access token, depending on the login
       // method being used.
       if (!tokenInfoPromise) {
@@ -239,8 +239,8 @@ export class AuthService extends TinyEmitter {
       // Step 3: Re-fetch the token if it is no longer valid
       if (origToken !== tokenInfoPromise) {
         // A token refresh has been initiated via a call to `refreshAccessToken`
-        // below since `tokenGetter()` was called.
-        return tokenGetter();
+        // below since `getAccessToken()` was called.
+        return getAccessToken();
       }
 
       if (Date.now() > token.expiresAt) {
@@ -254,7 +254,7 @@ export class AuthService extends TinyEmitter {
           persist: !usingGrantToken,
         });
 
-        return tokenGetter();
+        return getAccessToken();
       }
 
       // Step 4: If the token was valid, return it
@@ -305,6 +305,6 @@ export class AuthService extends TinyEmitter {
     // TODO - Convert these to ordinary class methods.
     this.login = login;
     this.logout = logout;
-    this.tokenGetter = tokenGetter;
+    this.getAccessToken = getAccessToken;
   }
 }

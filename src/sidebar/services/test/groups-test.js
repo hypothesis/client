@@ -48,7 +48,7 @@ describe('sidebar/services/groups', function () {
 
   beforeEach(function () {
     fakeAuth = {
-      tokenGetter: sinon.stub().returns('1234'),
+      getAccessToken: sinon.stub().returns('1234'),
     };
 
     fakeMetadata = {
@@ -563,7 +563,7 @@ describe('sidebar/services/groups', function () {
       );
 
       // The user is logged out.
-      fakeAuth.tokenGetter.returns(null);
+      fakeAuth.getAccessToken.returns(null);
 
       return svc.load().then(groups => {
         const groupIds = groups.map(g => g.id);
@@ -627,7 +627,7 @@ describe('sidebar/services/groups', function () {
       );
 
       // The user is logged out.
-      fakeAuth.tokenGetter.returns(null);
+      fakeAuth.getAccessToken.returns(null);
 
       return svc.load().then(groups => {
         const linkedToGroupShown = groups.some(g => g.id === 'out-of-scope');
@@ -656,7 +656,7 @@ describe('sidebar/services/groups', function () {
         Promise.resolve({ name: 'Public', id: '__world__' })
       );
 
-      fakeAuth.tokenGetter.returns(null);
+      fakeAuth.getAccessToken.returns(null);
 
       return svc.load().then(groups => {
         const publicGroupShown = groups.some(g => g.id === '__world__');
@@ -690,7 +690,7 @@ describe('sidebar/services/groups', function () {
             groups.push({ name: 'BioPub', id: 'biopub' });
           }
 
-          fakeAuth.tokenGetter.returns(loggedIn ? '1234' : null);
+          fakeAuth.getAccessToken.returns(loggedIn ? '1234' : null);
           fakeApi.groups.list.returns(Promise.resolve(groups));
 
           return svc.load().then(groups => {

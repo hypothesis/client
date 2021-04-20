@@ -210,7 +210,7 @@ export default function api(apiRoutes, auth, store) {
 
   function apiCall(route) {
     return createAPICall(links, route, {
-      getAccessToken: auth.tokenGetter,
+      getAccessToken: auth.getAccessToken,
       getClientId,
       onRequestStarted: store.apiRequestStarted,
       onRequestFinished: store.apiRequestFinished,

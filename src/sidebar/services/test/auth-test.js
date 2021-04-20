@@ -109,7 +109,7 @@ describe('AuthService', function () {
 
   it('configures an OAuthClient correctly', () => {
     // Call a method which will trigger construction of the `OAuthClient`.
-    return auth.tokenGetter().then(() => {
+    return auth.getAccessToken().then(() => {
       assert.deepEqual(fakeClient.config, {
         clientId: 'the-client-id',
         tokenEndpoint: 'https://hypothes.is/api/token',
@@ -119,7 +119,7 @@ describe('AuthService', function () {
     });
   });
 
-  describe('#tokenGetter', function () {
+  describe('#getAccessToken', function () {
     const successfulTokenResponse = Promise.resolve({
       accessToken: 'firstAccessToken',
       refreshToken: 'firstRefreshToken',
@@ -129,7 +129,7 @@ describe('AuthService', function () {
     it('exchanges the grant token for an access token if provided', function () {
       fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
 
-      return auth.tokenGetter().then(token => {
+      return auth.getAccessToken().then(token => {
         assert.calledWith(fakeClient.exchangeGrantToken, 'a.jwt.token');
         assert.equal(token, 'firstAccessToken');
       });
@@ -142,7 +142,7 @@ describe('AuthService', function () {
       });
 
       function assertThatAccessTokenPromiseWasRejectedAnd(func) {
-        return auth.tokenGetter().then(function onResolved() {
+        return auth.getAccessToken().then(function onResolved() {
           assert(false, 'The Promise should have been rejected');
         }, func);
       }
@@ -170,10 +170,10 @@ describe('AuthService', function () {
     it('should cache tokens for future use', function () {
       fakeClient.exchangeGrantToken.returns(successfulTokenResponse);
       return auth
-        .tokenGetter()
+        .getAccessToken()
         .then(function () {
           fakeClient.exchangeGrantToken.reset();
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(function (token) {
           assert.equal(token, 'firstAccessToken');
@@ -182,7 +182,7 @@ describe('AuthService', function () {
     });
 
     // If an access token request has already been made but is still in
-    // flight when tokenGetter() is called again, then it should just return
+    // flight when getAccessToken() is called again, then it should just return
     // the pending Promise for the first request again (and not send a second
     // concurrent HTTP request).
     it('should not make two concurrent access token requests', function () {
@@ -193,9 +193,9 @@ describe('AuthService', function () {
         })
       );
 
-      // The first time tokenGetter() is called it makes an `exchangeGrantToken`
+      // The first time getAccessToken() is called it makes an `exchangeGrantToken`
       // call and caches the resulting Promise.
-      const tokens = [auth.tokenGetter(), auth.tokenGetter()];
+      const tokens = [auth.getAccessToken(), auth.getAccessToken()];
 
       // Resolve the initial request for an access token in exchange for a JWT.
       respond({
@@ -210,7 +210,7 @@ describe('AuthService', function () {
 
     it('should not attempt to exchange a grant token if none was provided', function () {
       fakeSettings.services = [{ authority: 'publisher.org' }];
-      return auth.tokenGetter().then(function (token) {
+      return auth.getAccessToken().then(function (token) {
         assert.notCalled(fakeClient.exchangeGrantToken);
         assert.equal(token, null);
       });
@@ -222,7 +222,7 @@ describe('AuthService', function () {
       );
 
       function callTokenGetter() {
-        const tokenPromise = auth.tokenGetter();
+        const tokenPromise = auth.getAccessToken();
 
         fakeClient.refreshToken.returns(
           Promise.resolve({
@@ -243,12 +243,12 @@ describe('AuthService', function () {
 
       return callTokenGetter()
         .then(expireAccessToken)
-        .then(() => auth.tokenGetter())
+        .then(() => auth.getAccessToken())
         .then(token => assert.equal(token, 'secondAccessToken'))
         .then(assertRefreshTokenWasUsed('firstRefreshToken'));
     });
 
-    // It only sends one refresh request, even if tokenGetter() is called
+    // It only sends one refresh request, even if getAccessToken() is called
     // multiple times and the refresh response hasn't come back yet.
     it('does not send more than one refresh request', function () {
       fakeClient.exchangeGrantToken.returns(
@@ -258,7 +258,7 @@ describe('AuthService', function () {
       // Perform an initial token fetch which will exchange the JWT grant for an
       // access token.
       return auth
-        .tokenGetter()
+        .getAccessToken()
         .then(() => {
           // Expire the access token to trigger a refresh request on the next
           // token fetch.
@@ -271,7 +271,10 @@ describe('AuthService', function () {
           );
 
           // Request an auth token multiple times.
-          const tokens = Promise.all([auth.tokenGetter(), auth.tokenGetter()]);
+          const tokens = Promise.all([
+            auth.getAccessToken(),
+            auth.getAccessToken(),
+          ]);
 
           // Finally, respond to the refresh request.
           respond({
@@ -297,7 +300,7 @@ describe('AuthService', function () {
       it('logs the user out', function () {
         expireAccessToken();
 
-        return auth.tokenGetter(token => {
+        return auth.getAccessToken(token => {
           assert.equal(token, null);
         });
       });
@@ -319,7 +322,7 @@ describe('AuthService', function () {
     ].forEach(({ authority, grantToken, expectedToken }) => {
       it(`should not persist access tokens if a grant token (${grantToken}) was provided`, () => {
         fakeSettings.services = [{ authority, grantToken }];
-        return auth.tokenGetter().then(() => {
+        return auth.getAccessToken().then(() => {
           assert.notCalled(fakeLocalStorage.setObject);
         });
       });
@@ -329,7 +332,7 @@ describe('AuthService', function () {
           Promise.resolve(successfulTokenResponse)
         );
         fakeSettings.services = [{ authority, grantToken }];
-        return auth.tokenGetter().then(token => {
+        return auth.getAccessToken().then(token => {
           assert.equal(token, expectedToken);
           assert.notCalled(fakeLocalStorage.getObject);
         });
@@ -341,7 +344,7 @@ describe('AuthService', function () {
 
       return login()
         .then(() => {
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(() => {
           assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
@@ -362,7 +365,7 @@ describe('AuthService', function () {
           refreshToken: 'secondRefreshToken',
         })
       );
-      return auth.tokenGetter();
+      return auth.getAccessToken();
     }
 
     it('persists refreshed tokens to storage', () => {
@@ -371,7 +374,7 @@ describe('AuthService', function () {
       // 1. Perform initial token exchange.
       return login()
         .then(() => {
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(() => {
           // 2. Refresh access token.
@@ -393,7 +396,7 @@ describe('AuthService', function () {
       ];
 
       return auth
-        .tokenGetter()
+        .getAccessToken()
         .then(() => {
           return expireAndRefreshAccessToken();
         })
@@ -411,7 +414,7 @@ describe('AuthService', function () {
         expiresAt: 123,
       });
 
-      return auth.tokenGetter().then(token => {
+      return auth.getAccessToken().then(token => {
         assert.equal(token, 'foo');
       });
     });
@@ -436,7 +439,7 @@ describe('AuthService', function () {
 
       // Fetch the token again from the service and check that it gets
       // refreshed.
-      return auth.tokenGetter().then(token => {
+      return auth.getAccessToken().then(token => {
         assert.equal(token, 'secondToken');
         assert.calledWith(fakeLocalStorage.setObject, TOKEN_KEY, {
           accessToken: 'secondToken',
@@ -466,7 +469,7 @@ describe('AuthService', function () {
         it('ignores invalid tokens in storage', () => {
           fakeSettings.services = [];
           fakeLocalStorage.getObject.withArgs('foo').returns(data);
-          return auth.tokenGetter().then(token => {
+          return auth.getAccessToken().then(token => {
             assert.equal(token, null);
           });
         });
@@ -496,14 +499,14 @@ describe('AuthService', function () {
     it('reloads tokens from storage', () => {
       return login()
         .then(() => {
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(token => {
           assert.equal(token, 'firstAccessToken');
 
           notifyStoredTokenChange();
 
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(token => {
           assert.equal(token, 'storedAccessToken');
@@ -542,7 +545,7 @@ describe('AuthService', function () {
       return auth
         .login()
         .then(() => {
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(() => {
           // 2. Verify that auth code is exchanged for access & refresh tokens.
@@ -567,7 +570,7 @@ describe('AuthService', function () {
       return auth
         .login()
         .then(() => {
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .catch(err => {
           assert.equal(err.message, expectedErr.message);
@@ -583,7 +586,7 @@ describe('AuthService', function () {
 
       return login()
         .then(() => {
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(token => {
           assert.notEqual(token, null);
@@ -594,7 +597,7 @@ describe('AuthService', function () {
       return auth
         .logout()
         .then(() => {
-          return auth.tokenGetter();
+          return auth.getAccessToken();
         })
         .then(token => {
           assert.equal(token, null);
