@@ -69,8 +69,10 @@ function persistDefaults(persistedDefaults) {
 
 /**
  * Set up autosave-new-highlights service
+ *
+ * @param {import('./services/autosave').AutosaveService} autosaveService
+ * @inject
  */
-// @inject
 function autosave(autosaveService) {
   autosaveService.init();
 }
@@ -101,7 +103,7 @@ import { AnnotationsService } from './services/annotations';
 import apiService from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import authService from './services/oauth-auth';
-import autosaveService from './services/autosave';
+import { AutosaveService } from './services/autosave';
 import featuresService from './services/features';
 import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
@@ -138,7 +140,7 @@ function startApp(config, appEl) {
     .register('api', apiService)
     .register('apiRoutes', APIRoutesService)
     .register('auth', authService)
-    .register('autosaveService', autosaveService)
+    .register('autosaveService', AutosaveService)
     .register('bridge', bridgeService)
     .register('features', featuresService)
     .register('frameSync', frameSyncService)

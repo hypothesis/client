@@ -2,9 +2,9 @@ import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
 import { waitFor } from '../../../test-util/wait';
 
-import autosaveService, { $imports } from '../autosave';
+import { AutosaveService, $imports } from '../autosave';
 
-describe('autosaveService', () => {
+describe('AutosaveService', () => {
   let fakeAnnotationsService;
   let fakeNewHighlights;
   let fakeRetryPromiseOperation;
@@ -33,12 +33,15 @@ describe('autosaveService', () => {
     return newHighlight;
   };
 
+  const createService = () =>
+    new AutosaveService(fakeAnnotationsService, fakeStore);
+
   afterEach(() => {
     $imports.$restore();
   });
 
   it('should subscribe to store updates and check for new highlights', () => {
-    const svc = autosaveService(fakeAnnotationsService, fakeStore);
+    const svc = createService();
     svc.init();
 
     fakeStore.setState({});
@@ -47,7 +50,7 @@ describe('autosaveService', () => {
   });
 
   it('should save new highlights', () => {
-    const svc = autosaveService(fakeAnnotationsService, fakeStore);
+    const svc = createService();
     svc.init();
     const newHighlight = oneNewHighlight();
 
@@ -58,7 +61,7 @@ describe('autosaveService', () => {
   });
 
   it('should not try to save a highlight that is already being saved', () => {
-    const svc = autosaveService(fakeAnnotationsService, fakeStore);
+    const svc = createService();
     svc.init();
 
     oneNewHighlight();
@@ -72,7 +75,7 @@ describe('autosaveService', () => {
 
   it('should not retry a highlight that failed to save', async () => {
     fakeAnnotationsService.save.rejects(new Error('Something went wrong'));
-    const svc = autosaveService(fakeAnnotationsService, fakeStore);
+    const svc = createService();
     svc.init();
 
     oneNewHighlight();

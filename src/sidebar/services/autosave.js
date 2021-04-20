@@ -1,66 +1,70 @@
-/**
- * A service for automatically saving new highlights.
- */
 import { retryPromiseOperation } from '../util/retry';
 
 /**
- * @param {import('./annotations').AnnotationsService} annotationsService
- * @param {import('../store').SidebarStore} store
+ * A service for automatically saving new highlights.
+ *
+ * @inject
  */
-// @inject
-export default function autosaveService(annotationsService, store) {
-  // A Set of annotation $tags that have save requests in-flight
-  const saving = new Set();
-
-  // A Set of annotation $tags that have failed to save after retries
-  const failed = new Set();
-
+export class AutosaveService {
   /**
-   * Determine whether we should try to send a save request for the highlight
-   * indicated by `htag`
-   *
-   * @param {string} htag - The local unique identifier for the unsaved highlight
-   * @return {boolean}
+   * @param {import('./annotations').AnnotationsService} annotationsService
+   * @param {import('../store').SidebarStore} store
    */
-  const shouldSaveHighlight = htag => {
-    return !saving.has(htag) && !failed.has(htag);
-  };
+  constructor(annotationsService, store) {
+    this._store = store;
 
-  /**
-   * Store-subscribed call back. Automatically save new highlights.
-   */
-  const autosaveNewHighlights = () => {
-    const newHighlights = store.newHighlights();
+    // A set of annotation $tags that have save requests in-flight
+    this._saving = new Set();
 
-    newHighlights.forEach(highlight => {
-      // Because this is a new annotation object, it does not yet have an `id`
-      // property. Use the local `$tag` for uniqueness instead.
-      const htag = highlight.$tag;
+    // A set of annotation $tags that have failed to save after retries
+    this._failed = new Set();
 
-      if (!shouldSaveHighlight(htag)) {
-        return;
-      }
+    /**
+     * Determine whether we should try to send a save request for the highlight
+     * indicated by `htag`
+     *
+     * @param {string} htag - The local unique identifier for the unsaved highlight
+     * @return {boolean}
+     */
+    const shouldSaveHighlight = htag => {
+      return !this._saving.has(htag) && !this._failed.has(htag);
+    };
 
-      saving.add(htag);
+    /**
+     * Store-subscribed call back. Automatically save new highlights.
+     */
+    this._autosaveNewHighlights = () => {
+      const newHighlights = store.newHighlights();
 
-      retryPromiseOperation(() => annotationsService.save(highlight))
-        .catch(() => {
-          // save failed after retries
-          failed.add(htag);
-        })
-        .finally(() => {
-          // Request is complete, no longer attempting to save
-          saving.delete(htag);
-        });
-    });
-  };
+      newHighlights.forEach(highlight => {
+        // Because this is a new annotation object, it does not yet have an `id`
+        // property. Use the local `$tag` for uniqueness instead.
+        const htag = highlight.$tag;
 
-  return {
-    init() {
-      store.subscribe(autosaveNewHighlights);
-    },
-    isSaving() {
-      return saving.size > 0;
-    },
-  };
+        if (!shouldSaveHighlight(htag)) {
+          return;
+        }
+
+        this._saving.add(htag);
+
+        retryPromiseOperation(() => annotationsService.save(highlight))
+          .catch(() => {
+            // save failed after retries
+            this._failed.add(htag);
+          })
+          .finally(() => {
+            // Request is complete, no longer attempting to save
+            this._saving.delete(htag);
+          });
+      });
+    };
+  }
+
+  init() {
+    this._store.subscribe(this._autosaveNewHighlights);
+  }
+
+  isSaving() {
+    return this._saving.size > 0;
+  }
 }
