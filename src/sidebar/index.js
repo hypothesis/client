@@ -57,24 +57,20 @@ function setupRoute(groups, session, router) {
 }
 
 /**
- * Fetch any persisted client-side defaults, and persist any app-state changes to
- * those defaults
+ * Initialize background processes provided by various services.
  *
+ * These processes include persisting or synchronizing data from one place
+ * to another.
+ *
+ * @param {import('./services/autosave').AutosaveService} autosaveService
+ * @param {import('./services/features').FeaturesService} features
  * @param {import('./services/persisted-defaults').PersistedDefaultsService} persistedDefaults
  * @inject
  */
-function persistDefaults(persistedDefaults) {
-  persistedDefaults.init();
-}
-
-/**
- * Set up autosave-new-highlights service
- *
- * @param {import('./services/autosave').AutosaveService} autosaveService
- * @inject
- */
-function autosave(autosaveService) {
+function initServices(autosaveService, features, persistedDefaults) {
   autosaveService.init();
+  features.init();
+  persistedDefaults.init();
 }
 
 // @inject
@@ -104,7 +100,7 @@ import apiService from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import authService from './services/oauth-auth';
 import { AutosaveService } from './services/autosave';
-import featuresService from './services/features';
+import { FeaturesService } from './services/features';
 import frameSyncService from './services/frame-sync';
 import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
@@ -142,7 +138,7 @@ function startApp(config, appEl) {
     .register('auth', authService)
     .register('autosaveService', AutosaveService)
     .register('bridge', bridgeService)
-    .register('features', featuresService)
+    .register('features', FeaturesService)
     .register('frameSync', frameSyncService)
     .register('groups', groupsService)
     .register('loadAnnotationsService', loadAnnotationsService)
@@ -167,8 +163,7 @@ function startApp(config, appEl) {
     .register('settings', { value: config });
 
   // Initialize services.
-  container.run(persistDefaults);
-  container.run(autosave);
+  container.run(initServices);
   container.run(setupApi);
   container.run(setupRoute);
   container.run(startRPCServer);

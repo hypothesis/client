@@ -45,14 +45,9 @@ describe('integration: annotation threading', () => {
   let forceUpdate;
 
   beforeEach(function () {
-    const fakeFeatures = {
-      flagEnabled: sinon.stub().returns(true),
-    };
-
     const container = new Injector()
       .register('store', storeFactory)
       .register('annotationsService', () => {})
-      .register('features', { value: fakeFeatures })
       .register('settings', { value: {} });
 
     // Mount a dummy component to be able to use the `useRootThread` hook
