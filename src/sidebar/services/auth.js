@@ -241,6 +241,7 @@ export class AuthService extends TinyEmitter {
                 // Sanity check that prevents an infinite loop. Mostly useful in
                 // tests.
                 if (Date.now() > token.expiresAt) {
+                  /* istanbul ignore next */
                   throw new Error('Refreshed token expired in the past');
                 }
                 return token;
