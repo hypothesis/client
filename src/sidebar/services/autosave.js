@@ -11,6 +11,7 @@ export class AutosaveService {
    * @param {import('../store').SidebarStore} store
    */
   constructor(annotationsService, store) {
+    this._annotationsService = annotationsService;
     this._store = store;
 
     // A set of annotation $tags that have save requests in-flight
@@ -18,7 +19,13 @@ export class AutosaveService {
 
     // A set of annotation $tags that have failed to save after retries
     this._failed = new Set();
+  }
 
+  /**
+   * Begin watching the store for new unsaved highlights and save them in
+   * response.
+   */
+  init() {
     /**
      * Determine whether we should try to send a save request for the highlight
      * indicated by `htag`
@@ -33,8 +40,8 @@ export class AutosaveService {
     /**
      * Store-subscribed call back. Automatically save new highlights.
      */
-    this._autosaveNewHighlights = () => {
-      const newHighlights = store.newHighlights();
+    const autosaveNewHighlights = () => {
+      const newHighlights = this._store.newHighlights();
 
       newHighlights.forEach(highlight => {
         // Because this is a new annotation object, it does not yet have an `id`
@@ -47,7 +54,7 @@ export class AutosaveService {
 
         this._saving.add(htag);
 
-        retryPromiseOperation(() => annotationsService.save(highlight))
+        retryPromiseOperation(() => this._annotationsService.save(highlight))
           .catch(() => {
             // save failed after retries
             this._failed.add(htag);
@@ -58,12 +65,13 @@ export class AutosaveService {
           });
       });
     };
+
+    this._store.subscribe(autosaveNewHighlights);
   }
 
-  init() {
-    this._store.subscribe(this._autosaveNewHighlights);
-  }
-
+  /**
+   * Return `true` if any new highlights are currently being saved.
+   */
   isSaving() {
     return this._saving.size > 0;
   }
