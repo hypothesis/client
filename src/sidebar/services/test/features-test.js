@@ -1,22 +1,13 @@
 import bridgeEvents from '../../../shared/bridge-events';
-import features from '../features';
-import { $imports } from '../features';
+import { FeaturesService } from '../features';
 
-describe('sidebar/services/features', function () {
+describe('FeaturesService', () => {
   let fakeBridge;
-  let fakeWarnOnce;
-  let fakeSession;
   let fakeStore;
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeBridge = {
       call: sinon.stub(),
-    };
-
-    fakeWarnOnce = sinon.stub();
-
-    fakeSession = {
-      load: sinon.stub(),
     };
 
     fakeStore = {
@@ -29,45 +20,13 @@ describe('sidebar/services/features', function () {
         },
       }),
     };
-
-    $imports.$mock({
-      '../../shared/warn-once': fakeWarnOnce,
-    });
-  });
-
-  afterEach(function () {
-    $imports.$restore();
   });
 
   function createService() {
-    return features(fakeBridge, fakeSession, fakeStore);
+    const service = new FeaturesService(fakeBridge, fakeStore);
+    service.init();
+    return service;
   }
-
-  describe('flagEnabled', function () {
-    it('should retrieve features data', function () {
-      const features_ = createService();
-      assert.equal(features_.flagEnabled('feature_on'), true);
-      assert.equal(features_.flagEnabled('feature_off'), false);
-    });
-
-    it('should return false if features have not been loaded', function () {
-      const features_ = createService();
-      // Simulate feature data not having been loaded yet
-      fakeStore.profile.returns({});
-      assert.equal(features_.flagEnabled('feature_on'), false);
-    });
-
-    it('should trigger a refresh of session data', function () {
-      const features_ = createService();
-      features_.flagEnabled('feature_on');
-      assert.calledOnce(fakeSession.load);
-    });
-
-    it('should return false for unknown flags', function () {
-      const features_ = createService();
-      assert.isFalse(features_.flagEnabled('unknown_feature'));
-    });
-  });
 
   function notifyStoreSubscribers() {
     const subscribers = fakeStore.subscribe.args.map(args => args[0]);
