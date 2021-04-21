@@ -47,10 +47,10 @@ export default class Discovery {
      * Set whether this frame acts as a server (fetches annotations from the
      * API) or a client (contains annotatable content and displays highlights).
      */
-    this.server = false;
+    this.server = options.server ?? false;
 
     /** Origins allowed to communicate with this frame. */
-    this.origin = '*';
+    this.origin = options.origin ?? '*';
 
     /**
      * Flag set in client frames to indicate when they are waiting for a
@@ -59,14 +59,6 @@ export default class Discovery {
     this.requestInProgress = false;
 
     this.onDiscovery = null;
-
-    if (typeof options.server !== 'undefined') {
-      this.server = options.server;
-    }
-
-    if (typeof options.origin !== 'undefined') {
-      this.origin = options.origin;
-    }
 
     this._onMessage = this._onMessage.bind(this);
     this._listeners = new ListenerCollection();

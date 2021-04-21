@@ -42,8 +42,6 @@ export class CrossFrame {
         return;
       }
 
-      const { clientUrl } = config;
-
       frameUtil.isLoaded(frame, () => {
         const subFrameIdentifier = discovery.generateToken();
         frameIdentifiers.set(frame, subFrameIdentifier);
@@ -52,6 +50,7 @@ export class CrossFrame {
           subFrameIdentifier,
         };
 
+        const { clientUrl } = config;
         frameUtil.injectHypothesis(frame, clientUrl, injectedConfig);
       });
     };
