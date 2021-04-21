@@ -1,31 +1,62 @@
+import createStore from '../../create-store';
 import links from '../links';
 
-const init = links.init;
-const update = links.update.UPDATE_LINKS;
-const action = links.actions.updateLinks;
+describe('sidebar/store/modules/links', () => {
+  let store;
 
-describe('sidebar/store/modules/links', function () {
-  describe('#init()', function () {
-    it('returns a null links object', function () {
-      assert.deepEqual(init(), null);
-    });
+  beforeEach(() => {
+    store = createStore([links]);
   });
 
-  describe('#update.UPDATE_LINKS()', function () {
-    it('returns the given newLinks as the links object', function () {
-      assert.deepEqual(
-        update('CURRENT_STATE', { newLinks: { NEW_LINK: 'http://new_link' } }),
-        { NEW_LINK: 'http://new_link' }
+  function addLinks() {
+    // Snapshot of response from https://hypothes.is/api/links.
+    const data = {
+      'account.settings': 'https://hypothes.is/account/settings',
+      'forgot-password': 'https://hypothes.is/forgot-password',
+      'groups.new': 'https://hypothes.is/groups/new',
+      help: 'https://hypothes.is/docs/help',
+      'oauth.authorize': 'https://hypothes.is/oauth/authorize',
+      'oauth.revoke': 'https://hypothes.is/oauth/revoke',
+      'search.tag': 'https://hypothes.is/search?q=tag%3A%22:tag%22',
+      signup: 'https://hypothes.is/signup',
+      user: 'https://hypothes.is/u/:user',
+    };
+    store.updateLinks(data);
+  }
+
+  describe('#getLink', () => {
+    it('returns an empty string before links are loaded', () => {
+      assert.equal(store.getLink('account.settings'), '');
+    });
+
+    it('renders URLs once links are loaded', () => {
+      addLinks();
+      assert.equal(
+        store.getLink('account.settings'),
+        'https://hypothes.is/account/settings'
       );
     });
-  });
 
-  describe('#actions.updateLinks()', function () {
-    it('returns an UPDATE_LINKS action object for the given newLinks', function () {
-      assert.deepEqual(action({ NEW_LINK: 'http://new_link' }), {
-        type: 'UPDATE_LINKS',
-        newLinks: { NEW_LINK: 'http://new_link' },
-      });
+    it('renders URLs with parameters', () => {
+      addLinks();
+      assert.equal(
+        store.getLink('user', { user: 'foobar' }),
+        'https://hypothes.is/u/foobar'
+      );
+    });
+
+    it('throws an error if link name is invalid', () => {
+      addLinks();
+      assert.throws(() => {
+        store.getLink('unknown');
+      }, 'Unknown link "unknown"');
+    });
+
+    it('throws an error if unused link parameters are provided', () => {
+      addLinks();
+      assert.throws(() => {
+        store.getLink('account.settings', { unused: 'foo', unused2: 'bar' });
+      }, 'Unused parameters: unused, unused2');
     });
   });
 });

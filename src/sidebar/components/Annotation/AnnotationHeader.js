@@ -20,7 +20,6 @@ import AnnotationUser from './AnnotationUser';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import('../../services/service-url').ServiceUrlGetter} ServiceUrlGetter
  * @typedef {import('../../../types/config').MergedConfig} MergedConfig
  */
 
@@ -30,7 +29,6 @@ import AnnotationUser from './AnnotationUser';
  * @prop {boolean} [isEditing] - Whether the annotation is actively being edited
  * @prop {number} replyCount - How many replies this annotation currently has
  * @prop {boolean} threadIsCollapsed - Is this thread currently collapsed?
- * @prop {ServiceUrlGetter} serviceUrl - Injected service
  * @prop {MergedConfig} settings - Injected
  *
  */
@@ -47,7 +45,6 @@ function AnnotationHeader({
   isEditing,
   replyCount,
   threadIsCollapsed,
-  serviceUrl,
   settings,
 }) {
   const store = useStoreProxy();
@@ -63,7 +60,7 @@ function AnnotationHeader({
 
   const authorLink = (() => {
     if (!isThirdParty) {
-      return serviceUrl('user', { user: annotation.user });
+      return store.getLink('user', { user: annotation.user });
     } else {
       return (
         (settings.usernameUrl &&
@@ -174,6 +171,6 @@ function AnnotationHeader({
   );
 }
 
-AnnotationHeader.injectedProps = ['serviceUrl', 'settings'];
+AnnotationHeader.injectedProps = ['settings'];
 
 export default withServices(AnnotationHeader);

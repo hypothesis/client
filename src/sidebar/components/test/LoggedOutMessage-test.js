@@ -7,18 +7,21 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('LoggedOutMessage', () => {
+  let fakeStore;
+
   const createLoggedOutMessage = props => {
-    return mount(
-      <LoggedOutMessage
-        onLogin={sinon.stub()}
-        serviceUrl={sinon.stub()}
-        {...props}
-      />
-    );
+    return mount(<LoggedOutMessage onLogin={sinon.stub()} {...props} />);
   };
 
   beforeEach(() => {
+    fakeStore = {
+      getLink: sinon.stub().returns('signup_link'),
+    };
+
     $imports.$mock(mockImportedComponents());
+    $imports.$mock({
+      '../store/use-store': { useStoreProxy: () => fakeStore },
+    });
   });
 
   afterEach(() => {
@@ -26,12 +29,11 @@ describe('LoggedOutMessage', () => {
   });
 
   it('should link to signup', () => {
-    const fakeServiceUrl = sinon.stub().returns('signup_link');
-    const wrapper = createLoggedOutMessage({ serviceUrl: fakeServiceUrl });
+    const wrapper = createLoggedOutMessage();
 
     const signupLink = wrapper.find('.LoggedOutMessage__link').at(0);
 
-    assert.calledWith(fakeServiceUrl, 'signup');
+    assert.calledWith(fakeStore.getLink, 'signup');
     assert.equal(signupLink.prop('href'), 'signup_link');
   });
 

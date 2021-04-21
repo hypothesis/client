@@ -1,13 +1,10 @@
 import { LinkButton, SvgIcon } from '@hypothesis/frontend-shared';
 
-import { withServices } from '../service-context';
-
-/** @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter */
+import { useStoreProxy } from '../store/use-store';
 
 /**
  * @typedef LoggedOutMessageProps
  * @prop {() => any} onLogin
- * @prop {ServiceUrlGetter} serviceUrl
  */
 
 /**
@@ -17,7 +14,9 @@ import { withServices } from '../service-context';
  *
  * @param {LoggedOutMessageProps} props
  */
-function LoggedOutMessage({ onLogin, serviceUrl }) {
+function LoggedOutMessage({ onLogin }) {
+  const store = useStoreProxy();
+
   return (
     <div className="LoggedOutMessage">
       <span>
@@ -25,7 +24,7 @@ function LoggedOutMessage({ onLogin, serviceUrl }) {
         To reply or make your own annotations on this document,{' '}
         <a
           className="LoggedOutMessage__link"
-          href={serviceUrl('signup')}
+          href={store.getLink('signup')}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -54,6 +53,4 @@ function LoggedOutMessage({ onLogin, serviceUrl }) {
   );
 }
 
-LoggedOutMessage.injectedProps = ['serviceUrl'];
-
-export default withServices(LoggedOutMessage);
+export default LoggedOutMessage;

@@ -14,7 +14,6 @@ describe('HypothesisApp', () => {
   let fakeServiceConfig = null;
   let fakeSession = null;
   let fakeShouldAutoDisplayTutorial = null;
-  let fakeServiceUrl = null;
   let fakeSettings = null;
   let fakeToastMessenger = null;
 
@@ -23,7 +22,6 @@ describe('HypothesisApp', () => {
       <HypothesisApp
         auth={fakeAuth}
         bridge={fakeBridge}
-        serviceUrl={fakeServiceUrl}
         settings={fakeSettings}
         session={fakeSession}
         toastMessenger={fakeToastMessenger}
@@ -55,6 +53,8 @@ describe('HypothesisApp', () => {
         },
       }),
       route: sinon.stub().returns('sidebar'),
+
+      getLink: sinon.stub(),
     };
 
     fakeAuth = {};
@@ -64,8 +64,6 @@ describe('HypothesisApp', () => {
       logout: sinon.stub(),
       reload: sinon.stub().returns(Promise.resolve({ userid: null })),
     };
-
-    fakeServiceUrl = sinon.stub();
 
     fakeSettings = {};
 
@@ -244,7 +242,9 @@ describe('HypothesisApp', () => {
 
     context('when not using a third-party service', () => {
       it('opens the signup URL in a new tab', () => {
-        fakeServiceUrl.withArgs('signup').returns('https://ann.service/signup');
+        fakeStore.getLink
+          .withArgs('signup')
+          .returns('https://ann.service/signup');
         const wrapper = createComponent();
         clickSignUp(wrapper);
         assert.calledWith(window.open, 'https://ann.service/signup');

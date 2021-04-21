@@ -7,15 +7,12 @@ import mockImportedComponents from '../../../../test-util/mock-imported-componen
 
 describe('GroupList', () => {
   let fakeServiceConfig;
-  let fakeServiceUrl;
   let fakeSettings;
   let fakeStore;
   let testGroup;
 
   function createGroupList() {
-    return mount(
-      <GroupList serviceUrl={fakeServiceUrl} settings={fakeSettings} />
-    );
+    return mount(<GroupList settings={fakeSettings} />);
   }
 
   /**
@@ -46,12 +43,12 @@ describe('GroupList', () => {
       organization: { id: 'testorg', name: 'Test Org' },
     };
 
-    fakeServiceUrl = sinon.stub();
     fakeSettings = {};
     fakeStore = {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       getCurrentlyViewingGroups: sinon.stub().returns([]),
       getFeaturedGroups: sinon.stub().returns([]),
+      getLink: sinon.stub().returns(''),
       getMyGroups: sinon.stub().returns([]),
       focusedGroup: sinon.stub().returns(testGroup),
       profile: sinon.stub().returns({ userid: null }),
@@ -156,7 +153,7 @@ describe('GroupList', () => {
   });
 
   it('opens new window at correct URL when "New private group" is clicked', () => {
-    fakeServiceUrl
+    fakeStore.getLink
       .withArgs('groups.new')
       .returns('https://example.com/groups/new');
     fakeStore.profile.returns({ userid: 'jsmith@hypothes.is' });

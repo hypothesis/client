@@ -15,7 +15,6 @@ describe('AnnotationHeader', () => {
   let fakeIsReply;
   let fakeHasBeenEdited;
   let fakeIsPrivate;
-  let fakeServiceUrl;
   let fakeSettings;
   let fakeStore;
 
@@ -26,7 +25,6 @@ describe('AnnotationHeader', () => {
         isEditing={false}
         replyCount={0}
         threadIsCollapsed={false}
-        serviceUrl={fakeServiceUrl}
         settings={fakeSettings}
         {...props}
       />
@@ -47,11 +45,11 @@ describe('AnnotationHeader', () => {
 
     fakeAnnotationDisplayName = sinon.stub().returns('Robbie Burns');
 
-    fakeServiceUrl = sinon.stub().returns('http://example.com');
     fakeSettings = { usernameUrl: 'http://foo.bar/' };
 
     fakeStore = {
       defaultAuthority: sinon.stub().returns('foo.com'),
+      getLink: sinon.stub().returns('http://example.com'),
       isFeatureEnabled: sinon.stub().returns(false),
       route: sinon.stub().returns('sidebar'),
       setExpanded: sinon.stub(),

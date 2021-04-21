@@ -7,30 +7,20 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 describe('TagList', () => {
-  let fakeServiceUrl;
   let fakeIsThirdPartyUser;
   let fakeStore;
   const fakeTags = ['tag1', 'tag2'];
 
   function createComponent(props) {
-    return mount(
-      <TagList
-        // props
-        annotation={{}}
-        tags={fakeTags}
-        // service props
-        serviceUrl={fakeServiceUrl}
-        {...props}
-      />
-    );
+    return mount(<TagList annotation={{}} tags={fakeTags} {...props} />);
   }
 
   beforeEach(() => {
-    fakeServiceUrl = sinon.stub().returns('http://serviceurl.com');
     fakeIsThirdPartyUser = sinon.stub().returns(false);
 
     fakeStore = {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
+      getLink: sinon.stub().returns('http://serviceurl.com'),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -66,10 +56,10 @@ describe('TagList', () => {
       });
     });
 
-    it('calls fakeServiceUrl()', () => {
+    it('gets the links for tags', () => {
       createComponent();
-      assert.calledWith(fakeServiceUrl, 'search.tag', { tag: 'tag1' });
-      assert.calledWith(fakeServiceUrl, 'search.tag', { tag: 'tag2' });
+      assert.calledWith(fakeStore.getLink, 'search.tag', { tag: 'tag1' });
+      assert.calledWith(fakeStore.getLink, 'search.tag', { tag: 'tag2' });
     });
   });
 
@@ -87,9 +77,9 @@ describe('TagList', () => {
       });
     });
 
-    it('does not call fakeServiceUrl()', () => {
+    it('does not fetch tag link', () => {
       createComponent();
-      assert.notCalled(fakeServiceUrl);
+      assert.notCalled(fakeStore.getLink);
     });
   });
 

@@ -43,7 +43,6 @@ describe('sidebar/services/groups', function () {
   let fakeSession;
   let fakeSettings;
   let fakeApi;
-  let fakeServiceUrl;
   let fakeMetadata;
   let fakeToastMessenger;
 
@@ -120,7 +119,6 @@ describe('sidebar/services/groups', function () {
         },
       },
     };
-    fakeServiceUrl = sinon.stub();
     fakeSettings = { group: null };
 
     $imports.$mock({
@@ -136,7 +134,6 @@ describe('sidebar/services/groups', function () {
     return groups(
       fakeStore,
       fakeApi,
-      fakeServiceUrl,
       fakeSession,
       fakeSettings,
       fakeToastMessenger,

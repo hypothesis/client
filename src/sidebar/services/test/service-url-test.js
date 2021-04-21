@@ -1,164 +1,48 @@
-import serviceUrlFactory from '../service-url';
-import { $imports } from '../service-url';
+import { ServiceURLService } from '../service-url';
 
-/** Return a fake store object. */
-function fakeStore() {
-  let links = null;
-  return {
-    updateLinks: function (newLinks) {
-      links = newLinks;
-    },
-    getState: function () {
-      return { links: links };
-    },
-  };
-}
+const links = {
+  'account.settings': 'https://hypothes.is/account/settings',
+};
 
-function createServiceUrl(linksPromise) {
-  const replaceURLParams = sinon
-    .stub()
-    .returns({ url: 'EXPANDED_URL', params: {} });
+describe('ServiceURLService', () => {
+  let fakeStore;
+  let fakeAPIRoutes;
 
-  $imports.$mock({
-    '../util/url': { replaceURLParams: replaceURLParams },
-  });
+  beforeEach(() => {
+    fakeStore = {
+      updateLinks: sinon.stub(),
+    };
+    fakeAPIRoutes = {
+      links: sinon.stub().resolves(links),
+    };
 
-  const store = fakeStore();
-
-  const apiRoutes = {
-    links: sinon.stub().returns(linksPromise),
-  };
-
-  return {
-    store: store,
-    apiRoutes,
-    serviceUrl: serviceUrlFactory(store, apiRoutes),
-    replaceURLParams: replaceURLParams,
-  };
-}
-
-describe('sidebar.service-url', function () {
-  beforeEach(function () {
     sinon.stub(console, 'warn');
   });
 
-  afterEach(function () {
+  afterEach(() => {
     console.warn.restore();
-    $imports.$restore();
   });
 
-  context('before the API response has been received', function () {
-    let serviceUrl;
-    let apiRoutes;
+  describe('#init', () => {
+    it('fetches links and updates store with response', async () => {
+      const service = new ServiceURLService(fakeAPIRoutes, fakeStore);
 
-    beforeEach(function () {
-      // Create a serviceUrl function with an unresolved Promise that will
-      // never be resolved - it never receives the links from store.links().
-      const parts = createServiceUrl(new Promise(function () {}));
+      await service.init();
 
-      serviceUrl = parts.serviceUrl;
-      apiRoutes = parts.apiRoutes;
+      assert.calledWith(fakeStore.updateLinks, links);
     });
 
-    it('sends one API request for the links at boot time', function () {
-      assert.calledOnce(apiRoutes.links);
-      assert.isTrue(apiRoutes.links.calledWithExactly());
-    });
+    it('logs a warning if links cannot be fetched', async () => {
+      fakeAPIRoutes.links.returns(Promise.reject(new Error('Fetch failed')));
+      const service = new ServiceURLService(fakeAPIRoutes, fakeStore);
 
-    it('returns an empty string for any link', function () {
-      assert.equal(serviceUrl('foo'), '');
-    });
+      await service.init();
 
-    it('returns an empty string even if link params are given', function () {
-      assert.equal(serviceUrl('foo', { bar: 'bar' }), '');
-    });
-  });
-
-  context('after the API response has been received', function () {
-    let store;
-    let linksPromise;
-    let replaceURLParams;
-    let serviceUrl;
-
-    beforeEach(function () {
-      // The links Promise that store.links() will return.
-      linksPromise = Promise.resolve({
-        first_link: 'http://example.com/first_page/:foo',
-        second_link: 'http://example.com/second_page',
-      });
-
-      const parts = createServiceUrl(linksPromise);
-
-      store = parts.store;
-      serviceUrl = parts.serviceUrl;
-      replaceURLParams = parts.replaceURLParams;
-    });
-
-    it('updates store with the real links', function () {
-      return linksPromise.then(function (links) {
-        assert.deepEqual(store.getState(), { links: links });
-      });
-    });
-
-    it('calls replaceURLParams with the path and given params', function () {
-      return linksPromise.then(function () {
-        const params = { foo: 'bar' };
-
-        serviceUrl('first_link', params);
-
-        assert.calledOnce(replaceURLParams);
-        assert.deepEqual(replaceURLParams.args[0], [
-          'http://example.com/first_page/:foo',
-          params,
-        ]);
-      });
-    });
-
-    it('passes an empty params object to replaceURLParams if no params are given', function () {
-      return linksPromise.then(function () {
-        serviceUrl('first_link');
-
-        assert.calledOnce(replaceURLParams);
-        assert.deepEqual(replaceURLParams.args[0][1], {});
-      });
-    });
-
-    it('returns the expanded URL from replaceURLParams', function () {
-      return linksPromise.then(function () {
-        const renderedUrl = serviceUrl('first_link');
-
-        assert.equal(renderedUrl, 'EXPANDED_URL');
-      });
-    });
-
-    it("throws an error if it doesn't have the requested link", function () {
-      return linksPromise.then(function () {
-        assert.throws(
-          function () {
-            serviceUrl('madeUpLinkName');
-          },
-          Error,
-          'Unknown link madeUpLinkName'
-        );
-      });
-    });
-
-    it('throws an error if replaceURLParams returns unused params', function () {
-      const params = { unused_param_1: 'foo', unused_param_2: 'bar' };
-      replaceURLParams.returns({
-        url: 'EXPANDED_URL',
-        params: params,
-      });
-
-      return linksPromise.then(function () {
-        assert.throws(
-          function () {
-            serviceUrl('first_link', params);
-          },
-          Error,
-          'Unknown link parameters: unused_param_1, unused_param_2'
-        );
-      });
+      assert.notCalled(fakeStore.updateLinks);
+      assert.calledWith(
+        console.warn,
+        'Failed to fetch Hypothesis links: Fetch failed'
+      );
     });
   });
 });

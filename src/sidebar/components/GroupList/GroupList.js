@@ -16,7 +16,6 @@ import GroupListSection from './GroupListSection';
 /**
  * @typedef {import('../../../types/config').MergedConfig} MergedConfig
  * @typedef {import('../../../types/api').Group} Group
- * @typedef {import('../../services/service-url').ServiceUrlGetter} ServiceUrlGetter
  */
 
 /**
@@ -30,7 +29,6 @@ function publisherProvidedIcon(settings) {
 
 /**
  * @typedef GroupListProps
- * @prop {ServiceUrlGetter} serviceUrl
  * @prop {MergedConfig} settings
  */
 
@@ -40,7 +38,7 @@ function publisherProvidedIcon(settings) {
  *
  * @param {GroupListProps} props
  */
-function GroupList({ serviceUrl, settings }) {
+function GroupList({ settings }) {
   const store = useStoreProxy();
   const currentGroups = store.getCurrentlyViewingGroups();
   const featuredGroups = store.getFeaturedGroups();
@@ -65,7 +63,7 @@ function GroupList({ serviceUrl, settings }) {
   const defaultAuthority = store.defaultAuthority();
   const canCreateNewGroup =
     userid && !isThirdPartyUser(userid, defaultAuthority);
-  const newGroupLink = serviceUrl('groups.new');
+  const newGroupLink = store.getLink('groups.new');
 
   // The group whose submenu is currently open, or `null` if no group item is
   // currently expanded.
@@ -150,6 +148,6 @@ function GroupList({ serviceUrl, settings }) {
   );
 }
 
-GroupList.injectedProps = ['serviceUrl', 'settings'];
+GroupList.injectedProps = ['settings'];
 
 export default withServices(GroupList);
