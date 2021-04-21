@@ -65,12 +65,19 @@ function setupRoute(groups, session, router) {
  * @param {import('./services/autosave').AutosaveService} autosaveService
  * @param {import('./services/features').FeaturesService} features
  * @param {import('./services/persisted-defaults').PersistedDefaultsService} persistedDefaults
+ * @param {import('./services/service-url').ServiceURLService} serviceURL
  * @inject
  */
-function initServices(autosaveService, features, persistedDefaults) {
+function initServices(
+  autosaveService,
+  features,
+  persistedDefaults,
+  serviceURL
+) {
   autosaveService.init();
   features.init();
   persistedDefaults.init();
+  serviceURL.init();
 }
 
 // @inject
@@ -107,7 +114,7 @@ import loadAnnotationsService from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
 import { PersistedDefaultsService } from './services/persisted-defaults';
 import { RouterService } from './services/router';
-import serviceUrlService from './services/service-url';
+import { ServiceURLService } from './services/service-url';
 import sessionService from './services/session';
 import { StreamFilter } from './services/stream-filter';
 import streamerService from './services/streamer';
@@ -145,7 +152,7 @@ function startApp(config, appEl) {
     .register('localStorage', LocalStorageService)
     .register('persistedDefaults', PersistedDefaultsService)
     .register('router', RouterService)
-    .register('serviceUrl', serviceUrlService)
+    .register('serviceURL', ServiceURLService)
     .register('session', sessionService)
     .register('streamer', streamerService)
     .register('streamFilter', StreamFilter)

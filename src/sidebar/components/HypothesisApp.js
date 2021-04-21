@@ -22,7 +22,6 @@ import TopBar from './TopBar';
 
 /**
  * @typedef {import('../../types/api').Profile} Profile
- * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
  * @typedef {import('../../shared/bridge').default} Bridge
  */
@@ -55,7 +54,6 @@ function authStateFromProfile(profile) {
  * @typedef HypothesisAppProps
  * @prop {import('../services/auth').AuthService} auth
  * @prop {Bridge} bridge
- * @prop {ServiceUrlGetter} serviceUrl
  * @prop {MergedConfig} settings
  * @prop {Object} session
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
@@ -69,14 +67,7 @@ function authStateFromProfile(profile) {
  *
  * @param {HypothesisAppProps} props
  */
-function HypothesisApp({
-  auth,
-  bridge,
-  serviceUrl,
-  settings,
-  session,
-  toastMessenger,
-}) {
+function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
   const store = useStoreProxy();
   const hasFetchedProfile = store.hasFetchedProfile();
   const profile = store.profile();
@@ -127,7 +118,7 @@ function HypothesisApp({
       bridge.call(bridgeEvents.SIGNUP_REQUESTED);
       return;
     }
-    window.open(serviceUrl('signup'));
+    window.open(store.getLink('signup'));
   };
 
   const promptToLogout = async () => {
@@ -211,7 +202,6 @@ function HypothesisApp({
 HypothesisApp.injectedProps = [
   'auth',
   'bridge',
-  'serviceUrl',
   'session',
   'settings',
   'toastMessenger',

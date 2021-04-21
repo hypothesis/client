@@ -1,17 +1,7 @@
+import { actionTypes } from '../util';
+import { replaceURLParams } from '../../util/url';
 import { storeModule } from '../create-store';
 
-import { actionTypes } from '../util';
-
-/**
- * Reducer for storing a "links" object in the Redux state store.
- *
- * The links object is initially null, and can only be updated by completely
- * replacing it with a new links object.
- *
- * Used by serviceUrl.
- */
-
-/** Return the initial links. */
 function init() {
   return null;
 }
@@ -26,12 +16,42 @@ const update = {
 
 const actions = actionTypes(update);
 
-/** Return updated links based on the given current state and action object. */
+/**
+ * Update links
+ *
+ * @param {object} newLinks - Link map returned by the `/api/links` endpoint
+ */
 function updateLinks(newLinks) {
   return {
     type: actions.UPDATE_LINKS,
     newLinks,
   };
+}
+
+/**
+ * Render a service link (URL) using the given `params`
+ *
+ * Returns an empty string if links have not been fetched yet.
+ *
+ * @param {string} linkName
+ * @param {Record<string,string>} params
+ * @return {string}
+ */
+function getLink(state, linkName, params = {}) {
+  if (!state) {
+    return '';
+  }
+  const template = state[linkName];
+  if (!template) {
+    throw new Error(`Unknown link "${linkName}"`);
+  }
+  const { url, params: unusedParams } = replaceURLParams(template, params);
+  if (Object.keys(unusedParams).length > 0) {
+    throw new Error(
+      `Unused parameters: ${Object.keys(unusedParams).join(', ')}`
+    );
+  }
+  return url;
 }
 
 export default storeModule({
@@ -41,5 +61,7 @@ export default storeModule({
   actions: {
     updateLinks,
   },
-  selectors: {},
+  selectors: {
+    getLink,
+  },
 });

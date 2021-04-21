@@ -29,7 +29,6 @@ const DEFAULT_ORGANIZATION = {
 export default function groups(
   store,
   api,
-  serviceUrl,
   session,
   settings,
   toastMessenger,

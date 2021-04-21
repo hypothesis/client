@@ -12,7 +12,6 @@ import MenuItem from './MenuItem';
 import MenuSection from './MenuSection';
 
 /**
- * @typedef {import('../services/service-url').ServiceUrlGetter} ServiceUrlGetter
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
  * /
 
@@ -28,7 +27,6 @@ import MenuSection from './MenuSection';
  * @prop {AuthState} auth - object representing authenticated user and auth status
  * @prop {() => any} onLogout - onClick callback for the "log out" button
  * @prop {Object} bridge
- * @prop {ServiceUrlGetter} serviceUrl
  * @prop {MergedConfig} settings
  */
 
@@ -40,7 +38,7 @@ import MenuSection from './MenuSection';
  *
  * @param {UserMenuProps} props
  */
-function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
+function UserMenu({ auth, bridge, onLogout, settings }) {
   const store = useStoreProxy();
   const defaultAuthority = store.defaultAuthority();
 
@@ -77,7 +75,7 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
     const props = {};
     if (isSelectableProfile) {
       if (!isThirdParty) {
-        props.href = serviceUrl('user', { user: auth.username });
+        props.href = store.getLink('user', { user: auth.username });
       }
       props.onClick = onProfileSelected;
     }
@@ -109,7 +107,7 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
           {!isThirdParty && (
             <MenuItem
               label="Account settings"
-              href={serviceUrl('account.settings')}
+              href={store.getLink('account.settings')}
             />
           )}
           {isNotebookEnabled && (
@@ -129,6 +127,6 @@ function UserMenu({ auth, bridge, onLogout, serviceUrl, settings }) {
   );
 }
 
-UserMenu.injectedProps = ['bridge', 'serviceUrl', 'settings'];
+UserMenu.injectedProps = ['bridge', 'settings'];
 
 export default withServices(UserMenu);

@@ -8,10 +8,11 @@
  *     {url: '/things/foo', params: {q: 'bar'}}
  *
  * @param {string} url
- * @param {Record<string, any>} params
- * @return {{ url: string, params: Record<string, any>}}
+ * @param {Record<string, string>} params
+ * @return {{ url: string, params: Record<string, string>}}
  */
 export function replaceURLParams(url, params) {
+  /** @type {Record<string, string>} */
   const unusedParams = {};
   for (const param in params) {
     if (params.hasOwnProperty(param)) {
