@@ -208,8 +208,8 @@ export default class Sidebar {
     this.guest.crossframe.on('openSidebar', () => this.open());
     this.guest.crossframe.on('closeSidebar', () => this.close());
 
-    // Re-publish the crossframe event so that anything extending Delegator
-    // can subscribe to it (without need for crossframe)
+    // Sidebar listens to the `openNotebook` event coming from the sidebar's
+    // iframe and re-publish it via the emitter to the Notebook
     this.guest.crossframe.on('openNotebook', (
       /** @type {string} */ groupId
     ) => {
