@@ -241,9 +241,6 @@ export default class Sidebar {
   _setupGestures() {
     const toggleButton = this.toolbar.sidebarToggleButton;
     if (toggleButton) {
-      // Prevent any default gestures on the handle.
-      this._listeners.add(toggleButton, 'touchmove', e => e.preventDefault());
-
       this._hammerManager = new Hammer.Manager(toggleButton).on(
         'panstart panend panleft panright',
         /* istanbul ignore next */

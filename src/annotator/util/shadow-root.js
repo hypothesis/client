@@ -49,7 +49,7 @@ export function createShadowRoot(container) {
 }
 
 /**
- * Stop bubbling up of 'click' and 'touchstart' events.
+ * Stop bubbling up of several events.
  *
  * This makes the host page a little bit less aware of the annotator activity.
  * It is still possible for the host page to manipulate the events on the capturing
@@ -64,5 +64,7 @@ export function createShadowRoot(container) {
 function stopEventPropagation(element) {
   element.addEventListener('mouseup', event => event.stopPropagation());
   element.addEventListener('mousedown', event => event.stopPropagation());
-  element.addEventListener('touchstart', event => event.stopPropagation());
+  element.addEventListener('touchstart', event => event.stopPropagation(), {
+    passive: true,
+  });
 }
