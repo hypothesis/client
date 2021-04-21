@@ -180,11 +180,10 @@ export class AuthService extends TinyEmitter {
     /**
      * Exchange authorization code retrieved from login popup for a new
      * access token.
+     *
+     * @param {string} code
      */
-    const exchangeAuthCodeForToken = async () => {
-      const code = /** @type {string} */ (authCode);
-      authCode = null; // Auth codes can only be used once.
-
+    const exchangeAuthCodeForToken = async code => {
       const client = await oauthClient();
       const tokenInfo = await client.exchangeAuthCode(code);
       saveToken(tokenInfo);
@@ -192,17 +191,23 @@ export class AuthService extends TinyEmitter {
     };
 
     /**
+     * Return the grant token provided by the host page or parent frame used
+     * for automatic login. This will be:
+     *  - `undefined` if automatic login is not used
+     *  - `null` if automatic login is used but the user is not logged in
+     *  - a non-empty string if automatic login is used and the user is logged in
+     */
+    const getGrantToken = () => serviceConfig(settings)?.grantToken;
+
+    /**
      * Retrieve an access token for the API.
      *
      * @return {Promise<string|null>} The API access token or `null` if not logged in.
      */
     const getAccessToken = async () => {
-      // Step 1: Determine how to get an access token, depending on the login
-      // method being used.
+      // Determine how to get an access token, depending on the login method being used.
       if (!tokenInfoPromise) {
-        // Check if automatic login is being used, indicated by the presence of
-        // the 'grantToken' property in the service configuration.
-        const grantToken = serviceConfig(settings)?.grantToken;
+        const grantToken = getGrantToken();
         if (typeof grantToken !== 'undefined') {
           if (grantToken) {
             // User is logged-in on the publisher's website.
@@ -220,14 +225,16 @@ export class AuthService extends TinyEmitter {
             tokenInfoPromise = Promise.resolve(null);
           }
         } else if (authCode) {
-          tokenInfoPromise = exchangeAuthCodeForToken();
+          tokenInfoPromise = exchangeAuthCodeForToken(authCode);
+          authCode = null; // Auth codes can only be used once.
         } else {
           // Attempt to load the tokens from the previous session.
           tokenInfoPromise = Promise.resolve(loadToken());
         }
       }
 
-      // Step 2: Wait for the token to be fetched
+      // Wait for the token to be fetched, and check that it is valid and that
+      // it wasn't invalidated while it was being fetched.
       const origToken = tokenInfoPromise;
       const token = await tokenInfoPromise;
 
@@ -236,7 +243,6 @@ export class AuthService extends TinyEmitter {
         return null;
       }
 
-      // Step 3: Re-fetch the token if it is no longer valid
       if (origToken !== tokenInfoPromise) {
         // The token source was changed while waiting for the token to be fetched.
         // This can happen for various reasons. We'll just need to try again.
@@ -245,19 +251,14 @@ export class AuthService extends TinyEmitter {
 
       if (Date.now() > token.expiresAt) {
         // Token has expired, so we need to fetch a new one.
-        const usingGrantToken =
-          typeof serviceConfig(settings)?.grantToken === 'string';
-
+        const grantToken = getGrantToken();
         tokenInfoPromise = refreshAccessToken(token.refreshToken, {
-          // If we are using automatic login via a grant token, do not persist the
-          // initial access token or refreshed tokens.
-          persist: !usingGrantToken,
+          // Only persist tokens if automatic login is not being used.
+          persist: typeof grantToken === 'undefined',
         });
-
         return getAccessToken();
       }
 
-      // Step 4: If the token was valid, return it
       return token.accessToken;
     };
 
