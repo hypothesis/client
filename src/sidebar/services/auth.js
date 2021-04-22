@@ -208,7 +208,7 @@ export class AuthService extends TinyEmitter {
       // Determine how to get an access token, depending on the login method being used.
       if (!tokenInfoPromise) {
         const grantToken = getGrantToken();
-        if (typeof grantToken !== 'undefined') {
+        if (grantToken !== undefined) {
           if (grantToken) {
             // User is logged-in on the publisher's website.
             // Exchange the grant token for a new access token.
