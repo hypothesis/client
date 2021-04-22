@@ -119,7 +119,7 @@ import { LocalStorageService } from './services/local-storage';
 import { PersistedDefaultsService } from './services/persisted-defaults';
 import { RouterService } from './services/router';
 import { ServiceURLService } from './services/service-url';
-import sessionService from './services/session';
+import { SessionService } from './services/session';
 import { StreamFilter } from './services/stream-filter';
 import streamerService from './services/streamer';
 import { TagsService } from './services/tags';
@@ -157,7 +157,7 @@ function startApp(config, appEl) {
     .register('persistedDefaults', PersistedDefaultsService)
     .register('router', RouterService)
     .register('serviceURL', ServiceURLService)
-    .register('session', sessionService)
+    .register('session', SessionService)
     .register('streamer', streamerService)
     .register('streamFilter', StreamFilter)
     .register('tags', TagsService)
