@@ -1,24 +1,17 @@
 import EventEmitter from 'tiny-emitter';
 
 import { SessionService, $imports } from '../session';
-import { Injector } from '../../../shared/injector';
 
-describe('SessionService', function () {
+describe('SessionService', () => {
+  let fakeApi;
   let fakeAuth;
   let fakeSentry;
   let fakeServiceConfig;
   let fakeSettings;
   let fakeStore;
   let fakeToastMessenger;
-  let fakeApi;
-  let sandbox;
 
-  // The instance of the `session` service.
-  let session;
-
-  beforeEach(function () {
-    sandbox = sinon.createSandbox();
-
+  beforeEach(() => {
     let currentProfile = {
       userid: null,
     };
@@ -30,47 +23,59 @@ describe('SessionService', function () {
       }),
     };
     fakeAuth = Object.assign(new EventEmitter(), {
-      login: sandbox.stub().returns(Promise.resolve()),
+      login: sinon.stub().returns(Promise.resolve()),
       logout: sinon.stub().resolves(),
     });
     fakeSentry = {
-      setUserInfo: sandbox.spy(),
+      setUserInfo: sinon.spy(),
     };
     fakeApi = {
       profile: {
-        read: sandbox.stub().resolves(),
-        update: sandbox.stub().resolves({}),
+        read: sinon.stub().resolves(),
+        update: sinon.stub().resolves({}),
       },
     };
     fakeServiceConfig = sinon.stub().returns(null);
     fakeSettings = {
       serviceUrl: 'https://test.hypothes.is/root/',
     };
-    fakeToastMessenger = { error: sandbox.spy() };
+    fakeToastMessenger = { error: sinon.spy() };
+
+    const retryPromiseOperation = async callback => {
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        try {
+          return await callback();
+        } catch (err) {
+          // Try again
+        }
+      }
+    };
 
     $imports.$mock({
       '../config/service-config': fakeServiceConfig,
+      '../util/retry': { retryPromiseOperation },
       '../util/sentry': fakeSentry,
     });
-
-    session = new Injector()
-      .register('store', { value: fakeStore })
-      .register('api', { value: fakeApi })
-      .register('auth', { value: fakeAuth })
-      .register('settings', { value: fakeSettings })
-      .register('session', SessionService)
-      .register('toastMessenger', { value: fakeToastMessenger })
-      .get('session');
   });
 
-  afterEach(function () {
+  afterEach(() => {
     $imports.$restore();
-    sandbox.restore();
   });
 
-  describe('#load', function () {
-    context('when the host page provides an OAuth grant token', function () {
-      beforeEach(function () {
+  function createService() {
+    return new SessionService(
+      fakeStore,
+      fakeApi,
+      fakeAuth,
+      fakeSettings,
+      fakeToastMessenger
+    );
+  }
+
+  describe('#load', () => {
+    context('when the host page provides an OAuth grant token', () => {
+      beforeEach(() => {
         fakeServiceConfig.returns({
           authority: 'publisher.org',
           grantToken: 'a.jwt.token',
@@ -82,16 +87,18 @@ describe('SessionService', function () {
         );
       });
 
-      it('should pass the "authority" param when fetching the profile', function () {
-        return session.load().then(function () {
+      it('should pass the "authority" param when fetching the profile', () => {
+        const session = createService();
+        return session.load().then(() => {
           assert.calledWith(fakeApi.profile.read, {
             authority: 'publisher.org',
           });
         });
       });
 
-      it('should update the session with the profile data from the API', function () {
-        return session.load().then(function () {
+      it('should update the session with the profile data from the API', () => {
+        const session = createService();
+        return session.load().then(() => {
           assert.calledWith(fakeStore.updateProfile, {
             userid: 'acct:user@publisher.org',
           });
@@ -117,6 +124,7 @@ describe('SessionService', function () {
       });
 
       it('should fetch profile data from the API', () => {
+        const session = createService();
         return session.load().then(() => {
           assert.calledWith(fakeApi.profile.read);
         });
@@ -133,9 +141,7 @@ describe('SessionService', function () {
           .returns(Promise.reject(new Error('Server error')));
         fakeApi.profile.read.onCall(1).returns(Promise.resolve(fetchedProfile));
 
-        // Shorten the delay before retrying the fetch.
-        session.profileFetchRetryOpts.minTimeout = 50;
-
+        const session = createService();
         return session.load().then(() => {
           assert.calledOnce(fakeStore.updateProfile);
           assert.calledWith(fakeStore.updateProfile, fetchedProfile);
@@ -143,7 +149,8 @@ describe('SessionService', function () {
       });
 
       it('should update the session with the profile data from the API', () => {
-        return session.load().then(function () {
+        const session = createService();
+        return session.load().then(() => {
           assert.calledOnce(fakeStore.updateProfile);
           assert.calledWith(fakeStore.updateProfile, {
             userid: 'acct:user@hypothes.is',
@@ -152,6 +159,7 @@ describe('SessionService', function () {
       });
 
       it('should cache the returned profile data', () => {
+        const session = createService();
         return session
           .load()
           .then(() => {
@@ -166,6 +174,7 @@ describe('SessionService', function () {
         clock = sinon.useFakeTimers();
         const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+        const session = createService();
         return session
           .load()
           .then(() => {
@@ -179,8 +188,9 @@ describe('SessionService', function () {
     });
   });
 
-  describe('#update', function () {
-    it('updates the user ID for Sentry error reports', function () {
+  describe('#update', () => {
+    it('updates the user ID for Sentry error reports', () => {
+      const session = createService();
       session.update({
         userid: 'anne',
       });
@@ -190,8 +200,8 @@ describe('SessionService', function () {
     });
   });
 
-  describe('#dismissSidebarTutorial', function () {
-    beforeEach(function () {
+  describe('#dismissSidebarTutorial', () => {
+    beforeEach(() => {
       fakeApi.profile.update.returns(
         Promise.resolve({
           preferences: {},
@@ -199,7 +209,8 @@ describe('SessionService', function () {
       );
     });
 
-    it('disables the tutorial for the user', function () {
+    it('disables the tutorial for the user', () => {
+      const session = createService();
       session.dismissSidebarTutorial();
       assert.calledWith(
         fakeApi.profile.update,
@@ -208,8 +219,9 @@ describe('SessionService', function () {
       );
     });
 
-    it('should update the session with the response from the API', function () {
-      return session.dismissSidebarTutorial().then(function () {
+    it('should update the session with the response from the API', () => {
+      const session = createService();
+      return session.dismissSidebarTutorial().then(() => {
         assert.calledOnce(fakeStore.updateProfile);
         assert.calledWith(fakeStore.updateProfile, {
           preferences: {},
@@ -226,6 +238,7 @@ describe('SessionService', function () {
           userid: 'acct:user_a@hypothes.is',
         })
       );
+      const session = createService();
       return session.load();
     });
 
@@ -238,6 +251,7 @@ describe('SessionService', function () {
 
       fakeStore.updateProfile.resetHistory();
 
+      const session = createService();
       return session.reload().then(() => {
         assert.calledOnce(fakeStore.updateProfile);
         assert.calledWith(fakeStore.updateProfile, {
@@ -247,7 +261,7 @@ describe('SessionService', function () {
     });
   });
 
-  describe('#logout', function () {
+  describe('#logout', () => {
     const loggedOutProfile = {
       userid: null,
 
@@ -261,12 +275,14 @@ describe('SessionService', function () {
     });
 
     it('logs the user out', () => {
+      const session = createService();
       return session.logout().then(() => {
         assert.called(fakeAuth.logout);
       });
     });
 
     it('updates the profile after logging out', () => {
+      const session = createService();
       return session.logout().then(() => {
         assert.calledOnce(fakeStore.updateProfile);
         assert.calledWith(fakeStore.updateProfile, loggedOutProfile);
@@ -275,6 +291,7 @@ describe('SessionService', function () {
 
     it('displays an error if logging out fails', async () => {
       fakeAuth.logout.rejects(new Error('Could not revoke token'));
+      const session = createService();
       try {
         await session.logout();
       } catch (e) {
@@ -292,6 +309,7 @@ describe('SessionService', function () {
         })
       );
 
+      const session = createService();
       return session
         .load()
         .then(() => {
