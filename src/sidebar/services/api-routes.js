@@ -1,17 +1,23 @@
 import { retryPromiseOperation } from '../util/retry';
 
-/** @param {string} url */
+/**
+ * Fetch an API metadata file, retrying the operation if it fails.
+ *
+ * @param {string} url
+ */
 function getJSON(url) {
-  // nb. The `/api/` and `/api/links` routes are fetched without specifying
-  // any additional headers/config so that we can use `<link rel="preload">` in
-  // the `/app.html` response to fetch them early, while the client JS app
-  // is loading.
-  return fetch(url).then(response => {
-    if (response.status !== 200) {
-      throw new Error(`Fetching ${url} failed`);
-    }
-    return response.json();
-  });
+  return retryPromiseOperation(() =>
+    // nb. The `/api/` and `/api/links` routes are fetched without specifying
+    // any additional headers/config so that we can use `<link rel="preload">` in
+    // the `/app.html` response to fetch them early, while the client JS app
+    // is loading.
+    fetch(url).then(response => {
+      if (response.status !== 200) {
+        throw new Error(`Fetching ${url} failed`);
+      }
+      return response.json();
+    })
+  );
 }
 
 /**
@@ -47,9 +53,7 @@ export class APIRoutesService {
    */
   routes() {
     if (!this._routeCache) {
-      this._routeCache = retryPromiseOperation(() =>
-        getJSON(this._apiUrl)
-      ).then(index => index.links);
+      this._routeCache = getJSON(this._apiUrl).then(index => index.links);
     }
     return this._routeCache;
   }
@@ -61,9 +65,9 @@ export class APIRoutesService {
    */
   links() {
     if (!this._linkCache) {
-      this._linkCache = this.routes().then(routes => {
-        return getJSON(/** @type {string} */ (routes.links.url));
-      });
+      this._linkCache = this.routes().then(routes =>
+        getJSON(/** @type {string} */ (routes.links.url))
+      );
     }
     return this._linkCache;
   }

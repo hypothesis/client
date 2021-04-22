@@ -133,5 +133,17 @@ describe('APIRoutesService', () => {
         }
       );
     });
+
+    it('retries the link fetch until it succeeds', async () => {
+      window.fetch
+        .withArgs(apiIndexResponse.links.links.url)
+        .onFirstCall()
+        .returns(httpResponse(500, null));
+
+      const links = await apiRoutes.links();
+
+      assert.equal(window.fetch.callCount, 3); // One `/api` fetch, two `/api/links` fetches.
+      assert.deepEqual(links, linksResponse);
+    });
   });
 });
