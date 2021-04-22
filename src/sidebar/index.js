@@ -46,7 +46,7 @@ function setupApi(api, streamer) {
  * route to match the current URL.
  *
  * @param {Object} groups
- * @param {Object} session
+ * @param {import('./services/session').SessionService} session
  * @param {import('./services/router').RouterService} router
  */
 // @inject
