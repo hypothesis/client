@@ -14,7 +14,7 @@ import { replaceURLParams } from '../util/url';
  */
 function translateResponseToError(response, data) {
   let message = response.status + ' ' + response.statusText;
-  if (data && data.reason) {
+  if (data?.reason) {
     message = message + ': ' + data.reason;
   }
   return new Error(message);
@@ -24,7 +24,7 @@ function translateResponseToError(response, data) {
  * Return a shallow clone of `obj` with all client-only properties removed.
  * Client-only properties are marked by a '$' prefix.
  *
- * @param {Object} obj
+ * @param {object} obj
  */
 function stripInternalProperties(obj) {
   const result = {};
@@ -61,7 +61,7 @@ function stripInternalProperties(obj) {
  *
  * @callback APICallFunction
  * @param {Record<string, any>} params - A map of URL and query string parameters to include with the request.
- * @param {Object} [data] - The body of the request.
+ * @param {object} [data] - The body of the request.
  * @param {APICallOptions} [options]
  * @return {Promise<any|APIResponse>}
  */
@@ -69,7 +69,7 @@ function stripInternalProperties(obj) {
 /**
  * Callbacks invoked at various points during an API call to get an access token etc.
  *
- * @typedef {Object} APIMethodCallbacks
+ * @typedef APIMethodCallbacks
  * @prop {() => Promise<string|null>} getAccessToken -
  *   Function which acquires a valid access token for making an API request.
  * @prop {() => string|null} getClientId -
@@ -193,44 +193,41 @@ function createAPICall(
  * });
  * ```
  *
- * This service handles authenticated calls to the API, using the `auth` service
- * to get auth tokens. The URLs for API endpoints are fetched from the `/api`
- * endpoint, a responsibility delegated to the `apiRoutes` service which does
- * not use authentication.
- *
- * @param {import('./api-routes').APIRoutesService} apiRoutes
- * @param {import('./auth').AuthService} auth
+ * This service makes authenticated calls to the API, using `AuthService`
+ * to get auth tokens. The URLs for API endpoints are provided by the `APIRoutesService`
+ * service.
  */
 // @inject
-export default function api(apiRoutes, auth, store) {
-  const links = apiRoutes.routes();
-  let clientId = null;
+export class APIService {
+  /**
+   * @param {import('./api-routes').APIRoutesService} apiRoutes
+   * @param {import('./auth').AuthService} auth
+   * @param {import('../store').SidebarStore} store
+   */
+  constructor(apiRoutes, auth, store) {
+    const links = apiRoutes.routes();
 
-  const getClientId = () => clientId;
-
-  function apiCall(route) {
-    return createAPICall(links, route, {
-      getAccessToken: auth.getAccessToken,
-      getClientId,
-      onRequestStarted: store.apiRequestStarted,
-      onRequestFinished: store.apiRequestFinished,
-    });
-  }
-
-  return {
     /**
-     * Set the "client ID" sent with API requests.
+     * Client session identifier included with requests. Used by the backend
+     * to associate API requests with WebSocket connections from the same client.
      *
-     * This is a per-session unique ID which the client sends with REST API
-     * requests and in the configuration for the real-time API to prevent the
-     * client from receiving real-time notifications about its own actions.
+     * @type {string|null}
      */
-    setClientId(clientId_) {
-      clientId = clientId_;
-    },
+    this._clientId = null;
 
-    search: apiCall('search'),
-    annotation: {
+    const getClientId = () => this._clientId;
+
+    /** @param {string} route */
+    const apiCall = route =>
+      createAPICall(links, route, {
+        getAccessToken: auth.getAccessToken,
+        getClientId,
+        onRequestStarted: store.apiRequestStarted,
+        onRequestFinished: store.apiRequestFinished,
+      });
+
+    this.search = apiCall('search');
+    this.annotation = {
       create: apiCall('annotation.create'),
       delete: apiCall('annotation.delete'),
       get: apiCall('annotation.read'),
@@ -238,25 +235,35 @@ export default function api(apiRoutes, auth, store) {
       flag: apiCall('annotation.flag'),
       hide: apiCall('annotation.hide'),
       unhide: apiCall('annotation.unhide'),
-    },
-    group: {
+    };
+    this.group = {
       member: {
         delete: apiCall('group.member.delete'),
       },
       read: apiCall('group.read'),
-    },
-    groups: {
+    };
+    this.groups = {
       list: apiCall('groups.read'),
-    },
-    profile: {
+    };
+    this.profile = {
       groups: {
         read: apiCall('profile.groups.read'),
       },
       read: apiCall('profile.read'),
       update: apiCall('profile.update'),
-    },
+    };
+  }
 
-    // The `links` endpoint is not included here. Clients should fetch these
-    // from the `apiRoutes` service.
-  };
+  /**
+   * Set the "client ID" sent with API requests.
+   *
+   * This is a per-session unique ID which the client sends with REST API
+   * requests and in the configuration for the real-time API to prevent the
+   * client from receiving real-time notifications about its own actions.
+   *
+   * @param {string} clientId
+   */
+  setClientId(clientId) {
+    this._clientId = clientId;
+  }
 }

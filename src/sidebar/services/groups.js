@@ -22,6 +22,7 @@ const DEFAULT_ORGANIZATION = {
 
 /**
  * @param {import('../store').SidebarStore} store
+ * @param {import('./api').APIService} api
  * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
  * @param {import('./auth').AuthService} auth
  */

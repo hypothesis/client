@@ -13,7 +13,7 @@ import { withServices } from '../service-context';
  * @prop {Annotation} annotation -
  *   The annotation object for this banner. This contains state about the flag count
  *   or its hidden value.
- * @prop {Object} api - Injected service
+ * @prop {import('../services/api').APIService} api
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 

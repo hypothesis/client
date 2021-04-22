@@ -1,6 +1,6 @@
 import fetchMock from 'fetch-mock';
 
-import apiFactory from '../api';
+import { APIService } from '../api';
 
 // API route directory.
 //
@@ -13,7 +13,7 @@ import apiFactory from '../api';
 //
 const routes = require('./api-index.json').links;
 
-describe('sidebar.services.api', function () {
+describe('APIService', () => {
   let fakeAuth;
   let fakeStore;
   let api;
@@ -72,7 +72,7 @@ describe('sidebar.services.api', function () {
       apiRequestFinished: sinon.stub(),
     };
 
-    api = apiFactory(fakeApiRoutes, fakeAuth, fakeStore);
+    api = new APIService(fakeApiRoutes, fakeAuth, fakeStore);
 
     fetchMock.catch(() => {
       throw new Error('Unexpected `fetch` call');
