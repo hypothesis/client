@@ -21,74 +21,57 @@ const DEFAULT_ORGANIZATION = {
 };
 
 /**
- * @param {import('../store').SidebarStore} store
- * @param {import('./api').APIService} api
- * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
- * @param {import('./auth').AuthService} auth
+ * For any group that does not have an associated organization, populate with
+ * the default Hypothesis organization.
+ *
+ * Mutates group objects in place
+ *
+ * @param {Group[]} groups
  */
-// @inject
-export default function groups(
-  store,
-  api,
-  session,
-  settings,
-  toastMessenger,
-  auth
-) {
-  const svc = serviceConfig(settings);
-  const authority = svc ? svc.authority : null;
+function injectOrganizations(groups) {
+  groups.forEach(group => {
+    if (!group.organization || typeof group.organization !== 'object') {
+      group.organization = DEFAULT_ORGANIZATION;
+    }
+  });
+}
 
-  // `expand` parameter for various groups API calls.
-  const expandParam = ['organization', 'scopes'];
+// `expand` parameter for various groups API calls.
+const expandParam = ['organization', 'scopes'];
+
+/**
+ * Service for fetching groups from the API and adding them to the store.
+ *
+ * The service also provides a `focus` method for switching the active group
+ * and `leave` method to remove the current user from a private group.
+ *
+ * @inject
+ */
+export class GroupsService {
+  /**
+   * @param {import('../store').SidebarStore} store
+   * @param {import('./api').APIService} api
+   * @param {import('./session').SessionService} session
+   * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
+   * @param {import('./auth').AuthService} auth
+   */
+  constructor(store, api, session, settings, toastMessenger, auth) {
+    this._api = api;
+    this._auth = auth;
+    this._settings = settings;
+    this._store = store;
+    this._toastMessenger = toastMessenger;
+
+    this._serviceConfig = serviceConfig(settings);
+    this._reloadSetUp = false;
+  }
 
   /**
    * Return the main document URI that is used to fetch groups associated with
    * the site that the user is on.
    */
-  function mainUri() {
-    const mainFrame = store.mainFrame();
-    if (!mainFrame) {
-      return null;
-    }
-    return mainFrame.uri;
-  }
-
-  function getDocumentUriForGroupSearch() {
-    return awaitStateChange(store, mainUri);
-  }
-
-  /**
-   * Update the focused group. Update the store, then check to see if
-   * there are any new (unsaved) annotations—if so, update those annotations
-   * such that they are associated with the newly-focused group.
-   */
-  function focus(groupId) {
-    const prevGroupId = store.focusedGroupId();
-
-    store.focusGroup(groupId);
-
-    const newGroupId = store.focusedGroupId();
-
-    const groupHasChanged = prevGroupId !== newGroupId && prevGroupId !== null;
-    if (groupHasChanged) {
-      // Move any top-level new annotations to the newly-focused group.
-      // Leave replies where they are.
-      const updatedAnnotations = [];
-      store.newAnnotations().forEach(annot => {
-        if (!isReply(annot)) {
-          updatedAnnotations.push(
-            Object.assign({}, annot, { group: newGroupId })
-          );
-        }
-      });
-
-      if (updatedAnnotations.length) {
-        store.addAnnotations(updatedAnnotations);
-      }
-
-      // Persist this group as the last focused group default
-      store.setDefault('focusedGroup', newGroupId);
-    }
+  _mainURI() {
+    return this._store.mainFrame()?.uri ?? null;
   }
 
   /**
@@ -103,7 +86,7 @@ export default function groups(
    * @param {string|null} directLinkedGroupId
    * @return {Promise<Group[]>}
    */
-  async function filterGroups(
+  async _filterGroups(
     groups,
     isLoggedIn,
     directLinkedAnnotationGroupId,
@@ -119,7 +102,7 @@ export default function groups(
         directLinkedGroup.scopes.enforced
       ) {
         groups = groups.filter(g => g.id !== directLinkedGroupId);
-        store.setDirectLinkedGroupFetchFailed();
+        this._store.setDirectLinkedGroupFetchFailed();
         directLinkedGroupId = null;
       }
     }
@@ -152,19 +135,70 @@ export default function groups(
   }
 
   /**
-   * For any group that does not have an associated organization, populate with
-   * the default Hypothesis organization.
-   *
-   * Mutates group objects in place
+   * Set up automatic re-fetching of groups in response to various events
+   * in the sidebar.
+   */
+  _setupAutoReload() {
+    if (this._reloadSetUp) {
+      return;
+    }
+    this._reloadSetUp = true;
+
+    // Reload groups when main document URI changes.
+    watch(
+      this._store.subscribe,
+      () => this._mainURI(),
+      () => {
+        this.load();
+      }
+    );
+
+    // Reload groups when user ID changes. This is a bit inefficient since it
+    // means we are not fetching the groups and profile concurrently after
+    // logging in or logging out.
+    watch(
+      this._store.subscribe,
+      [
+        () => this._store.hasFetchedProfile(),
+        () => this._store.profile().userid,
+      ],
+      (_, [prevFetchedProfile]) => {
+        if (!prevFetchedProfile) {
+          // Ignore the first time that the profile is loaded.
+          return;
+        }
+        this.load();
+      }
+    );
+  }
+
+  /**
+   * Add groups to the store and set the initial focused group.
    *
    * @param {Group[]} groups
+   * @param {string|null} groupToFocus
    */
-  function injectOrganizations(groups) {
-    groups.forEach(group => {
-      if (!group.organization || typeof group.organization !== 'object') {
-        group.organization = DEFAULT_ORGANIZATION;
+  _addGroupsToStore(groups, groupToFocus) {
+    // Add a default organization to groups that don't have one. The organization
+    // provides the logo to display when the group is selected and is also used
+    // to order groups.
+    injectOrganizations(groups);
+
+    const isFirstLoad = this._store.allGroups().length === 0;
+    const prevFocusedGroup = this._store.getDefault('focusedGroup');
+
+    this._store.loadGroups(groups);
+
+    if (isFirstLoad) {
+      if (groupToFocus && groups.some(g => g.id === groupToFocus)) {
+        this.focus(groupToFocus);
+      } else if (
+        prevFocusedGroup &&
+        groups.some(g => g.id === prevFocusedGroup)
+      ) {
+        this.focus(prevFocusedGroup);
       }
-    });
+    }
   }
 
   /**
@@ -173,41 +207,8 @@ export default function groups(
    * @param {string} id
    * @return {Promise<Group>}
    */
-  async function fetchGroup(id) {
-    return api.group.read({ id, expand: expandParam });
-  }
-
-  let reloadSetUp = false;
-
-  /**
-   * Set up automatic re-fetching of groups in response to various events
-   * in the sidebar.
-   */
-  function setupAutoReload() {
-    if (reloadSetUp) {
-      return;
-    }
-    reloadSetUp = true;
-
-    // Reload groups when main document URI changes.
-    watch(store.subscribe, mainUri, () => {
-      load();
-    });
-
-    // Reload groups when user ID changes. This is a bit inefficient since it
-    // means we are not fetching the groups and profile concurrently after
-    // logging in or logging out.
-    watch(
-      store.subscribe,
-      [() => store.hasFetchedProfile(), () => store.profile().userid],
-      (_, [prevFetchedProfile]) => {
-        if (!prevFetchedProfile) {
-          // Ignore the first time that the profile is loaded.
-          return;
-        }
-        load();
-      }
-    );
+  _fetchGroup(id) {
+    return this._api.group.read({ id, expand: expandParam });
   }
 
   /**
@@ -216,15 +217,18 @@ export default function groups(
    *
    * @return {Promise<Group[]>}
    */
-  async function loadGroupsForUserAndDocument() {
+  async _loadGroupsForUserAndDocument() {
+    const getDocumentUriForGroupSearch = () =>
+      awaitStateChange(this._store, () => this._mainURI());
+
     // Step 1: Get the URI of the active document, so we can fetch groups
     // associated with that document.
     let documentUri = null;
-    if (store.route() === 'sidebar') {
+    if (this._store.route() === 'sidebar') {
       documentUri = await getDocumentUriForGroupSearch();
     }
 
-    setupAutoReload();
+    this._setupAutoReload();
 
     // Step 2: Concurrently fetch the groups the user is a member of,
     // the groups associated with the current document and the annotation
@@ -233,10 +237,10 @@ export default function groups(
     // If there is a direct-linked annotation, fetch the annotation in case
     // the associated group has not already been fetched and we need to make
     // an additional request for it.
-    const directLinkedAnnId = store.directLinkedAnnotationId();
+    const directLinkedAnnId = this._store.directLinkedAnnotationId();
     let directLinkedAnnApi = null;
     if (directLinkedAnnId) {
-      directLinkedAnnApi = api.annotation
+      directLinkedAnnApi = this._api.annotation
         .get({ id: directLinkedAnnId })
         .catch(() => {
           // If the annotation does not exist or the user doesn't have permission.
@@ -247,17 +251,17 @@ export default function groups(
     // If there is a direct-linked group, add an API request to get that
     // particular group since it may not be in the set of groups that are
     // fetched by other requests.
-    const directLinkedGroupId = store.directLinkedGroupId();
+    const directLinkedGroupId = this._store.directLinkedGroupId();
     let directLinkedGroupApi = null;
     if (directLinkedGroupId) {
-      directLinkedGroupApi = fetchGroup(directLinkedGroupId)
+      directLinkedGroupApi = this._fetchGroup(directLinkedGroupId)
         .then(group => {
-          store.clearDirectLinkedGroupFetchFailed();
+          this._store.clearDirectLinkedGroupFetchFailed();
           return group;
         })
         .catch(() => {
           // If the group does not exist or the user doesn't have permission.
-          store.setDirectLinkedGroupFetchFailed();
+          this._store.setDirectLinkedGroupFetchFailed();
           return null;
         });
     }
@@ -265,6 +269,7 @@ export default function groups(
     const listParams = {
       expand: expandParam,
     };
+    const authority = this._serviceConfig?.authority;
     if (authority) {
       listParams.authority = authority;
     }
@@ -279,9 +284,9 @@ export default function groups(
       directLinkedAnn,
       directLinkedGroup,
     ] = await Promise.all([
-      api.profile.groups.read({ expand: expandParam }),
-      api.groups.list(listParams),
-      auth.getAccessToken(),
+      this._api.profile.groups.read({ expand: expandParam }),
+      this._api.groups.list(listParams),
+      this._auth.getAccessToken(),
       directLinkedAnnApi,
       directLinkedGroupApi,
     ]);
@@ -314,10 +319,14 @@ export default function groups(
 
       if (!directLinkedAnnGroup) {
         try {
-          const directLinkedAnnGroup = await fetchGroup(directLinkedAnn.group);
+          const directLinkedAnnGroup = await this._fetchGroup(
+            directLinkedAnn.group
+          );
           featuredGroups.push(directLinkedAnnGroup);
         } catch (e) {
-          toastMessenger.error('Unable to fetch group for linked annotation');
+          this._toastMessenger.error(
+            'Unable to fetch group for linked annotation'
+          );
         }
       }
     }
@@ -325,8 +334,8 @@ export default function groups(
     // Step 4. Combine all the groups into a single list and set additional
     // metadata on them that will be used elsewhere in the app.
     const isLoggedIn = token !== null;
-    const groups = await filterGroups(
-      combineGroups(myGroups, featuredGroups, documentUri, settings),
+    const groups = await this._filterGroups(
+      combineGroups(myGroups, featuredGroups, documentUri, this._settings),
       isLoggedIn,
       directLinkedAnnotationGroupId,
       directLinkedGroupId
@@ -334,7 +343,7 @@ export default function groups(
 
     const groupToFocus =
       directLinkedAnnotationGroupId || directLinkedGroupId || null;
-    addGroupsToStore(groups, groupToFocus);
+    this._addGroupsToStore(groups, groupToFocus);
 
     return groups;
   }
@@ -344,19 +353,21 @@ export default function groups(
    *
    * @param {string[]} groupIds - `id` or `groupid`s of groups to fetch
    */
-  async function loadServiceSpecifiedGroups(groupIds) {
+  async _loadServiceSpecifiedGroups(groupIds) {
     // Fetch the groups that the user is a member of in one request and then
     // fetch any other groups not returned in that request directly.
     //
     // This reduces the number of requests to the backend on the assumption
     // that most or all of the group IDs that the service configures the client
     // to show are groups that the user is a member of.
-    const userGroups = await api.profile.groups.read({ expand: expandParam });
+    const userGroups = await this._api.profile.groups.read({
+      expand: expandParam,
+    });
 
     let error;
     const tryFetchGroup = async id => {
       try {
-        return await fetchGroup(id);
+        return await this._fetchGroup(id);
       } catch (e) {
         error = e;
         return null;
@@ -372,44 +383,18 @@ export default function groups(
     );
 
     // Optional direct linked group id. This is used in the Notebook context.
-    const focusedGroupId = store.directLinkedGroupId();
+    const focusedGroupId = this._store.directLinkedGroupId();
 
-    addGroupsToStore(groups, focusedGroupId);
+    this._addGroupsToStore(groups, focusedGroupId);
 
     if (error) {
       // @ts-ignore - TS can't track the type of `error` here.
-      toastMessenger.error(`Unable to fetch groups: ${error.message}`, {
+      this._toastMessenger.error(`Unable to fetch groups: ${error.message}`, {
         autoDismiss: false,
       });
     }
 
     return groups;
-  }
-
-  /**
-   * Add groups to the store and set the initial focused group.
-   *
-   * @param {Group[]} groups
-   * @param {string|null} [groupToFocus]
-   */
-  function addGroupsToStore(groups, groupToFocus) {
-    // Add a default organization to groups that don't have one. The organization
-    // provides the logo to display when the group is selected and is also used
-    // to order groups.
-    injectOrganizations(groups);
-
-    const isFirstLoad = store.allGroups().length === 0;
-    const prevFocusedGroup = store.getDefault('focusedGroup');
-
-    store.loadGroups(groups);
-
-    if (isFirstLoad) {
-      if (groups.some(g => g.id === groupToFocus)) {
-        focus(groupToFocus);
-      } else if (groups.some(g => g.id === prevFocusedGroup)) {
-        focus(prevFocusedGroup);
-      }
-    }
   }
 
   /**
@@ -430,54 +415,71 @@ export default function groups(
    *
    * @return {Promise<Group[]>}
    */
-  async function load() {
-    let groups;
-    if (svc && svc.groups) {
+  async load() {
+    if (this._serviceConfig?.groups) {
       let groupIds = [];
       try {
-        groupIds = await svc.groups;
+        groupIds = await this._serviceConfig.groups;
       } catch (e) {
-        toastMessenger.error(
+        this._toastMessenger.error(
           `Unable to fetch group configuration: ${e.message}`
         );
       }
-      groups = await loadServiceSpecifiedGroups(groupIds);
+      return this._loadServiceSpecifiedGroups(groupIds);
     } else {
-      groups = await loadGroupsForUserAndDocument();
+      return this._loadGroupsForUserAndDocument();
     }
-    return groups;
-  }
-
-  function all() {
-    return store.allGroups();
-  }
-
-  // Return the full object for the group with the given id.
-  function get(id) {
-    return store.getGroup(id);
   }
 
   /**
-   * Leave the group with the given ID.
-   * Returns a promise which resolves when the action completes.
+   * Update the focused group. Update the store, then check to see if
+   * there are any new (unsaved) annotations—if so, update those annotations
+   * such that they are associated with the newly-focused group.
+   *
+   * @param {string} groupId
    */
-  function leave(id) {
+  focus(groupId) {
+    const prevGroupId = this._store.focusedGroupId();
+
+    this._store.focusGroup(groupId);
+
+    const newGroupId = this._store.focusedGroupId();
+
+    const groupHasChanged = prevGroupId !== newGroupId && prevGroupId !== null;
+    if (groupHasChanged) {
+      // Move any top-level new annotations to the newly-focused group.
+      // Leave replies where they are.
+      const updatedAnnotations = [];
+      this._store.newAnnotations().forEach(annot => {
+        if (!isReply(annot)) {
+          updatedAnnotations.push(
+            Object.assign({}, annot, { group: newGroupId })
+          );
+        }
+      });
+
+      if (updatedAnnotations.length) {
+        this._store.addAnnotations(updatedAnnotations);
+      }
+
+      // Persist this group as the last focused group default
+      this._store.setDefault('focusedGroup', newGroupId);
+    }
+  }
+
+  /**
+   * Request to remove the current user from a group.
+   *
+   * @param {string} id - The group ID
+   * @return {Promise<void>}
+   */
+  leave(id) {
     // The groups list will be updated in response to a session state
     // change notification from the server. We could improve the UX here
     // by optimistically updating the session state
-    return api.group.member.delete({
+    return this._api.group.member.delete({
       pubid: id,
       userid: 'me',
     });
   }
-
-  return {
-    all: all,
-    get: get,
-
-    leave: leave,
-    load: load,
-
-    focus: focus,
-  };
 }

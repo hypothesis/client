@@ -1,5 +1,5 @@
 import fakeReduxStore from '../../test/fake-redux-store';
-import groups, { $imports } from '../groups';
+import { GroupsService, $imports } from '../groups';
 import { waitFor } from '../../../test-util/wait';
 
 /**
@@ -37,7 +37,7 @@ const dummyGroups = [
   { name: 'Group 3', id: 'id3' },
 ];
 
-describe('sidebar/services/groups', function () {
+describe('GroupsService', function () {
   let fakeAuth;
   let fakeStore;
   let fakeSession;
@@ -130,8 +130,8 @@ describe('sidebar/services/groups', function () {
     $imports.$restore();
   });
 
-  function service() {
-    return groups(
+  function createService() {
+    return new GroupsService(
       fakeStore,
       fakeApi,
       fakeSession,
@@ -143,7 +143,7 @@ describe('sidebar/services/groups', function () {
 
   describe('#focus', () => {
     it('updates the focused group in the store', () => {
-      const svc = service();
+      const svc = createService();
       fakeStore.focusedGroupId.returns('whatever');
 
       svc.focus('whatnot');
@@ -166,7 +166,7 @@ describe('sidebar/services/groups', function () {
         fakeMetadata.isReply.returns(false);
         fakeStore.newAnnotations.returns(fakeAnnotations);
 
-        const svc = service();
+        const svc = createService();
         svc.focus('newgroup');
 
         assert.calledWith(
@@ -190,7 +190,7 @@ describe('sidebar/services/groups', function () {
           { $tag: '2', group: 'groupB' },
         ]);
 
-        const svc = service();
+        const svc = createService();
         svc.focus('newgroup');
 
         assert.calledTwice(fakeMetadata.isReply);
@@ -198,7 +198,7 @@ describe('sidebar/services/groups', function () {
       });
 
       it('updates the focused-group default', () => {
-        const svc = service();
+        const svc = createService();
         svc.focus('newgroup');
 
         assert.calledOnce(fakeStore.setDefault);
@@ -209,25 +209,16 @@ describe('sidebar/services/groups', function () {
     it('does not update the focused-group default if the group has not changed', () => {
       fakeStore.focusedGroupId.returns('samegroup');
 
-      const svc = service();
+      const svc = createService();
       svc.focus('samegroup');
 
       assert.notCalled(fakeStore.setDefault);
     });
   });
 
-  describe('#all', function () {
-    it('returns all groups from store.allGroups', () => {
-      const svc = service();
-      fakeStore.allGroups = sinon.stub().returns(dummyGroups);
-      assert.deepEqual(svc.all(), dummyGroups);
-      assert.called(fakeStore.allGroups);
-    });
-  });
-
   describe('#load', function () {
     it('filters out direct-linked groups that are out of scope and scope enforced', () => {
-      const svc = service();
+      const svc = createService();
       fakeStore.getDefault.returns(dummyGroups[0].id);
       const outOfScopeEnforcedGroup = {
         id: 'oos',
@@ -247,7 +238,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('catches error from api.group.read request', () => {
-      const svc = service();
+      const svc = createService();
       fakeStore.getDefault.returns(dummyGroups[0].id);
       fakeStore.directLinkedGroupId.returns('does-not-exist');
 
@@ -268,7 +259,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('combines groups from both endpoints', function () {
-      const svc = service();
+      const svc = createService();
 
       const groups = [
         { id: 'groupa', name: 'GroupA' },
@@ -286,7 +277,7 @@ describe('sidebar/services/groups', function () {
     // TODO: Add a de-dup test for the direct-linked annotation.
 
     it('does not duplicate groups if the direct-linked group is also a featured group', () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedGroupId.returns(dummyGroups[0].id);
       fakeApi.group.read.returns(Promise.resolve(dummyGroups[0]));
@@ -302,7 +293,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('combines groups from all 3 endpoints if there is a selectedGroup', () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedGroupId.returns('selected-id');
 
@@ -322,7 +313,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('passes the direct-linked group id from the store to the api.group.read call', () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedGroupId.returns('selected-id');
 
@@ -343,7 +334,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('loads all available groups', function () {
-      const svc = service();
+      const svc = createService();
 
       return svc.load().then(() => {
         assert.calledWith(fakeStore.loadGroups, dummyGroups);
@@ -351,7 +342,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('sends `expand` parameter', function () {
-      const svc = service();
+      const svc = createService();
       fakeApi.groups.list.returns(
         Promise.resolve([{ id: 'groupa', name: 'GroupA' }])
       );
@@ -374,7 +365,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('sets the focused group from the value saved in local storage', () => {
-      const svc = service();
+      const svc = createService();
       fakeStore.getDefault.returns(dummyGroups[1].id);
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
@@ -382,7 +373,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it("sets the direct-linked annotation's group to take precedence over the group saved in local storage and the direct-linked group", () => {
-      const svc = service();
+      const svc = createService();
       fakeStore.directLinkedAnnotationId.returns('ann-id');
       fakeStore.directLinkedGroupId.returns(dummyGroups[1].id);
 
@@ -400,7 +391,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it("sets the focused group to the direct-linked annotation's group", () => {
-      const svc = service();
+      const svc = createService();
       fakeStore.directLinkedAnnotationId.returns('ann-id');
 
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
@@ -417,7 +408,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('sets the direct-linked group to take precedence over the group saved in local storage', () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedGroupId.returns(dummyGroups[1].id);
       fakeStore.getDefault.returns(dummyGroups[0].id);
@@ -428,7 +419,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('sets the focused group to the direct-linked group', () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedGroupId.returns(dummyGroups[1].id);
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
@@ -438,7 +429,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('clears the directLinkedGroupFetchFailed state if loading a direct-linked group', () => {
-      const svc = service();
+      const svc = createService();
       fakeStore.directLinkedGroupId.returns(dummyGroups[1].id);
       fakeApi.groups.list.returns(Promise.resolve(dummyGroups));
 
@@ -450,7 +441,7 @@ describe('sidebar/services/groups', function () {
 
     [null, 'some-group-id'].forEach(groupId => {
       it('does not set the focused group if not present in the groups list', () => {
-        const svc = service();
+        const svc = createService();
         fakeStore.getDefault.returns(groupId);
         return svc.load().then(() => {
           assert.notCalled(fakeStore.focusGroup);
@@ -460,7 +451,7 @@ describe('sidebar/services/groups', function () {
 
     context('in the sidebar', () => {
       it('waits for the document URL to be determined', () => {
-        const svc = service();
+        const svc = createService();
 
         fakeStore.setState({ frames: [null] });
         const loaded = svc.load();
@@ -482,7 +473,7 @@ describe('sidebar/services/groups', function () {
 
       it('does not wait for the document URL', () => {
         fakeStore.setState({ frames: [null] });
-        const svc = service();
+        const svc = createService();
         return svc.load().then(() => {
           assert.calledWith(fakeApi.groups.list, {
             expand: ['organization', 'scopes'],
@@ -493,7 +484,7 @@ describe('sidebar/services/groups', function () {
 
     it('passes authority argument when using a third-party authority', () => {
       fakeSettings.services = [{ authority: 'publisher.org' }];
-      const svc = service();
+      const svc = createService();
       return svc.load().then(() => {
         assert.calledWith(
           fakeApi.groups.list,
@@ -503,7 +494,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('injects a default organization if group is missing an organization', function () {
-      const svc = service();
+      const svc = createService();
       const groups = [{ id: '39r39f', name: 'Ding Dong!' }];
       fakeApi.groups.list.returns(Promise.resolve(groups));
       return svc.load().then(groups => {
@@ -513,7 +504,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it('catches error when fetching the direct-linked annotation', () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedAnnotationId.returns('ann-id');
       fakeApi.profile.groups.read.returns(Promise.resolve([]));
@@ -536,7 +527,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it("catches error when fetching the direct-linked annotation's group", () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedAnnotationId.returns('ann-id');
 
@@ -572,7 +563,7 @@ describe('sidebar/services/groups', function () {
     });
 
     it("includes the direct-linked annotation's group when it is not in the normal list of groups", () => {
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedAnnotationId.returns('ann-id');
 
@@ -604,7 +595,7 @@ describe('sidebar/services/groups', function () {
     it('both groups are in the final groups list when an annotation and a group are linked to', () => {
       // This can happen if the linked to annotation and group are configured by
       // the frame embedding the client.
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedGroupId.returns('out-of-scope');
       fakeStore.directLinkedAnnotationId.returns('ann-id');
@@ -641,7 +632,7 @@ describe('sidebar/services/groups', function () {
       // Set up the test under conditions that would otherwise
       // not return the Public group. Aka: the user is logged
       // out and there are associated groups.
-      const svc = service();
+      const svc = createService();
 
       fakeStore.directLinkedGroupId.returns('__world__');
 
@@ -667,7 +658,7 @@ describe('sidebar/services/groups', function () {
     truthTable(3).forEach(
       ([loggedIn, pageHasAssociatedGroups, directLinkToPublicAnnotation]) => {
         it('excludes the "Public" group if user logged out and page has associated groups', () => {
-          const svc = service();
+          const svc = createService();
           const shouldShowPublicGroup =
             loggedIn ||
             !pageHasAssociatedGroups ||
@@ -720,7 +711,7 @@ describe('sidebar/services/groups', function () {
         setServiceConfigGroups(['id-a', 'groupid-b']);
         fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
 
-        const svc = service();
+        const svc = createService();
         const groups = await svc.load();
 
         assert.deepEqual(
@@ -733,7 +724,7 @@ describe('sidebar/services/groups', function () {
         setServiceConfigGroups(Promise.resolve(['id-a', 'groupid-b']));
         fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
 
-        const svc = service();
+        const svc = createService();
         const groups = await svc.load();
 
         assert.deepEqual(
@@ -754,7 +745,7 @@ describe('sidebar/services/groups', function () {
           return group;
         });
 
-        const svc = service();
+        const svc = createService();
         const groups = await svc.load();
 
         const expand = ['organization', 'scopes'];
@@ -770,7 +761,7 @@ describe('sidebar/services/groups', function () {
         setServiceConfigGroups(Promise.resolve(['id-a', 'groupid-b']));
         fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
 
-        const svc = service();
+        const svc = createService();
         await svc.load();
 
         assert.notCalled(fakeApi.group.read);
@@ -781,7 +772,7 @@ describe('sidebar/services/groups', function () {
         fakeApi.profile.groups.read.resolves([groupA]);
         fakeApi.group.read.rejects(new Error('Not Found'));
 
-        const svc = service();
+        const svc = createService();
         const groups = await svc.load();
 
         assert.calledWith(
@@ -801,7 +792,7 @@ describe('sidebar/services/groups', function () {
           Promise.reject(new Error('Something went wrong'))
         );
 
-        const svc = service();
+        const svc = createService();
         const groups = await svc.load();
 
         assert.calledWith(
@@ -816,7 +807,7 @@ describe('sidebar/services/groups', function () {
         fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
         fakeStore.directLinkedGroupId.returns('id-c');
 
-        const svc = service();
+        const svc = createService();
         await svc.load();
 
         assert.calledWith(fakeStore.focusGroup, 'id-c');
@@ -827,7 +818,7 @@ describe('sidebar/services/groups', function () {
         fakeApi.profile.groups.read.resolves([groupA, groupB, groupC]);
         fakeStore.directLinkedGroupId.returns(null);
 
-        const svc = service();
+        const svc = createService();
         await svc.load();
 
         assert.notCalled(fakeStore.focusGroup);
@@ -835,18 +826,9 @@ describe('sidebar/services/groups', function () {
     });
   });
 
-  describe('#get', function () {
-    it('returns the requested group', function () {
-      const svc = service();
-      fakeStore.getGroup.withArgs('foo').returns(dummyGroups[1]);
-
-      assert.equal(svc.get('foo'), dummyGroups[1]);
-    });
-  });
-
   describe('#leave', function () {
     it('should call the group leave API', function () {
-      const s = service();
+      const s = createService();
       return s.leave('id2').then(() => {
         assert.calledWithMatch(fakeApi.group.member.delete, {
           pubid: 'id2',
@@ -860,7 +842,7 @@ describe('sidebar/services/groups', function () {
 
   describe('automatic re-fetching', function () {
     it('refetches groups when the logged-in user changes', async () => {
-      const svc = service();
+      const svc = createService();
 
       // Load groups before profile fetch has completed.
       fakeStore.hasFetchedProfile.returns(false);
@@ -889,7 +871,7 @@ describe('sidebar/services/groups', function () {
 
     context('when a new frame connects', () => {
       it('should refetch groups if main frame URL has changed', async () => {
-        const svc = service();
+        const svc = createService();
 
         fakeStore.setState({
           frames: [{ uri: 'https://domain.com/page-a' }],
@@ -908,7 +890,7 @@ describe('sidebar/services/groups', function () {
       });
 
       it('should not refetch groups if main frame URL has not changed', async () => {
-        const svc = service();
+        const svc = createService();
 
         fakeStore.setState({
           frames: [{ uri: 'https://domain.com/page-a' }],
