@@ -122,7 +122,7 @@ function createAPICall(
           headers['X-Client-Id'] = clientId;
         }
 
-        const { url, params: queryParams } = replaceURLParams(
+        const { url, unusedParams: queryParams } = replaceURLParams(
           descriptor.url,
           params
         );
