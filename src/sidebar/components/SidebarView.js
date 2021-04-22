@@ -17,8 +17,8 @@ import ThreadList from './ThreadList';
  * @prop {() => any} onLogin
  * @prop {() => any} onSignUp
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
- * @prop {ReturnType<import('../services/load-annotations').default>} loadAnnotationsService  - Injected service
- * @prop {import('../services/streamer').default} streamer - Injected service
+ * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
+ * @prop {import('../services/streamer').default} streamer
  */
 
 /**

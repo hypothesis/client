@@ -114,7 +114,7 @@ import { AutosaveService } from './services/autosave';
 import { FeaturesService } from './services/features';
 import { FrameSyncService } from './services/frame-sync';
 import groupsService from './services/groups';
-import loadAnnotationsService from './services/load-annotations';
+import { LoadAnnotationsService } from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
 import { PersistedDefaultsService } from './services/persisted-defaults';
 import { RouterService } from './services/router';
@@ -152,7 +152,7 @@ function startApp(config, appEl) {
     .register('features', FeaturesService)
     .register('frameSync', FrameSyncService)
     .register('groups', groupsService)
-    .register('loadAnnotationsService', loadAnnotationsService)
+    .register('loadAnnotationsService', LoadAnnotationsService)
     .register('localStorage', LocalStorageService)
     .register('persistedDefaults', PersistedDefaultsService)
     .register('router', RouterService)

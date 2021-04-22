@@ -1,6 +1,6 @@
-/**
- * A service for fetching annotations, filtered by document URIs and group.
- */
+import { SearchClient } from '../search-client';
+
+import { isReply } from '../helpers/annotation-metadata';
 
 /**
  * @typedef {import('../search-client').SortBy} SortBy
@@ -25,24 +25,32 @@
  *   to filter by either URIs or groupIds.
  */
 
-import { SearchClient } from '../search-client';
-
-import { isReply } from '../helpers/annotation-metadata';
-
 /**
- * @param {import('./api').APIService} api
- * @param {import('../store').SidebarStore} store
- * @param {import('./streamer').default} streamer
- * @param {import('./stream-filter').StreamFilter} streamFilter
+ * A service for fetching annotations via the Hypothesis API and loading them
+ * into the store.
+ *
+ * In addition to fetching annotations it also handles configuring the
+ * WebSocket connection so that appropriate real-time updates are received
+ * for the set of annotations being displayed.
+ *
+ * @inject
  */
-// @inject
-export default function loadAnnotationsService(
-  api,
-  store,
-  streamer,
-  streamFilter
-) {
-  let searchClient = null;
+export class LoadAnnotationsService {
+  /**
+   * @param {import('./api').APIService} api
+   * @param {import('../store').SidebarStore} store
+   * @param {import('./streamer').default} streamer
+   * @param {import('./stream-filter').StreamFilter} streamFilter
+   */
+  constructor(api, store, streamer, streamFilter) {
+    this._api = api;
+    this._store = store;
+    this._streamer = streamer;
+    this._streamFilter = streamFilter;
+
+    /** @type {SearchClient|null} */
+    this._searchClient = null;
+  }
 
   /**
    * Load annotations from Hypothesis.
@@ -52,7 +60,7 @@ export default function loadAnnotationsService(
    *
    * @param {LoadAnnotationOptions} options
    */
-  function load({
+  load({
     groupId,
     uris,
     onError,
@@ -61,28 +69,34 @@ export default function loadAnnotationsService(
     sortOrder,
     streamFilterBy = 'uri',
   }) {
-    store.removeAnnotations(store.savedAnnotations());
+    this._store.removeAnnotations(this._store.savedAnnotations());
 
     // Cancel previously running search client.
     //
     // This will emit the "end" event for the existing client and trigger cleanup
     // associated with that client (eg. resetting the count of in-flight
     // annotation fetches).
-    if (searchClient) {
-      searchClient.cancel();
+    if (this._searchClient) {
+      this._searchClient.cancel();
     }
 
     // Set the filter for the websocket stream
     switch (streamFilterBy) {
       case 'group':
-        streamFilter.resetFilter().addClause('/group', 'equals', groupId, true);
-        streamer.setConfig('filter', { filter: streamFilter.getFilter() });
+        this._streamFilter
+          .resetFilter()
+          .addClause('/group', 'equals', groupId, true);
+        this._streamer.setConfig('filter', {
+          filter: this._streamFilter.getFilter(),
+        });
         break;
       case 'uri':
       default:
         if (uris && uris.length > 0) {
-          streamFilter.resetFilter().addClause('/uri', 'one_of', uris);
-          streamer.setConfig('filter', { filter: streamFilter.getFilter() });
+          this._streamFilter.resetFilter().addClause('/uri', 'one_of', uris);
+          this._streamer.setConfig('filter', {
+            filter: this._streamFilter.getFilter(),
+          });
         }
         break;
     }
@@ -107,19 +121,19 @@ export default function loadAnnotationsService(
       sortOrder,
     };
 
-    searchClient = new SearchClient(api.search, searchOptions);
+    this._searchClient = new SearchClient(this._api.search, searchOptions);
 
-    searchClient.on('resultCount', resultCount => {
-      store.setAnnotationResultCount(resultCount);
+    this._searchClient.on('resultCount', resultCount => {
+      this._store.setAnnotationResultCount(resultCount);
     });
 
-    searchClient.on('results', results => {
+    this._searchClient.on('results', results => {
       if (results.length) {
-        store.addAnnotations(results);
+        this._store.addAnnotations(results);
       }
     });
 
-    searchClient.on('error', error => {
+    this._searchClient.on('error', error => {
       if (typeof onError === 'function') {
         onError(error);
       } else {
@@ -127,23 +141,22 @@ export default function loadAnnotationsService(
       }
     });
 
-    searchClient.on('end', () => {
+    this._searchClient.on('end', () => {
       // Remove client as it's no longer active.
-      searchClient = null;
+      this._searchClient = null;
 
       if (uris && uris.length > 0) {
-        store.frames().forEach(frame => {
+        this._store.frames().forEach(frame => {
           if (uris.indexOf(frame.uri) >= 0) {
-            store.updateFrameAnnotationFetchStatus(frame.uri, true);
+            this._store.updateFrameAnnotationFetchStatus(frame.uri, true);
           }
         });
       }
-      store.annotationFetchFinished();
+      this._store.annotationFetchFinished();
     });
 
-    store.annotationFetchStarted();
-
-    searchClient.get({ group: groupId, uri: uris });
+    this._store.annotationFetchStarted();
+    this._searchClient.get({ group: groupId, uri: uris });
   }
 
   /**
@@ -152,50 +165,49 @@ export default function loadAnnotationsService(
    * @param {string} id - Annotation ID. This may be an annotation or a reply.
    * @return Promise<Annotation[]> - The annotation, followed by any replies.
    */
-  async function loadThread(id) {
+  async loadThread(id) {
     let annotation;
     let replySearchResult;
 
     // Clear out any annotations already in the store before fetching new ones
-    store.clearAnnotations();
+    this._store.clearAnnotations();
 
     try {
-      store.annotationFetchStarted();
+      this._store.annotationFetchStarted();
       // 1. Fetch the annotation indicated by `id` — the target annotation
-      annotation = await api.annotation.get({ id });
+      annotation = await this._api.annotation.get({ id });
 
       // 2. If annotation is not the top-level annotation in its thread,
       //    fetch the top-level annotation
       if (isReply(annotation)) {
-        annotation = await api.annotation.get({ id: annotation.references[0] });
+        annotation = await this._api.annotation.get({
+          id: annotation.references[0],
+        });
       }
 
       // 3. Fetch all of the annotations in the thread, based on the
       //    top-level annotation
-      replySearchResult = await api.search({ references: annotation.id });
+      replySearchResult = await this._api.search({ references: annotation.id });
     } finally {
-      store.annotationFetchFinished();
+      this._store.annotationFetchFinished();
     }
     const threadAnnotations = [annotation, ...replySearchResult.rows];
 
-    store.addAnnotations(threadAnnotations);
+    this._store.addAnnotations(threadAnnotations);
 
     // If we've been successful in retrieving a thread, with a top-level annotation,
     // configure the connection to the real-time update service to send us
     // updates to any of the annotations in the thread.
     if (!isReply(annotation)) {
-      streamFilter
+      this._streamFilter
         .addClause('/references', 'one_of', annotation.id, true)
         .addClause('/id', 'equals', annotation.id, true);
-      streamer.setConfig('filter', { filter: streamFilter.getFilter() });
-      streamer.connect();
+      this._streamer.setConfig('filter', {
+        filter: this._streamFilter.getFilter(),
+      });
+      this._streamer.connect();
     }
 
     return threadAnnotations;
   }
-
-  return {
-    load,
-    loadThread,
-  };
 }

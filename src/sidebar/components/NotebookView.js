@@ -14,8 +14,8 @@ import useRootThread from './hooks/use-root-thread';
 
 /**
  * @typedef NotebookViewProps
- * @prop {ReturnType<import('../services/load-annotations').default>} loadAnnotationsService - Injected service
- * @prop {import('../services/streamer').default} streamer - Injected service
+ * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
+ * @prop {import('../services/streamer').default} streamer
  */
 
 /**
