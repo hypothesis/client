@@ -5,11 +5,11 @@
  * parameters.
  *
  *   replaceURLParams('/things/:id', {id: 'foo', q: 'bar'}) =>
- *     {url: '/things/foo', params: {q: 'bar'}}
+ *     {url: '/things/foo', unusedParams: {q: 'bar'}}
  *
  * @param {string} url
  * @param {Record<string, string>} params
- * @return {{ url: string, params: Record<string, string>}}
+ * @return {{ url: string, unusedParams: Record<string, string>}}
  */
 export function replaceURLParams(url, params) {
   /** @type {Record<string, string>} */
@@ -25,7 +25,7 @@ export function replaceURLParams(url, params) {
       }
     }
   }
-  return { url: url, params: unusedParams };
+  return { url, unusedParams };
 }
 
 /**
