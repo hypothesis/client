@@ -46,7 +46,7 @@ const fixtures = {
   },
 };
 
-describe('sidebar/services/frame-sync', function () {
+describe('FrameSyncService', () => {
   let fakeAnnotationsService;
   let fakeStore;
   let fakeBridge;
@@ -306,6 +306,7 @@ describe('sidebar/services/frame-sync', function () {
       call: function (name, callback) {
         callback(null, frameInfo);
       },
+      destroy: sinon.stub(),
     };
 
     it("adds the page's metadata to the frames list", function () {
@@ -318,6 +319,15 @@ describe('sidebar/services/frame-sync', function () {
         metadata: frameInfo.metadata,
         uri: frameInfo.uri,
       });
+    });
+
+    it('closes the channel and does not add frame to store if getting document info fails', () => {
+      fakeChannel.call = (name, callback) => callback('Something went wrong');
+
+      fakeBridge.emit('connect', fakeChannel);
+
+      assert.called(fakeChannel.destroy);
+      assert.notCalled(fakeStore.connectFrame);
     });
   });
 
@@ -388,7 +398,7 @@ describe('sidebar/services/frame-sync', function () {
     });
   });
 
-  describe('when annotations are focused in the sidebar', () => {
+  describe('#focusAnnotations', () => {
     it('should update the focused annotations in the store', () => {
       frameSync.focusAnnotations(['a1', 'a2']);
       assert.calledWith(
@@ -396,13 +406,20 @@ describe('sidebar/services/frame-sync', function () {
         sinon.match.array.deepEquals(['a1', 'a2'])
       );
     });
-    it('notify the host page', () => {
+    it('should notify the host page', () => {
       frameSync.focusAnnotations([1, 2]);
       assert.calledWith(
         fakeBridge.call,
         'focusAnnotations',
         sinon.match.array.deepEquals([1, 2])
       );
+    });
+  });
+
+  describe('#scrollToAnnotation', () => {
+    it('should scroll to the annotation in the host page', () => {
+      frameSync.scrollToAnnotation('atag');
+      assert.calledWith(fakeBridge.call, 'scrollToAnnotation', 'atag');
     });
   });
 });
