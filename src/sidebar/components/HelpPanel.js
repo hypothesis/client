@@ -43,7 +43,7 @@ function HelpPanelTab({ linkText, url }) {
 /**
  * @typedef HelpPanelProps
  * @prop {AuthState} auth - Object with auth and user information
- * @prop {Object} session - Injected service
+ * @prop {import('../services/session').SessionService} session
  */
 
 /**
@@ -86,17 +86,16 @@ function HelpPanel({ auth, session }) {
     setActiveSubPanel(panelName);
   };
 
-  const dismissFn = session.dismissSidebarTutorial; // Reference for useCallback dependency
   const onActiveChanged = useCallback(
     active => {
       if (!active && hasAutoDisplayPreference) {
         // If the tutorial is currently being auto-displayed, update the user
         // preference to disable the auto-display from happening on subsequent
         // app launches
-        dismissFn();
+        session.dismissSidebarTutorial();
       }
     },
-    [dismissFn, hasAutoDisplayPreference]
+    [session, hasAutoDisplayPreference]
   );
 
   return (

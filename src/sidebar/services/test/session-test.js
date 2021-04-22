@@ -1,10 +1,9 @@
 import EventEmitter from 'tiny-emitter';
 
-import sessionFactory from '../session';
-import { $imports } from '../session';
+import { SessionService, $imports } from '../session';
 import { Injector } from '../../../shared/injector';
 
-describe('sidebar/services/session', function () {
+describe('SessionService', function () {
   let fakeAuth;
   let fakeSentry;
   let fakeServiceConfig;
@@ -59,7 +58,7 @@ describe('sidebar/services/session', function () {
       .register('api', { value: fakeApi })
       .register('auth', { value: fakeAuth })
       .register('settings', { value: fakeSettings })
-      .register('session', sessionFactory)
+      .register('session', SessionService)
       .register('toastMessenger', { value: fakeToastMessenger })
       .get('session');
   });
@@ -69,7 +68,7 @@ describe('sidebar/services/session', function () {
     sandbox.restore();
   });
 
-  describe('#load()', function () {
+  describe('#load', function () {
     context('when the host page provides an OAuth grant token', function () {
       beforeEach(function () {
         fakeServiceConfig.returns({
@@ -180,7 +179,7 @@ describe('sidebar/services/session', function () {
     });
   });
 
-  describe('#update()', function () {
+  describe('#update', function () {
     it('updates the user ID for Sentry error reports', function () {
       session.update({
         userid: 'anne',
@@ -191,7 +190,7 @@ describe('sidebar/services/session', function () {
     });
   });
 
-  describe('#dismissSidebarTutorial()', function () {
+  describe('#dismissSidebarTutorial', function () {
     beforeEach(function () {
       fakeApi.profile.update.returns(
         Promise.resolve({
@@ -313,13 +312,6 @@ describe('sidebar/services/session', function () {
             userid: 'acct:different_user@hypothes.is',
           });
         });
-    });
-  });
-
-  // nb. This is a legacy property that should be removed.
-  describe('#state', () => {
-    it('returns the profile data', () => {
-      assert.equal(session.state, fakeStore.profile());
     });
   });
 });

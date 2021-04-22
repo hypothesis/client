@@ -55,7 +55,7 @@ function authStateFromProfile(profile) {
  * @prop {import('../services/auth').AuthService} auth
  * @prop {Bridge} bridge
  * @prop {MergedConfig} settings
- * @prop {Object} session
+ * @prop {import('../services/session').SessionService} session
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
