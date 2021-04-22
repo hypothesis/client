@@ -9,7 +9,7 @@ function init() {
 const update = {
   UPDATE_LINKS(state, action) {
     return {
-      ...action.newLinks,
+      ...action.links,
     };
   },
 };
@@ -17,14 +17,14 @@ const update = {
 const actions = actionTypes(update);
 
 /**
- * Update links
+ * Update the link map
  *
- * @param {object} newLinks - Link map returned by the `/api/links` endpoint
+ * @param {Record<string, string>} links - Link map fetched from the `/api/links` endpoint
  */
-function updateLinks(newLinks) {
+function updateLinks(links) {
   return {
     type: actions.UPDATE_LINKS,
-    newLinks,
+    links,
   };
 }
 
