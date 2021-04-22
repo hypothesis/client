@@ -16,7 +16,7 @@ import { generateHexString } from '../util/random';
 // @inject
 export class AnnotationsService {
   /**
-   * @param {ReturnType<import('./api').default>} api
+   * @param {import('./api').APIService} api
    * @param {import('../store').SidebarStore} store
    */
   constructor(api, store) {

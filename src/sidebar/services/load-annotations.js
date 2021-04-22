@@ -30,7 +30,7 @@ import { SearchClient } from '../search-client';
 import { isReply } from '../helpers/annotation-metadata';
 
 /**
- * @param {ReturnType<import('./api').default>} api
+ * @param {import('./api').APIService} api
  * @param {import('../store').SidebarStore} store
  * @param {import('./streamer').default} streamer
  * @param {import('./stream-filter').StreamFilter} streamFilter

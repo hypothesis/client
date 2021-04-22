@@ -9,7 +9,7 @@ import ThreadList from './ThreadList';
 
 /**
  * @typedef StreamViewProps
- * @prop {ReturnType<import('../services/api').default>} api
+ * @prop {import('../services/api').APIService} api
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 

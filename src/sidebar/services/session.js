@@ -13,6 +13,7 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * Access to the current profile is exposed via the `state` property.
  *
  * @param {import('../store').SidebarStore} store
+ * @param {import('./api').APIService} api
  * @param {import('./auth').AuthService} auth
  * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
  * @inject
