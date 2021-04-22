@@ -73,10 +73,14 @@ function initServices(autosaveService, features, persistedDefaults) {
   persistedDefaults.init();
 }
 
+/**
+ * @param {import('./services/frame-sync').FrameSyncService} frameSync
+ * @param {import('./store').SidebarStore} store
+ */
 // @inject
 function setupFrameSync(frameSync, store) {
   if (store.route() === 'sidebar') {
-    frameSync.connect(true);
+    frameSync.connect();
   }
 }
 
@@ -101,7 +105,7 @@ import { APIRoutesService } from './services/api-routes';
 import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
 import { FeaturesService } from './services/features';
-import frameSyncService from './services/frame-sync';
+import { FrameSyncService } from './services/frame-sync';
 import groupsService from './services/groups';
 import loadAnnotationsService from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
@@ -139,7 +143,7 @@ function startApp(config, appEl) {
     .register('autosaveService', AutosaveService)
     .register('bridge', bridgeService)
     .register('features', FeaturesService)
-    .register('frameSync', frameSyncService)
+    .register('frameSync', FrameSyncService)
     .register('groups', groupsService)
     .register('loadAnnotationsService', loadAnnotationsService)
     .register('localStorage', LocalStorageService)

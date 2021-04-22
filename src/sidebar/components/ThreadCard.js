@@ -14,7 +14,7 @@ import Thread from './Thread';
 /**
  * @typedef ThreadCardProps
  * @prop {Thread} thread
- * @prop {Object} frameSync - Injected service
+ * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  */
 
 /**

@@ -4,7 +4,7 @@ import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
 
-import FrameSync, { $imports, formatAnnot } from '../frame-sync';
+import { FrameSyncService, $imports, formatAnnot } from '../frame-sync';
 
 const fixtures = {
   ann: Object.assign({ $tag: 't1' }, annotationFixtures.defaultAnnotation()),
@@ -97,7 +97,7 @@ describe('sidebar/services/frame-sync', function () {
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('bridge', { value: fakeBridge })
       .register('store', { value: fakeStore })
-      .register('frameSync', FrameSync)
+      .register('frameSync', FrameSyncService)
       .get('frameSync');
 
     frameSync.connect();
