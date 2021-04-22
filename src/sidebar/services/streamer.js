@@ -12,7 +12,7 @@ import { watch } from '../util/watch';
  *
  * @param {import('../store').SidebarStore} store
  * @param {import('./auth').AuthService} auth
- * @param {ReturnType<import('./groups').default>} groups
+ * @param {import('./groups').GroupsService} groups
  * @param {import('./session').SessionService} session
  * @param {Record<string, any>} settings
  */

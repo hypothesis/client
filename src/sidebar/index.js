@@ -113,7 +113,7 @@ import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
 import { FeaturesService } from './services/features';
 import { FrameSyncService } from './services/frame-sync';
-import groupsService from './services/groups';
+import { GroupsService } from './services/groups';
 import { LoadAnnotationsService } from './services/load-annotations';
 import { LocalStorageService } from './services/local-storage';
 import { PersistedDefaultsService } from './services/persisted-defaults';
@@ -151,7 +151,7 @@ function startApp(config, appEl) {
     .register('bridge', bridgeService)
     .register('features', FeaturesService)
     .register('frameSync', FrameSyncService)
-    .register('groups', groupsService)
+    .register('groups', GroupsService)
     .register('loadAnnotationsService', LoadAnnotationsService)
     .register('localStorage', LocalStorageService)
     .register('persistedDefaults', PersistedDefaultsService)
