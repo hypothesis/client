@@ -28,7 +28,7 @@ export class ServiceURLService {
       const links = await this._apiRoutes.links();
       this._store.updateLinks(links);
     } catch (error) {
-      console.warn('Failed to fetch Hypothesis links: ' + error.message);
+      console.warn(`Failed to fetch Hypothesis links: ${error.message}`);
     }
   }
 }
