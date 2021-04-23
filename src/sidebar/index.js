@@ -36,7 +36,11 @@ if (process.env.NODE_ENV !== 'production') {
 // Install Preact renderer options to work around browser quirks
 rendererOptions.setupBrowserFixes();
 
-// @inject
+/**
+ * @param {import('./services/api').APIService} api
+ * @param {import('./services/streamer').StreamerService} streamer
+ * @inject
+ */
 function setupApi(api, streamer) {
   api.setClientId(streamer.clientId);
 }
@@ -83,8 +87,8 @@ function initServices(
 /**
  * @param {import('./services/frame-sync').FrameSyncService} frameSync
  * @param {import('./store').SidebarStore} store
+ * @inject
  */
-// @inject
 function setupFrameSync(frameSync, store) {
   if (store.route() === 'sidebar') {
     frameSync.connect();
@@ -121,7 +125,7 @@ import { RouterService } from './services/router';
 import { ServiceURLService } from './services/service-url';
 import { SessionService } from './services/session';
 import { StreamFilter } from './services/stream-filter';
-import streamerService from './services/streamer';
+import { StreamerService } from './services/streamer';
 import { TagsService } from './services/tags';
 import { ThreadsService } from './services/threads';
 import { ToastMessengerService } from './services/toast-messenger';
@@ -158,7 +162,7 @@ function startApp(config, appEl) {
     .register('router', RouterService)
     .register('serviceURL', ServiceURLService)
     .register('session', SessionService)
-    .register('streamer', streamerService)
+    .register('streamer', StreamerService)
     .register('streamFilter', StreamFilter)
     .register('tags', TagsService)
     .register('threadsService', ThreadsService)
