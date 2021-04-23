@@ -1,29 +1,41 @@
 import retry from 'retry';
 
 /**
+ * Options passed that control how the operation is retried.
+ *
+ * See https://github.com/tim-kos/node-retry#retrytimeoutsoptions
+ *
+ * @typedef RetryOptions
+ * @prop {number} minTimeout
+ */
+
+/**
  * Retry a Promise-returning operation until it succeeds or
  * fails after a set number of attempts.
  *
- * @param {Function} opFn - The operation to retry
- * @param {Object} [options] - The options object to pass to retry.operation()
- *
- * @return A promise for the first successful result of the operation, if
- *         it succeeds within the allowed number of attempts.
+ * @template T
+ * @param {() => Promise<T>} callback - The operation to retry
+ * @param {RetryOptions} [options]
+ * @return {Promise<T>} - Result of first successful `callback` call (ie. that
+ *   did not reject)
  */
-export function retryPromiseOperation(opFn, options) {
-  return new Promise(function (resolve, reject) {
+export function retryPromiseOperation(callback, options) {
+  return new Promise((resolve, reject) => {
     const operation = retry.operation(options);
-    operation.attempt(function () {
-      opFn()
-        .then(function (result) {
-          operation.retry();
-          resolve(result);
-        })
-        .catch(function (err) {
-          if (!operation.retry(err)) {
-            reject(err);
-          }
-        });
+    operation.attempt(async () => {
+      try {
+        const result = await callback();
+
+        // After a successful call `retry` still needs to be invoked without
+        // arguments to clear internal timeouts.
+        operation.retry();
+
+        resolve(result);
+      } catch (err) {
+        if (!operation.retry(err)) {
+          reject(err);
+        }
+      }
     });
   });
 }
