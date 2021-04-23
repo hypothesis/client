@@ -42,14 +42,16 @@ describe('SessionService', () => {
     fakeToastMessenger = { error: sinon.spy() };
 
     const retryPromiseOperation = async callback => {
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
+      const maxRetries = 3;
+      let lastError;
+      for (let i = 0; i < maxRetries; i++) {
         try {
           return await callback();
         } catch (err) {
-          // Try again
+          lastError = err;
         }
       }
+      throw lastError;
     };
 
     $imports.$mock({
@@ -146,6 +148,22 @@ describe('SessionService', () => {
           assert.calledOnce(fakeStore.updateProfile);
           assert.calledWith(fakeStore.updateProfile, fetchedProfile);
         });
+      });
+
+      it('should reject if the profile fetch repeatedly fails', async () => {
+        const fetchError = new Error('Server error');
+        fakeApi.profile.read.rejects(fetchError);
+
+        const session = createService();
+        let error;
+        try {
+          await session.load();
+        } catch (err) {
+          error = err;
+        }
+
+        assert.equal(error, fetchError);
+        assert.notCalled(fakeStore.updateProfile);
       });
 
       it('should update the session with the profile data from the API', () => {
