@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Annotatable iframe test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      iframe {
+        width: 100%;
+        height: 400px;
+        resize: both;
+        overflow: auto;
+      }
+    </style>
+    <script>
+      // Make the iframe annotatable after the sidebar has been created.
+      // This test if injected client in the iframe is able to discover the sidebar iframe
+      setTimeout(
+        () =>
+          document
+            .querySelector('iframe')
+            .setAttribute('enable-annotation', ''),
+        3000
+      );
+    </script>
+  </head>
+  <body>
+    <h1>Annotatable iframe test</h1>
+    <p>
+      The iframe below has an `enable-annotation` attribute. The client detects
+      and injects the annotator into the iframe, which makes the iframe content
+      annotatable.
+    </p>
+    <iframe src="/document/injectable-frame"></iframe>
+    {{{hypothesisScript}}}
+  </body>
+</html>

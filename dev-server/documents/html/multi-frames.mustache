@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Multi-frame test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      iframe {
+        width: 75%;
+        height: 300px;
+        resize: both;
+        overflow: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Multi-frame test</h1>
+    <p>
+      Selecting text, adding annotations, opening and closing the sidebar here
+      should not have any impact in the other frames.
+    </p>
+    <iframe src="/document/burns"></iframe>
+    <iframe src="/document/doyle"></iframe>
+    {{{hypothesisScript}}}
+  </body>
+</html>
