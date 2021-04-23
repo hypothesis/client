@@ -1,8 +1,7 @@
 import EventEmitter from 'tiny-emitter';
 
 import fakeReduxStore from '../../test/fake-redux-store';
-import Streamer from '../streamer';
-import { $imports } from '../streamer';
+import { StreamerService, $imports } from '../streamer';
 
 const fixtures = {
   createNotification: {
@@ -73,7 +72,7 @@ class FakeSocket extends EventEmitter {
   }
 }
 
-describe('Streamer', function () {
+describe('StreamerService', () => {
   let fakeStore;
   let fakeAuth;
   let fakeGroups;
@@ -82,7 +81,7 @@ describe('Streamer', function () {
   let activeStreamer;
 
   function createDefaultStreamer() {
-    activeStreamer = new Streamer(
+    activeStreamer = new StreamerService(
       fakeStore,
       fakeAuth,
       fakeGroups,

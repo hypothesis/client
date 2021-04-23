@@ -38,7 +38,7 @@ export class LoadAnnotationsService {
   /**
    * @param {import('./api').APIService} api
    * @param {import('../store').SidebarStore} store
-   * @param {import('./streamer').default} streamer
+   * @param {import('./streamer').StreamerService} streamer
    * @param {import('./stream-filter').StreamFilter} streamFilter
    */
   constructor(api, store, streamer, streamFilter) {
