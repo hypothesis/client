@@ -17,6 +17,7 @@ import MenuSection from './MenuSection';
 
 /**
  * @typedef AuthState
+ * @prop {'logged-in'|'logged-out'|'unknown'} status
  * @prop {string} displayName
  * @prop {string} userid
  * @prop {string} username
