@@ -293,25 +293,24 @@ export default class Guest {
     });
 
     this.crossframe.on('scrollToAnnotation', tag => {
-      for (let anchor of this.anchors) {
-        if (anchor.highlights) {
-          if (anchor.annotation.$tag === tag) {
-            const range = resolveAnchor(anchor);
-            if (!range) {
-              continue;
-            }
+      const anchor = this.anchors.find(a => a.annotation.$tag === tag);
+      if (!anchor?.highlights) {
+        return;
+      }
+      const range = resolveAnchor(anchor);
+      if (!range) {
+        return;
+      }
 
-            const event = new CustomEvent('scrolltorange', {
-              bubbles: true,
-              cancelable: true,
-              detail: range,
-            });
-            const defaultNotPrevented = this.element.dispatchEvent(event);
-            if (defaultNotPrevented) {
-              scrollIntoView(anchor.highlights[0]);
-            }
-          }
-        }
+      const event = new CustomEvent('scrolltorange', {
+        bubbles: true,
+        cancelable: true,
+        detail: range,
+      });
+      const defaultNotPrevented = this.element.dispatchEvent(event);
+
+      if (defaultNotPrevented) {
+        scrollIntoView(anchor.highlights[0]);
       }
     });
 
