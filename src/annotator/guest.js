@@ -1,5 +1,3 @@
-import scrollIntoView from 'scroll-into-view';
-
 import { Adder } from './adder';
 import { CrossFrame } from './cross-frame';
 import { HTMLIntegration } from './integrations/html';
@@ -310,7 +308,7 @@ export default class Guest {
       const defaultNotPrevented = this.element.dispatchEvent(event);
 
       if (defaultNotPrevented) {
-        scrollIntoView(anchor.highlights[0]);
+        this._integration.scrollToAnchor(anchor);
       }
     });
 

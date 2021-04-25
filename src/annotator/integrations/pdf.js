@@ -1,5 +1,6 @@
 import debounce from 'lodash.debounce';
 import { render } from 'preact';
+import scrollIntoView from 'scroll-into-view';
 
 import {
   RenderingStates,
@@ -309,5 +310,17 @@ export class PDFIntegration {
     this.pdfViewer.update();
 
     return active;
+  }
+
+  /**
+   * @param {Anchor} anchor
+   */
+  scrollToAnchor(anchor) {
+    // TODO - Account for pages changing state between un-rendered and rendered
+    // while scrolling.
+    const highlights = /** @type {Element[]} */ (anchor.highlights);
+    return new Promise(resolve => {
+      scrollIntoView(highlights[0], resolve);
+    });
   }
 }

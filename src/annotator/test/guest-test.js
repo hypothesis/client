@@ -2,8 +2,6 @@ import Guest from '../guest';
 import { EventBus } from '../util/emitter';
 import { $imports } from '../guest';
 
-const scrollIntoView = sinon.stub();
-
 class FakeAdder {
   constructor(container, options) {
     FakeAdder.instance = this;
@@ -90,6 +88,7 @@ describe('Guest', () => {
       destroy: sinon.stub(),
       fitSideBySide: sinon.stub(),
       getMetadata: sinon.stub().resolves({ title: 'Test title' }),
+      scrollToAnchor: sinon.stub().resolves(),
       uri: sinon.stub().resolves('https://example.com/test.html'),
     };
     HTMLIntegration = sinon.stub().returns(fakeHTMLIntegration);
@@ -101,6 +100,7 @@ describe('Guest', () => {
       getMetadata: sinon
         .stub()
         .resolves({ documentFingerprint: 'test-fingerprint' }),
+      scrollToAnchor: sinon.stub().resolves(),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     };
     PDFIntegration = sinon.stub().returns(fakePDFIntegration);
@@ -125,7 +125,6 @@ describe('Guest', () => {
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
-      'scroll-into-view': scrollIntoView,
     });
   });
 
@@ -266,10 +265,6 @@ describe('Guest', () => {
     });
 
     describe('on "scrollToAnnotation" event', () => {
-      beforeEach(() => {
-        scrollIntoView.reset();
-      });
-
       it('scrolls to the anchor with the matching tag', () => {
         const highlight = document.createElement('span');
         const guest = createGuest();
@@ -284,8 +279,8 @@ describe('Guest', () => {
 
         emitGuestEvent('scrollToAnnotation', 'tag1');
 
-        assert.called(scrollIntoView);
-        assert.calledWith(scrollIntoView, highlight);
+        assert.called(fakeHTMLIntegration.scrollToAnchor);
+        assert.calledWith(fakeHTMLIntegration.scrollToAnchor, guest.anchors[0]);
       });
 
       it('emits a "scrolltorange" DOM event', () => {
@@ -327,7 +322,7 @@ describe('Guest', () => {
 
         emitGuestEvent('scrollToAnnotation', 'tag1');
 
-        assert.notCalled(scrollIntoView);
+        assert.notCalled(fakeHTMLIntegration.scrollToAnchor);
       });
 
       it("does nothing if the anchor's range cannot be resolved", () => {
@@ -348,7 +343,7 @@ describe('Guest', () => {
         emitGuestEvent('scrollToAnnotation', 'tag1');
 
         assert.notCalled(eventEmitted);
-        assert.notCalled(scrollIntoView);
+        assert.notCalled(fakeHTMLIntegration.scrollToAnchor);
       });
     });
 
