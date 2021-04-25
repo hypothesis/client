@@ -107,6 +107,9 @@
  *   the currently loaded document, such as title, PDF fingerprint, etc.
  * @prop {() => Promise<string>} uri - Return the URL of the currently loaded document.
  *   This may be different than the current URL (`location.href`) in a PDF for example.
+ * @prop {(a: Anchor) => Promise<void>} scrollToAnchor - Scroll to an anchor.
+ *   This will only be called if the anchor has at least one highlight (ie.
+ *   `anchor.highlights` is a non-empty array)
  */
 
 /**

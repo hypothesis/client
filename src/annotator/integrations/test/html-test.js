@@ -3,6 +3,7 @@ import { HTMLIntegration, $imports } from '../html';
 describe('HTMLIntegration', () => {
   let fakeHTMLAnchoring;
   let fakeHTMLMetadata;
+  let fakeScrollIntoView;
 
   beforeEach(() => {
     fakeHTMLAnchoring = {
@@ -15,8 +16,11 @@ describe('HTMLIntegration', () => {
       uri: sinon.stub().returns('https://example.com/'),
     };
 
+    fakeScrollIntoView = sinon.stub().yields();
+
     const HTMLMetadata = sinon.stub().returns(fakeHTMLMetadata);
     $imports.$mock({
+      'scroll-into-view': fakeScrollIntoView,
       '../anchoring/html': fakeHTMLAnchoring,
       './html-metadata': { HTMLMetadata },
     });
@@ -57,6 +61,21 @@ describe('HTMLIntegration', () => {
       assert.deepEqual(await integration.getMetadata(), {
         title: 'Example site',
       });
+    });
+  });
+
+  describe('#scrollToAnchor', () => {
+    it('scrolls to first highlight of anchor', async () => {
+      const highlight = document.createElement('div');
+      document.body.appendChild(highlight);
+
+      const anchor = { highlights: [highlight] };
+
+      const integration = new HTMLIntegration();
+      await integration.scrollToAnchor(anchor);
+
+      assert.calledOnce(fakeScrollIntoView);
+      assert.calledWith(fakeScrollIntoView, highlight, sinon.match.func);
     });
   });
 

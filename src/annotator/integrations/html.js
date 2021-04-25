@@ -1,8 +1,11 @@
+import scrollIntoView from 'scroll-into-view';
+
 import { anchor, describe } from '../anchoring/html';
 
 import { HTMLMetadata } from './html-metadata';
 
 /**
+ * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').Integration} Integration
  */
 
@@ -42,5 +45,15 @@ export class HTMLIntegration {
 
   async uri() {
     return this._htmlMeta.uri();
+  }
+
+  /**
+   * @param {Anchor} anchor
+   */
+  scrollToAnchor(anchor) {
+    const highlights = /** @type {Element[]} */ (anchor.highlights);
+    return new Promise(resolve => {
+      scrollIntoView(highlights[0], resolve);
+    });
   }
 }

@@ -26,6 +26,7 @@ describe('PDFIntegration', () => {
   let fakePDFAnchoring;
   let fakePDFMetadata;
   let fakePDFViewerApplication;
+  let fakeScrollIntoView;
   let pdfIntegration;
 
   function createPDFIntegration() {
@@ -61,6 +62,8 @@ describe('PDFIntegration', () => {
       documentHasText: sinon.stub().resolves(true),
     };
 
+    fakeScrollIntoView = sinon.stub().yields();
+
     fakePDFMetadata = {
       getMetadata: sinon
         .stub()
@@ -69,6 +72,7 @@ describe('PDFIntegration', () => {
     };
 
     $imports.$mock({
+      'scroll-into-view': fakeScrollIntoView,
       './pdf-metadata': { PDFMetadata: sinon.stub().returns(fakePDFMetadata) },
       '../anchoring/pdf': fakePDFAnchoring,
 
@@ -359,6 +363,21 @@ describe('PDFIntegration', () => {
       assert.isFalse(active);
       assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
       assert.equal(pdfContainer().style.width, 'auto');
+    });
+  });
+
+  describe('#scrollToAnchor', () => {
+    it('scrolls to first highlight of anchor', async () => {
+      const highlight = document.createElement('div');
+      document.body.appendChild(highlight);
+
+      const anchor = { highlights: [highlight] };
+
+      const integration = createPDFIntegration();
+      await integration.scrollToAnchor(anchor);
+
+      assert.calledOnce(fakeScrollIntoView);
+      assert.calledWith(fakeScrollIntoView, highlight, sinon.match.func);
     });
   });
 });
