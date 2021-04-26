@@ -164,6 +164,7 @@ export default class Guest {
     // Setup connection to sidebar.
     this.crossframe = new CrossFrame(this.element, {
       config,
+      server: config.server,
       on: (event, handler) => this._emitter.subscribe(event, handler),
       emit: (event, ...args) => this._emitter.publish(event, ...args),
     });

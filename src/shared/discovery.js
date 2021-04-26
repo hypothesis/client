@@ -10,6 +10,8 @@
 
 import { ListenerCollection } from '../annotator/util/listener-collection';
 
+/** @typedef {import('../types/annotator').HypothesisWindow} HypothesisWindow */
+
 /**
  * Discovery finds frames in the current tab/window that can be annotated (the
  * "clients") or can fetch annotations from the backend (the "server").
@@ -34,7 +36,7 @@ import { ListenerCollection } from '../annotator/util/listener-collection';
  */
 export default class Discovery {
   /**
-   * @param {Window} target
+   * @param {HypothesisWindow} target
    * @param {object} [options]
    *   @param {boolean} [options.server]
    *   @param {string} [options.origin]
@@ -103,21 +105,24 @@ export default class Discovery {
   _beacon() {
     let beaconMessage;
     if (this.server) {
+      // `host` frame (frame where the client is initially loaded)
       beaconMessage = '__cross_frame_dhcp_offer';
     } else {
       beaconMessage = '__cross_frame_dhcp_discovery';
-    }
+      if (this.target.__hypothesis_frame) {
+        // Annotatable iframe(s) have a global `__hypothesis_frame` variable.
 
-    // Perform a top-down, breadth-first traversal of frames in the current
-    // window and send messages to them.
-    const queue = [this.target.top];
-    while (queue.length > 0) {
-      const parent = /** @type {Window} */ (queue.shift());
-      if (parent !== this.target) {
-        parent.postMessage(beaconMessage, this.origin);
-      }
-      for (let i = 0; i < parent.frames.length; i++) {
-        queue.push(parent.frames[i]);
+        // Find the closest parent that is not an annotatable iframe.
+        /** @type {HypothesisWindow} */
+        let parent = this.target.parent;
+        while (parent.__hypothesis_frame) {
+          parent = this.target.parent;
+        }
+
+        this.target.parent.postMessage(beaconMessage, this.origin);
+      } else {
+        // `sideframe` or `notebook`, iframes
+        this.target.parent.postMessage(beaconMessage, this.origin);
       }
     }
   }

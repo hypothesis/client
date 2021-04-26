@@ -61,8 +61,9 @@ export class CrossFrame {
     };
 
     // Initiate connection to the sidebar.
-    const onDiscoveryCallback = (source, origin, token) =>
+    const onDiscoveryCallback = (source, origin, token) => {
       bridge.createChannel(source, origin, token);
+    };
     discovery.startDiscovery(onDiscoveryCallback);
     frameObserver.observe(injectIntoFrame, iframeUnloaded);
 

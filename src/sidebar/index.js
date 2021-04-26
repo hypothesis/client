@@ -6,7 +6,7 @@ import * as rendererOptions from '../shared/renderer-options';
 import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
-} from './cross-origin-rpc.js';
+} from './cross-origin-rpc';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
 import { fetchConfig } from './config/fetch-config';
 import * as sentry from './util/sentry';

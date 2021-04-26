@@ -41,6 +41,9 @@ function init() {
     // frame context belongs to hypothesis.
     // Needs to be a global property that's set.
     window_.__hypothesis_frame = true;
+    config.server = false;
+  } else {
+    config.server = true;
   }
 
   // Load the PDF anchoring/metadata integration.

@@ -235,7 +235,7 @@ export class FrameSyncService {
       });
     };
 
-    const discovery = new Discovery(window, { server: true });
+    const discovery = new Discovery(window);
     discovery.startDiscovery(this._bridge.createChannel.bind(this._bridge));
     this._bridge.onConnect(addFrame);
 
