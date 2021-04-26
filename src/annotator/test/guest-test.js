@@ -325,6 +325,15 @@ describe('Guest', () => {
         assert.notCalled(fakeHTMLIntegration.scrollToAnchor);
       });
 
+      it('does nothing if the anchor has no highlights', () => {
+        const guest = createGuest();
+
+        guest.anchors = [{ annotation: { $tag: 'tag1' } }];
+        emitGuestEvent('scrollToAnnotation', 'tag1');
+
+        assert.notCalled(fakeHTMLIntegration.scrollToAnchor);
+      });
+
       it("does nothing if the anchor's range cannot be resolved", () => {
         const highlight = document.createElement('span');
         const guest = createGuest();
