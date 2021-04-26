@@ -1,3 +1,4 @@
+import { isInPlaceholder } from './anchoring/placeholder';
 import { isNodeInRange } from './range-util';
 
 const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
@@ -207,13 +208,9 @@ function wholeTextNodesInRange(range) {
 export function highlightRange(range, cssClass = 'hypothesis-highlight') {
   const textNodes = wholeTextNodesInRange(range);
 
-  // Check if this range refers to a placeholder for not-yet-rendered text in
+  // Check if this range refers to a placeholder for not-yet-rendered content in
   // a PDF. These highlights should be invisible.
-  const isPlaceholder =
-    textNodes.length > 0 &&
-    /** @type {Element} */ (textNodes[0].parentNode).closest(
-      '.annotator-placeholder'
-    ) !== null;
+  const isPlaceholder = textNodes.length > 0 && isInPlaceholder(textNodes[0]);
 
   // Group text nodes into spans of adjacent nodes. If a group of text nodes are
   // adjacent, we only need to create one highlight element for the group.

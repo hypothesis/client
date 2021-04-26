@@ -298,7 +298,7 @@ describe('annotator/anchoring/pdf', function () {
           return pdfAnchoring.anchor(container, selectors);
         })
         .then(function (anchoredRange) {
-          assert.equal(anchoredRange.toString(), 'Loading annotations…');
+          assert.equal(anchoredRange.toString(), 'Loading annotations...');
         });
     });
 
