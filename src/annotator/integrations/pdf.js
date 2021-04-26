@@ -8,6 +8,7 @@ import {
   describe,
   documentHasText,
 } from '../anchoring/pdf';
+import { removePlaceholder } from '../anchoring/placeholder';
 import WarningBanner from '../components/WarningBanner';
 import { createShadowRoot } from '../util/shadow-root';
 import { ListenerCollection } from '../util/listener-collection';
@@ -231,12 +232,7 @@ export class PDFIntegration {
           // means the PDF anchoring module anchored annotations before it was
           // rendered. Remove this, which will cause the annotations to anchor
           // again, below.
-          {
-            const placeholder = page.div.querySelector(
-              '.annotator-placeholder'
-            );
-            placeholder?.parentNode.removeChild(placeholder);
-          }
+          removePlaceholder(page.div);
           break;
       }
     }
