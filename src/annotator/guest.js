@@ -300,6 +300,9 @@ export default class Guest {
         return;
       }
 
+      // Emit a custom event that the host page can respond to. This is useful,
+      // for example, if the highlighted content is contained in a collapsible
+      // section of the page that needs to be un-collapsed.
       const event = new CustomEvent('scrolltorange', {
         bubbles: true,
         cancelable: true,
