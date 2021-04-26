@@ -1,6 +1,5 @@
 import debounce from 'lodash.debounce';
 import { render } from 'preact';
-import scrollIntoView from 'scroll-into-view';
 
 import {
   RenderingStates,
@@ -8,15 +7,17 @@ import {
   describe,
   documentHasText,
 } from '../anchoring/pdf';
-import { removePlaceholder } from '../anchoring/placeholder';
+import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
 import WarningBanner from '../components/WarningBanner';
 import { createShadowRoot } from '../util/shadow-root';
 import { ListenerCollection } from '../util/listener-collection';
+import { offsetRelativeTo, scrollElement } from '../util/scroll';
 
 import { PDFMetadata } from './pdf-metadata';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
+ * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  * @typedef {import('../../types/annotator').Integration} Integration
@@ -30,6 +31,21 @@ import { PDFMetadata } from './pdf-metadata';
 const MIN_PDF_WIDTH = 680;
 
 /**
+ * Return true if `anchor` is in an un-rendered page.
+ *
+ * @param {Anchor} anchor
+ */
+function anchorIsPlaceholder(anchor) {
+  const highlight = anchor.highlights?.[0];
+  return highlight && isInPlaceholder(highlight);
+}
+
+/** @param {number} ms */
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
  * Integration that works with PDF.js
  *
  * @implements {Integration}
@@ -37,8 +53,11 @@ const MIN_PDF_WIDTH = 680;
 export class PDFIntegration {
   /**
    * @param {Annotator} annotator
+   * @param {object} options
+   *   @param {number} [options.reanchoringWait] - Max time to wait for
+   *     re-anchoring to complete when scrolling to an un-rendered page.
    */
-  constructor(annotator) {
+  constructor(annotator, options = {}) {
     this.annotator = annotator;
 
     const window_ = /** @type {HypothesisWindow} */ (window);
@@ -58,6 +77,12 @@ export class PDFIntegration {
       childList: true,
       subtree: true,
     });
+
+    /**
+     * Amount of time to wait for re-anchoring to complete when scrolling to
+     * an anchor in a not-yet-rendered page.
+     */
+    this._reanchoringWait = options.reanchoringWait ?? 3000;
 
     /**
      * A banner shown at the top of the PDF viewer warning the user if the PDF
@@ -309,14 +334,78 @@ export class PDFIntegration {
   }
 
   /**
+   * Scroll to the location of an anchor in the PDF.
+   *
+   * If the anchor refers to a location that is an un-rendered page far from
+   * the viewport, then scrolling happens in three phases. First the document
+   * scrolls to the approximate location indicated by the placeholder anchor,
+   * then `scrollToAnchor` waits until the page's text layer is rendered and
+   * the annotation is re-anchored in the fully rendered page. Then it scrolls
+   * again to the final location.
+   *
    * @param {Anchor} anchor
    */
-  scrollToAnchor(anchor) {
-    // TODO - Account for pages changing state between un-rendered and rendered
-    // while scrolling.
-    const highlights = /** @type {Element[]} */ (anchor.highlights);
-    return new Promise(resolve => {
-      scrollIntoView(highlights[0], resolve);
-    });
+  async scrollToAnchor(anchor) {
+    const annotation = anchor.annotation;
+    const isPlaceholder = anchorIsPlaceholder(anchor);
+    const offset = this._anchorOffset(anchor);
+    if (offset === null) {
+      return;
+    }
+
+    await scrollElement(this.contentContainer(), offset);
+
+    if (isPlaceholder) {
+      const anchor = await this._waitForAnnotationToBeAnchored(
+        annotation,
+        this._reanchoringWait
+      );
+      if (!anchor) {
+        return;
+      }
+      const offset = this._anchorOffset(anchor);
+      if (offset === null) {
+        return;
+      }
+      await scrollElement(this.contentContainer(), offset);
+    }
+  }
+
+  /**
+   * Wait for an annotation to be anchored in a rendered page.
+   *
+   * @param {AnnotationData} annotation
+   * @param {number} maxWait
+   * @return {Promise<Anchor|null>}
+   */
+  async _waitForAnnotationToBeAnchored(annotation, maxWait) {
+    const start = Date.now();
+    let anchor;
+    do {
+      // nb. Re-anchoring might result in a different anchor object for the
+      // same annotation.
+      anchor = this.annotator.anchors.find(a => a.annotation === annotation);
+      if (!anchor || anchorIsPlaceholder(anchor)) {
+        anchor = null;
+        await delay(20);
+      }
+    } while (!anchor && Date.now() - start < maxWait);
+    return anchor ?? null;
+  }
+
+  /**
+   * Return the offset that the PDF content container would need to be scrolled
+   * to, in order to make an anchor visible.
+   *
+   * @param {Anchor} anchor
+   * @return {number|null} - Target offset or `null` if this anchor was not resolved
+   */
+  _anchorOffset(anchor) {
+    if (!anchor.highlights) {
+      // This anchor was not resolved to a location in the document.
+      return null;
+    }
+    const highlight = anchor.highlights[0];
+    return offsetRelativeTo(highlight, this.contentContainer());
   }
 }
