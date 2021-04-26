@@ -2,6 +2,7 @@ import { PDFIntegration, $imports } from '../pdf';
 
 import FakePDFViewerApplication from '../../anchoring/test/fake-pdf-viewer-application';
 import { RenderingStates } from '../../anchoring/pdf';
+import { createPlaceholder } from '../../anchoring/placeholder';
 
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -26,11 +27,11 @@ describe('PDFIntegration', () => {
   let fakePDFAnchoring;
   let fakePDFMetadata;
   let fakePDFViewerApplication;
-  let fakeScrollIntoView;
+  let fakeScrollUtils;
   let pdfIntegration;
 
-  function createPDFIntegration() {
-    return new PDFIntegration(fakeAnnotator);
+  function createPDFIntegration(options = {}) {
+    return new PDFIntegration(fakeAnnotator, options);
   }
 
   beforeEach(() => {
@@ -62,8 +63,6 @@ describe('PDFIntegration', () => {
       documentHasText: sinon.stub().resolves(true),
     };
 
-    fakeScrollIntoView = sinon.stub().yields();
-
     fakePDFMetadata = {
       getMetadata: sinon
         .stub()
@@ -71,10 +70,15 @@ describe('PDFIntegration', () => {
       getUri: sinon.stub().resolves('https://example.com/test.pdf'),
     };
 
+    fakeScrollUtils = {
+      offsetRelativeTo: sinon.stub().returns(0),
+      scrollElement: sinon.stub().resolves(),
+    };
+
     $imports.$mock({
-      'scroll-into-view': fakeScrollIntoView,
       './pdf-metadata': { PDFMetadata: sinon.stub().returns(fakePDFMetadata) },
       '../anchoring/pdf': fakePDFAnchoring,
+      '../util/scroll': fakeScrollUtils,
 
       // Disable debouncing of updates.
       'lodash.debounce': callback => callback,
@@ -369,15 +373,119 @@ describe('PDFIntegration', () => {
   describe('#scrollToAnchor', () => {
     it('scrolls to first highlight of anchor', async () => {
       const highlight = document.createElement('div');
-      document.body.appendChild(highlight);
+      const offset = 42;
+      const integration = createPDFIntegration();
+      fakeScrollUtils.offsetRelativeTo
+        .withArgs(highlight, integration.contentContainer())
+        .returns(offset);
 
       const anchor = { highlights: [highlight] };
-
-      const integration = createPDFIntegration();
       await integration.scrollToAnchor(anchor);
 
-      assert.calledOnce(fakeScrollIntoView);
-      assert.calledWith(fakeScrollIntoView, highlight, sinon.match.func);
+      assert.calledOnce(fakeScrollUtils.scrollElement);
+      assert.calledWith(
+        fakeScrollUtils.scrollElement,
+        integration.contentContainer(),
+        offset
+      );
+    });
+
+    it('does not scroll if anchor has no highlights', async () => {
+      const integration = createPDFIntegration();
+      const anchor = {};
+
+      await integration.scrollToAnchor(anchor);
+
+      assert.notCalled(fakeScrollUtils.scrollElement);
+    });
+
+    /**
+     * Create an anchor whose highlight is inside a placeholder for a non-rendered
+     * PDF page.
+     */
+    function createPlaceholderHighlight() {
+      const container = document.createElement('div');
+      const placeholder = createPlaceholder(container);
+      const highlight = document.createElement('div');
+      placeholder.append(highlight);
+      return highlight;
+    }
+
+    it('waits for anchors in placeholders to be re-anchored and scrolls to final highlight', async () => {
+      const placeholderHighlight = createPlaceholderHighlight();
+      const integration = createPDFIntegration();
+      fakeScrollUtils.offsetRelativeTo
+        .withArgs(placeholderHighlight, integration.contentContainer())
+        .returns(50);
+      const annotation = { $tag: 'tag1' };
+      const anchor = { annotation, highlights: [placeholderHighlight] };
+
+      // Check that the PDF content was scrolled to the approximate position of
+      // the anchor, indicated by the placeholder.
+      const scrollDone = integration.scrollToAnchor(anchor);
+      assert.calledWith(
+        fakeScrollUtils.scrollElement,
+        integration.contentContainer(),
+        50
+      );
+
+      // Simulate a delay while rendering of the text layer for the page happens
+      // and re-anchoring completes.
+      await delay(5);
+
+      // Create a new anchor for the annotation created by re-anchoring.
+      const finalHighlight = document.createElement('div');
+      fakeScrollUtils.scrollElement.resetHistory();
+      fakeAnnotator.anchors.push({
+        annotation,
+        highlights: [finalHighlight],
+      });
+      fakeScrollUtils.offsetRelativeTo
+        .withArgs(finalHighlight, integration.contentContainer())
+        .returns(150);
+
+      await scrollDone;
+
+      // Check that we scrolled to the location of the final highlight.
+      assert.calledWith(
+        fakeScrollUtils.scrollElement,
+        integration.contentContainer(),
+        150
+      );
+    });
+
+    it('skips scrolling to final anchor if re-anchoring does not complete within timeout', async () => {
+      const highlight = createPlaceholderHighlight();
+      const integration = createPDFIntegration({ reanchoringWait: 10 });
+      const annotation = { $tag: 'tag1' };
+      const anchor = { annotation, highlights: [highlight] };
+
+      const scrollDone = integration.scrollToAnchor(anchor);
+      await delay(5); // Simulate delay in re-anchoring
+      fakeScrollUtils.scrollElement.resetHistory();
+
+      // Wait until the re-anchoring timeout expires.
+      await scrollDone;
+
+      assert.notCalled(fakeScrollUtils.scrollElement);
+    });
+
+    it('skips scrolling to final anchor if re-anchoring fails', async () => {
+      const placeholderHighlight = createPlaceholderHighlight();
+      const integration = createPDFIntegration();
+      const annotation = { $tag: 'tag1' };
+      const anchor = { annotation, highlights: [placeholderHighlight] };
+
+      const scrollDone = integration.scrollToAnchor(anchor);
+      await delay(5);
+      fakeScrollUtils.scrollElement.resetHistory();
+
+      // Simulate re-anchoring failing (anchor has no `highlights` field). The
+      // PDF should remain scrolled to the location of the placeholder highlight.
+      fakeAnnotator.anchors.push({ annotation });
+      await scrollDone;
+
+      assert.notCalled(fakeScrollUtils.scrollElement);
     });
   });
 });
