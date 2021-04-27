@@ -8,12 +8,13 @@ const placeholderSelector = '.annotator-placeholder';
  *
  * In document viewers such as PDF.js which only render a subset of long
  * documents at a time, it may not be possible to anchor annotations to the
- * actual text in pages which are off-screen. Instead the annotations are anchored
- * to a placeholder element which is in roughly the correct location, in terms
- * of X/Y scroll offset.
+ * actual text in pages which are off-screen. For these non-rendered pages,
+ * a "placeholder" element is created in the approximate X/Y location (eg.
+ * middle of the page) where the content will appear. Any highlights for that
+ * page are then rendered inside the placeholder.
  *
- * When the viewport is scrolled to the region of the document, the placeholder
- * will be removed and annotations will be re-anchored to the real content.
+ * When the viewport is scrolled to the non-rendered page, the placeholder
+ * is removed and annotations are re-anchored to the real content.
  *
  * @param {HTMLElement} container - The container element for the page or tile
  *   which is not rendered.
