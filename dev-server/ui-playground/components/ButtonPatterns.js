@@ -9,7 +9,7 @@ import {
   Pattern,
   PatternExamples,
   PatternExample,
-} from '../shared/components/PatternPage';
+} from '@hypothesis/frontend-shared/lib/pattern-library/components/PatternPage';
 
 export default function ButtonPatterns() {
   return (
