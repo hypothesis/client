@@ -165,11 +165,18 @@ describe('annotator/util/buckets', () => {
 
     it('only buckets annotations that have highlights', () => {
       const badAnchor = { highlights: [] };
-      fakeAnchors.push(badAnchor);
       const bucketSet = anchorBuckets([badAnchor]);
       assert.equal(bucketSet.buckets.length, 0);
       assert.isEmpty(bucketSet.above.anchors); // Holder for above-screen anchors
       assert.isEmpty(bucketSet.below.anchors); // Holder for below-screen anchors
+    });
+
+    it('does not bucket annotations whose highlights have zero area', () => {
+      const badAnchor = { highlights: [0, 0] };
+      const bucketSet = anchorBuckets([badAnchor]);
+      assert.equal(bucketSet.buckets.length, 0);
+      assert.isEmpty(bucketSet.above.anchors);
+      assert.isEmpty(bucketSet.below.anchors);
     });
 
     it('sorts anchors by top position', () => {

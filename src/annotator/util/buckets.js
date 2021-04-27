@@ -118,6 +118,10 @@ function getAnchorPositions(anchors) {
       return;
     }
     const anchorBox = getBoundingClientRect(anchor.highlights);
+    if (anchorBox.top >= anchorBox.bottom) {
+      // Empty rect. The highlights may be disconnected from the document or hidden.
+      return;
+    }
     anchorPositions.push({
       top: anchorBox.top,
       bottom: anchorBox.bottom,
