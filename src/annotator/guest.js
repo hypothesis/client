@@ -178,6 +178,15 @@ export default class Guest {
     // Setup event handlers on the root element
     this._listeners = new ListenerCollection();
     this._setupElementEvents();
+
+    /**
+     * Tags of currently focused annotations. This is used to set the focused
+     * state correctly for new highlights if the associated annotation is already
+     * focused in the sidebar.
+     *
+     * @type {Set<string>}
+     */
+    this._focusedAnnotations = new Set();
   }
 
   // Add DOM event listeners for clicks, taps etc. on the document and
@@ -282,6 +291,9 @@ export default class Guest {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
     this.crossframe.on('focusAnnotations', (tags = []) => {
+      this._focusedAnnotations.clear();
+      tags.forEach(tag => this._focusedAnnotations.add(tag));
+
       for (let anchor of this.anchors) {
         if (anchor.highlights) {
           const toggle = tags.includes(anchor.annotation.$tag);
@@ -409,6 +421,10 @@ export default class Guest {
         h._annotation = anchor.annotation;
       });
       anchor.highlights = highlights;
+
+      if (this._focusedAnnotations.has(anchor.annotation.$tag)) {
+        setHighlightsFocused(highlights, true);
+      }
     };
 
     // Remove existing anchors for this annotation.
@@ -614,5 +630,15 @@ export default class Guest {
    */
   get sideBySideActive() {
     return this._sideBySideActive;
+  }
+
+  /**
+   * Return the tags of annotations that are currently displayed in a focused
+   * state.
+   *
+   * @return {Set<string>}
+   */
+  get focusedAnnotationTags() {
+    return this._focusedAnnotations;
   }
 }

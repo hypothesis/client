@@ -262,6 +262,15 @@ describe('Guest', () => {
           false
         );
       });
+
+      it('updates focused tag set', () => {
+        const guest = createGuest();
+
+        emitGuestEvent('focusAnnotations', ['tag1']);
+        emitGuestEvent('focusAnnotations', ['tag2', 'tag3']);
+
+        assert.deepEqual([...guest.focusedAnnotationTags], ['tag2', 'tag3']);
+      });
     });
 
     describe('on "scrollToAnnotation" event', () => {
@@ -1011,6 +1020,32 @@ describe('Guest', () => {
         assert.calledOnce(removeHighlights);
         assert.calledWith(removeHighlights, highlights);
       });
+    });
+
+    it('focuses the new highlights if the annotation is already focused', async () => {
+      const guest = createGuest();
+      const highlights = [document.createElement('span')];
+      fakeHTMLIntegration.anchor.resolves(range);
+      highlighter.highlightRange.returns(highlights);
+      const target = {
+        selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
+      };
+      const annotation = { $tag: 'tag1', target: [target] };
+
+      // Focus the annotation (in the sidebar) before it is anchored in the page.
+      const [, focusAnnotationsCallback] = fakeCrossFrame.on.args.find(
+        args => args[0] === 'focusAnnotations'
+      );
+      focusAnnotationsCallback([annotation.$tag]);
+      const anchors = await guest.anchor(annotation);
+
+      // Check that the new highlights are already in the focused state.
+      assert.equal(anchors.length, 1);
+      assert.calledWith(
+        highlighter.setHighlightsFocused,
+        anchors[0].highlights,
+        true
+      );
     });
   });
 
