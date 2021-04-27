@@ -18,7 +18,7 @@ import { ListenerCollection } from './util/listener-collection';
 export default class BucketBar {
   /**
    * @param {HTMLElement} container
-   * @param {Pick<import('./guest').default, 'anchors'|'selectAnnotations'>} guest
+   * @param {Pick<import('./guest').default, 'anchors'|'scrollToAnchor'|'selectAnnotations'>} guest
    * @param {BucketBarOptions} [options]
    */
   constructor(container, guest, { contentContainer = document.body } = {}) {
@@ -65,6 +65,7 @@ export default class BucketBar {
         onSelectAnnotations={(annotations, toggle) =>
           this._guest.selectAnnotations(annotations, toggle)
         }
+        scrollToAnchor={anchor => this._guest.scrollToAnchor(anchor)}
       />,
       this._bucketsContainer
     );

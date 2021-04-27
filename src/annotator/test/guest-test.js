@@ -709,6 +709,17 @@ describe('Guest', () => {
     });
   });
 
+  describe('#scrollToAnchor', () => {
+    it("invokes the document integration's `scrollToAnchor` implementation", () => {
+      const guest = createGuest();
+      const anchor = {};
+
+      guest.scrollToAnchor(anchor);
+
+      assert.calledWith(fakeHTMLIntegration.scrollToAnchor, anchor);
+    });
+  });
+
   describe('#getDocumentInfo', () => {
     let guest;
 
