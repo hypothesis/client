@@ -7,7 +7,6 @@ import Buckets, { $imports } from '../Buckets';
 describe('Buckets', () => {
   let fakeBucketsUtil;
   let fakeHighlighter;
-  let fakeScrollIntoView;
 
   let fakeAbove;
   let fakeBelow;
@@ -43,10 +42,8 @@ describe('Buckets', () => {
     fakeHighlighter = {
       setHighlightsFocused: sinon.stub(),
     };
-    fakeScrollIntoView = sinon.stub();
 
     $imports.$mock({
-      'scroll-into-view': fakeScrollIntoView,
       '../highlighter': fakeHighlighter,
       '../util/buckets': fakeBucketsUtil,
     });
@@ -99,7 +96,8 @@ describe('Buckets', () => {
     it('scrolls to anchors above when up navigation button is pressed', () => {
       const fakeAnchor = { highlights: ['hi'] };
       fakeBucketsUtil.findClosestOffscreenAnchor.returns(fakeAnchor);
-      const wrapper = createComponent();
+      const scrollToAnchor = sinon.stub();
+      const wrapper = createComponent({ scrollToAnchor });
       const upButton = wrapper.find('.Buckets__button--up');
 
       upButton.simulate('click');
@@ -109,13 +107,14 @@ describe('Buckets', () => {
         fakeAbove.anchors,
         'up'
       );
-      assert.calledWith(fakeScrollIntoView, fakeAnchor.highlights[0]);
+      assert.calledWith(scrollToAnchor, fakeAnchor);
     });
 
     it('scrolls to anchors below when down navigation button is pressed', () => {
       const fakeAnchor = { highlights: ['hi'] };
       fakeBucketsUtil.findClosestOffscreenAnchor.returns(fakeAnchor);
-      const wrapper = createComponent();
+      const scrollToAnchor = sinon.stub();
+      const wrapper = createComponent({ scrollToAnchor });
       const downButton = wrapper.find('.Buckets__button--down');
 
       downButton.simulate('click');
@@ -125,7 +124,7 @@ describe('Buckets', () => {
         fakeBelow.anchors,
         'down'
       );
-      assert.calledWith(fakeScrollIntoView, fakeAnchor.highlights[0]);
+      assert.calledWith(scrollToAnchor, fakeAnchor);
     });
   });
 

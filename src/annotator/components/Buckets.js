@@ -1,11 +1,11 @@
 import classnames from 'classnames';
-import scrollIntoView from 'scroll-into-view';
 
 import { setHighlightsFocused } from '../highlighter';
 import { findClosestOffscreenAnchor } from '../util/buckets';
 
 /**
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../util/buckets').Bucket} Bucket
  */
 
@@ -53,14 +53,15 @@ function BucketButton({ bucket, onSelectAnnotations }) {
  * @param {Object} props
  *   @param {Bucket} props.bucket
  *   @param {'up'|'down'} props.direction
+ *   @param {(a: Anchor) => void} props.scrollToAnchor
  */
-function NavigationBucketButton({ bucket, direction }) {
+function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
   const buttonTitle = `Go ${direction} to next annotations (${bucket.anchors.length})`;
 
   function scrollToClosest() {
     const closest = findClosestOffscreenAnchor(bucket.anchors, direction);
-    if (closest?.highlights?.length) {
-      scrollIntoView(closest.highlights[0]);
+    if (closest) {
+      scrollToAnchor(closest);
     }
   }
 
@@ -85,12 +86,14 @@ function NavigationBucketButton({ bucket, direction }) {
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets
  *   @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
+ *   @param {(a: Anchor) => void} props.scrollToAnchor
  */
 export default function Buckets({
   above,
   below,
   buckets,
   onSelectAnnotations,
+  scrollToAnchor,
 }) {
   const showUpNavigation = above.anchors.length > 0;
   const showDownNavigation = below.anchors.length > 0;
@@ -99,7 +102,11 @@ export default function Buckets({
     <ul className="Buckets__list">
       {showUpNavigation && (
         <li className="Buckets__bucket" style={{ top: above.position }}>
-          <NavigationBucketButton bucket={above} direction="up" />
+          <NavigationBucketButton
+            bucket={above}
+            direction="up"
+            scrollToAnchor={scrollToAnchor}
+          />
         </li>
       )}
       {buckets.map((bucket, index) => (
@@ -116,7 +123,11 @@ export default function Buckets({
       ))}
       {showDownNavigation && (
         <li className="Buckets__bucket" style={{ top: below.position }}>
-          <NavigationBucketButton bucket={below} direction="down" />
+          <NavigationBucketButton
+            bucket={below}
+            direction="down"
+            scrollToAnchor={scrollToAnchor}
+          />
         </li>
       )}
     </ul>

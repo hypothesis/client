@@ -593,6 +593,15 @@ export default class Guest {
   }
 
   /**
+   * Scroll the document content so that `anchor` is visible.
+   *
+   * @param {Anchor} anchor
+   */
+  scrollToAnchor(anchor) {
+    return this._integration.scrollToAnchor(anchor);
+  }
+
+  /**
    * Set whether highlights are visible in the document or not.
    *
    * @param {boolean} shouldShowHighlights

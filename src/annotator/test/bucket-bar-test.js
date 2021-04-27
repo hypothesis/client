@@ -3,14 +3,14 @@ import { $imports } from '../bucket-bar';
 
 describe('BucketBar', () => {
   const sandbox = sinon.createSandbox();
-  let fakeAnnotator;
+  let fakeGuest;
   let fakeBucketUtil;
   let bucketBars;
   let bucketProps;
   let container;
 
   const createBucketBar = function (options) {
-    const bucketBar = new BucketBar(container, fakeAnnotator, options);
+    const bucketBar = new BucketBar(container, fakeGuest, options);
     bucketBars.push(bucketBar);
     return bucketBar;
   };
@@ -19,8 +19,9 @@ describe('BucketBar', () => {
     container = document.createElement('div');
     bucketBars = [];
     bucketProps = {};
-    fakeAnnotator = {
+    fakeGuest = {
       anchors: [],
+      scrollToAnchor: sinon.stub(),
       selectAnnotations: sinon.stub(),
     };
 
@@ -50,7 +51,7 @@ describe('BucketBar', () => {
 
   it('should render buckets for existing anchors when constructed', () => {
     const bucketBar = createBucketBar();
-    assert.calledWith(fakeBucketUtil.anchorBuckets, fakeAnnotator.anchors);
+    assert.calledWith(fakeBucketUtil.anchorBuckets, fakeGuest.anchors);
     assert.ok(bucketBar._bucketsContainer.querySelector('.FakeBuckets'));
   });
 
@@ -79,7 +80,17 @@ describe('BucketBar', () => {
 
       const fakeAnnotations = ['hi', 'there'];
       bucketProps.onSelectAnnotations(fakeAnnotations, true);
-      assert.calledWith(fakeAnnotator.selectAnnotations, fakeAnnotations, true);
+      assert.calledWith(fakeGuest.selectAnnotations, fakeAnnotations, true);
+    });
+
+    it('should scroll to anchor when Buckets component invokes callback', () => {
+      const bucketBar = createBucketBar();
+      bucketBar._update();
+
+      const anchor = {};
+      bucketProps.scrollToAnchor(anchor);
+
+      assert.calledWith(fakeGuest.scrollToAnchor, anchor);
     });
 
     context('when `contentContainer` is specified', () => {
