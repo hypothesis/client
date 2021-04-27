@@ -1,14 +1,7 @@
-import { registerIcons } from '@hypothesis/frontend-shared';
-import { render } from 'preact';
-
+import { startApp } from '@hypothesis/frontend-shared/lib/pattern-library';
 import ButtonPatterns from './components/ButtonPatterns';
 
-import PlaygroundApp from './shared/components/PlaygroundApp';
-
 import sidebarIcons from '../../src/sidebar/icons';
-registerIcons(sidebarIcons);
-
-const container = document.querySelector('#app');
 
 const extraRoutes = [
   {
@@ -18,7 +11,4 @@ const extraRoutes = [
   },
 ];
 
-render(
-  <PlaygroundApp extraRoutes={extraRoutes} />,
-  /** @type Element */ (container)
-);
+startApp({ extraRoutes, icons: sidebarIcons });
