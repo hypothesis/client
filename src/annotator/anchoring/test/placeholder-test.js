@@ -57,5 +57,10 @@ describe('annotator/anchoring/placeholder', () => {
     it('returns false if node is not inside a placeholder', () => {
       assert.isFalse(isInPlaceholder(document.body));
     });
+
+    it('returns false if node has no parent', () => {
+      const el = document.createElement('div');
+      assert.isFalse(isInPlaceholder(el));
+    });
   });
 });

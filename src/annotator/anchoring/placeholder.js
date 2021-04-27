@@ -57,5 +57,8 @@ export function removePlaceholder(container) {
  * @param {Node} node
  */
 export function isInPlaceholder(node) {
-  return node.parentElement?.closest(placeholderSelector) !== null;
+  if (!node.parentElement) {
+    return false;
+  }
+  return node.parentElement.closest(placeholderSelector) !== null;
 }
