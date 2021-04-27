@@ -47,6 +47,7 @@ export function offsetRelativeTo(element, parent) {
 export async function scrollElement(
   element,
   offset,
+  /* istanbul ignore next - default options are overridden in tests */
   { maxDuration = 500 } = {}
 ) {
   const initialOffset = element.scrollTop;
