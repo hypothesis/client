@@ -29,6 +29,7 @@ export default class FrameObserver {
     this._mutationObserver.observe(this._target, {
       childList: true,
       subtree: true,
+      attributeFilter: ['enable-annotation'],
     });
   }
 

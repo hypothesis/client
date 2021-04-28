@@ -1,12 +1,18 @@
 /**
  * Return all `<iframe>` elements under `container` which are annotate-able.
  *
+ * To enable annotation, an iframe must be opted-in by adding the
+ * `enable-annotation` attribute.
+ *
+ * Eventually we may want annotation to be enabled by default for iframes that
+ * pass certain tests. However we need to resolve a number of issues before we
+ * can do that. See https://github.com/hypothesis/client/issues/530
+ *
  * @param {Element} container
  * @return {HTMLIFrameElement[]}
  */
 export function findFrames(container) {
-  const frames = Array.from(container.getElementsByTagName('iframe'));
-  return frames.filter(shouldEnableAnnotation);
+  return Array.from(container.querySelectorAll('iframe[enable-annotation]'));
 }
 
 // Check if the iframe has already been injected
@@ -38,29 +44,6 @@ export function isAccessible(iframe) {
   } catch (e) {
     return false;
   }
-}
-
-/**
- * Return `true` if an iframe should be made annotate-able.
- *
- * To enable annotation, an iframe must be opted-in by adding the
- * "enable-annotation" attribute and must be visible.
- *
- * @param  {HTMLIFrameElement} iframe the frame being checked
- * @returns {boolean}   result of our validity checks
- */
-function shouldEnableAnnotation(iframe) {
-  // Ignore the Hypothesis sidebar.
-  const isNotClientFrame = !iframe.classList.contains('h-sidebar-iframe');
-
-  // Require iframes to opt into annotation support.
-  //
-  // Eventually we may want annotation to be enabled by default for iframes that
-  // pass certain tests. However we need to resolve a number of issues before we
-  // can do that. See https://github.com/hypothesis/client/issues/530
-  const enabled = iframe.hasAttribute('enable-annotation');
-
-  return isNotClientFrame && enabled;
 }
 
 export function isDocumentReady(iframe, callback) {
