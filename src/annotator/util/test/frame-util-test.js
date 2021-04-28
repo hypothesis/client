@@ -1,6 +1,6 @@
 import * as frameUtil from '../frame-util';
 
-describe('annotator.util.frame-util', function () {
+describe('annotator/util/frame-util', function () {
   describe('findFrames', function () {
     let container;
 
@@ -51,18 +51,6 @@ describe('annotator.util.frame-util', function () {
 
       const foundFrames = frameUtil.findFrames(container);
       assert.lengthOf(foundFrames, 0);
-    });
-
-    it('should not return the Hypothesis sidebar', function () {
-      _addFrameToContainer({ className: 'h-sidebar-iframe other-class-too' });
-
-      const foundFrames = frameUtil.findFrames(container);
-
-      assert.lengthOf(
-        foundFrames,
-        0,
-        'frames with hypothesis className should not be found'
-      );
     });
   });
 });
