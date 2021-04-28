@@ -1,15 +1,21 @@
-import * as time from '../time';
+import {
+  clearFormatters,
+  decayingInterval,
+  formatDate,
+  formatRelativeDate,
+  nextFuzzyUpdate,
+} from '../time';
 
 const second = 1000;
 const minute = second * 60;
 const hour = minute * 60;
 const day = hour * 24;
 
-describe('sidebar.util.time', function () {
+describe('sidebar/util/time', () => {
   let sandbox;
   let fakeIntl;
 
-  beforeEach(function () {
+  beforeEach(() => {
     sandbox = sinon.createSandbox();
     sandbox.useFakeTimers();
 
@@ -20,10 +26,10 @@ describe('sidebar.util.time', function () {
     };
     // Clear the formatters cache so that mocked formatters
     // from one test run don't affect the next.
-    time.clearFormatters();
+    clearFormatters();
   });
 
-  afterEach(function () {
+  afterEach(() => {
     sandbox.restore();
   });
 
@@ -46,11 +52,11 @@ describe('sidebar.util.time', function () {
     return date;
   };
 
-  describe('.toFuzzyString', function () {
-    it('Handles empty dates', function () {
+  describe('formatRelativeDate', () => {
+    it('Handles empty dates', () => {
       const date = null;
       const expect = '';
-      assert.equal(time.toFuzzyString(date, undefined), expect);
+      assert.equal(formatRelativeDate(date, undefined), expect);
     });
 
     [
@@ -65,7 +71,7 @@ describe('sidebar.util.time', function () {
       it('creates correct fuzzy string for fixture ' + test.now, () => {
         const timeStamp = fakeDate('1970-01-01T00:00:00.000Z');
         const now = fakeDate(test.now);
-        assert.equal(time.toFuzzyString(timeStamp, now), test.text);
+        assert.equal(formatRelativeDate(timeStamp, now), test.text);
       });
     });
 
@@ -114,95 +120,71 @@ describe('sidebar.util.time', function () {
           const now = fakeDate(test.now);
 
           fakeIntl.DateTimeFormat().format.returns(test.text); // eslint-disable-line new-cap
-          assert.equal(time.toFuzzyString(timeStamp, now, fakeIntl), test.text);
+          assert.equal(formatRelativeDate(timeStamp, now, fakeIntl), test.text);
           assert.calledWith(fakeIntl.DateTimeFormat, undefined, test.options);
           assert.calledWith(fakeIntl.DateTimeFormat().format, timeStamp); // eslint-disable-line new-cap
         }
       );
     });
-
-    it('falls back to simple strings for >24hrs ago', function () {
-      // If window.Intl is not available then the date formatting for dates
-      // more than one day ago falls back to a simple date string.
-      const timeStamp = fakeDate('1970-01-01T00:00:00.000Z');
-      timeStamp.toDateString = sinon.stub().returns('Thu Jan 01 1970');
-      const now = fakeDate('1970-01-02T00:00:00.000Z');
-
-      const formattedDate = time.toFuzzyString(timeStamp, now, null);
-      assert.calledOnce(timeStamp.toDateString);
-      assert.equal(formattedDate, 'Thu Jan 01 1970');
-    });
-
-    it('falls back to simple strings for >1yr ago', function () {
-      // If window.Intl is not available then the date formatting for dates
-      // more than one year ago falls back to a simple date string.
-      const timeStamp = fakeDate('1970-01-01T00:00:00.000Z');
-      timeStamp.toDateString = sinon.stub().returns('Thu Jan 01 1970');
-      const now = fakeDate('1972-01-01T00:00:00.000Z');
-
-      const formattedDate = time.toFuzzyString(timeStamp, now, null);
-      assert.calledOnce(timeStamp.toDateString);
-      assert.equal(formattedDate, 'Thu Jan 01 1970');
-    });
   });
 
-  describe('.decayingInterval', function () {
-    it('Handles empty dates', function () {
+  describe('decayingInterval', () => {
+    it('Handles empty dates', () => {
       const date = null;
-      time.decayingInterval(date, undefined);
+      decayingInterval(date, undefined);
     });
 
-    it('uses a short delay for recent timestamps', function () {
+    it('uses a short delay for recent timestamps', () => {
       const date = new Date().toISOString();
       const callback = sandbox.stub();
-      time.decayingInterval(date, callback);
+      decayingInterval(date, callback);
       sandbox.clock.tick(6 * second);
-      assert.calledWith(callback, date);
+      assert.called(callback);
       sandbox.clock.tick(6 * second);
       assert.calledTwice(callback);
     });
 
-    it('uses a longer delay for older timestamps', function () {
+    it('uses a longer delay for older timestamps', () => {
       const date = new Date().toISOString();
       const ONE_MINUTE = minute;
       sandbox.clock.tick(10 * ONE_MINUTE);
       const callback = sandbox.stub();
-      time.decayingInterval(date, callback);
+      decayingInterval(date, callback);
       sandbox.clock.tick(ONE_MINUTE / 2);
       assert.notCalled(callback);
       sandbox.clock.tick(ONE_MINUTE);
-      assert.calledWith(callback, date);
+      assert.called(callback);
       sandbox.clock.tick(ONE_MINUTE);
       assert.calledTwice(callback);
     });
 
-    it('returned function cancels the timer', function () {
+    it('returned function cancels the timer', () => {
       const date = new Date().toISOString();
       const callback = sandbox.stub();
-      const cancel = time.decayingInterval(date, callback);
+      const cancel = decayingInterval(date, callback);
       cancel();
       sandbox.clock.tick(minute);
       assert.notCalled(callback);
     });
 
-    it('does not set a timeout for dates > 24hrs ago', function () {
+    it('does not set a timeout for dates > 24hrs ago', () => {
       const date = new Date().toISOString();
       const ONE_DAY = day;
       sandbox.clock.tick(10 * ONE_DAY);
       const callback = sandbox.stub();
 
-      time.decayingInterval(date, callback);
+      decayingInterval(date, callback);
       sandbox.clock.tick(ONE_DAY * 2);
 
       assert.notCalled(callback);
     });
   });
 
-  describe('.nextFuzzyUpdate', function () {
-    it('Handles empty dates', function () {
+  describe('nextFuzzyUpdate', () => {
+    it('Handles empty dates', () => {
       const date = null;
       const expect = null;
-      assert.equal(time.nextFuzzyUpdate(date, undefined), expect);
+      assert.equal(nextFuzzyUpdate(date, undefined), expect);
     });
 
     [
@@ -220,11 +202,25 @@ describe('sidebar.util.time', function () {
       it('gives correct next fuzzy update time for fixture ' + test.now, () => {
         const timeStamp = fakeDate('1970-01-01T00:00:00.000Z');
         const now = fakeDate(test.now);
-        assert.equal(
-          time.nextFuzzyUpdate(timeStamp, now),
-          test.expectedUpdateTime
-        );
+        assert.equal(nextFuzzyUpdate(timeStamp, now), test.expectedUpdateTime);
       });
+    });
+  });
+
+  describe('formatDate', () => {
+    it('returns absolute formatted date', () => {
+      // nb. Date has no time zone specifier so is assumed to be in the current
+      // time zone.
+      const date = new Date('2020-05-04T03:02:01');
+
+      const formatted = formatDate(date);
+
+      // The exact format will depend on the system locale and browser, but it
+      // should contain at least the following tokens.
+      const tokens = ['2020', '04', '03', '02'];
+      tokens.forEach(token =>
+        assert.match(formatted, new RegExp(`\\b${token}\\b`))
+      );
     });
   });
 });
