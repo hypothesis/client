@@ -1,14 +1,12 @@
-/**
- * Utility functions for generating formatted "fuzzy" date strings and
- * computing decaying intervals for updating those dates in a UI.
- */
-
 const SECOND = 1000;
 const MINUTE = 60 * SECOND;
 const HOUR = 60 * MINUTE;
 
-// Cached DateTimeFormat instances,
-// because instantiating a DateTimeFormat is expensive.
+/**
+ * Map of stringified `DateTimeFormatOptions` to cached `DateTimeFormat` instances.
+ *
+ * @type {Record<string, Intl.DateTimeFormat>}
+ */
 let formatters = {};
 
 /**
@@ -30,65 +28,61 @@ function delta(date, now) {
 }
 
 /**
- * Efficiently return date string formatted with `options`.
+ * Return date string formatted with `options`.
  *
- * This is a wrapper for `Intl.DateTimeFormat.format()` that caches
- * `DateTimeFormat` instances because they're expensive to create.
- * Calling `Date.toLocaleDateString()` lots of times is also expensive in some
- * browsers as it appears to create a new formatter for each call.
+ * This is a caching wrapper for `Intl.DateTimeFormat.format`, useful because
+ * constructing a `DateTimeFormat` is expensive.
  *
  * @param {Date} date
- * @param {Object} options - Options for `Intl.DateTimeFormat.format()`
- * @param {Object} Intl - JS internationalization API implementation; this
- *                      param is present for dependency injection during test.
+ * @param {Intl.DateTimeFormatOptions} options
+ * @param {Intl} Intl - Test seam. JS `Intl` API implementation.
  * @returns {string}
  */
-function formatIntl(date, options, Intl = window.Intl) {
-  if (Intl && Intl.DateTimeFormat) {
-    const key = JSON.stringify(options);
-    let formatter = formatters[key];
-
-    if (!formatter) {
-      formatter = formatters[key] = new Intl.DateTimeFormat(undefined, options);
-    }
-
-    return formatter.format(date);
-  } else {
-    // IE < 11, Safari <= 9.0.
-    return date.toDateString();
+function format(date, options, Intl = window.Intl) {
+  const key = JSON.stringify(options);
+  let formatter = formatters[key];
+  if (!formatter) {
+    formatter = formatters[key] = new Intl.DateTimeFormat(undefined, options);
   }
+  return formatter.format(date);
 }
 
 /**
- * Date templating functions.
- *
+ * @callback DateFormatter
  * @param {Date} date
  * @param {Date} now
- * @return {String} formatted date
+ * @param {Intl} [intl]
+ * @return {string} formatted date
  */
+
+/** @type {DateFormatter} */
 function nSec(date, now) {
   const n = Math.floor(delta(date, now) / SECOND);
   return `${n} secs ago`;
 }
 
+/** @type {DateFormatter} */
 function nMin(date, now) {
   const n = Math.floor(delta(date, now) / MINUTE);
   const plural = n > 1 ? 's' : '';
   return `${n} min${plural} ago`;
 }
 
+/** @type {DateFormatter} */
 function nHr(date, now) {
   const n = Math.floor(delta(date, now) / HOUR);
   const plural = n > 1 ? 's' : '';
   return `${n} hr${plural} ago`;
 }
 
+/** @type {DateFormatter} */
 function dayAndMonth(date, now, Intl) {
-  return formatIntl(date, { month: 'short', day: 'numeric' }, Intl);
+  return format(date, { month: 'short', day: 'numeric' }, Intl);
 }
 
+/** @type {DateFormatter} */
 function dayAndMonthAndYear(date, now, Intl) {
-  return formatIntl(
+  return format(
     date,
     { day: 'numeric', month: 'short', year: 'numeric' },
     Intl
@@ -98,7 +92,7 @@ function dayAndMonthAndYear(date, now, Intl) {
 /**
  * @typedef Breakpoint
  * @prop {(date: Date, now: Date) => boolean} test
- * @prop {(date: Date, now: Date, Intl: typeof window.Intl) => string} formatFn
+ * @prop {(date: Date, now: Date, Intl?: typeof window.Intl) => string} formatter
  * @prop {number|null} nextUpdate
  */
 
@@ -107,31 +101,31 @@ const BREAKPOINTS = [
   {
     // Less than 30 seconds
     test: (date, now) => delta(date, now) < 30 * SECOND,
-    formatFn: () => 'Just now',
+    formatter: () => 'Just now',
     nextUpdate: 1 * SECOND,
   },
   {
     // Less than 1 minute
     test: (date, now) => delta(date, now) < 1 * MINUTE,
-    formatFn: nSec,
+    formatter: nSec,
     nextUpdate: 1 * SECOND,
   },
   {
-    // less than one hour
+    // Less than one hour
     test: (date, now) => delta(date, now) < 1 * HOUR,
-    formatFn: nMin,
+    formatter: nMin,
     nextUpdate: 1 * MINUTE,
   },
   {
-    // less than one day
+    // Less than one day
     test: (date, now) => delta(date, now) < 24 * HOUR,
-    formatFn: nHr,
+    formatter: nHr,
     nextUpdate: 1 * HOUR,
   },
   {
-    // this year
+    // This year
     test: (date, now) => date.getFullYear() === now.getFullYear(),
-    formatFn: dayAndMonth,
+    formatter: dayAndMonth,
     nextUpdate: null,
   },
 ];
@@ -139,7 +133,7 @@ const BREAKPOINTS = [
 /** @type {Breakpoint} */
 const DEFAULT_BREAKPOINT = {
   test: /* istanbul ignore next */ () => true,
-  formatFn: dayAndMonthAndYear,
+  formatter: dayAndMonthAndYear,
   nextUpdate: null,
 };
 
@@ -192,19 +186,18 @@ export function nextFuzzyUpdate(date, now) {
 }
 
 /**
- * Starts an interval whose frequency decays depending on the relative
- * age of 'date'.
+ * Start an interval whose frequency depends on the age of a timestamp.
  *
- * This can be used to refresh parts of a UI whose
- * update frequency depends on the age of a timestamp.
+ * This is useful for refreshing UI components displaying timestamps generated
+ * by `formatRelativeDate`, since the output changes less often for older timestamps.
  *
- * @param {string} date - An ISO 8601 date string timestamp to format.
- * @param {UpdateCallback} callback - A callback function to call when the timestamp changes.
- * @return {()=>void} A function that cancels the automatic refresh.
+ * @param {string} date - Date string to use to determine the interval frequency
+ * @param {() => void} callback - Interval callback
+ * @return {() => void} A function that cancels the interval
  */
 export function decayingInterval(date, callback) {
   let timer;
-  const timeStamp = date ? new Date(date) : null;
+  const timeStamp = new Date(date);
 
   const update = () => {
     const fuzzyUpdate = nextFuzzyUpdate(timeStamp, new Date());
@@ -213,7 +206,7 @@ export function decayingInterval(date, callback) {
     }
     const nextUpdate = fuzzyUpdate + 500;
     timer = setTimeout(() => {
-      callback(date);
+      callback();
       update();
     }, nextUpdate);
   };
@@ -224,23 +217,46 @@ export function decayingInterval(date, callback) {
 }
 
 /**
- * This callback is a param for the `decayingInterval` function.
- * @callback UpdateCallback
- * @param {string} date - The date associated with the current interval/timeout
- */
-
-/**
- * Formats a date as a string relative to the current date.
+ * Formats a date as a short approximate string relative to the current date.
+ *
+ * The level of precision is proportional to how recent the date is.
+ *
+ * For example:
+ *
+ *  - "Just now"
+ *  - "5 minutes ago"
+ *  - "25 Oct 2018"
  *
  * @param {Date|null} date - The date to consider as the timestamp to format.
  * @param {Date} now - The date to consider as the current time.
- * @param {Object} [Intl] - JS internationalization API implementation; this
- *                      param is present for dependency injection during test.
+ * @param {Intl} [Intl] - Test seam. JS `Intl` API implementation.
  * @return {string} A 'fuzzy' string describing the relative age of the date.
  */
-export function toFuzzyString(date, now, Intl) {
+export function formatRelativeDate(date, now, Intl) {
   if (!date) {
     return '';
   }
-  return getBreakpoint(date, now).formatFn(date, now, Intl);
+  return getBreakpoint(date, now).formatter(date, now, Intl);
+}
+
+/**
+ * Formats a date as an absolute string in a human readable format.
+ *
+ * The exact format will vary depending on the locale, but the verbosity will
+ * be consistent across locales. In en-US for example this will look like:
+ *
+ *  "Sunday, Dec 17, 2017, 10:00 AM"
+ *
+ * @param {Date} date
+ * @return {string}
+ */
+export function formatDate(date) {
+  return format(date, {
+    year: 'numeric',
+    month: 'short',
+    day: '2-digit',
+    weekday: 'long',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }

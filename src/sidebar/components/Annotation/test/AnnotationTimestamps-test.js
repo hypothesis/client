@@ -7,9 +7,7 @@ import AnnotationTimestamps, { $imports } from '../AnnotationTimestamps';
 
 describe('AnnotationTimestamps', () => {
   let clock;
-  let fakeFormatDate;
   let fakeTime;
-  let fakeToFuzzyString;
 
   const createComponent = props =>
     mount(
@@ -24,16 +22,14 @@ describe('AnnotationTimestamps', () => {
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();
-    fakeToFuzzyString = sinon.stub().returns('fuzzy string');
-    fakeFormatDate = sinon.stub().returns('absolute date');
 
     fakeTime = {
-      toFuzzyString: fakeToFuzzyString,
+      formatDate: sinon.stub().returns('absolute date'),
+      formatRelativeDate: sinon.stub().returns('fuzzy string'),
       decayingInterval: sinon.stub(),
     };
 
     $imports.$mock({
-      '../../util/date': { format: fakeFormatDate },
       '../../util/time': fakeTime,
     });
   });
@@ -63,7 +59,7 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('renders edited timestamp if `withEditedTimestamp` is true', () => {
-    fakeToFuzzyString.onCall(1).returns('another fuzzy string');
+    fakeTime.formatRelativeDate.onCall(1).returns('another fuzzy string');
 
     const wrapper = createComponent({ withEditedTimestamp: true });
 
@@ -73,7 +69,7 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('does not render edited relative date if equivalent to created relative date', () => {
-    fakeToFuzzyString.returns('equivalent fuzzy strings');
+    fakeTime.formatRelativeDate.returns('equivalent fuzzy strings');
 
     const wrapper = createComponent({ withEditedTimestamp: true });
 
@@ -88,7 +84,7 @@ describe('AnnotationTimestamps', () => {
       return () => clearTimeout(id);
     });
     const wrapper = createComponent();
-    fakeTime.toFuzzyString.returns('60 jiffies');
+    fakeTime.formatRelativeDate.returns('60 jiffies');
 
     act(() => {
       clock.tick(1000);
