@@ -51,7 +51,7 @@ describe('BucketBar', () => {
   it('should render buckets for existing anchors when constructed', () => {
     const bucketBar = createBucketBar();
     assert.calledWith(fakeBucketUtil.anchorBuckets, fakeAnnotator.anchors);
-    assert.ok(bucketBar.element.querySelector('.FakeBuckets'));
+    assert.ok(bucketBar._bucketsContainer.querySelector('.FakeBuckets'));
   });
 
   describe('updating buckets', () => {
