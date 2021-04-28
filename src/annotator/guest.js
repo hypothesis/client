@@ -360,6 +360,10 @@ export default class Guest extends Delegator {
     crossframe.on('setDoodleOptions', state => {
       this.setDoodleOptions(state);
     });
+
+    crossframe.on('saveCurrentDoodle', () => {
+      this.saveCurrentDoodle();
+    });
   }
 
   destroy() {
@@ -585,6 +589,18 @@ export default class Guest extends Delegator {
     const setTargets = ([info, selectors]) => {
       // `selectors` is an array of arrays: each item is an array of selectors
       // identifying a distinct target.
+
+      // If the annotation is a doodle, add a target for the doodle lines
+      if (annotation.$doodle && annotation.doodleLines) {
+        selectors = [
+          ...selectors,
+          annotation.doodleLines.map(curLine => ({
+            type: 'DoodleSelector',
+            line: curLine,
+          })),
+        ];
+      }
+
       const source = info.uri;
       annotation.target = selectors.map(selector => ({
         source,
@@ -747,6 +763,18 @@ export default class Guest extends Delegator {
       if (options.hasOwnProperty('size')) {
         this.doodleCanvasController.size = options.size;
       }
+    }
+  }
+
+  /**
+   * Save the doodle
+   */
+  saveCurrentDoodle() {
+    if (this.doodleCanvasController) {
+      this.createAnnotation({
+        $doodle: true,
+        doodleLines: this.doodleCanvasController.lines,
+      });
     }
   }
 }

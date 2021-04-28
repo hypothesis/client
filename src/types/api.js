@@ -30,14 +30,28 @@
  */
 
 /**
- * @typedef {TextQuoteSelector | TextPositionSelector | RangeSelector} Selector
+ * @typedef DoodleSelector
+ * @prop {'DoodleSelector'} type
+ * @prop {DoodleLine} line
+ */
+
+/**
+ * @typedef {TextQuoteSelector | TextPositionSelector | RangeSelector | DoodleSelector} Selector
  */
 
 /**
  * @typedef Target
  * @prop {string} source
  * @prop {Selector[]} [selector]
- *
+ */
+
+/**
+ * @typedef DoodleLine
+ * @prop {string} tool
+ * @prop {string} color
+ * @prop {string} size
+ * @prop {Array<Array<number>>} points
+ */
 
 /**
  * TODO - Fill out remaining properties

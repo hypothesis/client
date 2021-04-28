@@ -9,6 +9,8 @@ import propTypes from 'prop-types';
  * @prop {number} size - The size of the brush.
  * @prop {boolean} active - Whether the canvas can be doodled on at this time
  * @prop {HTMLElement} attachedElement - Which element the DoodleCanvas should cover.
+ * @prop {Array<import('../types/api').DoodleLine>} lines - An array of lines that compose this doodle.
+ * @prop {Function} setLines - A function to set the lines
  */
 
 /**
@@ -20,8 +22,14 @@ import propTypes from 'prop-types';
  *
  * @param {DoodleCanvasProps} props
  */
-const DoodleCanvas = ({ tool, size, active, attachedElement }) => {
-  const [lines, setLines] = useState(/** @type {array} */ ([]));
+const DoodleCanvas = ({
+  tool,
+  size,
+  active,
+  attachedElement,
+  lines,
+  setLines,
+}) => {
   const [isDrawing, setIsDrawing] = useState(false);
 
   const handleMouseDown = e => {
@@ -103,6 +111,8 @@ DoodleCanvas.propTypes = {
   tool: propTypes.string.isRequired,
   size: propTypes.number.isRequired,
   active: propTypes.bool.isRequired,
+  lines: propTypes.array.isRequired,
+  setLines: propTypes.func.isRequired,
   attachedElement: propTypes.any.isRequired,
 };
 

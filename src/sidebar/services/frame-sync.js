@@ -182,6 +182,9 @@ export default function FrameSync(annotationsService, bridge, store) {
     bridge.on('setDoodleOptions', function (state) {
       bridge.call('setDoodleOptions', state);
     });
+    bridge.on('saveCurrentDoodle', function (state) {
+      bridge.call('saveCurrentDoodle', state);
+    });
   }
 
   /**
