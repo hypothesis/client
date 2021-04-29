@@ -35,7 +35,7 @@ const MIN_PDF_WIDTH = 680;
  *
  * @param {Anchor} anchor
  */
-function anchorIsPlaceholder(anchor) {
+function anchorIsInPlaceholder(anchor) {
   const highlight = anchor.highlights?.[0];
   return highlight && isInPlaceholder(highlight);
 }
@@ -347,7 +347,7 @@ export class PDFIntegration {
    */
   async scrollToAnchor(anchor) {
     const annotation = anchor.annotation;
-    const isPlaceholder = anchorIsPlaceholder(anchor);
+    const inPlaceholder = anchorIsInPlaceholder(anchor);
     const offset = this._anchorOffset(anchor);
     if (offset === null) {
       return;
@@ -355,7 +355,7 @@ export class PDFIntegration {
 
     await scrollElement(this.contentContainer(), offset);
 
-    if (isPlaceholder) {
+    if (inPlaceholder) {
       const anchor = await this._waitForAnnotationToBeAnchored(
         annotation,
         this._reanchoringWait
@@ -385,7 +385,7 @@ export class PDFIntegration {
       // nb. Re-anchoring might result in a different anchor object for the
       // same annotation.
       anchor = this.annotator.anchors.find(a => a.annotation === annotation);
-      if (!anchor || anchorIsPlaceholder(anchor)) {
+      if (!anchor || anchorIsInPlaceholder(anchor)) {
         anchor = null;
         await delay(20);
       }
