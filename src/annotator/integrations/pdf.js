@@ -353,6 +353,9 @@ export class PDFIntegration {
       return;
     }
 
+    // nb. We only compute the scroll offset once at the start of scrolling.
+    // This is important as the highlight may be removed from the document during
+    // the scroll due to a page transitioning from rendered <-> un-rendered.
     await scrollElement(this.contentContainer(), offset);
 
     if (inPlaceholder) {
