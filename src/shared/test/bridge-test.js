@@ -1,7 +1,7 @@
 import Bridge from '../bridge';
-import RPC from '../frame-rpc';
+import { RPC } from '../frame-rpc';
 
-describe('shared.bridge', function () {
+describe('shared/bridge', function () {
   const sandbox = sinon.createSandbox();
   let bridge;
   let createChannel;
@@ -26,8 +26,8 @@ describe('shared.bridge', function () {
   describe('#createChannel', function () {
     it('creates a new channel with the provided options', function () {
       const channel = createChannel();
-      assert.equal(channel.src, window);
-      assert.equal(channel.dst, fakeWindow);
+      assert.equal(channel.sourceFrame, window);
+      assert.equal(channel.destFrame, fakeWindow);
       assert.equal(channel.origin, 'http://example.com');
     });
 

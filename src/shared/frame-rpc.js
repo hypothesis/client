@@ -1,6 +1,7 @@
-/* eslint-disable */
+/*
+  This module was adapted from `index.js` in https://github.com/substack/frame-rpc.
 
-/** This software is released under the MIT license:
+  This software is released under the MIT license:
 
   Permission is hereby granted, free of charge, to any person obtaining a copy
   of this software and associated documentation files (the "Software"), to deal
@@ -21,106 +22,144 @@
   SOFTWARE.
  */
 
-/**
- * This is a modified copy of index.js from
- * https://github.com/substack/frame-rpc (see git log for the modifications),
- * upstream license above.
- */
-
 const VERSION = '1.0.0';
 
 /**
- *  @constructor
- *  @param {Window} src
- *  @param {Window} dst
- *  @param {string} origin
- *  @param {(Object<string, ((any) => any)>) | ((any) => any)} methods
+ * Format of messages sent between frames.
+ *
+ * See https://github.com/substack/frame-rpc#protocol
+ *
+ * @typedef RequestMessage
+ * @prop {number} sequence
+ * @prop {string} method
+ * @prop {any[]} arguments
+ *
+ * @typedef ResponseMessage
+ * @prop {number} response
+ * @prop {any[]} arguments
+ *
+ * @typedef {RequestMessage|ResponseMessage} Message
  */
-export default function RPC(src, dst, origin, methods) {
-  const self = this;
-  this.src = src;
-  this.dst = dst;
 
-  if (origin === '*') {
-    this.origin = '*';
-  } else {
-    const uorigin = new URL(origin);
-    this.origin = uorigin.protocol + '//' + uorigin.host;
+/**
+ * Class for making RPC requests between frames.
+ *
+ * Code adapted from https://github.com/substack/frame-rpc.
+ */
+export class RPC {
+  /**
+   * Create an RPC client for sending RPC requests from `sourceFrame` to
+   * `destFrame`.
+   *
+   * @param {Window} sourceFrame
+   * @param {Window} destFrame
+   * @param {string} origin - Origin of destination frame
+   * @param {Record<string, (...args: any[]) => any>} methods - Map of method
+   *   name to method handler
+   */
+  constructor(sourceFrame, destFrame, origin, methods) {
+    this.sourceFrame = sourceFrame;
+    this.destFrame = destFrame;
+
+    if (origin === '*') {
+      this.origin = '*';
+    } else {
+      const uorigin = new URL(origin);
+      this.origin = uorigin.protocol + '//' + uorigin.host;
+    }
+
+    this._sequence = 0;
+    this._callbacks = {};
+
+    /** @param {MessageEvent} event */
+    this._onmessage = event => {
+      // Validate message sender and format.
+      if (
+        this._destroyed ||
+        this.destFrame !== event.source ||
+        (this.origin !== '*' && event.origin !== this.origin) ||
+        !event.data ||
+        typeof event.data !== 'object' ||
+        event.data.protocol !== 'frame-rpc' ||
+        !Array.isArray(event.data.arguments)
+      ) {
+        return;
+      }
+      this._handle(event.data);
+    };
+    this.sourceFrame.addEventListener('message', this._onmessage);
+    this._methods = methods;
   }
 
-  this._sequence = 0;
-  this._callbacks = {};
+  /**
+   * Disconnect the RPC channel. After this is invoked no further method calls
+   * will be received.
+   */
+  destroy() {
+    this._destroyed = true;
+    this.sourceFrame.removeEventListener('message', this._onmessage);
+  }
 
-  this._onmessage = function (ev) {
-    if (self._destroyed) return;
-    if (self.dst !== ev.source) return;
-    if (self.origin !== '*' && ev.origin !== self.origin) return;
-    if (!ev.data || typeof ev.data !== 'object') return;
-    if (ev.data.protocol !== 'frame-rpc') return;
-    if (!Array.isArray(ev.data.arguments)) return;
-    self._handle(ev.data);
-  };
-  this.src.addEventListener('message', this._onmessage);
-  this._methods =
-    (typeof methods === 'function' ? methods(this) : methods) || {};
+  /**
+   * Send an RPC request to the destination frame.
+   *
+   * If the final argument in `args` is a function, it is treated as a callback
+   * which is invoked with the response.
+   *
+   * @param {string} method
+   * @param {any[]} args
+   */
+  call(method, ...args) {
+    if (this._destroyed) {
+      return;
+    }
+    const seq = this._sequence++;
+    if (typeof args[args.length - 1] === 'function') {
+      this._callbacks[seq] = args[args.length - 1];
+      args = args.slice(0, -1);
+    }
+    this.destFrame.postMessage(
+      {
+        protocol: 'frame-rpc',
+        version: VERSION,
+        sequence: seq,
+        method: method,
+        arguments: args,
+      },
+      this.origin
+    );
+  }
+
+  /**
+   * @param {Message} msg
+   */
+  _handle(msg) {
+    if (this._destroyed) {
+      return;
+    }
+    if ('method' in msg) {
+      if (!this._methods.hasOwnProperty(msg.method)) {
+        return;
+      }
+      /** @param {any[]} args */
+      const callback = (...args) => {
+        this.destFrame.postMessage(
+          {
+            protocol: 'frame-rpc',
+            version: VERSION,
+            response: msg.sequence,
+            arguments: args,
+          },
+          this.origin
+        );
+      };
+      this._methods[msg.method].call(this._methods, ...msg.arguments, callback);
+    } else if ('response' in msg) {
+      const cb = this._callbacks[msg.response];
+      delete this._callbacks[msg.response];
+      if (cb) {
+        cb.apply(null, msg.arguments);
+      }
+    }
+  }
 }
-
-RPC.prototype.destroy = function () {
-  this._destroyed = true;
-  this.src.removeEventListener('message', this._onmessage);
-};
-
-/**
- * @param {string} method
- */
-RPC.prototype.call = function (method) {
-  const args = [].slice.call(arguments, 1);
-  return this.apply(method, args);
-};
-
-/**
- * @param {string} method
- * @param {any[]} args
- */
-RPC.prototype.apply = function (method, args) {
-  if (this._destroyed) return;
-  const seq = this._sequence++;
-  if (typeof args[args.length - 1] === 'function') {
-    this._callbacks[seq] = args[args.length - 1];
-    args = args.slice(0, -1);
-  }
-  this.dst.postMessage(
-    {
-      protocol: 'frame-rpc',
-      version: VERSION,
-      sequence: seq,
-      method: method,
-      arguments: args,
-    },
-    this.origin
-  );
-};
-
-RPC.prototype._handle = function (msg) {
-  const self = this;
-  if (self._destroyed) return;
-  if (msg.hasOwnProperty('method')) {
-    if (!this._methods.hasOwnProperty(msg.method)) return;
-    const args = msg.arguments.concat(function () {
-      self.dst.postMessage(
-        {
-          protocol: 'frame-rpc',
-          version: VERSION,
-          response: msg.sequence,
-          arguments: [].slice.call(arguments),
-        },
-        self.origin
-      );
-    });
-    this._methods[msg.method].apply(this._methods, args);
-  } else if (msg.hasOwnProperty('response')) {
-    const cb = this._callbacks[msg.response];
-    delete this._callbacks[msg.response];
-    if (cb) cb.apply(null, msg.arguments);
-  }
-};
