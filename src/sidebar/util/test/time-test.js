@@ -129,9 +129,19 @@ describe('sidebar/util/time', () => {
   });
 
   describe('decayingInterval', () => {
-    it('Handles empty dates', () => {
+    it('handles empty dates', () => {
       const date = null;
       decayingInterval(date, undefined);
+    });
+
+    it('never invokes callback if date is invalid', () => {
+      const date = new Date('foo bar');
+      const callback = sinon.stub();
+
+      decayingInterval(date, callback);
+      sandbox.clock.tick(600 * day);
+
+      assert.notCalled(callback);
     });
 
     it('uses a short delay for recent timestamps', () => {
@@ -181,10 +191,21 @@ describe('sidebar/util/time', () => {
   });
 
   describe('nextFuzzyUpdate', () => {
-    it('Handles empty dates', () => {
+    it('handles empty dates', () => {
       const date = null;
       const expect = null;
       assert.equal(nextFuzzyUpdate(date, undefined), expect);
+    });
+
+    it('returns `null` if date is invalid', () => {
+      const date = new Date('foo bar');
+      assert.equal(nextFuzzyUpdate(date), null);
+    });
+
+    it('returns `null` if "now" date is invalid', () => {
+      const date = new Date();
+      const now = new Date('foo bar');
+      assert.equal(nextFuzzyUpdate(date, now), null);
     });
 
     [
