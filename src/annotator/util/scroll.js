@@ -50,15 +50,15 @@ export async function scrollElement(
   /* istanbul ignore next - default options are overridden in tests */
   { maxDuration = 500 } = {}
 ) {
-  const initialOffset = element.scrollTop;
-  const targetOffset = offset;
+  const startOffset = element.scrollTop;
+  const endOffset = offset;
   const scrollStart = Date.now();
 
   // Choose a scroll duration proportional to the scroll distance, but capped
   // to avoid it being too slow.
   const pixelsPerMs = 3;
   const scrollDuration = Math.min(
-    Math.abs(targetOffset - initialOffset) / pixelsPerMs,
+    Math.abs(endOffset - startOffset) / pixelsPerMs,
     maxDuration
   );
 
@@ -66,10 +66,6 @@ export async function scrollElement(
   while (scrollFraction < 1.0) {
     await nextAnimationFrame();
     scrollFraction = Math.min(1.0, (Date.now() - scrollStart) / scrollDuration);
-    element.scrollTop = interpolate(
-      initialOffset,
-      targetOffset,
-      scrollFraction
-    );
+    element.scrollTop = interpolate(startOffset, endOffset, scrollFraction);
   }
 }

@@ -54,7 +54,7 @@ export class PDFIntegration {
   /**
    * @param {Annotator} annotator
    * @param {object} options
-   *   @param {number} [options.reanchoringWait] - Max time to wait for
+   *   @param {number} [options.reanchoringMaxWait] - Max time to wait for
    *     re-anchoring to complete when scrolling to an un-rendered page.
    */
   constructor(annotator, options = {}) {
@@ -82,7 +82,7 @@ export class PDFIntegration {
      * Amount of time to wait for re-anchoring to complete when scrolling to
      * an anchor in a not-yet-rendered page.
      */
-    this._reanchoringWait = options.reanchoringWait ?? 3000;
+    this._reanchoringMaxWait = options.reanchoringMaxWait ?? 3000;
 
     /**
      * A banner shown at the top of the PDF viewer warning the user if the PDF
@@ -361,7 +361,7 @@ export class PDFIntegration {
     if (inPlaceholder) {
       const anchor = await this._waitForAnnotationToBeAnchored(
         annotation,
-        this._reanchoringWait
+        this._reanchoringMaxWait
       );
       if (!anchor) {
         return;
@@ -390,6 +390,9 @@ export class PDFIntegration {
       anchor = this.annotator.anchors.find(a => a.annotation === annotation);
       if (!anchor || anchorIsInPlaceholder(anchor)) {
         anchor = null;
+
+        // If no anchor was found, wait a bit longer and check again to see if
+        // re-anchoring completed.
         await delay(20);
       }
     } while (!anchor && Date.now() - start < maxWait);
