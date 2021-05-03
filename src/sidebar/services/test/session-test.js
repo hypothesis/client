@@ -155,14 +155,8 @@ describe('SessionService', () => {
         fakeApi.profile.read.rejects(fetchError);
 
         const session = createService();
-        let error;
-        try {
-          await session.load();
-        } catch (err) {
-          error = err;
-        }
 
-        assert.equal(error, fetchError);
+        assert.rejects(session.load(), fetchError.message);
         assert.notCalled(fakeStore.updateProfile);
       });
 
