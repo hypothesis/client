@@ -1,6 +1,5 @@
-import { SearchClient } from '../search-client';
-
 import { isReply } from '../helpers/annotation-metadata';
+import { SearchClient } from '../search-client';
 
 /**
  * @typedef {import('../search-client').SortBy} SortBy
