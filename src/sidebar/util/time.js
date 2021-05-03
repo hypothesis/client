@@ -155,6 +155,15 @@ function getBreakpoint(date, now) {
 }
 
 /**
+ * See https://262.ecma-international.org/6.0/#sec-time-values-and-time-range
+ *
+ * @param {Date} date
+ */
+function isDateValid(date) {
+  return !isNaN(date.valueOf());
+}
+
+/**
  * Return the number of milliseconds until the next update for a given date
  * should be handled, based on the delta between `date` and `now`.
  *
@@ -164,7 +173,7 @@ function getBreakpoint(date, now) {
  *                         should occur
  */
 export function nextFuzzyUpdate(date, now) {
-  if (!date) {
+  if (!date || !isDateValid(date) || !isDateValid(now)) {
     return null;
   }
 
@@ -197,10 +206,10 @@ export function nextFuzzyUpdate(date, now) {
  */
 export function decayingInterval(date, callback) {
   let timer;
-  const timeStamp = new Date(date);
+  const timestamp = new Date(date);
 
   const update = () => {
-    const fuzzyUpdate = nextFuzzyUpdate(timeStamp, new Date());
+    const fuzzyUpdate = nextFuzzyUpdate(timestamp, new Date());
     if (fuzzyUpdate === null) {
       return;
     }
