@@ -64,8 +64,8 @@ export class RPC {
     if (origin === '*') {
       this.origin = '*';
     } else {
-      const uorigin = new URL(origin);
-      this.origin = uorigin.protocol + '//' + uorigin.host;
+      const url = new URL(origin);
+      this.origin = url.protocol + '//' + url.host;
     }
 
     this._sequence = 0;
