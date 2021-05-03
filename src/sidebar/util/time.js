@@ -257,15 +257,20 @@ export function formatRelativeDate(date, now, Intl) {
  *  "Sunday, Dec 17, 2017, 10:00 AM"
  *
  * @param {Date} date
+ * @param {Intl} [Intl] - Test seam. JS `Intl` API implementation.
  * @return {string}
  */
-export function formatDate(date) {
-  return format(date, {
-    year: 'numeric',
-    month: 'short',
-    day: '2-digit',
-    weekday: 'long',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+export function formatDate(date, Intl) {
+  return format(
+    date,
+    {
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      weekday: 'long',
+      hour: '2-digit',
+      minute: '2-digit',
+    },
+    Intl
+  );
 }

@@ -230,17 +230,23 @@ describe('sidebar/util/time', () => {
 
   describe('formatDate', () => {
     it('returns absolute formatted date', () => {
-      // nb. Date has no time zone specifier so is assumed to be in the current
-      // time zone.
-      const date = new Date('2020-05-04T03:02:01');
+      const date = new Date('2020-05-04T23:02:01');
+      const fakeIntl = locale => ({
+        DateTimeFormat: function (_, options) {
+          return new Intl.DateTimeFormat(locale, options);
+        },
+      });
 
-      const formatted = formatDate(date);
+      assert.equal(
+        formatDate(date, fakeIntl('en-US')),
+        'Monday, May 04, 2020, 11:02 PM'
+      );
 
-      // The exact format will depend on the system locale and browser, but it
-      // should contain at least the following tokens.
-      const tokens = ['2020', '04', '03', '02'];
-      tokens.forEach(token =>
-        assert.match(formatted, new RegExp(`\\b${token}\\b`))
+      clearFormatters();
+
+      assert.equal(
+        formatDate(date, fakeIntl('de-DE')),
+        'Montag, 04. Mai 2020, 23:02'
       );
     });
   });
