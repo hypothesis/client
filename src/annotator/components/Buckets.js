@@ -53,7 +53,8 @@ function BucketButton({ bucket, onSelectAnnotations }) {
  * @param {Object} props
  *   @param {Bucket} props.bucket
  *   @param {'up'|'down'} props.direction
- *   @param {(a: Anchor) => void} props.scrollToAnchor
+ *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
+ *     scroll the document to a given anchor
  */
 function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
   const buttonTitle = `Go ${direction} to next annotations (${bucket.anchors.length})`;
@@ -86,7 +87,8 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets
  *   @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
- *   @param {(a: Anchor) => void} props.scrollToAnchor
+ *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
+ *     scroll the document to a given anchor
  */
 export default function Buckets({
   above,
