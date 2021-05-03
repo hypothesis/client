@@ -456,7 +456,7 @@ describe('PDFIntegration', () => {
 
     it('skips scrolling to final anchor if re-anchoring does not complete within timeout', async () => {
       const highlight = createPlaceholderHighlight();
-      const integration = createPDFIntegration({ reanchoringWait: 10 });
+      const integration = createPDFIntegration({ reanchoringMaxWait: 10 });
       const annotation = { $tag: 'tag1' };
       const anchor = { annotation, highlights: [highlight] };
 
