@@ -156,7 +156,7 @@ describe('SessionService', () => {
 
         const session = createService();
 
-        assert.rejects(session.load(), fetchError.message);
+        await assert.rejects(session.load(), fetchError.message);
         assert.notCalled(fakeStore.updateProfile);
       });
 
