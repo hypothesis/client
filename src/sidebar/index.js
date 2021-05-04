@@ -45,11 +45,11 @@ function setupApi(api, streamer) {
  * Perform the initial fetch of groups and user profile and then set the initial
  * route to match the current URL.
  *
- * @param {Object} groups
+ * @param {import('./services/groups').GroupsService} groups
  * @param {import('./services/session').SessionService} session
  * @param {import('./services/router').RouterService} router
+ * @inject
  */
-// @inject
 function setupRoute(groups, session, router) {
   groups.load();
   session.load();
