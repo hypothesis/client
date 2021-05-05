@@ -66,7 +66,7 @@ class FakeSocket extends EventEmitter {
       this.emit('message', { data: JSON.stringify(message) });
     };
 
-    this.close = function () {
+    this.close = () => {
       this.didClose = true;
     };
   }
@@ -91,7 +91,7 @@ describe('StreamerService', () => {
     );
   }
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeAuth = {
       getAccessToken: sinon.stub().resolves('dummy-access-token'),
     };
@@ -133,53 +133,53 @@ describe('StreamerService', () => {
     });
   });
 
-  afterEach(function () {
+  afterEach(() => {
     $imports.$restore();
     activeStreamer = null;
     fakeWebSockets = [];
   });
 
-  it('should not create a websocket connection if websocketUrl is not provided', function () {
+  it('should not create a websocket connection if websocketUrl is not provided', () => {
     fakeSettings = {};
     createDefaultStreamer();
 
-    return activeStreamer.connect().then(function () {
+    return activeStreamer.connect().then(() => {
       assert.isNull(fakeWebSocket);
     });
   });
 
-  it('should not create a websocket connection', function () {
+  it('should not create a websocket connection', () => {
     createDefaultStreamer();
     assert.isNull(fakeWebSocket);
   });
 
-  it('should have a non-null client ID', function () {
+  it('should have a non-null client ID', () => {
     createDefaultStreamer();
     assert.ok(activeStreamer.clientId);
   });
 
-  it('should send the client ID after connecting', function () {
+  it('should send the client ID after connecting', () => {
     createDefaultStreamer();
-    return activeStreamer.connect().then(function () {
-      const clientIdMsg = fakeWebSocket.messages.find(function (msg) {
-        return msg.messageType === 'client_id';
-      });
+    return activeStreamer.connect().then(() => {
+      const clientIdMsg = fakeWebSocket.messages.find(
+        msg => msg.messageType === 'client_id'
+      );
       assert.ok(clientIdMsg);
       assert.equal(clientIdMsg.value, activeStreamer.clientId);
     });
   });
 
-  it('should request the logged-in user ID after connecting', function () {
+  it('should request the logged-in user ID after connecting', () => {
     createDefaultStreamer();
-    return activeStreamer.connect().then(function () {
-      const whoamiMsg = fakeWebSocket.messages.find(function (msg) {
-        return msg.type === 'whoami';
-      });
+    return activeStreamer.connect().then(() => {
+      const whoamiMsg = fakeWebSocket.messages.find(
+        msg => msg.type === 'whoami'
+      );
       assert.ok(whoamiMsg);
     });
   });
 
-  describe('#connect', function () {
+  describe('#connect', () => {
     beforeEach(() => {
       sinon.stub(console, 'error');
     });
@@ -188,16 +188,16 @@ describe('StreamerService', () => {
       console.error.restore();
     });
 
-    it('should create a websocket connection', function () {
+    it('should create a websocket connection', () => {
       createDefaultStreamer();
-      return activeStreamer.connect().then(function () {
+      return activeStreamer.connect().then(() => {
         assert.ok(fakeWebSocket);
       });
     });
 
-    it('should include credentials in the URL if the client has an access token', function () {
+    it('should include credentials in the URL if the client has an access token', () => {
       createDefaultStreamer();
-      return activeStreamer.connect().then(function () {
+      return activeStreamer.connect().then(() => {
         assert.equal(
           fakeWebSocket.url,
           'ws://example.com/ws?access_token=dummy-access-token'
@@ -205,10 +205,10 @@ describe('StreamerService', () => {
       });
     });
 
-    it('should preserve query params when adding access token to URL', function () {
+    it('should preserve query params when adding access token to URL', () => {
       fakeSettings.websocketUrl = 'ws://example.com/ws?foo=bar';
       createDefaultStreamer();
-      return activeStreamer.connect().then(function () {
+      return activeStreamer.connect().then(() => {
         assert.equal(
           fakeWebSocket.url,
           'ws://example.com/ws?access_token=dummy-access-token&foo=bar'
@@ -220,21 +220,21 @@ describe('StreamerService', () => {
       fakeAuth.getAccessToken.resolves(null);
 
       createDefaultStreamer();
-      return activeStreamer.connect().then(function () {
+      return activeStreamer.connect().then(() => {
         assert.equal(fakeWebSocket.url, 'ws://example.com/ws');
       });
     });
 
-    it('should not close any existing socket', function () {
+    it('should not close any existing socket', () => {
       let oldWebSocket;
       createDefaultStreamer();
       return activeStreamer
         .connect()
-        .then(function () {
+        .then(() => {
           oldWebSocket = fakeWebSocket;
           return activeStreamer.connect();
         })
-        .then(function () {
+        .then(() => {
           assert.ok(!oldWebSocket.didClose);
           assert.ok(!fakeWebSocket.didClose);
         });
@@ -250,41 +250,23 @@ describe('StreamerService', () => {
     });
   });
 
-  describe('#reconnect()', function () {
-    it('should close the existing socket', function () {
-      let oldWebSocket;
-      createDefaultStreamer();
-
-      return activeStreamer
-        .connect()
-        .then(function () {
-          oldWebSocket = fakeWebSocket;
-          return activeStreamer.reconnect();
-        })
-        .then(function () {
-          assert.ok(oldWebSocket.didClose);
-          assert.ok(!fakeWebSocket.didClose);
-        });
-    });
-  });
-
-  describe('Automatic reconnection', function () {
+  describe('Automatic reconnection', () => {
     function delay(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    it('should reconnect when user changes', function () {
+    it('should reconnect when user changes', () => {
       let oldWebSocket;
       createDefaultStreamer();
 
       return activeStreamer
         .connect()
-        .then(function () {
+        .then(() => {
           oldWebSocket = fakeWebSocket;
           fakeStore.profile.returns({ userid: 'somebody' });
           return fakeStore.setState({});
         })
-        .then(function () {
+        .then(() => {
           assert.ok(oldWebSocket.didClose);
           assert.ok(!fakeWebSocket.didClose);
         });
@@ -347,17 +329,17 @@ describe('StreamerService', () => {
     );
   });
 
-  describe('annotation notifications', function () {
-    beforeEach(function () {
+  describe('annotation notifications', () => {
+    beforeEach(() => {
       createDefaultStreamer();
     });
 
-    context('when the app is the stream', function () {
-      beforeEach(function () {
+    context('when the app is the stream', () => {
+      beforeEach(() => {
         return activeStreamer.connect();
       });
 
-      it('applies updates immediately', function () {
+      it('applies updates immediately', () => {
         const [ann] = fixtures.createNotification.payload;
         fakeStore.pendingUpdates.returns({
           [ann.id]: ann,
@@ -375,26 +357,26 @@ describe('StreamerService', () => {
       });
     });
 
-    context('when the app is the sidebar', function () {
-      beforeEach(function () {
+    context('when the app is the sidebar', () => {
+      beforeEach(() => {
         return activeStreamer.connect({ applyUpdatesImmediately: false });
       });
 
-      it('saves pending updates', function () {
+      it('saves pending updates', () => {
         fakeWebSocket.notify(fixtures.createNotification);
         assert.calledWith(fakeStore.receiveRealTimeUpdates, {
           updatedAnnotations: fixtures.createNotification.payload,
         });
       });
 
-      it('saves pending deletions', function () {
+      it('saves pending deletions', () => {
         fakeWebSocket.notify(fixtures.deleteNotification);
         assert.calledWith(fakeStore.receiveRealTimeUpdates, {
           deletedAnnotations: fixtures.deleteNotification.payload,
         });
       });
 
-      it('does not apply updates immediately', function () {
+      it('does not apply updates immediately', () => {
         const ann = fixtures.createNotification.payload;
         fakeStore.pendingUpdates.returns({
           [ann.id]: ann,
@@ -407,19 +389,19 @@ describe('StreamerService', () => {
     });
   });
 
-  describe('#applyPendingUpdates', function () {
-    beforeEach(function () {
+  describe('#applyPendingUpdates', () => {
+    beforeEach(() => {
       createDefaultStreamer();
       return activeStreamer.connect();
     });
 
-    it('applies pending updates', function () {
+    it('applies pending updates', () => {
       fakeStore.pendingUpdates.returns({ 'an-id': { id: 'an-id' } });
       activeStreamer.applyPendingUpdates();
       assert.calledWith(fakeStore.addAnnotations, [{ id: 'an-id' }]);
     });
 
-    it('applies pending deletions', function () {
+    it('applies pending deletions', () => {
       fakeStore.pendingDeletions.returns({ 'an-id': true });
 
       activeStreamer.applyPendingUpdates();
@@ -430,17 +412,17 @@ describe('StreamerService', () => {
       );
     });
 
-    it('clears the set of pending updates', function () {
+    it('clears the set of pending updates', () => {
       fakeWebSocket.notify(fixtures.createNotification);
       activeStreamer.applyPendingUpdates();
       assert.calledWith(fakeStore.clearPendingUpdates);
     });
   });
 
-  describe('session change notifications', function () {
-    it('updates the session when a notification is received', function () {
+  describe('session change notifications', () => {
+    it('updates the session when a notification is received', () => {
       createDefaultStreamer();
-      return activeStreamer.connect().then(function () {
+      return activeStreamer.connect().then(() => {
         const model = {
           groups: [
             {
@@ -458,12 +440,12 @@ describe('StreamerService', () => {
     });
   });
 
-  describe('whoyouare notifications', function () {
-    beforeEach(function () {
+  describe('whoyouare notifications', () => {
+    beforeEach(() => {
       sinon.stub(console, 'warn');
     });
 
-    afterEach(function () {
+    afterEach(() => {
       console.warn.restore();
     });
 
@@ -482,7 +464,7 @@ describe('StreamerService', () => {
           userid: testCase.userid,
         });
         createDefaultStreamer();
-        return activeStreamer.connect().then(function () {
+        return activeStreamer.connect().then(() => {
           fakeWebSocket.notify({
             type: 'whoyouare',
             userid: testCase.websocketUserid,
@@ -507,7 +489,7 @@ describe('StreamerService', () => {
           userid: testCase.userid,
         });
         createDefaultStreamer();
-        return activeStreamer.connect().then(function () {
+        return activeStreamer.connect().then(() => {
           fakeWebSocket.notify({
             type: 'whoyouare',
             userid: testCase.websocketUserid,
@@ -518,14 +500,14 @@ describe('StreamerService', () => {
     });
   });
 
-  describe('reconnections', function () {
-    it('resends configuration messages when a reconnection occurs', function () {
+  describe('reconnections', () => {
+    it('resends configuration messages when a reconnection occurs', () => {
       createDefaultStreamer();
-      return activeStreamer.connect().then(function () {
+      return activeStreamer.connect().then(() => {
         fakeWebSocket.messages = [];
         fakeWebSocket.emit('open');
 
-        const configMsgTypes = fakeWebSocket.messages.map(function (msg) {
+        const configMsgTypes = fakeWebSocket.messages.map(msg => {
           return msg.type || msg.messageType;
         });
         assert.deepEqual(configMsgTypes, ['client_id', 'whoami']);

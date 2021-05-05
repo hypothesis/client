@@ -31,14 +31,23 @@ export class StreamerService {
    * @param {Record<string, any>} settings
    */
   constructor(store, auth, groups, session, settings) {
+    this._auth = auth;
+    this._groups = groups;
+    this._session = session;
+    this._store = store;
+    this._websocketURL = settings.websocketUrl;
+
     /** The randomly generated session ID */
-    const clientId = generateHexString(32);
+    this.clientId = generateHexString(32);
 
     /** @type {Socket|null} */
-    let socket = null;
+    this._socket = null;
 
-    // Flag that controls when to apply pending updates
-    let updateImmediately = true;
+    /**
+     * Flag that controls whether to apply updates immediately or defer them
+     * until "manually" applied via `applyPendingUpdates`
+     */
+    this._updateImmediately = true;
 
     /**
      * Client configuration messages, to be sent each time a new connection is
@@ -46,231 +55,204 @@ export class StreamerService {
      *
      * @type {Record<string, object>}
      */
-    const configMessages = {};
+    this._configMessages = {};
 
-    const applyPendingUpdates = () => {
-      const updates = Object.values(store.pendingUpdates());
-      if (updates.length) {
-        store.addAnnotations(updates);
-      }
+    this._reconnectSetUp = false;
+  }
 
-      const deletions = Object.keys(store.pendingDeletions()).map(id => ({
-        id,
-      }));
-      if (deletions.length) {
-        store.removeAnnotations(deletions);
-      }
+  /**
+   * Apply updates to annotations which have been received but not yet
+   * applied.
+   */
+  applyPendingUpdates() {
+    const updates = Object.values(this._store.pendingUpdates());
+    if (updates.length) {
+      this._store.addAnnotations(updates);
+    }
 
-      store.clearPendingUpdates();
-    };
+    const deletions = Object.keys(this._store.pendingDeletions()).map(id => ({
+      id,
+    }));
+    if (deletions.length) {
+      this._store.removeAnnotations(deletions);
+    }
 
-    const handleAnnotationNotification = message => {
-      const action = message.options.action;
-      const annotations = message.payload;
+    this._store.clearPendingUpdates();
+  }
 
-      switch (action) {
-        case 'create':
-        case 'update':
-        case 'past':
-          store.receiveRealTimeUpdates({ updatedAnnotations: annotations });
-          break;
-        case 'delete':
-          store.receiveRealTimeUpdates({ deletedAnnotations: annotations });
-          break;
-      }
+  _handleAnnotationNotification(message) {
+    const action = message.options.action;
+    const annotations = message.payload;
 
-      if (updateImmediately) {
-        applyPendingUpdates();
-      }
-    };
+    switch (action) {
+      case 'create':
+      case 'update':
+      case 'past':
+        this._store.receiveRealTimeUpdates({ updatedAnnotations: annotations });
+        break;
+      case 'delete':
+        this._store.receiveRealTimeUpdates({ deletedAnnotations: annotations });
+        break;
+    }
 
-    const handleSessionChangeNotification = message => {
-      session.update(message.model);
-      groups.load();
-    };
+    if (this._updateImmediately) {
+      this.applyPendingUpdates();
+    }
+  }
 
-    const handleSocketOnError = event => {
-      warnOnce('Error connecting to H push notification service:', event);
+  _handleSessionChangeNotification(message) {
+    this._session.update(message.model);
+    this._groups.load();
+  }
 
-      // In development, warn if the connection failure might be due to
-      // the app's origin not having been whitelisted in the H service's config.
-      //
-      // Unfortunately the error event does not provide a way to get at the
-      // HTTP status code for HTTP -> WS upgrade requests.
-      const websocketHost = new URL(settings.websocketUrl).hostname;
-      if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
-        /* istanbul ignore next */
-        warnOnce(
-          'Check that your H service is configured to allow ' +
-            'WebSocket connections from ' +
-            window.location.origin
+  /** @param {ErrorEvent} event */
+  _handleSocketError(event) {
+    warnOnce('Error connecting to H push notification service:', event);
+
+    // In development, warn if the connection failure might be due to
+    // the app's origin not having been whitelisted in the H service's config.
+    //
+    // Unfortunately the error event does not provide a way to get at the
+    // HTTP status code for HTTP -> WS upgrade requests.
+    const websocketHost = new URL(this._websocketURL).hostname;
+    if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
+      /* istanbul ignore next */
+      warnOnce(
+        'Check that your H service is configured to allow ' +
+          'WebSocket connections from ' +
+          window.location.origin
+      );
+    }
+  }
+
+  /** @param {MessageEvent} event */
+  _handleSocketMessage(event) {
+    const message = JSON.parse(event.data);
+    if (!message) {
+      return;
+    }
+
+    if (message.type === 'annotation-notification') {
+      this._handleAnnotationNotification(message);
+    } else if (message.type === 'session-change') {
+      this._handleSessionChangeNotification(message);
+    } else if (message.type === 'whoyouare') {
+      const userid = this._store.profile().userid;
+      if (message.userid !== userid) {
+        console.warn(
+          'WebSocket user ID "%s" does not match logged-in ID "%s"',
+          message.userid,
+          userid
         );
       }
-    };
+    } else {
+      warnOnce('Received unsupported notification', message.type);
+    }
+  }
 
-    /** @param {MessageEvent} event */
-    const handleSocketOnMessage = event => {
-      const message = JSON.parse(event.data);
-      if (!message) {
-        return;
+  /** @param {Socket} socket */
+  _sendClientConfig(socket) {
+    Object.keys(this._configMessages).forEach(key => {
+      if (this._configMessages[key]) {
+        socket.send(this._configMessages[key]);
       }
+    });
+  }
 
-      if (message.type === 'annotation-notification') {
-        handleAnnotationNotification(message);
-      } else if (message.type === 'session-change') {
-        handleSessionChangeNotification(message);
-      } else if (message.type === 'whoyouare') {
-        const userid = store.profile().userid;
-        if (message.userid !== userid) {
-          console.warn(
-            'WebSocket user ID "%s" does not match logged-in ID "%s"',
-            message.userid,
-            userid
-          );
-        }
-      } else {
-        warnOnce('Received unsupported notification', message.type);
-      }
-    };
+  /**
+   * Send a configuration message to the push notification service.
+   * Each message is associated with a key, which is used to re-send
+   * configuration data to the server in the event of a reconnection.
+   *
+   * @param {string} key
+   * @param {object} configMessage
+   */
+  setConfig(key, configMessage) {
+    this._configMessages[key] = configMessage;
+    if (this._socket?.isConnected()) {
+      this._socket.send(configMessage);
+    }
+  }
 
-    /** @param {Socket} socket */
-    const sendClientConfig = socket => {
-      Object.keys(configMessages).forEach(key => {
-        if (configMessages[key]) {
-          socket.send(configMessages[key]);
-        }
-      });
-    };
+  async _reconnect() {
+    // If we have no URL configured, don't do anything.
+    if (!this._websocketURL) {
+      return;
+    }
+    this._socket?.close();
 
-    /**
-     * Send a configuration message to the push notification service.
-     * Each message is associated with a key, which is used to re-send
-     * configuration data to the server in the event of a reconnection.
-     *
-     * @param {string} key
-     * @param {object} configMessage
-     */
-    const setConfig = (key, configMessage) => {
-      configMessages[key] = configMessage;
-      if (socket && socket.isConnected()) {
-        socket.send(configMessage);
-      }
-    };
+    let token;
+    try {
+      token = await this._auth.getAccessToken();
+    } catch (err) {
+      console.error('Failed to fetch token for WebSocket authentication', err);
+      throw err;
+    }
 
-    const _connect = async () => {
-      // If we have no URL configured, don't do anything.
-      if (!settings.websocketUrl) {
-        return;
-      }
+    let url;
+    if (token) {
+      // Include the access token in the URL via a query param. This method
+      // is used to send credentials because the `WebSocket` constructor does
+      // not support setting the `Authorization` header directly as we do for
+      // other API requests.
+      const parsedURL = new URL(this._websocketURL);
+      const queryParams = queryString.parse(parsedURL.search);
+      queryParams.access_token = token;
+      parsedURL.search = queryString.stringify(queryParams);
+      url = parsedURL.toString();
+    } else {
+      url = this._websocketURL;
+    }
 
-      let token;
-      try {
-        token = await auth.getAccessToken();
-      } catch (err) {
-        console.error(
-          'Failed to fetch token for WebSocket authentication',
-          err
-        );
-        throw err;
-      }
+    const newSocket = new Socket(url);
+    newSocket.on('open', () => this._sendClientConfig(newSocket));
+    newSocket.on('error', err => this._handleSocketError(err));
+    newSocket.on('message', event => this._handleSocketMessage(event));
+    this._socket = newSocket;
 
-      let url;
-      if (token) {
-        // Include the access token in the URL via a query param. This method
-        // is used to send credentials because the `WebSocket` constructor does
-        // not support setting the `Authorization` header directly as we do for
-        // other API requests.
-        const parsedURL = new URL(settings.websocketUrl);
-        const queryParams = queryString.parse(parsedURL.search);
-        queryParams.access_token = token;
-        parsedURL.search = queryString.stringify(queryParams);
-        url = parsedURL.toString();
-      } else {
-        url = settings.websocketUrl;
-      }
+    // Configure the client ID
+    this.setConfig('client-id', {
+      messageType: 'client_id',
+      value: this.clientId,
+    });
 
-      const newSocket = new Socket(url);
-      newSocket.on('open', () => sendClientConfig(newSocket));
-      newSocket.on('error', handleSocketOnError);
-      newSocket.on('message', handleSocketOnMessage);
-      socket = newSocket;
+    // Send a "whoami" message. The server will respond with a "whoyouare"
+    // reply which is useful for verifying that authentication worked as
+    // expected.
+    this.setConfig('auth-check', {
+      type: 'whoami',
+      id: 1,
+    });
+  }
 
-      // Configure the client ID
-      setConfig('client-id', {
-        messageType: 'client_id',
-        value: clientId,
-      });
+  /**
+   * Connect to the Hypothesis real time update service.
+   *
+   * If the service has already connected this does nothing.
+   *
+   * @param {Object} [options]
+   *   @param {boolean} [options.applyUpdatesImmediately] - true if pending updates should be applied immediately
+   * @return {Promise<void>} Promise which resolves once the WebSocket connection
+   *    process has started.
+   */
+  async connect(options = {}) {
+    this._updateImmediately = options.applyUpdatesImmediately ?? true;
 
-      // Send a "whoami" message. The server will respond with a "whoyouare"
-      // reply which is useful for verifying that authentication worked as
-      // expected.
-      setConfig('auth-check', {
-        type: 'whoami',
-        id: 1,
-      });
-    };
-
-    /**
-     * Connect to the Hypothesis real time update service.
-     *
-     * If the service has already connected this closes the existing connection
-     * and reconnects.
-     *
-     * @return {Promise} Promise which resolves once the WebSocket connection
-     *                   process has started.
-     */
-    const reconnect = () => {
-      if (socket) {
-        socket.close();
-      }
-      return _connect();
-    };
-
-    let reconnectSetUp = false;
-    /**
-     * Set up automatic reconnecting when user changes.
-     */
-    const setUpAutoReconnect = () => {
-      if (reconnectSetUp) {
-        return;
-      }
-      reconnectSetUp = true;
-
-      // Reconnect when user changes, as auth token will have changed
+    // Setup reconnection when user changes, as auth token will have changed.
+    if (!this._reconnectSetUp) {
+      this._reconnectSetUp = true;
       watch(
-        store.subscribe,
-        () => store.profile().userid,
+        this._store.subscribe,
+        () => this._store.profile().userid,
         () => {
-          reconnect();
+          this._reconnect();
         }
       );
-    };
+    }
 
-    /**
-     * Connect to the Hypothesis real time update service.
-     *
-     * If the service has already connected this does nothing.
-     *
-     * @param {Object} [options]
-     * @param {boolean} [options.applyUpdatesImmediately] - true if pending updates should be applied immediately
-     *
-     * @return {Promise<void>} Promise which resolves once the WebSocket connection
-     *    process has started.
-     */
-    const connect = async (options = {}) => {
-      updateImmediately = options.applyUpdatesImmediately ?? true;
-      setUpAutoReconnect();
-      if (socket) {
-        return;
-      }
-      await _connect();
-    };
-
-    this.applyPendingUpdates = applyPendingUpdates;
-    this.clientId = clientId;
-    this.configMessages = configMessages;
-    this.connect = connect;
-    this.reconnect = reconnect;
-    this.setConfig = setConfig;
+    if (this._socket) {
+      return;
+    }
+    await this._reconnect();
   }
 }
