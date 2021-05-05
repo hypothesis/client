@@ -78,6 +78,7 @@ describe('StreamerService', () => {
   let fakeGroups;
   let fakeSession;
   let fakeSettings;
+  let fakeWarnOnce;
   let activeStreamer;
 
   function createDefaultStreamer() {
@@ -92,9 +93,7 @@ describe('StreamerService', () => {
 
   beforeEach(function () {
     fakeAuth = {
-      getAccessToken: function () {
-        return Promise.resolve('dummy-access-token');
-      },
+      getAccessToken: sinon.stub().resolves('dummy-access-token'),
     };
 
     fakeStore = fakeReduxStore(
@@ -126,7 +125,10 @@ describe('StreamerService', () => {
       websocketUrl: 'ws://example.com/ws',
     };
 
+    fakeWarnOnce = sinon.stub();
+
     $imports.$mock({
+      '../../shared/warn-once': fakeWarnOnce,
       '../websocket': FakeSocket,
     });
   });
@@ -177,7 +179,15 @@ describe('StreamerService', () => {
     });
   });
 
-  describe('#connect()', function () {
+  describe('#connect', function () {
+    beforeEach(() => {
+      sinon.stub(console, 'error');
+    });
+
+    afterEach(() => {
+      console.error.restore();
+    });
+
     it('should create a websocket connection', function () {
       createDefaultStreamer();
       return activeStreamer.connect().then(function () {
@@ -207,9 +217,7 @@ describe('StreamerService', () => {
     });
 
     it('should not include credentials in the URL if the client has no access token', function () {
-      fakeAuth.getAccessToken = function () {
-        return Promise.resolve(null);
-      };
+      fakeAuth.getAccessToken.resolves(null);
 
       createDefaultStreamer();
       return activeStreamer.connect().then(function () {
@@ -230,6 +238,15 @@ describe('StreamerService', () => {
           assert.ok(!oldWebSocket.didClose);
           assert.ok(!fakeWebSocket.didClose);
         });
+    });
+
+    it('throws an error if fetching the access token fails', async () => {
+      fakeAuth.getAccessToken.rejects(new Error('Getting token failed'));
+      createDefaultStreamer();
+
+      const connected = activeStreamer.connect();
+
+      await assert.rejects(connected, 'Getting token failed');
     });
   });
 
@@ -290,6 +307,44 @@ describe('StreamerService', () => {
       // 3+ would indicate `reconnect` fired more than once
       assert.lengthOf(fakeWebSockets, 2);
     });
+  });
+
+  it('logs an error if the connection fails', () => {
+    createDefaultStreamer();
+    activeStreamer.connect();
+    const event = new ErrorEvent('Something went wrong');
+
+    fakeWebSocket.emit('error', event);
+
+    assert.calledWith(
+      fakeWarnOnce,
+      'Error connecting to H push notification service:',
+      event
+    );
+  });
+
+  [null, false].forEach(message => {
+    it('ignores invalid messages', () => {
+      createDefaultStreamer();
+      activeStreamer.connect();
+
+      fakeWebSocket.notify(message);
+    });
+  });
+
+  it('ignores messages with an unknown type', () => {
+    createDefaultStreamer();
+    activeStreamer.connect();
+
+    fakeWebSocket.notify({
+      type: 'unknown-event',
+    });
+
+    assert.calledWith(
+      fakeWarnOnce,
+      'Received unsupported notification',
+      'unknown-event'
+    );
   });
 
   describe('annotation notifications', function () {

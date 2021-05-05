@@ -99,6 +99,7 @@ export class StreamerService {
       // HTTP status code for HTTP -> WS upgrade requests.
       const websocketHost = new URL(settings.websocketUrl).hostname;
       if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
+        /* istanbul ignore next */
         warnOnce(
           'Check that your H service is configured to allow ' +
             'WebSocket connections from ' +
@@ -128,7 +129,7 @@ export class StreamerService {
           );
         }
       } else {
-        warnOnce('received unsupported notification', message.type);
+        warnOnce('Received unsupported notification', message.type);
       }
     };
 
