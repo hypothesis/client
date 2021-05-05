@@ -209,51 +209,48 @@ describe('PDFMetadata', function () {
   });
 
   describe('metadata sources', function () {
-    let pdfMetadata;
-    const fakePDFViewerApplication = new FakePDFViewerApplication();
-    fakePDFViewerApplication.completeInit();
-    fakePDFViewerApplication.finishLoading({
+    const testMetadata = {
       fingerprint: 'fakeFingerprint',
       title: 'fakeTitle',
       metadata: {
         'dc:title': 'dcFakeTitle',
       },
       url: 'http://fake.com/',
-    });
+    };
 
-    beforeEach(function () {
-      pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
-    });
+    function createPDFMetadata(metadata = testMetadata) {
+      const fakePDFViewerApplication = new FakePDFViewerApplication();
+      fakePDFViewerApplication.completeInit();
+      fakePDFViewerApplication.finishLoading(metadata);
+      return {
+        fakePDFViewerApplication,
+        pdfMetadata: new PDFMetadata(fakePDFViewerApplication),
+      };
+    }
 
     describe('#getUri', function () {
       it('returns the non-file URI', function () {
+        const { pdfMetadata } = createPDFMetadata();
         return pdfMetadata.getUri().then(function (uri) {
           assert.equal(uri, 'http://fake.com/');
         });
       });
 
       it('returns the fingerprint as a URN when the PDF URL is a local file', function () {
-        const fakePDFViewerApplication = new FakePDFViewerApplication();
-        fakePDFViewerApplication.completeInit();
-        fakePDFViewerApplication.finishLoading({
+        const { pdfMetadata } = createPDFMetadata({
           url: 'file:///test.pdf',
           fingerprint: 'fakeFingerprint',
         });
-        const pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
-
         return pdfMetadata.getUri().then(function (uri) {
           assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
         });
       });
 
       it('resolves relative URLs', () => {
-        const fakePDFViewerApplication = new FakePDFViewerApplication();
-        fakePDFViewerApplication.completeInit();
-        fakePDFViewerApplication.finishLoading({
+        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata({
           url: 'index.php?action=download&file_id=wibble',
           fingerprint: 'fakeFingerprint',
         });
-        const pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
 
         return pdfMetadata.getUri().then(uri => {
           const expected = new URL(
@@ -267,6 +264,7 @@ describe('PDFMetadata', function () {
 
     describe('#getMetadata', function () {
       it('gets the title from the dc:title field', function () {
+        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata();
         const expectedMetadata = {
           title: 'dcFakeTitle',
           link: [
@@ -285,6 +283,7 @@ describe('PDFMetadata', function () {
       });
 
       it('gets the title from the documentInfo.Title field', function () {
+        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata();
         const expectedMetadata = {
           title: fakePDFViewerApplication.documentInfo.Title,
           link: [
@@ -305,10 +304,7 @@ describe('PDFMetadata', function () {
       });
 
       it('does not save file:// URLs in document metadata', function () {
-        let pdfMetadata;
-        const fakePDFViewerApplication = new FakePDFViewerApplication();
-        fakePDFViewerApplication.completeInit();
-        fakePDFViewerApplication.finishLoading({
+        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata({
           fingerprint: 'fakeFingerprint',
           url: 'file://fake.pdf',
         });
@@ -320,8 +316,6 @@ describe('PDFMetadata', function () {
             },
           ],
         };
-
-        pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
 
         return pdfMetadata.getMetadata().then(function (actualMetadata) {
           assert.equal(actualMetadata.link.length, 1);
