@@ -192,7 +192,7 @@ describe('PDFMetadata', function () {
   // The `initializedPromise` param simulates different versions of PDF.js with
   // and without the `PDFViewerApplication.initializedPromise` API.
   [true, false].forEach(initializedPromise => {
-    it('does not wait for the PDF to load if it has already loaded', function () {
+    it('does not wait for the PDF to load if it has already loaded', async () => {
       const fakePDFViewerApplication = new FakePDFViewerApplication('', {
         initializedPromise,
       });
@@ -202,9 +202,8 @@ describe('PDFMetadata', function () {
         fingerprint: 'fakeFingerprint',
       });
       const pdfMetadata = new PDFMetadata(fakePDFViewerApplication);
-      return pdfMetadata.getUri().then(function (uri) {
-        assert.equal(uri, 'http://fake.com/');
-      });
+      const uri = await pdfMetadata.getUri();
+      assert.equal(uri, 'http://fake.com/');
     });
   });
 
@@ -227,37 +226,35 @@ describe('PDFMetadata', function () {
     };
   }
 
-  describe('#getUri', function () {
-    it('returns the non-file URI', function () {
+  describe('#getUri', () => {
+    it('returns the non-file URI', async () => {
       const { pdfMetadata } = createPDFMetadata();
-      return pdfMetadata.getUri().then(function (uri) {
-        assert.equal(uri, 'http://fake.com/');
-      });
+      const uri = await pdfMetadata.getUri();
+      assert.equal(uri, 'http://fake.com/');
     });
 
-    it('returns the fingerprint as a URN when the PDF URL is a local file', function () {
+    it('returns the fingerprint as a URN when the PDF URL is a local file', async () => {
       const { pdfMetadata } = createPDFMetadata({
         url: 'file:///test.pdf',
         fingerprint: 'fakeFingerprint',
       });
-      return pdfMetadata.getUri().then(function (uri) {
-        assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
-      });
+      const uri = await pdfMetadata.getUri();
+      assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
     });
 
-    it('resolves relative URLs', () => {
+    it('resolves relative URLs', async () => {
       const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata({
         url: 'index.php?action=download&file_id=wibble',
         fingerprint: 'fakeFingerprint',
       });
 
-      return pdfMetadata.getUri().then(uri => {
-        const expected = new URL(
-          fakePDFViewerApplication.url,
-          document.location.href
-        ).toString();
-        assert.equal(uri, expected);
-      });
+      const uri = await pdfMetadata.getUri();
+
+      const expected = new URL(
+        fakePDFViewerApplication.url,
+        document.location.href
+      ).toString();
+      assert.equal(uri, expected);
     });
   });
 
