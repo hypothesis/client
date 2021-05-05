@@ -208,123 +208,111 @@ describe('PDFMetadata', function () {
     });
   });
 
-  describe('metadata sources', function () {
-    const testMetadata = {
-      fingerprint: 'fakeFingerprint',
-      title: 'fakeTitle',
-      metadata: {
-        'dc:title': 'dcFakeTitle',
-      },
-      url: 'http://fake.com/',
+  const testMetadata = {
+    fingerprint: 'fakeFingerprint',
+    title: 'fakeTitle',
+    metadata: {
+      'dc:title': 'dcFakeTitle',
+    },
+    url: 'http://fake.com/',
+  };
+
+  function createPDFMetadata(metadata = testMetadata) {
+    const fakePDFViewerApplication = new FakePDFViewerApplication();
+    fakePDFViewerApplication.completeInit();
+    fakePDFViewerApplication.finishLoading(metadata);
+    return {
+      fakePDFViewerApplication,
+      pdfMetadata: new PDFMetadata(fakePDFViewerApplication),
     };
+  }
 
-    function createPDFMetadata(metadata = testMetadata) {
-      const fakePDFViewerApplication = new FakePDFViewerApplication();
-      fakePDFViewerApplication.completeInit();
-      fakePDFViewerApplication.finishLoading(metadata);
-      return {
-        fakePDFViewerApplication,
-        pdfMetadata: new PDFMetadata(fakePDFViewerApplication),
-      };
-    }
-
-    describe('#getUri', function () {
-      it('returns the non-file URI', function () {
-        const { pdfMetadata } = createPDFMetadata();
-        return pdfMetadata.getUri().then(function (uri) {
-          assert.equal(uri, 'http://fake.com/');
-        });
-      });
-
-      it('returns the fingerprint as a URN when the PDF URL is a local file', function () {
-        const { pdfMetadata } = createPDFMetadata({
-          url: 'file:///test.pdf',
-          fingerprint: 'fakeFingerprint',
-        });
-        return pdfMetadata.getUri().then(function (uri) {
-          assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
-        });
-      });
-
-      it('resolves relative URLs', () => {
-        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata({
-          url: 'index.php?action=download&file_id=wibble',
-          fingerprint: 'fakeFingerprint',
-        });
-
-        return pdfMetadata.getUri().then(uri => {
-          const expected = new URL(
-            fakePDFViewerApplication.url,
-            document.location.href
-          ).toString();
-          assert.equal(uri, expected);
-        });
+  describe('#getUri', function () {
+    it('returns the non-file URI', function () {
+      const { pdfMetadata } = createPDFMetadata();
+      return pdfMetadata.getUri().then(function (uri) {
+        assert.equal(uri, 'http://fake.com/');
       });
     });
 
-    describe('#getMetadata', function () {
-      it('gets the title from the dc:title field', function () {
-        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata();
-        const expectedMetadata = {
-          title: 'dcFakeTitle',
-          link: [
-            {
-              href:
-                'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint,
-            },
-            { href: fakePDFViewerApplication.url },
-          ],
-          documentFingerprint: fakePDFViewerApplication.pdfDocument.fingerprint,
-        };
+    it('returns the fingerprint as a URN when the PDF URL is a local file', function () {
+      const { pdfMetadata } = createPDFMetadata({
+        url: 'file:///test.pdf',
+        fingerprint: 'fakeFingerprint',
+      });
+      return pdfMetadata.getUri().then(function (uri) {
+        assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
+      });
+    });
 
-        return pdfMetadata.getMetadata().then(function (actualMetadata) {
-          assert.deepEqual(actualMetadata, expectedMetadata);
-        });
+    it('resolves relative URLs', () => {
+      const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata({
+        url: 'index.php?action=download&file_id=wibble',
+        fingerprint: 'fakeFingerprint',
       });
 
-      it('gets the title from the documentInfo.Title field', function () {
-        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata();
-        const expectedMetadata = {
-          title: fakePDFViewerApplication.documentInfo.Title,
-          link: [
-            {
-              href:
-                'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint,
-            },
-            { href: fakePDFViewerApplication.url },
-          ],
-          documentFingerprint: fakePDFViewerApplication.pdfDocument.fingerprint,
-        };
+      return pdfMetadata.getUri().then(uri => {
+        const expected = new URL(
+          fakePDFViewerApplication.url,
+          document.location.href
+        ).toString();
+        assert.equal(uri, expected);
+      });
+    });
+  });
 
-        fakePDFViewerApplication.metadata.has = sinon.stub().returns(false);
+  describe('#getMetadata', () => {
+    it('returns the document fingerprint in the `documentFingerprint` property', async () => {
+      const { pdfMetadata } = createPDFMetadata();
+      const metadata = await pdfMetadata.getMetadata();
+      assert.equal(metadata.documentFingerprint, testMetadata.fingerprint);
+    });
 
-        return pdfMetadata.getMetadata().then(function (actualMetadata) {
-          assert.deepEqual(actualMetadata, expectedMetadata);
-        });
+    it('returns the PDF URL in the `links` array', async () => {
+      const { pdfMetadata } = createPDFMetadata();
+      const metadata = await pdfMetadata.getMetadata();
+      assert.deepInclude(metadata.link, {
+        href: testMetadata.url,
+      });
+    });
+
+    it('returns the document fingerprint in the `links` array', async () => {
+      const { pdfMetadata } = createPDFMetadata();
+      const metadata = await pdfMetadata.getMetadata();
+      assert.deepInclude(metadata.link, {
+        href: `urn:x-pdf:${testMetadata.fingerprint}`,
+      });
+    });
+
+    it('does not return file:// URLs in `links` array', async () => {
+      const { pdfMetadata } = createPDFMetadata({
+        fingerprint: 'fakeFingerprint',
+        url: 'file://fake.pdf',
       });
 
-      it('does not save file:// URLs in document metadata', function () {
-        const { fakePDFViewerApplication, pdfMetadata } = createPDFMetadata({
-          fingerprint: 'fakeFingerprint',
-          url: 'file://fake.pdf',
-        });
-        const expectedMetadata = {
-          link: [
-            {
-              href:
-                'urn:x-pdf:' + fakePDFViewerApplication.pdfDocument.fingerprint,
-            },
-          ],
-        };
+      const metadata = await pdfMetadata.getMetadata();
 
-        return pdfMetadata.getMetadata().then(function (actualMetadata) {
-          assert.equal(actualMetadata.link.length, 1);
-          assert.equal(
-            actualMetadata.link[0].href,
-            expectedMetadata.link[0].href
-          );
-        });
+      const fileLink = metadata.link.find(link =>
+        link.href.includes('file://')
+      );
+      assert.isUndefined(fileLink);
+    });
+
+    it('gets the title from the dc:title field', async () => {
+      const { pdfMetadata } = createPDFMetadata();
+      const metadata = await pdfMetadata.getMetadata();
+      assert.equal(metadata.title, testMetadata.metadata['dc:title']);
+    });
+
+    it('gets the title from the documentInfo.Title field', async () => {
+      const { pdfMetadata } = createPDFMetadata({
+        title: 'Some title',
+        url: 'http://fake.com/',
       });
+
+      const metadata = await pdfMetadata.getMetadata();
+
+      assert.equal(metadata.title, 'Some title');
     });
   });
 });
