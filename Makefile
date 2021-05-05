@@ -35,11 +35,11 @@ lint: node_modules/.uptodate
 
 .PHONY: docs
 docs: python
-	tox -e py36-docs
+	tox -e docs
 
 .PHONY: checkdocs
 checkdocs: python
-	tox -e py36-checkdocs
+	tox -e checkdocs
 
 .PHONY: clean
 clean:
