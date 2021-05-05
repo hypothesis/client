@@ -13,19 +13,46 @@
  */
 
 /**
+ * Document metadata parsed from the PDF's _metadata stream_.
+ *
+ * See `Metadata` class from `display/metadata.js` in PDF.js.
+ *
  * @typedef Metadata
  * @prop {(name: string) => string} get
  * @prop {(name: string) => boolean} has
  */
 
 /**
- * @typedef PDFDocument
- * @prop {string} fingerprint
+ * Document metadata parsed from the PDF's _document info dictionary_.
+ *
+ * See `PDFDocument#documentInfo` in PDF.js.
+ *
+ * @typedef PDFDocumentInfo
+ * @prop {string} [Title]
  */
 
 /**
- * @typedef PDFDocumentInfo
- * @prop {string} [Title]
+ * An object containing metadata about the PDF. This includes information from:
+ *
+ * - The PDF's document info dictionary
+ * - The PDF's metadata stream
+ * - The HTTP headers (eg. `Content-Disposition`) sent when the PDF file was
+ *   served
+ *
+ * See the "Metadata" section (14.3) in the PDF 1.7 reference for details of
+ * the _metadata stream_ and _document info dictionary_.
+ *
+ * @typedef PDFDocumentMetadata
+ * @prop {Metadata|null} metadata
+ * @prop {PDFDocumentInfo} [info]
+ * @prop {string|null} contentDispositionFilename - The `filename` directive from
+ *   the `Content-Disposition` header
+ */
+
+/**
+ * @typedef PDFDocument
+ * @prop {string} fingerprint
+ * @prop {() => Promise<PDFDocumentMetadata>} getMetadata
  */
 
 /**
@@ -93,6 +120,7 @@
  * @prop {Promise<void>} [initializedPromise] -
  *   Promise that resolves when PDF.js is initialized. Since v2.4.456.
  *   See https://github.com/mozilla/pdf.js/wiki/Third-party-viewer-usage#initialization-promise.
+ * @prop {string} url - The URL of the loaded PDF file
  */
 
 /**

@@ -28,8 +28,25 @@ class FakeMetadata {
  * Fake implementation of PDF.js `window.PDFViewerApplication.pdfDocument`.
  */
 class FakePDFDocumentProxy {
-  constructor({ fingerprint }) {
+  constructor({
+    contentDispositionFilename = null,
+    fingerprint,
+    info,
+    metadata = null,
+  }) {
     this.fingerprint = fingerprint;
+
+    this._contentDispositionFilename = contentDispositionFilename;
+    this._info = info;
+    this._metadata = metadata;
+  }
+
+  async getMetadata() {
+    return {
+      contentDispositionFilename: this._contentDispositionFilename,
+      info: this._info,
+      metadata: this._metadata,
+    };
   }
 }
 
@@ -84,6 +101,7 @@ class FakePDFViewerApplication {
    * Simulate completion of PDF document loading.
    */
   finishLoading({
+    contentDispositionFilename,
     url,
     fingerprint,
     metadata,
@@ -92,17 +110,18 @@ class FakePDFViewerApplication {
   }) {
     this.url = url;
     this.downloadComplete = true;
-    this.documentInfo = {};
 
-    if (typeof title !== undefined) {
-      this.documentInfo.Title = title;
+    const info = {};
+    if (title) {
+      info.Title = title;
     }
 
-    if (metadata) {
-      this.metadata = new FakeMetadata(metadata);
-    }
-
-    this.pdfDocument = new FakePDFDocumentProxy({ fingerprint });
+    this.pdfDocument = new FakePDFDocumentProxy({
+      contentDispositionFilename,
+      info,
+      metadata: metadata ? new FakeMetadata(metadata) : null,
+      fingerprint,
+    });
 
     if (this.dispatchDOMEvents) {
       const event = document.createEvent('Event');
@@ -319,6 +338,45 @@ describe('PDFMetadata', function () {
       const metadata = await pdfMetadata.getMetadata();
 
       assert.equal(metadata.title, 'Some title');
+    });
+
+    it('gets the title from the `Content-Disposition` header', async () => {
+      const { pdfMetadata } = createPDFMetadata({
+        contentDispositionFilename: 'some-file.pdf',
+        url: 'http://fake.com/test.pdf',
+      });
+
+      const metadata = await pdfMetadata.getMetadata();
+
+      assert.equal(metadata.title, 'some-file.pdf');
+    });
+
+    it('gets the title from the URL', async () => {
+      const { pdfMetadata } = createPDFMetadata({
+        url: 'http://fake.com/a-file.pdf',
+      });
+
+      const metadata = await pdfMetadata.getMetadata();
+
+      assert.equal(metadata.title, 'a-file.pdf');
+    });
+
+    [
+      null, // Missing URL
+      '', // Invalid URL
+      'https://example.com', // Missing path
+      'https://example.com/', // Empty string after last `/` in path
+    ].forEach(url => {
+      it('returns an empty string if there is no title metadata or filename in URL', async () => {
+        const { pdfMetadata } = createPDFMetadata({ url });
+
+        // Earlier versions of the client used `document.title` as a fallback,
+        // but we changed this. See https://github.com/hypothesis/client/issues/3372.
+        document.title = 'Ignore me';
+        const metadata = await pdfMetadata.getMetadata();
+
+        assert.equal(metadata.title, '');
+      });
     });
   });
 });
