@@ -13,6 +13,8 @@ help:
 	@echo "make sure              Make sure that the formatter, linter, tests, etc all pass"
 	@echo "make docs              Build docs website and serve it locally"
 	@echo "make checkdocs         Crash if building the docs website fails"
+	@echo "make clean             Delete development artefacts (cached files, "
+	@echo "                       dependencies, etc)"
 
 .PHONY: dev
 dev: node_modules/.uptodate
@@ -38,6 +40,11 @@ docs: python
 .PHONY: checkdocs
 checkdocs: python
 	tox -e checkdocs
+
+.PHONY: clean
+clean:
+	rm -f node_modules/.uptodate
+	rm -rf build
 
 .PHONY: format
 format: node_modules/.uptodate
