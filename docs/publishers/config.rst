@@ -450,8 +450,6 @@ loads.
                               // relative from the receiving iframe.
     }
 
-.. option:: 
-
 Asset and Sidebar App Location
 ##############################
 
