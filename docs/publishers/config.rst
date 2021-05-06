@@ -470,5 +470,8 @@ These settings configure where the client's assets are loaded from.
 
 .. option:: sidebarAppUrl
 
-   ``String``. The URL for the sidebar application which displays annotations
-   (Default: ``"https://hypothes.is/app.html"``).
+   ``String``. The URL for the sidebar application (Default: ``"https://hypothes.is/app.html"``).
+
+.. option:: notebookAppUrl
+
+   ``String``. The URL for the notebook application (Default: ``"https://hypothes.is/notebook"``).
