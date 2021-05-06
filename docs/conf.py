@@ -15,8 +15,6 @@
 import os
 # import sys
 
-from recommonmark.parser import CommonMarkParser
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -37,16 +35,12 @@ on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.todo', 'sphinx.ext.intersphinx']
+extensions = ['myst_parser', 'sphinx.ext.todo', 'sphinx.ext.intersphinx']
 
 intersphinx_mapping = {'h': ('https://h.readthedocs.io/en/latest/', None)}
 
 # Add any paths that contain tempates here, relative to this directory.
 templates_path = ['_templates']
-
-source_parsers = {
-    '.md': CommonMarkParser,  # Add Markdown support to Sphinx.
-}
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
