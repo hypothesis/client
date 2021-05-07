@@ -177,6 +177,4 @@ function AnnotationShareControl({
   );
 }
 
-AnnotationShareControl.injectedProps = ['toastMessenger'];
-
-export default withServices(AnnotationShareControl);
+export default withServices(AnnotationShareControl, ['toastMessenger']);

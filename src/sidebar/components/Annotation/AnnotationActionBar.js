@@ -130,10 +130,8 @@ function AnnotationActionBar({
   );
 }
 
-AnnotationActionBar.injectedProps = [
+export default withServices(AnnotationActionBar, [
   'annotationsService',
   'settings',
   'toastMessenger',
-];
-
-export default withServices(AnnotationActionBar);
+]);

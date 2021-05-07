@@ -2,6 +2,8 @@
  * Parses H account names of the form 'acct:<username>@<provider>'
  * into a {username, provider} object or null if the input does not
  * match the expected form.
+ *
+ * @param {string|null} user
  */
 export function parseAccountID(user) {
   if (!user) {
@@ -34,7 +36,7 @@ export function username(user) {
  * Returns true if the user's provider (authority) differs from the default
  * authority for the application.
  *
- * @param {string} user
+ * @param {string|null} user
  * @param {string} defaultAuthority - The application's default authority
  *   (user identity provider)
  */

@@ -177,6 +177,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   );
 }
 
-NotebookView.injectedProps = ['loadAnnotationsService', 'streamer'];
-
-export default withServices(NotebookView);
+export default withServices(NotebookView, [
+  'loadAnnotationsService',
+  'streamer',
+]);

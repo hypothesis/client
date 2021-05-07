@@ -96,6 +96,4 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
   );
 }
 
-ModerationBanner.injectedProps = ['api', 'toastMessenger'];
-
-export default withServices(ModerationBanner);
+export default withServices(ModerationBanner, ['api', 'toastMessenger']);

@@ -128,6 +128,4 @@ function UserMenu({ auth, bridge, onLogout, settings }) {
   );
 }
 
-UserMenu.injectedProps = ['bridge', 'settings'];
-
-export default withServices(UserMenu);
+export default withServices(UserMenu, ['bridge', 'settings']);

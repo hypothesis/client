@@ -107,6 +107,4 @@ function ToastMessages({ toastMessenger }) {
   );
 }
 
-ToastMessages.injectedProps = ['toastMessenger'];
-
-export default withServices(ToastMessages);
+export default withServices(ToastMessages, ['toastMessenger']);

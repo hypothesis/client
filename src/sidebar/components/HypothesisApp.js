@@ -172,6 +172,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
     >
       {route !== 'notebook' && (
         <TopBar
+          // @ts-expect-error - This type mistmatch needs to be fixed or the prop removed.
           auth={authState}
           onLogin={login}
           onSignUp={signUp}
@@ -199,12 +200,10 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
   );
 }
 
-HypothesisApp.injectedProps = [
+export default withServices(HypothesisApp, [
   'auth',
   'bridge',
   'session',
   'settings',
   'toastMessenger',
-];
-
-export default withServices(HypothesisApp);
+]);

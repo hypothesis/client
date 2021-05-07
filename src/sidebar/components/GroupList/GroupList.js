@@ -148,6 +148,4 @@ function GroupList({ settings }) {
   );
 }
 
-GroupList.injectedProps = ['settings'];
-
-export default withServices(GroupList);
+export default withServices(GroupList, ['settings']);

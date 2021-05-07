@@ -149,6 +149,4 @@ function GroupListItem({
   );
 }
 
-GroupListItem.injectedProps = ['groups', 'toastMessenger'];
-
-export default withServices(GroupListItem);
+export default withServices(GroupListItem, ['groups', 'toastMessenger']);

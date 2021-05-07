@@ -13,7 +13,7 @@ import Thread from './Thread';
 
 /**
  * @typedef ThreadCardProps
- * @prop {Thread} thread
+ * @prop {import('../helpers/build-thread').Thread} thread
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  */
 
@@ -26,7 +26,7 @@ import Thread from './Thread';
 function ThreadCard({ frameSync, thread }) {
   const store = useStoreProxy();
   const threadTag = thread.annotation && thread.annotation.$tag;
-  const isFocused = store.isAnnotationFocused(threadTag);
+  const isFocused = threadTag && store.isAnnotationFocused(threadTag);
   const focusThreadAnnotation = useMemo(
     () =>
       debounce(tag => {
@@ -79,6 +79,4 @@ function ThreadCard({ frameSync, thread }) {
   );
 }
 
-ThreadCard.injectedProps = ['frameSync'];
-
-export default withServices(ThreadCard);
+export default withServices(ThreadCard, ['frameSync']);

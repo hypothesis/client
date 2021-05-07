@@ -169,6 +169,4 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
   );
 }
 
-SelectionTabs.injectedProps = ['annotationsService', 'settings'];
-
-export default withServices(SelectionTabs);
+export default withServices(SelectionTabs, ['annotationsService', 'settings']);

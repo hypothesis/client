@@ -53,7 +53,7 @@ function Annotation({
   const isEditing = annotation && !!store.getDraft(annotation) && !isSaving;
 
   const userid = store.profile().userid;
-  const showActions = annotation && !isSaving && !isEditing;
+  const showActions = !isSaving && !isEditing;
   const showReplyToggle = !isReply && !hasAppliedFilter && replyCount > 0;
 
   const onReply = () => annotationsService.reply(annotation, userid);
@@ -105,7 +105,7 @@ function Annotation({
               />
             )}
             {isSaving && <div className="Annotation__actions">Saving...</div>}
-            {showActions && (
+            {showActions && annotation && (
               <div className="u-layout-row--justify-right u-stretch">
                 <AnnotationActionBar
                   annotation={annotation}
@@ -120,6 +120,4 @@ function Annotation({
   );
 }
 
-Annotation.injectedProps = ['annotationsService'];
-
-export default withServices(Annotation);
+export default withServices(Annotation, ['annotationsService']);

@@ -68,6 +68,4 @@ function Tutorial({ settings }) {
   );
 }
 
-Tutorial.injectedProps = ['settings'];
-
-export default withServices(Tutorial);
+export default withServices(Tutorial, ['settings']);
