@@ -16,16 +16,17 @@ import MenuSection from './MenuSection';
  * /
 
 /**
- * @typedef AuthState
- * @prop {'logged-in'|'logged-out'|'unknown'} status
+ * @typedef AuthStateLoggedIn
+ * @prop {'logged-in'} status
  * @prop {string} displayName
  * @prop {string} userid
  * @prop {string} username
+ * @typedef {{status: 'logged-out'|'unknown'} | AuthStateLoggedIn}  AuthState
  */
 
 /**
  * @typedef UserMenuProps
- * @prop {AuthState} auth - object representing authenticated user and auth status
+ * @prop {AuthStateLoggedIn} auth - object representing authenticated user and auth status
  * @prop {() => any} onLogout - onClick callback for the "log out" button
  * @prop {Object} bridge
  * @prop {MergedConfig} settings
