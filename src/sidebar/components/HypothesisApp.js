@@ -24,16 +24,18 @@ import TopBar from './TopBar';
  * @typedef {import('../../types/api').Profile} Profile
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
  * @typedef {import('../../shared/bridge').default} Bridge
+ * @typedef {import('./UserMenu').AuthState} AuthState
  */
 
 /**
  * Return the user's authentication status from their profile.
  *
  * @param {Profile} profile - The profile object from the API.
+ * @return {AuthState}
  */
 function authStateFromProfile(profile) {
   const parsed = parseAccountID(profile.userid);
-  if (parsed) {
+  if (parsed && profile.userid) {
     let displayName = parsed.username;
     if (profile.user_info && profile.user_info.display_name) {
       displayName = profile.user_info.display_name;
@@ -43,7 +45,6 @@ function authStateFromProfile(profile) {
       displayName,
       userid: profile.userid,
       username: parsed.username,
-      provider: parsed.provider,
     };
   } else {
     return { status: 'logged-out' };
@@ -73,6 +74,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
   const profile = store.profile();
   const route = store.route();
 
+  /** @type {AuthState} */
   const authState = useMemo(() => {
     if (!hasFetchedProfile) {
       return { status: 'unknown' };
@@ -172,7 +174,6 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
     >
       {route !== 'notebook' && (
         <TopBar
-          // @ts-expect-error - This type mismatch needs to be fixed or the prop removed.
           auth={authState}
           onLogin={login}
           onSignUp={signUp}
@@ -182,7 +183,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
       )}
       <div className="HypothesisApp__content">
         <ToastMessages />
-        <HelpPanel auth={authState} />
+        <HelpPanel auth={authState.status === 'logged-in' ? authState : {}} />
         <ShareAnnotationsPanel />
 
         {route && (
