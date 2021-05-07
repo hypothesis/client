@@ -105,7 +105,7 @@ function Annotation({
               />
             )}
             {isSaving && <div className="Annotation__actions">Saving...</div>}
-            {showActions && annotation && (
+            {annotation && showActions && (
               <div className="u-layout-row--justify-right u-stretch">
                 <AnnotationActionBar
                   annotation={annotation}
