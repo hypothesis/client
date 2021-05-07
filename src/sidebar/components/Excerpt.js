@@ -56,9 +56,9 @@ const noop = () => {};
  *   when it is collapsed.
  * @prop {number} [overflowThreshold] - An additional margin of pixels by which
  *   the content height can exceed `collapsedHeight` before it becomes collapsible.
- * @prop {(isCollapsible?: boolean) => any} [onCollapsibleChanged] - Called when the content height
+ * @prop {(isCollapsible: boolean) => any} [onCollapsibleChanged] - Called when the content height
  *   exceeds or falls below `collapsedHeight + overflowThreshold`.
- * @prop {(collapsed?: boolean) => any} [onToggleCollapsed] - When `inlineControls` is `false`, this
+ * @prop {(collapsed: boolean) => any} [onToggleCollapsed] - When `inlineControls` is `false`, this
  *   function is called when the user requests to expand the content by clicking a
  *   zone at the bottom of the container.
  * @prop {Object} [settings] - Used for theming.
@@ -158,6 +158,4 @@ function Excerpt({
   );
 }
 
-Excerpt.injectedProps = ['settings'];
-
-export default withServices(Excerpt);
+export default withServices(Excerpt, ['settings']);

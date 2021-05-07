@@ -11,17 +11,11 @@ describe('sidebar/service-context', () => {
     function TestComponent(props) {
       lastProps = props;
     }
-    TestComponent.injectedProps = ['aService'];
-    const WrappedComponent = withServices(TestComponent);
+    const WrappedComponent = withServices(TestComponent, ['aService']);
 
     beforeEach(() => {
       lastProps = null;
       container = document.createElement('div');
-    });
-
-    it('returns the input component if there are no service dependencies', () => {
-      function TestComponent() {}
-      assert.equal(withServices(TestComponent), TestComponent);
     });
 
     it('looks up services that a Component depends on and injects them as props', () => {

@@ -130,6 +130,4 @@ function AnnotationPublishControl({
   );
 }
 
-AnnotationPublishControl.injectedProps = ['settings'];
-
-export default withServices(AnnotationPublishControl);
+export default withServices(AnnotationPublishControl, ['settings']);

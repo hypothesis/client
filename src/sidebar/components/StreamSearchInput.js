@@ -29,6 +29,4 @@ function StreamSearchInput({ router }) {
   );
 }
 
-StreamSearchInput.injectedProps = ['router'];
-
-export default withServices(StreamSearchInput);
+export default withServices(StreamSearchInput, ['router']);

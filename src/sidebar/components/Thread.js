@@ -129,6 +129,4 @@ function Thread({ thread, threadsService }) {
   );
 }
 
-Thread.injectedProps = ['threadsService'];
-
-export default withServices(Thread);
+export default withServices(Thread, ['threadsService']);

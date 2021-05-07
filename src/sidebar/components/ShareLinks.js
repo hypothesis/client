@@ -1,7 +1,5 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 
-import { withServices } from '../service-context';
-
 /**
  * @typedef ShareLinkProps
  * @prop {string} iconName - The name of the SVG icon to use for this link
@@ -68,4 +66,4 @@ function ShareLinks({ shareURI }) {
   );
 }
 
-export default withServices(ShareLinks);
+export default ShareLinks;

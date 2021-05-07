@@ -10,7 +10,7 @@ import Tutorial from './Tutorial';
 import VersionInfo from './VersionInfo';
 
 /**
- * @typedef {import('../components/UserMenu').AuthState} AuthState
+ * @typedef {import('../helpers/version-data').AuthState} AuthState
  */
 
 /**
@@ -42,7 +42,7 @@ function HelpPanelTab({ linkText, url }) {
 
 /**
  * @typedef HelpPanelProps
- * @prop {AuthState} auth - Object with auth and user information
+ * @prop {AuthState} auth
  * @prop {import('../services/session').SessionService} session
  */
 
@@ -153,6 +153,4 @@ function HelpPanel({ auth, session }) {
   );
 }
 
-HelpPanel.injectedProps = ['session'];
-
-export default withServices(HelpPanel);
+export default withServices(HelpPanel, ['session']);

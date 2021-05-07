@@ -85,6 +85,4 @@ function AnnotationBody({ annotation, settings }) {
   );
 }
 
-AnnotationBody.injectedProps = ['settings'];
-
-export default withServices(AnnotationBody);
+export default withServices(AnnotationBody, ['settings']);

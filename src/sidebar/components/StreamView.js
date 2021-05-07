@@ -66,6 +66,4 @@ function StreamView({ api, toastMessenger }) {
   return <ThreadList threads={rootThread.children} />;
 }
 
-StreamView.injectedProps = ['api', 'toastMessenger'];
-
-export default withServices(StreamView);
+export default withServices(StreamView, ['api', 'toastMessenger']);

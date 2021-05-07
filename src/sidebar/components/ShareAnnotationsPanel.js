@@ -117,6 +117,4 @@ function ShareAnnotationsPanel({ toastMessenger }) {
   );
 }
 
-ShareAnnotationsPanel.injectedProps = ['toastMessenger'];
-
-export default withServices(ShareAnnotationsPanel);
+export default withServices(ShareAnnotationsPanel, ['toastMessenger']);

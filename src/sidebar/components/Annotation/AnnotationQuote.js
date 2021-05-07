@@ -60,6 +60,4 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
   );
 }
 
-AnnotationQuote.injectedProps = ['settings'];
-
-export default withServices(AnnotationQuote);
+export default withServices(AnnotationQuote, ['settings']);

@@ -157,6 +157,8 @@ function SidebarView({
   );
 }
 
-SidebarView.injectedProps = ['frameSync', 'loadAnnotationsService', 'streamer'];
-
-export default withServices(SidebarView);
+export default withServices(SidebarView, [
+  'frameSync',
+  'loadAnnotationsService',
+  'streamer',
+]);

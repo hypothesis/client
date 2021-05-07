@@ -92,6 +92,4 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
   );
 }
 
-AnnotationView.injectedProps = ['loadAnnotationsService'];
-
-export default withServices(AnnotationView);
+export default withServices(AnnotationView, ['loadAnnotationsService']);

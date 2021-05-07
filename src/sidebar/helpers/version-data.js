@@ -1,5 +1,7 @@
 /**
- * @typedef {import('../components/UserMenu').AuthState} AuthState
+ * @typedef AuthState
+ * @prop {string|null} [userid]
+ * @prop {string} [displayName]
  */
 
 /**

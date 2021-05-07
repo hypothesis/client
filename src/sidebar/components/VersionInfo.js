@@ -49,6 +49,4 @@ function VersionInfo({ toastMessenger, versionData }) {
   );
 }
 
-VersionInfo.injectedProps = ['toastMessenger'];
-
-export default withServices(VersionInfo);
+export default withServices(VersionInfo, ['toastMessenger']);

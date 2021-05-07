@@ -171,6 +171,4 @@ function AnnotationHeader({
   );
 }
 
-AnnotationHeader.injectedProps = ['settings'];
-
-export default withServices(AnnotationHeader);
+export default withServices(AnnotationHeader, ['settings']);
