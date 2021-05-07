@@ -23,6 +23,7 @@ import { PDFMetadata } from './pdf-metadata';
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../../types/api').Selector} Selector
+ * @typedef {import('../../types/pdfjs').PDFViewerApplication} PDFViewerApplication
  */
 
 // The viewport and controls for PDF.js start breaking down below about 670px
@@ -61,14 +62,18 @@ export class PDFIntegration {
     this.annotator = annotator;
 
     const window_ = /** @type {HypothesisWindow} */ (window);
-    this.pdfViewer = window_.PDFViewerApplication.pdfViewer;
+
+    // Assume this class is only used if we're in the PDF.js viewer.
+    const pdfViewerApp = /** @type {PDFViewerApplication} */ (window_.PDFViewerApplication);
+
+    this.pdfViewer = pdfViewerApp.pdfViewer;
     this.pdfViewer.viewer.classList.add('has-transparent-text-layer');
 
     // Get the element that contains all of the PDF.js UI. This is typically
     // `document.body`.
-    this.pdfContainer = window_.PDFViewerApplication?.appConfig?.appContainer;
+    this.pdfContainer = pdfViewerApp.appConfig?.appContainer ?? document.body;
 
-    this.pdfMetadata = new PDFMetadata(window_.PDFViewerApplication);
+    this.pdfMetadata = new PDFMetadata(pdfViewerApp);
 
     this.observer = new MutationObserver(debounce(() => this._update(), 100));
     this.observer.observe(this.pdfViewer.viewer, {
@@ -241,7 +246,7 @@ export class PDFIntegration {
     const pageCount = this.pdfViewer.pagesCount;
     for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
       const page = this.pdfViewer.getPageView(pageIndex);
-      if (!page.textLayer?.renderingDone) {
+      if (!page?.textLayer?.renderingDone) {
         continue;
       }
 

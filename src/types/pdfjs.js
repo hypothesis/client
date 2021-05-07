@@ -61,10 +61,14 @@
  *
  * Defined in `web/pdf_viewer.js` in the PDF.js source.
  *
+ * @prop {string} currentScaleValue - Zoom level/mode. This can be a string representation
+ *   of a float or a special constant ("auto", "page-fit", "page-width" and more)
  * @prop {number} pagesCount
  * @prop {EventBus} eventBus -
  *   Reference to the global event bus. Added in PDF.js v1.6.210.
  * @prop {(page: number) => PDFPageView|null} getPageView
+ * @prop {HTMLElement} viewer - DOM element containing the main content of the document
+ * @prop {() => void} update - Re-render the current view
  */
 
 /**
@@ -76,11 +80,20 @@
  */
 
 /**
+ * Object containing references to various DOM elements that make up the PDF.js viewer UI,
+ * as well as a few other global objects used by the viewer.
+ *
+ * @typedef AppConfig
+ * @prop {HTMLElement} appContainer
+ */
+
+/**
  * The `PDFViewerApplication` global which is the entry-point for accessing PDF.js.
  *
  * Defined in `web/app.js` in the PDF.js source.
  *
  * @typedef PDFViewerApplication
+ * @prop {AppConfig} [appConfig] - Viewer DOM elements. Since v1.5.188.
  * @prop {EventBus} [eventBus] -
  *   Global event bus. Since v1.6.210. This is not available until the PDF viewer
  *   has been initialized. See `initialized` and `initializedPromise` properties.

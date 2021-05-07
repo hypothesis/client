@@ -138,7 +138,7 @@
  * when loaded in a frame that influence how it behaves.
  *
  * @typedef Globals
- * @prop {Object} [PDFViewerApplication] -
+ * @prop {import('./pdfjs').PDFViewerApplication} [PDFViewerApplication] -
  *   PDF.js entry point. If set, triggers loading of PDF rather than HTML integration.
  * @prop {boolean} [__hypothesis_frame] -
  *   Flag used to indicate that the "annotator" part of Hypothesis is loaded in
