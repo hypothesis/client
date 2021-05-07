@@ -172,7 +172,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
     >
       {route !== 'notebook' && (
         <TopBar
-          // @ts-expect-error - This type mistmatch needs to be fixed or the prop removed.
+          // @ts-expect-error - This type mismatch needs to be fixed or the prop removed.
           auth={authState}
           onLogin={login}
           onSignUp={signUp}
