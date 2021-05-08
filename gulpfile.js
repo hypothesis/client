@@ -2,29 +2,28 @@
 
 'use strict';
 
-const { mkdirSync, readdirSync } = require('fs');
+const { mkdirSync, writeFileSync } = require('fs');
 const path = require('path');
 
 const changed = require('gulp-changed');
 const commander = require('commander');
 const log = require('fancy-log');
+const glob = require('glob');
 const gulp = require('gulp');
 const replace = require('gulp-replace');
 const rename = require('gulp-rename');
+const rollup = require('rollup');
+const loadConfigFile = require('rollup/dist/loadConfigFile');
 const through = require('through2');
 
-const createBundle = require('./scripts/gulp/create-bundle');
 const createStyleBundle = require('./scripts/gulp/create-style-bundle');
 const manifest = require('./scripts/gulp/manifest');
 const serveDev = require('./dev-server/serve-dev');
 const servePackage = require('./dev-server/serve-package');
-const vendorBundles = require('./scripts/gulp/vendor-bundles');
 
 const IS_PRODUCTION_BUILD = process.env.NODE_ENV === 'production';
-const SCRIPT_DIR = 'build/scripts';
 const STYLE_DIR = 'build/styles';
 const FONTS_DIR = 'build/fonts';
-const IMAGES_DIR = 'build/images';
 
 function parseCommandLine() {
   commander
@@ -58,108 +57,51 @@ function parseCommandLine() {
 
 const karmaOptions = parseCommandLine();
 
-/** A list of all modules included in vendor bundles. */
-const vendorModules = Object.keys(vendorBundles.bundles).reduce((deps, key) => {
-  return deps.concat(vendorBundles.bundles[key]);
-}, []);
+async function buildJS(rollupConfig) {
+  const { options, warnings } = await loadConfigFile(
+    require.resolve(rollupConfig)
+  );
+  warnings.flush();
 
-// Builds the bundles containing vendor JS code
-gulp.task('build-vendor-js', () => {
-  const finished = [];
-  Object.keys(vendorBundles.bundles).forEach(name => {
-    finished.push(
-      createBundle({
-        name,
-        require: vendorBundles.bundles[name],
-        minify: IS_PRODUCTION_BUILD,
-        path: SCRIPT_DIR,
-        noParse: vendorBundles.noParseModules,
-      })
-    );
-  });
-  return Promise.all(finished);
-});
+  await Promise.all(
+    options.map(async inputs => {
+      const bundle = await rollup.rollup(inputs);
+      await Promise.all(inputs.output.map(output => bundle.write(output)));
+    })
+  );
+}
 
-const appBundleBaseConfig = {
-  path: SCRIPT_DIR,
-  external: vendorModules,
-  minify: IS_PRODUCTION_BUILD,
-  noParse: vendorBundles.noParseModules,
-};
+async function watchJS(rollupConfig) {
+  const { options, warnings } = await loadConfigFile(
+    require.resolve(rollupConfig)
+  );
+  warnings.flush();
+  const watcher = rollup.watch(options);
 
-const appBundles = [
-  {
-    // The entry point for both the Hypothesis client and the sidebar
-    // application. This is responsible for loading the rest of the assets needed
-    // by the client.
-    name: 'boot',
-    entry: './src/boot/index',
-    transforms: ['babel'],
-  },
-  {
-    // The sidebar application for displaying and editing annotations.
-    name: 'sidebar',
-    transforms: ['babel'],
-    entry: './src/sidebar/index',
-  },
-  {
-    // The annotation layer which handles displaying highlights, presenting
-    // annotation tools on the page and instantiating the sidebar application.
-    name: 'annotator',
-    entry: './src/annotator/index',
-    transforms: ['babel'],
-  },
-  {
-    // A web app to assist with testing UI components.
-    name: 'ui-playground',
-    entry: './dev-server/ui-playground/index',
-    transforms: ['babel'],
-  },
-];
-
-// Polyfill bundles. Polyfills are grouped into "sets" (one bundle per set)
-// based on major ECMAScript version or DOM API. Some large polyfills
-// (eg. for String.prototype.normalize) are additionally separated out into
-// their own bundles.
-//
-// To add a new polyfill:
-//  - Add the relevant dependencies to the project
-//  - Create an entry point in `src/boot/polyfills/{set}` and a feature
-//    detection function in `src/boot/polyfills/index.js`
-//  - Add the polyfill set name to the required dependencies for the parts of
-//    the client that need it in `src/boot/boot.js`
-const polyfillBundles = readdirSync('./src/boot/polyfills/')
-  .filter(name => name.endsWith('.js') && name !== 'index.js')
-  .map(name => name.replace(/\.js$/, ''))
-  .map(set => ({
-    name: `polyfills-${set}`,
-    entry: `./src/boot/polyfills/${set}`,
-    transforms: ['babel'],
-  }));
-
-const appBundleConfigs = appBundles.concat(polyfillBundles).map(config => {
-  return Object.assign({}, appBundleBaseConfig, config);
-});
-
-gulp.task(
-  'build-js',
-  gulp.parallel('build-vendor-js', () => {
-    return Promise.all(
-      appBundleConfigs.map(config => {
-        return createBundle(config);
-      })
-    );
-  })
-);
-
-gulp.task(
-  'watch-js',
-  gulp.series('build-vendor-js', function watchJS() {
-    appBundleConfigs.forEach(config => {
-      createBundle(config, { watch: true });
+  return new Promise(resolve => {
+    watcher.on('event', event => {
+      switch (event.code) {
+        case 'START':
+          log('JS build starting...');
+          break;
+        case 'BUNDLE_END':
+          event.result.close();
+          break;
+        case 'ERROR':
+          log('JS build error', event.error);
+          break;
+        case 'END':
+          log('JS build completed.');
+          resolve(); // Resolve once the initial build completes.
+          break;
+      }
     });
-  })
-);
+  });
+}
+
+gulp.task('build-js', () => buildJS('./rollup.config.js'));
+
+gulp.task('watch-js', () => watchJS('./rollup.config.js'));
 
 const cssBundles = [
   // Hypothesis client
@@ -215,23 +157,8 @@ gulp.task(
   })
 );
 
-const imageFiles = 'src/images/**/*';
-gulp.task('build-images', () => {
-  return gulp
-    .src(imageFiles)
-    .pipe(changed(IMAGES_DIR))
-    .pipe(gulp.dest(IMAGES_DIR));
-});
-
-gulp.task(
-  'watch-images',
-  gulp.series('build-images', function watchImages() {
-    gulp.watch(imageFiles, gulp.task('build-images'));
-  })
-);
-
 const MANIFEST_SOURCE_FILES =
-  'build/@(fonts|images|scripts|styles)/*.@(js|css|woff|jpg|png|svg)';
+  'build/@(fonts|scripts|styles)/*.@(js|css|woff|jpg|png|svg)';
 
 let isFirstBuild = true;
 
@@ -320,12 +247,7 @@ gulp.task('serve-test-pages', () => {
   serveDev(3002, { clientUrl: `//{current_host}:3001/hypothesis` });
 });
 
-const buildAssets = gulp.parallel(
-  'build-js',
-  'build-css',
-  'build-fonts',
-  'build-images'
-);
+const buildAssets = gulp.parallel('build-js', 'build-css', 'build-fonts');
 gulp.task('build', gulp.series(buildAssets, generateManifest));
 
 gulp.task(
@@ -336,34 +258,57 @@ gulp.task(
     'watch-js',
     'watch-css',
     'watch-fonts',
-    'watch-images',
     'watch-manifest'
   )
 );
 
-function runKarma(done) {
-  const karma = require('karma');
-  new karma.Server(
-    karma.config.parseConfig(
-      path.resolve(__dirname, './src/karma.config.js'),
-      karmaOptions
-    ),
-    done
-  ).start();
+async function buildAndRunTests() {
+  const { grep, singleRun } = karmaOptions;
 
-  process.on('SIGINT', () => {
-    // Give Karma a chance to handle SIGINT and cleanup, but forcibly
-    // exit if it takes too long.
-    setTimeout(() => {
-      done();
-      process.exit(1);
-    }, 5000);
+  const testFiles = [
+    'src/sidebar/test/bootstrap.js',
+    ...glob
+      .sync('src/**/*-test.js')
+      .filter(path => (grep ? path.match(grep) : true)),
+  ];
+
+  const testSource = testFiles
+    .map(path => `import "../../${path}";`)
+    .join('\n');
+
+  writeFileSync('build/scripts/test-inputs.js', testSource);
+
+  log(`Building test bundle... (${testFiles.length} files)`);
+  if (singleRun) {
+    await buildJS('./rollup-tests.config.js');
+  } else {
+    await watchJS('./rollup-tests.config.js');
+  }
+  log('Starting Karma...');
+
+  return new Promise(resolve => {
+    const karma = require('karma');
+    new karma.Server(
+      karma.config.parseConfig(
+        path.resolve(__dirname, './src/karma.config.js'),
+        { singleRun }
+      ),
+      resolve
+    ).start();
+
+    process.on('SIGINT', () => {
+      // Give Karma a chance to handle SIGINT and cleanup, but forcibly
+      // exit if it takes too long.
+      setTimeout(() => {
+        resolve();
+        process.exit(1);
+      }, 5000);
+    });
   });
 }
 
 // Unit and integration testing tasks.
-// Some (eg. a11y) tests rely on CSS bundles, so build these first.
-gulp.task(
-  'test',
-  gulp.series('build-css', done => runKarma(done))
-);
+//
+// Some (eg. a11y) tests rely on CSS bundles. We assume that JS will always take
+// londer to build than CSS, so build in parallel.
+gulp.task('test', gulp.parallel('build-css', buildAndRunTests));

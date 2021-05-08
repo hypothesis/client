@@ -3,7 +3,6 @@
 /* global __dirname */
 
 const path = require('path');
-const envify = require('loose-envify/custom');
 const glob = require('glob');
 
 let chromeFlags = [];
@@ -48,25 +47,15 @@ module.exports = function (config) {
 
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-    frameworks: ['browserify', 'mocha', 'chai', 'sinon'],
+    frameworks: ['mocha', 'chai', 'sinon'],
 
     // list of files / patterns to load in the browser
     files: [
-      // Test setup
-      './sidebar/test/bootstrap.js',
-
       // Empty HTML file to assist with some tests
       { pattern: './annotator/test/empty.html', watched: false },
 
-      // Test modules.
-      ...testFiles.map(pattern => ({
-        pattern,
-
-        // Disable watching because karma-browserify handles this.
-        watched: false,
-
-        type: 'js',
-      })),
+      // Test bundles.
+      '../build/scripts/tests.bundle.js',
 
       // CSS bundles, relied upon by accessibility tests (eg. for color-contrast
       // checks).
@@ -81,35 +70,6 @@ module.exports = function (config) {
 
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-    preprocessors: {
-      './boot/polyfills/*.js': ['browserify'],
-      './sidebar/test/bootstrap.js': ['browserify'],
-      '**/*-test.js': ['browserify'],
-      '**/*-it.js': ['browserify'],
-    },
-
-    browserify: {
-      debug: true,
-      transform: [
-        [
-          'babelify',
-          {
-            extensions: ['.js'],
-            plugins: [
-              'mockable-imports',
-              [
-                'babel-plugin-istanbul',
-                {
-                  exclude: ['**/test/**/*.js', '**/test-util/**'],
-                },
-              ],
-            ],
-          },
-        ],
-        // Enable debugging checks in libraries that use `NODE_ENV` guards.
-        [envify({ NODE_ENV: 'development' }), { global: true }],
-      ],
-    },
 
     mochaReporter: {
       // Display a helpful diff when comparing complex objects

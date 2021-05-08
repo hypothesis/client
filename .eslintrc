@@ -16,5 +16,12 @@
 
     // Replaced by TypeScript's static checking.
     "react/prop-types": "off"
-  }
+  },
+  "overrides": [
+    {
+      "files": "rollup*.js",
+      "env": { "node": true },
+      "parserOptions": { "sourceType": "module" }
+    }
+  ]
 }
