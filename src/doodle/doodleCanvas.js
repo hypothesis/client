@@ -1,5 +1,5 @@
 import { createElement } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import { Canvas } from './canvas';
 import propTypes from 'prop-types';
 
@@ -31,6 +31,28 @@ const DoodleCanvas = ({
   setLines,
 }) => {
   const [isDrawing, setIsDrawing] = useState(false);
+  const [everActive, setEverActive] = useState(false);
+
+  if (active && !everActive) {
+    setEverActive(true);
+  }
+
+  useEffect(() => {
+    if (lines.length === 0) {
+      return () => {};
+    }
+    const warn = e => {
+      e = e || window.event;
+
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => {
+      window.removeEventListener('beforeunload', warn);
+    };
+  }, [lines]);
 
   const handleMouseDown = e => {
     setIsDrawing(true);
@@ -74,7 +96,7 @@ const DoodleCanvas = ({
     setLines([newLine, ...rest]);
   };
 
-  if (!active) {
+  if (!everActive) {
     return null;
   }
 

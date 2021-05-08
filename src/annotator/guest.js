@@ -775,6 +775,7 @@ export default class Guest extends Delegator {
         $doodle: true,
         doodleLines: this.doodleCanvasController.lines,
       });
+      this.doodleCanvasController.lines = [];
     }
   }
 }
