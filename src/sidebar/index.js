@@ -1,5 +1,3 @@
-/* global process */
-
 import { parseJsonConfig } from '../boot/parse-json-config';
 import * as rendererOptions from '../shared/renderer-options';
 
@@ -29,9 +27,7 @@ disableOpenerForExternalLinks(document.body);
 import 'focus-visible';
 
 // Enable debugging checks for Preact.
-if (process.env.NODE_ENV !== 'production') {
-  require('preact/debug');
-}
+import 'preact/debug';
 
 // Install Preact renderer options to work around browser quirks
 rendererOptions.setupBrowserFixes();

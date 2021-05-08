@@ -8,13 +8,20 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 
-// The triangular indicator below the menu toggle button that visually links it
-// to the menu content.
-const menuArrow = className => (
-  <svg className={classnames('Menu__arrow', className)} width={15} height={8}>
-    <path d="M0 8 L7 0 L15 8" stroke="currentColor" strokeWidth="2" />
-  </svg>
-);
+/**
+ * The triangular indicator below the menu toggle button that visually links it
+ * to the menu content.
+ *
+ * @param {object} props
+ *   @param {string} [props.className]
+ */
+function MenuArrow({ className }) {
+  return (
+    <svg className={classnames('Menu__arrow', className)} width={15} height={8}>
+      <path d="M0 8 L7 0 L15 8" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
 
 /**
  * Flag indicating whether the next click event on the menu's toggle button
@@ -198,7 +205,7 @@ export default function Menu({
       </button>
       {isOpen && (
         <>
-          {menuArrow(arrowClass)}
+          <MenuArrow className={arrowClass} />
           <div
             className={classnames(
               'Menu__content',

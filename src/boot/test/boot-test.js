@@ -140,9 +140,6 @@ describe('bootstrap', () => {
     it('loads assets for the sidebar application', () => {
       runBoot('sidebar');
       const expectedAssets = [
-        'scripts/katex.bundle.1234.js',
-        'scripts/sentry.bundle.1234.js',
-        'scripts/showdown.bundle.1234.js',
         'scripts/sidebar.bundle.1234.js',
         'styles/katex.min.1234.css',
         'styles/sidebar.1234.css',

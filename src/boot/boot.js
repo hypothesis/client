@@ -60,7 +60,7 @@ function injectStylesheet(doc, href) {
  */
 function injectScript(doc, src) {
   const script = doc.createElement('script');
-  script.type = 'text/javascript';
+  script.type = 'module';
   script.src = src;
 
   // Set 'async' to false to maintain execution order of scripts.
@@ -170,7 +170,6 @@ export function bootHypothesisClient(doc, config) {
     // Vendor code and polyfills
     ...polyfills,
 
-    // Main entry point for the client
     'scripts/annotator.bundle.js',
 
     'styles/annotator.css',
@@ -194,12 +193,6 @@ export function bootSidebarApp(doc, config) {
   injectAssets(doc, config, [
     ...polyfills,
 
-    // Vendor code required by sidebar.bundle.js
-    'scripts/sentry.bundle.js',
-    'scripts/katex.bundle.js',
-    'scripts/showdown.bundle.js',
-
-    // The sidebar app
     'scripts/sidebar.bundle.js',
 
     'styles/katex.min.css',
