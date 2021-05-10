@@ -32,8 +32,7 @@ describe('sidebar/util/sentry', () => {
 
       fakeDocumentCurrentScript = sinon.stub(document, 'currentScript');
       fakeDocumentCurrentScript.get(() => ({
-        src:
-          'https://cdn.hypothes.is/hypothesis/1.123.0/build/scripts/sidebar.bundle.js',
+        src: 'https://cdn.hypothes.is/hypothesis/1.123.0/build/scripts/sidebar.bundle.js',
       }));
 
       // Reset rate limiting counters.

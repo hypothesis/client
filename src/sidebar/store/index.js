@@ -106,9 +106,7 @@ export default function store(settings) {
     toastMessages,
     viewer,
   ];
-  return /** @type {SidebarStore} */ (createStore(
-    modules,
-    [settings],
-    middleware
-  ));
+  return /** @type {SidebarStore} */ (
+    createStore(modules, [settings], middleware)
+  );
 }

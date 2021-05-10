@@ -14,7 +14,9 @@ function extractOrigin(url) {
 }
 
 function currentScriptOrigin(document_ = document) {
-  const scriptEl = /** @type {HTMLScriptElement|null} */ (document_.currentScript);
+  const scriptEl = /** @type {HTMLScriptElement|null} */ (
+    document_.currentScript
+  );
   if (!scriptEl) {
     // Function was called outside of initial script execution.
     return null;

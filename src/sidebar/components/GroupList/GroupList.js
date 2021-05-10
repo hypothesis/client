@@ -46,9 +46,10 @@ function GroupList({ settings }) {
   const focusedGroup = store.focusedGroup();
   const userid = store.profile().userid;
 
-  const myGroupsSorted = useMemo(() => groupsByOrganization(myGroups), [
-    myGroups,
-  ]);
+  const myGroupsSorted = useMemo(
+    () => groupsByOrganization(myGroups),
+    [myGroups]
+  );
 
   const featuredGroupsSorted = useMemo(
     () => groupsByOrganization(featuredGroups),

@@ -24,9 +24,10 @@ export default function MarkdownView({
   textClass = {},
   textStyle = {},
 }) {
-  const html = useMemo(() => (markdown ? renderMarkdown(markdown) : ''), [
-    markdown,
-  ]);
+  const html = useMemo(
+    () => (markdown ? renderMarkdown(markdown) : ''),
+    [markdown]
+  );
   const content = useRef(/** @type {HTMLDivElement|null} */ (null));
 
   useEffect(() => {

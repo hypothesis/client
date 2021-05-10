@@ -88,7 +88,9 @@ export default function Dialog({
   });
 
   useEffect(() => {
-    const focusEl = /** @type {InputElement|undefined} */ (initialFocus?.current);
+    const focusEl = /** @type {InputElement|undefined} */ (
+      initialFocus?.current
+    );
     if (focusEl && !focusEl.disabled) {
       focusEl.focus();
     } else {

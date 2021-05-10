@@ -414,9 +414,9 @@ export default class Guest {
         return;
       }
 
-      const highlights = /** @type {AnnotationHighlight[]} */ (highlightRange(
-        range
-      ));
+      const highlights = /** @type {AnnotationHighlight[]} */ (
+        highlightRange(range)
+      );
       highlights.forEach(h => {
         h._annotation = anchor.annotation;
       });

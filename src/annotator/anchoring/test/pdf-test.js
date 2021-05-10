@@ -139,8 +139,8 @@ describe('annotator/anchoring/pdf', function () {
       const quote = 'NODE B';
 
       // this selects NODE A text node
-      const textNodeSelected = container.querySelector('.textLayer div')
-        .firstChild;
+      const textNodeSelected =
+        container.querySelector('.textLayer div').firstChild;
       const staticRange = findText(container, quote);
 
       const range = {

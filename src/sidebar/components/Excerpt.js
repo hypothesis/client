@@ -83,9 +83,8 @@ function Excerpt({
   overflowThreshold = 0,
   settings = {},
 }) {
-  const [collapsedByInlineControls, setCollapsedByInlineControls] = useState(
-    true
-  );
+  const [collapsedByInlineControls, setCollapsedByInlineControls] =
+    useState(true);
 
   // Container for the excerpt's content.
   const contentElement = useRef(/** @type {HTMLDivElement|null} */ (null));
