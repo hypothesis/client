@@ -627,8 +627,7 @@ describe('annotator/config/settingsFrom', () => {
         expected: null,
       },
       {
-        when:
-          'the client is in a browser extension and allowInBrowserExt: true is given',
+        when: 'the client is in a browser extension and allowInBrowserExt: true is given',
         specify: 'it returns settings from window.hypothesisConfig()',
         isBrowserExtension: true,
         allowInBrowserExt: true,
@@ -637,8 +636,7 @@ describe('annotator/config/settingsFrom', () => {
         expected: 'configFuncValue',
       },
       {
-        when:
-          'the client is in a browser extension and allowInBrowserExt: true is given',
+        when: 'the client is in a browser extension and allowInBrowserExt: true is given',
         specify: 'it returns settings from js-hypothesis-configs',
         isBrowserExtension: true,
         allowInBrowserExt: true,
@@ -677,8 +675,7 @@ describe('annotator/config/settingsFrom', () => {
         expected: 'not the default value',
       },
       {
-        when:
-          'the client is in a browser extension and a default value is provided',
+        when: 'the client is in a browser extension and a default value is provided',
         specify: 'it returns the default value',
         isBrowserExtension: true,
         allowInBrowserExt: false,

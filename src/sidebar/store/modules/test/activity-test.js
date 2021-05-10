@@ -143,8 +143,8 @@ describe('sidebar/store/modules/activity', () => {
 
       store.annotationSaveFinished({ $tag: 'seven' });
 
-      const annotationsBeingSaved = store.getState().activity
-        .activeAnnotationSaveRequests;
+      const annotationsBeingSaved =
+        store.getState().activity.activeAnnotationSaveRequests;
 
       assert.lengthOf(annotationsBeingSaved, 1);
       assert.deepEqual(annotationsBeingSaved, ['nine']);
@@ -155,8 +155,8 @@ describe('sidebar/store/modules/activity', () => {
 
       store.annotationSaveFinished({});
 
-      const annotationsBeingSaved = store.getState().activity
-        .activeAnnotationSaveRequests;
+      const annotationsBeingSaved =
+        store.getState().activity.activeAnnotationSaveRequests;
 
       assert.lengthOf(annotationsBeingSaved, 1);
       assert.deepEqual(annotationsBeingSaved, ['nine']);
@@ -168,8 +168,8 @@ describe('sidebar/store/modules/activity', () => {
 
       store.annotationSaveFinished({ $tag: 'four' });
 
-      const annotationsBeingSaved = store.getState().activity
-        .activeAnnotationSaveRequests;
+      const annotationsBeingSaved =
+        store.getState().activity.activeAnnotationSaveRequests;
 
       assert.lengthOf(annotationsBeingSaved, 1);
       assert.deepEqual(annotationsBeingSaved, ['nine']);
@@ -180,8 +180,8 @@ describe('sidebar/store/modules/activity', () => {
     it('adds annotation `$tag` to list of saving annotations', () => {
       store.annotationSaveStarted({ $tag: 'five' });
 
-      const annotationsBeingSaved = store.getState().activity
-        .activeAnnotationSaveRequests;
+      const annotationsBeingSaved =
+        store.getState().activity.activeAnnotationSaveRequests;
 
       assert.lengthOf(annotationsBeingSaved, 1);
       assert.deepEqual(annotationsBeingSaved, ['five']);
@@ -191,8 +191,8 @@ describe('sidebar/store/modules/activity', () => {
       store.annotationSaveStarted({ $tag: 'five' });
       store.annotationSaveStarted({ $tag: 'five' });
 
-      const annotationsBeingSaved = store.getState().activity
-        .activeAnnotationSaveRequests;
+      const annotationsBeingSaved =
+        store.getState().activity.activeAnnotationSaveRequests;
 
       assert.lengthOf(annotationsBeingSaved, 1);
       assert.deepEqual(annotationsBeingSaved, ['five']);
@@ -201,8 +201,8 @@ describe('sidebar/store/modules/activity', () => {
     it('does not add the annotation if it does not have a `$tag`', () => {
       store.annotationSaveStarted({});
 
-      const annotationsBeingSaved = store.getState().activity
-        .activeAnnotationSaveRequests;
+      const annotationsBeingSaved =
+        store.getState().activity.activeAnnotationSaveRequests;
 
       assert.lengthOf(annotationsBeingSaved, 0);
     });

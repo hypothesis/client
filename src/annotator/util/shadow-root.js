@@ -2,9 +2,11 @@
  * Load stylesheets for annotator UI components into the shadow DOM root.
  */
 function loadStyles(shadowRoot) {
-  const url = /** @type {HTMLLinkElement|undefined} */ (document.querySelector(
-    'link[rel="stylesheet"][href*="/build/styles/annotator.css"]'
-  ))?.href;
+  const url = /** @type {HTMLLinkElement|undefined} */ (
+    document.querySelector(
+      'link[rel="stylesheet"][href*="/build/styles/annotator.css"]'
+    )
+  )?.href;
 
   if (!url) {
     return;

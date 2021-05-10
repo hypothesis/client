@@ -168,7 +168,9 @@ function wholeTextNodesInRange(range) {
   }
 
   const textNodes = [];
-  const nodeIter = /** @type {Document} */ (root.ownerDocument).createNodeIterator(
+  const nodeIter = /** @type {Document} */ (
+    root.ownerDocument
+  ).createNodeIterator(
     root,
     NodeFilter.SHOW_TEXT // Only return `Text` nodes.
   );

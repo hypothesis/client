@@ -37,9 +37,10 @@ export default function AnnotationTimestamps({
 }) {
   // "Current" time, used when calculating the relative age of `timestamp`.
   const [now, setNow] = useState(() => new Date());
-  const createdDate = useMemo(() => new Date(annotationCreated), [
-    annotationCreated,
-  ]);
+  const createdDate = useMemo(
+    () => new Date(annotationCreated),
+    [annotationCreated]
+  );
   const updatedDate = useMemo(
     () => withEditedTimestamp && new Date(annotationUpdated),
     [annotationUpdated, withEditedTimestamp]

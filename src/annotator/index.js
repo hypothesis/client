@@ -27,9 +27,11 @@ const window_ = /** @type {HypothesisWindow} */ (window);
 
 // Look up the URL of the sidebar. This element is added to the page by the
 // boot script before the "annotator" bundle loads.
-const appLinkEl = /** @type {Element} */ (document.querySelector(
-  'link[type="application/annotator+html"][rel="sidebar"]'
-));
+const appLinkEl = /** @type {Element} */ (
+  document.querySelector(
+    'link[type="application/annotator+html"][rel="sidebar"]'
+  )
+);
 
 const config = configFrom(window);
 

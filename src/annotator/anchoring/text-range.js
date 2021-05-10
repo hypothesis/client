@@ -41,10 +41,9 @@ function previousSiblingsTextLength(node) {
  */
 function resolveOffsets(element, ...offsets) {
   let nextOffset = offsets.shift();
-  const nodeIter = /** @type {Document} */ (element.ownerDocument).createNodeIterator(
-    element,
-    NodeFilter.SHOW_TEXT
-  );
+  const nodeIter = /** @type {Document} */ (
+    element.ownerDocument
+  ).createNodeIterator(element, NodeFilter.SHOW_TEXT);
   const results = [];
 
   let currentNode = nodeIter.nextNode();
@@ -157,9 +156,9 @@ export class TextPosition {
         );
         tw.currentNode = this.element;
         const forwards = options.direction === RESOLVE_FORWARDS;
-        const text = /** @type {Text|null} */ (forwards
-          ? tw.nextNode()
-          : tw.previousNode());
+        const text = /** @type {Text|null} */ (
+          forwards ? tw.nextNode() : tw.previousNode()
+        );
         if (!text) {
           throw err;
         }

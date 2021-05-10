@@ -46,10 +46,9 @@ export function isNodeInRange(range, node) {
  */
 export function forEachNodeInRange(range, callback) {
   const root = range.commonAncestorContainer;
-  const nodeIter = /** @type {Document} */ (root.ownerDocument).createNodeIterator(
-    root,
-    NodeFilter.SHOW_ALL
-  );
+  const nodeIter = /** @type {Document} */ (
+    root.ownerDocument
+  ).createNodeIterator(root, NodeFilter.SHOW_ALL);
 
   let currentNode;
   while ((currentNode = nodeIter.nextNode())) {

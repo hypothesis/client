@@ -76,20 +76,17 @@ function ThreadList({ threads }) {
 
   const topLevelThreads = threads;
 
-  const {
-    offscreenLowerHeight,
-    offscreenUpperHeight,
-    visibleThreads,
-  } = useMemo(
-    () =>
-      calculateVisibleThreads(
-        topLevelThreads,
-        threadHeights,
-        scrollPosition,
-        scrollContainerHeight
-      ),
-    [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
-  );
+  const { offscreenLowerHeight, offscreenUpperHeight, visibleThreads } =
+    useMemo(
+      () =>
+        calculateVisibleThreads(
+          topLevelThreads,
+          threadHeights,
+          scrollPosition,
+          scrollContainerHeight
+        ),
+      [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
+    );
 
   const store = useStoreProxy();
 
@@ -176,9 +173,9 @@ function ThreadList({ threads }) {
     setThreadHeights(prevHeights => {
       const changedHeights = {};
       for (let { id } of visibleThreads) {
-        const threadElement = /** @type {HTMLElement} */ (document.getElementById(
-          id
-        ));
+        const threadElement = /** @type {HTMLElement} */ (
+          document.getElementById(id)
+        );
         const height = getElementHeightWithMargins(threadElement);
         if (height !== prevHeights[id]) {
           changedHeights[id] = height;

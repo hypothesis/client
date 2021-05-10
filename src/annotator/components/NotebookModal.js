@@ -79,13 +79,14 @@ export default function NotebookModal({ eventBus, config }) {
 
   useEffect(() => {
     emitter.current = eventBus.createEmitter();
-    emitter.current.subscribe('openNotebook', (
-      /** @type {string} */ groupId
-    ) => {
-      setIsHidden(false);
-      setIframeKey(iframeKey => iframeKey + 1);
-      setGroupId(groupId);
-    });
+    emitter.current.subscribe(
+      'openNotebook',
+      (/** @type {string} */ groupId) => {
+        setIsHidden(false);
+        setIframeKey(iframeKey => iframeKey + 1);
+        setGroupId(groupId);
+      }
+    );
 
     return () => {
       emitter.current.destroy();

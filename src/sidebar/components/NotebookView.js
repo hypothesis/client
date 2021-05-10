@@ -50,9 +50,8 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   const lastPaginationPage = useRef(1);
   const [paginationPage, setPaginationPage] = useState(1);
 
-  const [hasTooManyAnnotationsError, setHasTooManyAnnotationsError] = useState(
-    false
-  );
+  const [hasTooManyAnnotationsError, setHasTooManyAnnotationsError] =
+    useState(false);
 
   // Load all annotations in the group, unless there are more than 5000
   // of them: this is a performance safety valve.

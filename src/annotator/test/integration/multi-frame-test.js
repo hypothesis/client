@@ -120,9 +120,8 @@ describe('CrossFrame multi-frame scenario', function () {
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
-        const scriptElement = frame.contentDocument.querySelector(
-          'script[src]'
-        );
+        const scriptElement =
+          frame.contentDocument.querySelector('script[src]');
         assert(scriptElement, 'expected embed script to be injected');
         assert.equal(
           scriptElement.src,
@@ -144,9 +143,8 @@ describe('CrossFrame multi-frame scenario', function () {
 
     return new Promise(function (resolve) {
       isLoaded(frame, function () {
-        const scriptElement = frame.contentDocument.querySelector(
-          'script[src]'
-        );
+        const scriptElement =
+          frame.contentDocument.querySelector('script[src]');
         assert.isNull(
           scriptElement,
           'expected embed script to not be injected'

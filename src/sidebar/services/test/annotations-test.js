@@ -410,8 +410,8 @@ describe('AnnotationsService', () => {
       });
 
       return svc.save(fixtures.defaultAnnotation()).then(() => {
-        const annotationWithChanges = fakeApi.annotation.create.getCall(0)
-          .args[1];
+        const annotationWithChanges =
+          fakeApi.annotation.create.getCall(0).args[1];
         assert.equal(annotationWithChanges.text, 'my text');
         assert.sameMembers(annotationWithChanges.tags, ['one', 'two']);
         // Permissions converted to "private"
@@ -433,8 +433,8 @@ describe('AnnotationsService', () => {
         fakeApi.annotation.update.resolves(fixtures.defaultAnnotation());
 
         return svc.save(annotation).then(() => {
-          const savedAnnotation = fakeStore.addAnnotations.getCall(0)
-            .args[0][0];
+          const savedAnnotation =
+            fakeStore.addAnnotations.getCall(0).args[0][0];
           assert.equal(savedAnnotation.$tag, 'mytag');
           assert.equal(savedAnnotation.$foo, 'bar');
         });

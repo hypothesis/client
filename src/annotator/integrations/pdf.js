@@ -201,9 +201,9 @@ export class PDFIntegration {
   _toggleNoSelectableTextWarning(showWarning) {
     // Get a reference to the top-level DOM element associated with the PDF.js
     // viewer.
-    const outerContainer = /** @type {HTMLElement} */ (document.querySelector(
-      '#outerContainer'
-    ));
+    const outerContainer = /** @type {HTMLElement} */ (
+      document.querySelector('#outerContainer')
+    );
 
     if (!showWarning) {
       this._warningBanner?.remove();
@@ -294,9 +294,9 @@ export class PDFIntegration {
    * @return {HTMLElement}
    */
   contentContainer() {
-    return /** @type {HTMLElement} */ (document.querySelector(
-      '#viewerContainer'
-    ));
+    return /** @type {HTMLElement} */ (
+      document.querySelector('#viewerContainer')
+    );
   }
 
   /**

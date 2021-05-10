@@ -104,17 +104,20 @@ describe('ShareAnnotationsPanel', () => {
     {
       groupType: 'private',
       introPattern: /Use this link.*with other group members/,
-      visibilityPattern: /Annotations in the private group.*are only visible to group members/,
+      visibilityPattern:
+        /Annotations in the private group.*are only visible to group members/,
     },
     {
       groupType: 'restricted',
       introPattern: /Use this link to share these annotations with anyone/,
-      visibilityPattern: /Anyone using this link may view the annotations in the group/,
+      visibilityPattern:
+        /Anyone using this link may view the annotations in the group/,
     },
     {
       groupType: 'open',
       introPattern: /Use this link to share these annotations with anyone/,
-      visibilityPattern: /Anyone using this link may view the annotations in the group/,
+      visibilityPattern:
+        /Anyone using this link may view the annotations in the group/,
     },
   ].forEach(testCase => {
     it('it displays appropriate help text depending on group type', () => {

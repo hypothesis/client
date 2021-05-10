@@ -242,15 +242,13 @@ describe('UserMenu', () => {
         expected: true,
       },
       {
-        it:
-          'should be present for first-party user if service supports `onLogoutRequest`',
+        it: 'should be present for first-party user if service supports `onLogoutRequest`',
         isThirdParty: false,
         serviceConfigReturns: { onLogoutRequestProvided: true },
         expected: true,
       },
       {
-        it:
-          'should be present for first-party user if service does not support `onLogoutRequest`',
+        it: 'should be present for first-party user if service does not support `onLogoutRequest`',
         isThirdParty: false,
         serviceConfigReturns: { onLogoutRequestProvided: false },
         expected: true,
@@ -262,15 +260,13 @@ describe('UserMenu', () => {
         expected: false,
       },
       {
-        it:
-          'should be present for third-party user if service supports `onLogoutRequest`',
+        it: 'should be present for third-party user if service supports `onLogoutRequest`',
         isThirdParty: true,
         serviceConfigReturns: { onLogoutRequestProvided: true },
         expected: true,
       },
       {
-        it:
-          'should be absent for third-party user if `onLogoutRequest` not supported',
+        it: 'should be absent for third-party user if `onLogoutRequest` not supported',
         isThirdParty: true,
         serviceConfigReturns: { onLogoutRequestProvided: false },
         expected: false,

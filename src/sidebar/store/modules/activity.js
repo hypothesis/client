@@ -61,9 +61,8 @@ const update = {
     ) {
       addToStarted.push(action.annotation.$tag);
     }
-    const updatedSaves = state.activeAnnotationSaveRequests.concat(
-      addToStarted
-    );
+    const updatedSaves =
+      state.activeAnnotationSaveRequests.concat(addToStarted);
     return {
       ...state,
       activeAnnotationSaveRequests: updatedSaves,

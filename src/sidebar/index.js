@@ -12,9 +12,9 @@ import { fetchConfig } from './config/fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const appConfig = /** @type {import('../types/config').SidebarConfig} */ (parseJsonConfig(
-  document
-));
+const appConfig = /** @type {import('../types/config').SidebarConfig} */ (
+  parseJsonConfig(document)
+);
 
 if (appConfig.sentry) {
   // Initialize Sentry. This is required at the top of this file
@@ -189,9 +189,9 @@ function startApp(config, appEl) {
   );
 }
 
-const appEl = /** @type {HTMLElement} */ (document.querySelector(
-  'hypothesis-app'
-));
+const appEl = /** @type {HTMLElement} */ (
+  document.querySelector('hypothesis-app')
+);
 
 // Start capturing RPC requests before we start the RPC server (startRPCServer)
 preStartRPCServer();
