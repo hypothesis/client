@@ -3395,9 +3395,9 @@ escape-string-regexp@^1.0.3, escape-string-regexp@^1.0.5:
   integrity sha1-G2HAViGQqN/2rjuyzwIAyhMLhtQ=
 
 eslint-config-hypothesis@^2.4.0:
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-hypothesis/-/eslint-config-hypothesis-2.4.0.tgz#aa9db1ecf4b18e6ca4389af265038db10b7f68d6"
-  integrity sha512-k2MXBLafvxqsDh+RBoTMvuFv9f8A/Dg6RJN6tI0KzHvIeGO/fV/VMkqBAKuWMAu2kcw+uH2DGsxGP00W2eX7OQ==
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-hypothesis/-/eslint-config-hypothesis-2.5.0.tgz#bc9c281b07923666696c5df1c1f96f3cbace266b"
+  integrity sha512-3KiknU/zX117ggOhDetdbnqn+RupdIsp4XXl9kn8NICc/1ObVY3dt802L01A//ajCGHgiYu5/vR2afsuChlnhw==
 
 eslint-plugin-jsx-a11y@^6.2.3:
   version "6.4.1"
