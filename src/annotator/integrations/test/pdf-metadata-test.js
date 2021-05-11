@@ -227,13 +227,15 @@ describe('PDFMetadata', function () {
   }
 
   describe('#getUri', () => {
-    it('returns the non-file URI', async () => {
-      const { pdfMetadata } = createPDFMetadata();
-      const uri = await pdfMetadata.getUri();
-      assert.equal(uri, 'http://fake.com/');
+    ['http://fake.com/', 'https://example.com/test.pdf'].forEach(pdfURL => {
+      it('returns the PDF URL if it is an HTTP(S) URL', async () => {
+        const { pdfMetadata } = createPDFMetadata({ url: pdfURL });
+        const uri = await pdfMetadata.getUri();
+        assert.equal(uri, pdfURL);
+      });
     });
 
-    it('returns the fingerprint as a URN when the PDF URL is a local file', async () => {
+    it('returns the fingerprint as a URN when the PDF URL is a file:// URL', async () => {
       const { pdfMetadata } = createPDFMetadata({
         url: 'file:///test.pdf',
         fingerprint: 'fakeFingerprint',
@@ -294,6 +296,13 @@ describe('PDFMetadata', function () {
       );
       assert.isUndefined(fileLink);
     });
+
+    // In order, the title is obtained from:
+    //  1. The `dc:title` field
+    //  2. The `documentInfo.Title` field
+    //  3. The `title` property of the HTML `document` (which PDF.js in turn
+    //     initializes based on the filename from the `Content-Disposition` header
+    //     or URL if that is not available)
 
     it('gets the title from the dc:title field', async () => {
       const { pdfMetadata } = createPDFMetadata();
