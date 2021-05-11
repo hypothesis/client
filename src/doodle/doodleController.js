@@ -8,6 +8,7 @@ export class DoodleController {
    */
   constructor(container, options) {
     const { tool, size, color } = options;
+    this._lines = [];
 
     this._container = container === null ? document.body : container;
     this._tool = tool;
@@ -29,6 +30,18 @@ export class DoodleController {
 
   get tool() {
     return this._tool;
+  }
+
+  /**
+   * Update the lines and re-render on change
+   */
+  set lines(newLines) {
+    this._lines = newLines;
+    this.render();
+  }
+
+  get lines() {
+    return this._lines;
   }
 
   /**
@@ -68,6 +81,9 @@ export class DoodleController {
   }
 
   render() {
+    const setLines = newLines => {
+      this.lines = newLines;
+    };
     render(
       <DoodleCanvas
         attachedElement={this._container}
@@ -75,6 +91,8 @@ export class DoodleController {
         tool={this._tool}
         color={this._color}
         active={this._doodleable}
+        lines={this._lines}
+        setLines={setLines}
       />,
       document.body
     );

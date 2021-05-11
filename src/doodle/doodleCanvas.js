@@ -1,5 +1,5 @@
 import { createElement } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import { Canvas } from './canvas';
 import propTypes from 'prop-types';
 
@@ -10,6 +10,8 @@ import propTypes from 'prop-types';
  * @prop {boolean} active - Whether the canvas can be doodled on at this time
  * @prop {string} color - The color of the brush
  * @prop {HTMLElement} attachedElement - Which element the DoodleCanvas should cover.
+ * @prop {Array<import('../types/api').DoodleLine>} lines - An array of lines that compose this doodle.
+ * @prop {Function} setLines - A function to set the lines
  */
 
 /**
@@ -21,9 +23,38 @@ import propTypes from 'prop-types';
  *
  * @param {DoodleCanvasProps} props
  */
-const DoodleCanvas = ({ tool, size, active, color, attachedElement }) => {
-  const [lines, setLines] = useState(/** @type {array} */ ([]));
+const DoodleCanvas = ({
+  tool,
+  size,
+  active,
+  color,
+  attachedElement,
+  lines,
+  setLines,
+}) => {
   const [isDrawing, setIsDrawing] = useState(false);
+  const [everActive, setEverActive] = useState(false);
+
+  if (active && !everActive) {
+    setEverActive(true);
+  }
+
+  useEffect(() => {
+    if (lines.length === 0) {
+      return () => {};
+    }
+    const warn = e => {
+      e = e || window.event;
+
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => {
+      window.removeEventListener('beforeunload', warn);
+    };
+  }, [lines]);
 
   const handleMouseDown = e => {
     setIsDrawing(true);
@@ -67,7 +98,7 @@ const DoodleCanvas = ({ tool, size, active, color, attachedElement }) => {
     setLines([newLine, ...rest]);
   };
 
-  if (!active) {
+  if (!everActive) {
     return null;
   }
 
@@ -105,6 +136,8 @@ DoodleCanvas.propTypes = {
   size: propTypes.number.isRequired,
   active: propTypes.bool.isRequired,
   color: propTypes.string.isRequired,
+  lines: propTypes.array.isRequired,
+  setLines: propTypes.func.isRequired,
   attachedElement: propTypes.any.isRequired,
 };
 

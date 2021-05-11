@@ -75,6 +75,8 @@ ToolbarButton.propTypes = {
  *   Callback to toggle the visibility of the sidebar.
  * @prop {(object) => any} setDoodleOptions
  *   Callback to set the options of the doodle canvas
+ * @prop {() => any} saveDoodle
+ *   Callback to set the options of the doodle canvas
  * @prop {import("preact").Ref<HTMLButtonElement>} [toggleSidebarRef] -
  *   Ref that gets set to the toolbar button for toggling the sidebar.
  *   This is exposed to enable the drag-to-resize functionality of this
@@ -102,6 +104,7 @@ export default function Toolbar({
   toggleHighlights,
   toggleSidebar,
   setDoodleOptions,
+  saveDoodle,
   toggleSidebarRef,
   useMinimalControls = false,
   drawingToolbarActivated,
@@ -287,6 +290,11 @@ export default function Toolbar({
                 />
               </span>
             </button>
+            <ToolbarButton
+              label="Save"
+              icon="erase"
+              onClick={() => saveDoodle()}
+            />
           </div>
         )}
       </div>
@@ -308,4 +316,5 @@ Toolbar.propTypes = {
   drawingToolbarActivated: propTypes.bool,
   drawingToolbarToggle: propTypes.func.isRequired,
   setDoodleOptions: propTypes.func.isRequired,
+  saveDoodle: propTypes.func.isRequired,
 };

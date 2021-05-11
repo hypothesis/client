@@ -170,7 +170,6 @@ export default function annotationsService(api, store) {
     let saved;
 
     const annotationWithChanges = applyDraftChanges(annotation);
-
     if (metadata.isNew(annotation)) {
       saved = api.annotation.create({}, annotationWithChanges);
     } else {

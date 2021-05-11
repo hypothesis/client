@@ -21,6 +21,7 @@
 /**
  * @typedef {import("./api").Selector} Selector
  * @typedef {import("./api").Target} Target
+ * @typedef {import("./api").DoodleLine} DoodleLine
  */
 
 /**
@@ -30,6 +31,10 @@
  * @prop {string} uri
  * @prop {Target[]} target
  * @prop {string} $tag
+ * @prop {boolean} [$doodle] -
+ *   Flag indicating that this annotation is a doodle
+ * @prop {DoodleLine[]} [doodleLines] -
+ *   Array of lines that compose the doodle
  * @prop {boolean} [$highlight] -
  *   Flag indicating that this annotation was created using the "Highlight" button,
  *   as opposed to "Annotate".
