@@ -51,15 +51,15 @@ export class GroupsService {
   /**
    * @param {import('../store').SidebarStore} store
    * @param {import('./api').APIService} api
+   * @param {import('./auth').AuthService} auth
    * @param {import('./session').SessionService} session
    * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
-   * @param {import('./auth').AuthService} auth
    */
-  constructor(store, api, session, settings, toastMessenger, auth) {
+  constructor(store, api, auth, session, settings, toastMessenger) {
+    this._store = store;
     this._api = api;
     this._auth = auth;
     this._settings = settings;
-    this._store = store;
     this._toastMessenger = toastMessenger;
 
     this._serviceConfig = serviceConfig(settings);

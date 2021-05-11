@@ -134,10 +134,10 @@ describe('GroupsService', function () {
     return new GroupsService(
       fakeStore,
       fakeApi,
+      fakeAuth,
       fakeSession,
       fakeSettings,
-      fakeToastMessenger,
-      fakeAuth
+      fakeToastMessenger
     );
   }
 
