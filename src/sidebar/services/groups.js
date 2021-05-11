@@ -446,17 +446,13 @@ export class GroupsService {
     const newGroupId = this._store.focusedGroupId();
 
     const groupHasChanged = prevGroupId !== newGroupId && prevGroupId !== null;
-    if (groupHasChanged) {
+    if (groupHasChanged && newGroupId) {
       // Move any top-level new annotations to the newly-focused group.
       // Leave replies where they are.
-      const updatedAnnotations = [];
-      this._store.newAnnotations().forEach(annot => {
-        if (!isReply(annot)) {
-          updatedAnnotations.push(
-            Object.assign({}, annot, { group: newGroupId })
-          );
-        }
-      });
+      const updatedAnnotations = this._store
+        .newAnnotations()
+        .filter(ann => !isReply(ann))
+        .map(ann => ({ ...ann, group: newGroupId }));
 
       if (updatedAnnotations.length) {
         this._store.addAnnotations(updatedAnnotations);
