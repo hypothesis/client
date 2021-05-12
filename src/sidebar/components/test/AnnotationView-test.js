@@ -14,7 +14,6 @@ describe('AnnotationView', () => {
   beforeEach(() => {
     fakeStore = {
       clearAnnotations: sinon.stub(),
-      getState: sinon.stub().returns({}),
       highlightAnnotations: sinon.stub(),
       routeParams: sinon.stub().returns({ id: 'test_annotation_id' }),
       profile: sinon.stub().returns({ userid: null }),
