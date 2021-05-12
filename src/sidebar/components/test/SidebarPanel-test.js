@@ -17,11 +17,6 @@ describe('SidebarPanel', () => {
     fakeScrollIntoView = sinon.stub();
 
     fakeStore = {
-      getState: sinon.stub().returns({
-        sidebarPanels: {
-          activePanelName: null,
-        },
-      }),
       isSidebarPanelOpen: sinon.stub().returns(false),
       toggleSidebarPanel: sinon.stub(),
     };

@@ -30,7 +30,6 @@ describe('StreamView', () => {
       annotationFetchStarted: sinon.stub(),
       annotationFetchFinished: sinon.stub(),
       clearAnnotations: sinon.spy(),
-      getState: sinon.stub().returns({}),
       routeParams: sinon.stub().returns({ id: 'test' }),
       setSortKey: sinon.spy(),
     };
