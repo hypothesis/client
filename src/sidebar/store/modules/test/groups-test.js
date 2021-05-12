@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import groups from '../groups';
 import session from '../session';
 import immutable from '../../../util/immutable';

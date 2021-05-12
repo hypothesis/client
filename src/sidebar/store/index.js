@@ -1,35 +1,4 @@
-/**
- * Central store of state for the sidebar application, managed using
- * [Redux](http://redux.js.org/).
- *
- * State management in Redux apps work as follows:
- *
- *  1. All important application state is stored in a single, immutable object.
- *  2. The user interface is a presentation of this state. Interaction with the
- *     UI triggers updates by creating `actions`.
- *  3. Actions are plain JS objects which describe some event that happened in
- *     the application. Updates happen by passing actions to a `reducer`
- *     function which takes the current application state, the action and
- *     returns the new application state.
- *
- *     The process of updating the app state using an action is known as
- *     'dispatching' the action.
- *  4. Other parts of the app can subscribe to changes in the app state.
- *     This is used to to update the UI etc.
- *
- * "middleware" functions can wrap the dispatch process in order to implement
- *  logging, trigger side effects etc.
- *
- * Tests for a given action consist of:
- *
- *  1. Checking that the UI (or other event source) dispatches the correct
- *     action when something happens.
- *  2. Checking that given an initial state, and an action, a reducer returns
- *     the correct resulting state.
- *  3. Checking that the UI correctly presents a given state.
- */
-
-import createStore from './create-store';
+import { createStore } from './create-store';
 import debugMiddleware from './debug-middleware';
 import activity from './modules/activity';
 import annotations from './modules/annotations';
@@ -74,18 +43,19 @@ import viewer from './modules/viewer';
  */
 
 /**
- * Factory which creates the sidebar app's state store.
+ * Create the central state store for the sidebar application.
  *
- * Returns a Redux store augmented with methods for each action and selector in
- * the individual state modules. ie. `store.actionName(args)` dispatches an
- * action through the store and `store.selectorName(args)` invokes a selector
- * passing the current state of the store.
+ * This is a Redux [1] store composed of several modules, augmented with
+ * _selector_ methods for querying it and _action_ methods for applying updates.
+ * See the `createStore` documentation for API and usage details.
+ *
+ * [1] https://redux.js.org
  *
  * @param {import('../../types/config').SidebarConfig} settings
  * @return {SidebarStore}
+ * @inject
  */
-// @inject
-export default function store(settings) {
+export function createSidebarStore(settings) {
   const middleware = [debugMiddleware];
 
   const modules = [

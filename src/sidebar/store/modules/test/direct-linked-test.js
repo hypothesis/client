@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import directLinked from '../direct-linked';
 
 describe('sidebar/store/modules/direct-linked', () => {

@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import annotations from '../annotations';
 import drafts from '../drafts';
 import { Draft } from '../drafts';

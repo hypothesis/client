@@ -75,7 +75,8 @@ import { createReducer, bindSelectors } from './util';
  */
 
 /**
- * Redux store augmented with methods to dispatch actions and select state.
+ * Redux store augmented with selector methods to query specific state and
+ * action methods that dispatch specific actions.
  *
  * @template {object} Actions
  * @template {object} Selectors
@@ -97,16 +98,25 @@ import { createReducer, bindSelectors } from './util';
  *  - The _selectors_ for reading that state or computing things
  *    from that state.
  *
- * On top of the standard Redux store methods, the returned store also exposes
- * each action and selector from the input modules as a method which operates on
- * the store.
+ * In addition to the standard Redux store interface, the returned store also exposes
+ * each action and selector from the input modules as a method. For example, if
+ * a store is created from a module that has a `getWidget(<id>)` selector and
+ * an `addWidget(<object>)` action, a consumer would use `store.getWidget(<id>)`
+ * to fetch an item and `store.addWidget(<object>)` to dispatch an action that
+ * adds an item. External consumers of the store should in most cases use these
+ * selector and action methods rather than `getState` or `dispatch`. This
+ * makes it easier to refactor the internal state structure.
+ *
+ * Preact UI components access stores via the `useStoreProxy` hook defined in
+ * `use-store.js`. This returns a proxy which enables UI components to observe
+ * what store state a component depends upon and re-render when it changes.
  *
  * @param {Module<any,any,any,any>[]} modules
  * @param {any[]} [initArgs] - Arguments to pass to each state module's `init` function
  * @param {any[]} [middleware] - List of additional Redux middlewares to use
  * @return Store<any,any,any>
  */
-export default function createStore(modules, initArgs = [], middleware = []) {
+export function createStore(modules, initArgs = [], middleware = []) {
   // Create the initial state and state update function.
 
   // Namespaced objects for initial states.

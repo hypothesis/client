@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import createStore from '../create-store';
+import { createStore } from '../create-store';
 import { useStoreProxy, $imports } from '../use-store';
 
 // Store module for use with `createStore` in tests.

@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import defaults from '../defaults';
 
 describe('store/modules/defaults', function () {

@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import annotations from '../annotations';
 import groups from '../groups';
 import realTimeUpdates from '../real-time-updates';

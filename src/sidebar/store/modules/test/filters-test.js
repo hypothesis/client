@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import filters from '../filters';
 import selection from '../selection';
 
