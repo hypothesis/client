@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import sidebarPanels from '../sidebar-panels';
 
 describe('sidebar/store/modules/sidebar-panels', () => {

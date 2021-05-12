@@ -1,5 +1,5 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
-import storeFactory from '../index';
+import { createSidebarStore } from '../index';
 import immutable from '../../util/immutable';
 
 const defaultAnnotation = annotationFixtures.defaultAnnotation;
@@ -16,7 +16,7 @@ const fixtures = immutable({
   ],
 });
 
-describe('store', function () {
+describe('createSidebarStore', function () {
   let store;
 
   function tagForID(id) {
@@ -28,7 +28,7 @@ describe('store', function () {
   }
 
   beforeEach(function () {
-    store = storeFactory({});
+    store = createSidebarStore({});
   });
 
   describe('initialization', function () {
@@ -38,12 +38,12 @@ describe('store', function () {
     });
 
     it('sets the selection when settings.annotations is set', function () {
-      store = storeFactory({ annotations: 'testid' });
+      store = createSidebarStore({ annotations: 'testid' });
       assert.deepEqual(store.selectedAnnotations(), ['testid']);
     });
 
     it('expands the selected annotations when settings.annotations is set', function () {
-      store = storeFactory({ annotations: 'testid' });
+      store = createSidebarStore({ annotations: 'testid' });
       assert.deepEqual(store.expandedMap(), {
         testid: true,
       });

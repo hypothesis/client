@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import toastMessages from '../toast-messages';
 
 describe('store/modules/toast-messages', function () {

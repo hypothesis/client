@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import session from '../session';
 
 describe('sidebar/store/modules/session', () => {

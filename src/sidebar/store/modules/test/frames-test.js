@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import frames from '../frames';
 
 describe('sidebar/store/modules/frames', function () {

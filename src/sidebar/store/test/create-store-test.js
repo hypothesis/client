@@ -1,6 +1,6 @@
 /* global process */
 
-import createStore from '../create-store';
+import { createStore } from '../create-store';
 
 const A = 0;
 
@@ -73,7 +73,7 @@ function counterStore(initArgs = [], middleware = []) {
   return createStore(modules, initArgs, middleware);
 }
 
-describe('sidebar/store/create-store', () => {
+describe('createStore', () => {
   it('returns a working Redux store', () => {
     const store = counterStore();
     assert.equal(store.getState().a.count, 0);

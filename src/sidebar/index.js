@@ -131,7 +131,7 @@ import { ThreadsService } from './services/threads';
 import { ToastMessengerService } from './services/toast-messenger';
 
 // Redux store.
-import store from './store';
+import { createSidebarStore } from './store';
 
 // Utilities.
 import { Injector } from '../shared/injector';
@@ -167,7 +167,7 @@ function startApp(config, appEl) {
     .register('tags', TagsService)
     .register('threadsService', ThreadsService)
     .register('toastMessenger', ToastMessengerService)
-    .register('store', store);
+    .register('store', { factory: createSidebarStore });
 
   // Register utility values/classes.
   //

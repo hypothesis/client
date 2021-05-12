@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import viewer from '../viewer';
 
 describe('store/modules/viewer', function () {

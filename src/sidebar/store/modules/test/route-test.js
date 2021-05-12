@@ -1,4 +1,4 @@
-import createStore from '../../create-store';
+import { createStore } from '../../create-store';
 import route from '../route';
 
 describe('store/modules/route', () => {
