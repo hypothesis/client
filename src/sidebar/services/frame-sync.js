@@ -66,7 +66,7 @@ export class FrameSyncService {
 
       watch(
         store.subscribe,
-        [() => store.getState().annotations.annotations, () => store.frames()],
+        [() => store.allAnnotations(), () => store.frames()],
         ([annotations, frames], [prevAnnotations]) => {
           let publicAnns = 0;
           const inSidebar = new Set();
