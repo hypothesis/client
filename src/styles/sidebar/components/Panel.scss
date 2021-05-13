@@ -1,6 +1,12 @@
 @use "../../mixins/molecules";
 
-.Panel {
+// TODO: Fix my naming, likely when converting to using shared `Panel` component
+// from @hypothesis/frontend-shared
+// This naming (`client-` prefix) is to avoid classname collisions with the
+// `.Panel` class currently used in @hypothesis/frontend-shared
+// In future, the `frontend-shared` classnames will be prefixed, obviating
+// the need to be defensive in applications that use the package.
+.client-Panel {
   @include molecules.panel;
   position: relative;
   margin-bottom: 0.75em;

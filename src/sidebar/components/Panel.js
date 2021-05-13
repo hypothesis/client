@@ -17,14 +17,14 @@ import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
 export default function Panel({ children, icon, onClose, title }) {
   const withCloseButton = typeof onClose === 'function';
   return (
-    <div className="Panel">
-      <div className="Panel__header">
+    <div className="client-Panel">
+      <div className="client-Panel__header">
         {icon && (
-          <div className="Panel__header-icon">
+          <div className="client-Panel__header-icon">
             <SvgIcon name={icon} title={title} />
           </div>
         )}
-        <h2 className="Panel__title u-stretch">{title}</h2>
+        <h2 className="client-Panel__title u-stretch">{title}</h2>
         {withCloseButton && (
           <div>
             <LabeledButton icon="cancel" title="Close" onClick={onClose}>
@@ -33,7 +33,7 @@ export default function Panel({ children, icon, onClose, title }) {
           </div>
         )}
       </div>
-      <div className="Panel__content">{children}</div>
+      <div className="client-Panel__content">{children}</div>
     </div>
   );
 }

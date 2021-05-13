@@ -24,7 +24,7 @@ describe('Panel', () => {
 
   it('renders the provided title', () => {
     const wrapper = createPanel({ title: 'My Panel' });
-    const titleEl = wrapper.find('.Panel__title');
+    const titleEl = wrapper.find('.client-Panel__title');
     assert.equal(titleEl.text(), 'My Panel');
   });
 
