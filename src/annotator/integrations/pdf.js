@@ -64,7 +64,9 @@ export class PDFIntegration {
     const window_ = /** @type {HypothesisWindow} */ (window);
 
     // Assume this class is only used if we're in the PDF.js viewer.
-    const pdfViewerApp = /** @type {PDFViewerApplication} */ (window_.PDFViewerApplication);
+    const pdfViewerApp = /** @type {PDFViewerApplication} */ (
+      window_.PDFViewerApplication
+    );
 
     this.pdfViewer = pdfViewerApp.pdfViewer;
     this.pdfViewer.viewer.classList.add('has-transparent-text-layer');
