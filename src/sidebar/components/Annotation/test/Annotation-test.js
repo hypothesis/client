@@ -295,6 +295,24 @@ describe('Annotation', () => {
     });
   });
 
+  context('visibility', () => {
+    it('should not render if visibility is `hidden`', () => {
+      const wrapper = createComponent({
+        visibility: 'hidden',
+      });
+
+      assert.isTrue(wrapper.isEmptyRender());
+    });
+
+    it('should render AnnotationHeader if visibility is `header-only`', () => {
+      const wrapper = createComponent({
+        visibility: 'header-only',
+      });
+
+      assert.isTrue(wrapper.find('AnnotationHeader').exists());
+    });
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([

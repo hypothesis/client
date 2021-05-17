@@ -214,12 +214,13 @@ describe('Thread', () => {
       noAnnotationThread = createThread();
       noAnnotationThread.annotation = undefined;
       noAnnotationThread.visible = false;
+      noAnnotationThread.parent = true;
     });
 
     it('does not render any kind of annotation component', () => {
       const wrapper = createComponent({ thread: noAnnotationThread });
 
-      assert.isFalse(wrapper.find('Annotation').exists());
+      assert.equal(wrapper.find('Annotation').prop('visibility'), 'hidden');
     });
   });
 
@@ -238,6 +239,16 @@ describe('Thread', () => {
 
       assert.calledOnce(fakeThreadsService.forceVisible);
       assert.calledWith(fakeThreadsService.forceVisible, thread);
+    });
+
+    it('shows annotation header (which includes the document target) on the first hidden thread', () => {
+      const thread = createThread();
+      thread.visible = false;
+      const wrapper = createComponent({ thread });
+      assert.equal(
+        wrapper.find('Annotation').prop('visibility'),
+        'header-only'
+      );
     });
   });
 

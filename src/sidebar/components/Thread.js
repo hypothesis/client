@@ -35,6 +35,11 @@ function Thread({ thread, threadsService }) {
   // Render a control to expand/collapse the current thread if this thread has
   // a parent (i.e. is a reply thread)
   const showThreadToggle = !!thread.parent;
+
+  // Render the annotation header which contains information about the target
+  // document only if this thread is hidden, has no parent and contains a top level annotation
+  const showAnnotationHeader =
+    !thread.visible && !thread.parent && !!thread.annotation;
   const toggleIcon = thread.collapsed ? 'collapsed' : 'expand-menu';
   const toggleTitle = thread.collapsed ? 'Expand replies' : 'Collapse replies';
 
@@ -53,33 +58,41 @@ function Thread({ thread, threadsService }) {
 
   // Memoize annotation content to avoid re-rendering an annotation when content
   // in other annotations/threads change.
-  const annotationContent = useMemo(
-    () =>
-      thread.visible && (
-        <>
-          {thread.annotation && (
-            <ModerationBanner annotation={thread.annotation} />
-          )}
-          <Annotation
-            annotation={thread.annotation}
-            hasAppliedFilter={hasAppliedFilter}
-            isReply={!!thread.parent}
-            onToggleReplies={onToggleReplies}
-            replyCount={thread.replyCount}
-            threadIsCollapsed={thread.collapsed}
-          />
-        </>
-      ),
-    [
-      hasAppliedFilter,
-      onToggleReplies,
-      thread.annotation,
-      thread.parent,
-      thread.replyCount,
-      thread.collapsed,
-      thread.visible,
-    ]
-  );
+  const annotationContent = useMemo(() => {
+    // The annotation header includes the document target.
+    // We want to show this information always, even when the first thread is is hidden.
+    // This information is a very important, specially in the context
+    // of the notebook, which displays annotations from different documents.
+    const visibility = thread.visible
+      ? 'visible'
+      : thread.parent
+      ? 'hidden'
+      : 'header-only';
+    return (
+      <>
+        {thread.visible && thread.annotation && (
+          <ModerationBanner annotation={thread.annotation} />
+        )}
+        <Annotation
+          visibility={visibility}
+          annotation={thread.annotation}
+          hasAppliedFilter={hasAppliedFilter}
+          isReply={!!thread.parent}
+          onToggleReplies={onToggleReplies}
+          replyCount={thread.replyCount}
+          threadIsCollapsed={thread.collapsed}
+        />
+      </>
+    );
+  }, [
+    hasAppliedFilter,
+    onToggleReplies,
+    thread.annotation,
+    thread.parent,
+    thread.replyCount,
+    thread.collapsed,
+    thread.visible,
+  ]);
 
   return (
     <section
@@ -108,7 +121,12 @@ function Thread({ thread, threadsService }) {
         {annotationContent}
 
         {showHiddenToggle && (
-          <div className="Thread__hidden-toggle-button-container">
+          <div
+            // Do not fix vertical alignment for the first thread
+            className={classnames({
+              'Thread__hidden-toggle-button-container': !showAnnotationHeader,
+            })}
+          >
             <LabeledButton onClick={() => threadsService.forceVisible(thread)}>
               Show {countHidden(thread)} more in conversation
             </LabeledButton>

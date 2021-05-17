@@ -26,6 +26,7 @@ import AnnotationReplyToggle from './AnnotationReplyToggle';
  * @prop {VoidFunction} onToggleReplies - Callback to expand/collapse reply threads
  * @prop {number} replyCount - Number of replies to this annotation's thread
  * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
+ * @prop {'visible'|'hidden'|'header-only'} [visibility] - The portion of the annotation to display
  * @prop {import('../../services/annotations').AnnotationsService} annotationsService
  */
 
@@ -41,6 +42,7 @@ function Annotation({
   onToggleReplies,
   replyCount,
   threadIsCollapsed,
+  visibility = 'visible',
   annotationsService,
 }) {
   const isCollapsedReply = isReply && threadIsCollapsed;
@@ -57,6 +59,21 @@ function Annotation({
   const showReplyToggle = !isReply && !hasAppliedFilter && replyCount > 0;
 
   const onReply = () => annotationsService.reply(annotation, userid);
+
+  if (visibility === 'hidden') {
+    return null;
+  }
+
+  if (visibility === 'header-only') {
+    return annotation ? (
+      <AnnotationHeader
+        annotation={annotation}
+        isEditing={isEditing}
+        replyCount={replyCount}
+        threadIsCollapsed={threadIsCollapsed}
+      />
+    ) : null;
+  }
 
   return (
     <article
