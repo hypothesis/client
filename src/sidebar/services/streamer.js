@@ -80,31 +80,6 @@ export class StreamerService {
     this._store.clearPendingUpdates();
   }
 
-  _handleAnnotationNotification(message) {
-    const action = message.options.action;
-    const annotations = message.payload;
-
-    switch (action) {
-      case 'create':
-      case 'update':
-      case 'past':
-        this._store.receiveRealTimeUpdates({ updatedAnnotations: annotations });
-        break;
-      case 'delete':
-        this._store.receiveRealTimeUpdates({ deletedAnnotations: annotations });
-        break;
-    }
-
-    if (this._updateImmediately) {
-      this.applyPendingUpdates();
-    }
-  }
-
-  _handleSessionChangeNotification(message) {
-    this._session.update(message.model);
-    this._groups.load();
-  }
-
   /** @param {ErrorEvent} event */
   _handleSocketError(event) {
     warnOnce('Error connecting to H push notification service:', event);
@@ -133,9 +108,28 @@ export class StreamerService {
     }
 
     if (message.type === 'annotation-notification') {
-      this._handleAnnotationNotification(message);
+      const annotations = message.payload;
+      switch (message.options.action) {
+        case 'create':
+        case 'update':
+        case 'past':
+          this._store.receiveRealTimeUpdates({
+            updatedAnnotations: annotations,
+          });
+          break;
+        case 'delete':
+          this._store.receiveRealTimeUpdates({
+            deletedAnnotations: annotations,
+          });
+          break;
+      }
+
+      if (this._updateImmediately) {
+        this.applyPendingUpdates();
+      }
     } else if (message.type === 'session-change') {
-      this._handleSessionChangeNotification(message);
+      this._session.update(message.model);
+      this._groups.load();
     } else if (message.type === 'whoyouare') {
       const userid = this._store.profile().userid;
       if (message.userid !== userid) {
