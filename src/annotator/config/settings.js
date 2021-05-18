@@ -2,79 +2,11 @@ import { parseJsonConfig } from '../../boot/parse-json-config';
 
 import configFuncSettingsFrom from './config-func-settings-from';
 import isBrowserExtension from './is-browser-extension';
+import { urlFromLinkTag } from './url-from-link-tag';
 
 export default function settingsFrom(window_) {
   const jsonConfigs = parseJsonConfig(window_.document);
   const configFuncSettings = configFuncSettingsFrom(window_);
-
-  /**
-   * Return the href of the first annotator link in the given
-   * document with this `rel` attribute.
-   *
-   * Return the value of the href attribute of the first
-   * `<link type="application/annotator+html" rel="${rel}">`
-   * element in the given document. This URL is used as the `src` for sidebar
-   * or notebook iframes.
-   *
-   * @param {string} rel - The `rel` attribute to match
-   * @return {string} - The URL to use for the iframe
-   * @throws {Error} - If there's no link with the `rel` indicated, or the first
-   *   matching link has no `href`
-   */
-  function urlFromLinkTag(rel) {
-    const link = window_.document.querySelector(
-      `link[type="application/annotator+html"][rel="${rel}"]`
-    );
-
-    if (!link) {
-      throw new Error(
-        `No application/annotator+html (rel="${rel}") link in the document`
-      );
-    }
-
-    if (!link.href) {
-      throw new Error(
-        `application/annotator+html (rel="${rel}") link has no href`
-      );
-    }
-
-    return link.href;
-  }
-
-  /**
-   * Return the href URL of the first annotator client link in the given document.
-   *
-   * Return the value of the href attribute of the first
-   * `<link type="application/annotator+javascript" rel="hypothesis-client">`
-   * element in the given document.
-   *
-   * This URL is used to identify where the client is from and what url should
-   * be used inside of subframes.
-   *
-   * @return {string} - The URL that the client is hosted from
-   * @throws {Error} - If there's no annotator link or the first annotator has
-   *   no href.
-   *
-   */
-  function clientUrl() {
-    const link = window_.document.querySelector(
-      'link[type="application/annotator+javascript"][rel="hypothesis-client"]'
-    );
-
-    if (!link) {
-      throw new Error(
-        'No application/annotator+javascript (rel="hypothesis-client") link in the document'
-      );
-    }
-
-    if (!link.href) {
-      throw new Error(
-        'application/annotator+javascript (rel="hypothesis-client") link has no href'
-      );
-    }
-
-    return link.href;
-  }
 
   /**
    * Return the `#annotations:*` ID from the given URL's fragment.
@@ -173,20 +105,20 @@ export default function settingsFrom(window_) {
   function hostPageSetting(name, options = {}) {
     const allowInBrowserExt = options.allowInBrowserExt || false;
     const hasDefaultValue = typeof options.defaultValue !== 'undefined';
-    // Optional coerce method, or a no-op.
-    const coerceValue =
-      typeof options.coerce === 'function' ? options.coerce : name => name;
 
-    if (!allowInBrowserExt && isBrowserExtension(urlFromLinkTag('sidebar'))) {
+    if (
+      !allowInBrowserExt &&
+      isBrowserExtension(urlFromLinkTag(window_, 'sidebar', 'html'))
+    ) {
       return hasDefaultValue ? options.defaultValue : null;
     }
 
     if (configFuncSettings.hasOwnProperty(name)) {
-      return coerceValue(configFuncSettings[name]);
+      return configFuncSettings[name];
     }
 
     if (jsonConfigs.hasOwnProperty(name)) {
-      return coerceValue(jsonConfigs[name]);
+      return jsonConfigs[name];
     }
 
     if (hasDefaultValue) {
@@ -201,19 +133,19 @@ export default function settingsFrom(window_) {
       return annotations();
     },
     get clientUrl() {
-      return clientUrl();
+      return urlFromLinkTag(window_, 'hypothesis-client', 'javascript');
     },
     get group() {
       return group();
     },
     get notebookAppUrl() {
-      return urlFromLinkTag('notebook');
+      return urlFromLinkTag(window_, 'notebook', 'html');
     },
     get showHighlights() {
       return showHighlights();
     },
     get sidebarAppUrl() {
-      return urlFromLinkTag('sidebar');
+      return urlFromLinkTag(window_, 'sidebar', 'html');
     },
     get query() {
       return query();
