@@ -81,6 +81,8 @@ describe('Thread', () => {
     fakeStore = {
       hasAppliedFilter: sinon.stub().returns(false),
       setExpanded: sinon.stub(),
+      isSavingAnnotation: sinon.stub().returns(false),
+      getDraft: sinon.stub().returns(false),
     };
 
     fakeThreadsService = {
@@ -238,6 +240,29 @@ describe('Thread', () => {
 
       assert.calledOnce(fakeThreadsService.forceVisible);
       assert.calledWith(fakeThreadsService.forceVisible, thread);
+    });
+
+    it('shows the annotation header on a hidden top-level thread', () => {
+      const thread = createThread();
+      const wrapper = createComponent({ thread });
+
+      assert.isTrue(wrapper.find('ThreadHeader').exists());
+    });
+
+    it("doesn't show the annotation header if top-level annotation is missing", () => {
+      const thread = createThread();
+      thread.annotation = null;
+      const wrapper = createComponent({ thread });
+
+      assert.isTrue(wrapper.find('ThreadHeader').isEmptyRender());
+    });
+
+    it("doesn't show the annotation header if thread is a child", () => {
+      const thread = createThread();
+      thread.parent = {}; // child threads have a parent
+      const wrapper = createComponent({ thread });
+
+      assert.isFalse(wrapper.find('ThreadHeader').exists());
     });
   });
 
