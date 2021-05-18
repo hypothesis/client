@@ -74,7 +74,6 @@ describe('annotator/config/index', function () {
       'openSidebar',
       sinon.match({
         allowInBrowserExt: true,
-        coerce: sinon.match.func,
       })
     );
   });
@@ -110,15 +109,34 @@ describe('annotator/config/index', function () {
         requestConfigFromFrame: 'https://embedder.com',
         services: 'SERVICES_SETTING',
       };
+      const expectedConfigValues = {
+        assetRoot: 'chrome-extension://1234/client/',
+        branding: 'BRANDING_SETTING',
+        openSidebar: true,
+        requestConfigFromFrame: 'https://embedder.com',
+        services: 'SERVICES_SETTING',
+      };
       fakeSettingsFrom().hostPageSetting = function (settingName) {
         return settings[settingName];
       };
 
       const settingValue = getConfig('all', 'WINDOW')[settingName];
 
-      assert.equal(settingValue, settings[settingName]);
+      assert.equal(settingValue, expectedConfigValues[settingName]);
     });
   });
+
+  describe('coerces values', () => {
+    it('coerces `openSidebar` from a string to a boolean', () => {
+      fakeSettingsFrom().hostPageSetting = sinon
+        .stub()
+        .withArgs('openSidebar')
+        .returns('false');
+      const config = getConfig('all', 'WINDOW');
+      assert.equal(config.openSidebar, false);
+    });
+  });
+
   describe('application contexts', () => {
     [
       {

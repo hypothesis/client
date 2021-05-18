@@ -5,6 +5,7 @@ import { toBoolean } from '../../shared/type-coercions';
  * @typedef ConfigDefinition
  * @prop {() => any} valueFn -
  *   Method to retrieve the value from the incoming source
+ * @prop {(value: any) => any} [coerce] - Transform a value's type, value or both
  */
 
 /**
@@ -131,10 +132,10 @@ function configDefinitions(settings) {
       valueFn: () => settings.hostPageSetting('onLayoutChange'),
     },
     openSidebar: {
+      coerce: toBoolean,
       valueFn: () =>
         settings.hostPageSetting('openSidebar', {
           allowInBrowserExt: true,
-          coerce: toBoolean,
         }),
     },
     query: {
@@ -183,8 +184,9 @@ export function getConfig(appContext = 'annotator', window_ = window) {
   let filteredKeys = configurationContexts(appContext);
   filteredKeys.forEach(name => {
     const configDef = configDefs[name];
+    const coerceFn = configDef.coerce ? configDef.coerce : name => name; // use no-op if omitted
     // Get the value from the configuration source and run through an optional coerce method
-    config[name] = configDef.valueFn();
+    config[name] = coerceFn(configDef.valueFn());
   });
 
   return config;
