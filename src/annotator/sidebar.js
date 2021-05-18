@@ -14,6 +14,9 @@ import { ListenerCollection } from './util/listener-collection';
 /**
  * @typedef {import('./guest').default} Guest
  *
+ * @typedef {'contentContainer'|'createAnnotation'|'crossframe'|'setVisibleHighlights'|'fitSideBySide'} MethodsNeededInSidebar
+ * @typedef {'anchors'|'scrollToAnchor'|'selectAnnotations'} MethodsNeededInBucketBar
+ *
  * @typedef LayoutState
  * @prop {boolean} expanded
  * @prop {number} width
@@ -55,7 +58,7 @@ export default class Sidebar {
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
-   * @param {Guest} guest -
+   * @param {Pick<Guest, MethodsNeededInSidebar|MethodsNeededInBucketBar>} guest -
    *   The `Guest` instance for the current frame. It is currently assumed that
    *   it is always possible to annotate in the frame where the sidebar is
    *   displayed.
