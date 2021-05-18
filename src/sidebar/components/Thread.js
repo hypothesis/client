@@ -7,6 +7,7 @@ import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
 
 import Annotation from './Annotation';
+import AnnotationHeader from './Annotation/AnnotationHeader';
 import ModerationBanner from './ModerationBanner';
 
 /** @typedef {import('../helpers/build-thread').Thread} Thread */
@@ -108,11 +109,22 @@ function Thread({ thread, threadsService }) {
         {annotationContent}
 
         {showHiddenToggle && (
-          <div className="Thread__hidden-toggle-button-container">
-            <LabeledButton onClick={() => threadsService.forceVisible(thread)}>
-              Show {countHidden(thread)} more in conversation
-            </LabeledButton>
-          </div>
+          <>
+            {!thread.parent && (
+              <ThreadHeader
+                annotation={thread.annotation}
+                replyCount={thread.replyCount}
+                threadIsCollapsed={thread.collapsed}
+              />
+            )}
+            <div className="Thread__hidden-toggle-button-container">
+              <LabeledButton
+                onClick={() => threadsService.forceVisible(thread)}
+              >
+                Show {countHidden(thread)} more in conversation
+              </LabeledButton>
+            </div>
+          </>
         )}
 
         {showChildren && (
@@ -126,6 +138,38 @@ function Thread({ thread, threadsService }) {
         )}
       </div>
     </section>
+  );
+}
+
+/**
+ * This wrapper around AnnotationHeader is to show the document target on the
+ * top-level annotation (if such exists).
+ *
+ * @param {object} props
+ *   @param {Thread['annotation']} props.annotation
+ *   @param {number} props.replyCount
+ *   @param {boolean} props.threadIsCollapsed
+ */
+function ThreadHeader({ annotation, ...restProps }) {
+  const store = useStoreProxy();
+
+  // These two lines are copied from the AnnotationHeader component to mimic the
+  // exact same behaviour.
+  const isSaving = annotation && store.isSavingAnnotation(annotation);
+  const isEditing = annotation && !!store.getDraft(annotation) && !isSaving;
+
+  if (!annotation) {
+    return null;
+  }
+
+  return (
+    <div className="Thread__top-annotation-header">
+      <AnnotationHeader
+        annotation={annotation}
+        isEditing={isEditing}
+        {...restProps}
+      />
+    </div>
   );
 }
 

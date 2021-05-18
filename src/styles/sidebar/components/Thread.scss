@@ -56,6 +56,12 @@
     margin-top: -0.25em;
   }
 
+  &__top-annotation-header {
+    // This disables the vertical alignment for the parent thread which contain
+    // an annotation header.
+    margin-bottom: 0.5em;
+  }
+
   &__content {
     flex-grow: 1;
     // Prevent annotation content from overflowing the container
