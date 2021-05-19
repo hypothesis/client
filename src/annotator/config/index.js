@@ -104,12 +104,12 @@ function configDefinitions(settings) {
     assetRoot: {
       allowInBrowserExt: true,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('assetRoot'),
+      valueFn: settings.hostPageSetting,
     },
     branding: {
       defaultValue: null,
       allowInBrowserExt: false,
-      valueFn: () => settings.hostPageSetting('branding'),
+      valueFn: settings.hostPageSetting,
     },
     // URL of the client's boot script. Used when injecting the client into
     // child iframes.
@@ -121,13 +121,12 @@ function configDefinitions(settings) {
     enableExperimentalNewNoteButton: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () =>
-        settings.hostPageSetting('enableExperimentalNewNoteButton'),
+      valueFn: settings.hostPageSetting,
     },
     experimental: {
       allowInBrowserExt: false,
       defaultValue: {},
-      valueFn: () => settings.hostPageSetting('experimental'),
+      valueFn: settings.hostPageSetting,
     },
     group: {
       allowInBrowserExt: true,
@@ -137,28 +136,28 @@ function configDefinitions(settings) {
     focus: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('focus'),
+      valueFn: settings.hostPageSetting,
     },
     theme: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('theme'),
+      valueFn: settings.hostPageSetting,
     },
     usernameUrl: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('usernameUrl'),
+      valueFn: settings.hostPageSetting,
     },
     onLayoutChange: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('onLayoutChange'),
+      valueFn: settings.hostPageSetting,
     },
     openSidebar: {
       allowInBrowserExt: true,
       defaultValue: false,
       coerce: toBoolean,
-      valueFn: () => settings.hostPageSetting('openSidebar'),
+      valueFn: settings.hostPageSetting,
     },
     query: {
       allowInBrowserExt: true,
@@ -168,12 +167,12 @@ function configDefinitions(settings) {
     requestConfigFromFrame: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('requestConfigFromFrame'),
+      valueFn: settings.hostPageSetting,
     },
     services: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('services'),
+      valueFn: settings.hostPageSetting,
     },
     showHighlights: {
       allowInBrowserExt: false,
@@ -195,12 +194,12 @@ function configDefinitions(settings) {
     subFrameIdentifier: {
       allowInBrowserExt: true,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('subFrameIdentifier'),
+      valueFn: settings.hostPageSetting,
     },
     externalContainerSelector: {
       allowInBrowserExt: false,
       defaultValue: null,
-      valueFn: () => settings.hostPageSetting('externalContainerSelector'),
+      valueFn: settings.hostPageSetting,
     },
   };
 }
@@ -235,7 +234,7 @@ export function getConfig(appContext = 'annotator', window_ = window) {
     }
 
     // Get the value from the configuration source
-    const value = configDef.valueFn();
+    const value = configDef.valueFn(name);
     if (value === undefined) {
       // If there is no value, then set to default if provided, otherwise, ignore the
       // config key:value pair
