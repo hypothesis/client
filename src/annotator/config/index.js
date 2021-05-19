@@ -176,7 +176,7 @@ function configDefinitions(settings) {
     },
     showHighlights: {
       allowInBrowserExt: false,
-      defaultValue: null,
+      defaultValue: 'always',
       valueFn: () => settings.showHighlights,
     },
     notebookAppUrl: {
