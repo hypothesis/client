@@ -3,14 +3,30 @@ import { $imports } from '../index';
 
 describe('annotator/config/index', function () {
   let fakeSettingsFrom;
+  let fakeIsBrowserExtension;
 
   beforeEach(() => {
     fakeSettingsFrom = sinon.stub().returns({
-      hostPageSetting: sinon.stub(),
+      hostPageSetting: sinon.stub().returns('fakeValue'),
+      // getters
+      annotations: 'fakeValue',
+      clientUrl: 'fakeValue',
+      group: 'fakeValue',
+      notebookAppUrl: 'fakeValue',
+      showHighlights: 'fakeValue',
+      sidebarAppUrl: 'fakeValue',
+      query: 'fakeValue',
     });
+    fakeIsBrowserExtension = sinon.stub();
 
     $imports.$mock({
       './settings': fakeSettingsFrom,
+      './is-browser-extension': {
+        isBrowserExtension: fakeIsBrowserExtension,
+      },
+      './url-from-link-tag': {
+        urlFromLinkTag: sinon.stub(),
+      },
     });
   });
 
@@ -51,47 +67,144 @@ describe('annotator/config/index', function () {
     });
   });
 
-  ['assetRoot', 'subFrameIdentifier'].forEach(function (settingName) {
-    it(
-      'reads ' +
-        settingName +
-        ' from the host page, even when in a browser extension',
-      function () {
-        getConfig('all', 'WINDOW');
-        assert.calledWithExactly(
-          fakeSettingsFrom().hostPageSetting,
-          settingName,
-          { allowInBrowserExt: true }
+  describe('browser extension', () => {
+    context('browser extension set to true', function () {
+      it('returns only config values where `allowInBrowserExt` is true or the defaultValue if provided', () => {
+        fakeIsBrowserExtension.returns(true);
+        const config = getConfig('all', 'WINDOW');
+        assert.deepEqual(
+          {
+            annotations: 'fakeValue',
+            assetRoot: 'fakeValue',
+            branding: null,
+            clientUrl: 'fakeValue',
+            enableExperimentalNewNoteButton: null,
+            experimental: {},
+            externalContainerSelector: null,
+            focus: null,
+            group: 'fakeValue',
+            notebookAppUrl: 'fakeValue',
+            onLayoutChange: null,
+            openSidebar: true, // coerced
+            query: 'fakeValue',
+            requestConfigFromFrame: null,
+            services: null,
+            showHighlights: null,
+            sidebarAppUrl: 'fakeValue',
+            subFrameIdentifier: 'fakeValue',
+            theme: null,
+            usernameUrl: null,
+          },
+          config
         );
-      }
-    );
+      });
+    });
+
+    context('browser extension set to false', function () {
+      it('returns all config values', () => {
+        fakeIsBrowserExtension.returns(false);
+        const config = getConfig('all', 'WINDOW');
+        assert.deepEqual(
+          {
+            annotations: 'fakeValue',
+            assetRoot: 'fakeValue',
+            branding: 'fakeValue',
+            clientUrl: 'fakeValue',
+            enableExperimentalNewNoteButton: 'fakeValue',
+            experimental: 'fakeValue',
+            externalContainerSelector: 'fakeValue',
+            focus: 'fakeValue',
+            group: 'fakeValue',
+            notebookAppUrl: 'fakeValue',
+            onLayoutChange: 'fakeValue',
+            openSidebar: true, // coerced
+            query: 'fakeValue',
+            requestConfigFromFrame: 'fakeValue',
+            services: 'fakeValue',
+            showHighlights: 'fakeValue',
+            sidebarAppUrl: 'fakeValue',
+            subFrameIdentifier: 'fakeValue',
+            theme: 'fakeValue',
+            usernameUrl: 'fakeValue',
+          },
+          config
+        );
+      });
+    });
   });
 
-  it('reads openSidebar from the host page, even when in a browser extension', function () {
-    getConfig('all', 'WINDOW');
-    sinon.assert.calledWith(
-      fakeSettingsFrom().hostPageSetting,
-      'openSidebar',
-      sinon.match({
-        allowInBrowserExt: true,
-      })
-    );
+  describe('hostPageSetting config values', () => {
+    it('calls the valueFn() and passes the config name as a param', () => {
+      getConfig('all', 'WINDOW');
+      [
+        'assetRoot',
+        'branding',
+        'enableExperimentalNewNoteButton',
+        'experimental',
+        'focus',
+        'theme',
+        'usernameUrl',
+        'onLayoutChange',
+        'openSidebar',
+        'requestConfigFromFrame',
+        'services',
+        'subFrameIdentifier',
+        'externalContainerSelector',
+      ].forEach(name => {
+        assert.calledWith(fakeSettingsFrom().hostPageSetting, name);
+      });
+    });
   });
 
-  ['branding', 'services'].forEach(function (settingName) {
-    it(
-      'reads ' +
-        settingName +
-        ' from the host page only when in an embedded client',
-      function () {
-        getConfig('all', 'WINDOW');
+  describe('default values', () => {
+    beforeEach(() => {
+      // Remove all fake values
+      $imports.$mock({
+        './settings': sinon.stub().returns({
+          hostPageSetting: sinon.stub().returns(undefined),
+          annotations: undefined,
+          clientUrl: undefined,
+          group: undefined,
+          notebookAppUrl: undefined,
+          showHighlights: undefined,
+          sidebarAppUrl: undefined,
+          query: undefined,
+        }),
+      });
+    });
 
-        assert.calledWithExactly(
-          fakeSettingsFrom().hostPageSetting,
-          settingName
-        );
-      }
-    );
+    this.afterEach(() => {
+      $imports.$restore({
+        './settings': true,
+      });
+    });
+
+    it('sets corresponding default values if settings are undefined', () => {
+      const config = getConfig('all', 'WINDOW');
+
+      assert.deepEqual(config, {
+        annotations: null,
+        assetRoot: null,
+        branding: null,
+        clientUrl: null,
+        enableExperimentalNewNoteButton: null,
+        experimental: {},
+        externalContainerSelector: null,
+        focus: null,
+        group: null,
+        notebookAppUrl: null,
+        onLayoutChange: null,
+        openSidebar: false,
+        query: null,
+        requestConfigFromFrame: null,
+        services: null,
+        showHighlights: null,
+        sidebarAppUrl: null,
+        subFrameIdentifier: null,
+        theme: null,
+        usernameUrl: null,
+      });
+    });
   });
 
   [

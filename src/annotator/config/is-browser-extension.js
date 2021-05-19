@@ -6,6 +6,6 @@
  *   website.
  *
  */
-export default function isBrowserExtension(app) {
+export function isBrowserExtension(app) {
   return !(app.startsWith('http://') || app.startsWith('https://'));
 }

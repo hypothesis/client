@@ -1,9 +1,16 @@
+import { isBrowserExtension } from './is-browser-extension';
 import settingsFrom from './settings';
 import { toBoolean } from '../../shared/type-coercions';
+import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
  * @typedef ConfigDefinition
- * @prop {() => any} valueFn -
+ * @prop {boolean} allowInBrowserExt -
+ *  Allow this name to be available in the browser extension. If this is false
+ *  and browser extension context is true, use `defaultValue` if provided otherwise
+ *  ignore the config key.
+ * @prop {any} [defaultValue] - Sets a default if `valueFn` returns undefined.
+ * @prop {(configName?: string) => any} valueFn -
  *   Method to retrieve the value from the incoming source
  * @prop {(value: any) => any} [coerce] - Transform a value's type, value or both
  */
@@ -88,83 +95,111 @@ function configurationContexts(appContext) {
 function configDefinitions(settings) {
   return {
     annotations: {
+      allowInBrowserExt: true,
+      defaultValue: null,
       valueFn: () => settings.annotations,
     },
     // URL where client assets are served from. Used when injecting the client
     // into child iframes.
     assetRoot: {
-      valueFn: () =>
-        settings.hostPageSetting('assetRoot', {
-          allowInBrowserExt: true,
-        }),
+      allowInBrowserExt: true,
+      defaultValue: null,
+      valueFn: () => settings.hostPageSetting('assetRoot'),
     },
     branding: {
+      defaultValue: null,
+      allowInBrowserExt: false,
       valueFn: () => settings.hostPageSetting('branding'),
     },
     // URL of the client's boot script. Used when injecting the client into
     // child iframes.
     clientUrl: {
+      allowInBrowserExt: true,
+      defaultValue: null,
       valueFn: () => settings.clientUrl,
     },
     enableExperimentalNewNoteButton: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () =>
         settings.hostPageSetting('enableExperimentalNewNoteButton'),
     },
     experimental: {
-      valueFn: () =>
-        settings.hostPageSetting('experimental', {
-          defaultValue: {},
-        }),
+      allowInBrowserExt: false,
+      defaultValue: {},
+      valueFn: () => settings.hostPageSetting('experimental'),
     },
     group: {
+      allowInBrowserExt: true,
+      defaultValue: null,
       valueFn: () => settings.group,
     },
     focus: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.hostPageSetting('focus'),
     },
     theme: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.hostPageSetting('theme'),
     },
     usernameUrl: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.hostPageSetting('usernameUrl'),
     },
     onLayoutChange: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.hostPageSetting('onLayoutChange'),
     },
     openSidebar: {
+      allowInBrowserExt: true,
+      defaultValue: false,
       coerce: toBoolean,
-      valueFn: () =>
-        settings.hostPageSetting('openSidebar', {
-          allowInBrowserExt: true,
-        }),
+      valueFn: () => settings.hostPageSetting('openSidebar'),
     },
     query: {
+      allowInBrowserExt: true,
+      defaultValue: null,
       valueFn: () => settings.query,
     },
     requestConfigFromFrame: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.hostPageSetting('requestConfigFromFrame'),
     },
     services: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.hostPageSetting('services'),
     },
     showHighlights: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.showHighlights,
     },
     notebookAppUrl: {
+      allowInBrowserExt: true,
+      defaultValue: null,
       valueFn: () => settings.notebookAppUrl,
     },
     sidebarAppUrl: {
+      allowInBrowserExt: true,
+      defaultValue: null,
       valueFn: () => settings.sidebarAppUrl,
     },
     // Sub-frame identifier given when a frame is being embedded into
     // by a top level client
     subFrameIdentifier: {
-      valueFn: () =>
-        settings.hostPageSetting('subFrameIdentifier', {
-          allowInBrowserExt: true,
-        }),
+      allowInBrowserExt: true,
+      defaultValue: null,
+      valueFn: () => settings.hostPageSetting('subFrameIdentifier'),
     },
     externalContainerSelector: {
+      allowInBrowserExt: false,
+      defaultValue: null,
       valueFn: () => settings.hostPageSetting('externalContainerSelector'),
     },
   };
@@ -184,9 +219,35 @@ export function getConfig(appContext = 'annotator', window_ = window) {
   let filteredKeys = configurationContexts(appContext);
   filteredKeys.forEach(name => {
     const configDef = configDefs[name];
+    const hasDefault = configDef.defaultValue !== undefined; // A default could be null
+    const browserExtensionTrue = isBrowserExtension(
+      urlFromLinkTag(window_, 'sidebar', 'html')
+    );
+
+    // Only allow certain values to pass through in in the browser extension context
+    if (!configDef.allowInBrowserExt && browserExtensionTrue) {
+      // If the value is not allowed here, then set to default if provided, otherwise ignore the
+      // key:value pair
+      if (hasDefault) {
+        config[name] = configDef.defaultValue;
+      }
+      return;
+    }
+
+    // Get the value from the configuration source
+    const value = configDef.valueFn();
+    if (value === undefined) {
+      // If there is no value, then set to default if provided, otherwise, ignore the
+      // config key:value pair
+      if (hasDefault) {
+        config[name] = configDef.defaultValue;
+      }
+      return;
+    }
+
+    // Finally, run the value through an optional coerce method
     const coerceFn = configDef.coerce ? configDef.coerce : name => name; // use no-op if omitted
-    // Get the value from the configuration source and run through an optional coerce method
-    config[name] = coerceFn(configDef.valueFn());
+    config[name] = coerceFn(value);
   });
 
   return config;

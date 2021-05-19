@@ -1,7 +1,7 @@
 import { parseJsonConfig } from '../../boot/parse-json-config';
 
 import configFuncSettingsFrom from './config-func-settings-from';
-import isBrowserExtension from './is-browser-extension';
+import { isBrowserExtension } from './is-browser-extension';
 import { urlFromLinkTag } from './url-from-link-tag';
 
 export default function settingsFrom(window_) {
@@ -55,6 +55,7 @@ export default function settingsFrom(window_) {
     return jsonConfigs.group || groupFromURL();
   }
 
+  // TODO: Move this to a coerce method
   function showHighlights() {
     let showHighlights_ = hostPageSetting('showHighlights');
 
@@ -106,6 +107,7 @@ export default function settingsFrom(window_) {
     const allowInBrowserExt = options.allowInBrowserExt || false;
     const hasDefaultValue = typeof options.defaultValue !== 'undefined';
 
+    // TODO: Remove this logic
     if (
       !allowInBrowserExt &&
       isBrowserExtension(urlFromLinkTag(window_, 'sidebar', 'html'))

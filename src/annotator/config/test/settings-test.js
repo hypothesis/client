@@ -15,7 +15,9 @@ describe('annotator/config/settingsFrom', () => {
 
     $imports.$mock({
       './config-func-settings-from': fakeConfigFuncSettingsFrom,
-      './is-browser-extension': fakeIsBrowserExtension,
+      './is-browser-extension': {
+        isBrowserExtension: fakeIsBrowserExtension,
+      },
       './url-from-link-tag': {
         urlFromLinkTag: fakeUrlFromLinkTag,
       },
