@@ -25,7 +25,7 @@ function NotebookIframe({ config, groupId }) {
   return (
     <iframe
       title={'Hypothesis annotation notebook'}
-      className="Notebook__iframe"
+      className="NotebookIframe"
       // Enable media in annotations to be shown fullscreen
       allowFullScreen
       src={notebookAppSrc}
@@ -99,9 +99,11 @@ export default function NotebookModal({ eventBus, config }) {
   };
 
   return (
-    <div className={classnames('Notebook__outer', { 'is-hidden': isHidden })}>
-      <div className="Notebook__inner">
-        <div className="Notebook__close-button-container">
+    <div
+      className={classnames('NotebookModal__outer', { 'is-hidden': isHidden })}
+    >
+      <div className="NotebookModal__inner">
+        <div className="NotebookModal__close-button-container">
           <LabeledButton
             icon="cancel"
             title="Close the Notebook"

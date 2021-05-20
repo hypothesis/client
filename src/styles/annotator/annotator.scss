@@ -16,10 +16,10 @@
 // Annotator-specific components.
 @use './components/AdderToolbar';
 @use './components/Buckets';
+@use './components/NotebookModal';
 @use './components/Toolbar';
 @use './components/WarningBanner';
 @use './highlights';
-@use './notebook';
 
 // Sidebar
 .annotator-frame {
