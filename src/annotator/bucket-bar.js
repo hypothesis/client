@@ -9,11 +9,15 @@ import { ListenerCollection } from './util/listener-collection';
  * @prop {Element} [contentContainer] - The scrollable container element for the
  *   document content. All of the highlights that the bucket bar's buckets point
  *   at should be contained within this element.
+ *
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
 /**
  * Controller for the "bucket bar" shown alongside the sidebar indicating where
  * annotations are in the document.
+ *
+ * @implements Destroyable
  */
 export default class BucketBar {
   /**

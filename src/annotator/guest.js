@@ -21,6 +21,7 @@ import { ListenerCollection } from './util/listener-collection';
  * @typedef {import('./util/emitter').EventBus} EventBus
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Anchor} Anchor
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/annotator').Integration} Integration
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
@@ -101,6 +102,8 @@ function resolveAnchor(anchor) {
  *
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
+ *
+ * @implements Destroyable
  */
 export default class Guest {
   /**

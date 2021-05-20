@@ -18,6 +18,8 @@ import { ListenerCollection } from './util/listener-collection';
  * @prop {boolean} expanded
  * @prop {number} width
  * @prop {number} height
+ *
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
 // Minimum width to which the iframeContainer can be resized.
@@ -49,6 +51,8 @@ function createSidebarIframe(config) {
 /**
  * The `Sidebar` class creates (1) the sidebar application iframe, (2) its container,
  * as well as (3) the adjacent controls.
+ *
+ * @implements Destroyable
  */
 export default class Sidebar {
   /**

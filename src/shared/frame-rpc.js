@@ -39,12 +39,16 @@ const VERSION = '1.0.0';
  * @prop {any[]} arguments
  *
  * @typedef {RequestMessage|ResponseMessage} Message
+ *
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
 /**
  * Class for making RPC requests between frames.
  *
  * Code adapted from https://github.com/substack/frame-rpc.
+ *
+ * @implements Destroyable
  */
 export class RPC {
   /**
