@@ -1,6 +1,6 @@
 import { TinyEmitter } from 'tiny-emitter';
 
-import serviceConfig from '../config/service-config';
+import { serviceConfig } from '../config/service-config';
 import OAuthClient from '../util/oauth-client';
 import { resolve } from '../util/url';
 

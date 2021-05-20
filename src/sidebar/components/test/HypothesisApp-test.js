@@ -80,7 +80,7 @@ describe('HypothesisApp', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../config/service-config': fakeServiceConfig,
+      '../config/service-config': { serviceConfig: fakeServiceConfig },
       '../store/use-store': { useStoreProxy: () => fakeStore },
       '../helpers/session': {
         shouldAutoDisplayTutorial: fakeShouldAutoDisplayTutorial,

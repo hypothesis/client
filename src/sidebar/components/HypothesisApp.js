@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'preact/hooks';
 
 import bridgeEvents from '../../shared/bridge-events';
 import { confirm } from '../../shared/prompts';
-import serviceConfig from '../config/service-config';
+import { serviceConfig } from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
 import { parseAccountID } from '../helpers/account-id';
 import { shouldAutoDisplayTutorial } from '../helpers/session';

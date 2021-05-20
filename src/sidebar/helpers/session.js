@@ -1,4 +1,4 @@
-import serviceConfig from '../config/service-config';
+import { serviceConfig } from '../config/service-config';
 
 /**
  * @typedef {import('../../types/config').HostConfig} HostConfig

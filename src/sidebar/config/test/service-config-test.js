@@ -1,4 +1,4 @@
-import serviceConfig from '../service-config';
+import { serviceConfig } from '../service-config';
 
 describe('config/service-config', () => {
   it('returns null if services is not an array', () => {
