@@ -29,7 +29,7 @@ async function createGitHubRelease() {
   }
 
   const octokit = new Octokit({
-    auth: `token ${process.env.GITHUB_TOKEN}`,
+    auth: process.env.GITHUB_TOKEN,
   });
 
   const changes = await changelistSinceTag(octokit);

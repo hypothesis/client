@@ -137,7 +137,7 @@ async function changelistSinceTag(octokit, tag = getHighestVersionTag()) {
 
 if (require.main === module) {
   const { Octokit } = require('@octokit/rest');
-  const octokit = new Octokit({ auth: `token ${process.env.GITHUB_TOKEN}` });
+  const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
   const tag = process.argv[2] || getHighestVersionTag();
 
   changelistSinceTag(octokit, tag)
