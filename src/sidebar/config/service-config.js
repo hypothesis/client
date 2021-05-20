@@ -11,7 +11,7 @@
  * @return {Service|null}
  */
 
-export default function serviceConfig(settings) {
+export function serviceConfig(settings) {
   if (!Array.isArray(settings.services) || settings.services.length === 0) {
     return null;
   }

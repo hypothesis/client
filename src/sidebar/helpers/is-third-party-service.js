@@ -2,7 +2,7 @@
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
  */
 
-import serviceConfig from '../config/service-config';
+import { serviceConfig } from '../config/service-config';
 
 /**
  * Return `true` if the first configured service is a "third-party" service.

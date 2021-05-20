@@ -1,4 +1,4 @@
-import serviceConfig from './service-config';
+import { serviceConfig } from './service-config';
 
 /**
  * Function that returns apiUrl from the settings object.

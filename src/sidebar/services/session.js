@@ -1,4 +1,4 @@
-import serviceConfig from '../config/service-config';
+import { serviceConfig } from '../config/service-config';
 import { retryPromiseOperation } from '../util/retry';
 import * as sentry from '../util/sentry';
 

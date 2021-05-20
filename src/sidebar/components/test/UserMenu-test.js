@@ -57,7 +57,7 @@ describe('UserMenu', () => {
       '../helpers/account-id': {
         isThirdPartyUser: fakeIsThirdPartyUser,
       },
-      '../config/service-config': fakeServiceConfig,
+      '../config/service-config': { serviceConfig: fakeServiceConfig },
       '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });

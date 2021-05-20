@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'preact/hooks';
 
-import serviceConfig from '../../config/service-config';
+import { serviceConfig } from '../../config/service-config';
 import { isThirdPartyUser } from '../../helpers/account-id';
 import { orgName } from '../../helpers/group-list-item-common';
 import groupsByOrganization from '../../helpers/group-organizations';

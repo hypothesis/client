@@ -1,7 +1,7 @@
 import { IconButton } from '@hypothesis/frontend-shared';
 
 import { confirm } from '../../../shared/prompts';
-import serviceConfig from '../../config/service-config';
+import { serviceConfig } from '../../config/service-config';
 import {
   sharingEnabled,
   annotationSharingLink,

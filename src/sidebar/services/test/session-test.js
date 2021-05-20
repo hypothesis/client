@@ -55,7 +55,7 @@ describe('SessionService', () => {
     };
 
     $imports.$mock({
-      '../config/service-config': fakeServiceConfig,
+      '../config/service-config': { serviceConfig: fakeServiceConfig },
       '../util/retry': { retryPromiseOperation },
       '../util/sentry': fakeSentry,
     });
