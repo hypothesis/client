@@ -18,13 +18,8 @@ import { serviceConfig } from '../config/service-config';
 export function isThirdPartyService(settings) {
   const service = serviceConfig(settings);
 
-  if (service === null) {
-    return false;
+  if (service?.authority) {
+    return service.authority !== settings.authDomain;
   }
-
-  if (!service.hasOwnProperty('authority')) {
-    return false;
-  }
-
-  return service.authority !== settings.authDomain;
+  return false;
 }
