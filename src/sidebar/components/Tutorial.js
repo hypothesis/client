@@ -1,6 +1,6 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 
-import isThirdPartyService from '../helpers/is-third-party-service';
+import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
 
 /**
