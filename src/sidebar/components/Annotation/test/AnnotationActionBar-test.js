@@ -269,6 +269,13 @@ describe('AnnotationActionBar', () => {
       assert.isFalse(getButton(wrapper, 'flag').exists());
     });
 
+    it('hides flag button if flagging is disabled in the settings', () => {
+      fakeSettings = { services: [{ allowFlagging: false }] };
+      const wrapper = createComponent();
+
+      assert.isFalse(getButton(wrapper, 'flag').exists());
+    });
+
     it('shows flag button if user is not author', () => {
       const wrapper = createComponent();
 

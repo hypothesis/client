@@ -1,6 +1,7 @@
 import { IconButton } from '@hypothesis/frontend-shared';
 
 import { confirm } from '../../../shared/prompts';
+import serviceConfig from '../../config/service-config';
 import {
   sharingEnabled,
   annotationSharingLink,
@@ -24,6 +25,15 @@ import AnnotationShareControl from './AnnotationShareControl';
  * @prop {HostConfig} settings
  * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  */
+
+/** @param {HostConfig} settings */
+function flaggingEnabled(settings) {
+  const service = serviceConfig(settings);
+  if (service?.allowFlagging === false) {
+    return false;
+  }
+  return true;
+}
 
 /**
  * A collection of buttons in the footer area of an annotation that take
@@ -53,7 +63,9 @@ function AnnotationActionBar({
 
   //  Only authenticated users can flag an annotation, except the annotation's author.
   const showFlagAction =
-    !!userProfile.userid && userProfile.userid !== annotation.user;
+    flaggingEnabled(settings) &&
+    !!userProfile.userid &&
+    userProfile.userid !== annotation.user;
 
   const shareLink =
     sharingEnabled(settings) && annotationSharingLink(annotation);

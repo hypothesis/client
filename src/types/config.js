@@ -15,6 +15,7 @@
  * @prop {string[]|Promise<string[]>} [groups] -
  *   List of groups to show. The embedder can specify an array. In the sidebar
  *   this may be converted to a Promise if this information is fetched asynchronously.
+ * @prop {boolean} [allowFlagging]
  * @prop {boolean} [allowLeavingGroups]
  * @prop {boolean} [enableShareLinks]
  * @prop {Function} [onLoginRequest]
