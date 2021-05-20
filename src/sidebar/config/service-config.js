@@ -11,9 +11,9 @@
  * @return {Service|null}
  */
 
-export function serviceConfig(settings) {
-  if (!Array.isArray(settings.services) || settings.services.length === 0) {
-    return null;
+export function serviceConfig({ services }) {
+  if (Array.isArray(services) && services[0]) {
+    return services[0];
   }
-  return settings.services[0];
+  return null;
 }
