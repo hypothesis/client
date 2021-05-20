@@ -4,7 +4,7 @@ import { serviceConfig } from '../../config/service-config';
 import { isThirdPartyUser } from '../../helpers/account-id';
 import { orgName } from '../../helpers/group-list-item-common';
 import groupsByOrganization from '../../helpers/group-organizations';
-import isThirdPartyService from '../../helpers/is-third-party-service';
+import { isThirdPartyService } from '../../helpers/is-third-party-service';
 import { withServices } from '../../service-context';
 import { useStoreProxy } from '../../store/use-store';
 

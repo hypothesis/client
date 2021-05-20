@@ -15,7 +15,7 @@ import { serviceConfig } from '../config/service-config';
  * @param {MergedConfig} settings
  * @return {boolean}
  */
-export default function isThirdPartyService(settings) {
+export function isThirdPartyService(settings) {
   const service = serviceConfig(settings);
 
   if (service === null) {

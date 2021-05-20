@@ -18,7 +18,9 @@ describe('Tutorial', function () {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../helpers/is-third-party-service': fakeIsThirdPartyService,
+      '../helpers/is-third-party-service': {
+        isThirdPartyService: fakeIsThirdPartyService,
+      },
     });
   });
 
