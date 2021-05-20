@@ -66,6 +66,8 @@ function nearestPositionedAncestor(el) {
  * @prop {() => any} onHighlight - Callback invoked when "Highlight" button is clicked
  * @prop {(annotations: Object[]) => any} onShowAnnotations -
  *   Callback invoked when  "Show" button is clicked
+ *
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
 /**
@@ -76,6 +78,8 @@ function nearestPositionedAncestor(el) {
  * the container for the toolbar that positions it on the page and isolates
  * it from the page's styles using shadow DOM, and the `AdderToolbar` Preact
  * component which actually renders the toolbar.
+ *
+ * @implements Destroyable
  */
 export class Adder {
   /**

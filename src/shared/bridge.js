@@ -1,8 +1,12 @@
 import { RPC } from './frame-rpc';
 
+/** @typedef {import('../types/annotator').Destroyable} Destroyable */
+
 /**
  * The Bridge service sets up a channel between frames and provides an events
  * API on top of it.
+ *
+ * @implements Destroyable
  */
 export default class Bridge {
   constructor() {

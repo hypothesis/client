@@ -6,6 +6,7 @@ import FrameObserver from './frame-observer';
 
 /**
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
 /**
@@ -16,6 +17,8 @@ import FrameObserver from './frame-observer';
  * This class also has logic for injecting Hypothesis into iframes that
  * are added to the page if they have the `enable-annotation` attribute set
  * and are same-origin with the current document.
+ *
+ * @implements Destroyable
  */
 export class CrossFrame {
   /**
