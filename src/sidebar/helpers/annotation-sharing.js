@@ -67,12 +67,10 @@ export function isShareableURI(uri) {
  * @return {boolean}
  */
 export function sharingEnabled(settings) {
-  const serviceConfig_ = serviceConfig(settings);
-  if (serviceConfig_ === null) {
-    return true;
+  const service = serviceConfig(settings);
+
+  if (service?.enableShareLinks === false) {
+    return false;
   }
-  if (typeof serviceConfig_.enableShareLinks !== 'boolean') {
-    return true;
-  }
-  return serviceConfig_.enableShareLinks;
+  return true;
 }
