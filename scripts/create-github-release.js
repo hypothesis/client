@@ -33,17 +33,27 @@ async function createGitHubRelease() {
   });
 
   const changes = await changelistSinceTag(octokit);
-
   const [owner, repo] = pkg.repository.split('/');
+  const releaseName = `v${pkg.version}`;
+
+  console.log(
+    `Creating release ${releaseName} of ${owner}/${repo} with changelog:
+
+${changes}
+`
+  );
 
   await octokit.repos.createRelease({
+    // Required params.
+    owner,
+    repo,
+    tag_name: releaseName,
+
+    // Optional params.
     body: changes,
     draft: false,
-    name: `v${pkg.version}`,
-    owner,
+    name: releaseName,
     prerelease: true,
-    repo,
-    tag_name: `v${pkg.version}`,
   });
 }
 
