@@ -302,18 +302,15 @@ describe('annotator/config/settingsFrom', () => {
         input: 42,
         output: 42,
       },
-      // If the host page sets showHighlights to null this will be mistaken
-      // for the host page not containing a showHighlights setting at all and
-      // showHighlights will be set to 'always'.
       {
         it: 'defaults to "always"',
-        input: null,
+        input: undefined,
         output: 'always',
       },
       {
-        it: 'passes undefined through unmodified',
-        input: undefined,
-        output: undefined,
+        it: 'passes null through unmodified',
+        input: null,
+        output: null,
       },
       {
         it: 'passes arrays through unmodified',
@@ -397,19 +394,11 @@ describe('annotator/config/settingsFrom', () => {
       },
       {
         when: 'no default value is provided',
-        specify: 'it returns null',
+        specify: 'it returns undefined',
         configFuncSettings: {},
         jsonSettings: {},
         defaultValue: undefined,
-        expected: null,
-      },
-      {
-        when: 'a default value is provided',
-        specify: 'it returns that default value',
-        configFuncSettings: {},
-        jsonSettings: {},
-        defaultValue: 'test value',
-        expected: 'test value',
+        expected: undefined,
       },
       {
         when: 'a default value is provided but it is overridden',

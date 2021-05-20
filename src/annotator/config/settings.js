@@ -58,7 +58,7 @@ export default function settingsFrom(window_) {
   function showHighlights() {
     let showHighlights_ = hostPageSetting('showHighlights');
 
-    if (showHighlights_ === null) {
+    if (showHighlights_ === undefined) {
       showHighlights_ = 'always'; // The default value is 'always'.
     }
 
@@ -102,9 +102,10 @@ export default function settingsFrom(window_) {
     return jsonConfigs.query || queryFromURL();
   }
 
-  function hostPageSetting(name, options = {}) {
-    const hasDefaultValue = typeof options.defaultValue !== 'undefined';
-
+  /**
+   * @param {string} name - Unique name of the setting
+   */
+  function hostPageSetting(name) {
     if (configFuncSettings.hasOwnProperty(name)) {
       return configFuncSettings[name];
     }
@@ -113,11 +114,7 @@ export default function settingsFrom(window_) {
       return jsonConfigs[name];
     }
 
-    if (hasDefaultValue) {
-      return options.defaultValue;
-    }
-
-    return null;
+    return undefined;
   }
 
   return {

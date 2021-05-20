@@ -223,7 +223,7 @@ export function getConfig(appContext = 'annotator', window_ = window) {
       urlFromLinkTag(window_, 'sidebar', 'html')
     );
 
-    // Only allow certain values to pass through in in the browser extension context
+    // Only allow certain values to pass through in the browser extension context
     if (!configDef.allowInBrowserExt && browserExtensionTrue) {
       // If the value is not allowed here, then set to default if provided, otherwise ignore the
       // key:value pair
