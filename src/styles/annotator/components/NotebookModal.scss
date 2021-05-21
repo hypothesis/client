@@ -37,9 +37,15 @@
   &__close-button-container {
     position: absolute;
     right: 0;
-    font-size: var.$font-size--large;
-    margin: var.$layout-space--xsmall;
+    font-size: var.$font-size--heading;
+    margin: var.$layout-space--medium;
+  }
+
+  &__close-button-container > button {
     cursor: pointer;
+    // When scrolling on small devices the `X` floats. This background makes it more
+    // obvious to recognize that it is the close button for the modal.
+    background-color: var.$grey-2;
   }
 }
 
