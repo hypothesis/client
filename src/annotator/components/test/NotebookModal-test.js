@@ -32,7 +32,7 @@ describe('NotebookModal', () => {
 
   it('hides modal on first render', () => {
     const wrapper = createComponent();
-    const outer = wrapper.find('.Notebook__outer');
+    const outer = wrapper.find('.NotebookModal__outer');
 
     assert.isTrue(outer.hasClass('is-hidden'));
     assert.isFalse(wrapper.find('iframe').exists());
@@ -40,7 +40,7 @@ describe('NotebookModal', () => {
 
   it('shows modal on "openNotebook" event', () => {
     const wrapper = createComponent();
-    let outer = wrapper.find('.Notebook__outer');
+    let outer = wrapper.find('.NotebookModal__outer');
 
     assert.isTrue(outer.hasClass('is-hidden'));
     assert.isFalse(wrapper.find('iframe').exists());
@@ -48,7 +48,7 @@ describe('NotebookModal', () => {
     emitter.publish('openNotebook', 'myGroup');
     wrapper.update();
 
-    outer = wrapper.find('.Notebook__outer');
+    outer = wrapper.find('.NotebookModal__outer');
     assert.isFalse(outer.hasClass('is-hidden'));
 
     const iframe = wrapper.find('iframe');
@@ -105,7 +105,7 @@ describe('NotebookModal', () => {
     emitter.publish('openNotebook', 'myGroup');
     wrapper.update();
 
-    let outer = wrapper.find('.Notebook__outer');
+    let outer = wrapper.find('.NotebookModal__outer');
     assert.isFalse(outer.hasClass('is-hidden'));
 
     act(() => {
@@ -113,7 +113,7 @@ describe('NotebookModal', () => {
     });
     wrapper.update();
 
-    outer = wrapper.find('.Notebook__outer');
+    outer = wrapper.find('.NotebookModal__outer');
 
     assert.isTrue(outer.hasClass('is-hidden'));
   });
