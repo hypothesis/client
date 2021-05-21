@@ -1,4 +1,4 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
+import { IconButton } from '@hypothesis/frontend-shared';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import classnames from 'classnames';
 
@@ -104,14 +104,12 @@ export default function NotebookModal({ eventBus, config }) {
     >
       <div className="NotebookModal__inner">
         <div className="NotebookModal__close-button-container">
-          <LabeledButton
+          <IconButton
             icon="cancel"
             title="Close the Notebook"
             onClick={onClose}
             variant="dark"
-          >
-            Close
-          </LabeledButton>
+          />
         </div>
         {groupId !== null && (
           <NotebookIframe key={iframeKey} config={config} groupId={groupId} />

@@ -109,7 +109,7 @@ describe('NotebookModal', () => {
     assert.isFalse(outer.hasClass('is-hidden'));
 
     act(() => {
-      wrapper.find('LabeledButton').prop('onClick')();
+      wrapper.find('IconButton').prop('onClick')();
     });
     wrapper.update();
 
@@ -125,7 +125,7 @@ describe('NotebookModal', () => {
     });
     assert.equal(document.body.style.overflow, 'hidden');
     act(() => {
-      wrapper.find('LabeledButton').prop('onClick')();
+      wrapper.find('IconButton').prop('onClick')();
     });
     assert.notEqual(document.body.style.overflow, 'hidden');
   });
