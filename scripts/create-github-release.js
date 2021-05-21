@@ -14,7 +14,7 @@ const { Octokit } = require('@octokit/rest');
 const pkg = require('../package.json');
 const { changelistSinceTag } = require('./generate-change-list');
 
-async function createGitHubRelease() {
+async function createGitHubRelease({ previousVersion }) {
   // See https://github.com/docker/docker/issues/679
   const GITHUB_ORG_REPO_PAT = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 
@@ -32,12 +32,13 @@ async function createGitHubRelease() {
     auth: process.env.GITHUB_TOKEN,
   });
 
-  const changes = await changelistSinceTag(octokit);
+  const changes = await changelistSinceTag(octokit, previousVersion);
   const [owner, repo] = pkg.repository.split('/');
   const releaseName = `v${pkg.version}`;
 
   console.log(
-    `Creating release ${releaseName} of ${owner}/${repo} with changelog:
+    `Creating release ${releaseName} of ${owner}/${repo}.
+Changes since previous release ${previousVersion}:
 
 ${changes}
 `
@@ -57,7 +58,13 @@ ${changes}
   });
 }
 
-createGitHubRelease().catch(err => {
+const previousVersion = process.argv[2];
+if (!previousVersion) {
+  console.error(`Usage: ${process.argv[1]} <previous version>`);
+  process.exit(1);
+}
+
+createGitHubRelease({ previousVersion }).catch(err => {
   console.error('Failed to create release.', err);
   process.exit(1);
 });

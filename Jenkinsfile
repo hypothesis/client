@@ -189,13 +189,15 @@ stage('Publish') {
                     sh "git push https://github.com/hypothesis/client.git v${newPkgVersion}"
                     sh "sleep 2" // Give GitHub a moment to realize the tag exists.
 
-                    // Bump the package version and create the GitHub release.
+                    // Bump the package version.
                     sh """
                     export SIDEBAR_APP_URL=https://hypothes.is/app.html
                     export NOTEBOOK_APP_URL=https://hypothes.is/notebook
                     yarn version --no-git-tag-version --new-version ${newPkgVersion}
                     """
-                    sh "scripts/create-github-release.js"
+
+                    // Create GitHub release with changes since previous release.
+                    sh "scripts/create-github-release.js ${pkgVersion}"
 
                     sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
                     sh "yarn publish --no-interactive --tag ${npmTag} --new-version=${newPkgVersion}"
