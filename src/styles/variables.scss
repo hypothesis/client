@@ -1,4 +1,5 @@
 @use "sass:color";
+@use "sass:math";
 
 // Greys (layout colors)
 // These may be used for non-textual styling of components and elements
@@ -90,9 +91,9 @@ $touch-input-font-size: 16px;
 // Layout spacing
 // -------------------------
 $layout-space: 1em;
-$layout-space--xxsmall: $layout-space * (1/4);
-$layout-space--xsmall: $layout-space * (1/2);
-$layout-space--small: $layout-space * (3/4);
+$layout-space--xxsmall: math.div($layout-space, 4);
+$layout-space--xsmall: math.div($layout-space, 2);
+$layout-space--small: math.div($layout-space * 3, 4);
 $layout-space--medium: $layout-space;
 $layout-space--large: $layout-space * 2;
 $layout-space--xlarge: $layout-space * 4;

@@ -17,6 +17,8 @@
  *
  * And pass 'my-component-button' as the `className` prop to `Button`.
  */
+@use "sass:math";
+
 @use "@hypothesis/frontend-shared/styles/mixins/focus";
 
 @use "./layout";
@@ -270,18 +272,18 @@ $indicator-vertical-offset: 6px;
   // This creates a left-pointing "wedge" in grey
   // offset to the left of the element
   &::before {
-    border-width: $indicator-height / 2;
+    border-width: math.div($indicator-height, 2);
     border-right: $indicator-horizontal-offset solid var.$grey-3;
-    margin-top: -1 * ($indicator-height / 2);
+    margin-top: -1 * math.div($indicator-height, 2);
   }
 
   // This creates a left-pointing "wedge" in white, on top
   // of the grey wedge and one pixel narrower so that the
   // grey wedge appears as a border around it
   &::after {
-    border-width: $indicator-height / 2 - 1;
+    border-width: math.div($indicator-height, 2) - 1;
     border-right: ($indicator-horizontal-offset - 1) solid var.$color-background;
-    margin-top: -1 * ($indicator-height / 2 - 1);
+    margin-top: -1 * (math.div($indicator-height, 2) - 1);
   }
 }
 
@@ -297,16 +299,16 @@ $indicator-vertical-offset: 6px;
 
   // Grey (border) arrow pointing up
   &::before {
-    border-width: $indicator-width / 2;
+    border-width: math.div($indicator-width, 2);
     border-bottom: $indicator-vertical-offset solid var.$grey-3;
-    margin-left: -1 * ($indicator-width / 2);
+    margin-left: -1 * math.div($indicator-width, 2);
   }
 
   // White (fill) arrow pointing up
   &::after {
-    border-width: $indicator-width / 2 - 1;
+    border-width: math.div($indicator-width, 2) - 1;
     border-bottom: ($indicator-vertical-offset - 1) solid var.$color-background;
-    margin-left: -1 * ($indicator-width / 2 - 1);
+    margin-left: -1 * (math.div($indicator-width, 2) - 1);
   }
 }
 
@@ -322,15 +324,15 @@ $indicator-vertical-offset: 6px;
 
   // Grey (border) arrow, pointing down
   &::before {
-    border-width: $indicator-width / 2;
+    border-width: math.div($indicator-width, 2);
     border-top: $indicator-vertical-offset solid var.$grey-3;
-    margin-left: -1 * ($indicator-width / 2);
+    margin-left: -1 * math.div($indicator-width, 2);
   }
 
   // White (fill) arrow, pointing down
   &::after {
-    border-width: $indicator-width / 2 - 1;
+    border-width: math.div($indicator-width, 2) - 1;
     border-top: ($indicator-vertical-offset - 1) solid var.$color-background;
-    margin-left: -1 * ($indicator-width / 2 - 1);
+    margin-left: -1 * (math.div($indicator-width, 2) - 1);
   }
 }

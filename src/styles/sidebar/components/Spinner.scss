@@ -5,6 +5,7 @@
 //
 //   <!-- Three nested spans -->
 //   <span class="Spinner"><span><span></span></span></span>
+@use "sass:math";
 
 $container-width: 1em;
 $container-height: $container-width;
@@ -44,13 +45,13 @@ $part-height: 3 * $part-width;
   content: '';
   position: absolute;
   top: 0;
-  left: ($container-width - $part-width) / 2;
+  left: math.div(($container-width - $part-width), 2);
   width: $part-width;
   height: $part-height;
   border-radius: 0.1em;
   background: #eee;
   box-shadow: 0 ($container-height - $part-height) rgba(0, 0, 0, 0.15);
-  transform-origin: 50% $container-height / 2;
+  transform-origin: 50% math.div($container-height, 2);
 }
 
 .Spinner:before {
