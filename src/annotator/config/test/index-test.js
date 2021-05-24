@@ -1,7 +1,7 @@
-import configFrom from '../index';
+import { getConfig } from '../index';
 import { $imports } from '../index';
 
-describe('annotator.config.index', function () {
+describe('annotator/config/index', function () {
   let fakeSettingsFrom;
 
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('annotator.config.index', function () {
   });
 
   it('gets the configuration settings', function () {
-    configFrom('WINDOW');
+    getConfig('all', 'WINDOW');
 
     assert.calledOnce(fakeSettingsFrom);
     assert.calledWithExactly(fakeSettingsFrom, 'WINDOW');
@@ -30,7 +30,7 @@ describe('annotator.config.index', function () {
       it('returns the ' + settingName + ' setting', () => {
         fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
 
-        const config = configFrom('WINDOW');
+        const config = getConfig('all', 'WINDOW');
 
         assert.equal(config[settingName], 'SETTING_VALUE');
       });
@@ -46,7 +46,7 @@ describe('annotator.config.index', function () {
 
     it('throws an error', function () {
       assert.throws(function () {
-        configFrom('WINDOW');
+        getConfig('all', 'WINDOW');
       }, "there's no link");
     });
   });
@@ -57,7 +57,7 @@ describe('annotator.config.index', function () {
         settingName +
         ' from the host page, even when in a browser extension',
       function () {
-        configFrom('WINDOW');
+        getConfig('all', 'WINDOW');
         assert.calledWithExactly(
           fakeSettingsFrom().hostPageSetting,
           settingName,
@@ -68,7 +68,7 @@ describe('annotator.config.index', function () {
   });
 
   it('reads openSidebar from the host page, even when in a browser extension', function () {
-    configFrom('WINDOW');
+    getConfig('all', 'WINDOW');
     sinon.assert.calledWith(
       fakeSettingsFrom().hostPageSetting,
       'openSidebar',
@@ -85,7 +85,7 @@ describe('annotator.config.index', function () {
         settingName +
         ' from the host page only when in an embedded client',
       function () {
-        configFrom('WINDOW');
+        getConfig('all', 'WINDOW');
 
         assert.calledWithExactly(
           fakeSettingsFrom().hostPageSetting,
@@ -114,9 +114,56 @@ describe('annotator.config.index', function () {
         return settings[settingName];
       };
 
-      const settingValue = configFrom('WINDOW')[settingName];
+      const settingValue = getConfig('all', 'WINDOW')[settingName];
 
       assert.equal(settingValue, settings[settingName]);
+    });
+  });
+  describe('application contexts', () => {
+    [
+      {
+        app: 'annotator',
+        expectedKeys: ['clientUrl', 'showHighlights', 'subFrameIdentifier'],
+      },
+      {
+        app: 'sidebar',
+        expectedKeys: [
+          'annotations',
+          'branding',
+          'enableExperimentalNewNoteButton',
+          'externalContainerSelector',
+          'focus',
+          'group',
+          'onLayoutChange',
+          'openSidebar',
+          'requestConfigFromFrame',
+          'services',
+          'showHighlights',
+          'sidebarAppUrl',
+          'theme',
+          'usernameUrl',
+        ],
+      },
+      {
+        app: 'notebook',
+        expectedKeys: [
+          'branding',
+          'enableExperimentalNewNoteButton',
+          'focus',
+          'group',
+          'notebookAppUrl',
+          'requestConfigFromFrame',
+          'services',
+          'showHighlights',
+          'theme',
+          'usernameUrl',
+        ],
+      },
+    ].forEach(test => {
+      it(`ignore values not belonging to "${test.app}" context`, () => {
+        const config = getConfig(test.app, 'WINDOW');
+        assert.deepEqual(Object.keys(config), test.expectedKeys);
+      });
     });
   });
 });
