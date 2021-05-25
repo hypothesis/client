@@ -197,7 +197,7 @@ stage('Publish') {
                     """
 
                     // Create GitHub release with changes since previous release.
-                    sh "scripts/create-github-release.js ${pkgVersion}"
+                    sh "scripts/create-github-release.js v${pkgVersion}"
 
                     sh "echo '//registry.npmjs.org/:_authToken=${env.NPM_TOKEN}' >> \$HOME/.npmrc"
                     sh "yarn publish --no-interactive --tag ${npmTag} --new-version=${newPkgVersion}"
