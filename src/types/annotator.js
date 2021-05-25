@@ -87,7 +87,7 @@
  * Interface for document type/viewer integrations that handle all the details
  * of supporting a specific document type (web page, PDF, ebook, etc.).
  *
- * @typedef Integration
+ * @typedef IntegrationBase
  * @prop {(root: HTMLElement, selectors: Selector[]) => Promise<Range>} anchor -
  *   Attempt to resolve a set of serialized selectors to the corresponding content in the
  *   current document.
@@ -110,6 +110,8 @@
  * @prop {(a: Anchor) => Promise<void>} scrollToAnchor - Scroll to an anchor.
  *   This will only be called if the anchor has at least one highlight (ie.
  *   `anchor.highlights` is a non-empty array)
+ *
+ * @typedef {Destroyable & IntegrationBase} Integration
  */
 
 /**
