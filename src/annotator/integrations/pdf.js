@@ -19,7 +19,6 @@ import { PDFMetadata } from './pdf-metadata';
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').Annotator} Annotator
- * @typedef {import('../../types/annotator').Destroyable} Destroyable
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
@@ -50,7 +49,6 @@ function delay(ms) {
 /**
  * Integration that works with PDF.js
  * @implements {Integration}
- * @implements {Destroyable}
  */
 export class PDFIntegration {
   /**

@@ -6,7 +6,6 @@ import { HTMLMetadata } from './html-metadata';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
- * @typedef {import('../../types/annotator').Destroyable} Destroyable
  * @typedef {import('../../types/annotator').Integration} Integration
  */
 
@@ -17,7 +16,6 @@ import { HTMLMetadata } from './html-metadata';
  * by a more specific integration (eg. for PDFs).
  *
  * @implements {Integration}
- * @implements {Destroyable}
  */
 export class HTMLIntegration {
   constructor(container = document.body) {
