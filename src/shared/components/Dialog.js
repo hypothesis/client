@@ -2,9 +2,8 @@ import {
   LabeledButton,
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
-import { Fragment } from 'preact';
-import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import classNames from 'classnames';
+import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 
 let idCounter = 0;
 
@@ -118,7 +117,7 @@ export default function Dialog({
   }, [dialogDescriptionId]);
 
   return (
-    <Fragment>
+    <>
       <div className="Dialog__background" />
       <div className="Dialog__container">
         <div
@@ -154,6 +153,6 @@ export default function Dialog({
           </div>
         </div>
       </div>
-    </Fragment>
+    </>
   );
 }
