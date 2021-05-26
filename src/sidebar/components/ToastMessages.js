@@ -99,7 +99,7 @@ function ToastMessages({ toastMessenger }) {
           <ToastMessage
             message={message}
             key={message.id}
-            onDismiss={toastMessenger.dismiss}
+            onDismiss={id => toastMessenger.dismiss(id)}
           />
         ))}
       </ul>
