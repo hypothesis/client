@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sidebar in external container test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      .container {
+        display: flex;
+        height: 400px;
+        resize: vertical;
+        overflow: auto;
+      }
+      #my-sidebar {
+        flex: 0 0 20%;
+        height: 100%;
+      }
+      iframe {
+        flex: 1;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sidebar in external container test</h1>
+    <p>
+      The sidebar is placed inside the element with `my-sidebar` id. The iframe
+      below has an `enable-annotation` attribute. The client detects and injects
+      the annotator into the iframe, which makes the iframe content annotatable.
+    </p>
+    <p>
+      This test case intends to replicate the
+      <a href="https://web.hypothes.is/demos/epubjs/">ePUB demo</a>.
+    </p>
+    <div class="container">
+      <div id="my-sidebar"></div>
+      <iframe src="/document/injectable-frame" enable-annotation></iframe>
+    </div>
+    {{{hypothesisScript}}}
+    <script>
+      window.hypothesisConfig = function () {
+        return {
+          externalContainerSelector: '#my-sidebar',
+        };
+      };
+    </script>
+  </body>
+</html>
