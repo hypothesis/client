@@ -1,3 +1,5 @@
+import { ListenerCollection } from '../annotator/util/listener-collection';
+
 /**
  * Callback invoked when another frame is discovered in this window which runs
  * the Hypothesis sidebar or annotation layer code.
@@ -8,7 +10,7 @@
  * @param {string} token - A random identifier used by this frame.
  */
 
-import { ListenerCollection } from '../annotator/util/listener-collection';
+/** @typedef {import('../types/annotator').HypothesisWindow} HypothesisWindow */
 
 /**
  * Discovery finds frames in the current tab/window that can be annotated (the
@@ -20,9 +22,8 @@ import { ListenerCollection } from '../annotator/util/listener-collection';
  *
  * The discovery process works as follows:
  *
- * 1. Clients and servers perform a top-down, breadth-first traversal of the
- *    frame hierarchy in the tab and send either an "offer" (server) or
- *    "discovery" (client) message to each frame, except for their own frame.
+ * 1. Clients and servers perform a targeted search based on the iframe layout
+ *    hierarchy.
  * 2. Clients listen for "offer" messages and respond with "request" messages.
  * 3. Servers listen for "discovery" messages and respond with "offer"
  *    messages.
@@ -34,7 +35,7 @@ import { ListenerCollection } from '../annotator/util/listener-collection';
  */
 export default class Discovery {
   /**
-   * @param {Window} target
+   * @param {HypothesisWindow} target
    * @param {object} [options]
    *   @param {boolean} [options.server]
    *   @param {string} [options.origin]
@@ -99,26 +100,77 @@ export default class Discovery {
    * Send a message to other frames in the current window to inform them about
    * the existence of this frame and tell them whether this frame is a client
    * or server.
+   *
+   * This layout describes the frame hierarchy:
+   *
+   * host frame (client)
+   * |-> (generally, shadow DOMed) sidebar iframe (server)
+   * |-> (generally, shadow DOMed) notebook iframe (client)
+   * |-> [annotatable iframe/s] (client)
+   *      |-> [annotatable iframe/s] (client)
+   *
+   * Note: In the LMS context, the `host frame` is yet a descendant of a parent
+   * iframe (several levels up) to whom the `sidebar iframe` exchange configuration
+   * information. This communication is established in a different way, elsewhere.
    */
   _beacon() {
-    let beaconMessage;
     if (this.server) {
-      beaconMessage = '__cross_frame_dhcp_offer';
+      // Sidebar iframe
+      // Send the `offer` signal only to the `host frame`.
+      const hostFrame = this.target.parent;
+      hostFrame.postMessage('__cross_frame_dhcp_offer', this.origin);
     } else {
-      beaconMessage = '__cross_frame_dhcp_discovery';
-    }
+      const beaconMessage = '__cross_frame_dhcp_discovery';
 
-    // Perform a top-down, breadth-first traversal of frames in the current
-    // window and send messages to them.
-    const queue = [this.target.top];
-    while (queue.length > 0) {
-      const parent = /** @type {Window} */ (queue.shift());
-      if (parent !== this.target) {
-        parent.postMessage(beaconMessage, this.origin);
+      // Annotatable iframe (can be nested)
+      if (this.target.__hypothesis_frame) {
+        // Find the host frame (which it is not an annotatable iframe)
+        let hostFrame;
+        do {
+          hostFrame = /** @type  {HypothesisWindow} */ (this.target.parent);
+        } while (hostFrame.__hypothesis_frame);
+
+        // The sidebar iframe may not be yet created, therefore try to find the
+        // `sidebar iframe` at intervals
+        const findSidebar = (retries = 0) => {
+          // Sidebar iframe can be shadow DOMed
+          const shadowDomSidebar = /** @type {HTMLIFrameElement|null} */ (
+            hostFrame.document.querySelector('hypothesis-sidebar')
+          )?.shadowRoot?.querySelector('iframe')?.contentWindow;
+
+          // Or can be no shadow DOMed
+          const noShadowDomSidebar = /** @type {HTMLIFrameElement|null} */ (
+            hostFrame.document.querySelector(
+              'iframe[title="Hypothesis annotation viewer"]'
+            )
+          )?.contentWindow;
+
+          const sidebar = shadowDomSidebar ?? noShadowDomSidebar;
+
+          if (sidebar) {
+            setTimeout(
+              () => sidebar.postMessage(beaconMessage, this.origin),
+              1000 /* TODO: arbitrary delay as we can't check the readyState of the `sidebar iframe` because of cross-origins */
+            );
+          } else if (retries < 20) {
+            // Try for a max of 10s (20 * 500ms) in intervals of 500ms
+            setTimeout(() => findSidebar(retries + 1), 500);
+          }
+        };
+
+        findSidebar(0);
+        return;
       }
-      for (let i = 0; i < parent.frames.length; i++) {
-        queue.push(parent.frames[i]);
+
+      // Notebook iframe
+      if (this.target.frameElement?.classList.contains('NotebookIframe')) {
+        // The sidebar iframe is unreachable, do nothing
+        return;
       }
+
+      // Host frame
+      // Do not send a `discovery` signal, but wait for the sidebar to beacon
+      // the `offer` signal, instead.
     }
   }
 
