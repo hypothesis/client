@@ -141,48 +141,6 @@
 }
 
 /**
- * An icon-only button that sits to the right of a text-input field
- * (e.g. "copy to clipboard" button in share panels)
- *
- * @param {boolean} [$compact] - Tighten padding for small spaces
- */
-@mixin button--input($compact: false) {
-  @include button;
-  @include utils.border;
-
-  @if $compact {
-    padding: var.$layout-space--xxsmall var.$layout-space--xsmall;
-  } @else {
-    padding: var.$layout-space--xsmall var.$layout-space--small;
-  }
-
-  color: var.$grey-mid;
-  background-color: var.$grey-1;
-
-  border-radius: 0; // Turn off border-radius to align with <input> edges
-  border-left: 0; // Avoid double border with the <input>
-
-  &:hover:not([disabled]),
-  &:focus:not([disabled]) {
-    background-color: var.$grey-2;
-  }
-}
-
-/**
- * A button that is styled roughly like an `<a>` element (link-like)
- */
-@mixin button--link {
-  @include button;
-  color: var.$grey-mid;
-  padding: 0;
-  &:hover:not([disabled]),
-  &:focus:not([disabled]) {
-    color: var.$color-link-hover;
-    text-decoration: underline;
-  }
-}
-
-/**
  * A button pattern that looks like a link with a small icon on the right
  * Used, e.g., in the help panel to navigate between sub-panels
  */
