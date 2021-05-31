@@ -16,7 +16,7 @@ import { storeModule } from '../create-store';
  * `persistedDefaults` service.
  */
 
-function init() {
+function initialState() {
   /**
    * Note that the persisted presence of any of these defaults cannot be
    * guaranteed, so consumers of said defaults should be prepared to handle
@@ -29,13 +29,13 @@ function init() {
   };
 }
 
-const update = {
+const reducers = {
   SET_DEFAULT: function (state, action) {
     return { [action.defaultKey]: action.value };
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 function setDefault(defaultKey, value) {
   return { type: actions.SET_DEFAULT, defaultKey: defaultKey, value: value };
@@ -58,10 +58,10 @@ function getDefaults(state) {
 }
 
 export default storeModule({
-  init,
+  initialState,
   namespace: 'defaults',
-  update,
-  actions: {
+  reducers,
+  actionCreators: {
     setDefault,
   },
   selectors: {

@@ -56,7 +56,7 @@ import { storeModule } from '../create-store';
  * @prop {string} displayName
  */
 
-function init(settings) {
+function initialState(settings) {
   const focusConfig = settings.focus || {};
   return {
     /**
@@ -105,7 +105,7 @@ function focusFiltersFromConfig(focusConfig) {
   };
 }
 
-const update = {
+const reducers = {
   CHANGE_FOCUS_MODE_USER: function (state, action) {
     if (isValidFocusConfig({ user: action.user })) {
       return {
@@ -152,7 +152,7 @@ const update = {
   },
 };
 
-const actions = actionTypes(update);
+const actions = actionTypes(reducers);
 
 // Action creators
 
@@ -286,10 +286,10 @@ function hasAppliedFilter(state) {
 }
 
 export default storeModule({
-  init,
+  initialState,
   namespace: 'filters',
-  update,
-  actions: {
+  reducers,
+  actionCreators: {
     changeFocusModeUser,
     setFilter,
     setFilterQuery,

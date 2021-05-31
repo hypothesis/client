@@ -89,7 +89,7 @@ function initializeAnnotation(annotation, tag) {
   });
 }
 
-function init() {
+function initialState() {
   return {
     /** @type {Annotation[]} */
     annotations: [],
@@ -105,7 +105,7 @@ function init() {
   };
 }
 
-const update = {
+const reducers = {
   ADD_ANNOTATIONS: function (state, action) {
     const updatedIDs = {};
     const updatedTags = {};
@@ -232,7 +232,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /* Action creators */
 
@@ -555,10 +555,10 @@ function savedAnnotations(state) {
 }
 
 export default storeModule({
-  init: init,
+  initialState,
   namespace: 'annotations',
-  update: update,
-  actions: {
+  reducers,
+  actionCreators: {
     addAnnotations,
     clearAnnotations,
     focusAnnotations,

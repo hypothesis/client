@@ -5,8 +5,8 @@ import realTimeUpdates from '../real-time-updates';
 import { $imports } from '../real-time-updates';
 import selection from '../selection';
 
-const { removeAnnotations } = annotations.actions;
-const { focusGroup } = groups.actions;
+const { removeAnnotations } = annotations.actionCreators;
+const { focusGroup } = groups.actionCreators;
 
 describe('sidebar/store/modules/real-time-updates', () => {
   let fakeAnnotationExists;

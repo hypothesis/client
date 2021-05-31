@@ -9,7 +9,7 @@ import session from './session';
  * @typedef {import('../../../types/api').Group} Group
  */
 
-function init() {
+function initialState() {
   return {
     /**
      * List of groups.
@@ -25,7 +25,7 @@ function init() {
   };
 }
 
-const update = {
+const reducers = {
   FOCUS_GROUP(state, action) {
     const group = state.groups.find(g => g.id === action.id);
     if (!group) {
@@ -67,7 +67,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 function clearGroups() {
   return {
@@ -198,10 +198,10 @@ const getCurrentlyViewingGroups = createSelector(
 );
 
 export default storeModule({
-  init,
+  initialState,
   namespace: 'groups',
-  update,
-  actions: {
+  reducers,
+  actionCreators: {
     focusGroup,
     loadGroups,
     clearGroups,

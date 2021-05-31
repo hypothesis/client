@@ -16,7 +16,7 @@ import * as util from '../util';
 
 import { storeModule } from '../create-store';
 
-function init() {
+function initialState() {
   return {
     /*
      * The `panelName` of the currently-active sidebar panel.
@@ -32,7 +32,7 @@ function init() {
   };
 }
 
-const update = {
+const reducers = {
   OPEN_SIDEBAR_PANEL: function (state, action) {
     return { activePanelName: action.panelName };
   },
@@ -76,7 +76,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /**
  * Designate `panelName` as the currently-active panel name
@@ -124,10 +124,10 @@ function isSidebarPanelOpen(state, panelName) {
 
 export default storeModule({
   namespace: 'sidebarPanels',
-  init: init,
-  update: update,
+  initialState,
+  reducers,
 
-  actions: {
+  actionCreators: {
     openSidebarPanel,
     closeSidebarPanel,
     toggleSidebarPanel,

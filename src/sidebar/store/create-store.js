@@ -37,14 +37,14 @@ import { createReducer, bindSelectors } from './util';
  * @template {object} Selectors
  * @template {object} RootSelectors
  * @typedef Module
- * @prop {(...args: any[]) => State} init -
+ * @prop {(...args: any[]) => State} initialState -
  *   Function that returns the initial state for the module
  * @prop {string} namespace -
  *   The key under which this module's state will live in the store's root state
- * @prop {Reducers<State>} update -
+ * @prop {Reducers<State>} reducers -
  *   Map of action types to "reducer" functions that process an action and return
  *   the changes to the state
- * @prop {Actions} actions
+ * @prop {Actions} actionCreators
  *   Object containing action creator functions
  * @prop {Selectors} selectors
  *   Object containing selector functions
@@ -99,7 +99,7 @@ import { createReducer, bindSelectors } from './util';
  *    from that state.
  *
  * In addition to the standard Redux store interface, the returned store also exposes
- * each action and selector from the input modules as a method. For example, if
+ * each action creator and selector from the input modules as a method. For example, if
  * a store is created from a module that has a `getWidget(<id>)` selector and
  * an `addWidget(<object>)` action, a consumer would use `store.getWidget(<id>)`
  * to fetch an item and `store.addWidget(<object>)` to dispatch an action that
@@ -112,7 +112,7 @@ import { createReducer, bindSelectors } from './util';
  * what store state a component depends upon and re-render when it changes.
  *
  * @param {Module<any,any,any,any>[]} modules
- * @param {any[]} [initArgs] - Arguments to pass to each state module's `init` function
+ * @param {any[]} [initArgs] - Arguments to pass to each state module's `initialState` function
  * @param {any[]} [middleware] - List of additional Redux middlewares to use
  * @return Store<any,any,any>
  */
@@ -137,9 +137,9 @@ export function createStore(modules, initArgs = [], middleware = []) {
   //
   modules.forEach(module => {
     if (module.namespace) {
-      initialState[module.namespace] = module.init(...initArgs);
+      initialState[module.namespace] = module.initialState(...initArgs);
 
-      allReducers[module.namespace] = createReducer(module.update);
+      allReducers[module.namespace] = createReducer(module.reducers);
       allSelectors[module.namespace] = {
         selectors: module.selectors,
         rootSelectors: module.rootSelectors || {},
@@ -172,7 +172,7 @@ export function createStore(modules, initArgs = [], middleware = []) {
   const store = redux.createStore(reducer, initialState, enhancer);
 
   // Add actions and selectors as methods to the store.
-  const actions = Object.assign({}, ...modules.map(m => m.actions));
+  const actions = Object.assign({}, ...modules.map(m => m.actionCreators));
   const boundActions = redux.bindActionCreators(actions, store.dispatch);
   const boundSelectors = bindSelectors(allSelectors, store.getState);
 
