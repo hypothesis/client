@@ -44,7 +44,7 @@ function initialSelection(settings) {
   return selection;
 }
 
-function init(settings) {
+function initialState(settings) {
   return {
     /**
      * The following objects map annotation identifiers to a boolean
@@ -100,7 +100,7 @@ const resetSelection = () => {
   };
 };
 
-const update = {
+const reducers = {
   CLEAR_SELECTION: function () {
     return resetSelection();
   },
@@ -204,7 +204,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /* Action Creators */
 
@@ -388,11 +388,11 @@ const sortKeys = createSelector(
 );
 
 export default storeModule({
-  init: init,
+  initialState,
   namespace: 'selection',
-  update: update,
+  reducers,
 
-  actions: {
+  actionCreators: {
     clearSelection,
     selectAnnotations,
     selectTab,

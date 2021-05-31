@@ -6,7 +6,7 @@
 import { actionTypes } from '../util';
 import { storeModule } from '../create-store';
 
-function init() {
+function initialState() {
   return {
     /**
      * Annotation `$tag`s that correspond to annotations with active API requests
@@ -32,7 +32,7 @@ function init() {
   };
 }
 
-const update = {
+const reducers = {
   API_REQUEST_STARTED(state) {
     return {
       ...state,
@@ -107,7 +107,7 @@ const update = {
   },
 };
 
-const actions = actionTypes(update);
+const actions = actionTypes(reducers);
 
 /** Action Creators */
 
@@ -189,11 +189,11 @@ function isSavingAnnotation(state, annotation) {
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
 export default storeModule({
-  init,
-  update,
+  initialState,
+  reducers,
   namespace: 'activity',
 
-  actions: {
+  actionCreators: {
     annotationFetchStarted,
     annotationFetchFinished,
     annotationSaveStarted,

@@ -7,12 +7,12 @@ const A = 0;
 const modules = [
   {
     // namespaced module A
-    init(value = 0) {
+    initialState(value = 0) {
       return { count: value };
     },
     namespace: 'a',
 
-    update: {
+    reducers: {
       INCREMENT_COUNTER_A: (state, action) => {
         return { count: state.count + action.amount };
       },
@@ -21,7 +21,7 @@ const modules = [
       },
     },
 
-    actions: {
+    actionCreators: {
       incrementA(amount) {
         return { type: 'INCREMENT_COUNTER_A', amount };
       },
@@ -41,12 +41,12 @@ const modules = [
   },
   {
     // namespaced module B
-    init(value = 0) {
+    initialState(value = 0) {
       return { count: value };
     },
     namespace: 'b',
 
-    update: {
+    reducers: {
       INCREMENT_COUNTER_B: (state, action) => {
         return { count: state.count + action.amount };
       },
@@ -55,7 +55,7 @@ const modules = [
       },
     },
 
-    actions: {
+    actionCreators: {
       incrementB(amount) {
         return { type: 'INCREMENT_COUNTER_B', amount };
       },
@@ -95,7 +95,7 @@ describe('createStore', () => {
     assert.calledWith(subscriber);
   });
 
-  it('passes initial state args to `init` function', () => {
+  it('passes initial state args to `initialState` function', () => {
     const store = counterStore([21]);
     assert.equal(store.getState().a.count, 21);
   });
@@ -108,20 +108,20 @@ describe('createStore', () => {
 
   it('adds selectors as methods to the store', () => {
     const store = counterStore();
-    store.dispatch(modules[A].actions.incrementA(5));
+    store.dispatch(modules[A].actionCreators.incrementA(5));
     assert.equal(store.getCountA(), 5);
   });
 
   it('adds root selectors as methods to the store', () => {
     const store = counterStore();
-    store.dispatch(modules[A].actions.incrementA(5));
+    store.dispatch(modules[A].actionCreators.incrementA(5));
     assert.equal(store.getCountAFromRoot(), 5);
   });
 
   it('applies `thunk` middleware by default', () => {
     const store = counterStore();
     const doubleAction = (dispatch, getState) => {
-      dispatch(modules[A].actions.incrementA(getState().a.count));
+      dispatch(modules[A].actionCreators.incrementA(getState().a.count));
     };
 
     store.incrementA(5);

@@ -8,11 +8,11 @@ import { useStoreProxy, $imports } from '../use-store';
 const thingsModule = {
   namespace: 'things',
 
-  init: () => ({
+  initialState: () => ({
     things: [],
   }),
 
-  update: {
+  reducers: {
     ADD_THING(state, action) {
       if (state.things.some(t => t.id === action.thing.id)) {
         return {};
@@ -21,7 +21,7 @@ const thingsModule = {
     },
   },
 
-  actions: {
+  actionCreators: {
     addThing(id) {
       return { type: 'ADD_THING', thing: { id } };
     },

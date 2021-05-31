@@ -16,13 +16,13 @@ import * as util from '../util';
  * maintains state only; it's up to other layers to handle the management
  * and interactions with these messages.
  */
-function init() {
+function initialState() {
   return {
     messages: [],
   };
 }
 
-const update = {
+const reducers = {
   ADD_MESSAGE: function (state, action) {
     return {
       messages: state.messages.concat({ ...action.message }),
@@ -47,7 +47,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /** Actions */
 
@@ -113,10 +113,10 @@ function hasMessage(state, type, text) {
 }
 
 export default storeModule({
-  init,
+  initialState,
   namespace: 'toastMessages',
-  update,
-  actions: {
+  reducers,
+  actionCreators: {
     addToastMessage: addMessage,
     removeToastMessage: removeMessage,
     updateToastMessage: updateMessage,

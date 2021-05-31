@@ -20,12 +20,12 @@ import { storeModule } from '../create-store';
  * @prop {string} uri - Current primary URI of the document being displayed
  */
 
-function init() {
+function initialState() {
   // The list of frames connected to the sidebar app
   return [];
 }
 
-const update = {
+const reducers = {
   CONNECT_FRAME: function (state, action) {
     return [...state, action.frame];
   },
@@ -49,7 +49,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /**
  * Add a frame to the list of frames currently connected to the sidebar app.
@@ -156,11 +156,11 @@ const searchUris = createShallowEqualSelector(
 );
 
 export default storeModule({
-  init: init,
+  initialState,
   namespace: 'frames',
-  update: update,
+  reducers,
 
-  actions: {
+  actionCreators: {
     connectFrame,
     destroyFrame,
     updateFrameAnnotationFetchStatus,

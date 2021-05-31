@@ -11,7 +11,7 @@ import { storeModule } from '../create-store';
  * existing annotations.
  */
 
-function init() {
+function initialState() {
   return [];
 }
 
@@ -57,7 +57,7 @@ export class Draft {
 
 /* Reducer */
 
-const update = {
+const reducers = {
   DISCARD_ALL_DRAFTS: function () {
     return [];
   },
@@ -77,7 +77,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /* Actions */
 
@@ -188,10 +188,10 @@ const unsavedAnnotations = createSelector(
 );
 
 export default storeModule({
-  init,
+  initialState,
   namespace: 'drafts',
-  update,
-  actions: {
+  reducers,
+  actionCreators: {
     createDraft,
     deleteNewAndEmptyDrafts,
     discardAllDrafts,

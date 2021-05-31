@@ -23,7 +23,7 @@ const initialProfile = {
   userid: null,
 };
 
-function init(settings) {
+function initialState(settings) {
   return {
     /**
      * The app's default authority (user identity provider), from settings,
@@ -41,7 +41,7 @@ function init(settings) {
   };
 }
 
-const update = {
+const reducers = {
   UPDATE_PROFILE: function (state, action) {
     return {
       profile: { ...action.profile },
@@ -49,7 +49,7 @@ const update = {
   },
 };
 
-const actions = util.actionTypes(update);
+const actions = util.actionTypes(reducers);
 
 /**
  * Update the profile information for the current user.
@@ -111,11 +111,11 @@ function profile(state) {
 }
 
 export default storeModule({
-  init,
+  initialState,
   namespace: 'session',
-  update,
+  reducers,
 
-  actions: {
+  actionCreators: {
     updateProfile,
   },
 

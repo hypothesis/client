@@ -2,7 +2,7 @@ import { actionTypes } from '../util';
 
 import { storeModule } from '../create-store';
 
-function init() {
+function initialState() {
   return {
     /**
      * The current route.
@@ -21,18 +21,18 @@ function init() {
   };
 }
 
-const update = {
+const reducers = {
   CHANGE_ROUTE(state, { name, params }) {
     return { name, params };
   },
 };
 
-const actions = actionTypes(update);
+const actions = actionTypes(reducers);
 
 /**
  * Change the active route.
  *
- * @param {string} name - Name of the route to activate. See `init` for possible values
+ * @param {string} name - Name of the route to activate. See `initialState` for possible values
  * @param {Object.<string,string>} params - Parameters associated with the route
  */
 function changeRoute(name, params = {}) {
@@ -59,10 +59,10 @@ function routeParams(state) {
 }
 
 export default storeModule({
-  init,
+  initialState,
   namespace: 'route',
-  update,
-  actions: {
+  reducers,
+  actionCreators: {
     changeRoute,
   },
   selectors: {
