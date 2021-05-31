@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 import { actionTypes } from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 /**
  * Manage state pertaining to the filtering of annotations in the UI.
@@ -285,7 +285,7 @@ function hasAppliedFilter(state) {
   return !!(state.query || Object.keys(getFilters(state)).length);
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'filters',
   reducers,

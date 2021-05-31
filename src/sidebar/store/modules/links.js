@@ -1,6 +1,6 @@
 import { actionTypes } from '../util';
 import { replaceURLParams } from '../../util/url';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 function initialState() {
   return null;
@@ -53,7 +53,7 @@ function getLink(state, linkName, params = {}) {
   return url;
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'links',
   reducers,

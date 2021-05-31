@@ -14,7 +14,7 @@
 
 import * as util from '../util';
 
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 function initialState() {
   return {
@@ -122,7 +122,7 @@ function isSidebarPanelOpen(state, panelName) {
   return state.activePanelName === panelName;
 }
 
-export default storeModule({
+export default createStoreModule({
   namespace: 'sidebarPanels',
   initialState,
   reducers,

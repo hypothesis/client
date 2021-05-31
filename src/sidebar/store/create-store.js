@@ -182,8 +182,7 @@ export function createStore(modules, initArgs = [], middleware = []) {
 }
 
 /**
- * Helper to validate a store module configuration before it is passed to
- * `createStore`.
+ * Create a store module that can be passed to `createStore`.
  *
  * @template State
  * @template Actions
@@ -192,9 +191,9 @@ export function createStore(modules, initArgs = [], middleware = []) {
  * @param {Module<State,Actions,Selectors,RootSelectors>} config
  * @return {Module<State,Actions,Selectors,RootSelectors>}
  */
-export function storeModule(config) {
+export function createStoreModule(config) {
   // This helper doesn't currently do anything at runtime. It does ensure more
   // helpful error messages when typechecking if there is something incorrect
-  // in the configuration.
+  // in the configuration though.
   return config;
 }

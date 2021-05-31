@@ -1,6 +1,6 @@
 import * as util from '../util';
 
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 /**
  * A store module for managing client-side user-convenience defaults.
@@ -57,7 +57,7 @@ function getDefaults(state) {
   return state;
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'defaults',
   reducers,

@@ -2,7 +2,7 @@ import { createSelector } from 'reselect';
 
 import * as metadata from '../../helpers/annotation-metadata';
 import * as util from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
@@ -187,7 +187,7 @@ const unsavedAnnotations = createSelector(
   drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'drafts',
   reducers,

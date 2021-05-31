@@ -1,6 +1,6 @@
 import * as util from '../util';
 
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 function initialState(settings) {
   return {
@@ -142,7 +142,7 @@ function directLinkedGroupFetchFailed(state) {
   return state.directLinkedGroupFetchFailed;
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'directLinked',
   reducers,
