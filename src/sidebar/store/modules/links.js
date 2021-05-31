@@ -53,8 +53,7 @@ function getLink(state, linkName, params = {}) {
   return url;
 }
 
-export default createStoreModule({
-  initialState,
+export default createStoreModule(initialState, {
   namespace: 'links',
   reducers,
   actionCreators: {

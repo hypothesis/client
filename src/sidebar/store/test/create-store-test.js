@@ -1,15 +1,16 @@
 /* global process */
 
-import { createStore } from '../create-store';
+import { createStore, createStoreModule } from '../create-store';
 
 const A = 0;
 
+function initialState(value = 0) {
+  return { count: value };
+}
+
 const modules = [
-  {
-    // namespaced module A
-    initialState(value = 0) {
-      return { count: value };
-    },
+  // namespaced module A
+  createStoreModule(initialState, {
     namespace: 'a',
 
     reducers: {
@@ -38,12 +39,10 @@ const modules = [
         return state.a.count;
       },
     },
-  },
-  {
-    // namespaced module B
-    initialState(value = 0) {
-      return { count: value };
-    },
+  }),
+
+  // namespaced module B
+  createStoreModule(initialState, {
     namespace: 'b',
 
     reducers: {
@@ -66,7 +65,7 @@ const modules = [
         return state.count;
       },
     },
-  },
+  }),
 ];
 
 function counterStore(initArgs = [], middleware = []) {

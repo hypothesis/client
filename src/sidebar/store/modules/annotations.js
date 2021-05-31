@@ -554,8 +554,7 @@ function savedAnnotations(state) {
   });
 }
 
-export default createStoreModule({
-  initialState,
+export default createStoreModule(initialState, {
   namespace: 'annotations',
   reducers,
   actionCreators: {
