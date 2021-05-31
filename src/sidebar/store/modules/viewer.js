@@ -1,6 +1,6 @@
 import * as util from '../util';
 
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 /**
  * This module defines actions and state related to the display mode of the
@@ -55,7 +55,7 @@ function hasSidebarOpened(state) {
   return state.sidebarHasOpened;
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'viewer',
   reducers,

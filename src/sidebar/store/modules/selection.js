@@ -22,7 +22,7 @@ import { createSelector } from 'reselect';
 import * as metadata from '../../helpers/annotation-metadata';
 import { countIf, trueKeys, toTrueMap } from '../../util/collections';
 import * as util from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 /**
  * Default sort keys for each tab.
@@ -387,7 +387,7 @@ const sortKeys = createSelector(
   }
 );
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'selection',
   reducers,

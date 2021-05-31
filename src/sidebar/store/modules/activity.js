@@ -4,7 +4,7 @@
  */
 
 import { actionTypes } from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 function initialState() {
   return {
@@ -188,7 +188,7 @@ function isSavingAnnotation(state, annotation) {
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   reducers,
   namespace: 'activity',

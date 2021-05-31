@@ -17,7 +17,7 @@ import { createSelector } from 'reselect';
 import * as metadata from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import * as util from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 import route from './route';
 
@@ -554,7 +554,7 @@ function savedAnnotations(state) {
   });
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'annotations',
   reducers,

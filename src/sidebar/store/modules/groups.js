@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
 
 import * as util from '../util';
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 import session from './session';
 
@@ -197,7 +197,7 @@ const getCurrentlyViewingGroups = createSelector(
   }
 );
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'groups',
   reducers,

@@ -9,7 +9,7 @@
 
 import { createSelector } from 'reselect';
 
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 import { actionTypes } from '../util';
 
 import annotations from './annotations';
@@ -183,7 +183,7 @@ function hasPendingDeletion(state, id) {
   return state.pendingDeletions.hasOwnProperty(id);
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'realTimeUpdates',
   reducers,

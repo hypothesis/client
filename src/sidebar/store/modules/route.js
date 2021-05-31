@@ -1,6 +1,6 @@
 import { actionTypes } from '../util';
 
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 function initialState() {
   return {
@@ -58,7 +58,7 @@ function routeParams(state) {
   return state.params;
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'route',
   reducers,

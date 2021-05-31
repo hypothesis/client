@@ -1,4 +1,4 @@
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 import * as util from '../util';
 
@@ -112,7 +112,7 @@ function hasMessage(state, type, text) {
   });
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'toastMessages',
   reducers,

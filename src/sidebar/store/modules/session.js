@@ -1,6 +1,6 @@
 import * as util from '../util';
 
-import { storeModule } from '../create-store';
+import { createStoreModule } from '../create-store';
 
 /**
  * @typedef {import('../../../types/api').Profile} Profile
@@ -110,7 +110,7 @@ function profile(state) {
   return state.profile;
 }
 
-export default storeModule({
+export default createStoreModule({
   initialState,
   namespace: 'session',
   reducers,
