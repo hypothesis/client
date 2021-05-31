@@ -197,8 +197,7 @@ const getCurrentlyViewingGroups = createSelector(
   }
 );
 
-export default createStoreModule({
-  initialState,
+export default createStoreModule(initialState, {
   namespace: 'groups',
   reducers,
   actionCreators: {

@@ -36,9 +36,7 @@ import { createReducer, bindSelectors } from './util';
  * @template {object} Actions
  * @template {object} Selectors
  * @template {object} RootSelectors
- * @typedef Module
- * @prop {(...args: any[]) => State} initialState -
- *   Function that returns the initial state for the module
+ * @typedef ModuleConfig
  * @prop {string} namespace -
  *   The key under which this module's state will live in the store's root state
  * @prop {Reducers<State>} reducers -
@@ -49,6 +47,18 @@ import { createReducer, bindSelectors } from './util';
  * @prop {Selectors} selectors
  *   Object containing selector functions
  * @prop {RootSelectors} [rootSelectors]
+ */
+
+/**
+ * Type of a store module returned by `createStoreModule`.
+ *
+ * @template State
+ * @template {object} Actions
+ * @template {object} Selectors
+ * @template {object} RootSelectors
+ * @typedef {ModuleConfig<State, Actions, Selectors, RootSelectors> & {
+ *   initialState: (...args: any[]) => State
+ * }} Module
  */
 
 /**
@@ -188,12 +198,16 @@ export function createStore(modules, initArgs = [], middleware = []) {
  * @template Actions
  * @template Selectors
  * @template RootSelectors
- * @param {Module<State,Actions,Selectors,RootSelectors>} config
+ * @param {(...args: any[]) => State} initialState
+ * @param {ModuleConfig<State,Actions,Selectors,RootSelectors>} config
  * @return {Module<State,Actions,Selectors,RootSelectors>}
  */
-export function createStoreModule(config) {
-  // This helper doesn't currently do anything at runtime. It does ensure more
-  // helpful error messages when typechecking if there is something incorrect
-  // in the configuration though.
-  return config;
+export function createStoreModule(initialState, config) {
+  // The `initialState` argument is separate to `config` as this allows
+  // TypeScript to infer the `State` type in the `config` argument at the
+  // `createStoreModule` call site.
+  return {
+    initialState,
+    ...config,
+  };
 }

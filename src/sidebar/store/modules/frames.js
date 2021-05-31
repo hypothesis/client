@@ -155,8 +155,7 @@ const searchUris = createShallowEqualSelector(
   uris => uris
 );
 
-export default createStoreModule({
-  initialState,
+export default createStoreModule(initialState, {
   namespace: 'frames',
   reducers,
 

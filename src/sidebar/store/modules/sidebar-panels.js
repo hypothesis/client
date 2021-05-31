@@ -122,9 +122,8 @@ function isSidebarPanelOpen(state, panelName) {
   return state.activePanelName === panelName;
 }
 
-export default createStoreModule({
+export default createStoreModule(initialState, {
   namespace: 'sidebarPanels',
-  initialState,
   reducers,
 
   actionCreators: {

@@ -57,8 +57,7 @@ function getDefaults(state) {
   return state;
 }
 
-export default createStoreModule({
-  initialState,
+export default createStoreModule(initialState, {
   namespace: 'defaults',
   reducers,
   actionCreators: {
