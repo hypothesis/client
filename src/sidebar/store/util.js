@@ -15,26 +15,31 @@ export function actionTypes(reducers) {
 }
 
 /**
- * Given objects which map action names to update functions, this returns a
- * reducer function that can be passed to the redux `createStore` function.
+ * Create a standard Redux reducer function from a map of action types to reducers.
  *
- * @param {Object} actionToUpdateFn - Object mapping action names to update
- *                                      functions.
+ * @template {object} State
+ * @param {Record<string, (s: State, action: any) => Partial<State>>} reducers -
+ *   Object mapping action types to reducer functions. The result of the
+ *   reducer is merged with the existing state.
  */
-export function createReducer(actionToUpdateFn) {
-  return (state = {}, action) => {
-    const fn = actionToUpdateFn[action.type];
-    if (!fn) {
+export function createReducer(reducers) {
+  return (state = /** @type {State} */ ({}), action) => {
+    const reducer = reducers[action.type];
+    if (!reducer) {
       return state;
     }
+    const stateChanges = reducer(state, action);
+
     // Some modules return an array rather than an object. They need to be
-    // handled differently so we don't cast them to an object.
-    if (Array.isArray(state)) {
-      return [...fn(state, action)];
+    // handled differently so we don't convert them to an object.
+    if (Array.isArray(stateChanges)) {
+      return stateChanges;
     }
+
     return {
+      // @ts-expect-error - TS isn't certain `state` is spreadable here. Trust us!
       ...state,
-      ...fn(state, action),
+      ...stateChanges,
     };
   };
 }
