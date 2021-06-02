@@ -173,6 +173,18 @@ describe('createStore', () => {
     assert.equal(store.getState().b.count, 0);
   });
 
+  it('supports modules with static initial state', () => {
+    const initialState = { value: 42 };
+    const module = createStoreModule(initialState, {
+      namespace: 'test',
+      actionCreators: {},
+      reducers: {},
+      selectors: {},
+    });
+    const store = createStore([module]);
+    assert.equal(store.getState().test.value, 42);
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     it('freezes store state in development builds', () => {
       const store = counterStore();
