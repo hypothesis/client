@@ -23,30 +23,17 @@ import { createReducer, bindSelectors } from './util';
  */
 
 /**
- * Map of action name to reducer function.
+ * Map of action type to reducer function.
  *
  * @template State
- * @typedef {{ [action: string]: (s: State, action: any) => Partial<State> }} Reducers
+ * @typedef {{ [action: string]: (s: State, action: any) => Partial<State> }} ReducerMap
  */
 
 /**
- * Configuration for a store module.
+ * Map of selector name to selector function.
  *
  * @template State
- * @template {object} Actions
- * @template {object} Selectors
- * @template {object} RootSelectors
- * @typedef ModuleConfig
- * @prop {string} namespace -
- *   The key under which this module's state will live in the store's root state
- * @prop {Reducers<State>} reducers -
- *   Map of action types to "reducer" functions that process an action and return
- *   the changes to the state
- * @prop {Actions} actionCreators
- *   Object containing action creator functions
- * @prop {Selectors} selectors
- *   Object containing selector functions
- * @prop {RootSelectors} [rootSelectors]
+ * @typedef {{ [name: string]: (s: State, ...args: any[]) => any }} SelectorMap
  */
 
 /**
@@ -56,9 +43,18 @@ import { createReducer, bindSelectors } from './util';
  * @template {object} Actions
  * @template {object} Selectors
  * @template {object} RootSelectors
- * @typedef {ModuleConfig<State, Actions, Selectors, RootSelectors> & {
- *   initialState: (...args: any[]) => State
- * }} Module
+ * @typedef Module
+ * @prop {string} namespace -
+ *   The key under which this module's state will live in the store's root state
+ * @prop {(...args: any[]) => State} initialState
+ * @prop {ReducerMap<State>} reducers -
+ *   Map of action types to "reducer" functions that process an action and return
+ *   the changes to the state
+ * @prop {Actions} actionCreators
+ *   Object containing action creator functions
+ * @prop {Selectors} selectors
+ *   Object containing selector functions
+ * @prop {RootSelectors} [rootSelectors]
  */
 
 /**
@@ -191,15 +187,24 @@ export function createStore(modules, initArgs = [], middleware = []) {
   return store;
 }
 
+// The properties of the `config` argument to `createStoreModule` below are
+// declared inline due to https://github.com/microsoft/TypeScript/issues/43403.
+
 /**
  * Create a store module that can be passed to `createStore`.
  *
  * @template State
  * @template Actions
- * @template Selectors
+ * @template {SelectorMap<State>} Selectors
  * @template RootSelectors
  * @param {(...args: any[]) => State} initialState
- * @param {ModuleConfig<State,Actions,Selectors,RootSelectors>} config
+ * @param {object} config
+ *   @param {string} config.namespace -
+ *     The key under which this module's state will live in the store's root state
+ *   @param {ReducerMap<State>} config.reducers -
+ *   @param {Actions} config.actionCreators
+ *   @param {Selectors} config.selectors
+ *   @param {RootSelectors} [config.rootSelectors]
  * @return {Module<State,Actions,Selectors,RootSelectors>}
  */
 export function createStoreModule(initialState, config) {
