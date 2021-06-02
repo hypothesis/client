@@ -197,7 +197,7 @@ export function createStore(modules, initArgs = [], middleware = []) {
  * @template Actions
  * @template {SelectorMap<State>} Selectors
  * @template RootSelectors
- * @param {(...args: any[]) => State} initialState
+ * @param {State | ((...args: any[]) => State)} initialState
  * @param {object} config
  *   @param {string} config.namespace -
  *     The key under which this module's state will live in the store's root state
@@ -211,6 +211,12 @@ export function createStoreModule(initialState, config) {
   // The `initialState` argument is separate to `config` as this allows
   // TypeScript to infer the `State` type in the `config` argument at the
   // `createStoreModule` call site.
+
+  if (!(initialState instanceof Function)) {
+    const state = initialState;
+    initialState = () => state;
+  }
+
   return {
     initialState,
     ...config,
