@@ -17,7 +17,7 @@ import { registerIcons } from '@hypothesis/frontend-shared';
 import iconSet from './icons';
 registerIcons(iconSet);
 
-import configFrom from './config/index';
+import { getConfig } from './config/index';
 import Guest from './guest';
 import Notebook from './notebook';
 import Sidebar from './sidebar';
@@ -33,34 +33,30 @@ const appLinkEl = /** @type {Element} */ (
   )
 );
 
-const config = configFrom(window);
-
 function init() {
+  const annotatorConfig = getConfig('annotator');
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
-  if (config.subFrameIdentifier) {
+  if (annotatorConfig.subFrameIdentifier) {
     // Other modules use this to detect if this
     // frame context belongs to hypothesis.
     // Needs to be a global property that's set.
     window_.__hypothesis_frame = true;
   }
 
-  // Load the PDF anchoring/metadata integration.
-  config.documentType = isPDF ? 'pdf' : 'html';
-
   const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, config);
-  const sidebar = !config.subFrameIdentifier
-    ? new Sidebar(document.body, eventBus, guest, config)
+  const guest = new Guest(document.body, eventBus, {
+    ...annotatorConfig,
+    // Load the PDF anchoring/metadata integration.
+    // nb. documentType is an internal config property only
+    documentType: isPDF ? 'pdf' : 'html',
+  });
+  const sidebar = !annotatorConfig.subFrameIdentifier
+    ? new Sidebar(document.body, eventBus, guest, getConfig('sidebar'))
     : null;
   // Clear `annotations` value from the notebook's config to prevent direct-linked
   // annotations from filtering the threads.
-  //
-  // TODO: Refactor configFrom() so it can export application specific configs
-  // for different usages such as the notebook.
-  const notebookConfig = { ...config };
-  notebookConfig.annotations = null;
-  const notebook = new Notebook(document.body, eventBus, notebookConfig);
+  const notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
   appLinkEl.addEventListener('destroy', () => {
     sidebar?.destroy();
