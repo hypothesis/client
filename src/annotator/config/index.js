@@ -61,7 +61,14 @@ function configurationKeys(appContext) {
       return contexts.notebook;
     case 'all':
       // Complete list of configuration keys used for testing.
-      return [...contexts.annotator, ...contexts.sidebar, ...contexts.notebook];
+      return [
+        ...contexts.annotator,
+        ...contexts.sidebar,
+        ...contexts.notebook,
+        // "experimental" currently has no uses in any app contexts, but is included
+        // for test coverage
+        'experimental',
+      ];
     default:
       throw new Error(`Invalid application context used: "${appContext}"`);
   }
