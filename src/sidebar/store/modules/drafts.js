@@ -11,9 +11,8 @@ import { createStoreModule } from '../create-store';
  * existing annotations.
  */
 
-function initialState() {
-  return [];
-}
+/** @type {Draft[]} */
+const initialState = [];
 
 /**
  * Helper class to encapsulate the draft properties and a few simple methods.

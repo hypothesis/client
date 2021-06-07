@@ -9,21 +9,19 @@ import session from './session';
  * @typedef {import('../../../types/api').Group} Group
  */
 
-function initialState() {
-  return {
-    /**
-     * List of groups.
-     * @type {Group[]}
-     */
-    groups: [],
+const initialState = {
+  /**
+   * List of groups.
+   * @type {Group[]}
+   */
+  groups: [],
 
-    /**
-     * ID of currently selected group.
-     * @type {string|null}
-     */
-    focusedGroupId: null,
-  };
-}
+  /**
+   * ID of currently selected group.
+   * @type {string|null}
+   */
+  focusedGroupId: null,
+};
 
 const reducers = {
   FOCUS_GROUP(state, action) {

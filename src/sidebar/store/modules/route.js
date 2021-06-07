@@ -2,24 +2,29 @@ import { actionTypes } from '../util';
 
 import { createStoreModule } from '../create-store';
 
-function initialState() {
-  return {
-    /**
-     * The current route.
-     * One of null (if no route active yet), "sidebar", "annotation" or "stream".
-     */
-    name: null,
+/**
+ * @typedef {'annotation'|'notebook'|'sidebar'|'stream'} RouteName
+ */
 
-    /**
-     * Parameters of the current route.
-     *
-     * - The "annotation" route has an "id" (annotation ID) parameter.
-     * - The "stream" route has a "q" (query) parameter.
-     * - The "sidebar" route has no parameters.
-     */
-    params: {},
-  };
-}
+const initialState = {
+  /**
+   * The current route.
+   *
+   * @type {RouteName|null}
+   */
+  name: null,
+
+  /**
+   * Parameters of the current route.
+   *
+   * - The "annotation" route has an "id" (annotation ID) parameter.
+   * - The "stream" route has a "q" (query) parameter.
+   * - The "sidebar" route has no parameters.
+   *
+   * @type {Record<string, string>}
+   */
+  params: {},
+};
 
 const reducers = {
   CHANGE_ROUTE(state, { name, params }) {

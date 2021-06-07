@@ -16,17 +16,23 @@ import annotations from './annotations';
 import groups from './groups';
 import route from './route';
 
-function initialState() {
-  return {
-    // Map of ID -> updated annotation for updates that have been received over
-    // the WebSocket but not yet applied
-    pendingUpdates: {},
+const initialState = {
+  /**
+   * Map of ID -> updated annotation for updates that have been received over
+   * the WebSocket but not yet applied
+   *
+   * @type {Record<string, Annotation>}
+   */
+  pendingUpdates: {},
 
-    // Set of IDs of annotations which have been deleted but for which the
-    // deletion has not yet been applied
-    pendingDeletions: {},
-  };
-}
+  /**
+   * Set of IDs of annotations which have been deleted but for which the
+   * deletion has not yet been applied
+   *
+   * @type {Record<string, boolean>}
+   */
+  pendingDeletions: {},
+};
 
 const reducers = {
   RECEIVE_REAL_TIME_UPDATES(state, action) {

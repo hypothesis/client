@@ -7,14 +7,14 @@ import { createStoreModule } from '../create-store';
  * sidebar.
  */
 
-function initialState() {
-  return {
-    // Has the sidebar ever been opened? NB: This is not necessarily the
-    // current state of the sidebar, but tracks whether it has ever been open
-    sidebarHasOpened: false,
-    visibleHighlights: false,
-  };
-}
+const initialState = {
+  /**
+   * Has the sidebar ever been opened? NB: This is not necessarily the
+   * current state of the sidebar, but tracks whether it has ever been open
+   */
+  sidebarHasOpened: false,
+  visibleHighlights: false,
+};
 
 const reducers = {
   SET_HIGHLIGHTS_VISIBLE: function (state, action) {

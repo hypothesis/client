@@ -2,9 +2,7 @@ import { actionTypes } from '../util';
 import { replaceURLParams } from '../../util/url';
 import { createStoreModule } from '../create-store';
 
-function initialState() {
-  return null;
-}
+const initialState = /** @type {Record<string, string>|null} */ (null);
 
 const reducers = {
   UPDATE_LINKS(state, action) {

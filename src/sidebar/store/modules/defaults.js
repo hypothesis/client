@@ -16,18 +16,10 @@ import { createStoreModule } from '../create-store';
  * `persistedDefaults` service.
  */
 
-function initialState() {
-  /**
-   * Note that the persisted presence of any of these defaults cannot be
-   * guaranteed, so consumers of said defaults should be prepared to handle
-   * missing (i.e. `null`) values. As `null` is a sentinal value indicating
-   * "not set/unavailable", a `null` value for a default is otherwise invalid.
-   */
-  return {
-    annotationPrivacy: null,
-    focusedGroup: null,
-  };
-}
+const initialState = {
+  annotationPrivacy: /** @type {'private'|'shared'|null} */ (null),
+  focusedGroup: /** @type {string|null} */ (null),
+};
 
 const reducers = {
   SET_DEFAULT: function (state, action) {

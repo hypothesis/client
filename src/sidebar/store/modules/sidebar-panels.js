@@ -16,21 +16,20 @@ import * as util from '../util';
 
 import { createStoreModule } from '../create-store';
 
-function initialState() {
-  return {
-    /*
-     * The `panelName` of the currently-active sidebar panel.
-     * Only one `panelName` may be active at a time, but it is valid (though not
-     * the standard use case) for multiple `SidebarPanel` components to share
-     * the same `panelName`—`panelName` is not intended as a unique ID/key.
-     *
-     * e.g. If `activePanelName` were `foobar`, all `SidebarPanel` components
-     * with `panelName` of `foobar` would be active, and thus visible.
-     *
-     */
-    activePanelName: null,
-  };
-}
+const initialState = {
+  /*
+   * The `panelName` of the currently-active sidebar panel.
+   * Only one `panelName` may be active at a time, but it is valid (though not
+   * the standard use case) for multiple `SidebarPanel` components to share
+   * the same `panelName`—`panelName` is not intended as a unique ID/key.
+   *
+   * e.g. If `activePanelName` were `foobar`, all `SidebarPanel` components
+   * with `panelName` of `foobar` would be active, and thus visible.
+   *
+   * @type {PanelName|null}
+   */
+  activePanelName: null,
+};
 
 const reducers = {
   OPEN_SIDEBAR_PANEL: function (state, action) {
