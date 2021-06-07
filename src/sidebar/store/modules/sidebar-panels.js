@@ -17,7 +17,7 @@ import * as util from '../util';
 import { createStoreModule } from '../create-store';
 
 const initialState = {
-  /*
+  /**
    * The `panelName` of the currently-active sidebar panel.
    * Only one `panelName` may be active at a time, but it is valid (though not
    * the standard use case) for multiple `SidebarPanel` components to share
