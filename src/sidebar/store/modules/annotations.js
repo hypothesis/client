@@ -89,21 +89,30 @@ function initializeAnnotation(annotation, tag) {
   });
 }
 
-function initialState() {
-  return {
-    /** @type {Annotation[]} */
-    annotations: [],
-    // A set of annotations that are currently "focused" — e.g. hovered over in
-    // the UI
-    focused: {},
-    // A map of annotations that should appear as "highlighted", e.g. the
-    // target of a single-annotation view
-    highlighted: {},
-    // The local tag to assign to the next annotation that is loaded into the
-    // app
-    nextTag: 1,
-  };
-}
+const initialState = {
+  /**
+   * Set of all currently loaded annotations.
+   *
+   * @type {Annotation[]}
+   */
+  annotations: [],
+  /**
+   * A set of annotations that are currently "focused" — e.g. hovered over in
+   * the UI.
+   *
+   * @type {Record<string, boolean>}
+   */
+  focused: {},
+  /**
+   * A map of annotations that should appear as "highlighted", e.g. the
+   * target of a single-annotation view
+   *
+   * @type {Record<string, boolean>}
+   */
+  highlighted: {},
+  /** The local tag to assign to the next annotation that is loaded into the app. */
+  nextTag: 1,
+};
 
 const reducers = {
   ADD_ANNOTATIONS: function (state, action) {

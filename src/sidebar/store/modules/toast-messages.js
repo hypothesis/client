@@ -16,11 +16,11 @@ import * as util from '../util';
  * maintains state only; it's up to other layers to handle the management
  * and interactions with these messages.
  */
-function initialState() {
-  return {
-    messages: [],
-  };
-}
+
+const initialState = {
+  /** @type {ToastMessage[]} */
+  messages: [],
+};
 
 const reducers = {
   ADD_MESSAGE: function (state, action) {

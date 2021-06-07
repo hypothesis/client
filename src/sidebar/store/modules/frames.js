@@ -20,10 +20,8 @@ import { createStoreModule } from '../create-store';
  * @prop {string} uri - Current primary URI of the document being displayed
  */
 
-function initialState() {
-  // The list of frames connected to the sidebar app
-  return [];
-}
+/** @type {Frame[]} */
+const initialState = [];
 
 const reducers = {
   CONNECT_FRAME: function (state, action) {

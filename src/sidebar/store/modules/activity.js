@@ -6,31 +6,33 @@
 import { actionTypes } from '../util';
 import { createStoreModule } from '../create-store';
 
-function initialState() {
-  return {
-    /**
-     * Annotation `$tag`s that correspond to annotations with active API requests
-     */
-    activeAnnotationSaveRequests: [],
-    /**
-     * The number of API requests that have started and not yet completed.
-     */
-    activeApiRequests: 0,
-    /**
-     * The number of annotation fetches that have started and not yet completed.
-     */
-    activeAnnotationFetches: 0,
-    /**
-     * Have annotations ever been fetched?
-     */
-    hasFetchedAnnotations: false,
-    /**
-     * The number of total annotation results the service reported as
-     * matching the most recent load/search request
-     */
-    annotationResultCount: null,
-  };
-}
+const initialState = {
+  /**
+   * Annotation `$tag`s that correspond to annotations with active API requests
+   *
+   * @type {string[]}
+   */
+  activeAnnotationSaveRequests: [],
+  /**
+   * The number of API requests that have started and not yet completed.
+   */
+  activeApiRequests: 0,
+  /**
+   * The number of annotation fetches that have started and not yet completed.
+   */
+  activeAnnotationFetches: 0,
+  /**
+   * Have annotations ever been fetched?
+   */
+  hasFetchedAnnotations: false,
+  /**
+   * The number of total annotation results the service reported as
+   * matching the most recent load/search request
+   *
+   * @type {number|null}
+   */
+  annotationResultCount: null,
+};
 
 const reducers = {
   API_REQUEST_STARTED(state) {
