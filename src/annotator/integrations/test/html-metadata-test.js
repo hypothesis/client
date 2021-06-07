@@ -62,8 +62,7 @@ describe('HTMLMetadata', function () {
         <link rel="canonical" href="http://example.com/canonical"></link>
       `;
 
-      testDocument.getDocumentMetadata();
-      metadata = testDocument.metadata;
+      metadata = testDocument.getDocumentMetadata();
     });
 
     it('should have metadata', () => assert.ok(metadata));
@@ -167,12 +166,12 @@ describe('HTMLMetadata', function () {
         <link rel="alternate" href="http://a:b:c">
       `;
 
-      testDocument.getDocumentMetadata();
+      const metadata = testDocument.getDocumentMetadata();
 
       // There should be one link with the document location and one for the
       // valid `<link>` tag.
-      assert.deepEqual(testDocument.metadata.link.length, 2);
-      assert.deepEqual(testDocument.metadata.link[1], {
+      assert.deepEqual(metadata.link.length, 2);
+      assert.deepEqual(metadata.link[1], {
         rel: 'alternate',
         href: 'https://example.com/foo',
         type: '',
@@ -183,19 +182,19 @@ describe('HTMLMetadata', function () {
       tempDocumentHead.innerHTML = `
         <link rel="favicon" href="http://a:b:c">
       `;
-      testDocument.getDocumentMetadata();
-      assert.isUndefined(testDocument.metadata.favicon);
+      const metadata = testDocument.getDocumentMetadata();
+      assert.isUndefined(metadata.favicon);
     });
 
     it('should ignore `<meta>` PDF links with invalid URIs', () => {
       tempDocumentHead.innerHTML = `
         <meta name="citation_pdf_url" content="http://a:b:c">
       `;
-      testDocument.getDocumentMetadata();
+      const metadata = testDocument.getDocumentMetadata();
 
       // There should only be one link for the document's location.
       // The invalid PDF link should be ignored.
-      assert.equal(testDocument.metadata.link.length, 1);
+      assert.equal(metadata.link.length, 1);
     });
   });
 
