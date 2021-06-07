@@ -78,22 +78,6 @@ export class HTMLMetadata {
   }
 
   /**
-   * Returns all uris for the document being annotated
-   *
-   * @return {string[]}
-   */
-  uris() {
-    const metadata = this.getDocumentMetadata();
-    const uniqueUrls = {};
-    for (let link of metadata.link) {
-      if (link.href) {
-        uniqueUrls[link.href] = true;
-      }
-    }
-    return Object.keys(uniqueUrls);
-  }
-
-  /**
    * Return metadata for the current page.
    *
    * @return {HTMLDocumentMetadata}

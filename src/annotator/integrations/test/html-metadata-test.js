@@ -196,11 +196,6 @@ describe('HTMLMetadata', function () {
       });
     });
 
-    it('should have unique uris', function () {
-      const uris = testDocument.uris();
-      assert.equal(uris.length, 8);
-    });
-
     it('uri() returns the canonical uri', function () {
       const uri = testDocument.uri();
       assert.equal(uri, metadata.link[5].href);
