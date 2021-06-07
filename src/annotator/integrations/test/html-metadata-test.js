@@ -65,10 +65,63 @@ describe('HTMLMetadata', function () {
       metadata = testDocument.getDocumentMetadata();
     });
 
-    it('should have metadata', () => assert.ok(metadata));
+    it('should return title', () => {
+      // Populate all supported title sources.
+      tempDocument.title = 'Test document title';
+      tempDocumentHead.innerHTML = `
+  <meta name="eprints.title" content="Eprints title">
+  <meta name="prism.title" content="PRISM title">
+  <meta name="dc.title" content="Dublin Core title">
+  <meta name="citation_title" content="Highwire title">
+  <meta property="og:title" content="Facebook title">
+  <meta name="twitter:title" content="Twitter title">
+  `;
 
-    it('should have a title, derived from highwire metadata if possible', () => {
-      assert.equal(metadata.title, 'Foo');
+      // Title values, in order of source priority.
+      const sources = [
+        {
+          metaName: 'citation_title',
+          value: 'Highwire title',
+        },
+        {
+          metaName: 'eprints.title',
+          value: 'Eprints title',
+        },
+        {
+          metaName: 'prism.title',
+          value: 'PRISM title',
+        },
+        {
+          metaAttr: 'property',
+          metaName: 'og:title',
+          value: 'Facebook title',
+        },
+        {
+          metaName: 'twitter:title',
+          value: 'Twitter title',
+        },
+        {
+          metaName: 'dc.title',
+          value: 'Dublin Core title',
+        },
+        {
+          value: 'Test document title',
+        },
+      ];
+
+      for (let source of sources) {
+        const metadata = testDocument.getDocumentMetadata();
+        assert.equal(metadata.title, source.value);
+
+        // Remove this title source. The next iteration should return the next
+        // title value in the priority order.
+        if (source.metaName) {
+          const attr = source.metaAttr ?? 'name';
+          tempDocumentHead
+            .querySelector(`meta[${attr}="${source.metaName}"]`)
+            .remove();
+        }
+      }
     });
 
     it('should have links with absolute hrefs and types', function () {
