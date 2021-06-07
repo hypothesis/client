@@ -20,14 +20,18 @@
 import { normalizeURI } from '../util/url';
 
 /**
+ * @typedef Link
+ * @prop {string} link.href
+ * @prop {string} [link.rel]
+ * @prop {string} [link.type]
+ */
+
+/**
  * Extension of the `Metadata` type with non-optional fields for `dc`, `eprints` etc.
  *
  * @typedef HTMLDocumentMetadata
  * @prop {string} title
- * @prop {Object[]} link
- *   @prop {string} [link.rel]
- *   @prop {string} [link.type]
- *   @prop {string} link.href
+ * @prop {Link[]} link
  * @prop {Object.<string, string[]>} dc
  * @prop {Object.<string, string[]>} eprints
  * @prop {Object.<string, string[]>} facebook
@@ -60,13 +64,16 @@ export class HTMLMetadata {
    * @return {string}
    */
   uri() {
-    const links = this._getLinks({ dc: {}, highwire: {} });
     let uri = decodeURIComponent(this._getDocumentHref());
+
+    // Use the `link[rel=canonical]` element's href as the URL if present.
+    const links = this._getLinks();
     for (let link of links) {
       if (link.rel === 'canonical') {
         uri = link.href;
       }
     }
+
     return uri;
   }
 
@@ -171,13 +178,17 @@ export class HTMLMetadata {
   }
 
   /**
-   * @param {Pick<HTMLDocumentMetadata, 'highwire'|'dc'>} metadata
+   * Get document URIs from `<link>` and `<meta>` elements on the page.
+   *
+   * @param {Pick<HTMLDocumentMetadata, 'highwire'|'dc'>} [metadata] -
+   *   Dublin Core and Highwire metadata parsed from `<meta>` tags.
+   * @return {Link[]}
    */
-  _getLinks(metadata) {
-    // We know our current location is a link for the document.
+  _getLinks(metadata = { dc: {}, highwire: {} }) {
+    /** @type {Link[]} */
     const links = [{ href: this._getDocumentHref() }];
 
-    // Extract links from certain `<link>` tags.
+    // Extract links from `<link>` tags with certain `rel` values.
     const linkElements = Array.from(this.document.querySelectorAll('link'));
     for (let link of linkElements) {
       if (
@@ -205,7 +216,7 @@ export class HTMLMetadata {
       }
     }
 
-    // look for links in scholar metadata
+    // Look for links in scholar metadata
     for (let name of Object.keys(metadata.highwire)) {
       const values = metadata.highwire[name];
       if (name === 'pdf_url') {
@@ -221,9 +232,9 @@ export class HTMLMetadata {
         }
       }
 
-      // kind of a hack to express DOI identifiers as links but it's a
+      // Kind of a hack to express DOI identifiers as links but it's a
       // convenient place to look them up later, and somewhat sane since
-      // they don't have a type
+      // they don't have a type.
       if (name === 'doi') {
         for (let doi of values) {
           if (doi.slice(0, 4) !== 'doi:') {
@@ -234,7 +245,7 @@ export class HTMLMetadata {
       }
     }
 
-    // look for links in dublincore data
+    // Look for links in Dublin Core data
     for (let name of Object.keys(metadata.dc)) {
       const values = metadata.dc[name];
       if (name === 'identifier') {
@@ -246,7 +257,7 @@ export class HTMLMetadata {
       }
     }
 
-    // look for a link to identify the resource in dublincore metadata
+    // Look for a link to identify the resource in Dublin Core metadata
     const dcRelationValues = metadata.dc['relation.ispartof'];
     const dcIdentifierValues = metadata.dc.identifier;
     if (dcRelationValues && dcIdentifierValues) {
