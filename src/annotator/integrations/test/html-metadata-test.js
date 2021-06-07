@@ -10,11 +10,9 @@
  ** https://github.com/openannotation/annotator/blob/master/LICENSE
  */
 
-import { normalizeURI } from '../../util/url';
 import { HTMLMetadata } from '../html-metadata';
 
 describe('HTMLMetadata', () => {
-  let fakeNormalizeURI;
   let tempDocument;
   let tempDocumentHead;
   let testDocument = null;
@@ -25,13 +23,8 @@ describe('HTMLMetadata', () => {
     tempDocumentHead = document.createElement('head');
     tempDocument.appendChild(tempDocumentHead);
 
-    fakeNormalizeURI = sinon.stub().callsFake((url, base) => {
-      return normalizeURI(url, base);
-    });
-
     testDocument = new HTMLMetadata({
       document: tempDocument,
-      normalizeURI: fakeNormalizeURI,
     });
   });
 
@@ -296,6 +289,7 @@ describe('HTMLMetadata', () => {
       // document.
       const fakeDocument = {
         createElement: htmlDoc.createElement.bind(htmlDoc), // eslint-disable-line no-restricted-properties
+        baseURI: baseURI ?? href,
         querySelectorAll: htmlDoc.querySelectorAll.bind(htmlDoc), // eslint-disable-line no-restricted-properties
         location: {
           href,
@@ -303,7 +297,6 @@ describe('HTMLMetadata', () => {
       };
       const doc = new HTMLMetadata({
         document: fakeDocument,
-        baseURI,
       });
       return doc;
     };

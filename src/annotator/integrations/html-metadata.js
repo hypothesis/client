@@ -49,13 +49,9 @@ export class HTMLMetadata {
   /**
    * @param {object} [options]
    *   @param {Document} [options.document]
-   *   @param {string} [options.baseURI]
-   *   @param {normalizeURI} [options.normalizeURI]
    */
   constructor(options = {}) {
     this.document = options.document || document;
-    this.baseURI = options.baseURI || this.document.baseURI;
-    this.normalizeURI = options.normalizeURI || normalizeURI;
   }
 
   /**
@@ -279,7 +275,7 @@ export class HTMLMetadata {
    * exception if the URL cannot be parsed.
    */
   _absoluteUrl(url) {
-    return this.normalizeURI(url, this.baseURI);
+    return normalizeURI(url, this.document.baseURI);
   }
 
   // Get the true URI record when it's masked via a different protocol.
@@ -297,10 +293,10 @@ export class HTMLMetadata {
 
     // Otherwise, try using the location specified by the <base> element.
     if (
-      this.baseURI &&
-      allowedSchemes.includes(new URL(this.baseURI).protocol)
+      this.document.baseURI &&
+      allowedSchemes.includes(new URL(this.document.baseURI).protocol)
     ) {
-      return this.baseURI;
+      return this.document.baseURI;
     }
 
     // Fall back to returning the document URI, even though the scheme is not
