@@ -1083,10 +1083,10 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hypothesis/frontend-shared@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-2.1.0.tgz#aed3ad900cca2f2284faaaf1b7931c0bbcc7b9f4"
-  integrity sha512-hy4qjVDaMJ0Uti73vfAjXI4EzWfcjP/05TmGU8on4F6dF/AJV3fV7mIDCtAaKTik8VAGy26yQfB3PaZ/QSxewg==
+"@hypothesis/frontend-shared@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-3.0.0.tgz#95e0a10e2d347e74ba6d3149320372954029de9e"
+  integrity sha512-l0B7Ch+Jcp0b89lFm3ePpyudFCCwam0LwLlldFlrvMkH+PC6NbShUG3YB+VVSwbsu/YF0d/RSzzeyhqp9+Zljg==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"

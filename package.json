@@ -12,7 +12,7 @@
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "@babel/preset-react": "^7.0.0",
-    "@hypothesis/frontend-shared": "^2.0.0",
+    "@hypothesis/frontend-shared": "^3.0.0",
     "@octokit/rest": "^18.0.0",
     "@sentry/browser": "^6.0.2",
     "approx-string-match": "^1.1.0",
