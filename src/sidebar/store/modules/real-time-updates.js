@@ -19,7 +19,8 @@ import route from './route';
 const initialState = {
   /**
    * Map of ID -> updated annotation for updates that have been received over
-   * the WebSocket but not yet applied
+   * the WebSocket but not yet applied (ie. saved to the "annotations" store
+   * module and shown in the UI).
    *
    * @type {Record<string, Annotation>}
    */
