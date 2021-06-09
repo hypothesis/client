@@ -10,8 +10,11 @@ import { RPC } from './frame-rpc';
  */
 export default class Bridge {
   constructor() {
+    /** @type {Array<{channel: RPC, windowOrPort: Window|MessagePort}>} */
     this.links = [];
+    /** @type {Record<string, (...args: any[]) => void>} */
     this.channelListeners = {};
+    /** @type {Array<(...args: any[]) => void>} */
     this.onConnectListeners = [];
   }
 
@@ -30,7 +33,7 @@ export default class Bridge {
    * The created channel is added to the list of channels which `call`
    * and `on` send and receive messages over.
    *
-   * @param {Window} source - The source window.
+   * @param {Window|MessagePort} source - The source window.
    * @param {string} origin - The origin of the document in `source`.
    * @param {string} token
    * @return {RPC} - Channel for communicating with the window.
@@ -67,7 +70,48 @@ export default class Bridge {
     // Store the newly created channel in our collection
     this.links.push({
       channel,
-      window: source,
+      windowOrPort: source, // TODO: unused, candidate to be removed
+    });
+
+    return channel;
+  }
+
+  /**
+   * Create a communication channel using `MessageChannel.MessagePort`.
+   *
+   * The created channel is added to the list of channels which `call`
+   * and `on` send and receive messages over.
+   *
+   * @param {MessagePort} port - The source port.
+   * @param {'host'|'sidebar'|'notebook'|'guest'} destinationFrame - TODO: this is to
+   * allow, in the future, to communicate with specific frames
+   * `bridge.call(..., {targetFrames: ['sidebar'|'notebook'|'host'|'guest']})`
+   * @return {RPC} - Channel for communicating with the port.
+   */
+  // eslint-disable-next-line no-unused-vars
+  createChannelFromPort(port, destinationFrame) {
+    const listeners = { ...this.channelListeners, connect: cb => cb() };
+
+    // Set up a channel
+    const channel = new RPC(
+      window /* dummy */,
+      port,
+      '*' /* dummy */,
+      listeners
+    );
+
+    // Fire off a connection attempt
+    const ready = () => {
+      Array.from(this.onConnectListeners).forEach(cb =>
+        cb.call(null, channel, port)
+      );
+    };
+    channel.call('connect', ready);
+
+    // Store the newly created channel in our collection
+    this.links.push({
+      channel,
+      windowOrPort: port, // TODO: unused, candidate to be removed
     });
 
     return channel;
@@ -140,7 +184,7 @@ export default class Bridge {
    * message to this `Bridge`.
    *
    * @param {string} method
-   * @param {Function} callback
+   * @param {(...args: any[]) => void} callback
    */
   on(method, callback) {
     if (this.channelListeners[method]) {
@@ -163,7 +207,7 @@ export default class Bridge {
   /**
    * Add a function to be called upon a new connection.
    *
-   * @param {Function} callback
+   * @param {(...args: any[]) => void} callback
    */
   onConnect(callback) {
     this.onConnectListeners.push(callback);
