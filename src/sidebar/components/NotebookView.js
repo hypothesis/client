@@ -2,6 +2,7 @@ import { IconButton, Panel } from '@hypothesis/frontend-shared';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
+import { PortFinder } from '../../shared/communicator';
 import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
@@ -13,6 +14,7 @@ import useRootThread from './hooks/use-root-thread';
 
 /**
  * @typedef NotebookViewProps
+ * @prop {import('../../shared/bridge').default} bridge
  * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
  * @prop {import('../services/streamer').StreamerService} streamer
  */
@@ -22,7 +24,7 @@ import useRootThread from './hooks/use-root-thread';
  *
  * @param {NotebookViewProps} props
  */
-function NotebookView({ loadAnnotationsService, streamer }) {
+function NotebookView({ bridge, loadAnnotationsService, streamer }) {
   const store = useStoreProxy();
 
   const filters = store.getFilterValues();
@@ -63,6 +65,28 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   };
 
   const hasFetchedProfile = store.hasFetchedProfile();
+
+  useEffect(() => {
+    bridge.on('openNotebook', (/** @type {string} */ newGroupId) => {
+      store.focusGroup(newGroupId);
+      // TODO: it would be nice to update the URL
+    });
+
+    const framePort = new PortFinder();
+    framePort
+      .discover({
+        channel: 'notebookToSidebarChannel',
+        hostFrame: window.parent,
+        port: 'notebook',
+      })
+      .then(port => bridge.createChannelFromPort(port, 'sidebar'));
+
+    return () => {
+      framePort.destroy();
+    };
+    // avoid `store` to be in the array of dependencies. TODO: fix later
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bridge]);
 
   // Establish websocket connection
   useEffect(() => {
@@ -176,6 +200,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
 }
 
 export default withServices(NotebookView, [
+  'bridge',
   'loadAnnotationsService',
   'streamer',
 ]);
