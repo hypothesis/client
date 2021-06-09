@@ -3,6 +3,22 @@ import { parseJsonConfig } from '../../boot/parse-json-config';
 import configFuncSettingsFrom from './config-func-settings-from';
 import isBrowserExtension from './is-browser-extension';
 
+/**
+ * @typedef SettingsGetters
+ * @prop {string|null} annotations
+ * @prop {string|null} query
+ * @prop {string|null} group
+ * @prop {string} showHighlights
+ * @prop {string} clientUrl
+ * @prop {string} sidebarAppUrl
+ * @prop {string} notebookAppUrl
+ 
+ * @prop {(name: string, options?: Object) => (string|null)} hostPageSetting
+ */
+
+/**
+ * @return {SettingsGetters}
+ */
 export default function settingsFrom(window_) {
   const jsonConfigs = parseJsonConfig(window_.document);
   const configFuncSettings = configFuncSettingsFrom(window_);

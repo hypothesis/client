@@ -3,6 +3,14 @@ import { toBoolean } from '../../shared/type-coercions';
 
 /**
  * @typedef {'sidebar'|'notebook'|'annotator'|'all'} AppContext
+ *
+ * @typedef {import('./settings').SettingsGetters} SettingsGetters
+ *
+ * @typedef ConfigDefinition
+ * @prop {(settings: SettingsGetters) => any} getValue -
+ *   Method to retrieve the value from the incoming source
+ *
+ * @typedef {Record<string, ConfigDefinition>} ConfigDefinitionMap
  */
 
 /**
@@ -60,61 +68,83 @@ function configurationKeys(appContext) {
 }
 
 /**
- * Reads the Hypothesis configuration from the environment.
- *
- * @param {string[]} settingsKeys - List of settings that should be returned.
- * @param {Window} window_ - The Window object to read config from.
+ * Definitions of configuration keys
+ * @type {ConfigDefinitionMap}
  */
-function configFrom(settingsKeys, window_) {
-  const settings = settingsFrom(window_);
-  const allConfigSettings = {
-    annotations: settings.annotations,
-    appType: settings.hostPageSetting('appType', {
-      allowInBrowserExt: true,
-    }),
-    branding: settings.hostPageSetting('branding'),
-    // URL of the client's boot script. Used when injecting the client into
-    // child iframes.
-    clientUrl: settings.clientUrl,
-    enableExperimentalNewNoteButton: settings.hostPageSetting(
-      'enableExperimentalNewNoteButton'
-    ),
-    experimental: settings.hostPageSetting('experimental', {
-      defaultValue: {},
-    }),
-    group: settings.group,
-    focus: settings.hostPageSetting('focus'),
-    theme: settings.hostPageSetting('theme'),
-    usernameUrl: settings.hostPageSetting('usernameUrl'),
-    onLayoutChange: settings.hostPageSetting('onLayoutChange'),
-    openSidebar: settings.hostPageSetting('openSidebar', {
-      allowInBrowserExt: true,
-      // Coerce value to a boolean because it may come from via as a string
-      coerce: toBoolean,
-    }),
-    query: settings.query,
-    requestConfigFromFrame: settings.hostPageSetting('requestConfigFromFrame'),
-    services: settings.hostPageSetting('services'),
-    showHighlights: settings.showHighlights,
-    notebookAppUrl: settings.notebookAppUrl,
-    sidebarAppUrl: settings.sidebarAppUrl,
-    // Subframe identifier given when a frame is being embedded into
-    // by a top level client
-    subFrameIdentifier: settings.hostPageSetting('subFrameIdentifier', {
-      allowInBrowserExt: true,
-    }),
-    externalContainerSelector: settings.hostPageSetting(
-      'externalContainerSelector'
-    ),
-  };
-
-  // Only return what we asked for
-  const resultConfig = {};
-  settingsKeys.forEach(key => {
-    resultConfig[key] = allConfigSettings[key];
-  });
-  return resultConfig;
-}
+const configDefinitions = {
+  annotations: {
+    getValue: settings => settings.annotations,
+  },
+  appType: {
+    getValue: settings =>
+      settings.hostPageSetting('appType', {
+        allowInBrowserExt: true,
+      }),
+  },
+  branding: {
+    getValue: settings => settings.hostPageSetting('branding'),
+  },
+  // URL of the client's boot script. Used when injecting the client into
+  // child iframes.
+  clientUrl: {
+    getValue: settings => settings.clientUrl,
+  },
+  enableExperimentalNewNoteButton: {
+    getValue: settings =>
+      settings.hostPageSetting('enableExperimentalNewNoteButton'),
+  },
+  group: {
+    getValue: settings => settings.group,
+  },
+  focus: {
+    getValue: settings => settings.hostPageSetting('focus'),
+  },
+  theme: {
+    getValue: settings => settings.hostPageSetting('theme'),
+  },
+  usernameUrl: {
+    getValue: settings => settings.hostPageSetting('usernameUrl'),
+  },
+  onLayoutChange: {
+    getValue: settings => settings.hostPageSetting('onLayoutChange'),
+  },
+  openSidebar: {
+    getValue: settings =>
+      settings.hostPageSetting('openSidebar', {
+        allowInBrowserExt: true,
+        coerce: toBoolean,
+      }),
+  },
+  query: {
+    getValue: settings => settings.query,
+  },
+  requestConfigFromFrame: {
+    getValue: settings => settings.hostPageSetting('requestConfigFromFrame'),
+  },
+  services: {
+    getValue: settings => settings.hostPageSetting('services'),
+  },
+  showHighlights: {
+    getValue: settings => settings.showHighlights,
+  },
+  notebookAppUrl: {
+    getValue: settings => settings.notebookAppUrl,
+  },
+  sidebarAppUrl: {
+    getValue: settings => settings.sidebarAppUrl,
+  },
+  // Sub-frame identifier given when a frame is being embedded into
+  // by a top level client
+  subFrameIdentifier: {
+    getValue: settings =>
+      settings.hostPageSetting('subFrameIdentifier', {
+        allowInBrowserExt: true,
+      }),
+  },
+  externalContainerSelector: {
+    getValue: settings => settings.hostPageSetting('externalContainerSelector'),
+  },
+};
 
 /**
  * Return the configuration for a given application context.
@@ -122,9 +152,16 @@ function configFrom(settingsKeys, window_) {
  * @param {AppContext} [appContext] - The name of the app.
  */
 export function getConfig(appContext = 'annotator', window_ = window) {
+  const settings = settingsFrom(window_);
+  const config = {};
   // Filter the config based on the application context as some config values
   // may be inappropriate or erroneous for some applications.
-  const filteredKeys = configurationKeys(appContext);
-  const config = configFrom(filteredKeys, window_);
+  let filteredKeys = configurationKeys(appContext);
+  filteredKeys.forEach(name => {
+    const configDef = configDefinitions[name];
+    // Get the value from the configuration source
+    config[name] = configDef.getValue(settings);
+  });
+
   return config;
 }
