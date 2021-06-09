@@ -33,7 +33,7 @@ export default class Bridge {
    * The created channel is added to the list of channels which `call`
    * and `on` send and receive messages over.
    *
-   * @param {Window|MessagePort} source - The source window.
+   * @param {Window|MessagePort} source - The message source.
    * @param {string} origin - The origin of the document in `source`.
    * @param {string} token
    * @return {RPC} - Channel for communicating with the window.

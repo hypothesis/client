@@ -2,7 +2,7 @@
  * @typedef Listener
  * @prop {EventTarget} eventTarget
  * @prop {string} eventType
- * @prop {(event: Event) => void} listener
+ * @prop {(event: Event|MessageEvent) => void} listener
  */
 
 /**
