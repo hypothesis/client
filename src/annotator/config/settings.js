@@ -1,4 +1,5 @@
 import { parseJsonConfig } from '../../boot/parse-json-config';
+import { toBoolean } from '../../shared/type-coercions';
 
 import configFuncSettingsFrom from './config-func-settings-from';
 import isBrowserExtension from './is-browser-extension';
@@ -20,8 +21,17 @@ import isBrowserExtension from './is-browser-extension';
  * @return {SettingsGetters}
  */
 export default function settingsFrom(window_) {
-  const jsonConfigs = parseJsonConfig(window_.document);
+  // Prioritize the `window.hypothesisConfig` function over the JSON format
+  // Via uses `window.hypothesisConfig` and makes it non-configurable and non-writable.
+  // In addition, Via sets the `ignoreOtherConfiguration` option to prevent configuration merging.
   const configFuncSettings = configFuncSettingsFrom(window_);
+
+  let jsonConfigs;
+  if (toBoolean(configFuncSettings.ignoreOtherConfiguration)) {
+    jsonConfigs = {};
+  } else {
+    jsonConfigs = parseJsonConfig(window_.document);
+  }
 
   /**
    * Return the href of the first annotator link in the given

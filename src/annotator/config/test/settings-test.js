@@ -580,8 +580,17 @@ describe('annotator/config/settingsFrom', () => {
         specify: 'it returns setting values from window.hypothesisConfig()',
         isBrowserExtension: false,
         configFuncSettings: { foo: 'configFuncValue' },
-        jsonSettings: {},
+        jsonSettings: { foo: 'ignored' }, // hypothesisConfig() overrides js-hypothesis-config
         expected: 'configFuncValue',
+      },
+      {
+        when: 'the client is embedded in a web page',
+        specify:
+          'it ignores settings from js-hypothesis-config if `ignoreOtherConfiguration` is present',
+        isBrowserExtension: false,
+        configFuncSettings: { ignoreOtherConfiguration: '1' },
+        jsonSettings: { foo: 'ignored' },
+        expected: null,
       },
       {
         when: 'the client is embedded in a web page',
