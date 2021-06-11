@@ -1,6 +1,6 @@
 import { render } from 'preact';
 
-import ConfirmDialog from './components/ConfirmDialog';
+import { ConfirmModal } from '@hypothesis/frontend-shared';
 
 /**
  * Show the user a prompt asking them to confirm an action.
@@ -11,7 +11,7 @@ import ConfirmDialog from './components/ConfirmDialog';
  *    for the native `window.confirm` dialog)
  *  - The visual style of the dialog matches the Hypothesis design system
  *
- * @param {object} options - Options for the `ConfirmDialog`
+ * @param {object} options - Options for the `ConfirmModal`
  *   @prop {string} [title]
  *   @prop {string} message
  *   @prop {string} [confirmAction]
@@ -52,7 +52,7 @@ export async function confirm({
     };
 
     render(
-      <ConfirmDialog
+      <ConfirmModal
         title={title}
         message={message}
         confirmAction={confirmAction}
