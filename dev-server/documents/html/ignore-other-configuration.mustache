@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ignore configuration test</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+    </style>
+
+    <!-- This configuration is ignored -->
+    <script type="application/json" class="js-hypothesis-config">
+      {
+        "theme": "clean",
+        "openSidebar": true
+      }
+    </script>
+
+    <!-- This configuration wins -->
+    <script>
+      Object.defineProperty(window, 'hypothesisConfig', {
+        value: function () {
+          return {
+            openSidebar: false,
+            ignoreOtherConfiguration: true,
+          };
+        },
+      });
+    </script>
+  </head>
+  <body>
+    <h1>Ignore configuration test</h1>
+    <p>
+      <em>viahtml</em> sets the <code>ignoreOtherConfiguration</code> option in
+      the result of <code>window.hypothesisConfig()</code>. This option
+      disregards other sources of Hypothesis configuration that the host page
+      could include.
+    </p>
+    <p>
+      In addition, <em>viahtml</em> makes
+      <code>window.hypothesisConfig</code> non-configurable and non-writable.
+      These two settings together makes the client consistently behave on
+      <em>via</em> (PDF or html).
+    </p>
+    <p>
+      If this test works, it should make the sidebar remain closed and use the
+      classic theme. The options
+      <code>openSidebar : true</code> and <code>theme: "clean"</code>
+      should be ignored.
+    </p>
+    {{{hypothesisScript}}}
+  </body>
+</html>
