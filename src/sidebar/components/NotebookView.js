@@ -1,4 +1,4 @@
-import { IconButton } from '@hypothesis/frontend-shared';
+import { IconButton, Panel } from '@hypothesis/frontend-shared';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
@@ -8,7 +8,6 @@ import { useStoreProxy } from '../store/use-store';
 
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
-import Panel from './Panel';
 import PaginatedThreadList from './PaginatedThreadList';
 import useRootThread from './hooks/use-root-thread';
 

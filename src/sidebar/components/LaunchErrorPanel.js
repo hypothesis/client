@@ -1,4 +1,4 @@
-import Panel from './Panel';
+import { Panel } from '@hypothesis/frontend-shared';
 
 /**
  * @typedef LaunchErrorPanelProps
@@ -16,9 +16,7 @@ import Panel from './Panel';
 export default function LaunchErrorPanel({ error }) {
   return (
     <div className="LaunchErrorPanel">
-      <Panel title="Unable to start Hypothesis">
-        <p>{error.message}</p>
-      </Panel>
+      <Panel title="Unable to start Hypothesis">{error.message}</Panel>
     </div>
   );
 }
