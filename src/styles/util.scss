@@ -89,3 +89,15 @@
 .u-color-text--muted {
   color: var.$color-text--light;
 }
+
+// TODO: This is a temporary utility class to allow elements in the sidebar
+// (e.g. panels, thread cards, etc.)
+// to apply margins such that they are evenly spaced. In the future, the
+// sidebar markup (DOM structure) should be reorganized and consolidated such
+// that is possible to apply vertical-spacing rules to the sidebar container
+// (these rules set margins on immediate-child elements).
+// This class should be removed once patterns are available for vertical spacing
+// and the sidebar element structure can be adjusted.
+.u-sidebar-container {
+  margin-bottom: 1em;
+}
