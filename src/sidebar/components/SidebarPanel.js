@@ -1,9 +1,9 @@
+import { Panel } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
 import { useStoreProxy } from '../store/use-store';
 
-import Panel from './Panel';
 import Slider from './Slider';
 
 /**
@@ -60,7 +60,7 @@ export default function SidebarPanel({
 
   return (
     <Slider visible={panelIsActive}>
-      <div ref={panelElement}>
+      <div ref={panelElement} className="u-sidebar-container">
         <Panel title={title} icon={icon} onClose={closePanel}>
           {children}
         </Panel>

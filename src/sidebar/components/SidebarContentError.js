@@ -1,8 +1,6 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
+import { LabeledButton, Panel } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
-
-import Panel from './Panel';
 
 /**
  * @typedef SidebarContentErrorProps
@@ -42,23 +40,25 @@ export default function SidebarContentError({
   })();
 
   return (
-    <Panel icon="restricted" title={errorTitle}>
-      <p>{errorMessage}</p>
-      <div className="u-layout-row--justify-right u-horizontal-rhythm">
-        {showClearSelection && (
-          <LabeledButton
-            variant={isLoggedIn ? 'primary' : undefined}
-            onClick={() => store.clearSelection()}
-          >
-            Show all annotations
-          </LabeledButton>
-        )}
-        {!isLoggedIn && (
-          <LabeledButton variant="primary" onClick={onLoginRequest}>
-            Log in
-          </LabeledButton>
-        )}
-      </div>
-    </Panel>
+    <div className="u-sidebar-container">
+      <Panel icon="restricted" title={errorTitle}>
+        <p>{errorMessage}</p>
+        <div className="u-layout-row--justify-right u-horizontal-rhythm">
+          {showClearSelection && (
+            <LabeledButton
+              variant={isLoggedIn ? 'primary' : undefined}
+              onClick={() => store.clearSelection()}
+            >
+              Show all annotations
+            </LabeledButton>
+          )}
+          {!isLoggedIn && (
+            <LabeledButton variant="primary" onClick={onLoginRequest}>
+              Log in
+            </LabeledButton>
+          )}
+        </div>
+      </Panel>
+    </div>
   );
 }
