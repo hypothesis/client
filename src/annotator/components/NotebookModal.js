@@ -98,6 +98,10 @@ export default function NotebookModal({ eventBus, config }) {
     emitter.current.publish('closeNotebook');
   };
 
+  if (groupId === null) {
+    return null;
+  }
+
   return (
     <div
       className={classnames('NotebookModal__outer', { 'is-hidden': isHidden })}
@@ -111,9 +115,7 @@ export default function NotebookModal({ eventBus, config }) {
             variant="dark"
           />
         </div>
-        {groupId !== null && (
-          <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
-        )}
+        <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
       </div>
     </div>
   );

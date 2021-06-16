@@ -34,15 +34,14 @@ describe('NotebookModal', () => {
     const wrapper = createComponent();
     const outer = wrapper.find('.NotebookModal__outer');
 
-    assert.isTrue(outer.hasClass('is-hidden'));
-    assert.isFalse(wrapper.find('iframe').exists());
+    assert.isFalse(outer.exists());
   });
 
   it('shows modal on "openNotebook" event', () => {
     const wrapper = createComponent();
     let outer = wrapper.find('.NotebookModal__outer');
 
-    assert.isTrue(outer.hasClass('is-hidden'));
+    assert.isFalse(outer.exists());
     assert.isFalse(wrapper.find('iframe').exists());
 
     emitter.publish('openNotebook', 'myGroup');
@@ -124,6 +123,7 @@ describe('NotebookModal', () => {
       emitter.publish('openNotebook', 'myGroup');
     });
     assert.equal(document.body.style.overflow, 'hidden');
+    wrapper.update();
     act(() => {
       wrapper.find('IconButton').prop('onClick')();
     });
