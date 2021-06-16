@@ -1,10 +1,10 @@
 import renderMarkdown from '../render-markdown';
 import { $imports } from '../render-markdown';
 
-describe('render-markdown', function () {
+describe('render-markdown', () => {
   let render;
 
-  beforeEach(function () {
+  beforeEach(() => {
     $imports.$mock({
       katex: {
         renderToString: function (input, opts) {
@@ -16,17 +16,16 @@ describe('render-markdown', function () {
         },
       },
     });
-    render = function (markdown) {
-      return renderMarkdown(markdown);
-    };
+
+    render = markdown => renderMarkdown(markdown);
   });
 
   afterEach(() => {
     $imports.$restore();
   });
 
-  describe('autolinking', function () {
-    it('should autolink URLs', function () {
+  describe('autolinking', () => {
+    it('should autolink URLs', () => {
       assert.equal(
         render('See this link - http://arxiv.org/article'),
         '<p>See this link - <a href="http://arxiv.org/article" target="_blank">' +
@@ -34,7 +33,7 @@ describe('render-markdown', function () {
       );
     });
 
-    it("should autolink URLs with _'s in them correctly", function () {
+    it("should autolink URLs with _'s in them correctly", () => {
       assert.equal(
         render(
           'See this https://hypothes.is/stream?q=tag:group_test_needs_card'
@@ -47,15 +46,15 @@ describe('render-markdown', function () {
     });
   });
 
-  describe('markdown rendering', function () {
-    it('should render markdown', function () {
+  describe('markdown rendering', () => {
+    it('should render markdown', () => {
       assert.equal(
         render('one **two** three'),
         '<p>one <strong>two</strong> three</p>'
       );
     });
 
-    it('should sanitize the result', function () {
+    it('should sanitize the result', () => {
       // Check that the rendered HTML is fed through the HTML sanitization
       // library. This is not an extensive test of sanitization behavior, that
       // is left to DOMPurify's tests.
@@ -71,14 +70,21 @@ describe('render-markdown', function () {
         '<p><a href="http://example.com" target="_blank">test</a></p>'
       );
     });
+
+    it('should render strikethrough', () => {
+      assert.equal(
+        renderMarkdown('This is ~~no longer the case~~'),
+        '<p>This is <del>no longer the case</del></p>'
+      );
+    });
   });
 
-  describe('math blocks', function () {
-    it('should render LaTeX blocks', function () {
+  describe('math blocks', () => {
+    it('should render LaTeX blocks', () => {
       assert.equal(render('$$x*2$$'), '<p>math+display:x*2</p>');
     });
 
-    it('should render mixed blocks', function () {
+    it('should render mixed blocks', () => {
       assert.equal(
         render('one $$x*2$$ two $$x*3$$ three'),
         '<p>one </p>\n<p>math+display:x*2</p>\n' +
@@ -86,14 +92,14 @@ describe('render-markdown', function () {
       );
     });
 
-    it('should not sanitize math renderer output', function () {
+    it('should not sanitize math renderer output', () => {
       // Check that KaTeX's rendered output is not corrupted in any way by
       // sanitization.
       const html = render('$$ <unknown-tag>foo</unknown-tag> $$');
       assert.include(html, '<unknown-tag>foo</unknown-tag>');
     });
 
-    it('should render mixed inline and block math', function () {
+    it('should render mixed inline and block math', () => {
       assert.equal(
         render('one \\(x*2\\) three $$x*3$$'),
         '<p>one math:x*2 three </p>\n<p>math+display:x*3</p>'
@@ -101,12 +107,12 @@ describe('render-markdown', function () {
     });
   });
 
-  describe('inline math', function () {
-    it('should render inline LaTeX', function () {
+  describe('inline math', () => {
+    it('should render inline LaTeX', () => {
       assert.equal(render('\\(x*2\\)'), '<p>math:x*2</p>');
     });
 
-    it('should render mixed inline LaTeX blocks', function () {
+    it('should render mixed inline LaTeX blocks', () => {
       assert.equal(
         render('one \\(x+2\\) two \\(x+3\\) four'),
         '<p>one math:x+2 two math:x+3 four</p>'
