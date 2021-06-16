@@ -33,6 +33,8 @@ function renderMarkdown(markdown) {
       // transformed into <em>'s.
       // See https://github.com/showdownjs/showdown/issues/211
       literalMidWordUnderscores: true,
+      // Enable strikethrough, which is disabled by default
+      strikethrough: true,
     });
   }
   return converter.makeHtml(markdown);
