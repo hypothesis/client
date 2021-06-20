@@ -9,7 +9,10 @@ import { toBoolean } from '../../shared/type-coercions';
  * @typedef ConfigDefinition
  * @prop {(settings: SettingsGetters) => any} getValue -
  *   Method to retrieve the value from the incoming source
- *
+ * @prop {(value: any) => any} [coerce] - Transform a value's type, value or both
+ */
+
+/**
  * @typedef {Record<string, ConfigDefinition>} ConfigDefinitionMap
  */
 
@@ -109,10 +112,10 @@ const configDefinitions = {
     getValue: settings => settings.hostPageSetting('onLayoutChange'),
   },
   openSidebar: {
+    coerce: toBoolean,
     getValue: settings =>
       settings.hostPageSetting('openSidebar', {
         allowInBrowserExt: true,
-        coerce: toBoolean,
       }),
   },
   query: {
@@ -159,8 +162,9 @@ export function getConfig(appContext = 'annotator', window_ = window) {
   let filteredKeys = configurationKeys(appContext);
   filteredKeys.forEach(name => {
     const configDef = configDefinitions[name];
-    // Get the value from the configuration source
-    config[name] = configDef.getValue(settings);
+    const value = configDef.getValue(settings);
+    // Get the value from the configuration source and run through an optional coerce method
+    config[name] = configDef.coerce ? configDef.coerce(value) : value;
   });
 
   return config;
