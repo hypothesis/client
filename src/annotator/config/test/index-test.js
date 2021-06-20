@@ -77,7 +77,7 @@ describe('annotator/config/index', function () {
       it(`returns the ${settingName} value from the host page`, function () {
         const settings = {
           branding: 'BRANDING_SETTING',
-          openSidebar: 'OPEN_SIDEBAR_SETTING',
+          openSidebar: true,
           requestConfigFromFrame: 'https://embedder.com',
           services: 'SERVICES_SETTING',
         };
@@ -91,6 +91,18 @@ describe('annotator/config/index', function () {
       });
     }
   );
+
+  describe('coerces values', () => {
+    it('coerces `openSidebar` from a string to a boolean', () => {
+      fakeSettingsFrom().hostPageSetting = sinon
+        .stub()
+        .withArgs('openSidebar')
+        .returns('false');
+      const config = getConfig('all', 'WINDOW');
+      assert.equal(config.openSidebar, false);
+    });
+  });
+
   describe('application contexts', () => {
     [
       {
