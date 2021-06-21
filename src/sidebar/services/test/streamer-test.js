@@ -129,7 +129,7 @@ describe('StreamerService', () => {
 
     $imports.$mock({
       '../../shared/warn-once': fakeWarnOnce,
-      '../websocket': FakeSocket,
+      '../websocket': { Socket: FakeSocket },
     });
   });
 

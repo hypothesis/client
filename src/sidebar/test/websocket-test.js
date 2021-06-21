@@ -1,4 +1,5 @@
-import Socket, {
+import {
+  Socket,
   CLOSE_NORMAL,
   CLOSE_GOING_AWAY,
   CLOSE_ABNORMAL,
