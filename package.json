@@ -81,7 +81,7 @@
     "redux": "^4.0.1",
     "redux-thunk": "^2.1.0",
     "reselect": "^4.0.0",
-    "retry": "^0.12.0",
+    "retry": "^0.13.1",
     "sass": "^1.23.0",
     "scroll-into-view": "^1.8.2",
     "shallowequal": "^1.1.0",
