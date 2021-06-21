@@ -1,4 +1,4 @@
-import isBrowserExtension from '../is-browser-extension';
+import { isBrowserExtension } from '../is-browser-extension';
 
 describe('annotator.config.isBrowserExtension', function () {
   [
