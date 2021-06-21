@@ -5,15 +5,20 @@ describe('annotator/config/settingsFrom', () => {
   let fakeConfigFuncSettingsFrom;
   let fakeIsBrowserExtension;
   let fakeParseJsonConfig;
+  let fakeUrlFromLinkTag;
 
   beforeEach(() => {
     fakeConfigFuncSettingsFrom = sinon.stub().returns({});
     fakeIsBrowserExtension = sinon.stub().returns(false);
+    fakeUrlFromLinkTag = sinon.stub().returns('http://example.com/app.html');
     fakeParseJsonConfig = sinon.stub().returns({});
 
     $imports.$mock({
       './config-func-settings-from': fakeConfigFuncSettingsFrom,
       './is-browser-extension': fakeIsBrowserExtension,
+      './url-from-link-tag': {
+        urlFromLinkTag: fakeUrlFromLinkTag,
+      },
       '../../boot/parse-json-config': { parseJsonConfig: fakeParseJsonConfig },
     });
   });
@@ -22,245 +27,38 @@ describe('annotator/config/settingsFrom', () => {
     $imports.$restore();
   });
 
-  describe('app frame URLs from link tags', () => {
-    function appendLink(href, rel) {
-      const link = document.createElement('link');
-      link.type = 'application/annotator+html';
-      link.rel = rel;
-      if (href) {
-        link.href = href;
-      }
-      document.head.appendChild(link);
-      return link;
-    }
-    describe('#notebookAppUrl', () => {
-      context(
-        "when there's an application/annotator+html notebook link",
-        () => {
-          let link;
-
-          beforeEach(
-            'add an application/annotator+html notebook <link>',
-            () => {
-              link = appendLink('http://example.com/app.html', 'notebook');
-            }
-          );
-
-          afterEach('tidy up the notebook link', () => {
-            link.remove();
-          });
-
-          it('returns the href from the notebook link', () => {
-            assert.equal(
-              settingsFrom(window).notebookAppUrl,
-              'http://example.com/app.html'
-            );
-          });
-        }
+  describe('#notebookAppUrl', () => {
+    it('calls urlFromLinkTag with appropriate params', () => {
+      assert.equal(
+        settingsFrom(window).notebookAppUrl,
+        'http://example.com/app.html'
       );
-
-      context('when there are multiple annotator+html notebook links', () => {
-        let link1;
-        let link2;
-
-        beforeEach('add two notebook links to the document', () => {
-          link1 = appendLink('http://example.com/app1', 'notebook');
-          link2 = appendLink('http://example.com/app2', 'notebook');
-        });
-
-        afterEach('tidy up the notebook links', () => {
-          link1.remove();
-          link2.remove();
-        });
-
-        it('returns the href from the first notebook link found', () => {
-          assert.equal(
-            settingsFrom(window).notebookAppUrl,
-            'http://example.com/app1'
-          );
-        });
-      });
-
-      context('when the annotator+html notebook link has no href', () => {
-        let link;
-
-        beforeEach(
-          'add an application/annotator+html notebook <link> with no href',
-          () => {
-            link = appendLink(undefined, 'notebook');
-          }
-        );
-
-        afterEach('tidy up the notebook link', () => {
-          link.remove();
-        });
-
-        it('throws an error', () => {
-          assert.throws(() => {
-            settingsFrom(window).notebookAppUrl; // eslint-disable-line no-unused-expressions
-          }, 'application/annotator+html (rel="notebook") link has no href');
-        });
-      });
-
-      context("when there's no annotator+html notebook link", () => {
-        it('throws an error', () => {
-          assert.throws(() => {
-            settingsFrom(window).notebookAppUrl; // eslint-disable-line no-unused-expressions
-          }, 'No application/annotator+html (rel="notebook") link in the document');
-        });
-      });
+      assert.calledWith(fakeUrlFromLinkTag, window, 'notebook', 'html');
     });
+  });
 
-    describe('#sidebarAppUrl', () => {
-      context("when there's an application/annotator+html sidebar link", () => {
-        let link;
-
-        beforeEach('add an application/annotator+html sidebar <link>', () => {
-          link = appendLink('http://example.com/app.html', 'sidebar');
-        });
-
-        afterEach('tidy up the sidebar link', () => {
-          link.remove();
-        });
-
-        it('returns the href from the sidebar link', () => {
-          assert.equal(
-            settingsFrom(window).sidebarAppUrl,
-            'http://example.com/app.html'
-          );
-        });
-      });
-
-      context('when there are multiple annotator+html sidebar links', () => {
-        let link1;
-        let link2;
-
-        beforeEach('add two sidebar links to the document', () => {
-          link1 = appendLink('http://example.com/app1', 'sidebar');
-          link2 = appendLink('http://example.com/app2', 'sidebar');
-        });
-
-        afterEach('tidy up the sidebar links', () => {
-          link1.remove();
-          link2.remove();
-        });
-
-        it('returns the href from the first one', () => {
-          assert.equal(
-            settingsFrom(window).sidebarAppUrl,
-            'http://example.com/app1'
-          );
-        });
-      });
-
-      context('when the annotator+html sidebar link has no href', () => {
-        let link;
-
-        beforeEach(
-          'add an application/annotator+html sidebar <link> with no href',
-          () => {
-            link = appendLink(null, 'sidebar');
-          }
-        );
-
-        afterEach('tidy up the sidebar link', () => {
-          link.remove();
-        });
-
-        it('throws an error', () => {
-          assert.throws(() => {
-            settingsFrom(window).sidebarAppUrl; // eslint-disable-line no-unused-expressions
-          }, 'application/annotator+html (rel="sidebar") link has no href');
-        });
-      });
-
-      context("when there's no annotator+html sidebar link", () => {
-        it('throws an error', () => {
-          assert.throws(() => {
-            settingsFrom(window).sidebarAppUrl; // eslint-disable-line no-unused-expressions
-          }, 'No application/annotator+html (rel="sidebar") link in the document');
-        });
-      });
+  describe('#sidebarAppUrl', () => {
+    it('calls urlFromLinkTag with appropriate params', () => {
+      assert.equal(
+        settingsFrom(window).sidebarAppUrl,
+        'http://example.com/app.html'
+      );
+      assert.calledWith(fakeUrlFromLinkTag, window, 'sidebar', 'html');
     });
   });
 
   describe('#clientUrl', () => {
-    function appendClientUrlLinkToDocument(href) {
-      const link = document.createElement('link');
-      link.type = 'application/annotator+javascript';
-      link.rel = 'hypothesis-client';
-      if (href) {
-        link.href = href;
-      }
-      document.head.appendChild(link);
-      return link;
-    }
-
-    context("when there's an application/annotator+javascript link", () => {
-      let link;
-
-      beforeEach('add an application/annotator+javascript <link>', () => {
-        link = appendClientUrlLinkToDocument('http://example.com/app.html');
-      });
-
-      afterEach('tidy up the link', () => {
-        link.remove();
-      });
-
-      it('returns the href from the link', () => {
-        assert.equal(
-          settingsFrom(window).clientUrl,
-          'http://example.com/app.html'
-        );
-      });
-    });
-
-    context('when there are multiple annotator+javascript links', () => {
-      let link1;
-      let link2;
-
-      beforeEach('add two links to the document', () => {
-        link1 = appendClientUrlLinkToDocument('http://example.com/app1');
-        link2 = appendClientUrlLinkToDocument('http://example.com/app2');
-      });
-
-      afterEach('tidy up the links', () => {
-        link1.remove();
-        link2.remove();
-      });
-
-      it('returns the href from the first one', () => {
-        assert.equal(settingsFrom(window).clientUrl, 'http://example.com/app1');
-      });
-    });
-
-    context('when the annotator+javascript link has no href', () => {
-      let link;
-
-      beforeEach(
-        'add an application/annotator+javascript <link> with no href',
-        () => {
-          link = appendClientUrlLinkToDocument();
-        }
+    it('calls urlFromLinkTag with appropriate params', () => {
+      assert.equal(
+        settingsFrom(window).clientUrl,
+        'http://example.com/app.html'
       );
-
-      afterEach('tidy up the link', () => {
-        link.remove();
-      });
-
-      it('throws an error', () => {
-        assert.throws(() => {
-          settingsFrom(window).clientUrl; // eslint-disable-line no-unused-expressions
-        }, 'application/annotator+javascript (rel="hypothesis-client") link has no href');
-      });
-    });
-
-    context("when there's no annotator+javascript link", () => {
-      it('throws an error', () => {
-        assert.throws(() => {
-          settingsFrom(window).clientUrl; // eslint-disable-line no-unused-expressions
-        }, 'No application/annotator+javascript (rel="hypothesis-client") link in the document');
-      });
+      assert.calledWith(
+        fakeUrlFromLinkTag,
+        window,
+        'hypothesis-client',
+        'javascript'
+      );
     });
   });
 
