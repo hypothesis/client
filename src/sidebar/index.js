@@ -84,17 +84,6 @@ function initServices(
   serviceURL.init();
 }
 
-/**
- * @param {import('./services/frame-sync').FrameSyncService} frameSync
- * @param {import('./store').SidebarStore} store
- * @inject
- */
-function setupFrameSync(frameSync, store) {
-  if (store.route() === 'sidebar') {
-    frameSync.connect();
-  }
-}
-
 // Register icons used by the sidebar app (and maybe other assets in future).
 import { registerIcons } from '@hypothesis/frontend-shared';
 import iconSet from './icons';
@@ -182,7 +171,6 @@ function startApp(config, appEl) {
   container.run(setupApi);
   container.run(setupRoute);
   container.run(startRPCServer);
-  container.run(setupFrameSync);
 
   // Render the UI.
   render(

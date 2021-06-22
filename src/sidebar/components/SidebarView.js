@@ -91,6 +91,17 @@ function SidebarView({
 
   useEffect(() => {
     const framePort = new PortFinder();
+
+    // Enables communication between `host` and `sidebar` frames
+    framePort
+      .discover({
+        channel: 'hostToSidebar',
+        hostFrame: window.parent,
+        port: 'sidebar',
+      })
+      .then(port => frameSync.connect(port));
+
+    // Enables communication between `notebook` and `sidebar` frames
     framePort
       .discover({
         channel: 'notebookToSidebar',
@@ -102,7 +113,7 @@ function SidebarView({
     return () => {
       framePort.destroy();
     };
-  }, [bridge]);
+  }, [bridge, frameSync]);
 
   // Reload annotations when group, user or document search URIs change
   useEffect(() => {
