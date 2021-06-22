@@ -5,8 +5,8 @@ import { ListenerCollection } from '../annotator/util/listener-collection';
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  *
  * @typedef Message
- * @prop {'guestToSidebarChannel'|'hostToSidebarChannel'|'notebookToSidebarChannel'} channel
- * @prop {'guest'|'notebook'|'sidebar'} port
+ * @prop {'guestToSidebar'|'hostToSidebar'|'notebookToSidebar'} channel
+ * @prop {'guest'|'host'|'notebook'|'sidebar'} port
  * @prop {'offer'|'request'}  type
  *
  * @typedef {Message & {source: 'hypothesis'}} MessageSourced
@@ -135,9 +135,9 @@ function equalMessage(message1, message2) {
  *                 V
  * 3. sends `offers` of channel.port using `frame.postMessage` ---> 4. listens to `offers` of channel.port
  *
- * TODO: after `hostToSidebarChannel` has been established, it would be recommended
- * in step #3 to substitute `frame.postMessage` for `sidebarPort.postMessage`
- * using `hostToSidebarChannel.sidebarPort`.
+ * TODO: after `hostToSidebar` channel has been established, it would be recommended
+ * in step #3 to substitute `frame.postMessage` by
+ * `hostToSidebar(channel).sidebar(port).postMessage`.
  *
  * It is essential that `FrameConnect` initialize the listeners (step #2) before
  * `PortFinder` sends the `requests` of channel.port (step #1). Because the
@@ -163,7 +163,7 @@ export class FrameConnector {
     this._sidebarAndNotebookAppOrigin = new URL(sidebarAppUrl).origin;
 
     // Create only the necessary channels. Channel nomenclature:
-    // `[frame1]To[frame2]Channel` so that `port1` should be owned by/sent to
+    // `[frame1]To[frame2]` so that `port1` should be owned by/sent to
     // `frame1` and `port2` by `frame2`.
     this._channels = {
       /**
@@ -172,39 +172,68 @@ export class FrameConnector {
        *
        * @type {Record<Window,MessageChannel>}
        */
-      guestToSidebarChannel: {}, // TODO
-      hostToSidebarChannel: new MessageChannel(), // TODO
-      notebookToSidebarChannel: new MessageChannel(),
+      guestToSidebar: {}, // TODO
+      hostToSidebar: new MessageChannel(), // TODO
+      notebookToSidebar: new MessageChannel(),
     };
 
     this._listeners = new ListenerCollection();
   }
 
-  listen() {
-    // Listen and respond to the request of the `notebook` port from `notebookToSidebarChannel`
-    this._listeners.add(window, 'message', event =>
-      this._handlePortRequest(/** @type {MessageEvent} */ (event), {
-        allowedOrigin: this._sidebarAndNotebookAppOrigin,
-        message: {
-          channel: 'notebookToSidebarChannel',
-          port: 'notebook',
-          type: 'request',
-        },
-        port: this._channels.notebookToSidebarChannel.port1,
-      })
-    );
+  /**
+   * Returns a port from a channel. Currently, only returns the `host` port from
+   * the `hostToSidebar` channel. Otherwise, it returns `null`.
+   *
+   * @param {object} options
+   *   @param {'hostToSidebar'} options.channel
+   *   @param {'host'} options.port
+   */
+  getPort({ channel, port }) {
+    if (channel === 'hostToSidebar' && port === 'host') {
+      return this._channels.hostToSidebar.port1;
+    }
 
-    // Listen and respond to the request of the `sidebar` port from `notebookToSidebarChannel`
-    // TODO: this listener is not required, if the `sidebarPort` is sent through the `hostToSidebarChannel.
+    return null;
+  }
+
+  listen() {
+    // Listen and respond to the request of the `sidebar` port from `hostToSidebar` channel
     this._listeners.add(window, 'message', event =>
       this._handlePortRequest(/** @type {MessageEvent} */ (event), {
         allowedOrigin: this._sidebarAndNotebookAppOrigin,
         message: {
-          channel: 'notebookToSidebarChannel',
+          channel: 'hostToSidebar',
           port: 'sidebar',
           type: 'request',
         },
-        port: this._channels.notebookToSidebarChannel.port2,
+        port: this._channels.hostToSidebar.port2,
+      })
+    );
+
+    // Listen and respond to the request of the `notebook` port from `notebookToSidebar` channel
+    this._listeners.add(window, 'message', event =>
+      this._handlePortRequest(/** @type {MessageEvent} */ (event), {
+        allowedOrigin: this._sidebarAndNotebookAppOrigin,
+        message: {
+          channel: 'notebookToSidebar',
+          port: 'notebook',
+          type: 'request',
+        },
+        port: this._channels.notebookToSidebar.port1,
+      })
+    );
+
+    // Listen and respond to the request of the `sidebar` port from `notebookToSidebar` channel
+    // TODO: this listener is not required, if the `sidebarPort` is sent through the `hostToSidebar` channel.
+    this._listeners.add(window, 'message', event =>
+      this._handlePortRequest(/** @type {MessageEvent} */ (event), {
+        allowedOrigin: this._sidebarAndNotebookAppOrigin,
+        message: {
+          channel: 'notebookToSidebar',
+          port: 'sidebar',
+          type: 'request',
+        },
+        port: this._channels.notebookToSidebar.port2,
       })
     );
   }
@@ -267,7 +296,7 @@ export class FrameConnector {
  * helps to discover `MessagePort` on a specific channel. The requested port
  * refers to the owners frame, not the frame to which the frame wants to communicate.
  * For example, the `notebook` frame should request the `notebook` port of the
- * `notebookToSidebarChannel` (not the `sidebar` port).
+ * `notebookToSidebar` channel (not the `sidebar` port).
  *
  * There should be the same amount of listener in this class as in FrameConnect.
  *
@@ -286,15 +315,15 @@ export class PortFinder {
   /**
    * guest <-> sidebar TODO
    * polling necessary because the `guest` frame could be loaded before the `host` frame
-   * @typedef {{channel: 'guestToSidebarChannel', hostFrame: Window, port: 'guest'}} options0
+   * @typedef {{channel: 'guestToSidebar', hostFrame: Window, port: 'guest', subFrameIdentifier: string}} options0
    *
-   * host <-> sidebar TODO
-   * @typedef {{channel: 'hostToSidebarChannel', hostFrame: Window, port: 'sidebar'}} options1
+   * host <-> sidebar
+   * @typedef {{channel: 'hostToSidebar', hostFrame: Window, port: 'sidebar'}} options1
    *
    * notebook <-> sidebar
-   * @typedef {{channel: 'notebookToSidebarChannel', hostFrame: Window, port: 'notebook'}} options2
-    // TODO: this listener is not required, if the `sidebarPort` is sent through the `hostToSidebarChannel.
-   * @typedef {{channel: 'notebookToSidebarChannel', hostFrame: Window, port: 'sidebar'}} options3
+   * @typedef {{channel: 'notebookToSidebar', hostFrame: Window, port: 'notebook'}} options2
+    // TODO: this listener is not required, if the `sidebarPort` is sent through the `hostToSidebar` channel.
+   * @typedef {{channel: 'notebookToSidebar', hostFrame: Window, port: 'sidebar'}} options3
    *
    * @param {options0|options1|options2|options3} options
    * @return {Promise<MessagePort>}
@@ -303,8 +332,15 @@ export class PortFinder {
   // eslint-disable-next-line no-unused-vars
   discover(options) {
     return new Promise((resolve, reject) => {
+      // `host` <-> `sidebar` communication
+      if (options.channel === 'hostToSidebar' && options.port === 'sidebar') {
+        this._requestPortAndListenForAnswer({ ...options, reject, resolve });
+        return;
+      }
+
+      // `notebook` <-> `sidebar` communication
       if (
-        options.channel === 'notebookToSidebarChannel' &&
+        options.channel === 'notebookToSidebar' &&
         options.port === 'notebook'
       ) {
         this._requestPortAndListenForAnswer({ ...options, reject, resolve });
@@ -313,7 +349,7 @@ export class PortFinder {
 
       // TODO: this is not necessary, we can use
       if (
-        options.channel === 'notebookToSidebarChannel' &&
+        options.channel === 'notebookToSidebar' &&
         options.port === 'sidebar'
       ) {
         this._requestPortAndListenForAnswer({ ...options, reject, resolve });

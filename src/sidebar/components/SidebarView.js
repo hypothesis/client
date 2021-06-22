@@ -93,7 +93,7 @@ function SidebarView({
     const framePort = new PortFinder();
     framePort
       .discover({
-        channel: 'notebookToSidebarChannel',
+        channel: 'notebookToSidebar',
         hostFrame: window.parent,
         port: 'sidebar',
       })
