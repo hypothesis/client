@@ -5,21 +5,18 @@ import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
  * @typedef {'sidebar'|'notebook'|'annotator'|'all'} AppContext
- *
  * @typedef {import('./settings').SettingsGetters} SettingsGetters
+ * @typedef {(settings: SettingsGetters, name: string) => any} ValueGetter
  *
  * @typedef ConfigDefinition
- * @prop {(settings: SettingsGetters) => any} getValue -
- *  Method to retrieve the value from the incoming source
+ * @prop {ValueGetter} getValue - Method to retrieve the value from the incoming source
  * @prop {boolean} allowInBrowserExt -
  *  Allow this setting to be read in the browser extension. If this is false
  *  and browser extension context is true, use `defaultValue` if provided otherwise
  *  ignore the config key
  * @prop {any} [defaultValue] - Sets a default if `getValue` returns undefined
  * @prop {(value: any) => any} [coerce] - Transform a value's type, value or both
- */
-
-/**
+ *
  * @typedef {Record<string, ConfigDefinition>} ConfigDefinitionMap
  */
 
@@ -77,6 +74,11 @@ function configurationKeys(appContext) {
   }
 }
 
+/** @type {ValueGetter} */
+function getHostPageSetting(settings, name) {
+  return settings.hostPageSetting(name);
+}
+
 /**
  * Definitions of configuration keys
  * @type {ConfigDefinitionMap}
@@ -90,12 +92,12 @@ const configDefinitions = {
   appType: {
     allowInBrowserExt: true,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('appType'),
+    getValue: getHostPageSetting,
   },
   branding: {
     defaultValue: null,
     allowInBrowserExt: false,
-    getValue: settings => settings.hostPageSetting('branding'),
+    getValue: getHostPageSetting,
   },
   // URL of the client's boot script. Used when injecting the client into
   // child iframes.
@@ -107,8 +109,7 @@ const configDefinitions = {
   enableExperimentalNewNoteButton: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings =>
-      settings.hostPageSetting('enableExperimentalNewNoteButton'),
+    getValue: getHostPageSetting,
   },
   group: {
     allowInBrowserExt: true,
@@ -118,28 +119,28 @@ const configDefinitions = {
   focus: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('focus'),
+    getValue: getHostPageSetting,
   },
   theme: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('theme'),
+    getValue: getHostPageSetting,
   },
   usernameUrl: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('usernameUrl'),
+    getValue: getHostPageSetting,
   },
   onLayoutChange: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('onLayoutChange'),
+    getValue: getHostPageSetting,
   },
   openSidebar: {
     allowInBrowserExt: true,
     defaultValue: false,
     coerce: toBoolean,
-    getValue: settings => settings.hostPageSetting('openSidebar'),
+    getValue: getHostPageSetting,
   },
   query: {
     allowInBrowserExt: true,
@@ -149,12 +150,12 @@ const configDefinitions = {
   requestConfigFromFrame: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('requestConfigFromFrame'),
+    getValue: getHostPageSetting,
   },
   services: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('services'),
+    getValue: getHostPageSetting,
   },
   showHighlights: {
     allowInBrowserExt: false,
@@ -176,12 +177,12 @@ const configDefinitions = {
   subFrameIdentifier: {
     allowInBrowserExt: true,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('subFrameIdentifier'),
+    getValue: getHostPageSetting,
   },
   externalContainerSelector: {
     allowInBrowserExt: false,
     defaultValue: null,
-    getValue: settings => settings.hostPageSetting('externalContainerSelector'),
+    getValue: getHostPageSetting,
   },
 };
 
@@ -214,7 +215,7 @@ export function getConfig(appContext = 'annotator', window_ = window) {
     }
 
     // Get the value from the configuration source
-    const value = configDef.getValue(settings);
+    const value = configDef.getValue(settings, name);
     if (value === undefined) {
       // If there is no value (e.g. undefined), then set to the default if provided,
       // otherwise ignore the config key:value pair
