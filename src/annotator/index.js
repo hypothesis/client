@@ -37,32 +37,38 @@ const appLinkEl = /** @type {Element} */ (
 
 function init() {
   const annotatorConfig = getConfig('annotator');
+  const sidebarConfig = getConfig('sidebar');
+  const { sidebarAppUrl } = sidebarConfig;
+
+  const frameConnector = new FrameConnector({
+    sidebarAppUrl,
+  });
+  let hostPort = frameConnector.getPort({
+    channel: 'hostToSidebar',
+    port: 'host',
+  });
+
+  if (annotatorConfig.subFrameIdentifier) {
+    // Other modules use this to detect if this frame context belongs to hypothesis.
+    // Needs to be a global property.
+    Object.defineProperty(window_, '__hypothesis_frame', { value: true });
+    hostPort = null;
+  }
+
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
-  let frameConnector = /** @type {FrameConnector?} */ (null);
   let sidebar = /** @type {Sidebar?} */ (null);
   let notebook = /** @type {Notebook?} */ (null);
 
   const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, {
+  const guest = new Guest(document.body, eventBus, hostPort, {
     ...annotatorConfig,
     // Load the PDF anchoring/metadata integration.
     // nb. documentType is an internal config property only
     documentType: isPDF ? 'pdf' : 'html',
   });
 
-  if (annotatorConfig.subFrameIdentifier) {
-    // Other modules use this to detect if this
-    // frame context belongs to hypothesis.
-    // Needs to be a global property that's set.
-    window_.__hypothesis_frame = true;
-  } else {
-    const sidebarConfig = getConfig('sidebar');
-
-    const { sidebarAppUrl } = sidebarConfig;
-    frameConnector = new FrameConnector({
-      sidebarAppUrl,
-    });
+  if (!window_.__hypothesis_frame) {
     frameConnector.listen();
 
     sidebar = new Sidebar(document.body, eventBus, guest, sidebarConfig);
@@ -71,6 +77,11 @@ function init() {
     // annotations from filtering the threads.
     notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
   }
+
+  // This enables the communication channel between `host` <-> `sidebar or
+  // `guest` <-> `sidebar` frames. It needs to happen after the `Sidebar` is
+  // created because `Sidebar` registers event listeners using `guest.crossframe`.
+  guest.connectWithSidebar();
 
   appLinkEl.addEventListener('destroy', () => {
     guest.destroy();
