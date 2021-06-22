@@ -1,7 +1,6 @@
 import debounce from 'lodash.debounce';
 
 import bridgeEvents from '../../shared/bridge-events';
-import Discovery from '../../shared/discovery';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
@@ -213,8 +212,11 @@ export class FrameSyncService {
 
   /**
    * Find and connect to Hypothesis clients in the current window.
+   *
+   * @param {MessagePort} sidebarPort -- `sidebar` port from `hostToSidebar`
+   * channel
    */
-  connect() {
+  connect(sidebarPort) {
     /**
      * Query the Hypothesis annotation client in a frame for the URL and metadata
      * of the document that is currently loaded and add the result to the set of
@@ -223,7 +225,7 @@ export class FrameSyncService {
     const addFrame = channel => {
       channel.call('getDocumentInfo', (err, info) => {
         if (err) {
-          channel.destroy();
+          channel.destroy(); // TODO: I am not sure if this works with `MessagePort`
           return;
         }
 
@@ -235,12 +237,12 @@ export class FrameSyncService {
       });
     };
 
-    const discovery = new Discovery(window, { server: true });
-    discovery.startDiscovery(this._bridge.createChannel.bind(this._bridge));
     this._bridge.onConnect(addFrame);
 
     this._setupSyncToFrame();
     this._setupSyncFromFrame();
+
+    this._bridge.createChannelFromPort(sidebarPort, 'host');
   }
 
   /**
