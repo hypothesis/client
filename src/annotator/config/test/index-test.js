@@ -3,14 +3,30 @@ import { $imports } from '../index';
 
 describe('annotator/config/index', function () {
   let fakeSettingsFrom;
+  let fakeIsBrowserExtension;
 
   beforeEach(() => {
     fakeSettingsFrom = sinon.stub().returns({
-      hostPageSetting: sinon.stub(),
+      hostPageSetting: sinon.stub().returns('fakeValue'),
+      // getters
+      annotations: 'fakeValue',
+      clientUrl: 'fakeValue',
+      group: 'fakeValue',
+      notebookAppUrl: 'fakeValue',
+      showHighlights: 'fakeValue',
+      sidebarAppUrl: 'fakeValue',
+      query: 'fakeValue',
     });
+    fakeIsBrowserExtension = sinon.stub();
 
     $imports.$mock({
       './settings': fakeSettingsFrom,
+      './is-browser-extension': {
+        isURLFromBrowserExtension: fakeIsBrowserExtension,
+      },
+      './url-from-link-tag': {
+        urlFromLinkTag: sinon.stub(),
+      },
     });
   });
 
@@ -51,24 +67,117 @@ describe('annotator/config/index', function () {
     });
   });
 
-  ['appType', 'openSidebar', 'subFrameIdentifier'].forEach(function (
-    settingName
-  ) {
-    it(`reads ${settingName} from the host page, even when in a browser extension`, function () {
-      getConfig('all', 'WINDOW');
-      assert.calledWith(
-        fakeSettingsFrom().hostPageSetting,
-        settingName,
-        sinon.match({ allowInBrowserExt: true })
-      );
+  describe('browser extension', () => {
+    context('when client is loaded from the browser extension', function () {
+      it('reads only config values where `allowInBrowserExt` is true, otherwise returns `defaultValue`', () => {
+        fakeIsBrowserExtension.returns(true);
+        const config = getConfig('all', 'WINDOW');
+        assert.deepEqual(
+          {
+            appType: 'fakeValue',
+            annotations: 'fakeValue',
+            branding: null,
+            clientUrl: 'fakeValue',
+            enableExperimentalNewNoteButton: false,
+            externalContainerSelector: null,
+            focus: null,
+            group: 'fakeValue',
+            notebookAppUrl: 'fakeValue',
+            onLayoutChange: null,
+            openSidebar: true, // coerced
+            query: 'fakeValue',
+            requestConfigFromFrame: null,
+            services: null,
+            showHighlights: null,
+            sidebarAppUrl: 'fakeValue',
+            subFrameIdentifier: 'fakeValue',
+            theme: null,
+            usernameUrl: null,
+          },
+          config
+        );
+      });
+    });
+
+    context('when client is not loaded from browser extension', function () {
+      it('returns all config values', () => {
+        fakeIsBrowserExtension.returns(false);
+        const config = getConfig('all', 'WINDOW');
+        assert.deepEqual(
+          {
+            appType: 'fakeValue',
+            annotations: 'fakeValue',
+            branding: 'fakeValue',
+            clientUrl: 'fakeValue',
+            enableExperimentalNewNoteButton: 'fakeValue',
+            externalContainerSelector: 'fakeValue',
+            focus: 'fakeValue',
+            group: 'fakeValue',
+            notebookAppUrl: 'fakeValue',
+            onLayoutChange: 'fakeValue',
+            openSidebar: true, // coerced
+            query: 'fakeValue',
+            requestConfigFromFrame: 'fakeValue',
+            services: 'fakeValue',
+            showHighlights: 'fakeValue',
+            sidebarAppUrl: 'fakeValue',
+            subFrameIdentifier: 'fakeValue',
+            theme: 'fakeValue',
+            usernameUrl: 'fakeValue',
+          },
+          config
+        );
+      });
     });
   });
 
-  ['branding', 'services'].forEach(function (settingName) {
-    it(`reads ${settingName} from the host page only when in an embedded client`, function () {
-      getConfig('all', 'WINDOW');
+  describe('default values', () => {
+    beforeEach(() => {
+      // Remove all fake values
+      $imports.$mock({
+        './settings': sinon.stub().returns({
+          hostPageSetting: sinon.stub().returns(undefined),
+          annotations: undefined,
+          clientUrl: undefined,
+          group: undefined,
+          notebookAppUrl: undefined,
+          showHighlights: undefined,
+          sidebarAppUrl: undefined,
+          query: undefined,
+        }),
+      });
+    });
 
-      assert.calledWithExactly(fakeSettingsFrom().hostPageSetting, settingName);
+    afterEach(() => {
+      $imports.$restore({
+        './settings': true,
+      });
+    });
+
+    it('sets corresponding default values if settings are undefined', () => {
+      const config = getConfig('all', 'WINDOW');
+
+      assert.deepEqual(config, {
+        appType: null,
+        annotations: null,
+        branding: null,
+        clientUrl: null,
+        enableExperimentalNewNoteButton: false,
+        externalContainerSelector: null,
+        focus: null,
+        group: null,
+        notebookAppUrl: null,
+        onLayoutChange: null,
+        openSidebar: false,
+        query: null,
+        requestConfigFromFrame: null,
+        services: null,
+        showHighlights: null,
+        sidebarAppUrl: null,
+        subFrameIdentifier: null,
+        theme: null,
+        usernameUrl: null,
+      });
     });
   });
 

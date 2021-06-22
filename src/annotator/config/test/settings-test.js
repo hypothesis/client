@@ -15,7 +15,9 @@ describe('annotator/config/settingsFrom', () => {
 
     $imports.$mock({
       './config-func-settings-from': fakeConfigFuncSettingsFrom,
-      './is-browser-extension': fakeIsBrowserExtension,
+      './is-browser-extension': {
+        isURLFromBrowserExtension: fakeIsBrowserExtension,
+      },
       './url-from-link-tag': {
         urlFromLinkTag: fakeUrlFromLinkTag,
       },
@@ -376,7 +378,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'the client is embedded in a web page',
         specify: 'it returns setting values from window.hypothesisConfig()',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         configFuncSettings: { foo: 'configFuncValue' },
         jsonSettings: { foo: 'ignored' }, // hypothesisConfig() overrides js-hypothesis-config
         expected: 'configFuncValue',
@@ -385,7 +387,7 @@ describe('annotator/config/settingsFrom', () => {
         when: 'the client is embedded in a web page',
         specify:
           'it ignores settings from js-hypothesis-config if `ignoreOtherConfiguration` is present',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         configFuncSettings: { ignoreOtherConfiguration: '1' },
         jsonSettings: { foo: 'ignored' },
         expected: null,
@@ -393,7 +395,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'the client is embedded in a web page',
         specify: 'it returns setting values from js-hypothesis-config objects',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         configFuncSettings: {},
         jsonSettings: { foo: 'jsonValue' },
         expected: 'jsonValue',
@@ -402,7 +404,7 @@ describe('annotator/config/settingsFrom', () => {
         when: 'the client is embedded in a web page',
         specify:
           'hypothesisConfig() settings override js-hypothesis-config ones',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         configFuncSettings: { foo: 'configFuncValue' },
         jsonSettings: { foo: 'jsonValue' },
         expected: 'configFuncValue',
@@ -411,7 +413,7 @@ describe('annotator/config/settingsFrom', () => {
         when: 'the client is embedded in a web page',
         specify:
           'even a null from hypothesisConfig() overrides js-hypothesis-config',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         configFuncSettings: { foo: null },
         jsonSettings: { foo: 'jsonValue' },
         expected: null,
@@ -420,7 +422,7 @@ describe('annotator/config/settingsFrom', () => {
         when: 'the client is embedded in a web page',
         specify:
           'even an undefined from hypothesisConfig() overrides js-hypothesis-config',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         configFuncSettings: { foo: undefined },
         jsonSettings: { foo: 'jsonValue' },
         expected: undefined,
@@ -428,7 +430,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'the client is in a browser extension',
         specify: 'it always returns null',
-        isBrowserExtension: true,
+        isURLFromBrowserExtension: true,
         configFuncSettings: { foo: 'configFuncValue' },
         jsonSettings: { foo: 'jsonValue' },
         expected: null,
@@ -436,7 +438,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'the client is in a browser extension and allowInBrowserExt: true is given',
         specify: 'it returns settings from window.hypothesisConfig()',
-        isBrowserExtension: true,
+        isURLFromBrowserExtension: true,
         allowInBrowserExt: true,
         configFuncSettings: { foo: 'configFuncValue' },
         jsonSettings: {},
@@ -445,7 +447,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'the client is in a browser extension and allowInBrowserExt: true is given',
         specify: 'it returns settings from js-hypothesis-configs',
-        isBrowserExtension: true,
+        isURLFromBrowserExtension: true,
         allowInBrowserExt: true,
         configFuncSettings: {},
         jsonSettings: { foo: 'jsonValue' },
@@ -454,7 +456,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'no default value is provided',
         specify: 'it returns null',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         allowInBrowserExt: false,
         configFuncSettings: {},
         jsonSettings: {},
@@ -464,7 +466,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'a default value is provided',
         specify: 'it returns that default value',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         allowInBrowserExt: false,
         configFuncSettings: {},
         jsonSettings: {},
@@ -474,7 +476,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'a default value is provided but it is overridden',
         specify: 'it returns the overridden value',
-        isBrowserExtension: false,
+        isURLFromBrowserExtension: false,
         allowInBrowserExt: false,
         configFuncSettings: { foo: 'not the default value' },
         jsonSettings: {},
@@ -484,7 +486,7 @@ describe('annotator/config/settingsFrom', () => {
       {
         when: 'the client is in a browser extension and a default value is provided',
         specify: 'it returns the default value',
-        isBrowserExtension: true,
+        isURLFromBrowserExtension: true,
         allowInBrowserExt: false,
         configFuncSettings: { foo: 'ignore me' },
         jsonSettings: { foo: 'also ignore me' },
@@ -494,7 +496,7 @@ describe('annotator/config/settingsFrom', () => {
     ].forEach(function (test) {
       context(test.when, () => {
         specify(test.specify, () => {
-          fakeIsBrowserExtension.returns(test.isBrowserExtension);
+          fakeIsBrowserExtension.returns(test.isURLFromBrowserExtension);
           fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);
           fakeParseJsonConfig.returns(test.jsonSettings);
           const settings = settingsFrom(fakeWindow());

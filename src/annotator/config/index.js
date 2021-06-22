@@ -1,5 +1,7 @@
+import { isURLFromBrowserExtension } from './is-browser-extension';
 import settingsFrom from './settings';
 import { toBoolean } from '../../shared/type-coercions';
+import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
  * @typedef {'sidebar'|'notebook'|'annotator'|'all'} AppContext
@@ -8,7 +10,15 @@ import { toBoolean } from '../../shared/type-coercions';
  *
  * @typedef ConfigDefinition
  * @prop {(settings: SettingsGetters) => any} getValue -
- *   Method to retrieve the value from the incoming source
+ *  Method to retrieve the value from the incoming source
+ * @prop {boolean} allowInBrowserExt -
+ *  Allow this setting to be read in the browser extension. If this is false
+ *  and browser extension context is true, use `defaultValue` if provided otherwise
+ *  ignore the config key
+ * @prop {any} [defaultValue] - Sets a default if `getValue` returns undefined
+ *   nb. Currently all setting have a defaultValue. An improvement will be to
+ *   audit each setting and see if we can remove the defaultValue which then allows
+ *   the setting to be omitted from the config when a value is undefined.
  * @prop {(value: any) => any} [coerce] - Transform a value's type, value or both
  */
 
@@ -76,75 +86,104 @@ function configurationKeys(appContext) {
  */
 const configDefinitions = {
   annotations: {
+    allowInBrowserExt: true,
+    defaultValue: null,
     getValue: settings => settings.annotations,
   },
   appType: {
-    getValue: settings =>
-      settings.hostPageSetting('appType', {
-        allowInBrowserExt: true,
-      }),
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.hostPageSetting('appType'),
   },
   branding: {
+    defaultValue: null,
+    allowInBrowserExt: false,
     getValue: settings => settings.hostPageSetting('branding'),
   },
   // URL of the client's boot script. Used when injecting the client into
   // child iframes.
   clientUrl: {
+    allowInBrowserExt: true,
+    defaultValue: null,
     getValue: settings => settings.clientUrl,
   },
   enableExperimentalNewNoteButton: {
+    allowInBrowserExt: false,
+    defaultValue: false,
     getValue: settings =>
       settings.hostPageSetting('enableExperimentalNewNoteButton'),
   },
   group: {
+    allowInBrowserExt: true,
+    defaultValue: null,
     getValue: settings => settings.group,
   },
   focus: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.hostPageSetting('focus'),
   },
   theme: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.hostPageSetting('theme'),
   },
   usernameUrl: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.hostPageSetting('usernameUrl'),
   },
   onLayoutChange: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.hostPageSetting('onLayoutChange'),
   },
   openSidebar: {
+    allowInBrowserExt: true,
+    defaultValue: false,
     coerce: toBoolean,
-    getValue: settings =>
-      settings.hostPageSetting('openSidebar', {
-        allowInBrowserExt: true,
-      }),
+    getValue: settings => settings.hostPageSetting('openSidebar'),
   },
   query: {
+    allowInBrowserExt: true,
+    defaultValue: null,
     getValue: settings => settings.query,
   },
   requestConfigFromFrame: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.hostPageSetting('requestConfigFromFrame'),
   },
   services: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.hostPageSetting('services'),
   },
   showHighlights: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.showHighlights,
   },
   notebookAppUrl: {
+    allowInBrowserExt: true,
+    defaultValue: null,
     getValue: settings => settings.notebookAppUrl,
   },
   sidebarAppUrl: {
+    allowInBrowserExt: true,
+    defaultValue: null,
     getValue: settings => settings.sidebarAppUrl,
   },
   // Sub-frame identifier given when a frame is being embedded into
   // by a top level client
   subFrameIdentifier: {
-    getValue: settings =>
-      settings.hostPageSetting('subFrameIdentifier', {
-        allowInBrowserExt: true,
-      }),
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.hostPageSetting('subFrameIdentifier'),
   },
   externalContainerSelector: {
+    allowInBrowserExt: false,
+    defaultValue: null,
     getValue: settings => settings.hostPageSetting('externalContainerSelector'),
   },
 };
@@ -162,8 +201,29 @@ export function getConfig(appContext = 'annotator', window_ = window) {
   let filteredKeys = configurationKeys(appContext);
   filteredKeys.forEach(name => {
     const configDef = configDefinitions[name];
+    const hasDefault = configDef.defaultValue !== undefined; // A default could be null
+    const isURLFromBrowserExtensionTrue = isURLFromBrowserExtension(
+      urlFromLinkTag(window_, 'sidebar', 'html')
+    );
+
+    // Only allow certain values in the browser extension context
+    if (!configDef.allowInBrowserExt && isURLFromBrowserExtensionTrue) {
+      if (hasDefault) {
+        config[name] = configDef.defaultValue;
+      }
+      return;
+    }
+
+    // Get the value from the configuration source
     const value = configDef.getValue(settings);
-    // Get the value from the configuration source and run through an optional coerce method
+    if (value === undefined) {
+      if (hasDefault) {
+        config[name] = configDef.defaultValue;
+      }
+      return;
+    }
+
+    // Finally, run the value through an optional coerce method
     config[name] = configDef.coerce ? configDef.coerce(value) : value;
   });
 
