@@ -54,7 +54,7 @@ function search(text, str, maxErrors) {
  */
 function textMatchScore(text, str) {
   /* istanbul ignore next - `scoreMatch` will never pass an empty string */
-  if (str.length === 0) {
+  if (str.length === 0 || text.length === 0) {
     return 0.0;
   }
   const matches = search(text, str, str.length);
@@ -116,7 +116,7 @@ export function matchQuote(text, quote, context = {}) {
 
     const prefixScore = context.prefix
       ? textMatchScore(
-          text.slice(match.start - context.prefix.length, match.start),
+          text.slice(Math.max(0, match.start - context.prefix.length), match.start),
           context.prefix
         )
       : 1.0;
