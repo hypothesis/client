@@ -159,7 +159,7 @@ const configDefinitions = {
   },
   showHighlights: {
     allowInBrowserExt: false,
-    defaultValue: null,
+    defaultValue: 'always',
     getValue: settings => settings.showHighlights,
   },
   notebookAppUrl: {
