@@ -298,18 +298,15 @@ describe('annotator/config/settingsFrom', () => {
         input: 42,
         output: 42,
       },
-      // If the host page sets showHighlights to null this will be mistaken
-      // for the host page not containing a showHighlights setting at all and
-      // showHighlights will be set to 'always'.
       {
         it: 'defaults to "always"',
-        input: null,
+        input: undefined,
         output: 'always',
       },
       {
-        it: 'passes undefined through unmodified',
-        input: undefined,
-        output: undefined,
+        it: 'passes null through unmodified',
+        input: null,
+        output: null,
       },
       {
         it: 'passes arrays through unmodified',
@@ -367,7 +364,7 @@ describe('annotator/config/settingsFrom', () => {
         isBrowserExtension: false,
         configFuncSettings: { ignoreOtherConfiguration: '1' },
         jsonSettings: { foo: 'ignored' },
-        expected: null,
+        expected: undefined,
       },
       {
         when: 'the client is embedded in a web page',
@@ -400,41 +397,13 @@ describe('annotator/config/settingsFrom', () => {
         jsonSettings: { foo: 'jsonValue' },
         expected: undefined,
       },
-      {
-        when: 'no default value is provided',
-        specify: 'it returns null',
-        configFuncSettings: {},
-        jsonSettings: {},
-        defaultValue: undefined,
-        expected: null,
-      },
-      {
-        when: 'a default value is provided',
-        specify: 'it returns that default value',
-        configFuncSettings: {},
-        jsonSettings: {},
-        defaultValue: 'test value',
-        expected: 'test value',
-      },
-      {
-        when: 'a default value is provided but it is overridden',
-        specify: 'it returns the overridden value',
-        configFuncSettings: { foo: 'not the default value' },
-        jsonSettings: {},
-        defaultValue: 'the default value',
-        expected: 'not the default value',
-      },
     ].forEach(function (test) {
       context(test.when, () => {
         specify(test.specify, () => {
           fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);
           fakeParseJsonConfig.returns(test.jsonSettings);
           const settings = settingsFrom(fakeWindow());
-
-          const setting = settings.hostPageSetting('foo', {
-            defaultValue: test.defaultValue || null,
-          });
-
+          const setting = settings.hostPageSetting('foo');
           assert.strictEqual(setting, test.expected);
         });
       });
