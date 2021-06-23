@@ -2,7 +2,6 @@ import { parseJsonConfig } from '../../boot/parse-json-config';
 import { toBoolean } from '../../shared/type-coercions';
 
 import configFuncSettingsFrom from './config-func-settings-from';
-import { isBrowserExtension } from './is-browser-extension';
 import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
@@ -130,16 +129,7 @@ export default function settingsFrom(window_) {
   }
 
   function hostPageSetting(name, options = {}) {
-    const allowInBrowserExt = options.allowInBrowserExt || false;
     const hasDefaultValue = typeof options.defaultValue !== 'undefined';
-
-    // TODO: Remove this logic
-    if (
-      !allowInBrowserExt &&
-      isBrowserExtension(urlFromLinkTag(window_, 'sidebar', 'html'))
-    ) {
-      return hasDefaultValue ? options.defaultValue : null;
-    }
 
     if (configFuncSettings.hasOwnProperty(name)) {
       return configFuncSettings[name];
