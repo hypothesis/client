@@ -195,4 +195,14 @@ describe('matchQuote', () => {
     assert.ok(matchNoHint);
     assert.equal(matchNoHint.start, posA, 'Wrong match with no hint');
   });
+
+  it('matches with a context prefix longer than the text', () => {
+    const match = matchQuote(fixtures.solitude, 'years later', {
+      prefix: 'It used to be many',
+    });
+    assert.equal(
+      fixtures.solitude.slice(match.start, match.end),
+      'years later'
+    );
+  });
 });
