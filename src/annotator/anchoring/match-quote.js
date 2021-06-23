@@ -116,7 +116,10 @@ export function matchQuote(text, quote, context = {}) {
 
     const prefixScore = context.prefix
       ? textMatchScore(
-          text.slice(Math.max(0, match.start - context.prefix.length), match.start),
+          text.slice(
+            Math.max(0, match.start - context.prefix.length),
+            match.start
+          ),
           context.prefix
         )
       : 1.0;
