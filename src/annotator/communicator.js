@@ -119,7 +119,7 @@ function equalMessage(message1, message2) {
  * - `notebook` <-> `sidebar`
  *
  * `FrameConnector` runs only on the `host` frame. The rest of the frames run the
- * companion class, `PortFinder`. `FrameConnector` creates `MessageChannels` for
+ * companion class, `PortFinder`. `FrameConnector` creates a `MessageChannel` for
  * two frames to communicate with each other. It also listens to requests for
  * particular channel.port and dispatches the corresponding `MessagePort`.
  *
