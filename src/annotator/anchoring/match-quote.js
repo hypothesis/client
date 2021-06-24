@@ -53,10 +53,13 @@ function search(text, str, maxErrors) {
  * @param {string} str
  */
 function textMatchScore(text, str) {
-  /* istanbul ignore next - `scoreMatch` will never pass an empty string */
+  // `search` will return no matches if either the text or pattern is empty,
+  // otherwise it will return at least one match if the max allowed error count
+  // is at least `str.length`.
   if (str.length === 0 || text.length === 0) {
     return 0.0;
   }
+
   const matches = search(text, str, str.length);
 
   // prettier-ignore
