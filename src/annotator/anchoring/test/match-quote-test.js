@@ -196,13 +196,22 @@ describe('matchQuote', () => {
     assert.equal(matchNoHint.start, posA, 'Wrong match with no hint');
   });
 
-  it('matches with a context prefix longer than the text', () => {
-    const match = matchQuote(fixtures.solitude, 'years later', {
-      prefix: 'It used to be many',
-    });
+  it('matches when prefix length is greater than the match start offset', () => {
+    const context = { prefix: 'It used to be many' };
+    const match = matchQuote(fixtures.solitude, 'years later', context);
+
+    assert.isAbove(context.prefix.length, match.start);
     assert.equal(
       fixtures.solitude.slice(match.start, match.end),
       'years later'
     );
+  });
+
+  it('matches when match ends at end of text and there is a non-empty suffix', () => {
+    const text = 'Some document text';
+    const match = matchQuote(text, 'text', {
+      suffix: 'missing',
+    });
+    assert.equal(text.slice(match.start, match.end), 'text');
   });
 });
