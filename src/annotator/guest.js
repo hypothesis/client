@@ -112,9 +112,11 @@ export default class Guest {
    *   or create annotations. In an ordinary web page this typically `document.body`.
    * @param {EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
+   * @param {MessagePort|null} hostPort -
+   *   Enables communication between `host` and `sidebar` frames
    * @param {Record<string, any>} [config]
    */
-  constructor(element, eventBus, config = {}) {
+  constructor(element, eventBus, hostPort, config = {}) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
     this._visibleHighlights = false;
@@ -165,7 +167,7 @@ export default class Guest {
     this._frameIdentifier = config.subFrameIdentifier || null;
 
     // Setup connection to sidebar.
-    this.crossframe = new CrossFrame(this.element, {
+    this.crossframe = new CrossFrame(this.element, hostPort, {
       config,
       on: (event, handler) => this._emitter.subscribe(event, handler),
       emit: (event, ...args) => this._emitter.publish(event, ...args),
@@ -631,6 +633,13 @@ export default class Guest {
    */
   fitSideBySide(sidebarLayout) {
     this._sideBySideActive = this._integration.fitSideBySide(sidebarLayout);
+  }
+
+  /**
+   * Initiate the communication with the `sidebar` frame
+   */
+  connectWithSidebar() {
+    this.crossframe.connectWithSidebar();
   }
 
   /**
