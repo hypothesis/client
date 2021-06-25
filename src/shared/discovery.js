@@ -59,8 +59,6 @@ export default class Discovery {
     this.requestInProgress = false;
 
     this.onDiscovery = null;
-
-    this._onMessage = this._onMessage.bind(this);
     this._listeners = new ListenerCollection();
   }
 
@@ -83,7 +81,9 @@ export default class Discovery {
     this.onDiscovery = onDiscovery;
 
     // Listen for messages from other frames.
-    this._listeners.add(this.target, 'message', this._onMessage);
+    this._listeners.add(this.target, 'message', event =>
+      this._onMessage(/** @type {MessageEvent} */ (event))
+    );
     this._beacon();
   }
 
@@ -125,10 +125,12 @@ export default class Discovery {
   /**
    * Handle a `MessageEvent` from another frame which _may_ be from a
    * `Discovery` instance.
+   *
+   * @param {MessageEvent} event
    */
   _onMessage(event) {
     const { source, data } = event;
-    let origin = event.origin;
+    let { origin } = event;
 
     // If `origin` is 'null' the source frame is a file URL or loaded over some
     // other scheme for which the `origin` is undefined. In this case, the only
@@ -167,6 +169,14 @@ export default class Discovery {
       origin
     );
 
+    if (
+      source === null ||
+      source instanceof ServiceWorker ||
+      source instanceof MessagePort
+    ) {
+      return;
+    }
+
     if (reply) {
       source.postMessage('__cross_frame_dhcp_' + reply, origin);
     }
@@ -178,6 +188,11 @@ export default class Discovery {
     }
   }
 
+  /**
+   * @param {string} messageType
+   * @param {string} token
+   * @param {string} origin
+   */
   _processMessage(messageType, token, origin) {
     let reply = null;
     let discovered = false;
