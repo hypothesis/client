@@ -1,6 +1,8 @@
 /**
- * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../shared/bridge').default} Bridge
+ * @typedef {import('../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -18,18 +20,16 @@
  *
  * It also listens for events from Guest when new annotations are created or
  * annotations successfully anchor and relays these to the sidebar app.
+ *
+ * @implements Destroyable
  */
 export default class AnnotationSync {
   /**
-   * @param {Bridge} bridge
-   * @param {Object} options
-   *   @param {(event: string, callback: (...args: any[]) => void) => void} options.on -
-   *     Function that registers a listener for an event from the rest of the
-   *     annotator
-   *   @param {(event: string, ...args: any[]) => void} options.emit -
-   *     Function that publishes an event to the rest of the annotator
+   * @param {EventBus} eventBus - enables intra-frame communication
+   * @param {Bridge} bridge - enables inter-frame communication
    */
-  constructor(bridge, options) {
+  constructor(eventBus, bridge) {
+    this._emitter = eventBus.createEmitter();
     this.bridge = bridge;
 
     /**
@@ -40,25 +40,22 @@ export default class AnnotationSync {
      */
     this.cache = {};
 
-    this._on = options.on;
-    this._emit = options.emit;
-
     // Relay events from the sidebar to the rest of the annotator.
     this.bridge.on('deleteAnnotation', (body, callback) => {
       const annotation = this._parse(body);
       delete this.cache[annotation.$tag];
-      this._emit('annotationDeleted', annotation);
+      this._emitter.publish('annotationDeleted', annotation);
       callback(null, this._format(annotation));
     });
 
     this.bridge.on('loadAnnotations', (bodies, callback) => {
       const annotations = bodies.map(body => this._parse(body));
-      this._emit('annotationsLoaded', annotations);
+      this._emitter.publish('annotationsLoaded', annotations);
       callback(null, annotations);
     });
 
     // Relay events from annotator to sidebar.
-    this._on('beforeAnnotationCreated', annotation => {
+    this._emitter.subscribe('beforeAnnotationCreated', annotation => {
       if (annotation.$tag) {
         return;
       }
@@ -127,5 +124,9 @@ export default class AnnotationSync {
       tag: annotation.$tag,
       msg: annotation,
     };
+  }
+
+  destroy() {
+    this._emitter.destroy();
   }
 }

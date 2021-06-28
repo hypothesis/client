@@ -1,5 +1,4 @@
 import { Adder } from './adder';
-import { CrossFrame } from './cross-frame';
 import { HTMLIntegration } from './integrations/html';
 import { PDFIntegration } from './integrations/pdf';
 
@@ -18,13 +17,13 @@ import { normalizeURI } from './util/url';
 import { ListenerCollection } from './util/listener-collection';
 
 /**
- * @typedef {import('./util/emitter').EventBus} EventBus
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Anchor} Anchor
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/annotator').Integration} Integration
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
+ * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -110,15 +109,15 @@ export default class Guest {
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {EventBus} eventBus -
-   *   Enables communication between components sharing the same eventBus
-   * @param {MessagePort|null} hostPort -
-   *   Enables communication between `host` and `sidebar` frames
+   * @param {EventBus} eventBus - enables intra-frame communication
+   * @param {import('./cross-frame').CrossFrame} crossframe - enables inter-frame
+   *   communication, between `host` or `guest` and `sidebar` frames
    * @param {Record<string, any>} [config]
    */
-  constructor(element, eventBus, hostPort, config = {}) {
+  constructor(element, eventBus, crossframe, config = {}) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
+    this.crossframe = crossframe;
     this._visibleHighlights = false;
     this._isAdderVisible = false;
 
@@ -167,11 +166,6 @@ export default class Guest {
     this._frameIdentifier = config.subFrameIdentifier || null;
 
     // Setup connection to sidebar.
-    this.crossframe = new CrossFrame(this.element, hostPort, {
-      config,
-      on: (event, handler) => this._emitter.subscribe(event, handler),
-      emit: (event, ...args) => this._emitter.publish(event, ...args),
-    });
     this.crossframe.onConnect(() => this._setupInitialState(config));
     this._connectSidebarEvents();
 
@@ -633,13 +627,6 @@ export default class Guest {
    */
   fitSideBySide(sidebarLayout) {
     this._sideBySideActive = this._integration.fitSideBySide(sidebarLayout);
-  }
-
-  /**
-   * Initiate the communication with the `sidebar` frame
-   */
-  connectWithSidebar() {
-    this.crossframe.connectWithSidebar();
   }
 
   /**

@@ -1,7 +1,4 @@
-import Bridge from '../shared/bridge';
-
 import AnnotationSync from './annotation-sync';
-import { PortFinder } from './communicator';
 import FrameObserver from './frame-observer';
 import * as frameUtil from './util/frame-util';
 
@@ -12,8 +9,10 @@ function generateToken() {
   return Math.random().toString().replace(/\D/g, '');
 }
 /**
+ * @typedef {import('../shared/bridge').default} Bridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -30,20 +29,13 @@ function generateToken() {
 export class CrossFrame {
   /**
    * @param {Element} element
-   * @param {MessagePort|null} hostPort -- enables to communicate between the
-   * `host` and `sidebar` frames. If `null`, it indicates that this is a `guest`
-   * frame.
-   * @param {object} options
-   *   @param {Record<string, any>} options.config,
-   *   @param {boolean} [options.server]
-   *   @param {(event: string, ...args: any[]) => void} options.on
-   *   @param {(event: string, ...args: any[]) => void } options.emit
+   * @param {EventBus} eventBus - enables intra-frame communication
+   * @param {Bridge} bridge - enables to inter-frame communication
+   * @param {Record<string, any>} config
    */
-  constructor(element, hostPort, options) {
-    const { config, on, emit } = options;
-    const bridge = new Bridge();
-    const annotationSync = new AnnotationSync(bridge, { on, emit });
+  constructor(element, eventBus, bridge, config) {
     const frameObserver = new FrameObserver(element);
+    const annotationSync = new AnnotationSync(eventBus, bridge);
     const frameIdentifiers = new Map();
 
     /**
@@ -78,7 +70,7 @@ export class CrossFrame {
      * Remove the connection between the sidebar and annotator.
      */
     this.destroy = () => {
-      bridge.destroy();
+      annotationSync.destroy();
       frameObserver.disconnect();
     };
 
@@ -112,32 +104,5 @@ export class CrossFrame {
      * @param {(...args: any[]) => void} callback
      */
     this.onConnect = callback => bridge.onConnect(callback);
-
-    /**
-     * Connect to the `sidebar` frame by either (1) using the `host` port in the
-     * `hostToSidebar` channel or (2) discovering the `guest` port of the
-     * `guestToSidebar` channel.
-     */
-    this.connectWithSidebar = () => {
-      if (hostPort) {
-        // Because `hostPort` is not `null` we know that this is a `host` frame.
-        // In this case, use the `host` port of the `hostToSidebar` channel to
-        // communicate with the `sidebar` frame.
-        bridge.createChannelFromPort(hostPort, 'sidebar');
-        return;
-      }
-
-      // This is a `guest` frame. Discover the `guest` port on the `guestToSidebar`
-      // channel using the parent window
-      const portFinder = new PortFinder();
-      portFinder
-        .discover({
-          channel: 'guestToSidebar',
-          hostFrame: window.parent,
-          port: 'guest',
-          subFrameIdentifier: config.subFrameIdentifier,
-        })
-        .then(port => bridge.createChannelFromPort(port, 'sidebar'));
-    };
   }
 }
