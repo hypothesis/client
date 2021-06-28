@@ -70,7 +70,7 @@ function isMessageSourced(possibleMessage) {
  * @param {any} message
  * @return {null|Message}
  */
-function parseMessage(message) {
+export function parseMessage(message) {
   if (isMessageSourced(message) === false) {
     return null;
   }
@@ -220,20 +220,7 @@ export class FrameConnector {
           type: 'request',
         },
         port: this._channels.notebookToSidebar.port1,
-      })
-    );
-
-    // Listen and respond to the request of the `sidebar` port from `notebookToSidebar` channel
-    // TODO: this listener is not required, if the `sidebarPort` is sent through the `hostToSidebar` channel.
-    this._listeners.add(window, 'message', event =>
-      this._handlePortRequest(/** @type {MessageEvent} */ (event), {
-        allowedOrigin: this._sidebarAndNotebookAppOrigin,
-        message: {
-          channel: 'notebookToSidebar',
-          port: 'sidebar',
-          type: 'request',
-        },
-        port: this._channels.notebookToSidebar.port2,
+        reciprocalPort: this._channels.notebookToSidebar.port2,
       })
     );
   }
@@ -249,10 +236,12 @@ export class FrameConnector {
    *   @param {string} options.allowedOrigin
    *   @param {Message} options.message
    *   @param {MessagePort} options.port
+   *   @param {MessagePort} [options.reciprocalPort] - when the reciprocalPort
+   *     is defined it is transferred through the sidebar port
    */
   _handlePortRequest(
     { data, origin, source },
-    { allowedOrigin, message, port }
+    { allowedOrigin, message, port, reciprocalPort }
   ) {
     if (origin !== allowedOrigin) {
       return;
@@ -275,15 +264,22 @@ export class FrameConnector {
       return;
     }
 
-    source.postMessage(
-      createMessage({
-        channel: message.channel,
-        port: message.port,
-        type: 'offer',
-      }),
-      allowedOrigin,
-      [port]
-    );
+    const messageSource = createMessage({
+      channel: message.channel,
+      port: message.port,
+      type: 'offer',
+    });
+
+    source.postMessage(messageSource, allowedOrigin, [port]);
+
+    // When requesting ports in channels different than the `hostToSidebar`
+    // channel, we sent the 'reciprocal' port to the `sidebar` using
+    // `hostToSidebar(channel).sidebar(port).postMessage`
+    if (reciprocalPort) {
+      this._channels.hostToSidebar.port1.postMessage(messageSource, [
+        reciprocalPort,
+      ]);
+    }
   }
 
   destroy() {
