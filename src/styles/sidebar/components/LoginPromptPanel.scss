@@ -1,7 +1,0 @@
-@use "../../mixins/layout";
-@use "../../variables" as var;
-
-.LoginPromptPanel__buttons {
-  @include layout.row;
-  @include layout.horizontal-rhythm(var.$layout-space--xsmall);
-}
