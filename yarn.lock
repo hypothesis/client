@@ -1016,10 +1016,10 @@
     normalize-path "^2.0.1"
     through2 "^2.0.3"
 
-"@hypothesis/frontend-shared@3.2.0":
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-3.2.0.tgz#f045a046871e1fcc4f8f7e5f5ab7a4b76f1d454c"
-  integrity sha512-uV4xRGJMESN1v43Wl076aVgdSxJ/Q3YBqLBK0W1HT7TKvKbEWF4TP/ifk2D9W7NJ8ljx59pXKQQoR0mfNzBYxQ==
+"@hypothesis/frontend-shared@3.3.0":
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-3.3.0.tgz#50186386e4a81e921df6d56dd10fcd452175d920"
+  integrity sha512-SRYpmjwfMbL4QB5M/a2ca8+BNiEa2z5XLdHJetJLGNpBE4xZW6brpAvZPsZJbdbqt6WJO4+wgQPnM46C8HHQdw==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
