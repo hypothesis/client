@@ -1,4 +1,4 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
+import { Actions, LabeledButton } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
 
@@ -28,14 +28,14 @@ export default function LoginPromptPanel({ onLogin, onSignUp }) {
       panelName="loginPrompt"
     >
       <p>Please log in to create annotations or highlights.</p>
-      <div className="LoginPromptPanel__buttons">
+      <Actions>
         <LabeledButton title="Sign up" onClick={onSignUp}>
           Sign up
         </LabeledButton>
         <LabeledButton title="Log in" variant="primary" onClick={onLogin}>
           Log in
         </LabeledButton>
-      </div>
+      </Actions>
     </SidebarPanel>
   );
 }
