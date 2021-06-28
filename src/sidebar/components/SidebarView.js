@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'preact/hooks';
 
-import { PortFinder } from '../../shared/communicator';
 import { tabForAnnotation } from '../helpers/tabs';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
@@ -29,7 +28,6 @@ import useRootThread from './hooks/use-root-thread';
  * @param {SidebarViewProps} props
  */
 function SidebarView({
-  bridge,
   frameSync,
   loadAnnotationsService,
   onLogin,
@@ -88,32 +86,6 @@ function SidebarView({
 
   /** @type {import("preact/hooks").Ref<string|null>} */
   const prevGroupId = useRef(focusedGroupId);
-
-  useEffect(() => {
-    const framePort = new PortFinder();
-
-    // Enables communication between `host` and `sidebar` frames
-    framePort
-      .discover({
-        channel: 'hostToSidebar',
-        hostFrame: window.parent,
-        port: 'sidebar',
-      })
-      .then(port => frameSync.connect(port));
-
-    // Enables communication between `notebook` and `sidebar` frames
-    framePort
-      .discover({
-        channel: 'notebookToSidebar',
-        hostFrame: window.parent,
-        port: 'sidebar',
-      })
-      .then(port => bridge.createChannelFromPort(port, 'notebook'));
-
-    return () => {
-      framePort.destroy();
-    };
-  }, [bridge, frameSync]);
 
   // Reload annotations when group, user or document search URIs change
   useEffect(() => {
@@ -187,7 +159,6 @@ function SidebarView({
 }
 
 export default withServices(SidebarView, [
-  'bridge',
   'frameSync',
   'loadAnnotationsService',
   'streamer',
