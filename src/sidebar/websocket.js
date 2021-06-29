@@ -94,22 +94,13 @@ export class Socket extends TinyEmitter {
       // ...otherwise reconnect the websocket after a short delay.
       let delay = RECONNECT_MIN_DELAY;
       delay += Math.floor(Math.random() * delay);
-      setTimeout(() => {
-        operation = null;
-        reconnect();
-      }, delay);
+      setTimeout(reconnect, delay);
     };
 
     /**
      * Connect the WebSocket.
-     *
-     * If a connection attempt is already in progress, do nothing.
      */
     const connect = () => {
-      if (operation) {
-        return;
-      }
-
       operation = /** @type {RetryOperation} */ (
         retry.operation({
           minTimeout: RECONNECT_MIN_DELAY * 2,
