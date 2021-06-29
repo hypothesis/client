@@ -1,12 +1,18 @@
 import AnnotationSync from './annotation-sync';
-import Bridge from '../shared/bridge';
-import Discovery from '../shared/discovery';
-import * as frameUtil from './util/frame-util';
 import FrameObserver from './frame-observer';
+import * as frameUtil from './util/frame-util';
 
 /**
+ * Generate a pseudo uuid to distinguish `guest` frames
+ */
+function generateToken() {
+  return Math.random().toString().replace(/\D/g, '');
+}
+/**
+ * @typedef {import('../shared/bridge').default} Bridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -23,18 +29,13 @@ import FrameObserver from './frame-observer';
 export class CrossFrame {
   /**
    * @param {Element} element
-   * @param {object} options
-   *   @param {Record<string, any>} options.config,
-   *   @param {boolean} [options.server]
-   *   @param {(event: string, ...args: any[]) => void} options.on
-   *   @param {(event: string, ...args: any[]) => void } options.emit
+   * @param {EventBus} eventBus - enables intra-frame communication
+   * @param {Bridge} bridge - enables to inter-frame communication
+   * @param {Record<string, any>} config
    */
-  constructor(element, options) {
-    const { config, server, on, emit } = options;
-    const discovery = new Discovery(window, { server });
-    const bridge = new Bridge();
-    const annotationSync = new AnnotationSync(bridge, { on, emit });
+  constructor(element, eventBus, bridge, config) {
     const frameObserver = new FrameObserver(element);
+    const annotationSync = new AnnotationSync(eventBus, bridge);
     const frameIdentifiers = new Map();
 
     /**
@@ -46,7 +47,7 @@ export class CrossFrame {
       }
 
       frameUtil.isLoaded(frame, () => {
-        const subFrameIdentifier = discovery.generateToken();
+        const subFrameIdentifier = generateToken();
         frameIdentifiers.set(frame, subFrameIdentifier);
         const injectedConfig = {
           ...config,
@@ -63,18 +64,13 @@ export class CrossFrame {
       frameIdentifiers.delete(frame);
     };
 
-    // Initiate connection to the sidebar.
-    const onDiscoveryCallback = (source, origin, token) =>
-      bridge.createChannel(source, origin, token);
-    discovery.startDiscovery(onDiscoveryCallback);
     frameObserver.observe(injectIntoFrame, iframeUnloaded);
 
     /**
      * Remove the connection between the sidebar and annotator.
      */
     this.destroy = () => {
-      bridge.destroy();
-      discovery.stopDiscovery();
+      annotationSync.destroy();
       frameObserver.disconnect();
     };
 
@@ -89,7 +85,7 @@ export class CrossFrame {
      * Subscribe to an event from the sidebar.
      *
      * @param {string} event
-     * @param {Function} callback
+     * @param {(...args: any[]) => void} callback
      */
     this.on = (event, callback) => bridge.on(event, callback);
 
@@ -105,7 +101,7 @@ export class CrossFrame {
      * Register a callback to be invoked once the connection to the sidebar
      * is set up.
      *
-     * @param {Function} callback
+     * @param {(...args: any[]) => void} callback
      */
     this.onConnect = callback => bridge.onConnect(callback);
   }

@@ -1,9 +1,8 @@
 import { useEffect, useRef } from 'preact/hooks';
 
-import useRootThread from './hooks/use-root-thread';
+import { tabForAnnotation } from '../helpers/tabs';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
-import { tabForAnnotation } from '../helpers/tabs';
 
 import FilterStatus from './FilterStatus';
 import LoggedOutMessage from './LoggedOutMessage';
@@ -11,13 +10,15 @@ import LoginPromptPanel from './LoginPromptPanel';
 import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
+import useRootThread from './hooks/use-root-thread';
 
 /**
  * @typedef SidebarViewProps
- * @prop {() => any} onLogin
- * @prop {() => any} onSignUp
+ * @prop {import('../../shared/bridge').default} bridge
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
+ * @prop {() => any} onLogin
+ * @prop {() => any} onSignUp
  * @prop {import('../services/streamer').StreamerService} streamer
  */
 
@@ -28,9 +29,9 @@ import ThreadList from './ThreadList';
  */
 function SidebarView({
   frameSync,
+  loadAnnotationsService,
   onLogin,
   onSignUp,
-  loadAnnotationsService,
   streamer,
 }) {
   const rootThread = useRootThread();

@@ -1,9 +1,14 @@
 import debounce from 'lodash.debounce';
 
+import { ListenerCollection } from '../../annotator/util/listener-collection'; // this is imported from `annotator`, this is an import mismatch.
 import bridgeEvents from '../../shared/bridge-events';
-import Discovery from '../../shared/discovery';
+import { PortFinder, parseMessage } from '../../shared/communicator';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
+
+/**
+ * @typedef {import('../../types/annotator').Destroyable} Destroyable - is importing a type from annotator, this is a mismatch
+ */
 
 /**
  * Return a minimal representation of an annotation that can be sent from the
@@ -42,6 +47,7 @@ export function formatAnnot(ann) {
  * data needed to create the highlights is sent. This is a security/privacy
  * feature to prevent the host page observing the contents or authors of annotations.
  *
+ * @implements Destroyable
  * @inject
  */
 export class FrameSyncService {
@@ -53,6 +59,8 @@ export class FrameSyncService {
   constructor(annotationsService, bridge, store) {
     this._bridge = bridge;
     this._store = store;
+    this._framePort = new PortFinder();
+    this._listeners = new ListenerCollection();
 
     // Set of tags of annotations that are currently loaded into the frame
     const inFrame = new Set();
@@ -212,7 +220,8 @@ export class FrameSyncService {
   }
 
   /**
-   * Find and connect to Hypothesis clients in the current window.
+   * Find and connect to the Hypothesis client in the `host` frame using
+   * window.parent.
    */
   connect() {
     /**
@@ -223,7 +232,7 @@ export class FrameSyncService {
     const addFrame = channel => {
       channel.call('getDocumentInfo', (err, info) => {
         if (err) {
-          channel.destroy();
+          channel.destroy(); // TODO: I am not sure if this works with `MessagePort`
           return;
         }
 
@@ -235,12 +244,28 @@ export class FrameSyncService {
       });
     };
 
-    const discovery = new Discovery(window, { server: true });
-    discovery.startDiscovery(this._bridge.createChannel.bind(this._bridge));
     this._bridge.onConnect(addFrame);
 
     this._setupSyncToFrame();
     this._setupSyncFromFrame();
+
+    this._framePort
+      .discover({
+        channel: 'hostToSidebar',
+        hostFrame: window.parent,
+        port: 'sidebar',
+      })
+      .then(port => {
+        this._bridge.createChannelFromPort(port, 'host');
+        // Create channels for new ports: `notebook` and `guest` frames
+        this._listeners.add(port, 'message', event => {
+          const { data, ports } = /** @type {MessageEvent} */ (event);
+          const message = parseMessage(data);
+          if (message && message.type === 'offer') {
+            this._bridge.createChannelFromPort(ports[0], message.port);
+          }
+        });
+      });
   }
 
   /**
@@ -263,5 +288,11 @@ export class FrameSyncService {
    */
   scrollToAnnotation(tag) {
     this._bridge.call('scrollToAnnotation', tag);
+  }
+
+  // TODO: This is not called
+  destroy() {
+    this._framePort.destroy();
+    this._listeners.removeAll();
   }
 }
