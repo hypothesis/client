@@ -18,7 +18,7 @@ import iconSet from './icons';
 registerIcons(iconSet);
 
 import Bridge from '../shared/bridge';
-import { FrameConnector } from '../shared/communicator';
+import { FrameConnector, PortFinder } from '../shared/communicator';
 
 import { getConfig } from './config/index';
 import { CrossFrame } from './cross-frame';
@@ -78,21 +78,19 @@ function init() {
     // This enables the communication channel between `guest` <-> `sidebar`.
     // Discover the `guest` port on the `guestToSidebar` channel using the
     // parent window
-    // const portFinder = new PortFinder();
-    // portFinder
-    //   .discover({
-    //     channel: 'guestToSidebar',
-    //     hostFrame: window.parent,
-    //     port: 'guest',
-    //   })
-    //   .then(port => hostBridge.createChannelFromPort(port, 'sidebar'));
+    const portFinder = new PortFinder();
+    portFinder
+      .discover({
+        channel: 'guestToSidebar',
+        hostFrame: window.parent,
+        port: 'guest',
+      })
+      .then(port => bridge.createChannelFromPort(port, 'sidebar'));
   } else {
     const sidebarConfig = getConfig('sidebar');
     const { sidebarAppUrl } = sidebarConfig;
 
-    frameConnector = new FrameConnector({
-      sidebarAppUrl,
-    });
+    frameConnector = new FrameConnector(sidebarAppUrl);
     frameConnector.listen();
 
     sidebar = new Sidebar(document.body, eventBus, guest, sidebarConfig);
