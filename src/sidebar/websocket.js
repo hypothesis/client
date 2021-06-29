@@ -16,7 +16,7 @@ export const CLOSE_ABNORMAL = 1006;
 // considered abnormal closures.
 
 // Minimum delay, in ms, before reconnecting after an abnormal connection close.
-const RECONNECT_MIN_DELAY = 1000;
+export const RECONNECT_MIN_DELAY = 1000;
 
 /**
  * Socket is a minimal wrapper around WebSocket which provides:
@@ -74,7 +74,7 @@ export class Socket extends TinyEmitter {
       if (operation) {
         if (!operation.retry(error)) {
           console.error(
-            'reached max retries attempting to reconnect websocket'
+            'Reached max retries attempting to reconnect WebSocket'
           );
         }
         return;
