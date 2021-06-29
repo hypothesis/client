@@ -1,6 +1,14 @@
 import retry from 'retry';
 import { TinyEmitter } from 'tiny-emitter';
 
+/**
+ * Operation created by `retry.operation`. See "retry" docs.
+ *
+ * @typedef RetryOperation
+ * @prop {(callback: () => void) => void} attempt
+ * @prop {(e: Error) => boolean} retry
+ */
+
 // Status codes indicating the reason why a WebSocket connection closed.
 // See https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent and
 // https://tools.ietf.org/html/rfc6455#section-7.4.
@@ -50,8 +58,12 @@ export class Socket extends TinyEmitter {
      */
     let socket;
 
-    // a pending operation to connect a WebSocket
-    let operation;
+    /**
+     * Pending connection or re-connection operation.
+     *
+     * @type {RetryOperation|null}
+     */
+    let operation = null;
 
     const sendMessages = () => {
       while (messageQueue.length > 0) {
@@ -82,7 +94,7 @@ export class Socket extends TinyEmitter {
       // ...otherwise reconnect the websocket after a short delay.
       let delay = RECONNECT_MIN_DELAY;
       delay += Math.floor(Math.random() * delay);
-      operation = setTimeout(() => {
+      setTimeout(() => {
         operation = null;
         reconnect();
       }, delay);
@@ -98,13 +110,15 @@ export class Socket extends TinyEmitter {
         return;
       }
 
-      operation = retry.operation({
-        minTimeout: RECONNECT_MIN_DELAY * 2,
-        // Don't retry forever -- fail permanently after 10 retries
-        retries: 10,
-        // Randomize retry times to minimize the thundering herd effect
-        randomize: true,
-      });
+      operation = /** @type {RetryOperation} */ (
+        retry.operation({
+          minTimeout: RECONNECT_MIN_DELAY * 2,
+          // Don't retry forever -- fail permanently after 10 retries
+          retries: 10,
+          // Randomize retry times to minimize the thundering herd effect
+          randomize: true,
+        })
+      );
 
       operation.attempt(() => {
         socket = new WebSocket(url);
