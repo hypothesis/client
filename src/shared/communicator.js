@@ -392,7 +392,7 @@ export class PortFinder {
     return new Promise((resolve, reject) => {
       // `guest` <-> `sidebar` communication
       if (options.channel === 'guestToSidebar' && options.port === 'guest') {
-        this._requestPortAndListenForAnswerWithPolling({
+        this._requestPortWithPolling({
           ...options,
           reject,
           resolve,
@@ -402,7 +402,7 @@ export class PortFinder {
 
       // `host` <-> `sidebar` communication
       if (options.channel === 'hostToSidebar' && options.port === 'sidebar') {
-        this._requestPortAndListenForAnswer({ ...options, reject, resolve });
+        this._requestPort({ ...options, reject, resolve });
         return;
       }
 
@@ -411,7 +411,7 @@ export class PortFinder {
         options.channel === 'notebookToSidebar' &&
         options.port === 'notebook'
       ) {
-        this._requestPortAndListenForAnswer({ ...options, reject, resolve });
+        this._requestPort({ ...options, reject, resolve });
         return;
       }
 
@@ -437,13 +437,7 @@ export class PortFinder {
    *
    * @param {RequestPortOptions} options
    */
-  _requestPortAndListenForAnswer({
-    channel,
-    hostFrame,
-    port,
-    reject,
-    resolve,
-  }) {
+  _requestPort({ channel, hostFrame, port, reject, resolve }) {
     // The resolution of the promise is guaranteed, however, as defensive
     // programming technique, it's better to reject the request after
     // certain amount of time.
@@ -475,13 +469,7 @@ export class PortFinder {
    *
    * @param {RequestPortOptions} options
    */
-  _requestPortAndListenForAnswerWithPolling({
-    channel,
-    hostFrame,
-    port,
-    reject,
-    resolve,
-  }) {
+  _requestPortWithPolling({ channel, hostFrame, port, reject, resolve }) {
     // The `host` frame maybe busy loading heavy documents, that's why the
     // waiting period is longer before we reject the request.
     const timeoutId = window.setTimeout(
