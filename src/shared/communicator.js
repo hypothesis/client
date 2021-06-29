@@ -14,16 +14,17 @@ import { ListenerCollection } from '../annotator/util/listener-collection';
 
 // Because there are many `postMessages` on the `host` frame, the SOURCE property
 // is added to the hypothesis `postMessages` to identify the provenance of the
-// message and avoid listening to messages that could have same properties but
-// different source. This is not a is not a security feature but an
+// message and avoid listening to messages that could have the same properties
+// but different source. This is not a is not a security feature but an
 // anti-collision mechanism.
 const SOURCE = 'hypothesis';
 
 const MAX_WAIT_FOR_PORT = 1000 * 5;
+const MAX_WAIT_FOR_GUEST_PORT = 1000 * 30;
+const POLLING_FOR_GUEST_PORT_INTERVAL = 500;
 
 /**
- * Utility to insert the `source` property into the `postMessage`. There are two
- * types of messages: `offer` and `request` of a port from a channel.
+ * Utility to insert the `source` property into the `postMessage`.
  *
  * @param {Message} message
  * @return {MessageSourced}
@@ -38,7 +39,7 @@ function createMessage({ channel, port, type }) {
 }
 
 /**
- * Checks if the `postMessage` has all the expected properties, including the
+ * It checks if the `postMessage` has all the expected properties, including the
  * correct `source` property. If so it returns `true`, otherwise, `false`.
  *
  * @param {any} possibleMessage
@@ -65,7 +66,8 @@ function isMessageSourced(possibleMessage) {
 
 /**
  * Utility to parse `postMessage`. If the `postMessage` is of type `MessageSourced`
- * it returns the message without the `source` property, otherwise, it returns `null`.
+ * it returns the message without the `source` property, otherwise, it returns
+ * `null`.
  *
  * @param {any} message
  * @return {null|Message}
@@ -102,9 +104,9 @@ function equalMessage(message1, message2) {
  * frames.
  *
  * There are 4 types of frames:
- * - `host`:  frame where the client is initially loaded
+ * - `host`:  frame where the hypothesis client is initially loaded
  * - `sidebar`: the main hypothesis app. It runs on an iframe and is responsible
- *    for communicating with the backend, fetching and saving the annotations.
+ *    for communicating with the backend, fetching and saving annotations.
  * - `notebook`: it is an another hypothesis app that runs on an iframe.
  * - `guest/s`: iframes with annotatable content
  *
@@ -117,63 +119,63 @@ function equalMessage(message1, message2) {
  *     |-> [`guest` iframe/s]
  *
  * Currently, we support the communication between the following pair of frames:
- * - `guest` <-> `sidebar` TODO
- * - `host` <-> `sidebar` TODO
+ * - `guest` <-> `sidebar`
+ * - `host` <-> `sidebar`
  * - `notebook` <-> `sidebar`
  *
  * `FrameConnector` runs only on the `host` frame. The rest of the frames run the
- * companion class, `PortFinder`. `FrameConnector` creates a `MessageChannels`
+ * companion class, `PortFinder`. `FrameConnector` creates a `MessageChannel`
  * for two frames to communicate with each other. It also listens to requests for
  * particular channel.port and dispatches the corresponding `MessagePort`.
  *
  *
  *                 FrameConnector                      |                PortFinder
- * ----------------------------------------------------|--------------------------------------------------------------
+ * ----------------------------------------------------|-------------------------------------------------------------------
  *
- * 2. listens to `requests` of channel.port <--------------------- 1. `request` a channel.port using `host.postMessage`
+ * 2. listens to `requests` of channel.port <--------------------- 1. `request` a channel.port using `hostFrame.postMessage`
  *                 |
  *                 V
  * 3. sends `offers` of channel.port using `frame.postMessage` ---> 4. listens to `offers` of channel.port
+ *                 |
+ *                 V
+ * 5. send reciprocal port to the `sidebar` frame using its
+ *    `hostToSidebar(channel).sideba(port)`
  *
- * TODO: after `hostToSidebar` channel has been established, it would be recommended
- * in step #3 to substitute `frame.postMessage` by
- * `hostToSidebar(channel).sidebar(port).postMessage`.
  *
- * It is essential that `FrameConnect` initialize the listeners (step #2) before
- * `PortFinder` sends the `requests` of channel.port (step #1). Because the
- * `host` frame creates the `sidebar` and `notebook` iframes, it is guaranteed
- * that `host` frame is ready to listen to messages originating from the
- * `sidebar` and `notebook` iframes.
+ * It is essential that `FrameConnect` initialize the listeners (step 2) before
+ * `PortFinder` sends the `requests` of channel.port (step 1). Because the
+ * `host` frame creates the `sidebar` and `notebook` iframes, under normal load
+ *  conditions, it is guaranteed that `host` frame is ready to listen to messages
+ *  originating from the `sidebar` and `notebook` iframes.
  *
- * However, the above assumption is not true for `host` and `guest` frames. Because
- * `guest` iframes load in parallel, we can not assume that the code in the `host`
- * frame is executed before the code in a `guest` frame. Therefore, for the `guest`
- * frames we implement a polling strategy (sending a message every N milliseconds
- * until a response is received).
+ * However, the above assumption is not true for the `guest` frames. Because
+ * `guest` iframes load in parallel to the `host` frame, we can not assume that
+ * the code in the `host`frame is executed before the code in a `guest` frame.
+ * Therefore, for the `guest` frames we implement a polling strategy (sending a
+ * message every N milliseconds until a response is received).
  *
  *
  * @implements Destroyable
  */
 export class FrameConnector {
   /**
-   * @param {object} options
-   *   @param {string} options.sidebarAppUrl
+   *   @param {string} sidebarAppUrl
    */
-  constructor({ sidebarAppUrl }) {
+  constructor(sidebarAppUrl) {
     this._sidebarAndNotebookAppOrigin = new URL(sidebarAppUrl).origin;
 
     // Create only the necessary channels. Channel nomenclature:
-    // `[frame1]To[frame2]` so that `port1` should be owned by/sent to
-    // `frame1` and `port2` by `frame2`.
+    // `[frame1]To[frame2]` so that `port1` should be owned by/transferred to
+    // `frame1` and `port2` to `frame2`.
     this._channels = {
       /**
        * Channels for the `guest` frame/s are created on demand (we don't know how
-       * many of those would be).
+       * many would be).
        *
-       * @type {Record<Window,MessageChannel>}
+       * @type {Map<Window,MessageChannel>}
        */
-      guestToSidebar: {}, // TODO
-      hostToSidebar: new MessageChannel(), // TODO
+      guestToSidebar: new Map(),
+      hostToSidebar: new MessageChannel(),
       notebookToSidebar: new MessageChannel(),
     };
 
@@ -197,11 +199,25 @@ export class FrameConnector {
   }
 
   listen() {
-    // Listen and respond to the request of the `sidebar` port from `hostToSidebar` channel
+    // TODO: It would be nice to remove the listener after sending the port.
+
+    // `guest` <-> `sidebar` communication
+    this._listeners.add(window, 'message', event =>
+      this._handleGuestPortRequest(/** @type {MessageEvent} */ (event), {
+        allowedOrigin: '*',
+        allowedMessage: {
+          channel: 'guestToSidebar',
+          port: 'guest',
+          type: 'request',
+        },
+      })
+    );
+
+    // `host` <-> `sidebar` communication
     this._listeners.add(window, 'message', event =>
       this._handlePortRequest(/** @type {MessageEvent} */ (event), {
         allowedOrigin: this._sidebarAndNotebookAppOrigin,
-        message: {
+        allowedMessage: {
           channel: 'hostToSidebar',
           port: 'sidebar',
           type: 'request',
@@ -210,11 +226,11 @@ export class FrameConnector {
       })
     );
 
-    // Listen and respond to the request of the `notebook` port from `notebookToSidebar` channel
+    // `notebook` <-> `sidebar` communication
     this._listeners.add(window, 'message', event =>
       this._handlePortRequest(/** @type {MessageEvent} */ (event), {
         allowedOrigin: this._sidebarAndNotebookAppOrigin,
-        message: {
+        allowedMessage: {
           channel: 'notebookToSidebar',
           port: 'notebook',
           type: 'request',
@@ -226,25 +242,24 @@ export class FrameConnector {
   }
 
   /**
-   * Respond to `request` of channel.ports. It sends a `frame.postMessage` with
-   * the port only if the frame's origin matches the the expected origin.
-   *
-   * It would be nicer to remove the listener after sending the port.
+   * @typedef Options
+   * @prop {string} allowedOrigin - the origin in the `MessageEvent` that is
+   *   allowed. If '*' allow every origin
+   * @prop {Message} allowedMessage - the message type that is allowed
+   * @prop {MessagePort} port - the port to be transferred to the frame.
+   * @prop {MessagePort} [reciprocalPort] - the reciprocalPort
+   *   is transferred to the `sidebar` frame using the `sidebar` port o
+   */
+
+  /**
+   * Checks the `postMessage` origin and message.
    *
    * @param {MessageEvent} event
-   * @param {object} options
-   *   @param {string} options.allowedOrigin
-   *   @param {Message} options.message
-   *   @param {MessagePort} options.port
-   *   @param {MessagePort} [options.reciprocalPort] - when the reciprocalPort
-   *     is defined it is transferred through the sidebar port
+   * @param {Omit<Options, 'port'>} options
    */
-  _handlePortRequest(
-    { data, origin, source },
-    { allowedOrigin, message, port, reciprocalPort }
-  ) {
-    if (origin !== allowedOrigin) {
-      return;
+  _isValidRequest({ data, origin, source }, { allowedOrigin, allowedMessage }) {
+    if (allowedOrigin !== '*' && origin !== allowedOrigin) {
+      return false;
     }
 
     if (
@@ -256,30 +271,82 @@ export class FrameConnector {
       source instanceof MessagePort ||
       source instanceof ServiceWorker
     ) {
-      return;
+      return false;
     }
 
     const parsedData = parseMessage(data);
-    if (!parsedData || !equalMessage(parsedData, message)) {
-      return;
+    if (!parsedData || !equalMessage(parsedData, allowedMessage)) {
+      return false;
     }
 
+    return true;
+  }
+
+  /**
+   * It sends (1) the requested port via `frame.postMessage` (the origin is set
+   * to match the allowedOrigin) and (2) the reciprocal port, if one is provided,
+   * to the `sidebar` frame using `hostToSidebar(channel).sidebar(port).postMessage`
+   *
+   * @param {MessageEvent} event
+   * @param {Options} options
+   */
+  _sendPort(event, { allowedMessage, port, reciprocalPort }) {
     const messageSource = createMessage({
-      channel: message.channel,
-      port: message.port,
+      channel: allowedMessage.channel,
+      port: allowedMessage.port,
       type: 'offer',
     });
 
-    source.postMessage(messageSource, allowedOrigin, [port]);
+    const source = /** @type {Window} */ (event.source);
 
-    // When requesting ports in channels different than the `hostToSidebar`
-    // channel, we sent the 'reciprocal' port to the `sidebar` using
-    // `hostToSidebar(channel).sidebar(port).postMessage`
+    source.postMessage(messageSource, event.origin, [port]);
+
     if (reciprocalPort) {
       this._channels.hostToSidebar.port1.postMessage(messageSource, [
         reciprocalPort,
       ]);
     }
+  }
+
+  /**
+   * Respond to `request` of ports on channels other than the `guestToSidebar`
+   * (which is a special case, see below).
+   *
+   * @param {MessageEvent} event
+   * @param {Options} options
+   */
+  _handlePortRequest(event, options) {
+    if (!this._isValidRequest(event, options)) {
+      return;
+    }
+
+    this._sendPort(event, options);
+  }
+
+  /**
+   * Respond to `request` of port in `guestToSidebar` channel. This ports are
+   * created on demand, one per window.
+   *
+   * @param {MessageEvent} event
+   * @param {Omit<Options, 'port'>} options
+   */
+  _handleGuestPortRequest(event, options) {
+    if (!this._isValidRequest(event, options)) {
+      return;
+    }
+
+    const source = /** @type {Window} */ (event.source);
+
+    // Check if channel has already been created, if it does then ignore the
+    // request because the port has already been sent.
+    if (this._channels.guestToSidebar.has(window)) {
+      return;
+    }
+
+    const { port1, port2 } = new MessageChannel();
+    this._channels.guestToSidebar.set(source, { port1, port2 });
+
+    this._sendPort(event, { ...options, port: port1, reciprocalPort: port2 });
   }
 
   destroy() {
@@ -309,25 +376,30 @@ export class PortFinder {
   // - messages are queued until the other port is ready to listen (`port.start()`)
 
   /**
-   * guest <-> sidebar TODO
-   * polling necessary because the `guest` frame could be loaded before the `host` frame
-   * @typedef {{channel: 'guestToSidebar', hostFrame: Window, port: 'guest', subFrameIdentifier: string}} options0
+   * `guest` <-> `sidebar` communication
+   * @typedef {{channel: 'guestToSidebar', hostFrame: Window, port: 'guest'}} options0
    *
-   * host <-> sidebar
+   * `host` <-> `sidebar` communication
    * @typedef {{channel: 'hostToSidebar', hostFrame: Window, port: 'sidebar'}} options1
    *
-   * notebook <-> sidebar
+   * `notebook` <-> `sidebar` communication
    * @typedef {{channel: 'notebookToSidebar', hostFrame: Window, port: 'notebook'}} options2
-    // TODO: this listener is not required, if the `sidebarPort` is sent through the `hostToSidebar` channel.
-   * @typedef {{channel: 'notebookToSidebar', hostFrame: Window, port: 'sidebar'}} options3
    *
-   * @param {options0|options1|options2|options3} options
+   * @param {options0|options1|options2} options
    * @return {Promise<MessagePort>}
    */
-  // @ts-ignore TODO: s
-  // eslint-disable-next-line no-unused-vars
   discover(options) {
     return new Promise((resolve, reject) => {
+      // `guest` <-> `sidebar` communication
+      if (options.channel === 'guestToSidebar' && options.port === 'guest') {
+        this._requestPortAndListenForAnswerWithPolling({
+          ...options,
+          reject,
+          resolve,
+        });
+        return;
+      }
+
       // `host` <-> `sidebar` communication
       if (options.channel === 'hostToSidebar' && options.port === 'sidebar') {
         this._requestPortAndListenForAnswer({ ...options, reject, resolve });
@@ -343,28 +415,27 @@ export class PortFinder {
         return;
       }
 
-      // TODO: this is not necessary, we can use
-      if (
-        options.channel === 'notebookToSidebar' &&
-        options.port === 'sidebar'
-      ) {
-        this._requestPortAndListenForAnswer({ ...options, reject, resolve });
-        return;
-      }
-
       reject(new Error('Unknown channel or port'));
     });
   }
 
   /**
+   *
+   * @typedef RequestPortOptions
+   * @prop {Message['channel']} channel - requested channel
+   * @prop {Window} hostFrame - the frame where the hypothesis client is loaded.
+   *   It is used to send a `hostFrame.postMessage`.
+   * @prop {Message['port']} port - requested port
+   * @prop {(reason?: any) => void} reject - execute the `Promise.reject` in case
+   *   the `host` frame takes too long to answer the request.
+   * @prop {(port: MessagePort) => void} resolve - execute the `Promise.resolve`
+   *   when `host` frame successfully answers the request.
+   */
+
+  /**
    * Register a listener for the port `offer` and sends a request for one port.
    *
-   * @param {object} options
-   *   @param {Message['channel']} options.channel
-   *   @param {Window} options.hostFrame
-   *   @param {Message['port']} options.port
-   *   @param {(reason?: any) => void} options.reject
-   *   @param {(port: MessagePort) => void} options.resolve
+   * @param {RequestPortOptions} options
    */
   _requestPortAndListenForAnswer({
     channel,
@@ -375,13 +446,16 @@ export class PortFinder {
   }) {
     // The resolution of the promise is guaranteed, however, as defensive
     // programming technique, it's better to reject the request after
-    // certain amount of time (30s).
+    // certain amount of time.
     const timeoutId = window.setTimeout(
       () =>
-        reject(new Error(`Unable to find '${port} port on ${channel} channel`)),
+        reject(
+          new Error(`Unable to find '${port}' port on '${channel}' channel`)
+        ),
       MAX_WAIT_FOR_PORT
     );
 
+    // TODO: It would be nice to remove the listener after sending the port.
     this._listeners.add(window, 'message', event =>
       this._handlePortOffer(/** @type {MessageEvent} */ (event), {
         message: { channel, port, type: 'offer' },
@@ -397,18 +471,70 @@ export class PortFinder {
   }
 
   /**
-   * Respond to `offer` of channel.ports. It calls resolve on the Promise.
+   * Register a listener for the port `offer` and sends a request for one port.
+   *
+   * @param {RequestPortOptions} options
+   */
+  _requestPortAndListenForAnswerWithPolling({
+    channel,
+    hostFrame,
+    port,
+    reject,
+    resolve,
+  }) {
+    // The `host` frame maybe busy loading heavy documents, that's why the
+    // waiting period is longer before we reject the request.
+    const timeoutId = window.setTimeout(
+      () =>
+        reject(
+          new Error(`Unable to find '${port}' port on '${channel}' channel`)
+        ),
+      MAX_WAIT_FOR_GUEST_PORT
+    );
+
+    const intervalId = window.setInterval(() => 
+      hostFrame.postMessage(
+        createMessage({ channel, port, type: 'request' }),
+        '*'
+      )
+    , POLLING_FOR_GUEST_PORT_INTERVAL);
+
+    // TODO: It would be nice to remove the listener after sending the port.
+    this._listeners.add(window, 'message', event =>
+      this._handlePortOffer(/** @type {MessageEvent} */ (event), {
+        message: { channel, port, type: 'offer' },
+        resolve,
+        timeoutId,
+        intervalId,
+      })
+    );
+
+    hostFrame.postMessage(
+      createMessage({ channel, port, type: 'request' }),
+      '*'
+    );
+  }
+
+  /**
+   * Respond to `offer` of channel.ports. It calls `Promise.resolve`.
    *
    * @param {MessageEvent} event
    * @param {object} options
    *   @param {Message} options.message
    *   @param {(port: MessagePort) => void} options.resolve
    *   @param {number} options.timeoutId
+   *   @param {number} [options.intervalId]
    */
-  _handlePortOffer({ data, ports }, { message, resolve, timeoutId }) {
+  _handlePortOffer(
+    { data, ports },
+    { message, resolve, timeoutId, intervalId }
+  ) {
     const parsedData = parseMessage(data);
     if (parsedData && equalMessage(parsedData, message)) {
       window.clearTimeout(timeoutId);
+      if (intervalId) {
+        window.clearInterval(intervalId);
+      }
       resolve(ports[0]);
     }
   }
