@@ -1,9 +1,9 @@
 import { useEffect, useRef } from 'preact/hooks';
 
-import useRootThread from './hooks/use-root-thread';
+import { PortFinder } from '../../shared/communicator';
+import { tabForAnnotation } from '../helpers/tabs';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
-import { tabForAnnotation } from '../helpers/tabs';
 
 import FilterStatus from './FilterStatus';
 import LoggedOutMessage from './LoggedOutMessage';
@@ -11,13 +11,15 @@ import LoginPromptPanel from './LoginPromptPanel';
 import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
+import useRootThread from './hooks/use-root-thread';
 
 /**
  * @typedef SidebarViewProps
- * @prop {() => any} onLogin
- * @prop {() => any} onSignUp
+ * @prop {import('../../shared/bridge').default} bridge
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
+ * @prop {() => any} onLogin
+ * @prop {() => any} onSignUp
  * @prop {import('../services/streamer').StreamerService} streamer
  */
 
@@ -27,10 +29,11 @@ import ThreadList from './ThreadList';
  * @param {SidebarViewProps} props
  */
 function SidebarView({
+  bridge,
   frameSync,
+  loadAnnotationsService,
   onLogin,
   onSignUp,
-  loadAnnotationsService,
   streamer,
 }) {
   const rootThread = useRootThread();
@@ -85,6 +88,21 @@ function SidebarView({
 
   /** @type {import("preact/hooks").Ref<string|null>} */
   const prevGroupId = useRef(focusedGroupId);
+
+  useEffect(() => {
+    const framePort = new PortFinder();
+    framePort
+      .discover({
+        channel: 'notebookToSidebarChannel',
+        hostFrame: window.parent,
+        port: 'sidebar',
+      })
+      .then(port => bridge.createChannelFromPort(port, 'notebook'));
+
+    return () => {
+      framePort.destroy();
+    };
+  }, [bridge]);
 
   // Reload annotations when group, user or document search URIs change
   useEffect(() => {
@@ -158,6 +176,7 @@ function SidebarView({
 }
 
 export default withServices(SidebarView, [
+  'bridge',
   'frameSync',
   'loadAnnotationsService',
   'streamer',
