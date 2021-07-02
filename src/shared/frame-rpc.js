@@ -69,7 +69,12 @@ export class RPC {
    */
   constructor(sourceFrame, destFrameOrPort, origin, methods) {
     this.sourceFrame = sourceFrame; // sourceFrame is ignored if using MessagePort
-    this.destFrameOrPort = destFrameOrPort;
+
+    if (destFrameOrPort instanceof MessagePort) {
+      this._port = destFrameOrPort;
+    } else {
+      this.destFrame = destFrameOrPort;
+    }
 
     if (origin === '*') {
       this.origin = '*';
@@ -84,44 +89,21 @@ export class RPC {
 
     this._listeners = new ListenerCollection();
 
-    if (this.destFrameOrPort instanceof MessagePort) {
-      /** @param {MessageEvent} event */
-      this._onmessage = event => {
-        // Validate message sender and format.
-        if (
-          this._destroyed ||
-          !event.data ||
-          typeof event.data !== 'object' ||
-          event.data.protocol !== 'frame-rpc' ||
-          !Array.isArray(event.data.arguments)
-        ) {
-          return;
-        }
-        this._handle(event.data);
-      };
-      this._listeners.add(this.destFrameOrPort, 'message', event =>
-        this._onmessage(/** @type {MessageEvent} */ (event))
+    if (this._port) {
+      this._listeners.add(this._port, 'message', event =>
+        this._handle(/** @type {MessageEvent} */ (event))
       );
-      this.destFrameOrPort.start();
+      this._port.start();
     } else {
       /** @param {MessageEvent} event */
-      this._onmessage = event => {
-        // Validate message sender and format.
-        if (
-          this._destroyed ||
-          this.destFrameOrPort !== event.source ||
-          (this.origin !== '*' && event.origin !== this.origin) ||
-          !event.data ||
-          typeof event.data !== 'object' ||
-          event.data.protocol !== 'frame-rpc' ||
-          !Array.isArray(event.data.arguments)
-        ) {
+      const onmessage = event => {
+        if (!this._isValidSender) {
           return;
         }
-        this._handle(event.data);
+        this._handle(event);
       };
       this._listeners.add(this.sourceFrame, 'message', event =>
-        this._onmessage(/** @type {MessageEvent} */ (event))
+        onmessage(/** @type {MessageEvent} */ (event))
       );
     }
   }
@@ -163,20 +145,60 @@ export class RPC {
       arguments: args,
     };
 
-    if (this.destFrameOrPort instanceof MessagePort) {
-      this.destFrameOrPort.postMessage(message);
-    } else {
-      this.destFrameOrPort.postMessage(message, this.origin);
+    if (this._port) {
+      this._port.postMessage(message);
+    }
+    if (this.destFrame) {
+      this.destFrame.postMessage(message, this.origin);
     }
   }
 
   /**
-   * @param {Message} msg
+   * Validate sender
+   *
+   * @param {MessageEvent} event
    */
-  _handle(msg) {
-    if (this._destroyed) {
+  _isValidSender(event) {
+    if (
+      this._destroyed ||
+      this.destFrame !== event.source ||
+      (this.origin !== '*' && event.origin !== this.origin)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Validate message
+   *
+   * @param {MessageEvent} event
+   */
+  _isValidMessage({ data }) {
+    if (
+      this._destroyed ||
+      !data ||
+      typeof data !== 'object' ||
+      data.protocol !== 'frame-rpc' ||
+      !Array.isArray(data.arguments)
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * @param {MessageEvent} event
+   */
+  _handle(event) {
+    if (!this._isValidMessage(event)) {
       return;
     }
+
+    const msg = /** @type {Message} */ (event.data);
+
     if ('method' in msg) {
       if (!this._methods.hasOwnProperty(msg.method)) {
         return;
@@ -191,10 +213,12 @@ export class RPC {
           arguments: args,
         };
 
-        if (this.destFrameOrPort instanceof MessagePort) {
-          this.destFrameOrPort.postMessage(message);
-        } else {
-          this.destFrameOrPort.postMessage(message, this.origin);
+        if (this._port) {
+          this._port.postMessage(message);
+        }
+
+        if (this.destFrame) {
+          this.destFrame.postMessage(message, this.origin);
         }
       };
       this._methods[msg.method].call(this._methods, ...msg.arguments, callback);
