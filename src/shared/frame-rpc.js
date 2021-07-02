@@ -25,6 +25,7 @@ import { ListenerCollection } from '../annotator/util/listener-collection';
  */
 
 const VERSION = '1.0.0';
+const PROTOCOL = 'frame-rpc';
 
 /**
  * Format of messages sent between frames.
@@ -32,13 +33,17 @@ const VERSION = '1.0.0';
  * See https://github.com/substack/frame-rpc#protocol
  *
  * @typedef RequestMessage
- * @prop {number} sequence
- * @prop {string} method
  * @prop {any[]} arguments
+ * @prop {string} method
+ * @prop {PROTOCOL} protocol
+ * @prop {number} sequence
+ * @prop {VERSION} version
  *
  * @typedef ResponseMessage
- * @prop {number} response
  * @prop {any[]} arguments
+ * @prop {PROTOCOL} protocol
+ * @prop {number} response
+ * @prop {VERSION} version
  *
  * @typedef {RequestMessage|ResponseMessage} Message
  *
@@ -54,8 +59,8 @@ const VERSION = '1.0.0';
  */
 export class RPC {
   /**
-   * Create an RPC client for sending RPC messages from `sourceFrame` to
-   * `destFrame`, and receiving RPC messages from `destFrame` to `sourceFrame`.
+   * Create an RPC client for sending RPC requests from `sourceFrame` to
+   * `destFrame`, and receiving RPC responses from `destFrame` to `sourceFrame`.
    *
    * This class has been adapted to work with `MessageChannel`. Because
    * `MessageChannel` are unidirectional we ignore the `sourceFrame` and `origin`
@@ -137,12 +142,13 @@ export class RPC {
       args = args.slice(0, -1);
     }
 
+    /** @type {RequestMessage} */
     const message = {
-      protocol: 'frame-rpc',
-      version: VERSION,
-      sequence: seq,
-      method,
       arguments: args,
+      method,
+      protocol: PROTOCOL,
+      sequence: seq,
+      version: VERSION,
     };
 
     if (this._port) {
@@ -180,7 +186,7 @@ export class RPC {
       this._destroyed ||
       !data ||
       typeof data !== 'object' ||
-      data.protocol !== 'frame-rpc' ||
+      data.protocol !== PROTOCOL ||
       !Array.isArray(data.arguments)
     ) {
       return false;
@@ -206,11 +212,12 @@ export class RPC {
 
       /** @param {any[]} args */
       const callback = (...args) => {
+        /** @type {ResponseMessage} */
         const message = {
-          protocol: 'frame-rpc',
-          version: VERSION,
-          response: msg.sequence,
           arguments: args,
+          protocol: PROTOCOL,
+          response: msg.sequence,
+          version: VERSION,
         };
 
         if (this._port) {
@@ -221,6 +228,7 @@ export class RPC {
           this.destFrame.postMessage(message, this.origin);
         }
       };
+
       this._methods[msg.method].call(this._methods, ...msg.arguments, callback);
     } else if ('response' in msg) {
       const cb = this._callbacks[msg.response];
