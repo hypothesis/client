@@ -318,7 +318,6 @@ function TagEditor({
           className="TagEditor__input"
           type="text"
           autoComplete="off"
-          aria-label="Add tag field"
           aria-autocomplete="list"
           aria-activedescendant={activeDescendant}
           aria-controls={`${tagEditorId}-AutocompleteList`}

@@ -78,7 +78,7 @@ describe('AnnotationPublishControl', () => {
   });
 
   const getPublishButton = wrapper =>
-    wrapper.find('LabeledButton[title^="Publish this annotation"]');
+    wrapper.find('LabeledButton.PublishControlButton');
 
   describe('theming', () => {
     it('should apply theme styles', () => {
@@ -102,10 +102,7 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl();
 
         const btn = getPublishButton(wrapper);
-        assert.equal(
-          btn.prop('title'),
-          `Publish this annotation to ${fakeGroup.name}`
-        );
+        assert.equal(btn.text(), `Post to ${fakeGroup.name}`);
       });
     });
 
@@ -117,7 +114,7 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl();
 
         const btn = getPublishButton(wrapper);
-        assert.equal(btn.prop('title'), 'Publish this annotation to Only Me');
+        assert.equal(btn.text(), 'Post to Only Me');
       });
     });
 
