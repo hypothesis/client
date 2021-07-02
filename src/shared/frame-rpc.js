@@ -1,3 +1,5 @@
+import { ListenerCollection } from '../annotator/util/listener-collection';
+
 /*
   This module was adapted from `index.js` in https://github.com/substack/frame-rpc.
 
@@ -80,6 +82,8 @@ export class RPC {
     this._sequence = 0;
     this._callbacks = {};
 
+    this._listeners = new ListenerCollection();
+
     if (this.destFrameOrPort instanceof MessagePort) {
       /** @param {MessageEvent} event */
       this._onmessage = event => {
@@ -95,7 +99,9 @@ export class RPC {
         }
         this._handle(event.data);
       };
-      this.destFrameOrPort.addEventListener('message', this._onmessage);
+      this._listeners.add(this.destFrameOrPort, 'message', event =>
+        this._onmessage(/** @type {MessageEvent} */ (event))
+      );
       this.destFrameOrPort.start();
     } else {
       /** @param {MessageEvent} event */
@@ -114,7 +120,9 @@ export class RPC {
         }
         this._handle(event.data);
       };
-      this.sourceFrame.addEventListener('message', this._onmessage);
+      this._listeners.add(this.sourceFrame, 'message', event =>
+        this._onmessage(/** @type {MessageEvent} */ (event))
+      );
     }
   }
 
@@ -124,11 +132,7 @@ export class RPC {
    */
   destroy() {
     this._destroyed = true;
-    if (this.destFrameOrPort instanceof MessagePort) {
-      this.destFrameOrPort.removeEventListener('message', this._onmessage);
-    } else {
-      this.sourceFrame.removeEventListener('message', this._onmessage);
-    }
+    this._listeners.removeAll();
   }
 
   /**
