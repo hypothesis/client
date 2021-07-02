@@ -27,7 +27,7 @@ describe('shared/bridge', () => {
     it('creates a new channel with the provided options', () => {
       const channel = createChannel();
       assert.equal(channel.sourceFrame, window);
-      assert.equal(channel.destFrame, fakeWindow);
+      assert.equal(channel.destFrameOrPort, fakeWindow);
       assert.equal(channel.origin, 'http://example.com');
     });
 
