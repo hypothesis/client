@@ -35,7 +35,7 @@ describe('shared/bridge', () => {
       const channel = createChannel();
       assert.isTrue(
         bridge.links.some(
-          link => link.channel === channel && link.window === fakeWindow
+          link => link.channel === channel && link.windowOrPort === fakeWindow
         )
       );
     });
