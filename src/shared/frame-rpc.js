@@ -66,9 +66,15 @@ export class RPC {
    * `MessageChannel` are unidirectional we ignore the `sourceFrame` and `origin`
    * properties, in this case.
    *
-   * @param {Window} sourceFrame
+   * TODO: July 2021, currently this class is a bit of a _frankenstein_ because
+   * we support both, `Window.postMessage` and `MessagePort.postMessage`.
+   * Once we move all the inter-frame communication to `MessageChannel` we will
+   * be able to cleanup this class. We have added `@deprecated` statements in
+   * the pieces of code that need to be removed.
+   *
+   * @param {Window} sourceFrame -- @deprecated
    * @param {Window|MessagePort} destFrameOrPort
-   * @param {string} origin - Origin of destination frame
+   * @param {string} origin - Origin of destination frame @deprecated
    * @param {Record<string, (...args: any[]) => void>} methods - Map of method
    *   name to method handler
    */
@@ -78,9 +84,11 @@ export class RPC {
     if (destFrameOrPort instanceof MessagePort) {
       this._port = destFrameOrPort;
     } else {
+      /** @deprecated */
       this.destFrame = destFrameOrPort;
     }
 
+    /** @deprecated */
     if (origin === '*') {
       this.origin = '*';
     } else {
@@ -91,6 +99,7 @@ export class RPC {
 
     this._sequence = 0;
     this._callbacks = {};
+    this._destroyed = false;
 
     this._listeners = new ListenerCollection();
 
@@ -100,6 +109,7 @@ export class RPC {
       );
       this._port.start();
     } else {
+      /** @deprecated */
       /** @param {MessageEvent} event */
       const onmessage = event => {
         if (!this._isValidSender) {
@@ -120,6 +130,9 @@ export class RPC {
   destroy() {
     this._destroyed = true;
     this._listeners.removeAll();
+    if (this._port) {
+      this._port.close();
+    }
   }
 
   /**
@@ -137,8 +150,9 @@ export class RPC {
     }
 
     const seq = this._sequence++;
-    if (typeof args[args.length - 1] === 'function') {
-      this._callbacks[seq] = args[args.length - 1];
+    const finalArg = args[args.length - 1];
+    if (typeof finalArg === 'function') {
+      this._callbacks[seq] = finalArg;
       args = args.slice(0, -1);
     }
 
@@ -154,6 +168,8 @@ export class RPC {
     if (this._port) {
       this._port.postMessage(message);
     }
+
+    /** @deprecated */
     if (this.destFrame) {
       this.destFrame.postMessage(message, this.origin);
     }
@@ -163,13 +179,13 @@ export class RPC {
    * Validate sender
    *
    * @param {MessageEvent} event
+   * @deprecated
    */
   _isValidSender(event) {
-    if (
-      this._destroyed ||
-      this.destFrame !== event.source ||
-      (this.origin !== '*' && event.origin !== this.origin)
-    ) {
+    if (this.destFrame !== event.source) {
+      return false;
+    }
+    if (this.origin !== '*' && event.origin !== this.origin) {
       return false;
     }
 
@@ -182,13 +198,16 @@ export class RPC {
    * @param {MessageEvent} event
    */
   _isValidMessage({ data }) {
-    if (
-      this._destroyed ||
-      !data ||
-      typeof data !== 'object' ||
-      data.protocol !== PROTOCOL ||
-      !Array.isArray(data.arguments)
-    ) {
+    if (!data || typeof data !== 'object') {
+      return false;
+    }
+    if (data.protocol !== PROTOCOL) {
+      return false;
+    }
+    if (data.version !== VERSION) {
+      return false;
+    }
+    if (!Array.isArray(data.arguments)) {
       return false;
     }
 
@@ -224,11 +243,11 @@ export class RPC {
           this._port.postMessage(message);
         }
 
+        /** @deprecated */
         if (this.destFrame) {
           this.destFrame.postMessage(message, this.origin);
         }
       };
-
       this._methods[msg.method].call(this._methods, ...msg.arguments, callback);
     } else if ('response' in msg) {
       const cb = this._callbacks[msg.response];

@@ -115,7 +115,7 @@ describe('shared/bridge', () => {
       sandbox.stub(channel, 'call').throws(new Error(''));
       sandbox.stub(channel, 'destroy');
 
-      const callback = function () {
+      const callback = () => {
         assert.called(channel.destroy);
         done();
       };
@@ -184,9 +184,10 @@ describe('shared/bridge', () => {
       };
 
       const data = {
-        protocol: 'frame-rpc',
-        method: 'connect',
         arguments: ['TOKEN'],
+        method: 'connect',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
       };
 
       const event = {
@@ -212,9 +213,10 @@ describe('shared/bridge', () => {
       };
 
       const data = {
-        protocol: 'frame-rpc',
-        method: 'connect',
         arguments: ['TOKEN'],
+        method: 'connect',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
       };
 
       const event = {
