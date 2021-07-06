@@ -35,7 +35,7 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
 /**
  * Union of possible toolbar commands.
  *
- * @typedef {'annotate'|'highlight'|'show'} Command
+ * @typedef {'annotate'|'highlight'|'show'|'hide'} Command
  */
 
 /**
@@ -70,6 +70,11 @@ export default function AdderToolbar({
   const annotateShortcut = isVisible ? 'a' : null;
   const highlightShortcut = isVisible ? 'h' : null;
   const showShortcut = isVisible ? 's' : null;
+  const hideShortcut = isVisible ? 'Escape' : null;
+
+  // Add a shortcut to close the adder. Note, there is no button associated with this
+  // shortcut because any outside click will also hide the adder.
+  useShortcut(hideShortcut, () => onCommand('hide'));
 
   // nb. The adder is hidden using the `visibility` property rather than `display`
   // so that we can compute its size in order to position it before display.

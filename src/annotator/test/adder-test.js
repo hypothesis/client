@@ -75,7 +75,7 @@ describe('Adder', () => {
     assert.exists(shadowRoot.querySelector('.AdderToolbar'));
   });
 
-  describe('button handling', () => {
+  describe('button and shortcut handling', () => {
     const getButton = label =>
       getContent(adder).querySelector(`button[title^="${label}"]`);
 
@@ -152,6 +152,17 @@ describe('Adder', () => {
       showAdder();
       triggerShortcut('s');
       assert.called(adderCallbacks.onShowAnnotations);
+    });
+
+    it('hides the adder when `Escape` shortcut is pressed', () => {
+      adder.annotationsForSelection = ['ann1'];
+      showAdder();
+
+      triggerShortcut('Escape');
+
+      const pos = adderRect();
+      assert.equal(pos.left, 0);
+      assert.equal(pos.top, 0);
     });
 
     it('does not call callbacks when adder is hidden', () => {

@@ -338,6 +338,9 @@ export class Adder {
         case 'show':
           this._onShowAnnotations(this.annotationsForSelection);
           break;
+        case 'hide':
+          this.hide();
+          break;
         default:
           break;
       }
