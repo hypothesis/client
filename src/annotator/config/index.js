@@ -1,6 +1,6 @@
 import { isBrowserExtension } from './is-browser-extension';
 import settingsFrom from './settings';
-import { toBoolean } from '../../shared/type-coercions';
+import { toBoolean, toShowHighlights } from '../../shared/type-coercions';
 import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
@@ -160,7 +160,8 @@ const configDefinitions = {
   showHighlights: {
     allowInBrowserExt: false,
     defaultValue: 'always',
-    getValue: settings => settings.showHighlights,
+    coerce: toShowHighlights,
+    getValue: getHostPageSetting,
   },
   notebookAppUrl: {
     allowInBrowserExt: true,
@@ -204,13 +205,20 @@ export function getConfig(appContext = 'annotator', window_ = window) {
       urlFromLinkTag(window_, 'sidebar', 'html')
     );
 
+    /**
+     * Closure helper to set an optional default
+     */
+    function setDefault(name) {
+      if (hasDefault) {
+        config[name] = configDef.defaultValue;
+      }
+    }
+
     // Only allow certain values in the browser extension context
     if (!configDef.allowInBrowserExt && isURLFromBrowserExtension) {
       // If the value is not allowed here, then set to the default if provided, otherwise ignore
       // the key:value pair
-      if (hasDefault) {
-        config[name] = configDef.defaultValue;
-      }
+      setDefault(name);
       return;
     }
 
@@ -219,14 +227,22 @@ export function getConfig(appContext = 'annotator', window_ = window) {
     if (value === undefined) {
       // If there is no value (e.g. undefined), then set to the default if provided,
       // otherwise ignore the config key:value pair
-      if (hasDefault) {
-        config[name] = configDef.defaultValue;
-      }
+      setDefault(name);
       return;
     }
 
     // Finally, run the value through an optional coerce method
-    config[name] = configDef.coerce ? configDef.coerce(value) : value;
+    const coerceValue = configDef.coerce ? configDef.coerce(value) : value;
+    if (coerceValue === undefined) {
+      // In some cases, the coerce method will return undefined when values are not appropriate.
+      // It is assumed we these should be omitted from the config.
+      //
+      // TODO: this could be replaced by validation further upstream with a console
+      // warning.
+      setDefault(name);
+      return;
+    }
+    config[name] = coerceValue;
   });
 
   return config;

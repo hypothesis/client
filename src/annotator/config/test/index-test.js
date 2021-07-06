@@ -41,17 +41,15 @@ describe('annotator/config/index', function () {
     assert.calledWithExactly(fakeSettingsFrom, 'WINDOW');
   });
 
-  ['sidebarAppUrl', 'query', 'annotations', 'group', 'showHighlights'].forEach(
-    settingName => {
-      it(`returns the ${settingName} setting`, () => {
-        fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
+  ['sidebarAppUrl', 'query', 'annotations', 'group'].forEach(settingName => {
+    it(`returns the ${settingName} setting`, () => {
+      fakeSettingsFrom()[settingName] = 'SETTING_VALUE';
 
-        const config = getConfig('all', 'WINDOW');
+      const config = getConfig('all', 'WINDOW');
 
-        assert.equal(config[settingName], 'SETTING_VALUE');
-      });
-    }
-  );
+      assert.equal(config[settingName], 'SETTING_VALUE');
+    });
+  });
 
   context("when there's no application/annotator+html <link>", function () {
     beforeEach('remove the application/annotator+html <link>', function () {
@@ -69,7 +67,7 @@ describe('annotator/config/index', function () {
 
   describe('browser extension', () => {
     context('when client is loaded from the browser extension', function () {
-      it('returns only config values where `allowInBrowserExt` is true or the defaultValue if provided', () => {
+      it('returns only config values where `allowInBrowserExt` is true or the `defaultValue` if provided', () => {
         fakeIsBrowserExtension.returns(true);
         const config = getConfig('all', 'WINDOW');
         assert.deepEqual(
@@ -84,11 +82,11 @@ describe('annotator/config/index', function () {
             group: 'fakeValue',
             notebookAppUrl: 'fakeValue',
             onLayoutChange: null,
-            openSidebar: true, // coerced
+            openSidebar: true, // coerced to true
             query: 'fakeValue',
             requestConfigFromFrame: null,
             services: null,
-            showHighlights: 'always',
+            showHighlights: 'always', // defaulted to 'always'
             sidebarAppUrl: 'fakeValue',
             subFrameIdentifier: 'fakeValue',
             theme: null,
@@ -115,11 +113,11 @@ describe('annotator/config/index', function () {
             group: 'fakeValue',
             notebookAppUrl: 'fakeValue',
             onLayoutChange: 'fakeValue',
-            openSidebar: true, // coerced
+            openSidebar: true, // coerced to true
             query: 'fakeValue',
             requestConfigFromFrame: 'fakeValue',
             services: 'fakeValue',
-            showHighlights: 'fakeValue',
+            showHighlights: 'always', // coerced to undefined, then defaulted to 'always'
             sidebarAppUrl: 'fakeValue',
             subFrameIdentifier: 'fakeValue',
             theme: 'fakeValue',
@@ -209,6 +207,42 @@ describe('annotator/config/index', function () {
         .returns('false');
       const config = getConfig('all', 'WINDOW');
       assert.equal(config.openSidebar, false);
+    });
+
+    [
+      {
+        value: true,
+        result: 'always',
+      },
+      {
+        value: false,
+        result: 'never',
+      },
+      {
+        value: 'whenSidebarOpen',
+        result: 'whenSidebarOpen',
+      },
+      {
+        value: 'always',
+        result: 'always',
+      },
+      {
+        value: 'never',
+        result: 'never',
+      },
+      {
+        value: 'invalid',
+        result: 'always', // coerced to undefined, then defaulted to 'always'
+      },
+    ].forEach(function (test) {
+      it('coerces `showHighlights` appropriately', () => {
+        fakeSettingsFrom().hostPageSetting = sinon
+          .stub()
+          .withArgs('showHighlights')
+          .returns(test.value);
+        const config = getConfig('all', 'WINDOW');
+        assert.equal(config.showHighlights, test.result);
+      });
     });
   });
 

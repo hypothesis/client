@@ -67,3 +67,22 @@ export function toString(value) {
   }
   return '';
 }
+
+/**
+ * Coerce incoming value to appropriate `showHighlights` string values.
+ *
+ * @param {any} value - initial value
+ * @return {'always'|'never'|'whenSidebarOpen'|undefined}
+ */
+export function toShowHighlights(value) {
+  // Convert legacy keys/values to corresponding current configuration.
+  if (typeof value === 'boolean') {
+    return value ? 'always' : 'never';
+  }
+  // Valid string values
+  if (value === 'always' || value === 'never' || value === 'whenSidebarOpen') {
+    return value;
+  }
+  // Any other value will be undefined
+  return undefined;
+}
