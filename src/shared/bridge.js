@@ -10,7 +10,7 @@ import { RPC } from './frame-rpc';
  */
 export default class Bridge {
   constructor() {
-    /** @type {Array<{channel: RPC, windowOrPort: Window|MessagePort}>} */
+    /** @type {Array<RPC>} */
     this.links = [];
     /** @type {Record<string, (...args: any[]) => void>} */
     this.channelListeners = {};
@@ -24,7 +24,7 @@ export default class Bridge {
    * This removes the event listeners for messages arriving from other windows.
    */
   destroy() {
-    Array.from(this.links).map(link => link.channel.destroy());
+    this.links.forEach(channel => channel.destroy());
   }
 
   /**
@@ -53,9 +53,7 @@ export default class Bridge {
         return;
       }
       connected = true;
-      Array.from(this.onConnectListeners).forEach(cb =>
-        cb.call(null, channel, source)
-      );
+      this.onConnectListeners.forEach(cb => cb.call(null, channel, source));
     };
 
     const connect = (_token, cb) => {
@@ -74,10 +72,7 @@ export default class Bridge {
     channel.call('connect', token, ready);
 
     // Store the newly created channel in our collection
-    this.links.push({
-      channel,
-      windowOrPort: source, // TODO: unused, candidate to be removed
-    });
+    this.links.push(channel);
 
     return channel;
   }
@@ -108,17 +103,12 @@ export default class Bridge {
 
     // Fire off a connection attempt
     const ready = () => {
-      Array.from(this.onConnectListeners).forEach(cb =>
-        cb.call(null, channel, port)
-      );
+      this.onConnectListeners.forEach(cb => cb.call(null, channel, port));
     };
     channel.call('connect', ready);
 
     // Store the newly created channel in our collection
-    this.links.push({
-      channel,
-      windowOrPort: port, // TODO: unused, candidate to be removed
-    });
+    this.links.push(channel);
 
     return channel;
   }
@@ -128,50 +118,46 @@ export default class Bridge {
    * callback when all results are collected.
    *
    * @param {string} method - Name of remote method to call.
-   * @param {any[]} args - Arguments to method.
+   * @param {any[]} args - Arguments to method. Final argument is an optional
+   *   callback with this type: `(err: any, ...result: any[]) => void`
    * @return {Promise<any[]>} - Array of results, one per connected frame
    */
   call(method, ...args) {
     let cb;
-    if (typeof args[args.length - 1] === 'function') {
-      cb = args[args.length - 1];
+    const finalArg = args[args.length - 1];
+    if (typeof finalArg === 'function') {
+      cb = finalArg;
       args = args.slice(0, -1);
     }
 
     const _makeDestroyFn = c => {
       return error => {
         c.destroy();
-        this.links = Array.from(this.links)
-          .filter(l => l.channel !== c)
-          .map(l => l);
+        this.links = this.links.filter(channel => channel !== c);
         throw error;
       };
     };
 
-    const promises = this.links.map(function (l) {
-      const p = new Promise(function (resolve, reject) {
+    const promises = this.links.map(channel => {
+      const promise = new Promise((resolve, reject) => {
         const timeout = setTimeout(() => resolve(null), 1000);
         try {
-          return l.channel.call(
-            method,
-            ...Array.from(args),
-            function (err, result) {
-              clearTimeout(timeout);
-              if (err) {
-                return reject(err);
-              } else {
-                return resolve(result);
-              }
+          channel.call(method, ...args, (err, result) => {
+            clearTimeout(timeout);
+            if (err) {
+              reject(err);
+            } else {
+              resolve(result);
             }
-          );
+          });
         } catch (error) {
           const err = error;
-          return reject(err);
+          reject(err);
         }
       });
 
       // Don't assign here. The disconnect is handled asynchronously.
-      return p.catch(_makeDestroyFn(l.channel));
+      return promise.catch(_makeDestroyFn(channel));
     });
 
     let resultPromise = Promise.all(promises);
