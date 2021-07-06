@@ -89,7 +89,7 @@ export class CrossFrame {
      * Subscribe to an event from the sidebar.
      *
      * @param {string} event
-     * @param {Function} callback
+     * @param {(...args: any[]) => void} callback
      */
     this.on = (event, callback) => bridge.on(event, callback);
 
@@ -105,7 +105,7 @@ export class CrossFrame {
      * Register a callback to be invoked once the connection to the sidebar
      * is set up.
      *
-     * @param {Function} callback
+     * @param {(...args: any[]) => void} callback
      */
     this.onConnect = callback => bridge.onConnect(callback);
   }
