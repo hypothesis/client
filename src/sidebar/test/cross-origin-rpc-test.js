@@ -182,7 +182,7 @@ describe('sidebar/cross-origin-rpc', () => {
 
         fakeWindow.emitter.emit('message', {
           origin: 'https://allowed1.com',
-          data: { jsonrpc: '2.0', method: method, id: 42 },
+          data: { jsonrpc: '2.0', method, id: 42 },
           source: frame,
         });
 

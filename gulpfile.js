@@ -42,7 +42,7 @@ function parseCommandLine() {
 
   const { grep, watch, browser } = commander.opts();
   const karmaOptions = {
-    grep: grep,
+    grep,
     singleRun: !watch,
   };
 
@@ -69,7 +69,7 @@ gulp.task('build-vendor-js', () => {
   Object.keys(vendorBundles.bundles).forEach(name => {
     finished.push(
       createBundle({
-        name: name,
+        name,
         require: vendorBundles.bundles[name],
         minify: IS_PRODUCTION_BUILD,
         path: SCRIPT_DIR,

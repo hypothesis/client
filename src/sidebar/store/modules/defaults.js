@@ -30,7 +30,7 @@ const reducers = {
 const actions = util.actionTypes(reducers);
 
 function setDefault(defaultKey, value) {
-  return { type: actions.SET_DEFAULT, defaultKey: defaultKey, value: value };
+  return { type: actions.SET_DEFAULT, defaultKey, value };
 }
 
 /** Selectors */

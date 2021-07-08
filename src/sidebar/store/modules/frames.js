@@ -55,7 +55,7 @@ const actions = util.actionTypes(reducers);
  * @param {Frame} frame
  */
 function connectFrame(frame) {
-  return { type: actions.CONNECT_FRAME, frame: frame };
+  return { type: actions.CONNECT_FRAME, frame };
 }
 
 /**
@@ -64,7 +64,7 @@ function connectFrame(frame) {
  * @param {Frame} frame
  */
 function destroyFrame(frame) {
-  return { type: actions.DESTROY_FRAME, frame: frame };
+  return { type: actions.DESTROY_FRAME, frame };
 }
 
 /**
@@ -77,7 +77,7 @@ function updateFrameAnnotationFetchStatus(uri, isFetchComplete) {
   return {
     type: actions.UPDATE_FRAME_ANNOTATION_FETCH_STATUS,
     isAnnotationFetchComplete: isFetchComplete,
-    uri: uri,
+    uri,
   };
 }
 

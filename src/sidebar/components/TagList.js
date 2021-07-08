@@ -30,7 +30,7 @@ function TagList({ annotation, tags }) {
    * @return {string}
    */
   const createTagSearchURL = tag => {
-    return store.getLink('search.tag', { tag: tag });
+    return store.getLink('search.tag', { tag });
   };
 
   return (

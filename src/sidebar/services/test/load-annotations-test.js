@@ -109,7 +109,7 @@ describe('LoadAnnotationsService', () => {
   function createService() {
     fakeStore.frames.returns(
       fakeUris.map(uri => {
-        return { uri: uri };
+        return { uri };
       })
     );
     return new LoadAnnotationsService(
@@ -167,7 +167,7 @@ describe('LoadAnnotationsService', () => {
       // Override the default frames set by the service call above.
       fakeStore.frames.returns([
         {
-          uri: uri,
+          uri,
           metadata: {
             documentFingerprint: 'fingerprint',
             link: [

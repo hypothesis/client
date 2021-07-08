@@ -190,7 +190,7 @@ export default class OAuthClient {
         origin: $window.location.origin,
         response_mode: 'web_message',
         response_type: 'code',
-        state: state,
+        state,
       });
 
     // @ts-ignore - TS doesn't know about `location = <string>`.
@@ -248,10 +248,10 @@ export default class OAuthClient {
     // key=value format.
     const authWindowSettings = queryString
       .stringify({
-        left: left,
-        top: top,
-        width: width,
-        height: height,
+        left,
+        top,
+        width,
+        height,
       })
       .replace(/&/g, ',');
 

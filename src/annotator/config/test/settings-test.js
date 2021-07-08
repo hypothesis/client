@@ -62,7 +62,7 @@ describe('annotator/config/settingsFrom', () => {
   function fakeWindow(href) {
     return {
       location: {
-        href: href,
+        href,
       },
       document: {
         querySelector: sinon.stub().returns({ href: 'hi' }),
