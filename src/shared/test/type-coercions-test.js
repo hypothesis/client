@@ -1,4 +1,10 @@
-import { toBoolean, toInteger, toObject, toString } from '../type-coercions';
+import {
+  toBoolean,
+  toInteger,
+  toObject,
+  toString,
+  toShowHighlights,
+} from '../type-coercions';
 
 describe('shared/type-coercions', () => {
   describe('toBoolean', () => {
@@ -145,6 +151,40 @@ describe('shared/type-coercions', () => {
     ].forEach(test => {
       it('coerces the values appropriately', () => {
         assert.equal(toString(test.value), test.result);
+      });
+    });
+  });
+
+  describe('toShowHighlights', () => {
+    [
+      {
+        value: true,
+        result: 'always',
+      },
+      {
+        value: false,
+        result: 'never',
+      },
+      // Any other values are returned unchanged
+      {
+        value: 'whenSidebarOpen',
+        result: 'whenSidebarOpen',
+      },
+      {
+        value: 'always',
+        result: 'always',
+      },
+      {
+        value: 'never',
+        result: 'never',
+      },
+      {
+        value: 42,
+        result: 42,
+      },
+    ].forEach(function (test) {
+      it('coerces the values appropriately', () => {
+        assert.equal(toShowHighlights(test.value), test.result);
       });
     });
   });

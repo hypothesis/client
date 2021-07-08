@@ -1,12 +1,15 @@
 import { isBrowserExtension } from './is-browser-extension';
 import settingsFrom from './settings';
-import { toBoolean } from '../../shared/type-coercions';
+import { toBoolean, toShowHighlights } from '../../shared/type-coercions';
+import { validators } from '../../shared/type-validation';
 import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
  * @typedef {'sidebar'|'notebook'|'annotator'|'all'} AppContext
  * @typedef {import('./settings').SettingsGetters} SettingsGetters
  * @typedef {(settings: SettingsGetters, name: string) => any} ValueGetter
+ * @typedef {import('../../shared/type-validation').Validator} Validator
+ *
  *
  * @typedef ConfigDefinition
  * @prop {ValueGetter} getValue - Method to retrieve the value from the incoming source
@@ -16,6 +19,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  *  ignore the config key
  * @prop {any} [defaultValue] - Sets a default if `getValue` returns undefined
  * @prop {(value: any) => any} [coerce] - Transform a value's type, value or both
+ * @prop {Validator} [validate]
  *
  * @typedef {Record<string, ConfigDefinition>} ConfigDefinitionMap
  */
@@ -160,7 +164,12 @@ const configDefinitions = {
   showHighlights: {
     allowInBrowserExt: false,
     defaultValue: 'always',
-    getValue: settings => settings.showHighlights,
+    validate: validators.oneOfType([
+      validators.isString.oneOf(['always', 'never', 'whenSidebarOpen']),
+      validators.isBoolean, // allow booleans for backwards compatibility
+    ]),
+    coerce: toShowHighlights, // transforms booleans to strings
+    getValue: getHostPageSetting,
   },
   notebookAppUrl: {
     allowInBrowserExt: true,
@@ -204,29 +213,36 @@ export function getConfig(appContext = 'annotator', window_ = window) {
       urlFromLinkTag(window_, 'sidebar', 'html')
     );
 
+    // Set an optional default first, this may be overridden below
+    if (hasDefault) {
+      config[name] = configDef.defaultValue;
+    }
+
     // Only allow certain values in the browser extension context
     if (!configDef.allowInBrowserExt && isURLFromBrowserExtension) {
-      // If the value is not allowed here, then set to the default if provided, otherwise ignore
-      // the key:value pair
-      if (hasDefault) {
-        config[name] = configDef.defaultValue;
-      }
       return;
     }
 
     // Get the value from the configuration source
     const value = configDef.getValue(settings, name);
     if (value === undefined) {
-      // If there is no value (e.g. undefined), then set to the default if provided,
-      // otherwise ignore the config key:value pair
-      if (hasDefault) {
-        config[name] = configDef.defaultValue;
-      }
       return;
     }
 
-    // Finally, run the value through an optional coerce method
-    config[name] = configDef.coerce ? configDef.coerce(value) : value;
+    // If there is a validator, run that next
+    const validationResult = configDef.validate
+      ? configDef.validate(value)
+      : true;
+    if (validationResult === true) {
+      // Finally, run the value through an optional coerce method
+      config[name] = configDef.coerce ? configDef.coerce(value) : value;
+    } else {
+      // Report the error to the user
+      console.error(
+        `Config setting ${name}=${value} has errored.`,
+        validationResult
+      );
+    }
   });
 
   return config;
