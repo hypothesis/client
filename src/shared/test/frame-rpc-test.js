@@ -1,6 +1,6 @@
 import { RPC } from '../frame-rpc';
 
-describe('shared/bridge', () => {
+describe('RPC', () => {
   let port1;
   let port2;
   let rpc1;
@@ -20,9 +20,9 @@ describe('shared/bridge', () => {
     };
 
     rpc1 = new RPC(
-      /** dummy when using ports */ window,
+      /* dummy when using ports */ window,
       port1,
-      /** dummy when using ports */ '*',
+      /* dummy when using ports */ '*',
       {
         concat,
       }
@@ -36,9 +36,9 @@ describe('shared/bridge', () => {
     });
 
     rpc2 = new RPC(
-      /** dummy when using ports */ window,
+      /* dummy when using ports */ window,
       port2,
-      /** dummy when using ports */ '*',
+      /* dummy when using ports */ '*',
       {
         plusOne,
       }
@@ -71,10 +71,12 @@ describe('shared/bridge', () => {
       done(new Error('Unexpected call'));
     });
 
+    // All messages posted in the same turn of the event loop will get delivered
+    // by the time a setTimeout(..., 0) expires
     setTimeout(() => {
       assert.notCalled(plusOne);
       done();
-    }, 100);
+    }, 0);
   });
 
   it('should call the method `concat` on rpc1', done => {
@@ -89,8 +91,7 @@ describe('shared/bridge', () => {
     });
   });
 
-  it('should ignore invalid messages', done => {
-    // Correct message
+  it('should call method on valid message', done => {
     port1.postMessage({
       arguments: [1, 2],
       method: 'plusOne',
@@ -98,49 +99,69 @@ describe('shared/bridge', () => {
       version: '1.0.0',
     });
 
-    // Incorrect argument
-    port1.postMessage({
-      arguments: 'test',
-      method: 'plusOne',
-      protocol: 'frame-rpc',
-      version: '1.0.0',
-    });
-
-    // Incorrect method
-    port1.postMessage({
-      arguments: [1, 2],
-      method: 'dummy',
-      protocol: 'frame-rpc',
-      version: '1.0.0',
-    });
-
-    // Incorrect protocol
-    port1.postMessage({
-      arguments: [1, 2],
-      method: 'plusOne',
-      protocol: 'dummy',
-      version: '1.0.0',
-    });
-
-    // Incorrect version
-    port1.postMessage({
-      arguments: [1, 2],
-      method: 'plusOne',
-      protocol: 'frame-rpc',
-      version: 'dummy',
-    });
-
-    // All incorrect
-    port1.postMessage({});
-    port1.postMessage(null);
-    port1.postMessage(undefined);
-    port1.postMessage(0);
-    port1.postMessage('');
-    port1.postMessage('dummy');
-
+    // All messages posted in the same turn of the event loop will get delivered
+    // by the time a setTimeout(..., 0) expires
     setTimeout(() => {
       assert.calledOnce(plusOne);
       done();
-    }, 100);
+    }, 0);
   });
+
+  [
+    {
+      message: {
+        arguments: 'test',
+        method: 'plusOne',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
+      },
+      reason: 'message has incorrect arguments',
+    },
+
+    {
+      message: {
+        arguments: [1, 2],
+        method: 'dummy',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
+      },
+      reason: 'message has incorrect method',
+    },
+    {
+      message: {
+        arguments: [1, 2],
+        method: 'plusOne',
+        protocol: 'dummy',
+        version: '1.0.0',
+      },
+      reason: 'message has incorrect protocol',
+    },
+
+    {
+      message: {
+        arguments: [1, 2],
+        method: 'plusOne',
+        protocol: 'frame-rpc',
+        version: 'dummy',
+      },
+      reason: 'message has incorrect version',
+    },
+    { message: {}, reason: 'message is an empty object' },
+    { message: null, reason: 'message is `null`' },
+    { message: undefined, reason: 'message is `undefined`' },
+    { message: 0, reason: 'message is `0`' },
+    { message: '', reason: 'message is empty string' },
+    { message: 'dummy', reason: 'message is a string' },
+  ].forEach(({ message }) =>
+    it('should not call method on invalid messages', done => {
+      port1.postMessage(message);
+
+      // All messages posted in the same turn of the event loop will get delivered
+      // by the time a setTimeout(..., 0) expires
+      setTimeout(() => {
+        assert.notCalled(plusOne);
+        done();
+      }, 0);
+    })
+  );
 });

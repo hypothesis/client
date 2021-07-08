@@ -177,7 +177,7 @@ describe('shared/bridge', () => {
   describe('#onConnect', () => {
     it('adds a callback that is called when a channel is connected', done => {
       let channel;
-      const callback = function (c, s) {
+      const callback = (c, s) => {
         assert.strictEqual(c, channel);
         assert.strictEqual(s, fakeWindow);
         done();
@@ -199,6 +199,56 @@ describe('shared/bridge', () => {
       addEventListener.yieldsAsync(event);
       bridge.onConnect(callback);
       channel = createChannel();
+    });
+
+    it("doesn't trigger `onConnect` callbacks when a channel is connected from a different origin", done => {
+      const callback = sinon.stub();
+
+      const data = {
+        arguments: ['TOKEN'],
+        method: 'connect',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
+      };
+
+      addEventListener.yieldsAsync({
+        data,
+        origin: 'http://other.dummy',
+        source: fakeWindow,
+      });
+
+      bridge.onConnect(callback);
+      createChannel();
+
+      setTimeout(() => {
+        assert.notCalled(callback);
+        done();
+      }, 0);
+    });
+
+    it("doesn't trigger `onConnect` callbacks when a channel is connected from a different source", done => {
+      const callback = sinon.stub();
+
+      const data = {
+        arguments: ['TOKEN'],
+        method: 'connect',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
+      };
+
+      addEventListener.yieldsAsync({
+        data,
+        origin: 'http://example.com',
+        source: 'other',
+      });
+
+      bridge.onConnect(callback);
+      createChannel();
+
+      setTimeout(() => {
+        assert.notCalled(callback);
+        done();
+      }, 0);
     });
 
     it('allows multiple callbacks to be registered', done => {
