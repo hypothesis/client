@@ -408,7 +408,7 @@ describe('shared/bridge', () => {
 
       it('calls a callback with an error when a channels fails', async () => {
         const error = 'My error';
-        bridge.on('method1', (arg, cb) => cb(error));
+        bridge.on('method1', (_arg, cb) => cb(error));
         createChannel(port1);
 
         const reciprocalBridge = createBridge();
@@ -421,30 +421,45 @@ describe('shared/bridge', () => {
         }
       });
 
-      it('destroys the channel when a call fails', done => {
-        const channel = createChannel(port1);
-        sandbox.stub(channel, 'call').throws(new Error(''));
+      it('destroys the channel when a call fails', async () => {
+        const error = 'My error';
+        bridge.on('method1', (_arg, cb) => cb(error));
+        createChannel(port1);
+
+        const reciprocalBridge = createBridge();
+        const channel = createChannelFromBridge(reciprocalBridge, port2);
         sandbox.stub(channel, 'destroy').callThrough();
 
-        const callback = () => {
+        try {
+          await reciprocalBridge.call('method1', 'params1');
+        } catch (err) {
           assert.called(channel.destroy);
-          assert.equal(bridge.links.length, 0);
-          done();
-        };
-
-        bridge.call('method1', 'params1', callback);
+          assert.equal(reciprocalBridge.links.length, 0);
+          assert.equal(err, error);
+        }
       });
 
-      it('no longer publishes to a channel that has had an error', done => {
-        const channel = createChannel(port1);
-        sandbox.stub(channel, 'call').throws(new Error(''));
-        bridge.call('method1', 'params1', () => {
-          assert.calledOnce(channel.call);
-          bridge.call('method1', 'params1', () => {
+      it('no longer publishes to a channel that has had an error', async () => {
+        const error = 'My error';
+        bridge.on('method1', (_arg, cb) => cb(error));
+        // Passing an error on the callback, instead of a string, causes the error
+        // to be raised. I am not sure why. The test still passes.
+        //bridge.on('method1', (_arg, cb) => cb(new Error(error)));
+        createChannel(port1);
+
+        const reciprocalBridge = createBridge();
+        const channel = createChannelFromBridge(reciprocalBridge, port2);
+        sandbox.stub(channel, 'call').callThrough();
+
+        for (let i = 0; i < 5; ++i) {
+          try {
+            await reciprocalBridge.call('method1', 'params1');
+          } catch (err) {
+            assert.equal(err, error);
+          } finally {
             assert.calledOnce(channel.call);
-            done();
-          });
-        });
+          }
+        }
       });
     });
 

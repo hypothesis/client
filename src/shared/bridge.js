@@ -119,7 +119,7 @@ export default class Bridge {
    *
    * @param {string} method - Name of remote method to call.
    * @param {any[]} args - Arguments to method. Final argument is an optional
-   *   callback with this type: `(err: any, ...result: any[]) => void`
+   *   callback with this type: `(error: string|Error, ...result: any[]) => void`
    * @return {Promise<any[]>} - Array of results, one per connected frame
    */
   call(method, ...args) {
@@ -130,10 +130,13 @@ export default class Bridge {
       args = args.slice(0, -1);
     }
 
-    const _makeDestroyFn = c => {
+    /** @param {RPC} channel */
+    const _makeDestroyFn = channel => {
       return error => {
-        c.destroy();
-        this.links = this.links.filter(channel => channel !== c);
+        channel.destroy();
+        this.links = this.links.filter(
+          registeredChannel => registeredChannel !== channel
+        );
         throw error;
       };
     };
@@ -141,17 +144,22 @@ export default class Bridge {
     const promises = this.links.map(channel => {
       const promise = new Promise((resolve, reject) => {
         const timeout = setTimeout(() => resolve(null), 1000);
+        // This try/catch is only used on tests, to exercise the `_makeDestroyFn`
+        // function. In real life, the execution of the channel.call's callback will
+        // never throws an exception. The try/catch can be removed when we support
+        // `MessageChannel`, because we can exercise `_makeDestroyFn` more easily
+        // In addition, the two lines in `_makeDestroyFn` can moved to the if
+        // condition below, and remove the `_makeDestroyFn` function altogether.
         try {
-          channel.call(method, ...args, (err, result) => {
+          channel.call(method, ...args, (error, result) => {
             clearTimeout(timeout);
-            if (err) {
-              reject(err);
+            if (error) {
+              reject(error);
             } else {
               resolve(result);
             }
           });
-        } catch (error) {
-          const err = error;
+        } catch (err) {
           reject(err);
         }
       });
@@ -176,7 +184,8 @@ export default class Bridge {
    * message to this `Bridge`.
    *
    * @param {string} method
-   * @param {(...args: any[]) => void} callback
+   * @param {(...args: any[]) => void} callback -- Final argument is an optional
+   *   callback of the type: `(error: string|Error, ...result: any[]) => void`
    */
   on(method, callback) {
     if (this.channelListeners[method]) {
