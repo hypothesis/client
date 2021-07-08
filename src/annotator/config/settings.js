@@ -9,7 +9,6 @@ import { urlFromLinkTag } from './url-from-link-tag';
  * @prop {string|null} annotations
  * @prop {string|null} query
  * @prop {string|null} group
- * @prop {string} showHighlights
  * @prop {string} clientUrl
  * @prop {string} sidebarAppUrl
  * @prop {string} notebookAppUrl
@@ -80,22 +79,6 @@ export default function settingsFrom(window_) {
     return jsonConfigs.group || groupFromURL();
   }
 
-  // TODO: Move this to a coerce method
-  function showHighlights() {
-    let showHighlights_ = hostPageSetting('showHighlights');
-
-    if (showHighlights_ === undefined) {
-      showHighlights_ = 'always'; // The default value is 'always'.
-    }
-
-    // Convert legacy keys/values to corresponding current configuration.
-    if (typeof showHighlights_ === 'boolean') {
-      return showHighlights_ ? 'always' : 'never';
-    }
-
-    return showHighlights_;
-  }
-
   /**
    * Return the config.query setting from the host page or from the URL.
    *
@@ -162,9 +145,6 @@ export default function settingsFrom(window_) {
     },
     get notebookAppUrl() {
       return urlFromLinkTag(window_, 'notebook', 'html');
-    },
-    get showHighlights() {
-      return showHighlights();
     },
     get sidebarAppUrl() {
       return urlFromLinkTag(window_, 'sidebar', 'html');

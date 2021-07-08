@@ -67,3 +67,19 @@ export function toString(value) {
   }
   return '';
 }
+
+/**
+ * Coerce incoming value to appropriate `showHighlights` string values.
+ *
+ * nb. This exists for purely for backwards compatibly with older configuration values.
+ * Returns 'always' if true, 'never' if false, or the original value in any other case.
+ *
+ * @param {any} value - initial value
+ */
+export function toShowHighlights(value) {
+  // Convert legacy keys/values to corresponding current configuration.
+  if (typeof value === 'boolean') {
+    return value ? 'always' : 'never';
+  }
+  return value;
+}
