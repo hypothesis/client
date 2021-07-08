@@ -62,19 +62,19 @@ export class RPC {
    * Create an RPC client for sending RPC requests from `sourceFrame` to
    * `destFrame`, and receiving RPC responses from `destFrame` to `sourceFrame`.
    *
-   * This class has been adapted to work with `MessageChannel`. Because
-   * `MessageChannel` are unidirectional we ignore the `sourceFrame` and `origin`
-   * properties, in this case.
+   * This class has been adapted to work with `MessageChannel`. Because messages
+   * sent through `MessageChannel` are only transmitted to and from `port1` and
+   * `port2`, there is no need for `sourceFrame` and `origin` properties.
    *
    * TODO: July 2021, currently this class is a bit of a _frankenstein_ because
-   * we support both, `Window.postMessage` and `MessagePort.postMessage`.
+   * we support both `Window.postMessage` and `MessagePort.postMessage`.
    * Once we move all the inter-frame communication to `MessageChannel` we will
-   * be able to cleanup this class. We have added `@deprecated` statements in
+   * be able to cleanup this class. We have added `deprecated` comments in
    * the pieces of code that need to be removed.
    *
-   * @param {Window} sourceFrame -- @deprecated
+   * @param {Window} sourceFrame -- deprecated - Remove after MessagePort conversion
    * @param {Window|MessagePort} destFrameOrPort
-   * @param {string} origin - Origin of destination frame @deprecated
+   * @param {string} origin - Origin of destination frame (deprecated - Remove after MessagePort conversion)
    * @param {Record<string, (...args: any[]) => void>} methods - Map of method
    *   name to method handler
    */
@@ -88,7 +88,7 @@ export class RPC {
       this.destFrame = destFrameOrPort;
     }
 
-    /** @deprecated */
+    // Deprecated - Remove after MessagePort conversion
     if (origin === '*') {
       this.origin = '*';
     } else {
@@ -109,10 +109,13 @@ export class RPC {
       );
       this._port.start();
     } else {
-      /** @deprecated */
-      /** @param {MessageEvent} event */
+      // Deprecated - Remove after MessagePort conversion
+      /**
+       * @param {MessageEvent} event
+       * @deprecated
+       */
       const onmessage = event => {
-        if (!this._isValidSender) {
+        if (!this._isValidSender(event)) {
           return;
         }
         this._handle(event);
@@ -130,9 +133,7 @@ export class RPC {
   destroy() {
     this._destroyed = true;
     this._listeners.removeAll();
-    if (this._port) {
-      this._port.close();
-    }
+    this._port?.close();
   }
 
   /**
@@ -169,7 +170,7 @@ export class RPC {
       this._port.postMessage(message);
     }
 
-    /** @deprecated */
+    // Deprecated - Remove after MessagePort conversion
     if (this.destFrame) {
       this.destFrame.postMessage(message, this.origin);
     }
@@ -182,7 +183,7 @@ export class RPC {
    * @deprecated
    */
   _isValidSender(event) {
-    if (this.destFrame !== event.source) {
+    if (event.source !== this.destFrame) {
       return false;
     }
     if (this.origin !== '*' && event.origin !== this.origin) {
@@ -196,33 +197,34 @@ export class RPC {
    * Validate message
    *
    * @param {MessageEvent} event
+   * @return {null|Message}
    */
-  _isValidMessage({ data }) {
+  _parseMessage({ data }) {
     if (!data || typeof data !== 'object') {
-      return false;
+      return null;
     }
     if (data.protocol !== PROTOCOL) {
-      return false;
+      return null;
     }
     if (data.version !== VERSION) {
-      return false;
+      return null;
     }
     if (!Array.isArray(data.arguments)) {
-      return false;
+      return null;
     }
 
-    return true;
+    return data;
   }
 
   /**
    * @param {MessageEvent} event
    */
   _handle(event) {
-    if (!this._isValidMessage(event)) {
+    const msg = this._parseMessage(event);
+
+    if (msg === null) {
       return;
     }
-
-    const msg = /** @type {Message} */ (event.data);
 
     if ('method' in msg) {
       if (!this._methods.hasOwnProperty(msg.method)) {
@@ -243,7 +245,7 @@ export class RPC {
           this._port.postMessage(message);
         }
 
-        /** @deprecated */
+        // Deprecated - Remove after MessagePort conversion
         if (this.destFrame) {
           this.destFrame.postMessage(message, this.origin);
         }

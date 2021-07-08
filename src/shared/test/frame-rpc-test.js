@@ -1,11 +1,18 @@
 import { RPC } from '../frame-rpc';
 
-describe('shared/bridge', () => {
+describe('RPC', () => {
   let port1;
   let port2;
   let rpc1;
   let rpc2;
   let plusOne;
+
+  /**
+   * Wait for messages enqueued via `postMessage` to be delivered.
+   */
+  function waitForMessageDelivery() {
+    return new Promise(resolve => setTimeout(resolve, 0));
+  }
 
   beforeEach(() => {
     const channel = new MessageChannel();
@@ -20,9 +27,9 @@ describe('shared/bridge', () => {
     };
 
     rpc1 = new RPC(
-      /** dummy when using ports */ window,
+      /* dummy when using ports */ window,
       port1,
-      /** dummy when using ports */ '*',
+      /* dummy when using ports */ '*',
       {
         concat,
       }
@@ -36,9 +43,9 @@ describe('shared/bridge', () => {
     });
 
     rpc2 = new RPC(
-      /** dummy when using ports */ window,
+      /* dummy when using ports */ window,
       port2,
-      /** dummy when using ports */ '*',
+      /* dummy when using ports */ '*',
       {
         plusOne,
       }
@@ -64,23 +71,18 @@ describe('shared/bridge', () => {
     assert.notCalled(plusOne);
   });
 
-  it('should not call the method `plusOne` if rpc2 is destroyed', done => {
+  it('should not call the method `plusOne` if rpc2 is destroyed', async () => {
     rpc2.destroy();
 
-    rpc1.call('plusOne', 1, 2, 3, () => {
-      done(new Error('Unexpected call'));
-    });
+    rpc1.call('plusOne', 1, 2, 3, () => {});
 
-    setTimeout(() => {
-      assert.notCalled(plusOne);
-      done();
-    }, 100);
+    await waitForMessageDelivery();
+    assert.notCalled(plusOne);
   });
 
   it('should call the method `concat` on rpc1', done => {
     rpc2.call('concat', 'hello', ' ', 'world', value => {
       assert.equal(value, 'hello world');
-      done();
     });
 
     rpc2.call('concat', [1], [2], [3], value => {
@@ -89,8 +91,7 @@ describe('shared/bridge', () => {
     });
   });
 
-  it('should ignore invalid messages', done => {
-    // Correct message
+  it('should call method on valid message', async () => {
     port1.postMessage({
       arguments: [1, 2],
       method: 'plusOne',
@@ -98,49 +99,61 @@ describe('shared/bridge', () => {
       version: '1.0.0',
     });
 
-    // Incorrect argument
-    port1.postMessage({
-      arguments: 'test',
-      method: 'plusOne',
-      protocol: 'frame-rpc',
-      version: '1.0.0',
-    });
-
-    // Incorrect method
-    port1.postMessage({
-      arguments: [1, 2],
-      method: 'dummy',
-      protocol: 'frame-rpc',
-      version: '1.0.0',
-    });
-
-    // Incorrect protocol
-    port1.postMessage({
-      arguments: [1, 2],
-      method: 'plusOne',
-      protocol: 'dummy',
-      version: '1.0.0',
-    });
-
-    // Incorrect version
-    port1.postMessage({
-      arguments: [1, 2],
-      method: 'plusOne',
-      protocol: 'frame-rpc',
-      version: 'dummy',
-    });
-
-    // All incorrect
-    port1.postMessage({});
-    port1.postMessage(null);
-    port1.postMessage(undefined);
-    port1.postMessage(0);
-    port1.postMessage('');
-    port1.postMessage('dummy');
-
-    setTimeout(() => {
-      assert.calledOnce(plusOne);
-      done();
-    }, 100);
+    await waitForMessageDelivery();
+    assert.calledOnce(plusOne);
   });
+
+  [
+    {
+      message: {
+        arguments: 'test',
+        method: 'plusOne',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
+      },
+      reason: 'message has incorrect arguments',
+    },
+
+    {
+      message: {
+        arguments: [1, 2],
+        method: 'dummy',
+        protocol: 'frame-rpc',
+        version: '1.0.0',
+      },
+      reason: 'message has incorrect method',
+    },
+    {
+      message: {
+        arguments: [1, 2],
+        method: 'plusOne',
+        protocol: 'dummy',
+        version: '1.0.0',
+      },
+      reason: 'message has incorrect protocol',
+    },
+
+    {
+      message: {
+        arguments: [1, 2],
+        method: 'plusOne',
+        protocol: 'frame-rpc',
+        version: 'dummy',
+      },
+      reason: 'message has incorrect version',
+    },
+    { message: {}, reason: 'message is an empty object' },
+    { message: null, reason: 'message is `null`' },
+    { message: undefined, reason: 'message is `undefined`' },
+    { message: 0, reason: 'message is `0`' },
+    { message: '', reason: 'message is empty string' },
+    { message: 'dummy', reason: 'message is a string' },
+  ].forEach(({ message, reason }) =>
+    it(`should not call method on invalid messages (${reason})`, async () => {
+      port1.postMessage(message);
+
+      await waitForMessageDelivery();
+      assert.notCalled(plusOne);
+    })
+  );
 });
