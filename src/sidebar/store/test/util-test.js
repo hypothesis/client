@@ -38,9 +38,9 @@ const fixtures = {
   },
 };
 
-describe('sidebar/store/util', function () {
-  describe('actionTypes', function () {
-    it('returns an object with values equal to keys', function () {
+describe('sidebar/store/util', () => {
+  describe('actionTypes', () => {
+    it('returns an object with values equal to keys', () => {
       assert.deepEqual(
         util.actionTypes({
           SOME_ACTION: sinon.stub(),
@@ -54,8 +54,8 @@ describe('sidebar/store/util', function () {
     });
   });
 
-  describe('createReducer', function () {
-    it('returns an object if input state is undefined', function () {
+  describe('createReducer', () => {
+    it('returns an object if input state is undefined', () => {
       // See redux.js:assertReducerShape in the "redux" package.
       const reducer = util.createReducer(fixtures.update);
       const initialState = reducer(undefined, {
@@ -64,7 +64,7 @@ describe('sidebar/store/util', function () {
       assert.isOk(initialState);
     });
 
-    it('returns a reducer that combines each update function from the input object', function () {
+    it('returns a reducer that combines each update function from the input object', () => {
       const reducer = util.createReducer(fixtures.update);
       const newState = reducer(
         {},
@@ -78,7 +78,7 @@ describe('sidebar/store/util', function () {
       });
     });
 
-    it('returns a new object if the action was handled', function () {
+    it('returns a new object if the action was handled', () => {
       const reducer = util.createReducer(fixtures.update);
       const originalState = { someFlag: false };
       assert.notEqual(
@@ -87,7 +87,7 @@ describe('sidebar/store/util', function () {
       );
     });
 
-    it('returns the original object if the action was not handled', function () {
+    it('returns the original object if the action was not handled', () => {
       const reducer = util.createReducer(fixtures.update);
       const originalState = { someFlag: false };
       assert.equal(
@@ -96,7 +96,7 @@ describe('sidebar/store/util', function () {
       );
     });
 
-    it('preserves state not modified by the update function', function () {
+    it('preserves state not modified by the update function', () => {
       const reducer = util.createReducer(fixtures.update);
       const newState = reducer(
         { otherFlag: false },
@@ -111,7 +111,7 @@ describe('sidebar/store/util', function () {
       });
     });
 
-    it('supports reducer functions that return an array', function () {
+    it('supports reducer functions that return an array', () => {
       const action = {
         type: 'FIRST_ITEM',
         item: 'bar',
@@ -128,7 +128,7 @@ describe('sidebar/store/util', function () {
     });
   });
 
-  describe('bindSelectors', function () {
+  describe('bindSelectors', () => {
     it('binds selectors to current value of module state', () => {
       const getState = sinon.stub().returns({
         namespace1: {
@@ -211,7 +211,7 @@ describe('sidebar/store/util', function () {
       store.setState({ val: 5 });
       return util
         .awaitStateChange(store, getValWhenGreaterThanTwo)
-        .then(function (actual) {
+        .then(actual => {
           assert.equal(actual, expected);
         });
     });

@@ -62,7 +62,7 @@ function toRange(root, descriptor) {
 }
 
 function findByType(selectors, type) {
-  return selectors.find(function (s) {
+  return selectors.find(s => {
     return s.type === type;
   });
 }
@@ -71,7 +71,7 @@ function findByType(selectors, type) {
  * Return a copy of a list of selectors sorted by type.
  */
 function sortByType(selectors) {
-  return selectors.slice().sort(function (a, b) {
+  return selectors.slice().sort((a, b) => {
     return a.type.localeCompare(b.type);
   });
 }
@@ -304,16 +304,16 @@ const expectedFailures = [
   // Currently empty.
 ];
 
-describe('HTML anchoring', function () {
+describe('HTML anchoring', () => {
   let container;
 
-  beforeEach(function () {
+  beforeEach(() => {
     container = document.createElement('section');
     container.innerHTML = fixture;
     document.body.appendChild(container);
   });
 
-  afterEach(function () {
+  afterEach(() => {
     container.remove();
   });
 
@@ -345,7 +345,7 @@ describe('HTML anchoring', function () {
       const positionSel = findByType(selectors, 'TextPositionSelector');
       const quoteSel = findByType(selectors, 'TextQuoteSelector');
 
-      const failInfo = expectedFailures.find(function (f) {
+      const failInfo = expectedFailures.find(f => {
         return f[0] === testCase.description;
       });
       let failTypes = {};
@@ -363,8 +363,8 @@ describe('HTML anchoring', function () {
 
       // Map each selector back to a Range and check that it refers to the same
       // text. We test each selector in turn to make sure they are all valid.
-      const anchored = selectors.map(function (sel) {
-        return html.anchor(container, [sel]).then(function (anchoredRange) {
+      const anchored = selectors.map(sel => {
+        return html.anchor(container, [sel]).then(anchoredRange => {
           assert.equal(range.toString(), anchoredRange.toString());
         });
       });
@@ -372,13 +372,13 @@ describe('HTML anchoring', function () {
     });
   });
 
-  describe('When anchoring fails', function () {
+  describe('When anchoring fails', () => {
     const validQuoteSelector = {
       type: 'TextQuoteSelector',
       exact: 'Lorem ipsum',
     };
 
-    it('throws an error if anchoring using a quote fails', async function () {
+    it('throws an error if anchoring using a quote fails', async () => {
       const quoteSelector = {
         type: 'TextQuoteSelector',
         exact: 'This text does not appear in the web page',
@@ -389,7 +389,7 @@ describe('HTML anchoring', function () {
       );
     });
 
-    it('does not throw an error if anchoring using a position fails', function () {
+    it('does not throw an error if anchoring using a position fails', () => {
       const positionSelector = {
         type: 'TextPositionSelector',
         start: 1000,
@@ -401,7 +401,7 @@ describe('HTML anchoring', function () {
       return html.anchor(container, [positionSelector, validQuoteSelector]);
     });
 
-    it('does not throw an error if anchoring using a range fails', function () {
+    it('does not throw an error if anchoring using a range fails', () => {
       const rangeSelector = {
         type: 'RangeSelector',
         startContainer: '/main',
@@ -416,15 +416,15 @@ describe('HTML anchoring', function () {
     });
   });
 
-  describe('Web page baselines', function () {
+  describe('Web page baselines', () => {
     let frame;
 
-    before(function () {
+    before(() => {
       frame = document.createElement('iframe');
       document.body.appendChild(frame);
     });
 
-    after(function () {
+    after(() => {
       frame.remove();
     });
 

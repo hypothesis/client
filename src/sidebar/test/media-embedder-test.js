@@ -1,6 +1,6 @@
 import * as mediaEmbedder from '../media-embedder.js';
 
-describe('sidebar/media-embedder', function () {
+describe('sidebar/media-embedder', () => {
   function domElement(html) {
     const element = document.createElement('div');
     element.innerHTML = html;
@@ -39,7 +39,7 @@ describe('sidebar/media-embedder', function () {
     });
   }
 
-  it('replaces YouTube watch links with iframes', function () {
+  it('replaces YouTube watch links with iframes', () => {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc',
@@ -47,7 +47,7 @@ describe('sidebar/media-embedder', function () {
       'https://www.youtube.com/watch?foo=bar&v=QCkm0lL-6lc&h=j',
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&foo=bar',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -59,13 +59,13 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('allows whitelisted parameters in YouTube watch URLs', function () {
+  it('allows whitelisted parameters in YouTube watch URLs', () => {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&start=5&end=10',
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&end=10&start=5',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc&end=10&start=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -81,13 +81,13 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('translates YouTube watch `t` param to `start` for embed', function () {
+  it('translates YouTube watch `t` param to `start` for embed', () => {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5&end=10',
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&end=10&t=5',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc&end=10&t=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -99,7 +99,7 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('parses YouTube `t` param values into seconds', function () {
+  it('parses YouTube `t` param values into seconds', () => {
     const cases = [
       [
         'https://www.youtube.com/watch?v=QCkm0lL-6lc&t=5m',
@@ -142,7 +142,7 @@ describe('sidebar/media-embedder', function () {
         'https://www.youtube.com/embed/QCkm0lL-6lc?start=10',
       ],
     ];
-    cases.forEach(function (url) {
+    cases.forEach(url => {
       const element = domElement('<a href="' + url[0] + '">' + url[0] + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -151,12 +151,12 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('excludes non-whitelisted params in YouTube watch links', function () {
+  it('excludes non-whitelisted params in YouTube watch links', () => {
     const urls = [
       'https://www.youtube.com/watch?v=QCkm0lL-6lc&start=5&end=10&baz=dingdong',
       'https://www.youtube.com/watch/?v=QCkm0lL-6lc&autoplay=1&end=10&start=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -170,12 +170,12 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('replaces YouTube share links with iframes', function () {
+  it('replaces YouTube share links with iframes', () => {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc',
       'https://youtu.be/QCkm0lL-6lc/',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -187,12 +187,12 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('allows whitelisted parameters in YouTube share links', function () {
+  it('allows whitelisted parameters in YouTube share links', () => {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc?start=5&end=10',
       'https://youtu.be/QCkm0lL-6lc/?end=10&start=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -206,12 +206,12 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('translates YouTube share URL `t` param to `start` for embed', function () {
+  it('translates YouTube share URL `t` param to `start` for embed', () => {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc?t=5&end=10',
       'https://youtu.be/QCkm0lL-6lc/?end=10&t=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -223,12 +223,12 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('excludes non-whitelisted params in YouTube share links', function () {
+  it('excludes non-whitelisted params in YouTube share links', () => {
     const urls = [
       'https://youtu.be/QCkm0lL-6lc?foo=bar&t=5&end=10&baz=dingdong',
       'https://youtu.be/QCkm0lL-6lc/?autoplay=1&end=10&t=5',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -240,7 +240,7 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('replaces Vimeo links with iframes', function () {
+  it('replaces Vimeo links with iframes', () => {
     const urls = [
       'https://vimeo.com/149000090',
       'https://vimeo.com/149000090/',
@@ -249,7 +249,7 @@ describe('sidebar/media-embedder', function () {
       'https://vimeo.com/149000090?foo=bar&a=b',
       'https://vimeo.com/149000090/?foo=bar&a=b',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -261,7 +261,7 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('replaces Vimeo channel links with iframes', function () {
+  it('replaces Vimeo channel links with iframes', () => {
     const urls = [
       'https://vimeo.com/channels/staffpicks/148845534',
       'https://vimeo.com/channels/staffpicks/148845534/',
@@ -271,7 +271,7 @@ describe('sidebar/media-embedder', function () {
       'https://vimeo.com/channels/staffpicks/148845534?foo=bar&id=1',
       'https://vimeo.com/channels/otherchannel/148845534',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -299,7 +299,7 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('replaces internet archive links with iframes', function () {
+  it('replaces internet archive links with iframes', () => {
     const urls = [
       // Video details page.
       'https://archive.org/details/PATH',
@@ -313,7 +313,7 @@ describe('sidebar/media-embedder', function () {
       // Embed link generated by the "Share" links on the details pages.
       'https://archive.org/embed/PATH?start=360&end=420.3',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -327,7 +327,7 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('replaces audio links with html5 audio elements', function () {
+  it('replaces audio links with html5 audio elements', () => {
     const urls = [
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3',
       'https://archive.org/download/testmp3testfile/mpthreetest.mp3#fragment',
@@ -341,7 +341,7 @@ describe('sidebar/media-embedder', function () {
       'https://wisc.pb.unizin.org/frenchcscr/wp-content/uploads/sites/208/2018/03/6Léry_Conclusion.mp3',
       'https://wisc.pb.unizin.org/frenchcscr/wp-content/uploads/sites/208/2018/03/6L%25C3%25A9ry_Conclusion.mp3',
     ];
-    urls.forEach(function (url) {
+    urls.forEach(url => {
       const element = domElement('<a href="' + url + '">' + url + '</a>');
 
       mediaEmbedder.replaceLinksWithEmbeds(element);
@@ -361,7 +361,7 @@ describe('sidebar/media-embedder', function () {
     });
   });
 
-  it('does not replace links if the link text is different', function () {
+  it('does not replace links if the link text is different', () => {
     const url = 'https://youtu.be/QCkm0lL-6lc';
     const element = domElement('<a href="' + url + '">different label</a>');
 
@@ -371,7 +371,7 @@ describe('sidebar/media-embedder', function () {
     assert.equal(element.children[0].tagName, 'A');
   });
 
-  it('does not replace non-media links', function () {
+  it('does not replace non-media links', () => {
     const url = 'https://example.com/example.html';
     const element = domElement('<a href="' + url + '">' + url + '</a>');
 
@@ -381,7 +381,7 @@ describe('sidebar/media-embedder', function () {
     assert.equal(element.children[0].tagName, 'A');
   });
 
-  it('does not mess with the rest of the HTML', function () {
+  it('does not mess with the rest of the HTML', () => {
     const url = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
     const element = domElement(
       '<p>Look at this video:</p>\n\n' +
@@ -400,7 +400,7 @@ describe('sidebar/media-embedder', function () {
     assert.equal(element.children[2].outerHTML, "<p>Isn't it cool!</p>");
   });
 
-  it('replaces multiple links with multiple embeds', function () {
+  it('replaces multiple links with multiple embeds', () => {
     const url1 = 'https://www.youtube.com/watch?v=QCkm0lL-6lc';
     const url2 = 'https://youtu.be/abcdefg';
     const element = domElement(

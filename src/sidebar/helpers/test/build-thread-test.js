@@ -38,9 +38,9 @@ const defaultBuildThreadOpts = {
  */
 function filter(thread, keys) {
   const result = {};
-  keys.forEach(function (key) {
+  keys.forEach(key => {
     if (key === 'children') {
-      result[key] = thread[key].map(function (child) {
+      result[key] = thread[key].map(child => {
         return filter(child, keys);
       });
     } else {

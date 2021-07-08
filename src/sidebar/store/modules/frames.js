@@ -33,7 +33,7 @@ const reducers = {
   },
 
   UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
-    const frames = state.map(function (frame) {
+    const frames = state.map(frame => {
       const match = frame.uri && frame.uri === action.uri;
       if (match) {
         return Object.assign({}, frame, {
@@ -115,13 +115,13 @@ function searchUrisForFrame(frame) {
   let uris = [frame.uri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
-    uris = frame.metadata.link.map(function (link) {
+    uris = frame.metadata.link.map(link => {
       return link.href;
     });
   }
 
   if (frame.metadata && frame.metadata.link) {
-    frame.metadata.link.forEach(function (link) {
+    frame.metadata.link.forEach(link => {
       if (link.href.startsWith('doi:')) {
         uris.push(link.href);
       }

@@ -1,7 +1,7 @@
 import { createStore } from '../../create-store';
 import frames from '../frames';
 
-describe('sidebar/store/modules/frames', function () {
+describe('sidebar/store/modules/frames', () => {
   let store;
 
   beforeEach(() => {
@@ -9,16 +9,16 @@ describe('sidebar/store/modules/frames', function () {
     store = createStore([frames]);
   });
 
-  describe('#connectFrame', function () {
-    it('adds the frame to the list of connected frames', function () {
+  describe('#connectFrame', () => {
+    it('adds the frame to the list of connected frames', () => {
       const frame = { uri: 'http://example.com' };
       store.connectFrame(frame);
       assert.deepEqual(store.frames(), [frame]);
     });
   });
 
-  describe('#destroyFrame', function () {
-    it('removes the frame from the list of connected frames', function () {
+  describe('#destroyFrame', () => {
+    it('removes the frame from the list of connected frames', () => {
       const frameList = [
         { uri: 'http://example.com' },
         { uri: 'http://example.org' },
@@ -30,8 +30,8 @@ describe('sidebar/store/modules/frames', function () {
     });
   });
 
-  describe('#updateFrameAnnotationFetchStatus', function () {
-    it('updates the isAnnotationFetchComplete status of the frame', function () {
+  describe('#updateFrameAnnotationFetchStatus', () => {
+    it('updates the isAnnotationFetchComplete status of the frame', () => {
       const frame = {
         uri: 'http://example.com',
       };
@@ -44,7 +44,7 @@ describe('sidebar/store/modules/frames', function () {
       assert.deepEqual(store.frames(), [expectedFrame]);
     });
 
-    it('does not update the isAnnotationFetchComplete status of the wrong frame', function () {
+    it('does not update the isAnnotationFetchComplete status of the wrong frame', () => {
       const frame = {
         uri: 'http://example.com',
       };
@@ -82,7 +82,7 @@ describe('sidebar/store/modules/frames', function () {
     });
   });
 
-  describe('#searchUris', function () {
+  describe('#searchUris', () => {
     [
       {
         when: 'one HTML frame',

@@ -18,7 +18,7 @@ module.exports = function (opts) {
   const manifest = {};
 
   return through.obj(
-    function (file, enc, callback) {
+    (file, enc, callback) => {
       const hash = crypto.createHash('sha1');
       hash.update(file.contents);
 

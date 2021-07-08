@@ -1,9 +1,9 @@
 import * as orgFixtures from '../../test/group-fixtures';
 import groupsByOrganization from '../group-organizations';
 
-describe('sidebar/helpers/group-organizations', function () {
-  context('when sorting organizations and their contained groups', function () {
-    it('should put the default organization groups last', function () {
+describe('sidebar/helpers/group-organizations', () => {
+  context('when sorting organizations and their contained groups', () => {
+    it('should put the default organization groups last', () => {
       const defaultOrg = orgFixtures.defaultOrganization();
       const groups = [
         orgFixtures.expandedGroup({ organization: defaultOrg }),
@@ -16,7 +16,7 @@ describe('sidebar/helpers/group-organizations', function () {
       assert.equal(sortedGroups[2].organization.id, defaultOrg.id);
     });
 
-    it('should sort organizations by name', function () {
+    it('should sort organizations by name', () => {
       const org1 = orgFixtures.organization({ name: 'zzzzz' });
       const org2 = orgFixtures.organization({ name: 'aaaaa' });
       const org3 = orgFixtures.organization({ name: 'yyyyy' });
@@ -33,7 +33,7 @@ describe('sidebar/helpers/group-organizations', function () {
       assert.equal(sortedGroups[2].organization.name, 'zzzzz');
     });
 
-    it('should sort organizations secondarily by id', function () {
+    it('should sort organizations secondarily by id', () => {
       const org1 = orgFixtures.organization({ name: 'zzzzz', id: 'zzzzz' });
       const org2 = orgFixtures.organization({ name: 'zzzzz', id: 'aaaaa' });
       const org3 = orgFixtures.organization({ name: 'zzzzz', id: 'yyyyy' });
@@ -50,7 +50,7 @@ describe('sidebar/helpers/group-organizations', function () {
       assert.equal(sortedGroups[2].organization.id, 'zzzzz');
     });
 
-    it('should only include logo for first group in each organization', function () {
+    it('should only include logo for first group in each organization', () => {
       const org = orgFixtures.organization({ name: 'Aluminum' });
       const org2 = orgFixtures.organization({ name: 'Zirconium' });
       const groups = [
@@ -69,8 +69,8 @@ describe('sidebar/helpers/group-organizations', function () {
     });
   });
 
-  context('when encountering missing data', function () {
-    it('should be able to sort without any groups in the default org', function () {
+  context('when encountering missing data', () => {
+    it('should be able to sort without any groups in the default org', () => {
       const org = orgFixtures.organization({ name: 'Aluminum' });
       const groups = [
         { name: 'Aluminum', organization: org },
@@ -85,7 +85,7 @@ describe('sidebar/helpers/group-organizations', function () {
       });
     });
 
-    it('should omit any groups without an organization', function () {
+    it('should omit any groups without an organization', () => {
       const org = orgFixtures.organization({ name: 'Europium' });
       const groups = [
         { name: 'Aluminum', organization: org },
@@ -102,7 +102,7 @@ describe('sidebar/helpers/group-organizations', function () {
       });
     });
 
-    it('should omit any groups with unexpanded organizations', function () {
+    it('should omit any groups with unexpanded organizations', () => {
       const org = orgFixtures.organization({ name: 'Europium' });
       const groups = [
         { name: 'Aluminum', organization: org },
@@ -119,7 +119,7 @@ describe('sidebar/helpers/group-organizations', function () {
       });
     });
 
-    it('should omit logo property if not present on organization', function () {
+    it('should omit logo property if not present on organization', () => {
       const org = orgFixtures.organization({ logo: undefined });
       const org2 = orgFixtures.organization({ logo: null });
       const groups = [
@@ -137,8 +137,8 @@ describe('sidebar/helpers/group-organizations', function () {
     });
   });
 
-  context('when building data structures', function () {
-    it('returned group objects should be immutable', function () {
+  context('when building data structures', () => {
+    it('returned group objects should be immutable', () => {
       const group = orgFixtures.expandedGroup({ name: 'Halfnium' });
       const groups = [group];
 

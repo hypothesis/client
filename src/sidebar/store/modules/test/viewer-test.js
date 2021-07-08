@@ -1,20 +1,20 @@
 import { createStore } from '../../create-store';
 import viewer from '../viewer';
 
-describe('store/modules/viewer', function () {
+describe('store/modules/viewer', () => {
   let store;
 
   beforeEach(() => {
     store = createStore([viewer]);
   });
 
-  describe('#setShowHighlights', function () {
-    it('sets a flag indicating that highlights are visible', function () {
+  describe('#setShowHighlights', () => {
+    it('sets a flag indicating that highlights are visible', () => {
       store.setShowHighlights(true);
       assert.isTrue(store.getState().viewer.visibleHighlights);
     });
 
-    it('sets a flag indicating that highlights are not visible', function () {
+    it('sets a flag indicating that highlights are not visible', () => {
       store.setShowHighlights(false);
       assert.isFalse(store.getState().viewer.visibleHighlights);
     });

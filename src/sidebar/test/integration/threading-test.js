@@ -44,7 +44,7 @@ describe('integration: annotation threading', () => {
   let store;
   let forceUpdate;
 
-  beforeEach(function () {
+  beforeEach(() => {
     const container = new Injector()
       .register('store', { factory: createSidebarStore })
       .register('annotationsService', () => {})

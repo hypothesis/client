@@ -1,8 +1,8 @@
 import * as fixtures from '../../test/annotation-fixtures';
 import * as tabs from '../tabs';
 
-describe('sidebar/helpers/tabs', function () {
-  describe('tabForAnnotation', function () {
+describe('sidebar/helpers/tabs', () => {
+  describe('tabForAnnotation', () => {
     [
       {
         ann: fixtures.defaultAnnotation(),
@@ -25,7 +25,7 @@ describe('sidebar/helpers/tabs', function () {
     });
   });
 
-  describe('shouldShowInTab', function () {
+  describe('shouldShowInTab', () => {
     [
       {
         // Anchoring in progress.

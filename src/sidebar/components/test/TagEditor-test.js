@@ -8,7 +8,7 @@ import { $imports } from '../TagEditor';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('TagEditor', function () {
+describe('TagEditor', () => {
   let containers = [];
   let fakeTags = ['tag1', 'tag2'];
   let fakeTagsService;
@@ -39,7 +39,7 @@ describe('TagEditor', function () {
     );
   }
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeOnAddTag = sinon.stub().returns(true);
     fakeOnRemoveTag = sinon.stub();
     fakeOnTagInput = sinon.stub();
@@ -50,7 +50,7 @@ describe('TagEditor', function () {
     $imports.$mock(mockImportedComponents());
   });
 
-  afterEach(function () {
+  afterEach(() => {
     containers.forEach(container => {
       container.remove();
     });
@@ -519,7 +519,7 @@ describe('TagEditor', function () {
   });
 
   describe('accessibility validation', () => {
-    beforeEach(function () {
+    beforeEach(() => {
       // create a full dom tree for a11y testing
       $imports.$mock({
         './AutocompleteList': AutocompleteList,

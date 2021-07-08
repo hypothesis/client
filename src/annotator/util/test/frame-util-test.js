@@ -1,7 +1,7 @@
 import * as frameUtil from '../frame-util';
 
-describe('annotator/util/frame-util', function () {
-  describe('findFrames', function () {
+describe('annotator/util/frame-util', () => {
+  describe('findFrames', () => {
     let container;
 
     const _addFrameToContainer = (options = {}) => {
@@ -14,16 +14,16 @@ describe('annotator/util/frame-util', function () {
       return frame;
     };
 
-    beforeEach(function () {
+    beforeEach(() => {
       container = document.createElement('div');
       document.body.appendChild(container);
     });
 
-    afterEach(function () {
+    afterEach(() => {
       container.remove();
     });
 
-    it('should return valid frames', function () {
+    it('should return valid frames', () => {
       let foundFrames = frameUtil.findFrames(container);
 
       assert.lengthOf(

@@ -1,13 +1,13 @@
 import annotationCounts from '../annotation-counts';
 
-describe('annotationCounts', function () {
+describe('annotationCounts', () => {
   let countEl1;
   let countEl2;
   let CrossFrame;
   let fakeCrossFrame;
   let sandbox;
 
-  beforeEach(function () {
+  beforeEach(() => {
     CrossFrame = null;
     fakeCrossFrame = {};
     sandbox = sinon.createSandbox();
@@ -26,13 +26,13 @@ describe('annotationCounts', function () {
     CrossFrame.returns(fakeCrossFrame);
   });
 
-  afterEach(function () {
+  afterEach(() => {
     sandbox.restore();
     countEl1.remove();
     countEl2.remove();
   });
 
-  describe('listen for "publicAnnotationCountChanged" event', function () {
+  describe('listen for "publicAnnotationCountChanged" event', () => {
     const emitEvent = function () {
       let crossFrameArgs;
       let evt;
@@ -53,7 +53,7 @@ describe('annotationCounts', function () {
       }
     };
 
-    it('displays the updated annotation count on the appropriate elements', function () {
+    it('displays the updated annotation count on the appropriate elements', () => {
       const newCount = 10;
       annotationCounts(document.body, fakeCrossFrame);
 

@@ -8,7 +8,7 @@
  * @return {{ [index in keyof T]: string }}
  */
 export function actionTypes(reducers) {
-  return Object.keys(reducers).reduce(function (types, key) {
+  return Object.keys(reducers).reduce((types, key) => {
     types[key] = key;
     return types;
   }, /** @type {any} */ ({}));

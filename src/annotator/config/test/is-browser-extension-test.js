@@ -1,6 +1,6 @@
 import { isBrowserExtension } from '../is-browser-extension';
 
-describe('annotator.config.isBrowserExtension', function () {
+describe('annotator.config.isBrowserExtension', () => {
   [
     {
       url: 'chrome-extension://abcxyz',
@@ -27,8 +27,8 @@ describe('annotator.config.isBrowserExtension', function () {
       url: 'ftp://partner.org',
       returns: true,
     },
-  ].forEach(function (test) {
-    it('returns ' + test.returns + ' for ' + test.url, function () {
+  ].forEach(test => {
+    it('returns ' + test.returns + ' for ' + test.url, () => {
       assert.equal(isBrowserExtension(test.url), test.returns);
     });
   });

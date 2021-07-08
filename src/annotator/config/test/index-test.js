@@ -1,7 +1,7 @@
 import { getConfig } from '../index';
 import { $imports } from '../index';
 
-describe('annotator/config/index', function () {
+describe('annotator/config/index', () => {
   let fakeSettingsFrom;
   let fakeIsBrowserExtension;
 
@@ -34,7 +34,7 @@ describe('annotator/config/index', function () {
     $imports.$restore();
   });
 
-  it('gets the configuration settings', function () {
+  it('gets the configuration settings', () => {
     getConfig('all', 'WINDOW');
 
     assert.calledOnce(fakeSettingsFrom);
@@ -53,22 +53,22 @@ describe('annotator/config/index', function () {
     }
   );
 
-  context("when there's no application/annotator+html <link>", function () {
-    beforeEach('remove the application/annotator+html <link>', function () {
+  context("when there's no application/annotator+html <link>", () => {
+    beforeEach('remove the application/annotator+html <link>', () => {
       Object.defineProperty(fakeSettingsFrom(), 'sidebarAppUrl', {
         get: sinon.stub().throws(new Error("there's no link")),
       });
     });
 
-    it('throws an error', function () {
-      assert.throws(function () {
+    it('throws an error', () => {
+      assert.throws(() => {
         getConfig('all', 'WINDOW');
       }, "there's no link");
     });
   });
 
   describe('browser extension', () => {
-    context('when client is loaded from the browser extension', function () {
+    context('when client is loaded from the browser extension', () => {
       it('returns only config values where `allowInBrowserExt` is true or the defaultValue if provided', () => {
         fakeIsBrowserExtension.returns(true);
         const config = getConfig('all', 'WINDOW');
@@ -99,7 +99,7 @@ describe('annotator/config/index', function () {
       });
     });
 
-    context('when client is not loaded from browser extension', function () {
+    context('when client is not loaded from browser extension', () => {
       it('returns all config values', () => {
         fakeIsBrowserExtension.returns(false);
         const config = getConfig('all', 'WINDOW');
@@ -182,8 +182,8 @@ describe('annotator/config/index', function () {
   });
 
   ['branding', 'openSidebar', 'requestConfigFromFrame', 'services'].forEach(
-    function (settingName) {
-      it(`returns the ${settingName} value from the host page`, function () {
+    settingName => {
+      it(`returns the ${settingName} value from the host page`, () => {
         const settings = {
           branding: 'BRANDING_SETTING',
           openSidebar: true,

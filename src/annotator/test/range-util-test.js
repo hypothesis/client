@@ -21,11 +21,11 @@ function roundCoords(rect) {
   };
 }
 
-describe('annotator.range-util', function () {
+describe('annotator.range-util', () => {
   let selection;
   let testNode;
 
-  beforeEach(function () {
+  beforeEach(() => {
     selection = window.getSelection();
     selection.collapse(null);
 
@@ -34,7 +34,7 @@ describe('annotator.range-util', function () {
     document.body.appendChild(testNode);
   });
 
-  afterEach(function () {
+  afterEach(() => {
     testNode.parentElement.removeChild(testNode);
   });
 
@@ -79,15 +79,15 @@ describe('annotator.range-util', function () {
     });
   });
 
-  describe('#getTextBoundingBoxes', function () {
-    it('gets the bounding box of a range in a text node', function () {
+  describe('#getTextBoundingBoxes', () => {
+    it('gets the bounding box of a range in a text node', () => {
       testNode.innerHTML = 'plain text';
       const rng = createRange(testNode.firstChild, 0, 5);
       const boxes = rangeUtil.getTextBoundingBoxes(rng);
       assert.ok(boxes.length);
     });
 
-    it('gets the bounding box of a range containing a text node', function () {
+    it('gets the bounding box of a range containing a text node', () => {
       testNode.innerHTML = 'plain text';
       const rng = createRange(testNode, 0, 1);
 
@@ -105,7 +105,7 @@ describe('annotator.range-util', function () {
       ]);
     });
 
-    it('returns the bounding box in viewport coordinates', function () {
+    it('returns the bounding box in viewport coordinates', () => {
       testNode.innerHTML = 'plain text';
       const rng = createRange(testNode, 0, 1);
 
@@ -118,17 +118,17 @@ describe('annotator.range-util', function () {
     });
   });
 
-  describe('#selectionFocusRect', function () {
-    it('returns null if the selection is empty', function () {
+  describe('#selectionFocusRect', () => {
+    it('returns null if the selection is empty', () => {
       assert.isNull(rangeUtil.selectionFocusRect(selection));
     });
 
-    it('returns a point if the selection is not empty', function () {
+    it('returns a point if the selection is not empty', () => {
       selectNode(testNode);
       assert.ok(rangeUtil.selectionFocusRect(selection));
     });
 
-    it("returns the first line's rect if the selection is backwards", function () {
+    it("returns the first line's rect if the selection is backwards", () => {
       selectNode(testNode);
       selection.collapseToEnd();
       selection.extend(testNode, 0);
@@ -137,7 +137,7 @@ describe('annotator.range-util', function () {
       assert.equal(rect.top, testNode.offsetTop);
     });
 
-    it("returns the last line's rect if the selection is forwards", function () {
+    it("returns the last line's rect if the selection is forwards", () => {
       selectNode(testNode);
       const rect = rangeUtil.selectionFocusRect(selection);
       assert.equal(rect.left, testNode.offsetLeft);

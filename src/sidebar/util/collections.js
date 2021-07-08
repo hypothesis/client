@@ -11,7 +11,7 @@
  * @return {number}
  */
 export function countIf(ary, predicate) {
-  return ary.reduce(function (count, item) {
+  return ary.reduce((count, item) => {
     return predicate(item) ? count + 1 : count;
   }, 0);
 }

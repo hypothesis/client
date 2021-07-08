@@ -145,7 +145,7 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-describe('PDFMetadata', function () {
+describe('PDFMetadata', () => {
   [
     {
       // PDF.js < 1.6.210: `documentload` event dispatched via DOM.

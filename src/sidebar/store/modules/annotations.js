@@ -34,7 +34,7 @@ import route from './route';
 function excludeAnnotations(current, annotations) {
   const ids = {};
   const tags = {};
-  annotations.forEach(function (annot) {
+  annotations.forEach(annot => {
     if (annot.id) {
       ids[annot.id] = true;
     }
@@ -42,7 +42,7 @@ function excludeAnnotations(current, annotations) {
       tags[annot.$tag] = true;
     }
   });
-  return current.filter(function (annot) {
+  return current.filter(annot => {
     const shouldRemove =
       (annot.id && annot.id in ids) || (annot.$tag && annot.$tag in tags);
     return !shouldRemove;
@@ -50,13 +50,13 @@ function excludeAnnotations(current, annotations) {
 }
 
 function findByID(annotations, id) {
-  return annotations.find(function (annot) {
+  return annotations.find(annot => {
     return annot.id === id;
   });
 }
 
 function findByTag(annotations, tag) {
-  return annotations.find(function (annot) {
+  return annotations.find(annot => {
     return annot.$tag === tag;
   });
 }
@@ -170,7 +170,7 @@ const reducers = {
   },
 
   HIDE_ANNOTATION: function (state, action) {
-    const anns = state.annotations.map(function (ann) {
+    const anns = state.annotations.map(ann => {
       if (ann.id !== action.id) {
         return ann;
       }
@@ -190,7 +190,7 @@ const reducers = {
   },
 
   UNHIDE_ANNOTATION: function (state, action) {
-    const anns = state.annotations.map(function (ann) {
+    const anns = state.annotations.map(ann => {
       if (ann.id !== action.id) {
         return ann;
       }
@@ -200,7 +200,7 @@ const reducers = {
   },
 
   UPDATE_ANCHOR_STATUS: function (state, action) {
-    const annotations = state.annotations.map(function (annot) {
+    const annotations = state.annotations.map(annot => {
       if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
         return annot;
       }
@@ -216,7 +216,7 @@ const reducers = {
   },
 
   UPDATE_FLAG_STATUS: function (state, action) {
-    const annotations = state.annotations.map(function (annot) {
+    const annotations = state.annotations.map(annot => {
       const match = annot.id && annot.id === action.id;
       if (match) {
         if (annot.flagged === action.isFlagged) {
@@ -558,7 +558,7 @@ const orphanCount = createSelector(
  * @return {Annotation[]}
  */
 function savedAnnotations(state) {
-  return state.annotations.filter(function (ann) {
+  return state.annotations.filter(ann => {
     return !metadata.isNew(ann);
   });
 }

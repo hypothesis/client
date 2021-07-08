@@ -1,7 +1,7 @@
 import { ResultSizeError, SearchClient } from '../search-client';
 
 function awaitEvent(emitter, event) {
-  return new Promise(function (resolve) {
+  return new Promise(resolve => {
     emitter.on(event, resolve);
   });
 }
