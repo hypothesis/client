@@ -40,7 +40,7 @@ const fixtures = {
   ],
 };
 
-describe('annotator/anchoring/pdf', function () {
+describe('annotator/anchoring/pdf', () => {
   let container;
   let viewer;
 
@@ -74,47 +74,47 @@ describe('annotator/anchoring/pdf', function () {
     window.PDFViewerApplication = null;
   }
 
-  beforeEach(function () {
+  beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
     initViewer(fixtures.pdfPages);
   });
 
-  afterEach(function () {
+  afterEach(() => {
     cleanupViewer();
     container.remove();
   });
 
-  describe('#describe', function () {
-    it('returns position and quote selectors', function () {
+  describe('#describe', () => {
+    it('returns position and quote selectors', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
-      return pdfAnchoring.describe(container, range).then(function (selectors) {
-        const types = selectors.map(function (s) {
+      return pdfAnchoring.describe(container, range).then(selectors => {
+        const types = selectors.map(s => {
           return s.type;
         });
         assert.deepEqual(types, ['TextPositionSelector', 'TextQuoteSelector']);
       });
     });
 
-    it('returns a position selector with correct start/end offsets', function () {
+    it('returns a position selector with correct start/end offsets', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const quote = 'Netherfield Park';
       const range = findText(container, quote);
       const contentStr = fixtures.pdfPages.join('');
       const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
 
-      return pdfAnchoring.describe(container, range).then(function (selectors) {
+      return pdfAnchoring.describe(container, range).then(selectors => {
         const position = selectors[0];
         assert.equal(position.start, expectedPos);
         assert.equal(position.end, expectedPos + quote.length);
       });
     });
 
-    it('returns a quote selector with the correct quote', function () {
+    it('returns a quote selector with the correct quote', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
-      return pdfAnchoring.describe(container, range).then(function (selectors) {
+      return pdfAnchoring.describe(container, range).then(selectors => {
         const quote = selectors[1];
 
         assert.deepEqual(quote, {
@@ -126,7 +126,7 @@ describe('annotator/anchoring/pdf', function () {
       });
     });
 
-    it('returns selector when range starts at end of text node with no next siblings', function () {
+    it('returns selector when range starts at end of text node with no next siblings', () => {
       // this problem is referenced in client issue #122
       // But what is happening is the startContainer is referencing a text
       // elment inside of a node. The logic in pdf#describe() was assuming if the
@@ -155,7 +155,7 @@ describe('annotator/anchoring/pdf', function () {
       const contentStr = fixtures.pdfPages.join('');
       const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
 
-      return pdfAnchoring.describe(container, range).then(function (selectors) {
+      return pdfAnchoring.describe(container, range).then(selectors => {
         const position = selectors[0];
         assert.equal(position.start, expectedPos);
         assert.equal(position.end, expectedPos + quote.length);
@@ -206,33 +206,33 @@ describe('annotator/anchoring/pdf', function () {
     });
   });
 
-  describe('#anchor', function () {
-    it('anchors previously created selectors if the page is rendered', function () {
+  describe('#anchor', () => {
+    it('anchors previously created selectors if the page is rendered', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'My dear Mr. Bennet');
-      return pdfAnchoring.describe(container, range).then(function (selectors) {
+      return pdfAnchoring.describe(container, range).then(selectors => {
         const position = selectors[0];
         const quote = selectors[1];
 
         // Test that all of the selectors anchor and that each selector individually
         // anchors correctly as well
         const subsets = [[position, quote], [position], [quote]];
-        const subsetsAnchored = subsets.map(function (subset) {
-          const types = subset.map(function (s) {
+        const subsetsAnchored = subsets.map(subset => {
+          const types = subset.map(s => {
             return s.type;
           });
           const description = 'anchoring failed with ' + types.join(', ');
 
           return pdfAnchoring
             .anchor(container, subset)
-            .then(function (anchoredRange) {
+            .then(anchoredRange => {
               assert.equal(
                 anchoredRange.toString(),
                 range.toString(),
                 description
               );
             })
-            .catch(function (err) {
+            .catch(err => {
               console.warn(description);
               throw err;
             });
@@ -268,12 +268,12 @@ describe('annotator/anchoring/pdf', function () {
         offset: 100000,
       },
     ].forEach(({ offset }) => {
-      it('anchors using a quote if the position selector fails', function () {
+      it('anchors using a quote if the position selector fails', () => {
         viewer.pdfViewer.setCurrentPage(0);
         const range = findText(container, 'Pride And Prejudice');
         return pdfAnchoring
           .describe(container, range)
-          .then(function (selectors) {
+          .then(selectors => {
             const position = selectors[0];
             const quote = selectors[1];
 
@@ -288,16 +288,16 @@ describe('annotator/anchoring/pdf', function () {
       });
     });
 
-    it('anchors to a placeholder element if the page is not rendered', function () {
+    it('anchors to a placeholder element if the page is not rendered', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
       return pdfAnchoring
         .describe(container, range)
-        .then(function (selectors) {
+        .then(selectors => {
           viewer.pdfViewer.setCurrentPage(0);
           return pdfAnchoring.anchor(container, selectors);
         })
-        .then(function (anchoredRange) {
+        .then(anchoredRange => {
           assert.equal(anchoredRange.toString(), 'Loading annotations...');
         });
     });

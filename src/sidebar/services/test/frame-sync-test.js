@@ -52,7 +52,7 @@ describe('FrameSyncService', () => {
   let fakeBridge;
   let frameSync;
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeStore = createFakeStore(
       { annotations: [] },
       {
@@ -110,8 +110,8 @@ describe('FrameSyncService', () => {
     $imports.$restore();
   });
 
-  context('when annotations are loaded into the sidebar', function () {
-    it('sends a "loadAnnotations" message to the frame', function () {
+  context('when annotations are loaded into the sidebar', () => {
+    it('sends a "loadAnnotations" message to the frame', () => {
       fakeStore.setState({
         annotations: [fixtures.ann],
       });
@@ -122,7 +122,7 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('sends a "loadAnnotations" message only for new annotations', function () {
+    it('sends a "loadAnnotations" message only for new annotations', () => {
       const ann2 = Object.assign({}, fixtures.ann, { $tag: 't2', id: 'a2' });
       fakeStore.setState({
         annotations: [fixtures.ann],
@@ -140,7 +140,7 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('does not send a "loadAnnotations" message for replies', function () {
+    it('does not send a "loadAnnotations" message for replies', () => {
       fakeStore.setState({
         annotations: [annotationFixtures.newReply()],
       });
@@ -148,8 +148,8 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when annotation count has changed', function () {
-    it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', function () {
+  context('when annotation count has changed', () => {
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', () => {
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
       });
@@ -160,7 +160,7 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', function () {
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', () => {
       const annot = annotationFixtures.defaultAnnotation();
       delete annot.permissions;
 
@@ -174,7 +174,7 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', function () {
+    it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', () => {
       fakeStore.frames.returns([{ uri: 'http://example.com' }]);
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
@@ -184,7 +184,7 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', function () {
+    it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', () => {
       fakeStore.frames.returns([]);
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
@@ -195,8 +195,8 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when annotations are removed from the sidebar', function () {
-    it('sends a "deleteAnnotation" message to the frame', function () {
+  context('when annotations are removed from the sidebar', () => {
+    it('sends a "deleteAnnotation" message to the frame', () => {
       fakeStore.setState({
         annotations: [fixtures.ann],
       });
@@ -211,9 +211,9 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when a new annotation is created in the frame', function () {
+  context('when a new annotation is created in the frame', () => {
     context('when an authenticated user is present', () => {
-      it('creates the annotation in the sidebar', function () {
+      it('creates the annotation in the sidebar', () => {
         fakeStore.isLoggedIn.returns(true);
         const ann = { target: [] };
 
@@ -265,7 +265,7 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when anchoring completes', function () {
+  context('when anchoring completes', () => {
     let clock = sinon.stub();
 
     beforeEach(() => {
@@ -282,7 +282,7 @@ describe('FrameSyncService', () => {
       clock.tick(20);
     }
 
-    it('updates the anchoring status for the annotation', function () {
+    it('updates the anchoring status for the annotation', () => {
       fakeBridge.emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
 
       expireDebounceTimeout();
@@ -303,7 +303,7 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when a new frame connects', function () {
+  context('when a new frame connects', () => {
     let frameInfo;
     const fakeChannel = {
       call: function (name, callback) {
@@ -312,7 +312,7 @@ describe('FrameSyncService', () => {
       destroy: sinon.stub(),
     };
 
-    it("adds the page's metadata to the frames list", function () {
+    it("adds the page's metadata to the frames list", () => {
       frameInfo = fixtures.htmlDocumentInfo;
 
       fakeBridge.emit('connect', fakeChannel);
@@ -334,18 +334,18 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when a frame is destroyed', function () {
+  context('when a frame is destroyed', () => {
     const frameId = fixtures.framesListEntry.id;
 
-    it('removes the frame from the frames list', function () {
+    it('removes the frame from the frames list', () => {
       fakeBridge.emit('destroyFrame', frameId);
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
     });
   });
 
-  describe('on "showAnnotations" message', function () {
-    it('selects annotations which have an ID', function () {
+  describe('on "showAnnotations" message', () => {
+    it('selects annotations which have an ID', () => {
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
       fakeBridge.emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
 
@@ -354,15 +354,15 @@ describe('FrameSyncService', () => {
     });
   });
 
-  describe('on "focusAnnotations" message', function () {
-    it('focuses the annotations', function () {
+  describe('on "focusAnnotations" message', () => {
+    it('focuses the annotations', () => {
       fakeBridge.emit('focusAnnotations', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.focusAnnotations, ['tag1', 'tag2', 'tag3']);
     });
   });
 
-  describe('on "toggleAnnotationSelection" message', function () {
-    it('toggles the selected state of the annotations', function () {
+  describe('on "toggleAnnotationSelection" message', () => {
+    it('toggles the selected state of the annotations', () => {
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
       fakeBridge.emit('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.toggleSelectedAnnotations, [
@@ -373,28 +373,28 @@ describe('FrameSyncService', () => {
     });
   });
 
-  describe('on "sidebarOpened" message', function () {
-    it('sets the sidebar open in the store', function () {
+  describe('on "sidebarOpened" message', () => {
+    it('sets the sidebar open in the store', () => {
       fakeBridge.emit('sidebarOpened');
 
       assert.calledWith(fakeStore.setSidebarOpened, true);
     });
   });
 
-  describe('on a relayed bridge call', function () {
-    it('calls "openSidebar"', function () {
+  describe('on a relayed bridge call', () => {
+    it('calls "openSidebar"', () => {
       fakeBridge.emit('openSidebar');
 
       assert.calledWith(fakeBridge.call, 'openSidebar');
     });
 
-    it('calls "closeSidebar"', function () {
+    it('calls "closeSidebar"', () => {
       fakeBridge.emit('closeSidebar');
 
       assert.calledWith(fakeBridge.call, 'closeSidebar');
     });
 
-    it('calls "setVisibleHighlights"', function () {
+    it('calls "setVisibleHighlights"', () => {
       fakeBridge.emit('setVisibleHighlights');
 
       assert.calledWith(fakeBridge.call, 'setVisibleHighlights');

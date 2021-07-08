@@ -114,7 +114,7 @@ function preloadUrl(doc, type, url) {
  * @param {string[]} assets
  */
 function injectAssets(doc, config, assets) {
-  assets.forEach(function (path) {
+  assets.forEach(path => {
     const url = config.assetRoot + 'build/' + config.manifest[path];
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);

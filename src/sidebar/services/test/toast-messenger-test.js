@@ -1,6 +1,6 @@
 import { ToastMessengerService } from '../toast-messenger';
 
-describe('ToastMessengerService', function () {
+describe('ToastMessengerService', () => {
   let clock;
   let fakeStore;
   let service;

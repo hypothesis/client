@@ -17,8 +17,8 @@ describe('sidebar/store/modules/selection', () => {
     store = createStore([annotations, filters, selection, route], fakeSettings);
   });
 
-  describe('setForcedVisible', function () {
-    it('sets the visibility of the annotation', function () {
+  describe('setForcedVisible', () => {
+    it('sets the visibility of the annotation', () => {
       store.setForcedVisible('id1', true);
       assert.deepEqual(getSelectionState().forcedVisible, { id1: true });
     });
@@ -34,8 +34,8 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('setExpanded()', function () {
-    it('sets the expanded state of the annotation', function () {
+  describe('setExpanded()', () => {
+    it('sets the expanded state of the annotation', () => {
       store.setExpanded('parent_id', true);
       store.setExpanded('whatnot', false);
       assert.deepEqual(store.expandedMap(), {
@@ -45,24 +45,24 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('hasSelectedAnnotations', function () {
-    it('returns true if there are any selected annotations', function () {
+  describe('hasSelectedAnnotations', () => {
+    it('returns true if there are any selected annotations', () => {
       store.selectAnnotations([1]);
       assert.isTrue(store.hasSelectedAnnotations());
     });
 
-    it('returns false if there are no selected annotations', function () {
+    it('returns false if there are no selected annotations', () => {
       assert.isFalse(store.hasSelectedAnnotations());
     });
   });
 
-  describe('filterQuery', function () {
-    it('returns the filterQuery value when provided', function () {
+  describe('filterQuery', () => {
+    it('returns the filterQuery value when provided', () => {
       store.setFilterQuery('tag:foo');
       assert.equal(store.filterQuery(), 'tag:foo');
     });
 
-    it('returns null when no filterQuery is present', function () {
+    it('returns null when no filterQuery is present', () => {
       assert.isNull(store.filterQuery());
     });
   });
@@ -93,8 +93,8 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('selectAnnotations()', function () {
-    it('adds the passed annotations to the selectedAnnotations', function () {
+  describe('selectAnnotations()', () => {
+    it('adds the passed annotations to the selectedAnnotations', () => {
       store.selectAnnotations([1, 2, 3]);
       assert.deepEqual(getSelectionState().selected, {
         1: true,
@@ -103,7 +103,7 @@ describe('sidebar/store/modules/selection', () => {
       });
     });
 
-    it('replaces any annotations originally in the selection', function () {
+    it('replaces any annotations originally in the selection', () => {
       store.selectAnnotations([1]);
       store.selectAnnotations([2, 3]);
       assert.deepEqual(getSelectionState().selected, {
@@ -112,7 +112,7 @@ describe('sidebar/store/modules/selection', () => {
       });
     });
 
-    it('empties the selection object if no annotations are selected', function () {
+    it('empties the selection object if no annotations are selected', () => {
       store.selectAnnotations([1]);
       store.selectAnnotations([]);
       assert.isObject(getSelectionState().selected);
@@ -120,8 +120,8 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('toggleSelectedAnnotations()', function () {
-    it('adds annotations missing from the selectedAnnotations', function () {
+  describe('toggleSelectedAnnotations()', () => {
+    it('adds annotations missing from the selectedAnnotations', () => {
       store.selectAnnotations([1, 2]);
       store.toggleSelectedAnnotations([3, 4]);
       assert.deepEqual(getSelectionState().selected, {
@@ -132,7 +132,7 @@ describe('sidebar/store/modules/selection', () => {
       });
     });
 
-    it('removes annotations already in the selection', function () {
+    it('removes annotations already in the selection', () => {
       store.selectAnnotations([1, 3]);
       store.toggleSelectedAnnotations([1, 2]);
       assert.deepEqual(getSelectionState().selected, {
@@ -194,8 +194,8 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('#REMOVE_ANNOTATIONS', function () {
-    it('removing an annotation should also remove it from the selection', function () {
+  describe('#REMOVE_ANNOTATIONS', () => {
+    it('removing an annotation should also remove it from the selection', () => {
       store.selectAnnotations([1, 2, 3]);
       store.setForcedVisible(2, true);
       store.setForcedVisible(1, true);
@@ -211,43 +211,43 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
-  describe('selectTab()', function () {
-    it('sets the selected tab', function () {
+  describe('selectTab()', () => {
+    it('sets the selected tab', () => {
       store.selectTab('annotation');
       assert.equal(getSelectionState().selectedTab, 'annotation');
     });
 
-    it('allows sorting annotations by time and document location', function () {
+    it('allows sorting annotations by time and document location', () => {
       store.selectTab('annotation');
       assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
     });
 
-    it('allows sorting page notes by time', function () {
+    it('allows sorting page notes by time', () => {
       store.selectTab('note');
       assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest']);
     });
 
-    it('allows sorting orphans by time and document location', function () {
+    it('allows sorting orphans by time and document location', () => {
       store.selectTab('orphan');
       assert.deepEqual(store.sortKeys(), ['Newest', 'Oldest', 'Location']);
     });
 
-    it('sorts annotations by document location by default', function () {
+    it('sorts annotations by document location by default', () => {
       store.selectTab('annotation');
       assert.deepEqual(getSelectionState().sortKey, 'Location');
     });
 
-    it('sorts page notes from oldest to newest by default', function () {
+    it('sorts page notes from oldest to newest by default', () => {
       store.selectTab('note');
       assert.deepEqual(getSelectionState().sortKey, 'Oldest');
     });
 
-    it('sorts orphans by document location by default', function () {
+    it('sorts orphans by document location by default', () => {
       store.selectTab('orphan');
       assert.deepEqual(getSelectionState().sortKey, 'Location');
     });
 
-    it('does not reset the sort key unless necessary', function () {
+    it('does not reset the sort key unless necessary', () => {
       // Select the tab, setting sort key to 'Oldest', and then manually
       // override the sort key.
       store.selectTab('note');

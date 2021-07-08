@@ -133,7 +133,7 @@ describe('annotator/config/settingsFrom', () => {
         url: 'http://localhost:3000',
         returns: null,
       },
-    ].forEach(function (test) {
+    ].forEach(test => {
       describe(test.describe, () => {
         it(test.it, () => {
           assert.deepEqual(
@@ -237,7 +237,7 @@ describe('annotator/config/settingsFrom', () => {
         url: 'http://localhost:3000',
         returns: null,
       },
-    ].forEach(function (test) {
+    ].forEach(test => {
       describe(test.describe, () => {
         it(test.it, () => {
           assert.deepEqual(
@@ -323,7 +323,7 @@ describe('annotator/config/settingsFrom', () => {
         input: /regex/,
         output: /regex/,
       },
-    ].forEach(function (test) {
+    ].forEach(test => {
       it(test.it, () => {
         fakeParseJsonConfig.returns({
           showHighlights: test.input,
@@ -397,7 +397,7 @@ describe('annotator/config/settingsFrom', () => {
         jsonSettings: { foo: 'jsonValue' },
         expected: undefined,
       },
-    ].forEach(function (test) {
+    ].forEach(test => {
       context(test.when, () => {
         specify(test.specify, () => {
           fakeConfigFuncSettingsFrom.returns(test.configFuncSettings);

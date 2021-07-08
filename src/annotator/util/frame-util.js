@@ -48,7 +48,7 @@ export function isAccessible(iframe) {
 
 export function isDocumentReady(iframe, callback) {
   if (iframe.contentDocument.readyState === 'loading') {
-    iframe.contentDocument.addEventListener('DOMContentLoaded', function () {
+    iframe.contentDocument.addEventListener('DOMContentLoaded', () => {
       callback();
     });
   } else {
@@ -58,7 +58,7 @@ export function isDocumentReady(iframe, callback) {
 
 export function isLoaded(iframe, callback) {
   if (iframe.contentDocument.readyState !== 'complete') {
-    iframe.addEventListener('load', function () {
+    iframe.addEventListener('load', () => {
       callback();
     });
   } else {

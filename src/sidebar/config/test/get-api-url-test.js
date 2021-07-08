@@ -26,14 +26,14 @@ describe('sidebar/config/get-api-url', () => {
 
   context(
     'when there is a service object in settings but does not contain an apiUrl key',
-    function () {
+    () => {
       it('throws error', () => {
         const settings = {
           apiUrl: 'someApiUrl',
           services: [{}],
         };
         assert.throws(
-          function () {
+          () => {
             getApiUrl(settings);
           },
           Error,

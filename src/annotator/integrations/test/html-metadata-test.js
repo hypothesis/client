@@ -328,7 +328,7 @@ describe('HTMLMetadata', () => {
       // created by a `<base>` tag.
       ['blob:1234', 'doi:foo'],
       ['chrome://foo', 'chrome://blah'],
-    ].forEach(function (...args) {
+    ].forEach((...args) => {
       const [href, baseURI] = Array.from(args[0]);
       it("should return the document's URL if it and the baseURI do not have an allowed scheme", () => {
         const doc = createDoc(href, baseURI);

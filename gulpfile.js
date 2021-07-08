@@ -59,18 +59,14 @@ function parseCommandLine() {
 const karmaOptions = parseCommandLine();
 
 /** A list of all modules included in vendor bundles. */
-const vendorModules = Object.keys(vendorBundles.bundles).reduce(function (
-  deps,
-  key
-) {
+const vendorModules = Object.keys(vendorBundles.bundles).reduce((deps, key) => {
   return deps.concat(vendorBundles.bundles[key]);
-},
-[]);
+}, []);
 
 // Builds the bundles containing vendor JS code
-gulp.task('build-vendor-js', function () {
+gulp.task('build-vendor-js', () => {
   const finished = [];
-  Object.keys(vendorBundles.bundles).forEach(function (name) {
+  Object.keys(vendorBundles.bundles).forEach(name => {
     finished.push(
       createBundle({
         name: name,
@@ -147,9 +143,9 @@ const appBundleConfigs = appBundles.concat(polyfillBundles).map(config => {
 
 gulp.task(
   'build-js',
-  gulp.parallel('build-vendor-js', function () {
+  gulp.parallel('build-vendor-js', () => {
     return Promise.all(
-      appBundleConfigs.map(function (config) {
+      appBundleConfigs.map(config => {
         return createBundle(config);
       })
     );
@@ -159,7 +155,7 @@ gulp.task(
 gulp.task(
   'watch-js',
   gulp.series('build-vendor-js', function watchJS() {
-    appBundleConfigs.forEach(function (config) {
+    appBundleConfigs.forEach(config => {
       createBundle(config, { watch: true });
     });
   })
@@ -178,7 +174,7 @@ const cssBundles = [
   './src/styles/ui-playground/ui-playground.scss',
 ];
 
-gulp.task('build-css', function () {
+gulp.task('build-css', () => {
   mkdirSync(STYLE_DIR, { recursive: true });
   const bundles = cssBundles.map(entry =>
     createStyleBundle({
@@ -205,7 +201,7 @@ const fontFiles = [
   'node_modules/katex/dist/fonts/*.woff2',
 ];
 
-gulp.task('build-fonts', function () {
+gulp.task('build-fonts', () => {
   return gulp
     .src(fontFiles)
     .pipe(changed(FONTS_DIR))
@@ -220,7 +216,7 @@ gulp.task(
 );
 
 const imageFiles = 'src/images/**/*';
-gulp.task('build-images', function () {
+gulp.task('build-images', () => {
   return gulp
     .src(imageFiles)
     .pipe(changed(IMAGES_DIR))
@@ -308,17 +304,17 @@ function generateManifest(opts) {
     .pipe(gulp.dest('build/'));
 }
 
-gulp.task('watch-manifest', function () {
+gulp.task('watch-manifest', () => {
   gulp.watch(MANIFEST_SOURCE_FILES, { delay: 500 }, function updateManifest() {
     return generateManifest({ usingDevServer: true });
   });
 });
 
-gulp.task('serve-package', function () {
+gulp.task('serve-package', () => {
   servePackage(3001);
 });
 
-gulp.task('serve-test-pages', function () {
+gulp.task('serve-test-pages', () => {
   serveDev(3000, { clientUrl: `//{current_host}:3001/hypothesis` });
 });
 

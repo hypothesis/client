@@ -6,7 +6,7 @@ import { $imports } from '../LoginPromptPanel';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('LoginPromptPanel', function () {
+describe('LoginPromptPanel', () => {
   let fakeOnLogin;
   let fakeOnSignUp;
 

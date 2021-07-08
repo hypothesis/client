@@ -37,7 +37,7 @@ const dummyGroups = [
   { name: 'Group 3', id: 'id3' },
 ];
 
-describe('GroupsService', function () {
+describe('GroupsService', () => {
   let fakeAuth;
   let fakeStore;
   let fakeSession;
@@ -46,7 +46,7 @@ describe('GroupsService', function () {
   let fakeMetadata;
   let fakeToastMessenger;
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeAuth = {
       getAccessToken: sinon.stub().returns('1234'),
     };
@@ -216,7 +216,7 @@ describe('GroupsService', function () {
     });
   });
 
-  describe('#load', function () {
+  describe('#load', () => {
     it('filters out direct-linked groups that are out of scope and scope enforced', () => {
       const svc = createService();
       fakeStore.getDefault.returns(dummyGroups[0].id);
@@ -258,7 +258,7 @@ describe('GroupsService', function () {
       });
     });
 
-    it('combines groups from both endpoints', function () {
+    it('combines groups from both endpoints', () => {
       const svc = createService();
 
       const groups = [
@@ -333,7 +333,7 @@ describe('GroupsService', function () {
       });
     });
 
-    it('loads all available groups', function () {
+    it('loads all available groups', () => {
       const svc = createService();
 
       return svc.load().then(() => {
@@ -341,7 +341,7 @@ describe('GroupsService', function () {
       });
     });
 
-    it('sends `expand` parameter', function () {
+    it('sends `expand` parameter', () => {
       const svc = createService();
       fakeApi.groups.list.returns(
         Promise.resolve([{ id: 'groupa', name: 'GroupA' }])
@@ -493,7 +493,7 @@ describe('GroupsService', function () {
       });
     });
 
-    it('injects a default organization if group is missing an organization', function () {
+    it('injects a default organization if group is missing an organization', () => {
       const svc = createService();
       const groups = [{ id: '39r39f', name: 'Ding Dong!' }];
       fakeApi.groups.list.returns(Promise.resolve(groups));
@@ -826,8 +826,8 @@ describe('GroupsService', function () {
     });
   });
 
-  describe('#leave', function () {
-    it('should call the group leave API', function () {
+  describe('#leave', () => {
+    it('should call the group leave API', () => {
       const s = createService();
       return s.leave('id2').then(() => {
         assert.calledWithMatch(fakeApi.group.member.delete, {
@@ -840,7 +840,7 @@ describe('GroupsService', function () {
 
   const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-  describe('automatic re-fetching', function () {
+  describe('automatic re-fetching', () => {
     it('refetches groups when the logged-in user changes', async () => {
       const svc = createService();
 

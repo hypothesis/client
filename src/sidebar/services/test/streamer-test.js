@@ -216,7 +216,7 @@ describe('StreamerService', () => {
       });
     });
 
-    it('should not include credentials in the URL if the client has no access token', function () {
+    it('should not include credentials in the URL if the client has no access token', () => {
       fakeAuth.getAccessToken.resolves(null);
 
       createDefaultStreamer();

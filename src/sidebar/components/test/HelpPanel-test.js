@@ -7,7 +7,7 @@ import { $imports } from '../HelpPanel';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('HelpPanel', function () {
+describe('HelpPanel', () => {
   let fakeAuth;
   let fakeSessionService;
   let fakeStore;

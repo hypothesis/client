@@ -18,7 +18,7 @@ export default function annotationCounts(rootEl, crossframe) {
 
   function updateAnnotationCountElems(newCount) {
     const elems = rootEl.querySelectorAll('[' + ANNOTATION_COUNT_ATTR + ']');
-    Array.from(elems).forEach(function (elem) {
+    Array.from(elems).forEach(elem => {
       elem.textContent = newCount;
     });
   }

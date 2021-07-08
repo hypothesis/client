@@ -6,7 +6,7 @@ import { $imports } from '../AutocompleteList';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
-describe('AutocompleteList', function () {
+describe('AutocompleteList', () => {
   let fakeList;
   let fakeOnSelectItem;
   let fakeListFormatter;
@@ -20,7 +20,7 @@ describe('AutocompleteList', function () {
     );
   }
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeList = ['tag1', 'tag2'];
     fakeOnSelectItem = sinon.stub();
     fakeListFormatter = sinon.stub();

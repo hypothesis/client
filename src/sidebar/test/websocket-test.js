@@ -6,7 +6,7 @@ import {
   RECONNECT_MIN_DELAY,
 } from '../websocket';
 
-describe('websocket wrapper', function () {
+describe('websocket wrapper', () => {
   let fakeSocket;
   let clock;
   let connectionCount;
@@ -24,7 +24,7 @@ describe('websocket wrapper', function () {
 
   const WebSocket = window.WebSocket;
 
-  beforeEach(function () {
+  beforeEach(() => {
     global.WebSocket = FakeWebSocket;
     clock = sinon.useFakeTimers();
     connectionCount = 0;
@@ -35,7 +35,7 @@ describe('websocket wrapper', function () {
     sinon.stub(console, 'error');
   });
 
-  afterEach(function () {
+  afterEach(() => {
     global.WebSocket = WebSocket;
     clock.restore();
     console.warn.restore();
@@ -43,7 +43,7 @@ describe('websocket wrapper', function () {
   });
 
   context('when the connection is closed by the browser or server', () => {
-    it('should reconnect after an abnormal disconnection', function () {
+    it('should reconnect after an abnormal disconnection', () => {
       new Socket('ws://test:1234');
       assert.ok(fakeSocket);
       const initialSocket = fakeSocket;
@@ -54,7 +54,7 @@ describe('websocket wrapper', function () {
       assert.notEqual(fakeSocket, initialSocket);
     });
 
-    it('should reconnect if initial connection fails', function () {
+    it('should reconnect if initial connection fails', () => {
       new Socket('ws://test:1234');
       assert.ok(fakeSocket);
       const initialSocket = fakeSocket;
@@ -65,7 +65,7 @@ describe('websocket wrapper', function () {
       assert.notEqual(fakeSocket, initialSocket);
     });
 
-    it('should send queued messages after a reconnect', function () {
+    it('should send queued messages after a reconnect', () => {
       // simulate WebSocket setup and initial connection
       const socket = new Socket('ws://test:1234');
       fakeSocket.onopen({});
@@ -80,7 +80,7 @@ describe('websocket wrapper', function () {
     });
 
     [CLOSE_NORMAL, CLOSE_GOING_AWAY].forEach(closeCode => {
-      it('should not reconnect after a normal disconnection', function () {
+      it('should not reconnect after a normal disconnection', () => {
         new Socket('ws://test:1234');
         assert.ok(fakeSocket);
         const initialSocket = fakeSocket;
@@ -117,7 +117,7 @@ describe('websocket wrapper', function () {
     });
   });
 
-  it('should queue messages sent prior to connection', function () {
+  it('should queue messages sent prior to connection', () => {
     const socket = new Socket('ws://test:1234');
     socket.send({ abc: 'foo' });
     assert.notCalled(fakeSocket.send);
@@ -125,7 +125,7 @@ describe('websocket wrapper', function () {
     assert.calledWith(fakeSocket.send, '{"abc":"foo"}');
   });
 
-  it('should send messages immediately when connected', function () {
+  it('should send messages immediately when connected', () => {
     const socket = new Socket('ws://test:1234');
     fakeSocket.readyState = FakeWebSocket.OPEN;
     socket.send({ abc: 'foo' });

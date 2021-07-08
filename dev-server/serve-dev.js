@@ -81,7 +81,7 @@ function serveDev(port, config) {
   app.use('/pdf-source', express.static(PDF_PATH));
 
   // Enable CORS for assets so that cross-origin font loading works.
-  app.use(function (req, res, next) {
+  app.use((req, res, next) => {
     res.append('Access-Control-Allow-Origin', '*');
     res.append('Access-Control-Allow-Methods', 'GET');
     next();

@@ -1,6 +1,6 @@
 import { parseJsonConfig } from '../parse-json-config';
 
-describe('#parseJsonConfig', function () {
+describe('#parseJsonConfig', () => {
   const sandbox = sinon.createSandbox();
 
   function appendJSHypothesisConfig(document_, jsonString) {
@@ -12,7 +12,7 @@ describe('#parseJsonConfig', function () {
     document_.body.appendChild(el);
   }
 
-  afterEach(function () {
+  afterEach(() => {
     // Remove test config scripts.
     const elements = document.querySelectorAll('.js-settings-test');
     for (let i = 0; i < elements.length; i++) {
@@ -22,98 +22,98 @@ describe('#parseJsonConfig', function () {
     sandbox.restore();
   });
 
-  context('when there are no JSON scripts', function () {
-    it('returns {}', function () {
+  context('when there are no JSON scripts', () => {
+    it('returns {}', () => {
       assert.deepEqual(parseJsonConfig(document), {});
     });
   });
 
-  context("when there's JSON scripts with no top-level objects", function () {
-    beforeEach('add JSON scripts with no top-level objects', function () {
+  context("when there's JSON scripts with no top-level objects", () => {
+    beforeEach('add JSON scripts with no top-level objects', () => {
       appendJSHypothesisConfig(document, 'null');
       appendJSHypothesisConfig(document, '23');
       appendJSHypothesisConfig(document, 'true');
     });
 
-    it('ignores them', function () {
+    it('ignores them', () => {
       assert.deepEqual(parseJsonConfig(document), {});
     });
   });
 
-  context("when there's a JSON script with a top-level array", function () {
-    beforeEach('add a JSON script containing a top-level array', function () {
+  context("when there's a JSON script with a top-level array", () => {
+    beforeEach('add a JSON script containing a top-level array', () => {
       appendJSHypothesisConfig(document, '["a", "b", "c"]');
     });
 
-    it('returns the array, parsed into an object', function () {
+    it('returns the array, parsed into an object', () => {
       assert.deepEqual(parseJsonConfig(document), { 0: 'a', 1: 'b', 2: 'c' });
     });
   });
 
-  context("when there's a JSON script with a top-level string", function () {
-    beforeEach('add a JSON script with a top-level string', function () {
+  context("when there's a JSON script with a top-level string", () => {
+    beforeEach('add a JSON script with a top-level string', () => {
       appendJSHypothesisConfig(document, '"hi"');
     });
 
-    it('returns the string, parsed into an object', function () {
+    it('returns the string, parsed into an object', () => {
       assert.deepEqual(parseJsonConfig(document), { 0: 'h', 1: 'i' });
     });
   });
 
-  context("when there's a JSON script containing invalid JSON", function () {
-    beforeEach('stub console.warn()', function () {
+  context("when there's a JSON script containing invalid JSON", () => {
+    beforeEach('stub console.warn()', () => {
       sandbox.stub(console, 'warn');
     });
 
-    beforeEach('add a JSON script containing invalid JSON', function () {
+    beforeEach('add a JSON script containing invalid JSON', () => {
       appendJSHypothesisConfig(document, 'this is not valid json');
     });
 
-    it('logs a warning', function () {
+    it('logs a warning', () => {
       parseJsonConfig(document);
 
       assert.called(console.warn);
     });
 
-    it('returns {}', function () {
+    it('returns {}', () => {
       assert.deepEqual(parseJsonConfig(document), {});
     });
 
-    it('still returns settings from other JSON scripts', function () {
+    it('still returns settings from other JSON scripts', () => {
       appendJSHypothesisConfig(document, '{"foo": "FOO", "bar": "BAR"}');
 
       assert.deepEqual(parseJsonConfig(document), { foo: 'FOO', bar: 'BAR' });
     });
   });
 
-  context("when there's a JSON script with an empty object", function () {
-    beforeEach('add a JSON script containing an empty object', function () {
+  context("when there's a JSON script with an empty object", () => {
+    beforeEach('add a JSON script containing an empty object', () => {
       appendJSHypothesisConfig(document, '{}');
     });
 
-    it('ignores it', function () {
+    it('ignores it', () => {
       assert.deepEqual(parseJsonConfig(document), {});
     });
   });
 
-  context("when there's a JSON script containing some settings", function () {
-    beforeEach('add a JSON script containing some settings', function () {
+  context("when there's a JSON script containing some settings", () => {
+    beforeEach('add a JSON script containing some settings', () => {
       appendJSHypothesisConfig(document, '{"foo": "FOO", "bar": "BAR"}');
     });
 
-    it('returns the settings', function () {
+    it('returns the settings', () => {
       assert.deepEqual(parseJsonConfig(document), { foo: 'FOO', bar: 'BAR' });
     });
   });
 
-  context('when there are JSON scripts with different settings', function () {
-    beforeEach('add some JSON scripts with different settings', function () {
+  context('when there are JSON scripts with different settings', () => {
+    beforeEach('add some JSON scripts with different settings', () => {
       appendJSHypothesisConfig(document, '{"foo": "FOO"}');
       appendJSHypothesisConfig(document, '{"bar": "BAR"}');
       appendJSHypothesisConfig(document, '{"gar": "GAR"}');
     });
 
-    it('merges them all into one returned object', function () {
+    it('merges them all into one returned object', () => {
       assert.deepEqual(parseJsonConfig(document), {
         foo: 'FOO',
         bar: 'BAR',
@@ -122,8 +122,8 @@ describe('#parseJsonConfig', function () {
     });
   });
 
-  context('when multiple JSON scripts contain the same setting', function () {
-    beforeEach('add some JSON scripts with different settings', function () {
+  context('when multiple JSON scripts contain the same setting', () => {
+    beforeEach('add some JSON scripts with different settings', () => {
       appendJSHypothesisConfig(document, '{"foo": "first"}');
       appendJSHypothesisConfig(document, '{"foo": "second"}');
       appendJSHypothesisConfig(document, '{"foo": "third"}');
@@ -131,7 +131,7 @@ describe('#parseJsonConfig', function () {
 
     specify(
       'settings from later in the page override ones from earlier',
-      function () {
+      () => {
         assert.equal(parseJsonConfig(document).foo, 'third');
       }
     );

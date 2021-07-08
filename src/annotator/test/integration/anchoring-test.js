@@ -30,7 +30,7 @@ function annotateQuote(quote) {
  */
 function highlightedPhrases(container) {
   return Array.from(container.querySelectorAll('.hypothesis-highlight')).map(
-    function (el) {
+    el => {
       return el.textContent;
     }
   );
@@ -47,7 +47,7 @@ function FakeCrossFrame() {
   this.sync = sinon.stub();
 }
 
-describe('anchoring', function () {
+describe('anchoring', () => {
   let guest;
   let container;
 
@@ -92,20 +92,20 @@ describe('anchoring', function () {
   ].forEach(testCase => {
     it(`should highlight ${testCase.tag} when annotations are loaded`, () => {
       const normalize = function (quotes) {
-        return quotes.map(function (q) {
+        return quotes.map(q => {
           return simplifyWhitespace(q);
         });
       };
 
-      const annotations = testCase.quotes.map(function (q) {
+      const annotations = testCase.quotes.map(q => {
         return annotateQuote(q);
       });
 
-      const anchored = annotations.map(function (ann) {
+      const anchored = annotations.map(ann => {
         return guest.anchor(ann);
       });
 
-      return Promise.all(anchored).then(function () {
+      return Promise.all(anchored).then(() => {
         const assertFn = testCase.expectFail
           ? assert.notDeepEqual
           : assert.deepEqual;

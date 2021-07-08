@@ -5,11 +5,11 @@ function assetUrl(url) {
   return `https://marginal.ly/client/build/${url}`;
 }
 
-describe('bootstrap', function () {
+describe('bootstrap', () => {
   let fakePolyfills;
   let iframe;
 
-  beforeEach(function () {
+  beforeEach(() => {
     iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
 
@@ -22,7 +22,7 @@ describe('bootstrap', function () {
     });
   });
 
-  afterEach(function () {
+  afterEach(() => {
     $imports.$restore();
     iframe.remove();
   });
@@ -47,7 +47,7 @@ describe('bootstrap', function () {
       'styles/sidebar.css',
     ];
 
-    const manifest = assetNames.reduce(function (manifest, path) {
+    const manifest = assetNames.reduce((manifest, path) => {
       const url = path.replace(/\.([a-z]+)$/, '.1234.$1');
       manifest[path] = url;
       return manifest;
@@ -73,21 +73,21 @@ describe('bootstrap', function () {
   function findAssets(doc_) {
     const scripts = Array.from(
       doc_.querySelectorAll('script[data-hypothesis-asset]')
-    ).map(function (el) {
+    ).map(el => {
       return el.src;
     });
 
     const styles = Array.from(
       doc_.querySelectorAll('link[rel="stylesheet"][data-hypothesis-asset]')
-    ).map(function (el) {
+    ).map(el => {
       return el.href;
     });
 
     return scripts.concat(styles).sort();
   }
 
-  describe('bootHypothesisClient', function () {
-    it('loads assets for the annotation layer', function () {
+  describe('bootHypothesisClient', () => {
+    it('loads assets for the annotation layer', () => {
       runBoot('annotator');
       const expectedAssets = [
         'scripts/annotator.bundle.1234.js',
@@ -98,7 +98,7 @@ describe('bootstrap', function () {
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
     });
 
-    it('creates the link to the sidebar iframe', function () {
+    it('creates the link to the sidebar iframe', () => {
       runBoot('annotator');
 
       const sidebarAppLink = iframe.contentDocument.querySelector(
@@ -109,7 +109,7 @@ describe('bootstrap', function () {
       assert.equal(sidebarAppLink.href, 'https://marginal.ly/app.html');
     });
 
-    it('does nothing if Hypothesis is already loaded in the document', function () {
+    it('does nothing if Hypothesis is already loaded in the document', () => {
       const link = iframe.contentDocument.createElement('link');
       link.type = 'application/annotator+html';
       iframe.contentDocument.head.appendChild(link);
@@ -136,8 +136,8 @@ describe('bootstrap', function () {
     });
   });
 
-  describe('bootSidebarApp', function () {
-    it('loads assets for the sidebar application', function () {
+  describe('bootSidebarApp', () => {
+    it('loads assets for the sidebar application', () => {
       runBoot('sidebar');
       const expectedAssets = [
         'scripts/katex.bundle.1234.js',

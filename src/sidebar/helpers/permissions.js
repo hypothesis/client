@@ -78,7 +78,7 @@ export function defaultPermissions(userid, groupid, savedLevel) {
  * @return {boolean}
  */
 export function isShared(perms) {
-  return perms.read.some(function (principal) {
+  return perms.read.some(principal => {
     return principal.indexOf('group:') === 0;
   });
 }

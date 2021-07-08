@@ -16,14 +16,14 @@ const watchify = require('watchify');
 const minifyStream = require('./minify-stream');
 
 function streamFinished(stream) {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     stream.on('finish', resolve);
     stream.on('error', reject);
   });
 }
 
 function waitForever() {
-  return new Promise(function () {});
+  return new Promise(() => {});
 }
 
 /**
@@ -100,7 +100,7 @@ module.exports = function createBundle(config, buildOpts) {
   // Specify modules that Browserify should not parse.
   // The 'noParse' array must contain full file paths,
   // not module names.
-  bundleOpts.noParse = (config.noParse || []).map(function (id) {
+  bundleOpts.noParse = (config.noParse || []).map(id => {
     // If package.json specifies a custom entry point for the module for
     // use in the browser, resolve that.
     const packageConfig = require('../../package.json');
@@ -137,7 +137,7 @@ module.exports = function createBundle(config, buildOpts) {
 
   const bundle = browserify([], bundleOpts);
 
-  (config.require || []).forEach(function (req) {
+  (config.require || []).forEach(req => {
     // When another bundle uses 'bundle.external(<module path>)',
     // the module path is rewritten relative to the
     // base directory and a '/' prefix is added, so
@@ -168,7 +168,7 @@ module.exports = function createBundle(config, buildOpts) {
   bundle.add(config.entry || []);
   bundle.external(config.external || []);
 
-  (config.transforms || []).forEach(function (transform) {
+  (config.transforms || []).forEach(transform => {
     if (transform === 'babel') {
       bundle.transform(babelify);
     }
@@ -194,7 +194,7 @@ module.exports = function createBundle(config, buildOpts) {
   function build() {
     const output = fs.createWriteStream(bundlePath);
     let stream = bundle.bundle();
-    stream.on('error', function (err) {
+    stream.on('error', err => {
       log('Build error', err.toString());
     });
 
@@ -208,23 +208,23 @@ module.exports = function createBundle(config, buildOpts) {
 
   if (buildOpts.watch) {
     bundle.plugin(watchify);
-    bundle.on('update', function (ids) {
+    bundle.on('update', ids => {
       const start = Date.now();
 
       log('Source files changed', ids);
       build()
-        .then(function () {
+        .then(() => {
           log('Updated %s (%d ms)', bundleFileName, Date.now() - start);
         })
-        .catch(function (err) {
+        .catch(err => {
           console.error('Building updated bundle failed:', err);
         });
     });
     build()
-      .then(function () {
+      .then(() => {
         log('Built ' + bundleFileName);
       })
-      .catch(function (err) {
+      .catch(err => {
         console.error('Error building bundle:', err);
       });
 
