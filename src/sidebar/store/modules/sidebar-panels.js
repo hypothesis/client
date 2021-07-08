@@ -83,7 +83,7 @@ const actions = util.actionTypes(reducers);
  * @param {PanelName} panelName
  */
 function openSidebarPanel(panelName) {
-  return { type: actions.OPEN_SIDEBAR_PANEL, panelName: panelName };
+  return { type: actions.OPEN_SIDEBAR_PANEL, panelName };
 }
 
 /**
@@ -92,7 +92,7 @@ function openSidebarPanel(panelName) {
  * @param {PanelName} panelName
  */
 function closeSidebarPanel(panelName) {
-  return { type: actions.CLOSE_SIDEBAR_PANEL, panelName: panelName };
+  return { type: actions.CLOSE_SIDEBAR_PANEL, panelName };
 }
 
 /**
@@ -106,8 +106,8 @@ function closeSidebarPanel(panelName) {
 function toggleSidebarPanel(panelName, panelState) {
   return {
     type: actions.TOGGLE_SIDEBAR_PANEL,
-    panelName: panelName,
-    panelState: panelState,
+    panelName,
+    panelState,
   };
 }
 

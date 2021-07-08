@@ -127,7 +127,7 @@ export class RPC {
         protocol: 'frame-rpc',
         version: VERSION,
         sequence: seq,
-        method: method,
+        method,
         arguments: args,
       },
       this.origin

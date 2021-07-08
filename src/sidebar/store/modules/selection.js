@@ -281,7 +281,7 @@ function setForcedVisible(id, visible) {
 function setSortKey(key) {
   return {
     type: actions.SET_SORT_KEY,
-    key: key,
+    key,
   };
 }
 

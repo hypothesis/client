@@ -26,9 +26,9 @@ export function documentMetadata(annotation) {
   }
 
   return {
-    uri: uri,
-    domain: domain,
-    title: title,
+    uri,
+    domain,
+    title,
   };
 }
 

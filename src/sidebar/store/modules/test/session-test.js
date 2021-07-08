@@ -33,7 +33,7 @@ describe('sidebar/store/modules/session', () => {
       { userid: null, expectedIsLoggedIn: false },
     ].forEach(({ userid, expectedIsLoggedIn }) => {
       it('returns whether the user is logged in', () => {
-        store.updateProfile({ userid: userid });
+        store.updateProfile({ userid });
         assert.equal(store.isLoggedIn(), expectedIsLoggedIn);
       });
     });

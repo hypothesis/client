@@ -2,6 +2,7 @@
   "extends": ["hypothesis", "plugin:jsx-a11y/recommended"],
   "rules": {
     "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
+    "object-shorthand": ["error", "properties"],
 
     // Suppressed to make ESLint v6 migration easier.
     "no-prototype-builtins": "off",

@@ -207,7 +207,7 @@ describe('sidebar/helpers/groups', () => {
       },
     ].forEach(({ description, scopes, isScopedToUri, uri }) => {
       it(description, () => {
-        const userGroups = [{ id: 'groupa', name: 'GroupA', scopes: scopes }];
+        const userGroups = [{ id: 'groupa', name: 'GroupA', scopes }];
         const featuredGroups = [];
 
         const groups = combineGroups(userGroups, featuredGroups, uri);

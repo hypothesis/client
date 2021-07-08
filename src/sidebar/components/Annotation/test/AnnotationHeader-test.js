@@ -249,7 +249,7 @@ describe('AnnotationHeader', () => {
       fakeHasBeenEdited.returns(true);
 
       const wrapper = createAnnotationHeader({
-        annotation: annotation,
+        annotation,
       });
       const timestamp = wrapper.find('AnnotationTimestamps');
       assert.equal(timestamp.props().withEditedTimestamp, true);
@@ -272,7 +272,7 @@ describe('AnnotationHeader', () => {
       fakeIsReply.returns(true);
 
       const wrapper = createAnnotationHeader({
-        annotation: annotation,
+        annotation,
         threadIsCollapsed: true,
       });
 

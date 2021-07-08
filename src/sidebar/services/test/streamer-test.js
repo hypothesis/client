@@ -432,7 +432,7 @@ describe('StreamerService', () => {
         };
         fakeWebSocket.notify({
           type: 'session-change',
-          model: model,
+          model,
         });
         assert.ok(fakeSession.update.calledWith(model));
         assert.calledOnce(fakeGroups.load);

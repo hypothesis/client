@@ -17,7 +17,7 @@ function targetBlank() {
   function filter(text) {
     return text.replace(/<a href=/g, '<a target="_blank" href=');
   }
-  return [{ type: 'output', filter: filter }];
+  return [{ type: 'output', filter }];
 }
 
 let converter;
@@ -86,7 +86,7 @@ function extractMath(content) {
     const id = mathBlocks.length + 1;
     const placeholder = mathPlaceholder(id);
     mathBlocks.push({
-      id: id,
+      id,
       expression: replacedContent.slice(mathStart + 2, mathEnd - 2),
       inline: inlineMathStart !== -1,
     });
@@ -108,7 +108,7 @@ function extractMath(content) {
   }
 
   return {
-    mathBlocks: mathBlocks,
+    mathBlocks,
     content: replacedContent,
   };
 }

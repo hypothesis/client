@@ -157,7 +157,7 @@ const reducers = {
 
     return {
       annotations: added.concat(updated).concat(unchanged),
-      nextTag: nextTag,
+      nextTag,
     };
   },
 
@@ -212,7 +212,7 @@ const reducers = {
         return Object.assign({}, annot, { $orphan: state === 'orphan' });
       }
     });
-    return { annotations: annotations };
+    return { annotations };
   },
 
   UPDATE_FLAG_STATUS: function (state, action) {
@@ -237,7 +237,7 @@ const reducers = {
         return annot;
       }
     });
-    return { annotations: annotations };
+    return { annotations };
   },
 };
 
@@ -258,7 +258,7 @@ function addAnnotations(annotations) {
 
     dispatch({
       type: actions.ADD_ANNOTATIONS,
-      annotations: annotations,
+      annotations,
       currentAnnotationCount: getState().annotations.annotations.length,
     });
 
@@ -327,7 +327,7 @@ function focusAnnotations(tags) {
 function hideAnnotation(id) {
   return {
     type: actions.HIDE_ANNOTATION,
-    id: id,
+    id,
   };
 }
 
@@ -378,7 +378,7 @@ export function removeAnnotations(annotations) {
 function unhideAnnotation(id) {
   return {
     type: actions.UNHIDE_ANNOTATION,
-    id: id,
+    id,
   };
 }
 
@@ -406,8 +406,8 @@ function updateAnchorStatus(statusUpdates) {
 function updateFlagStatus(id, isFlagged) {
   return {
     type: actions.UPDATE_FLAG_STATUS,
-    id: id,
-    isFlagged: isFlagged,
+    id,
+    isFlagged,
   };
 }
 

@@ -6,8 +6,8 @@ export function group() {
   const id = chance.hash({ length: 15 });
   const name = chance.string();
   const group = {
-    id: id,
-    name: name,
+    id,
+    name,
     links: {
       html: `http://localhost:5000/groups/${id}/${name}`,
     },

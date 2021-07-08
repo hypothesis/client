@@ -81,7 +81,7 @@ export class AnnotationsService {
         updated: now.toISOString(),
         user: userid,
         user_info: userInfo,
-        $tag: $tag,
+        $tag,
         hidden: false,
         links: {},
       },
