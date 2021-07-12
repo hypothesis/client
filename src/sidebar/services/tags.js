@@ -41,7 +41,7 @@ export class TagsService {
     //   (e.g. tag "pink banana" matches query "ban"), OR
     // * tag has substring query occurring after a non-word character
     //   (e.g. tag "pink!banana" matches query "ban")
-    let regex = new RegExp('(\\W|\\b)' + query, 'i');
+    let regex = new RegExp('(\\W|\\b|^)' + query, 'i');
     return savedTags.filter(tag => {
       if (tag.match(regex)) {
         if (limit === null || resultCount < limit) {
