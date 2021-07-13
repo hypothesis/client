@@ -41,12 +41,15 @@ export class TagsService {
     //   (e.g. tag "pink banana" matches query "ban"), OR
     // * tag has substring query occurring after a non-word character
     //   (e.g. tag "pink!banana" matches query "ban")
-    let regex = new RegExp('(\\W|\\b)' + query, 'i');
     return savedTags.filter(tag => {
-      if (tag.match(regex)) {
-        if (limit === null || resultCount < limit) {
-          // limit allows a subset of the results
-          // See https://github.com/hypothesis/client/issues/1606
+      const words = tag.split(/\W+/);
+      let regex = new RegExp(`^${query}`, 'i'); // Only match the start of the string
+      // limit allows a subset of the results
+      // See https://github.com/hypothesis/client/issues/1606
+      if (limit === null || resultCount < limit) {
+        const matches =
+          words.some(word => word.match(regex)) || tag.match(regex);
+        if (matches) {
           ++resultCount;
           return true;
         }

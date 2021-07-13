@@ -56,6 +56,12 @@ describe('TagsService', () => {
         count: 1,
         updated: stamp,
       },
+      'žŸ¡¢£¤¥¦§': {
+        // ASCII chars
+        text: 'žŸ¡¢£¤¥¦§',
+        count: 1,
+        updated: stamp,
+      },
     };
     const savedTagsList = Object.keys(savedTagsMap);
 
@@ -82,6 +88,10 @@ describe('TagsService', () => {
       assert.deepEqual(tags.filter('b', 1), ['bar']);
       assert.deepEqual(tags.filter('b', 2), ['bar', 'bar argon']);
       assert.deepEqual(tags.filter('b', 3), ['bar', 'bar argon', 'banana']);
+    });
+
+    it('returns ASCII tags that start with the query string', () => {
+      assert.deepEqual(tags.filter('žŸ¡'), ['žŸ¡¢£¤¥¦§']);
     });
   });
 
@@ -122,6 +132,7 @@ describe('TagsService', () => {
         'bar argon',
         'future',
         'argon',
+        'žŸ¡¢£¤¥¦§',
       ]);
     });
   });
