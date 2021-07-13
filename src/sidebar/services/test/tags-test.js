@@ -56,6 +56,11 @@ describe('TagsService', () => {
         count: 1,
         updated: stamp,
       },
+      ინგლისური: { // "English" in Georgian
+        text: 'ინგლისური',
+        count: 1,
+        updated: stamp,
+      },
     };
     const savedTagsList = Object.keys(savedTagsMap);
 
@@ -68,6 +73,10 @@ describe('TagsService', () => {
   describe('#filter', () => {
     it('returns tags that start with the query string', () => {
       assert.deepEqual(tags.filter('b'), ['bar', 'bar argon', 'banana']);
+    });
+
+    it('returns non-English tags that start with the query string', () => {
+      assert.deepEqual(tags.filter('ინგ'), ['ინგლისური']);
     });
 
     it('returns tags that have any word starting with the query string', () => {
@@ -122,6 +131,7 @@ describe('TagsService', () => {
         'bar argon',
         'future',
         'argon',
+        'ინგლისური'
       ]);
     });
   });
