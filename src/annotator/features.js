@@ -9,7 +9,7 @@ const _set = features => {
 
 export default {
   init: function (crossframe) {
-    crossframe.on(events.FEATURE_FLAGS_UPDATED, _set);
+    crossframe.register(events.FEATURE_FLAGS_UPDATED, _set);
   },
 
   reset: function () {

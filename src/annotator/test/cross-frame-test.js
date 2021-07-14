@@ -30,7 +30,7 @@ describe('CrossFrame', () => {
       createChannel: sinon.stub(),
       onConnect: sinon.stub(),
       call: sinon.stub(),
-      on: sinon.stub(),
+      register: sinon.stub(),
     };
 
     fakeAnnotationSync = { sync: sinon.stub() };
@@ -114,11 +114,11 @@ describe('CrossFrame', () => {
     });
   });
 
-  describe('#on', () => {
+  describe('#register', () => {
     it('proxies the call to the bridge', () => {
       const bridge = createCrossFrame();
-      bridge.on('event', 'arg');
-      assert.calledWith(fakeBridge.on, 'event', 'arg');
+      bridge.register('event', 'arg');
+      assert.calledWith(fakeBridge.register, 'event', 'arg');
     });
   });
 

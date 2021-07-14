@@ -80,7 +80,7 @@ describe('FrameSyncService', () => {
     fakeBridge = {
       call: sinon.stub(),
       createChannel: sinon.stub(),
-      on: emitter.on.bind(emitter),
+      register: emitter.on.bind(emitter),
       onConnect: function (listener) {
         emitter.on('connect', listener);
       },

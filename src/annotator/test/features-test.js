@@ -22,7 +22,7 @@ describe('features - annotation layer', () => {
     });
 
     features.init({
-      on: function (topic, handler) {
+      register: function (topic, handler) {
         if (topic === events.FEATURE_FLAGS_UPDATED) {
           featureFlagsUpdateHandler = handler;
         }

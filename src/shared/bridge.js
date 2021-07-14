@@ -138,7 +138,7 @@ export default class Bridge {
    * @param {string} method
    * @param {Function} callback
    */
-  on(method, callback) {
+  register(method, callback) {
     if (this.channelListeners[method]) {
       throw new Error(`Listener '${method}' already bound in Bridge`);
     }

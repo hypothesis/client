@@ -293,7 +293,7 @@ export default class Guest {
   _connectSidebarEvents() {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
-    this.crossframe.on('focusAnnotations', (tags = []) => {
+    this.crossframe.register('focusAnnotations', (tags = []) => {
       this._focusedAnnotations.clear();
       tags.forEach(tag => this._focusedAnnotations.add(tag));
 
@@ -305,7 +305,7 @@ export default class Guest {
       }
     });
 
-    this.crossframe.on('scrollToAnnotation', tag => {
+    this.crossframe.register('scrollToAnnotation', tag => {
       const anchor = this.anchors.find(a => a.annotation.$tag === tag);
       if (!anchor?.highlights) {
         return;
@@ -331,14 +331,14 @@ export default class Guest {
     });
 
     // Handler for when sidebar requests metadata for the current document
-    this.crossframe.on('getDocumentInfo', cb => {
+    this.crossframe.register('getDocumentInfo', cb => {
       this.getDocumentInfo()
         .then(info => cb(null, info))
         .catch(reason => cb(reason));
     });
 
     // Handler for controls on the sidebar
-    this.crossframe.on('setVisibleHighlights', showHighlights => {
+    this.crossframe.register('setVisibleHighlights', showHighlights => {
       this.setVisibleHighlights(showHighlights);
     });
   }

@@ -20,7 +20,7 @@ describe('annotationCounts', () => {
     countEl2.setAttribute('data-hypothesis-annotation-count', '');
     document.body.appendChild(countEl2);
 
-    fakeCrossFrame.on = sandbox.stub().returns(fakeCrossFrame);
+    fakeCrossFrame.register = sandbox.stub().returns(fakeCrossFrame);
 
     CrossFrame = sandbox.stub();
     CrossFrame.returns(fakeCrossFrame);
@@ -42,7 +42,7 @@ describe('annotationCounts', () => {
       const args =
         2 <= arguments.length ? Array.prototype.slice.call(arguments, 1) : [];
 
-      crossFrameArgs = fakeCrossFrame.on.args;
+      crossFrameArgs = fakeCrossFrame.register.args;
       for (let i = 0, len = crossFrameArgs.length; i < len; i++) {
         evt = crossFrameArgs[i][0];
         fn = crossFrameArgs[i][1];

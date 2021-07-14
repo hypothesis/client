@@ -44,14 +44,14 @@ export default class AnnotationSync {
     this._emit = options.emit;
 
     // Relay events from the sidebar to the rest of the annotator.
-    this.bridge.on('deleteAnnotation', (body, callback) => {
+    this.bridge.register('deleteAnnotation', (body, callback) => {
       const annotation = this._parse(body);
       delete this.cache[annotation.$tag];
       this._emit('annotationDeleted', annotation);
       callback(null, this._format(annotation));
     });
 
-    this.bridge.on('loadAnnotations', (bodies, callback) => {
+    this.bridge.register('loadAnnotations', (bodies, callback) => {
       const annotations = bodies.map(body => this._parse(body));
       this._emit('annotationsLoaded', annotations);
       callback(null, annotations);

@@ -74,7 +74,7 @@ describe('Guest', () => {
 
     fakeCrossFrame = {
       onConnect: sinon.stub(),
-      on: sinon.stub(),
+      register: sinon.stub(),
       call: sinon.stub(),
       sync: sinon.stub(),
       destroy: sinon.stub(),
@@ -219,7 +219,7 @@ describe('Guest', () => {
 
   describe('events from sidebar', () => {
     const emitGuestEvent = (event, ...args) => {
-      for (let [evt, fn] of fakeCrossFrame.on.args) {
+      for (let [evt, fn] of fakeCrossFrame.register.args) {
         if (event === evt) {
           fn(...args);
         }
@@ -1044,7 +1044,7 @@ describe('Guest', () => {
       const annotation = { $tag: 'tag1', target: [target] };
 
       // Focus the annotation (in the sidebar) before it is anchored in the page.
-      const [, focusAnnotationsCallback] = fakeCrossFrame.on.args.find(
+      const [, focusAnnotationsCallback] = fakeCrossFrame.register.args.find(
         args => args[0] === 'focusAnnotations'
       );
       focusAnnotationsCallback([annotation.$tag]);

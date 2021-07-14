@@ -43,7 +43,7 @@ function simplifyWhitespace(quote) {
 function FakeCrossFrame() {
   this.destroy = sinon.stub();
   this.onConnect = sinon.stub();
-  this.on = sinon.stub();
+  this.register = sinon.stub();
   this.sync = sinon.stub();
 }
 

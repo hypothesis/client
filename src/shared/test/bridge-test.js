@@ -43,8 +43,8 @@ describe('shared/bridge', () => {
     it('registers any existing listeners on the channel', () => {
       const message1 = sandbox.spy();
       const message2 = sandbox.spy();
-      bridge.on('message1', message1);
-      bridge.on('message2', message2);
+      bridge.register('message1', message1);
+      bridge.register('message2', message2);
       const channel = createChannel();
       assert.propertyVal(channel._methods, 'message1', message1);
       assert.propertyVal(channel._methods, 'message2', message2);
@@ -153,23 +153,23 @@ describe('shared/bridge', () => {
     });
   });
 
-  describe('#on', () => {
+  describe('#register', () => {
     it('adds a method to the method registry', () => {
       createChannel();
-      bridge.on('message1', sandbox.spy());
+      bridge.register('message1', sandbox.spy());
       assert.isFunction(bridge.channelListeners.message1);
     });
 
     it('only allows registering a method once', () => {
-      bridge.on('message1', sandbox.spy());
-      assert.throws(() => bridge.on('message1', sandbox.spy()));
+      bridge.register('message1', sandbox.spy());
+      assert.throws(() => bridge.register('message1', sandbox.spy()));
     });
   });
 
   describe('#off', () =>
     it('removes the method from the method registry', () => {
       createChannel();
-      bridge.on('message1', sandbox.spy());
+      bridge.register('message1', sandbox.spy());
       bridge.off('message1');
       assert.isUndefined(bridge.channelListeners.message1);
     }));

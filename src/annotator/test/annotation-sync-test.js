@@ -18,7 +18,7 @@ describe('AnnotationSync', () => {
     };
 
     fakeBridge = {
-      on: sandbox.spy((method, fn) => {
+      register: sandbox.spy((method, fn) => {
         listeners[method] = fn;
       }),
       call: sandbox.stub(),

@@ -11,7 +11,7 @@ const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
  */
 
 export default function annotationCounts(rootEl, crossframe) {
-  crossframe.on(
+  crossframe.register(
     events.PUBLIC_ANNOTATION_COUNT_CHANGED,
     updateAnnotationCountElems
   );

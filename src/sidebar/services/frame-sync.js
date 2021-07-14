@@ -135,7 +135,7 @@ export class FrameSyncService {
      */
     this._setupSyncFromFrame = () => {
       // A new annotation, note or highlight was created in the frame
-      bridge.on('beforeCreateAnnotation', event => {
+      bridge.register('beforeCreateAnnotation', event => {
         const annot = Object.assign({}, event.msg, { $tag: event.tag });
         // If user is not logged in, we can't really create a meaningful highlight
         // or annotation. Instead, we need to open the sidebar, show an error,
@@ -153,7 +153,7 @@ export class FrameSyncService {
         annotationsService.create(annot);
       });
 
-      bridge.on('destroyFrame', frameIdentifier =>
+      bridge.register('destroyFrame', frameIdentifier =>
         destroyFrame(frameIdentifier)
       );
 
@@ -171,7 +171,7 @@ export class FrameSyncService {
       }, 10);
 
       // Anchoring an annotation in the frame completed
-      bridge.on('sync', events_ => {
+      bridge.register('sync', events_ => {
         events_.forEach(event => {
           inFrame.add(event.tag);
           anchoringStatusUpdates[event.tag] = event.msg.$orphan
@@ -181,31 +181,31 @@ export class FrameSyncService {
         });
       });
 
-      bridge.on('showAnnotations', tags => {
+      bridge.register('showAnnotations', tags => {
         store.selectAnnotations(store.findIDsForTags(tags));
         store.selectTab('annotation');
       });
 
-      bridge.on('focusAnnotations', tags => {
+      bridge.register('focusAnnotations', tags => {
         store.focusAnnotations(tags || []);
       });
 
-      bridge.on('toggleAnnotationSelection', tags => {
+      bridge.register('toggleAnnotationSelection', tags => {
         store.toggleSelectedAnnotations(store.findIDsForTags(tags));
       });
 
-      bridge.on('sidebarOpened', () => {
+      bridge.register('sidebarOpened', () => {
         store.setSidebarOpened(true);
       });
 
       // These invoke the matching methods by name on the Guests
-      bridge.on('openSidebar', () => {
+      bridge.register('openSidebar', () => {
         bridge.call('openSidebar');
       });
-      bridge.on('closeSidebar', () => {
+      bridge.register('closeSidebar', () => {
         bridge.call('closeSidebar');
       });
-      bridge.on('setVisibleHighlights', state => {
+      bridge.register('setVisibleHighlights', state => {
         bridge.call('setVisibleHighlights', state);
       });
     };

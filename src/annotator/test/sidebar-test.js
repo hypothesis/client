@@ -66,7 +66,7 @@ describe('Sidebar', () => {
     sidebars = [];
     containers = [];
     fakeCrossFrame = {
-      on: sandbox.stub(),
+      register: sandbox.stub(),
       call: sandbox.stub(),
     };
 
@@ -253,7 +253,7 @@ describe('Sidebar', () => {
   describe('crossframe listeners', () => {
     const emitEvent = (event, ...args) => {
       const result = [];
-      for (let [evt, fn] of fakeCrossFrame.on.args) {
+      for (let [evt, fn] of fakeCrossFrame.register.args) {
         if (event === evt) {
           result.push(fn(...args));
         }

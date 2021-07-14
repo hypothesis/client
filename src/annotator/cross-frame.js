@@ -91,7 +91,7 @@ export class CrossFrame {
      * @param {string} event
      * @param {Function} callback
      */
-    this.on = (event, callback) => bridge.on(event, callback);
+    this.register = (event, callback) => bridge.register(event, callback);
 
     /**
      * Call an RPC method exposed by the sidebar to the annotator.

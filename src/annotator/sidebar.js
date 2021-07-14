@@ -209,12 +209,12 @@ export default class Sidebar {
     sidebarTrigger(document.body, () => this.open());
     features.init(this.guest.crossframe);
 
-    this.guest.crossframe.on('openSidebar', () => this.open());
-    this.guest.crossframe.on('closeSidebar', () => this.close());
+    this.guest.crossframe.register('openSidebar', () => this.open());
+    this.guest.crossframe.register('closeSidebar', () => this.close());
 
     // Sidebar listens to the `openNotebook` event coming from the sidebar's
     // iframe and re-publishes it via the emitter to the Notebook
-    this.guest.crossframe.on(
+    this.guest.crossframe.register(
       'openNotebook',
       (/** @type {string} */ groupId) => {
         this.hide();
@@ -234,7 +234,7 @@ export default class Sidebar {
     ];
     eventHandlers.forEach(([event, handler]) => {
       if (handler) {
-        this.guest.crossframe.on(event, () => handler());
+        this.guest.crossframe.register(event, () => handler());
       }
     });
   }
