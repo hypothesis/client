@@ -1,3 +1,6 @@
+// @ts-expect-error - Ignore error about default-importing a CommonJS module.
+import escapeStringRegexp from 'escape-string-regexp';
+
 /**
  * @typedef Tag
  * @property {string} text - The label of the tag
@@ -42,17 +45,20 @@ export class TagsService {
     // * tag has substring query occurring after a non-word character
     //   (e.g. tag "pink!banana" matches query "ban")
     return savedTags.filter(tag => {
+      if (limit !== null && resultCount >= limit) {
+        // limit allows a subset of the results
+        // See https://github.com/hypothesis/client/issues/1606
+        return false;
+      }
+      // Split the string on words. An improvement would be to use a unicode word boundary
+      // algorithm implemented by the browser (when available).
+      // https://unicode.org/reports/tr29/#Word_Boundaries
       const words = tag.split(/\W+/);
-      let regex = new RegExp(`^${query}`, 'i'); // Only match the start of the string
-      // limit allows a subset of the results
-      // See https://github.com/hypothesis/client/issues/1606
-      if (limit === null || resultCount < limit) {
-        const matches =
-          words.some(word => word.match(regex)) || tag.match(regex);
-        if (matches) {
-          ++resultCount;
-          return true;
-        }
+      const regex = new RegExp(`^${escapeStringRegexp(query)}`, 'i'); // Only match the start of the string
+      const matches = words.some(word => word.match(regex)) || tag.match(regex);
+      if (matches) {
+        ++resultCount;
+        return true;
       }
       return false;
     });
