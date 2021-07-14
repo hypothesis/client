@@ -1,5 +1,16 @@
-import Bridge from '../bridge';
-import { RPC } from '../frame-rpc';
+import { default as Bridge, $imports } from '../bridge';
+
+class FakeRPC {
+  constructor(sourceFrame, destFrame, origin, methods) {
+    this.destFrame = destFrame;
+    this.sourceFrame = sourceFrame;
+    this.origin = origin;
+    this.methods = methods;
+
+    this.call = sinon.stub();
+    this.destroy = sinon.stub();
+  }
+}
 
 describe('shared/bridge', () => {
   const sandbox = sinon.createSandbox();
@@ -17,11 +28,15 @@ describe('shared/bridge', () => {
       postMessage: sandbox.stub(),
     };
 
-    sandbox.stub(window, 'addEventListener');
-    sandbox.stub(window, 'removeEventListener');
+    $imports.$mock({
+      './frame-rpc': { RPC: FakeRPC },
+    });
   });
 
-  afterEach(() => sandbox.restore());
+  afterEach(() => {
+    $imports.$restore();
+    sandbox.restore();
+  });
 
   describe('#createChannel', () => {
     it('creates a new channel with the provided options', () => {
@@ -46,28 +61,26 @@ describe('shared/bridge', () => {
       bridge.on('message1', message1);
       bridge.on('message2', message2);
       const channel = createChannel();
-      assert.propertyVal(channel._methods, 'message1', message1);
-      assert.propertyVal(channel._methods, 'message2', message2);
+      assert.propertyVal(channel.methods, 'message1', message1);
+      assert.propertyVal(channel.methods, 'message2', message2);
     });
 
     it('returns the newly created channel', () => {
       const channel = createChannel();
-      assert.instanceOf(channel, RPC);
+      assert.instanceOf(channel, FakeRPC);
     });
   });
 
   describe('#call', () => {
     it('forwards the call to every created channel', () => {
       const channel = createChannel();
-      sandbox.stub(channel, 'call');
+      channel.call.resetHistory();
       bridge.call('method1', 'params1');
-      assert.called(channel.call);
       assert.calledWith(channel.call, 'method1', 'params1');
     });
 
     it('provides a timeout', done => {
-      const channel = createChannel();
-      sandbox.stub(channel, 'call');
+      createChannel();
       sandbox.stub(window, 'setTimeout').yields();
       bridge.call('method1', 'params1', done);
     });
@@ -79,8 +92,8 @@ describe('shared/bridge', () => {
         'http://example.com',
         'NEKOT'
       );
-      sandbox.stub(channel1, 'call').yields(null, 'result1');
-      sandbox.stub(channel2, 'call').yields(null, 'result2');
+      channel1.call.yields(null, 'result1');
+      channel2.call.yields(null, 'result2');
 
       const callback = function (err, results) {
         assert.isNull(err);
@@ -99,8 +112,8 @@ describe('shared/bridge', () => {
         'http://example.com',
         'NEKOT'
       );
-      sandbox.stub(channel1, 'call').throws(error);
-      sandbox.stub(channel2, 'call').yields(null, 'result2');
+      channel1.call.throws(error);
+      channel2.call.yields(null, 'result2');
 
       const callback = function (err) {
         assert.equal(err, error);
@@ -112,8 +125,7 @@ describe('shared/bridge', () => {
 
     it('destroys the channel when a call fails', done => {
       const channel = createChannel();
-      sandbox.stub(channel, 'call').throws(new Error(''));
-      sandbox.stub(channel, 'destroy');
+      channel.call.throws(new Error(''));
 
       const callback = () => {
         assert.called(channel.destroy);
@@ -125,7 +137,11 @@ describe('shared/bridge', () => {
 
     it('no longer publishes to a channel that has had an error', done => {
       const channel = createChannel();
-      sandbox.stub(channel, 'call').throws(new Error('oeunth'));
+      const error = new Error('Error sending message');
+
+      channel.call.resetHistory(); // Discard initial "connect" call.
+      channel.call.throws(error);
+
       bridge.call('method1', 'params1', () => {
         assert.calledOnce(channel.call);
         bridge.call('method1', 'params1', () => {
@@ -136,8 +152,7 @@ describe('shared/bridge', () => {
     });
 
     it('treats a timeout as a success with no result', done => {
-      const channel = createChannel();
-      sandbox.stub(channel, 'call');
+      createChannel();
       sandbox.stub(window, 'setTimeout').yields();
       bridge.call('method1', 'params1', (err, res) => {
         assert.isNull(err);
@@ -175,110 +190,56 @@ describe('shared/bridge', () => {
     }));
 
   describe('#onConnect', () => {
-    it('adds a callback that is called when a channel is connected', done => {
-      let channel;
-      const callback = (c, s) => {
-        assert.strictEqual(c, channel);
-        assert.strictEqual(s, fakeWindow);
-        done();
-      };
+    it('adds a callback that is called when a channel is connected', () => {
+      const onConnectCallback = sinon.stub();
+      bridge.onConnect(onConnectCallback);
 
-      const data = {
-        arguments: ['TOKEN'],
-        method: 'connect',
-        protocol: 'frame-rpc',
-        version: '1.0.0',
-      };
+      const channel = createChannel();
 
-      const event = {
-        source: fakeWindow,
-        origin: 'http://example.com',
-        data,
-      };
+      // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
+      channel.methods.connect('TOKEN', sinon.stub());
 
-      addEventListener.yieldsAsync(event);
-      bridge.onConnect(callback);
-      channel = createChannel();
+      assert.calledWith(onConnectCallback, channel, fakeWindow);
     });
 
-    it("doesn't trigger `onConnect` callbacks when a channel is connected from a different origin", done => {
-      const callback = sinon.stub();
+    it('does not run `onConnect` callbacks if the token is wrong', () => {
+      const onConnectCallback = sinon.stub();
+      bridge.onConnect(onConnectCallback);
 
-      const data = {
-        arguments: ['TOKEN'],
-        method: 'connect',
-        protocol: 'frame-rpc',
-        version: '1.0.0',
-      };
+      const channel = createChannel();
 
-      addEventListener.yieldsAsync({
-        data,
-        origin: 'http://other.dummy',
-        source: fakeWindow,
-      });
+      // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
+      channel.methods.connect('WRONG-TOKEN', sinon.stub());
 
-      bridge.onConnect(callback);
-      createChannel();
-
-      setTimeout(() => {
-        assert.notCalled(callback);
-        done();
-      }, 0);
+      assert.notCalled(onConnectCallback);
     });
 
-    it("doesn't trigger `onConnect` callbacks when a channel is connected from a different source", done => {
-      const callback = sinon.stub();
+    it('allows multiple callbacks to be registered', () => {
+      const onConnectCallback1 = sinon.stub();
+      const onConnectCallback2 = sinon.stub();
+      bridge.onConnect(onConnectCallback1);
+      bridge.onConnect(onConnectCallback2);
 
-      const data = {
-        arguments: ['TOKEN'],
-        method: 'connect',
-        protocol: 'frame-rpc',
-        version: '1.0.0',
-      };
+      const channel = createChannel();
 
-      addEventListener.yieldsAsync({
-        data,
-        origin: 'http://example.com',
-        source: 'other',
-      });
+      // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
+      channel.methods.connect('TOKEN', sinon.stub());
 
-      bridge.onConnect(callback);
-      createChannel();
-
-      setTimeout(() => {
-        assert.notCalled(callback);
-        done();
-      }, 0);
+      assert.calledWith(onConnectCallback1, channel, fakeWindow);
+      assert.calledWith(onConnectCallback2, channel, fakeWindow);
     });
 
-    it('allows multiple callbacks to be registered', done => {
-      let channel;
-      let callbackCount = 0;
-      const callback = (c, s) => {
-        assert.strictEqual(c, channel);
-        assert.strictEqual(s, fakeWindow);
-        if (++callbackCount === 2) {
-          done();
-        }
-      };
+    it('only invokes `onConnect` callback once', () => {
+      const onConnectCallback = sinon.stub();
+      bridge.onConnect(onConnectCallback);
 
-      const data = {
-        arguments: ['TOKEN'],
-        method: 'connect',
-        protocol: 'frame-rpc',
-        version: '1.0.0',
-      };
+      const channel = createChannel();
 
-      const event = {
-        source: fakeWindow,
-        origin: 'http://example.com',
-        data,
-      };
+      // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
+      channel.methods.connect('TOKEN', sinon.stub());
+      channel.methods.connect('TOKEN', sinon.stub());
 
-      addEventListener.callsArgWithAsync(1, event);
-      bridge.onConnect(callback);
-      bridge.onConnect(callback);
-      channel = createChannel();
+      assert.calledOnce(onConnectCallback);
     });
   });
 
@@ -294,8 +255,6 @@ describe('shared/bridge', () => {
         'http://example.com',
         'bar'
       );
-      sinon.spy(channel1, 'destroy');
-      sinon.spy(channel2, 'destroy');
 
       bridge.destroy();
 
