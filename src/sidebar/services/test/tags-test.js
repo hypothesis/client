@@ -56,9 +56,15 @@ describe('TagsService', () => {
         count: 1,
         updated: stamp,
       },
-      'žŸ¡¢£¤¥¦§': {
-        // ASCII chars
-        text: 'žŸ¡¢£¤¥¦§',
+      ინგლისური: {
+        // "English" in Georgian
+        text: 'ინგლისური',
+        count: 1,
+        updated: stamp,
+      },
+      '^žŸ¡\\¢£¤': {
+        // Non-word ASCII with special regex chars
+        text: '^žŸ¡\\¢£¤',
         count: 1,
         updated: stamp,
       },
@@ -90,8 +96,12 @@ describe('TagsService', () => {
       assert.deepEqual(tags.filter('b', 3), ['bar', 'bar argon', 'banana']);
     });
 
-    it('returns ASCII tags that start with the query string', () => {
-      assert.deepEqual(tags.filter('žŸ¡'), ['žŸ¡¢£¤¥¦§']);
+    it('returns non-word ASCII tags that start with the query string', () => {
+      assert.deepEqual(tags.filter('^žŸ¡\\'), ['^žŸ¡\\¢£¤']);
+    });
+
+    it('returns non-English tags that start with the query string', () => {
+      assert.deepEqual(tags.filter('ინ'), ['ინგლისური']);
     });
   });
 
@@ -131,8 +141,9 @@ describe('TagsService', () => {
         'banana',
         'bar argon',
         'future',
+        '^žŸ¡\\¢£¤',
         'argon',
-        'žŸ¡¢£¤¥¦§',
+        'ინგლისური',
       ]);
     });
   });
