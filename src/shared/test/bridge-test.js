@@ -181,14 +181,6 @@ describe('shared/bridge', () => {
     });
   });
 
-  describe('#off', () =>
-    it('removes the method from the method registry', () => {
-      createChannel();
-      bridge.on('message1', sandbox.spy());
-      bridge.off('message1');
-      assert.isUndefined(bridge.channelListeners.message1);
-    }));
-
   describe('#onConnect', () => {
     it('adds a callback that is called when a channel is connected', () => {
       const onConnectCallback = sinon.stub();
