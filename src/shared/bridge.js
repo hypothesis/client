@@ -147,16 +147,6 @@ export default class Bridge {
   }
 
   /**
-   * Unregister any callbacks registered with `on`.
-   *
-   * @param {string} method
-   */
-  off(method) {
-    delete this.channelListeners[method];
-    return this;
-  }
-
-  /**
    * Add a function to be called upon a new connection.
    *
    * @param {Function} callback
