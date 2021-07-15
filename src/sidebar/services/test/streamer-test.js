@@ -211,7 +211,7 @@ describe('StreamerService', () => {
       return activeStreamer.connect().then(() => {
         assert.equal(
           fakeWebSocket.url,
-          'ws://example.com/ws?access_token=dummy-access-token&foo=bar'
+          'ws://example.com/ws?foo=bar&access_token=dummy-access-token'
         );
       });
     });

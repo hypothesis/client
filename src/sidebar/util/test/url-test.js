@@ -9,6 +9,14 @@ describe('sidebar/util/url', () => {
       assert.equal(replaced.url, 'http://foo.com/things/test');
     });
 
+    it('should throw if param value is an array', () => {
+      assert.throws(() => {
+        replaceURLParams('http://foo.com/things/:id', {
+          id: ['foo', 'bar'],
+        });
+      }, 'Cannot use array as URL parameter');
+    });
+
     it('should URL encode params in URLs', () => {
       const replaced = replaceURLParams('http://foo.com/things/:id', {
         id: 'foo=bar',

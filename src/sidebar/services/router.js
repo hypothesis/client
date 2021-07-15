@@ -1,5 +1,3 @@
-import * as queryString from 'query-string';
-
 /**
  * @typedef {'annotation'|'notebook'|'stream'|'sidebar'} RouteName
  * @typedef {Record<string,string>} RouteParams
@@ -29,7 +27,13 @@ export class RouterService {
   currentRoute() {
     const path = this._window.location.pathname;
     const pathSegments = path.slice(1).split('/');
-    const params = queryString.parse(this._window.location.search);
+    const searchParams = new URLSearchParams(this._window.location.search);
+
+    /** @type {Record<string, string>} */
+    const params = {};
+    for (let [key, value] of searchParams) {
+      params[key] = value;
+    }
 
     // The extension puts client resources under `/client/` to separate them
     // from extension-specific resources. Ignore this part.
@@ -94,9 +98,15 @@ export class RouterService {
         throw new Error(`Cannot generate URL for route "${name}"`);
     }
 
-    const query = queryString.stringify(queryParams);
-    if (query.length > 0) {
-      url += '?' + query;
+    let hasParams = false;
+    const searchParams = new URLSearchParams();
+    for (let [key, value] of Object.entries(queryParams)) {
+      hasParams = true;
+      searchParams.set(key, value);
+    }
+
+    if (hasParams) {
+      url += '?' + searchParams.toString();
     }
 
     return url;

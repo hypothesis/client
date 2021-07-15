@@ -1,4 +1,9 @@
 /**
+ * @typedef {string|number|boolean} Param
+ * @typedef {Record<string, Param|Param[]>} Params
+ */
+
+/**
  * Replace parameters in a URL template with values from a `params` object.
  *
  * Returns an object containing the expanded URL and a dictionary of unused
@@ -8,17 +13,22 @@
  *     {url: '/things/foo', unusedParams: {q: 'bar'}}
  *
  * @param {string} url
- * @param {Record<string, string>} params
- * @return {{ url: string, unusedParams: Record<string, string>}}
+ * @param {Params} params
+ * @return {{ url: string, unusedParams: Params}}
  */
 export function replaceURLParams(url, params) {
-  /** @type {Record<string, string>} */
+  /** @type {Params} */
   const unusedParams = {};
   for (const param in params) {
     if (params.hasOwnProperty(param)) {
       const value = params[param];
       const urlParam = ':' + param;
       if (url.indexOf(urlParam) !== -1) {
+        // `params` allows array values but they can only be returned as unused
+        // parameters.
+        if (Array.isArray(value)) {
+          throw new TypeError('Cannot use array as URL parameter');
+        }
         url = url.replace(urlParam, encodeURIComponent(value));
       } else {
         unusedParams[param] = value;

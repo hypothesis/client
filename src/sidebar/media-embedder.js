@@ -1,5 +1,3 @@
-import * as queryString from 'query-string';
-
 /**
  * Return an HTML5 audio player with the given src URL.
  *
@@ -109,23 +107,28 @@ function youTubeQueryParams(link) {
     'start',
     't', // will be translated to `start`
   ];
-  const linkParams = queryString.parse(link.search);
-  const filteredQuery = {};
+  const linkParams = new URLSearchParams(link.search);
+  const filteredQuery = new URLSearchParams();
   // Filter linkParams for allowed keys and build those entries
   // into the filteredQuery object
-  Object.keys(linkParams)
+  [...linkParams.keys()]
     .filter(key => allowedParams.includes(key))
     .forEach(key => {
+      const value = /** @type {string} */ (linkParams.get(key));
       if (key === 't') {
         // `t` is not supported in embeds; `start` is
         // `t` accepts more formats than `start`; start must be in seconds
         // so, format it as seconds first
-        filteredQuery.start = parseTimeString(linkParams[key]);
+        filteredQuery.set('start', parseTimeString(value));
       } else {
-        filteredQuery[key] = linkParams[key];
+        filteredQuery.set(key, value);
       }
     });
-  query = queryString.stringify(filteredQuery);
+
+  // Tests currently expect sorted query params.
+  filteredQuery.sort();
+
+  query = filteredQuery.toString();
   if (query) {
     query = `?${query}`;
   }
@@ -274,9 +277,9 @@ const embedGenerators = [
     // Extract start and end times, which may appear either as query string
     // params or path params.
     let slug = slugMatch[2];
-    const linkParams = queryString.parse(link.search);
-    let startTime = linkParams.start;
-    let endTime = linkParams.end;
+    const linkParams = new URLSearchParams(link.search);
+    let startTime = linkParams.get('start');
+    let endTime = linkParams.get('end');
 
     if (!startTime) {
       const startPathParam = slug.match(/\/start\/([^/]+)/);
@@ -297,11 +300,12 @@ const embedGenerators = [
     // Generate embed URL.
     const iframeUrl = new URL(`https://archive.org/embed/${slug}`);
     if (startTime) {
-      iframeUrl.searchParams.append('start', startTime);
+      iframeUrl.searchParams.set('start', startTime);
     }
     if (endTime) {
-      iframeUrl.searchParams.append('end', endTime);
+      iframeUrl.searchParams.set('end', endTime);
     }
+
     return iframe(iframeUrl.href);
   },
 

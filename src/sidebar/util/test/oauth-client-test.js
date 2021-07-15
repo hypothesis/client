@@ -1,5 +1,4 @@
 import fetchMock from 'fetch-mock';
-import { stringify } from 'query-string';
 import sinon from 'sinon';
 
 import OAuthClient from '../oauth-client';
@@ -192,7 +191,7 @@ describe('sidebar/util/oauth-client', () => {
         fakeWindow.open,
         'about:blank',
         'Log in to Hypothesis',
-        'height=430,left=274.5,top=169,width=475'
+        'left=274.5,top=169,width=475,height=430'
       );
     });
 
@@ -229,16 +228,14 @@ describe('sidebar/util/oauth-client', () => {
       });
 
       return authorized.then(() => {
-        const params = {
+        const params = new URLSearchParams({
           client_id: config.clientId,
           origin: 'https://client.hypothes.is',
           response_mode: 'web_message',
           response_type: 'code',
           state: 'notrandom',
-        };
-        const expectedAuthUrl = `${config.authorizationEndpoint}?${stringify(
-          params
-        )}`;
+        });
+        const expectedAuthUrl = `${config.authorizationEndpoint}?${params}`;
         assert.equal(popupWindow.location.href, expectedAuthUrl);
       });
     });
