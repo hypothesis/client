@@ -1,4 +1,4 @@
-import * as queryString from 'query-string';
+import * as queryString from '../util/query-string';
 
 /**
  * @typedef {'annotation'|'notebook'|'stream'|'sidebar'} RouteName

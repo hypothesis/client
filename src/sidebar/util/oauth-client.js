@@ -1,5 +1,4 @@
-import * as queryString from 'query-string';
-
+import * as queryString from './query-string';
 import * as random from './random';
 
 /**
@@ -248,10 +247,10 @@ export default class OAuthClient {
     // key=value format.
     const authWindowSettings = queryString
       .stringify({
-        left,
-        top,
-        width,
-        height,
+        left: left.toString(),
+        top: top.toString(),
+        width: width.toString(),
+        height: height.toString(),
       })
       .replace(/&/g, ',');
 

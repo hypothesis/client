@@ -64,7 +64,7 @@ module.exports = function createBundle(config, buildOpts) {
     //
     // See node_modules/browserify/lib/builtins.js to find out which
     // modules provide the implementations of these.
-    builtins: ['console', '_process', 'querystring'],
+    builtins: ['console', '_process'],
     externalRequireName,
 
     // Map of global variable names to functions returning _source code_ for
