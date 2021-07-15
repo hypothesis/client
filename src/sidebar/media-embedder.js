@@ -1,4 +1,4 @@
-import * as queryString from 'query-string';
+import * as queryString from './util/query-string';
 
 /**
  * Return an HTML5 audio player with the given src URL.
@@ -109,7 +109,8 @@ function youTubeQueryParams(link) {
     'start',
     't', // will be translated to `start`
   ];
-  const linkParams = queryString.parse(link.search);
+  const linkParams = queryString.parseLast(link.search);
+  /** @type {Record<string, string>} */
   const filteredQuery = {};
   // Filter linkParams for allowed keys and build those entries
   // into the filteredQuery object
@@ -274,7 +275,7 @@ const embedGenerators = [
     // Extract start and end times, which may appear either as query string
     // params or path params.
     let slug = slugMatch[2];
-    const linkParams = queryString.parse(link.search);
+    const linkParams = queryString.parseLast(link.search);
     let startTime = linkParams.start;
     let endTime = linkParams.end;
 

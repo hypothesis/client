@@ -1,4 +1,4 @@
-import * as queryString from 'query-string';
+import * as queryString from '../util/query-string';
 
 /**
  * @typedef {'annotation'|'notebook'|'stream'|'sidebar'} RouteName
@@ -29,7 +29,7 @@ export class RouterService {
   currentRoute() {
     const path = this._window.location.pathname;
     const pathSegments = path.slice(1).split('/');
-    const params = queryString.parse(this._window.location.search);
+    const params = queryString.parseLast(this._window.location.search);
 
     // The extension puts client resources under `/client/` to separate them
     // from extension-specific resources. Ignore this part.

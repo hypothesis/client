@@ -1,4 +1,4 @@
-import * as queryString from 'query-string';
+import * as queryString from '../util/query-string';
 import {
   toBoolean,
   toInteger,
@@ -16,7 +16,7 @@ import {
  */
 export default function hostPageConfig(window) {
   const configStr = window.location.hash.slice(1);
-  const configJSON = queryString.parse(configStr).config;
+  const configJSON = queryString.parseLast(configStr).config;
   const config = JSON.parse(configJSON || '{}');
 
   // Known configuration parameters which we will import from the host page.

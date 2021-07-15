@@ -1,5 +1,5 @@
 import fetchMock from 'fetch-mock';
-import { stringify } from 'query-string';
+import { stringify } from '../query-string';
 import sinon from 'sinon';
 
 import OAuthClient from '../oauth-client';

@@ -1,8 +1,7 @@
-import * as queryString from 'query-string';
-
 import warnOnce from '../../shared/warn-once';
 import { generateHexString } from '../util/random';
 import { Socket } from '../websocket';
+import * as queryString from '../util/query-string';
 import { watch } from '../util/watch';
 
 /**
@@ -190,6 +189,7 @@ export class StreamerService {
       // not support setting the `Authorization` header directly as we do for
       // other API requests.
       const parsedURL = new URL(this._websocketURL);
+      /** @type {import('../util/query-string').Params} */
       const queryParams = queryString.parse(parsedURL.search);
       queryParams.access_token = token;
       parsedURL.search = queryString.stringify(queryParams);

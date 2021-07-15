@@ -1,9 +1,9 @@
-import * as queryString from 'query-string';
-
+import * as queryString from '../util/query-string';
 import { replaceURLParams } from '../util/url';
 
 /**
  * @typedef {import('../../types/api').RouteMap} RouteMap
+ * @typedef {import('../util/query-string').Params} Params
  */
 
 /**
@@ -60,7 +60,7 @@ function stripInternalProperties(obj) {
  * Function which makes an API request.
  *
  * @callback APICallFunction
- * @param {Record<string, any>} params - A map of URL and query string parameters to include with the request.
+ * @param {Params} params - A map of URL and query string parameters to include with the request.
  * @param {object} [data] - The body of the request.
  * @param {APICallOptions} [options]
  * @return {Promise<any|APIResponse>}

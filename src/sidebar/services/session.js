@@ -58,8 +58,8 @@ export class SessionService {
       // the /app endpoint.
       this._lastLoadTime = Date.now();
       this._lastLoad = retryPromiseOperation(() => {
-        const opts = this._authority ? { authority: this._authority } : {};
-        return this._api.profile.read(opts);
+        const authority = this._authority;
+        return this._api.profile.read(authority ? { authority } : {});
       })
         .then(session => {
           this.update(session);

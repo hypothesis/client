@@ -1,5 +1,4 @@
-import * as queryString from 'query-string';
-
+import * as queryString from './query-string';
 import * as random from './random';
 
 /**
