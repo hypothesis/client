@@ -49,9 +49,7 @@ describe('shared/bridge', () => {
     it('adds the channel to the .links property', () => {
       const channel = createChannel();
       assert.isTrue(
-        bridge.links.some(
-          link => link.channel === channel && link.window === fakeWindow
-        )
+        bridge.links.some(registeredChannel => registeredChannel === channel)
       );
     });
 
