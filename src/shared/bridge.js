@@ -24,7 +24,7 @@ export default class Bridge {
    * This removes the event listeners for messages arriving from other windows.
    */
   destroy() {
-    Array.from(this.links).map(link => link.channel.destroy());
+    this.links.map(link => link.channel.destroy());
   }
 
   /**
@@ -47,9 +47,7 @@ export default class Bridge {
         return;
       }
       connected = true;
-      Array.from(this.onConnectListeners).forEach(cb =>
-        cb.call(null, channel, source)
-      );
+      this.onConnectListeners.forEach(cb => cb.call(null, channel, source));
     };
 
     const connect = (_token, cb) => {
@@ -100,9 +98,7 @@ export default class Bridge {
     const _makeDestroyFn = c => {
       return error => {
         c.destroy();
-        this.links = Array.from(this.links)
-          .filter(l => l.channel !== c)
-          .map(l => l);
+        this.links = this.links.filter(l => l.channel !== c);
         throw error;
       };
     };
@@ -111,7 +107,7 @@ export default class Bridge {
       const p = new Promise((resolve, reject) => {
         const timeout = setTimeout(() => resolve(null), 1000);
         try {
-          return l.channel.call(method, ...Array.from(args), (err, result) => {
+          return l.channel.call(method, ...args, (err, result) => {
             clearTimeout(timeout);
             if (err) {
               return reject(err);
