@@ -104,25 +104,24 @@ export default class Bridge {
     };
 
     const promises = this.links.map(l => {
-      const p = new Promise((resolve, reject) => {
+      const promise = new Promise((resolve, reject) => {
         const timeout = setTimeout(() => resolve(null), 1000);
         try {
-          return l.channel.call(method, ...args, (err, result) => {
+          l.channel.call(method, ...args, (err, result) => {
             clearTimeout(timeout);
             if (err) {
-              return reject(err);
+              reject(err);
             } else {
-              return resolve(result);
+              resolve(result);
             }
           });
         } catch (error) {
-          const err = error;
-          return reject(err);
+          reject(error);
         }
       });
 
       // Don't assign here. The disconnect is handled asynchronously.
-      return p.catch(_makeDestroyFn(l.channel));
+      return promise.catch(_makeDestroyFn(l.channel));
     });
 
     let resultPromise = Promise.all(promises);
