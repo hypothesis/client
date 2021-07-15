@@ -1,4 +1,4 @@
-import * as queryString from '../util/query-string';
+import * as queryString from 'query-string';
 import {
   toBoolean,
   toInteger,
