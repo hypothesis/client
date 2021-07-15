@@ -10,8 +10,11 @@ import { RPC } from './frame-rpc';
  */
 export default class Bridge {
   constructor() {
+    /** @type {Array<{channel: RPC, window: Window}>} */
     this.links = [];
+    /** @type {Record<string, (...args: any[]) => void>} */
     this.channelListeners = {};
+    /** @type {Array<(...args: any[]) => void>} */
     this.onConnectListeners = [];
   }
 
@@ -78,16 +81,22 @@ export default class Bridge {
    * callback when all results are collected.
    *
    * @param {string} method - Name of remote method to call.
-   * @param {any[]} args - Arguments to method.
+   * @param {any[]} args - Arguments to method. Final argument is an optional
+   *   callback with this type: `(error: string|Error|null, ...result: any[]) => void`.
+   *   This callback, if any, will be triggered once a response (via `postMessage`)
+   *   comes back from the other frame/s. If the first argument (error) is `null`
+   *   it means successful execution of the whole remote procedure call.
    * @return {Promise<any[]>} - Array of results, one per connected frame
    */
   call(method, ...args) {
     let cb;
-    if (typeof args[args.length - 1] === 'function') {
-      cb = args[args.length - 1];
+    const finalArg = args[args.length - 1];
+    if (typeof finalArg === 'function') {
+      cb = finalArg;
       args = args.slice(0, -1);
     }
 
+    /** @param {RPC} c */
     const _makeDestroyFn = c => {
       return error => {
         c.destroy();
@@ -136,7 +145,10 @@ export default class Bridge {
    * message to this `Bridge`.
    *
    * @param {string} method
-   * @param {Function} callback
+   * @param {(...args: any[]) => void} callback -- Final argument is an optional
+   *   callback of the type: `(error: string|Error|null, ...result: any[]) => void`.
+   *   This callback must be invoked in order to respond (via `postMessage`)
+   *   to the other frame/s with a result or an error.
    */
   on(method, callback) {
     if (this.channelListeners[method]) {
@@ -149,7 +161,7 @@ export default class Bridge {
   /**
    * Add a function to be called upon a new connection.
    *
-   * @param {Function} callback
+   * @param {(error: null, channel: RPC, window: Window) => void} callback
    */
   onConnect(callback) {
     this.onConnectListeners.push(callback);
