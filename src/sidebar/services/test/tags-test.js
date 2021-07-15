@@ -57,7 +57,7 @@ describe('TagsService', () => {
         updated: stamp,
       },
       ინგლისური: {
-        // "English" in Georgian
+        // Non-ASCII characters. This is "English" in Georgian
         text: 'ინგლისური',
         count: 1,
         updated: stamp,
@@ -100,7 +100,7 @@ describe('TagsService', () => {
       assert.deepEqual(tags.filter('^žŸ¡\\'), ['^žŸ¡\\¢£¤']);
     });
 
-    it('returns non-English tags that start with the query string', () => {
+    it('returns non-ASCII tags that start with the query string', () => {
       assert.deepEqual(tags.filter('ინ'), ['ინგლისური']);
     });
   });
