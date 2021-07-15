@@ -10,7 +10,7 @@ import { RPC } from './frame-rpc';
  */
 export default class Bridge {
   constructor() {
-    /** @type {Array<{channel: RPC, window: Window}>} */
+    /** @type {RPC[]} */
     this.links = [];
     /** @type {Record<string, (...args: any[]) => void>} */
     this.channelListeners = {};
@@ -24,7 +24,7 @@ export default class Bridge {
    * This removes the event listeners for messages arriving from other windows.
    */
   destroy() {
-    this.links.map(link => link.channel.destroy());
+    this.links.forEach(channel => channel.destroy());
   }
 
   /**
@@ -66,10 +66,7 @@ export default class Bridge {
     channel.call('connect', token, ready);
 
     // Store the newly created channel in our collection
-    this.links.push({
-      channel,
-      window: source,
-    });
+    this.links.push(channel);
 
     return channel;
   }
@@ -94,20 +91,22 @@ export default class Bridge {
       args = args.slice(0, -1);
     }
 
-    /** @param {RPC} c */
-    const _makeDestroyFn = c => {
+    /** @param {RPC} channel */
+    const _makeDestroyFn = channel => {
       return error => {
-        c.destroy();
-        this.links = this.links.filter(l => l.channel !== c);
+        channel.destroy();
+        this.links = this.links.filter(
+          registeredChannel => registeredChannel !== channel
+        );
         throw error;
       };
     };
 
-    const promises = this.links.map(l => {
+    const promises = this.links.map(channel => {
       const promise = new Promise((resolve, reject) => {
         const timeout = setTimeout(() => resolve(null), 1000);
         try {
-          l.channel.call(method, ...args, (err, result) => {
+          channel.call(method, ...args, (err, result) => {
             clearTimeout(timeout);
             if (err) {
               reject(err);
@@ -121,7 +120,7 @@ export default class Bridge {
       });
 
       // Don't assign here. The disconnect is handled asynchronously.
-      return promise.catch(_makeDestroyFn(l.channel));
+      return promise.catch(_makeDestroyFn(channel));
     });
 
     let resultPromise = Promise.all(promises);
