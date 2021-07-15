@@ -38,12 +38,7 @@ export class TagsService {
   filter(query, limit = null) {
     const savedTags = this._storage.getObject(TAGS_LIST_KEY) || [];
     let resultCount = 0;
-    // query will match tag if:
-    // * tag starts with query (e.g. tag "banana" matches query "ban"), OR
-    // * any word in the tag starts with query
-    //   (e.g. tag "pink banana" matches query "ban"), OR
-    // * tag has substring query occurring after a non-word character
-    //   (e.g. tag "pink!banana" matches query "ban")
+    // Match any tag where the query is a prefix of the tag or a word within the tag.
     return savedTags.filter(tag => {
       if (limit !== null && resultCount >= limit) {
         // limit allows a subset of the results
