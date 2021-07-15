@@ -1,4 +1,4 @@
-import * as queryString from './util/query-string';
+import * as queryString from 'query-string';
 
 /**
  * Return an HTML5 audio player with the given src URL.
@@ -110,7 +110,6 @@ function youTubeQueryParams(link) {
     't', // will be translated to `start`
   ];
   const linkParams = queryString.parse(link.search);
-  /** @type {Record<string, string>} */
   const filteredQuery = {};
   // Filter linkParams for allowed keys and build those entries
   // into the filteredQuery object

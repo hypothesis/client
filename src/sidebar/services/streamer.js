@@ -1,7 +1,8 @@
+import * as queryString from 'query-string';
+
 import warnOnce from '../../shared/warn-once';
 import { generateHexString } from '../util/random';
 import { Socket } from '../websocket';
-import * as queryString from '../util/query-string';
 import { watch } from '../util/watch';
 
 /**
