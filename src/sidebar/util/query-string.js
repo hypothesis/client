@@ -4,6 +4,9 @@
  * The returned string does not have a leading "?" and the parameters are
  * sorted by name.
  *
+ * @example
+ *   stringify({ foo: 'bar', meep: 'one two' }) // Returns "foo=bar&meep=one+two"
+ *
  * @param {Record<string, string>} params
  * @return {string}
  */
@@ -26,8 +29,7 @@ export function parse(query) {
   const params = new URLSearchParams(query);
   /** @type {Record<string, string>} */
   const result = {};
-  // @ts-expect-error - `URLSearchParams.entries` is missing.
-  for (let [key, value] of params.entries()) {
+  for (let [key, value] of params) {
     result[key] = value;
   }
   return result;
