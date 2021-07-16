@@ -135,18 +135,18 @@ export default class Bridge {
   }
 
   /**
-   * Register a callback to be invoked when any connected channel sends a
+   * Register a listener to be invoked when any connected channel sends a
    * message to this `Bridge`.
    *
    * @param {string} method
-   * @param {(...args: any[]) => void} callback -- Final argument is an optional
+   * @param {(...args: any[]) => void} listener -- Final argument is an optional
    *   callback of the type: `(error: string|Error|null, ...result: any[]) => void`.
    *   This callback must be invoked in order to respond (via `postMessage`)
    *   to the other frame/s with a result or an error.
    * @throws {Error} If trying to register a callback after a channel has already been created
    * @throws {Error} If trying to register a callback with the same name multiple times
    */
-  on(method, callback) {
+  on(method, listener) {
     if (this.links.length > 0) {
       throw new Error(
         `Listener '${method}' can't be registered because a channel has already been created`
@@ -155,17 +155,17 @@ export default class Bridge {
     if (this.channelListeners[method]) {
       throw new Error(`Listener '${method}' already bound in Bridge`);
     }
-    this.channelListeners[method] = callback;
+    this.channelListeners[method] = listener;
     return this;
   }
 
   /**
-   * Add a function to be called upon a new connection.
+   * Add a listener to be called upon a new connection.
    *
-   * @param {(error: null, channel: RPC, window: Window) => void} callback
+   * @param {(error: null, channel: RPC, window: Window) => void} listener
    */
-  onConnect(callback) {
-    this.onConnectListeners.push(callback);
+  onConnect(listener) {
+    this.onConnectListeners.push(listener);
     return this;
   }
 }

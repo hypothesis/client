@@ -188,7 +188,7 @@ describe('shared/bridge', () => {
       );
     });
 
-    it('only allows registering a method once', () => {
+    it('only allows registering a listener once', () => {
       bridge.on('message1', () => {});
       let error;
       try {
