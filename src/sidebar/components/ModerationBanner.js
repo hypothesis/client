@@ -30,14 +30,22 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
   const isHiddenOrFlagged =
     flagCount !== null && (flagCount > 0 || annotation.hidden);
 
+  if (!isHiddenOrFlagged) {
+    return null;
+  }
+
+  // In order to have been hidden or flagged, this annotation must have been
+  // saved.
+  const id = /** @type {string} */ (annotation.id);
+
   /**
    * Hide an annotation from non-moderator users.
    */
   const hideAnnotation = () => {
     api.annotation
-      .hide({ id: annotation.id })
+      .hide({ id })
       .then(() => {
-        store.hideAnnotation(annotation.id);
+        store.hideAnnotation(id);
       })
       .catch(() => {
         toastMessenger.error('Failed to hide annotation');
@@ -49,9 +57,9 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
    */
   const unhideAnnotation = () => {
     api.annotation
-      .unhide({ id: annotation.id })
+      .unhide({ id })
       .then(() => {
-        store.unhideAnnotation(annotation.id);
+        store.unhideAnnotation(id);
       })
       .catch(() => {
         toastMessenger.error('Failed to unhide annotation');
@@ -77,9 +85,6 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
     'is-reply': annotationMetadata.isReply(annotation),
   });
 
-  if (!isHiddenOrFlagged) {
-    return null;
-  }
   return (
     <div className={bannerClasses}>
       {!!flagCount && !annotation.hidden && (
