@@ -168,14 +168,39 @@ describe('shared/bridge', () => {
 
   describe('#on', () => {
     it('adds a method to the method registry', () => {
-      createChannel();
       bridge.on('message1', sandbox.spy());
+      createChannel();
       assert.isFunction(bridge.channelListeners.message1);
     });
 
+    it('raise an error if trying to register a listener after a channel has been already created', () => {
+      createChannel();
+      let error;
+      try {
+        bridge.on('message1', () => {});
+      } catch (err) {
+        error = err;
+      }
+
+      assert.equal(
+        error.message,
+        "Listener 'message1' can't be registered because a channel has already been created"
+      );
+    });
+
     it('only allows registering a method once', () => {
-      bridge.on('message1', sandbox.spy());
-      assert.throws(() => bridge.on('message1', sandbox.spy()));
+      bridge.on('message1', () => {});
+      let error;
+      try {
+        bridge.on('message1', () => {});
+      } catch (err) {
+        error = err;
+      }
+
+      assert.equal(
+        error.message,
+        "Listener 'message1' already bound in Bridge"
+      );
     });
   });
 
