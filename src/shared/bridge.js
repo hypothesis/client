@@ -143,8 +143,15 @@ export default class Bridge {
    *   callback of the type: `(error: string|Error|null, ...result: any[]) => void`.
    *   This callback must be invoked in order to respond (via `postMessage`)
    *   to the other frame/s with a result or an error.
+   * @throws {Error} If trying to register a callback after a channel has already been created
+   * @throws {Error} If trying to register a callback with the same name multiple times
    */
   on(method, callback) {
+    if (this.links.length > 0) {
+      throw new Error(
+        `Listener '${method}' can't be registered because a channel has already been created`
+      );
+    }
     if (this.channelListeners[method]) {
       throw new Error(`Listener '${method}' already bound in Bridge`);
     }
