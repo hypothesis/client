@@ -156,6 +156,23 @@ describe('APIService', () => {
     return api.search({ uri: 'http://foobar.com/?foo=bar;baz=qux' });
   });
 
+  // Test that covers the most critical use case of multiple values being
+  // provided for an API parameter. Other API calls accept multiple values
+  // as well though.
+  it('repeats query parameters when multiple values are provided', () => {
+    const pdfURL = 'https://example.com/test.pdf';
+    const fingerprintURL = 'urn:x-pdf:foobar';
+
+    expectCall(
+      'get',
+      `search?uri=${encodeURIComponent(pdfURL)}&uri=${encodeURIComponent(
+        fingerprintURL
+      )}`
+    );
+
+    return api.search({ uri: [pdfURL, fingerprintURL] });
+  });
+
   it("fetches the user's profile", () => {
     const profile = { userid: 'acct:user@publisher.org' };
     expectCall('get', 'profile?authority=publisher.org', 200, profile);
