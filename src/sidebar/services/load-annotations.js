@@ -180,7 +180,7 @@ export class LoadAnnotationsService {
       //    fetch the top-level annotation
       if (isReply(annotation)) {
         annotation = await this._api.annotation.get({
-          id: annotation.references[0],
+          id: /** @type {string[]} */ (annotation.references)[0],
         });
       }
 
@@ -198,9 +198,10 @@ export class LoadAnnotationsService {
     // configure the connection to the real-time update service to send us
     // updates to any of the annotations in the thread.
     if (!isReply(annotation)) {
+      const id = /** @type {string} */ (annotation.id);
       this._streamFilter
-        .addClause('/references', 'one_of', annotation.id, true)
-        .addClause('/id', 'equals', annotation.id, true);
+        .addClause('/references', 'one_of', id, true)
+        .addClause('/id', 'equals', id, true);
       this._streamer.setConfig('filter', {
         filter: this._streamFilter.getFilter(),
       });

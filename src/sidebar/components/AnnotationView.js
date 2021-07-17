@@ -56,7 +56,9 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
 
         // Make the full thread of annotations visible. By default replies are
         // not shown until the user expands the thread.
-        annots.forEach(annot => store.setExpanded(annot.id, true));
+        annots.forEach(annot =>
+          store.setExpanded(/** @type {string} */ (annot.id), true)
+        );
 
         // FIXME - This should show a visual indication of which reply the
         // annotation ID in the URL refers to. That isn't currently working.

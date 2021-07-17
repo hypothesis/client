@@ -34,10 +34,11 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
    * Hide an annotation from non-moderator users.
    */
   const hideAnnotation = () => {
+    const id = /** @type {string} */ (annotation.id);
     api.annotation
-      .hide({ id: annotation.id })
+      .hide({ id })
       .then(() => {
-        store.hideAnnotation(annotation.id);
+        store.hideAnnotation(id);
       })
       .catch(() => {
         toastMessenger.error('Failed to hide annotation');
@@ -48,10 +49,11 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
    * Un-hide an annotation from non-moderator users.
    */
   const unhideAnnotation = () => {
+    const id = /** @type {string} */ (annotation.id);
     api.annotation
-      .unhide({ id: annotation.id })
+      .unhide({ id })
       .then(() => {
-        store.unhideAnnotation(annotation.id);
+        store.unhideAnnotation(id);
       })
       .catch(() => {
         toastMessenger.error('Failed to unhide annotation');
