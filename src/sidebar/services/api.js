@@ -52,15 +52,6 @@ function stripInternalProperties(obj) {
  */
 
 /**
- * Options controlling how an API call is made or processed.
- *
- * @typedef APICallOptions
- * @prop {boolean} [includeMetadata] - If false (the default), the response is
- *   just the JSON response from the API. If true, the response is an `APIResponse`
- *   containing additional metadata about the request and response.
- */
-
-/**
  * Function which makes an API request.
  *
  * @template {Record<string, any>} Params
@@ -69,7 +60,6 @@ function stripInternalProperties(obj) {
  * @callback APICall
  * @param {Params} params - A map of URL and query string parameters to include with the request.
  * @param {Body} [data] - The body of the request.
- * @param {APICallOptions} [options]
  * @return {Promise<Result>}
  */
 
@@ -107,10 +97,9 @@ function createAPICall(
   route,
   { getAccessToken, getClientId, onRequestStarted, onRequestFinished }
 ) {
-  return function (params, data, options = {}) {
+  return (params, data) => {
     onRequestStarted();
 
-    let accessToken;
     return Promise.all([links, getAccessToken()])
       .then(([links, token]) => {
         const descriptor = get(links, route);
@@ -119,7 +108,6 @@ function createAPICall(
           'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
         };
 
-        accessToken = token;
         if (token) {
           headers.Authorization = 'Bearer ' + token;
         }
@@ -170,11 +158,7 @@ function createAPICall(
             throw translateResponseToError(response, data);
           }
 
-          if (options.includeMetadata) {
-            return { data, token: accessToken };
-          } else {
-            return data;
-          }
+          return data;
         },
         err => {
           // `fetch` failed to execute the request, or parsing the response failed.
