@@ -378,8 +378,9 @@ export class GroupsService {
       userGroups.find(g => g.id === id || g.groupid === id) ||
       tryFetchGroup(id);
 
-    const groups = (await Promise.all(groupIds.map(getGroup))).filter(
-      g => g !== null
+    const groupResults = await Promise.all(groupIds.map(getGroup));
+    const groups = /** @type {Group[]} */ (
+      groupResults.filter(g => g !== null)
     );
 
     // Optional direct linked group id. This is used in the Notebook context.

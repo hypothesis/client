@@ -142,6 +142,7 @@
  *
  * @typedef Group
  * @prop {string} id
+ * @prop {string} groupid
  * @prop {'private'|'open'} type
  * @prop {Organization} organization - nb. This field is nullable in the API, but
  *   we assign a default organization on the client.

@@ -3,7 +3,10 @@ import * as queryString from 'query-string';
 import { replaceURLParams } from '../util/url';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ * @typedef {import('../../types/api').Group} Group
  * @typedef {import('../../types/api').RouteMap} RouteMap
+ * @typedef {import('../../types/api').Profile} Profile
  */
 
 /**
@@ -39,8 +42,9 @@ function stripInternalProperties(obj) {
 }
 
 /**
+ * @template {object} Body
  * @typedef APIResponse
- * @prop {any} data -
+ * @prop {Body} data -
  *  The JSON response from the API call, unless this call returned a
  *  "204 No Content" status.
  * @prop {string|null} token - The access token that was used to make the call
@@ -59,11 +63,14 @@ function stripInternalProperties(obj) {
 /**
  * Function which makes an API request.
  *
- * @callback APICallFunction
- * @param {Record<string, any>} params - A map of URL and query string parameters to include with the request.
- * @param {object} [data] - The body of the request.
+ * @template {Record<string, any>} Params
+ * @template {object} Body
+ * @template Result
+ * @callback APICall
+ * @param {Params} params - A map of URL and query string parameters to include with the request.
+ * @param {Body} [data] - The body of the request.
  * @param {APICallOptions} [options]
- * @return {Promise<any|APIResponse>}
+ * @return {Promise<Result>}
  */
 
 /**
@@ -93,7 +100,7 @@ function get(object, path) {
  * @param {Promise<RouteMap>} links - API route data from API index endpoint (`/api/`)
  * @param {string} route - The dotted path of the named API route (eg. `annotation.create`)
  * @param {APIMethodCallbacks} callbacks
- * @return {APICallFunction}
+ * @return {APICall<Record<string, any>, object, object>}
  */
 function createAPICall(
   links,
@@ -182,8 +189,8 @@ function createAPICall(
  * API client for the Hypothesis REST API.
  *
  * Returns an object that with keys that match the routes in
- * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/). See
- * `APICallFunction` for the syntax of API calls. For example:
+ * the Hypothesis API (see http://h.readthedocs.io/en/latest/api/).
+ * @see APICall for the syntax of API calls. For example:
  *
  * ```
  * api.annotations.update({ id: '1234' }, annotation).then(ann => {
@@ -226,30 +233,70 @@ export class APIService {
         onRequestFinished: store.apiRequestFinished,
       });
 
+    // Define available API calls.
+    //
+    // The type syntax is APICall<Parameters, Body, Result>, where `void` means
+    // no body / empty response.
+
+    /**
+     * @typedef AnnotationSearchResult
+     * @prop {Annotation[]} rows
+     * @prop {Annotation[]} replies
+     * @prop {number} total
+     */
+
+    /** @type {APICall<object, void, AnnotationSearchResult>} */
     this.search = apiCall('search');
     this.annotation = {
+      /** @type {APICall<{}, Partial<Annotation>, Annotation>} */
       create: apiCall('annotation.create'),
+
+      /** @type {APICall<{ id: string }, void, void>} */
       delete: apiCall('annotation.delete'),
+
+      /** @type {APICall<{ id: string }, void, Annotation>} */
       get: apiCall('annotation.read'),
+
+      /** @type {APICall<{ id: string }, Partial<Annotation>, Annotation>} */
       update: apiCall('annotation.update'),
+
+      /** @type {APICall<{ id: string }, void, void>} */
       flag: apiCall('annotation.flag'),
+
+      /** @type {APICall<{ id: string }, void, void>} */
       hide: apiCall('annotation.hide'),
+
+      /** @type {APICall<{ id: string }, void, void>} */
       unhide: apiCall('annotation.unhide'),
     };
     this.group = {
       member: {
+        /** @type {APICall<{ pubid: string, userid: string }, void, void>} */
         delete: apiCall('group.member.delete'),
       },
+      /** @type {APICall<{ id: string, expand: string[] }, void, Group>} */
       read: apiCall('group.read'),
     };
+
+    /**
+     * @typedef ListGroupParams
+     * @prop {string} [authority]
+     * @prop {string} [document_uri]
+     * @prop {string[]} [expand]
+     */
+
     this.groups = {
+      /** @type {APICall<ListGroupParams, void, Group[]>} */
       list: apiCall('groups.read'),
     };
     this.profile = {
       groups: {
+        /** @type {APICall<{ expand: string[] }, void, Group[]>} */
         read: apiCall('profile.groups.read'),
       },
+      /** @type {APICall<{ authority?: string }, void, Profile>} */
       read: apiCall('profile.read'),
+      /** @type {APICall<{}, Partial<Profile>, Profile>} */
       update: apiCall('profile.update'),
     };
   }
