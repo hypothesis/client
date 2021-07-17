@@ -222,7 +222,7 @@ describe('APIService', () => {
     });
   });
 
-  it('API calls return just the JSON response if `includeMetadata` is false', () => {
+  it('API calls return the JSON response', () => {
     expectCall('get', 'profile', 200, { userid: 'acct:user@example.com' });
     return api.profile.read({}).then(response => {
       assert.match(
@@ -232,23 +232,6 @@ describe('APIService', () => {
         })
       );
     });
-  });
-
-  it('API calls return an `APIResponse` if `includeMetadata` is true', () => {
-    expectCall('get', 'profile', 200, { userid: 'acct:user@example.com' });
-    return api.profile
-      .read({}, null, { includeMetadata: true })
-      .then(response => {
-        assert.match(
-          response,
-          sinon.match({
-            data: {
-              userid: 'acct:user@example.com',
-            },
-            token: 'faketoken',
-          })
-        );
-      });
   });
 
   it('omits Authorization header if no access token is available', () => {
