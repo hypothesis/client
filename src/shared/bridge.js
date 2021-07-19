@@ -14,7 +14,7 @@ export default class Bridge {
     this.links = [];
     /** @type {Record<string, (...args: any[]) => void>} */
     this.channelListeners = {};
-    /** @type {Array<(...args: any[]) => void>} */
+    /** @type {Array<(channel: RPC, window: Window) => void>} */
     this.onConnectListeners = [];
   }
 
@@ -47,7 +47,7 @@ export default class Bridge {
         return;
       }
       connected = true;
-      this.onConnectListeners.forEach(cb => cb.call(null, channel, source));
+      this.onConnectListeners.forEach(cb => cb(channel, source));
     };
 
     const connect = (_token, cb) => {
@@ -162,7 +162,7 @@ export default class Bridge {
   /**
    * Add a listener to be called upon a new connection.
    *
-   * @param {(error: null, channel: RPC, window: Window) => void} listener
+   * @param {(channel: RPC, window: Window) => void} listener
    */
   onConnect(listener) {
     this.onConnectListeners.push(listener);
