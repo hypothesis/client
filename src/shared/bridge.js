@@ -25,6 +25,7 @@ export default class Bridge {
    */
   destroy() {
     this.links.forEach(channel => channel.destroy());
+    this.links = [];
   }
 
   /**
