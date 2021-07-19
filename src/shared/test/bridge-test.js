@@ -22,7 +22,11 @@ describe('shared/bridge', () => {
     bridge = new Bridge();
 
     createChannel = () =>
-      bridge.createChannel(fakeWindow, 'http://example.com', 'TOKEN');
+      bridge.createChannel({
+        source: fakeWindow,
+        origin: 'http://example.com',
+        token: 'TOKEN',
+      });
 
     fakeWindow = {
       postMessage: sandbox.stub(),
@@ -85,11 +89,11 @@ describe('shared/bridge', () => {
 
     it('calls a callback when all channels return successfully', done => {
       const channel1 = createChannel();
-      const channel2 = bridge.createChannel(
-        fakeWindow,
-        'http://example.com',
-        'NEKOT'
-      );
+      const channel2 = bridge.createChannel({
+        source: fakeWindow,
+        origin: 'http://example.com',
+        token: 'NEKOT',
+      });
       channel1.call.yields(null, 'result1');
       channel2.call.yields(null, 'result2');
 
@@ -105,11 +109,11 @@ describe('shared/bridge', () => {
     it('calls a callback with an error when a channels fails', done => {
       const error = new Error('Uh oh');
       const channel1 = createChannel();
-      const channel2 = bridge.createChannel(
-        fakeWindow,
-        'http://example.com',
-        'NEKOT'
-      );
+      const channel2 = bridge.createChannel({
+        source: fakeWindow,
+        origin: 'http://example.com',
+        token: 'NEKOT',
+      });
       channel1.call.throws(error);
       channel2.call.yields(null, 'result2');
 
@@ -260,16 +264,16 @@ describe('shared/bridge', () => {
 
   describe('#destroy', () =>
     it('destroys all opened channels', () => {
-      const channel1 = bridge.createChannel(
-        fakeWindow,
-        'http://example.com',
-        'foo'
-      );
-      const channel2 = bridge.createChannel(
-        fakeWindow,
-        'http://example.com',
-        'bar'
-      );
+      const channel1 = bridge.createChannel({
+        source: fakeWindow,
+        origin: 'http://example.com',
+        token: 'foo',
+      });
+      const channel2 = bridge.createChannel({
+        source: fakeWindow,
+        origin: 'http://example.com',
+        token: 'bar',
+      });
 
       bridge.destroy();
 

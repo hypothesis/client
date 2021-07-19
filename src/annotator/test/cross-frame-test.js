@@ -88,7 +88,11 @@ describe('CrossFrame', () => {
       createCrossFrame();
       fakeDiscovery.startDiscovery.yield('SOURCE', 'ORIGIN', 'TOKEN');
       assert.called(fakeBridge.createChannel);
-      assert.calledWith(fakeBridge.createChannel, 'SOURCE', 'ORIGIN', 'TOKEN');
+      assert.calledWith(fakeBridge.createChannel, {
+        source: 'SOURCE',
+        origin: 'ORIGIN',
+        token: 'TOKEN',
+      });
     });
   });
 

@@ -236,7 +236,9 @@ export class FrameSyncService {
     };
 
     const discovery = new Discovery(window, { server: true });
-    discovery.startDiscovery(this._bridge.createChannel.bind(this._bridge));
+    discovery.startDiscovery((source, origin, token) =>
+      this._bridge.createChannel({ source, origin, token })
+    );
     this._bridge.onConnect(addFrame);
 
     this._setupSyncToFrame();
