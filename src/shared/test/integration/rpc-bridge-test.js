@@ -268,12 +268,10 @@ describe('rpc-bridge integration', () => {
       });
       clock.tick(1000);
 
-      // It timeouts using reciprocalBridge, too! This maybe a bit contour intuitive.
       reciprocalBridge.call('method1', 'params1', (err, results) => {
-        assert.deepEqual(results, [null]);
+        assert.deepEqual(results, []);
         assert.isNull(err);
         done();
       });
-      clock.tick(1000);
     }));
 });
