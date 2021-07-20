@@ -234,14 +234,29 @@ describe('shared/bridge', () => {
   });
 
   describe('#onConnect', () => {
+    // Simulate a Bridge attached to the other end of a channel receiving
+    // the `connect` RPC request and handling it using the `connect` handler
+    // registered by the Bridge.
+    const runConnectHandler = channel => {
+      const connectCall = channel.call
+        .getCalls()
+        .find(call => call.firstArg === 'connect');
+
+      // Invoke the `connect` handler. Here we're invoking it on `channel` but
+      // in the actual app this would be called on the counterpart channel in
+      // the other frame. This distinction doesn't matter because all the
+      // handler does is check a token (which is the same on both sides) and
+      // call the result callback.
+      channel.methods.connect(...connectCall.args.slice(1));
+    };
+
     it('runs callbacks when a Window channel connects with correct token', () => {
       const onConnectCallback = sinon.stub();
       bridge.onConnect(onConnectCallback);
 
       const channel = createChannel();
 
-      // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
-      channel.methods.connect('TOKEN', sinon.stub());
+      runConnectHandler(channel);
 
       assert.calledWith(onConnectCallback, channel, fakeWindow);
     });
@@ -253,7 +268,10 @@ describe('shared/bridge', () => {
       const channel = createChannel();
 
       // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
-      channel.methods.connect('WRONG-TOKEN', sinon.stub());
+      const connectCall = channel.call
+        .getCalls()
+        .find(call => call.firstArg === 'connect');
+      channel.methods.connect('WRONG-TOKEN', connectCall.lastArg);
 
       assert.notCalled(onConnectCallback);
     });
@@ -265,13 +283,7 @@ describe('shared/bridge', () => {
       const messageChannel = new MessageChannel();
       const channel = createChannel(messageChannel.port1);
 
-      // Simulate a Bridge attached to the other end of the channel receiving
-      // the `connect` RPC request and handling it using the `connect` handler
-      // registered by the Bridge.
-      const connectCall = channel.call
-        .getCalls()
-        .find(call => call.firstArg === 'connect');
-      channel.methods.connect(...connectCall.args.slice(1));
+      runConnectHandler(channel);
 
       assert.calledWith(onConnectCallback, channel);
     });
@@ -284,8 +296,7 @@ describe('shared/bridge', () => {
 
       const channel = createChannel();
 
-      // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
-      channel.methods.connect('TOKEN', sinon.stub());
+      runConnectHandler(channel);
 
       assert.calledWith(onConnectCallback1, channel, fakeWindow);
       assert.calledWith(onConnectCallback2, channel, fakeWindow);
@@ -297,9 +308,8 @@ describe('shared/bridge', () => {
 
       const channel = createChannel();
 
-      // Simulate "connect" RPC call by Bridge instance in channel's destination frame.
-      channel.methods.connect('TOKEN', sinon.stub());
-      channel.methods.connect('TOKEN', sinon.stub());
+      runConnectHandler(channel);
+      runConnectHandler(channel);
 
       assert.calledOnce(onConnectCallback);
     });
