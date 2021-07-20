@@ -29,7 +29,8 @@ export default class Bridge {
 
   /**
    * Deprecated - Remove after MessagePort conversion
-   * @typedef windowOptions
+   *
+   * @typedef WindowOptions
    * @prop {Window} source - The source window
    * @prop {string} origin - The origin of the document in `source`
    * @prop {string} token - Shared token between the `source` and this window
@@ -43,7 +44,7 @@ export default class Bridge {
    * The created channel is added to the list of channels which `call`
    * and `on` send and receive messages over.
    *
-   * @param {windowOptions|MessagePort} options
+   * @param {WindowOptions|MessagePort} options
    * @return {RPC} - Channel for communicating with the window.
    */
   createChannel(options) {
@@ -99,7 +100,7 @@ export default class Bridge {
    * The created channel is added to the list of channels which `call`
    * and `on` send and receive messages over.
    *
-   * @param {windowOptions} options
+   * @param {WindowOptions} options
    * @return {RPC} - Channel for communicating with the window.
    * @deprecated
    */
