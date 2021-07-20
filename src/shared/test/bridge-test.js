@@ -258,7 +258,7 @@ describe('shared/bridge', () => {
 
       runConnectHandler(channel);
 
-      assert.calledWith(onConnectCallback, channel, fakeWindow);
+      assert.calledWith(onConnectCallback, channel);
     });
 
     it('does not run callback if a Window channel connects with wrong token', () => {
@@ -298,8 +298,8 @@ describe('shared/bridge', () => {
 
       runConnectHandler(channel);
 
-      assert.calledWith(onConnectCallback1, channel, fakeWindow);
-      assert.calledWith(onConnectCallback2, channel, fakeWindow);
+      assert.calledWith(onConnectCallback1, channel);
+      assert.calledWith(onConnectCallback2, channel);
     });
 
     it('only invokes `onConnect` callback once', () => {
