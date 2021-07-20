@@ -118,7 +118,6 @@ export default class Bridge {
     const connect = (_token, cb) => {
       if (_token === token) {
         cb();
-        ready(); // This is necessary for testing only.
       }
     };
 
