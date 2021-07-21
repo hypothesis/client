@@ -17,7 +17,7 @@ export function findFrames(container) {
 
 // Check if the iframe has already been injected
 export function hasHypothesis(iframe) {
-  return iframe.contentWindow.__hypothesis_frame === true;
+  return '__hypothesis' in iframe.contentWindow;
 }
 
 // Inject embed.js into the iframe

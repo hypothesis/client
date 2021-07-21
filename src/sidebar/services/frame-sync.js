@@ -236,8 +236,13 @@ export class FrameSyncService {
     };
 
     const discovery = new Discovery(window, { server: true });
-    discovery.startDiscovery((source, origin, token) =>
-      this._bridge.createChannel({ source, origin, token })
+    discovery.startDiscovery(
+      (source, origin, token) =>
+        this._bridge.createChannel({ source, origin, token }),
+      [
+        // Ping the host frame which is in most cases also the only guest.
+        window.parent,
+      ]
     );
     this._bridge.onConnect(addFrame);
 

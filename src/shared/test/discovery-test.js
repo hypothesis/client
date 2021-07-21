@@ -16,9 +16,11 @@ describe('shared/discovery', () => {
   let fakeTopWindow;
 
   beforeEach(() => {
+    // Fake client frame (aka the host/guest frame)
     fakeTopWindow = createWindow();
     fakeTopWindow.top = fakeTopWindow;
 
+    // Fake server frame (aka the sidebar frame)
     fakeFrameWindow = createWindow();
     fakeFrameWindow.top = fakeTopWindow;
 
@@ -28,7 +30,7 @@ describe('shared/discovery', () => {
   describe('#startDiscovery', () => {
     it('adds a "message" listener to the window object', () => {
       const discovery = new Discovery(fakeTopWindow);
-      discovery.startDiscovery(sinon.stub());
+      discovery.startDiscovery(sinon.stub(), [fakeFrameWindow]);
       assert.calledWith(
         fakeTopWindow.addEventListener,
         'message',
@@ -44,8 +46,8 @@ describe('shared/discovery', () => {
       server = new Discovery(fakeFrameWindow, { server: true });
     });
 
-    it('sends "offer" messages to every frame in the current tab', () => {
-      server.startDiscovery(sinon.stub());
+    it('sends "offer" messages to specified frames', () => {
+      server.startDiscovery(sinon.stub(), [fakeTopWindow]);
       assert.calledWith(
         fakeTopWindow.postMessage,
         '__cross_frame_dhcp_offer',
@@ -58,17 +60,12 @@ describe('shared/discovery', () => {
         server: true,
         origin: 'https://example.com',
       });
-      server.startDiscovery(sinon.stub());
+      server.startDiscovery(sinon.stub(), [fakeTopWindow]);
       assert.calledWith(
         fakeTopWindow.postMessage,
         '__cross_frame_dhcp_offer',
         'https://example.com'
       );
-    });
-
-    it('does not send "offer" messages to itself', () => {
-      server.startDiscovery(sinon.stub());
-      assert.notCalled(fakeFrameWindow.postMessage);
     });
 
     it('sends an "ack" when it receives a "request" message', () => {
@@ -78,7 +75,7 @@ describe('shared/discovery', () => {
         origin: 'https://top.com',
       });
 
-      server.startDiscovery(sinon.stub());
+      server.startDiscovery(sinon.stub(), [fakeTopWindow]);
 
       assert.calledWith(
         fakeTopWindow.postMessage,
@@ -95,7 +92,7 @@ describe('shared/discovery', () => {
       });
       const onDiscovery = sinon.stub();
 
-      server.startDiscovery(onDiscovery);
+      server.startDiscovery(onDiscovery, [fakeTopWindow]);
 
       assert.calledWith(
         onDiscovery,
@@ -113,7 +110,7 @@ describe('shared/discovery', () => {
       });
       const onDiscovery = sinon.stub();
       assert.throws(() => {
-        server.startDiscovery(onDiscovery);
+        server.startDiscovery(onDiscovery, [fakeTopWindow]);
       });
     });
   });
@@ -125,18 +122,13 @@ describe('shared/discovery', () => {
       client = new Discovery(fakeTopWindow);
     });
 
-    it('sends out a discovery message to every frame', () => {
-      client.startDiscovery(sinon.stub());
+    it('sends out a discovery message to specified frames', () => {
+      client.startDiscovery(sinon.stub(), [fakeFrameWindow]);
       assert.calledWith(
         fakeFrameWindow.postMessage,
         '__cross_frame_dhcp_discovery',
         '*'
       );
-    });
-
-    it('does not send the message to itself', () => {
-      client.startDiscovery(sinon.stub());
-      assert.notCalled(fakeTopWindow.postMessage);
     });
 
     it('sends a "request" message in response to an "offer" message', () => {
@@ -146,7 +138,7 @@ describe('shared/discovery', () => {
         origin: 'https://iframe.com',
       });
 
-      client.startDiscovery(sinon.stub());
+      client.startDiscovery(sinon.stub(), [fakeFrameWindow]);
 
       assert.calledWith(
         fakeFrameWindow.postMessage,
@@ -167,7 +159,7 @@ describe('shared/discovery', () => {
         origin: 'https://iframe2.com',
       });
 
-      client.startDiscovery(sinon.stub());
+      client.startDiscovery(sinon.stub(), [fakeFrameWindow]);
 
       // `postMessage` should be called first for discovery, then for offer.
       assert.calledTwice(fakeFrameWindow.postMessage);
@@ -194,7 +186,7 @@ describe('shared/discovery', () => {
         origin: 'https://iframe2.com',
       });
 
-      client.startDiscovery(sinon.stub());
+      client.startDiscovery(sinon.stub(), [fakeFrameWindow]);
 
       assert.calledWith(
         fakeFrameWindow.postMessage,
@@ -211,7 +203,7 @@ describe('shared/discovery', () => {
       });
       const onDiscovery = sinon.stub();
 
-      client.startDiscovery(onDiscovery);
+      client.startDiscovery(onDiscovery, [fakeFrameWindow]);
 
       assert.calledWith(
         onDiscovery,
@@ -226,7 +218,7 @@ describe('shared/discovery', () => {
     it('removes the "message" listener from the window', () => {
       const discovery = new Discovery(fakeFrameWindow);
 
-      discovery.startDiscovery(sinon.stub());
+      discovery.startDiscovery(sinon.stub(), [fakeTopWindow]);
       discovery.stopDiscovery();
 
       const handler = fakeFrameWindow.addEventListener.lastCall.args[1];
@@ -240,11 +232,11 @@ describe('shared/discovery', () => {
     it('allows `startDiscovery` to be called with a new handler', () => {
       const discovery = new Discovery(fakeFrameWindow);
 
-      discovery.startDiscovery();
+      discovery.startDiscovery(sinon.stub(), [fakeTopWindow]);
       discovery.stopDiscovery();
 
       assert.doesNotThrow(() => {
-        discovery.startDiscovery();
+        discovery.startDiscovery(sinon.stub(), [fakeTopWindow]);
       });
     });
   });

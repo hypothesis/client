@@ -34,15 +34,10 @@ const appLinkEl = /** @type {Element} */ (
 );
 
 function init() {
+  window_.__hypothesis = {};
+
   const annotatorConfig = getConfig('annotator');
   const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
-
-  if (annotatorConfig.subFrameIdentifier) {
-    // Other modules use this to detect if this
-    // frame context belongs to hypothesis.
-    // Needs to be a global property that's set.
-    window_.__hypothesis_frame = true;
-  }
 
   const eventBus = new EventBus();
   const guest = new Guest(document.body, eventBus, {
@@ -51,15 +46,37 @@ function init() {
     // nb. documentType is an internal config property only
     documentType: isPDF ? 'pdf' : 'html',
   });
+
   const sidebar = !annotatorConfig.subFrameIdentifier
     ? new Sidebar(document.body, eventBus, guest, getConfig('sidebar'))
     : null;
+  if (sidebar) {
+    // Expose sidebar window reference for use by same-origin guest frames.
+    window_.__hypothesis.sidebarWindow = sidebar.sidebarWindow;
+  }
+
   // Clear `annotations` value from the notebook's config to prevent direct-linked
   // annotations from filtering the threads.
   const notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
+  // Setup guest <-> sidebar communication.
+  const sidebarWindow = sidebar
+    ? sidebar.sidebarWindow
+    : /** @type {HypothesisWindow} */ (window.parent).__hypothesis
+        ?.sidebarWindow;
+  if (sidebarWindow) {
+    guest.crossframe.connectToSidebar(sidebarWindow);
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Hypothesis guest frame in ${location.origin} could not find a sidebar to connect to`
+    );
+  }
+
   appLinkEl.addEventListener('destroy', () => {
+    delete window_.__hypothesis;
     sidebar?.destroy();
+
     notebook.destroy();
     guest.destroy();
 

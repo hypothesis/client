@@ -23,7 +23,8 @@ above script tag to the document displayed in the iframe. This will display the
 sidebar in the iframe itself.
 
 Additionally Hypothesis has limited support for enabling annotation of iframed
-content while showing the sidebar in the top-level document. To use this:
+content while showing the sidebar in the top-level document where Hypothesis
+was initially loaded. To use this:
 
 1. Add the above script tag to the top-level document
 
@@ -38,6 +39,8 @@ content while showing the sidebar in the top-level document. To use this:
    ...
    </iframe>
 
-This method *only* works for iframes which are same-origin with the top-level
-document. The client will watch for new iframes being added to the document and
-will automatically enable annotation for them.
+This method *only* works for iframes which are direct children of the top-level
+document and have the same origin.
+
+The client will watch for new iframes being added to the document and will
+automatically enable annotation for them.

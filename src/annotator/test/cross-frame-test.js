@@ -78,18 +78,24 @@ describe('CrossFrame', () => {
         emit: sinon.match.func,
       });
     });
+  });
 
-    it('starts the discovery of new channels', () => {
-      createCrossFrame();
-      assert.called(fakeDiscovery.startDiscovery);
-    });
+  describe('#connectToSidebar', () => {
+    it('starts the discovery of new channels', async () => {
+      const cf = createCrossFrame();
+      const sidebarFrame = {};
+      fakeDiscovery.startDiscovery.callsFake((callback, frames) => {
+        setTimeout(() => callback(frames[0], 'ORIGIN', 'TOKEN'), 0);
+      });
 
-    it('creates a channel when a new frame is discovered', () => {
-      createCrossFrame();
-      fakeDiscovery.startDiscovery.yield('SOURCE', 'ORIGIN', 'TOKEN');
+      await cf.connectToSidebar(sidebarFrame);
+
+      assert.calledWith(fakeDiscovery.startDiscovery, sinon.match.func, [
+        sidebarFrame,
+      ]);
       assert.called(fakeBridge.createChannel);
       assert.calledWith(fakeBridge.createChannel, {
-        source: 'SOURCE',
+        source: sidebarFrame,
         origin: 'ORIGIN',
         token: 'TOKEN',
       });
