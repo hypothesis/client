@@ -72,8 +72,9 @@ export default class Discovery {
    *
    * @param {DiscoveryCallback} onDiscovery - Callback to invoke with a token when
    *   another frame is discovered.
+   * @param {Window[]} frames - A list of frames to attempt to connect to.
    */
-  startDiscovery(onDiscovery) {
+  startDiscovery(onDiscovery, frames) {
     if (this.onDiscovery) {
       throw new Error(
         'Discovery is already in progress. Call stopDiscovery() first'
@@ -84,7 +85,14 @@ export default class Discovery {
 
     // Listen for messages from other frames.
     this._listeners.add(this.target, 'message', this._onMessage);
-    this._beacon();
+
+    // Ping specified other frames to tell them about the existence of this frame.
+    const beaconMessage = this.server
+      ? '__cross_frame_dhcp_offer'
+      : '__cross_frame_dhcp_discovery';
+    for (let frame of frames) {
+      frame.postMessage(beaconMessage, this.origin);
+    }
   }
 
   /**
@@ -93,33 +101,6 @@ export default class Discovery {
   stopDiscovery() {
     this.onDiscovery = null;
     this._listeners.removeAll();
-  }
-
-  /**
-   * Send a message to other frames in the current window to inform them about
-   * the existence of this frame and tell them whether this frame is a client
-   * or server.
-   */
-  _beacon() {
-    let beaconMessage;
-    if (this.server) {
-      beaconMessage = '__cross_frame_dhcp_offer';
-    } else {
-      beaconMessage = '__cross_frame_dhcp_discovery';
-    }
-
-    // Perform a top-down, breadth-first traversal of frames in the current
-    // window and send messages to them.
-    const queue = [this.target.top];
-    while (queue.length > 0) {
-      const parent = /** @type {Window} */ (queue.shift());
-      if (parent !== this.target) {
-        parent.postMessage(beaconMessage, this.origin);
-      }
-      for (let i = 0; i < parent.frames.length; i++) {
-        queue.push(parent.frames[i]);
-      }
-    }
   }
 
   /**

@@ -63,11 +63,27 @@ export class CrossFrame {
       frameIdentifiers.delete(frame);
     };
 
-    // Initiate connection to the sidebar.
-    discovery.startDiscovery((source, origin, token) =>
-      bridge.createChannel({ source, origin, token })
-    );
     frameObserver.observe(injectIntoFrame, iframeUnloaded);
+
+    /**
+     * Attempt to connect to the sidebar frame.
+     *
+     * Returns a promise that resolves once the connection has been established.
+     *
+     * @param {Window} frame - The window containing the sidebar application
+     * @return {Promise<void>}
+     */
+    this.connectToSidebar = frame => {
+      return new Promise(resolve => {
+        discovery.startDiscovery(
+          (source, origin, token) => {
+            bridge.createChannel({ source, origin, token });
+            resolve();
+          },
+          [frame]
+        );
+      });
+    };
 
     /**
      * Remove the connection between the sidebar and annotator.

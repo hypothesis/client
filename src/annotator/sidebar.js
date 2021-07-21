@@ -192,6 +192,13 @@ export default class Sidebar {
     this._setupSidebarEvents();
   }
 
+  /**
+   * Return a reference to the `Window` containing the sidebar application.
+   */
+  get sidebarWindow() {
+    return /** @type {Window} */ (this.iframe.contentWindow);
+  }
+
   destroy() {
     this.bucketBar?.destroy();
     this._listeners.removeAll();

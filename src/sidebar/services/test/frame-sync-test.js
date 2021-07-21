@@ -50,6 +50,7 @@ describe('FrameSyncService', () => {
   let fakeAnnotationsService;
   let fakeStore;
   let fakeBridge;
+  let fakeDiscovery;
   let frameSync;
 
   beforeEach(() => {
@@ -88,9 +89,10 @@ describe('FrameSyncService', () => {
       emit: emitter.emit.bind(emitter),
     };
 
-    function FakeDiscovery() {
-      this.startDiscovery = sinon.stub();
-    }
+    fakeDiscovery = {
+      startDiscovery: sinon.stub(),
+    };
+    const FakeDiscovery = sinon.stub().returns(fakeDiscovery);
 
     $imports.$mock({
       '../../shared/discovery': FakeDiscovery,
@@ -102,19 +104,41 @@ describe('FrameSyncService', () => {
       .register('store', { value: fakeStore })
       .register('frameSync', FrameSyncService)
       .get('frameSync');
-
-    frameSync.connect();
   });
 
   afterEach(() => {
     $imports.$restore();
   });
 
+  describe('#connect', () => {
+    it('establishes a connection to the parent host/guest frame', () => {
+      fakeDiscovery.startDiscovery.callsFake((callback, frames) => {
+        callback(frames[0], 'ORIGIN', 'TOKEN');
+      });
+
+      frameSync.connect();
+
+      assert.calledWith(fakeDiscovery.startDiscovery, sinon.match.func, [
+        window.parent,
+      ]);
+      assert.calledWith(fakeBridge.createChannel, {
+        source: window.parent,
+        origin: 'ORIGIN',
+        token: 'TOKEN',
+      });
+    });
+  });
+
   context('when annotations are loaded into the sidebar', () => {
+    beforeEach(() => {
+      frameSync.connect();
+    });
+
     it('sends a "loadAnnotations" message to the frame', () => {
       fakeStore.setState({
         annotations: [fixtures.ann],
       });
+
       assert.calledWithMatch(
         fakeBridge.call,
         'loadAnnotations',
@@ -144,11 +168,16 @@ describe('FrameSyncService', () => {
       fakeStore.setState({
         annotations: [annotationFixtures.newReply()],
       });
+
       assert.isFalse(fakeBridge.call.calledWith('loadAnnotations'));
     });
   });
 
   context('when annotation count has changed', () => {
+    beforeEach(() => {
+      frameSync.connect();
+    });
+
     it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', () => {
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
@@ -167,6 +196,7 @@ describe('FrameSyncService', () => {
       fakeStore.setState({
         annotations: [annot],
       });
+
       assert.calledWithMatch(
         fakeBridge.call,
         'publicAnnotationCountChanged',
@@ -197,12 +227,15 @@ describe('FrameSyncService', () => {
 
   context('when annotations are removed from the sidebar', () => {
     it('sends a "deleteAnnotation" message to the frame', () => {
+      frameSync.connect();
       fakeStore.setState({
         annotations: [fixtures.ann],
       });
+
       fakeStore.setState({
         annotations: [],
       });
+
       assert.calledWithMatch(
         fakeBridge.call,
         'deleteAnnotation',
@@ -214,6 +247,7 @@ describe('FrameSyncService', () => {
   context('when a new annotation is created in the frame', () => {
     context('when an authenticated user is present', () => {
       it('creates the annotation in the sidebar', () => {
+        frameSync.connect();
         fakeStore.isLoggedIn.returns(true);
         const ann = { target: [] };
 
@@ -232,6 +266,7 @@ describe('FrameSyncService', () => {
     context('when no authenticated user is present', () => {
       beforeEach(() => {
         fakeStore.isLoggedIn.returns(false);
+        frameSync.connect();
       });
 
       it('should not create an annotation in the sidebar', () => {
@@ -270,6 +305,7 @@ describe('FrameSyncService', () => {
 
     beforeEach(() => {
       clock = sinon.useFakeTimers();
+      frameSync.connect();
     });
 
     afterEach(() => {
@@ -312,6 +348,10 @@ describe('FrameSyncService', () => {
       destroy: sinon.stub(),
     };
 
+    beforeEach(() => {
+      frameSync.connect();
+    });
+
     it("adds the page's metadata to the frames list", () => {
       frameInfo = fixtures.htmlDocumentInfo;
 
@@ -338,6 +378,7 @@ describe('FrameSyncService', () => {
     const frameId = fixtures.framesListEntry.id;
 
     it('removes the frame from the frames list', () => {
+      frameSync.connect();
       fakeBridge.emit('destroyFrame', frameId);
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
@@ -346,6 +387,7 @@ describe('FrameSyncService', () => {
 
   describe('on "showAnnotations" message', () => {
     it('selects annotations which have an ID', () => {
+      frameSync.connect();
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
       fakeBridge.emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
 
@@ -356,6 +398,7 @@ describe('FrameSyncService', () => {
 
   describe('on "focusAnnotations" message', () => {
     it('focuses the annotations', () => {
+      frameSync.connect();
       fakeBridge.emit('focusAnnotations', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.focusAnnotations, ['tag1', 'tag2', 'tag3']);
     });
@@ -363,6 +406,7 @@ describe('FrameSyncService', () => {
 
   describe('on "toggleAnnotationSelection" message', () => {
     it('toggles the selected state of the annotations', () => {
+      frameSync.connect();
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
       fakeBridge.emit('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.toggleSelectedAnnotations, [
@@ -375,6 +419,7 @@ describe('FrameSyncService', () => {
 
   describe('on "sidebarOpened" message', () => {
     it('sets the sidebar open in the store', () => {
+      frameSync.connect();
       fakeBridge.emit('sidebarOpened');
 
       assert.calledWith(fakeStore.setSidebarOpened, true);
@@ -382,6 +427,10 @@ describe('FrameSyncService', () => {
   });
 
   describe('on a relayed bridge call', () => {
+    beforeEach(() => {
+      frameSync.connect();
+    });
+
     it('calls "openSidebar"', () => {
       fakeBridge.emit('openSidebar');
 
@@ -402,6 +451,10 @@ describe('FrameSyncService', () => {
   });
 
   describe('#focusAnnotations', () => {
+    beforeEach(() => {
+      frameSync.connect();
+    });
+
     it('should update the focused annotations in the store', () => {
       frameSync.focusAnnotations(['a1', 'a2']);
       assert.calledWith(
@@ -409,6 +462,7 @@ describe('FrameSyncService', () => {
         sinon.match.array.deepEquals(['a1', 'a2'])
       );
     });
+
     it('should notify the host page', () => {
       frameSync.focusAnnotations([1, 2]);
       assert.calledWith(
@@ -421,6 +475,7 @@ describe('FrameSyncService', () => {
 
   describe('#scrollToAnnotation', () => {
     it('should scroll to the annotation in the host page', () => {
+      frameSync.connect();
       frameSync.scrollToAnnotation('atag');
       assert.calledWith(fakeBridge.call, 'scrollToAnnotation', 'atag');
     });

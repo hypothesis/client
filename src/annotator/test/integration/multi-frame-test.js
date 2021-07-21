@@ -137,7 +137,7 @@ describe('CrossFrame multi-frame scenario', () => {
     const frame = document.createElement('iframe');
     frame.setAttribute('enable-annotation', '');
     container.appendChild(frame);
-    frame.contentWindow.eval('window.__hypothesis_frame = true');
+    frame.contentWindow.eval('window.__hypothesis = {}');
 
     crossFrame = createCrossFrame();
 
