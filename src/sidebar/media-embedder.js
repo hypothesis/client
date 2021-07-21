@@ -109,23 +109,23 @@ function youTubeQueryParams(link) {
   ];
   const linkParams = new URLSearchParams(link.search);
   const filteredQuery = new URLSearchParams();
-  // Filter linkParams for allowed keys and build those entries
-  // into the filteredQuery object
-  [...linkParams.keys()]
-    .filter(key => allowedParams.includes(key))
-    .forEach(key => {
-      const value = /** @type {string} */ (linkParams.get(key));
-      if (key === 't') {
-        // `t` is not supported in embeds; `start` is
-        // `t` accepts more formats than `start`; start must be in seconds
-        // so, format it as seconds first
-        filteredQuery.set('start', parseTimeString(value));
-      } else {
-        filteredQuery.set(key, value);
-      }
-    });
 
-  // Tests currently expect sorted query params.
+  // Copy allowed params into `filteredQuery`.
+  for (let [key, value] of linkParams.entries()) {
+    if (!allowedParams.includes(key)) {
+      continue;
+    }
+    if (key === 't') {
+      // `t` is not supported in embeds; `start` is
+      // `t` accepts more formats than `start`; start must be in seconds
+      // so, format it as seconds first
+      filteredQuery.append('start', parseTimeString(value));
+    } else {
+      filteredQuery.append(key, value);
+    }
+  }
+
+  // Tests currently expect sorted parameters.
   filteredQuery.sort();
 
   query = filteredQuery.toString();
