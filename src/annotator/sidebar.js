@@ -67,7 +67,12 @@ export default class Sidebar {
    */
   constructor(element, eventBus, guest, config = {}) {
     this._emitter = eventBus.createEmitter();
+
+    /**
+     * The `<iframe>` element containing the sidebar application.
+     */
     this.iframe = createSidebarIframe(config);
+
     this.options = config;
 
     /** @type {BucketBar|null} */
@@ -190,13 +195,6 @@ export default class Sidebar {
     // Initial layout notification
     this._notifyOfLayoutChange(false);
     this._setupSidebarEvents();
-  }
-
-  /**
-   * Return a reference to the `Window` containing the sidebar application.
-   */
-  get sidebarWindow() {
-    return /** @type {Window} */ (this.iframe.contentWindow);
   }
 
   destroy() {

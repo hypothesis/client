@@ -68,7 +68,7 @@ function init() {
     sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
 
     // Expose sidebar window reference for use by same-origin guest frames.
-    window_.__hypothesis.sidebarWindow = sidebar.sidebarWindow;
+    window_.__hypothesis.sidebarWindow = sidebar.iframe.contentWindow;
   }
 
   // Clear `annotations` value from the notebook's config to prevent direct-linked
@@ -77,7 +77,7 @@ function init() {
 
   // Set up communication between this host/guest frame and the sidebar frame.
   const sidebarWindow = sidebar
-    ? sidebar.sidebarWindow
+    ? sidebar.iframe.contentWindow
     : /** @type {HypothesisWindow} */ (window.parent).__hypothesis
         ?.sidebarWindow;
   if (sidebarWindow) {
