@@ -15,27 +15,42 @@
   <h1>Hypothesis Client development server</h1>
   <p>Welcome to the Hypothesis client's development server.</p>
   <h2>Test HTML documents</h2>
-  <ul>
-    <li><a href="/document/burns">Poems and Songs of Robert Burns</a></li>
-    <li><a href="/document/doyle">The Disappearance of Lady Carfax, by Arthur Conan Doyle</a></li>
-    <li><a href="/document/tolstoy">Anna Karenina, by Leo Tolstoy</a></li>
-    <li><a href="/document/z-index">z-index test</a></li>
-    <li><a href="/document/shadow-dom">Shadow DOM test</a></li>
-    <li><a href="/document/parent-frame">Annotatable iframe test</a></li>
-    <li><a href="/document/sidebar-external-container">Sidebar in external container test</a></li>
-    <li><a href="/document/multi-frames">Multi-frame test</a></li>
-    <li><a href="/document/ignore-other-configuration"><code>ignoreOtherConfiguration</code> test</a></li>
-  </ul>
+    <h3>General HTML test documents</h3>
+    <p>These document test typical/simple scenarios.</p>
+    <ul>
+      <li><a href="/document/burns">Poems and Songs of Robert Burns</a></li>
+      <li><a href="/document/doyle">The Disappearance of Lady Carfax, by Arthur Conan Doyle</a></li>
+      <li><a href="/document/tolstoy">Anna Karenina, by Leo Tolstoy</a></li>
+    </ul>
+
+    <h3>Scenario HTML test documents</h3>
+    <p>These documents test less common scenarios and edge cases.</p>
+    <ul>
+      <li><a href="/document/z-index">Content with high <code>z-index</code> style</a></li>
+      <li><a href="/document/shadow-dom">Content in shadow DOM</a></li>
+      <li><a href="/document/parent-frame">Annotation-enabled iframe</a></li>
+      <li><a href="/document/sidebar-external-container">Sidebar in external container</a></li>
+      <li><a href="/document/multi-frames">Page containing multiple iframes with Hypothesis loaded</a></li>
+      <li><a href="/document/ignore-other-configuration"><code>ignoreOtherConfiguration</code>
+          configuration option enabled</a></li>
+    </ul>
 
   <h2>Test PDF documents</h2>
+  <h3>General test documents</h3>
+  <p>These documents test typical/simple scenarios.</p>
   <ul>
     <li><a href="/pdf/nils-olav">Brigadier Sir Nils Olav III</a></li>
-    <li><a href="/pdf/nils-olav" class="js-randomize-url">Brigadier Sir Nils Olav III</a> (randomized URL)</li>
     <li><a href="/pdf/budlong">The Budlong Pickle Company (Wikipedia)</a></li>
     <li><a href="/pdf/widdershins">Widdershins (Wikipedia)</a></li>
-    <li><a href="/pdf/painting"><em>The Development of British Landscape Painting in Water-Colours</em></a> (excerpt)
-      by Alexander J. Finberg & E.A. Taylor (this PDF does not have select-able text)</li>
-    <li><a href="/pdf/gatsby">The Great Gatsby</a> (full novel)</li>
+  </ul>
+
+  <h3>Scenario PDF test documents</h3>
+  <p>These documents test less common scenarios and edge cases.</p>
+  <ul>
+    <li><a href="/pdf/nils-olav" class="js-randomize-url">PDF with URL that changes on each
+        visit</a></li>
+    <li><a href="/pdf/painting">PDF without selectable text</a></li>
+    <li><a href="/pdf/gatsby">The Great Gatsby</a> (A long document)</li>
   </ul>
 
   <h2>Page feature tests</h2>
