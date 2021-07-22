@@ -145,6 +145,16 @@ describe('Sidebar', () => {
     });
   });
 
+  describe('#iframe', () => {
+    it('returns a reference to the `<iframe>` containing the sidebar', () => {
+      const sidebar = createSidebar();
+      const iframe = containers[0]
+        .querySelector('hypothesis-sidebar')
+        .shadowRoot.querySelector('iframe');
+      assert.equal(sidebar.iframe, iframe);
+    });
+  });
+
   function getConfigString(sidebar) {
     return sidebar.iframe.src;
   }
