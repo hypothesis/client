@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Guest frame in shadow root</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+    </style>
+    <template id="content-container-template">
+      <iframe src="/document/burns" width="100%" height="400"></iframe>
+    </template>
+    <script>
+      class ContentContainerElement extends HTMLElement {
+        constructor() {
+          super();
+
+          const template = document.getElementById(
+            'content-container-template'
+          );
+          const shadowRoot = this.attachShadow({ mode: 'open' });
+          shadowRoot.append(template.content.cloneNode(true));
+        }
+      }
+      customElements.define('content-container', ContentContainerElement);
+    </script>
+  </head>
+  <body>
+    <h2>Guest frame in shadow root</h2>
+    <p>
+      This is a test for when the Hypothesis client is loaded inside an
+      <code>&lt;iframe&gt;</code> which is in turn contained within a shadow root.
+      Such frames are <a href="https://github.com/WICG/webcomponents/issues/145">not
+      discoverable</a> via <code>window.frames</code>.
+    </p>
+    <content-container></content-container>
+  </body>
+</html>
