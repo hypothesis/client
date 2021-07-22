@@ -33,7 +33,21 @@ const appLinkEl = /** @type {Element} */ (
   )
 );
 
+/**
+ * Entry point for the part of the Hypothesis client that runs in the page being
+ * annotated.
+ *
+ * Depending on the client configuration in the current frame, this can
+ * initialize different functionality. In "host" frames the sidebar controls and
+ * iframe containing the sidebar application are created. In "guest" frames the
+ * functionality to support anchoring and creating annotations is loaded. An
+ * instance of Hypothesis will have one host frame, one sidebar frame and one or
+ * more guest frames. The most common case is that the host frame, where the
+ * client is initially loaded, is also the only guest frame.
+ */
 function init() {
+  // Create an internal global used to share data between same-origin guest and
+  // host frames.
   window_.__hypothesis = {};
 
   const annotatorConfig = getConfig('annotator');
@@ -47,10 +61,12 @@ function init() {
     documentType: isPDF ? 'pdf' : 'html',
   });
 
-  const sidebar = !annotatorConfig.subFrameIdentifier
-    ? new Sidebar(document.body, eventBus, guest, getConfig('sidebar'))
-    : null;
-  if (sidebar) {
+  // Create the sidebar if this is the host frame. The `subFrameIdentifier`
+  // config option indicates a non-host/guest-only frame.
+  let sidebar;
+  if (!annotatorConfig.subFrameIdentifier) {
+    sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
+
     // Expose sidebar window reference for use by same-origin guest frames.
     window_.__hypothesis.sidebarWindow = sidebar.sidebarWindow;
   }
@@ -59,7 +75,7 @@ function init() {
   // annotations from filtering the threads.
   const notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
-  // Setup guest <-> sidebar communication.
+  // Set up communication between this host/guest frame and the sidebar frame.
   const sidebarWindow = sidebar
     ? sidebar.sidebarWindow
     : /** @type {HypothesisWindow} */ (window.parent).__hypothesis
