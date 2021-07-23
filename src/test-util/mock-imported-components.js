@@ -38,7 +38,9 @@ function getDisplayName(component) {
 
 /**
  * Helper for use with `babel-plugin-mockable-imports` that mocks components
- * imported by a file.
+ * imported by a file. This will only mock components that are local to the
+ * package; it will not mock external components. This is to aid in catching
+ * integration issues, at the slight cost of unit isolation.
  *
  * Mocked components will have the same display name as the original component,
  * minus any wrappers (eg. `Widget` and `withServices(Widget)` both become
@@ -62,7 +64,7 @@ function getDisplayName(component) {
  */
 export default function mockImportedComponents() {
   return (source, symbol, value) => {
-    if (!isComponent(value)) {
+    if (!isComponent(value) || !source.startsWith('.')) {
       return null;
     }
 

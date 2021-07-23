@@ -50,7 +50,7 @@ describe('HelpPanel', () => {
       const wrapper = createComponent();
       const subHeader = wrapper.find('.HelpPanel__sub-panel-title');
 
-      assert.equal(subHeader.text(), 'Getting started');
+      assert.include(subHeader.text(), 'Getting started');
       assert.isTrue(wrapper.find('Tutorial').exists());
       assert.isFalse(wrapper.find('VersionInfo').exists());
     });
@@ -59,14 +59,14 @@ describe('HelpPanel', () => {
       const wrapper = createComponent();
       const link = wrapper.find('.HelpPanel__sub-panel-navigation-button');
 
-      assert.equal(link.text(), 'About this version');
+      assert.include(link.text(), 'About this version');
     });
 
     it('should switch to versionInfo sub-panel when footer link clicked', () => {
       const wrapper = createComponent();
       wrapper.find('.HelpPanel__sub-panel-navigation-button').simulate('click');
 
-      assert.equal(
+      assert.include(
         wrapper.find('.HelpPanel__sub-panel-title').text(),
         'About this version'
       );
@@ -88,7 +88,7 @@ describe('HelpPanel', () => {
 
       assert.isTrue(wrapper.find('VersionInfo').exists());
       assert.isFalse(wrapper.find('Tutorial').exists());
-      assert.equal(link.text(), 'Getting started');
+      assert.include(link.text(), 'Getting started');
     });
 
     it('should switch to tutorial sub-panel when link clicked', () => {

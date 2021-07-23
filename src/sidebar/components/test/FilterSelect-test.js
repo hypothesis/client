@@ -70,7 +70,7 @@ describe('FilterSelect', () => {
     assert.isTrue(icon.exists());
     assert.equal(icon.props().name, 'profile');
     // Default option should be selected as we didn't indicate a selected option
-    assert.equal(label.text(), 'all');
+    assert.include(label.text(), 'all');
   });
 
   it('should render provided title', () => {
