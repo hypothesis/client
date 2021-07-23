@@ -90,8 +90,8 @@ describe('MenuItem', () => {
 
   describe('icons', () => {
     it('renders an SVG icon if an icon name is provided', () => {
-      const wrapper = createMenuItem({ icon: 'an-svg-icon' });
-      assert.isTrue(wrapper.exists('SvgIcon[name="an-svg-icon"]'));
+      const wrapper = createMenuItem({ icon: 'edit' });
+      assert.isTrue(wrapper.exists('SvgIcon[name="edit"]'));
     });
 
     it('renders a blank space for an icon if `icon` is "blank"', () => {
@@ -108,7 +108,7 @@ describe('MenuItem', () => {
     });
 
     it('renders top-level menu item icons on the left', () => {
-      const wrapper = createMenuItem({ icon: 'an-svg-icon' });
+      const wrapper = createMenuItem({ icon: 'edit' });
       const iconSpaces = wrapper.find('.MenuItem__icon-container');
 
       // There should be only one icon space, on the left.
@@ -164,7 +164,7 @@ describe('MenuItem', () => {
 
     it('renders submenu item icons on the right', () => {
       const wrapper = createMenuItem({
-        icon: 'an-svg-icon',
+        icon: 'edit',
         isSubmenuItem: true,
         submenu: <div role="menuitem">Submenu content</div>,
       });
@@ -304,7 +304,7 @@ describe('MenuItem', () => {
         // eslint-disable-next-line react/display-name
         content: () => (
           <div role="menu">
-            <MenuItem label="Test" icon="an-svg-icon" />
+            <MenuItem label="Test" icon="edit" />
           </div>
         ),
       },

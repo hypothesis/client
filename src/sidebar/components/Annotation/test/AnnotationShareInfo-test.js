@@ -52,7 +52,7 @@ describe('AnnotationShareInfo', () => {
       const groupLink = wrapper.find('a');
 
       assert.equal(groupLink.prop('href'), fakeGroup.links.html);
-      assert.equal(groupLink.text(), fakeGroup.name);
+      assert.include(groupLink.text(), fakeGroup.name);
     });
 
     it('should display a group icon for private and restricted groups', () => {

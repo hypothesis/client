@@ -90,7 +90,7 @@ describe('TagEditor', () => {
     const wrapper = createComponent();
     wrapper.find('li').forEach((tag, i) => {
       assert.isTrue(tag.hasClass('TagEditor__item'));
-      assert.equal(tag.text(), fakeTags[i]);
+      assert.include(tag.text(), fakeTags[i]);
       assert.equal(tag.prop('aria-label'), `Tag: ${fakeTags[i]}`);
     });
   });
