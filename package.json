@@ -93,7 +93,7 @@
     "tiny-emitter": "^2.0.2",
     "typescript": "^4.0.2",
     "vinyl": "^2.2.0",
-    "watchify": "^3.7.0",
+    "watchify": "^4.0.0",
     "wrap-text": "^1.0.7"
   },
   "browserslist": "chrome 57, edge 17, firefox 53, safari 10.1",
