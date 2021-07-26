@@ -30,6 +30,7 @@ class FakeTextRange {
 
 describe('Guest', () => {
   const sandbox = sinon.createSandbox();
+  let eventBus;
   let highlighter;
   let guestConfig;
   let rangeUtil;
@@ -47,7 +48,7 @@ describe('Guest', () => {
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
-    const eventBus = new EventBus();
+    eventBus = new EventBus();
     const guest = new Guest(element, eventBus, { ...guestConfig, ...config });
     guests.push(guest);
     return guest;
@@ -137,9 +138,7 @@ describe('Guest', () => {
   describe('cross frame', () => {
     it('provides an event bus for the annotation sync module', () => {
       createGuest();
-      const options = CrossFrame.lastCall.args[1];
-      assert.isFunction(options.on);
-      assert.isFunction(options.emit);
+      assert.deepEqual(CrossFrame.lastCall.args[1], eventBus);
     });
 
     it('publishes the "panelReady" event when a connection is established', () => {
@@ -151,20 +150,24 @@ describe('Guest', () => {
     });
 
     describe('event subscription', () => {
-      let options;
+      let emitter;
       let guest;
 
       beforeEach(() => {
         guest = createGuest();
-        options = CrossFrame.lastCall.args[1];
+        emitter = eventBus.createEmitter();
+      });
+
+      afterEach(() => {
+        emitter.destroy();
       });
 
       it('proxies the event into the annotator event system', () => {
         const fooHandler = sandbox.stub();
         const barHandler = sandbox.stub();
 
-        options.on('foo', fooHandler);
-        options.on('bar', barHandler);
+        emitter.subscribe('foo', fooHandler);
+        emitter.subscribe('bar', barHandler);
 
         guest._emitter.publish('foo', '1', '2');
         guest._emitter.publish('bar', '1', '2');
@@ -175,18 +178,18 @@ describe('Guest', () => {
     });
 
     describe('event publication', () => {
-      let options;
+      let emitter;
       let guest;
 
       beforeEach(() => {
         guest = createGuest();
-        options = CrossFrame.lastCall.args[1];
+        emitter = eventBus.createEmitter();
       });
 
       it('detaches annotations on "annotationDeleted"', () => {
         const ann = { id: 1, $tag: 'tag1' };
         sandbox.stub(guest, 'detach');
-        options.emit('annotationDeleted', ann);
+        emitter.publish('annotationDeleted', ann);
         assert.calledOnce(guest.detach);
         assert.calledWith(guest.detach, ann);
       });
@@ -195,7 +198,7 @@ describe('Guest', () => {
         const ann1 = { id: 1, $tag: 'tag1' };
         const ann2 = { id: 2, $tag: 'tag2' };
         sandbox.stub(guest, 'anchor');
-        options.emit('annotationsLoaded', [ann1, ann2]);
+        emitter.publish('annotationsLoaded', [ann1, ann2]);
         assert.calledTwice(guest.anchor);
         assert.calledWith(guest.anchor, ann1);
         assert.calledWith(guest.anchor, ann2);
@@ -208,8 +211,8 @@ describe('Guest', () => {
         guest._emitter.subscribe('foo', fooHandler);
         guest._emitter.subscribe('bar', barHandler);
 
-        options.emit('foo', '1', '2');
-        options.emit('bar', '1', '2');
+        emitter.publish('foo', '1', '2');
+        emitter.publish('bar', '1', '2');
 
         assert.calledWith(fooHandler, '1', '2');
         assert.calledWith(barHandler, '1', '2');

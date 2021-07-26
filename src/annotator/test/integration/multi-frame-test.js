@@ -9,7 +9,7 @@ describe('CrossFrame multi-frame scenario', () => {
   let proxyBridge;
   let container;
   let crossFrame;
-  let options;
+  let config;
 
   const sandbox = sinon.createSandbox();
 
@@ -24,7 +24,7 @@ describe('CrossFrame multi-frame scenario', () => {
       call: sandbox.stub(),
       destroy: sandbox.stub(),
     };
-    fakeAnnotationSync = {};
+    fakeAnnotationSync = { destroy: sandbox.stub() };
     proxyAnnotationSync = sandbox.stub().returns(fakeAnnotationSync);
     proxyBridge = sandbox.stub().returns(fakeBridge);
 
@@ -36,12 +36,8 @@ describe('CrossFrame multi-frame scenario', () => {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    options = {
-      config: {
-        clientUrl: 'data:,', // empty data uri
-      },
-      on: sandbox.stub(),
-      emit: sandbox.stub(),
+    config = {
+      clientUrl: 'data:,', // empty data uri
     };
 
     crossFrame = null;
@@ -56,7 +52,8 @@ describe('CrossFrame multi-frame scenario', () => {
   });
 
   function createCrossFrame() {
-    return new CrossFrame(container, options);
+    const eventBus = {};
+    return new CrossFrame(container, eventBus, config);
   }
 
   it('detects frames on page', () => {
@@ -125,7 +122,7 @@ describe('CrossFrame multi-frame scenario', () => {
         assert(scriptElement, 'expected embed script to be injected');
         assert.equal(
           scriptElement.src,
-          options.config.clientUrl,
+          config.clientUrl,
           'unexpected embed script source'
         );
         resolve();

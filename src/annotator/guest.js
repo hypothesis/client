@@ -165,11 +165,7 @@ export default class Guest {
     this._frameIdentifier = config.subFrameIdentifier || null;
 
     // Setup connection to sidebar.
-    this.crossframe = new CrossFrame(this.element, {
-      config,
-      on: (event, handler) => this._emitter.subscribe(event, handler),
-      emit: (event, ...args) => this._emitter.publish(event, ...args),
-    });
+    this.crossframe = new CrossFrame(this.element, eventBus, config);
     this.crossframe.onConnect(() => this._setupInitialState(config));
     this._connectSidebarEvents();
 
