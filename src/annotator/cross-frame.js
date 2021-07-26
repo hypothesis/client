@@ -6,6 +6,7 @@ import FrameObserver from './frame-observer';
 /**
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -22,15 +23,12 @@ import FrameObserver from './frame-observer';
 export class CrossFrame {
   /**
    * @param {Element} element
-   * @param {object} options
-   *   @param {Record<string, any>} options.config,
-   *   @param {(event: string, ...args: any[]) => void} options.on
-   *   @param {(event: string, ...args: any[]) => void } options.emit
+   * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
+   * @param {Record<string, any>} config
    */
-  constructor(element, options) {
-    const { config, on, emit } = options;
+  constructor(element, eventBus, config) {
     const bridge = new Bridge();
-    const annotationSync = new AnnotationSync(bridge, { on, emit });
+    const annotationSync = new AnnotationSync(eventBus, bridge);
     const frameObserver = new FrameObserver(element);
     const frameIdentifiers = new Map();
 
@@ -88,6 +86,7 @@ export class CrossFrame {
      */
     this.destroy = () => {
       bridge.destroy();
+      annotationSync.destroy();
       frameObserver.disconnect();
     };
 

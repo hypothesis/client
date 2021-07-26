@@ -1,20 +1,17 @@
 import { CrossFrame, $imports } from '../cross-frame';
 
 describe('CrossFrame', () => {
-  let fakeBridge;
   let fakeAnnotationSync;
+  let fakeBridge;
+  let fakeEventBus;
 
-  let proxyBridge;
   let proxyAnnotationSync;
+  let proxyBridge;
 
-  const createCrossFrame = options => {
-    const defaults = {
-      config: {},
-      on: sinon.stub(),
-      emit: sinon.stub(),
-    };
+  const createCrossFrame = (options = {}) => {
+    fakeEventBus = {};
     const element = document.createElement('div');
-    return new CrossFrame(element, { ...defaults, ...options });
+    return new CrossFrame(element, fakeEventBus, options);
   };
 
   beforeEach(() => {
@@ -26,7 +23,7 @@ describe('CrossFrame', () => {
       on: sinon.stub(),
     };
 
-    fakeAnnotationSync = { sync: sinon.stub() };
+    fakeAnnotationSync = { sync: sinon.stub(), destroy: sinon.stub() };
 
     proxyAnnotationSync = sinon.stub().returns(fakeAnnotationSync);
     proxyBridge = sinon.stub().returns(fakeBridge);
@@ -49,10 +46,7 @@ describe('CrossFrame', () => {
 
     it('passes along options to AnnotationSync', () => {
       createCrossFrame();
-      assert.calledWith(proxyAnnotationSync, fakeBridge, {
-        on: sinon.match.func,
-        emit: sinon.match.func,
-      });
+      assert.calledWith(proxyAnnotationSync, fakeEventBus, fakeBridge);
     });
   });
 
@@ -92,6 +86,12 @@ describe('CrossFrame', () => {
       const cf = createCrossFrame();
       cf.destroy();
       assert.called(fakeBridge.destroy);
+    });
+
+    it('destroys the AnnotationSync object', () => {
+      const cf = createCrossFrame();
+      cf.destroy();
+      assert.called(fakeAnnotationSync.destroy);
     });
   });
 
