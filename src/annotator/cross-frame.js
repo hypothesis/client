@@ -4,6 +4,7 @@ import * as frameUtil from './util/frame-util';
 import FrameObserver from './frame-observer';
 
 /**
+ * @typedef {import('../shared/frame-rpc').RPC} RPC
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('./util/emitter').EventBus} EventBus
@@ -27,9 +28,9 @@ export class CrossFrame {
    * @param {Record<string, any>} config
    */
   constructor(element, eventBus, config) {
-    const bridge = new Bridge();
-    const annotationSync = new AnnotationSync(eventBus, bridge);
-    const frameObserver = new FrameObserver(element);
+    this.bridge = new Bridge();
+    this.annotationSync = new AnnotationSync(eventBus, this.bridge);
+    this.frameObserver = new FrameObserver(element);
     const frameIdentifiers = new Map();
 
     /**
@@ -55,70 +56,87 @@ export class CrossFrame {
     };
 
     const iframeUnloaded = frame => {
-      bridge.call('destroyFrame', frameIdentifiers.get(frame));
+      this.bridge.call('destroyFrame', frameIdentifiers.get(frame));
       frameIdentifiers.delete(frame);
     };
 
-    frameObserver.observe(injectIntoFrame, iframeUnloaded);
+    this.frameObserver.observe(injectIntoFrame, iframeUnloaded);
+  }
 
-    /**
-     * Attempt to connect to the sidebar frame.
-     *
-     * Returns a promise that resolves once the connection has been established.
-     *
-     * @param {Window} frame - The window containing the sidebar application
-     * @param {string} origin - Origin of the sidebar application (eg. 'https://hypothes.is/')
-     */
-    this.connectToSidebar = (frame, origin) => {
-      const channel = new MessageChannel();
-      frame.postMessage(
-        {
-          type: 'hypothesisGuestReady',
-        },
-        origin,
-        [channel.port2]
-      );
-      bridge.createChannel(channel.port1);
-    };
+  /**
+   * Attempt to connect to the sidebar frame.
+   *
+   * Returns a promise that resolves once the connection has been established.
+   *
+   * @param {Window} frame - The window containing the sidebar application
+   * @param {string} origin - Origin of the sidebar application (eg. 'https://hypothes.is/')
+   */
+  connectToSidebar(frame, origin) {
+    const channel = new MessageChannel();
+    frame.postMessage(
+      {
+        type: 'hypothesisGuestReady',
+      },
+      origin,
+      [channel.port2]
+    );
+    this.bridge.createChannel(channel.port1);
+  }
 
-    /**
-     * Remove the connection between the sidebar and annotator.
-     */
-    this.destroy = () => {
-      bridge.destroy();
-      annotationSync.destroy();
-      frameObserver.disconnect();
-    };
+  /**
+   * Remove the connection between the sidebar and annotator.
+   */
+  destroy() {
+    this.bridge.destroy();
+    this.annotationSync.destroy();
+    this.frameObserver.disconnect();
+  }
 
-    /**
-     * Notify the sidebar about new annotations created in the page.
-     *
-     * @param {AnnotationData[]} annotations
-     */
-    this.sync = annotations => annotationSync.sync(annotations);
+  /**
+   * Notify the sidebar about new annotations created in the page.
+   *
+   * @param {AnnotationData[]} annotations
+   */
+  sync(annotations) {
+    this.annotationSync.sync(annotations);
+  }
 
-    /**
-     * Subscribe to an event from the sidebar.
-     *
-     * @param {string} event
-     * @param {(...args: any[]) => void} callback
-     */
-    this.on = (event, callback) => bridge.on(event, callback);
+  /**
+   * Subscribe to an event from the sidebar.
+   *
+   * @param {string} method
+   * @param {(...args: any[]) => void} listener -- Final argument is an optional
+   *   callback of the type: `(error: string|Error|null, ...result: any[]) => void`.
+   *   This callback must be invoked in order to respond (via `postMessage`)
+   *   to the other frame/s with a result or an error.
+   * @throws {Error} If trying to register a callback after a channel has already been created
+   * @throws {Error} If trying to register a callback with the same name multiple times
+   */
+  on(method, listener) {
+    this.bridge.on(method, listener);
+  }
 
-    /**
-     * Call an RPC method exposed by the sidebar to the annotator.
-     *
-     * @param {string} method
-     * @param {any[]} args
-     */
-    this.call = (method, ...args) => bridge.call(method, ...args);
+  /**
+   * Call an RPC method exposed by the sidebar to the annotator.
+   *
+   * @param {string} method
+   * @param {any[]} args - Arguments to method. Final argument is an optional
+   *   callback with this type: `(error: string|Error|null, ...result: any[]) => void`.
+   *   This callback, if any, will be triggered once a response (via `postMessage`)
+   *   comes back from the other frame/s. If the first argument (error) is `null`
+   *   it means successful execution of the whole remote procedure call.
+   */
+  call(method, ...args) {
+    this.bridge.call(method, ...args);
+  }
 
-    /**
-     * Register a callback to be invoked once the connection to the sidebar
-     * is set up.
-     *
-     * @param {(...args: any[]) => void} callback
-     */
-    this.onConnect = callback => bridge.onConnect(callback);
+  /**
+   * Register a callback to be invoked once the connection to the sidebar
+   * is set up.
+   *
+   * @param {(channel: RPC) => void} callback
+   */
+  onConnect(callback) {
+    this.bridge.onConnect(callback);
   }
 }
