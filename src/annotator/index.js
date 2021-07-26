@@ -27,7 +27,7 @@ const window_ = /** @type {HypothesisWindow} */ (window);
 
 // Look up the URL of the sidebar. This element is added to the page by the
 // boot script before the "annotator" bundle loads.
-const appLinkEl = /** @type {Element} */ (
+const sidebarLinkElement = /** @type {HTMLLinkElement} */ (
   document.querySelector(
     'link[type="application/annotator+html"][rel="sidebar"]'
   )
@@ -68,7 +68,9 @@ function init() {
     sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
 
     // Expose sidebar window reference for use by same-origin guest frames.
-    window_.__hypothesis.sidebarWindow = sidebar.iframe.contentWindow;
+    window_.__hypothesis.sidebarWindow = sidebar.ready.then(
+      () => sidebar.iframe.contentWindow
+    );
   }
 
   // Clear `annotations` value from the notebook's config to prevent direct-linked
@@ -76,12 +78,14 @@ function init() {
   const notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
   // Set up communication between this host/guest frame and the sidebar frame.
-  const sidebarWindow = sidebar
-    ? sidebar.iframe.contentWindow
-    : /** @type {HypothesisWindow} */ (window.parent).__hypothesis
-        ?.sidebarWindow;
+  const sidebarWindow =
+    window_.__hypothesis.sidebarWindow ||
+    /** @type {HypothesisWindow} */ (window.parent).__hypothesis?.sidebarWindow;
   if (sidebarWindow) {
-    guest.crossframe.connectToSidebar(sidebarWindow);
+    const sidebarOrigin = new URL(sidebarLinkElement.href).origin;
+    sidebarWindow.then(frame =>
+      guest.crossframe.connectToSidebar(frame, sidebarOrigin)
+    );
   } else {
     // eslint-disable-next-line no-console
     console.warn(
@@ -89,7 +93,7 @@ function init() {
     );
   }
 
-  appLinkEl.addEventListener('destroy', () => {
+  sidebarLinkElement.addEventListener('destroy', () => {
     delete window_.__hypothesis;
     sidebar?.destroy();
 

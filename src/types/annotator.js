@@ -143,7 +143,9 @@
  * @prop {import('./pdfjs').PDFViewerApplication} [PDFViewerApplication] -
  *   PDF.js entry point. If set, triggers loading of PDF rather than HTML integration.
  * @prop {object} [__hypothesis] - Internal data related to supporting guests in iframes
- *   @prop {Window} [sidebarWindow] - The sidebar window that is active in this frame.
+ *   @prop {Promise<Window>} [__hypothesis.sidebarWindow] -
+ *     The sidebar window that is active in this frame. This resolves once the sidebar
+ *     application has started and is ready to connect to guests.
  */
 
 /**

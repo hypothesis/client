@@ -1,11 +1,9 @@
 import { CrossFrame, $imports } from '../cross-frame';
 
 describe('CrossFrame', () => {
-  let fakeDiscovery;
   let fakeBridge;
   let fakeAnnotationSync;
 
-  let proxyDiscovery;
   let proxyBridge;
   let proxyAnnotationSync;
 
@@ -20,11 +18,6 @@ describe('CrossFrame', () => {
   };
 
   beforeEach(() => {
-    fakeDiscovery = {
-      startDiscovery: sinon.stub(),
-      stopDiscovery: sinon.stub(),
-    };
-
     fakeBridge = {
       destroy: sinon.stub(),
       createChannel: sinon.stub(),
@@ -36,13 +29,11 @@ describe('CrossFrame', () => {
     fakeAnnotationSync = { sync: sinon.stub() };
 
     proxyAnnotationSync = sinon.stub().returns(fakeAnnotationSync);
-    proxyDiscovery = sinon.stub().returns(fakeDiscovery);
     proxyBridge = sinon.stub().returns(fakeBridge);
 
     $imports.$mock({
       './annotation-sync': proxyAnnotationSync,
       '../shared/bridge': proxyBridge,
-      '../shared/discovery': proxyDiscovery,
     });
   });
 
@@ -51,21 +42,6 @@ describe('CrossFrame', () => {
   });
 
   describe('CrossFrame constructor', () => {
-    it('instantiates the Discovery component', () => {
-      createCrossFrame();
-      assert.calledWith(proxyDiscovery, window);
-    });
-
-    it('passes the options along to the bridge', () => {
-      createCrossFrame({ server: true });
-      assert.calledWith(proxyDiscovery, window, { server: true });
-    });
-
-    it('instantiates the CrossFrame component', () => {
-      createCrossFrame();
-      assert.calledWith(proxyDiscovery);
-    });
-
     it('instantiates the AnnotationSync component', () => {
       createCrossFrame();
       assert.called(proxyAnnotationSync);
@@ -81,34 +57,37 @@ describe('CrossFrame', () => {
   });
 
   describe('#connectToSidebar', () => {
-    it('starts the discovery of new channels', async () => {
+    it('sends a `hypothesisGuestReady` notification to the sidebar', async () => {
       const cf = createCrossFrame();
-      const sidebarFrame = {};
-      fakeDiscovery.startDiscovery.callsFake((callback, frames) => {
-        setTimeout(() => callback(frames[0], 'ORIGIN', 'TOKEN'), 0);
-      });
+      const sidebarFrame = { postMessage: sinon.stub() };
+      const sidebarOrigin = 'https://dummy.hypothes.is/';
 
-      await cf.connectToSidebar(sidebarFrame);
+      cf.connectToSidebar(sidebarFrame, sidebarOrigin);
 
-      assert.calledWith(fakeDiscovery.startDiscovery, sinon.match.func, [
-        sidebarFrame,
-      ]);
-      assert.called(fakeBridge.createChannel);
-      assert.calledWith(fakeBridge.createChannel, {
-        source: sidebarFrame,
-        origin: 'ORIGIN',
-        token: 'TOKEN',
-      });
+      assert.calledWith(
+        sidebarFrame.postMessage,
+        {
+          type: 'hypothesisGuestReady',
+          port: sinon.match.instanceOf(MessagePort),
+        },
+        sidebarOrigin
+      );
+    });
+
+    it('creates a channel for communication with the sidebar', () => {
+      const cf = createCrossFrame();
+      const sidebarFrame = { postMessage: sinon.stub() };
+
+      cf.connectToSidebar(sidebarFrame);
+
+      assert.calledWith(
+        fakeBridge.createChannel,
+        sinon.match.instanceOf(MessagePort)
+      );
     });
   });
 
   describe('#destroy', () => {
-    it('stops the discovery of new frames', () => {
-      const cf = createCrossFrame();
-      cf.destroy();
-      assert.called(fakeDiscovery.stopDiscovery);
-    });
-
     it('destroys the bridge object', () => {
       const cf = createCrossFrame();
       cf.destroy();

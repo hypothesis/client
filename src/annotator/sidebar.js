@@ -195,6 +195,21 @@ export default class Sidebar {
     // Initial layout notification
     this._notifyOfLayoutChange(false);
     this._setupSidebarEvents();
+
+    /**
+     * A promise that resolves when the sidebar application is ready to
+     * communicate with the host and guest frames.
+     *
+     * @type {Promise<void>}
+     */
+    this.ready = new Promise(resolve => {
+      this._listeners.add(window, 'message', event => {
+        const data = /** @type {MessageEvent} */ (event).data;
+        if (data?.type === 'hypothesisSidebarReady') {
+          resolve();
+        }
+      });
+    });
   }
 
   destroy() {
