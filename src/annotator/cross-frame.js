@@ -1,6 +1,5 @@
 import AnnotationSync from './annotation-sync';
 import Bridge from '../shared/bridge';
-import Discovery from '../shared/discovery';
 import * as frameUtil from './util/frame-util';
 import FrameObserver from './frame-observer';
 
@@ -25,13 +24,11 @@ export class CrossFrame {
    * @param {Element} element
    * @param {object} options
    *   @param {Record<string, any>} options.config,
-   *   @param {boolean} [options.server]
    *   @param {(event: string, ...args: any[]) => void} options.on
    *   @param {(event: string, ...args: any[]) => void } options.emit
    */
   constructor(element, options) {
-    const { config, server, on, emit } = options;
-    const discovery = new Discovery(window, { server });
+    const { config, on, emit } = options;
     const bridge = new Bridge();
     const annotationSync = new AnnotationSync(bridge, { on, emit });
     const frameObserver = new FrameObserver(element);
@@ -46,7 +43,8 @@ export class CrossFrame {
       }
 
       frameUtil.isLoaded(frame, () => {
-        const subFrameIdentifier = discovery.generateToken();
+        // Generate a random string to use as a frame ID. The format is not important.
+        const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
         frameIdentifiers.set(frame, subFrameIdentifier);
         const injectedConfig = {
           ...config,
@@ -71,18 +69,19 @@ export class CrossFrame {
      * Returns a promise that resolves once the connection has been established.
      *
      * @param {Window} frame - The window containing the sidebar application
-     * @return {Promise<void>}
+     * @param {string} origin - Origin of the sidebar application (eg. 'https://hypothes.is/')
      */
-    this.connectToSidebar = frame => {
-      return new Promise(resolve => {
-        discovery.startDiscovery(
-          (source, origin, token) => {
-            bridge.createChannel({ source, origin, token });
-            resolve();
-          },
-          [frame]
-        );
-      });
+    this.connectToSidebar = (frame, origin) => {
+      const channel = new MessageChannel();
+      frame.postMessage(
+        {
+          type: 'hypothesisGuestReady',
+          port: channel.port2,
+        },
+        origin,
+        [channel.port2]
+      );
+      bridge.createChannel(channel.port1);
     };
 
     /**
@@ -90,7 +89,6 @@ export class CrossFrame {
      */
     this.destroy = () => {
       bridge.destroy();
-      discovery.stopDiscovery();
       frameObserver.disconnect();
     };
 

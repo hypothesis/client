@@ -155,6 +155,27 @@ describe('Sidebar', () => {
     });
   });
 
+  describe('#ready', () => {
+    it('returns a promise that resolves when `hypothesisSidebarReady` message is received', async () => {
+      const sidebar = createSidebar();
+
+      // Check `sidebar.ready` is not resolved before `hypothesisSidebarReady`
+      // message is received.
+      assert.equal(
+        await Promise.race([sidebar.ready, Promise.resolve('not-ready')]),
+        'not-ready'
+      );
+
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { type: 'hypothesisSidebarReady' },
+        })
+      );
+
+      return sidebar.ready;
+    });
+  });
+
   function getConfigString(sidebar) {
     return sidebar.iframe.src;
   }

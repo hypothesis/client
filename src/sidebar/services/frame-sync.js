@@ -1,7 +1,6 @@
 import debounce from 'lodash.debounce';
 
 import bridgeEvents from '../../shared/bridge-events';
-import Discovery from '../../shared/discovery';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
@@ -46,13 +45,15 @@ export function formatAnnot(ann) {
  */
 export class FrameSyncService {
   /**
+   * @param {Window} $window - Test seam
    * @param {import('./annotations').AnnotationsService} annotationsService
    * @param {import('../../shared/bridge').default} bridge
    * @param {import('../store').SidebarStore} store
    */
-  constructor(annotationsService, bridge, store) {
+  constructor($window, annotationsService, bridge, store) {
     this._bridge = bridge;
     this._store = store;
+    this._window = $window;
 
     // Set of tags of annotations that are currently loaded into the frame
     const inFrame = new Set();
@@ -235,16 +236,29 @@ export class FrameSyncService {
       });
     };
 
-    const discovery = new Discovery(window, { server: true });
-    discovery.startDiscovery(
-      (source, origin, token) =>
-        this._bridge.createChannel({ source, origin, token }),
-      [
-        // Ping the host frame which is in most cases also the only guest.
-        window.parent,
-      ]
-    );
     this._bridge.onConnect(addFrame);
+
+    // Listen for messages from new guest frames that want to connect.
+    //
+    // The message will include a `MessagePort` to use for communication with
+    // the guest. Communication with the host currently relies on the host
+    // frame also always being a guest frame.
+    this._window.addEventListener('message', e => {
+      if (e.data?.type !== 'hypothesisGuestReady') {
+        return;
+      }
+      const port = /** @type {unknown} */ (e.data.port);
+      if (!(port instanceof MessagePort)) {
+        console.warn(
+          'Ignoring `hypothesisGuestReady` message without a MessagePort'
+        );
+        return;
+      }
+      this._bridge.createChannel(port);
+    });
+
+    // Notify host frame that it is ready for guests to connect to it.
+    this._window.parent.postMessage({ type: 'hypothesisSidebarReady' }, '*');
 
     this._setupSyncToFrame();
     this._setupSyncFromFrame();

@@ -6,6 +6,13 @@ import createFakeStore from '../../test/fake-redux-store';
 
 import { FrameSyncService, $imports, formatAnnot } from '../frame-sync';
 
+class FakeWindow extends EventTarget {
+  constructor() {
+    super();
+    this.postMessage = sinon.stub();
+  }
+}
+
 const fixtures = {
   ann: Object.assign({ $tag: 't1' }, annotationFixtures.defaultAnnotation()),
 
@@ -50,8 +57,8 @@ describe('FrameSyncService', () => {
   let fakeAnnotationsService;
   let fakeStore;
   let fakeBridge;
-  let fakeDiscovery;
   let frameSync;
+  let fakeWindow;
 
   beforeEach(() => {
     fakeStore = createFakeStore(
@@ -89,16 +96,11 @@ describe('FrameSyncService', () => {
       emit: emitter.emit.bind(emitter),
     };
 
-    fakeDiscovery = {
-      startDiscovery: sinon.stub(),
-    };
-    const FakeDiscovery = sinon.stub().returns(fakeDiscovery);
-
-    $imports.$mock({
-      '../../shared/discovery': FakeDiscovery,
-    });
+    fakeWindow = new FakeWindow();
+    fakeWindow.parent = new FakeWindow();
 
     frameSync = new Injector()
+      .register('$window', { value: fakeWindow })
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('bridge', { value: fakeBridge })
       .register('store', { value: fakeStore })
@@ -111,20 +113,57 @@ describe('FrameSyncService', () => {
   });
 
   describe('#connect', () => {
-    it('establishes a connection to the parent host/guest frame', () => {
-      fakeDiscovery.startDiscovery.callsFake((callback, frames) => {
-        callback(frames[0], 'ORIGIN', 'TOKEN');
-      });
+    beforeEach(() => {
+      sinon.stub(console, 'warn');
+    });
 
+    afterEach(() => {
+      console.warn.restore();
+    });
+
+    it('notifies host window that sidebar application is ready', () => {
       frameSync.connect();
 
-      assert.calledWith(fakeDiscovery.startDiscovery, sinon.match.func, [
-        window.parent,
-      ]);
-      assert.calledWith(fakeBridge.createChannel, {
-        source: window.parent,
-        origin: 'ORIGIN',
-        token: 'TOKEN',
+      assert.calledWith(fakeWindow.parent.postMessage, {
+        type: 'hypothesisSidebarReady',
+      });
+    });
+
+    it('connects to new guests when they are ready', () => {
+      const channel = new MessageChannel();
+
+      frameSync.connect();
+      fakeWindow.dispatchEvent(
+        new MessageEvent('message', {
+          data: { type: 'hypothesisGuestReady', port: channel.port1 },
+        })
+      );
+
+      assert.calledWith(fakeBridge.createChannel, channel.port1);
+    });
+
+    [
+      'not-an-object',
+      {},
+      { type: 'unknownType' },
+      {
+        // Missing `port` property
+        type: 'hypothesisGuestReady',
+      },
+      {
+        // `port` property is not a MessagePort
+        type: 'hypothesisGuestReady',
+        port: {},
+      },
+    ].forEach(message => {
+      it('ignores `hypothesisGuestReady` messages that are invalid', () => {
+        fakeWindow.dispatchEvent(
+          new MessageEvent('message', {
+            data: message,
+          })
+        );
+
+        assert.notCalled(fakeBridge.createChannel);
       });
     });
   });
