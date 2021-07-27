@@ -153,8 +153,8 @@ describe('FrameSyncService', () => {
       },
     ].forEach(messageInit => {
       it('ignores `hypothesisGuestReady` messages that are invalid', () => {
+        frameSync.connect();
         fakeWindow.dispatchEvent(new MessageEvent('message', messageInit));
-
         assert.notCalled(fakeBridge.createChannel);
       });
     });
