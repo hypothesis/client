@@ -247,13 +247,13 @@ export class FrameSyncService {
       if (e.data?.type !== 'hypothesisGuestReady') {
         return;
       }
-      const port = /** @type {unknown} */ (e.data.port);
-      if (!(port instanceof MessagePort)) {
+      if (e.ports.length === 0) {
         console.warn(
           'Ignoring `hypothesisGuestReady` message without a MessagePort'
         );
         return;
       }
+      const port = e.ports[0];
       this._bridge.createChannel(port);
     });
 

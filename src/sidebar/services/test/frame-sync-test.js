@@ -135,7 +135,8 @@ describe('FrameSyncService', () => {
       frameSync.connect();
       fakeWindow.dispatchEvent(
         new MessageEvent('message', {
-          data: { type: 'hypothesisGuestReady', port: channel.port1 },
+          data: { type: 'hypothesisGuestReady' },
+          ports: [channel.port1],
         })
       );
 
@@ -143,25 +144,16 @@ describe('FrameSyncService', () => {
     });
 
     [
-      'not-an-object',
-      {},
-      { type: 'unknownType' },
+      { data: 'not-an-object' },
+      { data: {} },
+      { data: { type: 'unknownType' } },
       {
-        // Missing `port` property
-        type: 'hypothesisGuestReady',
+        // No ports provided with message
+        data: { type: 'hypothesisGuestReady' },
       },
-      {
-        // `port` property is not a MessagePort
-        type: 'hypothesisGuestReady',
-        port: {},
-      },
-    ].forEach(message => {
+    ].forEach(messageInit => {
       it('ignores `hypothesisGuestReady` messages that are invalid', () => {
-        fakeWindow.dispatchEvent(
-          new MessageEvent('message', {
-            data: message,
-          })
-        );
+        fakeWindow.dispatchEvent(new MessageEvent('message', messageInit));
 
         assert.notCalled(fakeBridge.createChannel);
       });
