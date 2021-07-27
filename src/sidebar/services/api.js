@@ -90,7 +90,9 @@ function get(object, path) {
  * @param {Promise<RouteMap>} links - API route data from API index endpoint (`/api/`)
  * @param {string} route - The dotted path of the named API route (eg. `annotation.create`)
  * @param {APIMethodCallbacks} callbacks
- * @return {APICall<Record<string, any>, object, object>}
+ * @return {APICall<Record<string, any>, object, object>} - Function that makes
+ *   an API call. The returned `APICall` has generic parameter, body and return types.
+ *   This can be cast to an `APICall` with more specific types.
  */
 function createAPICall(
   links,
