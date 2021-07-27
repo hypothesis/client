@@ -68,9 +68,9 @@ describe('CrossFrame', () => {
         sidebarFrame.postMessage,
         {
           type: 'hypothesisGuestReady',
-          port: sinon.match.instanceOf(MessagePort),
         },
-        sidebarOrigin
+        sidebarOrigin,
+        [sinon.match.instanceOf(MessagePort)]
       );
     });
 

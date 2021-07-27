@@ -76,7 +76,6 @@ export class CrossFrame {
       frame.postMessage(
         {
           type: 'hypothesisGuestReady',
-          port: channel.port2,
         },
         origin,
         [channel.port2]
