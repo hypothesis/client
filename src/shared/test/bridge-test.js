@@ -100,7 +100,7 @@ describe('shared/bridge', () => {
 
   describe('#call', () => {
     it('returns an empty array calling a RPC method before a channel is created', async () => {
-      const results = await bridge.call('method1', 'params1');
+      const results = await bridge.call('method1', 'param1');
       assert.deepEqual(results, []);
     });
 

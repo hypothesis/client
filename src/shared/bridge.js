@@ -147,6 +147,9 @@ export default class Bridge {
    *   This callback, if any, will be triggered once a response (via `postMessage`)
    *   comes back from the other frame/s. If the first argument (error) is `null`
    *   it means successful execution of the whole remote procedure call.
+   *   TODO: July 2021, it has been suggested to retire the callback API and rely
+   *   solely on the `Promise`-based API
+   *   (see https://github.com/hypothesis/client/pull/3598#discussion_r678096863).
    * @return {Promise<any[]>} - Array of results, one per connected frame
    */
   call(method, ...args) {
