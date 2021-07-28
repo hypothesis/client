@@ -78,9 +78,15 @@ function init() {
   const notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
   // Set up communication between this host/guest frame and the sidebar frame.
-  const sidebarWindow =
-    window_.__hypothesis.sidebarWindow ||
-    /** @type {HypothesisWindow} */ (window.parent).__hypothesis?.sidebarWindow;
+  let sidebarWindow = window_.__hypothesis.sidebarWindow;
+  try {
+    sidebarWindow = /** @type {HypothesisWindow} */ (window.parent).__hypothesis
+      ?.sidebarWindow;
+  } catch {
+    // `window.parent` access can fail due to it being cross-origin. This is
+    // handled below.
+  }
+
   if (sidebarWindow) {
     const sidebarOrigin = new URL(sidebarLinkElement.href).origin;
     sidebarWindow.then(frame =>
@@ -89,7 +95,8 @@ function init() {
   } else {
     // eslint-disable-next-line no-console
     console.warn(
-      `Hypothesis guest frame in ${location.origin} could not find a sidebar to connect to`
+      `Hypothesis guest frame in ${location.origin} could not find a sidebar to connect to.
+Guest frames can only connect to sidebars in their same-origin parent frame.`
     );
   }
 
