@@ -28,9 +28,9 @@ export class CrossFrame {
    * @param {Record<string, any>} config
    */
   constructor(element, eventBus, config) {
-    this.bridge = new Bridge();
-    this.annotationSync = new AnnotationSync(eventBus, this.bridge);
-    this.frameObserver = new FrameObserver(element);
+    this._bridge = new Bridge();
+    this._annotationSync = new AnnotationSync(eventBus, this._bridge);
+    this._frameObserver = new FrameObserver(element);
     const frameIdentifiers = new Map();
 
     /**
@@ -56,11 +56,11 @@ export class CrossFrame {
     };
 
     const iframeUnloaded = frame => {
-      this.bridge.call('destroyFrame', frameIdentifiers.get(frame));
+      this._bridge.call('destroyFrame', frameIdentifiers.get(frame));
       frameIdentifiers.delete(frame);
     };
 
-    this.frameObserver.observe(injectIntoFrame, iframeUnloaded);
+    this._frameObserver.observe(injectIntoFrame, iframeUnloaded);
   }
 
   /**
@@ -80,16 +80,16 @@ export class CrossFrame {
       origin,
       [channel.port2]
     );
-    this.bridge.createChannel(channel.port1);
+    this._bridge.createChannel(channel.port1);
   }
 
   /**
    * Remove the connection between the sidebar and annotator.
    */
   destroy() {
-    this.bridge.destroy();
-    this.annotationSync.destroy();
-    this.frameObserver.disconnect();
+    this._bridge.destroy();
+    this._annotationSync.destroy();
+    this._frameObserver.disconnect();
   }
 
   /**
@@ -98,7 +98,7 @@ export class CrossFrame {
    * @param {AnnotationData[]} annotations
    */
   sync(annotations) {
-    this.annotationSync.sync(annotations);
+    this._annotationSync.sync(annotations);
   }
 
   /**
@@ -113,7 +113,7 @@ export class CrossFrame {
    * @throws {Error} If trying to register a callback with the same name multiple times
    */
   on(method, listener) {
-    this.bridge.on(method, listener);
+    this._bridge.on(method, listener);
   }
 
   /**
@@ -127,7 +127,7 @@ export class CrossFrame {
    *   it means successful execution of the whole remote procedure call.
    */
   call(method, ...args) {
-    this.bridge.call(method, ...args);
+    this._bridge.call(method, ...args);
   }
 
   /**
@@ -137,6 +137,6 @@ export class CrossFrame {
    * @param {(channel: RPC) => void} callback
    */
   onConnect(callback) {
-    this.bridge.onConnect(callback);
+    this._bridge.onConnect(callback);
   }
 }
