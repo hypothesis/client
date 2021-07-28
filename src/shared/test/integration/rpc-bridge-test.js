@@ -1,7 +1,6 @@
 import Bridge from '../../bridge';
 
 describe('RPC-Bridge integration', () => {
-  const sandbox = sinon.createSandbox();
   let clock;
   let port1;
   let port2;
@@ -26,45 +25,40 @@ describe('RPC-Bridge integration', () => {
 
   afterEach(() => {
     bridges.forEach(bridge => bridge.destroy());
-    sandbox.restore();
     clock.restore();
   });
 
-  context('establishing a connection', () => {
+  describe('establishing a connection', () => {
     it('should invoke Bridge `onConnect` callbacks after connecting', async () => {
       clock.restore();
       const bridge = createBridge();
       const reciprocalBridge = createBridge();
-
       let callbackCount = 0;
       const callback = () => {
         ++callbackCount;
       };
-
       bridge.onConnect(callback);
       bridge.onConnect(callback); // allows multiple callbacks to be registered
       reciprocalBridge.onConnect(callback);
 
       const channel = bridge.createChannel(port1);
-      reciprocalBridge.createChannel(port2);
-
+      const reciprocalChannel = reciprocalBridge.createChannel(port2);
       await waitForMessageDelivery();
+
       assert.equal(callbackCount, 3);
 
       // Additional calls to the RPC `connect` method are ignored
       channel.call('connect');
-      reciprocalBridge.call('connect');
-
+      reciprocalChannel.call('connect');
       await waitForMessageDelivery();
+
       assert.equal(callbackCount, 3);
     });
   });
 
-  context('sending and receiving RPC messages', () => {
-    let bridge;
-
-    beforeEach(() => {
-      bridge = createBridge();
+  describe('sending and receiving RPC messages', () => {
+    it('should invoke Bridge method handler on every channel when calling a RPC method', async () => {
+      const bridge = createBridge();
       const otherChannel = new MessageChannel();
       bridge.createChannel(port1);
       bridge.createChannel(otherChannel.port1);
@@ -74,23 +68,14 @@ describe('RPC-Bridge integration', () => {
       reciprocalBridge2.on('method1', (arg, cb) => cb(null, `${arg}bar`));
       reciprocalBridge1.createChannel(port2);
       reciprocalBridge2.createChannel(otherChannel.port2);
-    });
 
-    it('should invoke Bridge method handler on every channel when calling a RPC method (with Promise)', async () => {
-      const results = await bridge.call('method1', 'params1');
-      assert.deepEqual(results.sort(), ['params1foo', 'params1bar'].sort());
-    });
+      const results = await bridge.call('method1', 'param1');
 
-    it('should invoke Bridge method handler on every channel when calling a RPC method (with callback)', done => {
-      bridge.call('method1', 'params1', (err, results) => {
-        assert.deepEqual(results.sort(), ['params1foo', 'params1bar'].sort());
-        assert.isNull(err);
-        done();
-      });
+      assert.deepEqual(results.sort(), ['param1foo', 'param1bar'].sort());
     });
   });
 
-  context('errors and timeouts', () => {
+  describe('errors and timeouts', () => {
     it(`raises an error when the listener's callback fails`, async () => {
       const bridge = createBridge();
       const reciprocalBridge = createBridge();
@@ -101,10 +86,11 @@ describe('RPC-Bridge integration', () => {
 
       let error;
       try {
-        await reciprocalBridge.call('method1', 'params1');
+        await reciprocalBridge.call('method1', 'param1');
       } catch (err) {
         error = err;
       }
+
       assert.equal(error, errorMessage);
     });
 
@@ -115,11 +101,11 @@ describe('RPC-Bridge integration', () => {
       bridge.on('method1', (_arg, cb) => cb(errorMessage));
       bridge.createChannel(port1);
       const channel = reciprocalBridge.createChannel(port2);
-      sandbox.stub(channel, 'destroy').callThrough();
+      sinon.stub(channel, 'destroy').callThrough();
 
       let error;
       try {
-        await reciprocalBridge.call('method1', 'params1');
+        await reciprocalBridge.call('method1', 'param1');
       } catch (err) {
         error = err;
       }
@@ -129,57 +115,55 @@ describe('RPC-Bridge integration', () => {
       assert.deepEqual(reciprocalBridge.links, []);
     });
 
-    it('no longer send RPC messages to a Bridge channel that has received an error', async () => {
+    it('no longer sends RPC messages to a Bridge channel that has received an error', async () => {
       const bridge = createBridge();
       const reciprocalBridge = createBridge();
       const errorMessage = 'My error';
       bridge.on('method1', (_arg, cb) => cb(new Error(errorMessage)));
       bridge.createChannel(port1);
       const channel = reciprocalBridge.createChannel(port2);
-      sandbox.stub(channel, 'call').callThrough();
+      sinon.stub(channel, 'call').callThrough();
 
       let error;
       try {
-        await reciprocalBridge.call('method1', 'params1');
+        await reciprocalBridge.call('method1', 'param1');
       } catch (err) {
         error = err;
       }
+
       assert.equal(error.message, errorMessage);
 
-      for (let i = 0; i < 5; ++i) {
-        const results = await reciprocalBridge.call('method1', 'params1');
-        assert.deepEqual(results, []);
-        assert.calledOnce(channel.call);
-      }
+      const results = await reciprocalBridge.call('method1', 'param1');
+
+      assert.deepEqual(results, []);
+      assert.calledOnce(channel.call);
     });
 
-    it('timeouts if the Bridge channel is not connected', done => {
+    it('timeouts if the Bridge channel is not connected', async () => {
       const bridge = createBridge();
       bridge.createChannel(port1);
 
-      bridge.call('method1', 'params1', (err, results) => {
-        assert.deepEqual(results, [null]); // returns null for each channel that timeouts
-        assert.isNull(err); // no error
-        done();
-      });
+      const promise = bridge.call('method1', 'param1');
       clock.tick(1000);
+      const results = await promise;
+
+      assert.deepEqual(results, [null]); // returns null for each channel that timeouts
     });
 
-    it(`timeouts if the Bridge channel is connected but reciprocal Bridge channel doesn't answer`, done => {
+    it(`timeouts if the Bridge channel is connected but reciprocal Bridge channel doesn't answer`, async () => {
       const bridge = createBridge();
       const reciprocalBridge = createBridge();
       bridge.createChannel(port1);
       reciprocalBridge.createChannel(port2); // the reciprocal port hasn't registered a RPC method called 'method1'
 
-      bridge.call('method1', 'params1', (err, results) => {
-        assert.deepEqual(results, [null]);
-        assert.isNull(err);
-        done();
-      });
+      const promise = bridge.call('method1', 'param1');
       clock.tick(1000);
+      const results = await promise;
+
+      assert.deepEqual(results, [null]);
     });
 
-    it('timeouts if the reciprocal Bridge channel has been destroyed', done => {
+    it('timeouts if the reciprocal Bridge channel has been destroyed', async () => {
       const bridge = createBridge();
       const reciprocalBridge = createBridge();
       bridge.on('method1', (arg, cb) => cb(null, `${arg}foo`));
@@ -188,19 +172,15 @@ describe('RPC-Bridge integration', () => {
       reciprocalBridge.createChannel(port2);
 
       reciprocalBridge.destroy();
-
-      bridge.call('method2', 'params1', (err, results) => {
-        assert.deepEqual(results, [null]);
-        assert.isNull(err);
-        done();
-      });
+      const promise = bridge.call('method2', 'param1');
       clock.tick(1000);
+      const results0 = await promise;
 
-      reciprocalBridge.call('method1', 'params1', (err, results) => {
-        assert.deepEqual(results, []);
-        assert.isNull(err);
-        done();
-      });
+      assert.deepEqual(results0, [null]);
+
+      const results1 = await reciprocalBridge.call('method1', 'param1');
+
+      assert.deepEqual(results1, []);
     });
   });
 });
