@@ -80,11 +80,15 @@ function init() {
   // Set up communication between this host/guest frame and the sidebar frame.
   let sidebarWindow = window_.__hypothesis.sidebarWindow;
   try {
-    sidebarWindow = /** @type {HypothesisWindow} */ (window.parent).__hypothesis
-      ?.sidebarWindow;
+    // If this is a guest-only frame which doesn't have its own sidebar, try
+    // to connect to the one created by the parent frame. This only works if
+    // the host and guest frames are same-origin.
+    if (!sidebarWindow) {
+      sidebarWindow = /** @type {HypothesisWindow} */ (window.parent)
+        .__hypothesis?.sidebarWindow;
+    }
   } catch {
-    // `window.parent` access can fail due to it being cross-origin. This is
-    // handled below.
+    // `window.parent` access can fail due to it being cross-origin.
   }
 
   if (sidebarWindow) {
