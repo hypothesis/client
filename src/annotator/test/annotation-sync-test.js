@@ -36,9 +36,9 @@ describe('AnnotationSync', () => {
     emitter.destroy();
   });
 
-  describe('#constructor', () => {
-    context('when "deleteAnnotation" is published', () => {
-      it('calls publish("annotationDeleted")', () => {
+  describe('handling events from the sidebar', () => {
+    describe('on "deleteAnnotation" event', () => {
+      it('publish "annotationDeleted" to the annotator', () => {
         const ann = { id: 1, $tag: 'tag1' };
         const eventStub = sinon.stub();
         emitter.subscribe('annotationDeleted', eventStub);
@@ -61,7 +61,7 @@ describe('AnnotationSync', () => {
         publish('deleteAnnotation', { msg: ann }, callback);
       });
 
-      it('deletes any existing annotation from its cache before calling publish', done => {
+      it('deletes any existing annotation from its cache before publishing event to the annotator', done => {
         const annSync = createAnnotationSync();
         const ann = { id: 1, $tag: 'tag1' };
         annSync.cache.tag1 = ann;
@@ -84,8 +84,8 @@ describe('AnnotationSync', () => {
       });
     });
 
-    context('when "loadAnnotations" is published', () => {
-      it('calls publish("annotationsLoaded")', () => {
+    describe('on "loadAnnotations" event', () => {
+      it('publish "annotationsLoaded" to the annotator', () => {
         const annotations = [
           { id: 1, $tag: 'tag1' },
           { id: 2, $tag: 'tag2' },
@@ -105,9 +105,11 @@ describe('AnnotationSync', () => {
         assert.calledWith(loadedStub, annotations);
       });
     });
+  });
 
-    context('when "beforeAnnotationCreated" is published', () => {
-      it('calls bridge.call() passing the event', () => {
+  describe('handling events from the annotator', () => {
+    describe('on "beforeAnnotationCreated" event', () => {
+      it('calls "beforeCreateAnnotation" RPC method in the sidebar', () => {
         // nb. Setting an empty `$tag` here matches what `Guest#createAnnotation`
         // does.
         const ann = { id: 1, $tag: '' };
