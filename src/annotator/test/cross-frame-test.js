@@ -78,7 +78,7 @@ describe('CrossFrame', () => {
       const cf = createCrossFrame();
       const sidebarFrame = { postMessage: sinon.stub() };
 
-      cf.connectToSidebar(sidebarFrame);
+      cf.connectToSidebar(sidebarFrame, 'https://dummy.hypothes.is');
 
       assert.calledWith(
         fakeBridge.createChannel,
