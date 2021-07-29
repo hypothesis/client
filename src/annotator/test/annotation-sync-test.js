@@ -51,9 +51,9 @@ describe('AnnotationSync', () => {
 
       it("calls the 'deleteAnnotation' event's callback function", done => {
         const ann = { id: 1, $tag: 'tag1' };
-        const callback = function (err, ret) {
+        const callback = function (err, result) {
           assert.isNull(err);
-          assert.deepEqual(ret, { tag: 'tag1', msg: ann });
+          assert.isUndefined(result);
           done();
         };
         createAnnotationSync();
@@ -85,7 +85,7 @@ describe('AnnotationSync', () => {
     });
 
     describe('on "loadAnnotations" event', () => {
-      it('publish "annotationsLoaded" to the annotator', () => {
+      it('publishes "annotationsLoaded" to the annotator', () => {
         const annotations = [
           { id: 1, $tag: 'tag1' },
           { id: 2, $tag: 'tag2' },
@@ -167,6 +167,29 @@ describe('AnnotationSync', () => {
   });
 
   describe('#destroy', () => {
+    it('ignore `loadAnnotations` and `deleteAnnotation` events from the sidebar', () => {
+      const ann = { msg: { id: 1 }, tag: 'tag1' };
+      const annotationSync = createAnnotationSync();
+      annotationSync.destroy();
+      const cb = sinon.stub();
+
+      publish('loadAnnotations', [ann], cb);
+      publish('deleteAnnotation', ann, cb);
+
+      assert.calledTwice(cb);
+      assert.calledWith(cb.firstCall, null);
+      assert.calledWith(cb.secondCall, null);
+    });
+
+    it('disables annotation syncing with the sidebar', () => {
+      const annotationSync = createAnnotationSync();
+      annotationSync.destroy();
+
+      annotationSync.sync([{ id: 1 }]);
+
+      assert.notCalled(fakeBridge.call);
+    });
+
     it('ignores "beforeAnnotationCreated" events from the annotator', () => {
       const annotationSync = createAnnotationSync();
       annotationSync.destroy();

@@ -40,18 +40,29 @@ export default class AnnotationSync {
      */
     this.cache = {};
 
+    this.destroyed = false;
+
     // Relay events from the sidebar to the rest of the annotator.
     this.bridge.on('deleteAnnotation', (body, callback) => {
+      if (this.destroyed) {
+        callback(null);
+        return;
+      }
       const annotation = this._parse(body);
       delete this.cache[annotation.$tag];
       this._emitter.publish('annotationDeleted', annotation);
-      callback(null, this._format(annotation));
+      this._format(annotation);
+      callback(null);
     });
 
     this.bridge.on('loadAnnotations', (bodies, callback) => {
+      if (this.destroyed) {
+        callback(null);
+        return;
+      }
       const annotations = bodies.map(body => this._parse(body));
       this._emitter.publish('annotationsLoaded', annotations);
-      callback(null, annotations);
+      callback(null);
     });
 
     // Relay events from annotator to sidebar.
@@ -72,6 +83,10 @@ export default class AnnotationSync {
    * @param {AnnotationData[]} annotations
    */
   sync(annotations) {
+    if (this.destroyed) {
+      return;
+    }
+
     this.bridge.call(
       'sync',
       annotations.map(ann => this._format(ann))
@@ -127,6 +142,7 @@ export default class AnnotationSync {
   }
 
   destroy() {
+    this.destroyed = true;
     this._emitter.destroy();
   }
 }
