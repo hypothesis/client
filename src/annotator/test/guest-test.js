@@ -32,7 +32,6 @@ describe('Guest', () => {
   const sandbox = sinon.createSandbox();
   let eventBus;
   let highlighter;
-  let guestConfig;
   let rangeUtil;
   let notifySelectionChanged;
 
@@ -49,7 +48,7 @@ describe('Guest', () => {
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
     eventBus = new EventBus();
-    const guest = new Guest(element, eventBus, { ...guestConfig, ...config });
+    const guest = new Guest(element, eventBus, config);
     guests.push(guest);
     return guest;
   };
@@ -57,7 +56,6 @@ describe('Guest', () => {
   beforeEach(() => {
     guests = [];
     FakeAdder.instance = null;
-    guestConfig = {};
     highlighter = {
       getHighlightsContainingNode: sinon.stub().returns([]),
       highlightRange: sinon.stub().returns([]),
