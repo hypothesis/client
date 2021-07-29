@@ -159,8 +159,8 @@ describe('Sidebar', () => {
     it('returns a promise that resolves when `hypothesisSidebarReady` message is received', async () => {
       const sidebar = createSidebar();
 
-      // Check `sidebar.ready` is not resolved before `hypothesisSidebarReady`
-      // message is received.
+      // Check `sidebar.ready` is not already resolved, by racing it against
+      // an immediately resolved promise.
       assert.equal(
         await Promise.race([sidebar.ready, Promise.resolve('not-ready')]),
         'not-ready'
