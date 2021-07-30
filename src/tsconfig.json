@@ -2,7 +2,7 @@
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
-    "lib": ["es2018", "dom"],
+    "lib": ["es2018", "dom", "dom.iterable"],
     "jsx": "react-jsx",
     "jsxImportSource": "preact",
     "module": "commonjs",
