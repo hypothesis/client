@@ -51,8 +51,28 @@ export function init(config) {
   Sentry.init({
     dsn: config.dsn,
     environment: config.environment,
-    // Do not log Fetch failures to avoid inundating with unhandled fetch exceptions
-    ignoreErrors: ['Fetch operation failed'],
+
+    // Ignore various errors due to circumstances outside of our control.
+    ignoreErrors: [
+      // Ignore transient network request failures. Some of these ought to be
+      // caught and handled better but for now we are suppressing them to
+      // improve the signal-to-noise ratio.
+      'Failed to fetch', // Chrome
+      'Fetch operation failed',
+      'NetworkError when attempting to fetch resource', // Firefox
+
+      // Ignore network request failures due to empty JSON bodies.
+      'JSON.parse: unexpected end of data', // Firefox
+      'Unexpected end of JSON input', // Opera Mobile
+
+      // Ignore network request cancellations
+      'AbortError: The operation was aborted.', // Firefox
+
+      // Ignore an error that appears to come from CefSharp (embedded Chromium).
+      // See https://forum.sentry.io/t/unhandledrejection-non-error-promise-rejection-captured-with-value/14062/20
+      'Object Not Found Matching Id',
+    ],
+
     release: '__VERSION__', // replaced by versionify
     whitelistUrls,
 
