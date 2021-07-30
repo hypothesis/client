@@ -1,7 +1,6 @@
-import { AnnotationSync } from './annotation-sync';
 import { Bridge } from '../shared/bridge';
-import * as frameUtil from './util/frame-util';
-import FrameObserver from './frame-observer';
+import { AnnotationSync } from './annotation-sync';
+import { HypothesisInjector } from './hypothesis-injector';
 
 /**
  * @typedef {import('../shared/port-rpc').PortRPC} RPC
@@ -30,37 +29,11 @@ export class CrossFrame {
   constructor(element, eventBus, config) {
     this._bridge = new Bridge();
     this._annotationSync = new AnnotationSync(eventBus, this._bridge);
-    this._frameObserver = new FrameObserver(element);
-    const frameIdentifiers = new Map();
-
-    /**
-     * Inject Hypothesis into a newly-discovered iframe.
-     */
-    const injectIntoFrame = frame => {
-      if (frameUtil.hasHypothesis(frame)) {
-        return;
-      }
-
-      frameUtil.isLoaded(frame, () => {
-        // Generate a random string to use as a frame ID. The format is not important.
-        const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
-        frameIdentifiers.set(frame, subFrameIdentifier);
-        const injectedConfig = {
-          ...config,
-          subFrameIdentifier,
-        };
-
-        const { clientUrl } = config;
-        frameUtil.injectHypothesis(frame, clientUrl, injectedConfig);
-      });
-    };
-
-    const iframeUnloaded = frame => {
-      this._bridge.call('destroyFrame', frameIdentifiers.get(frame));
-      frameIdentifiers.delete(frame);
-    };
-
-    this._frameObserver.observe(injectIntoFrame, iframeUnloaded);
+    this._hypothesisInjector = new HypothesisInjector(
+      element,
+      this._bridge,
+      config
+    );
   }
 
   /**
@@ -89,7 +62,7 @@ export class CrossFrame {
   destroy() {
     this._bridge.destroy();
     this._annotationSync.destroy();
-    this._frameObserver.disconnect();
+    this._hypothesisInjector.destroy();
   }
 
   /**

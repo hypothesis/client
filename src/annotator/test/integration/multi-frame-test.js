@@ -1,19 +1,18 @@
 import { DEBOUNCE_WAIT } from '../../frame-observer';
-import { CrossFrame, $imports } from '../../cross-frame';
+import { HypothesisInjector } from '../../hypothesis-injector';
 import { isLoaded } from '../../util/frame-util';
 
-describe('CrossFrame multi-frame scenario', () => {
-  let fakeAnnotationSync;
-  let fakeBridge;
-  let proxyAnnotationSync;
-  let proxyBridge;
+describe('HypothesisInjector integration test', () => {
   let container;
-  let crossFrame;
-  let config;
+  let fakeBridge;
+  let hypothesisInjectors;
 
   const sandbox = sinon.createSandbox();
+  const config = {
+    clientUrl: 'data:,', // empty data uri
+  };
 
-  const waitForFrameObserver = function (cb) {
+  const waitForFrameObserver = cb => {
     const wait = DEBOUNCE_WAIT + 10;
     return setTimeout(cb, wait);
   };
@@ -24,43 +23,37 @@ describe('CrossFrame multi-frame scenario', () => {
       call: sandbox.stub(),
       destroy: sandbox.stub(),
     };
-    fakeAnnotationSync = { destroy: sandbox.stub() };
-    proxyAnnotationSync = sandbox.stub().returns(fakeAnnotationSync);
-    proxyBridge = sandbox.stub().returns(fakeBridge);
-
-    $imports.$mock({
-      './annotation-sync': { AnnotationSync: proxyAnnotationSync },
-      '../shared/bridge': { Bridge: proxyBridge },
-    });
+    hypothesisInjectors = [];
 
     container = document.createElement('div');
     document.body.appendChild(container);
-
-    config = {
-      clientUrl: 'data:,', // empty data uri
-    };
-
-    crossFrame = null;
   });
 
   afterEach(() => {
     sandbox.restore();
-    crossFrame.destroy();
-    container.parentNode.removeChild(container);
-
-    $imports.$restore();
+    hypothesisInjectors.forEach(injector => injector.destroy());
+    container.remove();
   });
 
-  function createCrossFrame() {
-    const eventBus = {};
-    return new CrossFrame(container, eventBus, config);
+  function createHypothesisInjector() {
+    const hypothesisInjector = new HypothesisInjector(
+      container,
+      fakeBridge,
+      config
+    );
+    hypothesisInjectors.push(hypothesisInjector);
+    return hypothesisInjector;
+  }
+
+  function createAnnotatableIFrame() {
+    const frame = document.createElement('iframe');
+    frame.setAttribute('enable-annotation', '');
+    container.appendChild(frame);
+    return frame;
   }
 
   it('detects frames on page', () => {
-    // Create a frame before initializing
-    const validFrame = document.createElement('iframe');
-    validFrame.setAttribute('enable-annotation', '');
-    container.appendChild(validFrame);
+    const validFrame = createAnnotatableIFrame();
 
     // Create another that mimics the sidebar frame
     // This one should should not be detected
@@ -69,7 +62,7 @@ describe('CrossFrame multi-frame scenario', () => {
     container.appendChild(invalidFrame);
 
     // Now initialize
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     const validFramePromise = new Promise(resolve => {
       isLoaded(validFrame, () => {
@@ -95,12 +88,10 @@ describe('CrossFrame multi-frame scenario', () => {
 
   it('detects removed frames', () => {
     // Create a frame before initializing
-    const frame = document.createElement('iframe');
-    frame.setAttribute('enable-annotation', '');
-    container.appendChild(frame);
+    const frame = createAnnotatableIFrame();
 
     // Now initialize
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     // Remove the frame
     frame.remove();
@@ -109,11 +100,9 @@ describe('CrossFrame multi-frame scenario', () => {
   });
 
   it('injects embed script in frame', () => {
-    const frame = document.createElement('iframe');
-    frame.setAttribute('enable-annotation', '');
-    container.appendChild(frame);
+    const frame = createAnnotatableIFrame();
 
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     return new Promise(resolve => {
       isLoaded(frame, () => {
@@ -136,7 +125,7 @@ describe('CrossFrame multi-frame scenario', () => {
     container.appendChild(frame);
     frame.contentWindow.eval('window.__hypothesis = {}');
 
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     return new Promise(resolve => {
       isLoaded(frame, () => {
@@ -153,12 +142,10 @@ describe('CrossFrame multi-frame scenario', () => {
 
   it('detects dynamically added frames', () => {
     // Initialize with no initial frame, unlike before
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     // Add a frame to the DOM
-    const frame = document.createElement('iframe');
-    frame.setAttribute('enable-annotation', '');
-    container.appendChild(frame);
+    const frame = createAnnotatableIFrame();
 
     return new Promise(resolve => {
       // Yield to let the DOM and CrossFrame catch up
@@ -181,7 +168,7 @@ describe('CrossFrame multi-frame scenario', () => {
     container.appendChild(frame);
 
     // Now initialize
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     return new Promise(resolve => {
       // Yield to let the DOM and CrossFrame catch up
@@ -199,12 +186,10 @@ describe('CrossFrame multi-frame scenario', () => {
 
   it('detects a frame dynamically removed, and added again', () => {
     // Create a frame before initializing
-    const frame = document.createElement('iframe');
-    frame.setAttribute('enable-annotation', '');
-    container.appendChild(frame);
+    const frame = createAnnotatableIFrame();
 
     // Now initialize
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     return new Promise(resolve => {
       isLoaded(frame, () => {
@@ -237,12 +222,10 @@ describe('CrossFrame multi-frame scenario', () => {
 
   it('detects a frame dynamically added, removed, and added again', () => {
     // Initialize with no initial frame
-    crossFrame = createCrossFrame();
+    createHypothesisInjector();
 
     // Add a frame to the DOM
-    const frame = document.createElement('iframe');
-    frame.setAttribute('enable-annotation', '');
-    container.appendChild(frame);
+    const frame = createAnnotatableIFrame();
 
     return new Promise(resolve => {
       // Yield to let the DOM and CrossFrame catch up
