@@ -71,6 +71,11 @@ function serveDev(port, config) {
   const app = express();
 
   app.engine('mustache', mustacheExpress());
+
+  // Disable template caching.
+  // See https://github.com/bryanburgers/node-mustache-express/issues/13.
+  app.disable('view cache');
+
   app.set('view engine', 'mustache');
   app.set('views', [HTML_PATH, path.join(__dirname, '/templates')]);
 
