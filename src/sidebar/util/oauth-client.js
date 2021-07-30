@@ -1,5 +1,3 @@
-import * as queryString from 'query-string';
-
 import * as random from './random';
 
 /**
@@ -182,19 +180,15 @@ export default class OAuthClient {
     });
 
     // Authorize user and retrieve grant token
-    let authUrl = this.authorizationEndpoint;
-    authUrl +=
-      '?' +
-      queryString.stringify({
-        client_id: this.clientId,
-        origin: $window.location.origin,
-        response_mode: 'web_message',
-        response_type: 'code',
-        state,
-      });
+    const authURL = new URL(this.authorizationEndpoint);
+    authURL.searchParams.set('client_id', this.clientId);
+    authURL.searchParams.set('origin', $window.location.origin);
+    authURL.searchParams.set('response_mode', 'web_message');
+    authURL.searchParams.set('response_type', 'code');
+    authURL.searchParams.set('state', state);
 
     // @ts-ignore - TS doesn't know about `location = <string>`.
-    authWindow.location = authUrl;
+    authWindow.location = authURL.toString();
 
     return authResponse.then(rsp => rsp.code);
   }
@@ -203,21 +197,22 @@ export default class OAuthClient {
    * Make an `application/x-www-form-urlencoded` POST request.
    *
    * @param {string} url
-   * @param {Object} data - Parameter dictionary
+   * @param {Record<string, string>} data - Parameter dictionary
    */
   _formPost(url, data) {
-    // The `fetch` API has native support for sending form data by setting
-    // the `body` option to a `FormData` instance. We are not using that here
-    // because our test environment has very limited `FormData` support and it
-    // is simpler just to format the data manually.
-    const formData = queryString.stringify(data);
+    const params = new URLSearchParams();
+    for (let [key, value] of Object.entries(data)) {
+      params.set(key, value);
+    }
+    params.sort();
+
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
     return fetch(url, {
       method: 'POST',
       headers,
-      body: formData,
+      body: params.toString(),
     });
   }
 
@@ -246,15 +241,7 @@ export default class OAuthClient {
 
     // Generate settings for `window.open` in the required comma-separated
     // key=value format.
-    const authWindowSettings = queryString
-      .stringify({
-        left,
-        top,
-        width,
-        height,
-      })
-      .replace(/&/g, ',');
-
+    const authWindowSettings = `left=${left},top=${top},width=${width},height=${height}`;
     const authWindow = $window.open(
       'about:blank',
       'Log in to Hypothesis',
