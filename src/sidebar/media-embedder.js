@@ -1,5 +1,3 @@
-import * as queryString from 'query-string';
-
 /**
  * Return an HTML5 audio player with the given src URL.
  *
@@ -103,29 +101,33 @@ function parseTimeString(timeValue) {
  * @param {HTMLAnchorElement} link
  */
 function youTubeQueryParams(link) {
-  let query;
   const allowedParams = [
     'end',
     'start',
     't', // will be translated to `start`
   ];
-  const linkParams = queryString.parse(link.search);
-  const filteredQuery = {};
-  // Filter linkParams for allowed keys and build those entries
-  // into the filteredQuery object
-  Object.keys(linkParams)
-    .filter(key => allowedParams.includes(key))
-    .forEach(key => {
-      if (key === 't') {
-        // `t` is not supported in embeds; `start` is
-        // `t` accepts more formats than `start`; start must be in seconds
-        // so, format it as seconds first
-        filteredQuery.start = parseTimeString(linkParams[key]);
-      } else {
-        filteredQuery[key] = linkParams[key];
-      }
-    });
-  query = queryString.stringify(filteredQuery);
+  const linkParams = new URLSearchParams(link.search);
+  const filteredQuery = new URLSearchParams();
+
+  // Copy allowed params into `filteredQuery`.
+  for (let [key, value] of linkParams) {
+    if (!allowedParams.includes(key)) {
+      continue;
+    }
+    if (key === 't') {
+      // `t` is not supported in embeds; `start` is
+      // `t` accepts more formats than `start`; start must be in seconds
+      // so, format it as seconds first
+      filteredQuery.append('start', parseTimeString(value));
+    } else {
+      filteredQuery.append(key, value);
+    }
+  }
+
+  // Tests currently expect sorted parameters.
+  filteredQuery.sort();
+
+  let query = filteredQuery.toString();
   if (query) {
     query = `?${query}`;
   }
@@ -274,9 +276,9 @@ const embedGenerators = [
     // Extract start and end times, which may appear either as query string
     // params or path params.
     let slug = slugMatch[2];
-    const linkParams = queryString.parse(link.search);
-    let startTime = linkParams.start;
-    let endTime = linkParams.end;
+    const linkParams = new URLSearchParams(link.search);
+    let startTime = linkParams.get('start');
+    let endTime = linkParams.get('end');
 
     if (!startTime) {
       const startPathParam = slug.match(/\/start\/([^/]+)/);
