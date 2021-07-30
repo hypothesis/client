@@ -83,7 +83,7 @@ describe('sidebar/util/sentry', () => {
       assert.calledWith(
         fakeSentry.init,
         sinon.match({
-          ignoreErrors: ['Fetch operation failed'],
+          ignoreErrors: sinon.match.array,
         })
       );
     });
