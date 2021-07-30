@@ -90,7 +90,8 @@ function parseTimeString(timeValue) {
  * all parameter possibilities.
  *
  * @param {HTMLAnchorElement} link
- * @returns {string} formatted filtered URL query string, e.g. '?start=90'
+ * @returns {string} formatted filtered URL query string, e.g. '?start=90' or
+ *   an empty string if the filtered query is empty.
  * @example
  * // returns '?end=10&start=5'
  * youTubeQueryParams(link); // where `link.search` = '?t=5&baz=foo&end=10'
