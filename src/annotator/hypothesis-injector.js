@@ -1,0 +1,75 @@
+import FrameObserver from './frame-observer';
+import * as frameUtil from './util/frame-util';
+
+/**
+ * @typedef {import('../shared/bridge').Bridge} Bridge
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
+ */
+
+/**
+ * HypothesisInjector has logic for injecting Hypothesis client into iframes that
+ * are added to the page if (1) they have the `enable-annotation` attribute set
+ * and (2) are same-origin with the current document.
+ *
+ * @implements Destroyable
+ */
+export class HypothesisInjector {
+  /**
+   * @param {Element} element - root of the DOM subtree to watch for the
+   *   addition and removal of annotatable iframes
+   * @param {Bridge} bridge - Channel for communicating with the sidebar
+   * @param {Record<string, any>} config - Annotator configuration that is
+   *   injected, along with the Hypothesis client, into the child iframes
+   */
+  constructor(element, bridge, config) {
+    this._bridge = bridge;
+    this._config = config;
+    this._frameObserver = new FrameObserver(element);
+    /** @type {Map<HTMLIFrameElement, string>} */
+    this._frameIdentifiers = new Map();
+
+    this._frameObserver.observe(
+      frame => this._injectIntoFrame(frame),
+      frame => this._iframeUnloaded(frame)
+    );
+  }
+
+  /**
+   * Disables the injection of the Hypothesis client into child iframes.
+   */
+  destroy() {
+    this._frameObserver.disconnect();
+  }
+
+  /**
+   * Inject Hypothesis client into a newly-discovered iframe.
+   *
+   * @param {HTMLIFrameElement} frame
+   */
+  _injectIntoFrame(frame) {
+    if (frameUtil.hasHypothesis(frame)) {
+      return;
+    }
+
+    frameUtil.isLoaded(frame, () => {
+      // Generate a random string to use as a frame ID. The format is not important.
+      const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
+      this._frameIdentifiers.set(frame, subFrameIdentifier);
+      const injectedConfig = {
+        ...this._config,
+        subFrameIdentifier,
+      };
+
+      const { clientUrl } = this._config;
+      frameUtil.injectHypothesis(frame, clientUrl, injectedConfig);
+    });
+  }
+
+  /**
+   * @param {HTMLIFrameElement} frame
+   */
+  _iframeUnloaded(frame) {
+    this._bridge.call('destroyFrame', this._frameIdentifiers.get(frame));
+    this._frameIdentifiers.delete(frame);
+  }
+}
