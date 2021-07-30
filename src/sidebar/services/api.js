@@ -1,5 +1,3 @@
-import * as queryString from 'query-string';
-
 import { replaceURLParams } from '../util/url';
 
 /**
@@ -52,9 +50,15 @@ function stripInternalProperties(obj) {
  */
 
 /**
+ * Types of value that can be passed as a parameter to API calls.
+ *
+ * @typedef {string|number|boolean} Param
+ */
+
+/**
  * Function which makes an API request.
  *
- * @template {Record<string, any>} Params
+ * @template {Record<string, Param|Param[]>} Params
  * @template {object} Body
  * @template Result
  * @callback APICall
@@ -123,10 +127,17 @@ function createAPICall(
           descriptor.url,
           params
         );
-        const apiUrl = new URL(url);
-        apiUrl.search = queryString.stringify(queryParams);
 
-        return fetch(apiUrl.toString(), {
+        const apiURL = new URL(url);
+        for (let [key, value] of Object.entries(queryParams)) {
+          if (Array.isArray(value)) {
+            value.forEach(v => apiURL.searchParams.append(key, v.toString()));
+          } else {
+            apiURL.searchParams.append(key, value.toString());
+          }
+        }
+
+        return fetch(apiURL.toString(), {
           body: data ? JSON.stringify(stripInternalProperties(data)) : null,
           headers,
           method: descriptor.method,
