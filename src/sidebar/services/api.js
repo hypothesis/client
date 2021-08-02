@@ -103,88 +103,79 @@ function createAPICall(
   route,
   { getAccessToken, getClientId, onRequestStarted, onRequestFinished }
 ) {
-  return (params, data) => {
+  return async (params, data) => {
     onRequestStarted();
+    try {
+      const [linksMap, token] = await Promise.all([links, getAccessToken()]);
+      const descriptor = get(linksMap, route);
 
-    return Promise.all([links, getAccessToken()])
-      .then(([links, token]) => {
-        const descriptor = get(links, route);
-        const headers = {
-          'Content-Type': 'application/json',
-          'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
-        };
+      const headers = {
+        'Content-Type': 'application/json',
+        'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
+      };
 
-        if (token) {
-          headers.Authorization = 'Bearer ' + token;
+      if (token) {
+        headers.Authorization = 'Bearer ' + token;
+      }
+
+      const clientId = getClientId();
+      if (clientId) {
+        headers['X-Client-Id'] = clientId;
+      }
+
+      const { url, unusedParams: queryParams } = replaceURLParams(
+        descriptor.url,
+        params
+      );
+
+      const apiURL = new URL(url);
+      for (let [key, value] of Object.entries(queryParams)) {
+        if (!Array.isArray(value)) {
+          value = [value];
         }
-
-        const clientId = getClientId();
-        if (clientId) {
-          headers['X-Client-Id'] = clientId;
-        }
-
-        const { url, unusedParams: queryParams } = replaceURLParams(
-          descriptor.url,
-          params
-        );
-
-        const apiURL = new URL(url);
-        for (let [key, value] of Object.entries(queryParams)) {
-          if (!Array.isArray(value)) {
-            value = [value];
+        for (let item of value) {
+          // eslint-disable-next-line eqeqeq
+          if (item == null) {
+            // Skip all parameters with nullish values.
+            continue;
           }
-          for (let item of value) {
-            // eslint-disable-next-line eqeqeq
-            if (item == null) {
-              // Skip all parameters with nullish values.
-              continue;
-            }
-            apiURL.searchParams.append(key, item.toString());
-          }
+          apiURL.searchParams.append(key, item.toString());
         }
+      }
 
-        return fetch(apiURL.toString(), {
+      let response;
+      try {
+        response = await fetch(apiURL.toString(), {
           body: data ? JSON.stringify(stripInternalProperties(data)) : null,
           headers,
           method: descriptor.method,
-        }).catch(() => {
-          // Re-throw Fetch errors such that they all "look the same" (different
-          // browsers throw different Errors on Fetch failure). This allows
-          // Fetch failures to be either handled in particular ways higher up
-          // or for them to be ignored in error reporting (see `sentry` config).
-          throw new Error(`Fetch operation failed for URL '${url}'`);
         });
-      })
-      .then(response => {
-        let data;
+      } catch (err) {
+        // Re-throw Fetch errors such that they all "look the same" (different
+        // browsers throw different Errors on Fetch failure). This allows
+        // Fetch failures to be either handled in particular ways higher up
+        // or for them to be ignored in error reporting (see `sentry` config).
+        throw new Error(`Fetch operation failed for URL '${url}'`);
+      }
 
-        const status = response.status;
-        if (status >= 200 && status !== 204 && status < 500) {
-          data = response.json();
-        } else {
-          data = response.text();
-        }
-        return Promise.all([response, data]);
-      })
-      .then(
-        ([response, data]) => {
-          // `fetch` executed the request and the response was successfully parsed.
-          onRequestFinished();
+      const status = response.status;
 
-          if (response.status >= 400) {
-            // Translate the API result into an `Error` to follow the convention that
-            // Promises should be rejected with an Error or Error-like object.
-            throw translateResponseToError(response, data);
-          }
+      let responseBody;
+      if (status >= 200 && status !== 204 && status < 500) {
+        responseBody = await response.json();
+      } else {
+        responseBody = await response.text();
+      }
 
-          return data;
-        },
-        err => {
-          // `fetch` failed to execute the request, or parsing the response failed.
-          onRequestFinished();
-          throw err;
-        }
-      );
+      if (status >= 400) {
+        // Translate the API result into an `Error` to follow the convention that
+        // Promises should be rejected with an Error or Error-like object.
+        throw translateResponseToError(response, responseBody);
+      }
+      return responseBody;
+    } finally {
+      onRequestFinished();
+    }
   };
 }
 
