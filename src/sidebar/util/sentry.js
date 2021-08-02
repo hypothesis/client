@@ -62,6 +62,8 @@ export function init(config) {
       'NetworkError when attempting to fetch resource', // Firefox
 
       // Ignore network request failures due to empty JSON bodies.
+      // TODO - Consider removing these once `fetch` callers have been changed
+      // to handle `Response.json()` calls failing.
       'JSON.parse: unexpected end of data', // Firefox
       'Unexpected end of JSON input', // Opera Mobile
 
