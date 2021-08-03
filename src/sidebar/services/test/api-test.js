@@ -173,6 +173,14 @@ describe('APIService', () => {
     return api.search({ uri: [pdfURL, fingerprintURL] });
   });
 
+  // Test serialization of nullish parameters in API calls. This behavior matches
+  // the query-string package that we used to use.
+  it('sends empty query parameters if value is nullish', () => {
+    expectCall('get', 'search?a=&b=&c=false&d=');
+
+    return api.search({ a: undefined, b: null, c: false, d: [null] });
+  });
+
   it("fetches the user's profile", () => {
     const profile = { userid: 'acct:user@publisher.org' };
     expectCall('get', 'profile?authority=publisher.org', 200, profile);
