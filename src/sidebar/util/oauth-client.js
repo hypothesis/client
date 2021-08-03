@@ -206,6 +206,8 @@ export default class OAuthClient {
     for (let [key, value] of Object.entries(data)) {
       params.set(key, value);
     }
+
+    // Tests currently expect sorted parameters.
     params.sort();
 
     const headers = {
