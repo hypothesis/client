@@ -187,7 +187,9 @@ export default class OAuthClient {
     authURL.searchParams.set('response_type', 'code');
     authURL.searchParams.set('state', state);
 
-    // @ts-ignore - TS doesn't know about `location = <string>`.
+    // @ts-ignore - TS doesn't support `location = <string>`. We have to
+    // use this method to set the URL rather than `location.href = <string>`
+    // because `authWindow` is cross-origin.
     authWindow.location = authURL.toString();
 
     return authResponse.then(rsp => rsp.code);
