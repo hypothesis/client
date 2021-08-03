@@ -7,19 +7,20 @@
  *   replaceURLParams('/things/:id', {id: 'foo', q: 'bar'}) =>
  *     {url: '/things/foo', unusedParams: {q: 'bar'}}
  *
+ * @template Param
  * @param {string} url
- * @param {Record<string, string>} params
- * @return {{ url: string, unusedParams: Record<string, string>}}
+ * @param {Record<string, Param>} params
+ * @return {{ url: string, unusedParams: Record<string, Param>}}
  */
 export function replaceURLParams(url, params) {
-  /** @type {Record<string, string>} */
+  /** @type {Record<string, Param>} */
   const unusedParams = {};
   for (const param in params) {
     if (params.hasOwnProperty(param)) {
       const value = params[param];
       const urlParam = ':' + param;
       if (url.indexOf(urlParam) !== -1) {
-        url = url.replace(urlParam, encodeURIComponent(value));
+        url = url.replace(urlParam, encodeURIComponent(String(value)));
       } else {
         unusedParams[param] = value;
       }

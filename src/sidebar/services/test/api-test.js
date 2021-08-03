@@ -176,7 +176,7 @@ describe('APIService', () => {
   // Test serialization of nullish parameters in API calls. This behavior matches
   // the query-string package that we used to use.
   it('sends empty query parameters if value is nullish', () => {
-    expectCall('get', 'search?a=&b=&c=false&d=');
+    expectCall('get', 'search?c=false');
 
     return api.search({ a: undefined, b: null, c: false, d: [null] });
   });
