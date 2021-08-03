@@ -128,15 +128,18 @@ function createAPICall(
           params
         );
 
-        /** @param {Param?} param */
-        const serialize = param => param?.toString() ?? '';
-
         const apiURL = new URL(url);
         for (let [key, value] of Object.entries(queryParams)) {
-          if (Array.isArray(value)) {
-            value.forEach(v => apiURL.searchParams.append(key, serialize(v)));
-          } else {
-            apiURL.searchParams.append(key, serialize(value));
+          if (!Array.isArray(value)) {
+            value = [value];
+          }
+          for (let item of value) {
+            // eslint-disable-next-line eqeqeq
+            if (item == null) {
+              // Skip all parameters with nullish values.
+              continue;
+            }
+            apiURL.searchParams.append(key, item.toString());
           }
         }
 
