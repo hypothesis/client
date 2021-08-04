@@ -1,6 +1,6 @@
 import { EventBus } from '../util/emitter';
 
-import AnnotationSync from '../annotation-sync';
+import { AnnotationSync } from '../annotation-sync';
 
 describe('AnnotationSync', () => {
   let createAnnotationSync;

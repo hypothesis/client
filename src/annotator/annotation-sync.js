@@ -23,7 +23,7 @@
  *
  * @implements Destroyable
  */
-export default class AnnotationSync {
+export class AnnotationSync {
   /**
    * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
    * @param {Bridge} bridge - Channel for communicating with the sidebar

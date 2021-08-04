@@ -29,7 +29,7 @@ describe('CrossFrame multi-frame scenario', () => {
     proxyBridge = sandbox.stub().returns(fakeBridge);
 
     $imports.$mock({
-      './annotation-sync': proxyAnnotationSync,
+      './annotation-sync': { AnnotationSync: proxyAnnotationSync },
       '../shared/bridge': proxyBridge,
     });
 
