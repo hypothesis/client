@@ -29,7 +29,7 @@ describe('CrossFrame', () => {
     proxyBridge = sinon.stub().returns(fakeBridge);
 
     $imports.$mock({
-      './annotation-sync': proxyAnnotationSync,
+      './annotation-sync': { AnnotationSync: proxyAnnotationSync },
       '../shared/bridge': proxyBridge,
     });
   });

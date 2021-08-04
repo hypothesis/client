@@ -1,4 +1,4 @@
-import AnnotationSync from './annotation-sync';
+import { AnnotationSync } from './annotation-sync';
 import Bridge from '../shared/bridge';
 import * as frameUtil from './util/frame-util';
 import FrameObserver from './frame-observer';
