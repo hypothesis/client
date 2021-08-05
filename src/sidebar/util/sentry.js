@@ -121,6 +121,17 @@ export function init(config) {
   // later when frames where the "annotator" code has loaded have connected to
   // the sidebar via `postMessage` RPC messages.
   Sentry.setExtra('document_url', document.referrer);
+
+  /** @param {HTMLScriptElement} script */
+  const isJavaScript = script =>
+    !script.type || script.type.match(/javascript|module/);
+
+  // Include information about the scripts on the page. This may help with
+  // debugging of errors caused by scripts injected by browser extensions.
+  const loadedScripts = Array.from(document.querySelectorAll('script'))
+    .filter(isJavaScript)
+    .map(script => script.src || '<inline>');
+  Sentry.setExtra('loaded_scripts', loadedScripts);
 }
 
 /**

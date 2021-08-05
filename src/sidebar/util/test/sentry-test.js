@@ -104,13 +104,24 @@ describe('sidebar/util/sentry', () => {
       );
     });
 
-    it('adds extra context to reports', () => {
+    it('adds "document_url" context to reports', () => {
       sentry.init({ dsn: 'test-dsn', environment: 'dev' });
       assert.calledWith(
         fakeSentry.setExtra,
         'document_url',
         'https://example.com'
       );
+    });
+
+    it('adds "loaded_scripts" context to reports', () => {
+      sentry.init({ dsn: 'test-dsn', environment: 'dev' });
+      assert.calledWith(fakeSentry.setExtra, 'loaded_scripts');
+
+      const urls = fakeSentry.setExtra
+        .getCalls()
+        .find(call => call.args[0] === 'loaded_scripts').args[1];
+      assert.isTrue(urls.length > 0);
+      urls.forEach(url => assert.match(url, /<inline>|http:.*\.js/));
     });
 
     function getBeforeSendHook() {
