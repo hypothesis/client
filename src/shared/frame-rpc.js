@@ -179,12 +179,12 @@ export class RPC {
 
         this._port.postMessage(message);
       };
-      this._methods[msg.method].call(this._methods, ...msg.arguments, callback);
+      this._methods[msg.method](...msg.arguments, callback);
     } else if ('response' in msg) {
       const cb = this._callbacks[msg.response];
       delete this._callbacks[msg.response];
       if (cb) {
-        cb.apply(null, msg.arguments);
+        cb(...msg.arguments);
       }
     }
   }
