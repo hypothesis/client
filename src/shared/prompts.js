@@ -23,16 +23,6 @@ export async function confirm({
   message,
   confirmAction = 'Yes',
 }) {
-  const start = Date.now();
-
-  // Use the legacy `window.confirm` API where available until we've polished
-  // the new one. In Chrome >= 91 `window.confirm` will immediately return false
-  // so we have no option but to use the new implementation.
-  const result = window.confirm(message);
-  if (result || Date.now() - start >= 10) {
-    return result;
-  }
-
   const container = document.createElement('div');
   container.setAttribute('data-testid', 'confirm-container');
 

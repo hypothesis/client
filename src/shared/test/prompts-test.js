@@ -37,13 +37,7 @@ describe('shared/prompts', () => {
       return document.querySelector('[data-testid="confirm-container"]');
     }
 
-    it('uses `window.confirm` if available', async () => {
-      window.confirm.returns(true);
-      const result = await confirm({ message: 'Do the thing?' });
-      assert.equal(result, true);
-    });
-
-    it('renders a custom dialog if `window.confirm` is not available', async () => {
+    it('renders a custom dialog', async () => {
       const result = confirm({
         title: 'Confirm action?',
         message: 'Do the thing?',
