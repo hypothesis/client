@@ -5,8 +5,8 @@ describe('CrossFrame', () => {
   let fakeBridge;
   let fakeEventBus;
 
-  let proxyAnnotationSync;
-  let proxyBridge;
+  let FakeAnnotationSync;
+  let FakeBridge;
 
   const createCrossFrame = (options = {}) => {
     fakeEventBus = {};
@@ -25,12 +25,12 @@ describe('CrossFrame', () => {
 
     fakeAnnotationSync = { sync: sinon.stub(), destroy: sinon.stub() };
 
-    proxyAnnotationSync = sinon.stub().returns(fakeAnnotationSync);
-    proxyBridge = sinon.stub().returns(fakeBridge);
+    FakeAnnotationSync = sinon.stub().returns(fakeAnnotationSync);
+    FakeBridge = sinon.stub().returns(fakeBridge);
 
     $imports.$mock({
-      './annotation-sync': { AnnotationSync: proxyAnnotationSync },
-      '../shared/bridge': proxyBridge,
+      './annotation-sync': { AnnotationSync: FakeAnnotationSync },
+      '../shared/bridge': FakeBridge,
     });
   });
 
@@ -41,12 +41,12 @@ describe('CrossFrame', () => {
   describe('CrossFrame constructor', () => {
     it('instantiates the AnnotationSync component', () => {
       createCrossFrame();
-      assert.called(proxyAnnotationSync);
+      assert.called(FakeAnnotationSync);
     });
 
     it('passes along options to AnnotationSync', () => {
       createCrossFrame();
-      assert.calledWith(proxyAnnotationSync, fakeEventBus, fakeBridge);
+      assert.calledWith(FakeAnnotationSync, fakeEventBus, fakeBridge);
     });
   });
 
