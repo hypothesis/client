@@ -846,7 +846,7 @@ describe('Guest', () => {
     });
 
     afterEach(() => {
-      document.body.removeChild(el);
+      el.remove();
     });
 
     it("doesn't mark an annotation lacking targets as an orphan", () => {
