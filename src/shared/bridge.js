@@ -21,40 +21,11 @@ export default class Bridge {
   /**
    * Destroy all channels created with `createChannel`.
    *
-   * This removes the event listeners for messages arriving from other windows.
+   * This removes the event listeners for messages arriving from other ports.
    */
   destroy() {
     this.links.forEach(channel => channel.destroy());
     this.links = [];
-  }
-
-  /**
-   * Deprecated - Remove after MessagePort conversion
-   *
-   * @typedef WindowOptions
-   * @prop {Window} source - The source window
-   * @prop {string} origin - The origin of the document in `source`
-   * @prop {string} token - Shared token between the `source` and this window
-   *   agreed during the discovery process
-   */
-
-  /**
-   * Create a communication channel between frames using either `MessagePort` or
-   * `Window`.
-   *
-   * The created channel is added to the list of channels which `call`
-   * and `on` send and receive messages over.
-   *
-   * @param {WindowOptions|MessagePort} options
-   * @return {RPC} - Channel for communicating with the window.
-   */
-  createChannel(options) {
-    if (options instanceof MessagePort) {
-      return this._createChannelForPort(options);
-    } else {
-      // Deprecated - Remove after MessagePort conversion
-      return this._createChannelForWindow(options);
-    }
   }
 
   /**
@@ -64,18 +35,13 @@ export default class Bridge {
    * and `on` send and receive messages over.
    *
    * @param {MessagePort} port
-   * @return {RPC} - Channel for communicating with the window.
+   * @return {RPC} - Channel for communicating with the reciprocal port.
    */
-  _createChannelForPort(port) {
+  createChannel(port) {
     const listeners = { connect: cb => cb(), ...this.channelListeners };
 
     // Set up a channel
-    const channel = new RPC(
-      window /* dummy */,
-      port,
-      '*' /* dummy */,
-      listeners
-    );
+    const channel = new RPC(port, listeners);
 
     let connected = false;
     const ready = () => {
@@ -88,48 +54,6 @@ export default class Bridge {
 
     // Fire off a connection attempt
     channel.call('connect', ready);
-
-    // Store the newly created channel in our collection
-    this.links.push(channel);
-
-    return channel;
-  }
-
-  /**
-   * Create a communication channel between this window and `source`.
-   *
-   * The created channel is added to the list of channels which `call`
-   * and `on` send and receive messages over.
-   *
-   * @param {WindowOptions} options
-   * @return {RPC} - Channel for communicating with the window.
-   * @deprecated
-   */
-  _createChannelForWindow({ source, origin, token }) {
-    let channel = null;
-    let connected = false;
-
-    const ready = () => {
-      if (connected) {
-        return;
-      }
-      connected = true;
-      this.onConnectListeners.forEach(cb => cb(channel));
-    };
-
-    const connect = (_token, cb) => {
-      if (_token === token) {
-        cb();
-      }
-    };
-
-    const listeners = { connect, ...this.channelListeners };
-
-    // Set up a channel
-    channel = new RPC(window, source, origin, listeners);
-
-    // Fire off a connection attempt
-    channel.call('connect', token, ready);
 
     // Store the newly created channel in our collection
     this.links.push(channel);
