@@ -105,12 +105,9 @@ export class CrossFrame {
    * Subscribe to an event from the sidebar.
    *
    * @param {string} method
-   * @param {(...args: any[]) => void} listener -- Final argument is an optional
-   *   callback of the type: `(error: string|Error|null, ...result: any[]) => void`.
-   *   This callback must be invoked in order to respond (via `postMessage`)
-   *   to the other frame/s with a result or an error.
-   * @throws {Error} If trying to register a callback after a channel has already been created
-   * @throws {Error} If trying to register a callback with the same name multiple times
+   * @param {(...args: any[]) => void} listener
+   *
+   * @see {Bridge.on} for details.
    */
   on(method, listener) {
     this._bridge.on(method, listener);
@@ -119,12 +116,10 @@ export class CrossFrame {
   /**
    * Call an RPC method exposed by the sidebar to the annotator.
    *
-   * @param {string} method
-   * @param {any[]} args - Arguments to method. Final argument is an optional
-   *   callback with this type: `(error: string|Error|null, ...result: any[]) => void`.
-   *   This callback, if any, will be triggered once a response (via `postMessage`)
-   *   comes back from the other frame/s. If the first argument (error) is `null`
-   *   it means successful execution of the whole remote procedure call.
+   * @param {string} method - Name of remote method to call.
+   * @param {any[]} args
+   *
+   * @see {Bridge.call} for details.
    */
   call(method, ...args) {
     this._bridge.call(method, ...args);
