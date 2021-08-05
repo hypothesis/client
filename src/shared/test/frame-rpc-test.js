@@ -26,14 +26,9 @@ describe('RPC', () => {
       callback(result);
     };
 
-    rpc1 = new RPC(
-      /* dummy when using ports */ window,
-      port1,
-      /* dummy when using ports */ '*',
-      {
-        concat,
-      }
-    );
+    rpc1 = new RPC(port1, {
+      concat,
+    });
 
     // `plusOne` method for rpc2
     plusOne = sinon.stub().callsFake((...numbers) => {
@@ -42,14 +37,9 @@ describe('RPC', () => {
       callback(result);
     });
 
-    rpc2 = new RPC(
-      /* dummy when using ports */ window,
-      port2,
-      /* dummy when using ports */ '*',
-      {
-        plusOne,
-      }
-    );
+    rpc2 = new RPC(port2, {
+      plusOne,
+    });
   });
 
   afterEach(() => {

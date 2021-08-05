@@ -59,42 +59,15 @@ const PROTOCOL = 'frame-rpc';
  */
 export class RPC {
   /**
-   * Create an RPC client for sending RPC requests from `sourceFrame` to
-   * `destFrame`, and receiving RPC responses from `destFrame` to `sourceFrame`.
+   * Create an RPC client for sending and receiving RPC message using a
+   * `MessagePort`.
    *
-   * This class has been adapted to work with `MessageChannel`. Because messages
-   * sent through `MessageChannel` are only transmitted to and from `port1` and
-   * `port2`, there is no need for `sourceFrame` and `origin` properties.
-   *
-   * TODO: July 2021, currently this class is a bit of a _frankenstein_ because
-   * we support both `Window.postMessage` and `MessagePort.postMessage`.
-   * Once we move all the inter-frame communication to `MessageChannel` we will
-   * be able to cleanup this class. We have added `deprecated` comments in
-   * the pieces of code that need to be removed.
-   *
-   * @param {Window} sourceFrame -- deprecated - Remove after MessagePort conversion
-   * @param {Window|MessagePort} destFrameOrPort
-   * @param {string} origin - Origin of destination frame (deprecated - Remove after MessagePort conversion)
+   * @param {MessagePort} port
    * @param {Record<string, (...args: any[]) => void>} methods - Map of method
    *   name to method handler
    */
-  constructor(sourceFrame, destFrameOrPort, origin, methods) {
-    this.sourceFrame = sourceFrame; // sourceFrame is ignored if using MessagePort
-
-    if (destFrameOrPort instanceof MessagePort) {
-      this._port = destFrameOrPort;
-    } else {
-      /** @deprecated */
-      this.destFrame = destFrameOrPort;
-    }
-
-    // Deprecated - Remove after MessagePort conversion
-    if (origin === '*') {
-      this.origin = '*';
-    } else {
-      this.origin = new URL(origin).origin;
-    }
-
+  constructor(port, methods) {
+    this._port = port;
     this._methods = methods;
 
     this._sequence = 0;
@@ -103,27 +76,10 @@ export class RPC {
 
     this._listeners = new ListenerCollection();
 
-    if (this._port) {
-      this._listeners.add(this._port, 'message', event =>
-        this._handle(/** @type {MessageEvent} */ (event))
-      );
-      this._port.start();
-    } else {
-      // Deprecated - Remove after MessagePort conversion
-      /**
-       * @param {MessageEvent} event
-       * @deprecated
-       */
-      const onmessage = event => {
-        if (!this._isValidSender(event)) {
-          return;
-        }
-        this._handle(event);
-      };
-      this._listeners.add(this.sourceFrame, 'message', event =>
-        onmessage(/** @type {MessageEvent} */ (event))
-      );
-    }
+    this._listeners.add(this._port, 'message', event =>
+      this._handle(/** @type {MessageEvent} */ (event))
+    );
+    this._port.start();
   }
 
   /**
@@ -133,7 +89,7 @@ export class RPC {
   destroy() {
     this._destroyed = true;
     this._listeners.removeAll();
-    this._port?.close();
+    this._port.close();
   }
 
   /**
@@ -166,31 +122,7 @@ export class RPC {
       version: VERSION,
     };
 
-    if (this._port) {
-      this._port.postMessage(message);
-    }
-
-    // Deprecated - Remove after MessagePort conversion
-    if (this.destFrame) {
-      this.destFrame.postMessage(message, this.origin);
-    }
-  }
-
-  /**
-   * Validate sender
-   *
-   * @param {MessageEvent} event
-   * @deprecated
-   */
-  _isValidSender(event) {
-    if (event.source !== this.destFrame) {
-      return false;
-    }
-    if (this.origin !== '*' && event.origin !== this.origin) {
-      return false;
-    }
-
-    return true;
+    this._port.postMessage(message);
   }
 
   /**
@@ -241,14 +173,7 @@ export class RPC {
           version: VERSION,
         };
 
-        if (this._port) {
-          this._port.postMessage(message);
-        }
-
-        // Deprecated - Remove after MessagePort conversion
-        if (this.destFrame) {
-          this.destFrame.postMessage(message, this.origin);
-        }
+        this._port.postMessage(message);
       };
       this._methods[msg.method].call(this._methods, ...msg.arguments, callback);
     } else if ('response' in msg) {
