@@ -16,6 +16,10 @@ export class Bridge {
     this.channelListeners = {};
     /** @type {Array<(channel: PortRPC) => void>} */
     this.onConnectListeners = [];
+
+    // `connect` is registered with a callback so it triggers a `postMessage`
+    // response from the reciprocal port.
+    this.on('connect', cb => cb());
   }
 
   /**
@@ -38,10 +42,7 @@ export class Bridge {
    * @return {PortRPC} - Channel for communicating with the reciprocal port.
    */
   createChannel(port) {
-    const listeners = { connect: cb => cb(), ...this.channelListeners };
-
-    // Set up a channel
-    const channel = new PortRPC(port, listeners);
+    const channel = new PortRPC(port, this.channelListeners);
 
     let connected = false;
     const ready = () => {
