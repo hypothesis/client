@@ -35,7 +35,7 @@ describe('annotator.range-util', () => {
   });
 
   afterEach(() => {
-    testNode.parentElement.removeChild(testNode);
+    testNode.remove();
   });
 
   function selectNode(node) {

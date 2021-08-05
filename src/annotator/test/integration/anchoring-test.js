@@ -72,7 +72,7 @@ describe('anchoring', () => {
 
   afterEach(() => {
     guest.destroy();
-    container.parentNode.removeChild(container);
+    container.remove();
     console.warn.restore();
   });
 
