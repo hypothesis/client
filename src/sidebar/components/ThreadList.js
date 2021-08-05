@@ -1,4 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'preact/hooks';
 import debounce from 'lodash.debounce';
 
 import { useStoreProxy } from '../store/use-store';
@@ -167,6 +173,8 @@ function ThreadList({ threads }) {
     };
   }, []);
 
+  const rootRef = useRef(/** @type {HTMLDivElement|null} */ (null));
+
   // When the set of visible threads changes, recalculate the real rendered
   // heights of thread cards and update `threadHeights` state if there are changes.
   useEffect(() => {
@@ -176,6 +184,31 @@ function ThreadList({ threads }) {
         const threadElement = /** @type {HTMLElement} */ (
           document.getElementById(id)
         );
+
+        // Temporary code added to aid debugging of
+        // https://sentry.io/organizations/hypothesis/issues/2554918407/
+        /* istanbul ignore next */
+        if (!threadElement) {
+          const root = rootRef.current;
+
+          // Check if effect was called when ThreadList is not mounted.
+          if (!root) {
+            throw new Error(`Unable to measure thread ${id}. DOM not present.`);
+          }
+
+          // Check if effect was called when ThreadList is rendered but not
+          // connected to parent document.
+          if (!root.isConnected) {
+            throw new Error(
+              `Unable to measure thread ${id}. DOM not connected`
+            );
+          }
+
+          // Check if effect was called with `visibleThreads` value which does
+          // not match most recently rendered `visibleThreads`.
+          throw new Error(`Unable to measure thread ${id}. Element not found`);
+        }
+
         const height = getElementHeightWithMargins(threadElement);
         if (height !== prevHeights[id]) {
           changedHeights[id] = height;
@@ -193,7 +226,7 @@ function ThreadList({ threads }) {
   }, [visibleThreads]);
 
   return (
-    <div>
+    <div ref={rootRef}>
       <div style={{ height: offscreenUpperHeight }} />
       {visibleThreads.map(child => (
         <div className="ThreadList__card" id={child.id} key={child.id}>
