@@ -47,7 +47,7 @@ export class FrameSyncService {
   /**
    * @param {Window} $window - Test seam
    * @param {import('./annotations').AnnotationsService} annotationsService
-   * @param {import('../../shared/bridge').default} bridge
+   * @param {import('../../shared/bridge').Bridge} bridge
    * @param {import('../store').SidebarStore} store
    */
   constructor($window, annotationsService, bridge, store) {

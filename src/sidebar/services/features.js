@@ -15,7 +15,7 @@ import { watch } from '../util/watch';
  */
 export class FeaturesService {
   /**
-   * @param {import('../../shared/bridge').default} bridge
+   * @param {import('../../shared/bridge').Bridge} bridge
    * @param {import('../store').SidebarStore} store
    */
   constructor(bridge, store) {

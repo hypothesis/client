@@ -8,7 +8,7 @@ import { RPC } from './frame-rpc';
  *
  * @implements Destroyable
  */
-export default class Bridge {
+export class Bridge {
   constructor() {
     /** @type {RPC[]} */
     this.links = [];

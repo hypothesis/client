@@ -16,7 +16,7 @@ import UserMenu from './UserMenu';
 /**
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
  * @typedef {import('../components/UserMenu').AuthState} AuthState
- * @typedef {import('../../shared/bridge').default} Bridge
+ * @typedef {import('../../shared/bridge').Bridge} Bridge
  */
 
 /**

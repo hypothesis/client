@@ -23,7 +23,7 @@ import TopBar from './TopBar';
 /**
  * @typedef {import('../../types/api').Profile} Profile
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
- * @typedef {import('../../shared/bridge').default} Bridge
+ * @typedef {import('../../shared/bridge').Bridge} Bridge
  * @typedef {import('./UserMenu').AuthState} AuthState
  */
 

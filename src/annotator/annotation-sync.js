@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../shared/bridge').default} Bridge
+ * @typedef {import('../shared/bridge').Bridge} Bridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('./util/emitter').EventBus} EventBus
