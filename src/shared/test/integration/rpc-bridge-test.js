@@ -1,6 +1,6 @@
 import Bridge from '../../bridge';
 
-describe('RPC-Bridge integration', () => {
+describe('PortRPC-Bridge integration', () => {
   let clock;
   let port1;
   let port2;

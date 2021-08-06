@@ -61,7 +61,7 @@ const PROTOCOL = 'frame-rpc';
  *
  * @implements Destroyable
  */
-export class RPC {
+export class PortRPC {
   /**
    * Create an RPC client for sending and receiving RPC message using a
    * `MessagePort`.

@@ -1,4 +1,4 @@
-import { RPC } from './frame-rpc';
+import { PortRPC } from './port-rpc';
 
 /** @typedef {import('../types/annotator').Destroyable} Destroyable */
 
@@ -10,11 +10,11 @@ import { RPC } from './frame-rpc';
  */
 export default class Bridge {
   constructor() {
-    /** @type {RPC[]} */
+    /** @type {PortRPC[]} */
     this.links = [];
     /** @type {Record<string, (...args: any[]) => void>} */
     this.channelListeners = {};
-    /** @type {Array<(channel: RPC) => void>} */
+    /** @type {Array<(channel: PortRPC) => void>} */
     this.onConnectListeners = [];
   }
 
@@ -35,13 +35,13 @@ export default class Bridge {
    * and `on` send and receive messages over.
    *
    * @param {MessagePort} port
-   * @return {RPC} - Channel for communicating with the reciprocal port.
+   * @return {PortRPC} - Channel for communicating with the reciprocal port.
    */
   createChannel(port) {
     const listeners = { connect: cb => cb(), ...this.channelListeners };
 
     // Set up a channel
-    const channel = new RPC(port, listeners);
+    const channel = new PortRPC(port, listeners);
 
     let connected = false;
     const ready = () => {
@@ -84,7 +84,7 @@ export default class Bridge {
       args = args.slice(0, -1);
     }
 
-    /** @param {RPC} channel */
+    /** @param {PortRPC} channel */
     const _makeDestroyFn = channel => {
       return error => {
         channel.destroy();
@@ -155,7 +155,7 @@ export default class Bridge {
   /**
    * Add a listener to be called upon a new connection.
    *
-   * @param {(channel: RPC) => void} listener
+   * @param {(channel: PortRPC) => void} listener
    */
   onConnect(listener) {
     this.onConnectListeners.push(listener);
