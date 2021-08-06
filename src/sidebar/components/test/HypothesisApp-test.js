@@ -9,7 +9,7 @@ describe('HypothesisApp', () => {
   let fakeApplyTheme;
   let fakeStore = null;
   let fakeAuth = null;
-  let fakeBridge = null;
+  let fakeFrameSync;
   let fakeConfirm;
   let fakeServiceConfig = null;
   let fakeSession = null;
@@ -21,7 +21,7 @@ describe('HypothesisApp', () => {
     return mount(
       <HypothesisApp
         auth={fakeAuth}
-        bridge={fakeBridge}
+        frameSync={fakeFrameSync}
         settings={fakeSettings}
         session={fakeSession}
         toastMessenger={fakeToastMessenger}
@@ -67,8 +67,8 @@ describe('HypothesisApp', () => {
 
     fakeSettings = {};
 
-    fakeBridge = {
-      call: sinon.stub(),
+    fakeFrameSync = {
+      notifyHost: sinon.stub(),
     };
 
     fakeToastMessenger = {
@@ -228,7 +228,10 @@ describe('HypothesisApp', () => {
       it('sends SIGNUP_REQUESTED event', () => {
         const wrapper = createComponent();
         clickSignUp(wrapper);
-        assert.calledWith(fakeBridge.call, bridgeEvents.SIGNUP_REQUESTED);
+        assert.calledWith(
+          fakeFrameSync.notifyHost,
+          bridgeEvents.SIGNUP_REQUESTED
+        );
       });
 
       it('does not open a URL directly', () => {
@@ -299,9 +302,9 @@ describe('HypothesisApp', () => {
       const wrapper = createComponent();
       await clickLogIn(wrapper);
 
-      assert.equal(fakeBridge.call.callCount, 1);
+      assert.equal(fakeFrameSync.notifyHost.callCount, 1);
       assert.isTrue(
-        fakeBridge.call.calledWithExactly(bridgeEvents.LOGIN_REQUESTED)
+        fakeFrameSync.notifyHost.calledWithExactly(bridgeEvents.LOGIN_REQUESTED)
       );
     });
   });
@@ -408,9 +411,9 @@ describe('HypothesisApp', () => {
         const wrapper = createComponent();
         await clickLogOut(wrapper);
 
-        assert.calledOnce(fakeBridge.call);
+        assert.calledOnce(fakeFrameSync.notifyHost);
         assert.calledWithExactly(
-          fakeBridge.call,
+          fakeFrameSync.notifyHost,
           bridgeEvents.LOGOUT_REQUESTED
         );
       });
@@ -422,7 +425,7 @@ describe('HypothesisApp', () => {
         const wrapper = createComponent();
         await clickLogOut(wrapper);
 
-        assert.notCalled(fakeBridge.call);
+        assert.notCalled(fakeFrameSync.notifyHost);
       });
 
       it('does not call session.logout()', async () => {

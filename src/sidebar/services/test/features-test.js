@@ -2,12 +2,12 @@ import bridgeEvents from '../../../shared/bridge-events';
 import { FeaturesService } from '../features';
 
 describe('FeaturesService', () => {
-  let fakeBridge;
+  let fakeFrameSync;
   let fakeStore;
 
   beforeEach(() => {
-    fakeBridge = {
-      call: sinon.stub(),
+    fakeFrameSync = {
+      notifyHost: sinon.stub(),
     };
 
     fakeStore = {
@@ -23,7 +23,7 @@ describe('FeaturesService', () => {
   });
 
   function createService() {
-    const service = new FeaturesService(fakeBridge, fakeStore);
+    const service = new FeaturesService(fakeFrameSync, fakeStore);
     service.init();
     return service;
   }
@@ -38,7 +38,7 @@ describe('FeaturesService', () => {
 
     // First update, with no changes to feature flags.
     notifyStoreSubscribers();
-    assert.notCalled(fakeBridge.call);
+    assert.notCalled(fakeFrameSync.notifyHost);
 
     // Second update, with changes to feature flags.
     fakeStore.profile.returns({
@@ -51,7 +51,7 @@ describe('FeaturesService', () => {
     notifyStoreSubscribers();
 
     assert.calledWith(
-      fakeBridge.call,
+      fakeFrameSync.notifyHost,
       bridgeEvents.FEATURE_FLAGS_UPDATED,
       fakeStore.profile().features
     );
@@ -62,7 +62,7 @@ describe('FeaturesService', () => {
 
     // First update, with no changes to frames.
     notifyStoreSubscribers();
-    assert.notCalled(fakeBridge.call);
+    assert.notCalled(fakeFrameSync.notifyHost);
 
     // Second update, with changes to frames.
     fakeStore.frames.returns([{ uri: 'https://example.com' }]);
@@ -70,7 +70,7 @@ describe('FeaturesService', () => {
     notifyStoreSubscribers();
 
     assert.calledWith(
-      fakeBridge.call,
+      fakeFrameSync.notifyHost,
       bridgeEvents.FEATURE_FLAGS_UPDATED,
       fakeStore.profile().features
     );

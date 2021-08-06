@@ -28,7 +28,7 @@ import MenuSection from './MenuSection';
  * @typedef UserMenuProps
  * @prop {AuthStateLoggedIn} auth - object representing authenticated user and auth status
  * @prop {() => any} onLogout - onClick callback for the "log out" button
- * @prop {object} bridge
+ * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {MergedConfig} settings
  */
 
@@ -40,7 +40,7 @@ import MenuSection from './MenuSection';
  *
  * @param {UserMenuProps} props
  */
-function UserMenu({ auth, bridge, onLogout, settings }) {
+function UserMenu({ auth, frameSync, onLogout, settings }) {
   const store = useStoreProxy();
   const defaultAuthority = store.defaultAuthority();
 
@@ -57,7 +57,7 @@ function UserMenu({ auth, bridge, onLogout, settings }) {
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
 
   const onSelectNotebook = () => {
-    bridge.call('openNotebook', store.focusedGroupId());
+    frameSync.notifyHost('openNotebook', store.focusedGroupId());
   };
 
   // Temporary access to the Notebook without feature flag:
@@ -70,7 +70,7 @@ function UserMenu({ auth, bridge, onLogout, settings }) {
   };
 
   const onProfileSelected = () =>
-    isThirdParty && bridge.call(bridgeEvents.PROFILE_REQUESTED);
+    isThirdParty && frameSync.notifyHost(bridgeEvents.PROFILE_REQUESTED);
 
   // Generate dynamic props for the profile <MenuItem> component
   const profileItemProps = (() => {
@@ -129,4 +129,4 @@ function UserMenu({ auth, bridge, onLogout, settings }) {
   );
 }
 
-export default withServices(UserMenu, ['bridge', 'settings']);
+export default withServices(UserMenu, ['frameSync', 'settings']);

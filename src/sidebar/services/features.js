@@ -15,18 +15,18 @@ import { watch } from '../util/watch';
  */
 export class FeaturesService {
   /**
-   * @param {import('../../shared/bridge').Bridge} bridge
+   * @param {import('../services/frame-sync').FrameSyncService} frameSync
    * @param {import('../store').SidebarStore} store
    */
-  constructor(bridge, store) {
-    this._bridge = bridge;
+  constructor(frameSync, store) {
+    this._frameSync = frameSync;
     this._store = store;
   }
 
   init() {
     const currentFlags = () => this._store.profile().features;
     const sendFeatureFlags = () => {
-      this._bridge.call(
+      this._frameSync.notifyHost(
         bridgeEvents.FEATURE_FLAGS_UPDATED,
         currentFlags() || {}
       );

@@ -10,7 +10,6 @@ const EXTERNAL_CONTAINER_SELECTOR = 'test-external-container';
 
 describe('Sidebar', () => {
   const sandbox = sinon.createSandbox();
-  let fakeCrossFrame;
   let fakeGuest;
 
   // Containers and Sidebar instances created by current test.
@@ -22,6 +21,8 @@ describe('Sidebar', () => {
 
   let FakeToolbarController;
   let fakeToolbar;
+
+  let fakeBridge;
 
   before(() => {
     sinon.stub(window, 'requestAnimationFrame').yields();
@@ -65,17 +66,12 @@ describe('Sidebar', () => {
   beforeEach(() => {
     sidebars = [];
     containers = [];
-    fakeCrossFrame = {
-      on: sandbox.stub(),
-      call: sandbox.stub(),
-    };
 
     class FakeGuest {
       constructor() {
         this.element = document.createElement('div');
         this.contentContainer = sinon.stub().returns(document.body);
         this.createAnnotation = sinon.stub();
-        this.crossframe = fakeCrossFrame;
         this.fitSideBySide = sinon.stub();
         this.setVisibleHighlights = sinon.stub();
       }
@@ -100,7 +96,14 @@ describe('Sidebar', () => {
 
     sidebars = [];
 
+    fakeBridge = {
+      call: sinon.stub(),
+      createChannel: sinon.stub(),
+      on: sinon.stub(),
+    };
+
     $imports.$mock({
+      '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
       './toolbar': {
         ToolbarController: FakeToolbarController,
       },
@@ -155,6 +158,27 @@ describe('Sidebar', () => {
     });
   });
 
+  function sendSidebarReadyMessage() {
+    const channel = new MessageChannel();
+    const event = new MessageEvent(
+      'message',
+      {
+        data: { type: 'hypothesisSidebarReady' },
+      },
+      [channel.port1]
+    );
+
+    window.dispatchEvent(event);
+
+    return event;
+  }
+
+  it('creates Bridge for host <-> sidebar RPC calls when `hypothesisSidebarReady` message is received', () => {
+    createSidebar();
+    const event = sendSidebarReadyMessage();
+    assert.calledWith(fakeBridge.createChannel, event.ports[0]);
+  });
+
   describe('#ready', () => {
     it('returns a promise that resolves when `hypothesisSidebarReady` message is received', async () => {
       const sidebar = createSidebar();
@@ -166,11 +190,7 @@ describe('Sidebar', () => {
         'not-ready'
       );
 
-      window.dispatchEvent(
-        new MessageEvent('message', {
-          data: { type: 'hypothesisSidebarReady' },
-        })
-      );
+      sendSidebarReadyMessage();
 
       return sidebar.ready;
     });
@@ -281,10 +301,10 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('crossframe listeners', () => {
+  describe('sidebar RPC call handlers', () => {
     const emitEvent = (event, ...args) => {
       const result = [];
-      for (let [evt, fn] of fakeCrossFrame.on.args) {
+      for (let [evt, fn] of fakeBridge.on.args) {
         if (event === evt) {
           result.push(fn(...args));
         }
@@ -308,7 +328,7 @@ describe('Sidebar', () => {
         assert.called(target);
       }));
 
-    describe('on "openNotebook" crossframe event', () => {
+    describe('on "openNotebook" event', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'hide').callThrough();
@@ -605,10 +625,10 @@ describe('Sidebar', () => {
   });
 
   describe('#setAllVisibleHighlights', () =>
-    it('sets the state through crossframe and emits', () => {
+    it('requests sidebar to set highlight visibility in guest frames', () => {
       const sidebar = createSidebar();
       sidebar.setAllVisibleHighlights(true);
-      assert.calledWith(fakeCrossFrame.call, 'setVisibleHighlights', true);
+      assert.calledWith(fakeBridge.call, 'setVisibleHighlights', true);
     }));
 
   it('hides toolbar controls when using the "clean" theme', () => {

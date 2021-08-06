@@ -9,7 +9,7 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 
 describe('UserMenu', () => {
   let fakeAuth;
-  let fakeBridge;
+  let fakeFrameSync;
   let fakeIsThirdPartyUser;
   let fakeOnLogout;
   let fakeServiceConfig;
@@ -20,7 +20,7 @@ describe('UserMenu', () => {
     return mount(
       <UserMenu
         auth={fakeAuth}
-        bridge={fakeBridge}
+        frameSync={fakeFrameSync}
         onLogout={fakeOnLogout}
         settings={fakeSettings}
       />
@@ -40,7 +40,7 @@ describe('UserMenu', () => {
       userid: 'acct:eleanorFishtail@hypothes.is',
       username: 'eleanorFishy',
     };
-    fakeBridge = { call: sinon.stub() };
+    fakeFrameSync = { notifyHost: sinon.stub() };
     fakeIsThirdPartyUser = sinon.stub();
     fakeOnLogout = sinon.stub();
     fakeServiceConfig = sinon.stub();
@@ -147,8 +147,11 @@ describe('UserMenu', () => {
 
         onProfileSelected();
 
-        assert.equal(fakeBridge.call.callCount, 1);
-        assert.calledWith(fakeBridge.call, bridgeEvents.PROFILE_REQUESTED);
+        assert.equal(fakeFrameSync.notifyHost.callCount, 1);
+        assert.calledWith(
+          fakeFrameSync.notifyHost,
+          bridgeEvents.PROFILE_REQUESTED
+        );
       });
 
       it('should not fire profile event for first-party user', () => {
@@ -159,7 +162,7 @@ describe('UserMenu', () => {
 
         onProfileSelected();
 
-        assert.equal(fakeBridge.call.callCount, 0);
+        assert.equal(fakeFrameSync.notifyHost.callCount, 0);
       });
     });
   });
@@ -201,8 +204,8 @@ describe('UserMenu', () => {
 
         const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
         openNotebookItem.props().onClick();
-        assert.calledOnce(fakeBridge.call);
-        assert.calledWith(fakeBridge.call, 'openNotebook', 'mygroup');
+        assert.calledOnce(fakeFrameSync.notifyHost);
+        assert.calledWith(fakeFrameSync.notifyHost, 'openNotebook', 'mygroup');
       });
 
       it('opens the notebook and closes itself when `n` is typed', () => {
@@ -215,8 +218,8 @@ describe('UserMenu', () => {
         assert.isTrue(wrapper.find('Menu').props().open);
 
         wrapper.find('.UserMenu').simulate('keydown', { key: 'n' });
-        assert.calledOnce(fakeBridge.call);
-        assert.calledWith(fakeBridge.call, 'openNotebook', 'mygroup');
+        assert.calledOnce(fakeFrameSync.notifyHost);
+        assert.calledWith(fakeFrameSync.notifyHost, 'openNotebook', 'mygroup');
         // Now the menu is "closed" again
         assert.isFalse(wrapper.find('Menu').props().open);
       });

@@ -16,13 +16,12 @@ import UserMenu from './UserMenu';
 /**
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
  * @typedef {import('../components/UserMenu').AuthState} AuthState
- * @typedef {import('../../shared/bridge').Bridge} Bridge
  */
 
 /**
  * @typedef TopBarProps
  * @prop {AuthState} auth
- * @prop {Bridge} bridge
+ * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {boolean} isSidebar - Flag indicating whether the app is the sidebar or a top-level page.
  * @prop {() => any} onLogin - Callback invoked when user clicks "Login" button.
  * @prop {() => any} onLogout - Callback invoked when user clicks "Logout" action in account menu.
@@ -39,7 +38,7 @@ import UserMenu from './UserMenu';
  */
 function TopBar({
   auth,
-  bridge,
+  frameSync,
   isSidebar,
   onLogin,
   onLogout,
@@ -72,7 +71,7 @@ function TopBar({
   const requestHelp = () => {
     const service = serviceConfig(settings);
     if (service && service.onHelpRequestProvided) {
-      bridge.call(bridgeEvents.HELP_REQUESTED);
+      frameSync.notifyHost(bridgeEvents.HELP_REQUESTED);
     } else {
       store.toggleSidebarPanel('help');
     }
@@ -171,4 +170,4 @@ function TopBar({
   );
 }
 
-export default withServices(TopBar, ['bridge', 'settings', 'streamer']);
+export default withServices(TopBar, ['frameSync', 'settings', 'streamer']);

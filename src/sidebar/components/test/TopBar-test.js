@@ -9,7 +9,7 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 
 describe('TopBar', () => {
   const fakeSettings = {};
-  let fakeBridge;
+  let fakeFrameSync;
   let fakeStore;
   let fakeStreamer;
   let fakeIsThirdPartyService;
@@ -26,8 +26,8 @@ describe('TopBar', () => {
       toggleSidebarPanel: sinon.stub(),
     };
 
-    fakeBridge = {
-      call: sinon.stub(),
+    fakeFrameSync = {
+      notifyHost: sinon.stub(),
     };
 
     fakeServiceConfig = sinon.stub().returns({});
@@ -60,7 +60,7 @@ describe('TopBar', () => {
     return mount(
       <TopBar
         auth={auth}
-        bridge={fakeBridge}
+        frameSync={fakeFrameSync}
         isSidebar={true}
         settings={fakeSettings}
         streamer={fakeStreamer}
@@ -123,7 +123,10 @@ describe('TopBar', () => {
           helpButton.props().onClick();
 
           assert.equal(fakeStore.toggleSidebarPanel.callCount, 0);
-          assert.calledWith(fakeBridge.call, bridgeEvents.HELP_REQUESTED);
+          assert.calledWith(
+            fakeFrameSync.notifyHost,
+            bridgeEvents.HELP_REQUESTED
+          );
         });
       });
     });
