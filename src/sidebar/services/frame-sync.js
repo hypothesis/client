@@ -1,8 +1,13 @@
 import debounce from 'lodash.debounce';
 
 import bridgeEvents from '../../shared/bridge-events';
+import { Bridge } from '../../shared/bridge';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
+
+/**
+ * @typedef {import('../../shared/port-rpc').PortRPC} PortRPC
+ */
 
 /**
  * Return a minimal representation of an annotation that can be sent from the
@@ -47,11 +52,15 @@ export class FrameSyncService {
   /**
    * @param {Window} $window - Test seam
    * @param {import('./annotations').AnnotationsService} annotationsService
-   * @param {import('../../shared/bridge').Bridge} bridge
    * @param {import('../store').SidebarStore} store
    */
-  constructor($window, annotationsService, bridge, store) {
-    this._bridge = bridge;
+  constructor($window, annotationsService, store) {
+    /** Channel for sidebar <-> host communication. */
+    this._hostRPC = new Bridge();
+
+    /** Channel for sidebar <-> guest(s) communication. */
+    this._guestRPC = new Bridge();
+
     this._store = store;
     this._window = $window;
 
@@ -60,9 +69,9 @@ export class FrameSyncService {
 
     /**
      * Watch for changes to the set of annotations displayed in the sidebar and
-     * notify connected frames about new/updated/deleted annotations.
+     * notify connected guests about new/updated/deleted annotations.
      */
-    this._setupSyncToFrame = () => {
+    this._setupSyncToGuests = () => {
       let prevPublicAnns = 0;
 
       watch(
@@ -96,20 +105,20 @@ export class FrameSyncService {
           // when they are added or removed in the sidebar, but not re-anchoring
           // annotations if their selectors are updated.
           if (added.length > 0) {
-            bridge.call('loadAnnotations', added.map(formatAnnot));
+            this._guestRPC.call('loadAnnotations', added.map(formatAnnot));
             added.forEach(annot => {
               inFrame.add(annot.$tag);
             });
           }
           deleted.forEach(annot => {
-            bridge.call('deleteAnnotation', formatAnnot(annot));
+            this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
             inFrame.delete(annot.$tag);
           });
 
           if (frames.length > 0) {
             if (frames.every(frame => frame.isAnnotationFetchComplete)) {
               if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-                bridge.call(
+                this._hostRPC.call(
                   bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
                   publicAnns
                 );
@@ -131,21 +140,21 @@ export class FrameSyncService {
     };
 
     /**
-     * Listen for messages coming in from connected frames and add new annotations
+     * Listen for messages coming in from connected guest frames and add new annotations
      * to the sidebar.
      */
-    this._setupSyncFromFrame = () => {
+    this._setupSyncFromGuests = () => {
       // A new annotation, note or highlight was created in the frame
-      bridge.on('beforeCreateAnnotation', event => {
+      this._guestRPC.on('beforeCreateAnnotation', event => {
         const annot = Object.assign({}, event.msg, { $tag: event.tag });
         // If user is not logged in, we can't really create a meaningful highlight
         // or annotation. Instead, we need to open the sidebar, show an error,
         // and delete the (unsaved) annotation so it gets un-selected in the
         // target document
         if (!store.isLoggedIn()) {
-          bridge.call('openSidebar');
+          this._hostRPC.call('openSidebar');
           store.openSidebarPanel('loginPrompt');
-          bridge.call('deleteAnnotation', formatAnnot(annot));
+          this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
           return;
         }
         inFrame.add(event.tag);
@@ -154,7 +163,10 @@ export class FrameSyncService {
         annotationsService.create(annot);
       });
 
-      bridge.on('destroyFrame', frameIdentifier =>
+      // The `destroyFrame` message currently comes from the guests, but we'll
+      // likely need to route it via the host <-> sidebar channel to work around
+      // a Safari bug (https://bugs.webkit.org/show_bug.cgi?id=231167).
+      this._guestRPC.on('destroyFrame', frameIdentifier =>
         destroyFrame(frameIdentifier)
       );
 
@@ -172,7 +184,7 @@ export class FrameSyncService {
       }, 10);
 
       // Anchoring an annotation in the frame completed
-      bridge.on('sync', events_ => {
+      this._guestRPC.on('sync', events_ => {
         events_.forEach(event => {
           inFrame.add(event.tag);
           anchoringStatusUpdates[event.tag] = event.msg.$orphan
@@ -182,44 +194,38 @@ export class FrameSyncService {
         });
       });
 
-      bridge.on('showAnnotations', tags => {
+      this._guestRPC.on('showAnnotations', tags => {
         store.selectAnnotations(store.findIDsForTags(tags));
         store.selectTab('annotation');
       });
 
-      bridge.on('focusAnnotations', tags => {
+      this._guestRPC.on('focusAnnotations', tags => {
         store.focusAnnotations(tags || []);
       });
 
-      bridge.on('toggleAnnotationSelection', tags => {
+      this._guestRPC.on('toggleAnnotationSelection', tags => {
         store.toggleSelectedAnnotations(store.findIDsForTags(tags));
       });
 
-      bridge.on('sidebarOpened', () => {
-        store.setSidebarOpened(true);
+      this._guestRPC.on('openSidebar', () => {
+        this._hostRPC.call('openSidebar');
       });
 
-      // These invoke the matching methods by name on the Guests
-      bridge.on('openSidebar', () => {
-        bridge.call('openSidebar');
-      });
-      bridge.on('closeSidebar', () => {
-        bridge.call('closeSidebar');
-      });
-      bridge.on('setVisibleHighlights', state => {
-        bridge.call('setVisibleHighlights', state);
+      this._guestRPC.on('closeSidebar', () => {
+        this._hostRPC.call('closeSidebar');
       });
     };
   }
 
   /**
-   * Find and connect to Hypothesis clients in the current window.
+   * Connect to the host frame and guest frame(s) in the current browser tab.
    */
   connect() {
     /**
-     * Query the Hypothesis annotation client in a frame for the URL and metadata
-     * of the document that is currently loaded and add the result to the set of
-     * connected frames.
+     * Query the guest in a frame for the URL and metadata of the document that
+     * is currently loaded and add the result to the set of connected frames.
+     *
+     * @param {PortRPC} channel
      */
     const addFrame = channel => {
       channel.call('getDocumentInfo', (err, info) => {
@@ -236,13 +242,12 @@ export class FrameSyncService {
       });
     };
 
-    this._bridge.onConnect(addFrame);
+    this._guestRPC.onConnect(addFrame);
 
     // Listen for messages from new guest frames that want to connect.
     //
     // The message will include a `MessagePort` to use for communication with
-    // the guest. Communication with the host currently relies on the host
-    // frame also always being a guest frame.
+    // the guest.
     this._window.addEventListener('message', e => {
       if (e.data?.type !== 'hypothesisGuestReady') {
         return;
@@ -254,14 +259,40 @@ export class FrameSyncService {
         return;
       }
       const port = e.ports[0];
-      this._bridge.createChannel(port);
+      this._guestRPC.createChannel(port);
     });
 
-    // Notify host frame that it is ready for guests to connect to it.
-    this._window.parent.postMessage({ type: 'hypothesisSidebarReady' }, '*');
+    this._setupSyncToGuests();
+    this._setupSyncFromGuests();
 
-    this._setupSyncToFrame();
-    this._setupSyncFromFrame();
+    this._hostRPC.on('sidebarOpened', () => {
+      this._store.setSidebarOpened(true);
+    });
+
+    // When user toggles the highlight visibility control in the sidebar container,
+    // update the visibility in all the guest frames.
+    this._hostRPC.on('setVisibleHighlights', state => {
+      this._guestRPC.call('setVisibleHighlights', state);
+    });
+
+    // Create channel for sidebar <-> host communication and send port to host.
+    //
+    // This also serves to notify the host that the sidebar application is ready.
+    const hostChannel = new MessageChannel();
+    this._hostRPC.createChannel(hostChannel.port1);
+    this._window.parent.postMessage({ type: 'hypothesisSidebarReady' }, '*', [
+      hostChannel.port2,
+    ]);
+  }
+
+  /**
+   * Send an RPC message to the host frame.
+   *
+   * @param {string} method
+   * @param {any[]} args
+   */
+  notifyHost(method, ...args) {
+    this._hostRPC.call(method, ...args);
   }
 
   /**
@@ -274,7 +305,7 @@ export class FrameSyncService {
    */
   focusAnnotations(tags) {
     this._store.focusAnnotations(tags);
-    this._bridge.call('focusAnnotations', tags);
+    this._guestRPC.call('focusAnnotations', tags);
   }
 
   /**
@@ -283,6 +314,6 @@ export class FrameSyncService {
    * @param {string} tag
    */
   scrollToAnnotation(tag) {
-    this._bridge.call('scrollToAnnotation', tag);
+    this._guestRPC.call('scrollToAnnotation', tag);
   }
 }

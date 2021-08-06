@@ -54,9 +54,11 @@ const fixtures = {
 };
 
 describe('FrameSyncService', () => {
+  let FakeBridge;
+
   let fakeAnnotationsService;
   let fakeStore;
-  let fakeBridge;
+  let fakeBridges;
   let frameSync;
   let fakeWindow;
 
@@ -84,25 +86,32 @@ describe('FrameSyncService', () => {
 
     fakeAnnotationsService = { create: sinon.stub() };
 
-    const emitter = new EventEmitter();
-    fakeBridge = {
-      call: sinon.stub(),
-      createChannel: sinon.stub(),
-      on: emitter.on.bind(emitter),
-      onConnect: function (listener) {
-        emitter.on('connect', listener);
-      },
-
-      emit: emitter.emit.bind(emitter),
-    };
+    fakeBridges = [];
+    FakeBridge = sinon.stub().callsFake(() => {
+      const emitter = new EventEmitter();
+      const bridge = {
+        call: sinon.stub(),
+        createChannel: sinon.stub(),
+        emit: emitter.emit.bind(emitter),
+        on: emitter.on.bind(emitter),
+        onConnect: function (listener) {
+          emitter.on('connect', listener);
+        },
+      };
+      fakeBridges.push(bridge);
+      return bridge;
+    });
 
     fakeWindow = new FakeWindow();
     fakeWindow.parent = new FakeWindow();
 
+    $imports.$mock({
+      '../../shared/bridge': { Bridge: FakeBridge },
+    });
+
     frameSync = new Injector()
       .register('$window', { value: fakeWindow })
       .register('annotationsService', { value: fakeAnnotationsService })
-      .register('bridge', { value: fakeBridge })
       .register('store', { value: fakeStore })
       .register('frameSync', FrameSyncService)
       .get('frameSync');
@@ -112,21 +121,46 @@ describe('FrameSyncService', () => {
     $imports.$restore();
   });
 
+  // Helpers for getting the channels used for sidebar <-> guest/host communication.
+  // These currently rely on knowing the implementation detail of which order
+  // the channels are created in.
+
+  function hostBridge() {
+    return fakeBridges[0];
+  }
+
+  function guestBridge() {
+    return fakeBridges[1];
+  }
+
   describe('#connect', () => {
+    let testChannel;
+
     beforeEach(() => {
+      testChannel = new MessageChannel();
+
       sinon.stub(console, 'warn');
+      sinon.stub(window, 'MessageChannel');
+      window.MessageChannel.returns(testChannel);
     });
 
     afterEach(() => {
       console.warn.restore();
+      window.MessageChannel.restore();
     });
 
-    it('notifies host window that sidebar application is ready', () => {
+    it('sends `hypothesisSidebarReady` notification to host frame with message port', () => {
       frameSync.connect();
 
-      assert.calledWith(fakeWindow.parent.postMessage, {
-        type: 'hypothesisSidebarReady',
-      });
+      assert.calledWith(hostBridge().createChannel, testChannel.port1);
+      assert.calledWith(
+        fakeWindow.parent.postMessage,
+        {
+          type: 'hypothesisSidebarReady',
+        },
+        '*',
+        [testChannel.port2]
+      );
     });
 
     it('connects to new guests when they are ready', () => {
@@ -140,7 +174,7 @@ describe('FrameSyncService', () => {
         })
       );
 
-      assert.calledWith(fakeBridge.createChannel, channel.port1);
+      assert.calledWith(guestBridge().createChannel, channel.port1);
     });
 
     [
@@ -155,7 +189,7 @@ describe('FrameSyncService', () => {
       it('ignores `hypothesisGuestReady` messages that are invalid', () => {
         frameSync.connect();
         fakeWindow.dispatchEvent(new MessageEvent('message', messageInit));
-        assert.notCalled(fakeBridge.createChannel);
+        assert.notCalled(guestBridge().createChannel);
       });
     });
   });
@@ -171,7 +205,7 @@ describe('FrameSyncService', () => {
       });
 
       assert.calledWithMatch(
-        fakeBridge.call,
+        guestBridge().call,
         'loadAnnotations',
         sinon.match([formatAnnot(fixtures.ann)])
       );
@@ -182,14 +216,14 @@ describe('FrameSyncService', () => {
       fakeStore.setState({
         annotations: [fixtures.ann],
       });
-      fakeBridge.call.reset();
+      guestBridge().call.reset();
 
       fakeStore.setState({
         annotations: [fixtures.ann, ann2],
       });
 
       assert.calledWithMatch(
-        fakeBridge.call,
+        guestBridge().call,
         'loadAnnotations',
         sinon.match([formatAnnot(ann2)])
       );
@@ -200,7 +234,7 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.newReply()],
       });
 
-      assert.isFalse(fakeBridge.call.calledWith('loadAnnotations'));
+      assert.isFalse(guestBridge().call.calledWith('loadAnnotations'));
     });
   });
 
@@ -214,7 +248,7 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.publicAnnotation()],
       });
       assert.calledWithMatch(
-        fakeBridge.call,
+        hostBridge().call,
         'publicAnnotationCountChanged',
         sinon.match(1)
       );
@@ -229,7 +263,7 @@ describe('FrameSyncService', () => {
       });
 
       assert.calledWithMatch(
-        fakeBridge.call,
+        hostBridge().call,
         'publicAnnotationCountChanged',
         sinon.match(0)
       );
@@ -241,7 +275,7 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.publicAnnotation()],
       });
       assert.isFalse(
-        fakeBridge.call.calledWith('publicAnnotationCountChanged')
+        hostBridge().call.calledWith('publicAnnotationCountChanged')
       );
     });
 
@@ -251,7 +285,7 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.publicAnnotation()],
       });
       assert.isFalse(
-        fakeBridge.call.calledWith('publicAnnotationCountChanged')
+        hostBridge().call.calledWith('publicAnnotationCountChanged')
       );
     });
   });
@@ -268,7 +302,7 @@ describe('FrameSyncService', () => {
       });
 
       assert.calledWithMatch(
-        fakeBridge.call,
+        guestBridge().call,
         'deleteAnnotation',
         sinon.match(formatAnnot(fixtures.ann))
       );
@@ -282,7 +316,7 @@ describe('FrameSyncService', () => {
         fakeStore.isLoggedIn.returns(true);
         const ann = { target: [] };
 
-        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(
           fakeAnnotationsService.create,
@@ -303,30 +337,30 @@ describe('FrameSyncService', () => {
       it('should not create an annotation in the sidebar', () => {
         const ann = { target: [] };
 
-        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
         assert.notCalled(fakeAnnotationsService.create);
       });
 
       it('should open the sidebar', () => {
         const ann = { target: [] };
-        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.calledWith(fakeBridge.call, 'openSidebar');
+        assert.calledWith(hostBridge().call, 'openSidebar');
       });
 
       it('should open the login prompt panel', () => {
         const ann = { target: [] };
-        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
       });
 
       it('should send a "deleteAnnotation" message to the frame', () => {
         const ann = { target: [] };
-        fakeBridge.emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.calledWith(fakeBridge.call, 'deleteAnnotation');
+        assert.calledWith(guestBridge().call, 'deleteAnnotation');
       });
     });
   });
@@ -350,7 +384,7 @@ describe('FrameSyncService', () => {
     }
 
     it('updates the anchoring status for the annotation', () => {
-      fakeBridge.emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
+      guestBridge().emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
 
       expireDebounceTimeout();
 
@@ -358,8 +392,8 @@ describe('FrameSyncService', () => {
     });
 
     it('coalesces multiple "sync" messages', () => {
-      fakeBridge.emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
-      fakeBridge.emit('sync', [{ tag: 't2', msg: { $orphan: true } }]);
+      guestBridge().emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
+      guestBridge().emit('sync', [{ tag: 't2', msg: { $orphan: true } }]);
 
       expireDebounceTimeout();
 
@@ -386,7 +420,7 @@ describe('FrameSyncService', () => {
     it("adds the page's metadata to the frames list", () => {
       frameInfo = fixtures.htmlDocumentInfo;
 
-      fakeBridge.emit('connect', fakeChannel);
+      guestBridge().emit('connect', fakeChannel);
 
       assert.calledWith(fakeStore.connectFrame, {
         id: frameInfo.frameIdentifier,
@@ -398,7 +432,7 @@ describe('FrameSyncService', () => {
     it('closes the channel and does not add frame to store if getting document info fails', () => {
       fakeChannel.call = (name, callback) => callback('Something went wrong');
 
-      fakeBridge.emit('connect', fakeChannel);
+      guestBridge().emit('connect', fakeChannel);
 
       assert.called(fakeChannel.destroy);
       assert.notCalled(fakeStore.connectFrame);
@@ -410,7 +444,7 @@ describe('FrameSyncService', () => {
 
     it('removes the frame from the frames list', () => {
       frameSync.connect();
-      fakeBridge.emit('destroyFrame', frameId);
+      guestBridge().emit('destroyFrame', frameId);
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
     });
@@ -420,7 +454,7 @@ describe('FrameSyncService', () => {
     it('selects annotations which have an ID', () => {
       frameSync.connect();
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
-      fakeBridge.emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
+      guestBridge().emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
 
       assert.calledWith(fakeStore.selectAnnotations, ['id1', 'id2', 'id3']);
       assert.calledWith(fakeStore.selectTab, 'annotation');
@@ -430,7 +464,7 @@ describe('FrameSyncService', () => {
   describe('on "focusAnnotations" message', () => {
     it('focuses the annotations', () => {
       frameSync.connect();
-      fakeBridge.emit('focusAnnotations', ['tag1', 'tag2', 'tag3']);
+      guestBridge().emit('focusAnnotations', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.focusAnnotations, ['tag1', 'tag2', 'tag3']);
     });
   });
@@ -439,7 +473,7 @@ describe('FrameSyncService', () => {
     it('toggles the selected state of the annotations', () => {
       frameSync.connect();
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
-      fakeBridge.emit('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
+      guestBridge().emit('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
       assert.calledWith(fakeStore.toggleSelectedAnnotations, [
         'id1',
         'id2',
@@ -451,33 +485,33 @@ describe('FrameSyncService', () => {
   describe('on "sidebarOpened" message', () => {
     it('sets the sidebar open in the store', () => {
       frameSync.connect();
-      fakeBridge.emit('sidebarOpened');
+      hostBridge().emit('sidebarOpened');
 
       assert.calledWith(fakeStore.setSidebarOpened, true);
     });
   });
 
-  describe('on a relayed bridge call', () => {
+  describe('relaying messages between host and guest frames', () => {
     beforeEach(() => {
       frameSync.connect();
     });
 
     it('calls "openSidebar"', () => {
-      fakeBridge.emit('openSidebar');
+      guestBridge().emit('openSidebar');
 
-      assert.calledWith(fakeBridge.call, 'openSidebar');
+      assert.calledWith(hostBridge().call, 'openSidebar');
     });
 
     it('calls "closeSidebar"', () => {
-      fakeBridge.emit('closeSidebar');
+      guestBridge().emit('closeSidebar');
 
-      assert.calledWith(fakeBridge.call, 'closeSidebar');
+      assert.calledWith(hostBridge().call, 'closeSidebar');
     });
 
     it('calls "setVisibleHighlights"', () => {
-      fakeBridge.emit('setVisibleHighlights');
+      hostBridge().emit('setVisibleHighlights');
 
-      assert.calledWith(fakeBridge.call, 'setVisibleHighlights');
+      assert.calledWith(guestBridge().call, 'setVisibleHighlights');
     });
   });
 
@@ -494,10 +528,10 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('should notify the host page', () => {
+    it('should focus the associated highlights in the guest', () => {
       frameSync.focusAnnotations([1, 2]);
       assert.calledWith(
-        fakeBridge.call,
+        guestBridge().call,
         'focusAnnotations',
         sinon.match.array.deepEquals([1, 2])
       );
@@ -505,10 +539,10 @@ describe('FrameSyncService', () => {
   });
 
   describe('#scrollToAnnotation', () => {
-    it('should scroll to the annotation in the host page', () => {
+    it('should scroll to the annotation in the guest', () => {
       frameSync.connect();
       frameSync.scrollToAnnotation('atag');
-      assert.calledWith(fakeBridge.call, 'scrollToAnnotation', 'atag');
+      assert.calledWith(guestBridge().call, 'scrollToAnnotation', 'atag');
     });
   });
 });

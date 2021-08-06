@@ -23,7 +23,6 @@ import TopBar from './TopBar';
 /**
  * @typedef {import('../../types/api').Profile} Profile
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
- * @typedef {import('../../shared/bridge').Bridge} Bridge
  * @typedef {import('./UserMenu').AuthState} AuthState
  */
 
@@ -54,7 +53,7 @@ function authStateFromProfile(profile) {
 /**
  * @typedef HypothesisAppProps
  * @prop {import('../services/auth').AuthService} auth
- * @prop {Bridge} bridge
+ * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {MergedConfig} settings
  * @prop {import('../services/session').SessionService} session
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
@@ -68,7 +67,7 @@ function authStateFromProfile(profile) {
  *
  * @param {HypothesisAppProps} props
  */
-function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
+function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
   const store = useStoreProxy();
   const hasFetchedProfile = store.hasFetchedProfile();
   const profile = store.profile();
@@ -99,7 +98,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
   const login = async () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the login request
-      bridge.call(bridgeEvents.LOGIN_REQUESTED);
+      frameSync.notifyHost(bridgeEvents.LOGIN_REQUESTED);
       return;
     }
 
@@ -117,7 +116,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
   const signUp = () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the signup request
-      bridge.call(bridgeEvents.SIGNUP_REQUESTED);
+      frameSync.notifyHost(bridgeEvents.SIGNUP_REQUESTED);
       return;
     }
     window.open(store.getLink('signup'));
@@ -157,7 +156,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
     store.discardAllDrafts();
 
     if (serviceConfig(settings)) {
-      bridge.call(bridgeEvents.LOGOUT_REQUESTED);
+      frameSync.notifyHost(bridgeEvents.LOGOUT_REQUESTED);
       return;
     }
 
@@ -203,7 +202,7 @@ function HypothesisApp({ auth, bridge, settings, session, toastMessenger }) {
 
 export default withServices(HypothesisApp, [
   'auth',
-  'bridge',
+  'frameSync',
   'session',
   'settings',
   'toastMessenger',
