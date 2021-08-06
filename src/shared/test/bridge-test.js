@@ -1,4 +1,4 @@
-import { default as Bridge, $imports } from '../bridge';
+import { Bridge, $imports } from '../bridge';
 
 class FakePortRPC {
   constructor(port, methods) {

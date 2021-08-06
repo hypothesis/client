@@ -30,7 +30,7 @@ describe('CrossFrame multi-frame scenario', () => {
 
     $imports.$mock({
       './annotation-sync': { AnnotationSync: proxyAnnotationSync },
-      '../shared/bridge': proxyBridge,
+      '../shared/bridge': { Bridge: proxyBridge },
     });
 
     container = document.createElement('div');

@@ -8,7 +8,7 @@ import { PortRPC } from './port-rpc';
  *
  * @implements Destroyable
  */
-export default class Bridge {
+export class Bridge {
   constructor() {
     /** @type {PortRPC[]} */
     this.links = [];

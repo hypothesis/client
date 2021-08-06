@@ -1,4 +1,4 @@
-import Bridge from '../../bridge';
+import { Bridge } from '../../bridge';
 
 describe('PortRPC-Bridge integration', () => {
   let clock;

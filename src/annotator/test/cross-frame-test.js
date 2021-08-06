@@ -30,7 +30,7 @@ describe('CrossFrame', () => {
 
     $imports.$mock({
       './annotation-sync': { AnnotationSync: FakeAnnotationSync },
-      '../shared/bridge': FakeBridge,
+      '../shared/bridge': { Bridge: FakeBridge },
     });
   });
 
