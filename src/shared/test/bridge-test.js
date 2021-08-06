@@ -1,6 +1,6 @@
 import { default as Bridge, $imports } from '../bridge';
 
-class FakeRPC {
+class FakePortRPC {
   constructor(port, methods) {
     this.port = port;
     this.methods = methods;
@@ -23,7 +23,7 @@ describe('shared/bridge', () => {
     };
 
     $imports.$mock({
-      './frame-rpc': { RPC: FakeRPC },
+      './port-rpc': { PortRPC: FakePortRPC },
     });
   });
 
@@ -58,7 +58,7 @@ describe('shared/bridge', () => {
 
     it('returns the newly created channel', () => {
       const channel = createChannel();
-      assert.instanceOf(channel, FakeRPC);
+      assert.instanceOf(channel, FakePortRPC);
     });
   });
 

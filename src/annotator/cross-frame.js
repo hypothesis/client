@@ -4,7 +4,7 @@ import * as frameUtil from './util/frame-util';
 import FrameObserver from './frame-observer';
 
 /**
- * @typedef {import('../shared/frame-rpc').RPC} RPC
+ * @typedef {import('../shared/port-rpc').PortRPC} RPC
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('./util/emitter').EventBus} EventBus

@@ -1,4 +1,4 @@
-import { RPC } from '../frame-rpc';
+import { PortRPC } from '../port-rpc';
 
 describe('RPC', () => {
   let port1;
@@ -26,7 +26,7 @@ describe('RPC', () => {
       callback(result);
     };
 
-    rpc1 = new RPC(port1, {
+    rpc1 = new PortRPC(port1, {
       concat,
     });
 
@@ -37,7 +37,7 @@ describe('RPC', () => {
       callback(result);
     });
 
-    rpc2 = new RPC(port2, {
+    rpc2 = new PortRPC(port2, {
       plusOne,
     });
   });
