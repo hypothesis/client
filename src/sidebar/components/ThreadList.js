@@ -173,6 +173,10 @@ function ThreadList({ threads }) {
     };
   }, []);
 
+  // Debugging code related to https://sentry.io/organizations/hypothesis/issues/2554918407/
+  const lastVisibleThreads = useRef(visibleThreads);
+  lastVisibleThreads.current = visibleThreads;
+
   const rootRef = useRef(/** @type {HTMLDivElement|null} */ (null));
 
   // When the set of visible threads changes, recalculate the real rendered
@@ -204,8 +208,14 @@ function ThreadList({ threads }) {
             );
           }
 
-          // Check if effect was called with `visibleThreads` value which does
-          // not match most recently rendered `visibleThreads`.
+          // Check if the values captured by this effect (eg. `visibleThreads`)
+          // do not match the current rendered output.
+          if (visibleThreads !== lastVisibleThreads.current) {
+            throw new Error(
+              `Unable to measure thread ${id}. Output changed since effect queued.`
+            );
+          }
+
           throw new Error(`Unable to measure thread ${id}. Element not found`);
         }
 
