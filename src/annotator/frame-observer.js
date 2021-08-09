@@ -12,8 +12,16 @@ let difference = (arrayA, arrayB) => {
 export const DEBOUNCE_WAIT = 40;
 
 export default class FrameObserver {
-  constructor(target) {
-    this._target = target;
+  /**
+   * @param {Element} element - root of the DOM subtree to watch for the addition
+   *   and removal of annotatable iframes
+   * @param {FrameCallback} onFrameAdded - callback fired when an annotatable iframe is added
+   * @param {FrameCallback} onFrameRemoved - callback triggered when the annotatable iframe is removed
+   */
+  constructor(element, onFrameAdded, onFrameRemoved) {
+    this._element = element;
+    this._onFrameAdded = onFrameAdded;
+    this._onFrameRemoved = onFrameRemoved;
     /** @type {HTMLIFrameElement[]} */
     this._handledFrames = [];
 
@@ -22,22 +30,8 @@ export default class FrameObserver {
         this._discoverFrames();
       }, DEBOUNCE_WAIT)
     );
-  }
-
-  /**
-   * Registers two listeners: the first callback is fired when an Hypothesis frame
-   * is added, the second when an Hypothesis frame is removed.
-   * This method is expected to be called only once.
-   *
-   * @param {FrameCallback} onFrameAdded
-   * @param {FrameCallback} onFrameRemoved
-   */
-  observe(onFrameAdded, onFrameRemoved) {
-    this._onFrameAdded = onFrameAdded;
-    this._onFrameRemoved = onFrameRemoved;
-
     this._discoverFrames();
-    this._mutationObserver.observe(this._target, {
+    this._mutationObserver.observe(this._element, {
       childList: true,
       subtree: true,
       attributeFilter: ['enable-annotation'],
@@ -59,8 +53,7 @@ export default class FrameObserver {
           this._removeFrame(frame);
         });
         this._handledFrames.push(frame);
-        // this._onFrameAdded is never undefined when reached this line
-        /** @type {FrameCallback} */ (this._onFrameAdded)(frame);
+        this._onFrameAdded(frame);
       });
     } else {
       // Could warn here that frame was not cross origin accessible
@@ -71,15 +64,14 @@ export default class FrameObserver {
    * @param {HTMLIFrameElement} frame
    */
   _removeFrame(frame) {
-    // this._onFrameRemoved is never undefined when reached this line
-    /** @type {FrameCallback} */ (this._onFrameRemoved)(frame);
+    this._onFrameRemoved(frame);
 
     // Remove the frame from our list
     this._handledFrames = this._handledFrames.filter(x => x !== frame);
   }
 
   _discoverFrames() {
-    let frames = FrameUtil.findFrames(this._target);
+    let frames = FrameUtil.findFrames(this._element);
 
     for (let frame of frames) {
       if (!this._handledFrames.includes(frame)) {

@@ -24,11 +24,10 @@ export class HypothesisInjector {
   constructor(element, bridge, config) {
     this._bridge = bridge;
     this._config = config;
-    this._frameObserver = new FrameObserver(element);
     /** @type {Map<HTMLIFrameElement, string>} */
     this._frameIdentifiers = new Map();
-
-    this._frameObserver.observe(
+    this._frameObserver = new FrameObserver(
+      element,
       frame => this._injectIntoFrame(frame),
       frame => this._iframeUnloaded(frame)
     );
