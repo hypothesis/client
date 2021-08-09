@@ -12,10 +12,6 @@ describe('PortRPC-Bridge integration', () => {
     return bridge;
   }
 
-  function waitForMessageDelivery() {
-    return new Promise(resolve => setTimeout(resolve, 0));
-  }
-
   beforeEach(() => {
     clock = sinon.useFakeTimers();
     const channel = new MessageChannel();
@@ -30,9 +26,9 @@ describe('PortRPC-Bridge integration', () => {
 
   describe('establishing a connection', () => {
     it('should invoke Bridge `onConnect` callbacks after connecting', async () => {
-      clock.restore();
       const bridge = createBridge();
       const reciprocalBridge = createBridge();
+      reciprocalBridge.on('method', cb => cb(null));
       let callbackCount = 0;
       const callback = () => {
         ++callbackCount;
@@ -43,14 +39,14 @@ describe('PortRPC-Bridge integration', () => {
 
       const channel = bridge.createChannel(port1);
       const reciprocalChannel = reciprocalBridge.createChannel(port2);
-      await waitForMessageDelivery();
+      await bridge.call('method');
 
       assert.equal(callbackCount, 3);
 
       // Additional calls to the RPC `connect` method are ignored
-      channel.call('connect');
-      reciprocalChannel.call('connect');
-      await waitForMessageDelivery();
+      await channel.call('connect');
+      await reciprocalChannel.call('connect');
+      await bridge.call('method');
 
       assert.equal(callbackCount, 3);
     });
