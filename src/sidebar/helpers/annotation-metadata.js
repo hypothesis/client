@@ -6,23 +6,32 @@
 /** @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector */
 /** @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector */
 
-/** Extract a URI, domain and title from the given domain model object.
+/**
+ * Extract document metadata from an annotation.
  *
  * @param {Annotation} annotation
- *
  */
 export function documentMetadata(annotation) {
   const uri = annotation.uri;
 
-  let domain = new URL(uri).hostname;
-  let title = domain;
-
-  if (annotation.document && annotation.document.title) {
-    title = annotation.document.title[0];
+  let domain;
+  try {
+    domain = new URL(uri).hostname;
+  } catch {
+    // Annotation URI parsing on the backend is very liberal compared to the URL
+    // constructor. There is also some historic invalid data in h (eg [1]).
+    // Hence we must handle URL parsing failures in the client.
+    //
+    // [1] https://github.com/hypothesis/client/issues/3666
+    domain = '';
   }
-
   if (domain === 'localhost') {
     domain = '';
+  }
+
+  let title = domain;
+  if (annotation.document && annotation.document.title) {
+    title = annotation.document.title[0];
   }
 
   return {

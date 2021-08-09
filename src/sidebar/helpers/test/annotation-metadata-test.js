@@ -51,6 +51,14 @@ describe('sidebar/helpers/annotation-metadata', () => {
           assert.equal(documentMetadata(annotation).title, 'example.com');
         });
       });
+
+      ['http://localhost:5000', '[not a URL]'].forEach(uri => {
+        it('returns empty domain if URL is invalid or private', () => {
+          const annotation = fakeAnnotation({ uri });
+          const { domain } = documentMetadata(annotation);
+          assert.equal(domain, '');
+        });
+      });
     });
 
     context('when the annotation does not have a document property', () => {
