@@ -44,6 +44,7 @@ export function documentMetadata(annotation) {
 /**
  * Return the domain and title of an annotation for display on an annotation
  * card.
+ *
  * @param {Annotation} annotation
  */
 export function domainAndTitle(annotation) {
@@ -116,7 +117,7 @@ function titleTextFromAnnotation(annotation) {
 /**
  * Return `true` if the given annotation is a reply, `false` otherwise.
  *
- *  @param {Annotation} annotation - An annotation domain model object.
+ * @param {Annotation} annotation
  */
 export function isReply(annotation) {
   return (annotation.references || []).length > 0;
