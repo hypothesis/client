@@ -40,7 +40,7 @@ export default class FrameObserver {
    */
   _addFrame(frame) {
     if (isAccessible(frame)) {
-      isDocumentReady(frame, () => {
+      onDocumentReady(frame, () => {
         const frameWindow = /** @type {Window} */ (frame.contentWindow);
         frameWindow.addEventListener('unload', () => {
           this._removeFrame(frame);
@@ -92,10 +92,12 @@ function isAccessible(iframe) {
 }
 
 /**
+ * Triggers a callback when the iframe's DOM is ready (loaded and parsed)
+ *
  * @param {HTMLIFrameElement} iframe
  * @param {() => void} callback
  */
-export function isDocumentReady(iframe, callback) {
+export function onDocumentReady(iframe, callback) {
   const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
   if (iframeDocument.readyState === 'loading') {
     iframeDocument.addEventListener('DOMContentLoaded', () => {
