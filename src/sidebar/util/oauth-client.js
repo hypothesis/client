@@ -1,3 +1,4 @@
+import { fetchJSON } from './fetch';
 import { generateHexString } from './random';
 
 /**
@@ -184,17 +185,11 @@ export default class OAuthClient {
     const headers = {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
-    const response = await fetch(url, {
+    return fetchJSON(url, {
       method: 'POST',
       headers,
       body: params.toString(),
     });
-
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}`);
-    }
-
-    return response.json();
   }
 
   /**
