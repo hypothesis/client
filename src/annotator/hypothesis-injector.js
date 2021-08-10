@@ -43,6 +43,10 @@ export class HypothesisInjector {
   /**
    * Inject Hypothesis client into a newly-discovered iframe.
    *
+   * IMPORTANT: This method requires that the iframe is "accessible"
+   * (frame.contentDocument|contentWindow is not null) and "ready" (DOM content
+   * has been loaded and parsed) before the method is called.
+   *
    * @param {HTMLIFrameElement} frame
    */
   _injectIntoFrame(frame) {
@@ -50,18 +54,16 @@ export class HypothesisInjector {
       return;
     }
 
-    frameUtil.isDocumentReady(frame, () => {
-      // Generate a random string to use as a frame ID. The format is not important.
-      const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
-      this._frameIdentifiers.set(frame, subFrameIdentifier);
-      const injectedConfig = {
-        ...this._config,
-        subFrameIdentifier,
-      };
+    // Generate a random string to use as a frame ID. The format is not important.
+    const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
+    this._frameIdentifiers.set(frame, subFrameIdentifier);
+    const injectedConfig = {
+      ...this._config,
+      subFrameIdentifier,
+    };
 
-      const { clientUrl } = this._config;
-      frameUtil.injectHypothesis(frame, clientUrl, injectedConfig);
-    });
+    const { clientUrl } = this._config;
+    frameUtil.injectHypothesis(frame, clientUrl, injectedConfig);
   }
 
   /**
