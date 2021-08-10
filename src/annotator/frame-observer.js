@@ -38,16 +38,15 @@ export default class FrameObserver {
   /**
    * @param {HTMLIFrameElement} frame
    */
-  _addFrame(frame) {
+  async _addFrame(frame) {
     if (isAccessible(frame)) {
-      onDocumentReady(frame, () => {
-        const frameWindow = /** @type {Window} */ (frame.contentWindow);
-        frameWindow.addEventListener('unload', () => {
-          this._removeFrame(frame);
-        });
-        this._handledFrames.add(frame);
-        this._onFrameAdded(frame);
+      await onDocumentReady(frame);
+      const frameWindow = /** @type {Window} */ (frame.contentWindow);
+      frameWindow.addEventListener('unload', () => {
+        this._removeFrame(frame);
       });
+      this._handledFrames.add(frame);
+      this._onFrameAdded(frame);
     } else {
       // Could warn here that frame was not cross origin accessible
     }
@@ -92,20 +91,22 @@ function isAccessible(iframe) {
 }
 
 /**
- * Triggers a callback when the iframe's DOM is ready (loaded and parsed)
+ * Resolves a Promise when the iframe's DOM is ready (loaded and parsed)
  *
  * @param {HTMLIFrameElement} iframe
- * @param {() => void} callback
+ * @return {Promise<void>}
  */
-export function onDocumentReady(iframe, callback) {
-  const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
-  if (iframeDocument.readyState === 'loading') {
-    iframeDocument.addEventListener('DOMContentLoaded', () => {
-      callback();
-    });
-  } else {
-    callback();
-  }
+export function onDocumentReady(iframe) {
+  return new Promise(resolve => {
+    const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
+    if (iframeDocument.readyState === 'loading') {
+      iframeDocument.addEventListener('DOMContentLoaded', () => {
+        resolve();
+      });
+    } else {
+      resolve();
+    }
+  });
 }
 
 /**
