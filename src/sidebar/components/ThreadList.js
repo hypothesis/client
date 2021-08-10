@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'preact/hooks';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 import debounce from 'lodash.debounce';
 
 import { useStoreProxy } from '../store/use-store';
@@ -173,12 +167,6 @@ function ThreadList({ threads }) {
     };
   }, []);
 
-  // Debugging code related to https://sentry.io/organizations/hypothesis/issues/2554918407/
-  const lastVisibleThreads = useRef(visibleThreads);
-  lastVisibleThreads.current = visibleThreads;
-
-  const rootRef = useRef(/** @type {HTMLDivElement|null} */ (null));
-
   // When the set of visible threads changes, recalculate the real rendered
   // heights of thread cards and update `threadHeights` state if there are changes.
   useEffect(() => {
@@ -189,34 +177,17 @@ function ThreadList({ threads }) {
           document.getElementById(id)
         );
 
-        // Temporary code added to aid debugging of
-        // https://sentry.io/organizations/hypothesis/issues/2554918407/
-        /* istanbul ignore next */
         if (!threadElement) {
-          const root = rootRef.current;
-
-          // Check if effect was called when ThreadList is not mounted.
-          if (!root) {
-            throw new Error(`Unable to measure thread ${id}. DOM not present.`);
-          }
-
-          // Check if effect was called when ThreadList is rendered but not
-          // connected to parent document.
-          if (!root.isConnected) {
-            throw new Error(
-              `Unable to measure thread ${id}. DOM not connected`
-            );
-          }
-
-          // Check if the values captured by this effect (eg. `visibleThreads`)
-          // do not match the current rendered output.
-          if (visibleThreads !== lastVisibleThreads.current) {
-            throw new Error(
-              `Unable to measure thread ${id}. Output changed since effect queued.`
-            );
-          }
-
-          throw new Error(`Unable to measure thread ${id}. Element not found`);
+          // This could happen if the `ThreadList` DOM is not connected to the document.
+          //
+          // Errors earlier in the render can also potentially cause this (see
+          // https://github.com/hypothesis/client/pull/3665#issuecomment-895857072),
+          // although we don't in general try to make all effects robust to that
+          // as it is a problem that needs to be handled elsewhere.
+          console.warn(
+            'ThreadList could not measure thread. Element not found.'
+          );
+          return prevHeights;
         }
 
         const height = getElementHeightWithMargins(threadElement);
@@ -236,7 +207,7 @@ function ThreadList({ threads }) {
   }, [visibleThreads]);
 
   return (
-    <div ref={rootRef}>
+    <div>
       <div style={{ height: offscreenUpperHeight }} />
       {visibleThreads.map(child => (
         <div className="ThreadList__card" id={child.id} key={child.id}>

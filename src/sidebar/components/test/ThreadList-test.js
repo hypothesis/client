@@ -75,9 +75,11 @@ describe('ThreadList', () => {
       '../util/dom': fakeDomUtil,
       '../helpers/visible-threads': fakeVisibleThreadsUtil,
     });
+    sinon.stub(console, 'warn');
   });
 
   afterEach(() => {
+    console.warn.restore();
     $imports.$restore();
     // Make sure all mounted components are unmounted
     wrappers.forEach(wrapper => wrapper.unmount());
@@ -303,6 +305,17 @@ describe('ThreadList', () => {
     const wrapper = createComponent();
     const cards = wrapper.find('ThreadCard');
     assert.equal(cards.length, fakeTopThread.children.length);
+  });
+
+  it('does not error if thread heights cannot be measured', () => {
+    // Render the `ThreadList` unconnected to a document. This will prevent
+    // it from being able to measure the height of rendered threads.
+    const wrapper = mount(<ThreadList threads={fakeTopThread.children} />);
+    wrappers.push(wrapper);
+    assert.calledWith(
+      console.warn,
+      'ThreadList could not measure thread. Element not found.'
+    );
   });
 
   it(
