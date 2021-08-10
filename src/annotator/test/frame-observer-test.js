@@ -22,13 +22,13 @@ describe('findFrames', () => {
   it('should return valid frames', () => {
     let foundFrames = findFrames(container);
 
-    assert.deepEqual(foundFrames, []);
+    assert.lengthOf(foundFrames, 0);
 
     const frame1 = _addFrameToContainer();
     const frame2 = _addFrameToContainer();
     foundFrames = findFrames(container);
 
-    assert.deepEqual(foundFrames, [frame1, frame2]);
+    assert.deepEqual([...foundFrames], [frame1, frame2]);
   });
 
   it('should not return frames that have not opted into annotation', () => {
@@ -37,6 +37,6 @@ describe('findFrames', () => {
     frame.removeAttribute('enable-annotation');
     const foundFrames = findFrames(container);
 
-    assert.deepEqual(foundFrames, []);
+    assert.lengthOf(foundFrames, 0);
   });
 });
