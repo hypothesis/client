@@ -1,6 +1,6 @@
 import { DEBOUNCE_WAIT } from '../../frame-observer';
 import { HypothesisInjector } from '../../hypothesis-injector';
-import { isLoaded } from '../../util/frame-util';
+import { isDocumentReady } from '../../util/frame-util';
 
 describe('HypothesisInjector integration test', () => {
   let container;
@@ -65,7 +65,7 @@ describe('HypothesisInjector integration test', () => {
     createHypothesisInjector();
 
     const validFramePromise = new Promise(resolve => {
-      isLoaded(validFrame, () => {
+      isDocumentReady(validFrame, () => {
         assert(
           validFrame.contentDocument.body.hasChildNodes(),
           'expected valid frame to be modified'
@@ -74,7 +74,7 @@ describe('HypothesisInjector integration test', () => {
       });
     });
     const invalidFramePromise = new Promise(resolve => {
-      isLoaded(invalidFrame, () => {
+      isDocumentReady(invalidFrame, () => {
         assert(
           !invalidFrame.contentDocument.body.hasChildNodes(),
           'expected invalid frame to not be modified'
@@ -105,7 +105,7 @@ describe('HypothesisInjector integration test', () => {
     createHypothesisInjector();
 
     return new Promise(resolve => {
-      isLoaded(frame, () => {
+      isDocumentReady(frame, () => {
         const scriptElement =
           frame.contentDocument.querySelector('script[src]');
         assert(scriptElement, 'expected embed script to be injected');
@@ -128,7 +128,7 @@ describe('HypothesisInjector integration test', () => {
     createHypothesisInjector();
 
     return new Promise(resolve => {
-      isLoaded(frame, () => {
+      isDocumentReady(frame, () => {
         const scriptElement =
           frame.contentDocument.querySelector('script[src]');
         assert.isNull(
@@ -150,7 +150,7 @@ describe('HypothesisInjector integration test', () => {
     return new Promise(resolve => {
       // Yield to let the DOM and CrossFrame catch up
       waitForFrameObserver(() => {
-        isLoaded(frame, () => {
+        isDocumentReady(frame, () => {
           assert(
             frame.contentDocument.body.hasChildNodes(),
             'expected dynamically added frame to be modified'
@@ -192,7 +192,7 @@ describe('HypothesisInjector integration test', () => {
     createHypothesisInjector();
 
     return new Promise(resolve => {
-      isLoaded(frame, () => {
+      isDocumentReady(frame, () => {
         assert(
           frame.contentDocument.body.hasChildNodes(),
           'expected initial frame to be modified'
@@ -207,7 +207,7 @@ describe('HypothesisInjector integration test', () => {
 
           // Yield again
           waitForFrameObserver(() => {
-            isLoaded(frame, () => {
+            isDocumentReady(frame, () => {
               assert(
                 frame.contentDocument.body.hasChildNodes(),
                 'expected dynamically added frame to be modified'
@@ -230,7 +230,7 @@ describe('HypothesisInjector integration test', () => {
     return new Promise(resolve => {
       // Yield to let the DOM and CrossFrame catch up
       waitForFrameObserver(() => {
-        isLoaded(frame, () => {
+        isDocumentReady(frame, () => {
           assert(
             frame.contentDocument.body.hasChildNodes(),
             'expected dynamically added frame to be modified'
@@ -245,7 +245,7 @@ describe('HypothesisInjector integration test', () => {
 
             // Yield
             waitForFrameObserver(() => {
-              isLoaded(frame, () => {
+              isDocumentReady(frame, () => {
                 assert(
                   frame.contentDocument.body.hasChildNodes(),
                   'expected dynamically added frame to be modified'

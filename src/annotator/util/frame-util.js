@@ -76,18 +76,3 @@ export function isDocumentReady(iframe, callback) {
     callback();
   }
 }
-
-/**
- * @param {HTMLIFrameElement} iframe
- * @param {() => void} callback
- */
-export function isLoaded(iframe, callback) {
-  const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
-  if (iframeDocument.readyState !== 'complete') {
-    iframe.addEventListener('load', () => {
-      callback();
-    });
-  } else {
-    callback();
-  }
-}

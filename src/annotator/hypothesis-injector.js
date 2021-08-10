@@ -50,7 +50,7 @@ export class HypothesisInjector {
       return;
     }
 
-    frameUtil.isLoaded(frame, () => {
+    frameUtil.isDocumentReady(frame, () => {
       // Generate a random string to use as a frame ID. The format is not important.
       const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
       this._frameIdentifiers.set(frame, subFrameIdentifier);
