@@ -39,13 +39,13 @@ export default class FrameObserver {
    * @param {HTMLIFrameElement} frame
    */
   async _addFrame(frame) {
+    this._handledFrames.add(frame);
     if (isAccessible(frame)) {
       await onDocumentReady(frame);
       const frameWindow = /** @type {Window} */ (frame.contentWindow);
       frameWindow.addEventListener('unload', () => {
         this._removeFrame(frame);
       });
-      this._handledFrames.add(frame);
       this._onFrameAdded(frame);
     } else {
       // Could warn here that frame was not cross origin accessible
@@ -56,8 +56,8 @@ export default class FrameObserver {
    * @param {HTMLIFrameElement} frame
    */
   _removeFrame(frame) {
-    this._onFrameRemoved(frame);
     this._handledFrames.delete(frame);
+    this._onFrameRemoved(frame);
   }
 
   _discoverFrames() {
