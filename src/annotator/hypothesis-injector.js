@@ -28,8 +28,8 @@ export class HypothesisInjector {
     this._frameIdentifiers = new Map();
     this._frameObserver = new FrameObserver(
       element,
-      frame => this._injectIntoFrame(frame),
-      frame => this._iframeUnloaded(frame)
+      frame => this._addHypothesis(frame),
+      frame => this._removeHypothesis(frame)
     );
   }
 
@@ -49,7 +49,7 @@ export class HypothesisInjector {
    *
    * @param {HTMLIFrameElement} frame
    */
-  _injectIntoFrame(frame) {
+  _addHypothesis(frame) {
     if (frameUtil.hasHypothesis(frame)) {
       return;
     }
@@ -69,7 +69,7 @@ export class HypothesisInjector {
   /**
    * @param {HTMLIFrameElement} frame
    */
-  _iframeUnloaded(frame) {
+  _removeHypothesis(frame) {
     this._bridge.call('destroyFrame', this._frameIdentifiers.get(frame));
     this._frameIdentifiers.delete(frame);
   }
