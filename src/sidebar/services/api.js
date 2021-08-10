@@ -1,3 +1,4 @@
+import { fetchJSON } from '../util/fetch';
 import { replaceURLParams } from '../util/url';
 
 /**
@@ -6,20 +7,6 @@ import { replaceURLParams } from '../util/url';
  * @typedef {import('../../types/api').RouteMap} RouteMap
  * @typedef {import('../../types/api').Profile} Profile
  */
-
-/**
- * Translate the response from a failed API call into an Error-like object.
- *
- * @param {Response} response
- * @param {Object} data - The parsed JSON response
- */
-function translateResponseToError(response, data) {
-  let message = response.status + ' ' + response.statusText;
-  if (data?.reason) {
-    message = message + ': ' + data.reason;
-  }
-  return new Error(message);
-}
 
 /**
  * Return a shallow clone of `obj` with all client-only properties removed.
@@ -143,36 +130,15 @@ function createAPICall(
         }
       }
 
-      let response;
-      try {
-        response = await fetch(apiURL.toString(), {
-          body: data ? JSON.stringify(stripInternalProperties(data)) : null,
-          headers,
-          method: descriptor.method,
-        });
-      } catch (err) {
-        // Re-throw Fetch errors such that they all "look the same" (different
-        // browsers throw different Errors on Fetch failure). This allows
-        // Fetch failures to be either handled in particular ways higher up
-        // or for them to be ignored in error reporting (see `sentry` config).
-        throw new Error(`Fetch operation failed for URL '${url}'`);
-      }
-
-      const status = response.status;
-
-      let responseBody;
-      if (status >= 200 && status !== 204 && status < 500) {
-        responseBody = await response.json();
-      } else {
-        responseBody = await response.text();
-      }
-
-      if (status >= 400) {
-        // Translate the API result into an `Error` to follow the convention that
-        // Promises should be rejected with an Error or Error-like object.
-        throw translateResponseToError(response, responseBody);
-      }
-      return responseBody;
+      // nb. Don't "simplify" the lines below to `return fetchJSON(...)` as this
+      // would cause `onRequestFinished` to be called before the API response
+      // is received.
+      const result = await fetchJSON(apiURL.toString(), {
+        body: data ? JSON.stringify(stripInternalProperties(data)) : null,
+        headers,
+        method: descriptor.method,
+      });
+      return result;
     } finally {
       onRequestFinished();
     }
