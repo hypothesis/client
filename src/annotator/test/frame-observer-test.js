@@ -20,6 +20,12 @@ describe('FrameObserver', () => {
     return frame;
   }
 
+  function waitForIFrameUnload(frame) {
+    return new Promise(resolve =>
+      frame.contentWindow.addEventListener('unload', resolve)
+    );
+  }
+
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
@@ -65,6 +71,57 @@ describe('FrameObserver', () => {
     await waitForFrameObserver();
 
     assert.notCalled(onFrameAdded);
+  });
+
+  it('removal of the annotatable iframe triggers onFrameRemoved', done => {
+    sinon.stub(frameObserver, '_removeFrame').callThrough();
+    const frame = createAnnotatableIFrame();
+
+    waitForFrameObserver()
+      .then(() => {
+        assert.calledOnce(onFrameAdded);
+        assert.calledWith(onFrameAdded, frame);
+      })
+      .then(() => {
+        frame.remove();
+      });
+
+    waitForIFrameUnload(frame)
+      .then(() => waitForFrameObserver())
+      .then(() => {
+        assert.calledOnce(frameObserver._removeFrame);
+        assert.calledOnce(onFrameRemoved);
+        assert.calledWith(onFrameRemoved, frame);
+      })
+      .then(done);
+  });
+
+  it('removal of the `enable-annotation` attribute triggers onFrameRemoved', async () => {
+    const frame = createAnnotatableIFrame();
+    await waitForFrameObserver();
+
+    assert.calledOnce(onFrameAdded);
+    assert.calledWith(onFrameAdded, frame);
+
+    frame.removeAttribute('enable-annotation');
+    await waitForFrameObserver();
+
+    assert.calledOnce(onFrameRemoved);
+    assert.calledWith(onFrameRemoved, frame);
+  });
+
+  it('changing the `src` attribute triggers onFrameRemoved', async () => {
+    const frame = createAnnotatableIFrame();
+    await waitForFrameObserver();
+
+    assert.calledOnce(onFrameAdded);
+    assert.calledWith(onFrameAdded, frame);
+
+    frame.setAttribute('src', document.location);
+    await waitForIFrameUnload(frame);
+
+    assert.calledOnce(onFrameRemoved);
+    assert.calledWith(onFrameRemoved, frame);
   });
 
   // This test doesn't work. Surprisingly, `isAccessible` returns `true` even
