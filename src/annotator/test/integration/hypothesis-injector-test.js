@@ -1,6 +1,6 @@
 import { DEBOUNCE_WAIT } from '../../frame-observer';
 import { HypothesisInjector } from '../../hypothesis-injector';
-import { isDocumentReady } from '../../util/frame-util';
+import { isDocumentReady } from '../../frame-observer';
 
 describe('HypothesisInjector integration test', () => {
   let container;

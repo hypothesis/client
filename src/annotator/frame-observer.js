@@ -1,7 +1,5 @@
 import debounce from 'lodash.debounce';
 
-import * as FrameUtil from './util/frame-util';
-
 /** @typedef {(frame: HTMLIFrameElement) => void} FrameCallback */
 
 // Find difference of two arrays
@@ -46,8 +44,8 @@ export default class FrameObserver {
    * @param {HTMLIFrameElement} frame
    */
   _addFrame(frame) {
-    if (FrameUtil.isAccessible(frame)) {
-      FrameUtil.isDocumentReady(frame, () => {
+    if (isAccessible(frame)) {
+      isDocumentReady(frame, () => {
         const frameWindow = /** @type {Window} */ (frame.contentWindow);
         frameWindow.addEventListener('unload', () => {
           this._removeFrame(frame);
@@ -71,7 +69,7 @@ export default class FrameObserver {
   }
 
   _discoverFrames() {
-    let frames = FrameUtil.findFrames(this._element);
+    let frames = findFrames(this._element);
 
     for (let frame of frames) {
       if (!this._handledFrames.includes(frame)) {
@@ -83,4 +81,49 @@ export default class FrameObserver {
       this._removeFrame(frame);
     }
   }
+}
+
+/**
+ * Check if we can access this iframe's document
+ *
+ * @param {HTMLIFrameElement} iframe
+ */
+function isAccessible(iframe) {
+  try {
+    return !!iframe.contentDocument;
+  } catch (e) {
+    return false;
+  }
+}
+
+/**
+ * @param {HTMLIFrameElement} iframe
+ * @param {() => void} callback
+ */
+export function isDocumentReady(iframe, callback) {
+  const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
+  if (iframeDocument.readyState === 'loading') {
+    iframeDocument.addEventListener('DOMContentLoaded', () => {
+      callback();
+    });
+  } else {
+    callback();
+  }
+}
+
+/**
+ * Return all `<iframe>` elements under `container` which are annotate-able.
+ *
+ * To enable annotation, an iframe must be opted-in by adding the
+ * `enable-annotation` attribute.
+ *
+ * Eventually we may want annotation to be enabled by default for iframes that
+ * pass certain tests. However we need to resolve a number of issues before we
+ * can do that. See https://github.com/hypothesis/client/issues/530
+ *
+ * @param {Element} container
+ * @return {HTMLIFrameElement[]}
+ */
+export function findFrames(container) {
+  return Array.from(container.querySelectorAll('iframe[enable-annotation]'));
 }
