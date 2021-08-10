@@ -1,3 +1,4 @@
+import { FetchError } from '../../util/fetch';
 import { APIRoutesService, $imports } from '../api-routes';
 
 // Abridged version of the response returned by https://hypothes.is/api,
@@ -51,24 +52,18 @@ async function fakeRetryPromiseOperation(callback) {
 
 describe('APIRoutesService', () => {
   let apiRoutes;
+
+  let fakeFetchJSON;
   let fakeSettings;
 
-  function httpResponse(status, data) {
-    return Promise.resolve({ status, json: () => Promise.resolve(data) });
-  }
-
   beforeEach(() => {
-    // We use a simple sinon stub of `fetch` here rather than `fetch-mock`
-    // because this service's usage of fetch is very simple and it makes it
-    // easier to mock the retry behavior.
-    const fetchStub = sinon.stub(window, 'fetch');
-
-    fetchStub
+    fakeFetchJSON = sinon.stub().rejects(new FetchError(null));
+    fakeFetchJSON
       .withArgs('https://annotation.service/api/')
-      .returns(httpResponse(200, apiIndexResponse));
-    fetchStub
+      .returns(apiIndexResponse);
+    fakeFetchJSON
       .withArgs('https://annotation.service/api/links')
-      .returns(httpResponse(200, linksResponse));
+      .returns(linksResponse);
 
     fakeSettings = {
       apiUrl: 'https://annotation.service/api/',
@@ -77,13 +72,13 @@ describe('APIRoutesService', () => {
     apiRoutes = new APIRoutesService(fakeSettings);
 
     $imports.$mock({
+      '../util/fetch': { fetchJSON: fakeFetchJSON },
       '../util/retry': { retryPromiseOperation: fakeRetryPromiseOperation },
     });
   });
 
   afterEach(() => {
     $imports.$restore();
-    window.fetch.restore();
   });
 
   describe('#routes', () => {
@@ -98,20 +93,20 @@ describe('APIRoutesService', () => {
       return Promise.all([apiRoutes.routes(), apiRoutes.routes()]).then(
         ([routesA, routesB]) => {
           assert.equal(routesA, routesB);
-          assert.equal(window.fetch.callCount, 1);
+          assert.equal(fakeFetchJSON.callCount, 1);
         }
       );
     });
 
     it('retries the route fetch until it succeeds', async () => {
-      window.fetch
+      fakeFetchJSON
         .withArgs('https://annotation.service/api/')
         .onFirstCall()
-        .returns(httpResponse(500, null));
+        .throws(new FetchError(null, 'Fetch failed'));
 
       const routes = await apiRoutes.routes();
 
-      assert.calledTwice(window.fetch);
+      assert.calledTwice(fakeFetchJSON);
       assert.deepEqual(routes, apiIndexResponse.links);
     });
   });
@@ -129,20 +124,20 @@ describe('APIRoutesService', () => {
       return Promise.all([apiRoutes.links(), apiRoutes.links()]).then(
         ([linksA, linksB]) => {
           assert.equal(linksA, linksB);
-          assert.deepEqual(window.fetch.callCount, 2);
+          assert.deepEqual(fakeFetchJSON.callCount, 2);
         }
       );
     });
 
     it('retries the link fetch until it succeeds', async () => {
-      window.fetch
+      fakeFetchJSON
         .withArgs(apiIndexResponse.links.links.url)
         .onFirstCall()
-        .returns(httpResponse(500, null));
+        .throws(new FetchError(null));
 
       const links = await apiRoutes.links();
 
-      assert.equal(window.fetch.callCount, 3); // One `/api` fetch, two `/api/links` fetches.
+      assert.equal(fakeFetchJSON.callCount, 3); // One `/api` fetch, two `/api/links` fetches.
       assert.deepEqual(links, linksResponse);
     });
   });

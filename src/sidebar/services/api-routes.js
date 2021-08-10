@@ -1,3 +1,4 @@
+import { fetchJSON } from '../util/fetch';
 import { retryPromiseOperation } from '../util/retry';
 
 /**
@@ -11,12 +12,7 @@ function getJSON(url) {
     // any additional headers/config so that we can use `<link rel="preload">` in
     // the `/app.html` response to fetch them early, while the client JS app
     // is loading.
-    fetch(url).then(response => {
-      if (response.status !== 200) {
-        throw new Error(`Fetching ${url} failed`);
-      }
-      return response.json();
-    })
+    fetchJSON(url)
   );
 }
 
