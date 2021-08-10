@@ -1,13 +1,8 @@
 import debounce from 'lodash.debounce';
 
-/** @typedef {(frame: HTMLIFrameElement) => void} FrameCallback */
-
-// Find difference of two arrays
-let difference = (arrayA, arrayB) => {
-  return arrayA.filter(x => !arrayB.includes(x));
-};
-
 export const DEBOUNCE_WAIT = 40;
+
+/** @typedef {(frame: HTMLIFrameElement) => void} FrameCallback */
 
 export default class FrameObserver {
   /**
@@ -20,8 +15,8 @@ export default class FrameObserver {
     this._element = element;
     this._onFrameAdded = onFrameAdded;
     this._onFrameRemoved = onFrameRemoved;
-    /** @type {HTMLIFrameElement[]} */
-    this._handledFrames = [];
+    /** @type {Set<HTMLIFrameElement>} */
+    this._handledFrames = new Set();
 
     this._mutationObserver = new MutationObserver(
       debounce(() => {
@@ -50,7 +45,7 @@ export default class FrameObserver {
         frameWindow.addEventListener('unload', () => {
           this._removeFrame(frame);
         });
-        this._handledFrames.push(frame);
+        this._handledFrames.add(frame);
         this._onFrameAdded(frame);
       });
     } else {
@@ -63,22 +58,22 @@ export default class FrameObserver {
    */
   _removeFrame(frame) {
     this._onFrameRemoved(frame);
-
-    // Remove the frame from our list
-    this._handledFrames = this._handledFrames.filter(x => x !== frame);
+    this._handledFrames.delete(frame);
   }
 
   _discoverFrames() {
     let frames = findFrames(this._element);
 
     for (let frame of frames) {
-      if (!this._handledFrames.includes(frame)) {
+      if (!this._handledFrames.has(frame)) {
         this._addFrame(frame);
       }
     }
 
-    for (let frame of difference(this._handledFrames, frames)) {
-      this._removeFrame(frame);
+    for (let frame of this._handledFrames) {
+      if (!frames.has(frame)) {
+        this._removeFrame(frame);
+      }
     }
   }
 }
@@ -122,8 +117,8 @@ export function isDocumentReady(iframe, callback) {
  * can do that. See https://github.com/hypothesis/client/issues/530
  *
  * @param {Element} container
- * @return {HTMLIFrameElement[]}
+ * @return {Set<HTMLIFrameElement>}
  */
 export function findFrames(container) {
-  return Array.from(container.querySelectorAll('iframe[enable-annotation]'));
+  return new Set(container.querySelectorAll('iframe[enable-annotation]'));
 }
