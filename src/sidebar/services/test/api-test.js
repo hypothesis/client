@@ -200,8 +200,7 @@ describe('APIService', () => {
         // Network error
         status: null,
         body: 'Service unreachable.',
-        expectedMessage:
-          "Fetch operation failed for URL 'https://example.com/api/profile'",
+        expectedMessage: 'Network request failed: Service unreachable.',
       },
       {
         // Request failed with an error given in the JSON body
@@ -210,14 +209,15 @@ describe('APIService', () => {
         body: {
           reason: 'Thing not found',
         },
-        expectedMessage: '404 Not Found: Thing not found',
+        expectedMessage: 'Network request failed (404): Thing not found',
       },
       {
         // Request failed with a non-JSON response
         status: 500,
         statusText: 'Server Error',
         body: 'Internal Server Error',
-        expectedMessage: '500 Internal Server Error',
+        expectedMessage:
+          'Network request failed (500): Failed to parse response',
       },
     ].forEach(({ status, body, expectedMessage }) => {
       it('rejects the call with an error', () => {
