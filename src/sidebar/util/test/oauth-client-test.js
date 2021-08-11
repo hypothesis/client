@@ -1,6 +1,7 @@
 import fetchMock from 'fetch-mock';
 import sinon from 'sinon';
 
+import { TokenError } from '../oauth-client';
 import OAuthClient from '../oauth-client';
 
 import FakeWindow from '../../test/fake-window';
@@ -88,7 +89,8 @@ describe('sidebar/util/oauth-client', () => {
         status: 400,
       });
       return client.exchangeAuthCode('unknowncode').catch(err => {
-        assert.equal(err.message, 'Authorization code exchange failed');
+        assert.instanceOf(err, TokenError);
+        assert.equal(err.message, 'Failed to fetch access token');
       });
     });
   });
@@ -121,7 +123,8 @@ describe('sidebar/util/oauth-client', () => {
         status: 400,
       });
       return client.exchangeGrantToken('unknowntoken').catch(err => {
-        assert.equal(err.message, 'Failed to retrieve access token');
+        assert.instanceOf(err, TokenError);
+        assert.equal(err.message, 'Failed to fetch access token');
       });
     });
   });
@@ -152,7 +155,8 @@ describe('sidebar/util/oauth-client', () => {
     it('rejects if the request fails', () => {
       fetchMock.post(config.tokenEndpoint, { status: 400 });
       return client.refreshToken('invalid-token').catch(err => {
-        assert.equal(err.message, 'Failed to refresh access token');
+        assert.instanceOf(err, TokenError);
+        assert.equal(err.message, 'Failed to fetch access token');
       });
     });
   });
@@ -170,14 +174,15 @@ describe('sidebar/util/oauth-client', () => {
     });
 
     it('resolves if the request succeeds', () => {
-      fetchMock.post(config.revokeEndpoint, { status: 200 });
+      fetchMock.post(config.revokeEndpoint, { status: 200, body: {} });
       return client.revokeToken('valid-access-token');
     });
 
     it('rejects if the request fails', () => {
       fetchMock.post(config.revokeEndpoint, { status: 400 });
       return client.revokeToken('invalid-token').catch(err => {
-        assert.equal(err.message, 'failed');
+        assert.instanceOf(err, TokenError);
+        assert.equal(err.message, 'Failed to revoke access token');
       });
     });
   });
