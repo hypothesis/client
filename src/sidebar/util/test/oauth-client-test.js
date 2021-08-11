@@ -1,7 +1,7 @@
 import fetchMock from 'fetch-mock';
 import sinon from 'sinon';
 
-import { TokenError } from '../oauth-client';
+import { $imports, TokenError } from '../oauth-client';
 import OAuthClient from '../oauth-client';
 
 import FakeWindow from '../../test/fake-window';
@@ -31,7 +31,6 @@ describe('sidebar/util/oauth-client', () => {
     authorizationEndpoint: 'https://annota.te/oauth/authorize',
     tokenEndpoint: 'https://annota.te/api/token',
     revokeEndpoint: 'https://annota.te/oauth/revoke',
-    generateState: () => 'notrandom',
   };
 
   beforeEach(() => {
@@ -44,6 +43,7 @@ describe('sidebar/util/oauth-client', () => {
   });
 
   afterEach(() => {
+    $imports.$restore();
     fetchMock.restore();
     clock.restore();
   });
@@ -215,6 +215,12 @@ describe('sidebar/util/oauth-client', () => {
 
     beforeEach(() => {
       fakeWindow = new FakeWindow();
+
+      $imports.$mock({
+        './random': {
+          generateHexString: () => 'notrandom',
+        },
+      });
     });
 
     function authorize() {
