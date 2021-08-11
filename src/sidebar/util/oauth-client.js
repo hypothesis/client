@@ -191,7 +191,7 @@ export default class OAuthClient {
     });
 
     if (response.status !== 200) {
-      throw new Error('Request failed');
+      throw new Error(`Request failed with status ${response.status}`);
     }
 
     return response.json();
@@ -201,6 +201,7 @@ export default class OAuthClient {
    * Fetch an OAuth access token.
    *
    * @param {Record<string, string>} data - Parameters for form POST request
+   * @return {Promise<TokenInfo>}
    */
   async _getAccessToken(data) {
     // The request to `tokenEndpoint` returns an OAuth "Access Token Response".
