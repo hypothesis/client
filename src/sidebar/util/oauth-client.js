@@ -3,7 +3,7 @@ import { generateHexString } from './random';
 /**
  * An object holding the details of an access token from the tokenUrl endpoint.
  *
- * @typedef {Object} TokenInfo
+ * @typedef TokenInfo
  * @prop {string} accessToken  - The access token itself.
  * @prop {number} expiresAt    - The date when the timestamp will expire.
  * @prop {string} refreshToken - The refresh token that can be used to
@@ -25,24 +25,13 @@ export class TokenError extends Error {
 }
 
 /**
- * Generate a short random string suitable for use as the "state" param in
- * authorization requests.
- *
- * See https://tools.ietf.org/html/rfc6749#section-4.1.1.
- */
-function generateState() {
-  return generateHexString(16);
-}
-
-/**
  * OAuthClient configuration.
  *
- * @typedef {Object} Config
- * @property {string} clientId - OAuth client ID
- * @property {string} tokenEndpoint - OAuth token exchange/refresh endpoint
- * @property {string} authorizationEndpoint - OAuth authorization endpoint
- * @property {string} revokeEndpoint - RFC 7009 token revocation endpoint
- * @property {() => string} [generateState] - Authorization "state" parameter generator
+ * @typedef Config
+ * @prop {string} clientId - OAuth client ID
+ * @prop {string} tokenEndpoint - OAuth token exchange/refresh endpoint
+ * @prop {string} authorizationEndpoint - OAuth authorization endpoint
+ * @prop {string} revokeEndpoint - RFC 7009 token revocation endpoint
  */
 
 /**
@@ -60,9 +49,6 @@ export default class OAuthClient {
     this.tokenEndpoint = config.tokenEndpoint;
     this.authorizationEndpoint = config.authorizationEndpoint;
     this.revokeEndpoint = config.revokeEndpoint;
-
-    // Test seam
-    this.generateState = config.generateState || generateState;
   }
 
   /**
@@ -136,7 +122,9 @@ export default class OAuthClient {
   authorize($window, authWindow) {
     // Random state string used to check that auth messages came from the popup
     // window that we opened.
-    const state = this.generateState();
+    //
+    // See https://tools.ietf.org/html/rfc6749#section-4.1.1.
+    const state = generateHexString(16);
 
     // Promise which resolves or rejects when the user accepts or closes the
     // auth popup.
