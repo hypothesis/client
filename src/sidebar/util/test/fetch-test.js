@@ -37,6 +37,8 @@ describe('sidebar/util/fetch', () => {
       }
 
       assert.instanceOf(err, FetchError);
+      assert.equal(err.url, 'https://example.com');
+      assert.equal(err.response, null);
       assert.include(err.message, 'Network request failed: Fetch failed');
     });
 
@@ -55,6 +57,8 @@ describe('sidebar/util/fetch', () => {
         err = e;
       }
       assert.instanceOf(err, FetchError);
+      assert.equal(err.url, 'https://example.com');
+      assert.equal(err.response, fakeResponse);
       assert.equal(
         err.message,
         'Network request failed (200): Failed to parse response'
@@ -71,6 +75,8 @@ describe('sidebar/util/fetch', () => {
         err = e;
       }
       assert.instanceOf(err, FetchError);
+      assert.equal(err.url, 'https://example.com');
+      assert.equal(err.response, fakeResponse);
       assert.equal(err.message, 'Network request failed (400): server error');
     });
 
