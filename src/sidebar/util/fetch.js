@@ -9,13 +9,15 @@
  */
 export class FetchError extends Error {
   /**
+   * @param {string} url - The URL that was requested. This may be different
+   *   than the final URL of the response if a redirect happened.
    * @param {Response|null} response - The response to the `fetch` request or
    *   `null` if the fetch failed
    * @param {string} [reason] - Additional details about the error. This might
    *   include context of the network request or a server-provided error in
    *   the response.
    */
-  constructor(response, reason = '') {
+  constructor(url, response, reason = '') {
     let message = 'Network request failed';
     if (response) {
       message += ` (${response.status})`;
@@ -25,6 +27,7 @@ export class FetchError extends Error {
     }
     super(message);
 
+    this.url = url;
     this.response = response;
     this.reason = reason;
   }
@@ -49,7 +52,7 @@ export async function fetchJSON(url, init) {
     // If the request fails for any reason, wrap the result in a `FetchError`.
     // Different browsers use different error messages for `fetch` failures, so
     // wrapping the error allows downstream clients to handle this uniformly.
-    throw new FetchError(null, err.message);
+    throw new FetchError(url, null, err.message);
   }
 
   if (response.status === 204 /* No Content */) {
@@ -62,14 +65,14 @@ export async function fetchJSON(url, init) {
   try {
     data = await response.json();
   } catch (err) {
-    throw new FetchError(response, 'Failed to parse response');
+    throw new FetchError(url, response, 'Failed to parse response');
   }
 
   // If the HTTP status indicates failure, attempt to extract a server-provided
   // reason from the response, assuming certain conventions for the formatting
   // of error responses.
   if (!response.ok) {
-    throw new FetchError(response, data?.reason);
+    throw new FetchError(url, response, data?.reason);
   }
 
   return data;
