@@ -36,13 +36,14 @@ export class FetchError extends Error {
 /**
  * Execute a network request and return the parsed JSON response.
  *
- * Throws {@link FetchError} if making the request fails or the request returns
- * a non-2xx response.
- *
- * Returns `null` if the request returns a 204 (No Content) response.
+ * fetchJSON wraps the browser's `fetch` API to standardize error handling when
+ * making network requests that return JSON responses.
  *
  * @param {string} url
  * @param {RequestInit} [init] - Parameters for `fetch` request
+ * @return {Promise<any>} - Parsed JSON response or `null` if response status is 204 (No Content)
+ * @throws {FetchError} if the request fails, returns a non-2xx status or a JSON
+ *   response is expected but cannot be parsed
  */
 export async function fetchJSON(url, init) {
   let response;
