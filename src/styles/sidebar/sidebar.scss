@@ -49,7 +49,6 @@
 @use './components/ShareAnnotationsPanel';
 @use './components/SearchInput';
 @use './components/ShareLinks';
-@use './components/Spinner';
 @use './components/TagEditor';
 @use './components/TagList';
 @use './components/Thread';
@@ -59,6 +58,9 @@
 @use './components/TopBar';
 @use './components/Tutorial';
 @use './components/VersionInfo';
+
+// Make the shared package utility styles available
+@use '@hypothesis/frontend-shared/styles/util' as hyp-u;
 
 // Top-level styles
 // ----------------

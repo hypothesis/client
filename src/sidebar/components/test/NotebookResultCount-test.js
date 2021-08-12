@@ -131,7 +131,7 @@ describe('NotebookResultCount', () => {
 
       const wrapper = createComponent({ isLoading: true, resultCount: 2 });
 
-      assert.equal(wrapper.text(), '(2 annotations)');
+      assert.include(wrapper.text(), '(2 annotations)');
     });
   });
 
