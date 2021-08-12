@@ -66,8 +66,8 @@ describe('sidebar/util/fetch', () => {
     });
 
     it('throws a FetchError if the response has a non-2xx status code', async () => {
-      fakeResponse.status = 400;
-      fakeResponse.json.resolves({ reason: 'server error' });
+      fakeResponse.status = 404;
+      fakeResponse.json.resolves({ reason: 'Thing not found' });
       let err;
       try {
         err = await fetchJSON('https://example.com');
@@ -77,7 +77,10 @@ describe('sidebar/util/fetch', () => {
       assert.instanceOf(err, FetchError);
       assert.equal(err.url, 'https://example.com');
       assert.equal(err.response, fakeResponse);
-      assert.equal(err.message, 'Network request failed (400): server error');
+      assert.equal(
+        err.message,
+        'Network request failed (404): Thing not found'
+      );
     });
 
     it('returns the parsed JSON response if the request was successful', async () => {
