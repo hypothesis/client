@@ -1,4 +1,4 @@
-import { IconButton, SvgIcon } from '@hypothesis/frontend-shared';
+import { IconButton, Spinner, SvgIcon } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
@@ -8,7 +8,6 @@ import { notNull } from '../util/typing';
 
 import ShareLinks from './ShareLinks';
 import SidebarPanel from './SidebarPanel';
-import Spinner from './Spinner';
 
 /**
  * @typedef ShareAnnotationsPanelProps
@@ -51,7 +50,7 @@ function ShareAnnotationsPanel({ toastMessenger }) {
   return (
     <SidebarPanel title={panelTitle} panelName="shareGroupAnnotations">
       {!sharingReady && (
-        <div className="ShareAnnotationsPanel__spinner">
+        <div className="hyp-u-layout-row--center">
           <Spinner />
         </div>
       )}

@@ -1,10 +1,8 @@
-import { IconButton } from '@hypothesis/frontend-shared';
+import { IconButton, Spinner } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
-
-import Spinner from './Spinner';
 
 /**
  * @typedef SearchInputProps
@@ -87,7 +85,12 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
           />
         </div>
       )}
-      {isLoading && <Spinner />}
+
+      {isLoading && (
+        <div style="margin:0.5em 0">
+          <Spinner size="small" />
+        </div>
+      )}
     </form>
   );
 }

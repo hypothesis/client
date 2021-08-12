@@ -1,7 +1,7 @@
+import { Spinner } from '@hypothesis/frontend-shared';
+
 import useRootThread from './hooks/use-root-thread';
 import { countVisible } from '../helpers/thread';
-
-import Spinner from './Spinner';
 
 /**
  * @typedef NotebookResultCountProps
@@ -39,7 +39,7 @@ function NotebookResultCount({
 
   return (
     <div className="NotebookResultCount u-layout-row">
-      {isLoading && <Spinner />}
+      {isLoading && <Spinner size="small" />}
       {!isLoading && (
         <h2>
           {!hasResults && <strong>No results</strong>}
