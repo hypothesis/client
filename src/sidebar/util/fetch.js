@@ -36,7 +36,7 @@ export class FetchError extends Error {
 /**
  * Execute a network request and return the parsed JSON response.
  *
- * Throws a `FetchError` if making the request fails or the request returns
+ * Throws {@link FetchError} if making the request fails or the request returns
  * a non-2xx response.
  *
  * Returns `null` if the request returns a 204 (No Content) response.
