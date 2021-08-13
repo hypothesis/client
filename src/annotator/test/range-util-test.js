@@ -133,17 +133,18 @@ describe('annotator.range-util', () => {
       selection.collapseToEnd();
       selection.extend(testNode, 0);
       const rect = rangeUtil.selectionFocusRect(selection);
-      assert.equal(rect.left, testNode.offsetLeft);
-      assert.equal(rect.top, testNode.offsetTop);
+      assert.approximately(rect.left, testNode.offsetLeft, 1);
+      assert.approximately(rect.top, testNode.offsetTop, 1);
     });
 
     it("returns the last line's rect if the selection is forwards", () => {
       selectNode(testNode);
       const rect = rangeUtil.selectionFocusRect(selection);
-      assert.equal(rect.left, testNode.offsetLeft);
-      assert.equal(
+      assert.approximately(rect.left, testNode.offsetLeft, 1);
+      assert.approximately(
         rect.top + rect.height,
-        testNode.offsetTop + testNode.offsetHeight
+        testNode.offsetTop + testNode.offsetHeight,
+        1
       );
     });
   });
