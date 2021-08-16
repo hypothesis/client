@@ -9,6 +9,7 @@ describe('FrameObserver', () => {
   let frameObserver;
   let onFrameAdded;
   let onFrameRemoved;
+  const sandbox = sinon.createSandbox();
 
   function waitForFrameObserver() {
     return new Promise(resolve => setTimeout(resolve, DEBOUNCE_WAIT + 10));
@@ -18,56 +19,58 @@ describe('FrameObserver', () => {
     attribute = 'enable-annotation',
     value = ''
   ) {
-    const frame = document.createElement('iframe');
-    frame.setAttribute(attribute, value);
-    container.appendChild(frame);
-    return frame;
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute(attribute, value);
+    container.appendChild(iframe);
+    return iframe;
   }
 
-  function waitForIFrameUnload(frame) {
+  function waitForIFrameUnload(iframe) {
     return new Promise(resolve =>
-      frame.contentWindow.addEventListener('unload', resolve)
+      iframe.contentWindow.addEventListener('unload', resolve)
     );
   }
 
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
-    onFrameAdded = sinon.stub();
-    onFrameRemoved = sinon.stub();
+    onFrameAdded = sandbox.stub();
+    onFrameRemoved = sandbox.stub();
     frameObserver = new FrameObserver(container, onFrameAdded, onFrameRemoved);
+    sandbox.stub(console, 'warn');
   });
 
   afterEach(() => {
     container.remove();
     frameObserver.disconnect();
+    sandbox.restore();
   });
 
   it('triggers onFrameAdded when an annotatable iframe is added', async () => {
-    let frame = createAnnotatableIFrame();
+    let iframe = createAnnotatableIFrame();
     await waitForFrameObserver();
 
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
 
-    frame = createAnnotatableIFrame('enable-annotation', 'yes');
+    iframe = createAnnotatableIFrame('enable-annotation', 'yes');
     await waitForFrameObserver();
 
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
 
-    frame = createAnnotatableIFrame('enable-annotation', 'true');
+    iframe = createAnnotatableIFrame('enable-annotation', 'true');
     await waitForFrameObserver();
 
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
 
-    frame = createAnnotatableIFrame('enable-annotation', '1');
+    iframe = createAnnotatableIFrame('enable-annotation', '1');
     await waitForFrameObserver();
 
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
 
-    frame = createAnnotatableIFrame('enable-annotation', 'false'); // the actual value of the attribute is irrelevant
+    iframe = createAnnotatableIFrame('enable-annotation', 'false'); // the actual value of the attribute is irrelevant
     await waitForFrameObserver();
 
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
   });
 
   it("doesn't trigger onFrameAdded when non-annotatable iframes are added", async () => {
@@ -78,54 +81,64 @@ describe('FrameObserver', () => {
   });
 
   it('removal of the annotatable iframe triggers onFrameRemoved', async () => {
-    const frame = createAnnotatableIFrame();
+    const iframe = createAnnotatableIFrame();
 
     await waitForFrameObserver();
     assert.calledOnce(onFrameAdded);
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
 
-    frame.remove();
+    iframe.remove();
 
     await waitForFrameObserver();
     assert.calledOnce(onFrameRemoved);
-    assert.calledWith(onFrameRemoved, frame);
+    assert.calledWith(onFrameRemoved, iframe);
   });
 
   it('removal of the `enable-annotation` attribute triggers onFrameRemoved', async () => {
-    const frame = createAnnotatableIFrame();
+    const iframe = createAnnotatableIFrame();
     await waitForFrameObserver();
 
     assert.calledOnce(onFrameAdded);
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
 
-    frame.removeAttribute('enable-annotation');
+    iframe.removeAttribute('enable-annotation');
     await waitForFrameObserver();
 
     assert.calledOnce(onFrameRemoved);
-    assert.calledWith(onFrameRemoved, frame);
+    assert.calledWith(onFrameRemoved, iframe);
   });
 
   it('changing the `src` attribute triggers onFrameRemoved', async () => {
-    const frame = createAnnotatableIFrame();
+    const iframe = createAnnotatableIFrame();
     await waitForFrameObserver();
 
     assert.calledOnce(onFrameAdded);
-    assert.calledWith(onFrameAdded, frame);
+    assert.calledWith(onFrameAdded, iframe);
 
-    frame.setAttribute('src', document.location);
-    await waitForIFrameUnload(frame);
+    iframe.setAttribute('src', document.location);
+    await waitForIFrameUnload(iframe);
 
     assert.calledOnce(onFrameRemoved);
-    assert.calledWith(onFrameRemoved, frame);
+    assert.calledWith(onFrameRemoved, iframe);
   });
 
   it(`doesn't call onFrameAdded if FrameObserver is disconnected`, async () => {
     frameObserver.disconnect();
-    const frame = createAnnotatableIFrame();
+    const iframe = createAnnotatableIFrame();
 
     frameObserver._discoverFrames(); // Emulate a race condition
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
     assert.notCalled(onFrameAdded);
+  });
+
+  it("doesn't trigger onFrameAdded when annotatable iframe is from a different domain", async () => {
+    const iframe = createAnnotatableIFrame();
+    iframe.setAttribute('src', 'http://cross-origin.dummy');
+
+    await onDocumentReady(iframe);
+    await waitForFrameObserver();
+    assert.notCalled(onFrameAdded);
+    assert.calledOnce(console.warn);
   });
 });
