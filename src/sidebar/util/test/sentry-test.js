@@ -74,7 +74,7 @@ describe('sidebar/util/sentry', () => {
       );
     });
 
-    it('configures Sentry to ignore Errors with matching the text "Fetch operation failed"', () => {
+    it('configures Sentry to ignore certain errors', () => {
       sentry.init({
         dsn: 'test-dsn',
         environment: 'dev',
