@@ -4,6 +4,16 @@ export const DEBOUNCE_WAIT = 40;
 
 /** @typedef {(frame: HTMLIFrameElement) => void} FrameCallback */
 
+/**
+ * FrameObserver detects iframes added and deleted from the document.
+ *
+ * To enable annotation, an iframe must be opted-in by adding the
+ * `enable-annotation` attribute.
+ *
+ * We require the `enable-annotation` attribute to avoid the overhead of loading
+ * the client into frames which are not useful to annotate. See
+ * https://github.com/hypothesis/client/issues/530
+ */
 export default class FrameObserver {
   /**
    * @param {Element} element - root of the DOM subtree to watch for the addition
@@ -61,7 +71,11 @@ export default class FrameObserver {
   }
 
   _discoverFrames() {
-    let frames = findFrames(this._element);
+    const frames = new Set(
+      /** @type {NodeListOf<HTMLIFrameElement> } */ (
+        this._element.querySelectorAll('iframe[enable-annotation]')
+      )
+    );
 
     for (let frame of frames) {
       if (!this._handledFrames.has(frame)) {
@@ -107,21 +121,4 @@ export function onDocumentReady(iframe) {
       resolve();
     }
   });
-}
-
-/**
- * Return all `<iframe>` elements under `container` which are annotate-able.
- *
- * To enable annotation, an iframe must be opted-in by adding the
- * `enable-annotation` attribute.
- *
- * Eventually we may want annotation to be enabled by default for iframes that
- * pass certain tests. However we need to resolve a number of issues before we
- * can do that. See https://github.com/hypothesis/client/issues/530
- *
- * @param {Element} container
- * @return {Set<HTMLIFrameElement>}
- */
-export function findFrames(container) {
-  return new Set(container.querySelectorAll('iframe[enable-annotation]'));
 }
