@@ -26,7 +26,7 @@ export class FrameObserver {
     this._onFrameAdded = onFrameAdded;
     this._onFrameRemoved = onFrameRemoved;
     /** @type {Set<HTMLIFrameElement>} */
-    this._handledFrames = new Set();
+    this._annotatableFrames = new Set();
     this._isDisconnected = false;
 
     this._mutationObserver = new MutationObserver(
@@ -51,19 +51,23 @@ export class FrameObserver {
    * @param {HTMLIFrameElement} frame
    */
   async _addFrame(frame) {
-    this._handledFrames.add(frame);
-    if (isAccessible(frame)) {
+    this._annotatableFrames.add(frame);
+    try {
       await onDocumentReady(frame);
       if (this._isDisconnected) {
         return;
       }
-      const frameWindow = /** @type {Window} */ (frame.contentWindow);
+      const frameWindow = frame.contentWindow;
+      // @ts-expect-error
+      // This line raises an exception if the iframe is from a different origin
       frameWindow.addEventListener('unload', () => {
         this._removeFrame(frame);
       });
       this._onFrameAdded(frame);
-    } else {
-      // Could warn here that frame was not cross origin accessible
+    } catch (e) {
+      console.warn(
+        `Unable to inject the Hypothesis client (from '${document.location.href}' into a cross-origin frame '${frame.src}')`
+      );
     }
   }
 
@@ -71,7 +75,7 @@ export class FrameObserver {
    * @param {HTMLIFrameElement} frame
    */
   _removeFrame(frame) {
-    this._handledFrames.delete(frame);
+    this._annotatableFrames.delete(frame);
     this._onFrameRemoved(frame);
   }
 
@@ -83,12 +87,12 @@ export class FrameObserver {
     );
 
     for (let frame of frames) {
-      if (!this._handledFrames.has(frame)) {
+      if (!this._annotatableFrames.has(frame)) {
         this._addFrame(frame);
       }
     }
 
-    for (let frame of this._handledFrames) {
+    for (let frame of this._annotatableFrames) {
       if (!frames.has(frame)) {
         this._removeFrame(frame);
       }
@@ -97,33 +101,39 @@ export class FrameObserver {
 }
 
 /**
- * Check if we can access this iframe's document
+ * Resolves a Promise when the iframe's document is ready (loaded and parsed)
  *
- * @param {HTMLIFrameElement} iframe
- */
-function isAccessible(iframe) {
-  try {
-    return !!iframe.contentDocument;
-  } catch (e) {
-    return false;
-  }
-}
-
-/**
- * Resolves a Promise when the iframe's DOM is ready (loaded and parsed)
- *
- * @param {HTMLIFrameElement} iframe
+ * @param {HTMLIFrameElement} frame
  * @return {Promise<void>}
+ * @throws {Error} if trying to access a document from a cross-origin iframe
  */
-export function onDocumentReady(iframe) {
+export function onDocumentReady(frame) {
   return new Promise(resolve => {
-    const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
-    if (iframeDocument.readyState === 'loading') {
-      iframeDocument.addEventListener('DOMContentLoaded', () => {
+    // @ts-expect-error
+    const frameDocument = frame.contentWindow.document;
+    const { readyState, location } = frameDocument;
+
+    // Web browsers initially load a blank document before the final document.
+    // This blank document is (1) accessible, (2) has an empty body and head,
+    // and (3) has a 'complete' readyState, on Chrome and Safari, and an
+    // 'uninitialized' readyState on Firefox. If a blank document is detected and
+    // there is a 'src' attribute, it is expected that the blank document will be
+    // replaced by the final document.
+    if (location.href === 'about:blank' && frame.hasAttribute('src')) {
+      // Unfortunately, listening for 'DOMContentLoaded' on the iframeDocument
+      // doesn't work. Instead, we need to wait for a 'load' event to be triggered.
+      frame.addEventListener('load', () => {
         resolve();
       });
-    } else {
-      resolve();
+      return;
     }
+
+    if (readyState === 'loading') {
+      frameDocument.addEventListener('DOMContentLoaded', () => resolve());
+      return;
+    }
+
+    // state is 'interactive' or 'complete';
+    resolve();
   });
 }
