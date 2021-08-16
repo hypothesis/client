@@ -36,21 +36,20 @@ function currentScriptOrigin() {
  * @param {SentryConfig} config
  */
 export function init(config) {
-  // Only send events for errors which can be attributed to our code. This
-  // reduces noise in Sentry caused by errors triggered by eg. script tags added
-  // by browser extensions. The downside is that this may cause us to miss errors
-  // which are caused by our code but, for any reason, cannot be attributed to
-  // it. This logic assumes that all of our script bundles are served from
-  // the same origin as the bundle which includes this module.
-  //
-  // If we can't determine the current script's origin, just disable the
-  // whitelist and report all errors.
   const scriptOrigin = currentScriptOrigin();
-  const whitelistUrls = scriptOrigin ? [scriptOrigin] : undefined;
+  const allowUrls = scriptOrigin ? [scriptOrigin] : undefined;
 
   Sentry.init({
     dsn: config.dsn,
     environment: config.environment,
+
+    // Only report exceptions where the stack trace references a URL that is
+    // part of our code. This reduces noise caused by third-party scripts which
+    // may be injected by browser extensions.
+    //
+    // Sentry currently always allows exceptions to bypass this list if no
+    // URL can be extracted.
+    allowUrls,
 
     // Ignore various errors due to circumstances outside of our control.
     ignoreErrors: [
@@ -65,7 +64,6 @@ export function init(config) {
     ],
 
     release: '__VERSION__', // replaced by versionify
-    whitelistUrls,
 
     // See https://docs.sentry.io/error-reporting/configuration/filtering/?platform=javascript#before-send
     beforeSend: (event, hint) => {
