@@ -69,7 +69,7 @@ describe('sidebar/util/sentry', () => {
       assert.calledWith(
         fakeSentry.init,
         sinon.match({
-          whitelistUrls: ['https://cdn.hypothes.is'],
+          allowUrls: ['https://cdn.hypothes.is'],
         })
       );
     });
@@ -88,7 +88,7 @@ describe('sidebar/util/sentry', () => {
       );
     });
 
-    it('disables the URL whitelist if `document.currentScript` is inaccessible', () => {
+    it('disables the URL allowlist if `document.currentScript` is inaccessible', () => {
       fakeDocumentCurrentScript.get(() => null);
 
       sentry.init({
@@ -99,7 +99,7 @@ describe('sidebar/util/sentry', () => {
       assert.calledWith(
         fakeSentry.init,
         sinon.match({
-          whitelistUrls: undefined,
+          allowUrls: undefined,
         })
       );
     });
