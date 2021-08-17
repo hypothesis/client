@@ -8,11 +8,35 @@ describe('HypothesisInjector integration test', () => {
 
   const sandbox = sinon.createSandbox();
   const config = {
-    clientUrl: 'data:,', // empty data uri
+    clientUrl: 'data:,Hypothesis', // empty data uri
   };
 
-  const waitForFrameObserver = () =>
-    new Promise(resolve => setTimeout(resolve, DEBOUNCE_WAIT + 10));
+  function waitForFrameObserver() {
+    return new Promise(resolve => setTimeout(resolve, DEBOUNCE_WAIT + 10));
+  }
+
+  function getHypothesisScript(iframe) {
+    return iframe.contentDocument.querySelector(
+      'script[src="data:,Hypothesis"]'
+    );
+  }
+
+  function createHypothesisInjector() {
+    const hypothesisInjector = new HypothesisInjector(
+      container,
+      fakeBridge,
+      config
+    );
+    hypothesisInjectors.push(hypothesisInjector);
+    return hypothesisInjector;
+  }
+
+  function createAnnotatableIFrame(attribute = 'enable-annotation') {
+    const frame = document.createElement('iframe');
+    frame.setAttribute(attribute, '');
+    container.appendChild(frame);
+    return frame;
+  }
 
   beforeEach(() => {
     fakeBridge = {
@@ -32,23 +56,6 @@ describe('HypothesisInjector integration test', () => {
     container.remove();
   });
 
-  function createHypothesisInjector() {
-    const hypothesisInjector = new HypothesisInjector(
-      container,
-      fakeBridge,
-      config
-    );
-    hypothesisInjectors.push(hypothesisInjector);
-    return hypothesisInjector;
-  }
-
-  function createAnnotatableIFrame(attribute = 'enable-annotation') {
-    const frame = document.createElement('iframe');
-    frame.setAttribute(attribute, '');
-    container.appendChild(frame);
-    return frame;
-  }
-
   it('detects frames on page', async () => {
     const validFrame = createAnnotatableIFrame();
     // Create another that mimics the sidebar frame
@@ -59,15 +66,15 @@ describe('HypothesisInjector integration test', () => {
     createHypothesisInjector();
 
     await onDocumentReady(validFrame);
-    assert(
-      validFrame.contentDocument.body.hasChildNodes(),
-      'expected valid frame to be modified'
+    assert.isNotNull(
+      getHypothesisScript(validFrame),
+      'expected valid frame to include the Hypothesis script'
     );
 
     await onDocumentReady(invalidFrame);
-    assert(
-      !invalidFrame.contentDocument.body.hasChildNodes(),
-      'expected invalid frame to not be modified'
+    assert.isNull(
+      getHypothesisScript(invalidFrame),
+      'expected invalid frame to not include the Hypothesis script'
     );
   });
 
@@ -92,8 +99,11 @@ describe('HypothesisInjector integration test', () => {
     createHypothesisInjector();
     await onDocumentReady(frame);
 
-    const scriptElement = frame.contentDocument.querySelector('script[src]');
-    assert(scriptElement, 'expected embed script to be injected');
+    const scriptElement = getHypothesisScript(frame);
+    assert.isNotNull(
+      scriptElement,
+      'expected the frame to include the Hypothesis script'
+    );
     assert.equal(
       scriptElement.src,
       config.clientUrl,
@@ -109,8 +119,8 @@ describe('HypothesisInjector integration test', () => {
     await onDocumentReady(frame);
 
     assert.isNull(
-      frame.contentDocument.querySelector('script[src]'),
-      'expected embed script to not be injected'
+      getHypothesisScript(frame),
+      'expected frame to not include the Hypothesis script'
     );
   });
 
@@ -123,9 +133,9 @@ describe('HypothesisInjector integration test', () => {
 
     await waitForFrameObserver();
     await onDocumentReady(frame);
-    assert.isTrue(
-      frame.contentDocument.body.hasChildNodes(),
-      'expected dynamically added frame to be modified'
+    assert.isNotNull(
+      getHypothesisScript(frame),
+      'expected dynamically added frame to include the Hypothesis script'
     );
   });
 
@@ -151,23 +161,23 @@ describe('HypothesisInjector integration test', () => {
     createHypothesisInjector();
     await onDocumentReady(frame);
 
-    assert.isTrue(
-      frame.contentDocument.body.hasChildNodes(),
-      'expected initial frame to be modified'
+    assert.isNotNull(
+      getHypothesisScript(frame),
+      'expected initial frame to include the Hypothesis script'
     );
 
     frame.remove();
     await waitForFrameObserver();
 
     container.appendChild(frame);
-    assert.isFalse(frame.contentDocument.body.hasChildNodes());
+    assert.isNull(getHypothesisScript(frame));
 
     await waitForFrameObserver();
     await onDocumentReady(frame);
 
-    assert(
-      frame.contentDocument.body.hasChildNodes(),
-      'expected dynamically added frame to be modified'
+    assert.isNotNull(
+      getHypothesisScript(frame),
+      'expected dynamically added frame to include the Hypothesis script'
     );
   });
 
@@ -181,23 +191,23 @@ describe('HypothesisInjector integration test', () => {
     await waitForFrameObserver();
     await onDocumentReady(frame);
 
-    assert.isTrue(
-      frame.contentDocument.body.hasChildNodes(),
-      'expected dynamically added frame to be modified'
+    assert.isNotNull(
+      getHypothesisScript(frame),
+      'expected dynamically added frame to include the Hypothesis script'
     );
 
     frame.remove();
     await waitForFrameObserver();
 
     container.appendChild(frame);
-    assert.isFalse(frame.contentDocument.body.hasChildNodes());
+    assert.isNull(getHypothesisScript(frame));
 
     await waitForFrameObserver();
     await onDocumentReady(frame);
 
-    assert.isTrue(
-      frame.contentDocument.body.hasChildNodes(),
-      'expected dynamically added frame to be modified'
+    assert.isNotNull(
+      getHypothesisScript(frame),
+      'expected dynamically added frame to include the Hypothesis script'
     );
   });
 });

@@ -1,4 +1,4 @@
-import FrameObserver from './frame-observer';
+import { FrameObserver } from './frame-observer';
 
 /**
  * @typedef {import('../shared/bridge').Bridge} Bridge
