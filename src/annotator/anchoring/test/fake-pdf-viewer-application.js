@@ -21,9 +21,10 @@ import { RenderingStates } from '../pdf';
  * @param {string} content - The text content for the page
  * @param {boolean} rendered - True if the page should be "rendered" or false if
  *        it should be an empty placeholder for a not-yet-rendered page
+ * @param {PDFJSConfig} config
  * @return {Element} - The root Element for the page
  */
-function createPage(content, rendered) {
+function createPage(content, rendered, config) {
   const pageEl = document.createElement('div');
   pageEl.classList.add('page');
 
@@ -35,6 +36,11 @@ function createPage(content, rendered) {
   textLayer.classList.add('textLayer');
 
   content.split(/\n/).forEach(item => {
+    if (!config.newTextRendering && /^\s*$/.test(item)) {
+      // PDF.js releases before v2.9.359 do not create elements in the text
+      // layer for whitespace-only text items.
+      return;
+    }
     const itemEl = document.createElement('div');
     itemEl.textContent = item;
     textLayer.appendChild(itemEl);
@@ -50,8 +56,13 @@ function createPage(content, rendered) {
  * The original is defined at https://github.com/mozilla/pdf.js/blob/master/src/display/api.js
  */
 class FakePDFPageProxy {
-  constructor(pageText) {
+  /**
+   * @param {string} pageText
+   * @param {PDFJSConfig} config
+   */
+  constructor(pageText, config) {
     this.pageText = pageText;
+    this._config = config;
   }
 
   getTextContent(params = {}) {
@@ -61,6 +72,17 @@ class FakePDFPageProxy {
       );
     }
 
+    const makeTextItem = str => {
+      if (this._config.newTextRendering) {
+        // The `hasEOL` property was added in https://github.com/mozilla/pdf.js/pull/13257
+        // and is used to feature-detect whether whitespace-only items need
+        // to ignored in the `items` array. The value is unimportant.
+        return { str, hasEOL: false };
+      } else {
+        return { str };
+      }
+    };
+
     const textContent = {
       // The way that the page text is split into items will depend on
       // the PDF and the version of PDF.js - individual text items might be
@@ -68,7 +90,7 @@ class FakePDFPageProxy {
       //
       // Here we split items by line which matches the typical output for a
       // born-digital PDF.
-      items: this.pageText.split(/\n/).map(line => ({ str: line })),
+      items: this.pageText.split(/\n/).map(makeTextItem),
     };
 
     return Promise.resolve(textContent);
@@ -77,8 +99,9 @@ class FakePDFPageProxy {
 
 /**
  * @typedef FakePDFPageViewOptions
- * @prop [boolean] rendered - Whether this page is "rendered", as if it were
+ * @prop {boolean} rendered - Whether this page is "rendered", as if it were
  *   near the viewport, or not.
+ * @prop {PDFJSConfig} config
  */
 
 /**
@@ -91,8 +114,8 @@ class FakePDFPageView {
    * @param {string} text - Text of the page
    * @param {FakePDFPageViewOptions} options
    */
-  constructor(text, options) {
-    const pageEl = createPage(text, options.rendered);
+  constructor(text, { rendered, config }) {
+    const pageEl = createPage(text, rendered, config);
     const textLayerEl = pageEl.querySelector('.textLayer');
 
     this.div = pageEl;
@@ -102,7 +125,7 @@ class FakePDFPageView {
     this.renderingState = textLayerEl
       ? RenderingStates.FINISHED
       : RenderingStates.INITIAL;
-    this.pdfPage = new FakePDFPageProxy(text);
+    this.pdfPage = new FakePDFPageProxy(text, config);
   }
 
   dispose() {
@@ -120,6 +143,7 @@ class FakePDFViewer {
    * @param {Options} options
    */
   constructor(options) {
+    this._config = options.config;
     this._container = options.container;
     this._content = options.content;
 
@@ -167,6 +191,7 @@ class FakePDFViewer {
       (text, idx) =>
         new FakePDFPageView(text, {
           rendered: idx >= index && idx <= lastRenderedPage,
+          config: this._config,
         })
     );
 
@@ -201,11 +226,21 @@ class FakePDFViewer {
 }
 
 /**
- * @typedef {Object} Options
- * @property {Element} container - The container into which the fake PDF viewer
- *           should render the content
- * @property {string[]} content - Array of strings containing the text for each
- *           page
+ * Options that control global aspects of the PDF.js fake, such as which
+ * version of PDF.js is being emulated.
+ *
+ * @typedef PDFJSConfig
+ * @prop {boolean} newTextRendering - Whether to emulate the PDF.js text rendering
+ *   changes added in v2.9.359.
+ */
+
+/**
+ * @typedef Options
+ * @prop {Element} container - The container into which the fake PDF viewer
+ *       should render the content
+ * @prop {string[]} content - Array of strings containing the text for each
+ *       page
+ * @prop {PDFJSConfig} [config]
  */
 
 /**
@@ -220,15 +255,16 @@ export default class FakePDFViewerApplication {
    * @param {Options} options
    */
   constructor(options) {
+    if (!options.config) {
+      options.config = { newTextRendering: true };
+    }
+
     this.appConfig = {
       // The root element which contains all of the PDF.js UI. In the real PDF.js
       // viewer this is generally `document.body`.
       appContainer: document.createElement('div'),
     };
-    this.pdfViewer = new FakePDFViewer({
-      content: options.content,
-      container: options.container,
-    });
+    this.pdfViewer = new FakePDFViewer(options);
   }
 
   /**
