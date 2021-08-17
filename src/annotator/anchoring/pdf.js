@@ -1,5 +1,6 @@
 /* global PDFViewerApplication */
 
+import warnOnce from '../../shared/warn-once';
 import { createPlaceholder } from './placeholder';
 import { TextPosition, TextRange } from './text-range';
 import { TextQuoteAnchor } from './types';
@@ -166,15 +167,22 @@ async function getPageTextContent(pageIndex) {
 
   // Join together PDF.js `TextItem`s representing pieces of text in a PDF page.
   const joinItems = items => {
-    // Skip empty items since PDF.js leaves their text layer divs blank.
-    // Excluding them makes our measurements match the rendered text layer.
-    // Otherwise, the selectors we generate would not match this stored text.
-    // See the `appendText` method of `TextLayerBuilder` in PDF.js.
-    const nonEmpty = items
-      .filter(item => /\S/.test(item.str))
-      .map(item => item.str);
-    const textContent = nonEmpty.join('');
-    return textContent;
+    let itemStrings = items.map(item => item.str);
+
+    // We want the text returned by `getPageTextContent` to match the `textContent`
+    // of the transparent text layer, so that text offsets match up.
+    //
+    // Older versions of PDF.js did not create elements in the text layer for
+    // text items that contained all-whitespace strings. Newer versions (after
+    // https://github.com/mozilla/pdf.js/pull/13257) do. The same commit also
+    // introduced the `hasEOL` property to text items, so we use the absence
+    // of this property to determine if we need to filter out whitespace-only strings.
+    const excludeEmpty = items.length > 0 && !('hasEOL' in items[0]);
+    if (excludeEmpty) {
+      itemStrings = itemStrings.filter(s => /\S/.test(s));
+    }
+
+    return itemStrings.join('');
   };
 
   // Fetch the text content for a given page as a string.
@@ -295,7 +303,10 @@ function findPage(offset) {
  * @return {Promise<Range>}
  */
 async function anchorByPosition(pageIndex, start, end) {
-  const page = await getPageView(pageIndex);
+  const [page, pageText] = await Promise.all([
+    getPageView(pageIndex),
+    getPageTextContent(pageIndex),
+  ]);
 
   if (
     page.renderingState === RenderingStates.FINISHED &&
@@ -304,6 +315,18 @@ async function anchorByPosition(pageIndex, start, end) {
   ) {
     // The page has been rendered. Locate the position in the text layer.
     const root = page.textLayer.textLayerDiv;
+
+    // Do a sanity check to verify that the page text extracted by `getPageTextContent`
+    // matches the transparent text layer.
+    //
+    // See https://github.com/hypothesis/client/issues/3674.
+    if (pageText !== root.textContent) {
+      /* istanbul ignore next */
+      warnOnce(
+        'PDF text layer content does not match page text. This will cause anchoring misalignment.'
+      );
+    }
+
     const startPos = new TextPosition(root, start);
     const endPos = new TextPosition(root, end);
     return new TextRange(startPos, endPos).toRange();
