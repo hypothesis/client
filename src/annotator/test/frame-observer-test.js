@@ -77,27 +77,18 @@ describe('FrameObserver', () => {
     assert.notCalled(onFrameAdded);
   });
 
-  it('removal of the annotatable iframe triggers onFrameRemoved', done => {
-    sinon.stub(frameObserver, '_removeFrame').callThrough();
+  it('removal of the annotatable iframe triggers onFrameRemoved', async () => {
     const frame = createAnnotatableIFrame();
 
-    waitForFrameObserver()
-      .then(() => {
-        assert.calledOnce(onFrameAdded);
-        assert.calledWith(onFrameAdded, frame);
-      })
-      .then(() => {
-        frame.remove();
-      });
+    await waitForFrameObserver();
+    assert.calledOnce(onFrameAdded);
+    assert.calledWith(onFrameAdded, frame);
 
-    waitForIFrameUnload(frame)
-      .then(() => waitForFrameObserver())
-      .then(() => {
-        assert.calledOnce(frameObserver._removeFrame);
-        assert.calledOnce(onFrameRemoved);
-        assert.calledWith(onFrameRemoved, frame);
-      })
-      .then(done);
+    frame.remove();
+
+    await waitForFrameObserver();
+    assert.calledOnce(onFrameRemoved);
+    assert.calledWith(onFrameRemoved, frame);
   });
 
   it('removal of the `enable-annotation` attribute triggers onFrameRemoved', async () => {
@@ -137,16 +128,4 @@ describe('FrameObserver', () => {
 
     assert.notCalled(onFrameAdded);
   });
-
-  // This test doesn't work. Surprisingly, `isAccessible` returns `true` even
-  // thought the iframe is from a different domain. My suspicion is that the
-  // iframe is accessed at a time where the loading has not yet started and it
-  // is therefore accessible.
-  // it("doesn't triggers onFrameAdded when annotatable iframe is from a different domain", async () => {
-  //   const frame = createAnnotatableIFrame('src', 'https://example.com');
-  //   frame.setAttribute('enable-annotation', '');
-  //   await waitForFrameObserver();
-
-  //   assert.notCalled(onFrameAdded);
-  // });
 });
