@@ -22,20 +22,16 @@ describe('HypothesisInjector integration test', () => {
   }
 
   function createHypothesisInjector() {
-    const hypothesisInjector = new HypothesisInjector(
-      container,
-      fakeBridge,
-      config
-    );
-    hypothesisInjectors.push(hypothesisInjector);
-    return hypothesisInjector;
+    const injector = new HypothesisInjector(container, fakeBridge, config);
+    hypothesisInjectors.push(injector);
+    return injector;
   }
 
   function createAnnotatableIFrame(attribute = 'enable-annotation') {
-    const frame = document.createElement('iframe');
-    frame.setAttribute(attribute, '');
-    container.appendChild(frame);
-    return frame;
+    const iframe = document.createElement('iframe');
+    iframe.setAttribute(attribute, '');
+    container.appendChild(iframe);
+    return iframe;
   }
 
   beforeEach(() => {
@@ -56,9 +52,9 @@ describe('HypothesisInjector integration test', () => {
     container.remove();
   });
 
-  it('detects frames on page', async () => {
+  it('detects iframes on page', async () => {
     const validFrame = createAnnotatableIFrame();
-    // Create another that mimics the sidebar frame
+    // Create another that mimics the sidebar iframe
     // This one should should not be detected
     const invalidFrame = createAnnotatableIFrame('dummy-attribute');
 
@@ -68,41 +64,41 @@ describe('HypothesisInjector integration test', () => {
     await onDocumentReady(validFrame);
     assert.isNotNull(
       getHypothesisScript(validFrame),
-      'expected valid frame to include the Hypothesis script'
+      'expected valid iframe to include the Hypothesis script'
     );
 
     await onDocumentReady(invalidFrame);
     assert.isNull(
       getHypothesisScript(invalidFrame),
-      'expected invalid frame to not include the Hypothesis script'
+      'expected invalid iframe to not include the Hypothesis script'
     );
   });
 
-  it('detects removed frames', async () => {
-    // Create a frame before initializing
-    const frame = createAnnotatableIFrame();
+  it('detects removed iframes', async () => {
+    // Create a iframe before initializing
+    const iframe = createAnnotatableIFrame();
 
     // Now initialize
     createHypothesisInjector();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
-    // Remove the frame
-    frame.remove();
+    // Remove the iframe
+    iframe.remove();
     await waitForFrameObserver();
 
     assert.calledWith(fakeBridge.call, 'destroyFrame');
   });
 
-  it('injects embed script in frame', async () => {
-    const frame = createAnnotatableIFrame();
+  it('injects embed script in iframe', async () => {
+    const iframe = createAnnotatableIFrame();
 
     createHypothesisInjector();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
-    const scriptElement = getHypothesisScript(frame);
+    const scriptElement = getHypothesisScript(iframe);
     assert.isNotNull(
       scriptElement,
-      'expected the frame to include the Hypothesis script'
+      'expected the iframe to include the Hypothesis script'
     );
     assert.equal(
       scriptElement.src,
@@ -111,103 +107,103 @@ describe('HypothesisInjector integration test', () => {
     );
   });
 
-  it('excludes injection from already injected frames', async () => {
-    const frame = createAnnotatableIFrame();
-    frame.contentWindow.eval('window.__hypothesis = {}');
+  it('excludes injection from already injected iframes', async () => {
+    const iframe = createAnnotatableIFrame();
+    iframe.contentWindow.eval('window.__hypothesis = {}');
 
     createHypothesisInjector();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
     assert.isNull(
-      getHypothesisScript(frame),
-      'expected frame to not include the Hypothesis script'
+      getHypothesisScript(iframe),
+      'expected iframe to not include the Hypothesis script'
     );
   });
 
-  it('detects dynamically added frames', async () => {
-    // Initialize with no initial frame, unlike before
+  it('detects dynamically added iframes', async () => {
+    // Initialize with no initial iframe, unlike before
     createHypothesisInjector();
 
-    // Add a frame to the DOM
-    const frame = createAnnotatableIFrame();
+    // Add an iframe to the DOM
+    const iframe = createAnnotatableIFrame();
 
     await waitForFrameObserver();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
     assert.isNotNull(
-      getHypothesisScript(frame),
-      'expected dynamically added frame to include the Hypothesis script'
+      getHypothesisScript(iframe),
+      'expected dynamically added iframe to include the Hypothesis script'
     );
   });
 
-  it('detects dynamically removed frames', async () => {
-    // Create a frame before initializing
-    const frame = createAnnotatableIFrame();
+  it('detects dynamically removed iframes', async () => {
+    // Create a iframe before initializing
+    const iframe = createAnnotatableIFrame();
 
     // Now initialize
     createHypothesisInjector();
     await waitForFrameObserver();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
-    frame.remove();
+    iframe.remove();
     await waitForFrameObserver();
 
     assert.calledWith(fakeBridge.call, 'destroyFrame');
   });
 
-  it('detects a frame dynamically removed, and added again', async () => {
-    const frame = createAnnotatableIFrame();
+  it('detects an iframe dynamically removed, and added again', async () => {
+    const iframe = createAnnotatableIFrame();
 
     // Now initialize
     createHypothesisInjector();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
     assert.isNotNull(
-      getHypothesisScript(frame),
-      'expected initial frame to include the Hypothesis script'
+      getHypothesisScript(iframe),
+      'expected initial iframe to include the Hypothesis script'
     );
 
-    frame.remove();
+    iframe.remove();
     await waitForFrameObserver();
 
-    container.appendChild(frame);
-    assert.isNull(getHypothesisScript(frame));
+    container.appendChild(iframe);
+    assert.isNull(getHypothesisScript(iframe));
 
     await waitForFrameObserver();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
     assert.isNotNull(
-      getHypothesisScript(frame),
-      'expected dynamically added frame to include the Hypothesis script'
+      getHypothesisScript(iframe),
+      'expected dynamically added iframe to include the Hypothesis script'
     );
   });
 
-  it('detects a frame dynamically added, removed, and added again', async () => {
-    // Initialize with no initial frame
+  it('detects an iframe dynamically added, removed, and added again', async () => {
+    // Initialize with no initial iframe
     createHypothesisInjector();
 
-    // Add a frame to the DOM
-    const frame = createAnnotatableIFrame();
+    // Add an iframe to the DOM
+    const iframe = createAnnotatableIFrame();
 
     await waitForFrameObserver();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
     assert.isNotNull(
-      getHypothesisScript(frame),
-      'expected dynamically added frame to include the Hypothesis script'
+      getHypothesisScript(iframe),
+      'expected dynamically added iframe to include the Hypothesis script'
     );
 
-    frame.remove();
+    iframe.remove();
     await waitForFrameObserver();
 
-    container.appendChild(frame);
-    assert.isNull(getHypothesisScript(frame));
+    container.appendChild(iframe);
+    assert.isNull(getHypothesisScript(iframe));
 
     await waitForFrameObserver();
-    await onDocumentReady(frame);
+    await onDocumentReady(iframe);
 
     assert.isNotNull(
-      getHypothesisScript(frame),
-      'expected dynamically added frame to include the Hypothesis script'
+      getHypothesisScript(iframe),
+      'expected dynamically added iframe to include the Hypothesis script'
     );
   });
 });
