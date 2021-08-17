@@ -437,13 +437,6 @@ export function anchor(root, selectors) {
   /** @type {Promise<Range>} */
   let result = Promise.reject('unable to anchor');
 
-  const checkQuote = range => {
-    if (quote && quote.exact !== range.toString()) {
-      throw new Error('quote mismatch');
-    }
-    return range;
-  };
-
   if (position) {
     result = result.catch(() => {
       return findPage(position.start).then(({ index, offset, textContent }) => {
@@ -451,7 +444,10 @@ export function anchor(root, selectors) {
         const end = position.end - offset;
         const length = end - start;
 
-        checkQuote(textContent.substr(start, length));
+        const matchedText = textContent.substr(start, length);
+        if (quote && quote.exact !== matchedText) {
+          throw new Error('quote mismatch');
+        }
 
         return anchorByPosition(index, start, end);
       });
