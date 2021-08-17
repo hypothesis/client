@@ -98,12 +98,11 @@ function injectHypothesis(iframe, scriptSrc, config) {
   configElement.type = 'application/json';
   configElement.innerText = JSON.stringify(config);
 
-  const embedElement = document.createElement('script');
-  embedElement.className = 'js-hypothesis-embed';
-  embedElement.async = true;
-  embedElement.src = scriptSrc;
+  const bootScript = document.createElement('script');
+  bootScript.async = true;
+  bootScript.src = scriptSrc;
 
   const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
   iframeDocument.body.appendChild(configElement);
-  iframeDocument.body.appendChild(embedElement);
+  iframeDocument.body.appendChild(bootScript);
 }
