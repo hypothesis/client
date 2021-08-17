@@ -27,6 +27,7 @@ export default class FrameObserver {
     this._onFrameRemoved = onFrameRemoved;
     /** @type {Set<HTMLIFrameElement>} */
     this._handledFrames = new Set();
+    this._isDisconnected = false;
 
     this._mutationObserver = new MutationObserver(
       debounce(() => {
@@ -42,6 +43,7 @@ export default class FrameObserver {
   }
 
   disconnect() {
+    this._isDisconnected = true;
     this._mutationObserver.disconnect();
   }
 
@@ -52,6 +54,9 @@ export default class FrameObserver {
     this._handledFrames.add(frame);
     if (isAccessible(frame)) {
       await onDocumentReady(frame);
+      if (this._isDisconnected) {
+        return;
+      }
       const frameWindow = /** @type {Window} */ (frame.contentWindow);
       frameWindow.addEventListener('unload', () => {
         this._removeFrame(frame);
