@@ -1,4 +1,5 @@
-import FrameObserver, {
+import {
+  FrameObserver,
   DEBOUNCE_WAIT,
   onDocumentReady,
 } from '../frame-observer';

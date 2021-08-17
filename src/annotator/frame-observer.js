@@ -14,7 +14,7 @@ export const DEBOUNCE_WAIT = 40;
  * the client into frames which are not useful to annotate. See
  * https://github.com/hypothesis/client/issues/530
  */
-export default class FrameObserver {
+export class FrameObserver {
   /**
    * @param {Element} element - root of the DOM subtree to watch for the addition
    *   and removal of annotatable iframes
