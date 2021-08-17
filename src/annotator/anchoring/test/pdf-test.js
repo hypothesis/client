@@ -23,10 +23,14 @@ function delay(ms) {
 }
 
 const fixtures = {
-  // Each item in this list contains the text for one page of the "PDF"
+  // Each item in this list contains the text for one page of the "PDF".
+  //
+  // Each line within an item is converted to a single text item, as returned by
+  // PDF.js' text APIs, and rendered as a separate element in the text layer.
   pdfPages: [
     'Pride And Prejudice And Zombies\n' +
-      'By Jane Austin and Seth Grahame-Smith ',
+      '       \n' + // nb. Blank text item handling differs between PDF.js versions
+      'By Jane Austen and Seth Grahame-Smith ',
 
     'IT IS A TRUTH universally acknowledged that a zombie in possession of\n' +
       'brains must be in want of more brains. Never was this truth more plain\n' +
@@ -49,8 +53,9 @@ describe('annotator/anchoring/pdf', () => {
    *
    * @param {string[]} content -
    *   Array containing the text content of each page of the loaded PDF document
+   * @param {import('./fake-pdf-viewer-application').PDFJSConfig} [config]
    */
-  function initViewer(content) {
+  function initViewer(content, config) {
     cleanupViewer();
 
     // The rendered text for each page is cached during anchoring.
@@ -60,6 +65,7 @@ describe('annotator/anchoring/pdf', () => {
     viewer = new FakePDFViewerApplication({
       container,
       content,
+      config,
     });
     window.PDFViewerApplication = viewer;
 
@@ -97,18 +103,41 @@ describe('annotator/anchoring/pdf', () => {
       });
     });
 
-    it('returns a position selector with correct start/end offsets', () => {
+    it('returns a position selector with correct start/end offsets', async () => {
       viewer.pdfViewer.setCurrentPage(2);
       const quote = 'Netherfield Park';
       const range = findText(container, quote);
       const contentStr = fixtures.pdfPages.join('');
       const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
 
-      return pdfAnchoring.describe(container, range).then(selectors => {
-        const position = selectors[0];
-        assert.equal(position.start, expectedPos);
-        assert.equal(position.end, expectedPos + quote.length);
-      });
+      const [positionSelector] = await pdfAnchoring.describe(container, range);
+
+      assert.equal(positionSelector.start, expectedPos);
+      assert.equal(positionSelector.end, expectedPos + quote.length);
+    });
+
+    // This test is similar to the above, but simulates older PDF.js releases
+    // which do not create elements in the text layer for whitespace-only text items.
+    it('returns a position selector with correct start/end offsets (old text rendering)', async () => {
+      initViewer(fixtures.pdfPages, { newTextRendering: false });
+
+      viewer.pdfViewer.setCurrentPage(2);
+      const quote = 'Netherfield Park';
+      const range = findText(container, quote);
+      const contentStr = fixtures.pdfPages
+        .map(pageText =>
+          pageText
+            .split('\n')
+            .filter(line => !line.match(/^\s*$/)) // Strip whitespace-only text items
+            .join('\n')
+        )
+        .join('');
+      const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
+
+      const [positionSelector] = await pdfAnchoring.describe(container, range);
+
+      assert.equal(positionSelector.start, expectedPos);
+      assert.equal(positionSelector.end, expectedPos + quote.length);
     });
 
     it('returns a quote selector with the correct quote', () => {
@@ -239,6 +268,16 @@ describe('annotator/anchoring/pdf', () => {
         });
         return Promise.all(subsetsAnchored);
       });
+    });
+
+    it('anchors text in older PDF.js versions', async () => {
+      initViewer(fixtures.pdfPages, { newTextRendering: false });
+
+      // Choose a quote in the first page, which has blank text items in it.
+      const quote = { type: 'TextQuoteSelector', exact: 'Jane Austen' };
+      const range = await pdfAnchoring.anchor(container, [quote]);
+
+      assert.equal(range.toString(), 'Jane Austen');
     });
 
     // See https://github.com/hypothesis/client/issues/1329
