@@ -1,4 +1,7 @@
-import FrameObserver, { DEBOUNCE_WAIT } from '../frame-observer';
+import FrameObserver, {
+  DEBOUNCE_WAIT,
+  onDocumentReady,
+} from '../frame-observer';
 
 describe('FrameObserver', () => {
   let container;
@@ -122,6 +125,16 @@ describe('FrameObserver', () => {
 
     assert.calledOnce(onFrameRemoved);
     assert.calledWith(onFrameRemoved, frame);
+  });
+
+  it(`doesn't call onFrameAdded if FrameObserver is disconnected`, async () => {
+    frameObserver.disconnect();
+    const frame = createAnnotatableIFrame();
+
+    frameObserver._discoverFrames(); // Emulate a race condition
+    await onDocumentReady(frame);
+
+    assert.notCalled(onFrameAdded);
   });
 
   // This test doesn't work. Surprisingly, `isAccessible` returns `true` even
