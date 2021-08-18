@@ -156,22 +156,30 @@ export async function documentHasText() {
 /**
  * Return the text of a given PDF page.
  *
+ * The page text returned by this function should match the `textContent` of the
+ * text layer element that PDF.js creates for rendered pages. This allows
+ * offsets computed in the text to be reused as offsets within the text layer
+ * element's content. This is important to create correct Ranges for anchored
+ * selectors.
+ *
  * @param {number} pageIndex
  * @return {Promise<string>}
  */
-async function getPageTextContent(pageIndex) {
+function getPageTextContent(pageIndex) {
+  // If we already have or are fetching the text for this page, return the
+  // existing result.
   const cachedText = pageTextCache[pageIndex];
   if (cachedText) {
     return cachedText;
   }
 
-  // Join together PDF.js `TextItem`s representing pieces of text in a PDF page.
-  const joinItems = items => {
-    let itemStrings = items.map(item => item.str);
+  const getPageText = async () => {
+    const pageView = await getPageView(pageIndex);
+    const textContent = await pageView.pdfPage.getTextContent({
+      normalizeWhitespace: true,
+    });
+    let items = textContent.items;
 
-    // We want the text returned by `getPageTextContent` to match the `textContent`
-    // of the transparent text layer, so that text offsets match up.
-    //
     // Older versions of PDF.js did not create elements in the text layer for
     // text items that contained all-whitespace strings. Newer versions (after
     // https://github.com/mozilla/pdf.js/pull/13257) do. The same commit also
@@ -179,22 +187,15 @@ async function getPageTextContent(pageIndex) {
     // of this property to determine if we need to filter out whitespace-only strings.
     const excludeEmpty = items.length > 0 && !('hasEOL' in items[0]);
     if (excludeEmpty) {
-      itemStrings = itemStrings.filter(s => /\S/.test(s));
+      items = items.filter(it => /\S/.test(it.str));
     }
 
-    return itemStrings.join('');
+    return items.map(it => it.str).join('');
   };
 
-  // Fetch the text content for a given page as a string.
-  const getTextContent = async pageIndex => {
-    const pageView = await getPageView(pageIndex);
-    const textContent = await pageView.pdfPage.getTextContent({
-      normalizeWhitespace: true,
-    });
-    return joinItems(textContent.items);
-  };
-
-  const pageText = getTextContent(pageIndex);
+  // This function synchronously populates the cache with a promise so that
+  // multiple calls don't call `PDFPageProxy.getTextContent` twice.
+  const pageText = getPageText();
   pageTextCache[pageIndex] = pageText;
   return pageText;
 }
