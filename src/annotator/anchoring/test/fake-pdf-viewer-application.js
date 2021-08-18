@@ -15,6 +15,15 @@ import { TinyEmitter as EventEmitter } from 'tiny-emitter';
 import { RenderingStates } from '../pdf';
 
 /**
+ * Options that control global aspects of the PDF.js fake, such as which
+ * version of PDF.js is being emulated.
+ *
+ * @typedef PDFJSConfig
+ * @prop {boolean} newTextRendering - Whether to emulate the PDF.js text rendering
+ *   changes added in v2.9.359.
+ */
+
+/**
  * Create the DOM structure for a page which matches the structure produced by
  * PDF.js
  *
@@ -75,8 +84,8 @@ class FakePDFPageProxy {
     const makeTextItem = str => {
       if (this._config.newTextRendering) {
         // The `hasEOL` property was added in https://github.com/mozilla/pdf.js/pull/13257
-        // and is used to feature-detect whether whitespace-only items need
-        // to ignored in the `items` array. The value is unimportant.
+        // and its existence is used to feature-detect whether whitespace-only
+        // items need to be ignored in the `items` array.
         return { str, hasEOL: false };
       } else {
         return { str };
@@ -224,15 +233,6 @@ class FakePDFViewer {
     }
   }
 }
-
-/**
- * Options that control global aspects of the PDF.js fake, such as which
- * version of PDF.js is being emulated.
- *
- * @typedef PDFJSConfig
- * @prop {boolean} newTextRendering - Whether to emulate the PDF.js text rendering
- *   changes added in v2.9.359.
- */
 
 /**
  * @typedef Options
