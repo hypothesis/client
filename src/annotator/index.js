@@ -116,6 +116,12 @@ Guest frames can only connect to sidebars in their same-origin parent frame.`
     const clientAssets = document.querySelectorAll('[data-hypothesis-asset]');
     clientAssets.forEach(el => el.remove());
   });
+
+  // Notify sidebar when guest frame is unloaded. This might be able to replace
+  // the `destroyFrame` call in `HypothesisInjector`.
+  window.addEventListener('unload', () => {
+    guest.destroy();
+  });
 }
 
 /**
