@@ -104,6 +104,38 @@ export function findClosestOffscreenAnchor(anchors, direction) {
 }
 
 /**
+ * Return the top and bottom offsets of the bounding box that contains `elements`.
+ *
+ * The returned coordinates are relative to the viewport.
+ *
+ * @param {Element[]} elements
+ */
+function elementsClientTopBottom(elements) {
+  let minTop = Number.MAX_SAFE_INTEGER;
+  let maxBottom = -Number.MAX_SAFE_INTEGER;
+
+  for (let el of elements) {
+    let { top, bottom } = el.getBoundingClientRect();
+
+    // If this element is in a child iframe, then map the coordinates which
+    // are relative to the iframe's viewport to be relative to the current
+    // frame's viewport.
+    const elementWindow = el.ownerDocument.defaultView;
+    if (elementWindow?.parent === window && elementWindow.frameElement) {
+      const frameEl = elementWindow.frameElement;
+      const frameRect = frameEl.getBoundingClientRect();
+      top += frameRect.top;
+      bottom += frameRect.top;
+    }
+
+    minTop = Math.min(top, minTop);
+    maxBottom = Math.max(bottom, maxBottom);
+  }
+
+  return { top: minTop, bottom: maxBottom };
+}
+
+/**
  * Compute the AnchorPositions for the set of anchors provided, sorted
  * by top offset
  *
@@ -117,7 +149,7 @@ function getAnchorPositions(anchors) {
     if (!anchor.highlights?.length) {
       return;
     }
-    const anchorBox = getBoundingClientRect(anchor.highlights);
+    const anchorBox = elementsClientTopBottom(anchor.highlights);
     if (anchorBox.top >= anchorBox.bottom) {
       // Empty rect. The highlights may be disconnected from the document or hidden.
       return;
