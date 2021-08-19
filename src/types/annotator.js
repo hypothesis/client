@@ -68,6 +68,7 @@
  * Subset of the annotator `Guest` instance that is exposed to other modules
  *
  * @typedef Annotator
+ * @prop {HTMLElement} element
  * @prop {Anchor[]} anchors
  * @prop {(ann: AnnotationData) => Promise<Anchor[]>} anchor
  */

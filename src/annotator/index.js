@@ -19,6 +19,10 @@ registerIcons(iconSet);
 
 import { getConfig } from './config/index';
 import Guest from './guest';
+import {
+  loadClientInVitalSourceContentFrame,
+  vitalSourceFrameRole,
+} from './integrations/vitalsource';
 import Notebook from './notebook';
 import Sidebar from './sidebar';
 import { EventBus } from './util/emitter';
@@ -51,14 +55,25 @@ function init() {
   window_.__hypothesis = {};
 
   const annotatorConfig = getConfig('annotator');
-  const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
+  // Determine the document/application type and set up the appropriate integration.
+  let documentType;
+  const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
+  const vsFrameRole = vitalSourceFrameRole();
+  if (vsFrameRole !== null) {
+    documentType = 'vitalsource';
+    if (vsFrameRole === 'container-frame') {
+      loadClientInVitalSourceContentFrame(annotatorConfig.clientUrl);
+    }
+  } else {
+    documentType = isPDF ? 'pdf' : 'html';
+  }
+
+  // Create the guest that handles creating annotations and displaying highlights.
   const eventBus = new EventBus();
   const guest = new Guest(document.body, eventBus, {
     ...annotatorConfig,
-    // Load the PDF anchoring/metadata integration.
-    // nb. documentType is an internal config property only
-    documentType: isPDF ? 'pdf' : 'html',
+    documentType,
   });
 
   // Create the sidebar if this is the host frame. The `subFrameIdentifier`
