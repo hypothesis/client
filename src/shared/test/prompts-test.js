@@ -2,16 +2,6 @@ import { confirm } from '../prompts';
 
 describe('shared/prompts', () => {
   describe('confirm', () => {
-    beforeEach(() => {
-      // This will cause the custom ConfirmModal to be used instead of
-      // window.confirm
-      sinon.stub(window, 'confirm').returns(false);
-    });
-
-    afterEach(() => {
-      window.confirm.restore();
-    });
-
     function clickClose() {
       const closeButton = getCustomDialog().querySelector(
         '[aria-label="Close"]'
