@@ -16,14 +16,6 @@ import { TextQuoteAnchor } from './types';
  */
 
 /**
- * @typedef PdfTextRange
- * @prop {number} pageIndex
- * @prop {Object} anchor
- * @prop {number} anchor.start - Start character offset within the page's text
- * @prop {number} anchor.end - End character offset within the page's text
- */
-
-/**
  * Enum values for page rendering states (IRenderableView#renderingState)
  * in PDF.js. Taken from web/pdf_rendering_queue.js in the PDF.js library.
  *
