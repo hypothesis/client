@@ -313,7 +313,36 @@ async function anchorByPosition(pageIndex, start, end) {
 }
 
 /**
+ * Return a string with spaces stripped and offsets into the input string.
+ *
+ * @param {string} str
+ * @return {[string, number[]]}
+ */
+function stripSpaces(str) {
+  const offsets = [];
+  let stripped = '';
+
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    if (char === ' ' || char === '\t' || char === '\n') {
+      continue;
+    }
+    stripped += char;
+    offsets.push(i);
+  }
+
+  return [stripped, offsets];
+}
+
+/**
  * Search for a quote in the given pages.
+ *
+ * When comparing quote selectors to document text, ASCII whitespace characters
+ * are ignored. This is because text extracted from a PDF by different PDF
+ * viewers, including different versions of PDF.js, can often differ in the
+ * whitespace between characters and words. For a long time PDF.js in particular
+ * had issues where it would often produce extra spaces between characters that
+ * should not be there or omit spaces between words.
  *
  * @param {TextQuoteSelector} quoteSelector
  * @param {number} [positionHint] - Expected start offset of quote
@@ -344,7 +373,16 @@ async function anchorQuote(quoteSelector, positionHint) {
     });
   }
 
-  // Search pages until we find a match.
+  // Search pages for the best match, ignoring whitespace differences.
+  const [strippedPrefix] = quoteSelector.prefix
+    ? stripSpaces(quoteSelector.prefix)
+    : [];
+  const [strippedSuffix] = quoteSelector.suffix
+    ? stripSpaces(quoteSelector.suffix)
+    : [];
+  const [strippedQuote] = stripSpaces(quoteSelector.exact);
+
+  let bestMatch;
   for (let page of pageIndexes) {
     const text = await getPageTextContent(page);
 
@@ -360,16 +398,58 @@ async function anchorQuote(quoteSelector, positionHint) {
       }
     }
 
-    const match = matchQuote(text, quoteSelector.exact, {
-      prefix: quoteSelector.prefix,
-      suffix: quoteSelector.suffix,
-      hint,
+    const [strippedText, offsets] = stripSpaces(text);
+
+    // Convert expected offset in original text into offset into stripped text.
+    let strippedHint;
+    if (hint !== undefined) {
+      strippedHint = 0;
+      while (strippedHint < offsets.length && offsets[strippedHint] < hint) {
+        ++strippedHint;
+      }
+    }
+
+    const match = matchQuote(strippedText, strippedQuote, {
+      prefix: strippedPrefix,
+      suffix: strippedSuffix,
+      hint: strippedHint,
     });
+
     if (!match) {
-      // We currently stop searching when we find a "good enough" match. This
-      // may not be the best match however. See https://github.com/hypothesis/client/issues/3705.
       continue;
     }
+
+    if (!bestMatch || match.score > bestMatch.match.score) {
+      bestMatch = {
+        page,
+        match: {
+          start: offsets[match.start],
+
+          // `match.end` is the offset one past the last character of the match
+          // in the stripped text. We need the offset one past the corresponding
+          // character in the original text.
+          //
+          // We assume here that matches returned by `matchQuote` must have
+          // be non-empty, so `match.end` > `match.start`.
+          end: offsets[match.end - 1] + 1,
+
+          score: match.score,
+        },
+      };
+
+      // If we found an exact match, stop early. This improves search performance
+      // in long documents compared to testing every page.
+      //
+      // A known limitation here is that the quote context (prefix and suffix)
+      // is not considered.
+      if (strippedText.slice(match.start, match.end) === strippedQuote) {
+        break;
+      }
+    }
+  }
+
+  if (bestMatch) {
+    const { page, match } = bestMatch;
 
     // If we found a match, optimize future anchoring of this selector in the
     // same session by caching the match location.
