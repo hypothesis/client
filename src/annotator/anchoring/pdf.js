@@ -29,17 +29,15 @@ export const RenderingStates = {
   FINISHED: 3,
 };
 
-// Caches for performance.
-
 /**
  * Map of page index to page text content.
  *
- * @type {Record<number,Promise<string> | undefined>}
+ * @type {Map<number, Promise<string>>}
  */
-let pageTextCache = {};
+const pageTextCache = new Map();
 
 /**
- * A cache that maps a `(quote, text offset in document)` key to a specific
+ * A cache that maps a `<quote>:<text offset>` key to a specific
  * location in the document.
  *
  * The components of the key come from an annotation's selectors. This is used
@@ -161,7 +159,7 @@ export async function documentHasText() {
 function getPageTextContent(pageIndex) {
   // If we already have or are fetching the text for this page, return the
   // existing result.
-  const cachedText = pageTextCache[pageIndex];
+  const cachedText = pageTextCache.get(pageIndex);
   if (cachedText) {
     return cachedText;
   }
@@ -188,9 +186,9 @@ function getPageTextContent(pageIndex) {
 
   // This function synchronously populates the cache with a promise so that
   // multiple calls don't call `PDFPageProxy.getTextContent` twice.
-  const pageText = getPageText();
-  pageTextCache[pageIndex] = pageText;
-  return pageText;
+  const text = getPageText();
+  pageTextCache.set(pageIndex, text);
+  return text;
 }
 
 /**
@@ -497,6 +495,6 @@ export async function describe(root, range) {
  * This exists mainly as a helper for use in tests.
  */
 export function purgeCache() {
-  pageTextCache = {};
+  pageTextCache.clear();
   quotePositionCache.clear();
 }
