@@ -295,6 +295,29 @@ describe('annotator/anchoring/pdf', () => {
       assert.equal(range.toString(), 'Jane Austen');
     });
 
+    // See https://github.com/hypothesis/client/issues/3705
+    [
+      // Exact match for text in PDF.
+      'Netherfield Park is',
+
+      // Exact match for text in PDF when whitespace differences are ignored.
+      'Netherfield  Park  is',
+      'NetherfieldParkis',
+
+      // Close match for text in PDF.
+      'Netherfield Park as',
+    ].forEach(quoteText => {
+      it('anchors quotes to best match across all pages', async () => {
+        viewer.pdfViewer.setCurrentPage(2);
+        const quote = { type: 'TextQuoteSelector', exact: quoteText };
+        const range = await pdfAnchoring.anchor(container, [quote]);
+
+        // This should anchor to an exact match on the third page, rather than a
+        // close match on the second page.
+        assert.equal(range.toString(), 'Netherfield Park is');
+      });
+    });
+
     // See https://github.com/hypothesis/client/issues/1329
     it('anchors selectors that match the last text on the page', async () => {
       viewer.pdfViewer.setCurrentPage(1);
