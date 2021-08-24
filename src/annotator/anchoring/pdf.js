@@ -1,6 +1,7 @@
 /* global PDFViewerApplication */
 
 import warnOnce from '../../shared/warn-once';
+import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
 import { TextPosition, TextRange } from './text-range';
 import { TextQuoteAnchor } from './types';
@@ -53,9 +54,9 @@ let pageTextCache = {};
  * to speed up re-anchoring an annotation that was previously anchored in the
  * current session.
  *
- * @type {Object<string, Object<number, PdfTextRange>>}
+ * @type {Map<string, { pageIndex: number, start: number, end: number }>}
  */
-let quotePositionCache = {};
+const quotePositionCache = new Map();
 
 /**
  * Return offset of `node` among its siblings
@@ -343,104 +344,79 @@ async function anchorByPosition(pageIndex, start, end) {
 }
 
 /**
- * Search for a quote in the given pages.
+ * Return an array filled with numbers from start (inclusive) to end (exlusive).
  *
- * @param {number[]} pageIndexes - Pages to search in priority order
- * @param {TextQuoteSelector} quoteSelector
- * @param {Object} positionHint - Options to pass to `TextQuoteAnchor#toPositionAnchor`
- * @return {Promise<Range>} Location of quote
+ * @param {number} start
+ * @param {number} end
  */
-function findInPages(pageIndexes, quoteSelector, positionHint) {
-  if (pageIndexes.length === 0) {
-    // We reached the end of the document without finding a match for the quote.
-    return Promise.reject(new Error('Quote not found'));
-  }
-
-  const [pageIndex, ...rest] = pageIndexes;
-
-  const content = getPageTextContent(pageIndex);
-  const offset = getPageOffset(pageIndex);
-
-  const attempt = ([content, offset]) => {
-    const root = document.createElement('div');
-    root.textContent = content;
-    const anchor = TextQuoteAnchor.fromSelector(root, quoteSelector);
-    if (positionHint) {
-      let hint = positionHint.start - offset;
-      hint = Math.max(0, hint);
-      hint = Math.min(hint, content.length);
-      return anchor.toPositionAnchor({ hint });
-    }
-    return anchor.toPositionAnchor();
-  };
-
-  const next = () => findInPages(rest, quoteSelector, positionHint);
-
-  const cacheAndFinish = anchor => {
-    if (positionHint) {
-      if (!quotePositionCache[quoteSelector.exact]) {
-        quotePositionCache[quoteSelector.exact] = {};
-      }
-      quotePositionCache[quoteSelector.exact][positionHint.start] = {
-        pageIndex,
-        anchor,
-      };
-    }
-    return anchorByPosition(pageIndex, anchor.start, anchor.end);
-  };
-
-  // First, get the text offset and other details of the current page.
-  return (
-    Promise.all([content, offset])
-      // Attempt to locate the quote in the current page.
-      .then(attempt)
-      // If the quote is located, find the DOM range and return it.
-      .then(cacheAndFinish)
-      // If the quote was not found, try the next page.
-      .catch(next)
-  );
+function range(start, end) {
+  return Array(end - start)
+    .fill(0)
+    .map((_, i) => start + i);
 }
 
 /**
- * Return a list of page indexes to search for a quote in priority order.
- *
- * When a position anchor is available, quote search can be optimized by
- * searching pages nearest the expected position first.
- *
- * @param {number} position - Text offset from start of document
- * @return {Promise<number[]>}
+ * @param {TextQuoteSelector} quote
+ * @param {number} position
  */
-function prioritizePages(position) {
-  const pageCount = getPdfViewer().pagesCount;
-  const pageIndices = Array(pageCount)
-    .fill(0)
-    .map((_, i) => i);
+function quotePositionCacheKey(quote, position) {
+  return `${quote.exact}:${position}`;
+}
 
-  if (!position) {
-    return Promise.resolve(pageIndices);
+/**
+ * Search for a quote in the PDF text.
+ *
+ * @param {TextQuoteSelector} quoteSelector
+ * @param {number} [positionHint] - Expected offset of quote. This is used to
+ *   choose between equally good matches.
+ * @return {Promise<Range>}
+ */
+async function findQuote(quoteSelector, positionHint) {
+  const viewer = getPdfViewer();
+  const pageIndexes = range(0, viewer.pagesCount);
+  const pageTexts = await Promise.all(
+    pageIndexes.map(i => getPageTextContent(i))
+  );
+  const pageOffsets = [0];
+  let maxOffset = 0;
+  for (let i = 0; i < pageTexts.length; i++) {
+    maxOffset += pageTexts[i].length;
+    pageOffsets.push(maxOffset);
   }
 
-  /**
-   * Sort page indexes by offset from `pageIndex`.
-   *
-   * @param {number} pageIndex
-   */
-  function sortPages(pageIndex) {
-    const left = pageIndices.slice(0, pageIndex);
-    const right = pageIndices.slice(pageIndex);
-    const result = [];
-    while (left.length > 0 || right.length > 0) {
-      if (right.length) {
-        result.push(/** @type {number} */ (right.shift()));
-      }
-      if (left.length) {
-        result.push(/** @type {number} */ (left.pop()));
-      }
-    }
-    return result;
+  // Find the best match for this quote across the entire document.
+  const documentText = pageTexts.join('');
+  const match = matchQuote(documentText, quoteSelector.exact, {
+    prefix: quoteSelector.prefix,
+    suffix: quoteSelector.suffix,
+    hint: positionHint,
+  });
+
+  if (!match) {
+    throw new Error('Quote not found');
   }
 
-  return findPage(position).then(({ index }) => sortPages(index));
+  const pageIndex = pageOffsets.findIndex(
+    (offset, i, offsets) =>
+      match.start >= offset && match.start < offsets[i + 1]
+  );
+
+  // Get offsets of match within the page. If the match spans multiple pages
+  // we currently truncate at the page boundary. It would be useful to support
+  // cross-page matches, but that involves many other changes as anchoring would
+  // need to return multiple ranges.
+  const start = match.start - pageOffsets[pageIndex];
+  const end = Math.min(
+    match.end - pageOffsets[pageIndex],
+    pageOffsets[pageIndex + 1]
+  );
+
+  if (positionHint) {
+    const cacheKey = quotePositionCacheKey(quoteSelector, positionHint);
+    quotePositionCache.set(cacheKey, { pageIndex, start, end });
+  }
+
+  return anchorByPosition(pageIndex, start, end);
 }
 
 /**
@@ -491,17 +467,11 @@ export async function anchor(root, selectors) {
     // If anchoring with the position failed, check for a cached quote-based
     // match using the quote + position as a cache key.
     try {
-      if (
-        quotePositionCache[quote.exact] &&
-        quotePositionCache[quote.exact][position.start]
-      ) {
-        const { pageIndex, anchor } =
-          quotePositionCache[quote.exact][position.start];
-        const range = await anchorByPosition(
-          pageIndex,
-          anchor.start,
-          anchor.end
-        );
+      const cacheKey = quotePositionCacheKey(quote, position.start);
+      const cachedPosition = quotePositionCache.get(cacheKey);
+      if (cachedPosition) {
+        const { pageIndex, start, end } = cachedPosition;
+        const range = await anchorByPosition(pageIndex, start, end);
         return range;
       }
     } catch {
@@ -509,8 +479,7 @@ export async function anchor(root, selectors) {
     }
   }
 
-  const pageIndices = await prioritizePages(position?.start ?? 0);
-  return findInPages(pageIndices, quote, position);
+  return findQuote(quote, position?.start);
 }
 
 /**
@@ -578,5 +547,5 @@ export async function describe(root, range) {
  */
 export function purgeCache() {
   pageTextCache = {};
-  quotePositionCache = {};
+  quotePositionCache.clear();
 }
