@@ -202,92 +202,51 @@ function getPageTextContent(pageIndex) {
 }
 
 /**
- * Return the offset in the text for the whole document at which the text for
- * `pageIndex` begins.
+ * Find the offset within the document's text at which a page's text begins.
  *
  * @param {number} pageIndex
- * @return {Promise<number>} - Character position at which page text starts
+ * @return {Promise<number>} - Character offset of start of within document text
  */
-function getPageOffset(pageIndex) {
-  let index = -1;
-
-  const next = offset => {
-    ++index;
-    if (index === pageIndex) {
-      return Promise.resolve(offset);
-    }
-
-    return getPageTextContent(index).then(textContent =>
-      next(offset + textContent.length)
-    );
-  };
-
-  return next(0);
+async function getPageOffset(pageIndex) {
+  const viewer = getPdfViewer();
+  if (pageIndex >= viewer.pagesCount) {
+    /* istanbul ignore next - This should never be triggered */
+    throw new Error('Invalid page index');
+  }
+  let pageOffset = 0;
+  for (let i = 0; i < pageIndex; i++) {
+    const text = await getPageTextContent(i);
+    pageOffset += text.length;
+  }
+  return pageOffset;
 }
 
 /**
- * Information about the page where a particular character position in the
- * text of the document occurs.
- *
  * @typedef PageOffset
- * @prop {number} index - Index of page containing offset
- * @prop {number} offset -
- *  Character position of the start of `textContent`
- *  within the full text of the document
- * @prop {string} textContent - Full text of page containing offset
+ * @prop {number} index - Page index
+ * @prop {number} offset - Character offset of start of page within document text
+ * @prop {string} text - Text of page
  */
 
 /**
- * Find the index and text content of a page containing the character position
- * `offset` within the complete text of the document.
+ * Find the page containing a given text `offset` within the document.
  *
  * @param {number} offset
  * @return {Promise<PageOffset>}
  */
-function findPage(offset) {
-  let index = 0;
-  let total = 0;
+async function findPageByOffset(offset) {
+  const viewer = getPdfViewer();
+  let pageEndOffset = 0;
+  for (let i = 0; i < viewer.pagesCount; i++) {
+    const text = await getPageTextContent(i);
+    const pageStartOffset = pageEndOffset;
+    pageEndOffset += text.length;
 
-  // We call `count` once for each page, in order. The passed offset is found on
-  // the first page where the cumulative length of the text content exceeds the
-  // offset value.
-  //
-  // When we find the page the offset is on, we return an object containing the
-  // page index, the offset at the start of that page, and the textContent of
-  // that page.
-  //
-  // To understand this a little better, here's a worked example. Imagine a
-  // document with the following page lengths:
-  //
-  //    Page 0 has length 100
-  //    Page 1 has length 50
-  //    Page 2 has length 50
-  //
-  // Then here are the pages that various offsets are found on:
-  //
-  //    offset | index
-  //    --------------
-  //    0      | 0
-  //    99     | 0
-  //    100    | 1
-  //    101    | 1
-  //    149    | 1
-  //    150    | 2
-  const count = textContent => {
-    const lastPageIndex = getPdfViewer().pagesCount - 1;
-    if (total + textContent.length > offset || index === lastPageIndex) {
-      // Offset is in current page.
-      offset = total;
-      return Promise.resolve({ index, offset, textContent });
-    } else {
-      // Offset is within a subsequent page.
-      ++index;
-      total += textContent.length;
-      return getPageTextContent(index).then(count);
+    if (pageEndOffset >= offset) {
+      return { index: i, offset: pageStartOffset, text };
     }
-  };
-
-  return getPageTextContent(0).then(count);
+  }
+  throw new Error('Offset is beyond end of document');
 }
 
 /**
@@ -448,12 +407,12 @@ export async function anchor(root, selectors) {
     // If we have a position selector, try using that first as it is the fastest
     // anchoring method.
     try {
-      const { index, offset, textContent } = await findPage(position.start);
+      const { index, offset, text } = await findPageByOffset(position.start);
       const start = position.start - offset;
       const end = position.end - offset;
       const length = end - start;
 
-      const matchedText = textContent.substr(start, length);
+      const matchedText = text.substr(start, length);
       if (quote.exact !== matchedText) {
         throw new Error('quote mismatch');
       }
