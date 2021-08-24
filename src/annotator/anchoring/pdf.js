@@ -1,6 +1,7 @@
 /* global PDFViewerApplication */
 
 import warnOnce from '../../shared/warn-once';
+import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
 import { TextPosition, TextRange } from './text-range';
 import { TextQuoteAnchor } from './types';
@@ -201,92 +202,61 @@ function getPageTextContent(pageIndex) {
 }
 
 /**
- * Return the offset in the text for the whole document at which the text for
- * `pageIndex` begins.
+ * Find the offset within the document's text at which a page begins.
  *
  * @param {number} pageIndex
- * @return {Promise<number>} - Character position at which page text starts
+ * @return {Promise<number>} - Offset of page's text within document text
  */
-function getPageOffset(pageIndex) {
-  let index = -1;
-
-  const next = offset => {
-    ++index;
-    if (index === pageIndex) {
-      return Promise.resolve(offset);
-    }
-
-    return getPageTextContent(index).then(textContent =>
-      next(offset + textContent.length)
-    );
-  };
-
-  return next(0);
+async function getPageOffset(pageIndex) {
+  const viewer = getPdfViewer();
+  if (pageIndex >= viewer.pagesCount) {
+    /* istanbul ignore next - This should never be triggered */
+    throw new Error('Invalid page index');
+  }
+  let offset = 0;
+  for (let i = 0; i < pageIndex; i++) {
+    const text = await getPageTextContent(i);
+    offset += text.length;
+  }
+  return offset;
 }
 
 /**
- * Information about the page where a particular character position in the
- * text of the document occurs.
- *
  * @typedef PageOffset
- * @prop {number} index - Index of page containing offset
- * @prop {number} offset -
- *  Character position of the start of `textContent`
- *  within the full text of the document
- * @prop {string} textContent - Full text of page containing offset
+ * @prop {number} index - Page index
+ * @prop {number} offset - Character offset of start of page within document text
+ * @prop {string} text - Text of page
  */
 
 /**
- * Find the index and text content of a page containing the character position
- * `offset` within the complete text of the document.
+ * Find the page containing a text offset within the document.
+ *
+ * If the offset is invalid (less than 0 or greater than the length of the document)
+ * then the nearest (first or last) page is returned.
  *
  * @param {number} offset
  * @return {Promise<PageOffset>}
  */
-function findPage(offset) {
-  let index = 0;
-  let total = 0;
+async function findPageByOffset(offset) {
+  const viewer = getPdfViewer();
 
-  // We call `count` once for each page, in order. The passed offset is found on
-  // the first page where the cumulative length of the text content exceeds the
-  // offset value.
-  //
-  // When we find the page the offset is on, we return an object containing the
-  // page index, the offset at the start of that page, and the textContent of
-  // that page.
-  //
-  // To understand this a little better, here's a worked example. Imagine a
-  // document with the following page lengths:
-  //
-  //    Page 0 has length 100
-  //    Page 1 has length 50
-  //    Page 2 has length 50
-  //
-  // Then here are the pages that various offsets are found on:
-  //
-  //    offset | index
-  //    --------------
-  //    0      | 0
-  //    99     | 0
-  //    100    | 1
-  //    101    | 1
-  //    149    | 1
-  //    150    | 2
-  const count = textContent => {
-    const lastPageIndex = getPdfViewer().pagesCount - 1;
-    if (total + textContent.length > offset || index === lastPageIndex) {
-      // Offset is in current page.
-      offset = total;
-      return Promise.resolve({ index, offset, textContent });
-    } else {
-      // Offset is within a subsequent page.
-      ++index;
-      total += textContent.length;
-      return getPageTextContent(index).then(count);
+  let pageStartOffset = 0;
+  let pageEndOffset = 0;
+  let text = '';
+
+  for (let i = 0; i < viewer.pagesCount; i++) {
+    text = await getPageTextContent(i);
+    pageStartOffset = pageEndOffset;
+    pageEndOffset += text.length;
+
+    if (pageEndOffset >= offset) {
+      return { index: i, offset: pageStartOffset, text };
     }
-  };
+  }
 
-  return getPageTextContent(0).then(count);
+  // If the offset is beyond the end of the document, just pretend it was on
+  // the last page.
+  return { index: viewer.pagesCount - 1, offset: pageStartOffset, text };
 }
 
 /**
@@ -345,102 +315,79 @@ async function anchorByPosition(pageIndex, start, end) {
 /**
  * Search for a quote in the given pages.
  *
- * @param {number[]} pageIndexes - Pages to search in priority order
  * @param {TextQuoteSelector} quoteSelector
- * @param {Object} positionHint - Options to pass to `TextQuoteAnchor#toPositionAnchor`
+ * @param {number} [positionHint] - Expected start offset of quote
  * @return {Promise<Range>} Location of quote
  */
-function findInPages(pageIndexes, quoteSelector, positionHint) {
-  if (pageIndexes.length === 0) {
-    // We reached the end of the document without finding a match for the quote.
-    return Promise.reject(new Error('Quote not found'));
+async function anchorQuote(quoteSelector, positionHint) {
+  // Determine which pages to search and in what order. If we have a position
+  // hint we'll try to use that. Otherwise we'll just search all pages in order.
+  const pageCount = getPdfViewer().pagesCount;
+  const pageIndexes = Array(pageCount)
+    .fill(0)
+    .map((_, i) => i);
+
+  let expectedPageIndex;
+  let expectedOffsetInPage;
+
+  if (positionHint) {
+    const { index, offset } = await findPageByOffset(positionHint);
+    expectedPageIndex = index;
+    expectedOffsetInPage = positionHint - offset;
+
+    // Sort pages by distance from the page where we expect to find the quote,
+    // based on the position hint.
+    pageIndexes.sort((a, b) => {
+      const distA = Math.abs(a - index);
+      const distB = Math.abs(b - index);
+      return distA - distB;
+    });
   }
 
-  const [pageIndex, ...rest] = pageIndexes;
+  // Search pages until we find a match.
+  for (let page of pageIndexes) {
+    const text = await getPageTextContent(page);
 
-  const content = getPageTextContent(pageIndex);
-  const offset = getPageOffset(pageIndex);
-
-  const attempt = ([content, offset]) => {
-    const root = document.createElement('div');
-    root.textContent = content;
-    const anchor = TextQuoteAnchor.fromSelector(root, quoteSelector);
-    if (positionHint) {
-      let hint = positionHint.start - offset;
-      hint = Math.max(0, hint);
-      hint = Math.min(hint, content.length);
-      return anchor.toPositionAnchor({ hint });
+    // Expected offset of quote in current page based on position hint.
+    let hint;
+    if (expectedPageIndex !== undefined) {
+      if (page < expectedPageIndex) {
+        hint = text.length; // Prefer matches closer to end of page.
+      } else if (page === expectedPageIndex) {
+        hint = expectedOffsetInPage;
+      } else {
+        hint = 0; // Prefer matches closer to start of page.
+      }
     }
-    return anchor.toPositionAnchor();
-  };
 
-  const next = () => findInPages(rest, quoteSelector, positionHint);
+    const match = matchQuote(text, quoteSelector.exact, {
+      prefix: quoteSelector.prefix,
+      suffix: quoteSelector.suffix,
+      hint,
+    });
+    if (!match) {
+      // We currently stop searching when we find a "good enough" match. This
+      // may not be the best match however. See https://github.com/hypothesis/client/issues/3705.
+      continue;
+    }
 
-  const cacheAndFinish = anchor => {
+    // If we found a match, optimize future anchoring of this selector in the
+    // same session by caching the match location.
     if (positionHint) {
       if (!quotePositionCache[quoteSelector.exact]) {
         quotePositionCache[quoteSelector.exact] = {};
       }
-      quotePositionCache[quoteSelector.exact][positionHint.start] = {
-        pageIndex,
-        anchor,
+      quotePositionCache[quoteSelector.exact][positionHint] = {
+        pageIndex: page,
+        anchor: match,
       };
     }
-    return anchorByPosition(pageIndex, anchor.start, anchor.end);
-  };
 
-  // First, get the text offset and other details of the current page.
-  return (
-    Promise.all([content, offset])
-      // Attempt to locate the quote in the current page.
-      .then(attempt)
-      // If the quote is located, find the DOM range and return it.
-      .then(cacheAndFinish)
-      // If the quote was not found, try the next page.
-      .catch(next)
-  );
-}
-
-/**
- * Return a list of page indexes to search for a quote in priority order.
- *
- * When a position anchor is available, quote search can be optimized by
- * searching pages nearest the expected position first.
- *
- * @param {number} position - Text offset from start of document
- * @return {Promise<number[]>}
- */
-function prioritizePages(position) {
-  const pageCount = getPdfViewer().pagesCount;
-  const pageIndices = Array(pageCount)
-    .fill(0)
-    .map((_, i) => i);
-
-  if (!position) {
-    return Promise.resolve(pageIndices);
+    // Convert the (start, end) position match into a DOM range.
+    return anchorByPosition(page, match.start, match.end);
   }
 
-  /**
-   * Sort page indexes by offset from `pageIndex`.
-   *
-   * @param {number} pageIndex
-   */
-  function sortPages(pageIndex) {
-    const left = pageIndices.slice(0, pageIndex);
-    const right = pageIndices.slice(pageIndex);
-    const result = [];
-    while (left.length > 0 || right.length > 0) {
-      if (right.length) {
-        result.push(/** @type {number} */ (right.shift()));
-      }
-      if (left.length) {
-        result.push(/** @type {number} */ (left.pop()));
-      }
-    }
-    return result;
-  }
-
-  return findPage(position).then(({ index }) => sortPages(index));
+  throw new Error('Quote not found');
 }
 
 /**
@@ -472,12 +419,12 @@ export async function anchor(root, selectors) {
     // If we have a position selector, try using that first as it is the fastest
     // anchoring method.
     try {
-      const { index, offset, textContent } = await findPage(position.start);
+      const { index, offset, text } = await findPageByOffset(position.start);
       const start = position.start - offset;
       const end = position.end - offset;
       const length = end - start;
 
-      const matchedText = textContent.substr(start, length);
+      const matchedText = text.substr(start, length);
       if (quote.exact !== matchedText) {
         throw new Error('quote mismatch');
       }
@@ -509,8 +456,7 @@ export async function anchor(root, selectors) {
     }
   }
 
-  const pageIndices = await prioritizePages(position?.start ?? 0);
-  return findInPages(pageIndices, quote, position);
+  return anchorQuote(quote, position?.start);
 }
 
 /**
