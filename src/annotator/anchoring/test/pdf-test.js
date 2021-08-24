@@ -245,7 +245,7 @@ describe('annotator/anchoring/pdf', () => {
 
         // Test that all of the selectors anchor and that each selector individually
         // anchors correctly as well
-        const subsets = [[position, quote], [position], [quote]];
+        const subsets = [[position, quote], [quote]];
         const subsetsAnchored = subsets.map(subset => {
           const types = subset.map(s => {
             return s.type;
@@ -269,6 +269,21 @@ describe('annotator/anchoring/pdf', () => {
         return Promise.all(subsetsAnchored);
       });
     });
+
+    [[], [{ type: 'TextPositionSelector', start: 0, end: 200 }]].forEach(
+      selectors => {
+        it('fails to anchor if there is no quote selector', async () => {
+          let error;
+          try {
+            await pdfAnchoring.anchor(container, selectors);
+          } catch (err) {
+            error = err;
+          }
+          assert.instanceOf(error, Error);
+          assert.equal(error.message, 'No quote selector found');
+        });
+      }
+    );
 
     it('anchors text in older PDF.js versions', async () => {
       initViewer(fixtures.pdfPages, { newTextRendering: false });

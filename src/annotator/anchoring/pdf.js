@@ -446,57 +446,71 @@ function prioritizePages(position) {
 /**
  * Anchor a set of selectors to a DOM Range.
  *
+ * `selectors` must include a `TextQuoteSelector` and may include other selector
+ * types.
+ *
  * @param {HTMLElement} root
- * @param {Selector[]} selectors - Selector objects to anchor
+ * @param {Selector[]} selectors
  * @return {Promise<Range>}
  */
-export function anchor(root, selectors) {
-  const position = /** @type {TextPositionSelector|undefined} */ (
-    selectors.find(s => s.type === 'TextPositionSelector')
-  );
+export async function anchor(root, selectors) {
   const quote = /** @type {TextQuoteSelector|undefined} */ (
     selectors.find(s => s.type === 'TextQuoteSelector')
   );
 
-  /** @type {Promise<Range>} */
-  let result = Promise.reject('unable to anchor');
-
-  if (position) {
-    result = result.catch(() => {
-      return findPage(position.start).then(({ index, offset, textContent }) => {
-        const start = position.start - offset;
-        const end = position.end - offset;
-        const length = end - start;
-
-        const matchedText = textContent.substr(start, length);
-        if (quote && quote.exact !== matchedText) {
-          throw new Error('quote mismatch');
-        }
-
-        return anchorByPosition(index, start, end);
-      });
-    });
+  // The quote selector is required in order to check that text position
+  // selector results are still valid.
+  if (!quote) {
+    throw new Error('No quote selector found');
   }
 
-  if (quote) {
-    result = result.catch(() => {
+  const position = /** @type {TextPositionSelector|undefined} */ (
+    selectors.find(s => s.type === 'TextPositionSelector')
+  );
+
+  if (position) {
+    // If we have a position selector, try using that first as it is the fastest
+    // anchoring method.
+    try {
+      const { index, offset, textContent } = await findPage(position.start);
+      const start = position.start - offset;
+      const end = position.end - offset;
+      const length = end - start;
+
+      const matchedText = textContent.substr(start, length);
+      if (quote.exact !== matchedText) {
+        throw new Error('quote mismatch');
+      }
+
+      const range = await anchorByPosition(index, start, end);
+      return range;
+    } catch {
+      // Fall back to quote selector
+    }
+
+    // If anchoring with the position failed, check for a cached quote-based
+    // match using the quote + position as a cache key.
+    try {
       if (
-        position &&
         quotePositionCache[quote.exact] &&
         quotePositionCache[quote.exact][position.start]
       ) {
         const { pageIndex, anchor } =
           quotePositionCache[quote.exact][position.start];
-        return anchorByPosition(pageIndex, anchor.start, anchor.end);
+        const range = await anchorByPosition(
+          pageIndex,
+          anchor.start,
+          anchor.end
+        );
+        return range;
       }
-
-      return prioritizePages(position?.start ?? 0).then(pageIndices => {
-        return findInPages(pageIndices, quote, position);
-      });
-    });
+    } catch {
+      // Fall back to uncached quote selector match
+    }
   }
 
-  return result;
+  const pageIndices = await prioritizePages(position?.start ?? 0);
+  return findInPages(pageIndices, quote, position);
 }
 
 /**
