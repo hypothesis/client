@@ -40,7 +40,7 @@ export const RenderingStates = {
 /**
  * Map of page index to page text content.
  *
- * @type {Object<number,Promise<string>>}
+ * @type {Record<number,Promise<string> | undefined>}
  */
 let pageTextCache = {};
 
@@ -159,8 +159,9 @@ export async function documentHasText() {
  * @return {Promise<string>}
  */
 async function getPageTextContent(pageIndex) {
-  if (pageTextCache[pageIndex]) {
-    return pageTextCache[pageIndex];
+  const cachedText = pageTextCache[pageIndex];
+  if (cachedText) {
+    return cachedText;
   }
 
   // Join together PDF.js `TextItem`s representing pieces of text in a PDF page.
@@ -185,9 +186,9 @@ async function getPageTextContent(pageIndex) {
     return joinItems(textContent.items);
   };
 
-  pageTextCache[pageIndex] = getTextContent(pageIndex);
-
-  return pageTextCache[pageIndex];
+  const pageText = getTextContent(pageIndex);
+  pageTextCache[pageIndex] = pageText;
+  return pageText;
 }
 
 /**
