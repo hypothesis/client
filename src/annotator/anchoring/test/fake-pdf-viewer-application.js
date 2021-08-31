@@ -81,6 +81,7 @@ class FakePDFPageProxy {
       );
     }
 
+    /** @param {string} str */
     const makeTextItem = str => {
       if (this._config.newTextRendering) {
         // The `hasEOL` property was added in https://github.com/mozilla/pdf.js/pull/13257
@@ -151,10 +152,10 @@ class FakePDFViewer {
   /**
    * @param {Options} options
    */
-  constructor(options) {
-    this._config = options.config;
-    this._container = options.container;
-    this._content = options.content;
+  constructor({ config, container, content }) {
+    this._config = config;
+    this._container = container;
+    this._content = content;
 
     /** @type {FakePDFPageView} */
     this._pages = [];

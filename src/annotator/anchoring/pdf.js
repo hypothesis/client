@@ -180,7 +180,7 @@ function getPageTextContent(pageIndex) {
     });
     let items = textContent.items;
 
-    // Older versions of PDF.js did not create elements in the text layer for
+    // Versions of PDF.js < v2.9.359 did not create elements in the text layer for
     // text items that contained all-whitespace strings. Newer versions (after
     // https://github.com/mozilla/pdf.js/pull/13257) do. The same commit also
     // introduced the `hasEOL` property to text items, so we use the absence
