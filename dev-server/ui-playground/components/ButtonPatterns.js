@@ -4,59 +4,58 @@ import {
   LinkButton,
 } from '@hypothesis/frontend-shared';
 
-import {
-  PatternPage,
-  Pattern,
-  PatternExamples,
-  PatternExample,
-} from '@hypothesis/frontend-shared/lib/pattern-library/components/PatternPage';
+// TODO: Update after https://github.com/hypothesis/frontend-shared/issues/179
+// is resolved
+import Library from '@hypothesis/frontend-shared/lib/pattern-library/components/Library';
 
 export default function ButtonPatterns() {
   return (
-    <PatternPage title="Buttons">
-      <Pattern title="PublishControlButton">
+    <Library.Page title="Buttons">
+      <Library.Pattern title="PublishControlButton">
         <p>
           Customizes <code>LabeledButton</code> styling to disable{' '}
           <code>border-radius</code> on the right side. This makes the publish
           button fit with a drop-down menu next to it.
         </p>
 
-        <PatternExamples>
-          <PatternExample details="Basic usage">
+        <Library.Example title="Basic usage">
+          <Library.Demo withSource>
             <LabeledButton className="PublishControlButton" variant="primary">
               Publish to My Group
             </LabeledButton>
-          </PatternExample>
-        </PatternExamples>
-      </Pattern>
+          </Library.Demo>
+        </Library.Example>
+      </Library.Pattern>
 
-      <Pattern title="InlineLinkButton">
+      <Library.Pattern title="InlineLinkButton">
         <p>
           Customizes <code>LinkButton</code> styling to position inline; dark
           variant always has underline.
         </p>
 
-        <PatternExamples>
-          <PatternExample details="Basic usage">
+        <Library.Example title="Basic usage">
+          <Library.Demo withSource>
             <LinkButton className="InlineLinkButton">Log in</LinkButton>
-          </PatternExample>
-          <PatternExample details="Dark variant: Always has underline">
+          </Library.Demo>
+        </Library.Example>
+        <Library.Example title="Dark variant: Always has underline">
+          <Library.Demo withSource>
             <LinkButton className="InlineLinkButton" variant="dark">
               Log in
             </LinkButton>
-          </PatternExample>
-        </PatternExamples>
-      </Pattern>
+          </Library.Demo>
+        </Library.Example>
+      </Library.Pattern>
 
-      <Pattern title="Non-Responsive IconButton">
+      <Library.Pattern title="Non-Responsive IconButton">
         <p>
           An icon-only button overriding responsive affordances to fit in
           specific or tight spaces. These buttons do not have a minimum size
           (for tap-target size) applied for touch-screen/narrow viewports.
         </p>
 
-        <PatternExamples>
-          <PatternExample details="Sizes: medium is default">
+        <Library.Example variant="wide" title="Sizes (medium is default)">
+          <Library.Demo withSource>
             <IconButton
               className="NonResponsiveIconButton"
               icon="edit"
@@ -75,22 +74,19 @@ export default function ButtonPatterns() {
               title="Edit"
               size="large"
             />
-          </PatternExample>
-        </PatternExamples>
-      </Pattern>
+          </Library.Demo>
+        </Library.Example>
+      </Library.Pattern>
 
-      <Pattern title="PaginationPageButton">
+      <Library.Pattern title="PaginationPageButton">
         <p>
           Style customization for <code>LabeledButton</code> that gives it
           asymmetrical padding to fit well as pagination controls in the
           Notebook.
         </p>
 
-        <PatternExamples>
-          <PatternExample
-            details="Page numbers"
-            style={{ backgroundColor: '#ececec' }}
-          >
+        <Library.Example title="Page numbers">
+          <Library.Demo withSource style={{ backgroundColor: '#ececec' }}>
             <LabeledButton className="PaginationPageButton" variant="dark">
               9
             </LabeledButton>
@@ -104,11 +100,11 @@ export default function ButtonPatterns() {
             <LabeledButton className="PaginationPageButton" variant="dark">
               11
             </LabeledButton>
-          </PatternExample>
-          <PatternExample
-            details="Navigation buttons"
-            style={{ backgroundColor: '#ececec' }}
-          >
+          </Library.Demo>
+        </Library.Example>
+
+        <Library.Example title="Navigation buttons">
+          <Library.Demo withSource style={{ backgroundColor: '#ececec' }}>
             <LabeledButton
               className="PaginationPageButton"
               icon="arrow-left"
@@ -124,34 +120,36 @@ export default function ButtonPatterns() {
             >
               Next
             </LabeledButton>
-          </PatternExample>
-        </PatternExamples>
-      </Pattern>
+          </Library.Demo>
+        </Library.Example>
+      </Library.Pattern>
 
-      <Pattern title="InputButton">
+      <Library.Pattern title="InputButton">
         <p>
           Customizes <code>IconButton</code> styling to make the button part of
           a composite pattern with an input field to the left.
         </p>
 
-        <PatternExamples>
-          <PatternExample details="Basic usage">
+        <Library.Example title="Basic usage">
+          <Library.Demo withSource>
             <IconButton
               className="InputButton"
               title="Copy version details"
               icon="copy"
             />
-          </PatternExample>
-          <PatternExample details="Small size">
+          </Library.Demo>
+        </Library.Example>
+        <Library.Example title="Small size">
+          <Library.Demo withSource>
             <IconButton
               className="InputButton"
               title="Copy version details"
               icon="copy"
               size="small"
             />
-          </PatternExample>
-        </PatternExamples>
-      </Pattern>
-    </PatternPage>
+          </Library.Demo>
+        </Library.Example>
+      </Library.Pattern>
+    </Library.Page>
   );
 }
