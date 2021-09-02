@@ -1,4 +1,4 @@
-import { ListenerCollection } from '../../util/listener-collection';
+import { ListenerCollection } from '../listener-collection';
 
 describe('ListenerCollection', () => {
   let listeners;

@@ -1,16 +1,16 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 import debounce from 'lodash.debounce';
 
-import { useStoreProxy } from '../store/use-store';
+import { ListenerCollection } from '../../shared/listener-collection';
 import { isHighlight } from '../helpers/annotation-metadata';
-import { getElementHeightWithMargins } from '../util/dom';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
 } from '../helpers/visible-threads';
+import { useStoreProxy } from '../store/use-store';
+import { getElementHeightWithMargins } from '../util/dom';
 
 import ThreadCard from './ThreadCard';
-import { ListenerCollection } from '../../annotator/util/listener-collection';
 
 /** @typedef {import('../helpers/build-thread').Thread} Thread */
 

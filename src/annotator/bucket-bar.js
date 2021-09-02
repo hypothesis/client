@@ -1,8 +1,9 @@
 import { render } from 'preact';
-import Buckets from './components/Buckets';
 
+import { ListenerCollection } from '../shared/listener-collection';
+
+import Buckets from './components/Buckets';
 import { anchorBuckets } from './util/buckets';
-import { ListenerCollection } from './util/listener-collection';
 
 /**
  * @typedef BucketBarOptions

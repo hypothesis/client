@@ -1,9 +1,8 @@
-import { Adder } from './adder';
-import { CrossFrame } from './cross-frame';
-import { HTMLIntegration } from './integrations/html';
-import { PDFIntegration } from './integrations/pdf';
+import { ListenerCollection } from '../shared/listener-collection';
 
+import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
+import { CrossFrame } from './cross-frame';
 import {
   getHighlightsContainingNode,
   highlightRange,
@@ -12,10 +11,11 @@ import {
   setHighlightsFocused,
   setHighlightsVisible,
 } from './highlighter';
+import { HTMLIntegration } from './integrations/html';
+import { PDFIntegration } from './integrations/pdf';
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
-import { ListenerCollection } from './util/listener-collection';
 
 /**
  * @typedef {import('./util/emitter').EventBus} EventBus

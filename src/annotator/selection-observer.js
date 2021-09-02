@@ -1,4 +1,4 @@
-import { ListenerCollection } from './util/listener-collection';
+import { ListenerCollection } from '../shared/listener-collection';
 
 /**
  * Return the current selection or `null` if there is no selection or it is empty.
