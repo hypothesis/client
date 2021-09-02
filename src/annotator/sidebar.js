@@ -1,15 +1,15 @@
 import Hammer from 'hammerjs';
 
-import annotationCounts from './annotation-counts';
-import sidebarTrigger from './sidebar-trigger';
-import { createSidebarConfig } from './config/sidebar';
 import events from '../shared/bridge-events';
-import features from './features';
+import { ListenerCollection } from '../shared/listener-collection';
 
+import annotationCounts from './annotation-counts';
+import BucketBar from './bucket-bar';
+import { createSidebarConfig } from './config/sidebar';
+import features from './features';
+import sidebarTrigger from './sidebar-trigger';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
-import BucketBar from './bucket-bar';
-import { ListenerCollection } from './util/listener-collection';
 
 /**
  * @typedef {import('./guest').default} Guest

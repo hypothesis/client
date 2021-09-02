@@ -1,4 +1,4 @@
-import { ListenerCollection } from '../annotator/util/listener-collection';
+import { ListenerCollection } from './listener-collection';
 
 /*
   This module was adapted from `index.js` in https://github.com/substack/frame-rpc.

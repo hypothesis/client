@@ -1,6 +1,7 @@
 import debounce from 'lodash.debounce';
 import { render } from 'preact';
 
+import { ListenerCollection } from '../../shared/listener-collection';
 import {
   RenderingStates,
   anchor,
@@ -10,7 +11,6 @@ import {
 import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
 import WarningBanner from '../components/WarningBanner';
 import { createShadowRoot } from '../util/shadow-root';
-import { ListenerCollection } from '../util/listener-collection';
 import { offsetRelativeTo, scrollElement } from '../util/scroll';
 
 import { PDFMetadata } from './pdf-metadata';
