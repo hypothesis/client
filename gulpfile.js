@@ -316,6 +316,8 @@ gulp.task('serve-package', () => {
 
 gulp.task('serve-test-pages', () => {
   serveDev(3000, { clientUrl: `//{current_host}:3001/hypothesis` });
+  // Starts an additional dev web server to test cross-origin functionality
+  serveDev(3002, { clientUrl: `//{current_host}:3001/hypothesis` });
 });
 
 const buildAssets = gulp.parallel(

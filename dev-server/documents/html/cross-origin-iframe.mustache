@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cross-origin guest iframe</title>
+    <style>
+      body {
+        font-family: sans-serif;
+      }
+      iframe {
+        width: 75%;
+        height: 300px;
+        resize: both;
+        overflow: auto;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Cross-origin guest iframe</h1>
+    <p>
+      The cross-origin iframe below should behave like a normal guest iframe. It should
+      be possible to select text and add annotations.
+    </p>
+    <iframe></iframe>
+    <script>
+      // Set a different port for the iframe `src` property to make it cross-origin.
+      const url = new URL(document.location);
+      const port = url.port === '3000' ? '3002' : '3000';
+      const src = `//${url.hostname}:${port}/document/doyle-embedded`;
+      document.querySelector('iframe').setAttribute('src', src);
+    </script>
+    {{{hypothesisScript}}}
+  </body>
+</html>
