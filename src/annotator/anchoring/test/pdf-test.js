@@ -310,34 +310,42 @@ describe('annotator/anchoring/pdf', () => {
 
     [
       {
-        // Position on same page as quote but different text.
+        // Position on page before quote.
         offset: 5,
       },
       {
-        // Position on a different page to the quote.
-        offset: fixtures.pdfPages[0].length + 10,
+        // Position same page as quote, but different location.
+        offset: fixtures.pdfPages[0].length + 1,
       },
       {
-        // Position invalid for document.
+        // Position on a page after the quote.
+        offset: fixtures.pdfPages[0].length + fixtures.pdfPages[1].length + 5,
+      },
+      {
+        // Position before beginning of document.
+        offset: -500,
+      },
+      {
+        // Position beyond end of document.
         offset: 100000,
       },
     ].forEach(({ offset }) => {
       it('anchors using a quote if the position selector fails', () => {
-        viewer.pdfViewer.setCurrentPage(0);
-        const range = findText(container, 'Pride And Prejudice');
+        viewer.pdfViewer.setCurrentPage(1);
+        const selection = 'zombie in possession';
+        const range = findText(container, selection);
         return pdfAnchoring
           .describe(container, range)
-          .then(selectors => {
-            const position = selectors[0];
-            const quote = selectors[1];
-
-            position.start += offset;
-            position.end += offset;
-
+          .then(([, quote]) => {
+            const position = {
+              type: 'TextPositionSelector',
+              start: offset,
+              end: offset + selection.length,
+            };
             return pdfAnchoring.anchor(container, [position, quote]);
           })
           .then(range => {
-            assert.equal(range.toString(), 'Pride And Prejudice');
+            assert.equal(range.toString(), selection);
           });
       });
     });
