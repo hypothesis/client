@@ -1,43 +1,54 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Hypothesis Client Test</title>
-<style>
-  body {
-    font-family: sans-serif;
-  }
-</style>
-  <template id="my-paragraph">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hypothesis Client Test</title>
     <style>
-      p {
-        color: white;
-        background-color: #666;
-        padding: 5px;
+      body {
+        font-family: sans-serif;
       }
-     </style>
-     <p>Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae, ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend leo.</p>
-  </template>
-  <script>
-    customElements.define('my-paragraph',
-      class extends HTMLElement {
-        constructor() {
-          super();
-          let template = document.getElementById('my-paragraph');
-          let templateContent = template.content;
-    
-          const shadowRoot = this.attachShadow({mode: 'open'})
-            .appendChild(templateContent.cloneNode(true));
+    </style>
+    <template id="my-paragraph">
+      <style>
+        p {
+          color: white;
+          background-color: #666;
+          padding: 5px;
         }
-      }
-    );
-  </script>
-</head>
-<body>
-  <h2>Shadow DOM example</h2>
-  <p>The following two paragraphs contain texts inside shadow DOMs. This page allows testing the addition and display of annotations in this scenario.</p>
-  <my-paragraph></my-paragraph>
-  <my-paragraph></my-paragraph>
-  {{{hypothesisScript}}}
+      </style>
+      <p>
+        Pellentesque habitant morbi tristique senectus et netus et malesuada
+        fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae,
+        ultricies eget, tempor sit amet, ante. Donec eu libero sit amet quam
+        egestas semper. Aenean ultricies mi vitae est. Mauris placerat eleifend
+        leo.
+      </p>
+    </template>
+    <script>
+      customElements.define(
+        'my-paragraph',
+        class extends HTMLElement {
+          constructor() {
+            super();
+            let template = document.getElementById('my-paragraph');
+            let templateContent = template.content;
+
+            const shadowRoot = this.attachShadow({ mode: 'open' }).appendChild(
+              templateContent.cloneNode(true)
+            );
+          }
+        }
+      );
+    </script>
+  </head>
+  <body>
+    <h2>Shadow DOM example</h2>
+    <p>
+      The following two paragraphs contain texts inside shadow DOMs. This page
+      allows testing the addition and display of annotations in this scenario.
+    </p>
+    <my-paragraph></my-paragraph>
+    <my-paragraph></my-paragraph>
+    {{{hypothesisScript}}}
   </body>
 </html>
