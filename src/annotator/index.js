@@ -68,9 +68,9 @@ function init() {
     sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
 
     // Expose sidebar window reference for use by same-origin guest frames.
-    window_.__hypothesis.sidebarWindow = sidebar.ready.then(
-      () => sidebar.iframe.contentWindow
-    );
+    window_.__hypothesis.sidebarWindow = sidebar.ready.then(() => [
+      sidebar.iframe.contentWindow,
+    ]);
   }
 
   // Clear `annotations` value from the notebook's config to prevent direct-linked
@@ -93,7 +93,7 @@ function init() {
 
   if (sidebarWindow) {
     const sidebarOrigin = new URL(sidebarLinkElement.href).origin;
-    sidebarWindow.then(frame =>
+    sidebarWindow.then(([frame]) =>
       guest.crossframe.connectToSidebar(frame, sidebarOrigin)
     );
   } else {
