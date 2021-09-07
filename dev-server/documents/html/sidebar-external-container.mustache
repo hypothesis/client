@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sidebar in external container test</title>
+
+    <script type="application/json" class="js-hypothesis-config">
+      {
+        "externalContainerSelector": "#my-sidebar"
+      }
+    </script>
+
     <style>
       body {
         font-family: sans-serif;
@@ -40,12 +47,5 @@
       <iframe src="/document/injectable-frame" enable-annotation></iframe>
     </div>
     {{{hypothesisScript}}}
-    <script>
-      window.hypothesisConfig = function () {
-        return {
-          externalContainerSelector: '#my-sidebar',
-        };
-      };
-    </script>
   </body>
 </html>
