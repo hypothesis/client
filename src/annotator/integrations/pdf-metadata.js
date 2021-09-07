@@ -16,6 +16,11 @@ import { normalizeURI } from '../util/url';
  * @prop {string} documentFingerprint - The fingerprint of this PDF. This is
  *   referred to as the "File Identifier" in the PDF spec. It may be a hash of
  *   part of the content if the PDF file does not have a File Identifier.
+ *
+ *   PDFs may have two file identifiers. The first is the "original" identifier
+ *   which is not supposed to change if the file is updated and the second
+ *   one is the "last modified" identifier. This property is the original
+ *   identifier.
  */
 
 /**
@@ -117,7 +122,7 @@ export class PDFMetadata {
     return this._loaded.then(app => {
       let uri = getPDFURL(app);
       if (!uri) {
-        uri = fingerprintToURN(app.pdfDocument.fingerprint);
+        uri = fingerprintToURN(getFingerprint(app));
       }
       return uri;
     });
@@ -138,8 +143,8 @@ export class PDFMetadata {
       contentDispositionFilename,
       metadata,
     } = await app.pdfDocument.getMetadata();
-    const documentFingerprint = app.pdfDocument.fingerprint;
 
+    const documentFingerprint = getFingerprint(app);
     const url = getPDFURL(app);
 
     // Return the title metadata embedded in the PDF if available, otherwise
@@ -176,8 +181,27 @@ export class PDFMetadata {
   }
 }
 
+/**
+ * Get the fingerprint/file identifier of the currently loaded PDF.
+ *
+ * @param {PDFViewerApplication} app
+ */
+function getFingerprint(app) {
+  if (Array.isArray(app.pdfDocument.fingerprints)) {
+    return app.pdfDocument.fingerprints[0];
+  } else {
+    return /** @type {string} */ (app.pdfDocument.fingerprint);
+  }
+}
+
+/**
+ * Generate a URI from a PDF fingerprint suitable for storing as the main
+ * or associated URI of an annotation.
+ *
+ * @param {string} fingerprint
+ */
 function fingerprintToURN(fingerprint) {
-  return 'urn:x-pdf:' + String(fingerprint);
+  return `urn:x-pdf:${fingerprint}`;
 }
 
 /**

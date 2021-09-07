@@ -51,7 +51,13 @@
 
 /**
  * @typedef PDFDocument
- * @prop {string} fingerprint
+ * @prop {string} [fingerprint] - PDF fingerprint in PDF.js before v2.10.377.
+ *   May exist in later versions depending on the PDF.js build.
+ * @prop {[string, string|null]} [fingerprints] - PDF fingerprints in PDF.js after
+ *   v2.10.377. See https://github.com/mozilla/pdf.js/pull/13661. The first
+ *   entry of this array is the "original" fingerprint and the same as the
+ *   `fingerprint` property in older versions. The second entry is the "modified"
+ *   fingerprint. See "File Identifiers" section in the PDF spec.
  * @prop {() => Promise<PDFDocumentMetadata>} getMetadata
  */
 

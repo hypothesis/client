@@ -33,12 +33,20 @@ class FakePDFDocumentProxy {
     fingerprint,
     info,
     metadata = null,
-  }) {
-    this.fingerprint = fingerprint;
 
+    // Whether to expose fingerprints via the new API (after
+    // https://github.com/mozilla/pdf.js/pull/13661) or the old one.
+    newFingerprintAPI = true,
+  }) {
     this._contentDispositionFilename = contentDispositionFilename;
     this._info = info;
     this._metadata = metadata;
+
+    if (newFingerprintAPI) {
+      this.fingerprints = [fingerprint, null];
+    } else {
+      this.fingerprint = fingerprint;
+    }
   }
 
   async getMetadata() {
@@ -67,10 +75,16 @@ class FakePDFViewerApplication {
    *   @prop {boolean} domEvents - Whether events are emitted on the DOM
    *   @prop {boolean} eventBusEvents - Whether the `eventBus` API is enabled
    *   @prop {boolean} initializedPromise - Whether the `initializedPromise` API is enabled
+   *   @prop {boolean} newFingerprintAPI - Whether to emulate the new fingerprints API
    */
   constructor(
     url = '',
-    { domEvents = false, eventBusEvents = true, initializedPromise = true } = {}
+    {
+      domEvents = false,
+      eventBusEvents = true,
+      initializedPromise = true,
+      newFingerprintAPI = true,
+    } = {}
   ) {
     this.url = url;
     this.documentInfo = undefined;
@@ -78,6 +92,7 @@ class FakePDFViewerApplication {
     this.pdfDocument = null;
     this.dispatchDOMEvents = domEvents;
     this.initialized = false;
+    this.newFingerprintAPI = newFingerprintAPI;
 
     // Use `EventEmitter` as a fake version of PDF.js's `EventBus` class as the
     // API for subscribing to events is the same.
@@ -118,9 +133,10 @@ class FakePDFViewerApplication {
 
     this.pdfDocument = new FakePDFDocumentProxy({
       contentDispositionFilename,
+      fingerprint,
       info,
       metadata: metadata ? new FakeMetadata(metadata) : null,
-      fingerprint,
+      newFingerprintAPI: this.newFingerprintAPI,
     });
 
     if (this.dispatchDOMEvents) {
@@ -235,8 +251,11 @@ describe('PDFMetadata', () => {
     url: 'http://fake.com/',
   };
 
-  function createPDFMetadata(metadata = testMetadata) {
-    const fakePDFViewerApplication = new FakePDFViewerApplication();
+  function createPDFMetadata(metadata = testMetadata, viewerOptions) {
+    const fakePDFViewerApplication = new FakePDFViewerApplication(
+      '',
+      viewerOptions
+    );
     fakePDFViewerApplication.completeInit();
     fakePDFViewerApplication.finishLoading(metadata);
     return {
@@ -254,13 +273,18 @@ describe('PDFMetadata', () => {
       });
     });
 
-    it('returns the fingerprint as a URN when the PDF URL is a file:// URL', async () => {
-      const { pdfMetadata } = createPDFMetadata({
-        url: 'file:///test.pdf',
-        fingerprint: 'fakeFingerprint',
+    [true, false].forEach(newFingerprintAPI => {
+      it('returns the fingerprint as a URN when the PDF URL is a file:// URL', async () => {
+        const { pdfMetadata } = createPDFMetadata(
+          {
+            url: 'file:///test.pdf',
+            fingerprint: 'fakeFingerprint',
+          },
+          { newFingerprintAPI }
+        );
+        const uri = await pdfMetadata.getUri();
+        assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
       });
-      const uri = await pdfMetadata.getUri();
-      assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
     });
 
     it('resolves relative URLs', async () => {
@@ -280,10 +304,14 @@ describe('PDFMetadata', () => {
   });
 
   describe('#getMetadata', () => {
-    it('returns the document fingerprint in the `documentFingerprint` property', async () => {
-      const { pdfMetadata } = createPDFMetadata();
-      const metadata = await pdfMetadata.getMetadata();
-      assert.equal(metadata.documentFingerprint, testMetadata.fingerprint);
+    [true, false].forEach(newFingerprintAPI => {
+      it('returns the document fingerprint in the `documentFingerprint` property', async () => {
+        const { pdfMetadata } = createPDFMetadata(testMetadata, {
+          newFingerprintAPI,
+        });
+        const metadata = await pdfMetadata.getMetadata();
+        assert.equal(metadata.documentFingerprint, testMetadata.fingerprint);
+      });
     });
 
     it('returns the PDF URL in the `links` array', async () => {
