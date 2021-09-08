@@ -119,7 +119,11 @@ export function onDocumentReady(frame) {
     // 'uninitialized' readyState on Firefox. If a blank document is detected and
     // there is a 'src' attribute, it is expected that the blank document will be
     // replaced by the final document.
-    if (location.href === 'about:blank' && frame.hasAttribute('src')) {
+    if (
+      location.href === 'about:blank' &&
+      frame.hasAttribute('src') &&
+      frame.src !== 'about:blank'
+    ) {
       // Unfortunately, listening for 'DOMContentLoaded' on the iframeDocument
       // doesn't work. Instead, we need to wait for a 'load' event to be triggered.
       frame.addEventListener('load', () => {
@@ -133,7 +137,7 @@ export function onDocumentReady(frame) {
       return;
     }
 
-    // state is 'interactive' or 'complete';
+    // State is 'interactive' or 'complete';
     resolve();
   });
 }

@@ -4,7 +4,7 @@ import {
   onDocumentReady,
 } from '../frame-observer';
 
-describe('annotator/frame-observer.js', () => {
+describe('annotator/frame-observer', () => {
   describe('FrameObserver', () => {
     let container;
     let frameObserver;
@@ -153,42 +153,48 @@ describe('annotator/frame-observer.js', () => {
     let fakeIFrame;
     let fakeIFrameDocument;
 
-    beforeEach(() => {
-      fakeIFrameDocument = {
-        addEventListener: sinon.stub(),
-        readyState: 'loading',
-        location: {
+    class FakeIFrameDocument extends EventTarget {
+      constructor() {
+        super();
+        this.readyState = 'loading';
+        this.location = {
           href: 'about:blank',
-        },
-      };
+        };
+      }
+    }
 
-      fakeIFrame = {
-        contentWindow: {
-          document: fakeIFrameDocument,
-        },
-        addEventListener: sinon.stub(),
-        hasAttribute: sinon.stub(),
-      };
+    beforeEach(() => {
+      fakeIFrameDocument = new FakeIFrameDocument();
+      fakeIFrame = document.createElement('div');
+      fakeIFrame.contentWindow = { document: fakeIFrameDocument };
+      fakeIFrame.setAttribute('src', 'http://my.dummy');
     });
 
     it('waits for the iframe load event to be triggered if the document is blank', () => {
       fakeIFrameDocument.location.href = 'about:blank';
-      fakeIFrame.hasAttribute.returns(true);
-      onDocumentReady(fakeIFrame);
+      const onLoad = onDocumentReady(fakeIFrame);
 
-      assert.calledWith(fakeIFrame.addEventListener, 'load');
+      fakeIFrame.dispatchEvent(new Event('load'));
+
+      return onLoad;
     });
 
     it('waits for the iframe DOMContentLoaded event to be triggered if the document is loading', () => {
       fakeIFrameDocument.location.href = 'about:srcdoc';
-      fakeIFrame.hasAttribute.returns(false);
       fakeIFrameDocument.readyState = 'loading';
-      onDocumentReady(fakeIFrame);
+      const onDOMContentLoaded = onDocumentReady(fakeIFrame);
 
-      assert.calledWith(
-        fakeIFrameDocument.addEventListener,
-        'DOMContentLoaded'
-      );
+      fakeIFrameDocument.dispatchEvent(new Event('DOMContentLoaded'));
+
+      return onDOMContentLoaded;
+    });
+
+    it("resolves immediately if document is 'complete' or 'interactive'", () => {
+      fakeIFrameDocument.location.href = 'about:srcdoc';
+      fakeIFrameDocument.readyState = 'complete';
+      const onReady = onDocumentReady(fakeIFrame);
+
+      return onReady;
     });
   });
 });
