@@ -44,19 +44,23 @@ function getPdfCanvas(highlightEl) {
 /**
  * Draw highlights in an SVG layer overlaid on top of a PDF.js canvas.
  *
- * Returns `null` if `highlightEl` is not above a PDF.js page canvas.
+ * The created SVG elements are stored in the `svgHighlight` property of
+ * each `HighlightElement`.
  *
- * @param {HTMLElement} highlightEl -
+ * @param {HighlightElement[]} highlightEls -
  *   An element that wraps the highlighted text in the transparent text layer
  *   above the PDF.
- * @return {SVGElement|null} -
- *   The SVG graphic element that corresponds to the highlight or `null` if
- *   no PDF page was found below the highlight.
  */
-function drawHighlightsAbovePdfCanvas(highlightEl) {
-  const canvasEl = getPdfCanvas(highlightEl);
+function drawHighlightsAbovePdfCanvas(highlightEls) {
+  if (highlightEls.length === 0) {
+    return;
+  }
+
+  // Get the <canvas> for the PDF page containing the highlight. We assume all
+  // the highlights are on the same page.
+  const canvasEl = getPdfCanvas(highlightEls[0]);
   if (!canvasEl || !canvasEl.parentElement) {
-    return null;
+    return;
   }
 
   /** @type {SVGElement|null} */
@@ -103,24 +107,32 @@ function drawHighlightsAbovePdfCanvas(highlightEl) {
   }
 
   const canvasRect = canvasEl.getBoundingClientRect();
-  const highlightRect = highlightEl.getBoundingClientRect();
+  const highlightRects = highlightEls.map(highlightEl => {
+    const highlightRect = highlightEl.getBoundingClientRect();
 
-  // Create SVG element for the current highlight element.
-  const rect = document.createElementNS(SVG_NAMESPACE, 'rect');
-  rect.setAttribute('x', (highlightRect.left - canvasRect.left).toString());
-  rect.setAttribute('y', (highlightRect.top - canvasRect.top).toString());
-  rect.setAttribute('width', highlightRect.width.toString());
-  rect.setAttribute('height', highlightRect.height.toString());
+    // Create SVG element for the current highlight element.
+    const rect = document.createElementNS(SVG_NAMESPACE, 'rect');
+    rect.setAttribute('x', (highlightRect.left - canvasRect.left).toString());
+    rect.setAttribute('y', (highlightRect.top - canvasRect.top).toString());
+    rect.setAttribute('width', highlightRect.width.toString());
+    rect.setAttribute('height', highlightRect.height.toString());
 
-  if (isCssBlendSupported) {
-    rect.setAttribute('class', 'hypothesis-svg-highlight');
-  } else {
-    rect.setAttribute('class', 'hypothesis-svg-highlight is-opaque');
-  }
+    if (isCssBlendSupported) {
+      rect.setAttribute('class', 'hypothesis-svg-highlight');
+    } else {
+      rect.setAttribute('class', 'hypothesis-svg-highlight is-opaque');
+    }
 
-  svgHighlightLayer.appendChild(rect);
+    // Make the highlight in the text layer transparent.
+    highlightEl.className += ' is-transparent';
 
-  return rect;
+    // Associate SVG element with highlight for use by `removeHighlights`.
+    highlightEl.svgHighlight = rect;
+
+    return rect;
+  });
+
+  svgHighlightLayer.append(...highlightRects);
 }
 
 /**
@@ -252,22 +264,21 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
     nodes[0].parentNode.replaceChild(highlightEl, nodes[0]);
     nodes.forEach(node => highlightEl.appendChild(node));
 
-    if (!inPlaceholder) {
-      // For PDF highlights, create the highlight effect by using an SVG placed
-      // above the page's canvas rather than CSS `background-color` on the
-      // highlight element. This enables more control over blending of the
-      // highlight with the content below.
-      const svgHighlight = drawHighlightsAbovePdfCanvas(highlightEl);
-      if (svgHighlight) {
-        highlightEl.className += ' is-transparent';
-
-        // Associate SVG element with highlight for use by `removeHighlights`.
-        highlightEl.svgHighlight = svgHighlight;
-      }
-    }
-
     highlights.push(highlightEl);
   });
+
+  // For PDF highlights, create the highlight effect by using an SVG placed
+  // above the page's canvas rather than CSS `background-color` on the highlight
+  // element. This enables more control over blending of the highlight with the
+  // content below.
+  //
+  // Drawing these SVG highlights involves measuring the `<hypothesis-highlight>`
+  // elements, so we create them only after those elements have all been created
+  // to reduce the number of forced reflows. We also skip creating them for
+  // unrendered pages for performance reasons.
+  if (!inPlaceholder) {
+    drawHighlightsAbovePdfCanvas(highlights);
+  }
 
   return highlights;
 }
