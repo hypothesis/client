@@ -144,7 +144,11 @@ function serveDev(port, config) {
 
   createServer(app).listen(port, () => {
     const scheme = useSsl ? 'https' : 'http';
-    log(`Dev web server started at ${scheme}://localhost:${port}/`);
+    if (port === 3000) {
+      log(`Primary web server started at ${scheme}://localhost:${port}/`);
+    } else {
+      log(`Alternate web server started at ${scheme}://localhost:${port}/`);
+    }
   });
 }
 

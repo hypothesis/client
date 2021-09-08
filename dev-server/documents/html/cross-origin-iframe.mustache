@@ -26,9 +26,9 @@
     <iframe></iframe>
     <script>
       // Set a different port for the iframe `src` property to make it cross-origin.
-      const url = new URL(document.location);
-      const port = url.port === '3000' ? '3002' : '3000';
-      const src = `//${url.hostname}:${port}/document/doyle-embedded`;
+      const { port, hostname } = document.location;
+      const newPort = port === '3000' ? '3002' : '3000';
+      const src = `//${hostname}:${newPort}/document/doyle-embedded`;
       document.querySelector('iframe').setAttribute('src', src);
     </script>
     {{{hypothesisScript}}}
