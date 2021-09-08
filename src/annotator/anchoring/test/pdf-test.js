@@ -1,4 +1,5 @@
 import * as pdfAnchoring from '../pdf';
+import { matchQuote } from '../match-quote';
 import { TextRange } from '../text-range';
 
 import FakePDFViewerApplication from './fake-pdf-viewer-application';
@@ -87,6 +88,7 @@ describe('annotator/anchoring/pdf', () => {
   });
 
   afterEach(() => {
+    pdfAnchoring.$imports.$restore();
     cleanupViewer();
     container.remove();
   });
@@ -315,6 +317,56 @@ describe('annotator/anchoring/pdf', () => {
         // This should anchor to an exact match on the third page, rather than a
         // close match on the second page.
         assert.equal(range.toString(), 'Netherfield Park is');
+      });
+    });
+
+    // The above test does high-level checking that whitespace mismatches don't
+    // affect quote anchoring. This test checks calls to `matchQuote` in more detail.
+    it('ignores spaces when searching for quote matches', async () => {
+      const matchQuoteSpy = sinon.spy(matchQuote);
+      pdfAnchoring.$imports.$mock({
+        './match-quote': { matchQuote: matchQuoteSpy },
+      });
+
+      viewer.pdfViewer.setCurrentPage(2);
+
+      // nb. The new lines in fixtures don't appear in the extracted PDF text.
+      const getPageText = page => fixtures.pdfPages[page].replaceAll('\n', '');
+
+      const quote = {
+        type: 'TextQuoteSelector',
+        exact: 'Mr. Bennet',
+        prefix: 'My dear',
+        suffix: '," said his lady',
+      };
+      const quoteOffset =
+        getPageText(0).length +
+        getPageText(1).length +
+        getPageText(2).indexOf(quote.exact);
+
+      const position = {
+        type: 'TextPositionSelector',
+        start: quoteOffset,
+
+        // Intentionally incorrect end position to trigger fallback to quote anchoring.
+        end: quoteOffset + 1,
+      };
+
+      await pdfAnchoring.anchor(container, [position, quote]);
+
+      const stripSpaces = str => str.replace(/\s+/g, '');
+      const strippedText = stripSpaces(fixtures.pdfPages[2]);
+      const strippedQuote = stripSpaces(quote.exact);
+
+      const call = matchQuoteSpy
+        .getCalls()
+        .find(call => call.args[0] === strippedText);
+      assert.ok(call);
+      assert.equal(call.args[1], strippedQuote);
+      assert.match(call.args[2], {
+        prefix: stripSpaces(quote.prefix),
+        suffix: stripSpaces(quote.suffix),
+        hint: strippedText.indexOf(strippedQuote),
       });
     });
 
