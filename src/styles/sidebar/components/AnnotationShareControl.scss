@@ -34,8 +34,9 @@
     border-bottom: none;
   }
 
-  &__form-input {
-    @include forms.form-input--with-button($compact: true);
+  &__inputs {
+    @include utils.font--small;
+    width: 100%;
   }
 
   &__details {

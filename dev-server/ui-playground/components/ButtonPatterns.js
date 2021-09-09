@@ -126,33 +126,6 @@ export default function ButtonPatterns() {
           </Library.Demo>
         </Library.Example>
       </Library.Pattern>
-
-      <Library.Pattern title="InputButton">
-        <p>
-          Customizes <code>IconButton</code> styling to make the button part of
-          a composite pattern with an input field to the left.
-        </p>
-
-        <Library.Example title="Basic usage">
-          <Library.Demo withSource>
-            <IconButton
-              className="InputButton"
-              title="Copy version details"
-              icon="copy"
-            />
-          </Library.Demo>
-        </Library.Example>
-        <Library.Example title="Small size">
-          <Library.Demo withSource>
-            <IconButton
-              className="InputButton"
-              title="Copy version details"
-              icon="copy"
-              size="small"
-            />
-          </Library.Demo>
-        </Library.Example>
-      </Library.Pattern>
     </Library.Page>
   );
 }
