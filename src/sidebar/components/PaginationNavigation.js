@@ -36,7 +36,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
       <div className="PaginationNavigation__relative PaginationNavigation__prev">
         {hasPreviousPage && (
           <LabeledButton
-            className="PaginationPageButton"
+            classes="PaginationPageButton"
             icon="arrow-left"
             title="Go to previous page"
             onClick={e => changePageTo(currentPage - 1, e.target)}
@@ -53,7 +53,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
               <div className="PaginationNavigation__gap">...</div>
             ) : (
               <LabeledButton
-                className="PaginationPageButton"
+                classes="PaginationPageButton"
                 key={`page-${idx}`}
                 title={`Go to page ${page}`}
                 pressed={page === currentPage}
@@ -69,7 +69,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
       <div className="PaginationNavigation__relative PaginationNavigation__next">
         {hasNextPage && (
           <LabeledButton
-            className="PaginationPageButton"
+            classes="PaginationPageButton"
             icon="arrow-right"
             iconPosition="right"
             title="Go to next page"
