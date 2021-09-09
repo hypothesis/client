@@ -1,4 +1,10 @@
-import { IconButton, Spinner, SvgIcon } from '@hypothesis/frontend-shared';
+import {
+  IconButton,
+  Spinner,
+  SvgIcon,
+  TextInput,
+  TextInputWithButton,
+} from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
@@ -69,19 +75,20 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                 )}
               </div>
               <div className="u-layout-row">
-                <input
-                  aria-label="Use this URL to share these annotations"
-                  className="ShareAnnotationsPanel__form-input"
-                  type="text"
-                  value={shareURI}
-                  readOnly
-                />
-                <IconButton
-                  className="InputButton"
-                  icon="copy"
-                  onClick={copyShareLink}
-                  title="Copy share link"
-                />
+                <TextInputWithButton>
+                  <TextInput
+                    aria-label="Use this URL to share these annotations"
+                    type="text"
+                    value={shareURI}
+                    readOnly
+                  />
+                  <IconButton
+                    icon="copy"
+                    onClick={copyShareLink}
+                    title="Copy share link"
+                    variant="dark"
+                  />
+                </TextInputWithButton>
               </div>
               <p>
                 {notNull(focusedGroup).type === 'private' ? (

@@ -1,8 +1,5 @@
 @use 'sass:map';
 
-// Button styling for the sidebar extending common button-component styles
-@use '@hypothesis/frontend-shared/styles/components/buttons';
-
 @use '../variables' as var;
 
 // Similar to `.LinkButton`, with inline layout (so button can be used
@@ -32,33 +29,5 @@
   @media (pointer: coarse) {
     min-width: auto;
     min-height: auto;
-  }
-}
-
-// This is for styling an icon-only button that sits to the right of a
-// text input field. It is really part of a composite pattern that includes
-// both the input and the buttons. At some point this pattern should be
-// consolidated.
-$input-button-colors: map.merge(
-  buttons.colors-for('IconButton'),
-  (
-    'background': var.$grey-1,
-    'hover-background': var.$grey-2,
-  )
-);
-
-.InputButton {
-  $-options: (
-    'colormap': $input-button-colors,
-    'withVariants': false,
-  );
-  @include buttons.IconButton($-options) {
-    border: 1px solid var.$grey-3;
-    border-radius: 0; // Turn off border-radius to align with <input> edges
-    border-left: 0; // Avoid double border with the <input>
-    padding: var.$layout-space--xsmall var.$layout-space--small;
-    &--small {
-      padding: var.$layout-space--xxsmall var.$layout-space--xsmall;
-    }
   }
 }

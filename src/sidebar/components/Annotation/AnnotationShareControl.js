@@ -1,6 +1,8 @@
 import {
   IconButton,
   SvgIcon,
+  TextInput,
+  TextInputWithButton,
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
 import { useEffect, useRef, useState } from 'preact/hooks';
@@ -136,22 +138,22 @@ function AnnotationShareControl({
             </div>
           </div>
           <div className="annotation-share-panel__content">
-            <div className="u-layout-row">
-              <input
-                aria-label="Use this URL to share this annotation"
-                className="annotation-share-panel__form-input"
-                type="text"
-                value={shareUri}
-                readOnly
-                ref={inputRef}
-              />
-              <IconButton
-                className="InputButton"
-                icon="copy"
-                title="Copy share link to clipboard"
-                onClick={copyShareLink}
-                size="small"
-              />
+            <div className="u-layout-row annotation-share-panel__inputs">
+              <TextInputWithButton>
+                <TextInput
+                  aria-label="Use this URL to share this annotation"
+                  type="text"
+                  value={shareUri}
+                  readOnly
+                  inputRef={inputRef}
+                />
+                <IconButton
+                  icon="copy"
+                  title="Copy share link to clipboard"
+                  onClick={copyShareLink}
+                  variant="dark"
+                />
+              </TextInputWithButton>
             </div>
             {inContextAvailable ? (
               <div className="annotation-share-panel__details">
