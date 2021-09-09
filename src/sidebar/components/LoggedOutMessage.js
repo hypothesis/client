@@ -32,7 +32,7 @@ function LoggedOutMessage({ onLogin }) {
         </a>{' '}
         or{' '}
         <LinkButton
-          className="InlineLinkButton"
+          classes="InlineLinkButton InlineLinkButton--underlined"
           onClick={onLogin}
           variant="dark"
         >

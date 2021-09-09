@@ -26,7 +26,7 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
     <div className="Excerpt__inline-controls">
       <div className="Excerpt__toggle-container">
         <LinkButton
-          className="InlineLinkButton"
+          classes="InlineLinkButton InlineLinkButton--underlined"
           onClick={() => setCollapsed(!isCollapsed)}
           expanded={!isCollapsed}
           title="Toggle visibility of full excerpt text"

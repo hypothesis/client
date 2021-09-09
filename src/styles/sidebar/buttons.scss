@@ -8,16 +8,11 @@
 // Similar to `.LinkButton`, with inline layout (so button can be used
 // within text)
 .InlineLinkButton {
-  @include buttons.LinkButton(
-    (
-      'inline': true,
-    )
-  );
-  // Custom: The dark variant is used for inline, anchor-like styling and needs
-  // to be underlined at all times to match <a> styling near it
-  &--dark {
-    text-decoration: underline;
-  }
+  display: inline;
+}
+
+.InlineLinkButton--underlined {
+  text-decoration: underline;
 }
 
 .PublishControlButton {
