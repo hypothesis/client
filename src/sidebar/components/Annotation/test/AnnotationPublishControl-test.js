@@ -78,7 +78,7 @@ describe('AnnotationPublishControl', () => {
   });
 
   const getPublishButton = wrapper =>
-    wrapper.find('LabeledButton.PublishControlButton');
+    wrapper.find('LabeledButton[data-testid="publish-control-button"]');
 
   describe('theming', () => {
     it('should apply theme styles', () => {

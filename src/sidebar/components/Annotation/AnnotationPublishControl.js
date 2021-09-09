@@ -81,7 +81,8 @@ function AnnotationPublishControl({
     <div className="AnnotationPublishControl">
       <div className="annotation-publish-button">
         <LabeledButton
-          className="PublishControlButton"
+          classes="PublishControlButton"
+          data-testid="publish-control-button"
           style={buttonStyle}
           onClick={onSave}
           disabled={isDisabled}

@@ -20,7 +20,7 @@ export default function ButtonPatterns() {
 
         <Library.Example title="Basic usage">
           <Library.Demo withSource>
-            <LabeledButton className="PublishControlButton" variant="primary">
+            <LabeledButton classes="PublishControlButton" variant="primary">
               Publish to My Group
             </LabeledButton>
           </Library.Demo>
