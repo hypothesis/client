@@ -90,17 +90,17 @@ export default function ButtonPatterns() {
 
         <Library.Example title="Page numbers">
           <Library.Demo withSource style={{ backgroundColor: '#ececec' }}>
-            <LabeledButton className="PaginationPageButton" variant="dark">
+            <LabeledButton classes="PaginationPageButton" variant="dark">
               9
             </LabeledButton>
             <LabeledButton
-              className="PaginationPageButton"
+              classes="PaginationPageButton"
               variant="dark"
               pressed
             >
               10
             </LabeledButton>
-            <LabeledButton className="PaginationPageButton" variant="dark">
+            <LabeledButton classes="PaginationPageButton" variant="dark">
               11
             </LabeledButton>
           </Library.Demo>
@@ -109,14 +109,14 @@ export default function ButtonPatterns() {
         <Library.Example title="Navigation buttons">
           <Library.Demo withSource style={{ backgroundColor: '#ececec' }}>
             <LabeledButton
-              className="PaginationPageButton"
+              classes="PaginationPageButton"
               icon="arrow-left"
               variant="dark"
             >
               Prev
             </LabeledButton>
             <LabeledButton
-              className="PaginationPageButton"
+              classes="PaginationPageButton"
               icon="arrow-right"
               iconPosition="right"
               variant="dark"
