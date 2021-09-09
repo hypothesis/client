@@ -60,19 +60,19 @@ export default function ButtonPatterns() {
         <Library.Example variant="wide" title="Sizes (medium is default)">
           <Library.Demo withSource>
             <IconButton
-              className="NonResponsiveIconButton"
+              classes="NonResponsiveIconButton"
               icon="copy"
               title="Edit"
               size="small"
             />
             <IconButton
-              className="NonResponsiveIconButton"
+              classes="NonResponsiveIconButton"
               icon="copy"
               title="Edit"
               size="medium"
             />
             <IconButton
-              className="NonResponsiveIconButton"
+              classes="NonResponsiveIconButton"
               icon="copy"
               title="Edit"
               size="large"

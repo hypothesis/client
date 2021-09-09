@@ -31,11 +31,10 @@
 
 // An IconButton, but override minimum height/width on touch screen devices
 .NonResponsiveIconButton {
-  @include buttons.IconButton(
-    (
-      'responsive': false,
-    )
-  );
+  @media (pointer: coarse) {
+    min-width: auto;
+    min-height: auto;
+  }
 }
 
 // This is for styling an icon-only button that sits to the right of a

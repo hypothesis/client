@@ -93,7 +93,7 @@ function Thread({ thread, threadsService }) {
         <div className="Thread__collapse">
           <div className="Thread__collapse-button-container">
             <IconButton
-              className="NonResponsiveIconButton"
+              classes="NonResponsiveIconButton"
               expanded={!thread.collapsed}
               icon={toggleIcon}
               title={toggleTitle}
