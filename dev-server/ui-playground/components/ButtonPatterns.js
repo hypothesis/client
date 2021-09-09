@@ -35,12 +35,15 @@ export default function ButtonPatterns() {
 
         <Library.Example title="Basic usage">
           <Library.Demo withSource>
-            <LinkButton className="InlineLinkButton">Log in</LinkButton>
+            <LinkButton classes="InlineLinkButton">Log in</LinkButton>
           </Library.Demo>
         </Library.Example>
-        <Library.Example title="Dark variant: Always has underline">
+        <Library.Example title="Dark variant, customized with underline">
           <Library.Demo withSource>
-            <LinkButton className="InlineLinkButton" variant="dark">
+            <LinkButton
+              classes="InlineLinkButton InlineLinkButton--underlined"
+              variant="dark"
+            >
               Log in
             </LinkButton>
           </Library.Demo>
@@ -58,19 +61,19 @@ export default function ButtonPatterns() {
           <Library.Demo withSource>
             <IconButton
               className="NonResponsiveIconButton"
-              icon="edit"
+              icon="copy"
               title="Edit"
               size="small"
             />
             <IconButton
               className="NonResponsiveIconButton"
-              icon="edit"
+              icon="copy"
               title="Edit"
               size="medium"
             />
             <IconButton
               className="NonResponsiveIconButton"
-              icon="edit"
+              icon="copy"
               title="Edit"
               size="large"
             />

@@ -86,7 +86,7 @@ function TopBar({
       {auth.status === 'logged-out' && (
         <span className="TopBar__login-links u-font--large u-horizontal-rhythm">
           <LinkButton
-            className="InlineLinkButton"
+            classes="InlineLinkButton"
             onClick={onSignUp}
             style={loginLinkStyle}
             variant="primary"
@@ -95,7 +95,7 @@ function TopBar({
           </LinkButton>
           <div>/</div>
           <LinkButton
-            className="InlineLinkButton"
+            classes="InlineLinkButton"
             onClick={onLogin}
             style={loginLinkStyle}
             variant="primary"
