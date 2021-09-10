@@ -54,14 +54,3 @@
     font-size: var.$touch-input-font-size;
   }
 }
-
-/**
- * A text input that has a button to its right; no border radius
- *
- * @param {boolean} [$compact] - For use in compact areas, with tighter padding
- */
-@mixin form-input--with-button($compact: false) {
-  @include form-input($compact);
-  width: 100%;
-  border-radius: 0;
-}
