@@ -437,12 +437,36 @@ async function anchorQuote(quoteSelector, positionHint) {
         },
       };
 
-      // If we found an exact match, stop early. This improves search performance
-      // in long documents compared to testing every page.
+      // If we find a very good match, stop early.
       //
-      // A known limitation here is that the quote context (prefix and suffix)
-      // is not considered.
-      if (strippedText.slice(match.start, match.end) === strippedQuote) {
+      // There is a tradeoff here between optimizing search performance and
+      // ensuring that we have found the best match in the document.
+      //
+      // The current heuristics are that we require an exact match for the quote
+      // and either the preceding or following context. The context matching
+      // helps to avoid incorrectly stopping the search early if the quote is
+      // a word or phrase that is common in the document.
+      const exactQuoteMatch =
+        strippedText.slice(match.start, match.end) === strippedQuote;
+
+      const exactPrefixMatch =
+        strippedPrefix !== undefined &&
+        strippedText.slice(
+          Math.max(0, match.start - strippedPrefix.length),
+          match.start
+        ) === strippedPrefix;
+
+      const exactSuffixMatch =
+        strippedSuffix !== undefined &&
+        strippedText.slice(match.end, strippedSuffix.length) === strippedSuffix;
+
+      const hasContext =
+        strippedPrefix !== undefined || strippedSuffix !== undefined;
+
+      if (
+        exactQuoteMatch &&
+        (exactPrefixMatch || exactSuffixMatch || !hasContext)
+      ) {
         break;
       }
     }

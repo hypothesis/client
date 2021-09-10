@@ -320,6 +320,74 @@ describe('annotator/anchoring/pdf', () => {
       });
     });
 
+    [
+      {
+        // If there is only a prefix, that should match.
+        test: 'prefix-only',
+        prefix: 'that',
+        suffix: undefined,
+        expectedMatch: 'Netherfield Park is occupied again?',
+      },
+      {
+        // If there is only a suffix, that should match.
+        test: 'suffix-only',
+        prefix: undefined,
+        suffix: ' Park is occupied',
+        expectedMatch: 'Netherfield Park is occupied again?',
+      },
+      {
+        // If there is both a prefix and suffix, either can match
+        test: 'suffix-match',
+        prefix: 'DOES NOT MATCH',
+        suffix: ' Park is occupied',
+        expectedMatch: 'Netherfield Park is occupied again?',
+      },
+      {
+        // If there is both a prefix and suffix, either can match
+        test: 'prefix-match',
+        prefix: 'that',
+        suffix: 'DOES NOT MATCH',
+        expectedMatch: 'Netherfield Park is occupied again?',
+      },
+      {
+        // If there is neither a prefix or suffix, only the quote matters.
+        test: 'no-context',
+        prefix: undefined,
+        suffix: undefined,
+        expectedMatch: 'recent attacks at Netherfield Park',
+      },
+    ].forEach(({ test, prefix, suffix, expectedMatch }) => {
+      it(`prefers a context match for quote selectors (${test})`, async () => {
+        const expectedPage = fixtures.pdfPages.findIndex(page =>
+          page.includes(expectedMatch)
+        );
+        assert.notEqual(expectedPage, -1);
+
+        // Ensure the page where we expect to find the match is rendered, otherwise
+        // the quote will be anchored to a placeholder.
+        viewer.pdfViewer.setCurrentPage(expectedPage);
+
+        // Create a quote selector where the `exact` phrase occurs on multiple
+        // pages.
+        const quote = {
+          type: 'TextQuoteSelector',
+          exact: 'Netherfield',
+          prefix,
+          suffix,
+        };
+
+        // Anchor the quote without providing a position selector, so pages are tried in order.
+        const range = await pdfAnchoring.anchor(container, [quote]);
+
+        // Check that we found the match on the expected page.
+        assert.equal(range.toString(), 'Netherfield');
+        assert.include(
+          range.startContainer.parentElement.textContent,
+          expectedMatch
+        );
+      });
+    });
+
     // The above test does high-level checking that whitespace mismatches don't
     // affect quote anchoring. This test checks calls to `matchQuote` in more detail.
     it('ignores spaces when searching for quote matches', async () => {
