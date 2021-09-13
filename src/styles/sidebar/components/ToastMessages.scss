@@ -1,7 +1,7 @@
-@use "../../mixins/molecules";
-@use "../../mixins/layout";
-@use "../mixins/responsive";
-@use "../../variables" as var;
+@use '../../mixins/molecules';
+@use '../../mixins/layout';
+@use '../mixins/responsive';
+@use '../../variables' as var;
 
 .ToastMessages {
   position: absolute;

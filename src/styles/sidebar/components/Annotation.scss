@@ -1,6 +1,6 @@
-@use "../../mixins/buttons";
-@use "../../mixins/layout";
-@use "../../variables" as var;
+@use '../../mixins/buttons';
+@use '../../mixins/layout';
+@use '../../variables' as var;
 
 // When hovering a top-level annotation, show the footer in a hovered state.
 // When hovering a reply (at any level), show the reply's own footer in

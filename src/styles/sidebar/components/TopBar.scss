@@ -1,7 +1,7 @@
-@use "../../mixins/buttons";
-@use "../../mixins/layout";
-@use "../../mixins/utils";
-@use "../../variables" as var;
+@use '../../mixins/buttons';
+@use '../../mixins/layout';
+@use '../../mixins/utils';
+@use '../../variables' as var;
 
 .TopBar {
   @include utils.font--xlarge;

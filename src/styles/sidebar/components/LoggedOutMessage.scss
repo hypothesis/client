@@ -1,6 +1,6 @@
-@use "../../mixins/buttons";
-@use "../../mixins/layout";
-@use "../../variables" as var;
+@use '../../mixins/buttons';
+@use '../../mixins/layout';
+@use '../../variables' as var;
 
 .LoggedOutMessage {
   @include layout.column;

@@ -1,5 +1,5 @@
-@use "../variables" as var;
-@use "../mixins/utils";
+@use '../variables' as var;
+@use '../mixins/utils';
 
 @mixin styled-text() {
   // Reset the line-height in case any parent elements have set it.

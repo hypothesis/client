@@ -1,5 +1,5 @@
-@use "../../variables" as var;
-@use "../../mixins/layout";
+@use '../../variables' as var;
+@use '../../mixins/layout';
 
 .NotebookResultCount {
   @include layout.horizontal-rhythm;

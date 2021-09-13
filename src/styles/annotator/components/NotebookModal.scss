@@ -1,6 +1,6 @@
 @use '../variables' as var;
 @use '../mixins/molecules';
-@use "../mixins/buttons";
+@use '../mixins/buttons';
 
 .NotebookModal {
   &__outer {

@@ -1,8 +1,8 @@
-@use "../../mixins/forms";
-@use "../../mixins/buttons";
-@use "../../mixins/layout";
-@use "../../mixins/utils";
-@use "../../variables" as var;
+@use '../../mixins/forms';
+@use '../../mixins/buttons';
+@use '../../mixins/layout';
+@use '../../mixins/utils';
+@use '../../variables' as var;
 
 .TagEditor {
   @include layout.vertical-rhythm(var.$layout-space--xsmall);

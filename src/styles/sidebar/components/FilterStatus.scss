@@ -1,6 +1,6 @@
-@use "../../mixins/layout";
-@use "../../mixins/molecules";
-@use "../../variables" as var;
+@use '../../mixins/layout';
+@use '../../mixins/molecules';
+@use '../../variables' as var;
 
 @mixin facet {
   white-space: nowrap;

@@ -1,6 +1,6 @@
-@use "../../variables" as var;
-@use "../../mixins/layout";
-@use "../../mixins/responsive";
+@use '../../variables' as var;
+@use '../../mixins/layout';
+@use '../../mixins/responsive';
 
 .VersionInfo {
   // Lay out version info as a column when viewport (sidebar) is narrow
