@@ -315,6 +315,10 @@ async function anchorByPosition(pageIndex, start, end) {
 /**
  * Return a string with spaces stripped and offsets into the input string.
  *
+ * This function optimizes for performance of stripping the main space chars
+ * that PDF.js generates over handling all kinds of whitespace that could
+ * occur in a string.
+ *
  * @param {string} str
  * @return {[string, number[]]}
  */
