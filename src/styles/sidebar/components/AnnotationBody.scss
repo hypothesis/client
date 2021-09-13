@@ -1,7 +1,7 @@
 @use '../../variables' as var;
-@use "../../mixins/buttons";
-@use "../../mixins/layout";
-@use "../../mixins/molecules";
+@use '../../mixins/buttons';
+@use '../../mixins/layout';
+@use '../../mixins/molecules';
 
 .AnnotationBody__text {
   &.is-hidden {

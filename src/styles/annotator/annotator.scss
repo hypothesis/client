@@ -1,7 +1,7 @@
 // SASS entry point for annotator styling
 
-@use "sass:meta";
-@use "sass:color" as color;
+@use 'sass:meta';
+@use 'sass:color' as color;
 
 @use '../variables' as var;
 @use '../mixins/reset';

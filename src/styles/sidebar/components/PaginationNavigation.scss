@@ -1,8 +1,8 @@
 @use '../../mixins/buttons';
-@use "../../mixins/layout";
-@use "../../mixins/responsive";
-@use "../../mixins/utils";
-@use "../../variables" as var;
+@use '../../mixins/layout';
+@use '../../mixins/responsive';
+@use '../../mixins/utils';
+@use '../../variables' as var;
 
 .PaginationNavigation {
   @include utils.font--large;

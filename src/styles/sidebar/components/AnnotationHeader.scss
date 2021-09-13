@@ -1,8 +1,8 @@
-@use "../../mixins/buttons";
-@use "../../mixins/forms";
-@use "../../mixins/layout";
-@use "../../mixins/utils";
-@use "../../variables" as var;
+@use '../../mixins/buttons';
+@use '../../mixins/forms';
+@use '../../mixins/layout';
+@use '../../mixins/utils';
+@use '../../variables' as var;
 
 .AnnotationHeader {
   &__row {

@@ -1,5 +1,5 @@
 @use '../variables' as var;
-@use "../mixins/a11y";
+@use '../mixins/a11y';
 
 // SVG highlights when the "Show Highlights" toggle is turned off.
 .hypothesis-svg-highlight {

@@ -1,6 +1,6 @@
-@use "../../mixins/responsive";
-@use "../../mixins/utils";
-@use "../../variables" as var;
+@use '../../mixins/responsive';
+@use '../../mixins/utils';
+@use '../../variables' as var;
 
 .NotebookView {
   display: grid;

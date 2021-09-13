@@ -1,6 +1,6 @@
-@use "../../variables" as var;
-@use "../../mixins/layout";
-@use "../../mixins/utils";
+@use '../../variables' as var;
+@use '../../mixins/layout';
+@use '../../mixins/utils';
 
 .AnnotationShareInfo {
   &__icon {

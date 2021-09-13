@@ -17,13 +17,13 @@
  *
  * And pass 'my-component-button' as the `className` prop to `Button`.
  */
-@use "sass:math";
+@use 'sass:math';
 
-@use "@hypothesis/frontend-shared/styles/mixins/focus";
+@use '@hypothesis/frontend-shared/styles/mixins/focus';
 
-@use "./layout";
-@use "./utils";
-@use "../variables" as var;
+@use './layout';
+@use './utils';
+@use '../variables' as var;
 
 @mixin reset-native-btn-styles {
   @include focus.outline-on-keyboard-focus;

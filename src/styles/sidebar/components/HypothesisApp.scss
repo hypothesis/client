@@ -1,6 +1,6 @@
-@use "../../variables" as var;
-@use "../mixins/layout";
-@use "../mixins/responsive";
+@use '../../variables' as var;
+@use '../mixins/layout';
+@use '../mixins/responsive';
 
 .HypothesisApp {
   $sidebar-h-padding: 9px;

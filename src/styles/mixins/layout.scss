@@ -1,5 +1,5 @@
-@use "./responsive";
-@use "../variables" as var;
+@use './responsive';
+@use '../variables' as var;
 
 @mixin sidebar-content {
   margin-left: auto;
