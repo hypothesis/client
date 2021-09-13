@@ -340,6 +340,16 @@ export function setHighlightsFocused(highlights, focused) {
     // `<hypothesis-highlight>` element.
     if (h.svgHighlight) {
       h.svgHighlight.classList.toggle('is-focused', focused);
+
+      // Ensure that focused highlights are drawn above un-focused highlights
+      // on the same page.
+      //
+      // SVG elements are rendered in document order so to achieve this we need
+      // to move the element to be the last child of its parent.
+      if (focused) {
+        const parent = /** @type {SVGElement} */ (h.svgHighlight.parentNode);
+        parent.append(h.svgHighlight);
+      }
     } else {
       h.classList.toggle('hypothesis-highlight-focused', focused);
     }

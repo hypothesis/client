@@ -485,6 +485,23 @@ describe('annotator/highlighter', () => {
       );
     });
 
+    it('raises focused highlights in PDFs', () => {
+      const root = document.createElement('div');
+      render(<PdfPage />, root);
+      const highlights1 = highlightPdfRange(root);
+      const highlights2 = highlightPdfRange(root);
+      const svgLayer = root.querySelector('svg');
+
+      const lastSVGHighlight = highlights =>
+        highlights[highlights.length - 1].svgHighlight;
+
+      setHighlightsFocused(highlights1, true);
+      assert.equal(svgLayer.lastChild, lastSVGHighlight(highlights1));
+
+      setHighlightsFocused(highlights2, true);
+      assert.equal(svgLayer.lastChild, lastSVGHighlight(highlights2));
+    });
+
     it('removes class from PDF highlights when not focused', () => {
       const root = document.createElement('div');
       render(<PdfPage />, root);
