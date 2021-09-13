@@ -378,12 +378,10 @@ async function anchorQuote(quoteSelector, positionHint) {
   }
 
   // Search pages for the best match, ignoring whitespace differences.
-  const [strippedPrefix] = quoteSelector.prefix
-    ? stripSpaces(quoteSelector.prefix)
-    : [];
-  const [strippedSuffix] = quoteSelector.suffix
-    ? stripSpaces(quoteSelector.suffix)
-    : [];
+  const [strippedPrefix] =
+    quoteSelector.prefix !== undefined ? stripSpaces(quoteSelector.prefix) : [];
+  const [strippedSuffix] =
+    quoteSelector.suffix !== undefined ? stripSpaces(quoteSelector.suffix) : [];
   const [strippedQuote] = stripSpaces(quoteSelector.exact);
 
   let bestMatch;
