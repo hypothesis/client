@@ -140,10 +140,16 @@ describe('annotator/frame-observer', () => {
     it("doesn't trigger onFrameAdded when annotatable iframe is from a different domain", async () => {
       const iframe = createAnnotatableIFrame();
       iframe.setAttribute('src', 'http://cross-origin.dummy');
+      let expectedError;
 
-      await onDocumentReady(iframe);
+      try {
+        await onDocumentReady(iframe);
+      } catch (error) {
+        expectedError = error;
+      }
       await waitForFrameObserver();
 
+      assert.isDefined(expectedError);
       assert.notCalled(onFrameAdded);
       assert.calledOnce(console.warn);
     });
@@ -170,13 +176,14 @@ describe('annotator/frame-observer', () => {
       fakeIFrame.setAttribute('src', 'http://my.dummy');
     });
 
-    it('waits for the iframe load event to be triggered if the document is blank', () => {
+    it('waits for the iframe to change the location and readyState if the initial document is blank', () => {
       fakeIFrameDocument.location.href = 'about:blank';
-      const onLoad = onDocumentReady(fakeIFrame);
+      const onReady = onDocumentReady(fakeIFrame);
 
-      fakeIFrame.dispatchEvent(new Event('load'));
+      fakeIFrameDocument.location.href = 'http://my.dummy';
+      fakeIFrameDocument.readyState = 'complete';
 
-      return onLoad;
+      return onReady;
     });
 
     it('waits for the iframe DOMContentLoaded event to be triggered if the document is loading', () => {

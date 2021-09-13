@@ -108,7 +108,7 @@ export class FrameObserver {
  * @throws {Error} if trying to access a document from a cross-origin iframe
  */
 export function onDocumentReady(frame) {
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     // @ts-expect-error
     const frameDocument = frame.contentWindow.document;
     const { readyState, location } = frameDocument;
@@ -124,11 +124,7 @@ export function onDocumentReady(frame) {
       frame.hasAttribute('src') &&
       frame.src !== 'about:blank'
     ) {
-      // Unfortunately, listening for 'DOMContentLoaded' on the iframeDocument
-      // doesn't work. Instead, we need to wait for a 'load' event to be triggered.
-      frame.addEventListener('load', () => {
-        resolve();
-      });
+      setTimeout(() => onDocumentReady(frame).then(resolve).catch(reject), 10);
       return;
     }
 
