@@ -387,10 +387,12 @@ async function anchorQuote(quoteSelector, positionHint) {
   let bestMatch;
   for (let page of pageIndexes) {
     const text = await getPageTextContent(page);
+    const [strippedText, offsets] = stripSpaces(text);
 
-    // Expected offset of quote in current page based on position hint.
-    let hint;
-    if (expectedPageIndex !== undefined) {
+    // Determine expected offset of quote in current page based on position hint.
+    let strippedHint;
+    if (expectedPageIndex !== undefined && expectedOffsetInPage !== undefined) {
+      let hint;
       if (page < expectedPageIndex) {
         hint = text.length; // Prefer matches closer to end of page.
       } else if (page === expectedPageIndex) {
@@ -398,13 +400,8 @@ async function anchorQuote(quoteSelector, positionHint) {
       } else {
         hint = 0; // Prefer matches closer to start of page.
       }
-    }
 
-    const [strippedText, offsets] = stripSpaces(text);
-
-    // Convert expected offset in original text into offset into stripped text.
-    let strippedHint;
-    if (hint !== undefined) {
+      // Convert expected offset in original text into offset into stripped text.
       strippedHint = 0;
       while (strippedHint < offsets.length && offsets[strippedHint] < hint) {
         ++strippedHint;
