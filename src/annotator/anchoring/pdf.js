@@ -42,21 +42,31 @@ export const RenderingStates = {
 /**
  * Map of page index to page text content.
  *
- * @type {Record<number,Promise<string> | undefined>}
+ * @type {Map<number,Promise<string> | undefined>}
  */
-let pageTextCache = {};
+const pageTextCache = new Map();
 
 /**
- * A cache that maps a `(quote, text offset in document)` key to a specific
+ * A cache that maps a `{quote}:{offset}` key to a specific
  * location in the document.
  *
  * The components of the key come from an annotation's selectors. This is used
  * to speed up re-anchoring an annotation that was previously anchored in the
  * current session.
  *
- * @type {Object<string, Object<number, PdfTextRange>>}
+ * @type {Map<string, PdfTextRange>}
  */
-let quotePositionCache = {};
+const quotePositionCache = new Map();
+
+/**
+ * Return a cache key for lookups in `quotePositionCache`.
+ *
+ * @param {string} quote
+ * @param {number} [pos] - Offset in document text
+ */
+function quotePositionCacheKey(quote, pos) {
+  return `${quote}:${pos}`;
+}
 
 /**
  * Return offset of `node` among its siblings
@@ -197,7 +207,7 @@ function getPageTextContent(pageIndex) {
   // This function synchronously populates the cache with a promise so that
   // multiple calls don't call `PDFPageProxy.getTextContent` twice.
   const pageText = getPageText();
-  pageTextCache[pageIndex] = pageText;
+  pageTextCache.set(pageIndex, pageText);
   return pageText;
 }
 
@@ -477,13 +487,11 @@ async function anchorQuote(quoteSelector, positionHint) {
     // If we found a match, optimize future anchoring of this selector in the
     // same session by caching the match location.
     if (positionHint) {
-      if (!quotePositionCache[quoteSelector.exact]) {
-        quotePositionCache[quoteSelector.exact] = {};
-      }
-      quotePositionCache[quoteSelector.exact][positionHint] = {
+      const cacheKey = quotePositionCacheKey(quoteSelector.exact, positionHint);
+      quotePositionCache.set(cacheKey, {
         pageIndex: page,
         anchor: match,
-      };
+      });
     }
 
     // Convert the (start, end) position match into a DOM range.
@@ -541,12 +549,10 @@ export async function anchor(root, selectors) {
     // If anchoring with the position failed, check for a cached quote-based
     // match using the quote + position as a cache key.
     try {
-      if (
-        quotePositionCache[quote.exact] &&
-        quotePositionCache[quote.exact][position.start]
-      ) {
-        const { pageIndex, anchor } =
-          quotePositionCache[quote.exact][position.start];
+      const cacheKey = quotePositionCacheKey(quote.exact, position.start);
+      const cachedPos = quotePositionCache.get(cacheKey);
+      if (cachedPos) {
+        const { pageIndex, anchor } = cachedPos;
         const range = await anchorByPosition(
           pageIndex,
           anchor.start,
@@ -626,6 +632,6 @@ export async function describe(root, range) {
  * This exists mainly as a helper for use in tests.
  */
 export function purgeCache() {
-  pageTextCache = {};
-  quotePositionCache = {};
+  pageTextCache.clear();
+  quotePositionCache.clear();
 }
