@@ -75,7 +75,7 @@
     "postcss": "^8.0.3",
     "postcss-url": "^10.0.0",
     "preact": "^10.4.0",
-    "prettier": "2.3.2",
+    "prettier": "2.4.0",
     "puppeteer": "^10.0.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.1.0",
