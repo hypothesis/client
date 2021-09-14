@@ -124,7 +124,7 @@ function drawHighlightsAbovePdfCanvas(highlightEls) {
     }
 
     // Make the highlight in the text layer transparent.
-    highlightEl.className += ' is-transparent';
+    highlightEl.classList.add('is-transparent');
 
     // Associate SVG element with highlight for use by `removeHighlights`.
     highlightEl.svgHighlight = rect;
