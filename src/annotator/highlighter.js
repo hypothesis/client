@@ -94,8 +94,6 @@ function drawHighlightsAbovePdfCanvas(highlightEls) {
       // of highlighted text, especially for overlapping highlights.
       //
       // This choice optimizes for the common case of dark text on a light background.
-      //
-      // @ts-ignore - `mixBlendMode` property is missing from type definitions.
       svgStyle.mixBlendMode = 'multiply';
     } else {
       // For older browsers (eg. Edge < 79) we draw all the highlights as
