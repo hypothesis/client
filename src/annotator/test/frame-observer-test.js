@@ -12,6 +12,7 @@ describe('annotator/frame-observer', () => {
     let onFrameRemoved;
     const sandbox = sinon.createSandbox();
 
+    // FrameObserver waits a few milliseconds (DEBOUNCE_WAIT) to detect changes in the DOM
     function waitForFrameObserver() {
       return new Promise(resolve => setTimeout(resolve, DEBOUNCE_WAIT + 10));
     }
@@ -142,6 +143,10 @@ describe('annotator/frame-observer', () => {
       iframe.setAttribute('src', 'http://cross-origin.dummy');
       let expectedError;
 
+      // In this particular case waiting for the FrameObserver to detect the new
+      // iframe may not be enough. Because the browser fetches the URL in `src`
+      // (it is not reachable) it could take longer, that's why we, in addition,
+      // wait for the iframe's document to completely load.
       try {
         await onDocumentReady(iframe);
       } catch (error) {
@@ -149,13 +154,14 @@ describe('annotator/frame-observer', () => {
       }
       await waitForFrameObserver();
 
-      assert.isDefined(expectedError);
       assert.notCalled(onFrameAdded);
+      assert.isDefined(expectedError); // Cross-origin error
       assert.calledOnce(console.warn);
     });
   });
 
   describe('onDocumentReady', () => {
+    let clock;
     let fakeIFrame;
     let fakeIFrameDocument;
 
@@ -170,20 +176,40 @@ describe('annotator/frame-observer', () => {
     }
 
     beforeEach(() => {
+      clock = sinon.useFakeTimers();
       fakeIFrameDocument = new FakeIFrameDocument();
       fakeIFrame = document.createElement('div');
       fakeIFrame.contentWindow = { document: fakeIFrameDocument };
       fakeIFrame.setAttribute('src', 'http://my.dummy');
     });
 
+    afterEach(() => {
+      clock.restore();
+    });
+
     it('waits for the iframe to change the location and readyState if the initial document is blank', () => {
       fakeIFrameDocument.location.href = 'about:blank';
       const onReady = onDocumentReady(fakeIFrame);
 
-      fakeIFrameDocument.location.href = 'http://my.dummy';
-      fakeIFrameDocument.readyState = 'complete';
+      // After the initial 'about:blank' document, a new document is loaded.
+      const newDocument = new FakeIFrameDocument();
+      newDocument.location.href = 'http://my.dummy';
+      newDocument.readyState = 'complete';
+      fakeIFrame.contentWindow = { document: newDocument };
+      clock.tick(10);
 
       return onReady;
+    });
+
+    it('rejects promise if the document stays in the initial blank document too long', () => {
+      fakeIFrameDocument.location.href = 'about:blank';
+      const promise = onDocumentReady(fakeIFrame).catch(error =>
+        assert.equal(error.message, 'Annotatable iframe took too long to load')
+      );
+
+      clock.tick(1000);
+
+      return promise;
     });
 
     it('waits for the iframe DOMContentLoaded event to be triggered if the document is loading', () => {

@@ -107,7 +107,7 @@ export class FrameObserver {
  * @return {Promise<void>}
  * @throws {Error} if trying to access a document from a cross-origin iframe
  */
-export function onDocumentReady(frame) {
+export function onDocumentReady(frame, counter = 0) {
   return new Promise((resolve, reject) => {
     // @ts-expect-error
     const frameDocument = frame.contentWindow.document;
@@ -124,7 +124,19 @@ export function onDocumentReady(frame) {
       frame.hasAttribute('src') &&
       frame.src !== 'about:blank'
     ) {
-      setTimeout(() => onDocumentReady(frame).then(resolve).catch(reject), 10);
+      setTimeout(() => {
+        // If `onDocumentReady` is recursively called more than 100 times
+        // (10ms * 100 = 1s) exit.
+        if (counter >= 99) {
+          reject(new Error('Annotatable iframe took too long to load'));
+          return;
+        }
+
+        onDocumentReady(frame, counter + 1)
+          .then(resolve)
+          .catch(reject);
+      }, 10);
+
       return;
     }
 
