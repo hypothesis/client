@@ -13,12 +13,7 @@ import { createShadowRoot } from './util/shadow-root';
 
 /**
  * @typedef {import('./guest').default} Guest
- *
- * @typedef LayoutState
- * @prop {boolean} expanded
- * @prop {number} width
- * @prop {number} height
- *
+ * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
@@ -349,10 +344,11 @@ export default class Sidebar {
       expanded = frameVisibleWidth > toolbarWidth;
     }
 
-    const layoutState = /** @type LayoutState */ ({
+    const layoutState = /** @type {SidebarLayout} */ ({
       expanded,
       width: expanded ? frameVisibleWidth : toolbarWidth,
       height: rect.height,
+      toolbarWidth,
     });
 
     if (this.onLayoutChange) {

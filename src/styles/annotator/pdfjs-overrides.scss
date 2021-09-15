@@ -21,15 +21,3 @@
 .textLayer .highlight.selected {
   background-color: rgba(0, 100, 0, 0.5);
 }
-
-// Make sure sidebar bucket bar/toolbar don't obscure PDF JS tools menu
-// This gives enough room for `.annotator-frame-button` which uses a hard-coded
-// width of 30px
-#toolbarViewer {
-  margin-right: 30px;
-}
-
-// The affordance is not needed in side-by-side mode
-.hypothesis-side-by-side #toolbarViewer {
-  margin-right: 0;
-}

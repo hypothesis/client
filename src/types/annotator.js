@@ -81,6 +81,8 @@
  * @typedef SidebarLayout
  * @prop {boolean} expanded - Whether sidebar is open or closed
  * @prop {number} width - Current width of sidebar in pixels
+ * @prop {number} toolbarWidth - Width of controls (toolbar, bucket bar) on the
+ *   edge of the sidebar.
  */
 
 /**
