@@ -42,7 +42,7 @@ export const RenderingStates = {
 /**
  * Map of page index to page text content.
  *
- * @type {Map<number,Promise<string> | undefined>}
+ * @type {Map<number, Promise<string>>}
  */
 const pageTextCache = new Map();
 
