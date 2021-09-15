@@ -124,8 +124,9 @@ export function onDocumentReady(frame) {
       frame.hasAttribute('src') &&
       frame.src !== 'about:blank'
     ) {
-      // Unfortunately, listening for 'DOMContentLoaded' on the iframeDocument
-      // doesn't work. Instead, we need to wait for a 'load' event to be triggered.
+      // Listening to `DOMContentLoaded` on the frame's document doesn't work because the
+      // document is replaced. On the other hand, listening the frame's `load`
+      // works because the frame element (as in HTMLIFrameElement) doesn't change.
       frame.addEventListener('load', () => {
         resolve();
       });

@@ -12,6 +12,7 @@ describe('annotator/frame-observer', () => {
     let onFrameRemoved;
     const sandbox = sinon.createSandbox();
 
+    // FrameObserver waits a few milliseconds (DEBOUNCE_WAIT) to detect changes in the DOM
     function waitForFrameObserver() {
       return new Promise(resolve => setTimeout(resolve, DEBOUNCE_WAIT + 10));
     }
@@ -139,8 +140,12 @@ describe('annotator/frame-observer', () => {
 
     it("doesn't trigger onFrameAdded when annotatable iframe is from a different domain", async () => {
       const iframe = createAnnotatableIFrame();
-      iframe.setAttribute('src', 'http://cross-origin.dummy');
+      iframe.setAttribute('src', 'http://localhost:1');
 
+      // In this particular case waiting for the FrameObserver to detect the new
+      // iframe may not be enough. Because the browser fetches the URL in `src`
+      // (it is not reachable) it could take longer, that's why, in addition, we
+      // wait for the iframe's document to completely load.
       await onDocumentReady(iframe);
       await waitForFrameObserver();
 
@@ -174,6 +179,11 @@ describe('annotator/frame-observer', () => {
       fakeIFrameDocument.location.href = 'about:blank';
       const onLoad = onDocumentReady(fakeIFrame);
 
+      // After the initial 'about:blank' document, a new document is loaded.
+      const newDocument = new FakeIFrameDocument();
+      newDocument.location.href = 'http://my.dummy';
+      newDocument.readyState = 'complete';
+      fakeIFrame.contentWindow = { document: newDocument };
       fakeIFrame.dispatchEvent(new Event('load'));
 
       return onLoad;
@@ -192,9 +202,7 @@ describe('annotator/frame-observer', () => {
     it("resolves immediately if document is 'complete' or 'interactive'", () => {
       fakeIFrameDocument.location.href = 'about:srcdoc';
       fakeIFrameDocument.readyState = 'complete';
-      const onReady = onDocumentReady(fakeIFrame);
-
-      return onReady;
+      return onDocumentReady(fakeIFrame);
     });
   });
 });
