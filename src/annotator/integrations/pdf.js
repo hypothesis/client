@@ -319,8 +319,17 @@ export class PDFIntegration {
     const maximumWidthToFit = window.innerWidth - sidebarLayout.width;
     const active = sidebarLayout.expanded && maximumWidthToFit >= MIN_PDF_WIDTH;
 
-    this.pdfContainer.style.width = active ? maximumWidthToFit + 'px' : 'auto';
-    this.pdfContainer.classList.toggle('hypothesis-side-by-side', active);
+    // If the sidebar is closed we reserve enough space for the toolbar controls
+    // so that they don't overlap a) the chevron-menu on the right side of
+    // PDF.js's top toolbar and b) the document's scrollbar.
+    //
+    // If the sidebar is open we reserve space for the whole sidebar if there is
+    // room, otherwise we reserve the same space as in the closed state to
+    // prevent the PDF content shifting when opening and closing the sidebar.
+    const reservedSpace = active
+      ? sidebarLayout.width
+      : sidebarLayout.toolbarWidth;
+    this.pdfContainer.style.width = `calc(100% - ${reservedSpace}px)`;
 
     // The following logic is pulled from PDF.js `webViewerResize`
     const currentScaleValue = this.pdfViewer.currentScaleValue;

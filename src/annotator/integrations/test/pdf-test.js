@@ -312,7 +312,7 @@ describe('PDFIntegration', () => {
 
       assert.isTrue(active);
       assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
-      assert.equal(pdfContainer().style.width, 1350 - 428 + 'px');
+      assert.equal(pdfContainer().style.width, 'calc(100% - 428px)');
     });
 
     /**
@@ -336,7 +336,7 @@ describe('PDFIntegration', () => {
 
         assert.isTrue(active);
         assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
-        assert.equal(pdfContainer().style.width, 1350 - 428 + 'px');
+        assert.equal(pdfContainer().style.width, 'calc(100% - 428px)');
       });
     });
 
@@ -348,10 +348,11 @@ describe('PDFIntegration', () => {
         expanded: false,
         width: 428,
         height: 728,
+        toolbarWidth: 115,
       });
 
       assert.isFalse(active);
-      assert.equal(pdfContainer().style.width, 'auto');
+      assert.equal(pdfContainer().style.width, 'calc(100% - 115px)');
     });
 
     it('does not activate side-by-side mode if there is not enough room', () => {
@@ -362,11 +363,12 @@ describe('PDFIntegration', () => {
         expanded: true,
         width: 428,
         height: 728,
+        toolbarWidth: 115,
       });
 
       assert.isFalse(active);
       assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
-      assert.equal(pdfContainer().style.width, 'auto');
+      assert.equal(pdfContainer().style.width, 'calc(100% - 115px)');
     });
   });
 

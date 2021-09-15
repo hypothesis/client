@@ -653,14 +653,14 @@ describe('Sidebar', () => {
     let layoutChangeHandlerSpy;
 
     const assertLayoutValues = (args, expectations) => {
-      const expected = Object.assign(
-        {
-          width: DEFAULT_WIDTH + fakeToolbar.getWidth(),
-          height: DEFAULT_HEIGHT,
-          expanded: true,
-        },
-        expectations
-      );
+      const expected = {
+        width: DEFAULT_WIDTH + fakeToolbar.getWidth(),
+        height: DEFAULT_HEIGHT,
+        expanded: true,
+        toolbarWidth: fakeToolbar.getWidth(),
+
+        ...expectations,
+      };
 
       assert.deepEqual(args, expected);
     };
@@ -800,6 +800,7 @@ describe('Sidebar', () => {
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: true,
           width: DEFAULT_WIDTH,
+          toolbarWidth: 0,
         });
 
         sidebar.close();
@@ -807,6 +808,7 @@ describe('Sidebar', () => {
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: false,
           width: 0,
+          toolbarWidth: 0,
         });
       });
 
