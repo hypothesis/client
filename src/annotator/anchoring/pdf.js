@@ -179,7 +179,7 @@ export async function documentHasText() {
 function getPageTextContent(pageIndex) {
   // If we already have or are fetching the text for this page, return the
   // existing result.
-  const cachedText = pageTextCache[pageIndex];
+  const cachedText = pageTextCache.get(pageIndex);
   if (cachedText) {
     return cachedText;
   }
