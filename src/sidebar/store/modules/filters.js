@@ -46,7 +46,7 @@ import { createStoreModule } from '../create-store';
  */
 
 /**
- * @typedef {Record<FilterKey, FilterOption>} Filters
+ * @typedef {Record<FilterKey, FilterOption>|{}} Filters
  */
 
 /**

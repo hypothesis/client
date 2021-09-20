@@ -377,7 +377,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
  * @prop {Record<string,string>} [textStyle] -
  *   Additional CSS properties to apply to the input field and rendered preview
  * @prop {string} [text] - The markdown text to edit.
- * @prop {(a?: Record<'text', string>) => void} [onEditText]
+ * @prop {({text: string}) => void} [onEditText]
  *   - Callback invoked with `{ text }` object when user edits text.
  *   TODO: Simplify this callback to take just a string rather than an object once the
  *   parent component is converted to Preact.
