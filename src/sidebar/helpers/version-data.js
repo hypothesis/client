@@ -7,14 +7,14 @@
 /**
  * An object representing document metadata.
  *
- * @typedef {object} DocMetadata
+ * @typedef DocMetadata
  * @prop {string=} documentFingerprint - Optional PDF fingerprint for current document
  */
 
 /**
  * An object representing document info.
  *
- * @typedef {object} DocumentInfo
+ * @typedef DocumentInfo
  * @prop {string=} [uri] - Current document URL
  * @prop {DocMetadata} [metadata] - Document metadata
  */

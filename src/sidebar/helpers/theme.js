@@ -59,10 +59,10 @@ export function applyTheme(themeProperties, settings) {
   if (!settings.branding) {
     return style;
   }
-
+  const { branding } = settings;
   themeProperties.forEach(themeProp => {
     const propertyName = supportedThemeProperties[themeProp];
-    const propertyValue = settings.branding[themeProp];
+    const propertyValue = branding[themeProp];
     if (propertyName && propertyValue) {
       style[propertyName] = propertyValue;
     }
