@@ -1113,10 +1113,10 @@
   resolved "https://registry.yarnpkg.com/@humanwhocodes/object-schema/-/object-schema-1.2.0.tgz#87de7af9c231826fdd68ac7258f77c429e0e5fcf"
   integrity sha512-wdppn25U8z/2yiaT6YGquE6X8sSv7hNMWSXYSSU1jGv/yd6XqjXgTDJ8KP4NgjTXfJ3GbRjeeb8RTV7a/VpM+w==
 
-"@hypothesis/frontend-shared@3.9.0":
-  version "3.9.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-3.9.0.tgz#1d6dceba0755c4bad62c655cd9b55890c6c49174"
-  integrity sha512-tNZVBxyCyML2KXqS6QWZxIfxWxERxyEj0M336iHJZSrw1a4MwONC/7vpY++yf7/YlE7y4xXPRq9NydyBVOR3tA==
+"@hypothesis/frontend-shared@3.10.0":
+  version "3.10.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-3.10.0.tgz#4eee2184d4f8b16320aeb5c98acebd8a3839227f"
+  integrity sha512-rGvYxH9HrrYmmG/oy+MAqi5e5i7mTKzdhuaXW3kHftAB8xf/AEUjMsZ6PqQhdC/Y8cwBBcFOXw7UJss9M8yHFw==
 
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
