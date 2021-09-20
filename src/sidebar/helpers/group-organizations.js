@@ -11,7 +11,7 @@ const DEFAULT_ORG_ID = '__default__';
  * Generate consistent object keys for organizations so that they
  * may be sorted
  *
- * @param {Object} organization
+ * @param {object} organization
  * @return {String}
  */
 function orgKey(organization) {
@@ -26,7 +26,7 @@ function orgKey(organization) {
  * groups Array.
  *
  * @param {Group} group
- * @param {Object} organization
+ * @param {object} organization
  * @return undefined - organization is mutated in place
  */
 function addGroup(group, organization) {
@@ -46,7 +46,7 @@ function addGroup(group, organization) {
  * their appropriate "parent" organizations.
  *
  * @param {Array<Group>} groups
- * @return {Object} - A collection of all unique organizations, containing
+ * @return {object} - A collection of all unique organizations, containing
  *                    their groups. Keyed by each org's "orgKey"
  */
 function organizations(groups) {
@@ -81,7 +81,7 @@ function organizations(groups) {
  * organization).
  *
  * @param {Array<Group>} groups
- * @return {Array<Object>} - groups sorted by which organization they're in
+ * @return {Array<object>} - groups sorted by which organization they're in
  */
 export default function groupsByOrganization(groups) {
   const orgs = organizations(groups);

@@ -73,7 +73,7 @@ function textMatchScore(text, str) {
  *
  * @param {string} text - Document text to search
  * @param {string} quote - String to find within `text`
- * @param {Object} context -
+ * @param {object} context -
  *   Context in which the quote originally appeared. This is used to choose the
  *   best match.
  *   @param {string} [context.prefix] - Expected text before the quote

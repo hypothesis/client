@@ -76,7 +76,7 @@ function ToastMessage({ message, onDismiss }) {
 
 /**
  * @typedef ToastMessagesProps
- * @prop {Object} toastMessenger - Injected service
+ * @prop {object} toastMessenger - Injected service
  */
 
 /**

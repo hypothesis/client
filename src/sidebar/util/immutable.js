@@ -25,8 +25,8 @@ function deepFreeze(object) {
 /**
  * Prevent accidental mutations to `object` or any of its fields in debug builds.
  *
- * @param {Object} object
- * @return {Object} Returns the input object
+ * @param {object} object
+ * @return {object} Returns the input object
  */
 export default function immutable(object) {
   if (process.env.NODE_ENV === 'production') {

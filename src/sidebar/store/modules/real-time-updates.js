@@ -89,7 +89,7 @@ const actions = actionTypes(reducers);
  * Record pending updates representing changes on the server that the client
  * has been notified about but has not yet applied.
  *
- * @param {Object} args
+ * @param {object} args
  * @param {Annotation[]} [args.updatedAnnotations]
  * @param {Annotation[]} [args.deletedAnnotations]
  */
@@ -153,7 +153,7 @@ function clearPendingUpdates() {
  * Return added or updated annotations received via the WebSocket
  * which have not been applied to the local state.
  *
- * @return {Object.<string, Annotation>}
+ * @return {Record<string, Annotation>}
  */
 function pendingUpdates(state) {
   return state.pendingUpdates;
@@ -163,7 +163,7 @@ function pendingUpdates(state) {
  * Return IDs of annotations which have been deleted on the server but not
  * yet removed from the local state.
  *
- * @return {Object.<string, Annotation>}
+ * @return {Record<string, Annotation>}
  */
 function pendingDeletions(state) {
   return state.pendingDeletions;

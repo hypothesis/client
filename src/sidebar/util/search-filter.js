@@ -86,10 +86,10 @@ function tokenize(searchText) {
  * Parse a search query into a map of search field to term.
  *
  * @param {string} searchText
- * @return {Object.<string,string[]>}
+ * @return {Record<string,string[]>}
  */
 export function toObject(searchText) {
-  /** @type {Object.<string,string[]>} */
+  /** @type {Record<string,string[]>} */
   const obj = {};
   const backendFilter = f => (f === 'tag' ? 'tags' : f);
 
@@ -136,7 +136,7 @@ export function toObject(searchText) {
  *
  * @param {string} searchText - Filter query to parse
  * @param {FocusFilter} focusFilters - Additional filter terms to mix in
- * @return {Object.<string,Facet>}
+ * @return {Record<string,Facet>}
  */
 export function generateFacetedFilter(searchText, focusFilters = {}) {
   let terms;

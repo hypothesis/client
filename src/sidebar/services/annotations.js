@@ -100,7 +100,7 @@ export class AnnotationsService {
    * Create a draft for it unless it's a highlight and clear other empty
    * drafts out of the way.
    *
-   * @param {Object} annotationData
+   * @param {object} annotationData
    * @param {Date} now
    */
   create(annotationData, now = new Date()) {
@@ -177,7 +177,7 @@ export class AnnotationsService {
   /**
    * Create a reply to `annotation` by the user `userid` and add to the store.
    *
-   * @param {Object} annotation
+   * @param {object} annotation
    * @param {string} userid
    */
   reply(annotation, userid) {

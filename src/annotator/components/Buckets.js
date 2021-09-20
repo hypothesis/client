@@ -13,7 +13,7 @@ import { findClosestOffscreenAnchor } from '../util/buckets';
  * A left-pointing indicator button that, when hovered or clicked, highlights
  * or selects associated annotations.
  *
- * @param {Object} props
+ * @param {object} props
  *  @param {Bucket} props.bucket
  *  @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
  */
@@ -50,7 +50,7 @@ function BucketButton({ bucket, onSelectAnnotations }) {
  * An up- or down-pointing button that will scroll to the next closest bucket
  * of annotations in the given direction.
  *
- * @param {Object} props
+ * @param {object} props
  *   @param {Bucket} props.bucket
  *   @param {'up'|'down'} props.direction
  *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
@@ -82,7 +82,7 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
  * A list of buckets, including up and down navigation (when applicable) and
  * on-screen buckets
  *
- * @param {Object} props
+ * @param {object} props
  *   @param {Bucket} props.above
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets

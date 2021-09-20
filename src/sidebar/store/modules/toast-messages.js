@@ -82,7 +82,7 @@ function updateMessage(message) {
  * Retrieve a message by `id`
  *
  * @param {string} id
- * @return {Object|undefined}
+ * @return {object|undefined}
  */
 function getMessage(state, id) {
   return state.messages.find(message => message.id === id);
@@ -91,7 +91,7 @@ function getMessage(state, id) {
 /**
  * Retrieve all current messages
  *
- * @return {Object[]}
+ * @return {object[]}
  */
 function getMessages(state) {
   return state.messages;

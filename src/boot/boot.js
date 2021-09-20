@@ -14,7 +14,7 @@ const commonPolyfills = [
 /**
  * @typedef SidebarAppConfig
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
- * @prop {Object.<string,string>} manifest -
+ * @prop {Record<string,string>} manifest -
  *   A mapping from canonical asset path to cache-busted asset path
  * @prop {string} apiUrl
  */
@@ -24,7 +24,7 @@ const commonPolyfills = [
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
  * @prop {string} notebookAppUrl - The URL of the sidebar's notebook
  * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
- * @prop {Object.<string,string>} manifest -
+ * @prop {Record<string,string>} manifest -
  *   A mapping from canonical asset path to cache-busted asset path
  */
 

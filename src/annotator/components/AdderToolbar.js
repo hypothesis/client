@@ -4,7 +4,7 @@ import { SvgIcon } from '@hypothesis/frontend-shared';
 import { useShortcut } from '../../shared/shortcut';
 
 /**
- * @param {Object} props
+ * @param {object} props
  *  @param {number} [props.badgeCount]
  *  @param {string} [props.icon]
  *  @param {string} props.label

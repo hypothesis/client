@@ -7,9 +7,9 @@ import renderMarkdown from '../render-markdown';
 /**
  * @typedef MarkdownViewProps
  * @prop {string} markdown - The string of markdown to display
- * @prop {Object.<string,string>} [textStyle] -
+ * @prop {Record<string,string>} [textStyle] -
  *   Additional CSS properties to apply to the rendered markdown
- * @prop {Object.<string,boolean>} [textClass] -
+ * @prop {Record<string,boolean>} [textClass] -
  *   Map of classes to apply to the container of the rendered markdown
  */
 

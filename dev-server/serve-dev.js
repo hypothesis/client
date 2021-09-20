@@ -23,7 +23,7 @@ const TEMPLATE_PATH = `${__dirname}/templates/`;
 /**
  * Render client config and script embed
  *
- * @param {Object} context
+ * @param {object} context
  */
 function renderScript(context) {
   const scriptTemplate = `

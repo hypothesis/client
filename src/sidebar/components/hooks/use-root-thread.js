@@ -20,7 +20,7 @@ export default function useRootThread() {
   const filters = store.getFilterValues();
 
   const threadState = useMemo(() => {
-    /** @type {Object.<string,string>} */
+    /** @type {Record<string,string>} */
     return {
       annotations,
       route,

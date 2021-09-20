@@ -68,10 +68,10 @@ function findByTag(annotations, tag) {
  * `annotation` may either be new (unsaved) or a persisted annotation retrieved
  * from the service.
  *
- * @param {Object} annotation
+ * @param {object} annotation
  * @param {string} tag - The `$tag` value that should be used for this
  *                       if it doesn't have a `$tag` already
- * @return {Object} - annotation with local (`$*`) fields set
+ * @return {object} - annotation with local (`$*`) fields set
  */
 function initializeAnnotation(annotation, tag) {
   let orphan = annotation.$orphan;

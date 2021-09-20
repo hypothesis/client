@@ -6,7 +6,7 @@ import { RangeAnchor, TextPositionAnchor, TextQuoteAnchor } from './types';
 
 /**
  * @param {RangeAnchor|TextPositionAnchor|TextQuoteAnchor} anchor
- * @param {Object} [options]
+ * @param {object} [options]
  *  @param {number} [options.hint]
  */
 async function querySelector(anchor, options = {}) {
@@ -22,7 +22,7 @@ async function querySelector(anchor, options = {}) {
  *
  * @param {Element} root - The root element of the anchoring context.
  * @param {Selector[]} selectors - The selectors to try.
- * @param {Object} [options]
+ * @param {object} [options]
  *   @param {number} [options.hint]
  */
 export function anchor(root, selectors, options = {}) {

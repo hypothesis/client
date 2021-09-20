@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 /**
  * @typedef SliderProps
- * @prop {Object} [children] - The slideable content to hide or reveal.
+ * @prop {object} [children] - The slideable content to hide or reveal.
  * @prop {boolean} visible - Whether the content should be visible or not.
  */
 

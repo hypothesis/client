@@ -38,7 +38,7 @@ const actions = actionTypes(reducers);
  * Change the active route.
  *
  * @param {string} name - Name of the route to activate. See `initialState` for possible values
- * @param {Object.<string,string>} params - Parameters associated with the route
+ * @param {Record<string,string>} params - Parameters associated with the route
  */
 function changeRoute(name, params = {}) {
   return {

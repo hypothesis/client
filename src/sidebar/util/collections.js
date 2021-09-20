@@ -21,10 +21,10 @@ export function countIf(ary, predicate) {
  * to `true`.
  *
  * @param {string[]} arr
- * @return {Object<string,true>}
+ * @return {Record<string,true>}
  */
 export function toTrueMap(arr) {
-  const obj = /** @type {Object<string,true>} */ ({});
+  const obj = /** @type {Record<string,true>} */ ({});
   arr.forEach(key => (obj[key] = true));
   return obj;
 }
@@ -33,7 +33,7 @@ export function toTrueMap(arr) {
  * Utility function that returns all of the properties of an object whose
  * value is `true`.
  *
- * @param {Object} obj
+ * @param {object} obj
  * @return {string[]}
  */
 export function trueKeys(obj) {

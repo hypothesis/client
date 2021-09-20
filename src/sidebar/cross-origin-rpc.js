@@ -6,8 +6,8 @@ let preStartQueue = [];
 /**
  * Return the mapped methods that can be called remotely via this server.
  *
- * @param {Object} store - The global store
- * @return {Object}
+ * @param {object} store - The global store
+ * @return {object}
  */
 const registeredMethods = store => {
   return {

@@ -14,7 +14,7 @@
  * @typedef Filter
  * @prop {string} match_policy - TODO: Remove this, the backend doesn't use it any more.
  * @prop {FilterClause[]} clauses
- * @prop {Object} actions - TODO: Remove this, the backend doesn't use it any more.
+ * @prop {object} actions - TODO: Remove this, the backend doesn't use it any more.
  *  @prop {boolean} [actions.create]
  *  @prop {boolean} [actions.update]
  *  @prop {boolean} [actions.delete]

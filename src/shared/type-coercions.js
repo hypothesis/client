@@ -44,7 +44,7 @@ export function toInteger(value) {
  * Returns either the value if its an object or an empty object
  *
  * @param {any} value - initial value
- * @return {Object}
+ * @return {object}
  */
 export function toObject(value) {
   if (typeof value === 'object' && value !== null) {

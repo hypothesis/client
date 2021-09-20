@@ -4,7 +4,7 @@ import { options } from 'preact';
  * Setup workarounds for setting certain HTML element properties or attributes
  * in some browsers.
  *
- * @param {Object} _options - Test seam
+ * @param {object} _options - Test seam
  */
 export function setupBrowserFixes(_options = options) {
   let needsDirAutoFix = false;

@@ -158,7 +158,7 @@ export class TextQuoteAnchor {
   /**
    * @param {Element} root - A root element from which to anchor.
    * @param {string} exact
-   * @param {Object} context
+   * @param {object} context
    *   @param {string} [context.prefix]
    *   @param {string} [context.suffix]
    */
