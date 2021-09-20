@@ -13,10 +13,10 @@ import { sorters } from './thread-sorters';
 /**
  * @typedef ThreadState
  * @prop {Annotation[]} annotations
- * @prop {Object} selection
- *   @prop {Object<string,boolean>} selection.expanded
+ * @prop {object} selection
+ *   @prop {Record<string,boolean>} selection.expanded
  *   @prop {string|null} selection.filterQuery
- *   @prop {Object<string,string>} selection.filters
+ *   @prop {Record<string,string>} selection.filters
  *   @prop {string[]} selection.forcedVisible
  *   @prop {string[]} selection.selected
  *   @prop {string} selection.sortKey

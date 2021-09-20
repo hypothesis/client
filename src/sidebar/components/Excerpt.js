@@ -10,7 +10,7 @@ import { applyTheme } from '../helpers/theme';
  * @typedef InlineControlsProps
  * @prop {boolean} isCollapsed
  * @prop {(collapsed: boolean) => any} setCollapsed
- * @prop {Object} [linkStyle]
+ * @prop {object} [linkStyle]
  */
 
 /**
@@ -44,7 +44,7 @@ const noop = () => {};
 
 /**
  * @typedef ExcerptProps
- * @prop {Object} [children]
+ * @prop {object} [children]
  * @prop {boolean} [inlineControls] - If `true`, the excerpt provides internal
  *   controls to expand and collapse the content. If `false`, the caller sets
  *   the collapsed state via the `collapse` prop.  When using inline controls,
@@ -61,7 +61,7 @@ const noop = () => {};
  * @prop {(collapsed: boolean) => void} [onToggleCollapsed] - When `inlineControls` is `false`, this
  *   function is called when the user requests to expand the content by clicking a
  *   zone at the bottom of the container.
- * @prop {Object} [settings] - Used for theming.
+ * @prop {object} [settings] - Used for theming.
  */
 
 /**
@@ -120,7 +120,7 @@ function Excerpt({
   const isCollapsed = inlineControls ? collapsedByInlineControls : collapse;
   const isExpandable = isOverflowing && isCollapsed;
 
-  /** @type {Object} */
+  /** @type {object} */
   const contentStyle = {};
   if (contentHeight !== 0) {
     contentStyle['max-height'] = isExpandable ? collapsedHeight : contentHeight;

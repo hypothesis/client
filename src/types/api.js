@@ -79,10 +79,10 @@
  * @prop {string} user
  * @prop {boolean} hidden
  *
- * @prop {Object} document
+ * @prop {object} document
  *   @prop {string} document.title
  *
- * @prop {Object} permissions
+ * @prop {object} permissions
  *   @prop {string[]} permissions.read
  *   @prop {string[]} permissions.update
  *   @prop {string[]} permissions.delete
@@ -91,16 +91,16 @@
  *   The Hypothesis API structure allows for multiple targets, but the current
  *   h server only allows for one target per annotation.
  *
- * @prop {Object} [moderation]
+ * @prop {object} [moderation]
  *   @prop {number} moderation.flagCount
  *
- * @prop {Object} links
+ * @prop {object} links
  *   @prop {string} [links.incontext] - A "bouncer" URL to the annotation in
  *     context on its target document
  *   @prop {string} [links.html] - An `h`-website URL to view the annotation
  *     by itself
  *
- * @prop {Object} [user_info]
+ * @prop {object} [user_info]
  *   @prop {string|null} user_info.display_name
  *
  * // Properties not present on API objects, but added by utilities in the client.
@@ -112,10 +112,10 @@
 /**
  * @typedef Profile
  * @prop {string|null} userid
- * @prop {Object} preferences
+ * @prop {object} preferences
  *   @prop {boolean} [preferences.show_sidebar_tutorial]
- * @prop {Object.<string, boolean>} features
- * @prop {Object} [user_info]
+ * @prop {Record<string, boolean>} features
+ * @prop {object} [user_info]
  *   @prop {string|null} user_info.display_name
  *
  * @prop {unknown} [groups] - Deprecated.
@@ -147,7 +147,7 @@
  * @prop {Organization} organization - nb. This field is nullable in the API, but
  *   we assign a default organization on the client.
  * @prop {GroupScopes|null} scopes
- * @prop {Object} links
+ * @prop {object} links
  *   @prop {string} [links.html]
  *
  * // Properties not present on API objects, but added by utilities in the client.

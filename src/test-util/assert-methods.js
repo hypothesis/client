@@ -38,7 +38,7 @@ const rejects = async (promiseResult, errorMessage) => {
  * Patches the assert object with additional custom helper methods
  * defined in this module.
  *
- * @param {Object} assert - global assertion object.
+ * @param {object} assert - global assertion object.
  */
 export function patch(assert) {
   assert.rejects = rejects;

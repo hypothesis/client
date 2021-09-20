@@ -3,7 +3,7 @@
 /**
  * Return an object where each key in `updateFns` is mapped to the key itself.
  *
- * @template {Object.<string,Function>} T
+ * @template {Record<string,Function>} T
  * @param {T} reducers - Object containing reducer functions
  * @return {{ [index in keyof T]: string }}
  */
@@ -81,7 +81,7 @@ export function bindSelectors(namespaces, getState) {
  * which reads values from a Redux store, returns non-null.
  *
  * @template T
- * @param {Object} store - Redux store
+ * @param {object} store - Redux store
  * @param {(s: Store) => T|null} selector - Function which returns a value from the
  *   store if the criteria is met or `null` otherwise.
  * @return {Promise<T>}

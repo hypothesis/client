@@ -155,7 +155,7 @@ function youTubeEmbed(id, link) {
  *   contain a single capture group which matches the video ID within the path.
  * @param {(videoId: string) => string} iframeUrlGenerator -
  *   Generate the URL for an embedded video iframe from a video ID
- * @param {Object} [options]
+ * @param {object} [options]
  *   @param {number} [options.aspectRatio]
  * @return {(link: HTMLAnchorElement) => HTMLElement|null}
  */
@@ -393,7 +393,7 @@ function replaceLinkWithEmbed(link) {
  * embeds of the same media.
  *
  * @param {HTMLElement} element
- * @param {Object} options
+ * @param {object} options
  *   @param {string} [options.className] -
  *     Class name to apply to embed containers. An important function of this class is to set
  *     the width of the embed.

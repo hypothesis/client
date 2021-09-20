@@ -119,18 +119,18 @@
 /**
  * @typedef DocumentMetadata
  * @prop {string} title
- * @prop {Object[]} link
+ * @prop {object[]} link
  *   @prop {string} [link.rel]
  *   @prop {string} [link.type]
  *   @prop {string} link.href
  *
  * // HTML only.
- * @prop {Object.<string, string[]>} [dc]
- * @prop {Object.<string, string[]>} [eprints]
- * @prop {Object.<string, string[]>} [facebook]
- * @prop {Object.<string, string[]>} [highwire]
- * @prop {Object.<string, string[]>} [prism]
- * @prop {Object.<string, string[]>} [twitter]
+ * @prop {Record<string, string[]>} [dc]
+ * @prop {Record<string, string[]>} [eprints]
+ * @prop {Record<string, string[]>} [facebook]
+ * @prop {Record<string, string[]>} [highwire]
+ * @prop {Record<string, string[]>} [prism]
+ * @prop {Record<string, string[]>} [twitter]
  * @prop {string} [favicon]
  *
  * // HTML + PDF.

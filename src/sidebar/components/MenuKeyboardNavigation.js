@@ -10,7 +10,7 @@ function isElementVisible(element) {
  * @prop {string} [className]
  * @prop {(e: KeyboardEvent) => any} [closeMenu] - Callback when the menu is closed via keyboard input
  * @prop {boolean} [visible] - When  true`, sets focus on the first item in the list
- * @prop {Object} children - Array of nodes which may contain <MenuItems> or any nodes
+ * @prop {object} children - Array of nodes which may contain <MenuItems> or any nodes
  */
 
 /**

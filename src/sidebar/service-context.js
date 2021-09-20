@@ -114,7 +114,7 @@ export function withServices(Component, serviceNames) {
  * context of custom hooks.
  *
  * @param {string} service - Name of the service to look up
- * @return {Object}
+ * @return {object}
  */
 export function useService(service) {
   const injector = useContext(ServiceContext);

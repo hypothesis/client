@@ -46,7 +46,7 @@ import { createStoreModule } from '../create-store';
  */
 
 /**
- * @typedef {Object.<FilterKey, FilterOption>} Filters
+ * @typedef {Record<FilterKey, FilterOption>} Filters
  */
 
 /**
@@ -265,7 +265,7 @@ function getFilter(state, filterName) {
 const getFilterValues = createSelector(
   state => getFilters(state),
   allFilters => {
-    /** @type {Object.<string,string>} */
+    /** @type {Record<string,string>} */
     const filterValues = {};
     Object.keys(allFilters).forEach(
       filterKey => (filterValues[filterKey] = allFilters[filterKey].value)

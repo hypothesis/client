@@ -10,7 +10,7 @@
 
 /**
  * @typedef SelectionState
- *   @prop {Object<string,boolean>} expanded
+ *   @prop {Record<string,boolean>} expanded
  *   @prop {string[]} forcedVisible
  *   @prop {string[]} selected
  *   @prop {string} sortKey
@@ -303,7 +303,7 @@ function toggleSelectedAnnotations(toggleIds) {
 /**
  * Retrieve map of expanded/collapsed annotations (threads)
  *
- * @return {Object<string,boolean>}
+ * @return {Record<string,boolean>}
  */
 function expandedMap(state) {
   return state.expanded;

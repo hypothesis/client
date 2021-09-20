@@ -16,7 +16,7 @@ import VersionInfo from './VersionInfo';
 /**
  * External link "tabs" inside of the help panel.
  *
- * @param {Object} props
+ * @param {object} props
  *   @param {string} props.linkText - What the tab's link should say
  *   @param {string} props.url - Where the tab's link should go
  */

@@ -5,7 +5,7 @@ import { toChildArray } from 'preact';
 /**
  * @typedef MenuSectionProps
  * @prop {string} [heading] - Heading displayed at the top of the menu.
- * @prop {Object} children - Menu items to display in this section.
+ * @prop {object} children - Menu items to display in this section.
  */
 
 /**

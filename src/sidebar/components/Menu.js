@@ -32,8 +32,8 @@ let ignoreNextClick = false;
  *   Additional CSS class for the arrow caret at the edge of the menu content that "points"
  *   toward the menu's toggle button. This can be used to adjust the position of that caret
  *   respective to the toggle button.
- * @prop {Object|string} [label] - Label element for the toggle button that hides and shows the menu.
- * @prop {Object} [children] -
+ * @prop {object|string} [label] - Label element for the toggle button that hides and shows the menu.
+ * @prop {object} [children] -
  *   Menu items and sections to display in the content area of the menu.  These are typically
  *   `MenuSection` and `MenuItem` components, but other custom content is also allowed.
  * @prop {boolean} [containerPositioned] -

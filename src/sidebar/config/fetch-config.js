@@ -84,9 +84,9 @@ function fetchConfigFromAncestorFrame(origin, window_ = window) {
  * synchronously in the query string. However it can also be retrieved from
  * an ancestor of the embedding frame. See tests for more details.
  *
- * @param {Object} appConfig - Settings rendered into `app.html` by the h service.
+ * @param {object} appConfig - Settings rendered into `app.html` by the h service.
  * @param {Window} window_ - Test seam.
- * @return {Promise<Object>} - The merged settings.
+ * @return {Promise<object>} - The merged settings.
  */
 function fetchConfigLegacy(appConfig, window_ = window) {
   const hostPageConfig = hostConfig(window_);
@@ -105,9 +105,9 @@ function fetchConfigLegacy(appConfig, window_ = window) {
 /**
  * Merge client configuration from h service with config from the hash fragment.
  *
- * @param {Object} appConfig - App config settings rendered into `app.html` by the h service.
- * @param {Object} hostPageConfig - App configuration specified by the embedding frame.
- * @return {Object} - The merged settings.
+ * @param {object} appConfig - App config settings rendered into `app.html` by the h service.
+ * @param {object} hostPageConfig - App configuration specified by the embedding frame.
+ * @return {object} - The merged settings.
  */
 function fetchConfigEmbed(appConfig, hostPageConfig) {
   const mergedConfig = {
@@ -125,10 +125,10 @@ function fetchConfigEmbed(appConfig, hostPageConfig) {
  * Use this method to retrieve the config asynchronously from a parent
  * frame via RPC. See tests for more details.
  *
- * @param {Object} appConfig - Settings rendered into `app.html` by the h service.
+ * @param {object} appConfig - Settings rendered into `app.html` by the h service.
  * @param {Window} parentFrame - Frame to send call to.
  * @param {string} origin - Origin filter for `window.postMessage` call.
- * @return {Promise<Object>} - The merged settings.
+ * @return {Promise<object>} - The merged settings.
  */
 async function fetchConfigRpc(appConfig, parentFrame, origin) {
   const remoteConfig = await postMessageJsonRpc.call(
@@ -156,11 +156,11 @@ async function fetchConfigRpc(appConfig, parentFrame, origin) {
  * fill in the `groups` value(s) later when its ready. This helps speed
  * up the loading process.
  *
- * @param {Object} config - The configuration object to mutate. This should
+ * @param {object} config - The configuration object to mutate. This should
  *  already have the `services` value
  * @param {function} rpcCall - RPC method
  *  (method, args, timeout) => Promise
- * @return {Promise<Object>} - The mutated settings
+ * @return {Promise<object>} - The mutated settings
  */
 async function fetchGroupsAsync(config, rpcCall) {
   if (Array.isArray(config.services)) {

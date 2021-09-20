@@ -12,7 +12,7 @@ import { withServices } from '../service-context';
 
 /**
  * @typedef TabProps
- * @prop {Object} children - Child components.
+ * @prop {object} children - Child components.
  * @prop {number} count - The total annotations for this tab.
  * @prop {boolean} isSelected - Is this tab currently selected?
  * @prop {boolean} isWaitingToAnchor - Are there any annotations still waiting to anchor?

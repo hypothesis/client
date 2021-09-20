@@ -5,7 +5,7 @@ const SIDEBAR_TRIGGER_BTN_ATTR = 'data-hypothesis-trigger';
  * trigger data attribute.
  *
  * @param {Element} rootEl - The DOM element which contains the trigger elements.
- * @param {Object} showFn - Function which shows the sidebar.
+ * @param {object} showFn - Function which shows the sidebar.
  */
 
 export default function trigger(rootEl, showFn) {

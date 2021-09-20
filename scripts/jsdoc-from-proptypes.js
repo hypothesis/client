@@ -73,7 +73,7 @@ function jsdocComment(lines) {
  * JSDoc `@typedef` comment.
  *
  * @param {string} componentName
- * @param {Object} An `ObjectExpression` AST node
+ * @param {object} An `ObjectExpression` AST node
  */
 function jsdocTypedefFromPropTypes(componentName, objectExpression) {
   const props = [];

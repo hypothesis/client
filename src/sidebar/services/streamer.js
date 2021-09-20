@@ -220,7 +220,7 @@ export class StreamerService {
    *
    * If the service has already connected this does nothing.
    *
-   * @param {Object} [options]
+   * @param {object} [options]
    *   @param {boolean} [options.applyUpdatesImmediately] - true if pending updates should be applied immediately
    * @return {Promise<void>} Promise which resolves once the WebSocket connection
    *    process has started.

@@ -14,7 +14,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  * @prop {string} sidebarAppUrl
  * @prop {string} notebookAppUrl
  
- * @prop {(name: string, options?: Object) => (string|null)} hostPageSetting
+ * @prop {(name: string, options?: object) => (string|null)} hostPageSetting
  */
 
 /**

@@ -9,7 +9,7 @@ class FakeMetadata {
   /**
    * Initialize the metadata dictionary.
    *
-   * @param {Object} metadata - A key/value dictionary of metadata fields.
+   * @param {object} metadata - A key/value dictionary of metadata fields.
    */
   constructor(metadata) {
     this._metadata = metadata;
@@ -69,7 +69,7 @@ class FakePDFViewerApplication {
    * when a document fails to load.
    *
    * @param {string} url - Fake PDF URL
-   * @param {Object} options -
+   * @param {object} options -
    *   Options to simulate APIs of different versions of PDF.js.
    *
    *   @prop {boolean} domEvents - Whether events are emitted on the DOM

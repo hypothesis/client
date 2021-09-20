@@ -36,7 +36,7 @@ describe('APIService', () => {
    * @param {number|null} status -
    *   Expected HTTP status. If `null` then the call to `fetch` will reject with
    *   the content of `body` as the error message.
-   * @param {Object|string} body - Expected response body or error message
+   * @param {object|string} body - Expected response body or error message
    */
   function expectCall(
     method,

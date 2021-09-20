@@ -32,12 +32,12 @@ import { normalizeURI } from '../util/url';
  * @typedef HTMLDocumentMetadata
  * @prop {string} title
  * @prop {Link[]} link
- * @prop {Object.<string, string[]>} dc
- * @prop {Object.<string, string[]>} eprints
- * @prop {Object.<string, string[]>} facebook
- * @prop {Object.<string, string[]>} highwire
- * @prop {Object.<string, string[]>} prism
- * @prop {Object.<string, string[]>} twitter
+ * @prop {Record<string, string[]>} dc
+ * @prop {Record<string, string[]>} eprints
+ * @prop {Record<string, string[]>} facebook
+ * @prop {Record<string, string[]>} highwire
+ * @prop {Record<string, string[]>} prism
+ * @prop {Record<string, string[]>} twitter
  * @prop {string} [favicon]
  * @prop {string} [documentFingerprint]
  */
@@ -115,10 +115,10 @@ export class HTMLMetadata {
    * @param {string} prefix
    * @param {string} attribute
    * @param {string} delimiter
-   * @return {Object.<string,string[]>}
+   * @return {Record<string,string[]>}
    */
   _getMetaTags(prefix, attribute, delimiter) {
-    /** @type {Object.<string,string[]>} */
+    /** @type {Record<string,string[]>} */
     const tags = {};
     for (let meta of Array.from(this.document.querySelectorAll('meta'))) {
       const name = meta.getAttribute(attribute);

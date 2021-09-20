@@ -239,8 +239,8 @@ let isFirstBuild = true;
  * Generates the `build/boot.js` script which serves as the entry point for
  * the Hypothesis client.
  *
- * @param {Object} manifest - Manifest mapping asset paths to cache-busted URLs
- * @param {Object} options - Options for generating the boot script
+ * @param {object} manifest - Manifest mapping asset paths to cache-busted URLs
+ * @param {object} options - Options for generating the boot script
  */
 function generateBootScript(manifest, { usingDevServer = false } = {}) {
   const { version } = require('./package.json');

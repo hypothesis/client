@@ -1,7 +1,7 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 
 /**
- * @param {Object} props
+ * @param {object} props
  *  @param {import("preact").Ref<HTMLButtonElement>} [props.buttonRef]
  *  @param {boolean} [props.expanded]
  *  @param {string} [props.className]

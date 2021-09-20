@@ -8,7 +8,7 @@ const MESSAGE_DISMISS_DELAY = 500;
 /**
  * Additional control over the display of a particular message.
  *
- * @typedef {Object} MessageOptions
+ * @typedef {object} MessageOptions
  * @prop {boolean} [autoDismiss=true] - Whether the toast message automatically disappears.
  * @prop {string} [moreInfoURL=''] - Optional URL for users to visit for "more info"
  */

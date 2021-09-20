@@ -17,7 +17,7 @@ const supportedThemeProperties = {
  * Subset of the config from the host page which includes theme configuration.
  *
  * @typedef Settings
- * @prop {Object.<ThemeProperty,string>} [branding]
+ * @prop {Record<ThemeProperty,string>} [branding]
  */
 
 /**
@@ -40,7 +40,7 @@ const supportedThemeProperties = {
  *   Which of the supported theme properties should have applied rules in the `style`
  *   object
  * @param {Settings} settings
- * @return {Object.<string,string>} - Object that can be passed as the `style` prop
+ * @return {Record<string,string>} - Object that can be passed as the `style` prop
  *
  * @example
  * let themeProperties = ['accentColor', 'ctaTextColor', 'foo'];
@@ -54,7 +54,7 @@ const supportedThemeProperties = {
  * applyTheme(themeProperties, settings); // -> { color: '#ffc '}
  */
 export function applyTheme(themeProperties, settings) {
-  /** @type {Object.<string,string>} */
+  /** @type {Record<string,string>} */
   const style = {};
   if (!settings.branding) {
     return style;

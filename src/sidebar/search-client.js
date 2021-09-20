@@ -48,7 +48,7 @@ function defaultPageSize(index) {
 export class SearchClient extends TinyEmitter {
   /**
    * @param {(query: SearchQuery) => Promise<SearchResult>} searchFn - Function for querying the search API
-   * @param {Object} options
+   * @param {object} options
    *   @param {(index: number) => number} [options.getPageSize] -
    *     Callback that returns the page size to use when fetching the index'th
    *     page of results.  Callers can vary this to balance the latency of

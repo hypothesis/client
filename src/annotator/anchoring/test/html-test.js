@@ -37,7 +37,7 @@ function findNode(context, query) {
  * Resolve a serialized description of a range into a Range object.
  *
  * @param {Element} root
- * @param {Object} descriptor
+ * @param {object} descriptor
  */
 function toRange(root, descriptor) {
   let startNode;

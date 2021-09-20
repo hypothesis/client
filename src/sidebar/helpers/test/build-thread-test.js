@@ -55,7 +55,7 @@ function filter(thread, keys) {
  * which do not match `keys`.
  *
  * @param {Array<Annotation>} fixture - List of annotations to thread
- * @param {Object?} opts - Options to pass to buildThread()
+ * @param {object?} opts - Options to pass to buildThread()
  * @param {Array<string>?} keys - List of keys to keep in the output
  */
 function createThread(fixture, options, keys) {

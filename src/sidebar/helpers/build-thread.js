@@ -66,7 +66,7 @@ function hasPathToRoot(threads, id, ancestorId) {
 
 /**
  * Link the thread's annotation to its parent
- * @param {Object.<string,Thread>} threads
+ * @param {Record<string,Thread>} threads
  * @param {string} id
  * @param {string[]} [parents] - ids of parent annotations, from the
  *        annotation's `references` field. Immediate parent is last entry.
@@ -111,7 +111,7 @@ function setParent(threads, id, parents = []) {
  * @return {Thread} - The input annotations threaded into a tree structure.
  */
 function threadAnnotations(annotations) {
-  /** @type {Object.<string,Thread>} */
+  /** @type {Record<string,Thread>} */
   const threads = {};
 
   // Create a `Thread` for each annotation
@@ -228,7 +228,7 @@ function hasVisibleChildren(thread) {
 
 /**
  * @typedef BuildThreadOptions
- * @prop {Object.<string, boolean>} expanded - Map of thread id => expansion state
+ * @prop {Record<string, boolean>} expanded - Map of thread id => expansion state
  * @prop {string[]} forcedVisible - List of $tags of annotations that have
  *       been explicitly expanded by the user, even if they don't
  *       match current filters
