@@ -11,18 +11,18 @@ import {
   setHighlightsFocused,
   setHighlightsVisible,
 } from './highlighter';
-import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
 
 /**
- * @typedef {import('./util/emitter').EventBus} EventBus
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Anchor} Anchor
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('../types/annotator').Integration} Integration
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
+ * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -110,9 +110,10 @@ export default class Guest {
    *   or create annotations. In an ordinary web page this typically `document.body`.
    * @param {EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
+   * @param {Integration} integration
    * @param {Record<string, any>} [config]
    */
-  constructor(element, eventBus, config = {}) {
+  constructor(element, eventBus, integration, config = {}) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
     this._visibleHighlights = false;
@@ -156,7 +157,7 @@ export default class Guest {
      * Integration that handles document-type specific functionality in the
      * guest.
      */
-    this._integration = createIntegration(this, config.documentType);
+    this._integration = integration;
 
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame

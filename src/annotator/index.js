@@ -19,10 +19,7 @@ registerIcons(iconSet);
 
 import { getConfig } from './config/index';
 import Guest from './guest';
-import {
-  loadClientInVitalSourceContentFrame,
-  vitalSourceFrameRole,
-} from './integrations/vitalsource';
+import { createIntegration } from './integrations';
 import Notebook from './notebook';
 import Sidebar from './sidebar';
 import { EventBus } from './util/emitter';
@@ -55,33 +52,35 @@ function init() {
   window_.__hypothesis = {};
 
   const annotatorConfig = getConfig('annotator');
+  const mainElement = document.body;
 
-  // Determine the document/application type and set up the appropriate integration.
-  let documentType;
-  const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
-  const vsFrameRole = vitalSourceFrameRole();
-  if (vsFrameRole !== null) {
-    documentType = 'vitalsource';
-    if (vsFrameRole === 'container-frame') {
-      loadClientInVitalSourceContentFrame(annotatorConfig.clientUrl);
-    }
-  } else {
-    documentType = isPDF ? 'pdf' : 'html';
-  }
+  /** @type {Guest} */
+  let guest;
+
+  // Create the integration which handles all the document-type specific logic.
+  const integration = createIntegration(
+    {
+      element: mainElement,
+      get anchors() {
+        return guest.anchors;
+      },
+      anchor(annotation) {
+        return guest.anchor(annotation);
+      },
+    },
+    annotatorConfig.clientUrl
+  );
 
   // Create the guest that handles creating annotations and displaying highlights.
   const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, {
-    ...annotatorConfig,
-    documentType,
-  });
+  guest = new Guest(mainElement, eventBus, integration, annotatorConfig);
 
   // Create the sidebar if this is the host frame. The `subFrameIdentifier`
   // config option indicates a non-host/guest-only frame.
   /** @type {Sidebar|undefined} */
   let sidebar;
   if (!annotatorConfig.subFrameIdentifier) {
-    sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
+    sidebar = new Sidebar(mainElement, eventBus, guest, getConfig('sidebar'));
 
     // Expose sidebar reference for use by same-origin guest frames.
     window_.__hypothesis.sidebar = sidebar;
@@ -89,7 +88,7 @@ function init() {
 
   // Clear `annotations` value from the notebook's config to prevent direct-linked
   // annotations from filtering the threads.
-  const notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
+  const notebook = new Notebook(mainElement, eventBus, getConfig('notebook'));
 
   // Set up communication between this host/guest frame and the sidebar frame.
   try {
@@ -109,7 +108,7 @@ function init() {
       sidebar.bucketBar.addGuest(guest);
     }
     const sidebarOrigin = new URL(sidebarLinkElement.href).origin;
-    const sidebar_ = sidebar;  // Avoids TS error in `then` callback
+    const sidebar_ = sidebar; // Avoids TS error in `then` callback
 
     sidebar.ready.then(() => {
       const frame = /** @type {Window} */ (sidebar_.iframe.contentWindow);

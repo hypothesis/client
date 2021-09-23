@@ -46,6 +46,11 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+export function isPDF() {
+  // @ts-ignore
+  return typeof PDFViewerApplication !== 'undefined';
+}
+
 /**
  * Integration that works with PDF.js
  * @implements {Integration}

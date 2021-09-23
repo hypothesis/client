@@ -10,24 +10,8 @@ import { parseJsonConfig } from '../../boot/parse-json-config';
  * @typedef {import('../../types/annotator').Selector} Selector
  */
 
-/**
- * Identify which frame this is in the VitalSource Bookshelf reader.
- *
- * Returns `null` if this is not Bookshelf, `container-frame` if this is frame
- * where the sidebar should be loaded or `content-frame` if this is the frame
- * containing the chapter content.
- *
- * @return {'container-frame'|'content-frame'|null}
- */
-export function vitalSourceFrameRole() {
-  if (!window.origin.endsWith('.vitalsource.com')) {
-    return null;
-  }
-  if (document.querySelector('mosaic-book')) {
-    return 'container-frame';
-  } else {
-    return 'content-frame';
-  }
+export function isVitalSource() {
+  return window.origin.endsWith('.vitalsource.com');
 }
 
 /**
@@ -57,7 +41,7 @@ async function waitForIFrameToLoad(frame) {
  *
  * @param {string} bootScript - URL to the client's boot script
  */
-export function loadClientInVitalSourceContentFrame(bootScript) {
+function loadClientInVitalSourceContentFrame(bootScript) {
   const bookElement = document.querySelector('mosaic-book');
   if (!bookElement || !bookElement.shadowRoot) {
     throw new Error(
@@ -151,8 +135,13 @@ export function loadClientInVitalSourceContentFrame(bootScript) {
 export class VitalSourceIntegration {
   /**
    * @param {HTMLElement} container
+   * @param {string} clientURL
    */
-  constructor(container) {
+  constructor(container, clientURL) {
+    if (document.querySelector('mosaic-book')) {
+      loadClientInVitalSourceContentFrame(clientURL);
+    }
+
     this._htmlIntegration = new HTMLIntegration(container);
 
     this._listeners = new ListenerCollection();

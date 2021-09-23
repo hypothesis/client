@@ -1,6 +1,6 @@
 import { HTMLIntegration } from './html';
-import { PDFIntegration } from './pdf';
-import { VitalSourceIntegration } from './vitalsource';
+import { PDFIntegration, isPDF } from './pdf';
+import { VitalSourceIntegration, isVitalSource } from './vitalsource';
 
 /**
  * @typedef {import('../../types/annotator').Annotator} Annotator
@@ -12,19 +12,16 @@ import { VitalSourceIntegration } from './vitalsource';
  *
  * Integrations handle the document-type specific functionality of guest frames.
  *
- * @param {Annotator} guest
- * @param {string} documentType
+ * @param {import('../../types/annotator').Annotator} annotator
+ * @param {string} clientURL
  * @return {Integration}
  */
-export function createIntegration(guest, documentType) {
-  switch (documentType) {
-    case 'html':
-      return new HTMLIntegration(guest.element);
-    case 'pdf':
-      return new PDFIntegration(guest);
-    case 'vitalsource':
-      return new VitalSourceIntegration(guest.element);
-    default:
-      throw new Error('Unable to create integration. Unknown document type');
+export function createIntegration(annotator, clientURL) {
+  if (isVitalSource()) {
+    return new VitalSourceIntegration(annotator.element, clientURL);
+  } else if (isPDF()) {
+    return new PDFIntegration(annotator);
+  } else {
+    return new HTMLIntegration(annotator.element);
   }
 }
