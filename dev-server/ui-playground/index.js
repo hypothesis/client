@@ -13,4 +13,4 @@ const extraRoutes = [
   },
 ];
 
-startApp({ extraRoutes, icons: sidebarIcons });
+startApp({ baseURL: '/ui-playground', extraRoutes, icons: sidebarIcons });
