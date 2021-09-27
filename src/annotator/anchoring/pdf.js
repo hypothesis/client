@@ -533,9 +533,8 @@ export async function anchor(root, selectors) {
       const { index, offset, text } = await findPageByOffset(position.start);
       const start = position.start - offset;
       const end = position.end - offset;
-      const length = end - start;
 
-      const matchedText = text.substr(start, length);
+      const matchedText = text.substring(start, end);
       if (quote.exact !== matchedText) {
         throw new Error('quote mismatch');
       }
