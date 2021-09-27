@@ -8,12 +8,15 @@ import { VitalSourceIntegration, isVitalSource } from './vitalsource';
  */
 
 /**
- * Create the `Integration` implementation for the given document type.
+ * Create the integration that handles document-type specific aspects of
+ * guest functionality.
  *
- * Integrations handle the document-type specific functionality of guest frames.
+ * This function creates the appropriate integration implementation for the
+ * current document.
  *
  * @param {import('../../types/annotator').Annotator} annotator
- * @param {string} clientURL
+ * @param {string} clientURL - URL of the boot script for the client. This is
+ *   used by some integrations to inject the client into child frames.
  * @return {Integration}
  */
 export function createIntegration(annotator, clientURL) {

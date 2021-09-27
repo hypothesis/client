@@ -46,6 +46,9 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/**
+ * Is the current document the PDF.js viewer application?
+ */
 export function isPDF() {
   // @ts-ignore
   return typeof PDFViewerApplication !== 'undefined';

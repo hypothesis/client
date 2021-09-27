@@ -19,7 +19,6 @@ registerIcons(iconSet);
 
 import { getConfig } from './config/index';
 import Guest from './guest';
-import { createIntegration } from './integrations';
 import Notebook from './notebook';
 import Sidebar from './sidebar';
 import { EventBus } from './util/emitter';
@@ -54,26 +53,9 @@ function init() {
   const annotatorConfig = getConfig('annotator');
   const mainElement = document.body;
 
-  /** @type {Guest} */
-  let guest;
-
-  // Create the integration which handles all the document-type specific logic.
-  const integration = createIntegration(
-    {
-      element: mainElement,
-      get anchors() {
-        return guest.anchors;
-      },
-      anchor(annotation) {
-        return guest.anchor(annotation);
-      },
-    },
-    annotatorConfig.clientUrl
-  );
-
   // Create the guest that handles creating annotations and displaying highlights.
   const eventBus = new EventBus();
-  guest = new Guest(mainElement, eventBus, integration, annotatorConfig);
+  const guest = new Guest(mainElement, eventBus, annotatorConfig);
 
   // Create the sidebar if this is the host frame. The `subFrameIdentifier`
   // config option indicates a non-host/guest-only frame.

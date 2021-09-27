@@ -10,6 +10,9 @@ import { parseJsonConfig } from '../../boot/parse-json-config';
  * @typedef {import('../../types/annotator').Selector} Selector
  */
 
+/**
+ * Is the current document the VitalSource Bookshelf reader?
+ */
 export function isVitalSource() {
   return window.origin.endsWith('.vitalsource.com');
 }
@@ -41,7 +44,7 @@ async function waitForIFrameToLoad(frame) {
  *
  * @param {string} bootScript - URL to the client's boot script
  */
-function loadClientInVitalSourceContentFrame(bootScript) {
+function loadClientInContentFrame(bootScript) {
   const bookElement = document.querySelector('mosaic-book');
   if (!bookElement || !bookElement.shadowRoot) {
     throw new Error(
@@ -139,7 +142,7 @@ export class VitalSourceIntegration {
    */
   constructor(container, clientURL) {
     if (document.querySelector('mosaic-book')) {
-      loadClientInVitalSourceContentFrame(clientURL);
+      loadClientInContentFrame(clientURL);
     }
 
     this._htmlIntegration = new HTMLIntegration(container);
