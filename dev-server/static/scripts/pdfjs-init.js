@@ -5,8 +5,6 @@
 // Listen for `webviewerloaded` event to configure the viewer after its files
 // have been loaded but before it is initialized.
 document.addEventListener('webviewerloaded', () => {
-  const app = window.PDFViewerApplication;
-
   // Prevent loading of default viewer PDF.
   PDFViewerApplicationOptions.set('defaultUrl', '');
 
@@ -29,7 +27,7 @@ document.addEventListener('webviewerloaded', () => {
     //
     // See https://github.com/mozilla/pdf.js/wiki/Frequently-Asked-Questions#can-i-specify-a-different-pdf-in-the-default-viewer
     // and https://github.com/mozilla/pdf.js/issues/10435#issuecomment-452706770
-    app.open({
+    PDFViewerApplication.open({
       // Load PDF through Via to work around CORS restrictions.
       url,
 
