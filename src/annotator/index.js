@@ -51,15 +51,10 @@ function init() {
   window_.__hypothesis = {};
 
   const annotatorConfig = getConfig('annotator');
-  const isPDF = typeof window_.PDFViewerApplication !== 'undefined';
 
+  // Create the guest that handles creating annotations and displaying highlights.
   const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, {
-    ...annotatorConfig,
-    // Load the PDF anchoring/metadata integration.
-    // nb. documentType is an internal config property only
-    documentType: isPDF ? 'pdf' : 'html',
-  });
+  const guest = new Guest(document.body, eventBus, annotatorConfig);
 
   // Create the sidebar if this is the host frame. The `subFrameIdentifier`
   // config option indicates a non-host/guest-only frame.

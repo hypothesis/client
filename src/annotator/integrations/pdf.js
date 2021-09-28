@@ -47,6 +47,14 @@ function delay(ms) {
 }
 
 /**
+ * Is the current document the PDF.js viewer application?
+ */
+export function isPDF() {
+  // @ts-ignore - TS doesn't know about PDFViewerApplication global.
+  return typeof PDFViewerApplication !== 'undefined';
+}
+
+/**
  * Integration that works with PDF.js
  * @implements {Integration}
  */
