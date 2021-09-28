@@ -38,10 +38,9 @@ describe('Guest', () => {
   let CrossFrame;
   let fakeCrossFrame;
 
-  let HTMLIntegration;
+  let fakeCreateIntegration;
   let fakeHTMLIntegration;
 
-  let PDFIntegration;
   let fakePDFIntegration;
   let guests;
 
@@ -90,7 +89,6 @@ describe('Guest', () => {
       scrollToAnchor: sinon.stub().resolves(),
       uri: sinon.stub().resolves('https://example.com/test.html'),
     };
-    HTMLIntegration = sinon.stub().returns(fakeHTMLIntegration);
 
     fakePDFIntegration = {
       contentContainer: sinon.stub().returns({}),
@@ -102,7 +100,8 @@ describe('Guest', () => {
       scrollToAnchor: sinon.stub().resolves(),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     };
-    PDFIntegration = sinon.stub().returns(fakePDFIntegration);
+
+    fakeCreateIntegration = sinon.stub().returns(fakeHTMLIntegration);
 
     class FakeSelectionObserver {
       constructor(callback) {
@@ -116,8 +115,7 @@ describe('Guest', () => {
       './anchoring/text-range': {
         TextRange: FakeTextRange,
       },
-      './integrations/html': { HTMLIntegration },
-      './integrations/pdf': { PDFIntegration },
+      './integrations': { createIntegration: fakeCreateIntegration },
       './highlighter': highlighter,
       './range-util': rangeUtil,
       './cross-frame': { CrossFrame },
@@ -404,7 +402,8 @@ describe('Guest', () => {
 
       context('in a PDF document', () => {
         it('calls the callback with PDF URL and metadata', done => {
-          guest = createGuest({ documentType: 'pdf' });
+          fakeCreateIntegration.returns(fakePDFIntegration);
+          guest = createGuest();
           const metadata = { title: 'hi' };
 
           fakePDFIntegration.getMetadata.resolves(metadata);
@@ -1129,7 +1128,8 @@ describe('Guest', () => {
     });
 
     it('cleans up PDF integration', () => {
-      const guest = createGuest({ documentType: 'pdf' });
+      fakeCreateIntegration.returns(fakePDFIntegration);
+      const guest = createGuest();
       guest.destroy();
       assert.calledOnce(fakePDFIntegration.destroy);
     });
@@ -1151,7 +1151,8 @@ describe('Guest', () => {
     });
 
     it('returns PDF viewer content container in PDF documents', () => {
-      const guest = createGuest({ documentType: 'pdf' });
+      fakeCreateIntegration.returns(fakePDFIntegration);
+      const guest = createGuest();
       assert.equal(
         guest.contentContainer(),
         fakePDFIntegration.contentContainer()
@@ -1161,29 +1162,34 @@ describe('Guest', () => {
 
   describe('#fitSideBySide', () => {
     ['html', 'pdf'].forEach(documentType => {
-      const getIntegration = () =>
-        documentType === 'html' ? fakeHTMLIntegration : fakePDFIntegration;
-
       context(`in a ${documentType} document`, () => {
+        let integration;
+
+        beforeEach(() => {
+          integration =
+            documentType === 'html' ? fakeHTMLIntegration : fakePDFIntegration;
+          fakeCreateIntegration.returns(integration);
+        });
+
         it('attempts to fit content alongside sidebar', () => {
           const guest = createGuest({ documentType });
-          getIntegration().fitSideBySide.returns(false);
+          integration.fitSideBySide.returns(false);
           const layout = { expanded: true, width: 100 };
 
           guest.fitSideBySide(layout);
 
-          assert.calledWith(getIntegration().fitSideBySide, layout);
+          assert.calledWith(integration.fitSideBySide, layout);
         });
 
         it('enables closing sidebar on document click if side-by-side is not activated', () => {
           const guest = createGuest({ documentType });
-          getIntegration().fitSideBySide.returns(false);
+          integration.fitSideBySide.returns(false);
           const layout = { expanded: true, width: 100 };
 
           guest.fitSideBySide(layout);
           assert.isFalse(guest.sideBySideActive);
 
-          getIntegration().fitSideBySide.returns(true);
+          integration.fitSideBySide.returns(true);
           guest.fitSideBySide(layout);
           assert.isTrue(guest.sideBySideActive);
         });
