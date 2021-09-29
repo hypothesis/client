@@ -71,6 +71,7 @@ describe('annotator/integrations/pdf', () => {
       fakePDFAnchoring = {
         RenderingStates,
         anchor: sinon.stub(),
+        canDescribe: sinon.stub().returns(true),
         describe: sinon.stub(),
         documentHasText: sinon.stub().resolves(true),
       };
@@ -174,6 +175,14 @@ describe('annotator/integrations/pdf', () => {
 
         assert.calledWith(fakePDFAnchoring.anchor, sinon.match.any, selectors);
         assert.equal(range, fakePDFAnchoring.anchor());
+      });
+    });
+
+    describe('#canAnnotate', () => {
+      it('checks if range is in text layer of PDF', () => {
+        const range = new Range();
+        assert.equal(pdfIntegration.canAnnotate(range), true);
+        assert.calledWith(fakePDFAnchoring.canDescribe, range);
       });
     });
 

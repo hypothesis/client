@@ -568,17 +568,14 @@ export async function anchor(root, selectors) {
 }
 
 /**
- * Convert a DOM Range object into a set of selectors.
+ * Prepare a DOM range for generating selectors and find the containing text layer.
  *
- * Converts a DOM `Range` object into a `[position, quote]` tuple of selectors
- * which can be saved with an annotation and later passed to `anchor` to
- * convert the selectors back to a `Range`.
+ * Throws if the range cannot be annotated.
  *
- * @param {HTMLElement} root - The root element
  * @param {Range} range
- * @return {Promise<Selector[]>}
+ * @return {[Range, Element]}
  */
-export async function describe(root, range) {
+function getTextLayerForRange(range) {
   // "Shrink" the range so that the start and endpoints are at offsets within
   // text nodes rather than any containing nodes.
   try {
@@ -598,18 +595,52 @@ export async function describe(root, range) {
     throw new Error('Selecting across page breaks is not supported');
   }
 
+  return [range, startTextLayer];
+}
+
+/**
+ * Return true if selectors can be generated for a range using `describe`.
+ *
+ * This function is faster than calling `describe` if the selectors are not
+ * required.
+ *
+ * @param {Range} range
+ */
+export function canDescribe(range) {
+  try {
+    getTextLayerForRange(range);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Convert a DOM Range object into a set of selectors.
+ *
+ * Converts a DOM `Range` object into a `[position, quote]` tuple of selectors
+ * which can be saved with an annotation and later passed to `anchor` to
+ * convert the selectors back to a `Range`.
+ *
+ * @param {HTMLElement} root - The root element
+ * @param {Range} range
+ * @return {Promise<Selector[]>}
+ */
+export async function describe(root, range) {
+  const [textRange, textLayer] = getTextLayerForRange(range);
+
   const startPos = TextPosition.fromPoint(
-    range.startContainer,
-    range.startOffset
-  ).relativeTo(startTextLayer);
+    textRange.startContainer,
+    textRange.startOffset
+  ).relativeTo(textLayer);
 
   const endPos = TextPosition.fromPoint(
-    range.endContainer,
-    range.endOffset
-  ).relativeTo(endTextLayer);
+    textRange.endContainer,
+    textRange.endOffset
+  ).relativeTo(textLayer);
 
   const startPageIndex = getSiblingIndex(
-    /** @type {Node} */ (startTextLayer.parentNode)
+    /** @type {Node} */ (textLayer.parentNode)
   );
   const pageOffset = await getPageOffset(startPageIndex);
 
@@ -620,7 +651,7 @@ export async function describe(root, range) {
     end: pageOffset + endPos.offset,
   };
 
-  const quote = TextQuoteAnchor.fromRange(root, range).toSelector();
+  const quote = TextQuoteAnchor.fromRange(root, textRange).toSelector();
 
   return [position, quote];
 }

@@ -26,6 +26,10 @@ export class HTMLIntegration {
     this._htmlMeta = new HTMLMetadata();
   }
 
+  canAnnotate() {
+    return true;
+  }
+
   destroy() {
     // There is nothing to do here yet.
   }

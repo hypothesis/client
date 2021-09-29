@@ -36,6 +36,14 @@ describe('HTMLIntegration', () => {
     assert.equal(integration.describe, fakeHTMLAnchoring.describe);
   });
 
+  describe('#canAnnotate', () => {
+    it('is always true', () => {
+      const integration = new HTMLIntegration();
+      const range = new Range();
+      assert.isTrue(integration.canAnnotate(range));
+    });
+  });
+
   describe('#contentContainer', () => {
     it('returns body by default', () => {
       const integration = new HTMLIntegration();
