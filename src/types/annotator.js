@@ -90,6 +90,9 @@
  * of supporting a specific document type (web page, PDF, ebook, etc.).
  *
  * @typedef IntegrationBase
+ * @prop {(range: Range) => boolean} canAnnotate -
+ *   Return whether the specified DOM range is part of the annotatable content
+ *   of the current document.
  * @prop {(root: HTMLElement, selectors: Selector[]) => Promise<Range>} anchor -
  *   Attempt to resolve a set of serialized selectors to the corresponding content in the
  *   current document.

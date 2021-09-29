@@ -5,6 +5,7 @@ import { ListenerCollection } from '../../shared/listener-collection';
 import {
   RenderingStates,
   anchor,
+  canDescribe,
   describe,
   documentHasText,
 } from '../anchoring/pdf';
@@ -165,6 +166,15 @@ export class PDFIntegration {
     // nb. The `root` argument is not really used by `anchor`. It existed for
     // consistency between HTML and PDF anchoring and could be removed.
     return anchor(root, selectors);
+  }
+
+  /**
+   * Return true if the text in a range lies within the text layer of a PDF.
+   *
+   * @param {Range} range
+   */
+  canAnnotate(range) {
+    return canDescribe(range);
   }
 
   /**

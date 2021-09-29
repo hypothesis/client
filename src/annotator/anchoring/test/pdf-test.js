@@ -90,7 +90,7 @@ describe('annotator/anchoring/pdf', () => {
     container.remove();
   });
 
-  describe('#describe', () => {
+  describe('describe', () => {
     it('returns position and quote selectors', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
@@ -234,7 +234,50 @@ describe('annotator/anchoring/pdf', () => {
     });
   });
 
-  describe('#anchor', () => {
+  describe('canDescribe', () => {
+    it('returns true if range is in text layer', () => {
+      viewer.pdfViewer.setCurrentPage(2);
+      const range = findText(container, 'Netherfield Park');
+      assert.isTrue(pdfAnchoring.canDescribe(range));
+    });
+
+    // nb. These tests should correspond to the situations where `describe` throws.
+    it('returns false if range does not contain any text', () => {
+      viewer.pdfViewer.setCurrentPage(2, 3);
+
+      const range = new Range();
+      const el = document.createElement('div');
+      range.setStart(el, 0);
+      range.setEnd(el, 0);
+
+      assert.isFalse(pdfAnchoring.canDescribe(range));
+    });
+
+    it('returns false if range spans multiple pages', () => {
+      viewer.pdfViewer.setCurrentPage(2, 3);
+      const firstPageRange = findText(container, 'occupied again?');
+      const secondPageRange = findText(container, 'NODE A');
+      const range = new Range();
+      range.setStart(firstPageRange.startContainer, firstPageRange.startOffset);
+      range.setEnd(secondPageRange.startContainer, secondPageRange.endOffset);
+
+      assert.isFalse(pdfAnchoring.canDescribe(range));
+    });
+
+    it('returns false if range is outside text layer', () => {
+      viewer.pdfViewer.setCurrentPage(2, 3);
+
+      const range = new Range();
+      const el = document.createElement('div');
+      el.append('foobar');
+      range.setStart(el.firstChild, 0);
+      range.setEnd(el.firstChild, 6);
+
+      assert.isFalse(pdfAnchoring.canDescribe(range));
+    });
+  });
+
+  describe('anchor', () => {
     it('anchors previously created selectors if the page is rendered', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'My dear Mr. Bennet');

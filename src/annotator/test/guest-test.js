@@ -80,6 +80,7 @@ describe('Guest', () => {
 
     fakeIntegration = {
       anchor: sinon.stub(),
+      canAnnotate: sinon.stub().returns(true),
       contentContainer: sinon.stub().returns({}),
       describe: sinon.stub(),
       destroy: sinon.stub(),
@@ -592,6 +593,17 @@ describe('Guest', () => {
       createGuest();
       notifySelectionChanged(null);
       assert.called(FakeAdder.instance.hide);
+    });
+
+    it('hides the adder if the integration indicates that the selection cannot be annotated', () => {
+      // Simulate integration indicating text is not part of annotatable content
+      // (eg. text that is part of the PDF.js UI)
+      fakeIntegration.canAnnotate.returns(false);
+
+      createGuest();
+      simulateSelectionWithText();
+
+      assert.notCalled(FakeAdder.instance.show);
     });
 
     it('emits `hasSelectionChanged` event with argument `true` if selection is non-empty', () => {

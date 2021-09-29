@@ -545,6 +545,11 @@ export default class Guest {
    * @param {Range} range
    */
   _onSelection(range) {
+    if (!this._integration.canAnnotate(range)) {
+      this._onClearSelection();
+      return;
+    }
+
     const selection = /** @type {Selection} */ (document.getSelection());
     const isBackwards = rangeUtil.isSelectionBackwards(selection);
     const focusRect = rangeUtil.selectionFocusRect(selection);
