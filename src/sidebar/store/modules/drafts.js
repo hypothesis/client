@@ -3,6 +3,7 @@ import { createSelector } from 'reselect';
 import * as metadata from '../../helpers/annotation-metadata';
 import * as util from '../util';
 import { createStoreModule } from '../create-store';
+import { removeAnnotations } from './annotations';
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
@@ -97,8 +98,6 @@ function createDraft(annotation, changes) {
  * An empty draft has no text and no reference tags.
  */
 function deleteNewAndEmptyDrafts() {
-  const { removeAnnotations } = require('./annotations');
-
   return (dispatch, getState) => {
     const newDrafts = getState().drafts.filter(draft => {
       return (

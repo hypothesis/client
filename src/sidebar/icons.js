@@ -1,54 +1,100 @@
-// @ts-nocheck - TS doesn't understand `require('.../icon.svg')`
+// @ts-nocheck - TS doesn't understand SVG imports.
+
+import addIcon from '../images/icons/add.svg';
+import annotateIcon from '../images/icons/annotate.svg';
+import arrowLeftIcon from '../images/icons/arrow-left.svg';
+import arrowRightIcon from '../images/icons/arrow-right.svg';
+import cancelIcon from '../images/icons/cancel.svg';
+import caretRightIcon from '../images/icons/caret-right.svg';
+import ccStdIcon from '../images/icons/cc-std.svg';
+import ccZeroIcon from '../images/icons/cc-zero.svg';
+import collapseMenuIcon from '../images/icons/collapse-menu.svg';
+import collapsedIcon from '../images/icons/collapsed.svg';
+import copyIcon from '../images/icons/copy.svg';
+import cursorIcon from '../images/icons/cursor.svg';
+import editIcon from '../images/icons/edit.svg';
+import emailIcon from '../images/icons/email.svg';
+import expandMenuIcon from '../images/icons/expand-menu.svg';
+import externalIcon from '../images/icons/external.svg';
+import facebookIcon from '../images/icons/facebook.svg';
+import flagIcon from '../images/icons/flag.svg';
+import flagActiveIcon from '../images/icons/flag--active.svg';
+import formatBoldIcon from '../images/icons/format-bold.svg';
+import formatFunctionsIcon from '../images/icons/format-functions.svg';
+import formatItalicIcon from '../images/icons/format-italic.svg';
+import formatListNumberedIcon from '../images/icons/format-list-numbered.svg';
+import formatListUnorderedIcon from '../images/icons/format-list-unordered.svg';
+import formatQuoteIcon from '../images/icons/format-quote.svg';
+import groupsIcon from '../images/icons/groups.svg';
+import helpIcon from '../images/icons/help.svg';
+import highlightIcon from '../images/icons/highlight.svg';
+import imageIcon from '../images/icons/image.svg';
+import leaveIcon from '../images/icons/leave.svg';
+import linkIcon from '../images/icons/link.svg';
+import lockIcon from '../images/icons/lock.svg';
+import logoIcon from '../images/icons/logo.svg';
+import pointerIcon from '../images/icons/pointer.svg';
+import profileIcon from '../images/icons/profile.svg';
+import publicIcon from '../images/icons/public.svg';
+import refreshIcon from '../images/icons/refresh.svg';
+import restrictedIcon from '../images/icons/restricted.svg';
+import replyIcon from '../images/icons/reply.svg';
+import searchIcon from '../images/icons/search.svg';
+import shareIcon from '../images/icons/share.svg';
+import checkIcon from '../images/icons/check.svg';
+import sortIcon from '../images/icons/sort.svg';
+import trashIcon from '../images/icons/trash.svg';
+import twitterIcon from '../images/icons/twitter.svg';
 
 /**
  * Set of icons used by the sidebar application via the `SvgIcon`
  * component.
  */
 export default {
-  add: require('../images/icons/add.svg'),
-  annotate: require('../images/icons/annotate.svg'),
-  'arrow-left': require('../images/icons/arrow-left.svg'),
-  'arrow-right': require('../images/icons/arrow-right.svg'),
-  cancel: require('../images/icons/cancel.svg'),
-  'caret-right': require('../images/icons/caret-right.svg'),
-  'cc-std': require('../images/icons/cc-std.svg'),
-  'cc-zero': require('../images/icons/cc-zero.svg'),
-  'collapse-menu': require('../images/icons/collapse-menu.svg'),
-  collapsed: require('../images/icons/collapsed.svg'),
-  copy: require('../images/icons/copy.svg'),
-  cursor: require('../images/icons/cursor.svg'),
-  edit: require('../images/icons/edit.svg'),
-  email: require('../images/icons/email.svg'),
-  'expand-menu': require('../images/icons/expand-menu.svg'),
-  error: require('../images/icons/cancel.svg'),
-  external: require('../images/icons/external.svg'),
-  facebook: require('../images/icons/facebook.svg'),
-  flag: require('../images/icons/flag.svg'),
-  'flag--active': require('../images/icons/flag--active.svg'),
-  'format-bold': require('../images/icons/format-bold.svg'),
-  'format-functions': require('../images/icons/format-functions.svg'),
-  'format-italic': require('../images/icons/format-italic.svg'),
-  'format-list-numbered': require('../images/icons/format-list-numbered.svg'),
-  'format-list-unordered': require('../images/icons/format-list-unordered.svg'),
-  'format-quote': require('../images/icons/format-quote.svg'),
-  groups: require('../images/icons/groups.svg'),
-  help: require('../images/icons/help.svg'),
-  highlight: require('../images/icons/highlight.svg'),
-  image: require('../images/icons/image.svg'),
-  leave: require('../images/icons/leave.svg'),
-  link: require('../images/icons/link.svg'),
-  lock: require('../images/icons/lock.svg'),
-  logo: require('../images/icons/logo.svg'),
-  pointer: require('../images/icons/pointer.svg'),
-  profile: require('../images/icons/profile.svg'),
-  public: require('../images/icons/public.svg'),
-  refresh: require('../images/icons/refresh.svg'),
-  restricted: require('../images/icons/restricted.svg'),
-  reply: require('../images/icons/reply.svg'),
-  search: require('../images/icons/search.svg'),
-  share: require('../images/icons/share.svg'),
-  success: require('../images/icons/check.svg'),
-  sort: require('../images/icons/sort.svg'),
-  trash: require('../images/icons/trash.svg'),
-  twitter: require('../images/icons/twitter.svg'),
+  add: addIcon,
+  annotate: annotateIcon,
+  'arrow-left': arrowLeftIcon,
+  'arrow-right': arrowRightIcon,
+  cancel: cancelIcon,
+  'caret-right': caretRightIcon,
+  'cc-std': ccStdIcon,
+  'cc-zero': ccZeroIcon,
+  'collapse-menu': collapseMenuIcon,
+  collapsed: collapsedIcon,
+  copy: copyIcon,
+  cursor: cursorIcon,
+  edit: editIcon,
+  email: emailIcon,
+  'expand-menu': expandMenuIcon,
+  error: cancelIcon,
+  external: externalIcon,
+  facebook: facebookIcon,
+  flag: flagIcon,
+  'flag--active': flagActiveIcon,
+  'format-bold': formatBoldIcon,
+  'format-functions': formatFunctionsIcon,
+  'format-italic': formatItalicIcon,
+  'format-list-numbered': formatListNumberedIcon,
+  'format-list-unordered': formatListUnorderedIcon,
+  'format-quote': formatQuoteIcon,
+  groups: groupsIcon,
+  help: helpIcon,
+  highlight: highlightIcon,
+  image: imageIcon,
+  leave: leaveIcon,
+  link: linkIcon,
+  lock: lockIcon,
+  logo: logoIcon,
+  pointer: pointerIcon,
+  profile: profileIcon,
+  public: publicIcon,
+  refresh: refreshIcon,
+  restricted: restrictedIcon,
+  reply: replyIcon,
+  search: searchIcon,
+  share: shareIcon,
+  success: checkIcon,
+  sort: sortIcon,
+  trash: trashIcon,
+  twitter: twitterIcon,
 };
