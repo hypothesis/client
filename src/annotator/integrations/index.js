@@ -10,9 +10,6 @@ import { PDFIntegration, isPDF } from './pdf';
  * Create the integration that handles document-type specific aspects of
  * guest functionality.
  *
- * This function creates the appropriate integration implementation for the
- * current document.
- *
  * @param {Annotator} annotator
  * @return {Integration}
  */
