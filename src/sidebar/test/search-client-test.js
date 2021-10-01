@@ -1,13 +1,10 @@
+import { delay } from '../../test-util/wait';
 import { ResultSizeError, SearchClient } from '../search-client';
 
 function awaitEvent(emitter, event) {
   return new Promise(resolve => {
     emitter.on(event, resolve);
   });
-}
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const RESULTS = [

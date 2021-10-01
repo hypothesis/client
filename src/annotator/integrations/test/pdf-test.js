@@ -1,12 +1,8 @@
-import { PDFIntegration, isPDF, $imports } from '../pdf';
-
+import { delay } from '../../../test-util/wait';
 import FakePDFViewerApplication from '../../anchoring/test/fake-pdf-viewer-application';
 import { RenderingStates } from '../../anchoring/pdf';
 import { createPlaceholder } from '../../anchoring/placeholder';
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
+import { PDFIntegration, isPDF, $imports } from '../pdf';
 
 function awaitEvent(target, eventName) {
   return new Promise(resolve => {

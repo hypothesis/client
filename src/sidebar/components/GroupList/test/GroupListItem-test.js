@@ -1,11 +1,8 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
+import { delay } from '../../../../test-util/wait';
 import GroupListItem, { $imports } from '../GroupListItem';
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 describe('GroupListItem', () => {
   let fakeConfirm;

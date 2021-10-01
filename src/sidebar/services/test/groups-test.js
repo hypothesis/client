@@ -1,6 +1,6 @@
+import { delay, waitFor } from '../../../test-util/wait';
 import fakeReduxStore from '../../test/fake-redux-store';
 import { GroupsService, $imports } from '../groups';
-import { waitFor } from '../../../test-util/wait';
 
 /**
  * Generate a truth table containing every possible combination of a set of
@@ -837,8 +837,6 @@ describe('GroupsService', () => {
       });
     });
   });
-
-  const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
   describe('automatic re-fetching', () => {
     it('refetches groups when the logged-in user changes', async () => {
