@@ -1,5 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
+import { delay } from '../../../test-util/wait';
 import { PDFMetadata } from '../pdf-metadata';
 
 /**
@@ -155,10 +156,6 @@ class FakePDFViewerApplication {
   completeInit() {
     this._resolveInitializedPromise();
   }
-}
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 describe('PDFMetadata', () => {

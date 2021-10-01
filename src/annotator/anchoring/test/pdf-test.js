@@ -1,3 +1,4 @@
+import { delay } from '../../../test-util/wait';
 import * as pdfAnchoring from '../pdf';
 import { matchQuote } from '../match-quote';
 import { TextRange } from '../text-range';
@@ -17,10 +18,6 @@ function findText(container, text) {
     throw new Error('Text not found');
   }
   return TextRange.fromOffsets(container, pos, pos + text.length).toRange();
-}
-
-function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 const fixtures = {

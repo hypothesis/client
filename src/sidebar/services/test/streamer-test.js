@@ -1,5 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
+import { delay } from '../../../test-util/wait';
 import fakeReduxStore from '../../test/fake-redux-store';
 import { StreamerService, $imports } from '../streamer';
 
@@ -251,10 +252,6 @@ describe('StreamerService', () => {
   });
 
   describe('Automatic reconnection', () => {
-    function delay(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     it('should reconnect when user changes', () => {
       let oldWebSocket;
       createDefaultStreamer();
