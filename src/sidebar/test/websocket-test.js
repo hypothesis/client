@@ -25,7 +25,7 @@ describe('websocket wrapper', () => {
   const WebSocket = window.WebSocket;
 
   beforeEach(() => {
-    global.WebSocket = FakeWebSocket;
+    globalThis.WebSocket = FakeWebSocket;
     clock = sinon.useFakeTimers();
     connectionCount = 0;
 
@@ -36,7 +36,7 @@ describe('websocket wrapper', () => {
   });
 
   afterEach(() => {
-    global.WebSocket = WebSocket;
+    globalThis.WebSocket = WebSocket;
     clock.restore();
     console.warn.restore();
     console.error.restore();
