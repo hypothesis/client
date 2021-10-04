@@ -570,10 +570,9 @@ export async function anchor(root, selectors) {
 /**
  * Prepare a DOM range for generating selectors and find the containing text layer.
  *
- * Throws if the range cannot be annotated.
- *
  * @param {Range} range
  * @return {[Range, Element]}
+ * @throws If the range cannot be annotated
  */
 function getTextLayerForRange(range) {
   // "Shrink" the range so that the start and endpoints are at offsets within
