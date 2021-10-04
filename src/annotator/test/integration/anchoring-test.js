@@ -4,6 +4,7 @@
 import Guest from '../../guest';
 import { $imports as guestImports } from '../../guest';
 import { EventBus } from '../../util/emitter';
+import testPageHTML from './test-page.html';
 
 function quoteSelector(quote) {
   return {
@@ -64,7 +65,7 @@ describe('anchoring', () => {
   beforeEach(() => {
     sinon.stub(console, 'warn');
     container = document.createElement('div');
-    container.innerHTML = require('./test-page.html');
+    container.innerHTML = testPageHTML;
     document.body.appendChild(container);
     const eventBus = new EventBus();
     guest = new Guest(container, eventBus);

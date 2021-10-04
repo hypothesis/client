@@ -11,7 +11,8 @@ import { APIService } from '../api';
 //
 // `curl https://hypothes.is/api/ | sed 's/hypothes.is/example.com/g' | jq . > api-index.json`
 //
-const routes = require('./api-index.json').links;
+import apiIndex from './api-index.json';
+const routes = apiIndex.links;
 
 describe('APIService', () => {
   let fakeAuth;
