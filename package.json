@@ -95,7 +95,7 @@
     "watchify": "^4.0.0",
     "wrap-text": "^1.0.7"
   },
-  "browserslist": "chrome 57, edge 17, firefox 53, safari 10.1",
+  "browserslist": "chrome 70, firefox 70, safari 11.1",
   "browserify": {
     "transform": [
       "browserify-versionify",
