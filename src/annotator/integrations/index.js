@@ -1,5 +1,10 @@
 import { HTMLIntegration } from './html';
 import { PDFIntegration, isPDF } from './pdf';
+import {
+  VitalSourceContentIntegration,
+  VitalSourceContainerIntegration,
+  vitalSourceFrameRole,
+} from './vitalsource';
 
 /**
  * @typedef {import('../../types/annotator').Annotator} Annotator
@@ -16,7 +21,14 @@ import { PDFIntegration, isPDF } from './pdf';
 export function createIntegration(annotator) {
   if (isPDF()) {
     return new PDFIntegration(annotator);
-  } else {
-    return new HTMLIntegration();
   }
+
+  const vsFrameRole = vitalSourceFrameRole();
+  if (vsFrameRole === 'container') {
+    return new VitalSourceContainerIntegration(annotator);
+  } else if (vsFrameRole === 'content') {
+    return new VitalSourceContentIntegration();
+  }
+
+  return new HTMLIntegration();
 }
