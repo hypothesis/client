@@ -61,9 +61,15 @@ export class VitalSourceContainerIntegration {
         annotator.injectClient(frame);
       }
     };
+
+    injectClientIntoContentFrame();
+
+    // Re-inject client into content frame after a chapter navigation.
+    //
+    // We currently don't do any debouncing here and rely on `injectClient` to
+    // be idempotent and cheap.
     this._frameObserver = new MutationObserver(injectClientIntoContentFrame);
     this._frameObserver.observe(shadowRoot, { childList: true, subtree: true });
-    injectClientIntoContentFrame();
   }
 
   destroy() {
