@@ -241,6 +241,17 @@ export default class Guest {
   }
 
   /**
+   * Inject the Hypothesis client into a guest frame.
+   *
+   * @param {HTMLIFrameElement} frame
+   */
+  // eslint-disable-next-line no-unused-vars
+  async injectClient(frame) {
+    /* istanbul ignore next */
+    console.warn('Guest#injectClient is not yet implemented.');
+  }
+
+  /**
    * Retrieve metadata for the current document.
    */
   async getDocumentInfo() {
