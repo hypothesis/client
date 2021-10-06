@@ -276,6 +276,7 @@ async function buildAndRunTests() {
     .map(path => `import "../../${path}";`)
     .join('\n');
 
+  mkdirSync('build/scripts', { recursive: true });
   writeFileSync('build/scripts/test-inputs.js', testSource);
 
   log(`Building test bundle... (${testFiles.length} files)`);
