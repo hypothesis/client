@@ -65,12 +65,13 @@
  */
 
 /**
- * Subset of the annotator `Guest` instance that is exposed to other modules
+ * Subset of the `Guest` class that is exposed to integrations.
  *
  * @typedef Annotator
  * @prop {Anchor[]} anchors
  * @prop {(ann: AnnotationData) => Promise<Anchor[]>} anchor
- * @prop {(frame: HTMLIFrameElement) => void} injectClient
+ * @prop {(frame: HTMLIFrameElement) => void} injectClient - Inject the Hypothesis client
+ *   into a same-origin iframe in guest mode.
  */
 
 /**
