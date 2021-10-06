@@ -165,7 +165,7 @@ describe('annotator/integrations/vitalsource', () => {
     });
 
     it('delegates to HTML integration for anchoring', async () => {
-      await integration.contentContainer();
+      integration.contentContainer();
       assert.calledWith(fakeHTMLIntegration.contentContainer);
 
       const range = new Range();
