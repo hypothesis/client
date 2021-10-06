@@ -18,6 +18,7 @@ import { normalizeURI } from './util/url';
 
 /**
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../types/annotator').Annotator} Annotator
  * @typedef {import('../types/annotator').Anchor} Anchor
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
@@ -101,7 +102,8 @@ function resolveAnchor(anchor) {
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
  *
- * @implements Destroyable
+ * @implements {Annotator}
+ * @implements {Destroyable}
  */
 export default class Guest {
   /**
