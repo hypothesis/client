@@ -444,7 +444,7 @@ describe('FrameSyncService', () => {
 
     it('removes the frame from the frames list', () => {
       frameSync.connect();
-      guestBridge().emit('destroyFrame', frameId);
+      hostBridge().emit('destroyFrame', frameId);
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
     });

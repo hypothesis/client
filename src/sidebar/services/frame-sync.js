@@ -130,15 +130,6 @@ export class FrameSyncService {
       );
     };
 
-    /** @param {string|null} frameIdentifier */
-    const destroyFrame = frameIdentifier => {
-      const frames = store.frames();
-      const frameToDestroy = frames.find(frame => frame.id === frameIdentifier);
-      if (frameToDestroy) {
-        store.destroyFrame(frameToDestroy);
-      }
-    };
-
     /**
      * Listen for messages coming in from connected guest frames and add new annotations
      * to the sidebar.
@@ -162,13 +153,6 @@ export class FrameSyncService {
         // Create the new annotation in the sidebar.
         annotationsService.create(annot);
       });
-
-      // The `destroyFrame` message currently comes from the guests, but we'll
-      // likely need to route it via the host <-> sidebar channel to work around
-      // a Safari bug (https://bugs.webkit.org/show_bug.cgi?id=231167).
-      this._guestRPC.on('destroyFrame', frameIdentifier =>
-        destroyFrame(frameIdentifier)
-      );
 
       // Map of annotation tag to anchoring status
       // ('anchored'|'orphan'|'timeout').
@@ -267,6 +251,16 @@ export class FrameSyncService {
 
     this._hostRPC.on('sidebarOpened', () => {
       this._store.setSidebarOpened(true);
+    });
+
+    // Listen for notifications of a guest being unloaded. This message is routed
+    // via the host frame rather than coming directly from the unloaded guest
+    // to work around https://bugs.webkit.org/show_bug.cgi?id=231167.
+    this._hostRPC.on('destroyFrame', frameIdentifier => {
+      const frame = this._store.frames().find(f => f.id === frameIdentifier);
+      if (frame) {
+        this._store.destroyFrame(frame);
+      }
     });
 
     // When user toggles the highlight visibility control in the sidebar container,

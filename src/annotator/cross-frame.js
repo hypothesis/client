@@ -29,11 +29,7 @@ export class CrossFrame {
   constructor(element, eventBus, config) {
     this._bridge = new Bridge();
     this._annotationSync = new AnnotationSync(eventBus, this._bridge);
-    this._hypothesisInjector = new HypothesisInjector(
-      element,
-      this._bridge,
-      config
-    );
+    this._hypothesisInjector = new HypothesisInjector(element, config);
   }
 
   /**

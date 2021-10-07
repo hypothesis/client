@@ -1,7 +1,6 @@
 import { FrameObserver } from './frame-observer';
 
 /**
- * @typedef {import('../shared/bridge').Bridge} Bridge
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
@@ -16,19 +15,15 @@ export class HypothesisInjector {
   /**
    * @param {Element} element - root of the DOM subtree to watch for the
    *   addition and removal of annotatable iframes
-   * @param {Bridge} bridge - Channel for communicating with the sidebar
    * @param {Record<string, any>} config - Annotator configuration that is
    *   injected, along with the Hypothesis client, into the child iframes
    */
-  constructor(element, bridge, config) {
-    this._bridge = bridge;
+  constructor(element, config) {
     this._config = config;
-    /** @type {Map<HTMLIFrameElement, string>} */
-    this._frameIdentifiers = new Map();
     this._frameObserver = new FrameObserver(
       element,
       frame => this._addHypothesis(frame),
-      frame => this._removeHypothesis(frame)
+      () => {}
     );
   }
 
@@ -55,7 +50,6 @@ export class HypothesisInjector {
 
     // Generate a random string to use as a frame ID. The format is not important.
     const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
-    this._frameIdentifiers.set(frame, subFrameIdentifier);
     const injectedConfig = {
       ...this._config,
       subFrameIdentifier,
@@ -63,14 +57,6 @@ export class HypothesisInjector {
 
     const { clientUrl } = this._config;
     injectHypothesis(frame, clientUrl, injectedConfig);
-  }
-
-  /**
-   * @param {HTMLIFrameElement} frame
-   */
-  _removeHypothesis(frame) {
-    this._bridge.call('destroyFrame', this._frameIdentifiers.get(frame));
-    this._frameIdentifiers.delete(frame);
   }
 }
 

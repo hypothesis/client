@@ -3,7 +3,6 @@ import { HypothesisInjector } from '../../hypothesis-injector';
 
 describe('HypothesisInjector integration test', () => {
   let container;
-  let fakeBridge;
   let hypothesisInjectors;
 
   const sandbox = sinon.createSandbox();
@@ -22,7 +21,7 @@ describe('HypothesisInjector integration test', () => {
   }
 
   function createHypothesisInjector() {
-    const injector = new HypothesisInjector(container, fakeBridge, config);
+    const injector = new HypothesisInjector(container, config);
     hypothesisInjectors.push(injector);
     return injector;
   }
@@ -35,11 +34,6 @@ describe('HypothesisInjector integration test', () => {
   }
 
   beforeEach(() => {
-    fakeBridge = {
-      createChannel: sandbox.stub(),
-      call: sandbox.stub(),
-      destroy: sandbox.stub(),
-    };
     hypothesisInjectors = [];
 
     container = document.createElement('div');
@@ -72,21 +66,6 @@ describe('HypothesisInjector integration test', () => {
       getHypothesisScript(invalidFrame),
       'expected invalid iframe to not include the Hypothesis script'
     );
-  });
-
-  it('detects removed iframes', async () => {
-    // Create a iframe before initializing
-    const iframe = createAnnotatableIFrame();
-
-    // Now initialize
-    createHypothesisInjector();
-    await onDocumentReady(iframe);
-
-    // Remove the iframe
-    iframe.remove();
-    await waitForFrameObserver();
-
-    assert.calledWith(fakeBridge.call, 'destroyFrame');
   });
 
   it('injects embed script in iframe', async () => {
@@ -133,21 +112,6 @@ describe('HypothesisInjector integration test', () => {
       getHypothesisScript(iframe),
       'expected dynamically added iframe to include the Hypothesis script'
     );
-  });
-
-  it('detects dynamically removed iframes', async () => {
-    // Create a iframe before initializing
-    const iframe = createAnnotatableIFrame();
-
-    // Now initialize
-    createHypothesisInjector();
-    await waitForFrameObserver();
-    await onDocumentReady(iframe);
-
-    iframe.remove();
-    await waitForFrameObserver();
-
-    assert.calledWith(fakeBridge.call, 'destroyFrame');
   });
 
   it('detects an iframe dynamically removed, and added again', async () => {

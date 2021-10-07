@@ -35,6 +35,8 @@ describe('Guest', () => {
   let rangeUtil;
   let notifySelectionChanged;
 
+  let hostFrame;
+
   let CrossFrame;
   let fakeCrossFrame;
 
@@ -46,7 +48,7 @@ describe('Guest', () => {
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
     eventBus = new EventBus();
-    const guest = new Guest(element, eventBus, config);
+    const guest = new Guest(element, eventBus, config, hostFrame);
     guests.push(guest);
     return guest;
   };
@@ -94,6 +96,10 @@ describe('Guest', () => {
     };
 
     fakeCreateIntegration = sinon.stub().returns(fakeIntegration);
+
+    hostFrame = {
+      postMessage: sinon.stub(),
+    };
 
     class FakeSelectionObserver {
       constructor(callback) {
@@ -1121,6 +1127,36 @@ describe('Guest', () => {
       guest.destroy();
       assert.calledWith(highlighter.removeAllHighlights, guest.element);
     });
+
+    it('notifies host frame that guest has been unloaded', () => {
+      const guest = createGuest({ subFrameIdentifier: 'frame-id' });
+
+      guest.destroy();
+
+      assert.calledWith(
+        hostFrame.postMessage,
+        {
+          type: 'hypothesisGuestUnloaded',
+          frameIdentifier: 'frame-id',
+        },
+        '*'
+      );
+    });
+  });
+
+  it('notifies host frame when guest frame is unloaded', () => {
+    createGuest({ subFrameIdentifier: 'frame-id' });
+
+    window.dispatchEvent(new Event('unload'));
+
+    assert.calledWith(
+      hostFrame.postMessage,
+      {
+        type: 'hypothesisGuestUnloaded',
+        frameIdentifier: 'frame-id',
+      },
+      '*'
+    );
   });
 
   describe('#contentContainer', () => {

@@ -209,6 +209,17 @@ export default class Sidebar {
         }
       });
     });
+
+    // Notify sidebar when a guest is unloaded. This message is routed via
+    // the host frame because in Safari guest frames are unable to send messages
+    // directly to the sidebar during a window's 'unload' event.
+    // See https://bugs.webkit.org/show_bug.cgi?id=231167.
+    this._listeners.add(window, 'message', event => {
+      const messageData = /** @type {MessageEvent} */ (event).data;
+      if (messageData?.type === 'hypothesisGuestUnloaded') {
+        this._sidebarRPC.call('destroyFrame', messageData.frameIdentifier);
+      }
+    });
   }
 
   destroy() {
