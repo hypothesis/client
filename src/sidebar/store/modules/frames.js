@@ -83,6 +83,8 @@ function updateFrameAnnotationFetchStatus(uri, isFetchComplete) {
 
 /**
  * Return the list of frames currently connected to the sidebar app.
+ *
+ * @return {Frame[]}
  */
 function frames(state) {
   return state;
