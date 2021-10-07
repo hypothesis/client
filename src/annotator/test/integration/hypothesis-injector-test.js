@@ -1,10 +1,12 @@
 import { delay } from '../../../test-util/wait';
 import { DEBOUNCE_WAIT, onDocumentReady } from '../../frame-observer';
-import { HypothesisInjector } from '../../hypothesis-injector';
+import { HypothesisInjector, $imports } from '../../hypothesis-injector';
 
 describe('HypothesisInjector integration test', () => {
   let container;
   let hypothesisInjectors;
+
+  let hostJSONConfig;
 
   const sandbox = sinon.createSandbox();
   const config = {
@@ -46,12 +48,69 @@ describe('HypothesisInjector integration test', () => {
 
     container = document.createElement('div');
     document.body.appendChild(container);
+
+    hostJSONConfig = {};
+
+    $imports.$mock({
+      '../boot/parse-json-config': {
+        parseJsonConfig: () => hostJSONConfig,
+      },
+    });
   });
 
   afterEach(() => {
     sandbox.restore();
     hypothesisInjectors.forEach(injector => injector.destroy());
     container.remove();
+  });
+
+  describe('#injectClient', () => {
+    it('configures client', async () => {
+      const frame = document.createElement('iframe');
+      container.append(frame);
+      const injector = createHypothesisInjector();
+
+      await injector.injectClient(frame);
+
+      const configElement = frame.contentDocument.querySelector(
+        '.js-hypothesis-config'
+      );
+      const config = JSON.parse(configElement.textContent);
+
+      assert.match(config.subFrameIdentifier, /[0-9]+/);
+      assert.notOk(config.assetRoot);
+      assert.notOk(config.notebookAppUrl);
+      assert.notOk(config.sidebarAppUrl);
+    });
+
+    it('copies client asset locations from host frame', async () => {
+      hostJSONConfig = {
+        assetRoot: 'chrome-extension://abc/client',
+        notebookAppUrl: 'chrome-extension://abc/client/notebook.html',
+        sidebarAppUrl: 'chrome-extension://abc/client/sidebar.html',
+      };
+
+      const frame = document.createElement('iframe');
+      container.append(frame);
+      const injector = createHypothesisInjector();
+
+      await injector.injectClient(frame);
+
+      const configElement = frame.contentDocument.querySelector(
+        '.js-hypothesis-config'
+      );
+      const config = JSON.parse(configElement.textContent);
+
+      assert.equal(config.assetRoot, 'chrome-extension://abc/client');
+      assert.equal(
+        config.notebookAppUrl,
+        'chrome-extension://abc/client/notebook.html'
+      );
+      assert.equal(
+        config.sidebarAppUrl,
+        'chrome-extension://abc/client/sidebar.html'
+      );
+    });
   });
 
   it('detects iframes on page', async () => {
