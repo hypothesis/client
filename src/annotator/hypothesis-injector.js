@@ -5,9 +5,11 @@ import { onDocumentReady, FrameObserver } from './frame-observer';
  */
 
 /**
- * HypothesisInjector has logic for injecting Hypothesis client into iframes that
- * are added to the page if (1) they have the `enable-annotation` attribute set
- * and (2) are same-origin with the current document.
+ * HypothesisInjector injects the Hypothesis client into same-origin iframes.
+ *
+ * The client will be injected automatically into frames that have the
+ * `enable-annotation` attribute set (see {@link FrameObserver}) and can be
+ * manually injected into other frames using {@link injectClient}.
  *
  * @implements Destroyable
  */
@@ -22,8 +24,8 @@ export class HypothesisInjector {
     this._config = config;
     this._frameObserver = new FrameObserver(
       element,
-      frame => this.injectClient(frame),
-      () => {}
+      frame => this.injectClient(frame), // Frame added callback
+      () => {} // Frame removed callback
     );
   }
 
