@@ -545,4 +545,12 @@ describe('FrameSyncService', () => {
       assert.calledWith(guestBridge().call, 'scrollToAnnotation', 'atag');
     });
   });
+
+  describe('#notifyHost', () => {
+    it('sends a message to the host frame', () => {
+      frameSync.connect();
+      frameSync.notifyHost('openNotebook', 'group-id');
+      assert.calledWith(hostBridge().call, 'openNotebook', 'group-id');
+    });
+  });
 });
