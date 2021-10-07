@@ -196,6 +196,17 @@ describe('Sidebar', () => {
     });
   });
 
+  it('notifies sidebar app when a guest frame is unloaded', () => {
+    createSidebar();
+
+    const event = new MessageEvent('message', {
+      data: { type: 'hypothesisGuestUnloaded', frameIdentifier: 'frame-id' },
+    });
+    window.dispatchEvent(event);
+
+    assert.calledWith(fakeBridge.call, 'destroyFrame', 'frame-id');
+  });
+
   function getConfigString(sidebar) {
     return sidebar.iframe.src;
   }

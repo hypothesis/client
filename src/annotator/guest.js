@@ -113,8 +113,11 @@ export default class Guest {
    * @param {EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
+   * @param {Window} [hostFrame] -
+   *   Host frame which this guest is associated with. This is expected to be
+   *   an ancestor of the guest frame. It may be same or cross origin.
    */
-  constructor(element, eventBus, config = {}) {
+  constructor(element, eventBus, config = {}, hostFrame = window) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
     this._visibleHighlights = false;
@@ -186,6 +189,9 @@ export default class Guest {
      * @type {Set<string>}
      */
     this._focusedAnnotations = new Set();
+
+    this._hostFrame = hostFrame;
+    this._listeners.add(window, 'unload', () => this._notifyGuestUnload());
   }
 
   // Add DOM event listeners for clicks, taps etc. on the document and
@@ -351,6 +357,7 @@ export default class Guest {
   }
 
   destroy() {
+    this._notifyGuestUnload();
     this._listeners.removeAll();
 
     this._selectionObserver.disconnect();
@@ -361,6 +368,19 @@ export default class Guest {
     this._integration.destroy();
     this._emitter.destroy();
     this.crossframe.destroy();
+  }
+
+  /**
+   * Notify the host frame that the guest is being unloaded.
+   *
+   * The host frame in turn notifies the sidebar app that the guest has gone away.
+   */
+  _notifyGuestUnload() {
+    const message = {
+      type: 'hypothesisGuestUnloaded',
+      frameIdentifier: this._frameIdentifier,
+    };
+    this._hostFrame.postMessage(message, '*');
   }
 
   /**

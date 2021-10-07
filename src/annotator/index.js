@@ -51,15 +51,14 @@ function init() {
   window_.__hypothesis = {};
 
   const annotatorConfig = getConfig('annotator');
+  const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
   // Create the guest that handles creating annotations and displaying highlights.
   const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, annotatorConfig);
+  const guest = new Guest(document.body, eventBus, annotatorConfig, hostFrame);
 
-  // Create the sidebar if this is the host frame. The `subFrameIdentifier`
-  // config option indicates a non-host/guest-only frame.
   let sidebar;
-  if (!annotatorConfig.subFrameIdentifier) {
+  if (window === hostFrame) {
     sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
 
     // Expose sidebar window reference for use by same-origin guest frames.
