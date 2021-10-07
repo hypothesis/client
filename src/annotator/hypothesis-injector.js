@@ -1,4 +1,4 @@
-import { FrameObserver } from './frame-observer';
+import { onDocumentReady, FrameObserver } from './frame-observer';
 
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
@@ -22,7 +22,7 @@ export class HypothesisInjector {
     this._config = config;
     this._frameObserver = new FrameObserver(
       element,
-      frame => this._addHypothesis(frame),
+      frame => this.injectClient(frame),
       () => {}
     );
   }
@@ -35,18 +35,22 @@ export class HypothesisInjector {
   }
 
   /**
-   * Inject Hypothesis client into a newly-discovered iframe.
+   * Inject Hypothesis client into a frame.
    *
    * IMPORTANT: This method requires that the iframe is "accessible"
-   * (frame.contentDocument|contentWindow is not null) and "ready" (DOM content
-   * has been loaded and parsed) before the method is called.
+   * (frame.contentDocument|contentWindow is not null).
+   *
+   * This waits for the frame to finish loading before injecting the client.
+   * See {@link onDocumentReady}.
    *
    * @param {HTMLIFrameElement} frame
    */
-  _addHypothesis(frame) {
+  async injectClient(frame) {
     if (hasHypothesis(frame)) {
       return;
     }
+
+    await onDocumentReady(frame);
 
     // Generate a random string to use as a frame ID. The format is not important.
     const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
