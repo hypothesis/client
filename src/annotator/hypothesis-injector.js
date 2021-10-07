@@ -1,3 +1,4 @@
+import { parseJsonConfig } from '../boot/parse-json-config';
 import { onDocumentReady, FrameObserver } from './frame-observer';
 
 /**
@@ -54,10 +55,22 @@ export class HypothesisInjector {
 
     await onDocumentReady(frame);
 
+    // Propagate the client resource locations from the current frame.
+    //
+    // These settings are set only in the browser extension and not by the
+    // embedded client (served by h).
+    const { assetRoot, notebookAppUrl, sidebarAppUrl } =
+      parseJsonConfig(document);
+
     // Generate a random string to use as a frame ID. The format is not important.
     const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
     const injectedConfig = {
       ...this._config,
+
+      assetRoot,
+      notebookAppUrl,
+      sidebarAppUrl,
+
       subFrameIdentifier,
     };
 
