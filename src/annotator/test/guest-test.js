@@ -142,7 +142,7 @@ describe('Guest', () => {
   describe('cross frame', () => {
     it('provides an event bus for the annotation sync module', () => {
       createGuest();
-      assert.deepEqual(CrossFrame.lastCall.args[1], eventBus);
+      assert.deepEqual(CrossFrame.lastCall.args[0], eventBus);
     });
 
     it('publishes the "panelReady" event when a connection is established', () => {

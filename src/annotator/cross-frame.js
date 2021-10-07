@@ -13,18 +13,13 @@ import { AnnotationSync } from './annotation-sync';
  *
  * It can be used to publish events to and subscribe to events from the sidebar.
  *
- * This class also has logic for injecting Hypothesis into iframes that
- * are added to the page if they have the `enable-annotation` attribute set
- * and are same-origin with the current document.
- *
  * @implements Destroyable
  */
 export class CrossFrame {
   /**
-   * @param {Element} element
    * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
    */
-  constructor(element, eventBus) {
+  constructor(eventBus) {
     this._bridge = new Bridge();
     this._annotationSync = new AnnotationSync(eventBus, this._bridge);
   }

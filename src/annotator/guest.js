@@ -163,7 +163,7 @@ export default class Guest {
     this._frameIdentifier = config.subFrameIdentifier || null;
 
     // Setup connection to sidebar.
-    this.crossframe = new CrossFrame(this.element, eventBus);
+    this.crossframe = new CrossFrame(eventBus);
     this.crossframe.onConnect(() => this._setupInitialState(config));
 
     this._hypothesisInjector = new HypothesisInjector(this.element, config);
