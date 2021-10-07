@@ -15,17 +15,6 @@
         overflow: auto;
       }
     </style>
-    <script>
-      // Make the iframe annotatable after the sidebar has been created.
-      // This test if injected client in the iframe is able to discover the sidebar iframe
-      setTimeout(
-        () =>
-          document
-            .querySelector('iframe')
-            .setAttribute('enable-annotation', ''),
-        3000
-      );
-    </script>
   </head>
   <body>
     <h1>Annotatable iframe test</h1>
@@ -34,7 +23,25 @@
       and injects the annotator into the iframe, which makes the iframe content
       annotatable.
     </p>
-    <iframe src="/document/injectable-frame"></iframe>
+
+    <button class="js-toggle-button">Toggle frame</button>
+
+    <iframe enable-annotation src="/document/injectable-frame"></iframe>
     {{{hypothesisScript}}}
+
+    <script type="module">
+      const toggleButton = document.querySelector('.js-toggle-button');
+      toggleButton.onclick = () => {
+        const frame = document.querySelector('iframe');
+        if (frame) {
+          frame.remove();
+        } else {
+          const newFrame = document.createElement('iframe');
+          newFrame.src = '/document/injectable-frame';
+          newFrame.setAttribute('enable-annotation', '');
+          document.body.append(newFrame);
+        }
+      };
+    </script>
   </body>
 </html>
