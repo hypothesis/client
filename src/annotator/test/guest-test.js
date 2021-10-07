@@ -43,6 +43,9 @@ describe('Guest', () => {
   let fakeCreateIntegration;
   let fakeIntegration;
 
+  let FakeHypothesisInjector;
+  let fakeHypothesisInjector;
+
   let guests;
 
   const createGuest = (config = {}) => {
@@ -101,6 +104,12 @@ describe('Guest', () => {
       postMessage: sinon.stub(),
     };
 
+    fakeHypothesisInjector = {
+      destroy: sinon.stub(),
+      injectClient: sinon.stub().resolves(),
+    };
+    FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
+
     class FakeSelectionObserver {
       constructor(callback) {
         notifySelectionChanged = callback;
@@ -115,6 +124,7 @@ describe('Guest', () => {
       },
       './integrations': { createIntegration: fakeCreateIntegration },
       './highlighter': highlighter,
+      './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
       './range-util': rangeUtil,
       './cross-frame': { CrossFrame },
       './selection-observer': {
@@ -1159,6 +1169,12 @@ describe('Guest', () => {
     );
   });
 
+  it('stops injecting client into annotation-enabled iframes', () => {
+    const guest = createGuest();
+    guest.destroy();
+    assert.calledWith(fakeHypothesisInjector.destroy);
+  });
+
   describe('#contentContainer', () => {
     it('returns document content container', () => {
       const guest = createGuest();
@@ -1191,6 +1207,19 @@ describe('Guest', () => {
       fakeIntegration.fitSideBySide.returns(true);
       guest.fitSideBySide(layout);
       assert.isTrue(guest.sideBySideActive);
+    });
+  });
+
+  describe('#injectClient', () => {
+    it('injects client into target frame', async () => {
+      const config = {};
+      const guest = createGuest({});
+      const frame = {};
+
+      await guest.injectClient(frame);
+
+      assert.calledWith(FakeHypothesisInjector, guest.element, config);
+      assert.calledWith(fakeHypothesisInjector.injectClient, frame);
     });
   });
 });
