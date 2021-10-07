@@ -3,12 +3,10 @@ import { CrossFrame, $imports } from '../cross-frame';
 describe('CrossFrame', () => {
   let fakeAnnotationSync;
   let fakeBridge;
-  let fakeHypothesisInjector;
   let fakeEventBus;
 
   let FakeAnnotationSync;
   let FakeBridge;
-  let FakeHypothesisInjector;
 
   const createCrossFrame = (options = {}) => {
     fakeEventBus = {};
@@ -26,16 +24,13 @@ describe('CrossFrame', () => {
       on: sinon.stub(),
     };
     fakeAnnotationSync = { sync: sinon.stub(), destroy: sinon.stub() };
-    fakeHypothesisInjector = { destroy: sinon.stub() };
 
     FakeAnnotationSync = sinon.stub().returns(fakeAnnotationSync);
     FakeBridge = sinon.stub().returns(fakeBridge);
-    FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
 
     $imports.$mock({
       '../shared/bridge': { Bridge: FakeBridge },
       './annotation-sync': { AnnotationSync: FakeAnnotationSync },
-      './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
     });
   });
 
@@ -52,11 +47,6 @@ describe('CrossFrame', () => {
     it('passes along options to AnnotationSync', () => {
       createCrossFrame();
       assert.calledWith(FakeAnnotationSync, fakeEventBus, fakeBridge);
-    });
-
-    it('initiates the HypothesisInjector service', () => {
-      createCrossFrame();
-      assert.calledOnce(FakeHypothesisInjector);
     });
   });
 
@@ -102,12 +92,6 @@ describe('CrossFrame', () => {
       const cf = createCrossFrame();
       cf.destroy();
       assert.called(fakeAnnotationSync.destroy);
-    });
-
-    it('destroys the HypothesisInjector service', () => {
-      const cf = createCrossFrame();
-      cf.destroy();
-      assert.called(fakeHypothesisInjector.destroy);
     });
   });
 

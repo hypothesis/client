@@ -11,6 +11,7 @@ import {
   setHighlightsFocused,
   setHighlightsVisible,
 } from './highlighter';
+import { HypothesisInjector } from './hypothesis-injector';
 import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
@@ -157,20 +158,23 @@ export default class Guest {
      */
     this.anchors = [];
 
-    /**
-     * Integration that handles document-type specific functionality in the
-     * guest.
-     */
-    this._integration = createIntegration(this);
-
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this._frameIdentifier = config.subFrameIdentifier || null;
 
     // Setup connection to sidebar.
-    this.crossframe = new CrossFrame(this.element, eventBus, config);
+    this.crossframe = new CrossFrame(this.element, eventBus);
     this.crossframe.onConnect(() => this._setupInitialState(config));
+
+    this._hypothesisInjector = new HypothesisInjector(this.element, config);
+
     this._connectSidebarEvents();
+
+    /**
+     * Integration that handles document-type specific functionality in the
+     * guest.
+     */
+    this._integration = createIntegration(this);
 
     this._sideBySideActive = false;
 
@@ -253,10 +257,8 @@ export default class Guest {
    *
    * @param {HTMLIFrameElement} frame
    */
-  // eslint-disable-next-line no-unused-vars
   async injectClient(frame) {
-    /* istanbul ignore next */
-    console.warn('Guest#injectClient is not yet implemented.');
+    return this._hypothesisInjector.injectClient(frame);
   }
 
   /**
@@ -358,6 +360,7 @@ export default class Guest {
 
   destroy() {
     this._notifyGuestUnload();
+    this._hypothesisInjector.destroy();
     this._listeners.removeAll();
 
     this._selectionObserver.disconnect();

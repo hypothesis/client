@@ -1,6 +1,5 @@
 import { Bridge } from '../shared/bridge';
 import { AnnotationSync } from './annotation-sync';
-import { HypothesisInjector } from './hypothesis-injector';
 
 /**
  * @typedef {import('../shared/port-rpc').PortRPC} RPC
@@ -24,12 +23,10 @@ export class CrossFrame {
   /**
    * @param {Element} element
    * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
-   * @param {Record<string, any>} config
    */
-  constructor(element, eventBus, config) {
+  constructor(element, eventBus) {
     this._bridge = new Bridge();
     this._annotationSync = new AnnotationSync(eventBus, this._bridge);
-    this._hypothesisInjector = new HypothesisInjector(element, config);
   }
 
   /**
@@ -58,7 +55,6 @@ export class CrossFrame {
   destroy() {
     this._bridge.destroy();
     this._annotationSync.destroy();
-    this._hypothesisInjector.destroy();
   }
 
   /**
