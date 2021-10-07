@@ -11,8 +11,10 @@ describe('HelpPanel', () => {
   let fakeAuth;
   let fakeSessionService;
   let fakeStore;
+  let frames;
+
+  let FakeVersionData;
   let fakeVersionData;
-  let fakeVersionDataObject;
 
   function createComponent(props) {
     return mount(
@@ -21,23 +23,25 @@ describe('HelpPanel', () => {
   }
 
   beforeEach(() => {
+    frames = [];
     fakeAuth = {};
     fakeSessionService = { dismissSidebarTutorial: sinon.stub() };
     fakeStore = {
-      mainFrame: sinon.stub().returns(null),
+      frames: () => frames,
+      mainFrame: () => frames.find(f => !f.id) ?? null,
       profile: sinon.stub().returns({
         preferences: { show_sidebar_tutorial: true },
       }),
     };
-    fakeVersionDataObject = {
+    fakeVersionData = {
       asEncodedURLString: sinon.stub().returns('fakeURLString'),
     };
-    fakeVersionData = sinon.stub().returns(fakeVersionDataObject);
+    FakeVersionData = sinon.stub().returns(fakeVersionData);
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../helpers/version-data': fakeVersionData,
+      '../helpers/version-data': FakeVersionData,
     });
   });
 
@@ -73,13 +77,52 @@ describe('HelpPanel', () => {
       assert.isTrue(wrapper.find('VersionInfo').exists());
       assert.equal(
         wrapper.find('VersionInfo').prop('versionData'),
-        fakeVersionDataObject
+        fakeVersionData
       );
       assert.isFalse(wrapper.find('Tutorial').exists());
     });
   });
 
   context('when viewing versionInfo sub-panel', () => {
+    it('shows document info for current frames', () => {
+      // Unsorted frames
+      frames = [
+        {
+          id: 'subframe',
+          uri: 'https://example.com/child-frame',
+        },
+        {
+          id: null,
+          uri: 'https://example.com/',
+        },
+        {
+          id: 'subframe2',
+          uri: 'https://example.com/child-frame-2',
+        },
+      ];
+
+      createComponent();
+
+      assert.calledOnce(FakeVersionData);
+      const docInfo = FakeVersionData.getCall(0).args[1];
+
+      // Frames should be passed to `VersionData` with the main frame first.
+      assert.deepEqual(docInfo, [
+        {
+          id: null,
+          uri: 'https://example.com/',
+        },
+        {
+          id: 'subframe',
+          uri: 'https://example.com/child-frame',
+        },
+        {
+          id: 'subframe2',
+          uri: 'https://example.com/child-frame-2',
+        },
+      ]);
+    });
+
     it('should show navigation link back to tutorial sub-panel', () => {
       const wrapper = createComponent();
       wrapper.find('.HelpPanel__sub-panel-navigation-button').simulate('click');

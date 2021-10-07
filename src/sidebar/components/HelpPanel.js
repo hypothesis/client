@@ -53,6 +53,7 @@ function HelpPanelTab({ linkText, url }) {
  */
 function HelpPanel({ auth, session }) {
   const store = useStoreProxy();
+  const frames = store.frames();
   const mainFrame = store.mainFrame();
 
   // Should this panel be auto-opened at app launch? Note that the actual
@@ -68,9 +69,21 @@ function HelpPanel({ auth, session }) {
   // Build version details about this session/app
   const versionData = useMemo(() => {
     const userInfo = auth || { status: 'logged-out' };
-    const documentInfo = mainFrame || {};
+
+    // Sort frames so the main frame is listed first. Other frames will retain
+    // their original order, assuming a stable sort.
+    const documentInfo = [...frames].sort((a, b) => {
+      if (a === mainFrame) {
+        return -1;
+      } else if (b === mainFrame) {
+        return 1;
+      } else {
+        return 0;
+      }
+    });
+
     return new VersionData(userInfo, documentInfo);
-  }, [auth, mainFrame]);
+  }, [auth, frames, mainFrame]);
 
   // The support ticket URL encodes some version info in it to pre-fill in the
   // create-new-ticket form

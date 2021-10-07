@@ -32,7 +32,7 @@ function VersionInfo({ toastMessenger, versionData }) {
         <dt className="VersionInfo__key">User Agent</dt>
         <dd className="VersionInfo__value">{versionData.userAgent}</dd>
         <dt className="VersionInfo__key">URL</dt>
-        <dd className="VersionInfo__value">{versionData.url}</dd>
+        <dd className="VersionInfo__value">{versionData.urls}</dd>
         <dt className="VersionInfo__key">Fingerprint</dt>
         <dd className="VersionInfo__value">{versionData.fingerprint}</dd>
         <dt className="VersionInfo__key">Account</dt>

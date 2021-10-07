@@ -40,7 +40,7 @@ describe('VersionInfo', () => {
     fakeVersionData = {
       version: 'fakeVersion',
       userAgent: 'fakeUserAgent',
-      url: 'fakeUrl',
+      urls: 'fakeUrl',
       fingerprint: 'fakeFingerprint',
       account: 'fakeAccount',
       timestamp: 'fakeTimestamp',
