@@ -59,6 +59,10 @@ export class HypothesisInjector {
     //
     // These settings are set only in the browser extension and not by the
     // embedded client (served by h).
+    //
+    // We could potentially do this by allowing these settings to be part of
+    // the "annotator" config (see `annotator/config/index.js`) which gets passed
+    // to the constructor.
     const { assetRoot, notebookAppUrl, sidebarAppUrl } =
       parseJsonConfig(document);
 
