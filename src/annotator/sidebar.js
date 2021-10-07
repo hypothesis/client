@@ -202,9 +202,9 @@ export default class Sidebar {
      */
     this.ready = new Promise(resolve => {
       this._listeners.add(window, 'message', event => {
-        const messageEvent = /** @type {MessageEvent} */ (event);
-        if (messageEvent.data?.type === 'hypothesisSidebarReady') {
-          this._sidebarRPC.createChannel(messageEvent.ports[0]);
+        const { data, ports } = /** @type {MessageEvent} */ (event);
+        if (data?.type === 'hypothesisSidebarReady') {
+          this._sidebarRPC.createChannel(ports[0]);
           resolve();
         }
       });
@@ -215,9 +215,9 @@ export default class Sidebar {
     // directly to the sidebar during a window's 'unload' event.
     // See https://bugs.webkit.org/show_bug.cgi?id=231167.
     this._listeners.add(window, 'message', event => {
-      const messageData = /** @type {MessageEvent} */ (event).data;
-      if (messageData?.type === 'hypothesisGuestUnloaded') {
-        this._sidebarRPC.call('destroyFrame', messageData.frameIdentifier);
+      const { data } = /** @type {MessageEvent} */ (event);
+      if (data?.type === 'hypothesisGuestUnloaded') {
+        this._sidebarRPC.call('destroyFrame', data.frameIdentifier);
       }
     });
   }
