@@ -10,8 +10,7 @@ describe('CrossFrame', () => {
 
   const createCrossFrame = (options = {}) => {
     fakeEventBus = {};
-    const element = document.createElement('div');
-    return new CrossFrame(element, fakeEventBus, options);
+    return new CrossFrame(fakeEventBus, options);
   };
 
   beforeEach(() => {
