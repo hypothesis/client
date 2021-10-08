@@ -1,8 +1,15 @@
 /**
- * @typedef {import('../shared/bridge').Bridge} Bridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
+ * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('./util/emitter').EventBus} EventBus
+ */
+
+/**
+ * @template {GuestToSidebarEvent} T
+ * @template {SidebarToGuestEvent} U
+ * @typedef {import('../shared/bridge').Bridge<T,U>} Bridge
  */
 
 /**
@@ -26,11 +33,11 @@
 export class AnnotationSync {
   /**
    * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
-   * @param {Bridge} bridge - Channel for communicating with the sidebar
+   * @param {Bridge<GuestToSidebarEvent,SidebarToGuestEvent>} bridge - Channel for communicating with the sidebar
    */
   constructor(eventBus, bridge) {
     this._emitter = eventBus.createEmitter();
-    this.bridge = bridge;
+    this._sidebar = bridge;
 
     /**
      * Mapping from annotation tags to annotation objects for annotations which
@@ -43,7 +50,7 @@ export class AnnotationSync {
     this.destroyed = false;
 
     // Relay events from the sidebar to the rest of the annotator.
-    this.bridge.on('deleteAnnotation', (body, callback) => {
+    this._sidebar.on('deleteAnnotation', (body, callback) => {
       if (this.destroyed) {
         callback(null);
         return;
@@ -55,7 +62,7 @@ export class AnnotationSync {
       callback(null);
     });
 
-    this.bridge.on('loadAnnotations', (bodies, callback) => {
+    this._sidebar.on('loadAnnotations', (bodies, callback) => {
       if (this.destroyed) {
         callback(null);
         return;
@@ -70,7 +77,7 @@ export class AnnotationSync {
       if (annotation.$tag) {
         return;
       }
-      this.bridge.call('beforeCreateAnnotation', this._format(annotation));
+      this._sidebar.call('beforeCreateAnnotation', this._format(annotation));
     });
   }
 
@@ -87,7 +94,7 @@ export class AnnotationSync {
       return;
     }
 
-    this.bridge.call(
+    this._sidebar.call(
       'sync',
       annotations.map(ann => this._format(ann))
     );

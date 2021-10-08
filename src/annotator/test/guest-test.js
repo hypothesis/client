@@ -1,6 +1,5 @@
-import Guest from '../guest';
+import Guest, { $imports } from '../guest';
 import { EventBus } from '../util/emitter';
-import { $imports } from '../guest';
 
 class FakeAdder {
   constructor(container, options) {
@@ -226,7 +225,7 @@ describe('Guest', () => {
   });
 
   describe('events from sidebar', () => {
-    const emitGuestEvent = (event, ...args) => {
+    const emitSidebarEvent = (event, ...args) => {
       for (let [evt, fn] of fakeBridge.on.args) {
         if (event === evt) {
           fn(...args);
@@ -244,7 +243,7 @@ describe('Guest', () => {
           { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
         ];
 
-        emitGuestEvent('focusAnnotations', ['tag1']);
+        emitSidebarEvent('focusAnnotations', ['tag1']);
 
         assert.calledWith(
           highlighter.setHighlightsFocused,
@@ -262,7 +261,7 @@ describe('Guest', () => {
           { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
         ];
 
-        emitGuestEvent('focusAnnotations', ['tag1']);
+        emitSidebarEvent('focusAnnotations', ['tag1']);
 
         assert.calledWith(
           highlighter.setHighlightsFocused,
@@ -274,8 +273,8 @@ describe('Guest', () => {
       it('updates focused tag set', () => {
         const guest = createGuest();
 
-        emitGuestEvent('focusAnnotations', ['tag1']);
-        emitGuestEvent('focusAnnotations', ['tag2', 'tag3']);
+        emitSidebarEvent('focusAnnotations', ['tag1']);
+        emitSidebarEvent('focusAnnotations', ['tag2', 'tag3']);
 
         assert.deepEqual([...guest.focusedAnnotationTags], ['tag2', 'tag3']);
       });
@@ -294,7 +293,7 @@ describe('Guest', () => {
           },
         ];
 
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent('scrollToAnnotation', 'tag1');
 
         assert.called(fakeIntegration.scrollToAnchor);
         assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
@@ -318,7 +317,7 @@ describe('Guest', () => {
             resolve();
           });
 
-          emitGuestEvent('scrollToAnnotation', 'tag1');
+          emitSidebarEvent('scrollToAnnotation', 'tag1');
         });
       });
 
@@ -337,7 +336,7 @@ describe('Guest', () => {
           event.preventDefault()
         );
 
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent('scrollToAnnotation', 'tag1');
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
@@ -346,7 +345,7 @@ describe('Guest', () => {
         const guest = createGuest();
 
         guest.anchors = [{ annotation: { $tag: 'tag1' } }];
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent('scrollToAnnotation', 'tag1');
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
@@ -366,7 +365,7 @@ describe('Guest', () => {
         const eventEmitted = sandbox.stub();
         guest.element.addEventListener('scrolltorange', eventEmitted);
 
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent('scrollToAnnotation', 'tag1');
 
         assert.notCalled(eventEmitted);
         assert.notCalled(fakeIntegration.scrollToAnchor);
@@ -400,7 +399,7 @@ describe('Guest', () => {
 
         fakeIntegration.getMetadata.resolves(metadata);
 
-        emitGuestEvent(
+        emitSidebarEvent(
           'getDocumentInfo',
           createCallback('https://example.com/test.pdf', metadata, done)
         );
@@ -411,14 +410,14 @@ describe('Guest', () => {
       it('sets visibility of highlights in document', () => {
         const guest = createGuest();
 
-        emitGuestEvent('setVisibleHighlights', true);
+        emitSidebarEvent('setVisibleHighlights', true);
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,
           true
         );
 
-        emitGuestEvent('setVisibleHighlights', false);
+        emitSidebarEvent('setVisibleHighlights', false);
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,

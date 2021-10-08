@@ -1,4 +1,3 @@
-import bridgeEvents from '../../shared/bridge-events';
 import { watch } from '../util/watch';
 
 /**
@@ -26,10 +25,7 @@ export class FeaturesService {
   init() {
     const currentFlags = () => this._store.profile().features;
     const sendFeatureFlags = () => {
-      this._frameSync.notifyHost(
-        bridgeEvents.FEATURE_FLAGS_UPDATED,
-        currentFlags() || {}
-      );
+      this._frameSync.notifyHost('featureFlagsUpdated', currentFlags() || {});
     };
 
     // Re-send feature flags to connected frames when flags change or a new

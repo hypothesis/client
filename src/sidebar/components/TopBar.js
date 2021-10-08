@@ -1,11 +1,10 @@
 import { IconButton, LinkButton } from '@hypothesis/frontend-shared';
 
-import bridgeEvents from '../../shared/bridge-events';
 import { serviceConfig } from '../config/service-config';
-import { useStoreProxy } from '../store/use-store';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
-import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
+import { withServices } from '../service-context';
+import { useStoreProxy } from '../store/use-store';
 
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
@@ -71,7 +70,7 @@ function TopBar({
   const requestHelp = () => {
     const service = serviceConfig(settings);
     if (service && service.onHelpRequestProvided) {
-      frameSync.notifyHost(bridgeEvents.HELP_REQUESTED);
+      frameSync.notifyHost('helpRequested');
     } else {
       store.toggleSidebarPanel('help');
     }
