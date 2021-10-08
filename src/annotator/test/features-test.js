@@ -1,6 +1,5 @@
 import events from '../../shared/bridge-events';
-import features from '../features';
-import { $imports } from '../features';
+import { features, $imports } from '../features';
 
 describe('features - annotation layer', () => {
   let featureFlagsUpdateHandler;
