@@ -1,4 +1,4 @@
-import annotationCounts from '../annotation-counts';
+import { annotationCounts } from '../annotation-counts';
 
 describe('annotationCounts', () => {
   let countEl1;
