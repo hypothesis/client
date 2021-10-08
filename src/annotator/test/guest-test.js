@@ -37,8 +37,10 @@ describe('Guest', () => {
 
   let hostFrame;
 
-  let CrossFrame;
-  let fakeCrossFrame;
+  let FakeAnnotationSync;
+  let fakeAnnotationSync;
+  let FakeBridge;
+  let fakeBridge;
 
   let fakeCreateIntegration;
   let fakeIntegration;
@@ -74,14 +76,20 @@ describe('Guest', () => {
     };
     notifySelectionChanged = null;
 
-    fakeCrossFrame = {
-      onConnect: sinon.stub(),
-      on: sinon.stub(),
-      call: sinon.stub(),
-      sync: sinon.stub(),
+    fakeAnnotationSync = {
       destroy: sinon.stub(),
+      sync: sinon.stub(),
     };
-    CrossFrame = sandbox.stub().returns(fakeCrossFrame);
+    FakeAnnotationSync = sinon.stub().returns(fakeAnnotationSync);
+
+    fakeBridge = {
+      call: sinon.stub(),
+      createChannel: sinon.stub(),
+      destroy: sinon.stub(),
+      on: sinon.stub(),
+      onConnect: sinon.stub(),
+    };
+    FakeBridge = sinon.stub().returns(fakeBridge);
 
     fakeIntegration = {
       anchor: sinon.stub(),
@@ -118,15 +126,16 @@ describe('Guest', () => {
     }
 
     $imports.$mock({
+      '../shared/bridge': { Bridge: FakeBridge },
       './adder': { Adder: FakeAdder },
       './anchoring/text-range': {
         TextRange: FakeTextRange,
       },
+      './annotation-sync': { AnnotationSync: FakeAnnotationSync },
       './integrations': { createIntegration: fakeCreateIntegration },
       './highlighter': highlighter,
       './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
       './range-util': rangeUtil,
-      './cross-frame': { CrossFrame },
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
       },
@@ -142,14 +151,14 @@ describe('Guest', () => {
   describe('cross frame', () => {
     it('provides an event bus for the annotation sync module', () => {
       createGuest();
-      assert.deepEqual(CrossFrame.lastCall.args[0], eventBus);
+      assert.deepEqual(FakeAnnotationSync.lastCall.args[0], eventBus);
     });
 
     it('publishes the "panelReady" event when a connection is established', () => {
       const handler = sandbox.stub();
       const guest = createGuest();
       guest._emitter.subscribe('panelReady', handler);
-      fakeCrossFrame.onConnect.yield();
+      fakeBridge.onConnect.yield();
       assert.called(handler);
     });
 
@@ -226,7 +235,7 @@ describe('Guest', () => {
 
   describe('events from sidebar', () => {
     const emitGuestEvent = (event, ...args) => {
-      for (let [evt, fn] of fakeCrossFrame.on.args) {
+      for (let [evt, fn] of fakeBridge.on.args) {
         if (event === evt) {
           fn(...args);
         }
@@ -458,8 +467,8 @@ describe('Guest', () => {
     it('hides sidebar on user "mousedown" or "touchstart" events in the document', () => {
       for (let event of ['mousedown', 'touchstart']) {
         rootElement.dispatchEvent(new Event(event));
-        assert.calledWith(guest.crossframe.call, 'closeSidebar');
-        guest.crossframe.call.resetHistory();
+        assert.calledWith(fakeBridge.call, 'closeSidebar');
+        fakeBridge.call.resetHistory();
       }
     });
 
@@ -471,8 +480,8 @@ describe('Guest', () => {
 
         rootElement.dispatchEvent(new Event(event));
 
-        assert.notCalled(guest.crossframe.call);
-        guest.crossframe.call.resetHistory();
+        assert.notCalled(fakeBridge.call);
+        fakeBridge.call.resetHistory();
       }
     });
 
@@ -502,20 +511,20 @@ describe('Guest', () => {
       // Hover the highlight
       fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
       assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
-      assert.calledWith(fakeCrossFrame.call, 'focusAnnotations', [
+      assert.calledWith(fakeBridge.call, 'focusAnnotations', [
         'highlight-ann-tag',
       ]);
 
       // Un-hover the highlight
       fakeHighlight.dispatchEvent(new Event('mouseout', { bubbles: true }));
-      assert.calledWith(fakeCrossFrame.call, 'focusAnnotations', []);
+      assert.calledWith(fakeBridge.call, 'focusAnnotations', []);
     });
 
     it('does not focus annotations in the sidebar when a non-highlight element is hovered', () => {
       rootElement.dispatchEvent(new Event('mouseover', { bubbles: true }));
 
       assert.calledWith(highlighter.getHighlightsContainingNode, rootElement);
-      assert.notCalled(fakeCrossFrame.call);
+      assert.notCalled(fakeBridge.call);
     });
 
     it('does not focus or select annotations in the sidebar if highlights are hidden', () => {
@@ -525,16 +534,16 @@ describe('Guest', () => {
       fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
 
       assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
-      assert.notCalled(fakeCrossFrame.call);
+      assert.notCalled(fakeBridge.call);
     });
 
     it('selects annotations in the sidebar when clicking on a highlight', () => {
       fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
 
-      assert.calledWith(fakeCrossFrame.call, 'showAnnotations', [
+      assert.calledWith(fakeBridge.call, 'showAnnotations', [
         'highlight-ann-tag',
       ]);
-      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, 'openSidebar');
     });
 
     it('toggles selected annotations in the sidebar when Ctrl/Cmd-clicking a highlight', () => {
@@ -542,10 +551,10 @@ describe('Guest', () => {
         new MouseEvent('mouseup', { bubbles: true, ctrlKey: true })
       );
 
-      assert.calledWith(fakeCrossFrame.call, 'toggleAnnotationSelection', [
+      assert.calledWith(fakeBridge.call, 'toggleAnnotationSelection', [
         'highlight-ann-tag',
       ]);
-      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, 'openSidebar');
     });
   });
 
@@ -671,8 +680,8 @@ describe('Guest', () => {
 
       FakeAdder.instance.options.onShowAnnotations([{ $tag: 'ann1' }]);
 
-      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
-      assert.calledWith(fakeCrossFrame.call, 'showAnnotations', ['ann1']);
+      assert.calledWith(fakeBridge.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, 'showAnnotations', ['ann1']);
     });
   });
 
@@ -683,10 +692,7 @@ describe('Guest', () => {
 
       guest.selectAnnotations(annotations);
 
-      assert.calledWith(fakeCrossFrame.call, 'showAnnotations', [
-        'ann1',
-        'ann2',
-      ]);
+      assert.calledWith(fakeBridge.call, 'showAnnotations', ['ann1', 'ann2']);
     });
 
     it('toggles the annotations if `toggle` is true', () => {
@@ -695,7 +701,7 @@ describe('Guest', () => {
 
       guest.selectAnnotations(annotations, true /* toggle */);
 
-      assert.calledWith(fakeCrossFrame.call, 'toggleAnnotationSelection', [
+      assert.calledWith(fakeBridge.call, 'toggleAnnotationSelection', [
         'ann1',
         'ann2',
       ]);
@@ -706,7 +712,7 @@ describe('Guest', () => {
 
       guest.selectAnnotations([]);
 
-      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, 'openSidebar');
     });
   });
 
@@ -810,13 +816,13 @@ describe('Guest', () => {
     it('opens sidebar if `highlight` is false', async () => {
       const guest = createGuest();
       await guest.createAnnotation();
-      assert.calledWith(fakeCrossFrame.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, 'openSidebar');
     });
 
     it('does not open sidebar if `highlight` is true', async () => {
       const guest = createGuest();
       await guest.createAnnotation({ highlight: true });
-      assert.notCalled(fakeCrossFrame.call);
+      assert.notCalled(fakeBridge.call);
     });
 
     it('triggers a "beforeAnnotationCreated" event', async () => {
@@ -971,7 +977,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const annotation = {};
       return guest.anchor(annotation).then(() => {
-        assert.called(guest.crossframe.sync);
+        assert.called(fakeAnnotationSync.sync);
       });
     });
 
@@ -1043,7 +1049,7 @@ describe('Guest', () => {
       const annotation = { $tag: 'tag1', target: [target] };
 
       // Focus the annotation (in the sidebar) before it is anchored in the page.
-      const [, focusAnnotationsCallback] = fakeCrossFrame.on.args.find(
+      const [, focusAnnotationsCallback] = fakeBridge.on.args.find(
         args => args[0] === 'focusAnnotations'
       );
       focusAnnotationsCallback([annotation.$tag]);
@@ -1116,7 +1122,7 @@ describe('Guest', () => {
     it('disconnects from sidebar events', () => {
       const guest = createGuest();
       guest.destroy();
-      assert.calledOnce(fakeCrossFrame.destroy);
+      assert.calledOnce(fakeBridge.destroy);
     });
 
     it('removes the adder toolbar', () => {
@@ -1136,6 +1142,13 @@ describe('Guest', () => {
       const guest = createGuest();
       guest.destroy();
       assert.calledWith(highlighter.removeAllHighlights, guest.element);
+    });
+
+    it('disconnects from sidebar', () => {
+      const guest = createGuest();
+      guest.destroy();
+      assert.called(fakeBridge.destroy);
+      assert.called(fakeAnnotationSync.destroy);
     });
 
     it('notifies host frame that guest has been unloaded', () => {
@@ -1220,6 +1233,37 @@ describe('Guest', () => {
 
       assert.calledWith(FakeHypothesisInjector, guest.element, config);
       assert.calledWith(fakeHypothesisInjector.injectClient, frame);
+    });
+  });
+
+  describe('#connectToSidebar', () => {
+    it('sends a `hypothesisGuestReady` notification to the sidebar', async () => {
+      const guest = createGuest();
+      const sidebarFrame = { postMessage: sinon.stub() };
+      const sidebarOrigin = 'https://dummy.hypothes.is/';
+
+      guest.connectToSidebar(sidebarFrame, sidebarOrigin);
+
+      assert.calledWith(
+        sidebarFrame.postMessage,
+        {
+          type: 'hypothesisGuestReady',
+        },
+        sidebarOrigin,
+        [sinon.match.instanceOf(MessagePort)]
+      );
+    });
+
+    it('creates a channel for communication with the sidebar', () => {
+      const guest = createGuest();
+      const sidebarFrame = { postMessage: sinon.stub() };
+
+      guest.connectToSidebar(sidebarFrame, 'https://dummy.hypothes.is');
+
+      assert.calledWith(
+        fakeBridge.createChannel,
+        sinon.match.instanceOf(MessagePort)
+      );
     });
   });
 });
