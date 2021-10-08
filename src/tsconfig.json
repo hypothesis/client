@@ -14,7 +14,7 @@
     // Let argument to catch statement be `any` rather than `unknown`.
     "useUnknownInCatchVariables": false
   },
-  "include": ["**/*.js"],
+  "include": ["**/*.js", "**/*.d.ts"],
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",

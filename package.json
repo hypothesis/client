@@ -123,8 +123,8 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production gulp build",
     "lint": "eslint .",
-    "checkformatting": "prettier --check '**/*.{js,scss}'",
-    "format": "prettier --list-different --write '**/*.{js,scss}'",
+    "checkformatting": "prettier --check '**/*.{js,scss,d.ts}'",
+    "format": "prettier --list-different --write '**/*.{js,scss,d.ts}'",
     "test": "gulp test",
     "typecheck": "tsc --build tsconfig.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",

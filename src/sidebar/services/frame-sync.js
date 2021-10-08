@@ -1,6 +1,5 @@
 import debounce from 'lodash.debounce';
 
-import bridgeEvents from '../../shared/bridge-events';
 import { Bridge } from '../../shared/bridge';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
@@ -118,10 +117,7 @@ export class FrameSyncService {
           if (frames.length > 0) {
             if (frames.every(frame => frame.isAnnotationFetchComplete)) {
               if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-                this._hostRPC.call(
-                  bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
-                  publicAnns
-                );
+                this._hostRPC.call('publicAnnotationCountChanged', publicAnns);
                 prevPublicAnns = publicAnns;
               }
             }
@@ -282,7 +278,7 @@ export class FrameSyncService {
   /**
    * Send an RPC message to the host frame.
    *
-   * @param {string} method
+   * @param {import('../../types/bridge-events').BrideEvents} method
    * @param {any[]} args
    */
   notifyHost(method, ...args) {
