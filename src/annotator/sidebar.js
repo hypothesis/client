@@ -4,7 +4,7 @@ import { Bridge } from '../shared/bridge';
 import events from '../shared/bridge-events';
 import { ListenerCollection } from '../shared/listener-collection';
 
-import annotationCounts from './annotation-counts';
+import { annotationCounts } from './annotation-counts';
 import BucketBar from './bucket-bar';
 import { createSidebarConfig } from './config/sidebar';
 import features from './features';
