@@ -1,11 +1,8 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import bridgeEvents from '../../../shared/bridge-events';
-import UserMenu from '../UserMenu';
-import { $imports } from '../UserMenu';
-
 import mockImportedComponents from '../../../test-util/mock-imported-components';
+import UserMenu, { $imports } from '../UserMenu';
 
 describe('UserMenu', () => {
   let fakeAuth;
@@ -148,10 +145,7 @@ describe('UserMenu', () => {
         onProfileSelected();
 
         assert.equal(fakeFrameSync.notifyHost.callCount, 1);
-        assert.calledWith(
-          fakeFrameSync.notifyHost,
-          bridgeEvents.PROFILE_REQUESTED
-        );
+        assert.calledWith(fakeFrameSync.notifyHost, 'profileRequested');
       });
 
       it('should not fire profile event for first-party user', () => {

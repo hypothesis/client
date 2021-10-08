@@ -1,5 +1,3 @@
-import events from '../shared/bridge-events';
-
 const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
 
 /**
@@ -11,8 +9,9 @@ const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
  *   display annotation count.
  * @param {import('../shared/bridge').Bridge} bridge - Channel for host-sidebar communication
  */
+
 export function annotationCounts(rootEl, bridge) {
-  bridge.on(events.PUBLIC_ANNOTATION_COUNT_CHANGED, updateAnnotationCountElems);
+  bridge.on('publicAnnotationCountChanged', updateAnnotationCountElems);
 
   function updateAnnotationCountElems(newCount) {
     const elems = rootEl.querySelectorAll('[' + ANNOTATION_COUNT_ATTR + ']');

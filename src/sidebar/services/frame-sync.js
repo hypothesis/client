@@ -1,11 +1,14 @@
 import debounce from 'lodash.debounce';
 
-import bridgeEvents from '../../shared/bridge-events';
 import { Bridge } from '../../shared/bridge';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
 /**
+ * @typedef {import('../../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
+ * @typedef {import('../../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
+ * @typedef {import('../../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
+ * @typedef {import('../../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../../shared/port-rpc').PortRPC} PortRPC
  */
 
@@ -55,10 +58,18 @@ export class FrameSyncService {
    * @param {import('../store').SidebarStore} store
    */
   constructor($window, annotationsService, store) {
-    /** Channel for sidebar <-> host communication. */
+    /**
+     * Channel for sidebar-host communication.
+     *
+     * @type {Bridge<SidebarToHostEvent,HostToSidebarEvent>}
+     */
     this._hostRPC = new Bridge();
 
-    /** Channel for sidebar <-> guest(s) communication. */
+    /**
+     * Channel for sidebar-guest(s) communication.
+     *
+     * @type {Bridge<SidebarToGuestEvent,GuestToSidebarEvent>}
+     */
     this._guestRPC = new Bridge();
 
     this._store = store;
@@ -118,10 +129,7 @@ export class FrameSyncService {
           if (frames.length > 0) {
             if (frames.every(frame => frame.isAnnotationFetchComplete)) {
               if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-                this._hostRPC.call(
-                  bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
-                  publicAnns
-                );
+                this._hostRPC.call('publicAnnotationCountChanged', publicAnns);
                 prevPublicAnns = publicAnns;
               }
             }
@@ -282,7 +290,7 @@ export class FrameSyncService {
   /**
    * Send an RPC message to the host frame.
    *
-   * @param {string} method
+   * @param {SidebarToHostEvent} method
    * @param {any[]} args
    */
   notifyHost(method, ...args) {

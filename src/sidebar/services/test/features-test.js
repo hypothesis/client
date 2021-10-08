@@ -1,4 +1,3 @@
-import bridgeEvents from '../../../shared/bridge-events';
 import { FeaturesService } from '../features';
 
 describe('FeaturesService', () => {
@@ -52,7 +51,7 @@ describe('FeaturesService', () => {
 
     assert.calledWith(
       fakeFrameSync.notifyHost,
-      bridgeEvents.FEATURE_FLAGS_UPDATED,
+      'featureFlagsUpdated',
       fakeStore.profile().features
     );
   });
@@ -71,7 +70,7 @@ describe('FeaturesService', () => {
 
     assert.calledWith(
       fakeFrameSync.notifyHost,
-      bridgeEvents.FEATURE_FLAGS_UPDATED,
+      'featureFlagsUpdated',
       fakeStore.profile().features
     );
   });

@@ -25,6 +25,8 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
+ * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
+ * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
@@ -163,7 +165,11 @@ export default class Guest {
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this._frameIdentifier = config.subFrameIdentifier || null;
 
-    // Set up listeners for messages coming from the sidebar to this guest.
+    /**
+     * Channel for sidebar-guest communication.
+     *
+     * @type {Bridge<GuestToSidebarEvent,SidebarToGuestEvent>}
+     */
     this._bridge = new Bridge();
     this._bridge.onConnect(() => {
       this._emitter.publish('panelReady');

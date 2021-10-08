@@ -1,7 +1,6 @@
 import Hammer from 'hammerjs';
 
 import { Bridge } from '../shared/bridge';
-import events from '../shared/bridge-events';
 import { ListenerCollection } from '../shared/listener-collection';
 
 import { annotationCounts } from './annotation-counts';
@@ -14,6 +13,8 @@ import { createShadowRoot } from './util/shadow-root';
 
 /**
  * @typedef {import('./guest').default} Guest
+ * @typedef {import('../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
+ * @typedef {import('../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
@@ -64,6 +65,11 @@ export default class Sidebar {
   constructor(element, eventBus, guest, config = {}) {
     this._emitter = eventBus.createEmitter();
 
+    /**
+     * Channel for sidebar-host communication.
+     *
+     * @type {Bridge<HostToSidebarEvent,SidebarToHostEvent>}
+     */
     this._sidebarRPC = new Bridge();
 
     /**
@@ -252,12 +258,13 @@ export default class Sidebar {
       this.show();
     });
 
+    /** @type {Array<[SidebarToHostEvent, function]>} */
     const eventHandlers = [
-      [events.LOGIN_REQUESTED, this.onLoginRequest],
-      [events.LOGOUT_REQUESTED, this.onLogoutRequest],
-      [events.SIGNUP_REQUESTED, this.onSignupRequest],
-      [events.PROFILE_REQUESTED, this.onProfileRequest],
-      [events.HELP_REQUESTED, this.onHelpRequest],
+      ['loginRequested', this.onLoginRequest],
+      ['logoutRequested', this.onLogoutRequest],
+      ['signupRequested', this.onSignupRequest],
+      ['profileRequested', this.onProfileRequest],
+      ['helpRequested', this.onHelpRequest],
     ];
     eventHandlers.forEach(([event, handler]) => {
       if (handler) {

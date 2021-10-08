@@ -1,6 +1,5 @@
-import { EventBus } from '../util/emitter';
-
 import { AnnotationSync } from '../annotation-sync';
+import { EventBus } from '../util/emitter';
 
 describe('AnnotationSync', () => {
   let createAnnotationSync;
@@ -49,7 +48,7 @@ describe('AnnotationSync', () => {
         assert.calledWith(eventStub, ann);
       });
 
-      it("calls the 'deleteAnnotation' event's callback function", done => {
+      it('calls the "deleteAnnotation" event\'s callback function', done => {
         const ann = { id: 1, $tag: 'tag1' };
         const callback = function (err, result) {
           assert.isNull(err);

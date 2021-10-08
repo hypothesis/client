@@ -1,4 +1,3 @@
-import events from '../shared/bridge-events';
 import warnOnce from '../shared/warn-once';
 
 let _features = {};
@@ -12,7 +11,7 @@ export const features = {
    * @param {import('../shared/bridge').Bridge} bridge - Channel for host-sidebar communication
    */
   init: function (bridge) {
-    bridge.on(events.FEATURE_FLAGS_UPDATED, _set);
+    bridge.on('featureFlagsUpdated', _set);
   },
 
   reset: function () {
