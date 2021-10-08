@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 
-import bridgeEvents from '../../../shared/bridge-events';
+import { bridgeEvents } from '../../../shared/bridge-events';
 import TopBar from '../TopBar';
 import { $imports } from '../TopBar';
 

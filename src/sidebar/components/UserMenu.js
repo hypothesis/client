@@ -1,7 +1,7 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 
-import bridgeEvents from '../../shared/bridge-events';
+import { bridgeEvents } from '../../shared/bridge-events';
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyUser } from '../helpers/account-id';
 import { useStoreProxy } from '../store/use-store';

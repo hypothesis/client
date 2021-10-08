@@ -1,4 +1,4 @@
-import events from '../../shared/bridge-events';
+import { bridgeEvents } from '../../shared/bridge-events';
 
 import Sidebar, { MIN_RESIZE } from '../sidebar';
 import { $imports } from '../sidebar';
@@ -366,7 +366,7 @@ describe('Sidebar', () => {
         const onLoginRequest = sandbox.stub();
         createSidebar({ services: [{ onLoginRequest }] });
 
-        emitEvent(events.LOGIN_REQUESTED);
+        emitEvent(bridgeEvents.LOGIN_REQUESTED);
 
         assert.called(onLoginRequest);
       });
@@ -386,7 +386,7 @@ describe('Sidebar', () => {
           ],
         });
 
-        emitEvent(events.LOGIN_REQUESTED);
+        emitEvent(bridgeEvents.LOGIN_REQUESTED);
 
         assert.called(firstOnLogin);
         assert.notCalled(secondOnLogin);
@@ -406,7 +406,7 @@ describe('Sidebar', () => {
           ],
         });
 
-        emitEvent(events.LOGIN_REQUESTED);
+        emitEvent(bridgeEvents.LOGIN_REQUESTED);
 
         assert.notCalled(secondOnLogin);
         assert.notCalled(thirdOnLogin);
@@ -414,17 +414,17 @@ describe('Sidebar', () => {
 
       it('does not crash if there is no services', () => {
         createSidebar(); // No config.services
-        emitEvent(events.LOGIN_REQUESTED);
+        emitEvent(bridgeEvents.LOGIN_REQUESTED);
       });
 
       it('does not crash if services is an empty array', () => {
         createSidebar({ services: [] });
-        emitEvent(events.LOGIN_REQUESTED);
+        emitEvent(bridgeEvents.LOGIN_REQUESTED);
       });
 
       it('does not crash if the first service has no onLoginRequest', () => {
         createSidebar({ services: [{}] });
-        emitEvent(events.LOGIN_REQUESTED);
+        emitEvent(bridgeEvents.LOGIN_REQUESTED);
       });
     });
 
@@ -433,7 +433,7 @@ describe('Sidebar', () => {
         const onLogoutRequest = sandbox.stub();
         createSidebar({ services: [{ onLogoutRequest }] });
 
-        emitEvent(events.LOGOUT_REQUESTED);
+        emitEvent(bridgeEvents.LOGOUT_REQUESTED);
 
         assert.called(onLogoutRequest);
       }));
@@ -443,7 +443,7 @@ describe('Sidebar', () => {
         const onSignupRequest = sandbox.stub();
         createSidebar({ services: [{ onSignupRequest }] });
 
-        emitEvent(events.SIGNUP_REQUESTED);
+        emitEvent(bridgeEvents.SIGNUP_REQUESTED);
 
         assert.called(onSignupRequest);
       }));
@@ -453,7 +453,7 @@ describe('Sidebar', () => {
         const onProfileRequest = sandbox.stub();
         createSidebar({ services: [{ onProfileRequest }] });
 
-        emitEvent(events.PROFILE_REQUESTED);
+        emitEvent(bridgeEvents.PROFILE_REQUESTED);
 
         assert.called(onProfileRequest);
       }));
@@ -463,7 +463,7 @@ describe('Sidebar', () => {
         const onHelpRequest = sandbox.stub();
         createSidebar({ services: [{ onHelpRequest }] });
 
-        emitEvent(events.HELP_REQUESTED);
+        emitEvent(bridgeEvents.HELP_REQUESTED);
 
         assert.called(onHelpRequest);
       }));

@@ -1,4 +1,4 @@
-import bridgeEvents from '../../shared/bridge-events';
+import { bridgeEvents } from '../../shared/bridge-events';
 import { watch } from '../util/watch';
 
 /**

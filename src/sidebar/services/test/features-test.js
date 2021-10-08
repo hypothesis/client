@@ -1,4 +1,4 @@
-import bridgeEvents from '../../../shared/bridge-events';
+import { bridgeEvents } from '../../../shared/bridge-events';
 import { FeaturesService } from '../features';
 
 describe('FeaturesService', () => {

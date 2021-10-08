@@ -1,4 +1,4 @@
-import events from '../shared/bridge-events';
+import { bridgeEvents } from '../shared/bridge-events';
 
 const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
 
@@ -12,7 +12,7 @@ const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
 
 export default function annotationCounts(rootEl, crossframe) {
   crossframe.on(
-    events.PUBLIC_ANNOTATION_COUNT_CHANGED,
+    bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
     updateAnnotationCountElems
   );
 

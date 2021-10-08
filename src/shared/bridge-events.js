@@ -2,7 +2,7 @@
  * This module defines the set of global events that are dispatched
  * across the bridge between the sidebar and annotator
  */
-export default {
+export const bridgeEvents = {
   // Events that the sidebar sends to the annotator
   // ----------------------------------------------
 

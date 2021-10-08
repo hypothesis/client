@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 
-import bridgeEvents from '../../../shared/bridge-events';
+import { bridgeEvents } from '../../../shared/bridge-events';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 
 import HypothesisApp, { $imports } from '../HypothesisApp';

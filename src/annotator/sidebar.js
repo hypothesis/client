@@ -1,7 +1,7 @@
 import Hammer from 'hammerjs';
 
 import { Bridge } from '../shared/bridge';
-import events from '../shared/bridge-events';
+import { bridgeEvents } from '../shared/bridge-events';
 import { ListenerCollection } from '../shared/listener-collection';
 
 import annotationCounts from './annotation-counts';
@@ -253,11 +253,11 @@ export default class Sidebar {
     });
 
     const eventHandlers = [
-      [events.LOGIN_REQUESTED, this.onLoginRequest],
-      [events.LOGOUT_REQUESTED, this.onLogoutRequest],
-      [events.SIGNUP_REQUESTED, this.onSignupRequest],
-      [events.PROFILE_REQUESTED, this.onProfileRequest],
-      [events.HELP_REQUESTED, this.onHelpRequest],
+      [bridgeEvents.LOGIN_REQUESTED, this.onLoginRequest],
+      [bridgeEvents.LOGOUT_REQUESTED, this.onLogoutRequest],
+      [bridgeEvents.SIGNUP_REQUESTED, this.onSignupRequest],
+      [bridgeEvents.PROFILE_REQUESTED, this.onProfileRequest],
+      [bridgeEvents.HELP_REQUESTED, this.onHelpRequest],
     ];
     eventHandlers.forEach(([event, handler]) => {
       if (handler) {

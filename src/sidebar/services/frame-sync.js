@@ -1,6 +1,6 @@
 import debounce from 'lodash.debounce';
 
-import bridgeEvents from '../../shared/bridge-events';
+import { bridgeEvents } from '../../shared/bridge-events';
 import { Bridge } from '../../shared/bridge';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';

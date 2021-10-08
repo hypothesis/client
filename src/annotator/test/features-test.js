@@ -1,4 +1,4 @@
-import events from '../../shared/bridge-events';
+import { bridgeEvents } from '../../shared/bridge-events';
 import features from '../features';
 import { $imports } from '../features';
 
@@ -23,7 +23,7 @@ describe('features - annotation layer', () => {
 
     features.init({
       on: function (topic, handler) {
-        if (topic === events.FEATURE_FLAGS_UPDATED) {
+        if (topic === bridgeEvents.FEATURE_FLAGS_UPDATED) {
           featureFlagsUpdateHandler = handler;
         }
       },

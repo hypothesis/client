@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import { useEffect, useMemo } from 'preact/hooks';
 
-import bridgeEvents from '../../shared/bridge-events';
+import { bridgeEvents } from '../../shared/bridge-events';
 import { confirm } from '../../shared/prompts';
 import { serviceConfig } from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';

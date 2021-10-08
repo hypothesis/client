@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import bridgeEvents from '../../../shared/bridge-events';
+import { bridgeEvents } from '../../../shared/bridge-events';
 import UserMenu from '../UserMenu';
 import { $imports } from '../UserMenu';
 
