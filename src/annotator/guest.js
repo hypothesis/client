@@ -1,8 +1,9 @@
+import { Bridge } from '../shared/bridge';
 import { ListenerCollection } from '../shared/listener-collection';
 
 import { Adder } from './adder';
+import { AnnotationSync } from './annotation-sync';
 import { TextRange } from './anchoring/text-range';
-import { CrossFrame } from './cross-frame';
 import {
   getHighlightsContainingNode,
   highlightRange,
@@ -162,13 +163,22 @@ export default class Guest {
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     this._frameIdentifier = config.subFrameIdentifier || null;
 
-    // Setup connection to sidebar.
-    this.crossframe = new CrossFrame(eventBus);
-    this.crossframe.onConnect(() => this._setupInitialState(config));
-
-    this._hypothesisInjector = new HypothesisInjector(this.element, config);
-
+    // Set up listeners for messages coming from the sidebar to this guest.
+    this._bridge = new Bridge();
+    this._bridge.onConnect(() => {
+      this._emitter.publish('panelReady');
+      this.setVisibleHighlights(config.showHighlights === 'always');
+    });
     this._connectSidebarEvents();
+
+    // Set up listeners for when the sidebar asks us to add or remove annotations
+    // in this frame.
+    this._annotationSync = new AnnotationSync(eventBus, this._bridge);
+    this._connectAnnotationSync();
+
+    // Set up automatic and integration-triggered injection of client into
+    // iframes in this frame.
+    this._hypothesisInjector = new HypothesisInjector(this.element, config);
 
     /**
      * Integration that handles document-type specific functionality in the
@@ -177,9 +187,6 @@ export default class Guest {
     this._integration = createIntegration(this);
 
     this._sideBySideActive = false;
-
-    // Listen for annotations being loaded or unloaded.
-    this._connectAnnotationSync();
 
     // Setup event handlers on the root element
     this._listeners = new ListenerCollection();
@@ -214,7 +221,7 @@ export default class Guest {
         // Don't hide the sidebar if the event comes from an element that contains a highlight
         return;
       }
-      this.crossframe.call('closeSidebar');
+      this._bridge.call('closeSidebar');
     };
 
     this._listeners.add(this.element, 'mouseup', event => {
@@ -290,11 +297,6 @@ export default class Guest {
     }
   }
 
-  _setupInitialState(config) {
-    this._emitter.publish('panelReady');
-    this.setVisibleHighlights(config.showHighlights === 'always');
-  }
-
   _connectAnnotationSync() {
     this._emitter.subscribe('annotationDeleted', annotation => {
       this.detach(annotation);
@@ -308,7 +310,7 @@ export default class Guest {
   _connectSidebarEvents() {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
-    this.crossframe.on('focusAnnotations', (tags = []) => {
+    this._bridge.on('focusAnnotations', (tags = []) => {
       this._focusedAnnotations.clear();
       tags.forEach(tag => this._focusedAnnotations.add(tag));
 
@@ -320,7 +322,7 @@ export default class Guest {
       }
     });
 
-    this.crossframe.on('scrollToAnnotation', tag => {
+    this._bridge.on('scrollToAnnotation', tag => {
       const anchor = this.anchors.find(a => a.annotation.$tag === tag);
       if (!anchor?.highlights) {
         return;
@@ -346,14 +348,14 @@ export default class Guest {
     });
 
     // Handler for when sidebar requests metadata for the current document
-    this.crossframe.on('getDocumentInfo', cb => {
+    this._bridge.on('getDocumentInfo', cb => {
       this.getDocumentInfo()
         .then(info => cb(null, info))
         .catch(reason => cb(reason));
     });
 
     // Handler for controls on the sidebar
-    this.crossframe.on('setVisibleHighlights', showHighlights => {
+    this._bridge.on('setVisibleHighlights', showHighlights => {
       this.setVisibleHighlights(showHighlights);
     });
   }
@@ -370,7 +372,8 @@ export default class Guest {
 
     this._integration.destroy();
     this._emitter.destroy();
-    this.crossframe.destroy();
+    this._annotationSync.destroy();
+    this._bridge.destroy();
   }
 
   /**
@@ -387,11 +390,30 @@ export default class Guest {
   }
 
   /**
+   * Attempt to connect to the sidebar frame.
+   *
+   * Returns a promise that resolves once the connection has been established.
+   *
+   * @param {Window} frame - The window containing the sidebar application
+   * @param {string} origin - Origin of the sidebar application (eg. 'https://hypothes.is/')
+   */
+  connectToSidebar(frame, origin) {
+    const channel = new MessageChannel();
+    frame.postMessage(
+      {
+        type: 'hypothesisGuestReady',
+      },
+      origin,
+      [channel.port2]
+    );
+    this._bridge.createChannel(channel.port1);
+  }
+
+  /**
    * Anchor an annotation's selectors in the document.
    *
    * _Anchoring_ resolves a set of selectors to a concrete region of the document
-   * which is then highlighted. The results of anchoring are broadcast to the
-   * rest of the application via `CrossFrame#sync`.
+   * which is then highlighted.
    *
    * Any existing anchors associated with `annotation` will be removed before
    * re-anchoring the annotation.
@@ -482,7 +504,7 @@ export default class Guest {
     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
     // Let other frames (eg. the sidebar) know about the new annotation.
-    this.crossframe.sync([annotation]);
+    this._annotationSync.sync([annotation]);
 
     return anchors;
   }
@@ -558,7 +580,7 @@ export default class Guest {
     this.anchor(annotation);
 
     if (!annotation.$highlight) {
-      this.crossframe.call('openSidebar');
+      this._bridge.call('openSidebar');
     }
 
     return annotation;
@@ -572,7 +594,7 @@ export default class Guest {
    */
   _focusAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
-    this.crossframe.call('focusAnnotations', tags);
+    this._bridge.call('focusAnnotations', tags);
   }
 
   /**
@@ -623,11 +645,11 @@ export default class Guest {
   selectAnnotations(annotations, toggle = false) {
     const tags = annotations.map(a => a.$tag);
     if (toggle) {
-      this.crossframe.call('toggleAnnotationSelection', tags);
+      this._bridge.call('toggleAnnotationSelection', tags);
     } else {
-      this.crossframe.call('showAnnotations', tags);
+      this._bridge.call('showAnnotations', tags);
     }
-    this.crossframe.call('openSidebar');
+    this._bridge.call('openSidebar');
   }
 
   /**

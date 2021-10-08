@@ -2,7 +2,6 @@
 // with various combinations of selector are anchored.
 
 import Guest from '../../guest';
-import { $imports as guestImports } from '../../guest';
 import { EventBus } from '../../util/emitter';
 import testPageHTML from './test-page.html';
 
@@ -41,26 +40,9 @@ function simplifyWhitespace(quote) {
   return quote.replace(/\s+/g, ' ');
 }
 
-function FakeCrossFrame() {
-  this.destroy = sinon.stub();
-  this.onConnect = sinon.stub();
-  this.on = sinon.stub();
-  this.sync = sinon.stub();
-}
-
 describe('anchoring', () => {
   let guest;
   let container;
-
-  before(() => {
-    guestImports.$mock({
-      './cross-frame': { CrossFrame: FakeCrossFrame },
-    });
-  });
-
-  after(() => {
-    guestImports.$restore();
-  });
 
   beforeEach(() => {
     sinon.stub(console, 'warn');

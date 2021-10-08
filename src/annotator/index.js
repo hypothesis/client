@@ -88,7 +88,7 @@ function init() {
   if (sidebarWindow) {
     const sidebarOrigin = new URL(sidebarLinkElement.href).origin;
     sidebarWindow.then(([frame]) =>
-      guest.crossframe.connectToSidebar(frame, sidebarOrigin)
+      guest.connectToSidebar(frame, sidebarOrigin)
     );
   } else {
     // eslint-disable-next-line no-console
