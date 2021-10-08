@@ -7,9 +7,12 @@ const _set = features => {
   _features = features || {};
 };
 
-export default {
-  init: function (crossframe) {
-    crossframe.on(events.FEATURE_FLAGS_UPDATED, _set);
+export const features = {
+  /**
+   * @param {import('../shared/bridge').Bridge} bridge - Channel for host-sidebar communication
+   */
+  init: function (bridge) {
+    bridge.on(events.FEATURE_FLAGS_UPDATED, _set);
   },
 
   reset: function () {

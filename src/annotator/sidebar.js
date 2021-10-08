@@ -7,7 +7,7 @@ import { ListenerCollection } from '../shared/listener-collection';
 import annotationCounts from './annotation-counts';
 import BucketBar from './bucket-bar';
 import { createSidebarConfig } from './config/sidebar';
-import features from './features';
+import { features } from './features';
 import sidebarTrigger from './sidebar-trigger';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
