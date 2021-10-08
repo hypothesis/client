@@ -1,11 +1,11 @@
 import { SvgIcon } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 
-import bridgeEvents from '../../shared/bridge-events';
+import { sidebarToHostEvents } from '../../shared/bridge-events';
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyUser } from '../helpers/account-id';
-import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
+import { useStoreProxy } from '../store/use-store';
 
 import Menu from './Menu';
 import MenuItem from './MenuItem';
@@ -57,7 +57,10 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
 
   const onSelectNotebook = () => {
-    frameSync.notifyHost('openNotebook', store.focusedGroupId());
+    frameSync.notifyHost(
+      sidebarToHostEvents.OPEN_NOTEBOOK,
+      store.focusedGroupId()
+    );
   };
 
   // Temporary access to the Notebook without feature flag:
@@ -70,7 +73,7 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
   };
 
   const onProfileSelected = () =>
-    isThirdParty && frameSync.notifyHost(bridgeEvents.PROFILE_REQUESTED);
+    isThirdParty && frameSync.notifyHost(sidebarToHostEvents.PROFILE_REQUESTED);
 
   // Generate dynamic props for the profile <MenuItem> component
   const profileItemProps = (() => {

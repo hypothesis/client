@@ -1,6 +1,9 @@
 import { PortRPC } from './port-rpc';
 
-/** @typedef {import('../types/annotator').Destroyable} Destroyable */
+/**
+ * @typedef {import('./bridge-events').BridgeEvent} BridgeEvent
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
+ */
 
 /**
  * The Bridge service sets up a channel between frames and provides an events
@@ -66,7 +69,7 @@ export class Bridge {
    * Make a method call on all channels, collect the results and pass them to a
    * callback when all results are collected.
    *
-   * @param {string} method - Name of remote method to call.
+   * @param {BridgeEvent} method - Name of remote method to call.
    * @param {any[]} args - Arguments to method. Final argument is an optional
    *   callback with this type: `(error: string|Error|null, ...result: any[]) => void`.
    *   This callback, if any, will be triggered once a response (via `postMessage`)
@@ -132,7 +135,7 @@ export class Bridge {
    * Register a listener to be invoked when any connected channel sends a
    * message to this `Bridge`.
    *
-   * @param {string} method
+   * @param {'connect'|BridgeEvent} method
    * @param {(...args: any[]) => void} listener -- Final argument is an optional
    *   callback of the type: `(error: string|Error|null, ...result: any[]) => void`.
    *   This callback must be invoked in order to respond (via `postMessage`)

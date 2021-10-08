@@ -1,7 +1,12 @@
 import debounce from 'lodash.debounce';
 
-import bridgeEvents from '../../shared/bridge-events';
 import { Bridge } from '../../shared/bridge';
+import {
+  hostToSidebarEvents,
+  guestToSidebarEvents,
+  sidebarToHostEvents,
+  sidebarToGuestEvents,
+} from '../../shared/bridge-events';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
@@ -105,13 +110,19 @@ export class FrameSyncService {
           // when they are added or removed in the sidebar, but not re-anchoring
           // annotations if their selectors are updated.
           if (added.length > 0) {
-            this._guestRPC.call('loadAnnotations', added.map(formatAnnot));
+            this._guestRPC.call(
+              sidebarToGuestEvents.LOAD_ANNOTATIONS,
+              added.map(formatAnnot)
+            );
             added.forEach(annot => {
               inFrame.add(annot.$tag);
             });
           }
           deleted.forEach(annot => {
-            this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
+            this._guestRPC.call(
+              sidebarToGuestEvents.DELETE_ANNOTATION,
+              formatAnnot(annot)
+            );
             inFrame.delete(annot.$tag);
           });
 
@@ -119,7 +130,7 @@ export class FrameSyncService {
             if (frames.every(frame => frame.isAnnotationFetchComplete)) {
               if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
                 this._hostRPC.call(
-                  bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
+                  sidebarToHostEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
                   publicAnns
                 );
                 prevPublicAnns = publicAnns;
@@ -136,23 +147,29 @@ export class FrameSyncService {
      */
     this._setupSyncFromGuests = () => {
       // A new annotation, note or highlight was created in the frame
-      this._guestRPC.on('beforeCreateAnnotation', event => {
-        const annot = Object.assign({}, event.msg, { $tag: event.tag });
-        // If user is not logged in, we can't really create a meaningful highlight
-        // or annotation. Instead, we need to open the sidebar, show an error,
-        // and delete the (unsaved) annotation so it gets un-selected in the
-        // target document
-        if (!store.isLoggedIn()) {
-          this._hostRPC.call('openSidebar');
-          store.openSidebarPanel('loginPrompt');
-          this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
-          return;
-        }
-        inFrame.add(event.tag);
+      this._guestRPC.on(
+        guestToSidebarEvents.BEFORE_CREATE_ANNOTATION,
+        event => {
+          const annot = Object.assign({}, event.msg, { $tag: event.tag });
+          // If user is not logged in, we can't really create a meaningful highlight
+          // or annotation. Instead, we need to open the sidebar, show an error,
+          // and delete the (unsaved) annotation so it gets un-selected in the
+          // target document
+          if (!store.isLoggedIn()) {
+            this._hostRPC.call(sidebarToHostEvents.OPEN_SIDEBAR);
+            store.openSidebarPanel('loginPrompt');
+            this._guestRPC.call(
+              sidebarToGuestEvents.DELETE_ANNOTATION,
+              formatAnnot(annot)
+            );
+            return;
+          }
+          inFrame.add(event.tag);
 
-        // Create the new annotation in the sidebar.
-        annotationsService.create(annot);
-      });
+          // Create the new annotation in the sidebar.
+          annotationsService.create(annot);
+        }
+      );
 
       // Map of annotation tag to anchoring status
       // ('anchored'|'orphan'|'timeout').
@@ -168,7 +185,7 @@ export class FrameSyncService {
       }, 10);
 
       // Anchoring an annotation in the frame completed
-      this._guestRPC.on('sync', events_ => {
+      this._guestRPC.on(guestToSidebarEvents.SYNC, events_ => {
         events_.forEach(event => {
           inFrame.add(event.tag);
           anchoringStatusUpdates[event.tag] = event.msg.$orphan
@@ -178,25 +195,28 @@ export class FrameSyncService {
         });
       });
 
-      this._guestRPC.on('showAnnotations', tags => {
+      this._guestRPC.on(guestToSidebarEvents.SHOW_ANNOTATIONS, tags => {
         store.selectAnnotations(store.findIDsForTags(tags));
         store.selectTab('annotation');
       });
 
-      this._guestRPC.on('focusAnnotations', tags => {
+      this._guestRPC.on(guestToSidebarEvents.FOCUS_ANNOTATIONS, tags => {
         store.focusAnnotations(tags || []);
       });
 
-      this._guestRPC.on('toggleAnnotationSelection', tags => {
-        store.toggleSelectedAnnotations(store.findIDsForTags(tags));
+      this._guestRPC.on(
+        guestToSidebarEvents.TOGGLE_ANNOTATION_SELECTION,
+        tags => {
+          store.toggleSelectedAnnotations(store.findIDsForTags(tags));
+        }
+      );
+
+      this._guestRPC.on(guestToSidebarEvents.OPEN_SIDEBAR, () => {
+        this._hostRPC.call(sidebarToHostEvents.OPEN_SIDEBAR);
       });
 
-      this._guestRPC.on('openSidebar', () => {
-        this._hostRPC.call('openSidebar');
-      });
-
-      this._guestRPC.on('closeSidebar', () => {
-        this._hostRPC.call('closeSidebar');
+      this._guestRPC.on(guestToSidebarEvents.CLOSE_SIDEBAR, () => {
+        this._hostRPC.call(sidebarToHostEvents.CLOSE_SIDEBAR);
       });
     };
   }
@@ -212,7 +232,7 @@ export class FrameSyncService {
      * @param {PortRPC} channel
      */
     const addFrame = channel => {
-      channel.call('getDocumentInfo', (err, info) => {
+      channel.call(sidebarToGuestEvents.GET_DOCUMENT_INFO, (err, info) => {
         if (err) {
           channel.destroy();
           return;
@@ -249,14 +269,14 @@ export class FrameSyncService {
     this._setupSyncToGuests();
     this._setupSyncFromGuests();
 
-    this._hostRPC.on('sidebarOpened', () => {
+    this._hostRPC.on(hostToSidebarEvents.SIDEBAR_OPENED, () => {
       this._store.setSidebarOpened(true);
     });
 
     // Listen for notifications of a guest being unloaded. This message is routed
     // via the host frame rather than coming directly from the unloaded guest
     // to work around https://bugs.webkit.org/show_bug.cgi?id=231167.
-    this._hostRPC.on('destroyFrame', frameIdentifier => {
+    this._hostRPC.on(hostToSidebarEvents.DESTROY_FRAME, frameIdentifier => {
       const frame = this._store.frames().find(f => f.id === frameIdentifier);
       if (frame) {
         this._store.destroyFrame(frame);
@@ -265,8 +285,8 @@ export class FrameSyncService {
 
     // When user toggles the highlight visibility control in the sidebar container,
     // update the visibility in all the guest frames.
-    this._hostRPC.on('setVisibleHighlights', state => {
-      this._guestRPC.call('setVisibleHighlights', state);
+    this._hostRPC.on(hostToSidebarEvents.SET_VISIBLE_HIGHLIGHTS, state => {
+      this._guestRPC.call(sidebarToGuestEvents.SET_VISIBLE_HIGHLIGHTS, state);
     });
 
     // Create channel for sidebar <-> host communication and send port to host.
@@ -282,7 +302,7 @@ export class FrameSyncService {
   /**
    * Send an RPC message to the host frame.
    *
-   * @param {string} method
+   * @param {import('../../shared/bridge-events').SidebarToHostEvent} method
    * @param {any[]} args
    */
   notifyHost(method, ...args) {
@@ -299,7 +319,7 @@ export class FrameSyncService {
    */
   focusAnnotations(tags) {
     this._store.focusAnnotations(tags);
-    this._guestRPC.call('focusAnnotations', tags);
+    this._guestRPC.call(sidebarToGuestEvents.FOCUS_ANNOTATIONS, tags);
   }
 
   /**
@@ -308,6 +328,6 @@ export class FrameSyncService {
    * @param {string} tag
    */
   scrollToAnnotation(tag) {
-    this._guestRPC.call('scrollToAnnotation', tag);
+    this._guestRPC.call(sidebarToGuestEvents.SCROLL_TO_ANNOTATION, tag);
   }
 }

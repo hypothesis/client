@@ -1,7 +1,10 @@
 import Hammer from 'hammerjs';
 
 import { Bridge } from '../shared/bridge';
-import events from '../shared/bridge-events';
+import {
+  hostToSidebarEvents,
+  sidebarToHostEvents,
+} from '../shared/bridge-events';
 import { ListenerCollection } from '../shared/listener-collection';
 
 import { annotationCounts } from './annotation-counts';
@@ -217,7 +220,10 @@ export default class Sidebar {
     this._listeners.add(window, 'message', event => {
       const { data } = /** @type {MessageEvent} */ (event);
       if (data?.type === 'hypothesisGuestUnloaded') {
-        this._sidebarRPC.call('destroyFrame', data.frameIdentifier);
+        this._sidebarRPC.call(
+          hostToSidebarEvents.DESTROY_FRAME,
+          data.frameIdentifier
+        );
       }
     });
   }
@@ -239,25 +245,29 @@ export default class Sidebar {
     sidebarTrigger(document.body, () => this.open());
     features.init(this._sidebarRPC);
 
-    this._sidebarRPC.on('openSidebar', () => this.open());
-    this._sidebarRPC.on('closeSidebar', () => this.close());
+    this._sidebarRPC.on(sidebarToHostEvents.OPEN_SIDEBAR, () => this.open());
+    this._sidebarRPC.on(sidebarToHostEvents.CLOSE_SIDEBAR, () => this.close());
 
     // Sidebar listens to the `openNotebook` event coming from the sidebar's
     // iframe and re-publishes it via the emitter to the Notebook
-    this._sidebarRPC.on('openNotebook', (/** @type {string} */ groupId) => {
-      this.hide();
-      this._emitter.publish('openNotebook', groupId);
-    });
+    this._sidebarRPC.on(
+      sidebarToHostEvents.OPEN_NOTEBOOK,
+      (/** @type {string} */ groupId) => {
+        this.hide();
+        this._emitter.publish('openNotebook', groupId);
+      }
+    );
     this._emitter.subscribe('closeNotebook', () => {
       this.show();
     });
 
+    /** @type {Array<[import('../shared/bridge-events').SidebarToHostEvent, function]>} */
     const eventHandlers = [
-      [events.LOGIN_REQUESTED, this.onLoginRequest],
-      [events.LOGOUT_REQUESTED, this.onLogoutRequest],
-      [events.SIGNUP_REQUESTED, this.onSignupRequest],
-      [events.PROFILE_REQUESTED, this.onProfileRequest],
-      [events.HELP_REQUESTED, this.onHelpRequest],
+      [sidebarToHostEvents.LOGIN_REQUESTED, this.onLoginRequest],
+      [sidebarToHostEvents.LOGOUT_REQUESTED, this.onLogoutRequest],
+      [sidebarToHostEvents.SIGNUP_REQUESTED, this.onSignupRequest],
+      [sidebarToHostEvents.PROFILE_REQUESTED, this.onProfileRequest],
+      [sidebarToHostEvents.HELP_REQUESTED, this.onHelpRequest],
     ];
     eventHandlers.forEach(([event, handler]) => {
       if (handler) {
@@ -439,7 +449,7 @@ export default class Sidebar {
   }
 
   open() {
-    this._sidebarRPC.call('sidebarOpened');
+    this._sidebarRPC.call(hostToSidebarEvents.SIDEBAR_OPENED);
     this._emitter.publish('sidebarOpened');
 
     if (this.iframeContainer) {
@@ -478,7 +488,10 @@ export default class Sidebar {
    * @param {boolean} shouldShowHighlights
    */
   setAllVisibleHighlights(shouldShowHighlights) {
-    this._sidebarRPC.call('setVisibleHighlights', shouldShowHighlights);
+    this._sidebarRPC.call(
+      hostToSidebarEvents.SET_VISIBLE_HIGHLIGHTS,
+      shouldShowHighlights
+    );
   }
 
   /**

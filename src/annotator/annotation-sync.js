@@ -1,3 +1,8 @@
+import {
+  guestToSidebarEvents,
+  sidebarToGuestEvents,
+} from '../shared/bridge-events';
+
 /**
  * @typedef {import('../shared/bridge').Bridge} Bridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
@@ -43,7 +48,7 @@ export class AnnotationSync {
     this.destroyed = false;
 
     // Relay events from the sidebar to the rest of the annotator.
-    this.bridge.on('deleteAnnotation', (body, callback) => {
+    this.bridge.on(sidebarToGuestEvents.DELETE_ANNOTATION, (body, callback) => {
       if (this.destroyed) {
         callback(null);
         return;
@@ -55,22 +60,28 @@ export class AnnotationSync {
       callback(null);
     });
 
-    this.bridge.on('loadAnnotations', (bodies, callback) => {
-      if (this.destroyed) {
+    this.bridge.on(
+      sidebarToGuestEvents.LOAD_ANNOTATIONS,
+      (bodies, callback) => {
+        if (this.destroyed) {
+          callback(null);
+          return;
+        }
+        const annotations = bodies.map(body => this._parse(body));
+        this._emitter.publish('annotationsLoaded', annotations);
         callback(null);
-        return;
       }
-      const annotations = bodies.map(body => this._parse(body));
-      this._emitter.publish('annotationsLoaded', annotations);
-      callback(null);
-    });
+    );
 
     // Relay events from annotator to sidebar.
     this._emitter.subscribe('beforeAnnotationCreated', annotation => {
       if (annotation.$tag) {
         return;
       }
-      this.bridge.call('beforeCreateAnnotation', this._format(annotation));
+      this.bridge.call(
+        guestToSidebarEvents.BEFORE_CREATE_ANNOTATION,
+        this._format(annotation)
+      );
     });
   }
 
@@ -88,7 +99,7 @@ export class AnnotationSync {
     }
 
     this.bridge.call(
-      'sync',
+      guestToSidebarEvents.SYNC,
       annotations.map(ann => this._format(ann))
     );
   }

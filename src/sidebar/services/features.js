@@ -1,4 +1,4 @@
-import bridgeEvents from '../../shared/bridge-events';
+import { sidebarToHostEvents } from '../../shared/bridge-events';
 import { watch } from '../util/watch';
 
 /**
@@ -27,7 +27,7 @@ export class FeaturesService {
     const currentFlags = () => this._store.profile().features;
     const sendFeatureFlags = () => {
       this._frameSync.notifyHost(
-        bridgeEvents.FEATURE_FLAGS_UPDATED,
+        sidebarToHostEvents.FEATURE_FLAGS_UPDATED,
         currentFlags() || {}
       );
     };

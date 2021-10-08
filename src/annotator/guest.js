@@ -1,3 +1,7 @@
+import {
+  guestToSidebarEvents,
+  sidebarToGuestEvents,
+} from '../shared/bridge-events';
 import { Bridge } from '../shared/bridge';
 import { ListenerCollection } from '../shared/listener-collection';
 
@@ -221,7 +225,7 @@ export default class Guest {
         // Don't hide the sidebar if the event comes from an element that contains a highlight
         return;
       }
-      this._bridge.call('closeSidebar');
+      this._bridge.call(guestToSidebarEvents.CLOSE_SIDEBAR);
     };
 
     this._listeners.add(this.element, 'mouseup', event => {
@@ -310,7 +314,7 @@ export default class Guest {
   _connectSidebarEvents() {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
-    this._bridge.on('focusAnnotations', (tags = []) => {
+    this._bridge.on(sidebarToGuestEvents.FOCUS_ANNOTATIONS, (tags = []) => {
       this._focusedAnnotations.clear();
       tags.forEach(tag => this._focusedAnnotations.add(tag));
 
@@ -322,7 +326,7 @@ export default class Guest {
       }
     });
 
-    this._bridge.on('scrollToAnnotation', tag => {
+    this._bridge.on(sidebarToGuestEvents.SCROLL_TO_ANNOTATION, tag => {
       const anchor = this.anchors.find(a => a.annotation.$tag === tag);
       if (!anchor?.highlights) {
         return;
@@ -348,16 +352,19 @@ export default class Guest {
     });
 
     // Handler for when sidebar requests metadata for the current document
-    this._bridge.on('getDocumentInfo', cb => {
+    this._bridge.on(sidebarToGuestEvents.GET_DOCUMENT_INFO, cb => {
       this.getDocumentInfo()
         .then(info => cb(null, info))
         .catch(reason => cb(reason));
     });
 
     // Handler for controls on the sidebar
-    this._bridge.on('setVisibleHighlights', showHighlights => {
-      this.setVisibleHighlights(showHighlights);
-    });
+    this._bridge.on(
+      sidebarToGuestEvents.SET_VISIBLE_HIGHLIGHTS,
+      showHighlights => {
+        this.setVisibleHighlights(showHighlights);
+      }
+    );
   }
 
   destroy() {
@@ -578,7 +585,7 @@ export default class Guest {
     this.anchor(annotation);
 
     if (!annotation.$highlight) {
-      this._bridge.call('openSidebar');
+      this._bridge.call(guestToSidebarEvents.OPEN_SIDEBAR);
     }
 
     return annotation;
@@ -592,7 +599,7 @@ export default class Guest {
    */
   _focusAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
-    this._bridge.call('focusAnnotations', tags);
+    this._bridge.call(guestToSidebarEvents.FOCUS_ANNOTATIONS, tags);
   }
 
   /**
@@ -643,11 +650,11 @@ export default class Guest {
   selectAnnotations(annotations, toggle = false) {
     const tags = annotations.map(a => a.$tag);
     if (toggle) {
-      this._bridge.call('toggleAnnotationSelection', tags);
+      this._bridge.call(guestToSidebarEvents.TOGGLE_ANNOTATION_SELECTION, tags);
     } else {
-      this._bridge.call('showAnnotations', tags);
+      this._bridge.call(guestToSidebarEvents.SHOW_ANNOTATIONS, tags);
     }
-    this._bridge.call('openSidebar');
+    this._bridge.call(guestToSidebarEvents.OPEN_SIDEBAR);
   }
 
   /**

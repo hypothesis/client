@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import { useEffect, useMemo } from 'preact/hooks';
 
-import bridgeEvents from '../../shared/bridge-events';
+import { sidebarToHostEvents } from '../../shared/bridge-events';
 import { confirm } from '../../shared/prompts';
 import { serviceConfig } from '../config/service-config';
 import { useStoreProxy } from '../store/use-store';
@@ -98,7 +98,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
   const login = async () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the login request
-      frameSync.notifyHost(bridgeEvents.LOGIN_REQUESTED);
+      frameSync.notifyHost(sidebarToHostEvents.LOGIN_REQUESTED);
       return;
     }
 
@@ -116,7 +116,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
   const signUp = () => {
     if (serviceConfig(settings)) {
       // Let the host page handle the signup request
-      frameSync.notifyHost(bridgeEvents.SIGNUP_REQUESTED);
+      frameSync.notifyHost(sidebarToHostEvents.SIGNUP_REQUESTED);
       return;
     }
     window.open(store.getLink('signup'));
@@ -156,7 +156,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
     store.discardAllDrafts();
 
     if (serviceConfig(settings)) {
-      frameSync.notifyHost(bridgeEvents.LOGOUT_REQUESTED);
+      frameSync.notifyHost(sidebarToHostEvents.LOGOUT_REQUESTED);
       return;
     }
 
