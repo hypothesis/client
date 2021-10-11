@@ -18,7 +18,8 @@ export default {
   treeshake: false,
   plugins: [
     // Replace some problematic dependencies which are imported but not actually
-    // used with stubs.
+    // used with stubs. Per @rollup/plugin-virtual's docs, this must be listed
+    // first.
     virtual({
       // Enzyme dependency used in its "Static Rendering" mode, which we don't use.
       'cheerio/lib/utils': '',
@@ -70,7 +71,16 @@ export default {
         ],
       ],
     }),
-    nodeResolve({ browser: true, preferBuiltins: false }),
+    nodeResolve({
+      browser: true,
+
+      // Disallow use of browser polyfills for Node builtin modules. We're
+      // trying to avoid dependencies which rely on these.
+      //
+      // There are a couple of references to Node builtins that are stubbed by
+      // configuration for the `virtual` plugin above.
+      preferBuiltins: false,
+    }),
     commonjs(),
     string({
       include: '**/*.{html,svg}',
