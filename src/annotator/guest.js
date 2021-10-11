@@ -392,8 +392,6 @@ export default class Guest {
   /**
    * Attempt to connect to the sidebar frame.
    *
-   * Returns a promise that resolves once the connection has been established.
-   *
    * @param {Window} frame - The window containing the sidebar application
    * @param {string} origin - Origin of the sidebar application (eg. 'https://hypothes.is/')
    */
