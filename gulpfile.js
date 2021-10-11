@@ -2,7 +2,7 @@
 
 'use strict';
 
-const { mkdirSync, writeFileSync } = require('fs');
+const { existsSync, mkdirSync, writeFileSync } = require('fs');
 const path = require('path');
 
 const changed = require('gulp-changed');
@@ -170,6 +170,15 @@ let isFirstBuild = true;
  * @param {object} options - Options for generating the boot script
  */
 function generateBootScript(manifest, { usingDevServer = false } = {}) {
+  const bootBundle = 'build/scripts/boot.bundle.js';
+
+  // In development, fail silently if the boot bundle has not yet been generated.
+  // This function will be re-run after it is. In production, the boot bundle
+  // should always have been generated first.
+  if (usingDevServer && !existsSync(bootBundle)) {
+    return;
+  }
+
   const { version } = require('./package.json');
 
   const defaultNotebookAppUrl = process.env.NOTEBOOK_APP_URL
@@ -197,7 +206,7 @@ function generateBootScript(manifest, { usingDevServer = false } = {}) {
   }
 
   gulp
-    .src('build/scripts/boot.bundle.js')
+    .src(bootBundle)
     .pipe(replace('__MANIFEST__', JSON.stringify(manifest)))
     .pipe(replace('__ASSET_ROOT__', defaultAssetRoot))
     .pipe(replace('__NOTEBOOK_APP_URL__', defaultNotebookAppUrl))
