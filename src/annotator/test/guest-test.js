@@ -148,7 +148,7 @@ describe('Guest', () => {
     $imports.$restore();
   });
 
-  describe('cross frame', () => {
+  describe('communication with sidebar', () => {
     it('provides an event bus for the annotation sync module', () => {
       createGuest();
       assert.deepEqual(FakeAnnotationSync.lastCall.args[0], eventBus);

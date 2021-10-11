@@ -99,7 +99,7 @@ function resolveAnchor(anchor) {
  * loads Hypothesis (not all frames will be annotation-enabled). In one frame,
  * usually the top-level one, there will also be an instance of the `Sidebar`
  * class that shows the sidebar app and surrounding UI. The `Guest` instance in
- * each frame connects to the sidebar via the `CrossFrame` service.
+ * each frame connects to the sidebar when {@link connectToSidebar} is called.
  *
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
