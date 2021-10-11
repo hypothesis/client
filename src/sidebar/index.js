@@ -186,6 +186,20 @@ function startApp(config, appEl) {
   );
 }
 
+/**
+ * @param {Error} error
+ * @param {HTMLElement} appEl
+ */
+function reportLaunchError(error, appEl) {
+  // Report error. In the sidebar the console log is the only notice the user
+  // gets because the sidebar does not appear at all if the app fails to start.
+  console.error('Failed to start Hypothesis client: ', error);
+
+  // For apps where the UI is visible (eg. notebook, single-annotation view),
+  // show an error notice.
+  render(<LaunchErrorPanel error={error} />, appEl);
+}
+
 const appEl = /** @type {HTMLElement} */ (
   document.querySelector('hypothesis-app')
 );
@@ -197,12 +211,4 @@ fetchConfig(appConfig)
   .then(config => {
     startApp(config, appEl);
   })
-  .catch(err => {
-    // Report error. In the sidebar the console log is the only notice the user
-    // gets because the sidebar does not appear at all if the app fails to start.
-    console.error('Failed to start Hypothesis client: ', err);
-
-    // For apps where the UI is visible (eg. notebook, single-annotation view),
-    // show an error notice.
-    render(<LaunchErrorPanel error={err} />, appEl);
-  });
+  .catch(err => reportLaunchError(err, appEl));
