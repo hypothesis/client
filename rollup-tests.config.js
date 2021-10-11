@@ -13,6 +13,7 @@ export default {
     file: 'build/scripts/tests.bundle.js',
     format: 'iife',
     name: 'testsBundle', // This just exists to suppress a build warning.
+    sourcemap: true,
   },
   treeshake: false,
   plugins: [
