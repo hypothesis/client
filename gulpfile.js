@@ -276,6 +276,8 @@ gulp.task(
 async function buildAndRunTests() {
   const { grep, singleRun } = karmaOptions;
 
+  // Generate an entry file for the test bundle. This imports all the test
+  // modules, filtered by the pattern specified by the `--grep` CLI option.
   const testFiles = [
     'src/sidebar/test/bootstrap.js',
     ...glob
@@ -290,14 +292,16 @@ async function buildAndRunTests() {
   mkdirSync('build/scripts', { recursive: true });
   writeFileSync('build/scripts/test-inputs.js', testSource);
 
+  // Build the test bundle.
   log(`Building test bundle... (${testFiles.length} files)`);
   if (singleRun) {
     await buildJS('./rollup-tests.config.js');
   } else {
     await watchJS('./rollup-tests.config.js');
   }
-  log('Starting Karma...');
 
+  // Run the tests.
+  log('Starting Karma...');
   return new Promise(resolve => {
     const karma = require('karma');
     new karma.Server(
@@ -322,5 +326,5 @@ async function buildAndRunTests() {
 // Unit and integration testing tasks.
 //
 // Some (eg. a11y) tests rely on CSS bundles. We assume that JS will always take
-// londer to build than CSS, so build in parallel.
+// longer to build than CSS, so build in parallel.
 gulp.task('test', gulp.parallel('build-css', buildAndRunTests));
