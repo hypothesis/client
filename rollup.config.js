@@ -5,18 +5,19 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import { string } from 'rollup-plugin-string';
 import { terser } from 'rollup-plugin-terser';
+import virtual from '@rollup/plugin-virtual';
 
 const isProd = process.env.NODE_ENV === 'production';
 const prodPlugins = [];
-const prodAliases = [];
 if (isProd) {
   prodPlugins.push(terser());
 
-  // Exclude 'preact/debug' from production builds.
-  prodAliases.push({
-    find: 'preact/debug',
-    replacement: 'preact',
-  });
+  // Eliminate debug-only imports.
+  prodPlugins.push(
+    virtual({
+      'preact/debug': '',
+    })
+  );
 }
 
 function bundleConfig(name, entryFile) {
@@ -44,7 +45,6 @@ function bundleConfig(name, entryFile) {
             find: 'preact/compat/jsx-dev-runtime',
             replacement: 'preact/jsx-dev-runtime',
           },
-          ...prodAliases,
         ],
       }),
       replace({
