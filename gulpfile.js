@@ -67,6 +67,7 @@ async function buildJS(rollupConfig) {
     options.map(async inputs => {
       const bundle = await rollup.rollup(inputs);
       await Promise.all(inputs.output.map(output => bundle.write(output)));
+      warnings.flush();
     })
   );
 }
@@ -92,6 +93,7 @@ async function watchJS(rollupConfig) {
           break;
         case 'END':
           log('JS build completed.');
+          warnings.flush();
           resolve(); // Resolve once the initial build completes.
           break;
       }
