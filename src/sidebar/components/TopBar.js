@@ -2,10 +2,10 @@ import { IconButton, LinkButton } from '@hypothesis/frontend-shared';
 
 import { sidebarToHostEvents } from '../../shared/bridge-events';
 import { serviceConfig } from '../config/service-config';
-import { useStoreProxy } from '../store/use-store';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
-import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
+import { withServices } from '../service-context';
+import { useStoreProxy } from '../store/use-store';
 
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';

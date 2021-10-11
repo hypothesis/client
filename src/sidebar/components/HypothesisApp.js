@@ -4,11 +4,11 @@ import { useEffect, useMemo } from 'preact/hooks';
 import { sidebarToHostEvents } from '../../shared/bridge-events';
 import { confirm } from '../../shared/prompts';
 import { serviceConfig } from '../config/service-config';
-import { useStoreProxy } from '../store/use-store';
 import { parseAccountID } from '../helpers/account-id';
 import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
+import { useStoreProxy } from '../store/use-store';
 
 import AnnotationView from './AnnotationView';
 import SidebarView from './SidebarView';
