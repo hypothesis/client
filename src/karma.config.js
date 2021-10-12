@@ -55,7 +55,7 @@ module.exports = function (config) {
       { pattern: './annotator/test/empty.html', watched: false },
 
       // Test bundles.
-      '../build/scripts/tests.bundle.js',
+      { pattern: '../build/scripts/tests.bundle.js', type: 'module' },
 
       // Sourcemaps for test bundles.
       { pattern: '../build/scripts/*.js.map', included: false },
