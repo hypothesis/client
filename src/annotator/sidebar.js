@@ -251,7 +251,7 @@ export default class Sidebar {
       this.show();
     });
 
-    /** @type {Array<[import('../types/bridge-events').BridgeEvents, function]>} */
+    /** @type {Array<[import('../types/bridge-events').BridgeEvent, function]>} */
     const eventHandlers = [
       ['loginRequested', this.onLoginRequest],
       ['logoutRequested', this.onLogoutRequest],

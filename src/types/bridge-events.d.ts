@@ -6,7 +6,7 @@
 /**
  * Events that the sidebar sends to the host
  */
-type SidebarToHostEvents = {
+type SidebarToHostEvent = {
   /**
    * The sidebar is asking the host to open the sidebar.
    */
@@ -65,7 +65,7 @@ type SidebarToHostEvents = {
 /**
  * Events that the host sends to the sidebar
  */
-type HostToSidebarEvents = {
+type HostToSidebarEvent = {
   /**
    * The host is asking the sidebar to delete a frame using an identifier
    */
@@ -80,7 +80,7 @@ type HostToSidebarEvents = {
 /**
  * Events that the sidebar sends to the guest/s
  */
-type SidebarToGuestEvents = {
+type SidebarToGuestEvent = {
   /**
    * The sidebar is asking the guest/s to focus on certain annotations.
    */
@@ -110,7 +110,7 @@ type SidebarToGuestEvents = {
 /**
  * Events that the guest sends to the sidebar
  */
-type GuestToSidebarEvents = {
+type GuestToSidebarEvent = {
   /**
    * The guest is asking the sidebar to create an annotation
    */
@@ -142,9 +142,9 @@ type GuestToSidebarEvents = {
   TOGGLE_ANNOTATION_SELECTION: 'toggleAnnotationSelection';
 };
 
-export type BridgeEvents =
+export type BridgeEvent =
   | 'connect'
-  | SidebarToHostEvents[keyof SidebarToHostEvents]
-  | HostToSidebarEvents[keyof HostToSidebarEvents]
-  | SidebarToGuestEvents[keyof SidebarToGuestEvents]
-  | GuestToSidebarEvents[keyof GuestToSidebarEvents];
+  | SidebarToHostEvent[keyof SidebarToHostEvent]
+  | HostToSidebarEvent[keyof HostToSidebarEvent]
+  | SidebarToGuestEvent[keyof SidebarToGuestEvent]
+  | GuestToSidebarEvent[keyof GuestToSidebarEvent];
