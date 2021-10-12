@@ -114,8 +114,13 @@ describe('PortRPC-Bridge integration', () => {
     it('no longer sends RPC messages to a Bridge channel that has received an error', async () => {
       const bridge = createBridge();
       const reciprocalBridge = createBridge();
+
+      // nb. We send an Error-like object here rather than an error because
+      // not all browsers (as of 2021-10) support structured cloning of Errors.
+      // It would be useful to handle this in `PortRPC`.
+      // See https://github.com/hypothesis/client/pull/3810#issuecomment-940910472.
       const errorMessage = 'My error';
-      bridge.on('method1', (_arg, cb) => cb(new Error(errorMessage)));
+      bridge.on('method1', (_arg, cb) => cb({ message: errorMessage }));
       bridge.createChannel(port1);
       const channel = reciprocalBridge.createChannel(port2);
       sinon.stub(channel, 'call').callThrough();
