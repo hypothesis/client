@@ -66,7 +66,7 @@ export class Bridge {
    * Make a method call on all channels, collect the results and pass them to a
    * callback when all results are collected.
    *
-   * @param {import('../types/bridge-events').BrideEvents} method - Name of remote method to call.
+   * @param {import('../types/bridge-events').BridgeEvents} method - Name of remote method to call.
    * @param {any[]} args - Arguments to method. Final argument is an optional
    *   callback with this type: `(error: string|Error|null, ...result: any[]) => void`.
    *   This callback, if any, will be triggered once a response (via `postMessage`)
@@ -132,7 +132,7 @@ export class Bridge {
    * Register a listener to be invoked when any connected channel sends a
    * message to this `Bridge`.
    *
-   * @param {import('../types/bridge-events').BrideEvents} method
+   * @param {import('../types/bridge-events').BridgeEvents} method
    * @param {(...args: any[]) => void} listener -- Final argument is an optional
    *   callback of the type: `(error: string|Error|null, ...result: any[]) => void`.
    *   This callback must be invoked in order to respond (via `postMessage`)

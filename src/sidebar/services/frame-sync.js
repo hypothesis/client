@@ -278,7 +278,7 @@ export class FrameSyncService {
   /**
    * Send an RPC message to the host frame.
    *
-   * @param {import('../../types/bridge-events').BrideEvents} method
+   * @param {import('../../types/bridge-events').BridgeEvents} method
    * @param {any[]} args
    */
   notifyHost(method, ...args) {

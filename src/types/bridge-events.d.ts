@@ -142,7 +142,7 @@ type GuestToSidebarEvents = {
   TOGGLE_ANNOTATION_SELECTION: 'toggleAnnotationSelection';
 };
 
-export type BrideEvents =
+export type BridgeEvents =
   | 'connect'
   | SidebarToHostEvents[keyof SidebarToHostEvents]
   | HostToSidebarEvents[keyof HostToSidebarEvents]
