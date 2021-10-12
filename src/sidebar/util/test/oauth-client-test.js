@@ -1,5 +1,4 @@
 import fetchMock from 'fetch-mock';
-import sinon from 'sinon';
 
 import FakeWindow from '../../test/fake-window';
 import OAuthClient, { TokenError, $imports } from '../oauth-client';
