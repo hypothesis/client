@@ -59,7 +59,7 @@ function bundleConfig({ name, entry, format = 'es' }) {
         exclude: 'node_modules/**',
       }),
       nodeResolve(),
-      commonjs(),
+      commonjs({ include: 'node_modules/**' }),
       string({
         include: '**/*.svg',
       }),
