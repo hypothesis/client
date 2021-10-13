@@ -1,5 +1,6 @@
 import { ListenerCollection } from '../../shared/listener-collection';
 import { HTMLIntegration } from './html';
+import { ImageTextLayer } from './image-text-layer';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -107,6 +108,41 @@ export class VitalSourceContainerIntegration {
 }
 
 /**
+ * Bounding box of a single character in the page.
+ *
+ * Coordinates are expressed in percentage distance from the top-left corner
+ * of the rendered page.
+ *
+ * @typedef GlyphBox
+ * @prop {number} l
+ * @prop {number} r
+ * @prop {number} t
+ * @prop {number} b
+ */
+
+/**
+ * @typedef PDFGlyphData
+ * @prop {GlyphBox[]} glyphs
+ */
+
+/**
+ * Data that the VitalSource book reader renders into the page about the
+ * content and location of text in the image.
+ *
+ * @typedef PDFTextData
+ * @prop {PDFGlyphData} glyphs - Locations of each text character in the page
+ * @prop {string} words - The text in the page
+ */
+
+function getPDFPageData() {
+  const pageData = /** @type {any} */ (window).innerPageData;
+  if (!pageData) {
+    return null;
+  }
+  return /** @type {PDFTextData} */ (pageData);
+}
+
+/**
  * Integration for the content frame in VitalSource's Bookshelf ebook reader.
  *
  * This integration delegates to the standard HTML integration for most
@@ -142,6 +178,30 @@ export class VitalSourceContentIntegration {
         e.stopPropagation();
       });
     }
+
+    // If this is a PDF, create the hidden text layer above the rendered PDF
+    // image.
+    const bookImage = document.querySelector('#pbk-page');
+    const pageData = getPDFPageData();
+    if (bookImage && pageData) {
+      this._textLayer = new ImageTextLayer(
+        bookImage,
+        pageData.glyphs.glyphs.map(glyph => ({
+          left: glyph.l / 100,
+          right: glyph.r / 100,
+          top: glyph.t / 100,
+          bottom: glyph.b / 100,
+        })),
+        pageData.words
+      );
+
+      // VitalSource has several DOM elements in the page which are raised
+      // above the image using z-index. One of these is used to handle VS's
+      // own text selection functionality.
+      //
+      // Set a z-index on our text layer to raise it above VS's own one.
+      this._textLayer.container.style.zIndex = '100';
+    }
   }
 
   canAnnotate() {
@@ -149,6 +209,7 @@ export class VitalSourceContentIntegration {
   }
 
   destroy() {
+    this._textLayer?.destroy();
     this._listeners.removeAll();
     this._htmlIntegration.destroy();
   }
