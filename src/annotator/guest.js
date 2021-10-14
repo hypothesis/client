@@ -576,10 +576,6 @@ export default class Guest {
     this._emitter.publish('beforeAnnotationCreated', annotation);
     this.anchor(annotation);
 
-    if (!annotation.$highlight) {
-      this._bridge.call('openSidebar');
-    }
-
     return annotation;
   }
 
