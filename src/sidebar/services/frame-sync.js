@@ -167,6 +167,11 @@ export class FrameSyncService {
           this._hostRPC.call('openSidebar');
         }
 
+        // Ensure that the highlight for the newly-created annotation is visible.
+        // Currently we only support a single, shared visibility state for all highlights
+        // in all frames, so this will make all existing highlights visible too.
+        this._hostRPC.call('showHighlights');
+
         // Create the new annotation in the sidebar.
         annotationsService.create(annot);
       });

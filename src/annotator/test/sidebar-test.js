@@ -294,6 +294,15 @@ describe('Sidebar', () => {
       return result;
     };
 
+    describe('on "showHighlights" event', () => {
+      it('makes all highlights visible', () => {
+        createSidebar();
+        assert.isFalse(fakeToolbar.highlightsVisible);
+        emitEvent('showHighlights');
+        assert.isTrue(fakeToolbar.highlightsVisible);
+      });
+    });
+
     describe('on "open" event', () =>
       it('opens the frame', () => {
         const target = sandbox.stub(Sidebar.prototype, 'open');

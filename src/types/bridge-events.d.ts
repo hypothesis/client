@@ -15,7 +15,7 @@ export type HostToSidebarEvent =
   /**
    * Highlights have been toggled on/off.
    */
-  | 'setVisibleHighlights'
+  | 'setHighlightsVisible'
 
   /**
    * The host informs the sidebar that the sidebar has been opened.
@@ -93,7 +93,7 @@ export type SidebarToGuestEvent =
   /**
    * The sidebar relays to the guest(s) to set the annotation highlights on/off.
    */
-  | 'setVisibleHighlights';
+  | 'setHighlightsVisible';
 
 /**
  * Events that the sidebar sends to the host
@@ -141,6 +141,11 @@ export type SidebarToHostEvent =
    * an annotation).
    */
   | 'openSidebar'
+
+  /**
+   * The sidebar requests the host to enable the "Show highlights" control.
+   */
+  | 'showHighlights'
 
   /**
    * The sidebar is asking the host to open the partner site profile page.

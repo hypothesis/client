@@ -239,6 +239,9 @@ export default class Sidebar {
     sidebarTrigger(document.body, () => this.open());
     features.init(this._sidebarRPC);
 
+    this._sidebarRPC.on('showHighlights', () =>
+      this.setHighlightsVisible(true)
+    );
     this._sidebarRPC.on('openSidebar', () => this.open());
     this._sidebarRPC.on('closeSidebar', () => this.close());
 

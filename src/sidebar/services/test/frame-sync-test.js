@@ -310,6 +310,16 @@ describe('FrameSyncService', () => {
   });
 
   context('when a new annotation is created in the frame', () => {
+    it('makes the new highlight visible in the frame', () => {
+      frameSync.connect();
+      fakeStore.isLoggedIn.returns(true);
+      const ann = { target: [] };
+
+      guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+
+      assert.calledWith(hostBridge().call, 'showHighlights');
+    });
+
     context('when an authenticated user is present', () => {
       it('creates the annotation in the sidebar', () => {
         frameSync.connect();
@@ -344,7 +354,7 @@ describe('FrameSyncService', () => {
 
         guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
 
-        assert.notCalled(hostBridge().call);
+        assert.neverCalledWith(hostBridge().call, 'openSidebar');
       });
     });
 
