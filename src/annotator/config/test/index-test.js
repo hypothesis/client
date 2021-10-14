@@ -216,7 +216,7 @@ describe('annotator/config/index', () => {
     [
       {
         app: 'annotator',
-        expectedKeys: ['clientUrl', 'showHighlights', 'subFrameIdentifier'],
+        expectedKeys: ['clientUrl', 'subFrameIdentifier'],
       },
       {
         app: 'sidebar',
@@ -252,7 +252,7 @@ describe('annotator/config/index', () => {
         ],
       },
     ].forEach(test => {
-      it(`ignore values not belonging to "${test.app}" context`, () => {
+      it(`ignores values not belonging to "${test.app}" context`, () => {
         const config = getConfig(test.app, 'WINDOW');
         assert.deepEqual(Object.keys(config), test.expectedKeys);
       });

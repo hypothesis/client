@@ -121,7 +121,7 @@ export default class Sidebar {
     this.toolbar = new ToolbarController(toolbarContainer, {
       createAnnotation: () => guest.createAnnotation(),
       setSidebarOpen: open => (open ? this.open() : this.close()),
-      setHighlightsVisible: show => this.setAllVisibleHighlights(show),
+      setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
 
     if (config.theme === 'clean') {
@@ -130,9 +130,6 @@ export default class Sidebar {
       this.toolbar.useMinimalControls = false;
     }
 
-    this._emitter.subscribe('highlightsVisibleChanged', visible => {
-      this.toolbar.highlightsVisible = visible;
-    });
     this._emitter.subscribe('hasSelectionChanged', hasSelection => {
       this.toolbar.newAnnotationType = hasSelection ? 'annotation' : 'note';
     });
@@ -196,6 +193,12 @@ export default class Sidebar {
       if (this.iframeContainer) {
         this.iframeContainer.style.display = '';
       }
+
+      // Set initial highlight visibility. We do this only once the sidebar app
+      // is ready because `setHighlightsVisible` needs to reflect this state to
+      // the sidebar app.
+      const showHighlights = config.showHighlights === 'always';
+      this.setHighlightsVisible(showHighlights);
 
       if (
         config.openSidebar ||
@@ -449,7 +452,7 @@ export default class Sidebar {
     this.toolbar.sidebarOpen = true;
 
     if (this.options.showHighlights === 'whenSidebarOpen') {
-      this.guest.setVisibleHighlights(true);
+      this.setHighlightsVisible(true);
     }
 
     this._notifyOfLayoutChange(true);
@@ -464,19 +467,22 @@ export default class Sidebar {
     this.toolbar.sidebarOpen = false;
 
     if (this.options.showHighlights === 'whenSidebarOpen') {
-      this.guest.setVisibleHighlights(false);
+      this.setHighlightsVisible(false);
     }
 
     this._notifyOfLayoutChange(false);
   }
 
   /**
-   * Hide or show highlights associated with annotations in the document.
+   * Set whether highlights are visible in guest frames.
    *
-   * @param {boolean} shouldShowHighlights
+   * @param {boolean} visible
    */
-  setAllVisibleHighlights(shouldShowHighlights) {
-    this._sidebarRPC.call('setVisibleHighlights', shouldShowHighlights);
+  setHighlightsVisible(visible) {
+    this.toolbar.highlightsVisible = visible;
+
+    // Notify sidebar app of change which will in turn reflect state to guest frames.
+    this._sidebarRPC.call('setHighlightsVisible', visible);
   }
 
   /**

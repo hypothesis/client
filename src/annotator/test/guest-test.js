@@ -86,7 +86,6 @@ describe('Guest', () => {
       createChannel: sinon.stub(),
       destroy: sinon.stub(),
       on: sinon.stub(),
-      onConnect: sinon.stub(),
     };
     FakeBridge = sinon.stub().returns(fakeBridge);
 
@@ -406,18 +405,18 @@ describe('Guest', () => {
       });
     });
 
-    describe('on "setVisibleHighlights" event', () => {
+    describe('on "setHighlightsVisible" event', () => {
       it('sets visibility of highlights in document', () => {
         const guest = createGuest();
 
-        emitSidebarEvent('setVisibleHighlights', true);
+        emitSidebarEvent('setHighlightsVisible', true);
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,
           true
         );
 
-        emitSidebarEvent('setVisibleHighlights', false);
+        emitSidebarEvent('setHighlightsVisible', false);
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,
@@ -436,7 +435,7 @@ describe('Guest', () => {
     beforeEach(() => {
       fakeSidebarFrame = null;
       guest = createGuest();
-      guest.setVisibleHighlights(true);
+      guest.setHighlightsVisible(true);
       rootElement = guest.element;
 
       // Create a fake highlight as a target for hover and click events.
@@ -519,7 +518,7 @@ describe('Guest', () => {
     });
 
     it('does not focus or select annotations in the sidebar if highlights are hidden', () => {
-      guest.setVisibleHighlights(false);
+      guest.setHighlightsVisible(false);
 
       fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
       fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));

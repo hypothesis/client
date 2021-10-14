@@ -124,7 +124,7 @@ export default class Guest {
   constructor(element, eventBus, config = {}, hostFrame = window) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
-    this._visibleHighlights = false;
+    this._highlightsVisible = false;
     this._isAdderVisible = false;
 
     this._adder = new Adder(this.element, {
@@ -133,7 +133,6 @@ export default class Guest {
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
       },
       onHighlight: async () => {
-        this.setVisibleHighlights(true);
         await this.createAnnotation({ highlight: true });
         /** @type {Selection} */ (document.getSelection()).removeAllRanges();
       },
@@ -171,9 +170,6 @@ export default class Guest {
      * @type {Bridge<GuestToSidebarEvent,SidebarToGuestEvent>}
      */
     this._bridge = new Bridge();
-    this._bridge.onConnect(() => {
-      this.setVisibleHighlights(config.showHighlights === 'always');
-    });
     this._connectSidebarEvents();
 
     // Set up listeners for when the sidebar asks us to add or remove annotations
@@ -232,7 +228,7 @@ export default class Guest {
     this._listeners.add(this.element, 'mouseup', event => {
       const { target, metaKey, ctrlKey } = /** @type {MouseEvent} */ (event);
       const annotations = annotationsAt(/** @type {Element} */ (target));
-      if (annotations.length && this._visibleHighlights) {
+      if (annotations.length && this._highlightsVisible) {
         const toggle = metaKey || ctrlKey;
         this.selectAnnotations(annotations, toggle);
       }
@@ -250,13 +246,13 @@ export default class Guest {
 
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
       const annotations = annotationsAt(/** @type {Element} */ (target));
-      if (annotations.length && this._visibleHighlights) {
+      if (annotations.length && this._highlightsVisible) {
         this._focusAnnotations(annotations);
       }
     });
 
     this._listeners.add(this.element, 'mouseout', () => {
-      if (this._visibleHighlights) {
+      if (this._highlightsVisible) {
         this._focusAnnotations([]);
       }
     });
@@ -360,8 +356,8 @@ export default class Guest {
     });
 
     // Handler for controls on the sidebar
-    this._bridge.on('setVisibleHighlights', showHighlights => {
-      this.setVisibleHighlights(showHighlights);
+    this._bridge.on('setHighlightsVisible', showHighlights => {
+      this.setHighlightsVisible(showHighlights);
     });
   }
 
@@ -663,12 +659,11 @@ export default class Guest {
   /**
    * Set whether highlights are visible in the document or not.
    *
-   * @param {boolean} shouldShowHighlights
+   * @param {boolean} visible
    */
-  setVisibleHighlights(shouldShowHighlights) {
-    setHighlightsVisible(this.element, shouldShowHighlights);
-    this._visibleHighlights = shouldShowHighlights;
-    this._emitter.publish('highlightsVisibleChanged', shouldShowHighlights);
+  setHighlightsVisible(visible) {
+    setHighlightsVisible(this.element, visible);
+    this._highlightsVisible = visible;
   }
 
   /**

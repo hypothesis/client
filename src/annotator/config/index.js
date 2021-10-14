@@ -29,7 +29,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  */
 function configurationKeys(appContext) {
   const contexts = {
-    annotator: ['clientUrl', 'showHighlights', 'subFrameIdentifier'],
+    annotator: ['clientUrl', 'subFrameIdentifier'],
     sidebar: [
       'appType',
       'annotations',
