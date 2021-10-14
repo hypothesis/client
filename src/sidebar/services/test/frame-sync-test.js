@@ -414,16 +414,22 @@ describe('FrameSyncService', () => {
     }
 
     it('updates the anchoring status for the annotation', () => {
-      guestBridge().emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
+      guestBridge().emit('syncAnchoringStatus', [
+        { tag: 't1', msg: { $orphan: false } },
+      ]);
 
       expireDebounceTimeout();
 
       assert.calledWith(fakeStore.updateAnchorStatus, { t1: 'anchored' });
     });
 
-    it('coalesces multiple "sync" messages', () => {
-      guestBridge().emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
-      guestBridge().emit('sync', [{ tag: 't2', msg: { $orphan: true } }]);
+    it('coalesces multiple "syncAnchoringStatus" messages', () => {
+      guestBridge().emit('syncAnchoringStatus', [
+        { tag: 't1', msg: { $orphan: false } },
+      ]);
+      guestBridge().emit('syncAnchoringStatus', [
+        { tag: 't2', msg: { $orphan: true } },
+      ]);
 
       expireDebounceTimeout();
 

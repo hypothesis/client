@@ -90,7 +90,7 @@ export class AnnotationSync {
     }
 
     this._sidebar.call(
-      'sync',
+      'syncAnchoringStatus',
       annotations.map(ann => this._format(ann))
     );
   }
