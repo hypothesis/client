@@ -72,7 +72,7 @@ export class AnnotationSync {
       if (annotation.$tag) {
         return;
       }
-      this._sidebar.call('beforeCreateAnnotation', this._format(annotation));
+      this._sidebar.call('createAnnotation', this._format(annotation));
     });
   }
 

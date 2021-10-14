@@ -147,7 +147,7 @@ export class FrameSyncService {
      */
     this._setupSyncFromGuests = () => {
       // A new annotation, note or highlight was created in the frame
-      this._guestRPC.on('beforeCreateAnnotation', event => {
+      this._guestRPC.on('createAnnotation', event => {
         const annot = Object.assign({}, event.msg, { $tag: event.tag });
         // If user is not logged in, we can't really create a meaningful highlight
         // or annotation. Instead, we need to open the sidebar, show an error,

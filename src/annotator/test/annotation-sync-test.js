@@ -108,7 +108,7 @@ describe('AnnotationSync', () => {
 
   describe('handling events from the annotator', () => {
     describe('on "beforeAnnotationCreated" event', () => {
-      it('calls "beforeCreateAnnotation" RPC method in the sidebar', () => {
+      it('calls "createAnnotation" RPC method in the sidebar', () => {
         // nb. Setting an empty `$tag` here matches what `Guest#createAnnotation`
         // does.
         const ann = { id: 1, $tag: '' };
@@ -117,7 +117,7 @@ describe('AnnotationSync', () => {
         emitter.publish('beforeAnnotationCreated', ann);
 
         assert.called(fakeBridge.call);
-        assert.calledWith(fakeBridge.call, 'beforeCreateAnnotation', {
+        assert.calledWith(fakeBridge.call, 'createAnnotation', {
           msg: ann,
           tag: ann.$tag,
         });

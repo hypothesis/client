@@ -29,7 +29,7 @@ export type GuestToSidebarEvent =
   /**
    * The guest is asking the sidebar to create an annotation.
    */
-  | 'beforeCreateAnnotation'
+  | 'createAnnotation'
 
   /**
    * The guest is asking the sidebar to relay the message to the host to close the sidebar.
