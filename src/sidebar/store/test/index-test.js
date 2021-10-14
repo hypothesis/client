@@ -139,15 +139,6 @@ describe('createSidebarStore', () => {
     });
   });
 
-  describe('#setShowHighlights()', () => {
-    [{ state: true }, { state: false }].forEach(testCase => {
-      it(`sets the visibleHighlights state flag to ${testCase.state}`, () => {
-        store.setShowHighlights(testCase.state);
-        assert.equal(store.getState().viewer.visibleHighlights, testCase.state);
-      });
-    });
-  });
-
   describe('#updatingAnchorStatus', () => {
     it("updates the annotation's orphan flag", () => {
       const annot = defaultAnnotation();
