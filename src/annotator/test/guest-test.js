@@ -154,14 +154,6 @@ describe('Guest', () => {
       assert.deepEqual(FakeAnnotationSync.lastCall.args[0], eventBus);
     });
 
-    it('publishes the "panelReady" event when a connection is established', () => {
-      const handler = sandbox.stub();
-      const guest = createGuest();
-      guest._emitter.subscribe('panelReady', handler);
-      fakeBridge.onConnect.yield();
-      assert.called(handler);
-    });
-
     describe('event subscription', () => {
       let emitter;
       let guest;

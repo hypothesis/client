@@ -166,7 +166,6 @@ export default class Guest {
     // Set up listeners for messages coming from the sidebar to this guest.
     this._bridge = new Bridge();
     this._bridge.onConnect(() => {
-      this._emitter.publish('panelReady');
       this.setVisibleHighlights(config.showHighlights === 'always');
     });
     this._connectSidebarEvents();
