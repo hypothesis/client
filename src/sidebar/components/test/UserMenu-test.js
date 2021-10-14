@@ -1,6 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
+import { sidebarToHostEvents } from '../../../shared/bridge-events';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 import UserMenu, { $imports } from '../UserMenu';
 
@@ -145,7 +146,10 @@ describe('UserMenu', () => {
         onProfileSelected();
 
         assert.equal(fakeFrameSync.notifyHost.callCount, 1);
-        assert.calledWith(fakeFrameSync.notifyHost, 'profileRequested');
+        assert.calledWith(
+          fakeFrameSync.notifyHost,
+          sidebarToHostEvents.PROFILE_REQUESTED
+        );
       });
 
       it('should not fire profile event for first-party user', () => {

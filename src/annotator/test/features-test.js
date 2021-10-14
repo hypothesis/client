@@ -1,3 +1,4 @@
+import { sidebarToHostEvents } from '../../shared/bridge-events';
 import { features, $imports } from '../features';
 
 describe('features - annotation layer', () => {
@@ -21,7 +22,7 @@ describe('features - annotation layer', () => {
 
     features.init({
       on: function (topic, handler) {
-        if (topic === 'featureFlagsUpdated') {
+        if (topic === sidebarToHostEvents.FEATURE_FLAGS_UPDATED) {
           featureFlagsUpdateHandler = handler;
         }
       },

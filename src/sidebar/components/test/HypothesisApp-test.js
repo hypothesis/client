@@ -1,5 +1,6 @@
 import { mount } from 'enzyme';
 
+import { sidebarToHostEvents } from '../../../shared/bridge-events';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
 import HypothesisApp, { $imports } from '../HypothesisApp';
 
@@ -223,10 +224,13 @@ describe('HypothesisApp', () => {
         fakeServiceConfig.returns({});
       });
 
-      it('sends SIGNUP_REQUESTED event', () => {
+      it('sends "signupRequest" event', () => {
         const wrapper = createComponent();
         clickSignUp(wrapper);
-        assert.calledWith(fakeFrameSync.notifyHost, 'signupRequested');
+        assert.calledWith(
+          fakeFrameSync.notifyHost,
+          sidebarToHostEvents.SIGNUP_REQUESTED
+        );
       });
 
       it('does not open a URL directly', () => {
@@ -299,7 +303,9 @@ describe('HypothesisApp', () => {
 
       assert.equal(fakeFrameSync.notifyHost.callCount, 1);
       assert.isTrue(
-        fakeFrameSync.notifyHost.calledWithExactly('loginRequested')
+        fakeFrameSync.notifyHost.calledWithExactly(
+          sidebarToHostEvents.LOGIN_REQUESTED
+        )
       );
     });
   });
@@ -407,7 +413,10 @@ describe('HypothesisApp', () => {
         await clickLogOut(wrapper);
 
         assert.calledOnce(fakeFrameSync.notifyHost);
-        assert.calledWithExactly(fakeFrameSync.notifyHost, 'logoutRequested');
+        assert.calledWithExactly(
+          fakeFrameSync.notifyHost,
+          sidebarToHostEvents.LOGOUT_REQUESTED
+        );
       });
 
       it('does not send LOGOUT_REQUESTED if the user cancels the prompt', async () => {

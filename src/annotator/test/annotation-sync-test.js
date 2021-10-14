@@ -1,6 +1,9 @@
-import { EventBus } from '../util/emitter';
-
+import {
+  guestToSidebarEvents,
+  sidebarToGuestEvents,
+} from '../../shared/bridge-events';
 import { AnnotationSync } from '../annotation-sync';
+import { EventBus } from '../util/emitter';
 
 describe('AnnotationSync', () => {
   let createAnnotationSync;
@@ -44,12 +47,12 @@ describe('AnnotationSync', () => {
         emitter.subscribe('annotationDeleted', eventStub);
         createAnnotationSync();
 
-        publish('deleteAnnotation', { msg: ann }, () => {});
+        publish(sidebarToGuestEvents.DELETE_ANNOTATION, { msg: ann }, () => {});
 
         assert.calledWith(eventStub, ann);
       });
 
-      it("calls the 'deleteAnnotation' event's callback function", done => {
+      it('calls the "deleteAnnotation" event\'s callback function', done => {
         const ann = { id: 1, $tag: 'tag1' };
         const callback = function (err, result) {
           assert.isNull(err);
@@ -58,7 +61,7 @@ describe('AnnotationSync', () => {
         };
         createAnnotationSync();
 
-        publish('deleteAnnotation', { msg: ann }, callback);
+        publish(sidebarToGuestEvents.DELETE_ANNOTATION, { msg: ann }, callback);
       });
 
       it('deletes any existing annotation from its cache before publishing event to the annotator', done => {
@@ -70,7 +73,7 @@ describe('AnnotationSync', () => {
           done();
         });
 
-        publish('deleteAnnotation', { msg: ann }, () => {});
+        publish(sidebarToGuestEvents.DELETE_ANNOTATION, { msg: ann }, () => {});
       });
 
       it('deletes any existing annotation from its cache', () => {
@@ -78,7 +81,7 @@ describe('AnnotationSync', () => {
         const annSync = createAnnotationSync();
         annSync.cache.tag1 = ann;
 
-        publish('deleteAnnotation', { msg: ann }, () => {});
+        publish(sidebarToGuestEvents.DELETE_ANNOTATION, { msg: ann }, () => {});
 
         assert.isUndefined(annSync.cache.tag1);
       });
@@ -100,7 +103,7 @@ describe('AnnotationSync', () => {
         emitter.subscribe('annotationsLoaded', loadedStub);
         createAnnotationSync();
 
-        publish('loadAnnotations', bodies, () => {});
+        publish(sidebarToGuestEvents.LOAD_ANNOTATIONS, bodies, () => {});
 
         assert.calledWith(loadedStub, annotations);
       });
@@ -118,10 +121,14 @@ describe('AnnotationSync', () => {
         emitter.publish('beforeAnnotationCreated', ann);
 
         assert.called(fakeBridge.call);
-        assert.calledWith(fakeBridge.call, 'beforeCreateAnnotation', {
-          msg: ann,
-          tag: ann.$tag,
-        });
+        assert.calledWith(
+          fakeBridge.call,
+          guestToSidebarEvents.BEFORE_CREATE_ANNOTATION,
+          {
+            msg: ann,
+            tag: ann.$tag,
+          }
+        );
       });
 
       it('assigns a non-empty tag to the annotation', () => {
@@ -162,7 +169,9 @@ describe('AnnotationSync', () => {
 
       annotationSync.sync([ann]);
 
-      assert.calledWith(fakeBridge.call, 'sync', [{ msg: ann, tag: ann.$tag }]);
+      assert.calledWith(fakeBridge.call, guestToSidebarEvents.SYNC, [
+        { msg: ann, tag: ann.$tag },
+      ]);
     });
   });
 
@@ -173,8 +182,8 @@ describe('AnnotationSync', () => {
       annotationSync.destroy();
       const cb = sinon.stub();
 
-      publish('loadAnnotations', [ann], cb);
-      publish('deleteAnnotation', ann, cb);
+      publish(sidebarToGuestEvents.LOAD_ANNOTATIONS, [ann], cb);
+      publish(sidebarToGuestEvents.DELETE_ANNOTATION, ann, cb);
 
       assert.calledTwice(cb);
       assert.calledWith(cb.firstCall, null);

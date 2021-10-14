@@ -1,6 +1,9 @@
-import Guest from '../guest';
+import {
+  guestToSidebarEvents,
+  sidebarToGuestEvents,
+} from '../../shared/bridge-events';
+import Guest, { $imports } from '../guest';
 import { EventBus } from '../util/emitter';
-import { $imports } from '../guest';
 
 class FakeAdder {
   constructor(container, options) {
@@ -234,7 +237,7 @@ describe('Guest', () => {
   });
 
   describe('events from sidebar', () => {
-    const emitGuestEvent = (event, ...args) => {
+    const emitSidebarEvent = (event, ...args) => {
       for (let [evt, fn] of fakeBridge.on.args) {
         if (event === evt) {
           fn(...args);
@@ -252,7 +255,7 @@ describe('Guest', () => {
           { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
         ];
 
-        emitGuestEvent('focusAnnotations', ['tag1']);
+        emitSidebarEvent(sidebarToGuestEvents.FOCUS_ANNOTATIONS, ['tag1']);
 
         assert.calledWith(
           highlighter.setHighlightsFocused,
@@ -270,7 +273,7 @@ describe('Guest', () => {
           { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
         ];
 
-        emitGuestEvent('focusAnnotations', ['tag1']);
+        emitSidebarEvent(sidebarToGuestEvents.FOCUS_ANNOTATIONS, ['tag1']);
 
         assert.calledWith(
           highlighter.setHighlightsFocused,
@@ -282,8 +285,11 @@ describe('Guest', () => {
       it('updates focused tag set', () => {
         const guest = createGuest();
 
-        emitGuestEvent('focusAnnotations', ['tag1']);
-        emitGuestEvent('focusAnnotations', ['tag2', 'tag3']);
+        emitSidebarEvent(sidebarToGuestEvents.FOCUS_ANNOTATIONS, ['tag1']);
+        emitSidebarEvent(sidebarToGuestEvents.FOCUS_ANNOTATIONS, [
+          'tag2',
+          'tag3',
+        ]);
 
         assert.deepEqual([...guest.focusedAnnotationTags], ['tag2', 'tag3']);
       });
@@ -302,7 +308,7 @@ describe('Guest', () => {
           },
         ];
 
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent(sidebarToGuestEvents.SCROLL_TO_ANNOTATION, 'tag1');
 
         assert.called(fakeIntegration.scrollToAnchor);
         assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
@@ -326,7 +332,7 @@ describe('Guest', () => {
             resolve();
           });
 
-          emitGuestEvent('scrollToAnnotation', 'tag1');
+          emitSidebarEvent(sidebarToGuestEvents.SCROLL_TO_ANNOTATION, 'tag1');
         });
       });
 
@@ -345,7 +351,7 @@ describe('Guest', () => {
           event.preventDefault()
         );
 
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent(sidebarToGuestEvents.SCROLL_TO_ANNOTATION, 'tag1');
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
@@ -354,7 +360,7 @@ describe('Guest', () => {
         const guest = createGuest();
 
         guest.anchors = [{ annotation: { $tag: 'tag1' } }];
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent(sidebarToGuestEvents.SCROLL_TO_ANNOTATION, 'tag1');
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
@@ -374,7 +380,7 @@ describe('Guest', () => {
         const eventEmitted = sandbox.stub();
         guest.element.addEventListener('scrolltorange', eventEmitted);
 
-        emitGuestEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent(sidebarToGuestEvents.SCROLL_TO_ANNOTATION, 'tag1');
 
         assert.notCalled(eventEmitted);
         assert.notCalled(fakeIntegration.scrollToAnchor);
@@ -408,8 +414,8 @@ describe('Guest', () => {
 
         fakeIntegration.getMetadata.resolves(metadata);
 
-        emitGuestEvent(
-          'getDocumentInfo',
+        emitSidebarEvent(
+          sidebarToGuestEvents.GET_DOCUMENT_INFO,
           createCallback('https://example.com/test.pdf', metadata, done)
         );
       });
@@ -419,14 +425,14 @@ describe('Guest', () => {
       it('sets visibility of highlights in document', () => {
         const guest = createGuest();
 
-        emitGuestEvent('setVisibleHighlights', true);
+        emitSidebarEvent(sidebarToGuestEvents.SET_VISIBLE_HIGHLIGHTS, true);
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,
           true
         );
 
-        emitGuestEvent('setVisibleHighlights', false);
+        emitSidebarEvent(sidebarToGuestEvents.SET_VISIBLE_HIGHLIGHTS, false);
         assert.calledWith(
           highlighter.setHighlightsVisible,
           guest.element,
@@ -467,7 +473,7 @@ describe('Guest', () => {
     it('hides sidebar on user "mousedown" or "touchstart" events in the document', () => {
       for (let event of ['mousedown', 'touchstart']) {
         rootElement.dispatchEvent(new Event(event));
-        assert.calledWith(fakeBridge.call, 'closeSidebar');
+        assert.calledWith(fakeBridge.call, guestToSidebarEvents.CLOSE_SIDEBAR);
         fakeBridge.call.resetHistory();
       }
     });
@@ -511,13 +517,19 @@ describe('Guest', () => {
       // Hover the highlight
       fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
       assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
-      assert.calledWith(fakeBridge.call, 'focusAnnotations', [
-        'highlight-ann-tag',
-      ]);
+      assert.calledWith(
+        fakeBridge.call,
+        sidebarToGuestEvents.FOCUS_ANNOTATIONS,
+        ['highlight-ann-tag']
+      );
 
       // Un-hover the highlight
       fakeHighlight.dispatchEvent(new Event('mouseout', { bubbles: true }));
-      assert.calledWith(fakeBridge.call, 'focusAnnotations', []);
+      assert.calledWith(
+        fakeBridge.call,
+        sidebarToGuestEvents.FOCUS_ANNOTATIONS,
+        []
+      );
     });
 
     it('does not focus annotations in the sidebar when a non-highlight element is hovered', () => {
@@ -540,10 +552,12 @@ describe('Guest', () => {
     it('selects annotations in the sidebar when clicking on a highlight', () => {
       fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
 
-      assert.calledWith(fakeBridge.call, 'showAnnotations', [
-        'highlight-ann-tag',
-      ]);
-      assert.calledWith(fakeBridge.call, 'openSidebar');
+      assert.calledWith(
+        fakeBridge.call,
+        guestToSidebarEvents.SHOW_ANNOTATIONS,
+        ['highlight-ann-tag']
+      );
+      assert.calledWith(fakeBridge.call, guestToSidebarEvents.OPEN_SIDEBAR);
     });
 
     it('toggles selected annotations in the sidebar when Ctrl/Cmd-clicking a highlight', () => {
@@ -551,10 +565,12 @@ describe('Guest', () => {
         new MouseEvent('mouseup', { bubbles: true, ctrlKey: true })
       );
 
-      assert.calledWith(fakeBridge.call, 'toggleAnnotationSelection', [
-        'highlight-ann-tag',
-      ]);
-      assert.calledWith(fakeBridge.call, 'openSidebar');
+      assert.calledWith(
+        fakeBridge.call,
+        guestToSidebarEvents.TOGGLE_ANNOTATION_SELECTION,
+        ['highlight-ann-tag']
+      );
+      assert.calledWith(fakeBridge.call, guestToSidebarEvents.OPEN_SIDEBAR);
     });
   });
 
@@ -680,8 +696,12 @@ describe('Guest', () => {
 
       FakeAdder.instance.options.onShowAnnotations([{ $tag: 'ann1' }]);
 
-      assert.calledWith(fakeBridge.call, 'openSidebar');
-      assert.calledWith(fakeBridge.call, 'showAnnotations', ['ann1']);
+      assert.calledWith(fakeBridge.call, guestToSidebarEvents.OPEN_SIDEBAR);
+      assert.calledWith(
+        fakeBridge.call,
+        guestToSidebarEvents.SHOW_ANNOTATIONS,
+        ['ann1']
+      );
     });
   });
 
@@ -692,7 +712,11 @@ describe('Guest', () => {
 
       guest.selectAnnotations(annotations);
 
-      assert.calledWith(fakeBridge.call, 'showAnnotations', ['ann1', 'ann2']);
+      assert.calledWith(
+        fakeBridge.call,
+        guestToSidebarEvents.SHOW_ANNOTATIONS,
+        ['ann1', 'ann2']
+      );
     });
 
     it('toggles the annotations if `toggle` is true', () => {
@@ -701,10 +725,11 @@ describe('Guest', () => {
 
       guest.selectAnnotations(annotations, true /* toggle */);
 
-      assert.calledWith(fakeBridge.call, 'toggleAnnotationSelection', [
-        'ann1',
-        'ann2',
-      ]);
+      assert.calledWith(
+        fakeBridge.call,
+        guestToSidebarEvents.TOGGLE_ANNOTATION_SELECTION,
+        ['ann1', 'ann2']
+      );
     });
 
     it('opens the sidebar', () => {
@@ -712,7 +737,7 @@ describe('Guest', () => {
 
       guest.selectAnnotations([]);
 
-      assert.calledWith(fakeBridge.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, guestToSidebarEvents.OPEN_SIDEBAR);
     });
   });
 
@@ -816,7 +841,7 @@ describe('Guest', () => {
     it('opens sidebar if `highlight` is false', async () => {
       const guest = createGuest();
       await guest.createAnnotation();
-      assert.calledWith(fakeBridge.call, 'openSidebar');
+      assert.calledWith(fakeBridge.call, guestToSidebarEvents.OPEN_SIDEBAR);
     });
 
     it('does not open sidebar if `highlight` is true', async () => {
@@ -1050,7 +1075,7 @@ describe('Guest', () => {
 
       // Focus the annotation (in the sidebar) before it is anchored in the page.
       const [, focusAnnotationsCallback] = fakeBridge.on.args.find(
-        args => args[0] === 'focusAnnotations'
+        args => args[0] === guestToSidebarEvents.FOCUS_ANNOTATIONS
       );
       focusAnnotationsCallback([annotation.$tag]);
       const anchors = await guest.anchor(annotation);

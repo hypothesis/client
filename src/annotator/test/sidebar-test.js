@@ -1,3 +1,7 @@
+import {
+  hostToSidebarEvents,
+  sidebarToHostEvents,
+} from '../../shared/bridge-events';
 import Sidebar, { MIN_RESIZE, $imports } from '../sidebar';
 import { EventBus } from '../util/emitter';
 
@@ -201,7 +205,11 @@ describe('Sidebar', () => {
     });
     window.dispatchEvent(event);
 
-    assert.calledWith(fakeBridge.call, 'destroyFrame', 'frame-id');
+    assert.calledWith(
+      fakeBridge.call,
+      hostToSidebarEvents.DESTROY_FRAME,
+      'frame-id'
+    );
   });
 
   function getConfigString(sidebar) {
@@ -324,7 +332,7 @@ describe('Sidebar', () => {
       it('opens the frame', () => {
         const target = sandbox.stub(Sidebar.prototype, 'open');
         createSidebar();
-        emitEvent('openSidebar');
+        emitEvent(sidebarToHostEvents.OPEN_SIDEBAR);
         assert.called(target);
       }));
 
@@ -332,7 +340,7 @@ describe('Sidebar', () => {
       it('closes the frame', () => {
         const target = sandbox.stub(Sidebar.prototype, 'close');
         createSidebar();
-        emitEvent('closeSidebar');
+        emitEvent(sidebarToHostEvents.CLOSE_SIDEBAR);
         assert.called(target);
       }));
 
@@ -358,12 +366,12 @@ describe('Sidebar', () => {
       });
     });
 
-    describe('on LOGIN_REQUESTED event', () => {
+    describe('on "loginRequest" event', () => {
       it('calls the onLoginRequest callback function if one was provided', () => {
         const onLoginRequest = sandbox.stub();
         createSidebar({ services: [{ onLoginRequest }] });
 
-        emitEvent('loginRequested');
+        emitEvent(sidebarToHostEvents.LOGIN_REQUESTED);
 
         assert.called(onLoginRequest);
       });
@@ -383,7 +391,7 @@ describe('Sidebar', () => {
           ],
         });
 
-        emitEvent('loginRequested');
+        emitEvent(sidebarToHostEvents.LOGIN_REQUESTED);
 
         assert.called(firstOnLogin);
         assert.notCalled(secondOnLogin);
@@ -403,7 +411,7 @@ describe('Sidebar', () => {
           ],
         });
 
-        emitEvent('loginRequested');
+        emitEvent(sidebarToHostEvents.LOGIN_REQUESTED);
 
         assert.notCalled(secondOnLogin);
         assert.notCalled(thirdOnLogin);
@@ -411,17 +419,17 @@ describe('Sidebar', () => {
 
       it('does not crash if there is no services', () => {
         createSidebar(); // No config.services
-        emitEvent('loginRequested');
+        emitEvent(sidebarToHostEvents.LOGIN_REQUESTED);
       });
 
       it('does not crash if services is an empty array', () => {
         createSidebar({ services: [] });
-        emitEvent('loginRequested');
+        emitEvent(sidebarToHostEvents.LOGIN_REQUESTED);
       });
 
       it('does not crash if the first service has no onLoginRequest', () => {
         createSidebar({ services: [{}] });
-        emitEvent('loginRequested');
+        emitEvent(sidebarToHostEvents.LOGIN_REQUESTED);
       });
     });
 
@@ -430,37 +438,37 @@ describe('Sidebar', () => {
         const onLogoutRequest = sandbox.stub();
         createSidebar({ services: [{ onLogoutRequest }] });
 
-        emitEvent('logoutRequested');
+        emitEvent(sidebarToHostEvents.LOGOUT_REQUESTED);
 
         assert.called(onLogoutRequest);
       }));
 
-    describe('on SIGNUP_REQUESTED event', () =>
+    describe('on "signupRequest" event', () =>
       it('calls the onSignupRequest callback function', () => {
         const onSignupRequest = sandbox.stub();
         createSidebar({ services: [{ onSignupRequest }] });
 
-        emitEvent('signupRequested');
+        emitEvent(sidebarToHostEvents.SIGNUP_REQUESTED);
 
         assert.called(onSignupRequest);
       }));
 
-    describe('on PROFILE_REQUESTED event', () =>
+    describe('on "profileRequest" event', () =>
       it('calls the onProfileRequest callback function', () => {
         const onProfileRequest = sandbox.stub();
         createSidebar({ services: [{ onProfileRequest }] });
 
-        emitEvent('profileRequested');
+        emitEvent(sidebarToHostEvents.PROFILE_REQUESTED);
 
         assert.called(onProfileRequest);
       }));
 
-    describe('on HELP_REQUESTED event', () =>
+    describe('on "helpRequested" event', () =>
       it('calls the onHelpRequest callback function', () => {
         const onHelpRequest = sandbox.stub();
         createSidebar({ services: [{ onHelpRequest }] });
 
-        emitEvent('helpRequested');
+        emitEvent(sidebarToHostEvents.HELP_REQUESTED);
 
         assert.called(onHelpRequest);
       }));
@@ -636,7 +644,11 @@ describe('Sidebar', () => {
     it('requests sidebar to set highlight visibility in guest frames', () => {
       const sidebar = createSidebar();
       sidebar.setAllVisibleHighlights(true);
-      assert.calledWith(fakeBridge.call, 'setVisibleHighlights', true);
+      assert.calledWith(
+        fakeBridge.call,
+        hostToSidebarEvents.SET_VISIBLE_HIGHLIGHTS,
+        true
+      );
     }));
 
   it('hides toolbar controls when using the "clean" theme', () => {

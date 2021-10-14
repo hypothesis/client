@@ -1,5 +1,11 @@
 import EventEmitter from 'tiny-emitter';
 
+import {
+  hostToSidebarEvents,
+  guestToSidebarEvents,
+  sidebarToHostEvents,
+  sidebarToGuestEvents,
+} from '../../../shared/bridge-events';
 import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
@@ -206,7 +212,7 @@ describe('FrameSyncService', () => {
 
       assert.calledWithMatch(
         guestBridge().call,
-        'loadAnnotations',
+        sidebarToGuestEvents.LOAD_ANNOTATIONS,
         sinon.match([formatAnnot(fixtures.ann)])
       );
     });
@@ -224,7 +230,7 @@ describe('FrameSyncService', () => {
 
       assert.calledWithMatch(
         guestBridge().call,
-        'loadAnnotations',
+        sidebarToGuestEvents.LOAD_ANNOTATIONS,
         sinon.match([formatAnnot(ann2)])
       );
     });
@@ -234,7 +240,9 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.newReply()],
       });
 
-      assert.isFalse(guestBridge().call.calledWith('loadAnnotations'));
+      assert.isFalse(
+        guestBridge().call.calledWith(sidebarToGuestEvents.LOAD_ANNOTATIONS)
+      );
     });
   });
 
@@ -249,7 +257,7 @@ describe('FrameSyncService', () => {
       });
       assert.calledWithMatch(
         hostBridge().call,
-        'publicAnnotationCountChanged',
+        sidebarToHostEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
         sinon.match(1)
       );
     });
@@ -264,7 +272,7 @@ describe('FrameSyncService', () => {
 
       assert.calledWithMatch(
         hostBridge().call,
-        'publicAnnotationCountChanged',
+        sidebarToHostEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
         sinon.match(0)
       );
     });
@@ -275,7 +283,9 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.publicAnnotation()],
       });
       assert.isFalse(
-        hostBridge().call.calledWith('publicAnnotationCountChanged')
+        hostBridge().call.calledWith(
+          sidebarToHostEvents.PUBLIC_ANNOTATION_COUNT_CHANGED
+        )
       );
     });
 
@@ -285,7 +295,9 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.publicAnnotation()],
       });
       assert.isFalse(
-        hostBridge().call.calledWith('publicAnnotationCountChanged')
+        hostBridge().call.calledWith(
+          sidebarToHostEvents.PUBLIC_ANNOTATION_COUNT_CHANGED
+        )
       );
     });
   });
@@ -303,7 +315,7 @@ describe('FrameSyncService', () => {
 
       assert.calledWithMatch(
         guestBridge().call,
-        'deleteAnnotation',
+        sidebarToGuestEvents.DELETE_ANNOTATION,
         sinon.match(formatAnnot(fixtures.ann))
       );
     });
@@ -316,7 +328,10 @@ describe('FrameSyncService', () => {
         fakeStore.isLoggedIn.returns(true);
         const ann = { target: [] };
 
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit(guestToSidebarEvents.BEFORE_CREATE_ANNOTATION, {
+          tag: 't1',
+          msg: ann,
+        });
 
         assert.calledWith(
           fakeAnnotationsService.create,
@@ -337,30 +352,45 @@ describe('FrameSyncService', () => {
       it('should not create an annotation in the sidebar', () => {
         const ann = { target: [] };
 
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit(guestToSidebarEvents.BEFORE_CREATE_ANNOTATION, {
+          tag: 't1',
+          msg: ann,
+        });
 
         assert.notCalled(fakeAnnotationsService.create);
       });
 
       it('should open the sidebar', () => {
         const ann = { target: [] };
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit(guestToSidebarEvents.BEFORE_CREATE_ANNOTATION, {
+          tag: 't1',
+          msg: ann,
+        });
 
-        assert.calledWith(hostBridge().call, 'openSidebar');
+        assert.calledWith(hostBridge().call, sidebarToHostEvents.OPEN_SIDEBAR);
       });
 
       it('should open the login prompt panel', () => {
         const ann = { target: [] };
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit(guestToSidebarEvents.BEFORE_CREATE_ANNOTATION, {
+          tag: 't1',
+          msg: ann,
+        });
 
         assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
       });
 
       it('should send a "deleteAnnotation" message to the frame', () => {
         const ann = { target: [] };
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit(guestToSidebarEvents.BEFORE_CREATE_ANNOTATION, {
+          tag: 't1',
+          msg: ann,
+        });
 
-        assert.calledWith(guestBridge().call, 'deleteAnnotation');
+        assert.calledWith(
+          guestBridge().call,
+          sidebarToGuestEvents.DELETE_ANNOTATION
+        );
       });
     });
   });
@@ -384,7 +414,9 @@ describe('FrameSyncService', () => {
     }
 
     it('updates the anchoring status for the annotation', () => {
-      guestBridge().emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
+      guestBridge().emit(guestToSidebarEvents.SYNC, [
+        { tag: 't1', msg: { $orphan: false } },
+      ]);
 
       expireDebounceTimeout();
 
@@ -392,8 +424,12 @@ describe('FrameSyncService', () => {
     });
 
     it('coalesces multiple "sync" messages', () => {
-      guestBridge().emit('sync', [{ tag: 't1', msg: { $orphan: false } }]);
-      guestBridge().emit('sync', [{ tag: 't2', msg: { $orphan: true } }]);
+      guestBridge().emit(guestToSidebarEvents.SYNC, [
+        { tag: 't1', msg: { $orphan: false } },
+      ]);
+      guestBridge().emit(guestToSidebarEvents.SYNC, [
+        { tag: 't2', msg: { $orphan: true } },
+      ]);
 
       expireDebounceTimeout();
 
@@ -444,7 +480,7 @@ describe('FrameSyncService', () => {
 
     it('removes the frame from the frames list', () => {
       frameSync.connect();
-      hostBridge().emit('destroyFrame', frameId);
+      hostBridge().emit(hostToSidebarEvents.DESTROY_FRAME, frameId);
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
     });
@@ -454,7 +490,11 @@ describe('FrameSyncService', () => {
     it('selects annotations which have an ID', () => {
       frameSync.connect();
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
-      guestBridge().emit('showAnnotations', ['tag1', 'tag2', 'tag3']);
+      guestBridge().emit(guestToSidebarEvents.SHOW_ANNOTATIONS, [
+        'tag1',
+        'tag2',
+        'tag3',
+      ]);
 
       assert.calledWith(fakeStore.selectAnnotations, ['id1', 'id2', 'id3']);
       assert.calledWith(fakeStore.selectTab, 'annotation');
@@ -464,7 +504,11 @@ describe('FrameSyncService', () => {
   describe('on "focusAnnotations" message', () => {
     it('focuses the annotations', () => {
       frameSync.connect();
-      guestBridge().emit('focusAnnotations', ['tag1', 'tag2', 'tag3']);
+      guestBridge().emit(guestToSidebarEvents.FOCUS_ANNOTATIONS, [
+        'tag1',
+        'tag2',
+        'tag3',
+      ]);
       assert.calledWith(fakeStore.focusAnnotations, ['tag1', 'tag2', 'tag3']);
     });
   });
@@ -473,7 +517,11 @@ describe('FrameSyncService', () => {
     it('toggles the selected state of the annotations', () => {
       frameSync.connect();
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
-      guestBridge().emit('toggleAnnotationSelection', ['tag1', 'tag2', 'tag3']);
+      guestBridge().emit(guestToSidebarEvents.TOGGLE_ANNOTATION_SELECTION, [
+        'tag1',
+        'tag2',
+        'tag3',
+      ]);
       assert.calledWith(fakeStore.toggleSelectedAnnotations, [
         'id1',
         'id2',
@@ -485,7 +533,7 @@ describe('FrameSyncService', () => {
   describe('on "sidebarOpened" message', () => {
     it('sets the sidebar open in the store', () => {
       frameSync.connect();
-      hostBridge().emit('sidebarOpened');
+      hostBridge().emit(hostToSidebarEvents.SIDEBAR_OPENED);
 
       assert.calledWith(fakeStore.setSidebarOpened, true);
     });
@@ -497,21 +545,24 @@ describe('FrameSyncService', () => {
     });
 
     it('calls "openSidebar"', () => {
-      guestBridge().emit('openSidebar');
+      guestBridge().emit(guestToSidebarEvents.OPEN_SIDEBAR);
 
-      assert.calledWith(hostBridge().call, 'openSidebar');
+      assert.calledWith(hostBridge().call, sidebarToHostEvents.OPEN_SIDEBAR);
     });
 
     it('calls "closeSidebar"', () => {
-      guestBridge().emit('closeSidebar');
+      guestBridge().emit(guestToSidebarEvents.CLOSE_SIDEBAR);
 
-      assert.calledWith(hostBridge().call, 'closeSidebar');
+      assert.calledWith(hostBridge().call, sidebarToHostEvents.CLOSE_SIDEBAR);
     });
 
     it('calls "setVisibleHighlights"', () => {
-      hostBridge().emit('setVisibleHighlights');
+      hostBridge().emit(hostToSidebarEvents.SET_VISIBLE_HIGHLIGHTS);
 
-      assert.calledWith(guestBridge().call, 'setVisibleHighlights');
+      assert.calledWith(
+        guestBridge().call,
+        sidebarToGuestEvents.SET_VISIBLE_HIGHLIGHTS
+      );
     });
   });
 
@@ -532,7 +583,7 @@ describe('FrameSyncService', () => {
       frameSync.focusAnnotations([1, 2]);
       assert.calledWith(
         guestBridge().call,
-        'focusAnnotations',
+        sidebarToGuestEvents.FOCUS_ANNOTATIONS,
         sinon.match.array.deepEquals([1, 2])
       );
     });
@@ -542,7 +593,11 @@ describe('FrameSyncService', () => {
     it('should scroll to the annotation in the guest', () => {
       frameSync.connect();
       frameSync.scrollToAnnotation('atag');
-      assert.calledWith(guestBridge().call, 'scrollToAnnotation', 'atag');
+      assert.calledWith(
+        guestBridge().call,
+        sidebarToGuestEvents.SCROLL_TO_ANNOTATION,
+        'atag'
+      );
     });
   });
 

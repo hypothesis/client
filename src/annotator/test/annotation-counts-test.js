@@ -1,3 +1,4 @@
+import { sidebarToHostEvents } from '../../shared/bridge-events';
 import { annotationCounts } from '../annotation-counts';
 
 describe('annotationCounts', () => {
@@ -57,7 +58,7 @@ describe('annotationCounts', () => {
       const newCount = 10;
       annotationCounts(document.body, fakeCrossFrame);
 
-      emitEvent('publicAnnotationCountChanged', newCount);
+      emitEvent(sidebarToHostEvents.PUBLIC_ANNOTATION_COUNT_CHANGED, newCount);
 
       assert.equal(countEl1.textContent, newCount);
       assert.equal(countEl2.textContent, newCount);

@@ -1,5 +1,6 @@
 import { mount } from 'enzyme';
 
+import { sidebarToHostEvents } from '../../../shared/bridge-events';
 import TopBar, { $imports } from '../TopBar';
 import { checkAccessibility } from '../../../test-util/accessibility';
 import mockImportedComponents from '../../../test-util/mock-imported-components';
@@ -120,7 +121,10 @@ describe('TopBar', () => {
           helpButton.props().onClick();
 
           assert.equal(fakeStore.toggleSidebarPanel.callCount, 0);
-          assert.calledWith(fakeFrameSync.notifyHost, 'helpRequested');
+          assert.calledWith(
+            fakeFrameSync.notifyHost,
+            sidebarToHostEvents.HELP_REQUESTED
+          );
         });
       });
     });
