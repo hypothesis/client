@@ -110,13 +110,6 @@ export default class Sidebar {
 
     this._listeners = new ListenerCollection();
 
-    this._emitter.subscribe('panelReady', () => {
-      // Show the UI
-      if (this.iframeContainer) {
-        this.iframeContainer.style.display = '';
-      }
-    });
-
     this._emitter.subscribe('beforeAnnotationCreated', annotation => {
       // When a new non-highlight annotation is created, focus
       // the sidebar so that the text editor can be focused as
@@ -125,15 +118,6 @@ export default class Sidebar {
         /** @type {Window} */ (this.iframe.contentWindow).focus();
       }
     });
-
-    if (
-      config.openSidebar ||
-      config.annotations ||
-      config.query ||
-      config.group
-    ) {
-      this._emitter.subscribe('panelReady', () => this.open());
-    }
 
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
@@ -208,6 +192,22 @@ export default class Sidebar {
           resolve();
         }
       });
+    });
+
+    this.ready.then(() => {
+      // Show the UI
+      if (this.iframeContainer) {
+        this.iframeContainer.style.display = '';
+      }
+
+      if (
+        config.openSidebar ||
+        config.annotations ||
+        config.query ||
+        config.group
+      ) {
+        this.open();
+      }
     });
 
     // Notify sidebar when a guest is unloaded. This message is routed via

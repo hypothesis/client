@@ -8,6 +8,25 @@ const DEFAULT_WIDTH = 350;
 const DEFAULT_HEIGHT = 600;
 const EXTERNAL_CONTAINER_SELECTOR = 'test-external-container';
 
+/**
+ * Simulate the sidebar application notifying the host frame that it has loaded
+ * and is ready to communicate with the host and guest frames.
+ */
+function sendSidebarReadyMessage() {
+  const channel = new MessageChannel();
+  const event = new MessageEvent(
+    'message',
+    {
+      data: { type: 'hypothesisSidebarReady' },
+    },
+    [channel.port1]
+  );
+
+  window.dispatchEvent(event);
+
+  return event;
+}
+
 describe('Sidebar', () => {
   const sandbox = sinon.createSandbox();
   let fakeGuest;
@@ -141,9 +160,10 @@ describe('Sidebar', () => {
       );
     });
 
-    it('becomes visible when the "panelReady" event fires', () => {
+    it('becomes visible when the sidebar application has loaded', async () => {
       const sidebar = createSidebar();
-      sidebar._emitter.publish('panelReady');
+      sendSidebarReadyMessage();
+      await sidebar.ready;
       assert.equal(sidebar.iframeContainer.style.display, '');
     });
   });
@@ -157,21 +177,6 @@ describe('Sidebar', () => {
       assert.equal(sidebar.iframe, iframe);
     });
   });
-
-  function sendSidebarReadyMessage() {
-    const channel = new MessageChannel();
-    const event = new MessageEvent(
-      'message',
-      {
-        data: { type: 'hypothesisSidebarReady' },
-      },
-      [channel.port1]
-    );
-
-    window.dispatchEvent(event);
-
-    return event;
-  }
 
   it('creates Bridge for host <-> sidebar RPC calls when `hypothesisSidebarReady` message is received', () => {
     createSidebar();
@@ -532,47 +537,39 @@ describe('Sidebar', () => {
       }));
   });
 
-  describe('panelReady event', () => {
-    it('opens the sidebar when a direct-linked annotation is present.', () => {
-      const sidebar = createSidebar({
-        annotations: 'ann-id',
+  describe('when the sidebar application has loaded', () => {
+    [
+      {
+        test: 'a direct-linked annotation is present',
+        config: { annotations: 'ann-id' },
+      },
+      {
+        test: 'a direct-linked group is present',
+        config: { group: 'group-id' },
+      },
+      {
+        test: 'a direct-linked query is present',
+        config: { query: 'tag:foo' },
+      },
+      {
+        test: '`openSidebar` is set to true',
+        config: { openSidebar: true },
+      },
+    ].forEach(({ test, config }) => {
+      it(`opens the sidebar when ${test}`, async () => {
+        const sidebar = createSidebar(config);
+        const open = sandbox.stub(sidebar, 'open');
+        sendSidebarReadyMessage();
+        await sidebar.ready;
+        assert.calledOnce(open);
       });
-      const open = sandbox.stub(sidebar, 'open');
-      sidebar._emitter.publish('panelReady');
-      assert.calledOnce(open);
     });
 
-    it('opens the sidebar when a direct-linked group is present.', () => {
-      const sidebar = createSidebar({
-        group: 'group-id',
-      });
-      const open = sandbox.stub(sidebar, 'open');
-      sidebar._emitter.publish('panelReady');
-      assert.calledOnce(open);
-    });
-
-    it('opens the sidebar when a direct-linked query is present.', () => {
-      const sidebar = createSidebar({
-        query: 'tag:foo',
-      });
-      const open = sandbox.stub(sidebar, 'open');
-      sidebar._emitter.publish('panelReady');
-      assert.calledOnce(open);
-    });
-
-    it('opens the sidebar when openSidebar is set to true.', () => {
-      const sidebar = createSidebar({
-        openSidebar: true,
-      });
-      const open = sandbox.stub(sidebar, 'open');
-      sidebar._emitter.publish('panelReady');
-      assert.calledOnce(open);
-    });
-
-    it('does not open the sidebar if not configured to.', () => {
+    it('does not open the sidebar if not configured to', async () => {
       const sidebar = createSidebar();
       const open = sandbox.stub(sidebar, 'open');
-      sidebar._emitter.publish('panelReady');
+      sendSidebarReadyMessage();
+      await sidebar.ready;
       assert.notCalled(open);
     });
   });
@@ -653,19 +650,25 @@ describe('Sidebar', () => {
   });
 
   describe('window resize events', () => {
-    it('hides the sidebar if window width is < MIN_RESIZE', () => {
-      const sidebar = createSidebar({ openSidebar: true });
-      sidebar._emitter.publish('panelReady');
+    let sidebar;
 
+    beforeEach(async () => {
+      // Configure the sidebar to open on load and wait for the initial open to
+      // complete.
+      sidebar = createSidebar({ openSidebar: true });
+      sendSidebarReadyMessage();
+      await sidebar.ready;
+    });
+
+    it('hides the sidebar if window width is < MIN_RESIZE', () => {
       window.innerWidth = MIN_RESIZE - 1;
       window.dispatchEvent(new Event('resize'));
+
       assert.equal(fakeToolbar.sidebarOpen, false);
     });
 
     it('invokes the "open" method when window is resized', () => {
       // Calling the 'open' methods adjust the marginLeft at different screen sizes
-      const sidebar = createSidebar({ openSidebar: true });
-      sidebar._emitter.publish('panelReady');
       sinon.stub(sidebar, 'open');
 
       // Make the window very small
