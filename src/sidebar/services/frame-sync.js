@@ -78,6 +78,9 @@ export class FrameSyncService {
     // Set of tags of annotations that are currently loaded into the frame
     const inFrame = new Set();
 
+    /** Whether highlights are visible in guest frames. */
+    this._highlightsVisible = false;
+
     /**
      * Watch for changes to the set of annotations displayed in the sidebar and
      * notify connected guests about new/updated/deleted annotations.
@@ -226,6 +229,9 @@ export class FrameSyncService {
      * @param {PortRPC} channel
      */
     const addFrame = channel => {
+      // Synchronize highlight visibility in this guest with the sidebar's controls.
+      channel.call('setHighlightsVisible', this._highlightsVisible);
+
       channel.call('getDocumentInfo', (err, info) => {
         if (err) {
           channel.destroy();
@@ -279,8 +285,9 @@ export class FrameSyncService {
 
     // When user toggles the highlight visibility control in the sidebar container,
     // update the visibility in all the guest frames.
-    this._hostRPC.on('setVisibleHighlights', state => {
-      this._guestRPC.call('setVisibleHighlights', state);
+    this._hostRPC.on('setHighlightsVisible', visible => {
+      this._highlightsVisible = visible;
+      this._guestRPC.call('setHighlightsVisible', visible);
     });
 
     // Create channel for sidebar <-> host communication and send port to host.

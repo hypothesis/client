@@ -89,7 +89,7 @@ describe('Sidebar', () => {
         this.contentContainer = sinon.stub().returns(document.body);
         this.createAnnotation = sinon.stub();
         this.fitSideBySide = sinon.stub();
-        this.setVisibleHighlights = sinon.stub();
+        this.setHighlightsVisible = sinon.stub();
       }
     }
     fakeGuest = new FakeGuest();
@@ -244,14 +244,14 @@ describe('Sidebar', () => {
 
     it('shows or hides highlights when toolbar button is clicked', () => {
       const sidebar = createSidebar();
-      sinon.stub(sidebar, 'setAllVisibleHighlights');
+      sinon.stub(sidebar, 'setHighlightsVisible');
 
       FakeToolbarController.args[0][1].setHighlightsVisible(true);
-      assert.calledWith(sidebar.setAllVisibleHighlights, true);
-      sidebar.setAllVisibleHighlights.resetHistory();
+      assert.calledWith(sidebar.setHighlightsVisible, true);
+      sidebar.setHighlightsVisible.resetHistory();
 
       FakeToolbarController.args[0][1].setHighlightsVisible(false);
-      assert.calledWith(sidebar.setAllVisibleHighlights, false);
+      assert.calledWith(sidebar.setHighlightsVisible, false);
     });
 
     it('creates an annotation when toolbar button is clicked', () => {
@@ -562,13 +562,17 @@ describe('Sidebar', () => {
     it('shows highlights if "showHighlights" is set to "whenSidebarOpen"', () => {
       const sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' });
       sidebar.open();
-      assert.calledWith(sidebar.guest.setVisibleHighlights, true);
+      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', true);
     });
 
     it('does not show highlights otherwise', () => {
       const sidebar = createSidebar({ showHighlights: 'never' });
       sidebar.open();
-      assert.notCalled(sidebar.guest.setVisibleHighlights);
+
+      const call = fakeBridge.call
+        .getCalls()
+        .find(args => args[0] === 'setHighlightsVisible' && args[1] === true);
+      assert.isUndefined(call);
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -585,7 +589,7 @@ describe('Sidebar', () => {
       sidebar.open();
       sidebar.close();
 
-      assert.calledWith(sidebar.guest.setVisibleHighlights, false);
+      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', false);
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -598,12 +602,25 @@ describe('Sidebar', () => {
     });
   });
 
-  describe('#setAllVisibleHighlights', () =>
+  describe('#setHighlightsVisible', () => {
     it('requests sidebar to set highlight visibility in guest frames', () => {
       const sidebar = createSidebar();
-      sidebar.setAllVisibleHighlights(true);
-      assert.calledWith(fakeBridge.call, 'setVisibleHighlights', true);
-    }));
+      sidebar.setHighlightsVisible(true);
+      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', true);
+
+      sidebar.setHighlightsVisible(false);
+      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', false);
+    });
+
+    it('toggles "Show highlights" control in toolbar', () => {
+      const sidebar = createSidebar();
+      sidebar.setHighlightsVisible(true);
+      assert.isTrue(fakeToolbar.highlightsVisible);
+
+      sidebar.setHighlightsVisible(false);
+      assert.isFalse(fakeToolbar.highlightsVisible);
+    });
+  });
 
   it('hides toolbar controls when using the "clean" theme', () => {
     createSidebar({ theme: 'clean' });

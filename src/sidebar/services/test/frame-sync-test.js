@@ -426,14 +426,17 @@ describe('FrameSyncService', () => {
 
   context('when a new frame connects', () => {
     let frameInfo;
-    const fakeChannel = {
-      call: function (name, callback) {
-        callback(null, frameInfo);
-      },
-      destroy: sinon.stub(),
-    };
+    let fakeChannel;
 
     beforeEach(() => {
+      fakeChannel = {
+        call: sinon.spy((name, callback) => {
+          if (name === 'getDocumentInfo') {
+            callback(null, frameInfo);
+          }
+        }),
+        destroy: sinon.stub(),
+      };
       frameSync.connect();
     });
 
@@ -450,12 +453,26 @@ describe('FrameSyncService', () => {
     });
 
     it('closes the channel and does not add frame to store if getting document info fails', () => {
-      fakeChannel.call = (name, callback) => callback('Something went wrong');
+      fakeChannel.call = (name, callback) => {
+        if (name === 'getDocumentInfo') {
+          callback('Something went wrong');
+        }
+      };
 
       guestBridge().emit('connect', fakeChannel);
 
       assert.called(fakeChannel.destroy);
       assert.notCalled(fakeStore.connectFrame);
+    });
+
+    it("synchronizes highlight visibility in the guest with the sidebar's controls", () => {
+      hostBridge().emit('setHighlightsVisible', true);
+      guestBridge().emit('connect', fakeChannel);
+      assert.calledWith(fakeChannel.call, 'setHighlightsVisible', true);
+
+      hostBridge().emit('setHighlightsVisible', false);
+      guestBridge().emit('connect', fakeChannel);
+      assert.calledWith(fakeChannel.call, 'setHighlightsVisible', false);
     });
   });
 
@@ -528,10 +545,10 @@ describe('FrameSyncService', () => {
       assert.calledWith(hostBridge().call, 'closeSidebar');
     });
 
-    it('calls "setVisibleHighlights"', () => {
-      hostBridge().emit('setVisibleHighlights');
+    it('calls "setHighlightsVisible"', () => {
+      hostBridge().emit('setHighlightsVisible');
 
-      assert.calledWith(guestBridge().call, 'setVisibleHighlights');
+      assert.calledWith(guestBridge().call, 'setHighlightsVisible');
     });
   });
 
