@@ -326,6 +326,26 @@ describe('FrameSyncService', () => {
           })
         );
       });
+
+      it('opens the sidebar ready for the user to edit the draft', () => {
+        frameSync.connect();
+        fakeStore.isLoggedIn.returns(true);
+        const ann = { target: [] };
+
+        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+
+        assert.calledWith(hostBridge().call, 'openSidebar');
+      });
+
+      it('does not open the sidebar if the annotation is a highlight', () => {
+        frameSync.connect();
+        fakeStore.isLoggedIn.returns(true);
+        const ann = { $highlight: true, target: [] };
+
+        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+
+        assert.notCalled(hostBridge().call);
+      });
     });
 
     context('when no authenticated user is present', () => {

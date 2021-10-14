@@ -150,6 +150,12 @@ export class FrameSyncService {
         }
         inFrame.add(event.tag);
 
+        // Open the sidebar so that the user can immediately edit the draft
+        // annotation.
+        if (!annot.$highlight) {
+          this._hostRPC.call('openSidebar');
+        }
+
         // Create the new annotation in the sidebar.
         annotationsService.create(annot);
       });

@@ -805,18 +805,6 @@ describe('Guest', () => {
       assert.equal(annotation.$highlight, true);
     });
 
-    it('opens sidebar if `highlight` is false', async () => {
-      const guest = createGuest();
-      await guest.createAnnotation();
-      assert.calledWith(fakeBridge.call, 'openSidebar');
-    });
-
-    it('does not open sidebar if `highlight` is true', async () => {
-      const guest = createGuest();
-      await guest.createAnnotation({ highlight: true });
-      assert.notCalled(fakeBridge.call);
-    });
-
     it('triggers a "beforeAnnotationCreated" event', async () => {
       const guest = createGuest();
       const callback = sandbox.stub();

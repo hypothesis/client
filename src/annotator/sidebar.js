@@ -110,15 +110,6 @@ export default class Sidebar {
 
     this._listeners = new ListenerCollection();
 
-    this._emitter.subscribe('beforeAnnotationCreated', annotation => {
-      // When a new non-highlight annotation is created, focus
-      // the sidebar so that the text editor can be focused as
-      // soon as the annotation card appears
-      if (!annotation.$highlight) {
-        /** @type {Window} */ (this.iframe.contentWindow).focus();
-      }
-    });
-
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {

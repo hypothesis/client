@@ -232,37 +232,6 @@ describe('Sidebar', () => {
     );
   });
 
-  context('when a new annotation is created', () => {
-    function stubIframeWindow(sidebar) {
-      const iframe = sidebar.iframe;
-      const fakeIframeWindow = { focus: sinon.stub() };
-      sinon.stub(iframe, 'contentWindow').get(() => fakeIframeWindow);
-      return iframe;
-    }
-
-    it('focuses the sidebar if the annotation is not a highlight', () => {
-      const sidebar = createSidebar();
-      const iframe = stubIframeWindow(sidebar);
-
-      sidebar._emitter.publish('beforeAnnotationCreated', {
-        $highlight: false,
-      });
-
-      assert.called(iframe.contentWindow.focus);
-    });
-
-    it('does not focus the sidebar if the annotation is a highlight', () => {
-      const sidebar = createSidebar();
-      const iframe = stubIframeWindow(sidebar);
-
-      sidebar._emitter.publish('beforeAnnotationCreated', {
-        $highlight: true,
-      });
-
-      assert.notCalled(iframe.contentWindow.focus);
-    });
-  });
-
   describe('toolbar buttons', () => {
     it('opens and closes sidebar when toolbar button is clicked', () => {
       const sidebar = createSidebar();
