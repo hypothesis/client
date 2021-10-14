@@ -13,13 +13,9 @@ const initialState = {
    * current state of the sidebar, but tracks whether it has ever been open
    */
   sidebarHasOpened: false,
-  visibleHighlights: false,
 };
 
 const reducers = {
-  SET_HIGHLIGHTS_VISIBLE: function (state, action) {
-    return { visibleHighlights: action.visible };
-  },
   SET_SIDEBAR_OPENED: (state, action) => {
     if (action.opened === true) {
       // If the sidebar is open, track that it has ever been opened
@@ -33,14 +29,6 @@ const reducers = {
 const actions = util.actionTypes(reducers);
 
 // Action creators
-
-/**
- * Sets whether annotation highlights in connected documents are shown
- * or not.
- */
-function setShowHighlights(show) {
-  return { type: actions.SET_HIGHLIGHTS_VISIBLE, visible: show };
-}
 
 /**
  * @param {boolean} opened - If the sidebar is open
@@ -59,7 +47,6 @@ export default createStoreModule(initialState, {
   namespace: 'viewer',
   reducers,
   actionCreators: {
-    setShowHighlights,
     setSidebarOpened,
   },
   selectors: {

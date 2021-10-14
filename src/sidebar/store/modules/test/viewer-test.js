@@ -8,18 +8,6 @@ describe('store/modules/viewer', () => {
     store = createStore([viewer]);
   });
 
-  describe('#setShowHighlights', () => {
-    it('sets a flag indicating that highlights are visible', () => {
-      store.setShowHighlights(true);
-      assert.isTrue(store.getState().viewer.visibleHighlights);
-    });
-
-    it('sets a flag indicating that highlights are not visible', () => {
-      store.setShowHighlights(false);
-      assert.isFalse(store.getState().viewer.visibleHighlights);
-    });
-  });
-
   describe('hasSidebarOpened', () => {
     it('is `false` if sidebar has never been opened', () => {
       assert.isFalse(store.hasSidebarOpened());
