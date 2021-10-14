@@ -315,7 +315,7 @@ describe('FrameSyncService', () => {
       fakeStore.isLoggedIn.returns(true);
       const ann = { target: [] };
 
-      guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+      guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
       assert.calledWith(hostBridge().call, 'showHighlights');
     });
@@ -326,7 +326,7 @@ describe('FrameSyncService', () => {
         fakeStore.isLoggedIn.returns(true);
         const ann = { target: [] };
 
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(
           fakeAnnotationsService.create,
@@ -342,7 +342,7 @@ describe('FrameSyncService', () => {
         fakeStore.isLoggedIn.returns(true);
         const ann = { target: [] };
 
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(hostBridge().call, 'openSidebar');
       });
@@ -352,7 +352,7 @@ describe('FrameSyncService', () => {
         fakeStore.isLoggedIn.returns(true);
         const ann = { $highlight: true, target: [] };
 
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
         assert.neverCalledWith(hostBridge().call, 'openSidebar');
       });
@@ -367,28 +367,28 @@ describe('FrameSyncService', () => {
       it('should not create an annotation in the sidebar', () => {
         const ann = { target: [] };
 
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
         assert.notCalled(fakeAnnotationsService.create);
       });
 
       it('should open the sidebar', () => {
         const ann = { target: [] };
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(hostBridge().call, 'openSidebar');
       });
 
       it('should open the login prompt panel', () => {
         const ann = { target: [] };
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(fakeStore.openSidebarPanel, 'loginPrompt');
       });
 
       it('should send a "deleteAnnotation" message to the frame', () => {
         const ann = { target: [] };
-        guestBridge().emit('beforeCreateAnnotation', { tag: 't1', msg: ann });
+        guestBridge().emit('createAnnotation', { tag: 't1', msg: ann });
 
         assert.calledWith(guestBridge().call, 'deleteAnnotation');
       });
