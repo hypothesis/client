@@ -54,7 +54,7 @@ export type GuestToSidebarEvent =
   /**
    * The guest informs the sidebar whether annotations were successfully anchored
    */
-  | 'sync'
+  | 'syncAnchoringStatus'
 
   /**
    * The guest is asking the sidebar to toggle some annotations.

@@ -190,7 +190,7 @@ export class FrameSyncService {
       }, 10);
 
       // Anchoring an annotation in the frame completed
-      this._guestRPC.on('sync', events_ => {
+      this._guestRPC.on('syncAnchoringStatus', events_ => {
         events_.forEach(event => {
           inFrame.add(event.tag);
           anchoringStatusUpdates[event.tag] = event.msg.$orphan

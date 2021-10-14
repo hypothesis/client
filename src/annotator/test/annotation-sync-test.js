@@ -155,13 +155,15 @@ describe('AnnotationSync', () => {
   });
 
   describe('#sync', () => {
-    it('calls "sync" method of the bridge', () => {
+    it('calls "syncAnchoringStatus" RPC method in the sidebar', () => {
       const ann = { id: 1 };
       const annotationSync = createAnnotationSync();
 
       annotationSync.sync([ann]);
 
-      assert.calledWith(fakeBridge.call, 'sync', [{ msg: ann, tag: ann.$tag }]);
+      assert.calledWith(fakeBridge.call, 'syncAnchoringStatus', [
+        { msg: ann, tag: ann.$tag },
+      ]);
     });
   });
 
