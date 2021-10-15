@@ -4,7 +4,6 @@
 // Base styles
 // -----------
 @use '../reset';
-@use '../util';
 @use './elements';
 
 // Shared styles
@@ -61,6 +60,8 @@
 
 // Make the shared package utility styles available
 @use '@hypothesis/frontend-shared/styles/util' as hyp-u;
+// Local utility classes
+@use '../util';
 
 // Top-level styles
 // ----------------
