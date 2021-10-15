@@ -132,7 +132,10 @@ function AnnotationEditor({
 
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
-    <div className="AnnotationEditor u-vertical-rhythm" onKeyDown={onKeyDown}>
+    <div
+      className="hyp-u-vertical-spacing AnnotationEditor"
+      onKeyDown={onKeyDown}
+    >
       <MarkdownEditor
         textStyle={textStyle}
         label="Annotation body"

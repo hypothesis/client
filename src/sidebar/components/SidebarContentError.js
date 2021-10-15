@@ -43,7 +43,7 @@ export default function SidebarContentError({
     <div className="u-sidebar-container">
       <Panel icon="restricted" title={errorTitle}>
         <p>{errorMessage}</p>
-        <div className="hyp-u-layout-row--justify-right u-horizontal-rhythm">
+        <div className="hyp-u-layout-row--justify-right hyp-u-horizontal-spacing">
           {showClearSelection && (
             <LabeledButton
               variant={isLoggedIn ? 'primary' : undefined}
