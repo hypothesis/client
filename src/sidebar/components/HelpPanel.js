@@ -118,7 +118,7 @@ function HelpPanel({ auth, session }) {
       onActiveChanged={onActiveChanged}
     >
       <div className="HelpPanel__content u-vertical-rhythm">
-        <div className="u-layout-row--align-middle">
+        <div className="hyp-u-layout-row--align-center">
           <h3 className="HelpPanel__sub-panel-title">
             {subPanelTitles[activeSubPanel]}
           </h3>

@@ -15,7 +15,7 @@
  */
 export default function AnnotationDocumentInfo({ domain, link, title }) {
   return (
-    <div className="u-layout-row u-horizontal-rhythm">
+    <div className="hyp-u-layout-row u-horizontal-rhythm">
       <div className="u-color-text--muted">
         on &quot;
         {link ? (

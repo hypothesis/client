@@ -96,7 +96,7 @@ function Annotation({
 
       {!isCollapsedReply && (
         <footer className="Annotation__footer">
-          <div className="Annotation__controls u-layout-row">
+          <div className="hyp-u-layout-row Annotation__controls">
             {showReplyToggle && (
               <AnnotationReplyToggle
                 onToggleReplies={onToggleReplies}
@@ -106,7 +106,7 @@ function Annotation({
             )}
             {isSaving && <div className="Annotation__actions">Saving...</div>}
             {annotation && showActions && (
-              <div className="u-layout-row--justify-right u-stretch">
+              <div className="hyp-u-layout-row--justify-right u-stretch">
                 <AnnotationActionBar
                   annotation={annotation}
                   onReply={onReply}

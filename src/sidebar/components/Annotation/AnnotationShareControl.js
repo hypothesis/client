@@ -138,7 +138,7 @@ function AnnotationShareControl({
             </div>
           </div>
           <div className="annotation-share-panel__content">
-            <div className="u-layout-row annotation-share-panel__inputs">
+            <div className="hyp-u-layout-row annotation-share-panel__inputs">
               <TextInputWithButton>
                 <TextInput
                   aria-label="Use this URL to share this annotation"

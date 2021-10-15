@@ -70,7 +70,7 @@ function FilterStatusPanel({
 }) {
   return (
     <div className="FilterStatus">
-      <div className="u-layout-row--align-center">
+      <div className="hyp-u-layout-row--align-center">
         <div className="FilterStatus__text">
           {resultCount > 0 && <span>Showing </span>}
           <span className="filter-facet">

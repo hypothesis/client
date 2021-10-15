@@ -30,10 +30,10 @@ function AnnotationShareInfo({ annotation }) {
   const annotationIsPrivate = isPrivate(annotation.permissions);
 
   return (
-    <div className="AnnotationShareInfo u-layout-row--align-baseline">
+    <div className="AnnotationShareInfo hyp-u-layout-row--align-baseline">
       {group && linkToGroup && (
         <a
-          className="u-layout-row--align-baseline u-color-text--muted"
+          className="hyp-u-layout-row--align-baseline u-color-text--muted"
           href={group.links.html}
           target="_blank"
           rel="noopener noreferrer"
@@ -47,7 +47,7 @@ function AnnotationShareInfo({ annotation }) {
         </a>
       )}
       {annotationIsPrivate && !linkToGroup && (
-        <span className="u-layout-row--align-baseline u-color-text--muted">
+        <span className="hyp-u-layout-row--align-baseline u-color-text--muted">
           <span className="AnnotationShareInfo__private-info">Only me</span>
         </span>
       )}
