@@ -173,28 +173,34 @@ export class StreamerService {
     }
     this._socket?.close();
 
-    let token;
-    try {
-      token = await this._auth.getAccessToken();
-    } catch (err) {
-      console.error('Failed to fetch token for WebSocket authentication', err);
-      throw err;
-    }
+    const getURL = async () => {
+      let token;
+      try {
+        token = await this._auth.getAccessToken();
+      } catch (err) {
+        console.error(
+          'Failed to fetch token for WebSocket authentication',
+          err
+        );
+        throw err;
+      }
 
-    let url;
-    if (token) {
-      // Include the access token in the URL via a query param. This method
-      // is used to send credentials because the `WebSocket` constructor does
-      // not support setting the `Authorization` header directly as we do for
-      // other API requests.
-      const parsedURL = new URL(this._websocketURL);
-      parsedURL.searchParams.set('access_token', token);
-      url = parsedURL.toString();
-    } else {
-      url = this._websocketURL;
-    }
+      let url;
+      if (token) {
+        // Include the access token in the URL via a query param. This method
+        // is used to send credentials because the `WebSocket` constructor does
+        // not support setting the `Authorization` header directly as we do for
+        // other API requests.
+        const parsedURL = new URL(this._websocketURL);
+        parsedURL.searchParams.set('access_token', token);
+        url = parsedURL.toString();
+      } else {
+        url = this._websocketURL;
+      }
+      return url;
+    };
 
-    const newSocket = new Socket(url);
+    const newSocket = new Socket(getURL);
     newSocket.on('open', () => this._sendClientConfig(newSocket));
     newSocket.on('error', err => this._handleSocketError(err));
     newSocket.on('message', event => this._handleSocketMessage(event));

@@ -37,3 +37,15 @@ export async function waitFor(
 export function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+/**
+ * Wait for an EventEmitter-like object to emit an event
+ *
+ * @param {{ on: (event: string) => void }} emitter
+ * @param {string} event
+ */
+export function awaitEvent(emitter, event) {
+  return new Promise(resolve => {
+    emitter.on(event, resolve);
+  });
+}

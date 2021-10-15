@@ -47,13 +47,13 @@ let fakeWebSocket = null;
 let fakeWebSockets = [];
 
 class FakeSocket extends EventEmitter {
-  constructor(url) {
+  constructor(getURL) {
     super();
 
     fakeWebSocket = this; // eslint-disable-line consistent-this
     fakeWebSockets.push(this);
 
-    this.url = url;
+    this.url = getURL();
     this.messages = [];
     this.didClose = false;
 
@@ -196,34 +196,32 @@ describe('StreamerService', () => {
       });
     });
 
-    it('should include credentials in the URL if the client has an access token', () => {
+    it('should include credentials in the URL if the client has an access token', async () => {
       createDefaultStreamer();
-      return activeStreamer.connect().then(() => {
-        assert.equal(
-          fakeWebSocket.url,
-          'ws://example.com/ws?access_token=dummy-access-token'
-        );
-      });
+      await activeStreamer.connect();
+      assert.equal(
+        await fakeWebSocket.url,
+        'ws://example.com/ws?access_token=dummy-access-token'
+      );
     });
 
-    it('should preserve query params when adding access token to URL', () => {
+    it('should preserve query params when adding access token to URL', async () => {
       fakeSettings.websocketUrl = 'ws://example.com/ws?foo=bar';
       createDefaultStreamer();
-      return activeStreamer.connect().then(() => {
-        assert.equal(
-          fakeWebSocket.url,
-          'ws://example.com/ws?foo=bar&access_token=dummy-access-token'
-        );
-      });
+      await activeStreamer.connect();
+      assert.equal(
+        await fakeWebSocket.url,
+        'ws://example.com/ws?foo=bar&access_token=dummy-access-token'
+      );
     });
 
-    it('should not include credentials in the URL if the client has no access token', () => {
+    it('should not include credentials in the URL if the client has no access token', async () => {
       fakeAuth.getAccessToken.resolves(null);
 
       createDefaultStreamer();
-      return activeStreamer.connect().then(() => {
-        assert.equal(fakeWebSocket.url, 'ws://example.com/ws');
-      });
+      await activeStreamer.connect();
+
+      assert.equal(await fakeWebSocket.url, 'ws://example.com/ws');
     });
 
     it('should not close any existing socket', () => {
@@ -241,13 +239,13 @@ describe('StreamerService', () => {
         });
     });
 
-    it('throws an error if fetching the access token fails', async () => {
+    it('URL fetching callback should reject if token fetch fails', async () => {
       fakeAuth.getAccessToken.rejects(new Error('Getting token failed'));
       createDefaultStreamer();
 
-      const connected = activeStreamer.connect();
+      await activeStreamer.connect();
 
-      await assert.rejects(connected, 'Getting token failed');
+      await assert.rejects(fakeWebSocket.url, 'Getting token failed');
     });
   });
 
