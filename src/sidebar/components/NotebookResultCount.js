@@ -38,7 +38,7 @@ function NotebookResultCount({
   const threadCount = rootThread.children.length;
 
   return (
-    <div className="NotebookResultCount u-layout-row">
+    <div className="hyp-u-layout-row NotebookResultCount">
       {isLoading && <Spinner size="small" />}
       {!isLoading && (
         <h2>

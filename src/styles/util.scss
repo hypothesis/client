@@ -8,32 +8,6 @@
 
 // Layout
 
-// Establish a flex container with a horizontal flow
-.u-layout-row {
-  @include layout.row;
-}
-
-// Establish a row flex container that aligns its children to (vertical) center
-.u-layout-row--align-center,
-.u-layout-row--align-middle {
-  @include layout.row($align: center);
-}
-
-// Establish a row flex container that aligns its children along the baseline
-.u-layout-row--align-baseline {
-  @include layout.row($align: baseline);
-}
-
-// Establish a row flex container justifies its children right
-.u-layout-row--justify-right {
-  @include layout.row($justify: right);
-}
-
-// Establish a row flex container that centers its children
-.u-layout-row--justify-center {
-  @include layout.row($justify: center);
-}
-
 // Use this class to make an element in a flex container "stretchy" and grow
 // when there is extra space available.
 .u-stretch {

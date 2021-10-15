@@ -40,7 +40,7 @@ function VersionInfo({ toastMessenger, versionData }) {
         <dt className="VersionInfo__key">Date</dt>
         <dd className="VersionInfo__value">{versionData.timestamp}</dd>
       </dl>
-      <div className="u-layout-row--justify-center">
+      <div className="hyp-u-layout-row--justify-center">
         <LabeledButton onClick={copyVersionData} icon="copy">
           Copy version details
         </LabeledButton>

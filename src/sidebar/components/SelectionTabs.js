@@ -136,7 +136,7 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
         )}
       </div>
       {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
-        <div className="u-layout-row--justify-right">
+        <div className="hyp-u-layout-row--justify-right">
           <LabeledButton
             icon="add"
             onClick={() => annotationsService.createPageNote()}

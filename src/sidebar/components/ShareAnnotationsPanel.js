@@ -74,7 +74,7 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                   <p>Use this link to share these annotations with anyone:</p>
                 )}
               </div>
-              <div className="u-layout-row">
+              <div className="hyp-u-layout-row">
                 <TextInputWithButton>
                   <TextInput
                     aria-label="Use this URL to share these annotations"
