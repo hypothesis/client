@@ -118,7 +118,7 @@ export class FrameSyncService {
           if (frames.length > 0) {
             if (frames.every(frame => frame.isAnnotationFetchComplete)) {
               if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-                this._hostRPC.call(
+                this.notifyHost(
                   bridgeEvents.PUBLIC_ANNOTATION_COUNT_CHANGED,
                   publicAnns
                 );
@@ -143,7 +143,7 @@ export class FrameSyncService {
         // and delete the (unsaved) annotation so it gets un-selected in the
         // target document
         if (!store.isLoggedIn()) {
-          this._hostRPC.call('openSidebar');
+          this.notifyHost('openSidebar');
           store.openSidebarPanel('loginPrompt');
           this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
           return;
@@ -192,11 +192,11 @@ export class FrameSyncService {
       });
 
       this._guestRPC.on('openSidebar', () => {
-        this._hostRPC.call('openSidebar');
+        this.notifyHost('openSidebar');
       });
 
       this._guestRPC.on('closeSidebar', () => {
-        this._hostRPC.call('closeSidebar');
+        this.notifyHost('closeSidebar');
       });
     };
   }
