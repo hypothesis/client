@@ -8,12 +8,6 @@
 
 // Layout
 
-// Use this class to make an element in a flex container "stretchy" and grow
-// when there is extra space available.
-.u-stretch {
-  flex-grow: 1;
-}
-
 // Put equal, standard spacing between children horizontally
 .u-horizontal-rhythm {
   @include layout.horizontal-rhythm;

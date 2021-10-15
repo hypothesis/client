@@ -90,7 +90,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
       {annotation.hidden && (
         <span>Hidden from users. Flagged x{flagCount}</span>
       )}
-      <span className="u-stretch" />
+      <span className="hyp-u-stretch" />
       <button {...toggleButtonProps}>
         {annotation.hidden ? 'Unhide' : 'Hide'}
       </button>

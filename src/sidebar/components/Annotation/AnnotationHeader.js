@@ -134,7 +134,7 @@ function AnnotationHeader({
         )}
 
         {showTimestamps && (
-          <div className="hyp-u-layout-row--justify-right u-stretch">
+          <div className="hyp-u-layout-row--justify-right hyp-u-stretch">
             <AnnotationTimestamps
               annotationCreated={annotation.created}
               annotationUpdated={annotation.updated}

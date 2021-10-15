@@ -106,7 +106,7 @@ function Annotation({
             )}
             {isSaving && <div className="Annotation__actions">Saving...</div>}
             {annotation && showActions && (
-              <div className="hyp-u-layout-row--justify-right u-stretch">
+              <div className="hyp-u-layout-row--justify-right hyp-u-stretch">
                 <AnnotationActionBar
                   annotation={annotation}
                   onReply={onReply}
