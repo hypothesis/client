@@ -343,7 +343,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         tabIndex={getTabIndex(buttonIds.list)}
         title="Bulleted list"
       />
-      <span className="u-stretch" />
+      <span className="hyp-u-stretch" />
       <div className="MarkdownEditor__toolbar-help-link">
         <a
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"

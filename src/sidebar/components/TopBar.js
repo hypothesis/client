@@ -115,7 +115,7 @@ function TopBar({
       {!isSidebar && (
         <div className="TopBar__inner content">
           <StreamSearchInput />
-          <div className="u-stretch" />
+          <div className="hyp-u-stretch" />
           <IconButton
             icon="help"
             expanded={isHelpPanelOpen}
@@ -130,7 +130,7 @@ function TopBar({
       {isSidebar && (
         <div className="TopBar__inner content">
           <GroupList />
-          <div className="u-stretch" />
+          <div className="hyp-u-stretch" />
           {pendingUpdateCount > 0 && (
             <IconButton
               icon="refresh"
