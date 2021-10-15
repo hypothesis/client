@@ -25,7 +25,7 @@ function VersionInfo({ toastMessenger, versionData }) {
   };
 
   return (
-    <div className="u-vertical-rhythm">
+    <div className="hyp-u-vertical-spacing">
       <dl className="VersionInfo">
         <dt className="VersionInfo__key">Version</dt>
         <dd className="VersionInfo__value">{versionData.version}</dd>

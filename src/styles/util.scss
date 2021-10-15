@@ -1,22 +1,8 @@
 @use './mixins/a11y';
-@use './mixins/layout';
 @use './mixins/utils';
 @use './variables' as var;
 
 // Utility classes
-// Use these classes on elements that don't require additional styling
-
-// Layout
-
-// Put equal, standard spacing between children horizontally
-.u-horizontal-rhythm {
-  @include layout.horizontal-rhythm;
-}
-
-// Put equal standard spacing between children vertically
-.u-vertical-rhythm {
-  @include layout.vertical-rhythm;
-}
 
 .u-font--large {
   @include utils.font--large;
