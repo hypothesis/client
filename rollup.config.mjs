@@ -1,3 +1,5 @@
+import { readFileSync } from 'fs';
+
 import alias from '@rollup/plugin-alias';
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
@@ -51,7 +53,8 @@ function bundleConfig({ name, entry, format = 'es' }) {
         preventAssignment: true,
         values: {
           'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-          __VERSION__: require('./package.json').version,
+          __VERSION__: JSON.parse(readFileSync('./package.json').toString())
+            .version,
         },
       }),
       babel({
