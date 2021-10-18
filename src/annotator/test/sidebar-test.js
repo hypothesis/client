@@ -358,7 +358,7 @@ describe('Sidebar', () => {
       });
     });
 
-    describe('on "loginRequest" event', () => {
+    describe('on "loginRequested" event', () => {
       it('calls the onLoginRequest callback function if one was provided', () => {
         const onLoginRequest = sandbox.stub();
         createSidebar({ services: [{ onLoginRequest }] });
@@ -425,7 +425,7 @@ describe('Sidebar', () => {
       });
     });
 
-    describe('on LOGOUT_REQUESTED event', () =>
+    describe('on "logoutRequested" event', () =>
       it('calls the onLogoutRequest callback function', () => {
         const onLogoutRequest = sandbox.stub();
         createSidebar({ services: [{ onLogoutRequest }] });
@@ -435,7 +435,7 @@ describe('Sidebar', () => {
         assert.called(onLogoutRequest);
       }));
 
-    describe('on "signupRequest" event', () =>
+    describe('on "signupRequested" event', () =>
       it('calls the onSignupRequest callback function', () => {
         const onSignupRequest = sandbox.stub();
         createSidebar({ services: [{ onSignupRequest }] });
@@ -445,7 +445,7 @@ describe('Sidebar', () => {
         assert.called(onSignupRequest);
       }));
 
-    describe('on "profileRequest" event', () =>
+    describe('on "profileRequested" event', () =>
       it('calls the onProfileRequest callback function', () => {
         const onProfileRequest = sandbox.stub();
         createSidebar({ services: [{ onProfileRequest }] });

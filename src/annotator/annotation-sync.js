@@ -1,15 +1,10 @@
 /**
+ * @typedef {import('../shared/bridge').Bridge<GuestToSidebarEvent,SidebarToGuestEvent>} SidebarBridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('./util/emitter').EventBus} EventBus
- */
-
-/**
- * @template {GuestToSidebarEvent} T
- * @template {SidebarToGuestEvent} U
- * @typedef {import('../shared/bridge').Bridge<T,U>} Bridge
  */
 
 /**
@@ -33,7 +28,7 @@
 export class AnnotationSync {
   /**
    * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
-   * @param {Bridge<GuestToSidebarEvent,SidebarToGuestEvent>} bridge - Channel for communicating with the sidebar
+   * @param {SidebarBridge} bridge - Channel for communicating with the sidebar
    */
   constructor(eventBus, bridge) {
     this._emitter = eventBus.createEmitter();

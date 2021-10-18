@@ -1,6 +1,6 @@
 /**
- * This module defines the set of global events that are dispatched across the
- * the bridge(s) between the sidebar-host and sidebar-guest(s).
+ * This module defines the events that are sent between frames with different
+ * roles in the client (guest, host, sidebar).
  */
 
 /**
@@ -8,12 +8,12 @@
  */
 export type HostToSidebarEvent =
   /**
-   * The host is asking the sidebar to delete a frame.
+   * The host informs the sidebar that a guest frame has been destroyed
    */
   | 'destroyFrame'
 
   /**
-   * The host is asking the sidebar to set the annotation highlights on/off.
+   * Highlights have been toggled on/off.
    */
   | 'setVisibleHighlights'
 
@@ -32,7 +32,7 @@ export type GuestToSidebarEvent =
   | 'beforeCreateAnnotation'
 
   /**
-   * The guest is asking the sidebar to relay the message to open the sidebar.
+   * The guest is asking the sidebar to relay the message to the host to close the sidebar.
    */
   | 'closeSidebar'
 
@@ -42,7 +42,7 @@ export type GuestToSidebarEvent =
   | 'focusAnnotations'
 
   /**
-   * The guest is asking the sidebar to relay the message to open the sidebar.
+   * The guest is asking the sidebar to relay the message to the host to open the sidebar.
    */
   | 'openSidebar'
 
@@ -52,7 +52,7 @@ export type GuestToSidebarEvent =
   | 'showAnnotations'
 
   /**
-   * The guest notifies the sidebar to synchronize about the anchoring status of annotations.
+   * The guest informs the sidebar whether annotations were successfully anchored
    */
   | 'sync'
 
@@ -76,7 +76,7 @@ export type SidebarToGuestEvent =
   | 'focusAnnotations'
 
   /**
-   * The sidebar is asking the guest(s) to get the document metadata.
+   * The sidebar is asking the guest(s) for the URL and other metadata about the document.
    */
   | 'getDocumentInfo'
 
@@ -100,17 +100,18 @@ export type SidebarToGuestEvent =
  */
 export type SidebarToHostEvent =
   /**
-   * The sidebar relays to the host to open the sidebar.
+   * The sidebar relays to the host to close the sidebar.
    */
   | 'closeSidebar'
 
   /**
-   * The updated feature flags for the user
+   * The sidebar informs the host to update the Hypothesis configuration to enable/disable additional features
    */
   | 'featureFlagsUpdated'
 
   /**
    * The sidebar is asking the host to open the partner site help page.
+   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onhelprequest
    */
   | 'helpRequested'
 
@@ -118,6 +119,7 @@ export type SidebarToHostEvent =
    * The sidebar is asking the host to do a partner site log in
    * (for example pop up a log in window). This is used when the client is
    * embedded in a partner site and a log in button in the client is clicked.
+   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onloginrequest
    */
   | 'loginRequested'
 
@@ -125,6 +127,7 @@ export type SidebarToHostEvent =
    * The sidebar is asking the host to do a partner site log out.
    * This is used when the client is embedded in a partner site and a log out
    * button in the client is clicked.
+   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onlogoutrequest
    */
   | 'logoutRequested'
 
@@ -134,23 +137,26 @@ export type SidebarToHostEvent =
   | 'openNotebook'
 
   /**
-   * The sidebar is asking the host to open the sidebar (side-effect of
-   * creating an annotation).
+   * The sidebar is asking the host to open the sidebar (side-effect of creating
+   * an annotation).
    */
   | 'openSidebar'
 
   /**
    * The sidebar is asking the host to open the partner site profile page.
+   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onprofilerequest
    */
   | 'profileRequested'
 
   /**
-   * The sidebar inform the host to update the number of annotations in the partner site.
+   * The sidebar informs the host to update the annotation counter in the partner site.
+   * https://h.readthedocs.io/projects/client/en/latest/publishers/host-page-integration/#cmdoption-arg-data-hypothesis-annotation-count
    */
   | 'publicAnnotationCountChanged'
 
   /**
    * The sidebar is asking the host to do a partner site sign-up.
+   * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onsignuprequest
    */
   | 'signupRequested';
 
