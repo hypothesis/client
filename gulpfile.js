@@ -61,11 +61,14 @@ function logRollupWarning(warning) {
   log(`Rollup warning: ${warning} (${warning.url})`);
 }
 
+async function readConfig(path) {
+  const { default: config } = await import(path);
+  return Array.isArray(config) ? config : [config];
+}
+
 async function buildJS(rollupConfig) {
-  let { default: configs } = await import(rollupConfig);
-  if (!Array.isArray(configs)) {
-    configs = [configs];
-  }
+  const configs = await readConfig(rollupConfig);
+
   await Promise.all(
     configs.map(async config => {
       const bundle = await rollup.rollup({
@@ -78,7 +81,8 @@ async function buildJS(rollupConfig) {
 }
 
 async function watchJS(rollupConfig) {
-  const { default: configs } = await import(rollupConfig);
+  const configs = await readConfig(rollupConfig);
+
   const watcher = rollup.watch(
     configs.map(config => ({
       ...config,
