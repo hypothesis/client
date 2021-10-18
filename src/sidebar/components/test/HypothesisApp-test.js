@@ -223,7 +223,7 @@ describe('HypothesisApp', () => {
         fakeServiceConfig.returns({});
       });
 
-      it('sends "signupRequest" event', () => {
+      it('sends "signupRequested" event', () => {
         const wrapper = createComponent();
         clickSignUp(wrapper);
         assert.calledWith(fakeFrameSync.notifyHost, 'signupRequested');
@@ -287,9 +287,9 @@ describe('HypothesisApp', () => {
       assert.called(fakeToastMessenger.error);
     });
 
-    it('sends LOGIN_REQUESTED event to host page if using a third-party service', async () => {
+    it('sends "loginRequested" event to host page if using a third-party service', async () => {
       // If the client is using a third-party annotation service then clicking
-      // on a login button should send the LOGIN_REQUESTED event over the bridge
+      // on a login button should send the "loginRequested" event over the bridge
       // (so that the partner site we're embedded in can do its own login
       // thing).
       fakeServiceConfig.returns({});
@@ -402,7 +402,7 @@ describe('HypothesisApp', () => {
 
       addCommonLogoutTests();
 
-      it('sends LOGOUT_REQUESTED', async () => {
+      it('sends "logoutRequested"', async () => {
         const wrapper = createComponent();
         await clickLogOut(wrapper);
 
@@ -410,7 +410,7 @@ describe('HypothesisApp', () => {
         assert.calledWithExactly(fakeFrameSync.notifyHost, 'logoutRequested');
       });
 
-      it('does not send LOGOUT_REQUESTED if the user cancels the prompt', async () => {
+      it('does not send "logoutRequested" if the user cancels the prompt', async () => {
         fakeStore.countDrafts.returns(1);
         fakeConfirm.returns(false);
 
