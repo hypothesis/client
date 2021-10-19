@@ -10,7 +10,7 @@ export type HostToSidebarEvent =
   /**
    * The host informs the sidebar that a guest frame has been destroyed
    */
-  | 'destroyFrame'
+  | 'frameDestroyed'
 
   /**
    * Highlights have been toggled on/off.
