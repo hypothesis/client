@@ -577,11 +577,7 @@ describe('Sidebar', () => {
     it('does not show highlights otherwise', () => {
       const sidebar = createSidebar({ showHighlights: 'never' });
       sidebar.open();
-
-      const call = fakeBridge.call
-        .getCalls()
-        .find(args => args[0] === 'setHighlightsVisible' && args[1] === true);
-      assert.isUndefined(call);
+      assert.neverCalledWith(fakeBridge.call, 'setHighlightsVisible');
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
