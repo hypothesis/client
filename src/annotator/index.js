@@ -17,7 +17,6 @@ import { getConfig } from './config/index';
 import Guest from './guest';
 import Notebook from './notebook';
 import Sidebar from './sidebar';
-import { EventBus } from './util/emitter';
 
 const window_ = /** @type {HypothesisWindow} */ (window);
 
@@ -50,22 +49,21 @@ function init() {
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
   // Create the guest that handles creating annotations and displaying highlights.
-  const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, annotatorConfig, hostFrame);
+  const guest = new Guest(document.body, annotatorConfig, hostFrame);
 
+  let notebook;
   let sidebar;
   if (window === hostFrame) {
-    sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
+    // Clear `annotations` value from the notebook's config to prevent direct-linked
+    // annotations from filtering the threads.
+    notebook = new Notebook(document.body, getConfig('notebook'));
+    sidebar = new Sidebar(document.body, guest, notebook, getConfig('sidebar'));
 
     // Expose sidebar window reference for use by same-origin guest frames.
     window_.__hypothesis.sidebarWindow = sidebar.ready.then(() => [
       sidebar.iframe.contentWindow,
     ]);
   }
-
-  // Clear `annotations` value from the notebook's config to prevent direct-linked
-  // annotations from filtering the threads.
-  const notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
   // Set up communication between this host/guest frame and the sidebar frame.
   let sidebarWindow = window_.__hypothesis.sidebarWindow;
@@ -96,9 +94,10 @@ Guest frames can only connect to sidebars in their same-origin parent frame.`
 
   sidebarLinkElement.addEventListener('destroy', () => {
     delete window_.__hypothesis;
-    sidebar?.destroy();
 
-    notebook.destroy();
+    sidebar?.destroy();
+    notebook?.destroy();
+
     guest.destroy();
 
     // Remove all the `<link>`, `<script>` and `<style>` elements added to the

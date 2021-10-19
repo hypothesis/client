@@ -1,3 +1,5 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import { Bridge } from '../shared/bridge';
 import { ListenerCollection } from '../shared/listener-collection';
 
@@ -27,7 +29,6 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/api').Target} Target
  * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
- * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -109,21 +110,21 @@ function resolveAnchor(anchor) {
  * @implements {Annotator}
  * @implements {Destroyable}
  */
-export default class Guest {
+export default class Guest extends TinyEmitter {
   /**
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
    * @param {Window} [hostFrame] -
    *   Host frame which this guest is associated with. This is expected to be
    *   an ancestor of the guest frame. It may be same or cross origin.
    */
-  constructor(element, eventBus, config = {}, hostFrame = window) {
+  constructor(element, config = {}, hostFrame = window) {
+    super();
+
     this.element = element;
-    this._emitter = eventBus.createEmitter();
     this._highlightsVisible = false;
     this._isAdderVisible = false;
 
@@ -174,7 +175,7 @@ export default class Guest {
 
     // Set up listeners for when the sidebar asks us to add or remove annotations
     // in this frame.
-    this._annotationSync = new AnnotationSync(eventBus, this._bridge);
+    this._annotationSync = new AnnotationSync(this._bridge);
     this._connectAnnotationSync();
 
     // Set up automatic and integration-triggered injection of client into
@@ -299,11 +300,11 @@ export default class Guest {
   }
 
   _connectAnnotationSync() {
-    this._emitter.subscribe('annotationDeleted', annotation => {
+    this._annotationSync.on('annotationDeleted', annotation => {
       this.detach(annotation);
     });
 
-    this._emitter.subscribe('annotationsLoaded', annotations => {
+    this._annotationSync.on('annotationsLoaded', annotations => {
       annotations.map(annotation => this.anchor(annotation));
     });
   }
@@ -362,6 +363,8 @@ export default class Guest {
   }
 
   destroy() {
+    this.emit('destroyed');
+
     this._notifyGuestUnload();
     this._hypothesisInjector.destroy();
     this._listeners.removeAll();
@@ -372,7 +375,6 @@ export default class Guest {
     removeAllHighlights(this.element);
 
     this._integration.destroy();
-    this._emitter.destroy();
     this._annotationSync.destroy();
     this._bridge.destroy();
   }
@@ -533,7 +535,7 @@ export default class Guest {
   _updateAnchors(anchors, notify) {
     this.anchors = anchors;
     if (notify) {
-      this._emitter.publish('anchorsChanged', this.anchors);
+      this.emit('anchorsChanged', this.anchors);
     }
   }
 
@@ -575,7 +577,7 @@ export default class Guest {
       $tag: '',
     };
 
-    this._emitter.publish('beforeAnnotationCreated', annotation);
+    this._annotationSync.createAnnotation(annotation);
     this.anchor(annotation);
 
     return annotation;
@@ -613,7 +615,7 @@ export default class Guest {
     }
 
     this.selectedRanges = [range];
-    this._emitter.publish('hasSelectionChanged', true);
+    this.emit('hasSelectionChanged', true);
 
     this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
@@ -624,7 +626,7 @@ export default class Guest {
     this._isAdderVisible = false;
     this._adder.hide();
     this.selectedRanges = [];
-    this._emitter.publish('hasSelectionChanged', false);
+    this.emit('hasSelectionChanged', false);
   }
 
   /**

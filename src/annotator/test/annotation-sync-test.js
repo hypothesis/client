@@ -1,17 +1,12 @@
 import { AnnotationSync } from '../annotation-sync';
-import { EventBus } from '../util/emitter';
 
 describe('AnnotationSync', () => {
   let createAnnotationSync;
-  let emitter;
   let fakeBridge;
   let publish;
   const sandbox = sinon.createSandbox();
 
   beforeEach(() => {
-    const eventBus = new EventBus();
-    emitter = eventBus.createEmitter();
-
     const listeners = {};
 
     fakeBridge = {
@@ -24,7 +19,7 @@ describe('AnnotationSync', () => {
     };
 
     createAnnotationSync = () => {
-      return new AnnotationSync(eventBus, fakeBridge);
+      return new AnnotationSync(fakeBridge);
     };
 
     publish = (method, ...args) => listeners[method](...args);
@@ -32,7 +27,6 @@ describe('AnnotationSync', () => {
 
   afterEach(() => {
     sandbox.restore();
-    emitter.destroy();
   });
 
   describe('handling events from the sidebar', () => {
@@ -40,8 +34,8 @@ describe('AnnotationSync', () => {
       it('publish "annotationDeleted" to the annotator', () => {
         const ann = { id: 1, $tag: 'tag1' };
         const eventStub = sinon.stub();
-        emitter.subscribe('annotationDeleted', eventStub);
-        createAnnotationSync();
+        const annSync = createAnnotationSync();
+        annSync.on('annotationDeleted', eventStub);
 
         publish('deleteAnnotation', { msg: ann }, () => {});
 
@@ -64,7 +58,7 @@ describe('AnnotationSync', () => {
         const annSync = createAnnotationSync();
         const ann = { id: 1, $tag: 'tag1' };
         annSync.cache.tag1 = ann;
-        emitter.subscribe('annotationDeleted', () => {
+        annSync.on('annotationDeleted', () => {
           assert.isUndefined(annSync.cache.tag1);
           done();
         });
@@ -96,8 +90,8 @@ describe('AnnotationSync', () => {
           { msg: annotations[2], tag: annotations[2].$tag },
         ];
         const loadedStub = sinon.stub();
-        emitter.subscribe('annotationsLoaded', loadedStub);
-        createAnnotationSync();
+        const annSync = createAnnotationSync();
+        annSync.on('annotationsLoaded', loadedStub);
 
         publish('loadAnnotations', bodies, () => {});
 
@@ -106,50 +100,48 @@ describe('AnnotationSync', () => {
     });
   });
 
-  describe('handling events from the annotator', () => {
-    describe('on "beforeAnnotationCreated" event', () => {
-      it('calls "createAnnotation" RPC method in the sidebar', () => {
-        // nb. Setting an empty `$tag` here matches what `Guest#createAnnotation`
-        // does.
-        const ann = { id: 1, $tag: '' };
-        createAnnotationSync();
+  describe('#createAnnotation', () => {
+    it('calls "createAnnotation" RPC method in the sidebar', () => {
+      // nb. Setting an empty `$tag` here matches what `Guest#createAnnotation`
+      // does.
+      const ann = { id: 1, $tag: '' };
+      const annSync = createAnnotationSync();
 
-        emitter.publish('beforeAnnotationCreated', ann);
+      annSync.createAnnotation(ann);
 
-        assert.called(fakeBridge.call);
-        assert.calledWith(fakeBridge.call, 'createAnnotation', {
-          msg: ann,
-          tag: ann.$tag,
-        });
+      assert.called(fakeBridge.call);
+      assert.calledWith(fakeBridge.call, 'createAnnotation', {
+        msg: ann,
+        tag: ann.$tag,
+      });
+    });
+
+    it('assigns a non-empty tag to the annotation', () => {
+      const ann = { id: 1, $tag: '' };
+      const annSync = createAnnotationSync();
+
+      annSync.createAnnotation(ann);
+
+      assert.notEmpty(ann.$tag);
+    });
+
+    context('if the annotation already has a $tag', () => {
+      it('does not call bridge.call()', () => {
+        const ann = { id: 1, $tag: 'tag1' };
+        const annSync = createAnnotationSync();
+
+        annSync.createAnnotation(ann);
+
+        assert.notCalled(fakeBridge.call);
       });
 
-      it('assigns a non-empty tag to the annotation', () => {
-        const ann = { id: 1, $tag: '' };
-        createAnnotationSync();
+      it('does not modify the tag', () => {
+        const ann = { id: 1, $tag: 'sometag' };
+        const annSync = createAnnotationSync();
 
-        emitter.publish('beforeAnnotationCreated', ann);
+        annSync.createAnnotation(ann);
 
-        assert.notEmpty(ann.$tag);
-      });
-
-      context('if the annotation already has a $tag', () => {
-        it('does not call bridge.call()', () => {
-          const ann = { id: 1, $tag: 'tag1' };
-          createAnnotationSync();
-
-          emitter.publish('beforeAnnotationCreated', ann);
-
-          assert.notCalled(fakeBridge.call);
-        });
-
-        it('does not modify the tag', () => {
-          const ann = { id: 1, $tag: 'sometag' };
-          createAnnotationSync();
-
-          emitter.publish('beforeAnnotationCreated', ann);
-
-          assert.equal(ann.$tag, 'sometag');
-        });
+        assert.equal(ann.$tag, 'sometag');
       });
     });
   });
@@ -187,15 +179,6 @@ describe('AnnotationSync', () => {
       annotationSync.destroy();
 
       annotationSync.sync([{ id: 1 }]);
-
-      assert.notCalled(fakeBridge.call);
-    });
-
-    it('ignores "beforeAnnotationCreated" events from the annotator', () => {
-      const annotationSync = createAnnotationSync();
-      annotationSync.destroy();
-
-      emitter.publish('beforeAnnotationCreated', { id: 1, $tag: '' });
 
       assert.notCalled(fakeBridge.call);
     });

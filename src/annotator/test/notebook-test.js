@@ -2,20 +2,17 @@ import { useEffect } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 
 import Notebook, { $imports } from '../notebook';
-import { EventBus } from '../util/emitter';
 
 describe('Notebook', () => {
   // `Notebook` instances created by current test
   let notebooks;
   let container;
   let cleanUpCallback;
+  let modalProps;
 
   const createNotebook = (config = {}) => {
-    const eventBus = new EventBus();
-    const notebook = new Notebook(container, eventBus, config);
-
+    const notebook = new Notebook(container, config);
     notebooks.push(notebook);
-
     return notebook;
   };
 
@@ -23,8 +20,10 @@ describe('Notebook', () => {
     notebooks = [];
     container = document.createElement('div');
     cleanUpCallback = sinon.stub();
+    modalProps = null;
 
-    const FakeNotebookModal = () => {
+    const FakeNotebookModal = props => {
+      modalProps = props;
       useEffect(() => {
         return () => {
           cleanUpCallback();
@@ -43,6 +42,45 @@ describe('Notebook', () => {
     $imports.$restore();
   });
 
+  describe('#open', () => {
+    it('opens the notebook', () => {
+      const notebook = createNotebook();
+      assert.isFalse(notebook.isOpen());
+      assert.match(modalProps, { open: false, groupId: null });
+
+      notebook.open('group-1');
+
+      assert.isTrue(notebook.isOpen());
+      assert.match(modalProps, { open: true, groupId: 'group-1' });
+    });
+  });
+
+  describe('#close', () => {
+    it('closes the notebook', () => {
+      const notebook = createNotebook();
+      const closed = sinon.stub();
+      notebook.on('closed', closed);
+
+      notebook.open('group-1');
+      notebook.close();
+
+      assert.isFalse(notebook.isOpen());
+      assert.called(closed);
+    });
+  });
+
+  it("closes the notebook when NotebookModal's `onClose` prop is called", () => {
+    const notebook = createNotebook();
+    const closed = sinon.stub();
+    notebook.on('closed', closed);
+
+    notebook.open('group-1');
+    modalProps.onClose();
+
+    assert.isFalse(notebook.isOpen());
+    assert.called(closed);
+  });
+
   describe('notebook container', () => {
     it('creates the container', () => {
       assert.isFalse(container.hasChildNodes());
@@ -58,7 +96,7 @@ describe('Notebook', () => {
       assert.isFalse(container.hasChildNodes());
     });
 
-    it('calls the clean up function of the NotebookModal when the container is removed', () => {
+    it('unmounts the NotebookModal when the container is removed', () => {
       // Necessary to run the useEffect for first time and register the cleanup function
       let notebook;
       act(() => {

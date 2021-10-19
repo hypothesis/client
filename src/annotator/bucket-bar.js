@@ -23,7 +23,7 @@ import { anchorBuckets } from './util/buckets';
 export default class BucketBar {
   /**
    * @param {HTMLElement} container
-   * @param {Pick<import('./guest').default, 'anchors'|'scrollToAnchor'|'selectAnnotations'>} guest
+   * @param {Pick<import('./guest').default, 'anchors'|'on'|'scrollToAnchor'|'selectAnnotations'>} guest
    * @param {BucketBarOptions} [options]
    */
   constructor(container, guest, { contentContainer = document.body } = {}) {
@@ -33,6 +33,7 @@ export default class BucketBar {
     container.appendChild(this._bucketsContainer);
 
     this._guest = guest;
+    guest.on('anchorsChanged', () => this._update());
 
     this._listeners = new ListenerCollection();
 

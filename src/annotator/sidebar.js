@@ -15,6 +15,7 @@ import { createShadowRoot } from './util/shadow-root';
  * @typedef {import('./guest').default} Guest
  * @typedef {import('../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
+ * @typedef {import('./notebook').default} Notebook
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
@@ -54,22 +55,14 @@ function createSidebarIframe(config) {
 export default class Sidebar {
   /**
    * @param {HTMLElement} element
-   * @param {import('./util/emitter').EventBus} eventBus -
-   *   Enables communication between components sharing the same eventBus
    * @param {Guest} guest -
    *   The `Guest` instance for the current frame. It is currently assumed that
    *   it is always possible to annotate in the frame where the sidebar is
    *   displayed.
+   * @param {Notebook} notebook
    * @param {Record<string, any>} [config]
    */
-  constructor(element, eventBus, guest, config = {}) {
-    this._emitter = eventBus.createEmitter();
-
-    /**
-     * Channel for sidebar-host communication.
-     *
-     * @type {Bridge<HostToSidebarEvent,SidebarToHostEvent>}
-     */
+  constructor(element, guest, notebook, config = {}) {
     this._sidebarRPC = new Bridge();
 
     /**
@@ -98,7 +91,6 @@ export default class Sidebar {
         const bucketBar = new BucketBar(this.iframeContainer, guest, {
           contentContainer: guest.contentContainer(),
         });
-        this._emitter.subscribe('anchorsChanged', () => bucketBar.update());
         this.bucketBar = bucketBar;
       }
 
@@ -113,6 +105,7 @@ export default class Sidebar {
     }
 
     this.guest = guest;
+    this._notebook = notebook;
 
     this._listeners = new ListenerCollection();
 
@@ -130,7 +123,7 @@ export default class Sidebar {
       this.toolbar.useMinimalControls = false;
     }
 
-    this._emitter.subscribe('hasSelectionChanged', hasSelection => {
+    guest.on('hasSelectionChanged', hasSelection => {
       this.toolbar.newAnnotationType = hasSelection ? 'annotation' : 'note';
     });
 
@@ -231,7 +224,6 @@ export default class Sidebar {
     } else {
       this.iframe.remove();
     }
-    this._emitter.destroy();
   }
 
   _setupSidebarEvents() {
@@ -249,11 +241,9 @@ export default class Sidebar {
     // iframe and re-publishes it via the emitter to the Notebook
     this._sidebarRPC.on('openNotebook', (/** @type {string} */ groupId) => {
       this.hide();
-      this._emitter.publish('openNotebook', groupId);
+      this._notebook.open(groupId);
     });
-    this._emitter.subscribe('closeNotebook', () => {
-      this.show();
-    });
+    this._notebook.on('closed', () => this.show());
 
     /** @type {Array<[SidebarToHostEvent, function]>} */
     const eventHandlers = [
@@ -372,8 +362,6 @@ export default class Sidebar {
     }
 
     this.guest.fitSideBySide(layoutState);
-
-    this._emitter.publish('sidebarLayoutChanged', layoutState);
   }
 
   /**
@@ -444,7 +432,6 @@ export default class Sidebar {
 
   open() {
     this._sidebarRPC.call('sidebarOpened');
-    this._emitter.publish('sidebarOpened');
 
     if (this.iframeContainer) {
       const width = this.iframeContainer.getBoundingClientRect().width;

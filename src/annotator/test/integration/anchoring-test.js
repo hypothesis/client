@@ -2,7 +2,6 @@
 // with various combinations of selector are anchored.
 
 import Guest from '../../guest';
-import { EventBus } from '../../util/emitter';
 import testPageHTML from './test-page.html';
 
 function quoteSelector(quote) {
@@ -49,8 +48,7 @@ describe('anchoring', () => {
     container = document.createElement('div');
     container.innerHTML = testPageHTML;
     document.body.appendChild(container);
-    const eventBus = new EventBus();
-    guest = new Guest(container, eventBus);
+    guest = new Guest(container);
   });
 
   afterEach(() => {

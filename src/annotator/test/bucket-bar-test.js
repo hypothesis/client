@@ -1,3 +1,5 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import BucketBar from '../bucket-bar';
 import { $imports } from '../bucket-bar';
 
@@ -19,11 +21,11 @@ describe('BucketBar', () => {
     container = document.createElement('div');
     bucketBars = [];
     bucketProps = {};
-    fakeGuest = {
+    fakeGuest = Object.assign(new TinyEmitter(), {
       anchors: [],
       scrollToAnchor: sinon.stub(),
       selectAnnotations: sinon.stub(),
-    };
+    });
 
     fakeBucketUtil = {
       anchorBuckets: sinon.stub().returns({}),
@@ -70,6 +72,15 @@ describe('BucketBar', () => {
       fakeBucketUtil.anchorBuckets.resetHistory();
 
       window.dispatchEvent(new Event('scroll'));
+
+      assert.calledOnce(fakeBucketUtil.anchorBuckets);
+    });
+
+    it('should update buckets when guest anchors change', () => {
+      createBucketBar();
+      fakeBucketUtil.anchorBuckets.resetHistory();
+
+      fakeGuest.emit('anchorsChanged');
 
       assert.calledOnce(fakeBucketUtil.anchorBuckets);
     });

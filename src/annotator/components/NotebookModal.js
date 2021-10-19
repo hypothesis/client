@@ -35,8 +35,10 @@ function NotebookIframe({ config, groupId }) {
 
 /**
  * @typedef NotebookModalProps
- * @prop {import('../util/emitter').EventBus} eventBus
  * @prop {Record<string, any>} config
+ * @prop {string|null} groupId
+ * @prop {boolean} open
+ * @prop {() => void} onClose
  */
 
 /**
@@ -44,18 +46,13 @@ function NotebookIframe({ config, groupId }) {
  *
  * @param {NotebookModalProps} props
  */
-export default function NotebookModal({ eventBus, config }) {
+export default function NotebookModal({ config, groupId, open, onClose }) {
   // Temporary solution: while there is no mechanism to sync new annotations in
   // the notebook, we force re-rendering of the iframe on every 'openNotebook'
   // event, so that the new annotations are displayed.
   // https://github.com/hypothesis/client/issues/3182
   const [iframeKey, setIframeKey] = useState(0);
-  const [isHidden, setIsHidden] = useState(true);
-  const [groupId, setGroupId] = useState(/** @type {string|null} */ (null));
   const originalDocumentOverflowStyle = useRef('');
-  const emitter = useRef(
-    /** @type {ReturnType<eventBus['createEmitter']>|null} */ (null)
-  );
 
   // Stores the original overflow CSS property of document.body and reset it
   // when the component is destroyed
@@ -70,42 +67,25 @@ export default function NotebookModal({ eventBus, config }) {
   // The overflow CSS property is set to hidden to prevent scrolling of the host page,
   // while the notebook modal is open. It is restored when the modal is closed.
   useEffect(() => {
-    if (isHidden) {
+    if (!open) {
       document.body.style.overflow = originalDocumentOverflowStyle.current;
     } else {
       document.body.style.overflow = 'hidden';
     }
-  }, [isHidden]);
+  }, [open]);
 
+  // Force the iframe to be re-created whenever the notebook is re-opened so
+  // that it displays the latest annotations.
   useEffect(() => {
-    emitter.current = eventBus.createEmitter();
-    emitter.current.subscribe(
-      'openNotebook',
-      (/** @type {string} */ groupId) => {
-        setIsHidden(false);
-        setIframeKey(iframeKey => iframeKey + 1);
-        setGroupId(groupId);
-      }
-    );
-
-    return () => {
-      emitter.current.destroy();
-    };
-  }, [eventBus]);
-
-  const onClose = () => {
-    setIsHidden(true);
-    emitter.current.publish('closeNotebook');
-  };
+    setIframeKey(key => key + 1);
+  }, [open]);
 
   if (groupId === null) {
     return null;
   }
 
   return (
-    <div
-      className={classnames('NotebookModal__outer', { 'is-hidden': isHidden })}
-    >
+    <div className={classnames('NotebookModal__outer', { 'is-hidden': !open })}>
       <div className="NotebookModal__inner">
         <div className="NotebookModal__close-button-container">
           <IconButton

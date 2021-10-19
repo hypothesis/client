@@ -1,10 +1,11 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 /**
  * @typedef {import('../shared/bridge').Bridge<GuestToSidebarEvent,SidebarToGuestEvent>} SidebarBridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
- * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -25,13 +26,13 @@
  *
  * @implements Destroyable
  */
-export class AnnotationSync {
+export class AnnotationSync extends TinyEmitter {
   /**
-   * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
    * @param {SidebarBridge} bridge - Channel for communicating with the sidebar
    */
-  constructor(eventBus, bridge) {
-    this._emitter = eventBus.createEmitter();
+  constructor(bridge) {
+    super();
+
     this._sidebar = bridge;
 
     /**
@@ -52,7 +53,7 @@ export class AnnotationSync {
       }
       const annotation = this._parse(body);
       delete this.cache[annotation.$tag];
-      this._emitter.publish('annotationDeleted', annotation);
+      this.emit('annotationDeleted', annotation);
       this._format(annotation);
       callback(null);
     });
@@ -63,17 +64,19 @@ export class AnnotationSync {
         return;
       }
       const annotations = bodies.map(body => this._parse(body));
-      this._emitter.publish('annotationsLoaded', annotations);
+      this.emit('annotationsLoaded', annotations);
       callback(null);
     });
+  }
 
-    // Relay events from annotator to sidebar.
-    this._emitter.subscribe('beforeAnnotationCreated', annotation => {
-      if (annotation.$tag) {
-        return;
-      }
-      this._sidebar.call('createAnnotation', this._format(annotation));
-    });
+  /**
+   * @param {AnnotationData} annotation
+   */
+  createAnnotation(annotation) {
+    if (annotation.$tag) {
+      return;
+    }
+    this._sidebar.call('createAnnotation', this._format(annotation));
   }
 
   /**
@@ -145,6 +148,5 @@ export class AnnotationSync {
 
   destroy() {
     this.destroyed = true;
-    this._emitter.destroy();
   }
 }

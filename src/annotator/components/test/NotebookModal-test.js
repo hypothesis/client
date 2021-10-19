@@ -2,18 +2,22 @@ import { act } from 'preact/test-utils';
 import { mount } from 'enzyme';
 
 import NotebookModal from '../NotebookModal';
-import { EventBus } from '../../util/emitter';
 
 describe('NotebookModal', () => {
   let components;
-  let eventBus;
-  let emitter;
 
-  const createComponent = config => {
+  const createComponent = ({
+    open = false,
+    groupId = null,
+    config,
+    onClose = sinon.stub(),
+  } = {}) => {
     const component = mount(
       <NotebookModal
-        eventBus={eventBus}
+        open={open}
+        groupId={groupId}
         config={{ notebookAppUrl: '/notebook', ...config }}
+        onClose={onClose}
       />
     );
     components.push(component);
@@ -22,32 +26,29 @@ describe('NotebookModal', () => {
 
   beforeEach(() => {
     components = [];
-    eventBus = new EventBus();
-    emitter = eventBus.createEmitter();
   });
 
   afterEach(() => {
     components.forEach(component => component.unmount());
   });
 
-  it('hides modal on first render', () => {
+  it('does not create modal container if no group ID is set', () => {
     const wrapper = createComponent();
     const outer = wrapper.find('.NotebookModal__outer');
 
     assert.isFalse(outer.exists());
   });
 
-  it('shows modal on "openNotebook" event', () => {
-    const wrapper = createComponent();
-    let outer = wrapper.find('.NotebookModal__outer');
+  it('hides modal if a group ID is set but `open` is false', () => {
+    const wrapper = createComponent({ groupId: '1' });
+    const outer = wrapper.find('.NotebookModal__outer');
+    assert.isTrue(outer.hasClass('is-hidden'));
+  });
 
-    assert.isFalse(outer.exists());
-    assert.isFalse(wrapper.find('iframe').exists());
+  it('shows modal when `open` is true and a group ID is set', () => {
+    const wrapper = createComponent({ open: true, groupId: 'myGroup' });
+    const outer = wrapper.find('.NotebookModal__outer');
 
-    emitter.publish('openNotebook', 'myGroup');
-    wrapper.update();
-
-    outer = wrapper.find('.NotebookModal__outer');
     assert.isFalse(outer.hasClass('is-hidden'));
 
     const iframe = wrapper.find('iframe');
@@ -57,11 +58,8 @@ describe('NotebookModal', () => {
     );
   });
 
-  it('creates a new iframe element on every "openNotebook" event', () => {
-    const wrapper = createComponent();
-
-    emitter.publish('openNotebook', '1');
-    wrapper.update();
+  it('creates a new iframe element when the notebook is re-opened', () => {
+    const wrapper = createComponent({ open: true, groupId: '1' });
 
     const iframe1 = wrapper.find('iframe');
     assert.equal(
@@ -69,8 +67,8 @@ describe('NotebookModal', () => {
       `/notebook#config=${encodeURIComponent('{"group":"1"}')}`
     );
 
-    emitter.publish('openNotebook', '1');
-    wrapper.update();
+    wrapper.setProps({ open: false });
+    wrapper.setProps({ open: true });
 
     const iframe2 = wrapper.find('iframe');
     assert.equal(
@@ -79,8 +77,7 @@ describe('NotebookModal', () => {
     );
     assert.notEqual(iframe1.getDOMNode(), iframe2.getDOMNode());
 
-    emitter.publish('openNotebook', '2');
-    wrapper.update();
+    wrapper.setProps({ open: true, groupId: '2' });
 
     const iframe3 = wrapper.find('iframe');
     assert.equal(
@@ -90,43 +87,44 @@ describe('NotebookModal', () => {
     assert.notEqual(iframe1.getDOMNode(), iframe3.getDOMNode());
   });
 
-  it('makes the document unscrollable on "openNotebook" event', () => {
-    createComponent();
-    act(() => {
-      emitter.publish('openNotebook', 'myGroup');
-    });
+  it('makes the document unscrollable when modal is open', () => {
+    createComponent({ open: true, groupId: 'myGroup' });
     assert.equal(document.body.style.overflow, 'hidden');
   });
 
-  it('hides modal on closing', () => {
-    const wrapper = createComponent();
+  it('invokes `onClose` prop when modal is closed', () => {
+    const onClose = sinon.stub();
+    const wrapper = createComponent({
+      open: true,
+      groupId: 'myGroup',
+      onClose,
+    });
 
-    emitter.publish('openNotebook', 'myGroup');
-    wrapper.update();
+    act(() => {
+      wrapper.find('IconButton').prop('onClick')();
+    });
+
+    assert.called(onClose);
+  });
+
+  it('hides modal on closing', () => {
+    const wrapper = createComponent({ open: true, groupId: 'myGroup' });
 
     let outer = wrapper.find('.NotebookModal__outer');
     assert.isFalse(outer.hasClass('is-hidden'));
 
-    act(() => {
-      wrapper.find('IconButton').prop('onClick')();
-    });
-    wrapper.update();
+    wrapper.setProps({ open: false });
 
     outer = wrapper.find('.NotebookModal__outer');
-
     assert.isTrue(outer.hasClass('is-hidden'));
   });
 
-  it('resets document scrollability on closing the modal', () => {
-    const wrapper = createComponent();
-    act(() => {
-      emitter.publish('openNotebook', 'myGroup');
-    });
+  it('resets document scrollability when modal is closed', () => {
+    const wrapper = createComponent({ open: true, groupId: 'myGroup' });
     assert.equal(document.body.style.overflow, 'hidden');
-    wrapper.update();
-    act(() => {
-      wrapper.find('IconButton').prop('onClick')();
-    });
+
+    wrapper.setProps({ open: false });
+
     assert.notEqual(document.body.style.overflow, 'hidden');
   });
 });

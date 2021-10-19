@@ -1,5 +1,6 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import Guest, { $imports } from '../guest';
-import { EventBus } from '../util/emitter';
 
 class FakeAdder {
   constructor(container, options) {
@@ -29,7 +30,6 @@ class FakeTextRange {
 
 describe('Guest', () => {
   const sandbox = sinon.createSandbox();
-  let eventBus;
   let highlighter;
   let rangeUtil;
   let notifySelectionChanged;
@@ -51,8 +51,7 @@ describe('Guest', () => {
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
-    eventBus = new EventBus();
-    const guest = new Guest(element, eventBus, config, hostFrame);
+    const guest = new Guest(element, config, hostFrame);
     guests.push(guest);
     return guest;
   };
@@ -75,10 +74,11 @@ describe('Guest', () => {
     };
     notifySelectionChanged = null;
 
-    fakeAnnotationSync = {
+    fakeAnnotationSync = Object.assign(new TinyEmitter(), {
+      createAnnotation: sinon.stub(),
       destroy: sinon.stub(),
       sync: sinon.stub(),
-    };
+    });
     FakeAnnotationSync = sinon.stub().returns(fakeAnnotationSync);
 
     fakeBridge = {
@@ -146,80 +146,33 @@ describe('Guest', () => {
     $imports.$restore();
   });
 
-  describe('communication with sidebar', () => {
-    it('provides an event bus for the annotation sync module', () => {
-      createGuest();
-      assert.deepEqual(FakeAnnotationSync.lastCall.args[0], eventBus);
+  describe('AnnotationSync event handling', () => {
+    let guest;
+
+    beforeEach(() => {
+      guest = createGuest();
     });
 
-    describe('event subscription', () => {
-      let emitter;
-      let guest;
+    it('detaches annotations on "annotationDeleted"', () => {
+      const ann = { id: 1, $tag: 'tag1' };
+      sandbox.stub(guest, 'detach');
 
-      beforeEach(() => {
-        guest = createGuest();
-        emitter = eventBus.createEmitter();
-      });
+      fakeAnnotationSync.emit('annotationDeleted', ann);
 
-      afterEach(() => {
-        emitter.destroy();
-      });
-
-      it('proxies the event into the annotator event system', () => {
-        const fooHandler = sandbox.stub();
-        const barHandler = sandbox.stub();
-
-        emitter.subscribe('foo', fooHandler);
-        emitter.subscribe('bar', barHandler);
-
-        guest._emitter.publish('foo', '1', '2');
-        guest._emitter.publish('bar', '1', '2');
-
-        assert.calledWith(fooHandler, '1', '2');
-        assert.calledWith(barHandler, '1', '2');
-      });
+      assert.calledOnce(guest.detach);
+      assert.calledWith(guest.detach, ann);
     });
 
-    describe('event publication', () => {
-      let emitter;
-      let guest;
+    it('anchors annotations on "annotationsLoaded"', () => {
+      const ann1 = { id: 1, $tag: 'tag1' };
+      const ann2 = { id: 2, $tag: 'tag2' };
+      sandbox.stub(guest, 'anchor');
 
-      beforeEach(() => {
-        guest = createGuest();
-        emitter = eventBus.createEmitter();
-      });
+      fakeAnnotationSync.emit('annotationsLoaded', [ann1, ann2]);
 
-      it('detaches annotations on "annotationDeleted"', () => {
-        const ann = { id: 1, $tag: 'tag1' };
-        sandbox.stub(guest, 'detach');
-        emitter.publish('annotationDeleted', ann);
-        assert.calledOnce(guest.detach);
-        assert.calledWith(guest.detach, ann);
-      });
-
-      it('anchors annotations on "annotationsLoaded"', () => {
-        const ann1 = { id: 1, $tag: 'tag1' };
-        const ann2 = { id: 2, $tag: 'tag2' };
-        sandbox.stub(guest, 'anchor');
-        emitter.publish('annotationsLoaded', [ann1, ann2]);
-        assert.calledTwice(guest.anchor);
-        assert.calledWith(guest.anchor, ann1);
-        assert.calledWith(guest.anchor, ann2);
-      });
-
-      it('proxies all other events into the annotator event system', () => {
-        const fooHandler = sandbox.stub();
-        const barHandler = sandbox.stub();
-
-        guest._emitter.subscribe('foo', fooHandler);
-        guest._emitter.subscribe('bar', barHandler);
-
-        emitter.publish('foo', '1', '2');
-        emitter.publish('bar', '1', '2');
-
-        assert.calledWith(fooHandler, '1', '2');
-        assert.calledWith(barHandler, '1', '2');
-      });
+      assert.calledTwice(guest.anchor);
+      assert.calledWith(guest.anchor, ann1);
+      assert.calledWith(guest.anchor, ann2);
     });
   });
 
@@ -624,7 +577,7 @@ describe('Guest', () => {
     it('emits `hasSelectionChanged` event with argument `true` if selection is non-empty', () => {
       const guest = createGuest();
       const callback = sandbox.stub();
-      guest._emitter.subscribe('hasSelectionChanged', callback);
+      guest.on('hasSelectionChanged', callback);
 
       simulateSelectionWithText();
 
@@ -634,7 +587,7 @@ describe('Guest', () => {
     it('emits `hasSelectionChanged` event with argument `false` if selection is empty', () => {
       const guest = createGuest();
       const callback = sandbox.stub();
-      guest._emitter.subscribe('hasSelectionChanged', callback);
+      guest.on('hasSelectionChanged', callback);
 
       simulateSelectionWithoutText();
 
@@ -646,23 +599,18 @@ describe('Guest', () => {
     // nb. Detailed tests for properties of new annotations are in the
     // `createAnnotation` tests.
     it('creates a new annotation if "Annotate" is clicked', async () => {
-      const guest = createGuest();
-      const callback = sandbox.stub();
-      guest._emitter.subscribe('beforeAnnotationCreated', callback);
-
+      createGuest();
       await FakeAdder.instance.options.onAnnotate();
-
-      assert.called(callback);
+      assert.called(fakeAnnotationSync.createAnnotation);
     });
 
     it('creates a new highlight if "Highlight" is clicked', async () => {
-      const guest = createGuest();
-      const callback = sandbox.stub();
-      guest._emitter.subscribe('beforeAnnotationCreated', callback);
-
+      createGuest();
       await FakeAdder.instance.options.onHighlight();
-
-      assert.calledWith(callback, sinon.match({ $highlight: true }));
+      assert.calledWith(
+        fakeAnnotationSync.createAnnotation,
+        sinon.match({ $highlight: true })
+      );
     });
 
     it('shows annotations if "Show" is clicked', () => {
@@ -803,14 +751,10 @@ describe('Guest', () => {
       assert.equal(annotation.$highlight, true);
     });
 
-    it('triggers a "beforeAnnotationCreated" event', async () => {
+    it('sends annotation to sidebar', async () => {
       const guest = createGuest();
-      const callback = sandbox.stub();
-      guest._emitter.subscribe('beforeAnnotationCreated', callback);
-
       const annotation = await guest.createAnnotation();
-
-      assert.calledWith(callback, annotation);
+      assert.calledWith(fakeAnnotationSync.createAnnotation, annotation);
     });
   });
 
@@ -963,7 +907,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const annotation = {};
       const anchorsChanged = sandbox.stub();
-      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
+      guest.on('anchorsChanged', anchorsChanged);
 
       await guest.anchor(annotation);
 
@@ -1088,7 +1032,7 @@ describe('Guest', () => {
       const guest = createGuest();
       const anchor = createAnchor();
       const anchorsChanged = sandbox.stub();
-      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
+      guest.on('anchorsChanged', anchorsChanged);
 
       guest.detach(anchor.annotation);
 

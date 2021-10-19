@@ -1,5 +1,6 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import Sidebar, { MIN_RESIZE, $imports } from '../sidebar';
-import { EventBus } from '../util/emitter';
 
 const DEFAULT_WIDTH = 350;
 const DEFAULT_HEIGHT = 600;
@@ -40,6 +41,8 @@ describe('Sidebar', () => {
 
   let fakeBridge;
 
+  let fakeNotebook;
+
   before(() => {
     sinon.stub(window, 'requestAnimationFrame').yields();
   });
@@ -60,8 +63,7 @@ describe('Sidebar', () => {
     document.body.appendChild(container);
     containers.push(container);
 
-    const eventBus = new EventBus();
-    const sidebar = new Sidebar(container, eventBus, fakeGuest, config);
+    const sidebar = new Sidebar(container, fakeGuest, fakeNotebook, config);
     sidebars.push(sidebar);
 
     return sidebar;
@@ -83,8 +85,10 @@ describe('Sidebar', () => {
     sidebars = [];
     containers = [];
 
-    class FakeGuest {
+    class FakeGuest extends TinyEmitter {
       constructor() {
+        super();
+
         this.element = document.createElement('div');
         this.contentContainer = sinon.stub().returns(document.body);
         this.createAnnotation = sinon.stub();
@@ -117,6 +121,11 @@ describe('Sidebar', () => {
       createChannel: sinon.stub(),
       on: sinon.stub(),
     };
+
+    fakeNotebook = Object.assign(new TinyEmitter(), {
+      open: sinon.stub(),
+      close: sinon.stub(),
+    });
 
     $imports.$mock({
       '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
@@ -265,9 +274,7 @@ describe('Sidebar', () => {
     it('sets create annotation button to "Annotation" when selection becomes non-empty', () => {
       const sidebar = createSidebar();
 
-      // nb. This event is normally published by the Guest, but the sidebar
-      // doesn't care about that.
-      sidebar._emitter.publish('hasSelectionChanged', true);
+      fakeGuest.emit('hasSelectionChanged', true);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
     });
@@ -275,9 +282,7 @@ describe('Sidebar', () => {
     it('sets create annotation button to "Page Note" when selection becomes empty', () => {
       const sidebar = createSidebar();
 
-      // nb. This event is normally published by the Guest, but the sidebar
-      // doesn't care about that.
-      sidebar._emitter.publish('hasSelectionChanged', false);
+      fakeGuest.emit('hasSelectionChanged', false);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
     });
@@ -323,21 +328,12 @@ describe('Sidebar', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'hide').callThrough();
-        sinon.stub(sidebar._emitter, 'publish');
+
         emitEvent('openNotebook', 'mygroup');
-        assert.calledWith(sidebar._emitter.publish, 'openNotebook', 'mygroup');
+
+        assert.calledWith(fakeNotebook.open, 'mygroup');
         assert.calledOnce(sidebar.hide);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
-      });
-    });
-
-    describe('on "closeNotebook" internal event', () => {
-      it('shows the sidebar', () => {
-        const sidebar = createSidebar();
-        sinon.stub(sidebar, 'show').callThrough();
-        sidebar._emitter.publish('closeNotebook');
-        assert.calledOnce(sidebar.show);
-        assert.equal(sidebar.iframeContainer.style.visibility, '');
       });
     });
 
@@ -447,6 +443,16 @@ describe('Sidebar', () => {
 
         assert.called(onHelpRequest);
       }));
+  });
+
+  it('shows the sidebar when the notebook closes', () => {
+    const sidebar = createSidebar();
+    sinon.stub(sidebar, 'show').callThrough();
+
+    fakeNotebook.emit('closed');
+
+    assert.calledOnce(sidebar.show);
+    assert.equal(sidebar.iframeContainer.style.visibility, '');
   });
 
   describe('pan gestures', () => {
@@ -722,30 +728,6 @@ describe('Sidebar', () => {
         frame.remove();
       });
 
-      it('notifies when sidebar changes expanded state', () => {
-        sinon.stub(sidebar._emitter, 'publish');
-        sidebar.open();
-        assert.calledOnce(layoutChangeHandlerSpy);
-        assert.calledWith(
-          sidebar._emitter.publish,
-          'sidebarLayoutChanged',
-          sinon.match.any
-        );
-        assert.calledWith(sidebar._emitter.publish, 'sidebarOpened');
-        assert.calledTwice(sidebar._emitter.publish);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
-          expanded: true,
-        });
-
-        sidebar.close();
-        assert.calledTwice(layoutChangeHandlerSpy);
-        assert.calledThrice(sidebar._emitter.publish);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
-          expanded: false,
-          width: fakeToolbar.getWidth(),
-        });
-      });
-
       it('attempts to fit the content alongside the sidebar', () => {
         fakeGuest.fitSideBySide.resetHistory();
         sidebar.open();
@@ -905,12 +887,6 @@ describe('Sidebar', () => {
         fakeGuest,
         sinon.match({ contentContainer })
       );
-    });
-
-    it('updates the bucket bar when an `anchorsChanged` event is received', () => {
-      const sidebar = createSidebar();
-      sidebar._emitter.publish('anchorsChanged');
-      assert.calledOnce(sidebar.bucketBar.update);
     });
   });
 });
