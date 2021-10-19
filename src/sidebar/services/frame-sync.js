@@ -281,7 +281,7 @@ export class FrameSyncService {
     // Listen for notifications of a guest being unloaded. This message is routed
     // via the host frame rather than coming directly from the unloaded guest
     // to work around https://bugs.webkit.org/show_bug.cgi?id=231167.
-    this._hostRPC.on('destroyFrame', frameIdentifier => {
+    this._hostRPC.on('frameDestroyed', frameIdentifier => {
       const frame = this._store.frames().find(f => f.id === frameIdentifier);
       if (frame) {
         this._store.destroyFrame(frame);

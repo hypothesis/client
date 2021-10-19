@@ -217,7 +217,7 @@ export default class Sidebar {
     this._listeners.add(window, 'message', event => {
       const { data } = /** @type {MessageEvent} */ (event);
       if (data?.type === 'hypothesisGuestUnloaded') {
-        this._sidebarRPC.call('destroyFrame', data.frameIdentifier);
+        this._sidebarRPC.call('frameDestroyed', data.frameIdentifier);
       }
     });
   }

@@ -206,7 +206,7 @@ describe('Sidebar', () => {
     });
     window.dispatchEvent(event);
 
-    assert.calledWith(fakeBridge.call, 'destroyFrame', 'frame-id');
+    assert.calledWith(fakeBridge.call, 'frameDestroyed', 'frame-id');
   });
 
   function getConfigString(sidebar) {
