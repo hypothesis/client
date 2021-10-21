@@ -21,14 +21,13 @@ if (isProd) {
   );
 }
 
-function bundleConfig({ name, entry, format = 'es' }) {
+function bundleConfig({ name, entry }) {
   return {
     input: {
       [name]: entry,
     },
     output: {
       dir: 'build/scripts/',
-      format,
       chunkFileNames: `${name}-[name].bundle.js`,
       entryFileNames: '[name].bundle.js',
       sourcemap: true,
@@ -68,14 +67,6 @@ function bundleConfig({ name, entry, format = 'es' }) {
 
 export default [
   bundleConfig({ name: 'annotator', entry: 'src/annotator/index.js' }),
-  bundleConfig({
-    name: 'boot',
-    entry: 'src/boot/index.js',
-
-    // Built as an IIFE rather than ES module because there are many existing
-    // <script> tags on websites that load it as a non-module script.
-    format: 'iife',
-  }),
   bundleConfig({ name: 'sidebar', entry: 'src/sidebar/index.js' }),
   bundleConfig({
     name: 'ui-playground',
