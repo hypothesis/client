@@ -1,5 +1,4 @@
 import { existsSync, readFileSync } from 'fs';
-import * as path from 'path';
 
 import {
   buildCSS,
@@ -18,7 +17,6 @@ import manifest from './scripts/gulp/manifest.js';
 import serveDev from './dev-server/serve-dev.js';
 import servePackage from './dev-server/serve-package.js';
 
-const STYLE_DIR = 'build/styles';
 const FONTS_DIR = 'build/fonts';
 
 gulp.task('build-js', () => buildJS('./rollup.config.mjs'));
