@@ -5,21 +5,18 @@
 // already has it cached when it encounters the reference in the sidebar
 // application.
 
-// Variables replaced by the build script
-
-/* global __MANIFEST__ */
-
 import { parseJsonConfig } from './parse-json-config';
 
 import { bootHypothesisClient, bootSidebarApp } from './boot';
 import processUrlTemplate from './url-template';
 import { isBrowserSupported } from './browser-check';
 
+// @ts-ignore - This file is generated before the boot bundle is built.
+import manifest from '../../build/manifest.json';
+
 if (isBrowserSupported()) {
   const settings = parseJsonConfig(document);
   const assetRoot = processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__');
-  // @ts-ignore - `__MANIFEST__` is injected by the build script
-  const manifest = __MANIFEST__;
 
   // Check whether this is the sidebar app (indicated by the presence of a
   // `<hypothesis-app>` element) and load the appropriate part of the client.
