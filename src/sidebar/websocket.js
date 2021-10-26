@@ -32,7 +32,8 @@ export class Socket extends TinyEmitter {
    *
    * @param {() => string|Promise<string>} getURL - Callback that returns the
    *   URL to connect to. This is invoked before the initial connection and
-   *   before any automatic reconnection attempts.
+   *   before any automatic reconnection attempts. If this callback throws or
+   *   rejects, an 'error' event will be emitted.
    */
   constructor(getURL) {
     super();
@@ -70,7 +71,17 @@ export class Socket extends TinyEmitter {
     const connect = async () => {
       ++connectionAttempts;
 
-      const url = await getURL();
+      let url;
+      try {
+        url = await getURL();
+      } catch (urlError) {
+        const error = new Error('Failed to get WebSocket URL');
+        // @ts-ignore - TS doesn't know about cause property.
+        error.cause = urlError;
+        this.emit('error', new ErrorEvent('error', { error }));
+        return;
+      }
+
       socket = new WebSocket(url);
       socket.onopen = event => {
         connectionAttempts = 0;

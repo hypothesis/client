@@ -203,6 +203,22 @@ describe('Socket (WebSocket wrapper)', () => {
     assert.calledWith(onMessage, sinon.match({ data: 'Test message' }));
   });
 
+  it('should emit "error" event if `getURL` callback fails', async () => {
+    const socket = new Socket(async () => {
+      throw new Error('Auth token fetch failed');
+    });
+    const onError = sinon.stub();
+    socket.on('error', onError);
+
+    await awaitEvent(socket, 'error');
+
+    assert.calledOnce(onError);
+    const event = onError.getCall(0).args[0];
+    assert.instanceOf(event, ErrorEvent);
+    assert.equal(event.error.message, 'Failed to get WebSocket URL');
+    assert.equal(event.error.cause.message, 'Auth token fetch failed');
+  });
+
   it('should emit "error" event for received errors', async () => {
     const socket = new Socket(() => 'ws://test:1234');
     const onError = sinon.stub();
