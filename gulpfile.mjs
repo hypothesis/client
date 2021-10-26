@@ -17,8 +17,6 @@ import manifest from './scripts/gulp/manifest.js';
 import serveDev from './dev-server/serve-dev.js';
 import servePackage from './dev-server/serve-package.js';
 
-const FONTS_DIR = 'build/fonts';
-
 gulp.task('build-js', () => buildJS('./rollup.config.mjs'));
 
 gulp.task('watch-js', () => watchJS('./rollup.config.mjs'));
@@ -48,17 +46,13 @@ gulp.task(
   })
 );
 
-const fontFiles = [
-  'src/styles/vendor/fonts/*.woff',
-  'node_modules/katex/dist/fonts/*.woff',
-  'node_modules/katex/dist/fonts/*.woff2',
-];
+const fontFiles = ['node_modules/katex/dist/fonts/*.woff2'];
 
 gulp.task('build-fonts', () => {
-  return gulp
-    .src(fontFiles)
-    .pipe(changed(FONTS_DIR))
-    .pipe(gulp.dest(FONTS_DIR));
+  // Fonts are located in a subdirectory of `build/styles` so that we can reuse
+  // KaTeX's CSS bundle directly without any URL rewriting.
+  const fontsDir = 'build/styles/fonts';
+  return gulp.src(fontFiles).pipe(changed(fontsDir)).pipe(gulp.dest(fontsDir));
 });
 
 gulp.task(
@@ -68,8 +62,8 @@ gulp.task(
   })
 );
 
-const MANIFEST_SOURCE_FILES =
-  'build/@(fonts|scripts|styles)/*.@(js|css|woff|jpg|png|svg)';
+// Files to reference in `build/manifest.json`, used by `build/boot.js`.
+const MANIFEST_SOURCE_FILES = 'build/{styles,scripts}/*.{js,css,map}';
 
 let isFirstBuild = true;
 
