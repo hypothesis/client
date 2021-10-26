@@ -87,10 +87,22 @@ describe('bootstrap', () => {
   }
 
   describe('bootHypothesisClient', () => {
+    let clock;
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
     it('loads assets for the annotation layer', () => {
+      clock.tick(123);
+
       runBoot('annotator');
       const expectedAssets = [
-        'scripts/annotator.bundle.1234.js',
+        'scripts/annotator.bundle.1234.js#ts=123',
         'styles/annotator.1234.css',
         'styles/pdfjs-overrides.1234.css',
       ].map(assetUrl);
@@ -131,7 +143,7 @@ describe('bootstrap', () => {
       );
       assert.called(fakePolyfills.requiredPolyfillSets);
       assert.deepEqual(polyfillsLoaded, [
-        assetUrl('scripts/polyfills-es2017.bundle.1234.js'),
+        assetUrl('scripts/polyfills-es2017.bundle.1234.js#ts=0'),
       ]);
     });
   });
