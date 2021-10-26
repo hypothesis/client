@@ -252,6 +252,18 @@ describe('StreamerService', () => {
   });
 
   describe('Automatic reconnection', () => {
+    let clock;
+
+    beforeEach(() => {
+      clock = null;
+      sinon.stub(console, 'error');
+    });
+
+    afterEach(() => {
+      clock?.restore();
+      console.error.restore();
+    });
+
     it('should reconnect when user changes', () => {
       let oldWebSocket;
       createDefaultStreamer();
@@ -269,6 +281,43 @@ describe('StreamerService', () => {
         });
     });
 
+    it('should reconnect after unexpected disconnection', async () => {
+      clock = sinon.useFakeTimers();
+      createDefaultStreamer();
+
+      await activeStreamer.connect();
+      fakeWebSocket.emit('disconnect');
+
+      // Wait for reconnection to happen.
+      clock.tick(3000);
+      await Promise.resolve();
+
+      assert.lengthOf(fakeWebSockets, 2);
+    });
+
+    it('should limit number of reconnection attempts after an unexpected disconnection', async () => {
+      clock = sinon.useFakeTimers();
+      createDefaultStreamer();
+
+      await activeStreamer.connect();
+
+      for (let i = 1; i < 11; i++) {
+        fakeWebSocket.emit('disconnect');
+
+        // This mirrors the delay calculation in the service itself.
+        const delay = 1000 * 2 ** i;
+        clock.tick(delay);
+
+        await Promise.resolve();
+      }
+
+      assert.lengthOf(fakeWebSockets, 10);
+      assert.calledWith(
+        console.error,
+        'Gave up trying to reconnect to Hypothesis real time update service'
+      );
+    });
+
     it('should only set up auto-reconnect once', async () => {
       createDefaultStreamer();
       // This should register auto-reconnect
@@ -282,7 +331,7 @@ describe('StreamerService', () => {
       fakeStore.setState({});
 
       await delay(1);
-      // Total number of web sockets blown through in this test should be 2
+      // Total number of web sockets created in this test should be 2
       // 3+ would indicate `reconnect` fired more than once
       assert.lengthOf(fakeWebSockets, 2);
     });
