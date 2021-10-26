@@ -57,10 +57,20 @@ function injectStylesheet(doc, href) {
 /**
  * @param {Document} doc
  * @param {string} src - The script URL
+ * @param {boolean} forceReload - Whether to force re-evaluation of the script,
+ *   in case it has been loaded in the same document previously.
  */
-function injectScript(doc, src) {
+function injectScript(doc, src, forceReload = false) {
   const script = doc.createElement('script');
   script.type = 'module';
+
+  if (forceReload) {
+    // Module scripts are only evaluated once per URL in a document. Adding
+    // a dynamic fragment forces re-evaluation without breaking browser or CDN
+    // caching of the script, as a query string would do.
+    src += `#ts=${Date.now()}`;
+  }
+
   script.src = src;
 
   // Set 'async' to false to maintain execution order of scripts.
@@ -112,14 +122,16 @@ function preloadUrl(doc, type, url) {
  * @param {Document} doc
  * @param {SidebarAppConfig|AnnotatorConfig} config
  * @param {string[]} assets
+ * @param {object} options
+ *   @param {boolean} [options.forceModuleReload]
  */
-function injectAssets(doc, config, assets) {
+function injectAssets(doc, config, assets, { forceModuleReload } = {}) {
   assets.forEach(path => {
     const url = config.assetRoot + 'build/' + config.manifest[path];
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);
     } else {
-      injectScript(doc, url);
+      injectScript(doc, url, forceModuleReload);
     }
   });
 }
@@ -166,15 +178,25 @@ export function bootHypothesisClient(doc, config) {
 
   const polyfills = polyfillBundles(commonPolyfills);
 
-  injectAssets(doc, config, [
-    // Vendor code and polyfills
-    ...polyfills,
+  injectAssets(
+    doc,
+    config,
+    [
+      // Vendor code and polyfills
+      ...polyfills,
 
-    'scripts/annotator.bundle.js',
+      'scripts/annotator.bundle.js',
 
-    'styles/annotator.css',
-    'styles/pdfjs-overrides.css',
-  ]);
+      'styles/annotator.css',
+      'styles/pdfjs-overrides.css',
+    ],
+
+    // Force re-evaluation of JS module scripts, so that the annotator entry
+    // point code gets re-run if the client is unloaded and later re-loaded.
+    // We do this even if the client has not been loaded before because it is
+    // simpler and there are no negative effects (eg. to caching).
+    { forceModuleReload: true }
+  );
 }
 
 /**
