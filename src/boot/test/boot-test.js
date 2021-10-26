@@ -98,7 +98,7 @@ describe('bootstrap', () => {
     });
 
     it('loads assets for the annotation layer', () => {
-      clock.tick(123);
+      clock.tick(123); // Set timestamp used by module cache-busting fragment.
 
       runBoot('annotator');
       const expectedAssets = [
