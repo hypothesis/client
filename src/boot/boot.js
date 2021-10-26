@@ -68,6 +68,8 @@ function injectScript(doc, src, forceReload = false) {
     // Module scripts are only evaluated once per URL in a document. Adding
     // a dynamic fragment forces re-evaluation without breaking browser or CDN
     // caching of the script, as a query string would do.
+    //
+    // See examples in https://html.spec.whatwg.org/multipage/webappapis.html#integration-with-the-javascript-module-system
     src += `#ts=${Date.now()}`;
   }
 
@@ -193,8 +195,6 @@ export function bootHypothesisClient(doc, config) {
 
     // Force re-evaluation of JS module scripts, so that the annotator entry
     // point code gets re-run if the client is unloaded and later re-loaded.
-    // We do this even if the client has not been loaded before because it is
-    // simpler and there are no negative effects (eg. to caching).
     { forceModuleReload: true }
   );
 }
