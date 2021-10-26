@@ -252,4 +252,15 @@ describe('Socket (WebSocket wrapper)', () => {
       assert.equal(fakeSocket, initialSocket);
     });
   });
+
+  describe('#isConnected', () => {
+    it('returns true if WebSocket is connected', async () => {
+      const socket = new Socket(() => 'ws://test:1234');
+      assert.isFalse(socket.isConnected());
+
+      await awaitEvent(socket, 'open');
+
+      assert.isTrue(socket.isConnected());
+    });
+  });
 });
