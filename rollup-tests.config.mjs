@@ -1,6 +1,5 @@
 import { readFileSync } from 'fs';
 
-import alias from '@rollup/plugin-alias';
 import { babel } from '@rollup/plugin-babel';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
@@ -29,16 +28,6 @@ export default {
       // Node modules that are not available in the browser.
       crypto: '',
       util: '',
-    }),
-    alias({
-      entries: [
-        {
-          // This is needed because of Babel configuration used by
-          // @hypothesis/frontend-shared. It can be removed once that is fixed.
-          find: 'preact/compat/jsx-dev-runtime',
-          replacement: 'preact/jsx-dev-runtime',
-        },
-      ],
     }),
     replace({
       preventAssignment: true,
