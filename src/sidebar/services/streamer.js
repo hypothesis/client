@@ -59,7 +59,7 @@ export class StreamerService {
      * Number of automatic reconnection attempts that have been made following
      * an unexpected disconnection.
      */
-    this._connectionAttempts = 0;
+    this._reconnectionAttempts = 0;
 
     this._reconnectSetUp = false;
   }
@@ -202,16 +202,16 @@ export class StreamerService {
 
     const newSocket = new Socket(url);
     newSocket.on('open', () => {
-      this._connectionAttempts = 0;
+      this._reconnectionAttempts = 0;
       this._sendClientConfig(newSocket);
     });
     newSocket.on('disconnect', () => {
-      ++this._connectionAttempts;
-      if (this._connectionAttempts < 10) {
+      ++this._reconnectionAttempts;
+      if (this._reconnectionAttempts < 10) {
         // Reconnect with a delay that doubles on each attempt.
         // This reduces the stampede of requests if the WebSocket server has a
         // problem.
-        const delay = 1000 * 2 ** this._connectionAttempts;
+        const delay = 1000 * 2 ** this._reconnectionAttempts;
         setTimeout(() => this._reconnect(), delay);
       } else {
         console.error(
