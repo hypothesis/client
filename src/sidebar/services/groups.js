@@ -9,7 +9,7 @@ import { watch } from '../util/watch';
 const DEFAULT_ORG_ID = '__default__';
 
 // @ts-ignore - TS doesn't know about SVG files.
-import logoIcon from '../../images/icons/logo.svg';
+import { logo } from '@hypothesis/frontend-shared/lib/icons';
 
 /**
  * FIXME: There is almost assuredly a better way to handle a fallback, default logo
@@ -17,7 +17,7 @@ import logoIcon from '../../images/icons/logo.svg';
 const DEFAULT_ORGANIZATION = {
   id: DEFAULT_ORG_ID,
   name: '__DEFAULT__',
-  logo: 'data:image/svg+xml;utf8,' + encodeURIComponent(logoIcon),
+  logo: 'data:image/svg+xml;utf8,' + encodeURIComponent(logo),
 };
 
 /**
