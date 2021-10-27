@@ -6,7 +6,7 @@ import {
 
 // TODO: Update after https://github.com/hypothesis/frontend-shared/issues/179
 // is resolved
-import Library from '@hypothesis/frontend-shared/lib-cjs/pattern-library/components/Library';
+import Library from '@hypothesis/frontend-shared/lib/pattern-library/components/Library';
 
 export default function ButtonPatterns() {
   return (

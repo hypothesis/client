@@ -1,4 +1,4 @@
-import { startApp } from '@hypothesis/frontend-shared/lib-cjs/pattern-library';
+import { startApp } from '@hypothesis/frontend-shared/lib/pattern-library';
 import ButtonPatterns from './components/ButtonPatterns';
 
 import sidebarIcons from '../../src/sidebar/icons';
