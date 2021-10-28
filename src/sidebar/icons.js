@@ -29,7 +29,6 @@ import {
   listOrdered,
   listUnordered,
   logo,
-  lock,
   plus,
   profile,
   refresh,
@@ -43,6 +42,7 @@ import {
 
 // The following icons differ here from the shared-package versions
 import annotateIcon from '../images/icons/annotate.svg';
+import lockIcon from '../images/icons/lock.svg';
 import replyIcon from '../images/icons/reply.svg';
 import sortIcon from '../images/icons/sort.svg';
 
@@ -88,7 +88,7 @@ export default {
   image,
   leave,
   link,
-  lock,
+  lock: lockIcon,
   logo,
   pointer: pointerIcon,
   profile,
