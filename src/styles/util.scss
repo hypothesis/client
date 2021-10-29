@@ -3,6 +3,11 @@
 @use './variables' as var;
 
 // Utility classes
+// These will be extracted and considered when developing typography patterns
+
+.u-font--small {
+  @include utils.font--small;
+}
 
 .u-font--large {
   @include utils.font--large;
@@ -11,6 +16,19 @@
 .u-font--xlarge {
   @include utils.font--xlarge;
 }
+
+.u-font--bold {
+  font-weight: bold;
+}
+
+.u-font--italic {
+  font-style: italic;
+}
+
+.u-line-height {
+  line-height: 1;
+}
+
 // Icons
 
 // These utilities establish dimensions appropriate for icon elements
@@ -42,6 +60,10 @@
 // Use on elements for a de-emphasized, muted text color
 .u-color-text--muted {
   color: var.$color-text--light;
+}
+
+.u-color-text {
+  color: var.$color-text;
 }
 
 // TODO: This is a temporary utility class to allow elements in the sidebar
