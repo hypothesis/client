@@ -1,3 +1,4 @@
+import { Link } from '@hypothesis/frontend-shared';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import {
@@ -5,10 +6,6 @@ import {
   formatRelativeDate,
   formatDate,
 } from '../../util/time';
-
-/**
- * @typedef {import("../../../types/api").Annotation} Annotation
- */
 
 /**
  * @typedef AnnotationTimestampsProps
@@ -81,28 +78,29 @@ export default function AnnotationTimestamps({
       : 'edited';
 
   return (
-    <div className="AnnotationTimestamps">
+    <div>
       {withEditedTimestamp && (
         <span
-          className="AnnotationTimestamps__timestamp AnnotationTimestamps__edited"
+          className="u-color-text--muted u-font--small u-font--italic"
+          data-testid="timestamp-edited"
           title={updated.absolute}
         >
           ({editedString}){' '}
         </span>
       )}
       {annotationUrl ? (
-        <a
-          className="AnnotationTimestamps__timestamp AnnotationTimestamps__timestamp--linked"
+        <Link
+          classes="p-link--muted p-link--hover-muted"
           target="_blank"
-          rel="noopener noreferrer"
           title={created.absolute}
           href={annotationUrl}
         >
           {created.relative}
-        </a>
+        </Link>
       ) : (
         <span
-          className="AnnotationTimestamps__timestamp AnnotationTimestamps__created"
+          className="u-color-text--muted"
+          data-testid="timestamp-created"
           title={created.absolute}
         >
           {created.relative}

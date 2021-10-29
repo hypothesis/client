@@ -1,4 +1,4 @@
-/** @typedef {import("../../../types/api").Annotation} Annotation */
+import { Link } from '@hypothesis/frontend-shared';
 
 /**
  * @typedef AnnotationDocumentInfoProps
@@ -19,9 +19,9 @@ export default function AnnotationDocumentInfo({ domain, link, title }) {
       <div className="u-color-text--muted">
         on &quot;
         {link ? (
-          <a href={link} target="_blank" rel="noopener noreferrer">
+          <Link href={link} target="_blank">
             {title}
-          </a>
+          </Link>
         ) : (
           <span>{title}</span>
         )}
