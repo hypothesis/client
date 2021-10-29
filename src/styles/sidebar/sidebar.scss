@@ -13,18 +13,18 @@
 // Custom button styling for the application
 @use './buttons';
 
+// Local patterns
+@use '../patterns';
+
 // Components
 // ----------
 @use './components/Annotation';
 @use './components/AnnotationBody';
 @use './components/AnnotationHeader';
-@use './components/AnnotationLicense';
 @use './components/AnnotationPublishControl';
 @use './components/AnnotationQuote';
 @use './components/AnnotationShareControl';
 @use './components/AnnotationShareInfo';
-@use './components/AnnotationTimestamps';
-@use './components/AnnotationUser';
 @use './components/AutocompleteList';
 @use './components/Excerpt';
 @use './components/FilterSelect';

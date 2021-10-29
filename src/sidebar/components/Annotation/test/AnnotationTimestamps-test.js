@@ -51,8 +51,8 @@ describe('AnnotationTimestamps', () => {
   it('renders an unlinked created timestamp if annotation does not have a link', () => {
     const wrapper = createComponent({ annotationUrl: '' });
 
-    const link = wrapper.find('a');
-    const span = wrapper.find('span.AnnotationTimestamps__created');
+    const link = wrapper.find('Link');
+    const span = wrapper.find('span[data-testid="timestamp-created"]');
     assert.isFalse(link.exists());
     assert.isTrue(span.exists());
     assert.equal(span.text(), 'fuzzy string');
@@ -63,7 +63,7 @@ describe('AnnotationTimestamps', () => {
 
     const wrapper = createComponent({ withEditedTimestamp: true });
 
-    const editedTimestamp = wrapper.find('.AnnotationTimestamps__edited');
+    const editedTimestamp = wrapper.find('[data-testid="timestamp-edited"]');
     assert.isTrue(editedTimestamp.exists());
     assert.include(editedTimestamp.text(), '(edited another fuzzy string)');
   });
@@ -73,7 +73,7 @@ describe('AnnotationTimestamps', () => {
 
     const wrapper = createComponent({ withEditedTimestamp: true });
 
-    const editedTimestamp = wrapper.find('.AnnotationTimestamps__edited');
+    const editedTimestamp = wrapper.find('[data-testid="timestamp-edited"]');
     assert.isTrue(editedTimestamp.exists());
     assert.include(editedTimestamp.text(), '(edited)');
   });
