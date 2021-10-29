@@ -1,0 +1,20 @@
+/**
+ * Patterns used in this application that may be candidates for extraction
+ * to the shared frontend package (@hypothesis/frontend-shared)
+ */
+@use './variables' as var;
+
+// This pattern overrides default link color (brand), but hover is still
+// dark-brand
+.p-link--muted {
+  color: var.$color-text--light;
+}
+
+// This pattern overrides the hover to stay muted color, but adds an underline
+// for distinction
+.p-link--hover-muted {
+  &:hover {
+    color: var.$color-text--light;
+    text-decoration: underline;
+  }
+}
