@@ -1,4 +1,4 @@
-import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isNew, isReply } from '../../helpers/annotation-metadata';
@@ -73,12 +73,12 @@ function AnnotationPublishControl({
 
   const menuLabel = (
     <div className="annotation-publish-button__menu-label" style={buttonStyle}>
-      <SvgIcon name="expand-menu" className="u-icon--small" />
+      <Icon name="expand-menu" classes="u-icon--small" />
     </div>
   );
 
   return (
-    <div className="AnnotationPublishControl">
+    <div className="hyp-u-layout-row hyp-u-horizontal-spacing--4">
       <div className="annotation-publish-button">
         <LabeledButton
           classes="PublishControlButton"
