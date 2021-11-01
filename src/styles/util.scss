@@ -4,6 +4,9 @@
 
 // Utility classes
 // These will be extracted and considered when developing typography patterns
+.u-font--xsmall {
+  @include utils.font--xsmall;
+}
 
 .u-font--small {
   @include utils.font--small;
@@ -64,6 +67,16 @@
 
 .u-color-text {
   color: var.$color-text;
+}
+
+// Layout
+
+.u-inline {
+  display: inline;
+}
+
+.u-text--centered {
+  text-align: center;
 }
 
 // TODO: This is a temporary utility class to allow elements in the sidebar
