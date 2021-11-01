@@ -10,8 +10,8 @@
 // -----------------
 @use '@hypothesis/frontend-shared/styles';
 
-// Custom button styling for the application
-@use './buttons';
+// Extensions and overrides to patterns from `frontend-shared`
+@use './frontend-shared';
 
 // Local patterns
 @use '../patterns';
