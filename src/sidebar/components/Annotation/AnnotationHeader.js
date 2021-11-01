@@ -1,4 +1,4 @@
-import { SvgIcon, LinkButton } from '@hypothesis/frontend-shared';
+import { Icon, LinkButton } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
 import { withServices } from '../../service-context';
 
@@ -114,11 +114,14 @@ function AnnotationHeader({
     store.setExpanded(/** @type {string} */ (annotation.id), true);
 
   return (
-    <header className="AnnotationHeader">
-      <div className="AnnotationHeader__row hyp-u-horizontal-spacing--2">
+    <header>
+      <div
+        className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2"
+        style="flex-wrap:wrap-reverse"
+      >
         {annotationIsPrivate && !isEditing && (
-          <SvgIcon
-            className="AnnotationHeader__icon"
+          <Icon
+            classes="u-icon--xsmall"
             name="lock"
             title="This annotation is visible only to you"
           />
@@ -146,17 +149,17 @@ function AnnotationHeader({
       </div>
 
       {showExtendedInfo && (
-        <div className="AnnotationHeader__row hyp-u-horizontal-spacing--2">
+        <div
+          className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2"
+          style="flex-wrap:wrap-reverse"
+        >
           <AnnotationShareInfo annotation={annotation} />
           {!isEditing && isHighlight(annotation) && (
-            <div className="AnnotationHeader__highlight">
-              <SvgIcon
-                name="highlight"
-                title="This is a highlight. Click 'edit' to add a note or tag."
-                inline={true}
-                className="AnnotationHeader__highlight-icon"
-              />
-            </div>
+            <Icon
+              name="highlight"
+              title="This is a highlight. Click 'edit' to add a note or tag."
+              classes="u-icon--xsmall u-color-text--muted"
+            />
           )}
           {showDocumentInfo && (
             <AnnotationDocumentInfo
