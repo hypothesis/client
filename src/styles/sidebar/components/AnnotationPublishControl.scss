@@ -1,11 +1,6 @@
 @use '../../mixins/layout';
 @use '../../variables' as var;
 
-.AnnotationPublishControl {
-  @include layout.row;
-  @include layout.horizontal-rhythm(var.$layout-space);
-}
-
 // A split control with a primary submit button on the left
 // and a drop-down menu for changing
 // the annotation's privacy settings on the right
