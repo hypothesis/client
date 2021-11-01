@@ -49,7 +49,7 @@ function AnnotationBody({ annotation, settings }) {
   const textStyle = applyTheme(['annotationFontFamily'], settings);
 
   return (
-    <div className="AnnotationBody">
+    <div className="hyp-u-vertical-spacing--2">
       {showExcerpt && (
         <Excerpt
           collapse={isCollapsed}
@@ -64,13 +64,13 @@ function AnnotationBody({ annotation, settings }) {
             markdown={text}
             textClass={{
               AnnotationBody__text: true,
-              'is-hidden': isHidden(annotation),
+              'p-redacted-content': isHidden(annotation),
             }}
           />
         </Excerpt>
       )}
       {isCollapsible && (
-        <div className="AnnotationBody__collapse-toggle">
+        <div className="hyp-u-layout-row--justify-right">
           <LabeledButton
             expanded={!isCollapsed}
             onClick={() => setIsCollapsed(!isCollapsed)}
