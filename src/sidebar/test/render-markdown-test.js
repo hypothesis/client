@@ -7,12 +7,14 @@ describe('render-markdown', () => {
   beforeEach(() => {
     $imports.$mock({
       katex: {
-        renderToString: function (input, opts) {
-          if (opts && opts.displayMode) {
-            return 'math+display:' + input;
-          } else {
-            return 'math:' + input;
-          }
+        default: {
+          renderToString: function (input, opts) {
+            if (opts && opts.displayMode) {
+              return 'math+display:' + input;
+            } else {
+              return 'math:' + input;
+            }
+          },
         },
       },
     });
