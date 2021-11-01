@@ -58,18 +58,18 @@ describe('AnnotationShareInfo', () => {
     it('should display a group icon for private and restricted groups', () => {
       const wrapper = createAnnotationShareInfo();
 
-      const groupIcon = wrapper.find('SvgIcon');
+      const groupIcon = wrapper.find('Icon[name="groups"]');
 
-      assert.equal(groupIcon.prop('name'), 'groups');
+      assert.isTrue(groupIcon.exists());
     });
 
     it('should display a public/world icon for open groups', () => {
       fakeGroup.type = 'open';
       const wrapper = createAnnotationShareInfo();
 
-      const groupIcon = wrapper.find('SvgIcon');
+      const groupIcon = wrapper.find('Icon[name="public"]');
 
-      assert.equal(groupIcon.prop('name'), 'public');
+      assert.isTrue(groupIcon.exists());
     });
 
     it('should not show a link to third-party groups', () => {
@@ -110,7 +110,7 @@ describe('AnnotationShareInfo', () => {
         fakeGetGroup.returns({ name: 'Some Name', links: {} });
         const wrapper = createAnnotationShareInfo();
 
-        const privacyText = wrapper.find('.AnnotationShareInfo__private-info');
+        const privacyText = wrapper.find('[data-testid="private-info"]');
 
         assert.isOk(privacyText.exists());
         assert.equal(privacyText.text(), 'Only me');
