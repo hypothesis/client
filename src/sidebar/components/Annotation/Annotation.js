@@ -60,7 +60,7 @@ function Annotation({
 
   return (
     <article
-      className={classnames('Annotation', {
+      className={classnames('Annotation', 'hyp-u-vertical-spacing', {
         'Annotation--missing': !annotation,
         'Annotation--reply': isReply,
         'is-collapsed': threadIsCollapsed,
