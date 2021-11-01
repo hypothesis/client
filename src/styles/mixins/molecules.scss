@@ -86,32 +86,6 @@
 }
 
 /**
- * A pattern for displaying redacted (moderated) text content
- */
-@mixin redacted-content {
-  text-decoration: line-through;
-  // Make any images within this content greyscale, and low-contrast
-  filter: grayscale(100%) contrast(65%);
-}
-
-/**
- * Represent quoted text, as in an excerpt, with a hover or focused state.
- */
-@mixin quoted-text {
-  border-left: 3px solid var.$color-border;
-  color: var.$color-text--light;
-  font-style: italic;
-  padding: 0 var.$layout-space;
-
-  // Prevent long URLs etc. in quote causing overflow
-  overflow-wrap: break-word;
-
-  &.is-focused,
-  &:hover {
-    border-left: var.$color-quote 3px solid;
-  }
-}
-/**
  * Base styles for a "panel"-like element, with appropriate
  * padding, heading and close-button styles.
  *

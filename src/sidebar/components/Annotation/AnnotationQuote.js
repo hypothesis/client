@@ -36,7 +36,7 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
 
   return (
     <div
-      className={classnames('AnnotationQuote', {
+      className={classnames({
         'is-orphan': isOrphan(annotation),
       })}
     >
@@ -46,8 +46,9 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
         overflowThreshold={20}
       >
         <blockquote
-          className={classnames('AnnotationQuote__quote', {
+          className={classnames('p-quoted-text', {
             'is-focused': isFocused,
+            'p-redacted-content': isOrphan(annotation),
           })}
           dir="auto"
           lang={documentLanguage}
