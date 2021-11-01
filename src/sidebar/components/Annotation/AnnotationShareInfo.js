@@ -1,11 +1,10 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon, Link } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isPrivate } from '../../helpers/permissions';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import('../../../types/api').Group} Group
  */
 
 /**
@@ -30,25 +29,24 @@ function AnnotationShareInfo({ annotation }) {
   const annotationIsPrivate = isPrivate(annotation.permissions);
 
   return (
-    <div className="AnnotationShareInfo hyp-u-layout-row--align-baseline">
+    <div className="hyp-u-layout-row--align-baseline">
       {group && linkToGroup && (
-        <a
-          className="hyp-u-layout-row--align-baseline u-color-text--muted"
+        <Link
+          classes="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 p-link--muted p-link--hover-muted"
           href={group.links.html}
           target="_blank"
-          rel="noopener noreferrer"
         >
           {group.type === 'open' ? (
-            <SvgIcon className="AnnotationShareInfo__icon" name="public" />
+            <Icon classes="u-icon--xsmall" name="public" />
           ) : (
-            <SvgIcon className="AnnotationShareInfo__icon" name="groups" />
+            <Icon classes="u-icon--xsmall" name="groups" />
           )}
-          <span className="AnnotationShareInfo__group-info">{group.name}</span>
-        </a>
+          <span>{group.name}</span>
+        </Link>
       )}
       {annotationIsPrivate && !linkToGroup && (
         <span className="hyp-u-layout-row--align-baseline u-color-text--muted">
-          <span className="AnnotationShareInfo__private-info">Only me</span>
+          <span data-testid="private-info">Only me</span>
         </span>
       )}
     </div>
