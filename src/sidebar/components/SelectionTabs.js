@@ -1,4 +1,4 @@
-import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
+import { Frame, Icon, LabeledButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { applyTheme } from '../helpers/theme';
@@ -11,17 +11,19 @@ import { withServices } from '../service-context';
  */
 
 /**
+ * @typedef {import('preact').ComponentChildren} Children
+ *
  * @typedef TabProps
- * @prop {object} children - Child components.
- * @prop {number} count - The total annotations for this tab.
+ * @prop {Children} children
+ * @prop {number} count - The total annotations for this tab
  * @prop {boolean} isSelected - Is this tab currently selected?
  * @prop {boolean} isWaitingToAnchor - Are there any annotations still waiting to anchor?
- * @prop {string} label - A string label to use for `aria-label` and `title`
- * @prop {() => any} onSelect - Callback to invoke when this tab is selected.
+ * @prop {string} label - A string label to use for a11y
+ * @prop {() => any} onSelect - Callback to invoke when this tab is selected
  */
 
 /**
- * Display name of the tab and annotation count.
+ * Display name of the tab and annotation count
  *
  * @param {TabProps} props
  */
@@ -42,28 +44,32 @@ function Tab({
   const title = count > 0 ? `${label} (${count} available)` : label;
 
   return (
-    <div>
-      <button
-        className={classnames('SelectionTabs__type', {
-          'is-selected': isSelected,
-        })}
-        // Listen for `onMouseDown` so that the tab is selected when _pressed_
-        // as this makes the UI feel faster. Also listen for `onClick` as a fallback
-        // to enable selecting the tab via other input methods.
-        onClick={selectTab}
-        onMouseDown={selectTab}
-        role="tab"
-        tabIndex={0}
-        title={title}
-        aria-label={title}
-        aria-selected={isSelected.toString()}
-      >
+    <LabeledButton
+      classes={classnames('u-color-text', 'SelectionTab', {
+        'is-selected': isSelected,
+      })}
+      // Listen for `onMouseDown` so that the tab is selected when _pressed_
+      // as this makes the UI feel faster. Also listen for `onClick` as a fallback
+      // to enable selecting the tab via other input methods.
+      onClick={selectTab}
+      onMouseDown={selectTab}
+      pressed={!!isSelected}
+      role="tab"
+      tabIndex={0}
+      title={title}
+    >
+      <>
         {children}
         {count > 0 && !isWaitingToAnchor && (
-          <span className="SelectionTabs__count"> {count}</span>
+          <span
+            className="u-font--xsmall"
+            style="position:relative;bottom:3px;left:2px"
+          >
+            {count}
+          </span>
         )}
-      </button>
-    </div>
+      </>
+    </LabeledButton>
   );
 }
 
@@ -75,7 +81,7 @@ function Tab({
  */
 
 /**
- * Tabbed display of annotations and notes.
+ * Tabbed display of annotations and notes
  *
  * @param {SelectionTabsProps} props
  */
@@ -103,8 +109,11 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
   const showNotesUnavailableMessage = selectedTab === 'note' && noteCount === 0;
 
   return (
-    <div className="SelectionTabs-container">
-      <div className="SelectionTabs" role="tablist">
+    <div className="hyp-u-vertical-spacing--4 SelectionTabs__container">
+      <div
+        className="hyp-u-layout-row hyp-u-horizontal-spacing--6 SelectionTabs"
+        role="tablist"
+      >
         <Tab
           count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
@@ -138,6 +147,7 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
       {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
         <div className="hyp-u-layout-row--justify-right">
           <LabeledButton
+            data-testid="new-note-button"
             icon="add"
             onClick={() => annotationsService.createPageNote()}
             variant="primary"
@@ -148,22 +158,26 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
         </div>
       )}
       {!isLoading && showNotesUnavailableMessage && (
-        <div className="SelectionTabs__message">
-          There are no page notes in this group.
-        </div>
+        <Frame classes="u-text--centered">
+          <span data-testid="notes-unavailable-message">
+            There are no page notes in this group.
+          </span>
+        </Frame>
       )}
       {!isLoading && showAnnotationsUnavailableMessage && (
-        <div className="SelectionTabs__message">
-          There are no annotations in this group.
-          <br />
-          Create one by selecting some text and clicking the{' '}
-          <SvgIcon
-            name="annotate"
-            inline={true}
-            className="SelectionTabs__icon"
-          />{' '}
-          button.
-        </div>
+        <Frame classes="u-text--centered">
+          <span data-testid="annotations-unavailable-message">
+            There are no annotations in this group.
+            <br />
+            Create one by selecting some text and clicking the{' '}
+            <Icon
+              classes="hyp-u-margin--1 u-inline"
+              name="annotate"
+              title="Annotate"
+            />{' '}
+            button.
+          </span>
+        </Frame>
       )}
     </div>
   );
