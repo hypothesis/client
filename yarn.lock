@@ -1023,10 +1023,10 @@
     fancy-log "^1.3.3"
     glob "^7.2.0"
 
-"@hypothesis/frontend-shared@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-4.0.0.tgz#dbd136e7636e5eab37aa1b7690aacca8ce2a7f5a"
-  integrity sha512-zg6NH+te8ghqP6nUeC3fqIr6i0Er1njs7ySwFaZq4NIlZJTN+4ImK/DSMJF3aE8AWL0UwQpTfpJQKeaJuR51OA==
+"@hypothesis/frontend-shared@4.1.0":
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-4.1.0.tgz#94cf311d4be96f37cb12996b76821e768175bb3b"
+  integrity sha512-sso+lfowXqleDm9NDToR0wMlz+y95FNorKRHzgTUUgRvh7gyZJRfS/XE/XHtsjSuwhkALk78BOxsglHwQ84bIw==
   dependencies:
     normalize.css "^8.0.1"
 
