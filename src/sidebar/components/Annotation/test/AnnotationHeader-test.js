@@ -84,7 +84,7 @@ describe('AnnotationHeader', () => {
 
       const wrapper = createAnnotationHeader();
 
-      assert.isTrue(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
+      assert.isTrue(wrapper.find('Icon').filter({ name: 'lock' }).exists());
     });
 
     it('should not render an "Only Me" icon if the annotation is being edited', () => {
@@ -92,7 +92,7 @@ describe('AnnotationHeader', () => {
 
       const wrapper = createAnnotationHeader({ isEditing: true });
 
-      assert.isFalse(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
+      assert.isFalse(wrapper.find('Icon').filter({ name: 'lock' }).exists());
     });
 
     it('should not render an "Only Me" icon if the annotation is not private', () => {
@@ -100,7 +100,7 @@ describe('AnnotationHeader', () => {
 
       const wrapper = createAnnotationHeader();
 
-      assert.isFalse(wrapper.find('SvgIcon').filter({ name: 'lock' }).exists());
+      assert.isFalse(wrapper.find('Icon').filter({ name: 'lock' }).exists());
     });
   });
 
@@ -298,7 +298,7 @@ describe('AnnotationHeader', () => {
         const wrapper = createAnnotationHeader({
           isEditing: false,
         });
-        const highlightIcon = wrapper.find('.AnnotationHeader__highlight');
+        const highlightIcon = wrapper.find('Icon[name="highlight"]');
 
         assert.isTrue(highlightIcon.exists());
       });
@@ -308,7 +308,7 @@ describe('AnnotationHeader', () => {
         const wrapper = createAnnotationHeader({
           isEditing: false,
         });
-        const highlightIcon = wrapper.find('.AnnotationHeader__highlight');
+        const highlightIcon = wrapper.find('Icon[name="highlight"]');
 
         assert.isFalse(highlightIcon.exists());
       });
@@ -414,7 +414,7 @@ describe('AnnotationHeader', () => {
         isEditing: true,
         isHighlight: true,
       });
-      const highlight = wrapper.find('.AnnotationHeader__highlight');
+      const highlight = wrapper.find('Icon[name="highlight"]');
 
       assert.isFalse(highlight.exists());
     });
