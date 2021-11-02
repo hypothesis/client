@@ -8,10 +8,7 @@
   }
 
   &__icon {
-    @include utils.icon--inline;
-    margin-right: 1px;
     margin-bottom: -1px; // Pull the icon a little toward the baseline
-    color: var.$grey-5;
   }
 
   &__instruction {
