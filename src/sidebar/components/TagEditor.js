@@ -1,5 +1,5 @@
 import {
-  SvgIcon,
+  Icon,
   normalizeKeyName,
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
@@ -292,7 +292,7 @@ function TagEditor({
                 title={`Remove Tag: ${tag}`}
                 className="TagEditor__delete"
               >
-                <SvgIcon name="cancel" />
+                <Icon name="cancel" />
               </button>
             </li>
           );
