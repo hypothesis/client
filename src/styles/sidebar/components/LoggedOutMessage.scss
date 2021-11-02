@@ -24,13 +24,3 @@
   @include layout.row(center);
   margin-top: 25px;
 }
-
-.LoggedOutMessage__logo-icon {
-  width: 30px;
-  height: 30px;
-  color: var.$grey-mid;
-
-  &:hover {
-    color: var.$grey-7;
-  }
-}

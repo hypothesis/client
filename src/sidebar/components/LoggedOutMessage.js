@@ -1,4 +1,4 @@
-import { LinkButton, SvgIcon } from '@hypothesis/frontend-shared';
+import { LinkButton, Icon } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
 
@@ -46,7 +46,7 @@ function LoggedOutMessage({ onLogin }) {
           aria-label="Hypothesis homepage"
           title="Hypothesis homepage"
         >
-          <SvgIcon name="logo" className="LoggedOutMessage__logo-icon" />
+          <Icon name="logo" classes="u-icon--xlarge hyp-u-color--grey-7" />
         </a>
       </div>
     </div>
