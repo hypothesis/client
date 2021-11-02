@@ -23,6 +23,8 @@ import { createStoreModule } from '../create-store';
 /** @type {Frame[]} */
 const initialState = [];
 
+/** @typedef {typeof initialState} State */
+
 const reducers = {
   CONNECT_FRAME: function (state, action) {
     return [...state, action.frame];
@@ -99,10 +101,9 @@ function frames(state) {
  * for that purpose.
  *
  * This may be `null` during startup.
- *
- * @type {(state: any) => Frame|null}
  */
 const mainFrame = createSelector(
+  /** @param {State} state */
   state => state,
 
   // Sub-frames will all have a "frame identifier" set. The main frame is the
@@ -142,16 +143,14 @@ const createShallowEqualSelector = createSelectorCreator(
 /**
  * Memoized selector will return the same array (of URIs) reference unless the
  * values of the array change (are not shallow-equal).
- *
- * @type {(state: any) => string[]}
  */
 const searchUris = createShallowEqualSelector(
-  frames => {
-    return frames.reduce(
+  /** @param {State} frames */
+  frames =>
+    frames.reduce(
       (uris, frame) => uris.concat(searchUrisForFrame(frame)),
-      []
-    );
-  },
+      /** @type {string[]} */ ([])
+    ),
   uris => uris
 );
 

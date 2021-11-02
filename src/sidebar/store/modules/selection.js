@@ -9,12 +9,12 @@
  */
 
 /**
- * @typedef SelectionState
- *   @prop {Record<string,boolean>} expanded
- *   @prop {string[]} forcedVisible
- *   @prop {string[]} selected
- *   @prop {string} sortKey
- *   @prop {'annotation'|'note'|'orphan'} selectedTab
+ * @typedef State
+ * @prop {Record<string, boolean>} expanded
+ * @prop {Record<string, boolean>} forcedVisible
+ * @prop {Record<string, boolean>} selected
+ * @prop {string} sortKey
+ * @prop {'annotation'|'note'|'orphan'} selectedTab
  */
 
 import { createSelector } from 'reselect';
@@ -34,6 +34,7 @@ const TAB_SORTKEY_DEFAULT = {
 };
 
 function initialSelection(settings) {
+  /** @type {Record<string, boolean>} */
   const selection = {};
   // TODO: Do not take into account existence of `settings.query` here
   // once root-thread-building is fully updated: the decision of whether
@@ -44,6 +45,7 @@ function initialSelection(settings) {
   return selection;
 }
 
+/** @return {State} */
 function initialState(settings) {
   return {
     /**
@@ -309,28 +311,23 @@ function expandedMap(state) {
   return state.expanded;
 }
 
-/**
- * @type {(state: any) => string[]}
- */
 const forcedVisibleThreads = createSelector(
+  /** @param {State} state */
   state => state.forcedVisible,
   forcedVisible => trueKeys(forcedVisible)
 );
 
 /**
  * Are any annotations currently selected?
- *
- * @type {(state: any) => boolean}
  */
 const hasSelectedAnnotations = createSelector(
+  /** @param {State} state */
   state => state.selected,
   selection => trueKeys(selection).length > 0
 );
 
-/**
- * @type {(state: any) => string[]}
- */
 const selectedAnnotations = createSelector(
+  /** @param {State} state */
   state => state.selected,
   selection => trueKeys(selection)
 );
@@ -344,10 +341,8 @@ function selectedTab(state) {
   return state.selectedTab;
 }
 
-/**
- * @return {SelectionState}
- */
 const selectionState = createSelector(
+  /** @param {State} state */
   state => state,
   selection => {
     return {
@@ -372,10 +367,9 @@ function sortKey(state) {
 
 /**
  * Retrieve applicable sort options for the currently-selected tab.
- *
- * @type {(state: any) => string[]}
  */
 const sortKeys = createSelector(
+  /** @param {State} state */
   state => state.selectedTab,
   selectedTab => {
     const sortKeysForTab = ['Newest', 'Oldest'];

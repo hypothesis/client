@@ -7,6 +7,7 @@ import session from './session';
 
 /**
  * @typedef {import('../../../types/api').Group} Group
+ * @typedef {import('./session').State} SessionState
  */
 
 const initialState = {
@@ -22,6 +23,8 @@ const initialState = {
    */
   focusedGroupId: null,
 };
+
+/** @typedef {typeof initialState} State */
 
 const reducers = {
   FOCUS_GROUP(state, action) {
@@ -139,10 +142,9 @@ function getGroup(state, id) {
 
 /**
  * Return groups the user isn't a member of that are scoped to the URI.
- *
- * @type {(state: any) => Group[]}
  */
 const getFeaturedGroups = createSelector(
+  /** @param {State} state */
   state => state.groups,
   groups => groups.filter(group => !group.isMember && group.isScopedToUri)
 );
@@ -151,10 +153,9 @@ const getFeaturedGroups = createSelector(
  * Return groups that are scoped to the uri. This is used to return the groups
  * that show up in the old groups menu. This should be removed once the new groups
  * menu is permanent.
- *
- * @type {(state: any) => Group[]}
  */
 const getInScopeGroups = createSelector(
+  /** @param {State} state */
   state => state.groups,
   groups => groups.filter(g => g.isScopedToUri)
 );
@@ -163,10 +164,9 @@ const getInScopeGroups = createSelector(
 
 /**
  * Return groups the logged in user is a member of.
- *
- * @type {(state: any) => Group[]}
  */
 const getMyGroups = createSelector(
+  /** @param {{ groups: State, session: SessionState }} rootState */
   rootState => rootState.groups.groups,
   rootState => session.selectors.isLoggedIn(rootState.session),
   (groups, loggedIn) => {
@@ -181,10 +181,9 @@ const getMyGroups = createSelector(
 
 /**
  * Return groups that don't show up in Featured and My Groups.
- *
- * @type {(state: any) => Group[]}
  */
 const getCurrentlyViewingGroups = createSelector(
+  /** @param {{ groups: State, session: SessionState }} rootState */
   rootState => allGroups(rootState.groups),
   rootState => getMyGroups(rootState),
   rootState => getFeaturedGroups(rootState.groups),
