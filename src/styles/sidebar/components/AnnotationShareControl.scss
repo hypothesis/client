@@ -47,9 +47,10 @@
   // Position the pointer icon absolutely and flip it to make it point at the
   // share icon
   &__arrow {
+    display: inline;
     @include molecules.menu-arrow($direction: 'down');
     right: 0px;
-    bottom: -8px;
+    bottom: -12px;
   }
 
   .ShareLinks__icon {

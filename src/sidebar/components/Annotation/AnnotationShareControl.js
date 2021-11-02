@@ -1,6 +1,6 @@
 import {
+  Icon,
   IconButton,
-  SvgIcon,
   TextInput,
   TextInputWithButton,
   useElementShouldClose,
@@ -168,11 +168,7 @@ function AnnotationShareControl({
             )}
             {showShareLinks && <ShareLinks shareURI={shareUri} />}
           </div>
-          <SvgIcon
-            name="pointer"
-            inline={true}
-            className="annotation-share-panel__arrow"
-          />
+          <Icon name="pointer" classes="annotation-share-panel__arrow" />
         </div>
       )}
     </div>
