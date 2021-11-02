@@ -1,4 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
 
@@ -29,7 +29,7 @@ export default function SortMenu() {
 
   const menuLabel = (
     <span className="TopBar__menu-label">
-      <SvgIcon name="sort" className="TopBar__menu-icon" />
+      <Icon name="sort" classes="TopBar__menu-icon" />
     </span>
   );
 
