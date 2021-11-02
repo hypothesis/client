@@ -1,4 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon } from '@hypothesis/frontend-shared';
 
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
@@ -15,7 +15,10 @@ import { withServices } from '../service-context';
 function TutorialInstruction({ commandName, iconName }) {
   return (
     <span className="Tutorial__instruction">
-      <SvgIcon name={iconName} inline={true} className="Tutorial__icon" />
+      <Icon
+        name={iconName}
+        classes="hyp-u-margin--right--1 hyp-u-color--grey-6 u-inline Tutorial__icon"
+      />
       <em>{commandName}</em>
     </span>
   );
