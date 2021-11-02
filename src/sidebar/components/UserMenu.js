@@ -1,4 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 
 import { serviceConfig } from '../config/service-config';
@@ -85,7 +85,7 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
 
   const menuLabel = (
     <span className="TopBar__menu-label">
-      <SvgIcon name="profile" className="TopBar__menu-icon" />
+      <Icon name="profile" classes="TopBar__menu-icon" />
     </span>
   );
   return (
