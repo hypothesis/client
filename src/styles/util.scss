@@ -49,6 +49,10 @@
   @include utils.icon--small;
 }
 
+.u-icon--medium {
+  @include utils.icon--medium;
+}
+
 .u-icon--large {
   @include utils.icon--large;
 }

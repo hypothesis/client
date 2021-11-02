@@ -24,9 +24,4 @@
     flex-shrink: 0;
     font-weight: bold;
   }
-
-  &__menu-icon {
-    @include utils.icon--medium;
-    margin-right: var.$layout-space--xsmall;
-  }
 }
