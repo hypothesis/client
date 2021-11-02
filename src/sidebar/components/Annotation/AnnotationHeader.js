@@ -115,10 +115,7 @@ function AnnotationHeader({
 
   return (
     <header>
-      <div
-        className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2"
-        style="flex-wrap:wrap-reverse"
-      >
+      <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 u-wrap-reverse">
         {annotationIsPrivate && !isEditing && (
           <Icon
             classes="u-icon--xsmall"
@@ -149,10 +146,7 @@ function AnnotationHeader({
       </div>
 
       {showExtendedInfo && (
-        <div
-          className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2"
-          style="flex-wrap:wrap-reverse"
-        >
+        <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 u-wrap-reverse">
           <AnnotationShareInfo annotation={annotation} />
           {!isEditing && isHighlight(annotation) && (
             <Icon
