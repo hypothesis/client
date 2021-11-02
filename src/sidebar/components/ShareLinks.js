@@ -1,4 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon } from '@hypothesis/frontend-shared';
 
 /**
  * @typedef ShareLinkProps
@@ -22,7 +22,7 @@ function ShareLink({ label, iconName, uri }) {
         target="_blank"
         rel="noopener noreferrer"
       >
-        <SvgIcon name={iconName} className="ShareLinks__icon" />
+        <Icon name={iconName} classes="ShareLinks__icon" />
       </a>
     </li>
   );
