@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon } from '@hypothesis/frontend-shared';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
@@ -49,7 +49,7 @@ function ToastMessage({ message, onDismiss }) {
         )}
       >
         <div className="toast-message__type">
-          <SvgIcon name={iconName} className="toast-message__icon" />
+          <Icon name={iconName} classes="toast-message__icon" />
         </div>
         <div className="toast-message__message">
           <strong>{prefix}: </strong>

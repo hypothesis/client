@@ -166,7 +166,7 @@ describe('ToastMessages', () => {
         const wrapper = createComponent();
 
         const iconProps = wrapper
-          .find('SvgIcon')
+          .find('Icon')
           .map(iconWrapper => iconWrapper.props().name);
 
         assert.deepEqual(iconProps, testCase.icons);
