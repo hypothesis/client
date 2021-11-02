@@ -1,4 +1,4 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { Icon } from '@hypothesis/frontend-shared';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
@@ -25,16 +25,11 @@ function HelpPanelTab({ linkText, url }) {
     <div className="HelpPanel-tabs__tab">
       <a
         href={url}
-        className="HelpPanel-tabs__link"
+        className="hyp-u-horizontal-spacing--2 hyp-u-layout-row--center HelpPanel-tabs__link"
         target="_blank"
         rel="noopener noreferrer"
       >
-        {linkText}{' '}
-        <SvgIcon
-          name="external"
-          className="HelpPanel-tabs__icon"
-          inline={true}
-        />
+        <span>{linkText}</span> <Icon name="external" classes="u-icon--small" />
       </a>
     </div>
   );
@@ -130,10 +125,7 @@ function HelpPanel({ auth, session }) {
                 aria-label="Show tutorial panel"
               >
                 Getting started
-                <SvgIcon
-                  name="arrow-right"
-                  className="HelpPanel__sub-panel-link-icon"
-                />
+                <Icon name="arrow-right" />
               </button>
             )}
             {activeSubPanel === 'tutorial' && (
@@ -143,7 +135,7 @@ function HelpPanel({ auth, session }) {
                 aria-label="Show version information panel"
               >
                 About this version
-                <SvgIcon name="arrow-right" />
+                <Icon name="arrow-right" />
               </button>
             )}
           </div>
