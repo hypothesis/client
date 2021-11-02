@@ -72,34 +72,6 @@ describe('Annotation', () => {
     $imports.$restore();
   });
 
-  describe('annotation classnames', () => {
-    it('should assign a reply class if the annotation is a reply', () => {
-      const wrapper = createComponent({
-        isReply: true,
-        threadIsCollapsed: false,
-      });
-      const annot = wrapper.find('.Annotation');
-
-      assert.isTrue(annot.hasClass('Annotation--reply'));
-      assert.isFalse(annot.hasClass('is-collapsed'));
-    });
-
-    it('applies a focused class if annotation is focused', () => {
-      fakeStore.isAnnotationFocused.returns(true);
-      const wrapper = createComponent({ threadIsCollapsed: false });
-      const annot = wrapper.find('.Annotation');
-
-      assert.isTrue(annot.hasClass('is-focused'));
-    });
-
-    it('should assign a collapsed class if the annotation thread is collapsed', () => {
-      const wrapper = createComponent({ threadIsCollapsed: true });
-      const annot = wrapper.find('.Annotation');
-
-      assert.isTrue(annot.hasClass('is-collapsed'));
-    });
-  });
-
   describe('annotation quote', () => {
     it('renders quote if annotation has a quote', () => {
       fakeMetadata.quote.returns('quote');
@@ -132,7 +104,10 @@ describe('Annotation', () => {
 
     const wrapper = createComponent();
 
-    assert.include(wrapper.find('.Annotation__actions').text(), 'Saving...');
+    assert.include(
+      wrapper.find('[data-testid="saving-message"]').text(),
+      'Saving...'
+    );
   });
 
   describe('reply thread toggle', () => {
