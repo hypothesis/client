@@ -79,6 +79,12 @@
   text-align: center;
 }
 
+// A style to make a flex row wrap from bottom to top instead of (default)
+// top to bottom
+.u-wrap-reverse {
+  flex-wrap: wrap-reverse;
+}
+
 // TODO: This is a temporary utility class to allow elements in the sidebar
 // (e.g. panels, thread cards, etc.)
 // to apply margins such that they are evenly spaced. In the future, the
