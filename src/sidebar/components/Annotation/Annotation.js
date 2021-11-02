@@ -1,3 +1,4 @@
+import { Actions } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { useStoreProxy } from '../../store/use-store';
@@ -60,9 +61,7 @@ function Annotation({
 
   return (
     <article
-      className={classnames('Annotation', 'hyp-u-vertical-spacing', {
-        'Annotation--missing': !annotation,
-        'Annotation--reply': isReply,
+      className={classnames('hyp-u-vertical-spacing', {
         'is-collapsed': threadIsCollapsed,
         'is-focused': isFocused,
       })}
@@ -95,8 +94,8 @@ function Annotation({
       )}
 
       {!isCollapsedReply && (
-        <footer className="Annotation__footer">
-          <div className="hyp-u-layout-row Annotation__controls">
+        <footer>
+          <div className="hyp-u-layout-row">
             {showReplyToggle && (
               <AnnotationReplyToggle
                 onToggleReplies={onToggleReplies}
@@ -104,14 +103,21 @@ function Annotation({
                 threadIsCollapsed={threadIsCollapsed}
               />
             )}
-            {isSaving && <div className="Annotation__actions">Saving...</div>}
+            {isSaving && (
+              <div
+                className="hyp-u-layout-row--justify-right hyp-u-stretch"
+                data-testid="saving-message"
+              >
+                Saving...
+              </div>
+            )}
             {annotation && showActions && (
-              <div className="hyp-u-layout-row--justify-right hyp-u-stretch">
+              <Actions classes="hyp-u-stretch">
                 <AnnotationActionBar
                   annotation={annotation}
                   onReply={onReply}
                 />
-              </div>
+              </Actions>
             )}
           </div>
         </footer>
