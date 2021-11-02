@@ -96,6 +96,8 @@ function ThreadList({ threads }) {
     // list is the most recently created one.
     const newAnnotations = store
       .unsavedAnnotations()
+      // @ts-expect-error - FIXME: The `isHighlight` check here will always fail
+      // because `unsavedAnnotations` returns objects that do not have a `$highlight` property.
       .filter(ann => !ann.id && !isHighlight(ann));
     if (!newAnnotations.length) {
       return null;

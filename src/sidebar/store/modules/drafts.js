@@ -15,6 +15,8 @@ import { removeAnnotations } from './annotations';
 /** @type {Draft[]} */
 const initialState = [];
 
+/** @typedef {typeof initialState} State */
+
 /**
  * Helper class to encapsulate the draft properties and a few simple methods.
  *
@@ -177,10 +179,9 @@ function getDraftIfNotEmpty(state, annotation) {
 
 /**
  * Returns a list of draft annotations which have no id.
- *
- * @type {(state: any) => Annotation[]}
  */
 const unsavedAnnotations = createSelector(
+  /** @param {State} state */
   state => state,
   drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );

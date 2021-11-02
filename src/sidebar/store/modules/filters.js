@@ -46,7 +46,7 @@ import { createStoreModule } from '../create-store';
  */
 
 /**
- * @typedef {Record<FilterKey, FilterOption>|{}} Filters
+ * @typedef {Record<FilterKey, FilterOption>} Filters
  */
 
 /**
@@ -59,10 +59,7 @@ import { createStoreModule } from '../create-store';
 function initialState(settings) {
   const focusConfig = settings.focus || {};
   return {
-    /**
-     * @type {Filters}
-     */
-    filters: {},
+    filters: /** @type {Filters} */ ({}),
 
     // immediately activate focus mode if there is a valid config
     focusActive: isValidFocusConfig(focusConfig),
@@ -72,6 +69,8 @@ function initialState(settings) {
     query: settings.query || null,
   };
 }
+
+/** @typedef {ReturnType<typeof initialState>} State */
 
 /**
  * Given the provided focusConfig: is it a valid configuration for focus?
@@ -93,7 +92,7 @@ function isValidFocusConfig(focusConfig) {
  */
 function focusFiltersFromConfig(focusConfig) {
   if (!isValidFocusConfig(focusConfig)) {
-    return {};
+    return /** @type {Filters} */ ({});
   }
   const userFilterValue =
     focusConfig.user.username || focusConfig.user.userid || '';
@@ -145,7 +144,7 @@ const reducers = {
 
   CLEAR_SELECTION: function () {
     return {
-      filters: {},
+      filters: /** @type {Filters} */ ({}),
       focusActive: false,
       query: null,
     };
@@ -221,7 +220,9 @@ function filterQuery(state) {
  * @type {(state: any) => FocusState}
  */
 const focusState = createSelector(
+  /** @param {State} state */
   state => state.focusActive,
+  /** @param {State} state */
   state => state.focusFilters,
   (focusActive, focusFilters) => {
     return {

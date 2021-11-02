@@ -35,6 +35,8 @@ const initialState = {
   pendingDeletions: {},
 };
 
+/** @typedef {typeof initialState} State */
+
 const reducers = {
   RECEIVE_REAL_TIME_UPDATES(state, action) {
     return {
@@ -175,6 +177,7 @@ function pendingDeletions(state) {
  * @type {(state: any) => number}
  */
 const pendingUpdateCount = createSelector(
+  /** @param {State} state */
   state => [state.pendingUpdates, state.pendingDeletions],
   ([pendingUpdates, pendingDeletions]) =>
     Object.keys(pendingUpdates).length + Object.keys(pendingDeletions).length

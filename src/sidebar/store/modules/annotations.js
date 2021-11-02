@@ -114,6 +114,8 @@ const initialState = {
   nextTag: 1,
 };
 
+/** @typedef {typeof initialState} State */
+
 const reducers = {
   ADD_ANNOTATIONS: function (state, action) {
     const updatedIDs = {};
@@ -415,10 +417,9 @@ function updateFlagStatus(id, isFlagged) {
 
 /**
  * Count the number of annotations (as opposed to notes or orphans)
- *
- * @type {(state: any) => number}
  */
 const annotationCount = createSelector(
+  /** @param {State} state */
   state => state.annotations,
   annotations => countIf(annotations, metadata.isAnnotation)
 );
@@ -470,20 +471,18 @@ function findIDsForTags(state, tags) {
 
 /**
  * Retrieve currently-focused annotation identifiers
- *
- * @type {(state: any) => string[]}
  */
 const focusedAnnotations = createSelector(
+  /** @param {State} state */
   state => state.focused,
   focused => trueKeys(focused)
 );
 
 /**
  * Retrieve currently-highlighted annotation identifiers
- *
- * @type {(state: any) => string[]}
  */
 const highlightedAnnotations = createSelector(
+  /** @param {State} state */
   state => state.highlighted,
   highlighted => trueKeys(highlighted)
 );
@@ -504,6 +503,7 @@ function isAnnotationFocused(state, $tag) {
  * @type {(state: any) => boolean}
  */
 const isWaitingToAnchorAnnotations = createSelector(
+  /** @param {State} state */
   state => state.annotations,
   annotations => annotations.some(metadata.isWaitingToAnchor)
 );
@@ -511,10 +511,9 @@ const isWaitingToAnchorAnnotations = createSelector(
 /**
  * Return all loaded annotations that are not highlights and have not been saved
  * to the server
- *
- * @type {(state: any) => Annotation[]}
  */
 const newAnnotations = createSelector(
+  /** @param {State} state */
   state => state.annotations,
   annotations =>
     annotations.filter(ann => metadata.isNew(ann) && !metadata.isHighlight(ann))
@@ -523,10 +522,9 @@ const newAnnotations = createSelector(
 /**
  * Return all loaded annotations that are highlights and have not been saved
  * to the server
- *
- * @type {(state: any) => Annotation[]}
  */
 const newHighlights = createSelector(
+  /** @param {State} state */
   state => state.annotations,
   annotations =>
     annotations.filter(ann => metadata.isNew(ann) && metadata.isHighlight(ann))
@@ -534,20 +532,18 @@ const newHighlights = createSelector(
 
 /**
  * Count the number of page notes currently in the collection
- *
- @type {(state: any) => number}
  */
 const noteCount = createSelector(
+  /** @param {State} state */
   state => state.annotations,
   annotations => countIf(annotations, metadata.isPageNote)
 );
 
 /**
  * Count the number of orphans currently in the collection
- *
- * @type {(state: any) => number}
  */
 const orphanCount = createSelector(
+  /** @param {State} state */
   state => state.annotations,
   annotations => countIf(annotations, metadata.isOrphan)
 );

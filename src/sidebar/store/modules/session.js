@@ -23,6 +23,13 @@ const initialProfile = {
   userid: null,
 };
 
+/**
+ * @typedef State
+ * @prop {string} defaultAuthority
+ * @prop {Profile} profile
+ */
+
+/** @return {State} */
 function initialState(settings) {
   return {
     /**
