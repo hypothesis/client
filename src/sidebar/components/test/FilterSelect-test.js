@@ -65,7 +65,7 @@ describe('FilterSelect', () => {
     const wrapper = createComponent({ icon: 'profile' });
 
     const label = mount(wrapper.find('Menu').props().label);
-    const icon = label.find('SvgIcon');
+    const icon = label.find('Icon');
 
     assert.isTrue(icon.exists());
     assert.equal(icon.props().name, 'profile');
