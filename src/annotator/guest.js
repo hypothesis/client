@@ -1,4 +1,5 @@
 import { Bridge } from '../shared/bridge';
+import { PortFinder } from '../shared/port-finder';
 import { ListenerCollection } from '../shared/listener-collection';
 
 import { Adder } from './adder';
@@ -117,11 +118,8 @@ export default class Guest {
    * @param {EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
-   * @param {Window} [hostFrame] -
-   *   Host frame which this guest is associated with. This is expected to be
-   *   an ancestor of the guest frame. It may be same or cross origin.
    */
-  constructor(element, eventBus, config = {}, hostFrame = window) {
+  constructor(element, eventBus, config = {}) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
     this._highlightsVisible = false;
@@ -162,10 +160,17 @@ export default class Guest {
 
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
-    this._frameIdentifier = config.subFrameIdentifier || null;
+    /** @type {string|null} */
+    this._frameIdentifier = config.subFrameIdentifier;
+    this._hostFrame =
+      config.subFrameIdentifier === null ? window : window.parent;
+    this._portFinder = new PortFinder({
+      hostFrame: this._hostFrame,
+      source: 'guest',
+    });
 
     /**
-     * Channel for sidebar-guest communication.
+     * Channel for guest-sidebar communication.
      *
      * @type {Bridge<GuestToSidebarEvent,SidebarToGuestEvent>}
      */
@@ -176,6 +181,10 @@ export default class Guest {
     // in this frame.
     this._annotationSync = new AnnotationSync(eventBus, this._bridge);
     this._connectAnnotationSync();
+
+    // Discover and connect to the sidebar frame. All RPC events must be
+    // registered before creating the channel.
+    this._connectToSidebar();
 
     // Set up automatic and integration-triggered injection of client into
     // iframes in this frame.
@@ -202,7 +211,6 @@ export default class Guest {
      */
     this._focusedAnnotations = new Set();
 
-    this._hostFrame = hostFrame;
     this._listeners.add(window, 'unload', () => this._notifyGuestUnload());
   }
 
@@ -361,7 +369,16 @@ export default class Guest {
     });
   }
 
+  /**
+   * Attempt to connect to the sidebar frame.
+   */
+  async _connectToSidebar() {
+    const sidebarPort = await this._portFinder.discover('sidebar');
+    this._bridge.createChannel(sidebarPort);
+  }
+
   destroy() {
+    this._portFinder.destroy();
     this._notifyGuestUnload();
     this._hypothesisInjector.destroy();
     this._listeners.removeAll();
@@ -387,25 +404,8 @@ export default class Guest {
       type: 'hypothesisGuestUnloaded',
       frameIdentifier: this._frameIdentifier,
     };
-    this._hostFrame.postMessage(message, '*');
-  }
 
-  /**
-   * Attempt to connect to the sidebar frame.
-   *
-   * @param {Window} frame - The window containing the sidebar application
-   * @param {string} origin - Origin of the sidebar application (eg. 'https://hypothes.is/')
-   */
-  connectToSidebar(frame, origin) {
-    const channel = new MessageChannel();
-    frame.postMessage(
-      {
-        type: 'hypothesisGuestReady',
-      },
-      origin,
-      [channel.port2]
-    );
-    this._bridge.createChannel(channel.port1);
+    this._hostFrame.postMessage(message, '*');
   }
 
   /**
