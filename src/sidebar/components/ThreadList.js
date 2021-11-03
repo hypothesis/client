@@ -2,7 +2,6 @@ import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 import debounce from 'lodash.debounce';
 
 import { ListenerCollection } from '../../shared/listener-collection';
-import { isHighlight } from '../helpers/annotation-metadata';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
@@ -94,11 +93,7 @@ function ThreadList({ threads }) {
   const newAnnotationTag = (() => {
     // If multiple unsaved annotations exist, assume that the last one in the
     // list is the most recently created one.
-    const newAnnotations = store
-      .unsavedAnnotations()
-      // @ts-expect-error - FIXME: The `isHighlight` check here will always fail
-      // because `unsavedAnnotations` returns objects that do not have a `$highlight` property.
-      .filter(ann => !ann.id && !isHighlight(ann));
+    const newAnnotations = store.unsavedAnnotations();
     if (!newAnnotations.length) {
       return null;
     }

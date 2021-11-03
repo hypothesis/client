@@ -9,7 +9,6 @@ import mockImportedComponents from '../../../test-util/mock-imported-components'
 
 describe('ThreadList', () => {
   let fakeDomUtil;
-  let fakeMetadata;
   let fakeTopThread;
   let fakeScrollContainer;
   let fakeStore;
@@ -31,9 +30,6 @@ describe('ThreadList', () => {
     wrappers = [];
     fakeDomUtil = {
       getElementHeightWithMargins: sinon.stub().returns(0),
-    };
-    fakeMetadata = {
-      isHighlight: sinon.stub().returns(false),
     };
 
     fakeScrollContainer = document.createElement('div');
@@ -71,7 +67,6 @@ describe('ThreadList', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../store/use-store': { useStoreProxy: () => fakeStore },
-      '../helpers/annotation-metadata': fakeMetadata,
       '../util/dom': fakeDomUtil,
       '../helpers/visible-threads': fakeVisibleThreadsUtil,
     });
