@@ -3,6 +3,7 @@ import EventEmitter from 'tiny-emitter';
 import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import createFakeStore from '../../test/fake-redux-store';
+import { delay } from '../../../test-util/wait';
 
 import { FrameSyncService, $imports, formatAnnot } from '../frame-sync';
 
@@ -57,12 +58,37 @@ describe('FrameSyncService', () => {
   let FakeBridge;
 
   let fakeAnnotationsService;
-  let fakeStore;
   let fakeBridges;
+  let fakePortFinder;
+  let fakeStore;
   let frameSync;
   let fakeWindow;
+  const { port1: hostPort, port2: sidebarPort } = new MessageChannel();
 
   beforeEach(() => {
+    fakeAnnotationsService = { create: sinon.stub() };
+
+    fakeBridges = [];
+    FakeBridge = sinon.stub().callsFake(() => {
+      const emitter = new EventEmitter();
+      const bridge = {
+        call: sinon.stub(),
+        createChannel: sinon.stub(),
+        emit: emitter.emit.bind(emitter),
+        on: emitter.on.bind(emitter),
+        onConnect: function (listener) {
+          emitter.on('connect', listener);
+        },
+      };
+      fakeBridges.push(bridge);
+      return bridge;
+    });
+
+    fakePortFinder = {
+      destroy: sinon.stub(),
+      discover: sinon.stub().resolves(sidebarPort),
+    };
+
     fakeStore = createFakeStore(
       { annotations: [] },
       {
@@ -84,29 +110,14 @@ describe('FrameSyncService', () => {
       }
     );
 
-    fakeAnnotationsService = { create: sinon.stub() };
-
-    fakeBridges = [];
-    FakeBridge = sinon.stub().callsFake(() => {
-      const emitter = new EventEmitter();
-      const bridge = {
-        call: sinon.stub(),
-        createChannel: sinon.stub(),
-        emit: emitter.emit.bind(emitter),
-        on: emitter.on.bind(emitter),
-        onConnect: function (listener) {
-          emitter.on('connect', listener);
-        },
-      };
-      fakeBridges.push(bridge);
-      return bridge;
-    });
-
     fakeWindow = new FakeWindow();
     fakeWindow.parent = new FakeWindow();
 
     $imports.$mock({
       '../../shared/bridge': { Bridge: FakeBridge },
+      '../../shared/port-finder': {
+        PortFinder: sinon.stub().returns(fakePortFinder),
+      },
     });
 
     frameSync = new Injector()
@@ -118,6 +129,7 @@ describe('FrameSyncService', () => {
   });
 
   afterEach(() => {
+    frameSync.destroy();
     $imports.$restore();
   });
 
@@ -134,63 +146,27 @@ describe('FrameSyncService', () => {
   }
 
   describe('#connect', () => {
-    let testChannel;
+    it('discovers and connects to the host frame', async () => {
+      await frameSync.connect();
 
-    beforeEach(() => {
-      testChannel = new MessageChannel();
-
-      sinon.stub(console, 'warn');
-      sinon.stub(window, 'MessageChannel');
-      window.MessageChannel.returns(testChannel);
+      assert.calledWith(hostBridge().createChannel, sidebarPort);
     });
 
-    afterEach(() => {
-      console.warn.restore();
-      window.MessageChannel.restore();
-    });
+    it('connects to new guests when they are ready', async () => {
+      const { port1 } = new MessageChannel();
 
-    it('sends `hypothesisSidebarReady` notification to host frame with message port', () => {
       frameSync.connect();
-
-      assert.calledWith(hostBridge().createChannel, testChannel.port1);
-      assert.calledWith(
-        fakeWindow.parent.postMessage,
+      hostPort.postMessage(
         {
-          type: 'hypothesisSidebarReady',
+          frame1: 'guest',
+          frame2: 'sidebar',
+          type: 'offer',
         },
-        '*',
-        [testChannel.port2]
+        [port1]
       );
-    });
+      await delay(0);
 
-    it('connects to new guests when they are ready', () => {
-      const channel = new MessageChannel();
-
-      frameSync.connect();
-      fakeWindow.dispatchEvent(
-        new MessageEvent('message', {
-          data: { type: 'hypothesisGuestReady' },
-          ports: [channel.port1],
-        })
-      );
-
-      assert.calledWith(guestBridge().createChannel, channel.port1);
-    });
-
-    [
-      { data: 'not-an-object' },
-      { data: {} },
-      { data: { type: 'unknownType' } },
-      {
-        // No ports provided with message
-        data: { type: 'hypothesisGuestReady' },
-      },
-    ].forEach(messageInit => {
-      it('ignores `hypothesisGuestReady` messages that are invalid', () => {
-        frameSync.connect();
-        fakeWindow.dispatchEvent(new MessageEvent('message', messageInit));
-        assert.notCalled(guestBridge().createChannel);
-      });
+      assert.calledWith(guestBridge().createChannel, port1);
     });
   });
 
