@@ -11,6 +11,10 @@ describe('sidebar/util/dom', () => {
       document.body.appendChild(theElement);
     });
 
+    afterEach(() => {
+      theElement.remove();
+    });
+
     it("should return an element's height", () => {
       const testElement = document.getElementById('testElement');
       assert.equal(getElementHeightWithMargins(testElement), 450);

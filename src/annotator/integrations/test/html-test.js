@@ -77,13 +77,17 @@ describe('HTMLIntegration', () => {
       const highlight = document.createElement('div');
       document.body.appendChild(highlight);
 
-      const anchor = { highlights: [highlight] };
+      try {
+        const anchor = { highlights: [highlight] };
 
-      const integration = new HTMLIntegration();
-      await integration.scrollToAnchor(anchor);
+        const integration = new HTMLIntegration();
+        await integration.scrollToAnchor(anchor);
 
-      assert.calledOnce(fakeScrollIntoView);
-      assert.calledWith(fakeScrollIntoView, highlight, sinon.match.func);
+        assert.calledOnce(fakeScrollIntoView);
+        assert.calledWith(fakeScrollIntoView, highlight, sinon.match.func);
+      } finally {
+        highlight.remove();
+      }
     });
   });
 

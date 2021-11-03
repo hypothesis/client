@@ -104,6 +104,7 @@ describe('annotator/integrations/pdf', () => {
       pdfIntegration?.destroy();
       delete window.PDFViewerApplication;
       outerContainer.remove();
+      document.querySelector('hypothesis-banner')?.remove(); // <hypothesis-banner> elements are created outside the outerContainer
       $imports.$restore();
     });
 
@@ -288,11 +289,16 @@ describe('annotator/integrations/pdf', () => {
         pdfIntegration = createPDFIntegration();
 
         document.body.appendChild(anchor.highlights[0]);
-        await triggerUpdate();
 
-        assert.equal(anchor.highlights.length, 1);
-        assert.ok(anchor.range);
-        assert.notCalled(fakeAnnotator.anchor);
+        try {
+          await triggerUpdate();
+
+          assert.equal(anchor.highlights.length, 1);
+          assert.ok(anchor.range);
+          assert.notCalled(fakeAnnotator.anchor);
+        } finally {
+          anchor.highlights[0].remove();
+        }
       });
     });
 

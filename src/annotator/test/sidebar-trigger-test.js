@@ -14,6 +14,11 @@ describe('sidebarTrigger', () => {
     document.body.appendChild(triggerEl2);
   });
 
+  afterEach(() => {
+    triggerEl1.remove();
+    triggerEl2.remove();
+  });
+
   it('calls the show callback which a trigger button is clicked', () => {
     const fakeShowFn = sinon.stub();
     sidebarTrigger(document, fakeShowFn);
