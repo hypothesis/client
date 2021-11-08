@@ -21,6 +21,7 @@ function targetBlank() {
   return [{ type: 'output', filter }];
 }
 
+/** @type {showdown.Converter} */
 let converter;
 
 /** @param {string} markdown */
