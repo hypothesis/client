@@ -48,20 +48,22 @@ function annotationId(annotation) {
  * Is there a valid path from the thread indicated by `id` to the root thread,
  * with no circular references?
  *
+ * @param {Record<string, Thread>} threads
  * @param {string} id - The id of the thread to be verified
  * @param {string} ancestorId - The ancestor of the thread indicated by id that
  *        is to be verified: is it extant and not a circular reference?
  * @return {boolean}
  */
 function hasPathToRoot(threads, id, ancestorId) {
-  if (!threads[ancestorId] || threads[ancestorId].parent === id) {
+  const ancestor = threads[ancestorId];
+  if (!ancestor || ancestor.parent === id) {
     // Thread for ancestor not found, or points at itself: circular reference
     return false;
-  } else if (!threads[ancestorId].parent) {
+  } else if (!ancestor.parent) {
     // Top of the tree: we've made it
     return true;
   }
-  return hasPathToRoot(threads, id, threads[ancestorId].parent);
+  return hasPathToRoot(threads, id, ancestor.parent);
 }
 
 /**
