@@ -19,7 +19,7 @@ import { sorters } from './thread-sorters';
  *   @prop {Record<string,string>} selection.filters
  *   @prop {string[]} selection.forcedVisible
  *   @prop {string[]} selection.selected
- *   @prop {string} selection.sortKey
+ *   @prop {keyof sorters} selection.sortKey
  *   @prop {'annotation'|'note'|'orphan'} selection.selectedTab
  * @prop {string|null} route
  */
@@ -34,6 +34,7 @@ import { sorters } from './thread-sorters';
 function buildRootThread(threadState) {
   const selection = threadState.selection;
 
+  /** @type {BuildThreadOptions} */
   const options = {
     expanded: selection.expanded,
     forcedVisible: selection.forcedVisible,
