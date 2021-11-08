@@ -159,6 +159,29 @@ describe('PortProvider', () => {
       );
     });
 
+    it('responds to the first valid port request, ignore additional requests', async () => {
+      const data = {
+        channel: 'host-sidebar',
+        port: 'sidebar',
+        source,
+        type: 'request',
+      };
+
+      for (let i = 0; i < 4; ++i) {
+        sendMessage({
+          data,
+        });
+      }
+      await delay(0);
+
+      assert.calledOnceWithExactly(
+        window.postMessage,
+        { ...data, type: 'offer' },
+        window.location.origin,
+        [sinon.match.instanceOf(MessagePort)]
+      );
+    });
+
     it('sends the reciprocal port of the `guest-sidebar` channel (via the sidebar port)', async () => {
       sendMessage({
         data: {
