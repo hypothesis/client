@@ -51,12 +51,15 @@ function oldestRootAnnotationDate(thread) {
   }, '');
 }
 
+/** @typedef {(a: Thread, b: Thread) => number} SortFunction */
+
 /**
  * Sorting comparison functions for the three defined application options for
  * sorting annotation (threads)
  */
 export const sorters = {
-  Newest: function (a, b) {
+  /** @type {SortFunction} */
+  Newest: (a, b) => {
     const dateA = newestRootAnnotationDate(a);
     const dateB = newestRootAnnotationDate(b);
     if (dateA > dateB) {
@@ -67,7 +70,8 @@ export const sorters = {
     return 0;
   },
 
-  Oldest: function (a, b) {
+  /** @type {SortFunction} */
+  Oldest: (a, b) => {
     const dateA = oldestRootAnnotationDate(a);
     const dateB = oldestRootAnnotationDate(b);
     if (dateA < dateB) {
@@ -78,7 +82,8 @@ export const sorters = {
     return 0;
   },
 
-  Location: function (a, b) {
+  /** @type {SortFunction} */
+  Location: (a, b) => {
     if (!a.annotation || !b.annotation) {
       return compareHeadlessThreads(a, b);
     }
