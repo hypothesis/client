@@ -22,6 +22,8 @@ function countByVisibility(thread, visibility) {
 
 /**
  * Count the hidden annotations/replies in the `thread`
+ *
+ * @param {Thread} thread
  */
 export function countHidden(thread) {
   return countByVisibility(thread, false);
@@ -29,6 +31,8 @@ export function countHidden(thread) {
 
 /**
  * Count the visible annotations/replies in the `thread`
+ *
+ * @param {Thread} thread
  */
 export function countVisible(thread) {
   return countByVisibility(thread, true);
@@ -76,6 +80,7 @@ export function rootAnnotations(threads) {
   }
 
   // Else, search across all children at once (an entire hierarchical level)
+  /** @type {Thread[]} */
   const allChildren = [];
   threads.forEach(thread => {
     if (thread.children) {
