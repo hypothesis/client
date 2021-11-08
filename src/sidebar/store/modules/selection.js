@@ -8,12 +8,14 @@
  * @typedef {import("../../../types/sidebar").TabName} TabName
  */
 
+/** @typedef {'Location'|'Newest'|'Oldest'} SortKey */
+
 /**
  * @typedef State
  * @prop {Record<string, boolean>} expanded
  * @prop {Record<string, boolean>} forcedVisible
  * @prop {Record<string, boolean>} selected
- * @prop {string} sortKey
+ * @prop {SortKey} sortKey
  * @prop {'annotation'|'note'|'orphan'} selectedTab
  */
 
@@ -74,7 +76,7 @@ function initialState(settings) {
 
     selectedTab: 'annotation',
     // Key by which annotations are currently sorted.
-    sortKey: TAB_SORTKEY_DEFAULT.annotation,
+    sortKey: /** @type {SortKey} */ (TAB_SORTKEY_DEFAULT.annotation),
   };
 }
 
@@ -91,7 +93,7 @@ const setTab = (newTab, oldTab) => {
   }
   return {
     selectedTab: newTab,
-    sortKey: TAB_SORTKEY_DEFAULT[newTab],
+    sortKey: /** @type {SortKey} */ (TAB_SORTKEY_DEFAULT[newTab]),
   };
 };
 
@@ -356,10 +358,9 @@ const selectionState = createSelector(
 );
 
 /**
- * Retrieve the current sort option key
- * TODO: sortKey could be typedef'd
+ * Retrieve the current sort option key.
  *
- * @return {string}
+ * @param {State} state
  */
 function sortKey(state) {
   return state.sortKey;
