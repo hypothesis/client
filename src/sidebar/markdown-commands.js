@@ -173,6 +173,10 @@ export function toggleSpanStyle(state, prefix, suffix, placeholder) {
   return newState;
 }
 
+/**
+ * @param {string} str
+ * @param {number} pos
+ */
 function startOfLine(str, pos) {
   const start = str.lastIndexOf('\n', pos);
   if (start < 0) {
@@ -182,6 +186,10 @@ function startOfLine(str, pos) {
   }
 }
 
+/**
+ * @param {string} str
+ * @param {number} pos
+ */
 function endOfLine(str, pos) {
   const end = str.indexOf('\n', pos);
   if (end < 0) {
