@@ -76,7 +76,8 @@ function parseTimeString(timeValue) {
   // match[2] - Unit (e.g. 'h','m','s', or empty)
   while ((match = timePattern.exec(timeValue)) !== null) {
     if (match[2]) {
-      seconds += Number(match[1]) * multipliers[match[2]];
+      const unit = /** @type {keyof multipliers} */ (match[2]);
+      seconds += Number(match[1]) * multipliers[unit];
     } else {
       seconds += +match[1]; // Treat values missing units as seconds
     }
@@ -165,6 +166,7 @@ function createEmbedGenerator(
   iframeUrlGenerator,
   { aspectRatio } = {}
 ) {
+  /** @param {HTMLAnchorElement} link */
   const generator = link => {
     if (link.hostname !== hostname) {
       return null;
