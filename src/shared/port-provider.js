@@ -86,10 +86,6 @@ export class PortProvider {
     // Create the `host-sidebar` channel immediately, while other channels are
     // created on demand
     this._hostSidebarChannel = new MessageChannel();
-    this._channels.set(
-      'host-sidebar',
-      new Map([[window, this._hostSidebarChannel]])
-    );
 
     this._listeners = new ListenerCollection();
     this._listen();
@@ -233,17 +229,7 @@ export class PortProvider {
       return;
     }
 
-    const { channel, port } = options.allowedMessage;
-
-    // Check if channel has already been created. `host-sidebar` channel is an
-    // special case, because is created in the constructor.
-    if (channel === 'host-sidebar' && port === 'sidebar') {
-      this._sendPort(event, {
-        ...options,
-        port: this._hostSidebarChannel.port2,
-      });
-      return;
-    }
+    const { channel } = options.allowedMessage;
 
     let windowChannelMap = this._channels.get(channel);
     if (!windowChannelMap) {
@@ -254,10 +240,25 @@ export class PortProvider {
     const source = /** @type {Window} */ (event.source);
     let messageChannel = windowChannelMap.get(source);
 
-    if (!messageChannel) {
-      messageChannel = new MessageChannel();
-      windowChannelMap.set(source, messageChannel);
+    // Ignore the port request if the channel for the specified window has
+    // already been created. This is to avoid transfer the port more than once.
+    if (messageChannel) {
+      return;
     }
+
+    // `host-sidebar` channel is an special case, because it is created in the
+    // constructor.
+    if (channel === 'host-sidebar') {
+      windowChannelMap.set(source, this._hostSidebarChannel);
+      this._sendPort(event, {
+        ...options,
+        port: this._hostSidebarChannel.port2,
+      });
+      return;
+    }
+
+    messageChannel = new MessageChannel();
+    windowChannelMap.set(source, messageChannel);
 
     const { port1, port2 } = messageChannel;
     this._sendPort(event, { ...options, port: port1, reciprocalPort: port2 });
