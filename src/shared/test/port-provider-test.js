@@ -23,12 +23,30 @@ describe('PortProvider', () => {
 
   beforeEach(() => {
     sinon.stub(window, 'postMessage');
-    portProvider = new PortProvider(window.location.href);
+    portProvider = new PortProvider(window.location.origin);
+    portProvider.listen();
   });
 
   afterEach(() => {
     window.postMessage.restore();
     portProvider.destroy();
+  });
+
+  describe('#destroy', () => {
+    it('ignores valid port request if `PortFinder` has been destroyed', async () => {
+      portProvider.destroy();
+      sendMessage({
+        data: {
+          channel: 'host-sidebar',
+          port: 'sidebar',
+          source,
+          type: 'request',
+        },
+      });
+      await delay(0);
+
+      assert.notCalled(window.postMessage);
+    });
   });
 
   describe('#getPort', () => {
@@ -59,20 +77,30 @@ describe('PortProvider', () => {
     });
   });
 
-  describe('#destroy', () => {
-    it('ignores valid port request if `PortFinder` has been destroyed', async () => {
+  describe('#listen', () => {
+    it('ignores all port request until start listening', async () => {
       portProvider.destroy();
+      portProvider = new PortProvider(window.location.origin);
+      const data = {
+        channel: 'host-sidebar',
+        port: 'sidebar',
+        source,
+        type: 'request',
+      };
       sendMessage({
-        data: {
-          channel: 'host-sidebar',
-          port: 'sidebar',
-          source,
-          type: 'request',
-        },
+        data,
       });
       await delay(0);
 
       assert.notCalled(window.postMessage);
+
+      portProvider.listen();
+      sendMessage({
+        data,
+      });
+      await delay(0);
+
+      assert.calledOnce(window.postMessage);
     });
   });
 
@@ -94,7 +122,6 @@ describe('PortProvider', () => {
         data,
         source: new MessageChannel().port1,
       });
-
       await delay(0);
 
       assert.notCalled(window.postMessage);
@@ -132,7 +159,6 @@ describe('PortProvider', () => {
         data,
         origin: 'https://dummy.com',
       });
-
       await delay(0);
 
       assert.notCalled(window.postMessage);
@@ -148,7 +174,6 @@ describe('PortProvider', () => {
       sendMessage({
         data,
       });
-
       await delay(0);
 
       assert.calledWith(
@@ -217,7 +242,7 @@ describe('PortProvider', () => {
 
     it('sends the reciprocal port of the `guest-host` channel (via listener)', async () => {
       const handler = sinon.stub();
-      portProvider.addEventListener('onHostPortRequest', handler);
+      portProvider.on('hostPortRequest', handler);
       const data = {
         channel: 'guest-host',
         port: 'guest',
