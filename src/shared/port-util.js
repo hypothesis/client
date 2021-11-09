@@ -1,11 +1,13 @@
 // Because there are many `postMessages` on the `host` frame, the SOURCE property
 // is added to the hypothesis `postMessages` to identify the provenance of the
 // message and avoid listening to messages that could have the same properties
-// but different source. This is not a is not a security feature but an
+// but different source. This is not a security feature but an
 // anti-collision mechanism.
 export const SOURCE = 'hypothesis';
 
 /**
+ * These types are the used in by `PortProvider` and `PortFinder` for the
+ * inter-frame discovery and communication processes.
  * @typedef {'guest-host'|'guest-sidebar'|'host-sidebar'|'notebook-sidebar'} Channel
  * @typedef {'guest'|'host'|'notebook'|'sidebar'} Port
  *
