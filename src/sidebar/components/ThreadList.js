@@ -47,21 +47,38 @@ function roundScrollPosition(pos) {
  * @param {ThreadListProps} props
  */
 function ThreadList({ threads }) {
-  // Height of the visible area of the scroll container.
-  const [scrollContainerHeight, setScrollContainerHeight] = useState(
-    window.innerHeight
-  );
+  // Client height of the scroll container.
+  const [scrollContainerHeight, setScrollContainerHeight] = useState(0);
 
-  // Scroll offset of scroll container. This is updated after the scroll
-  // container is scrolled, with debouncing to limit update frequency.
-  // These values are in multiples of `SCROLL_PRECISION` to optimize
-  // for performance.
+  // Scroll offset of scroll container, rounded to a multiple of `SCROLL_PRECISION`
+  // to avoid excessive re-renderings.
   const [scrollPosition, setScrollPosition] = useState(0);
 
+  // Measure the initial size and offset of the scroll container once rendering
+  // is complete and attach listeners to observe future size or scroll offset changes.
   useLayoutEffect(() => {
+    const listeners = new ListenerCollection();
     const scrollContainer = getScrollContainer();
+
     setScrollContainerHeight(scrollContainer.clientHeight);
     setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
+
+    const updateScrollPosition = debounce(
+      () => {
+        setScrollContainerHeight(scrollContainer.clientHeight);
+        setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
+      },
+      10,
+      { maxWait: 100 }
+    );
+
+    listeners.add(scrollContainer, 'scroll', updateScrollPosition);
+    listeners.add(window, 'resize', updateScrollPosition);
+
+    return () => {
+      listeners.removeAll();
+      updateScrollPosition.cancel();
+    };
   }, []);
 
   // Map of thread ID to measured height of thread.
@@ -139,30 +156,6 @@ function ThreadList({ threads }) {
     const scrollContainer = getScrollContainer();
     scrollContainer.scrollTop = yOffset;
   }, [scrollToId, topLevelThreads, threadHeights]);
-
-  // Attach listeners such that whenever the scroll container is scrolled or the
-  // window resized, a recalculation of visible threads is triggered
-  useEffect(() => {
-    const listeners = new ListenerCollection();
-    const scrollContainer = getScrollContainer();
-
-    const updateScrollPosition = debounce(
-      () => {
-        setScrollContainerHeight(scrollContainer.clientHeight);
-        setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
-      },
-      10,
-      { maxWait: 100 }
-    );
-
-    listeners.add(scrollContainer, 'scroll', updateScrollPosition);
-    listeners.add(window, 'resize', updateScrollPosition);
-
-    return () => {
-      listeners.removeAll();
-      updateScrollPosition.cancel();
-    };
-  }, []);
 
   // When the set of visible threads changes, recalculate the real rendered
   // heights of thread cards and update `threadHeights` state if there are changes.
