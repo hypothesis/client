@@ -11,11 +11,13 @@
  */
 export class ListenerCollection {
   constructor() {
-    /** @type {Listener[]} */
-    this._listeners = [];
+    /** @type {Map<Symbol, Listener>} */
+    this._listeners = new Map();
   }
 
   /**
+   * Adds a listener and returns a listenerId
+   *
    * @param {Listener['eventTarget']} eventTarget
    * @param {Listener['eventType']} eventType
    * @param {Listener['listener']} listener
@@ -23,13 +25,28 @@ export class ListenerCollection {
    */
   add(eventTarget, eventType, listener, options) {
     eventTarget.addEventListener(eventType, listener, options);
-    this._listeners.push({ eventTarget, eventType, listener });
+    const symbol = Symbol();
+    this._listeners.set(symbol, { eventTarget, eventType, listener });
+    return symbol;
+  }
+
+  /**
+   * Removes a listener using a listenerId
+   * @param {Symbol} listenerId
+   */
+  remove(listenerId) {
+    const event = this._listeners.get(listenerId);
+    if (event) {
+      const { eventTarget, eventType, listener } = event;
+      eventTarget.removeEventListener(eventType, listener);
+      this._listeners.delete(listenerId);
+    }
   }
 
   removeAll() {
     this._listeners.forEach(({ eventTarget, eventType, listener }) => {
       eventTarget.removeEventListener(eventType, listener);
     });
-    this._listeners = [];
+    this._listeners.clear();
   }
 }

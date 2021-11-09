@@ -80,8 +80,7 @@ export class PortFinder {
         );
       }, MAX_WAIT_FOR_PORT);
 
-      // TODO: It would be nice to remove the listener after receiving the port.
-      this._listeners.add(window, 'message', event => {
+      const listenerId = this._listeners.add(window, 'message', event => {
         const { data, ports } = /** @type {MessageEvent} */ (event);
         if (
           isMessageEqual(data, {
@@ -93,6 +92,7 @@ export class PortFinder {
         ) {
           clearInterval(intervalId);
           clearTimeout(timeoutId);
+          this._listeners.remove(listenerId);
           resolve(ports[0]);
         }
       });
