@@ -73,6 +73,10 @@ function ThreadList({ threads }) {
     );
 
     listeners.add(scrollContainer, 'scroll', updateScrollPosition);
+
+    // We currently assume that the scroll container's size only changes with
+    // the window as a whole. A more general approach would involve using
+    // ResizeObserver via the `observeElementSize` utility.
     listeners.add(window, 'resize', updateScrollPosition);
 
     return () => {
