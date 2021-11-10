@@ -3,7 +3,7 @@
 // message and avoid listening to messages that could have the same properties
 // but different source. This is not a security feature but an
 // anti-collision mechanism.
-export const SOURCE = 'hypothesis';
+const SOURCE = 'hypothesis';
 
 /**
  * These types are the used in by `PortProvider` and `PortFinder` for the
@@ -15,7 +15,7 @@ export const SOURCE = 'hypothesis';
  * @prop {Channel} channel
  * @prop {Port} port
  * @prop {'offer'|'request'}  type
- * @prop {SOURCE} source
+ * @prop {SOURCE} source -
  */
 
 /**

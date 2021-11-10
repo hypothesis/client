@@ -1,7 +1,7 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 import { ListenerCollection } from './listener-collection';
-import { isMessageEqual, SOURCE as source } from './port-util';
+import { isMessageEqual } from './port-util';
 
 /**
  * @typedef {import('../types/config').SidebarConfig} SidebarConfig
@@ -220,7 +220,7 @@ export class PortProvider {
         const allowedMessage = {
           channel,
           port,
-          source,
+          source: 'hypothesis',
           type: 'request',
         };
 

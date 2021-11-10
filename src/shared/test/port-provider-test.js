@@ -1,6 +1,7 @@
 import { delay } from '../../test-util/wait';
 import { PortProvider } from '../port-provider';
-import { SOURCE as source } from '../port-util';
+
+const source = 'hypothesis';
 
 describe('PortProvider', () => {
   let portProvider;
