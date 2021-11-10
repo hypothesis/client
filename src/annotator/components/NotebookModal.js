@@ -33,6 +33,8 @@ function NotebookIframe({ config, groupId }) {
   );
 }
 
+/** @typedef {import('../util/emitter').Emitter} Emitter */
+
 /**
  * @typedef NotebookModalProps
  * @prop {import('../util/emitter').EventBus} eventBus
@@ -53,9 +55,7 @@ export default function NotebookModal({ eventBus, config }) {
   const [isHidden, setIsHidden] = useState(true);
   const [groupId, setGroupId] = useState(/** @type {string|null} */ (null));
   const originalDocumentOverflowStyle = useRef('');
-  const emitter = useRef(
-    /** @type {ReturnType<eventBus['createEmitter']>|null} */ (null)
-  );
+  const emitterRef = useRef(/** @type {Emitter|null} */ (null));
 
   // Stores the original overflow CSS property of document.body and reset it
   // when the component is destroyed
@@ -78,24 +78,22 @@ export default function NotebookModal({ eventBus, config }) {
   }, [isHidden]);
 
   useEffect(() => {
-    emitter.current = eventBus.createEmitter();
-    emitter.current.subscribe(
-      'openNotebook',
-      (/** @type {string} */ groupId) => {
-        setIsHidden(false);
-        setIframeKey(iframeKey => iframeKey + 1);
-        setGroupId(groupId);
-      }
-    );
+    const emitter = eventBus.createEmitter();
+    emitter.subscribe('openNotebook', (/** @type {string} */ groupId) => {
+      setIsHidden(false);
+      setIframeKey(iframeKey => iframeKey + 1);
+      setGroupId(groupId);
+    });
+    emitterRef.current = emitter;
 
     return () => {
-      emitter.current.destroy();
+      emitter.destroy();
     };
   }, [eventBus]);
 
   const onClose = () => {
     setIsHidden(true);
-    emitter.current.publish('closeNotebook');
+    emitterRef.current?.publish('closeNotebook');
   };
 
   if (groupId === null) {

@@ -10,7 +10,7 @@ import { TinyEmitter } from 'tiny-emitter';
  *
  * @implements Destroyable
  */
-class Emitter {
+export class Emitter {
   /**
    * @param {TinyEmitter} emitter
    */

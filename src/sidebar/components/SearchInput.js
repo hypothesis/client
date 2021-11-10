@@ -28,7 +28,7 @@ import { useStoreProxy } from '../store/use-store';
 export default function SearchInput({ alwaysExpanded, query, onSearch }) {
   const store = useStoreProxy();
   const isLoading = store.isLoading();
-  const input = useRef(/** @type {HTMLInputElement|null} */ (null));
+  const input = /** @type {{ current: HTMLInputElement }} */ (useRef());
 
   // The active filter query from the previous render.
   const [prevQuery, setPrevQuery] = useState(query);

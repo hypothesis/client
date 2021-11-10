@@ -81,9 +81,9 @@ export default function MenuItem({
   const hasLeftIcon = icon || isSubmenuItem;
   const hasRightIcon = icon && isSubmenuItem;
 
-  const menuItemRef = useRef(
-    /** @type {(HTMLAnchorElement & HTMLDivElement)|null} */ (null)
-  );
+  const menuItemRef =
+    /** @type {{ current: HTMLAnchorElement & HTMLDivElement }} */ (useRef());
+
   let focusTimer = null;
 
   let renderedIcon = null;

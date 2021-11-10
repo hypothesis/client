@@ -60,6 +60,9 @@ function AnnotationShareControl({
   const closePanel = () => setOpen(false);
 
   // Interactions outside of the component when it is open should close it
+  //
+  // @ts-expect-error - `useElementShouldClose` requires a non-nullable ref,
+  // but `shareRef` is nullable.
   useElementShouldClose(shareRef, isOpen, closePanel);
 
   useEffect(() => {

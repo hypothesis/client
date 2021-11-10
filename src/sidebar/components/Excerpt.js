@@ -87,7 +87,7 @@ function Excerpt({
     useState(true);
 
   // Container for the excerpt's content.
-  const contentElement = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const contentElement = /** @type {{ current: HTMLDivElement }} */ (useRef());
 
   // Measured height of `contentElement` in pixels.
   const [contentHeight, setContentHeight] = useState(0);

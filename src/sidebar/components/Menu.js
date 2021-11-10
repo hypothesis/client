@@ -138,7 +138,7 @@ export default function Menu({
   //
   // These handlers close the menu when the user taps or clicks outside the
   // menu or presses Escape.
-  const menuRef = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const menuRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
 
   // Menu element should close via `closeMenu` whenever it's open and there
   // are user interactions outside of it (e.g. clicks) in the document

@@ -402,15 +402,16 @@ export default function MarkdownEditor({
 
   useEffect(() => {
     if (!preview) {
-      input.current.focus();
+      input.current?.focus();
     }
   }, [preview]);
 
   const togglePreview = () => setPreview(!preview);
   const handleCommand = command => {
-    const inputEl = input.current;
-    handleToolbarCommand(command, inputEl);
-    onEditText({ text: inputEl.value });
+    if (input.current) {
+      handleToolbarCommand(command, input.current);
+      onEditText({ text: input.current.value });
+    }
   };
 
   const handleKeyDown = event => {
