@@ -109,20 +109,12 @@ describe('SessionService', () => {
     });
 
     context('when using a first party account', () => {
-      let clock;
-
       beforeEach(() => {
         fakeApi.profile.read.returns(
           Promise.resolve({
             userid: 'acct:user@hypothes.is',
           })
         );
-      });
-
-      afterEach(() => {
-        if (clock) {
-          clock.restore();
-        }
       });
 
       it('should fetch profile data from the API', () => {
@@ -170,32 +162,28 @@ describe('SessionService', () => {
         });
       });
 
-      it('should cache the returned profile data', () => {
+      it('should cache the returned profile data', async () => {
         const session = createService();
-        return session
-          .load()
-          .then(() => {
-            return session.load();
-          })
-          .then(() => {
-            assert.calledOnce(fakeApi.profile.read);
-          });
+        await session.load();
+        await session.load();
+
+        assert.calledOnce(fakeApi.profile.read);
       });
 
-      it('should eventually expire the cache', () => {
-        clock = sinon.useFakeTimers();
+      it('should eventually expire the cache', async () => {
+        const clock = sinon.useFakeTimers();
         const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
         const session = createService();
-        return session
-          .load()
-          .then(() => {
-            clock.tick(CACHE_TTL * 2);
-            return session.load();
-          })
-          .then(() => {
-            assert.calledTwice(fakeApi.profile.read);
-          });
+
+        try {
+          await session.load();
+          clock.tick(CACHE_TTL * 2);
+          await session.load();
+
+          assert.calledTwice(fakeApi.profile.read);
+        } finally {
+          clock.restore();
+        }
       });
     });
   });
