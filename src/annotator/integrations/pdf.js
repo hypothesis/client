@@ -138,6 +138,7 @@ export class PDFIntegration {
     this._listeners.removeAll();
     this.pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this.observer.disconnect();
+    this._warningBanner?.remove();
     this._destroyed = true;
   }
 
