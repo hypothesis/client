@@ -84,6 +84,10 @@ function isScopedToUri(group, uri) {
   return true;
 }
 
+/**
+ * @param {string} uri
+ * @param {string[]} scopes
+ */
 function uriMatchesScopes(uri, scopes) {
   return (
     scopes.find(uriRegex =>
