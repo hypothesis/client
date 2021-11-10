@@ -148,18 +148,21 @@ describe('sidebar/util/postmessage-json-rpc', () => {
 
     it('if timeout is null, then it does not timeout', async () => {
       const clock = sinon.useFakeTimers();
-      const result = doCall(null);
-      clock.tick(100000); // wait a long time
-      fakeWindow.emitter.emit('message', {
-        origin,
-        data: {
-          jsonrpc: '2.0',
-          id: messageId,
-          result: {},
-        },
-      });
-      await result;
-      clock.restore();
+      try {
+        const result = doCall(null);
+        clock.tick(100000); // wait a long time
+        fakeWindow.emitter.emit('message', {
+          origin,
+          data: {
+            jsonrpc: '2.0',
+            id: messageId,
+            result: {},
+          },
+        });
+        await result;
+      } finally {
+        clock.restore();
+      }
     });
   });
 });
