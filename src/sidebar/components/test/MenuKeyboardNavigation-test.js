@@ -70,7 +70,6 @@ describe('MenuKeyboardNavigation', () => {
     });
 
     it('sets focus to the first `menuitem` child when `visible` is true', () => {
-      const clock = sinon.useFakeTimers();
       createMenuItem({ visible: true });
       clock.tick(1);
       assert.equal(document.activeElement.innerText, 'Item 1');
