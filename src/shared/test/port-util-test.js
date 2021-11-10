@@ -1,4 +1,6 @@
-import { isMessageEqual, SOURCE as source } from '../port-util';
+import { isMessageEqual } from '../port-util';
+
+const source = 'hypothesis';
 
 describe('port-util', () => {
   describe('isMessageEqual', () => {

@@ -1,5 +1,5 @@
 import { ListenerCollection } from './listener-collection';
-import { isMessageEqual, SOURCE as source } from './port-util';
+import { isMessageEqual } from './port-util';
 
 const MAX_WAIT_FOR_PORT = 1000 * 30;
 const POLLING_INTERVAL_FOR_PORT = 250;
@@ -59,7 +59,10 @@ export class PortFinder {
       }
 
       function postRequest() {
-        hostFrame.postMessage({ channel, port, source, type: 'request' }, '*');
+        hostFrame.postMessage(
+          { channel, port, source: 'hypothesis', type: 'request' },
+          '*'
+        );
       }
 
       const intervalId = setInterval(
@@ -78,7 +81,14 @@ export class PortFinder {
       // TODO: It would be nice to remove the listener after receiving the port.
       this._listeners.add(window, 'message', event => {
         const { data, ports } = /** @type {MessageEvent} */ (event);
-        if (isMessageEqual(data, { channel, port, source, type: 'offer' })) {
+        if (
+          isMessageEqual(data, {
+            channel,
+            port,
+            source: 'hypothesis',
+            type: 'offer',
+          })
+        ) {
           clearInterval(intervalId);
           clearTimeout(timeoutId);
           resolve(ports[0]);

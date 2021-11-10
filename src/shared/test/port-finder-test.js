@@ -1,6 +1,5 @@
 import { delay } from '../../test-util/wait';
 import { PortFinder } from '../port-finder';
-import { SOURCE as source } from '../port-util';
 
 describe('PortFinder', () => {
   let portFinder;
@@ -44,7 +43,7 @@ describe('PortFinder', () => {
           .catch(e => (error = e));
         portFinder.destroy();
         sendMessage({
-          data: { channel, port, source, type: 'offer' },
+          data: { channel, port, source: 'hypothesis', type: 'offer' },
           ports: [port1],
         });
         clock.tick(30000);
@@ -100,7 +99,7 @@ describe('PortFinder', () => {
           })
           .then(port => (resolvedPort = port));
         sendMessage({
-          data: { channel, port, source, type: 'offer' },
+          data: { channel, port, source: 'hypothesis', type: 'offer' },
           ports: [port1],
         });
         await delay(0);
@@ -131,7 +130,7 @@ describe('PortFinder', () => {
       assert.callCount(window.postMessage, 121);
       assert.alwaysCalledWithExactly(
         window.postMessage,
-        { channel, port, source, type: 'request' },
+        { channel, port, source: 'hypothesis', type: 'request' },
         '*'
       );
 
