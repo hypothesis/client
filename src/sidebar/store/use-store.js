@@ -144,5 +144,5 @@ export function useStoreProxy() {
     return cleanup;
   }, [cache, store]);
 
-  return proxy.current;
+  return /** @type {SidebarStore} */ (proxy.current);
 }

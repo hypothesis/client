@@ -28,7 +28,7 @@ export default function MarkdownView({
     () => (markdown ? renderMarkdown(markdown) : ''),
     [markdown]
   );
-  const content = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const content = /** @type {{ current: HTMLDivElement }} */ (useRef());
 
   useEffect(() => {
     replaceLinksWithEmbeds(content.current, {

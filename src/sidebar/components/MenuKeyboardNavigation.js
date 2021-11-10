@@ -28,7 +28,7 @@ export default function MenuKeyboardNavigation({
   children,
   visible,
 }) {
-  const menuRef = useRef(/** @type {HTMLDivElement|null} */ (null));
+  const menuRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
 
   useEffect(() => {
     let focusTimer = null;

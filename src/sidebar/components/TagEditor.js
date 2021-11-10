@@ -38,7 +38,7 @@ function TagEditor({
   tagList,
   tags: tagsService,
 }) {
-  const inputEl = useRef(/** @type {HTMLInputElement|null} */ (null));
+  const inputEl = /** @type {{ current: HTMLInputElement }} */ (useRef());
   const [suggestions, setSuggestions] = useState(/** @type {string[]} */ ([]));
   const [activeItem, setActiveItem] = useState(-1); // -1 is unselected
   const [suggestionsListOpen, setSuggestionsListOpen] = useState(false);
@@ -48,7 +48,7 @@ function TagEditor({
   });
 
   // Set up callback to monitor outside click events to close the AutocompleteList
-  const closeWrapperRef = useRef(/** @type {HTMLElement|null} */ (null));
+  const closeWrapperRef = /** @type {{ current: HTMLElement }} */ (useRef());
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
