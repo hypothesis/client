@@ -104,7 +104,6 @@ describe('annotator/integrations/pdf', () => {
       pdfIntegration?.destroy();
       delete window.PDFViewerApplication;
       outerContainer.remove();
-      document.querySelector('hypothesis-banner')?.remove(); // <hypothesis-banner> elements are created outside the outerContainer
       $imports.$restore();
     });
 
