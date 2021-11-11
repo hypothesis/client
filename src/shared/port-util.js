@@ -8,6 +8,7 @@ const SOURCE = 'hypothesis';
 /**
  * These types are the used in by `PortProvider` and `PortFinder` for the
  * inter-frame discovery and communication processes.
+ *
  * @typedef {'guest-host'|'guest-sidebar'|'host-sidebar'|'notebook-sidebar'} Channel
  * @typedef {'guest'|'host'|'notebook'|'sidebar'} Port
  *
@@ -19,23 +20,19 @@ const SOURCE = 'hypothesis';
  */
 
 /**
- * The function checks if the data conforms to the expected format. It returns
- * `true` if all the properties are including the correct value in the `source`
- *  property, otherwise it returns `false`.
+ * Return true if an object, eg. from the data field of a `MessageEvent`, is a
+ * valid `Message`.
  *
  * @param {any} data
  * @return {data is Message}
  */
 function isMessageValid(data) {
-  if (!data || typeof data !== 'object') {
+  if (data === null || typeof data !== 'object') {
     return false;
   }
 
   for (let property of ['channel', 'port', 'source', 'type']) {
-    if (
-      data.hasOwnProperty(property) === false ||
-      typeof data[property] !== 'string'
-    ) {
+    if (typeof data[property] !== 'string') {
       return false;
     }
   }
@@ -59,7 +56,7 @@ export function isMessageEqual(data, message) {
       JSON.stringify(data, Object.keys(data).sort()) ===
       JSON.stringify(message, Object.keys(message).sort())
     );
-  } catch (error) {
+  } catch {
     return false;
   }
 }

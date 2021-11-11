@@ -103,7 +103,7 @@ describe('port-util', () => {
           port: 'guest',
           source,
           type: 'offer',
-          window, // no serializable
+          window, // not serializable
         },
         message: {
           channel: 'host-sidebar',
@@ -128,7 +128,7 @@ describe('port-util', () => {
           type: 'offer',
         },
         expectedResult: false,
-        reason: 'data has one property that is different ',
+        reason: 'data has one property that is different',
       },
     ].forEach(({ data, message, expectedResult, reason }) => {
       it(`returns '${expectedResult}' because the ${reason}`, () => {
