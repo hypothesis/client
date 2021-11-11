@@ -5,7 +5,7 @@
 // Utility classes
 // These will be extracted and considered when developing typography patterns
 .u-font--xsmall {
-  @include utils.font--xsmall;
+  font-size: 10px;
 }
 
 .u-font--small {
@@ -26,6 +26,10 @@
 
 .u-font--italic {
   font-style: italic;
+}
+
+.u-font--normal {
+  font-weight: normal;
 }
 
 .u-line-height {

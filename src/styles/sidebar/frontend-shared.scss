@@ -32,3 +32,24 @@
     min-height: auto;
   }
 }
+
+// Override any background color on a LabeledButton
+.TransparentButton {
+  background-color: transparent;
+
+  &:hover:not([disabled]) {
+    background-color: transparent;
+  }
+}
+
+// Links
+
+// Styling for a Link that contains only an Icon and no text. Override coloring
+// and add some padding
+.IconOnlyLink {
+  padding: var.$layout-space;
+  color: var.$grey-7;
+  &:hover:not([disabled]) {
+    color: var.$grey-7;
+  }
+}

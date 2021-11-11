@@ -1,5 +1,10 @@
-import classnames from 'classnames';
-import { SvgIcon, normalizeKeyName } from '@hypothesis/frontend-shared';
+import {
+  Icon,
+  IconButton,
+  LabeledButton,
+  Link,
+  normalizeKeyName,
+} from '@hypothesis/frontend-shared';
 import { createRef } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
@@ -108,7 +113,7 @@ function handleToolbarCommand(command, inputEl) {
 function ToolbarButton({
   buttonRef,
   disabled = false,
-  iconName,
+  iconName = '',
   label,
   onClick,
   shortcutKey,
@@ -122,27 +127,27 @@ function ToolbarButton({
     tooltip += ` (${modifierKey}-${shortcutKey.toUpperCase()})`;
   }
 
+  const buttonProps = {
+    buttonRef,
+    disabled,
+    icon: iconName,
+    onClick,
+    tabIndex,
+    title: tooltip,
+  };
+
+  if (label) {
+    return (
+      <LabeledButton
+        classes="u-font--normal TransparentButton"
+        {...buttonProps}
+      >
+        {label}
+      </LabeledButton>
+    );
+  }
   return (
-    <button
-      className={classnames(
-        'MarkdownEditor__toolbar-button',
-        label && 'is-text'
-      )}
-      disabled={disabled}
-      onClick={onClick}
-      aria-label={tooltip}
-      title={tooltip}
-      tabIndex={tabIndex}
-      ref={buttonRef}
-    >
-      {iconName && (
-        <SvgIcon
-          name={iconName}
-          className="MarkdownEditor__toolbar-button-icon"
-        />
-      )}
-      {label}
-    </button>
+    <IconButton classes="MarkdownEditor__toolbar-button" {...buttonProps} />
   );
 }
 
@@ -267,7 +272,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
 
   return (
     <div
-      className="MarkdownEditor__toolbar"
+      className="hyp-u-layout-row hyp-u-border--left hyp-u-border--right hyp-u-border--top hyp-u-bg-color--white MarkdownEditor__toolbar"
       role="toolbar"
       aria-label="Markdown editor toolbar"
       onKeyDown={handleKeyDown}
@@ -344,22 +349,18 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         title="Bulleted list"
       />
       <span className="hyp-u-stretch" />
-      <div className="MarkdownEditor__toolbar-help-link">
-        <a
+      <div className="hyp-u-layout-row--center">
+        <Link
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
           target="_blank"
-          rel="noopener noreferrer"
-          className="MarkdownEditor__toolbar-button"
-          ref={buttonRefs[buttonIds.help]}
+          classes="u-font--xsmall IconOnlyLink"
+          linkRef={buttonRefs[buttonIds.help]}
           tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
           aria-label="Formatting help"
         >
-          <SvgIcon
-            name="help"
-            className="MarkdownEditor__toolbar-button-icon"
-          />
-        </a>
+          <Icon name="help" />
+        </Link>
       </div>
       <ToolbarButton
         label={isPreviewing ? 'Write' : 'Preview'}
@@ -429,7 +430,7 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div className="MarkdownEditor">
+    <div className="u-line-height">
       <Toolbar
         onCommand={handleCommand}
         isPreviewing={preview}
@@ -438,7 +439,11 @@ export default function MarkdownEditor({
       {preview ? (
         <MarkdownView
           markdown={text}
-          textClass={{ MarkdownEditor__preview: true }}
+          textClass={{
+            'hyp-u-border': true,
+            'hyp-u-bg-color--grey-1': true,
+            'hyp-u-padding': true,
+          }}
           textStyle={textStyle}
         />
       ) : (
