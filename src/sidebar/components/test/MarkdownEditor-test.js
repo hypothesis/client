@@ -112,7 +112,7 @@ describe('MarkdownEditor', () => {
         const text = 'toolbar command test';
         const wrapper = createComponent({ text, onEditText });
         const button = wrapper.find(
-          `ToolbarButton[title="${command}"] > button`
+          `ToolbarButton[title="${command}"] > IconButton button`
         );
         const input = wrapper.find('textarea').getDOMNode();
         input.selectionStart = 0;
@@ -153,7 +153,7 @@ describe('MarkdownEditor', () => {
               test.setOs();
               const wrapper = createComponent();
               const button = wrapper.find(
-                `ToolbarButton[title="${command}"] > button`
+                `ToolbarButton[title="${command}"] > IconButton`
               );
 
               const buttonTitlePattern = new RegExp(
