@@ -4,7 +4,6 @@ import { ListenerCollection } from './listener-collection';
 import { isMessageEqual } from './port-util';
 
 /**
- * @typedef {import('../types/config').SidebarConfig} SidebarConfig
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('./port-util').Message} Message
  * @typedef {Message['channel']} Channel
@@ -12,18 +11,18 @@ import { isMessageEqual } from './port-util';
  */
 
 /**
- * PortProvider creates a `MessageChannel` for the communication between two
+ * PortProvider creates a `MessageChannel` for communication between two
  * frames.
  *
  * There are 4 types of frames:
  * - `host`: frame where the hypothesis client is initially loaded.
- * - `guest/s`: frame/s with annotatable content. In some instances the `guest`
+ * - `guest`: frames with annotatable content. In some instances a `guest`
  *    frame can be the same as the `host` frame, in other cases, it is an iframe
  *    where either (1) the hypothesis client has been injected or (2) the
  *    hypothesis client has been configured to act exclusively as a `guest` (not
  *    showing the sidebar).
- * - `notebook`: it is an another hypothesis app that runs on a separate iframe.
- * - `sidebar`: the main hypothesis app. It runs on an iframe on a different
+ * - `notebook`: another hypothesis app that runs in a separate iframe.
+ * - `sidebar`: the main hypothesis app. It runs in an iframe on a different
  *    origin than the host and is responsible for the communication with the
  *    backend (fetching and saving annotations).
  *
@@ -32,9 +31,9 @@ import { isMessageEqual } from './port-util';
  * `host` frame
  * |-> `sidebar` iframe
  * |-> `notebook` iframe
- * |-> [`guest` iframe/s]
+ * |-> [`guest` iframes]
  *
- * Currently, we support the communication between the following pair of frames:
+ * Currently, we support the communication between the following pairs of frames:
  * - `guest-host`
  * - `guest-sidebar`
  * - `host-sidebar`
@@ -46,16 +45,15 @@ import { isMessageEqual } from './port-util';
  * particular `MessagePort` and dispatches the corresponding `MessagePort`.
  *
  *
- *                 PortProvider                                       |                PortFinder
- * -------------------------------------------------------------------|------------------------------------------------------
- *
- * 2. listens to requests of `MessagePort` <---------------------------- 1. request a `MessagePort` using `window#postMessage`
- *                 |
- *                 V
- * 3. sends offers of `MessagePort` using `event#source#postMessage` ---> 4. listens to offers of `MessagePort`
- *                 |
- *                 V
- * 5. send reciprocal port to the `sidebar` frame using the `host-sidebar`
+ *        PortFinder (non-host frame)                 |       PortProvider (host frame)
+ * -----------------------------------------------------------------------------------------------
+ * 1. Request `MessagePort` via `window.postMessage` ---> 2. Receive request and create port pair
+ *                                                                          |
+ *                                                                          V
+ * 4. Receive requested port      <---------------------- 3. Send first port to requesting frame
+ *                                                        5. Send second port to other frame
+ *                                                           (eg. via MessageChannel connection
+ *                                                           between host and other frame)
  *
  * Channel nomenclature is `[frame1]-[frame2]` so that:
  *   - `port1` should be owned by/transferred to `frame1`, and
@@ -63,20 +61,6 @@ import { isMessageEqual } from './port-util';
  *
  * @implements Destroyable
  */
-
-/*
- * In some situations, because `guest` iframe/s load in parallel to the `host`
- * frame, we can not assume that the code in the `host` frame is executed before
- * the code in a `guest` frame. Hence, we can't assume that `PortProvider` (in
- * the `host` frame) is initialized before `PortFinder` (in the `guest` frame).
- * Therefore, for the `PortFinder`, we implement a polling strategy (sending a
- * message every N milliseconds) until a response is received.
- *
- * Two important characteristics of `MessagePort`:
- * - it can only be used by one frame: in Chrome the port is neutered if transferred twice
- * - messages are queued until the other port is ready to listen (`port.start()`)
- */
-
 export class PortProvider {
   /**
    * @param {string} hypothesisAppsOrigin - the origin of the hypothesis apps
@@ -95,6 +79,12 @@ export class PortProvider {
     // channel.
     /** @type {Map<Channel, Map<Window, MessageChannel>>} */
     this._channels = new Map();
+
+    // Two important characteristics of `MessagePort`:
+    // - Once created, a MessagePort can only be transferred to a different
+    //   frame once, and if any frame attempts to transfer it again it gets
+    //   neutered.
+    // - Messages are queued until the other port is ready to listen (`port.start()`)
 
     // Create the `host-sidebar` channel immediately, while other channels are
     // created on demand
@@ -129,11 +119,7 @@ export class PortProvider {
       return false;
     }
 
-    if (!isMessageEqual(data, allowedMessage)) {
-      return false;
-    }
-
-    return true;
+    return isMessageEqual(data, allowedMessage);
   }
 
   /**
@@ -141,30 +127,32 @@ export class PortProvider {
    *
    * @param {MessageEvent} event
    * @param {Message} message - the message to be sent.
-   * @param {MessagePort} port - the port to be sent via `window#postMessage`
-   *   (the origin is set to match the MessageEvent's origin)frame that sends the initial request th
-   * @param {MessagePort} [reciprocalPort] - if a reciprocal port is provided,
-   *   send this port (1) to the `sidebar` frame using the `host-sidebar`
+   * @param {MessagePort} port - the port requested.
+   * @param {MessagePort} [counterpartPort] - if a counterpart port is provided,
+   *   send this port either, (1) to the `sidebar` frame using the `host-sidebar`
    *   channel or (2) through the `onHostPortRequest` event listener.
    */
-  _sendPort(event, message, port, reciprocalPort) {
+  _sendPort(event, message, port, counterpartPort) {
     const source = /** @type {Window} */ (event.source);
 
     source.postMessage(message, event.origin, [port]);
 
-    if (reciprocalPort) {
-      if (['notebook-sidebar', 'guest-sidebar'].includes(message.channel)) {
-        this._hostSidebarChannel.port1.postMessage(message, [reciprocalPort]);
-      }
-      if (message.channel === 'guest-host' && message.port === 'guest') {
-        this._emitter.emit('hostPortRequest', reciprocalPort, message.port);
-      }
+    if (!counterpartPort) {
+      return;
+    }
+
+    if (['notebook-sidebar', 'guest-sidebar'].includes(message.channel)) {
+      this._hostSidebarChannel.port1.postMessage(message, [counterpartPort]);
+    }
+
+    if (message.channel === 'guest-host' && message.port === 'guest') {
+      this._emitter.emit('hostPortRequest', message.port, counterpartPort);
     }
   }
 
   /**
    * @param {'hostPortRequest'} eventName
-   * @param {(MessagePort, channel: 'guest') => void} handler - this handler
+   * @param {(source: 'guest', port: MessagePort) => void} handler - this handler
    *   fires when a request for the 'guest-host' channel is listened.
    */
   on(eventName, handler) {
@@ -173,7 +161,7 @@ export class PortProvider {
 
   /**
    * Returns a port from a channel. Currently, only returns the `host` port from
-   * the `host-Sidebar` channel. Otherwise, it returns `null`.
+   * the `host-sidebar` channel. Otherwise, it returns `null`.
    *
    * @param {object} options
    *   @param {'host-sidebar'} options.channel
@@ -238,7 +226,7 @@ export class PortProvider {
         let messageChannel = windowChannelMap.get(eventSource);
 
         // Ignore the port request if the channel for the specified window has
-        // already been created. This is to avoid transfer the port more than once.
+        // already been created. This is to avoid transfering the port more than once.
         if (messageChannel) {
           return;
         }

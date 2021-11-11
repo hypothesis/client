@@ -1,10 +1,12 @@
 import { delay } from '../../test-util/wait';
 import { PortFinder } from '../port-finder';
 
+const MAX_WAIT_FOR_PORT = 1000 * 5;
+
 describe('PortFinder', () => {
   let portFinder;
 
-  function sendMessage({ data, ports = [] }) {
+  function portProviderOffer({ data, ports = [] }) {
     const event = new MessageEvent('message', {
       data,
       ports,
@@ -42,11 +44,11 @@ describe('PortFinder', () => {
           })
           .catch(e => (error = e));
         portFinder.destroy();
-        sendMessage({
+        portProviderOffer({
           data: { channel, port, source: 'hypothesis', type: 'offer' },
           ports: [port1],
         });
-        clock.tick(30000);
+        clock.tick(MAX_WAIT_FOR_PORT);
       } finally {
         clock.restore();
       }
@@ -98,7 +100,7 @@ describe('PortFinder', () => {
             port,
           })
           .then(port => (resolvedPort = port));
-        sendMessage({
+        portProviderOffer({
           data: { channel, port, source: 'hypothesis', type: 'offer' },
           ports: [port1],
         });
@@ -108,7 +110,7 @@ describe('PortFinder', () => {
       })
     );
 
-    it("timeouts if host doesn't respond", async () => {
+    it("times out if host doesn't respond", async () => {
       let error;
       const channel = 'host-sidebar';
       const port = 'sidebar';
@@ -122,12 +124,12 @@ describe('PortFinder', () => {
             port,
           })
           .catch(e => (error = e));
-        clock.tick(30000);
+        clock.tick(MAX_WAIT_FOR_PORT);
       } finally {
         clock.restore();
       }
 
-      assert.callCount(window.postMessage, 121);
+      assert.callCount(window.postMessage, 21);
       assert.alwaysCalledWithExactly(
         window.postMessage,
         { channel, port, source: 'hypothesis', type: 'request' },
