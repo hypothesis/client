@@ -16,7 +16,7 @@ export class ListenerCollection {
   }
 
   /**
-   * Adds a listener and returns a listenerId
+   * Add a listener and return an ID that can be used to remove it later
    *
    * @param {Listener['eventTarget']} eventTarget
    * @param {Listener['eventType']} eventType
@@ -31,7 +31,8 @@ export class ListenerCollection {
   }
 
   /**
-   * Removes a listener using a listenerId
+   * Remove a listener using a listenerId
+   *
    * @param {Symbol} listenerId
    */
   remove(listenerId) {

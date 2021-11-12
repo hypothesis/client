@@ -22,7 +22,7 @@ describe('ListenerCollection', () => {
   });
 
   describe('#remove', () => {
-    it('unregisters some event listeners', () => {
+    it('unregisters the specified listener', () => {
       const listener1 = sinon.stub();
       const listener2 = sinon.stub();
       listeners.add(window, 'resize', listener1);
