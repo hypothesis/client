@@ -1,8 +1,4 @@
-@use '@hypothesis/frontend-shared/styles/components/buttons';
-
-@use '../mixins/layout';
 @use '../mixins/molecules';
-@use '../mixins/utils';
 @use '../variables' as var;
 
 $adder-transition-duration: 80ms;
@@ -15,12 +11,9 @@ $adder-transition-duration: 80ms;
   // Adder, even when using Shadow DOM.
   all: initial;
 
-  @include utils.border;
-
   position: absolute;
   box-sizing: border-box;
   direction: ltr;
-  background: var.$color-background;
   border-radius: var.$annotator-border-radius;
 
   // Prevent the browser from selecting text in the adder itself during text
@@ -79,14 +72,9 @@ $adder-transition-duration: 80ms;
   }
 }
 
-.AdderToolbar__actions {
-  @include layout.row;
-}
-
 .AdderToolbar__badge {
   // The badge should be vertically aligned with icons in other toolbar buttons
   // and the label underneath should also align with labels in other buttons.
-  background-color: var.$grey-mid;
   border-radius: var.$annotator-border-radius;
   color: var.$color-text--inverted;
   font-weight: bold;
@@ -95,10 +83,8 @@ $adder-transition-duration: 80ms;
 }
 
 .AdderToolbar__separator {
-  margin: var.$layout-space--xxsmall;
-  @include utils.border--right;
   // Override border color to be a little darker
-  border-color: var.$grey-4;
+  border-right: 1px solid var.$grey-4;
 }
 
 // The toolbar has full contrast when not hovered. When the toolbar is hovered,

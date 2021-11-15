@@ -26,6 +26,9 @@
 @use './components/Toolbar';
 @use './components/WarningBanner';
 
+// Make the shared package utility styles available
+@use '@hypothesis/frontend-shared/styles/util';
+
 // Styles for all top-level elements in shadow roots.
 :host > * {
   font-family: var.$sans-font-family;
