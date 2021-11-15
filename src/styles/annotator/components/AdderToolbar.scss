@@ -55,6 +55,10 @@ $adder-transition-duration: 80ms;
   // Horizontal centering, part 1
   left: 50%;
 
+  // Override `Icon` default 1em sizing
+  height: auto;
+  width: auto;
+
   &--down {
     // These transforms:
     // 1) Reimplement the "down" variant of the menu-arrow mixin,
