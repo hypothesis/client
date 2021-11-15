@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
+import { LabeledButton, Icon } from '@hypothesis/frontend-shared';
 
 import { useShortcut } from '../../shared/shortcut';
 
@@ -109,10 +109,9 @@ export default function AdderToolbar({
           />
         )}
       </div>
-      <SvgIcon
+      <Icon
         name="pointer"
-        inline={true}
-        className={classnames('AdderToolbar__arrow', {
+        classes={classnames('AdderToolbar__arrow', {
           'AdderToolbar__arrow--down': arrowDirection === 'down',
           'AdderToolbar__arrow--up': arrowDirection === 'up',
         })}
