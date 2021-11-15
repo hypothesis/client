@@ -6,8 +6,8 @@ import { isMessageEqual } from './port-util';
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('./port-util').Message} Message
- * @typedef {Message['channel']} Channel
- * @typedef {Message['port']} Port
+ * @typedef {import('./port-util').Frame} Frame
+ * @typedef {'guest-host'|'guest-sidebar'|'notebook-sidebar'|'sidebar-host'} Channel
  */
 
 /**
@@ -36,8 +36,8 @@ import { isMessageEqual } from './port-util';
  * Currently, we support communication between the following pairs of frames:
  * - `guest-host`
  * - `guest-sidebar`
- * - `host-sidebar`
  * - `notebook-sidebar`
+ * - `sidebar-host`
  *
  * `PortProvider` is used only in the `host` frame. The other frames use the
  * companion class, `PortFinder`. `PortProvider` creates a `MessageChannel`
@@ -55,10 +55,6 @@ import { isMessageEqual } from './port-util';
  *                                                           (eg. via MessageChannel connection
  *                                                           between host and other frame)
  *
- * Channel nomenclature is `[frame1]-[frame2]` so that:
- *   - `port1` should be owned by/transferred to `frame1`, and
- *   - `port2` should be owned by/transferred to `frame2`
- *
  * @implements Destroyable
  */
 export class PortProvider {
@@ -73,10 +69,8 @@ export class PortProvider {
 
     // Although some channels (v.gr. `notebook-sidebar`) have only one
     // `MessageChannel`, other channels (v.gr. `guest-sidebar`) can have multiple
-    // `MessageChannel`s. In spite of the number channel, we store all
-    // `MessageChannel` on a `Map<Window, MessageChannel>`. The `Window` refers
-    // to the frame that sends the initial request that triggers creation of a
-    // channel.
+    // `MessageChannel`s. The `Window` refers to the frame that sends the initial
+    // request that triggers creation of a channel.
     /** @type {Map<Channel, Map<Window, MessageChannel>>} */
     this._channels = new Map();
 
@@ -86,36 +80,80 @@ export class PortProvider {
     //   neutered.
     // - Messages are queued until the other port is ready to listen (`port.start()`)
 
-    // Create the `host-sidebar` channel immediately, while other channels are
+    // Create the `sidebar-host` channel immediately, while other channels are
     // created on demand
-    this._hostSidebarChannel = new MessageChannel();
+    this._sidebarHostChannel = new MessageChannel();
 
     this._listeners = new ListenerCollection();
+
+    /** @type {Array<Message & {allowedOrigin: string}>} */
+    this._allowedMessages = [
+      {
+        allowedOrigin: '*',
+        authority: 'hypothesis',
+        frame1: 'guest',
+        frame2: 'host',
+        type: 'request',
+      },
+      {
+        allowedOrigin: '*',
+        authority: 'hypothesis',
+        frame1: 'guest',
+        frame2: 'sidebar',
+        type: 'request',
+      },
+      {
+        allowedOrigin: this._hypothesisAppsOrigin,
+        authority: 'hypothesis',
+        frame1: 'sidebar',
+        frame2: 'host',
+        type: 'request',
+      },
+      {
+        allowedOrigin: this._hypothesisAppsOrigin,
+        authority: 'hypothesis',
+        frame1: 'notebook',
+        frame2: 'sidebar',
+        type: 'request',
+      },
+    ];
   }
 
   /**
-   * Checks the `postMessage` origin and message.
+   * Check that source is of type Window.
    *
-   * @param {MessageEvent} event
-   * @param {Message} allowedMessage - the MessageEvent's data must match this
-   *   object to grant the port.
-   * @param {string} allowedOrigin - the MessageEvent's origin must match this
-   *   value to grant the port. If '*' allow all origins.
+   * @param {MessageEventSource|null} source
+   * @return {source is Window}
    */
-  _isValidRequest(event, allowedMessage, allowedOrigin) {
-    const { data, origin, source } = event;
-    if (allowedOrigin !== '*' && origin !== allowedOrigin) {
-      return false;
-    }
-
+  _isSourceWindow(source) {
     if (
       // `source` can be of type Window | MessagePort | ServiceWorker.
       // The simple check `source instanceof Window`` doesn't work here.
       // Alternatively, `source` could be casted `/** @type{Window} */ (source)`
-      !source ||
+      source === null ||
       source instanceof MessagePort ||
       source instanceof ServiceWorker
     ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Check that data and origin matches the expected values.
+   *
+   * @param {object} options
+   *   @param {Message} options.allowedMessage - the `data` must match this
+   *     `Message`.
+   *   @param {string} options.allowedOrigin - the `origin` must match this
+   *     value. If `allowedOrigin` is '*', the origin is ignored.
+   *   @param {any} options.data - the data to be compared with `allowedMessage`.
+   *   @param {string} options.origin - the origin to be compared with
+   *     `allowedOrigin`.
+   */
+  _messageMatches({ allowedMessage, allowedOrigin, data, origin }) {
+    if (allowedOrigin !== '*' && origin !== allowedOrigin) {
       return false;
     }
 
@@ -125,28 +163,31 @@ export class PortProvider {
   /**
    * Send a message and a port to the corresponding destinations.
    *
-   * @param {MessageEvent} event
-   * @param {Message} message - the message to be sent.
-   * @param {MessagePort} port - the port requested.
-   * @param {MessagePort} [counterpartPort] - if a counterpart port is provided,
-   *   send this port either, (1) to the `sidebar` frame using the `host-sidebar`
-   *   channel or (2) through the `onHostPortRequest` event listener.
+   * @param {object} options
+   *   @param {Channel} options.channel - communication channel enabled by this
+   *     port.
+   *   @param {Message} options.message - the message to be sent.
+   *   @param {string} options.origin - the target origin to be used for sending
+   *     the port.
+   *   @param {Window} options.source - the frame to be used for sending the port.
+   *   @param {MessagePort} options.port1 - the port to be sent.
+   *   @param {MessagePort} [options.port2] - if a counterpart port is provided,
+   *     send this port either, (1) to the `sidebar` frame using the `sidebar-host`
+   *     channel or (2) through the `onHostPortRequest` event listener.
    */
-  _sendPort(event, message, port, counterpartPort) {
-    const source = /** @type {Window} */ (event.source);
+  _sendPort({ channel, message, origin, source, port1, port2 }) {
+    source.postMessage(message, origin, [port1]);
 
-    source.postMessage(message, event.origin, [port]);
-
-    if (!counterpartPort) {
+    if (!port2) {
       return;
     }
 
-    if (['notebook-sidebar', 'guest-sidebar'].includes(message.channel)) {
-      this._hostSidebarChannel.port1.postMessage(message, [counterpartPort]);
+    if (['notebook-sidebar', 'guest-sidebar'].includes(channel)) {
+      this._sidebarHostChannel.port2.postMessage(message, [port2]);
     }
 
-    if (message.channel === 'guest-host' && message.port === 'guest') {
-      this._emitter.emit('hostPortRequest', message.port, counterpartPort);
+    if (channel === 'guest-host' && message.frame1 === 'guest') {
+      this._emitter.emit('hostPortRequest', message.frame1, port2);
     }
   }
 
@@ -160,19 +201,10 @@ export class PortProvider {
   }
 
   /**
-   * Returns a port from a channel. Currently, only returns the `host` port from
-   * the `host-sidebar` channel. Otherwise, it returns `null`.
-   *
-   * @param {object} options
-   *   @param {'host-sidebar'} options.channel
-   *   @param {'host'} options.port
+   * Returns the `host` port from the `sidebar-host` channel.
    */
-  getPort({ channel, port }) {
-    if (channel === 'host-sidebar' && port === 'host') {
-      return this._hostSidebarChannel.port1;
-    }
-
-    return null;
+  get sidebarPort() {
+    return this._sidebarHostChannel.port2;
   }
 
   /**
@@ -180,74 +212,65 @@ export class PortProvider {
    */
   listen() {
     this._listeners.add(window, 'message', messageEvent => {
-      const event = /** @type {MessageEvent} */ (messageEvent);
-      /** @type {Array<{allowedOrigin: string, channel: Channel, port: Port}>} */
-      ([
-        {
-          allowedOrigin: '*',
-          channel: 'guest-host',
-          port: 'guest',
-        },
-        {
-          allowedOrigin: '*',
-          channel: 'guest-sidebar',
-          port: 'guest',
-        },
-        {
-          allowedOrigin: this._hypothesisAppsOrigin,
-          channel: 'host-sidebar',
-          port: 'sidebar',
-        },
-        {
-          allowedOrigin: this._hypothesisAppsOrigin,
-          channel: 'notebook-sidebar',
-          port: 'notebook',
-        },
-      ]).forEach(({ allowedOrigin, channel, port }) => {
-        /** @type {Message} */
-        const allowedMessage = {
-          channel,
-          port,
-          source: 'hypothesis',
-          type: 'request',
-        };
+      const { data, origin, source } = /** @type {MessageEvent} */ (
+        messageEvent
+      );
 
-        if (!this._isValidRequest(event, allowedMessage, allowedOrigin)) {
-          return;
-        }
+      if (!this._isSourceWindow(source)) {
+        return;
+      }
 
-        let windowChannelMap = this._channels.get(channel);
-        if (!windowChannelMap) {
-          windowChannelMap = new Map();
-          this._channels.set(channel, windowChannelMap);
-        }
+      const match = this._allowedMessages.find(
+        ({ allowedOrigin, ...allowedMessage }) =>
+          this._messageMatches({
+            allowedMessage,
+            allowedOrigin,
+            data,
+            origin,
+          })
+      );
 
-        const eventSource = /** @type {Window} */ (event.source);
-        let messageChannel = windowChannelMap.get(eventSource);
+      if (match === undefined) {
+        return;
+      }
 
-        // Ignore the port request if the channel for the specified window has
-        // already been created. This is to avoid transfering the port more than once.
-        if (messageChannel) {
-          return;
-        }
+      const { authority, frame1, frame2 } = match;
+      const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
 
-        /** @type {Message} */
-        const message = { ...allowedMessage, type: 'offer' };
+      let windowChannelMap = this._channels.get(channel);
+      if (!windowChannelMap) {
+        windowChannelMap = new Map();
+        this._channels.set(channel, windowChannelMap);
+      }
 
-        // `host-sidebar` channel is an special case, because it is created in the
-        // constructor.
-        if (channel === 'host-sidebar') {
-          windowChannelMap.set(eventSource, this._hostSidebarChannel);
-          this._sendPort(event, message, this._hostSidebarChannel.port2);
-          return;
-        }
+      let messageChannel = windowChannelMap.get(source);
 
-        messageChannel = new MessageChannel();
-        windowChannelMap.set(eventSource, messageChannel);
+      // Ignore the port request if the channel for the specified window has
+      // already been created. This is to avoid transferring the port more than once.
+      if (messageChannel) {
+        return;
+      }
 
-        const { port1, port2 } = messageChannel;
-        this._sendPort(event, message, port1, port2);
-      });
+      /** @type {Message} */
+      const message = { authority, frame1, frame2, type: 'offer' };
+      const options = { channel, message, origin, source };
+
+      // `sidebar-host` channel is an special case, because it is created in the
+      // constructor.
+      if (channel === 'sidebar-host') {
+        windowChannelMap.set(source, this._sidebarHostChannel);
+        this._sendPort({
+          port1: this._sidebarHostChannel.port1,
+          ...options,
+        });
+        return;
+      }
+
+      messageChannel = new MessageChannel();
+      windowChannelMap.set(source, messageChannel);
+
+      const { port1, port2 } = messageChannel;
+      this._sendPort({ port1, port2, ...options });
     });
   }
 
