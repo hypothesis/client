@@ -15,7 +15,7 @@ import { isMessageEqual } from './port-util';
  * frames.
  *
  * There are 4 types of frames:
- * - `host`: frame where the hypothesis client is initially loaded.
+ * - `host`: frame where the Hypothesis client is initially loaded.
  * - `guest`: frames with annotatable content. In some instances a `guest`
  *    frame can be the same as the `host` frame, in other cases, it is an iframe
  *    where either (1) the hypothesis client has been injected or (2) the
@@ -33,7 +33,7 @@ import { isMessageEqual } from './port-util';
  * |-> `notebook` iframe
  * |-> [`guest` iframes]
  *
- * Currently, we support the communication between the following pairs of frames:
+ * Currently, we support communication between the following pairs of frames:
  * - `guest-host`
  * - `guest-sidebar`
  * - `host-sidebar`
@@ -65,7 +65,7 @@ export class PortProvider {
   /**
    * @param {string} hypothesisAppsOrigin - the origin of the hypothesis apps
    *   is use to send the notebook and sidebar ports to only the frames that
-   *   matches the origin.
+   *   match the origin.
    */
   constructor(hypothesisAppsOrigin) {
     this._hypothesisAppsOrigin = hypothesisAppsOrigin;

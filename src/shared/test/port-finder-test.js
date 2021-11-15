@@ -28,7 +28,7 @@ describe('PortFinder', () => {
   });
 
   describe('#destroy', () => {
-    it('ignores `offer` messages of ports', async () => {
+    it('ignores subsequent `offer` messages of ports', async () => {
       let error;
       const channel = 'host-sidebar';
       const port = 'sidebar';
