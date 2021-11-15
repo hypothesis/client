@@ -79,23 +79,6 @@ $adder-transition-duration: 80ms;
   @include layout.row;
 }
 
-.AdderToolbar__button {
-  @include layout.column($align: center);
-  @include buttons.reset;
-
-  cursor: pointer;
-  color: var.$grey-mid;
-  font-size: var.$annotator-adder-font-size;
-  line-height: var.$annotator-adder-line-height;
-  padding: var.$layout-space--small;
-  transition: color $adder-transition-duration;
-}
-
-.AdderToolbar__label {
-  margin-top: var.$layout-space--xxsmall;
-  transition: color $adder-transition-duration;
-}
-
 .AdderToolbar__badge {
   // The badge should be vertically aligned with icons in other toolbar buttons
   // and the label underneath should also align with labels in other buttons.
@@ -103,7 +86,7 @@ $adder-transition-duration: 80ms;
   border-radius: var.$annotator-border-radius;
   color: var.$color-text--inverted;
   font-weight: bold;
-  // For positioning the number appropriately withint the badge background
+  // For positioning the number appropriately within the badge background
   padding: 2px 4px;
 }
 
