@@ -24,7 +24,9 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
       title={title}
     >
       {typeof badgeCount === 'number' && (
-        <span className="AdderToolbar__badge">{badgeCount}</span>
+        <span className="hyp-u-bg-color--grey-7 AdderToolbar__badge">
+          {badgeCount}
+        </span>
       )}
       <span className="LabeledIconButton__label">{label}</span>
     </LabeledButton>
@@ -79,14 +81,18 @@ export default function AdderToolbar({
   // so that we can compute its size in order to position it before display.
   return (
     <div
-      className={classnames('AdderToolbar', {
-        'AdderToolbar--down': arrowDirection === 'up',
-        'AdderToolbar--up': arrowDirection === 'down',
-        'is-active': isVisible,
-      })}
+      className={classnames(
+        'hyp-u-border hyp-u-bg-color--white',
+        'AdderToolbar',
+        {
+          'AdderToolbar--down': arrowDirection === 'up',
+          'AdderToolbar--up': arrowDirection === 'down',
+          'is-active': isVisible,
+        }
+      )}
       style={{ visibility: isVisible ? 'visible' : 'hidden' }}
     >
-      <div className="AdderToolbar__actions">
+      <div className="hyp-u-layout-row AdderToolbar__actions">
         <ToolbarButton
           icon="annotate"
           onClick={() => onCommand('annotate')}
@@ -99,7 +105,9 @@ export default function AdderToolbar({
           label="Highlight"
           shortcut={highlightShortcut}
         />
-        {annotationCount > 0 && <div className="AdderToolbar__separator" />}
+        {annotationCount > 0 && (
+          <div className="hyp-u-margin--2 AdderToolbar__separator" />
+        )}
         {annotationCount > 0 && (
           <ToolbarButton
             badgeCount={annotationCount}
