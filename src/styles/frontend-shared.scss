@@ -33,6 +33,32 @@
   }
 }
 
+// Used in the AdderToolbar, a transparent button that has an icon and a small
+// label below the icon
+.LabeledIconButton {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  &:hover:not([disabled]) {
+    background-color: transparent;
+  }
+
+  cursor: pointer;
+  font-weight: normal;
+  font-size: var.$annotator-adder-font-size;
+  line-height: var.$annotator-adder-line-height;
+  padding: var.$layout-space--small;
+  transition: color 80ms;
+  background: transparent;
+
+  &__label {
+    margin-top: var.$layout-space--xxsmall;
+    transition: color 80ms;
+  }
+}
+
 // Override any background color on a LabeledButton
 .TransparentButton {
   background-color: transparent;

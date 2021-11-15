@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { LabeledButton, SvgIcon } from '@hypothesis/frontend-shared';
 
 import { useShortcut } from '../../shared/shortcut';
 
@@ -17,18 +17,17 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
   const title = shortcut ? `${label} (${shortcut})` : label;
 
   return (
-    <button
-      className="AdderToolbar__button"
+    <LabeledButton
+      classes="LabeledIconButton AdderToolbar__button"
+      icon={icon}
       onClick={onClick}
-      aria-label={title}
       title={title}
     >
-      {icon && <SvgIcon name={icon} className="AdderToolbar__icon" />}
       {typeof badgeCount === 'number' && (
         <span className="AdderToolbar__badge">{badgeCount}</span>
       )}
-      <span className="AdderToolbar__label">{label}</span>
-    </button>
+      <span className="LabeledIconButton__label">{label}</span>
+    </LabeledButton>
   );
 }
 
