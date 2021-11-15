@@ -208,7 +208,7 @@ describe('PortProvider', () => {
       );
     });
 
-    it('responds to the first valid port request, ignore additional requests', async () => {
+    it('responds to the first valid port request but ignores additional requests', async () => {
       const data = {
         channel: 'guest-host',
         port: 'guest',
