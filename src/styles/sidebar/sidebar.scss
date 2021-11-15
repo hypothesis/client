@@ -11,7 +11,7 @@
 @use '@hypothesis/frontend-shared/styles';
 
 // Extensions and overrides to patterns from `frontend-shared`
-@use './frontend-shared';
+@use '../frontend-shared';
 
 // Local patterns
 @use '../patterns';
