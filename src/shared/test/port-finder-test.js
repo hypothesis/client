@@ -4,9 +4,19 @@ import { PortFinder } from '../port-finder';
 const MAX_WAIT_FOR_PORT = 1000 * 5;
 
 describe('PortFinder', () => {
+  const authority = 'hypothesis';
+  const frame1 = 'guest';
+  const type = 'offer';
   let portFinder;
+  let portFinders;
 
-  function portProviderOffer({ data, ports = [] }) {
+  function createPortFinder(source = frame1) {
+    const instance = new PortFinder({ hostFrame: window, source });
+    portFinders.push(instance);
+    return instance;
+  }
+
+  function sendPortProviderOffer({ data, ports = [] }) {
     const event = new MessageEvent('message', {
       data,
       ports,
@@ -18,34 +28,35 @@ describe('PortFinder', () => {
   }
 
   beforeEach(() => {
+    portFinders = [];
     sinon.stub(window, 'postMessage');
-    portFinder = new PortFinder();
+    portFinder = createPortFinder();
   });
 
   afterEach(() => {
     window.postMessage.restore();
-    portFinder.destroy();
+    portFinders.forEach(instance => instance.destroy());
   });
 
   describe('#destroy', () => {
     it('ignores subsequent `offer` messages of ports', async () => {
       let error;
-      const channel = 'host-sidebar';
-      const port = 'sidebar';
+      const target = 'host';
       const { port1 } = new MessageChannel();
       const clock = sinon.useFakeTimers();
 
       try {
-        portFinder
-          .discover({
-            channel,
-            hostFrame: window,
-            port,
-          })
-          .catch(e => (error = e));
+        portFinder.discover(target).catch(e => (error = e));
+
         portFinder.destroy();
-        portProviderOffer({
-          data: { channel, port, source: 'hypothesis', type: 'offer' },
+
+        sendPortProviderOffer({
+          data: {
+            authority,
+            frame1,
+            frame2: target,
+            type,
+          },
           ports: [port1],
         });
         clock.tick(MAX_WAIT_FOR_PORT);
@@ -57,25 +68,17 @@ describe('PortFinder', () => {
 
       assert.equal(
         error.message,
-        "Unable to find 'sidebar' port on 'host-sidebar' channel"
+        'Unable to establish guest-host communication channel'
       );
     });
   });
 
   describe('#discover', () => {
-    [
-      { channel: 'invalid', port: 'guest' },
-      { channel: 'guest-host', port: 'invalid' },
-      { channel: 'guest-host', port: 'host' },
-    ].forEach(({ channel, port }) =>
+    ['guest', 'invalid'].forEach(target =>
       it('rejects if requesting an invalid port', async () => {
         let error;
         try {
-          await portFinder.discover({
-            channel,
-            hostFrame: window,
-            port,
-          });
+          await portFinder.discover(target);
         } catch (e) {
           error = e;
         }
@@ -84,24 +87,24 @@ describe('PortFinder', () => {
     );
 
     [
-      { channel: 'guest-host', port: 'guest' },
-      { channel: 'guest-sidebar', port: 'guest' },
-      { channel: 'host-sidebar', port: 'sidebar' },
-      { channel: 'notebook-sidebar', port: 'notebook' },
-    ].forEach(({ channel, port }) =>
+      { source: 'guest', target: 'host' },
+      { source: 'guest', target: 'sidebar' },
+      { source: 'sidebar', target: 'host' },
+      { source: 'notebook', target: 'sidebar' },
+    ].forEach(({ source, target }) =>
       it('resolves if requesting a valid port', async () => {
         const { port1 } = new MessageChannel();
         let resolvedPort;
+        portFinder = createPortFinder(source);
 
-        portFinder
-          .discover({
-            channel,
-            hostFrame: window,
-            port,
-          })
-          .then(port => (resolvedPort = port));
-        portProviderOffer({
-          data: { channel, port, source: 'hypothesis', type: 'offer' },
+        portFinder.discover(target).then(port => (resolvedPort = port));
+        sendPortProviderOffer({
+          data: {
+            authority,
+            frame1: source,
+            frame2: target,
+            type,
+          },
           ports: [port1],
         });
         await delay(0);
@@ -112,18 +115,11 @@ describe('PortFinder', () => {
 
     it("times out if host doesn't respond", async () => {
       let error;
-      const channel = 'host-sidebar';
-      const port = 'sidebar';
+      const target = 'host';
       const clock = sinon.useFakeTimers();
 
       try {
-        portFinder
-          .discover({
-            channel,
-            hostFrame: window,
-            port,
-          })
-          .catch(e => (error = e));
+        portFinder.discover(target).catch(e => (error = e));
         clock.tick(MAX_WAIT_FOR_PORT);
       } finally {
         clock.restore();
@@ -132,7 +128,7 @@ describe('PortFinder', () => {
       assert.callCount(window.postMessage, 21);
       assert.alwaysCalledWithExactly(
         window.postMessage,
-        { channel, port, source: 'hypothesis', type: 'request' },
+        { authority, frame1, frame2: target, type: 'request' },
         '*'
       );
 
@@ -140,7 +136,7 @@ describe('PortFinder', () => {
 
       assert.equal(
         error.message,
-        "Unable to find 'sidebar' port on 'host-sidebar' channel"
+        'Unable to establish guest-host communication channel'
       );
     });
   });

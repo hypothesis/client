@@ -3,20 +3,19 @@
 // message and avoid listening to messages that could have the same properties
 // but different source. This is not a security feature but an
 // anti-collision mechanism.
-const SOURCE = 'hypothesis';
+const AUTHORITY = 'hypothesis';
 
 /**
  * These types are the used in by `PortProvider` and `PortFinder` for the
  * inter-frame discovery and communication processes.
  *
- * @typedef {'guest-host'|'guest-sidebar'|'host-sidebar'|'notebook-sidebar'} Channel
- * @typedef {'guest'|'host'|'notebook'|'sidebar'} Port
+ * @typedef {'guest'|'host'|'notebook'|'sidebar'} Frame
  *
  * @typedef Message
- * @prop {Channel} channel
- * @prop {Port} port
- * @prop {'offer'|'request'}  type
- * @prop {SOURCE} source -
+ * @prop {AUTHORITY} authority
+ * @prop {Frame} frame1
+ * @prop {Frame} frame2
+ * @prop {'offer'|'request'} type
  */
 
 /**
@@ -26,18 +25,18 @@ const SOURCE = 'hypothesis';
  * @param {any} data
  * @return {data is Message}
  */
-function isMessageValid(data) {
+function isMessage(data) {
   if (data === null || typeof data !== 'object') {
     return false;
   }
 
-  for (let property of ['channel', 'port', 'source', 'type']) {
+  for (let property of ['frame1', 'frame2', 'type']) {
     if (typeof data[property] !== 'string') {
       return false;
     }
   }
 
-  return data.source === SOURCE;
+  return data.authority === AUTHORITY;
 }
 
 /**
@@ -47,7 +46,7 @@ function isMessageValid(data) {
  * @param {Message} message
  */
 export function isMessageEqual(data, message) {
-  if (!isMessageValid(data)) {
+  if (!isMessage(data)) {
     return false;
   }
 

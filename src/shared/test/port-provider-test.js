@@ -1,12 +1,12 @@
 import { delay } from '../../test-util/wait';
 import { PortProvider } from '../port-provider';
 
-const source = 'hypothesis';
+const authority = 'hypothesis';
 
 describe('PortProvider', () => {
   let portProvider;
 
-  function portFinderRequest({
+  async function sendPortFinderRequest({
     data,
     origin = window.location.origin,
     source = window,
@@ -18,6 +18,7 @@ describe('PortProvider', () => {
     });
 
     window.dispatchEvent(event);
+    await delay(0);
 
     return event;
   }
@@ -25,7 +26,6 @@ describe('PortProvider', () => {
   beforeEach(() => {
     sinon.stub(window, 'postMessage');
     portProvider = new PortProvider(window.location.origin);
-    portProvider.listen();
   });
 
   afterEach(() => {
@@ -36,97 +36,76 @@ describe('PortProvider', () => {
   describe('#destroy', () => {
     it('ignores valid port request if `PortFinder` has been destroyed', async () => {
       portProvider.destroy();
-      portFinderRequest({
+      await sendPortFinderRequest({
         data: {
-          channel: 'host-sidebar',
-          port: 'sidebar',
-          source,
+          authority,
+          frame1: 'sidebar',
+          frame2: 'host',
           type: 'request',
         },
       });
-      await delay(0);
 
       assert.notCalled(window.postMessage);
     });
   });
 
-  describe('#getPort', () => {
-    it('returns `null` if called with wrong arguments', () => {
-      let hostPort;
-
-      // Incorrect channel
-      hostPort = portProvider.getPort({
-        channel: 'notebook-sidebar',
-        port: 'host',
-      });
-      assert.isNull(hostPort);
-
-      // Incorrect port
-      hostPort = portProvider.getPort({
-        channel: 'host-sidebar',
-        port: 'sidebar',
-      });
-      assert.isNull(hostPort);
-    });
-
-    it('returns the `host` port of the `host-sidebar` channel if called with the right arguments', () => {
-      const hostPort = portProvider.getPort({
-        channel: 'host-sidebar',
-        port: 'host',
-      });
-      assert.exists(hostPort);
+  describe('#sidebarPort', () => {
+    it('returns the `host` port of the `sidebar-host` channel', () => {
+      assert.instanceOf(portProvider.sidebarPort, MessagePort);
     });
   });
 
   describe('#listen', () => {
     it('ignores all port requests before `listen` is called', async () => {
+      portProvider.listen();
       portProvider.destroy();
       portProvider = new PortProvider(window.location.origin);
       const data = {
-        channel: 'host-sidebar',
-        port: 'sidebar',
-        source,
+        authority,
+        frame1: 'sidebar',
+        frame2: 'host',
         type: 'request',
       };
-      portFinderRequest({
+      await sendPortFinderRequest({
         data,
       });
-      await delay(0);
 
       assert.notCalled(window.postMessage);
 
       portProvider.listen();
-      portFinderRequest({
+      await sendPortFinderRequest({
         data,
       });
-      await delay(0);
 
       assert.calledOnce(window.postMessage);
     });
   });
 
   describe('listens for port requests', () => {
-    it('ignores port requests with invalid sources', async () => {
-      const data = {
-        channel: 'host-sidebar',
-        port: 'sidebar',
-        source,
-        type: 'request',
-      };
-
-      portFinderRequest({
-        data,
-        source: null,
-      });
-
-      portFinderRequest({
-        data,
+    [
+      { source: null, reason: 'source is null' },
+      {
         source: new MessageChannel().port1,
-      });
-      await delay(0);
+        reason: 'source is a MessageChannel',
+      },
+    ].forEach(({ source, reason }) =>
+      it(`ignores port requests if ${reason}`, async () => {
+        portProvider.listen();
+        const data = {
+          authority,
+          frame1: 'sidebar',
+          frame2: 'host',
+          type: 'request',
+        };
 
-      assert.notCalled(window.postMessage);
-    });
+        await sendPortFinderRequest({
+          data,
+          source,
+        });
+
+        assert.notCalled(window.postMessage);
+      })
+    );
 
     [
       // Disabled this check because it make axes-core to crash
@@ -134,71 +113,73 @@ describe('PortProvider', () => {
       //{ data: null, reason: 'if message is null' },
       {
         data: {
-          channel: 'sidebar-host', // invalid channel (swapped words)
-          port: 'sidebar',
-          source,
+          authority: 'dummy', // invalid authority
+          frame1: 'sidebar',
+          frame2: 'host',
           type: 'request',
         },
-        reason: 'if message contains an invalid channel',
+        reason: 'contains an invalid authority',
       },
       {
         data: {
-          channel: 'host-sidebar',
-          port: 'host', // invalid port
-          source,
+          authority,
+          frame1: 'host', // invalid source
+          frame2: 'host',
           type: 'request',
         },
-        reason: 'if message contains an invalid port',
+        reason: 'contains an invalid frame1',
       },
       {
         data: {
-          channel: 'host-sidebar',
-          port: 'sidebar',
-          source: 'dummy',
+          authority,
+          frame1: 'sidebar',
+          frame2: 'dummy', // invalid target
           type: 'request',
         },
-        reason: 'if message contains an invalid source',
+        reason: 'contains an invalid frame2',
       },
       {
         data: {
-          channel: 'host-sidebar',
-          port: 'dummy',
-          source,
-          type: 'offer', // invalid offer
+          authority,
+          frame1: 'sidebar',
+          frame2: 'host',
+          type: 'offer', // invalid type
         },
-        reason: 'if message contains an invalid offer',
+        reason: 'contains an invalid type',
       },
       {
         data: {
-          channel: 'host-sidebar',
-          port: 'sidebar',
-          source,
+          authority,
+          frame1: 'sidebar',
+          frame2: 'host',
           type: 'request',
         },
         origin: 'https://dummy.com',
-        reason: 'if message comes from invalid origin',
+        reason: 'comes from invalid origin',
       },
     ].forEach(({ data, reason, origin }) => {
-      it(`ignores port request ${reason}`, async () => {
-        portFinderRequest({ data, origin: origin ?? window.location.origin });
-
-        await delay(0);
+      it(`ignores port request if message ${reason}`, async () => {
+        portProvider.listen();
+        await sendPortFinderRequest({
+          data,
+          origin: origin ?? window.location.origin,
+        });
 
         assert.notCalled(window.postMessage);
       });
     });
 
     it('responds to a valid port request', async () => {
+      portProvider.listen();
       const data = {
-        channel: 'host-sidebar',
-        port: 'sidebar',
-        source,
+        authority,
+        frame1: 'sidebar',
+        frame2: 'host',
         type: 'request',
       };
-      portFinderRequest({
+      await sendPortFinderRequest({
         data,
       });
-      await delay(0);
 
       assert.calledWith(
         window.postMessage,
@@ -209,19 +190,19 @@ describe('PortProvider', () => {
     });
 
     it('responds to the first valid port request but ignores additional requests', async () => {
+      portProvider.listen();
       const data = {
-        channel: 'guest-host',
-        port: 'guest',
-        source,
+        authority,
+        frame1: 'guest',
+        frame2: 'sidebar',
         type: 'request',
       };
 
       for (let i = 0; i < 4; ++i) {
-        portFinderRequest({
+        await sendPortFinderRequest({
           data,
         });
       }
-      await delay(0);
 
       assert.calledOnceWithExactly(
         window.postMessage,
@@ -232,30 +213,29 @@ describe('PortProvider', () => {
     });
 
     it('sends the counterpart port via the sidebar port', async () => {
-      portFinderRequest({
+      portProvider.listen();
+      await sendPortFinderRequest({
         data: {
-          channel: 'host-sidebar',
-          port: 'sidebar',
-          source,
+          authority,
+          frame1: 'sidebar',
+          frame2: 'host',
           type: 'request',
         },
       });
-      await delay(0);
 
       const [sidebarPort] = window.postMessage.getCall(0).args[2];
       const handler = sinon.stub();
       sidebarPort.onmessage = handler;
 
       const data = {
-        channel: 'guest-sidebar',
-        port: 'guest',
-        source,
+        authority,
+        frame1: 'guest',
+        frame2: 'sidebar',
         type: 'request',
       };
-      portFinderRequest({
+      await sendPortFinderRequest({
         data,
       });
-      await delay(0);
 
       assert.calledWith(
         handler,
@@ -266,18 +246,18 @@ describe('PortProvider', () => {
     });
 
     it('sends the counterpart port via the listener', async () => {
+      portProvider.listen();
       const handler = sinon.stub();
       portProvider.on('hostPortRequest', handler);
       const data = {
-        channel: 'guest-host',
-        port: 'guest',
-        source,
+        authority,
+        frame1: 'guest',
+        frame2: 'host',
         type: 'request',
       };
-      portFinderRequest({
+      await sendPortFinderRequest({
         data,
       });
-      await delay(0);
 
       assert.calledWith(handler, 'guest', sinon.match.instanceOf(MessagePort));
     });
