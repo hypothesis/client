@@ -18,6 +18,8 @@ import { createShadowRoot } from './util/shadow-root';
  * @typedef {import('../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {'contentContainer'|'createAnnotation'|'fitSideBySide'} DependenciesSidebar
+ * @typedef {'anchors'|'scrollToAnchor'|'selectAnnotations'} DependenciesBucketBar
  */
 
 // Minimum width to which the iframeContainer can be resized.
@@ -57,7 +59,7 @@ export default class Sidebar {
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
-   * @param {Guest} guest -
+   * @param {Pick<Guest, DependenciesSidebar|DependenciesBucketBar>} guest -
    *   The `Guest` instance for the current frame. It is currently assumed that
    *   it is always possible to annotate in the frame where the sidebar is
    *   displayed.
