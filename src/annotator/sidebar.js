@@ -67,7 +67,10 @@ export default class Sidebar {
    */
   constructor(element, eventBus, guest, config = {}) {
     this._emitter = eventBus.createEmitter();
-    const hypothesisAppsOrigin = new URL(config.sidebarAppUrl).origin;
+    this._guest = guest;
+    this._config = config;
+
+    const hypothesisAppsOrigin = new URL(this._config.sidebarAppUrl).origin;
     this._portProvider = new PortProvider(hypothesisAppsOrigin);
 
     /**
@@ -82,26 +85,25 @@ export default class Sidebar {
      */
     this.iframe = createSidebarIframe(config);
 
-    this.options = config;
-
     /** @type {BucketBar|null} */
     this.bucketBar = null;
 
-    if (config.externalContainerSelector) {
+    if (this._config.externalContainerSelector) {
       this.externalFrame =
         /** @type {HTMLElement} */
-        (document.querySelector(config.externalContainerSelector)) ?? element;
+        (document.querySelector(this._config.externalContainerSelector)) ??
+        element;
       this.externalFrame.appendChild(this.iframe);
     } else {
       this.iframeContainer = document.createElement('div');
       this.iframeContainer.style.display = 'none';
       this.iframeContainer.className = 'annotator-frame';
 
-      if (config.theme === 'clean') {
+      if (this._config.theme === 'clean') {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
-        const bucketBar = new BucketBar(this.iframeContainer, guest, {
-          contentContainer: guest.contentContainer(),
+        const bucketBar = new BucketBar(this.iframeContainer, this._guest, {
+          contentContainer: this._guest.contentContainer(),
         });
         this._emitter.subscribe('anchorsChanged', () => bucketBar.update());
         this.bucketBar = bucketBar;
@@ -117,19 +119,17 @@ export default class Sidebar {
       element.appendChild(this.hypothesisSidebar);
     }
 
-    this.guest = guest;
-
     this._listeners = new ListenerCollection();
 
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
-      createAnnotation: () => guest.createAnnotation(),
+      createAnnotation: () => this._guest.createAnnotation(),
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
 
-    if (config.theme === 'clean') {
+    if (this._config.theme === 'clean') {
       this.toolbar.useMinimalControls = true;
     } else {
       this.toolbar.useMinimalControls = false;
@@ -162,7 +162,7 @@ export default class Sidebar {
     this.close();
 
     // Publisher-provided callback functions
-    const [serviceConfig] = config.services || [];
+    const [serviceConfig] = this._config.services || [];
     if (serviceConfig) {
       this.onLoginRequest = serviceConfig.onLoginRequest;
       this.onLogoutRequest = serviceConfig.onLogoutRequest;
@@ -171,7 +171,7 @@ export default class Sidebar {
       this.onHelpRequest = serviceConfig.onHelpRequest;
     }
 
-    this.onLayoutChange = config.onLayoutChange;
+    this.onLayoutChange = this._config.onLayoutChange;
 
     // Initial layout notification
     this._notifyOfLayoutChange(false);
@@ -186,14 +186,14 @@ export default class Sidebar {
       // Set initial highlight visibility. We do this only once the sidebar app
       // is ready because `setHighlightsVisible` needs to reflect this state to
       // the sidebar app.
-      const showHighlights = config.showHighlights === 'always';
+      const showHighlights = this._config.showHighlights === 'always';
       this.setHighlightsVisible(showHighlights);
 
       if (
-        config.openSidebar ||
-        config.annotations ||
-        config.query ||
-        config.group
+        this._config.openSidebar ||
+        this._config.annotations ||
+        this._config.query ||
+        this._config.group
       ) {
         this.open();
       }
@@ -213,19 +213,6 @@ export default class Sidebar {
         this._sidebarRPC.call('frameDestroyed', data.frameIdentifier);
       }
     });
-  }
-
-  destroy() {
-    this._portProvider.destroy();
-    this.bucketBar?.destroy();
-    this._listeners.removeAll();
-    this._hammerManager?.destroy();
-    if (this.hypothesisSidebar) {
-      this.hypothesisSidebar.remove();
-    } else {
-      this.iframe.remove();
-    }
-    this._emitter.destroy();
   }
 
   _setupSidebarEvents() {
@@ -365,7 +352,7 @@ export default class Sidebar {
       this.onLayoutChange(layoutState);
     }
 
-    this.guest.fitSideBySide(layoutState);
+    this._guest.fitSideBySide(layoutState);
 
     this._emitter.publish('sidebarLayoutChanged', layoutState);
   }
@@ -436,6 +423,19 @@ export default class Sidebar {
     }
   }
 
+  destroy() {
+    this._portProvider.destroy();
+    this.bucketBar?.destroy();
+    this._listeners.removeAll();
+    this._hammerManager?.destroy();
+    if (this.hypothesisSidebar) {
+      this.hypothesisSidebar.remove();
+    } else {
+      this.iframe.remove();
+    }
+    this._emitter.destroy();
+  }
+
   open() {
     this._sidebarRPC.call('sidebarOpened');
     this._emitter.publish('sidebarOpened');
@@ -448,7 +448,7 @@ export default class Sidebar {
 
     this.toolbar.sidebarOpen = true;
 
-    if (this.options.showHighlights === 'whenSidebarOpen') {
+    if (this._config.showHighlights === 'whenSidebarOpen') {
       this.setHighlightsVisible(true);
     }
 
@@ -463,7 +463,7 @@ export default class Sidebar {
 
     this.toolbar.sidebarOpen = false;
 
-    if (this.options.showHighlights === 'whenSidebarOpen') {
+    if (this._config.showHighlights === 'whenSidebarOpen') {
       this.setHighlightsVisible(false);
     }
 

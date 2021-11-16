@@ -225,11 +225,11 @@ describe('Sidebar', () => {
     });
 
     it('creates an annotation when toolbar button is clicked', () => {
-      const sidebar = createSidebar();
+      createSidebar();
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.called(sidebar.guest.createAnnotation);
+      assert.called(fakeGuest.createAnnotation);
     });
 
     it('sets create annotation button to "Annotation" when selection becomes non-empty', () => {
