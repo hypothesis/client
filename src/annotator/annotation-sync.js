@@ -28,11 +28,11 @@
 export class AnnotationSync {
   /**
    * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
-   * @param {SidebarBridge} bridge - Channel for communicating with the sidebar
+   * @param {SidebarBridge} sidebarRPC - Channel for communicating with the sidebar
    */
-  constructor(eventBus, bridge) {
+  constructor(eventBus, sidebarRPC) {
     this._emitter = eventBus.createEmitter();
-    this._sidebar = bridge;
+    this._sidebarRPC = sidebarRPC;
 
     /**
      * Mapping from annotation tags to annotation objects for annotations which
@@ -45,7 +45,7 @@ export class AnnotationSync {
     this.destroyed = false;
 
     // Relay events from the sidebar to the rest of the annotator.
-    this._sidebar.on('deleteAnnotation', (body, callback) => {
+    this._sidebarRPC.on('deleteAnnotation', (body, callback) => {
       if (this.destroyed) {
         callback(null);
         return;
@@ -57,7 +57,7 @@ export class AnnotationSync {
       callback(null);
     });
 
-    this._sidebar.on('loadAnnotations', (bodies, callback) => {
+    this._sidebarRPC.on('loadAnnotations', (bodies, callback) => {
       if (this.destroyed) {
         callback(null);
         return;
@@ -72,7 +72,7 @@ export class AnnotationSync {
       if (annotation.$tag) {
         return;
       }
-      this._sidebar.call('createAnnotation', this._format(annotation));
+      this._sidebarRPC.call('createAnnotation', this._format(annotation));
     });
   }
 
@@ -89,7 +89,7 @@ export class AnnotationSync {
       return;
     }
 
-    this._sidebar.call(
+    this._sidebarRPC.call(
       'syncAnchoringStatus',
       annotations.map(ann => this._format(ann))
     );
