@@ -72,18 +72,6 @@ describe('PortFinder', () => {
   });
 
   describe('#discover', () => {
-    ['guest', 'invalid'].forEach(target =>
-      it('rejects if requesting an invalid port', async () => {
-        let error;
-        try {
-          await portFinder.discover(target);
-        } catch (e) {
-          error = e;
-        }
-        assert.equal(error.message, 'Invalid request of channel/port');
-      })
-    );
-
     [
       { source: 'guest', target: 'host' },
       { source: 'guest', target: 'sidebar' },

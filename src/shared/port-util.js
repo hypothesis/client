@@ -2,12 +2,12 @@
  * These types are the used in by `PortProvider` and `PortFinder` for the
  * inter-frame discovery and communication processes.
  *
- * @typedef {'guest'|'host'|'notebook'|'sidebar'} Frame
- *
- * @typedef Message
- * @prop {Frame} frame1
- * @prop {Frame} frame2
- * @prop {'offer'|'request'} type
+ * @typedef {{frame1: 'guest', frame2: 'host'}} GuestChannel1 - guest-host
+ * @typedef {{frame1: 'guest', frame2: 'sidebar'}} GuestChannel2 - guest-sidebar
+ * @typedef {{frame1: 'notebook', frame2: 'sidebar'}} NotebookChannel - notebook-sidebar
+ * @typedef {{frame1: 'sidebar', frame2: 'host'}} SidebarChannel - sidebar-host
+ * @typedef {GuestChannel1|GuestChannel2|NotebookChannel|SidebarChannel} Channel
+ * @typedef {Channel & {type: 'offer'|'request'}} Message
  */
 
 /**

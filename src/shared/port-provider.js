@@ -6,7 +6,6 @@ import { isMessageEqual, isSourceWindow } from './port-util';
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('./port-util').Message} Message
- * @typedef {import('./port-util').Frame} Frame
  * @typedef {'guest-host'|'guest-sidebar'|'notebook-sidebar'|'sidebar-host'} Channel
  */
 
@@ -124,6 +123,8 @@ export class PortProvider {
    *   @param {any} options.data - the data to be compared with `allowedMessage`.
    *   @param {string} options.origin - the origin to be compared with
    *     `allowedOrigin`.
+   *
+   * @return {data is Message}
    */
   _messageMatches({ allowedMessage, allowedOrigin, data, origin }) {
     if (allowedOrigin !== '*' && origin !== allowedOrigin) {
