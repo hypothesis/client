@@ -1,7 +1,7 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 import { ListenerCollection } from './listener-collection';
-import { isMessageEqual } from './port-util';
+import { isMessageEqual, isSourceWindow } from './port-util';
 
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
@@ -120,27 +120,6 @@ export class PortProvider {
   }
 
   /**
-   * Check that source is of type Window.
-   *
-   * @param {MessageEventSource|null} source
-   * @return {source is Window}
-   */
-  _isSourceWindow(source) {
-    if (
-      // `source` can be of type Window | MessagePort | ServiceWorker.
-      // The simple check `source instanceof Window`` doesn't work here.
-      // Alternatively, `source` could be casted `/** @type{Window} */ (source)`
-      source === null ||
-      source instanceof MessagePort ||
-      source instanceof ServiceWorker
-    ) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
    * Check that data and origin matches the expected values.
    *
    * @param {object} options
@@ -175,7 +154,7 @@ export class PortProvider {
    *     send this port either, (1) to the `sidebar` frame using the `sidebar-host`
    *     channel or (2) through the `onHostPortRequest` event listener.
    */
-  _sendPort({ channel, message, origin, source, port1, port2 }) {
+  _sendPorts({ channel, message, origin, source, port1, port2 }) {
     source.postMessage(message, origin, [port1]);
 
     if (!port2) {
@@ -216,7 +195,7 @@ export class PortProvider {
         messageEvent
       );
 
-      if (!this._isSourceWindow(source)) {
+      if (!isSourceWindow(source)) {
         return;
       }
 
@@ -259,7 +238,7 @@ export class PortProvider {
       // constructor.
       if (channel === 'sidebar-host') {
         windowChannelMap.set(source, this._sidebarHostChannel);
-        this._sendPort({
+        this._sendPorts({
           port1: this._sidebarHostChannel.port1,
           ...options,
         });
@@ -270,7 +249,7 @@ export class PortProvider {
       windowChannelMap.set(source, messageChannel);
 
       const { port1, port2 } = messageChannel;
-      this._sendPort({ port1, port2, ...options });
+      this._sendPorts({ port1, port2, ...options });
     });
   }
 

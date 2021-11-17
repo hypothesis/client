@@ -59,3 +59,24 @@ export function isMessageEqual(data, message) {
     return false;
   }
 }
+
+/**
+ * Check that source is of type Window.
+ *
+ * @param {MessageEventSource|null} source
+ * @return {source is Window}
+ */
+export function isSourceWindow(source) {
+  if (
+    // `source` can be of type Window | MessagePort | ServiceWorker.
+    // The simple check `source instanceof Window`` doesn't work here.
+    // Alternatively, `source` could be casted `/** @type{Window} */ (source)`
+    source === null ||
+    source instanceof MessagePort ||
+    source instanceof ServiceWorker
+  ) {
+    return false;
+  }
+
+  return true;
+}

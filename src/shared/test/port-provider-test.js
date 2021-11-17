@@ -83,31 +83,6 @@ describe('PortProvider', () => {
 
   describe('listens for port requests', () => {
     [
-      { source: null, reason: 'source is null' },
-      {
-        source: new MessageChannel().port1,
-        reason: 'source is a MessageChannel',
-      },
-    ].forEach(({ source, reason }) =>
-      it(`ignores port requests if ${reason}`, async () => {
-        portProvider.listen();
-        const data = {
-          authority,
-          frame1: 'sidebar',
-          frame2: 'host',
-          type: 'request',
-        };
-
-        await sendPortFinderRequest({
-          data,
-          source,
-        });
-
-        assert.notCalled(window.postMessage);
-      })
-    );
-
-    [
       // Disabled this check because it make axes-core to crash
       // Reported: https://github.com/dequelabs/axe-core/pull/3249
       //{ data: null, reason: 'if message is null' },
@@ -154,15 +129,26 @@ describe('PortProvider', () => {
           frame2: 'host',
           type: 'request',
         },
+        source: null,
+        reason: 'comes from invalid source',
+      },
+      {
+        data: {
+          authority,
+          frame1: 'sidebar',
+          frame2: 'host',
+          type: 'request',
+        },
         origin: 'https://dummy.com',
         reason: 'comes from invalid origin',
       },
-    ].forEach(({ data, reason, origin }) => {
+    ].forEach(({ data, reason, origin, source }) => {
       it(`ignores port request if message ${reason}`, async () => {
         portProvider.listen();
         await sendPortFinderRequest({
           data,
-          origin: origin ?? window.location.origin,
+          origin,
+          source,
         });
 
         assert.notCalled(window.postMessage);

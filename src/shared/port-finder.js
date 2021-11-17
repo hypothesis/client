@@ -35,7 +35,7 @@ export class PortFinder {
   }
 
   /**
-   * Request a specific port from `hostFrame`
+   * Request a specific port from the host frame
    *
    * @param {Frame} target - the frame aiming to be discovered
    * @return {Promise<MessagePort>}

@@ -1,4 +1,4 @@
-import { isMessageEqual } from '../port-util';
+import { isMessageEqual, isSourceWindow } from '../port-util';
 
 describe('port-util', () => {
   describe('isMessageEqual', () => {
@@ -96,5 +96,34 @@ describe('port-util', () => {
         assert.equal(result, expectedResult);
       });
     });
+  });
+
+  describe('isSourceWindow', () => {
+    [
+      {
+        expectedResult: true,
+        reason: 'Window',
+        source: window,
+      },
+      {
+        expectedResult: false,
+        reason: 'null',
+        source: null,
+      },
+      {
+        expectedResult: false,
+        reason: 'MessagePort',
+        source: new MessageChannel().port1,
+      },
+      {
+        expectedResult: false,
+        reason: 'ServiceWorker',
+        source: Object.create(ServiceWorker.prototype),
+      },
+    ].forEach(({ expectedResult, reason, source }) =>
+      it(`returns '${expectedResult}' because the source is ${reason}`, () => {
+        assert.equal(expectedResult, isSourceWindow(source));
+      })
+    );
   });
 });
