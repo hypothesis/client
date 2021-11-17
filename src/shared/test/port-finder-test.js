@@ -4,7 +4,6 @@ import { PortFinder } from '../port-finder';
 const MAX_WAIT_FOR_PORT = 1000 * 5;
 
 describe('PortFinder', () => {
-  const authority = 'hypothesis';
   const frame1 = 'guest';
   const type = 'offer';
   let portFinder;
@@ -52,7 +51,6 @@ describe('PortFinder', () => {
 
         sendPortProviderOffer({
           data: {
-            authority,
             frame1,
             frame2: target,
             type,
@@ -100,7 +98,6 @@ describe('PortFinder', () => {
         portFinder.discover(target).then(port => (resolvedPort = port));
         sendPortProviderOffer({
           data: {
-            authority,
             frame1: source,
             frame2: target,
             type,
@@ -128,7 +125,7 @@ describe('PortFinder', () => {
       assert.callCount(window.postMessage, 21);
       assert.alwaysCalledWithExactly(
         window.postMessage,
-        { authority, frame1, frame2: target, type: 'request' },
+        { frame1, frame2: target, type: 'request' },
         '*'
       );
 

@@ -59,7 +59,6 @@ export class PortFinder {
       const postRequest = () => {
         this._hostFrame.postMessage(
           {
-            authority: 'hypothesis',
             frame1: this._source,
             frame2: target,
             type: 'request',
@@ -91,7 +90,6 @@ export class PortFinder {
         const { data, ports } = /** @type {MessageEvent} */ (event);
         if (
           isMessageEqual(data, {
-            authority: 'hypothesis',
             frame1: this._source,
             frame2: target,
             type: 'offer',

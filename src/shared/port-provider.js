@@ -90,28 +90,24 @@ export class PortProvider {
     this._allowedMessages = [
       {
         allowedOrigin: '*',
-        authority: 'hypothesis',
         frame1: 'guest',
         frame2: 'host',
         type: 'request',
       },
       {
         allowedOrigin: '*',
-        authority: 'hypothesis',
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
       },
       {
         allowedOrigin: this._hypothesisAppsOrigin,
-        authority: 'hypothesis',
         frame1: 'sidebar',
         frame2: 'host',
         type: 'request',
       },
       {
         allowedOrigin: this._hypothesisAppsOrigin,
-        authority: 'hypothesis',
         frame1: 'notebook',
         frame2: 'sidebar',
         type: 'request',
@@ -213,7 +209,7 @@ export class PortProvider {
         return;
       }
 
-      const { authority, frame1, frame2 } = match;
+      const { frame1, frame2 } = match;
       const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
 
       let windowChannelMap = this._channels.get(channel);
@@ -231,7 +227,7 @@ export class PortProvider {
       }
 
       /** @type {Message} */
-      const message = { authority, frame1, frame2, type: 'offer' };
+      const message = { frame1, frame2, type: 'offer' };
       const options = { channel, message, origin, source };
 
       // `sidebar-host` channel is an special case, because it is created in the
