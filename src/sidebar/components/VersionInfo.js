@@ -1,4 +1,5 @@
 import { LabeledButton } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
@@ -8,6 +9,35 @@ import { withServices } from '../service-context';
  * @prop {import('../helpers/version-data').default} versionData - Object with version information
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
+
+/**
+ * @typedef VersionEntryProps
+ * @prop {boolean} [breakAll=false] - Should this entry break long strings of
+ *   text, even if they are mid-word? (This prevents long strings from breaking
+ *   layout but may cause awkward breaks in shorter text)
+ * @prop {string} field
+ * @prop {string} value
+ */
+
+/**
+ * Render an entry for one piece of version data.
+ *
+ * @param {VersionEntryProps} props
+ */
+function VersionEntry({ breakAll = false, field, value }) {
+  return (
+    <>
+      <dt className="font-medium col-span-1 justify-self-end">{field}</dt>
+      <dd
+        className={classnames('col-span-3 text-grey-6 ', {
+          'break-all': breakAll,
+        })}
+      >
+        {value}
+      </dd>
+    </>
+  );
+}
 
 /**
  * Display current client version info
@@ -25,22 +55,16 @@ function VersionInfo({ toastMessenger, versionData }) {
   };
 
   return (
-    <div className="hyp-u-vertical-spacing">
-      <dl className="VersionInfo">
-        <dt className="VersionInfo__key">Version</dt>
-        <dd className="VersionInfo__value">{versionData.version}</dd>
-        <dt className="VersionInfo__key">User Agent</dt>
-        <dd className="VersionInfo__value">{versionData.userAgent}</dd>
-        <dt className="VersionInfo__key">URL</dt>
-        <dd className="VersionInfo__value">{versionData.urls}</dd>
-        <dt className="VersionInfo__key">Fingerprint</dt>
-        <dd className="VersionInfo__value">{versionData.fingerprint}</dd>
-        <dt className="VersionInfo__key">Account</dt>
-        <dd className="VersionInfo__value">{versionData.account}</dd>
-        <dt className="VersionInfo__key">Date</dt>
-        <dd className="VersionInfo__value">{versionData.timestamp}</dd>
+    <div className="space-y-4">
+      <dl className="grid grid-cols-4 gap-y-1 gap-x-2">
+        <VersionEntry field="Version" value={versionData.version} />
+        <VersionEntry field="User Agent" value={versionData.userAgent} />
+        <VersionEntry field="URL" value={versionData.urls} breakAll />
+        <VersionEntry field="Fingerprint" value={versionData.fingerprint} />
+        <VersionEntry field="Account" value={versionData.account} />
+        <VersionEntry field="Date" value={versionData.timestamp} />
       </dl>
-      <div className="hyp-u-layout-row--justify-center">
+      <div className="flex flex-col items-center">
         <LabeledButton onClick={copyVersionData} icon="copy">
           Copy version details
         </LabeledButton>
