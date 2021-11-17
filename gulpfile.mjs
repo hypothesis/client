@@ -10,23 +10,27 @@ import gulp from 'gulp';
 
 import serveDev from './dev-server/serve-dev.js';
 import servePackage from './dev-server/serve-package.js';
+import tailwindConfig from './tailwind.config.mjs';
 
 gulp.task('build-js', () => buildJS('./rollup.config.mjs'));
 gulp.task('watch-js', () => watchJS('./rollup.config.mjs'));
 
 gulp.task('build-css', () =>
-  buildCSS([
-    // Hypothesis client
-    './src/styles/annotator/annotator.scss',
-    './src/styles/annotator/pdfjs-overrides.scss',
-    './src/styles/sidebar/sidebar.scss',
+  buildCSS(
+    [
+      // Hypothesis client
+      './src/styles/annotator/annotator.scss',
+      './src/styles/annotator/pdfjs-overrides.scss',
+      './src/styles/sidebar/sidebar.scss',
 
-    // Vendor
-    './node_modules/katex/dist/katex.min.css',
+      // Vendor
+      './node_modules/katex/dist/katex.min.css',
 
-    // Development tools
-    './src/styles/ui-playground/ui-playground.scss',
-  ])
+      // Development tools
+      './src/styles/ui-playground/ui-playground.scss',
+    ],
+    { tailwindConfig }
+  )
 );
 
 gulp.task(
