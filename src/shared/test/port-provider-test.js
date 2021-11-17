@@ -1,8 +1,6 @@
 import { delay } from '../../test-util/wait';
 import { PortProvider } from '../port-provider';
 
-const authority = 'hypothesis';
-
 describe('PortProvider', () => {
   let portProvider;
 
@@ -38,7 +36,6 @@ describe('PortProvider', () => {
       portProvider.destroy();
       await sendPortFinderRequest({
         data: {
-          authority,
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
@@ -61,7 +58,6 @@ describe('PortProvider', () => {
       portProvider.destroy();
       portProvider = new PortProvider(window.location.origin);
       const data = {
-        authority,
         frame1: 'sidebar',
         frame2: 'host',
         type: 'request',
@@ -83,22 +79,9 @@ describe('PortProvider', () => {
 
   describe('listens for port requests', () => {
     [
-      // Disabled this check because it make axes-core to crash
-      // Reported: https://github.com/dequelabs/axe-core/pull/3249
-      //{ data: null, reason: 'if message is null' },
       {
         data: {
-          authority: 'dummy', // invalid authority
-          frame1: 'sidebar',
-          frame2: 'host',
-          type: 'request',
-        },
-        reason: 'contains an invalid authority',
-      },
-      {
-        data: {
-          authority,
-          frame1: 'host', // invalid source
+          frame1: 'dummy', // invalid source
           frame2: 'host',
           type: 'request',
         },
@@ -106,7 +89,6 @@ describe('PortProvider', () => {
       },
       {
         data: {
-          authority,
           frame1: 'sidebar',
           frame2: 'dummy', // invalid target
           type: 'request',
@@ -115,16 +97,14 @@ describe('PortProvider', () => {
       },
       {
         data: {
-          authority,
           frame1: 'sidebar',
           frame2: 'host',
-          type: 'offer', // invalid type
+          type: 'dummy', // invalid type
         },
         reason: 'contains an invalid type',
       },
       {
         data: {
-          authority,
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
@@ -134,7 +114,6 @@ describe('PortProvider', () => {
       },
       {
         data: {
-          authority,
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
@@ -158,7 +137,6 @@ describe('PortProvider', () => {
     it('responds to a valid port request', async () => {
       portProvider.listen();
       const data = {
-        authority,
         frame1: 'sidebar',
         frame2: 'host',
         type: 'request',
@@ -178,7 +156,6 @@ describe('PortProvider', () => {
     it('responds to the first valid port request but ignores additional requests', async () => {
       portProvider.listen();
       const data = {
-        authority,
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
@@ -202,7 +179,6 @@ describe('PortProvider', () => {
       portProvider.listen();
       await sendPortFinderRequest({
         data: {
-          authority,
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
@@ -214,7 +190,6 @@ describe('PortProvider', () => {
       sidebarPort.onmessage = handler;
 
       const data = {
-        authority,
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
@@ -236,7 +211,6 @@ describe('PortProvider', () => {
       const handler = sinon.stub();
       portProvider.on('hostPortRequest', handler);
       const data = {
-        authority,
         frame1: 'guest',
         frame2: 'host',
         type: 'request',

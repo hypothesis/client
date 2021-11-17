@@ -2,7 +2,6 @@ import { isMessageEqual, isSourceWindow } from '../port-util';
 
 describe('port-util', () => {
   describe('isMessageEqual', () => {
-    const authority = 'hypothesis';
     const frame1 = 'guest';
     const frame2 = 'sidebar';
     const type = 'offer';
@@ -10,7 +9,6 @@ describe('port-util', () => {
     [
       {
         data: {
-          authority,
           frame1,
           frame2,
           type,
@@ -20,7 +18,6 @@ describe('port-util', () => {
       },
       {
         data: {
-          authority,
           frame1,
           frame2,
           type,
@@ -34,8 +31,12 @@ describe('port-util', () => {
         reason: 'data is null',
       },
       {
+        data: 'dummy',
+        expectedResult: false,
+        reason: 'data is string',
+      },
+      {
         data: {
-          authority,
           // frame1 property missing
           frame2,
           type,
@@ -45,7 +46,6 @@ describe('port-util', () => {
       },
       {
         data: {
-          authority,
           frame1,
           frame2: 9, // wrong type
           type,
@@ -55,7 +55,6 @@ describe('port-util', () => {
       },
       {
         data: {
-          authority,
           extra: 'dummy', // additional
           frame1,
           frame2,
@@ -66,7 +65,6 @@ describe('port-util', () => {
       },
       {
         data: {
-          authority,
           frame1: 'dummy', // different
           frame2,
           type,
@@ -76,7 +74,6 @@ describe('port-util', () => {
       },
       {
         data: {
-          authority,
           frame1,
           frame2,
           type,
@@ -88,7 +85,6 @@ describe('port-util', () => {
     ].forEach(({ data, expectedResult, reason }) => {
       it(`returns '${expectedResult}' because the ${reason}`, () => {
         const result = isMessageEqual(data, {
-          authority,
           frame1,
           frame2,
           type,

@@ -1,10 +1,3 @@
-// Because there are many `postMessages` on the `host` frame, the SOURCE property
-// is added to the hypothesis `postMessages` to identify the provenance of the
-// message and avoid listening to messages that could have the same properties
-// but different source. This is not a security feature but an
-// anti-collision mechanism.
-const AUTHORITY = 'hypothesis';
-
 /**
  * These types are the used in by `PortProvider` and `PortFinder` for the
  * inter-frame discovery and communication processes.
@@ -12,7 +5,6 @@ const AUTHORITY = 'hypothesis';
  * @typedef {'guest'|'host'|'notebook'|'sidebar'} Frame
  *
  * @typedef Message
- * @prop {AUTHORITY} authority
  * @prop {Frame} frame1
  * @prop {Frame} frame2
  * @prop {'offer'|'request'} type
@@ -36,7 +28,7 @@ function isMessage(data) {
     }
   }
 
-  return data.authority === AUTHORITY;
+  return true;
 }
 
 /**
