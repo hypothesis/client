@@ -102,7 +102,8 @@ function resolveAnchor(anchor) {
  * loads Hypothesis (not all frames will be annotation-enabled). In one frame,
  * usually the top-level one, there will also be an instance of the `Sidebar`
  * class that shows the sidebar app and surrounding UI. The `Guest` instance in
- * each frame connects to the sidebar when {@link connectToSidebar} is called.
+ * each frame connects to the sidebar as part of its initialization, when
+ * {@link _connectSidebarEvents} is called.
  *
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
@@ -118,10 +119,14 @@ export default class Guest {
    * @param {EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
+   * @param {Window} [hostFrame] -
+   *   Host frame which this guest is associated with. This is expected to be
+   *   an ancestor of the guest frame. It may be same or cross origin.
    */
-  constructor(element, eventBus, config = {}) {
+  constructor(element, eventBus, config = {}, hostFrame = window) {
     this.element = element;
     this._emitter = eventBus.createEmitter();
+    this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
 
@@ -161,9 +166,7 @@ export default class Guest {
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     /** @type {string|null} */
-    this._frameIdentifier = config.subFrameIdentifier;
-    this._hostFrame =
-      config.subFrameIdentifier === null ? window : window.parent;
+    this._frameIdentifier = config.subFrameIdentifier || null;
     this._portFinder = new PortFinder({
       hostFrame: this._hostFrame,
       source: 'guest',
@@ -181,10 +184,6 @@ export default class Guest {
     // in this frame.
     this._annotationSync = new AnnotationSync(eventBus, this._bridge);
     this._connectAnnotationSync();
-
-    // Discover and connect to the sidebar frame. All RPC events must be
-    // registered before creating the channel.
-    this._connectToSidebar();
 
     // Set up automatic and integration-triggered injection of client into
     // iframes in this frame.
@@ -316,7 +315,7 @@ export default class Guest {
     });
   }
 
-  _connectSidebarEvents() {
+  async _connectSidebarEvents() {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
     this._bridge.on('focusAnnotations', (tags = []) => {
@@ -367,12 +366,9 @@ export default class Guest {
     this._bridge.on('setHighlightsVisible', showHighlights => {
       this.setHighlightsVisible(showHighlights);
     });
-  }
 
-  /**
-   * Attempt to connect to the sidebar frame.
-   */
-  async _connectToSidebar() {
+    // Discover and connect to the sidebar frame. All RPC events must be
+    // registered before creating the channel.
     const sidebarPort = await this._portFinder.discover('sidebar');
     this._bridge.createChannel(sidebarPort);
   }

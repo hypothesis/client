@@ -1,7 +1,7 @@
 import { ListenerCollection } from './listener-collection';
 import { isMessageEqual } from './port-util';
 
-const MAX_WAIT_FOR_PORT = 1000 * 5;
+const MAX_WAIT_FOR_PORT = 1000 * 10;
 const POLLING_INTERVAL_FOR_PORT = 250;
 
 /**
