@@ -70,8 +70,10 @@ export class PortProvider {
     // Although some channels (v.gr. `notebook-sidebar`) have only one
     // `MessageChannel`, other channels (v.gr. `guest-sidebar`) can have multiple
     // `MessageChannel`s. The `Window` refers to the frame that sends the initial
-    // request that triggers creation of a channel.
-    /** @type {Map<Channel, Map<Window, MessageChannel>>} */
+    // request that triggers the creation of a channel. We use `WeakMap` so that
+    // entries are removed from the map when the garbage collector reclaims the
+    // removed window.
+    /** @type {Map<Channel, WeakMap<Window, MessageChannel>>} */
     this._channels = new Map();
 
     // Two important characteristics of `MessagePort`:
@@ -214,7 +216,7 @@ export class PortProvider {
 
       let windowChannelMap = this._channels.get(channel);
       if (!windowChannelMap) {
-        windowChannelMap = new Map();
+        windowChannelMap = new WeakMap();
         this._channels.set(channel, windowChannelMap);
       }
 
