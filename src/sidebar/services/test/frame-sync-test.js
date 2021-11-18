@@ -61,9 +61,11 @@ describe('FrameSyncService', () => {
   let fakeBridges;
   let fakePortFinder;
   let fakeStore;
-  let frameSync;
   let fakeWindow;
-  const { port1: hostPort, port2: sidebarPort } = new MessageChannel();
+
+  let frameSync;
+  let hostPort;
+  let sidebarPort;
 
   beforeEach(() => {
     fakeAnnotationsService = { create: sinon.stub() };
@@ -83,6 +85,11 @@ describe('FrameSyncService', () => {
       fakeBridges.push(bridge);
       return bridge;
     });
+
+    const { port1, port2 } = new MessageChannel();
+    hostPort = port1;
+    sidebarPort = port2;
+    sidebarPort.start();
 
     fakePortFinder = {
       destroy: sinon.stub(),

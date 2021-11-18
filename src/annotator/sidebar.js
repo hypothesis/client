@@ -2,7 +2,6 @@ import Hammer from 'hammerjs';
 
 import { Bridge } from '../shared/bridge';
 import { ListenerCollection } from '../shared/listener-collection';
-import { PortProvider } from '../shared/port-provider';
 
 import { annotationCounts } from './annotation-counts';
 import BucketBar from './bucket-bar';
@@ -57,16 +56,18 @@ export default class Sidebar {
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
+   * @param {MessagePort} hostPort -
+   *   Host port for the host-sidebar communication channel. The sidebar app will
+   *   request its side of the channel when it starts.
    * @param {Guest} guest -
    *   The `Guest` instance for the current frame. It is currently assumed that
    *   it is always possible to annotate in the frame where the sidebar is
    *   displayed.
    * @param {Record<string, any>} [config]
    */
-  constructor(element, eventBus, guest, config = {}) {
+  constructor(element, eventBus, hostPort, guest, config = {}) {
     this._emitter = eventBus.createEmitter();
-    const hypothesisAppsOrigin = new URL(config.sidebarAppUrl).origin;
-    this._portProvider = new PortProvider(hypothesisAppsOrigin);
+    this._hostPort = hostPort;
 
     /**
      * Channel for host-sidebar communication.
@@ -198,8 +199,7 @@ export default class Sidebar {
     });
 
     // Create channel *after* all bridge events are registered with the `on` method.
-    this._sidebarRPC.createChannel(this._portProvider.sidebarPort);
-    this._portProvider.listen();
+    this._sidebarRPC.createChannel(this._hostPort);
 
     // Notify sidebar when a guest is unloaded. This message is routed via
     // the host frame because in Safari guest frames are unable to send messages
@@ -214,7 +214,6 @@ export default class Sidebar {
   }
 
   destroy() {
-    this._portProvider.destroy();
     this.bucketBar?.destroy();
     this._listeners.removeAll();
     this._hammerManager?.destroy();
