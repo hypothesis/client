@@ -46,9 +46,9 @@ describe('PortProvider', () => {
     });
   });
 
-  describe('#sidebarPort', () => {
+  describe('#hostPortFor', () => {
     it('returns the `host` port of the `sidebar-host` channel', () => {
-      assert.instanceOf(portProvider.sidebarPort, MessagePort);
+      assert.instanceOf(portProvider.hostPortFor('sidebar'), MessagePort);
     });
   });
 
@@ -209,7 +209,7 @@ describe('PortProvider', () => {
     it('sends the counterpart port via the listener', async () => {
       portProvider.listen();
       const handler = sinon.stub();
-      portProvider.on('hostPortRequest', handler);
+      portProvider.on('frameConnected', handler);
       const data = {
         frame1: 'guest',
         frame2: 'host',

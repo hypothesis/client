@@ -164,14 +164,15 @@ export class PortProvider {
     }
 
     if (channel === 'guest-host' && message.frame1 === 'guest') {
-      this._emitter.emit('hostPortRequest', message.frame1, port2);
+      this._emitter.emit('frameConnected', message.frame1, port2);
     }
   }
 
   /**
-   * @param {'hostPortRequest'} eventName
+   * @param {'frameConnected'} eventName
    * @param {(source: 'guest', port: MessagePort) => void} handler - this handler
-   *   fires when a request for the 'guest-host' channel is listened.
+   *   fires when a request for the host frame has been granted. Currently, only
+   *   the 'guest-host' channel triggers this listener.
    */
   on(eventName, handler) {
     this._emitter.on(eventName, handler);
@@ -179,8 +180,11 @@ export class PortProvider {
 
   /**
    * Returns the `host` port from the `sidebar-host` channel.
+   *
+   * @param {'sidebar'} _targetFrame
    */
-  get sidebarPort() {
+  // eslint-disable-next-line no-unused-vars
+  hostPortFor(_targetFrame) {
     return this._sidebarHostChannel.port2;
   }
 
