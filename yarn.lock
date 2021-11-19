@@ -1009,10 +1009,10 @@
     fancy-log "^1.3.3"
     glob "^7.2.0"
 
-"@hypothesis/frontend-shared@4.1.0":
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-4.1.0.tgz#94cf311d4be96f37cb12996b76821e768175bb3b"
-  integrity sha512-sso+lfowXqleDm9NDToR0wMlz+y95FNorKRHzgTUUgRvh7gyZJRfS/XE/XHtsjSuwhkALk78BOxsglHwQ84bIw==
+"@hypothesis/frontend-shared@4.3.0":
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-4.3.0.tgz#42ccd475e26e10ed28c75357fa94ac35eec60b52"
+  integrity sha512-ciZ7l+YKm8VRWtifc1FNN3m14fj1eCC3Tejgb+UWPLGrawUXhmCgzjm4VKXb3dL0jKiS642ReGNxyiHm+NI7Cw==
   dependencies:
     normalize.css "^8.0.1"
 
