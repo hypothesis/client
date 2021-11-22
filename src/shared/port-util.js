@@ -60,12 +60,12 @@ export function isMessageEqual(data, message) {
  */
 export function isSourceWindow(source) {
   if (
-    // `source` can be of type Window | MessagePort | ServiceWorker.
-    // The simple check `source instanceof Window`` doesn't work here.
-    // Alternatively, `source` could be casted `/** @type{Window} */ (source)`
+    // `source` can be of type Window, MessagePort, ServiceWorker, or null.
+    // `source instanceof Window` doesn't work in Chrome if `source` is a
+    // cross-origin window.
     source === null ||
     source instanceof MessagePort ||
-    source instanceof ServiceWorker
+    (window.ServiceWorker && source instanceof ServiceWorker)
   ) {
     return false;
   }
