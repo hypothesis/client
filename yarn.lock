@@ -1810,9 +1810,9 @@ babel-plugin-polyfill-regenerator@^0.2.3:
     "@babel/helper-define-polyfill-provider" "^0.2.4"
 
 babel-plugin-transform-async-to-promises@^0.8.6:
-  version "0.8.15"
-  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.15.tgz#13b6d8ef13676b4e3c576d3600b85344bb1ba346"
-  integrity sha512-fDXP68ZqcinZO2WCiimCL9zhGjGXOnn3D33zvbh+yheZ/qOrNVVDDIBtAaM3Faz8TRvQzHiRKsu3hfrBAhEncQ==
+  version "0.8.16"
+  resolved "https://registry.yarnpkg.com/babel-plugin-transform-async-to-promises/-/babel-plugin-transform-async-to-promises-0.8.16.tgz#e7392100cd44f6a56d043c7efd383ffbee1c44a9"
+  integrity sha512-mm0UMekJVOTuIlkGIEH1fpnExyTIIJ2/L5ixTTI1zAVdMpbG7Em3LiS92p0TCWKiMkHhYYinz/zn2D/BPPJaxA==
 
 bach@^1.0.0:
   version "1.2.0"
