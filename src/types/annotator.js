@@ -149,6 +149,15 @@
  * @typedef Globals
  * @prop {import('./pdfjs').PDFViewerApplication} [PDFViewerApplication] -
  *   PDF.js entry point. If set, triggers loading of PDF rather than HTML integration.
+ * @prop {object} [__hypothesis] - Internal data related to supporting guests in iframes
+ *   @prop {Promise<[Window]>} [__hypothesis.sidebarWindow] -
+ *     The sidebar window that is active in this frame. This resolves once the sidebar
+ *     application has started and is ready to connect to guests.
+ *
+ *     The `Window` object is wrapped in an array to avoid issues with
+ *     combining promises with cross-origin objects in old browsers
+ *     (eg. Safari 11, Chrome <= 63) which trigger an exception when trying to
+ *     test if the object has a `then` method. See https://github.com/whatwg/dom/issues/536.
  */
 
 /**

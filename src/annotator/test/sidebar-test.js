@@ -5,6 +5,25 @@ const DEFAULT_WIDTH = 350;
 const DEFAULT_HEIGHT = 600;
 const EXTERNAL_CONTAINER_SELECTOR = 'test-external-container';
 
+/**
+ * Simulate the sidebar application notifying the host frame that it has loaded
+ * and is ready to communicate with the host and guest frames.
+ */
+function sendSidebarReadyMessage() {
+  const channel = new MessageChannel();
+  const event = new MessageEvent(
+    'message',
+    {
+      data: { type: 'hypothesisSidebarReady' },
+    },
+    [channel.port1]
+  );
+
+  window.dispatchEvent(event);
+
+  return event;
+}
+
 describe('Sidebar', () => {
   const sandbox = sinon.createSandbox();
   let fakeGuest;
@@ -13,12 +32,13 @@ describe('Sidebar', () => {
   let containers;
   let sidebars;
 
-  let fakeBridge;
   let FakeBucketBar;
   let fakeBucketBar;
-  let fakePortProvider;
+
   let FakeToolbarController;
   let fakeToolbar;
+
+  let fakeBridge;
 
   before(() => {
     sinon.stub(window, 'requestAnimationFrame').yields();
@@ -28,22 +48,14 @@ describe('Sidebar', () => {
     window.requestAnimationFrame.restore();
   });
 
-  /**
-   * Simulate the sidebar application connecting with the host frame. This happens
-   * when the sidebar has loaded and is ready.
-   */
-  const connectSidebarApp = () => {
-    const callback = fakeBridge.onConnect.getCall(0).args[0];
-
-    callback();
-  };
-
   const createSidebar = (config = {}) => {
-    config = {
-      // Dummy sidebar app.
-      sidebarAppUrl: 'https://hyp.is/base/annotator/test/empty.html',
-      ...config,
-    };
+    config = Object.assign(
+      {
+        // Dummy sidebar app.
+        sidebarAppUrl: '/base/annotator/test/empty.html',
+      },
+      config
+    );
     const container = document.createElement('div');
     document.body.appendChild(container);
     containers.push(container);
@@ -71,19 +83,6 @@ describe('Sidebar', () => {
     sidebars = [];
     containers = [];
 
-    fakeBridge = {
-      call: sinon.stub(),
-      createChannel: sinon.stub(),
-      on: sinon.stub(),
-      onConnect: sinon.stub(),
-    };
-
-    fakeBucketBar = {
-      destroy: sinon.stub(),
-      update: sinon.stub(),
-    };
-    FakeBucketBar = sinon.stub().returns(fakeBucketBar);
-
     class FakeGuest {
       constructor() {
         this.element = document.createElement('div');
@@ -95,12 +94,6 @@ describe('Sidebar', () => {
     }
     fakeGuest = new FakeGuest();
 
-    fakePortProvider = {
-      listen: sinon.stub(),
-      sidebarPort: sinon.stub(),
-      destroy: sinon.stub(),
-    };
-
     fakeToolbar = {
       getWidth: sinon.stub().returns(100),
       useMinimalControls: false,
@@ -111,15 +104,26 @@ describe('Sidebar', () => {
     };
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 
+    fakeBucketBar = {
+      destroy: sinon.stub(),
+      update: sinon.stub(),
+    };
+    FakeBucketBar = sandbox.stub().returns(fakeBucketBar);
+
+    sidebars = [];
+
+    fakeBridge = {
+      call: sinon.stub(),
+      createChannel: sinon.stub(),
+      on: sinon.stub(),
+    };
+
     $imports.$mock({
       '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
-      '../shared/port-provider': {
-        PortProvider: sinon.stub().returns(fakePortProvider),
-      },
-      './bucket-bar': { default: FakeBucketBar },
       './toolbar': {
         ToolbarController: FakeToolbarController,
       },
+      './bucket-bar': { default: FakeBucketBar },
     });
   });
 
@@ -155,7 +159,7 @@ describe('Sidebar', () => {
 
     it('becomes visible when the sidebar application has loaded', async () => {
       const sidebar = createSidebar();
-      connectSidebarApp();
+      sendSidebarReadyMessage();
       await sidebar.ready;
       assert.equal(sidebar.iframeContainer.style.display, '');
     });
@@ -168,6 +172,29 @@ describe('Sidebar', () => {
         .querySelector('hypothesis-sidebar')
         .shadowRoot.querySelector('iframe');
       assert.equal(sidebar.iframe, iframe);
+    });
+  });
+
+  it('creates Bridge for host <-> sidebar RPC calls when `hypothesisSidebarReady` message is received', () => {
+    createSidebar();
+    const event = sendSidebarReadyMessage();
+    assert.calledWith(fakeBridge.createChannel, event.ports[0]);
+  });
+
+  describe('#ready', () => {
+    it('returns a promise that resolves when `hypothesisSidebarReady` message is received', async () => {
+      const sidebar = createSidebar();
+
+      // Check `sidebar.ready` is not already resolved, by racing it against
+      // an immediately resolved promise.
+      assert.equal(
+        await Promise.race([sidebar.ready, Promise.resolve('not-ready')]),
+        'not-ready'
+      );
+
+      sendSidebarReadyMessage();
+
+      return sidebar.ready;
     });
   });
 
@@ -191,11 +218,14 @@ describe('Sidebar', () => {
   }
 
   it('creates sidebar iframe and passes configuration to it', () => {
-    const appURL = 'https://hyp.is/base/annotator/test/empty.html';
+    const appURL = new URL(
+      '/base/annotator/test/empty.html',
+      window.location.href
+    );
     const sidebar = createSidebar({ annotations: '1234' });
     assert.equal(
       getConfigString(sidebar),
-      `${appURL}${configFragment({ annotations: '1234' })}`
+      appURL + configFragment({ annotations: '1234' })
     );
   });
 
@@ -504,7 +534,7 @@ describe('Sidebar', () => {
       it(`opens the sidebar when ${test}`, async () => {
         const sidebar = createSidebar(config);
         const open = sandbox.stub(sidebar, 'open');
-        connectSidebarApp();
+        sendSidebarReadyMessage();
         await sidebar.ready;
         assert.calledOnce(open);
       });
@@ -513,7 +543,7 @@ describe('Sidebar', () => {
     it('does not open the sidebar if not configured to', async () => {
       const sidebar = createSidebar();
       const open = sandbox.stub(sidebar, 'open');
-      connectSidebarApp();
+      sendSidebarReadyMessage();
       await sidebar.ready;
       assert.notCalled(open);
     });
@@ -614,7 +644,8 @@ describe('Sidebar', () => {
       // Configure the sidebar to open on load and wait for the initial open to
       // complete.
       sidebar = createSidebar({ openSidebar: true });
-      connectSidebarApp();
+      sendSidebarReadyMessage();
+      await sidebar.ready;
     });
 
     it('hides the sidebar if window width is < MIN_RESIZE', () => {
@@ -664,6 +695,7 @@ describe('Sidebar', () => {
         layoutChangeHandlerSpy = sandbox.stub();
         sidebar = createSidebar({
           onLayoutChange: layoutChangeHandlerSpy,
+          sidebarAppUrl: '/',
         });
 
         // remove info about call that happens on creation of sidebar
@@ -771,6 +803,7 @@ describe('Sidebar', () => {
         layoutChangeHandlerSpy = sandbox.stub();
         const layoutChangeExternalConfig = {
           onLayoutChange: layoutChangeHandlerSpy,
+          sidebarAppUrl: '/',
           externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
         };
         sidebar = createSidebar(layoutChangeExternalConfig);

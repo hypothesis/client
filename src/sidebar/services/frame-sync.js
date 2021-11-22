@@ -1,9 +1,6 @@
 import debounce from 'lodash.debounce';
 
 import { Bridge } from '../../shared/bridge';
-import { ListenerCollection } from '../../shared/listener-collection';
-import { PortFinder } from '../../shared/port-finder';
-import { isMessageEqual } from '../../shared/port-util';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
@@ -61,14 +58,6 @@ export class FrameSyncService {
    * @param {import('../store').SidebarStore} store
    */
   constructor($window, annotationsService, store) {
-    this._window = $window;
-    this._store = store;
-    this._portFinder = new PortFinder({
-      hostFrame: this._window.parent,
-      source: 'sidebar',
-    });
-    this._listeners = new ListenerCollection();
-
     /**
      * Channel for sidebar-host communication.
      *
@@ -82,6 +71,9 @@ export class FrameSyncService {
      * @type {Bridge<SidebarToGuestEvent,GuestToSidebarEvent>}
      */
     this._guestRPC = new Bridge();
+
+    this._store = store;
+    this._window = $window;
 
     // Set of tags of annotations that are currently loaded into the frame
     const inFrame = new Set();
@@ -234,7 +226,7 @@ export class FrameSyncService {
   /**
    * Connect to the host frame and guest frame(s) in the current browser tab.
    */
-  async connect() {
+  connect() {
     /**
      * Query the guest in a frame for the URL and metadata of the document that
      * is currently loaded and add the result to the set of connected frames.
@@ -261,6 +253,24 @@ export class FrameSyncService {
 
     this._guestRPC.onConnect(addFrame);
 
+    // Listen for messages from new guest frames that want to connect.
+    //
+    // The message will include a `MessagePort` to use for communication with
+    // the guest.
+    this._window.addEventListener('message', e => {
+      if (e.data?.type !== 'hypothesisGuestReady') {
+        return;
+      }
+      if (e.ports.length === 0) {
+        console.warn(
+          'Ignoring `hypothesisGuestReady` message without a MessagePort'
+        );
+        return;
+      }
+      const port = e.ports[0];
+      this._guestRPC.createChannel(port);
+    });
+
     this._setupSyncToGuests();
     this._setupSyncFromGuests();
 
@@ -285,24 +295,14 @@ export class FrameSyncService {
       this._guestRPC.call('setHighlightsVisible', visible);
     });
 
-    // Create channel for sidebar-host communication and send port to host.
-    const hostPort = await this._portFinder.discover('host');
-    this._hostRPC.createChannel(hostPort);
-
-    // Create channel for guest-sidebar communication
-    hostPort.start();
-    this._listeners.add(hostPort, 'message', event => {
-      const { data, ports } = /** @type {MessageEvent} */ (event);
-      if (
-        isMessageEqual(data, {
-          frame1: 'guest',
-          frame2: 'sidebar',
-          type: 'offer',
-        })
-      ) {
-        this._guestRPC.createChannel(ports[0]);
-      }
-    });
+    // Create channel for sidebar <-> host communication and send port to host.
+    //
+    // This also serves to notify the host that the sidebar application is ready.
+    const hostChannel = new MessageChannel();
+    this._hostRPC.createChannel(hostChannel.port1);
+    this._window.parent.postMessage({ type: 'hypothesisSidebarReady' }, '*', [
+      hostChannel.port2,
+    ]);
   }
 
   /**
@@ -335,11 +335,5 @@ export class FrameSyncService {
    */
   scrollToAnnotation(tag) {
     this._guestRPC.call('scrollToAnnotation', tag);
-  }
-
-  // Only used to cleanup tests
-  destroy() {
-    this._portFinder.destroy();
-    this._listeners.removeAll();
   }
 }
