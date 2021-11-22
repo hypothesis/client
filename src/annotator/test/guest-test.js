@@ -1,4 +1,3 @@
-import { delay } from '../../test-util/wait';
 import Guest, { $imports } from '../guest';
 import { EventBus } from '../util/emitter';
 
@@ -31,29 +30,36 @@ class FakeTextRange {
 describe('Guest', () => {
   const sandbox = sinon.createSandbox();
   let eventBus;
-  let guests;
   let highlighter;
   let rangeUtil;
   let notifySelectionChanged;
 
+  let hostFrame;
+
   let FakeAnnotationSync;
   let fakeAnnotationSync;
+  let FakeBridge;
   let fakeBridge;
+
+  let fakeCreateIntegration;
   let fakeIntegration;
+
   let FakeHypothesisInjector;
   let fakeHypothesisInjector;
-  let fakePortFinder;
+
+  let guests;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
     eventBus = new EventBus();
-    const guest = new Guest(element, eventBus, config);
+    const guest = new Guest(element, eventBus, config, hostFrame);
     guests.push(guest);
     return guest;
   };
 
   beforeEach(() => {
     guests = [];
+    FakeAdder.instance = null;
     highlighter = {
       getHighlightsContainingNode: sinon.stub().returns([]),
       highlightRange: sinon.stub().returns([]),
@@ -69,8 +75,6 @@ describe('Guest', () => {
     };
     notifySelectionChanged = null;
 
-    FakeAdder.instance = null;
-
     fakeAnnotationSync = {
       destroy: sinon.stub(),
       sync: sinon.stub(),
@@ -83,6 +87,7 @@ describe('Guest', () => {
       destroy: sinon.stub(),
       on: sinon.stub(),
     };
+    FakeBridge = sinon.stub().returns(fakeBridge);
 
     fakeIntegration = {
       anchor: sinon.stub(),
@@ -99,16 +104,17 @@ describe('Guest', () => {
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     };
 
+    fakeCreateIntegration = sinon.stub().returns(fakeIntegration);
+
+    hostFrame = {
+      postMessage: sinon.stub(),
+    };
+
     fakeHypothesisInjector = {
       destroy: sinon.stub(),
       injectClient: sinon.stub().resolves(),
     };
     FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
-
-    fakePortFinder = {
-      discover: sinon.stub(),
-      destroy: sinon.stub(),
-    };
 
     class FakeSelectionObserver {
       constructor(callback) {
@@ -117,21 +123,14 @@ describe('Guest', () => {
       }
     }
 
-    sandbox.stub(window.parent, 'postMessage');
-
     $imports.$mock({
-      '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
-      '../shared/port-finder': {
-        PortFinder: sinon.stub().returns(fakePortFinder),
-      },
+      '../shared/bridge': { Bridge: FakeBridge },
       './adder': { Adder: FakeAdder },
       './anchoring/text-range': {
         TextRange: FakeTextRange,
       },
       './annotation-sync': { AnnotationSync: FakeAnnotationSync },
-      './integrations': {
-        createIntegration: sinon.stub().returns(fakeIntegration),
-      },
+      './integrations': { createIntegration: fakeCreateIntegration },
       './highlighter': highlighter,
       './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
       './range-util': rangeUtil,
@@ -1136,7 +1135,7 @@ describe('Guest', () => {
       guest.destroy();
 
       assert.calledWith(
-        window.parent.postMessage,
+        hostFrame.postMessage,
         {
           type: 'hypothesisGuestUnloaded',
           frameIdentifier: 'frame-id',
@@ -1152,7 +1151,7 @@ describe('Guest', () => {
     window.dispatchEvent(new Event('unload'));
 
     assert.calledWith(
-      window.parent.postMessage,
+      hostFrame.postMessage,
       {
         type: 'hypothesisGuestUnloaded',
         frameIdentifier: 'frame-id',
@@ -1165,19 +1164,6 @@ describe('Guest', () => {
     const guest = createGuest();
     guest.destroy();
     assert.calledWith(fakeHypothesisInjector.destroy);
-  });
-
-  it('discovers and creates a channel for communication with the sidebar', async () => {
-    const { port1 } = new MessageChannel();
-    fakePortFinder.discover.resolves(port1);
-    createGuest();
-
-    await delay(0);
-
-    assert.calledWith(
-      fakeBridge.createChannel,
-      sinon.match.instanceOf(MessagePort)
-    );
   });
 
   describe('#contentContainer', () => {
@@ -1225,6 +1211,37 @@ describe('Guest', () => {
 
       assert.calledWith(FakeHypothesisInjector, guest.element, config);
       assert.calledWith(fakeHypothesisInjector.injectClient, frame);
+    });
+  });
+
+  describe('#connectToSidebar', () => {
+    it('sends a `hypothesisGuestReady` notification to the sidebar', async () => {
+      const guest = createGuest();
+      const sidebarFrame = { postMessage: sinon.stub() };
+      const sidebarOrigin = 'https://dummy.hypothes.is/';
+
+      guest.connectToSidebar(sidebarFrame, sidebarOrigin);
+
+      assert.calledWith(
+        sidebarFrame.postMessage,
+        {
+          type: 'hypothesisGuestReady',
+        },
+        sidebarOrigin,
+        [sinon.match.instanceOf(MessagePort)]
+      );
+    });
+
+    it('creates a channel for communication with the sidebar', () => {
+      const guest = createGuest();
+      const sidebarFrame = { postMessage: sinon.stub() };
+
+      guest.connectToSidebar(sidebarFrame, 'https://dummy.hypothes.is');
+
+      assert.calledWith(
+        fakeBridge.createChannel,
+        sinon.match.instanceOf(MessagePort)
+      );
     });
   });
 });

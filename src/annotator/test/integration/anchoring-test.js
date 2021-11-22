@@ -1,7 +1,7 @@
 // Tests that the expected parts of the page are highlighted when annotations
 // with various combinations of selector are anchored.
 
-import Guest, { $imports } from '../../guest';
+import Guest from '../../guest';
 import { EventBus } from '../../util/emitter';
 import testPageHTML from './test-page.html';
 
@@ -50,15 +50,6 @@ describe('anchoring', () => {
     container.innerHTML = testPageHTML;
     document.body.appendChild(container);
     const eventBus = new EventBus();
-    const fakePortFinder = {
-      discover: sinon.stub().resolves(new MessageChannel().port1),
-      destroy: sinon.stub(),
-    };
-    $imports.$mock({
-      '../shared/port-finder': {
-        PortFinder: sinon.stub().returns(fakePortFinder),
-      },
-    });
     guest = new Guest(container, eventBus);
   });
 
@@ -66,7 +57,6 @@ describe('anchoring', () => {
     guest.destroy();
     container.remove();
     console.warn.restore();
-    $imports.$restore();
   });
 
   [
