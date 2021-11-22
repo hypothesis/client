@@ -33,9 +33,8 @@ describe('Guest', () => {
   let eventBus;
   let guests;
   let highlighter;
-  let hostFrame;
-  let notifySelectionChanged;
   let rangeUtil;
+  let notifySelectionChanged;
 
   let FakeAnnotationSync;
   let fakeAnnotationSync;
@@ -48,7 +47,7 @@ describe('Guest', () => {
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
     eventBus = new EventBus();
-    const guest = new Guest(element, eventBus, config, hostFrame);
+    const guest = new Guest(element, eventBus, config);
     guests.push(guest);
     return guest;
   };
@@ -63,15 +62,12 @@ describe('Guest', () => {
       setHighlightsFocused: sinon.stub(),
       setHighlightsVisible: sinon.stub(),
     };
-    hostFrame = {
-      postMessage: sinon.stub(),
-    };
-    notifySelectionChanged = null;
     rangeUtil = {
       itemsForRange: sinon.stub().returns([]),
       isSelectionBackwards: sinon.stub(),
       selectionFocusRect: sinon.stub(),
     };
+    notifySelectionChanged = null;
 
     FakeAdder.instance = null;
 
@@ -120,6 +116,8 @@ describe('Guest', () => {
         this.disconnect = sinon.stub();
       }
     }
+
+    sandbox.stub(window.parent, 'postMessage');
 
     $imports.$mock({
       '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
@@ -1138,7 +1136,7 @@ describe('Guest', () => {
       guest.destroy();
 
       assert.calledWith(
-        hostFrame.postMessage,
+        window.parent.postMessage,
         {
           type: 'hypothesisGuestUnloaded',
           frameIdentifier: 'frame-id',
@@ -1154,7 +1152,7 @@ describe('Guest', () => {
     window.dispatchEvent(new Event('unload'));
 
     assert.calledWith(
-      hostFrame.postMessage,
+      window.parent.postMessage,
       {
         type: 'hypothesisGuestUnloaded',
         frameIdentifier: 'frame-id',
@@ -1176,7 +1174,10 @@ describe('Guest', () => {
 
     await delay(0);
 
-    assert.calledWith(fakeBridge.createChannel, port1);
+    assert.calledWith(
+      fakeBridge.createChannel,
+      sinon.match.instanceOf(MessagePort)
+    );
   });
 
   describe('#contentContainer', () => {

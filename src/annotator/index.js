@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('../types/annotator').HypothesisWindow} HypothesisWindow
+ */
+
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
 
@@ -9,7 +13,6 @@ import { registerIcons } from '@hypothesis/frontend-shared';
 import iconSet from './icons';
 registerIcons(iconSet);
 
-import { PortProvider } from '../shared/port-provider';
 import { getConfig } from './config/index';
 import Guest from './guest';
 import Notebook from './notebook';
@@ -38,36 +41,23 @@ const sidebarLinkElement = /** @type {HTMLLinkElement} */ (
  */
 function init() {
   const annotatorConfig = getConfig('annotator');
-
-  const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
+  const isHostFrame = annotatorConfig.subFrameIdentifier === null;
 
   // Create the guest that handles creating annotations and displaying highlights.
   const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, annotatorConfig, hostFrame);
+  const guest = new Guest(document.body, eventBus, annotatorConfig);
 
   let sidebar;
   let notebook;
-  let portProvider;
-  if (hostFrame === window) {
-    const sidebarConfig = getConfig('sidebar');
+  if (isHostFrame) {
+    sidebar = new Sidebar(document.body, eventBus, guest, getConfig('sidebar'));
 
-    const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
-    portProvider = new PortProvider(hypothesisAppsOrigin);
-
-    sidebar = new Sidebar(
-      document.body,
-      eventBus,
-      portProvider.hostPortFor('sidebar'),
-      guest,
-      sidebarConfig
-    );
+    // Clear `annotations` value from the notebook's config to prevent direct-linked
+    // annotations from filtering the threads.
     notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
-
-    portProvider.listen();
   }
 
   sidebarLinkElement.addEventListener('destroy', () => {
-    portProvider?.destroy();
     sidebar?.destroy();
     notebook?.destroy();
     guest.destroy();
