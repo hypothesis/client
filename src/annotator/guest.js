@@ -177,12 +177,12 @@ export default class Guest {
      *
      * @type {Bridge<GuestToSidebarEvent,SidebarToGuestEvent>}
      */
-    this._sidebarRPC = new Bridge();
+    this._bridge = new Bridge();
     this._connectSidebarEvents();
 
     // Set up listeners for when the sidebar asks us to add or remove annotations
     // in this frame.
-    this._annotationSync = new AnnotationSync(eventBus, this._sidebarRPC);
+    this._annotationSync = new AnnotationSync(eventBus, this._bridge);
     this._connectAnnotationSync();
 
     // Set up automatic and integration-triggered injection of client into
@@ -229,7 +229,7 @@ export default class Guest {
         // Don't hide the sidebar if the event comes from an element that contains a highlight
         return;
       }
-      this._sidebarRPC.call('closeSidebar');
+      this._bridge.call('closeSidebar');
     };
 
     this._listeners.add(this.element, 'mouseup', event => {
@@ -318,7 +318,7 @@ export default class Guest {
   async _connectSidebarEvents() {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
-    this._sidebarRPC.on('focusAnnotations', (tags = []) => {
+    this._bridge.on('focusAnnotations', (tags = []) => {
       this._focusedAnnotations.clear();
       tags.forEach(tag => this._focusedAnnotations.add(tag));
 
@@ -330,7 +330,7 @@ export default class Guest {
       }
     });
 
-    this._sidebarRPC.on('scrollToAnnotation', tag => {
+    this._bridge.on('scrollToAnnotation', tag => {
       const anchor = this.anchors.find(a => a.annotation.$tag === tag);
       if (!anchor?.highlights) {
         return;
@@ -356,21 +356,21 @@ export default class Guest {
     });
 
     // Handler for when sidebar requests metadata for the current document
-    this._sidebarRPC.on('getDocumentInfo', cb => {
+    this._bridge.on('getDocumentInfo', cb => {
       this.getDocumentInfo()
         .then(info => cb(null, info))
         .catch(reason => cb(reason));
     });
 
     // Handler for controls on the sidebar
-    this._sidebarRPC.on('setHighlightsVisible', showHighlights => {
+    this._bridge.on('setHighlightsVisible', showHighlights => {
       this.setHighlightsVisible(showHighlights);
     });
 
     // Discover and connect to the sidebar frame. All RPC events must be
     // registered before creating the channel.
     const sidebarPort = await this._portFinder.discover('sidebar');
-    this._sidebarRPC.createChannel(sidebarPort);
+    this._bridge.createChannel(sidebarPort);
   }
 
   destroy() {
@@ -387,7 +387,7 @@ export default class Guest {
     this._integration.destroy();
     this._emitter.destroy();
     this._annotationSync.destroy();
-    this._sidebarRPC.destroy();
+    this._bridge.destroy();
   }
 
   /**
@@ -585,7 +585,7 @@ export default class Guest {
    */
   _focusAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
-    this._sidebarRPC.call('focusAnnotations', tags);
+    this._bridge.call('focusAnnotations', tags);
   }
 
   /**
@@ -636,11 +636,11 @@ export default class Guest {
   selectAnnotations(annotations, toggle = false) {
     const tags = annotations.map(a => a.$tag);
     if (toggle) {
-      this._sidebarRPC.call('toggleAnnotationSelection', tags);
+      this._bridge.call('toggleAnnotationSelection', tags);
     } else {
-      this._sidebarRPC.call('showAnnotations', tags);
+      this._bridge.call('showAnnotations', tags);
     }
-    this._sidebarRPC.call('openSidebar');
+    this._bridge.call('openSidebar');
   }
 
   /**
