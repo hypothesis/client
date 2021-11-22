@@ -285,11 +285,12 @@ export class FrameSyncService {
       this._guestRPC.call('setHighlightsVisible', visible);
     });
 
-    // Create channel for sidebar-host communication.
+    // Create channel for sidebar-host communication and send port to host.
     const hostPort = await this._portFinder.discover('host');
     this._hostRPC.createChannel(hostPort);
 
-    // Listen for guests connecting to the sidebar.
+    // Create channel for guest-sidebar communication
+    hostPort.start();
     this._listeners.add(hostPort, 'message', event => {
       const { data, ports } = /** @type {MessageEvent} */ (event);
       if (

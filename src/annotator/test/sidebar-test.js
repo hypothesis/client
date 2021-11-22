@@ -7,6 +7,7 @@ const EXTERNAL_CONTAINER_SELECTOR = 'test-external-container';
 
 describe('Sidebar', () => {
   const sandbox = sinon.createSandbox();
+  let fakeGuest;
 
   // Containers and Sidebar instances created by current test.
   let containers;
@@ -15,7 +16,7 @@ describe('Sidebar', () => {
   let fakeBridge;
   let FakeBucketBar;
   let fakeBucketBar;
-  let fakeGuest;
+  let fakePortProvider;
   let FakeToolbarController;
   let fakeToolbar;
 
@@ -40,7 +41,7 @@ describe('Sidebar', () => {
   const createSidebar = (config = {}) => {
     config = {
       // Dummy sidebar app.
-      sidebarAppUrl: '/base/annotator/test/empty.html',
+      sidebarAppUrl: 'https://hyp.is/base/annotator/test/empty.html',
       ...config,
     };
     const container = document.createElement('div');
@@ -48,8 +49,7 @@ describe('Sidebar', () => {
     containers.push(container);
 
     const eventBus = new EventBus();
-    const { port1 } = new MessageChannel();
-    const sidebar = new Sidebar(container, eventBus, port1, fakeGuest, config);
+    const sidebar = new Sidebar(container, eventBus, fakeGuest, config);
     sidebars.push(sidebar);
 
     return sidebar;
@@ -95,6 +95,12 @@ describe('Sidebar', () => {
     }
     fakeGuest = new FakeGuest();
 
+    fakePortProvider = {
+      listen: sinon.stub(),
+      sidebarPort: sinon.stub(),
+      destroy: sinon.stub(),
+    };
+
     fakeToolbar = {
       getWidth: sinon.stub().returns(100),
       useMinimalControls: false,
@@ -107,6 +113,9 @@ describe('Sidebar', () => {
 
     $imports.$mock({
       '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
+      '../shared/port-provider': {
+        PortProvider: sinon.stub().returns(fakePortProvider),
+      },
       './bucket-bar': { default: FakeBucketBar },
       './toolbar': {
         ToolbarController: FakeToolbarController,
@@ -182,14 +191,11 @@ describe('Sidebar', () => {
   }
 
   it('creates sidebar iframe and passes configuration to it', () => {
-    const appURL = new URL(
-      '/base/annotator/test/empty.html',
-      window.location.href
-    );
+    const appURL = 'https://hyp.is/base/annotator/test/empty.html';
     const sidebar = createSidebar({ annotations: '1234' });
     assert.equal(
       getConfigString(sidebar),
-      appURL + configFragment({ annotations: '1234' })
+      `${appURL}${configFragment({ annotations: '1234' })}`
     );
   });
 
