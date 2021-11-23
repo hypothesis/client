@@ -2,6 +2,8 @@
 @use './mixins/utils';
 @use './variables' as var;
 
+@tailwind utilities;
+
 // Utility classes
 // These will be extracted and considered when developing typography patterns
 .u-font--xsmall {
