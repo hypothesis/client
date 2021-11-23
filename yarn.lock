@@ -1527,10 +1527,10 @@ append-buffer@^1.0.2:
   dependencies:
     buffer-equal "^1.0.0"
 
-approx-string-match@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/approx-string-match/-/approx-string-match-1.1.0.tgz#2fb8e1d6dcb640acc1c0d1ae9f0895348d06f4c0"
-  integrity sha512-j1yQB9XhfGWsvTfHEuNsR/SrUT4XQDkAc0PEjMifyi97931LmNQyLsO6HbuvZ3HeMx+3Dvk8m8XGkUF+8lCeqw==
+approx-string-match@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/approx-string-match/-/approx-string-match-2.0.0.tgz#c7d11c5a893e76e60a2d080d91ee3bb0ec4e18fa"
+  integrity sha512-03v8MsWnZYV4Svv82EYWoVw1RIKAJ/zubmhG1FYvhJwOsBnLPxx6CPHF2dXN/yW8uwHK+653j52IwiNluJR97w==
 
 archy@^1.0.0:
   version "1.0.0"
