@@ -56,18 +56,14 @@ export default class Sidebar {
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
-   * @param {MessagePort} hostPort -
-   *   Host port for the host-sidebar communication channel. The sidebar app will
-   *   request its side of the channel when it starts.
    * @param {Guest} guest -
    *   The `Guest` instance for the current frame. It is currently assumed that
    *   it is always possible to annotate in the frame where the sidebar is
    *   displayed.
    * @param {Record<string, any>} [config]
    */
-  constructor(element, eventBus, hostPort, guest, config = {}) {
+  constructor(element, eventBus, guest, config = {}) {
     this._emitter = eventBus.createEmitter();
-    this._hostPort = hostPort;
 
     /**
      * Channel for host-sidebar communication.
@@ -198,9 +194,6 @@ export default class Sidebar {
       }
     });
 
-    // Create channel *after* all bridge events are registered with the `on` method.
-    this._sidebarRPC.createChannel(this._hostPort);
-
     // Notify sidebar when a guest is unloaded. This message is routed via
     // the host frame because in Safari guest frames are unable to send messages
     // directly to the sidebar during a window's 'unload' event.
@@ -223,6 +216,18 @@ export default class Sidebar {
       this.iframe.remove();
     }
     this._emitter.destroy();
+  }
+
+  /**
+   * Establish RPC channels from specific source frames
+   *
+   * @param {'guest'|'sidebar'} source
+   * @param {MessagePort} port
+   */
+  onFrameConnected(source, port) {
+    if (source === 'sidebar') {
+      this._sidebarRPC.createChannel(port);
+    }
   }
 
   _setupSidebarEvents() {

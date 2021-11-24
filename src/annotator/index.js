@@ -54,14 +54,12 @@ function init() {
     const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
     portProvider = new PortProvider(hypothesisAppsOrigin);
 
-    sidebar = new Sidebar(
-      document.body,
-      eventBus,
-      portProvider.hostPortFor('sidebar'),
-      guest,
-      sidebarConfig
-    );
+    sidebar = new Sidebar(document.body, eventBus, guest, sidebarConfig);
     notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
+
+    portProvider.on('frameConnected', (source, port) =>
+      sidebar.onFrameConnected(source, port)
+    );
 
     portProvider.listen();
   }
