@@ -7,7 +7,6 @@ import { isMessageEqual, isSourceWindow } from './port-util';
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('./port-util').Message} Message
  * @typedef {import('./port-util').Frame} Frame
- * @typedef {'guest-host'|'guest-sidebar'|'notebook-sidebar'|'sidebar-host'} Channel
  */
 
 /**
@@ -74,7 +73,7 @@ export class PortProvider {
      * Guest frames in particular may send duplicate requests (see comments in
      * PortFinder).
      *
-     * @type {WeakMap<Window, Set<Channel>>}
+     * @type {WeakMap<Window, Set<Frame>>}
      */
     this._sentChannels = new Map();
 
@@ -181,7 +180,6 @@ export class PortProvider {
       }
 
       const { frame1, frame2 } = match;
-      const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
 
       // Check if this request has already been received from this frame and
       // ignore it if so.
@@ -190,15 +188,15 @@ export class PortProvider {
         sentChannels = new Set();
         this._sentChannels.set(source, sentChannels);
       }
-      if (sentChannels.has(channel)) {
+      if (sentChannels.has(frame2)) {
         return;
       }
-      sentChannels.add(channel);
+      sentChannels.add(frame2);
 
       // Create the channel for these two frames to communicate and send the
       // corresponding ports to them.
       const messageChannel =
-        channel === 'sidebar-host'
+        frame1 === 'sidebar' && frame2 === 'host'
           ? this._sidebarHostChannel
           : new MessageChannel();
 
