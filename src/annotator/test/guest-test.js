@@ -132,7 +132,12 @@ describe('Guest', () => {
       },
       './annotation-sync': { AnnotationSync: FakeAnnotationSync },
       './integrations': {
-        createIntegration: sinon.stub().returns(fakeIntegration),
+        createIntegration: sinon
+          .stub()
+          .callsFake((_, subFrameIdentifier) => [
+            fakeIntegration,
+            subFrameIdentifier ?? 'main',
+          ]),
       },
       './highlighter': highlighter,
       './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },

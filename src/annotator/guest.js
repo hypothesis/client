@@ -166,11 +166,6 @@ export default class Guest {
      */
     this.anchors = [];
 
-    // Set the frame identifier if it's available.
-    // The "top" guest instance will have this as 'main' since it's in a top frame not a sub frame
-    /** @type {string} */
-    this._frameIdentifier = config.subFrameIdentifier ?? 'main';
-
     this._portFinder = new PortFinder({
       hostFrame: this._hostFrame,
       source: 'guest',
@@ -205,7 +200,12 @@ export default class Guest {
      * Integration that handles document-type specific functionality in the
      * guest.
      */
-    this._integration = createIntegration(this);
+    const [integration, frameIdentifier] = createIntegration(
+      this,
+      config.subFrameIdentifier
+    );
+    this._integration = integration;
+    this._frameIdentifier = frameIdentifier;
 
     this._sideBySideActive = false;
 
