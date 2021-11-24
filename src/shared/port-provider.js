@@ -67,14 +67,16 @@ export class PortProvider {
     this._hypothesisAppsOrigin = hypothesisAppsOrigin;
     this._emitter = new TinyEmitter();
 
-    // Although some channels (v.gr. `notebook-sidebar`) have only one
-    // `MessageChannel`, other channels (v.gr. `guest-sidebar`) can have multiple
-    // `MessageChannel`s. The `Window` refers to the frame that sends the initial
-    // request that triggers the creation of a channel. We use `WeakMap` so that
-    // entries are removed from the map when the garbage collector reclaims the
-    // removed window.
-    /** @type {Map<Channel, WeakMap<Window, MessageChannel>>} */
-    this._channels = new Map();
+    /**
+     * Map of source frame to channels that have been created for this frame.
+     *
+     * This is used to avoid responding to the same request multiple times.
+     * Guest frames in particular may send duplicate requests (see comments in
+     * PortFinder).
+     *
+     * @type {WeakMap<Window, Set<Channel>>}
+     */
+    this._sentChannels = new Map();
 
     // Create the `sidebar-host` channel immediately, while other channels are
     // created on demand
@@ -181,29 +183,25 @@ export class PortProvider {
       const { frame1, frame2 } = match;
       const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
 
-      let windowChannelMap = this._channels.get(channel);
-      if (!windowChannelMap) {
-        windowChannelMap = new WeakMap();
-        this._channels.set(channel, windowChannelMap);
+      // Check if this request has already been received from this frame and
+      // ignore it if so.
+      let sentChannels = this._sentChannels.get(source);
+      if (!sentChannels) {
+        sentChannels = new Set();
+        this._sentChannels.set(source, sentChannels);
       }
-
-      let messageChannel = windowChannelMap.get(source);
-
-      // Ignore the port request if the channel for the specified window has
-      // already been created. This is to avoid transferring the port more than once.
-      if (messageChannel) {
+      if (sentChannels.has(channel)) {
         return;
       }
+      sentChannels.add(channel);
 
-      // Create the channel for these two frames to communicate.
-      if (frame1 === 'sidebar' && frame2 === 'host') {
-        messageChannel = this._sidebarHostChannel;
-      } else {
-        messageChannel = new MessageChannel();
-      }
-      windowChannelMap.set(source, messageChannel);
+      // Create the channel for these two frames to communicate and send the
+      // corresponding ports to them.
+      const messageChannel =
+        channel === 'sidebar-host'
+          ? this._sidebarHostChannel
+          : new MessageChannel();
 
-      // Send the ports to the frames at either end of the channel.
       const message = { frame1, frame2, type: 'offer' };
       source.postMessage(message, origin, [messageChannel.port1]);
 
