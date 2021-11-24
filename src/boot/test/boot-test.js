@@ -35,6 +35,7 @@ describe('bootstrap', () => {
       // Annotation layer
       'scripts/annotator.bundle.js',
       'styles/annotator.css',
+      'styles/highlights.css',
       'styles/pdfjs-overrides.css',
 
       // Sidebar app
@@ -103,11 +104,29 @@ describe('bootstrap', () => {
       runBoot('annotator');
       const expectedAssets = [
         'scripts/annotator.bundle.1234.js#ts=123',
-        'styles/annotator.1234.css',
+        'styles/highlights.1234.css',
         'styles/pdfjs-overrides.1234.css',
       ].map(assetUrl);
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
+    });
+
+    it('preloads assets used wihin shadow roots in the annotation layer', () => {
+      runBoot('annotator');
+
+      const preloadLinks = [
+        ...iframe.contentDocument.querySelectorAll('link[rel=preload]'),
+      ];
+      preloadLinks.sort((a, b) => a.href.localeCompare(b.href));
+
+      assert.equal(preloadLinks.length, 1);
+
+      assert.equal(
+        preloadLinks[0].href,
+        'https://marginal.ly/client/build/styles/annotator.1234.css'
+      );
+      assert.equal(preloadLinks[0].as, 'style');
+      assert.equal(preloadLinks[0].crossOrigin, 'anonymous');
     });
 
     it('creates the link to the sidebar iframe', () => {

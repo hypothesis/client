@@ -18,6 +18,7 @@ gulp.task('build-css', () =>
   buildCSS([
     // Hypothesis client
     './src/styles/annotator/annotator.scss',
+    './src/styles/annotator/highlights.scss',
     './src/styles/annotator/pdfjs-overrides.scss',
     './src/styles/sidebar/sidebar.scss',
 

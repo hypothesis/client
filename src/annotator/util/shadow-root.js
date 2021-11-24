@@ -2,9 +2,10 @@
  * Load stylesheets for annotator UI components into the shadow DOM root.
  */
 function loadStyles(shadowRoot) {
+  // Find the preloaded stylesheet added by the boot script.
   const url = /** @type {HTMLLinkElement|undefined} */ (
     document.querySelector(
-      'link[rel="stylesheet"][href*="/build/styles/annotator.css"]'
+      'link[rel="preload"][href*="/build/styles/annotator.css"]'
     )
   )?.href;
 
@@ -13,6 +14,10 @@ function loadStyles(shadowRoot) {
   }
 
   const linkEl = document.createElement('link');
+
+  // This needs to match the `crossorigin` attribute on the preloaded stylesheet.
+  linkEl.crossOrigin = 'anonymous';
+
   linkEl.rel = 'stylesheet';
   linkEl.href = url;
   shadowRoot.appendChild(linkEl);

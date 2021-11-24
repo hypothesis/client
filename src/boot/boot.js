@@ -121,6 +121,14 @@ function preloadUrl(doc, type, url) {
 }
 
 /**
+ * @param {SidebarAppConfig|AnnotatorConfig} config
+ * @param {string} path
+ */
+function assetURL(config, path) {
+  return config.assetRoot + 'build/' + config.manifest[path];
+}
+
+/**
  * @param {Document} doc
  * @param {SidebarAppConfig|AnnotatorConfig} config
  * @param {string[]} assets
@@ -129,7 +137,7 @@ function preloadUrl(doc, type, url) {
  */
 function injectAssets(doc, config, assets, { forceModuleReload } = {}) {
   assets.forEach(path => {
-    const url = config.assetRoot + 'build/' + config.manifest[path];
+    const url = assetURL(config, path);
     if (url.match(/\.css/)) {
       injectStylesheet(doc, url);
     } else {
@@ -169,6 +177,9 @@ export function bootHypothesisClient(doc, config) {
   // Register the URL of the notebook app which the Hypothesis client should load.
   injectLink(doc, 'notebook', 'html', config.notebookAppUrl);
 
+  // Preload the styles used by the shadow roots of annotator UI elements.
+  preloadUrl(doc, 'style', assetURL(config, 'styles/annotator.css'));
+
   // Register the URL of the annotation client which is currently being used to drive
   // annotation interactions.
   injectLink(
@@ -189,7 +200,7 @@ export function bootHypothesisClient(doc, config) {
 
       'scripts/annotator.bundle.js',
 
-      'styles/annotator.css',
+      'styles/highlights.css',
       'styles/pdfjs-overrides.css',
     ],
 

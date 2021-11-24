@@ -3,14 +3,24 @@ import { createShadowRoot } from '../shadow-root';
 describe('annotator/util/shadow-root', () => {
   let applyFocusVisiblePolyfill;
   let container;
+  let preloadedStylesheet;
 
   beforeEach(() => {
+    // Create the stylesheet preload that would normally be added by the boot script.
+    preloadedStylesheet = document.createElement('link');
+    preloadedStylesheet.rel = 'preload';
+    preloadedStylesheet.as = 'style';
+    preloadedStylesheet.href = '/build/styles/annotator.css';
+    document.head.append(preloadedStylesheet);
+
     container = document.createElement('div');
     applyFocusVisiblePolyfill = window.applyFocusVisiblePolyfill;
     window.applyFocusVisiblePolyfill = sinon.stub();
   });
 
   afterEach(() => {
+    preloadedStylesheet.remove();
+
     container.remove();
     window.applyFocusVisiblePolyfill = applyFocusVisiblePolyfill;
   });
@@ -39,7 +49,7 @@ describe('annotator/util/shadow-root', () => {
 
     it('does not inject stylesheets into the shadow root if style is not found', () => {
       const link = document.querySelector(
-        'link[rel="stylesheet"][href*="/build/styles/annotator.css"]'
+        'link[rel="preload"][href*="/build/styles/annotator.css"]'
       );
       // Removing the `rel` attribute is enough for the URL to not be found
       link.removeAttribute('rel');
