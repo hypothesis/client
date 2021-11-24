@@ -110,8 +110,8 @@ export default class Sidebar {
 
       // Wrap up the 'iframeContainer' element into a shadow DOM so it is not affected by host CSS styles
       this.hypothesisSidebar = document.createElement('hypothesis-sidebar');
-      const shadowDom = createShadowRoot(this.hypothesisSidebar);
-      shadowDom.appendChild(this.iframeContainer);
+      const shadowRoot = createShadowRoot(this.hypothesisSidebar);
+      shadowRoot.appendChild(this.iframeContainer);
 
       element.appendChild(this.hypothesisSidebar);
     }

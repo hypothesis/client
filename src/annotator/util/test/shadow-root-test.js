@@ -23,13 +23,6 @@ describe('annotator/util/shadow-root', () => {
       assert.equal(container.shadowRoot, shadowRoot);
     });
 
-    it('does not attach a shadow root if Shadow DOM is unavailable', () => {
-      container.attachShadow = null;
-      const shadowRoot = createShadowRoot(container);
-
-      assert.equal(shadowRoot, container);
-    });
-
     it('injects stylesheets into the shadow root', () => {
       createShadowRoot(container);
 
