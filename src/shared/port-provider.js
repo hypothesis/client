@@ -76,12 +76,6 @@ export class PortProvider {
     /** @type {Map<Channel, WeakMap<Window, MessageChannel>>} */
     this._channels = new Map();
 
-    // Two important characteristics of `MessagePort`:
-    // - Once created, a MessagePort can only be transferred to a different
-    //   frame once, and if any frame attempts to transfer it again it gets
-    //   neutered.
-    // - Messages are queued until the other port is ready to listen (`port.start()`)
-
     // Create the `sidebar-host` channel immediately, while other channels are
     // created on demand
     this._sidebarHostChannel = new MessageChannel();
