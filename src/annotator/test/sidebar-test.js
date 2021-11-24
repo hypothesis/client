@@ -48,8 +48,7 @@ describe('Sidebar', () => {
     containers.push(container);
 
     const eventBus = new EventBus();
-    const { port1 } = new MessageChannel();
-    const sidebar = new Sidebar(container, eventBus, port1, fakeGuest, config);
+    const sidebar = new Sidebar(container, eventBus, fakeGuest, config);
     sidebars.push(sidebar);
 
     return sidebar;
@@ -528,6 +527,24 @@ describe('Sidebar', () => {
       const sidebar = createSidebar();
       sidebar.destroy();
       assert.called(sidebar.bucketBar.destroy);
+    });
+  });
+
+  describe('#onFrameConnected', () => {
+    it('ignores unrecognized source frames', () => {
+      const sidebar = createSidebar();
+      const { port1 } = new MessageChannel();
+      sidebar.onFrameConnected('dummy', port1);
+
+      assert.notCalled(fakeBridge.createChannel);
+    });
+
+    it('create RPC channels for recognized source frames', () => {
+      const sidebar = createSidebar();
+      const { port1 } = new MessageChannel();
+      sidebar.onFrameConnected('sidebar', port1);
+
+      assert.calledWith(fakeBridge.createChannel, port1);
     });
   });
 

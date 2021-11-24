@@ -46,12 +46,6 @@ describe('PortProvider', () => {
     });
   });
 
-  describe('#hostPortFor', () => {
-    it('returns the `host` port of the `sidebar-host` channel', () => {
-      assert.instanceOf(portProvider.hostPortFor('sidebar'), MessagePort);
-    });
-  });
-
   describe('#listen', () => {
     it('ignores all port requests before `listen` is called', async () => {
       portProvider.listen();
@@ -210,13 +204,27 @@ describe('PortProvider', () => {
       portProvider.listen();
       const handler = sinon.stub();
       portProvider.on('frameConnected', handler);
-      const data = {
-        frame1: 'guest',
-        frame2: 'host',
-        type: 'request',
-      };
       await sendPortFinderRequest({
-        data,
+        data: {
+          frame1: 'sidebar',
+          frame2: 'host',
+          type: 'request',
+        },
+      });
+
+      assert.calledWith(
+        handler,
+        'sidebar',
+        sinon.match.instanceOf(MessagePort)
+      );
+
+      handler.resetHistory();
+      await sendPortFinderRequest({
+        data: {
+          frame1: 'guest',
+          frame2: 'host',
+          type: 'request',
+        },
       });
 
       assert.calledWith(handler, 'guest', sinon.match.instanceOf(MessagePort));
