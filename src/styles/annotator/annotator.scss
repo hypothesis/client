@@ -1,4 +1,7 @@
-// SASS entry point for annotator styling
+// Styles for annotator UI elements. This stylesheet is loaded within shadow
+// roots to avoid affecting the host page. Styles for elements (eg. highlights)
+// which do not use shadow roots go in other bundles (eg. highlights.css,
+// pdfjs-overrides.scss).
 
 @use 'sass:meta';
 @use 'sass:color' as color;
