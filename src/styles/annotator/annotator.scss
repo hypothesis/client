@@ -21,6 +21,9 @@
 .annotator-frame {
   // CSS reset which attempts to isolate this element and its children from
   // host page styles.
+  //
+  // TODO - We should be able to remove these now because this element is always
+  // created inside a shadow root.
   @include meta.load-css('../reset');
   @include reset.nested-reset;
   @include reset.reset-box-model;
