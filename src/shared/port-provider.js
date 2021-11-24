@@ -138,37 +138,6 @@ export class PortProvider {
   }
 
   /**
-   * Send a message and a port to the corresponding destinations.
-   *
-   * @param {object} options
-   *   @param {Channel} options.channel - communication channel enabled by this
-   *     port.
-   *   @param {Message} options.message - the message to be sent.
-   *   @param {string} options.origin - the target origin to be used for sending
-   *     the port.
-   *   @param {Window} options.source - the frame to be used for sending the port.
-   *   @param {MessagePort} options.port1 - the port to be sent.
-   *   @param {MessagePort} [options.port2] - if a counterpart port is provided,
-   *     send this port either, (1) to the `sidebar` frame using the `sidebar-host`
-   *     channel or (2) through the `onHostPortRequest` event listener.
-   */
-  _sendPorts({ channel, message, origin, source, port1, port2 }) {
-    source.postMessage(message, origin, [port1]);
-
-    if (!port2) {
-      return;
-    }
-
-    if (['notebook-sidebar', 'guest-sidebar'].includes(channel)) {
-      this._sidebarHostChannel.port2.postMessage(message, [port2]);
-    }
-
-    if (channel === 'guest-host' && message.frame1 === 'guest') {
-      this._emitter.emit('frameConnected', message.frame1, port2);
-    }
-  }
-
-  /**
    * @param {'frameConnected'} eventName
    * @param {(source: 'guest', port: MessagePort) => void} handler - this handler
    *   fires when a request for the host frame has been granted. Currently, only
@@ -232,26 +201,25 @@ export class PortProvider {
         return;
       }
 
-      /** @type {Message} */
-      const message = { frame1, frame2, type: 'offer' };
-      const options = { channel, message, origin, source };
-
-      // `sidebar-host` channel is an special case, because it is created in the
-      // constructor.
-      if (channel === 'sidebar-host') {
-        windowChannelMap.set(source, this._sidebarHostChannel);
-        this._sendPorts({
-          port1: this._sidebarHostChannel.port1,
-          ...options,
-        });
-        return;
+      // Create the channel for these two frames to communicate.
+      if (frame1 === 'sidebar' && frame2 === 'host') {
+        messageChannel = this._sidebarHostChannel;
+      } else {
+        messageChannel = new MessageChannel();
       }
-
-      messageChannel = new MessageChannel();
       windowChannelMap.set(source, messageChannel);
 
-      const { port1, port2 } = messageChannel;
-      this._sendPorts({ port1, port2, ...options });
+      // Send the ports to the frames at either end of the channel.
+      const message = { frame1, frame2, type: 'offer' };
+      source.postMessage(message, origin, [messageChannel.port1]);
+
+      if (frame2 === 'sidebar') {
+        this._sidebarHostChannel.port2.postMessage(message, [
+          messageChannel.port2,
+        ]);
+      } else if (frame2 === 'host' && frame1 === 'guest') {
+        this._emitter.emit('frameConnected', frame1, messageChannel.port2);
+      }
     });
   }
 
