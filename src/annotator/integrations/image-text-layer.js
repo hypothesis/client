@@ -1,3 +1,5 @@
+import debounce from 'lodash.debounce';
+
 import { ListenerCollection } from '../../shared/listener-collection';
 
 /**
@@ -145,8 +147,8 @@ export class ImageTextLayer {
 
     // Position and scale text boxes to fit current image size.
     const updateBoxSizes = () => {
-      const imageWidth = image.getBoundingClientRect().width;
-      const imageHeight = image.getBoundingClientRect().height;
+      const { width: imageWidth, height: imageHeight } =
+        image.getBoundingClientRect();
       container.style.width = imageWidth + 'px';
       container.style.height = imageHeight + 'px';
 
@@ -179,18 +181,14 @@ export class ImageTextLayer {
     // Adjust box sizes when image is resized. We currently assume this
     // corresponds to a frame resize. We could use `ResizeObserver` instead in
     // supporting browsers.
-    this._pendingResizeTimer = 0;
+    this._updateBoxSizes = debounce(updateBoxSizes, { maxWait: 50 });
     this._listeners = new ListenerCollection();
-    this._listeners.add(window, 'resize', () => {
-      this._pendingResizeTimer = setTimeout(() => {
-        updateBoxSizes();
-      }, 50);
-    });
+    this._listeners.add(window, 'resize', this._updateBoxSizes);
   }
 
   destroy() {
     this.container.remove();
     this._listeners.removeAll();
-    clearTimeout(this._pendingResizeTimer);
+    this._updateBoxSizes.cancel();
   }
 }

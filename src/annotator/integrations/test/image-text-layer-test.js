@@ -240,6 +240,27 @@ describe('ImageTextLayer', () => {
     }
   });
 
+  it('debounces image resize events', () => {
+    const { image } = createPageImage();
+    const imageText = 'some text in the image';
+
+    const clock = sinon.useFakeTimers();
+    try {
+      createTextLayer(image, createCharBoxes(imageText), imageText);
+
+      // Spy on logic that is invoked each time a resize event is handled.
+      const measureImageSpy = sinon.spy(image, 'getBoundingClientRect');
+
+      window.dispatchEvent(new Event('resize'));
+      window.dispatchEvent(new Event('resize'));
+      clock.tick(300);
+
+      assert.calledOnce(measureImageSpy);
+    } finally {
+      clock.restore();
+    }
+  });
+
   describe('#destroy', () => {
     it('removes the <hypothesis-text-layer> element', () => {
       const { container, image } = createPageImage();
@@ -254,6 +275,33 @@ describe('ImageTextLayer', () => {
 
       const textLayerEl = container.querySelector('hypothesis-text-layer');
       assert.isNull(textLayerEl);
+    });
+
+    it('stops responding to window resize events', () => {
+      const { image } = createPageImage();
+      const imageText = 'some text in the image';
+      const textLayer = createTextLayer(
+        image,
+        createCharBoxes(imageText),
+        imageText
+      );
+
+      // Trigger an error if ImageTextLayer's resize logic is run.
+      sinon
+        .stub(image, 'getBoundingClientRect')
+        .throws(new Error('Should not be called'));
+
+      const clock = sinon.useFakeTimers();
+      try {
+        window.dispatchEvent(new Event('resize'));
+        textLayer.destroy();
+        window.dispatchEvent(new Event('resize'));
+
+        // Trigger any active debounced event handlers.
+        clock.tick(300);
+      } finally {
+        clock.restore();
+      }
     });
   });
 });
