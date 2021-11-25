@@ -82,6 +82,7 @@ describe('Sidebar', () => {
       createChannel: sinon.stub(),
       on: sinon.stub(),
       onConnect: sinon.stub(),
+      destroy: sinon.stub(),
     };
 
     fakeBucketBar = {
@@ -231,20 +232,36 @@ describe('Sidebar', () => {
       assert.calledWith(sidebar.setHighlightsVisible, false);
     });
 
-    it('creates an annotation when toolbar button is clicked', () => {
-      const sidebar = createSidebar();
+    it('creates an annotation in the main content frame when toolbar button is clicked', () => {
+      createSidebar();
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.called(sidebar.guest.createAnnotation);
+      assert.calledWith(fakeBridge.call, 'createAnnotationAt', 'main');
+    });
+
+    it('creates an annotation on another frame toolbar button is clicked', () => {
+      createSidebar({});
+
+      // make a text selection on another frame
+      const handler = fakeBridge.on
+        .getCalls()
+        .find(call => call.args[0] === 'textSelectedAt').args[1];
+      const frameIdentifier = 'other frame';
+      handler(frameIdentifier);
+
+      FakeToolbarController.args[0][1].createAnnotation();
+
+      assert.calledWith(fakeBridge.call, 'createAnnotationAt', frameIdentifier);
     });
 
     it('sets create annotation button to "Annotation" when selection becomes non-empty', () => {
       const sidebar = createSidebar();
 
-      // nb. This event is normally published by the Guest, but the sidebar
-      // doesn't care about that.
-      sidebar._emitter.publish('hasSelectionChanged', true);
+      const handler = fakeBridge.on
+        .getCalls()
+        .find(call => call.args[0] === 'textSelectedAt').args[1];
+      handler('dummy');
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
     });
@@ -252,9 +269,10 @@ describe('Sidebar', () => {
     it('sets create annotation button to "Page Note" when selection becomes empty', () => {
       const sidebar = createSidebar();
 
-      // nb. This event is normally published by the Guest, but the sidebar
-      // doesn't care about that.
-      sidebar._emitter.publish('hasSelectionChanged', false);
+      const handler = fakeBridge.on
+        .getCalls()
+        .find(call => call.args[0] === 'textDeselectedAt').args[1];
+      handler('dummy');
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
     });
@@ -608,6 +626,16 @@ describe('Sidebar', () => {
       sidebar.close();
 
       assert.equal(fakeToolbar.sidebarOpen, false);
+    });
+  });
+
+  describe('#onFrameConnected', () => {
+    it('creates a channel to communicate to the guests', () => {
+      const sidebar = createSidebar();
+      const { port1 } = new MessageChannel();
+      sidebar.onFrameConnected('guest', port1);
+
+      assert.calledWith(fakeBridge.createChannel, port1);
     });
   });
 
