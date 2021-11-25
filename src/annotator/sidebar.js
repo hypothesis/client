@@ -15,6 +15,8 @@ import { createShadowRoot } from './util/shadow-root';
 
 /**
  * @typedef {import('./guest').default} Guest
+ * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
+ * @typedef {import('../types/bridge-events').HostToGuestEvent} HostToGuestEvent
  * @typedef {import('../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
@@ -66,6 +68,22 @@ export default class Sidebar {
    */
   constructor(element, eventBus, guest, config = {}) {
     this._emitter = eventBus.createEmitter();
+
+    /**
+     * Tracks which `Guest` has a text selection. It uses the frame i«dentifier
+     * which uniquely identifies each `Guest`. If there is no text selected, the
+     * value is set to `null`.
+     *
+     * @type {null|string}
+     */
+    this._selectionAt = null;
+
+    /**
+     * Channel for host-guest communication.
+     *
+     * @type {Bridge<HostToGuestEvent,GuestToHostEvent>}
+     */
+    this._guestRPC = new Bridge();
 
     /**
      * Channel for host-sidebar communication.
@@ -126,7 +144,8 @@ export default class Sidebar {
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
-      createAnnotation: () => guest.createAnnotation(),
+      createAnnotation: () =>
+        this._guestRPC.call('createAnnotationAt', this._selectionAt ?? 'main'),
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
@@ -136,10 +155,6 @@ export default class Sidebar {
     } else {
       this.toolbar.useMinimalControls = false;
     }
-
-    this._emitter.subscribe('hasSelectionChanged', hasSelection => {
-      this.toolbar.newAnnotationType = hasSelection ? 'annotation' : 'note';
-    });
 
     if (this.iframeContainer) {
       // If using our own container frame for the sidebar, add the toolbar to it.
@@ -201,6 +216,8 @@ export default class Sidebar {
       }
     });
 
+    this._setupGuestEvents();
+
     // Notify sidebar when a guest is unloaded. This message is routed via
     // the host frame because in Safari guest frames are unable to send messages
     // directly to the sidebar during a window's 'unload' event.
@@ -214,6 +231,8 @@ export default class Sidebar {
   }
 
   destroy() {
+    this._guestRPC.destroy();
+    this._sidebarRPC.destroy();
     this.bucketBar?.destroy();
     this._listeners.removeAll();
     this._hammerManager?.destroy();
@@ -235,9 +254,34 @@ export default class Sidebar {
    * @param {MessagePort} port
    */
   onFrameConnected(source, port) {
-    if (source === 'sidebar') {
-      this._sidebarRPC.createChannel(port);
+    switch (source) {
+      case 'guest':
+        this._guestRPC.createChannel(port);
+        break;
+      case 'sidebar':
+        this._sidebarRPC.createChannel(port);
+        break;
     }
+  }
+
+  _setupGuestEvents() {
+    this._guestRPC.on(
+      'textSelectedAt',
+      /** @type {string} */ frameIdentifier => {
+        this._selectionAt = frameIdentifier;
+        this.toolbar.newAnnotationType = 'annotation';
+        this._guestRPC.call('deselectTextExcept', frameIdentifier);
+      }
+    );
+
+    this._guestRPC.on(
+      'textDeselectedAt',
+      /** @type {string} */ frameIdentifier => {
+        this._selectionAt = null;
+        this.toolbar.newAnnotationType = 'note';
+        this._guestRPC.call('deselectTextExcept', frameIdentifier);
+      }
+    );
   }
 
   _setupSidebarEvents() {
