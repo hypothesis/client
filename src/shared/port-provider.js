@@ -136,8 +136,7 @@ export class PortProvider {
   /**
    * @param {'frameConnected'} eventName
    * @param {(source: 'guest'|'sidebar', port: MessagePort) => void} handler - this handler
-   *   fires when a request for the host frame has been granted. Currently, only
-   *   the 'guest-host' channel triggers this listener.
+   *   fires when a request for the host frame has been granted.
    */
   on(eventName, handler) {
     this._emitter.on(eventName, handler);

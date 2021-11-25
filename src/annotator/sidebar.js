@@ -219,7 +219,7 @@ export default class Sidebar {
   }
 
   /**
-   * Establish RPC channels from specific source frames
+   * Setup communication with a frame that has connected to the host.
    *
    * @param {'guest'|'sidebar'} source
    * @param {MessagePort} port
