@@ -84,7 +84,11 @@ export class FrameSyncService {
      */
     this._guestRPC = new Bridge();
 
-    // Set of tags of annotations that are currently loaded into the frame
+    /**
+     * Tags of annotations that are currently loaded into guest frames.
+     *
+     * @type {Set<string>}
+     */
     this._inFrame = new Set();
 
     /** Whether highlights are visible in guest frames. */
@@ -96,7 +100,7 @@ export class FrameSyncService {
   }
 
   /**
-   * Watch for changes to the set of annotations displayed in the sidebar and
+   * Watch for changes to the set of annotations loaded in the sidebar and
    * notify connected guests about new/updated/deleted annotations.
    */
   _setupSyncToGuests() {
@@ -263,7 +267,7 @@ export class FrameSyncService {
   }
 
   /**
-   * Listen for message coming from the host frame.
+   * Listen for messages coming from the host frame.
    */
   _setupHostEvents() {
     this._hostRPC.on('sidebarOpened', () => {
