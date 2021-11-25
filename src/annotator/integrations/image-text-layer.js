@@ -143,7 +143,7 @@ export class ImageTextLayer {
     }
     addCurrentWordToTextLayer();
 
-    // Positon and scale text boxes to fit current image size.
+    // Position and scale text boxes to fit current image size.
     const updateBoxSizes = () => {
       const imageWidth = image.getBoundingClientRect().width;
       const imageHeight = image.getBoundingClientRect().height;
