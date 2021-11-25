@@ -76,8 +76,8 @@ describe('ImageTextLayer', () => {
     return { container, image };
   }
 
-  function createTextLayer(...args) {
-    const textLayer = new ImageTextLayer(...args);
+  function createTextLayer(image, charBoxes, text) {
+    const textLayer = new ImageTextLayer(image, charBoxes, text);
     textLayers.push(textLayer);
     return textLayer;
   }
