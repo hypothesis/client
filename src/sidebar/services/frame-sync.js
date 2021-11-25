@@ -62,6 +62,7 @@ export class FrameSyncService {
    */
   constructor($window, annotationsService, store) {
     this._window = $window;
+    this._annotationsService = annotationsService;
     this._store = store;
     this._portFinder = new PortFinder({
       hostFrame: this._window.parent,
@@ -84,157 +85,156 @@ export class FrameSyncService {
     this._guestRPC = new Bridge();
 
     // Set of tags of annotations that are currently loaded into the frame
-    const inFrame = new Set();
+    this._inFrame = new Set();
 
     /** Whether highlights are visible in guest frames. */
     this._highlightsVisible = false;
 
-    /**
-     * Watch for changes to the set of annotations displayed in the sidebar and
-     * notify connected guests about new/updated/deleted annotations.
-     */
-    this._setupSyncToGuests = () => {
-      let prevPublicAnns = 0;
-
-      watch(
-        store.subscribe,
-        [() => store.allAnnotations(), () => store.frames()],
-        ([annotations, frames], [prevAnnotations]) => {
-          let publicAnns = 0;
-          const inSidebar = new Set();
-          const added = [];
-
-          annotations.forEach(annot => {
-            if (isReply(annot)) {
-              // The frame does not need to know about replies
-              return;
-            }
-
-            if (isPublic(annot)) {
-              ++publicAnns;
-            }
-
-            inSidebar.add(annot.$tag);
-            if (!inFrame.has(annot.$tag)) {
-              added.push(annot);
-            }
-          });
-          const deleted = prevAnnotations.filter(
-            annot => !inSidebar.has(annot.$tag)
-          );
-
-          // We currently only handle adding and removing annotations from the frame
-          // when they are added or removed in the sidebar, but not re-anchoring
-          // annotations if their selectors are updated.
-          if (added.length > 0) {
-            this._guestRPC.call('loadAnnotations', added.map(formatAnnot));
-            added.forEach(annot => {
-              inFrame.add(annot.$tag);
-            });
-          }
-          deleted.forEach(annot => {
-            this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
-            inFrame.delete(annot.$tag);
-          });
-
-          if (frames.length > 0) {
-            if (frames.every(frame => frame.isAnnotationFetchComplete)) {
-              if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-                this._hostRPC.call('publicAnnotationCountChanged', publicAnns);
-                prevPublicAnns = publicAnns;
-              }
-            }
-          }
-        }
-      );
-    };
-
-    /**
-     * Listen for messages coming in from connected guest frames and add new annotations
-     * to the sidebar.
-     */
-    this._setupSyncFromGuests = () => {
-      // A new annotation, note or highlight was created in the frame
-      this._guestRPC.on('createAnnotation', event => {
-        const annot = Object.assign({}, event.msg, { $tag: event.tag });
-        // If user is not logged in, we can't really create a meaningful highlight
-        // or annotation. Instead, we need to open the sidebar, show an error,
-        // and delete the (unsaved) annotation so it gets un-selected in the
-        // target document
-        if (!store.isLoggedIn()) {
-          this._hostRPC.call('openSidebar');
-          store.openSidebarPanel('loginPrompt');
-          this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
-          return;
-        }
-        inFrame.add(event.tag);
-
-        // Open the sidebar so that the user can immediately edit the draft
-        // annotation.
-        if (!annot.$highlight) {
-          this._hostRPC.call('openSidebar');
-        }
-
-        // Ensure that the highlight for the newly-created annotation is visible.
-        // Currently we only support a single, shared visibility state for all highlights
-        // in all frames, so this will make all existing highlights visible too.
-        this._hostRPC.call('showHighlights');
-
-        // Create the new annotation in the sidebar.
-        annotationsService.create(annot);
-      });
-
-      // Map of annotation tag to anchoring status
-      // ('anchored'|'orphan'|'timeout').
-      //
-      // Updates are coalesced to reduce the overhead from processing
-      // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
-
-      /** @type {Record<string,'anchored'|'orphan'|'timeout'>} */
-      let anchoringStatusUpdates = {};
-      const scheduleAnchoringStatusUpdate = debounce(() => {
-        store.updateAnchorStatus(anchoringStatusUpdates);
-        anchoringStatusUpdates = {};
-      }, 10);
-
-      // Anchoring an annotation in the frame completed
-      this._guestRPC.on('syncAnchoringStatus', events_ => {
-        events_.forEach(event => {
-          inFrame.add(event.tag);
-          anchoringStatusUpdates[event.tag] = event.msg.$orphan
-            ? 'orphan'
-            : 'anchored';
-          scheduleAnchoringStatusUpdate();
-        });
-      });
-
-      this._guestRPC.on('showAnnotations', tags => {
-        store.selectAnnotations(store.findIDsForTags(tags));
-        store.selectTab('annotation');
-      });
-
-      this._guestRPC.on('focusAnnotations', tags => {
-        store.focusAnnotations(tags || []);
-      });
-
-      this._guestRPC.on('toggleAnnotationSelection', tags => {
-        store.toggleSelectedAnnotations(store.findIDsForTags(tags));
-      });
-
-      this._guestRPC.on('openSidebar', () => {
-        this._hostRPC.call('openSidebar');
-      });
-
-      this._guestRPC.on('closeSidebar', () => {
-        this._hostRPC.call('closeSidebar');
-      });
-    };
+    this._setupSyncToGuests();
+    this._setupSyncFromGuests();
+    this._setupHostEvents();
   }
 
   /**
-   * Connect to the host frame and guest frame(s) in the current browser tab.
+   * Watch for changes to the set of annotations displayed in the sidebar and
+   * notify connected guests about new/updated/deleted annotations.
    */
-  async connect() {
+  _setupSyncToGuests() {
+    let prevPublicAnns = 0;
+
+    watch(
+      this._store.subscribe,
+      [() => this._store.allAnnotations(), () => this._store.frames()],
+      ([annotations, frames], [prevAnnotations]) => {
+        let publicAnns = 0;
+        const inSidebar = new Set();
+        const added = [];
+
+        annotations.forEach(annot => {
+          if (isReply(annot)) {
+            // The frame does not need to know about replies
+            return;
+          }
+
+          if (isPublic(annot)) {
+            ++publicAnns;
+          }
+
+          inSidebar.add(annot.$tag);
+          if (!this._inFrame.has(annot.$tag)) {
+            added.push(annot);
+          }
+        });
+        const deleted = prevAnnotations.filter(
+          annot => !inSidebar.has(annot.$tag)
+        );
+
+        // We currently only handle adding and removing annotations from the frame
+        // when they are added or removed in the sidebar, but not re-anchoring
+        // annotations if their selectors are updated.
+        if (added.length > 0) {
+          this._guestRPC.call('loadAnnotations', added.map(formatAnnot));
+          added.forEach(annot => {
+            this._inFrame.add(annot.$tag);
+          });
+        }
+        deleted.forEach(annot => {
+          this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
+          this._inFrame.delete(annot.$tag);
+        });
+
+        if (frames.length > 0) {
+          if (frames.every(frame => frame.isAnnotationFetchComplete)) {
+            if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
+              this._hostRPC.call('publicAnnotationCountChanged', publicAnns);
+              prevPublicAnns = publicAnns;
+            }
+          }
+        }
+      }
+    );
+  }
+
+  /**
+   * Listen for messages coming in from connected guest frames and add new annotations
+   * to the sidebar.
+   */
+  _setupSyncFromGuests() {
+    // A new annotation, note or highlight was created in the frame
+    this._guestRPC.on('createAnnotation', event => {
+      const annot = Object.assign({}, event.msg, { $tag: event.tag });
+      // If user is not logged in, we can't really create a meaningful highlight
+      // or annotation. Instead, we need to open the sidebar, show an error,
+      // and delete the (unsaved) annotation so it gets un-selected in the
+      // target document
+      if (!this._store.isLoggedIn()) {
+        this._hostRPC.call('openSidebar');
+        this._store.openSidebarPanel('loginPrompt');
+        this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
+        return;
+      }
+      this._inFrame.add(event.tag);
+
+      // Open the sidebar so that the user can immediately edit the draft
+      // annotation.
+      if (!annot.$highlight) {
+        this._hostRPC.call('openSidebar');
+      }
+
+      // Ensure that the highlight for the newly-created annotation is visible.
+      // Currently we only support a single, shared visibility state for all highlights
+      // in all frames, so this will make all existing highlights visible too.
+      this._hostRPC.call('showHighlights');
+
+      // Create the new annotation in the sidebar.
+      this._annotationsService.create(annot);
+    });
+
+    // Map of annotation tag to anchoring status
+    // ('anchored'|'orphan'|'timeout').
+    //
+    // Updates are coalesced to reduce the overhead from processing
+    // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
+
+    /** @type {Record<string,'anchored'|'orphan'|'timeout'>} */
+    let anchoringStatusUpdates = {};
+    const scheduleAnchoringStatusUpdate = debounce(() => {
+      this._store.updateAnchorStatus(anchoringStatusUpdates);
+      anchoringStatusUpdates = {};
+    }, 10);
+
+    // Anchoring an annotation in the frame completed
+    this._guestRPC.on('syncAnchoringStatus', events_ => {
+      events_.forEach(event => {
+        this._inFrame.add(event.tag);
+        anchoringStatusUpdates[event.tag] = event.msg.$orphan
+          ? 'orphan'
+          : 'anchored';
+        scheduleAnchoringStatusUpdate();
+      });
+    });
+
+    this._guestRPC.on('showAnnotations', tags => {
+      this._store.selectAnnotations(this._store.findIDsForTags(tags));
+      this._store.selectTab('annotation');
+    });
+
+    this._guestRPC.on('focusAnnotations', tags => {
+      this._store.focusAnnotations(tags || []);
+    });
+
+    this._guestRPC.on('toggleAnnotationSelection', tags => {
+      this._store.toggleSelectedAnnotations(this._store.findIDsForTags(tags));
+    });
+
+    this._guestRPC.on('openSidebar', () => {
+      this._hostRPC.call('openSidebar');
+    });
+
+    this._guestRPC.on('closeSidebar', () => {
+      this._hostRPC.call('closeSidebar');
+    });
+
     /**
      * Query the guest in a frame for the URL and metadata of the document that
      * is currently loaded and add the result to the set of connected frames.
@@ -260,10 +260,12 @@ export class FrameSyncService {
     };
 
     this._guestRPC.onConnect(addFrame);
+  }
 
-    this._setupSyncToGuests();
-    this._setupSyncFromGuests();
-
+  /**
+   * Listen for message coming from the host frame.
+   */
+  _setupHostEvents() {
     this._hostRPC.on('sidebarOpened', () => {
       this._store.setSidebarOpened(true);
     });
@@ -284,7 +286,12 @@ export class FrameSyncService {
       this._highlightsVisible = visible;
       this._guestRPC.call('setHighlightsVisible', visible);
     });
+  }
 
+  /**
+   * Connect to the host frame and guest frame(s) in the current browser tab.
+   */
+  async connect() {
     // Create channel for sidebar-host communication.
     const hostPort = await this._portFinder.discover('host');
     this._hostRPC.createChannel(hostPort);
