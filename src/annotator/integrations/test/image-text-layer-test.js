@@ -8,29 +8,6 @@ const charSpacing = 0.05;
 const lineSpacing = 0.1;
 
 /**
- * Return a `[left, top, width, height]` tuple of the expected position of
- * a word in the text layer.
- */
-function expectedBoxOffsetAndSize(
-  imageWidth,
-  imageHeight,
-  lineIndex,
-  charIndex,
-  text
-) {
-  const width =
-    (text.length - 1) * charSpacing * imageWidth + charWidth * imageWidth;
-  const height = charHeight * imageHeight;
-
-  return [
-    charSpacing * charIndex * imageWidth,
-    lineSpacing * lineIndex * imageHeight,
-    width,
-    height,
-  ].map(coord => Math.round(coord));
-}
-
-/**
  * Create character bounding box data for text in an image.
  */
 function createCharBoxes(text) {
@@ -54,6 +31,29 @@ function createCharBoxes(text) {
     }
   }
   return charBoxes;
+}
+
+/**
+ * Return a `[left, top, width, height]` tuple of the expected position of
+ * a word in the text layer.
+ */
+function expectedBoxOffsetAndSize(
+  imageWidth,
+  imageHeight,
+  lineIndex,
+  charIndex,
+  text
+) {
+  const width =
+    (text.length - 1) * charSpacing * imageWidth + charWidth * imageWidth;
+  const height = charHeight * imageHeight;
+
+  return [
+    charSpacing * charIndex * imageWidth,
+    lineSpacing * lineIndex * imageHeight,
+    width,
+    height,
+  ].map(coord => Math.round(coord));
 }
 
 describe('ImageTextLayer', () => {
