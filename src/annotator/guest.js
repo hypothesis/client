@@ -26,6 +26,8 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
+ * @typedef {import('../types/bridge-events').HostToGuestEvent} HostToGuestEvent
+ * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
  * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('./util/emitter').EventBus} EventBus
@@ -102,8 +104,9 @@ function resolveAnchor(anchor) {
  * loads Hypothesis (not all frames will be annotation-enabled). In one frame,
  * usually the top-level one, there will also be an instance of the `Sidebar`
  * class that shows the sidebar app and surrounding UI. The `Guest` instance in
- * each frame connects to the sidebar as part of its initialization, when
- * {@link _connectSidebarEvents} is called.
+ * each frame connects to the sidebar frame as part of its initialization, when
+ * {@link _connectSidebarEvents} is called. The `Guest` is also connected to the
+ * host frame using the {@link _connectHostEvents} method.
  *
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
@@ -164,13 +167,22 @@ export default class Guest {
     this.anchors = [];
 
     // Set the frame identifier if it's available.
-    // The "top" guest instance will have this as null since it's in a top frame not a sub frame
-    /** @type {string|null} */
-    this._frameIdentifier = config.subFrameIdentifier || null;
+    // The "top" guest instance will have this as 'main' since it's in a top frame not a sub frame
+    /** @type {string} */
+    this._frameIdentifier = config.subFrameIdentifier ?? 'main';
+
     this._portFinder = new PortFinder({
       hostFrame: this._hostFrame,
       source: 'guest',
     });
+
+    /**
+     * Channel for host-guest communication.
+     *
+     * @type {Bridge<GuestToHostEvent,HostToGuestEvent>}
+     */
+    this._hostRPC = new Bridge();
+    this._connectHostEvents();
 
     /**
      * Channel for guest-sidebar communication.
@@ -313,6 +325,37 @@ export default class Guest {
     this._emitter.subscribe('annotationsLoaded', annotations => {
       annotations.map(annotation => this.anchor(annotation));
     });
+  }
+
+  async _connectHostEvents() {
+    this._hostRPC.on(
+      'deselectTextExcept',
+      /** @type {string} */ frameIdentifier => {
+        if (this._frameIdentifier === frameIdentifier) {
+          return;
+        }
+
+        this._onClearSelection({ informHostFrame: false });
+        // It would be nice to clear the shadow of the selection calling
+        // `document.getSelection()?.removeAllRanges();` however, because of the
+        // selection observer, that will trigger a call to `_onClearSelection({informHostFrame: true})`
+        // which in turn will remove the selection from the `Guest` that has the selection.
+      }
+    );
+
+    this._hostRPC.on(
+      'createAnnotationAt',
+      /** @type {string} */ frameIdentifier => {
+        if (this._frameIdentifier === frameIdentifier) {
+          this.createAnnotation();
+        }
+      }
+    );
+
+    // Discover and connect to the host frame. All RPC events must be
+    // registered before creating the channel.
+    const hostPort = await this._portFinder.discover('host');
+    this._hostRPC.createChannel(hostPort);
   }
 
   async _connectSidebarEvents() {
@@ -609,18 +652,20 @@ export default class Guest {
     }
 
     this.selectedRanges = [range];
-    this._emitter.publish('hasSelectionChanged', true);
+    this._hostRPC.call('textSelectedAt', this._frameIdentifier);
 
     this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
     this._adder.show(focusRect, isBackwards);
   }
 
-  _onClearSelection() {
+  _onClearSelection({ informHostFrame = true } = {}) {
     this._isAdderVisible = false;
     this._adder.hide();
     this.selectedRanges = [];
-    this._emitter.publish('hasSelectionChanged', false);
+    if (informHostFrame) {
+      this._hostRPC.call('textDeselectedAt', this._frameIdentifier);
+    }
   }
 
   /**
