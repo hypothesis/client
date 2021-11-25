@@ -57,8 +57,8 @@ function createCharBoxes(text) {
 }
 
 describe('ImageTextLayer', () => {
-  let textLayers;
   let containers;
+  let textLayers;
 
   function createPageImage() {
     const container = document.createElement('div');
