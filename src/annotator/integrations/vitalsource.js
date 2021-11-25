@@ -134,14 +134,6 @@ export class VitalSourceContainerIntegration {
  * @prop {string} words - The text in the page
  */
 
-function getPDFPageData() {
-  const pageData = /** @type {any} */ (window).innerPageData;
-  if (!pageData) {
-    return null;
-  }
-  return /** @type {PDFTextData} */ (pageData);
-}
-
 /**
  * Integration for the content frame in VitalSource's Bookshelf ebook reader.
  *
@@ -182,7 +174,10 @@ export class VitalSourceContentIntegration {
     // If this is a PDF, create the hidden text layer above the rendered PDF
     // image.
     const bookImage = document.querySelector('#pbk-page');
-    const pageData = getPDFPageData();
+
+    /** @type {PDFTextData|undefined} */
+    const pageData = /** @type {any} */ (window).innerPageData;
+
     if (bookImage && pageData) {
       this._textLayer = new ImageTextLayer(
         bookImage,
