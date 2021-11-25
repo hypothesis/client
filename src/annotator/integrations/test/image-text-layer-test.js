@@ -111,6 +111,13 @@ describe('ImageTextLayer', () => {
     assert.equal(container.style.position, 'relative');
     assert.equal(textLayerEl.style.position, 'absolute');
     assert.equal(textLayerEl.style.mixBlendMode, 'multiply');
+
+    const imageBox = image.getBoundingClientRect();
+    const textLayerBox = textLayerEl.getBoundingClientRect();
+    assert.equal(imageBox.left, textLayerBox.left);
+    assert.equal(imageBox.top, textLayerBox.top);
+    assert.equal(imageBox.width, textLayerBox.width);
+    assert.equal(imageBox.height, textLayerBox.height);
   });
 
   it('throws if char box array and text have different lengths', () => {
@@ -164,7 +171,7 @@ describe('ImageTextLayer', () => {
   });
 
   it('updates size and position of text layer elements when window is resized', () => {
-    const { image } = createPageImage();
+    const { container, image } = createPageImage();
     const imageText = 'some text in the image';
 
     const clock = sinon.useFakeTimers();
@@ -174,6 +181,7 @@ describe('ImageTextLayer', () => {
         createCharBoxes(imageText),
         imageText
       );
+      const textLayerEl = container.querySelector('hypothesis-text-layer');
 
       const originalBoxes = getWordBoxes(textLayer).map(box =>
         box.getBoundingClientRect()
@@ -188,10 +196,17 @@ describe('ImageTextLayer', () => {
       window.dispatchEvent(new Event('resize'));
       clock.tick(100);
 
+      // Check that text layer was resized to fit new image size.
+      const imageBox = image.getBoundingClientRect();
+      const textLayerBox = textLayerEl.getBoundingClientRect();
+      assert.equal(imageBox.left, textLayerBox.left);
+      assert.equal(imageBox.top, textLayerBox.top);
+      assert.equal(imageBox.width, textLayerBox.width);
+      assert.equal(imageBox.height, textLayerBox.height);
+
       // Check that the positions and sizes of each text box were changed to
       // reflect the new scale of the image.
       const ratio = 3 / 5;
-      const imageBox = image.getBoundingClientRect();
       const newBoxes = getWordBoxes(textLayer).map(box =>
         box.getBoundingClientRect()
       );
