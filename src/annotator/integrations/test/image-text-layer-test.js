@@ -11,20 +11,27 @@ const lineSpacing = 0.1;
  * Return a `[left, top, width, height]` tuple of the expected position of
  * a word in the text layer.
  */
-function expectedBoxOffsetAndSize(imageWidth, imageHeight, lineIndex, text) {
+function expectedBoxOffsetAndSize(
+  imageWidth,
+  imageHeight,
+  lineIndex,
+  charIndex,
+  text
+) {
   const width =
     (text.length - 1) * charSpacing * imageWidth + charWidth * imageWidth;
   const height = charHeight * imageHeight;
 
-  return [0, lineSpacing * lineIndex * imageHeight, width, height].map(coord =>
-    Math.round(coord)
-  );
+  return [
+    charSpacing * charIndex * imageWidth,
+    lineSpacing * lineIndex * imageHeight,
+    width,
+    height,
+  ].map(coord => Math.round(coord));
 }
 
 /**
  * Create character bounding box data for text in an image.
- *
- * The generated data positions each word on a separate line.
  */
 function createCharBoxes(text) {
   const charBoxes = [];
@@ -39,7 +46,7 @@ function createCharBoxes(text) {
       bottom: lineIndex * lineSpacing + charHeight,
     });
 
-    if (char === ' ') {
+    if (char === '\n') {
       charIndex = 0;
       ++lineIndex;
     } else {
@@ -118,19 +125,19 @@ describe('ImageTextLayer', () => {
 
   it('creates elements in the text layer for each word in the image', () => {
     const { image } = createPageImage();
-    const imageText = 'some words here';
+    const imageText = 'first line\nsecond line';
     const textLayer = createTextLayer(
       image,
       createCharBoxes(imageText),
       imageText
     );
 
-    assert.equal(textLayer.container.textContent, 'some words here ');
+    assert.equal(textLayer.container.textContent, 'first line second line ');
     const wordSpans = getWordBoxes(textLayer);
-    assert.equal(wordSpans.length, imageText.split(' ').length);
+    assert.equal(wordSpans.length, imageText.split(/\s+/).length);
     assert.deepEqual(
       wordSpans.map(ws => ws.textContent),
-      ['some', 'words', 'here']
+      ['first', 'line', 'second', 'line']
     );
 
     const imageBox = image.getBoundingClientRect();
@@ -148,9 +155,10 @@ describe('ImageTextLayer', () => {
     const imageHeight = parseInt(image.style.height);
 
     const expectedPositions = [
-      expectedBoxOffsetAndSize(imageWidth, imageHeight, 0, 'some'),
-      expectedBoxOffsetAndSize(imageWidth, imageHeight, 1, 'words'),
-      expectedBoxOffsetAndSize(imageWidth, imageHeight, 2, 'here'),
+      expectedBoxOffsetAndSize(imageWidth, imageHeight, 0, 0, 'first'),
+      expectedBoxOffsetAndSize(imageWidth, imageHeight, 0, 6, 'line'),
+      expectedBoxOffsetAndSize(imageWidth, imageHeight, 1, 0, 'second'),
+      expectedBoxOffsetAndSize(imageWidth, imageHeight, 1, 7, 'line'),
     ];
     assert.deepEqual(wordBoxPositions, expectedPositions);
   });
