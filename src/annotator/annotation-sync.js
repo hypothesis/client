@@ -1,3 +1,5 @@
+import { generateHexString } from '../shared/random';
+
 /**
  * @typedef {import('../shared/bridge').Bridge<GuestToSidebarEvent,SidebarToGuestEvent>} SidebarBridge
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
@@ -108,7 +110,7 @@ export class AnnotationSync {
     if (annotation.$tag) {
       return annotation;
     }
-    tag = tag || window.btoa(Math.random().toString());
+    tag = tag || generateHexString(8);
     Object.defineProperty(annotation, '$tag', {
       value: tag,
     });

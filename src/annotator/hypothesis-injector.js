@@ -1,4 +1,5 @@
 import { parseJsonConfig } from '../boot/parse-json-config';
+import { generateHexString } from '../shared/random';
 import { onDocumentReady, FrameObserver } from './frame-observer';
 
 /**
@@ -67,7 +68,7 @@ export class HypothesisInjector {
       parseJsonConfig(document);
 
     // Generate a random string to use as a frame ID. The format is not important.
-    const subFrameIdentifier = Math.random().toString().replace(/\D/g, '');
+    const subFrameIdentifier = generateHexString(10);
     const injectedConfig = {
       ...this._config,
 
