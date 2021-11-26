@@ -1,9 +1,10 @@
+import { addConfigFragment } from '../../../shared/config-fragment';
 import hostPageConfig from '../host-config';
 
 function fakeWindow(config) {
   return {
     location: {
-      hash: '#config=' + JSON.stringify(config),
+      href: addConfigFragment('https://hypothes.is/app.html', config),
     },
   };
 }

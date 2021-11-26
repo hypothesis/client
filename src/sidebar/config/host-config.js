@@ -1,3 +1,4 @@
+import { parseConfigFragment } from '../../shared/config-fragment';
 import {
   toBoolean,
   toInteger,
@@ -11,12 +12,11 @@ import {
  * Return the app configuration specified by the frame embedding the Hypothesis
  * client.
  *
+ * @param {Window} window
  * @return {HostConfig}
  */
 export default function hostPageConfig(window) {
-  const configStr = window.location.hash.slice(1);
-  const configJSON = new URLSearchParams(configStr).get('config');
-  const config = JSON.parse(configJSON || '{}');
+  const config = parseConfigFragment(window.location.href);
 
   // Known configuration parameters which we will import from the host page.
   // Note that since the host page is untrusted code, the filtering needs to

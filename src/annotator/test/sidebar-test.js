@@ -1,3 +1,4 @@
+import { addConfigFragment } from '../../shared/config-fragment';
 import Sidebar, { MIN_RESIZE, $imports } from '../sidebar';
 import { EventBus } from '../util/emitter';
 
@@ -6,6 +7,11 @@ const DEFAULT_HEIGHT = 600;
 const EXTERNAL_CONTAINER_SELECTOR = 'test-external-container';
 
 describe('Sidebar', () => {
+  const sidebarURL = new URL(
+    '/base/annotator/test/empty.html',
+    window.location.href
+  ).toString();
+
   const sandbox = sinon.createSandbox();
 
   // Containers and Sidebar instances created by current test.
@@ -40,7 +46,7 @@ describe('Sidebar', () => {
   const createSidebar = (config = {}) => {
     config = {
       // Dummy sidebar app.
-      sidebarAppUrl: '/base/annotator/test/empty.html',
+      sidebarAppUrl: sidebarURL,
       ...config,
     };
     const container = document.createElement('div');
@@ -176,19 +182,11 @@ describe('Sidebar', () => {
     return sidebar.iframe.src;
   }
 
-  function configFragment(config) {
-    return '#config=' + encodeURIComponent(JSON.stringify(config));
-  }
-
   it('creates sidebar iframe and passes configuration to it', () => {
-    const appURL = new URL(
-      '/base/annotator/test/empty.html',
-      window.location.href
-    );
     const sidebar = createSidebar({ annotations: '1234' });
     assert.equal(
       getConfigString(sidebar),
-      appURL + configFragment({ annotations: '1234' })
+      addConfigFragment(sidebarURL, { annotations: '1234' })
     );
   });
 

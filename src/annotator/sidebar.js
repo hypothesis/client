@@ -1,6 +1,7 @@
 import Hammer from 'hammerjs';
 
 import { Bridge } from '../shared/bridge';
+import { addConfigFragment } from '../shared/config-fragment';
 import { ListenerCollection } from '../shared/listener-collection';
 
 import { annotationCounts } from './annotation-counts';
@@ -28,10 +29,10 @@ export const MIN_RESIZE = 280;
  * @return {HTMLIFrameElement}
  */
 function createSidebarIframe(config) {
-  const sidebarConfig = createSidebarConfig(config);
-  const configParam =
-    'config=' + encodeURIComponent(JSON.stringify(sidebarConfig));
-  const sidebarAppSrc = config.sidebarAppUrl + '#' + configParam;
+  const sidebarAppSrc = addConfigFragment(
+    config.sidebarAppUrl,
+    createSidebarConfig(config)
+  );
 
   const sidebarFrame = document.createElement('iframe');
 

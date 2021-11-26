@@ -2,6 +2,7 @@ import { IconButton } from '@hypothesis/frontend-shared';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import classnames from 'classnames';
 
+import { addConfigFragment } from '../../shared/config-fragment';
 import { createSidebarConfig } from '../config/sidebar';
 
 /**
@@ -16,11 +17,12 @@ import { createSidebarConfig } from '../config/sidebar';
  * @param {NotebookIframeProps} props
  */
 function NotebookIframe({ config, groupId }) {
-  const notebookConfig = createSidebarConfig(config);
-  // Explicity set the "focused" group
-  notebookConfig.group = groupId;
-  const configParam = encodeURIComponent(JSON.stringify(notebookConfig));
-  const notebookAppSrc = `${config.notebookAppUrl}#config=${configParam}`;
+  const notebookAppSrc = addConfigFragment(config.notebookAppUrl, {
+    ...createSidebarConfig(config),
+
+    // Explicity set the "focused" group
+    group: groupId,
+  });
 
   return (
     <iframe
