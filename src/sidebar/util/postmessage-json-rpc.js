@@ -1,10 +1,5 @@
 import { generateHexString } from '../../shared/random';
 
-/** Generate a random ID to associate RPC requests and responses. */
-function generateId() {
-  return generateHexString(10);
-}
-
 /**
  * Return a Promise that rejects with an error after `delay` ms.
  */
@@ -33,7 +28,7 @@ export function call(
   params = [],
   timeout = 2000,
   window_ = window,
-  id = generateId()
+  id = generateHexString(10)
 ) {
   // Send RPC request.
   const request = {
