@@ -214,7 +214,7 @@ describe('sidebar/util/oauth-client', () => {
       fakeWindow = new FakeWindow();
 
       $imports.$mock({
-        './random': {
+        '../../shared/random': {
           generateHexString: () => 'notrandom',
         },
       });

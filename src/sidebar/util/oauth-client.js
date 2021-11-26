@@ -1,5 +1,5 @@
+import { generateHexString } from '../../shared/random';
 import { fetchJSON } from './fetch';
-import { generateHexString } from './random';
 
 /**
  * An object holding the details of an access token from the tokenUrl endpoint.
