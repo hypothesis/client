@@ -30,6 +30,7 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
  * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
+ * @typedef {import('./integrations').FrameIdentifier} FrameIdentifier
  * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
@@ -330,7 +331,7 @@ export default class Guest {
   async _connectHostEvents() {
     this._hostRPC.on(
       'unselectTextExceptIn',
-      /** @param {string} frameIdentifier */
+      /** @param {FrameIdentifier} frameIdentifier */
       frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           return;
@@ -346,7 +347,7 @@ export default class Guest {
 
     this._hostRPC.on(
       'createAnnotationIn',
-      /** @param {string} frameIdentifier */
+      /** @param {FrameIdentifier} frameIdentifier */
       frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           this.createAnnotation();

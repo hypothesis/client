@@ -21,6 +21,7 @@ import { createShadowRoot } from './util/shadow-root';
  * @typedef {import('../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('./integrations').FrameIdentifier} FrameIdentifier
  */
 
 // Minimum width to which the iframeContainer can be resized.
@@ -70,13 +71,12 @@ export default class Sidebar {
     this._emitter = eventBus.createEmitter();
 
     /**
-     * Tracks which `Guest` has a text selection. It uses the frame identifier
-     * which uniquely identifies each `Guest`. If there is no text selected, the
-     * value is set to `null`.
+     * Tracks which `Guest` has a text selection. If there is no text selected,
+     * the value is set to `main`.
      *
-     * @type {null|string}
+     * @type {FrameIdentifier}
      */
-    this._selectionAt = null;
+    this._selectionAt = 'main';
 
     /**
      * Channel for host-guest communication.
@@ -145,7 +145,7 @@ export default class Sidebar {
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
       createAnnotation: () =>
-        this._guestRPC.call('createAnnotationIn', this._selectionAt ?? 'main'),
+        this._guestRPC.call('createAnnotationIn', this._selectionAt),
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
@@ -267,7 +267,7 @@ export default class Sidebar {
   _setupGuestEvents() {
     this._guestRPC.on(
       'textSelectedIn',
-      /** @param {string} frameIdentifier */
+      /** @param {FrameIdentifier} frameIdentifier */
       frameIdentifier => {
         this._selectionAt = frameIdentifier;
         this.toolbar.newAnnotationType = 'annotation';
@@ -277,9 +277,9 @@ export default class Sidebar {
 
     this._guestRPC.on(
       'textUnselectedIn',
-      /** @param {string}  frameIdentifier */
+      /** @param {FrameIdentifier} frameIdentifier */
       frameIdentifier => {
-        this._selectionAt = null;
+        this._selectionAt = 'main';
         this.toolbar.newAnnotationType = 'note';
         this._guestRPC.call('unselectTextExceptIn', frameIdentifier);
       }

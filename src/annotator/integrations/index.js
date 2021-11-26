@@ -11,6 +11,7 @@ import {
 /**
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').Integration} Integration
+ * @typedef {'main'|`sub_${string}`} FrameIdentifier - role based frame identifier
  */
 
 /**
@@ -21,7 +22,7 @@ import {
  *
  * @param {Annotator} annotator
  * @param {string|null} [frameIdentifier]
- * @return {[Integration, 'main'|`sub_${string}`]}.
+ * @return {[Integration, FrameIdentifier]}
  */
 export function createIntegration(annotator, frameIdentifier = null) {
   if (isPDF()) {
