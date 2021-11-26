@@ -3,10 +3,13 @@ import * as sentry from '../sentry';
 describe('sidebar/util/sentry', () => {
   let fakeDocumentReferrer;
   let fakeDocumentCurrentScript;
+  let fakeParseConfigFragment;
   let fakeSentry;
   let fakeWarnOnce;
 
   beforeEach(() => {
+    fakeParseConfigFragment = sinon.stub().returns({});
+
     fakeSentry = {
       init: sinon.stub(),
       setExtra: sinon.stub(),
@@ -17,6 +20,9 @@ describe('sidebar/util/sentry', () => {
 
     sentry.$imports.$mock({
       '@sentry/browser': fakeSentry,
+      '../../shared/config-fragment': {
+        parseConfigFragment: fakeParseConfigFragment,
+      },
       '../../shared/warn-once': fakeWarnOnce,
     });
   });
@@ -102,6 +108,21 @@ describe('sidebar/util/sentry', () => {
           allowUrls: undefined,
         })
       );
+    });
+
+    it('adds "host_config" context to reports', () => {
+      fakeParseConfigFragment.returns({ appType: 'via' });
+
+      sentry.init({ dsn: 'test-dsn', environment: 'dev' });
+
+      assert.calledWith(fakeParseConfigFragment, window.location.href);
+      assert.calledWith(fakeSentry.setExtra, 'host_config', { appType: 'via' });
+    });
+
+    it('does not add "host_config" context if `parseConfigFragment` throws', () => {
+      fakeParseConfigFragment.throws(new Error('Parse error'));
+      sentry.init({ dsn: 'test-dsn', environment: 'dev' });
+      assert.neverCalledWith(fakeSentry.setExtra, 'host_config');
     });
 
     it('adds "document_url" context to reports', () => {
