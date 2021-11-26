@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/browser';
 
+import { parseConfigFragment } from '../../shared/config-fragment';
 import warnOnce from '../../shared/warn-once';
 
 /**
@@ -101,6 +102,12 @@ export function init(config) {
       return event;
     },
   });
+
+  try {
+    Sentry.setExtra('host_config', parseConfigFragment(window.location.href));
+  } catch (e) {
+    // Ignore errors parsing configuration.
+  }
 
   // In the sidebar application, it is often useful to know the URL which the
   // client was loaded into. This information is usually available in an iframe
