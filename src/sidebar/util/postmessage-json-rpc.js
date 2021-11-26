@@ -18,7 +18,6 @@ function createTimeout(delay, message) {
  * @param {any[]} params - Parameters of the JSON-RPC method
  * @param {number} [timeout] - Maximum time to wait in ms
  * @param {Window} [window_] - Test seam.
- * @param {string} [id] - Test seam.
  * @return {Promise<any>} - A Promise for the response to the call
  */
 export function call(
@@ -27,9 +26,11 @@ export function call(
   method,
   params = [],
   timeout = 2000,
-  window_ = window,
-  id = generateHexString(10)
+  /* istanbul ignore next */
+  window_ = window
 ) {
+  const id = generateHexString(10);
+
   // Send RPC request.
   const request = {
     jsonrpc: '2.0',
