@@ -1,6 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
-import { call } from '../postmessage-json-rpc';
+import { call, $imports } from '../postmessage-json-rpc';
 
 class FakeWindow {
   constructor() {
@@ -19,20 +19,21 @@ describe('sidebar/util/postmessage-json-rpc', () => {
     let fakeWindow;
 
     function doCall(timeout = 1) {
-      return call(
-        frame,
-        origin,
-        'testMethod',
-        [1, 2, 3],
-        timeout,
-        fakeWindow,
-        messageId
-      );
+      return call(frame, origin, 'testMethod', [1, 2, 3], timeout, fakeWindow);
     }
 
     beforeEach(() => {
       frame = { postMessage: sinon.stub() };
       fakeWindow = new FakeWindow();
+      $imports.$mock({
+        '../../shared/random': {
+          generateHexString: sinon.stub().returns(messageId),
+        },
+      });
+    });
+
+    afterEach(() => {
+      $imports.$restore();
     });
 
     it('sends a message to the target frame', () => {
