@@ -1,13 +1,13 @@
 /** @typedef {import('../../types/api').Annotation} Annotation */
 /** @typedef {import('../../types/annotator').AnnotationData} AnnotationData */
 
+import { generateHexString } from '../../shared/random';
 import * as metadata from '../helpers/annotation-metadata';
 import {
   defaultPermissions,
   privatePermissions,
   sharedPermissions,
 } from '../helpers/permissions';
-import { generateHexString } from '../util/random';
 
 /**
  * A service for creating, updating and persisting annotations both in the

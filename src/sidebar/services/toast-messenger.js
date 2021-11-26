@@ -1,4 +1,4 @@
-import { generateHexString } from '../util/random';
+import { generateHexString } from '../../shared/random';
 
 // How long toast messages should be displayed before they are dismissed, in ms
 const MESSAGE_DISPLAY_TIME = 5000;

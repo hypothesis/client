@@ -1,5 +1,5 @@
+import { generateHexString } from '../../shared/random';
 import warnOnce from '../../shared/warn-once';
-import { generateHexString } from '../util/random';
 import { Socket } from '../websocket';
 import { watch } from '../util/watch';
 
