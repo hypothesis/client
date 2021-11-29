@@ -109,13 +109,6 @@ export function init(config) {
     // Ignore errors parsing configuration.
   }
 
-  // In the sidebar application, it is often useful to know the URL which the
-  // client was loaded into. This information is usually available in an iframe
-  // via `document.referrer`. More information about the document is available
-  // later when frames where the "annotator" code has loaded have connected to
-  // the sidebar via `postMessage` RPC messages.
-  Sentry.setExtra('document_url', document.referrer);
-
   /** @param {HTMLScriptElement} script */
   const isJavaScript = script =>
     !script.type || script.type.match(/javascript|module/);
