@@ -6,7 +6,28 @@
  * @return {object}
  */
 export function createAppConfig(config) {
-  const appConfig = { ...config };
+  const appConfig = {};
+
+  for (let [key, value] of Object.entries(config)) {
+    // Remove several annotator-only properties.
+    //
+    // nb. We don't currently strip all the annotator-only properties here.
+    // That's OK because validation / filtering happens in the sidebar app itself.
+    // It just results in unnecessary content in the sidebar iframe's URL string.
+    if (key === 'notebookAppUrl' || key === 'sidebarAppUrl') {
+      continue;
+    }
+
+    // Strip nullish properties, as these are ignored by the application and
+    // they add noise to logs etc.
+    //
+    // eslint-disable-next-line eqeqeq
+    if (value == null) {
+      continue;
+    }
+
+    appConfig[key] = value;
+  }
 
   // Some config settings are not JSON-stringifiable (e.g. JavaScript
   // functions) and will be omitted when the config is JSON-stringified.
@@ -30,13 +51,6 @@ export function createAppConfig(config) {
       service.onHelpRequestProvided = true;
     }
   }
-
-  // Remove several annotator-only properties.
-  //
-  // nb. We don't currently strip all the annotator-only properties here.
-  // That's OK because validation / filtering happens in the sidebar app itself.
-  // It just results in unnecessary content in the sidebar iframe's URL string.
-  ['notebookAppUrl', 'sidebarAppUrl'].forEach(key => delete appConfig[key]);
 
   return appConfig;
 }

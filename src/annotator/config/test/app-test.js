@@ -27,6 +27,18 @@ describe('createAppConfig', () => {
     });
   });
 
+  it('does not copy nullish values', () => {
+    const config = {
+      nullValue: null,
+      undefinedValue: undefined,
+      notNullValue: 'test',
+    };
+
+    const appConfig = createAppConfig(config);
+
+    assert.deepEqual(appConfig, { notNullValue: 'test' });
+  });
+
   it('sets boolean properties to indicate presence of callbacks', () => {
     const callbacks = [
       'onLoginRequest',
