@@ -125,15 +125,6 @@ describe('sidebar/util/sentry', () => {
       assert.neverCalledWith(fakeSentry.setExtra, 'host_config');
     });
 
-    it('adds "document_url" context to reports', () => {
-      sentry.init({ dsn: 'test-dsn', environment: 'dev' });
-      assert.calledWith(
-        fakeSentry.setExtra,
-        'document_url',
-        'https://example.com'
-      );
-    });
-
     it('adds "loaded_scripts" context to reports', () => {
       sentry.init({ dsn: 'test-dsn', environment: 'dev' });
       assert.calledWith(fakeSentry.setExtra, 'loaded_scripts');
