@@ -29,6 +29,15 @@ export function createAppConfig(config) {
     appConfig[key] = value;
   }
 
+  // Pass the version of the client, so we can check if it is the same as the
+  // one used in the sidebar/notebook.
+  appConfig.version = '__VERSION__';
+
+  // Pass the URL of the page that embedded the client.
+  const hostURL = new URL(window.location.href);
+  hostURL.hash = '';
+  appConfig.hostURL = hostURL.toString();
+
   // Some config settings are not JSON-stringifiable (e.g. JavaScript
   // functions) and will be omitted when the config is JSON-stringified.
   // Add a JSON-stringifiable option for each of these so that the sidebar can
