@@ -70,7 +70,7 @@ export class AnnotationsService {
     // We need a unique local/app identifier for this new annotation such
     // that we might look it up later in the store. It won't have an ID yet,
     // as it has not been persisted to the service.
-    const $tag = generateHexString(8);
+    const $tag = 's:' + generateHexString(8);
 
     /** @type {Annotation} */
     const annotation = Object.assign(
