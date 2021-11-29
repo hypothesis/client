@@ -1,6 +1,7 @@
 import { Bridge } from '../shared/bridge';
-import { PortFinder } from '../shared/port-finder';
 import { ListenerCollection } from '../shared/listener-collection';
+import { PortFinder } from '../shared/port-finder';
+import { generateHexString } from '../shared/random';
 
 import { Adder } from './adder';
 import { AnnotationSync } from './annotation-sync';
@@ -559,9 +560,7 @@ export default class Guest {
       document: info.metadata,
       target,
       $highlight: highlight,
-
-      // nb. `$tag` is assigned by `AnnotationSync`.
-      $tag: '',
+      $tag: 'a:' + generateHexString(8),
     };
 
     this._annotationSync.sendToSidebar(annotation);
