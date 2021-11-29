@@ -182,8 +182,11 @@ export default class Guest {
 
     // Set up listeners for when the sidebar asks us to add or remove annotations
     // in this frame.
-    this._annotationSync = new AnnotationSync(eventBus, this._sidebarRPC);
-    this._connectAnnotationSync();
+    this._annotationSync = new AnnotationSync(this._sidebarRPC, {
+      onAnnotationDeleted: annotation => this.detach(annotation),
+      onAnnotationsLoaded: annotations =>
+        annotations.forEach(annotation => this.anchor(annotation)),
+    });
 
     // Set up automatic and integration-triggered injection of client into
     // iframes in this frame.
@@ -303,16 +306,6 @@ export default class Guest {
     if (range) {
       this._onSelection(range);
     }
-  }
-
-  _connectAnnotationSync() {
-    this._emitter.subscribe('annotationDeleted', annotation => {
-      this.detach(annotation);
-    });
-
-    this._emitter.subscribe('annotationsLoaded', annotations => {
-      annotations.map(annotation => this.anchor(annotation));
-    });
   }
 
   async _connectSidebarEvents() {
@@ -571,7 +564,7 @@ export default class Guest {
       $tag: '',
     };
 
-    this._emitter.publish('beforeAnnotationCreated', annotation);
+    this._annotationSync.sendToSidebar(annotation);
     this.anchor(annotation);
 
     return annotation;

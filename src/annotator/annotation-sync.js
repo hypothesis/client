@@ -13,7 +13,7 @@ import { generateHexString } from '../shared/random';
  * Message sent between the sidebar and annotator about an annotation that has
  * changed.
  *
- * @typedef RpcMessage
+ * @typedef RPCMessage
  * @prop {string} tag
  * @prop {AnnotationData} msg
  */
@@ -29,20 +29,21 @@ import { generateHexString } from '../shared/random';
  */
 export class AnnotationSync {
   /**
-   * @param {EventBus} eventBus - Event bus for communicating with the annotator code (eg. the Guest)
-   * @param {SidebarBridge} sidebarRPC - Channel for communicating with the sidebar
+   * @param {SidebarBridge} sidebarBridge - Channel for communicating with the sidebar
+   * @param {object} options
+   *   @param {(annotation: AnnotationData) => void} options.onAnnotationDeleted
+   *   @param {(annotations: AnnotationData[]) => void} options.onAnnotationsLoaded
    */
-  constructor(eventBus, sidebarRPC) {
-    this._emitter = eventBus.createEmitter();
-    this._sidebarRPC = sidebarRPC;
+  constructor(sidebarBridge, { onAnnotationDeleted, onAnnotationsLoaded }) {
+    this._sidebarRPC = sidebarBridge;
 
     /**
      * Mapping from annotation tags to annotation objects for annotations which
      * have been sent to or received from the sidebar.
      *
-     * @type {{ [tag: string]: AnnotationData }}
+     * @type {Map<string, AnnotationData>}
      */
-    this.cache = {};
+    this._cache = new Map();
 
     this.destroyed = false;
 
@@ -53,8 +54,8 @@ export class AnnotationSync {
         return;
       }
       const annotation = this._parse(body);
-      delete this.cache[annotation.$tag];
-      this._emitter.publish('annotationDeleted', annotation);
+      this._cache.delete(annotation.$tag);
+      onAnnotationDeleted(annotation);
       this._format(annotation);
       callback(null);
     });
@@ -65,16 +66,8 @@ export class AnnotationSync {
         return;
       }
       const annotations = bodies.map(body => this._parse(body));
-      this._emitter.publish('annotationsLoaded', annotations);
+      onAnnotationsLoaded(annotations);
       callback(null);
-    });
-
-    // Relay events from annotator to sidebar.
-    this._emitter.subscribe('beforeAnnotationCreated', annotation => {
-      if (annotation.$tag) {
-        return;
-      }
-      this._sidebarRPC.call('createAnnotation', this._format(annotation));
     });
   }
 
@@ -110,11 +103,10 @@ export class AnnotationSync {
     if (annotation.$tag) {
       return annotation;
     }
-    tag = tag || 'a:' + generateHexString(8);
-    Object.defineProperty(annotation, '$tag', {
-      value: tag,
-    });
-    this.cache[tag] = annotation;
+    const $tag = tag || 'a:' + generateHexString(8);
+    // In-place mutation is needed because `Guest` compares the annotation object
+    annotation.$tag = $tag;
+    this._cache.set($tag, annotation);
     return annotation;
   }
 
@@ -122,31 +114,44 @@ export class AnnotationSync {
    * Copy annotation data from an RPC message into a local copy (in `this.cache`)
    * and return the local copy.
    *
-   * @param {RpcMessage} body
+   * @param {RPCMessage} body
    * @return {AnnotationData}
    */
-  _parse(body) {
-    const merged = Object.assign(this.cache[body.tag] || {}, body.msg);
-    return this._tag(merged, body.tag);
+  _parse({ tag, msg }) {
+    const cachedAnnotation = this._cache.get(tag) || {};
+    // In-place mutation is needed because `Guest` compares the annotation object
+    const merged = Object.assign(cachedAnnotation, msg);
+    return this._tag(merged, tag);
   }
 
   /**
    * Format an annotation into an RPC message body.
    *
    * @param {AnnotationData} annotation
-   * @return {RpcMessage}
+   * @return {RPCMessage}
    */
   _format(annotation) {
-    this._tag(annotation);
+    const taggedAnnotation = this._tag(annotation);
 
     return {
-      tag: annotation.$tag,
-      msg: annotation,
+      tag: taggedAnnotation.$tag,
+      msg: taggedAnnotation,
     };
+  }
+
+  /**
+   * Send, if needed, a formatted annotation to the sidebar frame
+   *
+   * @param {AnnotationData} annotation
+   */
+  sendToSidebar(annotation) {
+    if (annotation.$tag) {
+      return;
+    }
+    this._sidebarRPC.call('createAnnotation', this._format(annotation));
   }
 
   destroy() {
     this.destroyed = true;
-    this._emitter.destroy();
   }
 }
