@@ -31,40 +31,33 @@ export class AnnotationSync {
   /**
    * @param {SidebarBridge} sidebarBridge - Channel for communicating with the sidebar
    * @param {object} options
-   *   @param {(annotation: AnnotationData) => void} options.onAnnotationDeleted
+   *   @param {(tag: string) => void} options.onAnnotationDeleted
    *   @param {(annotations: AnnotationData[]) => void} options.onAnnotationsLoaded
    */
   constructor(sidebarBridge, { onAnnotationDeleted, onAnnotationsLoaded }) {
     this._sidebarRPC = sidebarBridge;
 
-    /**
-     * Mapping from annotation tags to annotation objects for annotations which
-     * have been sent to or received from the sidebar.
-     *
-     * @type {Map<string, AnnotationData>}
-     */
-    this._cache = new Map();
-
     this.destroyed = false;
 
     // Relay events from the sidebar to the rest of the annotator.
-    this._sidebarRPC.on('deleteAnnotation', (body, callback) => {
-      if (this.destroyed) {
+    this._sidebarRPC.on(
+      'deleteAnnotation',
+      (/** @type {RPCMessage} */ { tag }, callback) => {
+        if (this.destroyed) {
+          callback(null);
+          return;
+        }
+        onAnnotationDeleted(tag);
         callback(null);
-        return;
       }
-      const annotation = this._parse(body);
-      this._cache.delete(annotation.$tag);
-      onAnnotationDeleted(annotation);
-      callback(null);
-    });
+    );
 
     this._sidebarRPC.on('loadAnnotations', (bodies, callback) => {
       if (this.destroyed) {
         callback(null);
         return;
       }
-      const annotations = bodies.map(body => this._parse(body));
+      const annotations = bodies.map(({ msg, tag }) => this._tag(msg, tag));
       onAnnotationsLoaded(annotations);
       callback(null);
     });
@@ -102,22 +95,7 @@ export class AnnotationSync {
     const $tag = tag || 'a:' + generateHexString(8);
     // In-place mutation is needed because `Guest` compares the annotation object
     annotation.$tag = $tag;
-    this._cache.set($tag, annotation);
     return annotation;
-  }
-
-  /**
-   * Copy annotation data from an RPC message into a local copy (in `this.cache`)
-   * and return the local copy.
-   *
-   * @param {RPCMessage} body
-   * @return {AnnotationData}
-   */
-  _parse({ tag, msg }) {
-    const cachedAnnotation = this._cache.get(tag) || {};
-    // In-place mutation is needed because `Guest` compares the annotation object
-    const merged = Object.assign(cachedAnnotation, msg);
-    return this._tag(merged, tag);
   }
 
   /**

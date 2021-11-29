@@ -183,7 +183,7 @@ export default class Guest {
     // Set up listeners for when the sidebar asks us to add or remove annotations
     // in this frame.
     this._annotationSync = new AnnotationSync(this._sidebarRPC, {
-      onAnnotationDeleted: annotation => this.detach(annotation),
+      onAnnotationDeleted: tag => this.detach(tag),
       onAnnotationsLoaded: annotations =>
         annotations.forEach(annotation => this.anchor(annotation)),
     });
@@ -471,7 +471,7 @@ export default class Guest {
     };
 
     // Remove existing anchors for this annotation.
-    this.detach(annotation, false /* notify */);
+    this.detach(annotation.$tag, false /* notify */);
 
     // Resolve selectors to ranges and insert highlights.
     if (!annotation.target) {
@@ -500,13 +500,13 @@ export default class Guest {
   /**
    * Remove the anchors and associated highlights for an annotation from the document.
    *
-   * @param {AnnotationData} annotation
+   * @param {string} tag
    * @param {boolean} [notify] - For internal use. Whether to emit an `anchorsChanged` notification
    */
-  detach(annotation, notify = true) {
+  detach(tag, notify = true) {
     const anchors = [];
     for (let anchor of this.anchors) {
-      if (anchor.annotation !== annotation) {
+      if (anchor.annotation.$tag !== tag) {
         anchors.push(anchor);
       } else if (anchor.highlights) {
         removeHighlights(anchor.highlights);
