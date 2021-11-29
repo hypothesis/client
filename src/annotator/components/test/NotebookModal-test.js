@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 
 import { addConfigFragment } from '../../../shared/config-fragment';
 import { EventBus } from '../../util/emitter';
-import NotebookModal from '../NotebookModal';
+import NotebookModal, { $imports } from '../NotebookModal';
 
 describe('NotebookModal', () => {
   const notebookURL = 'https://test.hypothes.is/notebook';
@@ -27,10 +27,21 @@ describe('NotebookModal', () => {
     components = [];
     eventBus = new EventBus();
     emitter = eventBus.createEmitter();
+
+    const fakeCreateAppConfig = sinon.spy(config => {
+      const appConfig = { ...config };
+      delete appConfig.notebookAppUrl;
+      return appConfig;
+    });
+
+    $imports.$mock({
+      '../config/app': { createAppConfig: fakeCreateAppConfig },
+    });
   });
 
   afterEach(() => {
     components.forEach(component => component.unmount());
+    $imports.$restore();
   });
 
   it('hides modal on first render', () => {
