@@ -6,7 +6,7 @@ import { ListenerCollection } from '../shared/listener-collection';
 
 import { annotationCounts } from './annotation-counts';
 import BucketBar from './bucket-bar';
-import { createSidebarConfig } from './config/sidebar';
+import { createAppConfig } from './config/app';
 import { features } from './features';
 import sidebarTrigger from './sidebar-trigger';
 import { ToolbarController } from './toolbar';
@@ -31,7 +31,7 @@ export const MIN_RESIZE = 280;
 function createSidebarIframe(config) {
   const sidebarAppSrc = addConfigFragment(
     config.sidebarAppUrl,
-    createSidebarConfig(config)
+    createAppConfig(config)
   );
 
   const sidebarFrame = document.createElement('iframe');
