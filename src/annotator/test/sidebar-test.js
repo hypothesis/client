@@ -110,9 +110,16 @@ describe('Sidebar', () => {
     };
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 
+    const fakeCreateAppConfig = sinon.spy(config => {
+      const appConfig = { ...config };
+      delete appConfig.sidebarAppUrl;
+      return appConfig;
+    });
+
     $imports.$mock({
       '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
       './bucket-bar': { default: FakeBucketBar },
+      './config/app': { createAppConfig: fakeCreateAppConfig },
       './toolbar': {
         ToolbarController: FakeToolbarController,
       },
