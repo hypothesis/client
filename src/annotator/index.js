@@ -53,6 +53,7 @@ function init() {
 
     const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
     portProvider = new PortProvider(hypothesisAppsOrigin);
+    portProvider.listen();
 
     sidebar = new Sidebar(document.body, eventBus, guest, sidebarConfig);
     notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
@@ -60,8 +61,6 @@ function init() {
     portProvider.on('frameConnected', (source, port) =>
       sidebar.onFrameConnected(source, port)
     );
-
-    portProvider.listen();
   }
 
   sidebarLinkElement.addEventListener('destroy', () => {
