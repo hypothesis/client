@@ -110,7 +110,7 @@ export class AnnotationSync {
     if (annotation.$tag) {
       return annotation;
     }
-    tag = tag || generateHexString(8);
+    tag = tag || 'a:' + generateHexString(8);
     Object.defineProperty(annotation, '$tag', {
       value: tag,
     });
