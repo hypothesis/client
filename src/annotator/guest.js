@@ -1,9 +1,9 @@
 import { Bridge } from '../shared/bridge';
-import { PortFinder } from '../shared/port-finder';
 import { ListenerCollection } from '../shared/listener-collection';
+import { PortFinder } from '../shared/port-finder';
+import { generateHexString } from '../shared/random';
 
 import { Adder } from './adder';
-import { AnnotationSync } from './annotation-sync';
 import { TextRange } from './anchoring/text-range';
 import {
   getHighlightsContainingNode,
@@ -180,11 +180,6 @@ export default class Guest {
     this._sidebarRPC = new Bridge();
     this._connectSidebarEvents();
 
-    // Set up listeners for when the sidebar asks us to add or remove annotations
-    // in this frame.
-    this._annotationSync = new AnnotationSync(eventBus, this._sidebarRPC);
-    this._connectAnnotationSync();
-
     // Set up automatic and integration-triggered injection of client into
     // iframes in this frame.
     this._hypothesisInjector = new HypothesisInjector(this.element, config);
@@ -305,55 +300,53 @@ export default class Guest {
     }
   }
 
-  _connectAnnotationSync() {
-    this._emitter.subscribe('annotationDeleted', annotation => {
-      this.detach(annotation);
-    });
-
-    this._emitter.subscribe('annotationsLoaded', annotations => {
-      annotations.map(annotation => this.anchor(annotation));
-    });
-  }
-
   async _connectSidebarEvents() {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
-    this._sidebarRPC.on('focusAnnotations', (tags = []) => {
-      this._focusedAnnotations.clear();
-      tags.forEach(tag => this._focusedAnnotations.add(tag));
+    this._sidebarRPC.on(
+      'focusAnnotations',
+      /** @param {string[]} tags */
+      (tags = []) => {
+        this._focusedAnnotations.clear();
+        tags.forEach(tag => this._focusedAnnotations.add(tag));
 
-      for (let anchor of this.anchors) {
-        if (anchor.highlights) {
-          const toggle = tags.includes(anchor.annotation.$tag);
-          setHighlightsFocused(anchor.highlights, toggle);
+        for (let anchor of this.anchors) {
+          if (anchor.highlights) {
+            const toggle = tags.includes(anchor.annotation.$tag);
+            setHighlightsFocused(anchor.highlights, toggle);
+          }
         }
       }
-    });
+    );
 
-    this._sidebarRPC.on('scrollToAnnotation', tag => {
-      const anchor = this.anchors.find(a => a.annotation.$tag === tag);
-      if (!anchor?.highlights) {
-        return;
-      }
-      const range = resolveAnchor(anchor);
-      if (!range) {
-        return;
-      }
+    this._sidebarRPC.on(
+      'scrollToAnnotation',
+      /** @param {string} tag */
+      tag => {
+        const anchor = this.anchors.find(a => a.annotation.$tag === tag);
+        if (!anchor?.highlights) {
+          return;
+        }
+        const range = resolveAnchor(anchor);
+        if (!range) {
+          return;
+        }
 
-      // Emit a custom event that the host page can respond to. This is useful,
-      // for example, if the highlighted content is contained in a collapsible
-      // section of the page that needs to be un-collapsed.
-      const event = new CustomEvent('scrolltorange', {
-        bubbles: true,
-        cancelable: true,
-        detail: range,
-      });
-      const defaultNotPrevented = this.element.dispatchEvent(event);
+        // Emit a custom event that the host page can respond to. This is useful,
+        // for example, if the highlighted content is contained in a collapsible
+        // section of the page that needs to be un-collapsed.
+        const event = new CustomEvent('scrolltorange', {
+          bubbles: true,
+          cancelable: true,
+          detail: range,
+        });
+        const defaultNotPrevented = this.element.dispatchEvent(event);
 
-      if (defaultNotPrevented) {
-        this._integration.scrollToAnchor(anchor);
+        if (defaultNotPrevented) {
+          this._integration.scrollToAnchor(anchor);
+        }
       }
-    });
+    );
 
     // Handler for when sidebar requests metadata for the current document
     this._sidebarRPC.on('getDocumentInfo', cb => {
@@ -366,6 +359,18 @@ export default class Guest {
     this._sidebarRPC.on('setHighlightsVisible', showHighlights => {
       this.setHighlightsVisible(showHighlights);
     });
+
+    this._sidebarRPC.on(
+      'deleteAnnotation',
+      /** @param {string} tag */
+      tag => this.detach(tag)
+    );
+
+    this._sidebarRPC.on(
+      'loadAnnotations',
+      /** @param {AnnotationData[]} annotations */
+      annotations => annotations.forEach(annotation => this.anchor(annotation))
+    );
 
     // Discover and connect to the sidebar frame. All RPC events must be
     // registered before creating the channel.
@@ -386,7 +391,6 @@ export default class Guest {
 
     this._integration.destroy();
     this._emitter.destroy();
-    this._annotationSync.destroy();
     this._sidebarRPC.destroy();
   }
 
@@ -478,7 +482,7 @@ export default class Guest {
     };
 
     // Remove existing anchors for this annotation.
-    this.detach(annotation, false /* notify */);
+    this.detach(annotation.$tag, false /* notify */);
 
     // Resolve selectors to ranges and insert highlights.
     if (!annotation.target) {
@@ -499,7 +503,7 @@ export default class Guest {
     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
     // Let other frames (eg. the sidebar) know about the new annotation.
-    this._annotationSync.sync([annotation]);
+    this._sidebarRPC.call('syncAnchoringStatus', annotation);
 
     return anchors;
   }
@@ -507,13 +511,14 @@ export default class Guest {
   /**
    * Remove the anchors and associated highlights for an annotation from the document.
    *
-   * @param {AnnotationData} annotation
+   * @param {string} tag
    * @param {boolean} [notify] - For internal use. Whether to emit an `anchorsChanged` notification
    */
-  detach(annotation, notify = true) {
+  detach(tag, notify = true) {
+    /** @type {Anchor[]} */
     const anchors = [];
     for (let anchor of this.anchors) {
-      if (anchor.annotation !== annotation) {
+      if (anchor.annotation.$tag !== tag) {
         anchors.push(anchor);
       } else if (anchor.highlights) {
         removeHighlights(anchor.highlights);
@@ -566,12 +571,10 @@ export default class Guest {
       document: info.metadata,
       target,
       $highlight: highlight,
-
-      // nb. `$tag` is assigned by `AnnotationSync`.
-      $tag: '',
+      $tag: 'a:' + generateHexString(8),
     };
 
-    this._emitter.publish('beforeAnnotationCreated', annotation);
+    this._sidebarRPC.call('createAnnotation', annotation);
     this.anchor(annotation);
 
     return annotation;

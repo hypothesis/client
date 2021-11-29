@@ -18,6 +18,7 @@ import { createStoreModule } from '../create-store';
  *   - Sub-frames will all have a id (frame identifier) set. The main frame's id is always `null`
  * @prop {DocumentMetadata} metadata - Metadata about the document currently loaded in this frame
  * @prop {string} uri - Current primary URI of the document being displayed
+ * @prop {boolean} [isAnnotationFetchComplete]
  */
 
 /** @type {Frame[]} */
