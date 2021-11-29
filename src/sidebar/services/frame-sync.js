@@ -8,29 +8,33 @@ import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
 /**
+ * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
  * @typedef {import('../../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('../../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../../shared/port-rpc').PortRPC} PortRPC
+ * @typedef {import('../store/modules/frames').Frame} Frame
  */
 
 /**
  * Return a minimal representation of an annotation that can be sent from the
- * sidebar app to a connected frame.
+ * sidebar app to the host frame.
  *
  * Because this representation will be exposed to untrusted third-party
  * JavaScript, it includes only the information needed to uniquely identify it
  * within the current session and anchor it in the document.
+ *
+ * @param {Annotation} annotation
+ * @returns {AnnotationData}
  */
-export function formatAnnot(ann) {
+export function formatAnnot({ $tag, document, target, uri }) {
   return {
-    tag: ann.$tag,
-    msg: {
-      document: ann.document,
-      target: ann.target,
-      uri: ann.uri,
-    },
+    $tag,
+    document: { title: document.title, link: [{ href: target[0].source }] },
+    target,
+    uri,
   };
 }
 
@@ -109,9 +113,15 @@ export class FrameSyncService {
     watch(
       this._store.subscribe,
       [() => this._store.allAnnotations(), () => this._store.frames()],
+      /**
+       * @param {[Annotation[], Frame[]]} current
+       * @param {[Annotation[]]} previous
+       */
       ([annotations, frames], [prevAnnotations]) => {
         let publicAnns = 0;
+        /** @type {Set<string>} */
         const inSidebar = new Set();
+        /** @type {Annotation[]} */
         const added = [];
 
         annotations.forEach(annot => {
@@ -143,7 +153,7 @@ export class FrameSyncService {
           });
         }
         deleted.forEach(annot => {
-          this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
+          this._guestRPC.call('deleteAnnotation', annot.$tag);
           this._inFrame.delete(annot.$tag);
         });
 
@@ -165,34 +175,37 @@ export class FrameSyncService {
    */
   _setupSyncFromGuests() {
     // A new annotation, note or highlight was created in the frame
-    this._guestRPC.on('createAnnotation', event => {
-      const annot = Object.assign({}, event.msg, { $tag: event.tag });
-      // If user is not logged in, we can't really create a meaningful highlight
-      // or annotation. Instead, we need to open the sidebar, show an error,
-      // and delete the (unsaved) annotation so it gets un-selected in the
-      // target document
-      if (!this._store.isLoggedIn()) {
-        this._hostRPC.call('openSidebar');
-        this._store.openSidebarPanel('loginPrompt');
-        this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
-        return;
+    this._guestRPC.on(
+      'createAnnotation',
+      /** @param {AnnotationData} annot */
+      annot => {
+        // If user is not logged in, we can't really create a meaningful highlight
+        // or annotation. Instead, we need to open the sidebar, show an error,
+        // and delete the (unsaved) annotation so it gets un-selected in the
+        // target document
+        if (!this._store.isLoggedIn()) {
+          this._hostRPC.call('openSidebar');
+          this._store.openSidebarPanel('loginPrompt');
+          this._guestRPC.call('deleteAnnotation', annot.$tag);
+          return;
+        }
+        this._inFrame.add(annot.$tag);
+
+        // Open the sidebar so that the user can immediately edit the draft
+        // annotation.
+        if (!annot.$highlight) {
+          this._hostRPC.call('openSidebar');
+        }
+
+        // Ensure that the highlight for the newly-created annotation is visible.
+        // Currently we only support a single, shared visibility state for all highlights
+        // in all frames, so this will make all existing highlights visible too.
+        this._hostRPC.call('showHighlights');
+
+        // Create the new annotation in the sidebar.
+        this._annotationsService.create(annot);
       }
-      this._inFrame.add(event.tag);
-
-      // Open the sidebar so that the user can immediately edit the draft
-      // annotation.
-      if (!annot.$highlight) {
-        this._hostRPC.call('openSidebar');
-      }
-
-      // Ensure that the highlight for the newly-created annotation is visible.
-      // Currently we only support a single, shared visibility state for all highlights
-      // in all frames, so this will make all existing highlights visible too.
-      this._hostRPC.call('showHighlights');
-
-      // Create the new annotation in the sidebar.
-      this._annotationsService.create(annot);
-    });
+    );
 
     // Map of annotation tag to anchoring status
     // ('anchored'|'orphan'|'timeout').
@@ -208,15 +221,15 @@ export class FrameSyncService {
     }, 10);
 
     // Anchoring an annotation in the frame completed
-    this._guestRPC.on('syncAnchoringStatus', events_ => {
-      events_.forEach(event => {
-        this._inFrame.add(event.tag);
-        anchoringStatusUpdates[event.tag] = event.msg.$orphan
-          ? 'orphan'
-          : 'anchored';
+    this._guestRPC.on(
+      'syncAnchoringStatus',
+      /** @param {AnnotationData} annotation */
+      ({ $tag, $orphan }) => {
+        this._inFrame.add($tag);
+        anchoringStatusUpdates[$tag] = $orphan ? 'orphan' : 'anchored';
         scheduleAnchoringStatusUpdate();
-      });
-    });
+      }
+    );
 
     this._guestRPC.on('showAnnotations', tags => {
       this._store.selectAnnotations(this._store.findIDsForTags(tags));
