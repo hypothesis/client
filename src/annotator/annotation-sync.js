@@ -56,7 +56,6 @@ export class AnnotationSync {
       const annotation = this._parse(body);
       this._cache.delete(annotation.$tag);
       onAnnotationDeleted(annotation);
-      this._format(annotation);
       callback(null);
     });
 
