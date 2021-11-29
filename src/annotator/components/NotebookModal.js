@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import classnames from 'classnames';
 
 import { addConfigFragment } from '../../shared/config-fragment';
-import { createSidebarConfig } from '../config/sidebar';
+import { createAppConfig } from '../config/app';
 
 /**
  * @typedef NotebookIframeProps
@@ -18,7 +18,7 @@ import { createSidebarConfig } from '../config/sidebar';
  */
 function NotebookIframe({ config, groupId }) {
   const notebookAppSrc = addConfigFragment(config.notebookAppUrl, {
-    ...createSidebarConfig(config),
+    ...createAppConfig(config),
 
     // Explicity set the "focused" group
     group: groupId,
