@@ -83,7 +83,6 @@ function SidebarView({
     !hasDirectLinkedAnnotationError &&
     !isLoading;
 
-  /** @type {import("preact/hooks").Ref<string|null>} */
   const prevGroupId = useRef(focusedGroupId);
 
   // Reload annotations when group, user or document search URIs change
