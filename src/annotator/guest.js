@@ -492,7 +492,7 @@ export default class Guest {
     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
     // Let other frames (eg. the sidebar) know about the new annotation.
-    this._annotationSync.sync([annotation]);
+    this._annotationSync.sync(annotation);
 
     return anchors;
   }

@@ -208,15 +208,17 @@ export class FrameSyncService {
     }, 10);
 
     // Anchoring an annotation in the frame completed
-    this._guestRPC.on('syncAnchoringStatus', events_ => {
-      events_.forEach(event => {
-        this._inFrame.add(event.tag);
-        anchoringStatusUpdates[event.tag] = event.msg.$orphan
-          ? 'orphan'
-          : 'anchored';
+    this._guestRPC.on(
+      'syncAnchoringStatus',
+      /** @type {import('../../annotator/annotation-sync').RPCMessage} */ ({
+        tag,
+        msg,
+      }) => {
+        this._inFrame.add(tag);
+        anchoringStatusUpdates[tag] = msg.$orphan ? 'orphan' : 'anchored';
         scheduleAnchoringStatusUpdate();
-      });
-    });
+      }
+    );
 
     this._guestRPC.on('showAnnotations', tags => {
       this._store.selectAnnotations(this._store.findIDsForTags(tags));

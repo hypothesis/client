@@ -71,22 +71,19 @@ export class AnnotationSync {
   }
 
   /**
-   * Relay updated annotations from the annotator to the sidebar.
+   * Relay updated annotation from the annotator to the sidebar.
    *
    * This is called for example after annotations are anchored to notify the
    * sidebar about the current anchoring status.
    *
-   * @param {AnnotationData[]} annotations
+   * @param {AnnotationData} annotation
    */
-  sync(annotations) {
+  sync(annotation) {
     if (this.destroyed) {
       return;
     }
 
-    this._sidebarRPC.call(
-      'syncAnchoringStatus',
-      annotations.map(ann => this._format(ann))
-    );
+    this._sidebarRPC.call('syncAnchoringStatus', this._format(annotation));
   }
 
   /**
