@@ -1,5 +1,6 @@
 import { TinyEmitter } from 'tiny-emitter';
 
+import { captureErrors } from './frame-error-capture';
 import { ListenerCollection } from './listener-collection';
 import { isMessageEqual, isSourceWindow } from './port-util';
 
@@ -146,10 +147,9 @@ export class PortProvider {
    * Initiate the listener of port requests by other frames.
    */
   listen() {
-    this._listeners.add(window, 'message', messageEvent => {
-      const { data, origin, source } = /** @type {MessageEvent} */ (
-        messageEvent
-      );
+    /** @param {Event} event */
+    const handleRequest = event => {
+      const { data, origin, source } = /** @type {MessageEvent} */ (event);
 
       if (!isSourceWindow(source)) {
         return;
@@ -201,7 +201,13 @@ export class PortProvider {
       } else if (frame2 === 'host') {
         this._emitter.emit('frameConnected', frame1, messageChannel.port2);
       }
-    });
+    };
+
+    this._listeners.add(
+      window,
+      'message',
+      captureErrors(handleRequest, 'Handling port request')
+    );
   }
 
   destroy() {
