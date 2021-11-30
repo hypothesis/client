@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/browser';
 
 import { parseConfigFragment } from '../../shared/config-fragment';
+import { handleErrorsInFrames } from '../../shared/frame-error-capture';
 import warnOnce from '../../shared/warn-once';
 
 /**
@@ -11,6 +12,9 @@ import warnOnce from '../../shared/warn-once';
 
 let eventsSent = 0;
 const maxEventsToSendPerSession = 5;
+
+/** @type {() => void} */
+let removeFrameErrorHandler;
 
 /**
  * Return the origin which the current script comes from.
@@ -119,6 +123,15 @@ export function init(config) {
     .filter(isJavaScript)
     .map(script => script.src || '<inline>');
   Sentry.setExtra('loaded_scripts', loadedScripts);
+
+  // Catch errors occuring in Hypothesis-related code in the host frame.
+  removeFrameErrorHandler = handleErrorsInFrames((err, context) => {
+    Sentry.captureException(err, {
+      tags: {
+        context,
+      },
+    });
+  });
 }
 
 /**
@@ -137,4 +150,5 @@ export function setUserInfo(user) {
  */
 export function reset() {
   eventsSent = 0;
+  removeFrameErrorHandler?.();
 }

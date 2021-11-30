@@ -24,6 +24,7 @@ describe('Sidebar', () => {
   let fakeGuest;
   let FakeToolbarController;
   let fakeToolbar;
+  let fakeSendErrorsTo;
 
   before(() => {
     sinon.stub(window, 'requestAnimationFrame').yields();
@@ -110,6 +111,8 @@ describe('Sidebar', () => {
     };
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 
+    fakeSendErrorsTo = sinon.stub();
+
     const fakeCreateAppConfig = sinon.spy(config => {
       const appConfig = { ...config };
       delete appConfig.sidebarAppUrl;
@@ -118,6 +121,7 @@ describe('Sidebar', () => {
 
     $imports.$mock({
       '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
+      '../shared/frame-error-capture': { sendErrorsTo: fakeSendErrorsTo },
       './bucket-bar': { default: FakeBucketBar },
       './config/app': { createAppConfig: fakeCreateAppConfig },
       './toolbar': {
@@ -172,6 +176,11 @@ describe('Sidebar', () => {
         .shadowRoot.querySelector('iframe');
       assert.equal(sidebar.iframe, iframe);
     });
+  });
+
+  it('registers sidebar app as a handler for errors in the host frame', () => {
+    const sidebar = createSidebar();
+    assert.calledWith(fakeSendErrorsTo, sidebar.iframe.contentWindow);
   });
 
   it('notifies sidebar app when a guest frame is unloaded', () => {
@@ -532,6 +541,15 @@ describe('Sidebar', () => {
       const sidebar = createSidebar();
       sidebar.destroy();
       assert.called(sidebar.bucketBar.destroy);
+    });
+
+    it('unregisters sidebar as handler for host frame errors', () => {
+      const sidebar = createSidebar();
+      fakeSendErrorsTo.resetHistory();
+
+      sidebar.destroy();
+
+      assert.calledWith(fakeSendErrorsTo, null);
     });
   });
 
