@@ -3,14 +3,17 @@ import * as sentry from '../sentry';
 describe('sidebar/util/sentry', () => {
   let fakeDocumentReferrer;
   let fakeDocumentCurrentScript;
+  let fakeHandleErrorsInFrames;
   let fakeParseConfigFragment;
   let fakeSentry;
   let fakeWarnOnce;
 
   beforeEach(() => {
+    fakeHandleErrorsInFrames = sinon.stub().returns(() => {});
     fakeParseConfigFragment = sinon.stub().returns({});
 
     fakeSentry = {
+      captureException: sinon.stub(),
       init: sinon.stub(),
       setExtra: sinon.stub(),
       setUser: sinon.stub(),
@@ -22,6 +25,9 @@ describe('sidebar/util/sentry', () => {
       '@sentry/browser': fakeSentry,
       '../../shared/config-fragment': {
         parseConfigFragment: fakeParseConfigFragment,
+      },
+      '../../shared/frame-error-capture': {
+        handleErrorsInFrames: fakeHandleErrorsInFrames,
       },
       '../../shared/warn-once': fakeWarnOnce,
     });
@@ -197,6 +203,21 @@ describe('sidebar/util/sentry', () => {
       // Serializing the custom event detail will fail, so that data will simply
       // be omitted from the report.
       assert.deepEqual(event.extra, {});
+    });
+
+    it('registers a handler for errors in other frames', () => {
+      sentry.init({ dsn: 'test-dsn' });
+
+      assert.calledOnce(fakeHandleErrorsInFrames);
+      const callback = fakeHandleErrorsInFrames.getCall(0).args[0];
+
+      const error = new Error('Some error in host frame');
+      const context = 'some-context';
+      callback(error, context);
+
+      assert.calledWith(fakeSentry.captureException, error, {
+        tags: { context },
+      });
     });
   });
 

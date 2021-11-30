@@ -2,6 +2,7 @@ import Hammer from 'hammerjs';
 
 import { Bridge } from '../shared/bridge';
 import { addConfigFragment } from '../shared/config-fragment';
+import { sendErrorsTo } from '../shared/frame-error-capture';
 import { ListenerCollection } from '../shared/listener-collection';
 
 import { annotationCounts } from './annotation-counts';
@@ -113,6 +114,11 @@ export default class Sidebar {
       element.appendChild(this.hypothesisSidebar);
     }
 
+    // Register the sidebar as a handler for Hypothesis errors in this frame.
+    if (this.iframe.contentWindow) {
+      sendErrorsTo(this.iframe.contentWindow);
+    }
+
     this.guest = guest;
 
     this._listeners = new ListenerCollection();
@@ -217,6 +223,9 @@ export default class Sidebar {
       this.iframe.remove();
     }
     this._emitter.destroy();
+
+    // Unregister the sidebar iframe as a handler for errors in this frame.
+    sendErrorsTo(null);
   }
 
   /**
