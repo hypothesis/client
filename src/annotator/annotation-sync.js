@@ -39,29 +39,25 @@ export class AnnotationSync {
     // Relay events from the sidebar to the rest of the annotator.
     this._sidebarRPC.on(
       'deleteAnnotation',
-      (/** @type {RPCMessage} */ { tag }, callback) => {
+      /** @type {RPCMessage} */ ({ tag }) => {
         if (this.destroyed) {
-          callback(null);
           return;
         }
         onAnnotationDeleted(tag);
-        callback(null);
       }
     );
 
     this._sidebarRPC.on(
       'loadAnnotations',
-      (/** @type {RPCMessage[]} */ bodies, callback) => {
+      /** @type {RPCMessage[]} */ messages => {
         if (this.destroyed) {
-          callback(null);
           return;
         }
-        const annotations = bodies.map(({ msg, tag: $tag }) => ({
+        const annotations = messages.map(({ msg, tag: $tag }) => ({
           ...msg,
           $tag,
         }));
         onAnnotationsLoaded(annotations);
-        callback(null);
       }
     );
   }
