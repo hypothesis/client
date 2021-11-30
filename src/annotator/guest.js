@@ -1,4 +1,3 @@
-import { formatAnnotation } from '../shared/annotation-rpcmessage';
 import { Bridge } from '../shared/bridge';
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder } from '../shared/port-finder';
@@ -21,8 +20,7 @@ import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
 
 /**
- * @typedef {import('../shared/annotation-rpcmessage').RPCMessage} RPCMessage
- * @typedef {import('../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../types/annotator').AnnotationSafeData} AnnotationSafeData
  * @typedef {import('../types/annotator').Annotator} Annotator
  * @typedef {import('../types/annotator').Anchor} Anchor
  * @typedef {import('../types/annotator').Destroyable} Destroyable
@@ -36,13 +34,13 @@ import { normalizeURI } from './util/url';
 /**
  * HTML element created by the highlighter with an associated annotation.
  *
- * @typedef {HTMLElement & { _annotation?: AnnotationData }} AnnotationHighlight
+ * @typedef {HTMLElement & { _annotation?: AnnotationSafeData }} AnnotationHighlight
  */
 
 /**
  * Return all the annotations associated with the selected text.
  *
- * @return {AnnotationData[]}
+ * @return {AnnotationSafeData[]}
  */
 function annotationsForSelection() {
   const selection = /** @type {Selection} */ (window.getSelection());
@@ -53,7 +51,7 @@ function annotationsForSelection() {
     // nb. Only non-nullish items are returned by `itemsForRange`.
     node => /** @type {AnnotationHighlight} */ (node)._annotation
   );
-  return /** @type {AnnotationData[]} */ (items);
+  return /** @type {AnnotationSafeData[]} */ (items);
 }
 
 /**
@@ -61,13 +59,13 @@ function annotationsForSelection() {
  * DOM node.
  *
  * @param {Node} node
- * @return {AnnotationData[]}
+ * @return {AnnotationSafeData[]}
  */
 function annotationsAt(node) {
   const items = getHighlightsContainingNode(node)
     .map(h => /** @type {AnnotationHighlight} */ (h)._annotation)
     .filter(ann => ann !== undefined);
-  return /** @type {AnnotationData[]} */ (items);
+  return /** @type {AnnotationSafeData[]} */ (items);
 }
 
 /**
@@ -361,13 +359,8 @@ export default class Guest {
 
     this._sidebarRPC.on(
       'loadAnnotations',
-      /** @type {RPCMessage[]} */ messages =>
-        messages
-          .map(({ msg, tag: $tag }) => ({
-            ...msg,
-            $tag,
-          }))
-          .forEach(annotation => this.anchor(annotation))
+      (/** @type {AnnotationSafeData[]} */ annotations) =>
+        annotations.forEach(annotation => this.anchor(annotation))
     );
 
     // Discover and connect to the sidebar frame. All RPC events must be
@@ -415,7 +408,7 @@ export default class Guest {
    * Any existing anchors associated with `annotation` will be removed before
    * re-anchoring the annotation.
    *
-   * @param {AnnotationData} annotation
+   * @param {AnnotationSafeData} annotation
    * @return {Promise<Anchor[]>}
    */
   async anchor(annotation) {
@@ -501,7 +494,7 @@ export default class Guest {
     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
     // Let other frames (eg. the sidebar) know about the new annotation.
-    this._sidebarRPC.call('syncAnchoringStatus', formatAnnotation(annotation));
+    this._sidebarRPC.call('syncAnchoringStatus', annotation);
 
     return anchors;
   }
@@ -543,7 +536,7 @@ export default class Guest {
    *   @param {boolean} [options.highlight] - If true, the new annotation has
    *     the `$highlight` flag set, causing it to be saved immediately without
    *     prompting for a comment.
-   * @return {Promise<AnnotationData>} - The new annotation
+   * @return {Promise<AnnotationSafeData>} - The new annotation
    */
   async createAnnotation({ highlight = false } = {}) {
     const ranges = this.selectedRanges ?? [];
@@ -562,7 +555,7 @@ export default class Guest {
       selector: selectors,
     }));
 
-    /** @type {AnnotationData} */
+    /** @type {AnnotationSafeData} */
     const annotation = {
       uri: info.uri,
       document: info.metadata,
@@ -571,7 +564,7 @@ export default class Guest {
       $tag: 'a:' + generateHexString(8),
     };
 
-    this._sidebarRPC.call('createAnnotation', formatAnnotation(annotation));
+    this._sidebarRPC.call('createAnnotation', annotation);
     this.anchor(annotation);
 
     return annotation;
@@ -581,7 +574,7 @@ export default class Guest {
    * Indicate in the sidebar that certain annotations are focused (ie. the
    * associated document region(s) is hovered).
    *
-   * @param {AnnotationData[]} annotations
+   * @param {AnnotationSafeData[]} annotations
    */
   _focusAnnotations(annotations) {
     const tags = annotations.map(a => a.$tag);
@@ -629,7 +622,7 @@ export default class Guest {
    * This sets up a filter in the sidebar to show only the selected annotations
    * and opens the sidebar.
    *
-   * @param {AnnotationData[]} annotations
+   * @param {AnnotationSafeData[]} annotations
    * @param {boolean} [toggle] - Toggle whether the annotations are selected
    *   instead of showing them regardless of whether they are currently selected.
    */

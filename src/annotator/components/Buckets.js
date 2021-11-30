@@ -4,7 +4,7 @@ import { setHighlightsFocused } from '../highlighter';
 import { findClosestOffscreenAnchor } from '../util/buckets';
 
 /**
- * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../../types/annotator').AnnotationSafeData} AnnotationSafeData
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../util/buckets').Bucket} Bucket
  */
@@ -15,7 +15,7 @@ import { findClosestOffscreenAnchor } from '../util/buckets';
  *
  * @param {object} props
  *  @param {Bucket} props.bucket
- *  @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
+ *  @param {(annotations: AnnotationSafeData[], toggle: boolean) => any} props.onSelectAnnotations
  */
 function BucketButton({ bucket, onSelectAnnotations }) {
   const annotations = bucket.anchors.map(anchor => anchor.annotation);
@@ -86,7 +86,7 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
  *   @param {Bucket} props.above
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets
- *   @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
+ *   @param {(annotations: AnnotationSafeData[], toggle: boolean) => any} props.onSelectAnnotations
  *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
  *     scroll the document to a given anchor
  */

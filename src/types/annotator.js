@@ -26,7 +26,7 @@
 /**
  * An object representing an annotation in the document.
  *
- * @typedef AnnotationData
+ * @typedef AnnotationSafeData
  * @prop {string} uri
  * @prop {Target[]} target
  * @prop {string} $tag
@@ -45,7 +45,7 @@
  * associated with.
  *
  * @typedef Anchor
- * @prop {AnnotationData} annotation
+ * @prop {AnnotationSafeData} annotation
  * @prop {HTMLElement[]} [highlights] -
  *   The HTML elements that create the highlight for this annotation.
  * @prop {AbstractRange} [range] -
@@ -69,7 +69,7 @@
  *
  * @typedef Annotator
  * @prop {Anchor[]} anchors
- * @prop {(ann: AnnotationData) => Promise<Anchor[]>} anchor
+ * @prop {(ann: AnnotationSafeData) => Promise<Anchor[]>} anchor
  * @prop {(frame: HTMLIFrameElement) => void} injectClient - Inject the Hypothesis client
  *   into a same-origin iframe in guest mode.
  */

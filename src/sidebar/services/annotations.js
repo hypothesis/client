@@ -8,7 +8,7 @@ import {
 
 /**
  * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../../types/annotator').AnnotationSafeData} AnnotationSafeData
  */
 
 /**
@@ -51,7 +51,7 @@ export class AnnotationsService {
   /**
    * Extend new annotation objects with defaults and permissions.
    *
-   * @param {AnnotationData} annotationData
+   * @param {AnnotationSafeData} annotationData
    * @param {Date} now
    * @return {Annotation}
    */

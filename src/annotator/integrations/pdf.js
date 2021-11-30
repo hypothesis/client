@@ -18,7 +18,7 @@ import { PDFMetadata } from './pdf-metadata';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
- * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../../types/annotator').AnnotationSafeData} AnnotationSafeData
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  * @typedef {import('../../types/annotator').Integration} Integration
@@ -411,7 +411,7 @@ export class PDFIntegration {
   /**
    * Wait for an annotation to be anchored in a rendered page.
    *
-   * @param {AnnotationData} annotation
+   * @param {AnnotationSafeData} annotation
    * @param {number} maxWait
    * @return {Promise<Anchor|null>}
    */
