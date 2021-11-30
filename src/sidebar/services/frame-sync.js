@@ -9,11 +9,13 @@ import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
  * @typedef {import('../../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('../../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../../shared/port-rpc').PortRPC} PortRPC
+ * @typedef {import('../store/modules/frames').Frame} Frame
  */
 
 /**
@@ -91,9 +93,15 @@ export class FrameSyncService {
     watch(
       this._store.subscribe,
       [() => this._store.allAnnotations(), () => this._store.frames()],
+      /**
+       * @param {[Annotation[], Frame[]]} arg0
+       * @param {[Annotation[]]} arg1
+       */
       ([annotations, frames], [prevAnnotations]) => {
         let publicAnns = 0;
+        /** @type {Set<string>} */
         const inSidebar = new Set();
+        /** @type {Annotation[]} */
         const added = [];
 
         annotations.forEach(annot => {
@@ -125,7 +133,7 @@ export class FrameSyncService {
           });
         }
         deleted.forEach(annot => {
-          this._guestRPC.call('deleteAnnotation', formatAnnotation(annot));
+          this._guestRPC.call('deleteAnnotation', annot.$tag);
           this._inFrame.delete(annot.$tag);
         });
 
@@ -156,7 +164,7 @@ export class FrameSyncService {
       if (!this._store.isLoggedIn()) {
         this._hostRPC.call('openSidebar');
         this._store.openSidebarPanel('loginPrompt');
-        this._guestRPC.call('deleteAnnotation', formatAnnotation(annot));
+        this._guestRPC.call('deleteAnnotation', annot.$tag);
         return;
       }
       this._inFrame.add(event.tag);

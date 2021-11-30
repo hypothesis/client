@@ -356,7 +356,7 @@ export default class Guest {
 
     this._sidebarRPC.on(
       'deleteAnnotation',
-      /** @type {RPCMessage} */ ({ tag }) => this.detach(tag)
+      /** @type {string} */ tag => this.detach(tag)
     );
 
     this._sidebarRPC.on(
