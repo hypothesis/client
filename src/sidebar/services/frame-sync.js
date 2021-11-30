@@ -2,6 +2,7 @@ import debounce from 'lodash.debounce';
 
 import { Bridge } from '../../shared/bridge';
 import { ListenerCollection } from '../../shared/listener-collection';
+import { formatAnnotation } from '../../shared/annotation-rpcmessage';
 import { PortFinder } from '../../shared/port-finder';
 import { isMessageEqual } from '../../shared/port-util';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
@@ -14,25 +15,6 @@ import { watch } from '../util/watch';
  * @typedef {import('../../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../../shared/port-rpc').PortRPC} PortRPC
  */
-
-/**
- * Return a minimal representation of an annotation that can be sent from the
- * sidebar app to a connected frame.
- *
- * Because this representation will be exposed to untrusted third-party
- * JavaScript, it includes only the information needed to uniquely identify it
- * within the current session and anchor it in the document.
- */
-export function formatAnnot(ann) {
-  return {
-    tag: ann.$tag,
-    msg: {
-      document: ann.document,
-      target: ann.target,
-      uri: ann.uri,
-    },
-  };
-}
 
 /**
  * Service that synchronizes annotations between the sidebar and host page.
@@ -137,13 +119,13 @@ export class FrameSyncService {
         // when they are added or removed in the sidebar, but not re-anchoring
         // annotations if their selectors are updated.
         if (added.length > 0) {
-          this._guestRPC.call('loadAnnotations', added.map(formatAnnot));
+          this._guestRPC.call('loadAnnotations', added.map(formatAnnotation));
           added.forEach(annot => {
             this._inFrame.add(annot.$tag);
           });
         }
         deleted.forEach(annot => {
-          this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
+          this._guestRPC.call('deleteAnnotation', formatAnnotation(annot));
           this._inFrame.delete(annot.$tag);
         });
 
@@ -174,7 +156,7 @@ export class FrameSyncService {
       if (!this._store.isLoggedIn()) {
         this._hostRPC.call('openSidebar');
         this._store.openSidebarPanel('loginPrompt');
-        this._guestRPC.call('deleteAnnotation', formatAnnot(annot));
+        this._guestRPC.call('deleteAnnotation', formatAnnotation(annot));
         return;
       }
       this._inFrame.add(event.tag);
@@ -210,7 +192,7 @@ export class FrameSyncService {
     // Anchoring an annotation in the frame completed
     this._guestRPC.on(
       'syncAnchoringStatus',
-      /** @type {import('../../annotator/annotation-sync').RPCMessage} */ ({
+      /** @type {import('../../shared/annotation-rpcmessage').RPCMessage} */ ({
         tag,
         msg,
       }) => {

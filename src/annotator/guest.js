@@ -1,10 +1,10 @@
+import { formatAnnotation } from '../shared/annotation-rpcmessage';
 import { Bridge } from '../shared/bridge';
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder } from '../shared/port-finder';
 import { generateHexString } from '../shared/random';
 
 import { Adder } from './adder';
-import { AnnotationSync } from './annotation-sync';
 import { TextRange } from './anchoring/text-range';
 import {
   getHighlightsContainingNode,
@@ -21,6 +21,7 @@ import { SelectionObserver } from './selection-observer';
 import { normalizeURI } from './util/url';
 
 /**
+ * @typedef {import('../shared/annotation-rpcmessage').RPCMessage} RPCMessage
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Annotator} Annotator
  * @typedef {import('../types/annotator').Anchor} Anchor
@@ -180,14 +181,6 @@ export default class Guest {
      */
     this._sidebarRPC = new Bridge();
     this._connectSidebarEvents();
-
-    // Set up listeners for when the sidebar asks us to add or remove annotations
-    // in this frame.
-    this._annotationSync = new AnnotationSync(this._sidebarRPC, {
-      onAnnotationDeleted: tag => this.detach(tag),
-      onAnnotationsLoaded: annotations =>
-        annotations.forEach(annotation => this.anchor(annotation)),
-    });
 
     // Set up automatic and integration-triggered injection of client into
     // iframes in this frame.
@@ -361,6 +354,22 @@ export default class Guest {
       this.setHighlightsVisible(showHighlights);
     });
 
+    this._sidebarRPC.on(
+      'deleteAnnotation',
+      /** @type {RPCMessage} */ ({ tag }) => this.detach(tag)
+    );
+
+    this._sidebarRPC.on(
+      'loadAnnotations',
+      /** @type {RPCMessage[]} */ messages =>
+        messages
+          .map(({ msg, tag: $tag }) => ({
+            ...msg,
+            $tag,
+          }))
+          .forEach(annotation => this.anchor(annotation))
+    );
+
     // Discover and connect to the sidebar frame. All RPC events must be
     // registered before creating the channel.
     const sidebarPort = await this._portFinder.discover('sidebar');
@@ -380,7 +389,6 @@ export default class Guest {
 
     this._integration.destroy();
     this._emitter.destroy();
-    this._annotationSync.destroy();
     this._sidebarRPC.destroy();
   }
 
@@ -493,7 +501,7 @@ export default class Guest {
     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
 
     // Let other frames (eg. the sidebar) know about the new annotation.
-    this._annotationSync.sync(annotation);
+    this._sidebarRPC.call('syncAnchoringStatus', formatAnnotation(annotation));
 
     return anchors;
   }
@@ -563,7 +571,7 @@ export default class Guest {
       $tag: 'a:' + generateHexString(8),
     };
 
-    this._annotationSync.sendToSidebar(annotation);
+    this._sidebarRPC.call('createAnnotation', formatAnnotation(annotation));
     this.anchor(annotation);
 
     return annotation;
