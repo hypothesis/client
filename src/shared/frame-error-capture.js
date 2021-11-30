@@ -25,8 +25,8 @@ export function captureErrors(callback, context) {
 /**
  * Forward an error to the frame registered with {@link sendErrorsTo}.
  *
- * This function operates on a best-effort basis. If no error handling frame
- * has been registered it does nothing.
+ * Errors are delivered on a best-effort basis. If no error handling frame has
+ * been registered or the frame is still loading, the error will not be received.
  *
  * @param {unknown} error
  * @param {string} context - A short message indicating where the error happened.
