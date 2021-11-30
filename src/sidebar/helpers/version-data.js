@@ -37,7 +37,7 @@ export default class VersionData {
       }
     }
 
-    this.version = '__VERSION__'; // replaced by versionify
+    this.version = '__VERSION__';
     this.userAgent = window_.navigator.userAgent;
     this.urls = documentInfo.map(di => di.uri).join(', ') || noValueString;
 

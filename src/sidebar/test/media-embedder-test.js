@@ -72,10 +72,6 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        // queryString's #stringify sorts keys, so resulting query string
-        // will be reliably as follows, regardless of original ordering
-        // Note also `v` param is handled elsewhere and is not "allowed" in
-        // queryString.
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -163,8 +159,6 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        // queryString's #stringify sorts keys, so resulting query string
-        // will be reliably as follows, regardless of original ordering
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });
@@ -199,8 +193,6 @@ describe('sidebar/media-embedder', () => {
 
       assert.equal(
         embedUrl(element),
-        // queryString's #stringify sorts keys, so resulting query string
-        // will be reliably as follows, regardless of original ordering
         'https://www.youtube.com/embed/QCkm0lL-6lc?end=10&start=5'
       );
     });

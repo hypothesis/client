@@ -98,7 +98,7 @@ function createAPICall(
 
       const headers = {
         'Content-Type': 'application/json',
-        'Hypothesis-Client-Version': '__VERSION__', // replaced by versionify
+        'Hypothesis-Client-Version': '__VERSION__',
       };
 
       if (token) {

@@ -68,7 +68,7 @@ export function init(config) {
       'Object Not Found Matching Id',
     ],
 
-    release: '__VERSION__', // replaced by versionify
+    release: '__VERSION__',
 
     // See https://docs.sentry.io/error-reporting/configuration/filtering/?platform=javascript#before-send
     beforeSend: (event, hint) => {
