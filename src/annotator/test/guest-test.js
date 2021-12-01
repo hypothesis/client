@@ -629,7 +629,7 @@ describe('Guest', () => {
 
       simulateSelectionWithText();
 
-      assert.calledWith(fakeBridge.call, 'textSelectedAt', 'main');
+      assert.calledWith(fakeBridge.call, 'textSelectedIn', 'main');
     });
 
     it('calls "textSelectionAt" RPC method with the subFrameIdentifier as argument if selection is non-empty', () => {
@@ -638,18 +638,18 @@ describe('Guest', () => {
 
       simulateSelectionWithText();
 
-      assert.calledWith(fakeBridge.call, 'textSelectedAt', subFrameIdentifier);
+      assert.calledWith(fakeBridge.call, 'textSelectedIn', subFrameIdentifier);
     });
 
-    it('calls "textDeselectedAt" RPC method with argument "main" if selection is empty', () => {
+    it('calls "textUnselectedIn" RPC method with argument "main" if selection is empty', () => {
       createGuest();
 
       simulateSelectionWithoutText();
 
-      assert.calledWith(fakeBridge.call, 'textDeselectedAt', 'main');
+      assert.calledWith(fakeBridge.call, 'textUnselectedIn', 'main');
     });
 
-    it('calls "textDeselectedAt" RPC method with the subFrameIdentifier as argument if selection is empty', () => {
+    it('calls "textUnselectedIn" RPC method with the subFrameIdentifier as argument if selection is empty', () => {
       const subFrameIdentifier = 'other frame';
       createGuest({ subFrameIdentifier });
 
@@ -657,7 +657,7 @@ describe('Guest', () => {
 
       assert.calledWith(
         fakeBridge.call,
-        'textDeselectedAt',
+        'textUnselectedIn',
         subFrameIdentifier
       );
     });
@@ -667,7 +667,7 @@ describe('Guest', () => {
       guest.selectedRanges = [1];
       const handler = fakeBridge.on
         .getCalls()
-        .find(call => call.args[0] === 'deselectTextExcept').args[1];
+        .find(call => call.args[0] === 'unselectTextExceptIn').args[1];
 
       simulateSelectionWithText();
       fakeBridge.call.resetHistory();
@@ -677,12 +677,12 @@ describe('Guest', () => {
       assert.notCalled(fakeBridge.call);
     });
 
-    it("doesn't unselects text if frame identifiers matches", () => {
+    it("doesn't deselect text if frame identifiers matches", () => {
       const guest = createGuest();
       guest.selectedRanges = [1];
       const handler = fakeBridge.on
         .getCalls()
-        .find(call => call.args[0] === 'deselectTextExcept').args[1];
+        .find(call => call.args[0] === 'unselectTextExceptIn').args[1];
 
       simulateSelectionWithText();
       handler('main'); // doesn't unselect the text because it matches the frameIdentifier
@@ -801,12 +801,12 @@ describe('Guest', () => {
   });
 
   describe('#createAnnotation', () => {
-    it('creates an annotation if host calls with "createAnnotationAt" RPC method', () => {
+    it('creates an annotation if host calls with "createAnnotationIn" RPC method', () => {
       const guest = createGuest();
       sinon.stub(guest, 'createAnnotation');
       const handler = fakeBridge.on
         .getCalls()
-        .find(call => call.args[0] === 'createAnnotationAt').args[1];
+        .find(call => call.args[0] === 'createAnnotationIn').args[1];
 
       handler('dummy');
       assert.notCalled(guest.createAnnotation);

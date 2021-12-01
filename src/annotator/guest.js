@@ -329,8 +329,9 @@ export default class Guest {
 
   async _connectHostEvents() {
     this._hostRPC.on(
-      'deselectTextExcept',
-      /** @type {string} */ frameIdentifier => {
+      'unselectTextExceptIn',
+      /** @param {string} frameIdentifier */
+      frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           return;
         }
@@ -344,8 +345,9 @@ export default class Guest {
     );
 
     this._hostRPC.on(
-      'createAnnotationAt',
-      /** @type {string} */ frameIdentifier => {
+      'createAnnotationIn',
+      /** @param {string} frameIdentifier */
+      frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           this.createAnnotation();
         }
@@ -652,7 +654,7 @@ export default class Guest {
     }
 
     this.selectedRanges = [range];
-    this._hostRPC.call('textSelectedAt', this._frameIdentifier);
+    this._hostRPC.call('textSelectedIn', this._frameIdentifier);
 
     this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
@@ -664,7 +666,7 @@ export default class Guest {
     this._adder.hide();
     this.selectedRanges = [];
     if (informHostFrame) {
-      this._hostRPC.call('textDeselectedAt', this._frameIdentifier);
+      this._hostRPC.call('textUnselectedIn', this._frameIdentifier);
     }
   }
 

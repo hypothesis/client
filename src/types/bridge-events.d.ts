@@ -8,14 +8,14 @@
  */
 export type GuestToHostEvent =
   /**
-   * The guest informs the host that text has been deselected at a frame with that identifier.
+   * The guest informs the host that text has been unselected at a frame with that identifier.
    */
-  | 'textDeselectedAt'
+  | 'textUnselectedIn'
 
   /**
    * The guest informs the host that text has been selected at a frame with that identifier.
    */
-  | 'textSelectedAt';
+  | 'textSelectedIn';
 
 /**
  * Events that the guest sends to the sidebar
@@ -63,12 +63,12 @@ export type HostToGuestEvent =
   /**
    * The host request the guest at a frame with that identifier to create an annotation.
    */
-  | 'createAnnotationAt'
+  | 'createAnnotationIn'
 
   /**
    * The host informs the guests that text should be deselected if it doesn't match the current frame identifier.
    */
-  | 'deselectTextExcept';
+  | 'unselectTextExceptIn';
 
 /**
  * Events that the host sends to the sidebar
