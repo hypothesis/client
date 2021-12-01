@@ -237,22 +237,22 @@ describe('Sidebar', () => {
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(fakeBridge.call, 'createAnnotationAt', 'main');
+      assert.calledWith(fakeBridge.call, 'createAnnotationIn', 'main');
     });
 
     it('creates an annotation on another frame toolbar button is clicked', () => {
       createSidebar({});
 
-      // make a text selection on another frame
+      // Make a text selection in another frame
       const handler = fakeBridge.on
         .getCalls()
-        .find(call => call.args[0] === 'textSelectedAt').args[1];
+        .find(call => call.args[0] === 'textSelectedIn').args[1];
       const frameIdentifier = 'other frame';
       handler(frameIdentifier);
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(fakeBridge.call, 'createAnnotationAt', frameIdentifier);
+      assert.calledWith(fakeBridge.call, 'createAnnotationIn', frameIdentifier);
     });
 
     it('sets create annotation button to "Annotation" when selection becomes non-empty', () => {
@@ -260,7 +260,7 @@ describe('Sidebar', () => {
 
       const handler = fakeBridge.on
         .getCalls()
-        .find(call => call.args[0] === 'textSelectedAt').args[1];
+        .find(call => call.args[0] === 'textSelectedIn').args[1];
       handler('dummy');
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
@@ -271,7 +271,7 @@ describe('Sidebar', () => {
 
       const handler = fakeBridge.on
         .getCalls()
-        .find(call => call.args[0] === 'textDeselectedAt').args[1];
+        .find(call => call.args[0] === 'textUnselectedIn').args[1];
       handler('dummy');
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
@@ -630,7 +630,7 @@ describe('Sidebar', () => {
   });
 
   describe('#onFrameConnected', () => {
-    it('creates a channel to communicate to the guests', () => {
+    it('creates a channel to communicate with the guests', () => {
       const sidebar = createSidebar();
       const { port1 } = new MessageChannel();
       sidebar.onFrameConnected('guest', port1);
