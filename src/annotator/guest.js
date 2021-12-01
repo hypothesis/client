@@ -104,9 +104,8 @@ function resolveAnchor(anchor) {
  * loads Hypothesis (not all frames will be annotation-enabled). In one frame,
  * usually the top-level one, there will also be an instance of the `Sidebar`
  * class that shows the sidebar app and surrounding UI. The `Guest` instance in
- * each frame connects to the sidebar frame as part of its initialization, when
- * {@link _connectSidebarEvents} is called. The `Guest` is also connected to the
- * host frame using the {@link _connectHostEvents} method.
+ * each frame connects to the sidebar and host frames as part of its
+ * initialization.
  *
  * The anchoring implementation defaults to a generic one for HTML documents and
  * can be overridden to handle different document types.
@@ -314,23 +313,24 @@ export default class Guest {
 
   async _connectHostEvents() {
     this._hostRPC.on(
-      'deselectTextExcept',
-      /** @type {string} */ frameIdentifier => {
+      'clearSelectionExceptIn',
+      /** @param {string} frameIdentifier */
+      frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           return;
         }
 
         this._onClearSelection({ informHostFrame: false });
-        // It would be nice to clear the shadow of the selection calling
-        // `document.getSelection()?.removeAllRanges();` however, because of the
-        // selection observer, that will trigger a call to `_onClearSelection({informHostFrame: true})`
-        // which in turn will remove the selection from the `Guest` that has the selection.
+        // TODO: clear the selection calling `document.getSelection()?.removeAllRanges();`
+        // without triggering the selection observer (that in turns calls
+        // `_onClearSelection({informHostFrame: true})` and changes `Sidebar#._guestWithSelection`).
       }
     );
 
     this._hostRPC.on(
-      'createAnnotationAt',
-      /** @type {string} */ frameIdentifier => {
+      'createAnnotationIn',
+      /** @param {string} frameIdentifier */
+      frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           this.createAnnotation();
         }
@@ -655,7 +655,7 @@ export default class Guest {
     }
 
     this.selectedRanges = [range];
-    this._hostRPC.call('textSelectedAt', this._frameIdentifier);
+    this._hostRPC.call('textSelectedIn', this._frameIdentifier);
 
     this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
@@ -667,7 +667,7 @@ export default class Guest {
     this._adder.hide();
     this.selectedRanges = [];
     if (informHostFrame) {
-      this._hostRPC.call('textDeselectedAt', this._frameIdentifier);
+      this._hostRPC.call('textUnselectedIn', this._frameIdentifier);
     }
   }
 

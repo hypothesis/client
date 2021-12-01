@@ -70,13 +70,13 @@ export default class Sidebar {
     this._emitter = eventBus.createEmitter();
 
     /**
-     * Tracks which `Guest` has a text selection. It uses the frame i«dentifier
+     * Tracks which `Guest` has a text selection. It uses the frame identifier
      * which uniquely identifies each `Guest`. If there is no text selected, the
      * value is set to `null`.
      *
-     * @type {null|string}
+     * @type {string|null}
      */
-    this._selectionAt = null;
+    this._guestWithSelection = null;
 
     /**
      * Channel for host-guest communication.
@@ -145,7 +145,10 @@ export default class Sidebar {
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
       createAnnotation: () =>
-        this._guestRPC.call('createAnnotationAt', this._selectionAt ?? 'main'),
+        this._guestRPC.call(
+          'createAnnotationIn',
+          this._guestWithSelection ?? 'main'
+        ),
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
@@ -266,20 +269,22 @@ export default class Sidebar {
 
   _setupGuestEvents() {
     this._guestRPC.on(
-      'textSelectedAt',
-      /** @type {string} */ frameIdentifier => {
-        this._selectionAt = frameIdentifier;
+      'textSelectedIn',
+      /** @param {string} frameIdentifier */
+      frameIdentifier => {
+        this._guestWithSelection = frameIdentifier;
         this.toolbar.newAnnotationType = 'annotation';
-        this._guestRPC.call('deselectTextExcept', frameIdentifier);
+        this._guestRPC.call('clearSelectionExceptIn', frameIdentifier);
       }
     );
 
     this._guestRPC.on(
-      'textDeselectedAt',
-      /** @type {string} */ frameIdentifier => {
-        this._selectionAt = null;
+      'textUnselectedIn',
+      /** @param {string}  frameIdentifier */
+      frameIdentifier => {
+        this._guestWithSelection = null;
         this.toolbar.newAnnotationType = 'note';
-        this._guestRPC.call('deselectTextExcept', frameIdentifier);
+        this._guestRPC.call('clearSelectionExceptIn', frameIdentifier);
       }
     );
   }
@@ -297,10 +302,14 @@ export default class Sidebar {
 
     // Sidebar listens to the `openNotebook` event coming from the sidebar's
     // iframe and re-publishes it via the emitter to the Notebook
-    this._sidebarRPC.on('openNotebook', (/** @type {string} */ groupId) => {
-      this.hide();
-      this._emitter.publish('openNotebook', groupId);
-    });
+    this._sidebarRPC.on(
+      'openNotebook',
+      /** @param {string} groupId */
+      groupId => {
+        this.hide();
+        this._emitter.publish('openNotebook', groupId);
+      }
+    );
     this._emitter.subscribe('closeNotebook', () => {
       this.show();
     });
