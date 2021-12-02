@@ -146,7 +146,8 @@ export function setUserInfo(user) {
 }
 
 /**
- * Reset metrics used for client-side event filtering.
+ * Testing aid that resets event counters and removes event handlers installed
+ * by {@link init}.
  */
 export function reset() {
   eventsSent = 0;
