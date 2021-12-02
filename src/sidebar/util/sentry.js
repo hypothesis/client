@@ -13,7 +13,7 @@ import warnOnce from '../../shared/warn-once';
 let eventsSent = 0;
 const maxEventsToSendPerSession = 5;
 
-/** @type {() => void} */
+/** @type {(() => void)|null} */
 let removeFrameErrorHandler;
 
 /**
@@ -151,4 +151,5 @@ export function setUserInfo(user) {
 export function reset() {
   eventsSent = 0;
   removeFrameErrorHandler?.();
+  removeFrameErrorHandler = null;
 }
