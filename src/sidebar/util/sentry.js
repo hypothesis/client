@@ -14,7 +14,7 @@ let eventsSent = 0;
 const maxEventsToSendPerSession = 5;
 
 /** @type {(() => void)|null} */
-let removeFrameErrorHandler;
+let removeFrameErrorHandler = null;
 
 /**
  * Return the origin which the current script comes from.
