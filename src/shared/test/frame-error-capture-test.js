@@ -53,16 +53,26 @@ describe('shared/frame-error-capture', () => {
         type: 'hypothesis-error',
       });
     });
+  });
 
-    it('does not forward errors if there is no handler frame', () => {
-      const callback = captureErrors(() => {
-        throw new Error('Test error');
-      }, 'Testing captureErrors');
+  describe('sendError', () => {
+    it('sends error to handler frame', async () => {
+      sendErrorsTo(window);
+      sendError(new Error('Test error'), 'some context');
 
-      assert.throws(() => {
-        callback();
-      }, 'Test error');
+      await delay(0);
 
+      assert.equal(errorEvents.length, 1);
+      assert.match(errorEvents[0], {
+        context: 'some context',
+        error: sinon.match({ message: 'Test error' }),
+        type: 'hypothesis-error',
+      });
+    });
+
+    it('does not forward errors if there is no handler frame', async () => {
+      sendError(new Error('Test error'));
+      await delay(0);
       assert.equal(errorEvents.length, 0);
     });
 
@@ -74,13 +84,7 @@ describe('shared/frame-error-capture', () => {
         sinon.stub(console, 'warn');
 
         sendErrorsTo(window);
-        const callback = captureErrors(() => {
-          throw new Error('Test error');
-        }, 'Testing captureErrors');
-
-        assert.throws(() => {
-          callback();
-        }, 'Test error');
+        sendError(new Error('Test error'), 'some context');
 
         assert.calledOnce(window.postMessage);
         assert.calledOnce(console.warn);
