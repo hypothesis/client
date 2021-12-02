@@ -28,6 +28,11 @@ export function captureErrors(callback, context) {
  * Errors are delivered on a best-effort basis. If no error handling frame has
  * been registered or the frame is still loading, the error will not be received.
  *
+ * Ideally we would use a more robust delivery system which can queue messages
+ * until they can be processed (eg. using MessagePort). We use `window.postMessage`
+ * for the moment because we are trying to rule out problems with
+ * MessageChannel/MessagePort when setting up sidebar <-> host communication.
+ *
  * @param {unknown} error
  * @param {string} context - A short message indicating where the error happened.
  */
