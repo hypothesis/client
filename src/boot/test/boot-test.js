@@ -126,7 +126,7 @@ describe('bootstrap', () => {
         'https://marginal.ly/client/build/styles/annotator.1234.css'
       );
       assert.equal(preloadLinks[0].as, 'style');
-      assert.equal(preloadLinks[0].crossOrigin, 'anonymous');
+      assert.equal(preloadLinks[0].crossOrigin, null);
     });
 
     it('creates the link to the sidebar iframe', () => {

@@ -14,10 +14,6 @@ function loadStyles(shadowRoot) {
   }
 
   const linkEl = document.createElement('link');
-
-  // This needs to match the `crossorigin` attribute on the preloaded stylesheet.
-  linkEl.crossOrigin = 'anonymous';
-
   linkEl.rel = 'stylesheet';
   linkEl.href = url;
   shadowRoot.appendChild(linkEl);

@@ -109,12 +109,18 @@ function injectLink(doc, rel, type, url) {
  * @param {string} type - Type of resource
  * @param {string} url
  */
-function preloadUrl(doc, type, url) {
+function preloadURL(doc, type, url) {
   const link = doc.createElement('link');
   link.rel = 'preload';
   link.as = type;
-  link.crossOrigin = 'anonymous';
   link.href = url;
+
+  // If this is a resource that we are going to read the contents of, then we
+  // need to make a cross-origin request. For other types, use a non cross-origin
+  // request which returns a response that is opaque.
+  if (type === 'fetch') {
+    link.crossOrigin = 'anonymous';
+  }
 
   tagElement(link);
   doc.head.appendChild(link);
@@ -178,7 +184,7 @@ export function bootHypothesisClient(doc, config) {
   injectLink(doc, 'notebook', 'html', config.notebookAppUrl);
 
   // Preload the styles used by the shadow roots of annotator UI elements.
-  preloadUrl(doc, 'style', assetURL(config, 'styles/annotator.css'));
+  preloadURL(doc, 'style', assetURL(config, 'styles/annotator.css'));
 
   // Register the URL of the annotation client which is currently being used to drive
   // annotation interactions.
@@ -218,8 +224,8 @@ export function bootHypothesisClient(doc, config) {
  */
 export function bootSidebarApp(doc, config) {
   // Preload `/api/` and `/api/links` API responses.
-  preloadUrl(doc, 'fetch', config.apiUrl);
-  preloadUrl(doc, 'fetch', config.apiUrl + 'links');
+  preloadURL(doc, 'fetch', config.apiUrl);
+  preloadURL(doc, 'fetch', config.apiUrl + 'links');
 
   const polyfills = polyfillBundles(commonPolyfills);
 
