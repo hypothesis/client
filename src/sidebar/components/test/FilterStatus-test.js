@@ -44,6 +44,7 @@ describe('FilterStatus', () => {
       filterState: sinon.stub().returns(getFilterState()),
       focusState: sinon.stub().returns(getFocusState()),
       forcedVisibleThreads: sinon.stub().returns([]),
+      isLoading: sinon.stub().returns(false),
       selectedAnnotations: sinon.stub().returns([]),
       toggleFocusMode: sinon.stub(),
     };
@@ -79,6 +80,16 @@ describe('FilterStatus', () => {
       callback: fakeStore.clearSelection,
     });
   }
+
+  context('Loading', () => {
+    it('shows a loading spinner', () => {
+      fakeStore.filterQuery.returns('foobar');
+      fakeStore.isLoading.returns(true);
+      const wrapper = createComponent();
+
+      assert.isTrue(wrapper.find('Spinner').exists());
+    });
+  });
 
   context('(State 1): no search filters active', () => {
     it('should return null if filter state indicates no active filters', () => {
