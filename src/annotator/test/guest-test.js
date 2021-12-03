@@ -397,30 +397,38 @@ describe('Guest', () => {
     });
 
     describe('on "loadAnnotations" event', () => {
-      it('anchors annotations', () => {
-        const guest = createGuest();
-        const ann1 = { id: 1, $tag: 'tag1' };
-        const ann2 = { id: 2, $tag: 'tag2' };
-        sandbox.stub(guest, 'anchor');
+      it('anchors annotations', async () => {
+        createGuest();
+        const ann1 = { target: [], uri: 'uri', $tag: 'tag1' };
+        const ann2 = { target: [], uri: 'uri', $tag: 'tag2' };
 
         emitSidebarEvent('loadAnnotations', [ann1, ann2]);
+        await delay(0);
 
-        assert.calledTwice(guest.anchor);
-        assert.calledWith(guest.anchor, ann1);
-        assert.calledWith(guest.anchor, ann2);
+        assert.calledTwice(fakeBridge.call);
+        assert.calledWith(
+          fakeBridge.call,
+          'syncAnchoringStatus',
+          sinon.match({ target: [], uri: 'uri', $tag: 'tag1' })
+        );
+        assert.calledWith(
+          fakeBridge.call,
+          'syncAnchoringStatus',
+          sinon.match({ target: [], uri: 'uri', $tag: 'tag2' })
+        );
       });
     });
 
     describe('on "deleteAnnotation" event', () => {
       it('detaches annotation', () => {
         const guest = createGuest();
-        const $tag = 'tag1';
-        sandbox.stub(guest, 'detach');
+        const callback = sinon.stub();
+        guest._emitter.subscribe('anchorsChanged', callback);
 
-        emitSidebarEvent('deleteAnnotation', $tag);
+        emitSidebarEvent('deleteAnnotation', 'tag1');
 
-        assert.calledOnce(guest.detach);
-        assert.calledWith(guest.detach, $tag);
+        assert.calledOnce(callback);
+        assert.calledWith(callback, []);
       });
     });
   });
