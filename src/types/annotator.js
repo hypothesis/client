@@ -37,7 +37,7 @@
  *   Flag indicating that this annotation was not found in the document.
  *   It is initially `undefined` while anchoring is in progress and then set to
  *   `true` if anchoring failed or `false` if it succeeded.
- * @prop {DocumentMetadata} document
+ * @prop {DocumentMetadata} [document]
  */
 
 /**

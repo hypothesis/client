@@ -86,6 +86,7 @@ export class AnnotationsService {
         $tag,
         hidden: false,
         links: {},
+        document: { title: '' },
       },
       annotationData
     );

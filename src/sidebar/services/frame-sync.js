@@ -20,7 +20,7 @@ import { watch } from '../util/watch';
 
 /**
  * Return a minimal representation of an annotation that can be sent from the
- * sidebar app to the host frame.
+ * sidebar app to a guest frame.
  *
  * Because this representation will be exposed to untrusted third-party
  * JavaScript, it includes only the information needed to uniquely identify it
@@ -29,10 +29,9 @@ import { watch } from '../util/watch';
  * @param {Annotation} annotation
  * @returns {AnnotationData}
  */
-export function formatAnnot({ $tag, document, target, uri }) {
+export function formatAnnot({ $tag, target, uri }) {
   return {
     $tag,
-    document: { title: document.title, link: [{ href: target[0].source }] },
     target,
     uri,
   };

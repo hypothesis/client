@@ -784,7 +784,7 @@ describe('Guest', () => {
       ]);
     });
 
-    it('sets `$tag` to a temporarily value', async () => {
+    it('sets `$tag` property', async () => {
       const guest = createGuest();
       const annotation = await guest.createAnnotation();
       assert.match(annotation.$tag, /a:\w{8}/);
@@ -1041,20 +1041,20 @@ describe('Guest', () => {
   });
 
   describe('#detach', () => {
-    let index = 1;
+    let nextTagId = 0;
     function createAnchor() {
       return {
-        annotation: { $tag: `t${index++}` },
+        annotation: { $tag: `t${nextTagId++}` },
         highlights: [document.createElement('span')],
       };
     }
 
     it('removes anchors associated with the removed annotation', () => {
       const guest = createGuest();
-      const annotation = { $tag: 't0' };
-      guest.anchors.push({ annotation });
+      const anchor = createAnchor();
+      guest.anchors.push(anchor);
 
-      guest.detach('t0');
+      guest.detach(anchor.annotation.$tag);
 
       assert.equal(guest.anchors.length, 0);
     });
