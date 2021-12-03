@@ -106,14 +106,9 @@ function focusFiltersFromConfig(focusConfig) {
 
 const reducers = {
   CHANGE_FOCUS_MODE_USER: function (state, action) {
-    if (isValidFocusConfig({ user: action.user })) {
-      return {
-        focusActive: true,
-        focusFilters: focusFiltersFromConfig({ user: action.user }),
-      };
-    }
     return {
-      focusActive: false,
+      focusActive: isValidFocusConfig({ user: action.user }),
+      focusFilters: focusFiltersFromConfig({ user: action.user }),
     };
   },
 
