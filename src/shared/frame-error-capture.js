@@ -23,6 +23,44 @@ export function captureErrors(callback, context) {
 }
 
 /**
+ * @typedef ErrorData
+ * @prop {string} message
+ * @prop {string} [stack]
+ */
+
+/**
+ * Return a cloneable representation of an Error.
+ *
+ * This is needed in browsers that don't support structured-cloning of Error
+ * objects, or if the error is not cloneable for some reason.
+ *
+ * @param {Error|unknown} err
+ * @return {ErrorData}
+ */
+function serializeError(err) {
+  if (!(err instanceof Error)) {
+    return { message: String(err), stack: undefined };
+  }
+
+  return {
+    message: err.message,
+    stack: err.stack,
+  };
+}
+
+/**
+ * Convert error data serialized by {@link serializeError} back into an Error.
+ *
+ * @param {ErrorData} data
+ * @return {Error}
+ */
+function deserializeError(data) {
+  const err = new Error(data.message);
+  err.stack = data.stack;
+  return err;
+}
+
+/**
  * Forward an error to the frame registered with {@link sendErrorsTo}.
  *
  * Errors are delivered on a best-effort basis. If no error handling frame has
@@ -41,12 +79,28 @@ export function sendError(error, context) {
     return;
   }
 
-  const data = { type: 'hypothesis-error', error, context };
+  const data = {
+    type: 'hypothesis-error',
+    error: error instanceof Error ? error : serializeError(error),
+    context,
+  };
+
   try {
-    // Try to send the error. This will currently fail in browsers which don't
-    // support structured cloning of exceptions. For these we'll need to implement
-    // a fallback.
-    errorDestination.postMessage(data, '*');
+    // Try to send the error. If this fails because the browser doesn't support
+    // structured cloning of errors, use a fallback.
+    try {
+      errorDestination.postMessage(data, '*');
+    } catch (postErr) {
+      if (
+        postErr instanceof DOMException &&
+        postErr.name === 'DataCloneError'
+      ) {
+        data.error = serializeError(data.error);
+        errorDestination.postMessage(data, '*');
+      } else {
+        throw postErr;
+      }
+    }
   } catch (sendErr) {
     console.warn('Unable to report Hypothesis error', sendErr);
   }
@@ -63,7 +117,11 @@ export function handleErrorsInFrames(callback) {
   const handleMessage = event => {
     const { data } = event;
     if (data && data?.type === 'hypothesis-error') {
-      callback(data.error, data.context);
+      const { context, error } = data;
+      callback(
+        error instanceof Error ? error : deserializeError(error),
+        context
+      );
     }
   };
   window.addEventListener('message', handleMessage);
