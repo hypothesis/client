@@ -32,6 +32,7 @@ function servePackage(port) {
   const serveBootScript = function (req, res) {
     const entryPath = require.resolve('../');
     const entryScript = readFileSync(entryPath).toString('utf-8');
+    res.append('Content-Type', 'application/javascript; charset=utf-8');
     res.send(entryScript);
   };
 
