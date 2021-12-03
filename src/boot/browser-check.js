@@ -9,6 +9,8 @@
  * @return {boolean}
  */
 export function isBrowserSupported() {
+  // Checks that return a truthy value if they succeed and throw or return
+  // a falsey value if they fail.
   const checks = [
     // ES APIs.
     () => Promise.resolve(),
@@ -17,7 +19,10 @@ export function isBrowserSupported() {
     // DOM API checks for frequently-used APIs.
     () => new URL(document.location.href), // URL constructor.
     () => new Request('https://hypothes.is'), // Part of the `fetch` API.
-    () => Element.prototype.prepend.name,
+    () => Element.prototype.attachShadow,
+
+    // CSS feature checks
+    () => CSS.supports('display: grid'),
 
     // DOM API checks for less frequently-used APIs.
     // These are less likely to have been polyfilled by the host page.
@@ -31,12 +36,12 @@ export function isBrowserSupported() {
         XPathResult.ANY_TYPE,
         null /* result */
       );
+      return true;
     },
   ];
 
   try {
-    checks.forEach(check => check());
-    return true;
+    return checks.every(check => check());
   } catch (err) {
     return false;
   }

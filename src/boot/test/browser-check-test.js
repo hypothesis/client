@@ -5,13 +5,35 @@ describe('isBrowserSupported', () => {
     assert.isTrue(isBrowserSupported());
   });
 
-  it('returns false if a check fails', () => {
-    // Override `Document.prototype.evaluate`.
-    document.evaluate = null;
+  // nb. This doesn't exhaustively test each feature check we use, just a few
+  // representative cases.
+  [
+    // Make certain checks return falsey values.
+    {
+      patch: () => (document.evaluate = null),
+      restore: () => {
+        delete document.evaluate;
+      },
+    },
+    {
+      patch: () => sinon.stub(CSS, 'supports').returns(false),
+      restore: () => CSS.supports.restore(),
+    },
 
-    assert.isFalse(isBrowserSupported());
-
-    // Remove override.
-    delete document.evaluate;
+    // Make certain checks throw an error.
+    {
+      patch: () =>
+        sinon.stub(CSS, 'supports').throws(new Error('Wrong arguments')),
+      restore: () => CSS.supports.restore(),
+    },
+  ].forEach(({ patch, restore }) => {
+    it('returns false if a check fails', () => {
+      patch();
+      try {
+        assert.isFalse(isBrowserSupported());
+      } finally {
+        restore();
+      }
+    });
   });
 });
