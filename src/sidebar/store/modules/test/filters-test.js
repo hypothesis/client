@@ -36,14 +36,26 @@ describe('sidebar/store/modules/filters', () => {
       //
       // This is the LMS app's way of asking the client to disable focus mode.
       it('deactivates and disables focus if username is undefined', () => {
-        store.toggleFocusMode(true);
+        // Set to a valid user first; this will set and also activate
+        // the filter
+        store.changeFocusModeUser({
+          username: 'testuser',
+          displayName: 'Test User',
+        });
+
+        const firstFilterState = getFiltersState();
+        assert.isTrue(firstFilterState.focusActive);
+        assert.equal(firstFilterState.focusFilters.user.value, 'testuser');
+
+        // Now, emulate the "empty" filter message from the LMS app.
         store.changeFocusModeUser({
           username: undefined,
           displayName: undefined,
         });
-        const filterState = getFiltersState();
-        assert.isFalse(filterState.focusActive);
-        assert.isUndefined(filterState.focusFilters.user);
+
+        const secondFilterState = getFiltersState();
+        assert.isFalse(secondFilterState.focusActive);
+        assert.isUndefined(secondFilterState.focusFilters.user);
       });
     });
 
