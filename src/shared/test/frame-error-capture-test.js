@@ -15,6 +15,19 @@ describe('shared/frame-error-capture', () => {
     }
   }
 
+  // Simulate behavior of `window.postMessage` in browsers (eg. Firefox, Safari)
+  // which cannot clone errors.
+  function patchPostMessageToFailWhenCloningErrors() {
+    const origPostMessage = window.postMessage;
+    const stub = sinon.stub(window, 'postMessage').callsFake((data, origin) => {
+      if (data.error instanceof Error) {
+        throw new DOMException('Object cannot be cloned', 'DataCloneError');
+      }
+      origPostMessage.call(window, data, origin);
+    });
+    return stub;
+  }
+
   beforeEach(() => {
     errorEvents = [];
     window.addEventListener('message', handleMessage);
@@ -56,17 +69,21 @@ describe('shared/frame-error-capture', () => {
   });
 
   describe('sendError', () => {
-    it('sends error to handler frame', async () => {
-      sendErrorsTo(window);
-      sendError(new Error('Test error'), 'some context');
+    [new Error('Test error'), 'non-Error value'].forEach(errorValue => {
+      it('sends error to handler frame', async () => {
+        sendErrorsTo(window);
+        sendError(errorValue, 'some context');
 
-      await delay(0);
+        await delay(0);
 
-      assert.equal(errorEvents.length, 1);
-      assert.match(errorEvents[0], {
-        context: 'some context',
-        error: sinon.match({ message: 'Test error' }),
-        type: 'hypothesis-error',
+        assert.equal(errorEvents.length, 1);
+        assert.match(errorEvents[0], {
+          context: 'some context',
+          error: sinon.match({
+            message: errorValue.message ?? String(errorValue),
+          }),
+          type: 'hypothesis-error',
+        });
       });
     });
 
@@ -93,6 +110,30 @@ describe('shared/frame-error-capture', () => {
         window.postMessage.restore();
       }
     });
+
+    it('serializes errors in browsers that cannot clone Error objects', async () => {
+      sendErrorsTo(window);
+
+      const postMessageStub = patchPostMessageToFailWhenCloningErrors();
+      try {
+        const error = new Error('Test error');
+        sendError(error, 'some context');
+        await delay(0);
+
+        assert.deepEqual(errorEvents, [
+          {
+            type: 'hypothesis-error',
+            context: 'some context',
+            error: {
+              message: error.message,
+              stack: error.stack,
+            },
+          },
+        ]);
+      } finally {
+        postMessageStub.restore();
+      }
+    });
   });
 
   describe('handleErrorsInFrames', () => {
@@ -116,33 +157,64 @@ describe('shared/frame-error-capture', () => {
         removeHandler();
       }
     });
+
+    it('deserializes errors in browsers that cannot clone Error objects', async () => {
+      const receivedErrors = [];
+
+      const removeHandler = handleErrorsInFrames((error, context) => {
+        receivedErrors.push({ error, context });
+      });
+
+      const postMessageStub = patchPostMessageToFailWhenCloningErrors();
+      try {
+        sendErrorsTo(window);
+        sendError(new Error('Test error'), 'Test context');
+
+        await delay(0);
+
+        assert.equal(receivedErrors.length, 1);
+        assert.equal(receivedErrors[0].error.message, 'Test error');
+        assert.equal(receivedErrors[0].context, 'Test context');
+      } finally {
+        removeHandler();
+        postMessageStub.restore();
+      }
+    });
   });
 
   // Integration test that combines `captureErrors` and `handleErrorsInFrames`.
-  it('captures and forwards errors from wrapped callbacks', async () => {
-    const receivedErrors = [];
-    const removeHandler = handleErrorsInFrames((error, context) => {
-      receivedErrors.push({ error, context });
-    });
+  [true, false].forEach(cloningErrorsSupported => {
+    it('captures and forwards errors from wrapped callbacks', async () => {
+      const receivedErrors = [];
+      const removeHandler = handleErrorsInFrames((error, context) => {
+        receivedErrors.push({ error, context });
+      });
 
-    try {
-      sendErrorsTo(window);
-      const callback = captureErrors(() => {
-        throw new Error('Test error');
-      }, 'Test context');
+      let postMessageStub;
+      if (!cloningErrorsSupported) {
+        postMessageStub = patchPostMessageToFailWhenCloningErrors();
+      }
 
       try {
-        callback();
-      } catch {
-        // Ignored
-      }
-      await delay(0);
+        sendErrorsTo(window);
+        const callback = captureErrors(() => {
+          throw new Error('Test error');
+        }, 'Test context');
 
-      assert.equal(receivedErrors.length, 1);
-      assert.equal(receivedErrors[0].error.message, 'Test error');
-      assert.equal(receivedErrors[0].context, 'Test context');
-    } finally {
-      removeHandler();
-    }
+        try {
+          callback();
+        } catch {
+          // Ignored
+        }
+        await delay(0);
+
+        assert.equal(receivedErrors.length, 1);
+        assert.equal(receivedErrors[0].error.message, 'Test error');
+        assert.equal(receivedErrors[0].context, 'Test context');
+      } finally {
+        removeHandler();
+        postMessageStub?.restore();
+      }
+    });
   });
 });
