@@ -1,4 +1,4 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
+import { LabeledButton, Spinner } from '@hypothesis/frontend-shared';
 
 import { useMemo } from 'preact/hooks';
 
@@ -68,37 +68,46 @@ function FilterStatusPanel({
   focusDisplayName,
   resultCount,
 }) {
+  const store = useStoreProxy();
   return (
     <div className="FilterStatus">
-      <div className="hyp-u-layout-row--align-center">
-        <div className="FilterStatus__text">
-          {resultCount > 0 && <span>Showing </span>}
-          <span className="filter-facet">
-            {resultCount > 0 ? resultCount : 'No'}{' '}
-            {resultCount === 1 ? entitySingular : entityPlural}
-          </span>
-          {filterQuery && (
-            <span>
-              {' '}
-              for{' '}
-              <span className="filter-facet--pre">&#39;{filterQuery}&#39;</span>
-            </span>
-          )}
-          {focusDisplayName && (
-            <span>
-              {' '}
-              by <span className="filter-facet">{focusDisplayName}</span>
-            </span>
-          )}
-          {additionalCount > 0 && (
-            <span className="filter-facet--muted">
-              {' '}
-              (and {additionalCount} more)
-            </span>
-          )}
+      {store.isLoading() ? (
+        <div className="hyp-u-layout-row--center">
+          <Spinner />
         </div>
-        <div>{actionButton}</div>
-      </div>
+      ) : (
+        <div className="hyp-u-layout-row--align-center">
+          <div className="FilterStatus__text">
+            {resultCount > 0 && <span>Showing </span>}
+            <span className="filter-facet">
+              {resultCount > 0 ? resultCount : 'No'}{' '}
+              {resultCount === 1 ? entitySingular : entityPlural}
+            </span>
+            {filterQuery && (
+              <span>
+                {' '}
+                for{' '}
+                <span className="filter-facet--pre">
+                  &#39;{filterQuery}&#39;
+                </span>
+              </span>
+            )}
+            {focusDisplayName && (
+              <span>
+                {' '}
+                by <span className="filter-facet">{focusDisplayName}</span>
+              </span>
+            )}
+            {additionalCount > 0 && (
+              <span className="filter-facet--muted">
+                {' '}
+                (and {additionalCount} more)
+              </span>
+            )}
+          </div>
+          <div>{actionButton}</div>
+        </div>
+      )}
     </div>
   );
 }
