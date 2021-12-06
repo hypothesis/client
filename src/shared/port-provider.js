@@ -2,7 +2,7 @@ import { TinyEmitter } from 'tiny-emitter';
 
 import { captureErrors } from './frame-error-capture';
 import { ListenerCollection } from './listener-collection';
-import { isMessageEqual, isSourceWindow } from './port-util';
+import { isMessage, isSourceWindow } from './port-util';
 
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
@@ -10,6 +10,19 @@ import { isMessageEqual, isSourceWindow } from './port-util';
  * @typedef {import('./port-util').Frame} Frame
  * @typedef {'guest-host'|'guest-sidebar'|'notebook-sidebar'|'sidebar-host'} Channel
  */
+
+/**
+ * Combinations of frames that are allowed to connect to each other.
+ *
+ * The first frame in each pair is the source frame which will initiate the
+ * connection.
+ */
+const allowedChannels = [
+  'guest-sidebar',
+  'guest-host',
+  'sidebar-host',
+  'notebook-sidebar',
+];
 
 /**
  * PortProvider creates a `MessageChannel` for communication between two
@@ -84,54 +97,6 @@ export class PortProvider {
     this._sidebarHostChannel = new MessageChannel();
 
     this._listeners = new ListenerCollection();
-
-    /** @type {Array<Message & {allowedOrigin: string}>} */
-    this._allowedMessages = [
-      {
-        allowedOrigin: '*',
-        frame1: 'guest',
-        frame2: 'host',
-        type: 'request',
-      },
-      {
-        allowedOrigin: '*',
-        frame1: 'guest',
-        frame2: 'sidebar',
-        type: 'request',
-      },
-      {
-        allowedOrigin: this._hypothesisAppsOrigin,
-        frame1: 'sidebar',
-        frame2: 'host',
-        type: 'request',
-      },
-      {
-        allowedOrigin: this._hypothesisAppsOrigin,
-        frame1: 'notebook',
-        frame2: 'sidebar',
-        type: 'request',
-      },
-    ];
-  }
-
-  /**
-   * Check that data and origin matches the expected values.
-   *
-   * @param {object} options
-   *   @param {Message} options.allowedMessage - the `data` must match this
-   *     `Message`.
-   *   @param {string} options.allowedOrigin - the `origin` must match this
-   *     value. If `allowedOrigin` is '*', the origin is ignored.
-   *   @param {any} options.data - the data to be compared with `allowedMessage`.
-   *   @param {string} options.origin - the origin to be compared with
-   *     `allowedOrigin`.
-   */
-  _messageMatches({ allowedMessage, allowedOrigin, data, origin }) {
-    if (allowedOrigin !== '*' && origin !== allowedOrigin) {
-      return false;
-    }
-
-    return isMessageEqual(data, allowedMessage);
   }
 
   /**
@@ -151,29 +116,36 @@ export class PortProvider {
     const handleRequest = event => {
       const { data, origin, source } = /** @type {MessageEvent} */ (event);
 
-      if (!isSourceWindow(source)) {
+      // Check that message is a port request intended for us.
+      if (!isMessage(data) || data.type !== 'request') {
         return;
       }
 
-      const match = this._allowedMessages.find(
-        ({ allowedOrigin, ...allowedMessage }) =>
-          this._messageMatches({
-            allowedMessage,
-            allowedOrigin,
-            data,
-            origin,
-          })
-      );
-
-      if (match === undefined) {
-        return;
-      }
-
-      const { frame1, frame2 } = match;
+      // Validate request details and source.
+      const { frame1, frame2 } = data;
       const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
+      if (!allowedChannels.includes(channel)) {
+        throw new Error(`Port request has unsupported channel ${channel}`);
+      }
 
-      // Check if this request has already been received from this frame and
-      // ignore it if so.
+      if (!isSourceWindow(source)) {
+        throw new Error(
+          `Port request for ${channel} came from a non-Window source`
+        );
+      }
+
+      const isAllowedOrigin =
+        // Guest and host frames may be hosted on any origin.
+        ['guest', 'host'].includes(frame1) ||
+        // The sidebar and notebook apps must be loaded from the expected origin.
+        origin === this._hypothesisAppsOrigin;
+      if (!isAllowedOrigin) {
+        throw new Error(
+          `Port request for ${channel} came from non-allowed origin ${origin}. Allowed origins: ${this._hypothesisAppsOrigin}`
+        );
+      }
+
+      // Check if this request has already been received from this frame.
       let sentChannels = this._sentChannels.get(source);
       if (!sentChannels) {
         sentChannels = new Set();
@@ -192,7 +164,13 @@ export class PortProvider {
           : new MessageChannel();
 
       const message = { frame1, frame2, type: 'offer' };
-      source.postMessage(message, origin, [messageChannel.port1]);
+      try {
+        source.postMessage(message, origin, [messageChannel.port1]);
+      } catch (err) {
+        throw new Error(
+          `Failed to send port for channel ${channel}: ${err?.message}`
+        );
+      }
 
       if (frame2 === 'sidebar') {
         this._sidebarHostChannel.port2.postMessage(message, [

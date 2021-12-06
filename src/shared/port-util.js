@@ -17,7 +17,7 @@
  * @param {any} data
  * @return {data is Message}
  */
-function isMessage(data) {
+export function isMessage(data) {
   if (data === null || typeof data !== 'object') {
     return false;
   }
