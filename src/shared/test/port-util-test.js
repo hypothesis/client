@@ -1,6 +1,39 @@
-import { isMessageEqual, isSourceWindow } from '../port-util';
+import { isMessage, isMessageEqual, isSourceWindow } from '../port-util';
 
 describe('port-util', () => {
+  describe('isMessage', () => {
+    [
+      {
+        frame1: 'guest',
+        frame2: 'sidebar',
+        type: 'request',
+      },
+
+      {
+        frame1: 'guest',
+        frame2: 'sidebar',
+        type: 'request',
+        extraField: 'foo',
+      },
+    ].forEach(data => {
+      it('returns true for objects with the expected fields', () => {
+        assert.isTrue(isMessage(data));
+      });
+    });
+
+    [
+      null,
+      undefined,
+      {},
+      'str',
+      { frame1: 'guest', frame2: false, type: 'request' },
+    ].forEach(data => {
+      it('returns false if data is not a valid message', () => {
+        assert.isFalse(isMessage(data));
+      });
+    });
+  });
+
   describe('isMessageEqual', () => {
     const frame1 = 'guest';
     const frame2 = 'sidebar';
@@ -55,16 +88,6 @@ describe('port-util', () => {
       },
       {
         data: {
-          extra: 'dummy', // additional
-          frame1,
-          frame2,
-          type,
-        },
-        expectedResult: false,
-        reason: 'data has one additional property',
-      },
-      {
-        data: {
           frame1: 'dummy', // different
           frame2,
           type,
@@ -74,10 +97,9 @@ describe('port-util', () => {
       },
       {
         data: {
-          frame1,
+          frame1: new Date(), // not JSON-serializable
           frame2,
           type,
-          window, // not serializable
         },
         expectedResult: false,
         reason: "data has one property that can't be serialized",
