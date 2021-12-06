@@ -735,4 +735,14 @@ export default class Guest {
   get focusedAnnotationTags() {
     return this._focusedAnnotations;
   }
+
+  /**
+   * Use only for testing purposes
+   *
+   * @param {string} $tag
+   * @param {Anchor[]} anchors
+   */
+  setAnnotations($tag, anchors) {
+    this._annotations.set($tag, anchors);
+  }
 }

@@ -203,7 +203,7 @@ describe('Guest', () => {
       }
     };
 
-    describe('on "focusAnnotations" event', () => {
+    describe('on "focusAnnotations" event', async () => {
       it('focuses any annotations with a matching tag', () => {
         const highlight0 = document.createElement('span');
         const highlight1 = document.createElement('span');
@@ -212,6 +212,8 @@ describe('Guest', () => {
           { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
           { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
         ];
+        guest.setAnnotations('tag1', [{ highlights: [highlight0] }]);
+        guest.setAnnotations('tag2', [{ highlights: [highlight1] }]);
 
         emitSidebarEvent('focusAnnotations', ['tag1']);
 
@@ -223,19 +225,24 @@ describe('Guest', () => {
       });
 
       it('unfocuses any annotations without a matching tag', () => {
-        const highlight0 = document.createElement('span');
-        const highlight1 = document.createElement('span');
+        const highlights0 = [document.createElement('span')];
+        const highlights1 = [document.createElement('span')];
         const guest = createGuest();
         guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
-          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
+          { annotation: { $tag: 'tag1' }, highlights: highlights0 },
+          { annotation: { $tag: 'tag2' }, highlights: highlights1 },
         ];
+        guest.setAnnotations('tag1', [{ highlights: highlights0 }]);
+        guest.setAnnotations('tag2', [{ highlights: highlights1 }]);
 
         emitSidebarEvent('focusAnnotations', ['tag1']);
+        highlighter.setHighlightsFocused.resetHistory();
+
+        emitSidebarEvent('focusAnnotations', ['tag2']);
 
         assert.calledWith(
           highlighter.setHighlightsFocused,
-          guest.anchors[1].highlights,
+          guest.anchors[0].highlights,
           false
         );
       });
