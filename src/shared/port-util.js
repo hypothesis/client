@@ -32,7 +32,7 @@ export function isMessage(data) {
 }
 
 /**
- * Compares a `postMessage` data to one `Message`
+ * Return true if the data payload from a MessageEvent matches `message`.
  *
  * @param {any} data
  * @param {Message} message
@@ -44,7 +44,7 @@ export function isMessageEqual(data, message) {
 
   try {
     return (
-      JSON.stringify(data, Object.keys(data).sort()) ===
+      JSON.stringify(data, Object.keys(message).sort()) ===
       JSON.stringify(message, Object.keys(message).sort())
     );
   } catch {
