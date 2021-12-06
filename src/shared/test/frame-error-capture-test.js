@@ -28,7 +28,15 @@ describe('shared/frame-error-capture', () => {
     return stub;
   }
 
+  let origPrepareStackTrace;
+
   beforeEach(() => {
+    // Replace the `prepareStackTrace` handler installed by source-map-support
+    // for the duration of these tests, as they make accesses to the `error.stack`
+    // property much more expensive, which sometimes caused timeouts in CI.
+    origPrepareStackTrace = Error.prepareStackTrace;
+    Error.prepareStackTrace = undefined;
+
     errorEvents = [];
     window.addEventListener('message', handleMessage);
   });
@@ -36,6 +44,8 @@ describe('shared/frame-error-capture', () => {
   afterEach(() => {
     window.removeEventListener('message', handleMessage);
     sendErrorsTo(null);
+
+    Error.prepareStackTrace = origPrepareStackTrace;
   });
 
   describe('captureErrors', () => {
