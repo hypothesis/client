@@ -1020,11 +1020,12 @@ describe('Guest', () => {
     });
 
     it('destroys targets that have been removed from the annotation', () => {
-      const annotation = {};
+      const annotation = { $tag: 'tag1' };
       const target = {};
       const highlights = [];
       const guest = createGuest();
       guest.anchors = [{ annotation, target, highlights }];
+      guest.setAnnotations('tag1', guest.anchors);
       const { removeHighlights } = highlighter;
 
       return guest.anchor(annotation).then(() => {
@@ -1062,18 +1063,26 @@ describe('Guest', () => {
   });
 
   describe('#detach', () => {
+    let guest;
+
     let nextTagId = 0;
     function createAnchor() {
-      return {
-        annotation: { $tag: `t${nextTagId++}` },
+      const $tag = `t${nextTagId++}`;
+      const anchor = {
+        annotation: { $tag },
         highlights: [document.createElement('span')],
       };
+      guest.anchors.push(anchor);
+      guest.setAnnotations($tag, [anchor]);
+      return anchor;
     }
 
+    beforeEach(() => {
+      guest = createGuest();
+    });
+
     it('removes anchors associated with the removed annotation', () => {
-      const guest = createGuest();
       const anchor = createAnchor();
-      guest.anchors.push(anchor);
 
       guest.detach(anchor.annotation.$tag);
 
@@ -1081,10 +1090,8 @@ describe('Guest', () => {
     });
 
     it('removes any highlights associated with the annotation', () => {
-      const guest = createGuest();
       const anchor = createAnchor();
       const { removeHighlights } = highlighter;
-      guest.anchors.push(anchor);
 
       guest.detach(anchor.annotation.$tag);
 
@@ -1093,10 +1100,8 @@ describe('Guest', () => {
     });
 
     it('keeps anchors and highlights associated with other annotations', () => {
-      const guest = createGuest();
       const anchorA = createAnchor();
       const anchorB = createAnchor();
-      guest.anchors.push(anchorA, anchorB);
 
       guest.detach(anchorA.annotation.$tag);
 
@@ -1107,7 +1112,6 @@ describe('Guest', () => {
     });
 
     it('emits an `anchorsChanged` event with updated anchors', () => {
-      const guest = createGuest();
       const anchor = createAnchor();
       const anchorsChanged = sandbox.stub();
       guest._emitter.subscribe('anchorsChanged', anchorsChanged);
