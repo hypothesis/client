@@ -313,15 +313,23 @@ export default class Guest {
       'focusAnnotations',
       /** @param {string[]} tags */
       (tags = []) => {
-        this._focusedAnnotations.clear();
-        tags.forEach(tag => this._focusedAnnotations.add(tag));
-
-        for (let anchor of this.anchors) {
-          if (anchor.highlights) {
-            const toggle = tags.includes(anchor.annotation.$tag);
-            setHighlightsFocused(anchor.highlights, toggle);
+        this._focusedAnnotations.forEach(tag => {
+          for (let anchor of this._annotations.get(tag) ?? []) {
+            if (anchor.highlights) {
+              setHighlightsFocused(anchor.highlights, false);
+            }
           }
-        }
+        });
+
+        this._focusedAnnotations = new Set(tags);
+
+        this._focusedAnnotations.forEach(tag => {
+          for (let anchor of this._annotations.get(tag) ?? []) {
+            if (anchor.highlights) {
+              setHighlightsFocused(anchor.highlights, true);
+            }
+          }
+        });
       }
     );
 
@@ -393,6 +401,7 @@ export default class Guest {
   destroy() {
     this._annotations.clear();
     this._deferredDetach.clear();
+    this._focusedAnnotations.clear();
     this._portFinder.destroy();
     this._notifyGuestUnload();
     this._hypothesisInjector.destroy();
