@@ -130,6 +130,12 @@ export default class Guest {
     this._highlightsVisible = false;
     this._isAdderVisible = false;
 
+    // Lookup of annotation's `$tag` and associated anchors.
+    this._annotations = /** @type {Map<string, Anchor[]>} */ (new Map());
+
+    // Tags of annotations deleted while being anchored.
+    this._deferredDetach = /** @type {Set<string>} */ (new Set());
+
     this._adder = new Adder(this.element, {
       onAnnotate: async () => {
         await this.createAnnotation();
@@ -363,7 +369,13 @@ export default class Guest {
     this._sidebarRPC.on(
       'deleteAnnotation',
       /** @param {string} tag */
-      tag => this.detach(tag)
+      tag => {
+        if (this._annotations.has(tag)) {
+          this.detach(tag);
+        } else {
+          this._deferredDetach.add(tag);
+        }
+      }
     );
 
     this._sidebarRPC.on(
@@ -379,6 +391,8 @@ export default class Guest {
   }
 
   destroy() {
+    this._annotations.clear();
+    this._deferredDetach.clear();
     this._portFinder.destroy();
     this._notifyGuestUnload();
     this._hypothesisInjector.destroy();
@@ -501,9 +515,14 @@ export default class Guest {
       anchors.every(anchor => anchor.target.selector && !anchor.range);
 
     this._updateAnchors(this.anchors.concat(anchors), true /* notify */);
+    this._annotations.set(annotation.$tag, anchors);
 
     // Let other frames (eg. the sidebar) know about the new annotation.
     this._sidebarRPC.call('syncAnchoringStatus', annotation);
+
+    if (this._deferredDetach.has(annotation.$tag)) {
+      this.detach(annotation.$tag);
+    }
 
     return anchors;
   }
@@ -524,6 +543,10 @@ export default class Guest {
         removeHighlights(anchor.highlights);
       }
     }
+
+    this._deferredDetach.delete(tag);
+    this._annotations.delete(tag);
+
     this._updateAnchors(anchors, notify);
   }
 

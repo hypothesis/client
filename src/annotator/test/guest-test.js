@@ -420,12 +420,18 @@ describe('Guest', () => {
     });
 
     describe('on "deleteAnnotation" event', () => {
-      it('detaches annotation', () => {
+      it('defers detach annotation until it is anchored', async () => {
         const guest = createGuest();
         const callback = sinon.stub();
+        const ann = { target: [], uri: 'uri', $tag: 'tag1' };
         guest._emitter.subscribe('anchorsChanged', callback);
 
-        emitSidebarEvent('deleteAnnotation', 'tag1');
+        emitSidebarEvent('deleteAnnotation', ann.$tag);
+
+        assert.notCalled(callback);
+
+        emitSidebarEvent('loadAnnotations', [ann]);
+        await delay(0);
 
         assert.calledOnce(callback);
         assert.calledWith(callback, []);
