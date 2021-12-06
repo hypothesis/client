@@ -66,7 +66,15 @@ gulp.task('build-boot-script', async () => {
 
 gulp.task('watch-boot-script', () => {
   gulp.watch(
-    manifestSourceFiles,
+    [
+      manifestSourceFiles,
+
+      // This relies on the boot script only depending on modules in src/boot.
+      //
+      // We could alternatively use `watchJS` to rebuild the bundle, but we'd
+      // need to make its logging less noisy first.
+      'src/boot/**/*.js',
+    ],
     { delay: 500 },
     gulp.task('build-boot-script')
   );
