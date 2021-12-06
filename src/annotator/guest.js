@@ -543,18 +543,20 @@ export default class Guest {
    * @param {boolean} [notify] - For internal use. Whether to emit an `anchorsChanged` notification
    */
   detach(tag, notify = true) {
-    /** @type {Anchor[]} */
-    const anchors = [];
-    for (let anchor of this.anchors) {
-      if (anchor.annotation.$tag !== tag) {
-        anchors.push(anchor);
-      } else if (anchor.highlights) {
+    for (let anchor of this._annotations.get(tag) ?? []) {
+      if (anchor.highlights) {
         removeHighlights(anchor.highlights);
       }
     }
 
     this._deferredDetach.delete(tag);
     this._annotations.delete(tag);
+
+    /** @type {Anchor[]} */
+    let anchors = [];
+    for (let anchor of this._annotations.values()) {
+      anchors = anchors.concat(anchor);
+    }
 
     this._updateAnchors(anchors, notify);
   }
