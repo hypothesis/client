@@ -42,14 +42,12 @@ export function isMessageEqual(data, message) {
     return false;
   }
 
-  try {
-    return (
-      JSON.stringify(data, Object.keys(message).sort()) ===
-      JSON.stringify(message, Object.keys(message).sort())
-    );
-  } catch {
-    return false;
-  }
+  // We assume `JSON.stringify` cannot throw because `isMessage` verifies that
+  // all the fields we serialize here are serializable values.
+  return (
+    JSON.stringify(data, Object.keys(message).sort()) ===
+    JSON.stringify(message, Object.keys(message).sort())
+  );
 }
 
 /**

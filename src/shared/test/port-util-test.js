@@ -95,15 +95,6 @@ describe('port-util', () => {
         expectedResult: false,
         reason: 'data has one property that is different',
       },
-      {
-        data: {
-          frame1: new Date(), // not JSON-serializable
-          frame2,
-          type,
-        },
-        expectedResult: false,
-        reason: "data has one property that can't be serialized",
-      },
     ].forEach(({ data, expectedResult, reason }) => {
       it(`returns '${expectedResult}' because the ${reason}`, () => {
         const result = isMessageEqual(data, {
