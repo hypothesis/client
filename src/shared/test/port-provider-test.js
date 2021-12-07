@@ -135,6 +135,7 @@ describe('PortProvider', () => {
         frame2: 'host',
         type: 'request',
       };
+
       await sendPortFinderRequest({
         data,
       });
@@ -145,6 +146,21 @@ describe('PortProvider', () => {
         window.location.origin,
         [sinon.match.instanceOf(MessagePort)]
       );
+    });
+
+    it('responds to a valid port request from a source with an opaque origin', async () => {
+      portProvider.listen();
+      const data = {
+        frame1: 'guest',
+        frame2: 'sidebar',
+        type: 'request',
+      };
+
+      await sendPortFinderRequest({ data, origin: 'null' });
+
+      assert.calledWith(window.postMessage, { ...data, type: 'offer' }, '*', [
+        sinon.match.instanceOf(MessagePort),
+      ]);
     });
 
     it('responds to the first valid port request but ignores additional requests', async () => {
