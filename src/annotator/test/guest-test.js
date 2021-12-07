@@ -2,13 +2,15 @@ import { delay } from '../../test-util/wait';
 import Guest, { $imports } from '../guest';
 import { EventBus } from '../util/emitter';
 
+const sandbox = sinon.createSandbox();
+
 class FakeAdder {
   constructor(container, options) {
     FakeAdder.instance = this;
 
-    this.hide = sinon.stub();
-    this.show = sinon.stub();
-    this.destroy = sinon.stub();
+    this.hide = sandbox.stub();
+    this.show = sandbox.stub();
+    this.destroy = sandbox.stub();
     this.options = options;
   }
 }
@@ -20,16 +22,15 @@ class FakeTextRange {
   }
 
   toRange() {
-    return this.range;
+    return this.range();
   }
 
   static fromRange(range) {
-    return new FakeTextRange(range);
+    return new FakeTextRange(() => range);
   }
 }
 
 describe('Guest', () => {
-  const sandbox = sinon.createSandbox();
   let eventBus;
   let guest;
   let guests;
@@ -52,79 +53,108 @@ describe('Guest', () => {
     return guest;
   };
 
+  const emitSidebarEvent = (event, ...args) => {
+    for (let [evt, fn] of fakeBridge.on.args) {
+      if (event === evt) {
+        fn(...args);
+      }
+    }
+  };
+
+  let nextTagId = 0;
+  const makeAnnotation = ({ target = [] } = {}) => {
+    return { target, uri: 'uri', $tag: `t${nextTagId++}` };
+  };
+
+  const makeAnchor = ({
+    target,
+    range = () => [],
+    highlights = [document.createElement('span')],
+  } = {}) => {
+    const annotation = makeAnnotation({ target });
+    const anchor = {
+      annotation,
+      highlights,
+      range: new FakeTextRange(range),
+    };
+    guest.anchors.push(anchor);
+    guest.setAnnotations(annotation.$tag, [anchor]);
+    return anchor;
+  };
+
   beforeEach(() => {
     guests = [];
     highlighter = {
-      getHighlightsContainingNode: sinon.stub().returns([]),
-      highlightRange: sinon.stub().returns([]),
-      removeHighlights: sinon.stub(),
-      removeAllHighlights: sinon.stub(),
-      setHighlightsFocused: sinon.stub(),
-      setHighlightsVisible: sinon.stub(),
+      getHighlightsContainingNode: sandbox.stub().returns([]),
+      highlightRange: sandbox.stub().returns([]),
+      removeHighlights: sandbox.stub(),
+      removeAllHighlights: sandbox.stub(),
+      setHighlightsFocused: sandbox.stub(),
+      setHighlightsVisible: sandbox.stub(),
     };
     hostFrame = {
-      postMessage: sinon.stub(),
+      postMessage: sandbox.stub(),
     };
     notifySelectionChanged = null;
     rangeUtil = {
-      itemsForRange: sinon.stub().returns([]),
-      isSelectionBackwards: sinon.stub(),
-      selectionFocusRect: sinon.stub(),
+      itemsForRange: sandbox.stub().returns([]),
+      isSelectionBackwards: sandbox.stub(),
+      selectionFocusRect: sandbox.stub(),
     };
 
     FakeAdder.instance = null;
 
     fakeBridge = {
-      call: sinon.stub(),
-      createChannel: sinon.stub(),
-      destroy: sinon.stub(),
-      on: sinon.stub(),
+      call: sandbox.stub(),
+      createChannel: sandbox.stub(),
+      destroy: sandbox.stub(),
+      on: sandbox.stub(),
     };
 
     fakeIntegration = {
-      anchor: sinon.stub(),
-      canAnnotate: sinon.stub().returns(true),
-      contentContainer: sinon.stub().returns({}),
-      describe: sinon.stub(),
-      destroy: sinon.stub(),
-      fitSideBySide: sinon.stub().returns(false),
-      getMetadata: sinon.stub().resolves({
+      anchor: sandbox.stub(),
+      canAnnotate: sandbox.stub().returns(true),
+      contentContainer: sandbox.stub().returns({}),
+      describe: sandbox.stub(),
+      destroy: sandbox.stub(),
+      fitSideBySide: sandbox.stub().returns(false),
+      getMetadata: sandbox.stub().resolves({
         title: 'Test title',
         documentFingerprint: 'test-fingerprint',
       }),
-      scrollToAnchor: sinon.stub().resolves(),
-      uri: sinon.stub().resolves('https://example.com/test.pdf'),
+      scrollToAnchor: sandbox.stub().resolves(),
+      uri: sandbox.stub().resolves('https://example.com/test.pdf'),
     };
 
     fakeHypothesisInjector = {
-      destroy: sinon.stub(),
-      injectClient: sinon.stub().resolves(),
+      destroy: sandbox.stub(),
+      injectClient: sandbox.stub().resolves(),
     };
-    FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
+    FakeHypothesisInjector = sandbox.stub().returns(fakeHypothesisInjector);
 
     fakePortFinder = {
-      discover: sinon.stub(),
-      destroy: sinon.stub(),
+      discover: sandbox.stub(),
+      destroy: sandbox.stub(),
     };
 
     class FakeSelectionObserver {
       constructor(callback) {
         notifySelectionChanged = callback;
-        this.disconnect = sinon.stub();
+        this.disconnect = sandbox.stub();
       }
     }
 
     $imports.$mock({
-      '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
+      '../shared/bridge': { Bridge: sandbox.stub().returns(fakeBridge) },
       '../shared/port-finder': {
-        PortFinder: sinon.stub().returns(fakePortFinder),
+        PortFinder: sandbox.stub().returns(fakePortFinder),
       },
       './adder': { Adder: FakeAdder },
       './anchoring/text-range': {
         TextRange: FakeTextRange,
       },
       './integrations': {
-        createIntegration: sinon.stub().returns(fakeIntegration),
+        createIntegration: sandbox.stub().returns(fakeIntegration),
       },
       './highlighter': highlighter,
       './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
@@ -194,161 +224,82 @@ describe('Guest', () => {
   });
 
   describe('events from sidebar frame', () => {
-    const emitSidebarEvent = (event, ...args) => {
-      for (let [evt, fn] of fakeBridge.on.args) {
-        if (event === evt) {
-          fn(...args);
-        }
-      }
-    };
-
     describe('on "focusAnnotations" event', async () => {
       it('focuses any annotations with a matching tag', () => {
-        const highlight0 = document.createElement('span');
-        const highlight1 = document.createElement('span');
+        const { annotation, highlights } = makeAnchor();
 
-        guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
-          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
-        ];
-        guest.setAnnotations('tag1', [{ highlights: [highlight0] }]);
-        guest.setAnnotations('tag2', [{ highlights: [highlight1] }]);
+        emitSidebarEvent('focusAnnotations', [annotation.$tag]);
 
-        emitSidebarEvent('focusAnnotations', ['tag1']);
-
-        assert.calledWith(
-          highlighter.setHighlightsFocused,
-          guest.anchors[0].highlights,
-          true
-        );
+        assert.calledWith(highlighter.setHighlightsFocused, highlights, true);
       });
 
       it('unfocuses any annotations without a matching tag', () => {
-        const highlights0 = [document.createElement('span')];
-        const highlights1 = [document.createElement('span')];
-
-        guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: highlights0 },
-          { annotation: { $tag: 'tag2' }, highlights: highlights1 },
-        ];
-        guest.setAnnotations('tag1', [{ highlights: highlights0 }]);
-        guest.setAnnotations('tag2', [{ highlights: highlights1 }]);
-
-        emitSidebarEvent('focusAnnotations', ['tag1']);
+        const { annotation, highlights } = makeAnchor();
+        emitSidebarEvent('focusAnnotations', [annotation.$tag]);
         highlighter.setHighlightsFocused.resetHistory();
 
-        emitSidebarEvent('focusAnnotations', ['tag2']);
+        emitSidebarEvent('focusAnnotations', ['dummy']);
 
-        assert.calledWith(
-          highlighter.setHighlightsFocused,
-          guest.anchors[0].highlights,
-          false
-        );
-      });
-
-      it('updates focused tag set', () => {
-        emitSidebarEvent('focusAnnotations', ['tag1']);
-        emitSidebarEvent('focusAnnotations', ['tag2', 'tag3']);
-
-        assert.deepEqual([...guest.focusedAnnotationTags], ['tag2', 'tag3']);
+        assert.calledWith(highlighter.setHighlightsFocused, highlights, false);
       });
     });
 
     describe('on "scrollToAnnotation" event', () => {
       it('scrolls to the anchor with the matching tag', () => {
-        const highlight = document.createElement('span');
+        const { annotation } = makeAnchor();
 
-        const fakeRange = sinon.stub();
-        guest.anchors = [
-          {
-            annotation: { $tag: 'tag1' },
-            highlights: [highlight],
-            range: new FakeTextRange(fakeRange),
-          },
-        ];
-
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent('scrollToAnnotation', annotation.$tag);
 
         assert.called(fakeIntegration.scrollToAnchor);
         assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
       });
 
       it('emits a "scrolltorange" DOM event', () => {
-        const highlight = document.createElement('span');
+        const { annotation } = makeAnchor({ range: () => [1] });
+        const callback = sandbox.stub();
+        guest.element.addEventListener('scrolltorange', callback);
 
-        const fakeRange = sinon.stub();
-        guest.anchors = [
-          {
-            annotation: { $tag: 'tag1' },
-            highlights: [highlight],
-            range: new FakeTextRange(fakeRange),
-          },
-        ];
+        emitSidebarEvent('scrollToAnnotation', annotation.$tag);
 
-        return new Promise(resolve => {
-          guest.element.addEventListener('scrolltorange', event => {
-            assert.equal(event.detail, fakeRange);
-            resolve();
-          });
-
-          emitSidebarEvent('scrollToAnnotation', 'tag1');
-        });
+        assert.calledWith(callback, sandbox.match({ detail: [1] }));
       });
 
       it('allows the default scroll behaviour to be prevented', () => {
-        const highlight = document.createElement('span');
-
-        const fakeRange = sandbox.stub();
-        guest.anchors = [
-          {
-            annotation: { $tag: 'tag1' },
-            highlights: [highlight],
-            range: new FakeTextRange(fakeRange),
-          },
-        ];
+        const { annotation } = makeAnchor();
         guest.element.addEventListener('scrolltorange', event =>
           event.preventDefault()
         );
 
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent('scrollToAnnotation', annotation.$tag);
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
 
       it('does nothing if the anchor has no highlights', () => {
-        guest.anchors = [{ annotation: { $tag: 'tag1' } }];
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
+        const { annotation } = makeAnchor({ highlights: null });
+
+        emitSidebarEvent('scrollToAnnotation', annotation.$tag);
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
 
       it("does nothing if the anchor's range cannot be resolved", () => {
-        const highlight = document.createElement('span');
-
-        guest.anchors = [
-          {
-            annotation: { $tag: 'tag1' },
-            highlights: [highlight],
-            range: {
-              toRange: sandbox.stub().throws(new Error('Something went wrong')),
-            },
+        const { annotation } = makeAnchor({
+          range: () => {
+            throw new Error('Something went wrong');
           },
-        ];
-        const eventEmitted = sandbox.stub();
-        guest.element.addEventListener('scrolltorange', eventEmitted);
+        });
+        const callback = sandbox.stub();
+        guest.element.addEventListener('scrolltorange', callback);
 
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
+        emitSidebarEvent('scrollToAnnotation', annotation.$tag);
 
-        assert.notCalled(eventEmitted);
+        assert.notCalled(callback);
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
     });
 
     describe('on "getDocumentInfo" event', () => {
-      afterEach(() => {
-        sandbox.restore();
-      });
-
       function createCallback(expectedUri, expectedMetadata, done) {
         return (err, result) => {
           assert.strictEqual(err, null);
@@ -364,7 +315,6 @@ describe('Guest', () => {
 
       it('calls the callback with document URL and metadata', done => {
         const metadata = { title: 'hi' };
-
         fakeIntegration.getMetadata.resolves(metadata);
 
         emitSidebarEvent(
@@ -394,38 +344,37 @@ describe('Guest', () => {
 
     describe('on "loadAnnotations" event', () => {
       it('anchors annotations', async () => {
-        fakeBridge.call.resetHistory();
-        const ann1 = { target: [], uri: 'uri', $tag: 'tag1' };
-        const ann2 = { target: [], uri: 'uri', $tag: 'tag2' };
+        const annotation1 = makeAnnotation();
+        const annotation2 = makeAnnotation();
 
-        emitSidebarEvent('loadAnnotations', [ann1, ann2]);
+        emitSidebarEvent('loadAnnotations', [annotation1, annotation2]);
         await delay(0);
 
         assert.calledTwice(fakeBridge.call);
         assert.calledWith(
           fakeBridge.call,
           'syncAnchoringStatus',
-          sinon.match({ target: [], uri: 'uri', $tag: 'tag1' })
+          sandbox.match(annotation1)
         );
         assert.calledWith(
           fakeBridge.call,
           'syncAnchoringStatus',
-          sinon.match({ target: [], uri: 'uri', $tag: 'tag2' })
+          sandbox.match(annotation2)
         );
       });
     });
 
     describe('on "deleteAnnotation" event', () => {
       it('defers detach annotation until it is anchored', async () => {
-        const callback = sinon.stub();
-        const ann = { target: [], uri: 'uri', $tag: 'tag1' };
+        const annotation = makeAnnotation();
+        const callback = sandbox.stub();
         guest._emitter.subscribe('anchorsChanged', callback);
 
-        emitSidebarEvent('deleteAnnotation', ann.$tag);
+        emitSidebarEvent('deleteAnnotation', annotation.$tag);
 
         assert.notCalled(callback);
 
-        emitSidebarEvent('loadAnnotations', [ann]);
+        emitSidebarEvent('loadAnnotations', [annotation]);
         await delay(0);
 
         assert.calledOnce(callback);
@@ -460,16 +409,16 @@ describe('Guest', () => {
       fakeSidebarFrame?.remove();
     });
 
-    it('hides sidebar on user "mousedown" or "touchstart" events in the document', () => {
-      for (let event of ['mousedown', 'touchstart']) {
+    ['mousedown', 'touchstart'].forEach(event =>
+      it(`hides sidebar on user "${event}" event in the document`, () => {
         rootElement.dispatchEvent(new Event(event));
-        assert.calledWith(fakeBridge.call, 'closeSidebar');
-        fakeBridge.call.resetHistory();
-      }
-    });
 
-    it('does not hide sidebar if side-by-side mode is active', () => {
-      for (let event of ['mousedown', 'touchstart']) {
+        assert.calledWith(fakeBridge.call, 'closeSidebar');
+      })
+    );
+
+    ['mousedown', 'touchstart'].forEach(event =>
+      it(`does not hide sidebar on "${event}" event if side-by-side mode is active`, () => {
         // Activate side-by-side mode
         fakeIntegration.fitSideBySide.returns(true);
         guest.fitSideBySide({ expanded: true, width: 100 });
@@ -477,9 +426,8 @@ describe('Guest', () => {
         rootElement.dispatchEvent(new Event(event));
 
         assert.notCalled(fakeBridge.call);
-        fakeBridge.call.resetHistory();
-      }
-    });
+      })
+    );
 
     it('does not reposition the adder on window "resize" event if the adder is hidden', () => {
       sandbox.stub(guest, '_repositionAdder').callThrough();
@@ -589,14 +537,16 @@ describe('Guest', () => {
     });
 
     it('sets the annotations associated with the selection', () => {
-      const ann = {};
-      container._annotation = ann;
+      const annotation = makeAnnotation();
+      container._annotation = annotation;
       rangeUtil.itemsForRange.callsFake((range, callback) => [
         callback(range.startContainer),
       ]);
       simulateSelectionWithText();
 
-      assert.deepEqual(FakeAdder.instance.annotationsForSelection, [ann]);
+      assert.deepEqual(FakeAdder.instance.annotationsForSelection, [
+        annotation,
+      ]);
     });
 
     it('hides the adder if the selection does not contain text', () => {
@@ -655,7 +605,7 @@ describe('Guest', () => {
       assert.calledWith(
         fakeBridge.call,
         'createAnnotation',
-        sinon.match({ $highlight: true })
+        sandbox.match({ $highlight: true })
       );
     });
 
@@ -748,9 +698,9 @@ describe('Guest', () => {
       const selectorA = { type: 'TextPositionSelector', start: 0, end: 10 };
       const selectorB = { type: 'TextQuoteSelector', exact: 'foobar' };
       fakeIntegration.anchor.resolves({});
-      fakeIntegration.describe.returns([selectorA, selectorB]);
+      fakeIntegration.describe.resolves([selectorA, selectorB]);
 
-      const annotation = await guest.createAnnotation({});
+      const annotation = await guest.createAnnotation();
 
       assert.calledWith(fakeIntegration.describe, guest.element, fakeRange);
       assert.deepEqual(annotation.target, [
@@ -801,7 +751,7 @@ describe('Guest', () => {
     });
 
     it("doesn't mark an annotation lacking targets as an orphan", () => {
-      const annotation = { target: [] };
+      const annotation = makeAnnotation({ target: [] });
 
       return guest
         .anchor(annotation)
@@ -809,7 +759,7 @@ describe('Guest', () => {
     });
 
     it("doesn't mark an annotation with a selectorless target as an orphan", () => {
-      const annotation = { target: [{ source: 'wibble' }] };
+      const annotation = makeAnnotation({ target: [{ source: 'wibble' }] });
 
       return guest
         .anchor(annotation)
@@ -817,7 +767,9 @@ describe('Guest', () => {
     });
 
     it("doesn't mark an annotation with only selectorless targets as an orphan", () => {
-      const annotation = { target: [{ source: 'foo' }, { source: 'bar' }] };
+      const annotation = makeAnnotation({
+        target: [{ source: 'foo' }, { source: 'bar' }],
+      });
 
       return guest
         .anchor(annotation)
@@ -825,10 +777,10 @@ describe('Guest', () => {
     });
 
     it("doesn't mark an annotation in which the target anchors as an orphan", () => {
-      const annotation = {
+      const annotation = makeAnnotation({
         target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
-      };
-      fakeIntegration.anchor.returns(Promise.resolve(range));
+      });
+      fakeIntegration.anchor.resolves(range);
 
       return guest
         .anchor(annotation)
@@ -836,12 +788,12 @@ describe('Guest', () => {
     });
 
     it("doesn't mark an annotation in which at least one target anchors as an orphan", () => {
-      const annotation = {
+      const annotation = makeAnnotation({
         target: [
           { selector: [{ type: 'TextQuoteSelector', exact: 'notinhere' }] },
           { selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] },
         ],
-      };
+      });
       fakeIntegration.anchor
         .onFirstCall()
         .returns(Promise.reject(new Error('Failed to anchor')))
@@ -854,14 +806,12 @@ describe('Guest', () => {
     });
 
     it('marks an annotation in which the target fails to anchor as an orphan', () => {
-      const annotation = {
+      const annotation = makeAnnotation({
         target: [
           { selector: [{ type: 'TextQuoteSelector', exact: 'notinhere' }] },
         ],
-      };
-      fakeIntegration.anchor.returns(
-        Promise.reject(new Error('Failed to anchor'))
-      );
+      });
+      fakeIntegration.anchor.rejects(new Error('Failed to anchor'));
 
       return guest
         .anchor(annotation)
@@ -869,15 +819,13 @@ describe('Guest', () => {
     });
 
     it('marks an annotation in which all (suitable) targets fail to anchor as an orphan', () => {
-      const annotation = {
+      const annotation = makeAnnotation({
         target: [
           { selector: [{ type: 'TextQuoteSelector', exact: 'notinhere' }] },
           { selector: [{ type: 'TextQuoteSelector', exact: 'neitherami' }] },
         ],
-      };
-      fakeIntegration.anchor.returns(
-        Promise.reject(new Error('Failed to anchor'))
-      );
+      });
+      fakeIntegration.anchor.rejects(new Error('Failed to anchor'));
 
       return guest
         .anchor(annotation)
@@ -885,14 +833,14 @@ describe('Guest', () => {
     });
 
     it('marks an annotation where the target has no TextQuoteSelectors as an orphan', () => {
-      const annotation = {
+      const annotation = makeAnnotation({
         target: [
           { selector: [{ type: 'TextPositionSelector', start: 0, end: 5 }] },
         ],
-      };
+      });
       // This shouldn't be called, but if it is, we successfully anchor so that
       // this test is guaranteed to fail.
-      fakeIntegration.anchor.returns(Promise.resolve(range));
+      fakeIntegration.anchor.resolves(range);
 
       return guest
         .anchor(annotation)
@@ -900,11 +848,11 @@ describe('Guest', () => {
     });
 
     it('does not attempt to anchor targets which have no TextQuoteSelector', () => {
-      const annotation = {
+      const annotation = makeAnnotation({
         target: [
           { selector: [{ type: 'TextPositionSelector', start: 0, end: 5 }] },
         ],
-      };
+      });
 
       return guest
         .anchor(annotation)
@@ -912,58 +860,52 @@ describe('Guest', () => {
     });
 
     it('syncs annotations to the sidebar', () => {
-      const annotation = {};
+      const annotation = makeAnnotation();
       return guest.anchor(annotation).then(() => {
         assert.calledWith(fakeBridge.call, 'syncAnchoringStatus', annotation);
       });
     });
 
     it('emits an `anchorsChanged` event', async () => {
-      const annotation = {};
-      const anchorsChanged = sandbox.stub();
-      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
+      const annotation = makeAnnotation();
+      const callback = sandbox.stub();
+      guest._emitter.subscribe('anchorsChanged', callback);
 
       await guest.anchor(annotation);
 
-      assert.calledWith(anchorsChanged, guest.anchors);
+      assert.calledWith(callback, guest.anchors);
     });
 
     it('returns a promise of the anchors for the annotation', () => {
-      const highlights = [document.createElement('span')];
-      fakeIntegration.anchor.returns(Promise.resolve(range));
-      highlighter.highlightRange.returns(highlights);
-      const target = {
-        selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
-      };
+      const annotation = makeAnnotation({
+        target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
+      });
+      fakeIntegration.anchor.resolves(range);
+
       return guest
-        .anchor({ target: [target] })
+        .anchor(annotation)
         .then(anchors => assert.equal(anchors.length, 1));
     });
 
     it('adds the anchor to the "anchors" instance property"', () => {
+      const annotation = makeAnnotation({
+        target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
+      });
+      fakeIntegration.anchor.resolves(range);
       const highlights = [document.createElement('span')];
-      fakeIntegration.anchor.returns(Promise.resolve(range));
       highlighter.highlightRange.returns(highlights);
-      const target = {
-        selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
-      };
-      const annotation = { target: [target] };
+
       return guest.anchor(annotation).then(() => {
         assert.equal(guest.anchors.length, 1);
         assert.strictEqual(guest.anchors[0].annotation, annotation);
-        assert.strictEqual(guest.anchors[0].target, target);
+        assert.strictEqual(guest.anchors[0].target, annotation.target[0]);
         assert.strictEqual(guest.anchors[0].range.toRange(), range);
         assert.strictEqual(guest.anchors[0].highlights, highlights);
       });
     });
 
     it('destroys targets that have been removed from the annotation', () => {
-      const annotation = { $tag: 'tag1' };
-      const target = {};
-      const highlights = [];
-
-      guest.anchors = [{ annotation, target, highlights }];
-      guest.setAnnotations('tag1', guest.anchors);
+      const { annotation, highlights } = makeAnchor();
       const { removeHighlights } = highlighter;
 
       return guest.anchor(annotation).then(() => {
@@ -974,19 +916,13 @@ describe('Guest', () => {
     });
 
     it('focuses the new highlights if the annotation is already focused', async () => {
-      const highlights = [document.createElement('span')];
+      const annotation = makeAnnotation({
+        target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
+      });
       fakeIntegration.anchor.resolves(range);
-      highlighter.highlightRange.returns(highlights);
-      const target = {
-        selector: [{ type: 'TextQuoteSelector', exact: 'hello' }],
-      };
-      const annotation = { $tag: 'tag1', target: [target] };
 
       // Focus the annotation (in the sidebar) before it is anchored in the page.
-      const [, focusAnnotationsCallback] = fakeBridge.on.args.find(
-        args => args[0] === 'focusAnnotations'
-      );
-      focusAnnotationsCallback([annotation.$tag]);
+      emitSidebarEvent('focusAnnotations', [annotation.$tag]);
       const anchors = await guest.anchor(annotation);
 
       // Check that the new highlights are already in the focused state.
@@ -1000,20 +936,8 @@ describe('Guest', () => {
   });
 
   describe('#detach', () => {
-    let nextTagId = 0;
-    function createAnchor() {
-      const $tag = `t${nextTagId++}`;
-      const anchor = {
-        annotation: { $tag },
-        highlights: [document.createElement('span')],
-      };
-      guest.anchors.push(anchor);
-      guest.setAnnotations($tag, [anchor]);
-      return anchor;
-    }
-
     it('removes anchors associated with the removed annotation', () => {
-      const anchor = createAnchor();
+      const anchor = makeAnchor();
 
       guest.detach(anchor.annotation.$tag);
 
@@ -1021,7 +945,7 @@ describe('Guest', () => {
     });
 
     it('removes any highlights associated with the annotation', () => {
-      const anchor = createAnchor();
+      const anchor = makeAnchor();
       const { removeHighlights } = highlighter;
 
       guest.detach(anchor.annotation.$tag);
@@ -1031,25 +955,25 @@ describe('Guest', () => {
     });
 
     it('keeps anchors and highlights associated with other annotations', () => {
-      const anchorA = createAnchor();
-      const anchorB = createAnchor();
+      const anchor1 = makeAnchor();
+      const anchor2 = makeAnchor();
 
-      guest.detach(anchorA.annotation.$tag);
+      guest.detach(anchor1.annotation.$tag);
 
-      assert.include(guest.anchors, anchorB);
+      assert.include(guest.anchors, anchor2);
       assert.isFalse(
-        highlighter.removeHighlights.calledWith(anchorB.highlights)
+        highlighter.removeHighlights.calledWith(anchor2.highlights)
       );
     });
 
     it('emits an `anchorsChanged` event with updated anchors', () => {
-      const anchor = createAnchor();
-      const anchorsChanged = sandbox.stub();
-      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
+      const anchor = makeAnchor();
+      const callback = sandbox.stub();
+      guest._emitter.subscribe('anchorsChanged', callback);
 
       guest.detach(anchor.annotation.$tag);
 
-      assert.calledWith(anchorsChanged, guest.anchors);
+      assert.calledWith(callback, guest.anchors);
     });
   });
 

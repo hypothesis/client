@@ -729,16 +729,6 @@ export default class Guest {
   }
 
   /**
-   * Return the tags of annotations that are currently displayed in a focused
-   * state.
-   *
-   * @return {Set<string>}
-   */
-  get focusedAnnotationTags() {
-    return this._focusedAnnotations;
-  }
-
-  /**
    * Use only for testing purposes
    *
    * @param {string} $tag
