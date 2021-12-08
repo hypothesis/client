@@ -29,6 +29,9 @@
 // Make the shared package utility styles available
 @use '@hypothesis/frontend-shared/styles/util';
 
+@tailwind base;
+@tailwind utilities;
+
 // Styles for all top-level elements in shadow roots.
 :host > * {
   font-family: var.$sans-font-family;
