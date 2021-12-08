@@ -1,5 +1,5 @@
 import { delay } from '../../test-util/wait';
-import { PortProvider } from '../port-provider';
+import { PortProvider, $imports } from '../port-provider';
 
 describe('PortProvider', () => {
   let portProvider;
@@ -29,6 +29,7 @@ describe('PortProvider', () => {
   afterEach(() => {
     window.postMessage.restore();
     portProvider.destroy();
+    $imports.$restore();
   });
 
   describe('#destroy', () => {
@@ -71,8 +72,43 @@ describe('PortProvider', () => {
     });
   });
 
+  describe('reporting message errors', () => {
+    let fakeSendError;
+
+    beforeEach(() => {
+      fakeSendError = sinon.stub();
+
+      $imports.$mock({
+        './frame-error-capture': { sendError: fakeSendError },
+      });
+
+      portProvider.listen();
+    });
+
+    it('reports errors validating messages', async () => {
+      await sendPortFinderRequest({
+        data: { frame1: 'sidebar', frame2: 'invalid', type: 'request' },
+      });
+      assert.called(fakeSendError);
+    });
+
+    it('only reports errors once', async () => {
+      const request = {
+        data: { frame1: 'sidebar', frame2: 'invalid', type: 'request' },
+      };
+      await sendPortFinderRequest(request);
+      await sendPortFinderRequest(request);
+
+      assert.calledOnce(fakeSendError);
+    });
+  });
+
   describe('listens for port requests', () => {
     [
+      {
+        data: {},
+        reason: 'is not a valid message',
+      },
       {
         data: {
           frame1: 'dummy', // invalid source
