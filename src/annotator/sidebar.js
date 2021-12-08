@@ -70,9 +70,8 @@ export default class Sidebar {
     this._emitter = eventBus.createEmitter();
 
     /**
-     * Tracks which `Guest` has a text selection. It uses the frame identifier
-     * which uniquely identifies each `Guest`. If there is no text selected, the
-     * value is set to `null`.
+     * Tracks which `Guest` has a text selection. `null` indicates the host frame,
+     * the top-level frame. Other `guest` frames use string identifier.
      *
      * @type {string|null}
      */
@@ -145,10 +144,7 @@ export default class Sidebar {
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
       createAnnotation: () =>
-        this._guestRPC.call(
-          'createAnnotationIn',
-          this._guestWithSelection ?? 'main'
-        ),
+        this._guestRPC.call('createAnnotationIn', this._guestWithSelection),
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
@@ -270,7 +266,7 @@ export default class Sidebar {
   _setupGuestEvents() {
     this._guestRPC.on(
       'textSelectedIn',
-      /** @param {string} frameIdentifier */
+      /** @param {string|null} frameIdentifier */
       frameIdentifier => {
         this._guestWithSelection = frameIdentifier;
         this.toolbar.newAnnotationType = 'annotation';
@@ -280,9 +276,9 @@ export default class Sidebar {
 
     this._guestRPC.on(
       'textUnselectedIn',
-      /** @param {string}  frameIdentifier */
+      /** @param {string|null}  frameIdentifier */
       frameIdentifier => {
-        this._guestWithSelection = null;
+        this._guestWithSelection = null; // default to the `host` frame
         this.toolbar.newAnnotationType = 'note';
         this._guestRPC.call('clearSelectionExceptIn', frameIdentifier);
       }

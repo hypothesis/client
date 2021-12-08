@@ -166,9 +166,9 @@ export default class Guest {
     this.anchors = [];
 
     // Set the frame identifier if it's available.
-    // The "top" guest instance will have this as 'main' since it's in a top frame not a sub frame
-    /** @type {string} */
-    this._frameIdentifier = config.subFrameIdentifier ?? 'main';
+    // The "top" guest instance will have this as null since it's in a top frame not a sub frame
+    /** @type {string|null} */
+    this._frameIdentifier = config.subFrameIdentifier || null;
 
     this._portFinder = new PortFinder({
       hostFrame: this._hostFrame,
@@ -314,7 +314,7 @@ export default class Guest {
   async _connectHostEvents() {
     this._hostRPC.on(
       'clearSelectionExceptIn',
-      /** @param {string} frameIdentifier */
+      /** @param {string|null} frameIdentifier */
       frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           return;
@@ -329,7 +329,7 @@ export default class Guest {
 
     this._hostRPC.on(
       'createAnnotationIn',
-      /** @param {string} frameIdentifier */
+      /** @param {string|null} frameIdentifier */
       frameIdentifier => {
         if (this._frameIdentifier === frameIdentifier) {
           this.createAnnotation();

@@ -61,12 +61,12 @@ export type GuestToSidebarEvent =
  */
 export type HostToGuestEvent =
   /**
-   * The host request the guest at a frame with that identifier to create an annotation.
+   * The host requests a guest with a specific frame identifier to create an annotation.
    */
   | 'createAnnotationIn'
 
   /**
-   * The host informs the guests that text should be unselect if it doesn't match the current frame identifier.
+   * The host informs guests that text should be unselected, except in the guest with a given frame identifier
    */
   | 'clearSelectionExceptIn';
 

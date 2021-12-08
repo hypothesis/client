@@ -232,22 +232,22 @@ describe('Sidebar', () => {
       assert.calledWith(sidebar.setHighlightsVisible, false);
     });
 
-    it('creates an annotation in the main content frame when toolbar button is clicked', () => {
+    it('creates an annotation in the host frame when toolbar button is clicked', () => {
       createSidebar();
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(fakeBridge.call, 'createAnnotationIn', 'main');
+      assert.calledWith(fakeBridge.call, 'createAnnotationIn', null);
     });
 
-    it('creates an annotation on another frame toolbar button is clicked', () => {
+    it('creates an annotation in frame with selection when toolbar button is clicked', () => {
       createSidebar({});
 
       // Make a text selection in another frame
       const handler = fakeBridge.on
         .getCalls()
         .find(call => call.args[0] === 'textSelectedIn').args[1];
-      const frameIdentifier = 'other frame';
+      const frameIdentifier = 'subframe identifier';
       handler(frameIdentifier);
 
       FakeToolbarController.args[0][1].createAnnotation();
@@ -255,26 +255,38 @@ describe('Sidebar', () => {
       assert.calledWith(fakeBridge.call, 'createAnnotationIn', frameIdentifier);
     });
 
-    it('sets create annotation button to "Annotation" when selection becomes non-empty', () => {
+    it('toggles create annotation button to "Annotation" when selection becomes non-empty', () => {
       const sidebar = createSidebar();
 
+      const frameIdentifier = 'subframe identifier';
       const handler = fakeBridge.on
         .getCalls()
         .find(call => call.args[0] === 'textSelectedIn').args[1];
-      handler('dummy');
+      handler(frameIdentifier);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
+      assert.calledWith(
+        fakeBridge.call,
+        'clearSelectionExceptIn',
+        frameIdentifier
+      );
     });
 
-    it('sets create annotation button to "Page Note" when selection becomes empty', () => {
+    it('toggles create annotation button to "Page Note" when selection becomes empty', () => {
       const sidebar = createSidebar();
 
+      const frameIdentifier = null;
       const handler = fakeBridge.on
         .getCalls()
         .find(call => call.args[0] === 'textUnselectedIn').args[1];
-      handler('dummy');
+      handler(frameIdentifier);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
+      assert.calledWith(
+        fakeBridge.call,
+        'clearSelectionExceptIn',
+        frameIdentifier
+      );
     });
   });
 
