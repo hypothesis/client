@@ -135,11 +135,9 @@ export default class Guest {
     this._adder = new Adder(this.element, {
       onAnnotate: async () => {
         await this.createAnnotation();
-        /** @type {Selection} */ (document.getSelection()).removeAllRanges();
       },
       onHighlight: async () => {
         await this.createAnnotation({ highlight: true });
-        /** @type {Selection} */ (document.getSelection()).removeAllRanges();
       },
       onShowAnnotations: anns => {
         this.selectAnnotations(anns);
@@ -619,6 +617,10 @@ export default class Guest {
 
     this._sidebarRPC.call('createAnnotation', annotation);
     this.anchor(annotation);
+
+    // Removing the text selection triggers the `SelectionObserver` callback,
+    // which causes the adder to be removed after some delay.
+    document.getSelection()?.removeAllRanges();
 
     return annotation;
   }

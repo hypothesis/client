@@ -852,6 +852,18 @@ describe('Guest', () => {
       ]);
     });
 
+    it('hides the adder when creating an annotation', async () => {
+      const guest = createGuest();
+      const removeAllRanges = sandbox.stub();
+      sandbox.stub(document, 'getSelection').returns({ removeAllRanges });
+
+      await guest.createAnnotation();
+
+      assert.calledOnce(removeAllRanges);
+      notifySelectionChanged(null); // removing the text selection triggers the selection observer
+      assert.calledOnce(FakeAdder.instance.hide);
+    });
+
     it('sets `$tag` property', async () => {
       const guest = createGuest();
       const annotation = await guest.createAnnotation();
