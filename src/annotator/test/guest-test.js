@@ -628,16 +628,16 @@ describe('Guest', () => {
       assert.notCalled(FakeAdder.instance.show);
     });
 
-    it('calls "textSelectionAt" RPC method with argument "main" if selection is non-empty', () => {
+    it('calls "textSelectedIn" RPC method with argument "null" if selection is non-empty', () => {
       createGuest();
 
       simulateSelectionWithText();
 
-      assert.calledWith(fakeBridge.call, 'textSelectedIn', 'main');
+      assert.calledWith(fakeBridge.call, 'textSelectedIn', null);
     });
 
-    it('calls "textSelectionAt" RPC method with the subFrameIdentifier as argument if selection is non-empty', () => {
-      const subFrameIdentifier = 'other frame';
+    it('calls "textSelectedIn" RPC method with the subFrameIdentifier as argument if selection is non-empty', () => {
+      const subFrameIdentifier = 'subframe identifier';
       createGuest({ subFrameIdentifier });
 
       simulateSelectionWithText();
@@ -645,16 +645,16 @@ describe('Guest', () => {
       assert.calledWith(fakeBridge.call, 'textSelectedIn', subFrameIdentifier);
     });
 
-    it('calls "textUnselectedIn" RPC method with argument "main" if selection is empty', () => {
+    it('calls "textUnselectedIn" RPC method with argument "null" if selection is empty', () => {
       createGuest();
 
       simulateSelectionWithoutText();
 
-      assert.calledWith(fakeBridge.call, 'textUnselectedIn', 'main');
+      assert.calledWith(fakeBridge.call, 'textUnselectedIn', null);
     });
 
     it('calls "textUnselectedIn" RPC method with the subFrameIdentifier as argument if selection is empty', () => {
-      const subFrameIdentifier = 'other frame';
+      const subFrameIdentifier = 'subframe identifier';
       createGuest({ subFrameIdentifier });
 
       simulateSelectionWithoutText();
@@ -675,13 +675,13 @@ describe('Guest', () => {
 
       simulateSelectionWithText();
       fakeBridge.call.resetHistory();
-      handler('dummy');
+      handler('subframe identifier');
 
       assert.equal(guest.selectedRanges.length, 0);
       assert.notCalled(fakeBridge.call);
     });
 
-    it("doesn't deselect text if frame identifiers matches", () => {
+    it("doesn't unselect text if frame identifier matches", () => {
       const guest = createGuest();
       guest.selectedRanges = [1];
       const handler = fakeBridge.on
@@ -689,7 +689,7 @@ describe('Guest', () => {
         .find(call => call.args[0] === 'clearSelectionExceptIn').args[1];
 
       simulateSelectionWithText();
-      handler('main'); // doesn't unselect the text because it matches the frameIdentifier
+      handler(null); // it matches the frameIdentifier in the host frame
 
       assert.equal(guest.selectedRanges.length, 1);
     });
@@ -805,7 +805,7 @@ describe('Guest', () => {
   });
 
   describe('#createAnnotation', () => {
-    it('creates an annotation if host calls with "createAnnotationIn" RPC method', () => {
+    it('creates an annotation if host calls "createAnnotationIn" RPC method', () => {
       const guest = createGuest();
       sinon.stub(guest, 'createAnnotation');
       const handler = fakeBridge.on
@@ -815,7 +815,7 @@ describe('Guest', () => {
       handler('dummy');
       assert.notCalled(guest.createAnnotation);
 
-      handler('main');
+      handler(null);
       assert.calledOnce(guest.createAnnotation);
     });
 
