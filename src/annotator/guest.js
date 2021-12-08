@@ -322,9 +322,6 @@ export default class Guest {
         }
 
         this._onClearSelection({ informHostFrame: false });
-        // TODO: clear the selection calling `document.getSelection()?.removeAllRanges();`
-        // without triggering the selection observer (that in turns calls
-        // `_onClearSelection({informHostFrame: true})` and changes `Sidebar#._guestWithSelection`).
       }
     );
 
@@ -667,8 +664,14 @@ export default class Guest {
     this._isAdderVisible = false;
     this._adder.hide();
     this.selectedRanges = [];
+
     if (informHostFrame) {
       this._hostRPC.call('textUnselectedIn', this._frameIdentifier);
+    } else {
+      // Remove all current selection without re-triggering this method again.
+      // 'selectionchange' must be canceled on the next tick in the event loop.
+      document.getSelection()?.removeAllRanges();
+      setTimeout(() => this._selectionObserver.cancelPendingCallback(), 0);
     }
   }
 

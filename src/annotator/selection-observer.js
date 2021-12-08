@@ -56,7 +56,7 @@ export class SelectionObserver {
         return;
       }
 
-      this._cancelPendingCallback();
+      this.cancelPendingCallback();
 
       // Schedule a notification after a short delay. The delay serves two
       // purposes:
@@ -87,10 +87,10 @@ export class SelectionObserver {
 
   disconnect() {
     this._listeners.removeAll();
-    this._cancelPendingCallback();
+    this.cancelPendingCallback();
   }
 
-  _cancelPendingCallback() {
+  cancelPendingCallback() {
     if (this._pendingCallback) {
       clearTimeout(this._pendingCallback);
       this._pendingCallback = null;
