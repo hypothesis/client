@@ -1,8 +1,8 @@
 import { TinyEmitter } from 'tiny-emitter';
 
-import { captureErrors } from './frame-error-capture';
+import { captureErrors, sendError } from './frame-error-capture';
 import { ListenerCollection } from './listener-collection';
-import { isMessageEqual, isSourceWindow } from './port-util';
+import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
 
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
@@ -147,11 +147,38 @@ export class PortProvider {
    * Initiate the listener of port requests by other frames.
    */
   listen() {
+    const errorContext = 'Handling port request';
+    const sentErrors = /** @type {Set<string>} */ (new Set());
+
+    /** @param {string} message */
+    const reportError = message => {
+      if (sentErrors.has(message)) {
+        // PortFinder will send requests repeatedly until it gets a response or
+        // a timeout is reached.
+        //
+        // Only send errors once to avoid spamming Sentry.
+        return;
+      }
+      sentErrors.add(message);
+      sendError(new Error(message), errorContext);
+    };
+
     /** @param {Event} event */
     const handleRequest = event => {
       const { data, origin, source } = /** @type {MessageEvent} */ (event);
 
+      if (!isMessage(data) || data.type !== 'request') {
+        // If this does not look like a message intended for us, ignore it.
+        return;
+      }
+
+      const { frame1, frame2 } = data;
+      const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
+
       if (!isSourceWindow(source)) {
+        reportError(
+          `Ignored port request for channel ${channel} from non-Window source`
+        );
         return;
       }
 
@@ -166,11 +193,11 @@ export class PortProvider {
       );
 
       if (match === undefined) {
+        reportError(
+          `Ignored invalid port request for channel ${channel} from ${origin}`
+        );
         return;
       }
-
-      const { frame1, frame2 } = match;
-      const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
 
       // Check if this request has already been received from this frame and
       // ignore it if so.
@@ -215,7 +242,7 @@ export class PortProvider {
     this._listeners.add(
       window,
       'message',
-      captureErrors(handleRequest, 'Handling port request')
+      captureErrors(handleRequest, errorContext)
     );
   }
 
