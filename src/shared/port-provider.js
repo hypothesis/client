@@ -77,7 +77,7 @@ export class PortProvider {
      *
      * @type {WeakMap<Window, Set<Channel>>}
      */
-    this._sentChannels = new Map();
+    this._sentChannels = new WeakMap();
 
     // Create the `sidebar-host` channel immediately, while other channels are
     // created on demand
