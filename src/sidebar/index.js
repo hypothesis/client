@@ -1,12 +1,13 @@
 import { parseJsonConfig } from '../boot/parse-json-config';
 import * as rendererOptions from '../shared/renderer-options';
 
+import { checkEnvironment } from './config/check-env';
+import { fetchConfig } from './config/fetch-config';
 import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
 } from './cross-origin-rpc.js';
 import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
-import { fetchConfig } from './config/fetch-config';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
@@ -14,7 +15,13 @@ const appConfig = /** @type {import('../types/config').SidebarConfig} */ (
   parseJsonConfig(document)
 );
 
-if (appConfig.sentry) {
+// Check for known issues which may prevent the client from working.
+//
+// If any checks fail we'll log warnings and disable error reporting, but try
+// and continue anyway.
+const envOk = checkEnvironment(window);
+
+if (appConfig.sentry && envOk) {
   // Initialize Sentry. This is required at the top of this file
   // so that it happens early in the app's startup flow
   sentry.init(appConfig.sentry);

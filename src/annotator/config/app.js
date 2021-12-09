@@ -2,10 +2,11 @@
  * Create the JSON-serializable subset of annotator configuration that should
  * be passed to the sidebar or notebook applications.
  *
+ * @param {string} appURL - URL from which the application will be served
  * @param {Record<string, any>} config
  * @return {object}
  */
-export function createAppConfig(config) {
+export function createAppConfig(appURL, config) {
   const appConfig = {};
 
   for (let [key, value] of Object.entries(config)) {
@@ -28,6 +29,10 @@ export function createAppConfig(config) {
 
     appConfig[key] = value;
   }
+
+  // Pass the expected origin of the app. This is used to detect when it is
+  // served from a different location than expected, which may stop it working.
+  appConfig.origin = new URL(appURL).origin;
 
   // Pass the version of the client, so we can check if it is the same as the
   // one used in the sidebar/notebook.

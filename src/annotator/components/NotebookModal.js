@@ -18,7 +18,7 @@ import { createAppConfig } from '../config/app';
  */
 function NotebookIframe({ config, groupId }) {
   const notebookAppSrc = addConfigFragment(config.notebookAppUrl, {
-    ...createAppConfig(config),
+    ...createAppConfig(config.notebookAppUrl, config),
 
     // Explicity set the "focused" group
     group: groupId,

@@ -147,7 +147,7 @@ describe('Sidebar', () => {
 
     fakeSendErrorsTo = sinon.stub();
 
-    const fakeCreateAppConfig = sinon.spy(config => {
+    const fakeCreateAppConfig = sinon.spy((appURL, config) => {
       const appConfig = { ...config };
       delete appConfig.sidebarAppUrl;
       return appConfig;
