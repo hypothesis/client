@@ -667,6 +667,8 @@ describe('Guest', () => {
     });
 
     it('unselects text if another iframe has made a selection', () => {
+      const removeAllRanges = sandbox.stub();
+      sandbox.stub(document, 'getSelection').returns({ removeAllRanges });
       const guest = createGuest();
       guest.selectedRanges = [1];
       const handler = fakeBridge.on
@@ -677,8 +679,16 @@ describe('Guest', () => {
       fakeBridge.call.resetHistory();
       handler('subframe identifier');
 
+      assert.calledOnce(removeAllRanges);
+      notifySelectionChanged(null); // removing the text selection triggers the selection observer
+
       assert.equal(guest.selectedRanges.length, 0);
       assert.notCalled(fakeBridge.call);
+
+      // On next selection clear it should be inform the host.
+      notifySelectionChanged(null);
+      assert.calledOnce(fakeBridge.call);
+      assert.calledWithExactly(fakeBridge.call, 'textUnselectedIn', null);
     });
 
     it("doesn't unselect text if frame identifier matches", () => {
