@@ -90,6 +90,10 @@ function resolveAnchor(anchor) {
   }
 }
 
+function removeTextSelection() {
+  document.getSelection()?.removeAllRanges();
+}
+
 /**
  * `Guest` is the central class of the annotator that handles anchoring (locating)
  * annotations in the document when they are fetched by the sidebar, rendering
@@ -131,6 +135,7 @@ export default class Guest {
     this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
+    this._informHostOnNextSelectionClear = true;
 
     this._adder = new Adder(this.element, {
       onAnnotate: async () => {
@@ -318,10 +323,8 @@ export default class Guest {
           return;
         }
 
-        this._onClearSelection({ informHostFrame: false });
-        // TODO: clear the selection calling `document.getSelection()?.removeAllRanges();`
-        // without triggering the selection observer (that in turns calls
-        // `_onClearSelection({informHostFrame: true})` and changes `Sidebar#._guestWithSelection`).
+        this._informHostOnNextSelectionClear = false;
+        removeTextSelection();
       }
     );
 
@@ -620,7 +623,7 @@ export default class Guest {
 
     // Removing the text selection triggers the `SelectionObserver` callback,
     // which causes the adder to be removed after some delay.
-    document.getSelection()?.removeAllRanges();
+    removeTextSelection();
 
     return annotation;
   }
@@ -664,13 +667,14 @@ export default class Guest {
     this._adder.show(focusRect, isBackwards);
   }
 
-  _onClearSelection({ informHostFrame = true } = {}) {
+  _onClearSelection() {
     this._isAdderVisible = false;
     this._adder.hide();
     this.selectedRanges = [];
-    if (informHostFrame) {
+    if (this._informHostOnNextSelectionClear) {
       this._hostRPC.call('textUnselectedIn', this._frameIdentifier);
     }
+    this._informHostOnNextSelectionClear = true;
   }
 
   /**
