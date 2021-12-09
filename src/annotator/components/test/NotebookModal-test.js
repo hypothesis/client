@@ -28,7 +28,7 @@ describe('NotebookModal', () => {
     eventBus = new EventBus();
     emitter = eventBus.createEmitter();
 
-    const fakeCreateAppConfig = sinon.spy(config => {
+    const fakeCreateAppConfig = sinon.spy((appURL, config) => {
       const appConfig = { ...config };
       delete appConfig.notebookAppUrl;
       return appConfig;

@@ -34,7 +34,7 @@ export const MIN_RESIZE = 280;
 function createSidebarIframe(config) {
   const sidebarAppSrc = addConfigFragment(
     config.sidebarAppUrl,
-    createAppConfig(config)
+    createAppConfig(config.sidebarAppUrl, config)
   );
 
   const sidebarFrame = document.createElement('iframe');
