@@ -51,6 +51,14 @@ describe('Guest', () => {
     return guest;
   };
 
+  const emitSidebarEvent = (event, ...args) => {
+    for (let [evt, fn] of fakeBridge.on.args) {
+      if (event === evt) {
+        fn(...args);
+      }
+    }
+  };
+
   beforeEach(() => {
     guests = [];
     highlighter = {
@@ -195,14 +203,6 @@ describe('Guest', () => {
   });
 
   describe('events from sidebar frame', () => {
-    const emitSidebarEvent = (event, ...args) => {
-      for (let [evt, fn] of fakeBridge.on.args) {
-        if (event === evt) {
-          fn(...args);
-        }
-      }
-    };
-
     describe('on "focusAnnotations" event', () => {
       it('focuses any annotations with a matching tag', () => {
         const highlight0 = document.createElement('span');
@@ -1105,6 +1105,21 @@ describe('Guest', () => {
         anchors[0].highlights,
         true
       );
+    });
+
+    it('prevents saving of annotations that are deleted while been anchored', async () => {
+      const guest = createGuest();
+      const annotation = {
+        $tag: 'tag1',
+        target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
+      };
+      fakeIntegration.anchor.resolves(range);
+
+      emitSidebarEvent('loadAnnotations', [annotation]);
+      emitSidebarEvent('deleteAnnotation', annotation.$tag);
+      await delay(0);
+
+      assert.lengthOf(guest.anchors, 0);
     });
   });
 

@@ -165,6 +165,12 @@ export default class Guest {
      */
     this.anchors = [];
 
+    /**
+     * Tags of annotations that are currently anchored or being anchored in
+     * the guest.
+     */
+    this._annotations = /** @type {Set<string>} */ (new Set());
+
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
     /** @type {string|null} */
@@ -527,11 +533,19 @@ export default class Guest {
     // Remove existing anchors for this annotation.
     this.detach(annotation.$tag, false /* notify */);
 
+    this._annotations.add(annotation.$tag);
+
     // Resolve selectors to ranges and insert highlights.
     if (!annotation.target) {
       annotation.target = [];
     }
     const anchors = await Promise.all(annotation.target.map(locate));
+
+    // If the annotation was removed while anchoring, don't save the anchors.
+    if (!this._annotations.has(annotation.$tag)) {
+      return [];
+    }
+
     for (let anchor of anchors) {
       highlight(anchor);
     }
@@ -558,6 +572,8 @@ export default class Guest {
    * @param {boolean} [notify] - For internal use. Whether to emit an `anchorsChanged` notification
    */
   detach(tag, notify = true) {
+    this._annotations.delete(tag);
+
     /** @type {Anchor[]} */
     const anchors = [];
     for (let anchor of this.anchors) {
