@@ -88,14 +88,20 @@ function SidebarView({
   // Reload annotations when group, user or document search URIs change
   useEffect(() => {
     if (!prevGroupId.current || prevGroupId.current !== focusedGroupId) {
-      // Clear any selected annotations and filters when the group ID changes.
-      //
+      // Clear any selected annotations and filters when the focused group
+      // changes.
       // We don't clear the selection/filters on the initial load when
       // the focused group transitions from null to non-null, as this would clear
       // any filters intended to be used for the initial display (eg. to focus
       // on a particular user).
       if (prevGroupId.current) {
+        // Respect applied focus-mode filtering when changing focused group
+        let restoreFocus = store.focusState().active;
+
         store.clearSelection();
+        if (restoreFocus) {
+          store.toggleFocusMode(true);
+        }
       }
       prevGroupId.current = focusedGroupId;
     }
