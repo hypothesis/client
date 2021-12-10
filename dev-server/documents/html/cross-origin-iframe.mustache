@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cross-origin guest iframe</title>
+    <title>Cross-origin, sandboxed guest iframe</title>
     <style>
       body {
         font-family: sans-serif;
@@ -18,10 +18,13 @@
 
   </head>
   <body>
-    <h1>Cross-origin guest iframe</h1>
+    <h1>Cross-origin, sandboxed guest iframe</h1>
     <p>
       The cross-origin iframe below should behave like a normal guest iframe. It should
       be possible to select text and add annotations.
+    </p>
+    <p>
+      Currently, the effects of sandboxing the guest iframe are more notable in Safari.
     </p>
     <iframe></iframe>
     <script>
@@ -29,7 +32,9 @@
       const { port, hostname } = document.location;
       const newPort = port === '3000' ? '3002' : '3000';
       const src = `//${hostname}:${newPort}/document/doyle-embedded`;
-      document.querySelector('iframe').setAttribute('src', src);
+      const iframe = document.querySelector('iframe');
+      iframe.setAttribute('src', src);
+      iframe.setAttribute('sandbox', 'allow-scripts');
     </script>
     {{{hypothesisScript}}}
   </body>
