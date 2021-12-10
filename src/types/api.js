@@ -141,8 +141,9 @@
  * TODO - Fill out remaining properties
  *
  * @typedef Group
- * @prop {string} id
- * @prop {string} groupid
+ * @prop {string} id - a.k.a. "pubid", unique per authority.
+ * @prop {string} [groupid] - Fully-qualified ID with authority.
+ *   Not all groups have a `groupid`. LMS groups always have a `groupid`.
  * @prop {'private'|'open'} type
  * @prop {Organization} organization - nb. This field is nullable in the API, but
  *   we assign a default organization on the client.
