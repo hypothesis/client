@@ -108,6 +108,7 @@ node {
             nodeEnv.inside("-e HOME=${workspace}") {
                 withCredentials([
                     string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
+                    string(credentialsId: 'sentry-token', variable: 'SENTRY_AUTH_TOKEN'),
                     usernamePassword(credentialsId: 'github-jenkins-user',
                                      passwordVariable: 'GITHUB_TOKEN_NOT_USED',
                                      usernameVariable: 'GITHUB_USERNAME'),
@@ -124,6 +125,9 @@ node {
                     export SIDEBAR_APP_URL=https://qa.hypothes.is/app.html
                     export NOTEBOOK_APP_URL=https://qa.hypothes.is/notebook
                     yarn version --no-git-tag-version --new-version ${qaVersion}
+
+                    yarn run sentry-cli releases --org hypothesis --project client new ${qaVersion}
+                    yarn run sentry-cli releases --org hypothesis --project client files ${qaVersion} upload-sourcemaps build/scripts/*.map
                     """
 
                     // Deploy to S3, so the package can be served by
@@ -169,6 +173,7 @@ stage('Publish') {
             nodeEnv.inside("-e HOME=${workspace} -e BRANCH_NAME=${env.BRANCH_NAME}") {
                 withCredentials([
                     string(credentialsId: 'npm-token', variable: 'NPM_TOKEN'),
+                    string(credentialsId: 'sentry-token', variable: 'SENTRY_AUTH_TOKEN'),
                     usernamePassword(credentialsId: 'github-jenkins-user',
                                       passwordVariable: 'GITHUB_TOKEN',
                                       usernameVariable: 'GITHUB_USERNAME'),
@@ -194,6 +199,9 @@ stage('Publish') {
                     export SIDEBAR_APP_URL=https://hypothes.is/app.html
                     export NOTEBOOK_APP_URL=https://hypothes.is/notebook
                     yarn version --no-git-tag-version --new-version ${newPkgVersion}
+
+                    yarn run sentry-cli releases --org hypothesis --project client new ${newPkgVersion}
+                    yarn run sentry-cli releases --org hypothesis --project client files ${newPkgVersion} upload-sourcemaps build/scripts/*.map
                     """
 
                     // Create GitHub release with changes since previous release.
