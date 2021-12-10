@@ -11,7 +11,10 @@ let preStartQueue = [];
  */
 const registeredMethods = store => {
   return {
-    changeFocusModeUser: store.changeFocusModeUser,
+    changeFocusModeUser: userInfo => {
+      store.changeFocusModeUser(userInfo);
+      store.filterGroups(userInfo?.groups);
+    },
   };
 };
 

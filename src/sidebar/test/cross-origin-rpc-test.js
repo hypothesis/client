@@ -20,6 +20,7 @@ describe('sidebar/cross-origin-rpc', () => {
   beforeEach(() => {
     fakeStore = {
       changeFocusModeUser: sinon.stub(),
+      filterGroups: sinon.stub(),
     };
 
     frame = { postMessage: sinon.stub() };
@@ -78,9 +79,7 @@ describe('sidebar/cross-origin-rpc', () => {
         source: frame,
       });
 
-      assert.isTrue(
-        fakeStore.changeFocusModeUser.calledWithExactly('one', 'two')
-      );
+      assert.calledWith(fakeStore.changeFocusModeUser, 'one');
     });
 
     it('calls the registered method with no params', () => {
@@ -95,7 +94,7 @@ describe('sidebar/cross-origin-rpc', () => {
         origin: 'https://allowed1.com',
         source: frame,
       });
-      assert.isTrue(fakeStore.changeFocusModeUser.calledWithExactly());
+      assert.isTrue(fakeStore.changeFocusModeUser.calledWithExactly(undefined));
     });
 
     it('does not call the unregistered method', () => {
@@ -110,6 +109,47 @@ describe('sidebar/cross-origin-rpc', () => {
         source: frame,
       });
       assert.isTrue(fakeStore.changeFocusModeUser.notCalled);
+    });
+
+    describe('changeFocusModeUser RPC method', () => {
+      it('calls `changeFocusModeUser` with first parameter', () => {
+        startServer(fakeStore, settings, fakeWindow);
+        fakeWindow.emitter.emit('message', {
+          data: {
+            jsonrpc: '2.0',
+            method: 'changeFocusModeUser',
+            id: 42,
+            params: [{ foo: 'foo', bar: 'bar' }, 'ignored'],
+          },
+          origin: 'https://allowed1.com',
+          source: frame,
+        });
+
+        assert.calledWith(
+          fakeStore.changeFocusModeUser,
+          sinon.match({ foo: 'foo', bar: 'bar' })
+        );
+        assert.calledWith(fakeStore.filterGroups, undefined);
+      });
+
+      it('calls `filterGroups` with `groups` property of first parameter', () => {
+        startServer(fakeStore, settings, fakeWindow);
+        fakeWindow.emitter.emit('message', {
+          data: {
+            jsonrpc: '2.0',
+            method: 'changeFocusModeUser',
+            id: 42,
+            params: [
+              { foo: 'foo', bar: 'bar', groups: ['one', 'two'] },
+              'ignored',
+            ],
+          },
+          origin: 'https://allowed1.com',
+          source: frame,
+        });
+
+        assert.calledWith(fakeStore.filterGroups, sinon.match(['one', 'two']));
+      });
     });
 
     [{}, null, { jsonrpc: '1.0' }].forEach(invalidMessage => {
