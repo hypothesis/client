@@ -5,6 +5,7 @@ import { generateHexString } from '../shared/random';
 
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
+import { BucketService } from './bucket-service';
 import {
   getHighlightsContainingNode,
   highlightRange,
@@ -17,6 +18,7 @@ import { HypothesisInjector } from './hypothesis-injector';
 import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
+import { computeBuckets } from './util/buckets-alt';
 import { normalizeURI } from './util/url';
 
 /**
@@ -122,16 +124,13 @@ export default class Guest {
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {EventBus} eventBus -
-   *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
    * @param {Window} [hostFrame] -
    *   Host frame which this guest is associated with. This is expected to be
    *   an ancestor of the guest frame. It may be same or cross origin.
    */
-  constructor(element, eventBus, config = {}, hostFrame = window) {
+  constructor(element, config = {}, hostFrame = window) {
     this.element = element;
-    this._emitter = eventBus.createEmitter();
     this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
@@ -191,6 +190,9 @@ export default class Guest {
      */
     this._hostRPC = new Bridge();
     this._connectHostEvents();
+    this._bucketService = new BucketService(this._hostRPC, {
+      onUpdateBuckets: () => computeBuckets(this.anchors),
+    });
 
     /**
      * Channel for guest-sidebar communication.
@@ -433,6 +435,7 @@ export default class Guest {
     this._notifyGuestUnload();
     this._hypothesisInjector.destroy();
     this._listeners.removeAll();
+    this._bucketService.destroy();
 
     this._selectionObserver.disconnect();
     this._adder.destroy();
@@ -440,7 +443,6 @@ export default class Guest {
     removeAllHighlights(this.element);
 
     this._integration.destroy();
-    this._emitter.destroy();
     this._sidebarRPC.destroy();
   }
 
@@ -593,9 +595,7 @@ export default class Guest {
    */
   _updateAnchors(anchors, notify) {
     this.anchors = anchors;
-    if (notify) {
-      this._emitter.publish('anchorsChanged', this.anchors);
-    }
+    this._bucketService.notify(computeBuckets(anchors), { notify });
   }
 
   /**

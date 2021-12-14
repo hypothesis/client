@@ -15,7 +15,12 @@ export type GuestToHostEvent =
   /**
    * The guest informs the host that text has been selected at a frame with that identifier.
    */
-  | 'textSelectedIn';
+  | 'textSelectedIn'
+
+  /**
+   * The guest informs the host that the buckets have been updated.
+   */
+  | 'bucketsUpdated';
 
 /**
  * Events that the guest sends to the sidebar

@@ -114,10 +114,12 @@ export default class Sidebar {
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
-        const bucketBar = new BucketBar(this.iframeContainer, guest, {
+        const bucketBar = new BucketBar(this.iframeContainer, {
           contentContainer: guest.contentContainer(),
         });
-        this._emitter.subscribe('anchorsChanged', () => bucketBar.update());
+        this._guestRPC.on('bucketsUpdated', buckets =>
+          bucketBar.update(buckets)
+        );
         this.bucketBar = bucketBar;
       }
 
