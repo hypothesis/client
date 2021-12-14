@@ -25,7 +25,17 @@ let preStartQueue = [];
  */
 const registeredMethods = store => {
   return {
-    changeFocusModeUser: store.changeFocusModeUser,
+    /** @param {FocusUserInfo} userInfo */
+    changeFocusModeUser: userInfo => {
+      store.changeFocusModeUser(userInfo);
+
+      const groupIds = userInfo?.groups ?? [];
+      const filteredGroupIds = normalizeGroupIds(groupIds, store.allGroups());
+      if (groupIds.length && !filteredGroupIds.length) {
+        console.error('No matching groups found in list of filtered group IDs');
+      }
+      store.filterGroups(filteredGroupIds);
+    },
   };
 };
 
