@@ -12,6 +12,14 @@ import session from './session';
 
 const initialState = {
   /**
+   * When there are entries, only `groups` with `id`s included in this list
+   * of will be displayed in the sidebar.
+   *
+   * @type {Group["id"][]|null}
+   */
+  filteredGroupIds: null,
+
+  /**
    * List of groups.
    * @type {Group[]}
    */
@@ -27,6 +35,33 @@ const initialState = {
 /** @typedef {typeof initialState} State */
 
 const reducers = {
+  FILTER_GROUPS(state, action) {
+    if (!action.filteredGroupIds?.length) {
+      return {
+        filteredGroupIds: null,
+      };
+    }
+    const filteredGroups = state.groups.filter(g =>
+      action.filteredGroupIds.includes(g.id)
+    );
+    if (!filteredGroups.length) {
+      // If there are no matches in the full set of groups for any of the
+      // provided `filteredGroupIds`, don't set the filter.
+      return {
+        filteredGroupIds: null,
+      };
+    }
+    // Ensure we have a focused group that is in the set of filtered groups
+    let focusedGroupId = state.focusedGroupId;
+    if (!focusedGroupId || !action.filteredGroupIds.includes(focusedGroupId)) {
+      focusedGroupId = filteredGroups[0].id;
+    }
+    return {
+      filteredGroupIds: action.filteredGroupIds,
+      focusedGroupId,
+    };
+  },
+
   FOCUS_GROUP(state, action) {
     const group = state.groups.find(g => g.id === action.id);
     if (!group) {
@@ -62,6 +97,7 @@ const reducers = {
 
   CLEAR_GROUPS() {
     return {
+      filteredGroupIds: null,
       focusedGroupId: null,
       groups: [],
     };
@@ -73,6 +109,18 @@ const actions = util.actionTypes(reducers);
 function clearGroups() {
   return {
     type: actions.CLEAR_GROUPS,
+  };
+}
+
+/**
+ * Set filtered groups.
+ *
+ * @param {Group["id"][]} filteredGroupIds
+ */
+function filterGroups(filteredGroupIds) {
+  return {
+    type: actions.FILTER_GROUPS,
+    filteredGroupIds,
   };
 }
 
@@ -122,12 +170,31 @@ function focusedGroupId(state) {
 }
 
 /**
- * Return the list of all groups.
+ * Return the list of all groups, ignoring any filter present.
  *
  * @return {Group[]}
  */
 function allGroups(state) {
   return state.groups;
+}
+
+/**
+ * Return a list of groups filtered by any values in `filteredGroupIds`
+ *
+ * @param {State} state
+ */
+function filteredGroups(state) {
+  if (!state.filteredGroupIds) {
+    return state.groups;
+  }
+  return state.groups.filter(g => state.filteredGroupIds?.includes(g.id));
+}
+
+/**
+ * @param {State} state
+ */
+function filteredGroupIds(state) {
+  return state.filteredGroupIds;
 }
 
 /**
@@ -145,7 +212,7 @@ function getGroup(state, id) {
  */
 const getFeaturedGroups = createSelector(
   /** @param {State} state */
-  state => state.groups,
+  state => filteredGroups(state),
   groups => groups.filter(group => !group.isMember && group.isScopedToUri)
 );
 
@@ -156,7 +223,7 @@ const getFeaturedGroups = createSelector(
  */
 const getInScopeGroups = createSelector(
   /** @param {State} state */
-  state => state.groups,
+  state => filteredGroups(state),
   groups => groups.filter(g => g.isScopedToUri)
 );
 
@@ -167,7 +234,7 @@ const getInScopeGroups = createSelector(
  */
 const getMyGroups = createSelector(
   /** @param {{ groups: State, session: SessionState }} rootState */
-  rootState => rootState.groups.groups,
+  rootState => filteredGroups(rootState.groups),
   rootState => session.selectors.isLoggedIn(rootState.session),
   (groups, loggedIn) => {
     // If logged out, the Public group still has isMember set to true so only
@@ -184,7 +251,7 @@ const getMyGroups = createSelector(
  */
 const getCurrentlyViewingGroups = createSelector(
   /** @param {{ groups: State, session: SessionState }} rootState */
-  rootState => allGroups(rootState.groups),
+  rootState => filteredGroups(rootState.groups),
   rootState => getMyGroups(rootState),
   rootState => getFeaturedGroups(rootState.groups),
   (allGroups, myGroups, featuredGroups) => {
@@ -198,12 +265,15 @@ export default createStoreModule(initialState, {
   namespace: 'groups',
   reducers,
   actionCreators: {
+    filterGroups,
     focusGroup,
     loadGroups,
     clearGroups,
   },
   selectors: {
     allGroups,
+    filteredGroups,
+    filteredGroupIds,
     focusedGroup,
     focusedGroupId,
     getFeaturedGroups,

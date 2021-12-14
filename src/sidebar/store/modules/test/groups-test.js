@@ -76,6 +76,46 @@ describe('sidebar/store/modules/groups', () => {
     store = createStore([groups, session], [{}]);
   });
 
+  describe('filterGroups', () => {
+    it('sets filtered groups to IDs provided', () => {
+      store.loadGroups([publicGroup, privateGroup, restrictedGroup]);
+      assert.deepEqual(store.filteredGroups(), [
+        publicGroup,
+        privateGroup,
+        restrictedGroup,
+      ]);
+      store.filterGroups([publicGroup.id, privateGroup.id]);
+      assert.deepEqual(store.filteredGroups(), [publicGroup, privateGroup]);
+    });
+
+    it('clears filtered groups if no IDs provided', () => {
+      store.loadGroups([publicGroup, privateGroup]);
+      store.filterGroups([publicGroup.id]);
+      assert.deepEqual(store.filteredGroups(), [publicGroup]);
+
+      store.filterGroups([]);
+      assert.deepEqual(store.filteredGroups(), [publicGroup, privateGroup]);
+    });
+
+    it('clears filtered groups if no provided IDs match any loaded groups', () => {
+      store.loadGroups([publicGroup, privateGroup]);
+      store.filterGroups([publicGroup.id]);
+      assert.deepEqual(store.filteredGroups(), [publicGroup]);
+
+      store.filterGroups([restrictedGroup.id]);
+      assert.deepEqual(store.filteredGroups(), [publicGroup, privateGroup]);
+    });
+
+    it('resets focused group if it is not contained in filtered groups', () => {
+      store.loadGroups([publicGroup, privateGroup]);
+      store.focusGroup(publicGroup);
+      assert.equal(store.focusedGroupId(), publicGroup.id);
+
+      store.filterGroups([privateGroup.id]);
+      assert.equal(store.focusedGroupId(), privateGroup.id);
+    });
+  });
+
   describe('focusGroup', () => {
     beforeEach(() => {
       sinon.stub(console, 'error');
@@ -144,6 +184,15 @@ describe('sidebar/store/modules/groups', () => {
 
       assert.equal(store.getState().groups.focusedGroupId, null);
     });
+
+    it('clears any filtered group IDs', () => {
+      store.loadGroups([publicGroup, restrictedGroup]);
+      store.filterGroups([publicGroup.id]);
+
+      assert.deepEqual(store.filteredGroupIds(), [publicGroup.id]);
+      store.clearGroups();
+      assert.isNull(store.filteredGroupIds());
+    });
   });
 
   describe('allGroups', () => {
@@ -157,6 +206,12 @@ describe('sidebar/store/modules/groups', () => {
     it('returns all groups that are in scope', () => {
       store.loadGroups([publicGroup, privateGroup, restrictedOutOfScopeGroup]);
       assert.deepEqual(store.getInScopeGroups(), [publicGroup, privateGroup]);
+    });
+
+    it('only returns groups that match filtered groups', () => {
+      store.loadGroups([publicGroup, privateGroup, restrictedOutOfScopeGroup]);
+      store.filterGroups([publicGroup.id]);
+      assert.deepEqual(store.getInScopeGroups(), [publicGroup]);
     });
   });
 
@@ -238,6 +293,16 @@ describe('sidebar/store/modules/groups', () => {
         });
       }
     );
+
+    it('should filter the returned featured groups if filtered groups are set', () => {
+      store.loadGroups([openGroup, restrictedGroup]);
+
+      assert.deepEqual(store.getFeaturedGroups(), [openGroup, restrictedGroup]);
+
+      store.filterGroups([restrictedGroup.id]);
+
+      assert.deepEqual(store.getFeaturedGroups(), [restrictedGroup]);
+    });
   });
 
   describe('getMyGroups', () => {
@@ -279,6 +344,17 @@ describe('sidebar/store/modules/groups', () => {
         assert.deepEqual(myGroups, expectedMyGroups);
       });
     });
+
+    it('should filter the returned my-groups if filtered groups are set', () => {
+      store.updateProfile({ userid: '1234' });
+      store.loadGroups([openGroup, publicGroup]);
+
+      assert.deepEqual(store.getMyGroups(), [publicGroup]);
+
+      store.filterGroups([openGroup.id]);
+
+      assert.deepEqual(store.getMyGroups(), []);
+    });
   });
 
   describe('getCurrentlyViewingGroups', () => {
@@ -313,6 +389,19 @@ describe('sidebar/store/modules/groups', () => {
 
         assert.deepEqual(currentlyViewing, allGroups);
       });
+    });
+
+    it('should filter the returned currently-viewing groups if filtered groups are set', () => {
+      store.loadGroups([restrictedOutOfScopeGroup, publicGroup]);
+
+      assert.deepEqual(store.getCurrentlyViewingGroups(), [
+        restrictedOutOfScopeGroup,
+        publicGroup,
+      ]);
+
+      store.filterGroups([publicGroup.id]);
+
+      assert.deepEqual(store.getCurrentlyViewingGroups(), [publicGroup]);
     });
   });
 });
