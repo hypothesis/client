@@ -31,6 +31,19 @@ function bundleConfig({ name, entry }) {
       chunkFileNames: `${name}-[name].bundle.js`,
       entryFileNames: '[name].bundle.js',
       sourcemap: true,
+
+      // Rewrite source paths from "../../src/path/to/module.js" to
+      // "app:///src/path/to/module.js". Converting the paths to absolute URLs
+      // prevents Sentry from resolving them against the sourcemap URL, which
+      // in turn keeps module URLs consistent across releases. This helps issue
+      // grouping. See https://gist.github.com/robertknight/cbdee9db50601c5244d9e483930c32ca.
+      //
+      // The "app:" scheme is one of several URI schemes (others being "https:"
+      // and "webpack:") that Sentry feeds through the module URL => module path
+      // cleaning process.
+      sourcemapPathTransform: sourcePath => {
+        return sourcePath.replace(/^\.\.\/\.\.\//, 'app:///');
+      },
     },
     preserveEntrySignatures: false,
 
