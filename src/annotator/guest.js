@@ -18,7 +18,7 @@ import { HypothesisInjector } from './hypothesis-injector';
 import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
-import { computeBuckets } from './util/buckets-alt';
+import { computeBuckets } from './util/buckets';
 import { normalizeURI } from './util/url';
 
 /**

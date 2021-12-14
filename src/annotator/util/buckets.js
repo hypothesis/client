@@ -6,7 +6,7 @@ import { getBoundingClientRect } from '../highlighter';
 
 /**
  * @typedef Bucket
- * @prop {Anchor[]} anchors - The anchors in this bucket
+ * @prop {Set<string>} tags - The annotations tags in this bucket
  * @prop {number} position - The vertical pixel offset where this bucket should
  *                           appear in the bucket bar.
  */
@@ -22,7 +22,7 @@ import { getBoundingClientRect } from '../highlighter';
 
 /**
  * @typedef WorkingBucket
- * @prop {Anchor[]} anchors - The anchors in this bucket
+ * @prop {Set<string>} tags - The annotation tags in this bucket
  * @prop {number} position - The computed position (offset) for this bucket,
  *   based on the current anchors. This is centered between `top` and `bottom`
  * @prop {number} top - The uppermost (lowest) vertical offset for the anchors
@@ -146,11 +146,14 @@ function getAnchorPositions(anchors) {
  * @param {Anchor[]} anchors
  * @return {BucketSet}
  */
-export function anchorBuckets(anchors) {
+export function computeBuckets(anchors) {
   const anchorPositions = getAnchorPositions(anchors);
+  /** @type {Set<string>} */
   const aboveScreen = new Set();
+  /** @type {Set<string>} */
   const belowScreen = new Set();
-  const buckets = /** @type {Bucket[]} */ ([]);
+  /** @type {Bucket[]} */
+  const buckets = [];
 
   // Hold current working anchors and positions as we build each bucket
   /** @type {WorkingBucket|null} */
@@ -165,22 +168,23 @@ export function anchorBuckets(anchors) {
   function newBucket(anchorPosition) {
     const anchorHeight = anchorPosition.bottom - anchorPosition.top;
     const bucketPosition = anchorPosition.top + anchorHeight / 2;
-    const bucket = /** @type WorkingBucket */ ({
-      anchors: [anchorPosition.anchor],
+    /** @type WorkingBucket */
+    const bucket = {
+      tags: new Set([anchorPosition.anchor.annotation.$tag]),
       top: anchorPosition.top,
       bottom: anchorPosition.bottom,
       position: bucketPosition,
-    });
+    };
     return bucket;
   }
 
   // Build buckets from position information
   anchorPositions.forEach(aPos => {
     if (aPos.top < BUCKET_TOP_THRESHOLD) {
-      aboveScreen.add(aPos.anchor);
+      aboveScreen.add(aPos.anchor.annotation.$tag);
       return;
     } else if (aPos.top > window.innerHeight - BUCKET_BOTTOM_THRESHOLD) {
-      belowScreen.add(aPos.anchor);
+      belowScreen.add(aPos.anchor.annotation.$tag);
       return;
     }
 
@@ -216,7 +220,7 @@ export function anchorBuckets(anchors) {
         aPos.bottom > currentBucket.bottom ? aPos.bottom : currentBucket.bottom;
       const updatedHeight = updatedBottom - currentBucket.top;
 
-      currentBucket.anchors.push(aPos.anchor);
+      currentBucket.tags.add(aPos.anchor.annotation.$tag);
       currentBucket.bottom = updatedBottom;
       currentBucket.position = currentBucket.top + updatedHeight / 2;
     }
@@ -228,13 +232,13 @@ export function anchorBuckets(anchors) {
 
   // Add an upper "navigation" bucket with offscreen-above anchors
   const above = {
-    anchors: Array.from(aboveScreen),
+    tags: aboveScreen,
     position: BUCKET_TOP_THRESHOLD,
   };
 
   // Add a lower "navigation" bucket with offscreen-below anchors
   const below = {
-    anchors: Array.from(belowScreen),
+    tags: belowScreen,
     position: window.innerHeight - BUCKET_BOTTOM_THRESHOLD,
   };
 

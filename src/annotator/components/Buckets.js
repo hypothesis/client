@@ -1,8 +1,5 @@
 import classnames from 'classnames';
 
-import { setHighlightsFocused } from '../highlighter';
-import { findClosestOffscreenAnchor } from '../util/buckets';
-
 /**
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -15,19 +12,19 @@ import { findClosestOffscreenAnchor } from '../util/buckets';
  *
  * @param {object} props
  *  @param {Bucket} props.bucket
- *  @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
+ *  @param {(tags: Set<string>, toggle: boolean) => any} props.onSelectAnnotations
  */
 function BucketButton({ bucket, onSelectAnnotations }) {
-  const annotations = bucket.anchors.map(anchor => anchor.annotation);
-  const buttonTitle = `Select nearby annotations (${bucket.anchors.length})`;
+  const buttonTitle = `Select nearby annotations (${bucket.tags.size})`;
 
   function selectAnnotations(event) {
-    onSelectAnnotations(annotations, event.metaKey || event.ctrlKey);
+    onSelectAnnotations(bucket.tags, event.metaKey || event.ctrlKey);
   }
 
   function setFocus(focusState) {
-    bucket.anchors.forEach(anchor => {
-      setHighlightsFocused(anchor.highlights || [], focusState);
+    bucket.tags.forEach(tag => {
+      // TODO
+      //setHighlightsFocused(anchor.highlights || [], focusState);
     });
   }
 
@@ -41,7 +38,7 @@ function BucketButton({ bucket, onSelectAnnotations }) {
       title={buttonTitle}
       aria-label={buttonTitle}
     >
-      {bucket.anchors.length}
+      {bucket.tags.size}
     </button>
   );
 }
@@ -53,17 +50,18 @@ function BucketButton({ bucket, onSelectAnnotations }) {
  * @param {object} props
  *   @param {Bucket} props.bucket
  *   @param {'up'|'down'} props.direction
- *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
+ *   @param {(tag: string) => void} props.scrollToAnchor - Callback invoked to
  *     scroll the document to a given anchor
  */
 function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
-  const buttonTitle = `Go ${direction} to next annotations (${bucket.anchors.length})`;
+  const buttonTitle = `Go ${direction} to next annotations (${bucket.tags.size})`;
 
   function scrollToClosest() {
-    const closest = findClosestOffscreenAnchor(bucket.anchors, direction);
-    if (closest) {
-      scrollToAnchor(closest);
-    }
+    // TODO
+    // const closest = findClosestOffscreenAnchor(bucket.tags, direction);
+    // if (closest) {
+    //   scrollToAnchor(closest);
+    // }
   }
 
   return (
@@ -73,7 +71,7 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
       title={buttonTitle}
       aria-label={buttonTitle}
     >
-      {bucket.anchors.length}
+      {bucket.tags.size}
     </button>
   );
 }
@@ -86,8 +84,8 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
  *   @param {Bucket} props.above
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets
- *   @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
- *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
+ *   @param {(tags: Set<string>, toggle: boolean) => any} props.onSelectAnnotations
+ *   @param {(tag: string ) => void} props.scrollToAnchor - Callback invoked to
  *     scroll the document to a given anchor
  */
 export default function Buckets({
@@ -97,8 +95,8 @@ export default function Buckets({
   onSelectAnnotations,
   scrollToAnchor,
 }) {
-  const showUpNavigation = above.anchors.length > 0;
-  const showDownNavigation = below.anchors.length > 0;
+  const showUpNavigation = above.tags.size > 0;
+  const showDownNavigation = below.tags.size > 0;
 
   return (
     <ul className="Buckets__list">

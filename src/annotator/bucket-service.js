@@ -5,7 +5,7 @@ import { ListenerCollection } from '../shared/listener-collection';
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/bridge-events').HostToGuestEvent} HostToGuestEvent
  * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
- * @typedef {import('./util/buckets-alt').BucketSet} BucketSet
+ * @typedef {import('./util/buckets').BucketSet} BucketSet
  */
 
 /**

@@ -2,7 +2,7 @@ import { render } from 'preact';
 
 import { ListenerCollection } from '../shared/listener-collection';
 
-import Buckets from './components/BucketsAlt';
+import Buckets from './components/Buckets';
 
 /**
  * @typedef BucketBarOptions
