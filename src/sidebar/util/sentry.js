@@ -16,20 +16,12 @@ const maxEventsToSendPerSession = 5;
 /** @type {(() => void)|null} */
 let removeFrameErrorHandler = null;
 
-/**
- * Return the origin which the current script comes from.
- *
- * @return {string|null}
- */
 function currentScriptOrigin() {
-  try {
-    // This property is only available while a `<script>` tag is initially being executed.
-    const script = /** @type {HTMLScriptElement} */ (document.currentScript);
-    const scriptUrl = new URL(script.src);
-    return scriptUrl.origin;
-  } catch (e) {
+  let url = import.meta.url;
+  if (!url) {
     return null;
   }
+  return new URL(url).origin;
 }
 
 /**
