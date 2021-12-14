@@ -1,8 +1,6 @@
 import * as sentry from '../sentry';
 
 describe('sidebar/util/sentry', () => {
-  let fakeDocumentReferrer;
-  let fakeDocumentCurrentScript;
   let fakeHandleErrorsInFrames;
   let fakeParseConfigFragment;
   let fakeSentry;
@@ -38,22 +36,15 @@ describe('sidebar/util/sentry', () => {
   });
 
   describe('init', () => {
+    const originalURL = import.meta.url;
+
     beforeEach(() => {
-      fakeDocumentReferrer = sinon.stub(document, 'referrer');
-      fakeDocumentReferrer.get(() => 'https://example.com');
-
-      fakeDocumentCurrentScript = sinon.stub(document, 'currentScript');
-      fakeDocumentCurrentScript.get(() => ({
-        src: 'https://cdn.hypothes.is/hypothesis/1.123.0/build/scripts/sidebar.bundle.js',
-      }));
-
       // Reset rate limiting counters.
       sentry.reset();
     });
 
     afterEach(() => {
-      fakeDocumentCurrentScript.restore();
-      fakeDocumentReferrer.restore();
+      import.meta.url = originalURL;
     });
 
     it('configures Sentry', () => {
@@ -73,6 +64,9 @@ describe('sidebar/util/sentry', () => {
     });
 
     it('configures Sentry to only report errors that can be attributed to our code', () => {
+      import.meta.url =
+        'https://cdn.hypothes.is/hypothesis/1.940.0/build/scripts/sidebar.bundle.js';
+
       sentry.init({
         dsn: 'test-dsn',
         environment: 'dev',
@@ -100,8 +94,8 @@ describe('sidebar/util/sentry', () => {
       );
     });
 
-    it('disables the URL allowlist if `document.currentScript` is inaccessible', () => {
-      fakeDocumentCurrentScript.get(() => null);
+    it('disables the URL allowlist if the script URL is unavailable', () => {
+      import.meta.url = null;
 
       sentry.init({
         dsn: 'test-dsn',
