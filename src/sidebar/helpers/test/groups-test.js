@@ -1,4 +1,4 @@
-import { combineGroups, $imports } from '../groups';
+import { combineGroups, normalizeGroupIds, $imports } from '../groups';
 
 describe('sidebar/helpers/groups', () => {
   let fakeServiceConfig;
@@ -227,6 +227,72 @@ describe('sidebar/helpers/groups', () => {
       );
 
       groups.forEach(g => assert.equal(g.isScopedToUri, true));
+    });
+  });
+
+  describe('normalizeGroupIds', () => {
+    const allGroups = [
+      { id: 'group1', groupid: 'group:group1@foo.com' },
+      { id: 'group2', groupid: 'group:group2@foo.com' },
+      { id: 'group3', groupid: 'group:group3@foo.com' },
+      { id: 'group4' },
+      { id: 'group5' },
+      { id: 'group6', groupid: 'group:group6@foo.com' },
+    ];
+
+    [
+      {
+        description: 'all `groupIds` are `id`s and have matches in `groups`',
+        groupIds: ['group1', 'group2', 'group3', 'group4', 'group5', 'group6'],
+        groups: allGroups,
+        expected: ['group1', 'group2', 'group3', 'group4', 'group5', 'group6'],
+      },
+      {
+        description:
+          '`groupIds` is a mix of `id`s and `groupIds` and all have matches in `groups`',
+        groupIds: [
+          'group:group1@foo.com',
+          'group:group2@foo.com',
+          'group:group3@foo.com',
+          'group4',
+          'group5',
+          'group:group6@foo.com',
+        ],
+        groups: allGroups,
+        expected: ['group1', 'group2', 'group3', 'group4', 'group5', 'group6'],
+      },
+      {
+        description:
+          '`groupIds` is a mix of `id`s and `groupIds` and some have matches in `groups`',
+        groupIds: [
+          'group4',
+          'group:group6@foo.com',
+          'group7',
+          'group:group5@foo.com',
+        ],
+        groups: allGroups,
+        expected: ['group4', 'group6'],
+      },
+      {
+        description:
+          '`groupIds` is a mix of `id`s and `groupIds` and none match any `groups`',
+        groupIds: ['group7', 'group:group5@foo.com', 'fingers'],
+        groups: allGroups,
+        expected: [],
+      },
+      {
+        description: '`groupIds` is empty',
+        groupIds: [],
+        groups: allGroups,
+        expected: [],
+      },
+    ].forEach(testCase => {
+      it(`returns the correct set of IDs when ${testCase.description}`, () => {
+        assert.deepEqual(
+          normalizeGroupIds(testCase.groupIds, testCase.groups),
+          testCase.expected
+        );
+      });
     });
   });
 });

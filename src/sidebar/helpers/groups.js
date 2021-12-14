@@ -1,6 +1,7 @@
 /**
  * @typedef {import('../../types/config').HostConfig} HostConfig
  * @typedef {import('../../types/api').Group} Group
+ * @typedef {import('../../types/api').GroupIdentifier} GroupIdentifier
  */
 
 // @ts-expect-error - Ignore error about default-importing a CommonJS module.
@@ -93,4 +94,32 @@ function uriMatchesScopes(uri, scopes) {
       )
     ) !== undefined
   );
+}
+
+/**
+ * Find groups in `groups` by GroupIdentifier, which may be either an `id` or
+ * `groupid`.
+ *
+ * @param {GroupIdentifier[]} groupIds
+ * @param {Group[]} groups
+ * @returns {Group[]}
+ */
+function findGroupsByAnyIds(groupIds, groups) {
+  return groups.filter(
+    g => groupIds.includes(g.id) || (g.groupid && groupIds.includes(g.groupid))
+  );
+}
+
+/**
+ * Attempt to convert a list in which each entry might be either an `id`
+ * (pubid) or a `groupid` into a list of `id`s by locating associated groups
+ * in the set of all `groups`. Only return entries for groups that can be
+ * found in `groups`.
+ *
+ * @param {GroupIdentifier[]} groupIds
+ * @param {Group[]} groups
+ * @return {Group["id"][]}
+ */
+export function normalizeGroupIds(groupIds, groups) {
+  return findGroupsByAnyIds(groupIds, groups).map(g => g.id);
 }

@@ -143,7 +143,7 @@
  * @typedef Group
  * @prop {string} id - a.k.a. "pubid", unique per authority.
  * @prop {string} [groupid] - Fully-qualified ID with authority.
- *   Not all groups have a `groupid`. LMS groups always have a `groupid`.
+ *   Not all groups have a `groupid`.
  * @prop {'private'|'open'} type
  * @prop {Organization} organization - nb. This field is nullable in the API, but
  *   we assign a default organization on the client.
@@ -157,6 +157,17 @@
  * @prop {boolean} isScopedToUri
  * @prop {string} name
  * @prop {boolean} canLeave
+ *
+ * @typedef {NonNullable<Group["id"]|Group["groupid"]>} GroupIdentifier
+ * Historically, Groups have been identified by their `id` (a.k.a. `pubid`)
+ * property, which is a unique identifier per authority.
+ *
+ * Third-party groups, especially LMS groups, use `groupid` as an identifier
+ * because it is unique across all authorities.
+ *
+ * Application logic operates on `id`s, but may receive `groupid`s as
+ * identifiers from outside services. All groups are guaranteed to have an `id`,
+ * but not all groups have a `groupid`.
  */
 
 /**
