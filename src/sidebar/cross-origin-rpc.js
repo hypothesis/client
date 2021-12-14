@@ -1,5 +1,19 @@
 import warnOnce from '../shared/warn-once';
 
+import { normalizeGroupIds } from './helpers/groups';
+
+/**
+ * @typedef FocusUserInfo
+ * @prop {string} [userid]
+ * @prop {string} [username]
+ * @prop {string} [displayName] - User's display name
+ * @prop {string[]} [groups] - A list of group IDs that correspond to the
+ *   focused user's list of groups. This is assumed to represent a subset
+ *   of the `groups` currently loaded in the store. Each entry in this array
+ *   may be either an `id` (a.k.a. `pubid`) OR a `groupid`. These should be
+ *   normalized to `id`s (`pubid`s) before use with the store.
+ */
+
 // Array to keep track of pre-start requests
 let preStartQueue = [];
 

@@ -22,16 +22,14 @@ import { createStoreModule } from '../create-store';
  */
 
 /**
- * Structure of focus-mode config, provided in settings (app config)
- * @typedef FocusConfig
- * @prop {FocusUserConfig} user
+ *
+ * @typedef { import('../../cross-origin-rpc').FocusUserInfo } FocusUserInfo
  */
 
 /**
- * @typedef FocusUserConfig
- * @prop {string} [userid]
- * @prop {string} [username]
- * @prop {string} displayName - User's display name
+ * Structure of focus-mode config, provided in settings (app config)
+ * @typedef FocusConfig
+ * @prop {FocusUserInfo} user
  */
 
 /**
@@ -153,7 +151,7 @@ const actions = actionTypes(reducers);
 /**
  * Change the focused user filter and activate focus
  *
- * @param {FocusUserConfig} user - The user to focus on
+ * @param {FocusUserInfo} user - The user to focus on
  */
 function changeFocusModeUser(user) {
   return { type: actions.CHANGE_FOCUS_MODE_USER, user };
