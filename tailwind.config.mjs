@@ -2,8 +2,7 @@ import tailwindConfig from '@hypothesis/frontend-shared/lib/tailwind.preset.js';
 
 export default {
   presets: [tailwindConfig],
-  mode: 'jit',
-  purge: [
+  content: [
     './src/sidebar/components/**/*.js',
     './src/annotator/components/**/*.js',
     './dev-server/ui-playground/components/**/*.js',
