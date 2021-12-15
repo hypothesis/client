@@ -23,7 +23,7 @@ import { createStoreModule } from '../create-store';
 
 /**
  *
- * @typedef { import('../../cross-origin-rpc').FocusUserInfo } FocusUserInfo
+ * @typedef {import('../../../types/rpc').FocusUserInfo} FocusUserInfo
  */
 
 /**

@@ -158,16 +158,20 @@
  * @prop {string} name
  * @prop {boolean} canLeave
  *
+ */
+
+/**
  * @typedef {NonNullable<Group["id"]|Group["groupid"]>} GroupIdentifier
- * Historically, Groups have been identified by their `id` (a.k.a. `pubid`)
- * property, which is a unique identifier per authority.
  *
- * Third-party groups, especially LMS groups, use `groupid` as an identifier
- * because it is unique across all authorities.
+ * All Groups have an `id`, which is a server-assigned identifier. This is the
+ * primary field used to identify a Group.
  *
- * Application logic operates on `id`s, but may receive `groupid`s as
- * identifiers from outside services. All groups are guaranteed to have an `id`,
- * but not all groups have a `groupid`.
+ * In some cases, specifically LMS, it is necessary for an outside service to
+ * be able to specify its own identifier. This gets stored in the `groupid`
+ * field of a Group. Only some Groups have a `groupid`.
+ *
+ * Application logic operates on `id`s, but we may receive `groupid`s in some
+ * cases from outside sevices, e.g. the `changeFocusModeUser` RPC method.
  */
 
 /**
