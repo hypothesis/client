@@ -28,6 +28,9 @@ node {
     // S3 bucket where the embedded client is served from.
     s3Bucket = "cdn.hypothes.is"
 
+    // URL where the embedded client will be served from.
+    cdnURL = "https://${s3Bucket}/hypothesis"
+
     // Pre-release suffix added to new package version number when deploying,
     // eg. "testing".
     //
@@ -125,10 +128,9 @@ node {
                     export SIDEBAR_APP_URL=https://qa.hypothes.is/app.html
                     export NOTEBOOK_APP_URL=https://qa.hypothes.is/notebook
                     yarn version --no-git-tag-version --new-version ${qaVersion}
-
-                    yarn run sentry-cli releases --org hypothesis --project client new ${qaVersion}
-                    yarn run sentry-cli releases --org hypothesis --project client files ${qaVersion} upload-sourcemaps build/scripts/*.map
                     """
+
+                    uploadFilesToSentry(cdnURL, qaVersion)
 
                     // Deploy to S3, so the package can be served by
                     // https://qa.hypothes.is/embed.js.
@@ -199,10 +201,9 @@ stage('Publish') {
                     export SIDEBAR_APP_URL=https://hypothes.is/app.html
                     export NOTEBOOK_APP_URL=https://hypothes.is/notebook
                     yarn version --no-git-tag-version --new-version ${newPkgVersion}
-
-                    yarn run sentry-cli releases --org hypothesis --project client new ${newPkgVersion}
-                    yarn run sentry-cli releases --org hypothesis --project client files ${newPkgVersion} upload-sourcemaps build/scripts/*.map
                     """
+
+                    uploadFilesToSentry(cdnURL, newPkgVersion)
 
                     // Create GitHub release with changes since previous release.
                     sh "scripts/create-github-release.js v${pkgVersion}"
@@ -245,4 +246,17 @@ String bumpMinorVersion(String version) {
     def newMinorVersion = parts[1].toInteger() + 1
 
     return "${parts[0]}.${newMinorVersion}.${parts[2]}"
+}
+
+// Upload the source files and sourcemaps for a new release to Sentry.
+//
+// See https://docs.sentry.io/product/cli/releases/#sentry-cli-sourcemaps.
+void uploadFilesToSentry(String cdnURL, String version) {
+  def sentryCmd = "yarn run sentry-cli releases --org hypothesis --project client"
+
+  sh """
+${sentryCmd} new ${version}
+${sentryCmd} files ${version} upload-sourcemaps --url-prefix ${cdnURL}/${version}/build/scripts/ build/scripts/
+${sentryCmd} finalize ${version}
+"""
 }
