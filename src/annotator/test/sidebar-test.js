@@ -454,6 +454,16 @@ describe('Sidebar', () => {
 
         assert.called(onHelpRequest);
       }));
+
+    describe('on "anchorsChanged" event', () => {
+      it('updates the bucket bar', () => {
+        const sidebar = createSidebar();
+
+        emitEvent('anchorsChanged');
+
+        assert.calledOnce(sidebar.bucketBar.update);
+      });
+    });
   });
 
   describe('pan gestures', () => {
@@ -946,12 +956,6 @@ describe('Sidebar', () => {
         fakeGuest,
         sinon.match({ contentContainer })
       );
-    });
-
-    it('updates the bucket bar when an `anchorsChanged` event is received', () => {
-      const sidebar = createSidebar();
-      sidebar._emitter.publish('anchorsChanged');
-      assert.calledOnce(sidebar.bucketBar.update);
     });
   });
 });
