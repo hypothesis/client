@@ -117,7 +117,7 @@ export default class Sidebar {
         const bucketBar = new BucketBar(this.iframeContainer, guest, {
           contentContainer: guest.contentContainer(),
         });
-        this._emitter.subscribe('anchorsChanged', () => bucketBar.update());
+        this._guestRPC.on('anchorsChanged', () => bucketBar.update());
         this.bucketBar = bucketBar;
       }
 

@@ -30,7 +30,6 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
  * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
- * @typedef {import('./util/emitter').EventBus} EventBus
  */
 
 /**
@@ -122,16 +121,13 @@ export default class Guest {
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {EventBus} eventBus -
-   *   Enables communication between components sharing the same eventBus
    * @param {Record<string, any>} [config]
    * @param {Window} [hostFrame] -
    *   Host frame which this guest is associated with. This is expected to be
    *   an ancestor of the guest frame. It may be same or cross origin.
    */
-  constructor(element, eventBus, config = {}, hostFrame = window) {
+  constructor(element, config = {}, hostFrame = window) {
     this.element = element;
-    this._emitter = eventBus.createEmitter();
     this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
@@ -440,7 +436,6 @@ export default class Guest {
     removeAllHighlights(this.element);
 
     this._integration.destroy();
-    this._emitter.destroy();
     this._sidebarRPC.destroy();
   }
 
@@ -593,8 +588,8 @@ export default class Guest {
    */
   _updateAnchors(anchors, notify) {
     this.anchors = anchors;
-    if (notify) {
-      this._emitter.publish('anchorsChanged', this.anchors);
+    if (notify && this._frameIdentifier === null) {
+      this._hostRPC.call('anchorsChanged');
     }
   }
 

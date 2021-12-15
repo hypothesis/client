@@ -1,6 +1,5 @@
 import { delay } from '../../test-util/wait';
 import Guest, { $imports } from '../guest';
-import { EventBus } from '../util/emitter';
 
 class FakeAdder {
   constructor(container, options) {
@@ -30,7 +29,6 @@ class FakeTextRange {
 
 describe('Guest', () => {
   const sandbox = sinon.createSandbox();
-  let eventBus;
   let guests;
   let highlighter;
   let hostFrame;
@@ -45,8 +43,7 @@ describe('Guest', () => {
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
-    eventBus = new EventBus();
-    const guest = new Guest(element, eventBus, config, hostFrame);
+    const guest = new Guest(element, config, hostFrame);
     guests.push(guest);
     return guest;
   };
@@ -146,60 +143,6 @@ describe('Guest', () => {
     guests.forEach(guest => guest.destroy());
     sandbox.restore();
     $imports.$restore();
-  });
-
-  describe('communication with sidebar component', () => {
-    describe('event subscription', () => {
-      let emitter;
-      let guest;
-
-      beforeEach(() => {
-        guest = createGuest();
-        emitter = eventBus.createEmitter();
-      });
-
-      afterEach(() => {
-        emitter.destroy();
-      });
-
-      it('proxies the event into the annotator event system', () => {
-        const fooHandler = sandbox.stub();
-        const barHandler = sandbox.stub();
-
-        emitter.subscribe('foo', fooHandler);
-        emitter.subscribe('bar', barHandler);
-
-        guest._emitter.publish('foo', '1', '2');
-        guest._emitter.publish('bar', '1', '2');
-
-        assert.calledWith(fooHandler, '1', '2');
-        assert.calledWith(barHandler, '1', '2');
-      });
-    });
-
-    describe('event publication', () => {
-      let emitter;
-      let guest;
-
-      beforeEach(() => {
-        guest = createGuest();
-        emitter = eventBus.createEmitter();
-      });
-
-      it('proxies all other events into the annotator event system', () => {
-        const fooHandler = sandbox.stub();
-        const barHandler = sandbox.stub();
-
-        guest._emitter.subscribe('foo', fooHandler);
-        guest._emitter.subscribe('bar', barHandler);
-
-        emitter.publish('foo', '1', '2');
-        emitter.publish('bar', '1', '2');
-
-        assert.calledWith(fooHandler, '1', '2');
-        assert.calledWith(barHandler, '1', '2');
-      });
-    });
   });
 
   describe('events from sidebar frame', () => {
@@ -405,7 +348,6 @@ describe('Guest', () => {
         emitSidebarEvent('loadAnnotations', [ann1, ann2]);
         await delay(0);
 
-        assert.calledTwice(fakeBridge.call);
         assert.calledWith(
           fakeBridge.call,
           'syncAnchoringStatus',
@@ -421,14 +363,11 @@ describe('Guest', () => {
 
     describe('on "deleteAnnotation" event', () => {
       it('detaches annotation', () => {
-        const guest = createGuest();
-        const callback = sinon.stub();
-        guest._emitter.subscribe('anchorsChanged', callback);
+        createGuest();
 
         emitSidebarEvent('deleteAnnotation', 'tag1');
 
-        assert.calledOnce(callback);
-        assert.calledWith(callback, []);
+        assert.deepEqual(fakeBridge.call.lastCall.args, ['anchorsChanged']);
       });
     });
   });
@@ -1046,15 +985,16 @@ describe('Guest', () => {
       });
     });
 
-    it('emits an `anchorsChanged` event', async () => {
+    it('calls "syncAnchoringStatus" RPC method', async () => {
       const guest = createGuest();
       const annotation = {};
-      const anchorsChanged = sandbox.stub();
-      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
 
       await guest.anchor(annotation);
 
-      assert.calledWith(anchorsChanged, guest.anchors);
+      assert.match(fakeBridge.call.lastCall.args, [
+        'syncAnchoringStatus',
+        annotation,
+      ]);
     });
 
     it('returns a promise of the anchors for the annotation', () => {
@@ -1190,15 +1130,13 @@ describe('Guest', () => {
       );
     });
 
-    it('emits an `anchorsChanged` event with updated anchors', () => {
+    it('calls "anchorsChanged" RPC method', () => {
       const guest = createGuest();
       const anchor = createAnchor();
-      const anchorsChanged = sandbox.stub();
-      guest._emitter.subscribe('anchorsChanged', anchorsChanged);
 
       guest.detach(anchor.annotation.$tag);
 
-      assert.calledWith(anchorsChanged, guest.anchors);
+      assert.deepEqual(fakeBridge.call.lastCall.args, ['anchorsChanged']);
     });
   });
 

@@ -2,7 +2,6 @@
 // with various combinations of selector are anchored.
 
 import Guest, { $imports as guestImports } from '../../guest';
-import { EventBus } from '../../util/emitter';
 import testPageHTML from './test-page.html';
 
 function quoteSelector(quote) {
@@ -49,7 +48,6 @@ describe('anchoring', () => {
     container = document.createElement('div');
     container.innerHTML = testPageHTML;
     document.body.appendChild(container);
-    const eventBus = new EventBus();
     const fakePortFinder = {
       discover: sinon.stub().resolves(new MessageChannel().port1),
       destroy: sinon.stub(),
@@ -59,7 +57,7 @@ describe('anchoring', () => {
         PortFinder: sinon.stub().returns(fakePortFinder),
       },
     });
-    guest = new Guest(container, eventBus);
+    guest = new Guest(container);
   });
 
   afterEach(() => {

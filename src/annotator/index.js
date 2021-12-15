@@ -42,8 +42,7 @@ function init() {
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
   // Create the guest that handles creating annotations and displaying highlights.
-  const eventBus = new EventBus();
-  const guest = new Guest(document.body, eventBus, annotatorConfig, hostFrame);
+  const guest = new Guest(document.body, annotatorConfig, hostFrame);
 
   let sidebar;
   let notebook;
@@ -55,6 +54,7 @@ function init() {
     portProvider = new PortProvider(hypothesisAppsOrigin);
     portProvider.listen();
 
+    const eventBus = new EventBus();
     sidebar = new Sidebar(document.body, eventBus, guest, sidebarConfig);
     notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
