@@ -42,7 +42,8 @@ function bundleConfig({ name, entry }) {
       // and "webpack:") that Sentry feeds through the module URL => module path
       // cleaning process.
       sourcemapPathTransform: sourcePath => {
-        return sourcePath.replace(/^\.\.\/\.\.\//, 'app:///');
+        const url = new URL(`app:///${sourcePath}`);
+        return url.toString();
       },
     },
     preserveEntrySignatures: false,
