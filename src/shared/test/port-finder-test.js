@@ -1,7 +1,9 @@
 import { delay } from '../../test-util/wait';
-import { PortFinder } from '../port-finder';
-
-const MAX_WAIT_FOR_PORT = 1000 * 10;
+import {
+  MAX_WAIT_FOR_PORT,
+  POLLING_INTERVAL_FOR_PORT,
+  PortFinder,
+} from '../port-finder';
 
 describe('PortFinder', () => {
   const frame1 = 'guest';
@@ -122,7 +124,10 @@ describe('PortFinder', () => {
         clock.restore();
       }
 
-      assert.callCount(window.postMessage, 41);
+      const expectedCalls =
+        Math.floor(MAX_WAIT_FOR_PORT / POLLING_INTERVAL_FOR_PORT) + 1;
+
+      assert.callCount(window.postMessage, expectedCalls);
       assert.alwaysCalledWithExactly(
         window.postMessage,
         { frame1, frame2: target, type: 'request' },
