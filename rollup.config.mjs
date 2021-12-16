@@ -15,10 +15,17 @@ if (isProd) {
   prodPlugins.push(
     terser({
       format: {
-        // Strip *all* comments from minified output. This works around an
-        // issue with column numbers in stack traces in Safari.
-        // See https://bugs.webkit.org/show_bug.cgi?id=221548.
+        // Strip *all* comments from minified output. This works around an issue
+        // with column numbers in stack traces in Safari. See
+        // https://bugs.webkit.org/show_bug.cgi?id=221548 and
+        // https://github.com/hypothesis/client/issues/4045.
         comments: false,
+
+        // Limit length of lines in output. This makes the minfied output easier
+        // to examine in tools that struggle with long lines and limits the
+        // impact of an issue with stack trace column numbers in Firefox.
+        // See https://github.com/hypothesis/client/issues/4045.
+        max_line_len: 1024,
       },
     })
   );
