@@ -11,7 +11,17 @@ import virtual from '@rollup/plugin-virtual';
 const isProd = process.env.NODE_ENV === 'production';
 const prodPlugins = [];
 if (isProd) {
-  prodPlugins.push(terser());
+  // Minify output.
+  prodPlugins.push(
+    terser({
+      format: {
+        // Strip *all* comments from minified output. This works around an
+        // issue with column numbers in stack traces in Safari.
+        // See https://bugs.webkit.org/show_bug.cgi?id=221548.
+        comments: false,
+      },
+    })
+  );
 
   // Eliminate debug-only imports.
   prodPlugins.push(
