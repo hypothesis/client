@@ -1,8 +1,11 @@
 import { ListenerCollection } from './listener-collection';
 import { isMessageEqual } from './port-util';
 
-const MAX_WAIT_FOR_PORT = 1000 * 10;
-const POLLING_INTERVAL_FOR_PORT = 250;
+/** Timeout for waiting for the host frame to respond to a port request. */
+export const MAX_WAIT_FOR_PORT = 1000 * 20;
+
+/** Polling interval for requests to the host frame for a port. */
+export const POLLING_INTERVAL_FOR_PORT = 250;
 
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
