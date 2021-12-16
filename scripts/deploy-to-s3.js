@@ -132,7 +132,7 @@ async function uploadPackageToS3(bucket, options) {
     // nb. When deploying to cdn.hypothes.is, the max-age seen by the browser is
     // the higher of the value here and CloudFlare's "Browser Cache TTL"
     // setting.
-    aliasCacheControl = 'public, max-age=1800, must-revalidate';
+    aliasCacheControl = 'public, s-maxage=300, max-age=60, must-revalidate';
   } else {
     aliasCacheControl = 'no-cache';
   }
