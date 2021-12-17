@@ -342,6 +342,16 @@ export default class Guest {
       }
     );
 
+    this._hostRPC.on(
+      'sidebarLayoutChanged',
+      /** @param {SidebarLayout} sidebarLayout */
+      sidebarLayout => {
+        if (this._frameIdentifier === null) {
+          this.fitSideBySide(sidebarLayout);
+        }
+      }
+    );
+
     // Discover and connect to the host frame. All RPC events must be
     // registered before creating the channel.
     const hostPort = await this._portFinder.discover('host');

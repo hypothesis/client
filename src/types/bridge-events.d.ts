@@ -73,7 +73,12 @@ export type HostToGuestEvent =
   /**
    * The host informs guests that text should be unselected, except in the guest with a given frame identifier
    */
-  | 'clearSelectionExceptIn';
+  | 'clearSelectionExceptIn'
+
+  /**
+   * The host informs guests that the sidebar layout has been changed.
+   */
+  | 'sidebarLayoutChanged';
 
 /**
  * Events that the host sends to the sidebar
