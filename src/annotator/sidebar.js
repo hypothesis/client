@@ -114,11 +114,9 @@ export default class Sidebar {
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
-        const bucketBar = new BucketBar(this.iframeContainer, guest, {
+        this.bucketBar = new BucketBar(this.iframeContainer, guest, {
           contentContainer: guest.contentContainer(),
         });
-        this._guestRPC.on('anchorsChanged', () => bucketBar.update());
-        this.bucketBar = bucketBar;
       }
 
       this.iframeContainer.appendChild(this.iframe);
@@ -283,6 +281,12 @@ export default class Sidebar {
         this._guestRPC.call('clearSelectionExceptIn', frameIdentifier);
       }
     );
+
+    // The listener will do nothing if the sidebar doesn't have a bucket bar
+    // (clean theme), but it is still actively listening.
+    this._guestRPC.on('anchorsChanged', () => {
+      this.bucketBar?.update();
+    });
   }
 
   _setupSidebarEvents() {
