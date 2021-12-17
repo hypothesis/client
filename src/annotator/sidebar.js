@@ -499,7 +499,6 @@ export default class Sidebar {
 
   open() {
     this._sidebarRPC.call('sidebarOpened');
-    this._emitter.publish('sidebarOpened');
 
     if (this.iframeContainer) {
       const width = this.iframeContainer.getBoundingClientRect().width;
