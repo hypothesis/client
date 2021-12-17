@@ -783,15 +783,14 @@ describe('Sidebar', () => {
           'sidebarLayoutChanged',
           sinon.match.any
         );
-        assert.calledWith(sidebar._emitter.publish, 'sidebarOpened');
-        assert.calledTwice(sidebar._emitter.publish);
+        assert.calledOnce(sidebar._emitter.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: true,
         });
 
         sidebar.close();
         assert.calledTwice(layoutChangeHandlerSpy);
-        assert.calledThrice(sidebar._emitter.publish);
+        assert.calledTwice(sidebar._emitter.publish);
         assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
           expanded: false,
           width: fakeToolbar.getWidth(),
