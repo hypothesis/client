@@ -183,7 +183,7 @@ describe('Guest', () => {
         assert.calledWith(fakeIntegration.fitSideBySide, dummyLayout);
       });
 
-      it('does not calls fitSideBySide if `Guest` is not the main annotatable frame', () => {
+      it('does not call fitSideBySide if `Guest` is not the main annotatable frame', () => {
         createGuest({ subFrameIdentifier: 'dummy' });
         const dummyLayout = {};
 

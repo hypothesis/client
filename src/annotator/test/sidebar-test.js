@@ -619,14 +619,17 @@ describe('Sidebar', () => {
       sidebar.onFrameConnected('dummy', port1);
 
       assert.notCalled(sidebarBridge().createChannel);
+      assert.notCalled(guestBridge().createChannel);
     });
 
     it('create RPC channels for recognized source frames', () => {
       const sidebar = createSidebar();
       const { port1 } = new MessageChannel();
       sidebar.onFrameConnected('sidebar', port1);
+      sidebar.onFrameConnected('guest', port1);
 
       assert.calledWith(sidebarBridge().createChannel, port1);
+      assert.calledWith(guestBridge().createChannel, port1);
     });
   });
 
