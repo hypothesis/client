@@ -18,7 +18,8 @@ describe('Sidebar', () => {
   let containers;
   let sidebars;
 
-  let fakeBridge;
+  let FakeBridge;
+  let fakeBridges;
   let FakeBucketBar;
   let fakeBucketBar;
   let fakeGuest;
@@ -34,13 +35,44 @@ describe('Sidebar', () => {
     window.requestAnimationFrame.restore();
   });
 
+  // Helpers for getting the channels used for host <-> guest/sidebar communication.
+  // These currently rely on knowing the implementation detail of which order
+  // the channels are created in.
+
+  const guestBridge = () => {
+    return fakeBridges[0];
+  };
+
+  const sidebarBridge = () => {
+    return fakeBridges[1];
+  };
+
+  const emitGuestEvent = (event, ...args) => {
+    const result = [];
+    for (let [evt, fn] of guestBridge().on.args) {
+      if (event === evt) {
+        result.push(fn(...args));
+      }
+    }
+    return result;
+  };
+
+  const emitSidebarEvent = (event, ...args) => {
+    const result = [];
+    for (let [evt, fn] of sidebarBridge().on.args) {
+      if (event === evt) {
+        result.push(fn(...args));
+      }
+    }
+    return result;
+  };
+
   /**
    * Simulate the sidebar application connecting with the host frame. This happens
    * when the sidebar has loaded and is ready.
    */
   const connectSidebarApp = () => {
-    const callback = fakeBridge.onConnect.getCall(0).args[0];
-
+    const callback = sidebarBridge().onConnect.getCall(0).args[0];
     callback();
   };
 
@@ -77,13 +109,18 @@ describe('Sidebar', () => {
     sidebars = [];
     containers = [];
 
-    fakeBridge = {
-      call: sinon.stub(),
-      createChannel: sinon.stub(),
-      on: sinon.stub(),
-      onConnect: sinon.stub(),
-      destroy: sinon.stub(),
-    };
+    fakeBridges = [];
+    FakeBridge = sinon.stub().callsFake(() => {
+      const bridge = {
+        call: sinon.stub(),
+        createChannel: sinon.stub(),
+        destroy: sinon.stub(),
+        on: sinon.stub(),
+        onConnect: sinon.stub(),
+      };
+      fakeBridges.push(bridge);
+      return bridge;
+    });
 
     fakeBucketBar = {
       destroy: sinon.stub(),
@@ -93,11 +130,7 @@ describe('Sidebar', () => {
 
     class FakeGuest {
       constructor() {
-        this.element = document.createElement('div');
         this.contentContainer = sinon.stub().returns(document.body);
-        this.createAnnotation = sinon.stub();
-        this.fitSideBySide = sinon.stub();
-        this.setHighlightsVisible = sinon.stub();
       }
     }
     fakeGuest = new FakeGuest();
@@ -121,7 +154,7 @@ describe('Sidebar', () => {
     });
 
     $imports.$mock({
-      '../shared/bridge': { Bridge: sinon.stub().returns(fakeBridge) },
+      '../shared/bridge': { Bridge: FakeBridge },
       '../shared/frame-error-capture': { sendErrorsTo: fakeSendErrorsTo },
       './bucket-bar': { default: FakeBucketBar },
       './config/app': { createAppConfig: fakeCreateAppConfig },
@@ -192,7 +225,7 @@ describe('Sidebar', () => {
     });
     window.dispatchEvent(event);
 
-    assert.calledWith(fakeBridge.call, 'frameDestroyed', 'frame-id');
+    assert.calledWith(sidebarBridge().call, 'frameDestroyed', 'frame-id');
   });
 
   function getConfigString(sidebar) {
@@ -237,36 +270,33 @@ describe('Sidebar', () => {
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(fakeBridge.call, 'createAnnotationIn', null);
+      assert.calledWith(guestBridge().call, 'createAnnotationIn', null);
     });
 
     it('creates an annotation in frame with selection when toolbar button is clicked', () => {
       createSidebar({});
 
-      // Make a text selection in another frame
-      const handler = fakeBridge.on
-        .getCalls()
-        .find(call => call.args[0] === 'textSelectedIn').args[1];
       const frameIdentifier = 'subframe identifier';
-      handler(frameIdentifier);
+      emitGuestEvent('textSelectedIn', frameIdentifier);
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(fakeBridge.call, 'createAnnotationIn', frameIdentifier);
+      assert.calledWith(
+        guestBridge().call,
+        'createAnnotationIn',
+        frameIdentifier
+      );
     });
 
     it('toggles create annotation button to "Annotation" when selection becomes non-empty', () => {
       const sidebar = createSidebar();
 
       const frameIdentifier = 'subframe identifier';
-      const handler = fakeBridge.on
-        .getCalls()
-        .find(call => call.args[0] === 'textSelectedIn').args[1];
-      handler(frameIdentifier);
+      emitGuestEvent('textSelectedIn', frameIdentifier);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
       assert.calledWith(
-        fakeBridge.call,
+        guestBridge().call,
         'clearSelectionExceptIn',
         frameIdentifier
       );
@@ -276,36 +306,23 @@ describe('Sidebar', () => {
       const sidebar = createSidebar();
 
       const frameIdentifier = null;
-      const handler = fakeBridge.on
-        .getCalls()
-        .find(call => call.args[0] === 'textUnselectedIn').args[1];
-      handler(frameIdentifier);
+      emitGuestEvent('textUnselectedIn', frameIdentifier);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
       assert.calledWith(
-        fakeBridge.call,
+        guestBridge().call,
         'clearSelectionExceptIn',
         frameIdentifier
       );
     });
   });
 
-  describe('sidebar RPC call handlers', () => {
-    const emitEvent = (event, ...args) => {
-      const result = [];
-      for (let [evt, fn] of fakeBridge.on.args) {
-        if (event === evt) {
-          result.push(fn(...args));
-        }
-      }
-      return result;
-    };
-
+  describe('events from sidebar frame', () => {
     describe('on "showHighlights" event', () => {
       it('makes all highlights visible', () => {
         createSidebar();
         assert.isFalse(fakeToolbar.highlightsVisible);
-        emitEvent('showHighlights');
+        emitSidebarEvent('showHighlights');
         assert.isTrue(fakeToolbar.highlightsVisible);
       });
     });
@@ -314,7 +331,7 @@ describe('Sidebar', () => {
       it('opens the frame', () => {
         const target = sandbox.stub(Sidebar.prototype, 'open');
         createSidebar();
-        emitEvent('openSidebar');
+        emitSidebarEvent('openSidebar');
         assert.called(target);
       }));
 
@@ -322,7 +339,7 @@ describe('Sidebar', () => {
       it('closes the frame', () => {
         const target = sandbox.stub(Sidebar.prototype, 'close');
         createSidebar();
-        emitEvent('closeSidebar');
+        emitSidebarEvent('closeSidebar');
         assert.called(target);
       }));
 
@@ -331,7 +348,7 @@ describe('Sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'hide').callThrough();
         sinon.stub(sidebar._emitter, 'publish');
-        emitEvent('openNotebook', 'mygroup');
+        emitSidebarEvent('openNotebook', 'mygroup');
         assert.calledWith(sidebar._emitter.publish, 'openNotebook', 'mygroup');
         assert.calledOnce(sidebar.hide);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
@@ -353,7 +370,7 @@ describe('Sidebar', () => {
         const onLoginRequest = sandbox.stub();
         createSidebar({ services: [{ onLoginRequest }] });
 
-        emitEvent('loginRequested');
+        emitSidebarEvent('loginRequested');
 
         assert.called(onLoginRequest);
       });
@@ -373,7 +390,7 @@ describe('Sidebar', () => {
           ],
         });
 
-        emitEvent('loginRequested');
+        emitSidebarEvent('loginRequested');
 
         assert.called(firstOnLogin);
         assert.notCalled(secondOnLogin);
@@ -393,7 +410,7 @@ describe('Sidebar', () => {
           ],
         });
 
-        emitEvent('loginRequested');
+        emitSidebarEvent('loginRequested');
 
         assert.notCalled(secondOnLogin);
         assert.notCalled(thirdOnLogin);
@@ -401,17 +418,17 @@ describe('Sidebar', () => {
 
       it('does not crash if there is no services', () => {
         createSidebar(); // No config.services
-        emitEvent('loginRequested');
+        emitSidebarEvent('loginRequested');
       });
 
       it('does not crash if services is an empty array', () => {
         createSidebar({ services: [] });
-        emitEvent('loginRequested');
+        emitSidebarEvent('loginRequested');
       });
 
       it('does not crash if the first service has no onLoginRequest', () => {
         createSidebar({ services: [{}] });
-        emitEvent('loginRequested');
+        emitSidebarEvent('loginRequested');
       });
     });
 
@@ -420,7 +437,7 @@ describe('Sidebar', () => {
         const onLogoutRequest = sandbox.stub();
         createSidebar({ services: [{ onLogoutRequest }] });
 
-        emitEvent('logoutRequested');
+        emitSidebarEvent('logoutRequested');
 
         assert.called(onLogoutRequest);
       }));
@@ -430,7 +447,7 @@ describe('Sidebar', () => {
         const onSignupRequest = sandbox.stub();
         createSidebar({ services: [{ onSignupRequest }] });
 
-        emitEvent('signupRequested');
+        emitSidebarEvent('signupRequested');
 
         assert.called(onSignupRequest);
       }));
@@ -440,7 +457,7 @@ describe('Sidebar', () => {
         const onProfileRequest = sandbox.stub();
         createSidebar({ services: [{ onProfileRequest }] });
 
-        emitEvent('profileRequested');
+        emitSidebarEvent('profileRequested');
 
         assert.called(onProfileRequest);
       }));
@@ -450,16 +467,18 @@ describe('Sidebar', () => {
         const onHelpRequest = sandbox.stub();
         createSidebar({ services: [{ onHelpRequest }] });
 
-        emitEvent('helpRequested');
+        emitSidebarEvent('helpRequested');
 
         assert.called(onHelpRequest);
       }));
+  });
 
+  describe('events from the guest frames', () => {
     describe('on "anchorsChanged" event', () => {
       it('updates the bucket bar', () => {
         const sidebar = createSidebar();
 
-        emitEvent('anchorsChanged');
+        emitGuestEvent('anchorsChanged');
 
         assert.calledOnce(sidebar.bucketBar.update);
       });
@@ -599,7 +618,7 @@ describe('Sidebar', () => {
       const { port1 } = new MessageChannel();
       sidebar.onFrameConnected('dummy', port1);
 
-      assert.notCalled(fakeBridge.createChannel);
+      assert.notCalled(sidebarBridge().createChannel);
     });
 
     it('create RPC channels for recognized source frames', () => {
@@ -607,7 +626,7 @@ describe('Sidebar', () => {
       const { port1 } = new MessageChannel();
       sidebar.onFrameConnected('sidebar', port1);
 
-      assert.calledWith(fakeBridge.createChannel, port1);
+      assert.calledWith(sidebarBridge().createChannel, port1);
     });
   });
 
@@ -615,13 +634,13 @@ describe('Sidebar', () => {
     it('shows highlights if "showHighlights" is set to "whenSidebarOpen"', () => {
       const sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' });
       sidebar.open();
-      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', true);
+      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', true);
     });
 
     it('does not show highlights otherwise', () => {
       const sidebar = createSidebar({ showHighlights: 'never' });
       sidebar.open();
-      assert.neverCalledWith(fakeBridge.call, 'setHighlightsVisible');
+      assert.neverCalledWith(sidebarBridge().call, 'setHighlightsVisible');
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -638,7 +657,7 @@ describe('Sidebar', () => {
       sidebar.open();
       sidebar.close();
 
-      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', false);
+      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', false);
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -657,7 +676,7 @@ describe('Sidebar', () => {
       const { port1 } = new MessageChannel();
       sidebar.onFrameConnected('guest', port1);
 
-      assert.calledWith(fakeBridge.createChannel, port1);
+      assert.calledWith(guestBridge().createChannel, port1);
     });
   });
 
@@ -665,10 +684,10 @@ describe('Sidebar', () => {
     it('requests sidebar to set highlight visibility in guest frames', () => {
       const sidebar = createSidebar();
       sidebar.setHighlightsVisible(true);
-      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', true);
+      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', true);
 
       sidebar.setHighlightsVisible(false);
-      assert.calledWith(fakeBridge.call, 'setHighlightsVisible', false);
+      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', false);
     });
 
     it('toggles "Show highlights" control in toolbar', () => {
@@ -774,49 +793,25 @@ describe('Sidebar', () => {
         frame.remove();
       });
 
-      it('notifies when sidebar changes expanded state', () => {
-        sinon.stub(sidebar._emitter, 'publish');
+      it('calls the "sidebarLayoutChanged" RPC method when sidebar changes expanded state', () => {
+        guestBridge().call.resetHistory();
         sidebar.open();
-        assert.calledOnce(layoutChangeHandlerSpy);
+        assert.calledOnce(guestBridge().call);
         assert.calledWith(
-          sidebar._emitter.publish,
+          guestBridge().call,
           'sidebarLayoutChanged',
           sinon.match.any
         );
-        assert.calledOnce(sidebar._emitter.publish);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assertLayoutValues(guestBridge().call.lastCall.args[1], {
           expanded: true,
         });
 
         sidebar.close();
-        assert.calledTwice(layoutChangeHandlerSpy);
-        assert.calledTwice(sidebar._emitter.publish);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assert.calledTwice(guestBridge().call);
+        assertLayoutValues(guestBridge().call.lastCall.args[1], {
           expanded: false,
           width: fakeToolbar.getWidth(),
         });
-      });
-
-      it('attempts to fit the content alongside the sidebar', () => {
-        fakeGuest.fitSideBySide.resetHistory();
-        sidebar.open();
-        assert.calledWith(
-          fakeGuest.fitSideBySide,
-          sinon.match({
-            expanded: true,
-            width: DEFAULT_WIDTH + fakeToolbar.getWidth(),
-          })
-        );
-
-        fakeGuest.fitSideBySide.resetHistory();
-        sidebar.close();
-        assert.calledWith(
-          fakeGuest.fitSideBySide,
-          sinon.match({
-            expanded: false,
-            width: fakeToolbar.getWidth(),
-          })
-        );
       });
 
       it('notifies when sidebar is panned left', () => {
