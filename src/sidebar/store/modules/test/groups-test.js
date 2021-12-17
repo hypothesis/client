@@ -108,11 +108,11 @@ describe('sidebar/store/modules/groups', () => {
 
     it('resets focused group if it is not contained in filtered groups', () => {
       store.loadGroups([publicGroup, privateGroup]);
-      store.focusGroup(publicGroup);
-      assert.equal(store.focusedGroupId(), publicGroup.id);
-
-      store.filterGroups([privateGroup.id]);
+      store.focusGroup(privateGroup.id);
       assert.equal(store.focusedGroupId(), privateGroup.id);
+
+      store.filterGroups([publicGroup.id]);
+      assert.equal(store.focusedGroupId(), publicGroup.id);
     });
   });
 
