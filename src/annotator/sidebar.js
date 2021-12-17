@@ -134,8 +134,6 @@ export default class Sidebar {
       sendErrorsTo(this.iframe.contentWindow);
     }
 
-    this.guest = guest;
-
     this._listeners = new ListenerCollection();
 
     // Set up the toolbar on the left edge of the sidebar.
@@ -430,9 +428,7 @@ export default class Sidebar {
       this.onLayoutChange(layoutState);
     }
 
-    this.guest.fitSideBySide(layoutState);
-
-    this._emitter.publish('sidebarLayoutChanged', layoutState);
+    this._guestRPC.call('sidebarLayoutChanged', layoutState);
   }
 
   /**
