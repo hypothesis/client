@@ -743,6 +743,11 @@ describe('Sidebar', () => {
     describe('with the frame set up as default', () => {
       let sidebar;
       let frame;
+      let layoutChangeHandlerSpy;
+
+      const lastLayoutChange = () => {
+        return layoutChangeHandlerSpy.lastCall.args[0];
+      };
 
       beforeEach(() => {
         layoutChangeHandlerSpy = sandbox.stub();
@@ -785,14 +790,14 @@ describe('Sidebar', () => {
         );
         assert.calledWith(sidebar._emitter.publish, 'sidebarOpened');
         assert.calledTwice(sidebar._emitter.publish);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assertLayoutValues(lastLayoutChange(), {
           expanded: true,
         });
 
         sidebar.close();
         assert.calledTwice(layoutChangeHandlerSpy);
         assert.calledThrice(sidebar._emitter.publish);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assertLayoutValues(lastLayoutChange(), {
           expanded: false,
           width: fakeToolbar.getWidth(),
         });
@@ -823,7 +828,7 @@ describe('Sidebar', () => {
       it('notifies when sidebar is panned left', () => {
         sidebar._gestureState = { initial: -DEFAULT_WIDTH };
         sidebar._onPan({ type: 'panleft', deltaX: -50 });
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assertLayoutValues(lastLayoutChange(), {
           width: DEFAULT_WIDTH + 50 + fakeToolbar.getWidth(),
         });
       });
@@ -831,7 +836,7 @@ describe('Sidebar', () => {
       it('notifies when sidebar is panned right', () => {
         sidebar._gestureState = { initial: -DEFAULT_WIDTH };
         sidebar._onPan({ type: 'panright', deltaX: 50 });
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assertLayoutValues(lastLayoutChange(), {
           width: DEFAULT_WIDTH - 50 + fakeToolbar.getWidth(),
         });
       });
@@ -840,6 +845,11 @@ describe('Sidebar', () => {
     describe('with the frame in an external container', () => {
       let sidebar;
       let externalFrame;
+      let layoutChangeHandlerSpy;
+
+      const lastLayoutChange = () => {
+        return layoutChangeHandlerSpy.lastCall.args[0];
+      };
 
       beforeEach(() => {
         externalFrame = createExternalContainer();
@@ -870,7 +880,7 @@ describe('Sidebar', () => {
       it('notifies when sidebar changes expanded state', () => {
         sidebar.open();
         assert.calledOnce(layoutChangeHandlerSpy);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assertLayoutValues(lastLayoutChange(), {
           expanded: true,
           width: DEFAULT_WIDTH,
           toolbarWidth: 0,
@@ -878,7 +888,7 @@ describe('Sidebar', () => {
 
         sidebar.close();
         assert.calledTwice(layoutChangeHandlerSpy);
-        assertLayoutValues(layoutChangeHandlerSpy.lastCall.args[0], {
+        assertLayoutValues(lastLayoutChange(), {
           expanded: false,
           width: 0,
           toolbarWidth: 0,
