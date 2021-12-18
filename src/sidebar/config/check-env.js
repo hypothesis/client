@@ -26,9 +26,10 @@ export function checkEnvironment(window) {
     return false;
   }
 
-  // The client can't work if loaded in the wrong origin or an opaque origin
+  // The sidebar can't work if loaded in the wrong origin or an opaque origin
   // because various cross-frame messaging (eg. login window, host <-> sidebar
-  // RPC) set an origin filter on `postMessage` calls.
+  // RPC) set an origin filter on `postMessage` calls to the sidebar frame for
+  // security.
   if (window.origin === 'null') {
     console.warn(
       `Hypothesis has been loaded in a sandboxed frame. This is not supported.`
