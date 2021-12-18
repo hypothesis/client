@@ -17,6 +17,10 @@ const maxEventsToSendPerSession = 5;
 let removeFrameErrorHandler = null;
 
 function currentScriptOrigin() {
+  // It might be possible to simplify this as `url` appears to be required
+  // according to the HTML spec.
+  //
+  // See https://html.spec.whatwg.org/multipage/webappapis.html#hostgetimportmetaproperties.
   let url = import.meta.url;
   if (!url) {
     return null;
