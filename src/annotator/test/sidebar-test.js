@@ -944,5 +944,17 @@ describe('Sidebar', () => {
       });
       assert.isNull(sidebar.bucketBar);
     });
+
+    it('calls the "selectAnnotations" RPC method', () => {
+      const sidebar = createSidebar();
+      connectGuest(sidebar);
+      const { onSelectAnnotations } = FakeBucketBar.getCall(0).args[2];
+      const tags = ['t1', 't2'];
+      const toggle = true;
+
+      onSelectAnnotations(tags, toggle);
+
+      assert.calledWith(guestRPC().call, 'selectAnnotations', tags, true);
+    });
   });
 });

@@ -198,8 +198,8 @@ describe('Buckets', () => {
       assert.calledOnce(fakeOnSelectAnnotations);
       const call = fakeOnSelectAnnotations.getCall(0);
       assert.deepEqual(call.args[0], [
-        fakeBuckets[0].anchors[0].annotation,
-        fakeBuckets[0].anchors[1].annotation,
+        fakeBuckets[0].anchors[0].annotation.$tag,
+        fakeBuckets[0].anchors[1].annotation.$tag,
       ]);
       assert.equal(call.args[1], false);
     });

@@ -114,7 +114,12 @@ export default class Sidebar {
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
-        this.bucketBar = new BucketBar(this.iframeContainer, guest);
+        this.bucketBar = new BucketBar(this.iframeContainer, guest, {
+          onSelectAnnotations: (tags, toggle) =>
+            this._guestRPC.forEach(rpc =>
+              rpc.call('selectAnnotations', tags, toggle)
+            ),
+        });
       }
 
       this.iframeContainer.appendChild(this.iframe);

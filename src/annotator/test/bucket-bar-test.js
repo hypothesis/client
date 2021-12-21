@@ -6,6 +6,7 @@ describe('BucketBar', () => {
   let container;
   let fakeBucketUtil;
   let fakeGuest;
+  let fakeOnSelectAnnotations;
 
   beforeEach(() => {
     bucketBars = [];
@@ -21,6 +22,8 @@ describe('BucketBar', () => {
       scrollToAnchor: sinon.stub(),
       selectAnnotations: sinon.stub(),
     };
+
+    fakeOnSelectAnnotations = sinon.stub();
 
     const FakeBuckets = props => {
       bucketProps = props;
@@ -40,7 +43,9 @@ describe('BucketBar', () => {
   });
 
   const createBucketBar = () => {
-    const bucketBar = new BucketBar(container, fakeGuest);
+    const bucketBar = new BucketBar(container, fakeGuest, {
+      onSelectAnnotations: fakeOnSelectAnnotations,
+    });
     bucketBars.push(bucketBar);
     return bucketBar;
   };
@@ -51,13 +56,13 @@ describe('BucketBar', () => {
     assert.ok(bucketBar._bucketsContainer.querySelector('.FakeBuckets'));
   });
 
-  it('should select annotations when Buckets component invokes callback', () => {
+  it('passes "onSelectAnnotations" to the Bucket component', () => {
     createBucketBar();
-    const fakeAnnotations = ['hi', 'there'];
+    const tags = ['t1', 't2'];
 
-    bucketProps.onSelectAnnotations(fakeAnnotations, true);
+    bucketProps.onSelectAnnotations(tags, true);
 
-    assert.calledWith(fakeGuest.selectAnnotations, fakeAnnotations, true);
+    assert.calledWith(fakeOnSelectAnnotations, tags, true);
   });
 
   it('should scroll to anchor when Buckets component invokes callback', () => {

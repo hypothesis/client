@@ -62,9 +62,9 @@ function nearestPositionedAncestor(el) {
 
 /**
  * @typedef AdderOptions
- * @prop {() => any} onAnnotate - Callback invoked when "Annotate" button is clicked
- * @prop {() => any} onHighlight - Callback invoked when "Highlight" button is clicked
- * @prop {(annotations: object[]) => any} onShowAnnotations -
+ * @prop {() => void} onAnnotate - Callback invoked when "Annotate" button is clicked
+ * @prop {() => void} onHighlight - Callback invoked when "Highlight" button is clicked
+ * @prop {(tags: string[]) => void} onShowAnnotations -
  *   Callback invoked when  "Show" button is clicked
  *
  * @typedef {import('../types/annotator').Destroyable} Destroyable
@@ -126,11 +126,11 @@ export class Adder {
     this._onShowAnnotations = options.onShowAnnotations;
 
     /**
-     * Annotation objects associated with the current selection. If non-empty,
+     * Annotation tags associated with the current selection. If non-empty,
      * a "Show" button appears in the toolbar. Clicking the button calls the
      * `onShowAnnotations` callback with the current value of `annotationsForSelection`.
      *
-     * @type {object[]}
+     * @type {string[]}
      */
     this.annotationsForSelection = [];
 

@@ -76,6 +76,11 @@ export type HostToGuestEvent =
   | 'clearSelectionExceptIn'
 
   /**
+   * The host informs guests to select/toggle on a set of annotations
+   */
+  | 'selectAnnotations'
+
+  /**
    * The host informs guests that the sidebar layout has been changed.
    */
   | 'sidebarLayoutChanged';
