@@ -16,13 +16,16 @@ import { anchorBuckets } from './util/buckets';
 export default class BucketBar {
   /**
    * @param {HTMLElement} container
-   * @param {Pick<import('./guest').default, 'anchors'|'scrollToAnchor'|'selectAnnotations'>} guest
+   * @param {Pick<import('./guest').default, 'anchors'|'scrollToAnchor'>} guest
+   * @param {object} options
+   *   @param {(tags: string[], toggle: boolean) => void} options.onSelectAnnotations
    */
-  constructor(container, guest) {
+  constructor(container, guest, { onSelectAnnotations }) {
     this._bucketsContainer = document.createElement('div');
     container.appendChild(this._bucketsContainer);
 
     this._guest = guest;
+    this._onSelectAnnotations = onSelectAnnotations;
 
     // Immediately render the buckets for the current anchors.
     this.update();
@@ -40,8 +43,8 @@ export default class BucketBar {
         above={buckets.above}
         below={buckets.below}
         buckets={buckets.buckets}
-        onSelectAnnotations={(annotations, toggle) =>
-          this._guest.selectAnnotations(annotations, toggle)
+        onSelectAnnotations={(tags, toogle) =>
+          this._onSelectAnnotations(tags, toogle)
         }
         scrollToAnchor={anchor => this._guest.scrollToAnchor(anchor)}
       />,

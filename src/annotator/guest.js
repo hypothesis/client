@@ -40,34 +40,33 @@ import { normalizeURI } from './util/url';
  */
 
 /**
- * Return all the annotations associated with the selected text.
+ * Return all the annotations tags associated with the selected text.
  *
- * @return {AnnotationData[]}
+ * @return {string[]}
  */
 function annotationsForSelection() {
   const selection = /** @type {Selection} */ (window.getSelection());
   const range = selection.getRangeAt(0);
-  const items = rangeUtil.itemsForRange(
+  const tags = rangeUtil.itemsForRange(
     range,
-
-    // nb. Only non-nullish items are returned by `itemsForRange`.
-    node => /** @type {AnnotationHighlight} */ (node)._annotation
+    node => /** @type {AnnotationHighlight} */ (node)._annotation?.$tag
   );
-  return /** @type {AnnotationData[]} */ (items);
+  return tags;
 }
 
 /**
- * Return the annotations associated with any highlights that contain a given
+ * Return the annotation tags associated with any highlights that contain a given
  * DOM node.
  *
  * @param {Node} node
- * @return {AnnotationData[]}
+ * @return {string[]}
  */
 function annotationsAt(node) {
   const items = getHighlightsContainingNode(node)
     .map(h => /** @type {AnnotationHighlight} */ (h)._annotation)
-    .filter(ann => ann !== undefined);
-  return /** @type {AnnotationData[]} */ (items);
+    .filter(ann => ann !== undefined)
+    .map(ann => ann?.$tag);
+  return /** @type {string[]} */ (items);
 }
 
 /**
@@ -137,15 +136,9 @@ export default class Guest {
     this.selectedRanges = [];
 
     this._adder = new Adder(this.element, {
-      onAnnotate: async () => {
-        await this.createAnnotation();
-      },
-      onHighlight: async () => {
-        await this.createAnnotation({ highlight: true });
-      },
-      onShowAnnotations: anns => {
-        this.selectAnnotations(anns);
-      },
+      onAnnotate: () => this.createAnnotation(),
+      onHighlight: () => this.createAnnotation({ highlight: true }),
+      onShowAnnotations: tags => this.selectAnnotations(tags),
     });
 
     this._selectionObserver = new SelectionObserver(range => {
@@ -256,10 +249,10 @@ export default class Guest {
 
     this._listeners.add(this.element, 'mouseup', event => {
       const { target, metaKey, ctrlKey } = /** @type {MouseEvent} */ (event);
-      const annotations = annotationsAt(/** @type {Element} */ (target));
-      if (annotations.length && this._highlightsVisible) {
+      const tags = annotationsAt(/** @type {Element} */ (target));
+      if (tags.length && this._highlightsVisible) {
         const toggle = metaKey || ctrlKey;
-        this.selectAnnotations(annotations, toggle);
+        this.selectAnnotations(tags, toggle);
       }
     });
 
@@ -274,9 +267,9 @@ export default class Guest {
     });
 
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
-      const annotations = annotationsAt(/** @type {Element} */ (target));
-      if (annotations.length && this._highlightsVisible) {
-        this._focusAnnotations(annotations);
+      const tags = annotationsAt(/** @type {Element} */ (target));
+      if (tags.length && this._highlightsVisible) {
+        this._focusAnnotations(tags);
       }
     });
 
@@ -349,6 +342,15 @@ export default class Guest {
           this.createAnnotation();
         }
       }
+    );
+
+    this._hostRPC.on(
+      'selectAnnotations',
+      /**
+       * @param {string[]} tags
+       * @param {boolean} toggle
+       */
+      (tags, toggle) => this.selectAnnotations(tags, toggle)
     );
 
     this._hostRPC.on(
@@ -666,10 +668,9 @@ export default class Guest {
    * Indicate in the sidebar that certain annotations are focused (ie. the
    * associated document region(s) is hovered).
    *
-   * @param {AnnotationData[]} annotations
+   * @param {string[]} tags
    */
-  _focusAnnotations(annotations) {
-    const tags = annotations.map(a => a.$tag);
+  _focusAnnotations(tags) {
     this._sidebarRPC.call('focusAnnotations', tags);
   }
 
@@ -717,12 +718,11 @@ export default class Guest {
    * This sets up a filter in the sidebar to show only the selected annotations
    * and opens the sidebar.
    *
-   * @param {AnnotationData[]} annotations
+   * @param {string[]} tags
    * @param {boolean} [toggle] - Toggle whether the annotations are selected
    *   instead of showing them regardless of whether they are currently selected.
    */
-  selectAnnotations(annotations, toggle = false) {
-    const tags = annotations.map(a => a.$tag);
+  selectAnnotations(tags, toggle = false) {
     if (toggle) {
       this._sidebarRPC.call('toggleAnnotationSelection', tags);
     } else {

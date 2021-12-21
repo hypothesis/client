@@ -15,14 +15,14 @@ import { findClosestOffscreenAnchor } from '../util/buckets';
  *
  * @param {object} props
  *  @param {Bucket} props.bucket
- *  @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
+ *  @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
  */
 function BucketButton({ bucket, onSelectAnnotations }) {
-  const annotations = bucket.anchors.map(anchor => anchor.annotation);
   const buttonTitle = `Select nearby annotations (${bucket.anchors.length})`;
 
   function selectAnnotations(event) {
-    onSelectAnnotations(annotations, event.metaKey || event.ctrlKey);
+    const tags = bucket.anchors.map(anchor => anchor.annotation.$tag);
+    onSelectAnnotations(tags, event.metaKey || event.ctrlKey);
   }
 
   function setFocus(focusState) {
@@ -86,7 +86,7 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
  *   @param {Bucket} props.above
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets
- *   @param {(annotations: AnnotationData[], toggle: boolean) => any} props.onSelectAnnotations
+ *   @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
  *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
  *     scroll the document to a given anchor
  */

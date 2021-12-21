@@ -134,10 +134,12 @@ export function selectionFocusRect(selection) {
  * @template T
  * @param {Range} range
  * @param {(n: Node) => T} itemForNode - Callback returning the item for a given node
- * @return {T[]} items
+ * @return {NonNullable<T>[]} items
  */
 export function itemsForRange(range, itemForNode) {
+  /** @type {Set<Node>} */
   const checkedNodes = new Set();
+  /** @type {Set<NonNullable<T>>} */
   const items = new Set();
 
   forEachNodeInRange(range, node => {
@@ -149,8 +151,10 @@ export function itemsForRange(range, itemForNode) {
       }
       checkedNodes.add(current);
 
-      const item = itemForNode(current);
-      if (item) {
+      const item = /** @type {NonNullable<T>|null|undefined} */ (
+        itemForNode(current)
+      );
+      if (item !== null && item !== undefined) {
         items.add(item);
       }
 

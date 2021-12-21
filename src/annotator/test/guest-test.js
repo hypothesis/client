@@ -202,6 +202,21 @@ describe('Guest', () => {
         assert.notCalled(fakeIntegration.fitSideBySide);
       });
     });
+
+    describe('on "selectAnnotations" event', () => {
+      it('calls "Guest#selectAnnotations"', () => {
+        const guest = createGuest();
+        sandbox.stub(guest, 'selectAnnotations').callThrough();
+        const tags = ['t1', 't2'];
+        const toggle = true;
+        sidebarRPC().call.resetHistory();
+
+        emitHostEvent('selectAnnotations', tags, toggle);
+
+        assert.calledWith(guest.selectAnnotations, tags, toggle);
+        assert.calledWith(sidebarRPC().call, 'openSidebar');
+      });
+    });
   });
 
   describe('events from sidebar frame', () => {
@@ -590,14 +605,14 @@ describe('Guest', () => {
 
     it('sets the annotations associated with the selection', () => {
       createGuest();
-      const ann = {};
+      const ann = { $tag: 't1' };
       container._annotation = ann;
       rangeUtil.itemsForRange.callsFake((range, callback) => [
         callback(range.startContainer),
       ]);
       simulateSelectionWithText();
 
-      assert.deepEqual(FakeAdder.instance.annotationsForSelection, [ann]);
+      assert.deepEqual(FakeAdder.instance.annotationsForSelection, ['t1']);
     });
 
     it('hides the adder if the selection does not contain text', () => {
@@ -718,34 +733,32 @@ describe('Guest', () => {
 
     it('shows annotations if "Show" is clicked', () => {
       createGuest();
+      const tags = ['t1', 't2'];
 
-      FakeAdder.instance.options.onShowAnnotations([{ $tag: 'ann1' }]);
+      FakeAdder.instance.options.onShowAnnotations(tags);
 
       assert.calledWith(sidebarRPC().call, 'openSidebar');
-      assert.calledWith(sidebarRPC().call, 'showAnnotations', ['ann1']);
+      assert.calledWith(sidebarRPC().call, 'showAnnotations', tags);
     });
   });
 
   describe('#selectAnnotations', () => {
     it('selects the specified annotations in the sidebar', () => {
       const guest = createGuest();
-      const annotations = [{ $tag: 'ann1' }, { $tag: 'ann2' }];
+      const tags = ['t1', 't2'];
 
-      guest.selectAnnotations(annotations);
+      guest.selectAnnotations(tags);
 
-      assert.calledWith(sidebarRPC().call, 'showAnnotations', ['ann1', 'ann2']);
+      assert.calledWith(sidebarRPC().call, 'showAnnotations', tags);
     });
 
     it('toggles the annotations if `toggle` is true', () => {
       const guest = createGuest();
-      const annotations = [{ $tag: 'ann1' }, { $tag: 'ann2' }];
+      const tags = ['t1', 't2'];
 
-      guest.selectAnnotations(annotations, true /* toggle */);
+      guest.selectAnnotations(tags, true /* toggle */);
 
-      assert.calledWith(sidebarRPC().call, 'toggleAnnotationSelection', [
-        'ann1',
-        'ann2',
-      ]);
+      assert.calledWith(sidebarRPC().call, 'toggleAnnotationSelection', tags);
     });
 
     it('opens the sidebar', () => {
