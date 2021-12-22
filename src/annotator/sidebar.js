@@ -117,6 +117,10 @@ export default class Sidebar {
         this.bucketBar = new BucketBar(this.iframeContainer, guest, {
           onFocusAnnotations: tags =>
             this._guestRPC.forEach(rpc => rpc.call('focusAnnotations', tags)),
+          onScrollToClosestOffScreenAnchor: (tags, direction) =>
+            this._guestRPC.forEach(rpc =>
+              rpc.call('scrollToClosestOffScreenAnchor', tags, direction)
+            ),
           onSelectAnnotations: (tags, toggle) =>
             this._guestRPC.forEach(rpc =>
               rpc.call('selectAnnotations', tags, toggle)

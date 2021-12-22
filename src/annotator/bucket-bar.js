@@ -16,17 +16,27 @@ import { anchorBuckets } from './util/buckets';
 export default class BucketBar {
   /**
    * @param {HTMLElement} container
-   * @param {Pick<import('./guest').default, 'anchors'|'scrollToAnchor'>} guest
+   * @param {Pick<import('./guest').default, 'anchors'>} guest
    * @param {object} options
    *   @param {(tags: string[]) => void} options.onFocusAnnotations
+   *   @param {(tags: string[], direction: 'down'|'up') => void} options.onScrollToClosestOffScreenAnchor
    *   @param {(tags: string[], toggle: boolean) => void} options.onSelectAnnotations
    */
-  constructor(container, guest, { onFocusAnnotations, onSelectAnnotations }) {
+  constructor(
+    container,
+    guest,
+    {
+      onFocusAnnotations,
+      onScrollToClosestOffScreenAnchor,
+      onSelectAnnotations,
+    }
+  ) {
     this._bucketsContainer = document.createElement('div');
     container.appendChild(this._bucketsContainer);
 
     this._guest = guest;
     this._onFocusAnnotations = onFocusAnnotations;
+    this._onScrollToClosestOffScreenAnchor = onScrollToClosestOffScreenAnchor;
     this._onSelectAnnotations = onSelectAnnotations;
 
     // Immediately render the buckets for the current anchors.
@@ -46,10 +56,12 @@ export default class BucketBar {
         below={buckets.below}
         buckets={buckets.buckets}
         onFocusAnnotations={tags => this._onFocusAnnotations(tags)}
+        onScrollToClosestOffScreenAnchor={(tags, direction) =>
+          this._onScrollToClosestOffScreenAnchor(tags, direction)
+        }
         onSelectAnnotations={(tags, toogle) =>
           this._onSelectAnnotations(tags, toogle)
         }
-        scrollToAnchor={anchor => this._guest.scrollToAnchor(anchor)}
       />,
       this._bucketsContainer
     );

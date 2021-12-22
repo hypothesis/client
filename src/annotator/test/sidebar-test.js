@@ -956,6 +956,24 @@ describe('Sidebar', () => {
       assert.calledWith(guestRPC().call, 'focusAnnotations', tags);
     });
 
+    it('calls the "scrollToClosestOffScreenAnchor" RPC method', () => {
+      const sidebar = createSidebar();
+      connectGuest(sidebar);
+      const { onScrollToClosestOffScreenAnchor } =
+        FakeBucketBar.getCall(0).args[2];
+      const tags = ['t1', 't2'];
+      const direction = 'down';
+
+      onScrollToClosestOffScreenAnchor(tags, direction);
+
+      assert.calledWith(
+        guestRPC().call,
+        'scrollToClosestOffScreenAnchor',
+        tags,
+        direction
+      );
+    });
+
     it('calls the "selectAnnotations" RPC method', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);

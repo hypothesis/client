@@ -1,20 +1,31 @@
 import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-
-import Buckets, { $imports } from '../Buckets';
+import Buckets from '../Buckets';
 
 describe('Buckets', () => {
   let fakeAbove;
   let fakeBelow;
   let fakeBuckets;
-  let fakeBucketsUtil;
   let fakeOnFocusAnnotations;
+  let fakeOnScrollToClosestOffScreenAnchor;
   let fakeOnSelectAnnotations;
 
   beforeEach(() => {
-    fakeAbove = { anchors: ['hi', 'there'], position: 150 };
-    fakeBelow = { anchors: ['ho', 'there'], position: 550 };
+    fakeAbove = {
+      anchors: [
+        { annotation: { $tag: 'a1' }, highlights: ['hi'] },
+        { annotation: { $tag: 'a2' }, highlights: ['there'] },
+      ],
+      position: 150,
+    };
+    fakeBelow = {
+      anchors: [
+        { annotation: { $tag: 'b1' }, highlights: ['ho'] },
+        { annotation: { $tag: 'b2' }, highlights: ['there'] },
+      ],
+      position: 550,
+    };
     fakeBuckets = [
       {
         anchors: [
@@ -25,30 +36,20 @@ describe('Buckets', () => {
       },
       { anchors: ['you', 'also', 'are', 'welcome'], position: 350 },
     ];
-    fakeBucketsUtil = {
-      findClosestOffscreenAnchor: sinon.stub().returns({}),
-    };
     fakeOnFocusAnnotations = sinon.stub();
+    fakeOnScrollToClosestOffScreenAnchor = sinon.stub();
     fakeOnSelectAnnotations = sinon.stub();
-
-    $imports.$mock({
-      '../util/buckets': fakeBucketsUtil,
-    });
   });
 
-  afterEach(() => {
-    $imports.$restore();
-  });
-
-  const createComponent = props =>
+  const createComponent = () =>
     mount(
       <Buckets
         above={fakeAbove}
         below={fakeBelow}
         buckets={fakeBuckets}
         onFocusAnnotations={fakeOnFocusAnnotations}
+        onScrollToClosestOffScreenAnchor={fakeOnScrollToClosestOffScreenAnchor}
         onSelectAnnotations={fakeOnSelectAnnotations}
-        {...props}
       />
     );
 
@@ -93,37 +94,29 @@ describe('Buckets', () => {
     });
 
     it('scrolls to anchors above when up navigation button is pressed', () => {
-      const fakeAnchor = { highlights: ['hi'] };
-      fakeBucketsUtil.findClosestOffscreenAnchor.returns(fakeAnchor);
-      const scrollToAnchor = sinon.stub();
-      const wrapper = createComponent({ scrollToAnchor });
+      const wrapper = createComponent();
       const upButton = wrapper.find('.Buckets__button--up');
 
       upButton.simulate('click');
 
       assert.calledWith(
-        fakeBucketsUtil.findClosestOffscreenAnchor,
-        fakeAbove.anchors,
+        fakeOnScrollToClosestOffScreenAnchor,
+        ['a1', 'a2'],
         'up'
       );
-      assert.calledWith(scrollToAnchor, fakeAnchor);
     });
 
     it('scrolls to anchors below when down navigation button is pressed', () => {
-      const fakeAnchor = { highlights: ['hi'] };
-      fakeBucketsUtil.findClosestOffscreenAnchor.returns(fakeAnchor);
-      const scrollToAnchor = sinon.stub();
-      const wrapper = createComponent({ scrollToAnchor });
+      const wrapper = createComponent();
       const downButton = wrapper.find('.Buckets__button--down');
 
       downButton.simulate('click');
 
       assert.calledWith(
-        fakeBucketsUtil.findClosestOffscreenAnchor,
-        fakeBelow.anchors,
+        fakeOnScrollToClosestOffScreenAnchor,
+        ['b1', 'b2'],
         'down'
       );
-      assert.calledWith(scrollToAnchor, fakeAnchor);
     });
   });
 

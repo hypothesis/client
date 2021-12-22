@@ -18,6 +18,7 @@ import { HypothesisInjector } from './hypothesis-injector';
 import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
+import { findClosestOffscreenAnchor } from './util/buckets';
 import { normalizeURI } from './util/url';
 
 /**
@@ -351,6 +352,15 @@ export default class Guest {
     );
 
     this._hostRPC.on(
+      'scrollToClosestOffScreenAnchor',
+      /**
+       * @param {string[]} tags
+       * @param {'down'|'up'} direction
+       */
+      (tags, direction) => this._scrollToClosestOffScreenAnchor(tags, direction)
+    );
+
+    this._hostRPC.on(
       'selectAnnotations',
       /**
        * @param {string[]} tags
@@ -680,6 +690,22 @@ export default class Guest {
   }
 
   /**
+   * Scroll to the closest off screen anchor.
+   *
+   * @param {string[]} tags
+   * @param {'down'|'up'} direction
+   */
+  _scrollToClosestOffScreenAnchor(tags, direction) {
+    const anchors = this.anchors.filter(({ annotation }) =>
+      tags.includes(annotation.$tag)
+    );
+    const closest = findClosestOffscreenAnchor(anchors, direction);
+    if (closest) {
+      this._integration.scrollToAnchor(closest);
+    }
+  }
+
+  /**
    * Show or hide the adder toolbar when the selection changes.
    *
    * @param {Range} range
@@ -734,15 +760,6 @@ export default class Guest {
       this._sidebarRPC.call('showAnnotations', tags);
     }
     this._sidebarRPC.call('openSidebar');
-  }
-
-  /**
-   * Scroll the document content so that `anchor` is visible.
-   *
-   * @param {Anchor} anchor
-   */
-  scrollToAnchor(anchor) {
-    return this._integration.scrollToAnchor(anchor);
   }
 
   /**

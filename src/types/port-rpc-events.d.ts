@@ -91,7 +91,12 @@ export type HostToGuestEvent =
   /**
    * The host informs guests that the sidebar layout has been changed.
    */
-  | 'sidebarLayoutChanged';
+  | 'sidebarLayoutChanged'
+
+  /**
+   * The host informs guests to scroll to the closest off-screen anchor associated with a set of annotations.
+   */
+  | 'scrollToClosestOffScreenAnchor';
 
 /**
  * Events that the host sends to the sidebar
