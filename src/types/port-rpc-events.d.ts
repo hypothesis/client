@@ -79,6 +79,11 @@ export type HostToGuestEvent =
   | 'clearSelectionExceptIn'
 
   /**
+   * The host informs guests to focus on a set of annotations
+   */
+  | 'focusAnnotations'
+
+  /**
    * The host informs guests to select/toggle on a set of annotations
    */
   | 'selectAnnotations'

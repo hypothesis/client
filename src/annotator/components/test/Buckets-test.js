@@ -5,23 +5,12 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import Buckets, { $imports } from '../Buckets';
 
 describe('Buckets', () => {
-  let fakeBucketsUtil;
-  let fakeHighlighter;
-
   let fakeAbove;
   let fakeBelow;
   let fakeBuckets;
-
-  const createComponent = props =>
-    mount(
-      <Buckets
-        above={fakeAbove}
-        below={fakeBelow}
-        buckets={fakeBuckets}
-        onSelectAnnotations={() => null}
-        {...props}
-      />
-    );
+  let fakeBucketsUtil;
+  let fakeOnFocusAnnotations;
+  let fakeOnSelectAnnotations;
 
   beforeEach(() => {
     fakeAbove = { anchors: ['hi', 'there'], position: 150 };
@@ -39,12 +28,10 @@ describe('Buckets', () => {
     fakeBucketsUtil = {
       findClosestOffscreenAnchor: sinon.stub().returns({}),
     };
-    fakeHighlighter = {
-      setHighlightsFocused: sinon.stub(),
-    };
+    fakeOnFocusAnnotations = sinon.stub();
+    fakeOnSelectAnnotations = sinon.stub();
 
     $imports.$mock({
-      '../highlighter': fakeHighlighter,
       '../util/buckets': fakeBucketsUtil,
     });
   });
@@ -52,6 +39,18 @@ describe('Buckets', () => {
   afterEach(() => {
     $imports.$restore();
   });
+
+  const createComponent = props =>
+    mount(
+      <Buckets
+        above={fakeAbove}
+        below={fakeBelow}
+        buckets={fakeBuckets}
+        onFocusAnnotations={fakeOnFocusAnnotations}
+        onSelectAnnotations={fakeOnSelectAnnotations}
+        {...props}
+      />
+    );
 
   describe('up and down navigation', () => {
     it('renders an up navigation button if there are above-screen anchors', () => {
@@ -140,17 +139,8 @@ describe('Buckets', () => {
 
       wrapper.find('.Buckets__button--left').first().simulate('mousemove');
 
-      assert.calledTwice(fakeHighlighter.setHighlightsFocused);
-      assert.calledWith(
-        fakeHighlighter.setHighlightsFocused,
-        fakeBuckets[0].anchors[0].highlights,
-        true
-      );
-      assert.calledWith(
-        fakeHighlighter.setHighlightsFocused,
-        fakeBuckets[0].anchors[1].highlights,
-        true
-      );
+      assert.calledOnce(fakeOnFocusAnnotations);
+      assert.calledWith(fakeOnFocusAnnotations, ['t1', 't2']);
     });
 
     it('removes focus on associated anchors when element is blurred', () => {
@@ -158,17 +148,8 @@ describe('Buckets', () => {
 
       wrapper.find('.Buckets__button--left').first().simulate('blur');
 
-      assert.calledTwice(fakeHighlighter.setHighlightsFocused);
-      assert.calledWith(
-        fakeHighlighter.setHighlightsFocused,
-        fakeBuckets[0].anchors[0].highlights,
-        false
-      );
-      assert.calledWith(
-        fakeHighlighter.setHighlightsFocused,
-        fakeBuckets[0].anchors[1].highlights,
-        false
-      );
+      assert.calledOnce(fakeOnFocusAnnotations);
+      assert.calledWith(fakeOnFocusAnnotations, []);
     });
 
     it('removes focus on associated anchors when mouse leaves the element', () => {
@@ -176,19 +157,12 @@ describe('Buckets', () => {
 
       wrapper.find('.Buckets__button--left').first().simulate('mouseout');
 
-      assert.calledTwice(fakeHighlighter.setHighlightsFocused);
-      assert.calledWith(
-        fakeHighlighter.setHighlightsFocused,
-        fakeBuckets[0].anchors[0].highlights,
-        false
-      );
+      assert.calledOnce(fakeOnFocusAnnotations);
+      assert.calledWith(fakeOnFocusAnnotations, []);
     });
 
     it('selects associated annotations when bucket button pressed', () => {
-      const fakeOnSelectAnnotations = sinon.stub();
-      const wrapper = createComponent({
-        onSelectAnnotations: fakeOnSelectAnnotations,
-      });
+      const wrapper = createComponent();
 
       wrapper
         .find('.Buckets__button--left')
@@ -205,10 +179,7 @@ describe('Buckets', () => {
     });
 
     it('toggles annotation selection if metakey pressed', () => {
-      const fakeOnSelectAnnotations = sinon.stub();
-      const wrapper = createComponent({
-        onSelectAnnotations: fakeOnSelectAnnotations,
-      });
+      const wrapper = createComponent();
 
       wrapper
         .find('.Buckets__button--left')

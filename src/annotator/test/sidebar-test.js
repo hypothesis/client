@@ -945,6 +945,17 @@ describe('Sidebar', () => {
       assert.isNull(sidebar.bucketBar);
     });
 
+    it('calls the "focusAnnotations" RPC method', () => {
+      const sidebar = createSidebar();
+      connectGuest(sidebar);
+      const { onFocusAnnotations } = FakeBucketBar.getCall(0).args[2];
+      const tags = ['t1', 't2'];
+
+      onFocusAnnotations(tags);
+
+      assert.calledWith(guestRPC().call, 'focusAnnotations', tags);
+    });
+
     it('calls the "selectAnnotations" RPC method', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
