@@ -115,6 +115,8 @@ export default class Sidebar {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
         this.bucketBar = new BucketBar(this.iframeContainer, guest, {
+          onFocusAnnotations: tags =>
+            this._guestRPC.forEach(rpc => rpc.call('focusAnnotations', tags)),
           onSelectAnnotations: (tags, toggle) =>
             this._guestRPC.forEach(rpc =>
               rpc.call('selectAnnotations', tags, toggle)

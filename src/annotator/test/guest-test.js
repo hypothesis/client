@@ -203,6 +203,20 @@ describe('Guest', () => {
       });
     });
 
+    describe('on "focusAnnotations" event', () => {
+      it('calls "Guest#._focusAnnotations"', () => {
+        const guest = createGuest();
+        sandbox.stub(guest, '_focusAnnotations').callThrough();
+        const tags = ['t1', 't2'];
+        sidebarRPC().call.resetHistory();
+
+        emitHostEvent('focusAnnotations', tags);
+
+        assert.calledWith(guest._focusAnnotations, tags);
+        assert.calledWith(sidebarRPC().call, 'focusAnnotations', tags);
+      });
+    });
+
     describe('on "selectAnnotations" event', () => {
       it('calls "Guest#selectAnnotations"', () => {
         const guest = createGuest();

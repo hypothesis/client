@@ -6,6 +6,7 @@ describe('BucketBar', () => {
   let container;
   let fakeBucketUtil;
   let fakeGuest;
+  let fakeOnFocusAnnotations;
   let fakeOnSelectAnnotations;
 
   beforeEach(() => {
@@ -23,6 +24,7 @@ describe('BucketBar', () => {
       selectAnnotations: sinon.stub(),
     };
 
+    fakeOnFocusAnnotations = sinon.stub();
     fakeOnSelectAnnotations = sinon.stub();
 
     const FakeBuckets = props => {
@@ -44,6 +46,7 @@ describe('BucketBar', () => {
 
   const createBucketBar = () => {
     const bucketBar = new BucketBar(container, fakeGuest, {
+      onFocusAnnotations: fakeOnFocusAnnotations,
       onSelectAnnotations: fakeOnSelectAnnotations,
     });
     bucketBars.push(bucketBar);
@@ -54,6 +57,15 @@ describe('BucketBar', () => {
     const bucketBar = createBucketBar();
     assert.calledWith(fakeBucketUtil.anchorBuckets, fakeGuest.anchors);
     assert.ok(bucketBar._bucketsContainer.querySelector('.FakeBuckets'));
+  });
+
+  it('passes "onFocusAnnotations" to the Bucket component', () => {
+    createBucketBar();
+    const tags = ['t1', 't2'];
+
+    bucketProps.onFocusAnnotations(tags);
+
+    assert.calledWith(fakeOnFocusAnnotations, tags);
   });
 
   it('passes "onSelectAnnotations" to the Bucket component', () => {

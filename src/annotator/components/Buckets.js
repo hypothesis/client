@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 
-import { setHighlightsFocused } from '../highlighter';
 import { findClosestOffscreenAnchor } from '../util/buckets';
 
 /**
@@ -15,9 +14,10 @@ import { findClosestOffscreenAnchor } from '../util/buckets';
  *
  * @param {object} props
  *  @param {Bucket} props.bucket
+ *  @param {(tags: string[]) => void} props.onFocusAnnotations
  *  @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
  */
-function BucketButton({ bucket, onSelectAnnotations }) {
+function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
   const buttonTitle = `Select nearby annotations (${bucket.anchors.length})`;
 
   function selectAnnotations(event) {
@@ -25,10 +25,13 @@ function BucketButton({ bucket, onSelectAnnotations }) {
     onSelectAnnotations(tags, event.metaKey || event.ctrlKey);
   }
 
-  function setFocus(focusState) {
-    bucket.anchors.forEach(anchor => {
-      setHighlightsFocused(anchor.highlights || [], focusState);
-    });
+  function setFocus(hasFocus) {
+    if (hasFocus) {
+      const tags = bucket.anchors.map(anchor => anchor.annotation.$tag);
+      onFocusAnnotations(tags);
+    } else {
+      onFocusAnnotations([]);
+    }
   }
 
   return (
@@ -86,6 +89,7 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
  *   @param {Bucket} props.above
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets
+ *   @param {(tags: string[]) => void} props.onFocusAnnotations
  *   @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
  *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
  *     scroll the document to a given anchor
@@ -94,6 +98,7 @@ export default function Buckets({
   above,
   below,
   buckets,
+  onFocusAnnotations,
   onSelectAnnotations,
   scrollToAnchor,
 }) {
@@ -119,6 +124,7 @@ export default function Buckets({
         >
           <BucketButton
             bucket={bucket}
+            onFocusAnnotations={onFocusAnnotations}
             onSelectAnnotations={onSelectAnnotations}
           />
         </li>

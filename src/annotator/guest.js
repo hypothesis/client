@@ -269,13 +269,13 @@ export default class Guest {
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
       const tags = annotationsAt(/** @type {Element} */ (target));
       if (tags.length && this._highlightsVisible) {
-        this._focusAnnotations(tags);
+        this._sidebarRPC.call('focusAnnotations', tags);
       }
     });
 
     this._listeners.add(this.element, 'mouseout', () => {
       if (this._highlightsVisible) {
-        this._focusAnnotations([]);
+        this._sidebarRPC.call('focusAnnotations', []);
       }
     });
 
@@ -345,6 +345,12 @@ export default class Guest {
     );
 
     this._hostRPC.on(
+      'focusAnnotations',
+      /** @param {string[]} tags */
+      tags => this._focusAnnotations(tags)
+    );
+
+    this._hostRPC.on(
       'selectAnnotations',
       /**
        * @param {string[]} tags
@@ -375,17 +381,7 @@ export default class Guest {
     this._sidebarRPC.on(
       'focusAnnotations',
       /** @param {string[]} tags */
-      (tags = []) => {
-        this._focusedAnnotations.clear();
-        tags.forEach(tag => this._focusedAnnotations.add(tag));
-
-        for (let anchor of this.anchors) {
-          if (anchor.highlights) {
-            const toggle = tags.includes(anchor.annotation.$tag);
-            setHighlightsFocused(anchor.highlights, toggle);
-          }
-        }
-      }
+      tags => this._focusAnnotations(tags)
     );
 
     this._sidebarRPC.on(
@@ -670,6 +666,16 @@ export default class Guest {
    * @param {string[]} tags
    */
   _focusAnnotations(tags) {
+    this._focusedAnnotations.clear();
+    tags.forEach(tag => this._focusedAnnotations.add(tag));
+
+    for (let anchor of this.anchors) {
+      if (anchor.highlights) {
+        const toggle = tags.includes(anchor.annotation.$tag);
+        setHighlightsFocused(anchor.highlights, toggle);
+      }
+    }
+
     this._sidebarRPC.call('focusAnnotations', tags);
   }
 
