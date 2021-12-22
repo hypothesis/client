@@ -38,12 +38,13 @@ describe('Guest', () => {
   let FakeBucketBarClient;
   let fakeBucketBarClient;
   let fakeCreateIntegration;
-  let FakePortRPC;
-  let fakePortRPCs;
-  let fakeIntegration;
+  let fakeFindClosestOffscreenAnchor;
   let FakeHypothesisInjector;
   let fakeHypothesisInjector;
+  let fakeIntegration;
   let fakePortFinder;
+  let FakePortRPC;
+  let fakePortRPCs;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -120,6 +121,14 @@ describe('Guest', () => {
     };
     FakeBucketBarClient = sinon.stub().returns(fakeBucketBarClient);
 
+    fakeFindClosestOffscreenAnchor = sinon.stub();
+
+    fakeHypothesisInjector = {
+      destroy: sinon.stub(),
+      injectClient: sinon.stub().resolves(),
+    };
+    FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
+
     fakeIntegration = {
       anchor: sinon.stub(),
       canAnnotate: sinon.stub().returns(true),
@@ -167,14 +176,17 @@ describe('Guest', () => {
       './bucket-bar-client': {
         BucketBarClient: FakeBucketBarClient,
       },
+      './highlighter': highlighter,
+      './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
       './integrations': {
         createIntegration: fakeCreateIntegration,
       },
-      './highlighter': highlighter,
-      './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
       './range-util': rangeUtil,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
+      },
+      './util/buckets': {
+        findClosestOffscreenAnchor: fakeFindClosestOffscreenAnchor,
       },
     });
   });
@@ -207,7 +219,7 @@ describe('Guest', () => {
     });
 
     describe('on "focusAnnotations" event', () => {
-      it('calls "Guest#._focusAnnotations"', () => {
+      it('focus on annotations', () => {
         const guest = createGuest();
         sandbox.stub(guest, '_focusAnnotations').callThrough();
         const tags = ['t1', 't2'];
@@ -220,8 +232,31 @@ describe('Guest', () => {
       });
     });
 
+    describe('on "scrollToClosestOffScreenAnchor" event', () => {
+      it('scrolls to the nearest off-screen anchor"', () => {
+        const guest = createGuest();
+        guest.anchors = [
+          { annotation: { $tag: 't1' } },
+          { annotation: { $tag: 't2' } },
+        ];
+        const anchor = {};
+        fakeFindClosestOffscreenAnchor.returns(anchor);
+        const tags = ['t1', 't2'];
+        const direction = 'down';
+
+        emitHostEvent('scrollToClosestOffScreenAnchor', tags, direction);
+
+        assert.calledWith(
+          fakeFindClosestOffscreenAnchor,
+          guest.anchors,
+          direction
+        );
+        assert.calledWith(fakeIntegration.scrollToAnchor, anchor);
+      });
+    });
+
     describe('on "selectAnnotations" event', () => {
-      it('calls "Guest#selectAnnotations"', () => {
+      it('selects annotations', () => {
         const guest = createGuest();
         sandbox.stub(guest, 'selectAnnotations').callThrough();
         const tags = ['t1', 't2'];
@@ -750,17 +785,6 @@ describe('Guest', () => {
       guest.selectAnnotations([]);
 
       assert.calledWith(sidebarRPC().call, 'openSidebar');
-    });
-  });
-
-  describe('#scrollToAnchor', () => {
-    it("invokes the document integration's `scrollToAnchor` implementation", () => {
-      const guest = createGuest();
-      const anchor = {};
-
-      guest.scrollToAnchor(anchor);
-
-      assert.calledWith(fakeIntegration.scrollToAnchor, anchor);
     });
   });
 

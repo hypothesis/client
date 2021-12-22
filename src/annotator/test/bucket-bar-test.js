@@ -7,6 +7,7 @@ describe('BucketBar', () => {
   let fakeBucketUtil;
   let fakeGuest;
   let fakeOnFocusAnnotations;
+  let fakeOnScrollToClosestOffScreenAnchor;
   let fakeOnSelectAnnotations;
 
   beforeEach(() => {
@@ -25,6 +26,7 @@ describe('BucketBar', () => {
     };
 
     fakeOnFocusAnnotations = sinon.stub();
+    fakeOnScrollToClosestOffScreenAnchor = sinon.stub();
     fakeOnSelectAnnotations = sinon.stub();
 
     const FakeBuckets = props => {
@@ -47,6 +49,7 @@ describe('BucketBar', () => {
   const createBucketBar = () => {
     const bucketBar = new BucketBar(container, fakeGuest, {
       onFocusAnnotations: fakeOnFocusAnnotations,
+      onScrollToClosestOffScreenAnchor: fakeOnScrollToClosestOffScreenAnchor,
       onSelectAnnotations: fakeOnSelectAnnotations,
     });
     bucketBars.push(bucketBar);
@@ -68,6 +71,16 @@ describe('BucketBar', () => {
     assert.calledWith(fakeOnFocusAnnotations, tags);
   });
 
+  it('passes "onScrollToClosestOffScreenAnchor" to the Bucket component', () => {
+    createBucketBar();
+    const tags = ['t1', 't2'];
+    const direction = 'down';
+
+    bucketProps.onScrollToClosestOffScreenAnchor(tags, direction);
+
+    assert.calledWith(fakeOnScrollToClosestOffScreenAnchor, tags, direction);
+  });
+
   it('passes "onSelectAnnotations" to the Bucket component', () => {
     createBucketBar();
     const tags = ['t1', 't2'];
@@ -75,15 +88,6 @@ describe('BucketBar', () => {
     bucketProps.onSelectAnnotations(tags, true);
 
     assert.calledWith(fakeOnSelectAnnotations, tags, true);
-  });
-
-  it('should scroll to anchor when Buckets component invokes callback', () => {
-    createBucketBar();
-    const anchor = {};
-
-    bucketProps.scrollToAnchor(anchor);
-
-    assert.calledWith(fakeGuest.scrollToAnchor, anchor);
   });
 
   describe('#update', () => {

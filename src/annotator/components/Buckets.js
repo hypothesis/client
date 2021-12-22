@@ -1,10 +1,6 @@
 import classnames from 'classnames';
 
-import { findClosestOffscreenAnchor } from '../util/buckets';
-
 /**
- * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
- * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../util/buckets').Bucket} Bucket
  */
 
@@ -13,9 +9,9 @@ import { findClosestOffscreenAnchor } from '../util/buckets';
  * or selects associated annotations.
  *
  * @param {object} props
- *  @param {Bucket} props.bucket
- *  @param {(tags: string[]) => void} props.onFocusAnnotations
- *  @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
+ *   @param {Bucket} props.bucket
+ *   @param {(tags: string[]) => void} props.onFocusAnnotations
+ *   @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
  */
 function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
   const buttonTitle = `Select nearby annotations (${bucket.anchors.length})`;
@@ -55,18 +51,19 @@ function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
  *
  * @param {object} props
  *   @param {Bucket} props.bucket
- *   @param {'up'|'down'} props.direction
- *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
- *     scroll the document to a given anchor
+ *   @param {'down'|'up'} props.direction
+ *   @param {(tags: string[], direction: 'down'|'up') => void} props.onScrollToClosestOffScreenAnchor
  */
-function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
+function NavigationBucketButton({
+  bucket,
+  direction,
+  onScrollToClosestOffScreenAnchor,
+}) {
   const buttonTitle = `Go ${direction} to next annotations (${bucket.anchors.length})`;
 
   function scrollToClosest() {
-    const closest = findClosestOffscreenAnchor(bucket.anchors, direction);
-    if (closest) {
-      scrollToAnchor(closest);
-    }
+    const tags = bucket.anchors.map(anchor => anchor.annotation.$tag);
+    onScrollToClosestOffScreenAnchor(tags, direction);
   }
 
   return (
@@ -90,17 +87,16 @@ function NavigationBucketButton({ bucket, direction, scrollToAnchor }) {
  *   @param {Bucket} props.below
  *   @param {Bucket[]} props.buckets
  *   @param {(tags: string[]) => void} props.onFocusAnnotations
+ *   @param {(tags: string[], direction: 'down'|'up') => void} props.onScrollToClosestOffScreenAnchor
  *   @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
- *   @param {(a: Anchor) => void} props.scrollToAnchor - Callback invoked to
- *     scroll the document to a given anchor
  */
 export default function Buckets({
   above,
   below,
   buckets,
   onFocusAnnotations,
+  onScrollToClosestOffScreenAnchor,
   onSelectAnnotations,
-  scrollToAnchor,
 }) {
   const showUpNavigation = above.anchors.length > 0;
   const showDownNavigation = below.anchors.length > 0;
@@ -112,7 +108,7 @@ export default function Buckets({
           <NavigationBucketButton
             bucket={above}
             direction="up"
-            scrollToAnchor={scrollToAnchor}
+            onScrollToClosestOffScreenAnchor={onScrollToClosestOffScreenAnchor}
           />
         </li>
       )}
@@ -134,7 +130,7 @@ export default function Buckets({
           <NavigationBucketButton
             bucket={below}
             direction="down"
-            scrollToAnchor={scrollToAnchor}
+            onScrollToClosestOffScreenAnchor={onScrollToClosestOffScreenAnchor}
           />
         </li>
       )}
