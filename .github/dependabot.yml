@@ -6,7 +6,3 @@ updates:
     interval: weekly
     time: "10:00"
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: query-string
-    versions:
-    - "> 3.0.3"
