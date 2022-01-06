@@ -194,59 +194,6 @@ describe('shared/bridge', () => {
     });
   });
 
-  describe('#onConnect', () => {
-    // Simulate a Bridge attached to the other end of a channel receiving
-    // the `connect` RPC request and handling it using the `connect` handler
-    // registered by the Bridge.
-    const runConnectHandler = channel => {
-      const connectCall = channel.call
-        .getCalls()
-        .find(call => call.firstArg === 'connect');
-
-      // Invoke the `connect` handler. Here we're invoking it on `channel` but
-      // in the actual app this would be called on the counterpart channel in
-      // the other frame.
-      channel.methods.connect(...connectCall.args.slice(1));
-    };
-
-    it('runs callbacks when channel connects', () => {
-      const onConnectCallback = sinon.stub();
-      bridge.onConnect(onConnectCallback);
-
-      const channel = createChannel();
-
-      runConnectHandler(channel);
-
-      assert.calledWith(onConnectCallback, channel);
-    });
-
-    it('allows multiple callbacks to be registered', () => {
-      const onConnectCallback1 = sinon.stub();
-      const onConnectCallback2 = sinon.stub();
-      bridge.onConnect(onConnectCallback1);
-      bridge.onConnect(onConnectCallback2);
-
-      const channel = createChannel();
-
-      runConnectHandler(channel);
-
-      assert.calledWith(onConnectCallback1, channel);
-      assert.calledWith(onConnectCallback2, channel);
-    });
-
-    it('only invokes `onConnect` callback once', () => {
-      const onConnectCallback = sinon.stub();
-      bridge.onConnect(onConnectCallback);
-
-      const channel = createChannel();
-
-      runConnectHandler(channel);
-      runConnectHandler(channel);
-
-      assert.calledOnce(onConnectCallback);
-    });
-  });
-
   describe('#destroy', () =>
     it('destroys all opened channels', () => {
       const channel1 = bridge.createChannel();

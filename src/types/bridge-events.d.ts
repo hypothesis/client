@@ -138,6 +138,11 @@ export type SidebarToGuestEvent =
  */
 export type SidebarToHostEvent =
   /**
+   * The sidebar notifies the host that it has loaded and is ready to be displayed.
+   */
+  | 'ready'
+
+  /**
    * The sidebar relays to the host to close the sidebar.
    */
   | 'closeSidebar'

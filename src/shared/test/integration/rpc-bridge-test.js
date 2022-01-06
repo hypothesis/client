@@ -24,34 +24,6 @@ describe('PortRPC-Bridge integration', () => {
     clock.restore();
   });
 
-  describe('establishing a connection', () => {
-    it('should invoke Bridge `onConnect` callbacks after connecting', async () => {
-      const bridge = createBridge();
-      const reciprocalBridge = createBridge();
-      reciprocalBridge.on('method', cb => cb(null));
-      let callbackCount = 0;
-      const callback = () => {
-        ++callbackCount;
-      };
-      bridge.onConnect(callback);
-      bridge.onConnect(callback); // allows multiple callbacks to be registered
-      reciprocalBridge.onConnect(callback);
-
-      const channel = bridge.createChannel(port1);
-      const reciprocalChannel = reciprocalBridge.createChannel(port2);
-      await bridge.call('method');
-
-      assert.equal(callbackCount, 3);
-
-      // Additional calls to the RPC `connect` method are ignored
-      await channel.call('connect');
-      await reciprocalChannel.call('connect');
-      await bridge.call('method');
-
-      assert.equal(callbackCount, 3);
-    });
-  });
-
   describe('sending and receiving RPC messages', () => {
     it('should invoke Bridge method handler on every channel when calling a RPC method', async () => {
       const bridge = createBridge();

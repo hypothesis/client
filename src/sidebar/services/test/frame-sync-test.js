@@ -60,6 +60,7 @@ describe('FrameSyncService', () => {
   let fakeAnnotationsService;
   let fakeBridges;
   let fakePortFinder;
+
   let fakeStore;
   let fakeWindow;
 
@@ -67,20 +68,31 @@ describe('FrameSyncService', () => {
   let hostPort;
   let sidebarPort;
 
+  // Hook to prepare channels created by `Bridge.createChannel` before they are
+  // returned to the service.
+  let setupChannel;
+
   beforeEach(() => {
     fakeAnnotationsService = { create: sinon.stub() };
-
     fakeBridges = [];
+    setupChannel = null;
+
     FakeBridge = sinon.stub().callsFake(() => {
       const emitter = new EventEmitter();
       const bridge = {
         call: sinon.stub(),
-        createChannel: sinon.stub(),
+        createChannel: sinon.stub().callsFake(() => {
+          const rpc = {
+            call: sinon.stub(),
+            destroy: sinon.stub(),
+          };
+
+          setupChannel?.(rpc);
+
+          return rpc;
+        }),
         emit: emitter.emit.bind(emitter),
         on: emitter.on.bind(emitter),
-        onConnect: function (listener) {
-          emitter.on('connect', listener);
-        },
       };
       fakeBridges.push(bridge);
       return bridge;
@@ -160,6 +172,25 @@ describe('FrameSyncService', () => {
     guestBridge().emit(event, ...args);
   }
 
+  /**
+   * Simulate a new guest frame connecting to the sidebar.
+   *
+   * @return {MessagePort} - The port that was sent to the sidebar
+   */
+  async function connectGuest() {
+    const { port1 } = new MessageChannel();
+    hostPort.postMessage(
+      {
+        frame1: 'guest',
+        frame2: 'sidebar',
+        type: 'offer',
+      },
+      [port1]
+    );
+    await delay(0);
+    return port1;
+  }
+
   describe('#connect', () => {
     it('discovers and connects to the host frame', async () => {
       await frameSync.connect();
@@ -167,21 +198,16 @@ describe('FrameSyncService', () => {
       assert.calledWith(hostBridge().createChannel, sidebarPort);
     });
 
-    it('connects to new guests when they are ready', async () => {
-      const { port1 } = new MessageChannel();
+    it('notifies the host frame that the sidebar is ready to be displayed', async () => {
+      await frameSync.connect();
 
+      assert.calledWith(hostBridge().call, 'ready');
+    });
+
+    it('connects to new guests', async () => {
       frameSync.connect();
-      hostPort.postMessage(
-        {
-          frame1: 'guest',
-          frame2: 'sidebar',
-          type: 'offer',
-        },
-        [port1]
-      );
-      await delay(0);
-
-      assert.calledWith(guestBridge().createChannel, port1);
+      const port = await connectGuest();
+      assert.calledWith(guestBridge().createChannel, port);
     });
   });
 
@@ -419,25 +445,19 @@ describe('FrameSyncService', () => {
   });
 
   context('when a new frame connects', () => {
-    let frameInfo;
-    let fakeChannel;
-
     beforeEach(() => {
-      fakeChannel = {
-        call: sinon.spy((name, callback) => {
-          if (name === 'getDocumentInfo') {
-            callback(null, frameInfo);
-          }
-        }),
-        destroy: sinon.stub(),
-      };
       frameSync.connect();
     });
 
-    it("adds the page's metadata to the frames list", () => {
-      frameInfo = fixtures.htmlDocumentInfo;
+    it("adds the page's metadata to the frames list", async () => {
+      const frameInfo = fixtures.htmlDocumentInfo;
+      setupChannel = rpc => {
+        rpc.call.withArgs('getDocumentInfo').callsFake((method, callback) => {
+          callback(null, frameInfo);
+        });
+      };
 
-      emitGuestEvent('connect', fakeChannel);
+      await connectGuest();
 
       assert.calledWith(fakeStore.connectFrame, {
         id: frameInfo.frameIdentifier,
@@ -446,27 +466,35 @@ describe('FrameSyncService', () => {
       });
     });
 
-    it('closes the channel and does not add frame to store if getting document info fails', () => {
-      fakeChannel.call = (name, callback) => {
-        if (name === 'getDocumentInfo') {
-          callback('Something went wrong');
-        }
+    it('closes the channel and does not add frame to store if getting document info fails', async () => {
+      let channel;
+      setupChannel = rpc => {
+        rpc.call.withArgs('getDocumentInfo').callsFake((method, callback) => {
+          callback('Error getting document info');
+        });
+        channel = rpc;
       };
 
-      emitGuestEvent('connect', fakeChannel);
+      await connectGuest();
 
-      assert.called(fakeChannel.destroy);
+      assert.ok(channel);
+      assert.called(channel.destroy);
       assert.notCalled(fakeStore.connectFrame);
     });
 
-    it("synchronizes highlight visibility in the guest with the sidebar's controls", () => {
+    it("synchronizes highlight visibility in the guest with the sidebar's controls", async () => {
+      let channel;
+      setupChannel = rpc => {
+        channel = rpc;
+      };
+
       emitHostEvent('setHighlightsVisible', true);
-      emitGuestEvent('connect', fakeChannel);
-      assert.calledWith(fakeChannel.call, 'setHighlightsVisible', true);
+      await connectGuest();
+      assert.calledWith(channel.call, 'setHighlightsVisible', true);
 
       emitHostEvent('setHighlightsVisible', false);
-      emitGuestEvent('connect', fakeChannel);
-      assert.calledWith(fakeChannel.call, 'setHighlightsVisible', false);
+      await connectGuest();
+      assert.calledWith(channel.call, 'setHighlightsVisible', false);
     });
   });
 

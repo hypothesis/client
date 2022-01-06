@@ -106,7 +106,6 @@ describe('Guest', () => {
         createChannel: sinon.stub(),
         destroy: sinon.stub(),
         on: sinon.stub(),
-        onConnect: sinon.stub(),
       };
       fakeBridges.push(bridge);
       return bridge;

@@ -250,32 +250,30 @@ export class FrameSyncService {
     this._guestRPC.on('closeSidebar', () => {
       this._hostRPC.call('closeSidebar');
     });
+  }
 
-    /**
-     * Query the guest in a frame for the URL and metadata of the document that
-     * is currently loaded and add the result to the set of connected frames.
-     *
-     * @param {PortRPC} channel
-     */
-    const addFrame = channel => {
-      // Synchronize highlight visibility in this guest with the sidebar's controls.
-      channel.call('setHighlightsVisible', this._highlightsVisible);
+  /**
+   * Query the guest in a frame for the URL and metadata of the document that
+   * is currently loaded and add the result to the set of connected frames.
+   *
+   * @param {PortRPC} channel
+   */
+  _addFrame(channel) {
+    // Synchronize highlight visibility in this guest with the sidebar's controls.
+    channel.call('setHighlightsVisible', this._highlightsVisible);
 
-      channel.call('getDocumentInfo', (err, info) => {
-        if (err) {
-          channel.destroy();
-          return;
-        }
+    channel.call('getDocumentInfo', (err, info) => {
+      if (err) {
+        channel.destroy();
+        return;
+      }
 
-        this._store.connectFrame({
-          id: info.frameIdentifier,
-          metadata: info.metadata,
-          uri: info.uri,
-        });
+      this._store.connectFrame({
+        id: info.frameIdentifier,
+        metadata: info.metadata,
+        uri: info.uri,
       });
-    };
-
-    this._guestRPC.onConnect(addFrame);
+    });
   }
 
   /**
@@ -311,6 +309,7 @@ export class FrameSyncService {
     // Create channel for sidebar-host communication.
     const hostPort = await this._portFinder.discover('host');
     this._hostRPC.createChannel(hostPort);
+    this._hostRPC.call('ready');
 
     // Listen for guests connecting to the sidebar.
     this._listeners.add(hostPort, 'message', event => {
@@ -322,7 +321,8 @@ export class FrameSyncService {
           type: 'offer',
         })
       ) {
-        this._guestRPC.createChannel(ports[0]);
+        const channel = this._guestRPC.createChannel(ports[0]);
+        this._addFrame(channel);
       }
     });
   }
