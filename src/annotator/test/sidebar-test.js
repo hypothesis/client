@@ -72,8 +72,7 @@ describe('Sidebar', () => {
    * when the sidebar has loaded and is ready.
    */
   const connectSidebarApp = () => {
-    const callback = sidebarBridge().onConnect.getCall(0).args[0];
-    callback();
+    emitSidebarEvent('ready');
   };
 
   const createSidebar = (config = {}) => {
@@ -116,7 +115,6 @@ describe('Sidebar', () => {
         createChannel: sinon.stub(),
         destroy: sinon.stub(),
         on: sinon.stub(),
-        onConnect: sinon.stub(),
       };
       fakeBridges.push(bridge);
       return bridge;

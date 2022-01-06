@@ -19,12 +19,6 @@ export class Bridge {
     this.links = [];
     /** @type {Record<string, (...args: any[]) => void>} */
     this.channelListeners = {};
-    /** @type {Array<(channel: PortRPC) => void>} */
-    this.onConnectListeners = [];
-
-    // `connect` is registered with a callback so it triggers a `postMessage`
-    // response from the reciprocal port.
-    this.on('connect', cb => cb());
   }
 
   /**
@@ -48,22 +42,7 @@ export class Bridge {
    */
   createChannel(port) {
     const channel = new PortRPC(port, this.channelListeners);
-
-    let connected = false;
-    const ready = () => {
-      if (connected) {
-        return;
-      }
-      connected = true;
-      this.onConnectListeners.forEach(cb => cb(channel));
-    };
-
-    // Fire off a connection attempt
-    channel.call('connect', ready);
-
-    // Store the newly created channel in our collection
     this.links.push(channel);
-
     return channel;
   }
 
@@ -155,16 +134,6 @@ export class Bridge {
       throw new Error(`Listener '${method}' already bound in Bridge`);
     }
     this.channelListeners[method] = listener;
-    return this;
-  }
-
-  /**
-   * Add a listener to be called upon a new connection.
-   *
-   * @param {(channel: PortRPC) => void} listener
-   */
-  onConnect(listener) {
-    this.onConnectListeners.push(listener);
     return this;
   }
 }
