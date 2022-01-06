@@ -580,8 +580,8 @@ describe('FrameSyncService', () => {
   describe('#notifyHost', () => {
     it('sends a message to the host frame', () => {
       frameSync.connect();
-      frameSync.notifyHost('openNotebook', 'group-id');
-      assert.calledWith(hostBridge().call, 'openNotebook', 'group-id');
+      frameSync.notifyHost('openNotebook');
+      assert.calledWith(hostBridge().call, 'openNotebook');
     });
   });
 });

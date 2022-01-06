@@ -56,7 +56,7 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
 
   const onSelectNotebook = () => {
-    frameSync.notifyHost('openNotebook', store.focusedGroupId());
+    frameSync.notifyHost('openNotebook');
   };
 
   // Temporary access to the Notebook without feature flag:

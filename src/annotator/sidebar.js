@@ -301,11 +301,9 @@ export default class Sidebar {
     // Sidebar listens to the `openNotebook` event coming from the sidebar's
     // iframe and re-publishes it via the emitter to the Notebook
     this._sidebarRPC.on(
-      'openNotebook',
-      /** @param {string} groupId */
-      groupId => {
+      'openNotebook', () => {
         this.hide();
-        this._emitter.publish('openNotebook', groupId);
+        this._emitter.publish('openNotebook');
       }
     );
     this._emitter.subscribe('closeNotebook', () => {

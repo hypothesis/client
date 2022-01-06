@@ -8,7 +8,6 @@ import { createAppConfig } from '../config/app';
 /**
  * @typedef NotebookIframeProps
  * @prop {Record<string, any>} config
- * @prop {string} groupId
  */
 
 /**
@@ -16,12 +15,9 @@ import { createAppConfig } from '../config/app';
  *
  * @param {NotebookIframeProps} props
  */
-function NotebookIframe({ config, groupId }) {
+function NotebookIframe({ config }) {
   const notebookAppSrc = addConfigFragment(config.notebookAppUrl, {
     ...createAppConfig(config.notebookAppUrl, config),
-
-    // Explicity set the "focused" group
-    group: groupId,
   });
 
   return (
@@ -49,13 +45,7 @@ function NotebookIframe({ config, groupId }) {
  * @param {NotebookModalProps} props
  */
 export default function NotebookModal({ eventBus, config }) {
-  // Temporary solution: while there is no mechanism to sync new annotations in
-  // the notebook, we force re-rendering of the iframe on every 'openNotebook'
-  // event, so that the new annotations are displayed.
-  // https://github.com/hypothesis/client/issues/3182
-  const [iframeKey, setIframeKey] = useState(0);
   const [isHidden, setIsHidden] = useState(true);
-  const [groupId, setGroupId] = useState(/** @type {string|null} */ (null));
   const originalDocumentOverflowStyle = useRef('');
   const emitterRef = useRef(/** @type {Emitter|null} */ (null));
 
@@ -81,10 +71,8 @@ export default function NotebookModal({ eventBus, config }) {
 
   useEffect(() => {
     const emitter = eventBus.createEmitter();
-    emitter.subscribe('openNotebook', (/** @type {string} */ groupId) => {
+    emitter.subscribe('openNotebook', () => {
       setIsHidden(false);
-      setIframeKey(iframeKey => iframeKey + 1);
-      setGroupId(groupId);
     });
     emitterRef.current = emitter;
 
@@ -97,10 +85,6 @@ export default function NotebookModal({ eventBus, config }) {
     setIsHidden(true);
     emitterRef.current?.publish('closeNotebook');
   };
-
-  if (groupId === null) {
-    return null;
-  }
 
   return (
     <div
@@ -115,7 +99,7 @@ export default function NotebookModal({ eventBus, config }) {
             variant="dark"
           />
         </div>
-        <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
+        <NotebookIframe config={config} />
       </div>
     </div>
   );

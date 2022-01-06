@@ -16,6 +16,7 @@ import MenuItem from '../MenuItem';
  * @prop {boolean} [isExpanded] - Whether the submenu for this group is expanded
  * @prop {(expand: boolean) => any} onExpand -
  *   Callback invoked to expand or collapse the current group
+ * @prop {import('../../services/frame-sync').FrameSyncService} frameSync
  * @prop {import('../../services/groups').GroupsService} groups
  * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  */
@@ -30,6 +31,7 @@ import MenuItem from '../MenuItem';
  */
 function GroupListItem({
   isExpanded,
+  frameSync,
   group,
   groups: groupsService,
   onExpand,
@@ -48,6 +50,7 @@ function GroupListItem({
     store.clearDirectLinkedGroupFetchFailed();
     store.clearDirectLinkedIds();
     groupsService.focus(group.id);
+    frameSync.notifyNotebook('groupChanged', group.id);
   };
 
   const leaveGroup = async () => {
@@ -149,4 +152,8 @@ function GroupListItem({
   );
 }
 
-export default withServices(GroupListItem, ['groups', 'toastMessenger']);
+export default withServices(GroupListItem, [
+  'frameSync',
+  'groups',
+  'toastMessenger',
+]);

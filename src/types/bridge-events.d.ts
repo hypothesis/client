@@ -134,6 +134,11 @@ export type SidebarToGuestEvent =
   | 'setHighlightsVisible';
 
 /**
+ * Events that the notebook sends to the sidebar
+ */
+export type NotebookToSidebarEvent = never;
+
+/**
  * Events that the sidebar sends to the host
  */
 export type SidebarToHostEvent =
@@ -203,10 +208,21 @@ export type SidebarToHostEvent =
    */
   | 'signupRequested';
 
+/**
+ * Events that the sidebar sends to the notebook
+ */
+export type SidebarToNotebookEvent =
+  /**
+   * The sidebar informs to the notebook that a different group has been selected.
+   */
+  'groupChanged';
+
 export type BridgeEvent =
   | HostToGuestEvent
   | HostToSidebarEvent
   | GuestToHostEvent
   | GuestToSidebarEvent
+  | NotebookToSidebarEvent
   | SidebarToGuestEvent
-  | SidebarToHostEvent;
+  | SidebarToHostEvent
+  | SidebarToNotebookEvent;

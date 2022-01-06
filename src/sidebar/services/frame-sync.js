@@ -10,10 +10,12 @@ import { watch } from '../util/watch';
 /**
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
- * @typedef {import('../../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('../../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
+ * @typedef {import('../../types/bridge-events').NotebookToSidebarEvent} NotebookToSidebarEvent
+ * @typedef {import('../../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
+ * @typedef {import('../../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
+ * @typedef {import('../../types/bridge-events').SidebarToNotebookEvent} SidebarToNotebookEvent
  * @typedef {import('../../shared/port-rpc').PortRPC} PortRPC
  * @typedef {import('../store/modules/frames').Frame} Frame
  */
@@ -86,6 +88,16 @@ export class FrameSyncService {
      * @type {Bridge<SidebarToGuestEvent,GuestToSidebarEvent>}
      */
     this._guestRPC = new Bridge();
+
+    /**
+     * Channel for sidebar-notebook communication.
+     *
+     * @type {Bridge<SidebarToNotebookEvent,NotebookToSidebarEvent>}
+     */
+    this._notebookRPC = new Bridge();
+    this._notebookRPC.onConnect(() =>
+      this._notebookRPC.call('groupChanged', store.focusedGroup()?.id)
+    );
 
     /**
      * Tags of annotations that are currently loaded into guest frames.
@@ -324,6 +336,15 @@ export class FrameSyncService {
       ) {
         this._guestRPC.createChannel(ports[0]);
       }
+      if (
+        isMessageEqual(data, {
+          frame1: 'notebook',
+          frame2: 'sidebar',
+          type: 'offer',
+        })
+      ) {
+        this._notebookRPC.createChannel(ports[0]);
+      }
     });
   }
 
@@ -335,6 +356,16 @@ export class FrameSyncService {
    */
   notifyHost(method, ...args) {
     this._hostRPC.call(method, ...args);
+  }
+
+  /**
+   * Send an RPC message to the notebook frame.
+   *
+   * @param {SidebarToNotebookEvent} method
+   * @param {any[]} args
+   */
+  notifyNotebook(method, ...args) {
+    this._notebookRPC.call(method, ...args);
   }
 
   /**

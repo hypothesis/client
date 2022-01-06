@@ -2,6 +2,8 @@ import { IconButton, Panel } from '@hypothesis/frontend-shared';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
+import { Bridge } from '../../shared/bridge';
+import { PortFinder } from '../../shared/port-finder';
 import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
@@ -12,7 +14,13 @@ import PaginatedThreadList from './PaginatedThreadList';
 import useRootThread from './hooks/use-root-thread';
 
 /**
+ * @typedef {import('../../types/bridge-events').NotebookToSidebarEvent} NotebookToSidebarEvent
+ * @typedef {import('../../types/bridge-events').SidebarToNotebookEvent} SidebarToNotebookEvent
+ */
+
+/**
  * @typedef NotebookViewProps
+ * @prop {import('../services/groups').GroupsService} groups
  * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
  * @prop {import('../services/streamer').StreamerService} streamer
  */
@@ -22,7 +30,11 @@ import useRootThread from './hooks/use-root-thread';
  *
  * @param {NotebookViewProps} props
  */
-function NotebookView({ loadAnnotationsService, streamer }) {
+function NotebookView({
+  groups: groupService,
+  loadAnnotationsService,
+  streamer,
+}) {
   const store = useStoreProxy();
 
   const filters = store.getFilterValues();
@@ -35,8 +47,10 @@ function NotebookView({ loadAnnotationsService, streamer }) {
 
   const rootThread = useRootThread();
 
+  // TODO: should we compute this more directly
   const groupName = focusedGroup?.name ?? '…';
 
+  // TODO: update this comment
   // Get the ID of the group to fetch annotations from.
   //
   // Once groups have been fetched and one has been focused, use its ID. If
@@ -63,6 +77,28 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   };
 
   const hasFetchedProfile = store.hasFetchedProfile();
+
+  // Establish communication channel with the sidebar
+  useEffect(() => {
+    /** @type {Bridge<NotebookToSidebarEvent,SidebarToNotebookEvent>} */
+    const sidebarRPC = new Bridge();
+    sidebarRPC.on('groupChanged', groupId => {
+      // store.clearDirectLinkedGroupFetchFailed();
+      // store.clearDirectLinkedIds();
+      groupService.focus(groupId);
+    });
+
+    const portFinder = new PortFinder({
+      hostFrame: window.parent,
+      source: 'notebook',
+    });
+    portFinder.discover('sidebar').then(port => sidebarRPC.createChannel(port));
+
+    return () => {
+      portFinder.destroy();
+      sidebarRPC.destroy();
+    };
+  }, []);
 
   // Establish websocket connection
   useEffect(() => {
@@ -176,6 +212,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
 }
 
 export default withServices(NotebookView, [
+  'groups',
   'loadAnnotationsService',
   'streamer',
 ]);
