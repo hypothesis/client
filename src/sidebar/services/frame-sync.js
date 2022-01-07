@@ -1,9 +1,7 @@
 import debounce from 'lodash.debounce';
 
 import { ListenerCollection } from '../../shared/listener-collection';
-import { PortFinder } from '../../shared/port-finder';
-import { PortRPC } from '../../shared/port-rpc';
-import { isMessageEqual } from '../../shared/port-util';
+import { PortFinder, PortRPC, isMessageEqual } from '../../shared/messaging';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 

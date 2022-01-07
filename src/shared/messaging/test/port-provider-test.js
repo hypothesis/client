@@ -1,4 +1,4 @@
-import { delay } from '../../test-util/wait';
+import { delay } from '../../../test-util/wait';
 import { PortProvider, $imports } from '../port-provider';
 
 describe('PortProvider', () => {
@@ -54,7 +54,7 @@ describe('PortProvider', () => {
       fakeSendError = sinon.stub();
 
       $imports.$mock({
-        './frame-error-capture': { sendError: fakeSendError },
+        '../frame-error-capture': { sendError: fakeSendError },
       });
     });
 

@@ -1,6 +1,5 @@
 import { ListenerCollection } from '../shared/listener-collection';
-import { PortFinder } from '../shared/port-finder';
-import { PortRPC } from '../shared/port-rpc';
+import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 
 import { Adder } from './adder';

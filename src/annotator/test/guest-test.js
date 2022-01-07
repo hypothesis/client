@@ -165,10 +165,10 @@ describe('Guest', () => {
     }
 
     $imports.$mock({
-      '../shared/port-finder': {
+      '../shared/messaging': {
         PortFinder: sinon.stub().returns(fakePortFinder),
+        PortRPC: FakePortRPC,
       },
-      '../shared/port-rpc': { PortRPC: FakePortRPC },
       './adder': { Adder: FakeAdder },
       './anchoring/text-range': {
         TextRange: FakeTextRange,

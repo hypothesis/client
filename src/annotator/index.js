@@ -9,7 +9,7 @@ import { registerIcons } from '@hypothesis/frontend-shared';
 import iconSet from './icons';
 registerIcons(iconSet);
 
-import { PortProvider } from '../shared/port-provider';
+import { PortProvider } from '../shared/messaging';
 import { getConfig } from './config/index';
 import Guest from './guest';
 import Notebook from './notebook';

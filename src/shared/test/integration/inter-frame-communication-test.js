@@ -1,9 +1,11 @@
 import { delay } from '../../../test-util/wait';
-import { PortRPC as PortRPC_ } from '../../port-rpc';
 import { ListenerCollection as ListenerCollection_ } from '../../listener-collection';
-import { PortFinder as PortFinder_ } from '../../port-finder';
-import { PortProvider as PortProvider_ } from '../../port-provider';
-import { isMessageEqual } from '../../port-util';
+import {
+  PortFinder as PortFinder_,
+  PortProvider as PortProvider_,
+  PortRPC as PortRPC_,
+  isMessageEqual,
+} from '../../messaging';
 
 describe('PortProvider-PortFinder-PortRPC integration', () => {
   let destroyables;

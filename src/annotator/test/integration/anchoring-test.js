@@ -53,7 +53,7 @@ describe('anchoring', () => {
       destroy: sinon.stub(),
     };
     guestImports.$mock({
-      '../shared/port-finder': {
+      '../shared/messaging': {
         PortFinder: sinon.stub().returns(fakePortFinder),
       },
     });

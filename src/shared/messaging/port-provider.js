@@ -1,11 +1,11 @@
 import { TinyEmitter } from 'tiny-emitter';
 
-import { captureErrors, sendError } from './frame-error-capture';
-import { ListenerCollection } from './listener-collection';
+import { captureErrors, sendError } from '../frame-error-capture';
+import { ListenerCollection } from '../listener-collection';
 import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
 
 /**
- * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('../../types/annotator').Destroyable} Destroyable
  * @typedef {import('./port-util').Message} Message
  * @typedef {import('./port-util').Frame} Frame
  * @typedef {'guest-host'|'guest-sidebar'|'notebook-sidebar'|'sidebar-host'} Channel

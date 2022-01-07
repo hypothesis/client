@@ -157,7 +157,7 @@ describe('Sidebar', () => {
 
     $imports.$mock({
       '../shared/frame-error-capture': { sendErrorsTo: fakeSendErrorsTo },
-      '../shared/port-rpc': { PortRPC: FakePortRPC },
+      '../shared/messaging': { PortRPC: FakePortRPC },
       './bucket-bar': { default: FakeBucketBar },
       './config/app': { createAppConfig: fakeCreateAppConfig },
       './toolbar': {

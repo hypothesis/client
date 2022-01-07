@@ -1,4 +1,4 @@
-import { ListenerCollection } from './listener-collection';
+import { ListenerCollection } from '../listener-collection';
 
 /*
   This module was adapted from `index.js` in https://github.com/substack/frame-rpc.
@@ -47,7 +47,7 @@ const PROTOCOL = 'frame-rpc';
  *
  * @typedef {RequestMessage|ResponseMessage} Message
  *
- * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('../../types/annotator').Destroyable} Destroyable
  */
 
 /**
