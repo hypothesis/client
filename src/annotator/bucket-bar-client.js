@@ -1,7 +1,7 @@
 import { ListenerCollection } from '../shared/listener-collection';
 
 /**
- * @typedef {import('../shared/port-rpc').PortRPC<HostToGuestEvent, GuestToHostEvent>} HostRPC
+ * @typedef {import('../shared/messaging').PortRPC<HostToGuestEvent, GuestToHostEvent>} HostRPC
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
  * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent

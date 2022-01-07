@@ -7,9 +7,8 @@ const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
  *
  * @param {Element} rootEl - The DOM element which contains the elements that
  *   display annotation count.
- * @param {import('../shared/port-rpc').PortRPC} rpc - Channel for host-sidebar communication
+ * @param {import('../shared/messaging').PortRPC} rpc - Channel for host-sidebar communication
  */
-
 export function annotationCounts(rootEl, rpc) {
   rpc.on('publicAnnotationCountChanged', updateAnnotationCountElems);
 

@@ -1,4 +1,4 @@
-import { delay } from '../../test-util/wait';
+import { delay } from '../../../test-util/wait';
 import {
   MAX_WAIT_FOR_PORT,
   POLLING_INTERVAL_FOR_PORT,
