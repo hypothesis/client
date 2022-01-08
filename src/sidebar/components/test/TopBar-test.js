@@ -111,7 +111,7 @@ describe('TopBar', () => {
       });
 
       context('help service handler configured in services', () => {
-        it('fires a bridge event if help clicked and service is configured', () => {
+        it('notifies host frame if help clicked and service is configured', () => {
           fakeServiceConfig.returns({ onHelpRequestProvided: true });
           const wrapper = createTopBar();
 

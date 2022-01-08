@@ -289,9 +289,8 @@ describe('HypothesisApp', () => {
 
     it('sends "loginRequested" event to host page if using a third-party service', async () => {
       // If the client is using a third-party annotation service then clicking
-      // on a login button should send the "loginRequested" event over the bridge
-      // (so that the partner site we're embedded in can do its own login
-      // thing).
+      // on a login button should notify the host frame (so that the partner
+      // site we're embedded in can do its own login thing).
       fakeServiceConfig.returns({});
 
       const wrapper = createComponent();

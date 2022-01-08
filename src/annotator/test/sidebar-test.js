@@ -18,8 +18,8 @@ describe('Sidebar', () => {
   let containers;
   let sidebars;
 
-  let FakeBridge;
-  let fakeBridges;
+  let FakePortRPC;
+  let fakePortRPCs;
   let FakeBucketBar;
   let fakeBucketBar;
   let fakeGuest;
@@ -39,17 +39,18 @@ describe('Sidebar', () => {
   // These currently rely on knowing the implementation detail of which order
   // the channels are created in.
 
-  const guestBridge = () => {
-    return fakeBridges[0];
+  const sidebarRPC = () => {
+    return fakePortRPCs[0];
   };
 
-  const sidebarBridge = () => {
-    return fakeBridges[1];
+  /** Return the PortRPC instance for the first connected guest. */
+  const guestRPC = () => {
+    return fakePortRPCs[1];
   };
 
   const emitGuestEvent = (event, ...args) => {
     const result = [];
-    for (let [evt, fn] of guestBridge().on.args) {
+    for (let [evt, fn] of guestRPC().on.args) {
       if (event === evt) {
         result.push(fn(...args));
       }
@@ -59,7 +60,7 @@ describe('Sidebar', () => {
 
   const emitSidebarEvent = (event, ...args) => {
     const result = [];
-    for (let [evt, fn] of sidebarBridge().on.args) {
+    for (let [evt, fn] of sidebarRPC().on.args) {
       if (event === evt) {
         result.push(fn(...args));
       }
@@ -73,6 +74,14 @@ describe('Sidebar', () => {
    */
   const connectSidebarApp = () => {
     emitSidebarEvent('ready');
+  };
+
+  /**
+   * Simulate a new guest frame connecting to the sidebar.
+   */
+  const connectGuest = sidebar => {
+    const { port1 } = new MessageChannel();
+    sidebar.onFrameConnected('guest', port1);
   };
 
   const createSidebar = (config = {}) => {
@@ -108,16 +117,16 @@ describe('Sidebar', () => {
     sidebars = [];
     containers = [];
 
-    fakeBridges = [];
-    FakeBridge = sinon.stub().callsFake(() => {
-      const bridge = {
+    fakePortRPCs = [];
+    FakePortRPC = sinon.stub().callsFake(() => {
+      const rpc = {
         call: sinon.stub(),
-        createChannel: sinon.stub(),
+        connect: sinon.stub(),
         destroy: sinon.stub(),
         on: sinon.stub(),
       };
-      fakeBridges.push(bridge);
-      return bridge;
+      fakePortRPCs.push(rpc);
+      return rpc;
     });
 
     fakeBucketBar = {
@@ -147,8 +156,8 @@ describe('Sidebar', () => {
     });
 
     $imports.$mock({
-      '../shared/bridge': { Bridge: FakeBridge },
       '../shared/frame-error-capture': { sendErrorsTo: fakeSendErrorsTo },
+      '../shared/port-rpc': { PortRPC: FakePortRPC },
       './bucket-bar': { default: FakeBucketBar },
       './config/app': { createAppConfig: fakeCreateAppConfig },
       './toolbar': {
@@ -218,7 +227,7 @@ describe('Sidebar', () => {
     });
     window.dispatchEvent(event);
 
-    assert.calledWith(sidebarBridge().call, 'frameDestroyed', 'frame-id');
+    assert.calledWith(sidebarRPC().call, 'frameDestroyed', 'frame-id');
   });
 
   function getConfigString(sidebar) {
@@ -259,37 +268,36 @@ describe('Sidebar', () => {
     });
 
     it('creates an annotation in the host frame when toolbar button is clicked', () => {
-      createSidebar();
+      const sidebar = createSidebar();
+      connectGuest(sidebar);
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(guestBridge().call, 'createAnnotationIn', null);
+      assert.calledWith(guestRPC().call, 'createAnnotationIn', null);
     });
 
     it('creates an annotation in frame with selection when toolbar button is clicked', () => {
-      createSidebar({});
+      const sidebar = createSidebar({});
+      connectGuest(sidebar);
 
       const frameIdentifier = 'subframe identifier';
       emitGuestEvent('textSelectedIn', frameIdentifier);
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(
-        guestBridge().call,
-        'createAnnotationIn',
-        frameIdentifier
-      );
+      assert.calledWith(guestRPC().call, 'createAnnotationIn', frameIdentifier);
     });
 
     it('toggles create annotation button to "Annotation" when selection becomes non-empty', () => {
       const sidebar = createSidebar();
+      connectGuest(sidebar);
 
       const frameIdentifier = 'subframe identifier';
       emitGuestEvent('textSelectedIn', frameIdentifier);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
       assert.calledWith(
-        guestBridge().call,
+        guestRPC().call,
         'clearSelectionExceptIn',
         frameIdentifier
       );
@@ -297,13 +305,14 @@ describe('Sidebar', () => {
 
     it('toggles create annotation button to "Page Note" when selection becomes empty', () => {
       const sidebar = createSidebar();
+      connectGuest(sidebar);
 
       const frameIdentifier = null;
       emitGuestEvent('textUnselectedIn', frameIdentifier);
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
       assert.calledWith(
-        guestBridge().call,
+        guestRPC().call,
         'clearSelectionExceptIn',
         frameIdentifier
       );
@@ -470,6 +479,7 @@ describe('Sidebar', () => {
     describe('on "anchorsChanged" event', () => {
       it('updates the bucket bar', () => {
         const sidebar = createSidebar();
+        connectGuest(sidebar);
 
         emitGuestEvent('anchorsChanged');
 
@@ -611,8 +621,8 @@ describe('Sidebar', () => {
       const { port1 } = new MessageChannel();
       sidebar.onFrameConnected('dummy', port1);
 
-      assert.notCalled(sidebarBridge().createChannel);
-      assert.notCalled(guestBridge().createChannel);
+      assert.notCalled(sidebarRPC().connect);
+      assert.isUndefined(guestRPC());
     });
 
     it('create RPC channels for recognized source frames', () => {
@@ -621,8 +631,8 @@ describe('Sidebar', () => {
       sidebar.onFrameConnected('sidebar', port1);
       sidebar.onFrameConnected('guest', port1);
 
-      assert.calledWith(sidebarBridge().createChannel, port1);
-      assert.calledWith(guestBridge().createChannel, port1);
+      assert.calledWith(sidebarRPC().connect, port1);
+      assert.calledWith(guestRPC().connect, port1);
     });
   });
 
@@ -630,13 +640,13 @@ describe('Sidebar', () => {
     it('shows highlights if "showHighlights" is set to "whenSidebarOpen"', () => {
       const sidebar = createSidebar({ showHighlights: 'whenSidebarOpen' });
       sidebar.open();
-      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', true);
+      assert.calledWith(sidebarRPC().call, 'setHighlightsVisible', true);
     });
 
     it('does not show highlights otherwise', () => {
       const sidebar = createSidebar({ showHighlights: 'never' });
       sidebar.open();
-      assert.neverCalledWith(sidebarBridge().call, 'setHighlightsVisible');
+      assert.neverCalledWith(sidebarRPC().call, 'setHighlightsVisible');
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -653,7 +663,7 @@ describe('Sidebar', () => {
       sidebar.open();
       sidebar.close();
 
-      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', false);
+      assert.calledWith(sidebarRPC().call, 'setHighlightsVisible', false);
     });
 
     it('updates the `sidebarOpen` property of the toolbar', () => {
@@ -672,7 +682,7 @@ describe('Sidebar', () => {
       const { port1 } = new MessageChannel();
       sidebar.onFrameConnected('guest', port1);
 
-      assert.calledWith(guestBridge().createChannel, port1);
+      assert.calledWith(guestRPC().connect, port1);
     });
   });
 
@@ -680,10 +690,10 @@ describe('Sidebar', () => {
     it('requests sidebar to set highlight visibility in guest frames', () => {
       const sidebar = createSidebar();
       sidebar.setHighlightsVisible(true);
-      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', true);
+      assert.calledWith(sidebarRPC().call, 'setHighlightsVisible', true);
 
       sidebar.setHighlightsVisible(false);
-      assert.calledWith(sidebarBridge().call, 'setHighlightsVisible', false);
+      assert.calledWith(sidebarRPC().call, 'setHighlightsVisible', false);
     });
 
     it('toggles "Show highlights" control in toolbar', () => {
@@ -790,21 +800,22 @@ describe('Sidebar', () => {
       });
 
       it('calls the "sidebarLayoutChanged" RPC method when sidebar changes expanded state', () => {
-        guestBridge().call.resetHistory();
+        connectGuest(sidebar);
+        guestRPC().call.resetHistory();
         sidebar.open();
-        assert.calledOnce(guestBridge().call);
+        assert.calledOnce(guestRPC().call);
         assert.calledWith(
-          guestBridge().call,
+          guestRPC().call,
           'sidebarLayoutChanged',
           sinon.match.any
         );
-        assertLayoutValues(guestBridge().call.lastCall.args[1], {
+        assertLayoutValues(guestRPC().call.lastCall.args[1], {
           expanded: true,
         });
 
         sidebar.close();
-        assert.calledTwice(guestBridge().call);
-        assertLayoutValues(guestBridge().call.lastCall.args[1], {
+        assert.calledTwice(guestRPC().call);
+        assertLayoutValues(guestRPC().call.lastCall.args[1], {
           expanded: false,
           width: fakeToolbar.getWidth(),
         });

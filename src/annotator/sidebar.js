@@ -1,9 +1,9 @@
 import Hammer from 'hammerjs';
 
-import { Bridge } from '../shared/bridge';
 import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
 import { ListenerCollection } from '../shared/listener-collection';
+import { PortRPC } from '../shared/port-rpc';
 
 import { annotationCounts } from './annotation-counts';
 import BucketBar from './bucket-bar';
@@ -15,10 +15,10 @@ import { createShadowRoot } from './util/shadow-root';
 
 /**
  * @typedef {import('./guest').default} Guest
- * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
- * @typedef {import('../types/bridge-events').HostToGuestEvent} HostToGuestEvent
- * @typedef {import('../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
- * @typedef {import('../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
+ * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
+ * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
+ * @typedef {import('../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
+ * @typedef {import('../types/port-rpc-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
@@ -78,18 +78,18 @@ export default class Sidebar {
     this._guestWithSelection = null;
 
     /**
-     * Channel for host-guest communication.
+     * Channels for host-guest communication.
      *
-     * @type {Bridge<HostToGuestEvent,GuestToHostEvent>}
+     * @type {PortRPC<GuestToHostEvent, HostToGuestEvent>[]}
      */
-    this._guestRPC = new Bridge();
+    this._guestRPC = [];
 
     /**
      * Channel for host-sidebar communication.
      *
-     * @type {Bridge<HostToSidebarEvent,SidebarToHostEvent>}
+     * @type {PortRPC<SidebarToHostEvent, HostToSidebarEvent>}
      */
-    this._sidebarRPC = new Bridge();
+    this._sidebarRPC = new PortRPC();
 
     /**
      * The `<iframe>` element containing the sidebar application.
@@ -138,7 +138,9 @@ export default class Sidebar {
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
       createAnnotation: () =>
-        this._guestRPC.call('createAnnotationIn', this._guestWithSelection),
+        this._guestRPC.forEach(rpc =>
+          rpc.call('createAnnotationIn', this._guestWithSelection)
+        ),
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
@@ -209,8 +211,6 @@ export default class Sidebar {
       }
     });
 
-    this._setupGuestEvents();
-
     // Notify sidebar when a guest is unloaded. This message is routed via
     // the host frame because in Safari guest frames are unable to send messages
     // directly to the sidebar during a window's 'unload' event.
@@ -224,7 +224,7 @@ export default class Sidebar {
   }
 
   destroy() {
-    this._guestRPC.destroy();
+    this._guestRPC.forEach(rpc => rpc.destroy());
     this._sidebarRPC.destroy();
     this.bucketBar?.destroy();
     this._listeners.removeAll();
@@ -249,40 +249,54 @@ export default class Sidebar {
   onFrameConnected(source, port) {
     switch (source) {
       case 'guest':
-        this._guestRPC.createChannel(port);
+        this._guestRPC.push(this._connectGuest(port));
         break;
       case 'sidebar':
-        this._sidebarRPC.createChannel(port);
+        this._sidebarRPC.connect(port);
         break;
     }
   }
 
-  _setupGuestEvents() {
-    this._guestRPC.on(
+  /**
+   * @param {MessagePort} port
+   */
+  _connectGuest(port) {
+    /** @type {PortRPC<GuestToHostEvent, HostToGuestEvent>} */
+    const guestRPC = new PortRPC();
+
+    guestRPC.on(
       'textSelectedIn',
       /** @param {string|null} frameIdentifier */
       frameIdentifier => {
         this._guestWithSelection = frameIdentifier;
         this.toolbar.newAnnotationType = 'annotation';
-        this._guestRPC.call('clearSelectionExceptIn', frameIdentifier);
+        this._guestRPC.forEach(rpc =>
+          rpc.call('clearSelectionExceptIn', frameIdentifier)
+        );
       }
     );
 
-    this._guestRPC.on(
+    guestRPC.on(
       'textUnselectedIn',
       /** @param {string|null}  frameIdentifier */
       frameIdentifier => {
         this._guestWithSelection = null; // default to the `host` frame
         this.toolbar.newAnnotationType = 'note';
-        this._guestRPC.call('clearSelectionExceptIn', frameIdentifier);
+        this._guestRPC.forEach(rpc =>
+          rpc.call('clearSelectionExceptIn', frameIdentifier)
+        );
       }
     );
 
     // The listener will do nothing if the sidebar doesn't have a bucket bar
     // (clean theme), but it is still actively listening.
-    this._guestRPC.on('anchorsChanged', () => {
+    guestRPC.on('anchorsChanged', () => {
       this.bucketBar?.update();
     });
+
+    guestRPC.connect(port);
+
+    return guestRPC;
   }
 
   _setupSidebarEvents() {
@@ -426,7 +440,9 @@ export default class Sidebar {
       this.onLayoutChange(layoutState);
     }
 
-    this._guestRPC.call('sidebarLayoutChanged', layoutState);
+    this._guestRPC.forEach(rpc =>
+      rpc.call('sidebarLayoutChanged', layoutState)
+    );
   }
 
   /**

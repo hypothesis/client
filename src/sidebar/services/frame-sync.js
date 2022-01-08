@@ -1,8 +1,8 @@
 import debounce from 'lodash.debounce';
 
-import { Bridge } from '../../shared/bridge';
 import { ListenerCollection } from '../../shared/listener-collection';
 import { PortFinder } from '../../shared/port-finder';
+import { PortRPC } from '../../shared/port-rpc';
 import { isMessageEqual } from '../../shared/port-util';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
@@ -10,11 +10,10 @@ import { watch } from '../util/watch';
 /**
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/bridge-events').SidebarToHostEvent} SidebarToHostEvent
- * @typedef {import('../../types/bridge-events').HostToSidebarEvent} HostToSidebarEvent
- * @typedef {import('../../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
- * @typedef {import('../../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
- * @typedef {import('../../shared/port-rpc').PortRPC} PortRPC
+ * @typedef {import('../../types/port-rpc-events').SidebarToHostEvent} SidebarToHostEvent
+ * @typedef {import('../../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
+ * @typedef {import('../../types/port-rpc-events').SidebarToGuestEvent} SidebarToGuestEvent
+ * @typedef {import('../../types/port-rpc-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../store/modules/frames').Frame} Frame
  */
 
@@ -76,16 +75,16 @@ export class FrameSyncService {
     /**
      * Channel for sidebar-host communication.
      *
-     * @type {Bridge<SidebarToHostEvent,HostToSidebarEvent>}
+     * @type {PortRPC<HostToSidebarEvent, SidebarToHostEvent>}
      */
-    this._hostRPC = new Bridge();
+    this._hostRPC = new PortRPC();
 
     /**
-     * Channel for sidebar-guest(s) communication.
+     * Channels for sidebar-guest(s) communication.
      *
-     * @type {Bridge<SidebarToGuestEvent,GuestToSidebarEvent>}
+     * @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>[]}
      */
-    this._guestRPC = new Bridge();
+    this._guestRPC = [];
 
     /**
      * Tags of annotations that are currently loaded into guest frames.
@@ -98,7 +97,6 @@ export class FrameSyncService {
     this._highlightsVisible = false;
 
     this._setupSyncToGuests();
-    this._setupSyncFromGuests();
     this._setupHostEvents();
   }
 
@@ -146,13 +144,20 @@ export class FrameSyncService {
         // when they are added or removed in the sidebar, but not re-anchoring
         // annotations if their selectors are updated.
         if (added.length > 0) {
-          this._guestRPC.call('loadAnnotations', added.map(formatAnnot));
+          // We currently send all loaded annotations to all connected guests,
+          // but we should only send annotations to appropriate guests.
+          // See https://github.com/hypothesis/client/issues/3992.
+          this._guestRPC.forEach(rpc =>
+            rpc.call('loadAnnotations', added.map(formatAnnot))
+          );
           added.forEach(annot => {
             this._inFrame.add(annot.$tag);
           });
         }
         deleted.forEach(annot => {
-          this._guestRPC.call('deleteAnnotation', annot.$tag);
+          this._guestRPC.forEach(rpc =>
+            rpc.call('deleteAnnotation', annot.$tag)
+          );
           this._inFrame.delete(annot.$tag);
         });
 
@@ -169,12 +174,16 @@ export class FrameSyncService {
   }
 
   /**
-   * Listen for messages coming in from connected guest frames and add new annotations
-   * to the sidebar.
+   * Set up a connection to a new guest frame.
+   *
+   * @param {MessagePort} port - Port for communicating with the guest
    */
-  _setupSyncFromGuests() {
+  _connectGuestFrame(port) {
+    /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
+    const guestRPC = new PortRPC();
+
     // A new annotation, note or highlight was created in the frame
-    this._guestRPC.on(
+    guestRPC.on(
       'createAnnotation',
       /** @param {AnnotationData} annot */
       annot => {
@@ -185,7 +194,9 @@ export class FrameSyncService {
         if (!this._store.isLoggedIn()) {
           this._hostRPC.call('openSidebar');
           this._store.openSidebarPanel('loginPrompt');
-          this._guestRPC.call('deleteAnnotation', annot.$tag);
+          this._guestRPC.forEach(rpc =>
+            rpc.call('deleteAnnotation', annot.$tag)
+          );
           return;
         }
         this._inFrame.add(annot.$tag);
@@ -220,7 +231,7 @@ export class FrameSyncService {
     }, 10);
 
     // Anchoring an annotation in the frame completed
-    this._guestRPC.on(
+    guestRPC.on(
       'syncAnchoringStatus',
       /** @param {AnnotationData} annotation */
       ({ $tag, $orphan }) => {
@@ -230,41 +241,38 @@ export class FrameSyncService {
       }
     );
 
-    this._guestRPC.on('showAnnotations', tags => {
+    guestRPC.on('showAnnotations', tags => {
       this._store.selectAnnotations(this._store.findIDsForTags(tags));
       this._store.selectTab('annotation');
     });
 
-    this._guestRPC.on('focusAnnotations', tags => {
+    guestRPC.on('focusAnnotations', tags => {
       this._store.focusAnnotations(tags || []);
     });
 
-    this._guestRPC.on('toggleAnnotationSelection', tags => {
+    guestRPC.on('toggleAnnotationSelection', tags => {
       this._store.toggleSelectedAnnotations(this._store.findIDsForTags(tags));
     });
 
-    this._guestRPC.on('openSidebar', () => {
+    guestRPC.on('openSidebar', () => {
       this._hostRPC.call('openSidebar');
     });
 
-    this._guestRPC.on('closeSidebar', () => {
+    guestRPC.on('closeSidebar', () => {
       this._hostRPC.call('closeSidebar');
     });
-  }
 
-  /**
-   * Query the guest in a frame for the URL and metadata of the document that
-   * is currently loaded and add the result to the set of connected frames.
-   *
-   * @param {PortRPC} channel
-   */
-  _addGuestFrame(channel) {
+    this._guestRPC.push(guestRPC);
+    guestRPC.connect(port);
+
     // Synchronize highlight visibility in this guest with the sidebar's controls.
-    channel.call('setHighlightsVisible', this._highlightsVisible);
+    guestRPC.call('setHighlightsVisible', this._highlightsVisible);
 
-    channel.call('getDocumentInfo', (err, info) => {
+    // Fetch document metadata. This could be optimized by having the guest
+    // push metadata to the sidebar. See https://github.com/hypothesis/client/issues/4094.
+    guestRPC.call('getDocumentInfo', (err, info) => {
       if (err) {
-        channel.destroy();
+        guestRPC.destroy();
         return;
       }
 
@@ -292,13 +300,14 @@ export class FrameSyncService {
       if (frame) {
         this._store.destroyFrame(frame);
       }
+      // TODO - Remove the guest connection associated with this frame identifier.
     });
 
     // When user toggles the highlight visibility control in the sidebar container,
     // update the visibility in all the guest frames.
     this._hostRPC.on('setHighlightsVisible', visible => {
       this._highlightsVisible = visible;
-      this._guestRPC.call('setHighlightsVisible', visible);
+      this._guestRPC.forEach(rpc => rpc.call('setHighlightsVisible', visible));
     });
   }
 
@@ -308,7 +317,7 @@ export class FrameSyncService {
   async connect() {
     // Create channel for sidebar-host communication.
     const hostPort = await this._portFinder.discover('host');
-    this._hostRPC.createChannel(hostPort);
+    this._hostRPC.connect(hostPort);
     this._hostRPC.call('ready');
 
     // Listen for guests connecting to the sidebar.
@@ -321,8 +330,7 @@ export class FrameSyncService {
           type: 'offer',
         })
       ) {
-        const channel = this._guestRPC.createChannel(ports[0]);
-        this._addGuestFrame(channel);
+        this._connectGuestFrame(ports[0]);
       }
     });
   }
@@ -347,7 +355,7 @@ export class FrameSyncService {
    */
   focusAnnotations(tags) {
     this._store.focusAnnotations(tags);
-    this._guestRPC.call('focusAnnotations', tags);
+    this._guestRPC.forEach(rpc => rpc.call('focusAnnotations', tags));
   }
 
   /**
@@ -356,7 +364,7 @@ export class FrameSyncService {
    * @param {string} tag
    */
   scrollToAnnotation(tag) {
-    this._guestRPC.call('scrollToAnnotation', tag);
+    this._guestRPC.forEach(rpc => rpc.call('scrollToAnnotation', tag));
   }
 
   // Only used to cleanup tests

@@ -1,10 +1,10 @@
 import { ListenerCollection } from '../shared/listener-collection';
 
 /**
- * @typedef {import('../shared/bridge').Bridge<GuestToHostEvent, HostToGuestEvent>} HostBridge
+ * @typedef {import('../shared/port-rpc').PortRPC<HostToGuestEvent, GuestToHostEvent>} HostRPC
  * @typedef {import('../types/annotator').Destroyable} Destroyable
- * @typedef {import('../types/bridge-events').HostToGuestEvent} HostToGuestEvent
- * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
+ * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
+ * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
  */
 
 /**
@@ -21,7 +21,7 @@ export class BucketBarClient {
    *   @param {Element} options.contentContainer - The scrollable container element for the
    *     document content. All of the highlights that the bucket bar's buckets point
    *     at should be contained within this element.
-   *   @param {HostBridge} options.hostRPC
+   *   @param {HostRPC} options.hostRPC
    */
   constructor({ contentContainer, hostRPC }) {
     this._hostRPC = hostRPC;
