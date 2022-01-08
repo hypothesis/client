@@ -1,6 +1,6 @@
 import { PortRPC } from '../port-rpc';
 
-describe('RPC', () => {
+describe('PortRPC', () => {
   let port1;
   let port2;
   let rpc1;
@@ -26,9 +26,9 @@ describe('RPC', () => {
       callback(result);
     };
 
-    rpc1 = new PortRPC(port1, {
-      concat,
-    });
+    rpc1 = new PortRPC();
+    rpc1.on('concat', concat);
+    rpc1.connect(port1);
 
     // `plusOne` method for rpc2
     plusOne = sinon.stub().callsFake((...numbers) => {
@@ -37,9 +37,9 @@ describe('RPC', () => {
       callback(result);
     });
 
-    rpc2 = new PortRPC(port2, {
-      plusOne,
-    });
+    rpc2 = new PortRPC();
+    rpc2.on('plusOne', plusOne);
+    rpc2.connect(port2);
   });
 
   afterEach(() => {

@@ -1,6 +1,6 @@
-import { Bridge } from '../shared/bridge';
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder } from '../shared/port-finder';
+import { PortRPC } from '../shared/port-rpc';
 import { generateHexString } from '../shared/random';
 
 import { Adder } from './adder';
@@ -27,10 +27,10 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
- * @typedef {import('../types/bridge-events').HostToGuestEvent} HostToGuestEvent
- * @typedef {import('../types/bridge-events').GuestToHostEvent} GuestToHostEvent
- * @typedef {import('../types/bridge-events').GuestToSidebarEvent} GuestToSidebarEvent
- * @typedef {import('../types/bridge-events').SidebarToGuestEvent} SidebarToGuestEvent
+ * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
+ * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
+ * @typedef {import('../types/port-rpc-events').GuestToSidebarEvent} GuestToSidebarEvent
+ * @typedef {import('../types/port-rpc-events').SidebarToGuestEvent} SidebarToGuestEvent
  */
 
 /**
@@ -186,17 +186,17 @@ export default class Guest {
     /**
      * Channel for host-guest communication.
      *
-     * @type {Bridge<GuestToHostEvent,HostToGuestEvent>}
+     * @type {PortRPC<HostToGuestEvent, GuestToHostEvent>}
      */
-    this._hostRPC = new Bridge();
+    this._hostRPC = new PortRPC();
     this._connectHostEvents();
 
     /**
      * Channel for guest-sidebar communication.
      *
-     * @type {Bridge<GuestToSidebarEvent,SidebarToGuestEvent>}
+     * @type {PortRPC<SidebarToGuestEvent, GuestToSidebarEvent>}
      */
-    this._sidebarRPC = new Bridge();
+    this._sidebarRPC = new PortRPC();
     this._connectSidebarEvents();
 
     // Set up automatic and integration-triggered injection of client into
@@ -364,7 +364,7 @@ export default class Guest {
     // Discover and connect to the host frame. All RPC events must be
     // registered before creating the channel.
     const hostPort = await this._portFinder.discover('host');
-    this._hostRPC.createChannel(hostPort);
+    this._hostRPC.connect(hostPort);
   }
 
   async _connectSidebarEvents() {
@@ -442,7 +442,7 @@ export default class Guest {
     // Discover and connect to the sidebar frame. All RPC events must be
     // registered before creating the channel.
     const sidebarPort = await this._portFinder.discover('sidebar');
-    this._sidebarRPC.createChannel(sidebarPort);
+    this._sidebarRPC.connect(sidebarPort);
   }
 
   destroy() {

@@ -8,10 +8,10 @@ const _set = features => {
 
 export const features = {
   /**
-   * @param {import('../shared/bridge').Bridge} bridge - Channel for host-sidebar communication
+   * @param {import('../shared/port-rpc').PortRPC} rpc - Channel for host-sidebar communication
    */
-  init: function (bridge) {
-    bridge.on('featureFlagsUpdated', _set);
+  init: function (rpc) {
+    rpc.on('featureFlagsUpdated', _set);
   },
 
   reset: function () {

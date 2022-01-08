@@ -51,39 +51,63 @@ const PROTOCOL = 'frame-rpc';
  */
 
 /**
- * RPC provides remote procedure calls between frames.
+ * PortRPC provides remote procedure calls between frames or workers. It uses
+ * the Channel Messaging API [1] as a transport.
  *
- * It uses the Channel Messaging API [1] for inter-frame communication.
+ * To communicate between two frames with this class, construct a PortRPC
+ * instance in each and register method handlers with {@link on}. Create a
+ * {@link MessageChannel} and send one of its two ports to each frame. Then call
+ * {@link connect} to make the PortRPC instance in each frame use the corresponding
+ * port.
  *
  * [1] https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API
  *
- * Code adapted from https://github.com/substack/frame-rpc.
- *
+ * @template {string} OnMethod - Names of RPC methods this client responds to
+ * @template {string} CallMethod - Names of RPC methods this client invokes
  * @implements Destroyable
  */
 export class PortRPC {
-  /**
-   * Create an RPC client for sending and receiving RPC message using a
-   * `MessagePort`.
-   *
-   * @param {MessagePort} port
-   * @param {Record<string, (...args: any[]) => void>} methods - Map of method
-   *   name to method handler
-   */
-  constructor(port, methods) {
-    this._port = port;
-    this._methods = methods;
+  constructor() {
+    /** @type {MessagePort|null} */
+    this._port = null;
 
-    this._sequence = 0;
+    /** @type {Record<string, (...args: any[]) => void>} */
+    this._methods = {};
+
+    this._sequence = 1;
+
+    /** @type {Record<number, (...args: any[]) => void>} */
     this._callbacks = {};
-    this._destroyed = false;
 
     this._listeners = new ListenerCollection();
+  }
 
-    this._listeners.add(this._port, 'message', event =>
+  /**
+   * Register a method handler for incoming RPC requests.
+   *
+   * All handlers must be registered before {@link connect} is invoked.
+   *
+   * @param {OnMethod} method
+   * @param {(...args: any[]) => void} handler
+   */
+  on(method, handler) {
+    if (this._port) {
+      throw new Error('Cannot add a method handler after a port is connected');
+    }
+    this._methods[method] = handler;
+  }
+
+  /**
+   * Connect to a MessagePort and process any queued RPC requests.
+   *
+   * @param {MessagePort} port
+   */
+  connect(port) {
+    this._port = port;
+    this._listeners.add(port, 'message', event =>
       this._handle(/** @type {MessageEvent} */ (event))
     );
-    this._port.start();
+    port.start();
   }
 
   /**
@@ -93,20 +117,23 @@ export class PortRPC {
   destroy() {
     this._destroyed = true;
     this._listeners.removeAll();
-    this._port.close();
+    this._port?.close();
   }
 
   /**
-   * Send an RPC request to the destination frame.
+   * Send an RPC request via the connected port.
    *
    * If the final argument in `args` is a function, it is treated as a callback
-   * which is invoked with the response.
+   * which is invoked with the response in the form of (error, result) arguments.
    *
-   * @param {string} method
+   * @param {CallMethod} method
    * @param {any[]} args
    */
   call(method, ...args) {
-    if (this._destroyed) {
+    // TODO - What should happen here if the port is not connected? Buffer
+    // method calls until the port is connected?
+
+    if (!this._port || this._destroyed) {
       return;
     }
 
@@ -157,8 +184,9 @@ export class PortRPC {
    */
   _handle(event) {
     const msg = this._parseMessage(event);
+    const port = this._port;
 
-    if (msg === null) {
+    if (msg === null || !port) {
       return;
     }
 
@@ -177,7 +205,7 @@ export class PortRPC {
           version: VERSION,
         };
 
-        this._port.postMessage(message);
+        port.postMessage(message);
       };
       this._methods[msg.method](...msg.arguments, callback);
     } else if ('response' in msg) {

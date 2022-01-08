@@ -55,10 +55,10 @@ const fixtures = {
 };
 
 describe('FrameSyncService', () => {
-  let FakeBridge;
+  let FakePortRPC;
 
   let fakeAnnotationsService;
-  let fakeBridges;
+  let fakePortRPCs;
   let fakePortFinder;
 
   let fakeStore;
@@ -68,34 +68,28 @@ describe('FrameSyncService', () => {
   let hostPort;
   let sidebarPort;
 
-  // Hook to prepare channels created by `Bridge.createChannel` before they are
-  // returned to the service.
-  let setupChannel;
+  // Hook to prepare new PortRPCs after they are created.
+  let setupPortRPC;
 
   beforeEach(() => {
     fakeAnnotationsService = { create: sinon.stub() };
-    fakeBridges = [];
-    setupChannel = null;
+    fakePortRPCs = [];
+    setupPortRPC = null;
 
-    FakeBridge = sinon.stub().callsFake(() => {
+    FakePortRPC = sinon.stub().callsFake(() => {
       const emitter = new EventEmitter();
-      const bridge = {
+      const rpc = {
         call: sinon.stub(),
-        createChannel: sinon.stub().callsFake(() => {
-          const rpc = {
-            call: sinon.stub(),
-            destroy: sinon.stub(),
-          };
-
-          setupChannel?.(rpc);
-
-          return rpc;
-        }),
+        connect: sinon.stub(),
+        destroy: sinon.stub(),
         emit: emitter.emit.bind(emitter),
         on: emitter.on.bind(emitter),
       };
-      fakeBridges.push(bridge);
-      return bridge;
+      fakePortRPCs.push(rpc);
+
+      setupPortRPC?.(rpc);
+
+      return rpc;
     });
 
     const { port1, port2 } = new MessageChannel();
@@ -133,10 +127,10 @@ describe('FrameSyncService', () => {
     fakeWindow.parent = new FakeWindow();
 
     $imports.$mock({
-      '../../shared/bridge': { Bridge: FakeBridge },
       '../../shared/port-finder': {
         PortFinder: sinon.stub().returns(fakePortFinder),
       },
+      '../../shared/port-rpc': { PortRPC: FakePortRPC },
     });
 
     frameSync = new Injector()
@@ -156,20 +150,20 @@ describe('FrameSyncService', () => {
   // These currently rely on knowing the implementation detail of which order
   // the channels are created in.
 
-  function hostBridge() {
-    return fakeBridges[0];
+  function hostRPC() {
+    return fakePortRPCs[0];
   }
 
-  function guestBridge() {
-    return fakeBridges[1];
+  function guestRPC() {
+    return fakePortRPCs[1];
   }
 
   function emitHostEvent(event, ...args) {
-    hostBridge().emit(event, ...args);
+    hostRPC().emit(event, ...args);
   }
 
   function emitGuestEvent(event, ...args) {
-    guestBridge().emit(event, ...args);
+    guestRPC().emit(event, ...args);
   }
 
   /**
@@ -195,19 +189,19 @@ describe('FrameSyncService', () => {
     it('discovers and connects to the host frame', async () => {
       await frameSync.connect();
 
-      assert.calledWith(hostBridge().createChannel, sidebarPort);
+      assert.calledWith(hostRPC().connect, sidebarPort);
     });
 
     it('notifies the host frame that the sidebar is ready to be displayed', async () => {
       await frameSync.connect();
 
-      assert.calledWith(hostBridge().call, 'ready');
+      assert.calledWith(hostRPC().call, 'ready');
     });
 
     it('connects to new guests', async () => {
       frameSync.connect();
       const port = await connectGuest();
-      assert.calledWith(guestBridge().createChannel, port);
+      assert.calledWith(guestRPC().connect, port);
     });
   });
 
@@ -216,42 +210,48 @@ describe('FrameSyncService', () => {
       frameSync.connect();
     });
 
-    it('sends a "loadAnnotations" message to the frame', () => {
+    it('sends a "loadAnnotations" message to the frame', async () => {
+      await connectGuest();
+
       fakeStore.setState({
         annotations: [fixtures.ann],
       });
 
       assert.calledWithMatch(
-        guestBridge().call,
+        guestRPC().call,
         'loadAnnotations',
         sinon.match([formatAnnot(fixtures.ann)])
       );
     });
 
-    it('sends a "loadAnnotations" message only for new annotations', () => {
+    it('sends a "loadAnnotations" message only for new annotations', async () => {
+      await connectGuest();
+
       const ann2 = Object.assign({}, fixtures.ann, { $tag: 't2', id: 'a2' });
       fakeStore.setState({
         annotations: [fixtures.ann],
       });
-      guestBridge().call.reset();
+      guestRPC().call.reset();
 
       fakeStore.setState({
         annotations: [fixtures.ann, ann2],
       });
 
       assert.calledWithMatch(
-        guestBridge().call,
+        guestRPC().call,
         'loadAnnotations',
         sinon.match([formatAnnot(ann2)])
       );
     });
 
-    it('does not send a "loadAnnotations" message for replies', () => {
+    it('does not send a "loadAnnotations" message for replies', async () => {
+      await connectGuest();
+
       fakeStore.setState({
         annotations: [annotationFixtures.newReply()],
       });
 
-      assert.isFalse(guestBridge().call.calledWith('loadAnnotations'));
+      assert.isFalse(guestRPC().call.calledWith('loadAnnotations'));
     });
   });
 
@@ -265,7 +265,7 @@ describe('FrameSyncService', () => {
         annotations: [annotationFixtures.publicAnnotation()],
       });
       assert.calledWithMatch(
-        hostBridge().call,
+        hostRPC().call,
         'publicAnnotationCountChanged',
         sinon.match(1)
       );
@@ -280,7 +280,7 @@ describe('FrameSyncService', () => {
       });
 
       assert.calledWithMatch(
-        hostBridge().call,
+        hostRPC().call,
         'publicAnnotationCountChanged',
         sinon.match(0)
       );
@@ -291,9 +291,7 @@ describe('FrameSyncService', () => {
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
       });
-      assert.isFalse(
-        hostBridge().call.calledWith('publicAnnotationCountChanged')
-      );
+      assert.isFalse(hostRPC().call.calledWith('publicAnnotationCountChanged'));
     });
 
     it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', () => {
@@ -301,16 +299,17 @@ describe('FrameSyncService', () => {
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
       });
-      assert.isFalse(
-        hostBridge().call.calledWith('publicAnnotationCountChanged')
-      );
+      assert.isFalse(hostRPC().call.calledWith('publicAnnotationCountChanged'));
     });
   });
 
   context('when annotations are removed from the sidebar', () => {
-    it('sends a "deleteAnnotation" message to the frame', () => {
+    it('sends a "deleteAnnotation" message to the frame', async () => {
       const ann = fixtures.ann;
+
       frameSync.connect();
+      await connectGuest();
+
       fakeStore.setState({
         annotations: [ann],
       });
@@ -319,23 +318,29 @@ describe('FrameSyncService', () => {
         annotations: [],
       });
 
-      assert.calledWithMatch(guestBridge().call, 'deleteAnnotation', ann.$tag);
+      assert.calledWithMatch(guestRPC().call, 'deleteAnnotation', ann.$tag);
     });
   });
 
   context('when a new annotation is created in the frame', () => {
-    it('makes the new highlight visible in the frame', () => {
+    it('makes the new highlight visible in the frame', async () => {
       frameSync.connect();
+      await connectGuest();
+
       fakeStore.isLoggedIn.returns(true);
 
       emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
 
-      assert.calledWith(hostBridge().call, 'showHighlights');
+      assert.calledWith(hostRPC().call, 'showHighlights');
     });
 
     context('when an authenticated user is present', () => {
-      it('creates the annotation in the sidebar', () => {
+      beforeEach(async () => {
         frameSync.connect();
+        await connectGuest();
+      });
+
+      it('creates the annotation in the sidebar', async () => {
         fakeStore.isLoggedIn.returns(true);
         const ann = { $tag: 't1', target: [] };
 
@@ -344,17 +349,15 @@ describe('FrameSyncService', () => {
         assert.calledWith(fakeAnnotationsService.create, ann);
       });
 
-      it('opens the sidebar ready for the user to edit the draft', () => {
-        frameSync.connect();
+      it('opens the sidebar ready for the user to edit the draft', async () => {
         fakeStore.isLoggedIn.returns(true);
 
         emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
 
-        assert.calledWith(hostBridge().call, 'openSidebar');
+        assert.calledWith(hostRPC().call, 'openSidebar');
       });
 
       it('does not open the sidebar if the annotation is a highlight', () => {
-        frameSync.connect();
         fakeStore.isLoggedIn.returns(true);
 
         emitGuestEvent('createAnnotation', {
@@ -363,14 +366,15 @@ describe('FrameSyncService', () => {
           target: [],
         });
 
-        assert.neverCalledWith(hostBridge().call, 'openSidebar');
+        assert.neverCalledWith(hostRPC().call, 'openSidebar');
       });
     });
 
     context('when no authenticated user is present', () => {
-      beforeEach(() => {
+      beforeEach(async () => {
         fakeStore.isLoggedIn.returns(false);
         frameSync.connect();
+        await connectGuest();
       });
 
       it('should not create an annotation in the sidebar', () => {
@@ -382,7 +386,7 @@ describe('FrameSyncService', () => {
       it('should open the sidebar', () => {
         emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
 
-        assert.calledWith(hostBridge().call, 'openSidebar');
+        assert.calledWith(hostRPC().call, 'openSidebar');
       });
 
       it('should open the login prompt panel', () => {
@@ -394,7 +398,7 @@ describe('FrameSyncService', () => {
       it('should send a "deleteAnnotation" message to the frame', () => {
         emitGuestEvent('createAnnotation', { $tag: 't1', target: [] });
 
-        assert.calledWith(guestBridge().call, 'deleteAnnotation');
+        assert.calledWith(guestRPC().call, 'deleteAnnotation');
       });
     });
   });
@@ -402,9 +406,11 @@ describe('FrameSyncService', () => {
   context('when anchoring completes', () => {
     let clock = sinon.stub();
 
-    beforeEach(() => {
-      clock = sinon.useFakeTimers();
+    beforeEach(async () => {
       frameSync.connect();
+      await connectGuest();
+
+      clock = sinon.useFakeTimers();
     });
 
     afterEach(() => {
@@ -451,7 +457,7 @@ describe('FrameSyncService', () => {
 
     it("adds the page's metadata to the frames list", async () => {
       const frameInfo = fixtures.htmlDocumentInfo;
-      setupChannel = rpc => {
+      setupPortRPC = rpc => {
         rpc.call.withArgs('getDocumentInfo').callsFake((method, callback) => {
           callback(null, frameInfo);
         });
@@ -468,7 +474,7 @@ describe('FrameSyncService', () => {
 
     it('closes the channel and does not add frame to store if getting document info fails', async () => {
       let channel;
-      setupChannel = rpc => {
+      setupPortRPC = rpc => {
         rpc.call.withArgs('getDocumentInfo').callsFake((method, callback) => {
           callback('Error getting document info');
         });
@@ -484,7 +490,7 @@ describe('FrameSyncService', () => {
 
     it("synchronizes highlight visibility in the guest with the sidebar's controls", async () => {
       let channel;
-      setupChannel = rpc => {
+      setupPortRPC = rpc => {
         channel = rpc;
       };
 
@@ -510,8 +516,12 @@ describe('FrameSyncService', () => {
   });
 
   describe('on "showAnnotations" message', () => {
-    it('selects annotations which have an ID', () => {
+    beforeEach(async () => {
       frameSync.connect();
+      await connectGuest();
+    });
+
+    it('selects annotations which have an ID', () => {
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
       emitGuestEvent('showAnnotations', ['tag1', 'tag2', 'tag3']);
 
@@ -521,6 +531,11 @@ describe('FrameSyncService', () => {
   });
 
   describe('on "focusAnnotations" message', () => {
+    beforeEach(async () => {
+      frameSync.connect();
+      await connectGuest();
+    });
+
     it('focuses the annotations', () => {
       frameSync.connect();
       emitGuestEvent('focusAnnotations', ['tag1', 'tag2', 'tag3']);
@@ -529,6 +544,11 @@ describe('FrameSyncService', () => {
   });
 
   describe('on "toggleAnnotationSelection" message', () => {
+    beforeEach(async () => {
+      frameSync.connect();
+      await connectGuest();
+    });
+
     it('toggles the selected state of the annotations', () => {
       frameSync.connect();
       fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
@@ -551,32 +571,34 @@ describe('FrameSyncService', () => {
   });
 
   describe('relaying messages between host and guest frames', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       frameSync.connect();
+      await connectGuest();
     });
 
     it('calls "openSidebar"', () => {
       emitGuestEvent('openSidebar');
 
-      assert.calledWith(hostBridge().call, 'openSidebar');
+      assert.calledWith(hostRPC().call, 'openSidebar');
     });
 
     it('calls "closeSidebar"', () => {
       emitGuestEvent('closeSidebar');
 
-      assert.calledWith(hostBridge().call, 'closeSidebar');
+      assert.calledWith(hostRPC().call, 'closeSidebar');
     });
 
     it('calls "setHighlightsVisible"', () => {
       emitHostEvent('setHighlightsVisible');
 
-      assert.calledWith(guestBridge().call, 'setHighlightsVisible');
+      assert.calledWith(guestRPC().call, 'setHighlightsVisible');
     });
   });
 
   describe('#focusAnnotations', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       frameSync.connect();
+      await connectGuest();
     });
 
     it('should update the focused annotations in the store', () => {
@@ -590,7 +612,7 @@ describe('FrameSyncService', () => {
     it('should focus the associated highlights in the guest', () => {
       frameSync.focusAnnotations([1, 2]);
       assert.calledWith(
-        guestBridge().call,
+        guestRPC().call,
         'focusAnnotations',
         sinon.match.array.deepEquals([1, 2])
       );
@@ -598,10 +620,15 @@ describe('FrameSyncService', () => {
   });
 
   describe('#scrollToAnnotation', () => {
+    beforeEach(async () => {
+      frameSync.connect();
+      await connectGuest();
+    });
+
     it('should scroll to the annotation in the guest', () => {
       frameSync.connect();
       frameSync.scrollToAnnotation('atag');
-      assert.calledWith(guestBridge().call, 'scrollToAnnotation', 'atag');
+      assert.calledWith(guestRPC().call, 'scrollToAnnotation', 'atag');
     });
   });
 
@@ -609,7 +636,7 @@ describe('FrameSyncService', () => {
     it('sends a message to the host frame', () => {
       frameSync.connect();
       frameSync.notifyHost('openNotebook', 'group-id');
-      assert.calledWith(hostBridge().call, 'openNotebook', 'group-id');
+      assert.calledWith(hostRPC().call, 'openNotebook', 'group-id');
     });
   });
 });
