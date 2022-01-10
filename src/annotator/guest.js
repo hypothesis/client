@@ -184,6 +184,12 @@ export default class Guest {
     });
 
     /**
+     * Integration that handles document-type specific functionality in the
+     * guest.
+     */
+    this._integration = createIntegration(this);
+
+    /**
      * Channel for host-guest communication.
      *
      * @type {PortRPC<HostToGuestEvent, GuestToHostEvent>}
@@ -202,12 +208,6 @@ export default class Guest {
     // Set up automatic and integration-triggered injection of client into
     // iframes in this frame.
     this._hypothesisInjector = new HypothesisInjector(this.element, config);
-
-    /**
-     * Integration that handles document-type specific functionality in the
-     * guest.
-     */
-    this._integration = createIntegration(this);
 
     this._bucketBarClient =
       this._frameIdentifier === null
@@ -415,13 +415,6 @@ export default class Guest {
       }
     );
 
-    // Handler for when sidebar requests metadata for the current document
-    this._sidebarRPC.on('getDocumentInfo', cb => {
-      this.getDocumentInfo()
-        .then(info => cb(null, info))
-        .catch(reason => cb(reason));
-    });
-
     // Handler for controls on the sidebar
     this._sidebarRPC.on('setHighlightsVisible', showHighlights => {
       this.setHighlightsVisible(showHighlights);
@@ -439,10 +432,16 @@ export default class Guest {
       annotations => annotations.forEach(annotation => this.anchor(annotation))
     );
 
-    // Discover and connect to the sidebar frame. All RPC events must be
-    // registered before creating the channel.
-    const sidebarPort = await this._portFinder.discover('sidebar');
-    this._sidebarRPC.connect(sidebarPort);
+    // Connect to sidebar and send document info/URIs to it.
+    //
+    // RPC calls are deferred until a connection is made, so these steps can
+    // complete in either order.
+    this._portFinder.discover('sidebar').then(port => {
+      this._sidebarRPC.connect(port);
+    });
+    this.getDocumentInfo().then(metadata =>
+      this._sidebarRPC.call('documentInfoChanged', metadata)
+    );
   }
 
   destroy() {

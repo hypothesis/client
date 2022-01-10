@@ -182,6 +182,18 @@ export class FrameSyncService {
     /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
     const guestRPC = new PortRPC();
 
+    // Update document metadata for this guest. We currently assume that the
+    // guest will make this call once after it connects. To handle updates
+    // to the document, we'll need to change `connectFrame` to update rather than
+    // add to the frame list.
+    guestRPC.on('documentInfoChanged', info => {
+      this._store.connectFrame({
+        id: info.frameIdentifier,
+        metadata: info.metadata,
+        uri: info.uri,
+      });
+    });
+
     // A new annotation, note or highlight was created in the frame
     guestRPC.on(
       'createAnnotation',
@@ -267,21 +279,6 @@ export class FrameSyncService {
 
     // Synchronize highlight visibility in this guest with the sidebar's controls.
     guestRPC.call('setHighlightsVisible', this._highlightsVisible);
-
-    // Fetch document metadata. This could be optimized by having the guest
-    // push metadata to the sidebar. See https://github.com/hypothesis/client/issues/4094.
-    guestRPC.call('getDocumentInfo', (err, info) => {
-      if (err) {
-        guestRPC.destroy();
-        return;
-      }
-
-      this._store.connectFrame({
-        id: info.frameIdentifier,
-        metadata: info.metadata,
-        uri: info.uri,
-      });
-    });
   }
 
   /**
