@@ -156,4 +156,22 @@ describe('PortRPC', () => {
       rpc.on('foo', () => {});
     }, 'Cannot add a method handler after a port is connected');
   });
+
+  it('should queue RPC requests made before port is connected', async () => {
+    const { port1, port2 } = new MessageChannel();
+    const sender = new PortRPC();
+
+    const receiver = new PortRPC();
+    const testMethod = sinon.stub();
+    receiver.on('test', testMethod);
+    receiver.connect(port2);
+
+    sender.call('test', 'first', 'call');
+    sender.call('test', 'second', 'call');
+    sender.connect(port1);
+
+    await waitForMessageDelivery();
+    assert.calledWith(testMethod, 'first', 'call');
+    assert.calledWith(testMethod, 'second', 'call');
+  });
 });
