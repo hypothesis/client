@@ -146,4 +146,14 @@ describe('PortRPC', () => {
       assert.notCalled(plusOne);
     })
   );
+
+  it('throws an error if `on` is called after `connect`', () => {
+    const { port1 } = new MessageChannel();
+    const rpc = new PortRPC();
+
+    rpc.connect(port1);
+    assert.throws(() => {
+      rpc.on('foo', () => {});
+    }, 'Cannot add a method handler after a port is connected');
+  });
 });
