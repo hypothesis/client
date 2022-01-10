@@ -80,6 +80,13 @@ export class PortRPC {
     this._callbacks = new Map();
 
     this._listeners = new ListenerCollection();
+
+    /**
+     * Method and arguments of pending RPC calls made before a port was connected.
+     *
+     * @type {Array<[CallMethod, any[]]>}
+     */
+    this._pendingCalls = [];
   }
 
   /**
@@ -108,6 +115,11 @@ export class PortRPC {
       this._handle(/** @type {MessageEvent} */ (event))
     );
     port.start();
+
+    for (let [method, args] of this._pendingCalls) {
+      this.call(method, ...args);
+    }
+    this._pendingCalls = [];
   }
 
   /**
@@ -123,6 +135,9 @@ export class PortRPC {
   /**
    * Send an RPC request via the connected port.
    *
+   * If this client is not yet connected to a port, the call will be queued and
+   * sent when {@link connect} is called.
+   *
    * If the final argument in `args` is a function, it is treated as a callback
    * which is invoked with the response in the form of (error, result) arguments.
    *
@@ -130,8 +145,9 @@ export class PortRPC {
    * @param {any[]} args
    */
   call(method, ...args) {
-    // TODO - What should happen here if the port is not connected? Buffer
-    // method calls until the port is connected?
+    if (!this._port) {
+      this._pendingCalls.push([method, args]);
+    }
 
     if (!this._port || this._destroyed) {
       return;
