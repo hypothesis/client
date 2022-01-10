@@ -141,7 +141,7 @@ describe('Guest', () => {
     FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
 
     fakePortFinder = {
-      discover: sinon.stub(),
+      discover: sinon.stub().resolves({}),
       destroy: sinon.stub(),
     };
 
@@ -356,40 +356,6 @@ describe('Guest', () => {
 
         assert.notCalled(eventEmitted);
         assert.notCalled(fakeIntegration.scrollToAnchor);
-      });
-    });
-
-    describe('on "getDocumentInfo" event', () => {
-      let guest;
-
-      afterEach(() => {
-        guest.destroy();
-        sandbox.restore();
-      });
-
-      function createCallback(expectedUri, expectedMetadata, done) {
-        return (err, result) => {
-          assert.strictEqual(err, null);
-          try {
-            assert.equal(result.uri, expectedUri);
-            assert.deepEqual(result.metadata, expectedMetadata);
-            done();
-          } catch (e) {
-            done(e);
-          }
-        };
-      }
-
-      it('calls the callback with document URL and metadata', done => {
-        guest = createGuest();
-        const metadata = { title: 'hi' };
-
-        fakeIntegration.getMetadata.resolves(metadata);
-
-        emitSidebarEvent(
-          'getDocumentInfo',
-          createCallback('https://example.com/test.pdf', metadata, done)
-        );
       });
     });
 
@@ -818,6 +784,8 @@ describe('Guest', () => {
   describe('#createAnnotation', () => {
     it('creates an annotation if host calls "createAnnotationIn" RPC method', async () => {
       createGuest();
+      await delay(0);
+      sidebarRPC().call.resetHistory(); // Discard `documentInfoChanged` call
 
       emitHostEvent('createAnnotationIn', 'dummy');
       await delay(0);
@@ -1297,6 +1265,19 @@ describe('Guest', () => {
     createGuest({ subFrameIdentifier: 'frame-id' });
 
     assert.notCalled(FakeBucketBarClient);
+  });
+
+  it('sends document metadata and URIs to sidebar', async () => {
+    createGuest();
+    await delay(0);
+    assert.calledWith(sidebarRPC().call, 'documentInfoChanged', {
+      uri: 'https://example.com/test.pdf',
+      metadata: {
+        title: 'Test title',
+        documentFingerprint: 'test-fingerprint',
+      },
+      frameIdentifier: null,
+    });
   });
 
   describe('#fitSideBySide', () => {

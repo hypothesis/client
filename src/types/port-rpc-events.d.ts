@@ -46,6 +46,9 @@ export type GuestToSidebarEvent =
    */
   | 'openSidebar'
 
+  /** The guest is notifying the sidebar of the current document metadata and URIs. */
+  | 'documentInfoChanged'
+
   /**
    * The guest is asking the sidebar to display some annotations.
    */
@@ -117,11 +120,6 @@ export type SidebarToGuestEvent =
    * The sidebar is asking the guest(s) to focus on certain annotations.
    */
   | 'focusAnnotations'
-
-  /**
-   * The sidebar is asking the guest(s) for the URL and other metadata about the document.
-   */
-  | 'getDocumentInfo'
 
   /**
    * The sidebar is asking the guest(s) to load annotations.

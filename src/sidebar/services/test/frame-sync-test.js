@@ -25,23 +25,12 @@ const fixtures = {
     },
   },
 
-  // Response to the `getDocumentInfo` channel message for a frame displaying
-  // an HTML document
+  // Argument to the `documentInfoChanged` call made by a guest displaying an HTML
+  // document.
   htmlDocumentInfo: {
     uri: 'http://example.org',
     metadata: {
       link: [],
-    },
-    frameIdentifier: null,
-  },
-
-  // Response to the `getDocumentInfo` channel message for a frame displaying
-  // a PDF
-  pdfDocumentInfo: {
-    uri: 'http://example.org/paper.pdf',
-    metadata: {
-      documentFingerprint: '1234',
-      link: [{ href: 'http://example.org/paper.pdf' }, { href: 'urn:1234' }],
     },
     frameIdentifier: null,
   },
@@ -457,35 +446,14 @@ describe('FrameSyncService', () => {
 
     it("adds the page's metadata to the frames list", async () => {
       const frameInfo = fixtures.htmlDocumentInfo;
-      setupPortRPC = rpc => {
-        rpc.call.withArgs('getDocumentInfo').callsFake((method, callback) => {
-          callback(null, frameInfo);
-        });
-      };
-
       await connectGuest();
+      emitGuestEvent('documentInfoChanged', frameInfo);
 
       assert.calledWith(fakeStore.connectFrame, {
         id: frameInfo.frameIdentifier,
         metadata: frameInfo.metadata,
         uri: frameInfo.uri,
       });
-    });
-
-    it('closes the channel and does not add frame to store if getting document info fails', async () => {
-      let channel;
-      setupPortRPC = rpc => {
-        rpc.call.withArgs('getDocumentInfo').callsFake((method, callback) => {
-          callback('Error getting document info');
-        });
-        channel = rpc;
-      };
-
-      await connectGuest();
-
-      assert.ok(channel);
-      assert.called(channel.destroy);
-      assert.notCalled(fakeStore.connectFrame);
     });
 
     it("synchronizes highlight visibility in the guest with the sidebar's controls", async () => {
