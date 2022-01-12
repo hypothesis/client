@@ -14,8 +14,10 @@ class FakeWindow extends EventTarget {
   }
 }
 
+const testAnnotation = annotationFixtures.defaultAnnotation();
+
 const fixtures = {
-  ann: Object.assign({ $tag: 't1' }, annotationFixtures.defaultAnnotation()),
+  ann: { $tag: 't1', ...testAnnotation },
 
   // New annotation received from the frame
   newAnnFromFrame: {
@@ -28,11 +30,13 @@ const fixtures = {
   // Argument to the `documentInfoChanged` call made by a guest displaying an HTML
   // document.
   htmlDocumentInfo: {
-    uri: 'http://example.org',
+    uri: testAnnotation.uri,
     metadata: {
       link: [],
     },
-    frameIdentifier: null,
+
+    // This should match the guest frame ID from `framesListEntry`.
+    frameIdentifier: 'abc',
   },
 
   // The entry in the list of frames currently connected
@@ -200,7 +204,9 @@ describe('FrameSyncService', () => {
     });
 
     it('sends a "loadAnnotations" message to the frame', async () => {
+      const frameInfo = fixtures.htmlDocumentInfo;
       await connectGuest();
+      emitGuestEvent('documentInfoChanged', frameInfo);
 
       fakeStore.setState({
         annotations: [fixtures.ann],
@@ -214,7 +220,9 @@ describe('FrameSyncService', () => {
     });
 
     it('sends a "loadAnnotations" message only for new annotations', async () => {
+      const frameInfo = fixtures.htmlDocumentInfo;
       await connectGuest();
+      emitGuestEvent('documentInfoChanged', frameInfo);
 
       const ann2 = Object.assign({}, fixtures.ann, { $tag: 't2', id: 'a2' });
       fakeStore.setState({
