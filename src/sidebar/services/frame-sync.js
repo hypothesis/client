@@ -35,6 +35,30 @@ export function formatAnnot({ $tag, target, uri }) {
 }
 
 /**
+ * Return the frame in `frames` which best matches `ann`.
+ *
+ * @param {Frame[]} frames
+ * @param {Annotation} ann
+ */
+function frameForAnnotation(frames, ann) {
+  // Choose the frame whose URL exactly matches this annotation. If there is
+  // none, we'll use the main frame.
+  //
+  // An annotation's URI may not match the frame URI. To handle these
+  // cases we'll need to either make separate search API calls for each
+  // frame, or get the backend to return information about which search
+  // URIs matched a frame.
+  //
+  // If there are multiple frames with a matching URI, we'll send it
+  // whichever one connected first, which is usually the main frame.
+  const frame = frames.find(f => f.uri === ann.uri);
+  if (frame) {
+    return frame;
+  }
+  return frames.find(f => f.id === null);
+}
+
+/**
  * Service that synchronizes annotations between the sidebar and host page.
  *
  * Annotations are synced in both directions. New annotations created in the host
@@ -78,11 +102,15 @@ export class FrameSyncService {
     this._hostRPC = new PortRPC();
 
     /**
-     * Channels for sidebar-guest(s) communication.
+     * Map of guest frame ID to channel for communicating with guest.
      *
-     * @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>[]}
+     * The ID will be `null` for the "main" guest, which is usually the one in
+     * the host frame.
+     *
+     * @type {Map<string|null, PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>>}
      */
-    this._guestRPC = [];
+    this._guestRPC = new Map();
+    this._nextGuestId = 0;
 
     /**
      * Tags of annotations that are currently loaded into guest frames.
@@ -119,6 +147,7 @@ export class FrameSyncService {
         /** @type {Annotation[]} */
         const added = [];
 
+        // Determine which annotations have been added or deleted in the sidebar.
         annotations.forEach(annot => {
           if (isReply(annot)) {
             // The frame does not need to know about replies
@@ -138,27 +167,43 @@ export class FrameSyncService {
           annot => !inSidebar.has(annot.$tag)
         );
 
-        // We currently only handle adding and removing annotations from the frame
-        // when they are added or removed in the sidebar, but not re-anchoring
-        // annotations if their selectors are updated.
+        // Send added annotations to matching frame.
         if (added.length > 0) {
-          // We currently send all loaded annotations to all connected guests,
-          // but we should only send annotations to appropriate guests.
-          // See https://github.com/hypothesis/client/issues/3992.
-          this._guestRPC.forEach(rpc =>
-            rpc.call('loadAnnotations', added.map(formatAnnot))
-          );
+          /** @type {Map<string|null, Annotation[]>} */
+          const addedByFrame = new Map();
+          for (let annotation of added) {
+            const frame = frameForAnnotation(frames, annotation);
+            if (!frame) {
+              continue;
+            }
+            const anns = addedByFrame.get(frame.id) ?? [];
+            anns.push(annotation);
+            addedByFrame.set(frame.id, anns);
+          }
+
+          for (let [frameId, anns] of addedByFrame) {
+            const rpc = this._guestRPC.get(frameId);
+            if (rpc) {
+              rpc.call('loadAnnotations', anns.map(formatAnnot));
+            }
+          }
+
           added.forEach(annot => {
             this._inFrame.add(annot.$tag);
           });
         }
+
+        // Remove deleted annotations from frames.
         deleted.forEach(annot => {
+          // Delete from all frames. If a guest is not displaying a particular
+          // annotation, it will just ignore the request.
           this._guestRPC.forEach(rpc =>
             rpc.call('deleteAnnotation', annot.$tag)
           );
           this._inFrame.delete(annot.$tag);
         });
 
+        // Update elements in host page which display annotation counts.
         if (frames.length > 0) {
           if (frames.every(frame => frame.isAnnotationFetchComplete)) {
             if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
@@ -179,17 +224,25 @@ export class FrameSyncService {
   _connectGuest(port) {
     /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
     const guestRPC = new PortRPC();
-    this._guestRPC.push(guestRPC);
 
-    /** @type {string|null} */
-    let frameIdentifier;
+    // Generate a temporary ID for this guest until we learn its "real" ID.
+    ++this._nextGuestId;
+    let frameIdentifier = /** @type {string|null} */ (
+      `temp-${this._nextGuestId}`
+    );
+
+    this._guestRPC.set(frameIdentifier, guestRPC);
 
     // Update document metadata for this guest. We currently assume that the
     // guest will make this call once after it connects. To handle updates
     // to the document, we'll need to change `connectFrame` to update rather than
     // add to the frame list.
     guestRPC.on('documentInfoChanged', info => {
+      this._guestRPC.delete(frameIdentifier);
+
       frameIdentifier = info.frameIdentifier;
+      this._guestRPC.set(frameIdentifier, guestRPC);
+
       this._store.connectFrame({
         id: info.frameIdentifier,
         metadata: info.metadata,
@@ -203,7 +256,7 @@ export class FrameSyncService {
         this._store.destroyFrame(frame);
       }
       guestRPC.destroy();
-      this._guestRPC = this._guestRPC.filter(rpc => rpc !== guestRPC);
+      this._guestRPC.delete(frameIdentifier);
     });
 
     // A new annotation, note or highlight was created in the frame
