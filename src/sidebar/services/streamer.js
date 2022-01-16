@@ -71,6 +71,7 @@ export class StreamerService {
   applyPendingUpdates() {
     const updates = Object.values(this._store.pendingUpdates());
     if (updates.length) {
+      // TODO - Handle multiple frames
       this._store.addAnnotations(updates);
     }
 
@@ -169,6 +170,9 @@ export class StreamerService {
    * @param {object} configMessage
    */
   setConfig(key, configMessage) {
+    // TODO - Figure out how to handle multiple frames. Do we create a separate
+    // connection for each frame or make changes on the backend so we can figure
+    // out which annotation goes with which frame?
     this._configMessages[key] = configMessage;
     if (this._socket?.isConnected()) {
       this._socket.send(configMessage);

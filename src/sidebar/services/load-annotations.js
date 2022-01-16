@@ -8,6 +8,7 @@ import { SearchClient } from '../search-client';
 
 /**
  * @typedef LoadAnnotationOptions
+ * @prop {string|null} frameId
  * @prop {string} groupId
  * @prop {string[]} [uris]
  * @prop {number} [maxResults] - If number of annotations in search results
@@ -47,8 +48,8 @@ export class LoadAnnotationsService {
     this._streamer = streamer;
     this._streamFilter = streamFilter;
 
-    /** @type {SearchClient|null} */
-    this._searchClient = null;
+    /** @type {Map<string|null, SearchClient>} */
+    this._searchClients = new Map();
   }
 
   /**
@@ -60,6 +61,7 @@ export class LoadAnnotationsService {
    * @param {LoadAnnotationOptions} options
    */
   load({
+    frameId,
     groupId,
     uris,
     onError,
@@ -68,18 +70,24 @@ export class LoadAnnotationsService {
     sortOrder,
     streamFilterBy = 'uri',
   }) {
-    this._store.removeAnnotations(this._store.savedAnnotations());
+    const currentAnnotations = this._store
+      .savedAnnotations()
+      .filter(a => a.$frameId === frameId);
+    this._store.removeAnnotations(currentAnnotations);
 
     // Cancel previously running search client.
     //
     // This will emit the "end" event for the existing client and trigger cleanup
     // associated with that client (eg. resetting the count of in-flight
     // annotation fetches).
-    if (this._searchClient) {
-      this._searchClient.cancel();
+    const prevSearchClient = this._searchClients.get(frameId);
+    if (prevSearchClient) {
+      prevSearchClient.cancel();
     }
 
     // Set the filter for the websocket stream
+    //
+    // TODO: How will multiple frames be handled here? Multiple WebSocket clients?
     switch (streamFilterBy) {
       case 'group':
         this._streamFilter
@@ -120,19 +128,21 @@ export class LoadAnnotationsService {
       sortOrder,
     };
 
-    this._searchClient = new SearchClient(this._api.search, searchOptions);
+    const searchClient = new SearchClient(this._api.search, searchOptions);
+    this._searchClients.set(frameId, searchClient);
 
-    this._searchClient.on('resultCount', resultCount => {
+    searchClient.on('resultCount', resultCount => {
+      // TODO - Pass frame ID here.
       this._store.setAnnotationResultCount(resultCount);
     });
 
-    this._searchClient.on('results', results => {
+    searchClient.on('results', results => {
       if (results.length) {
-        this._store.addAnnotations(results);
+        this._store.addAnnotations(frameId, results);
       }
     });
 
-    this._searchClient.on('error', error => {
+    searchClient.on('error', error => {
       if (typeof onError === 'function') {
         onError(error);
       } else {
@@ -140,13 +150,14 @@ export class LoadAnnotationsService {
       }
     });
 
-    this._searchClient.on('end', () => {
+    searchClient.on('end', () => {
       // Remove client as it's no longer active.
-      this._searchClient = null;
+      this._searchClients.delete(frameId);
 
       if (uris && uris.length > 0) {
         this._store.frames().forEach(frame => {
           if (uris.indexOf(frame.uri) >= 0) {
+            // TODO - Replace `frame.uri` with frame ID here?
             this._store.updateFrameAnnotationFetchStatus(frame.uri, true);
           }
         });
@@ -155,7 +166,7 @@ export class LoadAnnotationsService {
     });
 
     this._store.annotationFetchStarted();
-    this._searchClient.get({ group: groupId, uri: uris });
+    searchClient.get({ group: groupId, uri: uris });
   }
 
   /**
@@ -192,7 +203,7 @@ export class LoadAnnotationsService {
     }
     const threadAnnotations = [annotation, ...replySearchResult.rows];
 
-    this._store.addAnnotations(threadAnnotations);
+    this._store.addAnnotations(null /* frameId */, threadAnnotations);
 
     // If we've been successful in retrieving a thread, with a top-level annotation,
     // configure the connection to the real-time update service to send us

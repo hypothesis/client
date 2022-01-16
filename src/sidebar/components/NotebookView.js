@@ -81,6 +81,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
     store.setSortKey('Newest');
     if (groupId) {
       loadAnnotationsService.load({
+        frameId: null,
         groupId,
         // Load annotations in reverse-chronological order because that is how
         // threads are sorted in the notebook view. By aligning the fetch

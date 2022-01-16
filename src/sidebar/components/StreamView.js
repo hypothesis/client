@@ -42,7 +42,10 @@ function StreamView({ api, toastMessenger }) {
       try {
         store.annotationFetchStarted();
         const results = await api.search(queryParams);
-        store.addAnnotations([...results.rows, ...results.replies]);
+        store.addAnnotations(null /* frameId */, [
+          ...results.rows,
+          ...results.replies,
+        ]);
       } finally {
         store.annotationFetchFinished();
       }

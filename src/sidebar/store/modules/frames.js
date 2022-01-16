@@ -1,8 +1,4 @@
-import {
-  createSelector,
-  createSelectorCreator,
-  defaultMemoize,
-} from 'reselect';
+import { createSelector } from 'reselect';
 import shallowEqual from 'shallowequal';
 
 import * as util from '../util';
@@ -113,9 +109,9 @@ const mainFrame = createSelector(
 );
 
 /**
- * @param {Frame} frame
+ * @param {Pick<Frame, "metadata"|"uri">} frame
  */
-function searchUrisForFrame(frame) {
+function searchURIsForFrame(frame) {
   let uris = [frame.uri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
@@ -135,24 +131,42 @@ function searchUrisForFrame(frame) {
   return uris;
 }
 
-// "selector creator" that uses `shallowEqual` instead of `===` for memoization
-const createShallowEqualSelector = createSelectorCreator(
-  defaultMemoize,
-  shallowEqual
-);
+/**
+ * Return true if two arrays have the same entries in the same order.
+ *
+ * @template T
+ * @param {T[]} a
+ * @param {T[]} b
+ */
+function entriesShallowEqual(a, b) {
+  return (
+    a.length === b.length && a.every((item, i) => shallowEqual(item, b[i]))
+  );
+}
 
 /**
- * Memoized selector will return the same array (of URIs) reference unless the
- * values of the array change (are not shallow-equal).
+ * Return a map of frame ID to search URIs.
+ *
+ * The returned map's identity will change only if the set of frames or
+ * URIs for those frames changes.
  */
-const searchUris = createShallowEqualSelector(
+const searchURIMap = createSelector(
+  // Extract only fields of frames which may affect search URIs.
   /** @param {State} frames */
-  frames =>
-    frames.reduce(
-      (uris, frame) => uris.concat(searchUrisForFrame(frame)),
-      /** @type {string[]} */ ([])
-    ),
-  uris => uris
+  frames => frames.map(f => ({ id: f.id, uri: f.uri, metadata: f.metadata })),
+  frames => {
+    /** @type {Map<string|null, string[]>} */
+    const uriMap = new Map();
+    for (let frame of frames) {
+      uriMap.set(frame.id, searchURIsForFrame(frame));
+    }
+    return uriMap;
+  },
+  {
+    memoizeOptions: {
+      equalityCheck: entriesShallowEqual,
+    },
+  }
 );
 
 export const framesModule = createStoreModule(initialState, {
@@ -168,6 +182,6 @@ export const framesModule = createStoreModule(initialState, {
   selectors: {
     frames,
     mainFrame,
-    searchUris,
+    searchURIMap,
   },
 });

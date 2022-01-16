@@ -79,6 +79,9 @@
  * @prop {string} $tag - A locally-generated unique identifier for annotations.
  *   This is set for all annotations, whether they have been saved to the backend
  *   or not.
+ * @prop {string|null} $frameId - Local identifier for the frame that this annotation
+ *   is associated with. TODO - Decide what to do if the same annotation
+ *   is returned for multiple frames.
  * @prop {string[]} [references]
  * @prop {string} created
  * @prop {boolean} [flagged]

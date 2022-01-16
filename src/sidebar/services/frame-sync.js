@@ -297,7 +297,7 @@ export class FrameSyncService {
         this._hostRPC.call('showHighlights');
 
         // Create the new annotation in the sidebar.
-        this._annotationsService.create(annot);
+        this._annotationsService.create(frameIdentifier, annot);
       }
     );
 

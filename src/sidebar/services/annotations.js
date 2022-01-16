@@ -52,11 +52,12 @@ export class AnnotationsService {
   /**
    * Extend new annotation objects with defaults and permissions.
    *
+   * @param {string|null} frameId
    * @param {Omit<AnnotationData, '$tag'>} annotationData
    * @param {Date} now
    * @return {Annotation}
    */
-  _initialize(annotationData, now = new Date()) {
+  _initialize(frameId, annotationData, now = new Date()) {
     const defaultPrivacy = this._store.getDefault('annotationPrivacy');
     const groupid = this._store.focusedGroupId();
     const profile = this._store.profile();
@@ -76,6 +77,9 @@ export class AnnotationsService {
     /** @type {Annotation} */
     const annotation = Object.assign(
       {
+        $frameId: frameId,
+        $tag,
+
         created: now.toISOString(),
         group: groupid,
         permissions: defaultPermissions(userid, groupid, defaultPrivacy),
@@ -84,7 +88,6 @@ export class AnnotationsService {
         updated: now.toISOString(),
         user: userid,
         user_info: userInfo,
-        $tag,
         hidden: false,
         links: {},
         document: { title: '' },
@@ -104,13 +107,14 @@ export class AnnotationsService {
    * Create a draft for it unless it's a highlight and clear other empty
    * drafts out of the way.
    *
+   * @param {string|null} frameId
    * @param {Omit<AnnotationData, '$tag'>} annotationData
    * @param {Date} now
    */
-  create(annotationData, now = new Date()) {
-    const annotation = this._initialize(annotationData, now);
+  create(frameId, annotationData, now = new Date()) {
+    const annotation = this._initialize(frameId, annotationData, now);
 
-    this._store.addAnnotations([annotation]);
+    this._store.addAnnotations(frameId, [annotation]);
 
     // Remove other drafts that are in the way, and their annotations (if new)
     this._store.deleteNewAndEmptyDrafts();
@@ -159,7 +163,7 @@ export class AnnotationsService {
       target: [],
       uri: topLevelFrame.uri,
     };
-    this.create(pageNoteAnnotation);
+    this.create(topLevelFrame.id, pageNoteAnnotation);
   }
 
   /**
@@ -196,7 +200,7 @@ export class AnnotationsService {
       target: [{ source: annotation.target[0].source }],
       uri: annotation.uri,
     };
-    this.create(replyAnnotation);
+    this.create(annotation.$frameId, replyAnnotation);
   }
 
   /**
@@ -238,7 +242,7 @@ export class AnnotationsService {
     this._store.removeDraft(annotation);
 
     // Add (or, in effect, update) the annotation to the store's collection
-    this._store.addAnnotations([savedAnnotation]);
+    this._store.addAnnotations(annotation.$frameId, [savedAnnotation]);
     return savedAnnotation;
   }
 }

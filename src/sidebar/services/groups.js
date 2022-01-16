@@ -455,8 +455,8 @@ export class GroupsService {
         .filter(ann => !isReply(ann))
         .map(ann => ({ ...ann, group: newGroupId }));
 
-      if (updatedAnnotations.length) {
-        this._store.addAnnotations(updatedAnnotations);
+      for (let ann of updatedAnnotations) {
+        this._store.addAnnotations(ann.$frameId, [ann]);
       }
 
       // Persist this group as the last focused group default

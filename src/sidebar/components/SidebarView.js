@@ -51,7 +51,7 @@ function SidebarView({
     ? tabForAnnotation(linkedAnnotation)
     : 'annotation';
 
-  const searchUris = store.searchUris();
+  const searchURIMap = store.searchURIMap();
   const sidebarHasOpened = store.hasSidebarOpened();
   const userId = store.profile().userid;
 
@@ -105,13 +105,16 @@ function SidebarView({
       }
       prevGroupId.current = focusedGroupId;
     }
-    if (focusedGroupId && searchUris.length) {
-      loadAnnotationsService.load({
-        groupId: focusedGroupId,
-        uris: searchUris,
-      });
+    if (focusedGroupId && searchURIMap.size) {
+      for (let [frameId, uris] of searchURIMap) {
+        loadAnnotationsService.load({
+          frameId,
+          groupId: focusedGroupId,
+          uris,
+        });
+      }
     }
-  }, [store, loadAnnotationsService, focusedGroupId, userId, searchUris]);
+  }, [store, loadAnnotationsService, focusedGroupId, userId, searchURIMap]);
 
   // When a `linkedAnnotationAnchorTag` becomes available, scroll to it
   // and focus it

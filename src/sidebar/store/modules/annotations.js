@@ -70,18 +70,16 @@ function findByTag(annotations, tag) {
 }
 
 /**
- * Set custom private fields on an annotation object about to be added to the
- * store's collection of `annotations`.
+ * Initialize the local ("$"-prefixed) fields of an annotation.
  *
- * `annotation` may either be new (unsaved) or a persisted annotation retrieved
- * from the service.
- *
- * @param {Omit<Annotation, '$anchorTimeout'>} annotation
+ * @param {Annotation} annotation - New (unsaved) annotation or one retrieved from
+ *   the backend. This annotation may not have all local fields set.
  * @param {string} tag - The `$tag` value that should be used for this
  *                       if it doesn't have a `$tag` already
- * @return {Annotation} - annotation with local (`$*`) fields set
+ * @param {string} frameId
+ * @return {Annotation} - Annotation with all local fields set
  */
-function initializeAnnotation(annotation, tag) {
+function initializeAnnotation(annotation, tag, frameId) {
   let orphan = annotation.$orphan;
 
   if (!annotation.id) {
@@ -89,12 +87,14 @@ function initializeAnnotation(annotation, tag) {
     orphan = false;
   }
 
-  return Object.assign({}, annotation, {
-    // Flag indicating whether waiting for the annotation to anchor timed out.
+  return {
+    ...annotation,
+
     $anchorTimeout: false,
+    $frameId: frameId,
     $tag: annotation.$tag || tag,
     $orphan: orphan,
-  });
+  };
 }
 
 const initialState = {
@@ -155,7 +155,7 @@ const reducers = {
           updatedTags[existing.$tag] = true;
         }
       } else {
-        added.push(initializeAnnotation(annot, 't' + nextTag));
+        added.push(initializeAnnotation(annot, 't' + nextTag, action.frameId));
         ++nextTag;
       }
     });
@@ -267,9 +267,10 @@ const actions = util.actionTypes(reducers);
 /**
  * Add these `annotations` to the current collection of annotations in the store.
  *
+ * @param {string|null} frameId
  * @param {Annotation[]} annotations - Array of annotation objects to add.
  */
-function addAnnotations(annotations) {
+function addAnnotations(frameId, annotations) {
   return function (dispatch, getState) {
     const added = annotations.filter(annot => {
       return (
@@ -279,6 +280,7 @@ function addAnnotations(annotations) {
 
     dispatch({
       type: actions.ADD_ANNOTATIONS,
+      frameId,
       annotations,
       currentAnnotationCount: getState().annotations.annotations.length,
     });
