@@ -5,6 +5,7 @@ import { generateHexString } from '../shared/random';
 
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
+import { BucketBarClient } from './bucket-bar-client';
 import {
   getHighlightsContainingNode,
   highlightRange,
@@ -207,6 +208,14 @@ export default class Guest {
      * guest.
      */
     this._integration = createIntegration(this);
+
+    this._bucketBarClient =
+      this._frameIdentifier === null
+        ? new BucketBarClient({
+            contentContainer: this._integration.contentContainer(),
+            hostRPC: this._hostRPC,
+          })
+        : null;
 
     this._sideBySideActive = false;
 
@@ -444,6 +453,7 @@ export default class Guest {
 
     this._selectionObserver.disconnect();
     this._adder.destroy();
+    this._bucketBarClient?.destroy();
 
     removeAllHighlights(this.element);
 
@@ -577,7 +587,8 @@ export default class Guest {
    * Remove the anchors and associated highlights for an annotation from the document.
    *
    * @param {string} tag
-   * @param {boolean} [notify] - For internal use. Whether to emit an `anchorsChanged` notification
+   * @param {boolean} [notify] - For internal use. Whether to inform the host
+   *   frame about the removal of an anchor.
    */
   detach(tag, notify = true) {
     this._annotations.delete(tag);
@@ -600,8 +611,8 @@ export default class Guest {
    */
   _updateAnchors(anchors, notify) {
     this.anchors = anchors;
-    if (notify && this._frameIdentifier === null) {
-      this._hostRPC.call('anchorsChanged');
+    if (notify) {
+      this._bucketBarClient?.update();
     }
   }
 
@@ -737,15 +748,6 @@ export default class Guest {
   setHighlightsVisible(visible) {
     setHighlightsVisible(this.element, visible);
     this._highlightsVisible = visible;
-  }
-
-  /**
-   * Return the scrollable element that contains the main document content.
-   *
-   * @return {HTMLElement}
-   */
-  contentContainer() {
-    return this._integration.contentContainer();
   }
 
   /**

@@ -37,6 +37,8 @@ describe('Guest', () => {
 
   let FakeBridge;
   let fakeBridges;
+  let FakeBucketBarClient;
+  let fakeBucketBarClient;
   let fakeIntegration;
   let FakeHypothesisInjector;
   let fakeHypothesisInjector;
@@ -112,6 +114,12 @@ describe('Guest', () => {
       return bridge;
     });
 
+    fakeBucketBarClient = {
+      destroy: sinon.stub(),
+      update: sinon.stub(),
+    };
+    FakeBucketBarClient = sinon.stub().returns(fakeBucketBarClient);
+
     fakeIntegration = {
       anchor: sinon.stub(),
       canAnnotate: sinon.stub().returns(true),
@@ -153,6 +161,9 @@ describe('Guest', () => {
       './adder': { Adder: FakeAdder },
       './anchoring/text-range': {
         TextRange: FakeTextRange,
+      },
+      './bucket-bar-client': {
+        BucketBarClient: FakeBucketBarClient,
       },
       './integrations': {
         createIntegration: sinon.stub().returns(fakeIntegration),
@@ -416,7 +427,7 @@ describe('Guest', () => {
 
         emitSidebarEvent('deleteAnnotation', 'tag1');
 
-        assert.deepEqual(hostBridge().call.lastCall.args, ['anchorsChanged']);
+        assert.calledOnce(fakeBucketBarClient.update);
       });
     });
   });
@@ -1184,13 +1195,13 @@ describe('Guest', () => {
       );
     });
 
-    it('calls "anchorsChanged" RPC method', () => {
+    it('calls the `BucketBarClient#update` method', () => {
       const guest = createGuest();
       const anchor = createAnchor();
 
       guest.detach(anchor.annotation.$tag);
 
-      assert.deepEqual(hostBridge().call.lastCall.args, ['anchorsChanged']);
+      assert.calledOnce(fakeBucketBarClient.update);
     });
   });
 
@@ -1273,14 +1284,22 @@ describe('Guest', () => {
     assert.calledWith(sidebarBridge().createChannel, port1);
   });
 
-  describe('#contentContainer', () => {
-    it('returns document content container', () => {
-      const guest = createGuest();
-      assert.equal(
-        guest.contentContainer(),
-        fakeIntegration.contentContainer()
-      );
+  it('configures the BucketBarClient if guest is the main annotatable frame', () => {
+    const contentContainer = document.createElement('div');
+    fakeIntegration.contentContainer.returns(contentContainer);
+
+    createGuest();
+
+    assert.calledWith(FakeBucketBarClient, {
+      contentContainer,
+      hostRPC: hostBridge(),
     });
+  });
+
+  it('does not configure the BucketBarClient if guest is the main annotatable frame', () => {
+    createGuest({ subFrameIdentifier: 'frame-id' });
+
+    assert.notCalled(FakeBucketBarClient);
   });
 
   describe('#fitSideBySide', () => {

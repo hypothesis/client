@@ -1,16 +1,9 @@
 import { render } from 'preact';
 
-import { ListenerCollection } from '../shared/listener-collection';
-
 import Buckets from './components/Buckets';
 import { anchorBuckets } from './util/buckets';
 
 /**
- * @typedef BucketBarOptions
- * @prop {Element} [contentContainer] - The scrollable container element for the
- *   document content. All of the highlights that the bucket bar's buckets point
- *   at should be contained within this element.
- *
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
@@ -24,43 +17,23 @@ export default class BucketBar {
   /**
    * @param {HTMLElement} container
    * @param {Pick<import('./guest').default, 'anchors'|'scrollToAnchor'|'selectAnnotations'>} guest
-   * @param {BucketBarOptions} [options]
    */
-  constructor(container, guest, { contentContainer = document.body } = {}) {
-    this._contentContainer = contentContainer;
-
-    this._bucketsContainer = document.createElement('div');
-    container.appendChild(this._bucketsContainer);
+  constructor(container, guest) {
+    this._bucketBar = document.createElement('bucket-bar');
+    container.appendChild(this._bucketBar);
 
     this._guest = guest;
 
-    this._listeners = new ListenerCollection();
-
-    this._listeners.add(window, 'resize', () => this.update());
-    this._listeners.add(window, 'scroll', () => this.update());
-    this._listeners.add(contentContainer, 'scroll', () => this.update());
-
     // Immediately render the buckets for the current anchors.
-    this._update();
+    this.update();
   }
 
   destroy() {
-    this._listeners.removeAll();
-    this._bucketsContainer.remove();
+    render(null, this._bucketBar);
+    this._bucketBar.remove();
   }
 
   update() {
-    if (this._updatePending) {
-      return;
-    }
-    this._updatePending = true;
-    requestAnimationFrame(() => {
-      this._update();
-      this._updatePending = false;
-    });
-  }
-
-  _update() {
     const buckets = anchorBuckets(this._guest.anchors);
     render(
       <Buckets
@@ -72,7 +45,7 @@ export default class BucketBar {
         }
         scrollToAnchor={anchor => this._guest.scrollToAnchor(anchor)}
       />,
-      this._bucketsContainer
+      this._bucketBar
     );
   }
 }

@@ -128,12 +128,7 @@ describe('Sidebar', () => {
     };
     FakeBucketBar = sinon.stub().returns(fakeBucketBar);
 
-    class FakeGuest {
-      constructor() {
-        this.contentContainer = sinon.stub().returns(document.body);
-      }
-    }
-    fakeGuest = new FakeGuest();
+    fakeGuest = sinon.stub();
 
     fakeToolbar = {
       getWidth: sinon.stub().returns(100),
@@ -939,20 +934,6 @@ describe('Sidebar', () => {
         externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
       assert.isNull(sidebar.bucketBar);
-    });
-
-    it('configures bucket bar to observe `contentContainer` scrolling if specified', () => {
-      const contentContainer = document.createElement('div');
-      fakeGuest.contentContainer.returns(contentContainer);
-
-      const sidebar = createSidebar();
-
-      assert.calledWith(
-        FakeBucketBar,
-        sidebar.iframeContainer,
-        fakeGuest,
-        sinon.match({ contentContainer })
-      );
     });
   });
 });
