@@ -444,7 +444,7 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when a new frame connects', () => {
+  context('when a new guest frame connects', () => {
     beforeEach(() => {
       frameSync.connect();
     });
