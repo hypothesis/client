@@ -71,13 +71,13 @@ export class PortRPC {
     /** @type {MessagePort|null} */
     this._port = null;
 
-    /** @type {Record<string, (...args: any[]) => void>} */
-    this._methods = {};
+    /** @type {Map<string, (...args: any[]) => void>} */
+    this._methods = new Map();
 
     this._sequence = 1;
 
-    /** @type {Record<number, (...args: any[]) => void>} */
-    this._callbacks = {};
+    /** @type {Map<number, (...args: any[]) => void>} */
+    this._callbacks = new Map();
 
     this._listeners = new ListenerCollection();
   }
@@ -94,7 +94,7 @@ export class PortRPC {
     if (this._port) {
       throw new Error('Cannot add a method handler after a port is connected');
     }
-    this._methods[method] = handler;
+    this._methods.set(method, handler);
   }
 
   /**
@@ -140,7 +140,7 @@ export class PortRPC {
     const seq = this._sequence++;
     const finalArg = args[args.length - 1];
     if (typeof finalArg === 'function') {
-      this._callbacks[seq] = finalArg;
+      this._callbacks.set(seq, finalArg);
       args = args.slice(0, -1);
     }
 
@@ -191,7 +191,8 @@ export class PortRPC {
     }
 
     if ('method' in msg) {
-      if (!this._methods.hasOwnProperty(msg.method)) {
+      const handler = this._methods.get(msg.method);
+      if (!handler) {
         return;
       }
 
@@ -207,10 +208,10 @@ export class PortRPC {
 
         port.postMessage(message);
       };
-      this._methods[msg.method](...msg.arguments, callback);
+      handler(...msg.arguments, callback);
     } else if ('response' in msg) {
-      const cb = this._callbacks[msg.response];
-      delete this._callbacks[msg.response];
+      const cb = this._callbacks.get(msg.response);
+      this._callbacks.delete(msg.response);
       if (cb) {
         cb(...msg.arguments);
       }
