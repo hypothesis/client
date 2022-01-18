@@ -19,8 +19,8 @@ export default class BucketBar {
    * @param {Pick<import('./guest').default, 'anchors'|'scrollToAnchor'|'selectAnnotations'>} guest
    */
   constructor(container, guest) {
-    this._bucketBar = document.createElement('bucket-bar');
-    container.appendChild(this._bucketBar);
+    this._bucketsContainer = document.createElement('div');
+    container.appendChild(this._bucketsContainer);
 
     this._guest = guest;
 
@@ -29,8 +29,8 @@ export default class BucketBar {
   }
 
   destroy() {
-    render(null, this._bucketBar);
-    this._bucketBar.remove();
+    render(null, this._bucketsContainer);
+    this._bucketsContainer.remove();
   }
 
   update() {
@@ -45,7 +45,7 @@ export default class BucketBar {
         }
         scrollToAnchor={anchor => this._guest.scrollToAnchor(anchor)}
       />,
-      this._bucketBar
+      this._bucketsContainer
     );
   }
 }
