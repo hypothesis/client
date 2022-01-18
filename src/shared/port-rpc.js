@@ -186,7 +186,7 @@ export class PortRPC {
     const msg = this._parseMessage(event);
     const port = this._port;
 
-    if (msg === null || !port) {
+    if (!msg || !port) {
       return;
     }
 
