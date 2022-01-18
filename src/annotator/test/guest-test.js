@@ -1295,7 +1295,7 @@ describe('Guest', () => {
     });
   });
 
-  it('does not configure the BucketBarClient if guest is the main annotatable frame', () => {
+  it('does not configure the BucketBarClient if guest is not the main annotatable frame', () => {
     createGuest({ subFrameIdentifier: 'frame-id' });
 
     assert.notCalled(FakeBucketBarClient);

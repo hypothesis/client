@@ -48,7 +48,7 @@ describe('BucketBar', () => {
   it('should render buckets for existing anchors when constructed', () => {
     const bucketBar = createBucketBar();
     assert.calledWith(fakeBucketUtil.anchorBuckets, fakeGuest.anchors);
-    assert.ok(bucketBar._bucketBar.querySelector('.FakeBuckets'));
+    assert.ok(bucketBar._bucketsContainer.querySelector('.FakeBuckets'));
   });
 
   it('should select annotations when Buckets component invokes callback', () => {
@@ -82,7 +82,7 @@ describe('BucketBar', () => {
   });
 
   describe('#destroy', () => {
-    it('removes the bucket-bar element', () => {
+    it('removes the BucketBar container element', () => {
       const bucketBar = createBucketBar();
 
       bucketBar.destroy();
