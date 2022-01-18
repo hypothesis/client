@@ -178,7 +178,7 @@ export class FrameSyncService {
    *
    * @param {MessagePort} port - Port for communicating with the guest
    */
-  _connectGuestFrame(port) {
+  _connectGuest(port) {
     /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
     const guestRPC = new PortRPC();
 
@@ -330,7 +330,7 @@ export class FrameSyncService {
           type: 'offer',
         })
       ) {
-        this._connectGuestFrame(ports[0]);
+        this._connectGuest(ports[0]);
       }
     });
   }
