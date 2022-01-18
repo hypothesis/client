@@ -258,7 +258,7 @@ export class FrameSyncService {
    *
    * @param {PortRPC} channel
    */
-  _addFrame(channel) {
+  _addGuestFrame(channel) {
     // Synchronize highlight visibility in this guest with the sidebar's controls.
     channel.call('setHighlightsVisible', this._highlightsVisible);
 
@@ -322,7 +322,7 @@ export class FrameSyncService {
         })
       ) {
         const channel = this._guestRPC.createChannel(ports[0]);
-        this._addFrame(channel);
+        this._addGuestFrame(channel);
       }
     });
   }
