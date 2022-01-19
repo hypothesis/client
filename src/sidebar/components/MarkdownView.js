@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from 'preact/hooks';
 
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import renderMarkdown from '../render-markdown';
+import { servedFromLocalFile } from '../util/url';
 
 /**
  * @typedef MarkdownViewProps
@@ -33,6 +34,26 @@ export default function MarkdownView({
   useEffect(() => {
     replaceLinksWithEmbeds(content.current, {
       className: 'MarkdownView__embed',
+      wrapEmbedURL: url => {
+        if (!servedFromLocalFile()) {
+          // No workarounds are required in the embedded client.
+          return url;
+        }
+
+        // In the browser extension, wrap YouTube media embeds to work around
+        // an issue where certain videos fail to load unless a `Referer` header
+        // is sent. See https://github.com/hypothesis/product-backlog/issues/1297.
+        const embedURL = new URL(url);
+        if (embedURL.origin === 'https://www.youtube.com') {
+          const wrapperURL = new URL(
+            'https://cdn.hypothes.is/media-embed.html'
+          );
+          wrapperURL.searchParams.append('url', url);
+          return wrapperURL.toString();
+        } else {
+          return url;
+        }
+      },
     });
   }, [markdown]);
 

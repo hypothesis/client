@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 100%">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Hypothesis embedded media</title>
+  </head>
+  <body style="height: 100%; margin: 0">
+    <!--
+      This file is the source for https://cdn.hypothes.is/media-embed.html.
+      It must be re-uploaded manually to S3 after any changes and made publicly
+      readable.
+
+      It is part of a workaround for embedded YouTube videos in the browser extension.
+      See https://github.com/hypothesis/product-backlog/issues/1297.
+    -->
+    <iframe
+      id="media-embed"
+      src="about:blank"
+      width="100%"
+      height="100%"
+      style="border: none"
+      allow="fullscreen"
+    ></iframe>
+    <script>
+      const params = new URLSearchParams(location.search);
+      const url = params.get('url');
+      const frame = document.getElementById('media-embed');
+      if (url) {
+        frame.src = url;
+      }
+    </script>
+  </body>
+</html>

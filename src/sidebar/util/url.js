@@ -38,3 +38,10 @@ export function replaceURLParams(url, params) {
 export function resolve(relativeURL, baseURL) {
   return new URL(relativeURL, baseURL).href;
 }
+
+/**
+ * Is the current document served from a local source such as a browser extension?
+ */
+export function servedFromLocalFile() {
+  return location.protocol.includes('extension');
+}
