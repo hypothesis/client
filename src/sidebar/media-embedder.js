@@ -1,4 +1,9 @@
 /**
+ * @typedef MediaElement
+ * @prop {string} src
+ */
+
+/**
  * Return an HTML5 audio player with the given src URL.
  *
  * @param {string} src
@@ -33,6 +38,33 @@ function wrapInAspectRatioContainer(element, aspectRatio) {
   container.appendChild(element);
 
   return container;
+}
+
+/**
+ * @param {Element} embed
+ * @return {embed is MediaElement}
+ */
+function isMediaElement(embed) {
+  return 'src' in embed;
+}
+
+/**
+ * Return the media element in `element`.
+ *
+ * @param {HTMLElement} element - Media element or container. See {@link wrapInAspectRatioContainer}.
+ * @return {MediaElement|null}
+ */
+function getMediaElement(element) {
+  if (isMediaElement(element)) {
+    return element;
+  } else if (
+    element.firstElementChild &&
+    isMediaElement(element.firstElementChild)
+  ) {
+    return element.firstElementChild;
+  } else {
+    return null;
+  }
 }
 
 /**
@@ -397,14 +429,27 @@ function replaceLinkWithEmbed(link) {
  *   @param {string} [options.className] -
  *     Class name to apply to embed containers. An important function of this class is to set
  *     the width of the embed.
+ *   @param {(url: string) => string} [options.wrapEmbedURL] - Hook to modify
+ *     the URL of the embedded media element.
  */
-export function replaceLinksWithEmbeds(element, { className } = {}) {
+export function replaceLinksWithEmbeds(
+  element,
+  { className, wrapEmbedURL } = {}
+) {
   // Get a static (non-live) list of <a> children of `element`.
   // It needs to be static because we may replace these elements as we iterate over them.
   const links = Array.from(element.getElementsByTagName('a'));
 
   for (let link of links) {
     const embed = replaceLinkWithEmbed(link);
+
+    if (wrapEmbedURL && embed) {
+      const mediaElement = getMediaElement(embed);
+      if (mediaElement) {
+        mediaElement.src = wrapEmbedURL(mediaElement.src);
+      }
+    }
+
     if (embed) {
       if (className) {
         embed.className = className;
