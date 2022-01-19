@@ -188,7 +188,7 @@ export default class Guest {
      * @type {PortRPC<HostToGuestEvent, GuestToHostEvent>}
      */
     this._hostRPC = new PortRPC();
-    this._connectHostEvents();
+    this._connectHost();
 
     /**
      * Channel for guest-sidebar communication.
@@ -196,7 +196,7 @@ export default class Guest {
      * @type {PortRPC<SidebarToGuestEvent, GuestToSidebarEvent>}
      */
     this._sidebarRPC = new PortRPC();
-    this._connectSidebarEvents();
+    this._connectSidebar();
 
     // Set up automatic and integration-triggered injection of client into
     // iframes in this frame.
@@ -320,7 +320,7 @@ export default class Guest {
     }
   }
 
-  async _connectHostEvents() {
+  async _connectHost() {
     this._hostRPC.on(
       'clearSelectionExceptIn',
       /** @param {string|null} frameIdentifier */
@@ -369,7 +369,7 @@ export default class Guest {
     this._hostRPC.connect(hostPort);
   }
 
-  async _connectSidebarEvents() {
+  async _connectSidebar() {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
     this._sidebarRPC.on(
