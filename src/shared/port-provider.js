@@ -56,7 +56,7 @@ import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
  *                                                           (eg. via MessageChannel connection
  *                                                           between host and other frame)
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export class PortProvider {
   /**
