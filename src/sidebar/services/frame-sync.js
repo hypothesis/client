@@ -179,17 +179,31 @@ export class FrameSyncService {
   _connectGuest(port) {
     /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
     const guestRPC = new PortRPC();
+    this._guestRPC.push(guestRPC);
+
+    /** @type {string|null} */
+    let frameIdentifier;
 
     // Update document metadata for this guest. We currently assume that the
     // guest will make this call once after it connects. To handle updates
     // to the document, we'll need to change `connectFrame` to update rather than
     // add to the frame list.
     guestRPC.on('documentInfoChanged', info => {
+      frameIdentifier = info.frameIdentifier;
       this._store.connectFrame({
         id: info.frameIdentifier,
         metadata: info.metadata,
         uri: info.uri,
       });
+    });
+
+    guestRPC.on('frameDestroyed', () => {
+      const frame = this._store.frames().find(f => f.id === frameIdentifier);
+      if (frame) {
+        this._store.destroyFrame(frame);
+      }
+      guestRPC.destroy();
+      this._guestRPC = this._guestRPC.filter(rpc => rpc !== guestRPC);
     });
 
     // A new annotation, note or highlight was created in the frame
@@ -272,7 +286,6 @@ export class FrameSyncService {
       this._hostRPC.call('closeSidebar');
     });
 
-    this._guestRPC.push(guestRPC);
     guestRPC.connect(port);
 
     // Synchronize highlight visibility in this guest with the sidebar's controls.
@@ -285,17 +298,6 @@ export class FrameSyncService {
   _setupHostEvents() {
     this._hostRPC.on('sidebarOpened', () => {
       this._store.setSidebarOpened(true);
-    });
-
-    // Listen for notifications of a guest being unloaded. This message is routed
-    // via the host frame rather than coming directly from the unloaded guest
-    // to work around https://bugs.webkit.org/show_bug.cgi?id=231167.
-    this._hostRPC.on('frameDestroyed', frameIdentifier => {
-      const frame = this._store.frames().find(f => f.id === frameIdentifier);
-      if (frame) {
-        this._store.destroyFrame(frame);
-      }
-      // TODO - Remove the guest connection associated with this frame identifier.
     });
 
     // When user toggles the highlight visibility control in the sidebar container,

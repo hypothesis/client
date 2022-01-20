@@ -222,14 +222,18 @@ export default class Sidebar {
       }
     });
 
-    // Notify sidebar when a guest is unloaded. This message is routed via
-    // the host frame because in Safari guest frames are unable to send messages
-    // directly to the sidebar during a window's 'unload' event.
-    // See https://bugs.webkit.org/show_bug.cgi?id=231167.
+    // Notify other frames when a guest is unloaded. The ports are first
+    // transferred from the guest to the host frame to work around a bug in
+    // Safari <= 15. See https://bugs.webkit.org/show_bug.cgi?id=231167.
     this._listeners.add(window, 'message', event => {
-      const { data } = /** @type {MessageEvent} */ (event);
+      const { data, ports } = /** @type {MessageEvent} */ (event);
       if (data?.type === 'hypothesisGuestUnloaded') {
-        this._sidebarRPC.call('frameDestroyed', data.frameIdentifier);
+        for (let port of ports) {
+          const rpc = new PortRPC();
+          rpc.connect(port);
+          rpc.call('frameDestroyed');
+          rpc.destroy();
+        }
       }
     });
   }
@@ -260,7 +264,7 @@ export default class Sidebar {
   onFrameConnected(source, port) {
     switch (source) {
       case 'guest':
-        this._guestRPC.push(this._connectGuest(port));
+        this._connectGuest(port);
         break;
       case 'sidebar':
         this._sidebarRPC.connect(port);
@@ -305,9 +309,13 @@ export default class Sidebar {
       this.bucketBar?.update();
     });
 
-    guestRPC.connect(port);
+    guestRPC.on('frameDestroyed', () => {
+      guestRPC.destroy();
+      this._guestRPC = this._guestRPC.filter(rpc => rpc !== guestRPC);
+    });
 
-    return guestRPC;
+    guestRPC.connect(port);
+    this._guestRPC.push(guestRPC);
   }
 
   _setupSidebarEvents() {

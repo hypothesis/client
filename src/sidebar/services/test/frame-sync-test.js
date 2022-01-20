@@ -472,12 +472,25 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when a frame is destroyed', () => {
-    const frameId = fixtures.framesListEntry.id;
-
-    it('removes the frame from the frames list', () => {
+  context('when a guest frame is destroyed', () => {
+    it('disconnects the guest', async () => {
       frameSync.connect();
-      emitHostEvent('frameDestroyed', frameId);
+      await connectGuest();
+
+      emitGuestEvent('frameDestroyed');
+
+      assert.called(guestRPC().destroy);
+    });
+
+    it('removes the guest from the store', async () => {
+      frameSync.connect();
+      await connectGuest();
+
+      emitGuestEvent('documentInfoChanged', {
+        frameIdentifier: fixtures.framesListEntry.id,
+        uri: 'http://example.org',
+      });
+      emitGuestEvent('frameDestroyed');
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
     });

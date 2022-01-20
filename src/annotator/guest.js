@@ -225,7 +225,7 @@ export default class Guest {
      */
     this._focusedAnnotations = new Set();
 
-    this._listeners.add(window, 'unload', () => this._notifyGuestUnload());
+    this._listeners.add(window, 'unload', () => this._sendUnloadNotification());
   }
 
   // Add DOM event listeners for clicks, taps etc. on the document and
@@ -452,8 +452,12 @@ export default class Guest {
   }
 
   destroy() {
+    this._sendUnloadNotification();
+
     this._portFinder.destroy();
-    this._notifyGuestUnload();
+    this._hostRPC.destroy();
+    this._sidebarRPC.destroy();
+
     this._hypothesisInjector.destroy();
     this._listeners.removeAll();
 
@@ -464,21 +468,35 @@ export default class Guest {
     removeAllHighlights(this.element);
 
     this._integration.destroy();
-    this._sidebarRPC.destroy();
   }
 
   /**
-   * Notify the host frame that the guest is being unloaded.
+   * Notify other frames that the guest is being unloaded.
    *
-   * The host frame in turn notifies the sidebar app that the guest has gone away.
+   * In order to work around a bug in Safari 15 and below [1], this is done by
+   * first sending ports to the host frame and then, from the host frame,
+   * sending messages on the ports.
+   *
+   * [1] https://bugs.webkit.org/show_bug.cgi?id=231167.
    */
-  _notifyGuestUnload() {
-    const message = {
-      type: 'hypothesisGuestUnloaded',
-      frameIdentifier: this._frameIdentifier,
-    };
+  _sendUnloadNotification() {
+    const ports = [];
 
-    this._hostFrame.postMessage(message, '*');
+    const sidebarPort = this._sidebarRPC.disconnect();
+    if (sidebarPort) {
+      ports.push(sidebarPort);
+    }
+
+    const hostPort = this._hostRPC.disconnect();
+    if (hostPort) {
+      ports.push(hostPort);
+    }
+
+    this._hostFrame.postMessage(
+      { type: 'hypothesisGuestUnloaded' },
+      '*',
+      ports
+    );
   }
 
   /**

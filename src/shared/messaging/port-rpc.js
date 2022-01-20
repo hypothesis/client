@@ -123,13 +123,24 @@ export class PortRPC {
   }
 
   /**
-   * Disconnect the RPC channel. After this is invoked no further method calls
-   * will be received.
+   * Disconnect and return the current MessagePort.
+   *
+   * This does not close the port, so it can still be used afterwards.
+   */
+  disconnect() {
+    const port = this._port;
+    this._port = null;
+    this._listeners.removeAll();
+    return port;
+  }
+
+  /**
+   * Disconnect the RPC channel and close the MessagePort.
    */
   destroy() {
+    const port = this.disconnect();
+    port?.close();
     this._destroyed = true;
-    this._listeners.removeAll();
-    this._port?.close();
   }
 
   /**

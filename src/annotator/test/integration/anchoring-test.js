@@ -48,8 +48,11 @@ describe('anchoring', () => {
     container = document.createElement('div');
     container.innerHTML = testPageHTML;
     document.body.appendChild(container);
+
     const fakePortFinder = {
-      discover: sinon.stub().resolves(new MessageChannel().port1),
+      discover: sinon.stub().callsFake(async () => {
+        return new MessageChannel().port1;
+      }),
       destroy: sinon.stub(),
     };
     guestImports.$mock({
@@ -57,6 +60,7 @@ describe('anchoring', () => {
         PortFinder: sinon.stub().returns(fakePortFinder),
       },
     });
+
     guest = new Guest(container);
   });
 

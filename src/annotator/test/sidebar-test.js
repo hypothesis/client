@@ -219,15 +219,26 @@ describe('Sidebar', () => {
     assert.calledWith(fakeSendErrorsTo, sidebar.iframe.contentWindow);
   });
 
-  it('notifies sidebar app when a guest frame is unloaded', () => {
+  it('notifies other frames when a guest is unloaded', () => {
+    const guestHostChannel = new MessageChannel();
+    const guestSidebarChannel = new MessageChannel();
+    const guestPorts = [guestHostChannel.port1, guestSidebarChannel.port1];
     createSidebar();
 
     const event = new MessageEvent('message', {
-      data: { type: 'hypothesisGuestUnloaded', frameIdentifier: 'frame-id' },
+      data: { type: 'hypothesisGuestUnloaded' },
+      ports: guestPorts,
     });
+
+    const prevPorts = fakePortRPCs.length;
     window.dispatchEvent(event);
 
-    assert.calledWith(sidebarRPC().call, 'frameDestroyed', 'frame-id');
+    const tempPortRPCs = fakePortRPCs.slice(prevPorts);
+    assert.equal(tempPortRPCs.length, guestPorts.length);
+    tempPortRPCs.forEach(rpc => {
+      assert.calledWith(rpc.call, 'frameDestroyed');
+      assert.called(rpc.destroy);
+    });
   });
 
   function getConfigString(sidebar) {
