@@ -176,6 +176,10 @@ export default class Guest {
       source: 'guest',
     });
 
+    // Set up automatic and integration-triggered injection of client into
+    // iframes in this frame.
+    this._hypothesisInjector = new HypothesisInjector(this.element, config);
+
     /**
      * Integration that handles document-type specific functionality in the
      * guest.
@@ -197,10 +201,6 @@ export default class Guest {
      */
     this._sidebarRPC = new PortRPC();
     this._connectSidebar();
-
-    // Set up automatic and integration-triggered injection of client into
-    // iframes in this frame.
-    this._hypothesisInjector = new HypothesisInjector(this.element, config);
 
     this._bucketBarClient =
       this._frameIdentifier === null
