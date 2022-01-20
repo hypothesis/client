@@ -1,4 +1,5 @@
-import { Icon } from '@hypothesis/frontend-shared';
+import { Icon, Link } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
@@ -14,10 +15,13 @@ import { withServices } from '../service-context';
  */
 function TutorialInstruction({ commandName, iconName }) {
   return (
-    <span className="Tutorial__instruction">
+    <span className="whitespace-nowrap">
       <Icon
         name={iconName}
-        classes="hyp-u-margin--right--1 hyp-u-color--grey-6 u-inline Tutorial__icon"
+        classes={classnames(
+          'mx-1 -mt-1', // Give horizontal space; pull up top margin a little
+          'text-color-text-light inline'
+        )}
       />
       <em>{commandName}</em>
     </span>
@@ -30,40 +34,38 @@ function TutorialInstruction({ commandName, iconName }) {
 function Tutorial({ settings }) {
   const canCreatePrivateGroups = !isThirdPartyService(settings);
   return (
-    <ol className="Tutorial__list">
-      <li className="Tutorial__item">
+    <ol className="list-decimal pl-10 space-y-2">
+      <li>
         To create an annotation, select text and then select the{' '}
         <TutorialInstruction iconName="annotate" commandName="Annotate" />{' '}
         button.
       </li>
-      <li className="Tutorial__item">
+      <li>
         To create a highlight (
-        <a
+        <Link
           href="https://web.hypothes.is/help/why-are-highlights-private-by-default/"
           target="_blank"
-          rel="noopener noreferrer"
         >
           visible only to you
-        </a>
+        </Link>
         ), select text and then select the{' '}
         <TutorialInstruction iconName="highlight" commandName="Highlight" />{' '}
         button.
       </li>
       {canCreatePrivateGroups && (
-        <li className="Tutorial__item">
+        <li>
           To annotate in a private group, select the group from the groups
           dropdown. Don&apos;t see your group? Ask the group creator to send a{' '}
-          <a
+          <Link
             href="https://web.hypothes.is/help/how-to-join-a-private-group/"
             target="_blank"
-            rel="noopener noreferrer"
           >
             join link
-          </a>
+          </Link>
           ).
         </li>
       )}
-      <li className="Tutorial__item">
+      <li>
         To reply to an annotation, select the{' '}
         <TutorialInstruction iconName="reply" commandName="Reply" /> button.
       </li>
