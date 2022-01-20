@@ -109,6 +109,7 @@ describe('Guest', () => {
         call: sinon.stub(),
         connect: sinon.stub(),
         destroy: sinon.stub(),
+        disconnect: sinon.stub(),
         on: sinon.stub(),
       };
       fakePortRPCs.push(rpc);
@@ -1247,7 +1248,12 @@ describe('Guest', () => {
     });
 
     it('notifies host frame that guest has been unloaded', () => {
+      const sidebarPort = {};
+      const hostPort = {};
+
       const guest = createGuest({ subFrameIdentifier: 'frame-id' });
+      hostRPC().disconnect.returns(hostPort);
+      sidebarRPC().disconnect.returns(sidebarPort);
 
       guest.destroy();
 
@@ -1255,15 +1261,19 @@ describe('Guest', () => {
         hostFrame.postMessage,
         {
           type: 'hypothesisGuestUnloaded',
-          frameIdentifier: 'frame-id',
         },
-        '*'
+        '*',
+        sinon.match.array.contains([sidebarPort, hostPort])
       );
     });
   });
 
   it('notifies host frame when guest frame is unloaded', () => {
+    const sidebarPort = {};
+    const hostPort = {};
     createGuest({ subFrameIdentifier: 'frame-id' });
+    hostRPC().disconnect.returns(hostPort);
+    sidebarRPC().disconnect.returns(sidebarPort);
 
     window.dispatchEvent(new Event('unload'));
 
@@ -1271,9 +1281,9 @@ describe('Guest', () => {
       hostFrame.postMessage,
       {
         type: 'hypothesisGuestUnloaded',
-        frameIdentifier: 'frame-id',
       },
-      '*'
+      '*',
+      sinon.match.array.contains([sidebarPort, hostPort])
     );
   });
 

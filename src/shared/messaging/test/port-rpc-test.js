@@ -174,4 +174,24 @@ describe('PortRPC', () => {
     assert.calledWith(testMethod, 'first', 'call');
     assert.calledWith(testMethod, 'second', 'call');
   });
+
+  describe('#disconnect', () => {
+    it('disconnects and returns port', async () => {
+      const rpc = new PortRPC();
+      const testMethod = sinon.stub();
+      rpc.on('test', testMethod);
+
+      assert.isNull(rpc.disconnect());
+
+      const { port1 } = new MessageChannel();
+      rpc.connect(port1);
+
+      assert.equal(rpc.disconnect(), port1);
+      assert.isNull(rpc.disconnect());
+
+      rpc.call('test');
+      await waitForMessageDelivery();
+      assert.notCalled(testMethod);
+    });
+  });
 });
