@@ -60,6 +60,8 @@ import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
  */
 export class PortProvider {
   /**
+   * Begin listening to port requests from other frames.
+   *
    * @param {string} hypothesisAppsOrigin - the origin of the hypothesis apps
    *   is use to send the notebook and sidebar ports to only the frames that
    *   match the origin.
@@ -112,41 +114,11 @@ export class PortProvider {
         type: 'request',
       },
     ];
+
+    this._listen();
   }
 
-  /**
-   * Check that data and origin matches the expected values.
-   *
-   * @param {object} options
-   *   @param {Message} options.allowedMessage - the `data` must match this
-   *     `Message`.
-   *   @param {string} options.allowedOrigin - the `origin` must match this
-   *     value. If `allowedOrigin` is '*', the origin is ignored.
-   *   @param {any} options.data - the data to be compared with `allowedMessage`.
-   *   @param {string} options.origin - the origin to be compared with
-   *     `allowedOrigin`.
-   */
-  _messageMatches({ allowedMessage, allowedOrigin, data, origin }) {
-    if (allowedOrigin !== '*' && origin !== allowedOrigin) {
-      return false;
-    }
-
-    return isMessageEqual(data, allowedMessage);
-  }
-
-  /**
-   * @param {'frameConnected'} eventName
-   * @param {(source: 'guest'|'sidebar', port: MessagePort) => void} handler - this handler
-   *   fires when a request for the host frame has been granted.
-   */
-  on(eventName, handler) {
-    this._emitter.on(eventName, handler);
-  }
-
-  /**
-   * Initiate the listener of port requests by other frames.
-   */
-  listen() {
+  _listen() {
     const errorContext = 'Handling port request';
     const sentErrors = /** @type {Set<string>} */ (new Set());
 
@@ -244,6 +216,33 @@ export class PortProvider {
       'message',
       captureErrors(handleRequest, errorContext)
     );
+  }
+
+  /**
+   * @param {object} options
+   *   @param {Message} options.allowedMessage - the `data` must match this
+   *     `Message`.
+   *   @param {string} options.allowedOrigin - the `origin` must match this
+   *     value. If `allowedOrigin` is '*', the origin is ignored.
+   *   @param {any} options.data - the data to be compared with `allowedMessage`.
+   *   @param {string} options.origin - the origin to be compared with
+   *     `allowedOrigin`.
+   */
+  _messageMatches({ allowedMessage, allowedOrigin, data, origin }) {
+    if (allowedOrigin !== '*' && origin !== allowedOrigin) {
+      return false;
+    }
+
+    return isMessageEqual(data, allowedMessage);
+  }
+
+  /**
+   * @param {'frameConnected'} eventName
+   * @param {(source: 'guest'|'sidebar', port: MessagePort) => void} handler - this handler
+   *   fires when a frame connects to the host frame
+   */
+  on(eventName, handler) {
+    this._emitter.on(eventName, handler);
   }
 
   destroy() {

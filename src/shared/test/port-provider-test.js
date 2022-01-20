@@ -47,31 +47,6 @@ describe('PortProvider', () => {
     });
   });
 
-  describe('#listen', () => {
-    it('ignores all port requests before `listen` is called', async () => {
-      portProvider.listen();
-      portProvider.destroy();
-      portProvider = new PortProvider(window.location.origin);
-      const data = {
-        frame1: 'sidebar',
-        frame2: 'host',
-        type: 'request',
-      };
-      await sendPortFinderRequest({
-        data,
-      });
-
-      assert.notCalled(window.postMessage);
-
-      portProvider.listen();
-      await sendPortFinderRequest({
-        data,
-      });
-
-      assert.calledOnce(window.postMessage);
-    });
-  });
-
   describe('reporting message errors', () => {
     let fakeSendError;
 
@@ -81,8 +56,6 @@ describe('PortProvider', () => {
       $imports.$mock({
         './frame-error-capture': { sendError: fakeSendError },
       });
-
-      portProvider.listen();
     });
 
     it('reports errors validating messages', async () => {
@@ -153,7 +126,6 @@ describe('PortProvider', () => {
       },
     ].forEach(({ data, reason, origin, source }) => {
       it(`ignores port request if message ${reason}`, async () => {
-        portProvider.listen();
         await sendPortFinderRequest({
           data,
           origin,
@@ -165,7 +137,6 @@ describe('PortProvider', () => {
     });
 
     it('responds to a valid port request', async () => {
-      portProvider.listen();
       const data = {
         frame1: 'sidebar',
         frame2: 'host',
@@ -185,7 +156,6 @@ describe('PortProvider', () => {
     });
 
     it('responds to a valid port request from a source with an opaque origin', async () => {
-      portProvider.listen();
       const data = {
         frame1: 'guest',
         frame2: 'sidebar',
@@ -200,7 +170,6 @@ describe('PortProvider', () => {
     });
 
     it('responds to the first valid port request but ignores additional requests', async () => {
-      portProvider.listen();
       const data = {
         frame1: 'guest',
         frame2: 'sidebar',
@@ -222,7 +191,6 @@ describe('PortProvider', () => {
     });
 
     it('sends the counterpart port via the sidebar port', async () => {
-      portProvider.listen();
       await sendPortFinderRequest({
         data: {
           frame1: 'sidebar',
@@ -253,7 +221,6 @@ describe('PortProvider', () => {
     });
 
     it('sends the counterpart port via the listener', async () => {
-      portProvider.listen();
       const handler = sinon.stub();
       portProvider.on('frameConnected', handler);
       await sendPortFinderRequest({

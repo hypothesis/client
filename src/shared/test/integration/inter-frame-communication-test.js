@@ -70,7 +70,6 @@ describe('PortProvider-PortFinder-PortRPC integration', () => {
       await delay(10); // simulate scenario when host frame is ready before the guest frame
 
       const portProvider = new PortProvider(window.location.origin);
-      portProvider.listen();
 
       const guestRPC = new PortRPC();
       guestRPC.on('ping', cb => cb('pong'));
@@ -133,8 +132,7 @@ describe('PortProvider-PortFinder-PortRPC integration', () => {
     const simulateHost = async () => {
       await delay(10); // simulate scenario when host frame is ready before the guest frame
 
-      const portProvider = new PortProvider(window.location.origin);
-      portProvider.listen();
+      new PortProvider(window.location.origin);
     };
 
     return Promise.all([simulateGuest(), simulateSidebar(), simulateHost()]);
@@ -161,7 +159,6 @@ describe('PortProvider-PortFinder-PortRPC integration', () => {
 
     const simulateHost = () => {
       const portProvider = new PortProvider(window.location.origin);
-      portProvider.listen();
 
       const sidebarRPC = new PortRPC();
       sidebarRPC.on('ping', cb => cb('pong'));

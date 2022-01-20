@@ -52,7 +52,6 @@ function init() {
 
     const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
     portProvider = new PortProvider(hypothesisAppsOrigin);
-    portProvider.listen();
 
     const eventBus = new EventBus();
     sidebar = new Sidebar(document.body, eventBus, guest, sidebarConfig);
