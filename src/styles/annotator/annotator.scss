@@ -8,9 +8,7 @@
 
 @use '../variables' as var;
 
-// Base styles
-// -----------
-@use '../reset';
+@use './base';
 
 // Shared styles
 // -----------------
@@ -29,8 +27,7 @@
 // Make the shared package utility styles available
 @use '@hypothesis/frontend-shared/styles/util';
 
-@tailwind base;
-@tailwind utilities;
+@use 'tailwindcss/utilities';
 
 // Styles for all top-level elements in shadow roots.
 :host > * {
