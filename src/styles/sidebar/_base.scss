@@ -1,0 +1,37 @@
+@use 'tailwindcss/base';
+
+@layer base {
+  html,
+  body {
+    @apply h-full;
+  }
+
+  body {
+    @apply bg-white font-sans text-base text-color-text;
+  }
+
+  // TODO: Find all component-src uses of <a> elements directly and update to
+  // use `Link` component (for styling) or verify that they don't rely on this
+  // element style
+  a {
+    // Ensure the tag has width in order for :focus styling to render correctly.
+    @apply inline-block;
+    // Give links a radius to allow :focus styling to appear similar to that of buttons
+    @apply rounded-sm;
+    @apply text-brand no-underline;
+  }
+
+  a:active,
+  a:focus {
+    @apply no-underline;
+  }
+
+  a:hover {
+    @apply text-brand-dark no-underline;
+  }
+
+  // TODO: Research history of this and whether it's still appropriate
+  p {
+    hyphens: auto;
+  }
+}

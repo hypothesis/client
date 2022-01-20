@@ -1,10 +1,4 @@
-@use '../variables' as var;
-@use '../mixins/utils';
-
-// Base styles
-// -----------
-@use '../reset';
-@use './elements';
+@use './base';
 
 // Shared styles
 // -----------------
@@ -58,18 +52,4 @@
 // Local utility classes
 @use '../util';
 
-@tailwind base;
-@tailwind utilities;
-
-// Top-level styles
-// ----------------
-
-body {
-  @include utils.font--medium;
-  height: 100%;
-
-  background-color: var.$color-background;
-  color: var.$color-text;
-  font-family: var.$sans-font-family;
-  font-weight: normal;
-}
+@use 'tailwindcss/utilities';
