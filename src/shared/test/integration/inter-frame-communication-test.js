@@ -49,76 +49,72 @@ describe('PortProvider-PortFinder-PortRPC integration', () => {
   });
 
   it('enables the communication between guest-host', async () => {
-    let done;
-    const promise = new Promise(resolve => (done = resolve));
-
-    // guest frame
-    const portFinder = new PortFinder({
-      hostFrame: window,
-      source: 'guest',
-    });
-    const hostRPC = new PortRPC();
-
-    portFinder.discover('host').then(port => {
-      hostRPC.connect(port);
-      hostRPC.call('ping', response => {
-        assert.equal(response, 'pong');
-        done();
+    const simulateGuest = async () => {
+      const portFinder = new PortFinder({
+        hostFrame: window,
+        source: 'guest',
       });
-    });
+      const port = await portFinder.discover('host');
 
-    await delay(10); // add some realism
+      const hostRPC = new PortRPC();
+      hostRPC.connect(port);
+      await new Promise(resolve =>
+        hostRPC.call('ping', response => {
+          assert.equal(response, 'pong');
+          resolve();
+        })
+      );
+    };
 
-    // host frame
-    const portProvider = new PortProvider(window.location.origin);
-    portProvider.listen();
-    const guestRPC = new PortRPC();
+    const simulateHost = async () => {
+      await delay(10); // simulate scenario when host frame is ready before the guest frame
 
-    // Register RPC method *before* connection
-    guestRPC.on('ping', cb => cb('pong'));
+      const portProvider = new PortProvider(window.location.origin);
+      portProvider.listen();
 
-    portProvider.on('frameConnected', (source, port) => {
-      if (source === 'guest') {
-        guestRPC.connect(port);
-      }
-    });
+      const guestRPC = new PortRPC();
+      guestRPC.on('ping', cb => cb('pong'));
 
-    return promise;
+      portProvider.on('frameConnected', (source, port) => {
+        if (source === 'guest') {
+          guestRPC.connect(port);
+        }
+      });
+    };
+
+    return Promise.all([simulateGuest(), simulateHost()]);
   });
 
   it('enables the communication between guest-sidebar', async () => {
-    let done;
-    const promise = new Promise(resolve => (done = resolve));
-
-    // guest frame;
-    const portFinder1 = new PortFinder({
-      hostFrame: window,
-      source: 'guest',
-    });
-    const sidebarRPC = new PortRPC();
-
-    portFinder1.discover('sidebar').then(port => {
-      sidebarRPC.connect(port);
-      sidebarRPC.call('ping', response => {
-        assert.equal(response, 'pong');
-        done();
+    const simulateGuest = async () => {
+      const portFinder = new PortFinder({
+        hostFrame: window,
+        source: 'guest',
       });
-    });
+      const hostRPC = new PortRPC();
 
-    await delay(10); // add some realism
+      const port = await portFinder.discover('sidebar');
+      hostRPC.connect(port);
 
-    // sidebar frame
-    const portFinder2 = new PortFinder({
-      hostFrame: window,
-      source: 'sidebar',
-    });
-    const guestRPC = new PortRPC();
+      await new Promise(resolve =>
+        hostRPC.call('ping', response => {
+          assert.equal(response, 'pong');
+          resolve();
+        })
+      );
+    };
 
-    // Register RPC method *before* connection
-    guestRPC.on('ping', cb => cb('pong'));
+    const simulateSidebar = async () => {
+      const portFinder = new PortFinder({
+        hostFrame: window,
+        source: 'sidebar',
+      });
+      const port = await portFinder.discover('host');
 
-    const listenerCollection = new ListenerCollection();
-    portFinder2.discover('host').then(port => {
+      const guestRPC = new PortRPC();
+      guestRPC.on('ping', cb => cb('pong'));
+
+      const listenerCollection = new ListenerCollection();
       listenerCollection.add(port, 'message', ({ data, ports }) => {
         if (
           isMessageEqual(data, {
@@ -130,49 +126,53 @@ describe('PortProvider-PortFinder-PortRPC integration', () => {
           guestRPC.connect(ports[0]);
         }
       });
-      port.start(); // `start` method would be triggered by `hostRPC.connect(port)`
-    });
 
-    // host frame
-    const portProvider = new PortProvider(window.location.origin);
-    portProvider.listen();
+      port.start(); // `start` is normally invoked by `hostRPC.connect(port)`
+    };
 
-    return promise;
+    const simulateHost = async () => {
+      await delay(10); // simulate scenario when host frame is ready before the guest frame
+
+      const portProvider = new PortProvider(window.location.origin);
+      portProvider.listen();
+    };
+
+    return Promise.all([simulateGuest(), simulateSidebar(), simulateHost()]);
   });
 
   it('enables the communication between sidebar-host', async () => {
-    let done;
-    const promise = new Promise(resolve => (done = resolve));
-
-    // sidebar frame
-    const portFinder = new PortFinder({
-      hostFrame: window,
-      source: 'sidebar',
-    });
-    const hostRPC = new PortRPC();
-
-    portFinder.discover('host').then(port => {
-      hostRPC.connect(port);
-      hostRPC.call('ping', response => {
-        assert.equal(response, 'pong');
-        done();
+    const simulateSidebar = async () => {
+      const portFinder = new PortFinder({
+        hostFrame: window,
+        source: 'sidebar',
       });
-    });
+      const port = await portFinder.discover('host');
 
-    // host frame
-    const portProvider = new PortProvider(window.location.origin);
-    portProvider.listen();
-    const sidebarRPC = new PortRPC();
+      const hostRPC = new PortRPC();
+      hostRPC.connect(port);
 
-    // Register RPC method *before* connection
-    sidebarRPC.on('ping', cb => cb('pong'));
+      await new Promise(resolve => {
+        hostRPC.call('ping', response => {
+          assert.equal(response, 'pong');
+          resolve();
+        });
+      });
+    };
 
-    portProvider.on('frameConnected', (source, port) => {
-      if (source === 'sidebar') {
-        sidebarRPC.connect(port);
-      }
-    });
+    const simulateHost = () => {
+      const portProvider = new PortProvider(window.location.origin);
+      portProvider.listen();
 
-    return promise;
+      const sidebarRPC = new PortRPC();
+      sidebarRPC.on('ping', cb => cb('pong'));
+
+      portProvider.on('frameConnected', (source, port) => {
+        if (source === 'sidebar') {
+          sidebarRPC.connect(port);
+        }
+      });
+    };
+
+    return Promise.all([simulateSidebar(), simulateHost()]);
   });
 });
