@@ -269,13 +269,13 @@ export default class Guest {
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
       const tags = annotationsAt(/** @type {Element} */ (target));
       if (tags.length && this._highlightsVisible) {
-        this._sidebarRPC.call('focusAnnotations', tags);
+        this._focusAnnotations(tags);
       }
     });
 
     this._listeners.add(this.element, 'mouseout', () => {
       if (this._highlightsVisible) {
-        this._sidebarRPC.call('focusAnnotations', []);
+        this._focusAnnotations([]);
       }
     });
 
