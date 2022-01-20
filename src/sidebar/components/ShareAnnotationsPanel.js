@@ -56,15 +56,18 @@ function ShareAnnotationsPanel({ toastMessenger }) {
   return (
     <SidebarPanel title={panelTitle} panelName="shareGroupAnnotations">
       {!sharingReady && (
-        <div className="hyp-u-layout-row--center">
+        <div className="flex flex-row items-center justify-center">
           <Spinner />
         </div>
       )}
       {sharingReady && (
-        <div className="ShareAnnotationsPanel">
+        <div className="text-color-text-light space-y-3">
           {shareURI ? (
             <>
-              <div className="ShareAnnotationsPanel__intro">
+              <div
+                className="text-color-text font-medium"
+                data-testid="sharing-intro"
+              >
                 {notNull(focusedGroup).type === 'private' ? (
                   <p>
                     Use this link to share these annotations with other group
@@ -74,7 +77,7 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                   <p>Use this link to share these annotations with anyone:</p>
                 )}
               </div>
-              <div className="hyp-u-layout-row">
+              <div>
                 <TextInputWithButton>
                   <TextInput
                     aria-label="Use this URL to share these annotations"
@@ -90,7 +93,7 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                   />
                 </TextInputWithButton>
               </div>
-              <p>
+              <p data-testid="sharing-details">
                 {notNull(focusedGroup).type === 'private' ? (
                   <span>
                     Annotations in the private group{' '}
@@ -105,14 +108,14 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                 )}{' '}
                 <span>
                   Private (
-                  <Icon name="lock" classes="u-inline" /> <em>Only Me</em>)
+                  <Icon name="lock" classes="inline" /> <em>Only Me</em>)
                   annotations are only visible to you.
                 </span>
               </p>
               <ShareLinks shareURI={shareURI} />
             </>
           ) : (
-            <p>
+            <p data-testid="no-sharing">
               These annotations cannot be shared because this document is not
               available on the web.
             </p>
