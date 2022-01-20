@@ -95,7 +95,6 @@ describe('ShareAnnotationsPanel', () => {
 
     it('renders panel content if needed info available', () => {
       const wrapper = createShareAnnotationsPanel();
-      assert.isTrue(wrapper.exists('.ShareAnnotationsPanel'));
       assert.isFalse(wrapper.find('Spinner').exists());
     });
   });
@@ -130,12 +129,12 @@ describe('ShareAnnotationsPanel', () => {
       const wrapper = createShareAnnotationsPanel();
 
       assert.match(
-        wrapper.find('.ShareAnnotationsPanel__intro').text(),
+        wrapper.find('[data-testid="sharing-intro"]').text(),
         testCase.introPattern
       );
 
       assert.match(
-        wrapper.find('.ShareAnnotationsPanel').text(),
+        wrapper.find('[data-testid="sharing-details"]').text(),
         testCase.visibilityPattern
       );
     });
@@ -146,7 +145,7 @@ describe('ShareAnnotationsPanel', () => {
 
         const wrapper = createShareAnnotationsPanel();
 
-        const panelEl = wrapper.find('.ShareAnnotationsPanel');
+        const panelEl = wrapper.find('[data-testid="no-sharing"]');
         assert.include(panelEl.text(), 'These annotations cannot be shared');
       });
     });
