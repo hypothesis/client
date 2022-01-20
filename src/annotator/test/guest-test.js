@@ -37,6 +37,7 @@ describe('Guest', () => {
 
   let FakeBucketBarClient;
   let fakeBucketBarClient;
+  let fakeCreateIntegration;
   let FakePortRPC;
   let fakePortRPCs;
   let fakeIntegration;
@@ -134,6 +135,8 @@ describe('Guest', () => {
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     };
 
+    fakeCreateIntegration = sinon.stub().returns(fakeIntegration);
+
     fakeHypothesisInjector = {
       destroy: sinon.stub(),
       injectClient: sinon.stub().resolves(),
@@ -165,7 +168,7 @@ describe('Guest', () => {
         BucketBarClient: FakeBucketBarClient,
       },
       './integrations': {
-        createIntegration: sinon.stub().returns(fakeIntegration),
+        createIntegration: fakeCreateIntegration,
       },
       './highlighter': highlighter,
       './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
@@ -1312,6 +1315,22 @@ describe('Guest', () => {
       const frame = {};
 
       await guest.injectClient(frame);
+
+      assert.calledWith(FakeHypothesisInjector, guest.element, config);
+      assert.calledWith(fakeHypothesisInjector.injectClient, frame);
+    });
+
+    it('can be called by the integration when created', async () => {
+      const config = {};
+      const frame = {};
+
+      // Simulate the integration injecting the client into pre-existing content
+      // frames when created. The VitalSource integration does this for example.
+      fakeCreateIntegration.callsFake(annotator => {
+        annotator.injectClient(frame);
+        return fakeIntegration;
+      });
+      const guest = createGuest({});
 
       assert.calledWith(FakeHypothesisInjector, guest.element, config);
       assert.calledWith(fakeHypothesisInjector.injectClient, frame);
