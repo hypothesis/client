@@ -8,8 +8,26 @@ export default {
     './dev-server/ui-playground/components/**/*.js',
     './node_modules/@hypothesis/frontend-shared/lib/**/*.js',
   ],
-  theme: {},
-  corePlugins: {
-    preflight: false, // Disable Tailwind's CSS reset in the `base` layer
+  theme: {
+    extend: {
+      colors: {
+        'color-text': {
+          DEFAULT: '#202020',
+          light: '#737373',
+        },
+      },
+      fontFamily: {
+        sans: [
+          '"Helvetica Neue"',
+          'Helvetica',
+          'Arial',
+          '"Lucida Grande"',
+          'sans-serif',
+        ],
+      },
+      fontSize: {
+        base: ['13px', '1.4'],
+      },
+    },
   },
 };
