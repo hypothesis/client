@@ -18,7 +18,7 @@ export const POLLING_INTERVAL_FOR_PORT = 250;
  * MessagePort-based connection to other frames. It is used together with
  * PortProvider which runs in the host frame. See PortProvider for an overview.
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export class PortFinder {
   /**

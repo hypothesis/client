@@ -53,7 +53,7 @@ function createSidebarIframe(config) {
  * The `Sidebar` class creates (1) the sidebar application iframe, (2) its container,
  * as well as (3) the adjacent controls.
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export default class Sidebar {
   /**

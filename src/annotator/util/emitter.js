@@ -8,7 +8,7 @@ import { TinyEmitter } from 'tiny-emitter';
  * The different elements of the application can communicate with each other
  * without being tightly coupled.
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export class Emitter {
   /**

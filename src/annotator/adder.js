@@ -79,7 +79,7 @@ function nearestPositionedAncestor(el) {
  * it from the page's styles using shadow DOM, and the `AdderToolbar` Preact
  * component which actually renders the toolbar.
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export class Adder {
   /**

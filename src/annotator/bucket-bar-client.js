@@ -13,7 +13,7 @@ import { ListenerCollection } from '../shared/listener-collection';
  * 1. The set of anchors has been changed (due to annotations being added or removed)
  * 2. The position of anchors relative to the viewport of the guest has changed
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export class BucketBarClient {
   /**

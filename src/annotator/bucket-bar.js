@@ -11,7 +11,7 @@ import { anchorBuckets } from './util/buckets';
  * Controller for the "bucket bar" shown alongside the sidebar indicating where
  * annotations are in the document.
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export default class BucketBar {
   /**

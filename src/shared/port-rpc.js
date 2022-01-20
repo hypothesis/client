@@ -64,7 +64,7 @@ const PROTOCOL = 'frame-rpc';
  *
  * @template {string} OnMethod - Names of RPC methods this client responds to
  * @template {string} CallMethod - Names of RPC methods this client invokes
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export class PortRPC {
   constructor() {

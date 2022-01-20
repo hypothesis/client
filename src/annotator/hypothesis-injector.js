@@ -13,7 +13,7 @@ import { onDocumentReady, FrameObserver } from './frame-observer';
  * `enable-annotation` attribute set (see {@link FrameObserver}) and can be
  * manually injected into other frames using {@link injectClient}.
  *
- * @implements Destroyable
+ * @implements {Destroyable}
  */
 export class HypothesisInjector {
   /**
