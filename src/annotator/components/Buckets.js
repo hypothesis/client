@@ -20,6 +20,7 @@ function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
     onSelectAnnotations([...bucket.tags], event.metaKey || event.ctrlKey);
   }
 
+  /** @param {boolean} hasFocus */
   function setFocus(hasFocus) {
     if (hasFocus) {
       onFocusAnnotations([...bucket.tags]);
@@ -32,9 +33,10 @@ function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
     <button
       className="Buckets__button Buckets__button--left"
       onClick={event => selectAnnotations(event)}
-      onMouseMove={() => setFocus(true)}
-      onMouseOut={() => setFocus(false)}
       onBlur={() => setFocus(false)}
+      onFocus={() => setFocus(true)}
+      onMouseEnter={() => setFocus(true)}
+      onMouseOut={() => setFocus(false)}
       title={buttonTitle}
       aria-label={buttonTitle}
     >
@@ -50,14 +52,25 @@ function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
  * @param {object} props
  *   @param {Bucket} props.bucket
  *   @param {'down'|'up'} props.direction
+ *   @param {(tags: string[]) => void} props.onFocusAnnotations
  *   @param {(tags: string[], direction: 'down'|'up') => void} props.onScrollToClosestOffScreenAnchor
  */
 function NavigationBucketButton({
   bucket,
   direction,
+  onFocusAnnotations,
   onScrollToClosestOffScreenAnchor,
 }) {
   const buttonTitle = `Go ${direction} to next annotations (${bucket.tags.size})`;
+
+  /** @param {boolean} hasFocus */
+  function setFocus(hasFocus) {
+    if (hasFocus) {
+      onFocusAnnotations([...bucket.tags]);
+    } else {
+      onFocusAnnotations([]);
+    }
+  }
 
   return (
     <button
@@ -65,6 +78,10 @@ function NavigationBucketButton({
       onClick={() =>
         onScrollToClosestOffScreenAnchor([...bucket.tags], direction)
       }
+      onBlur={() => setFocus(false)}
+      onFocus={() => setFocus(true)}
+      onMouseEnter={() => setFocus(true)}
+      onMouseOut={() => setFocus(false)}
       title={buttonTitle}
       aria-label={buttonTitle}
     >
@@ -103,6 +120,7 @@ export default function Buckets({
           <NavigationBucketButton
             bucket={above}
             direction="up"
+            onFocusAnnotations={onFocusAnnotations}
             onScrollToClosestOffScreenAnchor={onScrollToClosestOffScreenAnchor}
           />
         </li>
@@ -125,6 +143,7 @@ export default function Buckets({
           <NavigationBucketButton
             bucket={below}
             direction="down"
+            onFocusAnnotations={onFocusAnnotations}
             onScrollToClosestOffScreenAnchor={onScrollToClosestOffScreenAnchor}
           />
         </li>
