@@ -497,6 +497,23 @@ describe('Sidebar', () => {
         assert.calledOnce(sidebar.bucketBar.update);
       });
     });
+
+    describe('on "frameDestroyed" event', () => {
+      it('disconnects the guest', () => {
+        const sidebar = createSidebar();
+        connectGuest(sidebar);
+        guestRPC().call.resetHistory();
+
+        emitGuestEvent('frameDestroyed');
+
+        assert.called(guestRPC().destroy);
+
+        // Trigger a notification to all connected guests. This should no longer
+        // be sent to the guest that has just been disconnected.
+        sidebar.open();
+        assert.notCalled(guestRPC().call);
+      });
+    });
   });
 
   describe('pan gestures', () => {
