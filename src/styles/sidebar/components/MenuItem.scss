@@ -81,7 +81,6 @@ a.MenuItem:hover {
 .MenuItem__icon {
   @include utils.icon--medium;
   color: inherit;
-  display: inline-block;
   margin-right: 4px;
   position: relative;
   &-container {
