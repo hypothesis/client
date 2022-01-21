@@ -10,6 +10,9 @@ export default {
   ],
   theme: {
     extend: {
+      borderColor: {
+        DEFAULT: '#dbdbdb',
+      },
       colors: {
         'color-text': {
           DEFAULT: '#202020',
@@ -27,6 +30,7 @@ export default {
       },
       fontSize: {
         base: ['13px', '1.4'],
+        lg: ['14px'],
       },
     },
   },

@@ -52,7 +52,7 @@ describe('HelpPanel', () => {
   context('when viewing tutorial sub-panel', () => {
     it('should show tutorial by default', () => {
       const wrapper = createComponent();
-      const subHeader = wrapper.find('.HelpPanel__sub-panel-title');
+      const subHeader = wrapper.find('[data-testid="subpanel-title"]');
 
       assert.include(subHeader.text(), 'Getting started');
       assert.isTrue(wrapper.find('Tutorial').exists());
@@ -61,19 +61,21 @@ describe('HelpPanel', () => {
 
     it('should show navigation link to versionInfo sub-panel', () => {
       const wrapper = createComponent();
-      const link = wrapper.find('.HelpPanel__sub-panel-navigation-button');
+      const button = wrapper.find('HelpPanelNavigationButton');
 
-      assert.include(link.text(), 'About this version');
+      assert.include(button.text(), 'About this version');
     });
 
-    it('should switch to versionInfo sub-panel when footer link clicked', () => {
+    it('should switch to versionInfo sub-panel when navigation button clicked', async () => {
       const wrapper = createComponent();
-      wrapper.find('.HelpPanel__sub-panel-navigation-button').simulate('click');
+      act(() => {
+        wrapper
+          .find('LinkButton')
+          .getDOMNode()
+          .dispatchEvent(new Event('click'));
+      });
+      wrapper.update();
 
-      assert.include(
-        wrapper.find('.HelpPanel__sub-panel-title').text(),
-        'About this version'
-      );
       assert.isTrue(wrapper.find('VersionInfo').exists());
       assert.equal(
         wrapper.find('VersionInfo').prop('versionData'),
@@ -125,9 +127,15 @@ describe('HelpPanel', () => {
 
     it('should show navigation link back to tutorial sub-panel', () => {
       const wrapper = createComponent();
-      wrapper.find('.HelpPanel__sub-panel-navigation-button').simulate('click');
+      act(() => {
+        wrapper
+          .find('LinkButton')
+          .getDOMNode()
+          .dispatchEvent(new Event('click'));
+      });
+      wrapper.update();
 
-      const link = wrapper.find('.HelpPanel__sub-panel-navigation-button');
+      const link = wrapper.find('LinkButton');
 
       assert.isTrue(wrapper.find('VersionInfo').exists());
       assert.isFalse(wrapper.find('Tutorial').exists());
@@ -138,11 +146,22 @@ describe('HelpPanel', () => {
       const wrapper = createComponent();
 
       // Click to get to VersionInfo sub-panel...
-      wrapper.find('.HelpPanel__sub-panel-navigation-button').simulate('click');
+      act(() => {
+        wrapper
+          .find('LinkButton')
+          .getDOMNode()
+          .dispatchEvent(new Event('click'));
+      });
+      wrapper.update();
 
-      const link = wrapper.find('.HelpPanel__sub-panel-navigation-button');
       // Click again to get back to tutorial sub-panel
-      link.simulate('click');
+      act(() => {
+        wrapper
+          .find('LinkButton')
+          .getDOMNode()
+          .dispatchEvent(new Event('click'));
+      });
+      wrapper.update();
 
       assert.isFalse(wrapper.find('VersionInfo').exists());
       assert.isTrue(wrapper.find('Tutorial').exists());
