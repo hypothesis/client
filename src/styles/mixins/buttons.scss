@@ -141,22 +141,6 @@
 }
 
 /**
- * A button pattern that looks like a link with a small icon on the right
- * Used, e.g., in the help panel to navigate between sub-panels
- */
-@mixin button--navigation {
-  @include reset-native-btn-styles;
-  @include layout.row($justify: right, $align: center);
-  color: var.$color-brand;
-
-  svg {
-    margin-left: 2px;
-    width: 12px;
-    height: 12px;
-  }
-}
-
-/**
  * Mixins that style buttons to appear as lozenges with an integrated arrow
  * pointing left, up or down (right doesn't exist yet but could easily be added).
  * These indicators are used, e.g., in the bucket bar.

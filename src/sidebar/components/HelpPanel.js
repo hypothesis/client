@@ -1,4 +1,4 @@
-import { Icon } from '@hypothesis/frontend-shared';
+import { Icon, Link, LinkButton } from '@hypothesis/frontend-shared';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
@@ -11,7 +11,24 @@ import VersionInfo from './VersionInfo';
 
 /**
  * @typedef {import('../helpers/version-data').AuthState} AuthState
+ * @typedef {import("preact").ComponentChildren} Children
  */
+
+/**
+ * Navigation link-button to swap between sub-panels in the help panel
+ *
+ * @param {object} props
+ *   @param {Children} props.children
+ *   @param {() => void} props.onClick
+ */
+function HelpPanelNavigationButton({ children, onClick }) {
+  return (
+    <LinkButton classes="leading-none text-brand" onClick={onClick}>
+      {children}
+      <Icon classes="ml-1" name="arrow-right" />
+    </LinkButton>
+  );
+}
 
 /**
  * External link "tabs" inside of the help panel.
@@ -22,15 +39,14 @@ import VersionInfo from './VersionInfo';
  */
 function HelpPanelTab({ linkText, url }) {
   return (
-    <div className="HelpPanel-tabs__tab">
-      <a
+    <div className="flex-1 border-r last-of-type:border-r-0">
+      <Link
         href={url}
-        className="hyp-u-horizontal-spacing--2 hyp-u-layout-row--center HelpPanel-tabs__link"
+        classes="flex items-center justify-center space-x-2 text-color-text-light text-lg font-medium"
         target="_blank"
-        rel="noopener noreferrer"
       >
-        <span>{linkText}</span> <Icon name="external" classes="u-icon--small" />
-      </a>
+        <span>{linkText}</span> <Icon name="external" classes="w-3 h-3" />
+      </Link>
     </div>
   );
 }
@@ -112,41 +128,33 @@ function HelpPanel({ auth, session }) {
       panelName="help"
       onActiveChanged={onActiveChanged}
     >
-      <div className="hyp-u-vertical-spacing HelpPanel__content">
-        <div className="hyp-u-layout-row--align-center">
-          <h3 className="HelpPanel__sub-panel-title">
+      <div className="space-y-4">
+        <div className="flex items-center">
+          <h3 className="grow text-lg font-medium" data-testid="subpanel-title">
             {subPanelTitles[activeSubPanel]}
           </h3>
-          <div>
-            {activeSubPanel === 'versionInfo' && (
-              <button
-                className="HelpPanel__sub-panel-navigation-button"
-                onClick={e => openSubPanel(e, 'tutorial')}
-                aria-label="Show tutorial panel"
-              >
-                Getting started
-                <Icon name="arrow-right" />
-              </button>
-            )}
-            {activeSubPanel === 'tutorial' && (
-              <button
-                className="HelpPanel__sub-panel-navigation-button"
-                onClick={e => openSubPanel(e, 'versionInfo')}
-                aria-label="Show version information panel"
-              >
-                About this version
-                <Icon name="arrow-right" />
-              </button>
-            )}
-          </div>
+          {activeSubPanel === 'versionInfo' && (
+            <HelpPanelNavigationButton
+              onClick={e => openSubPanel(e, 'tutorial')}
+            >
+              Getting started
+            </HelpPanelNavigationButton>
+          )}
+          {activeSubPanel === 'tutorial' && (
+            <HelpPanelNavigationButton
+              onClick={e => openSubPanel(e, 'versionInfo')}
+            >
+              About this version
+            </HelpPanelNavigationButton>
+          )}
         </div>
-        <div className="HelpPanel__subcontent">
+        <div className="border-y py-4">
           {activeSubPanel === 'tutorial' && <Tutorial />}
           {activeSubPanel === 'versionInfo' && (
             <VersionInfo versionData={versionData} />
           )}
         </div>
-        <div className="HelpPanel-tabs">
+        <div className="flex items-center">
           <HelpPanelTab
             linkText="Help topics"
             url="https://web.hypothes.is/help/"

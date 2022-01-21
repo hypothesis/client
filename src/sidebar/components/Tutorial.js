@@ -43,6 +43,7 @@ function Tutorial({ settings }) {
       <li>
         To create a highlight (
         <Link
+          classes="underline hover:underline"
           href="https://web.hypothes.is/help/why-are-highlights-private-by-default/"
           target="_blank"
         >
@@ -57,6 +58,7 @@ function Tutorial({ settings }) {
           To annotate in a private group, select the group from the groups
           dropdown. Don&apos;t see your group? Ask the group creator to send a{' '}
           <Link
+            classes="underline hover:underline"
             href="https://web.hypothes.is/help/how-to-join-a-private-group/"
             target="_blank"
           >

@@ -142,33 +142,6 @@
 }
 
 /**
- * Styled external-linked "tabs" with icons, intended for use in a panel
- */
-@mixin panel-tabs {
-  @include layout.row($align: center);
-
-  &__tab {
-    @include utils.font--large;
-    @include utils.border--right;
-    flex: 1 1;
-    text-align: center;
-    color: var.$color-text--light;
-
-    &:last-of-type {
-      border-right: none;
-    }
-  }
-
-  &__link {
-    color: var.$color-text--light;
-  }
-
-  &__icon {
-    @include utils.icon--xsmall;
-  }
-}
-
-/**
  * A full-width banner with optional "type" and styled icon at left
  */
 @mixin banner {
