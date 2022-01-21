@@ -108,8 +108,8 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                 )}{' '}
                 <span>
                   Private (
-                  <Icon name="lock" classes="inline" /> <em>Only Me</em>)
-                  annotations are only visible to you.
+                  <Icon name="lock" classes="inline -mt-0.5" /> <em>Only Me</em>
+                  ) annotations are only visible to you.
                 </span>
               </p>
               <ShareLinks shareURI={shareURI} />

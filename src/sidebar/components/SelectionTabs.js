@@ -171,7 +171,7 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
             <br />
             Create one by selecting some text and clicking the{' '}
             <Icon
-              classes="hyp-u-margin--1 u-inline"
+              classes="m-0.5 inline -mt-0.5"
               name="annotate"
               title="Annotate"
             />{' '}
