@@ -71,15 +71,15 @@ export class PortProvider {
     this._emitter = new TinyEmitter();
 
     /**
-     * Map of source frame to channels that have been created for this frame.
+     * IDs of port requests that have been handled.
      *
      * This is used to avoid responding to the same request multiple times.
      * Guest frames in particular may send duplicate requests (see comments in
      * PortFinder).
      *
-     * @type {WeakMap<Window, Set<Channel>>}
+     * @type {Set<string>}
      */
-    this._sentChannels = new WeakMap();
+    this._handledRequests = new Set();
 
     // Create the `sidebar-host` channel immediately, while other channels are
     // created on demand
@@ -87,7 +87,7 @@ export class PortProvider {
 
     this._listeners = new ListenerCollection();
 
-    /** @type {Array<Message & {allowedOrigin: string}>} */
+    /** @type {Array<Partial<Message> & {allowedOrigin: string}>} */
     this._allowedMessages = [
       {
         allowedOrigin: '*',
@@ -139,12 +139,12 @@ export class PortProvider {
     const handleRequest = event => {
       const { data, origin, source } = /** @type {MessageEvent} */ (event);
 
-      if (!isMessage(data) || data.type !== 'request') {
+      if (!isMessage(data) || data.type !== 'request' || !data.requestId) {
         // If this does not look like a message intended for us, ignore it.
         return;
       }
 
-      const { frame1, frame2 } = data;
+      const { frame1, frame2, requestId } = data;
       const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
 
       if (!isSourceWindow(source)) {
@@ -171,17 +171,10 @@ export class PortProvider {
         return;
       }
 
-      // Check if this request has already been received from this frame and
-      // ignore it if so.
-      let sentChannels = this._sentChannels.get(source);
-      if (!sentChannels) {
-        sentChannels = new Set();
-        this._sentChannels.set(source, sentChannels);
-      }
-      if (sentChannels.has(channel)) {
+      if (this._handledRequests.has(requestId)) {
         return;
       }
-      sentChannels.add(channel);
+      this._handledRequests.add(requestId);
 
       // Create the channel for these two frames to communicate and send the
       // corresponding ports to them.
@@ -190,7 +183,7 @@ export class PortProvider {
           ? this._sidebarHostChannel
           : new MessageChannel();
 
-      const message = { frame1, frame2, type: 'offer' };
+      const message = { frame1, frame2, type: 'offer', requestId };
 
       // If the source window has an opaque origin [1], `event.origin` will be
       // the string "null". This is not a legal value for the `targetOrigin`
@@ -220,7 +213,7 @@ export class PortProvider {
 
   /**
    * @param {object} options
-   *   @param {Message} options.allowedMessage - the `data` must match this
+   *   @param {Partial<Message>} options.allowedMessage - the `data` must match this
    *     `Message`.
    *   @param {string} options.allowedOrigin - the `origin` must match this
    *     value. If `allowedOrigin` is '*', the origin is ignored.

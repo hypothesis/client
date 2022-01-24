@@ -3,9 +3,14 @@ import {
   MAX_WAIT_FOR_PORT,
   POLLING_INTERVAL_FOR_PORT,
   PortFinder,
+  $imports,
 } from '../port-finder';
 
+const requestId = 'abcdef';
+
 describe('PortFinder', () => {
+  let fakeGenerateHexString;
+
   const frame1 = 'guest';
   const type = 'offer';
   let portFinder;
@@ -28,13 +33,21 @@ describe('PortFinder', () => {
     return event;
   }
 
+  // Generate predictable IDs for port requests
+  fakeGenerateHexString = sinon.stub().returns(requestId);
+
   beforeEach(() => {
     portFinders = [];
     sinon.stub(window, 'postMessage');
     portFinder = createPortFinder();
+
+    $imports.$mock({
+      '../random': { generateHexString: fakeGenerateHexString },
+    });
   });
 
   afterEach(() => {
+    $imports.$restore();
     window.postMessage.restore();
     portFinders.forEach(instance => instance.destroy());
   });
@@ -103,6 +116,7 @@ describe('PortFinder', () => {
             frame1: source,
             frame2: target,
             type,
+            requestId,
           },
           ports: [port1],
         });
@@ -130,7 +144,7 @@ describe('PortFinder', () => {
       assert.callCount(window.postMessage, expectedCalls);
       assert.alwaysCalledWithExactly(
         window.postMessage,
-        { frame1, frame2: target, type: 'request' },
+        { frame1, frame2: target, type: 'request', requestId },
         '*'
       );
 
