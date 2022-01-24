@@ -15,20 +15,41 @@ class FakeVitalSourceViewer {
     this.bookElement.shadowRoot.append(this.contentFrame);
 
     document.body.append(this.bookElement);
+
+    this.contentFrame.contentDocument.body.innerHTML = '<p>Initial content</p>';
   }
 
   destroy() {
     this.bookElement.remove();
   }
 
-  /** Simulate navigation to a different chapter of the book. */
-  loadNextChapter() {
+  /**
+   * Simulate navigation to a different chapter of the book.
+   *
+   * This process happens in two steps. This method simulates the first step.
+   * `finishChapterLoad` simulates the second step.
+   */
+  beginChapterLoad() {
     this.contentFrame.remove();
 
     // VS handles navigations by removing the frame and creating a new one,
     // rather than navigating the existing frame.
     this.contentFrame = document.createElement('iframe');
     this.bookElement.shadowRoot.append(this.contentFrame);
+
+    // When the new frame initially loads, it will contain some encoded/encrypted
+    // data for the new chapter. VS will then make a form submission to get the
+    // decoded HTML.
+    //
+    // The integration should not inject the client if the frame contains this
+    // data content.
+    this.contentFrame.contentDocument.body.innerHTML =
+      '<div>Encrypted content</div>';
+  }
+
+  finishChapterLoad() {
+    this.contentFrame.contentDocument.body.innerHTML = '<p>New content</p>';
+    this.contentFrame.dispatchEvent(new Event('load'));
   }
 }
 
@@ -107,9 +128,12 @@ describe('annotator/integrations/vitalsource', () => {
     it('re-injects client when content frame is changed', async () => {
       fakeGuest.injectClient.resetHistory();
 
-      fakeViewer.loadNextChapter();
+      fakeViewer.beginChapterLoad();
       await delay(0);
+      assert.notCalled(fakeGuest.injectClient);
 
+      fakeViewer.finishChapterLoad();
+      await delay(0);
       assert.calledWith(fakeGuest.injectClient, fakeViewer.contentFrame);
     });
 
