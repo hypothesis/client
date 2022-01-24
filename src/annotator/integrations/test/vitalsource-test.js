@@ -137,6 +137,31 @@ describe('annotator/integrations/vitalsource', () => {
       assert.calledWith(fakeGuest.injectClient, fakeViewer.contentFrame);
     });
 
+    it("doesn't re-inject if content frame is removed", async () => {
+      fakeGuest.injectClient.resetHistory();
+
+      // Remove the content frame. This will trigger a re-injection check, but
+      // do nothing as there is no content frame.
+      fakeViewer.contentFrame.remove();
+      await delay(0);
+
+      assert.notCalled(fakeGuest.injectClient);
+    });
+
+    it("doesn't re-inject if content frame siblings change", async () => {
+      fakeGuest.injectClient.resetHistory();
+
+      // Modify the DOM tree. This will trigger a re-injection check, but do
+      // nothing as we've already handled the current frame.
+      fakeViewer.contentFrame.insertAdjacentElement(
+        'afterend',
+        document.createElement('div')
+      );
+      await delay(0);
+
+      assert.notCalled(fakeGuest.injectClient);
+    });
+
     it('does not allow annotation in the container frame', async () => {
       assert.equal(integration.canAnnotate(), false);
 
