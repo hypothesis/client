@@ -55,12 +55,36 @@ export class VitalSourceContainerIntegration {
       throw new Error('Book container element not found');
     }
 
+    /** @type {WeakSet<HTMLIFrameElement>} */
+    const contentFrames = new WeakSet();
+
+    /** @param {HTMLIFrameElement} frame */
+    const injectIfContentReady = frame => {
+      // Check if this frame contains ebook content, as opposed to being a
+      // "blank" frame containing encrypted book content, as hidden text,
+      // which is created initially after a chapter navigation. These "blank"
+      // pages are replaced with the real content after a form submission.
+      //
+      // The format of the decoded HTML can vary, but as a simple heuristic,
+      // we look for a text paragraph.
+      const isBookContent = frame.contentDocument?.querySelector('p');
+      if (isBookContent) {
+        annotator.injectClient(frame);
+      }
+    };
+
     const shadowRoot = /** @type {ShadowRoot} */ (bookElement.shadowRoot);
     const injectClientIntoContentFrame = () => {
       const frame = shadowRoot.querySelector('iframe');
-      if (frame) {
-        annotator.injectClient(frame);
+      if (!frame || contentFrames.has(frame)) {
+        return;
       }
+      contentFrames.add(frame);
+
+      injectIfContentReady(frame);
+      frame.addEventListener('load', () => {
+        injectIfContentReady(frame);
+      });
     };
 
     injectClientIntoContentFrame();
