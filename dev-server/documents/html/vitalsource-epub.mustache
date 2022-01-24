@@ -27,7 +27,7 @@
 
           let chapterIndex = 0;
 
-          const setChapter = index => {
+          const setChapter = (index, initialLoad = false) => {
             if (index < 0 || index >= chapterURLs.length) {
               return;
             }
@@ -38,8 +38,31 @@
             // does. The client should be robust to either approach.
             this.contentFrame?.remove();
             this.contentFrame = document.createElement('iframe');
-            this.contentFrame.src = chapterURLs[chapterIndex];
             this.shadowRoot.append(this.contentFrame);
+
+            const chapterURL = chapterURLs[chapterIndex];
+
+            if (initialLoad) {
+              // Simulate client loading after VS chapter content has already
+              // loaded.
+              this.contentFrame.src = chapterURL;
+            } else {
+              // Simulate chapter navigation after client is injected. These
+              // navigations happen in several stages:
+              //
+              // 1. The previous chapter's iframe is removed
+              // 2. A new iframe is created. The initial HTML is a "blank" page
+              //    containing (invisible) content data for the new chapter as
+              //    text in the page.
+              // 3. The content data is posted to the server via a form
+              //    submission, which returns the decoded HTML.
+              //
+              // The client should only inject into the new frame after step 3.
+              this.contentFrame.src = 'about:blank';
+              setTimeout(() => {
+                this.contentFrame.src = chapterURL;
+              }, 50);
+            }
           };
 
           const styles = document.createElement('style');
@@ -66,7 +89,7 @@
           this.nextButton.onclick = () => setChapter(chapterIndex + 1);
           controlBar.append(this.nextButton);
 
-          setChapter(0);
+          setChapter(0, true /* initialLoad */);
         }
       }
       customElements.define('mosaic-book', MosaicElement);
