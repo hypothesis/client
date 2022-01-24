@@ -1,4 +1,5 @@
 import { ListenerCollection } from '../listener-collection';
+import { generateHexString } from '../random';
 import { isMessageEqual } from './port-util';
 
 /** Timeout for waiting for the host frame to respond to a port request. */
@@ -58,6 +59,8 @@ export class PortFinder {
       throw new Error('Invalid request of channel/port');
     }
 
+    const requestId = generateHexString(6);
+
     return new Promise((resolve, reject) => {
       const postRequest = () => {
         this._hostFrame.postMessage(
@@ -65,6 +68,7 @@ export class PortFinder {
             frame1: this._source,
             frame2: target,
             type: 'request',
+            requestId,
           },
           '*'
         );
@@ -96,6 +100,7 @@ export class PortFinder {
             frame1: this._source,
             frame2: target,
             type: 'offer',
+            requestId,
           })
         ) {
           clearInterval(intervalId);

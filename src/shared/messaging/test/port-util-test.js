@@ -7,6 +7,7 @@ describe('port-util', () => {
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
+        requestId: 'abcdef',
       },
 
       {
@@ -38,6 +39,7 @@ describe('port-util', () => {
     const frame1 = 'guest';
     const frame2 = 'sidebar';
     const type = 'offer';
+    const requestId = 'abcdef';
 
     [
       {
@@ -45,6 +47,7 @@ describe('port-util', () => {
           frame1,
           frame2,
           type,
+          requestId,
         },
         expectedResult: true,
         reason: 'data matches the message',
@@ -54,6 +57,7 @@ describe('port-util', () => {
           frame1,
           frame2,
           type,
+          requestId,
         },
         expectedResult: true,
         reason: 'data matches the message (properties in different order)',
@@ -73,6 +77,7 @@ describe('port-util', () => {
           // frame1 property missing
           frame2,
           type,
+          requestId,
         },
         expectedResult: false,
         reason: 'data has one property that is missing',
@@ -82,6 +87,7 @@ describe('port-util', () => {
           frame1,
           frame2: 9, // wrong type
           type,
+          requestId,
         },
         expectedResult: false,
         reason: 'data has one property with a wrong type',
@@ -91,6 +97,7 @@ describe('port-util', () => {
           frame1: 'dummy', // different
           frame2,
           type,
+          requestId,
         },
         expectedResult: false,
         reason: 'data has one property that is different',

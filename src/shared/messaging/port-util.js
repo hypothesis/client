@@ -8,6 +8,8 @@
  * @prop {Frame} frame1
  * @prop {Frame} frame2
  * @prop {'offer'|'request'} type
+ * @prop {string} requestId - ID of the request. Used to associate `offer`
+ *   responses with requests and enable PortProvider to ignore re-sent requests.
  */
 
 /**
@@ -35,7 +37,7 @@ export function isMessage(data) {
  * Return true if the data payload from a MessageEvent matches `message`.
  *
  * @param {any} data
- * @param {Message} message
+ * @param {Partial<Message>} message
  */
 export function isMessageEqual(data, message) {
   if (!isMessage(data)) {

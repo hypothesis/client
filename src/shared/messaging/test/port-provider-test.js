@@ -40,6 +40,7 @@ describe('PortProvider', () => {
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
+          requestId: 'abcdef',
         },
       });
 
@@ -60,14 +61,24 @@ describe('PortProvider', () => {
 
     it('reports errors validating messages', async () => {
       await sendPortFinderRequest({
-        data: { frame1: 'sidebar', frame2: 'invalid', type: 'request' },
+        data: {
+          frame1: 'sidebar',
+          frame2: 'invalid',
+          type: 'request',
+          requestId: 'abcdef',
+        },
       });
       assert.called(fakeSendError);
     });
 
     it('only reports errors once', async () => {
       const request = {
-        data: { frame1: 'sidebar', frame2: 'invalid', type: 'request' },
+        data: {
+          frame1: 'sidebar',
+          frame2: 'invalid',
+          type: 'request',
+          requestId: 'abcdef',
+        },
       };
       await sendPortFinderRequest(request);
       await sendPortFinderRequest(request);
@@ -87,6 +98,7 @@ describe('PortProvider', () => {
           frame1: 'dummy', // invalid source
           frame2: 'host',
           type: 'request',
+          requestId: 'abcdef',
         },
         reason: 'contains an invalid frame1',
       },
@@ -95,6 +107,7 @@ describe('PortProvider', () => {
           frame1: 'sidebar',
           frame2: 'dummy', // invalid target
           type: 'request',
+          requestId: 'abcdef',
         },
         reason: 'contains an invalid frame2',
       },
@@ -103,6 +116,7 @@ describe('PortProvider', () => {
           frame1: 'sidebar',
           frame2: 'host',
           type: 'dummy', // invalid type
+          requestId: 'abcdef',
         },
         reason: 'contains an invalid type',
       },
@@ -111,6 +125,7 @@ describe('PortProvider', () => {
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
+          requestId: 'abcdef',
         },
         source: null,
         reason: 'comes from invalid source',
@@ -120,6 +135,7 @@ describe('PortProvider', () => {
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
+          requestId: 'abcdef',
         },
         origin: 'https://dummy.com',
         reason: 'comes from invalid origin',
@@ -141,6 +157,7 @@ describe('PortProvider', () => {
         frame1: 'sidebar',
         frame2: 'host',
         type: 'request',
+        requestId: 'abcdef',
       };
 
       await sendPortFinderRequest({
@@ -160,6 +177,7 @@ describe('PortProvider', () => {
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
+        requestId: 'abcdef',
       };
 
       await sendPortFinderRequest({ data, origin: 'null' });
@@ -174,6 +192,7 @@ describe('PortProvider', () => {
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
+        requestId: 'abcdef',
       };
 
       for (let i = 0; i < 4; ++i) {
@@ -196,6 +215,7 @@ describe('PortProvider', () => {
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
+          requestId: 'abcdef',
         },
       });
 
@@ -207,6 +227,7 @@ describe('PortProvider', () => {
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
+        requestId: 'ghijkl',
       };
       await sendPortFinderRequest({
         data,
@@ -228,6 +249,7 @@ describe('PortProvider', () => {
           frame1: 'sidebar',
           frame2: 'host',
           type: 'request',
+          requestId: 'abcdef',
         },
       });
 
@@ -243,6 +265,7 @@ describe('PortProvider', () => {
           frame1: 'guest',
           frame2: 'host',
           type: 'request',
+          requestId: 'ghijkl',
         },
       });
 
