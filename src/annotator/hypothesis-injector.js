@@ -85,13 +85,13 @@ export class HypothesisInjector {
 }
 
 /**
- * Check if the Hypothesis client has already been injected into an iframe
+ * Check if the client was added to a frame by {@link injectHypothesis}.
  *
  * @param {HTMLIFrameElement} iframe
  */
 function hasHypothesis(iframe) {
-  const iframeWindow = /** @type {Window} */ (iframe.contentWindow);
-  return '__hypothesis' in iframeWindow;
+  const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
+  return iframeDocument.querySelector('script.js-hypothesis-config') !== null;
 }
 
 /**

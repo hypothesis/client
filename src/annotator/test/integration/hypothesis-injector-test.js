@@ -155,7 +155,11 @@ describe('HypothesisInjector integration test', () => {
 
   it('excludes injection from already injected iframes', async () => {
     const iframe = createAnnotatableIFrame();
-    iframe.contentWindow.eval('window.__hypothesis = {}');
+
+    // Add a client config in the same way as the injector.
+    const configScript = document.createElement('script');
+    configScript.className = 'js-hypothesis-config';
+    iframe.contentDocument.body.append(configScript);
 
     createHypothesisInjector();
     await onDocumentReady(iframe);
