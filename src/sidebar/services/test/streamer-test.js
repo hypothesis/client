@@ -74,25 +74,29 @@ class FakeSocket extends EventEmitter {
 }
 
 describe('StreamerService', () => {
+  let fakeAPIRoutes;
   let fakeStore;
   let fakeAuth;
   let fakeGroups;
   let fakeSession;
-  let fakeSettings;
   let fakeWarnOnce;
   let activeStreamer;
 
   function createDefaultStreamer() {
     activeStreamer = new StreamerService(
       fakeStore,
+      fakeAPIRoutes,
       fakeAuth,
       fakeGroups,
-      fakeSession,
-      fakeSettings
+      fakeSession
     );
   }
 
   beforeEach(() => {
+    fakeAPIRoutes = {
+      links: sinon.stub().resolves({ websocket: 'ws://example.com/ws' }),
+    };
+
     fakeAuth = {
       getAccessToken: sinon.stub().resolves('dummy-access-token'),
     };
@@ -122,10 +126,6 @@ describe('StreamerService', () => {
       update: sinon.stub(),
     };
 
-    fakeSettings = {
-      websocketUrl: 'ws://example.com/ws',
-    };
-
     fakeWarnOnce = sinon.stub();
 
     $imports.$mock({
@@ -140,8 +140,9 @@ describe('StreamerService', () => {
     fakeWebSockets = [];
   });
 
-  it('should not create a websocket connection if websocketUrl is not provided', () => {
-    fakeSettings = {};
+  it('should not create a websocket connection if WebSocket URL is not available', () => {
+    fakeAPIRoutes.links.resolves({});
+
     createDefaultStreamer();
 
     return activeStreamer.connect().then(() => {
@@ -207,7 +208,9 @@ describe('StreamerService', () => {
     });
 
     it('should preserve query params when adding access token to URL', () => {
-      fakeSettings.websocketUrl = 'ws://example.com/ws?foo=bar';
+      fakeAPIRoutes.links.resolves({
+        websocket: 'ws://example.com/ws?foo=bar',
+      });
       createDefaultStreamer();
       return activeStreamer.connect().then(() => {
         assert.equal(
@@ -264,21 +267,19 @@ describe('StreamerService', () => {
       console.error.restore();
     });
 
-    it('should reconnect when user changes', () => {
-      let oldWebSocket;
+    it('should reconnect when user changes', async () => {
       createDefaultStreamer();
 
-      return activeStreamer
-        .connect()
-        .then(() => {
-          oldWebSocket = fakeWebSocket;
-          fakeStore.profile.returns({ userid: 'somebody' });
-          return fakeStore.setState({});
-        })
-        .then(() => {
-          assert.ok(oldWebSocket.didClose);
-          assert.ok(!fakeWebSocket.didClose);
-        });
+      await activeStreamer.connect();
+
+      const oldWebSocket = fakeWebSocket;
+      fakeStore.profile.returns({ userid: 'somebody' });
+      fakeStore.setState({});
+
+      await delay(0);
+
+      assert.ok(oldWebSocket.didClose);
+      assert.ok(!fakeWebSocket.didClose);
     });
 
     it('should reconnect after unexpected disconnection', async () => {
@@ -290,7 +291,9 @@ describe('StreamerService', () => {
 
       // Wait for reconnection to happen.
       clock.tick(3000);
-      await Promise.resolve();
+      clock.restore();
+
+      await delay(0);
 
       assert.lengthOf(fakeWebSockets, 2);
     });

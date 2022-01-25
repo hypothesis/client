@@ -23,17 +23,17 @@ import { watch } from '../util/watch';
 export class StreamerService {
   /**
    * @param {import('../store').SidebarStore} store
+   * @param {import('./api-routes').APIRoutesService} apiRoutes
    * @param {import('./auth').AuthService} auth
    * @param {import('./groups').GroupsService} groups
    * @param {import('./session').SessionService} session
-   * @param {Record<string, any>} settings
    */
-  constructor(store, auth, groups, session, settings) {
+  constructor(store, apiRoutes, auth, groups, session) {
     this._auth = auth;
     this._groups = groups;
     this._session = session;
     this._store = store;
-    this._websocketURL = settings.websocketUrl;
+    this._websocketURL = apiRoutes.links().then(links => links.websocket);
 
     /** The randomly generated session ID */
     this.clientId = generateHexString(32);
@@ -84,8 +84,11 @@ export class StreamerService {
     this._store.clearPendingUpdates();
   }
 
-  /** @param {ErrorEvent} event */
-  _handleSocketError(event) {
+  /**
+   * @param {string} websocketURL
+   * @param {ErrorEvent} event
+   */
+  _handleSocketError(websocketURL, event) {
     warnOnce('Error connecting to H push notification service:', event);
 
     // In development, warn if the connection failure might be due to
@@ -93,7 +96,7 @@ export class StreamerService {
     //
     // Unfortunately the error event does not provide a way to get at the
     // HTTP status code for HTTP -> WS upgrade requests.
-    const websocketHost = new URL(this._websocketURL).hostname;
+    const websocketHost = new URL(websocketURL).hostname;
     if (['localhost', '127.0.0.1'].indexOf(websocketHost) !== -1) {
       /* istanbul ignore next */
       warnOnce(
@@ -173,8 +176,8 @@ export class StreamerService {
   }
 
   async _reconnect() {
-    // If we have no URL configured, don't do anything.
-    if (!this._websocketURL) {
+    const websocketURL = await this._websocketURL;
+    if (!websocketURL) {
       return;
     }
     this._socket?.close();
@@ -193,11 +196,11 @@ export class StreamerService {
       // is used to send credentials because the `WebSocket` constructor does
       // not support setting the `Authorization` header directly as we do for
       // other API requests.
-      const parsedURL = new URL(this._websocketURL);
+      const parsedURL = new URL(websocketURL);
       parsedURL.searchParams.set('access_token', token);
       url = parsedURL.toString();
     } else {
-      url = this._websocketURL;
+      url = websocketURL;
     }
 
     const newSocket = new Socket(url);
@@ -219,7 +222,7 @@ export class StreamerService {
         );
       }
     });
-    newSocket.on('error', err => this._handleSocketError(err));
+    newSocket.on('error', err => this._handleSocketError(websocketURL, err));
     newSocket.on('message', event => this._handleSocketMessage(event));
     this._socket = newSocket;
 
