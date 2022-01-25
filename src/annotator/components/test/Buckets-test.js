@@ -13,28 +13,19 @@ describe('Buckets', () => {
 
   beforeEach(() => {
     fakeAbove = {
-      anchors: [
-        { annotation: { $tag: 'a1' }, highlights: ['hi'] },
-        { annotation: { $tag: 'a2' }, highlights: ['there'] },
-      ],
+      tags: new Set(['a1', 'a2']),
       position: 150,
     };
     fakeBelow = {
-      anchors: [
-        { annotation: { $tag: 'b1' }, highlights: ['ho'] },
-        { annotation: { $tag: 'b2' }, highlights: ['there'] },
-      ],
+      tags: new Set(['b1', 'b2']),
       position: 550,
     };
     fakeBuckets = [
       {
-        anchors: [
-          { annotation: { $tag: 't1' }, highlights: ['hi'] },
-          { annotation: { $tag: 't2' }, highlights: ['yay'] },
-        ],
+        tags: new Set(['t1', 't2']),
         position: 250,
       },
-      { anchors: ['you', 'also', 'are', 'welcome'], position: 350 },
+      { tags: new Set(['t3', 't4', 't5', 't6']), position: 350 },
     ];
     fakeOnFocusAnnotations = sinon.stub();
     fakeOnScrollToClosestOffScreenAnchor = sinon.stub();
@@ -68,7 +59,7 @@ describe('Buckets', () => {
     });
 
     it('does not render an up navigation button if there are no above-screen anchors', () => {
-      fakeAbove = { anchors: [], position: 150 };
+      fakeAbove = { tags: new Set(), position: 150 };
       const wrapper = createComponent();
       assert.isFalse(wrapper.find('.Buckets__button--up').exists());
     });
@@ -88,7 +79,7 @@ describe('Buckets', () => {
     });
 
     it('does not render a down navigation button if there are no below-screen anchors', () => {
-      fakeBelow = { anchors: [], position: 550 };
+      fakeBelow = { tags: new Set(), position: 550 };
       const wrapper = createComponent();
       assert.isFalse(wrapper.find('.Buckets__button--down').exists());
     });
@@ -164,10 +155,7 @@ describe('Buckets', () => {
 
       assert.calledOnce(fakeOnSelectAnnotations);
       const call = fakeOnSelectAnnotations.getCall(0);
-      assert.deepEqual(call.args[0], [
-        fakeBuckets[0].anchors[0].annotation.$tag,
-        fakeBuckets[0].anchors[1].annotation.$tag,
-      ]);
+      assert.deepEqual(call.args[0], [...fakeBuckets[0].tags]);
       assert.equal(call.args[1], false);
     });
 

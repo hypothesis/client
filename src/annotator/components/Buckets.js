@@ -14,17 +14,15 @@ import classnames from 'classnames';
  *   @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
  */
 function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
-  const buttonTitle = `Select nearby annotations (${bucket.anchors.length})`;
+  const buttonTitle = `Select nearby annotations (${bucket.tags.size})`;
 
   function selectAnnotations(event) {
-    const tags = bucket.anchors.map(anchor => anchor.annotation.$tag);
-    onSelectAnnotations(tags, event.metaKey || event.ctrlKey);
+    onSelectAnnotations([...bucket.tags], event.metaKey || event.ctrlKey);
   }
 
   function setFocus(hasFocus) {
     if (hasFocus) {
-      const tags = bucket.anchors.map(anchor => anchor.annotation.$tag);
-      onFocusAnnotations(tags);
+      onFocusAnnotations([...bucket.tags]);
     } else {
       onFocusAnnotations([]);
     }
@@ -40,7 +38,7 @@ function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
       title={buttonTitle}
       aria-label={buttonTitle}
     >
-      {bucket.anchors.length}
+      {bucket.tags.size}
     </button>
   );
 }
@@ -59,21 +57,18 @@ function NavigationBucketButton({
   direction,
   onScrollToClosestOffScreenAnchor,
 }) {
-  const buttonTitle = `Go ${direction} to next annotations (${bucket.anchors.length})`;
-
-  function scrollToClosest() {
-    const tags = bucket.anchors.map(anchor => anchor.annotation.$tag);
-    onScrollToClosestOffScreenAnchor(tags, direction);
-  }
+  const buttonTitle = `Go ${direction} to next annotations (${bucket.tags.size})`;
 
   return (
     <button
       className={classnames('Buckets__button', `Buckets__button--${direction}`)}
-      onClick={scrollToClosest}
+      onClick={() =>
+        onScrollToClosestOffScreenAnchor([...bucket.tags], direction)
+      }
       title={buttonTitle}
       aria-label={buttonTitle}
     >
-      {bucket.anchors.length}
+      {bucket.tags.size}
     </button>
   );
 }
@@ -98,8 +93,8 @@ export default function Buckets({
   onScrollToClosestOffScreenAnchor,
   onSelectAnnotations,
 }) {
-  const showUpNavigation = above.anchors.length > 0;
-  const showDownNavigation = below.anchors.length > 0;
+  const showUpNavigation = above.tags.size > 0;
+  const showDownNavigation = below.tags.size > 0;
 
   return (
     <ul className="Buckets__list">

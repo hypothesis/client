@@ -1,6 +1,7 @@
 import { findClosestOffscreenAnchor, anchorBuckets } from '../buckets';
 import { $imports } from '../buckets';
 
+let tagIndex = 0;
 function fakeAnchorFactory(
   offsetStart = 1,
   offsetIncrement = 100,
@@ -13,7 +14,10 @@ function fakeAnchorFactory(
     // fake anchor's highlight box and `highlights[1]` is the height of the
     // box. This is in used in conjunction with the mock for
     // `getBoundingClientRect`, below
-    const anchor = { highlights: [highlightIndex, boxHeight] };
+    const anchor = {
+      annotation: { $tag: `t${tagIndex++}` },
+      highlights: [highlightIndex, boxHeight],
+    };
     highlightIndex = highlightIndex + offsetIncrement;
     return anchor;
   };
@@ -57,6 +61,11 @@ describe('annotator/util/buckets', () => {
     $imports.$restore();
     stubbedInnerHeight.restore();
   });
+
+  /** @param {number} index */
+  const getTag = index => {
+    return fakeAnchors[index].annotation.$tag;
+  };
 
   describe('findClosestOffscreenAnchor', () => {
     it('finds the closest anchor above screen when headed up', () => {
@@ -116,44 +125,32 @@ describe('annotator/util/buckets', () => {
   describe('anchorBuckets', () => {
     it('puts anchors that are above the screen into the `above` bucket', () => {
       const bucketSet = anchorBuckets(fakeAnchors);
-      assert.deepEqual(bucketSet.above.anchors, [
-        fakeAnchors[0],
-        fakeAnchors[1],
-      ]);
+      assert.deepEqual([...bucketSet.above.tags], [getTag(0), getTag(1)]);
     });
 
     it('puts anchors that are below the screen into the `below` bucket', () => {
       const bucketSet = anchorBuckets(fakeAnchors);
-      assert.deepEqual(bucketSet.below.anchors, [
-        fakeAnchors[4],
-        fakeAnchors[5],
-      ]);
+      assert.deepEqual([...bucketSet.below.tags], [getTag(4), getTag(5)]);
     });
 
     it('puts on-screen anchors into a buckets', () => {
       const bucketSet = anchorBuckets(fakeAnchors);
-      assert.deepEqual(bucketSet.buckets[0].anchors, [
-        fakeAnchors[2],
-        fakeAnchors[3],
-      ]);
+      assert.deepEqual([...bucketSet.buckets[0].tags], [getTag(2), getTag(3)]);
     });
 
     it('puts anchors into separate buckets if more than 60px separates their boxes', () => {
       fakeAnchors[2].highlights = [201, 15]; // bottom 216
       fakeAnchors[3].highlights = [301, 15]; // top 301 - more than 60px from 216
       const bucketSet = anchorBuckets(fakeAnchors);
-      assert.deepEqual(bucketSet.buckets[0].anchors, [fakeAnchors[2]]);
-      assert.deepEqual(bucketSet.buckets[1].anchors, [fakeAnchors[3]]);
+      assert.deepEqual([...bucketSet.buckets[0].tags], [getTag(2)]);
+      assert.deepEqual([...bucketSet.buckets[1].tags], [getTag(3)]);
     });
 
     it('puts overlapping anchors into a shared bucket', () => {
       fakeAnchors[2].highlights = [201, 200]; // Bottom 401
       fakeAnchors[3].highlights = [285, 100]; // Bottom 385
       const bucketSet = anchorBuckets(fakeAnchors);
-      assert.deepEqual(bucketSet.buckets[0].anchors, [
-        fakeAnchors[2],
-        fakeAnchors[3],
-      ]);
+      assert.deepEqual([...bucketSet.buckets[0].tags], [getTag(2), getTag(3)]);
     });
 
     it('positions the bucket at vertical midpoint of the box containing all bucket anchors', () => {
@@ -167,16 +164,16 @@ describe('annotator/util/buckets', () => {
       const badAnchor = { highlights: [] };
       const bucketSet = anchorBuckets([badAnchor]);
       assert.equal(bucketSet.buckets.length, 0);
-      assert.isEmpty(bucketSet.above.anchors); // Holder for above-screen anchors
-      assert.isEmpty(bucketSet.below.anchors); // Holder for below-screen anchors
+      assert.isEmpty(bucketSet.above.tags); // Holder for above-screen anchors
+      assert.isEmpty(bucketSet.below.tags); // Holder for below-screen anchors
     });
 
     it('does not bucket annotations whose highlights have zero area', () => {
       const badAnchor = { highlights: [0, 0] };
       const bucketSet = anchorBuckets([badAnchor]);
       assert.equal(bucketSet.buckets.length, 0);
-      assert.isEmpty(bucketSet.above.anchors);
-      assert.isEmpty(bucketSet.below.anchors);
+      assert.isEmpty(bucketSet.above.tags);
+      assert.isEmpty(bucketSet.below.tags);
     });
 
     it('sorts anchors by top position', () => {
@@ -188,18 +185,9 @@ describe('annotator/util/buckets', () => {
         fakeAnchors[0],
         fakeAnchors[1],
       ]);
-      assert.deepEqual(bucketSet.above.anchors, [
-        fakeAnchors[0],
-        fakeAnchors[1],
-      ]);
-      assert.deepEqual(bucketSet.buckets[0].anchors, [
-        fakeAnchors[2],
-        fakeAnchors[3],
-      ]);
-      assert.deepEqual(bucketSet.below.anchors, [
-        fakeAnchors[4],
-        fakeAnchors[5],
-      ]);
+      assert.deepEqual([...bucketSet.above.tags], [getTag(0), getTag(1)]);
+      assert.deepEqual([...bucketSet.buckets[0].tags], [getTag(2), getTag(3)]);
+      assert.deepEqual([...bucketSet.below.tags], [getTag(4), getTag(5)]);
     });
 
     it('returns only above- and below-screen anchors if none are on-screen', () => {
@@ -211,17 +199,12 @@ describe('annotator/util/buckets', () => {
       const bucketSet = anchorBuckets(fakeAnchors);
       assert.equal(bucketSet.buckets.length, 0);
       // Above-screen
-      assert.deepEqual(bucketSet.above.anchors, [
-        fakeAnchors[0],
-        fakeAnchors[1],
-      ]);
+      assert.deepEqual([...bucketSet.above.tags], [getTag(0), getTag(1)]);
       // Below-screen
-      assert.deepEqual(bucketSet.below.anchors, [
-        fakeAnchors[2],
-        fakeAnchors[3],
-        fakeAnchors[4],
-        fakeAnchors[5],
-      ]);
+      assert.deepEqual(
+        [...bucketSet.below.tags],
+        [getTag(2), getTag(3), getTag(4), getTag(5)]
+      );
     });
   });
 });
