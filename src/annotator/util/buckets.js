@@ -6,27 +6,27 @@ import { getBoundingClientRect } from '../highlighter';
 
 /**
  * @typedef Bucket
- * @prop {Anchor[]} anchors - The anchors in this bucket
+ * @prop {Set<string>} tags - The annotation tags in this bucket
  * @prop {number} position - The vertical pixel offset where this bucket should
- *                           appear in the bucket bar.
+ *   appear in the bucket bar
  */
 
 /**
  * @typedef BucketSet
- * @prop {Bucket} above - A single bucket containing all of the anchors that
- *                        are offscreen upwards
- * @prop {Bucket} below - A single bucket containing all of the anchors that are
- *                        offscreen downwards
+ * @prop {Bucket} above - A single bucket containing all the annotation
+ *   tags which anchors are offscreen upwards
+ * @prop {Bucket} below - A single bucket containing all the annotation
+ *   tags which anchors are offscreen downwards
  * @prop {Bucket[]} buckets - On-screen buckets
  */
 
 /**
  * @typedef WorkingBucket
- * @prop {Anchor[]} anchors - The anchors in this bucket
+ * @prop {Set<string>} tags - The annotation tags in this bucket
  * @prop {number} position - The computed position (offset) for this bucket,
  *   based on the current anchors. This is centered between `top` and `bottom`
  * @prop {number} top - The uppermost (lowest) vertical offset for the anchors
- *   in this bucket — the lowest `top` position value, akin to the top offest of
+ *   in this bucket — the lowest `top` position value, akin to the top offset of
  *   a theoretical box drawn around all of the anchor highlights in this bucket
  * @prop {number} bottom - The bottommost (highest) vertical offset for the
  *   anchors in this bucket — the highest `top` position value, akin to the
@@ -148,9 +148,12 @@ function getAnchorPositions(anchors) {
  */
 export function anchorBuckets(anchors) {
   const anchorPositions = getAnchorPositions(anchors);
-  const aboveScreen = new Set();
-  const belowScreen = new Set();
-  const buckets = /** @type {Bucket[]} */ ([]);
+  /** @type {Set<string>} */
+  const aboveTags = new Set();
+  /** @type {Set<string>} */
+  const belowTags = new Set();
+  /** @type {Bucket[]} */
+  const buckets = [];
 
   // Hold current working anchors and positions as we build each bucket
   /** @type {WorkingBucket|null} */
@@ -166,7 +169,7 @@ export function anchorBuckets(anchors) {
     const anchorHeight = anchorPosition.bottom - anchorPosition.top;
     const bucketPosition = anchorPosition.top + anchorHeight / 2;
     const bucket = /** @type WorkingBucket */ ({
-      anchors: [anchorPosition.anchor],
+      tags: new Set([anchorPosition.anchor.annotation.$tag]),
       top: anchorPosition.top,
       bottom: anchorPosition.bottom,
       position: bucketPosition,
@@ -177,10 +180,10 @@ export function anchorBuckets(anchors) {
   // Build buckets from position information
   anchorPositions.forEach(aPos => {
     if (aPos.top < BUCKET_TOP_THRESHOLD) {
-      aboveScreen.add(aPos.anchor);
+      aboveTags.add(aPos.anchor.annotation.$tag);
       return;
     } else if (aPos.top > window.innerHeight - BUCKET_BOTTOM_THRESHOLD) {
-      belowScreen.add(aPos.anchor);
+      belowTags.add(aPos.anchor.annotation.$tag);
       return;
     }
 
@@ -216,7 +219,7 @@ export function anchorBuckets(anchors) {
         aPos.bottom > currentBucket.bottom ? aPos.bottom : currentBucket.bottom;
       const updatedHeight = updatedBottom - currentBucket.top;
 
-      currentBucket.anchors.push(aPos.anchor);
+      currentBucket.tags.add(aPos.anchor.annotation.$tag);
       currentBucket.bottom = updatedBottom;
       currentBucket.position = currentBucket.top + updatedHeight / 2;
     }
@@ -228,13 +231,13 @@ export function anchorBuckets(anchors) {
 
   // Add an upper "navigation" bucket with offscreen-above anchors
   const above = {
-    anchors: Array.from(aboveScreen),
+    tags: aboveTags,
     position: BUCKET_TOP_THRESHOLD,
   };
 
   // Add a lower "navigation" bucket with offscreen-below anchors
   const below = {
-    anchors: Array.from(belowScreen),
+    tags: belowTags,
     position: window.innerHeight - BUCKET_BOTTOM_THRESHOLD,
   };
 
