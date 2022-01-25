@@ -118,7 +118,7 @@ describe('Buckets', () => {
       assert.equal(wrapper.find('.Buckets__button--left').length, 2);
     });
 
-    it('focuses associated anchors when mouse enters the element', () => {
+    it('focuses on associated annotations when mouse enters the element', () => {
       const wrapper = createComponent();
 
       wrapper.find('.Buckets__button--left').first().simulate('mousemove');
@@ -127,7 +127,7 @@ describe('Buckets', () => {
       assert.calledWith(fakeOnFocusAnnotations, ['t1', 't2']);
     });
 
-    it('removes focus on associated anchors when element is blurred', () => {
+    it('removes focus on associated annotations when element is blurred', () => {
       const wrapper = createComponent();
 
       wrapper.find('.Buckets__button--left').first().simulate('blur');
@@ -136,7 +136,7 @@ describe('Buckets', () => {
       assert.calledWith(fakeOnFocusAnnotations, []);
     });
 
-    it('removes focus on associated anchors when mouse leaves the element', () => {
+    it('removes focus on associated annotations when mouse leaves the element', () => {
       const wrapper = createComponent();
 
       wrapper.find('.Buckets__button--left').first().simulate('mouseout');
