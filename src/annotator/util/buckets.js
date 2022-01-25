@@ -14,7 +14,7 @@ import { getBoundingClientRect } from '../highlighter';
 /**
  * @typedef BucketSet
  * @prop {Bucket} above - A single bucket containing all the annotation
- *   tags which anchors are offscreen upwards
+ *   tags whose anchors are offscreen upwards
  * @prop {Bucket} below - A single bucket containing all the annotation
  *   tags which anchors are offscreen downwards
  * @prop {Bucket[]} buckets - On-screen buckets
