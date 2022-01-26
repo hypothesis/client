@@ -67,6 +67,9 @@ export class VitalSourceContainerIntegration {
       //
       // The format of the decoded HTML can vary, but as a simple heuristic,
       // we look for a text paragraph.
+      //
+      // If the document has not yet finished loading, then we rely on this function
+      // being called again once loading completes.
       const isBookContent = frame.contentDocument?.querySelector('p');
       if (isBookContent) {
         annotator.injectClient(frame);
@@ -77,6 +80,7 @@ export class VitalSourceContainerIntegration {
     const injectClientIntoContentFrame = () => {
       const frame = shadowRoot.querySelector('iframe');
       if (!frame || contentFrames.has(frame)) {
+        // Either there is no content frame or we are already watching it.
         return;
       }
       contentFrames.add(frame);
@@ -90,9 +94,6 @@ export class VitalSourceContainerIntegration {
     injectClientIntoContentFrame();
 
     // Re-inject client into content frame after a chapter navigation.
-    //
-    // We currently don't do any debouncing here and rely on `injectClient` to
-    // be idempotent and cheap.
     this._frameObserver = new MutationObserver(injectClientIntoContentFrame);
     this._frameObserver.observe(shadowRoot, { childList: true, subtree: true });
   }
