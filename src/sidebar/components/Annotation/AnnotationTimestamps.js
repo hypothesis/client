@@ -81,7 +81,7 @@ export default function AnnotationTimestamps({
     <div>
       {withEditedTimestamp && (
         <span
-          className="u-color-text--muted u-font--small u-font--italic"
+          className="text-color-text-light text-sm italic"
           data-testid="timestamp-edited"
           title={updated.absolute}
         >
@@ -99,7 +99,7 @@ export default function AnnotationTimestamps({
         </Link>
       ) : (
         <span
-          className="u-color-text--muted"
+          className="color-text-color-light"
           data-testid="timestamp-created"
           title={created.absolute}
         >

@@ -37,15 +37,15 @@ function AnnotationShareInfo({ annotation }) {
           target="_blank"
         >
           {group.type === 'open' ? (
-            <Icon classes="u-icon--xsmall" name="public" />
+            <Icon classes="text-tiny" name="public" />
           ) : (
-            <Icon classes="u-icon--xsmall" name="groups" />
+            <Icon classes="text-tiny" name="groups" />
           )}
           <span>{group.name}</span>
         </Link>
       )}
       {annotationIsPrivate && !linkToGroup && (
-        <span className="hyp-u-layout-row--align-baseline u-color-text--muted">
+        <span className="hyp-u-layout-row--align-baseline text-color-text-light">
           <span data-testid="private-info">Only me</span>
         </span>
       )}

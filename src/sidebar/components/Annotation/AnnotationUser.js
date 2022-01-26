@@ -13,7 +13,7 @@ import { Link } from '@hypothesis/frontend-shared';
  * @param {AnnotationUserProps} props
  */
 function AnnotationUser({ authorLink, displayName }) {
-  const user = <h3 className="u-color-text u-font--bold">{displayName}</h3>;
+  const user = <h3 className="text-color-text font-bold">{displayName}</h3>;
 
   if (authorLink) {
     return (

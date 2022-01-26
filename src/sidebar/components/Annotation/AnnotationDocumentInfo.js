@@ -16,7 +16,7 @@ import { Link } from '@hypothesis/frontend-shared';
 export default function AnnotationDocumentInfo({ domain, link, title }) {
   return (
     <div className="hyp-u-layout-row hyp-u-horizontal-spacing--2">
-      <div className="u-color-text--muted">
+      <div className="text-color-text-light">
         on &quot;
         {link ? (
           <Link href={link} target="_blank">
@@ -27,7 +27,7 @@ export default function AnnotationDocumentInfo({ domain, link, title }) {
         )}
         &quot;
       </div>
-      {domain && <span className="u-color-text--muted">({domain})</span>}
+      {domain && <span className="text-color-text-light">({domain})</span>}
     </div>
   );
 }

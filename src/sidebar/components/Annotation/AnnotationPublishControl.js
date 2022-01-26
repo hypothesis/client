@@ -73,7 +73,7 @@ function AnnotationPublishControl({
 
   const menuLabel = (
     <div className="annotation-publish-button__menu-label" style={buttonStyle}>
-      <Icon name="expand-menu" classes="u-icon--small" />
+      <Icon name="expand-menu" />
     </div>
   );
 

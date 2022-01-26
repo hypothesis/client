@@ -24,10 +24,7 @@
 @use './components/Toolbar';
 @use './components/WarningBanner';
 
-// Make the shared package utility styles available
-@use '@hypothesis/frontend-shared/styles/util';
-
-@use 'tailwindcss/utilities';
+@use './utilities';
 
 // Styles for all top-level elements in shadow roots.
 :host > * {

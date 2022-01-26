@@ -40,7 +40,7 @@ export default function SidebarContentError({
   })();
 
   return (
-    <div className="u-sidebar-container">
+    <div className="mb-4">
       <Panel icon="restricted" title={errorTitle}>
         <p>{errorMessage}</p>
         <div className="hyp-u-layout-row--justify-right hyp-u-horizontal-spacing">

@@ -109,7 +109,7 @@ function AnnotationActionBar({
   };
 
   return (
-    <div className="AnnotationActionBar hyp-u-layout-row u-font--xlarge">
+    <div className="AnnotationActionBar hyp-u-layout-row text-xl font-medium">
       {showEditAction && (
         <IconButton icon="edit" title="Edit" onClick={onEdit} />
       )}
