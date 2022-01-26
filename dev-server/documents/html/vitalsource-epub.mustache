@@ -60,7 +60,9 @@
               // The client should only inject into the new frame after step 3.
               this.contentFrame.src = 'about:blank';
               setTimeout(() => {
-                this.contentFrame.src = chapterURL;
+                // Set the final URL in a way that doesn't update the `src` attribute
+                // of the iframe, to make sure the client isn't relying on that.
+                this.contentFrame.contentWindow.location.href = chapterURL;
               }, 50);
             }
           };
