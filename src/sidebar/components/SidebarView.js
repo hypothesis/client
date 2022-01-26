@@ -142,7 +142,7 @@ function SidebarView({
 
   return (
     <div>
-      <h2 className="u-screen-reader-only">Annotations</h2>
+      <h2 className="sr-only">Annotations</h2>
       {showFilterStatus && <FilterStatus />}
       <LoginPromptPanel onLogin={onLogin} onSignUp={onSignUp} />
       {hasDirectLinkedAnnotationError && (

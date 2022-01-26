@@ -44,9 +44,4 @@
 @use './components/TopBar';
 @use './components/VersionInfo';
 
-// Make the shared package utility styles available
-@use '@hypothesis/frontend-shared/styles/util' as hyp-u;
-// Local utility classes
-@use '../util';
-
-@use 'tailwindcss/utilities';
+@use './utilities';

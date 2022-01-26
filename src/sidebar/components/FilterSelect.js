@@ -36,9 +36,7 @@ function FilterSelect({
 
   const menuLabel = (
     <span className="FilterSelect__menu-label">
-      {icon && (
-        <Icon name={icon} classes="u-icon--medium hyp-u-margin--right--3" />
-      )}
+      {icon && <Icon name={icon} classes="text-xl hyp-u-margin--right--3" />}
       {selected.display}
     </span>
   );

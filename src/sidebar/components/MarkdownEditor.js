@@ -138,10 +138,7 @@ function ToolbarButton({
 
   if (label) {
     return (
-      <LabeledButton
-        classes="u-font--normal TransparentButton"
-        {...buttonProps}
-      >
+      <LabeledButton classes="font-normal TransparentButton" {...buttonProps}>
         {label}
       </LabeledButton>
     );
@@ -353,7 +350,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         <Link
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
           target="_blank"
-          classes="u-font--xsmall IconOnlyLink"
+          classes="text-tiny IconOnlyLink"
           linkRef={buttonRefs[buttonIds.help]}
           tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
@@ -430,7 +427,7 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div className="u-line-height">
+    <div className="leading-none">
       <Toolbar
         onCommand={handleCommand}
         isPreviewing={preview}

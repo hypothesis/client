@@ -46,7 +46,7 @@ function LoggedOutMessage({ onLogin }) {
           aria-label="Hypothesis homepage"
           title="Hypothesis homepage"
         >
-          <Icon name="logo" classes="u-icon--xlarge hyp-u-color--grey-7" />
+          <Icon name="logo" classes="w-16 h-16 hyp-u-color--grey-7" />
         </a>
       </div>
     </div>

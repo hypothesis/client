@@ -60,7 +60,7 @@ export default function SidebarPanel({
 
   return (
     <Slider visible={panelIsActive}>
-      <div ref={panelElement} className="u-sidebar-container">
+      <div ref={panelElement} className="mb-4">
         <Panel title={title} icon={icon} onClose={closePanel}>
           {children}
         </Panel>

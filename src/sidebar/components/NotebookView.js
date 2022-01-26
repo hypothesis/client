@@ -133,7 +133,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
       <div className="NotebookView__filters">
         <NotebookFilters />
       </div>
-      <div className="NotebookView__results hyp-u-layout-row--align-center u-font--large">
+      <div className="NotebookView__results hyp-u-layout-row--align-center text-lg font-medium">
         {pendingUpdateCount > 0 && !hasAppliedFilter && (
           <IconButton
             icon="refresh"

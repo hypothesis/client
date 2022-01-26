@@ -115,10 +115,10 @@ function AnnotationHeader({
 
   return (
     <header>
-      <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 u-wrap-reverse">
+      <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 flex-wrap-reverse">
         {annotationIsPrivate && !isEditing && (
           <Icon
-            classes="u-icon--xsmall"
+            classes="text-tiny"
             name="lock"
             title="This annotation is visible only to you"
           />
@@ -146,13 +146,13 @@ function AnnotationHeader({
       </div>
 
       {showExtendedInfo && (
-        <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 u-wrap-reverse">
+        <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 flex-wrap-reverse">
           <AnnotationShareInfo annotation={annotation} />
           {!isEditing && isHighlight(annotation) && (
             <Icon
               name="highlight"
               title="This is a highlight. Click 'edit' to add a note or tag."
-              classes="u-icon--xsmall u-color-text--muted"
+              classes="text-tiny text-color-text-light"
             />
           )}
           {showDocumentInfo && (

@@ -45,7 +45,7 @@ function Tab({
 
   return (
     <LabeledButton
-      classes={classnames('u-color-text', 'SelectionTab', {
+      classes={classnames('text-color-text', 'SelectionTab', {
         'is-selected': isSelected,
       })}
       // Listen for `onMouseDown` so that the tab is selected when _pressed_
@@ -62,7 +62,7 @@ function Tab({
         {children}
         {count > 0 && !isWaitingToAnchor && (
           <span
-            className="u-font--xsmall"
+            className="text-tiny"
             style="position:relative;bottom:3px;left:2px"
           >
             {count}
@@ -158,14 +158,14 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
         </div>
       )}
       {!isLoading && showNotesUnavailableMessage && (
-        <Frame classes="u-text--centered">
+        <Frame classes="text-center">
           <span data-testid="notes-unavailable-message">
             There are no page notes in this group.
           </span>
         </Frame>
       )}
       {!isLoading && showAnnotationsUnavailableMessage && (
-        <Frame classes="u-text--centered">
+        <Frame classes="text-center">
           <span data-testid="annotations-unavailable-message">
             There are no annotations in this group.
             <br />
