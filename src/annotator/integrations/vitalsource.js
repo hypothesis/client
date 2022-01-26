@@ -60,10 +60,10 @@ export class VitalSourceContainerIntegration {
 
     /** @param {HTMLIFrameElement} frame */
     const injectIfContentReady = frame => {
-      // Check if this frame contains ebook content, as opposed to being a
-      // "blank" frame containing encrypted book content, as hidden text,
-      // which is created initially after a chapter navigation. These "blank"
-      // pages are replaced with the real content after a form submission.
+      // Check if this frame contains decoded ebook content, as opposed to
+      // invisible and encrypted book content, which is created initially after a
+      // chapter navigation. These encrypted pages are replaced with the real
+      // content after a form submission.
       //
       // The format of the decoded HTML can vary, but as a simple heuristic,
       // we look for a text paragraph.
