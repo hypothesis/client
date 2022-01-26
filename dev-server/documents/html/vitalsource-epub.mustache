@@ -27,7 +27,7 @@
 
           let chapterIndex = 0;
 
-          const setChapter = (index, initialLoad = false) => {
+          const setChapter = (index, { initialLoad = false } = {}) => {
             if (index < 0 || index >= chapterURLs.length) {
               return;
             }
@@ -89,7 +89,7 @@
           this.nextButton.onclick = () => setChapter(chapterIndex + 1);
           controlBar.append(this.nextButton);
 
-          setChapter(0, true /* initialLoad */);
+          setChapter(0, { initialLoad: true });
         }
       }
       customElements.define('mosaic-book', MosaicElement);
