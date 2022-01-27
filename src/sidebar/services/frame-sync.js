@@ -225,12 +225,15 @@ export class FrameSyncService {
     /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
     const guestRPC = new PortRPC();
 
-    // Generate a temporary ID for this guest until we learn its "real" ID.
+    // Add guest RPC to map with a temporary ID until we learn the real ID.
+    //
+    // We need to add the guest to the map immediately so that any notifications
+    // sent from this service to all guests, before we learn the real frame ID,
+    // are sent to this new guest.
     ++this._nextGuestId;
     let frameIdentifier = /** @type {string|null} */ (
       `temp-${this._nextGuestId}`
     );
-
     this._guestRPC.set(frameIdentifier, guestRPC);
 
     // Update document metadata for this guest. We currently assume that the
