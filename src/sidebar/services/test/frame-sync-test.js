@@ -219,6 +219,69 @@ describe('FrameSyncService', () => {
       );
     });
 
+    it('sends annotations only to matching frame', async () => {
+      // Annotation whose URI exactly matches the main frame.
+      const mainFrameAnn = {
+        id: 'abc',
+        uri: 'https://example.com',
+      };
+
+      // Annotation whose URI exactly matches the iframe.
+      const iframeAnn = {
+        id: 'def',
+        uri: 'https://example.com/iframe',
+      };
+
+      // Annotation whose URI doesn't match either frame exactly.
+      //
+      // The search API can return such annotations if the annotation's URI
+      // is deemed equivalent to one of the searched-for URIs.
+      const unknownFrameAnn = {
+        id: 'ghi',
+        uri: 'https://example.org',
+      };
+
+      // Connect two guests, one representing the main frame and one representing
+      // an iframe.
+      await connectGuest();
+      await connectGuest();
+
+      const mainGuestRPC = fakePortRPCs[1];
+      const iframeGuestRPC = fakePortRPCs[2];
+
+      const frames = [];
+      fakeStore.connectFrame.callsFake(frame => {
+        frames.push({ id: frame.id, uri: frame.uri });
+      });
+      fakeStore.frames.returns(frames);
+
+      mainGuestRPC.emit('documentInfoChanged', {
+        frameIdentifier: null,
+        uri: mainFrameAnn.uri,
+      });
+
+      iframeGuestRPC.emit('documentInfoChanged', {
+        frameIdentifier: 'iframe',
+        uri: iframeAnn.uri,
+      });
+
+      fakeStore.setState({
+        annotations: [mainFrameAnn, iframeAnn, unknownFrameAnn],
+      });
+
+      // Check that expected annotations were sent to each frame.
+      assert.calledWithMatch(
+        mainGuestRPC.call,
+        'loadAnnotations',
+        sinon.match([formatAnnot(mainFrameAnn), formatAnnot(unknownFrameAnn)])
+      );
+      assert.calledWithMatch(
+        iframeGuestRPC.call,
+        'loadAnnotations',
+        sinon.match([formatAnnot(iframeAnn)])
+      );
+    });
+
     it('sends a "loadAnnotations" message only for new annotations', async () => {
       const frameInfo = fixtures.htmlDocumentInfo;
       await connectGuest();
