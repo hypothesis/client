@@ -1,0 +1,45 @@
+@use 'tailwindcss/components';
+
+// Shared styles
+// -----------------
+@use '@hypothesis/frontend-shared/styles';
+
+// Extensions and overrides to patterns from `frontend-shared`
+@use '../../frontend-shared';
+
+// Local patterns
+@use '../../patterns';
+
+// Components
+// ----------
+@use './AnnotationPublishControl';
+@use './AnnotationShareControl';
+@use './AutocompleteList';
+@use './Excerpt';
+@use './FilterSelect';
+@use './FilterStatus';
+@use './GroupList';
+@use './GroupListItem';
+@use './HypothesisApp';
+@use './LaunchErrorPanel';
+@use './LoggedOutMessage';
+@use './MarkdownEditor';
+@use './MarkdownView';
+@use './Menu';
+@use './MenuItem';
+@use './MenuSection';
+@use './ModerationBanner';
+@use './NotebookView';
+@use './NotebookResultCount';
+@use './PaginationNavigation';
+@use './SelectionTabs';
+@use './SearchInput';
+@use './ShareLinks';
+@use './TagEditor';
+@use './TagList';
+@use './Thread';
+@use './ThreadCard';
+@use './ThreadList';
+@use './ToastMessages';
+@use './TopBar';
+@use './VersionInfo';
