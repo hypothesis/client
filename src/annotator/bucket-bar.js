@@ -1,9 +1,10 @@
 import { render } from 'preact';
 
 import Buckets from './components/Buckets';
-import { anchorBuckets } from './util/buckets';
+import { computeBuckets } from './util/buckets';
 
 /**
+ * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
@@ -16,7 +17,6 @@ import { anchorBuckets } from './util/buckets';
 export default class BucketBar {
   /**
    * @param {HTMLElement} container
-   * @param {Pick<import('./guest').default, 'anchors'>} guest
    * @param {object} options
    *   @param {(tags: string[]) => void} options.onFocusAnnotations
    *   @param {(tags: string[], direction: 'down'|'up') => void} options.onScrollToClosestOffScreenAnchor
@@ -24,7 +24,6 @@ export default class BucketBar {
    */
   constructor(
     container,
-    guest,
     {
       onFocusAnnotations,
       onScrollToClosestOffScreenAnchor,
@@ -34,13 +33,12 @@ export default class BucketBar {
     this._bucketsContainer = document.createElement('div');
     container.appendChild(this._bucketsContainer);
 
-    this._guest = guest;
     this._onFocusAnnotations = onFocusAnnotations;
     this._onScrollToClosestOffScreenAnchor = onScrollToClosestOffScreenAnchor;
     this._onSelectAnnotations = onSelectAnnotations;
 
-    // Immediately render the buckets for the current anchors.
-    this.update();
+    // Immediately render the bucket bar
+    this.update([]);
   }
 
   destroy() {
@@ -48,8 +46,11 @@ export default class BucketBar {
     this._bucketsContainer.remove();
   }
 
-  update() {
-    const buckets = anchorBuckets(this._guest.anchors);
+  /**
+   * @param {AnchorPosition[]} positions
+   */
+  update(positions) {
+    const buckets = computeBuckets(positions);
     render(
       <Buckets
         above={buckets.above}

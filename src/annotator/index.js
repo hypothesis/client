@@ -41,9 +41,6 @@ function init() {
 
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
-  // Create the guest that handles creating annotations and displaying highlights.
-  const guest = new Guest(document.body, annotatorConfig, hostFrame);
-
   let sidebar;
   let notebook;
   let portProvider;
@@ -54,13 +51,16 @@ function init() {
     portProvider = new PortProvider(hypothesisAppsOrigin);
 
     const eventBus = new EventBus();
-    sidebar = new Sidebar(document.body, eventBus, guest, sidebarConfig);
+    sidebar = new Sidebar(document.body, eventBus, sidebarConfig);
     notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
     portProvider.on('frameConnected', (source, port) =>
       sidebar.onFrameConnected(source, port)
     );
   }
+
+  // Create the guest that handles creating annotations and displaying highlights.
+  const guest = new Guest(document.body, annotatorConfig, hostFrame);
 
   sidebarLinkElement.addEventListener('destroy', () => {
     portProvider?.destroy();

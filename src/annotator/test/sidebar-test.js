@@ -22,7 +22,6 @@ describe('Sidebar', () => {
   let fakePortRPCs;
   let FakeBucketBar;
   let fakeBucketBar;
-  let fakeGuest;
   let FakeToolbarController;
   let fakeToolbar;
   let fakeSendErrorsTo;
@@ -95,7 +94,7 @@ describe('Sidebar', () => {
     containers.push(container);
 
     const eventBus = new EventBus();
-    const sidebar = new Sidebar(container, eventBus, fakeGuest, config);
+    const sidebar = new Sidebar(container, eventBus, config);
     sidebars.push(sidebar);
 
     return sidebar;
@@ -134,8 +133,6 @@ describe('Sidebar', () => {
       update: sinon.stub(),
     };
     FakeBucketBar = sinon.stub().returns(fakeBucketBar);
-
-    fakeGuest = sinon.stub();
 
     fakeToolbar = {
       getWidth: sinon.stub().returns(100),
@@ -481,9 +478,10 @@ describe('Sidebar', () => {
         const sidebar = createSidebar();
         connectGuest(sidebar);
 
-        emitGuestEvent('anchorsChanged');
+        emitGuestEvent('anchorsChanged', [1, 2]);
 
         assert.calledOnce(sidebar.bucketBar.update);
+        assert.calledWith(sidebar.bucketBar.update, [1, 2]);
       });
     });
   });
@@ -948,7 +946,7 @@ describe('Sidebar', () => {
     it('calls the "focusAnnotations" RPC method', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
-      const { onFocusAnnotations } = FakeBucketBar.getCall(0).args[2];
+      const { onFocusAnnotations } = FakeBucketBar.getCall(0).args[1];
       const tags = ['t1', 't2'];
 
       onFocusAnnotations(tags);
@@ -960,7 +958,7 @@ describe('Sidebar', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
       const { onScrollToClosestOffScreenAnchor } =
-        FakeBucketBar.getCall(0).args[2];
+        FakeBucketBar.getCall(0).args[1];
       const tags = ['t1', 't2'];
       const direction = 'down';
 
@@ -977,7 +975,7 @@ describe('Sidebar', () => {
     it('calls the "selectAnnotations" RPC method', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
-      const { onSelectAnnotations } = FakeBucketBar.getCall(0).args[2];
+      const { onSelectAnnotations } = FakeBucketBar.getCall(0).args[1];
       const tags = ['t1', 't2'];
       const toggle = true;
 

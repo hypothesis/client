@@ -1,7 +1,11 @@
 import { ListenerCollection } from '../shared/listener-collection';
 
+import { computeAnchorPositions } from './util/buckets';
+
 /**
  * @typedef {import('../shared/messaging').PortRPC<HostToGuestEvent, GuestToHostEvent>} HostRPC
+ * @typedef {import('../types/annotator').Anchor} Anchor
+ * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
  * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
@@ -26,6 +30,8 @@ export class BucketBarClient {
   constructor({ contentContainer, hostRPC }) {
     this._hostRPC = hostRPC;
     this._updatePending = false;
+    /** @type {Anchor[]} */
+    this._anchors = [];
     this._listeners = new ListenerCollection();
 
     this._listeners.add(window, 'resize', () => this.update());
@@ -44,15 +50,25 @@ export class BucketBarClient {
    *
    * Updates are debounced to reduce the overhead of gathering and sending anchor
    * position data across frames.
+   *
+   * @param {Anchor[]} [anchors] - pass this option when anchors are added or
+   *   deleted
    */
-  update() {
+  update(anchors) {
+    if (anchors) {
+      this._anchors = anchors;
+    }
+
     if (this._updatePending) {
       return;
     }
 
     this._updatePending = true;
     requestAnimationFrame(() => {
-      this._hostRPC.call('anchorsChanged');
+      // In document with many annotations computing the anchor positions can
+      // block the JS event loop for up to 200 ms.
+      const positions = computeAnchorPositions(this._anchors);
+      this._hostRPC.call('anchorsChanged', positions);
       this._updatePending = false;
     });
   }
