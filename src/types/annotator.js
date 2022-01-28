@@ -54,6 +54,16 @@
  */
 
 /**
+ * Top and bottom positions of the bounding box created by the union of the
+ * highlight elements associated to an anchor.
+ *
+ * @typedef AnchorPosition
+ * @prop {string} tag - annotation tag
+ * @prop {number} top
+ * @prop {number} bottom
+ */
+
+/**
  * Anchoring implementation for a particular document type (eg. PDF or HTML).
  *
  * This is responsible for converting between serialized "selectors" that can

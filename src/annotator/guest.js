@@ -618,7 +618,7 @@ export default class Guest {
   _updateAnchors(anchors, notify) {
     this.anchors = anchors;
     if (notify) {
-      this._bucketBarClient?.update();
+      this._bucketBarClient?.update(this.anchors);
     }
   }
 

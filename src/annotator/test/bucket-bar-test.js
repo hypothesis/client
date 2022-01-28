@@ -4,8 +4,7 @@ describe('BucketBar', () => {
   let bucketBars;
   let bucketProps;
   let container;
-  let fakeBucketUtil;
-  let fakeGuest;
+  let fakeComputeBuckets;
   let fakeOnFocusAnnotations;
   let fakeOnScrollToClosestOffScreenAnchor;
   let fakeOnSelectAnnotations;
@@ -15,15 +14,7 @@ describe('BucketBar', () => {
     bucketProps = {};
     container = document.createElement('div');
 
-    fakeBucketUtil = {
-      anchorBuckets: sinon.stub().returns({}),
-    };
-
-    fakeGuest = {
-      anchors: [],
-      scrollToAnchor: sinon.stub(),
-      selectAnnotations: sinon.stub(),
-    };
+    fakeComputeBuckets = sinon.stub().returns({});
 
     fakeOnFocusAnnotations = sinon.stub();
     fakeOnScrollToClosestOffScreenAnchor = sinon.stub();
@@ -36,7 +27,7 @@ describe('BucketBar', () => {
 
     $imports.$mock({
       './components/Buckets': FakeBuckets,
-      './util/buckets': fakeBucketUtil,
+      './util/buckets': { computeBuckets: fakeComputeBuckets },
     });
   });
 
@@ -47,7 +38,7 @@ describe('BucketBar', () => {
   });
 
   const createBucketBar = () => {
-    const bucketBar = new BucketBar(container, fakeGuest, {
+    const bucketBar = new BucketBar(container, {
       onFocusAnnotations: fakeOnFocusAnnotations,
       onScrollToClosestOffScreenAnchor: fakeOnScrollToClosestOffScreenAnchor,
       onSelectAnnotations: fakeOnSelectAnnotations,
@@ -56,9 +47,9 @@ describe('BucketBar', () => {
     return bucketBar;
   };
 
-  it('should render buckets for existing anchors when constructed', () => {
+  it('should render the bucket bar with no buckets when constructed', () => {
     const bucketBar = createBucketBar();
-    assert.calledWith(fakeBucketUtil.anchorBuckets, fakeGuest.anchors);
+    assert.calledWith(fakeComputeBuckets, []);
     assert.ok(bucketBar._bucketsContainer.querySelector('.FakeBuckets'));
   });
 
@@ -93,12 +84,12 @@ describe('BucketBar', () => {
   describe('#update', () => {
     it('updates the buckets', () => {
       const bucketBar = createBucketBar();
-      fakeBucketUtil.anchorBuckets.resetHistory();
+      fakeComputeBuckets.resetHistory();
 
-      bucketBar.update();
+      bucketBar.update([1, 2]);
 
-      assert.calledOnce(fakeBucketUtil.anchorBuckets);
-      assert.calledWith(fakeBucketUtil.anchorBuckets, fakeGuest.anchors);
+      assert.calledOnce(fakeComputeBuckets);
+      assert.calledWith(fakeComputeBuckets, [1, 2]);
     });
   });
 

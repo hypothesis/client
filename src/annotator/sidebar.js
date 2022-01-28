@@ -15,12 +15,13 @@ import { createShadowRoot } from './util/shadow-root';
 
 /**
  * @typedef {import('./guest').default} Guest
+ * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
+ * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
  * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
  * @typedef {import('../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
  * @typedef {import('../types/port-rpc-events').SidebarToHostEvent} SidebarToHostEvent
- * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
- * @typedef {import('../types/annotator').Destroyable} Destroyable
  */
 
 // Minimum width to which the iframeContainer can be resized.
@@ -60,13 +61,9 @@ export default class Sidebar {
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
-   * @param {Guest} guest -
-   *   The `Guest` instance for the current frame. It is currently assumed that
-   *   it is always possible to annotate in the frame where the sidebar is
-   *   displayed.
    * @param {Record<string, any>} [config]
    */
-  constructor(element, eventBus, guest, config = {}) {
+  constructor(element, eventBus, config = {}) {
     this._emitter = eventBus.createEmitter();
 
     /**
@@ -114,7 +111,7 @@ export default class Sidebar {
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('annotator-frame--theme-clean');
       } else {
-        this.bucketBar = new BucketBar(this.iframeContainer, guest, {
+        this.bucketBar = new BucketBar(this.iframeContainer, {
           onFocusAnnotations: tags =>
             this._guestRPC.forEach(rpc => rpc.call('focusAnnotations', tags)),
           onScrollToClosestOffScreenAnchor: (tags, direction) =>
@@ -301,9 +298,13 @@ export default class Sidebar {
 
     // The listener will do nothing if the sidebar doesn't have a bucket bar
     // (clean theme), but it is still actively listening.
-    guestRPC.on('anchorsChanged', () => {
-      this.bucketBar?.update();
-    });
+    guestRPC.on(
+      'anchorsChanged',
+      /** @param {AnchorPosition[]} positions  */
+      positions => {
+        this.bucketBar?.update(positions);
+      }
+    );
 
     guestRPC.connect(port);
 

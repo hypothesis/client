@@ -1,11 +1,11 @@
 import { delay } from '../../test-util/wait';
-import { BucketBarClient } from '../bucket-bar-client';
+import { BucketBarClient, $imports } from '../bucket-bar-client';
 
 describe('BucketBarClient', () => {
   const sandbox = sinon.createSandbox();
   let bucketBarClients;
   let contentContainer;
-  let fakeBridge;
+  let fakeRPC;
 
   beforeEach(() => {
     sandbox
@@ -13,19 +13,24 @@ describe('BucketBarClient', () => {
       .callsFake(cb => setTimeout(cb, 0));
     bucketBarClients = [];
     contentContainer = document.createElement('div');
-    fakeBridge = { call: sinon.stub() };
+    fakeRPC = { call: sinon.stub() };
+
+    $imports.$mock({
+      './util/buckets': { computeAnchorPositions: sinon.stub().returns([]) },
+    });
   });
 
   afterEach(() => {
     bucketBarClients.forEach(bucketBarClient => bucketBarClient.destroy());
     contentContainer.remove();
     sandbox.restore();
+    $imports.$restore();
   });
 
   const createBucketBarClient = () => {
     const bucketBarClient = new BucketBarClient({
       contentContainer,
-      hostRPC: fakeBridge,
+      hostRPC: fakeRPC,
     });
     bucketBarClients.push(bucketBarClient);
     return bucketBarClient;
@@ -37,8 +42,8 @@ describe('BucketBarClient', () => {
     window.dispatchEvent(new Event('resize'));
     await delay(0);
 
-    assert.calledOnce(fakeBridge.call);
-    assert.calledWith(fakeBridge.call, 'anchorsChanged');
+    assert.calledOnce(fakeRPC.call);
+    assert.calledWith(fakeRPC.call, 'anchorsChanged');
   });
 
   it('should update buckets when the window is scrolled', async () => {
@@ -47,8 +52,8 @@ describe('BucketBarClient', () => {
     window.dispatchEvent(new Event('scroll'));
     await delay(0);
 
-    assert.calledOnce(fakeBridge.call);
-    assert.calledWith(fakeBridge.call, 'anchorsChanged');
+    assert.calledOnce(fakeRPC.call);
+    assert.calledWith(fakeRPC.call, 'anchorsChanged');
   });
 
   it('should update buckets when the contentContainer element scrolls', async () => {
@@ -57,8 +62,8 @@ describe('BucketBarClient', () => {
     contentContainer.dispatchEvent(new Event('scroll'));
     await delay(0);
 
-    assert.calledOnce(fakeBridge.call);
-    assert.calledWith(fakeBridge.call, 'anchorsChanged');
+    assert.calledOnce(fakeRPC.call);
+    assert.calledWith(fakeRPC.call, 'anchorsChanged');
   });
 
   describe('#destroy', () => {
@@ -71,7 +76,7 @@ describe('BucketBarClient', () => {
       window.dispatchEvent(new Event('scroll'));
       await delay(0);
 
-      assert.notCalled(fakeBridge.call);
+      assert.notCalled(fakeRPC.call);
     });
   });
 
@@ -82,8 +87,8 @@ describe('BucketBarClient', () => {
       bucketBarClient.update();
       await delay(0);
 
-      assert.calledOnce(fakeBridge.call);
-      assert.calledWith(fakeBridge.call, 'anchorsChanged');
+      assert.calledOnce(fakeRPC.call);
+      assert.calledWith(fakeRPC.call, 'anchorsChanged');
     });
 
     it('does not update if another update is pending', async () => {
@@ -93,8 +98,8 @@ describe('BucketBarClient', () => {
       bucketBarClient.update();
       await delay(0);
 
-      assert.calledOnce(fakeBridge.call);
-      assert.calledWith(fakeBridge.call, 'anchorsChanged');
+      assert.calledOnce(fakeRPC.call);
+      assert.calledWith(fakeRPC.call, 'anchorsChanged');
     });
   });
 });

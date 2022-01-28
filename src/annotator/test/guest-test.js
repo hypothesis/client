@@ -1203,11 +1203,14 @@ describe('Guest', () => {
 
     it('calls the `BucketBarClient#update` method', () => {
       const guest = createGuest();
-      const anchor = createAnchor();
+      const anchor1 = createAnchor();
+      const anchor2 = createAnchor();
+      guest.anchors.push(anchor1, anchor2);
 
-      guest.detach(anchor.annotation.$tag);
+      guest.detach(anchor1.annotation.$tag);
 
       assert.calledOnce(fakeBucketBarClient.update);
+      assert.calledWith(fakeBucketBarClient.update, [anchor2]);
     });
   });
 

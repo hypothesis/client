@@ -2,6 +2,7 @@ import { getBoundingClientRect } from '../highlighter';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
+ * @typedef {import('../../types/annotator').AnchorPosition} AnchorPosition
  */
 
 /**
@@ -32,15 +33,6 @@ import { getBoundingClientRect } from '../highlighter';
  *   anchors in this bucket — the highest `top` position value, akin to the
  *   bottom of a theoretical box drawn around all of the anchor highlights in
  *   this bucket
- */
-
-/**
- * @typedef AnchorPosition
- * @prop {Anchor} anchor
- * @prop {number} top - The vertical offset, in pixels, of the top of this
- *   anchor's highlight(s) bounding box
- * @prop {number} bottom - The vertical offset, in pixels, of the bottom of this
- *   anchor's highlight(s) bounding box
  */
 
 // Only anchors with top offsets between `BUCKET_TOP_THRESHOLD` and
@@ -104,50 +96,48 @@ export function findClosestOffscreenAnchor(anchors, direction) {
 }
 
 /**
- * Compute the AnchorPositions for the set of anchors provided, sorted
- * by top offset
+ * Compute the top and bottom positions for the set of anchors' highlights, sorted
+ * vertically, from top to bottom.
  *
  * @param {Anchor[]} anchors
  * @return {AnchorPosition[]}
  */
-function getAnchorPositions(anchors) {
-  const anchorPositions = [];
+export function computeAnchorPositions(anchors) {
+  /** @type {AnchorPosition[]} */
+  const positions = [];
 
-  anchors.forEach(anchor => {
-    if (!anchor.highlights?.length) {
+  anchors.forEach(({ annotation, highlights }) => {
+    if (!highlights?.length) {
       return;
     }
-    const anchorBox = getBoundingClientRect(anchor.highlights);
-    if (anchorBox.top >= anchorBox.bottom) {
+
+    const { top, bottom } = getBoundingClientRect(highlights);
+
+    if (top >= bottom) {
       // Empty rect. The highlights may be disconnected from the document or hidden.
       return;
     }
-    anchorPositions.push({
-      top: anchorBox.top,
-      bottom: anchorBox.bottom,
-      anchor,
+
+    positions.push({
+      tag: annotation.$tag,
+      top,
+      bottom,
     });
   });
 
-  // Now sort by top position
-  anchorPositions.sort((a, b) => {
-    if (a.top < b.top) {
-      return -1;
-    }
-    return 1;
-  });
+  // Sort anchors vertically from top to bottom
+  positions.sort((anchor1, anchor2) => anchor1.top - anchor2.top);
 
-  return anchorPositions;
+  return positions;
 }
 
 /**
  * Compute buckets
  *
- * @param {Anchor[]} anchors
+ * @param {AnchorPosition[]} anchorPositions
  * @return {BucketSet}
  */
-export function anchorBuckets(anchors) {
-  const anchorPositions = getAnchorPositions(anchors);
+export function computeBuckets(anchorPositions) {
   /** @type {Set<string>} */
   const aboveTags = new Set();
   /** @type {Set<string>} */
@@ -165,25 +155,24 @@ export function anchorBuckets(anchors) {
    * @param {AnchorPosition} anchorPosition
    * @return {WorkingBucket}
    */
-  function newBucket(anchorPosition) {
-    const anchorHeight = anchorPosition.bottom - anchorPosition.top;
-    const bucketPosition = anchorPosition.top + anchorHeight / 2;
-    const bucket = /** @type WorkingBucket */ ({
-      tags: new Set([anchorPosition.anchor.annotation.$tag]),
-      top: anchorPosition.top,
-      bottom: anchorPosition.bottom,
+  function newBucket({ bottom, tag, top }) {
+    const anchorHeight = bottom - top;
+    const bucketPosition = top + anchorHeight / 2;
+    return {
+      bottom,
       position: bucketPosition,
-    });
-    return bucket;
+      tags: new Set([tag]),
+      top,
+    };
   }
 
   // Build buckets from position information
   anchorPositions.forEach(aPos => {
     if (aPos.top < BUCKET_TOP_THRESHOLD) {
-      aboveTags.add(aPos.anchor.annotation.$tag);
+      aboveTags.add(aPos.tag);
       return;
     } else if (aPos.top > window.innerHeight - BUCKET_BOTTOM_THRESHOLD) {
-      belowTags.add(aPos.anchor.annotation.$tag);
+      belowTags.add(aPos.tag);
       return;
     }
 
@@ -219,7 +208,7 @@ export function anchorBuckets(anchors) {
         aPos.bottom > currentBucket.bottom ? aPos.bottom : currentBucket.bottom;
       const updatedHeight = updatedBottom - currentBucket.top;
 
-      currentBucket.tags.add(aPos.anchor.annotation.$tag);
+      currentBucket.tags.add(aPos.tag);
       currentBucket.bottom = updatedBottom;
       currentBucket.position = currentBucket.top + updatedHeight / 2;
     }
