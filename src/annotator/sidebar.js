@@ -302,6 +302,7 @@ export default class Sidebar {
       'anchorsChanged',
       /** @param {AnchorPosition[]} positions  */
       positions => {
+        // Currently, only one guest frame sends anchor positions to the bucket bar
         this.bucketBar?.update(positions);
       }
     );
