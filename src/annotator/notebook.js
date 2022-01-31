@@ -5,7 +5,7 @@ import NotebookModal from './components/NotebookModal';
 /** @typedef {import('../types/annotator').Destroyable} Destroyable */
 
 /** @implements {Destroyable} */
-export default class Notebook {
+export class Notebook {
   /**
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
