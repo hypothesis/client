@@ -4,7 +4,7 @@ import SidebarPanel from '../SidebarPanel';
 import { $imports } from '../SidebarPanel';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('SidebarPanel', () => {
   let fakeStore;

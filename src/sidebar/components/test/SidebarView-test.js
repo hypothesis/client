@@ -4,7 +4,7 @@ import SidebarView from '../SidebarView';
 import { $imports } from '../SidebarView';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('SidebarView', () => {
   let fakeFrameSync;

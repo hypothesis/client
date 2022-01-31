@@ -4,7 +4,7 @@ import ShareAnnotationsPanel from '../ShareAnnotationsPanel';
 import { $imports } from '../ShareAnnotationsPanel';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('ShareAnnotationsPanel', () => {
   let fakeStore;

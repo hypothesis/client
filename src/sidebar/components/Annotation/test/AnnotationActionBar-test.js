@@ -7,7 +7,7 @@ import { $imports } from '../AnnotationActionBar';
 import * as fixtures from '../../../test/annotation-fixtures';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
-import mockImportedComponents from '../../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
 import { waitFor } from '../../../../test-util/wait';
 
 describe('AnnotationActionBar', () => {

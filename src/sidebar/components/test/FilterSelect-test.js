@@ -5,7 +5,7 @@ import { $imports } from '../FilterSelect';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('FilterSelect', () => {
   let someOptions;

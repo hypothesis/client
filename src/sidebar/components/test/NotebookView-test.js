@@ -3,7 +3,7 @@ import { act } from 'preact/test-utils';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 import { ResultSizeError } from '../../search-client';
 import NotebookView, { $imports } from '../NotebookView';

@@ -5,7 +5,7 @@ import MenuItem from '../MenuItem';
 import { $imports } from '../MenuItem';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('MenuItem', () => {
   let containers = [];

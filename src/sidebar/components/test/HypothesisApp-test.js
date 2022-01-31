@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import HypothesisApp, { $imports } from '../HypothesisApp';
 
 describe('HypothesisApp', () => {

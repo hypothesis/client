@@ -3,7 +3,7 @@ import { mount } from 'enzyme';
 import * as fixtures from '../../../test/annotation-fixtures';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
-import mockImportedComponents from '../../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
 
 import Annotation, { $imports } from '../Annotation';
 

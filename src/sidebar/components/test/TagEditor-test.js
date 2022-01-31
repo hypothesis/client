@@ -6,7 +6,7 @@ import TagEditor from '../TagEditor';
 import { $imports } from '../TagEditor';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('TagEditor', () => {
   let containers = [];

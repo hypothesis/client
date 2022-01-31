@@ -4,7 +4,7 @@ import { act } from 'preact/test-utils';
 import * as fixtures from '../../../test/annotation-fixtures';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
-import mockImportedComponents from '../../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
 
 import AnnotationBody, { $imports } from '../AnnotationBody';
 

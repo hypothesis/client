@@ -4,7 +4,7 @@ import Tutorial from '../Tutorial';
 import { $imports } from '../Tutorial';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('Tutorial', () => {
   let fakeIsThirdPartyService;
