@@ -65,8 +65,8 @@ export class BucketBarClient {
 
     this._updatePending = true;
     requestAnimationFrame(() => {
-      // In document with many annotations computing the anchor positions can
-      // block the JS event loop for up to 200 ms.
+      // Computing anchor positions may be expensive when there are many
+      // annotations or a forced layout reflow
       const positions = computeAnchorPositions(this._anchors);
       this._hostRPC.call('anchorsChanged', positions);
       this._updatePending = false;

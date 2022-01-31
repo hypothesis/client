@@ -2,16 +2,20 @@ import {
   findClosestOffscreenAnchor,
   computeAnchorPositions,
   computeBuckets,
+  $imports,
 } from '../buckets';
-import { $imports } from '../buckets';
 
 describe('annotator/util/buckets', () => {
   let fakeAnchors;
-  let fakeAnchorPositions;
   let fakeGetBoundingClientRect;
   let stubbedInnerHeight;
 
   beforeEach(() => {
+    // In a normal `Anchor` object, `highlights` would be an array of
+    // DOM elements. Here, `highlights[0]` is the vertical offset (top) of the
+    // fake anchor's highlight box and `highlights[1]` is the height of the
+    // box. This is in used in conjunction with the mock for
+    // `getBoundingClientRect`, below.
     fakeAnchors = [
       // top: 1, bottom: 51 — above screen
       { annotation: { $tag: 't0' }, highlights: [1, 50] },
@@ -25,39 +29,6 @@ describe('annotator/util/buckets', () => {
       { annotation: { $tag: 't4' }, highlights: [401, 50] },
       // top: 501, bottom: 551 - below screen
       { annotation: { $tag: 't5' }, highlights: [501, 50] },
-    ];
-
-    fakeAnchorPositions = [
-      {
-        tag: 't0',
-        top: 1,
-        bottom: 51,
-      },
-      {
-        tag: 't1',
-        top: 101,
-        bottom: 151,
-      },
-      {
-        tag: 't2',
-        top: 201,
-        bottom: 251,
-      },
-      {
-        tag: 't3',
-        top: 301,
-        bottom: 351,
-      },
-      {
-        tag: 't4',
-        top: 401,
-        bottom: 451,
-      },
-      {
-        tag: 't5',
-        top: 501,
-        bottom: 551,
-      },
     ];
 
     stubbedInnerHeight = sinon.stub(window, 'innerHeight').value(410);
@@ -138,7 +109,7 @@ describe('annotator/util/buckets', () => {
     });
   });
 
-  describe('computeAnchorPosition', () => {
+  describe('computeAnchorPositions', () => {
     it('ignores anchors with no highlights', () => {
       const anchorPositions = computeAnchorPositions([
         { highlights: undefined },
@@ -156,9 +127,20 @@ describe('annotator/util/buckets', () => {
     });
 
     it('computes anchor positions', () => {
-      const anchorPositions = computeAnchorPositions(fakeAnchors);
+      const anchorPositions = computeAnchorPositions(fakeAnchors.slice(0, 2));
 
-      assert.deepEqual(anchorPositions, fakeAnchorPositions);
+      assert.deepEqual(anchorPositions, [
+        {
+          tag: 't0',
+          top: 1,
+          bottom: 51,
+        },
+        {
+          tag: 't1',
+          top: 101,
+          bottom: 151,
+        },
+      ]);
     });
 
     it('computes anchor positions sorted vertically', () => {
@@ -175,6 +157,43 @@ describe('annotator/util/buckets', () => {
   });
 
   describe('computeBuckets', () => {
+    let fakeAnchorPositions;
+
+    beforeEach(() => {
+      fakeAnchorPositions = [
+        {
+          tag: 't0',
+          top: 1,
+          bottom: 51,
+        },
+        {
+          tag: 't1',
+          top: 101,
+          bottom: 151,
+        },
+        {
+          tag: 't2',
+          top: 201,
+          bottom: 251,
+        },
+        {
+          tag: 't3',
+          top: 301,
+          bottom: 351,
+        },
+        {
+          tag: 't4',
+          top: 401,
+          bottom: 451,
+        },
+        {
+          tag: 't5',
+          top: 501,
+          bottom: 551,
+        },
+      ];
+    });
+
     it('puts anchors that are above the screen into the `above` bucket', () => {
       const bucketSet = computeBuckets(fakeAnchorPositions);
       assert.deepEqual([...bucketSet.above.tags], ['t0', 't1']);
@@ -193,7 +212,6 @@ describe('annotator/util/buckets', () => {
     it('puts anchors into separate buckets if more than 60px separates their boxes', () => {
       fakeAnchorPositions[2].bottom = 216;
       fakeAnchorPositions[3].top = 301; // more than 60px from 216
-      fakeAnchorPositions[3].top = 316;
 
       const bucketSet = computeBuckets(fakeAnchorPositions);
       assert.deepEqual([...bucketSet.buckets[0].tags], ['t2']);

@@ -59,8 +59,8 @@
  *
  * @typedef AnchorPosition
  * @prop {string} tag - annotation tag
- * @prop {number} top
- * @prop {number} bottom
+ * @prop {number} top - in pixel
+ * @prop {number} bottom - in pixel
  */
 
 /**

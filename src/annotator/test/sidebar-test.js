@@ -478,10 +478,11 @@ describe('Sidebar', () => {
         const sidebar = createSidebar();
         connectGuest(sidebar);
 
-        emitGuestEvent('anchorsChanged', [1, 2]);
+        const anchorPositions = [{ tag: 't0', top: 1, bottom: 2 }];
+        emitGuestEvent('anchorsChanged', anchorPositions);
 
         assert.calledOnce(sidebar.bucketBar.update);
-        assert.calledWith(sidebar.bucketBar.update, [1, 2]);
+        assert.calledWith(sidebar.bucketBar.update, anchorPositions);
       });
     });
   });
