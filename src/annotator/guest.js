@@ -482,6 +482,16 @@ export class Guest {
   _sendUnloadNotification() {
     const ports = [];
 
+    // There is currently a race condition where the guest can fail to notify
+    // the host and sidebar when it unloads if it has not yet received its ports
+    // for guest-host and guest-sidebar commmunication.
+    //
+    // For the moment this can be tolerated as guest frames are not displayed in
+    // the sidebar until the guest has received the port and sent a
+    // `documentInfoChanged` notification on it. Nevertheless the host / sidebar
+    // will be left with a disconnected PortRPC for the guest, so we should aim
+    // to fix this in future.
+
     const sidebarPort = this._sidebarRPC.disconnect();
     if (sidebarPort) {
       ports.push(sidebarPort);
