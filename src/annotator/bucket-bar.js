@@ -14,7 +14,7 @@ import { computeBuckets } from './util/buckets';
  *
  * @implements {Destroyable}
  */
-export default class BucketBar {
+export class BucketBar {
   /**
    * @param {HTMLElement} container
    * @param {object} options

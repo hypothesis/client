@@ -1,4 +1,4 @@
-import BucketBar, { $imports } from '../bucket-bar';
+import { BucketBar, $imports } from '../bucket-bar';
 
 describe('BucketBar', () => {
   let bucketBars;
