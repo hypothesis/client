@@ -6,7 +6,7 @@ import { ListenerCollection } from '../shared/listener-collection';
 import { PortRPC } from '../shared/messaging';
 
 import { annotationCounts } from './annotation-counts';
-import BucketBar from './bucket-bar';
+import { BucketBar } from './bucket-bar';
 import { createAppConfig } from './config/app';
 import { features } from './features';
 import sidebarTrigger from './sidebar-trigger';
