@@ -33,7 +33,7 @@
     "chance": "^1.0.13",
     "classnames": "^2.2.4",
     "codecov": "^3.1.0",
-    "commander": "^8.0.0",
+    "commander": "^9.0.0",
     "core-js": "^3.4.1",
     "cross-env": "^7.0.0",
     "diff": "^5.0.0",
