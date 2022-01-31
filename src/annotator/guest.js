@@ -116,7 +116,7 @@ function removeTextSelection() {
  * @implements {Annotator}
  * @implements {Destroyable}
  */
-export default class Guest {
+export class Guest {
   /**
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor

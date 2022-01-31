@@ -1,5 +1,5 @@
 import { delay } from '../../test-util/wait';
-import Guest, { $imports } from '../guest';
+import { Guest, $imports } from '../guest';
 
 class FakeAdder {
   constructor(container, options) {
