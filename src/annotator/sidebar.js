@@ -14,7 +14,7 @@ import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
 
 /**
- * @typedef {import('./guest').default} Guest
+ * @typedef {import('./guest').Guest} Guest
  * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
