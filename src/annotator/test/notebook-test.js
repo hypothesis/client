@@ -1,7 +1,7 @@
 import { useEffect } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 
-import Notebook, { $imports } from '../notebook';
+import { Notebook, $imports } from '../notebook';
 import { EventBus } from '../util/emitter';
 
 describe('Notebook', () => {
