@@ -4,7 +4,7 @@ import ShareLinks from '../ShareLinks';
 import { $imports } from '../ShareLinks';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('ShareLinks', () => {
   const shareLink =

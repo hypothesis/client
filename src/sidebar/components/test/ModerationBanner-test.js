@@ -5,7 +5,7 @@ import ModerationBanner from '../ModerationBanner';
 import { $imports } from '../ModerationBanner';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 const moderatedAnnotation = fixtures.moderatedAnnotation;
 

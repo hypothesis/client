@@ -4,7 +4,7 @@ import { act } from 'preact/test-utils';
 import Menu from '../Menu';
 import { $imports } from '../Menu';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Menu', () => {

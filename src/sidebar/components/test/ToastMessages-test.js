@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 import ToastMessages, { $imports } from '../ToastMessages';
 import { checkAccessibility } from '../../../test-util/accessibility';

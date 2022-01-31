@@ -5,7 +5,7 @@ import ThreadList from '../ThreadList';
 import { $imports } from '../ThreadList';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('ThreadList', () => {
   let fakeDomUtil;

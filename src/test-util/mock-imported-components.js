@@ -62,7 +62,7 @@ function getDisplayName(component) {
  *
  * @return {Function} - A function that can be passed to `$imports.$mock`.
  */
-export default function mockImportedComponents() {
+export function mockImportedComponents() {
   return (source, symbol, value) => {
     if (!isComponent(value) || !source.startsWith('.')) {
       return null;

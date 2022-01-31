@@ -5,7 +5,7 @@ import HelpPanel from '../HelpPanel';
 import { $imports } from '../HelpPanel';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('HelpPanel', () => {
   let fakeAuth;

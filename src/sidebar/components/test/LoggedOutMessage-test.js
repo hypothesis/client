@@ -4,7 +4,7 @@ import LoggedOutMessage from '../LoggedOutMessage';
 import { $imports } from '../LoggedOutMessage';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('LoggedOutMessage', () => {
   let fakeStore;

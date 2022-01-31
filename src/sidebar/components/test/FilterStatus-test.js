@@ -2,7 +2,7 @@ import { mount } from 'enzyme';
 
 import FilterStatus, { $imports } from '../FilterStatus';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 function getFilterState() {
   return {

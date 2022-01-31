@@ -6,7 +6,7 @@ import { LinkType } from '../../markdown-commands';
 import MarkdownEditor from '../MarkdownEditor';
 import { $imports } from '../MarkdownEditor';
 
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('MarkdownEditor', () => {

@@ -5,7 +5,7 @@ import Thread from '../Thread';
 import { $imports } from '../Thread';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 // Utility functions to build nested threads
 let lastThreadId = 0;

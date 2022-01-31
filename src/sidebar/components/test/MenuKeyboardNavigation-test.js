@@ -4,7 +4,7 @@ import MenuKeyboardNavigation from '../MenuKeyboardNavigation';
 import { $imports } from '../MenuKeyboardNavigation';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('MenuKeyboardNavigation', () => {
   let fakeCloseMenu;

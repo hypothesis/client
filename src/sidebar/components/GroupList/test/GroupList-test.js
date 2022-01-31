@@ -3,7 +3,7 @@ import { act } from 'preact/test-utils';
 
 import GroupList, { $imports } from '../GroupList';
 
-import mockImportedComponents from '../../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
 
 describe('GroupList', () => {
   let fakeServiceConfig;

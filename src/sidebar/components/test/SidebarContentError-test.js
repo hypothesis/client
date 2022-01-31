@@ -4,7 +4,7 @@ import SidebarContentError from '../SidebarContentError';
 import { $imports } from '../SidebarContentError';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-import mockImportedComponents from '../../../test-util/mock-imported-components';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('SidebarContentError', () => {
   let fakeStore;
