@@ -221,7 +221,7 @@ export type SidebarToHostEvent =
    */
   | 'signupRequested';
 
-export type BridgeEvent =
+export type RPCEvent =
   | HostToGuestEvent
   | HostToSidebarEvent
   | GuestToHostEvent

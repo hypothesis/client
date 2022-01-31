@@ -48,6 +48,7 @@ const PROTOCOL = 'frame-rpc';
  * @typedef {RequestMessage|ResponseMessage} Message
  *
  * @typedef {import('../../types/annotator').Destroyable} Destroyable
+ * @typedef {import('../../types/port-rpc-events').RPCEvent} RPCEvent
  */
 
 /**
@@ -62,8 +63,8 @@ const PROTOCOL = 'frame-rpc';
  *
  * [1] https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API
  *
- * @template {string} OnMethod - Names of RPC methods this client responds to
- * @template {string} CallMethod - Names of RPC methods this client invokes
+ * @template {RPCEvent} OnMethod - Names of RPC methods this client responds to
+ * @template {RPCEvent} CallMethod - Names of RPC methods this client invokes
  * @implements {Destroyable}
  */
 export class PortRPC {
