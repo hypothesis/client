@@ -1248,11 +1248,12 @@ describe('Guest', () => {
     });
 
     it('notifies host frame that guest has been unloaded', () => {
-      const sidebarPort = {};
-      const hostPort = {};
-
       const guest = createGuest({ subFrameIdentifier: 'frame-id' });
+
+      const hostPort = {};
       hostRPC().disconnect.returns(hostPort);
+
+      const sidebarPort = {};
       sidebarRPC().disconnect.returns(sidebarPort);
 
       guest.destroy();
@@ -1268,11 +1269,13 @@ describe('Guest', () => {
     });
   });
 
-  it('notifies host frame when guest frame is unloaded', () => {
-    const sidebarPort = {};
-    const hostPort = {};
+  it('notifies host and sidebar frames when guest is unloaded', () => {
     createGuest({ subFrameIdentifier: 'frame-id' });
+
+    const hostPort = {};
     hostRPC().disconnect.returns(hostPort);
+
+    const sidebarPort = {};
     sidebarRPC().disconnect.returns(sidebarPort);
 
     window.dispatchEvent(new Event('unload'));
