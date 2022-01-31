@@ -55,7 +55,9 @@
 
 /**
  * Top and bottom positions of the bounding box created by the union of the
- * highlight elements associated to an anchor.
+ * highlight elements associated to an anchor. Top and bottom positions are
+ * based on the viewport. The value zero corresponds to the top of viewport.
+ * Hidden elements that are above the viewport have negative values.
  *
  * @typedef AnchorPosition
  * @prop {string} tag - annotation tag
