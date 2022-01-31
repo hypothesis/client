@@ -1,5 +1,5 @@
 import { addConfigFragment } from '../../shared/config-fragment';
-import Sidebar, { MIN_RESIZE, $imports } from '../sidebar';
+import { Sidebar, MIN_RESIZE, $imports } from '../sidebar';
 import { EventBus } from '../util/emitter';
 
 const DEFAULT_WIDTH = 350;

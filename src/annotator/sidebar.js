@@ -56,7 +56,7 @@ function createSidebarIframe(config) {
  *
  * @implements {Destroyable}
  */
-export default class Sidebar {
+export class Sidebar {
   /**
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -

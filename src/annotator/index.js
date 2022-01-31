@@ -12,8 +12,8 @@ registerIcons(iconSet);
 import { PortProvider } from '../shared/messaging';
 import { getConfig } from './config/index';
 import { Guest } from './guest';
-import Notebook from './notebook';
-import Sidebar from './sidebar';
+import { Notebook } from './notebook';
+import { Sidebar } from './sidebar';
 import { EventBus } from './util/emitter';
 
 // Look up the URL of the sidebar. This element is added to the page by the
