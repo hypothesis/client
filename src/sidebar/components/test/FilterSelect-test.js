@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import FilterSelect from '../FilterSelect';
-import { $imports } from '../FilterSelect';
+import FilterSelect, { $imports } from '../FilterSelect';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 

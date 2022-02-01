@@ -1,5 +1,4 @@
-import { bootHypothesisClient, bootSidebarApp } from '../boot';
-import { $imports } from '../boot';
+import { bootHypothesisClient, bootSidebarApp, $imports } from '../boot';
 
 function assetUrl(url) {
   return `https://marginal.ly/client/build/${url}`;

@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import SelectionTabs from '../SelectionTabs';
-import { $imports } from '../SelectionTabs';
+import SelectionTabs, { $imports } from '../SelectionTabs';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import ShareLinks from '../ShareLinks';
-import { $imports } from '../ShareLinks';
+import ShareLinks, { $imports } from '../ShareLinks';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import ThreadCard from '../ThreadCard';
-import { $imports } from '../ThreadCard';
+import ThreadCard, { $imports } from '../ThreadCard';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

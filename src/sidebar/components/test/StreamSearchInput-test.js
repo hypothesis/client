@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import StreamSearchInput from '../StreamSearchInput';
-import { $imports } from '../StreamSearchInput';
+import StreamSearchInput, { $imports } from '../StreamSearchInput';
 
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 

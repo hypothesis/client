@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import TagList from '../TagList';
-import { $imports } from '../TagList';
+import TagList, { $imports } from '../TagList';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

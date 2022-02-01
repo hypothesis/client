@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import AutocompleteList from '../AutocompleteList';
-import { $imports } from '../AutocompleteList';
+import AutocompleteList, { $imports } from '../AutocompleteList';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

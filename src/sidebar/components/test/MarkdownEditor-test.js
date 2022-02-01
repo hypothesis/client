@@ -3,8 +3,7 @@ import { render } from 'preact';
 import { act } from 'preact/test-utils';
 
 import { LinkType } from '../../markdown-commands';
-import MarkdownEditor from '../MarkdownEditor';
-import { $imports } from '../MarkdownEditor';
+import MarkdownEditor, { $imports } from '../MarkdownEditor';
 
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import { checkAccessibility } from '../../../test-util/accessibility';

@@ -1,5 +1,4 @@
-import { isThirdPartyService } from '../is-third-party-service';
-import { $imports } from '../is-third-party-service';
+import { isThirdPartyService, $imports } from '../is-third-party-service';
 
 describe('sidebar/helpers/is-third-party-service', () => {
   let fakeServiceConfig;

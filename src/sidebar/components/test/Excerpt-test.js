@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import Excerpt from '../Excerpt';
-import { $imports } from '../Excerpt';
+import Excerpt, { $imports } from '../Excerpt';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 

@@ -2,8 +2,7 @@ import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
-import NotebookResultCount from '../NotebookResultCount';
-import { $imports } from '../NotebookResultCount';
+import NotebookResultCount, { $imports } from '../NotebookResultCount';
 
 describe('NotebookResultCount', () => {
   let fakeCountVisible;
