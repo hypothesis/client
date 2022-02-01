@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 
 import { replaceLinksWithEmbeds } from '../media-embedder';
-import { renderMathAndMarkdown as renderMarkdown } from '../render-markdown';
+import { renderMathAndMarkdown } from '../render-markdown';
 
 /**
  * @typedef MarkdownViewProps
@@ -25,7 +25,7 @@ export default function MarkdownView({
   textStyle = {},
 }) {
   const html = useMemo(
-    () => (markdown ? renderMarkdown(markdown) : ''),
+    () => (markdown ? renderMathAndMarkdown(markdown) : ''),
     [markdown]
   );
   const content = /** @type {{ current: HTMLDivElement }} */ (useRef());
