@@ -2,7 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
-import useRootThread from './hooks/use-root-thread';
+import { useRootThread } from './hooks/use-root-thread';
 
 import ThreadList from './ThreadList';
 import SidebarContentError from './SidebarContentError';

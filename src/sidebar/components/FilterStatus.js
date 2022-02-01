@@ -5,7 +5,7 @@ import { useMemo } from 'preact/hooks';
 import { countVisible } from '../helpers/thread';
 import { useStoreProxy } from '../store/use-store';
 
-import useRootThread from './hooks/use-root-thread';
+import { useRootThread } from './hooks/use-root-thread';
 
 /**
  * @typedef {import('../helpers/build-thread').Thread} Thread

@@ -11,7 +11,7 @@ import { threadAnnotations } from '../../helpers/thread-annotations';
  *
  * @return {Thread}
  */
-export default function useRootThread() {
+export function useRootThread() {
   const store = useStoreProxy();
   const annotations = store.allAnnotations();
   const query = store.filterQuery();

@@ -1,10 +1,8 @@
 import { mount } from 'enzyme';
 
-import SidebarView from '../SidebarView';
-import { $imports } from '../SidebarView';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import SidebarView, { $imports } from '../SidebarView';
 
 describe('SidebarView', () => {
   let fakeFrameSync;
@@ -70,7 +68,7 @@ describe('SidebarView', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      './hooks/use-root-thread': fakeUseRootThread,
+      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store/use-store': { useStoreProxy: () => fakeStore },
       '../helpers/tabs': fakeTabsUtil,
     });

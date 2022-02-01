@@ -2,7 +2,6 @@ import { mount } from 'enzyme';
 
 import { waitFor } from '../../../test-util/wait';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
-
 import AnnotationView, { $imports } from '../AnnotationView';
 
 describe('AnnotationView', () => {
@@ -32,7 +31,7 @@ describe('AnnotationView', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      './hooks/use-root-thread': fakeUseRootThread,
+      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store/use-store': { useStoreProxy: () => fakeStore },
     });
   });

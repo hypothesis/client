@@ -2,7 +2,7 @@ import { useCallback, useEffect } from 'preact/hooks';
 
 import * as searchFilter from '../util/search-filter';
 import { withServices } from '../service-context';
-import useRootThread from './hooks/use-root-thread';
+import { useRootThread } from './hooks/use-root-thread';
 import { useStoreProxy } from '../store/use-store';
 
 import ThreadList from './ThreadList';

@@ -26,7 +26,7 @@ describe('NotebookResultCount', () => {
     fakeUseRootThread = sinon.stub().returns({ children: [] });
 
     $imports.$mock({
-      './hooks/use-root-thread': fakeUseRootThread,
+      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../helpers/thread': { countVisible: fakeCountVisible },
     });
   });

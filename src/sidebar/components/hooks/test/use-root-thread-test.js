@@ -1,6 +1,6 @@
 import { mount } from 'enzyme';
 
-import useRootThread, { $imports } from '../use-root-thread';
+import { useRootThread, $imports } from '../use-root-thread';
 
 describe('sidebar/components/hooks/use-root-thread', () => {
   let fakeStore;
