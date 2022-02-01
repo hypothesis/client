@@ -9,7 +9,7 @@ import { useStoreProxy } from '../store/use-store';
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
 import PaginatedThreadList from './PaginatedThreadList';
-import useRootThread from './hooks/use-root-thread';
+import { useRootThread } from './hooks/use-root-thread';
 
 /**
  * @typedef NotebookViewProps

@@ -1,6 +1,6 @@
 import { Spinner } from '@hypothesis/frontend-shared';
 
-import useRootThread from './hooks/use-root-thread';
+import { useRootThread } from './hooks/use-root-thread';
 import { countVisible } from '../helpers/thread';
 
 /**

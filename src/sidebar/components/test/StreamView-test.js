@@ -40,7 +40,7 @@ describe('StreamView', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      './hooks/use-root-thread': fakeUseRootThread,
+      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store/use-store': { useStoreProxy: () => fakeStore },
       '../util/search-filter': fakeSearchFilter,
     });

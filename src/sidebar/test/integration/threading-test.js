@@ -3,10 +3,9 @@ import { useReducer } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 
 import { Injector } from '../../../shared/injector';
-import { createSidebarStore } from '../../store';
-
+import { useRootThread } from '../../components/hooks/use-root-thread';
 import { ServiceContext } from '../../service-context';
-import useRootThread from '../../components/hooks/use-root-thread';
+import { createSidebarStore } from '../../store';
 
 const fixtures = {
   annotations: [

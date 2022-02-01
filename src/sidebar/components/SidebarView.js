@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'preact/hooks';
 
-import useRootThread from './hooks/use-root-thread';
+import { useRootThread } from './hooks/use-root-thread';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
 import { tabForAnnotation } from '../helpers/tabs';

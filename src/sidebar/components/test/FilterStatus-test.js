@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 
-import FilterStatus, { $imports } from '../FilterStatus';
-
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import FilterStatus, { $imports } from '../FilterStatus';
 
 function getFilterState() {
   return {
@@ -53,7 +52,7 @@ describe('FilterStatus', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      './hooks/use-root-thread': fakeUseRootThread,
+      './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
       '../store/use-store': { useStoreProxy: () => fakeStore },
       '../helpers/thread': fakeThreadUtil,
     });
