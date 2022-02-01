@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import { directLinked } from '../direct-linked';
+import { directLinkedModule } from '../direct-linked';
 
 describe('sidebar/store/modules/direct-linked', () => {
   let store;
@@ -11,7 +11,7 @@ describe('sidebar/store/modules/direct-linked', () => {
 
   beforeEach(() => {
     fakeSettings = {};
-    store = createStore([directLinked], [fakeSettings]);
+    store = createStore([directLinkedModule], [fakeSettings]);
   });
 
   describe('setDirectLinkedGroupFetchFailed', () => {
@@ -35,7 +35,7 @@ describe('sidebar/store/modules/direct-linked', () => {
   it('sets directLinkedAnnotationId to settings.annotations during store init', () => {
     fakeSettings.annotations = 'ann-id';
 
-    store = createStore([directLinked], [fakeSettings]);
+    store = createStore([directLinkedModule], [fakeSettings]);
 
     assert.equal(store.directLinkedAnnotationId(), 'ann-id');
   });
@@ -51,7 +51,7 @@ describe('sidebar/store/modules/direct-linked', () => {
   it('sets directLinkedGroupId to settings.group during store init', () => {
     fakeSettings.group = 'group-id';
 
-    store = createStore([directLinked], [fakeSettings]);
+    store = createStore([directLinkedModule], [fakeSettings]);
 
     assert.equal(store.directLinkedGroupId(), 'group-id');
   });

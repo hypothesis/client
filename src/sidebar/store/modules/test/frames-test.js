@@ -1,12 +1,12 @@
 import { createStore } from '../../create-store';
-import { framesModule as frames } from '../frames';
+import { framesModule } from '../frames';
 
 describe('sidebar/store/modules/frames', () => {
   let store;
 
   beforeEach(() => {
     // Setup a store for tests.
-    store = createStore([frames]);
+    store = createStore([framesModule]);
   });
 
   describe('#connectFrame', () => {

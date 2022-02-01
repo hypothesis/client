@@ -12,9 +12,9 @@ import { createSelector } from 'reselect';
 import { createStoreModule } from '../create-store';
 import { actionTypes } from '../util';
 
-import { annotations } from './annotations';
-import { groups } from './groups';
-import { routeModule as route } from './route';
+import { annotationsModule } from './annotations';
+import { groupsModule } from './groups';
+import { routeModule } from './route';
 
 const initialState = {
   /**
@@ -112,8 +112,8 @@ function receiveRealTimeUpdates({
       const routeState = getState().route;
 
       if (
-        ann.group === groups.selectors.focusedGroupId(groupState) ||
-        route.selectors.route(routeState) !== 'sidebar'
+        ann.group === groupsModule.selectors.focusedGroupId(groupState) ||
+        routeModule.selectors.route(routeState) !== 'sidebar'
       ) {
         pendingUpdates[/** @type {string} */ (ann.id)] = ann;
       }
@@ -130,7 +130,7 @@ function receiveRealTimeUpdates({
       // new annotation (saved in pendingUpdates and removed above), that has
       // not yet been loaded.
       const annotationsState = getState().annotations;
-      if (annotations.selectors.annotationExists(annotationsState, id)) {
+      if (annotationsModule.selectors.annotationExists(annotationsState, id)) {
         pendingDeletions[id] = true;
       }
     });
@@ -193,7 +193,7 @@ function hasPendingDeletion(state, id) {
   return state.pendingDeletions.hasOwnProperty(id);
 }
 
-export const realTimeUpdates = createStoreModule(initialState, {
+export const realTimeUpdatesModule = createStoreModule(initialState, {
   namespace: 'realTimeUpdates',
   reducers,
   actionCreators: {

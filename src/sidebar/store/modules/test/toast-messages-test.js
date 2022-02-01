@@ -1,12 +1,12 @@
 import { createStore } from '../../create-store';
-import { toastMessages } from '../toast-messages';
+import { toastMessagesModule } from '../toast-messages';
 
 describe('store/modules/toast-messages', () => {
   let store;
   let fakeToastMessage;
 
   beforeEach(() => {
-    store = createStore([toastMessages]);
+    store = createStore([toastMessagesModule]);
     fakeToastMessage = {
       id: 'myToast',
       type: 'anyType',

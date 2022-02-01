@@ -1,11 +1,11 @@
 import * as fixtures from '../../../test/annotation-fixtures';
 import * as metadata from '../../../helpers/annotation-metadata';
 import { createStore } from '../../create-store';
-import { annotations } from '../annotations';
-import { routeModule as route } from '../route';
+import { annotationsModule } from '../annotations';
+import { routeModule } from '../route';
 
 function createTestStore() {
-  return createStore([annotations, route], [{}]);
+  return createStore([annotationsModule, routeModule], [{}]);
 }
 
 // Tests for some of the functionality in this store module are currently in

@@ -1,8 +1,8 @@
 import { createStore } from '../../create-store';
-import { annotations } from '../annotations';
-import { filters } from '../filters';
-import { selection } from '../selection';
-import { routeModule as route } from '../route';
+import { annotationsModule } from '../annotations';
+import { filtersModule } from '../filters';
+import { selectionModule } from '../selection';
+import { routeModule } from '../route';
 import * as fixtures from '../../../test/annotation-fixtures';
 
 describe('sidebar/store/modules/selection', () => {
@@ -14,7 +14,10 @@ describe('sidebar/store/modules/selection', () => {
   };
 
   beforeEach(() => {
-    store = createStore([annotations, filters, selection, route], fakeSettings);
+    store = createStore(
+      [annotationsModule, filtersModule, selectionModule, routeModule],
+      fakeSettings
+    );
   });
 
   describe('setForcedVisible', () => {

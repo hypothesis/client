@@ -1,6 +1,6 @@
 import { createStore } from '../../create-store';
-import { groups } from '../groups';
-import { session } from '../session';
+import { groupsModule } from '../groups';
+import { sessionModule } from '../session';
 import { immutable } from '../../../util/immutable';
 
 describe('sidebar/store/modules/groups', () => {
@@ -73,7 +73,7 @@ describe('sidebar/store/modules/groups', () => {
   beforeEach(() => {
     // The empty second argument (settings) needed here because of the
     // dependency on the `session` module
-    store = createStore([groups, session], [{}]);
+    store = createStore([groupsModule, sessionModule], [{}]);
   });
 
   describe('filterGroups', () => {

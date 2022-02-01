@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import { sidebarPanels } from '../sidebar-panels';
+import { sidebarPanelsModule } from '../sidebar-panels';
 
 describe('sidebar/store/modules/sidebar-panels', () => {
   let store;
@@ -9,7 +9,7 @@ describe('sidebar/store/modules/sidebar-panels', () => {
   };
 
   beforeEach(() => {
-    store = createStore([sidebarPanels]);
+    store = createStore([sidebarPanelsModule]);
   });
 
   describe('#initialState', () => {
