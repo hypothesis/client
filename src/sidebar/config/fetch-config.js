@@ -1,5 +1,5 @@
 import { getApiUrl } from './get-api-url';
-import { hostPageConfig as hostConfig } from './host-config';
+import { hostPageConfig } from './host-config';
 import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
@@ -89,10 +89,10 @@ function fetchConfigFromAncestorFrame(origin, window_ = window) {
  * @return {Promise<object>} - The merged settings.
  */
 function fetchConfigLegacy(appConfig, window_ = window) {
-  const hostPageConfig = hostConfig(window_);
+  const hostConfig = hostPageConfig(window_);
 
   let embedderConfig;
-  const origin = /** @type string */ (hostPageConfig.requestConfigFromFrame);
+  const origin = /** @type string */ (hostConfig.requestConfigFromFrame);
   embedderConfig = fetchConfigFromAncestorFrame(origin, window_);
 
   return embedderConfig.then(embedderConfig => {
@@ -190,13 +190,13 @@ async function fetchGroupsAsync(config, rpcCall) {
  * @return {Promise<MergedConfig>} - The merged settings.
  */
 export async function fetchConfig(appConfig, window_ = window) {
-  const hostPageConfig = hostConfig(window);
+  const hostConfig = hostPageConfig(window);
 
-  const requestConfigFromFrame = hostPageConfig.requestConfigFromFrame;
+  const requestConfigFromFrame = hostConfig.requestConfigFromFrame;
 
   if (!requestConfigFromFrame) {
     // Directly embed: just get the config.
-    return fetchConfigEmbed(appConfig, hostPageConfig);
+    return fetchConfigEmbed(appConfig, hostConfig);
   }
   if (typeof requestConfigFromFrame === 'string') {
     // Legacy: send RPC to all parents to find config. (deprecated)
@@ -222,7 +222,7 @@ export async function fetchConfig(appConfig, window_ = window) {
     // as this is needed in the Notebook.
     return {
       ...rpcMergedConfig,
-      ...(hostPageConfig.group ? { group: hostPageConfig.group } : {}),
+      ...(hostConfig.group ? { group: hostConfig.group } : {}),
     };
   } else {
     throw new Error(
