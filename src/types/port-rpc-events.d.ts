@@ -220,11 +220,3 @@ export type SidebarToHostEvent =
    * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onsignuprequest
    */
   | 'signupRequested';
-
-export type BridgeEvent =
-  | HostToGuestEvent
-  | HostToSidebarEvent
-  | GuestToHostEvent
-  | GuestToSidebarEvent
-  | SidebarToGuestEvent
-  | SidebarToHostEvent;
