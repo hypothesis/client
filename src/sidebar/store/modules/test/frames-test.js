@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import frames from '../frames';
+import { framesModule as frames } from '../frames';
 
 describe('sidebar/store/modules/frames', () => {
   let store;

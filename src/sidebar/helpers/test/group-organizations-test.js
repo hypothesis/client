@@ -1,5 +1,5 @@
 import * as orgFixtures from '../../test/group-fixtures';
-import groupsByOrganization from '../group-organizations';
+import { groupsByOrganization } from '../group-organizations';
 
 describe('sidebar/helpers/group-organizations', () => {
   context('when sorting organizations and their contained groups', () => {

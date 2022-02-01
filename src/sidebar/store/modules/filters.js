@@ -279,7 +279,7 @@ function hasAppliedFilter(state) {
   return !!(state.query || Object.keys(getFilters(state)).length);
 }
 
-export default createStoreModule(initialState, {
+export const filters = createStoreModule(initialState, {
   namespace: 'filters',
   reducers,
   actionCreators: {

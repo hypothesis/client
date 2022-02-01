@@ -8,7 +8,7 @@ import { serviceConfig } from './service-config';
  * @throws {Error} If the settings has a service but the service doesn't have an apiUrl
  *
  */
-export default function getApiUrl(settings) {
+export function getApiUrl(settings) {
   const service = serviceConfig(settings);
 
   if (service) {

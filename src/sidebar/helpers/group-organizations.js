@@ -1,4 +1,4 @@
-import immutable from '../util/immutable';
+import { immutable } from '../util/immutable';
 
 /**
  * @typedef {import('../../types/api').Group} Group
@@ -83,7 +83,7 @@ function organizations(groups) {
  * @param {Array<Group>} groups
  * @return {Array<object>} - groups sorted by which organization they're in
  */
-export default function groupsByOrganization(groups) {
+export function groupsByOrganization(groups) {
   const orgs = organizations(groups);
   const defaultOrganizationGroups = [];
   const sortedGroups = [];

@@ -7,7 +7,7 @@ import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
 } from './cross-origin-rpc.js';
-import disableOpenerForExternalLinks from './util/disable-opener-for-external-links';
+import { disableOpenerForExternalLinks } from './util/disable-opener-for-external-links';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
@@ -100,9 +100,9 @@ function setupFrameSync(frameSync, store) {
 
 // Register icons used by the sidebar app (and maybe other assets in future).
 import { registerIcons } from '@hypothesis/frontend-shared';
-import iconSet from './icons';
+import { sidebarIcons } from './icons';
 
-registerIcons(iconSet);
+registerIcons(sidebarIcons);
 
 // The entry point component for the app.
 import { render } from 'preact';

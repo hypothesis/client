@@ -1,7 +1,7 @@
 import { parseJsonConfig } from '../../boot/parse-json-config';
 import { toBoolean } from '../../shared/type-coercions';
 
-import configFuncSettingsFrom from './config-func-settings-from';
+import { configFuncSettingsFrom } from './config-func-settings-from';
 import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
@@ -20,7 +20,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
 /**
  * @return {SettingsGetters}
  */
-export default function settingsFrom(window_) {
+export function settingsFrom(window_) {
   // Prioritize the `window.hypothesisConfig` function over the JSON format
   // Via uses `window.hypothesisConfig` and makes it non-configurable and non-writable.
   // In addition, Via sets the `ignoreOtherConfiguration` option to prevent configuration merging.

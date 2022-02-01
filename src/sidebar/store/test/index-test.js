@@ -1,6 +1,6 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import { createSidebarStore } from '../index';
-import immutable from '../../util/immutable';
+import { immutable } from '../../util/immutable';
 
 const defaultAnnotation = annotationFixtures.defaultAnnotation;
 const newAnnotation = annotationFixtures.newAnnotation;

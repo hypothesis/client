@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import toastMessages from '../toast-messages';
+import { toastMessages } from '../toast-messages';
 
 describe('store/modules/toast-messages', () => {
   let store;

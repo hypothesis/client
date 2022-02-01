@@ -11,7 +11,7 @@ import * as redux from 'redux';
  *        returned store.
  * @return {object} Redux store
  */
-export default function fakeStore(initialState, methods) {
+export function fakeReduxStore(initialState, methods) {
   function update(state, action) {
     if (action.state) {
       return Object.assign({}, state, action.state);

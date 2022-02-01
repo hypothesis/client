@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import defaults from '../defaults';
+import { defaults } from '../defaults';
 
 describe('store/modules/defaults', () => {
   let store;

@@ -1,5 +1,4 @@
-import renderMarkdown from '../render-markdown';
-import { $imports } from '../render-markdown';
+import { renderMathAndMarkdown, $imports } from '../render-markdown';
 
 describe('render-markdown', () => {
   let render;
@@ -19,7 +18,7 @@ describe('render-markdown', () => {
       },
     });
 
-    render = markdown => renderMarkdown(markdown);
+    render = markdown => renderMathAndMarkdown(markdown);
   });
 
   afterEach(() => {
@@ -61,21 +60,21 @@ describe('render-markdown', () => {
       // library. This is not an extensive test of sanitization behavior, that
       // is left to DOMPurify's tests.
       assert.equal(
-        renderMarkdown('one **two** <script>alert("three")</script>'),
+        renderMathAndMarkdown('one **two** <script>alert("three")</script>'),
         '<p>one <strong>two</strong> </p>'
       );
     });
 
     it('should open links in a new window', () => {
       assert.equal(
-        renderMarkdown('<a href="http://example.com">test</a>'),
+        renderMathAndMarkdown('<a href="http://example.com">test</a>'),
         '<p><a href="http://example.com" target="_blank">test</a></p>'
       );
     });
 
     it('should render strikethrough', () => {
       assert.equal(
-        renderMarkdown('This is ~~no longer the case~~'),
+        renderMathAndMarkdown('This is ~~no longer the case~~'),
         '<p>This is <del>no longer the case</del></p>'
       );
     });

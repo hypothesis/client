@@ -112,7 +112,7 @@ function hasMessage(state, type, text) {
   });
 }
 
-export default createStoreModule(initialState, {
+export const toastMessages = createStoreModule(initialState, {
   namespace: 'toastMessages',
   reducers,
   actionCreators: {

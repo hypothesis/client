@@ -1,4 +1,4 @@
-import warnOnce from '../shared/warn-once';
+import { warnOnce } from '../shared/warn-once';
 
 let _features = {};
 

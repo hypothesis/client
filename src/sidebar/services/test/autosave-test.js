@@ -1,5 +1,5 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
-import createFakeStore from '../../test/fake-redux-store';
+import { fakeReduxStore } from '../../test/fake-redux-store';
 import { waitFor } from '../../../test-util/wait';
 
 import { AutosaveService, $imports } from '../autosave';
@@ -14,7 +14,7 @@ describe('AutosaveService', () => {
     fakeAnnotationsService = { save: sinon.stub().resolves() };
     fakeNewHighlights = sinon.stub().returns([]);
     fakeRetryPromiseOperation = sinon.stub().callsFake(callback => callback());
-    fakeStore = createFakeStore({}, { newHighlights: fakeNewHighlights });
+    fakeStore = fakeReduxStore({}, { newHighlights: fakeNewHighlights });
 
     $imports.$mock({
       '../util/retry': {

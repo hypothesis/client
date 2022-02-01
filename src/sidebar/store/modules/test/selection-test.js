@@ -1,8 +1,8 @@
 import { createStore } from '../../create-store';
-import annotations from '../annotations';
-import filters from '../filters';
-import selection from '../selection';
-import route from '../route';
+import { annotations } from '../annotations';
+import { filters } from '../filters';
+import { selection } from '../selection';
+import { routeModule as route } from '../route';
 import * as fixtures from '../../../test/annotation-fixtures';
 
 describe('sidebar/store/modules/selection', () => {

@@ -1,7 +1,7 @@
 import { generateHexString } from '../../shared/random';
-import warnOnce from '../../shared/warn-once';
-import { Socket } from '../websocket';
+import { warnOnce } from '../../shared/warn-once';
 import { watch } from '../util/watch';
+import { Socket } from '../websocket';
 
 /**
  * `StreamerService` manages the WebSocket connection to the Hypothesis Real-Time

@@ -1,4 +1,4 @@
-export default class FakeWindow {
+export class FakeWindow {
   constructor() {
     this.callbacks = [];
 

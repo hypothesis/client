@@ -38,7 +38,7 @@ describe('sidebar/cross-origin-rpc', () => {
 
     $imports.$mock({
       './helpers/groups': { normalizeGroupIds: fakeNormalizeGroupIds },
-      '../shared/warn-once': fakeWarnOnce,
+      '../shared/warn-once': { warnOnce: fakeWarnOnce },
     });
   });
 

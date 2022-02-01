@@ -190,7 +190,7 @@ function isSavingAnnotation(state, annotation) {
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
 
-export default createStoreModule(initialState, {
+export const activity = createStoreModule(initialState, {
   reducers,
   namespace: 'activity',
 

@@ -1,26 +1,26 @@
 import { fetchConfig, $imports } from '../fetch-config';
 
 describe('sidebar/config/fetch-config', () => {
-  let fakeHostConfig;
+  let fakeHostPageConfig;
   let fakeJsonRpc;
   let fakeWindow;
   let fakeApiUrl;
   let fakeTopWindow;
 
   beforeEach(() => {
-    fakeHostConfig = sinon.stub();
+    fakeHostPageConfig = sinon.stub();
     fakeJsonRpc = {
       call: sinon.stub(),
     };
     fakeApiUrl = sinon.stub().returns('https://dev.hypothes.is/api/');
     $imports.$mock({
-      './host-config': fakeHostConfig,
+      './host-config': { hostPageConfig: fakeHostPageConfig },
       '../util/postmessage-json-rpc': fakeJsonRpc,
-      './get-api-url': fakeApiUrl,
+      './get-api-url': { getApiUrl: fakeApiUrl },
     });
 
     // By default, embedder provides no custom config.
-    fakeHostConfig.returns({});
+    fakeHostPageConfig.returns({});
 
     // By default, fetching config from parent frames fails.
     fakeJsonRpc.call.throws(new Error('call() response not set'));
@@ -59,7 +59,7 @@ describe('sidebar/config/fetch-config', () => {
       it('merges the hostPageConfig onto appConfig and returns the result', async () => {
         // hostPageConfig shall take precedent over appConfig
         const appConfig = { foo: 'bar', appType: 'via' };
-        fakeHostConfig.returns({ foo: 'baz' });
+        fakeHostPageConfig.returns({ foo: 'baz' });
         const mergedConfig = await fetchConfig(appConfig);
         assert.deepEqual(mergedConfig, {
           foo: 'baz',
@@ -79,7 +79,7 @@ describe('sidebar/config/fetch-config', () => {
       // exposed to the document itself.
       const expectedTimeout = 3000;
       beforeEach(() => {
-        fakeHostConfig.returns({
+        fakeHostPageConfig.returns({
           requestConfigFromFrame: 'https://embedder.com',
         });
         sinon.stub(console, 'warn');
@@ -169,7 +169,7 @@ describe('sidebar/config/fetch-config', () => {
       // exposed to the document itself.
       beforeEach(() => {
         fakeJsonRpc.call.resolves({});
-        fakeHostConfig.returns({
+        fakeHostPageConfig.returns({
           requestConfigFromFrame: {
             origin: 'https://embedder.com',
             ancestorLevel: 2,
@@ -192,7 +192,7 @@ describe('sidebar/config/fetch-config', () => {
 
       [0, 1, 2].forEach(level => {
         it(`finds ${level}'th ancestor window according to how high the level is`, async () => {
-          fakeHostConfig.returns({
+          fakeHostPageConfig.returns({
             requestConfigFromFrame: {
               origin: 'https://embedder.com',
               ancestorLevel: level,
@@ -205,7 +205,7 @@ describe('sidebar/config/fetch-config', () => {
       });
 
       it('throws an error when target ancestor exceeds top window', async () => {
-        fakeHostConfig.returns({
+        fakeHostPageConfig.returns({
           requestConfigFromFrame: {
             origin: 'https://embedder.com',
             ancestorLevel: 10, // The top window is only 2 levels high
@@ -279,7 +279,7 @@ describe('sidebar/config/fetch-config', () => {
       });
 
       it('creates a merged config and also adds back the `group` value from the host config', async () => {
-        fakeHostConfig.returns({
+        fakeHostPageConfig.returns({
           requestConfigFromFrame: {
             origin: 'https://embedder.com',
             ancestorLevel: 2,
@@ -306,7 +306,7 @@ describe('sidebar/config/fetch-config', () => {
       });
 
       it('missing ancestorLevel', async () => {
-        fakeHostConfig.returns({
+        fakeHostPageConfig.returns({
           requestConfigFromFrame: {
             origin: 'https://embedder.com',
             // missing ancestorLevel
@@ -319,7 +319,7 @@ describe('sidebar/config/fetch-config', () => {
       });
 
       it('missing origin', async () => {
-        fakeHostConfig.returns({
+        fakeHostPageConfig.returns({
           requestConfigFromFrame: {
             // missing origin
             ancestorLevel: 2,

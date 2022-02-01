@@ -15,7 +15,7 @@ import {
  * @param {Window} window
  * @return {HostConfig}
  */
-export default function hostPageConfig(window) {
+export function hostPageConfig(window) {
   const config = parseConfigFragment(window.location.href);
 
   // Known configuration parameters which we will import from the host page.

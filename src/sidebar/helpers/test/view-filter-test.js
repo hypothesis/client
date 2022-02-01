@@ -1,4 +1,4 @@
-import filterAnnotations, { $imports } from '../view-filter';
+import { filterAnnotations, $imports } from '../view-filter';
 
 function isoDateWithAge(age) {
   return new Date(Date.now() - age * 1000).toISOString();

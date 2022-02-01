@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import MenuItem from '../MenuItem';
-import { $imports } from '../MenuItem';
+import MenuItem, { $imports } from '../MenuItem';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

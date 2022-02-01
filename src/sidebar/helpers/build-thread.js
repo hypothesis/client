@@ -284,7 +284,7 @@ const replySortCompareFn = (a, b) => {
  * @return {Thread} - The root thread, whose children are the top-level
  *                    annotations to display.
  */
-export default function buildThread(annotations, options) {
+export function buildThread(annotations, options) {
   const hasSelection = options.selected.length > 0;
   const hasForcedVisible = options.forcedVisible.length > 0;
 

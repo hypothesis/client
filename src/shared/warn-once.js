@@ -11,7 +11,7 @@ let shownWarnings = {};
  *   are concatenated into a string key which is used to determine if the warning
  *   has been logged before.
  */
-export default function warnOnce(...args) {
+export function warnOnce(...args) {
   const key = args.join();
   if (key in shownWarnings) {
     return;

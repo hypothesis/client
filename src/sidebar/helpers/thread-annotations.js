@@ -1,8 +1,8 @@
-import buildThread from './build-thread';
+import { buildThread } from './build-thread';
 
-import memoize from '../util/memoize';
+import { memoize } from '../util/memoize';
 import { generateFacetedFilter } from '../util/search-filter';
-import filterAnnotations from './view-filter';
+import { filterAnnotations } from './view-filter';
 import { shouldShowInTab } from './tabs';
 import { sorters } from './thread-sorters';
 
@@ -71,6 +71,4 @@ function buildRootThread(threadState) {
   return buildThread(threadState.annotations, options);
 }
 
-const threadAnnotations = memoize(buildRootThread);
-
-export default threadAnnotations;
+export const threadAnnotations = memoize(buildRootThread);

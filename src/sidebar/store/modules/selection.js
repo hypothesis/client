@@ -381,7 +381,7 @@ const sortKeys = createSelector(
   }
 );
 
-export default createStoreModule(initialState, {
+export const selection = createStoreModule(initialState, {
   namespace: 'selection',
   reducers,
 

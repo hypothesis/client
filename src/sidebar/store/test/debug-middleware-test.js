@@ -2,7 +2,7 @@
 
 import * as redux from 'redux';
 
-import debugMiddleware from '../debug-middleware';
+import { debugMiddleware } from '../debug-middleware';
 
 function id(state) {
   return state;

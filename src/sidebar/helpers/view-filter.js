@@ -158,7 +158,7 @@ const fieldMatchers = {
  * `generateFacetedFilter`.
  * @return {string[]} IDs of matching annotations.
  */
-export default function filterAnnotations(annotations, filters) {
+export function filterAnnotations(annotations, filters) {
   // Convert the input filter object into a filter tree, expanding "any"
   // filters.
   const fieldFilters = Object.entries(filters)

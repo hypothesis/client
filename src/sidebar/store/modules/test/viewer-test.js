@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import viewer from '../viewer';
+import { viewer } from '../viewer';
 
 describe('store/modules/viewer', () => {
   let store;

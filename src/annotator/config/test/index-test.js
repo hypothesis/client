@@ -1,5 +1,4 @@
-import { getConfig } from '../index';
-import { $imports } from '../index';
+import { getConfig, $imports } from '../index';
 
 describe('annotator/config/index', () => {
   let fakeSettingsFrom;
@@ -20,7 +19,7 @@ describe('annotator/config/index', () => {
     fakeIsBrowserExtension = sinon.stub();
 
     $imports.$mock({
-      './settings': fakeSettingsFrom,
+      './settings': { settingsFrom: fakeSettingsFrom },
       './is-browser-extension': {
         isBrowserExtension: fakeIsBrowserExtension,
       },
@@ -135,16 +134,18 @@ describe('annotator/config/index', () => {
     beforeEach(() => {
       // Remove all fake values
       $imports.$mock({
-        './settings': sinon.stub().returns({
-          hostPageSetting: sinon.stub().returns(undefined),
-          annotations: undefined,
-          clientUrl: undefined,
-          group: undefined,
-          notebookAppUrl: undefined,
-          showHighlights: undefined,
-          sidebarAppUrl: undefined,
-          query: undefined,
-        }),
+        './settings': {
+          settingsFrom: sinon.stub().returns({
+            hostPageSetting: sinon.stub().returns(undefined),
+            annotations: undefined,
+            clientUrl: undefined,
+            group: undefined,
+            notebookAppUrl: undefined,
+            showHighlights: undefined,
+            sidebarAppUrl: undefined,
+            query: undefined,
+          }),
+        },
       });
     });
 

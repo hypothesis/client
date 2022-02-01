@@ -1,6 +1,6 @@
 /* global PDFViewerApplication */
 
-import warnOnce from '../../shared/warn-once';
+import { warnOnce } from '../../shared/warn-once';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
 import { TextPosition, TextRange } from './text-range';

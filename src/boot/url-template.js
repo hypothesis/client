@@ -36,7 +36,7 @@ function currentScriptOrigin(document_ = document) {
  * @param {string} url
  * @param {Document} document_
  */
-export default function processUrlTemplate(url, document_ = document) {
+export function processUrlTemplate(url, document_ = document) {
   if (url.indexOf('{') === -1) {
     // Not a template. This should always be the case in production.
     return url;

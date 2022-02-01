@@ -1,9 +1,8 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
 
-import threadAnnotations from '../thread-annotations';
+import { threadAnnotations, $imports } from '../thread-annotations';
 import { sorters } from '../thread-sorters';
-import { $imports } from '../thread-annotations';
-import immutable from '../../util/immutable';
+import { immutable } from '../../util/immutable';
 
 const fixtures = immutable({
   emptyThread: {
@@ -45,9 +44,9 @@ describe('sidebar/helpers/thread-annotations', () => {
     };
 
     $imports.$mock({
-      './build-thread': fakeBuildThread,
+      './build-thread': { buildThread: fakeBuildThread },
       '../util/search-filter': fakeSearchFilter,
-      './view-filter': fakeFilterAnnotations,
+      './view-filter': { filterAnnotations: fakeFilterAnnotations },
     });
   });
 

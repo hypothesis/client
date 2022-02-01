@@ -110,10 +110,12 @@ describe('GroupList', () => {
 
   it('sorts groups within each section by organization', () => {
     const testGroups = populateGroupSections();
-    const fakeGroupOrganizations = groups =>
+    const fakeGroupsByOrganization = groups =>
       groups.sort((a, b) => a.id.localeCompare(b.id));
     $imports.$mock({
-      '../../helpers/group-organizations': fakeGroupOrganizations,
+      '../../helpers/group-organizations': {
+        groupsByOrganization: fakeGroupsByOrganization,
+      },
     });
 
     const wrapper = createGroupList();
@@ -123,7 +125,7 @@ describe('GroupList', () => {
     sections.forEach(section => {
       assert.deepEqual(
         section.prop('groups'),
-        fakeGroupOrganizations(testGroups)
+        fakeGroupsByOrganization(testGroups)
       );
     });
   });

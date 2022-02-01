@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/browser';
 
 import { parseConfigFragment } from '../../shared/config-fragment';
 import { handleErrorsInFrames } from '../../shared/frame-error-capture';
-import warnOnce from '../../shared/warn-once';
+import { warnOnce } from '../../shared/warn-once';
 
 /**
  * @typedef SentryConfig

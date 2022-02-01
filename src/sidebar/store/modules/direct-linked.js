@@ -142,7 +142,7 @@ function directLinkedGroupFetchFailed(state) {
   return state.directLinkedGroupFetchFailed;
 }
 
-export default createStoreModule(initialState, {
+export const directLinked = createStoreModule(initialState, {
   namespace: 'directLinked',
   reducers,
   actionCreators: {

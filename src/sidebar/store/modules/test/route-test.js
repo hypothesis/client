@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import route from '../route';
+import { routeModule as route } from '../route';
 
 describe('store/modules/route', () => {
   let store;
