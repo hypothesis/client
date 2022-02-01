@@ -549,7 +549,7 @@ describe('FrameSyncService', () => {
       frameSync.connect();
       await connectGuest();
 
-      emitGuestEvent('frameDestroyed');
+      emitGuestEvent('close');
 
       assert.called(guestRPC().destroy);
     });
@@ -562,7 +562,7 @@ describe('FrameSyncService', () => {
         frameIdentifier: fixtures.framesListEntry.id,
         uri: 'http://example.org',
       });
-      emitGuestEvent('frameDestroyed');
+      emitGuestEvent('close');
 
       assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
     });

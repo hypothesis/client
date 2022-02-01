@@ -9,7 +9,10 @@ import { registerIcons } from '@hypothesis/frontend-shared';
 import { annotatorIcons } from './icons';
 registerIcons(annotatorIcons);
 
-import { PortProvider } from '../shared/messaging';
+import {
+  PortProvider,
+  installPortCloseWorkaroundForSafari,
+} from '../shared/messaging';
 import { getConfig } from './config/index';
 import { Guest } from './guest';
 import { HypothesisInjector } from './hypothesis-injector';
@@ -52,6 +55,9 @@ function init() {
   const destroyables = [];
 
   if (hostFrame === window) {
+    // Ensure port "close" notifications from eg. guest frames are delivered properly.
+    installPortCloseWorkaroundForSafari();
+
     const sidebarConfig = getConfig('sidebar');
 
     const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;

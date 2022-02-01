@@ -175,23 +175,54 @@ describe('PortRPC', () => {
     assert.calledWith(testMethod, 'second', 'call');
   });
 
-  describe('#disconnect', () => {
-    it('disconnects and returns port', async () => {
-      const rpc = new PortRPC();
-      const testMethod = sinon.stub();
-      rpc.on('test', testMethod);
+  it('should send "connect" event after connection', async () => {
+    const { port1, port2 } = new MessageChannel();
+    const sender = new PortRPC();
+    const receiver = new PortRPC();
+    const connectHandler = sinon.stub();
 
-      assert.isNull(rpc.disconnect());
+    receiver.on('connect', connectHandler);
+    receiver.connect(port2);
+    sender.connect(port1);
 
-      const { port1 } = new MessageChannel();
-      rpc.connect(port1);
+    await waitForMessageDelivery();
 
-      assert.equal(rpc.disconnect(), port1);
-      assert.isNull(rpc.disconnect());
+    assert.calledWith(connectHandler);
+  });
 
-      rpc.call('test');
-      await waitForMessageDelivery();
-      assert.notCalled(testMethod);
-    });
+  it('should send "close" event after port is destroyed', async () => {
+    const { port1, port2 } = new MessageChannel();
+    const sender = new PortRPC();
+    const receiver = new PortRPC();
+    const closeHandler = sinon.stub();
+
+    receiver.on('close', closeHandler);
+    receiver.connect(port2);
+    sender.connect(port1);
+    await waitForMessageDelivery();
+
+    closeHandler.resetHistory();
+    sender.destroy();
+    await waitForMessageDelivery();
+
+    assert.calledWith(closeHandler);
+  });
+
+  it('should send "close" event when window is unloaded', async () => {
+    const { port1, port2 } = new MessageChannel();
+    const sender = new PortRPC();
+    const receiver = new PortRPC();
+    const closeHandler = sinon.stub();
+
+    receiver.on('close', closeHandler);
+    receiver.connect(port2);
+    sender.connect(port1);
+    await waitForMessageDelivery();
+
+    closeHandler.resetHistory();
+    window.dispatchEvent(new Event('unload'));
+    await waitForMessageDelivery();
+
+    assert.calledWith(closeHandler);
   });
 });

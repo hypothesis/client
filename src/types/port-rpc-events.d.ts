@@ -20,10 +20,7 @@ export type GuestToHostEvent =
   /**
    * The guest informs the host that the anchors have been changed in the main annotatable frame.
    */
-  | 'anchorsChanged'
-
-  /** The guest was unloaded. */
-  | 'frameDestroyed';
+  | 'anchorsChanged';
 
 /**
  * Events that the guest sends to the sidebar
@@ -65,10 +62,7 @@ export type GuestToSidebarEvent =
   /**
    * The guest is asking the sidebar to toggle some annotations.
    */
-  | 'toggleAnnotationSelection'
-
-  /** The guest frame was unloaded. */
-  | 'frameDestroyed';
+  | 'toggleAnnotationSelection';
 
 /**
  * Events that the host sends to the guest

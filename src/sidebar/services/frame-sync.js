@@ -249,7 +249,10 @@ export class FrameSyncService {
       });
     });
 
-    guestRPC.on('frameDestroyed', () => {
+    // TODO - Close connection if we don't receive a "connect" message within
+    // a certain time frame.
+
+    guestRPC.on('close', () => {
       const frame = this._store.frames().find(f => f.id === frameIdentifier);
       if (frame) {
         this._store.destroyFrame(frame);
