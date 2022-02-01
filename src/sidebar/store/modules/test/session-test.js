@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import { session } from '../session';
+import { sessionModule } from '../session';
 
 describe('sidebar/store/modules/session', () => {
   let fakeSettings;
@@ -7,7 +7,7 @@ describe('sidebar/store/modules/session', () => {
 
   beforeEach(() => {
     fakeSettings = {};
-    store = createStore([session], [fakeSettings]);
+    store = createStore([sessionModule], [fakeSettings]);
   });
 
   describe('#updateProfile', () => {
@@ -21,7 +21,7 @@ describe('sidebar/store/modules/session', () => {
   describe('#defaultAuthority', () => {
     it('returns the default authority from the settings', () => {
       fakeSettings.authDomain = 'foo.com';
-      store = createStore([session], [fakeSettings]);
+      store = createStore([sessionModule], [fakeSettings]);
 
       assert.equal(store.defaultAuthority(), 'foo.com');
     });

@@ -559,7 +559,7 @@ function savedAnnotations(state) {
   });
 }
 
-export const annotations = createStoreModule(initialState, {
+export const annotationsModule = createStoreModule(initialState, {
   namespace: 'annotations',
   reducers,
   actionCreators: {

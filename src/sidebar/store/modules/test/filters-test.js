@@ -1,6 +1,6 @@
 import { createStore } from '../../create-store';
-import { filters } from '../filters';
-import { selection } from '../selection';
+import { filtersModule } from '../filters';
+import { selectionModule } from '../selection';
 
 describe('sidebar/store/modules/filters', () => {
   let store;
@@ -11,7 +11,7 @@ describe('sidebar/store/modules/filters', () => {
   };
 
   beforeEach(() => {
-    store = createStore([filters, selection], fakeSettings);
+    store = createStore([filtersModule, selectionModule], fakeSettings);
   });
 
   describe('actions', () => {
@@ -88,7 +88,7 @@ describe('sidebar/store/modules/filters', () => {
 
       it('disables focus mode if there is a conflicting filter key', () => {
         store = createStore(
-          [filters],
+          [filtersModule],
           [{ focus: { user: { username: 'somebody' } } }]
         );
 
@@ -286,7 +286,7 @@ describe('sidebar/store/modules/filters', () => {
     describe('getFocusFilters', () => {
       it('returns any set focus filters', () => {
         store = createStore(
-          [filters],
+          [filtersModule],
           [
             {
               focus: {
@@ -313,7 +313,7 @@ describe('sidebar/store/modules/filters', () => {
 
       it('returns true if user-focused mode is active', () => {
         store = createStore(
-          [filters],
+          [filtersModule],
           [{ focus: { user: { username: 'somebody' } } }]
         );
 
@@ -338,7 +338,7 @@ describe('sidebar/store/modules/filters', () => {
 
       it('returns false if user-focused mode is configured but inactive', () => {
         store = createStore(
-          [filters],
+          [filtersModule],
           [{ focus: { user: { username: 'somebody' } } }]
         );
         store.toggleFocusMode(false);

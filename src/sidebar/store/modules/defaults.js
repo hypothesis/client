@@ -49,7 +49,7 @@ function getDefaults(state) {
   return state;
 }
 
-export const defaults = createStoreModule(initialState, {
+export const defaultsModule = createStoreModule(initialState, {
   namespace: 'defaults',
   reducers,
   actionCreators: {

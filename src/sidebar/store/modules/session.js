@@ -117,7 +117,7 @@ function profile(state) {
   return state.profile;
 }
 
-export const session = createStoreModule(initialState, {
+export const sessionModule = createStoreModule(initialState, {
   namespace: 'session',
   reducers,
 

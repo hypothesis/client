@@ -1,11 +1,11 @@
 import { createStore } from '../../create-store';
-import { links } from '../links';
+import { linksModule } from '../links';
 
 describe('sidebar/store/modules/links', () => {
   let store;
 
   beforeEach(() => {
-    store = createStore([links]);
+    store = createStore([linksModule]);
   });
 
   function addLinks() {

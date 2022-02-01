@@ -1,11 +1,11 @@
 import { createStore } from '../../create-store';
-import { defaults } from '../defaults';
+import { defaultsModule } from '../defaults';
 
 describe('store/modules/defaults', () => {
   let store;
 
   beforeEach(() => {
-    store = createStore([defaults]);
+    store = createStore([defaultsModule]);
   });
 
   describe('actions', () => {

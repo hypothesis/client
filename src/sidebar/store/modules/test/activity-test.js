@@ -1,11 +1,11 @@
 import { createStore } from '../../create-store';
-import { activity } from '../activity';
+import { activityModule } from '../activity';
 
 describe('sidebar/store/modules/activity', () => {
   let store;
 
   beforeEach(() => {
-    store = createStore([activity]);
+    store = createStore([activityModule]);
   });
 
   describe('hasFetchedAnnotations', () => {

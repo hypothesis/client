@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import * as util from '../util';
 import { createStoreModule } from '../create-store';
 
-import { session } from './session';
+import { sessionModule } from './session';
 
 /**
  * @typedef {import('../../../types/api').Group} Group
@@ -235,7 +235,7 @@ const getInScopeGroups = createSelector(
 const getMyGroups = createSelector(
   /** @param {{ groups: State, session: SessionState }} rootState */
   rootState => filteredGroups(rootState.groups),
-  rootState => session.selectors.isLoggedIn(rootState.session),
+  rootState => sessionModule.selectors.isLoggedIn(rootState.session),
   (groups, loggedIn) => {
     // If logged out, the Public group still has isMember set to true so only
     // return groups with membership in logged in state.
@@ -261,7 +261,7 @@ const getCurrentlyViewingGroups = createSelector(
   }
 );
 
-export const groups = createStoreModule(initialState, {
+export const groupsModule = createStoreModule(initialState, {
   namespace: 'groups',
   reducers,
   actionCreators: {

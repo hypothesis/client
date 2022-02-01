@@ -1,11 +1,11 @@
 import { createStore } from '../../create-store';
-import { viewer } from '../viewer';
+import { viewerModule } from '../viewer';
 
 describe('store/modules/viewer', () => {
   let store;
 
   beforeEach(() => {
-    store = createStore([viewer]);
+    store = createStore([viewerModule]);
   });
 
   describe('hasSidebarOpened', () => {

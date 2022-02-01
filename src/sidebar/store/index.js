@@ -1,21 +1,21 @@
 import { createStore } from './create-store';
 import { debugMiddleware } from './debug-middleware';
-import { activity } from './modules/activity';
-import { annotations } from './modules/annotations';
-import { defaults } from './modules/defaults';
-import { directLinked } from './modules/direct-linked';
-import { drafts } from './modules/drafts';
-import { filters } from './modules/filters';
-import { framesModule as frames } from './modules/frames';
-import { groups } from './modules/groups';
-import { links } from './modules/links';
-import { realTimeUpdates } from './modules/real-time-updates';
-import { routeModule as route } from './modules/route';
-import { selection } from './modules/selection';
-import { session } from './modules/session';
-import { sidebarPanels } from './modules/sidebar-panels';
-import { toastMessages } from './modules/toast-messages';
-import { viewer } from './modules/viewer';
+import { activityModule } from './modules/activity';
+import { annotationsModule } from './modules/annotations';
+import { defaultsModule } from './modules/defaults';
+import { directLinkedModule } from './modules/direct-linked';
+import { draftsModule } from './modules/drafts';
+import { filtersModule } from './modules/filters';
+import { framesModule } from './modules/frames';
+import { groupsModule } from './modules/groups';
+import { linksModule } from './modules/links';
+import { realTimeUpdatesModule } from './modules/real-time-updates';
+import { routeModule } from './modules/route';
+import { selectionModule } from './modules/selection';
+import { sessionModule } from './modules/session';
+import { sidebarPanelsModule } from './modules/sidebar-panels';
+import { toastMessagesModule } from './modules/toast-messages';
+import { viewerModule } from './modules/viewer';
 
 /**
  * @template M
@@ -23,22 +23,22 @@ import { viewer } from './modules/viewer';
  */
 
 /**
- * @typedef {StoreFromModule<activity> &
- *   StoreFromModule<annotations> &
- *   StoreFromModule<defaults> &
- *   StoreFromModule<directLinked> &
- *   StoreFromModule<drafts> &
- *   StoreFromModule<filters> &
- *   StoreFromModule<frames> &
- *   StoreFromModule<groups> &
- *   StoreFromModule<links> &
- *   StoreFromModule<realTimeUpdates> &
- *   StoreFromModule<route> &
- *   StoreFromModule<selection> &
- *   StoreFromModule<session> &
- *   StoreFromModule<sidebarPanels> &
- *   StoreFromModule<toastMessages> &
- *   StoreFromModule<viewer>
+ * @typedef {StoreFromModule<activityModule> &
+ *   StoreFromModule<annotationsModule> &
+ *   StoreFromModule<defaultsModule> &
+ *   StoreFromModule<directLinkedModule> &
+ *   StoreFromModule<draftsModule> &
+ *   StoreFromModule<filtersModule> &
+ *   StoreFromModule<framesModule> &
+ *   StoreFromModule<groupsModule> &
+ *   StoreFromModule<linksModule> &
+ *   StoreFromModule<realTimeUpdatesModule> &
+ *   StoreFromModule<routeModule> &
+ *   StoreFromModule<selectionModule> &
+ *   StoreFromModule<sessionModule> &
+ *   StoreFromModule<sidebarPanelsModule> &
+ *   StoreFromModule<toastMessagesModule> &
+ *   StoreFromModule<viewerModule>
  *  } SidebarStore
  */
 
@@ -59,22 +59,22 @@ export function createSidebarStore(settings) {
   const middleware = [debugMiddleware];
 
   const modules = [
-    activity,
-    annotations,
-    defaults,
-    directLinked,
-    drafts,
-    filters,
-    frames,
-    links,
-    groups,
-    realTimeUpdates,
-    route,
-    selection,
-    session,
-    sidebarPanels,
-    toastMessages,
-    viewer,
+    activityModule,
+    annotationsModule,
+    defaultsModule,
+    directLinkedModule,
+    draftsModule,
+    filtersModule,
+    framesModule,
+    linksModule,
+    groupsModule,
+    realTimeUpdatesModule,
+    routeModule,
+    selectionModule,
+    sessionModule,
+    sidebarPanelsModule,
+    toastMessagesModule,
+    viewerModule,
   ];
   return /** @type {SidebarStore} */ (
     createStore(modules, [settings], middleware)
