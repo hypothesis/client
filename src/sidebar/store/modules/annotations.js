@@ -19,7 +19,7 @@ import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import * as util from '../util';
 import { createStoreModule } from '../create-store';
 
-import { routeModule as route } from './route';
+import { routeModule } from './route';
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
@@ -267,7 +267,7 @@ function addAnnotations(annotations) {
     // If we're not in the sidebar, we're done here.
     // FIXME Split the annotation-adding from the anchoring code; possibly
     // move into service
-    if (route.selectors.route(getState().route) !== 'sidebar') {
+    if (routeModule.selectors.route(getState().route) !== 'sidebar') {
       return;
     }
 
