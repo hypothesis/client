@@ -1231,48 +1231,6 @@ describe('Guest', () => {
       guest.destroy();
       assert.called(sidebarRPC().destroy);
     });
-
-    it('notifies host frame that guest has been unloaded', () => {
-      const guest = createGuest({ subFrameIdentifier: 'frame-id' });
-
-      const hostPort = {};
-      hostRPC().disconnect.returns(hostPort);
-
-      const sidebarPort = {};
-      sidebarRPC().disconnect.returns(sidebarPort);
-
-      guest.destroy();
-
-      assert.calledWith(
-        hostFrame.postMessage,
-        {
-          type: 'hypothesisGuestUnloaded',
-        },
-        '*',
-        sinon.match.array.contains([sidebarPort, hostPort])
-      );
-    });
-  });
-
-  it('notifies host and sidebar frames when guest is unloaded', () => {
-    createGuest({ subFrameIdentifier: 'frame-id' });
-
-    const hostPort = {};
-    hostRPC().disconnect.returns(hostPort);
-
-    const sidebarPort = {};
-    sidebarRPC().disconnect.returns(sidebarPort);
-
-    window.dispatchEvent(new Event('unload'));
-
-    assert.calledWith(
-      hostFrame.postMessage,
-      {
-        type: 'hypothesisGuestUnloaded',
-      },
-      '*',
-      sinon.match.array.contains([sidebarPort, hostPort])
-    );
   });
 
   it('discovers and creates a channel for communication with the sidebar', async () => {

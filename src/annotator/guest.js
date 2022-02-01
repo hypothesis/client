@@ -216,8 +216,6 @@ export class Guest {
      * @type {Set<string>}
      */
     this._focusedAnnotations = new Set();
-
-    this._listeners.add(window, 'unload', () => this._sendUnloadNotification());
   }
 
   // Add DOM event listeners for clicks, taps etc. on the document and
@@ -435,8 +433,6 @@ export class Guest {
   }
 
   destroy() {
-    this._sendUnloadNotification();
-
     this._portFinder.destroy();
     this._hostRPC.destroy();
     this._sidebarRPC.destroy();
@@ -450,45 +446,6 @@ export class Guest {
     removeAllHighlights(this.element);
 
     this._integration.destroy();
-  }
-
-  /**
-   * Notify other frames that the guest is being unloaded.
-   *
-   * In order to work around a bug in Safari 15 and below [1], this is done by
-   * first sending ports to the host frame and then, from the host frame,
-   * sending messages on the ports.
-   *
-   * [1] https://bugs.webkit.org/show_bug.cgi?id=231167.
-   */
-  _sendUnloadNotification() {
-    const ports = [];
-
-    // There is currently a race condition where the guest can fail to notify
-    // the host and sidebar when it unloads if it has not yet received its ports
-    // for guest-host and guest-sidebar commmunication.
-    //
-    // For the moment this can be tolerated as guest frames are not displayed in
-    // the sidebar until the guest has received the port and sent a
-    // `documentInfoChanged` notification on it. Nevertheless the host / sidebar
-    // will be left with a disconnected PortRPC for the guest, so we should aim
-    // to fix this in future.
-
-    const sidebarPort = this._sidebarRPC.disconnect();
-    if (sidebarPort) {
-      ports.push(sidebarPort);
-    }
-
-    const hostPort = this._hostRPC.disconnect();
-    if (hostPort) {
-      ports.push(hostPort);
-    }
-
-    this._hostFrame.postMessage(
-      { type: 'hypothesisGuestUnloaded' },
-      '*',
-      ports
-    );
   }
 
   /**

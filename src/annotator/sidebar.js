@@ -218,21 +218,6 @@ export class Sidebar {
         this.open();
       }
     });
-
-    // Notify other frames when a guest is unloaded. The ports are first
-    // transferred from the guest to the host frame to work around a bug in
-    // Safari <= 15. See https://bugs.webkit.org/show_bug.cgi?id=231167.
-    this._listeners.add(window, 'message', event => {
-      const { data, ports } = /** @type {MessageEvent} */ (event);
-      if (data?.type === 'hypothesisGuestUnloaded') {
-        for (let port of ports) {
-          const rpc = new PortRPC();
-          rpc.connect(port);
-          rpc.call('frameDestroyed');
-          rpc.destroy();
-        }
-      }
-    });
   }
 
   destroy() {
@@ -316,7 +301,7 @@ export class Sidebar {
       );
     }
 
-    guestRPC.on('frameDestroyed', () => {
+    guestRPC.on('close', () => {
       guestRPC.destroy();
       this._guestRPC = this._guestRPC.filter(rpc => rpc !== guestRPC);
     });
