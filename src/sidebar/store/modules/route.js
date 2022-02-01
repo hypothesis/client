@@ -63,7 +63,7 @@ function routeParams(state) {
   return state.params;
 }
 
-export default createStoreModule(initialState, {
+export const routeModule = createStoreModule(initialState, {
   namespace: 'route',
   reducers,
   actionCreators: {

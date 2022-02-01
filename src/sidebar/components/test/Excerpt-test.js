@@ -39,7 +39,9 @@ describe('Excerpt', () => {
     document.body.appendChild(container);
 
     $imports.$mock({
-      '../util/observe-element-size': fakeObserveElementSize,
+      '../util/observe-element-size': {
+        observeElementSize: fakeObserveElementSize,
+      },
     });
   });
 

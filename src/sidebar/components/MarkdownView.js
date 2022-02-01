@@ -2,7 +2,7 @@ import classnames from 'classnames';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 
 import { replaceLinksWithEmbeds } from '../media-embedder';
-import renderMarkdown from '../render-markdown';
+import { renderMathAndMarkdown as renderMarkdown } from '../render-markdown';
 
 /**
  * @typedef MarkdownViewProps

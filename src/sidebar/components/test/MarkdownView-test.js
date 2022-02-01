@@ -1,23 +1,24 @@
 import { mount } from 'enzyme';
 
-import MarkdownView from '../MarkdownView';
-import { $imports } from '../MarkdownView';
+import MarkdownView, { $imports } from '../MarkdownView';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('MarkdownView', () => {
-  let fakeMediaEmbedder;
-  let fakeRenderMarkdown;
+  let fakeRenderMathAndMarkdown;
+  let fakeReplaceLinksWithEmbeds;
 
   beforeEach(() => {
-    fakeRenderMarkdown = markdown => `rendered:${markdown}`;
-    fakeMediaEmbedder = {
-      replaceLinksWithEmbeds: sinon.stub(),
-    };
+    fakeRenderMathAndMarkdown = markdown => `rendered:${markdown}`;
+    fakeReplaceLinksWithEmbeds = sinon.stub();
 
     $imports.$mock({
-      '../render-markdown': fakeRenderMarkdown,
-      '../media-embedder': fakeMediaEmbedder,
+      '../render-markdown': {
+        renderMathAndMarkdown: fakeRenderMathAndMarkdown,
+      },
+      '../media-embedder': {
+        replaceLinksWithEmbeds: fakeReplaceLinksWithEmbeds,
+      },
     });
   });
 
@@ -46,7 +47,7 @@ describe('MarkdownView', () => {
   it('replaces links with embeds in rendered output', () => {
     const wrapper = mount(<MarkdownView markdown="**test**" />);
     const rendered = wrapper.find('.MarkdownView').getDOMNode();
-    assert.calledWith(fakeMediaEmbedder.replaceLinksWithEmbeds, rendered, {
+    assert.calledWith(fakeReplaceLinksWithEmbeds, rendered, {
       className: 'MarkdownView__embed',
     });
   });

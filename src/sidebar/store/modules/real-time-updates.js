@@ -12,9 +12,9 @@ import { createSelector } from 'reselect';
 import { createStoreModule } from '../create-store';
 import { actionTypes } from '../util';
 
-import annotations from './annotations';
-import groups from './groups';
-import route from './route';
+import { annotations } from './annotations';
+import { groups } from './groups';
+import { routeModule as route } from './route';
 
 const initialState = {
   /**
@@ -193,7 +193,7 @@ function hasPendingDeletion(state, id) {
   return state.pendingDeletions.hasOwnProperty(id);
 }
 
-export default createStoreModule(initialState, {
+export const realTimeUpdates = createStoreModule(initialState, {
   namespace: 'realTimeUpdates',
   reducers,
   actionCreators: {

@@ -1,4 +1,4 @@
-import immutable from '../immutable';
+import { immutable } from '../immutable';
 
 describe('immutable', () => {
   it('deeply freezes objects', () => {

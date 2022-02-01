@@ -1,7 +1,7 @@
 import { useMemo } from 'preact/hooks';
 
 import { useStoreProxy } from '../../store/use-store';
-import threadAnnotations from '../../helpers/thread-annotations';
+import { threadAnnotations } from '../../helpers/thread-annotations';
 
 /** @typedef {import('../../helpers/build-thread').Thread} Thread */
 

@@ -1,7 +1,7 @@
 import * as html from '../html';
 
 import fixture from './html-anchoring-fixture.html';
-import htmlBaselines from './html-baselines';
+import { htmlBaselines } from './html-baselines';
 
 /** Return all text node children of `container`. */
 function textNodes(container) {

@@ -6,8 +6,8 @@ import 'preact/debug';
 
 // Load icons.
 import { registerIcons } from '@hypothesis/frontend-shared';
-import iconSet from './icons';
-registerIcons(iconSet);
+import { annotatorIcons } from './icons';
+registerIcons(annotatorIcons);
 
 import { PortProvider } from '../shared/messaging';
 import { getConfig } from './config/index';

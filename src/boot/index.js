@@ -8,7 +8,7 @@
 import { parseJsonConfig } from './parse-json-config';
 
 import { bootHypothesisClient, bootSidebarApp } from './boot';
-import processUrlTemplate from './url-template';
+import { processUrlTemplate } from './url-template';
 import { isBrowserSupported } from './browser-check';
 
 // @ts-ignore - This file is generated before the boot bundle is built.

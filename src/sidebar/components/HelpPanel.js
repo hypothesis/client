@@ -3,7 +3,7 @@ import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
-import VersionData from '../helpers/version-data';
+import { VersionData } from '../helpers/version-data';
 
 import SidebarPanel from './SidebarPanel';
 import Tutorial from './Tutorial';

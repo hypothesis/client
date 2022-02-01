@@ -1,5 +1,4 @@
-import settingsFrom from '../settings';
-import { $imports } from '../settings';
+import { settingsFrom, $imports } from '../settings';
 
 describe('annotator/config/settingsFrom', () => {
   let fakeConfigFuncSettingsFrom;
@@ -12,7 +11,9 @@ describe('annotator/config/settingsFrom', () => {
     fakeParseJsonConfig = sinon.stub().returns({});
 
     $imports.$mock({
-      './config-func-settings-from': fakeConfigFuncSettingsFrom,
+      './config-func-settings-from': {
+        configFuncSettingsFrom: fakeConfigFuncSettingsFrom,
+      },
       './url-from-link-tag': {
         urlFromLinkTag: fakeUrlFromLinkTag,
       },

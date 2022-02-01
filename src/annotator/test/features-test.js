@@ -16,7 +16,7 @@ describe('features - annotation layer', () => {
   beforeEach(() => {
     fakeWarnOnce = sinon.stub();
     $imports.$mock({
-      '../shared/warn-once': fakeWarnOnce,
+      '../shared/warn-once': { warnOnce: fakeWarnOnce },
     });
 
     features.init({

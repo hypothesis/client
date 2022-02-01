@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import activity from '../activity';
+import { activity } from '../activity';
 
 describe('sidebar/store/modules/activity', () => {
   let store;

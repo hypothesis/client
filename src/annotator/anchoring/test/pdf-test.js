@@ -3,7 +3,7 @@ import * as pdfAnchoring from '../pdf';
 import { matchQuote } from '../match-quote';
 import { TextRange } from '../text-range';
 
-import FakePDFViewerApplication from './fake-pdf-viewer-application';
+import { FakePDFViewerApplication } from './fake-pdf-viewer-application';
 
 /**
  * Return a DOM Range which refers to the specified `text` in `container`.

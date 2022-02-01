@@ -3,7 +3,7 @@ import { createSelector } from 'reselect';
 import * as util from '../util';
 import { createStoreModule } from '../create-store';
 
-import session from './session';
+import { session } from './session';
 
 /**
  * @typedef {import('../../../types/api').Group} Group
@@ -261,7 +261,7 @@ const getCurrentlyViewingGroups = createSelector(
   }
 );
 
-export default createStoreModule(initialState, {
+export const groups = createStoreModule(initialState, {
   namespace: 'groups',
   reducers,
   actionCreators: {

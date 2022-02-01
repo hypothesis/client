@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import sidebarPanels from '../sidebar-panels';
+import { sidebarPanels } from '../sidebar-panels';
 
 describe('sidebar/store/modules/sidebar-panels', () => {
   let store;

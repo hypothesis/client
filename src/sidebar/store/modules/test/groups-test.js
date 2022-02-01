@@ -1,7 +1,7 @@
 import { createStore } from '../../create-store';
-import groups from '../groups';
-import session from '../session';
-import immutable from '../../../util/immutable';
+import { groups } from '../groups';
+import { session } from '../session';
+import { immutable } from '../../../util/immutable';
 
 describe('sidebar/store/modules/groups', () => {
   const publicGroup = immutable({

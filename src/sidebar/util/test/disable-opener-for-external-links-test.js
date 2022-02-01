@@ -1,4 +1,4 @@
-import disableOpenerForExternalLinks from '../disable-opener-for-external-links';
+import { disableOpenerForExternalLinks } from '../disable-opener-for-external-links';
 
 describe('sidebar.util.disable-opener-for-external-links', () => {
   let containerEl;

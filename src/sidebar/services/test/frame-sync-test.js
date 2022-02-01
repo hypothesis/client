@@ -2,7 +2,7 @@ import EventEmitter from 'tiny-emitter';
 
 import { Injector } from '../../../shared/injector';
 import * as annotationFixtures from '../../test/annotation-fixtures';
-import createFakeStore from '../../test/fake-redux-store';
+import { fakeReduxStore } from '../../test/fake-redux-store';
 import { delay } from '../../../test-util/wait';
 
 import { FrameSyncService, $imports, formatAnnot } from '../frame-sync';
@@ -91,7 +91,7 @@ describe('FrameSyncService', () => {
       discover: sinon.stub().resolves(sidebarPort),
     };
 
-    fakeStore = createFakeStore(
+    fakeStore = fakeReduxStore(
       { annotations: [] },
       {
         allAnnotations() {

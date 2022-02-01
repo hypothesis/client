@@ -1,7 +1,7 @@
 import fetchMock from 'fetch-mock';
 
-import FakeWindow from '../../test/fake-window';
-import OAuthClient, { TokenError, $imports } from '../oauth-client';
+import { FakeWindow } from '../../test/fake-window';
+import { OAuthClient, TokenError, $imports } from '../oauth-client';
 
 const fixtures = {
   tokenResponse: {

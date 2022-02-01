@@ -27,7 +27,7 @@ import minimalJSON from './minimal.json';
 import wikipediaDoc from './wikipedia-regression-testing.html';
 import wikipediaJSON from './wikipedia-regression-testing.json';
 
-export default [
+export const htmlBaselines = [
   {
     name: 'Minimal Document',
     html: minimalDoc,

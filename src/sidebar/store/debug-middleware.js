@@ -10,7 +10,7 @@
  *
  * @param {import("redux").Store} store
  */
-export default function debugMiddleware(store) {
+export function debugMiddleware(store) {
   /* eslint-disable no-console */
   let serial = 0;
 

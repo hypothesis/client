@@ -27,7 +27,7 @@ describe('sidebar/util/sentry', () => {
       '../../shared/frame-error-capture': {
         handleErrorsInFrames: fakeHandleErrorsInFrames,
       },
-      '../../shared/warn-once': fakeWarnOnce,
+      '../../shared/warn-once': { warnOnce: fakeWarnOnce },
     });
   });
 

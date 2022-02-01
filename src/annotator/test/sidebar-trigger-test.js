@@ -1,4 +1,4 @@
-import sidebarTrigger from '../sidebar-trigger';
+import { sidebarTrigger } from '../sidebar-trigger';
 
 describe('sidebarTrigger', () => {
   let triggerEl1;

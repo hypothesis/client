@@ -19,7 +19,7 @@ import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import * as util from '../util';
 import { createStoreModule } from '../create-store';
 
-import route from './route';
+import { routeModule as route } from './route';
 
 /**
  * Return a copy of `current` with all matching annotations in `annotations`
@@ -559,7 +559,7 @@ function savedAnnotations(state) {
   });
 }
 
-export default createStoreModule(initialState, {
+export const annotations = createStoreModule(initialState, {
   namespace: 'annotations',
   reducers,
   actionCreators: {

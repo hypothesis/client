@@ -1,4 +1,4 @@
-import fakeStore from '../../test/fake-redux-store';
+import { fakeReduxStore } from '../../test/fake-redux-store';
 
 import * as util from '../util';
 
@@ -194,7 +194,7 @@ describe('sidebar/store/util', () => {
     let store;
 
     beforeEach(() => {
-      store = fakeStore({
+      store = fakeReduxStore({
         fake: { val: 0 },
       });
     });

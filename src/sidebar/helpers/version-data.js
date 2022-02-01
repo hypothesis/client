@@ -19,7 +19,7 @@
  * @prop {DocMetadata} [metadata] - Document metadata
  */
 
-export default class VersionData {
+export class VersionData {
   /**
    * @param {AuthState} userInfo
    * @param {DocumentInfo[]} documentInfo - Metadata for connected frames.

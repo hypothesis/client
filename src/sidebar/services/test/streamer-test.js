@@ -1,7 +1,7 @@
 import EventEmitter from 'tiny-emitter';
 
 import { delay } from '../../../test-util/wait';
-import fakeReduxStore from '../../test/fake-redux-store';
+import { fakeReduxStore } from '../../test/fake-redux-store';
 import { StreamerService, $imports } from '../streamer';
 
 const fixtures = {
@@ -129,7 +129,7 @@ describe('StreamerService', () => {
     fakeWarnOnce = sinon.stub();
 
     $imports.$mock({
-      '../../shared/warn-once': fakeWarnOnce,
+      '../../shared/warn-once': { warnOnce: fakeWarnOnce },
       '../websocket': { Socket: FakeSocket },
     });
   });

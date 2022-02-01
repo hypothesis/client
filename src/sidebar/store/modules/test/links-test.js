@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import links from '../links';
+import { links } from '../links';
 
 describe('sidebar/store/modules/links', () => {
   let store;

@@ -1,9 +1,8 @@
 import { createStore } from '../../create-store';
-import annotations from '../annotations';
-import groups from '../groups';
-import realTimeUpdates from '../real-time-updates';
-import { $imports } from '../real-time-updates';
-import selection from '../selection';
+import { annotations } from '../annotations';
+import { groups } from '../groups';
+import { realTimeUpdates, $imports } from '../real-time-updates';
+import { selection } from '../selection';
 
 const { removeAnnotations } = annotations.actionCreators;
 const { focusGroup } = groups.actionCreators;
@@ -38,17 +37,17 @@ describe('sidebar/store/modules/real-time-updates', () => {
 
     $imports.$mock({
       './annotations': {
-        default: {
+        annotations: {
           selectors: { annotationExists: fakeAnnotationExists },
         },
       },
       './groups': {
-        default: {
+        groups: {
           selectors: { focusedGroupId: fakeFocusedGroupId },
         },
       },
       './route': {
-        default: {
+        routeModule: {
           selectors: { route: fakeRoute },
         },
       },

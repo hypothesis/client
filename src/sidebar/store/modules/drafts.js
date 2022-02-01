@@ -186,7 +186,7 @@ const unsavedAnnotations = createSelector(
   drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );
 
-export default createStoreModule(initialState, {
+export const drafts = createStoreModule(initialState, {
   namespace: 'drafts',
   reducers,
   actionCreators: {

@@ -1,5 +1,5 @@
 import { addConfigFragment } from '../../../shared/config-fragment';
-import hostPageConfig from '../host-config';
+import { hostPageConfig } from '../host-config';
 
 function fakeWindow(config) {
   return {

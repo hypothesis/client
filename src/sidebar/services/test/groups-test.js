@@ -1,5 +1,5 @@
 import { delay, waitFor } from '../../../test-util/wait';
-import fakeReduxStore from '../../test/fake-redux-store';
+import { fakeReduxStore } from '../../test/fake-redux-store';
 import { GroupsService, $imports } from '../groups';
 
 /**

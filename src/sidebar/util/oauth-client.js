@@ -39,7 +39,7 @@ export class TokenError extends Error {
  * OAuthClient handles interaction with the annotation service's OAuth
  * endpoints.
  */
-export default class OAuthClient {
+export class OAuthClient {
   /**
    * Create a new OAuthClient
    *

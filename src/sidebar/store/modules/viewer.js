@@ -43,7 +43,7 @@ function hasSidebarOpened(state) {
   return state.sidebarHasOpened;
 }
 
-export default createStoreModule(initialState, {
+export const viewer = createStoreModule(initialState, {
   namespace: 'viewer',
   reducers,
   actionCreators: {

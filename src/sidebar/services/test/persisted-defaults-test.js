@@ -1,4 +1,4 @@
-import fakeReduxStore from '../../test/fake-redux-store';
+import { fakeReduxStore } from '../../test/fake-redux-store';
 import { PersistedDefaultsService } from '../persisted-defaults';
 
 const DEFAULT_KEYS = {

@@ -1,4 +1,4 @@
-import VersionData from '../version-data';
+import { VersionData } from '../version-data';
 
 describe('sidebar/helpers/version-data', () => {
   let clock;

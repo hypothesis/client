@@ -13,7 +13,7 @@ import { ListenerCollection } from '../../shared/listener-collection';
  *   element when a change in its size is detected.
  * @return {() => void}
  */
-export default function observeElementSize(element, onSizeChanged) {
+export function observeElementSize(element, onSizeChanged) {
   if (typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(() =>
       onSizeChanged(element.clientWidth, element.clientHeight)

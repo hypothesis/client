@@ -1,8 +1,8 @@
 import * as fixtures from '../../../test/annotation-fixtures';
 import * as metadata from '../../../helpers/annotation-metadata';
 import { createStore } from '../../create-store';
-import annotations from '../annotations';
-import route from '../route';
+import { annotations } from '../annotations';
+import { routeModule as route } from '../route';
 
 function createTestStore() {
   return createStore([annotations, route], [{}]);

@@ -1,4 +1,4 @@
-import configFuncSettingsFrom from '../config-func-settings-from';
+import { configFuncSettingsFrom } from '../config-func-settings-from';
 
 describe('annotator.config.configFuncSettingsFrom', () => {
   const sandbox = sinon.createSandbox();

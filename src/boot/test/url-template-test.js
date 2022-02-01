@@ -1,4 +1,4 @@
-import processUrlTemplate from '../url-template';
+import { processUrlTemplate } from '../url-template';
 
 describe('processUrlTemplate', () => {
   let fakeDocument;

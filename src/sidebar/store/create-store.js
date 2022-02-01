@@ -3,7 +3,7 @@
 import * as redux from 'redux';
 import thunk from 'redux-thunk';
 
-import immutable from '../util/immutable';
+import { immutable } from '../util/immutable';
 
 import { createReducer, bindSelectors } from './util';
 

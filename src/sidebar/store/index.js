@@ -1,21 +1,21 @@
 import { createStore } from './create-store';
-import debugMiddleware from './debug-middleware';
-import activity from './modules/activity';
-import annotations from './modules/annotations';
-import defaults from './modules/defaults';
-import directLinked from './modules/direct-linked';
-import drafts from './modules/drafts';
-import filters from './modules/filters';
-import frames from './modules/frames';
-import groups from './modules/groups';
-import links from './modules/links';
-import realTimeUpdates from './modules/real-time-updates';
-import route from './modules/route';
-import selection from './modules/selection';
-import session from './modules/session';
-import sidebarPanels from './modules/sidebar-panels';
-import toastMessages from './modules/toast-messages';
-import viewer from './modules/viewer';
+import { debugMiddleware } from './debug-middleware';
+import { activity } from './modules/activity';
+import { annotations } from './modules/annotations';
+import { defaults } from './modules/defaults';
+import { directLinked } from './modules/direct-linked';
+import { drafts } from './modules/drafts';
+import { filters } from './modules/filters';
+import { framesModule as frames } from './modules/frames';
+import { groups } from './modules/groups';
+import { links } from './modules/links';
+import { realTimeUpdates } from './modules/real-time-updates';
+import { routeModule as route } from './modules/route';
+import { selection } from './modules/selection';
+import { session } from './modules/session';
+import { sidebarPanels } from './modules/sidebar-panels';
+import { toastMessages } from './modules/toast-messages';
+import { viewer } from './modules/viewer';
 
 /**
  * @template M

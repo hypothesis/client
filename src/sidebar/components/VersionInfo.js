@@ -5,7 +5,7 @@ import { withServices } from '../service-context';
 
 /**
  * @typedef VersionInfoProps
- * @prop {import('../helpers/version-data').default} versionData - Object with version information
+ * @prop {import('../helpers/version-data').VersionData} versionData - Object with version information
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 

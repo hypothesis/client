@@ -56,7 +56,7 @@ import pointerIcon from '../images/icons/pointer.svg';
  * Set of icons used by the sidebar application via the `SvgIcon`
  * component.
  */
-export default {
+export const sidebarIcons = {
   add: plus,
   annotate: annotateIcon,
   'arrow-left': arrowLeft,

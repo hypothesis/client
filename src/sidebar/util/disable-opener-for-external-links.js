@@ -15,7 +15,7 @@
  *
  * @param {Element} root - Root element
  */
-export default function disableOpenerForExternalLinks(root) {
+export function disableOpenerForExternalLinks(root) {
   root.addEventListener('click', event => {
     const target = /** @type {HTMLElement} */ (event.target);
 

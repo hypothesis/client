@@ -9,7 +9,7 @@ import { annotationCounts } from './annotation-counts';
 import { BucketBar } from './bucket-bar';
 import { createAppConfig } from './config/app';
 import { features } from './features';
-import sidebarTrigger from './sidebar-trigger';
+import { sidebarTrigger } from './sidebar-trigger';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
 

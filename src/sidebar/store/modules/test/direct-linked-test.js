@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import directLinked from '../direct-linked';
+import { directLinked } from '../direct-linked';
 
 describe('sidebar/store/modules/direct-linked', () => {
   let store;

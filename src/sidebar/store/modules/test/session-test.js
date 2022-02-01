@@ -1,5 +1,5 @@
 import { createStore } from '../../create-store';
-import session from '../session';
+import { session } from '../session';
 
 describe('sidebar/store/modules/session', () => {
   let fakeSettings;

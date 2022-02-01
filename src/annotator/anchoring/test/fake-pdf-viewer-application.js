@@ -251,7 +251,7 @@ class FakePDFViewer {
  *
  * The original is defined at https://github.com/mozilla/pdf.js/blob/master/web/app.js
  */
-export default class FakePDFViewerApplication {
+export class FakePDFViewerApplication {
   /**
    * @param {Options} options
    */

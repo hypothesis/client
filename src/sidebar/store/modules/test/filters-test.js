@@ -1,6 +1,6 @@
 import { createStore } from '../../create-store';
-import filters from '../filters';
-import selection from '../selection';
+import { filters } from '../filters';
+import { selection } from '../selection';
 
 describe('sidebar/store/modules/filters', () => {
   let store;
