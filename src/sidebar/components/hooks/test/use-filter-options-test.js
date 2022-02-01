@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import { useUserFilterOptions } from '../use-filter-options';
-import { $imports } from '../use-filter-options';
+import { useUserFilterOptions, $imports } from '../use-filter-options';
 
 describe('sidebar/components/hooks/use-user-filter-options', () => {
   let fakeAccountId;

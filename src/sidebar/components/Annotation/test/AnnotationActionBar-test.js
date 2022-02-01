@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import AnnotationActionBar from '../AnnotationActionBar';
-import { $imports } from '../AnnotationActionBar';
+import AnnotationActionBar, { $imports } from '../AnnotationActionBar';
 
 import * as fixtures from '../../../test/annotation-fixtures';
 

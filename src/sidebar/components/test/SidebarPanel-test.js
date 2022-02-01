@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import SidebarPanel from '../SidebarPanel';
-import { $imports } from '../SidebarPanel';
+import SidebarPanel, { $imports } from '../SidebarPanel';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import LoggedOutMessage from '../LoggedOutMessage';
-import { $imports } from '../LoggedOutMessage';
+import LoggedOutMessage, { $imports } from '../LoggedOutMessage';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

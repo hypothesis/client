@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
-import LoginPromptPanel from '../LoginPromptPanel';
-import { $imports } from '../LoginPromptPanel';
+import LoginPromptPanel, { $imports } from '../LoginPromptPanel';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 
 import * as fixtures from '../../test/annotation-fixtures';
-import ModerationBanner from '../ModerationBanner';
-import { $imports } from '../ModerationBanner';
+import ModerationBanner, { $imports } from '../ModerationBanner';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
