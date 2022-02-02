@@ -10,19 +10,7 @@
 
 @use './base';
 
-// Shared styles
-// -----------------
-@use '@hypothesis/frontend-shared/styles';
-
-// Extensions and overrides to patterns from `frontend-shared`
-@use '../frontend-shared';
-
-// Annotator-specific components.
-@use './components/AdderToolbar';
-@use './components/Buckets';
-@use './components/NotebookModal';
-@use './components/Toolbar';
-@use './components/WarningBanner';
+@use './components';
 
 @use './utilities';
 
