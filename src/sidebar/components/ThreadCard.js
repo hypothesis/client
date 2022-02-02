@@ -70,7 +70,7 @@ function ThreadCard({ frameSync, thread }) {
       onMouseEnter={() => focusThreadAnnotation(threadTag)}
       onMouseLeave={() => focusThreadAnnotation(null)}
       key={thread.id}
-      className={classnames('ThreadCard', {
+      className={classnames('ThreadCard p-3', {
         'is-focused': isFocused,
       })}
     >
