@@ -97,31 +97,7 @@ describe('ModerationBanner', () => {
   it('displays the number of flags the annotation has received', () => {
     const ann = fixtures.moderatedAnnotation({ flagCount: 10 });
     const wrapper = createComponent({ annotation: ann });
-    assert.include(wrapper.text(), 'Flagged for review x10');
-  });
-
-  it('displays in a more compact form if the annotation is a reply', () => {
-    const wrapper = createComponent({
-      annotation: {
-        ...fixtures.oldReply(),
-        moderation: {
-          flagCount: 10,
-        },
-      },
-    });
-    wrapper.exists('.is-reply');
-  });
-
-  it('does not display in a more compact form if the annotation is not a reply', () => {
-    const wrapper = createComponent({
-      annotation: {
-        ...fixtures.moderatedAnnotation({}),
-        moderation: {
-          flagCount: 10,
-        },
-      },
-    });
-    assert.isFalse(wrapper.exists('.is-reply'));
+    assert.include(wrapper.text(), 'Flagged for review by 10 users');
   });
 
   it('reports if the annotation was hidden', () => {

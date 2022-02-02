@@ -1,3 +1,4 @@
+import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { useStoreProxy } from '../store/use-store';
@@ -60,40 +61,58 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
       });
   };
 
-  const toggleButtonProps = (() => {
-    const buttonProps = {};
-    if (annotation.hidden) {
-      buttonProps.onClick = unhideAnnotation;
-      buttonProps.title = 'Make this annotation visible to everyone';
-    } else {
-      buttonProps.onClick = hideAnnotation;
-      buttonProps.title = 'Hide this annotation from non-moderators';
-    }
-    buttonProps['aria-label'] = buttonProps.title;
-    return buttonProps;
-  })();
-
-  const bannerClasses = classnames('ModerationBanner', {
-    'is-flagged': flagCount !== null && flagCount > 0,
-    'is-hidden': annotation.hidden,
-    'is-reply': annotationMetadata.isReply(annotation),
-  });
-
   if (!isHiddenOrFlagged) {
     return null;
   }
   return (
-    <div className={bannerClasses}>
-      {!!flagCount && !annotation.hidden && (
-        <span>Flagged for review x{flagCount}</span>
+    <div
+      className={classnames(
+        'flex gap-x-3 bg-grey-1 text-color-text font-semibold',
+        // Vertical margins should ultimately be handled by the parent, but
+        // until we can refactor outer components (e.g. `ThreadCard`), this
+        // component manages its own bottom margin
+        'mb-2 ',
+        {
+          // For top-level annotations, use negative margins to "break out" of
+          // the parent card's 3-unit padding and have the banner span the
+          // full card width with no padding
+          '-mt-3 -ml-3 -mr-3': !annotationMetadata.isReply(annotation),
+          // For replies, break out of the right padding only
+          '-mr-3': annotationMetadata.isReply(annotation),
+        }
       )}
-      {annotation.hidden && (
-        <span>Hidden from users. Flagged x{flagCount}</span>
-      )}
-      <span className="hyp-u-stretch" />
-      <button {...toggleButtonProps}>
-        {annotation.hidden ? 'Unhide' : 'Hide'}
-      </button>
+    >
+      <div
+        className={classnames('p-3 text-white', {
+          'bg-red-error': !annotation.hidden,
+          'bg-grey-6': annotation.hidden,
+        })}
+      >
+        <Icon name={annotation.hidden ? 'hide' : 'flag'} />
+      </div>
+      <div className="self-center grow">
+        {!annotation.hidden && (
+          <span>
+            Flagged for review by {flagCount}{' '}
+            {flagCount === 1 ? 'user' : 'users'}
+          </span>
+        )}
+        {annotation.hidden && <span>Hidden from users</span>}
+      </div>
+      <div className="self-center pr-2">
+        <LabeledButton
+          classes="py-1 bg-slate-1"
+          onClick={annotation.hidden ? unhideAnnotation : hideAnnotation}
+          title={
+            annotation.hidden
+              ? 'Make this annotation visible to everyone'
+              : 'Hide this annotationn from non-moderators'
+          }
+          variant="dark"
+        >
+          {annotation.hidden ? 'Unhide' : 'Hide'}
+        </LabeledButton>
+      </div>
     </div>
   );
 }
