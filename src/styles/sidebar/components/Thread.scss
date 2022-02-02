@@ -43,7 +43,10 @@
     // centered on the parent element's right border and aligned vertically
     // with the content on the right
     top: -0.25em;
-    left: -1em;
+    // TODO: This whole component is ready to be converted to rems and tailwind
+    // This particular position needs to be updated to rem to align with outer
+    // containers
+    left: -0.75rem;
     // Give a non-transparent background to this element so that the dashed
     // border (vertical) on the parent element doesn't show through the
     // child button
