@@ -10,14 +10,7 @@ export default {
   ],
   theme: {
     extend: {
-      borderColor: {
-        DEFAULT: '#dbdbdb', // TODO: remove when available from upstream preset
-      },
       colors: {
-        'color-text': {
-          // TODO: remove when available from upstream preset
-          DEFAULT: '#202020',
-          light: '#737373',
         },
       },
       fontFamily: {
