@@ -11,6 +11,9 @@ export default {
   theme: {
     extend: {
       colors: {
+        slate: {
+          // TODO remove when available from upstream preset
+          1: '#e3e3e5',
         },
       },
       fontFamily: {
