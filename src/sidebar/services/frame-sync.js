@@ -35,22 +35,18 @@ export function formatAnnot({ $tag, target, uri }) {
 }
 
 /**
- * Return the frame in `frames` which best matches `ann`.
+ * Return the frame which best matches an annotation.
+ *
+ * If there is a frame whose URL exactly matches the annotation, it will be
+ * returned. Otherwise the main frame will be returned. Currently this may fail
+ * to return the expected frame if an annotation was fetched from h that
+ * does not match one of the frame URIs. This can happen due to URI expansion /
+ * document equivalence in h.
  *
  * @param {Frame[]} frames
  * @param {Annotation} ann
  */
 function frameForAnnotation(frames, ann) {
-  // Choose the frame whose URL exactly matches this annotation. If there is
-  // none, we'll use the main frame.
-  //
-  // An annotation's URI may not match the frame URI. To handle these
-  // cases we'll need to either make separate search API calls for each
-  // frame, or get the backend to return information about which search
-  // URIs matched a frame.
-  //
-  // If there are multiple frames with a matching URI, we'll send it
-  // whichever one connected first, which is usually the main frame.
   const frame = frames.find(f => f.uri === ann.uri);
   if (frame) {
     return frame;
