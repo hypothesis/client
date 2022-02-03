@@ -82,8 +82,6 @@
  * @typedef Annotator
  * @prop {Anchor[]} anchors
  * @prop {(ann: AnnotationData) => Promise<Anchor[]>} anchor
- * @prop {(frame: HTMLIFrameElement) => void} injectClient - Inject the Hypothesis client
- *   into a same-origin iframe in guest mode.
  */
 
 /**

@@ -1,6 +1,6 @@
 import { delay } from '../../../test-util/wait';
 import {
-  VitalSourceContainerIntegration,
+  VitalSourceInjector,
   VitalSourceContentIntegration,
   vitalSourceFrameRole,
   $imports,
@@ -57,6 +57,7 @@ describe('annotator/integrations/vitalsource', () => {
   let fakeViewer;
   let FakeHTMLIntegration;
   let fakeHTMLIntegration;
+  let fakeInjectClient;
 
   beforeEach(() => {
     fakeViewer = new FakeVitalSourceViewer();
@@ -71,8 +72,11 @@ describe('annotator/integrations/vitalsource', () => {
 
     FakeHTMLIntegration = sinon.stub().returns(fakeHTMLIntegration);
 
+    fakeInjectClient = sinon.stub();
+
     $imports.$mock({
       './html': { HTMLIntegration: FakeHTMLIntegration },
+      '../hypothesis-injector': { injectClient: fakeInjectClient },
     });
   });
 
@@ -99,57 +103,57 @@ describe('annotator/integrations/vitalsource', () => {
     });
   });
 
-  describe('VitalSourceContainerIntegration', () => {
-    let fakeGuest;
-    let integration;
+  describe('VitalSourceInjector', () => {
+    let fakeConfig;
+    let injector;
 
     beforeEach(() => {
-      fakeGuest = {
-        injectClient: sinon.stub(),
+      fakeConfig = {
+        clientUrl: 'https://hypothes.is',
       };
-      integration = new VitalSourceContainerIntegration(fakeGuest);
+      injector = new VitalSourceInjector(fakeConfig);
     });
 
     afterEach(() => {
-      integration.destroy();
+      injector.destroy();
     });
 
     it('throws if constructed outside the VitalSource book reader', () => {
       fakeViewer.destroy();
       assert.throws(() => {
-        new VitalSourceContainerIntegration(fakeGuest);
+        new VitalSourceInjector(fakeConfig);
       }, 'Book container element not found');
     });
 
     it('injects client into content frame', () => {
-      assert.calledWith(fakeGuest.injectClient, fakeViewer.contentFrame);
+      assert.calledWith(fakeInjectClient, fakeViewer.contentFrame, fakeConfig);
     });
 
     it('re-injects client when content frame is changed', async () => {
-      fakeGuest.injectClient.resetHistory();
+      fakeInjectClient.resetHistory();
 
       fakeViewer.beginChapterLoad();
       await delay(0);
-      assert.notCalled(fakeGuest.injectClient);
+      assert.notCalled(fakeInjectClient);
 
       fakeViewer.finishChapterLoad();
       await delay(0);
-      assert.calledWith(fakeGuest.injectClient, fakeViewer.contentFrame);
+      assert.calledWith(fakeInjectClient, fakeViewer.contentFrame, fakeConfig);
     });
 
     it("doesn't re-inject if content frame is removed", async () => {
-      fakeGuest.injectClient.resetHistory();
+      fakeInjectClient.resetHistory();
 
       // Remove the content frame. This will trigger a re-injection check, but
       // do nothing as there is no content frame.
       fakeViewer.contentFrame.remove();
       await delay(0);
 
-      assert.notCalled(fakeGuest.injectClient);
+      assert.notCalled(fakeInjectClient);
     });
 
     it("doesn't re-inject if content frame siblings change", async () => {
-      fakeGuest.injectClient.resetHistory();
+      fakeInjectClient.resetHistory();
 
       // Modify the DOM tree. This will trigger a re-injection check, but do
       // nothing as we've already handled the current frame.
@@ -159,23 +163,7 @@ describe('annotator/integrations/vitalsource', () => {
       );
       await delay(0);
 
-      assert.notCalled(fakeGuest.injectClient);
-    });
-
-    it('does not allow annotation in the container frame', async () => {
-      assert.equal(integration.canAnnotate(), false);
-
-      // Briefly check the results of the stub methods.
-      assert.instanceOf(await integration.anchor(), Range);
-      assert.throws(() => integration.describe());
-      assert.equal(integration.fitSideBySide(), false);
-      assert.deepEqual(await integration.getMetadata(), {
-        title: '',
-        link: [],
-      });
-      assert.equal(await integration.uri(), document.location.href);
-      assert.equal(integration.contentContainer(), document.body);
-      await integration.scrollToAnchor({}); // nb. No assert, this does nothing.
+      assert.notCalled(fakeInjectClient);
     });
   });
 

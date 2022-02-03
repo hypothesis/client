@@ -1,6 +1,7 @@
 import { ListenerCollection } from '../../shared/listener-collection';
 import { HTMLIntegration } from './html';
 import { ImageTextLayer } from './image-text-layer';
+import { injectClient } from '../hypothesis-injector';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -38,18 +39,14 @@ export function vitalSourceFrameRole(window_ = window) {
 }
 
 /**
- * Integration for the container frame in VitalSource's Bookshelf ebook reader.
- *
- * This frame cannot be annotated directly. This integration serves only to
- * load the client into the frame that contains the book content.
- *
- * @implements {Integration}
+ * Observe the book content iframe and load the client into this frame.
  */
-export class VitalSourceContainerIntegration {
+export class VitalSourceInjector {
   /**
-   * @param {Annotator} annotator
+   * @param {Record<string, any>} config - Annotator configuration that is
+   *   injected, along with the Hypothesis client, into the book content iframes
    */
-  constructor(annotator) {
+  constructor(config) {
     const bookElement = findBookElement();
     if (!bookElement) {
       throw new Error('Book container element not found');
@@ -72,7 +69,7 @@ export class VitalSourceContainerIntegration {
       // being called again once loading completes.
       const isBookContent = frame.contentDocument?.querySelector('p');
       if (isBookContent) {
-        annotator.injectClient(frame);
+        injectClient(frame, config);
       }
     };
 
@@ -101,35 +98,6 @@ export class VitalSourceContainerIntegration {
   destroy() {
     this._frameObserver.disconnect();
   }
-
-  canAnnotate() {
-    // No part of the container frame can be annotated.
-    return false;
-  }
-
-  // The methods below are all stubs. Creating annotations is not supported
-  // in the container frame.
-  async anchor() {
-    return new Range();
-  }
-
-  /** @return {Selector[]} */
-  describe() {
-    throw new Error('This frame cannot be annotated');
-  }
-  contentContainer() {
-    return document.body;
-  }
-  fitSideBySide() {
-    return false;
-  }
-  async getMetadata() {
-    return { title: '', link: [] };
-  }
-  async uri() {
-    return document.location.href;
-  }
-  async scrollToAnchor() {}
 }
 
 /**

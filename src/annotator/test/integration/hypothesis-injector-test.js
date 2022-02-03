@@ -1,6 +1,10 @@
 import { delay } from '../../../test-util/wait';
 import { DEBOUNCE_WAIT, onDocumentReady } from '../../frame-observer';
-import { HypothesisInjector, $imports } from '../../hypothesis-injector';
+import {
+  HypothesisInjector,
+  injectClient,
+  $imports,
+} from '../../hypothesis-injector';
 
 describe('HypothesisInjector integration test', () => {
   let container;
@@ -64,20 +68,19 @@ describe('HypothesisInjector integration test', () => {
     container.remove();
   });
 
-  describe('#injectClient', () => {
+  describe('injectClient', () => {
     it('configures client', async () => {
       const frame = document.createElement('iframe');
       container.append(frame);
-      const injector = createHypothesisInjector();
 
-      await injector.injectClient(frame);
+      await injectClient(frame, { clientUrl: 'https://hyp.is' });
 
       const configElement = frame.contentDocument.querySelector(
         '.js-hypothesis-config'
       );
       const config = JSON.parse(configElement.textContent);
 
-      assert.match(config.subFrameIdentifier, /[0-9]+/);
+      assert.match(config.subFrameIdentifier, /[a-f0-9]+/);
       assert.notOk(config.assetRoot);
       assert.notOk(config.notebookAppUrl);
       assert.notOk(config.sidebarAppUrl);
@@ -85,6 +88,7 @@ describe('HypothesisInjector integration test', () => {
 
     it('copies client asset locations from host frame', async () => {
       hostJSONConfig = {
+        clientUrl: 'chrome-extension:///o',
         assetRoot: 'chrome-extension://abc/client',
         notebookAppUrl: 'chrome-extension://abc/client/notebook.html',
         sidebarAppUrl: 'chrome-extension://abc/client/sidebar.html',
@@ -92,9 +96,8 @@ describe('HypothesisInjector integration test', () => {
 
       const frame = document.createElement('iframe');
       container.append(frame);
-      const injector = createHypothesisInjector();
 
-      await injector.injectClient(frame);
+      await injectClient(frame, hostJSONConfig);
 
       const configElement = frame.contentDocument.querySelector(
         '.js-hypothesis-config'

@@ -2,7 +2,6 @@ import { HTMLIntegration } from './html';
 import { PDFIntegration, isPDF } from './pdf';
 import {
   VitalSourceContentIntegration,
-  VitalSourceContainerIntegration,
   vitalSourceFrameRole,
 } from './vitalsource';
 
@@ -15,7 +14,7 @@ import {
  * Create the integration that handles document-type specific aspects of
  * guest functionality.
  *
- * @param {Annotator} annotator
+ * @param {Pick<Annotator, 'anchor'|'anchors'>} annotator
  * @return {Integration}
  */
 export function createIntegration(annotator) {
@@ -24,9 +23,7 @@ export function createIntegration(annotator) {
   }
 
   const vsFrameRole = vitalSourceFrameRole();
-  if (vsFrameRole === 'container') {
-    return new VitalSourceContainerIntegration(annotator);
-  } else if (vsFrameRole === 'content') {
+  if (vsFrameRole === 'content') {
     return new VitalSourceContentIntegration();
   }
 

@@ -39,8 +39,6 @@ describe('Guest', () => {
   let fakeBucketBarClient;
   let fakeCreateIntegration;
   let fakeFindClosestOffscreenAnchor;
-  let FakeHypothesisInjector;
-  let fakeHypothesisInjector;
   let fakeIntegration;
   let fakePortFinder;
   let FakePortRPC;
@@ -124,12 +122,6 @@ describe('Guest', () => {
 
     fakeFindClosestOffscreenAnchor = sinon.stub();
 
-    fakeHypothesisInjector = {
-      destroy: sinon.stub(),
-      injectClient: sinon.stub().resolves(),
-    };
-    FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
-
     fakeIntegration = {
       anchor: sinon.stub(),
       canAnnotate: sinon.stub().returns(true),
@@ -146,12 +138,6 @@ describe('Guest', () => {
     };
 
     fakeCreateIntegration = sinon.stub().returns(fakeIntegration);
-
-    fakeHypothesisInjector = {
-      destroy: sinon.stub(),
-      injectClient: sinon.stub().resolves(),
-    };
-    FakeHypothesisInjector = sinon.stub().returns(fakeHypothesisInjector);
 
     fakePortFinder = {
       discover: sinon.stub().resolves({}),
@@ -178,7 +164,6 @@ describe('Guest', () => {
         BucketBarClient: FakeBucketBarClient,
       },
       './highlighter': highlighter,
-      './hypothesis-injector': { HypothesisInjector: FakeHypothesisInjector },
       './integrations': {
         createIntegration: fakeCreateIntegration,
       },
@@ -1290,12 +1275,6 @@ describe('Guest', () => {
     );
   });
 
-  it('stops injecting client into annotation-enabled iframes', () => {
-    const guest = createGuest();
-    guest.destroy();
-    assert.calledWith(fakeHypothesisInjector.destroy);
-  });
-
   it('discovers and creates a channel for communication with the sidebar', async () => {
     const { port1 } = new MessageChannel();
     fakePortFinder.discover.resolves(port1);
@@ -1359,35 +1338,6 @@ describe('Guest', () => {
       fakeIntegration.fitSideBySide.returns(true);
       guest.fitSideBySide(layout);
       assert.isTrue(guest.sideBySideActive);
-    });
-  });
-
-  describe('#injectClient', () => {
-    it('injects client into target frame', async () => {
-      const config = {};
-      const guest = createGuest({});
-      const frame = {};
-
-      await guest.injectClient(frame);
-
-      assert.calledWith(FakeHypothesisInjector, guest.element, config);
-      assert.calledWith(fakeHypothesisInjector.injectClient, frame);
-    });
-
-    it('can be called by the integration when created', async () => {
-      const config = {};
-      const frame = {};
-
-      // Simulate the integration injecting the client into pre-existing content
-      // frames when created. The VitalSource integration does this for example.
-      fakeCreateIntegration.callsFake(annotator => {
-        annotator.injectClient(frame);
-        return fakeIntegration;
-      });
-      const guest = createGuest({});
-
-      assert.calledWith(FakeHypothesisInjector, guest.element, config);
-      assert.calledWith(fakeHypothesisInjector.injectClient, frame);
     });
   });
 });
