@@ -13,7 +13,6 @@ import {
   setHighlightsFocused,
   setHighlightsVisible,
 } from './highlighter';
-import { HypothesisInjector } from './hypothesis-injector';
 import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
 import { SelectionObserver } from './selection-observer';
@@ -176,10 +175,6 @@ export class Guest {
       source: 'guest',
     });
 
-    // Set up automatic and integration-triggered injection of client into
-    // iframes in this frame.
-    this._hypothesisInjector = new HypothesisInjector(this.element, config);
-
     /**
      * Integration that handles document-type specific functionality in the
      * guest.
@@ -280,15 +275,6 @@ export class Guest {
     });
 
     this._listeners.add(window, 'resize', () => this._repositionAdder());
-  }
-
-  /**
-   * Inject the Hypothesis client into a guest frame.
-   *
-   * @param {HTMLIFrameElement} frame
-   */
-  async injectClient(frame) {
-    return this._hypothesisInjector.injectClient(frame);
   }
 
   /**
@@ -458,7 +444,6 @@ export class Guest {
     this._hostRPC.destroy();
     this._sidebarRPC.destroy();
 
-    this._hypothesisInjector.destroy();
     this._listeners.removeAll();
 
     this._selectionObserver.disconnect();

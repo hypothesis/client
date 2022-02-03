@@ -12,6 +12,11 @@ registerIcons(annotatorIcons);
 import { PortProvider } from '../shared/messaging';
 import { getConfig } from './config/index';
 import { Guest } from './guest';
+import { HypothesisInjector } from './hypothesis-injector';
+import {
+  VitalSourceInjector,
+  vitalSourceFrameRole,
+} from './integrations/vitalsource';
 import { Notebook } from './notebook';
 import { Sidebar } from './sidebar';
 import { EventBus } from './util/emitter';
@@ -41,8 +46,11 @@ function init() {
 
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
+  /** @type {Sidebar|undefined} */
   let sidebar;
+  /** @type {Notebook|undefined} */
   let notebook;
+  /** @type {PortProvider|undefined} */
   let portProvider;
   if (hostFrame === window) {
     const sidebarConfig = getConfig('sidebar');
@@ -55,18 +63,34 @@ function init() {
     notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
 
     portProvider.on('frameConnected', (source, port) =>
-      sidebar.onFrameConnected(source, port)
+      /** @type {Sidebar} */ (sidebar).onFrameConnected(source, port)
     );
   }
 
-  // Create the guest that handles creating annotations and displaying highlights.
-  const guest = new Guest(document.body, annotatorConfig, hostFrame);
+  /** @type {Guest|undefined} */
+  let guest;
+  /** @type {VitalSourceInjector|undefined} */
+  let vitalSourceInjector;
+  /** @type {HypothesisInjector|undefined} */
+  let hypothesisInjector;
+  const vsFrameRole = vitalSourceFrameRole();
+  if (vsFrameRole === 'container') {
+    vitalSourceInjector = new VitalSourceInjector(annotatorConfig);
+  } else {
+    // Set up automatic and integration-triggered injection of client into
+    // iframes in this frame.
+    hypothesisInjector = new HypothesisInjector(document.body, annotatorConfig);
+    // Create the guest that handles creating annotations and displaying highlights.
+    guest = new Guest(document.body, annotatorConfig, hostFrame);
+  }
 
   sidebarLinkElement.addEventListener('destroy', () => {
     portProvider?.destroy();
     sidebar?.destroy();
     notebook?.destroy();
-    guest.destroy();
+    vitalSourceInjector?.destroy();
+    hypothesisInjector?.destroy();
+    guest?.destroy();
 
     // Remove all the `<link>`, `<script>` and `<style>` elements added to the
     // page by the boot script.
