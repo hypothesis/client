@@ -14,7 +14,7 @@ import {
  * Create the integration that handles document-type specific aspects of
  * guest functionality.
  *
- * @param {Pick<Annotator, 'anchor'|'anchors'>} annotator
+ * @param {Annotator} annotator
  * @return {Integration}
  */
 export function createIntegration(annotator) {

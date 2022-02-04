@@ -39,7 +39,8 @@ export function vitalSourceFrameRole(window_ = window) {
 }
 
 /**
- * Observe the book content iframe and load the client into this frame.
+ * VitalSourceInjector runs in the book container frame and loads the client into
+ * book content frames.
  */
 export class VitalSourceInjector {
   /**

@@ -88,7 +88,7 @@ describe('HypothesisInjector integration test', () => {
 
     it('copies client asset locations from host frame', async () => {
       hostJSONConfig = {
-        clientUrl: 'chrome-extension:///o',
+        clientUrl: 'chrome-extension://abc/client/build/boot.js',
         assetRoot: 'chrome-extension://abc/client',
         notebookAppUrl: 'chrome-extension://abc/client/notebook.html',
         sidebarAppUrl: 'chrome-extension://abc/client/sidebar.html',
