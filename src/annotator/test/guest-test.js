@@ -1285,7 +1285,7 @@ describe('Guest', () => {
     assert.calledWith(sidebarRPC().connect, port1);
   });
 
-  it('configures the BucketBarClient if guest is the main annotatable frame', () => {
+  it('configures the BucketBarClient', () => {
     const contentContainer = document.createElement('div');
     fakeIntegration.contentContainer.returns(contentContainer);
 
@@ -1295,12 +1295,6 @@ describe('Guest', () => {
       contentContainer,
       hostRPC: hostRPC(),
     });
-  });
-
-  it('does not configure the BucketBarClient if guest is not the main annotatable frame', () => {
-    createGuest({ subFrameIdentifier: 'frame-id' });
-
-    assert.notCalled(FakeBucketBarClient);
   });
 
   it('sends document metadata and URIs to sidebar', async () => {

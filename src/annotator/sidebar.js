@@ -301,15 +301,20 @@ export class Sidebar {
     );
 
     // The listener will do nothing if the sidebar doesn't have a bucket bar
-    // (clean theme), but it is still actively listening.
-    guestRPC.on(
-      'anchorsChanged',
-      /** @param {AnchorPosition[]} positions  */
-      positions => {
-        // Currently, only one guest frame sends anchor positions to the bucket bar
-        this.bucketBar?.update(positions);
-      }
-    );
+    // (clean theme)
+    const bucketBar = this.bucketBar;
+    // Currently, we ignore `anchorsChanged` for all the guests except the first connected guest.
+    if (bucketBar) {
+      guestRPC.on(
+        'anchorsChanged',
+        /** @param {AnchorPosition[]} positions  */
+        positions => {
+          if (this._guestRPC.indexOf(guestRPC) === 0) {
+            bucketBar.update(positions);
+          }
+        }
+      );
+    }
 
     guestRPC.on('frameDestroyed', () => {
       guestRPC.destroy();

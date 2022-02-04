@@ -197,13 +197,10 @@ export class Guest {
     this._sidebarRPC = new PortRPC();
     this._connectSidebar();
 
-    this._bucketBarClient =
-      this._frameIdentifier === null
-        ? new BucketBarClient({
-            contentContainer: this._integration.contentContainer(),
-            hostRPC: this._hostRPC,
-          })
-        : null;
+    this._bucketBarClient = new BucketBarClient({
+      contentContainer: this._integration.contentContainer(),
+      hostRPC: this._hostRPC,
+    });
 
     this._sideBySideActive = false;
 
@@ -448,7 +445,7 @@ export class Guest {
 
     this._selectionObserver.disconnect();
     this._adder.destroy();
-    this._bucketBarClient?.destroy();
+    this._bucketBarClient.destroy();
 
     removeAllHighlights(this.element);
 
@@ -631,7 +628,7 @@ export class Guest {
   _updateAnchors(anchors, notify) {
     this.anchors = anchors;
     if (notify) {
-      this._bucketBarClient?.update(this.anchors);
+      this._bucketBarClient.update(this.anchors);
     }
   }
 

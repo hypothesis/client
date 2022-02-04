@@ -494,6 +494,17 @@ describe('Sidebar', () => {
 
         assert.calledOnce(sidebar.bucketBar.update);
         assert.calledWith(sidebar.bucketBar.update, anchorPositions);
+
+        sidebar.bucketBar.update.resetHistory();
+
+        // Second connected Guest does register a listener for the
+        // `anchorsChanged` RPC event but it is inactive.
+        connectGuest(sidebar);
+        const anchorChangedCallback = fakePortRPCs[2].on
+          .getCalls()
+          .find(({ args }) => args[0] === 'anchorsChanged').args[1];
+        anchorChangedCallback(anchorPositions);
+        assert.notCalled(sidebar.bucketBar.update);
       });
     });
 
