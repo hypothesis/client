@@ -21,6 +21,8 @@ import { Notebook } from './notebook';
 import { Sidebar } from './sidebar';
 import { EventBus } from './util/emitter';
 
+/** @typedef {import('../types/annotator').Destroyable} Destroyable */
+
 // Look up the URL of the sidebar. This element is added to the page by the
 // boot script before the "annotator" bundle loads.
 const sidebarLinkElement = /** @type {HTMLLinkElement} */ (
@@ -46,51 +48,46 @@ function init() {
 
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
-  /** @type {Sidebar|undefined} */
-  let sidebar;
-  /** @type {Notebook|undefined} */
-  let notebook;
-  /** @type {PortProvider|undefined} */
-  let portProvider;
+  /** @type {Destroyable[]} */
+  const destroyables = [];
+
   if (hostFrame === window) {
     const sidebarConfig = getConfig('sidebar');
 
     const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
-    portProvider = new PortProvider(hypothesisAppsOrigin);
+    const portProvider = new PortProvider(hypothesisAppsOrigin);
 
     const eventBus = new EventBus();
-    sidebar = new Sidebar(document.body, eventBus, sidebarConfig);
-    notebook = new Notebook(document.body, eventBus, getConfig('notebook'));
+    const sidebar = new Sidebar(document.body, eventBus, sidebarConfig);
+    const notebook = new Notebook(
+      document.body,
+      eventBus,
+      getConfig('notebook')
+    );
 
     portProvider.on('frameConnected', (source, port) =>
       /** @type {Sidebar} */ (sidebar).onFrameConnected(source, port)
     );
+    destroyables.push(portProvider, sidebar, notebook);
   }
 
-  /** @type {Guest|undefined} */
-  let guest;
-  /** @type {VitalSourceInjector|undefined} */
-  let vitalSourceInjector;
-  /** @type {HypothesisInjector|undefined} */
-  let hypothesisInjector;
   const vsFrameRole = vitalSourceFrameRole();
   if (vsFrameRole === 'container') {
-    vitalSourceInjector = new VitalSourceInjector(annotatorConfig);
+    const vitalSourceInjector = new VitalSourceInjector(annotatorConfig);
+    destroyables.push(vitalSourceInjector);
   } else {
-    // Set up automatic and integration-triggered injection of client into
-    // iframes in this frame.
-    hypothesisInjector = new HypothesisInjector(document.body, annotatorConfig);
+    // Set up automatic injection of the client into iframes in this frame.
+    const hypothesisInjector = new HypothesisInjector(
+      document.body,
+      annotatorConfig
+    );
     // Create the guest that handles creating annotations and displaying highlights.
-    guest = new Guest(document.body, annotatorConfig, hostFrame);
+    const guest = new Guest(document.body, annotatorConfig, hostFrame);
+    destroyables.push(hypothesisInjector, guest);
   }
 
   sidebarLinkElement.addEventListener('destroy', () => {
-    portProvider?.destroy();
-    sidebar?.destroy();
-    notebook?.destroy();
-    vitalSourceInjector?.destroy();
-    hypothesisInjector?.destroy();
-    guest?.destroy();
+    destroyables.forEach(instance => instance.destroy());
 
     // Remove all the `<link>`, `<script>` and `<style>` elements added to the
     // page by the boot script.

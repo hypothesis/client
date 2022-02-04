@@ -52,7 +52,7 @@ function hasHypothesis(iframe) {
 /**
  * Inject Hypothesis client into a frame.
  *
- * IMPORTANT: This method requires that the iframe is "accessible"
+ * IMPORTANT: This method requires that the iframe is same-origin
  * (frame.contentDocument|contentWindow is not null).
  *
  * This waits for the frame to finish loading before injecting the client.

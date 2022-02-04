@@ -61,7 +61,7 @@ export function isPDF() {
  */
 export class PDFIntegration {
   /**
-   * @param {Pick<Annotator, 'anchor'|'anchors'>} annotator
+   * @param {Annotator} annotator
    * @param {object} options
    *   @param {number} [options.reanchoringMaxWait] - Max time to wait for
    *     re-anchoring to complete when scrolling to an un-rendered page.
