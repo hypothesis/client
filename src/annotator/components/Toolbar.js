@@ -1,36 +1,31 @@
-import { SvgIcon } from '@hypothesis/frontend-shared';
+import { IconButton } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 
 /**
- * @param {object} props
- *  @param {import("preact").Ref<HTMLButtonElement>} [props.buttonRef]
- *  @param {boolean} [props.expanded]
- *  @param {string} [props.className]
- *  @param {string} props.label
- *  @param {string} props.icon
- *  @param {() => any} props.onClick
- *  @param {boolean} [props.selected]
+ * @typedef {import("@hypothesis/frontend-shared/lib/components/buttons").IconButtonProps} IconButtonProps
+ *
+ * @typedef {Omit<IconButtonProps, "className">} ToolbarButtonProps
  */
-function ToolbarButton({
-  buttonRef,
-  expanded,
-  className = 'Toolbar__button',
-  label,
-  icon,
-  onClick,
-  selected = false,
-}) {
+
+/**
+ * Style an IconButton for use on the Toolbar
+ *
+ * @param {ToolbarButtonProps} props
+ */
+function ToolbarButton({ ...buttonProps }) {
+  const { icon, title, ...restProps } = buttonProps;
   return (
-    <button
-      className={className}
-      aria-label={label}
-      aria-expanded={expanded}
-      aria-pressed={selected}
-      onClick={onClick}
-      ref={buttonRef}
-      title={label}
-    >
-      <SvgIcon name={icon} />
-    </button>
+    <IconButton
+      className={classnames(
+        'w-[30px] h-[30px]', // These buttons have precise dimensions
+        'flex items-center justify-center',
+        'border rounded bg-white text-grey-6 hover:text-grey-9 text-xl',
+        'shadow transition-colors'
+      )}
+      icon={icon}
+      title={title}
+      {...restProps}
+    />
   );
 }
 
@@ -59,7 +54,7 @@ function ToolbarButton({
  *   button.
  * @prop {boolean} [useMinimalControls] -
  *   If true, all controls are hidden except for the "Close sidebar" button
- *   when the sidebar is open.
+ *   when the sidebar is open. This is enabled in the "clean" theme.
  */
 
 /**
@@ -80,41 +75,65 @@ export default function Toolbar({
   useMinimalControls = false,
 }) {
   return (
-    <div className="Toolbar">
+    <div className="absolute left-[-33px] w-[33px] z-2">
+      {/* In the clean theme (`useMinimalControls` is `true`),
+          the only button that should appear is a button
+          to close the sidebar, and only if the sidebar is open. This button is
+          absolutely positioned some way down the edge of the sidebar.
+      */}
       {useMinimalControls && isSidebarOpen && (
-        <ToolbarButton
-          className="Toolbar__sidebar-close"
-          label="Close annotation sidebar"
+        <IconButton
+          className={classnames(
+            'w-[27px] h-[27px] mt-[140px] ml-[6px]',
+            'flex items-center justify-center bg-white border',
+            'text-grey-6 hover:text-grey-9 text-xl transition-colors',
+            // Turn off right border to blend with sidebar
+            'border-r-0',
+            // A more intense shadow than other ToolbarButtons, to match that
+            // of the edge of the sidebar in clean theme
+            'shadow-sidebar'
+          )}
+          title="Close annotation sidebar"
           icon="cancel"
           onClick={closeSidebar}
         />
       )}
       {!useMinimalControls && (
-        <ToolbarButton
-          className="Toolbar__sidebar-toggle"
-          buttonRef={toggleSidebarRef}
-          label="Annotation sidebar"
-          icon={isSidebarOpen ? 'caret-right' : 'caret-left'}
-          expanded={isSidebarOpen}
-          onClick={toggleSidebar}
-        />
-      )}
-      {!useMinimalControls && (
-        <div className="Toolbar__buttonbar">
-          <ToolbarButton
-            label="Show highlights"
-            icon={showHighlights ? 'show' : 'hide'}
-            selected={showHighlights}
-            onClick={toggleHighlights}
+        <>
+          <IconButton
+            className={classnames(
+              // Height and width to align with the sidebar's top bar
+              'h-[40px] w-[33px]',
+              'bg-white text-grey-5 pl-1.5 hover:text-grey-9',
+              // Turn on left and bottom borders to continue the
+              // border of the sidebar's top bar
+              'border-l border-b'
+            )}
+            buttonRef={toggleSidebarRef}
+            title="Annotation sidebar"
+            icon={isSidebarOpen ? 'caret-right' : 'caret-left'}
+            expanded={isSidebarOpen}
+            pressed={isSidebarOpen}
+            onClick={toggleSidebar}
           />
-          <ToolbarButton
-            label={
-              newAnnotationType === 'note' ? 'New page note' : 'New annotation'
-            }
-            icon={newAnnotationType === 'note' ? 'note' : 'annotate'}
-            onClick={createAnnotation}
-          />
-        </div>
+          <div className="space-y-1.5 mt-2">
+            <ToolbarButton
+              title="Show highlights"
+              icon={showHighlights ? 'show' : 'hide'}
+              selected={showHighlights}
+              onClick={toggleHighlights}
+            />
+            <ToolbarButton
+              title={
+                newAnnotationType === 'note'
+                  ? 'New page note'
+                  : 'New annotation'
+              }
+              icon={newAnnotationType === 'note' ? 'note' : 'annotate'}
+              onClick={createAnnotation}
+            />
+          </div>
+        </>
       )}
     </div>
   );
