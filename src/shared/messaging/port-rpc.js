@@ -79,10 +79,13 @@ function sendCall(port, method, args = [], sequence = -1) {
  * in the host frame to ensure delivery of "close" notifications from "guest"
  * frames.
  *
+ * @param {string} [userAgent] - Test seam
  * @return {() => void} - Callback that removes the listener
  */
-export function installPortCloseWorkaroundForSafari() {
-  if (!shouldUseSafariWorkaround()) {
+export function installPortCloseWorkaroundForSafari(
+  userAgent = navigator.userAgent
+) {
+  if (!shouldUseSafariWorkaround(userAgent)) {
     return () => {};
   }
 
@@ -101,11 +104,11 @@ export function installPortCloseWorkaroundForSafari() {
 
 /**
  * Test whether this browser needs the workaround for https://bugs.webkit.org/show_bug.cgi?id=231167.
+ *
+ * @param {string} userAgent
  */
-function shouldUseSafariWorkaround() {
-  const webkitVersionMatch = navigator.userAgent.match(
-    /\bAppleWebKit\/([0-9]+)\b/
-  );
+function shouldUseSafariWorkaround(userAgent) {
+  const webkitVersionMatch = userAgent.match(/\bAppleWebKit\/([0-9]+)\b/);
   if (!webkitVersionMatch) {
     return false;
   }
@@ -148,7 +151,15 @@ function shouldUseSafariWorkaround() {
  * @implements {Destroyable}
  */
 export class PortRPC {
-  constructor() {
+  /**
+   * @param {object} options
+   *   @param {string} [options.userAgent] - Test seam
+   *   @param {Window} [options.currentWindow] - Test seam
+   */
+  constructor({
+    userAgent = navigator.userAgent,
+    currentWindow = window,
+  } = {}) {
     /** @type {MessagePort|null} */
     this._port = null;
 
@@ -161,7 +172,7 @@ export class PortRPC {
     this._callbacks = new Map();
 
     this._listeners = new ListenerCollection();
-    this._listeners.add(window, 'unload', () => {
+    this._listeners.add(currentWindow, 'unload', () => {
       if (this._port) {
         // Send "close" notification directly. This works in Chrome, Firefox and
         // Safari >= 16.
@@ -170,10 +181,15 @@ export class PortRPC {
         // To work around a bug in Safari <= 15 which prevents sending messages
         // while a window is unloading, try transferring the port to the parent frame
         // and re-sending the "close" event from there.
-        if (window !== window.parent && shouldUseSafariWorkaround()) {
-          window.parent.postMessage({ type: 'hypothesisPortClosed' }, '*', [
-            this._port,
-          ]);
+        if (
+          currentWindow !== currentWindow.parent &&
+          shouldUseSafariWorkaround(userAgent)
+        ) {
+          currentWindow.parent.postMessage(
+            { type: 'hypothesisPortClosed' },
+            '*',
+            [this._port]
+          );
         }
       }
     });
