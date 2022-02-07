@@ -15,7 +15,10 @@ export default {
         adderPopDown: 'adderPopDown 0.08s ease-in forwards',
       },
       boxShadow: {
+        DEFAULT: '0 1px 1px rgba(0, 0, 0, 0.1)',
         adderToolbar: '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
+        // The shadow shown along the edge of the sidebar in the clean theme
+        sidebar: '0px 1px 4px rgb(0, 0, 0, 0.5)',
       },
       colors: {
         slate: {
@@ -76,6 +79,9 @@ export default {
             transform: 'scale(1) translateY(0px)',
           },
         },
+      },
+      zIndex: {
+        2: '2',
       },
     },
   },
