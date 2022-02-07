@@ -83,6 +83,7 @@ function sendCall(port, method, args = [], sequence = -1) {
  * @return {() => void} - Callback that removes the listener
  */
 export function installPortCloseWorkaroundForSafari(
+  /* istanbul ignore next */
   userAgent = navigator.userAgent
 ) {
   if (!shouldUseSafariWorkaround(userAgent)) {
