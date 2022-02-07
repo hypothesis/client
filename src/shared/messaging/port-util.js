@@ -24,7 +24,7 @@ export function isMessage(data) {
     return false;
   }
 
-  for (let property of ['frame1', 'frame2', 'type']) {
+  for (let property of ['frame1', 'frame2', 'type', 'requestId']) {
     if (typeof data[property] !== 'string') {
       return false;
     }

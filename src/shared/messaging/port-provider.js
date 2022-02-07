@@ -139,7 +139,7 @@ export class PortProvider {
     const handleRequest = event => {
       const { data, origin, source } = /** @type {MessageEvent} */ (event);
 
-      if (!isMessage(data) || data.type !== 'request' || !data.requestId) {
+      if (!isMessage(data) || data.type !== 'request') {
         // If this does not look like a message intended for us, ignore it.
         return;
       }
