@@ -225,4 +225,24 @@ describe('PortRPC', () => {
 
     assert.calledWith(closeHandler);
   });
+
+  it('should only invoke "close" handler once', async () => {
+    const { port1, port2 } = new MessageChannel();
+    const sender = new PortRPC();
+    const receiver = new PortRPC();
+    const closeHandler = sinon.stub();
+
+    receiver.on('close', closeHandler);
+    receiver.connect(port2);
+    sender.connect(port1);
+
+    // Invoke "close" manually. In a real app it will be invoked when the
+    // window is unloaded and/or the PortRPC is destroyed.
+    sender.call('close');
+    sender.call('close');
+
+    await waitForMessageDelivery();
+
+    assert.calledOnce(closeHandler);
+  });
 });
