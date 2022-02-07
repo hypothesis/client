@@ -14,6 +14,7 @@ describe('port-util', () => {
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'request',
+        requestId: 'bar',
         extraField: 'foo',
       },
     ].forEach(data => {
@@ -27,7 +28,15 @@ describe('port-util', () => {
       undefined,
       {},
       'str',
-      { frame1: 'guest', frame2: false, type: 'request' },
+
+      // Wrong type for a property
+      { frame1: 'guest', frame2: false, type: 'request', requestId: 'bar' },
+
+      // Missing properties
+      { frame2: 'sidebar', type: 'request', requestId: 'r1' }, // Missing 'frame1'
+      { frame1: 'guest', type: 'request', requestId: 'r1' }, // Missing 'frame2'
+      { frame1: 'guest', frame2: 'sidebar', requestId: 'r1' }, // Missing 'type'
+      { frame1: 'guest', frame2: 'sidebar', type: 'request' }, // Missing 'requestId'
     ].forEach(data => {
       it('returns false if data is not a valid message', () => {
         assert.isFalse(isMessage(data));

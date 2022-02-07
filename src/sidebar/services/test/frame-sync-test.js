@@ -171,6 +171,7 @@ describe('FrameSyncService', () => {
         frame1: 'guest',
         frame2: 'sidebar',
         type: 'offer',
+        requestId: 'abc',
       },
       [port1]
     );
