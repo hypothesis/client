@@ -42,7 +42,7 @@ function AdderToolbarArrow({ arrowDirection }) {
         'absolute left-1/2 -translate-x-1/2',
         // Override `1em` width/height rules in `Icon` to size the arrow as
         // its SVG dimensions dictate
-        'h-auto w-auto z-10',
+        'h-auto w-auto z-2',
         'text-grey-3 fill-white',
         {
           // Down arrow: transform to point the arrow down
