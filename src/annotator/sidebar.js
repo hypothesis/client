@@ -93,7 +93,7 @@ export class Sidebar {
      */
     this.iframe = createSidebarIframe(config);
 
-    this.options = config;
+    this._config = config;
 
     /** @type {BucketBar|null} */
     this.bucketBar = null;
@@ -200,28 +200,6 @@ export class Sidebar {
     // Initial layout notification
     this._notifyOfLayoutChange(false);
     this._setupSidebarEvents();
-
-    this._sidebarRPC.on('connect', () => {
-      // Show the UI
-      if (this.iframeContainer) {
-        this.iframeContainer.style.display = '';
-      }
-
-      // Set initial highlight visibility. We do this only once the sidebar app
-      // is ready because `setHighlightsVisible` needs to reflect this state to
-      // the sidebar app.
-      const showHighlights = config.showHighlights === 'always';
-      this.setHighlightsVisible(showHighlights);
-
-      if (
-        config.openSidebar ||
-        config.annotations ||
-        config.query ||
-        config.group
-      ) {
-        this.open();
-      }
-    });
   }
 
   destroy() {
@@ -314,10 +292,31 @@ export class Sidebar {
     sidebarTrigger(document.body, () => this.open());
     features.init(this._sidebarRPC);
 
+    this._sidebarRPC.on('connect', () => {
+      // Show the UI
+      if (this.iframeContainer) {
+        this.iframeContainer.style.display = '';
+      }
+
+      const showHighlights = this._config.showHighlights === 'always';
+      this.setHighlightsVisible(showHighlights);
+
+      if (
+        this._config.openSidebar ||
+        this._config.annotations ||
+        this._config.query ||
+        this._config.group
+      ) {
+        this.open();
+      }
+    });
+
     this._sidebarRPC.on('showHighlights', () =>
       this.setHighlightsVisible(true)
     );
+
     this._sidebarRPC.on('openSidebar', () => this.open());
+
     this._sidebarRPC.on('closeSidebar', () => this.close());
 
     // Sidebar listens to the `openNotebook` event coming from the sidebar's
@@ -330,6 +329,7 @@ export class Sidebar {
         this._emitter.publish('openNotebook', groupId);
       }
     );
+
     this._emitter.subscribe('closeNotebook', () => {
       this.show();
     });
@@ -532,7 +532,7 @@ export class Sidebar {
 
     this.toolbar.sidebarOpen = true;
 
-    if (this.options.showHighlights === 'whenSidebarOpen') {
+    if (this._config.showHighlights === 'whenSidebarOpen') {
       this.setHighlightsVisible(true);
     }
 
@@ -547,7 +547,7 @@ export class Sidebar {
 
     this.toolbar.sidebarOpen = false;
 
-    if (this.options.showHighlights === 'whenSidebarOpen') {
+    if (this._config.showHighlights === 'whenSidebarOpen') {
       this.setHighlightsVisible(false);
     }
 
