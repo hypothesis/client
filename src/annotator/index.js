@@ -56,7 +56,8 @@ function init() {
 
   if (hostFrame === window) {
     // Ensure port "close" notifications from eg. guest frames are delivered properly.
-    installPortCloseWorkaroundForSafari();
+    const removeWorkaround = installPortCloseWorkaroundForSafari();
+    destroyables.push({ destroy: removeWorkaround });
 
     const sidebarConfig = getConfig('sidebar');
 
