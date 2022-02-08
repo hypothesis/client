@@ -370,7 +370,6 @@ export class FrameSyncService {
     // Create channel for sidebar-host communication.
     const hostPort = await this._portFinder.discover('host');
     this._hostRPC.connect(hostPort);
-    this._hostRPC.call('ready');
 
     // Listen for guests connecting to the sidebar.
     this._listeners.add(hostPort, 'message', event => {

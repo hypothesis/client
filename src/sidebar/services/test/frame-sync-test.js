@@ -186,12 +186,6 @@ describe('FrameSyncService', () => {
       assert.calledWith(hostRPC().connect, sidebarPort);
     });
 
-    it('notifies the host frame that the sidebar is ready to be displayed', async () => {
-      await frameSync.connect();
-
-      assert.calledWith(hostRPC().call, 'ready');
-    });
-
     it('connects to new guests', async () => {
       frameSync.connect();
       const port = await connectGuest();
