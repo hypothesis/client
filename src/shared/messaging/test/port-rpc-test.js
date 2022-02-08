@@ -45,6 +45,9 @@ describe('PortRPC', () => {
   afterEach(() => {
     rpc1.destroy();
     rpc2.destroy();
+
+    // Restore any temporarily mocked DOM APIs.
+    sinon.restore();
   });
 
   it('should call the method `plusOne` on rpc2', done => {
@@ -201,10 +204,11 @@ describe('PortRPC', () => {
     sender.connect(port1);
     await waitForMessageDelivery();
 
-    closeHandler.resetHistory();
+    assert.notCalled(closeHandler);
     sender.destroy();
     await waitForMessageDelivery();
 
+    assert.calledOnce(closeHandler);
     assert.calledWith(closeHandler);
   });
 
@@ -219,10 +223,11 @@ describe('PortRPC', () => {
     sender.connect(port1);
     await waitForMessageDelivery();
 
-    closeHandler.resetHistory();
+    assert.notCalled(closeHandler);
     window.dispatchEvent(new Event('unload'));
     await waitForMessageDelivery();
 
+    assert.calledOnce(closeHandler);
     assert.calledWith(closeHandler);
   });
 
@@ -297,7 +302,7 @@ describe('PortRPC', () => {
       sender.connect(transferredPort);
       await waitForMessageDelivery();
 
-      closeHandler.resetHistory();
+      assert.notCalled(closeHandler);
 
       // Emulate the Safari bug by disabling `postMessage` on the sending port
       // in the original frame. When the port is transferred to the "parent"
@@ -326,7 +331,6 @@ describe('PortRPC', () => {
       const removeWorkaround = installPortCloseWorkaroundForSafari(userAgent);
       removeWorkaround();
       assert.notCalled(window.addEventListener);
-      window.addEventListener.restore();
     });
   });
 });
