@@ -7,15 +7,11 @@
  * Events that the guest sends to the host
  */
 export type GuestToHostEvent =
-  /**
-   * The guest informs the host that text has been unselected at a frame with that identifier.
-   */
-  | 'textUnselectedIn'
+  /** The guest informs the host that text has been unselected. */
+  | 'textUnselected'
 
-  /**
-   * The guest informs the host that text has been selected at a frame with that identifier.
-   */
-  | 'textSelectedIn'
+  /** The guest informs the host that text has been selected. */
+  | 'textSelected'
 
   /**
    * The guest informs the host that the anchors have been changed in the main annotatable frame.
@@ -68,15 +64,11 @@ export type GuestToSidebarEvent =
  * Events that the host sends to the guest
  */
 export type HostToGuestEvent =
-  /**
-   * The host requests a guest with a specific frame identifier to create an annotation.
-   */
-  | 'createAnnotationIn'
+  /** The host requests a guest to create an annotation. */
+  | 'createAnnotation'
 
-  /**
-   * The host informs guests that text should be unselected, except in the guest with a given frame identifier
-   */
-  | 'clearSelectionExceptIn'
+  /** The host informs guests that text should be unselected. */
+  | 'clearSelection'
 
   /**
    * The host informs guests to focus on a set of annotations

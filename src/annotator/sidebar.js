@@ -67,10 +67,10 @@ export class Sidebar {
     this._emitter = eventBus.createEmitter();
 
     /**
-     * Tracks which `Guest` has a text selection. `null` indicates the host frame,
-     * the top-level frame. Other `guest` frames use string identifier.
+     * Tracks which `Guest` has a text selection. `null` indicates to default
+     * to the first connected guest frame.
      *
-     * @type {string|null}
+     * @type {PortRPC|null}
      */
     this._guestWithSelection = null;
 
@@ -145,10 +145,14 @@ export class Sidebar {
     // Set up the toolbar on the left edge of the sidebar.
     const toolbarContainer = document.createElement('div');
     this.toolbar = new ToolbarController(toolbarContainer, {
-      createAnnotation: () =>
-        this._guestRPC.forEach(rpc =>
-          rpc.call('createAnnotationIn', this._guestWithSelection)
-        ),
+      createAnnotation: () => {
+        if (this._guestRPC.length === 0) {
+          return;
+        }
+
+        const rpc = this._guestWithSelection ?? this._guestRPC[0];
+        rpc.call('createAnnotation');
+      },
       setSidebarOpen: open => (open ? this.open() : this.close()),
       setHighlightsVisible: show => this.setHighlightsVisible(show),
     });
@@ -261,29 +265,21 @@ export class Sidebar {
     /** @type {PortRPC<GuestToHostEvent, HostToGuestEvent>} */
     const guestRPC = new PortRPC();
 
-    guestRPC.on(
-      'textSelectedIn',
-      /** @param {string|null} frameIdentifier */
-      frameIdentifier => {
-        this._guestWithSelection = frameIdentifier;
-        this.toolbar.newAnnotationType = 'annotation';
-        this._guestRPC.forEach(rpc =>
-          rpc.call('clearSelectionExceptIn', frameIdentifier)
-        );
-      }
-    );
+    guestRPC.on('textSelected', () => {
+      this._guestWithSelection = guestRPC;
+      this.toolbar.newAnnotationType = 'annotation';
+      this._guestRPC
+        .filter(port => port !== guestRPC)
+        .forEach(rpc => rpc.call('clearSelection'));
+    });
 
-    guestRPC.on(
-      'textUnselectedIn',
-      /** @param {string|null}  frameIdentifier */
-      frameIdentifier => {
-        this._guestWithSelection = null; // default to the `host` frame
-        this.toolbar.newAnnotationType = 'note';
-        this._guestRPC.forEach(rpc =>
-          rpc.call('clearSelectionExceptIn', frameIdentifier)
-        );
-      }
-    );
+    guestRPC.on('textUnselected', () => {
+      this._guestWithSelection = null;
+      this.toolbar.newAnnotationType = 'note';
+      this._guestRPC
+        .filter(port => port !== guestRPC)
+        .forEach(rpc => rpc.call('clearSelection'));
+    });
 
     // The listener will do nothing if the sidebar doesn't have a bucket bar
     // (clean theme)
@@ -303,6 +299,9 @@ export class Sidebar {
 
     guestRPC.on('close', () => {
       guestRPC.destroy();
+      if (guestRPC === this._guestWithSelection) {
+        this._guestWithSelection = null;
+      }
       this._guestRPC = this._guestRPC.filter(rpc => rpc !== guestRPC);
     });
 

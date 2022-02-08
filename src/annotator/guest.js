@@ -302,28 +302,12 @@ export class Guest {
   }
 
   async _connectHost() {
-    this._hostRPC.on(
-      'clearSelectionExceptIn',
-      /** @param {string|null} frameIdentifier */
-      frameIdentifier => {
-        if (this._frameIdentifier === frameIdentifier) {
-          return;
-        }
+    this._hostRPC.on('clearSelection', () => {
+      this._informHostOnNextSelectionClear = false;
+      removeTextSelection();
+    });
 
-        this._informHostOnNextSelectionClear = false;
-        removeTextSelection();
-      }
-    );
-
-    this._hostRPC.on(
-      'createAnnotationIn',
-      /** @param {string|null} frameIdentifier */
-      frameIdentifier => {
-        if (this._frameIdentifier === frameIdentifier) {
-          this.createAnnotation();
-        }
-      }
-    );
+    this._hostRPC.on('createAnnotation', () => this.createAnnotation());
 
     this._hostRPC.on(
       'focusAnnotations',
@@ -692,7 +676,7 @@ export class Guest {
     }
 
     this.selectedRanges = [range];
-    this._hostRPC.call('textSelectedIn', this._frameIdentifier);
+    this._hostRPC.call('textSelected');
 
     this._adder.annotationsForSelection = annotationsForSelection();
     this._isAdderVisible = true;
@@ -704,7 +688,7 @@ export class Guest {
     this._adder.hide();
     this.selectedRanges = [];
     if (this._informHostOnNextSelectionClear) {
-      this._hostRPC.call('textUnselectedIn', this._frameIdentifier);
+      this._hostRPC.call('textUnselected');
     }
     this._informHostOnNextSelectionClear = true;
   }
