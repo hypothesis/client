@@ -439,6 +439,17 @@ describe('Guest', () => {
       });
     });
 
+    describe('on "createAnnotation" event', () => {
+      it('creates an annotation', async () => {
+        createGuest();
+
+        emitHostEvent('createAnnotation');
+        await delay(0);
+
+        assert.calledWith(sidebarRPC().call, 'createAnnotation');
+      });
+    });
+
     describe('on "deleteAnnotation" event', () => {
       it('detaches annotation', () => {
         createGuest();
@@ -645,38 +656,20 @@ describe('Guest', () => {
       assert.notCalled(FakeAdder.instance.show);
     });
 
-    it('calls "textSelectedIn" RPC method with argument "null" if selection is non-empty', () => {
+    it('calls "textSelected" RPC method when selecting text', () => {
       createGuest();
 
       simulateSelectionWithText();
 
-      assert.calledWith(hostRPC().call, 'textSelectedIn', null);
+      assert.calledWith(hostRPC().call, 'textSelected');
     });
 
-    it('calls "textSelectedIn" RPC method with the subFrameIdentifier as argument if selection is non-empty', () => {
-      const subFrameIdentifier = 'subframe identifier';
-      createGuest({ subFrameIdentifier });
-
-      simulateSelectionWithText();
-
-      assert.calledWith(hostRPC().call, 'textSelectedIn', subFrameIdentifier);
-    });
-
-    it('calls "textUnselectedIn" RPC method with argument "null" if selection is empty', () => {
+    it('calls "textUnselected" RPC method when clearing text selection', () => {
       createGuest();
 
       simulateSelectionWithoutText();
 
-      assert.calledWith(hostRPC().call, 'textUnselectedIn', null);
-    });
-
-    it('calls "textUnselectedIn" RPC method with the subFrameIdentifier as argument if selection is empty', () => {
-      const subFrameIdentifier = 'subframe identifier';
-      createGuest({ subFrameIdentifier });
-
-      simulateSelectionWithoutText();
-
-      assert.calledWith(hostRPC().call, 'textUnselectedIn', subFrameIdentifier);
+      assert.calledWith(hostRPC().call, 'textUnselected');
     });
 
     it('unselects text if another iframe has made a selection', () => {
@@ -687,7 +680,7 @@ describe('Guest', () => {
 
       simulateSelectionWithText();
       hostRPC().call.resetHistory();
-      emitHostEvent('clearSelectionExceptIn', 'subframe identifier');
+      emitHostEvent('clearSelection');
 
       assert.calledOnce(removeAllRanges);
       notifySelectionChanged(null); // removing the text selection triggers the selection observer
@@ -698,7 +691,7 @@ describe('Guest', () => {
       // On next selection clear it should be inform the host.
       notifySelectionChanged(null);
       assert.calledOnce(hostRPC().call);
-      assert.calledWithExactly(hostRPC().call, 'textUnselectedIn', null);
+      assert.calledWithExactly(hostRPC().call, 'textUnselected');
     });
 
     it("doesn't unselect text if frame identifier matches", () => {
@@ -809,22 +802,6 @@ describe('Guest', () => {
   });
 
   describe('#createAnnotation', () => {
-    it('creates an annotation if host calls "createAnnotationIn" RPC method', async () => {
-      createGuest();
-      await delay(0);
-      sidebarRPC().call.resetHistory(); // Discard `documentInfoChanged` call
-
-      emitHostEvent('createAnnotationIn', 'dummy');
-      await delay(0);
-
-      assert.notCalled(sidebarRPC().call);
-
-      emitHostEvent('createAnnotationIn', null);
-      await delay(0);
-
-      assert.calledWith(sidebarRPC().call, 'createAnnotation');
-    });
-
     it('adds document metadata to the annotation', async () => {
       const guest = createGuest();
 

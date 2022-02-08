@@ -43,18 +43,22 @@ describe('Sidebar', () => {
   };
 
   /** Return the PortRPC instance for the first connected guest. */
-  const guestRPC = () => {
-    return fakePortRPCs[1];
+  const guestRPC = (index = 1) => {
+    return fakePortRPCs[index];
   };
 
-  const emitGuestEvent = (event, ...args) => {
+  const emitNthGuestEvent = (index = 1, event, ...args) => {
     const result = [];
-    for (let [evt, fn] of guestRPC().on.args) {
+    for (let [evt, fn] of guestRPC(index).on.args) {
       if (event === evt) {
         result.push(fn(...args));
       }
     }
     return result;
+  };
+
+  const emitGuestEvent = (event, ...args) => {
+    return emitNthGuestEvent(1, event, ...args);
   };
 
   const emitSidebarEvent = (event, ...args) => {
@@ -253,55 +257,70 @@ describe('Sidebar', () => {
       assert.calledWith(sidebar.setHighlightsVisible, false);
     });
 
-    it('creates an annotation in the host frame when toolbar button is clicked', () => {
+    it("doesn't throw when creating an annotation by clicking in toolbar button and there are not connected guests", () => {
+      createSidebar();
+
+      FakeToolbarController.args[0][1].createAnnotation();
+    });
+
+    it('creates an annotation in the first connected guest when toolbar button is clicked', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
 
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(guestRPC().call, 'createAnnotationIn', null);
+      assert.calledWith(guestRPC().call, 'createAnnotation');
     });
 
-    it('creates an annotation in frame with selection when toolbar button is clicked', () => {
+    it('creates an annotation in guest with selected text when toolbar button is clicked', () => {
       const sidebar = createSidebar({});
       connectGuest(sidebar);
+      connectGuest(sidebar);
 
-      const frameIdentifier = 'subframe identifier';
-      emitGuestEvent('textSelectedIn', frameIdentifier);
-
+      emitNthGuestEvent(2, 'textSelected');
       FakeToolbarController.args[0][1].createAnnotation();
 
-      assert.calledWith(guestRPC().call, 'createAnnotationIn', frameIdentifier);
+      assert.neverCalledWith(guestRPC(1).call, 'createAnnotation');
+      assert.calledWith(guestRPC(2).call, 'createAnnotation');
+    });
+
+    it('creates an annotation in the first connected guest if guest with selected text has closed', () => {
+      const sidebar = createSidebar({});
+      connectGuest(sidebar);
+      connectGuest(sidebar);
+
+      emitNthGuestEvent(2, 'textSelected');
+      emitNthGuestEvent(2, 'close');
+      FakeToolbarController.args[0][1].createAnnotation();
+
+      assert.calledWith(guestRPC(1).call, 'createAnnotation');
+      assert.neverCalledWith(guestRPC(2).call, 'createAnnotation');
     });
 
     it('toggles create annotation button to "Annotation" when selection becomes non-empty', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
+      connectGuest(sidebar);
 
-      const frameIdentifier = 'subframe identifier';
-      emitGuestEvent('textSelectedIn', frameIdentifier);
+      emitGuestEvent('textSelected');
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
-      assert.calledWith(
-        guestRPC().call,
-        'clearSelectionExceptIn',
-        frameIdentifier
-      );
+      assert.neverCalledWith(guestRPC(1).call, 'clearSelection');
+      assert.calledWith(guestRPC(2).call, 'clearSelection');
     });
 
     it('toggles create annotation button to "Page Note" when selection becomes empty', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
+      connectGuest(sidebar);
+      emitGuestEvent('textSelected');
+      assert.equal(sidebar.toolbar.newAnnotationType, 'annotation');
 
-      const frameIdentifier = null;
-      emitGuestEvent('textUnselectedIn', frameIdentifier);
+      emitGuestEvent('textUnselected');
 
       assert.equal(sidebar.toolbar.newAnnotationType, 'note');
-      assert.calledWith(
-        guestRPC().call,
-        'clearSelectionExceptIn',
-        frameIdentifier
-      );
+      assert.neverCalledWith(guestRPC(1).call, 'clearSelection');
+      assert.calledWith(guestRPC(2).call, 'clearSelection');
     });
   });
 
