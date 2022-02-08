@@ -72,7 +72,7 @@ describe('Sidebar', () => {
    * when the sidebar has loaded and is ready.
    */
   const connectSidebarApp = () => {
-    emitSidebarEvent('ready');
+    emitSidebarEvent('connect');
   };
 
   /**

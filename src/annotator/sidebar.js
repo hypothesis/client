@@ -197,7 +197,7 @@ export class Sidebar {
     this._notifyOfLayoutChange(false);
     this._setupSidebarEvents();
 
-    this._sidebarRPC.on('ready', () => {
+    this._sidebarRPC.on('connect', () => {
       // Show the UI
       if (this.iframeContainer) {
         this.iframeContainer.style.display = '';
