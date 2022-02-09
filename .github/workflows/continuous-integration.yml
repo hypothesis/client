@@ -18,6 +18,8 @@ jobs:
     - name: Lint
       run: yarn lint
     - name: Typecheck
-      run: yarn typecheck
+      run: |
+        yarn typecheck
+        yarn typecheck-no-any
     - name: Test
       run: yarn test
