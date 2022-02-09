@@ -1,92 +1,59 @@
+import { LabeledButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 /**
  * @typedef {import('../util/buckets').Bucket} Bucket
+ * @typedef {import("preact").ComponentChildren} Children
  */
 
 /**
- * A left-pointing indicator button that, when hovered or clicked, highlights
- * or selects associated annotations.
+ * Render a set of buckets in a vertical channel positioned along the edge of
+ * the sidebar.
  *
  * @param {object} props
- *   @param {Bucket} props.bucket
- *   @param {(tags: string[]) => void} props.onFocusAnnotations
- *   @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
+ *   @prop {Children} props.children
  */
-function BucketButton({ bucket, onFocusAnnotations, onSelectAnnotations }) {
-  const buttonTitle = `Select nearby annotations (${bucket.tags.size})`;
-
-  function selectAnnotations(event) {
-    onSelectAnnotations([...bucket.tags], event.metaKey || event.ctrlKey);
-  }
-
-  /** @param {boolean} hasFocus */
-  function setFocus(hasFocus) {
-    if (hasFocus) {
-      onFocusAnnotations([...bucket.tags]);
-    } else {
-      onFocusAnnotations([]);
-    }
-  }
-
+function BucketList({ children }) {
   return (
-    <button
-      className="Buckets__button Buckets__button--left"
-      onClick={event => selectAnnotations(event)}
-      onBlur={() => setFocus(false)}
-      onFocus={() => setFocus(true)}
-      onMouseEnter={() => setFocus(true)}
-      onMouseOut={() => setFocus(false)}
-      title={buttonTitle}
-      aria-label={buttonTitle}
+    <ul
+      className={classnames(
+        // 2020-11-20: Making bucket bar one pixel wider (23px vs 22px) is an
+        // interim and pragmatic solution for an apparent glitch on
+        // Safari and Chrome. Adding one pixel resolves this issue:
+        // https://github.com/hypothesis/client/pull/2750
+        'absolute w-[23px] left-[-22px] h-full',
+        // The background is set to low opacity when the sidebar is collapsed.
+        'bg-grey-2 annotator-collapsed:bg-black/[.08]',
+        // Disable pointer events along the sidebar itself; re-enable them in
+        // bucket indicator buttons
+        'pointer-events-none'
+      )}
     >
-      {bucket.tags.size}
-    </button>
+      {children}
+    </ul>
   );
 }
 
 /**
- * An up- or down-pointing button that will scroll to the next closest bucket
- * of annotations in the given direction.
+ * Render a vertically-positioned bucket-list item.
  *
  * @param {object} props
- *   @param {Bucket} props.bucket
- *   @param {'down'|'up'} props.direction
- *   @param {(tags: string[]) => void} props.onFocusAnnotations
- *   @param {(tags: string[], direction: 'down'|'up') => void} props.onScrollToClosestOffScreenAnchor
+ *  @prop {Children} props.children
+ *  @prop {number} props.topPosition - The vertical top position, in pixels,
+ *   for this bucket item relative to the top of the containing BucketList
  */
-function NavigationBucketButton({
-  bucket,
-  direction,
-  onFocusAnnotations,
-  onScrollToClosestOffScreenAnchor,
-}) {
-  const buttonTitle = `Go ${direction} to next annotations (${bucket.tags.size})`;
-
-  /** @param {boolean} hasFocus */
-  function setFocus(hasFocus) {
-    if (hasFocus) {
-      onFocusAnnotations([...bucket.tags]);
-    } else {
-      onFocusAnnotations([]);
-    }
-  }
-
+function BucketItem({ children, topPosition }) {
   return (
-    <button
-      className={classnames('Buckets__button', `Buckets__button--${direction}`)}
-      onClick={() =>
-        onScrollToClosestOffScreenAnchor([...bucket.tags], direction)
-      }
-      onBlur={() => setFocus(false)}
-      onFocus={() => setFocus(true)}
-      onMouseEnter={() => setFocus(true)}
-      onMouseOut={() => setFocus(false)}
-      title={buttonTitle}
-      aria-label={buttonTitle}
+    <li
+      className={classnames(
+        'absolute right-0',
+        // Re-enable pointer events, which are disabled on the containing list
+        'pointer-events-auto'
+      )}
+      style={{ top: topPosition }}
     >
-      {bucket.tags.size}
-    </button>
+      {children}
+    </li>
   );
 }
 
@@ -114,40 +81,75 @@ export default function Buckets({
   const showDownNavigation = below.tags.size > 0;
 
   return (
-    <ul className="Buckets__list">
+    <BucketList>
       {showUpNavigation && (
-        <li className="Buckets__bucket" style={{ top: above.position }}>
-          <NavigationBucketButton
-            bucket={above}
-            direction="up"
-            onFocusAnnotations={onFocusAnnotations}
-            onScrollToClosestOffScreenAnchor={onScrollToClosestOffScreenAnchor}
-          />
-        </li>
+        <BucketItem topPosition={above.position}>
+          <LabeledButton
+            className={classnames(
+              'BucketButton UpBucketButton',
+              // Center the button vertically at `above.position` by pulling
+              // its top margin up by about half the button's height.
+              // This puts it nearer the toolbar's other buttons above the
+              // bucket list.
+              'right-0 mt-[-11px]'
+            )}
+            data-testid="up-navigation-button"
+            onClick={() =>
+              onScrollToClosestOffScreenAnchor([...above.tags], 'up')
+            }
+            onBlur={() => onFocusAnnotations([])}
+            onFocus={() => onFocusAnnotations([...above.tags])}
+            onMouseEnter={() => onFocusAnnotations([...above.tags])}
+            onMouseOut={() => onFocusAnnotations([])}
+            title={`Go up to next annotations (${above.tags.size})`}
+          >
+            {above.tags.size}
+          </LabeledButton>
+        </BucketItem>
       )}
       {buckets.map((bucket, index) => (
-        <li
-          className="Buckets__bucket"
-          style={{ top: bucket.position }}
-          key={index}
-        >
-          <BucketButton
-            bucket={bucket}
-            onFocusAnnotations={onFocusAnnotations}
-            onSelectAnnotations={onSelectAnnotations}
-          />
-        </li>
+        <BucketItem topPosition={bucket.position} key={index}>
+          <LabeledButton
+            className={classnames(
+              'BucketButton LeftBucketButton',
+              // Center the bucket indicator button vertically on `bucket.position`
+              // by pulling it by half the height of the button
+              'right-0 mt-[-8px]'
+            )}
+            onClick={event =>
+              onSelectAnnotations(
+                [...bucket.tags],
+                event.metaKey || event.ctrlKey
+              )
+            }
+            onBlur={() => onFocusAnnotations([])}
+            onFocus={() => onFocusAnnotations([...bucket.tags])}
+            onMouseEnter={() => onFocusAnnotations([...bucket.tags])}
+            onMouseOut={() => onFocusAnnotations([])}
+            title={`Select nearby annotations (${bucket.tags.size})`}
+          >
+            {bucket.tags.size}
+          </LabeledButton>
+        </BucketItem>
       ))}
       {showDownNavigation && (
-        <li className="Buckets__bucket" style={{ top: below.position }}>
-          <NavigationBucketButton
-            bucket={below}
-            direction="down"
-            onFocusAnnotations={onFocusAnnotations}
-            onScrollToClosestOffScreenAnchor={onScrollToClosestOffScreenAnchor}
-          />
-        </li>
+        <BucketItem topPosition={below.position}>
+          <LabeledButton
+            className="BucketButton DownBucketButton right-0"
+            data-testid="down-navigation-button"
+            onClick={() =>
+              onScrollToClosestOffScreenAnchor([...below.tags], 'down')
+            }
+            onBlur={() => onFocusAnnotations([])}
+            onFocus={() => onFocusAnnotations([...below.tags])}
+            onMouseEnter={() => onFocusAnnotations([...below.tags])}
+            onMouseOut={() => onFocusAnnotations([])}
+            title={`Go up to next annotations (${below.tags.size})`}
+          >
+            {below.tags.size}
+          </LabeledButton>
+        </BucketItem>
       )}
-    </ul>
+    </BucketList>
   );
 }

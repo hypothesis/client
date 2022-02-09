@@ -1,4 +1,5 @@
 import tailwindConfig from '@hypothesis/frontend-shared/lib/tailwind.preset.js';
+import plugin from 'tailwindcss/plugin.js';
 
 export default {
   presets: [tailwindConfig],
@@ -81,8 +82,18 @@ export default {
         },
       },
       zIndex: {
+        1: '1',
         2: '2',
       },
     },
   },
+  plugins: [
+    plugin(({ addVariant }) => {
+      // Add a custom variant such that the `annotator-collapsed:` modifier
+      // is available. The `Sidebar` logic adds the `.annotator-collapsed`
+      // class to the sidebar frame when it's collapsed. This modifier allows
+      // sub-components to select for that state.
+      addVariant('annotator-collapsed', '.annotator-collapsed &');
+    }),
+  ],
 };

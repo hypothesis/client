@@ -1,48 +1,103 @@
-@use '../mixins/buttons';
-@use '../variables' as var;
+/**
+ * These classes style buttons to appear as lozenges with an integrated arrow
+ * pointing left, up or down (right doesn't exist yet but could easily be added).
+ * *
+ * The arrow-points are created by the combination of borders and positioning.
+ * See https://css-tricks.com/snippets/css/css-triangle/ for a few examples
+ *
+ */
 
-$bucket-bar-width: 22px;
+@layer components {
+  // Base styling for a button with a numerical badge that points either up,
+  // down or left. On its own, it will be lozenge-shaped. Compose with one
+  // of the directional classes below to style a button fully, e.g.
+  // `classname="BucketButton LeftBucketButton`
+  .BucketButton {
+    // A lozenge-shaped element with very small text
+    @apply w-[26px] h-[16px] absolute border bg-white shadow rounded;
+    @apply font-sans text-center text-tiny font-bold text-color-text-light leading-none;
 
-.Buckets__list {
-  background: var.$grey-2; // When sidebar is unfolded, remove the background transparency
-  pointer-events: none;
-  position: absolute;
-  height: 100%;
-  // 2020-11-20: interim and pragmatic solution for an apparent glitch on Safari and Chrome.
-  // Adding one pixel resolve this issue: https://github.com/hypothesis/client/pull/2750
-  width: $bucket-bar-width + 1;
-  left: -($bucket-bar-width);
-}
+    // Establish :before and :after content for later manipulation into
+    // different pointer shapes and directions
+    &::before,
+    &::after {
+      @apply content-[""] absolute border-transparent;
+    }
+  }
 
-// When the sidebar is collapsed, make the background semi-transparent so the
-// text is visible throughout (useful for pages with tight margins)
-.annotator-collapsed .Buckets__list {
-  background: rgba(0, 0, 0, 0.08);
-}
+  // Style a `BucketButton` to point left
+  .LeftBucketButton {
+    @apply rounded-r rounded-l-sm;
 
-.Buckets__bucket {
-  position: absolute;
-  right: 0;
-}
+    // Position to the left of the button and centered vertically
+    &::before,
+    &::after {
+      @apply right-full top-1/2;
+    }
 
-.Buckets__button {
-  // Need pointer events again. Necessary because of `pointer-events` rule
-  // in `.Buckets__list`
-  pointer-events: all;
-}
+    // Create a grey wedge to the left of the button
+    // This will appear as the border around the pointy side
+    &::before {
+      @apply mt-[-8px] border-8;
+      @apply border-r-[5px] border-r-grey-3;
+    }
 
-.Buckets__button--left {
-  // Center the indicator vertically (the element is 16px tall)
-  margin-top: -8px;
-  @include buttons.indicator--left;
-}
+    // Create a white wedge to the left of the button, 1px smaller than
+    // grey wedge. This will composite on top of the grey wedge and serve as
+    // the white fill of the pointy side
+    &::after {
+      @apply mt-[-7px] border-[7px];
+      @apply border-r-[4px] border-r-white;
+    }
+  }
 
-.Buckets__button--up {
-  @include buttons.indicator--up;
-  // Vertically center the element (which is 22px high)
-  margin-top: -11px;
-}
+  // Style a `BucketButton` to point up
+  .UpBucketButton {
+    // Z-index assures that left-pointing buttons will scroll behind this
+    @apply z-1 rounded-t-sm rounded-b;
 
-.Buckets__button--down {
-  @include buttons.indicator--down;
+    // Position above the button and horizontally centered
+    &::before,
+    &::after {
+      @apply top-auto left-1/2 bottom-full;
+    }
+
+    // Create a grey wedge at the top of the button
+    // This will appear as the border around the pointy side
+    &::before {
+      @apply ml-[-13px] border-[13px];
+      @apply border-b-[6px] border-b-grey-3;
+    }
+
+    // Create a white wedge 1px smaller than the grey wedge, as "fill"
+    &::after {
+      @apply ml-[-12px] border-[12px];
+      @apply border-b-[5px] border-b-white;
+    }
+  }
+
+  // Style a `BucketButton` to point down
+  .DownBucketButton {
+    // Z-index assures that left-pointing buttons will scroll behind this
+    @apply z-1 rounded-t rounded-b-sm;
+
+    // Position below the button and horizontally centered
+    &::before,
+    &::after {
+      @apply top-full left-1/2;
+    }
+
+    // Create a grey wedge at the bottom of the button
+    // This will appear as the border around the pointy side
+    &::before {
+      @apply ml-[-13px] border-[13px];
+      @apply border-t-[6px] border-t-grey-3;
+    }
+
+    // Create a white wedge 1px smaller than the grey wedge, as "fill"
+    &::after {
+      @apply ml-[-12px] border-[12px];
+      @apply border-t-[5px] border-t-white;
+    }
+  }
 }
