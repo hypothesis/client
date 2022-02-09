@@ -45,37 +45,76 @@ describe('Buckets', () => {
     );
 
   describe('up and down navigation', () => {
-    it('focuses associated anchors when mouse enters the element', () => {
+    const upButtonSelector = '[data-testid="up-navigation-button"] button';
+    const downButtonSelector = '[data-testid="down-navigation-button"] button';
+
+    it('focuses associated anchors above the screen when mouse enters the element', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--up').first().simulate('mouseenter');
+      wrapper.find(upButtonSelector).simulate('mouseenter');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, ['a1', 'a2']);
     });
 
-    it('removes focus on associated anchors when mouse leaves the element', () => {
+    it('focuses associated anchors below the screen when mouse enters the element', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--up').first().simulate('mouseout');
+      wrapper.find(downButtonSelector).simulate('mouseenter');
+
+      assert.calledOnce(fakeOnFocusAnnotations);
+      assert.calledWith(fakeOnFocusAnnotations, ['b1', 'b2']);
+    });
+
+    it('removes focus on associated anchors above screen when mouse leaves the element', () => {
+      const wrapper = createComponent();
+
+      wrapper.find(upButtonSelector).simulate('mouseout');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, []);
     });
 
-    it('focuses associated anchors when the element is focused', () => {
+    it('removes focus on associated anchors below screen when mouse leaves the element', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--up').first().simulate('focus');
+      wrapper.find(downButtonSelector).simulate('mouseout');
+
+      assert.calledOnce(fakeOnFocusAnnotations);
+      assert.calledWith(fakeOnFocusAnnotations, []);
+    });
+
+    it('focuses associated anchors above screen when the element is focused', () => {
+      const wrapper = createComponent();
+
+      wrapper.find(upButtonSelector).simulate('focus');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, ['a1', 'a2']);
     });
 
-    it('removes focus on associated anchors when element is blurred', () => {
+    it('focuses associated anchors below screen when the element is focused', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--up').first().simulate('blur');
+      wrapper.find(downButtonSelector).simulate('focus');
+
+      assert.calledOnce(fakeOnFocusAnnotations);
+      assert.calledWith(fakeOnFocusAnnotations, ['b1', 'b2']);
+    });
+
+    it('removes focus on associated anchors above screen when element is blurred', () => {
+      const wrapper = createComponent();
+
+      wrapper.find(upButtonSelector).simulate('blur');
+
+      assert.calledOnce(fakeOnFocusAnnotations);
+      assert.calledWith(fakeOnFocusAnnotations, []);
+    });
+
+    it('removes focus on associated anchors below screen when element is blurred', () => {
+      const wrapper = createComponent();
+
+      wrapper.find(downButtonSelector).simulate('blur');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, []);
@@ -83,9 +122,9 @@ describe('Buckets', () => {
 
     it('renders an up navigation button if there are above-screen anchors', () => {
       const wrapper = createComponent();
-      const upButton = wrapper.find('.Buckets__button--up');
+      const upButton = wrapper.find(upButtonSelector);
       // The list item element wrapping the button
-      const bucketItem = wrapper.find('.Buckets__bucket').first();
+      const bucketItem = wrapper.find('BucketItem').first();
 
       assert.isTrue(upButton.exists());
       assert.equal(
@@ -97,15 +136,15 @@ describe('Buckets', () => {
     it('does not render an up navigation button if there are no above-screen anchors', () => {
       fakeAbove = { tags: new Set(), position: 150 };
       const wrapper = createComponent();
-      assert.isFalse(wrapper.find('.Buckets__button--up').exists());
+      assert.isFalse(wrapper.find(upButtonSelector).exists());
     });
 
     it('renders a down navigation button if there are below-screen anchors', () => {
       const wrapper = createComponent();
 
-      const downButton = wrapper.find('.Buckets__button--down');
+      const downButton = wrapper.find(downButtonSelector);
       // The list item element wrapping the button
-      const bucketItem = wrapper.find('.Buckets__bucket').last();
+      const bucketItem = wrapper.find('BucketItem').last();
 
       assert.isTrue(downButton.exists());
       assert.equal(
@@ -117,12 +156,12 @@ describe('Buckets', () => {
     it('does not render a down navigation button if there are no below-screen anchors', () => {
       fakeBelow = { tags: new Set(), position: 550 };
       const wrapper = createComponent();
-      assert.isFalse(wrapper.find('.Buckets__button--down').exists());
+      assert.isFalse(wrapper.find(downButtonSelector).exists());
     });
 
     it('scrolls to anchors above when up navigation button is pressed', () => {
       const wrapper = createComponent();
-      const upButton = wrapper.find('.Buckets__button--up');
+      const upButton = wrapper.find(upButtonSelector);
 
       upButton.simulate('click');
 
@@ -135,7 +174,7 @@ describe('Buckets', () => {
 
     it('scrolls to anchors below when down navigation button is pressed', () => {
       const wrapper = createComponent();
-      const downButton = wrapper.find('.Buckets__button--down');
+      const downButton = wrapper.find(downButtonSelector);
 
       downButton.simulate('click');
 
@@ -148,16 +187,17 @@ describe('Buckets', () => {
   });
 
   describe('on-screen buckets', () => {
+    const bucketButtonSelector = 'button[title^="Select nearby annotations"]';
     it('renders a bucket button for each bucket', () => {
       const wrapper = createComponent();
 
-      assert.equal(wrapper.find('.Buckets__button--left').length, 2);
+      assert.equal(wrapper.find(bucketButtonSelector).length, 2);
     });
 
     it('focuses on associated annotations when mouse enters the element', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--left').first().simulate('mouseenter');
+      wrapper.find(bucketButtonSelector).first().simulate('mouseenter');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, ['t1', 't2']);
@@ -166,7 +206,7 @@ describe('Buckets', () => {
     it('removes focus on associated anchors when mouse leaves the element', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--left').first().simulate('mouseout');
+      wrapper.find(bucketButtonSelector).first().simulate('mouseout');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, []);
@@ -175,7 +215,7 @@ describe('Buckets', () => {
     it('focuses associated anchors when the element is focused', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--left').first().simulate('focus');
+      wrapper.find(bucketButtonSelector).first().simulate('focus');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, ['t1', 't2']);
@@ -184,7 +224,7 @@ describe('Buckets', () => {
     it('removes focus on associated annotations when element is blurred', () => {
       const wrapper = createComponent();
 
-      wrapper.find('.Buckets__button--left').first().simulate('blur');
+      wrapper.find(bucketButtonSelector).first().simulate('blur');
 
       assert.calledOnce(fakeOnFocusAnnotations);
       assert.calledWith(fakeOnFocusAnnotations, []);
@@ -194,7 +234,7 @@ describe('Buckets', () => {
       const wrapper = createComponent();
 
       wrapper
-        .find('.Buckets__button--left')
+        .find(bucketButtonSelector)
         .first()
         .simulate('click', { metaKey: false, ctrlKey: false });
 
@@ -208,7 +248,7 @@ describe('Buckets', () => {
       const wrapper = createComponent();
 
       wrapper
-        .find('.Buckets__button--left')
+        .find(bucketButtonSelector)
         .first()
         .simulate('click', { metaKey: true, ctrlKey: false });
 
