@@ -157,6 +157,16 @@ describe('HTMLMetadata', () => {
       assert.deepEqual(metadata.highwire.title, ['Foo']);
     });
 
+    it('should ignore meta tags without content', () => {
+      tempDocumentHead.innerHTML = `
+        <meta name="citation_doi" content>
+        <meta name="DC.type">
+      `;
+      const metadata = testDocument.getDocumentMetadata();
+      assert.isEmpty(metadata.highwire);
+      assert.isEmpty(metadata.dc);
+    });
+
     it('should return Dublin Core metadata', () => {
       assert.ok(metadata.dc);
       assert.deepEqual(metadata.dc.identifier, [
