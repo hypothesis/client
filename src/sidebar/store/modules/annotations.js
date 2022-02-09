@@ -3,7 +3,10 @@
  * sidebar.
  */
 
-/** @typedef {import('../../../types/api').Annotation} Annotation */
+/**
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ * @typedef {import('../../../types/api').SavedAnnotation} SavedAnnotation
+ */
 
 /**
  * @typedef AnnotationStub
@@ -15,6 +18,7 @@
 import { createSelector } from 'reselect';
 
 import * as metadata from '../../helpers/annotation-metadata';
+import { isSaved } from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import * as util from '../util';
 import { createStoreModule } from '../create-store';
@@ -49,16 +53,20 @@ function excludeAnnotations(current, annotations) {
   });
 }
 
+/**
+ * @param {Annotation[]} annotations
+ * @param {string} id
+ */
 function findByID(annotations, id) {
-  return annotations.find(annot => {
-    return annot.id === id;
-  });
+  return annotations.find(a => a.id === id);
 }
 
+/**
+ * @param {Annotation[]} annotations
+ * @param {string} tag
+ */
 function findByTag(annotations, tag) {
-  return annotations.find(annot => {
-    return annot.$tag === tag;
-  });
+  return annotations.find(a => a.$tag === tag);
 }
 
 /**
@@ -68,10 +76,10 @@ function findByTag(annotations, tag) {
  * `annotation` may either be new (unsaved) or a persisted annotation retrieved
  * from the service.
  *
- * @param {object} annotation
+ * @param {Omit<Annotation, '$anchorTimeout'>} annotation
  * @param {string} tag - The `$tag` value that should be used for this
  *                       if it doesn't have a `$tag` already
- * @return {object} - annotation with local (`$*`) fields set
+ * @return {Annotation} - annotation with local (`$*`) fields set
  */
 function initializeAnnotation(annotation, tag) {
   let orphan = annotation.$orphan;
@@ -117,7 +125,8 @@ const initialState = {
 /** @typedef {typeof initialState} State */
 
 const reducers = {
-  ADD_ANNOTATIONS: function (state, action) {
+  /** @param {State} state */
+  ADD_ANNOTATIONS(state, action) {
     const updatedIDs = {};
     const updatedTags = {};
 
@@ -163,15 +172,17 @@ const reducers = {
     };
   },
 
-  CLEAR_ANNOTATIONS: function () {
+  CLEAR_ANNOTATIONS() {
     return { annotations: [], focused: {}, highlighted: {} };
   },
 
-  FOCUS_ANNOTATIONS: function (state, action) {
+  /** @param {State} state */
+  FOCUS_ANNOTATIONS(state, action) {
     return { focused: toTrueMap(action.focusedTags) };
   },
 
-  HIDE_ANNOTATION: function (state, action) {
+  /** @param {State} state */
+  HIDE_ANNOTATION(state, action) {
     const anns = state.annotations.map(ann => {
       if (ann.id !== action.id) {
         return ann;
@@ -181,17 +192,20 @@ const reducers = {
     return { annotations: anns };
   },
 
-  HIGHLIGHT_ANNOTATIONS: function (state, action) {
+  /** @param {State} state */
+  HIGHLIGHT_ANNOTATIONS(state, action) {
     return { highlighted: action.highlighted };
   },
 
-  REMOVE_ANNOTATIONS: function (state, action) {
+  /** @param {State} state */
+  REMOVE_ANNOTATIONS(state, action) {
     return {
       annotations: [...action.remainingAnnotations],
     };
   },
 
-  UNHIDE_ANNOTATION: function (state, action) {
+  /** @param {State} state */
+  UNHIDE_ANNOTATION(state, action) {
     const anns = state.annotations.map(ann => {
       if (ann.id !== action.id) {
         return ann;
@@ -201,7 +215,8 @@ const reducers = {
     return { annotations: anns };
   },
 
-  UPDATE_ANCHOR_STATUS: function (state, action) {
+  /** @param {State} state */
+  UPDATE_ANCHOR_STATUS(state, action) {
     const annotations = state.annotations.map(annot => {
       if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
         return annot;
@@ -217,7 +232,8 @@ const reducers = {
     return { annotations };
   },
 
-  UPDATE_FLAG_STATUS: function (state, action) {
+  /** @param {State} state */
+  UPDATE_FLAG_STATUS(state, action) {
     const annotations = state.annotations.map(annot => {
       const match = annot.id && annot.id === action.id;
       if (match) {
@@ -230,9 +246,10 @@ const reducers = {
         });
         if (newAnn.moderation) {
           const countDelta = action.isFlagged ? 1 : -1;
-          newAnn.moderation = Object.assign({}, annot.moderation, {
-            flagCount: annot.moderation.flagCount + countDelta,
-          });
+          newAnn.moderation = {
+            ...newAnn.moderation,
+            flagCount: newAnn.moderation.flagCount + countDelta,
+          };
         }
         return newAnn;
       } else {
@@ -255,7 +272,9 @@ const actions = util.actionTypes(reducers);
 function addAnnotations(annotations) {
   return function (dispatch, getState) {
     const added = annotations.filter(annot => {
-      return !findByID(getState().annotations.annotations, annot.id);
+      return (
+        !annot.id || !findByID(getState().annotations.annotations, annot.id)
+      );
     });
 
     dispatch({
@@ -284,16 +303,16 @@ function addAnnotations(annotations) {
         // Find annotations which haven't yet been anchored in the document.
         const anns = getState().annotations.annotations;
         const annsStillAnchoring = anchoringIDs
-          .map(id => findByID(anns, id))
+          .map(id => (id ? findByID(anns, id) : null))
           .filter(ann => ann && metadata.isWaitingToAnchor(ann));
 
         // Mark anchoring as timed-out for these annotations.
         const anchorStatusUpdates = annsStillAnchoring.reduce(
           (updates, ann) => {
-            updates[ann.$tag] = 'timeout';
+            updates[/** @type {Annotation} */ (ann).$tag] = 'timeout';
             return updates;
           },
-          {}
+          /** @type {Record<string, 'timeout'>} */ ({})
         );
         dispatch(updateAnchorStatus(anchorStatusUpdates));
       }, ANCHORING_TIMEOUT);
@@ -325,6 +344,8 @@ function focusAnnotations(tags) {
  *
  * This updates an annotation to reflect the fact that it has been hidden from
  * non-moderators.
+ *
+ * @param {string} id
  */
 function hideAnnotation(id) {
   return {
@@ -376,6 +397,8 @@ export function removeAnnotations(annotations) {
  *
  * This updates an annotation to reflect the fact that it has been made visible
  * to non-moderators.
+ *
+ * @param {string} id
  */
 function unhideAnnotation(id) {
   return {
@@ -427,7 +450,7 @@ const annotationCount = createSelector(
 /**
  * Retrieve all annotations currently in the store
  *
- * @type {(state: any) => Annotation[]}
+ * @param {State} state
  */
 function allAnnotations(state) {
   return state.annotations;
@@ -436,8 +459,8 @@ function allAnnotations(state) {
 /**
  * Does the annotation indicated by `id` exist in the collection?
  *
+ * @param {State} state
  * @param {string} id
- * @return {boolean}
  */
 function annotationExists(state, id) {
   return state.annotations.some(annot => annot.id === id);
@@ -445,6 +468,9 @@ function annotationExists(state, id) {
 
 /**
  * Return the annotation with the given ID
+ *
+ * @param {State} state
+ * @param {string} id
  */
 function findAnnotationByID(state, id) {
   return findByID(state.annotations, id);
@@ -456,6 +482,7 @@ function findAnnotationByID(state, id) {
  * If an annotation does not have an ID because it has not been created on
  * the server, there will be no entry for it in the returned array.
  *
+ * @param {State} state
  * @param {string[]} tags - Local tags of annotations to look up
  */
 function findIDsForTags(state, tags) {
@@ -490,8 +517,8 @@ const highlightedAnnotations = createSelector(
 /**
  * Is the annotation referenced by `$tag` currently focused?
  *
- * @param {string} $tag - annotation identifier
- * @return {boolean}
+ * @param {State} state
+ * @param {string} $tag
  */
 function isAnnotationFocused(state, $tag) {
   return state.focused[$tag] === true;
@@ -499,8 +526,6 @@ function isAnnotationFocused(state, $tag) {
 
 /**
  * Are there any annotations still waiting to anchor?
- *
- * @type {(state: any) => boolean}
  */
 const isWaitingToAnchorAnnotations = createSelector(
   /** @param {State} state */
@@ -551,12 +576,13 @@ const orphanCount = createSelector(
 /**
  * Return all loaded annotations which have been saved to the server
  *
- * @return {Annotation[]}
+ * @param {State} state
+ * @return {SavedAnnotation[]}
  */
 function savedAnnotations(state) {
-  return state.annotations.filter(ann => {
-    return !metadata.isNew(ann);
-  });
+  return /** @type {SavedAnnotation[]} */ (
+    state.annotations.filter(ann => isSaved(ann))
+  );
 }
 
 export const annotationsModule = createStoreModule(initialState, {
