@@ -2,7 +2,11 @@ import { normalizeKeyName } from '@hypothesis/frontend-shared';
 
 import { useEffect } from 'preact/hooks';
 
-// Bit flags indicating modifiers required by a shortcut or pressed in a key event.
+/**
+ * Bit flags indicating modifiers required by a shortcut or pressed in a key event.
+ *
+ * @type {Record<string, number>}
+ */
 const modifiers = {
   alt: 1,
   ctrl: 2,
@@ -78,6 +82,7 @@ export function installShortcut(
   onPress,
   { rootElement = document.body } = {}
 ) {
+  /** @param {KeyboardEvent} event */
   const onKeydown = event => {
     if (matchShortcut(event, shortcut)) {
       onPress(event);

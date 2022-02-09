@@ -1,4 +1,5 @@
-let shownWarnings = {};
+/** @type {Set<string>} */
+let shownWarnings = new Set();
 
 /**
  * Log a warning if it has not already been reported.
@@ -13,13 +14,13 @@ let shownWarnings = {};
  */
 export function warnOnce(...args) {
   const key = args.join();
-  if (key in shownWarnings) {
+  if (shownWarnings.has(key)) {
     return;
   }
   console.warn(...args);
-  shownWarnings[key] = true;
+  shownWarnings.add(key);
 }
 
 warnOnce.reset = () => {
-  shownWarnings = {};
+  shownWarnings.clear();
 };
