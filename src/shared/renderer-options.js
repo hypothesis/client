@@ -4,7 +4,7 @@ import { options } from 'preact';
  * Setup workarounds for setting certain HTML element properties or attributes
  * in some browsers.
  *
- * @param {object} _options - Test seam
+ * @param {import('preact').Options} _options - Test seam
  */
 export function setupBrowserFixes(_options = options) {
   let needsDirAutoFix = false;
@@ -21,9 +21,10 @@ export function setupBrowserFixes(_options = options) {
     const prevHook = _options.vnode;
     _options.vnode = vnode => {
       if (typeof vnode.type === 'string') {
-        if ('dir' in vnode.props && vnode.props.dir === 'auto') {
+        const props = /** @type {{ dir?: string }} */ (vnode.props);
+        if ('dir' in props && props.dir === 'auto') {
           // Re-assign `vnode.props.dir` if its value is "auto"
-          vnode.props.dir = '';
+          props.dir = '';
         }
       }
       // Call previously defined hook if there was any

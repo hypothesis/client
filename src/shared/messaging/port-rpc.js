@@ -55,7 +55,7 @@ const PROTOCOL = 'frame-rpc';
  *
  * @param {MessagePort} port
  * @param {string} method
- * @param {any[]} [arguments]
+ * @param {any[]} [args]
  * @param {number} [sequence] - Sequence number used for replies
  */
 function sendCall(port, method, args = [], sequence = -1) {

@@ -12,9 +12,9 @@ import { ConfirmModal } from '@hypothesis/frontend-shared';
  *  - The visual style of the dialog matches the Hypothesis design system
  *
  * @param {object} options - Options for the `ConfirmModal`
- *   @prop {string} [title]
- *   @prop {string} message
- *   @prop {string} [confirmAction]
+ *   @param {string} [options.title]
+ *   @param {string} options.message
+ *   @param {string} [options.confirmAction]
  * @return {Promise<boolean>} - Promise that resolves with `true` if the user
  *   confirmed the action or `false` if they canceled it.
  */

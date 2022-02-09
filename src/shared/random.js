@@ -1,3 +1,4 @@
+/** @param {number} val */
 function byteToHex(val) {
   const str = val.toString(16);
   return str.length === 1 ? '0' + str : str;
