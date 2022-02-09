@@ -157,14 +157,26 @@ describe('HTMLMetadata', () => {
       assert.deepEqual(metadata.highwire.title, ['Foo']);
     });
 
-    it('should ignore meta tags without content', () => {
-      tempDocumentHead.innerHTML = `
-        <meta name="citation_doi" content>
-        <meta name="DC.type">
-      `;
-      const metadata = testDocument.getDocumentMetadata();
-      assert.isEmpty(metadata.highwire);
-      assert.isEmpty(metadata.dc);
+    context('in "meta" elements', () => {
+      it('should ignore if "content" attribute is not present', () => {
+        tempDocumentHead.innerHTML = `
+          <meta name="citation_doi" content>
+          <meta name="DC.type">
+        `;
+        const metadata = testDocument.getDocumentMetadata();
+        assert.isEmpty(metadata.highwire);
+        assert.isEmpty(metadata.dc);
+      });
+
+      it('should lower-case the value of the specified attribute', () => {
+        tempDocumentHead.innerHTML = `
+          <meta name="CITATION_DOI" content="10.1175/JCLI-D-11-00015.1">
+          <meta property="OG:URL" content="https://fb.com">
+        `;
+        const metadata = testDocument.getDocumentMetadata();
+        assert.deepEqual(metadata.highwire.doi, ['10.1175/JCLI-D-11-00015.1']);
+        assert.deepEqual(metadata.facebook.url, ['https://fb.com']);
+      });
     });
 
     it('should return Dublin Core metadata', () => {
