@@ -2,9 +2,12 @@
  * Utility functions for querying annotation metadata.
  */
 
-/** @typedef {import('../../types/api').Annotation} Annotation */
-/** @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector */
-/** @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector */
+/**
+ * @typedef {import('../../types/api').Annotation} Annotation
+ * @typedef {import('../../types/api').SavedAnnotation} SavedAnnotation
+ * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
+ * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
+ */
 
 /**
  * Extract document metadata from an annotation.
@@ -123,11 +126,21 @@ export function isReply(annotation) {
   return (annotation.references || []).length > 0;
 }
 
-/** Return `true` if the given annotation is new, `false` otherwise.
+/**
+ * Return true if the given annotation has been saved to the backend and assigned
+ * an ID.
  *
- * "New" means this annotation has been newly created client-side and not
- * saved to the server yet.
+ * @param {Annotation} annotation
+ * @return {annotation is SavedAnnotation}
+ */
+export function isSaved(annotation) {
+  return !!annotation.id;
+}
+
+/**
+ * Return true if an annotation has not been saved to the backend.
  *
+ * @deprecated - Use {@link isSaved} instead
  * @param {Annotation} annotation
  */
 export function isNew(annotation) {

@@ -2,7 +2,7 @@ import { Actions } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { useStoreProxy } from '../../store/use-store';
-import { quote } from '../../helpers/annotation-metadata';
+import { isSaved, quote } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 
 import AnnotationActionBar from './AnnotationActionBar';
@@ -14,6 +14,7 @@ import AnnotationReplyToggle from './AnnotationReplyToggle';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import("../../../types/api").SavedAnnotation} SavedAnnotation
  * @typedef {import('../../../types/api').Group} Group
  */
 
@@ -57,7 +58,11 @@ function Annotation({
   const showActions = !isSaving && !isEditing;
   const showReplyToggle = !isReply && !hasAppliedFilter && replyCount > 0;
 
-  const onReply = () => annotationsService.reply(annotation, userid);
+  const onReply = () => {
+    if (annotation && isSaved(annotation)) {
+      annotationsService.reply(annotation, userid);
+    }
+  };
 
   return (
     <article
@@ -111,7 +116,7 @@ function Annotation({
                 Saving...
               </div>
             )}
-            {annotation && showActions && (
+            {annotation && showActions && isSaved(annotation) && (
               <Actions classes="hyp-u-stretch">
                 <AnnotationActionBar
                   annotation={annotation}

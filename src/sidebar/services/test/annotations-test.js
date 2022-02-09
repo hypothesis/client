@@ -30,7 +30,7 @@ describe('AnnotationsService', () => {
     fakeMetadata = {
       isAnnotation: sinon.stub(),
       isHighlight: sinon.stub(),
-      isNew: sinon.stub(),
+      isSaved: sinon.stub(),
       isPageNote: sinon.stub(),
       isPublic: sinon.stub(),
     };
@@ -370,7 +370,7 @@ describe('AnnotationsService', () => {
 
   describe('save', () => {
     it('calls the `create` API service for new annotations', () => {
-      fakeMetadata.isNew.returns(true);
+      fakeMetadata.isSaved.returns(false);
       // Using the new-annotation fixture has no bearing on which API method
       // will get called because `isNew` is mocked, but it has representative
       // properties
@@ -384,7 +384,7 @@ describe('AnnotationsService', () => {
     });
 
     it('calls the `update` API service for pre-existing annotations', () => {
-      fakeMetadata.isNew.returns(false);
+      fakeMetadata.isSaved.returns(true);
 
       const annotation = fixtures.defaultAnnotation();
       return svc.save(annotation).then(() => {
@@ -396,7 +396,7 @@ describe('AnnotationsService', () => {
     });
 
     it('calls the relevant API service with an object that has any draft changes integrated', () => {
-      fakeMetadata.isNew.returns(true);
+      fakeMetadata.isSaved.returns(false);
       fakePrivatePermissions.returns({ read: ['foo'] });
       const annotation = fixtures.defaultAnnotation();
       annotation.text = 'not this';
@@ -424,7 +424,7 @@ describe('AnnotationsService', () => {
 
     context('successful save', () => {
       it('copies over internal app-specific keys to the annotation object', () => {
-        fakeMetadata.isNew.returns(false);
+        fakeMetadata.isSaved.returns(true);
         const annotation = fixtures.defaultAnnotation();
         annotation.$tag = 'mytag';
         annotation.$foo = 'bar';
@@ -450,7 +450,7 @@ describe('AnnotationsService', () => {
 
       it('adds the updated annotation to the store', () => {
         const annotation = fixtures.defaultAnnotation();
-        fakeMetadata.isNew.returns(false);
+        fakeMetadata.isSaved.returns(true);
         fakeApi.annotation.update.resolves(annotation);
 
         return svc.save(annotation).then(() => {
@@ -462,7 +462,7 @@ describe('AnnotationsService', () => {
     context('error on save', () => {
       it('removes the active save request from the store', () => {
         fakeApi.annotation.update.rejects();
-        fakeMetadata.isNew.returns(false);
+        fakeMetadata.isSaved.returns(true);
 
         return svc.save(fixtures.defaultAnnotation()).catch(() => {
           assert.notCalled(fakeStore.removeDraft);
@@ -472,7 +472,7 @@ describe('AnnotationsService', () => {
 
       it('does not remove the annotation draft', () => {
         fakeApi.annotation.update.rejects();
-        fakeMetadata.isNew.returns(false);
+        fakeMetadata.isSaved.returns(true);
 
         return svc.save(fixtures.defaultAnnotation()).catch(() => {
           assert.notCalled(fakeStore.removeDraft);
@@ -481,7 +481,7 @@ describe('AnnotationsService', () => {
 
       it('does not add the annotation to the store', () => {
         fakeApi.annotation.update.rejects();
-        fakeMetadata.isNew.returns(false);
+        fakeMetadata.isSaved.returns(true);
 
         return svc.save(fixtures.defaultAnnotation()).catch(() => {
           assert.notCalled(fakeStore.addAnnotations);
