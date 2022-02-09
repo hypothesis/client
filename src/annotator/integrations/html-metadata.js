@@ -123,7 +123,7 @@ export class HTMLMetadata {
     for (let meta of Array.from(this.document.querySelectorAll('meta'))) {
       const name = meta.getAttribute(attribute);
       const { content } = meta;
-      if (name) {
+      if (name && content) {
         const match = name.match(RegExp(`^${prefix}${delimiter}(.+)$`, 'i'));
         if (match) {
           const n = match[1];
