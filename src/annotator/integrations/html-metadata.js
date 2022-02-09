@@ -126,11 +126,11 @@ export class HTMLMetadata {
       if (name && content) {
         const match = name.match(RegExp(`^${prefix}${delimiter}(.+)$`, 'i'));
         if (match) {
-          const n = match[1];
-          if (tags[n]) {
-            tags[n].push(content);
+          const key = match[1].toLowerCase();
+          if (tags[key]) {
+            tags[key].push(content);
           } else {
-            tags[n] = [content];
+            tags[key] = [content];
           }
         }
       }
