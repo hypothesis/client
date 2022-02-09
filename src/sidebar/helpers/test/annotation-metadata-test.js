@@ -1,8 +1,10 @@
 import * as fixtures from '../../test/annotation-fixtures';
 import * as annotationMetadata from '../annotation-metadata';
-
-const documentMetadata = annotationMetadata.documentMetadata;
-const domainAndTitle = annotationMetadata.domainAndTitle;
+import {
+  documentMetadata,
+  domainAndTitle,
+  isSaved,
+} from '../annotation-metadata';
 
 describe('sidebar/helpers/annotation-metadata', () => {
   const fakeAnnotation = (props = {}) => {
@@ -449,6 +451,16 @@ describe('sidebar/helpers/annotation-metadata', () => {
         $anchorTimeout: true,
       });
       assert.isFalse(isWaitingToAnchor(pending));
+    });
+  });
+
+  describe('isSaved', () => {
+    it('returns true for saved annotations', () => {
+      assert.isTrue(isSaved(fixtures.defaultAnnotation()));
+    });
+
+    it('returns false for unsaved annotations', () => {
+      assert.isFalse(isSaved(fixtures.newAnnotation()));
     });
   });
 

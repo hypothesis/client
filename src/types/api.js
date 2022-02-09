@@ -110,6 +110,12 @@
  */
 
 /**
+ * An annotation which has been saved to the backend and assigned an ID.
+ *
+ * @typedef {Annotation & { id: string }} SavedAnnotation
+ */
+
+/**
  * @typedef Profile
  * @prop {string|null} userid
  * @prop {object} preferences

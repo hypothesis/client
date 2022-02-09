@@ -9,6 +9,7 @@ import {
 /**
  * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../../types/api').SavedAnnotation} SavedAnnotation
  */
 
 /**
@@ -51,7 +52,7 @@ export class AnnotationsService {
   /**
    * Extend new annotation objects with defaults and permissions.
    *
-   * @param {AnnotationData} annotationData
+   * @param {Omit<AnnotationData, '$tag'>} annotationData
    * @param {Date} now
    * @return {Annotation}
    */
@@ -103,7 +104,7 @@ export class AnnotationsService {
    * Create a draft for it unless it's a highlight and clear other empty
    * drafts out of the way.
    *
-   * @param {object} annotationData
+   * @param {Omit<AnnotationData, '$tag'>} annotationData
    * @param {Date} now
    */
   create(annotationData, now = new Date()) {
@@ -171,6 +172,8 @@ export class AnnotationsService {
 
   /**
    * Flag an annotation for review by a moderator.
+   *
+   * @param {SavedAnnotation} annotation
    */
   async flag(annotation) {
     await this._api.annotation.flag({ id: annotation.id });
@@ -180,7 +183,7 @@ export class AnnotationsService {
   /**
    * Create a reply to `annotation` by the user `userid` and add to the store.
    *
-   * @param {object} annotation
+   * @param {SavedAnnotation} annotation
    * @param {string} userid
    */
   reply(annotation, userid) {
@@ -200,13 +203,15 @@ export class AnnotationsService {
    * Save new (or update existing) annotation. On success,
    * the annotation's `Draft` will be removed and the annotation added
    * to the store.
+   *
+   * @param {Annotation} annotation
    */
   async save(annotation) {
     let saved;
 
     const annotationWithChanges = this._applyDraftChanges(annotation);
 
-    if (metadata.isNew(annotation)) {
+    if (!metadata.isSaved(annotation)) {
       saved = this._api.annotation.create({}, annotationWithChanges);
     } else {
       saved = this._api.annotation.update(

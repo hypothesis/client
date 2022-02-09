@@ -13,13 +13,13 @@ import { useStoreProxy } from '../../store/use-store';
 import AnnotationShareControl from './AnnotationShareControl';
 
 /**
- *  @typedef {import("../../../types/api").Annotation} Annotation
+ *  @typedef {import("../../../types/api").SavedAnnotation} SavedAnnotation
  *  @typedef {import('../../../types/config').HostConfig} HostConfig
  */
 
 /**
  * @typedef AnnotationActionBarProps
- * @prop {Annotation} annotation - The annotation in question
+ * @prop {SavedAnnotation} annotation - The annotation in question
  * @prop {() => any} onReply - Callbacks for when action buttons are clicked/tapped
  * @prop {import('../../services/annotations').AnnotationsService} annotationsService
  * @prop {HostConfig} settings
