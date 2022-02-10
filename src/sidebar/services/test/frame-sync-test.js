@@ -38,13 +38,6 @@ const fixtures = {
     // This should match the guest frame ID from `framesListEntry`.
     frameIdentifier: 'abc',
   },
-
-  // The entry in the list of frames currently connected
-  framesListEntry: {
-    id: 'abc',
-    uri: 'http://example.com',
-    isAnnotationFetchComplete: true,
-  },
 };
 
 describe('FrameSyncService', () => {
@@ -96,16 +89,34 @@ describe('FrameSyncService', () => {
     };
 
     fakeStore = fakeReduxStore(
-      { annotations: [] },
+      { annotations: [], frames: [] },
       {
         allAnnotations() {
           return this.getState().annotations;
         },
-        connectFrame: sinon.stub(),
-        destroyFrame: sinon.stub(),
+
+        connectFrame(frame) {
+          const frames = [
+            ...this.getState().frames,
+            {
+              ...frame,
+              isAnnotationFetchComplete: true,
+            },
+          ];
+          this.setState({ frames });
+        },
+
+        destroyFrame(frame) {
+          const frames = this.getState().frames;
+          this.setState({ frames: frames.filter(f => f.id !== frame.id) });
+        },
+
+        frames() {
+          return this.getState().frames;
+        },
+
         findIDsForTags: sinon.stub(),
         focusAnnotations: sinon.stub(),
-        frames: sinon.stub().returns([fixtures.framesListEntry]),
         isLoggedIn: sinon.stub().returns(false),
         openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
@@ -244,12 +255,6 @@ describe('FrameSyncService', () => {
       const mainGuestRPC = fakePortRPCs[1];
       const iframeGuestRPC = fakePortRPCs[2];
 
-      const frames = [];
-      fakeStore.connectFrame.callsFake(frame => {
-        frames.push({ id: frame.id, uri: frame.uri });
-      });
-      fakeStore.frames.returns(frames);
-
       mainGuestRPC.emit('documentInfoChanged', {
         frameIdentifier: null,
         uri: mainFrameAnn.uri,
@@ -282,12 +287,6 @@ describe('FrameSyncService', () => {
         id: 'abc',
         uri: 'urn:book-id:1234',
       };
-
-      const frames = [];
-      fakeStore.connectFrame.callsFake(frame => {
-        frames.push({ id: frame.id, uri: frame.uri });
-      });
-      fakeStore.frames.returns(frames);
 
       // Connect a single guest which is not the main/host frame. This simulates
       // what happens in VitalSource for example.
@@ -349,10 +348,15 @@ describe('FrameSyncService', () => {
       frameSync.connect();
     });
 
-    it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', () => {
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', async () => {
+      await connectGuest();
+      emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
+      fakeStore.frames()[0].isAnnotationFetchComplete = true;
+
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
       });
+
       assert.calledWithMatch(
         hostRPC().call,
         'publicAnnotationCountChanged',
@@ -360,7 +364,11 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', () => {
+    it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', async () => {
+      await connectGuest();
+      emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
+      fakeStore.frames()[0].isAnnotationFetchComplete = true;
+
       const annot = annotationFixtures.defaultAnnotation();
       delete annot.permissions;
 
@@ -375,8 +383,14 @@ describe('FrameSyncService', () => {
       );
     });
 
-    it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', () => {
-      fakeStore.frames.returns([{ uri: 'http://example.com' }]);
+    it('does not send a "publicAnnotationCountChanged" message to the frame if annotation fetch is not complete', async () => {
+      await connectGuest();
+      emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
+      fakeStore.frames()[0].isAnnotationFetchComplete = false;
+
+      // Discard 'publicAnnotationCountChanged' message sent after frame connected.
+      hostRPC().call.resetHistory();
+
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
       });
@@ -384,7 +398,6 @@ describe('FrameSyncService', () => {
     });
 
     it('does not send a "publicAnnotationCountChanged" message if there are no connected frames', () => {
-      fakeStore.frames.returns([]);
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
       });
@@ -549,11 +562,17 @@ describe('FrameSyncService', () => {
       await connectGuest();
       emitGuestEvent('documentInfoChanged', frameInfo);
 
-      assert.calledWith(fakeStore.connectFrame, {
-        id: frameInfo.frameIdentifier,
-        metadata: frameInfo.metadata,
-        uri: frameInfo.uri,
-      });
+      assert.deepEqual(fakeStore.frames(), [
+        {
+          id: frameInfo.frameIdentifier,
+          metadata: frameInfo.metadata,
+          uri: frameInfo.uri,
+
+          // This would be false in the real application initially, but in these
+          // tests we pretend that the fetch completed immediately.
+          isAnnotationFetchComplete: true,
+        },
+      ]);
     });
 
     it("synchronizes highlight visibility in the guest with the sidebar's controls", async () => {
@@ -587,12 +606,12 @@ describe('FrameSyncService', () => {
       await connectGuest();
 
       emitGuestEvent('documentInfoChanged', {
-        frameIdentifier: fixtures.framesListEntry.id,
+        frameIdentifier: 'abc',
         uri: 'http://example.org',
       });
       emitGuestEvent('close');
 
-      assert.calledWith(fakeStore.destroyFrame, fixtures.framesListEntry);
+      assert.deepEqual(fakeStore.frames(), []);
     });
   });
 
