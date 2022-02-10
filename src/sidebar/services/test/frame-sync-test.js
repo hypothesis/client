@@ -277,6 +277,40 @@ describe('FrameSyncService', () => {
       );
     });
 
+    it('sends annotation to first frame if there is no frame with matching URL or main frame', async () => {
+      const annotation = {
+        id: 'abc',
+        uri: 'urn:book-id:1234',
+      };
+
+      const frames = [];
+      fakeStore.connectFrame.callsFake(frame => {
+        frames.push({ id: frame.id, uri: frame.uri });
+      });
+      fakeStore.frames.returns(frames);
+
+      // Connect a single guest which is not the main/host frame. This simulates
+      // what happens in VitalSource for example.
+      await connectGuest();
+      emitGuestEvent('documentInfoChanged', {
+        frameIdentifier: 'iframe',
+
+        // Note that URI does not match annotation URI. The backend can still return
+        // the annotation for this frame based on URI equivalence information.
+        uri: 'https://publisher.com/books/1234/chapter1.html',
+      });
+
+      fakeStore.setState({
+        annotations: [annotation],
+      });
+
+      assert.calledWithMatch(
+        guestRPC().call,
+        'loadAnnotations',
+        sinon.match([formatAnnot(annotation)])
+      );
+    });
+
     it('sends a "loadAnnotations" message only for new annotations', async () => {
       const frameInfo = fixtures.htmlDocumentInfo;
       await connectGuest();
