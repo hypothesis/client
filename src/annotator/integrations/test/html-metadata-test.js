@@ -17,6 +17,11 @@ describe('HTMLMetadata', () => {
   let tempDocumentHead;
   let testDocument = null;
 
+  /** @params {string[]} elements */
+  function insertDocumentHead(...elements) {
+    tempDocumentHead.innerHTML = elements.join('\n');
+  }
+
   beforeEach(() => {
     tempDocument = document.createDocumentFragment();
     tempDocument.location = { href: 'https://example.com' };
@@ -33,39 +38,38 @@ describe('HTMLMetadata', () => {
       let metadata = null;
 
       beforeEach(() => {
-        // Add some metadata to the page
-        tempDocumentHead.innerHTML = `
-          <meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">
-          <meta name="citation_title" content="Foo">
-          <meta name="citation_pdf_url" content="foo.pdf">
-          <meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">
-          <meta name="dc:identifier" content="foobar-abcxyz">
-          <meta name="dc.relation.ispartof" content="isbn:123456789">
-          <meta name="DC.type" content="Article">
-          <meta property="og:url" content="http://example.com">
-          <meta name="twitter:site" content="@okfn">
-          <meta name="eprints.title" content="Computer Lib / Dream Machines">
-          <meta name="prism.title" content="Literary Machines">
-        `;
+        insertDocumentHead(
+          '<meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">',
+          '<meta name="citation_title" content="Foo">',
+          '<meta name="citation_pdf_url" content="foo.pdf">',
+          '<meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">',
+          '<meta name="dc:identifier" content="foobar-abcxyz">',
+          '<meta name="dc.relation.ispartof" content="isbn:123456789">',
+          '<meta name="DC.type" content="Article">',
+          '<meta property="og:url" content="http://example.com">',
+          '<meta name="twitter:site" content="@okfn">',
+          '<meta name="eprints.title" content="Computer Lib / Dream Machines">',
+          '<meta name="prism.title" content="Literary Machines">'
+        );
 
         metadata = testDocument.getDocumentMetadata();
       });
 
       it('should ignore if "content" attribute is not present', () => {
-        tempDocumentHead.innerHTML = `
-          <meta name="citation_doi" content>
-          <meta name="DC.type">
-        `;
+        insertDocumentHead(
+          '<meta name="citation_doi" content>',
+          '<meta name="DC.type">'
+        );
         const metadata = testDocument.getDocumentMetadata();
         assert.isEmpty(metadata.highwire);
         assert.isEmpty(metadata.dc);
       });
 
       it('should lower-case the value of the specified attribute', () => {
-        tempDocumentHead.innerHTML = `
-          <meta name="CITATION_DOI" content="10.1175/JCLI-D-11-00015.1">
-          <meta property="OG:URL" content="https://fb.com">
-        `;
+        insertDocumentHead(
+          '<meta name="CITATION_DOI" content="10.1175/JCLI-D-11-00015.1">',
+          '<meta property="OG:URL" content="https://fb.com">'
+        );
         const metadata = testDocument.getDocumentMetadata();
         assert.deepEqual(metadata.highwire.doi, ['10.1175/JCLI-D-11-00015.1']);
         assert.deepEqual(metadata.facebook.url, ['https://fb.com']);
@@ -74,14 +78,14 @@ describe('HTMLMetadata', () => {
       it('should return title', () => {
         // Populate all supported title sources.
         tempDocument.title = 'Test document title';
-        tempDocumentHead.innerHTML = `
-          <meta name="eprints.title" content="Eprints title">
-          <meta name="prism.title" content="PRISM title">
-          <meta name="dc.title" content="Dublin Core title">
-          <meta name="citation_title" content="Highwire title">
-          <meta property="og:title" content="Facebook title">
-          <meta name="twitter:title" content="Twitter title">
-        `;
+        insertDocumentHead(
+          '<meta name="eprints.title" content="Eprints title">',
+          '<meta name="prism.title" content="PRISM title">',
+          '<meta name="dc.title" content="Dublin Core title">',
+          '<meta name="citation_title" content="Highwire title">',
+          '<meta property="og:title" content="Facebook title">',
+          '<meta name="twitter:title" content="Twitter title">'
+        );
 
         // Title values, in order of source priority.
         const sources = [
@@ -170,9 +174,9 @@ describe('HTMLMetadata', () => {
       });
 
       it('should ignore `pdf_url` links with invalid URIs', () => {
-        tempDocumentHead.innerHTML = `
-          <meta name="citation_pdf_url" content="http://a:b:c">
-        `;
+        insertDocumentHead(
+          '<meta name="citation_pdf_url" content="http://a:b:c">'
+        );
         const metadata = testDocument.getDocumentMetadata();
 
         // There should only be one link for the document's location.
@@ -185,21 +189,21 @@ describe('HTMLMetadata', () => {
       let metadata = null;
 
       beforeEach(() => {
-        tempDocumentHead.innerHTML = `
-          <link rel="alternate" href="foo.pdf" type="application/pdf"></link>
-          <link rel="alternate" href="foo.doc" type="application/msword"></link> 
-          <link rel="bookmark" href="http://example.com/bookmark"></link>
-          <link rel="shortlink" href="http://example.com/bookmark/short"></link>
-          <link rel="alternate" href="es/foo.html" hreflang="es" type="text/html"></link>
-          <link rel="icon" href="http://example.com/images/icon.ico"></link>
-          <link rel="canonical" href="http://example.com/canonical"></link>
+        insertDocumentHead(
+          '<link rel="alternate" href="foo.pdf" type="application/pdf">',
+          '<link rel="alternate" href="foo.doc" type="application/msword">',
+          '<link rel="bookmark" href="http://example.com/bookmark">',
+          '<link rel="shortlink" href="http://example.com/bookmark/short">',
+          '<link rel="alternate" href="es/foo.html" hreflang="es" type="text/html">',
+          '<link rel="icon" href="http://example.com/images/icon.ico">',
+          '<link rel="canonical" href="http://example.com/canonical">',
 
-          <meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">
-          <meta name="citation_pdf_url" content="foo.pdf">
-          <meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">
-          <meta name="dc:identifier" content="foobar-abcxyz">
-          <meta name="dc.relation.ispartof" content="isbn:123456789">
-        `;
+          '<meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">',
+          '<meta name="citation_pdf_url" content="foo.pdf">',
+          '<meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">',
+          '<meta name="dc:identifier" content="foobar-abcxyz">',
+          '<meta name="dc.relation.ispartof" content="isbn:123456789">'
+        );
 
         metadata = testDocument.getDocumentMetadata();
       });
@@ -245,23 +249,23 @@ describe('HTMLMetadata', () => {
       });
 
       it('should ignore atom and RSS feeds and alternate languages', () => {
-        tempDocumentHead.innerHTML = '';
+        insertDocumentHead();
         const links0 = testDocument.getDocumentMetadata().link;
 
-        tempDocumentHead.innerHTML = `
-          <link rel="alternate" href="feed" type="application/rss+xml"></link>
-          <link rel="alternate" href="feed" type="application/atom+xml"></link>
-        `;
+        insertDocumentHead(
+          '<link rel="alternate" href="feed" type="application/rss+xml">',
+          '<link rel="alternate" href="feed" type="application/atom+xml">'
+        );
         const links1 = testDocument.getDocumentMetadata().link;
 
         assert.equal(links1.length - links0.length, 0);
       });
 
       it('should ignore `<link>` tags with invalid URIs', () => {
-        tempDocumentHead.innerHTML = `
-          <link rel="alternate" href="https://example.com/foo">
-          <link rel="alternate" href="http://a:b:c">
-        `;
+        insertDocumentHead(
+          '<link rel="alternate" href="https://example.com/foo">',
+          '<link rel="alternate" href="http://a:b:c">'
+        );
         const metadata = testDocument.getDocumentMetadata();
 
         // There should be one link with the document location and one for the
@@ -275,9 +279,7 @@ describe('HTMLMetadata', () => {
       });
 
       it('should ignore favicons with invalid URIs', () => {
-        tempDocumentHead.innerHTML = `
-          <link rel="favicon" href="http://a:b:c">
-        `;
+        insertDocumentHead('<link rel="favicon" href="http://a:b:c">');
         const metadata = testDocument.getDocumentMetadata();
 
         assert.isUndefined(metadata.favicon);
