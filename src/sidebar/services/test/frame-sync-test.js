@@ -351,7 +351,6 @@ describe('FrameSyncService', () => {
     it('sends a "publicAnnotationCountChanged" message to the frame when there are public annotations', async () => {
       await connectGuest();
       emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
-      fakeStore.frames()[0].isAnnotationFetchComplete = true;
 
       fakeStore.setState({
         annotations: [annotationFixtures.publicAnnotation()],
@@ -367,7 +366,6 @@ describe('FrameSyncService', () => {
     it('sends a "publicAnnotationCountChanged" message to the frame when there are only private annotations', async () => {
       await connectGuest();
       emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
-      fakeStore.frames()[0].isAnnotationFetchComplete = true;
 
       const annot = annotationFixtures.defaultAnnotation();
       delete annot.permissions;
