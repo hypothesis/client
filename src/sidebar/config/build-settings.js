@@ -4,6 +4,7 @@ import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
  * @typedef {import('../../types/config').SidebarConfig} SidebarConfig
+ * @typedef {import('../../types/config').HostConfig} HostConfig
  * @typedef {import('../../types/config').MergedConfig} MergedConfig
  */
 
@@ -76,63 +77,15 @@ function fetchConfigFromAncestorFrame(origin, window_ = window) {
 }
 
 /**
- * @deprecated
- * Merge client configuration from h service with config fetched from
- * embedding frame.
+ * Retrieve host configuration by RPC from another frame
  *
- * Typically the configuration from the embedding frame is passed
- * synchronously in the query string. However it can also be retrieved from
- * an ancestor of the embedding frame. See tests for more details.
- *
- * @param {object} appConfig - Settings rendered into `app.html` by the h service.
- * @param {Window} window_ - Test seam.
- * @return {Promise<object>} - The merged settings.
- */
-function fetchConfigLegacy(appConfig, window_ = window) {
-  const hostConfig = hostPageConfig(window_);
-
-  let embedderConfig;
-  const origin = /** @type string */ (hostConfig.requestConfigFromFrame);
-  embedderConfig = fetchConfigFromAncestorFrame(origin, window_);
-
-  return embedderConfig.then(embedderConfig => {
-    const mergedConfig = Object.assign({}, appConfig, embedderConfig);
-    mergedConfig.apiUrl = getApiUrl(mergedConfig);
-    return mergedConfig;
-  });
-}
-
-/**
- * Merge client configuration from h service with config from the hash fragment.
- *
- * @param {object} appConfig - App config settings rendered into `app.html` by the h service.
- * @param {object} hostPageConfig - App configuration specified by the embedding frame.
- * @return {object} - The merged settings.
- */
-function fetchConfigEmbed(appConfig, hostPageConfig) {
-  const mergedConfig = {
-    ...appConfig,
-    ...hostPageConfig,
-  };
-  mergedConfig.apiUrl = getApiUrl(mergedConfig);
-  return mergedConfig;
-}
-
-/**
- * Merge client configuration from h service with config fetched from
- * a parent frame asynchronously.
- *
- * Use this method to retrieve the config asynchronously from a parent
- * frame via RPC. See tests for more details.
- *
- * @param {object} appConfig - Settings rendered into `app.html` by the h service.
- * @param {Window} parentFrame - Frame to send call to.
+ * @param {Window} targetFrame - Frame to request configuration from
  * @param {string} origin - Origin filter for `window.postMessage` call.
- * @return {Promise<object>} - The merged settings.
+ * @return {Promise<HostConfig>}
  */
-async function fetchConfigRpc(appConfig, parentFrame, origin) {
+async function fetchHostConfigRPC(targetFrame, origin) {
   const remoteConfig = await postMessageJsonRpc.call(
-    parentFrame,
+    targetFrame,
     origin,
     'requestConfig',
     [],
@@ -140,9 +93,8 @@ async function fetchConfigRpc(appConfig, parentFrame, origin) {
   );
   // Closure for the RPC call to scope parentFrame and origin variables.
   const rpcCall = (method, args = [], timeout = 3000) =>
-    postMessageJsonRpc.call(parentFrame, origin, method, args, timeout);
-  const mergedConfig = fetchConfigEmbed(appConfig, remoteConfig);
-  return fetchGroupsAsync(mergedConfig, rpcCall);
+    postMessageJsonRpc.call(targetFrame, origin, method, args, timeout);
+  return fetchGroupsAsync(remoteConfig, rpcCall);
 }
 
 /**
@@ -178,55 +130,78 @@ async function fetchGroupsAsync(config, rpcCall) {
 }
 
 /**
- * Fetch the host configuration and merge it with the app configuration from h.
+ * Find and retrieve the correct host configuration for the sidebar.
  *
- * There are 3 ways to get the host config:
- *  Direct embed - From the hash string of the embedder frame.
- *  Legacy RPC with unknown parent - From a ancestor parent frame that passes it down via RPC. (deprecated)
- *  RPC with known parent - From a ancestor parent frame that passes it down via RPC.
+ * Host configuration may come from one of three places:
+ * - From the embedding (host) document frame.
+ *   The annotator encodes JavaScript/JSON settings from the host frame as a
+ *   URL fragment on the sidebar frame's `src`. In this (common) case,
+ *   use the parsed `configFromURL` itself as the host configuration.
+ * - From a known parent frame, requested by RPC (e.g. LMS).
+ *   Send a single RPC request to a known frame to retrieve host configuration
+ * - From an ancestor frame, using RPC (deprecated)
+ *   Send RPC requests for configuration to ancestor frames until we
+ *   (hopefully) find a host configuration.
  *
- * @param {SidebarConfig} appConfig
- * @param {Window} window_ - Test seam.
- * @return {Promise<MergedConfig>} - The merged settings.
+ * In cases where configuration is retrieved by RPC, the `configFromURL` object
+ * values are not retained in the returned host configuration. Note the
+ * exception related to the `group` property below.
+ *
+ * @param {HostConfig} configFromURL
+ * @param {Window} [window_]
+ * @returns {Promise<HostConfig>}
  */
-export async function fetchConfig(appConfig, window_ = window) {
-  const hostConfig = hostPageConfig(window);
-
-  const requestConfigFromFrame = hostConfig.requestConfigFromFrame;
+async function findHostConfiguration(configFromURL, window_) {
+  const requestConfigFromFrame = configFromURL.requestConfigFromFrame;
 
   if (!requestConfigFromFrame) {
-    // Directly embed: just get the config.
-    return fetchConfigEmbed(appConfig, hostConfig);
+    // In this case, the `configFromURL` is retained and used as host configuration
+    return configFromURL;
   }
+
   if (typeof requestConfigFromFrame === 'string') {
-    // Legacy: send RPC to all parents to find config. (deprecated)
-    // nb. Browsers may display errors in the console when messages are sent to frames
-    // that don't match the origin filter".
-    return await fetchConfigLegacy(appConfig, window_);
+    return await fetchConfigFromAncestorFrame(requestConfigFromFrame, window_);
   } else if (
     typeof requestConfigFromFrame.ancestorLevel === 'number' &&
     typeof requestConfigFromFrame.origin === 'string'
   ) {
-    // Know parent frame: send RPC directly to the parent.
-    const parentFrame = getAncestorFrame(
-      requestConfigFromFrame.ancestorLevel,
-      window_
-    );
-
-    const rpcMergedConfig = await fetchConfigRpc(
-      appConfig,
-      parentFrame,
+    const hostConfiguration = await fetchHostConfigRPC(
+      getAncestorFrame(requestConfigFromFrame.ancestorLevel, window_),
       requestConfigFromFrame.origin
     );
-    // Add back the optional focused group id from the host page config
-    // as this is needed in the Notebook.
-    return {
-      ...rpcMergedConfig,
-      ...(hostConfig.group ? { group: hostConfig.group } : {}),
-    };
+
+    // Manually add a `group` property to the host configuration if
+    // it was present on `configFromURL`. This allows a focused group to be
+    // available to the Notebook within LMS contexts.
+    // FIXME: This could be organized/typed more elegantly.
+    if (configFromURL.group && !hostConfiguration.group) {
+      hostConfiguration.group = configFromURL.group;
+    }
+    return hostConfiguration;
   } else {
     throw new Error(
       'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
     );
   }
+}
+
+/**
+ * Build a settings object for use in the sidebar by extending provided base
+ * configuration with the correct "host configuration" settings.
+ *
+ * @param {SidebarConfig} sidebarConfiguration
+ * @param {Window} [window_]
+ * @returns {Promise<MergedConfig>}
+ */
+export async function buildSettings(sidebarConfiguration, window_ = window) {
+  const configFromURL = hostPageConfig(window_);
+  const hostConfiguration = await findHostConfiguration(configFromURL, window_);
+
+  const settings = {
+    ...sidebarConfiguration,
+    ...hostConfiguration,
+  };
+  settings.apiUrl = getApiUrl(settings);
+
+  return settings;
 }
