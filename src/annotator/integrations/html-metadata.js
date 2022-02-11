@@ -84,12 +84,12 @@ export class HTMLMetadata {
       title: document.title,
       link: [],
 
-      dc: this._getMetaTags('name', 'dc', '.'),
-      eprints: this._getMetaTags('name', 'eprints', '.'),
-      facebook: this._getMetaTags('property', 'og', ':'),
-      highwire: this._getMetaTags('name', 'citation', '_'),
-      prism: this._getMetaTags('name', 'prism', '.'),
-      twitter: this._getMetaTags('name', 'twitter', ':'),
+      dc: this._getMetaTags('name', 'dc.'),
+      eprints: this._getMetaTags('name', 'eprints.'),
+      facebook: this._getMetaTags('property', 'og:'),
+      highwire: this._getMetaTags('name', 'citation_'),
+      prism: this._getMetaTags('name', 'prism.'),
+      twitter: this._getMetaTags('name', 'twitter:'),
     };
 
     const favicon = this._getFavicon();
@@ -110,21 +110,20 @@ export class HTMLMetadata {
 
   /**
    * Return an array of all the `content` values of `<meta>` tags on the page
-   * where the attribute named `attribute` begins with `<prefix><delimiter>`.
+   * where the value of the attribute begins with `<prefix>`.
    *
    * @param {string} attribute
    * @param {string} prefix - it is interpreted as a regex
-   * @param {string} delimiter - it is interpreted as a regex
    * @return {Record<string,string[]>}
    */
-  _getMetaTags(attribute, prefix, delimiter) {
+  _getMetaTags(attribute, prefix) {
     /** @type {Record<string,string[]>} */
     const tags = {};
     for (let meta of Array.from(this.document.querySelectorAll('meta'))) {
       const name = meta.getAttribute(attribute);
       const { content } = meta;
       if (name && content) {
-        const match = name.match(RegExp(`^${prefix}${delimiter}(.+)$`, 'i'));
+        const match = name.match(RegExp(`^${prefix}(.+)$`, 'i'));
         if (match) {
           const n = match[1];
           if (tags[n]) {
