@@ -8,7 +8,36 @@ describe('PortRPC', () => {
   let plusOne;
 
   /**
-   * Wait for messages enqueued via `postMessage` to be delivered.
+   * Wait for a specific PortRPC method call to be delivered to a port.
+   *
+   * @param {MessagePort} port
+   * @param {string} method
+   * @param {number} [count]
+   */
+  function waitForMessage(port, method, count = 1) {
+    let receivedCount = 0;
+
+    return new Promise(resolve => {
+      const onMessage = e => {
+        if (e.data.method === method) {
+          ++receivedCount;
+          if (receivedCount >= count) {
+            resolve();
+            port.removeEventListener('message', onMessage);
+          }
+        }
+      };
+      port.addEventListener('message', onMessage);
+    });
+  }
+
+  /**
+   * Wait briefly to allow any pending MessagePort messages to be delivered.
+   *
+   * Browsers don't guarantee how long message delivery will take, though it
+   * almost always happens after one macrotask, so there is a small risk this
+   * doesn't wait long enough. Use this only for scenarios (eg. just before
+   * asserting that a message was not delivered) where that is acceptable.
    */
   function waitForMessageDelivery() {
     return new Promise(resolve => setTimeout(resolve, 0));
@@ -92,7 +121,7 @@ describe('PortRPC', () => {
       version: '1.0.0',
     });
 
-    await waitForMessageDelivery();
+    await waitForMessage(port2, 'plusOne');
     assert.calledOnce(plusOne);
   });
 
@@ -173,7 +202,7 @@ describe('PortRPC', () => {
     sender.call('test', 'second', 'call');
     sender.connect(port1);
 
-    await waitForMessageDelivery();
+    await waitForMessage(port2, 'test', 2);
     assert.calledWith(testMethod, 'first', 'call');
     assert.calledWith(testMethod, 'second', 'call');
   });
@@ -188,7 +217,7 @@ describe('PortRPC', () => {
     receiver.connect(port2);
     sender.connect(port1);
 
-    await waitForMessageDelivery();
+    await waitForMessage(port2, 'connect');
 
     assert.calledWith(connectHandler);
   });
@@ -206,7 +235,7 @@ describe('PortRPC', () => {
 
     assert.notCalled(closeHandler);
     sender.destroy();
-    await waitForMessageDelivery();
+    await waitForMessage(port2, 'close');
 
     assert.calledOnce(closeHandler);
     assert.calledWith(closeHandler);
@@ -225,7 +254,7 @@ describe('PortRPC', () => {
 
     assert.notCalled(closeHandler);
     window.dispatchEvent(new Event('unload'));
-    await waitForMessageDelivery();
+    await waitForMessage(port2, 'close');
 
     assert.calledOnce(closeHandler);
     assert.calledWith(closeHandler);
@@ -246,7 +275,7 @@ describe('PortRPC', () => {
     sender.call('close');
     sender.call('close');
 
-    await waitForMessageDelivery();
+    await waitForMessage(port2, 'close');
 
     assert.calledOnce(closeHandler);
   });
@@ -313,7 +342,7 @@ describe('PortRPC', () => {
       // the parent frame and the "close" event will be sent from there.
       childFrame.remove();
 
-      await waitForMessageDelivery();
+      await waitForMessage(port2, 'close');
 
       assert.called(closeHandler);
     });
