@@ -6,7 +6,7 @@ import { ListenerCollection } from '../shared/listener-collection';
  * @param {Document} document
  * @return {Range|null}
  */
-function selectedRange(document) {
+export function selectedRange(document) {
   const selection = document.getSelection();
   if (!selection || selection.rangeCount === 0) {
     return null;

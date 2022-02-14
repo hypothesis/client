@@ -43,6 +43,7 @@ describe('Guest', () => {
   let fakePortFinder;
   let FakePortRPC;
   let fakePortRPCs;
+  let fakeSelectedRange;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -151,6 +152,8 @@ describe('Guest', () => {
       }
     }
 
+    fakeSelectedRange = sinon.stub();
+
     $imports.$mock({
       '../shared/messaging': {
         PortFinder: sinon.stub().returns(fakePortFinder),
@@ -170,6 +173,7 @@ describe('Guest', () => {
       './range-util': rangeUtil,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
+        selectedRange: fakeSelectedRange,
       },
       './util/buckets': {
         findClosestOffscreenAnchor: fakeFindClosestOffscreenAnchor,
@@ -672,26 +676,51 @@ describe('Guest', () => {
       assert.calledWith(hostRPC().call, 'textUnselected');
     });
 
-    it('unselects text if another iframe has made a selection', () => {
-      const removeAllRanges = sandbox.stub();
-      sandbox.stub(document, 'getSelection').returns({ removeAllRanges });
-      const guest = createGuest();
-      guest.selectedRanges = [1];
+    context('on "clearSelection" RPC event', () => {
+      it('if guest has selected text, clears the selection', () => {
+        const removeAllRanges = sandbox.stub();
+        sandbox.stub(document, 'getSelection').returns({ removeAllRanges });
+        const guest = createGuest();
+        guest.selectedRanges = [1];
 
-      simulateSelectionWithText();
-      hostRPC().call.resetHistory();
-      emitHostEvent('clearSelection');
+        // Guest has text selected
+        simulateSelectionWithText();
+        fakeSelectedRange.returns({});
 
-      assert.calledOnce(removeAllRanges);
-      notifySelectionChanged(null); // removing the text selection triggers the selection observer
+        hostRPC().call.resetHistory();
+        emitHostEvent('clearSelection');
 
-      assert.equal(guest.selectedRanges.length, 0);
-      assert.notCalled(hostRPC().call);
+        assert.calledOnce(removeAllRanges);
+        notifySelectionChanged(null); // removing the text selection triggers the selection observer
 
-      // On next selection clear it should be inform the host.
-      notifySelectionChanged(null);
-      assert.calledOnce(hostRPC().call);
-      assert.calledWithExactly(hostRPC().call, 'textUnselected');
+        assert.equal(guest.selectedRanges.length, 0);
+        assert.notCalled(hostRPC().call);
+
+        // On next selection clear it should be inform the host.
+        notifySelectionChanged(null);
+        assert.calledOnce(hostRPC().call);
+        assert.calledWithExactly(hostRPC().call, 'textUnselected');
+      });
+
+      it('if guest has no text selected, does nothing', () => {
+        const removeAllRanges = sandbox.stub();
+        sandbox.stub(document, 'getSelection').returns({ removeAllRanges });
+        const guest = createGuest();
+        guest.selectedRanges = [1];
+
+        // Guest has no text selected
+        fakeSelectedRange.returns(null);
+
+        hostRPC().call.resetHistory();
+        emitHostEvent('clearSelection');
+
+        assert.notCalled(removeAllRanges);
+
+        // On next selection clear it should be inform the host.
+        notifySelectionChanged(null);
+        assert.calledOnce(hostRPC().call);
+        assert.calledWithExactly(hostRPC().call, 'textUnselected');
+      });
     });
   });
 
