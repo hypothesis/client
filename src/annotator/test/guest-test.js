@@ -693,16 +693,6 @@ describe('Guest', () => {
       assert.calledOnce(hostRPC().call);
       assert.calledWithExactly(hostRPC().call, 'textUnselected');
     });
-
-    it("doesn't unselect text if frame identifier matches", () => {
-      const guest = createGuest();
-      guest.selectedRanges = [1];
-
-      simulateSelectionWithText();
-      emitHostEvent('clearSelectionExceptIn', null);
-
-      assert.equal(guest.selectedRanges.length, 1);
-    });
   });
 
   describe('when adder toolbar buttons are clicked', () => {
