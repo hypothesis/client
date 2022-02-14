@@ -15,7 +15,7 @@ import {
 } from './highlighter';
 import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
-import { SelectionObserver } from './selection-observer';
+import { SelectionObserver, selectedRange } from './selection-observer';
 import { findClosestOffscreenAnchor } from './util/buckets';
 import { normalizeURI } from './util/url';
 
@@ -303,8 +303,10 @@ export class Guest {
 
   async _connectHost() {
     this._hostRPC.on('clearSelection', () => {
-      this._informHostOnNextSelectionClear = false;
-      removeTextSelection();
+      if (selectedRange(document)) {
+        this._informHostOnNextSelectionClear = false;
+        removeTextSelection();
+      }
     });
 
     this._hostRPC.on('createAnnotation', () => this.createAnnotation());
