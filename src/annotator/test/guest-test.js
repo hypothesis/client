@@ -696,7 +696,7 @@ describe('Guest', () => {
         assert.equal(guest.selectedRanges.length, 0);
         assert.notCalled(hostRPC().call);
 
-        // On next selection clear it should be inform the host.
+        // On next selection clear it should inform the host.
         notifySelectionChanged(null);
         assert.calledOnce(hostRPC().call);
         assert.calledWithExactly(hostRPC().call, 'textUnselected');
@@ -716,7 +716,7 @@ describe('Guest', () => {
 
         assert.notCalled(removeAllRanges);
 
-        // On next selection clear it should be inform the host.
+        // On next selection clear it should inform the host.
         notifySelectionChanged(null);
         assert.calledOnce(hostRPC().call);
         assert.calledWithExactly(hostRPC().call, 'textUnselected');
