@@ -197,8 +197,15 @@ export class Sidebar {
 
     this.onLayoutChange = config.onLayoutChange;
 
+    /** @type {SidebarLayout} */
+    this._layoutState = {
+      expanded: false,
+      width: 0,
+      toolbarWidth: 0,
+    };
+
     // Initial layout notification
-    this._notifyOfLayoutChange(false);
+    this._updateLayoutState(false);
     this._setupSidebarEvents();
   }
 
@@ -285,6 +292,8 @@ export class Sidebar {
 
     guestRPC.connect(port);
     this._guestRPC.push(guestRPC);
+
+    guestRPC.call('sidebarLayoutChanged', this._layoutState);
   }
 
   _setupSidebarEvents() {
@@ -388,19 +397,23 @@ export class Sidebar {
         if (width >= MIN_RESIZE) {
           this.iframeContainer.style.width = `${width}px`;
         }
-        this._notifyOfLayoutChange();
+        this._updateLayoutState();
       }
     });
   }
 
   /**
-   * Notify integrator when sidebar is opened, closed or resized.
+   * Update the current layout state and notify the embedder if they provided
+   * an `onLayoutChange` callback in the Hypothesis config, as well as guests
+   * so they can enable/adapt side-by-side mode.
+   *
+   * This is called when the sidebar is opened, closed or resized.
    *
    * @param {boolean} [expanded] -
    *   `true` or `false` if the sidebar is being directly opened or closed, as
    *   opposed to being resized via the sidebar's drag handles
    */
-  _notifyOfLayoutChange(expanded) {
+  _updateLayoutState(expanded) {
     // The sidebar structure is:
     //
     // [ Toolbar    ][                                   ]
@@ -446,6 +459,7 @@ export class Sidebar {
       toolbarWidth,
     });
 
+    this._layoutState = layoutState;
     if (this.onLayoutChange) {
       this.onLayoutChange(layoutState);
     }
@@ -536,7 +550,7 @@ export class Sidebar {
       this.setHighlightsVisible(true);
     }
 
-    this._notifyOfLayoutChange(true);
+    this._updateLayoutState(true);
   }
 
   close() {
@@ -551,7 +565,7 @@ export class Sidebar {
       this.setHighlightsVisible(false);
     }
 
-    this._notifyOfLayoutChange(false);
+    this._updateLayoutState(false);
   }
 
   /**
