@@ -856,6 +856,21 @@ describe('Sidebar', () => {
         });
       });
 
+      it('notifies new guests of current sidebar layout', () => {
+        sidebar.open();
+
+        connectGuest(sidebar);
+
+        assert.calledWith(
+          guestRPC().call,
+          'sidebarLayoutChanged',
+          sinon.match({
+            expanded: true,
+            width: DEFAULT_WIDTH + fakeToolbar.getWidth(),
+          })
+        );
+      });
+
       it('notifies when sidebar is panned left', () => {
         sidebar._gestureState = { initial: -DEFAULT_WIDTH };
         sidebar._onPan({ type: 'panleft', deltaX: -50 });
