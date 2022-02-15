@@ -29,6 +29,10 @@ const commonPolyfills = [
  */
 
 /**
+ * @typedef {Window & { PDFViewerApplication?: object }} MaybePDFWindow
+ */
+
+/**
  * Mark an element as having been added by the boot script.
  *
  * This marker is later used to know which elements to remove when unloading
@@ -197,17 +201,23 @@ export function bootHypothesisClient(doc, config) {
 
   const polyfills = polyfillBundles(commonPolyfills);
 
+  // Override styling in certain document viewers.
+  const viewerStyles = [];
+  if (
+    /** @type {MaybePDFWindow} */ (window).PDFViewerApplication !== undefined
+  ) {
+    viewerStyles.push('styles/pdfjs-overrides.css');
+  }
+
   injectAssets(
     doc,
     config,
     [
-      // Vendor code and polyfills
       ...polyfills,
+      ...viewerStyles,
 
       'scripts/annotator.bundle.js',
-
       'styles/highlights.css',
-      'styles/pdfjs-overrides.css',
     ],
 
     // Force re-evaluation of JS module scripts, so that the annotator entry

@@ -104,10 +104,27 @@ describe('bootstrap', () => {
       const expectedAssets = [
         'scripts/annotator.bundle.1234.js#ts=123',
         'styles/highlights.1234.css',
-        'styles/pdfjs-overrides.1234.css',
       ].map(assetUrl);
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
+    });
+
+    it('loads styling overrides in PDF.js', () => {
+      clock.tick(123); // Set timestamp used by module cache-busting fragment.
+
+      window.PDFViewerApplication = {};
+      try {
+        runBoot('annotator');
+        const expectedAssets = [
+          'scripts/annotator.bundle.1234.js#ts=123',
+          'styles/highlights.1234.css',
+          'styles/pdfjs-overrides.1234.css',
+        ].map(assetUrl);
+
+        assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
+      } finally {
+        delete window.PDFViewerApplication;
+      }
     });
 
     it('preloads assets used wihin shadow roots in the annotation layer', () => {
