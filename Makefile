@@ -18,7 +18,7 @@ help:
 
 .PHONY: dev
 dev: node_modules/.uptodate
-	node_modules/.bin/gulp watch
+	yarn gulp watch
 
 .PHONY: test
 test: node_modules/.uptodate
