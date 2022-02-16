@@ -38,6 +38,7 @@ export function isMessage(data) {
  *
  * @param {any} data
  * @param {Partial<Message>} message
+ * @return {data is Message}
  */
 export function isMessageEqual(data, message) {
   if (!isMessage(data)) {

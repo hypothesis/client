@@ -111,7 +111,6 @@ export class FrameSyncService {
      * @type {Map<string|null, PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>>}
      */
     this._guestRPC = new Map();
-    this._nextGuestId = 0;
 
     /**
      * Tags of annotations that are currently loaded into guest frames.
@@ -221,20 +220,11 @@ export class FrameSyncService {
    * Set up a connection to a new guest frame.
    *
    * @param {MessagePort} port - Port for communicating with the guest
+   * @param {string} frameIdentifier
    */
-  _connectGuest(port) {
+  _connectGuest(port, frameIdentifier) {
     /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
     const guestRPC = new PortRPC();
-
-    // Add guest RPC to map with a temporary ID until we learn the real ID.
-    //
-    // We need to add the guest to the map immediately so that any notifications
-    // sent from this service to all guests, before we learn the real frame ID,
-    // are sent to this new guest.
-    ++this._nextGuestId;
-    let frameIdentifier = /** @type {string|null} */ (
-      `temp-${this._nextGuestId}`
-    );
     this._guestRPC.set(frameIdentifier, guestRPC);
 
     // Update document metadata for this guest. We currently assume that the
@@ -242,11 +232,6 @@ export class FrameSyncService {
     // to the document, we'll need to change `connectFrame` to update rather than
     // add to the frame list.
     guestRPC.on('documentInfoChanged', info => {
-      this._guestRPC.delete(frameIdentifier);
-
-      frameIdentifier = info.frameIdentifier;
-      this._guestRPC.set(frameIdentifier, guestRPC);
-
       this._store.connectFrame({
         id: info.frameIdentifier,
         metadata: info.metadata,
@@ -373,7 +358,7 @@ export class FrameSyncService {
    */
   async connect() {
     // Create channel for sidebar-host communication.
-    const hostPort = await this._portFinder.discover('host');
+    const {port: hostPort} = await this._portFinder.discover('host');
     this._hostRPC.connect(hostPort);
 
     // Listen for guests connecting to the sidebar.
@@ -386,7 +371,7 @@ export class FrameSyncService {
           type: 'offer',
         })
       ) {
-        this._connectGuest(ports[0]);
+        this._connectGuest(ports[0], data.requestId);
       }
     });
   }

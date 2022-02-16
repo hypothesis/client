@@ -165,10 +165,18 @@ export class Guest {
      */
     this._annotations = /** @type {Set<string>} */ (new Set());
 
+    /** @type {(value: string|null) => void} */
+    this._resolveFrameIdentifier = () => {};
+
     // Set the frame identifier if it's available.
     // The "top" guest instance will have this as null since it's in a top frame not a sub frame
-    /** @type {string|null} */
-    this._frameIdentifier = config.subFrameIdentifier || null;
+    /** @type {Promise<string|null>} */
+    this._frameIdentifier = new Promise(
+      resolve => (this._resolveFrameIdentifier = resolve)
+    );
+    if (!config.subFrameIdentifier) {
+      this._resolveFrameIdentifier(null);
+    }
 
     this._portFinder = new PortFinder({
       hostFrame: this._hostFrame,
@@ -276,15 +284,16 @@ export class Guest {
    * Retrieve metadata for the current document.
    */
   async getDocumentInfo() {
-    const [uri, metadata] = await Promise.all([
+    const [uri, metadata, frameIdentifier] = await Promise.all([
       this._integration.uri(),
       this._integration.getMetadata(),
+      this._frameIdentifier,
     ]);
 
     return {
       uri: normalizeURI(uri),
       metadata,
-      frameIdentifier: this._frameIdentifier,
+      frameIdentifier,
     };
   }
 
@@ -345,7 +354,7 @@ export class Guest {
 
     // Discover and connect to the host frame. All RPC events must be
     // registered before creating the channel.
-    const hostPort = await this._portFinder.discover('host');
+    const { port: hostPort } = await this._portFinder.discover('host');
     this._hostRPC.connect(hostPort);
   }
 
@@ -405,11 +414,9 @@ export class Guest {
     );
 
     // Connect to sidebar and send document info/URIs to it.
-    //
-    // RPC calls are deferred until a connection is made, so these steps can
-    // complete in either order.
-    this._portFinder.discover('sidebar').then(port => {
+    this._portFinder.discover('sidebar').then(({ port, requestId }) => {
       this._sidebarRPC.connect(port);
+      this._resolveFrameIdentifier(requestId);
     });
     this.getDocumentInfo().then(metadata =>
       this._sidebarRPC.call('documentInfoChanged', metadata)

@@ -42,7 +42,7 @@ export class PortFinder {
    * Request a specific port from the host frame
    *
    * @param {Frame} target - the frame aiming to be discovered
-   * @return {Promise<MessagePort>}
+   * @return {Promise<{port: MessagePort, requestId: string}>}
    */
   async discover(target) {
     let isValidRequest = false;
@@ -106,7 +106,7 @@ export class PortFinder {
           clearInterval(intervalId);
           clearTimeout(timeoutId);
           this._listeners.remove(listenerId);
-          resolve(ports[0]);
+          resolve({ port: ports[0], requestId });
         }
       });
 
