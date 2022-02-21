@@ -1,3 +1,4 @@
+import { delay } from '../../../test-util/wait';
 import { ImageTextLayer } from '../image-text-layer';
 
 // Sizes and spacing between character bounding boxes in these tests, expressed
@@ -54,6 +55,16 @@ function expectedBoxOffsetAndSize(
     width,
     height,
   ].map(coord => Math.round(coord));
+}
+
+function waitForResize(element) {
+  return new Promise(resolve => {
+    const observer = new ResizeObserver(() => {
+      observer.disconnect();
+      resolve();
+    });
+    observer.observe(element);
+  });
 }
 
 describe('ImageTextLayer', () => {
@@ -170,7 +181,7 @@ describe('ImageTextLayer', () => {
     assert.deepEqual(wordBoxPositions, expectedPositions);
   });
 
-  it('updates size and position of text layer elements when window is resized', () => {
+  it('updates size and position of text layer when page image is resized', async () => {
     const { container, image } = createPageImage();
     const imageText = 'some text in the image';
 
@@ -191,9 +202,7 @@ describe('ImageTextLayer', () => {
       image.style.width = '300px';
       image.style.height = '300px';
 
-      // Notify text layer that image has been resized. We currently assume
-      // that this always corresponds to a window resize.
-      window.dispatchEvent(new Event('resize'));
+      await waitForResize(textLayerEl);
       clock.tick(100);
 
       // Check that text layer was resized to fit new image size.
@@ -240,25 +249,32 @@ describe('ImageTextLayer', () => {
     }
   });
 
-  it('debounces image resize events', () => {
+  it('debounces text layer size updates', async () => {
     const { image } = createPageImage();
     const imageText = 'some text in the image';
 
-    const clock = sinon.useFakeTimers();
-    try {
-      createTextLayer(image, createCharBoxes(imageText), imageText);
+    createTextLayer(image, createCharBoxes(imageText), imageText);
 
-      // Spy on logic that is invoked each time a resize event is handled.
-      const measureImageSpy = sinon.spy(image, 'getBoundingClientRect');
+    // Spy on logic that is invoked each time a resize event is handled.
+    const measureImageSpy = sinon.spy(image, 'getBoundingClientRect');
 
-      window.dispatchEvent(new Event('resize'));
-      window.dispatchEvent(new Event('resize'));
-      clock.tick(300);
+    // Resize the image twice in quick succession. The text layer should only
+    // be resized once.
+    const imageResized = waitForResize(image);
+    image.style.width = '250px';
+    image.style.height = '250px';
+    await imageResized;
 
-      assert.calledOnce(measureImageSpy);
-    } finally {
-      clock.restore();
-    }
+    // Waiting one event loop turn between resizes is necessary to avoid a
+    // "ResizeObserver loop limit exceeded" error.
+    await delay(0);
+
+    const imageResizedAgain = waitForResize(image);
+    image.style.width = '300px';
+    image.style.height = '300px';
+    await imageResizedAgain;
+
+    assert.calledOnce(measureImageSpy);
   });
 
   describe('#destroy', () => {
