@@ -178,11 +178,19 @@ export class ImageTextLayer {
      */
     this.container = container;
 
-    // Adjust box sizes when image is resized. We currently assume this
-    // corresponds to a frame resize. We could use `ResizeObserver` instead in
-    // supporting browsers.
     this._updateBoxSizes = debounce(updateBoxSizes, { maxWait: 50 });
     this._listeners = new ListenerCollection();
+
+    if (typeof ResizeObserver !== 'undefined') {
+      this._imageSizeObserver = new ResizeObserver(() => {
+        this._updateBoxSizes();
+      });
+      this._imageSizeObserver.observe(image);
+    }
+
+    // Fallback for browsers that don't support ResizeObserver (Safari < 13.4).
+    // Due to the debouncing, we can register this listener in all browsers for
+    // simplicity, without downsides.
     this._listeners.add(window, 'resize', this._updateBoxSizes);
   }
 
@@ -190,5 +198,6 @@ export class ImageTextLayer {
     this.container.remove();
     this._listeners.removeAll();
     this._updateBoxSizes.cancel();
+    this._imageSizeObserver?.disconnect();
   }
 }
