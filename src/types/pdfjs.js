@@ -63,7 +63,8 @@
 
 /**
  * @typedef GetTextContentParameters
- * @prop {boolean} normalizeWhitespace
+ * @prop {boolean} normalizeWhitespace - Whether to convert all whitespace to
+ *   an ASCII space char. Obsolete since https://github.com/mozilla/pdf.js/pull/14527.
  */
 
 /**
