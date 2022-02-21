@@ -350,6 +350,36 @@ describe('annotator/integrations/vitalsource', () => {
 
         assert.calledOnce(fakeImageTextLayer.destroy);
       });
+
+      context('when side-by-side mode is toggled', () => {
+        it('resizes page image', () => {
+          createPageImageAndData();
+          const integration = createIntegration();
+
+          // Activate side-by-side mode. Page image should be resized to fit
+          // alongside sidebar.
+          const sidebarWidth = 150;
+          const expectedWidth = window.innerWidth - sidebarWidth;
+          integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+          assert.equal(fakePageImage.parentElement.style.textAlign, 'left');
+          assert.equal(fakePageImage.style.width, `${expectedWidth}px`);
+
+          // Deactivate side-by-side mode. Style overrides should be removed.
+          integration.fitSideBySide({ expanded: false });
+          assert.equal(fakePageImage.parentElement.style.textAlign, '');
+          assert.equal(fakePageImage.style.width, '');
+        });
+
+        it('does not resize page image if there is not enough space', () => {
+          createPageImageAndData();
+          const integration = createIntegration();
+
+          const sidebarWidth = window.innerWidth - 200;
+          integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+          assert.equal(fakePageImage.parentElement.style.textAlign, '');
+          assert.equal(fakePageImage.style.width, '');
+        });
+      });
     });
   });
 });

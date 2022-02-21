@@ -129,6 +129,12 @@ export class VitalSourceInjector {
  * @prop {string} words - The text in the page
  */
 
+function getPDFPageImage() {
+  return /** @type {HTMLImageElement|null} */ (
+    document.querySelector('img#pbk-page')
+  );
+}
+
 /**
  * Integration for the content frame in VitalSource's Bookshelf ebook reader.
  *
@@ -169,7 +175,7 @@ export class VitalSourceContentIntegration {
 
     // If this is a PDF, create the hidden text layer above the rendered PDF
     // image.
-    const bookImage = document.querySelector('#pbk-page');
+    const bookImage = getPDFPageImage();
 
     /** @type {PDFTextData|undefined} */
     const pageData = /** @type {any} */ (window).innerPageData;
@@ -229,7 +235,32 @@ export class VitalSourceContentIntegration {
    * @param {SidebarLayout} layout
    */
   fitSideBySide(layout) {
-    return this._htmlIntegration.fitSideBySide(layout);
+    const bookImage = getPDFPageImage();
+
+    if (bookImage && this._textLayer) {
+      const bookContainer = /** @type {HTMLElement} */ (
+        bookImage.parentElement
+      );
+
+      // Update the PDF image size and alignment to fit alongside the sidebar.
+      // `ImageTextLayer` will handle adjusting the text layer to match.
+      const newWidth = window.innerWidth - layout.width;
+      const minWidth = 250;
+
+      if (layout.expanded && newWidth > minWidth) {
+        // The VS book viewer sets `text-align: center` on the <body> element
+        // by default, which centers the book image in the page. When the sidebar
+        // is open we need the image to be left-aligned.
+        bookContainer.style.textAlign = 'left';
+        bookImage.style.width = `${newWidth}px`;
+      } else {
+        bookContainer.style.textAlign = '';
+        bookImage.style.width = '';
+      }
+      return layout.expanded;
+    } else {
+      return this._htmlIntegration.fitSideBySide(layout);
+    }
   }
 
   async getMetadata() {
