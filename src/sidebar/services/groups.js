@@ -4,7 +4,10 @@ import { combineGroups } from '../helpers/groups';
 import { awaitStateChange } from '../store/util';
 import { watch } from '../util/watch';
 
-/** @typedef {import('../../types/api').Group} Group */
+/**
+ *  @typedef {import('../../types/api').Group} Group
+ *  @typedef {import('../../types/config').Service} ServiceConfig
+ */
 
 const DEFAULT_ORG_ID = '__default__';
 
@@ -418,7 +421,7 @@ export class GroupsService {
    */
   async load() {
     if (this._serviceConfig?.groups) {
-      let groupIds = [];
+      let groupIds = /** @type ServiceConfig["groups"] */ ([]);
       try {
         groupIds = await this._serviceConfig.groups;
       } catch (e) {
@@ -426,7 +429,9 @@ export class GroupsService {
           `Unable to fetch group configuration: ${e.message}`
         );
       }
-      return this._loadServiceSpecifiedGroups(groupIds);
+      // Once `this._serviceConfig.groups` resolves, we know the result to be
+      // of type `string[]`
+      return this._loadServiceSpecifiedGroups(/** @type string[] */ (groupIds));
     } else {
       return this._loadGroupsForUserAndDocument();
     }
