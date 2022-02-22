@@ -8,24 +8,6 @@ import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
  */
 
 /**
- * @deprecated
- */
-function ancestors(window_) {
-  if (window_ === window_.top) {
-    return [];
-  }
-
-  // nb. The top window's `parent` is itself!
-  const ancestors = [];
-  do {
-    window_ = window_.parent;
-    ancestors.push(window_);
-  } while (window_ !== window_.top);
-
-  return ancestors;
-}
-
-/**
  * Returns the global embedder ancestor frame.
  *
  * @param {number} levels - Number of ancestors levels to ascend.
@@ -43,63 +25,6 @@ function getAncestorFrame(levels, window_ = window) {
     ancestorWindow = ancestorWindow.parent;
   }
   return ancestorWindow;
-}
-
-/**
- * @deprecated
- * Fetch client configuration from an ancestor frame.
- *
- * @param {string} origin - The origin of the frame to fetch config from.
- * @param {Window} window_ - Test seam.
- * @return {Promise<any>}
- */
-function fetchConfigFromAncestorFrame(origin, window_ = window) {
-  const configResponses = [];
-
-  for (let ancestor of ancestors(window_)) {
-    const timeout = 3000;
-    const result = postMessageJsonRpc.call(
-      ancestor,
-      origin,
-      'requestConfig',
-      [],
-      timeout
-    );
-    configResponses.push(result);
-  }
-
-  if (configResponses.length === 0) {
-    configResponses.push(Promise.reject(new Error('Client is top frame')));
-  }
-
-  return Promise.race(configResponses);
-}
-
-/**
- * @deprecated
- * Merge client configuration from h service with config fetched from
- * embedding frame.
- *
- * Typically the configuration from the embedding frame is passed
- * synchronously in the query string. However it can also be retrieved from
- * an ancestor of the embedding frame. See tests for more details.
- *
- * @param {object} appConfig - Settings rendered into `app.html` by the h service.
- * @param {Window} window_ - Test seam.
- * @return {Promise<object>} - The merged settings.
- */
-function fetchConfigLegacy(appConfig, window_ = window) {
-  const hostConfig = hostPageConfig(window_);
-
-  let embedderConfig;
-  const origin = /** @type string */ (hostConfig.requestConfigFromFrame);
-  embedderConfig = fetchConfigFromAncestorFrame(origin, window_);
-
-  return embedderConfig.then(embedderConfig => {
-    const mergedConfig = Object.assign({}, appConfig, embedderConfig);
-    mergedConfig.apiUrl = getApiUrl(mergedConfig);
-    return mergedConfig;
-  });
 }
 
 /**
@@ -180,10 +105,9 @@ async function fetchGroupsAsync(config, rpcCall) {
 /**
  * Fetch the host configuration and merge it with the app configuration from h.
  *
- * There are 3 ways to get the host config:
+ * There are 2 ways to get the host config:
  *  Direct embed - From the hash string of the embedder frame.
- *  Legacy RPC with unknown parent - From a ancestor parent frame that passes it down via RPC. (deprecated)
- *  RPC with known parent - From a ancestor parent frame that passes it down via RPC.
+ *  RPC request to indicated parent frame
  *
  * @param {SidebarConfig} appConfig
  * @param {Window} window_ - Test seam.
@@ -198,12 +122,7 @@ export async function fetchConfig(appConfig, window_ = window) {
     // Directly embed: just get the config.
     return fetchConfigEmbed(appConfig, hostConfig);
   }
-  if (typeof requestConfigFromFrame === 'string') {
-    // Legacy: send RPC to all parents to find config. (deprecated)
-    // nb. Browsers may display errors in the console when messages are sent to frames
-    // that don't match the origin filter".
-    return await fetchConfigLegacy(appConfig, window_);
-  } else if (
+  if (
     typeof requestConfigFromFrame.ancestorLevel === 'number' &&
     typeof requestConfigFromFrame.origin === 'string'
   ) {

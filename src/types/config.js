@@ -76,7 +76,7 @@
  *   Theme properties (fonts, colors etc.)
  * @prop {boolean} [enableExperimentalNewNoteButton] -
  *   Whether to show the "New note" button on the "Page Notes" tab
- * @prop {RequestConfigFromFrameOptions|string} [requestConfigFromFrame]
+ * @prop {RequestConfigFromFrameOptions} [requestConfigFromFrame]
  *   Origin of the ancestor frame to request configuration from
  * @prop {Service[]} [services] -
  *   Configuration for the annotation services that the client connects to
