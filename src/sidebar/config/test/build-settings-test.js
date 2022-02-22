@@ -1,6 +1,6 @@
-import { fetchConfig, $imports } from '../fetch-config';
+import { buildSettings, $imports } from '../build-settings';
 
-describe('sidebar/config/fetch-config', () => {
+describe('sidebar/config/build-settings', () => {
   let fakeHostPageConfig;
   let fakeJsonRpc;
   let fakeWindow;
@@ -39,7 +39,7 @@ describe('sidebar/config/fetch-config', () => {
     $imports.$restore();
   });
 
-  describe('config/fetch-config', () => {
+  describe('config/build-settings', () => {
     context('direct embed', () => {
       // no `requestConfigFromFrame` variable
       //
@@ -47,12 +47,12 @@ describe('sidebar/config/fetch-config', () => {
       // by h with the settings from `window.hypothesisConfig` in the parent
       // window.
       it('adds the apiUrl to the merged result', async () => {
-        const sidebarSettings = await fetchConfig({});
+        const sidebarSettings = await buildSettings({});
         assert.deepEqual(sidebarSettings, { apiUrl: fakeApiUrl() });
       });
 
       it('does not fetch settings from ancestor frames', async () => {
-        await fetchConfig({});
+        await buildSettings({});
         assert.notCalled(fakeJsonRpc.call);
       });
 
@@ -60,7 +60,7 @@ describe('sidebar/config/fetch-config', () => {
         // hostPageConfig shall take precedent over appConfig
         const appConfig = { foo: 'bar', appType: 'via' };
         fakeHostPageConfig.returns({ foo: 'baz' });
-        const sidebarSettings = await fetchConfig(appConfig);
+        const sidebarSettings = await buildSettings(appConfig);
         assert.deepEqual(sidebarSettings, {
           foo: 'baz',
           appType: 'via',
@@ -87,7 +87,7 @@ describe('sidebar/config/fetch-config', () => {
       });
 
       it('makes an RPC request to `requestConfig` ', async () => {
-        await fetchConfig({}, fakeWindow);
+        await buildSettings({}, fakeWindow);
         assert.isTrue(
           fakeJsonRpc.call.calledWithExactly(
             fakeTopWindow,
@@ -107,7 +107,7 @@ describe('sidebar/config/fetch-config', () => {
               ancestorLevel: level,
             },
           });
-          await fetchConfig({}, fakeWindow);
+          await buildSettings({}, fakeWindow);
           // testId is a fake property used to assert the level of the fake window
           assert.equal(fakeJsonRpc.call.getCall(0).args[0].testId, level);
         });
@@ -121,7 +121,7 @@ describe('sidebar/config/fetch-config', () => {
           },
         });
         await assert.rejects(
-          fetchConfig({}, fakeWindow),
+          buildSettings({}, fakeWindow),
           /The target parent frame has exceeded the ancestor tree|Try reducing the/g
         );
       });
@@ -129,7 +129,7 @@ describe('sidebar/config/fetch-config', () => {
       it('creates a merged config when the RPC requests returns the host config', async () => {
         const appConfig = { foo: 'bar', appType: 'via' };
         fakeJsonRpc.call.resolves({ foo: 'baz' }); // host config
-        const result = await fetchConfig(appConfig, fakeWindow);
+        const result = await buildSettings(appConfig, fakeWindow);
         assert.deepEqual(result, {
           foo: 'baz',
           appType: 'via',
@@ -140,7 +140,7 @@ describe('sidebar/config/fetch-config', () => {
       it('rejects if fetching config fails` ', async () => {
         fakeJsonRpc.call.rejects(new Error('Nope'));
         const appConfig = { foo: 'bar', appType: 'via' };
-        await assert.rejects(fetchConfig(appConfig, fakeWindow), 'Nope');
+        await assert.rejects(buildSettings(appConfig, fakeWindow), 'Nope');
       });
 
       it('returns the `groups` array with the initial host config request', async () => {
@@ -149,18 +149,20 @@ describe('sidebar/config/fetch-config', () => {
           appType: 'via',
         };
         fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
-        const result = await fetchConfig(appConfig, fakeWindow);
+        const result = await buildSettings(appConfig, fakeWindow);
         assert.deepEqual(result.services[0].groups, ['group1', 'group2']);
       });
 
       it("creates a merged config where `groups` is a promise when its initial value is '$rpc:requestGroups'", async () => {
         const appConfig = {
-          services: [{ groups: '$rpc:requestGroups' }],
           appType: 'via',
         };
-        fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
+        fakeJsonRpc.call.onFirstCall().resolves({
+          foo: 'baz',
+          services: [{ groups: '$rpc:requestGroups' }],
+        }); // host config
         fakeJsonRpc.call.onSecondCall().resolves(['group1', 'group2']); // requestGroups
-        const result = await fetchConfig(appConfig, fakeWindow);
+        const result = await buildSettings(appConfig, fakeWindow);
         assert.deepEqual(await result.services[0].groups, ['group1', 'group2']);
         assert.isTrue(
           fakeJsonRpc.call.getCall(1).calledWithExactly(
@@ -175,12 +177,14 @@ describe('sidebar/config/fetch-config', () => {
 
       it('throws an error when the RPC call to `requestGroups` fails', async () => {
         const appConfig = {
-          services: [{ groups: '$rpc:requestGroups' }],
           appType: 'via',
         };
-        fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
+        fakeJsonRpc.call.onFirstCall().resolves({
+          foo: 'baz',
+          services: [{ groups: '$rpc:requestGroups' }],
+        }); // host config
         fakeJsonRpc.call.onSecondCall().rejects(); // requestGroups
-        const result = await fetchConfig(appConfig, fakeWindow);
+        const result = await buildSettings(appConfig, fakeWindow);
         await assert.rejects(
           result.services[0].groups,
           'Unable to fetch groups'
@@ -198,7 +202,7 @@ describe('sidebar/config/fetch-config', () => {
         const appConfig = { foo: 'bar', appType: 'via' };
         fakeJsonRpc.call.resolves({ foo: 'baz' });
 
-        const result = await fetchConfig(appConfig, fakeWindow);
+        const result = await buildSettings(appConfig, fakeWindow);
 
         assert.deepEqual(result, {
           foo: 'baz',
@@ -222,7 +226,7 @@ describe('sidebar/config/fetch-config', () => {
           },
         });
         await assert.rejects(
-          fetchConfig({}, fakeWindow),
+          buildSettings({}, fakeWindow),
           'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
         );
       });
@@ -235,7 +239,7 @@ describe('sidebar/config/fetch-config', () => {
           },
         });
         await assert.rejects(
-          fetchConfig({}, fakeWindow),
+          buildSettings({}, fakeWindow),
           'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
         );
       });

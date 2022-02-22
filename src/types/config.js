@@ -12,9 +12,12 @@
  * @prop {string} authority
  * @prop {string} grantToken
  * @prop {string} [icon]
- * @prop {string[]|Promise<string[]>} [groups] -
- *   List of groups to show. The embedder can specify an array. In the sidebar
- *   this may be converted to a Promise if this information is fetched asynchronously.
+ * @prop {string[]|Promise<string[]>|"$rpc:requestGroups"} [groups] -
+ *   Optional list of groups to show in the sidebar.
+ *   The embedder may provide an array of groups, or may indicate that the
+ *   list of groups should be fetched by RPC request. In the latter case,
+ *   the value will be set to a Promise that resolves to the list of groups
+ *   returned by the RPC call.
  * @prop {boolean} [allowFlagging]
  * @prop {boolean} [allowLeavingGroups]
  * @prop {boolean} [enableShareLinks]

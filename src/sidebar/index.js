@@ -2,7 +2,7 @@ import { parseJsonConfig } from '../boot/parse-json-config';
 import * as rendererOptions from '../shared/renderer-options';
 
 import { checkEnvironment } from './config/check-env';
-import { fetchConfig } from './config/fetch-config';
+import { buildSettings } from './config/build-settings';
 import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
@@ -140,10 +140,10 @@ import { Injector } from '../shared/injector';
 /**
  * Launch the client application corresponding to the current URL.
  *
- * @param {object} config
+ * @param {import('../types/config').SidebarSettings} settings
  * @param {HTMLElement} appEl - Root HTML container for the app
  */
-function startApp(config, appEl) {
+function startApp(settings, appEl) {
   const container = new Injector();
 
   // Register services.
@@ -175,7 +175,7 @@ function startApp(config, appEl) {
   // that use them, since they don't depend on instances of other services.
   container
     .register('$window', { value: window })
-    .register('settings', { value: config });
+    .register('settings', { value: settings });
 
   // Initialize services.
   container.run(initServices);
@@ -214,8 +214,8 @@ const appEl = /** @type {HTMLElement} */ (
 // Start capturing RPC requests before we start the RPC server (startRPCServer)
 preStartRPCServer();
 
-fetchConfig(appConfig)
-  .then(config => {
-    startApp(config, appEl);
+buildSettings(appConfig)
+  .then(settings => {
+    startApp(settings, appEl);
   })
   .catch(err => reportLaunchError(err, appEl));
