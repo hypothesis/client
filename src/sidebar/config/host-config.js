@@ -6,14 +6,14 @@ import {
   toString,
 } from '../../shared/type-coercions';
 
-/** @typedef {import('../../types/config').HostConfig} HostConfig */
+/** @typedef {import('../../types/config').ConfigFromHost} ConfigFromHost */
 
 /**
  * Return the app configuration specified by the frame embedding the Hypothesis
  * client.
  *
  * @param {Window} window
- * @return {HostConfig}
+ * @return {ConfigFromHost}
  */
 export function hostPageConfig(window) {
   const config = parseConfigFragment(window.location.href);

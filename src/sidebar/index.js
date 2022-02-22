@@ -11,7 +11,7 @@ import { disableOpenerForExternalLinks } from './util/disable-opener-for-externa
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const appConfig = /** @type {import('../types/config').SidebarConfig} */ (
+const appConfig = /** @type {import('../types/config').ConfigFromSidebar} */ (
   parseJsonConfig(document)
 );
 

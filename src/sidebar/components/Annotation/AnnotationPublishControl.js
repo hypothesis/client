@@ -11,7 +11,7 @@ import MenuItem from '../MenuItem';
 
 /**
  * @typedef {import('../../../types/api').Annotation} Annotation
- * @typedef {import('../../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**
@@ -20,7 +20,7 @@ import MenuItem from '../MenuItem';
  * @prop {boolean} [isDisabled]
  *  - Should the save button be disabled? Hint: it will be if the annotation has no content
  * @prop {() => any} onSave - Callback for save button click
- * @prop {MergedConfig} settings - Injected service
+ * @prop {SidebarSettings} settings - Injected service
  */
 
 /**

@@ -1,7 +1,7 @@
 import { serviceConfig } from '../config/service-config';
 
 /**
- * @typedef {import('../../types/config').HostConfig} HostConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('../../types/api').Profile} Profile
  */
 
@@ -31,7 +31,7 @@ export function shouldShowSidebarTutorial(sessionState) {
  *
  * @param {boolean} isSidebar - is the app currently displayed in a sidebar?
  * @param {Profile} profile - User profile returned from the API
- * @param {HostConfig} settings
+ * @param {SidebarSettings} settings
  * @return {boolean} - Tutorial panel should be displayed automatically
  */
 export function shouldAutoDisplayTutorial(isSidebar, profile, settings) {

@@ -13,7 +13,7 @@ import StreamSearchInput from './StreamSearchInput';
 import UserMenu from './UserMenu';
 
 /**
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('../components/UserMenu').AuthState} AuthState
  */
 
@@ -25,7 +25,7 @@ import UserMenu from './UserMenu';
  * @prop {() => any} onLogin - Callback invoked when user clicks "Login" button.
  * @prop {() => any} onLogout - Callback invoked when user clicks "Logout" action in account menu.
  * @prop {() => any} onSignUp - Callback invoked when user clicks "Sign up" button.
- * @prop {MergedConfig} settings
+ * @prop {SidebarSettings} settings
  * @prop {import('../services/streamer').StreamerService} streamer
  */
 

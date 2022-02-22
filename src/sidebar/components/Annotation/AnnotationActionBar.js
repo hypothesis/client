@@ -14,7 +14,7 @@ import AnnotationShareControl from './AnnotationShareControl';
 
 /**
  *  @typedef {import("../../../types/api").SavedAnnotation} SavedAnnotation
- *  @typedef {import('../../../types/config').HostConfig} HostConfig
+ *  @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**
@@ -22,11 +22,11 @@ import AnnotationShareControl from './AnnotationShareControl';
  * @prop {SavedAnnotation} annotation - The annotation in question
  * @prop {() => any} onReply - Callbacks for when action buttons are clicked/tapped
  * @prop {import('../../services/annotations').AnnotationsService} annotationsService
- * @prop {HostConfig} settings
+ * @prop {SidebarSettings} settings
  * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
-/** @param {HostConfig} settings */
+/** @param {SidebarSettings} settings */
 function flaggingEnabled(settings) {
   const service = serviceConfig(settings);
   if (service?.allowFlagging === false) {

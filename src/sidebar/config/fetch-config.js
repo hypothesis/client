@@ -3,8 +3,8 @@ import { hostPageConfig } from './host-config';
 import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
- * @typedef {import('../../types/config').SidebarConfig} SidebarConfig
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/config').ConfigFromSidebar} ConfigFromSidebar
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**
@@ -32,15 +32,15 @@ function getAncestorFrame(levels, window_ = window) {
  *
  * @param {object} appConfig - App config settings rendered into `app.html` by the h service.
  * @param {object} hostPageConfig - App configuration specified by the embedding frame.
- * @return {object} - The merged settings.
+ * @return {SidebarSettings} - The merged settings.
  */
 function fetchConfigEmbed(appConfig, hostPageConfig) {
-  const mergedConfig = {
+  const sidebarSettings = {
     ...appConfig,
     ...hostPageConfig,
   };
-  mergedConfig.apiUrl = getApiUrl(mergedConfig);
-  return mergedConfig;
+  sidebarSettings.apiUrl = getApiUrl(sidebarSettings);
+  return sidebarSettings;
 }
 
 /**
@@ -66,8 +66,8 @@ async function fetchConfigRpc(appConfig, parentFrame, origin) {
   // Closure for the RPC call to scope parentFrame and origin variables.
   const rpcCall = (method, args = [], timeout = 3000) =>
     postMessageJsonRpc.call(parentFrame, origin, method, args, timeout);
-  const mergedConfig = fetchConfigEmbed(appConfig, remoteConfig);
-  return fetchGroupsAsync(mergedConfig, rpcCall);
+  const sidebarSettings = fetchConfigEmbed(appConfig, remoteConfig);
+  return fetchGroupsAsync(sidebarSettings, rpcCall);
 }
 
 /**
@@ -109,9 +109,9 @@ async function fetchGroupsAsync(config, rpcCall) {
  *  Direct embed - From the hash string of the embedder frame.
  *  RPC request to indicated parent frame
  *
- * @param {SidebarConfig} appConfig
+ * @param {ConfigFromSidebar} appConfig
  * @param {Window} window_ - Test seam.
- * @return {Promise<MergedConfig>} - The merged settings.
+ * @return {Promise<SidebarSettings>} - The merged settings.
  */
 export async function fetchConfig(appConfig, window_ = window) {
   const hostConfig = hostPageConfig(window);
@@ -132,7 +132,7 @@ export async function fetchConfig(appConfig, window_ = window) {
       window_
     );
 
-    const rpcMergedConfig = await fetchConfigRpc(
+    const rpcSidebarSettings = await fetchConfigRpc(
       appConfig,
       parentFrame,
       requestConfigFromFrame.origin
@@ -140,7 +140,7 @@ export async function fetchConfig(appConfig, window_ = window) {
     // Add back the optional focused group id from the host page config
     // as this is needed in the Notebook.
     return {
-      ...rpcMergedConfig,
+      ...rpcSidebarSettings,
       ...(hostConfig.group ? { group: hostConfig.group } : {}),
     };
   } else {

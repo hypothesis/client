@@ -18,7 +18,7 @@ function getJSON(url) {
 
 /**
  * @typedef {import('../../types/api').RouteMap} RouteMap
- * @typedef {import('../../types/config').SidebarConfig} SidebarConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**
@@ -27,7 +27,7 @@ function getJSON(url) {
 // @inject
 export class APIRoutesService {
   /**
-   * @param {SidebarConfig} settings
+   * @param {SidebarSettings} settings
    */
   constructor(settings) {
     this._apiUrl = settings.apiUrl;

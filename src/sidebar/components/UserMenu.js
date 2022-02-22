@@ -11,7 +11,7 @@ import MenuItem from './MenuItem';
 import MenuSection from './MenuSection';
 
 /**
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * /
 
 /**
@@ -28,7 +28,7 @@ import MenuSection from './MenuSection';
  * @prop {AuthStateLoggedIn} auth - object representing authenticated user and auth status
  * @prop {() => any} onLogout - onClick callback for the "log out" button
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
- * @prop {MergedConfig} settings
+ * @prop {SidebarSettings} settings
  */
 
 /**

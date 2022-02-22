@@ -20,7 +20,7 @@ import AnnotationUser from './AnnotationUser';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import('../../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**
@@ -29,7 +29,7 @@ import AnnotationUser from './AnnotationUser';
  * @prop {boolean} [isEditing] - Whether the annotation is actively being edited
  * @prop {number} replyCount - How many replies this annotation currently has
  * @prop {boolean} threadIsCollapsed - Is this thread currently collapsed?
- * @prop {MergedConfig} settings - Injected
+ * @prop {SidebarSettings} settings - Injected
  *
  */
 

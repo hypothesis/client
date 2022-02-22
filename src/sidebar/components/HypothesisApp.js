@@ -21,7 +21,7 @@ import TopBar from './TopBar';
 
 /**
  * @typedef {import('../../types/api').Profile} Profile
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('./UserMenu').AuthState} AuthState
  */
 
@@ -53,7 +53,7 @@ function authStateFromProfile(profile) {
  * @typedef HypothesisAppProps
  * @prop {import('../services/auth').AuthService} auth
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
- * @prop {MergedConfig} settings
+ * @prop {SidebarSettings} settings
  * @prop {import('../services/session').SessionService} session
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
