@@ -6,7 +6,7 @@ import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
 
 /**
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('../../types/sidebar').TabName} TabName
  */
 
@@ -76,7 +76,7 @@ function Tab({
 /**
  * @typedef SelectionTabsProps
  * @prop {boolean} isLoading - Are we waiting on any annotations from the server?
- * @prop {MergedConfig} settings - Injected service.
+ * @prop {SidebarSettings} settings - Injected service.
  * @prop {import('../services/annotations').AnnotationsService} annotationsService
  */
 

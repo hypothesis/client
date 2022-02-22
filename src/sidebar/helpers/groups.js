@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../../types/config').HostConfig} HostConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('../../types/api').Group} Group
  * @typedef {import('../../types/api').GroupIdentifier} GroupIdentifier
  */
@@ -15,7 +15,7 @@ import { serviceConfig } from '../config/service-config';
  * explicitly disallowed in the service configuration of the
  * `settings` object.
  *
- * @param {HostConfig} settings
+ * @param {SidebarSettings} settings
  * @return {boolean}
  */
 function allowLeavingGroups(settings) {
@@ -35,7 +35,7 @@ function allowLeavingGroups(settings) {
  * @param {Group[]} userGroups - groups the user is a member of
  * @param {Group[]} featuredGroups - all other groups, may include some duplicates from the userGroups
  * @param {string|null} uri - uri of the current page
- * @param {HostConfig} settings
+ * @param {SidebarSettings} settings
  */
 export function combineGroups(userGroups, featuredGroups, uri, settings) {
   const worldGroup = featuredGroups.find(g => g.id === '__world__');

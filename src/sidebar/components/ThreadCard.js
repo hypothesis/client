@@ -8,7 +8,7 @@ import { withServices } from '../service-context';
 import Thread from './Thread';
 
 /**
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**

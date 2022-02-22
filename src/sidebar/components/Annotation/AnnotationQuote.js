@@ -8,14 +8,14 @@ import Excerpt from '../Excerpt';
 
 /**
  * @typedef {import('../../../types/api').Annotation} Annotation
- * @typedef {import('../../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**
  * @typedef AnnotationQuoteProps
  * @prop {Annotation} annotation
  * @prop {boolean} [isFocused] - Is this annotation currently focused?
- * @prop {MergedConfig} [settings] - Used for theming.
+ * @prop {SidebarSettings} [settings] - Used for theming.
  */
 
 /**

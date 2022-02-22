@@ -12,13 +12,13 @@ import TagList from '../TagList';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import("../../../types/config").MergedConfig} MergedConfig
+ * @typedef {import("../../../types/config").SidebarSettings} SidebarSettings
  */
 
 /**
  * @typedef AnnotationBodyProps
  * @prop {Annotation} annotation - The annotation in question
- * @prop {MergedConfig} settings
+ * @prop {SidebarSettings} settings
  */
 
 /**

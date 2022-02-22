@@ -14,7 +14,7 @@ import MenuItem from '../MenuItem';
 import GroupListSection from './GroupListSection';
 
 /**
- * @typedef {import('../../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('../../../types/api').Group} Group
  */
 
@@ -29,7 +29,7 @@ function publisherProvidedIcon(settings) {
 
 /**
  * @typedef GroupListProps
- * @prop {MergedConfig} settings
+ * @prop {SidebarSettings} settings
  */
 
 /**

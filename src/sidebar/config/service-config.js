@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../../types/config').HostConfig} HostConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('../../types/config').Service} Service
  */
 
@@ -7,7 +7,7 @@
  * Return the configuration for the annotation service which the client would retrieve
  * annotations from which may contain the authority, grantToken and icon.
  *
- * @param {HostConfig} settings
+ * @param {SidebarSettings} settings
  * @return {Service|null}
  */
 

@@ -47,8 +47,8 @@ describe('sidebar/config/fetch-config', () => {
       // by h with the settings from `window.hypothesisConfig` in the parent
       // window.
       it('adds the apiUrl to the merged result', async () => {
-        const mergedConfig = await fetchConfig({});
-        assert.deepEqual(mergedConfig, { apiUrl: fakeApiUrl() });
+        const sidebarSettings = await fetchConfig({});
+        assert.deepEqual(sidebarSettings, { apiUrl: fakeApiUrl() });
       });
 
       it('does not fetch settings from ancestor frames', async () => {
@@ -60,8 +60,8 @@ describe('sidebar/config/fetch-config', () => {
         // hostPageConfig shall take precedent over appConfig
         const appConfig = { foo: 'bar', appType: 'via' };
         fakeHostPageConfig.returns({ foo: 'baz' });
-        const mergedConfig = await fetchConfig(appConfig);
-        assert.deepEqual(mergedConfig, {
+        const sidebarSettings = await fetchConfig(appConfig);
+        assert.deepEqual(sidebarSettings, {
           foo: 'baz',
           appType: 'via',
           apiUrl: fakeApiUrl(),

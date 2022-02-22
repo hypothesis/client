@@ -51,7 +51,7 @@ import { viewerModule } from './modules/viewer';
  *
  * [1] https://redux.js.org
  *
- * @param {import('../../types/config').SidebarConfig} settings
+ * @param {import('../../types/config').SidebarSettings} settings
  * @return {SidebarStore}
  * @inject
  */

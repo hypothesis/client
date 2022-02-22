@@ -13,14 +13,14 @@ import AnnotationPublishControl from './AnnotationPublishControl';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import("../../../types/config").MergedConfig} MergedConfig
+ * @typedef {import("../../../types/config").SidebarSettings} SidebarSettings
  */
 
 /**
  * @typedef AnnotationEditorProps
  * @prop {Annotation} annotation - The annotation under edit
  * @prop {import('../../services/annotations').AnnotationsService} annotationsService
- * @prop {MergedConfig} settings - Injected service
+ * @prop {SidebarSettings} settings - Injected service
  * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
  * @prop {import('../../services/tags').TagsService} tags
  */

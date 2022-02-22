@@ -44,7 +44,7 @@
  *
  * See `h.views.client` in the "h" application.
  *
- * @typedef SidebarConfig
+ * @typedef ConfigFromSidebar
  * @prop {string} apiUrl
  * @prop {string} authDomain
  * @prop {string} oauthClientId
@@ -65,7 +65,7 @@
  * https://h.readthedocs.io/projects/client/en/latest/publishers/config/ which
  * excludes any keys used only by the "annotator" part of the application.
  *
- * @typedef HostConfig
+ * @typedef ConfigFromHost
  * @prop {string} [annotations] - Direct-linked annotation ID
  * @prop {string} [group] - Direct-linked group ID
  * @prop {string} [query] - Initial filter query
@@ -91,7 +91,7 @@
  * (filtered and validated) configuration from the host page with configuration
  * from h / the browser extension.
  *
- * @typedef {HostConfig & SidebarConfig} MergedConfig
+ * @typedef {ConfigFromHost & ConfigFromSidebar} SidebarSettings
  */
 
 // Make TypeScript treat this file as a module.

@@ -1,5 +1,5 @@
 /**
- * @typedef {import('../../types/config').MergedConfig} MergedConfig
+ * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
 
 import { serviceConfig } from '../config/service-config';
@@ -12,7 +12,7 @@ import { serviceConfig } from '../config/service-config';
  *
  * If no custom annotation services are configured then return `false`.
  *
- * @param {MergedConfig} settings
+ * @param {SidebarSettings} settings
  * @return {boolean}
  */
 export function isThirdPartyService(settings) {
