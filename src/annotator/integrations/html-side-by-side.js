@@ -1,3 +1,5 @@
+import { intersectRects, rectContains, rectIntersects } from '../util/geometry';
+
 /**
  * Attempt to guess the region of the page that contains the main content.
  *
@@ -60,4 +62,138 @@ export function guessMainContentArea(root) {
   const [rightPos] = rightMargin[0];
 
   return { left: leftPos, right: rightPos };
+}
+
+/** @type {Range} */
+let textRectRange;
+
+/**
+ * Return the viewport-relative rect occupied by part of a text node.
+ *
+ * @param {Text} text
+ * @param {number} start
+ * @param {number} end
+ */
+function textRect(text, start = 0, end = text.data.length) {
+  if (!textRectRange) {
+    // Allocate a range only on the first call to avoid the overhead of
+    // constructing and maintaining a large number of live ranges.
+    textRectRange = document.createRange();
+  }
+  textRectRange.setStart(text, start);
+  textRectRange.setEnd(text, end);
+  return textRectRange.getBoundingClientRect();
+}
+
+/**
+ * Yield all the text node descendants of `root` that intersect `rect`.
+ *
+ * @param {Element} root
+ * @param {DOMRect} rect
+ * @return {Generator<Text>}
+ */
+function* textNodesInRect(root, rect) {
+  /** @type {Node|null} */
+  let node = root.firstChild;
+  while (node) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = /** @type {Element} */ (node);
+      const elementRect = element.getBoundingClientRect();
+
+      // Skip over subtrees which are entirely outside the viewport or hidden.
+      if (rectIntersects(elementRect, rect)) {
+        yield* textNodesInRect(element, rect);
+      }
+    } else if (node.nodeType === Node.TEXT_NODE) {
+      const text = /** @type {Text} */ (node);
+
+      // Skip over text nodes which are entirely outside the viewport or empty.
+      if (rectIntersects(textRect(text), rect)) {
+        yield text;
+      }
+    }
+    node = node.nextSibling;
+  }
+}
+
+/**
+ * Find content within an element to use as an anchor when scrolling.
+ *
+ * @param {Element} scrollRoot
+ * @return {Range|null} - Range to use as an anchor or `null` if a suitable
+ *   range could not be found
+ */
+function getScrollAnchor(scrollRoot) {
+  // Range representing the content whose position within the viewport we will
+  // try to maintain after running the callback.
+  let anchorRange = /** @type {Range|null} */ (null);
+
+  const viewport = intersectRects(
+    scrollRoot.getBoundingClientRect(),
+    new DOMRect(0, 0, window.innerWidth, window.innerHeight)
+  );
+  if (viewport.width < 0 || viewport.height < 0) {
+    // Element being scrolled is outside the viewport
+    return null;
+  }
+
+  // Find the first word (non-whitespace substring of a text node) that is fully
+  // visible in the viewport.
+  textNodeLoop: for (let textNode of textNodesInRect(scrollRoot, viewport)) {
+    let textLen = 0;
+
+    // Visit all the non-whitespace substrings of the text node.
+    for (let word of textNode.data.split(/\b/)) {
+      if (/\S/.test(word)) {
+        const start = textLen;
+        const end = textLen + word.length;
+        const wordBox = textRect(textNode, start, end);
+        if (rectContains(viewport, wordBox)) {
+          anchorRange = document.createRange();
+          anchorRange.setStart(textNode, start);
+          anchorRange.setEnd(textNode, end);
+          break textNodeLoop;
+        }
+      }
+
+      textLen += word.length;
+    }
+  }
+
+  return anchorRange;
+}
+
+/**
+ * Apply a layout change to the document and preserve the scroll position.
+ *
+ * This utility selects part of the content in the viewport as an _anchor_
+ * and tries to preserve the position of this content within the viewport
+ * after the callback is invoked.
+ *
+ * @param {() => any} callback - Callback that will apply the layout change
+ * @param {Element} [scrollRoot]
+ * @return {number} - Amount by which the scroll position was adjusted to keep
+ *   the anchored content in view
+ */
+export function preserveScrollPosition(
+  callback,
+  /* istanbul ignore next */
+  scrollRoot = document.documentElement
+) {
+  const anchor = getScrollAnchor(scrollRoot);
+  if (!anchor) {
+    callback();
+    return 0;
+  }
+
+  const anchorTop = anchor.getBoundingClientRect().top;
+  callback();
+  const newAnchorTop = anchor.getBoundingClientRect().top;
+
+  // Determine how far we scrolled as a result of the layout change.
+  // This will be positive if the anchor element moved down or negative if it moved up.
+  const scrollDelta = newAnchorTop - anchorTop;
+  scrollRoot.scrollTop += scrollDelta;
+
+  return scrollDelta;
 }
