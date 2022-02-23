@@ -3,7 +3,10 @@ import scrollIntoView from 'scroll-into-view';
 import { anchor, describe } from '../anchoring/html';
 
 import { HTMLMetadata } from './html-metadata';
-import { guessMainContentArea } from './html-side-by-side';
+import {
+  guessMainContentArea,
+  preserveScrollPosition,
+} from './html-side-by-side';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -107,40 +110,44 @@ export class HTMLIntegration {
     const padding = 12;
     const rightMargin = sidebarWidth + padding;
 
-    // nb. Adjusting the body size this way relies on the page not setting a
-    // width on the body. For sites that do this won't work.
-    document.body.style.marginRight = `${rightMargin}px`;
+    preserveScrollPosition(() => {
+      // nb. Adjusting the body size this way relies on the page not setting a
+      // width on the body. For sites that do this won't work.
+      document.body.style.marginRight = `${rightMargin}px`;
 
-    const contentArea = guessMainContentArea(document.body);
-    if (contentArea) {
-      // Check if we can give the main content more space by letting the
-      // sidebar overlap stuff in the document to the right of the main content.
-      const freeSpace = Math.max(
-        0,
-        window.innerWidth - rightMargin - contentArea.right
-      );
-      if (freeSpace > 0) {
-        const adjustedMargin = Math.max(0, rightMargin - freeSpace);
-        document.body.style.marginRight = `${adjustedMargin}px`;
-      }
+      const contentArea = guessMainContentArea(document.body);
+      if (contentArea) {
+        // Check if we can give the main content more space by letting the
+        // sidebar overlap stuff in the document to the right of the main content.
+        const freeSpace = Math.max(
+          0,
+          window.innerWidth - rightMargin - contentArea.right
+        );
+        if (freeSpace > 0) {
+          const adjustedMargin = Math.max(0, rightMargin - freeSpace);
+          document.body.style.marginRight = `${adjustedMargin}px`;
+        }
 
-      // If the main content appears to be right up against the edge of the
-      // window, add padding for readability.
-      if (contentArea.left < padding) {
-        document.body.style.marginLeft = `${padding}px`;
+        // If the main content appears to be right up against the edge of the
+        // window, add padding for readability.
+        if (contentArea.left < padding) {
+          document.body.style.marginLeft = `${padding}px`;
+        }
+      } else {
+        document.body.style.marginLeft = '';
+        document.body.style.marginRight = '';
       }
-    } else {
-      document.body.style.marginLeft = '';
-      document.body.style.marginRight = '';
-    }
+    });
   }
 
   /**
    * Undo the effects of `activateSideBySide`.
    */
   _deactivateSideBySide() {
-    document.body.style.marginLeft = '';
-    document.body.style.marginRight = '';
+    preserveScrollPosition(() => {
+      document.body.style.marginLeft = '';
+      document.body.style.marginRight = '';
+    });
   }
 
   async getMetadata() {

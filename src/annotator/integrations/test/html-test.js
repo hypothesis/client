@@ -4,6 +4,7 @@ describe('HTMLIntegration', () => {
   let fakeHTMLAnchoring;
   let fakeHTMLMetadata;
   let fakeGuessMainContentArea;
+  let fakePreserveScrollPosition;
   let fakeScrollIntoView;
 
   beforeEach(() => {
@@ -20,6 +21,7 @@ describe('HTMLIntegration', () => {
     fakeScrollIntoView = sinon.stub().yields();
 
     fakeGuessMainContentArea = sinon.stub().returns(null);
+    fakePreserveScrollPosition = sinon.stub().yields();
 
     const HTMLMetadata = sinon.stub().returns(fakeHTMLMetadata);
     $imports.$mock({
@@ -28,6 +30,7 @@ describe('HTMLIntegration', () => {
       './html-metadata': { HTMLMetadata },
       './html-side-by-side': {
         guessMainContentArea: fakeGuessMainContentArea,
+        preserveScrollPosition: fakePreserveScrollPosition,
       },
     });
   });
@@ -144,6 +147,14 @@ describe('HTMLIntegration', () => {
         integration.fitSideBySide({ expanded: true, width: sidebarWidth });
 
         assert.deepEqual(getMargins(), [null, null]);
+      });
+
+      it('saves and restores the scroll position after adjusting margins', () => {
+        const integration = createIntegration();
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+        assert.calledOnce(fakePreserveScrollPosition);
       });
 
       it('removes margins on body element when side-by-side mode is deactivated', () => {
