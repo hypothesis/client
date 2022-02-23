@@ -82,7 +82,10 @@ describe('sidebar/store/use-store', () => {
       assert.deepEqual(proxy.getThing('bar'), { id: 'bar' });
 
       // Test proxied action dispatch.
-      proxy.addThing('baz');
+      act(() => {
+        proxy.addThing('baz');
+      });
+
       assert.calledWith(addThingSpy, 'baz');
     });
 
@@ -118,8 +121,10 @@ describe('sidebar/store/use-store', () => {
 
       const { proxy } = renderTestComponent();
 
-      proxy.addThing('foo');
-      proxy.addThing('foo');
+      act(() => {
+        proxy.addThing('foo');
+        proxy.addThing('foo');
+      });
 
       assert.calledTwice(addThingSpy);
       assert.calledWith(addThingSpy, 'foo');
