@@ -17,6 +17,7 @@ import { createIntegration } from './integrations';
 import * as rangeUtil from './range-util';
 import { SelectionObserver, selectedRange } from './selection-observer';
 import { findClosestOffscreenAnchor } from './util/buckets';
+import { frameFillsAncestor } from './util/frame';
 import { normalizeURI } from './util/url';
 
 /**
@@ -187,7 +188,7 @@ export class Guest {
      * @type {PortRPC<HostToGuestEvent, GuestToHostEvent>}
      */
     this._hostRPC = new PortRPC();
-    this._connectHost();
+    this._connectHost(hostFrame);
 
     /**
      * Channel for guest-sidebar communication.
@@ -301,7 +302,8 @@ export class Guest {
     }
   }
 
-  async _connectHost() {
+  /** @param {Window} hostFrame */
+  async _connectHost(hostFrame) {
     this._hostRPC.on('clearSelection', () => {
       if (selectedRange(document)) {
         this._informHostOnNextSelectionClear = false;
@@ -339,7 +341,7 @@ export class Guest {
       'sidebarLayoutChanged',
       /** @param {SidebarLayout} sidebarLayout */
       sidebarLayout => {
-        if (this._frameIdentifier === null) {
+        if (frameFillsAncestor(window, hostFrame)) {
           this.fitSideBySide(sidebarLayout);
         }
       }
