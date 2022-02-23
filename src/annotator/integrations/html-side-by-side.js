@@ -1,3 +1,5 @@
+import { intersectRects, rectContains, rectIntersects } from '../util/geometry';
+
 /**
  * Attempt to guess the region of the page that contains the main content.
  *
@@ -62,16 +64,56 @@ export function guessMainContentArea(root) {
   return { left: leftPos, right: rightPos };
 }
 
+/** @type {Range} */
+let textRectRange;
+
 /**
- * @param {DOMRect} a
- * @param {DOMRect} b
+ * Return the viewport-relative rect occupied by part of a text node.
+ *
+ * @param {Text} text
+ * @param {number} start
+ * @param {number} end
  */
-function intersect(a, b) {
-  const left = Math.max(a.left, b.left);
-  const right = Math.min(a.right, b.right);
-  const top = Math.max(a.top, b.top);
-  const bottom = Math.min(a.bottom, b.bottom);
-  return new DOMRect(left, top, right - left, bottom - top);
+function textRect(text, start = 0, end = text.data.length) {
+  if (!textRectRange) {
+    // Allocate a range only on the first call to avoid the overhead of
+    // constructing and maintaining a large number of live ranges.
+    textRectRange = document.createRange();
+  }
+  textRectRange.setStart(text, start);
+  textRectRange.setEnd(text, end);
+  return textRectRange.getBoundingClientRect();
+}
+
+/**
+ * Yield all the text node descendants of `root` that intersect `rect`.
+ *
+ * @param {Element} root
+ * @param {DOMRect} rect
+ * @return {Generator<Text>}
+ */
+function* textNodesInRect(root, rect) {
+  /** @type {Node|null} */
+  let node = root.firstChild;
+  while (node) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = /** @type {Element} */ (node);
+      const elementRect = element.getBoundingClientRect();
+
+      // Skip over subtrees which are entirely outside the viewport or hidden.
+      if (rectIntersects(elementRect, rect)) {
+        yield* textNodesInRect(element, rect);
+      }
+    } else if (node.nodeType === Node.TEXT_NODE) {
+      const text = /** @type {Text} */ (node);
+
+      // Skip over text nodes which are entirely outside the viewport or empty.
+      if (rectIntersects(textRect(text), rect)) {
+        yield text;
+      }
+    }
+    node = node.nextSibling;
+  }
 }
 
 /**
@@ -86,7 +128,7 @@ function getScrollAnchor(scrollRoot) {
   // try to maintain after running the callback.
   let anchorRange = /** @type {Range|null} */ (null);
 
-  const viewport = intersect(
+  const viewport = intersectRects(
     scrollRoot.getBoundingClientRect(),
     new DOMRect(0, 0, window.innerWidth, window.innerHeight)
   );
@@ -95,36 +137,22 @@ function getScrollAnchor(scrollRoot) {
     return null;
   }
 
-  // Create a range that includes the first word that is fully visible in the
-  // viewport.
-  //
-  // This currently visits every text node in `scrollRoot` and tests every
-  // possible anchor until it finds a suitable one. This could be optimized
-  // by skipping over elements that are entirely outside the viewport.
-  const walker = document.createTreeWalker(scrollRoot, NodeFilter.SHOW_TEXT);
-  const tempRange = document.createRange();
-
-  treeWalkLoop: while (walker.nextNode()) {
-    const textNode = /** @type {Text} */ (walker.currentNode);
+  // Find the first word (non-whitespace substring of a text node) that is fully
+  // visible in the viewport.
+  textNodeLoop: for (let textNode of textNodesInRect(scrollRoot, viewport)) {
     let textLen = 0;
 
+    // Visit all the non-whitespace substrings of the text node.
     for (let word of textNode.data.split(/\b/)) {
       if (/\S/.test(word)) {
         const start = textLen;
         const end = textLen + word.length;
-
-        tempRange.setStart(textNode, start);
-        tempRange.setEnd(textNode, end);
-
-        const wordBox = tempRange.getBoundingClientRect();
-        if (
-          wordBox.left >= viewport.left &&
-          wordBox.right <= viewport.right &&
-          wordBox.top >= viewport.top &&
-          wordBox.bottom <= viewport.bottom
-        ) {
-          anchorRange = tempRange.cloneRange();
-          break treeWalkLoop;
+        const wordBox = textRect(textNode, start, end);
+        if (rectContains(viewport, wordBox)) {
+          anchorRange = document.createRange();
+          anchorRange.setStart(textNode, start);
+          anchorRange.setEnd(textNode, end);
+          break textNodeLoop;
         }
       }
 
