@@ -39,6 +39,7 @@ describe('Guest', () => {
   let fakeBucketBarClient;
   let fakeCreateIntegration;
   let fakeFindClosestOffscreenAnchor;
+  let fakeFrameFillsAncestor;
   let fakeIntegration;
   let fakePortFinder;
   let FakePortRPC;
@@ -123,6 +124,8 @@ describe('Guest', () => {
 
     fakeFindClosestOffscreenAnchor = sinon.stub();
 
+    fakeFrameFillsAncestor = sinon.stub().returns(true);
+
     fakeIntegration = {
       anchor: sinon.stub(),
       canAnnotate: sinon.stub().returns(true),
@@ -178,6 +181,9 @@ describe('Guest', () => {
       './util/buckets': {
         findClosestOffscreenAnchor: fakeFindClosestOffscreenAnchor,
       },
+      './util/frame': {
+        frameFillsAncestor: fakeFrameFillsAncestor,
+      },
     });
   });
 
@@ -189,18 +195,21 @@ describe('Guest', () => {
 
   describe('events from host frame', () => {
     describe('on "sidebarLayoutChanged" event', () => {
-      it('calls fitSideBySide if `Guest` is the main annotatable frame', () => {
+      it('calls fitSideBySide if guest frame fills host frame', () => {
         createGuest();
         const dummyLayout = {};
+        fakeFrameFillsAncestor.withArgs(window, hostFrame).returns(true);
 
         emitHostEvent('sidebarLayoutChanged', dummyLayout);
 
+        assert.calledWith(fakeFrameFillsAncestor, window, hostFrame);
         assert.calledWith(fakeIntegration.fitSideBySide, dummyLayout);
       });
 
-      it('does not call fitSideBySide if `Guest` is not the main annotatable frame', () => {
+      it('does not call fitSideBySide if guest frame does not fill host frame', () => {
         createGuest({ subFrameIdentifier: 'dummy' });
         const dummyLayout = {};
+        fakeFrameFillsAncestor.withArgs(window, hostFrame).returns(false);
 
         emitHostEvent('sidebarLayoutChanged', dummyLayout);
 
