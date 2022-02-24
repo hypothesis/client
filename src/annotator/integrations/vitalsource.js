@@ -147,6 +147,38 @@ function getPDFPageImage() {
 }
 
 /**
+ * Fix how a VitalSource book content frame scrolls, so that various related
+ * Hypothesis behaviors (the bucket bar, scrolling annotations into view) work
+ * as intended.
+ *
+ * Some VitalSource books (PDFs) make content scrolling work by making the
+ * content iframe really tall and having the parent frame scroll. This stops the
+ * Hypothesis bucket bar and scrolling annotations into view from working.
+ *
+ * @param {HTMLIFrameElement} frame
+ */
+function makeContentFrameScrollable(frame) {
+  if (frame.getAttribute('scrolling') !== 'no') {
+    // This is a book (eg. EPUB) where the workaround is not required.
+    return;
+  }
+
+  // Override inline styles of iframe (hence `!important`). The iframe lives
+  // in Shadow DOM, so the element styles won't affect the rest of the app.
+  const style = document.createElement('style');
+  style.textContent = `iframe { height: 100% !important; }`;
+  frame.insertAdjacentElement('beforebegin', style);
+
+  const removeScrollingAttr = () => frame.removeAttribute('scrolling');
+  removeScrollingAttr();
+
+  // Sometimes the attribute gets re-added by VS. Remove it if that
+  // happens.
+  const attrObserver = new MutationObserver(removeScrollingAttr);
+  attrObserver.observe(frame, { attributes: true });
+}
+
+/**
  * Integration for the content frame in VitalSource's Bookshelf ebook reader.
  *
  * This integration delegates to the standard HTML integration for most
@@ -182,6 +214,14 @@ export class VitalSourceContentIntegration {
       this._listeners.add(document.documentElement, event, e => {
         e.stopPropagation();
       });
+    }
+
+    // Install scrolling workaround for PDFs. We do this in the content frame
+    // so that it works whether Hypothesis is loaded directly into the content
+    // frame or injected by VitalSourceInjector from the parent frame.
+    const frame = /** @type {HTMLIFrameElement|null} */ (window.frameElement);
+    if (frame) {
+      makeContentFrameScrollable(frame);
     }
 
     // If this is a PDF, create the hidden text layer above the rendered PDF
