@@ -21,5 +21,10 @@ export function frameFillsAncestor(frame, ancestor) {
   }
 
   const frameBox = frame.frameElement.getBoundingClientRect();
-  return frameBox.width / frame.parent.innerWidth >= 0.8;
+
+  // Threshold for deciding when a frame occupies enough of its parent's width
+  // to count as filling the viewport.
+  const fullWidthThreshold = 0.8;
+
+  return frameBox.width / frame.parent.innerWidth >= fullWidthThreshold;
 }

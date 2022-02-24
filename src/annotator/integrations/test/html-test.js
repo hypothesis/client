@@ -78,9 +78,12 @@ describe('HTMLIntegration', () => {
     const sidebarWidth = 200;
     const padding = 12;
 
-    // Return a rect for content that occupies the full width of the viewport,
-    // minus space for the opened sidebar, as `fitSideBySide` only calls this
-    // after initially allocating space for the sidebar.
+    // Generate a dummy response for `guessMainContentArea`. This response
+    // is what would be returned when the content fills the full width of the
+    // viewport, mins space for an open sidebar and some padding.
+    //
+    // The sidebar space is included because `fitSideBySide` adjusts the margins
+    // on the body before calling `guessMainContentArea`.
     function fullWidthContentRect() {
       return new DOMRect(
         0,
@@ -143,7 +146,7 @@ describe('HTMLIntegration', () => {
         assert.deepEqual(getMargins(), [null, null]);
       });
 
-      it('resets margins on body element when side-by-side mode is deactivated', () => {
+      it('removes margins on body element when side-by-side mode is deactivated', () => {
         const integration = createIntegration();
 
         integration.fitSideBySide({ expanded: true, width: sidebarWidth });
