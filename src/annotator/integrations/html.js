@@ -102,7 +102,9 @@ export class HTMLIntegration {
     // of content. If we can't find the "main content" then we just assume that
     // everything on the page is potentially content that the user might want
     // to annotate and so try to keep it all visible.
-    const padding = 10;
+
+    // nb. 12px padding is a multiple of the 4px grid unit in our design system.
+    const padding = 12;
     const rightMargin = sidebarWidth + padding;
 
     // nb. Adjusting the body size this way relies on the page not setting a
@@ -115,7 +117,7 @@ export class HTMLIntegration {
       // sidebar overlap stuff in the document to the right of the main content.
       const freeSpace = Math.max(
         0,
-        window.innerWidth - sidebarWidth - contentArea.right
+        window.innerWidth - rightMargin - contentArea.right
       );
       if (freeSpace > 0) {
         const adjustedMargin = Math.max(0, rightMargin - freeSpace);
@@ -124,7 +126,7 @@ export class HTMLIntegration {
 
       // If the main content appears to be right up against the edge of the
       // window, add padding for readability.
-      if (contentArea.left < 10) {
+      if (contentArea.left < padding) {
         document.body.style.marginLeft = `${padding}px`;
       }
     } else {

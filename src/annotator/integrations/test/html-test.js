@@ -76,6 +76,7 @@ describe('HTMLIntegration', () => {
     }
 
     const sidebarWidth = 200;
+    const padding = 12;
 
     // Return a rect for content that occupies the full width of the viewport,
     // minus space for the opened sidebar, as `fitSideBySide` only calls this
@@ -84,7 +85,7 @@ describe('HTMLIntegration', () => {
       return new DOMRect(
         0,
         0,
-        window.innerWidth - sidebarWidth,
+        window.innerWidth - sidebarWidth - padding,
         window.innerHeight
       );
     }
@@ -116,7 +117,7 @@ describe('HTMLIntegration', () => {
 
         integration.fitSideBySide({ expanded: true, width: sidebarWidth });
 
-        assert.deepEqual(getMargins(), [10, 210]);
+        assert.deepEqual(getMargins(), [padding, sidebarWidth + padding]);
       });
 
       it('allows sidebar to overlap non-main content on the side of the page', () => {
@@ -130,7 +131,7 @@ describe('HTMLIntegration', () => {
 
         integration.fitSideBySide({ expanded: true, width: sidebarWidth });
 
-        assert.deepEqual(getMargins(), [10, 110]);
+        assert.deepEqual(getMargins(), [padding, sidebarWidth + padding - 100]);
       });
 
       it('does nothing if the content area cannot be determined', () => {
