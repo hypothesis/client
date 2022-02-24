@@ -335,6 +335,41 @@ describe('annotator/integrations/vitalsource', () => {
         assert.notCalled(FakeImageTextLayer);
       });
 
+      it('installs scrolling workaround for tall frames', async () => {
+        // Create a shadow DOM and iframe structure that matches the relevant
+        // parts of the real VS reader.
+        const bookElement = document.createElement('mosaic-book');
+        const shadowRoot = bookElement.attachShadow({ mode: 'open' });
+        document.body.append(bookElement);
+
+        const frame = document.createElement('iframe');
+        frame.style.height = '2000px';
+        frame.setAttribute('scrolling', 'no');
+        shadowRoot.append(frame);
+
+        const frameElementStub = sinon
+          .stub(window, 'frameElement')
+          .get(() => frame);
+        try {
+          createIntegration();
+
+          assert.isFalse(frame.hasAttribute('scrolling'));
+          assert.equal(
+            getComputedStyle(frame).height,
+            `${window.innerHeight}px` // "100%" in pixels
+          );
+
+          // Try re-adding the scrolling attribute. It should get re-removed.
+          frame.setAttribute('scrolling', 'no');
+          await delay(0);
+
+          assert.isFalse(frame.hasAttribute('scrolling'));
+        } finally {
+          frameElementStub.restore();
+          bookElement.remove();
+        }
+      });
+
       it('creates hidden text layer in PDF documents', () => {
         createPageImageAndData();
         createIntegration();
