@@ -52,6 +52,7 @@ export default {
         // remain as pixels when sidebar converts to rems or otherwise be
         // independent of sidebar font sizes
         'annotator-sm': ['12px'],
+        'annotator-base': ['14px'],
         'annotator-lg': ['16px'],
         'annotator-xl': ['18px'],
       },
