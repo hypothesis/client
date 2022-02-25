@@ -19,7 +19,7 @@ function ToolbarButton({ ...buttonProps }) {
       className={classnames(
         'w-[30px] h-[30px]', // These buttons have precise dimensions
         'flex items-center justify-center',
-        'border rounded bg-white text-grey-6 hover:text-grey-9 text-xl',
+        'border rounded bg-white text-grey-6 hover:text-grey-9 text-annotator-lg',
         'shadow transition-colors'
       )}
       icon={icon}
@@ -86,7 +86,7 @@ export default function Toolbar({
           className={classnames(
             'w-[27px] h-[27px] mt-[140px] ml-[6px]',
             'flex items-center justify-center bg-white border',
-            'text-grey-6 hover:text-grey-9 text-xl transition-colors',
+            'text-grey-6 hover:text-grey-9 text-annotator-lg transition-colors',
             // Turn off right border to blend with sidebar
             'border-r-0',
             // A more intense shadow than other ToolbarButtons, to match that
