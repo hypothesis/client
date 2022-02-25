@@ -277,6 +277,28 @@ describe('ImageTextLayer', () => {
     assert.calledOnce(measureImageSpy);
   });
 
+  describe('#updateSync', () => {
+    it('flushes text layer size updates immediately', () => {
+      const { image } = createPageImage();
+      const imageText = 'some text in the image';
+
+      const textLayer = createTextLayer(
+        image,
+        createCharBoxes(imageText),
+        imageText
+      );
+
+      // Spy on logic that is invoked each time a resize event is handled.
+      const measureImageSpy = sinon.spy(image, 'getBoundingClientRect');
+
+      image.style.width = '250px';
+      image.style.height = '250px';
+      textLayer.updateSync();
+
+      assert.calledOnce(measureImageSpy);
+    });
+  });
+
   describe('#destroy', () => {
     it('removes the <hypothesis-text-layer> element', () => {
       const { container, image } = createPageImage();
