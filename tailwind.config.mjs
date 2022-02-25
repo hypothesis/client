@@ -45,13 +45,15 @@ export default {
       fontSize: {
         tiny: ['10px'],
         sm: ['11px', '1.4'],
-        'annotator-sm': ['12px'],
         base: ['13px', '1.4'],
         lg: ['14px'],
         xl: ['16px'],
-        annotator: {
-          sm: ['12px'],
-        },
+        // Keep separate font settings for the annotator; these may need to
+        // remain as pixels when sidebar converts to rems or otherwise be
+        // independent of sidebar font sizes
+        'annotator-sm': ['12px'],
+        'annotator-lg': ['16px'],
+        'annotator-xl': ['18px'],
       },
       keyframes: {
         adderPopDown: {
