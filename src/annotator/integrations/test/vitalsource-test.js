@@ -44,11 +44,11 @@ class FakeVitalSourceViewer {
     // The integration should not inject the client if the frame contains this
     // data content.
     this.contentFrame.contentDocument.body.innerHTML =
-      '<div>Encrypted content</div>';
+      '<div id="page-content">Encrypted content</div>';
   }
 
-  finishChapterLoad() {
-    this.contentFrame.contentDocument.body.innerHTML = '<p>New content</p>';
+  finishChapterLoad(contentHTML = '<p>New content</p>') {
+    this.contentFrame.contentDocument.body.innerHTML = contentHTML;
     this.contentFrame.dispatchEvent(new Event('load'));
   }
 }
@@ -131,16 +131,32 @@ describe('annotator/integrations/vitalsource', () => {
       assert.calledWith(fakeInjectClient, fakeViewer.contentFrame, fakeConfig);
     });
 
-    it('re-injects client when content frame is changed', async () => {
-      fakeInjectClient.resetHistory();
+    [
+      // Typical EPUB book chapter which contains text paragraphs.
+      '<p>New content</p>',
 
-      fakeViewer.beginChapterLoad();
-      await delay(0);
-      assert.notCalled(fakeInjectClient);
+      // "Great Book" EPUBs used in the freely available classic texts in VitalSource.
+      // These don't use `<p>` elements :(
+      '<div class="para">New content</div>',
 
-      fakeViewer.finishChapterLoad();
-      await delay(0);
-      assert.calledWith(fakeInjectClient, fakeViewer.contentFrame, fakeConfig);
+      // Book chapters which don't contain text content.
+      '<img src="cover-image.png">',
+    ].forEach(newChapterContent => {
+      it('re-injects client when content frame is changed', async () => {
+        fakeInjectClient.resetHistory();
+
+        fakeViewer.beginChapterLoad();
+        await delay(0);
+        assert.notCalled(fakeInjectClient);
+
+        fakeViewer.finishChapterLoad(newChapterContent);
+        await delay(0);
+        assert.calledWith(
+          fakeInjectClient,
+          fakeViewer.contentFrame,
+          fakeConfig
+        );
+      });
     });
 
     it("doesn't re-inject if content frame is removed", async () => {
