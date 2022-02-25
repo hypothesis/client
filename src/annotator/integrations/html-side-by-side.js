@@ -100,7 +100,7 @@ function* textNodesInRect(root, rect) {
       const element = /** @type {Element} */ (node);
       const elementRect = element.getBoundingClientRect();
 
-      // Skip over subtrees which are entirely outside the viewport or hidden.
+      // Only examine subtrees which are visible and intersect the viewport.
       if (rectIntersects(elementRect, rect)) {
         yield* textNodesInRect(element, rect);
       }
