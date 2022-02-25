@@ -6,6 +6,11 @@ import {
 describe('annotator/integrations/html-side-by-side', () => {
   let contentElements;
 
+  function addContentElementToDocument(element) {
+    contentElements.push(element);
+    document.body.append(element);
+  }
+
   function createContent(paragraphs) {
     const paraElements = paragraphs.map(({ content, left, width }) => {
       const el = document.createElement('p');
@@ -18,9 +23,7 @@ describe('annotator/integrations/html-side-by-side', () => {
 
     const root = document.createElement('div');
     root.append(...paraElements);
-
-    document.body.append(root);
-    contentElements.push(root);
+    addContentElementToDocument(root);
 
     return root;
   }
@@ -61,6 +64,23 @@ describe('annotator/integrations/html-side-by-side', () => {
       const area = guessMainContentArea(content);
 
       assert.deepEqual(area, { left: 10, right: 110 });
+    });
+
+    [
+      '<p>content</p>',
+
+      // Paragraphs in VitalSource "Great Book" format ebooks.
+      '<div class="para">content</div>',
+    ].forEach(contentHTML => {
+      it('finds content area with various paragraph types', () => {
+        const content = document.createElement('div');
+        content.innerHTML = contentHTML;
+        addContentElementToDocument(content);
+
+        const area = guessMainContentArea(content);
+
+        assert.ok(area);
+      });
     });
 
     it('ignores the positions of hidden paragraphs', () => {

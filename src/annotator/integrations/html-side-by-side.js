@@ -1,6 +1,17 @@
 import { intersectRects, rectContains, rectIntersects } from '../util/geometry';
 
 /**
+ * CSS selectors used to find elements that are considered potentially part
+ * of the main content of a page.
+ */
+const contentSelectors = [
+  'p',
+
+  // Paragraphs in VitalSource "Great Book" format ebooks.
+  '.para',
+];
+
+/**
  * Attempt to guess the region of the page that contains the main content.
  *
  * @param {Element} root
@@ -21,7 +32,8 @@ export function guessMainContentArea(root) {
   // In future we might want to expand this to consider other text containers,
   // since some pages, especially eg. in ebooks, may not have any paragraphs
   // (eg. instead they may only contain tables or lists or headings).
-  const paragraphs = Array.from(root.querySelectorAll('p'))
+  const contentSelector = contentSelectors.join(',');
+  const paragraphs = Array.from(root.querySelectorAll(contentSelector))
     .map(p => {
       // Gather some data about them.
       const rect = p.getBoundingClientRect();
