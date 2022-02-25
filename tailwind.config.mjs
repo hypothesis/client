@@ -86,6 +86,7 @@ export default {
       zIndex: {
         1: '1',
         2: '2',
+        max: '2147483647',
       },
     },
   },
