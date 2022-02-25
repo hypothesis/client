@@ -26,8 +26,13 @@ export function rectIsEmpty(rect) {
 }
 
 /**
- * Return true if the lines a-b and c-d overlap (ie. the length of their
+ * Return true if the 1D lines a-b and c-d overlap (ie. the length of their
  * intersection is non-zero).
+ *
+ * For example, the following lines overlap:
+ *
+ *   a----b
+ *      c------d
  *
  * The inputs must be normalized such that b >= a and d >= c.
  *
