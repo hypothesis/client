@@ -59,17 +59,28 @@ export class VitalSourceInjector {
 
     /** @param {HTMLIFrameElement} frame */
     const injectIfContentReady = frame => {
-      // Check if this frame contains decoded ebook content, as opposed to
-      // invisible and encrypted book content, which is created initially after a
-      // chapter navigation. These encrypted pages are replaced with the real
-      // content after a form submission.
-      //
-      // The format of the decoded HTML can vary, but as a simple heuristic,
-      // we look for a text paragraph.
-      //
-      // If the document has not yet finished loading, then we rely on this function
-      // being called again once loading completes.
-      const isBookContent = frame.contentDocument?.querySelector('p');
+      // Check if this frame contains decoded ebook content. If the document has
+      // not yet finished loading, then we rely on this function being called
+      // again once loading completes.
+
+      const body = frame.contentDocument?.body;
+      const isBookContent =
+        body &&
+        // Check that this is not the blank document which is displayed in
+        // brand new iframes before any of their content has loaded.
+        body.children.length > 0 &&
+        // Check that this is not the temporary page containing encrypted and
+        // invisible book content, which is replaced with the real content after
+        // a form submission. These pages look something like:
+        //
+        // ```
+        // <html>
+        //   <title>content</title>
+        //   <body><div id="page-content">{ Base64 encoded data }</div></body>
+        // </html>
+        // ```
+        !body.querySelector('#page-content');
+
       if (isBookContent) {
         injectClient(frame, config);
       }
