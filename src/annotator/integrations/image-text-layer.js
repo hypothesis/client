@@ -194,6 +194,20 @@ export class ImageTextLayer {
     this._listeners.add(window, 'resize', this._updateBoxSizes);
   }
 
+  /**
+   * Synchronously update the text layer to match the size and position of
+   * the image.
+   *
+   * Normally the text layer is resized automatically but asynchronously when
+   * the image size changes (eg. due to the window being resized) and updates
+   * are debounced. This method can be used to force an immediate update if
+   * needed.
+   */
+  updateSync() {
+    this._updateBoxSizes();
+    this._updateBoxSizes.flush();
+  }
+
   destroy() {
     this.container.remove();
     this._listeners.removeAll();

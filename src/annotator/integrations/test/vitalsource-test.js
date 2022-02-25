@@ -299,6 +299,7 @@ describe('annotator/integrations/vitalsource', () => {
         fakeImageTextLayer = {
           container: document.createElement('div'),
           destroy: sinon.stub(),
+          updateSync: sinon.stub(),
         };
         FakeImageTextLayer = sinon.stub().returns(fakeImageTextLayer);
 
@@ -414,11 +415,13 @@ describe('annotator/integrations/vitalsource', () => {
           integration.fitSideBySide({ expanded: true, width: sidebarWidth });
           assert.equal(fakePageImage.parentElement.style.textAlign, 'left');
           assert.equal(fakePageImage.style.width, `${expectedWidth}px`);
+          assert.calledOnce(fakeImageTextLayer.updateSync);
 
           // Deactivate side-by-side mode. Style overrides should be removed.
           integration.fitSideBySide({ expanded: false });
           assert.equal(fakePageImage.parentElement.style.textAlign, '');
           assert.equal(fakePageImage.style.width, '');
+          assert.calledTwice(fakeImageTextLayer.updateSync);
         });
 
         it('does not resize page image if there is not enough space', () => {
