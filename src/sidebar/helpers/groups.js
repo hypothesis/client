@@ -4,7 +4,6 @@
  * @typedef {import('../../types/api').GroupIdentifier} GroupIdentifier
  */
 
-// @ts-expect-error - Ignore error about default-importing a CommonJS module.
 import escapeStringRegexp from 'escape-string-regexp';
 
 import { serviceConfig } from '../config/service-config';

@@ -13,11 +13,9 @@ export function sidebarTrigger(rootEl, showFn) {
   );
 
   Array.from(triggerElems).forEach(triggerElem => {
-    triggerElem.addEventListener('click', handleCommand);
+    triggerElem.addEventListener('click', e => {
+      showFn();
+      e.stopPropagation();
+    });
   });
-
-  function handleCommand(event) {
-    showFn();
-    event.stopPropagation();
-  }
 }

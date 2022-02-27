@@ -116,7 +116,9 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   useLayoutEffect(() => {
     // TODO: Transition and effects here should be improved
     if (paginationPage !== lastPaginationPage.current) {
-      scrollIntoView(threadListScrollTop.current);
+      if (threadListScrollTop.current) {
+        scrollIntoView(threadListScrollTop.current);
+      }
       lastPaginationPage.current = paginationPage;
     }
   }, [paginationPage]);

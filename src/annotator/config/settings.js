@@ -13,9 +13,13 @@ import { urlFromLinkTag } from './url-from-link-tag';
  * @prop {string} clientUrl
  * @prop {string} sidebarAppUrl
  * @prop {string} notebookAppUrl
- 
- * @prop {(name: string, options?: object) => (string|null)} hostPageSetting
+ * @prop {(name: string) => unknown} hostPageSetting
  */
+
+/** @param {unknown} value */
+function checkIfString(value) {
+  return typeof value === 'string' ? value : null;
+}
 
 /**
  * @param {Window} window_
@@ -27,6 +31,7 @@ export function settingsFrom(window_) {
   // In addition, Via sets the `ignoreOtherConfiguration` option to prevent configuration merging.
   const configFuncSettings = configFuncSettingsFrom(window_);
 
+  /** @type {Record<string, unknown>} */
   let jsonConfigs;
   if (toBoolean(configFuncSettings.ignoreOtherConfiguration)) {
     jsonConfigs = {};
@@ -56,7 +61,7 @@ export function settingsFrom(window_) {
       return null;
     }
 
-    return jsonConfigs.annotations || annotationsFromURL();
+    return checkIfString(jsonConfigs.annotations) || annotationsFromURL();
   }
 
   /**
@@ -78,23 +83,24 @@ export function settingsFrom(window_) {
       return null;
     }
 
-    return jsonConfigs.group || groupFromURL();
+    return checkIfString(jsonConfigs.group) || groupFromURL();
   }
 
-  // TODO: Move this to a coerce method
   function showHighlights() {
-    let showHighlights_ = hostPageSetting('showHighlights');
+    const value = hostPageSetting('showHighlights');
 
-    if (showHighlights_ === undefined) {
-      showHighlights_ = 'always'; // The default value is 'always'.
+    switch (value) {
+      case 'always':
+      case 'never':
+      case 'whenSidebarOpen':
+        return value;
+      case true:
+        return 'always';
+      case false:
+        return 'never';
+      default:
+        return 'always';
     }
-
-    // Convert legacy keys/values to corresponding current configuration.
-    if (typeof showHighlights_ === 'boolean') {
-      return showHighlights_ ? 'always' : 'never';
-    }
-
-    return showHighlights_;
   }
 
   /**
@@ -126,7 +132,7 @@ export function settingsFrom(window_) {
       return null;
     }
 
-    return jsonConfigs.query || queryFromURL();
+    return checkIfString(jsonConfigs.query) || queryFromURL();
   }
 
   /**

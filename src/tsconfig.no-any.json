@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "allowJs": true,
+
+    // Needed for some npm packages
     "allowSyntheticDefaultImports": true,
+
     "checkJs": true,
     "lib": ["es2020", "dom", "dom.iterable"],
     "jsx": "react-jsx",
@@ -20,7 +23,12 @@
     // code for the browser.
     "types": []
   },
-  "include": ["shared/**/*.js", "types/process.d.ts"],
+  "include": [
+    "annotator/**/*.js",
+    "boot/**/*.js",
+    "shared/**/*.js",
+    "types/*.d.ts"
+  ],
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",

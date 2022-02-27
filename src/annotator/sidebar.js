@@ -1,4 +1,4 @@
-import Hammer from 'hammerjs';
+import * as Hammer from 'hammerjs';
 
 import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
@@ -30,12 +30,14 @@ export const MIN_RESIZE = 280;
 /**
  * Create the iframe that will load the sidebar application.
  *
+ * @param {Record<string, unknown>} config
  * @return {HTMLIFrameElement}
  */
 function createSidebarIframe(config) {
+  const sidebarURL = /** @type {string} */ (config.sidebarAppUrl);
   const sidebarAppSrc = addConfigFragment(
-    config.sidebarAppUrl,
-    createAppConfig(config.sidebarAppUrl, config)
+    sidebarURL,
+    createAppConfig(sidebarURL, config)
   );
 
   const sidebarFrame = document.createElement('iframe');
@@ -70,7 +72,7 @@ export class Sidebar {
      * Tracks which `Guest` has a text selection. `null` indicates to default
      * to the first connected guest frame.
      *
-     * @type {PortRPC|null}
+     * @type {PortRPC<GuestToHostEvent, HostToGuestEvent>|null}
      */
     this._guestWithSelection = null;
 
@@ -365,7 +367,8 @@ export class Sidebar {
   _setupGestures() {
     const toggleButton = this.toolbar.sidebarToggleButton;
     if (toggleButton) {
-      this._hammerManager = new Hammer.Manager(toggleButton).on(
+      this._hammerManager = new Hammer.Manager(toggleButton);
+      this._hammerManager.on(
         'panstart panend panleft panright',
         /* istanbul ignore next */
         event => this._onPan(event)
@@ -482,6 +485,7 @@ export class Sidebar {
     }
   }
 
+  /** @param {HammerInput} event */
   _onPan(event) {
     const frame = this.iframeContainer;
     if (!frame) {

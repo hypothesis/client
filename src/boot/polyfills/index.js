@@ -9,6 +9,9 @@
 
 /**
  * Return true if `obj` has all of the methods in `methods`.
+ *
+ * @param {any} obj
+ * @param {string[]} methods
  */
 function hasMethods(obj, ...methods) {
   return methods.every(method => typeof obj[method] === 'function');
@@ -34,8 +37,16 @@ const needsPolyfill = {
 };
 
 /**
+ * Name of a polyfill set that can be loaded.
+ *
+ * @typedef {keyof needsPolyfill} PolyfillSet
+ */
+
+/**
  * Return the subset of polyfill sets from `needed`  which are needed by the
  * current browser.
+ *
+ * @param {PolyfillSet[]} needed
  */
 export function requiredPolyfillSets(needed) {
   return needed.filter(set => {

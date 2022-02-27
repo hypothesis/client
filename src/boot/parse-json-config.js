@@ -1,5 +1,10 @@
-// `Object.assign()`-like helper. Used because this script needs to work
-// in IE 10/11 without polyfills.
+/**
+ * `Object.assign()`-like helper. Used because this script needs to work
+ * in IE 10/11 without polyfills.
+ *
+ * @param {Record<string, unknown>} dest
+ * @param {Record<string, unknown>} src
+ */
 function assign(dest, src) {
   for (const k in src) {
     if (src.hasOwnProperty(k)) {
@@ -26,6 +31,7 @@ function assign(dest, src) {
  * @param {Document|Element} document - The root element to search.
  */
 export function parseJsonConfig(document) {
+  /** @type {Record<string, unknown>} */
   const config = {};
   const settingsElements = document.querySelectorAll(
     'script.js-hypothesis-config'

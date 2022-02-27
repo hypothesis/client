@@ -193,7 +193,10 @@ const configDefinitions = {
  */
 export function getConfig(appContext = 'annotator', window_ = window) {
   const settings = settingsFrom(window_);
+
+  /** @type {Record<string, unknown>} */
   const config = {};
+
   // Filter the config based on the application context as some config values
   // may be inappropriate or erroneous for some applications.
   let filteredKeys = configurationKeys(appContext);

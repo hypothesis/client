@@ -45,7 +45,7 @@ export default function SidebarPanel({
   useEffect(() => {
     if (panelWasActive.current !== panelIsActive) {
       panelWasActive.current = panelIsActive;
-      if (panelIsActive) {
+      if (panelIsActive && panelElement.current) {
         scrollIntoView(panelElement.current);
       }
       if (typeof onActiveChanged === 'function') {

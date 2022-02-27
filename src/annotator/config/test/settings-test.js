@@ -290,39 +290,14 @@ describe('annotator/config/settingsFrom', () => {
         output: 'never',
       },
       {
-        it: 'passes invalid string values through unmodified',
-        input: 'invalid',
-        output: 'invalid',
-      },
-      {
-        it: 'passes numbers through unmodified',
-        input: 42,
-        output: 42,
-      },
-      {
         it: 'defaults to "always"',
         input: undefined,
         output: 'always',
       },
       {
-        it: 'passes null through unmodified',
-        input: null,
-        output: null,
-      },
-      {
-        it: 'passes arrays through unmodified',
-        input: [1, 2, 3],
-        output: [1, 2, 3],
-      },
-      {
-        it: 'passes objects through unmodified',
-        input: { foo: 'bar' },
-        output: { foo: 'bar' },
-      },
-      {
-        it: 'passes regular expressions through unmodified',
-        input: /regex/,
-        output: /regex/,
+        it: 'converts invalid values to "always"',
+        input: { someInvalidValue: true },
+        output: 'always',
       },
     ].forEach(test => {
       it(test.it, () => {

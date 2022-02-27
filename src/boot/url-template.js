@@ -4,6 +4,8 @@
  * We don't use the URL constructor here because IE and early versions of Edge
  * do not support it and this code runs early in the life of the app before any
  * polyfills can be loaded.
+ *
+ * @param {string} url
  */
 function extractOrigin(url) {
   const match = url.match(/(https?):\/\/([^:/]+)/);

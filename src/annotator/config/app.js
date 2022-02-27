@@ -3,10 +3,11 @@
  * be passed to the sidebar or notebook applications.
  *
  * @param {string} appURL - URL from which the application will be served
- * @param {Record<string, any>} config
- * @return {object}
+ * @param {Record<string, unknown>} config
+ * @return {Record<string, unknown>}
  */
 export function createAppConfig(appURL, config) {
+  /** @type {Record<string, unknown>} */
   const appConfig = {};
 
   for (let [key, value] of Object.entries(config)) {
@@ -47,7 +48,7 @@ export function createAppConfig(appURL, config) {
   // functions) and will be omitted when the config is JSON-stringified.
   // Add a JSON-stringifiable option for each of these so that the sidebar can
   // at least know whether the callback functions were provided or not.
-  if (appConfig.services?.length > 0) {
+  if (Array.isArray(appConfig.services) && appConfig.services?.length > 0) {
     const service = appConfig.services[0];
     if (service.onLoginRequest) {
       service.onLoginRequestProvided = true;
