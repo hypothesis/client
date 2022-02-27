@@ -1,15 +1,17 @@
 import { requiredPolyfillSets } from './polyfills';
 
+/** @typedef {import('./polyfills').PolyfillSet} PolyfillSet */
+
 /**
  * Polyfills used by both the annotator and sidebar app.
  */
-const commonPolyfills = [
+const commonPolyfills = /** @type {PolyfillSet[]} */ ([
   // ES APIs
   'es2017',
   'es2018',
 
   // Any other polyfills which may rely on certain ES APIs should be listed here.
-];
+]);
 
 /**
  * @typedef SidebarAppConfig
@@ -156,6 +158,7 @@ function injectAssets(doc, config, assets, { forceModuleReload } = {}) {
   });
 }
 
+/** @param {PolyfillSet[]} needed */
 function polyfillBundles(needed) {
   return requiredPolyfillSets(needed).map(
     set => `scripts/polyfills-${set}.bundle.js`

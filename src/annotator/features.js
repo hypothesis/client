@@ -10,7 +10,7 @@ const _set = features => {
 
 export const features = {
   /**
-   * @param {import('../shared/messaging').PortRPC} rpc - Channel for host-sidebar communication
+   * @param {import('../shared/messaging').PortRPC<'featureFlagsUpdated', string>} rpc - Channel for host-sidebar communication
    */
   init: function (rpc) {
     rpc.on('featureFlagsUpdated', _set);

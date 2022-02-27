@@ -1,6 +1,6 @@
 /**
  * @typedef HypothesisWindowProps
- * @prop {() => object} [hypothesisConfig] - Function that returns configuration
+ * @prop {() => Record<string, unknown>} [hypothesisConfig] - Function that returns configuration
  *   for the Hypothesis client
  */
 
@@ -19,8 +19,7 @@
  * If there's no window.hypothesisConfig() function then return {}.
  *
  * @param {Window & HypothesisWindowProps} window_ - The window to search for a hypothesisConfig() function
- * @return {object} - Any config settings returned by hypothesisConfig()
- *
+ * @return {Record<string, unknown>} - Any config settings returned by hypothesisConfig()
  */
 export function configFuncSettingsFrom(window_) {
   if (!window_.hasOwnProperty('hypothesisConfig')) {

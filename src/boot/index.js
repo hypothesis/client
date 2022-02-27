@@ -14,20 +14,33 @@ import { isBrowserSupported } from './browser-check';
 // @ts-ignore - This file is generated before the boot bundle is built.
 import manifest from '../../build/manifest.json';
 
+/**
+ * @typedef {import('./boot').AnnotatorConfig} AnnotatorConfig
+ * @typedef {import('./boot').SidebarAppConfig} SidebarAppConfig
+ */
+
 if (isBrowserSupported()) {
-  const settings = parseJsonConfig(document);
-  const assetRoot = processUrlTemplate(settings.assetRoot || '__ASSET_ROOT__');
+  const config = /** @type {AnnotatorConfig|SidebarAppConfig} */ (
+    parseJsonConfig(document)
+  );
+  const assetRoot = processUrlTemplate(config.assetRoot || '__ASSET_ROOT__');
 
   // Check whether this is the sidebar app (indicated by the presence of a
   // `<hypothesis-app>` element) and load the appropriate part of the client.
   if (document.querySelector('hypothesis-app')) {
-    bootSidebarApp(document, { assetRoot, manifest, apiUrl: settings.apiUrl });
+    const sidebarConfig = /** @type {SidebarAppConfig} */ (config);
+    bootSidebarApp(document, {
+      assetRoot,
+      manifest,
+      apiUrl: sidebarConfig.apiUrl,
+    });
   } else {
+    const annotatorConfig = /** @type {AnnotatorConfig} */ (config);
     const notebookAppUrl = processUrlTemplate(
-      settings.notebookAppUrl || '__NOTEBOOK_APP_URL__'
+      annotatorConfig.notebookAppUrl || '__NOTEBOOK_APP_URL__'
     );
     const sidebarAppUrl = processUrlTemplate(
-      settings.sidebarAppUrl || '__SIDEBAR_APP_URL__'
+      annotatorConfig.sidebarAppUrl || '__SIDEBAR_APP_URL__'
     );
     bootHypothesisClient(document, {
       assetRoot,

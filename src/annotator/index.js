@@ -61,7 +61,9 @@ function init() {
 
     const sidebarConfig = getConfig('sidebar');
 
-    const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
+    const hypothesisAppsOrigin = new URL(
+      /** @type {string} */ (sidebarConfig.sidebarAppUrl)
+    ).origin;
     const portProvider = new PortProvider(hypothesisAppsOrigin);
 
     const eventBus = new EventBus();

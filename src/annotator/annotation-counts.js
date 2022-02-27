@@ -7,15 +7,16 @@ const ANNOTATION_COUNT_ATTR = 'data-hypothesis-annotation-count';
  *
  * @param {Element} rootEl - The DOM element which contains the elements that
  *   display annotation count.
- * @param {import('../shared/messaging').PortRPC} rpc - Channel for host-sidebar communication
+ * @param {import('../shared/messaging').PortRPC<'publicAnnotationCountChanged', string>} rpc - Channel for host-sidebar communication
  */
 export function annotationCounts(rootEl, rpc) {
   rpc.on('publicAnnotationCountChanged', updateAnnotationCountElems);
 
+  /** @param {number} newCount */
   function updateAnnotationCountElems(newCount) {
     const elems = rootEl.querySelectorAll('[' + ANNOTATION_COUNT_ATTR + ']');
     Array.from(elems).forEach(elem => {
-      elem.textContent = newCount;
+      elem.textContent = newCount.toString();
     });
   }
 }

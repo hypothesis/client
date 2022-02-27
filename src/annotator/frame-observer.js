@@ -162,7 +162,9 @@ export function onNextDocumentReady(frame) {
  * @return {() => void} Callback that unsubscribes from future changes
  */
 export function onDocumentReady(frame, callback, { pollInterval = 10 } = {}) {
+  /** @type {number|undefined} */
   let pollTimer;
+  /** @type {() => void} */
   let pollForDocumentChange;
 
   // Visited documents for which we have fired the callback or are waiting
@@ -171,7 +173,7 @@ export function onDocumentReady(frame, callback, { pollInterval = 10 } = {}) {
 
   const cancelPoll = () => {
     clearTimeout(pollTimer);
-    pollTimer = null;
+    pollTimer = undefined;
   };
 
   // Begin polling for a document change when the current document is about

@@ -1422,6 +1422,11 @@
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-0.0.39.tgz#e177e699ee1b8c22d23174caaa7422644389509f"
   integrity sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==
 
+"@types/hammerjs@^2.0.41":
+  version "2.0.41"
+  resolved "https://registry.yarnpkg.com/@types/hammerjs/-/hammerjs-2.0.41.tgz#f6ecf57d1b12d2befcce00e928a6a097c22980aa"
+  integrity sha512-ewXv/ceBaJprikMcxCmWU1FKyMAQ2X7a9Gtmzw8fcg2kIePI1crERDM818W+XYrxqdBBOdlf2rm137bU+BltCA==
+
 "@types/node@*", "@types/node@>= 8":
   version "14.14.43"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.14.43.tgz#26bcbb0595b305400e8ceaf9a127a7f905ae49c8"
@@ -1443,6 +1448,11 @@
   integrity sha512-yy7HuzQhj0dhGpD8RLXSZWEkLsV9ibvxvi6EiJ3bkqLAO1RGo0WbkWQiwpRlSFymTJRz0d3k5LM3kkx8ArDbLw==
   dependencies:
     "@types/node" "*"
+
+"@types/scroll-into-view@^1.16.0":
+  version "1.16.0"
+  resolved "https://registry.yarnpkg.com/@types/scroll-into-view/-/scroll-into-view-1.16.0.tgz#bd02094307624cc0243c34dca478510a0a8515e8"
+  integrity sha512-WT0YBP7CLi3XH/gDbWdtBf4mQVyE7zQrpEZ2rNrxz9tVoIPJf97zGlfRqnkECj7P8rPkFxVlo1KbOOMetcchdA==
 
 "@types/yauzl@^2.9.1":
   version "2.9.1"
