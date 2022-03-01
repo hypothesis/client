@@ -93,11 +93,11 @@ export default {
   },
   plugins: [
     plugin(({ addVariant }) => {
-      // Add a custom variant such that the `annotator-collapsed:` modifier
-      // is available. The `Sidebar` logic adds the `.annotator-collapsed`
+      // Add a custom variant such that the `sidebar-collapsed:` modifier
+      // is available. The `Sidebar` logic adds the `.sidebar-collapsed`
       // class to the sidebar frame when it's collapsed. This modifier allows
       // sub-components to select for that state.
-      addVariant('annotator-collapsed', '.annotator-collapsed &');
+      addVariant('sidebar-collapsed', '.sidebar-collapsed &');
     }),
   ],
 };
