@@ -8,6 +8,8 @@ export default {
     './src/annotator/components/**/*.js',
     './dev-server/ui-playground/components/**/*.js',
     './node_modules/@hypothesis/frontend-shared/lib/**/*.js',
+    // This module references `sidebar-frame` and related classes
+    './src/annotator/sidebar.js',
   ],
   theme: {
     extend: {
@@ -84,9 +86,18 @@ export default {
           },
         },
       },
+      screens: {
+        // Narrow mobile screens
+        'annotator-sm': '240px',
+        // Wider mobile screens/small tablets
+        'annotator-md': '480px',
+        // Tablet and up
+        'annotator-lg': '600px',
+      },
       zIndex: {
         1: '1',
         2: '2',
+        3: '3',
         max: '2147483647',
       },
     },

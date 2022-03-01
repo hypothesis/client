@@ -3,108 +3,11 @@
 // which do not use shadow roots go in other bundles (eg. highlights.css,
 // pdfjs-overrides.scss).
 
-@use 'sass:meta';
-@use 'sass:color' as color;
-
-@use '../variables' as var;
-
 @use './base';
-
 @use './components';
-
 @use './utilities';
 
 // Styles for all top-level elements in shadow roots.
 :host > * {
-  font-family: var.$sans-font-family;
-}
-
-// Sidebar
-.annotator-frame {
-  // frame styles
-  position: fixed;
-  top: 0;
-  left: 100%;
-  height: 100%;
-  z-index: 2147483647;
-  direction: ltr;
-  font-size: var.$annotator-adder-font-size;
-  line-height: var.$annotator-base-line-height;
-
-  user-select: none;
-  -webkit-tap-highlight-color: rgba(255, 255, 255, 0);
-
-  &.is-hidden {
-    visibility: hidden;
-    transition: visibility var.$annotator-timing--sidebar-collapse-transition;
-  }
-
-  &.annotator-collapsed {
-    margin-left: 0;
-
-    .h-sidebar-iframe {
-      // Add a transition when collapsing only. This serves to delay
-      // the effect until the sidebar finishes closing. Visibility is
-      // a boolean value and can not actually animate.
-      transition: visibility var.$annotator-timing--sidebar-collapse-transition;
-      visibility: hidden;
-    }
-  }
-
-  .h-sidebar-iframe {
-    border: none;
-    height: 100%;
-    width: 100%;
-    z-index: 3;
-    position: relative;
-  }
-}
-
-// this disables the width transition for the sidebar when
-// it is manually resized by dragging
-.annotator-no-transition {
-  transition: none !important;
-}
-
-/** Affordances for clean theme */
-#{var.$annotator--theme-clean} {
-  box-shadow: var.$annotator-shadow--sidebar;
-}
-
-/*
-  Mobile layout
-  240-479 px
-*/
-
-@media screen and (min-width: 15em) {
-  .annotator-frame {
-    width: 90%;
-    margin-left: -90%;
-  }
-}
-
-/*
-  Wide mobile layout
-  480-599 px
-*/
-
-@media screen and (min-width: 30em) {
-  .annotator-frame {
-    width: 70%;
-    margin-left: -70%;
-  }
-}
-
-/*
-  Tablet layout
-  600-above px
-*/
-
-@media screen and (min-width: 37.5em) {
-  .annotator-frame {
-    transition: margin-left var.$annotator-timing--sidebar-collapse-transition
-      cubic-bezier(0.55, 0, 0.2, 0.8);
-    width: 428px;
-    margin-left: -428px;
-  }
+  @apply font-sans;
 }

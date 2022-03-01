@@ -1,0 +1,66 @@
+/**
+ * Styles for the container and iframe containing the sidebar app. These
+ * classes are used by the `Sidebar` class (not a UI component).
+ */
+
+@layer utilities {
+  .sidebar-transition-visibility {
+    // This transition delays the visibility change to when
+    // collapsing the sidebar. This serves to delay
+    // the effect until the sidebar finishes closing. Visibility is
+    // a boolean value and can not actually animate.
+    @apply invisible transition-[visibility] duration-150;
+  }
+  .sidebar-transition-margin {
+    // This transition makes the sidebar slide in and off of the screen
+    // when opening or closing.
+    @apply transition-[margin-left] duration-150 ease-[cubic-bezier(0.55,0,0.2,0.8)];
+  }
+}
+
+@layer components {
+  .sidebar-container {
+    // Typically applied as an HTML attribute; there is no corresponding
+    // tailwind utility class
+    direction: ltr;
+
+    // Full height, fixed position all the way to the right (offscreen) to start
+    @apply fixed top-0 left-full h-full z-max select-none;
+
+    // Next, set different widths and left-margin positions for different
+    // breakpoints
+    @apply annotator-sm:w-[90%] annotator-sm:ml-[-90%];
+    @apply annotator-md:w-[70%] annotator-md:ml-[-70%];
+    @apply annotator-lg:w-[428px] annotator-lg:ml-[-428px];
+
+    // Wider screens: apply transition when opening/closing of the sidebar
+    @apply annotator-lg:sidebar-transition-margin;
+
+    &.is-hidden {
+      @apply sidebar-transition-visibility;
+    }
+
+    // We can't use `theme-clean:` or `sidebar-collapsed:` tailwind modifiers
+    // here because this is the one place in the project where the relevant
+    // classes are assigned to the same element, not a parent element.
+    &.theme-clean {
+      @apply shadow-sidebar;
+    }
+
+    &.sidebar-collapsed {
+      @apply ml-0;
+    }
+  }
+
+  // The sidebar's iframe
+  .sidebar-frame {
+    @apply relative border-0 h-full w-full z-3;
+    @apply sidebar-collapsed:sidebar-transition-visibility;
+  }
+
+  // this disables the width transition for the sidebar when
+  // it is manually resized by dragging
+  .annotator-no-transition {
+    transition: none !important;
+  }
+}
