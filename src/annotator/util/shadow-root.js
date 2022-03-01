@@ -1,5 +1,7 @@
 /**
  * Load stylesheets for annotator UI components into the shadow DOM root.
+ *
+ * @param {ShadowRoot} shadowRoot
  */
 function loadStyles(shadowRoot) {
   // Find the preloaded stylesheet added by the boot script.

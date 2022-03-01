@@ -11,7 +11,7 @@ import classnames from 'classnames';
  * the sidebar.
  *
  * @param {object} props
- *   @prop {Children} props.children
+ *   @param {Children} props.children
  */
 function BucketList({ children }) {
   return (
@@ -38,8 +38,8 @@ function BucketList({ children }) {
  * Render a vertically-positioned bucket-list item.
  *
  * @param {object} props
- *  @prop {Children} props.children
- *  @prop {number} props.topPosition - The vertical top position, in pixels,
+ *  @param {Children} props.children
+ *  @param {number} props.topPosition - The vertical top position, in pixels,
  *   for this bucket item relative to the top of the containing BucketList
  */
 function BucketItem({ children, topPosition }) {

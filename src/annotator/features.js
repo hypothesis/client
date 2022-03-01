@@ -1,7 +1,9 @@
 import { warnOnce } from '../shared/warn-once';
 
+/** @type {Record<string, boolean>} */
 let _features = {};
 
+/** @param {Record<string, boolean>} features */
 const _set = features => {
   _features = features || {};
 };
@@ -18,6 +20,7 @@ export const features = {
     _set({});
   },
 
+  /** @param {string} flag */
   flagEnabled: function (flag) {
     if (!(flag in _features)) {
       warnOnce('looked up unknown feature', flag);

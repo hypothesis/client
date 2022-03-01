@@ -226,8 +226,8 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
 
   // Group text nodes into spans of adjacent nodes. If a group of text nodes are
   // adjacent, we only need to create one highlight element for the group.
-  let textNodeSpans = [];
-  let prevNode = null;
+  let textNodeSpans = /** @type {Text[][]} */ ([]);
+  let prevNode = /** @type {Node|null} */ (null);
   let currentSpan = null;
 
   textNodes.forEach(node => {
@@ -246,11 +246,11 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
   const whitespace = /^\s*$/;
   textNodeSpans = textNodeSpans.filter(span =>
     // Check for at least one text node with non-space content.
-    span.some(node => !whitespace.test(node.nodeValue))
+    span.some(node => !whitespace.test(node.data))
   );
 
   // Wrap each text node span with a `<hypothesis-highlight>` element.
-  const highlights = [];
+  const highlights = /** @type {HighlightElement[]} */ ([]);
   textNodeSpans.forEach(nodes => {
     // A custom element name is used here rather than `<span>` to reduce the
     // likelihood of highlights being hidden by page styling.
@@ -259,7 +259,8 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
     const highlightEl = document.createElement('hypothesis-highlight');
     highlightEl.className = cssClass;
 
-    nodes[0].parentNode.replaceChild(highlightEl, nodes[0]);
+    const parent = /** @type {Node} */ (nodes[0].parentNode);
+    parent.replaceChild(highlightEl, nodes[0]);
     nodes.forEach(node => highlightEl.appendChild(node));
 
     highlights.push(highlightEl);

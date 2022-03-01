@@ -272,6 +272,8 @@ export class HTMLMetadata {
   /**
    * Convert a possibly relative URI to an absolute one. This will throw an
    * exception if the URL cannot be parsed.
+   *
+   * @param {string} url
    */
   _absoluteUrl(url) {
     return normalizeURI(url, this.document.baseURI);
