@@ -541,7 +541,7 @@ export class Sidebar {
     if (this.iframeContainer) {
       const width = this.iframeContainer.getBoundingClientRect().width;
       this.iframeContainer.style.marginLeft = `${-1 * width}px`;
-      this.iframeContainer.classList.remove('annotator-collapsed');
+      this.iframeContainer.classList.remove('sidebar-collapsed');
     }
 
     this.toolbar.sidebarOpen = true;
@@ -556,7 +556,7 @@ export class Sidebar {
   close() {
     if (this.iframeContainer) {
       this.iframeContainer.style.marginLeft = '';
-      this.iframeContainer.classList.add('annotator-collapsed');
+      this.iframeContainer.classList.add('sidebar-collapsed');
     }
 
     this.toolbar.sidebarOpen = false;
