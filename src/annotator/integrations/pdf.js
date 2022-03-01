@@ -261,7 +261,7 @@ export class PDFIntegration {
   // This method (re-)anchors annotations when pages are rendered and destroyed.
   _update() {
     // A list of annotations that need to be refreshed.
-    const refreshAnnotations = [];
+    const refreshAnnotations = /** @type {AnnotationData[]} */ ([]);
 
     const pageCount = this.pdfViewer.pagesCount;
     for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {

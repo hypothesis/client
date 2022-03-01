@@ -30,6 +30,7 @@ function getNodePosition(node) {
   return pos;
 }
 
+/** @param {Node} node */
 function getPathSegment(node) {
   const name = getNodeName(node);
   const pos = getNodePosition(node);

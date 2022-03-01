@@ -18,6 +18,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  */
 
 /**
+ * @param {Window} window_
  * @return {SettingsGetters}
  */
 export function settingsFrom(window_) {

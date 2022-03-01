@@ -31,6 +31,7 @@ export const ARROW_POINTING_UP = 2;
  * @prop {ArrowDirection} arrowDirection - Direction of the adder's arrow.
  */
 
+/** @param {number} pixels */
 function toPx(pixels) {
   return pixels.toString() + 'px';
 }
@@ -325,6 +326,7 @@ export class Adder {
   }
 
   _render() {
+    /** @param {import('./components/AdderToolbar').Command} command */
     const handleCommand = command => {
       switch (command) {
         case 'annotate':

@@ -66,16 +66,17 @@ export function forEachNodeInRange(range, callback) {
  */
 export function getTextBoundingBoxes(range) {
   const whitespaceOnly = /^\s*$/;
-  const textNodes = [];
+  const textNodes = /** @type {Text[]} */ ([]);
   forEachNodeInRange(range, node => {
     if (
       node.nodeType === Node.TEXT_NODE &&
       !(/** @type {string} */ (node.textContent).match(whitespaceOnly))
     ) {
-      textNodes.push(node);
+      textNodes.push(/** @type {Text} */ (node));
     }
   });
 
+  /** @type {DOMRect[]} */
   let rects = [];
   textNodes.forEach(node => {
     const nodeRange = node.ownerDocument.createRange();
