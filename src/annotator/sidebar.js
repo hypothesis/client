@@ -45,7 +45,7 @@ function createSidebarIframe(config) {
 
   sidebarFrame.src = sidebarAppSrc;
   sidebarFrame.title = 'Hypothesis annotation viewer';
-  sidebarFrame.className = 'h-sidebar-iframe';
+  sidebarFrame.className = 'sidebar-frame';
 
   return sidebarFrame;
 }
@@ -106,10 +106,10 @@ export class Sidebar {
     } else {
       this.iframeContainer = document.createElement('div');
       this.iframeContainer.style.display = 'none';
-      this.iframeContainer.className = 'annotator-frame';
+      this.iframeContainer.className = 'sidebar-container';
 
       if (config.theme === 'clean') {
-        this.iframeContainer.classList.add('annotator-frame--theme-clean');
+        this.iframeContainer.classList.add('theme-clean');
       } else {
         this.bucketBar = new BucketBar(this.iframeContainer, {
           onFocusAnnotations: tags =>

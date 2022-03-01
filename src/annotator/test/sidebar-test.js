@@ -190,11 +190,7 @@ describe('Sidebar', () => {
 
     it('applies a style if theme is configured as "clean"', () => {
       const sidebar = createSidebar({ theme: 'clean' });
-      assert.isTrue(
-        sidebar.iframeContainer.classList.contains(
-          'annotator-frame--theme-clean'
-        )
-      );
+      assert.isTrue(sidebar.iframeContainer.classList.contains('theme-clean'));
     });
 
     it('becomes visible when the sidebar application has loaded', async () => {
