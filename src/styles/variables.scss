@@ -116,21 +116,4 @@ $icon-size--medium: 16px;
 $icon-size--large: 24px;
 
 // Selectors for applying clean-theme styling
-$annotator--theme-clean: '.annotator-frame--theme-clean';
 $sidebar--theme-clean: '.theme-clean';
-
-// Annotator-specific values
-// -----------------------------------
-$annotator-toolbar-width: 33px;
-
-$annotator-base-line-height: 20px;
-
-$annotator-adder-font-size: 12px;
-$annotator-adder-line-height: 1em;
-
-$annotator-bucket-bar-font-size: 10px;
-
-$annotator-border-radius: 4px;
-
-$annotator-shadow--sidebar: 0px 1px 4px color.scale($color-shadow, $alpha: -50%);
-$annotator-timing--sidebar-collapse-transition: 150ms;
