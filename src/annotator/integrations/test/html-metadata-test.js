@@ -39,11 +39,10 @@ describe('HTMLMetadata', () => {
       assert.isEmpty(metadata.dc);
     });
 
-    describe('metadata.title', () => {
-      it('should return title', () => {
-        // Populate all supported title sources.
-        tempDocument.title = 'Test document title';
-        tempDocumentHead.innerHTML = `
+    it('metadata.title should contain title', () => {
+      // Populate all supported title sources.
+      tempDocument.title = 'Test document title';
+      tempDocumentHead.innerHTML = `
           <meta name="eprints.title" content="Eprints title">
           <meta name="prism.title" content="PRISM title">
           <meta name="dc.title" content="Dublin Core title">
@@ -52,72 +51,69 @@ describe('HTMLMetadata', () => {
           <meta name="twitter:title" content="Twitter title">
         `;
 
-        // Title values, in order of source priority.
-        const sources = [
-          {
-            metaName: 'citation_title',
-            value: 'Highwire title',
-          },
-          {
-            metaName: 'eprints.title',
-            value: 'Eprints title',
-          },
-          {
-            metaName: 'prism.title',
-            value: 'PRISM title',
-          },
-          {
-            metaAttr: 'property',
-            metaName: 'og:title',
-            value: 'Facebook title',
-          },
-          {
-            metaName: 'twitter:title',
-            value: 'Twitter title',
-          },
-          {
-            metaName: 'dc.title',
-            value: 'Dublin Core title',
-          },
-          {
-            value: 'Test document title',
-          },
-        ];
+      // Title values, in order of source priority.
+      const sources = [
+        {
+          metaName: 'citation_title',
+          value: 'Highwire title',
+        },
+        {
+          metaName: 'eprints.title',
+          value: 'Eprints title',
+        },
+        {
+          metaName: 'prism.title',
+          value: 'PRISM title',
+        },
+        {
+          metaAttr: 'property',
+          metaName: 'og:title',
+          value: 'Facebook title',
+        },
+        {
+          metaName: 'twitter:title',
+          value: 'Twitter title',
+        },
+        {
+          metaName: 'dc.title',
+          value: 'Dublin Core title',
+        },
+        {
+          value: 'Test document title',
+        },
+      ];
 
-        for (let source of sources) {
-          const metadata = testDocument.getDocumentMetadata();
-          assert.equal(metadata.title, source.value);
+      for (let source of sources) {
+        const metadata = testDocument.getDocumentMetadata();
+        assert.equal(metadata.title, source.value);
 
-          // Remove this title source. The next iteration should return the next
-          // title value in the priority order.
-          if (source.metaName) {
-            const attr = source.metaAttr ?? 'name';
-            tempDocumentHead
-              .querySelector(`meta[${attr}="${source.metaName}"]`)
-              .remove();
-          }
+        // Remove this title source. The next iteration should return the next
+        // title value in the priority order.
+        if (source.metaName) {
+          const attr = source.metaAttr ?? 'name';
+          tempDocumentHead
+            .querySelector(`meta[${attr}="${source.metaName}"]`)
+            .remove();
         }
-      });
+      }
     });
 
-    describe('metadata.highwire', () => {
-      it('should return Highwire metadata', () => {
-        tempDocumentHead.innerHTML = `
+    it('metadata.highwire should contain Highwire metadata', () => {
+      tempDocumentHead.innerHTML = `
           <meta name="citation_doi" content="10.1175/JCLI-D-11-00015.1">
           <meta name="citation_title" content="Foo">
           <meta name="citation_pdf_url" content="foo.pdf">
         `;
-        const metadata = testDocument.getDocumentMetadata();
+      const metadata = testDocument.getDocumentMetadata();
 
-        assert.ok(metadata.highwire);
-        assert.deepEqual(metadata.highwire.pdf_url, ['foo.pdf']);
-        assert.deepEqual(metadata.highwire.doi, ['10.1175/JCLI-D-11-00015.1']);
-        assert.deepEqual(metadata.highwire.title, ['Foo']);
-      });
+      assert.ok(metadata.highwire);
+      assert.deepEqual(metadata.highwire.pdf_url, ['foo.pdf']);
+      assert.deepEqual(metadata.highwire.doi, ['10.1175/JCLI-D-11-00015.1']);
+      assert.deepEqual(metadata.highwire.title, ['Foo']);
     });
 
     describe('metadata.dc', () => {
-      it('should return Dublin Core metadata', () => {
+      it('should contain Dublin Core metadata', () => {
         tempDocumentHead.innerHTML = `
           <meta name="dc.identifier" content="doi:10.1175/JCLI-D-11-00015.1">
           <meta name="dc.identifier" content="foobar-abcxyz">
@@ -152,29 +148,24 @@ describe('HTMLMetadata', () => {
       });
     });
 
-    describe('metadata.facebook', () => {
-      it('should return Facebook metadata', () => {
-        tempDocumentHead.innerHTML =
-          '<meta property="og:url" content="http://example.com">';
-        const metadata = testDocument.getDocumentMetadata();
+    it('metadata.facebook should contain Facebook metadata', () => {
+      tempDocumentHead.innerHTML =
+        '<meta property="og:url" content="http://example.com">';
+      const metadata = testDocument.getDocumentMetadata();
 
-        assert.ok(metadata.facebook);
-        assert.deepEqual(metadata.facebook.url, ['http://example.com']);
-      });
+      assert.ok(metadata.facebook);
+      assert.deepEqual(metadata.facebook.url, ['http://example.com']);
     });
 
-    describe('metadata.twitter', () => {
-      it('should return Twitter card metadata', () => {
-        tempDocumentHead.innerHTML =
-          '<meta name="twitter:site" content="@okfn">';
-        const metadata = testDocument.getDocumentMetadata();
+    it('metadata.twitter should contain Twitter card metadata', () => {
+      tempDocumentHead.innerHTML = '<meta name="twitter:site" content="@okfn">';
+      const metadata = testDocument.getDocumentMetadata();
 
-        assert.ok(metadata.twitter);
-        assert.deepEqual(metadata.twitter.site, ['@okfn']);
-      });
+      assert.ok(metadata.twitter);
+      assert.deepEqual(metadata.twitter.site, ['@okfn']);
     });
 
-    it('should lower-case the value of the specified attribute', () => {
+    it('should lower-case metadata attribute names', () => {
       tempDocumentHead.innerHTML = `
         <meta name="CITATION_DOI" content="10.1175/JCLI-D-11-00015.1">
         <meta property="OG:URL" content="https://fb.com">
@@ -184,7 +175,7 @@ describe('HTMLMetadata', () => {
       assert.deepEqual(metadata.facebook.url, ['https://fb.com']);
     });
 
-    describe('metadata.link', () => {
+    describe('metadata link properties', () => {
       let metadata = null;
 
       beforeEach(() => {
