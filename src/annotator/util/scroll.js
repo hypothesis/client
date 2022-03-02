@@ -77,7 +77,7 @@ export async function scrollElement(
  *
  * @param {HTMLElement} element
  * @param {object} options
- *   @prop {number} maxDuration
+ *   @param {number} [options.maxDuration]
  */
 export async function scrollElementIntoView(
   element,
