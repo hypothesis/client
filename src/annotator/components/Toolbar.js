@@ -18,8 +18,9 @@ function ToolbarButton({ ...buttonProps }) {
     <IconButton
       className={classnames(
         'w-[30px] h-[30px]', // These buttons have precise dimensions
+        'rounded-px', // size of border radius in absolute units
         'flex items-center justify-center',
-        'border rounded bg-white text-grey-6 hover:text-grey-9 text-annotator-lg',
+        'border bg-white text-grey-6 hover:text-grey-9',
         'shadow transition-colors'
       )}
       icon={icon}
@@ -61,6 +62,10 @@ function ToolbarButton({ ...buttonProps }) {
  * Controls on the edge of the sidebar for opening/closing the sidebar,
  * controlling highlight visibility and creating new page notes.
  *
+ * This component and its buttons are sized with absolute units such that they
+ * don't scale with changes to the host page's root font size. They will still
+ * properly scale with user/browser zooming.
+ *
  * @param {ToolbarProps} props
  */
 export default function Toolbar({
@@ -75,7 +80,12 @@ export default function Toolbar({
   useMinimalControls = false,
 }) {
   return (
-    <div className="absolute left-[-33px] w-[33px] z-2">
+    <div
+      className={classnames(
+        'absolute left-[-33px] w-[33px] z-2',
+        'text-px-base leading-none' // non-scaling sizing
+      )}
+    >
       {/* In the clean theme (`useMinimalControls` is `true`),
           the only button that should appear is a button
           to close the sidebar, and only if the sidebar is open. This button is
@@ -84,9 +94,9 @@ export default function Toolbar({
       {useMinimalControls && isSidebarOpen && (
         <IconButton
           className={classnames(
-            'w-[27px] h-[27px] mt-[140px] ml-[6px]',
+            'w-[27px] h-[27px] mt-[140px] ml-px-1.5',
             'flex items-center justify-center bg-white border',
-            'text-grey-6 hover:text-grey-9 text-annotator-lg transition-colors',
+            'text-grey-6 hover:text-grey-9 transition-colors',
             // Turn off right border to blend with sidebar
             'border-r-0',
             // A more intense shadow than other ToolbarButtons, to match that
@@ -103,8 +113,8 @@ export default function Toolbar({
           <IconButton
             className={classnames(
               // Height and width to align with the sidebar's top bar
-              'h-[40px] w-[33px]',
-              'bg-white text-grey-5 pl-1.5 hover:text-grey-9',
+              'h-[40px] w-[33px] pl-px-1.5',
+              'bg-white text-grey-5 hover:text-grey-9',
               // Turn on left and bottom borders to continue the
               // border of the sidebar's top bar
               'border-l border-b'
@@ -116,7 +126,7 @@ export default function Toolbar({
             pressed={isSidebarOpen}
             onClick={toggleSidebar}
           />
-          <div className="space-y-1.5 mt-2">
+          <div className="space-y-px-1.5 mt-px-2">
             <ToolbarButton
               title="Show highlights"
               icon={showHighlights ? 'show' : 'hide'}

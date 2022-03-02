@@ -12,10 +12,16 @@
   // down or left. On its own, it will be lozenge-shaped. Compose with one
   // of the directional classes below to style a button fully, e.g.
   // `classname="BucketButton LeftBucketButton`
+
+  // These buttons use absolute units for sizing, fonts, border-radius. This is
+  // purposeful: they should not scale with root-font scaling in the host page.
+  // This is to make sure they still properly align with the sidebar UI.
+  //
+  // These will still properly scale if the user zooms the font in the browser.
   .BucketButton {
     // A lozenge-shaped element with very small text
-    @apply w-[26px] h-[16px] absolute border bg-white shadow rounded;
-    @apply font-sans text-center text-tiny font-bold text-color-text-light leading-none;
+    @apply w-[26px] h-[16px] absolute border bg-white shadow rounded-px;
+    @apply font-sans text-center text-px-tiny font-bold text-color-text-light leading-none;
 
     // Establish :before and :after content for later manipulation into
     // different pointer shapes and directions
@@ -27,7 +33,7 @@
 
   // Style a `BucketButton` to point left
   .LeftBucketButton {
-    @apply rounded-r rounded-l-sm;
+    @apply rounded-r-px rounded-l-px-sm;
 
     // Position to the left of the button and centered vertically
     &::before,
@@ -54,7 +60,7 @@
   // Style a `BucketButton` to point up
   .UpBucketButton {
     // Z-index assures that left-pointing buttons will scroll behind this
-    @apply z-1 rounded-t-sm rounded-b;
+    @apply z-1 rounded-t-px-sm rounded-b-px;
 
     // Position above the button and horizontally centered
     &::before,
@@ -79,7 +85,7 @@
   // Style a `BucketButton` to point down
   .DownBucketButton {
     // Z-index assures that left-pointing buttons will scroll behind this
-    @apply z-1 rounded-t rounded-b-sm;
+    @apply z-1 rounded-t-px rounded-b-px-sm;
 
     // Position below the button and horizontally centered
     &::before,

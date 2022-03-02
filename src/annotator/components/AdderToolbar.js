@@ -76,10 +76,10 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
         'transition-colors duration-200',
         'dim-item'
       )}
-      icon={icon}
       onClick={onClick}
       title={title}
     >
+      {icon && <Icon classes="text-annotator-lg" name={icon} title={title} />}
       {typeof badgeCount === 'number' && <NumberIcon badgeCount={badgeCount} />}
       <span className="font-normal">{label}</span>
     </LabeledButton>
