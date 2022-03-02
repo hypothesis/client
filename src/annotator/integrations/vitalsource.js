@@ -188,6 +188,8 @@ function makeContentFrameScrollable(frame) {
  *  - Customize the document URI and metadata that is associated with annotations
  *  - Prevent VitalSource's built-in selection menu from getting in the way
  *    of the adder.
+ *  - Create a hidden text layer in PDF-based books, so the user can select text
+ *    in the PDF image. This is similar to what PDF.js does for us in PDFs.
  *
  * @implements {Integration}
  */
@@ -287,8 +289,9 @@ export class VitalSourceContentIntegration {
    * @param {SidebarLayout} layout
    */
   fitSideBySide(layout) {
+    // For PDF books, handle side-by-side mode in this integration. For EPUBs,
+    // delegate to the HTML integration.
     const bookImage = getPDFPageImage();
-
     if (bookImage && this._textLayer) {
       const bookContainer = /** @type {HTMLElement} */ (
         bookImage.parentElement
