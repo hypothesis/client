@@ -43,6 +43,21 @@ export function vitalSourceFrameRole(window_ = window) {
 /**
  * VitalSourceInjector runs in the book container frame and loads the client into
  * book content frames.
+ *
+ * The frame structure of the VitalSource book reader looks like this:
+ *
+ * [VitalSource top frame - bookshelf.vitalsource.com]
+ *   |
+ *   [Book container frame - jigsaw.vitalsource.com]
+ *     |
+ *     [Book content frame - jigsaw.vitalsource.com]
+ *
+ * The Hypothesis client can be initially loaded in the container frame or the
+ * content frame. As the user navigates around the book, the container frame
+ * remains the same but the content frame is swapped out. When used in the
+ * container frame, this class handles initial injection of the client as a
+ * guest in the current content frame, and re-injecting the client into new
+ * content frames when they are created.
  */
 export class VitalSourceInjector {
   /**
