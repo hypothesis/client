@@ -1,5 +1,5 @@
-import { delay } from '../../../test-util/wait';
-import { DEBOUNCE_WAIT, onDocumentReady } from '../../frame-observer';
+import { delay, waitFor } from '../../../test-util/wait';
+import { DEBOUNCE_WAIT, onNextDocumentReady } from '../../frame-observer';
 import {
   HypothesisInjector,
   injectClient,
@@ -24,8 +24,8 @@ describe('HypothesisInjector integration test', () => {
 
   // Wait for `HypothesisInjector.injectClient` to finish injecting the client
   // into the page.
-  async function waitForInjectClient() {
-    await delay(0);
+  async function waitForInjectClient(frame) {
+    await waitFor(() => getHypothesisScript(frame));
   }
 
   function getHypothesisScript(iframe) {
@@ -125,7 +125,7 @@ describe('HypothesisInjector integration test', () => {
     // Now initialize
     createHypothesisInjector();
 
-    await waitForInjectClient();
+    await waitForInjectClient(validFrame);
 
     assert.isNotNull(
       getHypothesisScript(validFrame),
@@ -142,7 +142,7 @@ describe('HypothesisInjector integration test', () => {
     const iframe = createAnnotatableIFrame();
 
     createHypothesisInjector();
-    await waitForInjectClient();
+    await waitForInjectClient(iframe);
 
     const scriptElement = getHypothesisScript(iframe);
     assert.isNotNull(
@@ -165,7 +165,7 @@ describe('HypothesisInjector integration test', () => {
     iframe.contentDocument.body.append(configScript);
 
     createHypothesisInjector();
-    await onDocumentReady(iframe);
+    await onNextDocumentReady(iframe);
 
     assert.isNull(
       getHypothesisScript(iframe),
@@ -181,7 +181,7 @@ describe('HypothesisInjector integration test', () => {
     const iframe = createAnnotatableIFrame();
 
     await waitForFrameObserver();
-    await waitForInjectClient();
+    await waitForInjectClient(iframe);
     assert.isNotNull(
       getHypothesisScript(iframe),
       'expected dynamically added iframe to include the Hypothesis script'
@@ -193,7 +193,7 @@ describe('HypothesisInjector integration test', () => {
 
     // Now initialize
     createHypothesisInjector();
-    await waitForInjectClient();
+    await waitForInjectClient(iframe);
 
     assert.isNotNull(
       getHypothesisScript(iframe),
@@ -207,7 +207,7 @@ describe('HypothesisInjector integration test', () => {
     assert.isNull(getHypothesisScript(iframe));
 
     await waitForFrameObserver();
-    await waitForInjectClient();
+    await waitForInjectClient(iframe);
 
     assert.isNotNull(
       getHypothesisScript(iframe),
@@ -223,7 +223,7 @@ describe('HypothesisInjector integration test', () => {
     const iframe = createAnnotatableIFrame();
 
     await waitForFrameObserver();
-    await waitForInjectClient();
+    await waitForInjectClient(iframe);
 
     assert.isNotNull(
       getHypothesisScript(iframe),
@@ -237,7 +237,7 @@ describe('HypothesisInjector integration test', () => {
     assert.isNull(getHypothesisScript(iframe));
 
     await waitForFrameObserver();
-    await waitForInjectClient();
+    await waitForInjectClient(iframe);
 
     assert.isNotNull(
       getHypothesisScript(iframe),

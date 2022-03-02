@@ -1,9 +1,34 @@
-import { delay } from '../../test-util/wait';
-import { FrameObserver, onDocumentReady, $imports } from '../frame-observer';
+import { delay, waitFor } from '../../test-util/wait';
+import {
+  FrameObserver,
+  onDocumentReady,
+  onNextDocumentReady,
+  $imports,
+} from '../frame-observer';
+
+function waitForEvent(target, event) {
+  return new Promise(resolve => {
+    target.addEventListener(event, () => resolve());
+  });
+}
+
+function waitForCall(spy) {
+  return waitFor(() => spy.called, 300 /* timeout */);
+}
 
 describe('annotator/frame-observer', () => {
+  let container;
+
+  afterEach(() => {
+    container.remove();
+  });
+
+  beforeEach(() => {
+    container = document.createElement('div');
+    document.body.append(container);
+  });
+
   describe('FrameObserver', () => {
-    let container;
     let frameObserver;
     let onFrameAdded;
     let onFrameRemoved;
@@ -26,8 +51,6 @@ describe('annotator/frame-observer', () => {
     }
 
     beforeEach(() => {
-      container = document.createElement('div');
-      document.body.appendChild(container);
       sandbox.stub(console, 'warn');
       $imports.$mock({
         // Disable debouncing
@@ -51,71 +74,48 @@ describe('annotator/frame-observer', () => {
     });
 
     it('triggers onFrameAdded when an annotatable iframe is added', async () => {
-      let iframe = createAnnotatableIFrame();
-      await delay(0);
-
-      assert.calledWith(onFrameAdded, iframe);
-
-      iframe = createAnnotatableIFrame('enable-annotation', 'yes');
-      await delay(0);
-
-      assert.calledWith(onFrameAdded, iframe);
-
-      iframe = createAnnotatableIFrame('enable-annotation', 'true');
-      await delay(0);
-
-      assert.calledWith(onFrameAdded, iframe);
-
-      iframe = createAnnotatableIFrame('enable-annotation', '1');
-      await delay(0);
-
-      assert.calledWith(onFrameAdded, iframe);
-
-      iframe = createAnnotatableIFrame('enable-annotation', 'false'); // the actual value of the attribute is irrelevant
-      await delay(0);
-
+      const iframe = createAnnotatableIFrame();
+      await waitForCall(onFrameAdded);
       assert.calledWith(onFrameAdded, iframe);
     });
 
     it("doesn't trigger onFrameAdded when non-annotatable iframes are added", async () => {
       createAnnotatableIFrame('dummy-attribute');
-      await delay(0);
-
+      await delay(10);
       assert.notCalled(onFrameAdded);
     });
 
     it('removal of the annotatable iframe triggers onFrameRemoved', async () => {
       const iframe = createAnnotatableIFrame();
 
-      await delay(0);
+      await waitForCall(onFrameAdded);
       assert.calledOnce(onFrameAdded);
       assert.calledWith(onFrameAdded, iframe);
 
       iframe.remove();
 
-      await delay(0);
+      await waitForCall(onFrameRemoved);
       assert.calledOnce(onFrameRemoved);
       assert.calledWith(onFrameRemoved, iframe);
     });
 
     it('removal of the `enable-annotation` attribute triggers onFrameRemoved', async () => {
       const iframe = createAnnotatableIFrame();
-      await delay(0);
-
+      await waitForCall(onFrameAdded);
       assert.calledOnce(onFrameAdded);
       assert.calledWith(onFrameAdded, iframe);
 
       iframe.removeAttribute('enable-annotation');
-      await delay(0);
 
+      await waitForCall(onFrameRemoved);
       assert.calledOnce(onFrameRemoved);
       assert.calledWith(onFrameRemoved, iframe);
     });
 
     it('changing the `src` attribute triggers onFrameRemoved', async () => {
       const iframe = createAnnotatableIFrame();
-      await delay(0);
 
+      await waitForCall(onFrameAdded);
       assert.calledOnce(onFrameAdded);
       assert.calledWith(onFrameAdded, iframe);
 
@@ -131,7 +131,7 @@ describe('annotator/frame-observer', () => {
       const iframe = createAnnotatableIFrame();
 
       frameObserver._discoverFrames(); // Emulate a race condition
-      await onDocumentReady(iframe);
+      await onNextDocumentReady(iframe);
 
       assert.notCalled(onFrameAdded);
     });
@@ -140,67 +140,129 @@ describe('annotator/frame-observer', () => {
       const iframe = createAnnotatableIFrame();
       iframe.setAttribute('src', 'http://localhost:1');
 
-      // In this particular case waiting for the FrameObserver to detect the new
-      // iframe may not be enough. Because the browser fetches the URL in `src`
-      // (it is not reachable) it could take longer, that's why, in addition, we
-      // wait for the iframe's document to completely load.
-      await onDocumentReady(iframe);
-      await delay(0);
+      await waitForCall(console.warn);
 
       assert.notCalled(onFrameAdded);
       assert.calledOnce(console.warn);
     });
   });
 
+  function createFrame(src) {
+    const frame = document.createElement('iframe');
+    frame.src = src;
+    container.append(frame);
+    return frame;
+  }
+
+  const sameOriginURL = new URL(
+    '/base/annotator/test/empty.html',
+    document.location.href
+  ).href;
+
+  // A cross-origin local URL that "loads" fast (whether the load succeeds or
+  // fails doesn't matter for these tests). We assume that nothing else is
+  // listening on the port.
+  const crossOriginURL = 'http://localhost:12345/test.html';
+
   describe('onDocumentReady', () => {
-    let fakeIFrame;
-    let fakeIFrameDocument;
+    it('invokes callback with current document if it is already ready', async () => {
+      const callback = sinon.stub();
+      const frame = createFrame(sameOriginURL);
+      await waitForEvent(frame, 'load');
 
-    class FakeIFrameDocument extends EventTarget {
-      constructor() {
-        super();
-        this.readyState = 'loading';
-        this.location = {
-          href: 'about:blank',
-        };
+      onDocumentReady(frame, callback);
+      await waitForCall(callback);
+
+      assert.calledOnce(callback);
+      assert.calledWith(callback, null);
+      const doc = callback.args[0][1];
+      assert.equal(doc.location.href, sameOriginURL);
+    });
+
+    it('invokes callback when current document becomes ready', async () => {
+      let resolveDocReady;
+      const docReady = new Promise(resolve => (resolveDocReady = resolve));
+      const callback = sinon
+        .stub()
+        .callsFake((err, doc) => resolveDocReady(doc));
+
+      // We use a randomized URL so that the browser won't have a cached copy
+      // that loads instantly. This will force execution through the code path
+      // that waits for 'DOMContentLoaded' before triggering the callback.
+      const docURL = `${sameOriginURL}?random=${Math.random()}`;
+      const frame = createFrame(docURL);
+      onDocumentReady(frame, callback, { pollInterval: 0 });
+      await docReady;
+
+      assert.calledOnce(callback);
+      assert.calledWith(callback, null);
+      const doc = callback.args[0][1];
+      assert.equal(doc.location.href, docURL);
+    });
+
+    it('invokes callback for subsequent navigations to same-origin documents', async () => {
+      const callback = sinon.stub();
+      const frame = createFrame(sameOriginURL);
+      await waitForEvent(frame, 'load');
+
+      onDocumentReady(frame, callback);
+      await waitForCall(callback);
+
+      frame.src = sameOriginURL + 'v2';
+      await waitForEvent(frame, 'load');
+
+      assert.calledTwice(callback);
+    });
+
+    it('invokes callback with error if document is cross-origin', async () => {
+      const callback = sinon.stub();
+      const frame = createFrame(crossOriginURL);
+      await waitForEvent(frame, 'load');
+
+      onDocumentReady(frame, callback);
+      await waitForCall(callback);
+
+      assert.calledOnce(callback);
+      assert.calledWith(callback, sinon.match.instanceOf(Error));
+      const error = callback.args[0][0];
+      assert.equal(error.message, 'Frame is cross-origin');
+    });
+
+    it('returns a callback that stops polling', async () => {
+      const callback = sinon.stub();
+      const frame = createFrame(sameOriginURL);
+      await waitForEvent(frame, 'load');
+
+      const unsubscribe = onDocumentReady(frame, callback);
+      await waitForCall(callback);
+
+      unsubscribe();
+      frame.src = sameOriginURL + '?v2';
+      await waitForEvent(frame, 'load');
+
+      assert.calledOnce(callback);
+    });
+  });
+
+  describe('onNextDocumentReady', () => {
+    it('it resolves when a document first becomes ready in the frame', async () => {
+      const frame = createFrame(sameOriginURL);
+      const doc = await onNextDocumentReady(frame);
+      assert.equal(doc.location.href, sameOriginURL);
+    });
+
+    it('it rejects if frame document is cross-origin', async () => {
+      const frame = createFrame(crossOriginURL);
+
+      let error;
+      try {
+        await onNextDocumentReady(frame);
+      } catch (e) {
+        error = e;
       }
-    }
 
-    beforeEach(() => {
-      fakeIFrameDocument = new FakeIFrameDocument();
-      fakeIFrame = document.createElement('div');
-      fakeIFrame.contentWindow = { document: fakeIFrameDocument };
-      fakeIFrame.setAttribute('src', 'http://my.dummy');
-    });
-
-    it('waits for the iframe load event to be triggered if the document is blank', () => {
-      fakeIFrameDocument.location.href = 'about:blank';
-      const onLoad = onDocumentReady(fakeIFrame);
-
-      // After the initial 'about:blank' document, a new document is loaded.
-      const newDocument = new FakeIFrameDocument();
-      newDocument.location.href = 'http://my.dummy';
-      newDocument.readyState = 'complete';
-      fakeIFrame.contentWindow = { document: newDocument };
-      fakeIFrame.dispatchEvent(new Event('load'));
-
-      return onLoad;
-    });
-
-    it('waits for the iframe DOMContentLoaded event to be triggered if the document is loading', () => {
-      fakeIFrameDocument.location.href = 'about:srcdoc';
-      fakeIFrameDocument.readyState = 'loading';
-      const onDOMContentLoaded = onDocumentReady(fakeIFrame);
-
-      fakeIFrameDocument.dispatchEvent(new Event('DOMContentLoaded'));
-
-      return onDOMContentLoaded;
-    });
-
-    it("resolves immediately if document is 'complete' or 'interactive'", () => {
-      fakeIFrameDocument.location.href = 'about:srcdoc';
-      fakeIFrameDocument.readyState = 'complete';
-      return onDocumentReady(fakeIFrame);
+      assert.instanceOf(error, Error);
+      assert.equal(error.message, 'Frame is cross-origin');
     });
   });
 });

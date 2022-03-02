@@ -1,4 +1,4 @@
-import { delay } from '../../../test-util/wait';
+import { delay, waitFor } from '../../../test-util/wait';
 import {
   VitalSourceInjector,
   VitalSourceContentIntegration,
@@ -127,7 +127,8 @@ describe('annotator/integrations/vitalsource', () => {
       }, 'Book container element not found');
     });
 
-    it('injects client into content frame', () => {
+    it('injects client into content frame', async () => {
+      await waitFor(() => fakeInjectClient.called);
       assert.calledWith(fakeInjectClient, fakeViewer.contentFrame, fakeConfig);
     });
 
@@ -150,7 +151,7 @@ describe('annotator/integrations/vitalsource', () => {
         assert.notCalled(fakeInjectClient);
 
         fakeViewer.finishChapterLoad(newChapterContent);
-        await delay(0);
+        await waitFor(() => fakeInjectClient.called);
         assert.calledWith(
           fakeInjectClient,
           fakeViewer.contentFrame,
@@ -160,6 +161,7 @@ describe('annotator/integrations/vitalsource', () => {
     });
 
     it("doesn't re-inject if content frame is removed", async () => {
+      await waitFor(() => fakeInjectClient.called);
       fakeInjectClient.resetHistory();
 
       // Remove the content frame. This will trigger a re-injection check, but
@@ -171,6 +173,7 @@ describe('annotator/integrations/vitalsource', () => {
     });
 
     it("doesn't re-inject if content frame siblings change", async () => {
+      await waitFor(() => fakeInjectClient.called);
       fakeInjectClient.resetHistory();
 
       // Modify the DOM tree. This will trigger a re-injection check, but do

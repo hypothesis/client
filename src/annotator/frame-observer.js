@@ -53,7 +53,7 @@ export class FrameObserver {
   async _addFrame(frame) {
     this._annotatableFrames.add(frame);
     try {
-      await onDocumentReady(frame);
+      await onNextDocumentReady(frame);
       if (this._isDisconnected) {
         return;
       }
@@ -101,44 +101,140 @@ export class FrameObserver {
 }
 
 /**
- * Resolves a Promise when the iframe's document is ready (loaded and parsed)
+ * Test if this is the empty document that a new iframe has before the URL
+ * specified by its `src` attribute loads.
  *
  * @param {HTMLIFrameElement} frame
- * @return {Promise<void>}
- * @throws {Error} if trying to access a document from a cross-origin iframe
  */
-export function onDocumentReady(frame) {
-  return new Promise(resolve => {
-    // @ts-expect-error
-    const frameDocument = frame.contentWindow.document;
-    const { readyState, location } = frameDocument;
+function hasBlankDocumentThatWillNavigate(frame) {
+  return (
+    frame.contentDocument?.location.href === 'about:blank' &&
+    // Do we expect the frame to navigate away from about:blank?
+    frame.hasAttribute('src') &&
+    frame.src !== 'about:blank'
+  );
+}
 
-    // Web browsers initially load a blank document before the final document.
-    // This blank document is (1) accessible, (2) has an empty body and head,
-    // and (3) has a 'complete' readyState, on Chrome and Safari, and an
-    // 'uninitialized' readyState on Firefox. If a blank document is detected and
-    // there is a 'src' attribute, it is expected that the blank document will be
-    // replaced by the final document.
-    if (
-      location.href === 'about:blank' &&
-      frame.hasAttribute('src') &&
-      frame.src !== 'about:blank'
-    ) {
-      // Listening to `DOMContentLoaded` on the frame's document doesn't work because the
-      // document is replaced. On the other hand, listening the frame's `load`
-      // works because the frame element (as in HTMLIFrameElement) doesn't change.
-      frame.addEventListener('load', () => {
-        resolve();
-      });
-      return;
-    }
-
-    if (readyState === 'loading') {
-      frameDocument.addEventListener('DOMContentLoaded', () => resolve());
-      return;
-    }
-
-    // State is 'interactive' or 'complete';
-    resolve();
+/**
+ * Wrapper around {@link onDocumentReady} which returns a promise that resolves
+ * the first time that a document in `frame` becomes ready.
+ *
+ * See {@link onDocumentReady} for the definition of _ready_.
+ *
+ * @param {HTMLIFrameElement} frame
+ * @return {Promise<Document>}
+ */
+export function onNextDocumentReady(frame) {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = onDocumentReady(frame, (err, doc) => {
+      unsubscribe();
+      if (doc) {
+        resolve(doc);
+      } else {
+        reject(err);
+      }
+    });
   });
+}
+
+/**
+ * Register a callback that is invoked when the content document
+ * (`frame.contentDocument`) in a same-origin iframe becomes _ready_.
+ *
+ * A document is _ready_ when its `readyState` is either "interactive" or
+ * "complete". It must also not be the empty document with URL "about:blank"
+ * that iframes have before they navigate to the URL specified by their "src"
+ * attribute.
+ *
+ * The callback is fired both for the document that is in the frame when
+ * `onDocumentReady` is called, as well as for new documents that are
+ * subsequently loaded into the same frame.
+ *
+ * If at any time the frame navigates to an iframe that is cross-origin,
+ * the callback will fire with an error. It will fire again for subsequent
+ * navigations, but due to platform limitations, it will only fire after the
+ * next document fully loads (ie. when the frame's `load` event fires).
+ *
+ * @param {HTMLIFrameElement} frame
+ * @param {(...args: [Error]|[null, Document]) => void} callback
+ * @param {object} options
+ *   @param {number} [options.pollInterval]
+ * @return {() => void} Callback that unsubscribes from future changes
+ */
+export function onDocumentReady(frame, callback, { pollInterval = 10 } = {}) {
+  let pollTimer;
+  let pollForDocumentChange;
+
+  // Visited documents for which we have fired the callback or are waiting
+  // to become ready.
+  const documents = new WeakSet();
+
+  const cancelPoll = () => {
+    clearTimeout(pollTimer);
+    pollTimer = null;
+  };
+
+  // Begin polling for a document change when the current document is about
+  // to go away.
+  const pollOnUnload = () => {
+    if (frame.contentDocument) {
+      frame.contentWindow?.addEventListener('unload', pollForDocumentChange);
+    }
+  };
+
+  const checkForDocumentChange = () => {
+    const currentDocument = frame.contentDocument;
+    if (!currentDocument) {
+      callback(new Error('Frame is cross-origin'));
+      return;
+    }
+
+    if (documents.has(currentDocument)) {
+      return;
+    }
+    documents.add(currentDocument);
+    cancelPoll();
+
+    if (!hasBlankDocumentThatWillNavigate(frame)) {
+      const isReady =
+        currentDocument.readyState === 'interactive' ||
+        currentDocument.readyState === 'complete';
+
+      if (isReady) {
+        callback(null, currentDocument);
+      } else {
+        currentDocument.addEventListener('DOMContentLoaded', () =>
+          callback(null, currentDocument)
+        );
+      }
+    }
+
+    // Poll for the next document change.
+    pollOnUnload();
+  };
+
+  pollForDocumentChange = () => {
+    cancelPoll();
+    pollTimer = setInterval(checkForDocumentChange, pollInterval);
+  };
+
+  // Set up observers for signals that the document either has changed or will
+  // soon change. There are two signals with different trade-offs:
+  //
+  //  - Polling after the current document is about to be unloaded. This allows
+  //    us to detect the new document quickly, but may not fire in some
+  //    situations (exact circumstances unclear, but eg. MDN warns about this).
+  //  - The iframe's "load" event. This is guaranteed to fire but only after the
+  //    new document is fully loaded.
+  pollOnUnload();
+  frame.addEventListener('load', checkForDocumentChange);
+
+  // Notify caller about the current document. This fires asynchronously so that
+  // the caller will have received the unsubscribe callback first.
+  setTimeout(() => checkForDocumentChange(), 0);
+
+  return () => {
+    cancelPoll();
+    frame.removeEventListener('load', checkForDocumentChange);
+  };
 }
