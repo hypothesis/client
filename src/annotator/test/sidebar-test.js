@@ -531,7 +531,7 @@ describe('Sidebar', () => {
         sidebar._onPan({ type: 'panstart' });
 
         assert.isTrue(
-          sidebar.iframeContainer.classList.contains('annotator-no-transition')
+          sidebar.iframeContainer.classList.contains('sidebar-no-transition')
         );
         assert.equal(sidebar.iframeContainer.style.pointerEvents, 'none');
       });
@@ -550,7 +550,7 @@ describe('Sidebar', () => {
         sidebar._gestureState = { final: 0 };
         sidebar._onPan({ type: 'panend' });
         assert.isFalse(
-          sidebar.iframeContainer.classList.contains('annotator-no-transition')
+          sidebar.iframeContainer.classList.contains('sidebar-no-transition')
         );
         assert.equal(sidebar.iframeContainer.style.pointerEvents, '');
       });
