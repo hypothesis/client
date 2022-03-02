@@ -493,7 +493,7 @@ export class Sidebar {
         this._resetGestureState();
 
         // Disable animated transition of sidebar position
-        frame.classList.add('annotator-no-transition');
+        frame.classList.add('sidebar-no-transition');
 
         // Disable pointer events on the iframe.
         frame.style.pointerEvents = 'none';
@@ -504,7 +504,7 @@ export class Sidebar {
 
         break;
       case 'panend':
-        frame.classList.remove('annotator-no-transition');
+        frame.classList.remove('sidebar-no-transition');
 
         // Re-enable pointer events on the iframe.
         frame.style.pointerEvents = '';
