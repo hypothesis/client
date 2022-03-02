@@ -112,6 +112,8 @@ describe('annotator/util/scroll', () => {
 
     it('installs scroll-into-view workaround for XHTML documents', async () => {
       try {
+        // Simulate an XHTML document, where `tagName` is not upper-cased as
+        // it is for HTML documents.
         Object.defineProperty(document.body, 'tagName', {
           value: 'body',
           configurable: true,
