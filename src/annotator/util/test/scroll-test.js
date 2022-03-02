@@ -109,5 +109,22 @@ describe('annotator/util/scroll', () => {
       assert.isTrue(containerRect.top <= targetRect.top);
       assert.isTrue(containerRect.bottom >= targetRect.bottom);
     });
+
+    it('installs scroll-into-view workaround for XHTML documents', async () => {
+      try {
+        Object.defineProperty(document.body, 'tagName', {
+          value: 'body',
+          configurable: true,
+        });
+        assert.equal(document.body.tagName, 'body');
+
+        await scrollElementIntoView(target, { maxDuration: 1 });
+
+        assert.equal(document.body.tagName, 'BODY');
+      } finally {
+        // Remove property override installed by this test.
+        delete document.body.tagName;
+      }
+    });
   });
 });
