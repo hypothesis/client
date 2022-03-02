@@ -1,3 +1,5 @@
+import scrollIntoView from 'scroll-into-view';
+
 /**
  * Return a promise that resolves on the next animation frame.
  */
@@ -68,4 +70,20 @@ export async function scrollElement(
     scrollFraction = Math.min(1.0, (Date.now() - scrollStart) / scrollDuration);
     element.scrollTop = interpolate(startOffset, endOffset, scrollFraction);
   }
+}
+
+/**
+ * Smoothly scroll an element into view.
+ *
+ * @param {HTMLElement} element
+ * @param {object} options
+ *   @prop {number} maxDuration
+ */
+export async function scrollElementIntoView(
+  element,
+  { maxDuration = 500 } = {}
+) {
+  await new Promise(resolve =>
+    scrollIntoView(element, { time: maxDuration }, resolve)
+  );
 }

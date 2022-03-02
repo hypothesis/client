@@ -1,5 +1,3 @@
-import scrollIntoView from 'scroll-into-view';
-
 import { anchor, describe } from '../anchoring/html';
 
 import { HTMLMetadata } from './html-metadata';
@@ -7,6 +5,7 @@ import {
   guessMainContentArea,
   preserveScrollPosition,
 } from './html-side-by-side';
+import { scrollElementIntoView } from '../util/scroll';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -161,10 +160,11 @@ export class HTMLIntegration {
   /**
    * @param {Anchor} anchor
    */
-  scrollToAnchor(anchor) {
-    const highlights = /** @type {Element[]} */ (anchor.highlights);
-    return new Promise(resolve => {
-      scrollIntoView(highlights[0], resolve);
-    });
+  async scrollToAnchor(anchor) {
+    const highlight = anchor.highlights?.[0];
+    if (!highlight) {
+      return;
+    }
+    await scrollElementIntoView(highlight);
   }
 }

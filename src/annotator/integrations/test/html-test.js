@@ -5,7 +5,7 @@ describe('HTMLIntegration', () => {
   let fakeHTMLMetadata;
   let fakeGuessMainContentArea;
   let fakePreserveScrollPosition;
-  let fakeScrollIntoView;
+  let fakeScrollElementIntoView;
 
   beforeEach(() => {
     fakeHTMLAnchoring = {
@@ -18,15 +18,17 @@ describe('HTMLIntegration', () => {
       uri: sinon.stub().returns('https://example.com/'),
     };
 
-    fakeScrollIntoView = sinon.stub().yields();
+    fakeScrollElementIntoView = sinon.stub().resolves();
 
     fakeGuessMainContentArea = sinon.stub().returns(null);
     fakePreserveScrollPosition = sinon.stub().yields();
 
     const HTMLMetadata = sinon.stub().returns(fakeHTMLMetadata);
     $imports.$mock({
-      'scroll-into-view': fakeScrollIntoView,
       '../anchoring/html': fakeHTMLAnchoring,
+      '../util/scroll': {
+        scrollElementIntoView: fakeScrollElementIntoView,
+      },
       './html-metadata': { HTMLMetadata },
       './html-side-by-side': {
         guessMainContentArea: fakeGuessMainContentArea,
@@ -179,21 +181,34 @@ describe('HTMLIntegration', () => {
   });
 
   describe('#scrollToAnchor', () => {
-    it('scrolls to first highlight of anchor', async () => {
-      const highlight = document.createElement('div');
+    let highlight;
+
+    beforeEach(() => {
+      highlight = document.createElement('div');
       document.body.appendChild(highlight);
+    });
 
-      try {
-        const anchor = { highlights: [highlight] };
+    afterEach(() => {
+      highlight.remove();
+    });
 
-        const integration = new HTMLIntegration();
-        await integration.scrollToAnchor(anchor);
+    it('scrolls to first highlight of anchor', async () => {
+      const anchor = { highlights: [highlight] };
 
-        assert.calledOnce(fakeScrollIntoView);
-        assert.calledWith(fakeScrollIntoView, highlight, sinon.match.func);
-      } finally {
-        highlight.remove();
-      }
+      const integration = new HTMLIntegration();
+      await integration.scrollToAnchor(anchor);
+
+      assert.calledOnce(fakeScrollElementIntoView);
+      assert.calledWith(fakeScrollElementIntoView, highlight);
+    });
+
+    it('does nothing if anchor has no highlights', async () => {
+      const anchor = {};
+
+      const integration = new HTMLIntegration();
+      await integration.scrollToAnchor(anchor);
+
+      assert.notCalled(fakeScrollElementIntoView);
     });
   });
 
