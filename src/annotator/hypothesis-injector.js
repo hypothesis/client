@@ -1,6 +1,6 @@
 import { parseJsonConfig } from '../boot/parse-json-config';
 import { generateHexString } from '../shared/random';
-import { onDocumentReady, FrameObserver } from './frame-observer';
+import { onNextDocumentReady, FrameObserver } from './frame-observer';
 
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable
@@ -67,7 +67,7 @@ export async function injectClient(frame, config) {
     return;
   }
 
-  await onDocumentReady(frame);
+  await onNextDocumentReady(frame);
 
   // Propagate the client resource locations from the current frame.
   //

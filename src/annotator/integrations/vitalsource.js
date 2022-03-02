@@ -1,4 +1,5 @@
 import { ListenerCollection } from '../../shared/listener-collection';
+import { onDocumentReady } from '../frame-observer';
 import { HTMLIntegration } from './html';
 import { preserveScrollPosition } from './html-side-by-side';
 import { ImageTextLayer } from './image-text-layer';
@@ -73,35 +74,6 @@ export class VitalSourceInjector {
     /** @type {WeakSet<HTMLIFrameElement>} */
     const contentFrames = new WeakSet();
 
-    /** @param {HTMLIFrameElement} frame */
-    const injectIfContentReady = frame => {
-      // Check if this frame contains decoded ebook content. If the document has
-      // not yet finished loading, then we rely on this function being called
-      // again once loading completes.
-
-      const body = frame.contentDocument?.body;
-      const isBookContent =
-        body &&
-        // Check that this is not the blank document which is displayed in
-        // brand new iframes before any of their content has loaded.
-        body.children.length > 0 &&
-        // Check that this is not the temporary page containing encrypted and
-        // invisible book content, which is replaced with the real content after
-        // a form submission. These pages look something like:
-        //
-        // ```
-        // <html>
-        //   <title>content</title>
-        //   <body><div id="page-content">{ Base64 encoded data }</div></body>
-        // </html>
-        // ```
-        !body.querySelector('#page-content');
-
-      if (isBookContent) {
-        injectClient(frame, config);
-      }
-    };
-
     const shadowRoot = /** @type {ShadowRoot} */ (bookElement.shadowRoot);
     const injectClientIntoContentFrame = () => {
       const frame = shadowRoot.querySelector('iframe');
@@ -110,10 +82,25 @@ export class VitalSourceInjector {
         return;
       }
       contentFrames.add(frame);
+      onDocumentReady(frame, (err, document_) => {
+        const body = document_?.body;
+        const isBookContent =
+          body &&
+          // Check that this is not the temporary page containing encrypted and
+          // invisible book content, which is replaced with the real content after
+          // a form submission. These pages look something like:
+          //
+          // ```
+          // <html>
+          //   <title>content</title>
+          //   <body><div id="page-content">{ Base64 encoded data }</div></body>
+          // </html>
+          // ```
+          !body.querySelector('#page-content');
 
-      injectIfContentReady(frame);
-      frame.addEventListener('load', () => {
-        injectIfContentReady(frame);
+        if (isBookContent) {
+          injectClient(frame, config);
+        }
       });
     };
 
