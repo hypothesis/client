@@ -49,7 +49,7 @@ export function offsetRelativeTo(element, parent) {
 export async function scrollElement(
   element,
   offset,
-  /* istanbul ignore next - default options are overridden in tests */
+  /* istanbul ignore next - defaults are overridden in tests */
   { maxDuration = 500 } = {}
 ) {
   const startOffset = element.scrollTop;
@@ -81,6 +81,7 @@ export async function scrollElement(
  */
 export async function scrollElementIntoView(
   element,
+  /* istanbul ignore next - defaults are overridden in tests */
   { maxDuration = 500 } = {}
 ) {
   // Make the body's `tagName` return an upper-case string in XHTML documents
