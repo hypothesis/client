@@ -61,6 +61,10 @@ function BucketItem({ children, topPosition }) {
  * A list of buckets, including up and down navigation (when applicable) and
  * on-screen buckets
  *
+ * This component and its buttons are sized with absolute units such that they
+ * don't scale with changes to the host page's root font size. They will still
+ * properly scale with user/browser zooming.
+ *
  * @param {object} props
  *   @param {Bucket} props.above
  *   @param {Bucket} props.below
