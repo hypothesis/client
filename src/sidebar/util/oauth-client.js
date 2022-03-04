@@ -100,7 +100,7 @@ export class OAuthClient {
    * Revoke an access and refresh token pair.
    *
    * @param {string} accessToken
-   * @return {Promise}
+   * @return {Promise<void>}
    */
   async revokeToken(accessToken) {
     try {
@@ -130,6 +130,7 @@ export class OAuthClient {
     // Promise which resolves or rejects when the user accepts or closes the
     // auth popup.
     const authResponse = new Promise((resolve, reject) => {
+      /** @param {MessageEvent} event */
       function authRespListener(event) {
         if (typeof event.data !== 'object') {
           return;

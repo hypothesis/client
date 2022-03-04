@@ -5,6 +5,9 @@
  *
  * This only works for plain objects, arrays and objects where data is stored
  * in enumerable fields.
+ *
+ * @template T
+ * @param {T} object
  */
 function deepFreeze(object) {
   if (Object.isFrozen(object)) {
@@ -25,8 +28,9 @@ function deepFreeze(object) {
 /**
  * Prevent accidental mutations to `object` or any of its fields in debug builds.
  *
- * @param {object} object
- * @return {object} Returns the input object
+ * @template T
+ * @param {T} object
+ * @return {T} Returns the input object
  */
 export function immutable(object) {
   if (process.env.NODE_ENV === 'production') {

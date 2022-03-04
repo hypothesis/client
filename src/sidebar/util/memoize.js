@@ -15,7 +15,9 @@ export function memoize(fn) {
     throw new Error('Memoize input must be a function of one argument');
   }
 
+  /** @type {Arg} */
   let lastArg;
+  /** @type {Result} */
   let lastResult;
 
   return function (arg) {
