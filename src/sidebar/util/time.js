@@ -205,6 +205,7 @@ export function nextFuzzyUpdate(date, now) {
  * @return {() => void} A function that cancels the interval
  */
 export function decayingInterval(date, callback) {
+  /** @type {number|undefined} */
   let timer;
   const timestamp = new Date(date);
 

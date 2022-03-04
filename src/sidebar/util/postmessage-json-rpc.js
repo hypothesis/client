@@ -2,6 +2,9 @@ import { generateHexString } from '../../shared/random';
 
 /**
  * Return a Promise that rejects with an error after `delay` ms.
+ *
+ * @param {number} delay
+ * @param {string} message
  */
 function createTimeout(delay, message) {
   return new Promise((_, reject) => {
@@ -46,6 +49,7 @@ export function call(
   }
 
   // Await response or timeout.
+  /** @type {(e: MessageEvent) => void} */
   let listener;
   const response = new Promise((resolve, reject) => {
     listener = event => {

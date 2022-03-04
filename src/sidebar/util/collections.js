@@ -33,7 +33,7 @@ export function toTrueMap(arr) {
  * Utility function that returns all of the properties of an object whose
  * value is `true`.
  *
- * @param {object} obj
+ * @param {Record<string, boolean>} obj
  * @return {string[]}
  */
 export function trueKeys(obj) {

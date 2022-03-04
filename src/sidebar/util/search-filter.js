@@ -47,15 +47,18 @@ function tokenize(searchText) {
     return [];
   }
 
-  // Small helper function for removing quote characters
-  // from the beginning- and end of a string, if the
-  // quote characters are the same.
-  // I.e.
-  //   'foo' -> foo
-  //   "bar" -> bar
-  //   'foo" -> 'foo"
-  //   bar"  -> bar"
-  const _removeQuoteCharacter = function (text) {
+  /**
+   * Remove a quote character from the beginning and end of the string, but
+   * only if they match. ie:
+   *
+-  *   'foo' -> foo
+-  *   "bar" -> bar
+-  *   'foo" -> 'foo"
+-  *    bar"  -> bar"
+   *
+   * @param {string} text
+   */
+  const removeQuoteCharacter = text => {
     const start = text.slice(0, 1);
     const end = text.slice(-1);
     if ((start === '"' || start === "'") && start === end) {
@@ -67,7 +70,7 @@ function tokenize(searchText) {
   let tokens = searchText.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || [];
 
   // Cut the opening and closing quote characters
-  tokens = tokens.map(_removeQuoteCharacter);
+  tokens = tokens.map(removeQuoteCharacter);
 
   // Remove quotes for power search.
   // I.e. 'tag:"foo bar"' -> 'tag:foo bar'
@@ -75,7 +78,7 @@ function tokenize(searchText) {
     const token = tokens[index];
     const [filter, data] = splitTerm(token);
     if (filter) {
-      tokens[index] = filter + ':' + _removeQuoteCharacter(data);
+      tokens[index] = filter + ':' + removeQuoteCharacter(data);
     }
   }
 
@@ -91,25 +94,25 @@ function tokenize(searchText) {
 export function toObject(searchText) {
   /** @type {Record<string,string[]>} */
   const obj = {};
-  const backendFilter = f => (f === 'tag' ? 'tags' : f);
 
-  const addToObj = (key, data) => {
-    if (obj[key]) {
-      return obj[key].push(data);
-    } else {
-      return (obj[key] = [data]);
-    }
-  };
+  /** @param {string} field */
+  const backendFilter = field => (field === 'tag' ? 'tags' : field);
 
   if (searchText) {
     const terms = tokenize(searchText);
     for (const term of terms) {
-      let [filter, data] = splitTerm(term);
-      if (!filter) {
-        filter = 'any';
+      let [field, data] = splitTerm(term);
+      if (!field) {
+        field = 'any';
         data = term;
       }
-      addToObj(backendFilter(filter), data);
+
+      const backendField = backendFilter(field);
+      if (obj[backendField]) {
+        obj[backendField].push(data);
+      } else {
+        obj[backendField] = [data];
+      }
     }
   }
   return obj;
@@ -175,7 +178,9 @@ export function generateFacetedFilter(searchText, focusFilters = {}) {
             );
             if (match) {
               const value = parseFloat(match[1]);
-              const unit = match[2] || 'sec';
+              const unit = /** @type {keyof secondsPerUnit} */ (
+                match[2] || 'sec'
+              );
               since.push(value * secondsPerUnit[unit]);
             }
           }

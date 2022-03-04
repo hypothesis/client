@@ -27,6 +27,7 @@
     "annotator/**/*.js",
     "boot/**/*.js",
     "shared/**/*.js",
+    "sidebar/util/*.js",
     "types/*.d.ts"
   ],
   "exclude": [
