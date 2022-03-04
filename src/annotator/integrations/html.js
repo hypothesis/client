@@ -117,9 +117,21 @@ export class HTMLIntegration {
     const padding = 12;
     const rightMargin = sidebarWidth + padding;
 
+    /** @param {HTMLElement} element */
+    const computeLeftMargin = element =>
+      parseInt(window.getComputedStyle(element).marginLeft, 10);
+
     preserveScrollPosition(() => {
       // nb. Adjusting the body size this way relies on the page not setting a
       // width on the body. For sites that do this won't work.
+
+      // Remove any margins we've previously set
+      document.body.style.marginLeft = '';
+      document.body.style.marginRight = '';
+
+      // Keep track of what left margin would be naturally without right margin set
+      const beforeBodyLeft = computeLeftMargin(document.body);
+
       document.body.style.marginRight = `${rightMargin}px`;
 
       const contentArea = guessMainContentArea(document.body);
@@ -133,6 +145,15 @@ export class HTMLIntegration {
         if (freeSpace > 0) {
           const adjustedMargin = Math.max(0, rightMargin - freeSpace);
           document.body.style.marginRight = `${adjustedMargin}px`;
+        }
+
+        // Changes to right margin can affect left margin in cases where body
+        // has `margin:auto`. It's OK to move the body to the left to make
+        // space, but avoid moving it to the right.
+        // See https://github.com/hypothesis/client/issues/4280
+        const afterBodyLeft = computeLeftMargin(document.body);
+        if (afterBodyLeft > beforeBodyLeft) {
+          document.body.style.marginLeft = `${beforeBodyLeft}px`;
         }
 
         // If the main content appears to be right up against the edge of the
