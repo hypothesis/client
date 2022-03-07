@@ -41,6 +41,7 @@ export default {
         },
       },
       fontFamily: {
+        mono: ['"Open Sans Mono"', 'Menlo', '"DejaVu Sans Mono"', 'monospace'],
         sans: [
           '"Helvetica Neue"',
           'Helvetica',
@@ -103,6 +104,7 @@ export default {
         },
       },
       screens: {
+        md: '480px',
         // Narrow mobile screens
         'annotator-sm': '240px',
         // Wider mobile screens/small tablets
