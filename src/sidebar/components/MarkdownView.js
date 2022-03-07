@@ -32,7 +32,10 @@ export default function MarkdownView({
 
   useEffect(() => {
     replaceLinksWithEmbeds(content.current, {
-      className: 'MarkdownView__embed',
+      // Make embeds the full width of the sidebar, unless the sidebar has been
+      // made wider than the `md` breakpoint. In that case, restrict width
+      // to 380px.
+      className: 'w-full md:w-[380px]',
     });
   }, [markdown]);
 
@@ -43,12 +46,17 @@ export default function MarkdownView({
 
   return (
     <div
-      className={classnames('MarkdownView', textClass)}
+      className="w-full break-words cursor-text"
       dir="auto"
       lang={contentLanguage}
-      ref={content}
-      dangerouslySetInnerHTML={{ __html: html }}
-      style={textStyle}
-    />
+    >
+      <div
+        className={classnames('styled-text', textClass)}
+        data-testid="styled-text"
+        ref={content}
+        dangerouslySetInnerHTML={{ __html: html }}
+        style={textStyle}
+      />
+    </div>
   );
 }

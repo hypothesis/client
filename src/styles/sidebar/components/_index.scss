@@ -10,7 +10,7 @@
 // Local patterns
 @use '../../patterns';
 
-// Components
+// UI (Preact) Components
 // ----------
 @use './AnnotationPublishControl';
 @use './AnnotationShareControl';
@@ -24,7 +24,6 @@
 @use './LaunchErrorPanel';
 @use './LoggedOutMessage';
 @use './MarkdownEditor';
-@use './MarkdownView';
 @use './Menu';
 @use './MenuItem';
 @use './MenuSection';
@@ -42,3 +41,5 @@
 @use './ToastMessages';
 @use './TopBar';
 @use './VersionInfo';
+
+@use './styled-text';
