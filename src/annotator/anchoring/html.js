@@ -67,6 +67,7 @@ export function anchor(root, selectors, options = {}) {
   let promise = Promise.reject('unable to anchor');
 
   if (range) {
+    // Const binding assures TS that it won't be re-assigned when callback runs.
     const range_ = range;
     promise = promise.catch(() => {
       let anchor = RangeAnchor.fromSelector(root, range_);
