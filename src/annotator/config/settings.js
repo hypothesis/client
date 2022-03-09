@@ -16,7 +16,11 @@ import { urlFromLinkTag } from './url-from-link-tag';
  * @prop {(name: string) => unknown} hostPageSetting
  */
 
-/** @param {unknown} value */
+/**
+ * Discard a setting if it is not a string.
+ *
+ * @param {unknown} value
+ */
 function checkIfString(value) {
   return typeof value === 'string' ? value : null;
 }
