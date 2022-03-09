@@ -22,6 +22,9 @@
  */
 
 /**
+ * Selector which identifies a document region using the selected text plus
+ * the surrounding context.
+ *
  * @typedef TextQuoteSelector
  * @prop {'TextQuoteSelector'} type
  * @prop {string} exact
@@ -30,6 +33,9 @@
  */
 
 /**
+ * Selector which identifies a document region using UTF-16 character offsets
+ * in the document body's `textContent`.
+ *
  * @typedef TextPositionSelector
  * @prop {'TextPositionSelector'} type
  * @prop {number} start
@@ -37,6 +43,8 @@
  */
 
 /**
+ * Selector which identifies a document region using XPaths and character offsets.
+ *
  * @typedef RangeSelector
  * @prop {'RangeSelector'} type
  * @prop {string} startContainer
@@ -46,6 +54,9 @@
  */
 
 /**
+ * Serialized representation of a region of a document which an annotation
+ * pertains to.
+ *
  * @typedef {TextQuoteSelector | TextPositionSelector | RangeSelector} Selector
  */
 
