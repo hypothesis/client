@@ -128,6 +128,16 @@ describe('HTMLIntegration', () => {
         assert.deepEqual(getMargins(), [padding, sidebarWidth + padding]);
       });
 
+      it('does not set left and right margins if there is not enough room to enable', () => {
+        const integration = createIntegration();
+
+        // Minimum available content width for side-by-side is 480
+        // window.innerWidth (800) - 321 = 479 --> too small
+        integration.fitSideBySide({ expanded: true, width: 321 });
+
+        assert.deepEqual(getMargins(), [null, null]);
+      });
+
       it('allows sidebar to overlap non-main content on the side of the page', () => {
         const integration = createIntegration();
 

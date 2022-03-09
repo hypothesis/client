@@ -13,6 +13,11 @@ import { scrollElementIntoView } from '../util/scroll';
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  */
 
+// When activating side-by-side mode, make sure there is at least this amount
+// of space (in pixels) left for the document's content. Any narrower and the
+// content line lengths and scale are too short to be readable.
+const MIN_HTML_WIDTH = 480;
+
 /**
  * Document type integration for ordinary web pages.
  *
@@ -54,11 +59,14 @@ export class HTMLIntegration {
    * @param {SidebarLayout} layout
    */
   fitSideBySide(layout) {
+    const maximumWidthToFit = window.innerWidth - layout.width;
+    const active = layout.expanded && maximumWidthToFit >= MIN_HTML_WIDTH;
+
     if (!this.sideBySideEnabled) {
       return false;
     }
 
-    if (layout.expanded) {
+    if (active) {
       this._activateSideBySide(layout.width);
       return true;
     } else {
