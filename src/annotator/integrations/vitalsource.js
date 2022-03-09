@@ -13,6 +13,11 @@ import { injectClient } from '../hypothesis-injector';
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  */
 
+// When activating side-by-side mode for VitalSource PDF documents, make sure
+// at least this much space (in pixels) is left for the PDF document. Any
+// smaller and it feels unreadable or too-zoomed-out
+const MIN_CONTENT_WIDTH = 480;
+
 /**
  * Return the custom DOM element that contains the book content iframe.
  */
@@ -303,10 +308,9 @@ export class VitalSourceContentIntegration {
       // Update the PDF image size and alignment to fit alongside the sidebar.
       // `ImageTextLayer` will handle adjusting the text layer to match.
       const newWidth = window.innerWidth - layout.width;
-      const minWidth = 250;
 
       preserveScrollPosition(() => {
-        if (layout.expanded && newWidth > minWidth) {
+        if (layout.expanded && newWidth > MIN_CONTENT_WIDTH) {
           // The VS book viewer sets `text-align: center` on the <body> element
           // by default, which centers the book image in the page. When the sidebar
           // is open we need the image to be left-aligned.

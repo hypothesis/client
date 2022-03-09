@@ -413,7 +413,8 @@ describe('annotator/integrations/vitalsource', () => {
 
           // Activate side-by-side mode. Page image should be resized to fit
           // alongside sidebar.
-          const sidebarWidth = 150;
+          // Minimum threshold for enabling side-by-side mode is 480px
+          const sidebarWidth = window.innerWidth - 481;
           const expectedWidth = window.innerWidth - sidebarWidth;
           integration.fitSideBySide({ expanded: true, width: sidebarWidth });
           assert.equal(fakePageImage.parentElement.style.textAlign, 'left');
@@ -431,7 +432,8 @@ describe('annotator/integrations/vitalsource', () => {
           createPageImageAndData();
           const integration = createIntegration();
 
-          const sidebarWidth = window.innerWidth - 200;
+          // This will leave less than 480px available to the main content
+          const sidebarWidth = window.innerWidth - 479;
           integration.fitSideBySide({ expanded: true, width: sidebarWidth });
           assert.equal(fakePageImage.parentElement.style.textAlign, '');
           assert.equal(fakePageImage.style.width, '');
