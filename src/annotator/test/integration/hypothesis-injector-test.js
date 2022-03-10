@@ -25,7 +25,7 @@ describe('HypothesisInjector integration test', () => {
   // Wait for `HypothesisInjector.injectClient` to finish injecting the client
   // into the page.
   async function waitForInjectClient(frame) {
-    await waitFor(() => getHypothesisScript(frame));
+    await waitFor(() => getHypothesisScript(frame), 100 /* timeout */);
   }
 
   function getHypothesisScript(iframe) {
