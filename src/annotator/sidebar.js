@@ -8,7 +8,7 @@ import { PortRPC } from '../shared/messaging';
 import { annotationCounts } from './annotation-counts';
 import { BucketBar } from './bucket-bar';
 import { createAppConfig } from './config/app';
-import { features } from './features';
+import { FeatureFlags } from './features';
 import { sidebarTrigger } from './sidebar-trigger';
 import { ToolbarController } from './toolbar';
 import { createShadowRoot } from './util/shadow-root';
@@ -124,6 +124,8 @@ export class Sidebar {
 
     /** @type {BucketBar|null} */
     this.bucketBar = null;
+
+    this.features = new FeatureFlags();
 
     if (config.externalContainerSelector) {
       this.externalFrame =
@@ -326,7 +328,10 @@ export class Sidebar {
   _setupSidebarEvents() {
     annotationCounts(document.body, this._sidebarRPC);
     sidebarTrigger(document.body, () => this.open());
-    features.init(this._sidebarRPC);
+
+    this._sidebarRPC.on('featureFlagsUpdated', flags =>
+      this.features.update(flags)
+    );
 
     this._sidebarRPC.on('connect', () => {
       // Show the UI

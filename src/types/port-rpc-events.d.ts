@@ -112,6 +112,7 @@ export type SidebarToGuestEvent =
    * The sidebar is asking the guest(s) to delete an annotation.
    */
   | 'deleteAnnotation'
+  | 'featureFlagsUpdated'
 
   /**
    * The sidebar is asking the guest(s) to focus on certain annotations.

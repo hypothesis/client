@@ -5,6 +5,7 @@ import { generateHexString } from '../shared/random';
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
+import { FeatureFlags } from './features';
 import {
   getHighlightsContainingNode,
   highlightRange,
@@ -187,6 +188,8 @@ export class Guest {
       source: 'guest',
     });
 
+    this.features = new FeatureFlags();
+
     /**
      * Integration that handles document-type specific functionality in the
      * guest.
@@ -367,6 +370,10 @@ export class Guest {
   }
 
   async _connectSidebar() {
+    this._sidebarRPC.on('featureFlagsUpdated', flags =>
+      this.features.update(flags)
+    );
+
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
     this._sidebarRPC.on(

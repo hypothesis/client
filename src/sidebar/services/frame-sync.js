@@ -126,6 +126,7 @@ export class FrameSyncService {
 
     this._setupSyncToGuests();
     this._setupHostEvents();
+    this._setupFeatureFlagSync();
   }
 
   /**
@@ -364,6 +365,7 @@ export class FrameSyncService {
 
     // Synchronize highlight visibility in this guest with the sidebar's controls.
     guestRPC.call('setHighlightsVisible', this._highlightsVisible);
+    guestRPC.call('featureFlagsUpdated', this._store.profile().features);
   }
 
   /**
@@ -380,6 +382,28 @@ export class FrameSyncService {
       this._highlightsVisible = visible;
       this._guestRPC.forEach(rpc => rpc.call('setHighlightsVisible', visible));
     });
+  }
+
+  /**
+   * Setup synchronization of feature flags to host and guest frames.
+   */
+  _setupFeatureFlagSync() {
+    const getFlags = () => this._store.profile().features;
+
+    /** @param {Record<string, boolean>} flags */
+    const sendFlags = flags => {
+      this._hostRPC.call('featureFlagsUpdated', flags);
+      for (let guest of this._guestRPC.values()) {
+        guest.call('featureFlagsUpdated', flags);
+      }
+    };
+
+    // Send current flags to host when it connects, and any already-connected
+    // guests.
+    sendFlags(getFlags());
+
+    // Watch for future flag changes.
+    watch(this._store.subscribe, getFlags, sendFlags);
   }
 
   /**
