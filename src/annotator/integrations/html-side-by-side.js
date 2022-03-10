@@ -97,14 +97,27 @@ function textRect(text, start = 0, end = text.data.length) {
   return textRectRange.getBoundingClientRect();
 }
 
+/** @param {Element} element */
+function hasFixedPosition(element) {
+  switch (getComputedStyle(element).position) {
+    case 'fixed':
+    case 'sticky':
+      return true;
+    default:
+      return false;
+  }
+}
+
 /**
  * Yield all the text node descendants of `root` that intersect `rect`.
  *
  * @param {Element} root
  * @param {DOMRect} rect
+ * @param {(el: Element) => boolean} shouldVisit - Optional filter that determines
+ *   whether to visit a subtree
  * @return {Generator<Text>}
  */
-function* textNodesInRect(root, rect) {
+function* textNodesInRect(root, rect, shouldVisit = () => true) {
   /** @type {Node|null} */
   let node = root.firstChild;
   while (node) {
@@ -113,8 +126,8 @@ function* textNodesInRect(root, rect) {
       const elementRect = element.getBoundingClientRect();
 
       // Only examine subtrees which are visible and intersect the viewport.
-      if (rectIntersects(elementRect, rect)) {
-        yield* textNodesInRect(element, rect);
+      if (shouldVisit(element) && rectIntersects(elementRect, rect)) {
+        yield* textNodesInRect(element, rect, shouldVisit);
       }
     } else if (node.nodeType === Node.TEXT_NODE) {
       const text = /** @type {Text} */ (node);
@@ -129,7 +142,8 @@ function* textNodesInRect(root, rect) {
 }
 
 /**
- * Find content within an element to use as an anchor when scrolling.
+ * Find content within an element to use as an anchor when applying a layout
+ * change to the document.
  *
  * @param {Element} scrollRoot
  * @return {Range|null} - Range to use as an anchor or `null` if a suitable
@@ -151,7 +165,17 @@ function getScrollAnchor(scrollRoot) {
 
   // Find the first word (non-whitespace substring of a text node) that is fully
   // visible in the viewport.
-  textNodeLoop: for (let textNode of textNodesInRect(scrollRoot, viewport)) {
+
+  // Text inside fixed-position elements is ignored because its position won't
+  // be affected by a layout change and so it makes a poor scroll anchor.
+  /** @param {Element} el */
+  const shouldVisit = el => !hasFixedPosition(el);
+
+  textNodeLoop: for (let textNode of textNodesInRect(
+    scrollRoot,
+    viewport,
+    shouldVisit
+  )) {
     let textLen = 0;
 
     // Visit all the non-whitespace substrings of the text node.

@@ -163,6 +163,40 @@ the fighting was.`;
       );
     });
 
+    it('ignores fixed-position content when choosing a scroll anchor', () => {
+      // Set up a DOM structure that emulates a page with a sticky heading:
+      //
+      // <div> // Scroll root
+      //   <div> // Inner container
+      //     <nav> // Fixed-position navbar
+      //     <p>..</p> // Content
+      //   </div>
+      // </div>
+      //
+      // Here the `<nav>` contains the top-left most text node in the viewport,
+      // but we should it because of its fixed position.
+      //
+      // The inner container is used to check that the element filtering is
+      // applied as the DOM tree is recursively traversed.
+      const nav = document.createElement('nav');
+      nav.style.position = 'fixed';
+      nav.style.left = '0px';
+      nav.style.top = '0px';
+      nav.textContent = 'Some heading';
+      const inner = document.createElement('div');
+      inner.append(nav, content);
+      scrollRoot.append(inner);
+
+      scrollRoot.scrollTop = 200;
+      const delta = preserveScrollPosition(() => {
+        scrollRoot.style.width = '150px';
+      }, scrollRoot);
+
+      // The scroll position should be adjusted. This would be zero if the
+      // text in the <nav> element was used as a scroll anchor.
+      assert.notEqual(delta, 0);
+    });
+
     it('does not restore the scroll position if no anchor content could be found', () => {
       // Fill content with empty text, which cannot be used as a scroll anchor.
       content.textContent = ' '.repeat(documentText.length);
