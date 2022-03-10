@@ -47,26 +47,6 @@
 }
 
 /**
- * horizontally-oriented collection of linked icons
- */
-@mixin footer-links {
-  @include layout.row(center);
-  @include utils.border--top;
-  padding-top: 8px;
-
-  &__icon {
-    @include layout.row;
-    @include utils.icon--medium;
-    margin: 0 8px;
-    color: var.$grey-5;
-
-    &:hover {
-      color: var.$grey-6;
-    }
-  }
-}
-
-/**
  * A pattern for styling a little "pointer" (arrow) icon that attaches to
  * menu content and serves as a visual anchor back to the triggering
  * button/element. When using, you'll need to provide the appropriate

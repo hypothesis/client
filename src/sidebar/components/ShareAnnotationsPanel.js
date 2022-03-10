@@ -112,7 +112,9 @@ function ShareAnnotationsPanel({ toastMessenger }) {
                   ) annotations are only visible to you.
                 </span>
               </p>
-              <ShareLinks shareURI={shareURI} />
+              <div className="text-[24px]">
+                <ShareLinks shareURI={shareURI} />
+              </div>
             </>
           ) : (
             <p data-testid="no-sharing">
