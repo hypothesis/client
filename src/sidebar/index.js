@@ -71,19 +71,12 @@ function setupRoute(groups, session, router) {
  * to another.
  *
  * @param {import('./services/autosave').AutosaveService} autosaveService
- * @param {import('./services/features').FeaturesService} features
  * @param {import('./services/persisted-defaults').PersistedDefaultsService} persistedDefaults
  * @param {import('./services/service-url').ServiceURLService} serviceURL
  * @inject
  */
-function initServices(
-  autosaveService,
-  features,
-  persistedDefaults,
-  serviceURL
-) {
+function initServices(autosaveService, persistedDefaults, serviceURL) {
   autosaveService.init();
-  features.init();
   persistedDefaults.init();
   serviceURL.init();
 }
@@ -118,7 +111,6 @@ import { APIService } from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import { AuthService } from './services/auth';
 import { AutosaveService } from './services/autosave';
-import { FeaturesService } from './services/features';
 import { FrameSyncService } from './services/frame-sync';
 import { GroupsService } from './services/groups';
 import { LoadAnnotationsService } from './services/load-annotations';
@@ -156,7 +148,6 @@ function startApp(settings, appEl) {
     .register('apiRoutes', APIRoutesService)
     .register('auth', AuthService)
     .register('autosaveService', AutosaveService)
-    .register('features', FeaturesService)
     .register('frameSync', FrameSyncService)
     .register('groups', GroupsService)
     .register('loadAnnotationsService', LoadAnnotationsService)

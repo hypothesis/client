@@ -89,7 +89,7 @@ describe('FrameSyncService', () => {
     };
 
     fakeStore = fakeReduxStore(
-      { annotations: [], frames: [] },
+      { annotations: [], frames: [], profile: { features: {} } },
       {
         allAnnotations() {
           return this.getState().annotations;
@@ -113,6 +113,10 @@ describe('FrameSyncService', () => {
 
         frames() {
           return this.getState().frames;
+        },
+
+        profile() {
+          return this.getState().profile;
         },
 
         findIDsForTags: sinon.stub(),
@@ -735,6 +739,40 @@ describe('FrameSyncService', () => {
       frameSync.connect();
       frameSync.notifyHost('openNotebook', 'group-id');
       assert.calledWith(hostRPC().call, 'openNotebook', 'group-id');
+    });
+  });
+
+  describe('sending feature flags to frames', () => {
+    const currentFlags = () => fakeStore.getState().profile.features;
+    const setFlags = features => fakeStore.setState({ profile: { features } });
+
+    beforeEach(async () => {
+      // Set some initial flags before the host frame is even connected.
+      setFlags({ some_flag: true, other_flag: false });
+
+      await frameSync.connect();
+    });
+
+    it('sends feature flags to host frame', () => {
+      assert.calledWith(hostRPC().call, 'featureFlagsUpdated', currentFlags());
+    });
+
+    it('sends feature flags to guest frames when they connect', async () => {
+      await connectGuest();
+      assert.calledWith(guestRPC().call, 'featureFlagsUpdated', currentFlags());
+    });
+
+    it('sends updated feature flags to host and guest frames', async () => {
+      await connectGuest();
+      hostRPC().call.resetHistory();
+      guestRPC().call.resetHistory();
+
+      // Simulate profile update changing feature flags.
+      const features = { some_flag: true, other_flag: true };
+      setFlags(features);
+
+      assert.calledWith(hostRPC().call, 'featureFlagsUpdated', currentFlags());
+      assert.calledWith(guestRPC().call, 'featureFlagsUpdated', currentFlags());
     });
   });
 });

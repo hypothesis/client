@@ -474,6 +474,22 @@ describe('Sidebar', () => {
 
         assert.called(onHelpRequest);
       }));
+
+    describe('on "featureFlagsUpdated" event', () => {
+      it('updates feature flags in host frame', () => {
+        const sidebar = createSidebar();
+
+        emitSidebarEvent('featureFlagsUpdated', {
+          some_flag: true,
+          other_flag: false,
+        });
+
+        assert.deepEqual(sidebar.features.allFlags(), {
+          some_flag: true,
+          other_flag: false,
+        });
+      });
+    });
   });
 
   describe('events from the guest frames', () => {

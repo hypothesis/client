@@ -472,6 +472,25 @@ describe('Guest', () => {
         assert.calledOnce(fakeBucketBarClient.update);
       });
     });
+
+    describe('on "featureFlagsUpdated" event', () => {
+      it('updates active feature flags', () => {
+        const flagsUpdated = sinon.stub();
+        const guest = createGuest();
+        guest.features.on('flagsChanged', flagsUpdated);
+
+        emitSidebarEvent('featureFlagsUpdated', {
+          some_flag: true,
+          other_flag: false,
+        });
+
+        assert.calledOnce(flagsUpdated);
+        assert.deepEqual(guest.features.allFlags(), {
+          some_flag: true,
+          other_flag: false,
+        });
+      });
+    });
   });
 
   describe('document events', () => {
