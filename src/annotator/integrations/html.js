@@ -9,6 +9,8 @@ import { scrollElementIntoView } from '../util/scroll';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
+ * @typedef {import('../../types/annotator').Annotator} Annotator
+ * @typedef {import('../../types/annotator').FeatureFlags} FeatureFlags
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  */
@@ -27,20 +29,41 @@ const MIN_HTML_WIDTH = 480;
  * @implements {Integration}
  */
 export class HTMLIntegration {
-  constructor(container = document.body) {
+  /**
+   * @param {object} options
+   *   @param {FeatureFlags} options.features
+   *   @param {HTMLElement} [options.container]
+   */
+  constructor({ features, container = document.body }) {
+    this.features = features;
     this.container = container;
     this.anchor = anchor;
     this.describe = describe;
 
     this._htmlMeta = new HTMLMetadata();
 
+    /** Whether to attempt to resize the document to fit alongside sidebar. */
+    this._sideBySideEnabled = this.features.flagEnabled('html_side_by_side');
+
     /**
-     * Whether to attempt to resize the document contents when {@link fitSideBySide}
-     * is called.
-     *
-     * Currently disabled by default.
+     * Whether the document is currently being resized to fit alongside an
+     * open sidebar.
      */
-    this.sideBySideEnabled = false;
+    this._sideBySideActive = false;
+
+    /** @type {SidebarLayout|null} */
+    this._lastLayout = null;
+
+    this._flagsChanged = () => {
+      const sideBySide = features.flagEnabled('html_side_by_side');
+      if (sideBySide !== this._sideBySideEnabled) {
+        this._sideBySideEnabled = sideBySide;
+        if (this._lastLayout) {
+          this.fitSideBySide(this._lastLayout);
+        }
+      }
+    };
+    this.features.on('flagsChanged', this._flagsChanged);
   }
 
   canAnnotate() {
@@ -48,7 +71,7 @@ export class HTMLIntegration {
   }
 
   destroy() {
-    // There is nothing to do here yet.
+    this.features.off('flagsChanged', this._flagsChanged);
   }
 
   contentContainer() {
@@ -59,20 +82,23 @@ export class HTMLIntegration {
    * @param {SidebarLayout} layout
    */
   fitSideBySide(layout) {
-    const maximumWidthToFit = window.innerWidth - layout.width;
-    const active = layout.expanded && maximumWidthToFit >= MIN_HTML_WIDTH;
+    this._lastLayout = layout;
 
-    if (!this.sideBySideEnabled) {
-      return false;
-    }
+    const maximumWidthToFit = window.innerWidth - layout.width;
+    const active =
+      this._sideBySideEnabled &&
+      layout.expanded &&
+      maximumWidthToFit >= MIN_HTML_WIDTH;
 
     if (active) {
+      // nb. We call `_activateSideBySide` regardless of whether side-by-side
+      // is already active because the sidebar width might be different.
       this._activateSideBySide(layout.width);
-      return true;
-    } else {
+    } else if (this._sideBySideActive) {
       this._deactivateSideBySide();
-      return false;
     }
+    this._sideBySideActive = active;
+    return active;
   }
 
   /**

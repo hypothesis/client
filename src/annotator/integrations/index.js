@@ -31,5 +31,5 @@ export function createIntegration(annotator, { contentPartner } = {}) {
     return new VitalSourceContentIntegration();
   }
 
-  return new HTMLIntegration();
+  return new HTMLIntegration({ features: annotator.features });
 }

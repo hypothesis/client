@@ -1,6 +1,8 @@
+import { FeatureFlags } from '../../features';
 import { HTMLIntegration, $imports } from '../html';
 
 describe('HTMLIntegration', () => {
+  let features;
   let fakeHTMLAnchoring;
   let fakeHTMLMetadata;
   let fakeGuessMainContentArea;
@@ -8,6 +10,8 @@ describe('HTMLIntegration', () => {
   let fakeScrollElementIntoView;
 
   beforeEach(() => {
+    features = new FeatureFlags();
+
     fakeHTMLAnchoring = {
       anchor: sinon.stub(),
       describe: sinon.stub(),
@@ -41,15 +45,19 @@ describe('HTMLIntegration', () => {
     $imports.$restore();
   });
 
+  function createIntegration() {
+    return new HTMLIntegration({ features });
+  }
+
   it('implements `anchor` and `destroy` using HTML anchoring', () => {
-    const integration = new HTMLIntegration();
+    const integration = createIntegration();
     assert.equal(integration.anchor, fakeHTMLAnchoring.anchor);
     assert.equal(integration.describe, fakeHTMLAnchoring.describe);
   });
 
   describe('#canAnnotate', () => {
     it('is always true', () => {
-      const integration = new HTMLIntegration();
+      const integration = createIntegration();
       const range = new Range();
       assert.isTrue(integration.canAnnotate(range));
     });
@@ -57,14 +65,25 @@ describe('HTMLIntegration', () => {
 
   describe('#contentContainer', () => {
     it('returns body by default', () => {
-      const integration = new HTMLIntegration();
+      const integration = createIntegration();
       assert.equal(integration.contentContainer(), document.body);
     });
   });
 
   describe('#destroy', () => {
-    it('does nothing', () => {
-      new HTMLIntegration().destroy();
+    it('cleans up feature flag listeners', () => {
+      sinon.spy(features, 'on');
+      sinon.spy(features, 'off');
+
+      const integration = createIntegration();
+      assert.called(features.on);
+
+      const listeners = features.on.args;
+      integration.destroy();
+
+      for (let [event, callback] of listeners) {
+        assert.calledWith(features.off, event, callback);
+      }
     });
   });
 
@@ -98,12 +117,6 @@ describe('HTMLIntegration', () => {
       );
     }
 
-    function createIntegration() {
-      const integration = new HTMLIntegration();
-      integration.sideBySideEnabled = true;
-      return integration;
-    }
-
     beforeEach(() => {
       // By default, pretend that the content fills the page.
       fakeGuessMainContentArea.returns(fullWidthContentRect());
@@ -116,10 +129,15 @@ describe('HTMLIntegration', () => {
     });
 
     it('does nothing when disabled', () => {
-      new HTMLIntegration().fitSideBySide({});
+      const integration = createIntegration();
+      integration.fitSideBySide({});
     });
 
     context('when enabled', () => {
+      beforeEach(() => {
+        features.update({ html_side_by_side: true });
+      });
+
       it('sets left and right margins on body element when activated', () => {
         const integration = createIntegration();
 
@@ -269,11 +287,29 @@ describe('HTMLIntegration', () => {
         });
       });
     });
+
+    const isSideBySideActive = () => {
+      const [left, right] = getMargins();
+      return left !== null || right !== null;
+    };
+
+    it('side-by-side is enabled/disabled when feature flag changes', () => {
+      const integration = createIntegration();
+
+      integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+      assert.isFalse(isSideBySideActive());
+
+      features.update({ html_side_by_side: true });
+      assert.isTrue(isSideBySideActive());
+
+      features.update({ html_side_by_side: false });
+      assert.isFalse(isSideBySideActive());
+    });
   });
 
   describe('#getMetadata', () => {
     it('returns document metadata', async () => {
-      const integration = new HTMLIntegration();
+      const integration = createIntegration();
       assert.deepEqual(await integration.getMetadata(), {
         title: 'Example site',
       });
@@ -295,7 +331,7 @@ describe('HTMLIntegration', () => {
     it('scrolls to first highlight of anchor', async () => {
       const anchor = { highlights: [highlight] };
 
-      const integration = new HTMLIntegration();
+      const integration = createIntegration();
       await integration.scrollToAnchor(anchor);
 
       assert.calledOnce(fakeScrollElementIntoView);
@@ -305,7 +341,7 @@ describe('HTMLIntegration', () => {
     it('does nothing if anchor has no highlights', async () => {
       const anchor = {};
 
-      const integration = new HTMLIntegration();
+      const integration = createIntegration();
       await integration.scrollToAnchor(anchor);
 
       assert.notCalled(fakeScrollElementIntoView);
@@ -314,7 +350,7 @@ describe('HTMLIntegration', () => {
 
   describe('#uri', () => {
     it('returns main document URL', async () => {
-      const integration = new HTMLIntegration();
+      const integration = createIntegration();
       assert.deepEqual(await integration.uri(), 'https://example.com/');
     });
   });

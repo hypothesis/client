@@ -3,14 +3,20 @@ import { TinyEmitter } from 'tiny-emitter';
 import { warnOnce } from '../shared/warn-once';
 
 /**
+ * @typedef {import('../types/annotator').FeatureFlags} IFeatureFlags
+ */
+
+/**
  * List of feature flags that annotator code tests for.
  *
  * @type {string[]}
  */
-const annotatorFlags = [];
+const annotatorFlags = ['html_side_by_side'];
 
 /**
  * An observable container of feature flags.
+ *
+ * @implements {IFeatureFlags}
  */
 export class FeatureFlags extends TinyEmitter {
   /**

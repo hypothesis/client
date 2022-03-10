@@ -1,4 +1,5 @@
 import { ListenerCollection } from '../../shared/listener-collection';
+import { FeatureFlags } from '../features';
 import { onDocumentReady } from '../frame-observer';
 import { HTMLIntegration } from './html';
 import { preserveScrollPosition } from './html-side-by-side';
@@ -206,8 +207,9 @@ export class VitalSourceContentIntegration {
    * @param {HTMLElement} container
    */
   constructor(container = document.body) {
-    this._htmlIntegration = new HTMLIntegration(container);
-    this._htmlIntegration.sideBySideEnabled = true;
+    const features = new FeatureFlags();
+    features.update({ html_side_by_side: true });
+    this._htmlIntegration = new HTMLIntegration({ container, features });
 
     this._listeners = new ListenerCollection();
 
