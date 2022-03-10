@@ -2,6 +2,8 @@
  * Type definitions for objects passed between the annotator and sidebar.
  */
 
+/** @typedef {import('tiny-emitter').TinyEmitter} TinyEmitter */
+
 /**
  * Object representing a region of a document that an annotation
  * has been anchored to.
@@ -77,11 +79,21 @@
  */
 
 /**
+ * Interface for querying a collection of feature flags and subscribing to
+ * flag updates.
+ *
+ * Emits a "flagsChanged" event when the flags are updated.
+ *
+ * @typedef {TinyEmitter & { flagEnabled: (flag: string) => boolean }} FeatureFlags
+ */
+
+/**
  * Subset of the `Guest` class that is exposed to integrations.
  *
  * @typedef Annotator
  * @prop {Anchor[]} anchors
  * @prop {(ann: AnnotationData) => Promise<Anchor[]>} anchor
+ * @prop {FeatureFlags} features
  */
 
 /**
