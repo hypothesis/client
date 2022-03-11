@@ -17,7 +17,8 @@ const TEMPLATE_PATH = `${__dirname}/templates/`;
 
 /**
  * @typedef Config
- * @property {string} clientUrl - The URL of the client's boot script
+ * @prop {string} clientUrl - The URL of the client's boot script
+ * @prop {object} clientConfig
  */
 
 /**
@@ -48,10 +49,21 @@ function renderScript(context) {
 function templateContext(config) {
   // Just the config by itself, in contrast with `hypothesisScript`, which
   // combines this config with a <script> that adds the embed script
-  const hypothesisConfig = fs.readFileSync(
+  let hypothesisConfig = fs.readFileSync(
     `${TEMPLATE_PATH}client-config.js.mustache`,
     'utf-8'
   );
+
+  if (config.clientConfig) {
+    const clientConfigScript = `<script type="application/json" class="js-hypothesis-config">${JSON.stringify(
+      config.clientConfig
+    )}</script>`;
+    hypothesisConfig = `
+${hypothesisConfig}
+${clientConfigScript}
+`;
+  }
+
   return {
     hypothesisConfig,
     hypothesisScript: renderScript({
@@ -112,11 +124,22 @@ function serveDev(port, config) {
   // This is helpful for testing that annotations/real-time updates etc. work
   // based on the document fingerprint as well as the URL.
   app.get('/pdf/:pdf/:suffix?', (req, res, next) => {
-    if (fs.existsSync(`${PDF_PATH}${req.params.pdf}.pdf`)) {
+    const pdfPath = `${PDF_PATH}${req.params.pdf}.pdf`;
+
+    if (fs.existsSync(pdfPath)) {
       const relativeSourceUrl = `/pdf-source/${req.params.pdf}.pdf`;
       const suffix = req.params.suffix ? `?suffix=${req.params.suffix}` : '';
       const fullUrl = `${req.protocol}://${req.hostname}:${port}${req.originalUrl}${suffix}`;
-      const context = templateContext(config);
+
+      const configPath = pdfPath.replace(/\.pdf$/, '.config.json');
+      const extraConfig = fs.existsSync(configPath)
+        ? JSON.parse(fs.readFileSync(configPath))
+        : {};
+
+      const context = templateContext({
+        ...config,
+        ...extraConfig,
+      });
 
       res.render('pdfjs-viewer', {
         ...context,
