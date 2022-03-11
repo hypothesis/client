@@ -10,6 +10,8 @@ import {
   documentHasText,
 } from '../anchoring/pdf';
 import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
+import Banners from '../components/Banners';
+import ContentPartnerBanner from '../components/ContentPartnerBanner';
 import WarningBanner from '../components/WarningBanner';
 import { createShadowRoot } from '../util/shadow-root';
 import { offsetRelativeTo, scrollElement } from '../util/scroll';
@@ -20,6 +22,7 @@ import { PDFMetadata } from './pdf-metadata';
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').Annotator} Annotator
+ * @typedef {import('../../types/annotator').ContentPartner} ContentPartner
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
@@ -63,6 +66,8 @@ export class PDFIntegration {
   /**
    * @param {Annotator} annotator
    * @param {object} options
+   *   @param {ContentPartner} [options.contentPartner] - If set, show branding
+   *     for the given content partner in a banner above the PDF viewer.
    *   @param {number} [options.reanchoringMaxWait] - Max time to wait for
    *     re-anchoring to complete when scrolling to an un-rendered page.
    */
@@ -100,12 +105,24 @@ export class PDFIntegration {
     this._reanchoringMaxWait = options.reanchoringMaxWait ?? 3000;
 
     /**
-     * A banner shown at the top of the PDF viewer warning the user if the PDF
-     * is not suitable for use with Hypothesis.
+     * Banners shown at the top of the PDF viewer.
      *
      * @type {HTMLElement|null}
      */
-    this._warningBanner = null;
+    this._banner = null;
+
+    /** State indicating which banners to show above the PDF viewer. */
+    this._bannerState = {
+      /**
+       * Branding for a content provider.
+       *
+       * @type {ContentPartner|null}
+       */
+      contentPartner: options.contentPartner ?? null,
+      /** Warning that the current PDF does not have selectable text. */
+      noTextWarning: false,
+    };
+    this._updateBannerState(this._bannerState);
     this._checkForSelectableText();
 
     // Hide annotation layer when the user is making a selection. The annotation
@@ -138,7 +155,7 @@ export class PDFIntegration {
     this._listeners.removeAll();
     this.pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this.observer.disconnect();
-    this._warningBanner?.remove();
+    this._banner?.remove();
     this._destroyed = true;
   }
 
@@ -210,7 +227,7 @@ export class PDFIntegration {
 
     try {
       const hasText = await documentHasText();
-      this._toggleNoSelectableTextWarning(!hasText);
+      this._updateBannerState({ noTextWarning: !hasText });
     } catch (err) {
       /* istanbul ignore next */
       console.warn('Unable to check for text in PDF:', err);
@@ -218,21 +235,25 @@ export class PDFIntegration {
   }
 
   /**
-   * Set whether the warning about a PDF's suitability for use with Hypothesis
-   * is shown.
+   * Update banners shown above the PDF viewer.
    *
-   * @param {boolean} showWarning
+   * @param {Partial<typeof PDFIntegration.prototype._bannerState>} state
    */
-  _toggleNoSelectableTextWarning(showWarning) {
+  _updateBannerState(state) {
+    this._bannerState = { ...this._bannerState, ...state };
+
     // Get a reference to the top-level DOM element associated with the PDF.js
     // viewer.
     const outerContainer = /** @type {HTMLElement} */ (
       document.querySelector('#outerContainer')
     );
 
-    if (!showWarning) {
-      this._warningBanner?.remove();
-      this._warningBanner = null;
+    const showBanner =
+      this._bannerState.contentPartner || this._bannerState.noTextWarning;
+
+    if (!showBanner) {
+      this._banner?.remove();
+      this._banner = null;
 
       // Undo inline styles applied when the banner is shown. The banner will
       // then gets its normal 100% height set by PDF.js's CSS.
@@ -241,13 +262,26 @@ export class PDFIntegration {
       return;
     }
 
-    this._warningBanner = document.createElement('hypothesis-banner');
-    document.body.prepend(this._warningBanner);
+    if (!this._banner) {
+      this._banner = document.createElement('hypothesis-banner');
+      document.body.prepend(this._banner);
+      createShadowRoot(this._banner);
+    }
 
-    const warningBannerContent = createShadowRoot(this._warningBanner);
-    render(<WarningBanner />, warningBannerContent);
+    render(
+      <Banners>
+        {this._bannerState.contentPartner && (
+          <ContentPartnerBanner
+            provider={this._bannerState.contentPartner}
+            onClose={() => this._updateBannerState({ contentPartner: null })}
+          />
+        )}
+        {this._bannerState.noTextWarning && <WarningBanner />}
+      </Banners>,
+      /** @type {ShadowRoot} */ (this._banner.shadowRoot)
+    );
 
-    const bannerHeight = this._warningBanner.getBoundingClientRect().height;
+    const bannerHeight = this._banner.getBoundingClientRect().height;
 
     // The `#outerContainer` element normally has height set to 100% of the body.
     //
