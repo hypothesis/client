@@ -390,16 +390,16 @@ describe('TagEditor', () => {
       });
     });
 
-    describe('when removing tags', () => {
-      it('removes `tag1` when clicking its delete button', () => {
-        const wrapper = createComponent(); // note: initial tagList is ['tag1', 'tag2']
-        assert.equal(wrapper.find('.TagEditor__edit').length, 2);
-        wrapper
-          .find('button')
-          .at(0) // delete 'tag1'
-          .simulate('click');
+    describe('tag removal', () => {
+      it('provides a tag removal callback to each tag in the tag list', () => {
+        const wrapper = createComponent();
+        const tagListItems = wrapper.find('TagListItem');
 
-        assert.calledWith(fakeOnRemoveTag, 'tag1');
+        assert.equal(tagListItems.length, 2);
+        assert.equal(
+          tagListItems.first().props().onRemoveTag,
+          wrapper.props().onRemoveTag
+        );
       });
     });
 

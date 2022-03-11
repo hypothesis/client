@@ -1,5 +1,4 @@
 import {
-  Icon,
   normalizeKeyName,
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
@@ -8,6 +7,8 @@ import { useRef, useState } from 'preact/hooks';
 import { withServices } from '../service-context';
 
 import AutocompleteList from './AutocompleteList';
+import TagList from './TagList';
+import TagListItem from './TagListItem';
 
 /** @typedef {import("preact").JSX.Element} JSXElement */
 
@@ -48,7 +49,7 @@ function TagEditor({
   });
 
   // Set up callback to monitor outside click events to close the AutocompleteList
-  const closeWrapperRef = /** @type {{ current: HTMLElement }} */ (useRef());
+  const closeWrapperRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
@@ -269,36 +270,13 @@ function TagEditor({
     activeItem >= 0 ? `${tagEditorId}-AutocompleteList-item-${activeItem}` : '';
 
   return (
-    <div className="TagEditor">
-      <ul
-        className="TagEditor__tags"
-        aria-label="Suggested tags for annotation"
-      >
+    <div className="TagEditor space-y-4">
+      <TagList>
         {tagList.map(tag => {
-          return (
-            <li
-              key={`${tag}`}
-              className="TagEditor__item"
-              aria-label={`Tag: ${tag}`}
-            >
-              <span lang="" className="TagEditor__edit">
-                {tag}
-              </span>
-              <button
-                onClick={() => {
-                  onRemoveTag(tag);
-                }}
-                aria-label={`Remove Tag: ${tag}`}
-                title={`Remove Tag: ${tag}`}
-                className="TagEditor__delete"
-              >
-                <Icon name="cancel" />
-              </button>
-            </li>
-          );
+          return <TagListItem key={tag} onRemoveTag={onRemoveTag} tag={tag} />;
         })}
-      </ul>
-      <span
+      </TagList>
+      <div
         id={tagEditorId}
         className="TagEditor__combobox-wrapper"
         ref={closeWrapperRef}
@@ -332,7 +310,7 @@ function TagEditor({
           itemPrefixId={`${tagEditorId}-AutocompleteList-item-`}
           activeItem={activeItem}
         />
-      </span>
+      </div>
     </div>
   );
 }

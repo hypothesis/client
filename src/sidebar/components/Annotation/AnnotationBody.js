@@ -1,7 +1,9 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
-import { useState } from 'preact/hooks';
+import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
+import { useMemo, useState } from 'preact/hooks';
 
 import { useStoreProxy } from '../../store/use-store';
+import { isThirdPartyUser } from '../../helpers/account-id';
 import { isHidden } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
@@ -9,6 +11,7 @@ import { applyTheme } from '../../helpers/theme';
 import Excerpt from '../Excerpt';
 import MarkdownView from '../MarkdownView';
 import TagList from '../TagList';
+import TagListItem from '../TagListItem';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
@@ -36,6 +39,7 @@ function AnnotationBody({ annotation, settings }) {
   const [isCollapsible, setIsCollapsible] = useState(false);
 
   const store = useStoreProxy();
+  const defaultAuthority = store.defaultAuthority();
   const draft = store.getDraft(annotation);
 
   const toggleText = isCollapsed ? 'More' : 'Less';
@@ -48,8 +52,20 @@ function AnnotationBody({ annotation, settings }) {
 
   const textStyle = applyTheme(['annotationFontFamily'], settings);
 
+  const shouldLinkTags = useMemo(
+    () => annotation && !isThirdPartyUser(annotation?.user, defaultAuthority),
+    [annotation, defaultAuthority]
+  );
+
+  /**
+   * @param {string} tag
+   */
+  const createTagSearchURL = tag => {
+    return store.getLink('search.tag', { tag });
+  };
+
   return (
-    <div className="hyp-u-vertical-spacing--2">
+    <div className="space-y-4">
       {showExcerpt && (
         <Excerpt
           collapse={isCollapsed}
@@ -63,24 +79,55 @@ function AnnotationBody({ annotation, settings }) {
             textStyle={textStyle}
             markdown={text}
             textClass={{
-              AnnotationBody__text: true,
               'p-redacted-content': isHidden(annotation),
             }}
           />
         </Excerpt>
       )}
-      {isCollapsible && (
-        <div className="hyp-u-layout-row--justify-right">
-          <LabeledButton
-            expanded={!isCollapsed}
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            title={`Toggle visibility of full annotation text: Show ${toggleText}`}
-          >
-            {toggleText}
-          </LabeledButton>
+      {(isCollapsible || showTagList) && (
+        <div className="flex flex-row gap-x-2">
+          <div className="grow">
+            {showTagList && (
+              <TagList>
+                {tags.map(tag => {
+                  return (
+                    <TagListItem
+                      key={tag}
+                      tag={tag}
+                      href={
+                        shouldLinkTags ? createTagSearchURL(tag) : undefined
+                      }
+                    />
+                  );
+                })}
+              </TagList>
+            )}
+          </div>
+          {isCollapsible && (
+            <div>
+              <LabeledButton
+                classes={classnames(
+                  // Pull this button up toward the bottom of the excerpt content
+                  '-mt-3',
+                  'text-grey-7 font-normal'
+                )}
+                expanded={!isCollapsed}
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                title={`Toggle visibility of full annotation text: Show ${toggleText}`}
+              >
+                <div className="flex items-center gap-x-2">
+                  <Icon
+                    classes="!text-tiny"
+                    name={isCollapsed ? 'expand' : 'collapse'}
+                    title={isCollapsed ? 'expand' : 'collapse'}
+                  />
+                  <div>{toggleText}</div>
+                </div>
+              </LabeledButton>
+            </div>
+          )}
         </div>
       )}
-      {showTagList && <TagList annotation={annotation} tags={tags} />}
     </div>
   );
 }

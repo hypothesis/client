@@ -11,6 +11,7 @@ import AnnotationBody, { $imports } from '../AnnotationBody';
 describe('AnnotationBody', () => {
   let fakeAnnotation;
   let fakeApplyTheme;
+  let fakeIsThirdPartyUser;
   let fakeSettings;
 
   // Inject dependency mocks
@@ -44,14 +45,20 @@ describe('AnnotationBody', () => {
     fakeAnnotation.text = 'some text here';
     fakeAnnotation.tags = ['eenie', 'minie'];
     fakeApplyTheme = sinon.stub();
+    fakeIsThirdPartyUser = sinon.stub().returns(false);
     fakeSettings = {};
 
     fakeStore = {
+      defaultAuthority: sinon.stub(),
       getDraft: sinon.stub().returns(null),
+      getLink: sinon
+        .stub()
+        .callsFake((linkPath, { tag }) => `http://www.example.com/${tag}`),
     };
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
+      '../../helpers/account-id': { isThirdPartyUser: fakeIsThirdPartyUser },
       '../../helpers/theme': { applyTheme: fakeApplyTheme },
       '../../store/use-store': { useStoreProxy: () => fakeStore },
     });
@@ -66,9 +73,25 @@ describe('AnnotationBody', () => {
     wrapper.update();
 
     const markdownView = wrapper.find('MarkdownView');
-    const tagList = wrapper.find('TagList');
+    const tagItems = wrapper.find('TagListItem');
     assert.strictEqual(markdownView.props().markdown, 'some text here');
-    assert.deepStrictEqual(tagList.props().tags, ['eenie', 'minie']);
+    assert.equal(tagItems.length, fakeAnnotation.tags.length);
+    assert.equal(tagItems.first().props().tag, 'eenie');
+  });
+
+  it('links the annotation tags', () => {
+    const wrapper = createBody();
+
+    const tagItems = wrapper.find('TagListItem');
+    assert.equal(tagItems.first().props().href, 'http://www.example.com/eenie');
+  });
+
+  it('does not link the annotation tags if the user is third party', () => {
+    fakeIsThirdPartyUser.returns(true);
+    const wrapper = createBody();
+
+    const tagItems = wrapper.find('TagListItem');
+    assert.isUndefined(tagItems.first().props().href);
   });
 
   it('renders the tags and text from the draft', () => {
@@ -78,9 +101,10 @@ describe('AnnotationBody', () => {
     wrapper.update();
 
     const markdownView = wrapper.find('MarkdownView');
-    const tagList = wrapper.find('TagList');
+    const tagItems = wrapper.find('TagListItem');
     assert.strictEqual(markdownView.props().markdown, 'this is a draft');
-    assert.deepStrictEqual(tagList.props().tags, ['1', '2']);
+    assert.equal(tagItems.length, 2);
+    assert.equal(tagItems.first().props().tag, '1');
   });
 
   it('does not render controls to expand/collapse the excerpt if it is not collapsible', () => {
