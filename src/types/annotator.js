@@ -174,7 +174,7 @@
  */
 
 /**
- * Name of a content partner to show branding for.
+ * Specifies a content partner/provider to show branding for.
  *
  * @typedef {'jstor'} ContentPartner
  */

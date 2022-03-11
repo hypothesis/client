@@ -29,7 +29,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  */
 function configurationKeys(appContext) {
   const contexts = {
-    annotator: ['clientUrl', 'subFrameIdentifier'],
+    annotator: ['clientUrl', 'contentPartner', 'subFrameIdentifier'],
     sidebar: [
       'appType',
       'annotations',
@@ -105,6 +105,11 @@ const configDefinitions = {
     allowInBrowserExt: true,
     defaultValue: null,
     getValue: settings => settings.clientUrl,
+  },
+  contentPartner: {
+    allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
   },
   enableExperimentalNewNoteButton: {
     allowInBrowserExt: false,
