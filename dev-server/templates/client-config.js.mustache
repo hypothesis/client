@@ -31,6 +31,11 @@
 
       // Open the sidebar when the page loads
       openSidebar: true,
+
+      {{#exampleConfig}}
+      // Additional configuration for the current test document
+      ...{{{exampleConfig}}},
+      {{/exampleConfig}}
     };
   };
 </script>
