@@ -165,9 +165,6 @@
  * @typedef {Window & Globals} HypothesisWindow
  */
 
-// Make TypeScript treat this file as a module.
-export const unused = {};
-
 /**
  * Destroyable classes implement the `destroy` method to properly remove all
  * event handlers and other resources.
@@ -175,3 +172,12 @@ export const unused = {};
  * @typedef Destroyable
  * @prop {VoidFunction} destroy
  */
+
+/**
+ * Name of a content partner to show branding for.
+ *
+ * @typedef {'jstor'} ContentPartner
+ */
+
+// Make TypeScript treat this file as a module.
+export const unused = {};
