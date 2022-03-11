@@ -142,16 +142,19 @@ the fighting was.`;
       scrollRoot.remove();
     });
 
-    it('selects content as a scroll anchor and preserves its position in the viewport', () => {
-      scrollRoot.scrollTop = 200;
+    function resizeViewportAndExpectScrollAdjustment() {
       const initialScrollTop = scrollRoot.scrollTop;
 
-      const delta = preserveScrollPosition(() => {
-        // Make the viewport narrower. This will make the content taller and
-        // require `preserveScrollPosition` to adjust the scroll offset to keep
-        // the anchored content visible.
-        scrollRoot.style.width = '150px';
-      }, scrollRoot);
+      const delta = preserveScrollPosition(
+        () => {
+          // Make the viewport narrower. This will make the content taller and
+          // require `preserveScrollPosition` to adjust the scroll offset to keep
+          // the anchored content visible.
+          scrollRoot.style.width = '150px';
+        },
+        scrollRoot,
+        scrollRoot.getBoundingClientRect()
+      );
 
       assert.notEqual(delta, 0);
 
@@ -161,6 +164,19 @@ the fighting was.`;
         Math.floor(scrollRoot.scrollTop),
         Math.floor(initialScrollTop + delta)
       );
+    }
+
+    it('selects content as a scroll anchor and preserves its position in the viewport', () => {
+      scrollRoot.scrollTop = 200;
+      resizeViewportAndExpectScrollAdjustment();
+    });
+
+    it('selects scroll anchor if it is part of overflowing content', () => {
+      // Give the content a small height so that the text in the viewport is
+      // part of overflowing content.
+      content.style.height = '10px';
+      scrollRoot.scrollTop = 200;
+      resizeViewportAndExpectScrollAdjustment();
     });
 
     it('ignores fixed-position content when choosing a scroll anchor', () => {
@@ -188,13 +204,10 @@ the fighting was.`;
       scrollRoot.append(inner);
 
       scrollRoot.scrollTop = 200;
-      const delta = preserveScrollPosition(() => {
-        scrollRoot.style.width = '150px';
-      }, scrollRoot);
 
-      // The scroll position should be adjusted. This would be zero if the
-      // text in the <nav> element was used as a scroll anchor.
-      assert.notEqual(delta, 0);
+      // Resize viewport and check scroll position is adjusted. It would not be
+      // adjusted if the text in the <nav> element was used as a scroll anchor.
+      resizeViewportAndExpectScrollAdjustment();
     });
 
     it('does not restore the scroll position if no anchor content could be found', () => {
@@ -203,30 +216,39 @@ the fighting was.`;
       scrollRoot.scrollTop = 200;
       const initialScrollTop = scrollRoot.scrollTop;
 
-      const delta = preserveScrollPosition(() => {
-        // Make the viewport narrower. This will make the content taller and
-        // require `preserveScrollPosition` to adjust the scroll offset to keep
-        // the anchored content visible.
-        scrollRoot.style.width = '150px';
-      }, scrollRoot);
+      const delta = preserveScrollPosition(
+        () => {
+          // Make the viewport narrower. This will make the content taller and
+          // require `preserveScrollPosition` to adjust the scroll offset to keep
+          // the anchored content visible.
+          scrollRoot.style.width = '150px';
+        },
+        scrollRoot,
+        scrollRoot.getBoundingClientRect()
+      );
 
       assert.equal(delta, 0);
       assert.equal(scrollRoot.scrollTop, initialScrollTop);
     });
 
-    it('does nothing if scroll element is outside viewport', () => {
+    it('does nothing if scroll root is outside viewport', () => {
       scrollRoot.style.position = 'absolute';
       scrollRoot.style.top = '10000px';
 
       scrollRoot.scrollTop = 200;
       const initialScrollTop = scrollRoot.scrollTop;
 
-      const delta = preserveScrollPosition(() => {
-        // Make the viewport narrower. This will make the content taller and
-        // require `preserveScrollPosition` to adjust the scroll offset to keep
-        // the anchored content visible.
-        scrollRoot.style.width = '150px';
-      }, scrollRoot);
+      const delta = preserveScrollPosition(
+        () => {
+          // Make the viewport narrower. This will make the content taller and
+          // require `preserveScrollPosition` to adjust the scroll offset to keep
+          // the anchored content visible.
+          scrollRoot.style.width = '150px';
+        },
+        scrollRoot,
+        // Viewport
+        new DOMRect(0, 0, 800, 600)
+      );
 
       assert.equal(delta, 0);
       assert.equal(scrollRoot.scrollTop, initialScrollTop);

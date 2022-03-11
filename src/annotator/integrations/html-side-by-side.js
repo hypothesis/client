@@ -1,4 +1,4 @@
-import { intersectRects, rectContains, rectIntersects } from '../util/geometry';
+import { rectContains, rectIntersects } from '../util/geometry';
 
 /**
  * CSS selectors used to find elements that are considered potentially part
@@ -109,6 +109,21 @@ function hasFixedPosition(element) {
 }
 
 /**
+ * Return the bounding rect that contains the element's content, including
+ * any content which overflows the element's specified size.
+ *
+ * @param {Element} element
+ */
+function elementContentRect(element) {
+  const rect = element.getBoundingClientRect();
+  rect.x -= element.scrollLeft;
+  rect.y -= element.scrollTop;
+  rect.height = Math.max(rect.height, element.scrollHeight);
+  rect.width = Math.max(rect.width, element.scrollWidth);
+  return rect;
+}
+
+/**
  * Yield all the text node descendants of `root` that intersect `rect`.
  *
  * @param {Element} root
@@ -123,10 +138,13 @@ function* textNodesInRect(root, rect, shouldVisit = () => true) {
   while (node) {
     if (node.nodeType === Node.ELEMENT_NODE) {
       const element = /** @type {Element} */ (node);
-      const elementRect = element.getBoundingClientRect();
+      const contentIntersectsRect = rectIntersects(
+        elementContentRect(element),
+        rect
+      );
 
-      // Only examine subtrees which are visible and intersect the viewport.
-      if (shouldVisit(element) && rectIntersects(elementRect, rect)) {
+      // Only examine subtrees which are visible.
+      if (shouldVisit(element) && contentIntersectsRect) {
         yield* textNodesInRect(element, rect, shouldVisit);
       }
     } else if (node.nodeType === Node.TEXT_NODE) {
@@ -145,23 +163,15 @@ function* textNodesInRect(root, rect, shouldVisit = () => true) {
  * Find content within an element to use as an anchor when applying a layout
  * change to the document.
  *
- * @param {Element} scrollRoot
+ * @param {Element} root
+ * @param {DOMRect} viewport
  * @return {Range|null} - Range to use as an anchor or `null` if a suitable
  *   range could not be found
  */
-function getScrollAnchor(scrollRoot) {
+function getScrollAnchor(root, viewport) {
   // Range representing the content whose position within the viewport we will
   // try to maintain after running the callback.
   let anchorRange = /** @type {Range|null} */ (null);
-
-  const viewport = intersectRects(
-    scrollRoot.getBoundingClientRect(),
-    new DOMRect(0, 0, window.innerWidth, window.innerHeight)
-  );
-  if (viewport.width < 0 || viewport.height < 0) {
-    // Element being scrolled is outside the viewport
-    return null;
-  }
 
   // Find the first word (non-whitespace substring of a text node) that is fully
   // visible in the viewport.
@@ -172,7 +182,7 @@ function getScrollAnchor(scrollRoot) {
   const shouldVisit = el => !hasFixedPosition(el);
 
   textNodeLoop: for (let textNode of textNodesInRect(
-    scrollRoot,
+    root,
     viewport,
     shouldVisit
   )) {
@@ -208,15 +218,19 @@ function getScrollAnchor(scrollRoot) {
  *
  * @param {() => any} callback - Callback that will apply the layout change
  * @param {Element} [scrollRoot]
+ * @param {DOMRect} [viewport] - Area to consider "in the viewport". Defaults to
+ *   the viewport of the current window.
  * @return {number} - Amount by which the scroll position was adjusted to keep
  *   the anchored content in view
  */
 export function preserveScrollPosition(
   callback,
   /* istanbul ignore next */
-  scrollRoot = document.documentElement
+  scrollRoot = document.documentElement,
+  /* istanbul ignore next */
+  viewport = new DOMRect(0, 0, window.innerWidth, window.innerHeight)
 ) {
-  const anchor = getScrollAnchor(scrollRoot);
+  const anchor = getScrollAnchor(scrollRoot, viewport);
   if (!anchor) {
     callback();
     return 0;
