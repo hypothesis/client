@@ -18,7 +18,7 @@ const TEMPLATE_PATH = `${__dirname}/templates/`;
 /**
  * @typedef Config
  * @prop {string} clientUrl - The URL of the client's boot script
- * @prop {object} clientConfig
+ * @prop {object} clientConfig - Additional configuration for the Hypothesis client
  */
 
 /**
@@ -49,20 +49,15 @@ function renderScript(context) {
 function templateContext(config) {
   // Just the config by itself, in contrast with `hypothesisScript`, which
   // combines this config with a <script> that adds the embed script
-  let hypothesisConfig = fs.readFileSync(
+  const configTemplate = fs.readFileSync(
     `${TEMPLATE_PATH}client-config.js.mustache`,
     'utf-8'
   );
-
-  if (config.clientConfig) {
-    const clientConfigScript = `<script type="application/json" class="js-hypothesis-config">${JSON.stringify(
-      config.clientConfig
-    )}</script>`;
-    hypothesisConfig = `
-${hypothesisConfig}
-${clientConfigScript}
-`;
-  }
+  const hypothesisConfig = Mustache.render(configTemplate, {
+    exampleConfig: config.clientConfig
+      ? JSON.stringify(config.clientConfig)
+      : null,
+  });
 
   return {
     hypothesisConfig,
@@ -131,6 +126,7 @@ function serveDev(port, config) {
       const suffix = req.params.suffix ? `?suffix=${req.params.suffix}` : '';
       const fullUrl = `${req.protocol}://${req.hostname}:${port}${req.originalUrl}${suffix}`;
 
+      // Read custom client configuration for this test document.
       const configPath = pdfPath.replace(/\.pdf$/, '.config.json');
       const extraConfig = fs.existsSync(configPath)
         ? JSON.parse(fs.readFileSync(configPath))
