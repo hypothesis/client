@@ -104,6 +104,7 @@ export default {
         },
       },
       screens: {
+        touch: { raw: '(pointer: coarse)' },
         md: '480px',
         // Narrow mobile screens
         'annotator-sm': '240px',
