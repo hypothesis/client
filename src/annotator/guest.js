@@ -180,7 +180,9 @@ export class Guest {
      * Integration that handles document-type specific functionality in the
      * guest.
      */
-    this._integration = createIntegration(this);
+    this._integration = createIntegration(this, {
+      contentPartner: config.contentPartner,
+    });
 
     /**
      * Channel for host-guest communication.
