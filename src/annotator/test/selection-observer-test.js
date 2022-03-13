@@ -1,39 +1,35 @@
 import { SelectionObserver } from '../selection-observer';
 
-class FakeDocument extends EventTarget {
-  constructor() {
-    super();
-    this.selection = null;
-  }
-
-  getSelection() {
-    return this.selection;
-  }
-}
-
 describe('SelectionObserver', () => {
   let clock;
-  let fakeDocument;
-  let range;
+  let frame;
   let observer;
   let onSelectionChanged;
+  let testDocument;
+
+  function getSelectedRange() {
+    return testDocument.getSelection().getRangeAt(0);
+  }
+
+  before(() => {
+    frame = document.createElement('iframe');
+    document.body.append(frame);
+    testDocument = frame.contentDocument;
+    testDocument.body.innerHTML = 'Some test content';
+
+    testDocument.getSelection().selectAllChildren(testDocument.body);
+    assert.isNotNull(getSelectedRange());
+  });
+
+  after(() => {
+    frame.remove();
+  });
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();
-    fakeDocument = new FakeDocument();
     onSelectionChanged = sinon.stub();
 
-    range = { collapsed: false };
-    fakeDocument.selection = {
-      rangeCount: 1,
-      getRangeAt: function (index) {
-        return index === 0 ? range : null;
-      },
-    };
-
-    observer = new SelectionObserver(range => {
-      onSelectionChanged(range);
-    }, fakeDocument);
+    observer = new SelectionObserver(onSelectionChanged, testDocument);
 
     // Move the clock forwards past the initial event.
     clock.tick(10);
@@ -46,14 +42,14 @@ describe('SelectionObserver', () => {
   });
 
   it('invokes callback when mouseup occurs', () => {
-    fakeDocument.dispatchEvent(new Event('mouseup'));
+    testDocument.body.dispatchEvent(new Event('mouseup'));
     clock.tick(20);
-    assert.calledWith(onSelectionChanged, range);
+    assert.calledWith(onSelectionChanged, getSelectedRange());
   });
 
   it('invokes callback with initial selection', () => {
     const onInitialSelection = sinon.stub();
-    const observer = new SelectionObserver(onInitialSelection, fakeDocument);
+    const observer = new SelectionObserver(onInitialSelection, testDocument);
     clock.tick(10);
     assert.called(onInitialSelection);
     observer.disconnect();
@@ -61,22 +57,22 @@ describe('SelectionObserver', () => {
 
   describe('when the selection changes', () => {
     it('invokes callback if mouse is not down', () => {
-      fakeDocument.dispatchEvent(new Event('selectionchange'));
+      testDocument.dispatchEvent(new Event('selectionchange'));
       clock.tick(200);
-      assert.calledWith(onSelectionChanged, range);
+      assert.calledWith(onSelectionChanged, getSelectedRange());
     });
 
     it('does not invoke callback if mouse is down', () => {
-      fakeDocument.dispatchEvent(new Event('mousedown'));
-      fakeDocument.dispatchEvent(new Event('selectionchange'));
+      testDocument.body.dispatchEvent(new Event('mousedown'));
+      testDocument.dispatchEvent(new Event('selectionchange'));
       clock.tick(200);
       assert.notCalled(onSelectionChanged);
     });
 
     it('does not invoke callback until there is a pause since the last change', () => {
-      fakeDocument.dispatchEvent(new Event('selectionchange'));
+      testDocument.dispatchEvent(new Event('selectionchange'));
       clock.tick(90);
-      fakeDocument.dispatchEvent(new Event('selectionchange'));
+      testDocument.dispatchEvent(new Event('selectionchange'));
       clock.tick(90);
       assert.notCalled(onSelectionChanged);
       clock.tick(20);

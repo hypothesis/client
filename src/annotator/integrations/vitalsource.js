@@ -214,12 +214,10 @@ export class VitalSourceContentIntegration {
     // from showing its native selection menu, which obscures the client's
     // annotation toolbar.
     //
-    // VitalSource only checks the selection on the `mouseup` and `mouseout` events,
-    // but we also need to stop `mousedown` to prevent the client's `SelectionObserver`
-    // from thinking that the mouse is held down when a selection change occurs.
-    // This has the unwanted side effect of allowing the adder to appear while
-    // dragging the mouse.
-    const stopEvents = ['mousedown', 'mouseup', 'mouseout'];
+    // To avoid interfering with the client's own selection handling, this
+    // event blocking must happen at the same level or higher in the DOM tree
+    // than where SelectionObserver listens.
+    const stopEvents = ['mouseup', 'mouseout'];
     for (let event of stopEvents) {
       this._listeners.add(document.documentElement, event, e => {
         e.stopPropagation();

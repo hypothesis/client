@@ -42,7 +42,7 @@ export class SelectionObserver {
     };
 
     /** @param {Event} event */
-    this._eventHandler = event => {
+    const eventHandler = event => {
       if (event.type === 'mousedown') {
         isMouseDown = true;
       }
@@ -76,10 +76,13 @@ export class SelectionObserver {
 
     this._document = document_;
     this._listeners = new ListenerCollection();
-    this._events = ['mousedown', 'mouseup', 'selectionchange'];
-    for (let event of this._events) {
-      this._listeners.add(document_, event, this._eventHandler);
-    }
+
+    this._listeners.add(document_, 'selectionchange', eventHandler);
+
+    // Mouse events are handled on the body because propagation may be stopped
+    // before they reach the document in some environments (eg. VitalSource).
+    this._listeners.add(document_.body, 'mousedown', eventHandler);
+    this._listeners.add(document_.body, 'mouseup', eventHandler);
 
     // Report the initial selection.
     scheduleCallback(1);
