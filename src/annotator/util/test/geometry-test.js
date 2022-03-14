@@ -1,8 +1,12 @@
 import {
   intersectRects,
+  rectCenter,
   rectContains,
   rectIntersects,
+  rectsOverlapHorizontally,
+  rectsOverlapVertically,
   rectIsEmpty,
+  unionRects,
 } from '../geometry';
 
 function rectEquals(a, b) {
@@ -80,6 +84,71 @@ describe('annotator/util/geometry', () => {
       assert.isTrue(
         rectContains(new DOMRect(0, 0, 10, 10), new DOMRect(2, 2, 8, 8))
       );
+    });
+  });
+
+  describe('rectCenter', () => {
+    it('returns a point at the center of the rect', () => {
+      const point = rectCenter(new DOMRect(10, 10, 90, 90));
+      assert.equal(point.x, 55);
+      assert.equal(point.y, 55);
+    });
+  });
+
+  describe('rectsOverlapVertically', () => {
+    it('returns true if rects overlap', () => {
+      assert.isTrue(
+        rectsOverlapVertically(
+          new DOMRect(0, 0, 10, 10),
+          new DOMRect(100, 5, 10, 10)
+        )
+      );
+      assert.isFalse(
+        rectsOverlapVertically(
+          new DOMRect(0, 0, 10, 10),
+          new DOMRect(100, 100, 10, 10)
+        )
+      );
+    });
+  });
+
+  describe('rectsOverlapHorizontally', () => {
+    it('returns true if rects overlap', () => {
+      assert.isTrue(
+        rectsOverlapHorizontally(
+          new DOMRect(0, 0, 10, 10),
+          new DOMRect(5, 100, 10, 10)
+        )
+      );
+      assert.isFalse(
+        rectsOverlapHorizontally(
+          new DOMRect(0, 0, 10, 10),
+          new DOMRect(100, 100, 10, 10)
+        )
+      );
+    });
+  });
+
+  describe('unionRects', () => {
+    it('returns non-empty rect if one is empty', () => {
+      const emptyRect = new DOMRect();
+      const nonEmptyRect = new DOMRect(10, 10, 50, 50);
+
+      assert.equal(unionRects(emptyRect, nonEmptyRect), nonEmptyRect);
+      assert.equal(unionRects(nonEmptyRect, emptyRect), nonEmptyRect);
+      assert.equal(unionRects(emptyRect, emptyRect), emptyRect);
+    });
+
+    it('returns union of both input rects', () => {
+      const a = new DOMRect(5, 5, 10, 10);
+      const b = new DOMRect(100, 100, 10, 10);
+
+      const union = unionRects(a, b);
+
+      assert.equal(union.left, 5);
+      assert.equal(union.top, 5);
+      assert.equal(union.right, 110);
+      assert.equal(union.bottom, 110);
     });
   });
 });
