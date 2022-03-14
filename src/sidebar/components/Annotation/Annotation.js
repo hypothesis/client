@@ -49,10 +49,12 @@ function Annotation({
 
   const store = useStoreProxy();
 
+  const draft = annotation && store.getDraft(annotation);
+
   const hasQuote = annotation && !!quote(annotation);
   const isFocused = annotation && store.isAnnotationFocused(annotation.$tag);
   const isSaving = annotation && store.isSavingAnnotation(annotation);
-  const isEditing = annotation && !!store.getDraft(annotation) && !isSaving;
+  const isEditing = annotation && !!draft && !isSaving;
 
   const userid = store.profile().userid;
   const showActions = !isSaving && !isEditing;
@@ -88,7 +90,9 @@ function Annotation({
             <AnnotationBody annotation={annotation} />
           )}
 
-          {isEditing && <AnnotationEditor annotation={annotation} />}
+          {isEditing && (
+            <AnnotationEditor annotation={annotation} draft={draft} />
+          )}
         </>
       )}
 
