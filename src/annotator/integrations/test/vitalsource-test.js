@@ -385,7 +385,13 @@ describe('annotator/integrations/vitalsource', () => {
           pageText
         );
 
-        const glyphs = FakeImageTextLayer.getCall(0).args[1];
+        const glyphs = FakeImageTextLayer.getCall(0).args[1].map(domRect => ({
+          left: domRect.left,
+          right: domRect.right,
+          top: domRect.top,
+          bottom: domRect.bottom,
+        }));
+
         const expectedGlyphs = window.innerPageData.glyphs.glyphs.map(g => ({
           left: g.l / 100,
           right: g.r / 100,
