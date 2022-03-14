@@ -1,29 +1,152 @@
 import debounce from 'lodash.debounce';
 
 import { ListenerCollection } from '../../shared/listener-collection';
+import {
+  rectCenter,
+  rectsOverlapHorizontally,
+  rectsOverlapVertically,
+  unionRects,
+} from '../util/geometry';
 
 /**
- * @typedef Rect
- * @prop {number} left
- * @prop {number} right
- * @prop {number} top
- * @prop {number} bottom
+ * @typedef WordBox
+ * @prop {DOMRect[]} glyphs
+ * @prop {string} text
+ * @prop {DOMRect} rect - Bounding rectangle of all glyphs in word
  */
 
 /**
- * @param {Rect|null} a
- * @param {Rect} b
+ * @typedef LineBox
+ * @prop {WordBox[]} words
+ * @prop {DOMRect} rect - Bounding rectangle of all words in line
  */
-function mergeBoxes(a, b) {
-  if (!a) {
-    return b;
-  }
-  return {
-    left: Math.min(a.left, b.left),
-    right: Math.max(a.right, b.right),
-    top: Math.min(a.top, b.top),
-    bottom: Math.max(a.bottom, b.bottom),
+
+/**
+ * @typedef ColumnBox
+ * @prop {LineBox[]} lines
+ * @prop {DOMRect} rect - Bounding rectangle of all lines in column
+ */
+
+/**
+ * Group characters in a page into words, lines and columns.
+ *
+ * The input is assumed to be _roughly_ reading order, more so at the low (word,
+ * line) level. When the input is not in reading order, the output may be
+ * divided into more lines / columns than expected. Downstream code is expected
+ * to tolerate over-segmentation. This function should try to avoid producing
+ * lines or columns that significantly intersect, as this can impair text
+ * selection.
+ *
+ * @param {DOMRect[]} chars
+ * @param {string} text
+ * @return {ColumnBox[]}
+ */
+function analyzeLayout(chars, text) {
+  /** @type {WordBox[]} */
+  const words = [];
+
+  /** @type {WordBox} */
+  let currentWord = { glyphs: [], text: '', rect: new DOMRect() };
+
+  // Group characters into words.
+  const addWord = () => {
+    if (currentWord.glyphs.length > 0) {
+      words.push(currentWord);
+      currentWord = { glyphs: [], text: '', rect: new DOMRect() };
+    }
   };
+  for (let [i, rect] of chars.entries()) {
+    const char = text[i];
+    const isSpace = /\s/.test(char);
+
+    currentWord.glyphs.push(rect);
+    currentWord.rect = unionRects(currentWord.rect, rect);
+
+    // To simplify downstream logic, normalize whitespace.
+    currentWord.text += isSpace ? ' ' : char;
+
+    if (isSpace) {
+      addWord();
+    }
+  }
+  addWord();
+
+  /** @type {LineBox[]} */
+  const lines = [];
+
+  /** @type {LineBox} */
+  let currentLine = { words: [], rect: new DOMRect() };
+
+  // Group words into lines.
+  const addLine = () => {
+    if (currentLine.words.length > 0) {
+      lines.push(currentLine);
+      currentLine = { words: [], rect: new DOMRect() };
+    }
+  };
+  for (let word of words) {
+    const prevWord = currentLine.words[currentLine.words.length - 1];
+    if (prevWord) {
+      const prevCenter = rectCenter(prevWord.rect);
+      const currentCenter = rectCenter(word.rect);
+      const xDist = currentCenter.x - prevCenter.x;
+      if (
+        !rectsOverlapVertically(prevWord.rect, word.rect) ||
+        // Break line if current word is left of previous word
+        xDist < 0
+      ) {
+        addLine();
+      }
+    }
+    currentLine.words.push(word);
+    currentLine.rect = unionRects(currentLine.rect, word.rect);
+  }
+  addLine();
+
+  /** @type {ColumnBox[]} */
+  const columns = [];
+
+  /** @type {ColumnBox} */
+  let currentColumn = { lines: [], rect: new DOMRect() };
+
+  // Group lines into columns.
+  const addColumn = () => {
+    if (currentColumn.lines.length > 0) {
+      columns.push(currentColumn);
+      currentColumn = { lines: [], rect: new DOMRect() };
+    }
+  };
+  for (let line of lines) {
+    const prevLine = currentColumn.lines[currentColumn.lines.length - 1];
+
+    if (prevLine) {
+      const prevCenter = rectCenter(prevLine.rect);
+      const currentCenter = rectCenter(line.rect);
+      const yDist = currentCenter.y - prevCenter.y;
+
+      if (
+        !rectsOverlapHorizontally(prevLine.rect, line.rect) ||
+        rectsOverlapVertically(prevLine.rect, line.rect) ||
+        // Break column if current line is above previous line.
+        //
+        // In the case of a two column layout for example, this happens when
+        // moving from the bottom of one column to the top of the next.
+        yDist < 0 ||
+        // Break column if there is a large gap between the previous and current lines.
+        //
+        // This helps to avoid generating intersecting columns if there happens
+        // to be other content between the lines that comes later in the input.
+        yDist > line.rect.height * 4
+      ) {
+        addColumn();
+      }
+    }
+    currentColumn.lines.push(line);
+    currentColumn.rect = unionRects(currentColumn.rect, line.rect);
+  }
+  addColumn();
+
+  return columns;
 }
 
 /**
@@ -40,7 +163,7 @@ export class ImageTextLayer {
    *
    * @param {Element} image - Rendered image on which to overlay the text layer.
    *   The text layer will be inserted into the DOM as the next sibling of `image`.
-   * @param {Rect[]} charBoxes - Bounding boxes for characters in the image.
+   * @param {DOMRect[]} charBoxes - Bounding boxes for characters in the image.
    *   Coordinates should be in the range [0-1], where 0 is the top/left corner
    *   of the image and 1 is the bottom/right.
    * @param {string} text - Characters in the image corresponding to `charBoxes`
@@ -55,12 +178,17 @@ export class ImageTextLayer {
     const container = document.createElement('hypothesis-text-layer');
     containerParent.insertBefore(container, image.nextSibling);
 
-    // Position text layer over image. For now we assume that the image's top-left
-    // corner aligns with the top-left corner of its container.
+    // Position text layer over image. We assume the image's top-left corner
+    // aligns with the top-left corner of its container.
     containerParent.style.position = 'relative';
     container.style.position = 'absolute';
     container.style.top = '0';
     container.style.left = '0';
+    container.style.color = 'transparent';
+
+    // Prevent inherited text alignment from affecting positioning.
+    // VitalSource sets `text-align: center` for example.
+    container.style.textAlign = 'left';
 
     // Use multiply blending to make text in the image more readable when
     // the corresponding text in the text layer is selected or highlighted.
@@ -80,95 +208,107 @@ export class ImageTextLayer {
     );
     context.font = `${fontSize}px ${fontFamily}`;
 
-    // Split the text into words and create an element for each in the text layer.
-
-    /** @type {Rect|null} */
-    let currentWordBox = null;
-    let currentWordText = '';
-
     /**
-     * @typedef TextBox
-     * @prop {HTMLElement} span
-     * @prop {Rect} box
-     * @prop {number} width - Natural width of the text
-     * @prop {number} height - Natural height of the text
+     * Generate a CSS value that scales with the `--x-scale` or `--y-scale` CSS variables.
+     *
+     * @param {'x'|'y'} dimension
+     * @param {number} value
+     * @param {string} unit
      */
+    const scaledValue = (dimension, value, unit = 'px') =>
+      `calc(var(--${dimension}-scale) * ${value}${unit})`;
 
-    /** @type {TextBox[]} */
-    const boxes = [];
+    // Group characters into words, lines and columns. Then use the result to
+    // create a hierarchical DOM structure in the text layer:
+    //
+    // 1. Columns are positioned absolutely
+    // 2. Columns stack lines vertically using a block layout
+    // 3. Lines arrange words horizontally using an inline layout
+    //
+    // This allows the browser to select the expected text when the cursor is
+    // in-between lines or words.
+    const columns = analyzeLayout(charBoxes, text);
 
-    // Actual height of text boxes before scaling using CSS transforms.
-    let boxHeight = 0;
+    for (let column of columns) {
+      const columnEl = document.createElement('hypothesis-text-column');
+      columnEl.style.display = 'block';
+      columnEl.style.position = 'absolute';
+      columnEl.style.left = scaledValue('x', column.rect.left);
+      columnEl.style.top = scaledValue('y', column.rect.top);
 
-    const addCurrentWordToTextLayer = () => {
-      if (!currentWordBox) {
-        return;
+      let prevLine = null;
+      for (let line of column.lines) {
+        const lineEl = document.createElement('hypothesis-text-line');
+        lineEl.style.display = 'block';
+        lineEl.style.marginLeft = scaledValue(
+          'x',
+          line.rect.left - column.rect.left
+        );
+        lineEl.style.height = scaledValue('y', line.rect.height);
+
+        if (prevLine) {
+          lineEl.style.marginTop = scaledValue(
+            'y',
+            line.rect.top - prevLine.rect.bottom
+          );
+        }
+        prevLine = line;
+
+        // Prevent line breaks if the word elements don't quite fit the line.
+        lineEl.style.whiteSpace = 'nowrap';
+
+        let prevWord = null;
+        for (let word of line.words) {
+          const wordEl = document.createElement('hypothesis-text-word');
+          wordEl.style.display = 'inline-block';
+          wordEl.style.transformOrigin = 'top left';
+          wordEl.textContent = word.text;
+
+          if (prevWord) {
+            wordEl.style.marginLeft = scaledValue(
+              'x',
+              word.rect.left - prevWord.rect.right
+            );
+          }
+          prevWord = word;
+
+          // Set the size of this box used for layout. This does not affect the
+          // rendered size of the content.
+          wordEl.style.width = scaledValue('x', word.rect.width);
+          wordEl.style.height = scaledValue('y', word.rect.height);
+
+          // Don't collapse whitespace at end of words, so it remains visible
+          // in selected text. Also prevent line breaks due to overflows.
+          wordEl.style.whiteSpace = 'pre';
+
+          // Scale content using a transform. This affects the rendered size
+          // of the text, used by text selection and
+          // `Element.getBoundingClientRect`, but not layout.
+          const metrics = context.measureText(word.text);
+          const xScale = scaledValue('x', word.rect.width / metrics.width, '');
+          const yScale = scaledValue('y', word.rect.height / fontSize, '');
+          wordEl.style.transform = `scale(${xScale}, ${yScale})`;
+
+          lineEl.append(wordEl);
+        }
+
+        columnEl.append(lineEl);
       }
 
-      const span = document.createElement('span');
-      span.style.position = 'absolute';
-      span.style.color = 'transparent';
-      span.style.transformOrigin = 'top left';
-
-      span.textContent = currentWordText;
-
-      container.append(span);
-      container.append(' ');
-
-      // Measure the initial height of text boxes. We only do this once as it
-      // should be the same for all boxes, since they use the same font.
-      if (!boxHeight) {
-        boxHeight = span.getBoundingClientRect().height;
-      }
-
-      boxes.push({
-        span,
-        box: currentWordBox,
-        width: context.measureText(currentWordText).width,
-        height: boxHeight,
-      });
-
-      currentWordBox = null;
-      currentWordText = '';
-    };
-
-    for (let i = 0; i < charBoxes.length; i++) {
-      const char = text[i];
-      if (/\s/.test(char)) {
-        addCurrentWordToTextLayer();
-        continue;
-      }
-
-      const charBox = charBoxes[i];
-      currentWordBox = mergeBoxes(currentWordBox, charBox);
-      currentWordText += char;
+      container.append(columnEl);
     }
-    addCurrentWordToTextLayer();
 
-    // Position and scale text boxes to fit current image size.
-    const updateBoxSizes = () => {
+    const updateTextLayerSize = () => {
       const { width: imageWidth, height: imageHeight } =
         image.getBoundingClientRect();
       container.style.width = imageWidth + 'px';
       container.style.height = imageHeight + 'px';
 
-      for (let { span, box, width, height } of boxes) {
-        const left = box.left * imageWidth;
-        const top = box.top * imageHeight;
-        const right = box.right * imageWidth;
-        const bottom = box.bottom * imageHeight;
-
-        span.style.left = left + 'px';
-        span.style.top = top + 'px';
-
-        const scaleX = (right - left) / width;
-        const scaleY = (bottom - top) / height;
-
-        span.style.transform = `scale(${scaleX}, ${scaleY})`;
-      }
+      container.style.setProperty('--x-scale', `${imageWidth}`);
+      container.style.setProperty('--y-scale', `${imageHeight}`);
     };
 
-    updateBoxSizes();
+    updateTextLayerSize();
 
     /**
      * Container element for the text layer.
@@ -178,12 +318,12 @@ export class ImageTextLayer {
      */
     this.container = container;
 
-    this._updateBoxSizes = debounce(updateBoxSizes, { maxWait: 50 });
+    this._updateTextLayerSize = debounce(updateTextLayerSize, { maxWait: 50 });
     this._listeners = new ListenerCollection();
 
     if (typeof ResizeObserver !== 'undefined') {
       this._imageSizeObserver = new ResizeObserver(() => {
-        this._updateBoxSizes();
+        this._updateTextLayerSize();
       });
       this._imageSizeObserver.observe(image);
     }
@@ -191,7 +331,7 @@ export class ImageTextLayer {
     // Fallback for browsers that don't support ResizeObserver (Safari < 13.4).
     // Due to the debouncing, we can register this listener in all browsers for
     // simplicity, without downsides.
-    this._listeners.add(window, 'resize', this._updateBoxSizes);
+    this._listeners.add(window, 'resize', this._updateTextLayerSize);
   }
 
   /**
@@ -204,14 +344,14 @@ export class ImageTextLayer {
    * needed.
    */
   updateSync() {
-    this._updateBoxSizes();
-    this._updateBoxSizes.flush();
+    this._updateTextLayerSize();
+    this._updateTextLayerSize.flush();
   }
 
   destroy() {
     this.container.remove();
     this._listeners.removeAll();
-    this._updateBoxSizes.cancel();
+    this._updateTextLayerSize.cancel();
     this._imageSizeObserver?.disconnect();
   }
 }

@@ -240,14 +240,17 @@ export class VitalSourceContentIntegration {
     const pageData = /** @type {any} */ (window).innerPageData;
 
     if (bookImage && pageData) {
+      const charRects = pageData.glyphs.glyphs.map(glyph => {
+        const left = glyph.l / 100;
+        const right = glyph.r / 100;
+        const top = glyph.t / 100;
+        const bottom = glyph.b / 100;
+        return new DOMRect(left, top, right - left, bottom - top);
+      });
+
       this._textLayer = new ImageTextLayer(
         bookImage,
-        pageData.glyphs.glyphs.map(glyph => ({
-          left: glyph.l / 100,
-          right: glyph.r / 100,
-          top: glyph.t / 100,
-          bottom: glyph.b / 100,
-        })),
+        charRects,
         pageData.words
       );
 
