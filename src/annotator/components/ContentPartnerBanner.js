@@ -29,7 +29,9 @@ export default function ContentPartnerBanner({ provider, onClose }) {
         </>
       )}
       <div className="text-annotator-base">
-        <LabeledButton onClick={onClose}>Close</LabeledButton>
+        <LabeledButton onClick={onClose} data-testid="close-button">
+          Close
+        </LabeledButton>
       </div>
     </div>
   );

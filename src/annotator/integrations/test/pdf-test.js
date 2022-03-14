@@ -214,7 +214,7 @@ describe('annotator/integrations/pdf', () => {
       });
     });
 
-    function getWarningBanner() {
+    function getBanner() {
       return document.querySelector('hypothesis-banner');
     }
 
@@ -225,7 +225,7 @@ describe('annotator/integrations/pdf', () => {
       await delay(0); // Wait for text check to complete.
 
       assert.called(fakePDFAnchoring.documentHasText);
-      assert.isNull(getWarningBanner());
+      assert.isNull(getBanner());
     });
 
     it('does not show a warning if PDF does not load', async () => {
@@ -235,7 +235,7 @@ describe('annotator/integrations/pdf', () => {
       await delay(0); // Wait for text check to complete.
 
       assert.notCalled(fakePDFAnchoring.documentHasText);
-      assert.isNull(getWarningBanner());
+      assert.isNull(getBanner());
     });
 
     it('shows a warning when PDF has no selectable text', async () => {
@@ -245,12 +245,31 @@ describe('annotator/integrations/pdf', () => {
       await delay(0); // Wait for text check to complete.
 
       assert.called(fakePDFAnchoring.documentHasText);
-      const banner = getWarningBanner();
+      const banner = getBanner();
       assert.isNotNull(banner);
       assert.include(
         banner.shadowRoot.textContent,
         'This PDF does not contain selectable text'
       );
+    });
+
+    it('shows banner when content is provided by JSTOR', () => {
+      pdfIntegration = createPDFIntegration({ contentPartner: 'jstor' });
+      const banner = getBanner();
+      assert.isNotNull(banner);
+      assert.include(banner.shadowRoot.textContent, 'Document hosted by JSTOR');
+    });
+
+    it('closes content partner banner when "Close" button is clicked', () => {
+      pdfIntegration = createPDFIntegration({ contentPartner: 'jstor' });
+      const banner = getBanner();
+      const closeButton = banner.shadowRoot.querySelector(
+        'button[data-testid=close-button]'
+      );
+
+      closeButton.click();
+
+      assert.isNull(getBanner());
     });
 
     context('when the PDF viewer content changes', () => {
