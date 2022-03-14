@@ -1248,6 +1248,22 @@ describe('Guest', () => {
     assert.calledWith(sidebarRPC().connect, port1);
   });
 
+  it('passes configuration to integration', () => {
+    const config = {
+      // Configuration options that should be forwarded to the integration
+      contentPartner: 'jstor',
+      // Other configuration
+      otherOption: 'test',
+    };
+
+    const guest = createGuest(config);
+
+    assert.calledOnce(fakeCreateIntegration);
+    assert.calledWith(fakeCreateIntegration, guest, {
+      contentPartner: 'jstor',
+    });
+  });
+
   it('configures the BucketBarClient', () => {
     const contentContainer = document.createElement('div');
     fakeIntegration.contentContainer.returns(contentContainer);
