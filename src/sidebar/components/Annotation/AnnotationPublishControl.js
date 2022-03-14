@@ -1,4 +1,5 @@
 import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 
 import { useStoreProxy } from '../../store/use-store';
 import { isNew, isReply } from '../../helpers/annotation-metadata';
@@ -72,16 +73,19 @@ function AnnotationPublishControl({
   );
 
   const menuLabel = (
-    <div className="annotation-publish-button__menu-label" style={buttonStyle}>
+    <div className="p-2.5 text-color-text-inverted" style={buttonStyle}>
       <Icon name="expand-menu" />
     </div>
   );
 
   return (
-    <div className="hyp-u-layout-row hyp-u-horizontal-spacing--4">
-      <div className="annotation-publish-button">
+    <div className="flex flex-row gap-x-3">
+      <div className="flex relative">
         <LabeledButton
-          classes="PublishControlButton"
+          classes={classnames(
+            // Turn off right-side border radius to align with menu-open button
+            'rounded-r-none'
+          )}
           data-testid="publish-control-button"
           style={buttonStyle}
           onClick={onSave}
@@ -94,13 +98,24 @@ function AnnotationPublishControl({
         {/* This wrapper div is necessary because of peculiarities with
              Safari: see https://github.com/hypothesis/client/issues/2302 */}
         <div
-          className="annotation-publish-button__menu-wrapper"
+          className={classnames(
+            // Round the right side of this menu-open button only
+            'flex flex-row rounded-r-sm bg-grey-7 hover:bg-grey-8'
+          )}
           style={buttonStyle}
         >
           <Menu
-            arrowClass="annotation-publish-button__menu-arrow"
+            arrowClass={classnames(
+              // Position up-pointing menu caret aligned beneath the
+              // down-pointing menu-open button icon
+              'right-[10px]'
+            )}
             containerPositioned={false}
-            contentClass="annotation-publish-button__menu-content"
+            contentClass={classnames(
+              // Ensure the menu is wide enough to "reach" the right-aligned
+              // up-pointing menu arrow
+              'min-w-full'
+            )}
             label={menuLabel}
             menuIndicator={false}
             title="Change annotation sharing setting"
@@ -122,7 +137,12 @@ function AnnotationPublishControl({
         </div>
       </div>
       <div>
-        <LabeledButton icon="cancel" onClick={onCancel} size="large">
+        <LabeledButton
+          classes="p-2.5"
+          icon="cancel"
+          onClick={onCancel}
+          size="large"
+        >
           Cancel
         </LabeledButton>
       </div>

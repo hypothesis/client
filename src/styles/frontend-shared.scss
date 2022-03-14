@@ -13,12 +13,6 @@
   text-decoration: underline;
 }
 
-// Disable border-radius on right side so it can align with a button next to it
-.PublishControlButton {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
 // This button style has asymmetrical padding. Hold it here to see if
 // this kind of padding is useful in other patterns.
 .PaginationPageButton {
