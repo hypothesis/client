@@ -10,7 +10,6 @@ import {
 
 /**
  * @typedef WordBox
- * @prop {DOMRect[]} glyphs
  * @prop {string} text
  * @prop {DOMRect} rect - Bounding rectangle of all glyphs in word
  */
@@ -46,20 +45,19 @@ function analyzeLayout(chars, text) {
   const words = [];
 
   /** @type {WordBox} */
-  let currentWord = { glyphs: [], text: '', rect: new DOMRect() };
+  let currentWord = { text: '', rect: new DOMRect() };
 
   // Group characters into words.
   const addWord = () => {
-    if (currentWord.glyphs.length > 0) {
+    if (currentWord.text.length > 0) {
       words.push(currentWord);
-      currentWord = { glyphs: [], text: '', rect: new DOMRect() };
+      currentWord = { text: '', rect: new DOMRect() };
     }
   };
   for (let [i, rect] of chars.entries()) {
     const char = text[i];
     const isSpace = /\s/.test(char);
 
-    currentWord.glyphs.push(rect);
     currentWord.rect = unionRects(currentWord.rect, rect);
 
     // To simplify downstream logic, normalize whitespace.
