@@ -16,7 +16,7 @@ export default function ContentPartnerBanner({ provider, onClose }) {
     <div className="flex items-center border-b gap-x-4 px-2 py-1 bg-white text-annotator-lg">
       {provider === 'jstor' && (
         <>
-          <Link href="https://jstor.org">
+          <Link href="https://jstor.org" target="_blank">
             <Icon
               classes="w-[97px] h-[25px]"
               name="jstor"
