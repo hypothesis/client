@@ -43,7 +43,8 @@ function createCharBoxes(text) {
  * but not layout.
  */
 function untransformedBoundingRect(element) {
-  // We assume transform is "matrix(a b c ...)" or "none", which DOMMatrix can parse.
+  // We assume `transform` is a string that DOMMatrix can parse, either
+  // "matrix(a b c ...)" or "none".
   const transform = getComputedStyle(element).transform;
   const mat = new DOMMatrix(transform);
   const scaleX = mat.a;
@@ -207,9 +208,9 @@ describe('ImageTextLayer', () => {
         // Create two sets of char boxes which overlap. This will cause each
         // set to be assigned to a separate column.
         ...createCharBoxes('first line\nsecond line\n'),
-        ...createCharBoxes('third line\nforth line'),
+        ...createCharBoxes('third line\nfourth line'),
       ],
-      'first line\nsecond line\nthird line\nforth line'
+      'first line\nsecond line\nthird line\nfourth line'
     );
 
     const columns = textLayer.container.querySelectorAll(
@@ -217,7 +218,7 @@ describe('ImageTextLayer', () => {
     );
     assert.equal(columns.length, 2);
     assert.equal(columns[0].textContent, 'first line second line ');
-    assert.equal(columns[1].textContent, 'third line forth line');
+    assert.equal(columns[1].textContent, 'third line fourth line');
 
     const col1Lines = columns[0].querySelectorAll('hypothesis-text-line');
     assert.equal(col1Lines.length, 2);
@@ -227,7 +228,7 @@ describe('ImageTextLayer', () => {
     const col2Lines = columns[1].querySelectorAll('hypothesis-text-line');
     assert.equal(col2Lines.length, 2);
     assert.equal(col2Lines[0].textContent, 'third line ');
-    assert.equal(col2Lines[1].textContent, 'forth line');
+    assert.equal(col2Lines[1].textContent, 'fourth line');
   });
 
   it('updates size and position of text layer when page image is resized', async () => {
