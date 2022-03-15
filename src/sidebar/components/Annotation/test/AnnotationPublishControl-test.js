@@ -1,7 +1,5 @@
 import { mount } from 'enzyme';
 
-import * as fixtures from '../../../test/annotation-fixtures';
-
 import { checkAccessibility } from '../../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
 
@@ -11,17 +9,22 @@ import AnnotationPublishControl, {
 
 describe('AnnotationPublishControl', () => {
   let fakeGroup;
-  let fakeMetadata;
   let fakeSettings;
-  let fakeStore;
   let fakeApplyTheme;
+
+  let fakeOnSave;
+  let fakeOnCancel;
+  let fakeOnSetPrivacy;
 
   const createAnnotationPublishControl = (props = {}) => {
     return mount(
       <AnnotationPublishControl
-        annotation={fixtures.defaultAnnotation()}
+        group={fakeGroup}
         isDisabled={false}
-        onSave={sinon.stub()}
+        isPrivate={false}
+        onCancel={fakeOnCancel}
+        onSave={fakeOnSave}
+        onSetPrivacy={fakeOnSetPrivacy}
         settings={fakeSettings}
         {...props}
       />
@@ -29,14 +32,12 @@ describe('AnnotationPublishControl', () => {
   };
 
   beforeEach(() => {
+    fakeOnCancel = sinon.stub();
+    fakeOnSave = sinon.stub();
+    fakeOnSetPrivacy = sinon.stub();
     fakeGroup = {
       name: 'Fake Group',
       type: 'private',
-    };
-
-    fakeMetadata = {
-      isNew: sinon.stub(),
-      isReply: sinon.stub().returns(false),
     };
 
     fakeSettings = {
@@ -46,21 +47,10 @@ describe('AnnotationPublishControl', () => {
       },
     };
 
-    fakeStore = {
-      createDraft: sinon.stub(),
-      getDraft: sinon.stub().returns(fixtures.defaultDraft()),
-      getGroup: sinon.stub().returns(fakeGroup),
-      setDefault: sinon.stub(),
-      removeAnnotations: sinon.stub(),
-      removeDraft: sinon.stub(),
-    };
-
     fakeApplyTheme = sinon.stub();
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
-      '../../helpers/annotation-metadata': fakeMetadata,
       '../../helpers/theme': {
         applyTheme: fakeApplyTheme,
       },
@@ -69,12 +59,6 @@ describe('AnnotationPublishControl', () => {
 
   afterEach(() => {
     $imports.$restore();
-  });
-
-  it('should not render if group is missing', () => {
-    fakeStore.getGroup.returns(undefined);
-    const wrapper = createAnnotationPublishControl();
-    assert.isFalse(wrapper.find('.AnnotationPublishControl').exists());
   });
 
   const getPublishButton = wrapper =>
@@ -108,10 +92,7 @@ describe('AnnotationPublishControl', () => {
 
     context('private annotation', () => {
       it('should label the button with "Only Me"', () => {
-        const draft = fixtures.defaultDraft();
-        draft.isPrivate = true;
-        fakeStore.getDraft.returns(draft);
-        const wrapper = createAnnotationPublishControl();
+        const wrapper = createAnnotationPublishControl({ isPrivate: true });
 
         const btn = getPublishButton(wrapper);
         assert.equal(btn.text(), 'Post to Only Me');
@@ -144,43 +125,14 @@ describe('AnnotationPublishControl', () => {
 
   describe('menu', () => {
     describe('share (to group) menu item', () => {
-      it('should invoke privacy callback with shared privacy', () => {
+      it('should set privacy to shared when group name clicked', () => {
         const wrapper = createAnnotationPublishControl();
-        const shareMenuItem = wrapper.find('MenuItem').first();
+        const shareMenuItem = wrapper.find('MenuItem[label="Fake Group"]');
 
         shareMenuItem.prop('onClick')();
 
-        const call = fakeStore.createDraft.getCall(0);
-
-        assert.calledOnce(fakeStore.createDraft);
-        assert.isFalse(call.args[1].isPrivate);
-      });
-
-      it('should update default privacy level to shared', () => {
-        const wrapper = createAnnotationPublishControl();
-        const privateMenuItem = wrapper.find('MenuItem').first();
-
-        privateMenuItem.prop('onClick')();
-
-        assert.calledOnce(fakeStore.setDefault);
-        assert.calledWith(fakeStore.setDefault, 'annotationPrivacy', 'shared');
-      });
-
-      it('should not update default privacy level if annotation is reply', () => {
-        fakeMetadata.isReply.returns(true);
-        const wrapper = createAnnotationPublishControl();
-        const privateMenuItem = wrapper.find('MenuItem').first();
-
-        privateMenuItem.prop('onClick')();
-
-        assert.equal(fakeStore.setDefault.callCount, 0);
-      });
-
-      it('should have a label that is the name of the group', () => {
-        const wrapper = createAnnotationPublishControl();
-        const shareMenuItem = wrapper.find('MenuItem').first();
-
-        assert.equal(shareMenuItem.prop('label'), fakeGroup.name);
+        assert.calledOnce(fakeOnSetPrivacy);
+        assert.calledWith(fakeOnSetPrivacy, false);
       });
 
       context('private group', () => {
@@ -191,6 +143,7 @@ describe('AnnotationPublishControl', () => {
           assert.equal(shareMenuItem.prop('icon'), 'groups');
         });
       });
+
       context('open group', () => {
         beforeEach(() => {
           fakeGroup.type = 'open';
@@ -206,36 +159,14 @@ describe('AnnotationPublishControl', () => {
     });
 
     describe('private (only me) menu item', () => {
-      it('should invoke callback with private privacy', () => {
+      it('should set privacy to private when "Only Me" option clicked', () => {
         const wrapper = createAnnotationPublishControl();
-        const privateMenuItem = wrapper.find('MenuItem').at(1);
+        const shareMenuItem = wrapper.find('MenuItem[label="Only Me"]');
 
-        privateMenuItem.prop('onClick')();
+        shareMenuItem.prop('onClick')();
 
-        const call = fakeStore.createDraft.getCall(0);
-
-        assert.calledOnce(fakeStore.createDraft);
-        assert.isTrue(call.args[1].isPrivate);
-      });
-
-      it('should update default privacy level to private', () => {
-        const wrapper = createAnnotationPublishControl();
-        const privateMenuItem = wrapper.find('MenuItem').at(1);
-
-        privateMenuItem.prop('onClick')();
-
-        assert.calledOnce(fakeStore.setDefault);
-        assert.calledWith(fakeStore.setDefault, 'annotationPrivacy', 'private');
-      });
-
-      it('should not update default privacy level if annotation is reply', () => {
-        fakeMetadata.isReply.returns(true);
-        const wrapper = createAnnotationPublishControl();
-        const privateMenuItem = wrapper.find('MenuItem').at(1);
-
-        privateMenuItem.prop('onClick')();
-
-        assert.equal(fakeStore.setDefault.callCount, 0);
+        assert.calledOnce(fakeOnSetPrivacy);
+        assert.calledWith(fakeOnSetPrivacy, true);
       });
 
       it('should use a private/lock icon', () => {
@@ -244,6 +175,7 @@ describe('AnnotationPublishControl', () => {
 
         assert.equal(privateMenuItem.prop('icon'), 'lock');
       });
+
       it('should have an "Only me" label', () => {
         const wrapper = createAnnotationPublishControl();
         const privateMenuItem = wrapper.find('MenuItem').at(1);
@@ -254,29 +186,15 @@ describe('AnnotationPublishControl', () => {
   });
 
   describe('cancel button', () => {
-    it('should remove the current draft on cancel button click', () => {
-      const wrapper = createAnnotationPublishControl({});
+    it('should invoke the `onCancel` callback when cancel button clicked', () => {
+      const wrapper = createAnnotationPublishControl();
       const cancelBtn = wrapper
         .find('LabeledButton')
         .filter({ icon: 'cancel' });
 
       cancelBtn.props().onClick();
 
-      assert.calledOnce(fakeStore.removeDraft);
-      assert.calledWith(fakeStore.removeDraft, wrapper.props().annotation);
-      assert.equal(fakeStore.removeAnnotations.callCount, 0);
-    });
-
-    it('should remove the annotation from the store if it is new/unsaved', () => {
-      fakeMetadata.isNew.returns(true);
-      const wrapper = createAnnotationPublishControl({});
-      const cancelBtn = wrapper
-        .find('LabeledButton')
-        .filter({ icon: 'cancel' });
-
-      cancelBtn.props().onClick();
-
-      assert.calledOnce(fakeStore.removeAnnotations);
+      assert.calledOnce(fakeOnCancel);
     });
   });
 
