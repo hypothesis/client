@@ -217,7 +217,7 @@ export class VitalSourceContentIntegration {
     // To avoid interfering with the client's own selection handling, this
     // event blocking must happen at the same level or higher in the DOM tree
     // than where SelectionObserver listens.
-    const stopEvents = ['mouseup', 'mouseout'];
+    const stopEvents = ['mouseup', 'mousedown', 'mouseout'];
     for (let event of stopEvents) {
       this._listeners.add(document.documentElement, event, e => {
         e.stopPropagation();
