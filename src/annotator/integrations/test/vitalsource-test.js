@@ -225,7 +225,7 @@ describe('annotator/integrations/vitalsource', () => {
     it('stops mouse events from propagating to parent frame', () => {
       createIntegration();
 
-      const events = ['mouseup', 'mouseout'];
+      const events = ['mouseup', 'mousedown', 'mouseout'];
 
       for (let eventName of events) {
         const listener = sinon.stub();
