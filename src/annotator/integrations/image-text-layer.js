@@ -36,11 +36,11 @@ import {
  * lines or columns that significantly intersect, as this can impair text
  * selection.
  *
- * @param {DOMRect[]} chars
- * @param {string} text
+ * @param {DOMRect[]} charBoxes - Bounding rectangle associated with each character on the page
+ * @param {string} text - Text that corresponds to `charBoxes`
  * @return {ColumnBox[]}
  */
-function analyzeLayout(chars, text) {
+function analyzeLayout(charBoxes, text) {
   /** @type {WordBox[]} */
   const words = [];
 
@@ -54,7 +54,7 @@ function analyzeLayout(chars, text) {
       currentWord = { text: '', rect: new DOMRect() };
     }
   };
-  for (let [i, rect] of chars.entries()) {
+  for (let [i, rect] of charBoxes.entries()) {
     const char = text[i];
     const isSpace = /\s/.test(char);
 
