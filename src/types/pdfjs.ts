@@ -76,8 +76,22 @@ export type GetTextContentParameters = {
   normalizeWhitespace: boolean;
 };
 
+/**
+ * An item of text in the text layer. This may be a few characters, a word or
+ * a whole line depending on how the PDF was constructed.
+ */
 export type TextContentItem = {
   str: string;
+  width: number;
+  height: number;
+
+  /**
+   * Elements of a transform matrix specifying the size and position of the
+   * item. The elements are `[sx, b, c, sy, tx, ty]` where `sx` and `sy` are the
+   * X and Y scale factors and `tx` and `ty` are the X and Y translations. See
+   * section 9.4.2 / Table 108 in the PDF 1.7 specification.
+   */
+  transform: number[];
 };
 
 export type TextContent = {

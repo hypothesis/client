@@ -1,6 +1,7 @@
 /* global PDFViewerApplication */
 
 import { warnOnce } from '../../shared/warn-once';
+import { ImageTextLayer } from '../integrations/image-text-layer';
 import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
@@ -179,6 +180,85 @@ function getPageTextContent(pageIndex: number): Promise<string> {
   const pageText = getPageText();
   pageTextCache.set(pageIndex, pageText);
   return pageText;
+}
+
+export class TextLayerManager {
+  constructor() {
+    /** @type {Map<number, ImageTextLayer>} */
+    this._layers = new Map();
+  }
+
+  /**
+   * @param {number} pageIndex
+   */
+  removeTextLayer(pageIndex) {
+    const layer = this._layers.get(pageIndex);
+    this._layers.delete(pageIndex);
+    layer?.destroy();
+  }
+
+  /**
+   * Create a text layer for the given page.
+   *
+   * @param {number} pageIndex
+   */
+  async createTextLayer(pageIndex) {
+    if (this._layers.has(pageIndex)) {
+      return this._layers.get(pageIndex);
+    }
+
+    const pageView = await getPageView(pageIndex);
+    const textContent = await pageView.pdfPage.getTextContent({
+      normalizeWhitespace: true,
+    });
+    const items = textContent.items;
+
+    // TODO - Check that `pageWidth` and `pageHeight` are width/height rather
+    // than right/bottom coords.
+    const viewBox = pageView.viewport.viewBox;
+    const [, , pageWidth, pageHeight] = viewBox;
+
+    const wordBoxes = [];
+
+    for (let item of items) {
+      const [, , , , tx, ty] = item.transform;
+      const x = tx / pageWidth;
+      const y = (pageHeight - ty - item.height) / pageHeight;
+      const width = item.width / pageWidth;
+      const height = item.height / pageHeight;
+      const wordRect = new DOMRect(x, y, width, height);
+      wordBoxes.push({
+        text: item.str,
+        rect: wordRect,
+      });
+    }
+
+    const pageContainer = document.querySelector(
+      `.page[data-page-number="${pageIndex + 1}"]`
+    );
+    if (!pageContainer) {
+      console.warn('Page container not found for page', pageIndex);
+      return null;
+    }
+
+    const pageCanvas = pageContainer?.querySelector('canvas');
+    if (!pageCanvas) {
+      console.warn('Page canvas not found for page', pageIndex);
+      return null;
+    }
+
+    // Prevent selection in PDF.js's own text layer.
+    const builtinTextLayer = /** @type {HTMLElement|null} */ (
+      pageContainer.querySelector('.textLayer')
+    );
+    if (builtinTextLayer) {
+      builtinTextLayer.style.display = 'none';
+    }
+
+    const textLayer = new ImageTextLayer(pageCanvas, { wordBoxes });
+    this._layers.set(pageIndex, textLayer);
+    return textLayer;
+  }
 }
 
 /**

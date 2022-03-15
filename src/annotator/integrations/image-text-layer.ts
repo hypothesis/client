@@ -9,7 +9,7 @@ import {
   unionRects,
 } from '../util/geometry';
 
-type WordBox = {
+export type WordBox = {
   text: string;
 
   /** Bounding rect of all glyphs in word. */
@@ -29,19 +29,12 @@ type ColumnBox = {
 };
 
 /**
- * Group characters in a page into words, lines and columns.
- *
- * The input is assumed to be _roughly_ reading order, more so at the low (word,
- * line) level. When the input is not in reading order, the output may be
- * divided into more lines / columns than expected. Downstream code is expected
- * to tolerate over-segmentation. This function should try to avoid producing
- * lines or columns that significantly intersect, as this can impair text
- * selection.
+ * Group characters in a page into words.
  *
  * @param charBoxes - Bounding rectangle associated with each character on the page
  * @param text - Text that corresponds to `charBoxes`
  */
-function analyzeLayout(charBoxes: DOMRect[], text: string): ColumnBox[] {
+function wordsFromChars(charBoxes: DOMRect[], text: string): WordBox[] {
   const words = [] as WordBox[];
 
   let currentWord = { text: '', rect: new DOMRect() } as WordBox;
@@ -75,6 +68,20 @@ function analyzeLayout(charBoxes: DOMRect[], text: string): ColumnBox[] {
   }
   addWord();
 
+  return words;
+}
+
+/**
+ * Group characters in a page into words, lines and columns.
+ *
+ * The input is assumed to be _roughly_ reading order, more so at the low (word,
+ * line) level. When the input is not in reading order, the output may be
+ * divided into more lines / columns than expected. Downstream code is expected
+ * to tolerate over-segmentation. This function should try to avoid producing
+ * lines or columns that significantly intersect, as this can impair text
+ * selection.
+ */
+function analyzeLayout(words: WordBox[]): ColumnBox[] {
   const lines = [] as LineBox[];
 
   let currentLine = { words: [], rect: new DOMRect() } as LineBox;
@@ -149,6 +156,21 @@ function analyzeLayout(charBoxes: DOMRect[], text: string): ColumnBox[] {
   return columns;
 }
 
+export type ImageTextLayerInit = {
+  /**
+   * Bounding boxes for chars in the image.
+   *
+   * Coordinates should be in the range [0-1], where 0 is the top/left corner
+   * of the image and 1 is the bottom right.
+   */
+  charBoxes?: DOMRect[];
+
+  /** Characters in the image corresponding to `charBoxes`. */
+  text?: string;
+  /** Bounding boxes for words in the image. */
+  wordBoxes?: WordBox[];
+};
+
 /**
  * ImageTextLayer maintains a transparent text layer on top of an image
  * which contains text. This enables the text in the image to be selected
@@ -169,13 +191,12 @@ export class ImageTextLayer {
    *
    * @param image - Rendered image on which to overlay the text layer.
    *   The text layer will be inserted into the DOM as the next sibling of `image`.
-   * @param charBoxes - Bounding boxes for characters in the image.
-   *   Coordinates should be in the range [0-1], where 0 is the top/left corner
-   *   of the image and 1 is the bottom/right.
-   * @param text - Characters in the image corresponding to `charBoxes`
    */
-  constructor(image: Element, charBoxes: DOMRect[], text: string) {
-    if (charBoxes.length !== text.length) {
+  constructor(
+    image: Element,
+    { charBoxes, text, wordBoxes }: ImageTextLayerInit
+  ) {
+    if (charBoxes && text && charBoxes.length !== text.length) {
       throw new Error('Char boxes length does not match text length');
     }
 
@@ -190,7 +211,9 @@ export class ImageTextLayer {
     container.style.position = 'absolute';
     container.style.top = '0';
     container.style.left = '0';
-    container.style.color = 'transparent';
+
+    // TESTING
+    container.style.color = 'red';
 
     // Prevent inherited text alignment from affecting positioning.
     // VitalSource sets `text-align: center` for example.
@@ -228,7 +251,15 @@ export class ImageTextLayer {
     //
     // This allows the browser to select the expected text when the cursor is
     // in-between lines or words.
-    const columns = analyzeLayout(charBoxes, text);
+    let columns;
+    if (charBoxes && text) {
+      const wordBoxes = wordsFromChars(charBoxes, text);
+      columns = analyzeLayout(wordBoxes);
+    } else if (wordBoxes) {
+      columns = analyzeLayout(wordBoxes);
+    } else {
+      throw new Error('Either `charBoxes` or `wordBoxes` must be set');
+    }
 
     for (const column of columns) {
       const columnEl = document.createElement('hypothesis-text-column');

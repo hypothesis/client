@@ -6,6 +6,7 @@ import { TextRange } from '../anchoring/text-range';
 import { ListenerCollection } from '../../shared/listener-collection';
 import {
   RenderingStates,
+  TextLayerManager,
   anchor,
   canDescribe,
   describe,
@@ -162,6 +163,8 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     );
 
     this._destroyed = false;
+
+    this._textLayers = new TextLayerManager();
   }
 
   destroy() {
@@ -328,6 +331,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
       if (!page?.textLayer?.renderingDone) {
         continue;
       }
+      this._textLayers.createTextLayer(pageIndex);
 
       // Detect what needs to be done by checking the rendering state.
       switch (page.renderingState) {
