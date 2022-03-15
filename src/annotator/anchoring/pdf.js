@@ -1,6 +1,7 @@
 /* global PDFViewerApplication */
 
 import { warnOnce } from '../../shared/warn-once';
+import { ImageTextLayer } from '../integrations/image-text-layer';
 import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
@@ -197,6 +198,51 @@ function getPageTextContent(pageIndex) {
   const pageText = getPageText();
   pageTextCache.set(pageIndex, pageText);
   return pageText;
+}
+
+/** @type {Map<number, ImageTextLayer>} */
+const textLayers = new Map();
+
+/**
+ * TODO: Call this at an appropriate time to create the text layer.
+ *
+ * @param {number} pageIndex
+ */
+async function createTextLayerForPage(pageIndex) {
+  if (textLayers.has(pageIndex)) {
+    return textLayers.get(pageIndex);
+  }
+
+  const pageView = await getPageView(pageIndex);
+  const textContent = await pageView.pdfPage.getTextContent({
+    normalizeWhitespace: true,
+  });
+  const items = textContent.items;
+
+  const charBoxes = [];
+  let text = '';
+
+  for (let item of items) {
+    const x = 0;
+    const y = 0;
+    const width = 0;
+    const height = 0;
+    const wordRect = new DOMRect(x, y, width, height);
+    for (let i=0; i < item.str.length; i++) {
+      charBoxes.push(wordRect);
+    }
+    text += item.str;
+  }
+
+  const pageContainer = document.querySelector(`.page[data-page-number=${pageIndex}]`);
+  const pageCanvas = pageContainer?.querySelector('canvas');
+  if (!pageCanvas) {
+    throw new Error('Unable to find page canvas');
+  }
+
+  const textLayer = new ImageTextLayer(pageCanvas, charBoxes, text);
+  textLayers.set(pageIndex, textLayer);
+  return textLayer;
 }
 
 /**
