@@ -57,7 +57,7 @@ function AnnotationEditor({
   const isEmpty = !text && !tags.length;
 
   const onEditTags = useCallback(
-    ({ tags }) => {
+    tags => {
       store.createDraft(draft.annotation, { ...draft, tags });
     },
     [draft, store]
@@ -78,7 +78,7 @@ function AnnotationEditor({
       const tagList = [...tags, newTag];
       // Update the tag locally for the suggested-tag list
       tagsService.store(tagList);
-      onEditTags({ tags: tagList });
+      onEditTags(tagList);
       return true;
     },
     [onEditTags, tags, tagsService]
@@ -96,7 +96,7 @@ function AnnotationEditor({
       const index = newTagList.indexOf(tag);
       if (index >= 0) {
         newTagList.splice(index, 1);
-        onEditTags({ tags: newTagList });
+        onEditTags(newTagList);
         return true;
       }
       return false;
@@ -114,9 +114,12 @@ function AnnotationEditor({
   /**
    * @param {boolean} isPrivate
    */
-  const onSetPrivacy = useCallback(
+  const onSetPrivate = useCallback(
     isPrivate => {
-      store.createDraft(annotation, { ...draft, isPrivate });
+      store.createDraft(annotation, {
+        ...draft,
+        isPrivate,
+      });
       // Persist this as privacy default for future annotations unless this is a reply
       if (!isReply(annotation)) {
         store.setDefault('annotationPrivacy', isPrivate ? 'private' : 'shared');
@@ -189,7 +192,7 @@ function AnnotationEditor({
             isPrivate={draft.isPrivate}
             onCancel={onCancel}
             onSave={onSave}
-            onSetPrivacy={onSetPrivacy}
+            onSetPrivate={onSetPrivate}
           />
         )}
       </div>

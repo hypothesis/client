@@ -269,7 +269,7 @@ describe('AnnotationEditor', () => {
           draft.isPrivate = false;
           const wrapper = createComponent({ draft });
 
-          wrapper.find('AnnotationPublishControl').props().onSetPrivacy(true);
+          wrapper.find('AnnotationPublishControl').props().onSetPrivate(true);
 
           const call = fakeStore.createDraft.getCall(0);
 
@@ -280,7 +280,7 @@ describe('AnnotationEditor', () => {
         it("updates the draft's privacy when set to shared", () => {
           const wrapper = createComponent();
 
-          wrapper.find('AnnotationPublishControl').props().onSetPrivacy(false);
+          wrapper.find('AnnotationPublishControl').props().onSetPrivate(false);
 
           const call = fakeStore.createDraft.getCall(0);
 
@@ -291,7 +291,7 @@ describe('AnnotationEditor', () => {
         it('updates privacy default setting', () => {
           const wrapper = createComponent();
 
-          wrapper.find('AnnotationPublishControl').props().onSetPrivacy(false);
+          wrapper.find('AnnotationPublishControl').props().onSetPrivate(false);
 
           assert.calledOnce(fakeStore.setDefault);
           assert.calledWith(
@@ -305,7 +305,7 @@ describe('AnnotationEditor', () => {
           fakeMetadata.isReply.returns(true);
           const wrapper = createComponent();
 
-          wrapper.find('AnnotationPublishControl').props().onSetPrivacy(false);
+          wrapper.find('AnnotationPublishControl').props().onSetPrivate(false);
 
           assert.notCalled(fakeStore.setDefault);
         });
