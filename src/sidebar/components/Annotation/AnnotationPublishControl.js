@@ -20,7 +20,7 @@ import MenuItem from '../MenuItem';
  * @prop {boolean} isPrivate - Annotation or draft is "Only Me"
  * @prop {() => void} onCancel - Callback for cancel button click
  * @prop {() => void} onSave - Callback for save button click
- * @prop {(isPrivate: boolean) => void} onSetPrivacy - Callback for save button click
+ * @prop {(isPrivate: boolean) => void} onSetPrivate - Callback for save button click
  * @prop {SidebarSettings} settings - Injected service
  */
 
@@ -37,7 +37,7 @@ function AnnotationPublishControl({
   isPrivate,
   onCancel,
   onSave,
-  onSetPrivacy,
+  onSetPrivate,
   settings,
 }) {
   const buttonStyle = applyTheme(
@@ -98,13 +98,13 @@ function AnnotationPublishControl({
               icon={group.type === 'open' ? 'public' : 'groups'}
               label={group.name}
               isSelected={!isPrivate}
-              onClick={() => onSetPrivacy(false)}
+              onClick={() => onSetPrivate(false)}
             />
             <MenuItem
               icon="lock"
               label="Only Me"
               isSelected={isPrivate}
-              onClick={() => onSetPrivacy(true)}
+              onClick={() => onSetPrivate(true)}
             />
           </Menu>
         </div>

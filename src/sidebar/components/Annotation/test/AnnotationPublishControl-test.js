@@ -14,7 +14,7 @@ describe('AnnotationPublishControl', () => {
 
   let fakeOnSave;
   let fakeOnCancel;
-  let fakeOnSetPrivacy;
+  let fakeOnSetPrivate;
 
   const createAnnotationPublishControl = (props = {}) => {
     return mount(
@@ -24,7 +24,7 @@ describe('AnnotationPublishControl', () => {
         isPrivate={false}
         onCancel={fakeOnCancel}
         onSave={fakeOnSave}
-        onSetPrivacy={fakeOnSetPrivacy}
+        onSetPrivate={fakeOnSetPrivate}
         settings={fakeSettings}
         {...props}
       />
@@ -34,7 +34,7 @@ describe('AnnotationPublishControl', () => {
   beforeEach(() => {
     fakeOnCancel = sinon.stub();
     fakeOnSave = sinon.stub();
-    fakeOnSetPrivacy = sinon.stub();
+    fakeOnSetPrivate = sinon.stub();
     fakeGroup = {
       name: 'Fake Group',
       type: 'private',
@@ -131,8 +131,8 @@ describe('AnnotationPublishControl', () => {
 
         shareMenuItem.prop('onClick')();
 
-        assert.calledOnce(fakeOnSetPrivacy);
-        assert.calledWith(fakeOnSetPrivacy, false);
+        assert.calledOnce(fakeOnSetPrivate);
+        assert.calledWith(fakeOnSetPrivate, false);
       });
 
       context('private group', () => {
@@ -165,8 +165,8 @@ describe('AnnotationPublishControl', () => {
 
         shareMenuItem.prop('onClick')();
 
-        assert.calledOnce(fakeOnSetPrivacy);
-        assert.calledWith(fakeOnSetPrivacy, true);
+        assert.calledOnce(fakeOnSetPrivate);
+        assert.calledWith(fakeOnSetPrivate, true);
       });
 
       it('should use a private/lock icon', () => {
