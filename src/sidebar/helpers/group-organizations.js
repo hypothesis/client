@@ -2,6 +2,11 @@ import { immutable } from '../util/immutable';
 
 /**
  * @typedef {import('../../types/api').Group} Group
+ * @typedef {import('../../types/api').Organization} Organization
+ */
+
+/**
+ * @typedef {Organization & { groups: Group[] }} OrganizationWithGroups
  */
 
 // TODO: Update when this is a property available on the API response
@@ -11,7 +16,7 @@ const DEFAULT_ORG_ID = '__default__';
  * Generate consistent object keys for organizations so that they
  * may be sorted
  *
- * @param {object} organization
+ * @param {Organization} organization
  * @return {String}
  */
 function orgKey(organization) {
@@ -26,7 +31,7 @@ function orgKey(organization) {
  * groups Array.
  *
  * @param {Group} group
- * @param {object} organization
+ * @param {OrganizationWithGroups} organization
  * @return undefined - organization is mutated in place
  */
 function addGroup(group, organization) {
@@ -45,11 +50,12 @@ function addGroup(group, organization) {
  * Iterate over groups and locate unique organizations. Slot groups into
  * their appropriate "parent" organizations.
  *
- * @param {Array<Group>} groups
- * @return {object} - A collection of all unique organizations, containing
- *                    their groups. Keyed by each org's "orgKey"
+ * @param {Group[]} groups
+ * @return {Record<string, OrganizationWithGroups>} - A collection of all unique
+ *   organizations, containing their groups. Keyed by each org's "orgKey"
  */
 function organizations(groups) {
+  /** @type {Record<string, OrganizationWithGroups>} */
   const orgs = {};
   groups.forEach(group => {
     // Ignore groups with undefined or non-object organizations
@@ -59,8 +65,7 @@ function organizations(groups) {
     const orgId = orgKey(group.organization);
     if (typeof orgs[orgId] === 'undefined') {
       // First time we've seen this org
-      orgs[orgId] = Object.assign({}, group.organization);
-      orgs[orgId].groups = []; // Will hold this org's groups
+      orgs[orgId] = { ...group.organization, groups: [] };
     }
     addGroup(group, orgs[orgId]); // Add the current group to its organization's groups
   });
@@ -80,12 +85,12 @@ function organizations(groups) {
  * in each organization will have a logo property (if available on the
  * organization).
  *
- * @param {Array<Group>} groups
- * @return {Array<object>} - groups sorted by which organization they're in
+ * @param {Group[]} groups
+ * @return {Group[]} - groups sorted by which organization they're in
  */
 export function groupsByOrganization(groups) {
   const orgs = organizations(groups);
-  const defaultOrganizationGroups = [];
+  const defaultOrganizationGroups = /** @type {Group[]} */ ([]);
   const sortedGroups = [];
 
   const sortedOrgKeys = Object.keys(orgs).sort();
