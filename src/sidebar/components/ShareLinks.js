@@ -35,8 +35,10 @@ function ShareLink({ label, iconName, uri }) {
 
 /**
  * A list of share links to social-media platforms.
+ *
+ * @param {ShareLinksProps} props
  */
-function ShareLinks({ shareURI }) {
+export default function ShareLinks({ shareURI }) {
   // This is the double-encoded format needed for other services (the entire
   // URI needs to be encoded because it's used as the value of querystring params)
   const encodedURI = encodeURIComponent(shareURI);
@@ -65,5 +67,3 @@ function ShareLinks({ shareURI }) {
     </ul>
   );
 }
-
-export default ShareLinks;

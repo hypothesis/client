@@ -24,10 +24,9 @@ function StreamView({ api, toastMessenger }) {
 
   /**
    * Fetch annotations from the API and display them in the stream.
-   *
-   * @param {string} query - The user-supplied search query
    */
   const loadAnnotations = useCallback(
+    /** @param {string} query */
     async query => {
       const queryParams = {
         _separate_replies: true,

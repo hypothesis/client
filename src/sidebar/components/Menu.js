@@ -116,6 +116,7 @@ export default function Menu({
   // Toggle menu when user presses toggle button. The menu is shown on mouse
   // press for a more responsive/native feel but also handles a click event for
   // activation via other input methods.
+  /** @param {Event} event */
   const toggleMenu = event => {
     // If the menu was opened on press, don't close it again on the subsequent
     // mouse up ("click") event.
@@ -144,9 +145,11 @@ export default function Menu({
   // are user interactions outside of it (e.g. clicks) in the document
   useElementShouldClose(menuRef, isOpen, closeMenu);
 
+  /** @param {Event} e */
   const stopPropagation = e => e.stopPropagation();
 
   // It should also close if the user presses a key which activates menu items.
+  /** @param {KeyboardEvent} event */
   const handleMenuKeyDown = event => {
     const key = normalizeKeyName(event.key);
     if (key === 'Enter' || key === ' ') {

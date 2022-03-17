@@ -30,6 +30,9 @@ function TutorialInstruction({ commandName, iconName }) {
 
 /**
  * Tutorial for using the sidebar app
+ *
+ * @param {object} props
+ *   @param {import('../../types/config').SidebarSettings} props.settings
  */
 function Tutorial({ settings }) {
   const canCreatePrivateGroups = !isThirdPartyService(settings);

@@ -22,6 +22,7 @@ export function useUserFilterOptions() {
 
   return useMemo(() => {
     // Determine unique users (authors) in annotation collection
+    /** @type {Record<string, string>} */
     const users = {};
     annotations.forEach(annotation => {
       const username_ = username(annotation.user);

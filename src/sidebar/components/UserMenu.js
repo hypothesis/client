@@ -48,6 +48,7 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
   const isNotebookEnabled = store.isFeatureEnabled('notebook_launch');
   const [isOpen, setOpen] = useState(false);
 
+  /** @param {keyof import('../../types/config').Service} feature */
   const serviceSupports = feature => service && !!service[feature];
 
   const isSelectableProfile =
@@ -61,6 +62,8 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
 
   // Temporary access to the Notebook without feature flag:
   // type the key 'n' when user menu is focused/open
+
+  /** @param {KeyboardEvent} event */
   const onKeyDown = event => {
     if (event.key === 'n') {
       onSelectNotebook();

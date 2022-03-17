@@ -110,6 +110,7 @@ export default function MenuItem({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** @param {Event} event */
   const onCloseSubmenu = event => {
     if (onToggleSubmenu) {
       onToggleSubmenu(event);
@@ -120,6 +121,7 @@ export default function MenuItem({
     });
   };
 
+  /** @param {KeyboardEvent} event */
   const onKeyDown = event => {
     switch (normalizeKeyName(event.key)) {
       case 'ArrowRight':

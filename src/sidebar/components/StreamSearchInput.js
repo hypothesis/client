@@ -18,6 +18,7 @@ import SearchInput from './SearchInput';
 function StreamSearchInput({ router }) {
   const store = useStoreProxy();
   const query = store.routeParams().q;
+  /** @param {string} query */
   const setQuery = query => {
     // Re-route the user to `/stream` if they are on `/a/:id` and then set
     // the search query.
