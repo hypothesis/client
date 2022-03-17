@@ -13,7 +13,6 @@ describe('AnnotationEditor', () => {
   let fakeApplyTheme;
   let fakeAnnotationsService;
   let fakeGroup;
-  let fakeMetadata;
   let fakeTagsService;
   let fakeSettings;
   let fakeToastMessenger;
@@ -45,11 +44,6 @@ describe('AnnotationEditor', () => {
       type: 'private',
     };
 
-    fakeMetadata = {
-      isReply: sinon.stub().returns(false),
-      isSaved: sinon.stub().returns(true),
-    };
-
     fakeSettings = {};
     fakeTagsService = {
       store: sinon.stub(),
@@ -69,7 +63,6 @@ describe('AnnotationEditor', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../../store/use-store': { useStoreProxy: () => fakeStore },
-      '../../helpers/annotation-metadata': fakeMetadata,
       '../../helpers/theme': { applyTheme: fakeApplyTheme },
     });
     // `AnnotationLicense` is a presentation-only component and is only used
@@ -302,8 +295,7 @@ describe('AnnotationEditor', () => {
         });
 
         it('does not update privacy default if annotation is a reply', () => {
-          fakeMetadata.isReply.returns(true);
-          const wrapper = createComponent();
+          const wrapper = createComponent({ annotation: fixtures.newReply() });
 
           wrapper.find('AnnotationPublishControl').props().onSetPrivate(false);
 
@@ -325,8 +317,7 @@ describe('AnnotationEditor', () => {
     });
 
     it('removes annotation from store if it is an unsaved annotation', () => {
-      fakeMetadata.isSaved.returns(false);
-      const wrapper = createComponent();
+      const wrapper = createComponent({ annotation: fixtures.newAnnotation() });
 
       wrapper.find('AnnotationPublishControl').props().onCancel();
 
