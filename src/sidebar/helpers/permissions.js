@@ -14,6 +14,7 @@
  * annotation
  */
 
+/** @param {string|null} savedLevel */
 function defaultLevel(savedLevel) {
   switch (savedLevel) {
     case 'private':
@@ -60,6 +61,7 @@ export function sharedPermissions(userid, groupid) {
  * @param {string} userid - User ID of the author
  * @param {string} groupid - ID of the group the annotation is being shared
  * with
+ * @param {string|null} savedLevel
  * @return {Permissions}
  */
 export function defaultPermissions(userid, groupid, savedLevel) {
