@@ -1,29 +1,7 @@
 import * as sessionUtil from '../session';
 
 describe('sidebar/helpers/session', () => {
-  describe('#shouldShowSidebarTutorial', () => {
-    it('shows sidebar tutorial if the settings object has the show_sidebar_tutorial key set', () => {
-      const sessionState = {
-        preferences: {
-          show_sidebar_tutorial: true,
-        },
-      };
-
-      assert.isTrue(sessionUtil.shouldShowSidebarTutorial(sessionState));
-    });
-
-    it('hides sidebar tutorial if the settings object does not have the show_sidebar_tutorial key set', () => {
-      const sessionState = {
-        preferences: {
-          show_sidebar_tutorial: false,
-        },
-      };
-
-      assert.isFalse(sessionUtil.shouldShowSidebarTutorial(sessionState));
-    });
-  });
-
-  describe('#shouldAutoDisplayTutorial', () => {
+  describe('shouldAutoDisplayTutorial', () => {
     [
       {
         // The only "true" state

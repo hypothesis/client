@@ -6,17 +6,6 @@ import { serviceConfig } from '../config/service-config';
  */
 
 /**
- * Returns true if the sidebar tutorial has to be shown to a user for a given session.
- * @deprecated To be removed once preact help/tutorial panel is in place
- */
-export function shouldShowSidebarTutorial(sessionState) {
-  if (sessionState.preferences.show_sidebar_tutorial) {
-    return true;
-  }
-  return false;
-}
-
-/**
  * The following things must all be true for the tutorial component to auto-display
  * on app launch:
  * - The app must be operating within the "sidebar" (i.e. not single-annotation
