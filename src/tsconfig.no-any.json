@@ -28,6 +28,7 @@
     "boot/**/*.js",
     "shared/**/*.js",
     "sidebar/config/*.js",
+    "sidebar/helpers/*.js",
     "sidebar/util/*.js",
     "types/*.d.ts"
   ],
