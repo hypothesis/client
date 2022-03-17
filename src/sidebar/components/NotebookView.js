@@ -56,6 +56,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   // of them: this is a performance safety valve.
   const maxResults = 5000;
 
+  /** @param {Error} error */
   const onLoadError = error => {
     if (error instanceof ResultSizeError) {
       setHasTooManyAnnotationsError(true);
@@ -101,7 +102,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
     }
   }, [loadAnnotationsService, groupId, store]);
 
-  // Pagination-page-changing callback
+  /** @param {number} newPage */
   const onChangePage = newPage => {
     setPaginationPage(newPage);
   };

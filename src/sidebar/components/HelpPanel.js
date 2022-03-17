@@ -74,8 +74,15 @@ function HelpPanel({ auth, session }) {
   const hasAutoDisplayPreference =
     !!store.profile().preferences.show_sidebar_tutorial;
 
+  const subPanelTitles = {
+    tutorial: 'Getting started',
+    versionInfo: 'About this version',
+  };
+
   // The "Tutorial" (getting started) subpanel is the default panel shown
-  const [activeSubPanel, setActiveSubPanel] = useState('tutorial');
+  const [activeSubPanel, setActiveSubPanel] = useState(
+    /** @type {keyof subPanelTitles} */ ('tutorial')
+  );
 
   // Build version details about this session/app
   const versionData = useMemo(() => {
@@ -100,17 +107,17 @@ function HelpPanel({ auth, session }) {
   // create-new-ticket form
   const supportTicketURL = `https://web.hypothes.is/get-help/?sys_info=${versionData.asEncodedURLString()}`;
 
-  const subPanelTitles = {
-    tutorial: 'Getting started',
-    versionInfo: 'About this version',
-  };
-
+  /**
+   * @param {Event} e
+   * @param {keyof subPanelTitles} panelName
+   */
   const openSubPanel = (e, panelName) => {
     e.preventDefault();
     setActiveSubPanel(panelName);
   };
 
   const onActiveChanged = useCallback(
+    /** @param {boolean} active */
     active => {
       if (!active && hasAutoDisplayPreference) {
         // If the tutorial is currently being auto-displayed, update the user

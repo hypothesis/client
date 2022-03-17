@@ -22,13 +22,17 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
   const hasPreviousPage = currentPage > 1;
   const pageNumbers = pageNumberOptions(currentPage, totalPages);
 
-  const changePageTo = (pageNumber, eventTarget) => {
+  /**
+   * @param {number} pageNumber
+   * @param {HTMLElement} element
+   */
+  const changePageTo = (pageNumber, element) => {
     onChangePage(pageNumber);
     // Because changing pagination page doesn't reload the page (as it would
     // in a "traditional" HTML context), the clicked-upon navigation button
     // will awkwardly retain focus unless it is actively removed.
     // TODO: Evaluate this for a11y issues
-    /** @type HTMLElement */ (eventTarget)?.blur();
+    element.blur();
   };
 
   return (
@@ -39,7 +43,12 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
             classes="PaginationPageButton"
             icon="arrow-left"
             title="Go to previous page"
-            onClick={e => changePageTo(currentPage - 1, e.target)}
+            onClick={e =>
+              changePageTo(
+                currentPage - 1,
+                /** @type {HTMLElement} */ (e.target)
+              )
+            }
             variant="dark"
           >
             prev
@@ -57,7 +66,9 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
                 key={`page-${idx}`}
                 title={`Go to page ${page}`}
                 pressed={page === currentPage}
-                onClick={e => changePageTo(page, e.target)}
+                onClick={e =>
+                  changePageTo(page, /** @type {HTMLElement} */ (e.target))
+                }
                 variant="dark"
               >
                 {page.toString()}
@@ -73,7 +84,12 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
             icon="arrow-right"
             iconPosition="right"
             title="Go to next page"
-            onClick={e => changePageTo(currentPage + 1, e.target)}
+            onClick={e =>
+              changePageTo(
+                currentPage + 1,
+                /** @type {HTMLElement} */ (e.target)
+              )
+            }
             variant="dark"
           >
             next

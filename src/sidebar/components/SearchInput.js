@@ -36,6 +36,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
   // The query that the user is currently typing, but may not yet have applied.
   const [pendingQuery, setPendingQuery] = useState(query);
 
+  /** @param {Event} e */
   const onSubmit = e => {
     e.preventDefault();
     if (input.current.value || prevQuery) {

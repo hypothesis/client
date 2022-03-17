@@ -116,6 +116,7 @@ function AnnotationEditor({
   };
 
   // Allow saving of annotation by pressing CMD/CTRL-Enter
+  /** @param {KeyboardEvent} event */
   const onKeyDown = event => {
     const key = normalizeKeyName(event.key);
     if (isEmpty) {

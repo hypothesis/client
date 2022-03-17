@@ -10,7 +10,7 @@ import { applyTheme } from '../helpers/theme';
  * @typedef InlineControlsProps
  * @prop {boolean} isCollapsed
  * @prop {(collapsed: boolean) => any} setCollapsed
- * @prop {object} [linkStyle]
+ * @prop {Record<string, string>} [linkStyle]
  */
 
 /**
@@ -120,12 +120,13 @@ function Excerpt({
   const isCollapsed = inlineControls ? collapsedByInlineControls : collapse;
   const isExpandable = isOverflowing && isCollapsed;
 
-  /** @type {object} */
+  /** @type {Record<string, number>} */
   const contentStyle = {};
   if (contentHeight !== 0) {
     contentStyle['max-height'] = isExpandable ? collapsedHeight : contentHeight;
   }
 
+  /** @param {boolean} collapsed */
   const setCollapsed = collapsed =>
     inlineControls
       ? setCollapsedByInlineControls(collapsed)

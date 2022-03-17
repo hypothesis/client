@@ -1,6 +1,7 @@
 import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useEffect, useRef } from 'preact/hooks';
 
+/** @param {HTMLElement} element */
 function isElementVisible(element) {
   return element.offsetParent !== null;
 }
@@ -10,7 +11,7 @@ function isElementVisible(element) {
  * @prop {string} [className]
  * @prop {(e: KeyboardEvent) => any} [closeMenu] - Callback when the menu is closed via keyboard input
  * @prop {boolean} [visible] - When  true`, sets focus on the first item in the list
- * @prop {object} children - Array of nodes which may contain <MenuItems> or any nodes
+ * @prop {import('preact').ComponentChildren} children - Array of nodes which may contain <MenuItems> or any nodes
  */
 
 /**
@@ -47,6 +48,7 @@ export default function MenuKeyboardNavigation({
     };
   }, [visible]);
 
+  /** @param {KeyboardEvent} event */
   const onKeyDown = event => {
     const menuItems = Array.from(
       /** @type {NodeListOf<HTMLElement>} */

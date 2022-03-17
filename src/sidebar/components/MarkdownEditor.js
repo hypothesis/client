@@ -213,6 +213,8 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
   /**
    * Handles left and right arrow navigation as well as home and end
    * keys so the user may navigate the toolbar without multiple tab stops.
+   *
+   * @param {KeyboardEvent} e
    */
   const handleKeyDown = e => {
     let lowerLimit = 0;
