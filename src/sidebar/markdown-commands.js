@@ -174,6 +174,8 @@ export function toggleSpanStyle(state, prefix, suffix, placeholder) {
 }
 
 /**
+ * Find the nearest line beginning searching backwards from `pos`.
+ *
  * @param {string} str
  * @param {number} pos
  */
@@ -187,6 +189,8 @@ function startOfLine(str, pos) {
 }
 
 /**
+ * Find the nearest line ending searching forwards from `pos`.
+ *
  * @param {string} str
  * @param {number} pos
  */
