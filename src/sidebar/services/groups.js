@@ -36,6 +36,14 @@ function injectOrganizations(groups) {
   });
 }
 
+/**
+ * @param {any} value
+ * @return {value is Promise<unknown>}
+ */
+function isPromise(value) {
+  return typeof value?.then === 'function';
+}
+
 // `expand` parameter for various groups API calls.
 const expandParam = ['organization', 'scopes'];
 
@@ -417,10 +425,14 @@ export class GroupsService {
    * @return {Promise<Group[]>}
    */
   async load() {
-    if (this._serviceConfig?.groups) {
+    // The `groups` property may be a list of group IDs or a promise for one,
+    // if we're in the LMS app and the group list is being fetched asynchronously.
+    const groupIdsOrPromise = this._serviceConfig?.groups;
+
+    if (Array.isArray(groupIdsOrPromise) || isPromise(groupIdsOrPromise)) {
       let groupIds = [];
       try {
-        groupIds = await this._serviceConfig.groups;
+        groupIds = await groupIdsOrPromise;
       } catch (e) {
         this._toastMessenger.error(
           `Unable to fetch group configuration: ${e.message}`
