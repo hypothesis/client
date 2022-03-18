@@ -1,9 +1,11 @@
+/** @typedef {import('../../types/config').SidebarSettings} SidebarSettings */
+
 import { serviceConfig } from './service-config';
 
 /**
  * Function that returns apiUrl from the settings object.
  *
- * @param {object} settings - The settings object
+ * @param {SidebarSettings} settings - The settings object
  * @returns {string} The apiUrl from the service or the default apiUrl from the settings
  * @throws {Error} If the settings has a service but the service doesn't have an apiUrl
  *

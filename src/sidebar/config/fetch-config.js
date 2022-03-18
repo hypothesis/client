@@ -3,6 +3,7 @@ import { hostPageConfig } from './host-config';
 import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
+ * @typedef {import('../../types/config').ConfigFromHost} ConfigFromHost
  * @typedef {import('../../types/config').ConfigFromSidebar} ConfigFromSidebar
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
@@ -30,8 +31,8 @@ function getAncestorFrame(levels, window_ = window) {
 /**
  * Merge client configuration from h service with config from the hash fragment.
  *
- * @param {object} appConfig - App config settings rendered into `app.html` by the h service.
- * @param {object} hostPageConfig - App configuration specified by the embedding frame.
+ * @param {ConfigFromSidebar} appConfig - App config settings rendered into `app.html` by the h service.
+ * @param {ConfigFromHost} hostPageConfig - App configuration specified by the embedding frame.
  * @return {SidebarSettings} - The merged settings.
  */
 function fetchConfigEmbed(appConfig, hostPageConfig) {
@@ -50,10 +51,10 @@ function fetchConfigEmbed(appConfig, hostPageConfig) {
  * Use this method to retrieve the config asynchronously from a parent
  * frame via RPC. See tests for more details.
  *
- * @param {object} appConfig - Settings rendered into `app.html` by the h service.
+ * @param {ConfigFromSidebar} appConfig - Settings rendered into `app.html` by the h service.
  * @param {Window} parentFrame - Frame to send call to.
  * @param {string} origin - Origin filter for `window.postMessage` call.
- * @return {Promise<object>} - The merged settings.
+ * @return {Promise<SidebarSettings>} - The merged settings.
  */
 async function fetchConfigRpc(appConfig, parentFrame, origin) {
   const remoteConfig = await postMessageJsonRpc.call(
@@ -63,7 +64,10 @@ async function fetchConfigRpc(appConfig, parentFrame, origin) {
     [],
     3000
   );
-  // Closure for the RPC call to scope parentFrame and origin variables.
+  /**
+   * @param {string} method
+   * @param {any[]} args
+   */
   const rpcCall = (method, args = [], timeout = 3000) =>
     postMessageJsonRpc.call(parentFrame, origin, method, args, timeout);
   const sidebarSettings = fetchConfigEmbed(appConfig, remoteConfig);
@@ -81,11 +85,11 @@ async function fetchConfigRpc(appConfig, parentFrame, origin) {
  * fill in the `groups` value(s) later when its ready. This helps speed
  * up the loading process.
  *
- * @param {object} config - The configuration object to mutate. This should
+ * @param {SidebarSettings} config - The configuration object to mutate. This should
  *  already have the `services` value
  * @param {function} rpcCall - RPC method
  *  (method, args, timeout) => Promise
- * @return {Promise<object>} - The mutated settings
+ * @return {Promise<SidebarSettings>} - The mutated settings
  */
 async function fetchGroupsAsync(config, rpcCall) {
   if (Array.isArray(config.services)) {
