@@ -228,7 +228,7 @@ describe('annotator/frame-observer', () => {
       assert.equal(error.message, 'Frame is cross-origin');
     });
 
-    it('returns a callback that stops polling', async () => {
+    it('stops polling when subscription is canceled', async () => {
       const callback = sinon.stub();
       const frame = createFrame(sameOriginURL);
       await waitForEvent(frame, 'load');
@@ -241,6 +241,45 @@ describe('annotator/frame-observer', () => {
       await waitForEvent(frame, 'load');
 
       assert.calledOnce(callback);
+    });
+
+    it('does not start polling if "unload" event is received after subscription is canceled', async () => {
+      const clock = sinon.useFakeTimers();
+      try {
+        const callback = sinon.stub();
+        const frame = createFrame(sameOriginURL);
+        await waitForEvent(frame, 'load');
+
+        const unsubscribe = onDocumentReady(frame, callback);
+        clock.tick();
+        assert.calledOnce(callback);
+
+        const contentWindow = frame.contentWindow;
+        unsubscribe();
+        contentWindow.dispatchEvent(new Event('unload'));
+
+        frame.src = sameOriginURL + '?v2';
+        await waitForEvent(frame, 'load');
+        clock.tick(50); // Wait for any active polling to trigger
+
+        assert.calledOnce(callback);
+      } finally {
+        clock.restore();
+      }
+    });
+
+    it('does not invoke callback if subscription is immediately canceled', async () => {
+      const callback = sinon.stub();
+      const frame = createFrame(sameOriginURL);
+      await waitForEvent(frame, 'load');
+
+      const unsubscribe = onDocumentReady(frame, callback);
+      unsubscribe();
+
+      frame.src = sameOriginURL + '?v2';
+      await waitForEvent(frame, 'load');
+
+      assert.notCalled(callback);
     });
   });
 

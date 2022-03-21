@@ -215,9 +215,12 @@ export function onDocumentReady(frame, callback, { pollInterval = 10 } = {}) {
     pollOnUnload();
   };
 
+  let canceled = false;
   pollForDocumentChange = () => {
     cancelPoll();
-    pollTimer = setInterval(checkForDocumentChange, pollInterval);
+    if (!canceled) {
+      pollTimer = setInterval(checkForDocumentChange, pollInterval);
+    }
   };
 
   // Set up observers for signals that the document either has changed or will
@@ -226,16 +229,20 @@ export function onDocumentReady(frame, callback, { pollInterval = 10 } = {}) {
   //  - Polling after the current document is about to be unloaded. This allows
   //    us to detect the new document quickly, but may not fire in some
   //    situations (exact circumstances unclear, but eg. MDN warns about this).
+  //
+  //    This is set up in the first call to `checkForDocumentChange`.
+  //
   //  - The iframe's "load" event. This is guaranteed to fire but only after the
   //    new document is fully loaded.
-  pollOnUnload();
   frame.addEventListener('load', checkForDocumentChange);
 
   // Notify caller about the current document. This fires asynchronously so that
   // the caller will have received the unsubscribe callback first.
-  setTimeout(() => checkForDocumentChange(), 0);
+  const initialCheckTimer = setTimeout(checkForDocumentChange, 0);
 
   return () => {
+    canceled = true;
+    clearTimeout(initialCheckTimer);
     cancelPoll();
     frame.removeEventListener('load', checkForDocumentChange);
   };
