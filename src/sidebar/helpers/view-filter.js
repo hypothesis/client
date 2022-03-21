@@ -58,7 +58,8 @@ function normalize(val) {
 class TermFilter {
   /**
    * @param {string} field - Name of field to match
-   * @param {string|number} term - Query term
+   * @param {string|number} term - Query term or value. Most fields use string
+   *   terms, but eg. `since` is parsed into a number first.
    * @param {Checker} checker - Functions for extracting term values from
    *   an annotation and checking whether they match a query term.
    */
