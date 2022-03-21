@@ -1328,9 +1328,9 @@
     tslib "^1.9.3"
 
 "@sentry/cli@^1.71.0":
-  version "1.73.2"
-  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-1.73.2.tgz#968efd44f278a9e0f6755b2749f20b7bbcb289f3"
-  integrity sha512-+pOL6q3IopNrVNFfrw0XEr4SSBLE2WW0qX3TA2Ph4qXxX+8AcgBgf1fck6u8Hf8x2UJORp+LL7O+FpqaiydNsw==
+  version "1.74.2"
+  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-1.74.2.tgz#3821ec2fe1a027c6bb6c802ea3ae4f63a21e2533"
+  integrity sha512-J1P66/4yNN55PMO70+QQXeS87r4O9nYuJqZ29HJCPA/ih57jbMFRw9Wp9XLuO/QtpF8Yl7FvOwya/nImTOVOkA==
   dependencies:
     https-proxy-agent "^5.0.0"
     mkdirp "^0.5.5"
