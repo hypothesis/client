@@ -235,12 +235,13 @@ describe('annotator/frame-observer', () => {
 
       const unsubscribe = onDocumentReady(frame, callback);
       await waitForCall(callback);
+      callback.resetHistory();
 
       unsubscribe();
       frame.src = sameOriginURL + '?v2';
       await waitForEvent(frame, 'load');
 
-      assert.calledOnce(callback);
+      assert.notCalled(callback);
     });
 
     it('does not start polling if "unload" event is received after subscription is canceled', async () => {
@@ -253,6 +254,7 @@ describe('annotator/frame-observer', () => {
         const unsubscribe = onDocumentReady(frame, callback);
         clock.tick();
         assert.calledOnce(callback);
+        callback.resetHistory();
 
         const contentWindow = frame.contentWindow;
         unsubscribe();
@@ -262,7 +264,7 @@ describe('annotator/frame-observer', () => {
         await waitForEvent(frame, 'load');
         clock.tick(50); // Wait for any active polling to trigger
 
-        assert.calledOnce(callback);
+        assert.notCalled(callback);
       } finally {
         clock.restore();
       }
