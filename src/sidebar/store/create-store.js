@@ -132,6 +132,25 @@ function bindSelectors(selectors, getState) {
 }
 
 /**
+ * `Object.assign` wrapper that checks for overwriting properties in debug builds.
+ *
+ * @template T
+ * @template U
+ * @param {T} target
+ * @param {U} source
+ */
+function assignOnce(target, source) {
+  if (process.env.NODE_ENV !== 'production') {
+    for (let key of Object.keys(source)) {
+      if (key in target) {
+        throw new Error(`Cannot add duplicate '${key}' property to object`);
+      }
+    }
+  }
+  return Object.assign(target, source);
+}
+
+/**
  * Create a Redux store from a set of _modules_.
  *
  * Each module defines the logic related to a particular piece of the application
@@ -195,10 +214,11 @@ export function createStore(modules, initArgs = [], middleware = []) {
   const store = redux.createStore(reducer, initialState, enhancer);
 
   // Add action creators as methods to the store.
-  const actionCreators = Object.assign(
-    {},
-    ...modules.map(m => m.actionCreators)
-  );
+  /** @type {Record<string, (...args: any[]) => redux.Action>} */
+  const actionCreators = {};
+  for (let module of modules) {
+    assignOnce(actionCreators, module.actionCreators);
+  }
   const actionMethods = redux.bindActionCreators(
     actionCreators,
     store.dispatch
@@ -213,11 +233,11 @@ export function createStore(modules, initArgs = [], middleware = []) {
       selectors,
       () => store.getState()[namespace]
     );
-    Object.assign(selectorMethods, boundSelectors);
+    assignOnce(selectorMethods, boundSelectors);
 
     if (rootSelectors) {
       const boundRootSelectors = bindSelectors(rootSelectors, store.getState);
-      Object.assign(selectorMethods, boundRootSelectors);
+      assignOnce(selectorMethods, boundRootSelectors);
     }
   }
   Object.assign(store, selectorMethods);

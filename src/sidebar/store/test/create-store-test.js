@@ -273,6 +273,56 @@ describe('createStore', () => {
     assert.deepEqual(store.currentGroup(), group2);
   });
 
+  it('throws if two store modules define the same selector', () => {
+    const moduleA = createStoreModule(
+      {},
+      {
+        namespace: 'a',
+        reducers: {},
+        actionCreators: {},
+        selectors: { testSelector() {} },
+      }
+    );
+    const moduleB = createStoreModule(
+      {},
+      {
+        namespace: 'b',
+        reducers: {},
+        actionCreators: {},
+        selectors: { testSelector() {} },
+      }
+    );
+    assert.throws(
+      () => createStore([moduleA, moduleB]),
+      "Cannot add duplicate 'testSelector' property to object"
+    );
+  });
+
+  it('throws if two store modules define the same action', () => {
+    const moduleA = createStoreModule(
+      {},
+      {
+        namespace: 'a',
+        reducers: {},
+        actionCreators: { testAction() {} },
+        selectors: {},
+      }
+    );
+    const moduleB = createStoreModule(
+      {},
+      {
+        namespace: 'b',
+        reducers: {},
+        actionCreators: { testAction() {} },
+        selectors: {},
+      }
+    );
+    assert.throws(
+      () => createStore([moduleA, moduleB]),
+      "Cannot add duplicate 'testAction' property to object"
+    );
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     it('freezes store state in development builds', () => {
       const store = counterStore();
