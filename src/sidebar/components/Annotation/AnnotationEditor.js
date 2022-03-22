@@ -57,19 +57,21 @@ function AnnotationEditor({
   const isEmpty = !text && !tags.length;
 
   const onEditTags = useCallback(
+    /** @param {string[]} tags */
     tags => {
       store.createDraft(draft.annotation, { ...draft, tags });
     },
     [draft, store]
   );
 
-  /**
-   * Verify `newTag` has content and is not a duplicate; add the tag
-   *
-   * @param {string} newTag
-   * @return {boolean} - `true` if tag is added
-   */
   const onAddTag = useCallback(
+    /**
+     * Verify `newTag` has content and is not a duplicate; add the tag
+     *
+     * @param {string} newTag
+     * @return {boolean} Tag was added to the draft's tags; `false` if duplicate
+     *   or empty
+     */
     newTag => {
       if (!newTag || tags.indexOf(newTag) >= 0) {
         // don't add empty or duplicate tags
@@ -84,13 +86,13 @@ function AnnotationEditor({
     [onEditTags, tags, tagsService]
   );
 
-  /**
-   * Remove a tag from the annotation.
-   *
-   * @param {string} tag
-   * @return {boolean} - `true` if tag extant and removed
-   */
   const onRemoveTag = useCallback(
+    /**
+     * Remove tag from draft if present.
+     *
+     * @param {string} tag
+     * @return {boolean} Tag removed from draft
+     */
     tag => {
       const newTagList = [...tags]; // make a copy
       const index = newTagList.indexOf(tag);
@@ -115,6 +117,7 @@ function AnnotationEditor({
    * @param {boolean} isPrivate
    */
   const onSetPrivate = useCallback(
+    /** @param {boolean} isPrivate */
     isPrivate => {
       store.createDraft(annotation, {
         ...draft,
