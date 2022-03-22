@@ -5,8 +5,6 @@ import thunk from 'redux-thunk';
 
 import { immutable } from '../util/immutable';
 
-import { createReducer, bindSelectors } from './util';
-
 /**
  * Helper that strips the first argument from a function type.
  *
@@ -84,6 +82,56 @@ import { createReducer, bindSelectors } from './util';
  */
 
 /**
+ * Create a Redux reducer from a store module's reducer map.
+ *
+ * @template State
+ * @param {Record<string, (s: State, a: redux.Action) => Partial<State>>} reducers -
+ *   Map of reducers from a store module.
+ */
+function createReducer(reducers) {
+  /** @param {redux.Action} action */
+  return (state = /** @type {State} */ ({}), action) => {
+    const reducer = reducers[action.type];
+    if (!reducer) {
+      return state;
+    }
+    const stateChanges = reducer(state, action);
+
+    // Some modules return an array rather than an object. They need to be
+    // handled differently so we don't convert them to an object.
+    if (Array.isArray(stateChanges)) {
+      return stateChanges;
+    }
+
+    return {
+      ...state,
+      ...stateChanges,
+    };
+  };
+}
+
+/**
+ * Convert a map of selector functions, which take a state value as their
+ * first argument, to a map of selector methods, which pre-fill the first
+ * argument by calling `getState()`.
+ *
+ * @template State
+ * @template {SelectorMap<State>} Selectors
+ * @param {Selectors} selectors
+ * @param {() => State} getState
+ * @return {SelectorMethods<Selectors>}
+ */
+function bindSelectors(selectors, getState) {
+  /** @type {Record<string, Function>} */
+  const boundSelectors = {};
+  for (let [name, selector] of Object.entries(selectors)) {
+    boundSelectors[name] = /** @param {any[]} args */ (...args) =>
+      selector(getState(), ...args);
+  }
+  return /** @type {SelectorMethods<Selectors>} */ (boundSelectors);
+}
+
+/**
  * Create a Redux store from a set of _modules_.
  *
  * Each module defines the logic related to a particular piece of the application
@@ -113,37 +161,17 @@ import { createReducer, bindSelectors } from './util';
  * @return Store<any,any,any>
  */
 export function createStore(modules, initArgs = [], middleware = []) {
-  // Create the initial state and state update function.
-
-  // Namespaced objects for initial states.
+  /** @type {Record<string, unknown>} */
   const initialState = {};
+  for (let module of modules) {
+    initialState[module.namespace] = module.initialState(...initArgs);
+  }
 
-  /**
-   * Namespaced reducers from each module.
-   * @type {import("redux").ReducersMapObject} allReducers
-   */
+  /** @type {redux.ReducersMapObject} */
   const allReducers = {};
-  // Namespaced selectors from each module.
-  const allSelectors = {};
-
-  // Iterate over each module and prep each module's:
-  //    1. state
-  //    2. reducers
-  //    3. selectors
-  //
-  modules.forEach(module => {
-    if (module.namespace) {
-      initialState[module.namespace] = module.initialState(...initArgs);
-
-      allReducers[module.namespace] = createReducer(module.reducers);
-      allSelectors[module.namespace] = {
-        selectors: module.selectors,
-        rootSelectors: module.rootSelectors || {},
-      };
-    } else {
-      console.warn('Store module does not specify a namespace', module);
-    }
-  });
+  for (let module of modules) {
+    allReducers[module.namespace] = createReducer(module.reducers);
+  }
 
   const defaultMiddleware = [
     // The `thunk` middleware handles actions which are functions.
@@ -154,7 +182,7 @@ export function createStore(modules, initArgs = [], middleware = []) {
 
   const enhancer = redux.applyMiddleware(...defaultMiddleware, ...middleware);
 
-  // Create the combined reducer from the reducers for each module.
+  // Combine the reducers for all modules
   let reducer = redux.combineReducers(allReducers);
 
   // In debug builds, freeze the new state after each action to catch any attempts
@@ -164,15 +192,35 @@ export function createStore(modules, initArgs = [], middleware = []) {
     reducer = (state, action) => immutable(originalReducer(state, action));
   }
 
-  // Create the store.
   const store = redux.createStore(reducer, initialState, enhancer);
 
-  // Add actions and selectors as methods to the store.
-  const actions = Object.assign({}, ...modules.map(m => m.actionCreators));
-  const boundActions = redux.bindActionCreators(actions, store.dispatch);
-  const boundSelectors = bindSelectors(allSelectors, store.getState);
+  // Add action creators as methods to the store.
+  const actionCreators = Object.assign(
+    {},
+    ...modules.map(m => m.actionCreators)
+  );
+  const actionMethods = redux.bindActionCreators(
+    actionCreators,
+    store.dispatch
+  );
+  Object.assign(store, actionMethods);
 
-  Object.assign(store, boundActions, boundSelectors);
+  // Add selectors as methods to the store.
+  const selectorMethods = {};
+  for (let module of modules) {
+    const { namespace, selectors, rootSelectors } = module;
+    const boundSelectors = bindSelectors(
+      selectors,
+      () => store.getState()[namespace]
+    );
+    Object.assign(selectorMethods, boundSelectors);
+
+    if (rootSelectors) {
+      const boundRootSelectors = bindSelectors(rootSelectors, store.getState);
+      Object.assign(selectorMethods, boundRootSelectors);
+    }
+  }
+  Object.assign(store, selectorMethods);
 
   return store;
 }
@@ -192,9 +240,6 @@ export function makeAction(reducers, type, payload) {
   // nb. `reducers` is not used here. It exists purely for type inference.
   return { type, ...payload };
 }
-
-// The properties of the `config` argument to `createStoreModule` below are
-// declared inline due to https://github.com/microsoft/TypeScript/issues/43403.
 
 /**
  * Create a store module that can be passed to `createStore`.
