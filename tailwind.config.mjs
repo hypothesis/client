@@ -75,6 +75,13 @@ export default {
         'px-tiny': ['10px'],
         'px-base': ['16px'],
       },
+      gradientColorStops: {
+        // These gradient stops define a custom gradient shown at the bottom of
+        // long annotation body excerpts.
+        excerptStop1: 'rgba(255, 255, 255, 0) 50%',
+        excerptStop2: 'rgba(0, 0, 0, 0.08) 95%',
+        excerptStop3: 'rgba(0, 0, 0, 0.13) 100%',
+      },
       keyframes: {
         adderPopDown: {
           '0%': {
