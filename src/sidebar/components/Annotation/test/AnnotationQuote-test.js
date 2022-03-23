@@ -6,15 +6,14 @@ import { mockImportedComponents } from '../../../../test-util/mock-imported-comp
 import AnnotationQuote, { $imports } from '../AnnotationQuote';
 
 describe('AnnotationQuote', () => {
-  let fakeAnnotation;
-  let fakeIsOrphan;
-  let fakeQuote;
+  let fakeApplyTheme;
 
   function createQuote(props) {
     return mount(
       <AnnotationQuote
-        annotation={fakeAnnotation}
+        quote={'test quote'}
         isFocused={false}
+        isOrphan={false}
         settings={{}}
         {...props}
       />
@@ -22,18 +21,12 @@ describe('AnnotationQuote', () => {
   }
 
   beforeEach(() => {
-    fakeAnnotation = {
-      target: [],
-    };
-
-    fakeQuote = sinon.stub().returns('test quote');
-    fakeIsOrphan = sinon.stub();
+    fakeApplyTheme = sinon.stub().returns({});
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../../helpers/annotation-metadata': {
-        quote: fakeQuote,
-        isOrphan: fakeIsOrphan,
+      '../../helpers/theme': {
+        applyTheme: fakeApplyTheme,
       },
     });
   });
@@ -46,6 +39,18 @@ describe('AnnotationQuote', () => {
     const wrapper = createQuote();
     const quote = wrapper.find('blockquote');
     assert.equal(quote.text(), 'test quote');
+  });
+
+  it('applies selectionFontFamily styling from settings', () => {
+    fakeApplyTheme
+      .withArgs(sinon.match.array.deepEquals(['selectionFontFamily']))
+      .returns({ fontFamily: 'monospace' });
+
+    const wrapper = createQuote();
+
+    const quote = wrapper.find('blockquote');
+
+    assert.equal(quote.getDOMNode().style.fontFamily, 'monospace');
   });
 
   it(
