@@ -2,7 +2,7 @@ import { Actions } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { useStoreProxy } from '../../store/use-store';
-import { isSaved, quote } from '../../helpers/annotation-metadata';
+import { isOrphan, isSaved, quote } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 
 import AnnotationActionBar from './AnnotationActionBar';
@@ -83,7 +83,11 @@ function Annotation({
           />
 
           {hasQuote && (
-            <AnnotationQuote annotation={annotation} isFocused={isFocused} />
+            <AnnotationQuote
+              quote={quote(annotation)}
+              isFocused={isFocused}
+              isOrphan={isOrphan(annotation)}
+            />
           )}
 
           {!isCollapsedReply && !isEditing && (

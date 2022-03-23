@@ -19,22 +19,6 @@
   }
 }
 
-// Represent quoted text, as in an excerpt, with a hover or focused state.
-.p-quoted-text {
-  border-left: 3px solid var.$color-border;
-  color: var.$color-text--light;
-  font-style: italic;
-  padding: 0 var.$layout-space;
-
-  // Prevent long URLs etc. in quote causing overflow
-  overflow-wrap: break-word;
-
-  &.is-focused,
-  &:hover {
-    border-left: var.$color-quote 3px solid;
-  }
-}
-
 // A pattern for displaying redacted (moderated) text content
 .p-redacted-content {
   text-decoration: line-through;

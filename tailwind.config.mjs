@@ -39,6 +39,9 @@ export default {
         'color-text': {
           inverted: '#f2f2f2',
         },
+        blue: {
+          quote: '#58cef4',
+        },
       },
       fontFamily: {
         mono: ['"Open Sans Mono"', 'Menlo', '"DejaVu Sans Mono"', 'monospace'],

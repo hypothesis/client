@@ -1,6 +1,5 @@
 import classnames from 'classnames';
 
-import { isOrphan, quote } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
 
@@ -12,18 +11,14 @@ import Excerpt from '../Excerpt';
  */
 
 /**
- * @typedef AnnotationQuoteProps
- * @prop {Annotation} annotation
- * @prop {boolean} [isFocused] - Is this annotation currently focused?
- * @prop {SidebarSettings} [settings] - Used for theming.
- */
-
-/**
- * Display the selected text from the document associated with an annotation.
+ * Style content as quoted text
  *
- * @parm {AnnotationQuoteProps} props
+ * @param {object} props
+ *   @param {import('preact').ComponentChildren} props.children
+ *   @param {string} [props.classes] - Additional CSS classes
+ *   @param {object} [props.style] - Inline style object
  */
-function AnnotationQuote({ annotation, isFocused, settings = {} }) {
+function QuotedText({ children, classes, style }) {
   // The language for the quote may be different than the client's UI (set by
   // `<html lang="...">`).
   //
@@ -35,29 +30,47 @@ function AnnotationQuote({ annotation, isFocused, settings = {} }) {
   const documentLanguage = '';
 
   return (
-    <div
-      className={classnames({
-        'is-orphan': isOrphan(annotation),
-      })}
+    <blockquote
+      className={classnames(
+        'border-l-[3px] border-grey-3 hover:border-l-blue-quote',
+        'italic text-color-text-light px-[1em]',
+        classes
+      )}
+      dir="auto"
+      lang={documentLanguage}
+      style={style}
     >
-      <Excerpt
-        collapsedHeight={35}
-        inlineControls={true}
-        overflowThreshold={20}
+      {children}
+    </blockquote>
+  );
+}
+
+/**
+ * @typedef AnnotationQuoteProps
+ * @prop {string} quote
+ * @prop {boolean} [isFocused] - Is this annotation currently focused?
+ * @prop {boolean} [isOrphan]
+ * @prop {SidebarSettings} [settings] - Used for theming.
+ */
+
+/**
+ * Display the selected text from the document associated with an annotation.
+ *
+ * @parm {AnnotationQuoteProps} props
+ */
+function AnnotationQuote({ quote, isFocused, isOrphan, settings = {} }) {
+  return (
+    <Excerpt collapsedHeight={35} inlineControls={true} overflowThreshold={20}>
+      <QuotedText
+        classes={classnames({
+          'border-l-blue-quote': isFocused,
+          'line-through grayscale contrast-50': isOrphan,
+        })}
+        style={applyTheme(['selectionFontFamily'], settings)}
       >
-        <blockquote
-          className={classnames('p-quoted-text', {
-            'is-focused': isFocused,
-            'p-redacted-content': isOrphan(annotation),
-          })}
-          dir="auto"
-          lang={documentLanguage}
-          style={applyTheme(['selectionFontFamily'], settings)}
-        >
-          {quote(annotation)}
-        </blockquote>
-      </Excerpt>
-    </div>
+        {quote}
+      </QuotedText>
+    </Excerpt>
   );
 }
 
