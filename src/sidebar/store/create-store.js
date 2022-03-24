@@ -85,8 +85,7 @@ import { immutable } from '../util/immutable';
  * Create a Redux reducer from a store module's reducer map.
  *
  * @template State
- * @param {Record<string, (s: State, a: redux.Action) => Partial<State>>} reducers -
- *   Map of reducers from a store module.
+ * @param {ReducerMap<State>} reducers
  */
 function createReducer(reducers) {
   /** @param {redux.Action} action */
