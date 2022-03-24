@@ -17,30 +17,7 @@ import { sidebarPanelsModule } from './modules/sidebar-panels';
 import { toastMessagesModule } from './modules/toast-messages';
 import { viewerModule } from './modules/viewer';
 
-/**
- * @template M
- * @typedef {import('./create-store').StoreFromModule<M>} StoreFromModule
- */
-
-/**
- * @typedef {StoreFromModule<activityModule> &
- *   StoreFromModule<annotationsModule> &
- *   StoreFromModule<defaultsModule> &
- *   StoreFromModule<directLinkedModule> &
- *   StoreFromModule<draftsModule> &
- *   StoreFromModule<filtersModule> &
- *   StoreFromModule<framesModule> &
- *   StoreFromModule<groupsModule> &
- *   StoreFromModule<linksModule> &
- *   StoreFromModule<realTimeUpdatesModule> &
- *   StoreFromModule<routeModule> &
- *   StoreFromModule<selectionModule> &
- *   StoreFromModule<sessionModule> &
- *   StoreFromModule<sidebarPanelsModule> &
- *   StoreFromModule<toastMessagesModule> &
- *   StoreFromModule<viewerModule>
- *  } SidebarStore
- */
+/** @typedef {ReturnType<createSidebarStore>} SidebarStore */
 
 /**
  * Create the central state store for the sidebar application.
@@ -52,13 +29,14 @@ import { viewerModule } from './modules/viewer';
  * [1] https://redux.js.org
  *
  * @param {import('../../types/config').SidebarSettings} settings
- * @return {SidebarStore}
  * @inject
  */
 export function createSidebarStore(settings) {
   const middleware = [debugMiddleware];
 
-  const modules = [
+  // `const` type gives `modules` a tuple type, which allows `createStore`
+  // to infer properties (eg. action and selector methods) of returned store.
+  const modules = /** @type {const} */ ([
     activityModule,
     annotationsModule,
     defaultsModule,
@@ -75,8 +53,6 @@ export function createSidebarStore(settings) {
     sidebarPanelsModule,
     toastMessagesModule,
     viewerModule,
-  ];
-  return /** @type {SidebarStore} */ (
-    createStore(modules, [settings], middleware)
-  );
+  ]);
+  return createStore(modules, [settings], middleware);
 }
