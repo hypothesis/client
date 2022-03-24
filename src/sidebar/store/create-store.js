@@ -58,16 +58,6 @@ import { createReducer, bindSelectors } from './util';
  */
 
 /**
- * Replace a type `T` with `Fallback` if `T` is `any`.
- *
- * Based on https://stackoverflow.com/a/61626123/434243.
- *
- * @template T
- * @template Fallback
- * @typedef {0 extends (1 & T) ? Fallback : T} DefaultIfAny
- */
-
-/**
  * Helper for getting the type of store produced by `createStore` when
  * passed a given module.
  *
@@ -77,7 +67,7 @@ import { createReducer, bindSelectors } from './util';
  *
  * @template T
  * @typedef {T extends Module<any, infer Actions, infer Selectors, infer RootSelectors> ?
- *   Store<Actions,Selectors,DefaultIfAny<RootSelectors,{}>> : never} StoreFromModule
+ *   Store<Actions,Selectors,RootSelectors> : never} StoreFromModule
  */
 
 /**
@@ -196,7 +186,7 @@ export function createStore(modules, initArgs = [], middleware = []) {
  * @template State
  * @template Actions
  * @template {SelectorMap<State>} Selectors
- * @template RootSelectors
+ * @template [RootSelectors={}]
  * @param {State | ((...args: any[]) => State)} initialState
  * @param {object} config
  *   @param {string} config.namespace -
