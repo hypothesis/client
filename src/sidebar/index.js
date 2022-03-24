@@ -2,7 +2,7 @@ import { parseJsonConfig } from '../boot/parse-json-config';
 import * as rendererOptions from '../shared/renderer-options';
 
 import { checkEnvironment } from './config/check-env';
-import { fetchConfig } from './config/fetch-config';
+import { buildSettings } from './config/build-settings';
 import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
@@ -11,9 +11,10 @@ import { disableOpenerForExternalLinks } from './util/disable-opener-for-externa
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const appConfig = /** @type {import('../types/config').ConfigFromSidebar} */ (
-  parseJsonConfig(document)
-);
+const configFromSidebar =
+  /** @type {import('../types/config').ConfigFromSidebar} */ (
+    parseJsonConfig(document)
+  );
 
 // Check for known issues which may prevent the client from working.
 //
@@ -21,10 +22,10 @@ const appConfig = /** @type {import('../types/config').ConfigFromSidebar} */ (
 // and continue anyway.
 const envOk = checkEnvironment(window);
 
-if (appConfig.sentry && envOk) {
+if (configFromSidebar.sentry && envOk) {
   // Initialize Sentry. This is required at the top of this file
   // so that it happens early in the app's startup flow
-  sentry.init(appConfig.sentry);
+  sentry.init(configFromSidebar.sentry);
 }
 
 // Prevent tab-jacking.
@@ -140,10 +141,10 @@ import { Injector } from '../shared/injector';
 /**
  * Launch the client application corresponding to the current URL.
  *
- * @param {object} config
+ * @param {import('../types/config').SidebarSettings} settings
  * @param {HTMLElement} appEl - Root HTML container for the app
  */
-function startApp(config, appEl) {
+function startApp(settings, appEl) {
   const container = new Injector();
 
   // Register services.
@@ -175,7 +176,7 @@ function startApp(config, appEl) {
   // that use them, since they don't depend on instances of other services.
   container
     .register('$window', { value: window })
-    .register('settings', { value: config });
+    .register('settings', { value: settings });
 
   // Initialize services.
   container.run(initServices);
@@ -214,8 +215,8 @@ const appEl = /** @type {HTMLElement} */ (
 // Start capturing RPC requests before we start the RPC server (startRPCServer)
 preStartRPCServer();
 
-fetchConfig(appConfig)
-  .then(config => {
-    startApp(config, appEl);
+buildSettings(configFromSidebar)
+  .then(settings => {
+    startApp(settings, appEl);
   })
   .catch(err => reportLaunchError(err, appEl));
