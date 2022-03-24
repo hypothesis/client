@@ -88,11 +88,19 @@
  */
 
 /**
+ * RPC settings derived from `ConfigFromHost['requestConfigFromFrame']`
+ *
+ * @typedef RPCSettings
+ * @prop {Window} targetFrame
+ * @prop {RequestConfigFromFrameOptions['origin']} origin
+ */
+
+/**
  * The `settings` object used in the sidebar app that is a result of merging
  * (filtered and validated) configuration from the host page with configuration
  * from h / the browser extension.
  *
- * @typedef {ConfigFromHost & ConfigFromSidebar} SidebarSettings
+ * @typedef {ConfigFromHost & ConfigFromSidebar & { rpc?: RPCSettings }} SidebarSettings
  */
 
 // Make TypeScript treat this file as a module.

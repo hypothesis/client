@@ -41,11 +41,8 @@ describe('sidebar/config/build-settings', () => {
 
   describe('config/build-settings', () => {
     context('direct embed', () => {
-      // no `requestConfigFromFrame` variable
-      //
-      // Combine the settings rendered into the sidebar's HTML page
-      // by h with the settings from `window.hypothesisConfig` in the parent
-      // window.
+      // no `requestConfigFromFrame` (RPC configuration) property on
+      // ConfigFromHost derived from iframe src URL hash
       it('adds the apiUrl to the merged settings object', async () => {
         const sidebarSettings = await buildSettings({});
         assert.deepEqual(sidebarSettings, { apiUrl: fakeApiUrl() });
@@ -56,11 +53,11 @@ describe('sidebar/config/build-settings', () => {
         assert.notCalled(fakeJsonRpc.call);
       });
 
-      it('merges the hostPageConfig onto appConfig and returns the result', async () => {
-        // hostPageConfig shall take precedent over appConfig
-        const appConfig = { foo: 'bar', appType: 'via' };
+      it('merges the hostPageConfig onto configFromSidebar and returns the result', async () => {
+        // ConfigFromHost has precedence over ConfigFromSidebar
+        const configFromSidebar = { foo: 'bar', appType: 'via' };
         fakeHostPageConfig.returns({ foo: 'baz' });
-        const sidebarSettings = await buildSettings(appConfig);
+        const sidebarSettings = await buildSettings(configFromSidebar);
         assert.deepEqual(sidebarSettings, {
           foo: 'baz',
           appType: 'via',
@@ -126,41 +123,61 @@ describe('sidebar/config/build-settings', () => {
         );
       });
 
-      it('creates merged settings when the RPC requests returns the host config', async () => {
-        const appConfig = { foo: 'bar', appType: 'via' };
+      it('adds RPC settings to resulting SidebarSettings', async () => {
         fakeJsonRpc.call.resolves({ foo: 'baz' }); // host config
-        const result = await buildSettings(appConfig, fakeWindow);
+
+        const result = await buildSettings({}, fakeWindow);
+
+        assert.deepEqual(result.rpc, {
+          origin: 'https://embedder.com',
+          targetFrame: fakeTopWindow,
+        });
+      });
+
+      it('merges ConfigFromHost returned from RPC with ConfigFromSidebar', async () => {
+        const configFromSidebar = { foo: 'bar', appType: 'via' };
+        fakeJsonRpc.call.resolves({ foo: 'baz' }); // host config
+        const result = await buildSettings(configFromSidebar, fakeWindow);
         assert.deepEqual(result, {
           foo: 'baz',
           appType: 'via',
           apiUrl: fakeApiUrl(),
+          rpc: {
+            origin: 'https://embedder.com',
+            targetFrame: fakeTopWindow,
+          },
         });
       });
 
-      it('rejects if fetching host config fails` ', async () => {
+      it('rejects if RPC request for ConfigFromHost fails', async () => {
         fakeJsonRpc.call.rejects(new Error('Nope'));
-        const appConfig = { foo: 'bar', appType: 'via' };
-        await assert.rejects(buildSettings(appConfig, fakeWindow), 'Nope');
+        const configFromSidebar = { foo: 'bar', appType: 'via' };
+        await assert.rejects(
+          buildSettings(configFromSidebar, fakeWindow),
+          'Nope'
+        );
       });
 
       it('returns the `groups` array with the initial host config request', async () => {
-        const appConfig = {
+        const configFromSidebar = {
           services: [{ groups: ['group1', 'group2'] }],
           appType: 'via',
         };
         fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
-        const result = await buildSettings(appConfig, fakeWindow);
+        const result = await buildSettings(configFromSidebar, fakeWindow);
         assert.deepEqual(result.services[0].groups, ['group1', 'group2']);
       });
 
       it("creates merged settings where `groups` is a promise when its initial value is '$rpc:requestGroups'", async () => {
-        const appConfig = {
-          services: [{ groups: '$rpc:requestGroups' }],
+        const configFromSidebar = {
           appType: 'via',
         };
-        fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
+        fakeJsonRpc.call.onFirstCall().resolves({
+          foo: 'baz',
+          services: [{ groups: '$rpc:requestGroups' }],
+        }); // host config
         fakeJsonRpc.call.onSecondCall().resolves(['group1', 'group2']); // requestGroups
-        const result = await buildSettings(appConfig, fakeWindow);
+        const result = await buildSettings(configFromSidebar, fakeWindow);
         assert.deepEqual(await result.services[0].groups, ['group1', 'group2']);
         assert.isTrue(
           fakeJsonRpc.call.getCall(1).calledWithExactly(
@@ -168,19 +185,21 @@ describe('sidebar/config/build-settings', () => {
             'https://embedder.com',
             'requestGroups',
             [0], // passes service index to requestGroups
-            null // no timeout
+            0 // no timeout
           )
         );
       });
 
       it('throws an error when the RPC call to `requestGroups` fails', async () => {
-        const appConfig = {
-          services: [{ groups: '$rpc:requestGroups' }],
+        const configFromSidebar = {
           appType: 'via',
         };
-        fakeJsonRpc.call.onFirstCall().resolves({ foo: 'baz' }); // host config
+        fakeJsonRpc.call.onFirstCall().resolves({
+          foo: 'baz',
+          services: [{ groups: '$rpc:requestGroups' }],
+        }); // host config
         fakeJsonRpc.call.onSecondCall().rejects(); // requestGroups
-        const result = await buildSettings(appConfig, fakeWindow);
+        const result = await buildSettings(configFromSidebar, fakeWindow);
         await assert.rejects(
           result.services[0].groups,
           'Unable to fetch groups'
@@ -195,16 +214,20 @@ describe('sidebar/config/build-settings', () => {
           },
           group: '1234',
         });
-        const appConfig = { foo: 'bar', appType: 'via' };
+        const configFromSidebar = { foo: 'bar', appType: 'via' };
         fakeJsonRpc.call.resolves({ foo: 'baz' });
 
-        const result = await buildSettings(appConfig, fakeWindow);
+        const result = await buildSettings(configFromSidebar, fakeWindow);
 
         assert.deepEqual(result, {
           foo: 'baz',
           appType: 'via',
           group: '1234',
           apiUrl: fakeApiUrl(),
+          rpc: {
+            origin: 'https://embedder.com',
+            targetFrame: fakeTopWindow,
+          },
         });
       });
     });
