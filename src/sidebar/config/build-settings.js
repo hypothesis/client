@@ -107,17 +107,19 @@ async function fetchGroupsAsync(config, rpcCall) {
 }
 
 /**
- * Fetch the host configuration and merge it with the app configuration from h.
+ * Build a `SidebarSettings` object by merging the provided `ConfigFromSidebar`
+ * with `ConfigFromHost` from an appropriate source.
  *
- * There are 2 ways to get the host config:
- *  Direct embed - From the hash string of the embedder frame.
- *  RPC request to indicated parent frame
+ * `ConfigFromHost` may come from either:
+ *  - The URL hash of the iframe, written by the annotator when creating the
+ *    sidebar's iframe, OR
+ *  - By sending an RPC request for host configuration to a known ancestor frame
  *
  * @param {ConfigFromSidebar} appConfig
  * @param {Window} window_ - Test seam.
  * @return {Promise<SidebarSettings>} - The merged settings.
  */
-export async function fetchConfig(appConfig, window_ = window) {
+export async function buildSettings(appConfig, window_ = window) {
   const hostConfig = hostPageConfig(window);
 
   const requestConfigFromFrame = hostConfig.requestConfigFromFrame;
