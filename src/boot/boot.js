@@ -63,12 +63,16 @@ function injectStylesheet(doc, href) {
 /**
  * @param {Document} doc
  * @param {string} src - The script URL
- * @param {boolean} forceReload - Whether to force re-evaluation of the script,
- *   in case it has been loaded in the same document previously.
+ * @param {object} options
+ *   @param {boolean} [options.esModule] - Whether to load the script as an ES module
+ *   @param {boolean} [options.forceReload] - Whether to force re-evaluation of an ES module script
  */
-function injectScript(doc, src, forceReload = false) {
+function injectScript(doc, src, { esModule = true, forceReload = false } = {}) {
   const script = doc.createElement('script');
-  script.type = 'module';
+
+  if (esModule) {
+    script.type = 'module';
+  }
 
   if (forceReload) {
     // Module scripts are only evaluated once per URL in a document. Adding
@@ -140,24 +144,6 @@ function assetURL(config, path) {
   return config.assetRoot + 'build/' + config.manifest[path];
 }
 
-/**
- * @param {Document} doc
- * @param {SidebarAppConfig|AnnotatorConfig} config
- * @param {string[]} assets
- * @param {object} options
- *   @param {boolean} [options.forceModuleReload]
- */
-function injectAssets(doc, config, assets, { forceModuleReload } = {}) {
-  assets.forEach(path => {
-    const url = assetURL(config, path);
-    if (url.match(/\.css/)) {
-      injectStylesheet(doc, url);
-    } else {
-      injectScript(doc, url, forceModuleReload);
-    }
-  });
-}
-
 /** @param {PolyfillSet[]} needed */
 function polyfillBundles(needed) {
   return requiredPolyfillSets(needed).map(
@@ -203,30 +189,23 @@ export function bootHypothesisClient(doc, config) {
   );
 
   const polyfills = polyfillBundles(commonPolyfills);
+  const scripts = [...polyfills, 'scripts/annotator.bundle.js'];
+  for (let path of scripts) {
+    const url = assetURL(config, path);
+    injectScript(doc, url, { esModule: false });
+  }
 
-  // Override styling in certain document viewers.
-  const viewerStyles = [];
+  const styles = [];
   if (
     /** @type {MaybePDFWindow} */ (window).PDFViewerApplication !== undefined
   ) {
-    viewerStyles.push('styles/pdfjs-overrides.css');
+    styles.push('styles/pdfjs-overrides.css');
   }
-
-  injectAssets(
-    doc,
-    config,
-    [
-      ...polyfills,
-      ...viewerStyles,
-
-      'scripts/annotator.bundle.js',
-      'styles/highlights.css',
-    ],
-
-    // Force re-evaluation of JS module scripts, so that the annotator entry
-    // point code gets re-run if the client is unloaded and later re-loaded.
-    { forceModuleReload: true }
-  );
+  styles.push('styles/highlights.css');
+  for (let path of styles) {
+    const url = assetURL(config, path);
+    injectStylesheet(doc, url);
+  }
 }
 
 /**
@@ -242,12 +221,15 @@ export function bootSidebarApp(doc, config) {
 
   const polyfills = polyfillBundles(commonPolyfills);
 
-  injectAssets(doc, config, [
-    ...polyfills,
+  const scripts = [...polyfills, 'scripts/sidebar.bundle.js'];
+  for (let path of scripts) {
+    const url = assetURL(config, path);
+    injectScript(doc, url, { esModule: true });
+  }
 
-    'scripts/sidebar.bundle.js',
-
-    'styles/katex.min.css',
-    'styles/sidebar.css',
-  ]);
+  const styles = ['styles/katex.min.css', 'styles/sidebar.css'];
+  for (let path of styles) {
+    const url = assetURL(config, path);
+    injectStylesheet(doc, url);
+  }
 }

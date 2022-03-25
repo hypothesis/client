@@ -1,6 +1,6 @@
 import { bootHypothesisClient, bootSidebarApp, $imports } from '../boot';
 
-function assetUrl(url) {
+function assetURL(url) {
   return `https://marginal.ly/client/build/${url}`;
 }
 
@@ -74,16 +74,16 @@ describe('bootstrap', () => {
     const scripts = Array.from(
       doc_.querySelectorAll('script[data-hypothesis-asset]')
     ).map(el => {
-      return el.src;
+      return { src: el.src, type: el.type === 'module' ? 'module' : 'script' };
     });
 
     const styles = Array.from(
       doc_.querySelectorAll('link[rel="stylesheet"][data-hypothesis-asset]')
     ).map(el => {
-      return el.href;
+      return { src: el.href, type: 'stylesheet' };
     });
 
-    return scripts.concat(styles).sort();
+    return scripts.concat(styles).sort((a, b) => a.src.localeCompare(b.src));
   }
 
   describe('bootHypothesisClient', () => {
@@ -102,9 +102,9 @@ describe('bootstrap', () => {
 
       runBoot('annotator');
       const expectedAssets = [
-        'scripts/annotator.bundle.1234.js#ts=123',
-        'styles/highlights.1234.css',
-      ].map(assetUrl);
+        { src: assetURL('scripts/annotator.bundle.1234.js'), type: 'script' },
+        { src: assetURL('styles/highlights.1234.css'), type: 'stylesheet' },
+      ];
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
     });
@@ -116,10 +116,13 @@ describe('bootstrap', () => {
       try {
         runBoot('annotator');
         const expectedAssets = [
-          'scripts/annotator.bundle.1234.js#ts=123',
-          'styles/highlights.1234.css',
-          'styles/pdfjs-overrides.1234.css',
-        ].map(assetUrl);
+          { src: assetURL('scripts/annotator.bundle.1234.js'), type: 'script' },
+          { src: assetURL('styles/highlights.1234.css'), type: 'stylesheet' },
+          {
+            src: assetURL('styles/pdfjs-overrides.1234.css'),
+            type: 'stylesheet',
+          },
+        ];
 
         assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
       } finally {
@@ -174,11 +177,14 @@ describe('bootstrap', () => {
       runBoot('annotator');
 
       const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
-        a.match(/polyfills/)
+        a.src.match(/polyfills/)
       );
       assert.called(fakePolyfills.requiredPolyfillSets);
       assert.deepEqual(polyfillsLoaded, [
-        assetUrl('scripts/polyfills-es2017.bundle.1234.js#ts=0'),
+        {
+          src: assetURL('scripts/polyfills-es2017.bundle.1234.js'),
+          type: 'script',
+        },
       ]);
     });
   });
@@ -187,10 +193,10 @@ describe('bootstrap', () => {
     it('loads assets for the sidebar application', () => {
       runBoot('sidebar');
       const expectedAssets = [
-        'scripts/sidebar.bundle.1234.js',
-        'styles/katex.min.1234.css',
-        'styles/sidebar.1234.css',
-      ].map(assetUrl);
+        { src: assetURL('scripts/sidebar.bundle.1234.js'), type: 'module' },
+        { src: assetURL('styles/katex.min.1234.css'), type: 'stylesheet' },
+        { src: assetURL('styles/sidebar.1234.css'), type: 'stylesheet' },
+      ];
 
       assert.deepEqual(findAssets(iframe.contentDocument), expectedAssets);
     });
@@ -222,11 +228,14 @@ describe('bootstrap', () => {
       runBoot('sidebar');
 
       const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
-        a.match(/polyfills/)
+        a.src.match(/polyfills/)
       );
       assert.called(fakePolyfills.requiredPolyfillSets);
       assert.deepEqual(polyfillsLoaded, [
-        assetUrl('scripts/polyfills-es2017.bundle.1234.js'),
+        {
+          src: assetURL('scripts/polyfills-es2017.bundle.1234.js'),
+          type: 'module',
+        },
       ]);
     });
   });

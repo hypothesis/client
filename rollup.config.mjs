@@ -38,7 +38,7 @@ if (isProd) {
   );
 }
 
-function bundleConfig({ name, entry }) {
+function bundleConfig({ name, entry, format = 'es' }) {
   return {
     input: {
       [name]: entry,
@@ -47,6 +47,7 @@ function bundleConfig({ name, entry }) {
       dir: 'build/scripts/',
       chunkFileNames: `${name}-[name].bundle.js`,
       entryFileNames: '[name].bundle.js',
+      format,
       sourcemap: true,
 
       // Rewrite source paths from "../../src/path/to/module.js" to
@@ -97,7 +98,20 @@ function bundleConfig({ name, entry }) {
 }
 
 export default [
-  bundleConfig({ name: 'annotator', entry: 'src/annotator/index.js' }),
+  bundleConfig({
+    name: 'annotator',
+    entry: 'src/annotator/index.js',
+
+    // The annotator bundle is created as a non-module script because module
+    // scripts are not supported in Safari in XHTML documents.
+    // See https://github.com/hypothesis/client/issues/4350#issuecomment-1079101754.
+    //
+    // Non-module scripts also re-evaluate if they are added to the page multiple
+    // times, which is important if the client is unloaded and then re-loaded
+    // into a page, although that is possible to work around with a module script
+    // by changing the URL fragment each time.
+    format: 'iife',
+  }),
   bundleConfig({ name: 'sidebar', entry: 'src/sidebar/index.js' }),
   bundleConfig({
     name: 'ui-playground',
