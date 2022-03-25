@@ -11,6 +11,7 @@ describe('AnnotationHeader', () => {
   let fakeAccountId;
   let fakeAnnotationDisplayName;
   let fakeDomainAndTitle;
+  let fakeGroup;
   let fakeIsHighlight;
   let fakeIsReply;
   let fakeHasBeenEdited;
@@ -33,6 +34,13 @@ describe('AnnotationHeader', () => {
 
   beforeEach(() => {
     fakeDomainAndTitle = sinon.stub().returns({});
+    fakeGroup = {
+      name: 'My Group',
+      links: {
+        html: 'https://www.example.com',
+      },
+      type: 'private',
+    };
     fakeIsHighlight = sinon.stub().returns(false);
     fakeIsReply = sinon.stub().returns(false);
     fakeHasBeenEdited = sinon.stub().returns(false);
@@ -49,6 +57,7 @@ describe('AnnotationHeader', () => {
 
     fakeStore = {
       defaultAuthority: sinon.stub().returns('foo.com'),
+      getGroup: sinon.stub().returns(fakeGroup),
       getLink: sinon.stub().returns('http://example.com'),
       isFeatureEnabled: sinon.stub().returns(false),
       route: sinon.stub().returns('sidebar'),
@@ -282,14 +291,21 @@ describe('AnnotationHeader', () => {
   });
 
   describe('extended header information', () => {
+    it('should render extended header information if annotation is not a reply', () => {
+      fakeIsReply.returns(false);
+      const wrapper = createAnnotationHeader();
+
+      // Extended header information is rendered in a second (flex) row
+      assert.equal(wrapper.find('HeaderRow').length, 2);
+    });
+
     it('should not render extended header information if annotation is reply', () => {
       fakeIsReply.returns(true);
       const wrapper = createAnnotationHeader({
         showDocumentInfo: true,
       });
 
-      assert.isFalse(wrapper.find('AnnotationShareInfo').exists());
-      assert.isFalse(wrapper.find('AnnotationDocumentInfo').exists());
+      assert.equal(wrapper.find('HeaderRow').length, 1);
     });
 
     describe('annotation is-highlight icon', () => {
@@ -311,6 +327,21 @@ describe('AnnotationHeader', () => {
         const highlightIcon = wrapper.find('Icon[name="highlight"]');
 
         assert.isFalse(highlightIcon.exists());
+      });
+    });
+
+    describe('Annotation share info', () => {
+      it('should render annotation share/group information if group is available', () => {
+        const wrapper = createAnnotationHeader();
+
+        assert.isTrue(wrapper.find('AnnotationShareInfo').exists());
+      });
+
+      it('should not render annotation share/group information if group is unavailable', () => {
+        fakeStore.getGroup.returns(undefined);
+        const wrapper = createAnnotationHeader();
+
+        assert.isFalse(wrapper.find('AnnotationShareInfo').exists());
       });
     });
 
