@@ -15,7 +15,7 @@ import { Link } from '@hypothesis/frontend-shared';
  */
 export default function AnnotationDocumentInfo({ domain, link, title }) {
   return (
-    <div className="hyp-u-layout-row hyp-u-horizontal-spacing--2">
+    <div className="flex gap-x-1">
       <div className="text-color-text-light">
         on &quot;
         {link ? (

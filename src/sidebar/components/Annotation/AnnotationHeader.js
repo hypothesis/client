@@ -1,7 +1,7 @@
 import { Icon, LinkButton } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
-import { withServices } from '../../service-context';
 
+import { withServices } from '../../service-context';
 import { useStoreProxy } from '../../store/use-store';
 import { isThirdPartyUser, username } from '../../helpers/account-id';
 import {
@@ -22,6 +22,15 @@ import AnnotationUser from './AnnotationUser';
  * @typedef {import("../../../types/api").Annotation} Annotation
  * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
  */
+
+/** @param {{ children: import("preact").ComponentChildren}} props */
+function HeaderRow({ children }) {
+  return (
+    <div className="flex gap-x-1 items-baseline flex-wrap-reverse">
+      {children}
+    </div>
+  );
+}
 
 /**
  * @typedef AnnotationHeaderProps
@@ -72,22 +81,14 @@ function AnnotationHeader({
 
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
 
-  const annotationIsPrivate = isPrivate(annotation.permissions);
-
   // Link (URL) to single-annotation view for this annotation, if it has
   // been provided by the service. Note: this property is not currently
   // present on third-party annotations.
   const annotationUrl = annotation.links?.html || '';
 
-  const showTimestamps = !isEditing && annotation.created;
   const showEditedTimestamp = useMemo(() => {
     return hasBeenEdited(annotation) && !isCollapsedReply;
   }, [annotation, isCollapsedReply]);
-
-  const replyPluralized = replyCount > 1 ? 'replies' : 'reply';
-  const replyButtonText = `${replyCount} ${replyPluralized}`;
-  const showReplyButton = replyCount > 0 && isCollapsedReply;
-  const showExtendedInfo = !isReply(annotation);
 
   // Pull together some document metadata related to this annotation
   const documentInfo = domainAndTitle(annotation);
@@ -113,10 +114,12 @@ function AnnotationHeader({
     // an ID.
     store.setExpanded(/** @type {string} */ (annotation.id), true);
 
+  const group = store.getGroup(annotation.group);
+
   return (
     <header>
-      <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 flex-wrap-reverse">
-        {annotationIsPrivate && !isEditing && (
+      <HeaderRow>
+        {isPrivate(annotation.permissions) && !isEditing && (
           <Icon
             classes="text-tiny"
             name="lock"
@@ -127,14 +130,14 @@ function AnnotationHeader({
           authorLink={authorLink}
           displayName={authorDisplayName}
         />
-        {showReplyButton && (
+        {replyCount > 0 && isCollapsedReply && (
           <LinkButton onClick={onReplyCountClick} title="Expand replies">
-            {replyButtonText}
+            {`${replyCount} ${replyCount > 1 ? 'replies' : 'reply'}`}
           </LinkButton>
         )}
 
-        {showTimestamps && (
-          <div className="hyp-u-layout-row--justify-right hyp-u-stretch">
+        {!isEditing && annotation.created && (
+          <div className="flex justify-end grow">
             <AnnotationTimestamps
               annotationCreated={annotation.created}
               annotationUpdated={annotation.updated}
@@ -143,11 +146,16 @@ function AnnotationHeader({
             />
           </div>
         )}
-      </div>
+      </HeaderRow>
 
-      {showExtendedInfo && (
-        <div className="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 flex-wrap-reverse">
-          <AnnotationShareInfo annotation={annotation} />
+      {!isReply(annotation) && (
+        <HeaderRow>
+          {group && (
+            <AnnotationShareInfo
+              group={group}
+              isPrivate={isPrivate(annotation.permissions)}
+            />
+          )}
           {!isEditing && isHighlight(annotation) && (
             <Icon
               name="highlight"
@@ -162,7 +170,7 @@ function AnnotationHeader({
               title={documentInfo.titleText}
             />
           )}
-        </div>
+        </HeaderRow>
       )}
     </header>
   );

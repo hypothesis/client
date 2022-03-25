@@ -1,7 +1,5 @@
 import { mount } from 'enzyme';
 
-import * as fixtures from '../../../test/annotation-fixtures';
-
 import { checkAccessibility } from '../../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
 
@@ -9,17 +7,9 @@ import AnnotationShareInfo, { $imports } from '../AnnotationShareInfo';
 
 describe('AnnotationShareInfo', () => {
   let fakeGroup;
-  let fakeStore;
-  let fakeGetGroup;
-  let fakeIsPrivate;
 
   const createAnnotationShareInfo = props => {
-    return mount(
-      <AnnotationShareInfo
-        annotation={fixtures.defaultAnnotation()}
-        {...props}
-      />
-    );
+    return mount(<AnnotationShareInfo group={fakeGroup} {...props} />);
   };
 
   beforeEach(() => {
@@ -30,15 +20,8 @@ describe('AnnotationShareInfo', () => {
       },
       type: 'private',
     };
-    fakeGetGroup = sinon.stub().returns(fakeGroup);
-    fakeStore = { getGroup: fakeGetGroup };
-    fakeIsPrivate = sinon.stub().returns(false);
 
     $imports.$mock(mockImportedComponents());
-    $imports.$mock({
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
-      '../../helpers/permissions': { isPrivate: fakeIsPrivate },
-    });
   });
 
   afterEach(() => {
@@ -74,18 +57,9 @@ describe('AnnotationShareInfo', () => {
 
     it('should not show a link to third-party groups', () => {
       // Third-party groups have no `html` link
-      fakeGetGroup.returns({ name: 'A Group', links: {} });
-
-      const wrapper = createAnnotationShareInfo();
-      const groupLink = wrapper.find('.AnnotationShareInfo__group');
-
-      assert.notOk(groupLink.exists());
-    });
-
-    it('should not show a link if no group available', () => {
-      fakeGetGroup.returns(undefined);
-
-      const wrapper = createAnnotationShareInfo();
+      const wrapper = createAnnotationShareInfo({
+        group: { name: 'A Group', links: {} },
+      });
       const groupLink = wrapper.find('.AnnotationShareInfo__group');
 
       assert.notOk(groupLink.exists());
@@ -102,13 +76,11 @@ describe('AnnotationShareInfo', () => {
     });
 
     context('private annotation', () => {
-      beforeEach(() => {
-        fakeIsPrivate.returns(true);
-      });
-
       it('should show "only me" text for annotation in third-party group', () => {
-        fakeGetGroup.returns({ name: 'Some Name', links: {} });
-        const wrapper = createAnnotationShareInfo();
+        const wrapper = createAnnotationShareInfo({
+          group: { name: 'Some Name', links: {} },
+          isPrivate: true,
+        });
 
         const privacyText = wrapper.find('[data-testid="private-info"]');
 

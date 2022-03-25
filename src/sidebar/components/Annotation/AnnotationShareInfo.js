@@ -1,15 +1,14 @@
 import { Icon, Link } from '@hypothesis/frontend-shared';
-
-import { useStoreProxy } from '../../store/use-store';
-import { isPrivate } from '../../helpers/permissions';
+import classnames from 'classnames';
 
 /**
- * @typedef {import("../../../types/api").Annotation} Annotation
+ * @typedef {import("../../../types/api").Group} Group
  */
 
 /**
  * @typedef AnnotationShareInfoProps
- * @prop {Annotation} annotation
+ * @prop {Group} group - Group to which the annotation belongs
+ * @prop {boolean} isPrivate
  */
 
 /**
@@ -18,38 +17,35 @@ import { isPrivate } from '../../helpers/permissions';
  *
  * @param {AnnotationShareInfoProps} props
  */
-function AnnotationShareInfo({ annotation }) {
-  const store = useStoreProxy();
-  const group = store.getGroup(annotation.group);
-
+function AnnotationShareInfo({ group, isPrivate }) {
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = group?.links.html;
 
-  const annotationIsPrivate = isPrivate(annotation.permissions);
-
   return (
-    <div className="hyp-u-layout-row--align-baseline">
+    <>
       {group && linkToGroup && (
         <Link
-          classes="hyp-u-layout-row--align-baseline hyp-u-horizontal-spacing--2 p-link--muted p-link--hover-muted"
+          classes={classnames(
+            'flex items-baseline gap-x-1',
+            'text-color-text-light hover:text-color-text-light hover:underline'
+          )}
           href={group.links.html}
           target="_blank"
         >
-          {group.type === 'open' ? (
-            <Icon classes="text-tiny" name="public" />
-          ) : (
-            <Icon classes="text-tiny" name="groups" />
-          )}
+          <Icon
+            classes="text-tiny"
+            name={group.type === 'open' ? 'public' : 'groups'}
+          />
           <span>{group.name}</span>
         </Link>
       )}
-      {annotationIsPrivate && !linkToGroup && (
-        <span className="hyp-u-layout-row--align-baseline text-color-text-light">
-          <span data-testid="private-info">Only me</span>
-        </span>
+      {isPrivate && !linkToGroup && (
+        <div className="text-color-text-light" data-testid="private-info">
+          Only me
+        </div>
       )}
-    </div>
+    </>
   );
 }
 
