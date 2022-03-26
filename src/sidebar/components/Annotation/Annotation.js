@@ -88,7 +88,7 @@ function Annotation({
     !isReply && !isEditing && !hasAppliedFilter && replyCount > 0;
 
   const onReply = () => {
-    if (annotation && isSaved(annotation)) {
+    if (annotation && isSaved(annotation) && userid) {
       annotationsService.reply(annotation, userid);
     }
   };

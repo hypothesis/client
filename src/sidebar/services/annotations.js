@@ -68,6 +68,10 @@ export class AnnotationsService {
     }
 
     const userid = profile.userid;
+    if (!userid) {
+      throw new Error('Cannot create annotation when logged out');
+    }
+
     const userInfo = profile.user_info;
 
     // We need a unique local/app identifier for this new annotation such
