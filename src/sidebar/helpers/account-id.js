@@ -22,7 +22,7 @@ export function parseAccountID(user) {
 /**
  * Returns the username part of an account ID or an empty string.
  *
- * @param {string} user
+ * @param {string|null} user
  */
 export function username(user) {
   const account = parseAccountID(user);

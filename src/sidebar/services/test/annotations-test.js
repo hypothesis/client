@@ -14,6 +14,14 @@ describe('AnnotationsService', () => {
 
   let svc;
 
+  function setLoggedIn(loggedIn) {
+    const profile = loggedIn
+      ? { userid: 'acct:foo@bar.com', user_info: {} }
+      : { userid: null };
+    fakeStore.profile.returns(profile);
+    fakeStore.isLoggedIn.returns(loggedIn);
+  }
+
   beforeEach(() => {
     fakeAnnotationActivity = {
       reportActivity: sinon.stub(),
@@ -59,6 +67,8 @@ describe('AnnotationsService', () => {
       updateFlagStatus: sinon.stub(),
     };
 
+    setLoggedIn(true);
+
     $imports.$mock({
       '../helpers/annotation-metadata': fakeMetadata,
       '../helpers/permissions': {
@@ -90,10 +100,6 @@ describe('AnnotationsService', () => {
       now = new Date();
 
       fakeStore.focusedGroupId.returns('mygroup');
-      fakeStore.profile.returns({
-        userid: 'acct:foo@bar.com',
-        user_info: {},
-      });
     });
 
     it('extends the provided annotation object with defaults', () => {
@@ -232,6 +238,14 @@ describe('AnnotationsService', () => {
       assert.calledWith(fakeStore.setExpanded, 'yetanotherancestor', true);
     });
 
+    it('throws if the user is not logged in', () => {
+      setLoggedIn(false);
+
+      assert.throws(() => {
+        svc.create(fixtures.newAnnotation(), now);
+      }, 'Cannot create annotation when logged out');
+    });
+
     it('throws an error if there is no focused group', () => {
       fakeStore.focusedGroupId.returns(null);
 
@@ -243,7 +257,7 @@ describe('AnnotationsService', () => {
 
   describe('createPageNote', () => {
     it('should open the login-prompt panel if the user is not logged in', () => {
-      fakeStore.isLoggedIn.returns(false);
+      setLoggedIn(false);
 
       svc.createPageNote();
 
