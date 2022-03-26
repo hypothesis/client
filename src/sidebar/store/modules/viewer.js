@@ -1,6 +1,4 @@
-import * as util from '../util';
-
-import { createStoreModule } from '../create-store';
+import { createStoreModule, makeAction } from '../create-store';
 
 /**
  * This module defines actions and state related to the display mode of the
@@ -15,8 +13,14 @@ const initialState = {
   sidebarHasOpened: false,
 };
 
+/** @typedef {typeof initialState} State */
+
 const reducers = {
-  SET_SIDEBAR_OPENED: (state, action) => {
+  /**
+   * @param {State} state
+   * @param {{ opened: boolean }} action
+   */
+  SET_SIDEBAR_OPENED(state, action) {
     if (action.opened === true) {
       // If the sidebar is open, track that it has ever been opened
       return { sidebarHasOpened: true };
@@ -26,19 +30,14 @@ const reducers = {
   },
 };
 
-const actions = util.actionTypes(reducers);
-
-// Action creators
-
 /**
  * @param {boolean} opened - If the sidebar is open
  */
 function setSidebarOpened(opened) {
-  return { type: actions.SET_SIDEBAR_OPENED, opened };
+  return makeAction(reducers, 'SET_SIDEBAR_OPENED', { opened });
 }
 
-// Selectors
-
+/** @param {State} state */
 function hasSidebarOpened(state) {
   return state.sidebarHasOpened;
 }
