@@ -1,6 +1,6 @@
 /* global PDFViewerApplication */
 
-import { warnOnce } from '../../shared/warn-once';
+import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
 import { TextPosition, TextRange } from './text-range';
@@ -167,11 +167,9 @@ export async function documentHasText() {
 /**
  * Return the text of a given PDF page.
  *
- * The page text returned by this function should match the `textContent` of the
- * text layer element that PDF.js creates for rendered pages. This allows
- * offsets computed in the text to be reused as offsets within the text layer
- * element's content. This is important to create correct Ranges for anchored
- * selectors.
+ * The text returned by this function should match the `textContent` of the text
+ * layer element that PDF.js creates for rendered pages, with the exception
+ * that differences in whitespace are tolerated.
  *
  * @param {number} pageIndex
  * @return {Promise<string>}
@@ -187,21 +185,10 @@ function getPageTextContent(pageIndex) {
   const getPageText = async () => {
     const pageView = await getPageView(pageIndex);
     const textContent = await pageView.pdfPage.getTextContent({
+      // Deprecated option, set for compatibility with older PDF.js releases.
       normalizeWhitespace: true,
     });
-    let items = textContent.items;
-
-    // Versions of PDF.js < v2.9.359 did not create elements in the text layer for
-    // text items that contained all-whitespace strings. Newer versions (after
-    // https://github.com/mozilla/pdf.js/pull/13257) do. The same commit also
-    // introduced the `hasEOL` property to text items, so we use the absence
-    // of this property to determine if we need to filter out whitespace-only strings.
-    const excludeEmpty = items.length > 0 && !('hasEOL' in items[0]);
-    if (excludeEmpty) {
-      items = items.filter(it => /\S/.test(it.str));
-    }
-
-    return items.map(it => it.str).join('');
+    return textContent.items.map(it => it.str).join('');
   };
 
   // This function synchronously populates the cache with a promise so that
@@ -270,6 +257,29 @@ async function findPageByOffset(offset) {
 }
 
 /**
+ * Return true if `char` is an ASCII space.
+ *
+ * This is more efficient than `/\s/.test(char)` but does not handle Unicode
+ * spaces.
+ *
+ * @param {string} char
+ */
+function isSpace(char) {
+  switch (char) {
+    case ' ':
+    case '\f':
+    case '\n':
+    case '\r':
+    case '\t':
+    case '\v':
+    case '\u00a0': // nbsp
+      return true;
+    default:
+      return false;
+  }
+}
+
+/**
  * Locate the DOM Range which a position selector refers to.
  *
  * If the page is off-screen it may be in an unrendered state, in which case
@@ -295,21 +305,24 @@ async function anchorByPosition(pageIndex, start, end) {
     page.textLayer.renderingDone
   ) {
     // The page has been rendered. Locate the position in the text layer.
-    const root = page.textLayer.textLayerDiv;
-
-    // Do a sanity check to verify that the page text extracted by `getPageTextContent`
-    // matches the transparent text layer.
     //
-    // See https://github.com/hypothesis/client/issues/3674.
-    if (pageText !== root.textContent) {
-      /* istanbul ignore next */
-      warnOnce(
-        'PDF text layer content does not match page text. This will cause anchoring misalignment.'
-      );
-    }
+    // We allow for differences in whitespace between the text returned by
+    // `getPageTextContent` and the text layer content. Any other differences
+    // will cause mis-anchoring.
 
-    const startPos = new TextPosition(root, start);
-    const endPos = new TextPosition(root, end);
+    const root = page.textLayer.textLayerDiv;
+    const textLayerStr = /** @type {string} */ (root.textContent);
+
+    const [textLayerStart, textLayerEnd] = translateOffsets(
+      pageText,
+      textLayerStr,
+      start,
+      end,
+      char => !isSpace(char)
+    );
+
+    const startPos = new TextPosition(root, textLayerStart);
+    const endPos = new TextPosition(root, textLayerEnd);
     return new TextRange(startPos, endPos).toRange();
   }
 
@@ -338,7 +351,7 @@ function stripSpaces(str) {
 
   for (let i = 0; i < str.length; i++) {
     const char = str[i];
-    if (char === ' ' || char === '\t' || char === '\n') {
+    if (isSpace(char)) {
       continue;
     }
     stripped += char;
