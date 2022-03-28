@@ -60,7 +60,7 @@ class CacheEntry {
  * @return {SidebarStore}
  */
 export function useStoreProxy() {
-  const store = useService('store');
+  const store = /** @type {SidebarStore} */ (useService('store'));
 
   // Hack to trigger a component re-render.
   const [, forceUpdate] = useReducer(x => x + 1, 0);
@@ -78,11 +78,13 @@ export function useStoreProxy() {
   const proxy = useRef(/** @type {SidebarStore|null} */ (null));
   if (!proxy.current) {
     // Cached method wrappers.
-    const wrappedMethods = {};
+    /** @type {Map<string, Function>} */
+    const wrappedMethods = new Map();
 
     /**
-     * @param {typeof store} store
-     * @param {string} prop
+     * @template {Store} StoreType
+     * @param {StoreType} store
+     * @param {keyof StoreType & string} prop
      */
     const get = (store, prop) => {
       const method = store[prop];
@@ -91,12 +93,13 @@ export function useStoreProxy() {
       }
 
       // Check for pre-existing method wrapper.
-      let wrapped = wrappedMethods[prop];
+      let wrapped = wrappedMethods.get(prop);
       if (wrapped) {
         return wrapped;
       }
 
       // Create method wrapper.
+      /** @param {unknown[]} args */
       wrapped = (...args) => {
         const cacheEntry = cache.find(entry => entry.matches(prop, args));
         if (cacheEntry) {
@@ -114,7 +117,7 @@ export function useStoreProxy() {
         }
         return result;
       };
-      wrappedMethods[prop] = wrapped;
+      wrappedMethods.set(prop, wrapped);
 
       return wrapped;
     };
