@@ -4,6 +4,8 @@ import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
  * @typedef {import('../../types/config').ConfigFromHost} ConfigFromHost
+ * @typedef {import('../../types/config').ConfigFromAnnotator} ConfigFromAnnotator
+ * @typedef {import('../../types/config').ConfigFromEmbedder} ConfigFromEmbedder
  * @typedef {import('../../types/config').ConfigFromSidebar} ConfigFromSidebar
  * @typedef {import('../../types/config').RPCSettings} RPCSettings
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
@@ -71,9 +73,9 @@ function fetchServiceGroups(configFromHost, rpcSettings) {
 }
 
 /**
- * Derive RPC settings from the provided `ConfigFromHost`, if any are present.
+ * Derive RPC settings from the provided `AnnotatorConfigFromHost`, if any are present.
  *
- * @param {ConfigFromHost} configFromHost
+ * @param {ConfigFromAnnotator} configFromHost
  * @param {Window} window_
  * @return {import('../../types/config').RPCSettings|null}
  */
@@ -99,11 +101,11 @@ function buildRPCSettings(configFromHost, window_) {
  * Retrieve ConfigFromHost to use for settings from the ancestor frame indicated
  * in `rpcSettings`
  *
- * @param {ConfigFromHost} hostConfigFromURL
+ * @param {ConfigFromAnnotator} hostConfigFromURL
  * @param {RPCSettings} rpcSettings
- * @return {Promise<ConfigFromHost>}
+ * @return {Promise<ConfigFromEmbedder>}
  */
-async function getHostConfigByRPC(hostConfigFromURL, rpcSettings) {
+async function getEmbedderConfig(hostConfigFromURL, rpcSettings) {
   const hostConfigFromFrame = await postMessageJsonRpc.call(
     rpcSettings.targetFrame,
     rpcSettings.origin,
@@ -140,21 +142,21 @@ async function getHostConfigByRPC(hostConfigFromURL, rpcSettings) {
  * @return {Promise<SidebarSettings>} - The merged settings
  */
 export async function buildSettings(configFromSidebar, window_ = window) {
-  const hostConfigFromURL = hostPageConfig(window);
+  const annotatorConfigFromHost = hostPageConfig(window);
 
-  const rpcSettings = buildRPCSettings(hostConfigFromURL, window_);
+  const rpcSettings = buildRPCSettings(annotatorConfigFromHost, window_);
   let configFromHost;
   if (rpcSettings) {
     // The presence of RPCSettings indicates that we should
     // source the ConfigFromHost from another frame, and potentially load
     // the correct groups asynchronously as well.
-    const hostConfigFromFrame = await getHostConfigByRPC(
-      hostConfigFromURL,
+    const hostConfigFromFrame = await getEmbedderConfig(
+      annotatorConfigFromHost,
       rpcSettings
     );
     configFromHost = fetchServiceGroups(hostConfigFromFrame, rpcSettings);
   } else {
-    configFromHost = hostConfigFromURL;
+    configFromHost = annotatorConfigFromHost;
   }
 
   /** @type {SidebarSettings} */
