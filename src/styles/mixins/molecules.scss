@@ -106,22 +106,6 @@
 }
 
 /**
- * `panel` with tighter margins and padding, for use in more confined spaces
- */
-@mixin panel--compact {
-  @include panel($rhythm: var.$layout-space--xsmall);
-  width: 24em;
-  // Keep panel constrained within annotation card boundaries and not cut off
-  // on left side when sidebar is extremely narrow
-  max-width: 85vw;
-  padding: var.$layout-space--small;
-
-  &__header {
-    padding-bottom: var.$layout-space--xsmall;
-  }
-}
-
-/**
  * A full-width banner with optional "type" and styled icon at left
  */
 @mixin banner {
