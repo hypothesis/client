@@ -115,30 +115,6 @@ describe('annotator/anchoring/pdf', () => {
       assert.equal(positionSelector.end, expectedPos + quote.length);
     });
 
-    // This test is similar to the above, but simulates older PDF.js releases
-    // which do not create elements in the text layer for whitespace-only text items.
-    it('returns a position selector with correct start/end offsets (old text rendering)', async () => {
-      initViewer(fixtures.pdfPages, { newTextRendering: false });
-
-      viewer.pdfViewer.setCurrentPage(2);
-      const quote = 'Netherfield Park';
-      const range = findText(container, quote);
-      const contentStr = fixtures.pdfPages
-        .map(pageText =>
-          pageText
-            .split('\n')
-            .filter(line => !line.match(/^\s*$/)) // Strip whitespace-only text items
-            .join('\n')
-        )
-        .join('');
-      const expectedPos = contentStr.replace(/\n/g, '').lastIndexOf(quote);
-
-      const [positionSelector] = await pdfAnchoring.describe(container, range);
-
-      assert.equal(positionSelector.start, expectedPos);
-      assert.equal(positionSelector.end, expectedPos + quote.length);
-    });
-
     it('returns a quote selector with the correct quote', () => {
       viewer.pdfViewer.setCurrentPage(2);
       const range = findText(container, 'Netherfield Park');
@@ -531,6 +507,47 @@ describe('annotator/anchoring/pdf', () => {
             assert.equal(range.toString(), selection);
           });
       });
+    });
+
+    it('anchors if text layer has different spaces than PDF.js text API output', async () => {
+      viewer.pdfViewer.setCurrentPage(1);
+      const selection = 'zombie in possession';
+      const range = findText(container, selection);
+      const [, quote] = await pdfAnchoring.describe(container, range);
+
+      // Add extra spaces into the text layer. This can happen due to
+      // differences in the way that PDF.js constructs the text layer compared
+      // to how we extract text. Anchoring should adjust the returned range
+      // accordingly.
+      const textLayerEl =
+        viewer.pdfViewer.getPageView(1).textLayer.textLayerDiv;
+      textLayerEl.textContent = textLayerEl.textContent.split('').join(' ');
+
+      const anchoredRange = await pdfAnchoring.anchor(container, [quote]);
+      assert.equal(
+        anchoredRange.toString(),
+        'z o m b i e   i n   p o s s e s s i o n'
+      );
+    });
+
+    it('anchors with mismatch if text layer differs from PDF.js text API output', async () => {
+      viewer.pdfViewer.setCurrentPage(1);
+      const selection = 'zombie in possession';
+      const range = findText(container, selection);
+      const [, quote] = await pdfAnchoring.describe(container, range);
+
+      // Modify text layer so it doesn't match text from PDF.js APIs.
+      // This will cause mis-anchoring, but if the differences are only minor,
+      // the result may still be useful.
+      const textLayerEl =
+        viewer.pdfViewer.getPageView(1).textLayer.textLayerDiv;
+      textLayerEl.textContent = textLayerEl.textContent.replace(
+        'zombie',
+        'zomby'
+      );
+
+      const anchoredRange = await pdfAnchoring.anchor(container, [quote]);
+      assert.equal(anchoredRange.toString(), 'zomby in possession o');
     });
 
     it('anchors to a placeholder element if the page is not rendered', () => {
