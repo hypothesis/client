@@ -2,8 +2,6 @@
 
 import { createStore, createStoreModule } from '../create-store';
 
-const A = 0;
-
 function initialState(value = 0) {
   return { count: value };
 }
@@ -169,20 +167,20 @@ describe('createStore', () => {
 
   it('adds selectors as methods to the store', () => {
     const store = counterStore();
-    store.dispatch(counterModules[A].actionCreators.incrementA(5));
+    store.dispatch(counterModules[0].actionCreators.incrementA(5));
     assert.equal(store.getCountA(), 5);
   });
 
   it('adds root selectors as methods to the store', () => {
     const store = counterStore();
-    store.dispatch(counterModules[A].actionCreators.incrementA(5));
+    store.dispatch(counterModules[0].actionCreators.incrementA(5));
     assert.equal(store.getCountAFromRoot(), 5);
   });
 
   it('applies `thunk` middleware by default', () => {
     const store = counterStore();
     const doubleAction = (dispatch, getState) => {
-      dispatch(counterModules[A].actionCreators.incrementA(getState().a.count));
+      dispatch(counterModules[0].actionCreators.incrementA(getState().a.count));
     };
 
     store.incrementA(5);
