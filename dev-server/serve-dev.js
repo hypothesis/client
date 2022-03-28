@@ -106,6 +106,15 @@ function serveDev(port, config) {
 
   // Serve HTML documents with injected client script
   app.get('/document/:document', (req, res, next) => {
+    // All HTML documents are served with the `text/html` mime type by default,
+    // even though some declare themselves to be XHTML. This mirrors how most
+    // content on the web is served. However we do have some test pages that
+    // need to be served with the correct XHTML mime type, as that alters
+    // browser behavior. See https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/XHTML.
+    if (req.params.document.startsWith('xhtml-')) {
+      res.set('Content-Type', 'application/xhtml+xml');
+    }
+
     if (fs.existsSync(`${HTML_PATH}${req.params.document}.mustache`)) {
       res.render(req.params.document, templateContext(config));
     } else {
