@@ -106,7 +106,7 @@ describe('AnnotationShareControl', () => {
     const wrapper = createComponent();
 
     // Component is not `open` initially
-    assert.isFalse(wrapper.find('.annotation-share-panel').exists());
+    assert.isFalse(wrapper.find('Card').exists());
   });
 
   it('toggles the share control element when the button is clicked', () => {
@@ -118,7 +118,7 @@ describe('AnnotationShareControl', () => {
     });
     wrapper.update();
 
-    assert.isTrue(wrapper.find('.annotation-share-panel').exists());
+    assert.isTrue(wrapper.find('Card').exists());
   });
 
   it('renders the share URI in a readonly input field', () => {
@@ -194,7 +194,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent({ isPrivate: testcase.isPrivate });
       openElement(wrapper);
 
-      const permissionsEl = wrapper.find('.annotation-share-panel__details');
+      const permissionsEl = wrapper.find('[data-testid="share-details"]');
       assert.equal(permissionsEl.text(), testcase.expected);
     });
   });
@@ -204,7 +204,7 @@ describe('AnnotationShareControl', () => {
     const wrapper = createComponent();
     openElement(wrapper);
 
-    const detailsEl = wrapper.find('.annotation-share-panel__details');
+    const detailsEl = wrapper.find('[data-testid="share-details"]');
     assert.include(
       detailsEl.text(),
       'This annotation cannot be shared in its original context'

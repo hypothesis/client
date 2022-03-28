@@ -1,10 +1,12 @@
 import {
+  Card,
   Icon,
   IconButton,
   TextInput,
   TextInputWithButton,
   useElementShouldClose,
 } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { isShareableURI } from '../../helpers/annotation-sharing';
@@ -35,6 +37,23 @@ function selectionOverflowsInputElement() {
   // On iOS the selection overflows the input element
   // See: https://github.com/hypothesis/client/pull/2799
   return isIOS();
+}
+
+/**
+ *
+ * @param {object} props
+ *   @param {string} [props.classes] - Optional additional CSS classes
+ */
+function MenuArrowDown({ classes }) {
+  return (
+    <Icon
+      name="pointer"
+      classes={classnames(
+        'absolute inline z-2 text-grey-3 fill-white rotate-180',
+        classes
+      )}
+    />
+  );
 }
 
 /**
@@ -123,7 +142,7 @@ function AnnotationShareControl({
   );
 
   return (
-    <div className="AnnotationShareControl" ref={shareRef}>
+    <div className="relative" ref={shareRef}>
       <IconButton
         icon="share"
         title="Share"
@@ -131,45 +150,61 @@ function AnnotationShareControl({
         expanded={isOpen}
       />
       {isOpen && (
-        <div className="annotation-share-panel">
-          <div className="annotation-share-panel__header">
-            <div className="annotation-share-panel__title">
+        <Card
+          classes={classnames(
+            // Prefer width 96 (24rem) but ensure that component isn't wider
+            // than 85vw
+            'w-96 max-w-[85vw]',
+            // Position this Card above its IconButton. Account for larger
+            // IconButtons in touch interfaces
+            'absolute bottom-8 right-1 touch:bottom-touch-minimum',
+            'space-y-2 p-2',
+            // Cards do not have a border in the clean theme. Turn it back on.
+            'theme-clean:border'
+          )}
+        >
+          <div className="flex items-center pb-2 border-b">
+            <h2 className="text-brand text-lg font-medium">
               Share this annotation
-            </div>
+            </h2>
           </div>
-          <div className="annotation-share-panel__content">
-            <div className="hyp-u-layout-row annotation-share-panel__inputs">
-              <TextInputWithButton>
-                <TextInput
-                  aria-label="Use this URL to share this annotation"
-                  type="text"
-                  value={shareUri}
-                  readOnly
-                  inputRef={inputRef}
-                />
-                <IconButton
-                  icon="copy"
-                  title="Copy share link to clipboard"
-                  onClick={copyShareLink}
-                  variant="dark"
-                />
-              </TextInputWithButton>
-            </div>
+          <div
+            className={classnames(
+              // Slightly larger font size for touch devices to correspond with
+              // larger button and input sizes
+              'flex w-full text-sm touch:text-base'
+            )}
+          >
+            <TextInputWithButton>
+              <TextInput
+                aria-label="Use this URL to share this annotation"
+                type="text"
+                value={shareUri}
+                readOnly
+                inputRef={inputRef}
+              />
+              <IconButton
+                icon="copy"
+                title="Copy share link to clipboard"
+                onClick={copyShareLink}
+                variant="dark"
+              />
+            </TextInputWithButton>
+          </div>
+          <div className="text-base font-normal" data-testid="share-details">
             {inContextAvailable ? (
-              <div className="annotation-share-panel__details">
-                {annotationSharingInfo}
-              </div>
+              <>{annotationSharingInfo}</>
             ) : (
-              <div className="annotation-share-panel__details">
+              <>
                 This annotation cannot be shared in its original context because
                 it was made on a document that is not available on the web. This
                 link shares the annotation by itself.
-              </div>
+              </>
             )}
-            {showShareLinks && <ShareLinks shareURI={shareUri} />}
           </div>
-          <Icon name="pointer" classes="annotation-share-panel__arrow" />
-        </div>
+          {showShareLinks && <ShareLinks shareURI={shareUri} />}
+          <MenuArrowDown classes="bottom-[-12px] right-1 touch:right-[9px]" />
+        </Card>
       )}
     </div>
   );
