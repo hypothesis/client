@@ -84,13 +84,26 @@ describe('shared/shortcut', () => {
     });
   });
 
+  /**
+   * Simulate a key press on a document.
+   *
+   * In an HTML document this will go to the body if no other element is
+   * focused. In an XHTML document this will go to the document element in
+   * Safari and Chrome. In both cases the event will bubble up to the document
+   * element.
+   */
+  function pressKey(key, element = document.documentElement) {
+    const event = new KeyboardEvent('keydown', { key });
+    element.dispatchEvent(event);
+    return event;
+  }
+
   describe('installShortcut', () => {
-    it('should install a shortcut listener on the document body', () => {
+    it('should install a shortcut listener on the document element', () => {
       const onPress = sinon.stub();
       const removeShortcut = installShortcut('a', onPress);
-      const event = new KeyboardEvent('keydown', { key: 'a' });
 
-      document.body.dispatchEvent(event);
+      const event = pressKey('a');
       removeShortcut();
 
       assert.calledWith(onPress, event);
@@ -100,9 +113,8 @@ describe('shared/shortcut', () => {
       const onPress = sinon.stub();
       const el = document.createElement('div');
       const removeShortcut = installShortcut('a', onPress, { rootElement: el });
-      const event = new KeyboardEvent('keydown', { key: 'a' });
 
-      el.dispatchEvent(event);
+      const event = pressKey('a', el);
       removeShortcut();
 
       assert.calledWith(onPress, event);
@@ -111,9 +123,8 @@ describe('shared/shortcut', () => {
     it('should not trigger if not-matching key is pressed', () => {
       const onPress = sinon.stub();
       const removeShortcut = installShortcut('a', onPress);
-      const event = new KeyboardEvent('keydown', { key: 'b' });
 
-      document.body.dispatchEvent(event);
+      pressKey('b');
       removeShortcut();
 
       assert.notCalled(onPress);
@@ -122,10 +133,9 @@ describe('shared/shortcut', () => {
     it('should remove shortcut listener when returned callback is called', () => {
       const onPress = sinon.stub();
       const removeShortcut = installShortcut('a', onPress);
-      const event = new KeyboardEvent('keydown', { key: 'a' });
 
       removeShortcut();
-      document.body.dispatchEvent(event);
+      pressKey('a');
 
       assert.notCalled(onPress);
     });
@@ -135,11 +145,6 @@ describe('shared/shortcut', () => {
     function Button({ shortcut = null, onClick }) {
       useShortcut(shortcut, onClick);
       return <button onClick={onClick}>Shortcut test</button>;
-    }
-
-    function triggerShortcut(keyEventArgs) {
-      const event = new KeyboardEvent('keydown', keyEventArgs);
-      document.body.dispatchEvent(event);
     }
 
     let container;
@@ -160,7 +165,7 @@ describe('shared/shortcut', () => {
       act(() => {
         render(<Button shortcut="a" onClick={onClick} />, container);
       });
-      triggerShortcut({ key: 'a' });
+      pressKey('a');
 
       assert.called(onClick);
     });
@@ -171,7 +176,7 @@ describe('shared/shortcut', () => {
       act(() => {
         render(<Button onClick={onClick} />, container);
       });
-      triggerShortcut({ key: 'a' });
+      pressKey('a');
 
       assert.notCalled(onClick);
     });
@@ -183,8 +188,7 @@ describe('shared/shortcut', () => {
         render(<Button onClick={onClick} />, container);
         render(null, container);
       });
-
-      triggerShortcut({ key: 'a' });
+      pressKey('a');
 
       assert.notCalled(onClick);
     });
