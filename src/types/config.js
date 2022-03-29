@@ -68,12 +68,12 @@
  * An "embedder frame" may provide configuration to be notified (via JSON RPC)
  * of qualifying annotation activity from the sidebar frame.
  *
- * @typedef {'create'|'save'|'delete'} AnnotationActivityEvent
+ * @typedef {'create'|'update'|'flag'|'delete'} AnnotationEventType
  *
  * @typedef ReportAnnotationActivityConfig
  *   @prop {string} method - Name of method to call in embedder frame on
  *     qualifying annotation activity
- *   @prop {AnnotationActivityEvent[]} events - Which events to notify about
+ *   @prop {AnnotationEventType[]} events - Which events to notify about
  *
  */
 

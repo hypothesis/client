@@ -113,6 +113,7 @@ import { ServiceContext } from './service-context';
 
 // Services.
 import { AnnotationsService } from './services/annotations';
+import { AnnotationActivityService } from './services/annotation-activity';
 import { APIService } from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import { AuthService } from './services/auth';
@@ -150,6 +151,7 @@ function startApp(settings, appEl) {
   // Register services.
   container
     .register('annotationsService', AnnotationsService)
+    .register('annotationActivity', AnnotationActivityService)
     .register('api', APIService)
     .register('apiRoutes', APIRoutesService)
     .register('auth', AuthService)

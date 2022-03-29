@@ -3,6 +3,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import { AnnotationsService, $imports } from '../annotations';
 
 describe('AnnotationsService', () => {
+  let fakeAnnotationActivity;
   let fakeApi;
   let fakeMetadata;
   let fakeStore;
@@ -14,6 +15,9 @@ describe('AnnotationsService', () => {
   let svc;
 
   beforeEach(() => {
+    fakeAnnotationActivity = {
+      reportActivity: sinon.stub(),
+    };
     fakeApi = {
       annotation: {
         create: sinon.stub().resolves(fixtures.defaultAnnotation()),
@@ -64,7 +68,7 @@ describe('AnnotationsService', () => {
       },
     });
 
-    svc = new AnnotationsService(fakeApi, fakeStore);
+    svc = new AnnotationsService(fakeAnnotationActivity, fakeApi, fakeStore);
   });
 
   afterEach(() => {
@@ -286,6 +290,13 @@ describe('AnnotationsService', () => {
       await assert.rejects(svc.delete(annot), 'Annotation does not exist');
       assert.notCalled(fakeStore.removeAnnotations);
     });
+
+    it('reports delete-annotation activity', async () => {
+      const annot = fixtures.defaultAnnotation();
+      await svc.delete(annot);
+      assert.calledOnce(fakeAnnotationActivity.reportActivity);
+      assert.calledWith(fakeAnnotationActivity.reportActivity, 'delete', annot);
+    });
   });
 
   describe('flag', () => {
@@ -307,6 +318,13 @@ describe('AnnotationsService', () => {
 
       await assert.rejects(svc.flag(annot), 'Annotation does not exist');
       assert.notCalled(fakeStore.updateFlagStatus);
+    });
+
+    it('reports flag-annotation activity', async () => {
+      const annot = fixtures.defaultAnnotation();
+      await svc.flag(annot);
+      assert.calledOnce(fakeAnnotationActivity.reportActivity);
+      assert.calledWith(fakeAnnotationActivity.reportActivity, 'flag', annot);
     });
   });
 
@@ -383,6 +401,19 @@ describe('AnnotationsService', () => {
       });
     });
 
+    it('reports create-annotation activity for new annotations', async () => {
+      fakeMetadata.isSaved.returns(false);
+      const annotation = fixtures.newAnnotation();
+
+      const savedAnnotation = await svc.save(annotation);
+      assert.calledOnce(fakeAnnotationActivity.reportActivity);
+      assert.calledWith(
+        fakeAnnotationActivity.reportActivity,
+        'create',
+        savedAnnotation
+      );
+    });
+
     it('calls the `update` API service for pre-existing annotations', () => {
       fakeMetadata.isSaved.returns(true);
 
@@ -393,6 +424,19 @@ describe('AnnotationsService', () => {
         assert.calledOnce(fakeStore.annotationSaveStarted);
         assert.calledOnce(fakeStore.annotationSaveFinished);
       });
+    });
+
+    it('reports update-annotation activity for pre-existing annotations', async () => {
+      fakeMetadata.isSaved.returns(true);
+      const annotation = fixtures.defaultAnnotation();
+
+      const savedAnnotation = await svc.save(annotation);
+      assert.calledOnce(fakeAnnotationActivity.reportActivity);
+      assert.calledWith(
+        fakeAnnotationActivity.reportActivity,
+        'update',
+        savedAnnotation
+      );
     });
 
     it('calls the relevant API service with an object that has any draft changes integrated', () => {
