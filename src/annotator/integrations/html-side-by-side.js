@@ -109,8 +109,9 @@ function hasFixedPosition(element) {
 }
 
 /**
- * Return the bounding rect that contains the element's content, including
- * any content which overflows the element's specified size.
+ * Return the bounding rect that contains the element's content. Unlike
+ * `Element.getBoundingClientRect`, this includes content which overflows
+ * the element's specified size.
  *
  * @param {Element} element
  */
