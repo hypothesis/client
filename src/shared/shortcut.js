@@ -80,7 +80,13 @@ export function matchShortcut(event, shortcut) {
 export function installShortcut(
   shortcut,
   onPress,
-  { rootElement = document.body } = {}
+  {
+    // We use `documentElement` as the root element rather than `document.body`
+    // which is used as a root element in some other places because the body
+    // element is not keyboard-focusable in XHTML documents in Safari/Chrome.
+    // See https://github.com/hypothesis/client/issues/4364.
+    rootElement = document.documentElement,
+  } = {}
 ) {
   /** @param {KeyboardEvent} event */
   const onKeydown = event => {
@@ -108,11 +114,7 @@ export function installShortcut(
  * @param {(e: KeyboardEvent) => any} onPress - A function to call when the shortcut matches
  * @param {ShortcutOptions} [options]
  */
-export function useShortcut(
-  shortcut,
-  onPress,
-  { rootElement = document.body } = {}
-) {
+export function useShortcut(shortcut, onPress, { rootElement } = {}) {
   useEffect(() => {
     if (!shortcut) {
       return undefined;

@@ -80,7 +80,9 @@ describe('Adder', () => {
       getContent(adder).querySelector(`button[title^="${label}"]`);
 
     const triggerShortcut = key =>
-      document.body.dispatchEvent(new KeyboardEvent('keydown', { key }));
+      document.body.dispatchEvent(
+        new KeyboardEvent('keydown', { key, bubbles: true })
+      );
 
     const showAdder = () => {
       // nb. `act` is necessary here to flush effect hooks in `AdderToolbar`
