@@ -279,6 +279,9 @@ function isSpace(char) {
   }
 }
 
+/** @param {string} char */
+const isNotSpace = char => !isSpace(char);
+
 /**
  * Locate the DOM Range which a position selector refers to.
  *
@@ -318,7 +321,7 @@ async function anchorByPosition(pageIndex, start, end) {
       textLayerStr,
       start,
       end,
-      char => !isSpace(char)
+      isNotSpace
     );
 
     const startPos = new TextPosition(root, textLayerStart);
@@ -336,29 +339,24 @@ async function anchorByPosition(pageIndex, start, end) {
 }
 
 /**
- * Return a string with spaces stripped and offsets into the input string.
+ * Return a string with spaces stripped.
  *
  * This function optimizes for performance of stripping the main space chars
  * that PDF.js generates over handling all kinds of whitespace that could
  * occur in a string.
  *
  * @param {string} str
- * @return {[string, number[]]}
  */
 function stripSpaces(str) {
-  const offsets = [];
   let stripped = '';
-
   for (let i = 0; i < str.length; i++) {
     const char = str[i];
     if (isSpace(char)) {
       continue;
     }
     stripped += char;
-    offsets.push(i);
   }
-
-  return [stripped, offsets];
+  return stripped;
 }
 
 /**
@@ -401,33 +399,36 @@ async function anchorQuote(quoteSelector, positionHint) {
   }
 
   // Search pages for the best match, ignoring whitespace differences.
-  const [strippedPrefix] =
-    quoteSelector.prefix !== undefined ? stripSpaces(quoteSelector.prefix) : [];
-  const [strippedSuffix] =
-    quoteSelector.suffix !== undefined ? stripSpaces(quoteSelector.suffix) : [];
-  const [strippedQuote] = stripSpaces(quoteSelector.exact);
+  const strippedPrefix =
+    quoteSelector.prefix !== undefined
+      ? stripSpaces(quoteSelector.prefix)
+      : undefined;
+  const strippedSuffix =
+    quoteSelector.suffix !== undefined
+      ? stripSpaces(quoteSelector.suffix)
+      : undefined;
+  const strippedQuote = stripSpaces(quoteSelector.exact);
 
   let bestMatch;
   for (let page of pageIndexes) {
     const text = await getPageTextContent(page);
-    const [strippedText, offsets] = stripSpaces(text);
+    const strippedText = stripSpaces(text);
 
     // Determine expected offset of quote in current page based on position hint.
     let strippedHint;
     if (expectedPageIndex !== undefined && expectedOffsetInPage !== undefined) {
-      let hint;
       if (page < expectedPageIndex) {
-        hint = text.length; // Prefer matches closer to end of page.
+        strippedHint = strippedText.length; // Prefer matches closer to end of page.
       } else if (page === expectedPageIndex) {
-        hint = expectedOffsetInPage;
+        [strippedHint] = translateOffsets(
+          text,
+          strippedText,
+          expectedOffsetInPage,
+          expectedOffsetInPage,
+          isNotSpace
+        );
       } else {
-        hint = 0; // Prefer matches closer to start of page.
-      }
-
-      // Convert expected offset in original text into offset into stripped text.
-      strippedHint = 0;
-      while (strippedHint < offsets.length && offsets[strippedHint] < hint) {
-        ++strippedHint;
+        strippedHint = 0; // Prefer matches closer to start of page.
       }
     }
 
@@ -442,19 +443,18 @@ async function anchorQuote(quoteSelector, positionHint) {
     }
 
     if (!bestMatch || match.score > bestMatch.match.score) {
+      const [start, end] = translateOffsets(
+        strippedText,
+        text,
+        match.start,
+        match.end,
+        isNotSpace
+      );
       bestMatch = {
         page,
         match: {
-          start: offsets[match.start],
-
-          // `match.end` is the offset one past the last character of the match
-          // in the stripped text. We need the offset one past the corresponding
-          // character in the original text.
-          //
-          // We assume here that matches returned by `matchQuote` must have
-          // be non-empty, so `match.end` > `match.start`.
-          end: offsets[match.end - 1] + 1,
-
+          start,
+          end,
           score: match.score,
         },
       };
