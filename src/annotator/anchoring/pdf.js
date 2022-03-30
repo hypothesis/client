@@ -1,5 +1,6 @@
 /* global PDFViewerApplication */
 
+import { warnOnce } from '../../shared/warn-once';
 import { translateOffsets } from '../util/normalize';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
@@ -323,6 +324,16 @@ async function anchorByPosition(pageIndex, start, end) {
       end,
       isNotSpace
     );
+
+    const textLayerQuote = stripSpaces(
+      textLayerStr.slice(textLayerStart, textLayerEnd)
+    );
+    const pageTextQuote = stripSpaces(pageText.slice(start, end));
+    if (textLayerQuote !== pageTextQuote) {
+      warnOnce(
+        'Text layer text does not match page text. Highlights will be mis-aligned.'
+      );
+    }
 
     const startPos = new TextPosition(root, textLayerStart);
     const endPos = new TextPosition(root, textLayerEnd);
