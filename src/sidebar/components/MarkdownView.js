@@ -1,16 +1,16 @@
-import classnames from 'classnames';
 import { useEffect, useMemo, useRef } from 'preact/hooks';
 
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
 
+import StyledText from './StyledText';
+
 /**
  * @typedef MarkdownViewProps
  * @prop {string} markdown - The string of markdown to display
- * @prop {Record<string,string>} [textStyle] -
- *   Additional CSS properties to apply to the rendered markdown
- * @prop {Record<string,boolean>} [textClass] -
- *   Map of classes to apply to the container of the rendered markdown
+ * @prop {string} [classes]
+ * @prop {Record<string,string>} [style]
+
  */
 
 /**
@@ -19,11 +19,7 @@ import { renderMathAndMarkdown } from '../render-markdown';
  *
  * @param {MarkdownViewProps} props
  */
-export default function MarkdownView({
-  markdown = '',
-  textClass = {},
-  textStyle = {},
-}) {
+export default function MarkdownView({ markdown, classes, style }) {
   const html = useMemo(
     () => (markdown ? renderMathAndMarkdown(markdown) : ''),
     [markdown]
@@ -39,24 +35,22 @@ export default function MarkdownView({
     });
   }, [markdown]);
 
-  // Use a blank string to indicate that the content language is unknown and may be
-  // different than the client UI. The user agent may pick a default or analyze
-  // the content to guess.
-  const contentLanguage = '';
-
+  // NB: The following could be implemented by setting attribute props directly
+  // on `StyledText` (which renders a `div` itself), versus introducing a child
+  // `div` as is done here. However, in initial testing, this interfered with
+  // some overflow calculations in the `Excerpt` element. This could be worth
+  // a review in the future.
   return (
-    <div
-      className="w-full break-words cursor-text"
-      dir="auto"
-      lang={contentLanguage}
-    >
-      <div
-        className={classnames('styled-text', textClass)}
-        data-testid="styled-text"
-        ref={content}
-        dangerouslySetInnerHTML={{ __html: html }}
-        style={textStyle}
-      />
+    <div className="w-full break-words cursor-text">
+      <StyledText>
+        <div
+          className={classes}
+          data-testid="markdown-text"
+          ref={content}
+          dangerouslySetInnerHTML={{ __html: html }}
+          style={style}
+        />
+      </StyledText>
     </div>
   );
 }

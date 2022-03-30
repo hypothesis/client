@@ -438,12 +438,8 @@ export default function MarkdownEditor({
       {preview ? (
         <MarkdownView
           markdown={text}
-          textClass={{
-            'hyp-u-border': true,
-            'hyp-u-bg-color--grey-1': true,
-            'hyp-u-padding': true,
-          }}
-          textStyle={textStyle}
+          classes="border bg-grey-1 p-2"
+          style={textStyle}
         />
       ) : (
         <textarea
