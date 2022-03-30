@@ -531,6 +531,11 @@ describe('annotator/anchoring/pdf', () => {
     });
 
     it('anchors with mismatch if text layer differs from PDF.js text API output', async () => {
+      const warnOnce = sinon.stub();
+      pdfAnchoring.$imports.$mock({
+        '../../shared/warn-once': { warnOnce },
+      });
+
       viewer.pdfViewer.setCurrentPage(1);
       const selection = 'zombie in possession';
       const range = findText(container, selection);
@@ -548,6 +553,10 @@ describe('annotator/anchoring/pdf', () => {
 
       const anchoredRange = await pdfAnchoring.anchor(container, [quote]);
       assert.equal(anchoredRange.toString(), 'zomby in possession o');
+      assert.calledWith(
+        warnOnce,
+        'Text layer text does not match page text. Highlights will be mis-aligned.'
+      );
     });
 
     it('anchors to a placeholder element if the page is not rendered', () => {
