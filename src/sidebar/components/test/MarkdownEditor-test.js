@@ -500,7 +500,7 @@ describe('MarkdownEditor', () => {
     });
     wrapper.update();
 
-    assert.deepEqual(wrapper.find('MarkdownView').prop('textStyle'), textStyle);
+    assert.deepEqual(wrapper.find('MarkdownView').prop('style'), textStyle);
   });
 
   it(

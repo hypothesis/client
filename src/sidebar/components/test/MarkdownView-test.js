@@ -8,7 +8,7 @@ describe('MarkdownView', () => {
   let fakeRenderMathAndMarkdown;
   let fakeReplaceLinksWithEmbeds;
 
-  const markdownSelector = '[data-testid="styled-text"]';
+  const markdownSelector = '[data-testid="markdown-text"]';
 
   beforeEach(() => {
     fakeRenderMathAndMarkdown = markdown => `rendered:${markdown}`;
@@ -56,14 +56,14 @@ describe('MarkdownView', () => {
 
   it('applies `textClass` class to container', () => {
     const wrapper = mount(
-      <MarkdownView markdown="foo" textClass={{ 'fancy-effect': true }} />
+      <MarkdownView markdown="foo" classes={'fancy-effect'} />
     );
     assert.isTrue(wrapper.find('.fancy-effect').exists());
   });
 
   it('applies `textStyle` style to container', () => {
     const wrapper = mount(
-      <MarkdownView markdown="foo" textStyle={{ fontFamily: 'serif' }} />
+      <MarkdownView markdown="foo" style={{ fontFamily: 'serif' }} />
     );
     assert.deepEqual(wrapper.find(markdownSelector).prop('style'), {
       fontFamily: 'serif',

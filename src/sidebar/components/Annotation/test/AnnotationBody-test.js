@@ -179,10 +179,7 @@ describe('AnnotationBody', () => {
         .returns(textStyle);
 
       const wrapper = createBody();
-      assert.deepEqual(
-        wrapper.find('MarkdownView').prop('textStyle'),
-        textStyle
-      );
+      assert.deepEqual(wrapper.find('MarkdownView').prop('style'), textStyle);
     });
   });
 

@@ -76,11 +76,11 @@ function AnnotationBody({ annotation, settings }) {
           overflowThreshold={20}
         >
           <MarkdownView
-            textStyle={textStyle}
             markdown={text}
-            textClass={{
-              'p-redacted-content': isHidden(annotation),
-            }}
+            classes={classnames({
+              'line-through grayscale contrast-50': isHidden(annotation),
+            })}
+            style={textStyle}
           />
         </Excerpt>
       )}
