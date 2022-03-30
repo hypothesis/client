@@ -163,7 +163,7 @@ function AnnotationShareControl({
             'theme-clean:border'
           )}
         >
-          <div className="flex items-center pb-2 border-b">
+          <div className="flex items-center">
             <h2 className="text-brand text-lg font-medium">
               Share this annotation
             </h2>
