@@ -19,6 +19,8 @@ describe('AnnotationEditor', () => {
 
   let fakeStore;
 
+  const editorSelector = '[data-testid="annotation-editor"]';
+
   function createComponent(props = {}) {
     return mount(
       <AnnotationEditor
@@ -199,7 +201,7 @@ describe('AnnotationEditor', () => {
       const wrapper = createComponent({ draft });
 
       wrapper
-        .find('.AnnotationEditor')
+        .find(editorSelector)
         .simulate('keydown', { key: 'Enter', ctrlKey: true });
 
       assert.calledOnce(fakeAnnotationsService.save);
@@ -216,7 +218,7 @@ describe('AnnotationEditor', () => {
       const wrapper = createComponent({ draft });
 
       wrapper
-        .find('.AnnotationEditor')
+        .find(editorSelector)
         .simulate('keydown', { key: 'Enter', metaKey: true });
 
       assert.calledOnce(fakeAnnotationsService.save);
@@ -230,7 +232,7 @@ describe('AnnotationEditor', () => {
       const wrapper = createComponent();
 
       wrapper
-        .find('.AnnotationEditor')
+        .find(editorSelector)
         .simulate('keydown', { key: 'Enter', metaKey: true });
 
       assert.notCalled(fakeAnnotationsService.save);
