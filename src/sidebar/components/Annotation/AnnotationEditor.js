@@ -172,7 +172,8 @@ function AnnotationEditor({
   return (
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
     <div
-      className="hyp-u-vertical-spacing AnnotationEditor"
+      data-testid="annotation-editor"
+      className="space-y-4"
       onKeyDown={onKeyDown}
     >
       <MarkdownEditor
@@ -187,18 +188,16 @@ function AnnotationEditor({
         onTagInput={setPendingTag}
         tagList={tags}
       />
-      <div className="hyp-u-layout-row annotation__form-actions">
-        {group && (
-          <AnnotationPublishControl
-            group={group}
-            isDisabled={isEmpty}
-            isPrivate={draft.isPrivate}
-            onCancel={onCancel}
-            onSave={onSave}
-            onSetPrivate={onSetPrivate}
-          />
-        )}
-      </div>
+      {group && (
+        <AnnotationPublishControl
+          group={group}
+          isDisabled={isEmpty}
+          isPrivate={draft.isPrivate}
+          onCancel={onCancel}
+          onSave={onSave}
+          onSetPrivate={onSetPrivate}
+        />
+      )}
       {shouldShowLicense && <AnnotationLicense />}
     </div>
   );
