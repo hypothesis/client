@@ -110,5 +110,26 @@ describe('annotator/util/normalize', () => {
       assert.equal(outStart, outStr.indexOf('c'));
       assert.equal(outEnd, outStart);
     });
+
+    it('does not return offsets beyond output string length', () => {
+      const inStr = 'foo bar baz';
+      const start = inStr.indexOf('bar');
+      const end = start + 'bar'.length;
+
+      const outStrs = ['', 'foo   b', 'fooba'];
+      for (let outStr of outStrs) {
+        const [outStart, outEnd] = translateOffsets(
+          inStr,
+          outStr,
+          start,
+          end,
+          isNotSpace
+        );
+        const outSubStr = outStr.slice(outStart, outEnd);
+        assert.equal(outSubStr, inStr.slice(start, start + outSubStr.length));
+        assert.isAtMost(outStart, outStr.length);
+        assert.isAtMost(outEnd, outStr.length);
+      }
+    });
   });
 });
