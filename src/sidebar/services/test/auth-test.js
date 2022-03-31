@@ -82,7 +82,6 @@ describe('AuthService', () => {
       fakeClient.config = config;
       return fakeClient;
     };
-    FakeOAuthClient.openAuthPopupWindow = sinon.stub();
 
     fakeWindow = new FakeWindow();
 
@@ -530,12 +529,9 @@ describe('AuthService', () => {
       fakeSettings.services = [];
     });
 
-    it('calls OAuthClient#authorize', () => {
-      const fakePopup = {};
-      FakeOAuthClient.openAuthPopupWindow.returns(fakePopup);
-      return auth.login().then(() => {
-        assert.calledWith(fakeClient.authorize, fakeWindow, fakePopup);
-      });
+    it('calls OAuthClient#authorize', async () => {
+      await auth.login();
+      assert.calledWith(fakeClient.authorize, fakeWindow);
     });
 
     it('resolves when auth completes successfully', () => {

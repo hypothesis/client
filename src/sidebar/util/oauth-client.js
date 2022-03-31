@@ -116,11 +116,9 @@ export class OAuthClient {
    * Returns an authorization code which can be passed to `exchangeAuthCode`.
    *
    * @param {Window} $window - Window which will receive the auth response.
-   * @param {Window} authWindow - Popup window where the login prompt will be shown.
-   *   This should be created using `openAuthPopupWindow`.
    * @return {Promise<string>}
    */
-  authorize($window, authWindow) {
+  authorize($window) {
     // Random state string used to check that auth messages came from the popup
     // window that we opened.
     //
@@ -160,10 +158,29 @@ export class OAuthClient {
     authURL.searchParams.set('response_type', 'code');
     authURL.searchParams.set('state', state);
 
-    // @ts-ignore - TS doesn't support `location = <string>`. We have to
-    // use this method to set the URL rather than `location.href = <string>`
-    // because `authWindow` is cross-origin.
-    authWindow.location = authURL.toString();
+    // In Chrome & Firefox the sizes passed to `window.open` are used for the
+    // viewport size. In Safari the size is used for the window size including
+    // title bar etc. There is enough vertical space at the bottom to allow for
+    // this.
+    //
+    // See https://bugs.webkit.org/show_bug.cgi?id=143678
+    const width = 475;
+    const height = 430;
+    const left = $window.screen.width / 2 - width / 2;
+    const top = $window.screen.height / 2 - height / 2;
+
+    // Generate settings for `window.open` in the required comma-separated
+    // key=value format.
+    const authWindowSettings = `left=${left},top=${top},width=${width},height=${height}`;
+    const authWindow = $window.open(
+      authURL.toString(),
+      'Log in to Hypothesis',
+      authWindowSettings
+    );
+
+    if (!authWindow) {
+      throw new Error('Failed to open login window');
+    }
 
     return authResponse.then(rsp => rsp.code);
   }
@@ -219,44 +236,5 @@ export class OAuthClient {
 
       refreshToken: response.refresh_token,
     };
-  }
-
-  /**
-   * Create and show a pop-up window for use with `OAuthClient#authorize`.
-   *
-   * This function _must_ be called in the same turn of the event loop as the
-   * button or link which initiates login to avoid triggering the popup blocker
-   * in certain browsers. See https://github.com/hypothesis/client/issues/534
-   * and https://github.com/hypothesis/client/issues/535.
-   *
-   * @param {Window} $window - The parent of the created window.
-   * @return {Window} The new popup window.
-   */
-  static openAuthPopupWindow($window) {
-    // In Chrome & Firefox the sizes passed to `window.open` are used for the
-    // viewport size. In Safari the size is used for the window size including
-    // title bar etc. There is enough vertical space at the bottom to allow for
-    // this.
-    //
-    // See https://bugs.webkit.org/show_bug.cgi?id=143678
-    const width = 475;
-    const height = 430;
-    const left = $window.screen.width / 2 - width / 2;
-    const top = $window.screen.height / 2 - height / 2;
-
-    // Generate settings for `window.open` in the required comma-separated
-    // key=value format.
-    const authWindowSettings = `left=${left},top=${top},width=${width},height=${height}`;
-    const authWindow = $window.open(
-      'about:blank',
-      'Log in to Hypothesis',
-      authWindowSettings
-    );
-
-    if (!authWindow) {
-      throw new Error('Failed to open login window');
-    }
-
-    return authWindow;
   }
 }
