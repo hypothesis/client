@@ -42,6 +42,27 @@ function renderScript(context) {
 }
 
 /**
+ * Read tags in test pages specifying custom headers to serve the content with.
+ *
+ * These tags look like `<!-- Header: <Key>: <Value> -->`.
+ *
+ * @param {string} content
+ * @return {[key: string, value: string][]}
+ */
+function readCustomHeaderTags(content) {
+  return content
+    .split('\n')
+    .map(line => {
+      const keyValue = line.match(/<!--\s*Header:\s*([A-Za-z-]+):(.*)-->/);
+      if (!keyValue) {
+        return null;
+      }
+      return [keyValue[1], keyValue[2]];
+    })
+    .filter(kv => kv !== null);
+}
+
+/**
  * Build context for rendering templates in the defined views directory.
  *
  * @param {Config} config
@@ -106,16 +127,13 @@ function serveDev(port, config) {
 
   // Serve HTML documents with injected client script
   app.get('/document/:document', (req, res, next) => {
-    // All HTML documents are served with the `text/html` mime type by default,
-    // even though some declare themselves to be XHTML. This mirrors how most
-    // content on the web is served. However we do have some test pages that
-    // need to be served with the correct XHTML mime type, as that alters
-    // browser behavior. See https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/XHTML.
-    if (req.params.document.startsWith('xhtml-')) {
-      res.set('Content-Type', 'application/xhtml+xml');
-    }
-
-    if (fs.existsSync(`${HTML_PATH}${req.params.document}.mustache`)) {
+    const path = `${HTML_PATH}${req.params.document}.mustache`;
+    if (fs.existsSync(path)) {
+      const content = fs.readFileSync(path, 'utf8');
+      const headers = readCustomHeaderTags(content);
+      for (let [key, value] of headers) {
+        res.set(key, value);
+      }
       res.render(req.params.document, templateContext(config));
     } else {
       next();
