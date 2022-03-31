@@ -1,8 +1,7 @@
 import { createSelector } from 'reselect';
 
 import * as metadata from '../../helpers/annotation-metadata';
-import * as util from '../util';
-import { createStoreModule } from '../create-store';
+import { createStoreModule, makeAction } from '../create-store';
 import { removeAnnotations } from './annotations';
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */
@@ -18,19 +17,29 @@ const initialState = [];
 /** @typedef {typeof initialState} State */
 
 /**
- * Helper class to encapsulate the draft properties and a few simple methods.
+ * @typedef {Pick<Annotation, 'id'|'$tag'>} AnnotationID
+ */
+
+/**
+ * Edits made to a new or existing annotation by a user.
  *
- *  A draft consists of:
+ * @typedef DraftChanges
+ * @prop {boolean} isPrivate
+ * @prop {string[]} tags
+ * @prop {string} text
+ */
+
+/**
+ * An unsaved set of changes to an annotation.
  *
- * 1. `annotation` which is the original annotation object which the
- *    draft is associated with. If this is just a draft, then this may
- *    not have an id yet and instead, $tag is used.
- *
- * 2. `isPrivate` (boolean), `tags` (array of objects) and `text` (string)
- *    which are the user's draft changes to the annotation. These are returned
- *    from the drafts store selector by `drafts.getDraft()`.
+ * This consists of an annotation ID ({@link AnnotationID}) and the edits
+ * ({@link DraftChanges}) made by the user.
  */
 export class Draft {
+  /**
+   * @param {AnnotationID} annotation
+   * @param {DraftChanges} changes
+   */
   constructor(annotation, changes) {
     this.annotation = { id: annotation.id, $tag: annotation.$tag };
     this.isPrivate = changes.isPrivate;
@@ -41,6 +50,8 @@ export class Draft {
    * Returns true if this draft matches a given annotation.
    *
    * Annotations are matched by ID or local tag.
+   *
+   * @param {AnnotationID} annotation
    */
   match(annotation) {
     return (
@@ -57,19 +68,27 @@ export class Draft {
   }
 }
 
-/* Reducer */
-
 const reducers = {
-  DISCARD_ALL_DRAFTS: function () {
+  DISCARD_ALL_DRAFTS() {
     return [];
   },
-  REMOVE_DRAFT: function (state, action) {
+
+  /**
+   * @param {State} state
+   * @param {{ annotation: AnnotationID }} action
+   */
+  REMOVE_DRAFT(state, action) {
     const drafts = state.filter(draft => {
       return !draft.match(action.annotation);
     });
     return drafts;
   },
-  UPDATE_DRAFT: function (state, action) {
+
+  /**
+   * @param {State} state
+   * @param {{ draft: Draft }} action
+   */
+  UPDATE_DRAFT(state, action) {
     // removes a matching existing draft, then adds
     const drafts = state.filter(draft => {
       return !draft.match(action.draft.annotation);
@@ -79,19 +98,17 @@ const reducers = {
   },
 };
 
-const actions = util.actionTypes(reducers);
-
-/* Actions */
-
 /**
  * Create or update the draft version for a given annotation by
  * replacing any existing draft or simply creating a new one.
+ *
+ * @param {AnnotationID} annotation
+ * @param {DraftChanges} changes
  */
 function createDraft(annotation, changes) {
-  return {
-    type: actions.UPDATE_DRAFT,
+  return makeAction(reducers, 'UPDATE_DRAFT', {
     draft: new Draft(annotation, changes),
-  };
+  });
 }
 
 /**
@@ -117,30 +134,25 @@ function deleteNewAndEmptyDrafts() {
 
 /**
  * Remove all drafts.
- * */
+ */
 function discardAllDrafts() {
-  return {
-    type: actions.DISCARD_ALL_DRAFTS,
-  };
+  return makeAction(reducers, 'DISCARD_ALL_DRAFTS', undefined);
 }
 
 /**
  * Remove the draft version of an annotation.
+ *
+ * @param {AnnotationID} annotation
  */
 function removeDraft(annotation) {
-  return {
-    type: actions.REMOVE_DRAFT,
-    annotation,
-  };
+  return makeAction(reducers, 'REMOVE_DRAFT', { annotation });
 }
-
-/* Selectors */
 
 /**
  * Returns the number of drafts - both unsaved new annotations, and unsaved
  * edits to saved annotations - currently stored.
  *
- * @return {number}
+ * @param {State} state
  */
 function countDrafts(state) {
   return state.length;
@@ -149,7 +161,8 @@ function countDrafts(state) {
 /**
  * Retrieve the draft changes for an annotation.
  *
- * @return {Draft|null}
+ * @param {State} state
+ * @param {AnnotationID} annotation
  */
 function getDraft(state, annotation) {
   const drafts = state;
@@ -167,7 +180,8 @@ function getDraft(state, annotation) {
  * Returns the draft changes for an annotation, or null if no draft exists
  * or the draft is empty.
  *
- * @return {Draft|null}
+ * @param {State} state
+ * @param {AnnotationID} annotation
  */
 function getDraftIfNotEmpty(state, annotation) {
   const draft = getDraft(state, annotation);
