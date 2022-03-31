@@ -1,0 +1,35 @@
+<!-- Header: Cross-Origin-Opener-Policy: same-origin -->
+<html>
+  <head>
+    <title>Cross-Origin-Opener-Policy test document</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        font-size: 1rem;
+        line-height: 1.5rem;
+      }
+      main {
+        max-width: 600px;
+        margin-top: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Cross-Origin-Opener-Policy test</h1>
+      <p>
+        This page tests the client on a document which is served with a
+        <a
+          href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy"
+          ><code>Cross-Origin-Opener-Policy: same-origin</code></a
+        >
+        header. This header prevents popup windows from accessing their opener
+        using
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/opener"
+          ><code>window.opener</code></a
+        >, which affects the client's login popup.
+      </p>
+      {{{ hypothesisScript }}}
+    </main>
+  </body>
+</html>
