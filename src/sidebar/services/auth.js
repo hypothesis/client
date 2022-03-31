@@ -270,9 +270,15 @@ export class AuthService extends TinyEmitter {
      * then exchange for access and refresh tokens.
      */
     async function login() {
-      const authWindow = OAuthClient.openAuthPopupWindow($window);
+      // Any async steps before the call to `client.authorize` must complete
+      // in less than ~1 second, otherwise the browser's popup blocker may block
+      // the popup.
+      //
+      // `oauthClient` is async in case in needs to fetch links from the API.
+      // This should already have happened by the time this function is called
+      // however, so it will just be returning a cached value.
       const client = await oauthClient();
-      const code = await client.authorize($window, authWindow);
+      const code = await client.authorize($window);
 
       // Save the auth code. It will be exchanged for an access token when the
       // next API request is made.

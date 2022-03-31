@@ -184,29 +184,6 @@ describe('sidebar/util/oauth-client', () => {
     });
   });
 
-  describe('#openAuthPopupWindow', () => {
-    it('opens a popup window', () => {
-      const fakeWindow = new FakeWindow();
-      const popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
-      assert.equal(popupWindow, fakeWindow.open.returnValues[0]);
-      assert.calledWith(
-        fakeWindow.open,
-        'about:blank',
-        'Log in to Hypothesis',
-        'left=274.5,top=169,width=475,height=430'
-      );
-    });
-
-    it('throws error if popup cannot be opened', () => {
-      const fakeWindow = new FakeWindow();
-      fakeWindow.open = sinon.stub().returns(null);
-
-      assert.throws(() => {
-        OAuthClient.openAuthPopupWindow(fakeWindow);
-      }, 'Failed to open login window');
-    });
-  });
-
   describe('#authorize', () => {
     let fakeWindow;
 
@@ -221,13 +198,27 @@ describe('sidebar/util/oauth-client', () => {
     });
 
     function authorize() {
-      const popupWindow = OAuthClient.openAuthPopupWindow(fakeWindow);
-      const authorized = client.authorize(fakeWindow, popupWindow);
-      return { authorized, popupWindow };
+      return client.authorize(fakeWindow);
     }
 
-    it('navigates the popup window to the authorization URL', () => {
-      const { authorized, popupWindow } = authorize();
+    it('opens a popup window at the authorization URL', async () => {
+      const authorized = authorize();
+
+      const params = new URLSearchParams({
+        client_id: config.clientId,
+        origin: 'https://client.hypothes.is',
+        response_mode: 'web_message',
+        response_type: 'code',
+        state: 'notrandom',
+      });
+      const expectedAuthURL = `${config.authorizationEndpoint}?${params}`;
+
+      assert.calledWith(
+        fakeWindow.open,
+        expectedAuthURL,
+        'Log in to Hypothesis',
+        'left=274.5,top=169,width=475,height=430'
+      );
 
       fakeWindow.sendMessage({
         type: 'authorization_response',
@@ -235,21 +226,25 @@ describe('sidebar/util/oauth-client', () => {
         state: 'notrandom',
       });
 
-      return authorized.then(() => {
-        const params = new URLSearchParams({
-          client_id: config.clientId,
-          origin: 'https://client.hypothes.is',
-          response_mode: 'web_message',
-          response_type: 'code',
-          state: 'notrandom',
-        });
-        const expectedAuthUrl = `${config.authorizationEndpoint}?${params}`;
-        assert.equal(popupWindow.location.href, expectedAuthUrl);
-      });
+      await authorized;
+    });
+
+    it('rejects if popup cannot be opened', async () => {
+      fakeWindow.open = sinon.stub().returns(null);
+
+      let error;
+      try {
+        await authorize();
+      } catch (e) {
+        error = e;
+      }
+
+      assert.instanceOf(error, Error);
+      assert.equal(error.message, 'Failed to open login window');
     });
 
     it('resolves with an auth code if successful', () => {
-      const { authorized } = authorize();
+      const authorized = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',
@@ -263,7 +258,7 @@ describe('sidebar/util/oauth-client', () => {
     });
 
     it('rejects with an error if canceled', () => {
-      const { authorized } = authorize();
+      const authorized = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_canceled',
@@ -276,7 +271,7 @@ describe('sidebar/util/oauth-client', () => {
     });
 
     it('ignores responses with incorrect "state" values', () => {
-      const { authorized } = authorize();
+      const authorized = authorize();
 
       fakeWindow.sendMessage({
         type: 'authorization_response',
