@@ -1,5 +1,10 @@
 import { watch } from '../util/watch';
 
+/**
+ * @typedef {import('../store/modules/defaults').Key} Key
+ */
+
+/** @type {Record<Key, string>} */
 const DEFAULT_KEYS = {
   annotationPrivacy: 'hypothesis.privacy',
   focusedGroup: 'hypothesis.groups.focus',
@@ -46,7 +51,7 @@ export class PersistedDefaultsService {
     Object.keys(DEFAULT_KEYS).forEach(defaultKey => {
       // `localStorage.getItem` will return `null` for a non-existent key
       const defaultValue = this._storage.getItem(DEFAULT_KEYS[defaultKey]);
-      this._store.setDefault(defaultKey, defaultValue);
+      this._store.setDefault(/** @type {Key} */ (defaultKey), defaultValue);
     });
 
     // Listen for changes to those defaults from the store and persist them
