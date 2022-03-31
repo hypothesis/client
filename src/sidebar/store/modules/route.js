@@ -1,6 +1,4 @@
-import { actionTypes } from '../util';
-
-import { createStoreModule } from '../create-store';
+import { createStoreModule, makeAction } from '../create-store';
 
 /**
  * @typedef {'annotation'|'notebook'|'sidebar'|'stream'} RouteName
@@ -26,30 +24,32 @@ const initialState = {
   params: {},
 };
 
+/** @typedef {typeof initialState} State */
+
 const reducers = {
+  /**
+   * @param {State} state
+   * @param {{ name: RouteName, params: Record<string, string> }} action
+   */
   CHANGE_ROUTE(state, { name, params }) {
     return { name, params };
   },
 };
 
-const actions = actionTypes(reducers);
-
 /**
  * Change the active route.
  *
- * @param {string} name - Name of the route to activate. See `initialState` for possible values
+ * @param {RouteName} name - Name of the route to activate. See `initialState` for possible values
  * @param {Record<string,string>} params - Parameters associated with the route
  */
 function changeRoute(name, params = {}) {
-  return {
-    type: actions.CHANGE_ROUTE,
-    name,
-    params,
-  };
+  return makeAction(reducers, 'CHANGE_ROUTE', { name, params });
 }
 
 /**
  * Return the name of the current route.
+ *
+ * @param {State} state
  */
 function route(state) {
   return state.name;
@@ -58,6 +58,8 @@ function route(state) {
 /**
  * Return any parameters for the current route, extracted from the path and
  * query string.
+ *
+ * @param {State} state
  */
 function routeParams(state) {
   return state.params;
