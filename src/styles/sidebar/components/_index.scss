@@ -7,9 +7,6 @@
 // Extensions and overrides to patterns from `frontend-shared`
 @use '../../frontend-shared';
 
-// Local patterns
-@use '../../patterns';
-
 // UI (Preact) Components
 // ----------
 @use './AutocompleteList';
@@ -37,3 +34,9 @@
 @use './ToastMessages';
 @use './TopBar';
 @use './VersionInfo';
+
+@layer components {
+  .p-redacted-text {
+    @apply line-through grayscale contrast-50 text-color-text-light;
+  }
+}

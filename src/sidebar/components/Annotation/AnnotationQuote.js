@@ -26,9 +26,7 @@ import StyledText from '../StyledText';
 function AnnotationQuote({ quote, isFocused, isOrphan, settings = {} }) {
   return (
     <Excerpt collapsedHeight={35} inlineControls={true} overflowThreshold={20}>
-      <StyledText
-        classes={classnames({ 'line-through grayscale contrast-50': isOrphan })}
-      >
+      <StyledText classes={classnames({ 'p-redacted-text': isOrphan })}>
         <blockquote
           className={classnames('hover:border-l-blue-quote', {
             'border-l-blue-quote': isFocused,

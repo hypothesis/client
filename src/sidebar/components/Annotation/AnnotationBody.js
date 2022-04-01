@@ -78,7 +78,7 @@ function AnnotationBody({ annotation, settings }) {
           <MarkdownView
             markdown={text}
             classes={classnames({
-              'line-through grayscale contrast-50': isHidden(annotation),
+              'p-redacted-text': isHidden(annotation),
             })}
             style={textStyle}
           />
