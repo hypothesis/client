@@ -19,6 +19,34 @@ import TagListItem from '../TagListItem';
  */
 
 /**
+ * Button to expand or collapse the annotation excerpt (content)
+ * @param {object} props
+ *   @param {string} [props.classes]
+ *   @param {(collapse:boolean) => void} props.setIsCollapsed
+ *   @param {boolean} props.isCollapsed
+ */
+function ToggleExcerptButton({ classes, setIsCollapsed, isCollapsed }) {
+  const toggleText = isCollapsed ? 'More' : 'Less';
+  return (
+    <LabeledButton
+      classes={classnames('text-grey-7 font-normal', classes)}
+      expanded={!isCollapsed}
+      onClick={() => setIsCollapsed(!isCollapsed)}
+      title={`Toggle visibility of full annotation text: Show ${toggleText}`}
+    >
+      <div className="flex items-center gap-x-2">
+        <Icon
+          classes="!text-tiny"
+          name={isCollapsed ? 'expand' : 'collapse'}
+          title={isCollapsed ? 'expand' : 'collapse'}
+        />
+        <div>{toggleText}</div>
+      </div>
+    </LabeledButton>
+  );
+}
+
+/**
  * @typedef AnnotationBodyProps
  * @prop {Annotation} annotation - The annotation in question
  * @prop {SidebarSettings} settings
@@ -41,8 +69,6 @@ function AnnotationBody({ annotation, settings }) {
   const store = useStoreProxy();
   const defaultAuthority = store.defaultAuthority();
   const draft = store.getDraft(annotation);
-
-  const toggleText = isCollapsed ? 'More' : 'Less';
 
   // If there is a draft use the tag and text from it.
   const tags = draft?.tags ?? annotation.tags;
@@ -105,25 +131,14 @@ function AnnotationBody({ annotation, settings }) {
           </div>
           {isCollapsible && (
             <div>
-              <LabeledButton
+              <ToggleExcerptButton
                 classes={classnames(
-                  // Pull this button up toward the bottom of the excerpt content
-                  '-mt-3',
-                  'text-grey-7 font-normal'
+                  // Pull button up toward bottom of excerpt content
+                  '-mt-3'
                 )}
-                expanded={!isCollapsed}
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                title={`Toggle visibility of full annotation text: Show ${toggleText}`}
-              >
-                <div className="flex items-center gap-x-2">
-                  <Icon
-                    classes="!text-tiny"
-                    name={isCollapsed ? 'expand' : 'collapse'}
-                    title={isCollapsed ? 'expand' : 'collapse'}
-                  />
-                  <div>{toggleText}</div>
-                </div>
-              </LabeledButton>
+                isCollapsed={isCollapsed}
+                setIsCollapsed={setIsCollapsed}
+              />
             </div>
           )}
         </div>
