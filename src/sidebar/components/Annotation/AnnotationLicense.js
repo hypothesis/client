@@ -5,16 +5,16 @@ import { Icon, Link } from '@hypothesis/frontend-shared';
  */
 export default function AnnotationLicense() {
   return (
-    <div className="hyp-u-padding--top hyp-u-border--top text-sm leading-none">
+    <div className="pt-2 border-t text-sm leading-none">
       <Link
-        classes="hyp-u-layout-row--align-center p-link--muted"
+        classes="flex items-center text-color-text-light"
         href="http://creativecommons.org/publicdomain/zero/1.0/"
         target="_blank"
         title="View more information about the Creative Commons Public Domain dedication"
       >
         <Icon name="cc-std" classes="text-tiny" />
-        <Icon name="cc-zero" classes="hyp-u-margin--left--1 text-tiny" />
-        <div className="hyp-u-margin--left--2">
+        <Icon name="cc-zero" classes="ml-px text-tiny" />
+        <div className="ml-1">
           Annotations can be freely reused by anyone for any purpose.
         </div>
       </Link>
