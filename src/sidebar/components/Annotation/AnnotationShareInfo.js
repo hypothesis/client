@@ -26,10 +26,7 @@ function AnnotationShareInfo({ group, isPrivate }) {
     <>
       {group && linkToGroup && (
         <Link
-          classes={classnames(
-            'flex items-baseline gap-x-1',
-            'text-color-text-light hover:text-color-text-light hover:underline'
-          )}
+          classes={classnames('flex items-baseline gap-x-1', 'p-muted-link')}
           href={group.links.html}
           target="_blank"
         >

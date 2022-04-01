@@ -90,7 +90,7 @@ export default function AnnotationTimestamps({
       )}
       {annotationUrl ? (
         <Link
-          classes="text-color-text-light hover:text-color-text-light hover:underline"
+          classes="p-muted-link"
           target="_blank"
           title={created.absolute}
           href={annotationUrl}
