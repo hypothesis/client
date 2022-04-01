@@ -35,8 +35,17 @@
 @use './TopBar';
 @use './VersionInfo';
 
-@layer components {
-  .p-redacted-text {
-    @apply line-through grayscale contrast-50 text-color-text-light;
-  }
+// TODO: Put these in @layer components after shared component styles have
+// been converted to Tailwind (and are contained in the components layer
+// themselves). They need to come after shared-component styles in the
+// output stylesheet.
+
+// Applies to <Link>
+.p-muted-link {
+  @apply text-color-text-light hover:text-color-text-light hover:underline;
+}
+
+// Applies to any text: strikeout effect
+.p-redacted-text {
+  @apply line-through grayscale contrast-50 text-color-text-light;
 }
