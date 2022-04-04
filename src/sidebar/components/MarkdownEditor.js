@@ -17,6 +17,7 @@ import {
 import { isMacOS } from '../../shared/user-agent';
 
 import MarkdownView from './MarkdownView';
+import classNames from 'classnames';
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.
@@ -138,19 +139,51 @@ function ToolbarButton({
 
   if (label) {
     return (
-      <LabeledButton classes="font-normal TransparentButton" {...buttonProps}>
+      <LabeledButton
+        classes={classNames(
+          'font-normal bg-transparent',
+          // TODO: Refactor shared button styles to reduce specificity and make
+          // this !important rule unnecessary
+          'hover:!bg-transparent'
+        )}
+        {...buttonProps}
+      >
         {label}
       </LabeledButton>
     );
   }
   return (
-    <IconButton classes="MarkdownEditor__toolbar-button" {...buttonProps} />
+    <IconButton
+      classes="py-3.5 px-2 text-tiny touch:text-base"
+      {...buttonProps}
+    />
   );
 }
 
 /**
  * @typedef {'bold'|'italic'|'quote'|'link'|'image'|'math'|'numlist'|'list'|'preview'|'help'} ButtonID
  */
+
+/**
+ * @typedef {import('preact').Ref<HTMLTextAreaElement>} TextAreaRef
+ * @typedef {import('preact').JSX.HTMLAttributes<HTMLTextAreaElement>} TextAreaAttributes
+ *
+ * @param {TextAreaAttributes & { classes?: string, containerRef?: TextAreaRef }} props
+ */
+function TextArea({ classes, containerRef, ...restProps }) {
+  return (
+    <textarea
+      className={classNames(
+        'border rounded-sm p-2',
+        'text-color-text-light bg-grey-0',
+        'focus:bg-white focus:outline-none focus:shadow-focus-inner',
+        classes
+      )}
+      {...restProps}
+      ref={containerRef}
+    />
+  );
+}
 
 /**
  * @typedef ToolbarProps
@@ -271,7 +304,16 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
 
   return (
     <div
-      className="hyp-u-layout-row hyp-u-border--left hyp-u-border--right hyp-u-border--top hyp-u-bg-color--white MarkdownEditor__toolbar"
+      className={classNames(
+        // Allow buttons to wrap to second line if necessary.
+        'flex flex-wrap w-full items-center',
+        'px-1 border-x border-t rounded-t bg-white',
+        // For touch interfaces, allow height to scale to larger button targets.
+        // Don't wrap buttons but instead scroll horizontally. Add bottom
+        // padding to provide some space for scrollbar.
+        'touch:h-auto touch:overflow-x-scroll touch:flex-nowrap touch:pb-2.5'
+      )}
+      data-testid="markdown-toolbar"
       role="toolbar"
       aria-label="Markdown editor toolbar"
       onKeyDown={handleKeyDown}
@@ -347,26 +389,25 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         tabIndex={getTabIndex(buttonIds.list)}
         title="Bulleted list"
       />
-      <span className="hyp-u-stretch" />
-      <div className="hyp-u-layout-row--center">
+      <div className="grow flex items-center justify-end">
         <Link
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
           target="_blank"
-          classes="text-tiny IconOnlyLink"
+          classes="text-grey-7 hover:!text-grey-7 px-2 py-3"
           linkRef={buttonRefs[buttonIds.help]}
           tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
           aria-label="Formatting help"
         >
-          <Icon name="help" />
+          <Icon classes="text-tiny" name="help" />
         </Link>
+        <ToolbarButton
+          label={isPreviewing ? 'Write' : 'Preview'}
+          onClick={onTogglePreview}
+          buttonRef={buttonRefs[buttonIds.preview]}
+          tabIndex={getTabIndex(buttonIds.preview)}
+        />
       </div>
-      <ToolbarButton
-        label={isPreviewing ? 'Write' : 'Preview'}
-        onClick={onTogglePreview}
-        buttonRef={buttonRefs[buttonIds.preview]}
-        tabIndex={getTabIndex(buttonIds.preview)}
-      />
     </div>
   );
 }
@@ -442,11 +483,17 @@ export default function MarkdownEditor({
           style={textStyle}
         />
       ) : (
-        <textarea
+        <TextArea
           aria-label={label}
-          className="MarkdownEditor__input"
           dir="auto"
-          ref={input}
+          classes={classNames(
+            'w-full min-h-[8em] resize-y',
+            // Turn off border-radius on top edges to align with toolbar above
+            'rounded-t-none',
+            // Larger font on touch devices
+            'text-base touch:text-touch-base'
+          )}
+          containerRef={input}
           onClick={e => e.stopPropagation()}
           onKeyDown={handleKeyDown}
           onInput={e => {
