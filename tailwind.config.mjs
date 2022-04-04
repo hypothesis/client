@@ -29,6 +29,8 @@ export default {
       boxShadow: {
         DEFAULT: '0 1px 1px rgba(0, 0, 0, 0.1)',
         adderToolbar: '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
+        focus: '0 0 0 2px #59a7e8',
+        'focus-inner': 'inset 0 0 0 2px #59a7e8',
         // The shadow shown along the edge of the sidebar in the clean theme
         sidebar: '0px 1px 4px rgb(0, 0, 0, 0.5)',
       },
@@ -41,6 +43,7 @@ export default {
           inverted: '#f2f2f2',
         },
         blue: {
+          focus: '#59a7e8',
           quote: '#58cef4',
         },
       },
@@ -66,6 +69,7 @@ export default {
         base: ['13px', '1.4'], // Current base font size for sidebar
         lg: ['14px'],
         xl: ['16px'],
+        'touch-base': ['16px', '1.4'], // Used for touch interfaces in certain UIs
         // rem-based font sizes for annotator controls that should scale
         // with text scaling in the underlying document
         'annotator-sm': ['0.75rem'],
