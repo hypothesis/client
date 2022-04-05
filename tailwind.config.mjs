@@ -16,6 +16,7 @@ export default {
       animation: {
         adderPopUp: 'adderPopUp 0.08s ease-in forwards',
         adderPopDown: 'adderPopDown 0.08s ease-in forwards',
+        'fade-in-slow': 'fade-in 1s ease-in',
       },
       borderRadius: {
         // Tailwind provides a default set of border-radius utility styles
@@ -110,6 +111,14 @@ export default {
           '100%': {
             opacity: '1',
             transform: 'scale(1) translateY(0px)',
+          },
+        },
+        'fade-in': {
+          '0%': {
+            opacity: '0',
+          },
+          '100%': {
+            opacity: '1',
           },
         },
       },
