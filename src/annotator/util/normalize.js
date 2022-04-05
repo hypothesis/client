@@ -37,43 +37,47 @@ function countChars(str, filter, startPos, endPos) {
 }
 
 /**
- * Translate a (start, end) pair of offsets in an input string to corresponding
- * offsets in an output string, where positions in the input and output strings
- * are related by counting the number of preceding characters that pass a
- * filter.
+ * Translate a (start, end) pair of offsets for an "input" string into
+ * corresponding offsets in an "output" string.
  *
- * In typical usage, the output string is a corrupted version of the input
- * string, where characters that do not match the filter (eg. whitespace)
- * have been inserted or deleted at arbitrary locations.
+ * Positions in the input and output strings are related by counting
+ * the number of "important" characters before them, as determined by a
+ * filter function.
+ *
+ * An example usage would be to find equivalent positions in two strings which
+ * contain the same text content except for the addition or removal of
+ * whitespace at arbitrary locations in the output string.
  *
  * Where there are multiple possible offsets in the output string that
  * correspond to the input offsets, the largest start offset and smallest end
  * offset are chosen.
  *
  * @example
- *   // Input offsets specify the substring "bc" in the input. Result specifies
- *   // the corresponding "b c" substring in the output.
+ *   // The input offsets (1, 3) select the substring "bc" in the "input" argument.
+ *   // The returned offsets select the substring "b c" in the "output" argument.
  *   translateOffsets('abcd', ' a b c d ', 1, 3, char => char !== ' ')
  *
- * @param {string} inputStr
- * @param {string} outputStr
- * @param {number} start - Start offset in `inputStr`
- * @param {number} end - End offset in `inputStr`
- * @param {(ch: string) => boolean} filter
- * @return {[number, number]} - Start and end offsets in `outputStr`
+ * @param {string} input
+ * @param {string} output
+ * @param {number} start - Start offset in `input`
+ * @param {number} end - End offset in `input`
+ * @param {(ch: string) => boolean} filter - Filter function that returns true
+ *   if a character should be counted when relating positions between `input`
+ *   and `output`.
+ * @return {[number, number]} - Start and end offsets in `output`
  */
-export function translateOffsets(inputStr, outputStr, start, end, filter) {
-  const startCount = countChars(inputStr, filter, 0, start);
-  const startToEndCount = countChars(inputStr, filter, start, end);
+export function translateOffsets(input, output, start, end, filter) {
+  const beforeStartCount = countChars(input, filter, 0, start);
+  const startToEndCount = countChars(input, filter, start, end);
 
   // Find smallest offset with `startCount` matching chars before it in output,
   // then adjust to the largest such offset.
-  let outStart = advance(outputStr, startCount, filter);
-  while (outStart < outputStr.length && !filter(outputStr[outStart])) {
-    ++outStart;
+  let outputStart = advance(output, beforeStartCount, filter);
+  while (outputStart < output.length && !filter(output[outputStart])) {
+    ++outputStart;
   }
 
-  const outEnd = advance(outputStr, startToEndCount, filter, outStart);
+  const outputEnd = advance(output, startToEndCount, filter, outputStart);
 
-  return [outStart, outEnd];
+  return [outputStart, outputEnd];
 }
