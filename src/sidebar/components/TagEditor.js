@@ -1,6 +1,7 @@
 import {
   normalizeKeyName,
   useElementShouldClose,
+  TextInput,
 } from '@hypothesis/frontend-shared';
 import { useRef, useState } from 'preact/hooks';
 
@@ -270,7 +271,7 @@ function TagEditor({
     activeItem >= 0 ? `${tagEditorId}-AutocompleteList-item-${activeItem}` : '';
 
   return (
-    <div className="TagEditor space-y-4">
+    <div className="space-y-4">
       <TagList>
         {tagList.map(tag => {
           return <TagListItem key={tag} onRemoveTag={onRemoveTag} tag={tag} />;
@@ -278,7 +279,7 @@ function TagEditor({
       </TagList>
       <div
         id={tagEditorId}
-        className="TagEditor__combobox-wrapper"
+        data-testid="combobox-container"
         ref={closeWrapperRef}
         // Disabled because aria-controls must be attached to the <input> field
         // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
@@ -287,13 +288,13 @@ function TagEditor({
         aria-owns={`${tagEditorId}-AutocompleteList`}
         aria-haspopup="listbox"
       >
-        <input
+        <TextInput
+          classes="w-full"
           onInput={handleOnInput}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
-          ref={inputEl}
+          inputRef={inputEl}
           placeholder="Add new tags"
-          className="TagEditor__input"
           type="text"
           autoComplete="off"
           aria-autocomplete="list"

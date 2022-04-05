@@ -88,10 +88,8 @@ describe('TagEditor', () => {
 
   it('adds appropriate tag values to the elements', () => {
     const wrapper = createComponent();
-    wrapper.find('li').forEach((tag, i) => {
-      assert.isTrue(tag.hasClass('TagEditor__item'));
-      assert.include(tag.text(), fakeTags[i]);
-      assert.equal(tag.prop('aria-label'), `Tag: ${fakeTags[i]}`);
+    wrapper.find('TagListItem').forEach((tag, i) => {
+      assert.equal(tag.props().tag, fakeTags[i]);
     });
   });
 
@@ -455,6 +453,7 @@ describe('TagEditor', () => {
   });
 
   describe('accessibility attributes and ids', () => {
+    const comboboxSelector = '[data-testid="combobox-container"]';
     it('creates multiple <TagEditor> components with unique AutocompleteList `id` props', () => {
       const wrapper1 = createComponent();
       const wrapper2 = createComponent();
@@ -469,7 +468,7 @@ describe('TagEditor', () => {
       wrapper.find('AutocompleteList');
 
       assert.equal(
-        wrapper.find('.TagEditor__combobox-wrapper').prop('aria-owns'),
+        wrapper.find(comboboxSelector).prop('aria-owns'),
         wrapper.find('AutocompleteList').prop('id')
       );
     });
@@ -479,13 +478,13 @@ describe('TagEditor', () => {
       wrapper.find('input').instance().value = 'non-empty'; // to open list
       typeInput(wrapper);
       assert.equal(
-        wrapper.find('.TagEditor__combobox-wrapper').prop('aria-expanded'),
+        wrapper.find(comboboxSelector).prop('aria-expanded'),
         'true'
       );
       selectOption(wrapper, 'tag4');
       wrapper.update();
       assert.equal(
-        wrapper.find('.TagEditor__combobox-wrapper').prop('aria-expanded'),
+        wrapper.find(comboboxSelector).prop('aria-expanded'),
         'false'
       );
     });
