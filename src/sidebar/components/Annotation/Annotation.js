@@ -29,7 +29,15 @@ function SavingMessage() {
       )}
       data-testid="saving-message"
     >
-      <Spinner classes="text-xl" size="small" />
+      <Spinner
+        classes={classnames(
+          'text-xl',
+          // Slowly fade in the Spinner such that it only shows up if
+          // the saving is slow
+          'animate-fade-in-slow'
+        )}
+        size="small"
+      />
       <div className="text-color-text-light font-medium">Saving...</div>
     </div>
   );
