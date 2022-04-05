@@ -1,8 +1,0 @@
-@use '../../mixins/forms';
-
-.TagEditor {
-  &__input {
-    @include forms.form-input;
-    width: 100%;
-  }
-}
