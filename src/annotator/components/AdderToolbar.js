@@ -136,7 +136,7 @@ export default function AdderToolbar({
     <div
       className={classnames(
         'AdderToolbar',
-        'absolute select-none bg-white rounded shadow-adderToolbar',
+        'absolute select-none bg-white rounded shadow-adder-toolbar',
         // Because `.AdderToolbar` rules reset `all:initial`, we cannot use
         // default border values from Tailwind and have to be explicit about
         // all border attributes
@@ -144,8 +144,8 @@ export default function AdderToolbar({
         // Start at a very low opacity as we're going to fade in in the animation
         'opacity-5',
         {
-          'animate-adderPopUp': arrowDirection === 'up' && isVisible,
-          'animate-adderPopDown': arrowDirection === 'down' && isVisible,
+          'animate-adder-pop-up': arrowDirection === 'up' && isVisible,
+          'animate-adder-pop-down': arrowDirection === 'down' && isVisible,
         }
       )}
       dir="ltr"
