@@ -178,7 +178,7 @@ function Excerpt({
           {
             // For expandable excerpts not using inlineControls, style this
             // element with a custom shadow-like gradient
-            'bg-gradient-to-b from-excerptStop1 via-excerptStop2 to-excerptStop3':
+            'bg-gradient-to-b from-excerpt-stop-1 via-excerpt-stop-2 to-excerpt-stop-3':
               !inlineControls && isExpandable,
             'bg-none': inlineControls,
             // Don't make this shadow visible OR clickable if there's nothing
