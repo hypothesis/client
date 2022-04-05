@@ -30,20 +30,15 @@ describe('AutocompleteList', () => {
     $imports.$restore();
   });
 
-  it('does not render the list when `open` is false', () => {
+  it('hides the list container when `open` is false', () => {
+    // `open` prop defaults to `false`
     const wrapper = createComponent();
-    assert.isTrue(wrapper.find('.AutocompleteList').hasClass('is-hidden'));
+    assert.include(wrapper.find('Card').props().classes, 'hidden');
   });
 
-  it('does not render the list when `list` is empty', () => {
+  it('hides the list container when `list` is empty', () => {
     const wrapper = createComponent({ open: true, list: [] });
-    assert.isTrue(wrapper.find('.AutocompleteList').hasClass('is-hidden'));
-  });
-
-  it('sets unique keys to the <li> items', () => {
-    const wrapper = createComponent({ open: true });
-    assert.equal(wrapper.find('li').at(0).key(), 'AutocompleteList-0');
-    assert.equal(wrapper.find('li').at(1).key(), 'AutocompleteList-1');
+    assert.include(wrapper.find('Card').props().classes, 'hidden');
   });
 
   it('renders the items in order of the list prop', () => {
@@ -52,15 +47,10 @@ describe('AutocompleteList', () => {
     assert.equal(wrapper.find('li').at(1).text(), 'tag2');
   });
 
-  it('does not apply the `is-selected` class to items that are not selected', () => {
-    const wrapper = createComponent({ open: true });
-    assert.isFalse(wrapper.find('li.is-selected').exists());
-  });
-
-  it('applies `is-selected` class only to the <li> at the matching index', () => {
+  it('sets `aria-selected` on the <li> at the matching index to `activeItem`', () => {
     const wrapper = createComponent({ open: true, activeItem: 0 });
-    assert.isTrue(wrapper.find('li').at(0).hasClass('is-selected'));
-    assert.isFalse(wrapper.find('li').at(1).hasClass('is-selected'));
+    assert.equal(wrapper.find('li').at(0).prop('aria-selected'), 'true');
+    assert.equal(wrapper.find('li').at(1).prop('aria-selected'), 'false');
   });
 
   it('calls `onSelect` when an <li> is clicked with the corresponding item', () => {
@@ -88,13 +78,6 @@ describe('AutocompleteList', () => {
     wrapper = createComponent({ open: true, itemPrefixId: 'item-prefix-id-' });
     assert.equal(wrapper.find('li').at(0).prop('id'), 'item-prefix-id-0');
     assert.equal(wrapper.find('li').at(1).prop('id'), 'item-prefix-id-1');
-  });
-
-  it('sets the `aria-selected` attribute to "true" on the active item and "false" for all others', () => {
-    const wrapper = createComponent({ open: true, activeItem: 0 });
-    assert.equal(wrapper.find('li').at(0).prop('aria-selected'), 'true');
-
-    assert.equal(wrapper.find('li').at(1).prop('aria-selected'), 'false');
   });
 
   it(
