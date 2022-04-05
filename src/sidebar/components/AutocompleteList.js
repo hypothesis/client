@@ -1,3 +1,4 @@
+import { Card, Icon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
@@ -6,6 +7,22 @@ import { useMemo } from 'preact/hooks';
  * @param {T} item
  */
 const defaultListFormatter = item => item;
+
+/**
+ * @param {object} props
+ *   @param {string} [props.classes] - Optional additional CSS classes
+ */
+function MenuArrowUp({ classes }) {
+  return (
+    <Icon
+      name="pointer"
+      classes={classnames(
+        'absolute inline z-2 text-grey-3 fill-white',
+        classes
+      )}
+    />
+  );
+}
 
 /**
  * @template T
@@ -59,10 +76,13 @@ export default function AutocompleteList({
           role="option"
           aria-selected={(activeItem === index).toString()}
           className={classnames(
+            'flex items-center',
+            'border-l-4 py-1 px-3 cursor-pointer hover:bg-grey-2',
+            'touch:h-touch-minimum',
             {
-              'is-selected': activeItem === index,
-            },
-            'AutocompleteList__li'
+              'border-brand bg-grey-1': activeItem === index,
+              'border-transparent': activeItem !== index,
+            }
           )}
           onClick={() => {
             onSelectItem(item);
@@ -78,23 +98,21 @@ export default function AutocompleteList({
   const props = id ? { id } : {}; // only add the id if its passed
   const isHidden = list.length === 0 || !open;
   return (
-    <div
-      className={classnames(
-        {
-          'is-hidden': isHidden,
-        },
-        'AutocompleteList'
-      )}
-    >
-      <ul
-        className="AutocompleteList__items"
-        tabIndex={-1}
-        aria-label="Suggestions"
-        role="listbox"
-        {...props}
+    <div className="relative">
+      <Card
+        classes={classnames(
+          { hidden: isHidden },
+          // Move the Card down a bit to make room for the up-pointing arrow
+          'absolute top-[3px] z-3',
+          // Override full-width of Card, but set a min-width of `10em`
+          'w-auto min-w-[10em] theme-clean:border p-0'
+        )}
       >
-        {items}
-      </ul>
+        <ul tabIndex={-1} aria-label="Suggestions" role="listbox" {...props}>
+          {items}
+        </ul>
+        <MenuArrowUp classes="top-[-10px]" />
+      </Card>
     </div>
   );
 }
