@@ -37,7 +37,11 @@ function ToggleExcerptButton({ classes, setCollapsed, collapsed }) {
     >
       <div className="flex items-center gap-x-2">
         <Icon
-          classes="!text-tiny"
+          classes={classnames(
+            // TODO: Refactor shared LabeledButton styles such that rules
+            // have lower specificity and we don't need an !important rule here
+            '!text-tiny'
+          )}
           name={collapsed ? 'expand' : 'collapse'}
           title={collapsed ? 'expand' : 'collapse'}
         />
