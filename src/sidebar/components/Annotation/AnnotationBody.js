@@ -20,25 +20,26 @@ import TagListItem from '../TagListItem';
 
 /**
  * Button to expand or collapse the annotation excerpt (content)
+ *
  * @param {object} props
  *   @param {string} [props.classes]
- *   @param {(collapse:boolean) => void} props.setIsCollapsed
- *   @param {boolean} props.isCollapsed
+ *   @param {(collapse:boolean) => void} props.setCollapsed
+ *   @param {boolean} props.collapsed
  */
-function ToggleExcerptButton({ classes, setIsCollapsed, isCollapsed }) {
-  const toggleText = isCollapsed ? 'More' : 'Less';
+function ToggleExcerptButton({ classes, setCollapsed, collapsed }) {
+  const toggleText = collapsed ? 'More' : 'Less';
   return (
     <LabeledButton
       classes={classnames('text-grey-7 font-normal', classes)}
-      expanded={!isCollapsed}
-      onClick={() => setIsCollapsed(!isCollapsed)}
+      expanded={!collapsed}
+      onClick={() => setCollapsed(!collapsed)}
       title={`Toggle visibility of full annotation text: Show ${toggleText}`}
     >
       <div className="flex items-center gap-x-2">
         <Icon
           classes="!text-tiny"
-          name={isCollapsed ? 'expand' : 'collapse'}
-          title={isCollapsed ? 'expand' : 'collapse'}
+          name={collapsed ? 'expand' : 'collapse'}
+          title={collapsed ? 'expand' : 'collapse'}
         />
         <div>{toggleText}</div>
       </div>
@@ -60,11 +61,11 @@ function ToggleExcerptButton({ classes, setIsCollapsed, isCollapsed }) {
 function AnnotationBody({ annotation, settings }) {
   // Should the text content of `Excerpt` be rendered in a collapsed state,
   // assuming it is collapsible (exceeds allotted collapsed space)?
-  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(true);
 
   // Does the text content of `Excerpt` take up enough vertical space that
   // collapsing/expanding is relevant?
-  const [isCollapsible, setIsCollapsible] = useState(false);
+  const [collapsible, setCollapsible] = useState(false);
 
   const store = useStoreProxy();
   const defaultAuthority = store.defaultAuthority();
@@ -94,11 +95,11 @@ function AnnotationBody({ annotation, settings }) {
     <div className="space-y-4">
       {showExcerpt && (
         <Excerpt
-          collapse={isCollapsed}
+          collapse={collapsed}
           collapsedHeight={400}
           inlineControls={false}
-          onCollapsibleChanged={setIsCollapsible}
-          onToggleCollapsed={setIsCollapsed}
+          onCollapsibleChanged={setCollapsible}
+          onToggleCollapsed={setCollapsed}
           overflowThreshold={20}
         >
           <MarkdownView
@@ -110,7 +111,7 @@ function AnnotationBody({ annotation, settings }) {
           />
         </Excerpt>
       )}
-      {(isCollapsible || showTagList) && (
+      {(collapsible || showTagList) && (
         <div className="flex flex-row gap-x-2">
           <div className="grow">
             {showTagList && (
@@ -129,15 +130,15 @@ function AnnotationBody({ annotation, settings }) {
               </TagList>
             )}
           </div>
-          {isCollapsible && (
+          {collapsible && (
             <div>
               <ToggleExcerptButton
                 classes={classnames(
                   // Pull button up toward bottom of excerpt content
                   '-mt-3'
                 )}
-                isCollapsed={isCollapsed}
-                setIsCollapsed={setIsCollapsed}
+                collapsed={collapsed}
+                setCollapsed={setCollapsed}
               />
             </div>
           )}
