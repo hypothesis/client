@@ -127,7 +127,7 @@ describe('TopBar', () => {
   });
 
   describe('login/account actions', () => {
-    const getLoginText = wrapper => wrapper.find('.TopBar__login-links');
+    const getLoginText = wrapper => wrapper.find('[data-testid="login-links"]');
 
     it('Shows ellipsis when login state is unknown', () => {
       const wrapper = createTopBar({ auth: { status: 'unknown' } });
