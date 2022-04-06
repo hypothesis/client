@@ -30,7 +30,7 @@ describe('LoggedOutMessage', () => {
   it('should link to signup', () => {
     const wrapper = createLoggedOutMessage();
 
-    const signupLink = wrapper.find('.LoggedOutMessage__link').at(0);
+    const signupLink = wrapper.find('Link').at(0);
 
     assert.calledWith(fakeStore.getLink, 'signup');
     assert.equal(signupLink.prop('href'), 'signup_link');
