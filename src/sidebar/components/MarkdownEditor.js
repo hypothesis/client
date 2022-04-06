@@ -5,6 +5,7 @@ import {
   Link,
   normalizeKeyName,
 } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 import { createRef } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
@@ -17,7 +18,14 @@ import {
 import { isMacOS } from '../../shared/user-agent';
 
 import MarkdownView from './MarkdownView';
-import classnames from 'classnames';
+
+/**
+ * @typedef {import("@hypothesis/frontend-shared/lib/components/Link").LinkProps} LinkProps
+ * @typedef {import('preact').JSX.HTMLAttributes<HTMLTextAreaElement>} TextAreaAttributes
+ * @typedef {import('preact').Ref<HTMLTextAreaElement>} TextAreaRef
+ *
+ * @typedef {'bold'|'italic'|'quote'|'link'|'image'|'math'|'numlist'|'list'|'preview'|'help'} ButtonID
+ */
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.
@@ -99,8 +107,6 @@ function handleToolbarCommand(command, inputEl) {
 }
 
 /**
- * @typedef {import("@hypothesis/frontend-shared/lib/components/Link").LinkProps} LinkProps
- *
  * Style a Link to look like an IconButton, including touch sizing
  * affordances.
  *
@@ -186,12 +192,6 @@ function ToolbarButton({
 }
 
 /**
- * @typedef {'bold'|'italic'|'quote'|'link'|'image'|'math'|'numlist'|'list'|'preview'|'help'} ButtonID
- */
-
-/**
- * @typedef {import('preact').Ref<HTMLTextAreaElement>} TextAreaRef
- * @typedef {import('preact').JSX.HTMLAttributes<HTMLTextAreaElement>} TextAreaAttributes
  *
  * @param {TextAreaAttributes & { classes?: string, containerRef?: TextAreaRef }} props
  */
