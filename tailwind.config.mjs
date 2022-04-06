@@ -1,6 +1,8 @@
 import tailwindConfig from '@hypothesis/frontend-shared/lib/tailwind.preset.js';
 import plugin from 'tailwindcss/plugin.js';
 
+const focusBlue = '#59a7e8';
+
 export default {
   presets: [tailwindConfig],
   content: [
@@ -29,8 +31,8 @@ export default {
       boxShadow: {
         DEFAULT: '0 1px 1px rgba(0, 0, 0, 0.1)',
         adderToolbar: '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
-        focus: '0 0 0 2px #59a7e8',
-        'focus-inner': 'inset 0 0 0 2px #59a7e8',
+        focus: `0 0 0 2px ${focusBlue}`,
+        'focus-inner': `inset 0 0 0 2px ${focusBlue}`,
         // The shadow shown along the edge of the sidebar in the clean theme
         sidebar: '0px 1px 4px rgb(0, 0, 0, 0.5)',
       },
@@ -43,7 +45,7 @@ export default {
           inverted: '#f2f2f2',
         },
         blue: {
-          focus: '#59a7e8',
+          focus: focusBlue,
           quote: '#58cef4',
         },
       },
