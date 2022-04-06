@@ -50,7 +50,8 @@ function countChars(str, filter, startPos, endPos) {
  *
  * Where there are multiple possible offsets in the output string that
  * correspond to the input offsets, the largest start offset and smallest end
- * offset are chosen.
+ * offset are chosen. In other words, leading and trailing ignored characters
+ * are trimmed from the output.
  *
  * @example
  *   // The input offsets (1, 3) select the substring "bc" in the "input" argument.
@@ -70,13 +71,19 @@ export function translateOffsets(input, output, start, end, filter) {
   const beforeStartCount = countChars(input, filter, 0, start);
   const startToEndCount = countChars(input, filter, start, end);
 
-  // Find smallest offset with `startCount` matching chars before it in output,
-  // then adjust to the largest such offset.
+  // Find smallest offset in `output` with same number of non-ignored characters
+  // before it as before `start` in the input. This offset might correspond to
+  // an ignored character.
   let outputStart = advance(output, beforeStartCount, filter);
+
+  // Increment this offset until it points to a non-ignored character. This
+  // "trims" leading ignored characters from the result.
   while (outputStart < output.length && !filter(output[outputStart])) {
     ++outputStart;
   }
 
+  // Find smallest offset in `output` with same number of non-ignored characters
+  // before it as before `end` in the input.
   const outputEnd = advance(output, startToEndCount, filter, outputStart);
 
   return [outputStart, outputEnd];
