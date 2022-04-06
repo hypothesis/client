@@ -431,6 +431,8 @@ async function anchorQuote(quoteSelector, positionHint) {
       if (page < expectedPageIndex) {
         strippedHint = strippedText.length; // Prefer matches closer to end of page.
       } else if (page === expectedPageIndex) {
+        // Translate expected offset in whitespace-inclusive version of page
+        // text into offset in whitespace-stripped version of page text.
         [strippedHint] = translateOffsets(
           text,
           strippedText,
@@ -454,6 +456,8 @@ async function anchorQuote(quoteSelector, positionHint) {
     }
 
     if (!bestMatch || match.score > bestMatch.match.score) {
+      // Translate match offset from whitespace-stripped version of page text
+      // back to original text.
       const [start, end] = translateOffsets(
         strippedText,
         text,
