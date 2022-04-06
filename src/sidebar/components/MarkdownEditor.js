@@ -17,7 +17,7 @@ import {
 import { isMacOS } from '../../shared/user-agent';
 
 import MarkdownView from './MarkdownView';
-import classNames from 'classnames';
+import classnames from 'classnames';
 
 // Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
 // The shortcuts are taken from Stack Overflow's editor.
@@ -99,6 +99,31 @@ function handleToolbarCommand(command, inputEl) {
 }
 
 /**
+ * @typedef {import("@hypothesis/frontend-shared/lib/components/Link").LinkProps} LinkProps
+ *
+ * Style a Link to look like an IconButton, including touch sizing
+ * affordances.
+ *
+ * @param {Omit<LinkProps, 'children'> & { icon: string }} props
+ */
+function IconLink({ classes, icon, linkRef, ...restProps }) {
+  return (
+    <Link
+      classes={classnames(
+        'flex justify-center items-center',
+        'text-grey-7 hover:!text-grey-7',
+        'touch:h-touch-minimum touch:w-touch-minimum',
+        classes
+      )}
+      linkRef={linkRef}
+      {...restProps}
+    >
+      <Icon classes="text-tiny touch:text-base" name={icon} />
+    </Link>
+  );
+}
+
+/**
  * @typedef ToolbarButtonProps
  * @prop {object} buttonRef
  * @prop {boolean} [disabled]
@@ -140,7 +165,7 @@ function ToolbarButton({
   if (label) {
     return (
       <LabeledButton
-        classes={classNames(
+        classes={classnames(
           'font-normal bg-transparent',
           // TODO: Refactor shared button styles to reduce specificity and make
           // this !important rule unnecessary
@@ -154,7 +179,7 @@ function ToolbarButton({
   }
   return (
     <IconButton
-      classes="py-3.5 px-2 text-tiny touch:text-base"
+      classes="px-2 py-2.5 text-tiny touch:text-base"
       {...buttonProps}
     />
   );
@@ -173,7 +198,7 @@ function ToolbarButton({
 function TextArea({ classes, containerRef, ...restProps }) {
   return (
     <textarea
-      className={classNames(
+      className={classnames(
         'border rounded-sm p-2',
         'text-color-text-light bg-grey-0',
         'focus:bg-white focus:outline-none focus:shadow-focus-inner',
@@ -304,10 +329,10 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
 
   return (
     <div
-      className={classNames(
+      className={classnames(
         // Allow buttons to wrap to second line if necessary.
         'flex flex-wrap w-full items-center',
-        'px-1 border-x border-t rounded-t bg-white',
+        'p-1 border-x border-t rounded-t bg-white',
         // For touch interfaces, allow height to scale to larger button targets.
         // Don't wrap buttons but instead scroll horizontally. Add bottom
         // padding to provide some space for scrollbar.
@@ -389,18 +414,21 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         tabIndex={getTabIndex(buttonIds.list)}
         title="Bulleted list"
       />
-      <div className="grow flex items-center justify-end">
-        <Link
+      <div className="grow flex justify-end">
+        <IconLink
+          classes={classnames(
+            // Adjust padding to make element a little taller than wide
+            // This matches ToolbarButton styling
+            'px-2 py-2.5'
+          )}
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
+          icon="help"
           target="_blank"
-          classes="text-grey-7 hover:!text-grey-7 px-2 py-3"
           linkRef={buttonRefs[buttonIds.help]}
           tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
           aria-label="Formatting help"
-        >
-          <Icon classes="text-tiny" name="help" />
-        </Link>
+        />
         <ToolbarButton
           label={isPreviewing ? 'Write' : 'Preview'}
           onClick={onTogglePreview}
@@ -486,7 +514,7 @@ export default function MarkdownEditor({
         <TextArea
           aria-label={label}
           dir="auto"
-          classes={classNames(
+          classes={classnames(
             'w-full min-h-[8em] resize-y',
             // Turn off border-radius on top edges to align with toolbar above
             'rounded-t-none',
