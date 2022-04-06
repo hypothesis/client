@@ -131,6 +131,7 @@ export default {
       screens: {
         touch: { raw: '(pointer: coarse)' },
         md: '480px',
+        lg: '768px',
         // Narrow mobile screens
         'annotator-sm': '240px',
         // Wider mobile screens/small tablets
@@ -151,6 +152,7 @@ export default {
         1: '1',
         2: '2',
         3: '3',
+        4: '4',
         max: '2147483647',
       },
     },
