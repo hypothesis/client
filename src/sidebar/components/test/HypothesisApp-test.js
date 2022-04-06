@@ -5,15 +5,16 @@ import HypothesisApp, { $imports } from '../HypothesisApp';
 
 describe('HypothesisApp', () => {
   let fakeApplyTheme;
-  let fakeStore = null;
-  let fakeAuth = null;
+  let fakeStore;
+  let fakeAuth;
   let fakeFrameSync;
   let fakeConfirm;
-  let fakeServiceConfig = null;
-  let fakeSession = null;
-  let fakeShouldAutoDisplayTutorial = null;
-  let fakeSettings = null;
-  let fakeToastMessenger = null;
+  let fakeServiceConfig;
+  let fakeSession;
+  let fakeShouldAutoDisplayTutorial;
+  let fakeSettings;
+  let fakeStreamer;
+  let fakeToastMessenger;
 
   const createComponent = (props = {}) => {
     return mount(
@@ -22,6 +23,7 @@ describe('HypothesisApp', () => {
         frameSync={fakeFrameSync}
         settings={fakeSettings}
         session={fakeSession}
+        streamer={fakeStreamer}
         toastMessenger={fakeToastMessenger}
         {...props}
       />
@@ -44,6 +46,7 @@ describe('HypothesisApp', () => {
       removeAnnotations: sinon.stub(),
 
       hasFetchedProfile: sinon.stub().returns(true),
+      pendingUpdateCount: sinon.stub().returns(0),
       profile: sinon.stub().returns({
         userid: null,
         preferences: {
@@ -51,6 +54,7 @@ describe('HypothesisApp', () => {
         },
       }),
       route: sinon.stub().returns('sidebar'),
+      toggleSidebarPanel: sinon.stub(),
 
       getLink: sinon.stub(),
     };
@@ -67,6 +71,10 @@ describe('HypothesisApp', () => {
 
     fakeFrameSync = {
       notifyHost: sinon.stub(),
+    };
+
+    fakeStreamer = {
+      applyPendingUpdates: sinon.stub(),
     };
 
     fakeToastMessenger = {
@@ -207,6 +215,20 @@ describe('HypothesisApp', () => {
     });
   });
 
+  describe('"apply pending updates" action', () => {
+    it('applies updates when clicked', () => {
+      const clickApplyUpdates = wrapper =>
+        wrapper.find('TopBar').props().onApplyUpdates();
+
+      fakeStore.pendingUpdateCount.returns(3);
+      const wrapper = createComponent();
+
+      clickApplyUpdates(wrapper);
+      assert.equal(wrapper.find('TopBar').props().pendingUpdateCount, 3);
+      assert.calledOnce(fakeStreamer.applyPendingUpdates);
+    });
+  });
+
   describe('"Sign up" action', () => {
     const clickSignUp = wrapper => wrapper.find('TopBar').props().onSignUp();
 
@@ -244,6 +266,28 @@ describe('HypothesisApp', () => {
         const wrapper = createComponent();
         clickSignUp(wrapper);
         assert.calledWith(window.open, 'https://ann.service/signup');
+      });
+    });
+  });
+
+  describe('"Help" action', () => {
+    const clickHelp = wrapper => wrapper.find('TopBar').props().onRequestHelp();
+
+    it('toggles the help panel', () => {
+      const wrapper = createComponent();
+      clickHelp(wrapper);
+
+      assert.calledWith(fakeStore.toggleSidebarPanel, 'help');
+    });
+
+    context('help service handler configured in services configuartion', () => {
+      it('notifies host frame if help clicked', () => {
+        fakeServiceConfig.returns({ onHelpRequestProvided: true });
+
+        const wrapper = createComponent();
+        clickHelp(wrapper);
+
+        assert.calledWith(fakeFrameSync.notifyHost, 'helpRequested');
       });
     });
   });

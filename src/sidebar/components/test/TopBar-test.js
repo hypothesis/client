@@ -6,31 +6,29 @@ import TopBar, { $imports } from '../TopBar';
 
 describe('TopBar', () => {
   const fakeSettings = {};
-  let fakeFrameSync;
   let fakeStore;
-  let fakeStreamer;
   let fakeIsThirdPartyService;
-  let fakeServiceConfig;
+
+  let fakeOnApplyUpdates;
+  let fakeOnLogin;
+  let fakeOnLogout;
+  let fakeOnRequestHelp;
+  let fakeOnSignUp;
 
   beforeEach(() => {
+    fakeOnApplyUpdates = sinon.stub();
+    fakeOnLogin = sinon.stub();
+    fakeOnLogout = sinon.stub();
+    fakeOnRequestHelp = sinon.stub();
+    fakeOnSignUp = sinon.stub();
+
     fakeIsThirdPartyService = sinon.stub().returns(false);
 
     fakeStore = {
       filterQuery: sinon.stub().returns(null),
       isSidebarPanelOpen: sinon.stub().returns(false),
-      pendingUpdateCount: sinon.stub().returns(0),
       setFilterQuery: sinon.stub(),
       toggleSidebarPanel: sinon.stub(),
-    };
-
-    fakeFrameSync = {
-      notifyHost: sinon.stub(),
-    };
-
-    fakeServiceConfig = sinon.stub().returns({});
-
-    fakeStreamer = {
-      applyPendingUpdates: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -39,7 +37,6 @@ describe('TopBar', () => {
       '../helpers/is-third-party-service': {
         isThirdPartyService: fakeIsThirdPartyService,
       },
-      '../config/service-config': { serviceConfig: fakeServiceConfig },
     });
   });
 
@@ -57,72 +54,64 @@ describe('TopBar', () => {
     return mount(
       <TopBar
         auth={auth}
-        frameSync={fakeFrameSync}
         isSidebar={true}
+        onApplyUpdates={fakeOnApplyUpdates}
+        onLogin={fakeOnLogin}
+        onLogout={fakeOnLogout}
+        onRequestHelp={fakeOnRequestHelp}
+        onSignUp={fakeOnSignUp}
+        pendingUpdateCount={0}
         settings={fakeSettings}
-        streamer={fakeStreamer}
         {...props}
       />
     );
   }
 
   it('shows the pending update count', () => {
-    fakeStore.pendingUpdateCount.returns(1);
-    const wrapper = createTopBar();
+    const wrapper = createTopBar({ pendingUpdateCount: 1 });
     const applyBtn = getButton(wrapper, 'refresh');
     assert.isTrue(applyBtn.exists());
   });
 
   it('does not show the pending update count when there are no updates', () => {
-    const wrapper = createTopBar();
+    const wrapper = createTopBar({ pendingUpdateCount: 0 });
     const applyBtn = getButton(wrapper, 'refresh');
     assert.isFalse(applyBtn.exists());
   });
 
   it('applies updates when clicked', () => {
-    fakeStore.pendingUpdateCount.returns(1);
-    const wrapper = createTopBar();
+    const updateFn = sinon.stub();
+    const wrapper = createTopBar({
+      onApplyUpdates: updateFn,
+      pendingUpdateCount: 1,
+    });
     const applyBtn = getButton(wrapper, 'refresh');
 
     applyBtn.props().onClick();
 
-    assert.called(fakeStreamer.applyPendingUpdates);
+    assert.calledOnce(updateFn);
   });
 
   describe('`HelpButton` and help requests', () => {
-    context('no help service handler configured in services (default)', () => {
-      it('toggles Help Panel on click', () => {
-        const wrapper = createTopBar();
-        const helpButton = getButton(wrapper, 'help');
+    it('displays a help icon active state when help panel active', () => {
+      fakeStore.isSidebarPanelOpen.withArgs('help').returns(true);
+      const wrapper = createTopBar();
+      const helpButton = getButton(wrapper, 'help');
 
-        helpButton.props().onClick();
+      wrapper.update();
 
-        assert.calledWith(fakeStore.toggleSidebarPanel, 'help');
-      });
+      assert.isTrue(helpButton.props().expanded);
+    });
 
-      it('displays a help icon active state when help panel active', () => {
-        fakeStore.isSidebarPanelOpen.withArgs('help').returns(true);
-        const wrapper = createTopBar();
-        const helpButton = getButton(wrapper, 'help');
+    it('invokes help callback when help button clicked', () => {
+      const helpFn = sinon.stub();
+      const wrapper = createTopBar({ onRequestHelp: helpFn });
 
-        wrapper.update();
+      const helpButton = getButton(wrapper, 'help');
 
-        assert.isTrue(helpButton.props().expanded);
-      });
+      helpButton.props().onClick();
 
-      context('help service handler configured in services', () => {
-        it('notifies host frame if help clicked and service is configured', () => {
-          fakeServiceConfig.returns({ onHelpRequestProvided: true });
-          const wrapper = createTopBar();
-
-          const helpButton = getButton(wrapper, 'help');
-
-          helpButton.props().onClick();
-
-          assert.equal(fakeStore.toggleSidebarPanel.callCount, 0);
-          assert.calledWith(fakeFrameSync.notifyHost, 'helpRequested');
-        });
-      });
+      assert.calledOnce(helpFn);
     });
   });
 

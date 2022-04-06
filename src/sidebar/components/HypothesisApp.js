@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { useEffect, useMemo } from 'preact/hooks';
+import { useCallback, useEffect, useMemo } from 'preact/hooks';
 
 import { confirm } from '../../shared/prompts';
 import { serviceConfig } from '../config/service-config';
@@ -55,6 +55,7 @@ function authStateFromProfile(profile) {
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {SidebarSettings} settings
  * @prop {import('../services/session').SessionService} session
+ * @prop {import('../services/streamer').StreamerService} streamer
  * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
  */
 
@@ -66,11 +67,24 @@ function authStateFromProfile(profile) {
  *
  * @param {HypothesisAppProps} props
  */
-function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
+function HypothesisApp({
+  auth,
+  frameSync,
+  settings,
+  session,
+  streamer,
+  toastMessenger,
+}) {
   const store = useStoreProxy();
   const hasFetchedProfile = store.hasFetchedProfile();
   const profile = store.profile();
   const route = store.route();
+  const pendingUpdateCount = store.pendingUpdateCount();
+
+  const applyPendingUpdates = useCallback(
+    () => streamer.applyPendingUpdates(),
+    [streamer]
+  );
 
   /** @type {AuthState} */
   const authState = useMemo(() => {
@@ -162,6 +176,19 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
     session.logout();
   };
 
+  /**
+   * Open the help panel, or, if a service callback is configured to handle
+   * help requests, fire a relevant event instead
+   */
+  const onRequestHelp = useCallback(() => {
+    const service = serviceConfig(settings);
+    if (service && service.onHelpRequestProvided) {
+      frameSync.notifyHost('helpRequested');
+    } else {
+      store.toggleSidebarPanel('help');
+    }
+  }, [frameSync, settings, store]);
+
   return (
     <div
       className={classnames('HypothesisApp', 'js-thread-list-scroll-root', {
@@ -173,10 +200,13 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
       {route !== 'notebook' && (
         <TopBar
           auth={authState}
+          onApplyUpdates={applyPendingUpdates}
           onLogin={login}
           onSignUp={signUp}
           onLogout={logout}
+          onRequestHelp={onRequestHelp}
           isSidebar={isSidebar}
+          pendingUpdateCount={pendingUpdateCount}
         />
       )}
       <div className="HypothesisApp__content">
@@ -204,5 +234,6 @@ export default withServices(HypothesisApp, [
   'frameSync',
   'session',
   'settings',
+  'streamer',
   'toastMessenger',
 ]);

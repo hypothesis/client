@@ -1,7 +1,6 @@
 import { IconButton, LinkButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import { serviceConfig } from '../config/service-config';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
@@ -16,9 +15,7 @@ import UserMenu from './UserMenu';
 /**
  * @typedef {import('../components/UserMenu').AuthState} AuthState
  * @typedef {import('preact').ComponentChildren} Children
- * @typedef {import('../services/frame-sync').FrameSyncService} FrameSyncService
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../services/streamer').StreamerService} StreamerService
  */
 
 /**
@@ -48,13 +45,14 @@ function SidebarContent({ children, classes }) {
 /**
  * @typedef TopBarProps
  * @prop {AuthState} auth
- * @prop {FrameSyncService} frameSync - injected
  * @prop {boolean} isSidebar - Flag indicating whether the app is the sidebar or a top-level page.
+ * @prop {() => void} onApplyUpdates
  * @prop {() => void} onLogin - Callback invoked when user clicks "Login" button.
  * @prop {() => void} onLogout - Callback invoked when user clicks "Logout" action in account menu.
+ * @prop {() => void} onRequestHelp - Callback invoked when user clicks "Help" button.
  * @prop {() => void} onSignUp - Callback invoked when user clicks "Sign up" button.
+ * @prop {number} pendingUpdateCount
  * @prop {SidebarSettings} settings - injected
- * @prop {StreamerService} streamer - injected
  */
 
 /**
@@ -65,22 +63,20 @@ function SidebarContent({ children, classes }) {
  */
 function TopBar({
   auth,
-  frameSync,
   isSidebar,
+  onApplyUpdates,
   onLogin,
   onLogout,
+  onRequestHelp,
   onSignUp,
+  pendingUpdateCount,
   settings,
-  streamer,
 }) {
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
   const store = useStoreProxy();
   const filterQuery = store.filterQuery();
-  const pendingUpdateCount = store.pendingUpdateCount();
-
-  const applyPendingUpdates = () => streamer.applyPendingUpdates();
 
   const toggleSharePanel = () => {
     store.toggleSidebarPanel('shareGroupAnnotations');
@@ -90,19 +86,6 @@ function TopBar({
   const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
     'shareGroupAnnotations'
   );
-
-  /**
-   * Open the help panel, or, if a service callback is configured to handle
-   * help requests, fire a relevant event instead
-   */
-  const requestHelp = () => {
-    const service = serviceConfig(settings);
-    if (service && service.onHelpRequestProvided) {
-      frameSync.notifyHost('helpRequested');
-    } else {
-      store.toggleSidebarPanel('help');
-    }
-  };
 
   return (
     <div
@@ -133,7 +116,7 @@ function TopBar({
               {pendingUpdateCount > 0 && (
                 <IconButton
                   icon="refresh"
-                  onClick={applyPendingUpdates}
+                  onClick={onApplyUpdates}
                   size="small"
                   variant="primary"
                   title={`Show ${pendingUpdateCount} new/updated ${
@@ -160,7 +143,7 @@ function TopBar({
           <IconButton
             icon="help"
             expanded={isHelpPanelOpen}
-            onClick={requestHelp}
+            onClick={onRequestHelp}
             size="small"
             title="Help"
           />
@@ -201,4 +184,4 @@ function TopBar({
   );
 }
 
-export default withServices(TopBar, ['frameSync', 'settings', 'streamer']);
+export default withServices(TopBar, ['settings']);
