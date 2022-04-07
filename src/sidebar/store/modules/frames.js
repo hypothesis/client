@@ -5,8 +5,7 @@ import {
 } from 'reselect';
 import shallowEqual from 'shallowequal';
 
-import * as util from '../util';
-import { createStoreModule } from '../create-store';
+import { createStoreModule, makeAction } from '../create-store';
 
 /**
  * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
@@ -27,15 +26,27 @@ const initialState = [];
 /** @typedef {typeof initialState} State */
 
 const reducers = {
-  CONNECT_FRAME: function (state, action) {
+  /**
+   * @param {State} state
+   * @param {{ frame: Frame }} action
+   */
+  CONNECT_FRAME(state, action) {
     return [...state, action.frame];
   },
 
-  DESTROY_FRAME: function (state, action) {
+  /**
+   * @param {State} state
+   * @param {{ frame: Frame }} action
+   */
+  DESTROY_FRAME(state, action) {
     return state.filter(f => f !== action.frame);
   },
 
-  UPDATE_FRAME_ANNOTATION_FETCH_STATUS: function (state, action) {
+  /**
+   * @param {State} state
+   * @param {{ uri: string, isAnnotationFetchComplete: boolean }} action
+   */
+  UPDATE_FRAME_ANNOTATION_FETCH_STATUS(state, action) {
     const frames = state.map(frame => {
       const match = frame.uri && frame.uri === action.uri;
       if (match) {
@@ -50,15 +61,13 @@ const reducers = {
   },
 };
 
-const actions = util.actionTypes(reducers);
-
 /**
  * Add a frame to the list of frames currently connected to the sidebar app.
  *
  * @param {Frame} frame
  */
 function connectFrame(frame) {
-  return { type: actions.CONNECT_FRAME, frame };
+  return makeAction(reducers, 'CONNECT_FRAME', { frame });
 }
 
 /**
@@ -67,7 +76,7 @@ function connectFrame(frame) {
  * @param {Frame} frame
  */
 function destroyFrame(frame) {
-  return { type: actions.DESTROY_FRAME, frame };
+  return makeAction(reducers, 'DESTROY_FRAME', { frame });
 }
 
 /**
@@ -77,17 +86,16 @@ function destroyFrame(frame) {
  * @param {boolean} isFetchComplete
  */
 function updateFrameAnnotationFetchStatus(uri, isFetchComplete) {
-  return {
-    type: actions.UPDATE_FRAME_ANNOTATION_FETCH_STATUS,
-    isAnnotationFetchComplete: isFetchComplete,
+  return makeAction(reducers, 'UPDATE_FRAME_ANNOTATION_FETCH_STATUS', {
     uri,
-  };
+    isAnnotationFetchComplete: isFetchComplete,
+  });
 }
 
 /**
  * Return the list of frames currently connected to the sidebar app.
  *
- * @return {Frame[]}
+ * @param {State} state
  */
 function frames(state) {
   return state;
