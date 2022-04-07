@@ -78,6 +78,13 @@
  */
 
 /**
+ * Structure of focus-mode config, provided in settings (app config)
+ *
+ * @typedef FocusConfig
+ * @prop {import('./rpc').FocusUserInfo} [user]
+ */
+
+/**
  * Configuration provided by the annotator ("host frame") as
  * `ConfigFromAnnotator` OR by an ancestor ("embedder frame") as
  * `ConfigFromEmbedder`.
@@ -88,6 +95,7 @@
  *
  * @typedef ConfigFromHost
  * @prop {string} [annotations] - Direct-linked annotation ID
+ * @prop {FocusConfig} [focus]
  * @prop {string} [group] - Direct-linked group ID
  * @prop {string} [query] - Initial filter query
  * @prop {string} [appType] - Method used to load the client
