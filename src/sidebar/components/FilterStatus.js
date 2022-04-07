@@ -225,16 +225,20 @@ function FocusFilterStatus({ filterState, rootThread }) {
   const store = useStoreProxy();
   const visibleCount = countVisible(rootThread);
   const resultCount = visibleCount - filterState.forcedVisibleCount;
-  const buttonProps = {};
 
+  let buttonProps;
   if (filterState.forcedVisibleCount > 0) {
-    buttonProps.onClick = () => store.clearSelection();
-    buttonProps.title = 'Reset filters';
+    buttonProps = {
+      onClick: () => store.clearSelection(),
+      title: 'Reset filters',
+    };
   } else {
-    buttonProps.onClick = () => store.toggleFocusMode();
-    buttonProps.title = filterState.focusActive
-      ? 'Show all'
-      : `Show only ${filterState.focusDisplayName}`;
+    buttonProps = {
+      onClick: () => store.toggleFocusMode(),
+      title: filterState.focusActive
+        ? 'Show all'
+        : `Show only ${filterState.focusDisplayName}`,
+    };
   }
   const focusDisplayName = filterState.focusActive
     ? filterState.focusDisplayName
