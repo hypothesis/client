@@ -17,7 +17,7 @@ import { TextQuoteAnchor } from './types';
  */
 
 /**
- * @typedef PdfTextRange
+ * @typedef PDFTextRange
  * @prop {number} pageIndex
  * @prop {object} anchor
  * @prop {number} anchor.start - Start character offset within the page's text
@@ -55,7 +55,7 @@ const pageTextCache = new Map();
  * to speed up re-anchoring an annotation that was previously anchored in the
  * current session.
  *
- * @type {Map<string, PdfTextRange>}
+ * @type {Map<string, PDFTextRange>}
  */
 const quotePositionCache = new Map();
 
@@ -99,7 +99,7 @@ function getNodeTextLayer(node) {
  *
  * @return {PDFViewer}
  */
-function getPdfViewer() {
+function getPDFViewer() {
   // @ts-ignore - TS doesn't know about PDFViewerApplication global.
   return PDFViewerApplication.pdfViewer;
 }
@@ -115,7 +115,7 @@ function getPdfViewer() {
  * @return {Promise<PDFPageView>}
  */
 async function getPageView(pageIndex) {
-  const pdfViewer = getPdfViewer();
+  const pdfViewer = getPDFViewer();
   let pageView = pdfViewer.getPageView(pageIndex);
 
   if (!pageView || !pageView.pdfPage) {
@@ -153,7 +153,7 @@ async function getPageView(pageIndex) {
  * Return true if the document has selectable text.
  */
 export async function documentHasText() {
-  const viewer = getPdfViewer();
+  const viewer = getPDFViewer();
   let hasText = false;
   for (let i = 0; i < viewer.pagesCount; i++) {
     const pageText = await getPageTextContent(i);
@@ -206,7 +206,7 @@ function getPageTextContent(pageIndex) {
  * @return {Promise<number>} - Offset of page's text within document text
  */
 async function getPageOffset(pageIndex) {
-  const viewer = getPdfViewer();
+  const viewer = getPDFViewer();
   if (pageIndex >= viewer.pagesCount) {
     /* istanbul ignore next - This should never be triggered */
     throw new Error('Invalid page index');
@@ -236,7 +236,7 @@ async function getPageOffset(pageIndex) {
  * @return {Promise<PageOffset>}
  */
 async function findPageByOffset(offset) {
-  const viewer = getPdfViewer();
+  const viewer = getPDFViewer();
 
   let pageStartOffset = 0;
   let pageEndOffset = 0;
@@ -387,7 +387,7 @@ function stripSpaces(str) {
 async function anchorQuote(quoteSelector, positionHint) {
   // Determine which pages to search and in what order. If we have a position
   // hint we'll try to use that. Otherwise we'll just search all pages in order.
-  const pageCount = getPdfViewer().pagesCount;
+  const pageCount = getPDFViewer().pagesCount;
   const pageIndexes = Array(pageCount)
     .fill(0)
     .map((_, i) => i);
