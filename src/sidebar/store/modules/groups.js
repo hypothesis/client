@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect';
 
-import * as util from '../util';
-import { createStoreModule } from '../create-store';
+import { createStoreModule, makeAction } from '../create-store';
 
 import { sessionModule } from './session';
 
@@ -35,6 +34,10 @@ const initialState = {
 /** @typedef {typeof initialState} State */
 
 const reducers = {
+  /**
+   * @param {State} state
+   * @param {{ filteredGroupIds: string[] }} action
+   */
   FILTER_GROUPS(state, action) {
     if (!action.filteredGroupIds?.length) {
       return {
@@ -62,6 +65,10 @@ const reducers = {
     };
   },
 
+  /**
+   * @param {State} state
+   * @param {{ id: string }} action
+   */
   FOCUS_GROUP(state, action) {
     const group = state.groups.find(g => g.id === action.id);
     if (!group) {
@@ -73,6 +80,10 @@ const reducers = {
     return { focusedGroupId: action.id };
   },
 
+  /**
+   * @param {State} state
+   * @param {{ groups: Group[] }} action
+   */
   LOAD_GROUPS(state, action) {
     const groups = action.groups;
     let focusedGroupId = state.focusedGroupId;
@@ -104,12 +115,8 @@ const reducers = {
   },
 };
 
-const actions = util.actionTypes(reducers);
-
 function clearGroups() {
-  return {
-    type: actions.CLEAR_GROUPS,
-  };
+  return makeAction(reducers, 'CLEAR_GROUPS', undefined);
 }
 
 /**
@@ -118,10 +125,7 @@ function clearGroups() {
  * @param {Group["id"][]} filteredGroupIds
  */
 function filterGroups(filteredGroupIds) {
-  return {
-    type: actions.FILTER_GROUPS,
-    filteredGroupIds,
-  };
+  return makeAction(reducers, 'FILTER_GROUPS', { filteredGroupIds });
 }
 
 /**
@@ -130,10 +134,7 @@ function filterGroups(filteredGroupIds) {
  * @param {string} id
  */
 function focusGroup(id) {
-  return {
-    type: actions.FOCUS_GROUP,
-    id,
-  };
+  return makeAction(reducers, 'FOCUS_GROUP', { id });
 }
 
 /**
@@ -142,16 +143,13 @@ function focusGroup(id) {
  * @param {Group[]} groups
  */
 function loadGroups(groups) {
-  return {
-    type: actions.LOAD_GROUPS,
-    groups,
-  };
+  return makeAction(reducers, 'LOAD_GROUPS', { groups });
 }
 
 /**
  * Return the currently focused group.
  *
- * @return {Group|undefined|null}
+ * @param {State} state
  */
 function focusedGroup(state) {
   if (!state.focusedGroupId) {
@@ -163,7 +161,7 @@ function focusedGroup(state) {
 /**
  * Return the current focused group ID or `null`.
  *
- * @return {string|null}
+ * @param {State} state
  */
 function focusedGroupId(state) {
   return state.focusedGroupId;
@@ -172,7 +170,7 @@ function focusedGroupId(state) {
 /**
  * Return the list of all groups, ignoring any filter present.
  *
- * @return {Group[]}
+ * @param {State} state
  */
 function allGroups(state) {
   return state.groups;
@@ -200,8 +198,8 @@ function filteredGroupIds(state) {
 /**
  * Return the group with the given ID.
  *
+ * @param {State} state
  * @param {string} id
- * @return {Group|undefined}
  */
 function getGroup(state, id) {
   return state.groups.find(g => g.id === id);
@@ -230,11 +228,16 @@ const getInScopeGroups = createSelector(
 // Selectors that receive root state.
 
 /**
+ * @typedef {{ groups: State, session: SessionState }} RootState
+ */
+
+/**
  * Return groups the logged in user is a member of.
  */
 const getMyGroups = createSelector(
-  /** @param {{ groups: State, session: SessionState }} rootState */
+  /** @param {RootState} rootState */
   rootState => filteredGroups(rootState.groups),
+  /** @param {RootState} rootState */
   rootState => sessionModule.selectors.isLoggedIn(rootState.session),
   (groups, loggedIn) => {
     // If logged out, the Public group still has isMember set to true so only
@@ -250,9 +253,11 @@ const getMyGroups = createSelector(
  * Return groups that don't show up in Featured and My Groups.
  */
 const getCurrentlyViewingGroups = createSelector(
-  /** @param {{ groups: State, session: SessionState }} rootState */
+  /** @param {RootState} rootState */
   rootState => filteredGroups(rootState.groups),
+  /** @param {RootState} rootState */
   rootState => getMyGroups(rootState),
+  /** @param {RootState} rootState */
   rootState => getFeaturedGroups(rootState.groups),
   (allGroups, myGroups, featuredGroups) => {
     return allGroups.filter(
