@@ -1,17 +1,5 @@
-@use './responsive';
 @use '../variables' as var;
 
-@mixin sidebar-content {
-  margin-left: auto;
-  margin-right: auto;
-
-  @include responsive.respond-to(tablets desktops) {
-    margin: auto;
-    max-width: responsive.$break-tablet;
-    padding-left: 4rem;
-    padding-right: 4rem;
-  }
-}
 /**
  * Abstract mixin for establishing basic flex container. External users should
  * use `row` or `column` as needed. Default values here reflect default CSS
