@@ -160,7 +160,7 @@ function AnnotationShareControl({
             'absolute bottom-8 right-1 touch:bottom-touch-minimum',
             'space-y-2 p-2',
             // Cards do not have a border in the clean theme. Turn it back on.
-            'theme-clean:border'
+            'theme-clean:border theme-clean:border-solid theme-clean:border-grey-3'
           )}
         >
           <div className="flex items-center">
