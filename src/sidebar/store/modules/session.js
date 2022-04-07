@@ -2,6 +2,7 @@ import { createStoreModule, makeAction } from '../create-store';
 
 /**
  * @typedef {import('../../../types/api').Profile} Profile
+ * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
  */
 
 /**
@@ -27,7 +28,7 @@ const initialProfile = {
  * @prop {Profile} profile
  */
 
-/** @return {State} */
+/** @param {SidebarSettings} settings */
 function initialState(settings) {
   return {
     /**
