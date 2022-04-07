@@ -13,7 +13,7 @@ const SVG_NAMESPACE = 'http://www.w3.org/2000/svg';
  *   A `<hypothesis-highlight>` element in the page's text layer
  * @return {HTMLCanvasElement|null}
  */
-function getPdfCanvas(highlightEl) {
+function getPDFCanvas(highlightEl) {
   // This code assumes that PDF.js renders pages with a structure like:
   //
   // <div class="page">
@@ -51,14 +51,14 @@ function getPdfCanvas(highlightEl) {
  *   An element that wraps the highlighted text in the transparent text layer
  *   above the PDF.
  */
-function drawHighlightsAbovePdfCanvas(highlightEls) {
+function drawHighlightsAbovePDFCanvas(highlightEls) {
   if (highlightEls.length === 0) {
     return;
   }
 
   // Get the <canvas> for the PDF page containing the highlight. We assume all
   // the highlights are on the same page.
-  const canvasEl = getPdfCanvas(highlightEls[0]);
+  const canvasEl = getPDFCanvas(highlightEls[0]);
   if (!canvasEl || !canvasEl.parentElement) {
     return;
   }
@@ -276,7 +276,7 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
   // to reduce the number of forced reflows. We also skip creating them for
   // unrendered pages for performance reasons.
   if (!inPlaceholder) {
-    drawHighlightsAbovePdfCanvas(highlights);
+    drawHighlightsAbovePDFCanvas(highlights);
   }
 
   return highlights;
