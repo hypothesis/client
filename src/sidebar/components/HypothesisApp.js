@@ -8,6 +8,7 @@ import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import { useStoreProxy } from '../store/use-store';
+import { downcastRef } from '../util/typing';
 
 import AnnotationView from './AnnotationView';
 import SidebarView from './SidebarView';
@@ -16,12 +17,14 @@ import StreamView from './StreamView';
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
 import ShareAnnotationsPanel from './ShareAnnotationsPanel';
+import SidebarContent from './SidebarContent';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
 
 /**
  * @typedef {import('../../types/api').Profile} Profile
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
+ * @typedef {import('../../types/sidebar').PresentationalDivComponentProps} PresentationalDivProps
  * @typedef {import('./UserMenu').AuthState} AuthState
  */
 
@@ -177,6 +180,35 @@ function HypothesisApp({
   };
 
   /**
+   * Style a div as a scroll-root container for sidebar content.
+   *
+   * @param {PresentationalDivProps} props
+   */
+  function SidebarScrollContainer({
+    children,
+    classes,
+    elementRef,
+    ...restProps
+  }) {
+    return (
+      <div
+        className={classnames(
+          'h-full min-h-full overflow-scroll bg-grey-2',
+          // Precise padding alignment with sidebar content; extra padding
+          // at the bottom on wide screens
+          'p-[9px] lg:pb-16',
+          'js-thread-list-scroll-root',
+          classes
+        )}
+        {...restProps}
+        ref={downcastRef(elementRef)}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  /**
    * Open the help panel, or, if a service callback is configured to handle
    * help requests, fire a relevant event instead
    */
@@ -190,11 +222,15 @@ function HypothesisApp({
   }, [frameSync, settings, store]);
 
   return (
-    <div
-      className={classnames('HypothesisApp', 'js-thread-list-scroll-root', {
+    <SidebarScrollContainer
+      classes={classnames({
         'theme-clean': isThemeClean,
-        'HypothesisApp--notebook': route === 'notebook',
+        // For routes that have a `TopBar`, position this element below
+        // the top bar via top-padding (9px + 40px of top-bar height)
+        'pt-[49px]': route !== 'notebook',
+        'p-4 lg:p-12': route === 'notebook',
       })}
+      data-testid="hypothesis-app"
       style={backgroundStyle}
     >
       {route !== 'notebook' && (
@@ -209,7 +245,7 @@ function HypothesisApp({
           pendingUpdateCount={pendingUpdateCount}
         />
       )}
-      <div className="HypothesisApp__content">
+      <SidebarContent>
         <ToastMessages />
         <HelpPanel auth={authState.status === 'logged-in' ? authState : {}} />
         <ShareAnnotationsPanel />
@@ -224,8 +260,8 @@ function HypothesisApp({
             )}
           </main>
         )}
-      </div>
-    </div>
+      </SidebarContent>
+    </SidebarScrollContainer>
   );
 }
 

@@ -94,6 +94,12 @@ describe('HypothesisApp', () => {
       '../helpers/theme': { applyTheme: fakeApplyTheme },
       '../../shared/prompts': { confirm: fakeConfirm },
     });
+
+    // Restore presentational SidebarContent component to exercise it for test
+    // coverage
+    $imports.$restore({
+      './SidebarContent': true,
+    });
   });
 
   afterEach(() => {
@@ -472,33 +478,34 @@ describe('HypothesisApp', () => {
   });
 
   describe('theming', () => {
+    const appElSelector = 'SidebarScrollContainer';
     it('applies theme config', () => {
       const style = { backgroundColor: 'red' };
       fakeApplyTheme.returns({ backgroundColor: 'red' });
 
       const wrapper = createComponent();
-      const background = wrapper.find('.HypothesisApp');
+      const background = wrapper.find(appElSelector);
 
       assert.calledWith(fakeApplyTheme, ['appBackgroundColor'], fakeSettings);
       assert.deepEqual(background.prop('style'), style);
     });
-  });
 
-  it('applies a clean-theme style when config sets theme to "clean"', () => {
-    fakeSettings.theme = 'clean';
+    it('applies a clean-theme style when config sets theme to "clean"', () => {
+      fakeSettings.theme = 'clean';
 
-    const wrapper = createComponent();
-    const container = wrapper.find('.HypothesisApp');
+      const wrapper = createComponent();
+      const container = wrapper.find(appElSelector);
 
-    assert.isTrue(container.hasClass('theme-clean'));
-  });
+      assert.include(container.props().classes, 'theme-clean');
+    });
 
-  it('does not apply clean-theme style when config does not assert `clean` theme', () => {
-    fakeSettings.theme = '';
+    it('does not apply clean-theme style when config does not assert `clean` theme', () => {
+      fakeSettings.theme = '';
 
-    const wrapper = createComponent();
-    const container = wrapper.find('.HypothesisApp');
+      const wrapper = createComponent();
+      const container = wrapper.find(appElSelector);
 
-    assert.isFalse(container.hasClass('HypothesisApp--theme-clean'));
+      assert.notInclude(container.props().classes, 'theme-clean');
+    });
   });
 });
