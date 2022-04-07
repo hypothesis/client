@@ -92,6 +92,8 @@ const reducers = {
 
 /**
  * Set the direct linked group id.
+ *
+ * @param {string} groupId
  */
 function setDirectLinkedGroupId(groupId) {
   return makeAction(reducers, 'UPDATE_DIRECT_LINKED_GROUP_ID', {
@@ -101,6 +103,8 @@ function setDirectLinkedGroupId(groupId) {
 
 /**
  * Set the direct linked annotation's id.
+ *
+ * @param {string} annId
  */
 function setDirectLinkedAnnotationId(annId) {
   return makeAction(reducers, 'UPDATE_DIRECT_LINKED_ANNOTATION_ID', {
