@@ -1,10 +1,12 @@
 import { createSelector } from 'reselect';
 
-import * as metadata from '../../helpers/annotation-metadata';
 import { createStoreModule, makeAction } from '../create-store';
 import { removeAnnotations } from './annotations';
 
-/** @typedef {import('../../../types/api').Annotation} Annotation */
+/**
+ * @typedef {import('redux-thunk/extend-redux')} Dummy
+ * @typedef {import('../../../types/api').Annotation} Annotation
+ */
 
 /**
  * The drafts store provides temporary storage for unsaved edits to new or
@@ -117,10 +119,14 @@ function createDraft(annotation, changes) {
  * An empty draft has no text and no reference tags.
  */
 function deleteNewAndEmptyDrafts() {
+  /**
+   * @param {import('redux').Dispatch} dispatch
+   * @param {() => { drafts: State }} getState
+   */
   return (dispatch, getState) => {
     const newDrafts = getState().drafts.filter(draft => {
       return (
-        metadata.isNew(draft.annotation) &&
+        !draft.annotation.id &&
         !getDraftIfNotEmpty(getState().drafts, draft.annotation)
       );
     });
