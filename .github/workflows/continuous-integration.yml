@@ -1,5 +1,8 @@
 name: Continuous integration
 on: pull_request
+permissions:
+  contents: read
+
 jobs:
   ci:
     runs-on: ubuntu-latest
