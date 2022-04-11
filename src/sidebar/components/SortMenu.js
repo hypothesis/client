@@ -28,8 +28,8 @@ export default function SortMenu() {
   });
 
   const menuLabel = (
-    <span className="TopBar__menu-label">
-      <Icon name="sort" classes="TopBar__menu-icon" />
+    <span className="p-1">
+      <Icon name="sort" />
     </span>
   );
 
