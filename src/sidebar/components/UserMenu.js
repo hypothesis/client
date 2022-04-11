@@ -87,8 +87,8 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
   })();
 
   const menuLabel = (
-    <span className="TopBar__menu-label">
-      <Icon name="profile" classes="TopBar__menu-icon" />
+    <span className="p-1">
+      <Icon name="profile" />
     </span>
   );
   return (

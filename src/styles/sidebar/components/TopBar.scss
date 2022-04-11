@@ -1,8 +1,0 @@
-@use '../../variables' as var;
-
-.TopBar {
-  // FIXME This is used by SortMenu and UserMenu.
-  &__menu-label {
-    padding: var.$layout-space--xxsmall;
-  }
-}
