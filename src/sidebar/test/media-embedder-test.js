@@ -363,6 +363,28 @@ describe('sidebar/media-embedder', () => {
     assert.equal(element.children[0].tagName, 'A');
   });
 
+  [
+    {
+      href: 'https://youtu.be/abcd',
+      // URL that cannot be percent-encoded. Taken from MDN `encodeURI` docs.
+      text: 'https://youtu.be/abcd\uD800',
+    },
+    {
+      // URL that cannot be percent-decoded. Taken from MDN `decodeURI` docs.
+      href: 'https://youtu.be/abcd/%E0%A4%A',
+      text: 'https://youtu.be/abcd',
+    },
+  ].forEach(({ href, text }) => {
+    it('does not replace links if percent-encoding agnostic comparison of href and text fails', () => {
+      const element = domElement(`<a href="${href}">${text}</a>`);
+
+      mediaEmbedder.replaceLinksWithEmbeds(element);
+
+      assert.equal(element.childElementCount, 1);
+      assert.equal(element.children[0].tagName, 'A');
+    });
+  });
+
   it('does not replace non-media links', () => {
     const url = 'https://example.com/example.html';
     const element = domElement('<a href="' + url + '">' + url + '</a>');
