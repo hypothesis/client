@@ -107,10 +107,7 @@ function TopBar({
   return (
     <div
       className={classnames(
-        // This absolute-positioned top bar allows content to scroll beneath it;
-        // the use of `transform-gpu` can kick on hardware acceleration to make
-        // this smoother
-        'absolute h-10 left-0 top-0 right-0 z-4 transform-gpu',
+        'absolute h-10 left-0 top-0 right-0 z-4',
         'text-grey-7 border-b theme-clean:border-b-0 bg-white'
       )}
       data-testid="top-bar"
