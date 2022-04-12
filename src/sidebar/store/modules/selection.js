@@ -216,6 +216,7 @@ const reducers = {
       newTab = 'annotation';
     }
 
+    /** @param {BooleanMap} collection */
     const removeAnns = collection => {
       action.annotationsToRemove.forEach(annotation => {
         if (annotation.id) {
@@ -251,6 +252,7 @@ function clearSelection() {
  * @param {string[]} ids - Identifiers of annotations to select
  */
 function selectAnnotations(ids) {
+  /** @param {import('redux').Dispatch} dispatch */
   return dispatch => {
     dispatch(clearSelection());
     dispatch(
@@ -291,7 +293,11 @@ function setForcedVisible(id, visible) {
   return makeAction(reducers, 'SET_FORCED_VISIBLE', { id, visible });
 }
 
-/** Sets the sort key for the annotation list. */
+/**
+ * Sets the sort key for the annotation list.
+ *
+ * @param {SortKey} key
+ */
 function setSortKey(key) {
   return makeAction(reducers, 'SET_SORT_KEY', { key });
 }
@@ -375,6 +381,7 @@ const sortKeys = createSelector(
   /** @param {State} state */
   state => state.selectedTab,
   selectedTab => {
+    /** @type {SortKey[]} */
     const sortKeysForTab = ['Newest', 'Oldest'];
     if (selectedTab !== 'note') {
       // Location is inapplicable to Notes tab
