@@ -16,6 +16,7 @@ import StreamView from './StreamView';
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
 import ShareAnnotationsPanel from './ShareAnnotationsPanel';
+import SidebarContent from './SidebarContent';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
 
@@ -164,10 +165,21 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
 
   return (
     <div
-      className={classnames('HypothesisApp', 'js-thread-list-scroll-root', {
-        'theme-clean': isThemeClean,
-        'HypothesisApp--notebook': route === 'notebook',
-      })}
+      className={classnames(
+        'h-full min-h-full overflow-scroll',
+        // Precise padding to align with annotation cards in content
+        // Larger padding on bottom for wide screens
+        'p-[9px] lg:pb-16 bg-grey-2',
+        'js-thread-list-scroll-root',
+        {
+          'theme-clean': isThemeClean,
+          // Make room at top for the TopBar (40px) plus custom padding (9px)
+          // but not in the Notebook, which doesn't use the TopBar
+          'pt-[49px]': route !== 'notebook',
+          'p-4 lg:p-12': route === 'notebook',
+        }
+      )}
+      data-testid="hypothesis-app"
       style={backgroundStyle}
     >
       {route !== 'notebook' && (
@@ -179,7 +191,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
           isSidebar={isSidebar}
         />
       )}
-      <div className="HypothesisApp__content">
+      <SidebarContent>
         <ToastMessages />
         <HelpPanel auth={authState.status === 'logged-in' ? authState : {}} />
         <ShareAnnotationsPanel />
@@ -194,7 +206,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
             )}
           </main>
         )}
-      </div>
+      </SidebarContent>
     </div>
   );
 }

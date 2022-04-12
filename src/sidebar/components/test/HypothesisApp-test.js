@@ -428,33 +428,34 @@ describe('HypothesisApp', () => {
   });
 
   describe('theming', () => {
+    const appSelector = '[data-testid="hypothesis-app"]';
     it('applies theme config', () => {
       const style = { backgroundColor: 'red' };
       fakeApplyTheme.returns({ backgroundColor: 'red' });
 
       const wrapper = createComponent();
-      const background = wrapper.find('.HypothesisApp');
+      const background = wrapper.find(appSelector);
 
       assert.calledWith(fakeApplyTheme, ['appBackgroundColor'], fakeSettings);
       assert.deepEqual(background.prop('style'), style);
     });
-  });
 
-  it('applies a clean-theme style when config sets theme to "clean"', () => {
-    fakeSettings.theme = 'clean';
+    it('applies a clean-theme style when config sets theme to "clean"', () => {
+      fakeSettings.theme = 'clean';
 
-    const wrapper = createComponent();
-    const container = wrapper.find('.HypothesisApp');
+      const wrapper = createComponent();
+      const container = wrapper.find(appSelector);
 
-    assert.isTrue(container.hasClass('theme-clean'));
-  });
+      assert.isTrue(container.hasClass('theme-clean'));
+    });
 
-  it('does not apply clean-theme style when config does not assert `clean` theme', () => {
-    fakeSettings.theme = '';
+    it('does not apply clean-theme style when config does not assert `clean` theme', () => {
+      fakeSettings.theme = '';
 
-    const wrapper = createComponent();
-    const container = wrapper.find('.HypothesisApp');
+      const wrapper = createComponent();
+      const container = wrapper.find(appSelector);
 
-    assert.isFalse(container.hasClass('HypothesisApp--theme-clean'));
+      assert.isFalse(container.hasClass('theme-clean'));
+    });
   });
 });

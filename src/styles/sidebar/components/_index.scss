@@ -14,7 +14,6 @@
 @use './FilterStatus';
 @use './GroupList';
 @use './GroupListItem';
-@use './HypothesisApp';
 @use './LaunchErrorPanel';
 @use './Menu';
 @use './MenuItem';
@@ -31,10 +30,11 @@
 @use './ToastMessages';
 @use './VersionInfo';
 
-// TODO: Put these in @layer components after shared component styles have
-// been converted to Tailwind (and are contained in the components layer
-// themselves). They need to come after shared-component styles in the
-// output stylesheet.
+// TODO: Evaluate all classes below after components have been converted to
+// Tailwind. If retaining, put them in @layer components after `frontend-shared`
+//  component styles have been converted to Tailwind (and are contained in the
+// components layer themselves). They need to come after shared-component
+// styles in the output stylesheet.
 
 // Applies to <Link>
 .p-muted-link {
@@ -44,4 +44,10 @@
 // Applies to any text: strikeout effect
 .p-redacted-text {
   @apply line-through grayscale contrast-50 text-color-text-light;
+}
+
+// Disable scroll anchoring as it interferes with `ThreadList` and
+// `visible-threads` calculations and can cause a render loop
+.js-thread-list-scroll-root {
+  overflow-anchor: none;
 }
