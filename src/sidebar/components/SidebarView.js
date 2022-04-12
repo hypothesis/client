@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'preact/hooks';
 
 import { useRootThread } from './hooks/use-root-thread';
 import { withServices } from '../service-context';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { tabForAnnotation } from '../helpers/tabs';
 
 import FilterStatus from './FilterStatus';
@@ -36,7 +36,7 @@ function SidebarView({
   const rootThread = useRootThread();
 
   // Store state values
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const focusedGroupId = store.focusedGroupId();
   const hasAppliedFilter =
     store.hasAppliedFilter() || store.hasSelectedAnnotations();

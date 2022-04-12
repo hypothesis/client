@@ -4,7 +4,7 @@ import { useCallback, useState } from 'preact/hooks';
 import { withServices } from '../../service-context';
 import { isReply, isSaved } from '../../helpers/annotation-metadata';
 import { applyTheme } from '../../helpers/theme';
-import { useStoreProxy } from '../../store/use-store';
+import { useSidebarStore } from '../../store';
 
 import MarkdownEditor from '../MarkdownEditor';
 import TagEditor from '../TagEditor';
@@ -46,7 +46,7 @@ function AnnotationEditor({
     /** @type {string|null} */ (null)
   );
 
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const group = store.getGroup(annotation.group);
 
   const shouldShowLicense =

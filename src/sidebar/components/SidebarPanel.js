@@ -2,7 +2,7 @@ import { Panel } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import Slider from './Slider';
 
@@ -35,7 +35,7 @@ export default function SidebarPanel({
   title,
   onActiveChanged,
 }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const panelIsActive = store.isSidebarPanelOpen(panelName);
 
   const panelElement = useRef(/** @type {HTMLDivElement|null}*/ (null));

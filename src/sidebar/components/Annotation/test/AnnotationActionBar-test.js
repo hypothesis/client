@@ -95,7 +95,7 @@ describe('AnnotationActionBar', () => {
         annotationSharingLink: fakeAnnotationSharingLink,
       },
       '../../helpers/permissions': { permits: fakePermits },
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
       '../../../shared/prompts': { confirm: fakeConfirm },
     });
   });

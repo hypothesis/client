@@ -39,7 +39,7 @@ describe('HelpPanel', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../store': { useSidebarStore: () => fakeStore },
       '../helpers/version-data': { VersionData: FakeVersionData },
     });
   });

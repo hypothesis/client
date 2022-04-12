@@ -1,4 +1,4 @@
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { useUserFilterOptions } from './hooks/use-filter-options';
 
 import FilterSelect from './FilterSelect';
@@ -11,7 +11,7 @@ import FilterSelect from './FilterSelect';
  * Filters for the Notebook
  */
 function NotebookFilters() {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
 
   const userFilter = store.getFilter('user');
   const userFilterOptions = useUserFilterOptions();

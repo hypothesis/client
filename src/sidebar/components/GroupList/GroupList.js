@@ -6,7 +6,7 @@ import { orgName } from '../../helpers/group-list-item-common';
 import { groupsByOrganization } from '../../helpers/group-organizations';
 import { isThirdPartyService } from '../../helpers/is-third-party-service';
 import { withServices } from '../../service-context';
-import { useStoreProxy } from '../../store/use-store';
+import { useSidebarStore } from '../../store';
 
 import Menu from '../Menu';
 import MenuItem from '../MenuItem';
@@ -41,7 +41,7 @@ function publisherProvidedIcon(settings) {
  * @param {GroupListProps} props
  */
 function GroupList({ settings }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const currentGroups = store.getCurrentlyViewingGroups();
   const featuredGroups = store.getFeaturedGroups();
   const myGroups = store.getMyGroups();

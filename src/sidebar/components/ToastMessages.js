@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import { Icon } from '@hypothesis/frontend-shared';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
 
 /**
@@ -86,7 +86,7 @@ function ToastMessage({ message, onDismiss }) {
  * @param {ToastMessagesProps} props
  */
 function ToastMessages({ toastMessenger }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const messages = store.getToastMessages();
   return (
     <div>

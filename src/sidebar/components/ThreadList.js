@@ -7,7 +7,7 @@ import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
 } from '../helpers/visible-threads';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { getElementHeightWithMargins } from '../util/dom';
 
 import ThreadCard from './ThreadCard';
@@ -109,7 +109,7 @@ function ThreadList({ threads }) {
       [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
     );
 
-  const store = useStoreProxy();
+  const store = useSidebarStore();
 
   // Get the `$tag` of the most recently created unsaved annotation.
   const newAnnotationTag = (() => {

@@ -25,7 +25,7 @@ describe('SidebarContentError', () => {
       isLoggedIn: sinon.stub().returns(true),
     };
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../store': { useSidebarStore: () => fakeStore },
     });
     $imports.$mock(mockImportedComponents());
   });

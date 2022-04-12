@@ -26,7 +26,7 @@ describe('NotebookFilters', () => {
       './hooks/use-filter-options': {
         useUserFilterOptions: fakeUseUserFilterOptions,
       },
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../store': { useSidebarStore: () => fakeStore },
     });
   });
 

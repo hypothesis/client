@@ -1,6 +1,6 @@
 import { Link, LinkButton, Icon } from '@hypothesis/frontend-shared';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 /**
  * @typedef LoggedOutMessageProps
@@ -15,7 +15,7 @@ import { useStoreProxy } from '../store/use-store';
  * @param {LoggedOutMessageProps} props
  */
 function LoggedOutMessage({ onLogin }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
 
   return (
     <div className="flex flex-col items-center m-6 space-y-6">

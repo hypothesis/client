@@ -60,7 +60,7 @@ describe('AnnotationBody', () => {
     $imports.$mock({
       '../../helpers/account-id': { isThirdPartyUser: fakeIsThirdPartyUser },
       '../../helpers/theme': { applyTheme: fakeApplyTheme },
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
     });
   });
 

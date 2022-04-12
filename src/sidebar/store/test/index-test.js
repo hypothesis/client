@@ -1,6 +1,10 @@
+import { render } from 'preact';
+import { act } from 'preact/test-utils';
+
 import * as annotationFixtures from '../../test/annotation-fixtures';
-import { createSidebarStore } from '../index';
+import { createSidebarStore, useSidebarStore } from '../index';
 import { immutable } from '../../util/immutable';
+import { ServiceContext } from '../../service-context';
 
 const defaultAnnotation = annotationFixtures.defaultAnnotation;
 const newAnnotation = annotationFixtures.newAnnotation;
@@ -146,5 +150,47 @@ describe('createSidebarStore', () => {
       store.updateAnchorStatus({ [tagForID(annot.id)]: 'orphan' });
       assert.equal(store.getState().annotations.annotations[0].$orphan, true);
     });
+  });
+});
+
+describe('useSidebarStore', () => {
+  function AnnotationCard({ id }) {
+    const store = useSidebarStore();
+    const ann = store.findAnnotationByID(id);
+    return <div>{ann.text}</div>;
+  }
+
+  // `useSidebarStore` is a trivial wrapper, so rather than mock its dependencies,
+  // this is a more useful integration test that covers interaction of the store
+  // and UI components.
+  it('returns wrapper for components to interact with store', () => {
+    const store = createSidebarStore({});
+    const annot = { ...defaultAnnotation(), text: 'Initial text' };
+    store.addAnnotations([annot]);
+
+    const services = {
+      get(service) {
+        return service === 'store' ? store : null;
+      },
+    };
+
+    const el = document.createElement('div');
+    act(() => {
+      render(
+        <ServiceContext.Provider value={services}>
+          <AnnotationCard id={annot.id} />
+        </ServiceContext.Provider>,
+        el
+      );
+    });
+    assert.equal(el.innerHTML, '<div>Initial text</div>');
+
+    act(() => {
+      const updatedAnnot = { ...annot, text: 'Updated text' };
+      store.addAnnotations([updatedAnnot]);
+    });
+    assert.equal(el.innerHTML, '<div>Updated text</div>');
+
+    render(null, el); // Force unmount and cleanup of subscribers
   });
 });

@@ -1,6 +1,6 @@
 import { useMemo } from 'preact/hooks';
 
-import { useStoreProxy } from '../../store/use-store';
+import { useSidebarStore } from '../../store';
 import { isThirdPartyUser, username } from '../../helpers/account-id';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 
@@ -13,7 +13,7 @@ import { annotationDisplayName } from '../../helpers/annotation-user';
  * @return {FilterOption[]}
  */
 export function useUserFilterOptions() {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const annotations = store.allAnnotations();
   const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');

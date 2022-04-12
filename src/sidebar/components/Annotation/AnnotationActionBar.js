@@ -8,7 +8,7 @@ import {
 } from '../../helpers/annotation-sharing';
 import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
-import { useStoreProxy } from '../../store/use-store';
+import { useSidebarStore } from '../../store';
 
 import AnnotationShareControl from './AnnotationShareControl';
 
@@ -48,7 +48,7 @@ function AnnotationActionBar({
   settings,
   toastMessenger,
 }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const userProfile = store.profile();
   const annotationGroup = store.getGroup(annotation.group);
   const isLoggedIn = store.isLoggedIn();

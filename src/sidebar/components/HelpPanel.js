@@ -1,7 +1,7 @@
 import { Icon, Link, LinkButton } from '@hypothesis/frontend-shared';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
 import { VersionData } from '../helpers/version-data';
 
@@ -63,7 +63,7 @@ function HelpPanelTab({ linkText, url }) {
  * @param {HelpPanelProps} props
  */
 function HelpPanel({ auth, session }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const frames = store.frames();
   const mainFrame = store.mainFrame();
 

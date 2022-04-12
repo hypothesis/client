@@ -40,7 +40,7 @@ describe('TopBar', () => {
       './SidebarContent': true,
     });
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../store': { useSidebarStore: () => fakeStore },
       '../helpers/is-third-party-service': {
         isThirdPartyService: fakeIsThirdPartyService,
       },

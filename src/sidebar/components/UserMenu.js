@@ -4,7 +4,7 @@ import { useState } from 'preact/hooks';
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyUser } from '../helpers/account-id';
 import { withServices } from '../service-context';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import Menu from './Menu';
 import MenuItem from './MenuItem';
@@ -40,7 +40,7 @@ import MenuSection from './MenuSection';
  * @param {UserMenuProps} props
  */
 function UserMenu({ auth, frameSync, onLogout, settings }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const defaultAuthority = store.defaultAuthority();
 
   const isThirdParty = isThirdPartyUser(auth.userid, defaultAuthority);

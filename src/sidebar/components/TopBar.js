@@ -5,7 +5,7 @@ import { serviceConfig } from '../config/service-config';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
@@ -53,7 +53,7 @@ function TopBar({
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const filterQuery = store.filterQuery();
   const pendingUpdateCount = store.pendingUpdateCount();
 

@@ -66,7 +66,7 @@ describe('AnnotationHeader', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
       '../../helpers/account-id': fakeAccountId,
       '../../helpers/annotation-metadata': {
         domainAndTitle: fakeDomainAndTitle,

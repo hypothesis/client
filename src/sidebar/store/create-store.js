@@ -187,9 +187,9 @@ function assignOnce(target, source) {
  * selector and action methods rather than `getState` or `dispatch`. This
  * makes it easier to refactor the internal state structure.
  *
- * Preact UI components access stores via the `useStoreProxy` hook defined in
- * `use-store.js`. This returns a proxy which enables UI components to observe
- * what store state a component depends upon and re-render when it changes.
+ * Preact UI components access stores via the `useStore` hook. This returns a
+ * proxy which enables UI components to observe what store state a component
+ * depends upon and re-render when it changes.
  *
  * @template {readonly Module<any,any,any,any>[]} Modules
  * @param {Modules} modules

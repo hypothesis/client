@@ -6,7 +6,7 @@ import {
   TextInputWithButton,
 } from '@hypothesis/frontend-shared';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
@@ -30,7 +30,7 @@ import SidebarPanel from './SidebarPanel';
  * @param {ShareAnnotationsPanelProps} props
  */
 function ShareAnnotationsPanel({ toastMessenger }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const mainFrame = store.mainFrame();
   const focusedGroup = store.focusedGroup();
   const groupName = (focusedGroup && focusedGroup.name) || '...';

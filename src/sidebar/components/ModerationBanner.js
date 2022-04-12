@@ -1,7 +1,7 @@
 import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import * as annotationMetadata from '../helpers/annotation-metadata';
 import { withServices } from '../service-context';
 
@@ -25,7 +25,7 @@ import { withServices } from '../service-context';
  * @param {ModerationBannerProps} props
  */
 function ModerationBanner({ annotation, api, toastMessenger }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const flagCount = annotationMetadata.flagCount(annotation);
 
   const isHiddenOrFlagged =

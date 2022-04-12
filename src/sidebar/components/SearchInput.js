@@ -2,7 +2,7 @@ import { IconButton, Spinner } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 /**
  * @typedef SearchInputProps
@@ -26,7 +26,7 @@ import { useStoreProxy } from '../store/use-store';
  * @param {SearchInputProps} props
  */
 export default function SearchInput({ alwaysExpanded, query, onSearch }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const isLoading = store.isLoading();
   const input = /** @type {{ current: HTMLInputElement }} */ (useRef());
 

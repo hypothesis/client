@@ -3,7 +3,7 @@ import { useCallback, useEffect } from 'preact/hooks';
 import * as searchFilter from '../util/search-filter';
 import { withServices } from '../service-context';
 import { useRootThread } from './hooks/use-root-thread';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import ThreadList from './ThreadList';
 
@@ -19,7 +19,7 @@ import ThreadList from './ThreadList';
  * @param {StreamViewProps} props
  */
 function StreamView({ api, toastMessenger }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const currentQuery = store.routeParams().q;
 
   /**

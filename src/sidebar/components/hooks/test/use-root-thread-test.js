@@ -18,7 +18,7 @@ describe('sidebar/components/hooks/use-root-thread', () => {
     fakeThreadAnnotations = sinon.stub().returns('fakeThreadAnnotations');
 
     $imports.$mock({
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
       '../../helpers/thread-annotations': {
         threadAnnotations: fakeThreadAnnotations,
       },

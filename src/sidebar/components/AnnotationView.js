@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'preact/hooks';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
 import { useRootThread } from './hooks/use-root-thread';
 
@@ -19,7 +19,7 @@ import SidebarContentError from './SidebarContentError';
  * @param {AnnotationViewProps} props
  */
 function AnnotationView({ loadAnnotationsService, onLogin }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const annotationId = store.routeParams().id;
   const rootThread = useRootThread();
   const userid = store.profile().userid;

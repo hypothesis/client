@@ -66,7 +66,7 @@ describe('ThreadList', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../store': { useSidebarStore: () => fakeStore },
       '../util/dom': fakeDomUtil,
       '../helpers/visible-threads': fakeVisibleThreadsUtil,
     });
