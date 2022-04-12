@@ -9,6 +9,7 @@ import { useStoreProxy } from '../store/use-store';
 
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
+import SidebarContent from './SidebarContent';
 import SortMenu from './SortMenu';
 import StreamSearchInput from './StreamSearchInput';
 import UserMenu from './UserMenu';
@@ -20,30 +21,6 @@ import UserMenu from './UserMenu';
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  * @typedef {import('../services/streamer').StreamerService} StreamerService
  */
-
-/**
- * Render "page" content in a container that centers it and constrains its
- * maximum width.
- *
- * @param {object} props
- *   @param {Children} props.children
- *   @param {string} [props.classes]
- * @returns
- */
-function SidebarContent({ children, classes }) {
-  return (
-    <div
-      className={classnames(
-        // Center this content (auto margins). For larger viewports, set a
-        // maximum width (768px) and add some horizontal padding.
-        'mx-auto lg:px-16 lg:max-w-3xl',
-        classes
-      )}
-    >
-      {children}
-    </div>
-  );
-}
 
 /**
  * @typedef TopBarProps
