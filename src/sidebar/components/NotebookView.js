@@ -4,7 +4,7 @@ import scrollIntoView from 'scroll-into-view';
 
 import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
@@ -23,7 +23,7 @@ import { useRootThread } from './hooks/use-root-thread';
  * @param {NotebookViewProps} props
  */
 function NotebookView({ loadAnnotationsService, streamer }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
 
   const filters = store.getFilterValues();
   const focusedGroup = store.focusedGroup();

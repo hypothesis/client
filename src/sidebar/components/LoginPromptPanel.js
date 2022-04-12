@@ -1,6 +1,6 @@
 import { Actions, LabeledButton } from '@hypothesis/frontend-shared';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import SidebarPanel from './SidebarPanel';
 
@@ -16,7 +16,7 @@ import SidebarPanel from './SidebarPanel';
  * @param {LoginPromptPanelProps} props
  */
 export default function LoginPromptPanel({ onLogin, onSignUp }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const isLoggedIn = store.isLoggedIn();
   if (isLoggedIn) {
     return null;

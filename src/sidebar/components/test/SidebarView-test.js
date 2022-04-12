@@ -69,7 +69,7 @@ describe('SidebarView', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       './hooks/use-root-thread': { useRootThread: fakeUseRootThread },
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../store': { useSidebarStore: () => fakeStore },
       '../helpers/tabs': fakeTabsUtil,
     });
   });

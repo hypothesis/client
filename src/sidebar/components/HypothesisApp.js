@@ -7,7 +7,7 @@ import { parseAccountID } from '../helpers/account-id';
 import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import AnnotationView from './AnnotationView';
 import SidebarView from './SidebarView';
@@ -68,7 +68,7 @@ function authStateFromProfile(profile) {
  * @param {HypothesisAppProps} props
  */
 function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const hasFetchedProfile = store.hasFetchedProfile();
   const profile = store.profile();
   const route = store.route();

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
 import { countVisible } from '../helpers/thread';
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import { useRootThread } from './hooks/use-root-thread';
 
@@ -69,7 +69,7 @@ function FilterStatusPanel({
   focusDisplayName,
   resultCount,
 }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   return (
     <Card classes="mb-3 p-3">
       <div className="flex items-center justify-center space-x-1">
@@ -133,7 +133,7 @@ function FilterStatusPanel({
  * @param {FilterModeProps} props
  */
 function SelectionFilterStatus({ filterState, rootThread }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const directLinkedId = store.directLinkedAnnotationId();
   // The total number of top-level annotations (visible or not)
   const totalCount = store.annotationCount();
@@ -188,7 +188,7 @@ function SelectionFilterStatus({ filterState, rootThread }) {
  * @param {FilterModeProps} props
  */
 function QueryFilterStatus({ filterState, rootThread }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const visibleCount = countVisible(rootThread);
   const resultCount = visibleCount - filterState.forcedVisibleCount;
 
@@ -233,7 +233,7 @@ function QueryFilterStatus({ filterState, rootThread }) {
  * @param {FilterModeProps} props
  */
 function FocusFilterStatus({ filterState, rootThread }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const visibleCount = countVisible(rootThread);
   const resultCount = visibleCount - filterState.forcedVisibleCount;
 
@@ -280,7 +280,7 @@ function FocusFilterStatus({ filterState, rootThread }) {
 export default function FilterStatus() {
   const rootThread = useRootThread();
 
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const focusState = store.focusState();
   const forcedVisibleCount = store.forcedVisibleThreads().length;
   const filterQuery = store.filterQuery();

@@ -1,6 +1,6 @@
 import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';
-import { useStoreProxy } from '../../store/use-store';
+import { useSidebarStore } from '../../store';
 import { copyText } from '../../util/copy-to-clipboard';
 import { confirm } from '../../../shared/prompts';
 
@@ -40,7 +40,7 @@ function GroupListItem({
   const isSelectable =
     (group.scopes && !group.scopes.enforced) || group.isScopedToUri;
 
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const focusedGroupId = store.focusedGroupId();
   const isSelected = group.id === focusedGroupId;
 

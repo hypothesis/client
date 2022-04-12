@@ -18,7 +18,7 @@ describe('StreamSearchInput', () => {
     };
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store/use-store': { useStoreProxy: () => fakeStore },
+      '../store': { useSidebarStore: () => fakeStore },
     });
   });
 

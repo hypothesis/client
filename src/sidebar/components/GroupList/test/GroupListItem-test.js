@@ -67,7 +67,7 @@ describe('GroupListItem', () => {
         copyText: fakeCopyText,
       },
       '../../helpers/group-list-item-common': fakeGroupListItemCommon,
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
       '../../../shared/prompts': { confirm: fakeConfirm },
     });
   });

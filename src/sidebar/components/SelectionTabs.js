@@ -7,8 +7,8 @@ import {
 import classnames from 'classnames';
 
 import { applyTheme } from '../helpers/theme';
-import { useStoreProxy } from '../store/use-store';
 import { withServices } from '../service-context';
+import { useSidebarStore } from '../store';
 
 /**
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
@@ -91,7 +91,7 @@ function Tab({
  * @param {SelectionTabsProps} props
  */
 function SelectionTabs({ annotationsService, isLoading, settings }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const selectedTab = store.selectedTab();
   const noteCount = store.noteCount();
   const annotationCount = store.annotationCount();

@@ -1,6 +1,6 @@
 import { Icon } from '@hypothesis/frontend-shared';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 import Menu from './Menu';
 import MenuItem from './MenuItem';
@@ -9,7 +9,7 @@ import MenuItem from './MenuItem';
  * A drop-down menu of sorting options for a collection of annotations.
  */
 export default function SortMenu() {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   // The currently-applied sort order
   const sortKey = store.sortKey();
   // All available sorting options. These change depending on current

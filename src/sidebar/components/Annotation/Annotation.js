@@ -1,7 +1,7 @@
 import { Actions, Spinner } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-import { useStoreProxy } from '../../store/use-store';
+import { useSidebarStore } from '../../store';
 import { isOrphan, isSaved, quote } from '../../helpers/annotation-metadata';
 import { withServices } from '../../service-context';
 
@@ -72,7 +72,7 @@ function Annotation({
 }) {
   const isCollapsedReply = isReply && threadIsCollapsed;
 
-  const store = useStoreProxy();
+  const store = useSidebarStore();
 
   const draft = annotation && store.getDraft(annotation);
 

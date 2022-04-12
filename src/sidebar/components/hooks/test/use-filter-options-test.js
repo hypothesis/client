@@ -60,7 +60,7 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
     $imports.$mock({
       '../../helpers/account-id': fakeAccountId,
       '../../helpers/annotation-user': fakeAnnotationUser,
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
     });
   });
 

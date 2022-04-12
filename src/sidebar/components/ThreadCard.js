@@ -3,7 +3,7 @@ import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
 
 import Thread from './Thread';
@@ -25,7 +25,7 @@ import Thread from './Thread';
  * @param {ThreadCardProps} props
  */
 function ThreadCard({ frameSync, thread }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const threadTag = thread.annotation?.$tag ?? null;
   const isFocused = threadTag && store.isAnnotationFocused(threadTag);
   const focusThreadAnnotation = useMemo(

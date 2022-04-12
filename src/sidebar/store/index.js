@@ -1,3 +1,4 @@
+import { useService } from '../service-context';
 import { createStore } from './create-store';
 import { debugMiddleware } from './debug-middleware';
 import { activityModule } from './modules/activity';
@@ -16,6 +17,7 @@ import { sessionModule } from './modules/session';
 import { sidebarPanelsModule } from './modules/sidebar-panels';
 import { toastMessagesModule } from './modules/toast-messages';
 import { viewerModule } from './modules/viewer';
+import { useStore } from './use-store';
 
 /** @typedef {ReturnType<createSidebarStore>} SidebarStore */
 
@@ -55,4 +57,16 @@ export function createSidebarStore(settings) {
     viewerModule,
   ]);
   return createStore(modules, [settings], middleware);
+}
+
+/**
+ * Hook for accessing the sidebar's store in UI components.
+ *
+ * Returns a wrapper around the store which tracks its usage by the component
+ * and re-renders the component when relevant data in the store changes. See
+ * {@link useStore}.
+ */
+export function useSidebarStore() {
+  const store = /** @type {SidebarStore} */ (useService('store'));
+  return useStore(store);
 }

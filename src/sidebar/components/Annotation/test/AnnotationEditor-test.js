@@ -64,7 +64,7 @@ describe('AnnotationEditor', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../../store/use-store': { useStoreProxy: () => fakeStore },
+      '../../store': { useSidebarStore: () => fakeStore },
       '../../helpers/theme': { applyTheme: fakeApplyTheme },
     });
     // `AnnotationLicense` is a presentation-only component and is only used

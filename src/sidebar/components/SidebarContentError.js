@@ -1,6 +1,6 @@
 import { LabeledButton, Panel } from '@hypothesis/frontend-shared';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 
 /**
  * @typedef SidebarContentErrorProps
@@ -20,7 +20,7 @@ export default function SidebarContentError({
   onLoginRequest,
   showClearSelection = false,
 }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const isLoggedIn = store.isLoggedIn();
 
   const errorTitle =

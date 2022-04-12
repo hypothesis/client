@@ -2,7 +2,7 @@ import { Icon, LinkButton } from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
-import { useStoreProxy } from '../../store/use-store';
+import { useSidebarStore } from '../../store';
 import { isThirdPartyUser, username } from '../../helpers/account-id';
 import {
   domainAndTitle,
@@ -56,7 +56,7 @@ function AnnotationHeader({
   threadIsCollapsed,
   settings,
 }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const defaultAuthority = store.defaultAuthority();
   const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
 

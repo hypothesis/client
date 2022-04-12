@@ -2,7 +2,7 @@ import { IconButton, LabeledButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import { useStoreProxy } from '../store/use-store';
+import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
 
@@ -26,7 +26,7 @@ import ModerationBanner from './ModerationBanner';
  *   @param {boolean} props.threadIsCollapsed
  */
 function HiddenThreadCardHeader({ annotation, ...restProps }) {
-  const store = useStoreProxy();
+  const store = useSidebarStore();
 
   // These two lines are copied from the AnnotationHeader component to mimic the
   // exact same behaviour.
@@ -129,7 +129,7 @@ function Thread({ thread, threadsService }) {
     child => countVisible(child) > 0
   );
 
-  const store = useStoreProxy();
+  const store = useSidebarStore();
   const hasAppliedFilter = store.hasAppliedFilter();
   const onToggleReplies = useCallback(
     () => store.setExpanded(thread.id, !!thread.collapsed),
