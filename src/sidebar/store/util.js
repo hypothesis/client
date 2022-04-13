@@ -21,7 +21,7 @@ export function actionTypes(reducers) {
  * which reads values from a Redux store, returns non-null.
  *
  * @template T
- * @param {object} store - Redux store
+ * @param {import('redux').Store} store - Redux store
  * @param {(s: Store) => T|null} selector - Function which returns a value from the
  *   store if the criteria is met or `null` otherwise.
  * @return {Promise<T>}

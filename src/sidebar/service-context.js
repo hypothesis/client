@@ -65,13 +65,14 @@ export const ServiceContext = createContext(fallbackInjector);
  *   // Wrap `MyComponent` to inject "settings" service from context.
  *   export default withServices(MyComponent, ['settings']);
  *
- * @template Props
+ * @template {Record<string, unknown>} Props
  * @template {string} ServiceName
  * @param {ComponentType<Props>} Component
  * @param {ServiceName[]} serviceNames - List of prop names that should be injected
  * @return {ComponentType<Omit<Props,ServiceName>>}
  */
 export function withServices(Component, serviceNames) {
+  /** @param {Omit<Props,ServiceName>} props */
   function Wrapper(props) {
     // Get the current dependency injector instance that is provided by a
     // `ServiceContext.Provider` somewhere higher up the component tree.
@@ -96,7 +97,9 @@ export function withServices(Component, serviceNames) {
         services[service] = injector.get(service);
       }
     }
-    return <Component {...services} {...props} />;
+
+    const propsWithServices = /** @type {Props} */ ({ ...services, ...props });
+    return <Component {...propsWithServices} />;
   }
 
   // Set the name of the wrapper for use in debug tools and queries in Enzyme

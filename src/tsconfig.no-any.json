@@ -29,7 +29,7 @@
     "shared/**/*.js",
     "sidebar/config/*.js",
     "sidebar/helpers/*.js",
-    "sidebar/store/create-store.js",
+    "sidebar/store/**/*.js",
     "sidebar/util/*.js",
     "types/*.d.ts"
   ],
