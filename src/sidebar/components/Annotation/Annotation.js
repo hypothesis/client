@@ -76,7 +76,7 @@ function Annotation({
 
   const draft = annotation && store.getDraft(annotation);
 
-  const hasQuote = annotation && !!quote(annotation);
+  const annotationQuote = annotation ? quote(annotation) : null;
   const isFocused = annotation && store.isAnnotationFocused(annotation.$tag);
   const isSaving = annotation && store.isSavingAnnotation(annotation);
   const isEditing = annotation && !!draft && !isSaving;
@@ -104,9 +104,9 @@ function Annotation({
             threadIsCollapsed={threadIsCollapsed}
           />
 
-          {hasQuote && (
+          {annotationQuote && (
             <AnnotationQuote
-              quote={quote(annotation)}
+              quote={annotationQuote}
               isFocused={isFocused}
               isOrphan={isOrphan(annotation)}
             />

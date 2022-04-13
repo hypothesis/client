@@ -15,15 +15,15 @@ import StyledText from '../StyledText';
  * @prop {string} quote
  * @prop {boolean} [isFocused]
  * @prop {boolean} [isOrphan]
- * @prop {SidebarSettings} [settings] - Used for theming.
+ * @prop {SidebarSettings} settings
  */
 
 /**
  * Display the selected text from the document associated with an annotation.
  *
- * @parm {AnnotationQuoteProps} props
+ * @param {AnnotationQuoteProps} props
  */
-function AnnotationQuote({ quote, isFocused, isOrphan, settings = {} }) {
+function AnnotationQuote({ quote, isFocused, isOrphan, settings }) {
   return (
     <Excerpt collapsedHeight={35} inlineControls={true} overflowThreshold={20}>
       <StyledText classes={classnames({ 'p-redacted-text': isOrphan })}>
