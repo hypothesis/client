@@ -1,4 +1,9 @@
 /**
+ * @typedef {import('redux').Action} Action
+ * @typedef {import('redux').Store} Store
+ */
+
+/**
  * A debug utility that prints information about internal application state
  * changes to the console.
  *
@@ -8,14 +13,16 @@
  * to the console, along with the application state before and after the action
  * was handled.
  *
- * @param {import("redux").Store} store
+ * @param {Store} store
  */
 export function debugMiddleware(store) {
   /* eslint-disable no-console */
   let serial = 0;
 
-  return function (next) {
-    return function (action) {
+  /** @param {(a: Action) => void} next */
+  return next => {
+    /** @param {Action} action */
+    return action => {
       // @ts-ignore The window interface needs to be expanded to include this property
       if (!window.debug) {
         next(action);
