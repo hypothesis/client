@@ -24,17 +24,42 @@
 @use './SelectionTabs';
 @use './SearchInput';
 @use './StyledText';
-@use './Thread';
 @use './ThreadCard';
 @use './ThreadList';
 @use './ToastMessages';
 @use './VersionInfo';
 
 // TODO: Evaluate all classes below after components have been converted to
-// Tailwind. If retaining, put them in @layer components after `frontend-shared`
+// Tailwind.
+// - If retaining "here", put them in @layer components after `frontend-shared`
 //  component styles have been converted to Tailwind (and are contained in the
 // components layer themselves). They need to come after shared-component
 // styles in the output stylesheet.
+// - Some may need to be moved to another layer or elsewhere.
+
+@layer components {
+  // Style a background to contain a vertical dashed line, horizontally-
+  // centered, that gets darker on hover.
+  //
+  // Linear gradient, sizing and positioning derived from
+  // https://css-tricks.com/more-control-over-css-borders-with-background-image/
+  .bg-thread-line {
+    // Use TW gradient stops to color the line
+    // These set --tw-gradient-from CSS properties
+    @apply from-grey-3 hover:from-grey-4;
+    @apply bg-no-repeat bg-center;
+
+    background-image: repeating-linear-gradient(
+      180deg,
+      var(--tw-gradient-from),
+      var(--tw-gradient-from) 4px,
+      transparent 4px,
+      transparent 6px,
+      var(--tw-gradient-from) 6px
+    );
+    background-size: 1px 100%;
+  }
+}
 
 // Applies to <Link>
 .p-muted-link {

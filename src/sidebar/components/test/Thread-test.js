@@ -77,6 +77,8 @@ describe('Thread', () => {
     );
   };
 
+  const childListSelector = 'ul[data-testid="thread-children"]';
+
   beforeEach(() => {
     fakeStore = {
       hasAppliedFilter: sinon.stub().returns(false),
@@ -138,12 +140,6 @@ describe('Thread', () => {
       assert.calledOnce(fakeStore.setExpanded);
       assert.calledWith(fakeStore.setExpanded, replyThread.id, false);
     });
-
-    it('assigns an appropriate CSS class to the element', () => {
-      const wrapper = createComponent({ thread: replyThread });
-
-      assert.isTrue(wrapper.find('.Thread').hasClass('Thread--reply'));
-    });
   });
 
   context('visible thread with annotation', () => {
@@ -170,12 +166,6 @@ describe('Thread', () => {
       collapsedThread.collapsed = true;
     });
 
-    it('assigns an appropriate CSS class to the element', () => {
-      const wrapper = createComponent({ thread: collapsedThread });
-      assert.isTrue(wrapper.find('.Thread').hasClass('is-collapsed'));
-      assert.isFalse(wrapper.find('.Thread__collapse-button').exists());
-    });
-
     it('renders reply toggle controls when thread has a parent', () => {
       collapsedThread.parent = '1';
       const wrapper = createComponent({ thread: collapsedThread });
@@ -188,7 +178,7 @@ describe('Thread', () => {
     it('does not render child threads', () => {
       const wrapper = createComponent({ thread: collapsedThread });
 
-      assert.isFalse(wrapper.find('.Thread__children').exists());
+      assert.isFalse(wrapper.find(childListSelector).exists());
     });
   });
 
@@ -246,7 +236,7 @@ describe('Thread', () => {
       const thread = createThread();
       const wrapper = createComponent({ thread });
 
-      assert.isTrue(wrapper.find('ThreadHeader').exists());
+      assert.isTrue(wrapper.find('HiddenThreadCardHeader').exists());
     });
 
     it("doesn't show the annotation header if top-level annotation is missing", () => {
@@ -254,7 +244,7 @@ describe('Thread', () => {
       thread.annotation = null;
       const wrapper = createComponent({ thread });
 
-      assert.isTrue(wrapper.find('ThreadHeader').isEmptyRender());
+      assert.isTrue(wrapper.find('HiddenThreadCardHeader').isEmptyRender());
     });
 
     it("doesn't show the annotation header if thread is a child", () => {
@@ -262,7 +252,7 @@ describe('Thread', () => {
       thread.parent = {}; // child threads have a parent
       const wrapper = createComponent({ thread });
 
-      assert.isFalse(wrapper.find('ThreadHeader').exists());
+      assert.isFalse(wrapper.find('HiddenThreadCardHeader').exists());
     });
   });
 
@@ -279,7 +269,7 @@ describe('Thread', () => {
       const wrapper = createComponent({ thread: threadWithChildren });
 
       assert.equal(
-        wrapper.find('.Thread__children').find('Thread').length,
+        wrapper.find(childListSelector).find('Thread').length,
         threadWithChildren.replyCount
       );
     });
@@ -294,7 +284,7 @@ describe('Thread', () => {
       // The number of children that end up getting rendered is equal to
       // all of the second child's replies plus the second child itself.
       assert.equal(
-        wrapper.find('.Thread__children').find('Thread').length,
+        wrapper.find(childListSelector).find('Thread').length,
         threadWithChildren.children[1].replyCount + 1
       );
     });
