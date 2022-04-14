@@ -5,6 +5,7 @@ import { replaceURLParams } from '../util/url';
  * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/api').Group} Group
  * @typedef {import('../../types/api').RouteMap} RouteMap
+ * @typedef {import('../../types/api').RouteMetadata} RouteMetadata
  * @typedef {import('../../types/api').Profile} Profile
  */
 
@@ -12,17 +13,16 @@ import { replaceURLParams } from '../util/url';
  * Return a shallow clone of `obj` with all client-only properties removed.
  * Client-only properties are marked by a '$' prefix.
  *
- * @param {object} obj
+ * @param {Record<string, unknown>} obj
  */
 function stripInternalProperties(obj) {
+  /** @type {Record<string, unknown>} */
   const result = {};
-
-  for (const k in obj) {
-    if (obj.hasOwnProperty(k) && k[0] !== '$') {
-      result[k] = obj[k];
+  for (let [key, value] of Object.entries(obj)) {
+    if (!key.startsWith('$')) {
+      result[key] = value;
     }
   }
-
   return result;
 }
 
@@ -45,9 +45,9 @@ function stripInternalProperties(obj) {
 /**
  * Function which makes an API request.
  *
- * @template {Record<string, Param|Param[]>} Params
- * @template {object} Body
- * @template Result
+ * @template {Record<string, Param|Param[]>} [Params={}]
+ * @template [Body=void]
+ * @template [Result=void]
  * @callback APICall
  * @param {Params} params - A map of URL and query string parameters to include with the request.
  * @param {Body} [data] - The body of the request.
@@ -67,12 +67,30 @@ function stripInternalProperties(obj) {
  * @prop {() => any} onRequestFinished - Callback invoked when the API request finishes.
  */
 
-function get(object, path) {
-  let cursor = object;
-  path.split('.').forEach(segment => {
+/**
+ * @param {RouteMap|RouteMetadata} link
+ * @return {link is RouteMetadata}
+ */
+function isRouteMetadata(link) {
+  return link ? 'url' in link : false;
+}
+
+/**
+ * Lookup metadata for an API route in the result of an `/api/` response.
+ *
+ * @param {RouteMap} routeMap
+ * @param {string} route - Dot-separated path of route in `routeMap`
+ */
+function findRouteMetadata(routeMap, route) {
+  /** @type {RouteMap|RouteMetadata} */
+  let cursor = routeMap;
+  for (let segment of route.split('.')) {
     cursor = cursor[segment];
-  });
-  return cursor;
+    if (!cursor) {
+      break;
+    }
+  }
+  return isRouteMetadata(cursor) ? cursor : null;
 }
 
 /**
@@ -81,7 +99,7 @@ function get(object, path) {
  * @param {Promise<RouteMap>} links - API route data from API index endpoint (`/api/`)
  * @param {string} route - The dotted path of the named API route (eg. `annotation.create`)
  * @param {APIMethodCallbacks} callbacks
- * @return {APICall<Record<string, any>, object, object>} - Function that makes
+ * @return {APICall<Record<string, any>, Record<string, any>|void, unknown>} - Function that makes
  *   an API call. The returned `APICall` has generic parameter, body and return types.
  *   This can be cast to an `APICall` with more specific types.
  */
@@ -94,8 +112,12 @@ function createAPICall(
     onRequestStarted();
     try {
       const [linksMap, token] = await Promise.all([links, getAccessToken()]);
-      const descriptor = get(linksMap, route);
+      const descriptor = findRouteMetadata(linksMap, route);
+      if (!descriptor) {
+        throw new Error(`Missing API route: ${route}`);
+      }
 
+      /** @type {Record<string, string>} */
       const headers = {
         'Content-Type': 'application/json',
         'Hypothesis-Client-Version': '__VERSION__',
@@ -205,37 +227,35 @@ export class APIService {
      * @prop {number} total
      */
 
-    /** @type {APICall<object, void, AnnotationSearchResult>} */
-    this.search = apiCall('search');
+    /** @typedef {{ id: string }} IDParam */
+
+    this.search = /** @type {APICall<{}, void, AnnotationSearchResult>} */ (
+      apiCall('search')
+    );
     this.annotation = {
-      /** @type {APICall<{}, Partial<Annotation>, Annotation>} */
-      create: apiCall('annotation.create'),
-
-      /** @type {APICall<{ id: string }, void, void>} */
-      delete: apiCall('annotation.delete'),
-
-      /** @type {APICall<{ id: string }, void, Annotation>} */
-      get: apiCall('annotation.read'),
-
-      /** @type {APICall<{ id: string }, Partial<Annotation>, Annotation>} */
-      update: apiCall('annotation.update'),
-
-      /** @type {APICall<{ id: string }, void, void>} */
-      flag: apiCall('annotation.flag'),
-
-      /** @type {APICall<{ id: string }, void, void>} */
-      hide: apiCall('annotation.hide'),
-
-      /** @type {APICall<{ id: string }, void, void>} */
-      unhide: apiCall('annotation.unhide'),
+      create: /** @type {APICall<{}, Partial<Annotation>, Annotation>} */ (
+        apiCall('annotation.create')
+      ),
+      delete: /** @type {APICall<IDParam>} */ (apiCall('annotation.delete')),
+      get: /** @type {APICall<IDParam, void, Annotation>} */ (
+        apiCall('annotation.read')
+      ),
+      update: /** @type {APICall<IDParam, Partial<Annotation>, Annotation>} */ (
+        apiCall('annotation.update')
+      ),
+      flag: /** @type {APICall<IDParam>} */ (apiCall('annotation.flag')),
+      hide: /** @type {APICall<IDParam>} */ (apiCall('annotation.hide')),
+      unhide: /** @type {APICall<IDParam>} */ (apiCall('annotation.unhide')),
     };
     this.group = {
       member: {
-        /** @type {APICall<{ pubid: string, userid: string }, void, void>} */
-        delete: apiCall('group.member.delete'),
+        delete: /** @type {APICall<{ pubid: string, userid: string }>} */ (
+          apiCall('group.member.delete')
+        ),
       },
-      /** @type {APICall<{ id: string, expand: string[] }, void, Group>} */
-      read: apiCall('group.read'),
+      read: /** @type {APICall<{ id: string, expand: string[] }, void, Group>} */ (
+        apiCall('group.read')
+      ),
     };
 
     /**
@@ -246,18 +266,22 @@ export class APIService {
      */
 
     this.groups = {
-      /** @type {APICall<ListGroupParams, void, Group[]>} */
-      list: apiCall('groups.read'),
+      list: /** @type {APICall<ListGroupParams, void, Group[]>} */ (
+        apiCall('groups.read')
+      ),
     };
     this.profile = {
       groups: {
-        /** @type {APICall<{ expand: string[] }, void, Group[]>} */
-        read: apiCall('profile.groups.read'),
+        read: /** @type {APICall<{ expand: string[] }, void, Group[]>} */ (
+          apiCall('profile.groups.read')
+        ),
       },
-      /** @type {APICall<{ authority?: string }, void, Profile>} */
-      read: apiCall('profile.read'),
-      /** @type {APICall<{}, Partial<Profile>, Profile>} */
-      update: apiCall('profile.update'),
+      read: /** @type {APICall<{ authority?: string }, void, Profile>} */ (
+        apiCall('profile.read')
+      ),
+      update: /** @type {APICall<{}, Partial<Profile>, Profile>} */ (
+        apiCall('profile.update')
+      ),
     };
   }
 

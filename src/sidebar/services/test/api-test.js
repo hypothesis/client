@@ -15,6 +15,7 @@ import apiIndex from './api-index.json';
 const routes = apiIndex.links;
 
 describe('APIService', () => {
+  let fakeApiRoutes;
   let fakeAuth;
   let fakeStore;
   let api;
@@ -61,7 +62,7 @@ describe('APIService', () => {
   }
 
   beforeEach(() => {
-    const fakeApiRoutes = {
+    fakeApiRoutes = {
       links: sinon.stub(),
       routes: sinon.stub().returns(Promise.resolve(routes)),
     };
@@ -310,6 +311,39 @@ describe('APIService', () => {
     return api.profile.read({}).then(() => {
       const [, options] = fetchMock.lastCall();
       assert.equal(options.headers['X-Client-Id'], '1234-5678');
+    });
+  });
+
+  [
+    // `profile.read` route is missing
+    {},
+    { profile: {} },
+    // `profile` is a route instead of a route map
+    {
+      profile: {
+        method: 'GET',
+        url: 'https://hypothes.is/api/profile',
+        desc: "Fetch the user's profile",
+      },
+    },
+    // `profile.read` is a route map instead of a route
+    { profile: { read: { subroute: {} } } },
+  ].forEach(routes => {
+    it('throws if API route is missing from /api/ response', async () => {
+      expectCall('get', 'profile');
+      fakeApiRoutes.routes.resolves(routes);
+
+      const api = new APIService(fakeApiRoutes, fakeAuth, fakeStore);
+
+      let error;
+      try {
+        await api.profile.read({});
+      } catch (e) {
+        error = e;
+      }
+
+      assert.instanceOf(error, Error);
+      assert.equal(error.message, 'Missing API route: profile.read');
     });
   });
 });
