@@ -17,6 +17,7 @@ export class SessionService {
    * @param {import('../store').SidebarStore} store
    * @param {import('./api').APIService} api
    * @param {import('./auth').AuthService} auth
+   * @param {import('../../types/config').SidebarSettings} settings
    * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
    */
   constructor(store, api, auth, settings, toastMessenger) {

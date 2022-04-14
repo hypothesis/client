@@ -222,8 +222,16 @@ export class StreamerService {
         );
       }
     });
-    newSocket.on('error', err => this._handleSocketError(websocketURL, err));
-    newSocket.on('message', event => this._handleSocketMessage(event));
+    newSocket.on(
+      'error',
+      /** @param {ErrorEvent} event */ event =>
+        this._handleSocketError(websocketURL, event)
+    );
+    newSocket.on(
+      'message',
+      /** @param {MessageEvent} event */ event =>
+        this._handleSocketMessage(event)
+    );
     this._socket = newSocket;
 
     // Configure the client ID

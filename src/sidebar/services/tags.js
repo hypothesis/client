@@ -35,6 +35,7 @@ export class TagsService {
    * @return {string[]} List of matching tags
    */
   filter(query, limit = null) {
+    /** @type {string[]} */
     const savedTags = this._storage.getObject(TAGS_LIST_KEY) || [];
     let resultCount = 0;
     // Match any tag where the query is a prefix of the tag or a word within the tag.
