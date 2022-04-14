@@ -37,10 +37,6 @@ export default {
         sidebar: '0px 1px 4px rgb(0, 0, 0, 0.5)',
       },
       colors: {
-        slate: {
-          // TODO remove when available from upstream preset
-          1: '#e3e3e5',
-        },
         'color-text': {
           inverted: '#f2f2f2',
         },
