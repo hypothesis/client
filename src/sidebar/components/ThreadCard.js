@@ -1,3 +1,4 @@
+import { Card } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 import { useCallback, useMemo } from 'preact/hooks';
@@ -63,7 +64,11 @@ function ThreadCard({ frameSync, thread }) {
 
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
-    <div
+    <Card
+      classes={classnames('p-3 cursor-pointer', {
+        'is-focused': isFocused,
+      })}
+      data-testid="thread-card"
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
@@ -74,12 +79,9 @@ function ThreadCard({ frameSync, thread }) {
       onMouseEnter={() => focusThreadAnnotation(threadTag)}
       onMouseLeave={() => focusThreadAnnotation(null)}
       key={thread.id}
-      className={classnames('ThreadCard p-3', {
-        'is-focused': isFocused,
-      })}
     >
       {threadContent}
-    </div>
+    </Card>
   );
 }
 
