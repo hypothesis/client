@@ -1,4 +1,5 @@
-import { LabeledButton, Spinner } from '@hypothesis/frontend-shared';
+import { Card, LabeledButton, Spinner } from '@hypothesis/frontend-shared';
+import classNames from 'classnames';
 
 import { useMemo } from 'preact/hooks';
 
@@ -70,43 +71,53 @@ function FilterStatusPanel({
 }) {
   const store = useStoreProxy();
   return (
-    <div className="FilterStatus">
-      {store.isLoading() ? (
-        <div className="hyp-u-layout-row--center">
+    <Card classes="mb-3 p-3">
+      <div className="flex items-center justify-center space-x-1">
+        {store.isLoading() ? (
           <Spinner />
-        </div>
-      ) : (
-        <div className="hyp-u-layout-row--align-center">
-          <div className="FilterStatus__text">
-            {resultCount > 0 && <span>Showing </span>}
-            <span className="filter-facet">
-              {resultCount > 0 ? resultCount : 'No'}{' '}
-              {resultCount === 1 ? entitySingular : entityPlural}
-            </span>
-            {filterQuery && (
-              <span>
-                {' '}
-                for{' '}
-                <span className="filter-facet--pre">{`'${filterQuery}'`}</span>
+        ) : (
+          <>
+            <div
+              className={classNames(
+                // Setting `min-width: 0` here allows wrapping to work as
+                // expected for long `filterQuery` strings. See
+                // https://css-tricks.com/flexbox-truncated-text/
+                'grow min-w-[0]'
+              )}
+              data-testid="filter-text"
+            >
+              {resultCount > 0 && <span>Showing </span>}
+              <span className="whitespace-nowrap font-bold">
+                {resultCount > 0 ? resultCount : 'No'}{' '}
+                {resultCount === 1 ? entitySingular : entityPlural}
               </span>
-            )}
-            {focusDisplayName && (
-              <span>
-                {' '}
-                by <span className="filter-facet">{focusDisplayName}</span>
-              </span>
-            )}
-            {additionalCount > 0 && (
-              <span className="filter-facet--muted">
-                {' '}
-                (and {additionalCount} more)
-              </span>
-            )}
-          </div>
-          <div>{actionButton}</div>
-        </div>
-      )}
-    </div>
+              {filterQuery && (
+                <span>
+                  {' '}
+                  for <span className="break-words">{`'${filterQuery}'`}</span>
+                </span>
+              )}
+              {focusDisplayName && (
+                <span>
+                  {' '}
+                  by{' '}
+                  <span className="whitespace-nowrap font-bold">
+                    {focusDisplayName}
+                  </span>
+                </span>
+              )}
+              {additionalCount > 0 && (
+                <span className="whitespace-nowrap italic text-color-text-light">
+                  {' '}
+                  (and {additionalCount} more)
+                </span>
+              )}
+            </div>
+            <div>{actionButton}</div>
+          </>
+        )}
+      </div>
+    </Card>
   );
 }
 

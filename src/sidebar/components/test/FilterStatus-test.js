@@ -59,7 +59,7 @@ describe('FilterStatus', () => {
   });
 
   function assertFilterText(wrapper, text) {
-    const filterText = wrapper.find('.FilterStatus__text').text();
+    const filterText = wrapper.find('[data-testid="filter-text"]').text();
     assert.equal(filterText, text);
   }
 
