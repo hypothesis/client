@@ -1,5 +1,4 @@
 @use '../variables' as var;
-@use './buttons';
 @use './layout';
 @use './utils';
 
@@ -13,37 +12,6 @@
   @include utils.shadow;
   border-radius: var.$border-radius;
   background-color: var.$color-background;
-}
-
-/**
- * A "card"-like pattern that may be displayed in vertical lists, a la
- * annotation (thread) cards. Will vertically-space its children. Adds a
- * hover/active intensified box shadow and accounts for "theme-clean" affordances.
- */
-@mixin card($rhythm: var.$layout-space) {
-  @include card-frame;
-  @include layout.vertical-rhythm($rhythm);
-  padding: var.$layout-space;
-
-  &:hover,
-  &.is-focused {
-    @include utils.shadow--active;
-  }
-
-  /** Clean theme affordances */
-  #{var.$sidebar--theme-clean} & {
-    // Give a little more space so that the border appears centered
-    // between cards
-    padding-bottom: 1.5em;
-    border-width: 0 0 1px 0;
-    border-bottom-style: solid;
-    border-bottom-color: var.$grey-2;
-    box-shadow: none;
-
-    &:hover {
-      box-shadow: none;
-    }
-  }
 }
 
 /**
@@ -62,46 +30,6 @@
   fill: var.$color-background;
   @if ($direction == 'down') {
     transform: rotateX(180deg);
-  }
-}
-
-/**
- * Base styles for a "panel"-like element, with appropriate
- * padding, heading and close-button styles.
- *
- * @param {length} [$rhythm] - An optional value to use for vertical rhythm
- *   (spacing, vertically)
- */
-@mixin panel($rhythm: var.$layout-space) {
-  @include card($rhythm);
-
-  &__header {
-    @include layout.row($align: center);
-    @include utils.border--bottom;
-    padding-bottom: var.$layout-space;
-  }
-
-  &__header-icon {
-    margin-right: var.$layout-space--xsmall;
-  }
-
-  &__title {
-    @include utils.font--large;
-    color: var.$color-brand;
-    font-weight: 700;
-  }
-
-  &__button {
-    @include buttons.button--labeled;
-  }
-
-  &__button--primary {
-    @include buttons.button--primary;
-  }
-
-  &__actions {
-    @include layout.row(right);
-    @include layout.horizontal-rhythm(10px);
   }
 }
 
