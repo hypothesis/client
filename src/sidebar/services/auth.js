@@ -33,6 +33,7 @@ export class AuthService extends TinyEmitter {
    * @param {import('./api-routes').APIRoutesService} apiRoutes
    * @param {import('./local-storage').LocalStorageService} localStorage
    * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
+   * @param {import('../../types/config').SidebarSettings} settings
    */
   constructor($window, apiRoutes, localStorage, settings, toastMessenger) {
     super();
@@ -62,6 +63,8 @@ export class AuthService extends TinyEmitter {
 
     /**
      * Show an error message telling the user that the access token has expired.
+     *
+     * @param {string} message
      */
     function showAccessTokenExpiredErrorMessage(message) {
       toastMessenger.error(`Hypothesis login lost: ${message}`, {
@@ -111,6 +114,8 @@ export class AuthService extends TinyEmitter {
 
     /**
      * Persist access & refresh tokens for future use.
+     *
+     * @param {TokenInfo} token
      */
     function saveToken(token) {
       localStorage.setObject(storageKey(), token);

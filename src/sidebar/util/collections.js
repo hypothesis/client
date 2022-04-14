@@ -39,3 +39,17 @@ export function toTrueMap(arr) {
 export function trueKeys(obj) {
   return Object.keys(obj).filter(key => obj[key] === true);
 }
+
+/**
+ * Typed version of `Object.entries` for use with objects typed as
+ * `Record<Key, Value>`.
+ *
+ * Unlike `Object.entries`, this preserves the type of the key.
+ *
+ * @template {string|number|symbol} Key
+ * @template Value
+ * @param {Record<Key, Value>} object
+ */
+export function entries(object) {
+  return /** @type {[Key, Value][]} */ (Object.entries(object));
+}

@@ -85,7 +85,7 @@ function findRouteMetadata(routeMap, route) {
   /** @type {RouteMap|RouteMetadata} */
   let cursor = routeMap;
   for (let segment of route.split('.')) {
-    cursor = cursor[segment];
+    cursor = /** @type {RouteMap} */ (cursor)[segment];
     if (!cursor) {
       break;
     }

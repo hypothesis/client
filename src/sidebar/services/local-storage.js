@@ -3,19 +3,25 @@
  */
 class InMemoryStorage {
   constructor() {
-    this._store = {};
+    this._store = new Map();
   }
 
+  /** @param {string} key */
   getItem(key) {
-    return key in this._store ? this._store[key] : null;
+    return this._store.get(key) ?? null;
   }
 
+  /**
+   * @param {string} key
+   * @param {string} value
+   */
   setItem(key, value) {
-    this._store[key] = value;
+    this._store.set(key, value);
   }
 
+  /** @param {string} key */
   removeItem(key) {
-    delete this._store[key];
+    this._store.delete(key);
   }
 }
 

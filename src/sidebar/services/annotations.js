@@ -170,6 +170,8 @@ export class AnnotationsService {
 
   /**
    * Delete an annotation via the API and update the store.
+   *
+   * @param {SavedAnnotation} annotation
    */
   async delete(annotation) {
     await this._api.annotation.delete({ id: annotation.id });
@@ -232,6 +234,7 @@ export class AnnotationsService {
       eventType = 'update';
     }
 
+    /** @type {Annotation} */
     let savedAnnotation;
     this._store.annotationSaveStarted(annotation);
     try {
@@ -241,11 +244,14 @@ export class AnnotationsService {
       this._store.annotationSaveFinished(annotation);
     }
 
-    Object.keys(annotation).forEach(key => {
-      if (key[0] === '$') {
-        savedAnnotation[key] = annotation[key];
+    // Copy local/internal fields from the original annotation to the saved
+    // version.
+    for (let [key, value] of Object.entries(annotation)) {
+      if (key.startsWith('$')) {
+        const fields = /** @type {Record<string, any>} */ (savedAnnotation);
+        fields[key] = value;
       }
-    });
+    }
 
     // Clear out any pending changes (draft)
     this._store.removeDraft(annotation);

@@ -2,6 +2,7 @@ import { isReply } from '../helpers/annotation-metadata';
 import { SearchClient } from '../search-client';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../search-client').SortBy} SortBy
  * @typedef {import('../search-client').SortOrder} SortOrder
  */
@@ -122,23 +123,33 @@ export class LoadAnnotationsService {
 
     this._searchClient = new SearchClient(this._api.search, searchOptions);
 
-    this._searchClient.on('resultCount', resultCount => {
-      this._store.setAnnotationResultCount(resultCount);
-    });
-
-    this._searchClient.on('results', results => {
-      if (results.length) {
-        this._store.addAnnotations(results);
+    this._searchClient.on(
+      'resultCount',
+      /** @param {number} count */
+      count => {
+        this._store.setAnnotationResultCount(count);
       }
-    });
+    );
 
-    this._searchClient.on('error', error => {
-      if (typeof onError === 'function') {
-        onError(error);
-      } else {
-        console.error(error);
+    this._searchClient.on(
+      'results',
+      /** @param {Annotation[]} results */ results => {
+        if (results.length) {
+          this._store.addAnnotations(results);
+        }
       }
-    });
+    );
+
+    this._searchClient.on(
+      'error',
+      /** @param {Error} error */ error => {
+        if (typeof onError === 'function') {
+          onError(error);
+        } else {
+          console.error(error);
+        }
+      }
+    );
 
     this._searchClient.on('end', () => {
       // Remove client as it's no longer active.
