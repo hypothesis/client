@@ -256,7 +256,7 @@ describe('ThreadList', () => {
 
       // Calculate expected total height of thread list contents.
       const getRect = wrapper => wrapper.getDOMNode().getBoundingClientRect();
-      const cards = wrapper.find('.ThreadList__card');
+      const cards = wrapper.find('[data-testid="thread-card-container"]');
       const spaceBelowEachCard =
         getRect(cards.at(1)).top - getRect(cards.at(0)).bottom;
       const totalThreadHeight = fakeTopThread.children.reduce(

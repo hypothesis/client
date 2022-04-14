@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
+import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 
 import { ListenerCollection } from '../../shared/listener-collection';
@@ -204,7 +205,19 @@ function ThreadList({ threads }) {
     <div>
       <div style={{ height: offscreenUpperHeight }} />
       {visibleThreads.map(child => (
-        <div className="ThreadList__card" id={child.id} key={child.id}>
+        <div
+          className={classnames(
+            // The goal is to space out each annotation card vertically. Typically
+            // this is better handled by applying vertical spacing to the parent
+            // element (e.g. `space-y-3`) but in this case, the constraints of
+            // sibling divs before and after the list of annotation cards prevents
+            // this, so a bottom margin is added to each card's wrapping element.
+            'mb-3'
+          )}
+          data-testid="thread-card-container"
+          id={child.id}
+          key={child.id}
+        >
           <ThreadCard thread={child} />
         </div>
       ))}
