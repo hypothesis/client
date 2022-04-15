@@ -24,7 +24,7 @@
     // code for the browser.
     "types": []
   },
-  "include": ["**/*.js", "types/process.d.ts"],
+  "include": ["**/*.js", "types/*.d.ts"],
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",
