@@ -16,7 +16,6 @@ import StreamView from './StreamView';
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
 import ShareAnnotationsPanel from './ShareAnnotationsPanel';
-import SidebarContent from './SidebarContent';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
 
@@ -169,7 +168,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
         'h-full min-h-full overflow-scroll',
         // Precise padding to align with annotation cards in content
         // Larger padding on bottom for wide screens
-        'p-[9px] lg:pb-16 bg-grey-2',
+        'lg:pb-16 bg-grey-2',
         'js-thread-list-scroll-root',
         {
           'theme-clean': isThemeClean,
@@ -191,7 +190,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
           isSidebar={isSidebar}
         />
       )}
-      <SidebarContent>
+      <div className="container">
         <ToastMessages />
         <HelpPanel auth={authState.status === 'logged-in' ? authState : {}} />
         <ShareAnnotationsPanel />
@@ -206,7 +205,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
             )}
           </main>
         )}
-      </SidebarContent>
+      </div>
     </div>
   );
 }

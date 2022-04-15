@@ -53,7 +53,7 @@ export default {
         center: true,
         // Horizontal padding is larger for wider screens
         padding: {
-          DEFAULT: '0.5rem',
+          DEFAULT: '9px',
           lg: '4rem',
         },
         // By default, tailwind will provide appropriately-sized containers at

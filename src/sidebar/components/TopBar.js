@@ -9,7 +9,6 @@ import { useStoreProxy } from '../store/use-store';
 
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
-import SidebarContent from './SidebarContent';
 import SortMenu from './SortMenu';
 import StreamSearchInput from './StreamSearchInput';
 import UserMenu from './UserMenu';
@@ -89,12 +88,10 @@ function TopBar({
       )}
       data-testid="top-bar"
     >
-      <SidebarContent
-        classes={classnames(
+      <div
+        className={classnames(
+          'container',
           'flex items-center h-full',
-          // This precise horizontal padding makes the edges of its contents
-          // align accurately with the edges of annotation cards in the sidebar
-          'px-[9px]',
           // Text sizing will size icons in buttons correctly
           'text-xl'
         )}
@@ -170,7 +167,7 @@ function TopBar({
             </div>
           )}
         </div>
-      </SidebarContent>
+      </div>
     </div>
   );
 }
