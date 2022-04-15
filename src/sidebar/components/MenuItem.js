@@ -84,7 +84,8 @@ export default function MenuItem({
   const menuItemRef =
     /** @type {{ current: HTMLAnchorElement & HTMLDivElement }} */ (useRef());
 
-  let focusTimer = null;
+  /** @type {number|undefined} */
+  let focusTimer;
 
   let renderedIcon = null;
   if (icon && icon !== 'blank') {
