@@ -13,7 +13,6 @@
     "moduleResolution": "node",
     "noEmit": true,
     "strict": true,
-    "noImplicitAny": false,
     "target": "ES2020",
 
     // Let argument to catch statement be `any` rather than `unknown`.

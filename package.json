@@ -111,7 +111,6 @@
     "format": "prettier --list-different --write '**/*.{js,scss,d.ts}'",
     "test": "gulp test",
     "typecheck": "tsc --build tsconfig.json",
-    "typecheck-no-any": "tsc --build src/tsconfig.no-any.json",
     "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build"
   }

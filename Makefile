@@ -32,7 +32,6 @@ endif
 lint: node_modules/.uptodate
 	yarn run lint
 	yarn run typecheck
-	yarn run typecheck-no-any
 
 .PHONY: docs
 docs: python
