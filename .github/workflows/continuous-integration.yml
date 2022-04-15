@@ -20,6 +20,5 @@ jobs:
     - name: Typecheck
       run: |
         yarn typecheck
-        yarn typecheck-no-any
     - name: Test
       run: yarn test
