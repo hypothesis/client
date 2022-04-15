@@ -85,6 +85,18 @@
  */
 
 /**
+ * List of theme elements which can be customized.
+ *
+ * @typedef {'accentColor'|
+ *   'annotationFontFamily' |
+ *   'appBackgroundColor'|
+ *   'ctaBackgroundColor'|
+ *   'ctaTextColor'|
+ *   'selectionFontFamily'
+ * } ThemeProperty
+ */
+
+/**
  * Configuration provided by the annotator ("host frame") as
  * `ConfigFromAnnotator` OR by an ancestor ("embedder frame") as
  * `ConfigFromEmbedder`.
@@ -101,7 +113,7 @@
  * @prop {string} [appType] - Method used to load the client
  * @prop {boolean} [openSidebar] - Whether to open the sidebar on the initial load
  * @prop {boolean} [showHighlights] - Whether to show highlights
- * @prop {object} [branding] -
+ * @prop {Record<ThemeProperty, string>} [branding] -
  *   Theme properties (fonts, colors etc.)
  * @prop {boolean} [enableExperimentalNewNoteButton] -
  *   Whether to show the "New note" button on the "Page Notes" tab
