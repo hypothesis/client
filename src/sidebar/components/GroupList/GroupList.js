@@ -21,6 +21,8 @@ import GroupListSection from './GroupListSection';
 /**
  * Return the custom icon for the top bar configured by the publisher in
  * the Hypothesis client configuration.
+ *
+ * @param {SidebarSettings} settings
  */
 function publisherProvidedIcon(settings) {
   const svc = serviceConfig(settings);
