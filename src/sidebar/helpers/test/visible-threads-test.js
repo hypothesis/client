@@ -19,7 +19,7 @@ describe('sidebar/helpers/visible-threads', () => {
       { id: 't9' },
       { id: 't10' },
     ];
-    fakeThreadHeights = {};
+    fakeThreadHeights = new Map();
     fakeWindowHeight = 100;
     fakeDefaultDimensions = {
       defaultHeight: 200,
