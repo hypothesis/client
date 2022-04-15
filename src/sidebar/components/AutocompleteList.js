@@ -1,6 +1,10 @@
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
+/**
+ * @template T
+ * @param {T} item
+ */
 const defaultListFormatter = item => item;
 
 /**
