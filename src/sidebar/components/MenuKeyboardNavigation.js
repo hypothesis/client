@@ -32,7 +32,8 @@ export default function MenuKeyboardNavigation({
   const menuRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
 
   useEffect(() => {
-    let focusTimer = null;
+    /** @type {number|undefined} */
+    let focusTimer;
     if (visible) {
       focusTimer = setTimeout(() => {
         // The focus won't work without delaying rendering.
