@@ -42,6 +42,7 @@ function ThreadCard({ frameSync, thread }) {
   );
 
   const scrollToAnnotation = useCallback(
+    /** @param {string} tag */
     tag => {
       frameSync.scrollToAnnotation(tag);
     },
@@ -72,11 +73,14 @@ function ThreadCard({ frameSync, thread }) {
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
-        if (!isFromButtonOrLink(/** @type {Element} */ (e.target))) {
+        if (
+          !isFromButtonOrLink(/** @type {Element} */ (e.target)) &&
+          threadTag
+        ) {
           scrollToAnnotation(threadTag);
         }
       }}
-      onMouseEnter={() => focusThreadAnnotation(threadTag)}
+      onMouseEnter={() => focusThreadAnnotation(threadTag ?? null)}
       onMouseLeave={() => focusThreadAnnotation(null)}
       key={thread.id}
     >

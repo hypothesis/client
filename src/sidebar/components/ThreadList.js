@@ -87,7 +87,7 @@ function ThreadList({ threads }) {
   }, []);
 
   // Map of thread ID to measured height of thread.
-  const [threadHeights, setThreadHeights] = useState({});
+  const [threadHeights, setThreadHeights] = useState(() => new Map());
 
   // ID of thread to scroll to after the next render. If the thread is not
   // present, the value persists until it can be "consumed".
@@ -151,8 +151,9 @@ function ThreadList({ threads }) {
     // Clear `scrollToId` so we don't scroll again after the next render.
     setScrollToId(null);
 
+    /** @param {Thread} thread */
     const getThreadHeight = thread =>
-      threadHeights[thread.id] || THREAD_DIMENSION_DEFAULTS.defaultHeight;
+      threadHeights.get(thread.id) || THREAD_DIMENSION_DEFAULTS.defaultHeight;
 
     const yOffset = topLevelThreads
       .slice(0, threadIndex)
@@ -166,7 +167,7 @@ function ThreadList({ threads }) {
   // heights of thread cards and update `threadHeights` state if there are changes.
   useEffect(() => {
     setThreadHeights(prevHeights => {
-      const changedHeights = {};
+      const changedHeights = new Map();
       for (let { id } of visibleThreads) {
         const threadElement = /** @type {HTMLElement} */ (
           document.getElementById(id)
@@ -186,18 +187,18 @@ function ThreadList({ threads }) {
         }
 
         const height = getElementHeightWithMargins(threadElement);
-        if (height !== prevHeights[id]) {
-          changedHeights[id] = height;
+        if (height !== prevHeights.get(id)) {
+          changedHeights.set(id, height);
         }
       }
 
       // Skip update if no heights changed from previous measured values
       // (or defaults).
-      if (Object.keys(changedHeights).length === 0) {
+      if (changedHeights.size === 0) {
         return prevHeights;
       }
 
-      return { ...prevHeights, ...changedHeights };
+      return new Map([...prevHeights, ...changedHeights]);
     });
   }, [visibleThreads]);
 
