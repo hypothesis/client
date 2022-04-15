@@ -19,7 +19,7 @@ import VersionInfo from './VersionInfo';
  *
  * @param {object} props
  *   @param {Children} props.children
- *   @param {() => void} props.onClick
+ *   @param {(e: Event) => void} props.onClick
  */
 function HelpPanelNavigationButton({ children, onClick }) {
   return (
