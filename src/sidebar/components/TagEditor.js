@@ -75,11 +75,11 @@ function TagEditor({
    */
   const removeDuplicates = (suggestions, duplicates) => {
     const suggestionsSet = [];
-    suggestions.forEach(suggestion => {
+    for (let suggestion of suggestions) {
       if (duplicates.indexOf(suggestion) < 0) {
         suggestionsSet.push(suggestion);
       }
-    });
+    }
     return suggestionsSet.sort();
   };
 
