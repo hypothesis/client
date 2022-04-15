@@ -54,6 +54,7 @@ function AnnotationActionBar({
   const isLoggedIn = store.isLoggedIn();
 
   // Is the current user allowed to take the given `action` on this annotation?
+  /** @param {'update'|'delete'} action */
   const userIsAuthorizedTo = action => {
     return permits(annotation.permissions, action, userProfile.userid);
   };
