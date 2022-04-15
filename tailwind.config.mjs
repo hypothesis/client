@@ -19,6 +19,8 @@ export default {
         'adder-pop-down': 'adder-pop-down 0.08s ease-in forwards',
         'adder-pop-up': 'adder-pop-up 0.08s ease-in forwards',
         'fade-in-slow': 'fade-in 1s ease-in',
+        'fade-out': 'fade-out 0.3s forwards',
+        'slide-in-from-right': 'slide-in-from-right 0.3s forwards ease-in-out',
       },
       borderRadius: {
         // Tailwind provides a default set of border-radius utility styles
@@ -43,6 +45,25 @@ export default {
         blue: {
           focus: focusBlue,
           quote: '#58cef4',
+        },
+      },
+      // Content in the sidebar should never exceed a max-width of `768px`, and
+      // that content should be auto-centered
+      container: {
+        center: true,
+        // Horizontal padding is larger for wider screens
+        padding: {
+          DEFAULT: '0.5rem',
+          lg: '4rem',
+        },
+        // By default, tailwind will provide appropriately-sized containers at
+        // every breakpoint available in `screens`, but for the sidebar, only
+        // one width matters: the width associated with the `lg` breakpoint.
+        // The content container should never be larger than that. `container`
+        // has a `max-width:100%` until the `lg` breakpoint, after which it
+        // never exceeds `768px`.
+        screens: {
+          lg: '768px',
         },
       },
       fontFamily: {
@@ -120,6 +141,27 @@ export default {
             opacity: '0',
           },
           '100%': {
+            opacity: '1',
+          },
+        },
+        'fade-out': {
+          '0%': {
+            opacity: '1',
+          },
+          '100%': {
+            opacity: '0',
+          },
+        },
+        'slide-in-from-right': {
+          '0%': {
+            opacity: '0',
+            left: '100%',
+          },
+          '80%': {
+            left: '-10px',
+          },
+          '100%': {
+            left: '0',
             opacity: '1',
           },
         },

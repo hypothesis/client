@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { Icon } from '@hypothesis/frontend-shared';
+import { Card, Icon, Link } from '@hypothesis/frontend-shared';
 
 import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
@@ -15,7 +15,7 @@ import { withServices } from '../service-context';
  */
 
 /**
- * An individual toast message—a brief and transient success or error message.
+ * An individual toast message: a brief and transient success or error message.
  * The message may be dismissed by clicking on it.
  * Otherwise, the `toastMessenger` service handles removing messages after a
  * certain amount of time.
@@ -23,8 +23,12 @@ import { withServices } from '../service-context';
  * @param {ToastMessageProps} props
  */
 function ToastMessage({ message, onDismiss }) {
-  // Capitalize the message type for prepending
-  const prefix = message.type.charAt(0).toUpperCase() + message.type.slice(1);
+  // Capitalize the message type for prepending; Don't prepend a message
+  // type for "notice" messages
+  const prefix =
+    message.type !== 'notice'
+      ? `${message.type.charAt(0).toUpperCase() + message.type.slice(1)}: `
+      : '';
   const iconName = message.type === 'notice' ? 'cancel' : message.type;
   /**
    * a11y linting is disabled here: There is a click-to-remove handler on a
@@ -36,41 +40,55 @@ function ToastMessage({ message, onDismiss }) {
    */
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
-    <li
-      className={classnames('toast-message-container', {
-        'is-dismissed': message.isDismissed,
+    <Card
+      classes={classnames('p-0 flex border', {
+        'border-red-error': message.type === 'error',
+        'border-yellow-notice': message.type === 'notice',
+        'border-green-success': message.type === 'success',
       })}
       onClick={() => onDismiss(message.id)}
     >
       <div
-        className={classnames(
-          'toast-message',
-          `toast-message--${message.type}`
-        )}
+        className={classnames('flex items-center p-3 text-white', {
+          'bg-red-error': message.type === 'error',
+          'bg-yellow-notice': message.type === 'notice',
+          'bg-green-success': message.type === 'success',
+        })}
       >
-        <div className="toast-message__type">
-          <Icon name={iconName} classes="toast-message__icon" />
-        </div>
-        <div className="toast-message__message">
-          <strong>{prefix}: </strong>
-          {message.message}
-          {message.moreInfoURL && (
-            <div className="toast-message__link">
-              <a
-                href={message.moreInfoURL}
-                onClick={
-                  event =>
-                    event.stopPropagation() /* consume the event so that it does not dismiss the message */
-                }
-                target="_new"
-              >
-                More info
-              </a>
-            </div>
+        <Icon
+          name={iconName}
+          classes={classnames(
+            // Adjust alignment of icon to appear more aligned with text
+            'mt-[2px]'
           )}
-        </div>
+        />
       </div>
-    </li>
+      <div
+        className={classnames(
+          // TODO: After re-factoring of Card styling, `mt-0` should not need
+          // !important
+          'grow p-3 !mt-0'
+        )}
+        data-testid="toast-message-text"
+      >
+        <strong>{prefix}</strong>
+        {message.message}
+        {message.moreInfoURL && (
+          <div className="text-right">
+            <Link
+              href={message.moreInfoURL}
+              onClick={
+                event =>
+                  event.stopPropagation() /* consume the event so that it does not dismiss the message */
+              }
+              target="_new"
+            >
+              More info
+            </Link>
+          </div>
+        )}
+      </div>
+    </Card>
   );
 }
 
@@ -88,19 +106,32 @@ function ToastMessage({ message, onDismiss }) {
 function ToastMessages({ toastMessenger }) {
   const store = useSidebarStore();
   const messages = store.getToastMessages();
+  // The `ul` containing any toast messages is absolute-positioned and the full
+  // width of the viewport. Each toast message `li` has its position and width
+  // constrained by `container` configuration in tailwind.
   return (
     <div>
       <ul
         aria-live="polite"
         aria-relevant="additions"
-        className="ToastMessages"
+        className="absolute z-2 left-0 w-full space-y-2"
       >
         {messages.map(message => (
-          <ToastMessage
-            message={message}
+          <li
+            className={classnames(
+              'relative w-full container hover:cursor-pointer',
+              'animate-slide-in-from-right ',
+              {
+                'animate-fade-out': message.isDismissed,
+              }
+            )}
             key={message.id}
-            onDismiss={id => toastMessenger.dismiss(id)}
-          />
+          >
+            <ToastMessage
+              message={message}
+              onDismiss={id => toastMessenger.dismiss(id)}
+            />
+          </li>
         ))}
       </ul>
     </div>
