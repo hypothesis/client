@@ -25,14 +25,18 @@ import Thread from './Thread';
  */
 function ThreadCard({ frameSync, thread }) {
   const store = useStoreProxy();
-  const threadTag = thread.annotation && thread.annotation.$tag;
+  const threadTag = thread.annotation?.$tag ?? null;
   const isFocused = threadTag && store.isAnnotationFocused(threadTag);
   const focusThreadAnnotation = useMemo(
     () =>
-      debounce(tag => {
-        const focusTags = tag ? [tag] : [];
-        frameSync.focusAnnotations(focusTags);
-      }, 10),
+      debounce(
+        /** @param {string|null} tag */
+        tag => {
+          const focusTags = tag ? [tag] : [];
+          frameSync.focusAnnotations(focusTags);
+        },
+        10
+      ),
     [frameSync]
   );
 
