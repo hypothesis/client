@@ -20,38 +20,62 @@ import { isMacOS } from '../../shared/user-agent';
 import MarkdownView from './MarkdownView';
 
 /**
- * @typedef {import("@hypothesis/frontend-shared/lib/components/Link").LinkProps} LinkProps
- * @typedef {import('preact').JSX.HTMLAttributes<HTMLTextAreaElement>} TextAreaAttributes
- * @typedef {import('preact').Ref<HTMLTextAreaElement>} TextAreaRef
- *
- * @typedef {'bold'|'italic'|'quote'|'link'|'image'|'math'|'numlist'|'list'|'preview'|'help'} ButtonID
+ * @template T
+ * @typedef {import('preact').RefObject<T>} Ref
  */
 
-// Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
-// The shortcuts are taken from Stack Overflow's editor.
+/**
+ * @typedef {import("@hypothesis/frontend-shared/lib/components/Link").LinkProps} LinkProps
+ * @typedef {import('preact').JSX.HTMLAttributes<HTMLTextAreaElement>} TextAreaAttributes
+ * @typedef {import('../markdown-commands').EditorState} EditorState
+ */
+
+/**
+ * Toolbar commands that modify the editor state. This excludes the Help link
+ * and Preview buttons.
+ *
+ * @typedef {'bold'|
+ *   'image'|
+ *   'italic'|
+ *   'link'|
+ *   'list' |
+ *   'math'|
+ *   'numlist'|
+ *   'quote'
+ * } Command
+ */
+
+/**
+ * Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
+ * The shortcuts are taken from Stack Overflow's editor.
+ *
+ * @type {Record<Command, string>}
+ */
 const SHORTCUT_KEYS = {
   bold: 'b',
+  image: 'g',
   italic: 'i',
   link: 'l',
-  quote: 'q',
-  image: 'g',
-  numlist: 'o',
   list: 'u',
+  math: 'm',
+  numlist: 'o',
+  quote: 'q',
 };
 
 /**
  * Apply a toolbar command to an editor input field.
  *
- * @param {string} command
+ * @param {Command} command
  * @param {HTMLInputElement|HTMLTextAreaElement} inputEl
  */
 function handleToolbarCommand(command, inputEl) {
+  /** @param {(prevState: EditorState) => EditorState} newStateFn */
   const update = newStateFn => {
     // Apply the toolbar command to the current state of the input field.
     const newState = newStateFn({
       text: inputEl.value,
-      selectionStart: inputEl.selectionStart,
-      selectionEnd: inputEl.selectionEnd,
+      selectionStart: /** @type {number} */ (inputEl.selectionStart),
+      selectionEnd: /** @type {number} */ (inputEl.selectionEnd),
     });
 
     // Update the input field to match the new state.
@@ -63,6 +87,7 @@ function handleToolbarCommand(command, inputEl) {
     inputEl.focus();
   };
 
+  /** @param {EditorState} state */
   const insertMath = state => {
     const before = state.text.slice(0, state.selectionStart);
     if (
@@ -131,7 +156,7 @@ function IconLink({ classes, icon, linkRef, ...restProps }) {
 
 /**
  * @typedef ToolbarButtonProps
- * @prop {object} buttonRef
+ * @prop {import('preact').Ref<HTMLButtonElement>} buttonRef
  * @prop {boolean} [disabled]
  * @prop {string} [iconName]
  * @prop {string} [label]
@@ -192,8 +217,7 @@ function ToolbarButton({
 }
 
 /**
- *
- * @param {TextAreaAttributes & { classes?: string, containerRef?: TextAreaRef }} props
+ * @param {TextAreaAttributes & { classes?: string, containerRef?: Ref<HTMLTextAreaElement> }} props
  */
 function TextArea({ classes, containerRef, ...restProps }) {
   return (
@@ -213,8 +237,8 @@ function TextArea({ classes, containerRef, ...restProps }) {
 /**
  * @typedef ToolbarProps
  * @prop {boolean} isPreviewing - `true` if the editor's "Preview" mode is active.
- * @prop {(a: ButtonID) => any} onCommand - Callback invoked with the selected command when a toolbar button is clicked.
- * @prop {() => any} onTogglePreview - Callback invoked when the "Preview" toggle button is clicked.
+ * @prop {(a: Command) => void} onCommand - Callback invoked when a toolbar button is clicked.
+ * @prop {() => void} onTogglePreview - Callback invoked when the "Preview" toggle button is clicked.
  */
 
 /**
@@ -249,7 +273,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
   // is set to 0, and all other elements are set to -1.
   const [rovingElement, setRovingElement] = useState(0);
 
-  // An array of refs
+  /** @type {Ref<HTMLElement>[]} */
   const buttonRefs = useRef([]).current;
   if (buttonRefs.length === 0) {
     // Initialize buttonRefs on first render only
@@ -259,13 +283,22 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
   }
 
   /**
+   * @template {HTMLElement} ElementType
+   * @param {keyof buttonIds} buttonId
+   * @return {Ref<ElementType>}
+   */
+  function getRef(buttonId) {
+    return /** @type {Ref<ElementType>} */ (buttonRefs[buttonIds[buttonId]]);
+  }
+
+  /**
    * Sets the element to be both focused and the active roving index.
    *
    * @param {number} index - Ordered index that matches the element
    */
   const setFocusedElement = index => {
     setRovingElement(index);
-    buttonRefs[index].current.focus();
+    /** @type {HTMLElement} */ (buttonRefs[index].current).focus();
   };
 
   /**
@@ -348,7 +381,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-bold"
         onClick={() => onCommand('bold')}
         shortcutKey={SHORTCUT_KEYS.bold}
-        buttonRef={buttonRefs[buttonIds.bold]}
+        buttonRef={getRef('bold')}
         tabIndex={getTabIndex(buttonIds.bold)}
         title="Bold"
       />
@@ -357,7 +390,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-italic"
         onClick={() => onCommand('italic')}
         shortcutKey={SHORTCUT_KEYS.italic}
-        buttonRef={buttonRefs[buttonIds.italic]}
+        buttonRef={getRef('italic')}
         tabIndex={getTabIndex(buttonIds.italic)}
         title="Italic"
       />
@@ -366,7 +399,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-quote"
         onClick={() => onCommand('quote')}
         shortcutKey={SHORTCUT_KEYS.quote}
-        buttonRef={buttonRefs[buttonIds.quote]}
+        buttonRef={getRef('quote')}
         tabIndex={getTabIndex(buttonIds.quote)}
         title="Quote"
       />
@@ -375,7 +408,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="link"
         onClick={() => onCommand('link')}
         shortcutKey={SHORTCUT_KEYS.link}
-        buttonRef={buttonRefs[buttonIds.link]}
+        buttonRef={getRef('link')}
         tabIndex={getTabIndex(buttonIds.link)}
         title="Insert link"
       />
@@ -384,7 +417,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="image"
         onClick={() => onCommand('image')}
         shortcutKey={SHORTCUT_KEYS.image}
-        buttonRef={buttonRefs[buttonIds.image]}
+        buttonRef={getRef('image')}
         tabIndex={getTabIndex(buttonIds.image)}
         title="Insert image"
       />
@@ -392,7 +425,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         disabled={isPreviewing}
         iconName="format-functions"
         onClick={() => onCommand('math')}
-        buttonRef={buttonRefs[buttonIds.math]}
+        buttonRef={getRef('math')}
         tabIndex={getTabIndex(buttonIds.math)}
         title="Insert math (LaTeX is supported)"
       />
@@ -401,7 +434,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-list-numbered"
         onClick={() => onCommand('numlist')}
         shortcutKey={SHORTCUT_KEYS.numlist}
-        buttonRef={buttonRefs[buttonIds.numlist]}
+        buttonRef={getRef('numlist')}
         tabIndex={getTabIndex(buttonIds.numlist)}
         title="Numbered list"
       />
@@ -410,7 +443,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-list-unordered"
         onClick={() => onCommand('list')}
         shortcutKey={SHORTCUT_KEYS.list}
-        buttonRef={buttonRefs[buttonIds.list]}
+        buttonRef={getRef('list')}
         tabIndex={getTabIndex(buttonIds.list)}
         title="Bulleted list"
       />
@@ -424,7 +457,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
           icon="help"
           target="_blank"
-          linkRef={buttonRefs[buttonIds.help]}
+          linkRef={getRef('help')}
           tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
           aria-label="Formatting help"
@@ -432,7 +465,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         <ToolbarButton
           label={isPreviewing ? 'Write' : 'Preview'}
           onClick={onTogglePreview}
-          buttonRef={buttonRefs[buttonIds.preview]}
+          buttonRef={getRef('preview')}
           tabIndex={getTabIndex(buttonIds.preview)}
         />
       </div>
@@ -446,7 +479,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
  * @prop {Record<string,string>} [textStyle] -
  *   Additional CSS properties to apply to the input field and rendered preview
  * @prop {string} [text] - The markdown text to edit.
- * @prop {({text: string}) => void} [onEditText]
+ * @prop {(text: string) => void} [onEditText]
  *   - Callback invoked with `{ text }` object when user edits text.
  *   TODO: Simplify this callback to take just a string rather than an object once the
  *   parent component is converted to Preact.
@@ -476,13 +509,16 @@ export default function MarkdownEditor({
   }, [preview]);
 
   const togglePreview = () => setPreview(!preview);
+
+  /** @param {Command} command */
   const handleCommand = command => {
     if (input.current) {
       handleToolbarCommand(command, input.current);
-      onEditText({ text: input.current.value });
+      onEditText(input.current.value);
     }
   };
 
+  /** @param {KeyboardEvent} event */
   const handleKeyDown = event => {
     if (!event.ctrlKey && !event.metaKey) {
       return;
@@ -492,7 +528,7 @@ export default function MarkdownEditor({
       if (key === normalizeKeyName(event.key)) {
         event.stopPropagation();
         event.preventDefault();
-        handleCommand(command);
+        handleCommand(/** @type {Command} */ (command));
       }
     }
   };
@@ -524,11 +560,9 @@ export default function MarkdownEditor({
           containerRef={input}
           onClick={e => e.stopPropagation()}
           onKeyDown={handleKeyDown}
-          onInput={e => {
-            onEditText({
-              text: /** @type {HTMLTextAreaElement} */ (e.target).value,
-            });
-          }}
+          onInput={e =>
+            onEditText(/** @type {HTMLTextAreaElement} */ (e.target).value)
+          }
           value={text}
           style={textStyle}
         />
