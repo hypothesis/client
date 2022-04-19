@@ -6,7 +6,6 @@ import {
   normalizeKeyName,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import { createRef } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
 import {
@@ -16,6 +15,7 @@ import {
   toggleSpanStyle,
 } from '../markdown-commands';
 import { isMacOS } from '../../shared/user-agent';
+import { useArrowKeyNavigation } from '../../shared/keyboard-navigation';
 
 import MarkdownView from './MarkdownView';
 
@@ -156,25 +156,21 @@ function IconLink({ classes, icon, linkRef, ...restProps }) {
 
 /**
  * @typedef ToolbarButtonProps
- * @prop {import('preact').Ref<HTMLButtonElement>} buttonRef
  * @prop {boolean} [disabled]
  * @prop {string} [iconName]
  * @prop {string} [label]
  * @prop {(e: MouseEvent) => void} onClick
  * @prop {string} [shortcutKey]
- * @prop {number} tabIndex
  * @prop {string} [title]
  */
 
 /** @param {ToolbarButtonProps} props */
 function ToolbarButton({
-  buttonRef,
   disabled = false,
   iconName = '',
   label,
   onClick,
   shortcutKey,
-  tabIndex,
   title = '',
 }) {
   const modifierKey = useMemo(() => (isMacOS() ? 'Cmd' : 'Ctrl'), []);
@@ -185,11 +181,9 @@ function ToolbarButton({
   }
 
   const buttonProps = {
-    buttonRef,
     disabled,
     icon: iconName,
     onClick,
-    tabIndex,
     title: tooltip,
   };
 
@@ -252,113 +246,8 @@ function TextArea({ classes, containerRef, ...restProps }) {
  * @param {ToolbarProps} props
  */
 function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
-  const buttonIds = {
-    // Ordered buttons
-    bold: 0,
-    italic: 1,
-    quote: 2,
-    link: 3,
-    image: 4,
-    math: 5,
-    numlist: 6,
-    list: 7,
-    help: 8,
-    preview: 9,
-
-    // Total button count
-    maxId: 10,
-  };
-
-  // Keep track of a roving index. The active roving tabIndex
-  // is set to 0, and all other elements are set to -1.
-  const [rovingElement, setRovingElement] = useState(0);
-
-  /** @type {Ref<HTMLElement>[]} */
-  const buttonRefs = useRef([]).current;
-  if (buttonRefs.length === 0) {
-    // Initialize buttonRefs on first render only
-    for (let i = 0; i <= buttonIds.maxId; i++) {
-      buttonRefs.push(createRef());
-    }
-  }
-
-  /**
-   * @template {HTMLElement} ElementType
-   * @param {keyof buttonIds} buttonId
-   * @return {Ref<ElementType>}
-   */
-  function getRef(buttonId) {
-    return /** @type {Ref<ElementType>} */ (buttonRefs[buttonIds[buttonId]]);
-  }
-
-  /**
-   * Sets the element to be both focused and the active roving index.
-   *
-   * @param {number} index - Ordered index that matches the element
-   */
-  const setFocusedElement = index => {
-    setRovingElement(index);
-    /** @type {HTMLElement} */ (buttonRefs[index].current).focus();
-  };
-
-  /**
-   * Handles left and right arrow navigation as well as home and end
-   * keys so the user may navigate the toolbar without multiple tab stops.
-   *
-   * @param {KeyboardEvent} e
-   */
-  const handleKeyDown = e => {
-    let lowerLimit = 0;
-    const upperLimit = buttonIds.maxId - 1;
-    if (isPreviewing) {
-      // When isPreviewing is true, only allow navigation of
-      // the last 2 items.
-      lowerLimit = buttonIds.help;
-    }
-    let newFocusedElement = null;
-    switch (normalizeKeyName(e.key)) {
-      case 'ArrowLeft':
-        if (rovingElement <= lowerLimit) {
-          newFocusedElement = upperLimit;
-        } else {
-          newFocusedElement = rovingElement - 1;
-        }
-        break;
-      case 'ArrowRight':
-        if (rovingElement >= upperLimit) {
-          newFocusedElement = lowerLimit;
-        } else {
-          newFocusedElement = rovingElement + 1;
-        }
-        break;
-      case 'Home':
-        newFocusedElement = lowerLimit;
-        break;
-      case 'End':
-        newFocusedElement = upperLimit;
-        break;
-    }
-    if (newFocusedElement !== null) {
-      setFocusedElement(newFocusedElement);
-      e.preventDefault();
-    }
-  };
-
-  /**
-   * Returns the tab index value for a given element.
-   * Each element should be set to -1 unless its the
-   * active roving index, in which case it will be 0.
-   *
-   * @param {number} index - An index from `buttonIds`
-   * @return {number}
-   */
-  const getTabIndex = index => {
-    if (rovingElement === index) {
-      return 0;
-    } else {
-      return -1;
-    }
-  };
+  const toolbarContainer = useRef(null);
+  useArrowKeyNavigation(toolbarContainer);
 
   return (
     <div
@@ -374,15 +263,13 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
       data-testid="markdown-toolbar"
       role="toolbar"
       aria-label="Markdown editor toolbar"
-      onKeyDown={handleKeyDown}
+      ref={toolbarContainer}
     >
       <ToolbarButton
         disabled={isPreviewing}
         iconName="format-bold"
         onClick={() => onCommand('bold')}
         shortcutKey={SHORTCUT_KEYS.bold}
-        buttonRef={getRef('bold')}
-        tabIndex={getTabIndex(buttonIds.bold)}
         title="Bold"
       />
       <ToolbarButton
@@ -390,8 +277,6 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-italic"
         onClick={() => onCommand('italic')}
         shortcutKey={SHORTCUT_KEYS.italic}
-        buttonRef={getRef('italic')}
-        tabIndex={getTabIndex(buttonIds.italic)}
         title="Italic"
       />
       <ToolbarButton
@@ -399,8 +284,6 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-quote"
         onClick={() => onCommand('quote')}
         shortcutKey={SHORTCUT_KEYS.quote}
-        buttonRef={getRef('quote')}
-        tabIndex={getTabIndex(buttonIds.quote)}
         title="Quote"
       />
       <ToolbarButton
@@ -408,8 +291,6 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="link"
         onClick={() => onCommand('link')}
         shortcutKey={SHORTCUT_KEYS.link}
-        buttonRef={getRef('link')}
-        tabIndex={getTabIndex(buttonIds.link)}
         title="Insert link"
       />
       <ToolbarButton
@@ -417,16 +298,12 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="image"
         onClick={() => onCommand('image')}
         shortcutKey={SHORTCUT_KEYS.image}
-        buttonRef={getRef('image')}
-        tabIndex={getTabIndex(buttonIds.image)}
         title="Insert image"
       />
       <ToolbarButton
         disabled={isPreviewing}
         iconName="format-functions"
         onClick={() => onCommand('math')}
-        buttonRef={getRef('math')}
-        tabIndex={getTabIndex(buttonIds.math)}
         title="Insert math (LaTeX is supported)"
       />
       <ToolbarButton
@@ -434,8 +311,6 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-list-numbered"
         onClick={() => onCommand('numlist')}
         shortcutKey={SHORTCUT_KEYS.numlist}
-        buttonRef={getRef('numlist')}
-        tabIndex={getTabIndex(buttonIds.numlist)}
         title="Numbered list"
       />
       <ToolbarButton
@@ -443,8 +318,6 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
         iconName="format-list-unordered"
         onClick={() => onCommand('list')}
         shortcutKey={SHORTCUT_KEYS.list}
-        buttonRef={getRef('list')}
-        tabIndex={getTabIndex(buttonIds.list)}
         title="Bulleted list"
       />
       <div className="grow flex justify-end">
@@ -457,16 +330,12 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
           icon="help"
           target="_blank"
-          linkRef={getRef('help')}
-          tabIndex={getTabIndex(buttonIds.help)}
           title="Formatting help"
           aria-label="Formatting help"
         />
         <ToolbarButton
           label={isPreviewing ? 'Write' : 'Preview'}
           onClick={onTogglePreview}
-          buttonRef={getRef('preview')}
-          tabIndex={getTabIndex(buttonIds.preview)}
         />
       </div>
     </div>
