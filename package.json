@@ -47,7 +47,7 @@
     "diff": "^5.0.0",
     "dompurify": "^2.0.1",
     "enzyme": "^3.8.0",
-    "enzyme-adapter-preact-pure": "^3.2.0",
+    "enzyme-adapter-preact-pure": "^4.0.1",
     "escape-html": "^1.0.3",
     "escape-string-regexp": "^4.0.0",
     "eslint": "^8.3.0",
