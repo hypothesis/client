@@ -107,7 +107,8 @@ function AnnotationEditor({
   );
 
   const onEditText = useCallback(
-    ({ text }) => {
+    /** @param {string} text */
+    text => {
       store.createDraft(draft.annotation, { ...draft, text });
     },
     [draft, store]

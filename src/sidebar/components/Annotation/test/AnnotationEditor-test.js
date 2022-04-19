@@ -98,7 +98,7 @@ describe('AnnotationEditor', () => {
       const editor = wrapper.find('MarkdownEditor');
 
       act(() => {
-        editor.props().onEditText({ text: 'updated text' });
+        editor.props().onEditText('updated text');
       });
 
       const call = fakeStore.createDraft.getCall(0);

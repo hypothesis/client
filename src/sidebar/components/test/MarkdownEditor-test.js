@@ -119,9 +119,7 @@ describe('MarkdownEditor', () => {
 
         button.simulate('click');
 
-        assert.calledWith(onEditText, {
-          text: 'formatted text',
-        });
+        assert.calledWith(onEditText, 'formatted text');
         const [formatFunction, ...args] = effect;
         assert.calledWith(
           formatFunction,
@@ -184,9 +182,7 @@ describe('MarkdownEditor', () => {
               key: keyEvent.key,
             });
 
-            assert.calledWith(onEditText, {
-              text: 'formatted text',
-            });
+            assert.calledWith(onEditText, 'formatted text');
             const [formatFunction, ...args] = effect;
             assert.calledWith(
               formatFunction,
@@ -235,9 +231,7 @@ describe('MarkdownEditor', () => {
     const input = wrapper.find('textarea').getDOMNode();
     input.value = 'changed';
     wrapper.find('textarea').simulate('input');
-    assert.calledWith(onEditText, {
-      text: 'changed',
-    });
+    assert.calledWith(onEditText, 'changed');
   });
 
   it('enters preview mode when Preview button is clicked', () => {
