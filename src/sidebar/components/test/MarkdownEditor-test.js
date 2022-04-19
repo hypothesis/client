@@ -311,172 +311,57 @@ describe('MarkdownEditor', () => {
       newContainer.remove();
     });
 
-    /**
-     * Helper method to simulate a keypress on the markdown wrapper
-     *
-     * @param {string} key - One of 'ArrowRight', 'ArrowLeft', 'End', 'Home'
-     */
     const pressKey = key =>
       wrapper
         .find('[data-testid="markdown-toolbar"]')
         .simulate('keydown', { key });
 
-    /**
-     * Asserts the active button's title partially matches the supplied string.
-     *
-     * @param {string} partialTitle
-     */
-    const matchesFocusedTitle = partialTitle => {
-      assert.isTrue(
-        document.activeElement.getAttribute('title').indexOf(partialTitle) >= 0
-      );
-    };
-    /**
-     * Asserts the active button's inner text partially matches the supplied string.
-     *
-     * @param {string} partialText
-     */
-    const matchesFocusedText = partialText => {
-      assert.isTrue(document.activeElement.innerText.indexOf(partialText) >= 0);
-    };
-
-    /**
-     * Asserts there should only be one "0" `tabIndex` value at a time which
-     * should be set on the focused element. All other `tabIndex` values
-     * on elements shall be "-1".
-     */
-    const testRovingIndex = () => {
-      assert.isTrue(document.activeElement.getAttribute('tabIndex') === '0');
-      assert.equal(
-        wrapper.find('ToolbarButton[tabIndex=0]').length +
-          wrapper.find('a[tabIndex=0]').length,
-        1
-      );
-    };
+    function testArrowKeySequence(buttons) {
+      for (let button of buttons) {
+        pressKey('ArrowRight');
+        const label =
+          document.activeElement.getAttribute('title') ||
+          document.activeElement.innerText;
+        assert.include(label, button);
+      }
+    }
 
     context('when `isPreviewing` is false', () => {
-      it('changes focus circularly to the left', () => {
-        pressKey('ArrowLeft');
-        // preview is the last button
-        matchesFocusedText('Preview');
-        testRovingIndex();
-      });
-
-      it('changes focus circularly to the right', () => {
-        pressKey('ArrowLeft'); // move to the end node
-        pressKey('ArrowRight'); // move back to the start
-        matchesFocusedTitle('Bold');
-        testRovingIndex();
-      });
-
-      it('changes focus to the last element when pressing `end`', () => {
-        pressKey('End'); // move to the end node
-        matchesFocusedText('Preview');
-        testRovingIndex();
-      });
-
-      it('changes focus to the first element when pressing `home`', () => {
-        pressKey('ArrowRight'); // move focus off first button
-        pressKey('Home');
-        matchesFocusedTitle('Bold');
-        testRovingIndex();
-      });
-
-      it('preserves the elements order and roving index', () => {
-        [
-          {
-            title: 'Italic',
-          },
-          {
-            title: 'Quote',
-          },
-          {
-            title: 'Insert link',
-          },
-          {
-            title: 'Insert image',
-          },
-          {
-            title: 'Insert math (LaTeX is supported)',
-          },
-          {
-            title: 'Numbered list',
-          },
-          {
-            title: 'Bulleted list',
-          },
-          {
-            title: 'Formatting help',
-          },
-          {
-            text: 'Preview',
-          },
-          {
-            // back to the start
-            title: 'Bold',
-          },
-        ].forEach(test => {
-          pressKey('ArrowRight');
-          if (test.title) {
-            matchesFocusedTitle(test.title);
-          }
-          if (test.text) {
-            matchesFocusedText(test.text);
-          }
-          testRovingIndex();
-        });
+      // This is a basic test of arrow key navigation in this component.
+      // `useArrowKeyNavigation` tests cover this more fully.
+      it('arrow keys navigate through buttons', () => {
+        const buttons = [
+          'Italic',
+          'Quote',
+          'Insert link',
+          'Insert image',
+          'Insert math',
+          'Numbered list',
+          'Bulleted list',
+          'Formatting help',
+          'Preview',
+          'Bold',
+          'Italic',
+        ];
+        testArrowKeySequence(buttons);
       });
     });
 
     context('when `isPreviewing` is true', () => {
       beforeEach(() => {
-        // turn on Preview mode
-        act(() => {
-          wrapper.find('Toolbar').props().onTogglePreview();
-        });
         const previewButton = wrapper
           .find('button')
-          .filterWhere(el => el.text() === 'Write');
-        previewButton.simulate('focus');
+          .filterWhere(el => el.text() === 'Preview');
+        previewButton.simulate('click');
+
         pressKey('Home');
       });
 
-      it('changes focus to the last element when pressing `end`', () => {
-        pressKey('End'); // move to the end node
-        matchesFocusedText('Write');
-        testRovingIndex();
-      });
-
-      it('changes focus to the first element when pressing `home`', () => {
-        pressKey('ArrowRight'); // move focus off first button
-        pressKey('Home');
-        matchesFocusedTitle('Formatting help');
-        testRovingIndex();
-      });
-
-      it('preserves the elements order', () => {
-        [
-          {
-            text: 'Write',
-          },
-          {
-            title: 'Formatting help',
-          },
-          {
-            // back to the start
-            text: 'Write',
-          },
-        ].forEach(test => {
-          // only 2 enabled buttons
-          pressKey('ArrowRight');
-          if (test.title) {
-            matchesFocusedTitle(test.title);
-          }
-          if (test.text) {
-            matchesFocusedText(test.text);
-          }
-          testRovingIndex();
-        });
+      // This is a basic test of arrow key navigation in this component.
+      // `useArrowKeyNavigation` tests cover this more fully.
+      it('arrow keys navigate through buttons', () => {
+        const buttons = ['Write', 'Formatting help', 'Write'];
+        testArrowKeySequence(buttons);
       });
     });
   });
