@@ -72,7 +72,7 @@ function stripInternalProperties(obj) {
  * @return {link is RouteMetadata}
  */
 function isRouteMetadata(link) {
-  return link ? 'url' in link : false;
+  return 'url' in link;
 }
 
 /**
@@ -82,15 +82,23 @@ function isRouteMetadata(link) {
  * @param {string} route - Dot-separated path of route in `routeMap`
  */
 function findRouteMetadata(routeMap, route) {
-  /** @type {RouteMap|RouteMetadata} */
+  /** @type {RouteMap} */
   let cursor = routeMap;
-  for (let segment of route.split('.')) {
-    cursor = /** @type {RouteMap} */ (cursor)[segment];
-    if (!cursor) {
+  const pathSegments = route.split('.');
+  for (let [index, segment] of pathSegments.entries()) {
+    const nextCursor = cursor[segment];
+    if (!nextCursor || isRouteMetadata(nextCursor)) {
+      if (nextCursor && index === pathSegments.length - 1) {
+        // Found the RouteMetadata at the end of the path.
+        return nextCursor;
+      }
+      // Didn't find the route, or found a RouteMetadata before we reached the
+      // end of the path.
       break;
     }
+    cursor = nextCursor;
   }
-  return isRouteMetadata(cursor) ? cursor : null;
+  return null;
 }
 
 /**
