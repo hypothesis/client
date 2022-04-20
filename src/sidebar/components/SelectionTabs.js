@@ -1,4 +1,9 @@
-import { Frame, Icon, LabeledButton } from '@hypothesis/frontend-shared';
+import {
+  Frame,
+  Icon,
+  LabeledButton,
+  LinkButton,
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { applyTheme } from '../helpers/theme';
@@ -44,10 +49,13 @@ function Tab({
   const title = count > 0 ? `${label} (${count} available)` : label;
 
   return (
-    <LabeledButton
-      classes={classnames('text-color-text', 'SelectionTab', {
-        'is-selected': isSelected,
-      })}
+    <LinkButton
+      classes={classnames(
+        'inline bg-transparent min-w-[5.25rem] text-color-text hover:!no-underline',
+        {
+          'font-bold': isSelected,
+        }
+      )}
       // Listen for `onMouseDown` so that the tab is selected when _pressed_
       // as this makes the UI feel faster. Also listen for `onClick` as a fallback
       // to enable selecting the tab via other input methods.
@@ -61,15 +69,12 @@ function Tab({
       <>
         {children}
         {count > 0 && !isWaitingToAnchor && (
-          <span
-            className="text-tiny"
-            style="position:relative;bottom:3px;left:2px"
-          >
+          <span className="relative bottom-[3px] left-[2px] text-tiny">
             {count}
           </span>
         )}
       </>
-    </LabeledButton>
+    </LinkButton>
   );
 }
 
@@ -109,11 +114,13 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
   const showNotesUnavailableMessage = selectedTab === 'note' && noteCount === 0;
 
   return (
-    <div className="hyp-u-vertical-spacing--4 SelectionTabs__container">
-      <div
-        className="hyp-u-layout-row hyp-u-horizontal-spacing--6 SelectionTabs"
-        role="tablist"
-      >
+    <div
+      className={classnames(
+        // 9px balances out the space above the tabs
+        'space-y-3 pb-[9px]'
+      )}
+    >
+      <div className="flex gap-x-6 theme-clean:ml-[15px]" role="tablist">
         <Tab
           count={annotationCount}
           isWaitingToAnchor={isWaitingToAnchorAnnotations}
@@ -145,7 +152,7 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
         )}
       </div>
       {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
-        <div className="hyp-u-layout-row--justify-right">
+        <div className="flex justify-end">
           <LabeledButton
             data-testid="new-note-button"
             icon="add"
@@ -171,7 +178,7 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
             <br />
             Create one by selecting some text and clicking the{' '}
             <Icon
-              classes="m-0.5 inline -mt-0.5"
+              classes="inline m-0.5 -mt-0.5"
               name="annotate"
               title="Annotate"
             />{' '}
