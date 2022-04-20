@@ -72,8 +72,8 @@ describe('SelectionTabs', () => {
       const annotationTab = wrapper.find('Tab[label="Annotations"]');
       const noteTab = wrapper.find('Tab[label="Page notes"]');
 
-      assert.isTrue(annotationTab.find('LabeledButton').props().pressed);
-      assert.isFalse(noteTab.find('LabeledButton').props().pressed);
+      assert.isTrue(annotationTab.find('LinkButton').props().pressed);
+      assert.isFalse(noteTab.find('LinkButton').props().pressed);
     });
 
     it('should not display the add-page-note button when the annotations tab is active', () => {
@@ -93,12 +93,11 @@ describe('SelectionTabs', () => {
 
       const annotationTabButton = wrapper
         .find('Tab[label="Annotations"]')
-        .find('LabeledButton');
+        .find('LinkButton');
       const noteTabButton = wrapper
         .find('Tab[label="Page notes"]')
-        .find('LabeledButton');
+        .find('LinkButton');
 
-      assert.isTrue(noteTabButton.find('button').hasClass('is-selected'));
       assert.isTrue(noteTabButton.prop('pressed'));
       assert.isFalse(annotationTabButton.prop('pressed'));
     });
@@ -175,7 +174,7 @@ describe('SelectionTabs', () => {
       const wrapper = createComponent();
 
       const orphanTab = wrapper.find('Tab[label="Orphans"]');
-      assert.isTrue(orphanTab.find('LabeledButton').prop('pressed'));
+      assert.isTrue(orphanTab.find('LinkButton').prop('pressed'));
     });
 
     it('should not display orphans tab if there are 0 orphans', () => {
