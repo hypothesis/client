@@ -11,6 +11,7 @@ import { injectClient } from '../hypothesis-injector';
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').Selector} Selector
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
+ * @typedef {import('../hypothesis-injector').InjectConfig} InjectConfig
  */
 
 // When activating side-by-side mode for VitalSource PDF documents, make sure
@@ -67,8 +68,8 @@ export function vitalSourceFrameRole(window_ = window) {
  */
 export class VitalSourceInjector {
   /**
-   * @param {Record<string, any>} config - Annotator configuration that is
-   *   injected, along with the Hypothesis client, into the book content iframes
+   * @param {InjectConfig} config - Configuration for injecting the client into
+   *   book content frames
    */
   constructor(config) {
     const bookElement = findBookElement();

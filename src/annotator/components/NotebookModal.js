@@ -6,8 +6,17 @@ import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';
 
 /**
+ * Configuration used to launch the notebook application.
+ *
+ * This includes the URL for the iframe and configuration to pass to the
+ * application using a config fragment (see {@link addConfigFragment}).
+ *
+ * @typedef {{ notebookAppUrl: string } & Record<string, unknown>} NotebookConfig
+ */
+
+/**
  * @typedef NotebookIframeProps
- * @prop {Record<string, any>} config
+ * @prop {NotebookConfig} config
  * @prop {string} groupId
  */
 
@@ -40,7 +49,7 @@ function NotebookIframe({ config, groupId }) {
 /**
  * @typedef NotebookModalProps
  * @prop {import('../util/emitter').EventBus} eventBus
- * @prop {Record<string, any>} config
+ * @prop {NotebookConfig} config
  */
 
 /**

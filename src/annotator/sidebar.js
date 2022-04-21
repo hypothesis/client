@@ -18,6 +18,7 @@ import { createShadowRoot } from './util/shadow-root';
  * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('../types/config').Service} Service
  * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
  * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
  * @typedef {import('../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
@@ -28,9 +29,33 @@ import { createShadowRoot } from './util/shadow-root';
 export const MIN_RESIZE = 280;
 
 /**
+ * Client configuration used to launch the sidebar application.
+ *
+ * This includes the URL for the iframe and configuration to pass to the
+ * application using a config fragment (see {@link addConfigFragment}).
+ *
+ * @typedef {{ sidebarAppUrl: string } & Record<string, unknown>} SidebarConfig
+ */
+
+/**
+ * Client configuration used by the sidebar container ({@link Sidebar}).
+ *
+ * @typedef SidebarContainerConfig
+ * @prop {Service[]} [services] - Details of the annotation service the
+ *   client should connect to. This includes callbacks provided by the host
+ *   page to handle certain actions in the sidebar (eg. the Login button).
+ * @prop {string} [externalContainerSelector] - CSS selector of a container
+ *   element in the host page which the sidebar should be added into, instead
+ *   of creating a new container.
+ * @prop {(layout: SidebarLayout) => void} [onLayoutChange] - Callback that
+ *   allows the host page to react to the sidebar being opened, closed or
+ *   resized
+ */
+
+/**
  * Create the iframe that will load the sidebar application.
  *
- * @param {Record<string, unknown>} config
+ * @param {SidebarConfig} config
  * @return {HTMLIFrameElement}
  */
 function createSidebarIframe(config) {
@@ -63,9 +88,9 @@ export class Sidebar {
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
-   * @param {Record<string, any>} [config]
+   * @param {SidebarContainerConfig & SidebarConfig} config
    */
-  constructor(element, eventBus, config = {}) {
+  constructor(element, eventBus, config) {
     this._emitter = eventBus.createEmitter();
 
     /**
@@ -345,7 +370,7 @@ export class Sidebar {
       this.show();
     });
 
-    /** @type {Array<[SidebarToHostEvent, function]>} */
+    /** @type {Array<[SidebarToHostEvent, Function|undefined]>} */
     const eventHandlers = [
       ['loginRequested', this.onLoginRequest],
       ['logoutRequested', this.onLogoutRequest],

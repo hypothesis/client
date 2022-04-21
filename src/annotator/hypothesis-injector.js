@@ -7,6 +7,15 @@ import { onNextDocumentReady, FrameObserver } from './frame-observer';
  */
 
 /**
+ * Options for injecting the client into child frames.
+ *
+ * This includes the URL of the client's boot script, plus configuration
+ * for the client when it loads in the child frame.
+ *
+ * @typedef {{ clientUrl: string } & Record<string, unknown>} InjectConfig
+ */
+
+/**
  * HypothesisInjector injects the Hypothesis client into same-origin iframes.
  *
  * The client will be injected automatically into frames that have the
@@ -19,8 +28,7 @@ export class HypothesisInjector {
   /**
    * @param {Element} element - root of the DOM subtree to watch for the
    *   addition and removal of annotatable iframes
-   * @param {Record<string, any>} config - Annotator configuration that is
-   *   injected, along with the Hypothesis client, into the child iframes
+   * @param {InjectConfig} config
    */
   constructor(element, config) {
     this._config = config;
@@ -59,8 +67,7 @@ function hasHypothesis(iframe) {
  * See {@link onDocumentReady}.
  *
  * @param {HTMLIFrameElement} frame
- * @param {Record<string, any>} config - Annotator configuration that is
- *   injected, along with the Hypothesis client, into the child iframes
+ * @param {InjectConfig} config -
  */
 export async function injectClient(frame, config) {
   if (hasHypothesis(frame)) {

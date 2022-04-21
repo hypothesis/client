@@ -35,6 +35,14 @@ const sidebarLinkElement = /** @type {HTMLLinkElement} */ (
 );
 
 /**
+ * @typedef {import('./components/NotebookModal').NotebookConfig} NotebookConfig
+ * @typedef {import('./guest').GuestConfig} GuestConfig
+ * @typedef {import('./hypothesis-injector').InjectConfig} InjectConfig
+ * @typedef {import('./sidebar').SidebarConfig} SidebarConfig
+ * @typedef {import('./sidebar').SidebarContainerConfig} SidebarContainerConfig
+ */
+
+/**
  * Entry point for the part of the Hypothesis client that runs in the page being
  * annotated.
  *
@@ -47,7 +55,9 @@ const sidebarLinkElement = /** @type {HTMLLinkElement} */ (
  * client is initially loaded, is also the only guest frame.
  */
 function init() {
-  const annotatorConfig = getConfig('annotator');
+  const annotatorConfig = /** @type {GuestConfig & InjectConfig} */ (
+    getConfig('annotator')
+  );
 
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
@@ -59,7 +69,7 @@ function init() {
     const removeWorkaround = installPortCloseWorkaroundForSafari();
     destroyables.push({ destroy: removeWorkaround });
 
-    const sidebarConfig = getConfig('sidebar');
+    const sidebarConfig = /** @type {SidebarConfig} */ (getConfig('sidebar'));
 
     const hypothesisAppsOrigin = new URL(
       /** @type {string} */ (sidebarConfig.sidebarAppUrl)
@@ -71,7 +81,7 @@ function init() {
     const notebook = new Notebook(
       document.body,
       eventBus,
-      getConfig('notebook')
+      /** @type {NotebookConfig} */ (getConfig('notebook'))
     );
 
     portProvider.on('frameConnected', (source, port) =>
