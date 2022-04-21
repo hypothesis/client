@@ -120,8 +120,13 @@ function ToastMessages({ toastMessenger }) {
           <li
             className={classnames(
               'relative w-full container hover:cursor-pointer',
-              'animate-slide-in-from-right ',
               {
+                // Slide in from right in narrow viewports; fade in in
+                // larger viewports to toast message isn't flying too far
+                'motion-safe:animate-slide-in-from-right lg:animate-fade-in':
+                  !message.isDismissed,
+                // Only ever fade in if motion-reduction is preferred
+                'motion-reduce:animate-fade-in': !message.isDismissed,
                 'animate-fade-out': message.isDismissed,
               }
             )}
