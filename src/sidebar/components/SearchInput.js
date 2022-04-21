@@ -10,7 +10,7 @@ import { useStoreProxy } from '../store/use-store';
  *   If true, the input field is always shown. If false, the input field is only shown
  *   if the query is non-empty.
  * @prop {string|null} query - The currently active filter query
- * @prop {(value: string) => any} onSearch -
+ * @prop {(value: string) => void} onSearch -
  *   Callback to invoke when the current filter query changes
  */
 

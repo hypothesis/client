@@ -49,7 +49,7 @@ let ignoreNextClick = false;
  * @prop {string} [contentClass] - Additional CSS classes to apply to the menu.
  * @prop {boolean} [defaultOpen] - Whether the menu is open or closed when initially rendered.
  *   Ignored if `open` is present.
- * @prop {(open: boolean) => any} [onOpenChanged] - Callback invoked when the menu is
+ * @prop {(open: boolean) => void} [onOpenChanged] - Callback invoked when the menu is
  *   opened or closed.  This can be used, for example, to reset any ephemeral state that the
  *   menu content may have.
  * @prop {boolean} [open] - Whether the menu is currently open; overrides internal state

@@ -14,8 +14,8 @@ import ThreadList from './ThreadList';
 
 /**
  * @typedef SidebarViewProps
- * @prop {() => any} onLogin
- * @prop {() => any} onSignUp
+ * @prop {() => void} onLogin
+ * @prop {() => void} onSignUp
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
  * @prop {import('../services/streamer').StreamerService} streamer

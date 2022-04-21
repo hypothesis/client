@@ -2,7 +2,7 @@ import { LinkButton } from '@hypothesis/frontend-shared';
 
 /**
  * @typedef AnnotationReplyToggleProps
- * @prop {() => any} onToggleReplies
+ * @prop {() => void} onToggleReplies
  * @prop {number} replyCount
  * @prop {boolean} threadIsCollapsed
  */

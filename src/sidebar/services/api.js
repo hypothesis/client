@@ -63,8 +63,8 @@ function stripInternalProperties(obj) {
  * @prop {() => string|null} getClientId -
  *   Function that returns a per-session client ID to include with the request
  *   or `null`.
- * @prop {() => any} onRequestStarted - Callback invoked when the API request starts.
- * @prop {() => any} onRequestFinished - Callback invoked when the API request finishes.
+ * @prop {() => void} onRequestStarted - Callback invoked when the API request starts.
+ * @prop {() => void} onRequestFinished - Callback invoked when the API request finishes.
  */
 
 /**

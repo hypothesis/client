@@ -19,7 +19,7 @@ import { withServices } from '../service-context';
  * @prop {boolean} isSelected - Is this tab currently selected?
  * @prop {boolean} isWaitingToAnchor - Are there any annotations still waiting to anchor?
  * @prop {string} label - A string label to use for a11y
- * @prop {() => any} onSelect - Callback to invoke when this tab is selected
+ * @prop {() => void} onSelect - Callback to invoke when this tab is selected
  */
 
 /**

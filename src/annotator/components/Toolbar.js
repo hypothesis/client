@@ -33,10 +33,10 @@ function ToolbarButton({ ...buttonProps }) {
 /**
  * @typedef ToolbarProps
  *
- * @prop {() => any} closeSidebar -
+ * @prop {() => void} closeSidebar -
  *   Callback for the "Close sidebar" button. This button is only shown when
  *   `useMinimalControls` is true and the sidebar is open.
- * @prop {() => any} createAnnotation -
+ * @prop {() => void} createAnnotation -
  *   Callback for the "Create annotation" / "Create page note" button. The type
  *   of annotation depends on whether there is a text selection and is decided
  *   by the caller.
@@ -45,9 +45,9 @@ function ToolbarButton({ ...buttonProps }) {
  *   Icon to show on the "Create annotation" button indicating what kind of annotation
  *   will be created.
  * @prop {boolean} showHighlights - Are highlights currently visible in the document?
- * @prop {() => any} toggleHighlights -
+ * @prop {() => void} toggleHighlights -
  *   Callback to toggle visibility of highlights in the document.
- * @prop {() => any} toggleSidebar -
+ * @prop {() => void} toggleSidebar -
  *   Callback to toggle the visibility of the sidebar.
  * @prop {import("preact").Ref<HTMLButtonElement>} [toggleSidebarRef] -
  *   Ref that gets set to the toolbar button for toggling the sidebar.

@@ -18,7 +18,7 @@ import Slider from './Slider';
  *   A string identifying this panel. Only one `panelName` may be active at any time.
  *   Multiple panels with the same `panelName` would be "in sync", opening and closing together.
  * @prop {string} title - The panel's title
- * @prop {(active: boolean) => any} [onActiveChanged] -
+ * @prop {(active: boolean) => void} [onActiveChanged] -
  *   Optional callback to invoke when this panel's active status changes
  */
 

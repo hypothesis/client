@@ -42,7 +42,7 @@ export function isNodeInRange(range, node) {
  * `callback` for each of them.
  *
  * @param {Range} range
- * @param {(n: Node) => any} callback
+ * @param {(n: Node) => void} callback
  */
 export function forEachNodeInRange(range, callback) {
   const root = range.commonAncestorContainer;

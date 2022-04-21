@@ -4,7 +4,7 @@ import { useStoreProxy } from '../store/use-store';
 
 /**
  * @typedef LoggedOutMessageProps
- * @prop {() => any} onLogin
+ * @prop {() => void} onLogin
  */
 
 /**

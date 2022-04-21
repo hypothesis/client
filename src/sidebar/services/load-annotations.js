@@ -19,7 +19,7 @@ import { SearchClient } from '../search-client';
  *   with the expected presentation order of annotations/threads in the current
  *   view.
  * @prop {SortOrder} [sortOrder]
- * @prop {(error: Error) => any} [onError] - Optional error handler for
+ * @prop {(error: Error) => void} [onError] - Optional error handler for
  *   SearchClient. Default error handling logs errors to console.
  * @prop {'uri'|'group'} [streamFilterBy] - Set the websocket stream
  *   to filter by either URIs or groupIds.

@@ -26,7 +26,7 @@ import MenuSection from './MenuSection';
 /**
  * @typedef UserMenuProps
  * @prop {AuthStateLoggedIn} auth - object representing authenticated user and auth status
- * @prop {() => any} onLogout - onClick callback for the "log out" button
+ * @prop {() => void} onLogout - onClick callback for the "log out" button
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {SidebarSettings} settings
  */

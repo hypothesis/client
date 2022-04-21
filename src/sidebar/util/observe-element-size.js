@@ -8,7 +8,7 @@ import { ListenerCollection } from '../../shared/listener-collection';
  * updates are no longer needed.
  *
  * @param {Element} element - HTML element to watch
- * @param {(width: number, height: number) => any} onSizeChanged -
+ * @param {(width: number, height: number) => void} onSizeChanged -
  *   Callback to invoke with the `clientWidth` and `clientHeight` of the
  *   element when a change in its size is detected.
  * @return {() => void}

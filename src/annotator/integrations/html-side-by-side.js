@@ -217,7 +217,7 @@ function getScrollAnchor(root, viewport) {
  * and tries to preserve the position of this content within the viewport
  * after the callback is invoked.
  *
- * @param {() => any} callback - Callback that will apply the layout change
+ * @param {() => void} callback - Callback that will apply the layout change
  * @param {Element} [scrollRoot]
  * @param {DOMRect} [viewport] - Area to consider "in the viewport". Defaults to
  *   the viewport of the current window.

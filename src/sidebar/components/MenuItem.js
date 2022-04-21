@@ -34,8 +34,8 @@ import Slider from './Slider';
  *   indicate the current state; `true` if the submenu is visible. Note. Omit this prop,
  *    or set it to null, if there is no `submenu`.
  * @prop {string} label - Label of the menu item.
- * @prop {(e: Event) => any} [onClick] - Callback to invoke when the menu item is clicked.
- * @prop {(e: Event) => any} [onToggleSubmenu] -
+ * @prop {(e: Event) => void} [onClick] - Callback to invoke when the menu item is clicked.
+ * @prop {(e: Event) => void} [onToggleSubmenu] -
  *   Callback when the user clicks on the toggle to change the expanded state of the menu.
  * @prop {object} [submenu] -
  *   Contents of the submenu for this item.  This is typically a list of `MenuItem` components
