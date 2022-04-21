@@ -9,7 +9,7 @@ import { applyTheme } from '../helpers/theme';
 /**
  * @typedef InlineControlsProps
  * @prop {boolean} isCollapsed
- * @prop {(collapsed: boolean) => any} setCollapsed
+ * @prop {(collapsed: boolean) => void} setCollapsed
  * @prop {Record<string, string>} [linkStyle]
  */
 

@@ -60,7 +60,7 @@ function AdderToolbarArrow({ arrowDirection }) {
  *  @param {number} [props.badgeCount]
  *  @param {string} [props.icon]
  *  @param {string} props.label
- *  @param {() => any} props.onClick
+ *  @param {() => void} props.onClick
  *  @param {string|null} props.shortcut
  */
 function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
@@ -99,7 +99,7 @@ function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
  *   should appear above the toolbar pointing Up or below the toolbar pointing
  *   Down.
  * @prop {boolean} isVisible - Whether to show the toolbar or not.
- * @prop {(c: Command) => any} onCommand - Called when a toolbar button is clicked.
+ * @prop {(c: Command) => void} onCommand - Called when a toolbar button is clicked.
  * @prop {number} [annotationCount] -
  *   Number of annotations associated with the selected text.
  *   If non-zero, a "Show" button is displayed to allow the user to see the

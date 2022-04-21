@@ -42,7 +42,7 @@ import shallowEqual from 'shallowequal';
  *   subscribe to notifications of _potential_ changes in the watched values.
  * @param {Function|Array<Function>} watchFns - A function or array of functions
  *   which return the current watched values
- * @param {(current: any, previous: any) => any} callback -
+ * @param {(current: any, previous: any) => void} callback -
  *   A callback that is invoked when the watched values changed. It is passed
  *   the current and previous values respectively. If `watchFns` is an array,
  *   the `current` and `previous` arguments will be arrays of current and

@@ -4,9 +4,9 @@ import Toolbar from './components/Toolbar';
 
 /**
  * @typedef ToolbarOptions
- * @prop {() => any} createAnnotation
- * @prop {(open: boolean) => any} setSidebarOpen
- * @prop {(visible: boolean) => any} setHighlightsVisible
+ * @prop {() => void} createAnnotation
+ * @prop {(open: boolean) => void} setSidebarOpen
+ * @prop {(visible: boolean) => void} setHighlightsVisible
  */
 
 /**

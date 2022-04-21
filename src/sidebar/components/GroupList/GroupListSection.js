@@ -12,7 +12,7 @@ import GroupListItem from './GroupListItem';
  *  - The `Group` whose submenu is currently expanded, or `null` if no group is currently expanded
  * @prop {Group[]} groups - The list of groups to be displayed in the group list section
  * @prop {string} [heading] - The string name of the group list section
- * @prop {(group: Group|null) => any} onExpandGroup -
+ * @prop {(group: Group|null) => void} onExpandGroup -
  *   Callback invoked when a group is expanded or collapsed.  The argument is the group being
  *   expanded, or `null` if the expanded group is being collapsed.
  */

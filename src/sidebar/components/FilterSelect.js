@@ -11,7 +11,7 @@ import MenuItem from './MenuItem';
  * @typedef FilterSelectProps
  * @prop {FilterOption} defaultOption
  * @prop {string} [icon]
- * @prop {(selectedFilter: FilterOption) => any} onSelect
+ * @prop {(selectedFilter: FilterOption) => void} onSelect
  * @prop {FilterOption[]} options
  * @prop {FilterOption} [selectedOption]
  * @prop {string} title

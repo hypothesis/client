@@ -6,8 +6,8 @@ import SidebarPanel from './SidebarPanel';
 
 /**
  * @typedef LoginPromptPanelProps
- * @prop {() => any} onLogin
- * @prop {() => any} onSignUp
+ * @prop {() => void} onLogin
+ * @prop {() => void} onSignUp
  */
 
 /**

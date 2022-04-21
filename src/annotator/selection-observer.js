@@ -25,7 +25,7 @@ export class SelectionObserver {
   /**
    * Start observing changes to the current selection in the document.
    *
-   * @param {(range: Range|null) => any} callback -
+   * @param {(range: Range|null) => void} callback -
    *   Callback invoked with the selected region of the document when it has
    *   changed.
    * @param {Document} document_ - Test seam

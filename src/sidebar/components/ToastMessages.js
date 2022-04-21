@@ -11,7 +11,7 @@ import { withServices } from '../service-context';
 /**
  * @typedef ToastMessageProps
  * @prop {ToastMessage} message - The message object to render
- * @prop {(id: string) => any} onDismiss
+ * @prop {(id: string) => void} onDismiss
  */
 
 /**

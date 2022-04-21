@@ -20,7 +20,7 @@ let tagEditorIdCounter = 0;
  * @typedef TagEditorProps
  * @prop {(tag: string) => boolean} onAddTag - Callback to add a tag to the annotation
  * @prop {(tag: string) => boolean} onRemoveTag - Callback to remove a tag from the annotation
- * @prop {(tag: string) => any} onTagInput - Callback when inputted tag text changes
+ * @prop {(tag: string) => void} onTagInput - Callback when inputted tag text changes
  * @prop {string[]} tagList - The list of tags for the annotation under edit
  * @prop {import('../services/tags').TagsService} tags
  */

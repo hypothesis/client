@@ -9,7 +9,7 @@ function isElementVisible(element) {
 /**
  * @typedef MenuKeyboardNavigationProps
  * @prop {string} [className]
- * @prop {(e: KeyboardEvent) => any} [closeMenu] - Callback when the menu is closed via keyboard input
+ * @prop {(e: KeyboardEvent) => void} [closeMenu] - Callback when the menu is closed via keyboard input
  * @prop {boolean} [visible] - When  true`, sets focus on the first item in the list
  * @prop {import('preact').ComponentChildren} children - Array of nodes which may contain <MenuItems> or any nodes
  */

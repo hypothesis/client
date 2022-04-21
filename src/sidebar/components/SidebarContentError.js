@@ -6,7 +6,7 @@ import { useStoreProxy } from '../store/use-store';
  * @typedef SidebarContentErrorProps
  * @prop {'annotation'|'group'} errorType
  * @prop {boolean} [showClearSelection] - Whether to show a "Clear selection" button.
- * @prop {() => any} onLoginRequest - A function that will launch the login flow for the user.
+ * @prop {() => void} onLoginRequest - A function that will launch the login flow for the user.
  */
 
 /**
