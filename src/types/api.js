@@ -6,7 +6,7 @@
  */
 
 /**
- * An entry in the API index response (`/api`) describing an API route.
+ * Metadata specifying how to call an API route.
  *
  * @typedef RouteMetadata
  * @prop {string} method - HTTP method
@@ -15,10 +15,25 @@
  */
 
 /**
- * Structure of the `links` field of the API index response (`/api`) describing
- * available API routes.
+ * A nested map of API route name to route metadata.
  *
  * @typedef {{ [key: string]: RouteMap|RouteMetadata }} RouteMap
+ */
+
+/**
+ * Structure of the API index response (`/api`).
+ *
+ * @typedef IndexResponse
+ * @prop {RouteMap} links
+ */
+
+/**
+ * Structure of the Hypothesis links response (`/api/links`).
+ *
+ * This is a map of link name (eg. "account.settings") to URL. The URL may
+ * include ":"-prefixed placeholders/variables.
+ *
+ * @typedef {Record<string, string>} LinksResponse
  */
 
 /**

@@ -41,7 +41,7 @@ export class FetchError extends Error {
  *
  * @param {string} url
  * @param {RequestInit} [init] - Parameters for `fetch` request
- * @return {Promise<any>} - Parsed JSON response or `null` if response status is 204 (No Content)
+ * @return {Promise<unknown>} - Parsed JSON response or `null` if response status is 204 (No Content)
  * @throws {FetchError} if the request fails, returns a non-2xx status or a JSON
  *   response is expected but cannot be parsed
  */
