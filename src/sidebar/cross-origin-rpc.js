@@ -35,20 +35,22 @@ const registeredMethods = store => {
 };
 
 /**
- * @typedef JSONRPCMessage
+ * See https://www.jsonrpc.org/specification#request_object.
+ *
+ * @typedef JSONRPCRequest
  * @prop {string} jsonrpc
  * @prop {string} id
  * @prop {string} method
- * @prop {unknown[]} params
+ * @prop {unknown[]} [params]
  */
 
 /**
  * Return true if `data` "looks like" a JSON-RPC message.
  *
  * @param {any} data
- * @return {data is JSONRPCMessage}
+ * @return {data is JSONRPCRequest}
  */
-function isJsonRpcMessage(data) {
+function isJSONRPCRequest(data) {
   // eslint-disable-next-line eqeqeq
   if (data == null || typeof data !== 'object') {
     return false;
@@ -99,7 +101,7 @@ export function startServer(store, settings, $window) {
   function receiveMessage(event) {
     let allowedOrigins = settings.rpcAllowedOrigins || [];
 
-    if (!isJsonRpcMessage(event.data)) {
+    if (!isJSONRPCRequest(event.data)) {
       return;
     }
 
@@ -121,7 +123,7 @@ export function startServer(store, settings, $window) {
   /**
    * Return a JSON-RPC response to the given JSON-RPC request object.
    *
-   * @param {JSONRPCMessage} request
+   * @param {JSONRPCRequest} request
    */
   function jsonRpcResponse(request) {
     const method = methods[request.method];
