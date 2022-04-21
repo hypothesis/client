@@ -2,6 +2,17 @@ import { generateHexString } from '../../shared/random';
 import { fetchJSON } from './fetch';
 
 /**
+ * OAuth access token response.
+ *
+ * See https://datatracker.ietf.org/doc/html/rfc6749#section-5.1
+ *
+ * @typedef AccessTokenResponse
+ * @prop {string} access_token
+ * @prop {number} expires_in
+ * @prop {string} refresh_token
+ */
+
+/**
  * An object holding the details of an access token from the tokenUrl endpoint.
  *
  * @typedef TokenInfo
@@ -213,15 +224,17 @@ export class OAuthClient {
   /**
    * Fetch an OAuth access token.
    *
+   * See https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.3
+   *
    * @param {Record<string, string>} data - Parameters for form POST request
    * @return {Promise<TokenInfo>}
    */
   async _getAccessToken(data) {
-    // The request to `tokenEndpoint` returns an OAuth "Access Token Response".
-    // See https://datatracker.ietf.org/doc/html/rfc6749#section-4.1.4
     let response;
     try {
-      response = await this._formPost(this.tokenEndpoint, data);
+      response = /** @type {AccessTokenResponse} */ (
+        await this._formPost(this.tokenEndpoint, data)
+      );
     } catch (err) {
       throw new TokenError('Failed to fetch access token', err);
     }
