@@ -1,4 +1,4 @@
-import { IconButton, Spinner } from '@hypothesis/frontend-shared';
+import { IconButton, Spinner, TextInput } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useRef, useState } from 'preact/hooks';
 
@@ -53,31 +53,69 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
     setPrevQuery(query);
   }
 
+  const isExpanded = alwaysExpanded || query;
+
   return (
     <form
       action="#"
-      className="SearchInput__form"
+      className={classnames(
+        // Relative positioning allows the search input to expand without
+        // pushing other things in the top bar to the right when there is
+        // a long group name (input will slide "over" end of group name in menu)
+        'relative',
+        'flex items-center',
+        // Having a nearly opaque white background makes the collision with
+        // group names to the left a little less jarring. Full white on hover
+        // to fully remove the distraction.
+        'bg-white/90 hover:bg-white transition-colors'
+      )}
       name="searchForm"
       onSubmit={onSubmit}
     >
-      <input
+      <TextInput
         aria-label="Search"
-        className={classnames('SearchInput__input', {
-          'is-expanded': alwaysExpanded || query,
-        })}
+        classes={classnames(
+          // This element is ordered second in the flex layout (appears to the
+          // right of the search icon-button) but having it first in source
+          // ensures it is first in keyboard tab order
+          'order-1',
+          'text-base',
+          {
+            // Borders must be turned off when input is not expanded or focused
+            // to ensure it has 0 dimensions
+            'border-0': !isExpanded,
+            // The goal is to have a one-pixel grey border when `isExpanded`.
+            // Setting it both on focus (when it will be ofuscated by the focus
+            // ring) and when expanded prevents any change in the input's size
+            // when moving between the two states.
+            'focus:border': true,
+            border: isExpanded,
+          },
+          {
+            // Make the input dimensionless when not expanded (or focused)
+            'max-w-0 p-0': !isExpanded,
+            // Make the input have dimensions and padding when focused or
+            // expanded. The left-margin is to make room for the focus ring of
+            // the search icon-button when navigating by keyboard. Set a
+            // max-width to allow transition to work when exact width is unknown.
+            'focus:max-w-[150px] focus:p-1.5 focus:ml-[2px]': true,
+            'max-w-[150px] p-1.5 ml-[2px]': isExpanded,
+          },
+          'transition-[max-width] duration-300 ease-out'
+        )}
         dir="auto"
         type="text"
         name="query"
         placeholder={(isLoading && 'Loading…') || 'Search…'}
         disabled={isLoading}
-        ref={input}
+        inputRef={input}
         value={pendingQuery || ''}
         onInput={e =>
           setPendingQuery(/** @type {HTMLInputElement} */ (e.target).value)
         }
       />
       {!isLoading && (
-        <div className="SearchInput__button-container">
+        <div className="order-0">
           <IconButton
             icon="search"
             onClick={() => input.current.focus()}
@@ -87,11 +125,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         </div>
       )}
 
-      {isLoading && (
-        <div style="margin:0.5em 0">
-          <Spinner size="small" />
-        </div>
-      )}
+      {isLoading && <Spinner size="small" />}
     </form>
   );
 }

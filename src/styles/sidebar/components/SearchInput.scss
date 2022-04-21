@@ -2,44 +2,44 @@
 @use '../../mixins/layout';
 @use '../../variables' as var;
 
-.SearchInput__form {
-  @include layout.row;
-  position: relative;
-  color: var.$color-text;
-}
+// .SearchInput__form {
+//   @include layout.row;
+//   position: relative;
+//   color: var.$color-text;
+// }
 
-.SearchInput__button-container {
-  order: 0;
-}
+// .SearchInput__button-container {
+//   order: 0;
+// }
 
 .SearchInput__input {
-  @include forms.form-input;
+  //@include forms.form-input;
 
-  flex-grow: 1;
-  order: 1;
+  //flex-grow: 1;
+  //order: 1;
 
-  // Disable default browser styling for the input.
-  &:not(:focus) {
-    border: none;
-    padding: 0px;
-  }
+  // // Disable default browser styling for the input.
+  // &:not(:focus) {
+  //   border: none;
+  //   padding: 0px;
+  // }
 
   // The search box expands when focused, via a change in the
   // `max-width` property.
-  max-width: 0px;
+  //max-width: 0px;
 
-  transition: max-width 0.3s ease-out, padding-left 0.3s ease-out;
+  //transition: max-width 0.3s ease-out;
 
-  &:disabled {
-    background: none;
-    color: var.$color-text--light;
-  }
+  // &:disabled {
+  //   background: none;
+  //   color: var.$color-text--light;
+  // }
 
   // Expand the search input when focused (triggered by clicking
   // on the search icon) or when `is-expanded` is applied.
-  &:focus,
-  &.is-expanded {
-    max-width: 150px;
-    padding-left: 6px;
-  }
+  // &:focus,
+  // &.is-expanded {
+  //   max-width: 150px;
+  //   padding-left: 6px;
+  // }
 }
