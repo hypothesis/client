@@ -1,3 +1,8 @@
+/**
+ * @typedef {import('../../types/config').ThemeProperty} ThemeProperty
+ */
+
+/** @type {Record<ThemeProperty, string>} */
 const supportedThemeProperties = {
   accentColor: 'color',
   appBackgroundColor: 'backgroundColor',
@@ -6,12 +11,6 @@ const supportedThemeProperties = {
   selectionFontFamily: 'fontFamily',
   annotationFontFamily: 'fontFamily',
 };
-
-/**
- * Name of a theme element which can be configured.
- *
- * @typedef {keyof supportedThemeProperties} ThemeProperty
- */
 
 /**
  * Subset of the config from the host page which includes theme configuration.
