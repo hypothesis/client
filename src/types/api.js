@@ -231,7 +231,7 @@
  *
  * See https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
  *
- * @typedef SearchResult
+ * @typedef SearchResponse
  * @prop {number} total
  * @prop {Annotation[]} rows
  * @prop {Annotation[]} [replies] - Unofficial property that is populated if

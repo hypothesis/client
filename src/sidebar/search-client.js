@@ -3,7 +3,7 @@ import { TinyEmitter } from 'tiny-emitter';
 /**
  * @typedef {import('../types/api').Annotation} Annotation
  * @typedef {import('../types/api').SearchQuery} SearchQuery
- * @typedef {import('../types/api').SearchResult} SearchResult
+ * @typedef {import('../types/api').SearchResponse} SearchResponse
  *
  */
 
@@ -47,7 +47,8 @@ function defaultPageSize(index) {
  */
 export class SearchClient extends TinyEmitter {
   /**
-   * @param {(query: SearchQuery) => Promise<SearchResult>} searchFn - Function for querying the search API
+   * @param {(query: SearchQuery) => Promise<SearchResponse>} searchFn -
+   *   Callback that executes a search request against the Hypothesis API
    * @param {object} options
    *   @param {(index: number) => number} [options.getPageSize] -
    *     Callback that returns the page size to use when fetching the index'th
