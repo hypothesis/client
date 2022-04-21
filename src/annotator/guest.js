@@ -94,6 +94,17 @@ function removeTextSelection() {
 }
 
 /**
+ * Subset of the Hypothesis client configuration that is used by {@link Guest}.
+ *
+ * @typedef GuestConfig
+ * @prop {string} [subFrameIdentifier] - An identifier used by this guest to
+ *   identify the current frame when communicating with the sidebar. This is
+ *   only set in non-host frames.
+ * @prop {'jstor'} [contentPartner] - Configures a banner or other indicators
+ *   showing where the content has come from.
+ */
+
+/**
  * `Guest` is the central class of the annotator that handles anchoring (locating)
  * annotations in the document when they are fetched by the sidebar, rendering
  * highlights for them and handling subsequent interactions with the highlights.
@@ -121,7 +132,7 @@ export class Guest {
    * @param {HTMLElement} element -
    *   The root element in which the `Guest` instance should be able to anchor
    *   or create annotations. In an ordinary web page this typically `document.body`.
-   * @param {Record<string, any>} [config]
+   * @param {GuestConfig} [config]
    * @param {Window} [hostFrame] -
    *   Host frame which this guest is associated with. This is expected to be
    *   an ancestor of the guest frame. It may be same or cross origin.

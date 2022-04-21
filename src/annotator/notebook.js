@@ -2,7 +2,10 @@ import { createShadowRoot } from './util/shadow-root';
 import { render } from 'preact';
 import NotebookModal from './components/NotebookModal';
 
-/** @typedef {import('../types/annotator').Destroyable} Destroyable */
+/**
+ * @typedef {import('../types/annotator').Destroyable} Destroyable
+ * @typedef {import('./components/NotebookModal').NotebookConfig} NotebookConfig
+ */
 
 /** @implements {Destroyable} */
 export class Notebook {
@@ -10,9 +13,9 @@ export class Notebook {
    * @param {HTMLElement} element
    * @param {import('./util/emitter').EventBus} eventBus -
    *   Enables communication between components sharing the same eventBus
-   * @param {Record<string, any>} config
+   * @param {NotebookConfig} config
    */
-  constructor(element, eventBus, config = {}) {
+  constructor(element, eventBus, config) {
     /**
      * Un-styled shadow host for the notebook content.
      * This isolates the notebook from the page's styles.

@@ -4,7 +4,6 @@ import { toBoolean } from '../../shared/type-coercions';
 import { urlFromLinkTag } from './url-from-link-tag';
 
 /**
- * @typedef {'sidebar'|'notebook'|'annotator'|'all'} AppContext
  * @typedef {import('./settings').SettingsGetters} SettingsGetters
  * @typedef {(settings: SettingsGetters, name: string) => any} ValueGetter
  *
@@ -21,13 +20,18 @@ import { urlFromLinkTag } from './url-from-link-tag';
  */
 
 /**
- * List of allowed configuration keys per application context. Keys omitted
- * in a given context will be removed from the relative configs when calling
- * getConfig.
+ * Named subset of the Hypothesis client configuration that is relevant in
+ * a particular context.
  *
- * @param {AppContext} [appContext] - The name of the app.
+ * @typedef {'sidebar'|'notebook'|'annotator'|'all'} Context
  */
-function configurationKeys(appContext) {
+
+/**
+ * Returns the configuration keys that are relevant to a particular context.
+ *
+ * @param {Context} context
+ */
+function configurationKeys(context) {
   const contexts = {
     annotator: ['clientUrl', 'contentPartner', 'subFrameIdentifier'],
     sidebar: [
@@ -59,7 +63,7 @@ function configurationKeys(appContext) {
     ],
   };
 
-  switch (appContext) {
+  switch (context) {
     case 'annotator':
       return contexts.annotator;
     case 'sidebar':
@@ -70,7 +74,7 @@ function configurationKeys(appContext) {
       // Complete list of configuration keys used for testing.
       return [...contexts.annotator, ...contexts.sidebar, ...contexts.notebook];
     default:
-      throw new Error(`Invalid application context used: "${appContext}"`);
+      throw new Error(`Invalid application context used: "${context}"`);
   }
 }
 
@@ -81,6 +85,7 @@ function getHostPageSetting(settings, name) {
 
 /**
  * Definitions of configuration keys
+ *
  * @type {ConfigDefinitionMap}
  */
 const configDefinitions = {
@@ -192,11 +197,19 @@ const configDefinitions = {
 };
 
 /**
- * Return the configuration for a given application context.
+ * Return the subset of Hypothesis client configuration that is relevant in
+ * a particular context.
  *
- * @param {AppContext} [appContext] - The name of the app.
+ * See https://h.readthedocs.io/projects/client/en/latest/publishers/config/
+ * for details of all available configuration and the different ways they
+ * can be included on the page. In addition to the configuration provided by
+ * the embedder, the boot script also passes some additional configuration
+ * to the annotator, such as URLs of the various sub-applications and the
+ * boot script itself.
+ *
+ * @param {Context} context
  */
-export function getConfig(appContext = 'annotator', window_ = window) {
+export function getConfig(context, window_ = window) {
   const settings = settingsFrom(window_);
 
   /** @type {Record<string, unknown>} */
@@ -204,9 +217,8 @@ export function getConfig(appContext = 'annotator', window_ = window) {
 
   // Filter the config based on the application context as some config values
   // may be inappropriate or erroneous for some applications.
-  let filteredKeys = configurationKeys(appContext);
-  filteredKeys.forEach(name => {
-    const configDef = configDefinitions[name];
+  for (let key of configurationKeys(context)) {
+    const configDef = configDefinitions[key];
     const hasDefault = configDef.defaultValue !== undefined; // A default could be null
     const isURLFromBrowserExtension = isBrowserExtension(
       urlFromLinkTag(window_, 'sidebar', 'html')
@@ -217,25 +229,25 @@ export function getConfig(appContext = 'annotator', window_ = window) {
       // If the value is not allowed here, then set to the default if provided, otherwise ignore
       // the key:value pair
       if (hasDefault) {
-        config[name] = configDef.defaultValue;
+        config[key] = configDef.defaultValue;
       }
-      return;
+      continue;
     }
 
     // Get the value from the configuration source
-    const value = configDef.getValue(settings, name);
+    const value = configDef.getValue(settings, key);
     if (value === undefined) {
       // If there is no value (e.g. undefined), then set to the default if provided,
       // otherwise ignore the config key:value pair
       if (hasDefault) {
-        config[name] = configDef.defaultValue;
+        config[key] = configDef.defaultValue;
       }
-      return;
+      continue;
     }
 
     // Finally, run the value through an optional coerce method
-    config[name] = configDef.coerce ? configDef.coerce(value) : value;
-  });
+    config[key] = configDef.coerce ? configDef.coerce(value) : value;
+  }
 
   return config;
 }
