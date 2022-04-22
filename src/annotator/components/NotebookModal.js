@@ -9,7 +9,7 @@ import { createAppConfig } from '../config/app';
  * Configuration used to launch the notebook application.
  *
  * This includes the URL for the iframe and configuration to pass to the
- * application using a config fragment (see {@link addConfigFragment}).
+ * application on launch.
  *
  * @typedef {{ notebookAppUrl: string } & Record<string, unknown>} NotebookConfig
  */
