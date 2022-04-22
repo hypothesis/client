@@ -32,7 +32,7 @@ export const MIN_RESIZE = 280;
  * Client configuration used to launch the sidebar application.
  *
  * This includes the URL for the iframe and configuration to pass to the
- * application using a config fragment (see {@link addConfigFragment}).
+ * application on launch.
  *
  * @typedef {{ sidebarAppUrl: string } & Record<string, unknown>} SidebarConfig
  */
