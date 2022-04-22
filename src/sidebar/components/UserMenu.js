@@ -45,7 +45,6 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
 
   const isThirdParty = isThirdPartyUser(auth.userid, defaultAuthority);
   const service = serviceConfig(settings);
-  const isNotebookEnabled = store.isFeatureEnabled('notebook_launch');
   const [isOpen, setOpen] = useState(false);
 
   /** @param {keyof import('../../types/config').Service} feature */
@@ -92,9 +91,9 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
     </span>
   );
   return (
-    // FIXME: KeyDown handling is temporary for Notebook "easter egg"
+    // Allow keyboard shortcut 'n' to open Notebook
     /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */
-    <div className="UserMenu" onKeyDown={onKeyDown}>
+    <div data-testid="user-menu" onKeyDown={onKeyDown}>
       <Menu
         label={menuLabel}
         title={auth.displayName}
@@ -114,12 +113,7 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
               href={store.getLink('account.settings')}
             />
           )}
-          {isNotebookEnabled && (
-            <MenuItem
-              label="Open notebook"
-              onClick={() => onSelectNotebook()}
-            />
-          )}
+          <MenuItem label="Open notebook" onClick={() => onSelectNotebook()} />
         </MenuSection>
         {isLogoutEnabled && (
           <MenuSection>

@@ -46,7 +46,6 @@ describe('UserMenu', () => {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       focusedGroupId: sinon.stub().returns('mygroup'),
       getLink: sinon.stub(),
-      isFeatureEnabled: sinon.stub().returns(false),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -183,50 +182,38 @@ describe('UserMenu', () => {
   });
 
   describe('open notebook item', () => {
-    context('notebook feature is enabled', () => {
-      it('includes the open notebook item', () => {
-        fakeStore.isFeatureEnabled.withArgs('notebook_launch').returns(true);
-        const wrapper = createUserMenu();
+    it('includes the open notebook item', () => {
+      const wrapper = createUserMenu();
 
-        const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
-        assert.isTrue(openNotebookItem.exists());
-      });
-
-      it('triggers a message when open-notebook item is clicked', () => {
-        fakeStore.isFeatureEnabled.withArgs('notebook_launch').returns(true);
-        const wrapper = createUserMenu();
-
-        const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
-        openNotebookItem.props().onClick();
-        assert.calledOnce(fakeFrameSync.notifyHost);
-        assert.calledWith(fakeFrameSync.notifyHost, 'openNotebook', 'mygroup');
-      });
-
-      it('opens the notebook and closes itself when `n` is typed', () => {
-        const wrapper = createUserMenu();
-        // Make the menu "open"
-        act(() => {
-          wrapper.find('Menu').props().onOpenChanged(true);
-        });
-        wrapper.update();
-        assert.isTrue(wrapper.find('Menu').props().open);
-
-        wrapper.find('.UserMenu').simulate('keydown', { key: 'n' });
-        assert.calledOnce(fakeFrameSync.notifyHost);
-        assert.calledWith(fakeFrameSync.notifyHost, 'openNotebook', 'mygroup');
-        // Now the menu is "closed" again
-        assert.isFalse(wrapper.find('Menu').props().open);
-      });
+      const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
+      assert.isTrue(openNotebookItem.exists());
     });
 
-    context('notebook feature is not enabled', () => {
-      it('does not include the open notebook item', () => {
-        fakeStore.isFeatureEnabled.withArgs('notebook_launch').returns(false);
-        const wrapper = createUserMenu();
+    it('triggers a message when open-notebook item is clicked', () => {
+      const wrapper = createUserMenu();
 
-        const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
-        assert.isFalse(openNotebookItem.exists());
+      const openNotebookItem = findMenuItem(wrapper, 'Open notebook');
+      openNotebookItem.props().onClick();
+      assert.calledOnce(fakeFrameSync.notifyHost);
+      assert.calledWith(fakeFrameSync.notifyHost, 'openNotebook', 'mygroup');
+    });
+
+    it('opens the notebook and closes itself when `n` is typed', () => {
+      const wrapper = createUserMenu();
+      // Make the menu "open"
+      act(() => {
+        wrapper.find('Menu').props().onOpenChanged(true);
       });
+      wrapper.update();
+      assert.isTrue(wrapper.find('Menu').props().open);
+
+      wrapper
+        .find('[data-testid="user-menu"]')
+        .simulate('keydown', { key: 'n' });
+      assert.calledOnce(fakeFrameSync.notifyHost);
+      assert.calledWith(fakeFrameSync.notifyHost, 'openNotebook', 'mygroup');
+      // Now the menu is "closed" again
+      assert.isFalse(wrapper.find('Menu').props().open);
     });
   });
 
