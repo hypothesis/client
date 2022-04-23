@@ -268,9 +268,7 @@ export class StreamerService {
       watch(
         this._store.subscribe,
         () => this._store.profile().userid,
-        () => {
-          this._reconnect();
-        }
+        () => this._reconnect()
       );
     }
 
