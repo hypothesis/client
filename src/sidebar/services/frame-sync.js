@@ -1,4 +1,5 @@
 import debounce from 'lodash.debounce';
+import shallowEqual from 'shallowequal';
 
 import { ListenerCollection } from '../../shared/listener-collection';
 import { PortFinder, PortRPC, isMessageEqual } from '../../shared/messaging';
@@ -134,86 +135,99 @@ export class FrameSyncService {
   _setupSyncToGuests() {
     let prevPublicAnns = 0;
 
-    watch(
-      this._store.subscribe,
-      [() => this._store.allAnnotations(), () => this._store.frames()],
-      /**
-       * @param {[Annotation[], Frame[]]} current
-       * @param {[Annotation[]]} previous
-       */
-      ([annotations, frames], [prevAnnotations]) => {
-        let publicAnns = 0;
-        /** @type {Set<string>} */
-        const inSidebar = new Set();
-        /** @type {Annotation[]} */
-        const added = [];
+    /**
+     * Handle annotations or frames being added or removed in the store.
+     *
+     * @param {Annotation[]} annotations
+     * @param {Frame[]} frames
+     * @param {Annotation[]} prevAnnotations
+     */
+    const onStoreAnnotationsChanged = (
+      annotations,
+      frames,
+      prevAnnotations
+    ) => {
+      let publicAnns = 0;
+      /** @type {Set<string>} */
+      const inSidebar = new Set();
+      /** @type {Annotation[]} */
+      const added = [];
 
-        // Determine which annotations have been added or deleted in the sidebar.
-        annotations.forEach(annot => {
-          if (isReply(annot)) {
-            // The frame does not need to know about replies
-            return;
-          }
-
-          if (isPublic(annot)) {
-            ++publicAnns;
-          }
-
-          inSidebar.add(annot.$tag);
-          if (!this._inFrame.has(annot.$tag)) {
-            added.push(annot);
-          }
-        });
-        const deleted = prevAnnotations.filter(
-          annot => !inSidebar.has(annot.$tag)
-        );
-
-        // Send added annotations to matching frame.
-        if (added.length > 0) {
-          /** @type {Map<string|null, Annotation[]>} */
-          const addedByFrame = new Map();
-          for (let annotation of added) {
-            const frame = frameForAnnotation(frames, annotation);
-            if (!frame) {
-              continue;
-            }
-            const anns = addedByFrame.get(frame.id) ?? [];
-            anns.push(annotation);
-            addedByFrame.set(frame.id, anns);
-          }
-
-          for (let [frameId, anns] of addedByFrame) {
-            const rpc = this._guestRPC.get(frameId);
-            if (rpc) {
-              rpc.call('loadAnnotations', anns.map(formatAnnot));
-            }
-          }
-
-          added.forEach(annot => {
-            this._inFrame.add(annot.$tag);
-          });
+      // Determine which annotations have been added or deleted in the sidebar.
+      annotations.forEach(annot => {
+        if (isReply(annot)) {
+          // The frame does not need to know about replies
+          return;
         }
 
-        // Remove deleted annotations from frames.
-        deleted.forEach(annot => {
-          // Delete from all frames. If a guest is not displaying a particular
-          // annotation, it will just ignore the request.
-          this._guestRPC.forEach(rpc =>
-            rpc.call('deleteAnnotation', annot.$tag)
-          );
-          this._inFrame.delete(annot.$tag);
-        });
+        if (isPublic(annot)) {
+          ++publicAnns;
+        }
 
-        // Update elements in host page which display annotation counts.
-        if (frames.length > 0) {
-          if (frames.every(frame => frame.isAnnotationFetchComplete)) {
-            if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
-              this._hostRPC.call('publicAnnotationCountChanged', publicAnns);
-              prevPublicAnns = publicAnns;
-            }
+        inSidebar.add(annot.$tag);
+        if (!this._inFrame.has(annot.$tag)) {
+          added.push(annot);
+        }
+      });
+      const deleted = prevAnnotations.filter(
+        annot => !inSidebar.has(annot.$tag)
+      );
+
+      // Send added annotations to matching frame.
+      if (added.length > 0) {
+        /** @type {Map<string|null, Annotation[]>} */
+        const addedByFrame = new Map();
+        for (let annotation of added) {
+          const frame = frameForAnnotation(frames, annotation);
+          if (!frame) {
+            continue;
+          }
+          const anns = addedByFrame.get(frame.id) ?? [];
+          anns.push(annotation);
+          addedByFrame.set(frame.id, anns);
+        }
+
+        for (let [frameId, anns] of addedByFrame) {
+          const rpc = this._guestRPC.get(frameId);
+          if (rpc) {
+            rpc.call('loadAnnotations', anns.map(formatAnnot));
+          }
+        }
+
+        added.forEach(annot => {
+          this._inFrame.add(annot.$tag);
+        });
+      }
+
+      // Remove deleted annotations from frames.
+      deleted.forEach(annot => {
+        // Delete from all frames. If a guest is not displaying a particular
+        // annotation, it will just ignore the request.
+        this._guestRPC.forEach(rpc => rpc.call('deleteAnnotation', annot.$tag));
+        this._inFrame.delete(annot.$tag);
+      });
+
+      // Update elements in host page which display annotation counts.
+      if (frames.length > 0) {
+        if (frames.every(frame => frame.isAnnotationFetchComplete)) {
+          if (publicAnns === 0 || publicAnns !== prevPublicAnns) {
+            this._hostRPC.call('publicAnnotationCountChanged', publicAnns);
+            prevPublicAnns = publicAnns;
           }
         }
       }
+    };
+
+    watch(
+      this._store.subscribe,
+      () =>
+        /** @type {const} */ ([
+          this._store.allAnnotations(),
+          this._store.frames(),
+        ]),
+      ([annotations, frames], [prevAnnotations]) =>
+        onStoreAnnotationsChanged(annotations, frames, prevAnnotations),
+      shallowEqual
     );
   }
 

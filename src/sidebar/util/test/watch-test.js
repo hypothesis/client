@@ -47,45 +47,42 @@ describe('sidebar/util/watch', () => {
       assert.notCalled(callback);
     });
 
-    it('compares watched values using strict equality', () => {
+    it('compares watched values using strict equality by default', () => {
       const callback = sinon.stub();
       const store = counterStore();
+      const getValue = () => [store.getState().a];
 
-      const newEmptyObject = () => ({});
-      watch(store.subscribe, newEmptyObject, callback);
+      watch(store.subscribe, getValue, callback);
 
-      store.dispatch({ type: 'INCREMENT_A' });
-      store.dispatch({ type: 'INCREMENT_A' });
+      store.dispatch({ type: 'INCREMENT_B' });
+      store.dispatch({ type: 'INCREMENT_B' });
 
-      // This will trigger the callback because we're comparing values by
-      // strict equality rather than by shallow equality.
+      // The callback is called twice even though `getValue` returns an array
+      // with the same content each time, because a strict equality check is
+      // used.
       assert.calledTwice(callback);
-      assert.calledWith(callback, {});
     });
 
-    it('runs callback if any of multiple watched values changes', () => {
+    it('compares watched values using custom equality check', () => {
       const callback = sinon.stub();
       const store = counterStore();
+      const equals = sinon.stub().returns(true);
 
-      watch(
-        store.subscribe,
-        [() => store.getState().a, () => store.getState().b],
-        callback
-      );
+      watch(store.subscribe, () => store.getState().a, callback, equals);
 
-      // Dispatch action that changes the first watched value.
       store.dispatch({ type: 'INCREMENT_A' });
-      assert.calledWith(callback, [1, 0], [0, 0]);
+      store.dispatch({ type: 'INCREMENT_A' });
 
-      // Dispatch action that changes the second watched value.
-      callback.resetHistory();
-      store.dispatch({ type: 'INCREMENT_B' });
-      assert.calledWith(callback, [1, 1], [1, 0]);
-
-      // Dispatch action that doesn't change either watched value.
-      callback.resetHistory();
-      store.dispatch({ type: 'INCREMENT_C' });
+      assert.calledTwice(equals);
+      assert.calledWith(equals, 1, 0);
+      assert.calledWith(equals, 2, 0);
       assert.notCalled(callback);
+
+      equals.returns(false);
+
+      store.dispatch({ type: 'INCREMENT_A' });
+      assert.calledWith(equals, 3, 0);
+      assert.calledWith(callback, 3, 0);
     });
 
     it('returns unsubscription function', () => {

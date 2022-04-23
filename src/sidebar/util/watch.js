@@ -1,81 +1,68 @@
-import shallowEqual from 'shallowequal';
-
 /**
- * Watch for changes of computed values.
+ * Watch a data source for changes to a subset of its data.
  *
- * This utility is a shorthand for a common pattern for reacting to changes in
- * some data source:
+ * `watch` subscribes to change notifications from a data source, computes
+ * values using the data in it, and runs a callback with the current and
+ * previous computed values each time the computed result changes.
  *
- * ```
- * let prevValue = getCurrentValue();
- * subscribe(() => {
- *   const newValue = getCurrentValue();
- *   if (prevValue !== newValue) {
- *     // Respond to change of value.
- *     // ...
+ * @example
+ *   const unsubscribe = watch(
+ *     store.subscribe,
  *
- *     // Update previous value.
- *     prevValue = new value;
- *   }
- * });
- * ```
+ *     // Extract some data of interest from the store.
+ *     () => store.getValue(),
  *
- * Where `getCurrentValue` calculates the value of interest and
- * `subscribe` registers a callback to receive change notifications for
- * whatever data source (eg. a Redux store) is used by `getCurrentValue`.
+ *     // Use strict comparison of values
+ *     null,
  *
- * With the `watch` utility this becomes:
+ *     // Callback that is invoked each time the extracted data changes.
+ *     (currentValue, prevValue) => { ... }
+ *   );
+ *   unsubcribe(); // Remove the subscription
  *
- * ```
- * watch(subscribe, getCurrentValue, (newValue, prevValue) => {
- *   // Respond to change of value
- * });
- * ```
+ * To watch multiple values, make {@link getValue} return an array and set
+ * {@link compare} to a function that compares each element of the array:
  *
- * `watch` can watch a single value, if the second argument is a function,
- * or many if the second argument is an array of functions. In the latter case
- * the callback will be invoked whenever _any_ of the watched values changes.
+ * @example
+ *   watch(
+ *     store.subscribe,
+ *     () => [store.getValueA(), store.getValueB()],
  *
- * Values are compared using strict equality (`===`).
+ *     // Compare each element of the result
+ *     shallowEqual,
  *
- * @param {(callback: () => void) => Function} subscribe - Function used to
- *   subscribe to notifications of _potential_ changes in the watched values.
- * @param {Function|Array<Function>} watchFns - A function or array of functions
- *   which return the current watched values
- * @param {(current: any, previous: any) => void} callback -
- *   A callback that is invoked when the watched values changed. It is passed
- *   the current and previous values respectively. If `watchFns` is an array,
- *   the `current` and `previous` arguments will be arrays of current and
- *   previous values.
- * @return {Function} - Return value of `subscribe`. Typically this is a
- *   function that removes the subscription.
+ *     ([currentValueA, currentValueB], [prevValueA, prevValueB]) => { ... }
+ *   );
+ *
+ * @template T
+ * @param {(callback: () => void) => VoidFunction} subscribe - Function to
+ *   subscribe to changes from the data source.
+ * @param {() => T} getValue - Callback that extracts information of interest
+ *   from the data source.
+ * @param {(current: T, previous: T) => void} callback -
+ *   A callback that receives the data extracted by `getValue`. It is called
+ *   each time the result of `getValue` changes.
+ * @param {((current: T, previous: T) => boolean)} [compare] -
+ *   Comparison function that tests whether the results of two `getValue` calls
+ *   are equal. If omitted, a strict equality check is used
+ * @return {VoidFunction} - Return value of `subscribe`
  */
-export function watch(subscribe, watchFns, callback) {
-  const isArray = Array.isArray(watchFns);
-
-  const getWatchedValues = () =>
-    isArray
-      ? /** @type {Function[]} */ (watchFns).map(fn => fn())
-      : /** @type {Function} */ (watchFns)();
-
-  let prevValues = getWatchedValues();
+export function watch(subscribe, getValue, callback, compare) {
+  let prevValue = getValue();
   const unsubscribe = subscribe(() => {
-    const values = getWatchedValues();
-
-    const equal = isArray
-      ? shallowEqual(values, prevValues)
-      : values === prevValues;
-
-    if (equal) {
+    const currentValue = getValue();
+    if (
+      compare ? compare(currentValue, prevValue) : currentValue === prevValue
+    ) {
       return;
     }
 
     // Save and then update `prevValues` before invoking `callback` in case
     // `callback` triggers another update.
-    const savedPrevValues = prevValues;
-    prevValues = values;
+    const savedPrevValue = prevValue;
+    prevValue = currentValue;
 
-    callback(values, savedPrevValues);
+    callback(currentValue, savedPrevValue);
   });
 
   return unsubscribe;
