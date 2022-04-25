@@ -111,7 +111,7 @@ export default function AutocompleteList({
         <ul tabIndex={-1} aria-label="Suggestions" role="listbox" {...props}>
           {items}
         </ul>
-        <MenuArrowUp classes="top-[-10px]" />
+        <MenuArrowUp classes="top-[-10px] left-[3px]" />
       </Card>
     </div>
   );
