@@ -23,17 +23,10 @@ export class FeaturesService {
   }
 
   init() {
-    const currentFlags = () => this._store.profile().features;
-    const sendFeatureFlags = () => {
-      this._frameSync.notifyHost('featureFlagsUpdated', currentFlags() || {});
-    };
-
-    // Re-send feature flags to connected frames when flags change or a new
-    // frame connects.
     watch(
       this._store.subscribe,
-      [currentFlags, () => this._store.frames()],
-      sendFeatureFlags
+      () => this._store.profile().features,
+      flags => this._frameSync.notifyHost('featureFlagsUpdated', flags || {})
     );
   }
 }
