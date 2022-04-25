@@ -169,6 +169,7 @@ export default {
       },
       screens: {
         touch: { raw: '(pointer: coarse)' },
+        sm: '360px',
         md: '480px',
         lg: '768px',
         // Narrow mobile screens
