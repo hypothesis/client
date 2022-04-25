@@ -44,7 +44,7 @@ class CacheEntry {
  *   function useAppStore() {
  *     // Get the store from somewhere, eg. a prop or context.
  *     const appStore = ...;
- *     return useStore(store);
+ *     return useStore(appStore);
  *   }
  *
  *   function MyComponent() {
