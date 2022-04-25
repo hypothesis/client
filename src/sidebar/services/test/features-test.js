@@ -55,23 +55,4 @@ describe('FeaturesService', () => {
       fakeStore.profile().features
     );
   });
-
-  it('should broadcast feature flags to annotator if a new frame connects', () => {
-    createService();
-
-    // First update, with no changes to frames.
-    notifyStoreSubscribers();
-    assert.notCalled(fakeFrameSync.notifyHost);
-
-    // Second update, with changes to frames.
-    fakeStore.frames.returns([{ uri: 'https://example.com' }]);
-
-    notifyStoreSubscribers();
-
-    assert.calledWith(
-      fakeFrameSync.notifyHost,
-      'featureFlagsUpdated',
-      fakeStore.profile().features
-    );
-  });
 });
