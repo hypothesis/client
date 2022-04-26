@@ -23,7 +23,7 @@
     // code for the browser.
     "types": []
   },
-  "include": ["**/*.js", "types/*.d.ts"],
+  "include": ["**/*.js", "**/*.ts", "**/*.tsx", "types/*.d.ts"],
   "exclude": [
     // Tests are not checked.
     "**/test/**/*.js",
