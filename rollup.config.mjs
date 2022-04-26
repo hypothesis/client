@@ -86,8 +86,9 @@ function bundleConfig({ name, entry, format = 'es' }) {
       babel({
         babelHelpers: 'bundled',
         exclude: 'node_modules/**',
+        extensions: ['.js', '.ts', '.tsx'],
       }),
-      nodeResolve(),
+      nodeResolve({ extensions: ['.js', '.ts', '.tsx'] }),
       commonjs({ include: 'node_modules/**' }),
       string({
         include: '**/*.svg',
