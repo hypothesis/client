@@ -129,14 +129,16 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   }`;
 
   return (
-    <div className="NotebookView">
-      <header className="NotebookView__heading" ref={threadListScrollTop}>
-        <h1 className="NotebookView__group-name">{groupName}</h1>
+    <div className="grid gap-2 lg:grid-cols-2" data-testid="notebook-container">
+      <header className="leading-none lg:col-span-2" ref={threadListScrollTop}>
+        <h1 className="text-2xl font-bold" data-testid="notebook-group-name">
+          {groupName}
+        </h1>
       </header>
-      <div className="NotebookView__filters">
+      <div>
         <NotebookFilters />
       </div>
-      <div className="NotebookView__results hyp-u-layout-row--align-center text-lg font-medium">
+      <div className="flex items-center lg:justify-self-end text-lg font-medium">
         {pendingUpdateCount > 0 && !hasAppliedFilter && (
           <IconButton
             icon="refresh"
@@ -152,9 +154,9 @@ function NotebookView({ loadAnnotationsService, streamer }) {
           resultCount={resultCount ?? 0}
         />
       </div>
-      <div className="NotebookView__items">
+      <div className="lg:col-span-2">
         {hasTooManyAnnotationsError && (
-          <div className="NotebookView__messages">
+          <div className="py-4" data-testid="notebook-messages">
             <Panel title="Too many results to show">
               This preview of the Notebook can show{' '}
               <strong>up to {maxResults} results</strong> at a time (there are{' '}

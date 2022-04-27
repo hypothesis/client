@@ -89,6 +89,7 @@ export default {
         base: ['13px', '1.4'], // Current base font size for sidebar
         lg: ['14px'],
         xl: ['16px'],
+        '2xl': ['18px'],
         'touch-base': ['16px', '1.4'], // Used for touch interfaces in certain UIs
         // rem-based font sizes for annotator controls that should scale
         // with text scaling in the underlying document
