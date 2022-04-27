@@ -114,7 +114,7 @@ describe('NotebookView', () => {
     fakeStore.focusedGroup.returns({ id: 'hallothere', name: 'Hallo' });
     const wrapper = createComponent();
 
-    const message = wrapper.find('.NotebookView__messages');
+    const message = wrapper.find('[data-testid="notebook-messages"]');
     assert.include(message.text(), 'up to 5000 results at a time');
     assert.isTrue(message.exists());
   });
@@ -123,14 +123,20 @@ describe('NotebookView', () => {
     fakeStore.focusedGroup.returns({ id: 'hallothere', name: 'Hallo' });
     const wrapper = createComponent();
 
-    assert.equal(wrapper.find('.NotebookView__heading').text(), 'Hallo');
+    assert.equal(
+      wrapper.find('[data-testid="notebook-group-name"]').text(),
+      'Hallo'
+    );
   });
 
   it('renders a placeholder if group name missing', () => {
     fakeStore.focusedGroup.returns({ id: 'hallothere' });
     const wrapper = createComponent();
 
-    assert.equal(wrapper.find('.NotebookView__heading').text(), '…');
+    assert.equal(
+      wrapper.find('[data-testid="notebook-group-name"]').text(),
+      '…'
+    );
   });
 
   it('renders results (counts)', () => {
