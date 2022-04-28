@@ -13,12 +13,6 @@
   text-decoration: underline;
 }
 
-// This button style has asymmetrical padding. Hold it here to see if
-// this kind of padding is useful in other patterns.
-.PaginationPageButton {
-  padding: var.$layout-space--small var.$layout-space;
-}
-
 // An IconButton, but override minimum height/width on touch screen devices
 .NonResponsiveIconButton {
   @media (pointer: coarse) {

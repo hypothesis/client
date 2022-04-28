@@ -133,7 +133,7 @@ describe('PaginationNavigation', () => {
       });
 
       // There is one "gap":
-      assert.equal(wrapper.find('.PaginationNavigation__gap').length, 1);
+      assert.equal(wrapper.find('[data-testid="pagination-gap"]').length, 1);
     });
 
     it('should invoke the onChangePage callback when page number button clicked', () => {

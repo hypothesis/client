@@ -1,4 +1,5 @@
 import { LabeledButton } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 
 import { pageNumberOptions } from '../util/pagination';
 
@@ -12,7 +13,8 @@ import { pageNumberOptions } from '../util/pagination';
 
 /**
  * Render pagination navigation controls, with buttons to go next, previous
- * and nearby pages.
+ * and nearby pages. Buttons corresponding to nearby pages are shown on wider
+ * screens; for narrow screens only Prev and Next buttons are shown.
  *
  * @param {PaginationNavigationProps} props
  */
@@ -36,11 +38,14 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
   };
 
   return (
-    <div className="PaginationNavigation">
-      <div className="PaginationNavigation__relative PaginationNavigation__prev">
+    <div
+      className="flex items-center text-lg"
+      data-testid="pagination-navigation"
+    >
+      <div className="w-28 h-10">
         {hasPreviousPage && (
           <LabeledButton
-            classes="PaginationPageButton"
+            classes="p-navigation-button"
             icon="arrow-left"
             title="Go to previous page"
             onClick={e =>
@@ -55,14 +60,30 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
           </LabeledButton>
         )}
       </div>
-      <ul className="PaginationNavigation__pages">
+      <ul
+        className={classnames(
+          // Where there's enough horizontal space,
+          // lay out page navigation buttons horizontally between prev/next:
+          // | prevPage  |       numberedPages          | nextPage
+          //
+          // e.g.
+          // | [<- prev] | [2] ... [5] [6] [7] ... [10] | [next ->] |
+          //
+          // These page buttons are hidden on narrow screens
+          'hidden',
+          // For slightly wider screens, they are shown in a horizontal row
+          'md:flex md:items-center md:justify-center md:gap-x-2',
+          // when visible, this element should stretch to fill available space
+          'md:grow'
+        )}
+      >
         {pageNumbers.map((page, idx) => (
           <li key={idx}>
             {page === null ? (
-              <div className="PaginationNavigation__gap">...</div>
+              <div data-testid="pagination-gap">...</div>
             ) : (
               <LabeledButton
-                classes="PaginationPageButton"
+                classes="p-navigation-button"
                 key={`page-${idx}`}
                 title={`Go to page ${page}`}
                 pressed={page === currentPage}
@@ -77,10 +98,17 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
           </li>
         ))}
       </ul>
-      <div className="PaginationNavigation__relative PaginationNavigation__next">
+      <div
+        className={classnames(
+          'w-28 h-10 flex justify-end',
+          // When page buttons are not shown, this element should grow to fill
+          // available space. But when page buttons are shown, it should not.
+          'grow md:grow-0'
+        )}
+      >
         {hasNextPage && (
           <LabeledButton
-            classes="PaginationPageButton"
+            classes="p-navigation-button"
             icon="arrow-right"
             iconPosition="right"
             title="Go to next page"
