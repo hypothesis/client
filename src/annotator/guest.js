@@ -252,7 +252,7 @@ export class Guest {
     };
 
     this._listeners.add(this.element, 'mouseup', event => {
-      const { target, metaKey, ctrlKey } = /** @type {MouseEvent} */ (event);
+      const { target, metaKey, ctrlKey } = event;
       const tags = annotationsAt(/** @type {Element} */ (target));
       if (tags.length && this._highlightsVisible) {
         const toggle = metaKey || ctrlKey;

@@ -135,9 +135,9 @@ export class PortProvider {
       sendError(new Error(message), errorContext);
     };
 
-    /** @param {Event} event */
+    /** @param {MessageEvent} event */
     const handleRequest = event => {
-      const { data, origin, source } = /** @type {MessageEvent} */ (event);
+      const { data, origin, source } = event;
 
       if (!isMessage(data) || data.type !== 'request') {
         // If this does not look like a message intended for us, ignore it.

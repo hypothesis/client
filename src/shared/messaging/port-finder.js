@@ -94,7 +94,7 @@ export class PortFinder {
       }, MAX_WAIT_FOR_PORT);
 
       const listenerId = this._listeners.add(window, 'message', event => {
-        const { data, ports } = /** @type {MessageEvent} */ (event);
+        const { data, ports } = event;
         if (
           isMessageEqual(data, {
             frame1: this._source,

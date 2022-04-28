@@ -230,9 +230,7 @@ export class PortRPC {
    */
   connect(port) {
     this._port = port;
-    this._listeners.add(port, 'message', event =>
-      this._handle(/** @type {MessageEvent} */ (event))
-    );
+    this._listeners.add(port, 'message', event => this._handle(event));
     port.start();
     sendCall(port, 'connect');
 

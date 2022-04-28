@@ -392,7 +392,7 @@ export class FrameSyncService {
 
     // Listen for guests connecting to the sidebar.
     this._listeners.add(hostPort, 'message', event => {
-      const { data, ports } = /** @type {MessageEvent} */ (event);
+      const { data, ports } = event;
       if (
         isMessageEqual(data, {
           frame1: 'guest',
