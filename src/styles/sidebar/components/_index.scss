@@ -15,7 +15,6 @@
 @use './Menu';
 @use './MenuItem';
 @use './MenuSection';
-@use './PaginationNavigation';
 @use './StyledText';
 
 // TODO: Evaluate all classes below after components have been converted to
@@ -58,6 +57,12 @@
 // Applies to any text: strikeout effect
 .p-redacted-text {
   @apply line-through grayscale contrast-50 text-color-text-light;
+}
+
+// Applies to <LabeledButton>; asymmetrical padding used on pagination
+// navigation buttons
+.p-navigation-button {
+  @apply py-2.5 px-3.5;
 }
 
 // Disable scroll anchoring as it interferes with `ThreadList` and
