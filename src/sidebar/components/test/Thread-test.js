@@ -236,7 +236,7 @@ describe('Thread', () => {
       const thread = createThread();
       const wrapper = createComponent({ thread });
 
-      assert.isTrue(wrapper.find('HiddenThreadCardHeader').exists());
+      assert.isTrue(wrapper.find('AnnotationHeader').exists());
     });
 
     it("doesn't show the annotation header if top-level annotation is missing", () => {
@@ -244,7 +244,7 @@ describe('Thread', () => {
       thread.annotation = null;
       const wrapper = createComponent({ thread });
 
-      assert.isTrue(wrapper.find('HiddenThreadCardHeader').isEmptyRender());
+      assert.isFalse(wrapper.find('AnnotationHeader').exists());
     });
 
     it("doesn't show the annotation header if thread is a child", () => {
@@ -252,7 +252,7 @@ describe('Thread', () => {
       thread.parent = {}; // child threads have a parent
       const wrapper = createComponent({ thread });
 
-      assert.isFalse(wrapper.find('HiddenThreadCardHeader').exists());
+      assert.isFalse(wrapper.find('AnnotationHeader').exists());
     });
   });
 
