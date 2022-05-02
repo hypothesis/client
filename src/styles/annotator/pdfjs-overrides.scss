@@ -4,10 +4,9 @@
   display: none;
 }
 
-// Override PDFjs base font-size of miniscule `10px` to reset REM size.
-// This is necessary for styling components in shadow DOMs that rely on REM-
-// based scales.
-// See https://github.com/mozilla/pdf.js/issues/14555
+// Override tiny base 10px font-size in older versions of PDF.js. This is
+// necessary for styling components in shadow DOMs that rely on REM- based
+// scales. See https://github.com/mozilla/pdf.js/issues/14555.
 html {
   font-size: 100%;
 }
