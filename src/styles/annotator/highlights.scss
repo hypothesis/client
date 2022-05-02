@@ -53,15 +53,14 @@
         background-color: transparent;
       }
 
-      // In document viewers where the highlight is drawn _on top of_ the text
-      // (eg. PDF.js) too many nested highlights can make the underlying text unreadable.
-      // Therefore we make any highlights that are 3+ levels deep transparent.
+      // Limit the number of different highlight shades by making highlights
+      // that are 3+ levels deep transparent.
       //
-      // In web pages highlights are drawn _underneath_ the text so nested
-      // highlights don't reduce text contrast as much, but we still only use
-      // two levels of highlight color for consistency.
+      // This was historically done to improve readability in PDFs [1], but that
+      // is no longer an issue as in PDFs highlights are created by drawing
+      // SVGs on top of the <canvas>.
       //
-      // See https://github.com/hypothesis/client/issues/1995.
+      // [1] https://github.com/hypothesis/client/issues/1995.
       & .hypothesis-highlight {
         background-color: transparent;
       }
