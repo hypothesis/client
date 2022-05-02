@@ -13,40 +13,6 @@ import ModerationBanner from './ModerationBanner';
 /** @typedef {import('../helpers/build-thread').Thread} Thread */
 
 /**
- * Render a header for a hidden top-level thread.
- *
- * Every ThreadCard should have a header of some sort representing its top-level
- * thread. When a thread is visible, an Annotation is rendered which in turn
- * renders an AnnotationHeader. But when a thread is hidden, Annotation is not
- * rendered: use this header instead for hidden top-level threads.
- *
- * @param {object} props
- *   @param {Thread['annotation']} props.annotation
- *   @param {number} props.replyCount
- *   @param {boolean} props.threadIsCollapsed
- */
-function HiddenThreadCardHeader({ annotation, ...restProps }) {
-  const store = useSidebarStore();
-
-  // These two lines are copied from the AnnotationHeader component to mimic the
-  // exact same behaviour.
-  const isSaving = annotation && store.isSavingAnnotation(annotation);
-  const isEditing = annotation && !!store.getDraft(annotation) && !isSaving;
-
-  if (!annotation) {
-    return null;
-  }
-
-  return (
-    <AnnotationHeader
-      annotation={annotation}
-      isEditing={isEditing}
-      {...restProps}
-    />
-  );
-}
-
-/**
  * Render a gutter area to the left of a thread's content with a control for
  * expanding/collapsing the thread and a visual vertical line showing the
  * extent of the thread.
@@ -131,6 +97,11 @@ function Thread({ thread, threadsService }) {
 
   const store = useSidebarStore();
   const hasAppliedFilter = store.hasAppliedFilter();
+  const isSaving =
+    thread.annotation && store.isSavingAnnotation(thread.annotation);
+  const isEditing =
+    thread.annotation && !!store.getDraft(thread.annotation) && !isSaving;
+
   const onToggleReplies = useCallback(
     () => store.setExpanded(thread.id, !!thread.collapsed),
     [store, thread.id, thread.collapsed]
@@ -187,9 +158,17 @@ function Thread({ thread, threadsService }) {
 
         {countHidden(thread) > 0 && (
           <div className="space-y-2">
-            {!thread.parent && (
-              <HiddenThreadCardHeader
+            {
+              // Every ThreadCard should have a header of some sort representing
+              // its top-level thread. When a thread is visible, an Annotation
+              // is rendered which in turn renders an AnnotationHeader. But when
+              // a thread is hidden, Annotation is not rendered: reander a header
+              // here instead for hidden top-level threads.
+            }
+            {!thread.parent && thread.annotation && (
+              <AnnotationHeader
                 annotation={thread.annotation}
+                isEditing={isEditing}
                 replyCount={thread.replyCount}
                 threadIsCollapsed={thread.collapsed}
               />
