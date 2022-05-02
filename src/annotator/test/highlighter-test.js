@@ -253,7 +253,7 @@ describe('annotator/highlighter', () => {
       it('creates an SVG layer above the PDF canvas and draws a highlight in that', () => {
         const page = createPDFPageWithHighlight();
         const canvas = page.querySelector('canvas');
-        const svgLayer = page.querySelector('svg');
+        const svgLayer = page.querySelector('svg.hypothesis-highlight-layer');
 
         // Verify SVG layer was created.
         assert.ok(svgLayer);
@@ -264,6 +264,7 @@ describe('annotator/highlighter', () => {
         const svgRect = page.querySelector('rect');
         assert.ok(svgRect);
         assert.equal(highlight.svgHighlight, svgRect);
+        assert.equal(svgRect.getAttribute('class'), 'hypothesis-svg-highlight');
       });
 
       it('re-uses the existing SVG layer for the page if present', () => {
@@ -315,53 +316,6 @@ describe('annotator/highlighter', () => {
         // ...but the highlight should be visually hidden so the SVG should
         // not be created.
         assert.isNull(container.querySelector('rect'));
-      });
-
-      describe('CSS blend mode support testing', () => {
-        beforeEach(() => {
-          sinon.stub(CSS, 'supports');
-        });
-
-        afterEach(() => {
-          CSS.supports.restore();
-        });
-
-        it('renders highlights when mix-blend-mode is supported', () => {
-          const container = document.createElement('div');
-          render(<PDFPage />, container);
-          CSS.supports.withArgs('mix-blend-mode', 'multiply').returns(true);
-
-          highlightPDFRange(container);
-
-          // When mix blending is available, the highlight layer has default
-          // opacity and highlight rects are transparent.
-          const highlightLayer = container.querySelector(
-            '.hypothesis-highlight-layer'
-          );
-          assert.equal(highlightLayer.style.opacity, '');
-          const rect = container.querySelector('rect');
-          assert.equal(rect.getAttribute('class'), 'hypothesis-svg-highlight');
-        });
-
-        it('renders highlights when mix-blend-mode is not supported', () => {
-          const container = document.createElement('div');
-          render(<PDFPage />, container);
-          CSS.supports.withArgs('mix-blend-mode', 'multiply').returns(false);
-
-          highlightPDFRange(container);
-
-          // When mix blending is not available, highlight rects are opaque and
-          // the entire highlight layer is transparent.
-          const highlightLayer = container.querySelector(
-            '.hypothesis-highlight-layer'
-          );
-          assert.equal(highlightLayer.style.opacity, '0.3');
-          const rect = container.querySelector('rect');
-          assert.include(
-            rect.getAttribute('class'),
-            'hypothesis-svg-highlight is-opaque'
-          );
-        });
       });
     });
   });

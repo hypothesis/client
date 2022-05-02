@@ -68,8 +68,6 @@ function drawHighlightsAbovePDFCanvas(highlightEls) {
     '.hypothesis-highlight-layer'
   );
 
-  const isCssBlendSupported = CSS.supports('mix-blend-mode', 'multiply');
-
   if (!svgHighlightLayer) {
     // Create SVG layer. This must be in the same stacking context as
     // the canvas so that CSS `mix-blend-mode` can be used to control how SVG
@@ -88,20 +86,12 @@ function drawHighlightsAbovePDFCanvas(highlightEls) {
     svgStyle.width = '100%';
     svgStyle.height = '100%';
 
-    if (isCssBlendSupported) {
-      // Use multiply blending so that highlights drawn on top of text darken it
-      // rather than making it lighter. This improves contrast and thus readability
-      // of highlighted text, especially for overlapping highlights.
-      //
-      // This choice optimizes for the common case of dark text on a light background.
-      svgStyle.mixBlendMode = 'multiply';
-    } else {
-      // For older browsers (eg. Edge < 79) we draw all the highlights as
-      // opaque and then make the entire highlight layer transparent. This means
-      // that there is no visual indication of whether text has one or multiple
-      // highlights, but it preserves readability.
-      svgStyle.opacity = '0.3';
-    }
+    // Use multiply blending so that highlights drawn on top of text darken it
+    // rather than making it lighter. This improves contrast and thus readability
+    // of highlighted text, especially for overlapping highlights.
+    //
+    // This choice optimizes for the common case of dark text on a light background.
+    svgStyle.mixBlendMode = 'multiply';
   }
 
   const canvasRect = canvasEl.getBoundingClientRect();
@@ -114,12 +104,7 @@ function drawHighlightsAbovePDFCanvas(highlightEls) {
     rect.setAttribute('y', (highlightRect.top - canvasRect.top).toString());
     rect.setAttribute('width', highlightRect.width.toString());
     rect.setAttribute('height', highlightRect.height.toString());
-
-    if (isCssBlendSupported) {
-      rect.setAttribute('class', 'hypothesis-svg-highlight');
-    } else {
-      rect.setAttribute('class', 'hypothesis-svg-highlight is-opaque');
-    }
+    rect.setAttribute('class', 'hypothesis-svg-highlight');
 
     // Make the highlight in the text layer transparent.
     highlightEl.classList.add('is-transparent');
