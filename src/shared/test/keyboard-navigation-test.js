@@ -30,16 +30,10 @@ describe('shared/keyboard-navigation', () => {
       container = document.createElement('div');
       document.body.append(container);
       renderToolbar();
-
-      // Suppress "Add @babel/plugin-transform-react-jsx-source to get a more
-      // detailed component stack" warning in tests that trigger an error during
-      // effects.
-      sinon.stub(console, 'warn');
     });
 
     afterEach(() => {
       container.remove();
-      console.warn.restore();
     });
 
     // Workaround for an issue with `useEffect` throwing exceptions during
@@ -53,18 +47,17 @@ describe('shared/keyboard-navigation', () => {
     });
 
     function renderToolbar(options = {}) {
+      // We render the component with Preact directly rather than using Enzyme
+      // for these tests. Since the `tabIndex` state lives only in the DOM,
+      // and there are no child components involved, this is more convenient.
       act(() => {
         render(<Toolbar navigationOptions={options} />, container);
       });
-      return getElement('toolbar');
+      return findElementByTestId('toolbar');
     }
 
-    function getElement(testId) {
+    function findElementByTestId(testId) {
       return container.querySelector(`[data-testid=${testId}]`);
-    }
-
-    function getElements() {
-      return Array.from(getElement('toolbar').querySelectorAll('a,button'));
     }
 
     function pressKey(key) {
@@ -74,7 +67,7 @@ describe('shared/keyboard-navigation', () => {
         key,
       });
       act(() => {
-        getElement('toolbar').dispatchEvent(event);
+        findElementByTestId('toolbar').dispatchEvent(event);
       });
       return event;
     }
@@ -115,7 +108,9 @@ describe('shared/keyboard-navigation', () => {
 
           const currentElement = document.activeElement;
           assert.equal(currentElement.innerText, expectedItem);
-          for (let element of getElements()) {
+
+          const toolbarButtons = container.querySelectorAll('a,button');
+          for (let element of toolbarButtons) {
             if (element === currentElement) {
               assert.equal(element.tabIndex, 0);
             } else {
@@ -202,8 +197,8 @@ describe('shared/keyboard-navigation', () => {
 
     it('should skip hidden elements', () => {
       renderToolbar();
-      getElement('bold').focus();
-      getElement('italic').style.display = 'none';
+      findElementByTestId('bold').focus();
+      findElementByTestId('italic').style.display = 'none';
 
       pressKey('ArrowRight');
 
@@ -212,8 +207,8 @@ describe('shared/keyboard-navigation', () => {
 
     it('should skip disabled elements', () => {
       renderToolbar();
-      getElement('bold').focus();
-      getElement('italic').disabled = true;
+      findElementByTestId('bold').focus();
+      findElementByTestId('italic').disabled = true;
 
       pressKey('ArrowRight');
 
@@ -222,7 +217,7 @@ describe('shared/keyboard-navigation', () => {
 
     it('should not respond to Up/Down arrow keys if vertical navigation is disabled', () => {
       renderToolbar({ vertical: false });
-      getElement('bold').focus();
+      findElementByTestId('bold').focus();
 
       pressKey('ArrowDown');
 
@@ -231,7 +226,7 @@ describe('shared/keyboard-navigation', () => {
 
     it('should not respond to Left/Right arrow keys if horizontal navigation is disabled', () => {
       renderToolbar({ horizontal: false });
-      getElement('bold').focus();
+      findElementByTestId('bold').focus();
 
       pressKey('ArrowRight');
 
@@ -245,12 +240,19 @@ describe('shared/keyboard-navigation', () => {
         return <div />;
       }
 
+      // Suppress "Add @babel/plugin-transform-react-jsx-source to get a more
+      // detailed component stack" warning from the `render` call below.
+      sinon.stub(console, 'warn');
+
       let error;
       try {
         act(() => render(<BrokenToolbar />, container));
       } catch (e) {
         error = e;
+      } finally {
+        console.warn.restore();
       }
+
       assert.instanceOf(error, Error);
       assert.equal(error.message, 'Container ref not set');
     });
@@ -259,7 +261,7 @@ describe('shared/keyboard-navigation', () => {
       renderToolbar({
         selector: '[data-testid=bold],[data-testid=italic]',
       });
-      getElement('bold').focus();
+      findElementByTestId('bold').focus();
 
       pressKey('ArrowRight');
       assert.equal(currentItem(), 'Italic');
@@ -286,8 +288,8 @@ describe('shared/keyboard-navigation', () => {
 
     it('should re-initialize tabindex attributes if current element is disabled', async () => {
       renderToolbar();
-      const boldButton = getElement('bold');
-      const italicButton = getElement('italic');
+      const boldButton = findElementByTestId('bold');
+      const italicButton = findElementByTestId('italic');
 
       boldButton.focus();
       assert.equal(boldButton.tabIndex, 0);
