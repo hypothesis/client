@@ -326,43 +326,37 @@ describe('MarkdownEditor', () => {
       }
     }
 
-    context('when `isPreviewing` is false', () => {
-      // This is a basic test of arrow key navigation in this component.
-      // `useArrowKeyNavigation` tests cover this more fully.
-      it('arrow keys navigate through buttons', () => {
-        const buttons = [
-          'Italic',
-          'Quote',
-          'Insert link',
-          'Insert image',
-          'Insert math',
-          'Numbered list',
-          'Bulleted list',
-          'Formatting help',
-          'Preview',
-          'Bold',
-          'Italic',
-        ];
-        testArrowKeySequence(buttons);
-      });
+    // This is a basic test that arrow key navigation is enabled.
+    // `useArrowKeyNavigation` tests cover behavior in more detail.
+    it('arrow keys navigate through buttons', () => {
+      // Sequence of buttons we expect to be focused when the first action
+      // ("Bold") action is initially focused and we press the right arrow key
+      // until focus returns to it.
+      const buttons = [
+        'Italic',
+        'Quote',
+        'Insert link',
+        'Insert image',
+        'Insert math',
+        'Numbered list',
+        'Bulleted list',
+        'Formatting help',
+        'Preview',
+        'Bold',
+      ];
+      testArrowKeySequence(buttons);
     });
 
-    context('when `isPreviewing` is true', () => {
-      beforeEach(() => {
-        const previewButton = wrapper
-          .find('button')
-          .filterWhere(el => el.text() === 'Preview');
-        previewButton.simulate('click');
+    it('arrow keys navigate through enabled buttons when `isPreviewing` is true', () => {
+      const previewButton = wrapper
+        .find('button')
+        .filterWhere(el => el.text() === 'Preview');
+      previewButton.simulate('click');
 
-        pressKey('Home');
-      });
+      pressKey('Home');
 
-      // This is a basic test of arrow key navigation in this component.
-      // `useArrowKeyNavigation` tests cover this more fully.
-      it('arrow keys navigate through buttons', () => {
-        const buttons = ['Write', 'Formatting help', 'Write'];
-        testArrowKeySequence(buttons);
-      });
+      const buttons = ['Write', 'Formatting help', 'Write'];
+      testArrowKeySequence(buttons);
     });
   });
 
