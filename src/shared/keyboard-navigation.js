@@ -19,11 +19,11 @@ function isElementVisible(element) {
  * container element.
  *
  * In addition to moving focus between elements when arrow keys are pressed,
- * this also implements the "roving tabindex" pattern which sets the `tabindex`
- * attribute of elements to control which element gets focus when the user
- * tabs into the container.
+ * this also implements the "roving tabindex" pattern [1] which sets the
+ * `tabindex` attribute of elements to control which element gets focus when the
+ * user tabs into the container.
  *
- * See [1] for a reference of how keyboard navigation should work in web
+ * See [2] for a reference of how keyboard navigation should work in web
  * applications and how it applies to various common widgets.
  *
  * @example
@@ -43,7 +43,8 @@ function isElementVisible(element) {
  *     )
  *   }
  *
- * [1] https://www.w3.org/TR/wai-aria-practices/#keyboard
+ * [1] https://www.w3.org/TR/wai-aria-practices/#kbd_roving_tabindex
+ * [2] https://www.w3.org/TR/wai-aria-practices/#keyboard
  *
  * @param {import('preact').RefObject<HTMLElement>} containerRef
  * @param {object} options
