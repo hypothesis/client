@@ -56,17 +56,19 @@ function fetchServiceGroups(configFromHost, rpcSettings) {
     if (service.groups === '$rpc:requestGroups') {
       // The `groups` need to be fetched from a secondary RPC call and
       // there should be no timeout as it may be waiting for user input.
-      service.groups = postMessageJsonRpc
-        .call(
-          rpcSettings.targetFrame,
-          rpcSettings.origin,
-          'requestGroups',
-          [index],
-          0 // no timeout
-        )
-        .catch(() => {
-          throw new Error('Unable to fetch groups');
-        });
+      service.groups = /** @type {Promise<string[]>} */ (
+        postMessageJsonRpc
+          .call(
+            rpcSettings.targetFrame,
+            rpcSettings.origin,
+            'requestGroups',
+            [index],
+            0 // no timeout
+          )
+          .catch(() => {
+            throw new Error('Unable to fetch groups');
+          })
+      );
     }
   });
   return configFromHost;
@@ -105,12 +107,14 @@ function buildRPCSettings(configFromAnnotator, window_) {
  * @return {Promise<ConfigFromEmbedder>}
  */
 async function getEmbedderConfig(configFromAnnotator, rpcSettings) {
-  const configFromEmbedder = await postMessageJsonRpc.call(
-    rpcSettings.targetFrame,
-    rpcSettings.origin,
-    'requestConfig',
-    [],
-    3000
+  const configFromEmbedder = /** @type {ConfigFromEmbedder} */ (
+    await postMessageJsonRpc.call(
+      rpcSettings.targetFrame,
+      rpcSettings.origin,
+      'requestConfig',
+      [],
+      3000
+    )
   );
 
   // In cases where host configuration is requested from the embedder frame

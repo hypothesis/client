@@ -25,7 +25,7 @@ export class Emitter {
    * Fire an event.
    *
    * @param {string} event
-   * @param {any[]} args
+   * @param {unknown[]} args
    */
   publish(event, ...args) {
     this._emitter.emit(event, ...args);

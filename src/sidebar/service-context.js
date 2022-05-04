@@ -17,7 +17,7 @@ import { useContext } from 'preact/hooks';
 
 /**
  * @typedef ServiceProvider
- * @prop {(serviceName: string) => any} get
+ * @prop {(serviceName: string) => unknown} get
  */
 
 /** @type {ServiceProvider} */
@@ -117,7 +117,6 @@ export function withServices(Component, serviceNames) {
  * context of custom hooks.
  *
  * @param {string} service - Name of the service to look up
- * @return {object}
  */
 export function useService(service) {
   const injector = useContext(ServiceContext);
