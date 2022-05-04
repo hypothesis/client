@@ -18,10 +18,10 @@ function createTimeout(delay, message) {
  * @param {Window} frame - Frame to send call to
  * @param {string} origin - Origin filter for `window.postMessage` call
  * @param {string} method - Name of the JSON-RPC method
- * @param {any[]} params - Parameters of the JSON-RPC method
+ * @param {unknown[]} params - Parameters of the JSON-RPC method
  * @param {number} [timeout] - Maximum time to wait in ms
  * @param {Window} [window_] - Test seam.
- * @return {Promise<any>} - A Promise for the response to the call
+ * @return {Promise<unknown>} - A Promise for the response to the call
  */
 export function call(
   frame,

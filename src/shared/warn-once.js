@@ -7,7 +7,7 @@ let shownWarnings = new Set();
  * This is useful to avoid spamming the console if a warning is emitted in a
  * context that may be called frequently.
  *
- * @param {...any} args -
+ * @param {...unknown} args -
  *   Arguments to forward to `console.warn`. The arguments `toString()` values
  *   are concatenated into a string key which is used to determine if the warning
  *   has been logged before.

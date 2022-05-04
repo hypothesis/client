@@ -217,7 +217,7 @@ export class PortProvider {
    *     `Message`.
    *   @param {string} options.allowedOrigin - the `origin` must match this
    *     value. If `allowedOrigin` is '*', the origin is ignored.
-   *   @param {any} options.data - the data to be compared with `allowedMessage`.
+   *   @param {unknown} options.data - the data to be compared with `allowedMessage`.
    *   @param {string} options.origin - the origin to be compared with
    *     `allowedOrigin`.
    */

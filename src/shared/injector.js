@@ -1,6 +1,6 @@
 /**
  * @typedef Provider
- * @prop {any} [value] - The value for the object
+ * @prop {unknown} [value] - The value for the object
  * @prop {Function} [class] - A class that should be instantiated to create the object
  * @prop {Function} [factory] - Function that should be called to create the object
  */
@@ -57,7 +57,7 @@ export class Injector {
    * Construct or return the existing instance of an object with a given `name`
    *
    * @param {string} name - Name of object to construct
-   * @return {any} - The constructed object
+   * @return {unknown} - The constructed object
    */
   get(name) {
     if (this._instances.has(name)) {
@@ -144,7 +144,8 @@ export class Injector {
    * Run a function which uses one or more dependencies provided by the
    * container.
    *
-   * @param {Function} callback -
+   * @template T
+   * @param {(...args: any[]) => T} callback -
    *   A callback to run, with dependencies annotated in the same way as
    *   functions or classes passed to `register`.
    * @return {any} - Returns the result of running the function.

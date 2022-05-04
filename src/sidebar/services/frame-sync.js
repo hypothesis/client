@@ -409,7 +409,7 @@ export class FrameSyncService {
    * Send an RPC message to the host frame.
    *
    * @param {SidebarToHostEvent} method
-   * @param {any[]} args
+   * @param {unknown[]} args
    */
   notifyHost(method, ...args) {
     this._hostRPC.call(method, ...args);

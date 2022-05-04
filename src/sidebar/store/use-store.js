@@ -7,8 +7,8 @@ class CacheEntry {
   /**
    * @param {string} name - Method name
    * @param {Function} method - Method implementation
-   * @param {any[]} args - Arguments to the selector
-   * @param {any} result - Result of the invocation
+   * @param {unknown[]} args - Arguments to the selector
+   * @param {unknown} result - Result of the invocation
    */
   constructor(name, method, args, result) {
     this.name = name;
@@ -19,7 +19,7 @@ class CacheEntry {
 
   /**
    * @param {string} name
-   * @param {any[]} args
+   * @param {unknown[]} args
    */
   matches(name, args) {
     return (
