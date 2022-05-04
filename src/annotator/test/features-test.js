@@ -32,15 +32,6 @@ describe('FeatureFlags', () => {
       features.update(testFlags);
 
       assert.calledOnce(onFlagsChanged);
-      const flagMap = onFlagsChanged.getCall(0).args[0];
-      assert.instanceOf(flagMap, Map);
-      assert.deepEqual(
-        [...flagMap.entries()],
-        [
-          ['feature_on', true],
-          ['feature_off', false],
-        ]
-      );
     });
 
     it('updates flags returned by `flagEnabled`', () => {

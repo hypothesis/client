@@ -39,7 +39,7 @@ export class FeatureFlags extends TinyEmitter {
     for (let [flag, on] of Object.entries(flags)) {
       this._flags.set(flag, on);
     }
-    this.emit('flagsChanged', this._flags);
+    this.emit('flagsChanged');
   }
 
   /**
