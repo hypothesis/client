@@ -8,6 +8,7 @@ import { countHidden, countVisible } from '../helpers/thread';
 
 import Annotation from './Annotation';
 import AnnotationHeader from './Annotation/AnnotationHeader';
+import EmptyAnnotation from './Annotation/EmptyAnnotation';
 import ModerationBanner from './ModerationBanner';
 
 /** @typedef {import('../helpers/build-thread').Thread} Thread */
@@ -107,29 +108,40 @@ function Thread({ thread, threadsService }) {
     [store, thread.id, thread.collapsed]
   );
 
+  const showReplyToggle =
+    !isReply && !isEditing && !hasAppliedFilter && thread.replyCount > 0;
+
   // Memoize annotation content to avoid re-rendering an annotation when content
   // in other annotations/threads change.
   const annotationContent = useMemo(
     () =>
       thread.visible && (
         <>
-          {thread.annotation && (
-            <ModerationBanner annotation={thread.annotation} />
+          {thread.annotation ? (
+            <>
+              <ModerationBanner annotation={thread.annotation} />
+              <Annotation
+                annotation={thread.annotation}
+                isReply={isReply}
+                onToggleReplies={showReplyToggle ? onToggleReplies : undefined}
+                replyCount={thread.replyCount}
+                threadIsCollapsed={thread.collapsed}
+              />
+            </>
+          ) : (
+            <EmptyAnnotation
+              isReply={isReply}
+              onToggleReplies={showReplyToggle ? onToggleReplies : undefined}
+              replyCount={thread.replyCount}
+              threadIsCollapsed={thread.collapsed}
+            />
           )}
-          <Annotation
-            annotation={thread.annotation}
-            hasAppliedFilter={hasAppliedFilter}
-            isReply={isReply}
-            onToggleReplies={onToggleReplies}
-            replyCount={thread.replyCount}
-            threadIsCollapsed={thread.collapsed}
-          />
         </>
       ),
     [
-      hasAppliedFilter,
       isReply,
       onToggleReplies,
+      showReplyToggle,
       thread.annotation,
       thread.replyCount,
       thread.collapsed,
