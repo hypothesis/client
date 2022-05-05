@@ -158,6 +158,45 @@ describe('Thread', () => {
     });
   });
 
+  describe('toggling replies for top-level threads', () => {
+    it('provides an `onToggleReplies` callback for top-level threads with replies', () => {
+      const threadWithChildren = buildThreadWithChildren();
+      const wrapper = createComponent({ thread: threadWithChildren });
+      assert.isFunction(wrapper.find('Annotation').props().onToggleReplies);
+    });
+
+    it('does not provide a toggle callback if thread is being edited', () => {
+      fakeStore.getDraft.returns({});
+      const threadWithChildren = buildThreadWithChildren();
+
+      const wrapper = createComponent({ thread: threadWithChildren });
+      assert.isUndefined(wrapper.find('Annotation').props().onToggleReplies);
+    });
+
+    it('does not provide a toggle callback if thread is a reply', () => {
+      const threadWithChildren = buildThreadWithChildren();
+      threadWithChildren.parent = 1;
+
+      const wrapper = createComponent({ thread: threadWithChildren });
+      assert.isUndefined(wrapper.find('Annotation').props().onToggleReplies);
+    });
+
+    it('does not provide a toggle callback if there is an applied filter', () => {
+      fakeStore.hasAppliedFilter.returns(true);
+      const threadWithChildren = buildThreadWithChildren();
+
+      const wrapper = createComponent({ thread: threadWithChildren });
+      assert.isUndefined(wrapper.find('Annotation').props().onToggleReplies);
+    });
+
+    it('does not provide a toggle callback if there are no replies', () => {
+      const thread = createThread();
+      const wrapper = createComponent({ thread });
+
+      assert.isUndefined(wrapper.find('Annotation').props().onToggleReplies);
+    });
+  });
+
   context('collapsed thread with annotation and children', () => {
     let collapsedThread;
 
@@ -193,7 +232,7 @@ describe('Thread', () => {
     it('renders an annotation component', () => {
       const wrapper = createComponent({ thread: noAnnotationThread });
 
-      const annotation = wrapper.find('Annotation');
+      const annotation = wrapper.find('EmptyAnnotation');
 
       assert.isTrue(annotation.exists());
     });

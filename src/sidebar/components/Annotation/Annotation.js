@@ -14,8 +14,17 @@ import AnnotationReplyToggle from './AnnotationReplyToggle';
 
 /**
  * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import("../../../types/api").SavedAnnotation} SavedAnnotation
- * @typedef {import('../../../types/api').Group} Group
+ */
+
+/**
+ * @typedef AnnotationProps
+ * @prop {Annotation} annotation
+ * @prop {boolean} isReply
+ * @prop {VoidFunction} [onToggleReplies] - Callback to expand/collapse reply
+ *   threads. The presence of a function indicates a toggle should be rendered.
+ * @prop {number} replyCount - Number of replies to this annotation's thread
+ * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
+ * @prop {import('../../services/annotations').AnnotationsService} annotationsService
  */
 
 function SavingMessage() {
@@ -42,20 +51,6 @@ function SavingMessage() {
     </div>
   );
 }
-
-/**
- * @typedef AnnotationProps
- * @prop {Annotation} [annotation] - The annotation to render. If undefined,
- *   this Annotation will render as a "missing annotation" and will stand in
- *   as an Annotation for threads that lack an annotation.
- * @prop {boolean} hasAppliedFilter - Is any filter applied currently?
- * @prop {boolean} isReply
- * @prop {VoidFunction} onToggleReplies - Callback to expand/collapse reply threads
- * @prop {number} replyCount - Number of replies to this annotation's thread
- * @prop {boolean} threadIsCollapsed - Is the thread to which this annotation belongs currently collapsed?
- * @prop {import('../../services/annotations').AnnotationsService} annotationsService
- */
-
 /**
  * A single annotation.
  *
@@ -63,74 +58,58 @@ function SavingMessage() {
  */
 function Annotation({
   annotation,
-  hasAppliedFilter,
   isReply,
   onToggleReplies,
   replyCount,
   threadIsCollapsed,
   annotationsService,
 }) {
-  const isCollapsedReply = isReply && threadIsCollapsed;
-
   const store = useSidebarStore();
 
-  const draft = annotation && store.getDraft(annotation);
-
-  const annotationQuote = annotation ? quote(annotation) : null;
-  const isFocused = annotation && store.isAnnotationFocused(annotation.$tag);
-  const isSaving = annotation && store.isSavingAnnotation(annotation);
-  const isEditing = annotation && !!draft && !isSaving;
-
+  const annotationQuote = quote(annotation);
+  const draft = store.getDraft(annotation);
   const userid = store.profile().userid;
-  const showActions =
-    annotation && !isSaving && !isEditing && isSaved(annotation);
-  const showReplyToggle =
-    !isReply && !isEditing && !hasAppliedFilter && replyCount > 0;
+
+  const isFocused = store.isAnnotationFocused(annotation.$tag);
+  const isSaving = store.isSavingAnnotation(annotation);
+
+  const isEditing = !!draft && !isSaving;
+  const isCollapsedReply = isReply && threadIsCollapsed;
+
+  const showActions = !isSaving && !isEditing && isSaved(annotation);
 
   const onReply = () => {
-    if (annotation && isSaved(annotation) && userid) {
+    if (isSaved(annotation) && userid) {
       annotationsService.reply(annotation, userid);
     }
   };
 
   return (
     <article className="space-y-4">
-      {annotation && (
-        <>
-          <AnnotationHeader
-            annotation={annotation}
-            isEditing={isEditing}
-            replyCount={replyCount}
-            threadIsCollapsed={threadIsCollapsed}
-          />
+      <AnnotationHeader
+        annotation={annotation}
+        isEditing={isEditing}
+        replyCount={replyCount}
+        threadIsCollapsed={threadIsCollapsed}
+      />
 
-          {annotationQuote && (
-            <AnnotationQuote
-              quote={annotationQuote}
-              isFocused={isFocused}
-              isOrphan={isOrphan(annotation)}
-            />
-          )}
-
-          {!isCollapsedReply && !isEditing && (
-            <AnnotationBody annotation={annotation} />
-          )}
-
-          {isEditing && (
-            <AnnotationEditor annotation={annotation} draft={draft} />
-          )}
-        </>
+      {annotationQuote && (
+        <AnnotationQuote
+          quote={annotationQuote}
+          isFocused={isFocused}
+          isOrphan={isOrphan(annotation)}
+        />
       )}
 
-      {!annotation && !isCollapsedReply && (
-        <div>
-          <em>Message not available.</em>
-        </div>
+      {!isCollapsedReply && !isEditing && (
+        <AnnotationBody annotation={annotation} />
       )}
+
+      {isEditing && <AnnotationEditor annotation={annotation} draft={draft} />}
 
       {!isCollapsedReply && (
         <footer className="flex items-center">
-          {showReplyToggle && (
+          {onToggleReplies && (
             <AnnotationReplyToggle
               onToggleReplies={onToggleReplies}
               replyCount={replyCount}
