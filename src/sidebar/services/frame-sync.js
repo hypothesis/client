@@ -385,7 +385,7 @@ export class FrameSyncService {
   }
 
   /**
-   * Setup synchronization of feature flags to host and guest frames.
+   * Set up synchronization of feature flags to host and guest frames.
    */
   _setupFeatureFlagSync() {
     const getFlags = () => this._store.profile().features;
