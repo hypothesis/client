@@ -122,9 +122,6 @@ function removeTextSelection() {
  * each frame connects to the sidebar and host frames as part of its
  * initialization.
  *
- * The anchoring implementation defaults to a generic one for HTML documents and
- * can be overridden to handle different document types.
- *
  * @implements {Annotator}
  * @implements {Destroyable}
  */
