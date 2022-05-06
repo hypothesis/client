@@ -11,7 +11,7 @@ import { withServices } from '../service-context';
  */
 
 /**
- * @param {Object} props
+ * @param {object} props
  *   @param {string} props.label
  *   @param {import('preact').ComponentChildren} props.children
  *   @param {string} [props.classes]
