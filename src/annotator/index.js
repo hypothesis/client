@@ -71,9 +71,7 @@ function init() {
 
     const sidebarConfig = /** @type {SidebarConfig} */ (getConfig('sidebar'));
 
-    const hypothesisAppsOrigin = new URL(
-      /** @type {string} */ (sidebarConfig.sidebarAppUrl)
-    ).origin;
+    const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
     const portProvider = new PortProvider(hypothesisAppsOrigin);
 
     const eventBus = new EventBus();
@@ -85,7 +83,7 @@ function init() {
     );
 
     portProvider.on('frameConnected', (source, port) =>
-      /** @type {Sidebar} */ (sidebar).onFrameConnected(source, port)
+      sidebar.onFrameConnected(source, port)
     );
     destroyables.push(portProvider, sidebar, notebook);
   }
