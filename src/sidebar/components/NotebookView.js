@@ -135,7 +135,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
           {groupName}
         </h1>
       </header>
-      <div>
+      <div className="justify-self-start">
         <NotebookFilters />
       </div>
       <div className="flex items-center lg:justify-self-end text-lg font-medium">
