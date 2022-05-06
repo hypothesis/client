@@ -56,7 +56,7 @@ function iframe(src, aspectRatio = 16 / 9) {
  * it's assumed to be seconds and is left alone.
  *
  * @param {string} timeValue - value of `t` or `start` param in YouTube URL
- * @returns {string} timeValue in seconds
+ * @return {string} timeValue in seconds
  * @example
  * formatYouTubeTime('5m'); // returns '300'
  * formatYouTubeTime('20m10s'); // returns '1210'
@@ -91,7 +91,7 @@ function parseTimeString(timeValue) {
  * all parameter possibilities.
  *
  * @param {HTMLAnchorElement} link
- * @returns {string} formatted filtered URL query string, e.g. '?start=90' or
+ * @return {string} formatted filtered URL query string, e.g. '?start=90' or
  *   an empty string if the filtered query is empty.
  * @example
  * // returns '?end=10&start=5'

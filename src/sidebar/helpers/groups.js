@@ -105,7 +105,7 @@ function uriMatchesScopes(uri, scopes) {
  *
  * @param {GroupIdentifier[]} groupIds
  * @param {Group[]} groups
- * @returns {Group[]}
+ * @return {Group[]}
  */
 function findGroupsByAnyIds(groupIds, groups) {
   return groups.filter(

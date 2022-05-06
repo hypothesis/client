@@ -45,7 +45,7 @@ function getEmbedderFrame(levels, window_ = window) {
  *
  * @param {ConfigFromHost} configFromHost
  * @param {RPCSettings} rpcSettings
- * @returns {ConfigFromHost}
+ * @return {ConfigFromHost}
  */
 function fetchServiceGroups(configFromHost, rpcSettings) {
   const services = configFromHost.services;

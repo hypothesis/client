@@ -36,7 +36,7 @@ function delta(date, now) {
  * @param {Date} date
  * @param {Intl.DateTimeFormatOptions} options
  * @param {Intl} Intl - Test seam. JS `Intl` API implementation.
- * @returns {string}
+ * @return {string}
  */
 function format(date, options, Intl = window.Intl) {
   const key = JSON.stringify(options);
