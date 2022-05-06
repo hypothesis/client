@@ -8,7 +8,7 @@ import { resolve } from '../util/url';
  * @typedef {import('../util/oauth-client').TokenInfo} TokenInfo
  *
  * @typedef RefreshOptions
- * @property {boolean} persist - True if access tokens should be persisted for
+ * @prop {boolean} persist - True if access tokens should be persisted for
  *   use in future sessions.
  */
 

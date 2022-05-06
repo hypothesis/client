@@ -8,9 +8,9 @@
  * specific user) or `'group'` (for a group).
  *
  * @typedef Permissions
- * @property {string[]} read - List of principals that can read the annotation
- * @property {string[]} update - List of principals that can edit the annotation
- * @property {string[]} delete - List of principals that can delete the
+ * @prop {string[]} read - List of principals that can read the annotation
+ * @prop {string[]} update - List of principals that can edit the annotation
+ * @prop {string[]} delete - List of principals that can delete the
  * annotation
  */
 
