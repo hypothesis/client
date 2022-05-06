@@ -2,9 +2,9 @@ import escapeStringRegexp from 'escape-string-regexp';
 
 /**
  * @typedef Tag
- * @property {string} text - The label of the tag
- * @property {number} count - The number of times this tag has been used.
- * @property {number} updated - The timestamp when this tag was last used.
+ * @prop {string} text - The label of the tag
+ * @prop {number} count - The number of times this tag has been used.
+ * @prop {number} updated - The timestamp when this tag was last used.
  */
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';

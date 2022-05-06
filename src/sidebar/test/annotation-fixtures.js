@@ -173,8 +173,8 @@ export function oldReply() {
 
 /**
  * @typedef ModerationState
- * @property {boolean} hidden
- * @property {number} flagCount
+ * @prop {boolean} hidden
+ * @prop {number} flagCount
  */
 
 /**

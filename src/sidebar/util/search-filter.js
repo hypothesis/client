@@ -120,8 +120,8 @@ export function toObject(searchText) {
 
 /**
  * @typedef Facet
- * @property {'and'|'or'} operator
- * @property {string[]|number[]} terms
+ * @prop {'and'|'or'} operator
+ * @prop {string[]|number[]} terms
  */
 
 /**
