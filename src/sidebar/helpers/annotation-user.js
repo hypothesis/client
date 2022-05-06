@@ -20,7 +20,7 @@ import { username } from './account-id';
  * @param {boolean} isThirdPartyUser - Is the annotation's user third-party?
  * @param {boolean} isFeatureFlagEnabled - Is the `client_display_names`
  *   feature flag enabled
- * @returns {string}
+ * @return {string}
  */
 export function annotationDisplayName(
   annotation,

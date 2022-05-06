@@ -25,7 +25,7 @@ import { watch } from '../util/watch';
  * within the current session and anchor it in the document.
  *
  * @param {Annotation} annotation
- * @returns {AnnotationData}
+ * @return {AnnotationData}
  */
 export function formatAnnot({ $tag, target, uri }) {
   return {

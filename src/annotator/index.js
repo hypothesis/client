@@ -116,7 +116,8 @@ function init() {
 /**
  * Returns a Promise that resolves when the document has loaded (but subresources
  * may still be loading).
- * @returns {Promise<void>}
+ *
+ * @return {Promise<void>}
  */
 function documentReady() {
   return new Promise(resolve => {
