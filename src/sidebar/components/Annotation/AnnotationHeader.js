@@ -3,15 +3,17 @@ import { useMemo } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
-import { isThirdPartyUser, username } from '../../helpers/account-id';
 import {
   domainAndTitle,
   isHighlight,
   isReply,
   hasBeenEdited,
 } from '../../helpers/annotation-metadata';
-import { annotationDisplayName } from '../../helpers/annotation-user';
 import { isPrivate } from '../../helpers/permissions';
+import {
+  useAnnotationAuthorName,
+  useAnnotationAuthorLink,
+} from '../hooks/use-annotation-author';
 
 import AnnotationDocumentInfo from './AnnotationDocumentInfo';
 import AnnotationShareInfo from './AnnotationShareInfo';
@@ -57,27 +59,8 @@ function AnnotationHeader({
   settings,
 }) {
   const store = useSidebarStore();
-  const defaultAuthority = store.defaultAuthority();
-  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
-
-  const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
-  const authorDisplayName = annotationDisplayName(
-    annotation,
-    isThirdParty,
-    displayNamesEnabled
-  );
-
-  const authorLink = (() => {
-    if (!isThirdParty) {
-      return store.getLink('user', { user: annotation.user });
-    } else {
-      return (
-        (settings.usernameUrl &&
-          `${settings.usernameUrl}${username(annotation.user)}`) ??
-        undefined
-      );
-    }
-  })();
+  const authorDisplayName = useAnnotationAuthorName(annotation);
+  const authorLink = useAnnotationAuthorLink(annotation, settings);
 
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
 
