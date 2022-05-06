@@ -12,9 +12,6 @@
  *     // Extract some data of interest from the store.
  *     () => store.getValue(),
  *
- *     // Use strict comparison of values
- *     null,
- *
  *     // Callback that is invoked each time the extracted data changes.
  *     (currentValue, prevValue) => { ... }
  *   );
@@ -28,10 +25,10 @@
  *     store.subscribe,
  *     () => [store.getValueA(), store.getValueB()],
  *
+ *     ([currentValueA, currentValueB], [prevValueA, prevValueB]) => { ... },
+ *
  *     // Compare each element of the result
  *     shallowEqual,
- *
- *     ([currentValueA, currentValueB], [prevValueA, prevValueB]) => { ... }
  *   );
  *
  * @template T
