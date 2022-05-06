@@ -208,7 +208,12 @@ export class VitalSourceContentIntegration {
    */
   constructor(container = document.body) {
     const features = new FeatureFlags();
+
+    // Forcibly enable the side-by-side feature for VS books. This feature is
+    // only behind a flag for regular web pages, which are typically more
+    // complex and varied than EPUB books.
     features.update({ html_side_by_side: true });
+
     this._htmlIntegration = new HTMLIntegration({ container, features });
 
     this._listeners = new ListenerCollection();
