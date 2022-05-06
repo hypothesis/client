@@ -58,6 +58,9 @@ export class HTMLIntegration {
       const sideBySide = features.flagEnabled('html_side_by_side');
       if (sideBySide !== this._sideBySideEnabled) {
         this._sideBySideEnabled = sideBySide;
+
+        // `fitSideBySide` is normally called by Guest when the sidebar layout
+        // changes. When the feature flag changes, we need to re-run the method.
         if (this._lastLayout) {
           this.fitSideBySide(this._lastLayout);
         }
