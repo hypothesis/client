@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import { useMemo, useState } from 'preact/hooks';
 
 import { serviceConfig } from '../../config/service-config';
@@ -86,9 +87,21 @@ function GroupList({ settings }) {
     // and pass an empty string.
     const altName = orgName(focusedGroup) ? orgName(focusedGroup) : '';
     label = (
-      <span className="GroupList__menu-label">
+      <span
+        className={classnames(
+          // Don't allow this label to shrink (wrap to next line)
+          'shrink-0 flex items-center gap-x-1 text-lg text-color-text font-bold'
+        )}
+      >
         {icon && (
-          <img className="GroupList__menu-icon" src={icon} alt={altName} />
+          <img
+            className={classnames(
+              // Tiny adjustment to make H logo align better with group name
+              'relative top-[1px] w-4 h-4'
+            )}
+            src={icon}
+            alt={altName}
+          />
         )}
         {focusedGroup.name}
       </span>
@@ -114,7 +127,7 @@ function GroupList({ settings }) {
   return (
     <Menu
       align="left"
-      contentClass="GroupList__content"
+      contentClass="min-w-[250px]"
       label={label}
       onOpenChanged={() => setExpandedGroup(null)}
       title={menuTitle}
