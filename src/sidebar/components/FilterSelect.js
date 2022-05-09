@@ -1,4 +1,5 @@
 import { Icon } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
 
 import Menu from './Menu';
 import MenuItem from './MenuItem';
@@ -35,14 +36,28 @@ function FilterSelect({
   const selected = selectedOption ?? defaultOption;
 
   const menuLabel = (
-    <span className="FilterSelect__menu-label">
-      {icon && <Icon name={icon} classes="text-xl hyp-u-margin--right--3" />}
+    <span
+      className={classnames(
+        // Don't allow the label text to wrap
+        'shrink-0 flex items-center gap-x-2',
+        'text-color-text font-bold text-lg'
+      )}
+    >
+      {icon && <Icon name={icon} classes="w-4 h-4" />}
       {selected.display}
     </span>
   );
 
   return (
-    <Menu label={menuLabel} title={title} contentClass="FilterSelect__menu">
+    <Menu
+      label={menuLabel}
+      title={title}
+      contentClass={classnames(
+        // Don't let filter list get too terribly tall. On shorter screens,
+        // restrict to 70vh; set a static max-height for taller screens.
+        'max-h-[70vh] tall:max-h-[504px] overflow-y-auto'
+      )}
+    >
       {filterOptions.map(filterOption => (
         <MenuItem
           onClick={() => onSelect(filterOption)}
