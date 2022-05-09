@@ -1,7 +1,7 @@
 import { useMemo } from 'preact/hooks';
 
 import { useSidebarStore } from '../../store';
-import { isThirdPartyUser, username } from '../../helpers/account-id';
+import { username } from '../../helpers/account-id';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 
 /** @typedef {import('../../store/modules/filters').FilterOption} FilterOption */
@@ -15,8 +15,6 @@ import { annotationDisplayName } from '../../helpers/annotation-user';
 export function useUserFilterOptions() {
   const store = useSidebarStore();
   const annotations = store.allAnnotations();
-  const defaultAuthority = store.defaultAuthority();
-  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
   const focusFilters = store.getFocusFilters();
   const currentUsername = username(store.profile().userid);
 
@@ -26,11 +24,7 @@ export function useUserFilterOptions() {
     const users = {};
     annotations.forEach(annotation => {
       const username_ = username(annotation.user);
-      users[username_] = annotationDisplayName(
-        annotation,
-        isThirdPartyUser(annotation.user, defaultAuthority),
-        displayNamesEnabled
-      );
+      users[username_] = annotationDisplayName(annotation, store);
     });
 
     // If user-focus is configured (even if not applied) add a filter
@@ -63,11 +57,5 @@ export function useUserFilterOptions() {
     });
 
     return userOptions;
-  }, [
-    annotations,
-    currentUsername,
-    defaultAuthority,
-    displayNamesEnabled,
-    focusFilters.user,
-  ]);
+  }, [annotations, currentUsername, focusFilters.user, store]);
 }

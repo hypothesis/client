@@ -8,8 +8,7 @@ import { mockImportedComponents } from '../../../../test-util/mock-imported-comp
 import AnnotationHeader, { $imports } from '../AnnotationHeader';
 
 describe('AnnotationHeader', () => {
-  let fakeAccountId;
-  let fakeAnnotationDisplayName;
+  let fakeAnnotationAuthorInfo;
   let fakeDomainAndTitle;
   let fakeGroup;
   let fakeIsHighlight;
@@ -46,20 +45,15 @@ describe('AnnotationHeader', () => {
     fakeHasBeenEdited = sinon.stub().returns(false);
     fakeIsPrivate = sinon.stub();
 
-    fakeAccountId = {
-      isThirdPartyUser: sinon.stub().returns(false),
-      username: sinon.stub().returnsArg(0),
-    };
-
-    fakeAnnotationDisplayName = sinon.stub().returns('Robbie Burns');
+    fakeAnnotationAuthorInfo = sinon.stub().returns({
+      authorDisplayName: 'Robbie Burns',
+      authorLink: 'http://www.example.com',
+    });
 
     fakeSettings = { usernameUrl: 'http://foo.bar/' };
 
     fakeStore = {
-      defaultAuthority: sinon.stub().returns('foo.com'),
       getGroup: sinon.stub().returns(fakeGroup),
-      getLink: sinon.stub().returns('http://example.com'),
-      isFeatureEnabled: sinon.stub().returns(false),
       route: sinon.stub().returns('sidebar'),
       setExpanded: sinon.stub(),
     };
@@ -67,7 +61,6 @@ describe('AnnotationHeader', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../../store': { useSidebarStore: () => fakeStore },
-      '../../helpers/account-id': fakeAccountId,
       '../../helpers/annotation-metadata': {
         domainAndTitle: fakeDomainAndTitle,
         isHighlight: fakeIsHighlight,
@@ -75,7 +68,7 @@ describe('AnnotationHeader', () => {
         hasBeenEdited: fakeHasBeenEdited,
       },
       '../../helpers/annotation-user': {
-        annotationDisplayName: fakeAnnotationDisplayName,
+        annotationAuthorInfo: fakeAnnotationAuthorInfo,
       },
       '../../helpers/permissions': {
         isPrivate: fakeIsPrivate,
@@ -114,33 +107,22 @@ describe('AnnotationHeader', () => {
   });
 
   describe('annotation author (user) information', () => {
-    it('should link to author activity if first-party', () => {
-      fakeAccountId.isThirdPartyUser.returns(false);
-
+    it('should link to author activity if link available', () => {
       const wrapper = createAnnotationHeader();
 
       assert.equal(
         wrapper.find('AnnotationUser').props().authorLink,
-        'http://example.com'
+        'http://www.example.com'
       );
     });
 
-    it('should link to author activity if third-party and has settings URL', () => {
-      fakeAccountId.isThirdPartyUser.returns(true);
-      const fakeAnnotation = fixtures.defaultAnnotation();
+    it('should not link to author if none provided', () => {
+      fakeAnnotationAuthorInfo.returns({
+        authorDisplayName: 'Robbie Burns',
+        authorLink: undefined,
+      });
 
-      const wrapper = createAnnotationHeader({ annotation: fakeAnnotation });
-
-      assert.equal(
-        wrapper.find('AnnotationUser').props().authorLink,
-        `http://foo.bar/${fakeAnnotation.user}`
-      );
-    });
-
-    it('should not link to author if third-party and no settings URL', () => {
-      fakeAccountId.isThirdPartyUser.returns(true);
-
-      const wrapper = createAnnotationHeader({ settings: {} });
+      const wrapper = createAnnotationHeader();
 
       assert.isUndefined(wrapper.find('AnnotationUser').props().authorLink);
     });
