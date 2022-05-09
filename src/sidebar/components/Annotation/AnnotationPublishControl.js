@@ -46,8 +46,11 @@ function AnnotationPublishControl({
   );
 
   const menuLabel = (
-    <div className="p-2.5 text-color-text-inverted" style={buttonStyle}>
-      <Icon name="expand-menu" />
+    <div
+      className="w-9 h-9 flex items-center justify-center text-color-text-inverted"
+      style={buttonStyle}
+    >
+      <Icon name="expand-menu" classes="w-4 h-4" />
     </div>
   );
 
