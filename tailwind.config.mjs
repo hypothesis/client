@@ -179,6 +179,7 @@ export default {
         'annotator-md': '480px',
         // Tablet and up
         'annotator-lg': '600px',
+        tall: { raw: '(min-height: 700px)' },
       },
       spacing: {
         // These are selective, pixel-specific variants of Tailwind's default
@@ -205,6 +206,17 @@ export default {
       // class to the sidebar frame when it's collapsed. This modifier allows
       // sub-components to select for that state.
       addVariant('sidebar-collapsed', '.sidebar-collapsed &');
+    }),
+    plugin(({ addUtilities }) => {
+      // Tailwind does not provide hyphens-related utility classes.
+      addUtilities({
+        '.hyphens-none': {
+          hyphens: 'none',
+        },
+        '.hyphens-auto': {
+          hyphens: 'auto',
+        },
+      });
     }),
   ],
 };
