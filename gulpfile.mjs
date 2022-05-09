@@ -11,26 +11,55 @@ import gulp from 'gulp';
 import serveDev from './dev-server/serve-dev.js';
 import servePackage from './dev-server/serve-package.js';
 import tailwindConfig from './tailwind.config.mjs';
+import annotatorTailwindConfig from './tailwind-annotator.config.mjs';
+import sidebarTailwindConfig from './tailwind-sidebar.config.mjs';
 
 gulp.task('build-js', () => buildJS('./rollup.config.mjs'));
 gulp.task('watch-js', () => watchJS('./rollup.config.mjs'));
 
-gulp.task('build-css', () =>
+gulp.task('build-annotator-tailwind-css', () =>
+  buildCSS(['./src/styles/annotator/annotator.scss'], {
+    tailwindConfig: annotatorTailwindConfig,
+  })
+);
+
+gulp.task('build-sidebar-tailwind-css', () =>
   buildCSS(
     [
-      // Hypothesis client
-      './src/styles/annotator/annotator.scss',
+      // sidebar styles (with tailwind)
+      './src/styles/sidebar/sidebar.scss',
+      // TODO: After tailwind migration complete, should this
+      // be managed with its own tailwind config?
+      './src/styles/ui-playground/ui-playground.scss',
+    ],
+    { tailwindConfig: sidebarTailwindConfig }
+  )
+);
+
+// These CSS source files should not use Tailwind, as they are used in
+// third-party contexts.
+// TODO: Remove `tailwindConfig` after updating `sass` task in `frontend-build`.
+// Setting it is necessary currently to suppress a build warning.
+gulp.task('build-standalone-css', () =>
+  buildCSS(
+    [
+      // other styles used by annotator (standalone)
       './src/styles/annotator/highlights.scss',
       './src/styles/annotator/pdfjs-overrides.scss',
-      './src/styles/sidebar/sidebar.scss',
 
       // Vendor
       './node_modules/katex/dist/katex.min.css',
-
-      // Development tools
-      './src/styles/ui-playground/ui-playground.scss',
     ],
     { tailwindConfig }
+  )
+);
+
+gulp.task(
+  'build-css',
+  gulp.parallel(
+    'build-annotator-tailwind-css',
+    'build-sidebar-tailwind-css',
+    'build-standalone-css'
   )
 );
 
