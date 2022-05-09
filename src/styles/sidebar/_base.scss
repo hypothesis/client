@@ -32,6 +32,6 @@
 
   // TODO: Research history of this and whether it's still appropriate
   p {
-    hyphens: auto;
+    @apply hyphens-auto;
   }
 }
