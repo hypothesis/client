@@ -301,7 +301,10 @@ describe('GroupListItem', () => {
       );
 
       const submenu = getSubmenu(wrapper);
-      assert.equal(submenu.exists('.GroupListItem__footer'), expectDisabled);
+      assert.equal(
+        submenu.exists('[data-testid="unselectable-group-note"]'),
+        expectDisabled
+      );
     });
   });
 
@@ -312,7 +315,7 @@ describe('GroupListItem', () => {
     });
     assert.equal(wrapper.find('MenuItem').first().prop('isDisabled'), true);
     const submenu = getSubmenu(wrapper);
-    assert.equal(submenu.exists('.GroupListItem__footer'), true);
+    assert.isTrue(submenu.exists('[data-testid="unselectable-group-note"]'));
   });
 
   [

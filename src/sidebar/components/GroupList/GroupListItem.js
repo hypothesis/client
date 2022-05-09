@@ -1,3 +1,5 @@
+import classnames from 'classnames';
+
 import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
@@ -139,7 +141,14 @@ function GroupListItem({
             )}
           </ul>
           {!isSelectable && (
-            <p className="GroupListItem__footer">
+            <p
+              className={classnames(
+                // Left padding to match submenu items above. Turn off hyphenation
+                // as it causes this content to hyphenate awkwardly.
+                'p-2 pl-9 bg-grey-1 hyphens-none'
+              )}
+              data-testid="unselectable-group-note"
+            >
               This group is restricted to specific URLs.
             </p>
           )}
