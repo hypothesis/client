@@ -1,6 +1,5 @@
 import {
   Card,
-  Icon,
   IconButton,
   TextInput,
   TextInputWithButton,
@@ -15,6 +14,7 @@ import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import { isIOS } from '../../../shared/user-agent';
 
+import MenuArrow from '../MenuArrow';
 import ShareLinks from '../ShareLinks';
 
 /**
@@ -37,23 +37,6 @@ function selectionOverflowsInputElement() {
   // On iOS the selection overflows the input element
   // See: https://github.com/hypothesis/client/pull/2799
   return isIOS();
-}
-
-/**
- *
- * @param {object} props
- *   @param {string} [props.classes] - Optional additional CSS classes
- */
-function MenuArrowDown({ classes }) {
-  return (
-    <Icon
-      name="pointer"
-      classes={classnames(
-        'absolute inline z-2 text-grey-3 fill-white rotate-180',
-        classes
-      )}
-    />
-  );
 }
 
 /**
@@ -203,7 +186,10 @@ function AnnotationShareControl({
             )}
           </div>
           {showShareLinks && <ShareLinks shareURI={shareUri} />}
-          <MenuArrowDown classes="bottom-[-12px] right-1 touch:right-[9px]" />
+          <MenuArrow
+            direction="down"
+            classes="bottom-[-12px] right-1 touch:right-[9px]"
+          />
         </Card>
       )}
     </div>
