@@ -28,8 +28,12 @@ import { toChildArray } from 'preact';
 export default function MenuSection({ heading, children }) {
   return (
     <>
-      {heading && <h2 className="MenuSection__heading">{heading}</h2>}
-      <ul className="MenuSection__content">
+      {heading && (
+        <h2 className="text-color-text-light p-3 leading-none uppercase">
+          {heading}
+        </h2>
+      )}
+      <ul className="border-b">
         {toChildArray(children).map(child => (
           <li key={/** @type {JSXElement} **/ (child).key}>{child}</li>
         ))}
