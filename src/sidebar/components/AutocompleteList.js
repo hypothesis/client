@@ -1,28 +1,14 @@
-import { Card, Icon } from '@hypothesis/frontend-shared';
+import { Card } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
+
+import MenuArrow from './MenuArrow';
 
 /**
  * @template T
  * @param {T} item
  */
 const defaultListFormatter = item => item;
-
-/**
- * @param {object} props
- *   @param {string} [props.classes] - Optional additional CSS classes
- */
-function MenuArrowUp({ classes }) {
-  return (
-    <Icon
-      name="pointer"
-      classes={classnames(
-        'absolute inline z-2 text-grey-3 fill-white',
-        classes
-      )}
-    />
-  );
-}
 
 /**
  * @template T
@@ -111,7 +97,7 @@ export default function AutocompleteList({
         <ul tabIndex={-1} aria-label="Suggestions" role="listbox" {...props}>
           {items}
         </ul>
-        <MenuArrowUp classes="top-[-10px] left-[3px]" />
+        <MenuArrow direction="up" classes="top-[-10px] left-[3px]" />
       </Card>
     </div>
   );
