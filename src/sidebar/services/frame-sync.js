@@ -8,12 +8,20 @@ import { watch } from '../util/watch';
 
 /**
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
+ * @typedef {import('../../types/annotator').DocumentMetadata} DocumentMetadata
  * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/port-rpc-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
  * @typedef {import('../../types/port-rpc-events').SidebarToGuestEvent} SidebarToGuestEvent
  * @typedef {import('../../types/port-rpc-events').GuestToSidebarEvent} GuestToSidebarEvent
  * @typedef {import('../store/modules/frames').Frame} Frame
+ */
+
+/**
+ * @typedef DocumentInfo
+ * @prop {string|null} frameIdentifier
+ * @prop {string} uri
+ * @prop {DocumentMetadata} metadata
  */
 
 /**
@@ -256,18 +264,22 @@ export class FrameSyncService {
     // guest will make this call once after it connects. To handle updates
     // to the document, we'll need to change `connectFrame` to update rather than
     // add to the frame list.
-    guestRPC.on('documentInfoChanged', info => {
-      this._guestRPC.delete(frameIdentifier);
+    guestRPC.on(
+      'documentInfoChanged',
+      /** @param {DocumentInfo} info */
+      info => {
+        this._guestRPC.delete(frameIdentifier);
 
-      frameIdentifier = info.frameIdentifier;
-      this._guestRPC.set(frameIdentifier, guestRPC);
+        frameIdentifier = info.frameIdentifier;
+        this._guestRPC.set(frameIdentifier, guestRPC);
 
-      this._store.connectFrame({
-        id: info.frameIdentifier,
-        metadata: info.metadata,
-        uri: info.uri,
-      });
-    });
+        this._store.connectFrame({
+          id: info.frameIdentifier,
+          metadata: info.metadata,
+          uri: info.uri,
+        });
+      }
+    );
 
     // TODO - Close connection if we don't receive a "connect" message within
     // a certain time frame.
@@ -340,18 +352,27 @@ export class FrameSyncService {
       }
     );
 
-    guestRPC.on('showAnnotations', tags => {
-      this._store.selectAnnotations(this._store.findIDsForTags(tags));
-      this._store.selectTab('annotation');
-    });
+    guestRPC.on(
+      'showAnnotations',
+      /** @param {string[]} tags */ tags => {
+        this._store.selectAnnotations(this._store.findIDsForTags(tags));
+        this._store.selectTab('annotation');
+      }
+    );
 
-    guestRPC.on('focusAnnotations', tags => {
-      this._store.focusAnnotations(tags || []);
-    });
+    guestRPC.on(
+      'focusAnnotations',
+      /** @param {string[]} tags */ tags => {
+        this._store.focusAnnotations(tags || []);
+      }
+    );
 
-    guestRPC.on('toggleAnnotationSelection', tags => {
-      this._store.toggleSelectedAnnotations(this._store.findIDsForTags(tags));
-    });
+    guestRPC.on(
+      'toggleAnnotationSelection',
+      /** @param {string[]} tags */ tags => {
+        this._store.toggleSelectedAnnotations(this._store.findIDsForTags(tags));
+      }
+    );
 
     guestRPC.on('openSidebar', () => {
       this._hostRPC.call('openSidebar');
@@ -378,10 +399,15 @@ export class FrameSyncService {
 
     // When user toggles the highlight visibility control in the sidebar container,
     // update the visibility in all the guest frames.
-    this._hostRPC.on('setHighlightsVisible', visible => {
-      this._highlightsVisible = visible;
-      this._guestRPC.forEach(rpc => rpc.call('setHighlightsVisible', visible));
-    });
+    this._hostRPC.on(
+      'setHighlightsVisible',
+      /** @param {boolean} visible */ visible => {
+        this._highlightsVisible = visible;
+        this._guestRPC.forEach(rpc =>
+          rpc.call('setHighlightsVisible', visible)
+        );
+      }
+    );
   }
 
   /**
