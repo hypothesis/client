@@ -367,8 +367,10 @@ export class Guest {
   }
 
   async _connectSidebar() {
-    this._sidebarRPC.on('featureFlagsUpdated', flags =>
-      this.features.update(flags)
+    this._sidebarRPC.on(
+      'featureFlagsUpdated',
+      /** @param {Record<string, boolean>} flags */ flags =>
+        this.features.update(flags)
     );
 
     // Handlers for events sent when user hovers or clicks on an annotation card
@@ -409,9 +411,12 @@ export class Guest {
     );
 
     // Handler for controls on the sidebar
-    this._sidebarRPC.on('setHighlightsVisible', showHighlights => {
-      this.setHighlightsVisible(showHighlights);
-    });
+    this._sidebarRPC.on(
+      'setHighlightsVisible',
+      /** @param {boolean} showHighlights */ showHighlights => {
+        this.setHighlightsVisible(showHighlights);
+      }
+    );
 
     this._sidebarRPC.on(
       'deleteAnnotation',

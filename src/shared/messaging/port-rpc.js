@@ -33,14 +33,14 @@ const PROTOCOL = 'frame-rpc';
  * See https://github.com/substack/frame-rpc#protocol
  *
  * @typedef RequestMessage
- * @prop {any[]} arguments
+ * @prop {unknown[]} arguments
  * @prop {string} method
  * @prop {PROTOCOL} protocol
  * @prop {number} sequence
  * @prop {VERSION} version
  *
  * @typedef ResponseMessage
- * @prop {any[]} arguments
+ * @prop {unknown[]} arguments
  * @prop {PROTOCOL} protocol
  * @prop {number} response
  * @prop {VERSION} version
@@ -55,7 +55,7 @@ const PROTOCOL = 'frame-rpc';
  *
  * @param {MessagePort} port
  * @param {string} method
- * @param {any[]} [args]
+ * @param {unknown[]} [args]
  * @param {number} [sequence] - Sequence number used for replies
  */
 function sendCall(port, method, args = [], sequence = -1) {
@@ -126,6 +126,20 @@ function shouldUseSafariWorkaround(userAgent) {
 }
 
 /**
+ * Callback type used for RPC method handlers and result callbacks.
+ *
+ * @typedef {(...args: unknown[]) => void} Callback
+ */
+
+/**
+ * @param {any} value
+ * @return {value is Callback}
+ */
+function isCallback(value) {
+  return typeof value === 'function';
+}
+
+/**
  * PortRPC provides remote procedure calls between frames or workers. It uses
  * the Channel Messaging API [1] as a transport.
  *
@@ -164,12 +178,12 @@ export class PortRPC {
     /** @type {MessagePort|null} */
     this._port = null;
 
-    /** @type {Map<string, (...args: any[]) => void>} */
+    /** @type {Map<string, Callback>} */
     this._methods = new Map();
 
     this._sequence = 1;
 
-    /** @type {Map<number, (...args: any[]) => void>} */
+    /** @type {Map<number, Callback>} */
     this._callbacks = new Map();
 
     this._listeners = new ListenerCollection();
@@ -198,7 +212,7 @@ export class PortRPC {
     /**
      * Method and arguments of pending RPC calls made before a port was connected.
      *
-     * @type {Array<[CallMethod, any[]]>}
+     * @type {Array<[CallMethod, unknown[]]>}
      */
     this._pendingCalls = [];
 
@@ -213,14 +227,15 @@ export class PortRPC {
    *
    * All handlers must be registered before {@link connect} is invoked.
    *
+   * @template {function} Handler
    * @param {OnMethod|'close'|'connect'} method
-   * @param {(...args: any[]) => void} handler
+   * @param {Handler} handler
    */
   on(method, handler) {
     if (this._port) {
       throw new Error('Cannot add a method handler after a port is connected');
     }
-    this._methods.set(method, handler);
+    this._methods.set(method, /** @type {any} */ (handler));
   }
 
   /**
@@ -262,7 +277,7 @@ export class PortRPC {
    * which is invoked with the response in the form of (error, result) arguments.
    *
    * @param {CallMethod} method
-   * @param {any[]} args
+   * @param {unknown[]} args
    */
   call(method, ...args) {
     if (!this._port) {
@@ -275,7 +290,7 @@ export class PortRPC {
 
     const seq = this._sequence++;
     const finalArg = args[args.length - 1];
-    if (typeof finalArg === 'function') {
+    if (isCallback(finalArg)) {
       this._callbacks.set(seq, finalArg);
       args = args.slice(0, -1);
     }
@@ -332,7 +347,7 @@ export class PortRPC {
         return;
       }
 
-      /** @param {any[]} args */
+      /** @param {unknown[]} args */
       const callback = (...args) => {
         /** @type {ResponseMessage} */
         const message = {

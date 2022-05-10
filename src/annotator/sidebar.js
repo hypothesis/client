@@ -329,8 +329,10 @@ export class Sidebar {
     annotationCounts(document.body, this._sidebarRPC);
     sidebarTrigger(document.body, () => this.open());
 
-    this._sidebarRPC.on('featureFlagsUpdated', flags =>
-      this.features.update(flags)
+    this._sidebarRPC.on(
+      'featureFlagsUpdated',
+      /** @param {Record<string, boolean>} flags */ flags =>
+        this.features.update(flags)
     );
 
     this._sidebarRPC.on('connect', () => {
