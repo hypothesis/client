@@ -1,3 +1,33 @@
-@use '@hypothesis/frontend-shared/styles/util';
-
 @use 'tailwindcss/utilities';
+
+// This is a temporary local implementation of `.hyp-u-outline-on-keyboard-focus`
+// and `.hyp-u-outline-on-keyboard-focus--inset`. These are the last remaining
+// utilities used by this application, so implementing them here allows us to
+// remove the `frontend-shared` utility styles from the `sidebar` CSS.
+// TODO: This should be re-implemented as a Tailwind plugin in `frontend-shared`
+.u-outline-on-keyboard-focus:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #59a7e8;
+}
+.js-focus-visible .u-outline-on-keyboard-focus:focus:not(.focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+.u-outline-on-keyboard-focus:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
+.u-outline-on-keyboard-focus--inset:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #59a7e8 inset;
+}
+.js-focus-visible
+  .u-outline-on-keyboard-focus--inset:focus:not(.focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+.u-outline-on-keyboard-focus--inset:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
