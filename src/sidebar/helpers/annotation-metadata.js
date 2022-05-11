@@ -276,6 +276,22 @@ export function isAnnotation(annotation) {
   return !!(hasSelector(annotation) && !isOrphan(annotation));
 }
 
+/**
+ * Return a human-readable string describing the annotation's role.
+ *
+ * @param {Annotation} annotation
+ */
+export function annotationRole(annotation) {
+  if (isReply(annotation)) {
+    return 'Reply';
+  } else if (isHighlight(annotation)) {
+    return 'Highlight';
+  } else if (isPageNote(annotation)) {
+    return 'Page note';
+  }
+  return 'Annotation';
+}
+
 /** Return a numeric key that can be used to sort annotations by location.
  *
  * @param {Annotation} annotation

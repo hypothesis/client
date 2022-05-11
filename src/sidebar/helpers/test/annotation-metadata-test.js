@@ -272,7 +272,7 @@ describe('sidebar/helpers/annotation-metadata', () => {
     });
   });
 
-  describe('.isHighlight', () => {
+  describe('isHighlight', () => {
     [
       {
         annotation: fixtures.newEmptyAnnotation(),
@@ -370,6 +370,47 @@ describe('sidebar/helpers/annotation-metadata', () => {
 
     it('returns false if an annotation has no target', () => {
       assert.isFalse(annotationMetadata.isAnnotation({}));
+    });
+  });
+
+  describe('annotationRole', () => {
+    it('correctly identifies the role of an annotation', () => {
+      // An annotation needs a `selector` or else it will be identified as a
+      // 'Page note'
+      const annotationAnnotation = {
+        ...fixtures.newAnnotation(),
+        target: [{ source: 'source', selector: [] }],
+      };
+      const highlightAnnotation = fixtures.oldHighlight();
+      const pageNoteAnnotation = fixtures.newPageNote();
+
+      // If an annotation is a reply of any sort, that will supersede.
+      // e.g. the label for a page note that is also a reply is "Reply"
+      // In practice, highlights are never replies.
+      const replyAnnotations = [
+        { ...annotationAnnotation, references: ['parent_annotation_id'] },
+        { ...highlightAnnotation, references: ['parent_annotation_id'] },
+        { ...pageNoteAnnotation, references: ['parent_annotation_id'] },
+        fixtures.oldReply(),
+      ];
+      assert.equal(
+        annotationMetadata.annotationRole(annotationAnnotation),
+        'Annotation'
+      );
+
+      assert.equal(
+        annotationMetadata.annotationRole(highlightAnnotation),
+        'Highlight'
+      );
+
+      assert.equal(
+        annotationMetadata.annotationRole(pageNoteAnnotation),
+        'Page note'
+      );
+
+      replyAnnotations.forEach(reply => {
+        assert.equal(annotationMetadata.annotationRole(reply), 'Reply');
+      });
     });
   });
 

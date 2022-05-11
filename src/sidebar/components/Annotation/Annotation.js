@@ -1,8 +1,15 @@
 import { Actions, Spinner } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
+import { useMemo } from 'preact/hooks';
 
 import { useSidebarStore } from '../../store';
-import { isOrphan, isSaved, quote } from '../../helpers/annotation-metadata';
+import {
+  annotationRole,
+  isOrphan,
+  isSaved,
+  quote,
+} from '../../helpers/annotation-metadata';
+import { annotationDisplayName } from '../../helpers/annotation-user';
 import { withServices } from '../../service-context';
 
 import AnnotationActionBar from './AnnotationActionBar';
@@ -84,8 +91,16 @@ function Annotation({
     }
   };
 
+  const authorName = useMemo(
+    () => annotationDisplayName(annotation, store),
+    [annotation, store]
+  );
+
   return (
-    <article className="space-y-4">
+    <article
+      className="space-y-4"
+      aria-label={`${annotationRole(annotation)} by ${authorName}`}
+    >
       <AnnotationHeader
         annotation={annotation}
         isEditing={isEditing}

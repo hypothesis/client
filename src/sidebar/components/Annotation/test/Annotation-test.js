@@ -10,6 +10,7 @@ import Annotation, { $imports } from '../Annotation';
 describe('Annotation', () => {
   // Dependency Mocks
   let fakeMetadata;
+  let fakeAnnotationUser;
 
   // Injected dependency mocks
   let fakeAnnotationsService;
@@ -43,7 +44,12 @@ describe('Annotation', () => {
       save: sinon.stub().resolves(),
     };
 
+    fakeAnnotationUser = {
+      annotationDisplayName: sinon.stub().returns('Richard Lionheart'),
+    };
+
     fakeMetadata = {
+      annotationRole: sinon.stub().returns('Annotation'),
       quote: sinon.stub(),
     };
 
@@ -58,12 +64,24 @@ describe('Annotation', () => {
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '../../helpers/annotation-metadata': fakeMetadata,
+      '../../helpers/annotation-user': fakeAnnotationUser,
       '../../store': { useSidebarStore: () => fakeStore },
     });
   });
 
   afterEach(() => {
     $imports.$restore();
+  });
+
+  describe('annotation accessibility (ARIA) attributes', () => {
+    it('should add an `aria-label` composed of annotation type and author name', () => {
+      const wrapper = createComponent();
+
+      assert.equal(
+        wrapper.find('article').props()['aria-label'],
+        'Annotation by Richard Lionheart'
+      );
+    });
   });
 
   describe('annotation quote', () => {
