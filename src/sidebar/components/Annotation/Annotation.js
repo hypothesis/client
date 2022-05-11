@@ -1,8 +1,15 @@
 import { Actions, Spinner } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
+import { useMemo } from 'preact/hooks';
 
 import { useSidebarStore } from '../../store';
-import { isOrphan, isSaved, quote } from '../../helpers/annotation-metadata';
+import {
+  isHighlight,
+  isOrphan,
+  isSaved,
+  quote,
+} from '../../helpers/annotation-metadata';
+import { annotationDisplayName } from '../../helpers/annotation-user';
 import { withServices } from '../../service-context';
 
 import AnnotationActionBar from './AnnotationActionBar';
@@ -84,8 +91,30 @@ function Annotation({
     }
   };
 
+  const authorName = useMemo(
+    () => annotationDisplayName(annotation, store),
+    [annotation, store]
+  );
+
+  let annotationType;
+  if (isHighlight(annotation)) {
+    annotationType = 'Highlight';
+  } else if (isReply) {
+    annotationType = 'Reply';
+  } else {
+    annotationType = 'Annotation';
+  }
+
+  const quoteElementId = annotationQuote
+    ? `annotation-quote-${annotation.$tag}`
+    : undefined;
+
   return (
-    <article className="space-y-4">
+    <article
+      className="space-y-4"
+      aria-label={`${annotationType} by ${authorName}`}
+      aria-describedby={quoteElementId}
+    >
       <AnnotationHeader
         annotation={annotation}
         isEditing={isEditing}
@@ -95,6 +124,7 @@ function Annotation({
 
       {annotationQuote && (
         <AnnotationQuote
+          elementId={quoteElementId}
           quote={annotationQuote}
           isFocused={isFocused}
           isOrphan={isOrphan(annotation)}

@@ -12,6 +12,7 @@ import StyledText from '../StyledText';
 
 /**
  * @typedef AnnotationQuoteProps
+ * @prop {string} [elementId]
  * @prop {string} quote
  * @prop {boolean} [isFocused]
  * @prop {boolean} [isOrphan]
@@ -23,7 +24,7 @@ import StyledText from '../StyledText';
  *
  * @param {AnnotationQuoteProps} props
  */
-function AnnotationQuote({ quote, isFocused, isOrphan, settings }) {
+function AnnotationQuote({ elementId, quote, isFocused, isOrphan, settings }) {
   return (
     <Excerpt collapsedHeight={35} inlineControls={true} overflowThreshold={20}>
       <StyledText classes={classnames({ 'p-redacted-text': isOrphan })}>
@@ -31,6 +32,7 @@ function AnnotationQuote({ quote, isFocused, isOrphan, settings }) {
           className={classnames('hover:border-l-blue-quote', {
             'border-l-blue-quote': isFocused,
           })}
+          id={elementId}
           style={applyTheme(['selectionFontFamily'], settings)}
         >
           {quote}
