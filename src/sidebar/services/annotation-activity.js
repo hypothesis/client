@@ -1,3 +1,4 @@
+import { isShared } from '../helpers/permissions';
 import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
@@ -45,16 +46,16 @@ export class AnnotationActivityService {
       date: activityDate,
       annotation: {
         id: annotation.id,
+        isShared: isShared(annotation.permissions),
       },
     };
 
     if (this._reportConfig.events.includes(eventType)) {
-      postMessageJsonRpc.call(
+      postMessageJsonRpc.notify(
         this._rpc.targetFrame,
         this._rpc.origin,
         this._reportConfig.method,
-        [eventType, data],
-        3000
+        [eventType, data]
       );
     }
   }

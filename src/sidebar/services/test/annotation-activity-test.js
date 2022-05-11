@@ -3,6 +3,7 @@ import * as fixtures from '../../test/annotation-fixtures';
 import { AnnotationActivityService, $imports } from '../annotation-activity';
 
 describe('AnnotationActivityService', () => {
+  let fakePermissions;
   let fakePostMessageJsonRpc;
 
   let fakeRpcSettings;
@@ -10,8 +11,12 @@ describe('AnnotationActivityService', () => {
   let fakeSettings;
 
   beforeEach(() => {
+    fakePermissions = {
+      isShared: sinon.stub().returns(true),
+    };
+
     fakePostMessageJsonRpc = {
-      call: sinon.stub(),
+      notify: sinon.stub(),
     };
 
     fakeRpcSettings = {
@@ -30,6 +35,7 @@ describe('AnnotationActivityService', () => {
     };
 
     $imports.$mock({
+      '../helpers/permissions': fakePermissions,
       '../util/postmessage-json-rpc': fakePostMessageJsonRpc,
     });
   });
@@ -45,9 +51,9 @@ describe('AnnotationActivityService', () => {
 
       svc.reportActivity('update', annotation);
 
-      assert.calledOnce(fakePostMessageJsonRpc.call);
+      assert.calledOnce(fakePostMessageJsonRpc.notify);
       assert.calledWith(
-        fakePostMessageJsonRpc.call,
+        fakePostMessageJsonRpc.notify,
         window,
         'https://www.example.com',
         'remoteMethod'
@@ -60,8 +66,8 @@ describe('AnnotationActivityService', () => {
 
       svc.reportActivity('update', annotation);
 
-      const eventType = fakePostMessageJsonRpc.call.getCall(0).args[3][0];
-      const data = fakePostMessageJsonRpc.call.getCall(0).args[3][1];
+      const eventType = fakePostMessageJsonRpc.notify.getCall(0).args[3][0];
+      const data = fakePostMessageJsonRpc.notify.getCall(0).args[3][1];
 
       assert.equal(eventType, 'update');
       assert.deepEqual(data, {
@@ -70,6 +76,7 @@ describe('AnnotationActivityService', () => {
         date: new Date(annotation.updated).toISOString(),
         annotation: {
           id: annotation.id,
+          isShared: true,
         },
       });
     });
@@ -82,7 +89,7 @@ describe('AnnotationActivityService', () => {
 
       svc.reportActivity('update', annotation);
 
-      assert.notCalled(fakePostMessageJsonRpc.call);
+      assert.notCalled(fakePostMessageJsonRpc.notify);
     });
 
     it('does not invoke remote activity method if reportActivity not configured', () => {
@@ -91,7 +98,7 @@ describe('AnnotationActivityService', () => {
 
       svc.reportActivity('update', annotation);
 
-      assert.notCalled(fakePostMessageJsonRpc.call);
+      assert.notCalled(fakePostMessageJsonRpc.notify);
     });
 
     it('does not invoke remote activity method if annotation event type is not one of configured events', () => {
@@ -100,7 +107,7 @@ describe('AnnotationActivityService', () => {
 
       svc.reportActivity('delete', annotation);
 
-      assert.notCalled(fakePostMessageJsonRpc.call);
+      assert.notCalled(fakePostMessageJsonRpc.notify);
     });
 
     it('uses annotation created date as `date` for `create` events', () => {
@@ -109,7 +116,7 @@ describe('AnnotationActivityService', () => {
 
       svc.reportActivity('create', annotation);
 
-      const data = fakePostMessageJsonRpc.call.getCall(0).args[3][1];
+      const data = fakePostMessageJsonRpc.notify.getCall(0).args[3][1];
 
       assert.equal(data.date, new Date(annotation.created).toISOString());
     });
@@ -120,7 +127,7 @@ describe('AnnotationActivityService', () => {
 
       svc.reportActivity('update', annotation);
 
-      const data = fakePostMessageJsonRpc.call.getCall(0).args[3][1];
+      const data = fakePostMessageJsonRpc.notify.getCall(0).args[3][1];
 
       assert.equal(data.date, new Date(annotation.updated).toISOString());
     });
@@ -145,7 +152,7 @@ describe('AnnotationActivityService', () => {
 
         svc.reportActivity('delete', annotation);
 
-        const data = fakePostMessageJsonRpc.call.getCall(0).args[3][1];
+        const data = fakePostMessageJsonRpc.notify.getCall(0).args[3][1];
         assert.equal(data.date, now.toISOString());
       });
     });
