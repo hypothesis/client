@@ -78,9 +78,9 @@ class TermFilter {
  *
  * @implements {Filter}
  */
-class BinaryOpFilter {
+class BooleanOpFilter {
   /**
-   * @param {'and'|'or'} op - Binary operator
+   * @param {'and'|'or'} op - Boolean operator
    * @param {Filter[]} filters - Array of filters to test against
    */
   constructor(op, filters) {
@@ -175,7 +175,7 @@ export function filterAnnotations(annotations, filters) {
         const anyFields = ['quote', 'text', 'tag', 'user'];
         termFilters = filter.terms.map(
           term =>
-            new BinaryOpFilter(
+            new BooleanOpFilter(
               'or',
               anyFields.map(field => makeTermFilter(field, term))
             )
@@ -183,10 +183,10 @@ export function filterAnnotations(annotations, filters) {
       } else {
         termFilters = filter.terms.map(term => makeTermFilter(field, term));
       }
-      return new BinaryOpFilter(filter.operator, termFilters);
+      return new BooleanOpFilter(filter.operator, termFilters);
     });
 
-  const rootFilter = new BinaryOpFilter('and', fieldFilters);
+  const rootFilter = new BooleanOpFilter('and', fieldFilters);
 
   return annotations
     .filter(ann => {
