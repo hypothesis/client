@@ -98,3 +98,21 @@ export function call(
       throw err;
     });
 }
+
+/**
+ * Send a JSON-RPC 2.0 notification request to another frame via `postMessage`.
+ * No response is expected.
+ *
+ * @param {Window} frame - Frame to send call to
+ * @param {string} origin - Origin filter for `window.postMessage` call
+ * @param {string} method - Name of the JSON-RPC method
+ * @param {unknown[]} params - Parameters of the JSON-RPC method
+ */
+export function notify(frame, origin, method, params = []) {
+  const request = {
+    jsonrpc: '2.0',
+    method,
+    params,
+  };
+  frame.postMessage(request, origin);
+}

@@ -1,6 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
-import { call, $imports } from '../postmessage-json-rpc';
+import { call, notify, $imports } from '../postmessage-json-rpc';
 
 class FakeWindow {
   constructor() {
@@ -13,6 +13,25 @@ class FakeWindow {
 describe('sidebar/util/postmessage-json-rpc', () => {
   const origin = 'https://embedder.com';
   const messageId = 42;
+
+  describe('notify', () => {
+    let frame;
+
+    beforeEach(() => {
+      frame = { postMessage: sinon.stub() };
+    });
+
+    it('should send a JSON-RPC 2.0 notification to the frame', () => {
+      notify(frame, origin, 'testMethod', [1, 2, 3]);
+
+      assert.calledOnce(frame.postMessage);
+      assert.calledWith(frame.postMessage, {
+        jsonrpc: '2.0',
+        method: 'testMethod',
+        params: [1, 2, 3],
+      });
+    });
+  });
 
   describe('call', () => {
     let frame;
