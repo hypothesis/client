@@ -80,11 +80,17 @@ describe('sidebar/helpers/view-filter', () => {
 
   describe('"any" field', () => {
     it('finds matches in any field', () => {
+      const defaultFields = {
+        text: '',
+        tags: [],
+        uri: 'https://example.com',
+        target: [{}],
+      };
       const annotations = [
-        { id: 1, text: poem.tiger, target: [{}] },
-        { id: 4, user: 'lion', target: [{}] },
-        { id: 2, user: 'Tyger', target: [{}] },
-        { id: 3, tags: ['Tyger'], target: [{}] },
+        { id: 1, ...defaultFields, text: poem.tiger },
+        { id: 4, ...defaultFields, user: 'lion' },
+        { id: 2, ...defaultFields, user: 'Tyger' },
+        { id: 3, ...defaultFields, tags: ['Tyger'] },
       ];
       const filters = { any: { terms: ['Tyger'], operator: 'and' } };
 
@@ -187,6 +193,12 @@ describe('sidebar/helpers/view-filter', () => {
       assert.deepEqual(result, [anns[1].id, anns[2].id, anns[3].id]);
     });
 
+    it('matches username and display name independently', () => {
+      const anns = [annotationWithUser('dean31', 'James Dean')];
+      const result = filterAnnotations(anns, userQuery('dean31 james'));
+      assert.equal(result.length, 0);
+    });
+
     it('ignores display name if not set', () => {
       const anns = [annotationWithUser('msmith')];
       const result = filterAnnotations(anns, userQuery('null'));
@@ -231,6 +243,8 @@ describe('sidebar/helpers/view-filter', () => {
       id: 1,
       tags: ['foo'],
       target: [{}],
+      text: '',
+      url: 'https://example.com',
     };
     const filters = {
       any: {
