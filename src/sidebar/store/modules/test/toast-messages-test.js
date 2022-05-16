@@ -11,6 +11,7 @@ describe('store/modules/toast-messages', () => {
       id: 'myToast',
       type: 'anyType',
       message: 'This is a message',
+      visuallyHidden: false,
     };
   });
 
@@ -27,6 +28,7 @@ describe('store/modules/toast-messages', () => {
         assert.equal(messages[0].id, 'myToast');
         assert.equal(messages[0].type, 'anyType');
         assert.equal(messages[0].message, 'This is a message');
+        assert.isFalse(messages[0].visuallyHidden);
       });
 
       it('adds duplicate messages to the array of messages in state', () => {

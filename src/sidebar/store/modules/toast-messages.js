@@ -7,6 +7,7 @@ import { createStoreModule, makeAction } from '../create-store';
  * @prop {string} message
  * @prop {string} moreInfoURL
  * @prop {boolean} isDismissed
+ * @prop {boolean} visuallyHidden
  */
 
 /**

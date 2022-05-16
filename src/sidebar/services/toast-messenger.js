@@ -11,6 +11,8 @@ const MESSAGE_DISMISS_DELAY = 500;
  * @typedef MessageOptions
  * @prop {boolean} [autoDismiss=true] - Whether the toast message automatically disappears.
  * @prop {string} [moreInfoURL=''] - Optional URL for users to visit for "more info"
+ * @prop {boolean} [visuallyHidden=false] - When `true`, message will be visually
+ *   hidden but still available to screen readers.
  */
 
 /**
@@ -58,7 +60,7 @@ export class ToastMessengerService {
   _addMessage(
     type,
     messageText,
-    { autoDismiss = true, moreInfoURL = '' } = {}
+    { autoDismiss = true, moreInfoURL = '', visuallyHidden = false } = {}
   ) {
     // Do not add duplicate messages (messages with the same type and text)
     if (this._store.hasToastMessage(type, messageText)) {
@@ -66,7 +68,13 @@ export class ToastMessengerService {
     }
 
     const id = generateHexString(10);
-    const message = { type, id, message: messageText, moreInfoURL };
+    const message = {
+      type,
+      id,
+      message: messageText,
+      moreInfoURL,
+      visuallyHidden,
+    };
 
     this._store.addToastMessage({
       isDismissed: false,
