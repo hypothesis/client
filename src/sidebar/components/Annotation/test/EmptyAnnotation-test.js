@@ -74,15 +74,6 @@ describe('EmptyAnnotation', () => {
         'Reply with unavailable content'
       );
     });
-
-    it('should not render a message if collapsed reply', () => {
-      const wrapper = createComponent({
-        isReply: true,
-        threadIsCollapsed: true,
-      });
-
-      assert.equal(wrapper.text(), '');
-    });
   });
 
   it(
