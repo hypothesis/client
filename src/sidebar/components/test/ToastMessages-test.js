@@ -90,6 +90,17 @@ describe('ToastMessages', () => {
       assert.calledOnce(fakeToastMessenger.dismiss);
     });
 
+    it('should set a screen-reader-only class on `visuallyHidden` messages', () => {
+      const message = fakeSuccessMessage();
+      message.visuallyHidden = true;
+      fakeStore.getToastMessages.returns([message]);
+
+      const wrapper = createComponent();
+
+      const messageContainer = wrapper.find('ToastMessage').getDOMNode();
+      assert.include(messageContainer.className, 'sr-only');
+    });
+
     it('should not dismiss the message if a "More info" link is clicked', () => {
       fakeStore.getToastMessages.returns([fakeNoticeMessage()]);
 

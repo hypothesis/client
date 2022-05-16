@@ -16,7 +16,9 @@ import { withServices } from '../service-context';
 
 /**
  * An individual toast message: a brief and transient success or error message.
- * The message may be dismissed by clicking on it.
+ * The message may be dismissed by clicking on it. `visuallyHidden` toast
+ * messages will not be visible but are still available to screen readers.
+ *
  * Otherwise, the `toastMessenger` service handles removing messages after a
  * certain amount of time.
  *
@@ -42,6 +44,7 @@ function ToastMessage({ message, onDismiss }) {
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
     <Card
       classes={classnames('p-0 flex border', {
+        'sr-only': message.visuallyHidden,
         'border-red-error': message.type === 'error',
         'border-yellow-notice': message.type === 'notice',
         'border-green-success': message.type === 'success',
