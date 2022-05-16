@@ -18,7 +18,6 @@ export default function EmptyAnnotation({
   threadIsCollapsed,
   onToggleReplies,
 }) {
-  const isCollapsedReply = isReply && threadIsCollapsed;
   return (
     <article
       className="space-y-4"
@@ -26,11 +25,9 @@ export default function EmptyAnnotation({
         isReply ? 'Reply' : 'Annotation'
       } with unavailable content`}
     >
-      {!isCollapsedReply && (
-        <div>
-          <em>Message not available.</em>
-        </div>
-      )}
+      <div>
+        <em>Message not available.</em>
+      </div>
       {onToggleReplies && (
         <footer className="flex items-center">
           <AnnotationReplyToggle
