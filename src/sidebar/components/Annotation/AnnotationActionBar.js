@@ -2,6 +2,7 @@ import { IconButton } from '@hypothesis/frontend-shared';
 
 import { confirm } from '../../../shared/prompts';
 import { serviceConfig } from '../../config/service-config';
+import { annotationRole } from '../../helpers/annotation-metadata';
 import {
   sharingEnabled,
   annotationSharingLink,
@@ -72,15 +73,17 @@ function AnnotationActionBar({
     sharingEnabled(settings) && annotationSharingLink(annotation);
 
   const onDelete = async () => {
+    const annType = annotationRole(annotation);
     if (
       await confirm({
-        title: 'Delete annotation?',
-        message: 'Are you sure you want to delete this annotation?',
+        title: `Delete ${annType.toLowerCase()}?`,
+        message: `Are you sure you want to delete this ${annType.toLowerCase()}?`,
         confirmAction: 'Delete',
       })
     ) {
       try {
         await annotationsService.delete(annotation);
+        toastMessenger.success(`${annType} deleted`, { visuallyHidden: true });
       } catch (err) {
         toastMessenger.error(err.message);
       }
