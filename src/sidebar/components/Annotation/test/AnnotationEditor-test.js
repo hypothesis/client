@@ -52,6 +52,7 @@ describe('AnnotationEditor', () => {
     };
     fakeToastMessenger = {
       error: sinon.stub(),
+      success: sinon.stub(),
     };
 
     fakeStore = {
@@ -163,6 +164,20 @@ describe('AnnotationEditor', () => {
 
       assert.calledOnce(fakeAnnotationsService.save);
       assert.calledWith(fakeAnnotationsService.save, annotation);
+    });
+
+    it('shows a visually-hidden toast message on success', async () => {
+      const annotation = fixtures.defaultAnnotation();
+      const wrapper = createComponent({ annotation });
+
+      await wrapper.find('AnnotationPublishControl').props().onSave();
+
+      await waitFor(() => fakeToastMessenger.success.called);
+      // The defaultAnnotation() fixture evaluates as a previously-saved
+      // highlight because it lacks selectors
+      assert.calledWith(fakeToastMessenger.success, 'Highlight updated', {
+        visuallyHidden: true,
+      });
     });
 
     it('checks for unsaved tags on save', async () => {
