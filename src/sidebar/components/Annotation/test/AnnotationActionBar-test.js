@@ -68,6 +68,7 @@ describe('AnnotationActionBar', () => {
 
     fakeToastMessenger = {
       error: sinon.stub(),
+      success: sinon.stub(),
     };
 
     fakeOnReply = sinon.stub();
@@ -167,6 +168,23 @@ describe('AnnotationActionBar', () => {
       });
 
       assert.calledWith(fakeAnnotationsService.delete, fakeAnnotation);
+    });
+
+    it('sets a visually-hidden message when deletion succeeds', async () => {
+      allowOnly('delete');
+      fakeConfirm.resolves(true);
+      const button = getButton(createComponent(), 'trash');
+
+      await act(async () => {
+        await button.props().onClick();
+      });
+
+      await waitFor(() => fakeToastMessenger.success.called);
+      // Annotation fixture used evaluates as a highlight because it is missing
+      // selectors
+      assert.calledWith(fakeToastMessenger.success, 'Highlight deleted', {
+        visuallyHidden: true,
+      });
     });
 
     it('sets a flash message if there is an error with deletion', async () => {
