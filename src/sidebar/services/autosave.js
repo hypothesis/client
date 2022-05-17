@@ -8,10 +8,12 @@ import { retryPromiseOperation } from '../util/retry';
 export class AutosaveService {
   /**
    * @param {import('./annotations').AnnotationsService} annotationsService
+   * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
    * @param {import('../store').SidebarStore} store
    */
-  constructor(annotationsService, store) {
+  constructor(annotationsService, toastMessenger, store) {
     this._annotationsService = annotationsService;
+    this._toastMessenger = toastMessenger;
     this._store = store;
 
     // A set of annotation $tags that have save requests in-flight
@@ -55,6 +57,11 @@ export class AutosaveService {
         this._saving.add(htag);
 
         retryPromiseOperation(() => this._annotationsService.save(highlight))
+          .then(() => {
+            this._toastMessenger.success('Highlight saved', {
+              visuallyHidden: true,
+            });
+          })
           .catch(() => {
             // save failed after retries
             this._failed.add(htag);

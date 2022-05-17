@@ -9,12 +9,16 @@ describe('AutosaveService', () => {
   let fakeNewHighlights;
   let fakeRetryPromiseOperation;
   let fakeStore;
+  let fakeToastMessenger;
 
   beforeEach(() => {
     fakeAnnotationsService = { save: sinon.stub().resolves() };
     fakeNewHighlights = sinon.stub().returns([]);
     fakeRetryPromiseOperation = sinon.stub().callsFake(callback => callback());
     fakeStore = fakeReduxStore({}, { newHighlights: fakeNewHighlights });
+    fakeToastMessenger = {
+      success: sinon.stub(),
+    };
 
     $imports.$mock({
       '../util/retry': {
@@ -34,7 +38,7 @@ describe('AutosaveService', () => {
   };
 
   const createService = () =>
-    new AutosaveService(fakeAnnotationsService, fakeStore);
+    new AutosaveService(fakeAnnotationsService, fakeToastMessenger, fakeStore);
 
   afterEach(() => {
     $imports.$restore();
@@ -58,6 +62,20 @@ describe('AutosaveService', () => {
 
     assert.calledOnce(fakeAnnotationsService.save);
     assert.calledWith(fakeAnnotationsService.save, newHighlight);
+  });
+
+  it('should announce saved highlight via toast messenger service', async () => {
+    const svc = createService();
+    svc.init();
+    oneNewHighlight();
+
+    fakeStore.setState({});
+    await waitFor(() => !svc.isSaving());
+
+    assert.calledOnce(fakeToastMessenger.success);
+    assert.calledWith(fakeToastMessenger.success, 'Highlight saved', {
+      visuallyHidden: true,
+    });
   });
 
   it('should not try to save a highlight that is already being saved', () => {
