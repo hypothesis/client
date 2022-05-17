@@ -2,7 +2,11 @@ import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useCallback, useState } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
-import { isReply, isSaved } from '../../helpers/annotation-metadata';
+import {
+  annotationRole,
+  isReply,
+  isSaved,
+} from '../../helpers/annotation-metadata';
 import { applyTheme } from '../../helpers/theme';
 import { useSidebarStore } from '../../store';
 
@@ -139,8 +143,12 @@ function AnnotationEditor({
     if (pendingTag) {
       onAddTag(pendingTag);
     }
+    const successMessage = `${annotationRole(annotation)} ${
+      isSaved(annotation) ? 'updated' : 'saved'
+    }`;
     try {
       await annotationsService.save(annotation);
+      toastMessenger.success(successMessage, { visuallyHidden: true });
     } catch (err) {
       toastMessenger.error('Saving annotation failed');
     }
