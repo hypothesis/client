@@ -117,13 +117,20 @@ function ToastMessages({ toastMessenger }) {
       <ul
         aria-live="polite"
         aria-relevant="additions"
-        className="absolute z-2 left-0 w-full space-y-2"
+        className="absolute z-2 left-0 w-full"
       >
         {messages.map(message => (
           <li
             className={classnames(
               'relative w-full container hover:cursor-pointer',
               {
+                // Add a bottom margin to visible messages only. Typically we'd
+                // use a `space-y-2` class on the parent to space children.
+                // Doing that here could cause an undesired top margin on
+                // the first visible message in a list that contains (only)
+                // visually-hidden messages before it.
+                // See https://tailwindcss.com/docs/space#limitations
+                'mb-2': !message.visuallyHidden,
                 // Slide in from right in narrow viewports; fade in in
                 // larger viewports to toast message isn't flying too far
                 'motion-safe:animate-slide-in-from-right lg:animate-fade-in':
