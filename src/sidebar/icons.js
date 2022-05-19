@@ -56,8 +56,7 @@ import expandMenuIcon from '../images/icons/expand-menu.svg';
 import pointerIcon from '../images/icons/pointer.svg';
 
 /**
- * Set of icons used by the sidebar application via the `SvgIcon`
- * component.
+ * Set of icons used by the sidebar application
  */
 export const sidebarIcons = {
   add: plus,
