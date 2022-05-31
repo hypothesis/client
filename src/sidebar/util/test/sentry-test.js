@@ -164,7 +164,7 @@ describe('sidebar/util/sentry', () => {
     it('extracts metadata from thrown `Event`s', () => {
       sentry.init({ dsn: 'test-dsn' });
       const beforeSend = getBeforeSendHook();
-      const event = { extra: {} };
+      const event = {};
 
       beforeSend(event, {
         originalException: new CustomEvent('unexpectedevent', {
@@ -184,7 +184,7 @@ describe('sidebar/util/sentry', () => {
     it('ignores errors serializing non-Error exception values', () => {
       sentry.init({ dsn: 'test-dsn' });
       const beforeSend = getBeforeSendHook();
-      const event = { extra: {} };
+      const event = {};
       const originalException = new CustomEvent('unexpectedevent');
       Object.defineProperty(originalException, 'detail', {
         get: () => {

@@ -88,6 +88,9 @@ export function init(config) {
       try {
         const originalErr = hint && hint.originalException;
         if (originalErr instanceof Event) {
+          if (!event.extra) {
+            event.extra = {};
+          }
           Object.assign(event.extra, {
             type: originalErr.type,
             // @ts-ignore - `detail` is a property of certain event types.
