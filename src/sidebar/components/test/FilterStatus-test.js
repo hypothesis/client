@@ -3,17 +3,6 @@ import { mount } from 'enzyme';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import FilterStatus, { $imports } from '../FilterStatus';
 
-function getFilterState() {
-  return {
-    filterQuery: null,
-    focusActive: false,
-    focusConfigured: false,
-    focusDisplayName: null,
-    forcedVisibleCount: 0,
-    selectedCount: 0,
-  };
-}
-
 function getFocusState() {
   return {
     active: false,
@@ -40,7 +29,6 @@ describe('FilterStatus', () => {
       clearSelection: sinon.stub(),
       directLinkedAnnotationId: sinon.stub(),
       filterQuery: sinon.stub().returns(null),
-      filterState: sinon.stub().returns(getFilterState()),
       focusState: sinon.stub().returns(getFocusState()),
       forcedVisibleThreads: sinon.stub().returns([]),
       isLoading: sinon.stub().returns(false),
@@ -59,7 +47,7 @@ describe('FilterStatus', () => {
   });
 
   function assertFilterText(wrapper, text) {
-    const filterText = wrapper.find('[data-testid="filter-text"]').text();
+    const filterText = wrapper.find('[role="status"]').text();
     assert.equal(filterText, text);
   }
 
@@ -91,9 +79,12 @@ describe('FilterStatus', () => {
   });
 
   context('(State 1): no search filters active', () => {
-    it('should return null if filter state indicates no active filters', () => {
+    it('should render hidden but available to screen readers', () => {
       const wrapper = createComponent();
-      assert.equal(wrapper.children().length, 0);
+      const containerEl = wrapper.find('Card').getDOMNode();
+
+      assert.include(containerEl.className, 'sr-only');
+      assertFilterText(wrapper, '');
     });
   });
 
