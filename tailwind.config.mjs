@@ -50,11 +50,13 @@ export default {
       },
       // Content in the sidebar should never exceed a max-width of `768px`, and
       // that content should be auto-centered
+      // See https://tailwindcss.com/docs/container
       container: {
         center: true,
         // Horizontal padding is larger for wider screens
         padding: {
-          DEFAULT: '0.5rem',
+          // Precise horizontal padding for annotation-card alignment
+          DEFAULT: '9px',
           lg: '4rem',
         },
         // By default, tailwind will provide appropriately-sized containers at

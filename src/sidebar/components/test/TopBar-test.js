@@ -35,10 +35,6 @@ describe('TopBar', () => {
 
     $imports.$mock(mockImportedComponents());
 
-    // SidebarContent is a presentational-only component without its own tests
-    $imports.$restore({
-      './SidebarContent': true,
-    });
     $imports.$mock({
       '../store': { useSidebarStore: () => fakeStore },
       '../helpers/is-third-party-service': {
