@@ -1,13 +1,13 @@
 Hypothesis client
 =================
 
-[![Continuous integration](https://github.com/hypothesis/client/workflows/Continuous%20integration/badge.svg?branch=master)][gha]
+[![Continuous integration](https://github.com/hypothesis/client/workflows/Continuous%20integration/badge.svg?branch=main)][gha]
 [![npm version](https://img.shields.io/npm/v/hypothesis.svg)][npm]
 [![BSD licensed](https://img.shields.io/badge/license-BSD-blue.svg)][license]
 
-[gha]: https://github.com/hypothesis/client/actions?query=branch%3Amaster
+[gha]: https://github.com/hypothesis/client/actions?query=branch%3Amain
 [npm]: https://www.npmjs.com/package/hypothesis
-[license]: https://github.com/hypothesis/client/blob/master/LICENSE
+[license]: https://github.com/hypothesis/client/blob/main/LICENSE
 
 The Hypothesis client is a browser-based tool for making annotations on web
 pages. It’s a client for the [Hypothesis web annotation service][service].
@@ -42,7 +42,7 @@ Please note that this project is released with a [Contributor Code of
 Conduct][coc]. By participating in this project you agree to abide by its terms.
 
 [ml]: https://groups.google.com/a/list.hypothes.is/g/dev
-[coc]: https://github.com/hypothesis/client/blob/master/CODE_OF_CONDUCT
+[coc]: https://github.com/hypothesis/client/blob/main/CODE_OF_CONDUCT
 
 License
 -------
@@ -53,4 +53,4 @@ components are included. They are subject to their own licenses. All of the
 license information can be found in the included [LICENSE][license] file.
 
 [bsd2c]: http://www.opensource.org/licenses/BSD-2-Clause
-[license]: https://github.com/hypothesis/client/blob/master/LICENSE
+[license]: https://github.com/hypothesis/client/blob/main/LICENSE

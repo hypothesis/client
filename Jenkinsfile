@@ -23,7 +23,7 @@ node {
     npmTag = "latest"
 
     // Git branch which releases are deployed from.
-    releaseFromBranch = "master"
+    releaseFromBranch = "main"
 
     // S3 bucket where the embedded client is served from.
     s3Bucket = "cdn.hypothes.is"
@@ -231,7 +231,7 @@ stage('Publish') {
 
 milestone()
 stage('Update browser extension') {
-    build(job: 'browser-extension/master',
+    build(job: 'browser-extension/main',
           parameters: [
                string(name: 'BUILD_TYPE', value: 'update-hypothesis-client')
           ])
