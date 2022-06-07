@@ -71,7 +71,7 @@
     "karma-mocha-reporter": "^2.0.4",
     "karma-sinon": "^1.0.5",
     "karma-source-map-support": "^1.4.0",
-    "katex": "^0.15.1",
+    "katex": "^0.16.0",
     "lodash.debounce": "^4.0.3",
     "mocha": "10.0.0",
     "mustache": "^4.0.1",
