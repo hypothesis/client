@@ -19,7 +19,7 @@
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-virtual": "^2.0.3",
-    "@sentry/browser": "^6.0.2",
+    "@sentry/browser": "^7.1.1",
     "@sentry/cli": "^2.0.2",
     "@types/dompurify": "^2.3.3",
     "@types/escape-html": "^1.0.1",
