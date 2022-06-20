@@ -230,7 +230,7 @@ export default function MenuItem({
   );
 
   const wrapperClasses = classnames(
-    'u-outline-on-keyboard-focus--inset',
+    'focus-visible-ring ring-inset',
     'w-full min-w-[150px] flex items-center select-none',
     'border-b',
     // Set this container as a "group" so that children may style based on its

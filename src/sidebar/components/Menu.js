@@ -174,7 +174,7 @@ export default function Menu({
         aria-expanded={isOpen ? 'true' : 'false'}
         aria-haspopup={true}
         className={classnames(
-          'u-outline-on-keyboard-focus',
+          'focus-visible-ring',
           'flex items-center justify-center rounded-sm transition-colors',
           {
             'text-grey-7 hover:text-grey-9': !isOpen,
@@ -215,7 +215,7 @@ export default function Menu({
           />
           <div
             className={classnames(
-              'u-outline-on-keyboard-focus',
+              'focus-visible-ring',
               // Position menu content near bottom of menu label/toggle control
               'absolute top-[calc(100%+5px)] z-1 border shadow',
               'bg-white text-lg',
