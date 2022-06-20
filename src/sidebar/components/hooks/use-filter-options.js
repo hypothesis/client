@@ -17,6 +17,8 @@ export function useUserFilterOptions() {
   const annotations = store.allAnnotations();
   const focusFilters = store.getFocusFilters();
   const currentUsername = username(store.profile().userid);
+  const defaultAuthority = store.defaultAuthority();
+  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
 
   return useMemo(() => {
     // Determine unique users (authors) in annotation collection
@@ -24,7 +26,11 @@ export function useUserFilterOptions() {
     const users = {};
     annotations.forEach(annotation => {
       const username_ = username(annotation.user);
-      users[username_] = annotationDisplayName(annotation, store);
+      users[username_] = annotationDisplayName(
+        annotation,
+        defaultAuthority,
+        displayNamesEnabled
+      );
     });
 
     // If user-focus is configured (even if not applied) add a filter
@@ -57,5 +63,11 @@ export function useUserFilterOptions() {
     });
 
     return userOptions;
-  }, [annotations, currentUsername, focusFilters.user, store]);
+  }, [
+    annotations,
+    currentUsername,
+    defaultAuthority,
+    displayNamesEnabled,
+    focusFilters.user,
+  ]);
 }

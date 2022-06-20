@@ -1,26 +1,15 @@
 import {
   annotationDisplayName,
   annotationAuthorLink,
-  annotationAuthorInfo,
   $imports,
 } from '../annotation-user';
 
 describe('sidebar/helpers/annotation-user', () => {
   let fakeAccountId;
   let fakeSettings;
-  let fakeStore;
 
   beforeEach(() => {
     fakeSettings = { usernameUrl: 'http://foo.bar/' };
-
-    fakeStore = {
-      defaultAuthority: sinon.stub().returns('foo.com'),
-      isFeatureEnabled: sinon.stub().returns(false),
-      getLink: sinon
-        .stub()
-        .withArgs('user')
-        .returns('http://www.example.com/user/'),
-    };
 
     fakeAccountId = {
       isThirdPartyUser: sinon.stub().returns(false),
@@ -63,11 +52,8 @@ describe('sidebar/helpers/annotation-user', () => {
         },
       ].forEach(testcase => {
         it('should return author username if display-names feature flag is not enabled', () => {
-          fakeStore.isFeatureEnabled
-            .withArgs('client_display_names')
-            .returns(false);
           assert.equal(
-            annotationDisplayName(testcase.annotation, fakeStore),
+            annotationDisplayName(testcase.annotation, 'firstparty.com', false),
             testcase.expected
           );
         });
@@ -88,11 +74,8 @@ describe('sidebar/helpers/annotation-user', () => {
         },
       ].forEach(testcase => {
         it('should return author display name when available if display-names feature flag is enabled', () => {
-          fakeStore.isFeatureEnabled
-            .withArgs('client_display_names')
-            .returns(true);
           assert.equal(
-            annotationDisplayName(testcase.annotation, fakeStore),
+            annotationDisplayName(testcase.annotation, 'firstparty.com', true),
             testcase.expected
           );
         });
@@ -116,8 +99,10 @@ describe('sidebar/helpers/annotation-user', () => {
       ].forEach(testcase => {
         it('should return author display name if available', () => {
           fakeAccountId.isThirdPartyUser.returns(true);
+          // Third-party annotations always display display name (if available)
+          // even if feature-flag is not enabled
           assert.equal(
-            annotationDisplayName(testcase.annotation, fakeStore),
+            annotationDisplayName(testcase.annotation, 'thirdparty.com', false),
             testcase.expected
           );
         });
@@ -131,8 +116,9 @@ describe('sidebar/helpers/annotation-user', () => {
       assert.equal(
         annotationAuthorLink(
           fakeAnnotations.withDisplayName,
-          fakeStore,
-          fakeSettings
+          fakeSettings,
+          'firstparty.com',
+          'http://www.example.com/user/'
         ),
         'http://www.example.com/user/'
       );
@@ -143,8 +129,9 @@ describe('sidebar/helpers/annotation-user', () => {
       assert.equal(
         annotationAuthorLink(
           fakeAnnotations.withDisplayName,
-          fakeStore,
-          fakeSettings
+          fakeSettings,
+          'thirdparty.com',
+          'http://www.example.com/user/'
         ),
         'http://foo.bar/albert'
       );
@@ -153,23 +140,12 @@ describe('sidebar/helpers/annotation-user', () => {
     it('should not return a URL for third-party users if not configured with `usernameUrl`', () => {
       fakeAccountId.isThirdPartyUser.returns(true);
       assert.isUndefined(
-        annotationAuthorLink(fakeAnnotations.withDisplayName, fakeStore, {})
-      );
-    });
-  });
-
-  describe('annotationAuthorInfo', () => {
-    it('should return both a display name and a link for annotation author', () => {
-      assert.deepEqual(
-        annotationAuthorInfo(
+        annotationAuthorLink(
           fakeAnnotations.withDisplayName,
-          fakeStore,
-          fakeSettings
-        ),
-        {
-          authorDisplayName: 'albert',
-          authorLink: 'http://www.example.com/user/',
-        }
+          {},
+          'thirdparty.com',
+          'http://www.example.com/user/'
+        )
       );
     });
   });
