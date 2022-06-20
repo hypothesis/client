@@ -79,7 +79,7 @@
     "npm-packlist": "^5.0.0",
     "postcss": "^8.0.3",
     "preact": "^10.4.0",
-    "prettier": "2.6.2",
+    "prettier": "2.7.1",
     "puppeteer": "^14.1.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.1.0",
