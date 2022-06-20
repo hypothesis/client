@@ -54,8 +54,13 @@ describe('Annotation', () => {
     };
 
     fakeStore = {
+      defaultAuthority: sinon.stub().returns('example.com'),
       getDraft: sinon.stub().returns(null),
       isAnnotationFocused: sinon.stub().returns(false),
+      isFeatureEnabled: sinon
+        .stub()
+        .withArgs('client_display_names')
+        .returns(true),
       isSavingAnnotation: sinon.stub().returns(false),
       profile: sinon.stub().returns({ userid: 'acct:foo@bar.com' }),
       setExpanded: sinon.stub(),

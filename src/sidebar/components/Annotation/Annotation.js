@@ -85,6 +85,9 @@ function Annotation({
 
   const showActions = !isSaving && !isEditing && isSaved(annotation);
 
+  const defaultAuthority = store.defaultAuthority();
+  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
+
   const onReply = () => {
     if (isSaved(annotation) && userid) {
       annotationsService.reply(annotation, userid);
@@ -92,8 +95,9 @@ function Annotation({
   };
 
   const authorName = useMemo(
-    () => annotationDisplayName(annotation, store),
-    [annotation, store]
+    () =>
+      annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled),
+    [annotation, defaultAuthority, displayNamesEnabled]
   );
 
   return (

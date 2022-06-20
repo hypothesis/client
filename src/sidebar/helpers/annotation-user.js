@@ -1,10 +1,10 @@
 /**
  * @typedef {import("../../types/api").Annotation} Annotation
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../store').SidebarStore} SidebarStore
  */
 
 import { isThirdPartyUser, username } from './account-id';
+
 /**
  * What string should we use to represent the author (user) of a given
  * annotation: a display name or a username?
@@ -18,15 +18,17 @@ import { isThirdPartyUser, username } from './account-id';
  * username or the display name.
  *
  * @param {Pick<Annotation, 'user'|'user_info'>} annotation
- * @param {SidebarStore} store
+ * @param {string} defaultAuthority
+ * @param {boolean} displayNamesEnabled
  *
  * @return {string}
  */
-export function annotationDisplayName(annotation, store) {
-  const defaultAuthority = store.defaultAuthority();
+export function annotationDisplayName(
+  annotation,
+  defaultAuthority,
+  displayNamesEnabled
+) {
   const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
-
-  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
 
   const useDisplayName = displayNamesEnabled || isThirdParty;
   return useDisplayName && annotation.user_info?.display_name
@@ -40,15 +42,20 @@ export function annotationDisplayName(annotation, store) {
  * provided in `settings`.
  *
  * @param {Pick<Annotation, 'user'>} annotation
- * @param {SidebarStore} store
  * @param {SidebarSettings} settings
+ * @param {string} defaultAuthority
+ * @param {string} [userLink]
  */
-export function annotationAuthorLink(annotation, store, settings) {
-  const defaultAuthority = store.defaultAuthority();
+export function annotationAuthorLink(
+  annotation,
+  settings,
+  defaultAuthority,
+  userLink
+) {
   const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
 
-  if (!isThirdParty) {
-    return store.getLink('user', { user: annotation.user });
+  if (!isThirdParty && userLink) {
+    return userLink;
   }
 
   return (
@@ -56,18 +63,4 @@ export function annotationAuthorLink(annotation, store, settings) {
       `${settings.usernameUrl}${username(annotation.user)}`) ??
     undefined
   );
-}
-
-/**
- * Retrieve both author display name and link.
- *
- * @param {Pick<Annotation, 'user'|'user_info'>} annotation
- * @param {SidebarStore} store
- * @param {SidebarSettings} settings
- */
-export function annotationAuthorInfo(annotation, store, settings) {
-  return {
-    authorDisplayName: annotationDisplayName(annotation, store),
-    authorLink: annotationAuthorLink(annotation, store, settings),
-  };
 }

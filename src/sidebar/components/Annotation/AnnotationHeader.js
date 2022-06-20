@@ -9,7 +9,10 @@ import {
   isReply,
   hasBeenEdited,
 } from '../../helpers/annotation-metadata';
-import { annotationAuthorInfo } from '../../helpers/annotation-user';
+import {
+  annotationAuthorLink,
+  annotationDisplayName,
+} from '../../helpers/annotation-user';
 import { isPrivate } from '../../helpers/permissions';
 
 import AnnotationDocumentInfo from './AnnotationDocumentInfo';
@@ -57,9 +60,19 @@ function AnnotationHeader({
 }) {
   const store = useSidebarStore();
 
-  const { authorDisplayName, authorLink } = useMemo(
-    () => annotationAuthorInfo(annotation, store, settings),
-    [annotation, store, settings]
+  const defaultAuthority = store.defaultAuthority();
+  const displayNamesEnabled = store.isFeatureEnabled('client_display_names');
+  const userURL = store.getLink('user', { user: annotation.user });
+
+  const authorName = useMemo(
+    () =>
+      annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled),
+    [annotation, defaultAuthority, displayNamesEnabled]
+  );
+
+  const authorLink = useMemo(
+    () => annotationAuthorLink(annotation, settings, defaultAuthority, userURL),
+    [annotation, settings, defaultAuthority, userURL]
   );
 
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;
@@ -109,10 +122,7 @@ function AnnotationHeader({
             title="This annotation is visible only to you"
           />
         )}
-        <AnnotationUser
-          authorLink={authorLink}
-          displayName={authorDisplayName}
-        />
+        <AnnotationUser authorLink={authorLink} displayName={authorName} />
         {replyCount > 0 && isCollapsedReply && (
           <LinkButton onClick={onReplyCountClick} title="Expand replies">
             {`${replyCount} ${replyCount > 1 ? 'replies' : 'reply'}`}

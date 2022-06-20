@@ -51,7 +51,12 @@ describe('sidebar/components/hooks/use-user-filter-options', () => {
 
     fakeStore = {
       allAnnotations: sinon.stub().returns([]),
+      defaultAuthority: sinon.stub().returns('example.com'),
       getFocusFilters: sinon.stub().returns({}),
+      isFeatureEnabled: sinon
+        .stub()
+        .withArgs('client_display_names')
+        .returns(true),
       profile: sinon.stub().returns({}),
     };
 

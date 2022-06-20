@@ -8,7 +8,8 @@ import { mockImportedComponents } from '../../../../test-util/mock-imported-comp
 import AnnotationHeader, { $imports } from '../AnnotationHeader';
 
 describe('AnnotationHeader', () => {
-  let fakeAnnotationAuthorInfo;
+  let fakeAnnotationAuthorLink;
+  let fakeAnnotationDisplayName;
   let fakeDomainAndTitle;
   let fakeGroup;
   let fakeIsHighlight;
@@ -32,6 +33,10 @@ describe('AnnotationHeader', () => {
   };
 
   beforeEach(() => {
+    fakeAnnotationAuthorLink = sinon
+      .stub()
+      .returns('http://www.example.com/user/');
+    fakeAnnotationDisplayName = sinon.stub().returns('Wackford Squeers');
     fakeDomainAndTitle = sinon.stub().returns({});
     fakeGroup = {
       name: 'My Group',
@@ -45,15 +50,19 @@ describe('AnnotationHeader', () => {
     fakeHasBeenEdited = sinon.stub().returns(false);
     fakeIsPrivate = sinon.stub();
 
-    fakeAnnotationAuthorInfo = sinon.stub().returns({
-      authorDisplayName: 'Robbie Burns',
-      authorLink: 'http://www.example.com',
-    });
-
     fakeSettings = { usernameUrl: 'http://foo.bar/' };
 
     fakeStore = {
+      defaultAuthority: sinon.stub().returns('example.com'),
+      isFeatureEnabled: sinon
+        .stub()
+        .withArgs('client_display_names')
+        .returns(true),
       getGroup: sinon.stub().returns(fakeGroup),
+      getLink: sinon
+        .stub()
+        .withArgs('user')
+        .returns('http://www.example.com/user/'),
       route: sinon.stub().returns('sidebar'),
       setExpanded: sinon.stub(),
     };
@@ -68,7 +77,8 @@ describe('AnnotationHeader', () => {
         hasBeenEdited: fakeHasBeenEdited,
       },
       '../../helpers/annotation-user': {
-        annotationAuthorInfo: fakeAnnotationAuthorInfo,
+        annotationAuthorLink: fakeAnnotationAuthorLink,
+        annotationDisplayName: fakeAnnotationDisplayName,
       },
       '../../helpers/permissions': {
         isPrivate: fakeIsPrivate,
@@ -112,15 +122,12 @@ describe('AnnotationHeader', () => {
 
       assert.equal(
         wrapper.find('AnnotationUser').props().authorLink,
-        'http://www.example.com'
+        'http://www.example.com/user/'
       );
     });
 
     it('should not link to author if none provided', () => {
-      fakeAnnotationAuthorInfo.returns({
-        authorDisplayName: 'Robbie Burns',
-        authorLink: undefined,
-      });
+      fakeAnnotationAuthorLink.returns(undefined);
 
       const wrapper = createAnnotationHeader();
 
@@ -131,7 +138,7 @@ describe('AnnotationHeader', () => {
       const wrapper = createAnnotationHeader();
       assert.equal(
         wrapper.find('AnnotationUser').props().displayName,
-        'Robbie Burns'
+        'Wackford Squeers'
       );
     });
   });
