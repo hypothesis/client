@@ -3,7 +3,6 @@ import {
   IconButton,
   LabeledButton,
   Link,
-  normalizeKeyName,
 } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
@@ -394,7 +393,7 @@ export default function MarkdownEditor({
     }
 
     for (let [command, key] of Object.entries(SHORTCUT_KEYS)) {
-      if (key === normalizeKeyName(event.key)) {
+      if (key === event.key) {
         event.stopPropagation();
         event.preventDefault();
         handleCommand(/** @type {Command} */ (command));
