@@ -1,9 +1,5 @@
 import classnames from 'classnames';
-import {
-  Icon,
-  normalizeKeyName,
-  useElementShouldClose,
-} from '@hypothesis/frontend-shared';
+import { Icon, useElementShouldClose } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import MenuArrow from './MenuArrow';
@@ -137,7 +133,7 @@ export default function Menu({
   // It should also close if the user presses a key which activates menu items.
   /** @param {KeyboardEvent} event */
   const handleMenuKeyDown = event => {
-    const key = normalizeKeyName(event.key);
+    const key = event.key;
     if (key === 'Enter' || key === ' ') {
       // The browser will not open the link if the link element is removed
       // from within the keypress event that triggers it. Add a little

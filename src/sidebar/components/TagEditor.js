@@ -1,8 +1,4 @@
-import {
-  normalizeKeyName,
-  useElementShouldClose,
-  TextInput,
-} from '@hypothesis/frontend-shared';
+import { useElementShouldClose, TextInput } from '@hypothesis/frontend-shared';
 import { useRef, useState } from 'preact/hooks';
 
 import { withServices } from '../service-context';
@@ -172,7 +168,7 @@ function TagEditor({
    * @param {KeyboardEvent} e
    */
   const handleKeyDown = e => {
-    switch (normalizeKeyName(e.key)) {
+    switch (e.key) {
       case 'ArrowUp':
         // Select the previous item in the suggestion list
         changeSelectedItem(-1);

@@ -1,5 +1,5 @@
 import classnames from 'classnames';
-import { Icon, normalizeKeyName } from '@hypothesis/frontend-shared';
+import { Icon } from '@hypothesis/frontend-shared';
 import { useEffect, useRef } from 'preact/hooks';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
@@ -161,7 +161,7 @@ export default function MenuItem({
 
   /** @param {KeyboardEvent} event */
   const onKeyDown = event => {
-    switch (normalizeKeyName(event.key)) {
+    switch (event.key) {
       case 'ArrowRight':
         if (onToggleSubmenu) {
           event.stopPropagation();

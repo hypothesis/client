@@ -1,4 +1,3 @@
-import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useCallback, useState } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
@@ -165,7 +164,7 @@ function AnnotationEditor({
   // Allow saving of annotation by pressing CMD/CTRL-Enter
   /** @param {KeyboardEvent} event */
   const onKeyDown = event => {
-    const key = normalizeKeyName(event.key);
+    const key = event.key;
     if (isEmpty) {
       return;
     }

@@ -1,5 +1,3 @@
-import { normalizeKeyName } from '@hypothesis/frontend-shared';
-
 import { useEffect } from 'preact/hooks';
 
 /**
@@ -55,7 +53,7 @@ export function matchShortcut(event, shortcut) {
 
   return (
     actualModifiers === requiredModifiers &&
-    normalizeKeyName(event.key).toLowerCase() === requiredKey
+    event.key.toLowerCase() === requiredKey
   );
 }
 

@@ -1,4 +1,3 @@
-import { normalizeKeyName } from '@hypothesis/frontend-shared';
 import { useEffect, useRef } from 'preact/hooks';
 
 /** @param {HTMLElement} element */
@@ -62,7 +61,7 @@ export default function MenuKeyboardNavigation({
 
     let handled = false;
 
-    switch (normalizeKeyName(event.key)) {
+    switch (event.key) {
       case 'ArrowLeft':
       case 'Escape':
         if (closeMenu) {
