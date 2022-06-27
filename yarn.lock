@@ -1306,9 +1306,9 @@
     "@rollup/pluginutils" "^3.1.0"
 
 "@rollup/plugin-commonjs@^22.0.0":
-  version "22.0.0"
-  resolved "https://registry.yarnpkg.com/@rollup/plugin-commonjs/-/plugin-commonjs-22.0.0.tgz#f4d87016e2fbf187a593ab9f46626fe05b59e8bd"
-  integrity sha512-Ktvf2j+bAO+30awhbYoCaXpBcyPmJbaEUYClQns/+6SNCYFURbvBiNbWgHITEsIgDDWCDUclWRKEuf8cwZCFoQ==
+  version "22.0.1"
+  resolved "https://registry.yarnpkg.com/@rollup/plugin-commonjs/-/plugin-commonjs-22.0.1.tgz#f7cb777d20de3eeeaf994f39080115c336bef810"
+  integrity sha512-dGfEZvdjDHObBiP5IvwTKMVeq/tBZGMBHZFMdIV1ClMM/YoWS34xrHFGfag9SN2ZtMgNZRFruqvxZQEa70O6nQ==
   dependencies:
     "@rollup/pluginutils" "^3.1.0"
     commondir "^1.0.1"
@@ -1907,9 +1907,9 @@ autoprefixer@^10.0.1:
     postcss-value-parser "^4.2.0"
 
 aws-sdk@^2.345.0:
-  version "2.1157.0"
-  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1157.0.tgz#d00b5ea932439de38e19435b48a6a2b38aa7c805"
-  integrity sha512-30t+zhCECib8uaggd0Du8ifab4vtJjgVvNKxHWTpiLa3deTnM+0K7x3pwM99zxw0gLDxAUet/oURaoPJHwk/5Q==
+  version "2.1162.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.1162.0.tgz#e19ff30f255e5c4021eaf02a80ec0a368a4712a0"
+  integrity sha512-tRDAa5GOqSkphVR/Yhc8eyLcV9ZGTgmZ7kY5ODJDMw52Cd/92kXfe6YDoFWFLyeA/z5H9o/2uZ6+3CjU96Ap/g==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
