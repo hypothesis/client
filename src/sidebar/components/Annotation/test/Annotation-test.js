@@ -79,12 +79,21 @@ describe('Annotation', () => {
   });
 
   describe('annotation accessibility (ARIA) attributes', () => {
-    it('should add an `aria-label` composed of annotation type and author name', () => {
+    it('should add a descriptive `aria-label` for an existing annotation', () => {
       const wrapper = createComponent();
 
       assert.equal(
         wrapper.find('article').props()['aria-label'],
         'Annotation by Richard Lionheart'
+      );
+    });
+
+    it('should add a descriptive `aria-label` for a new annotation', () => {
+      const wrapper = createComponent({ annotation: fixtures.newAnnotation() });
+
+      assert.equal(
+        wrapper.find('article').props()['aria-label'],
+        'New annotation by Richard Lionheart'
       );
     });
   });
