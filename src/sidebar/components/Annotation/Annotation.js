@@ -100,10 +100,14 @@ function Annotation({
     [annotation, defaultAuthority, displayNamesEnabled]
   );
 
+  const annotationDescription = isSaved(annotation)
+    ? annotationRole(annotation)
+    : `New ${annotationRole(annotation).toLowerCase()}`;
+
   return (
     <article
       className="space-y-4"
-      aria-label={`${annotationRole(annotation)} by ${authorName}`}
+      aria-label={`${annotationDescription} by ${authorName}`}
     >
       <AnnotationHeader
         annotation={annotation}
