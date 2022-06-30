@@ -32,7 +32,6 @@ export default {
         px: '4px',
       },
       boxShadow: {
-        DEFAULT: '0 1px 1px rgba(0, 0, 0, 0.1)',
         'adder-toolbar': '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
         focus: `0 0 0 2px ${focusBlue}`,
         'focus-inner': `inset 0 0 0 2px ${focusBlue}`,
@@ -40,11 +39,7 @@ export default {
         sidebar: '0px 1px 4px rgb(0, 0, 0, 0.5)',
       },
       colors: {
-        'color-text': {
-          inverted: '#f2f2f2',
-        },
         blue: {
-          focus: focusBlue,
           quote: '#58cef4',
         },
       },
@@ -191,13 +186,6 @@ export default {
         // buttons in the annotator toolbar
         'px-1.5': '6px',
         'px-2': '8px',
-      },
-      zIndex: {
-        1: '1',
-        2: '2',
-        3: '3',
-        4: '4',
-        max: '2147483647',
       },
     },
   },
