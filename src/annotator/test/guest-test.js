@@ -1,3 +1,5 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import { delay } from '../../test-util/wait';
 import { Guest, $imports } from '../guest';
 
@@ -126,7 +128,7 @@ describe('Guest', () => {
 
     fakeFrameFillsAncestor = sinon.stub().returns(true);
 
-    fakeIntegration = {
+    fakeIntegration = Object.assign(new TinyEmitter(), {
       anchor: sinon.stub(),
       canAnnotate: sinon.stub().returns(true),
       contentContainer: sinon.stub().returns({}),
@@ -139,7 +141,7 @@ describe('Guest', () => {
       }),
       scrollToAnchor: sinon.stub().resolves(),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
-    };
+    });
 
     fakeCreateIntegration = sinon.stub().returns(fakeIntegration);
 
@@ -1303,6 +1305,38 @@ describe('Guest', () => {
       metadata: {
         title: 'Test title',
         documentFingerprint: 'test-fingerprint',
+      },
+      frameIdentifier: null,
+    });
+  });
+
+  it('sends new document metadata and URIs to sidebar after a client-side navigation', async () => {
+    fakeIntegration.uri.resolves('https://example.com/page-1');
+    fakeIntegration.getMetadata.resolves({ title: 'Page 1' });
+
+    createGuest();
+    const sidebarRPCCall = sidebarRPC().call;
+    await delay(0);
+
+    assert.calledWith(sidebarRPCCall, 'documentInfoChanged', {
+      uri: 'https://example.com/page-1',
+      metadata: {
+        title: 'Page 1',
+      },
+      frameIdentifier: null,
+    });
+
+    sidebarRPCCall.resetHistory();
+    fakeIntegration.uri.resolves('https://example.com/page-2');
+    fakeIntegration.getMetadata.resolves({ title: 'Page 2' });
+
+    fakeIntegration.emit('uriChanged');
+    await delay(0);
+
+    assert.calledWith(sidebarRPCCall, 'documentInfoChanged', {
+      uri: 'https://example.com/page-2',
+      metadata: {
+        title: 'Page 2',
       },
       frameIdentifier: null,
     });

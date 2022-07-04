@@ -194,6 +194,10 @@ export class Guest {
     this._integration = createIntegration(this, {
       contentPartner: config.contentPartner,
     });
+    this._integration.on('uriChanged', async () => {
+      const metadata = await this.getDocumentInfo();
+      this._sidebarRPC.call('documentInfoChanged', metadata);
+    });
 
     /**
      * Channel for host-guest communication.
