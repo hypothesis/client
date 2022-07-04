@@ -38,6 +38,24 @@ class CacheEntry {
  *
  * The returned wrapper has the same API as the store itself.
  *
+ * The returned wrapper does not change its identity if the store updates. This
+ * means you need to be careful when using it with hooks that have dependencies,
+ * such as `useMemo`, `useEffect` or `useCallback`. Given code like this:
+ *
+ * ```
+ * const calculatedValue = useMemo(() => calculateSomething(store.getSomeValue()), [store]);
+ * ```
+ *
+ * `calulatedValue` will not be recalculated if the result of
+ * `store.getSomeValue()` changes, because the `store` reference itself does not
+ * change. A workaround is to extract the values from the store and pass those
+ * into the closure:
+ *
+ * ```
+ * const someValue = store.getSomeValue();
+ * const calculatedValue = useMemo(() => calculateSomething(someValue), [someValue]);
+ * ```
+ *
  * @example
  *   // A hook which encapsulates looking up the specific store instance,
  *   // eg. via `useContext`.
