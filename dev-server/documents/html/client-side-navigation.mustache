@@ -1,0 +1,62 @@
+<!doctype>
+<html>
+  <title>Client-side navigation test</title>
+  <body>
+  <h1 id="header"></h1>
+  <p id="intro"></p>
+  <hr>
+  <p id="content"></p>
+  <hr>
+  <div id="navLinks">
+    <!-- Omit page param for Page 1, otherwise we'd need a rel-canonical link
+         to make `page=1` equivalent to not setting the param. -->
+    <a href="client-side-navigation">Page 1</a>
+    <a href="client-side-navigation?page=2">Page 2</a>
+    <a href="client-side-navigation?page=3">Page 3</a>
+  </div>
+  <div style="padding-top: 10px;">
+    <label for="replaceStateCheckbox">Use <code>replaceState</code> instead of <code>pushState</code>?</label><input type="checkbox" id="replaceStateCheckbox">
+  </div>
+  <script type="module">
+    const pageContent = [
+      'Some extra content that is only on the first page.',
+      'Word that only appear on the second page.',
+      'Thoughts on the third page',
+    ];
+
+    const setContent = (url) => {
+      const page = new URL(url).searchParams.get('page') ?? 1;
+      const header = document.querySelector('#header');
+      const intro = document.querySelector('#intro');
+      const content = document.querySelector('#content');
+
+      header.textContent = `Page ${page}`;
+      intro.textContent =
+        `You are currently on page ${page}. Use the links below to perform a
+         client-side navigation and then try using Back/Forwards.`;
+
+      const pageText = pageContent[parseInt(page) - 1];
+      content.textContent = pageText || '';
+    };
+
+    const replaceStateCheckbox = document.querySelector('#replaceStateCheckbox');
+
+    const navLinks = document.querySelector('#navLinks');
+    navLinks.addEventListener('click', e => {
+      e.preventDefault();
+      if (e.target.href) {
+        if (replaceStateCheckbox.checked) {
+          history.replaceState({}, null, e.target.href);
+        } else {
+          history.pushState({}, null, e.target.href);
+        }
+        setContent(e.target.href);
+      }
+    });
+
+    setContent(location.href);
+    window.addEventListener('popstate', () => setContent(location.href));
+  </script>
+  {{{ hypothesisScript }}}
+  </body>
+</html>
