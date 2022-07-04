@@ -1,4 +1,4 @@
-import { useEffect, useRef, useReducer } from 'preact/hooks';
+import { useLayoutEffect, useRef, useReducer } from 'preact/hooks';
 
 /**
  * Result of a cached store selector method call.
@@ -129,7 +129,7 @@ export function useStore(store) {
 
   // Register a subscriber which clears cache and re-renders component when
   // relevant store state changes.
-  useEffect(() => {
+  useLayoutEffect(() => {
     const cleanup = store.subscribe(() => {
       const invalidEntry = cache.find(
         // nb. A potential problem here is that the method arguments may refer
