@@ -3,19 +3,10 @@ Thank you for reporting an issue with the Hypothesis client! This is our bug
 tracker. If you have any support questions please email support@hypothes.is
 instead.
 
-In order to make it easy for us to help you, please note the following:
-
-1. Only report **bugs** with the Hypothesis client here. If you want to discuss
-   potential new features, please use our developer mailing list:
-
-       https://groups.google.com/a/list.hypothes.is/forum/#!forum/dev
-
-2. Be sure to check that the bug you're reporting isn't already reported. You
-   can use the GitHub issues search box to help with this.
-
-3. Fill out the information requested by the template below. If you can't supply
-   all the information, don't worry, but do please use the template.
+Please check that the issue you're reporting isn't already reported. You
+can use the GitHub issues search box to help with this.
 -->
+
 ### Steps to reproduce
 1.
 2.
