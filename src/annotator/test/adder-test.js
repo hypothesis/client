@@ -118,6 +118,23 @@ describe('Adder', () => {
       assert.equal(showBtn.querySelector('span').textContent, '2');
     });
 
+    it('updates "Show" button when `annotationsForSelection` changes', () => {
+      adder.show(rect(100, 200, 100, 20), false);
+
+      adder.annotationsForSelection = [];
+      let showButton = getButton('Show');
+      assert.notOk(showButton);
+
+      adder.annotationsForSelection = [{ $tag: '123' }, { $tag: '456' }];
+      showButton = getButton('Show');
+      assert.ok(showButton);
+      assert.include(showButton.textContent, '2');
+
+      adder.annotationsForSelection = [];
+      showButton = getButton('Show');
+      assert.notOk(showButton);
+    });
+
     it('calls onShowAnnotations callback when Show button is clicked', () => {
       adder.annotationsForSelection = ['ann1'];
       showAdder();

@@ -127,14 +127,28 @@ export class Adder {
     this._onShowAnnotations = options.onShowAnnotations;
 
     /**
-     * Annotation tags associated with the current selection. If non-empty,
-     * a "Show" button appears in the toolbar. Clicking the button calls the
-     * `onShowAnnotations` callback with the current value of `annotationsForSelection`.
+     * Annotation tags associated with the current selection.
      *
      * @type {string[]}
      */
-    this.annotationsForSelection = [];
+    this._annotationsForSelection = [];
 
+    this._render();
+  }
+
+  get annotationsForSelection() {
+    return this._annotationsForSelection;
+  }
+
+  /**
+   * Set the annotation IDs associated with the current selection.
+   *
+   * Setting this to a non-empty list causes the "Show" button to appear in
+   * the toolbar, triggering the `onShowAnnotations` callback passed to the
+   * constructor when clicked.
+   */
+  set annotationsForSelection(ids) {
+    this._annotationsForSelection = ids;
     this._render();
   }
 
