@@ -10,22 +10,46 @@ describe('sidebar/store/modules/frames', () => {
   });
 
   describe('#connectFrame', () => {
-    it('adds the frame to the list of connected frames', () => {
-      const frame = { uri: 'http://example.com' };
+    it('adds first frame to the list of connected frames', () => {
+      const frame = { id: 'frameA', uri: 'http://example.com' };
       store.connectFrame(frame);
       assert.deepEqual(store.frames(), [frame]);
+    });
+
+    [null, 'frameA'].forEach(frameId => {
+      it('replaces existing frame with the same ID', () => {
+        const frame = { id: frameId, uri: 'https://example.com/page-1' };
+        const updatedFrame = { id: frameId, uri: 'https://example.com/page-2' };
+
+        store.connectFrame(frame);
+        store.connectFrame(updatedFrame);
+
+        assert.deepEqual(store.frames(), [updatedFrame]);
+      });
+    });
+
+    it('appends frame if ID does not match existing frames', () => {
+      const frame = { id: null, uri: 'https://example.com/' };
+      const subframe = { id: 'frameA', uri: 'https://example.com/an-iframe' };
+
+      store.connectFrame(frame);
+      store.connectFrame(subframe);
+
+      assert.deepEqual(store.frames(), [frame, subframe]);
     });
   });
 
   describe('#destroyFrame', () => {
     it('removes the frame from the list of connected frames', () => {
       const frameList = [
-        { uri: 'http://example.com' },
-        { uri: 'http://example.org' },
+        { id: 'frameA', uri: 'http://example.com' },
+        { id: 'frameB', uri: 'http://example.org' },
       ];
+
       store.connectFrame(frameList[0]);
       store.connectFrame(frameList[1]);
       store.destroyFrame(frameList[0]);
+
       assert.deepEqual(store.frames(), [frameList[1]]);
     });
   });
@@ -33,9 +57,11 @@ describe('sidebar/store/modules/frames', () => {
   describe('#updateFrameAnnotationFetchStatus', () => {
     it('updates the isAnnotationFetchComplete status of the frame', () => {
       const frame = {
+        id: null,
         uri: 'http://example.com',
       };
       const expectedFrame = {
+        id: null,
         uri: 'http://example.com',
         isAnnotationFetchComplete: true,
       };
@@ -125,9 +151,11 @@ describe('sidebar/store/modules/frames', () => {
         when: 'multiple HTML frames',
         frames: [
           {
+            id: 'frameA',
             uri: 'https://publisher.org/article.html',
           },
           {
+            id: 'frameB',
             uri: 'https://publisher.org/article2.html',
           },
         ],

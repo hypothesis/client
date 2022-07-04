@@ -31,7 +31,14 @@ const reducers = {
    * @param {{ frame: Frame }} action
    */
   CONNECT_FRAME(state, action) {
-    return [...state, action.frame];
+    const frameIndex = state.findIndex(frame => frame.id === action.frame.id);
+    const newFrames = [...state];
+    if (frameIndex !== -1) {
+      newFrames[frameIndex] = action.frame;
+    } else {
+      newFrames.push(action.frame);
+    }
+    return newFrames;
   },
 
   /**
@@ -62,7 +69,10 @@ const reducers = {
 };
 
 /**
- * Add a frame to the list of frames currently connected to the sidebar app.
+ * Add or replace a frame in the list of connected frames.
+ *
+ * If a frame exists with the same ID as `frame` it is replaced, otherwise
+ * a new frame is added.
  *
  * @param {Frame} frame
  */
@@ -71,7 +81,7 @@ function connectFrame(frame) {
 }
 
 /**
- * Remove a frame from the list of frames currently connected to the sidebar app.
+ * Remove a frame from the list of connected frames.
  *
  * @param {Frame} frame
  */
