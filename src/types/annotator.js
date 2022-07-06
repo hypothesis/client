@@ -140,7 +140,7 @@
  *   This will only be called if the anchor has at least one highlight (ie.
  *   `anchor.highlights` is a non-empty array)
  *
- * @typedef {Destroyable & IntegrationBase} Integration
+ * @typedef {Destroyable & TinyEmitter & IntegrationBase} Integration
  */
 
 /**

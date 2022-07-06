@@ -1,5 +1,6 @@
 import debounce from 'lodash.debounce';
 import { render } from 'preact';
+import { TinyEmitter } from 'tiny-emitter';
 
 import { ListenerCollection } from '../../shared/listener-collection';
 import {
@@ -62,7 +63,7 @@ export function isPDF() {
  * Integration that works with PDF.js
  * @implements {Integration}
  */
-export class PDFIntegration {
+export class PDFIntegration extends TinyEmitter {
   /**
    * @param {Annotator} annotator
    * @param {object} options
@@ -72,6 +73,8 @@ export class PDFIntegration {
    *     re-anchoring to complete when scrolling to an un-rendered page.
    */
   constructor(annotator, options = {}) {
+    super();
+
     this.annotator = annotator;
 
     const window_ = /** @type {HypothesisWindow} */ (window);

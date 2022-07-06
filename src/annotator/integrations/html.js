@@ -1,3 +1,5 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import { anchor, describe } from '../anchoring/html';
 
 import { HTMLMetadata } from './html-metadata';
@@ -28,13 +30,15 @@ const MIN_HTML_WIDTH = 480;
  *
  * @implements {Integration}
  */
-export class HTMLIntegration {
+export class HTMLIntegration extends TinyEmitter {
   /**
    * @param {object} options
    *   @param {FeatureFlags} options.features
    *   @param {HTMLElement} [options.container]
    */
   constructor({ features, container = document.body }) {
+    super();
+
     this.features = features;
     this.container = container;
     this.anchor = anchor;
