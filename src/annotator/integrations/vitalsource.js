@@ -1,3 +1,5 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import { ListenerCollection } from '../../shared/listener-collection';
 import { FeatureFlags } from '../features';
 import { onDocumentReady } from '../frame-observer';
@@ -202,11 +204,13 @@ function makeContentFrameScrollable(frame) {
  *
  * @implements {Integration}
  */
-export class VitalSourceContentIntegration {
+export class VitalSourceContentIntegration extends TinyEmitter {
   /**
    * @param {HTMLElement} container
    */
   constructor(container = document.body) {
+    super();
+
     const features = new FeatureFlags();
 
     // Forcibly enable the side-by-side feature for VS books. This feature is
