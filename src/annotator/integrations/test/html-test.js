@@ -1,3 +1,4 @@
+import { delay } from '../../../test-util/wait';
 import { FeatureFlags } from '../../features';
 import { HTMLIntegration, $imports } from '../html';
 
@@ -8,6 +9,7 @@ describe('HTMLIntegration', () => {
   let fakeGuessMainContentArea;
   let fakePreserveScrollPosition;
   let fakeScrollElementIntoView;
+  let notifyNavigation;
 
   beforeEach(() => {
     features = new FeatureFlags();
@@ -22,6 +24,13 @@ describe('HTMLIntegration', () => {
       uri: sinon.stub().returns('https://example.com/'),
     };
 
+    class FakeNavigationObserver {
+      constructor(callback) {
+        notifyNavigation = callback;
+        this.disconnect = sinon.stub();
+      }
+    }
+
     fakeScrollElementIntoView = sinon.stub().resolves();
 
     fakeGuessMainContentArea = sinon.stub().returns(null);
@@ -30,6 +39,9 @@ describe('HTMLIntegration', () => {
     const HTMLMetadata = sinon.stub().returns(fakeHTMLMetadata);
     $imports.$mock({
       '../anchoring/html': fakeHTMLAnchoring,
+      '../util/navigation-observer': {
+        NavigationObserver: FakeNavigationObserver,
+      },
       '../util/scroll': {
         scrollElementIntoView: fakeScrollElementIntoView,
       },
@@ -353,5 +365,67 @@ describe('HTMLIntegration', () => {
       const integration = createIntegration();
       assert.deepEqual(await integration.uri(), 'https://example.com/');
     });
+  });
+
+  it('emits "uriChanged" event when URL changes after a navigation', () => {
+    const integration = createIntegration();
+    const onURIChanged = sinon.stub();
+    integration.on('uriChanged', onURIChanged);
+
+    fakeHTMLMetadata.uri.returns('https://example.com/new-url');
+    notifyNavigation();
+
+    assert.calledWith(onURIChanged, 'https://example.com/new-url');
+  });
+
+  it('emits "uriChanged" event when URL changes after a <head> change', async () => {
+    const linkEl = document.createElement('link');
+    linkEl.rel = 'dummy';
+    linkEl.href = 'https://example.com/dummy';
+
+    const integration = createIntegration();
+    const onURIChanged = sinon.stub();
+    integration.on('uriChanged', onURIChanged);
+
+    try {
+      document.head.append(linkEl);
+      fakeHTMLMetadata.uri.returns('https://example.com/new-url');
+
+      await delay(0); // Wait for MutationObserver
+
+      assert.calledWith(onURIChanged, 'https://example.com/new-url');
+    } finally {
+      linkEl.remove();
+    }
+  });
+
+  it('does not emit "uriChanged" if URL has not changed after a navigation', () => {
+    const integration = createIntegration();
+    const onURIChanged = sinon.stub();
+    integration.on('uriChanged', onURIChanged);
+
+    notifyNavigation();
+
+    assert.notCalled(onURIChanged);
+  });
+
+  it('does not emit "uriChanged" if URL has not changed after a <head> change', async () => {
+    const linkEl = document.createElement('link');
+    linkEl.rel = 'dummy';
+    linkEl.href = 'https://example.com/dummy';
+
+    const integration = createIntegration();
+    const onURIChanged = sinon.stub();
+    integration.on('uriChanged', onURIChanged);
+
+    try {
+      document.head.append(linkEl);
+
+      await delay(0); // Wait for MutationObserver
+
+      assert.notCalled(onURIChanged);
+    } finally {
+      linkEl.remove();
+    }
   });
 });
