@@ -2,13 +2,14 @@ import { TinyEmitter } from 'tiny-emitter';
 
 import { anchor, describe } from '../anchoring/html';
 
+import { NavigationObserver } from '../util/navigation-observer';
+import { scrollElementIntoView } from '../util/scroll';
+import { CanonicalURLRevalidator } from './canonical-url-revalidator';
 import { HTMLMetadata } from './html-metadata';
 import {
   guessMainContentArea,
   preserveScrollPosition,
 } from './html-side-by-side';
-import { NavigationObserver } from '../util/navigation-observer';
-import { scrollElementIntoView } from '../util/scroll';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor
@@ -47,6 +48,7 @@ export class HTMLIntegration extends TinyEmitter {
 
     this._htmlMeta = new HTMLMetadata();
     this._prevURI = this._htmlMeta.uri();
+    this._canonicalRevalidator = new CanonicalURLRevalidator();
 
     /** Whether to attempt to resize the document to fit alongside sidebar. */
     this._sideBySideEnabled = this.features.flagEnabled('html_side_by_side');
@@ -97,8 +99,8 @@ export class HTMLIntegration extends TinyEmitter {
     this.features.on('flagsChanged', this._flagsChanged);
   }
 
-  _checkForURIChange() {
-    const currentURI = this._htmlMeta.uri();
+  async _checkForURIChange() {
+    const currentURI = await this.uri();
     if (currentURI !== this._prevURI) {
       this._prevURI = currentURI;
       this.emit('uriChanged', currentURI);
@@ -250,6 +252,11 @@ export class HTMLIntegration extends TinyEmitter {
   }
 
   async uri() {
+    try {
+      await this._canonicalRevalidator.revalidate();
+    } catch (e) {
+      console.warn('Canonical URL revalidation failed:', e.message);
+    }
     return this._htmlMeta.uri();
   }
 
