@@ -62,6 +62,10 @@ export class HTMLIntegration extends TinyEmitter {
     /** @type {SidebarLayout|null} */
     this._lastLayout = null;
 
+    // TODO - Wait for a short while after a navigation to allow the canonical
+    // URL to be updated, to avoid redundantly re-fetching the page from the
+    // origin server.
+    //
     // Watch for changes to `location.href`.
     this._navObserver = new NavigationObserver(() => this._checkForURIChange());
 
