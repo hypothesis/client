@@ -14,7 +14,6 @@ import {
 // Different variant than shared icon
 import annotateIcon from '../images/icons/annotate.svg';
 // Not in shared icon set
-import jstor from '../images/icons/jstor.svg';
 import pointerIcon from '../images/icons/pointer.svg';
 
 /**
@@ -29,7 +28,6 @@ export const annotatorIcons = {
   'caret-right': caretRight,
   hide,
   highlight,
-  jstor,
   note,
   pointer: pointerIcon,
   show,
