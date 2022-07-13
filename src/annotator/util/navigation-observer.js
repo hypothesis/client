@@ -3,7 +3,7 @@ import { ListenerCollection } from '../../shared/listener-collection';
 /**
  * Monkey-patch an object to observe calls to a method.
  *
- * The observer is not notified if the method throws.
+ * The `handler` is not invoked if the observed method throws.
  *
  * @template {any} T
  * @param {T} object
@@ -20,12 +20,13 @@ function observeCalls(object, method, handler) {
     throw new Error('Can only intercept functions');
   }
 
-  // @ts-expect-error
-  object[method] = (...args) => {
+  /** @param {unknown[]} args */
+  const wrapper = (...args) => {
     const result = origHandler.call(object, ...args);
     handler(...args);
     return result;
   };
+  object[method] = /** @type {any} */ (wrapper);
 
   return () => {
     object[method] = origHandler;
