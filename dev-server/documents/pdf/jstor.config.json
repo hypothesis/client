@@ -1,5 +1,19 @@
 {
   "clientConfig": {
-    "contentPartner": "jstor"
+    "contentInfoBanner": {
+      "logo": {
+        "logo": "/jstor-logo.svg",
+        "link": "https://www.jstor.org",
+        "title": "Document provided by JSTOR"
+      },
+      "item": {
+        "title": "Chapter 2: A chapter",
+        "containerTitle": "Book Title Here"
+      },
+      "links": {
+        "previousItem": "https://jstor.org/stable/book123.1",
+        "nextItem": "https://jstor.org/stable/book123.2"
+      }
+    }
   }
 }
