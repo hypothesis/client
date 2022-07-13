@@ -140,6 +140,7 @@ describe('Guest', () => {
         documentFingerprint: 'test-fingerprint',
       }),
       scrollToAnchor: sinon.stub().resolves(),
+      showContentInfo: sinon.stub(),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     });
 
@@ -1269,20 +1270,23 @@ describe('Guest', () => {
     assert.calledWith(sidebarRPC().connect, port1);
   });
 
-  it('passes configuration to integration', () => {
+  it('creates integration', () => {
+    createGuest();
+    assert.calledOnce(fakeCreateIntegration);
+  });
+
+  it('shows content info banner if `contentInfoBanner` configuration is set', () => {
     const config = {
-      // Configuration options that should be forwarded to the integration
-      contentPartner: 'jstor',
-      // Other configuration
-      otherOption: 'test',
+      contentInfoBanner: {},
     };
 
-    const guest = createGuest(config);
+    createGuest(config);
 
-    assert.calledOnce(fakeCreateIntegration);
-    assert.calledWith(fakeCreateIntegration, guest, {
-      contentPartner: 'jstor',
-    });
+    assert.calledOnce(fakeIntegration.showContentInfo);
+    assert.calledWith(
+      fakeIntegration.showContentInfo,
+      config.contentInfoBanner
+    );
   });
 
   it('configures the BucketBarClient', () => {

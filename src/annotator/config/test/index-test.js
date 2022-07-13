@@ -77,7 +77,7 @@ describe('annotator/config/index', () => {
             annotations: 'fakeValue',
             branding: null,
             clientUrl: 'fakeValue',
-            contentPartner: null,
+            contentInfoBanner: null,
             enableExperimentalNewNoteButton: null,
             externalContainerSelector: null,
             focus: null,
@@ -109,7 +109,7 @@ describe('annotator/config/index', () => {
             annotations: 'fakeValue',
             branding: 'fakeValue',
             clientUrl: 'fakeValue',
-            contentPartner: 'fakeValue',
+            contentInfoBanner: 'fakeValue',
             enableExperimentalNewNoteButton: 'fakeValue',
             externalContainerSelector: 'fakeValue',
             focus: 'fakeValue',
@@ -165,7 +165,7 @@ describe('annotator/config/index', () => {
         annotations: null,
         branding: null,
         clientUrl: null,
-        contentPartner: null,
+        contentInfoBanner: null,
         enableExperimentalNewNoteButton: null,
         externalContainerSelector: null,
         focus: null,
@@ -220,7 +220,7 @@ describe('annotator/config/index', () => {
     [
       {
         app: 'annotator',
-        expectedKeys: ['clientUrl', 'contentPartner', 'subFrameIdentifier'],
+        expectedKeys: ['clientUrl', 'contentInfoBanner', 'subFrameIdentifier'],
       },
       {
         app: 'sidebar',

@@ -25,6 +25,7 @@ import { normalizeURI } from './util/url';
  * @typedef {import('../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../types/annotator').Annotator} Annotator
  * @typedef {import('../types/annotator').Anchor} Anchor
+ * @typedef {import('../types/annotator').ContentInfoConfig} ContentInfoConfig
  * @typedef {import('../types/annotator').Destroyable} Destroyable
  * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../types/api').Target} Target
@@ -101,7 +102,7 @@ function removeTextSelection() {
  * @prop {string} [subFrameIdentifier] - An identifier used by this guest to
  *   identify the current frame when communicating with the sidebar. This is
  *   only set in non-host frames.
- * @prop {'jstor'} [contentPartner] - Configures a banner or other indicators
+ * @prop {ContentInfoConfig} [contentInfoBanner] - Configures a banner or other indicators
  *   showing where the content has come from.
  */
 
@@ -191,13 +192,14 @@ export class Guest {
      * Integration that handles document-type specific functionality in the
      * guest.
      */
-    this._integration = createIntegration(this, {
-      contentPartner: config.contentPartner,
-    });
+    this._integration = createIntegration(this);
     this._integration.on('uriChanged', async () => {
       const metadata = await this.getDocumentInfo();
       this._sidebarRPC.call('documentInfoChanged', metadata);
     });
+    if (config.contentInfoBanner) {
+      this._integration.showContentInfo?.(config.contentInfoBanner);
+    }
 
     /**
      * Channel for host-guest communication.

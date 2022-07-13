@@ -7,7 +7,7 @@ import {
 
 /**
  * @typedef {import('../../types/annotator').Annotator} Annotator
- * @typedef {import('../../types/annotator').ContentPartner} ContentPartner
+ * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoBanner
  * @typedef {import('../../types/annotator').Integration} Integration
  */
 
@@ -16,14 +16,11 @@ import {
  * guest functionality.
  *
  * @param {Annotator} annotator
- * @param {object} options
- *   @param {ContentPartner} [options.contentPartner] - Content partner banner to show,
- *     if supported by the integration.
  * @return {Integration}
  */
-export function createIntegration(annotator, { contentPartner } = {}) {
+export function createIntegration(annotator) {
   if (isPDF()) {
-    return new PDFIntegration(annotator, { contentPartner });
+    return new PDFIntegration(annotator);
   }
 
   const vsFrameRole = vitalSourceFrameRole();

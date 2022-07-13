@@ -12,7 +12,7 @@ import {
 } from '../anchoring/pdf';
 import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
 import Banners from '../components/Banners';
-import ContentPartnerBanner from '../components/ContentPartnerBanner';
+import ContentInfoBanner from '../components/ContentInfoBanner';
 import WarningBanner from '../components/WarningBanner';
 import { createShadowRoot } from '../util/shadow-root';
 import { offsetRelativeTo, scrollElement } from '../util/scroll';
@@ -23,7 +23,7 @@ import { PDFMetadata } from './pdf-metadata';
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').Annotator} Annotator
- * @typedef {import('../../types/annotator').ContentPartner} ContentPartner
+ * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoConfig
  * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
@@ -67,8 +67,6 @@ export class PDFIntegration extends TinyEmitter {
   /**
    * @param {Annotator} annotator
    * @param {object} options
-   *   @param {ContentPartner} [options.contentPartner] - If set, show branding
-   *     for the given content partner in a banner above the PDF viewer.
    *   @param {number} [options.reanchoringMaxWait] - Max time to wait for
    *     re-anchoring to complete when scrolling to an un-rendered page.
    */
@@ -116,12 +114,8 @@ export class PDFIntegration extends TinyEmitter {
 
     /** State indicating which banners to show above the PDF viewer. */
     this._bannerState = {
-      /**
-       * Branding for a content provider.
-       *
-       * @type {ContentPartner|null}
-       */
-      contentPartner: options.contentPartner ?? null,
+      /** @type {ContentInfoConfig|null} */
+      contentInfo: null,
       /** Warning that the current PDF does not have selectable text. */
       noTextWarning: false,
     };
@@ -174,6 +168,16 @@ export class PDFIntegration extends TinyEmitter {
    */
   getMetadata() {
     return this.pdfMetadata.getMetadata();
+  }
+
+  /**
+   * Display a banner at the top of the PDF viewer showing information about the
+   * current document.
+   *
+   * @param {ContentInfoConfig} contentInfo
+   */
+  showContentInfo(contentInfo) {
+    this._updateBannerState({ contentInfo });
   }
 
   /**
@@ -252,7 +256,7 @@ export class PDFIntegration extends TinyEmitter {
     );
 
     const showBanner =
-      this._bannerState.contentPartner || this._bannerState.noTextWarning;
+      this._bannerState.contentInfo || this._bannerState.noTextWarning;
 
     if (!showBanner) {
       this._banner?.remove();
@@ -273,10 +277,10 @@ export class PDFIntegration extends TinyEmitter {
 
     render(
       <Banners>
-        {this._bannerState.contentPartner && (
-          <ContentPartnerBanner
-            provider={this._bannerState.contentPartner}
-            onClose={() => this._updateBannerState({ contentPartner: null })}
+        {this._bannerState.contentInfo && (
+          <ContentInfoBanner
+            info={this._bannerState.contentInfo}
+            onClose={() => this._updateBannerState({ contentInfo: null })}
           />
         )}
         {this._bannerState.noTextWarning && <WarningBanner />}
