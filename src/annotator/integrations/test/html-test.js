@@ -404,6 +404,10 @@ describe('HTMLIntegration', () => {
     const onURIChanged = sinon.stub();
     integration.on('uriChanged', onURIChanged);
 
+    // Report a navigation, but do not change the URL returned by `fakeHTMLMetadata.uri`.
+    //
+    // This can happen if the page has a `<link rel=canonical>` that gets used
+    // as the document URI instead of the URL in the URL bar.
     notifyNavigation();
 
     assert.notCalled(onURIChanged);
