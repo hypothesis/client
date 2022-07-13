@@ -39,19 +39,6 @@ describe('createIntegration', () => {
     assert.instanceOf(integration, FakePDFIntegration);
   });
 
-  it('passes options to PDF integration', () => {
-    const annotator = {};
-    fakeIsPDF.returns(true);
-
-    createIntegration(annotator, {
-      contentPartner: 'jstor',
-    });
-
-    assert.calledWith(FakePDFIntegration, annotator, {
-      contentPartner: 'jstor',
-    });
-  });
-
   it('creates VitalSource content integration in the VS Bookshelf reader', () => {
     const annotator = {};
     fakeVitalSourceFrameRole.returns('content');

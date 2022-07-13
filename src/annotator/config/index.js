@@ -33,7 +33,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  */
 function configurationKeys(context) {
   const contexts = {
-    annotator: ['clientUrl', 'contentPartner', 'subFrameIdentifier'],
+    annotator: ['clientUrl', 'contentInfoBanner', 'subFrameIdentifier'],
     sidebar: [
       'appType',
       'annotations',
@@ -111,7 +111,7 @@ const configDefinitions = {
     defaultValue: null,
     getValue: settings => settings.clientUrl,
   },
-  contentPartner: {
+  contentInfoBanner: {
     allowInBrowserExt: false,
     defaultValue: null,
     getValue: getHostPageSetting,

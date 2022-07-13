@@ -218,6 +218,51 @@ describe('annotator/integrations/pdf', () => {
       return document.querySelector('hypothesis-banner');
     }
 
+    describe('content info banner', () => {
+      const contentInfo = {
+        logo: {
+          logo: '/jstor-logo.svg',
+          link: 'https://www.jstor.org',
+          title: 'Document provided by JSTOR',
+        },
+        item: {
+          title: 'Chapter 2: A chapter',
+          containerTitle: 'Book Title Here',
+        },
+        links: {
+          previousItem: 'https://jstor.org/stable/book123.1',
+          nextItem: 'https://jstor.org/stable/book123.2',
+        },
+      };
+
+      it('does not show content banner initially', () => {
+        pdfIntegration = createPDFIntegration();
+        assert.isNull(getBanner());
+      });
+
+      it('shows content banner when `showContentInfo` is called', () => {
+        pdfIntegration = createPDFIntegration();
+        pdfIntegration.showContentInfo(contentInfo);
+
+        const banner = getBanner();
+        assert.isNotNull(banner);
+        assert.include(banner.shadowRoot.textContent, contentInfo.item.title);
+      });
+
+      it('closes content info banner when "Close" button is clicked', () => {
+        pdfIntegration = createPDFIntegration();
+        pdfIntegration.showContentInfo(contentInfo);
+        const banner = getBanner();
+        const closeButton = banner.shadowRoot.querySelector(
+          'button[data-testid=close-button]'
+        );
+
+        closeButton.click();
+
+        assert.isNull(getBanner());
+      });
+    });
+
     it('does not show a warning when PDF has selectable text', async () => {
       fakePDFAnchoring.documentHasText.resolves(true);
 
@@ -251,25 +296,6 @@ describe('annotator/integrations/pdf', () => {
         banner.shadowRoot.textContent,
         'This PDF does not contain selectable text'
       );
-    });
-
-    it('shows banner when content is provided by JSTOR', () => {
-      pdfIntegration = createPDFIntegration({ contentPartner: 'jstor' });
-      const banner = getBanner();
-      assert.isNotNull(banner);
-      assert.include(banner.shadowRoot.textContent, 'Document hosted by JSTOR');
-    });
-
-    it('closes content partner banner when "Close" button is clicked', () => {
-      pdfIntegration = createPDFIntegration({ contentPartner: 'jstor' });
-      const banner = getBanner();
-      const closeButton = banner.shadowRoot.querySelector(
-        'button[data-testid=close-button]'
-      );
-
-      closeButton.click();
-
-      assert.isNull(getBanner());
     });
 
     context('when the PDF viewer content changes', () => {
