@@ -4,15 +4,9 @@
     "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
     "object-shorthand": ["error", "properties"],
 
-    // Suppressed to make ESLint v6 migration easier.
+    // We have some `object.hasOwnProperty` calls that need to be replaced with
+    // `Object.hasOwn` (or a polyfill).
     "no-prototype-builtins": "off",
-
-    // Handled by Prettier.
-    "comma-dangle": "off",
-
-    // https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html#eslint
-    "react/jsx-uses-react": "off",
-    "react/react-in-jsx-scope": "off",
 
     // Replaced by TypeScript's static checking.
     "react/prop-types": "off"
