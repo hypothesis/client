@@ -5,7 +5,8 @@ import { LabeledButton, Link } from '@hypothesis/frontend-shared';
  */
 
 /**
- * A banner that informs the user about the provider of the document.
+ * A banner that displays information about the current document and the entity
+ * that is providing access to it (eg. JSTOR).
  *
  * @param {object} props
  *   @param {ContentInfoConfig} props.info
