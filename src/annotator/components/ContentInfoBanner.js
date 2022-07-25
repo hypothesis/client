@@ -20,7 +20,9 @@ export default function ContentInfoBanner({ info, onClose }) {
       </Link>
       <div className="grow">
         {info.links.previousItem && (
-          <Link href={info.links.previousItem}>Previous article</Link>
+          <Link href={info.links.previousItem} target="_blank">
+            Previous article
+          </Link>
         )}
         {info.item.title}
         {info.item.containerTitle && (
@@ -30,7 +32,9 @@ export default function ContentInfoBanner({ info, onClose }) {
           </span>
         )}
         {info.links.nextItem && (
-          <Link href={info.links.nextItem}>Next article</Link>
+          <Link href={info.links.nextItem} target="_blank">
+            Next article
+          </Link>
         )}
       </div>
       <div className="text-annotator-base">
