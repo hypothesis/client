@@ -219,6 +219,7 @@ describe('annotator/integrations/pdf', () => {
     }
 
     describe('content info banner', () => {
+      /** @type {ContentInfoConfig} */
       const contentInfo = {
         logo: {
           logo: '/jstor-logo.svg',
