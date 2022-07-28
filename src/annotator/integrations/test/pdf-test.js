@@ -249,19 +249,6 @@ describe('annotator/integrations/pdf', () => {
         assert.isNotNull(banner);
         assert.include(banner.shadowRoot.textContent, contentInfo.item.title);
       });
-
-      it('closes content info banner when "Close" button is clicked', () => {
-        pdfIntegration = createPDFIntegration();
-        pdfIntegration.showContentInfo(contentInfo);
-        const banner = getBanner();
-        const closeButton = banner.shadowRoot.querySelector(
-          'button[data-testid=close-button]'
-        );
-
-        closeButton.click();
-
-        assert.isNull(getBanner());
-      });
     });
 
     it('does not show a warning when PDF has selectable text', async () => {

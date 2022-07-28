@@ -170,6 +170,8 @@ export default {
         sm: '360px',
         md: '480px',
         lg: '768px',
+        xl: '1024px',
+        '2xl': '1220px',
         // Narrow mobile screens
         'annotator-sm': '240px',
         // Wider mobile screens/small tablets
