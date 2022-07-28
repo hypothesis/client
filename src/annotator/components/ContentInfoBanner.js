@@ -1,4 +1,10 @@
-import { LabeledButton, Link } from '@hypothesis/frontend-shared';
+import classnames from 'classnames';
+
+import {
+  Link,
+  CaretLeftIcon,
+  CaretRightIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 /**
  * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoConfig
@@ -8,39 +14,110 @@ import { LabeledButton, Link } from '@hypothesis/frontend-shared';
  * A banner that displays information about the current document and the entity
  * that is providing access to it (eg. JSTOR).
  *
+ * Layout columns:
+ *  - Logo
+ *  - Container title (only shown on screens at `2xl` breakpoint and wider)
+ *  - Item title with previous and next links
+ *
  * @param {object} props
  *   @param {ContentInfoConfig} props.info
- *   @param {() => void} props.onClose
  */
-export default function ContentInfoBanner({ info, onClose }) {
+export default function ContentInfoBanner({ info }) {
   return (
-    <div className="flex items-center border-b gap-x-4 px-2 py-1 bg-white text-annotator-lg">
-      <Link href={info.logo.link} target="_blank" data-testid="logo-link">
-        <img src={info.logo.logo} alt={info.logo.title} />
-      </Link>
-      <div className="grow">
-        {info.links.previousItem && (
-          <Link href={info.links.previousItem} target="_blank">
-            Previous article
-          </Link>
-        )}
-        {info.item.title}
-        {info.item.containerTitle && (
-          <span>
-            {' '}
-            from <i>{info.item.containerTitle}</i>
-          </span>
-        )}
-        {info.links.nextItem && (
-          <Link href={info.links.nextItem} target="_blank">
-            Next article
+    <div
+      className={classnames(
+        'h-10 bg-white px-4 text-slate-7 text-annotator-base border-b',
+        'grid items-center',
+        // Two columns in narrower viewports; three in wider
+        'grid-cols-[100px_minmax(0,auto)] gap-x-4',
+        '2xl:grid-cols-[100px_minmax(0,auto)_minmax(0,auto)] 2xl:gap-x-3'
+      )}
+    >
+      <div data-testid="content-logo">
+        {info.logo && (
+          <Link href={info.logo.link} target="_blank" data-testid="logo-link">
+            <img
+              alt={info.logo.title}
+              src={info.logo.logo}
+              data-testid="logo-image"
+            />
           </Link>
         )}
       </div>
-      <div className="text-annotator-base">
-        <LabeledButton onClick={onClose} data-testid="close-button">
-          Close
-        </LabeledButton>
+      <div
+        className={classnames(
+          // Container title (this element) is not shown on narrow screens
+          'hidden',
+          '2xl:block 2xl:whitespace-nowrap 2xl:overflow-hidden 2xl:text-ellipsis',
+          'font-semibold'
+        )}
+        data-testid="content-container-info"
+        title={info.item.containerTitle}
+      >
+        {info.item.containerTitle}
+      </div>
+      <div
+        className={classnames(
+          // Flex layout for item title, next and previous links
+          'flex justify-center items-center gap-x-2'
+        )}
+        data-testid="content-item-info"
+      >
+        <div
+          className={classnames(
+            // Narrower viewports center this flex content:
+            // this element is not needed for alignment
+            'hidden',
+            // Wider viewports align this flex content to the right:
+            // This empty element is needed to fill extra space at left
+            '2xl:block 2xl:grow'
+          )}
+        />
+        {info.links.previousItem && (
+          <>
+            <Link
+              classes="flex gap-x-1 items-center text-annotator-sm whitespace-nowrap"
+              title="Open previous item"
+              href={info.links.previousItem}
+              underline="always"
+              target="_blank"
+              data-testid="content-previous-link"
+            >
+              <CaretLeftIcon className="w-em h-em" />
+              <span>Previous</span>
+            </Link>
+            <div className="text-annotator-sm">|</div>
+          </>
+        )}
+        <div
+          className={classnames(
+            // This element will shrink and truncate fluidly.
+            // Overriding min-width `auto` prevents the content from overflowing
+            // See https://stackoverflow.com/a/66689926/434243.
+            'min-w-0 whitespace-nowrap overflow-hidden text-ellipsis shrink font-medium'
+          )}
+        >
+          <span title={info.item.title} data-testid="content-item-title">
+            {info.item.title}
+          </span>
+        </div>
+
+        {info.links.nextItem && (
+          <>
+            <div className="text-annotator-sm">|</div>
+            <Link
+              title="Open next item"
+              classes="flex gap-x-1 items-center text-annotator-sm whitespace-nowrap"
+              href={info.links.nextItem}
+              underline="always"
+              target="_blank"
+              data-testid="content-next-link"
+            >
+              <span>Next</span>
+              <CaretRightIcon className="w-em h-em" />
+            </Link>
+          </>
+        )}
       </div>
     </div>
   );

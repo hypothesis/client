@@ -278,10 +278,7 @@ export class PDFIntegration extends TinyEmitter {
     render(
       <Banners>
         {this._bannerState.contentInfo && (
-          <ContentInfoBanner
-            info={this._bannerState.contentInfo}
-            onClose={() => this._updateBannerState({ contentInfo: null })}
-          />
+          <ContentInfoBanner info={this._bannerState.contentInfo} />
         )}
         {this._bannerState.noTextWarning && <WarningBanner />}
       </Banners>,

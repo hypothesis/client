@@ -2,43 +2,113 @@ import { mount } from 'enzyme';
 
 import ContentInfoBanner from '../ContentInfoBanner';
 
-const contentInfo = {
-  logo: {
-    link: 'https://www.jstor.org',
-    logo: 'https://www.jstorg.org/logo.svg',
-    title: 'JSTOR homepage',
-  },
+let contentInfo;
 
-  item: {
-    title: 'Chapter 2: Some book chapter',
-  },
-
-  links: {
-    previousItem: 'https://www.jstor.org/stable/book.123.1',
-    nextItem: 'https://www.jstor.org/stable/book.123.3',
-  },
-};
+const createComponent = props =>
+  mount(<ContentInfoBanner info={contentInfo} {...props} />);
 
 describe('ContentInfoBanner', () => {
-  it('renders banner', () => {
-    const wrapper = mount(<ContentInfoBanner info={contentInfo} />);
-    assert.include(wrapper.text(), contentInfo.item.title);
+  beforeEach(() => {
+    contentInfo = {
+      logo: {
+        link: 'https://www.jstor.org',
+        logo: 'https://www.jstor.org/logo.svg',
+        title: 'JSTOR homepage',
+      },
 
-    const logo = wrapper.find('Link[data-testid="logo-link"]');
-    assert.equal(logo.prop('href'), contentInfo.logo.link);
+      item: {
+        title: 'Chapter 2: Some book chapter',
+        containerTitle: 'Expansive Book',
+      },
+
+      links: {
+        previousItem: 'https://www.jstor.org/stable/book.123.1',
+        nextItem: 'https://www.jstor.org/stable/book.123.3',
+      },
+    };
   });
 
-  it('closes when "Close" button is clicked', () => {
-    const onClose = sinon.stub();
-    const wrapper = mount(
-      <ContentInfoBanner info={contentInfo} onClose={onClose} />
-    );
-    const closeButton = wrapper.find(
-      'LabeledButton[data-testid="close-button"]'
-    );
+  it('shows linked partner logo', () => {
+    const wrapper = createComponent();
 
-    closeButton.prop('onClick')();
+    const logoLink = wrapper.find('Link[data-testid="logo-link"]');
+    const logoImg = wrapper.find('img[data-testid="logo-image"]');
 
-    assert.calledOnce(onClose);
+    assert.equal(logoLink.prop('href'), contentInfo.logo.link);
+    assert.equal(logoImg.prop('src'), 'https://www.jstor.org/logo.svg');
+  });
+
+  it('shows item title', () => {
+    const wrapper = createComponent();
+
+    // TODO: This should be a link once the item link is available in
+    // content-info metadata
+    const title = wrapper.find('span[data-testid="content-item-title"]');
+    assert.equal(title.text(), 'Chapter 2: Some book chapter');
+  });
+
+  it('provides disclosure of long titles through title attributes', () => {
+    const wrapper = createComponent();
+
+    // Element text could be partially obscured (CSS truncation), so these
+    // title attributes provide access to the full titles
+    assert.equal(
+      wrapper.find('div[data-testid="content-container-info"]').prop('title'),
+      'Expansive Book'
+    );
+    assert.equal(
+      wrapper.find('span[data-testid="content-item-title"]').prop('title'),
+      'Chapter 2: Some book chapter'
+    );
+  });
+
+  describe('next and previous links', () => {
+    it('displays next and previous links when available', () => {
+      const wrapper = createComponent();
+
+      const prevLink = wrapper.find(
+        'Link[data-testid="content-previous-link"]'
+      );
+      const nextLink = wrapper.find('Link[data-testid="content-next-link"]');
+
+      assert.equal(
+        prevLink.prop('href'),
+        'https://www.jstor.org/stable/book.123.1'
+      );
+      assert.equal(
+        nextLink.prop('href'),
+        'https://www.jstor.org/stable/book.123.3'
+      );
+    });
+
+    it('does not display previous link if unavailable', () => {
+      const noLinks = { ...contentInfo };
+      delete noLinks.links.previousItem;
+
+      const wrapper = createComponent({ contentInfo: noLinks });
+
+      const prevLink = wrapper.find(
+        'Link[data-testid="content-previous-link"]'
+      );
+      const nextLink = wrapper.find('Link[data-testid="content-next-link"]');
+
+      assert.isFalse(prevLink.exists());
+      assert.isTrue(nextLink.exists());
+    });
+
+    it('does not display next link if unavailable', () => {
+      const noLinks = { ...contentInfo };
+      delete noLinks.links.nextItem;
+
+      const wrapper = createComponent({ contentInfo: noLinks });
+
+      const prevLink = wrapper.find(
+        'Link[data-testid="content-previous-link"]'
+      );
+      const nextLink = wrapper.find('Link[data-testid="content-next-link"]');
+
+      assert.isTrue(prevLink.exists());
+      assert.isFalse(nextLink.exists());
+    });
   });
 });
