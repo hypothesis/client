@@ -23,6 +23,7 @@ describe('sidebar/cross-origin-rpc', () => {
       allGroups: sinon.stub().returns([]),
       changeFocusModeUser: sinon.stub(),
       filterGroups: sinon.stub(),
+      setContentInfo: sinon.stub(),
     };
 
     fakeNormalizeGroupIds = sinon.stub().returns(['1', '2']);
@@ -70,12 +71,13 @@ describe('sidebar/cross-origin-rpc', () => {
       );
     });
 
-    describe('changeFocusModeUser', () => {
-      function callRPC(params) {
+    describe('on RPC request from embedder frame', () => {
+      // Simulate an RPC call from the embedder (eg. LMS) frame to the sidebar.
+      function callRPC(method, params) {
         fakeWindow.emitter.emit('message', {
           data: {
             jsonrpc: '2.0',
-            method: 'changeFocusModeUser',
+            method,
             id: 42,
             params,
           },
@@ -92,57 +94,72 @@ describe('sidebar/cross-origin-rpc', () => {
         console.error.restore();
       });
 
-      it('sets the focused user', () => {
-        startServer(fakeStore, settings, fakeWindow);
-
-        callRPC([{ username: 'foobar', displayName: 'Simon Says' }]);
-
-        assert.calledWith(
-          fakeStore.changeFocusModeUser,
-          sinon.match({ username: 'foobar', displayName: 'Simon Says' })
-        );
-      });
-
-      context('groups provided', () => {
-        it('normalizes any provided group IDs and sets filtered groups', () => {
+      describe('on "changeFocusModeUser" call', () => {
+        it('sets the focused user', () => {
           startServer(fakeStore, settings, fakeWindow);
-          fakeStore.allGroups.returns(['1', '2', '3']);
-          fakeNormalizeGroupIds.returns(['1', '2']);
 
-          callRPC([{ groups: ['1', '2', '3', '4'] }]);
+          callRPC('changeFocusModeUser', [
+            { username: 'foobar', displayName: 'Simon Says' },
+          ]);
 
           assert.calledWith(
-            fakeNormalizeGroupIds,
-            ['1', '2', '3', '4'],
-            ['1', '2', '3']
+            fakeStore.changeFocusModeUser,
+            sinon.match({ username: 'foobar', displayName: 'Simon Says' })
           );
-          assert.calledWith(fakeStore.filterGroups, ['1', '2']);
-          assert.notCalled(console.error);
         });
 
-        it('logs an error if there are provided group IDs but none match any known groups', () => {
-          startServer(fakeStore, settings, fakeWindow);
-          fakeNormalizeGroupIds.returns([]);
+        context('groups provided', () => {
+          it('normalizes any provided group IDs and sets filtered groups', () => {
+            startServer(fakeStore, settings, fakeWindow);
+            fakeStore.allGroups.returns(['1', '2', '3']);
+            fakeNormalizeGroupIds.returns(['1', '2']);
 
-          callRPC([{ groups: ['1', '2', '3'] }]);
+            callRPC('changeFocusModeUser', [{ groups: ['1', '2', '3', '4'] }]);
 
-          assert.calledWith(
-            console.error,
-            'No matching groups found in list of filtered group IDs'
-          );
-          assert.calledWith(fakeStore.filterGroups, []);
+            assert.calledWith(
+              fakeNormalizeGroupIds,
+              ['1', '2', '3', '4'],
+              ['1', '2', '3']
+            );
+            assert.calledWith(fakeStore.filterGroups, ['1', '2']);
+            assert.notCalled(console.error);
+          });
+
+          it('logs an error if there are provided group IDs but none match any known groups', () => {
+            startServer(fakeStore, settings, fakeWindow);
+            fakeNormalizeGroupIds.returns([]);
+
+            callRPC('changeFocusModeUser', [{ groups: ['1', '2', '3'] }]);
+
+            assert.calledWith(
+              console.error,
+              'No matching groups found in list of filtered group IDs'
+            );
+            assert.calledWith(fakeStore.filterGroups, []);
+          });
+        });
+
+        context('no groups provided', () => {
+          it('sets filtered groups to an empty set', () => {
+            startServer(fakeStore, settings, fakeWindow);
+            fakeNormalizeGroupIds.returns([]);
+
+            callRPC('changeFocusModeUser', [{ groups: [] }]);
+
+            assert.calledWith(fakeStore.filterGroups, []);
+            assert.notCalled(console.error);
+          });
         });
       });
 
-      context('no groups provided', () => {
-        it('sets filtered groups to an empty set', () => {
+      describe('on "showContentInfo" call', () => {
+        it('updates content info in store', () => {
           startServer(fakeStore, settings, fakeWindow);
-          fakeNormalizeGroupIds.returns([]);
+          const contentInfo = { item: { title: 'Some article' } };
 
-          callRPC([{ groups: [] }]);
+          callRPC('showContentInfo', [contentInfo]);
 
-          assert.calledWith(fakeStore.filterGroups, []);
-          assert.notCalled(console.error);
+          assert.calledWith(fakeStore.setContentInfo, sinon.match(contentInfo));
         });
       });
     });

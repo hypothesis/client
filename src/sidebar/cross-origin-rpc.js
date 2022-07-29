@@ -3,6 +3,7 @@ import { warnOnce } from '../shared/warn-once';
 import { normalizeGroupIds } from './helpers/groups';
 
 /**
+ * @typedef {import('../types/annotator').ContentInfoConfig} ContentInfoConfig
  * @typedef {import('../types/rpc').FocusUserInfo} FocusUserInfo
  */
 
@@ -30,6 +31,11 @@ const registeredMethods = store => {
         console.error('No matching groups found in list of filtered group IDs');
       }
       store.filterGroups(filteredGroupIds);
+    },
+
+    /** @param {ContentInfoConfig} contentInfo */
+    showContentInfo: contentInfo => {
+      store.setContentInfo(contentInfo);
     },
   };
 };
