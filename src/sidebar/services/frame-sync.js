@@ -238,6 +238,15 @@ export class FrameSyncService {
         onStoreAnnotationsChanged(annotations, frames, prevAnnotations),
       shallowEqual
     );
+
+    watch(
+      this._store.subscribe,
+      () => this._store.getContentInfo(),
+      contentInfo => {
+        const mainGuest = this._guestRPC.get(null);
+        mainGuest?.call('showContentInfo', contentInfo);
+      }
+    );
   }
 
   /**
@@ -272,6 +281,16 @@ export class FrameSyncService {
 
         frameIdentifier = info.frameIdentifier;
         this._guestRPC.set(frameIdentifier, guestRPC);
+
+        // Show the content info banner, if this is the main guest frame and
+        // if we already have the data for it.
+        //
+        // We send this only after "documentInfoChanged" is received, because
+        // we don't know before then if this is the main guest or not.
+        const contentInfo = this._store.getContentInfo();
+        if (frameIdentifier === null && contentInfo) {
+          guestRPC.call('showContentInfo', contentInfo);
+        }
 
         this._store.connectFrame({
           id: info.frameIdentifier,

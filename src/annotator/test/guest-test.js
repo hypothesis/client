@@ -494,6 +494,26 @@ describe('Guest', () => {
         });
       });
     });
+
+    describe('on "showContentInfo" event', () => {
+      const contentInfo = {
+        logo: {},
+        item: { title: 'Some article' },
+        links: {},
+      };
+
+      it('triggers display of content info in integration', () => {
+        createGuest();
+        emitSidebarEvent('showContentInfo', contentInfo);
+        assert.calledWith(fakeIntegration.showContentInfo, contentInfo);
+      });
+
+      it('does nothing if integration does not support content info display', () => {
+        createGuest();
+        fakeIntegration.showContentInfo = null;
+        emitSidebarEvent('showContentInfo', contentInfo);
+      });
+    });
   });
 
   describe('document events', () => {

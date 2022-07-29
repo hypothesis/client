@@ -132,7 +132,12 @@ export type SidebarToGuestEvent =
   /**
    * The sidebar relays to the guest(s) to set the annotation highlights on/off.
    */
-  | 'setHighlightsVisible';
+  | 'setHighlightsVisible'
+
+  /**
+   * Show a banner with information about the current content.
+   */
+  | 'showContentInfo';
 
 /**
  * Events that the sidebar sends to the host

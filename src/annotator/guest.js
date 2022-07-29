@@ -436,6 +436,12 @@ export class Guest {
       annotations => annotations.forEach(annotation => this.anchor(annotation))
     );
 
+    this._sidebarRPC.on(
+      'showContentInfo',
+      /** @param {ContentInfoConfig} info */
+      info => this._integration.showContentInfo?.(info)
+    );
+
     // Connect to sidebar and send document info/URIs to it.
     //
     // RPC calls are deferred until a connection is made, so these steps can
