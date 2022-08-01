@@ -17,7 +17,8 @@ const initialState = {
   sidebarHasOpened: false,
 
   /**
-   * Data for the content information banner shown in the host frame.
+   * Data for the content information banner shown above the content in the main
+   * guest frame.
    *
    * @type {ContentInfoConfig|null}
    */
