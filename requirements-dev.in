@@ -1,5 +1,0 @@
-# Python requirements needed to run the `make docs` command.
-recommonmark
-sphinx
-sphinx-autobuild
-sphinx_rtd_theme
