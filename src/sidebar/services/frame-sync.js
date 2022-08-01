@@ -243,8 +243,11 @@ export class FrameSyncService {
       this._store.subscribe,
       () => this._store.getContentInfo(),
       contentInfo => {
-        const mainGuest = this._guestRPC.get(null);
-        mainGuest?.call('showContentInfo', contentInfo);
+        // We send the content info to all guests, even though it is only needed
+        // by the main one. See notes in `_connectGuest`.
+        this._guestRPC.forEach(guest => {
+          guest.call('showContentInfo', contentInfo);
+        });
       }
     );
   }
@@ -281,16 +284,6 @@ export class FrameSyncService {
 
         frameIdentifier = info.frameIdentifier;
         this._guestRPC.set(frameIdentifier, guestRPC);
-
-        // Show the content info banner, if this is the main guest frame and
-        // if we already have the data for it.
-        //
-        // We send this only after "documentInfoChanged" is received, because
-        // we don't know before then if this is the main guest or not.
-        const contentInfo = this._store.getContentInfo();
-        if (frameIdentifier === null && contentInfo) {
-          guestRPC.call('showContentInfo', contentInfo);
-        }
 
         this._store.connectFrame({
           id: info.frameIdentifier,
@@ -406,6 +399,17 @@ export class FrameSyncService {
     // Synchronize highlight visibility in this guest with the sidebar's controls.
     guestRPC.call('setHighlightsVisible', this._highlightsVisible);
     guestRPC.call('featureFlagsUpdated', this._store.profile().features);
+
+    // If we have content banner data, send it to the guest. If there are
+    // multiple guests the banner is likely only appropriate for the main one.
+    // Current contexts that use the banner only have one guest, so we can get
+    // the data to the guest faster by sending it immediately, rather than
+    // waiting for the `documentInfoChanged` event to tell us which is the main
+    // guest.
+    const contentInfo = this._store.getContentInfo();
+    if (contentInfo) {
+      guestRPC.call('showContentInfo', contentInfo);
+    }
   }
 
   /**

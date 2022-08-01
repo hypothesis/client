@@ -605,21 +605,8 @@ describe('FrameSyncService', () => {
       assert.calledWith(channel.call, 'setHighlightsVisible', false);
     });
 
-    [
-      {
-        haveContentInfo: false,
-        isMainGuest: true,
-      },
-      {
-        haveContentInfo: true,
-        isMainGuest: false,
-      },
-      {
-        haveContentInfo: true,
-        isMainGuest: true,
-      },
-    ].forEach(({ haveContentInfo, isMainGuest }) => {
-      it('sends content info to main guest if available', async () => {
+    [true, false].forEach(haveContentInfo => {
+      it('sends content info to guest if available', async () => {
         let channel;
         setupPortRPC = rpc => {
           channel = rpc;
@@ -632,12 +619,12 @@ describe('FrameSyncService', () => {
         await connectGuest();
         emitGuestEvent('documentInfoChanged', {
           uri: 'https://publisher.org/article.pdf',
-          frameIdentifier: isMainGuest ? null : 'sub-frame',
+          frameIdentifier: null,
         });
 
         assert.equal(
           channel.call.calledWith('showContentInfo', contentInfo),
-          haveContentInfo && isMainGuest
+          haveContentInfo
         );
       });
     });
@@ -829,7 +816,7 @@ describe('FrameSyncService', () => {
   context('when content info in store changes', () => {
     const contentInfo = { item: { title: 'Some article' } };
 
-    it('sends content info to main guest', async () => {
+    it('sends new content info to guests', async () => {
       await frameSync.connect();
       await connectGuest();
       emitGuestEvent('documentInfoChanged', {
@@ -840,19 +827,6 @@ describe('FrameSyncService', () => {
       fakeStore.setContentInfo(contentInfo);
 
       assert.calledWith(guestRPC().call, 'showContentInfo', contentInfo);
-    });
-
-    it("doesn't send content info to non-main guests", async () => {
-      await frameSync.connect();
-      await connectGuest();
-      emitGuestEvent('documentInfoChanged', {
-        uri: 'https://publisher.org/article.pdf',
-        frameIdentifier: 'sub-frame',
-      });
-
-      fakeStore.setContentInfo(contentInfo);
-
-      assert.isFalse(guestRPC().call.calledWith('showContentInfo'));
     });
   });
 });
