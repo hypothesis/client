@@ -617,10 +617,6 @@ describe('FrameSyncService', () => {
         }
 
         await connectGuest();
-        emitGuestEvent('documentInfoChanged', {
-          uri: 'https://publisher.org/article.pdf',
-          frameIdentifier: null,
-        });
 
         assert.equal(
           channel.call.calledWith('showContentInfo', contentInfo),
@@ -819,10 +815,6 @@ describe('FrameSyncService', () => {
     it('sends new content info to guests', async () => {
       await frameSync.connect();
       await connectGuest();
-      emitGuestEvent('documentInfoChanged', {
-        uri: 'https://publisher.org/article.pdf',
-        frameIdentifier: null,
-      });
 
       fakeStore.setContentInfo(contentInfo);
 
