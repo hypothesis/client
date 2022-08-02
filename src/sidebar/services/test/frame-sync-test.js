@@ -605,14 +605,14 @@ describe('FrameSyncService', () => {
       assert.calledWith(channel.call, 'setHighlightsVisible', false);
     });
 
-    [true, false].forEach(haveContentInfo => {
+    [true, false].forEach(contentInfoAvailable => {
       it('sends content info to guest if available', async () => {
         let channel;
         setupPortRPC = rpc => {
           channel = rpc;
         };
         const contentInfo = { item: { title: 'Some article' } };
-        if (haveContentInfo) {
+        if (contentInfoAvailable) {
           fakeStore.setContentInfo(contentInfo);
         }
 
@@ -624,7 +624,7 @@ describe('FrameSyncService', () => {
 
         assert.equal(
           channel.call.calledWith('showContentInfo', contentInfo),
-          haveContentInfo
+          contentInfoAvailable
         );
       });
     });
