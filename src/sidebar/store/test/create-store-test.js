@@ -65,29 +65,6 @@ const counterModules = [
   }),
 ];
 
-// Store module whose state is an array.
-const tagsModule = createStoreModule([], {
-  namespace: 'tags',
-
-  reducers: {
-    ADD_TAG(state, action) {
-      return [...state, action.tag];
-    },
-  },
-
-  actionCreators: {
-    addTag(tag) {
-      return { type: 'ADD_TAG', tag };
-    },
-  },
-
-  selectors: {
-    getTags(state) {
-      return state;
-    },
-  },
-});
-
 // Store module with reducers that update only a subset of the state.
 const groupsModule = createStoreModule(
   {
@@ -243,14 +220,6 @@ describe('createStore', () => {
     });
     const store = createStore([module]);
     assert.equal(store.getState().test.value, 42);
-  });
-
-  it('supports modules whose state is an array', () => {
-    const store = createStore([tagsModule]);
-    assert.deepEqual(store.getTags(), []);
-    store.addTag('tag-1');
-    store.addTag('tag-2');
-    assert.deepEqual(store.getTags(), ['tag-1', 'tag-2']);
   });
 
   it('combines state updates from reducers with initial module state', () => {
