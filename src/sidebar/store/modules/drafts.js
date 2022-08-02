@@ -13,8 +13,10 @@ import { removeAnnotations } from './annotations';
  * existing annotations.
  */
 
-/** @type {Draft[]} */
-const initialState = [];
+const initialState = {
+  /** @type {Draft[]} */
+  drafts: [],
+};
 
 /** @typedef {typeof initialState} State */
 
@@ -72,7 +74,7 @@ export class Draft {
 
 const reducers = {
   DISCARD_ALL_DRAFTS() {
-    return [];
+    return { drafts: [] };
   },
 
   /**
@@ -80,10 +82,10 @@ const reducers = {
    * @param {{ annotation: AnnotationID }} action
    */
   REMOVE_DRAFT(state, action) {
-    const drafts = state.filter(draft => {
+    const drafts = state.drafts.filter(draft => {
       return !draft.match(action.annotation);
     });
-    return drafts;
+    return { drafts };
   },
 
   /**
@@ -92,11 +94,11 @@ const reducers = {
    */
   UPDATE_DRAFT(state, action) {
     // removes a matching existing draft, then adds
-    const drafts = state.filter(draft => {
+    const drafts = state.drafts.filter(draft => {
       return !draft.match(action.draft.annotation);
     });
     drafts.push(action.draft); // push ok since its a copy
-    return drafts;
+    return { drafts };
   },
 };
 
@@ -124,7 +126,7 @@ function deleteNewAndEmptyDrafts() {
    * @param {() => { drafts: State }} getState
    */
   return (dispatch, getState) => {
-    const newDrafts = getState().drafts.filter(draft => {
+    const newDrafts = getState().drafts.drafts.filter(draft => {
       return (
         !draft.annotation.id &&
         !getDraftIfNotEmpty(getState().drafts, draft.annotation)
@@ -161,7 +163,7 @@ function removeDraft(annotation) {
  * @param {State} state
  */
 function countDrafts(state) {
-  return state.length;
+  return state.drafts.length;
 }
 
 /**
@@ -171,7 +173,7 @@ function countDrafts(state) {
  * @param {AnnotationID} annotation
  */
 function getDraft(state, annotation) {
-  const drafts = state;
+  const drafts = state.drafts;
   for (let i = 0; i < drafts.length; i++) {
     const draft = drafts[i];
     if (draft.match(annotation)) {
@@ -202,7 +204,7 @@ function getDraftIfNotEmpty(state, annotation) {
  */
 const unsavedAnnotations = createSelector(
   /** @param {State} state */
-  state => state,
+  state => state.drafts,
   drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );
 
