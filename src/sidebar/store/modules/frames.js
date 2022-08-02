@@ -8,6 +8,7 @@ import shallowEqual from 'shallowequal';
 import { createStoreModule, makeAction } from '../create-store';
 
 /**
+ * @typedef {import('../../../types/annotator').ContentInfoConfig} ContentInfoConfig
  * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
  */
 
@@ -23,6 +24,14 @@ import { createStoreModule, makeAction } from '../create-store';
 const initialState = {
   /** @type {Frame[]} */
   frames: [],
+
+  /**
+   * Data for the content information banner shown above the content in the main
+   * guest frame.
+   *
+   * @type {ContentInfoConfig|null}
+   */
+  contentInfo: null,
 };
 
 /** @typedef {typeof initialState} State */
@@ -71,6 +80,14 @@ const reducers = {
     });
     return { frames };
   },
+
+  /**
+   * @param {State} state
+   * @param {{ info: ContentInfoConfig }} action
+   */
+  SET_CONTENT_INFO(state, action) {
+    return { contentInfo: action.info };
+  },
 };
 
 /**
@@ -105,6 +122,11 @@ function updateFrameAnnotationFetchStatus(uri, isFetchComplete) {
     uri,
     isAnnotationFetchComplete: isFetchComplete,
   });
+}
+
+/** @param {ContentInfoConfig} info */
+function setContentInfo(info) {
+  return makeAction(reducers, 'SET_CONTENT_INFO', { info });
 }
 
 /**
@@ -178,6 +200,11 @@ const searchUris = createShallowEqualSelector(
   uris => uris
 );
 
+/** @param {State} state */
+function getContentInfo(state) {
+  return state.contentInfo;
+}
+
 export const framesModule = createStoreModule(initialState, {
   namespace: 'frames',
   reducers,
@@ -185,10 +212,12 @@ export const framesModule = createStoreModule(initialState, {
   actionCreators: {
     connectFrame,
     destroyFrame,
+    setContentInfo,
     updateFrameAnnotationFetchStatus,
   },
 
   selectors: {
+    getContentInfo,
     frames,
     mainFrame,
     searchUris,

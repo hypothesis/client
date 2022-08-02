@@ -194,4 +194,16 @@ describe('sidebar/store/modules/frames', () => {
       });
     });
   });
+
+  describe('getContentInfo', () => {
+    it('returns data for content info banner', () => {
+      const contentInfo = {
+        logo: {},
+        item: { title: 'Some article' },
+        links: {},
+      };
+      store.setContentInfo(contentInfo);
+      assert.deepEqual(store.getContentInfo(), contentInfo);
+    });
+  });
 });
