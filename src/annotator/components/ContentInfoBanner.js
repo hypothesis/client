@@ -106,6 +106,7 @@ export default function ContentInfoBanner({ info }) {
             title={itemTitle}
             href={info.links.currentItem}
             data-testid="content-item-link"
+            target="_blank"
           >
             {itemTitle}
           </LinkUnstyled>

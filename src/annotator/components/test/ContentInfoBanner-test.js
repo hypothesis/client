@@ -46,8 +46,9 @@ describe('ContentInfoBanner', () => {
   it('shows item title', () => {
     const wrapper = createComponent();
 
-    const title = wrapper.find('LinkUnstyled[data-testid="content-item-link"]');
-    assert.equal(title.text(), 'Chapter 2: Some book chapter');
+    const link = wrapper.find('LinkUnstyled[data-testid="content-item-link"]');
+    assert.equal(link.text(), 'Chapter 2: Some book chapter');
+    assert.equal(link.prop('target'), '_blank');
   });
 
   it('provides disclosure of long titles through title attributes', () => {
@@ -80,10 +81,12 @@ describe('ContentInfoBanner', () => {
         prevLink.prop('href'),
         'https://www.jstor.org/stable/book.123.1'
       );
+      assert.equal(prevLink.prop('target'), '_blank');
       assert.equal(
         nextLink.prop('href'),
         'https://www.jstor.org/stable/book.123.3'
       );
+      assert.equal(nextLink.prop('target'), '_blank');
     });
 
     it('does not display previous link if unavailable', () => {
