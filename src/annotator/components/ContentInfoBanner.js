@@ -2,6 +2,7 @@ import classnames from 'classnames';
 
 import {
   Link,
+  LinkUnstyled,
   CaretLeftIcon,
   CaretRightIcon,
 } from '@hypothesis/frontend-shared/lib/next';
@@ -23,6 +24,10 @@ import {
  *   @param {ContentInfoConfig} props.info
  */
 export default function ContentInfoBanner({ info }) {
+  // Format item title to show subtitle
+  const itemTitle = `${info.item.title}${info.item.subtitle && ': '}${
+    info.item.subtitle
+  }`;
   return (
     <div
       className={classnames(
@@ -52,9 +57,9 @@ export default function ContentInfoBanner({ info }) {
           'font-semibold'
         )}
         data-testid="content-container-info"
-        title={info.item.containerTitle}
+        title={info.container.title}
       >
-        {info.item.containerTitle}
+        {info.container.title}
       </div>
       <div
         className={classnames(
@@ -97,9 +102,13 @@ export default function ContentInfoBanner({ info }) {
             'min-w-0 whitespace-nowrap overflow-hidden text-ellipsis shrink font-medium'
           )}
         >
-          <span title={info.item.title} data-testid="content-item-title">
-            {info.item.title}
-          </span>
+          <LinkUnstyled
+            title={itemTitle}
+            href={info.links.currentItem}
+            data-testid="content-item-link"
+          >
+            {itemTitle}
+          </LinkUnstyled>
         </div>
 
         {info.links.nextItem && (

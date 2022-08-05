@@ -201,8 +201,7 @@
  *
  * @typedef ContentInfoItem
  * @prop {string} title - Title of the current article, chapter etc.
- * @prop {string} containerTitle - Title of the journal issue, book etc. which
- *   contains the current work
+ * @prop {string} [subtitle]
  */
 
 /**
@@ -211,6 +210,7 @@
  * @typedef ContentInfoLinks
  * @prop {string} [previousItem] - Previous item in the book, journal etc.
  * @prop {string} [nextItem] - Next item in the book, journal etc.
+ * @prop {string} currentItem - This item in the content provider's context
  */
 
 /**
@@ -222,7 +222,9 @@
  *
  * @typedef {object} ContentInfoConfig
  * @prop {ContentInfoLogo} logo - Logo of the content provider
- * @prop {ContentInfoItem} item
+ * @prop {ContentInfoItem} item - Metadata about the current content item
+ * @prop {ContentInfoItem} container - Metadata about the container (journal or
+ *   book, e.g.) the current `item` is part of
  * @prop {ContentInfoLinks} links
  */
 

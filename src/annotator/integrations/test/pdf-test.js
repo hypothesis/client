@@ -228,7 +228,9 @@ describe('annotator/integrations/pdf', () => {
         },
         item: {
           title: 'Chapter 2: A chapter',
-          containerTitle: 'Book Title Here',
+        },
+        container: {
+          title: 'Book Title Here',
         },
         links: {
           previousItem: 'https://jstor.org/stable/book123.1',
