@@ -51,6 +51,15 @@ describe('ContentInfoBanner', () => {
     assert.equal(link.prop('target'), '_blank');
   });
 
+  it('handles missing subtitle', () => {
+    delete contentInfo.item.subtitle;
+
+    const wrapper = createComponent();
+
+    const link = wrapper.find('LinkUnstyled[data-testid="content-item-link"]');
+    assert.equal(link.text(), 'Chapter 2');
+  });
+
   it('provides disclosure of long titles through title attributes', () => {
     const wrapper = createComponent();
 

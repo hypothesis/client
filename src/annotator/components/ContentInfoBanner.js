@@ -25,9 +25,10 @@ import {
  */
 export default function ContentInfoBanner({ info }) {
   // Format item title to show subtitle
-  const itemTitle = `${info.item.title}${info.item.subtitle && ': '}${
-    info.item.subtitle
-  }`;
+  let itemTitle = info.item.title;
+  if (info.item.subtitle) {
+    itemTitle += `: ${info.item.subtitle}`;
+  }
   return (
     <div
       className={classnames(
