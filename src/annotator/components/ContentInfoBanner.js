@@ -34,7 +34,7 @@ export default function ContentInfoBanner({ info }) {
         'h-10 bg-white px-4 text-slate-7 text-annotator-base border-b',
         'grid items-center',
         // Two columns in narrower viewports; three in wider
-        'grid-cols-[100px_minmax(0,auto)] gap-x-4',
+        'grid-cols-[100px_minmax(0,auto)]',
         '2xl:grid-cols-[100px_minmax(0,auto)_minmax(0,auto)] 2xl:gap-x-3'
       )}
     >
