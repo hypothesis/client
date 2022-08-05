@@ -17,8 +17,13 @@ describe('ContentInfoBanner', () => {
       },
 
       item: {
-        title: 'Chapter 2: Some book chapter',
-        containerTitle: 'Expansive Book',
+        title: 'Chapter 2',
+        subtitle: 'Some book chapter',
+      },
+
+      container: {
+        title: 'Expansive Book',
+        subtitle: 'The revenge',
       },
 
       links: {
@@ -41,9 +46,7 @@ describe('ContentInfoBanner', () => {
   it('shows item title', () => {
     const wrapper = createComponent();
 
-    // TODO: This should be a link once the item link is available in
-    // content-info metadata
-    const title = wrapper.find('span[data-testid="content-item-title"]');
+    const title = wrapper.find('LinkUnstyled[data-testid="content-item-link"]');
     assert.equal(title.text(), 'Chapter 2: Some book chapter');
   });
 
@@ -57,7 +60,9 @@ describe('ContentInfoBanner', () => {
       'Expansive Book'
     );
     assert.equal(
-      wrapper.find('span[data-testid="content-item-title"]').prop('title'),
+      wrapper
+        .find('LinkUnstyled[data-testid="content-item-link"]')
+        .prop('title'),
       'Chapter 2: Some book chapter'
     );
   });
