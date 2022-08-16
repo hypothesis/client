@@ -61,12 +61,11 @@ export class HTMLMetadata {
    */
   uri() {
     let uri = decodeURIComponent(this._getDocumentHref());
-
     // Use the `link[rel=canonical]` element's href as the URL if present.
     const links = this._getLinks();
     for (let link of links) {
-      if (link.rel === 'canonical') {
-        uri = link.href;
+      if (link.rel === 'canonical' && this._isValidCanonicalUrl(uri, link.href)) {
+        return link.href;
       }
     }
 
@@ -277,6 +276,30 @@ export class HTMLMetadata {
    */
   _absoluteUrl(url) {
     return normalizeURI(url, this.document.baseURI);
+  }
+
+  /**
+   * Check that the canonical URL does not point to `localhost` when document URL
+   * does not.
+   *
+   * 1. If document URL hostname and canonical URL hostname are both `localhost`,
+   *    use canonical URL.
+   * 2. If canonical URL hostname is `localhost` and document URL
+   *    hostname is different, do not use canonical URL as the resource URL
+   *    but the document URL.
+   * 3. Else use canonical URL as the resource URL.
+   *
+   * @param {string} documentURL
+   * @param {string} canonicalURL
+   */
+  _isValidCanonicalUrl(documentURL, canonicalURL) {
+    if (new URL(canonicalURL).hostname === 'localhost');
+      if (new URL(documentURL).hostname === 'localhost');
+        return canonicalURL;
+      else
+        return documentURL;
+    else
+      return canonicalURL;
   }
 
   // Get the true URI record when it's masked via a different protocol.
