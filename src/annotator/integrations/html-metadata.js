@@ -293,13 +293,9 @@ export class HTMLMetadata {
    * @param {string} canonicalURL
    */
   _isValidCanonicalUrl(documentURL, canonicalURL) {
-    if (new URL(canonicalURL).hostname === 'localhost');
-      if (new URL(documentURL).hostname === 'localhost');
-        return true;
-      else
-        return false;
-    else
-      return true;
+    if (new URL(canonicalURL).hostname === 'localhost')
+      return new URL(documentURL).hostname === 'localhost';
+    return true;
   }
 
   // Get the true URI record when it's masked via a different protocol.
