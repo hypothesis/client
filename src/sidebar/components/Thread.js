@@ -205,7 +205,15 @@ function Thread({ thread, threadsService }) {
             data-testid="thread-children"
           >
             {visibleChildren.map(child => (
-              <li key={child.id} className="mt-2">
+              <li
+                key={child.id}
+                className={classnames(
+                  'mt-2',
+                  // Ensure correct rendering of replies with RTL content.
+                  // See https://github.com/hypothesis/client/issues/4705.
+                  '[text-align:start]'
+                )}
+              >
                 <Thread thread={child} threadsService={threadsService} />
               </li>
             ))}
