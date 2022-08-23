@@ -12,6 +12,13 @@
 // `:host` rules have lower precedence than global CSS, unless `!important` is used.
 // See https://stackoverflow.com/questions/54821175/.
 :host {
+  // Define the reference font size used by `text-annotator-<size>` utilities.
+  //
+  // We try to respect the document's standard font size, but clamp to ensure
+  // text is always readable. See https://github.com/hypothesis/client/issues/4615.
+  --hypothesis-font-size: 16px; // Fallback
+  --hypothesis-font-size: clamp(16px, 1rem, 24px);
+
   // Our host elements have zero width/height, as they are just containers for
   // the shadow roots. Therefore we must override any page styles which would
   // cause them to clip their contents. See eg. https://github.com/hypothesis/client/issues/4641.
