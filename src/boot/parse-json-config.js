@@ -1,20 +1,4 @@
 /**
- * `Object.assign()`-like helper. Used because this script needs to work
- * in IE 10/11 without polyfills.
- *
- * @param {Record<string, unknown>} dest
- * @param {Record<string, unknown>} src
- */
-function assign(dest, src) {
-  for (const k in src) {
-    if (src.hasOwnProperty(k)) {
-      dest[k] = src[k];
-    }
-  }
-  return dest;
-}
-
-/**
  * Return a parsed `js-hypothesis-config` object from the document, or `{}`.
  *
  * Find all `<script class="js-hypothesis-config">` tags in the given document,
@@ -48,7 +32,7 @@ export function parseJsonConfig(document) {
       );
       settings = {};
     }
-    assign(config, settings);
+    Object.assign(config, settings);
   }
 
   return config;

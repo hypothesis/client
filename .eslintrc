@@ -4,10 +4,6 @@
     "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
     "object-shorthand": ["error", "properties"],
 
-    // We have some `object.hasOwnProperty` calls that need to be replaced with
-    // `Object.hasOwn` (or a polyfill).
-    "no-prototype-builtins": "off",
-
     // Replaced by TypeScript's static checking.
     "react/prop-types": "off"
   },

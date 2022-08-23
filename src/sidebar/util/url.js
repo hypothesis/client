@@ -1,3 +1,5 @@
+import { hasOwn } from '../../shared/has-own';
+
 /**
  * Replace parameters in a URL template with values from a `params` object.
  *
@@ -16,7 +18,7 @@ export function replaceURLParams(url, params) {
   /** @type {Record<string, Param>} */
   const unusedParams = {};
   for (const param in params) {
-    if (params.hasOwnProperty(param)) {
+    if (hasOwn(params, param)) {
       const value = params[param];
       const urlParam = ':' + param;
       if (url.indexOf(urlParam) !== -1) {
