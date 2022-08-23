@@ -88,12 +88,13 @@ export default {
         xl: ['16px'],
         '2xl': ['18px'],
         'touch-base': ['16px', '1.4'], // Used for touch interfaces in certain UIs
-        // rem-based font sizes for annotator controls that should scale
-        // with text scaling in the underlying document
-        'annotator-sm': ['0.75rem'],
-        'annotator-base': ['0.875rem'],
-        'annotator-lg': ['1rem'],
-        'annotator-xl': ['1.125rem'],
+        // Font sizes for annotator controls that should scale with text in the
+        // document. These can only be used within shadow roots that include the
+        // annotator.css bundle.
+        'annotator-sm': ['calc(0.75 * var(--hypothesis-font-size))'],
+        'annotator-base': ['calc(0.875 * var(--hypothesis-font-size))'],
+        'annotator-lg': ['var(--hypothesis-font-size)'],
+        'annotator-xl': ['calc(1.125 * var(--hypothesis-font-size))'],
         // These are known cases when we want absolute sizing for fonts so
         // that they do not scale, for example annotator components that are
         // rendered next to the sidebar (which doesn't scale with host root
