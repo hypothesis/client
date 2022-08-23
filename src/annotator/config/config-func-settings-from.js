@@ -1,3 +1,5 @@
+import { hasOwn } from '../../shared/has-own';
+
 /**
  * @typedef HypothesisWindowProps
  * @prop {() => Record<string, unknown>} [hypothesisConfig] - Function that returns configuration
@@ -22,7 +24,7 @@
  * @return {Record<string, unknown>} - Any config settings returned by hypothesisConfig()
  */
 export function configFuncSettingsFrom(window_) {
-  if (!window_.hasOwnProperty('hypothesisConfig')) {
+  if (!hasOwn(window_, 'hypothesisConfig')) {
     return {};
   }
 

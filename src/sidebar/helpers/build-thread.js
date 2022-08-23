@@ -1,3 +1,5 @@
+import { hasOwn } from '../../shared/has-own';
+
 /**
  * @typedef {import('../../types/api').Annotation} Annotation
  *
@@ -342,7 +344,7 @@ export function buildThread(annotations, options) {
       collapsed: thread.collapsed,
     };
 
-    if (options.expanded.hasOwnProperty(thread.id)) {
+    if (hasOwn(options.expanded, thread.id)) {
       // This thread has been explicitly expanded/collapsed by user
       threadStates.collapsed = !options.expanded[thread.id];
     } else {

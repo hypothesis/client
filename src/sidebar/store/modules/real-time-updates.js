@@ -12,8 +12,8 @@
 
 import { createSelector } from 'reselect';
 
+import { hasOwn } from '../../../shared/has-own';
 import { createStoreModule, makeAction } from '../create-store';
-
 import { annotationsModule } from './annotations';
 import { groupsModule } from './groups';
 import { routeModule } from './route';
@@ -215,7 +215,7 @@ const pendingUpdateCount = createSelector(
  * @param {string} id
  */
 function hasPendingDeletion(state, id) {
-  return state.pendingDeletions.hasOwnProperty(id);
+  return hasOwn(state.pendingDeletions, id);
 }
 
 export const realTimeUpdatesModule = createStoreModule(initialState, {

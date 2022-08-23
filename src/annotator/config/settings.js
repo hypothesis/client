@@ -1,3 +1,4 @@
+import { hasOwn } from '../../shared/has-own';
 import { parseJsonConfig } from '../../boot/parse-json-config';
 import { toBoolean } from '../../shared/type-coercions';
 
@@ -150,11 +151,11 @@ export function settingsFrom(window_) {
    * @param {string} name - Unique name of the setting
    */
   function hostPageSetting(name) {
-    if (configFuncSettings.hasOwnProperty(name)) {
+    if (hasOwn(configFuncSettings, name)) {
       return configFuncSettings[name];
     }
 
-    if (jsonConfigs.hasOwnProperty(name)) {
+    if (hasOwn(jsonConfigs, name)) {
       return jsonConfigs[name];
     }
 

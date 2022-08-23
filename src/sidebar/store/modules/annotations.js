@@ -5,6 +5,7 @@
 
 import { createSelector } from 'reselect';
 
+import { hasOwn } from '../../../shared/has-own';
 import * as metadata from '../../helpers/annotation-metadata';
 import { isSaved } from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
@@ -239,7 +240,7 @@ const reducers = {
    */
   UPDATE_ANCHOR_STATUS(state, action) {
     const annotations = state.annotations.map(annot => {
-      if (!action.statusUpdates.hasOwnProperty(annot.$tag)) {
+      if (!hasOwn(action.statusUpdates, annot.$tag)) {
         return annot;
       }
 
