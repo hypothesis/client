@@ -7,6 +7,17 @@
 @use './components';
 @use './utilities';
 
+// Styles for `<hypothesis-*>` elements in the host page.
+//
+// `:host` rules have lower precedence than global CSS, unless `!important` is used.
+// See https://stackoverflow.com/questions/54821175/.
+:host {
+  // Our host elements have zero width/height, as they are just containers for
+  // the shadow roots. Therefore we must override any page styles which would
+  // cause them to clip their contents. See eg. https://github.com/hypothesis/client/issues/4641.
+  overflow: visible !important;
+}
+
 // Styles for all top-level elements in shadow roots.
 :host > * {
   @apply font-sans;
