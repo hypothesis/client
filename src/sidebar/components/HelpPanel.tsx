@@ -1,7 +1,10 @@
 import { Icon, Link, LinkButton } from '@hypothesis/frontend-shared';
+import type { ComponentChildren as Children } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
+import type { AuthState } from '../helpers/version-data';
 import { useSidebarStore } from '../store';
+import type { SessionService } from '../services/session';
 import { withServices } from '../service-context';
 import { VersionData } from '../helpers/version-data';
 
@@ -9,19 +12,18 @@ import SidebarPanel from './SidebarPanel';
 import Tutorial from './Tutorial';
 import VersionInfo from './VersionInfo';
 
-/**
- * @typedef {import('../helpers/version-data').AuthState} AuthState
- * @typedef {import("preact").ComponentChildren} Children
- */
+type HelpPanelNavigationButtonProps = {
+  children: Children;
+  onClick: (e: Event) => void;
+};
 
 /**
  * Navigation link-button to swap between sub-panels in the help panel
- *
- * @param {object} props
- *   @param {Children} props.children
- *   @param {(e: Event) => void} props.onClick
  */
-function HelpPanelNavigationButton({ children, onClick }) {
+function HelpPanelNavigationButton({
+  children,
+  onClick,
+}: HelpPanelNavigationButtonProps) {
   return (
     <LinkButton classes="leading-none text-brand" onClick={onClick}>
       {children}
@@ -30,14 +32,17 @@ function HelpPanelNavigationButton({ children, onClick }) {
   );
 }
 
+type HelpPanelTabProps = {
+  /** What the tab's link should say. */
+  linkText: string;
+  /** Where the tab's link should go. */
+  url: string;
+};
+
 /**
  * External link "tabs" inside of the help panel.
- *
- * @param {object} props
- *   @param {string} props.linkText - What the tab's link should say
- *   @param {string} props.url - Where the tab's link should go
  */
-function HelpPanelTab({ linkText, url }) {
+function HelpPanelTab({ linkText, url }: HelpPanelTabProps) {
   return (
     <div className="flex-1 border-r last-of-type:border-r-0">
       <Link
@@ -51,18 +56,15 @@ function HelpPanelTab({ linkText, url }) {
   );
 }
 
-/**
- * @typedef HelpPanelProps
- * @prop {AuthState} auth
- * @prop {import('../services/session').SessionService} session
- */
+type HelpPanelProps = {
+  auth: AuthState;
+  session: SessionService;
+};
 
 /**
  * A help sidebar panel with two sub-panels: tutorial and version info.
- *
- * @param {HelpPanelProps} props
  */
-function HelpPanel({ auth, session }) {
+function HelpPanel({ auth, session }: HelpPanelProps) {
   const store = useSidebarStore();
   const frames = store.frames();
   const mainFrame = store.mainFrame();
@@ -78,11 +80,10 @@ function HelpPanel({ auth, session }) {
     tutorial: 'Getting started',
     versionInfo: 'About this version',
   };
+  type PanelKey = keyof typeof subPanelTitles;
 
   // The "Tutorial" (getting started) subpanel is the default panel shown
-  const [activeSubPanel, setActiveSubPanel] = useState(
-    /** @type {keyof subPanelTitles} */ ('tutorial')
-  );
+  const [activeSubPanel, setActiveSubPanel] = useState<PanelKey>('tutorial');
 
   // Build version details about this session/app
   const versionData = useMemo(() => {
@@ -107,18 +108,13 @@ function HelpPanel({ auth, session }) {
   // create-new-ticket form
   const supportTicketURL = `https://web.hypothes.is/get-help/?sys_info=${versionData.asEncodedURLString()}`;
 
-  /**
-   * @param {Event} e
-   * @param {keyof subPanelTitles} panelName
-   */
-  const openSubPanel = (e, panelName) => {
+  const openSubPanel = (e: Event, panelName: PanelKey) => {
     e.preventDefault();
     setActiveSubPanel(panelName);
   };
 
   const onActiveChanged = useCallback(
-    /** @param {boolean} active */
-    active => {
+    (active: boolean) => {
       if (!active && hasAutoDisplayPreference) {
         // If the tutorial is currently being auto-displayed, update the user
         // preference to disable the auto-display from happening on subsequent
