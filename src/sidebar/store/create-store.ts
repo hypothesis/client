@@ -5,55 +5,49 @@ import thunk from 'redux-thunk';
 
 import { immutable } from '../util/immutable';
 
-/**
- * Helper that strips the first argument from a function type.
- *
- * @template F
- * @typedef {F extends (x: any, ...args: infer P) => infer R ? (...args: P) => R : never} OmitFirstArg
- */
+/** Helper that strips the first argument from a function type. */
+type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
+  ? (...args: P) => R
+  : never;
 
 /**
  * Helper that converts an object of selector functions, which take a `state`
  * parameter plus zero or more arguments, into selector methods, with no `state` parameter.
- *
- * @template T
- * @typedef {{ [K in keyof T]: OmitFirstArg<T[K]> }} SelectorMethods
  */
+type SelectorMethods<T> = { [K in keyof T]: OmitFirstArg<T[K]> };
 
-/**
- * Map of action type to reducer function.
- *
- * @template State
- * @typedef {{ [action: string]: (s: State, action: any) => Partial<State> }} ReducerMap
- */
+/** Map of action type to reducer function. */
+type ReducerMap<State> = {
+  [action: string]: (s: State, action: any) => Partial<State>;
+};
 
-/**
- * Map of selector name to selector function.
- *
- * @template State
- * @typedef {{ [name: string]: (s: State, ...args: any[]) => any }} SelectorMap
- */
+/** Map of selector name to selector function. */
+type SelectorMap<State> = { [name: string]: (s: State, ...args: any[]) => any };
 
-/**
- * Type of a store module returned by `createStoreModule`.
- *
- * @template State
- * @template {object} Actions
- * @template {object} Selectors
- * @template {object} RootSelectors
- * @typedef Module
- * @prop {string} namespace -
- *   The key under which this module's state will live in the store's root state
- * @prop {(...args: any[]) => State} initialState
- * @prop {ReducerMap<State>} reducers -
- *   Map of action types to "reducer" functions that process an action and return
- *   the changes to the state
- * @prop {Actions} actionCreators
- *   Object containing action creator functions
- * @prop {Selectors} selectors
- *   Object containing selector functions
- * @prop {RootSelectors} [rootSelectors]
- */
+/** Type of a store module returned by `createStoreModule`. */
+type Module<
+  State,
+  Actions extends object,
+  Selectors extends Object,
+  RootSelectors extends Object
+> = {
+  /** The key under which this module's state will live in the store's root state. */
+  namespace: string;
+  initialState: (...args: any[]) => State;
+
+  /**
+   * Map of action types to "reducer" functions that process an action and return
+   * the changes to the state
+   */
+  reducers: ReducerMap<State>;
+
+  /** Object containing action creator functions. */
+  actionCreators: Actions;
+
+  /** Object containing selector functions. */
+  selectors: Selectors;
+  rootSelectors?: RootSelectors;
+};
 
 /**
  * Helper for getting the type of store produced by `createStore` when
@@ -62,34 +56,32 @@ import { immutable } from '../util/immutable';
  * To get the type for a store created from several modules, use `&`:
  *
  * `StoreFromModule<firstModule> & StoreFromModule<secondModule>`
- *
- * @template T
- * @typedef {T extends Module<any, infer Actions, infer Selectors, infer RootSelectors> ?
- *   Store<Actions,Selectors,RootSelectors> : never} StoreFromModule
  */
+type StoreFromModule<T> = T extends Module<
+  any,
+  infer Actions,
+  infer Selectors,
+  infer RootSelectors
+>
+  ? Store<Actions, Selectors, RootSelectors>
+  : never;
 
 /**
  * Redux store augmented with selector methods to query specific state and
  * action methods that dispatch specific actions.
- *
- * @template {object} Actions
- * @template {object} Selectors
- * @template {object} RootSelectors
- * @typedef {redux.Store &
- *   Actions &
- *   SelectorMethods<Selectors> &
- *   SelectorMethods<RootSelectors>} Store
  */
+export type Store<
+  Actions extends object,
+  Selectors extends object,
+  RootSelectors extends object
+> = redux.Store &
+  Actions &
+  SelectorMethods<Selectors> &
+  SelectorMethods<RootSelectors>;
 
-/**
- * Create a Redux reducer from a store module's reducer map.
- *
- * @template State
- * @param {ReducerMap<State>} reducers
- */
-function createReducer(reducers) {
-  /** @param {redux.Action} action */
-  return (state = /** @type {State} */ ({}), action) => {
+/** Create a Redux reducer from a store module's reducer map. */
+function createReducer<State>(reducers: ReducerMap<State>) {
+  return (state = {} as State, action: redux.Action) => {
     const reducer = reducers[action.type];
     if (!reducer) {
       return state;
@@ -106,32 +98,22 @@ function createReducer(reducers) {
  * Convert a map of selector functions, which take a state value as their
  * first argument, to a map of selector methods, which pre-fill the first
  * argument by calling `getState()`.
- *
- * @template State
- * @template {SelectorMap<State>} Selectors
- * @param {Selectors} selectors
- * @param {() => State} getState
- * @return {SelectorMethods<Selectors>}
  */
-function bindSelectors(selectors, getState) {
-  /** @type {Record<string, Function>} */
-  const boundSelectors = {};
+function bindSelectors<State, Selectors extends SelectorMap<State>>(
+  selectors: Selectors,
+  getState: () => State
+): SelectorMethods<Selectors> {
+  const boundSelectors: Record<string, Function> = {};
   for (let [name, selector] of Object.entries(selectors)) {
-    boundSelectors[name] = /** @param {any[]} args */ (...args) =>
-      selector(getState(), ...args);
+    boundSelectors[name] = (...args: any[]) => selector(getState(), ...args);
   }
-  return /** @type {SelectorMethods<Selectors>} */ (boundSelectors);
+  return boundSelectors as SelectorMethods<Selectors>;
 }
 
 /**
  * `Object.assign` wrapper that checks for overwriting properties in debug builds.
- *
- * @template {object} T
- * @template {object} U
- * @param {T} target
- * @param {U} source
  */
-function assignOnce(target, source) {
+function assignOnce<T extends object, U extends object>(target: T, source: U) {
   if (process.env.NODE_ENV !== 'production') {
     for (let key of Object.keys(source)) {
       if (key in target) {
@@ -142,10 +124,7 @@ function assignOnce(target, source) {
   return Object.assign(target, source);
 }
 
-/**
- * @template T
- * @typedef {{[K in keyof T]: (x: T[K]) => void }} MapContravariant
- */
+type MapContravariant<T> = { [K in keyof T]: (x: T[K]) => void };
 
 /**
  * Utility that turns a tuple type `[A, B, C]` into an intersection `A & B & C`.
@@ -154,11 +133,11 @@ function assignOnce(target, source) {
  * https://github.com/microsoft/TypeScript/issues/28323. Roughly speaking it
  * works by computing a type that could be assigned to any position in the
  * tuple, which must be the intersection of all the tuple element types.
- *
- * @template T
- * @template {Record<number, unknown>} [Temp=MapContravariant<T>]
- * @typedef {Temp[number] extends (x: infer U) => unknown ? U : never} TupleToIntersection
  */
+type TupleToIntersection<
+  T,
+  Temp extends Record<number, unknown> = MapContravariant<T>
+> = Temp[number] extends (x: infer U) => unknown ? U : never;
 
 /**
  * Create a Redux store from a set of _modules_.
@@ -183,22 +162,20 @@ function assignOnce(target, source) {
  * Preact UI components access stores via the `useStore` hook. This returns a
  * proxy which enables UI components to observe what store state a component
  * depends upon and re-render when it changes.
- *
- * @template {readonly Module<any,any,any,any>[]} Modules
- * @param {Modules} modules
- * @param {any[]} [initArgs] - Arguments to pass to each state module's `initialState` function
- * @param {any[]} [middleware] - List of additional Redux middlewares to use
- * @return {StoreFromModule<TupleToIntersection<Modules>>}
  */
-export function createStore(modules, initArgs = [], middleware = []) {
-  /** @type {Record<string, unknown>} */
-  const initialState = {};
+export function createStore<
+  Modules extends readonly Module<any, any, any, any>[]
+>(
+  modules: Modules,
+  initArgs: any[] = [],
+  middleware: any[] = []
+): StoreFromModule<TupleToIntersection<Modules>> {
+  const initialState: Record<string, unknown> = {};
   for (let module of modules) {
     initialState[module.namespace] = module.initialState(...initArgs);
   }
 
-  /** @type {redux.ReducersMapObject} */
-  const allReducers = {};
+  const allReducers: redux.ReducersMapObject = {};
   for (let module of modules) {
     allReducers[module.namespace] = createReducer(module.reducers);
   }
@@ -225,8 +202,7 @@ export function createStore(modules, initArgs = [], middleware = []) {
   const store = redux.createStore(reducer, initialState, enhancer);
 
   // Add action creators as methods to the store.
-  /** @type {Record<string, (...args: any[]) => redux.Action>} */
-  const actionCreators = {};
+  const actionCreators: Record<string, (...args: any[]) => redux.Action> = {};
   for (let module of modules) {
     assignOnce(actionCreators, module.actionCreators);
   }
@@ -253,45 +229,56 @@ export function createStore(modules, initArgs = [], middleware = []) {
   }
   Object.assign(store, selectorMethods);
 
-  return /** @type {any} */ (store);
+  return store as any;
 }
 
 /**
  * Helper for creating an action which checks that the type of the action's
  * payload is compatible with what the reducer expects.
  *
- * @template {ReducerMap<any>} Reducers
- * @template {keyof Reducers} Type
- * @param {Reducers} reducers - The map of reducer functions from a store module
- * @param {Type} type - The name of a specific reducer in `reducers`
- * @param {Parameters<Reducers[Type]>[1]} payload - The fields of the action
+ * @param reducers - The map of reducer functions from a store module
+ * @param type - The name of a specific reducer in `reducers`
+ * @param payload - The fields of the action
  *   except for `type`. Pass `undefined` if the reducer doesn't need an action payload.
  */
-export function makeAction(reducers, type, payload) {
+export function makeAction<
+  Reducers extends ReducerMap<any>,
+  Type extends keyof Reducers
+>(reducers: Reducers, type: Type, payload: Parameters<Reducers[Type]>[1]) {
   // nb. `reducers` is not used here. It exists purely for type inference.
   return { type, ...payload };
 }
 
+type ModuleConfig<
+  State,
+  Actions,
+  Selectors extends SelectorMap<State>,
+  RootSelectors = {}
+> = {
+  /** The key under which this module's state will live in the store's root state. */
+  namespace: string;
+  reducers: ReducerMap<State>;
+  actionCreators: Actions;
+  selectors: Selectors;
+  rootSelectors?: RootSelectors;
+};
+
 /**
  * Create a store module that can be passed to `createStore`.
  *
- * @template State
- * @template Actions
- * @template {SelectorMap<State>} Selectors
- * @template [RootSelectors={}]
- * @param {State | ((...args: any[]) => State)} initialState - Object containing
+ * @param initialState - Object containing
  *   the initial state for the module, or a function which returns such an
  *   object. The arguments come from the {@link createStore} call.
- * @param {object} config
- *   @param {string} config.namespace -
- *     The key under which this module's state will live in the store's root state
- *   @param {ReducerMap<State>} config.reducers -
- *   @param {Actions} config.actionCreators
- *   @param {Selectors} config.selectors
- *   @param {RootSelectors} [config.rootSelectors]
- * @return {Module<State,Actions,Selectors,RootSelectors>}
  */
-export function createStoreModule(initialState, config) {
+export function createStoreModule<
+  State,
+  Actions extends object,
+  Selectors extends SelectorMap<State>,
+  RootSelectors extends object = {}
+>(
+  initialState: State | ((...args: any[]) => State),
+  config: ModuleConfig<State, Actions, Selectors, RootSelectors>
+): Module<State, Actions, Selectors, RootSelectors> {
   // The `initialState` argument is separate to `config` as this allows
   // TypeScript to infer the `State` type in the `config` argument at the
   // `createStoreModule` call site.
