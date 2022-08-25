@@ -144,8 +144,8 @@ export class Adder {
    * Set the annotation IDs associated with the current selection.
    *
    * Setting this to a non-empty list causes the "Show" button to appear in
-   * the toolbar, triggering the `onShowAnnotations` callback passed to the
-   * constructor when clicked.
+   * the toolbar. Clicking the "Show" button  triggers the `onShowAnnotations`
+   * callback passed to the constructor.
    */
   set annotationsForSelection(ids) {
     this._annotationsForSelection = ids;
