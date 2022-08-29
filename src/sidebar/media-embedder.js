@@ -156,7 +156,7 @@ function youTubeEmbed(id, link) {
  *   contain a single capture group which matches the video ID within the path.
  * @param {(videoId: string) => string} iframeUrlGenerator -
  *   Generate the URL for an embedded video iframe from a video ID
- * @param {object} [options]
+ * @param {object} options
  *   @param {number} [options.aspectRatio]
  * @return {(link: HTMLAnchorElement) => HTMLElement|null}
  */

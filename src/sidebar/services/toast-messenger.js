@@ -55,7 +55,7 @@ export class ToastMessengerService {
    *
    * @param {('error'|'success'|'notice')} type
    * @param {string} messageText - The message to be rendered
-   * @param {MessageOptions} [options]
+   * @param {MessageOptions} options
    */
   _addMessage(
     type,
