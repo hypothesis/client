@@ -6,12 +6,12 @@ const focusBlue = '#59a7e8';
 export default {
   presets: [tailwindConfig],
   content: [
-    './src/sidebar/components/**/*.js',
-    './src/annotator/components/**/*.js',
-    './dev-server/ui-playground/components/**/*.js',
-    './node_modules/@hypothesis/frontend-shared/lib/**/*.js',
+    './src/sidebar/components/**/*.{js,ts,tsx}',
+    './src/annotator/components/**/*.{js,ts,tsx}',
+    './dev-server/ui-playground/components/**/*.{js,ts,tsx}',
+    './node_modules/@hypothesis/frontend-shared/lib/**/*.{js,ts,tsx}',
     // This module references `sidebar-frame` and related classes
-    './src/annotator/sidebar.js',
+    './src/annotator/sidebar.{js,ts,tsx}',
   ],
   theme: {
     extend: {
