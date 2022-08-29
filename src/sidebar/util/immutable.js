@@ -6,7 +6,7 @@
  * This only works for plain objects, arrays and objects where data is stored
  * in enumerable fields.
  *
- * @template T
+ * @template {object} T
  * @param {T} object
  */
 function deepFreeze(object) {
@@ -28,7 +28,7 @@ function deepFreeze(object) {
 /**
  * Prevent accidental mutations to `object` or any of its fields in debug builds.
  *
- * @template T
+ * @template {object} T
  * @param {T} object
  * @return {T} Returns the input object
  */
