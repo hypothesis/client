@@ -1,5 +1,4 @@
 import { parseJsonConfig } from '../boot/parse-json-config';
-import * as rendererOptions from '../shared/renderer-options';
 
 import { checkEnvironment } from './config/check-env';
 import { buildSettings } from './config/build-settings';
@@ -36,9 +35,6 @@ import 'focus-visible';
 
 // Enable debugging checks for Preact. Removed in prod builds by Rollup config.
 import 'preact/debug';
-
-// Install Preact renderer options to work around browser quirks
-rendererOptions.setupBrowserFixes();
 
 /**
  * @param {import('./services/api').APIService} api
