@@ -126,8 +126,8 @@ function bindSelectors(selectors, getState) {
 /**
  * `Object.assign` wrapper that checks for overwriting properties in debug builds.
  *
- * @template T
- * @template U
+ * @template {object} T
+ * @template {object} U
  * @param {T} target
  * @param {U} source
  */
