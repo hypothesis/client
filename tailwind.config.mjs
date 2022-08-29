@@ -211,9 +211,9 @@ export default {
         },
       });
       addComponents({
-        // Add a custom class to set all properties to initial values. This must
-        // be on the components layer such that it gets applied "before" utility
-        // classes.
+        // Add a custom class to set all properties to initial values. Used
+        // within shadow DOMs. This must be on the components layer such that it
+        // gets applied "before" utility classes.
         '.all-initial': {
           all: 'initial',
         },

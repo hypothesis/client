@@ -1,7 +1,17 @@
 import classnames from 'classnames';
-import { LabeledButton, Icon } from '@hypothesis/frontend-shared';
+import {
+  AnnotateIcon,
+  ButtonBase,
+  HighlightIcon,
+  PointerDownIcon,
+  PointerUpIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 import { useShortcut } from '../../shared/shortcut';
+
+/**
+ * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
+ */
 
 /**
  * Render an inverted light-on-dark "pill" with the given `badgeCount`
@@ -16,11 +26,12 @@ function NumberIcon({ badgeCount }) {
     <span
       className={classnames(
         'rounded px-1 py-0.5',
-        'text-color-text-inverted font-bold bg-grey-7',
-        'dim-bg'
+        // The background color is inherited from the current text color in
+        // the containing button and will vary depending on hover state.
+        'bg-current'
       )}
     >
-      {badgeCount}
+      <span className="font-bold text-color-text-inverted">{badgeCount}</span>
     </span>
   );
 }
@@ -34,55 +45,58 @@ function NumberIcon({ badgeCount }) {
  */
 function AdderToolbarArrow({ arrowDirection }) {
   return (
-    <Icon
-      name="pointer"
-      classes={classnames(
-        // Position the arrow in the horizontal center at the bottom of the
-        // container (toolbar). Note: the arrow is pointing up at this point.
-        'absolute left-1/2 -translate-x-1/2',
-        // Override `1em` width/height rules in `Icon` to size the arrow as
-        // its SVG dimensions dictate
-        'h-auto w-auto z-2',
-        'text-grey-3 fill-white',
+    <div
+      className={classnames(
+        // Position horizontally center of the AdderToolbar
+        'absolute left-1/2 -translate-x-1/2 z-2',
+        'fill-white text-grey-3',
         {
-          // Down arrow: transform to point the arrow down
-          'rotate-180': arrowDirection === 'down',
-          // Up arrow: position vertically above the toolbar
+          // Move the pointer to the top of the AdderToolbar
           'top-0 -translate-y-full': arrowDirection === 'up',
         }
       )}
-    />
+    >
+      {arrowDirection === 'up' ? <PointerUpIcon /> : <PointerDownIcon />}
+    </div>
   );
 }
 
 /**
  * @param {object} props
  *  @param {number} [props.badgeCount]
- *  @param {string} [props.icon]
+ *  @param {IconComponent} [props.icon]
  *  @param {string} props.label
  *  @param {() => void} props.onClick
  *  @param {string|null} props.shortcut
  */
-function ToolbarButton({ badgeCount, icon, label, onClick, shortcut }) {
+function ToolbarButton({ badgeCount, icon: Icon, label, onClick, shortcut }) {
   useShortcut(shortcut, onClick);
 
   const title = shortcut ? `${label} (${shortcut})` : label;
 
   return (
-    <LabeledButton
-      className={classnames(
-        'flex flex-col gap-y-1 items-center py-2.5 px-2',
-        'text-annotator-sm leading-none text-grey-7',
-        'transition-colors duration-200',
-        'dim-item'
+    <ButtonBase
+      classes={classnames(
+        'flex-col gap-y-1 py-2.5 px-2',
+        'text-annotator-sm leading-none',
+        // Default color when the toolbar is not hovered
+        'text-grey-7',
+        // When the parent .group element is hovered (but this element itself is
+        // not), dim this button's text. This has the effect of dimming inactive
+        // buttons.
+        'group-hover:text-grey-5',
+        // When the parent .group element is hovered AND this element is
+        // hovered, this is the "active" button. Intensify the text color, which
+        // will also darken any descendant Icon
+        'hover:group-hover:text-grey-9'
       )}
       onClick={onClick}
       title={title}
     >
-      {icon && <Icon classes="text-annotator-lg" name={icon} title={title} />}
+      {Icon && <Icon className="text-annotator-lg" title={title} />}
       {typeof badgeCount === 'number' && <NumberIcon badgeCount={badgeCount} />}
-      <span className="font-normal">{label}</span>
-    </LabeledButton>
+      <span>{label}</span>
+    </ButtonBase>
   );
 }
 
@@ -135,12 +149,15 @@ export default function AdderToolbar({
   return (
     <div
       className={classnames(
-        'AdderToolbar',
-        'absolute select-none bg-white rounded shadow-adder-toolbar',
-        // Because `.AdderToolbar` rules reset `all:initial`, we cannot use
-        // default border values from Tailwind and have to be explicit about
-        // all border attributes
+        // Reset all inherited properties to their initial values. This prevents
+        // CSS property values from the host page being inherited by elements of
+        // the Adder, even when using Shadow DOM.
+        'all-initial',
+        // As we've reset all properties to initial values, we cannot rely on
+        // default border values from Tailwind and have to be explicit about all
+        // border attributes.
         'border border-solid border-grey-3',
+        'absolute select-none bg-white rounded shadow-adder-toolbar',
         // Start at a very low opacity as we're going to fade in in the animation
         'opacity-5',
         {
@@ -148,20 +165,27 @@ export default function AdderToolbar({
           'animate-adder-pop-down': arrowDirection === 'down' && isVisible,
         }
       )}
+      data-component="AdderToolbar"
       dir="ltr"
       style={{
         visibility: isVisible ? 'visible' : 'hidden',
       }}
     >
-      <div className="flex dim-items-on-hover">
+      <div
+        className={classnames(
+          // This group is used to manage hover state styling for descendant
+          // buttons
+          'flex group'
+        )}
+      >
         <ToolbarButton
-          icon="annotate"
+          icon={AnnotateIcon}
           onClick={() => onCommand('annotate')}
           label="Annotate"
           shortcut={annotateShortcut}
         />
         <ToolbarButton
-          icon="highlight"
+          icon={HighlightIcon}
           onClick={() => onCommand('highlight')}
           label="Highlight"
           shortcut={highlightShortcut}
