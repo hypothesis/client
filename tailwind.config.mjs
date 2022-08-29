@@ -200,7 +200,7 @@ export default {
       // sub-components to select for that state.
       addVariant('sidebar-collapsed', '.sidebar-collapsed &');
     }),
-    plugin(({ addUtilities }) => {
+    plugin(({ addComponents, addUtilities }) => {
       // Tailwind does not provide hyphens-related utility classes.
       addUtilities({
         '.hyphens-none': {
@@ -208,6 +208,14 @@ export default {
         },
         '.hyphens-auto': {
           hyphens: 'auto',
+        },
+      });
+      addComponents({
+        // Add a custom class to set all properties to initial values. This must
+        // be on the components layer such that it gets applied "before" utility
+        // classes.
+        '.all-initial': {
+          all: 'initial',
         },
       });
     }),
