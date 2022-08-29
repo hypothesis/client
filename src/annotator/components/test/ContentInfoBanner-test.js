@@ -46,7 +46,7 @@ describe('ContentInfoBanner', () => {
   it('shows item title', () => {
     const wrapper = createComponent();
 
-    const link = wrapper.find('LinkUnstyled[data-testid="content-item-link"]');
+    const link = wrapper.find('LinkBase[data-testid="content-item-link"]');
     assert.equal(link.text(), 'Chapter 2: Some book chapter');
     assert.equal(link.prop('target'), '_blank');
   });
@@ -56,7 +56,7 @@ describe('ContentInfoBanner', () => {
 
     const wrapper = createComponent();
 
-    const link = wrapper.find('LinkUnstyled[data-testid="content-item-link"]');
+    const link = wrapper.find('LinkBase[data-testid="content-item-link"]');
     assert.equal(link.text(), 'Chapter 2');
   });
 
@@ -70,9 +70,7 @@ describe('ContentInfoBanner', () => {
       'Expansive Book'
     );
     assert.equal(
-      wrapper
-        .find('LinkUnstyled[data-testid="content-item-link"]')
-        .prop('title'),
+      wrapper.find('LinkBase[data-testid="content-item-link"]').prop('title'),
       'Chapter 2: Some book chapter'
     );
   });

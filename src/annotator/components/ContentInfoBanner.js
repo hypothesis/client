@@ -2,7 +2,7 @@ import classnames from 'classnames';
 
 import {
   Link,
-  LinkUnstyled,
+  LinkBase,
   CaretLeftIcon,
   CaretRightIcon,
 } from '@hypothesis/frontend-shared/lib/next';
@@ -103,14 +103,15 @@ export default function ContentInfoBanner({ info }) {
             'min-w-0 whitespace-nowrap overflow-hidden text-ellipsis shrink font-medium'
           )}
         >
-          <LinkUnstyled
+          <LinkBase
             title={itemTitle}
             href={info.links.currentItem}
             data-testid="content-item-link"
             target="_blank"
+            unstyled
           >
             {itemTitle}
-          </LinkUnstyled>
+          </LinkBase>
         </div>
 
         {info.links.nextItem && (
