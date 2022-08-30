@@ -5,6 +5,7 @@ describe('hasOwn', () => {
     [{ foo: 'bar' }, 'foo', true],
     [{ foo: 'bar' }, 'baz', false],
     [Object.create(null), 'foo', false],
+    [{}, 'hasOwnProperty', false],
     [{ hasOwnProperty: 'foo' }, 'hasOwnProperty', true],
   ].forEach(([object, property, expected]) => {
     it('returns true if object has own property', () => {
