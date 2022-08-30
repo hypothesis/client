@@ -6,22 +6,16 @@ import {
   PointerDownIcon,
   PointerUpIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 
 import { useShortcut } from '../../shared/shortcut';
-
-/**
- * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
- */
 
 /**
  * Render an inverted light-on-dark "pill" with the given `badgeCount`
  * (annotation count). This is rendered instead of an icon on the toolbar
  * button for "show"-ing associated annotations for the current selection.
- *
- * @param {object} props
- *  @param {number} props.badgeCount
  */
-function NumberIcon({ badgeCount }) {
+function NumberIcon({ badgeCount }: { badgeCount: number }) {
   return (
     <span
       className={classnames(
@@ -39,11 +33,12 @@ function NumberIcon({ badgeCount }) {
 /**
  * Render an arrow pointing up or down from the AdderToolbar. This arrow
  * should point roughly to the end of the user selection in the document.
- *
- * @param {object} props
- *  @param {'up'|'down'} props.arrowDirection
  */
-function AdderToolbarArrow({ arrowDirection }) {
+function AdderToolbarArrow({
+  arrowDirection,
+}: {
+  arrowDirection: 'up' | 'down';
+}) {
   return (
     <div
       className={classnames(
@@ -61,15 +56,21 @@ function AdderToolbarArrow({ arrowDirection }) {
   );
 }
 
-/**
- * @param {object} props
- *  @param {number} [props.badgeCount]
- *  @param {IconComponent} [props.icon]
- *  @param {string} props.label
- *  @param {() => void} props.onClick
- *  @param {string|null} props.shortcut
- */
-function ToolbarButton({ badgeCount, icon: Icon, label, onClick, shortcut }) {
+type ToolbarButtonProps = {
+  badgeCount?: number;
+  icon?: IconComponent;
+  label: string;
+  onClick: () => void;
+  shortcut: string | null;
+};
+
+function ToolbarButton({
+  badgeCount,
+  icon: Icon,
+  label,
+  onClick,
+  shortcut,
+}: ToolbarButtonProps) {
   useShortcut(shortcut, onClick);
 
   const title = shortcut ? `${label} (${shortcut})` : label;
@@ -100,38 +101,72 @@ function ToolbarButton({ badgeCount, icon: Icon, label, onClick, shortcut }) {
   );
 }
 
-/**
- * Union of possible toolbar commands.
- *
- * @typedef {'annotate'|'highlight'|'show'|'hide'} Command
- */
+export type Command = 'annotate' | 'highlight' | 'show' | 'hide';
 
-/**
- * @typedef AdderToolbarProps
- * @prop {'up'|'down'} arrowDirection -
- *   Whether the arrow pointing out of the toolbar towards the selected text
- *   should appear above the toolbar pointing Up or below the toolbar pointing
- *   Down.
- * @prop {boolean} isVisible - Whether to show the toolbar or not.
- * @prop {(c: Command) => void} onCommand - Called when a toolbar button is clicked.
- * @prop {number} [annotationCount] -
- *   Number of annotations associated with the selected text.
- *   If non-zero, a "Show" button is displayed to allow the user to see the
- *   annotations that correspond to the selection.
- */
+type AdderToolbarProps = {
+  /**
+   * Number of annotations associated with the selected text. If non-zero, a
+   * Show" button is displayed to allow the user to see the annotations that
+   * correspond to the selection.
+   */
+  annotationCount?: number;
+  /**
+   * Whether the arrow pointing out of the toolbar towards the selected text
+   * should appear above the toolbar pointing up or below the toolbar pointing
+   * down.
+   */
+  arrowDirection: 'up' | 'down';
+  /** The toolbar is always rendered, but is not always visible. */
+  isVisible: boolean;
+  /** Called when a toolbar button is clicked */
+  onCommand: (c: Command) => void;
+};
 
 /**
  * The toolbar that is displayed above or below selected text in the document,
  * providing options to create annotations or highlights.
  *
+<<<<<<< HEAD:src/annotator/components/AdderToolbar.js
  * @param {AdderToolbarProps} props
+=======
+ * The toolbar has nuanced styling for hover. The component structure is:
+ *
+ * <AdderToolbar>
+ *   <div.group>
+ *     <button.hover-group><AnnotateIcon />Annotate</button>
+ *     <button.hover-group><HighlightIcon />Highlight</button>
+ *     <div>[vertical separator]</div>
+ *     <button.hover-group><span><NumberIcon /></span>[count]</button>
+ *   </div.group>
+ *   <AdderToolbarArrow />
+ * </AdderToolbar>
+ *
+ * Behavior: When div.group is hovered, all descendant buttons and their
+ * contents dim, except for the contents of the button that is directly hovered,
+ * which are darkened. This is intended to make the hovered button stand out,
+ * and the non-hovered buttons recede.
+ *
+ * This is achieved by:
+ * - Setting the .group class on the div that contains the buttons. This allows
+ *   buttons to style themselves based on the combination of the div.group's
+ *   hover state and their own "local" hover state. `group` is available in
+ *   Tailwind out of the box; see
+ *   https://tailwindcss.com/docs/hover-focus-and-other-states#styling-based-on-parent-state
+ * - The challenge is in getting the "badge" in NumberIcon to dim and darken its
+ *   background appropriately. `hover-group-hover` is a custom tailwind variant
+ *   that allows NumberIcon to style itself based on the hover states of
+ *   both div.group AND its parent button.hover-group. We need to ensure this
+ *   badge will darken when its parent button is hovered, even if it is not
+ *   hovered directly.
+ *
+>>>>>>> 544c8e5c6 (Convert `AdderToolbar` to TypeScript):src/annotator/components/AdderToolbar.tsx
  */
 export default function AdderToolbar({
   arrowDirection,
   isVisible,
   onCommand,
   annotationCount = 0,
-}) {
+}: AdderToolbarProps) {
   // Since the selection toolbar is only shown when there is a selection
   // of static text, we can use a plain key without any modifier as
   // the shortcut. This avoids conflicts with browser/OS shortcuts.
