@@ -1,36 +1,23 @@
-import { bootHypothesisClient, bootSidebarApp, $imports } from '../boot';
+import { bootHypothesisClient, bootSidebarApp } from '../boot';
 
 function assetURL(url) {
   return `https://marginal.ly/client/build/${url}`;
 }
 
 describe('bootstrap', () => {
-  let fakePolyfills;
   let iframe;
 
   beforeEach(() => {
     iframe = document.createElement('iframe');
     document.body.appendChild(iframe);
-
-    fakePolyfills = {
-      requiredPolyfillSets: sinon.stub().returns([]),
-    };
-
-    $imports.$mock({
-      './polyfills': fakePolyfills,
-    });
   });
 
   afterEach(() => {
-    $imports.$restore();
     iframe.remove();
   });
 
   function runBoot(app = 'annotator') {
     const assetNames = [
-      // Polyfills
-      'scripts/polyfills-es2017.bundle.js',
-
       // Annotation layer
       'scripts/annotator.bundle.js',
       'styles/annotator.css',
@@ -168,25 +155,6 @@ describe('bootstrap', () => {
 
       assert.deepEqual(findAssets(iframe.contentDocument), []);
     });
-
-    it('loads polyfills if required', () => {
-      fakePolyfills.requiredPolyfillSets.callsFake(sets =>
-        sets.filter(s => s.match(/es2017/))
-      );
-
-      runBoot('annotator');
-
-      const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
-        a.src.match(/polyfills/)
-      );
-      assert.called(fakePolyfills.requiredPolyfillSets);
-      assert.deepEqual(polyfillsLoaded, [
-        {
-          src: assetURL('scripts/polyfills-es2017.bundle.1234.js'),
-          type: 'script',
-        },
-      ]);
-    });
   });
 
   describe('bootSidebarApp', () => {
@@ -218,25 +186,6 @@ describe('bootstrap', () => {
       assert.equal(preloadLinks[1].href, 'https://marginal.ly/api/links');
       assert.equal(preloadLinks[1].as, 'fetch');
       assert.equal(preloadLinks[1].crossOrigin, 'anonymous');
-    });
-
-    it('loads polyfills if required', () => {
-      fakePolyfills.requiredPolyfillSets.callsFake(sets =>
-        sets.filter(s => s.match(/es2017/))
-      );
-
-      runBoot('sidebar');
-
-      const polyfillsLoaded = findAssets(iframe.contentDocument).filter(a =>
-        a.src.match(/polyfills/)
-      );
-      assert.called(fakePolyfills.requiredPolyfillSets);
-      assert.deepEqual(polyfillsLoaded, [
-        {
-          src: assetURL('scripts/polyfills-es2017.bundle.1234.js'),
-          type: 'module',
-        },
-      ]);
     });
   });
 });

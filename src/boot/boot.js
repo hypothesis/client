@@ -1,18 +1,3 @@
-import { requiredPolyfillSets } from './polyfills';
-
-/** @typedef {import('./polyfills').PolyfillSet} PolyfillSet */
-
-/**
- * Polyfills used by both the annotator and sidebar app.
- */
-const commonPolyfills = /** @type {PolyfillSet[]} */ ([
-  // ES APIs
-  'es2017',
-  'es2018',
-
-  // Any other polyfills which may rely on certain ES APIs should be listed here.
-]);
-
 /**
  * @typedef SidebarAppConfig
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
@@ -144,13 +129,6 @@ function assetURL(config, path) {
   return config.assetRoot + 'build/' + config.manifest[path];
 }
 
-/** @param {PolyfillSet[]} needed */
-function polyfillBundles(needed) {
-  return requiredPolyfillSets(needed).map(
-    set => `scripts/polyfills-${set}.bundle.js`
-  );
-}
-
 /**
  * Bootstrap the Hypothesis client.
  *
@@ -188,8 +166,7 @@ export function bootHypothesisClient(doc, config) {
     config.assetRoot + 'build/boot.js'
   );
 
-  const polyfills = polyfillBundles(commonPolyfills);
-  const scripts = [...polyfills, 'scripts/annotator.bundle.js'];
+  const scripts = ['scripts/annotator.bundle.js'];
   for (let path of scripts) {
     const url = assetURL(config, path);
     injectScript(doc, url, { esModule: false });
@@ -219,9 +196,7 @@ export function bootSidebarApp(doc, config) {
   preloadURL(doc, 'fetch', config.apiUrl);
   preloadURL(doc, 'fetch', config.apiUrl + 'links');
 
-  const polyfills = polyfillBundles(commonPolyfills);
-
-  const scripts = [...polyfills, 'scripts/sidebar.bundle.js'];
+  const scripts = ['scripts/sidebar.bundle.js'];
   for (let path of scripts) {
     const url = assetURL(config, path);
     injectScript(doc, url, { esModule: true });
