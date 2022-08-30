@@ -53,8 +53,12 @@ packaging==21.3
     #   sphinx
 pep517==0.13.0
     # via build
-pip-tools==6.8.0
+pip-sync-faster==0.0.2
     # via -r requirements/docs.in
+pip-tools==6.8.0
+    # via
+    #   -r requirements/docs.in
+    #   pip-sync-faster
 pygments==2.12.0
     # via sphinx
 pyparsing==3.0.9
