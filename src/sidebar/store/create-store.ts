@@ -24,27 +24,19 @@ type ReducerMap<State> = {
 /** Map of selector name to selector function. */
 type SelectorMap<State> = { [name: string]: (s: State, ...args: any[]) => any };
 
-/** Type of a store module returned by `createStoreModule`. */
+/**
+ * Type of a store module returned by `createStoreModule`. See {@link ModuleConfig}.
+ */
 type Module<
   State,
   Actions extends object,
   Selectors extends Object,
   RootSelectors extends Object
 > = {
-  /** The key under which this module's state will live in the store's root state. */
   namespace: string;
   initialState: (...args: any[]) => State;
-
-  /**
-   * Map of action types to "reducer" functions that process an action and return
-   * the changes to the state
-   */
   reducers: ReducerMap<State>;
-
-  /** Object containing action creator functions. */
   actionCreators: Actions;
-
-  /** Object containing selector functions. */
   selectors: Selectors;
   rootSelectors?: RootSelectors;
 };
@@ -140,15 +132,14 @@ type TupleToIntersection<
 > = Temp[number] extends (x: infer U) => unknown ? U : never;
 
 /**
- * Create a Redux store from a set of _modules_.
+ * Create a Redux store from a set of modules.
  *
- * Each module defines the logic related to a particular piece of the application
- * state, including:
+ * Each module defines the logic related to a subset of the application state.
+ * This includes:
  *
- *  - The initial value of that state
- *  - The _actions_ that can change that state
- *  - The _selectors_ for reading that state or computing things
- *    from that state.
+ *  - The initial value of the state. This should always be an object.
+ *  - Actions that can change the state
+ *  - Selectors for extracting information from the state
  *
  * In addition to the standard Redux store interface, the returned store also exposes
  * each action creator and selector from the input modules as a method. For example, if
@@ -249,6 +240,13 @@ export function makeAction<
   return { type, ...payload };
 }
 
+/**
+ * Configuration for a store module.
+ *
+ * This specifies everything about the contents of a store module, except the
+ * initial state. The initial state is passed separately to {@link createStoreModule}
+ * to aid type inference.
+ */
 type ModuleConfig<
   State,
   Actions,
@@ -257,18 +255,38 @@ type ModuleConfig<
 > = {
   /** The key under which this module's state will live in the store's root state. */
   namespace: string;
+
+  /**
+   * Map of action types to "reducer" functions that process an action and return
+   * the changes to the state
+   */
   reducers: ReducerMap<State>;
+
+  /**
+   * Map of functions which create actions that alter state in this module.
+   *
+   * These actions may also be handled by other modules.
+   */
   actionCreators: Actions;
+
+  /** Map of functions which compute information from this module's state. */
   selectors: Selectors;
+
+  /**
+   * Map of functions which compute information from state in this module and
+   * other modules.
+   */
   rootSelectors?: RootSelectors;
 };
 
 /**
- * Create a store module that can be passed to `createStore`.
+ * Create a store module that can be passed to {@link createStore}.
  *
- * @param initialState - Object containing
- *   the initial state for the module, or a function which returns such an
- *   object. The arguments come from the {@link createStore} call.
+ * @param initialState - Initial state for the module, specified either as a
+ *   value or a function which computes it. If a function is passed, it is
+ *   provided the arguments from the {@link createStore} call
+ * @param config - Namespace and contents (actions, selectors, reducers etc.)
+ *   of the module
  */
 export function createStoreModule<
   State,
@@ -279,10 +297,6 @@ export function createStoreModule<
   initialState: State | ((...args: any[]) => State),
   config: ModuleConfig<State, Actions, Selectors, RootSelectors>
 ): Module<State, Actions, Selectors, RootSelectors> {
-  // The `initialState` argument is separate to `config` as this allows
-  // TypeScript to infer the `State` type in the `config` argument at the
-  // `createStoreModule` call site.
-
   if (!(initialState instanceof Function)) {
     const state = initialState;
     initialState = () => state;
