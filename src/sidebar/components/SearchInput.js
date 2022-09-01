@@ -1,8 +1,65 @@
 import { IconButton, Spinner, TextInput } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
-import { useRef, useState } from 'preact/hooks';
+import { useCallback, useRef, useState } from 'preact/hooks';
 
+import { useShortcut } from '../../shared/shortcut';
+import { isMacOS } from '../../shared/user-agent';
 import { useSidebarStore } from '../store';
+
+/**
+ * Respond to keydown events on the document (shortcut keys):
+ *
+ * - Focus the search input when the user presses '/', unless the user is
+ *   currently typing in or focused on an input field.
+ * - Focus the search input when the user presses CMD-K (MacOS) or CTRL-K
+ *   (everyone else)
+ * - Restore previous focus when the user presses 'Escape' while the search
+ *   input is focused.
+ *
+ * @param {import('preact').RefObject<HTMLInputElement>} searchInputRef
+ */
+function useSearchKeyboardShortcuts(searchInputRef) {
+  const prevFocusRef =
+    /** @type {import('preact').RefObject<HTMLOrSVGElement>} */ (useRef());
+
+  const focusSearch = useCallback(
+    /** @param {KeyboardEvent} event */ event => {
+      // When user is in an input field, respond to CMD-/CTRL-K keypresses,
+      // but ignore '/' keypresses
+      if (
+        !event.metaKey &&
+        !event.ctrlKey &&
+        event.target instanceof HTMLElement &&
+        ['INPUT', 'TEXTAREA'].includes(event.target.tagName)
+      ) {
+        return;
+      }
+      prevFocusRef.current = /** @type {HTMLOrSVGElement|null} */ (
+        document.activeElement
+      );
+      searchInputRef.current?.focus();
+      event.preventDefault();
+      event.stopPropagation();
+    },
+    [searchInputRef]
+  );
+
+  const restoreFocus = useCallback(() => {
+    if (document.activeElement === searchInputRef.current) {
+      if (prevFocusRef.current) {
+        prevFocusRef.current.focus();
+        prevFocusRef.current = null;
+      }
+      searchInputRef.current?.blur();
+    }
+  }, [searchInputRef]);
+
+  const modifierKey = isMacOS() ? 'meta' : 'ctrl';
+
+  useShortcut('/', focusSearch);
+  useShortcut(`${modifierKey}+k`, focusSearch);
+  useShortcut('escape', restoreFocus);
+}
 
 /**
  * @typedef SearchInputProps
@@ -28,7 +85,10 @@ import { useSidebarStore } from '../store';
 export default function SearchInput({ alwaysExpanded, query, onSearch }) {
   const store = useSidebarStore();
   const isLoading = store.isLoading();
-  const input = /** @type {{ current: HTMLInputElement }} */ (useRef());
+  const input = /** @type {import('preact').RefObject<HTMLInputElement>} */ (
+    useRef()
+  );
+  useSearchKeyboardShortcuts(input);
 
   // The active filter query from the previous render.
   const [prevQuery, setPrevQuery] = useState(query);
@@ -39,10 +99,10 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
   /** @param {Event} e */
   const onSubmit = e => {
     e.preventDefault();
-    if (input.current.value || prevQuery) {
+    if (input.current?.value || prevQuery) {
       // Don't set an initial empty query, but allow a later empty query to
       // clear `prevQuery`
-      onSearch(input.current.value);
+      onSearch(input.current?.value ?? '');
     }
   };
 
@@ -103,6 +163,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
           },
           'transition-[max-width] duration-300 ease-out'
         )}
+        data-testid="search-input"
         dir="auto"
         type="text"
         name="query"
@@ -118,7 +179,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         <div className="order-0">
           <IconButton
             icon="search"
-            onClick={() => input.current.focus()}
+            onClick={() => input.current?.focus()}
             size="small"
             title="Search annotations"
           />
