@@ -161,6 +161,16 @@ describe('sidebar/store/modules/selection', () => {
     });
   });
 
+  describe('setAnnotationFocusRequest', () => {
+    it('sets annotation ID returned by `annotationFocusRequest`', () => {
+      assert.equal(store.annotationFocusRequest(), null);
+      store.setAnnotationFocusRequest('ann1');
+      assert.equal(store.annotationFocusRequest(), 'ann1');
+      store.clearAnnotationFocusRequest();
+      assert.equal(store.annotationFocusRequest(), null);
+    });
+  });
+
   describe('setFilter', () => {
     it('clears selection', () => {
       store.selectAnnotations([1, 2, 3]);

@@ -73,6 +73,13 @@ function initialState(settings) {
      * @type {SortKey}
      */
     sortKey: TAB_SORTKEY_DEFAULT.annotation,
+
+    /**
+     * ID or tag of an annotation that should be given keyboard focus.
+     *
+     * @type {string|null}
+     */
+    focusRequest: null,
   };
 }
 
@@ -102,6 +109,10 @@ const resetSelection = () => {
 };
 
 const reducers = {
+  CLEAR_ANNOTATION_FOCUS_REQUEST() {
+    return { focusRequest: null };
+  },
+
   CLEAR_SELECTION() {
     return resetSelection();
   },
@@ -130,6 +141,14 @@ const reducers = {
     const newExpanded = { ...state.expanded };
     newExpanded[action.id] = action.expanded;
     return { expanded: newExpanded };
+  },
+
+  /**
+   * @param {State} state
+   * @param {{ id: string }} action
+   */
+  SET_ANNOTATION_FOCUS_REQUEST(state, action) {
+    return { focusRequest: action.id };
   },
 
   /**
@@ -262,6 +281,25 @@ function selectAnnotations(ids) {
 }
 
 /**
+ * Request the UI to give keyboard focus to a given annotation.
+ *
+ * Once the UI has processed this request, it should be cleared with
+ * {@link clearAnnotationFocusRequest}.
+ *
+ * @param {string} id
+ */
+function setAnnotationFocusRequest(id) {
+  return makeAction(reducers, 'SET_ANNOTATION_FOCUS_REQUEST', { id });
+}
+
+/**
+ * Clear an annotation focus request created with {@link setAnnotationFocusRequest}.
+ */
+function clearAnnotationFocusRequest() {
+  return makeAction(reducers, 'CLEAR_ANNOTATION_FOCUS_REQUEST', undefined);
+}
+
+/**
  * Set the currently-selected tab to `tabKey`.
  *
  * @param {TabName} tabKey
@@ -319,6 +357,11 @@ function toggleSelectedAnnotations(toggleIds) {
  */
 function expandedMap(state) {
   return state.expanded;
+}
+
+/** @param {State} state */
+function annotationFocusRequest(state) {
+  return state.focusRequest;
 }
 
 const forcedVisibleThreads = createSelector(
@@ -396,9 +439,11 @@ export const selectionModule = createStoreModule(initialState, {
   reducers,
 
   actionCreators: {
+    clearAnnotationFocusRequest,
     clearSelection,
     selectAnnotations,
     selectTab,
+    setAnnotationFocusRequest,
     setExpanded,
     setForcedVisible,
     setSortKey,
@@ -407,6 +452,7 @@ export const selectionModule = createStoreModule(initialState, {
 
   selectors: {
     expandedMap,
+    annotationFocusRequest,
     forcedVisibleThreads,
     hasSelectedAnnotations,
     selectedAnnotations,
