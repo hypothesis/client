@@ -1,7 +1,7 @@
 import { Card } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
-import { useCallback, useMemo } from 'preact/hooks';
+import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 
 import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
@@ -63,6 +63,17 @@ function ThreadCard({ frameSync, thread }) {
   // parent component but the `Thread` itself has not changed.
   const threadContent = useMemo(() => <Thread thread={thread} />, [thread]);
 
+  // Handle requests to give this thread keyboard focus.
+  const focusRequest = store.annotationFocusRequest();
+  const cardRef = useRef(/** @type {HTMLElement|null} */ (null));
+  useEffect(() => {
+    if (focusRequest !== thread.id || !cardRef.current) {
+      return;
+    }
+    cardRef.current.focus();
+    store.clearAnnotationFocusRequest();
+  }, [focusRequest, store, thread.id]);
+
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <Card
@@ -70,6 +81,8 @@ function ThreadCard({ frameSync, thread }) {
         'is-hovered': isHovered,
       })}
       data-testid="thread-card"
+      elementRef={cardRef}
+      tabIndex={0}
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
