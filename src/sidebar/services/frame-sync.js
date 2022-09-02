@@ -366,9 +366,23 @@ export class FrameSyncService {
 
     guestRPC.on(
       'showAnnotations',
-      /** @param {string[]} tags */ tags => {
-        this._store.selectAnnotations(this._store.findIDsForTags(tags));
+      /**
+       * @param {string[]} tags
+       * @param {boolean} focusFirstInSelection - Whether to give keyboard focus
+       *   to the first annotation in the selection.
+       */
+      (tags, focusFirstInSelection = false) => {
+        const ids = this._store.findIDsForTags(tags);
+        this._store.selectAnnotations(ids);
         this._store.selectTab('annotation');
+
+        // Attempt to transfer keyboard focus to the first selected annotation.
+        // This may be blocked in WebKit-based browsers if the user has not
+        // previously interacted with the frame.
+        if (ids.length > 0 && focusFirstInSelection) {
+          this._store.setAnnotationFocusRequest(ids[0]);
+          window.focus();
+        }
       }
     );
 
