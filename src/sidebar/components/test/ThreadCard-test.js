@@ -6,6 +6,7 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('ThreadCard', () => {
+  let container;
   let fakeDebounce;
   let fakeFrameSync;
   let fakeStore;
@@ -15,17 +16,23 @@ describe('ThreadCard', () => {
 
   function createComponent(props) {
     return mount(
-      <ThreadCard frameSync={fakeFrameSync} thread={fakeThread} {...props} />
+      <ThreadCard frameSync={fakeFrameSync} thread={fakeThread} {...props} />,
+      { attachTo: container }
     );
   }
 
   beforeEach(() => {
+    container = document.createElement('div');
+    document.body.append(container);
+
     fakeDebounce = sinon.stub().returnsArg(0);
     fakeFrameSync = {
       hoverAnnotations: sinon.stub(),
       scrollToAnnotation: sinon.stub(),
     };
     fakeStore = {
+      annotationFocusRequest: sinon.stub().returns(null),
+      clearAnnotationFocusRequest: sinon.stub(),
       isAnnotationHovered: sinon.stub().returns(false),
       route: sinon.stub(),
     };
@@ -44,6 +51,7 @@ describe('ThreadCard', () => {
 
   afterEach(() => {
     $imports.$restore();
+    container.remove();
   });
 
   it('renders a `Thread` for the passed `thread`', () => {
@@ -99,6 +107,31 @@ describe('ThreadCard', () => {
         });
         assert.notCalled(fakeFrameSync.scrollToAnnotation);
       });
+    });
+  });
+
+  describe('keyboard focus request handling', () => {
+    [null, 'other-annotation'].forEach(focusRequest => {
+      it('does not focus thread if there is no matching focus request', () => {
+        fakeStore.annotationFocusRequest.returns(focusRequest);
+
+        createComponent();
+
+        const threadCard = container.querySelector(threadCardSelector);
+
+        assert.notEqual(document.activeElement, threadCard);
+        assert.notCalled(fakeStore.clearAnnotationFocusRequest);
+      });
+    });
+
+    it('gives focus to the thread if there is a matching focus request', () => {
+      fakeStore.annotationFocusRequest.returns('t1');
+
+      createComponent();
+
+      const threadCard = container.querySelector(threadCardSelector);
+      assert.equal(document.activeElement, threadCard);
+      assert.called(fakeStore.clearAnnotationFocusRequest);
     });
   });
 
