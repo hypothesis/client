@@ -138,6 +138,7 @@ describe('FrameSyncService', () => {
         openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
         selectTab: sinon.stub(),
+        setAnnotationFocusRequest: sinon.stub(),
         setSidebarOpened: sinon.stub(),
         toggleSelectedAnnotations: sinon.stub(),
         updateAnchorStatus: sinon.stub(),
@@ -662,6 +663,26 @@ describe('FrameSyncService', () => {
 
       assert.calledWith(fakeStore.selectAnnotations, ['id1', 'id2', 'id3']);
       assert.calledWith(fakeStore.selectTab, 'annotation');
+    });
+
+    it('does not request keyboard focus if `focusFirstInSelection` is false', () => {
+      fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
+      emitGuestEvent(
+        'showAnnotations',
+        ['tag1', 'tag2', 'tag3'],
+        false /* focus */
+      );
+      assert.notCalled(fakeStore.setAnnotationFocusRequest);
+    });
+
+    it('requests keyboard focus for first annotation in selection', () => {
+      fakeStore.findIDsForTags.returns(['id1', 'id2', 'id3']);
+      emitGuestEvent(
+        'showAnnotations',
+        ['tag1', 'tag2', 'tag3'],
+        true /* focus */
+      );
+      assert.calledWith(fakeStore.setAnnotationFocusRequest, 'id1');
     });
   });
 
