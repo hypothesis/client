@@ -12,7 +12,7 @@ describe('AnnotationQuote', () => {
     return mount(
       <AnnotationQuote
         quote={'test quote'}
-        isFocused={false}
+        isHovered={false}
         isOrphan={false}
         settings={{}}
         {...props}

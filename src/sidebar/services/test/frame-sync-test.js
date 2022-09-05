@@ -133,7 +133,7 @@ describe('FrameSyncService', () => {
         },
 
         findIDsForTags: sinon.stub(),
-        focusAnnotations: sinon.stub(),
+        hoverAnnotations: sinon.stub(),
         isLoggedIn: sinon.stub().returns(false),
         openSidebarPanel: sinon.stub(),
         selectAnnotations: sinon.stub(),
@@ -665,7 +665,7 @@ describe('FrameSyncService', () => {
     });
   });
 
-  describe('on "focusAnnotations" message', () => {
+  describe('on "hoverAnnotations" message', () => {
     beforeEach(async () => {
       frameSync.connect();
       await connectGuest();
@@ -673,8 +673,8 @@ describe('FrameSyncService', () => {
 
     it('focuses the annotations', () => {
       frameSync.connect();
-      emitGuestEvent('focusAnnotations', ['tag1', 'tag2', 'tag3']);
-      assert.calledWith(fakeStore.focusAnnotations, ['tag1', 'tag2', 'tag3']);
+      emitGuestEvent('hoverAnnotations', ['tag1', 'tag2', 'tag3']);
+      assert.calledWith(fakeStore.hoverAnnotations, ['tag1', 'tag2', 'tag3']);
     });
   });
 
@@ -730,25 +730,25 @@ describe('FrameSyncService', () => {
     });
   });
 
-  describe('#focusAnnotations', () => {
+  describe('#hoverAnnotations', () => {
     beforeEach(async () => {
       frameSync.connect();
       await connectGuest();
     });
 
     it('should update the focused annotations in the store', () => {
-      frameSync.focusAnnotations(['a1', 'a2']);
+      frameSync.hoverAnnotations(['a1', 'a2']);
       assert.calledWith(
-        fakeStore.focusAnnotations,
+        fakeStore.hoverAnnotations,
         sinon.match.array.deepEquals(['a1', 'a2'])
       );
     });
 
     it('should focus the associated highlights in the guest', () => {
-      frameSync.focusAnnotations([1, 2]);
+      frameSync.hoverAnnotations([1, 2]);
       assert.calledWith(
         guestRPC().call,
-        'focusAnnotations',
+        'hoverAnnotations',
         sinon.match.array.deepEquals([1, 2])
       );
     });

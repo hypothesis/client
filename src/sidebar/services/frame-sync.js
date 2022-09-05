@@ -373,9 +373,9 @@ export class FrameSyncService {
     );
 
     guestRPC.on(
-      'focusAnnotations',
+      'hoverAnnotations',
       /** @param {string[]} tags */ tags => {
-        this._store.focusAnnotations(tags || []);
+        this._store.hoverAnnotations(tags || []);
       }
     );
 
@@ -489,16 +489,16 @@ export class FrameSyncService {
   }
 
   /**
-   * Focus annotations with the given $tags.
+   * Mark annotations as hovered.
    *
-   * This is used to indicate the highlight in the document that corresponds to
-   * a given annotation in the sidebar.
+   * This is used to indicate the highlights in the document that correspond
+   * to hovered annotations in the sidebar.
    *
    * @param {string[]} tags - annotation $tags
    */
-  focusAnnotations(tags) {
-    this._store.focusAnnotations(tags);
-    this._guestRPC.forEach(rpc => rpc.call('focusAnnotations', tags));
+  hoverAnnotations(tags) {
+    this._store.hoverAnnotations(tags);
+    this._guestRPC.forEach(rpc => rpc.call('hoverAnnotations', tags));
   }
 
   /**

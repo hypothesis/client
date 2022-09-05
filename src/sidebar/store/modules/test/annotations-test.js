@@ -151,33 +151,33 @@ describe('sidebar/store/modules/annotations', () => {
       it('should clear annotations and annotation state from the store', () => {
         const annot = fixtures.defaultAnnotation();
         store.addAnnotations([annot]);
-        store.focusAnnotations([annot.id]);
+        store.hoverAnnotations([annot.id]);
         store.highlightAnnotations([annot.id]);
 
         store.clearAnnotations();
 
         assert.isEmpty(store.getState().annotations.annotations);
-        assert.isEmpty(store.focusedAnnotations());
+        assert.isEmpty(store.hoveredAnnotations());
         assert.isEmpty(store.highlightedAnnotations());
       });
     });
 
-    describe('focusAnnotations', () => {
+    describe('hoverAnnotations', () => {
       it('adds the provided annotation IDs to the focused annotations', () => {
-        store.focusAnnotations(['1', '2', '3']);
-        assert.deepEqual(store.focusedAnnotations(), ['1', '2', '3']);
+        store.hoverAnnotations(['1', '2', '3']);
+        assert.deepEqual(store.hoveredAnnotations(), ['1', '2', '3']);
       });
 
       it('replaces any other focused annotation IDs', () => {
-        store.focusAnnotations(['1']);
-        store.focusAnnotations(['2', '3']);
-        assert.deepEqual(store.focusedAnnotations(), ['2', '3']);
+        store.hoverAnnotations(['1']);
+        store.hoverAnnotations(['2', '3']);
+        assert.deepEqual(store.hoveredAnnotations(), ['2', '3']);
       });
 
       it('sets focused annotations to an empty object if no IDs provided', () => {
-        store.focusAnnotations(['1']);
-        store.focusAnnotations([]);
-        assert.isEmpty(store.focusedAnnotations());
+        store.hoverAnnotations(['1']);
+        store.hoverAnnotations([]);
+        assert.isEmpty(store.hoveredAnnotations());
       });
     });
 
@@ -198,14 +198,14 @@ describe('sidebar/store/modules/annotations', () => {
       });
     });
 
-    describe('isAnnotationFocused', () => {
-      it('returns true if the provided annotation ID is in the set of focused annotations', () => {
-        store.focusAnnotations([1, 2]);
-        assert.isTrue(store.isAnnotationFocused(2));
+    describe('isAnnotationHovered', () => {
+      it('returns true if the provided annotation ID is in the set of hovered annotations', () => {
+        store.hoverAnnotations([1, 2]);
+        assert.isTrue(store.isAnnotationHovered(2));
       });
 
-      it('returns false if the provided annotation ID is not in the set of focused annotations', () => {
-        assert.isFalse(store.isAnnotationFocused(2));
+      it('returns false if the provided annotation ID is not in the set of hovered annotations', () => {
+        assert.isFalse(store.isAnnotationHovered(2));
       });
     });
   });

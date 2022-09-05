@@ -77,7 +77,7 @@ function Annotation({
   const draft = store.getDraft(annotation);
   const userid = store.profile().userid;
 
-  const isFocused = store.isAnnotationFocused(annotation.$tag);
+  const isHovered = store.isAnnotationHovered(annotation.$tag);
   const isSaving = store.isSavingAnnotation(annotation);
 
   const isEditing = !!draft && !isSaving;
@@ -119,7 +119,7 @@ function Annotation({
       {annotationQuote && (
         <AnnotationQuote
           quote={annotationQuote}
-          isFocused={isFocused}
+          isHovered={isHovered}
           isOrphan={isOrphan(annotation)}
         />
       )}

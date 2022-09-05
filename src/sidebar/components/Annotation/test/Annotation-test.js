@@ -56,7 +56,7 @@ describe('Annotation', () => {
     fakeStore = {
       defaultAuthority: sinon.stub().returns('example.com'),
       getDraft: sinon.stub().returns(null),
-      isAnnotationFocused: sinon.stub().returns(false),
+      isAnnotationHovered: sinon.stub().returns(false),
       isFeatureEnabled: sinon
         .stub()
         .withArgs('client_display_names')
@@ -107,12 +107,12 @@ describe('Annotation', () => {
       assert.isTrue(quote.exists());
     });
 
-    it('sets the quote to "focused" if annotation is currently focused', () => {
-      fakeStore.isAnnotationFocused.returns(true);
+    it('sets the quote to hovered if annotation is currently hovered', () => {
+      fakeStore.isAnnotationHovered.returns(true);
       fakeMetadata.quote.returns('quote');
       const wrapper = createComponent();
 
-      assert.isTrue(wrapper.find('AnnotationQuote').props().isFocused);
+      assert.isTrue(wrapper.find('AnnotationQuote').props().isHovered);
     });
 
     it('does not render quote if annotation does not have a quote', () => {

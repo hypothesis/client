@@ -229,13 +229,13 @@ export class Guest {
     this._setupElementEvents();
 
     /**
-     * Tags of currently focused annotations. This is used to set the focused
+     * Tags of currently hovered annotations. This is used to set the hovered
      * state correctly for new highlights if the associated annotation is already
-     * focused in the sidebar.
+     * hovered in the sidebar.
      *
      * @type {Set<string>}
      */
-    this._focusedAnnotations = new Set();
+    this._hoveredAnnotations = new Set();
   }
 
   // Add DOM event listeners for clicks, taps etc. on the document and
@@ -279,13 +279,13 @@ export class Guest {
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
       const tags = annotationsAt(/** @type {Element} */ (target));
       if (tags.length && this._highlightsVisible) {
-        this._sidebarRPC.call('focusAnnotations', tags);
+        this._sidebarRPC.call('hoverAnnotations', tags);
       }
     });
 
     this._listeners.add(this.element, 'mouseout', () => {
       if (this._highlightsVisible) {
-        this._sidebarRPC.call('focusAnnotations', []);
+        this._sidebarRPC.call('hoverAnnotations', []);
       }
     });
 
@@ -333,9 +333,9 @@ export class Guest {
     this._hostRPC.on('createAnnotation', () => this.createAnnotation());
 
     this._hostRPC.on(
-      'focusAnnotations',
+      'hoverAnnotations',
       /** @param {string[]} tags */
-      tags => this._focusAnnotations(tags)
+      tags => this._hoverAnnotations(tags)
     );
 
     this._hostRPC.on(
@@ -382,9 +382,9 @@ export class Guest {
     // Handlers for events sent when user hovers or clicks on an annotation card
     // in the sidebar.
     this._sidebarRPC.on(
-      'focusAnnotations',
+      'hoverAnnotations',
       /** @param {string[]} tags */
-      tags => this._focusAnnotations(tags)
+      tags => this._hoverAnnotations(tags)
     );
 
     this._sidebarRPC.on(
@@ -538,7 +538,7 @@ export class Guest {
       });
       anchor.highlights = highlights;
 
-      if (this._focusedAnnotations.has(anchor.annotation.$tag)) {
+      if (this._hoveredAnnotations.has(anchor.annotation.$tag)) {
         setHighlightsFocused(highlights, true);
       }
     };
@@ -663,9 +663,9 @@ export class Guest {
    *
    * @param {string[]} tags
    */
-  _focusAnnotations(tags) {
-    this._focusedAnnotations.clear();
-    tags.forEach(tag => this._focusedAnnotations.add(tag));
+  _hoverAnnotations(tags) {
+    this._hoveredAnnotations.clear();
+    tags.forEach(tag => this._hoveredAnnotations.add(tag));
 
     for (let anchor of this.anchors) {
       if (anchor.highlights) {
@@ -674,7 +674,7 @@ export class Guest {
       }
     }
 
-    this._sidebarRPC.call('focusAnnotations', tags);
+    this._sidebarRPC.call('hoverAnnotations', tags);
   }
 
   /**
@@ -781,12 +781,12 @@ export class Guest {
   }
 
   /**
-   * Return the tags of annotations that are currently displayed in a focused
+   * Return the tags of annotations that are currently displayed in a hovered
    * state.
    *
    * @return {Set<string>}
    */
-  get focusedAnnotationTags() {
-    return this._focusedAnnotations;
+  get hoveredAnnotationTags() {
+    return this._hoveredAnnotations;
   }
 }

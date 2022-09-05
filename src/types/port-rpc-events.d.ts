@@ -33,9 +33,10 @@ export type GuestToSidebarEvent =
   | 'closeSidebar'
 
   /**
-   * The guest is asking the sidebar to focus on certain annotations.
+   * Indicate in the sidebar which annotation cards correspond to hovered
+   * highlights in the guest.
    */
-  | 'focusAnnotations'
+  | 'hoverAnnotations'
 
   /**
    * The guest is asking the sidebar to relay the message to the host to open the sidebar.
@@ -71,9 +72,10 @@ export type HostToGuestEvent =
   | 'clearSelection'
 
   /**
-   * The host informs guests to focus on a set of annotations
+   * Indicate in the guest which highlights correspond to hovered buckets in
+   * the bucket bar.
    */
-  | 'focusAnnotations'
+  | 'hoverAnnotations'
 
   /**
    * The host informs guests to select/toggle on a set of annotations
@@ -115,9 +117,10 @@ export type SidebarToGuestEvent =
   | 'featureFlagsUpdated'
 
   /**
-   * The sidebar is asking the guest(s) to focus on certain annotations.
+   * Indicate in the guest which highlights correspond to hovered annotations
+   * in the sidebar.
    */
-  | 'focusAnnotations'
+  | 'hoverAnnotations'
 
   /**
    * The sidebar is asking the guest(s) to load annotations.

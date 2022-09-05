@@ -27,14 +27,14 @@ import Thread from './Thread';
 function ThreadCard({ frameSync, thread }) {
   const store = useSidebarStore();
   const threadTag = thread.annotation?.$tag ?? null;
-  const isFocused = threadTag && store.isAnnotationFocused(threadTag);
+  const isHovered = threadTag && store.isAnnotationHovered(threadTag);
   const focusThreadAnnotation = useMemo(
     () =>
       debounce(
         /** @param {string|null} tag */
         tag => {
           const focusTags = tag ? [tag] : [];
-          frameSync.focusAnnotations(focusTags);
+          frameSync.hoverAnnotations(focusTags);
         },
         10
       ),
@@ -67,7 +67,7 @@ function ThreadCard({ frameSync, thread }) {
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <Card
       classes={classnames('p-3 cursor-pointer', {
-        'is-focused': isFocused,
+        'is-hovered': isHovered,
       })}
       data-testid="thread-card"
       onClick={e => {
