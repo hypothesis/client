@@ -22,11 +22,11 @@ describe('ThreadCard', () => {
   beforeEach(() => {
     fakeDebounce = sinon.stub().returnsArg(0);
     fakeFrameSync = {
-      focusAnnotations: sinon.stub(),
+      hoverAnnotations: sinon.stub(),
       scrollToAnnotation: sinon.stub(),
     };
     fakeStore = {
-      isAnnotationFocused: sinon.stub().returns(false),
+      isAnnotationHovered: sinon.stub().returns(false),
       route: sinon.stub(),
     };
 
@@ -51,12 +51,12 @@ describe('ThreadCard', () => {
     assert(wrapper.find('Thread').props().thread === fakeThread);
   });
 
-  it('applies a focused CSS class if the annotation thread is focused', () => {
-    fakeStore.isAnnotationFocused.returns(true);
+  it('applies a hovered CSS class if the annotation thread is hovered', () => {
+    fakeStore.isAnnotationHovered.returns(true);
 
     const wrapper = createComponent();
 
-    assert.isTrue(wrapper.find(threadCardSelector).hasClass('is-focused'));
+    assert.isTrue(wrapper.find(threadCardSelector).hasClass('is-hovered'));
   });
 
   describe('mouse and click events', () => {
@@ -73,7 +73,7 @@ describe('ThreadCard', () => {
 
       wrapper.find(threadCardSelector).simulate('mouseenter');
 
-      assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match(['myTag']));
+      assert.calledWith(fakeFrameSync.hoverAnnotations, sinon.match(['myTag']));
     });
 
     it('unfocuses the annotation thread when mouse exits', () => {
@@ -81,7 +81,7 @@ describe('ThreadCard', () => {
 
       wrapper.find(threadCardSelector).simulate('mouseleave');
 
-      assert.calledWith(fakeFrameSync.focusAnnotations, sinon.match([]));
+      assert.calledWith(fakeFrameSync.hoverAnnotations, sinon.match([]));
     });
 
     ['button', 'a'].forEach(tag => {

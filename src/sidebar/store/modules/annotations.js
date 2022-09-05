@@ -106,12 +106,14 @@ const initialState = {
    */
   annotations: [],
   /**
-   * A set of annotations that are currently "focused" — e.g. hovered over in
-   * the UI.
+   * Annotations whose cards or highlights are currently hovered.
+   *
+   * The styling of the highlights/cards of these annotations are adjusted to
+   * show the correspondence between the two.
    *
    * @type {Record<string, boolean>}
    */
-  focused: {},
+  hovered: {},
   /**
    * A map of annotations that should appear as "highlighted", e.g. the
    * target of a single-annotation view
@@ -177,15 +179,15 @@ const reducers = {
   },
 
   CLEAR_ANNOTATIONS() {
-    return { annotations: [], focused: {}, highlighted: {} };
+    return { annotations: [], highlighted: {}, hovered: {} };
   },
 
   /**
    * @param {State} state
-   * @param {{ focusedTags: string[] }} action
+   * @param {{ tags: string[] }} action
    */
-  FOCUS_ANNOTATIONS(state, action) {
-    return { focused: toTrueMap(action.focusedTags) };
+  HOVER_ANNOTATIONS(state, action) {
+    return { hovered: toTrueMap(action.tags) };
   },
 
   /**
@@ -354,14 +356,13 @@ function clearAnnotations() {
 }
 
 /**
- * Replace the current set of focused annotations with the annotations
- * identified by `tags`. All provided annotations (`tags`) will be set to
- * `true` in the `focused` map.
+ * Replace the current set of hovered annotations with the annotations
+ * identified by `tags`.
  *
- * @param {string[]} tags - Identifiers of annotations to focus
+ * @param {string[]} tags
  */
-function focusAnnotations(tags) {
-  return makeAction(reducers, 'FOCUS_ANNOTATIONS', { focusedTags: tags });
+function hoverAnnotations(tags) {
+  return makeAction(reducers, 'HOVER_ANNOTATIONS', { tags });
 }
 
 /**
@@ -512,12 +513,12 @@ function findIDsForTags(state, tags) {
 }
 
 /**
- * Retrieve currently-focused annotation identifiers
+ * Retrieve currently-hovered annotation identifiers
  */
-const focusedAnnotations = createSelector(
+const hoveredAnnotations = createSelector(
   /** @param {State} state */
-  state => state.focused,
-  focused => trueKeys(focused)
+  state => state.hovered,
+  hovered => trueKeys(hovered)
 );
 
 /**
@@ -530,13 +531,13 @@ const highlightedAnnotations = createSelector(
 );
 
 /**
- * Is the annotation referenced by `$tag` currently focused?
+ * Is the annotation identified by `$tag` currently hovered?
  *
  * @param {State} state
  * @param {string} $tag
  */
-function isAnnotationFocused(state, $tag) {
-  return state.focused[$tag] === true;
+function isAnnotationHovered(state, $tag) {
+  return state.hovered[$tag] === true;
 }
 
 /**
@@ -606,7 +607,7 @@ export const annotationsModule = createStoreModule(initialState, {
   actionCreators: {
     addAnnotations,
     clearAnnotations,
-    focusAnnotations,
+    hoverAnnotations,
     hideAnnotation,
     highlightAnnotations,
     removeAnnotations,
@@ -620,9 +621,9 @@ export const annotationsModule = createStoreModule(initialState, {
     annotationExists,
     findAnnotationByID,
     findIDsForTags,
-    focusedAnnotations,
+    hoveredAnnotations,
     highlightedAnnotations,
-    isAnnotationFocused,
+    isAnnotationHovered,
     isWaitingToAnchorAnnotations,
     newAnnotations,
     newHighlights,

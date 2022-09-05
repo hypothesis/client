@@ -117,7 +117,7 @@ function SidebarView({
   // and focus it
   useEffect(() => {
     if (linkedAnnotationAnchorTag) {
-      frameSync.focusAnnotations([linkedAnnotationAnchorTag]);
+      frameSync.hoverAnnotations([linkedAnnotationAnchorTag]);
       frameSync.scrollToAnnotation(linkedAnnotationAnchorTag);
       store.selectTab(directLinkedTab);
     } else if (linkedAnnotation) {
