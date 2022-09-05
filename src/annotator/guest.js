@@ -148,7 +148,14 @@ export class Guest {
     this._adder = new Adder(this.element, {
       onAnnotate: () => this.createAnnotation(),
       onHighlight: () => this.createAnnotation({ highlight: true }),
-      onShowAnnotations: tags => this.selectAnnotations(tags),
+
+      // When the "Show" button is triggered, open the sidebar and select the
+      // annotations. Also give keyboard focus to the first selected annotation.
+      // This is an important affordance for eg. screen reader users as it gives
+      // them an efficient way to navigate from highlights in the document to
+      // the corresponding comments in the sidebar.
+      onShowAnnotations: tags =>
+        this.selectAnnotations(tags, { focusInSidebar: true }),
     });
 
     this._selectionObserver = new SelectionObserver(range => {
@@ -262,7 +269,7 @@ export class Guest {
       const tags = annotationsAt(/** @type {Element} */ (target));
       if (tags.length && this._highlightsVisible) {
         const toggle = metaKey || ctrlKey;
-        this.selectAnnotations(tags, toggle);
+        this.selectAnnotations(tags, { toggle });
       }
     });
 
@@ -353,7 +360,7 @@ export class Guest {
        * @param {string[]} tags
        * @param {boolean} toggle
        */
-      (tags, toggle) => this.selectAnnotations(tags, toggle)
+      (tags, toggle) => this.selectAnnotations(tags, { toggle })
     );
 
     this._hostRPC.on(
@@ -735,17 +742,22 @@ export class Guest {
    * Show the given annotations in the sidebar.
    *
    * This sets up a filter in the sidebar to show only the selected annotations
-   * and opens the sidebar.
+   * and opens the sidebar. Optionally it can also transfer keyboard focus to
+   * the annotation card for the first selected annotation.
    *
    * @param {string[]} tags
-   * @param {boolean} [toggle] - Toggle whether the annotations are selected
-   *   instead of showing them regardless of whether they are currently selected.
+   * @param {object} options
+   *   @param {boolean} [options.toggle] - Toggle whether the annotations are
+   *     selected, as opposed to just selecting them
+   *   @param {boolean} [options.focusInSidebar] - Whether to transfer keyboard
+   *     focus to the card for the first annotation in the selection. This
+   *     option has no effect if {@link toggle} is true.
    */
-  selectAnnotations(tags, toggle = false) {
+  selectAnnotations(tags, { toggle = false, focusInSidebar = false } = {}) {
     if (toggle) {
       this._sidebarRPC.call('toggleAnnotationSelection', tags);
     } else {
-      this._sidebarRPC.call('showAnnotations', tags);
+      this._sidebarRPC.call('showAnnotations', tags, focusInSidebar);
     }
     this._sidebarRPC.call('openSidebar');
   }
