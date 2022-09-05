@@ -267,7 +267,7 @@ describe('Guest', () => {
 
         emitHostEvent('selectAnnotations', tags, toggle);
 
-        assert.calledWith(guest.selectAnnotations, tags, toggle);
+        assert.calledWith(guest.selectAnnotations, tags, { toggle });
         assert.calledWith(sidebarRPC().call, 'openSidebar');
       });
     });
@@ -805,7 +805,12 @@ describe('Guest', () => {
       FakeAdder.instance.options.onShowAnnotations(tags);
 
       assert.calledWith(sidebarRPC().call, 'openSidebar');
-      assert.calledWith(sidebarRPC().call, 'showAnnotations', tags);
+      assert.calledWith(
+        sidebarRPC().call,
+        'showAnnotations',
+        tags,
+        true // Focus annotation in sidebar
+      );
     });
   });
 
@@ -816,14 +821,19 @@ describe('Guest', () => {
 
       guest.selectAnnotations(tags);
 
-      assert.calledWith(sidebarRPC().call, 'showAnnotations', tags);
+      assert.calledWith(
+        sidebarRPC().call,
+        'showAnnotations',
+        tags,
+        false // Don't focus annotation in sidebar
+      );
     });
 
     it('toggles the annotations if `toggle` is true', () => {
       const guest = createGuest();
       const tags = ['t1', 't2'];
 
-      guest.selectAnnotations(tags, true /* toggle */);
+      guest.selectAnnotations(tags, { toggle: true });
 
       assert.calledWith(sidebarRPC().call, 'toggleAnnotationSelection', tags);
     });
@@ -834,6 +844,20 @@ describe('Guest', () => {
       guest.selectAnnotations([]);
 
       assert.calledWith(sidebarRPC().call, 'openSidebar');
+    });
+
+    it('focuses first selected annotation in sidebar if `focusInSidebar` is true', () => {
+      const guest = createGuest();
+      const tags = ['t1', 't2'];
+
+      guest.selectAnnotations(tags, { focusInSidebar: true });
+
+      assert.calledWith(
+        sidebarRPC().call,
+        'showAnnotations',
+        tags,
+        true // Focus in sidebar
+      );
     });
   });
 
