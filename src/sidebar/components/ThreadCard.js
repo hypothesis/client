@@ -77,12 +77,12 @@ function ThreadCard({ frameSync, thread }) {
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <Card
-      classes={classnames('p-3 cursor-pointer', {
+      classes={classnames('p-3 cursor-pointer focus-visible-ring', {
         'is-hovered': isHovered,
       })}
       data-testid="thread-card"
       elementRef={cardRef}
-      tabIndex={0}
+      tabIndex={-1}
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
