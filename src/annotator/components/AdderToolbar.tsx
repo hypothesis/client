@@ -101,6 +101,46 @@ function ToolbarButton({
   );
 }
 
+/**
+ * Render non-visible content for screen readers to announce adder keyboard
+ * shortcuts and count of annotations associated with the current selection.
+ */
+function AdderToolbarShortcuts({
+  annotationCount,
+  isVisible,
+}: {
+  annotationCount: number;
+  isVisible: boolean;
+}) {
+  return (
+    <div className="sr-only">
+      <span
+        aria-live="polite"
+        aria-atomic="true"
+        role="status"
+        data-testid="annotation-count-announce"
+      >
+        {annotationCount > 0 && (
+          <span>
+            {annotationCount}{' '}
+            {annotationCount === 1 ? 'annotation' : 'annotations'} for this
+            selection.
+          </span>
+        )}
+      </span>
+      <ul aria-live="polite" data-testid="annotate-shortcuts-announce">
+        {isVisible && (
+          <>
+            {annotationCount > 0 && <li>Press {"'S'"} to show annotations.</li>}
+            <li>Press {"'A'"} to annotate.</li>
+            <li>Press {"'H'"} to highlight.</li>
+          </>
+        )}
+      </ul>
+    </div>
+  );
+}
+
 export type Command = 'annotate' | 'highlight' | 'show' | 'hide';
 
 type AdderToolbarProps = {
@@ -240,6 +280,10 @@ export default function AdderToolbar({
         )}
       </div>
       <AdderToolbarArrow arrowDirection={arrowDirection} />
+      <AdderToolbarShortcuts
+        annotationCount={annotationCount}
+        isVisible={isVisible}
+      />
     </div>
   );
 }
