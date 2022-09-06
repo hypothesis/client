@@ -372,15 +372,22 @@ export class FrameSyncService {
        *   to the first annotation in the selection.
        */
       (tags, focusFirstInSelection = false) => {
+        // Since annotations are selected by ID rather than tag, this logic
+        // currently only supports saved annotations.
         const ids = this._store.findIDsForTags(tags);
         this._store.selectAnnotations(ids);
         this._store.selectTab('annotation');
 
         // Attempt to transfer keyboard focus to the first selected annotation.
-        // This may be blocked in WebKit-based browsers if the user has not
-        // previously interacted with the frame.
+        //
+        // To do this we need to focus both the annotation card and the frame
+        // itself. It doesn't matter in which order.
         if (ids.length > 0 && focusFirstInSelection) {
+          // Request the annotation card to be focused. This is handled asynchronously.
           this._store.setAnnotationFocusRequest(ids[0]);
+
+          // Focus the sidebar frame. This may fail in WebKit-based browsers
+          // if the user has no interacted with the frame since it loaded.
           window.focus();
         }
       }
