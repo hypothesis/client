@@ -126,9 +126,7 @@ type AdderToolbarProps = {
  * The toolbar that is displayed above or below selected text in the document,
  * providing options to create annotations or highlights.
  *
-<<<<<<< HEAD:src/annotator/components/AdderToolbar.js
  * @param {AdderToolbarProps} props
-=======
  * The toolbar has nuanced styling for hover. The component structure is:
  *
  * <AdderToolbar>
@@ -159,7 +157,6 @@ type AdderToolbarProps = {
  *   badge will darken when its parent button is hovered, even if it is not
  *   hovered directly.
  *
->>>>>>> 544c8e5c6 (Convert `AdderToolbar` to TypeScript):src/annotator/components/AdderToolbar.tsx
  */
 export default function AdderToolbar({
   arrowDirection,
