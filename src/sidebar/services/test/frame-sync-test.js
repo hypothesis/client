@@ -684,6 +684,14 @@ describe('FrameSyncService', () => {
       );
       assert.calledWith(fakeStore.setAnnotationFocusRequest, 'id1');
     });
+
+    it('does not request keyboard focus if no IDs could be found for annotation', () => {
+      // Simulate no IDs being found. This could happen if annotations are not
+      // saved or have been deleted since the request was sent.
+      fakeStore.findIDsForTags.returns([]);
+      emitGuestEvent('showAnnotations', ['tag1'], true /* focus */);
+      assert.notCalled(fakeStore.setAnnotationFocusRequest);
+    });
   });
 
   describe('on "hoverAnnotations" message', () => {
