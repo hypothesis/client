@@ -3,6 +3,8 @@ node_modules/
 coverage/
 docs/_build/
 
+.eslintcache
+
 # The client uses Yarn rather than npm to manage the lockfile.
 package-lock.json
 
