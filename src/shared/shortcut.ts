@@ -2,15 +2,13 @@ import { useEffect } from 'preact/hooks';
 
 /**
  * Bit flags indicating modifiers required by a shortcut or pressed in a key event.
- *
- * @type {Record<string, number>}
  */
 const modifiers = {
   alt: 1,
   ctrl: 2,
   meta: 4,
   shift: 8,
-};
+} as Record<string, number>;
 
 /**
  * Match a `shortcut` key sequence against a keydown event.
@@ -19,12 +17,8 @@ const modifiers = {
  * keys. The list may contain zero or more modifiers and must contain exactly
  * one non-modifier key. The key and modifier names are case-insensitive.
  * For example "Ctrl+Enter", "shift+a". Key names are matched against `KeyboardEvent.key`.
- *
- * @param {KeyboardEvent} event
- * @param {string} shortcut
- * @return {boolean}
  */
-export function matchShortcut(event, shortcut) {
+export function matchShortcut(event: KeyboardEvent, shortcut: string): boolean {
   const parts = shortcut.split('+').map(p => p.toLowerCase());
 
   let requiredModifiers = 0;
@@ -57,37 +51,36 @@ export function matchShortcut(event, shortcut) {
   );
 }
 
-/**
- * @typedef ShortcutOptions
- * @prop {HTMLElement} [rootElement] -
- *   Element on which the key event listener should be installed. Defaults to
- *   `document.body`.
- */
+export type ShortcutOptions = {
+  /**
+   * Element on which the key event listener should be installed. Defaults to
+   * `document.body`.
+   */
+  rootElement?: HTMLElement;
+};
 
 /**
  * Install a shortcut key listener on the document.
  *
  * This can be used directly outside of a component. To use within a Preact
- * component, you probably want the `useShortcut` hook.
+ * component, you probably want {@link useShortcut}.
  *
- * @param {string} shortcut - Shortcut key sequence. See `matchShortcut`.
- * @param {(e: KeyboardEvent) => void} onPress - A function to call when the shortcut matches
- * @param {ShortcutOptions} options
- * @return {() => void} A function that removes the shortcut
+ * @param shortcut - Shortcut key sequence. See {@link matchShortcut}.
+ * @param onPress - A function to call when the shortcut matches
+ * @return A function that removes the shortcut
  */
 export function installShortcut(
-  shortcut,
-  onPress,
+  shortcut: string,
+  onPress: (e: KeyboardEvent) => void,
   {
     // We use `documentElement` as the root element rather than `document.body`
     // which is used as a root element in some other places because the body
     // element is not keyboard-focusable in XHTML documents in Safari/Chrome.
     // See https://github.com/hypothesis/client/issues/4364.
     rootElement = document.documentElement,
-  } = {}
+  }: ShortcutOptions = {}
 ) {
-  /** @param {KeyboardEvent} event */
-  const onKeydown = event => {
+  const onKeydown = (event: KeyboardEvent) => {
     if (matchShortcut(event, shortcut)) {
       onPress(event);
     }
@@ -97,8 +90,8 @@ export function installShortcut(
 }
 
 /**
- * An effect hook that installs a shortcut using `installShortcut` and removes
- * it when the component is unmounted.
+ * An effect hook that installs a shortcut using {@link installShortcut} and
+ * removes it when the component is unmounted.
  *
  * This provides a convenient way to enable a document-level shortcut while
  * a component is mounted. This differs from adding an `onKeyDown` handler to
@@ -107,12 +100,14 @@ export function installShortcut(
  *
  * To conditionally disable the shortcut, set `shortcut` to `null`.
  *
- * @param {string|null} shortcut -
- *   A shortcut key sequence to match or `null` to disable. See `matchShortcut`.
- * @param {(e: KeyboardEvent) => void} onPress - A function to call when the shortcut matches
- * @param {ShortcutOptions} options
+ * @param shortcut - A shortcut key sequence to match or `null` to disable. See {@link matchShortcut}.
+ * @param onPress - A function to call when the shortcut matches
  */
-export function useShortcut(shortcut, onPress, { rootElement } = {}) {
+export function useShortcut(
+  shortcut: string | null,
+  onPress: (e: KeyboardEvent) => void,
+  { rootElement }: ShortcutOptions = {}
+) {
   useEffect(() => {
     if (!shortcut) {
       return undefined;
