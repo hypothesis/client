@@ -16,7 +16,12 @@ const modifiers = {
  * A shortcut key sequence is a string of "+"-separated keyboard modifiers and
  * keys. The list may contain zero or more modifiers and must contain exactly
  * one non-modifier key. The key and modifier names are case-insensitive.
- * For example "Ctrl+Enter", "shift+a". Key names are matched against `KeyboardEvent.key`.
+ * For example "Ctrl+Enter", "shift+a".
+ *
+ * Key names are matched against {@link KeyboardEvent.key}. Be aware that this
+ * property is affected by the modifiers for certain keys. For example on a US
+ * QWERTY keyboard, "Shift+1" would not match any event because the key value
+ * would be "!" instead. See also https://github.com/w3c/uievents/issues/247.
  */
 export function matchShortcut(event: KeyboardEvent, shortcut: string): boolean {
   const parts = shortcut.split('+').map(p => p.toLowerCase());
