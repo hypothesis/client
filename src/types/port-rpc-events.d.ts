@@ -16,7 +16,13 @@ export type GuestToHostEvent =
   /**
    * The guest informs the host that the anchors have been changed in the main annotatable frame.
    */
-  | 'anchorsChanged';
+  | 'anchorsChanged'
+
+  /**
+   * Visibility of highlights was toggled from the guest frame (it can also be
+   * toggled from the host frame).
+   */
+  | 'highlightsVisibleChanged';
 
 /**
  * Events that the guest sends to the sidebar
