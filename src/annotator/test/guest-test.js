@@ -1414,4 +1414,32 @@ describe('Guest', () => {
       assert.isTrue(guest.sideBySideActive);
     });
   });
+
+  describe('keyboard shortcuts', () => {
+    it('toggles highlights when shortcut is pressed', () => {
+      const guest = createGuest();
+      guest.setHighlightsVisible(true, false /* notifyHost */);
+      assert.equal(guest.highlightsVisible, true);
+
+      guest.element.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'h',
+        })
+      );
+      assert.equal(guest.highlightsVisible, false);
+      assert.calledWith(hostRPC().call, 'highlightsVisibleChanged', false);
+
+      guest.element.dispatchEvent(
+        new KeyboardEvent('keydown', {
+          ctrlKey: true,
+          shiftKey: true,
+          key: 'h',
+        })
+      );
+      assert.equal(guest.highlightsVisible, true);
+      assert.calledWith(hostRPC().call, 'highlightsVisibleChanged', true);
+    });
+  });
 });

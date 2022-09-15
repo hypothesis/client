@@ -295,6 +295,14 @@ export class Sidebar {
         .forEach(rpc => rpc.call('clearSelection'));
     });
 
+    guestRPC.on(
+      'highlightsVisibleChanged',
+      /** @param {boolean} visible */
+      visible => {
+        this.setHighlightsVisible(visible);
+      }
+    );
+
     // The listener will do nothing if the sidebar doesn't have a bucket bar
     // (clean theme)
     const bucketBar = this.bucketBar;

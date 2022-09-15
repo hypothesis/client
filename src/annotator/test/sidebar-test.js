@@ -318,6 +318,18 @@ describe('Sidebar', () => {
       assert.neverCalledWith(guestRPC(1).call, 'clearSelection');
       assert.calledWith(guestRPC(2).call, 'clearSelection');
     });
+
+    it('updates state of highlights-visible button when state is changed in guest', () => {
+      const sidebar = createSidebar();
+      connectGuest(sidebar);
+      assert.isFalse(fakeToolbar.highlightsVisible);
+
+      emitGuestEvent('highlightsVisibleChanged', true);
+      assert.isTrue(fakeToolbar.highlightsVisible);
+
+      emitGuestEvent('highlightsVisibleChanged', false);
+      assert.isFalse(fakeToolbar.highlightsVisible);
+    });
   });
 
   describe('events from sidebar frame', () => {

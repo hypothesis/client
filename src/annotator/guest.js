@@ -1,6 +1,7 @@
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
+import { matchShortcut } from '../shared/shortcut';
 
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
@@ -296,6 +297,10 @@ export class Guest {
       }
     });
 
+    this._listeners.add(this.element, 'keydown', event => {
+      this._handleShortcut(event);
+    });
+
     this._listeners.add(window, 'resize', () => this._repositionAdder());
   }
 
@@ -427,7 +432,7 @@ export class Guest {
     this._sidebarRPC.on(
       'setHighlightsVisible',
       /** @param {boolean} showHighlights */ showHighlights => {
-        this.setHighlightsVisible(showHighlights);
+        this.setHighlightsVisible(showHighlights, false /* notifyHost */);
       }
     );
 
@@ -766,10 +771,20 @@ export class Guest {
    * Set whether highlights are visible in the document or not.
    *
    * @param {boolean} visible
+   * @param {boolean} notifyHost - Whether to notify the host frame about this
+   *   change. This should be true unless the request to change highlight
+   *   visibility is coming from the host frame.
    */
-  setHighlightsVisible(visible) {
+  setHighlightsVisible(visible, notifyHost = true) {
     setHighlightsVisible(this.element, visible);
     this._highlightsVisible = visible;
+    if (notifyHost) {
+      this._hostRPC.call('highlightsVisibleChanged', visible);
+    }
+  }
+
+  get highlightsVisible() {
+    return this._highlightsVisible;
   }
 
   /**
@@ -800,5 +815,16 @@ export class Guest {
    */
   get hoveredAnnotationTags() {
     return this._hoveredAnnotations;
+  }
+
+  /**
+   * Handle a potential shortcut trigger.
+   *
+   * @param {KeyboardEvent} event
+   */
+  _handleShortcut(event) {
+    if (matchShortcut(event, 'Ctrl+Shift+H')) {
+      this.setHighlightsVisible(!this._highlightsVisible);
+    }
   }
 }
