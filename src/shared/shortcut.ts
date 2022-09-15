@@ -29,7 +29,7 @@ export function matchShortcut(event: KeyboardEvent, shortcut: string): boolean {
   let requiredModifiers = 0;
   let requiredKey = null;
 
-  for (let part of parts) {
+  for (const part of parts) {
     const modifierFlag = modifiers[part];
     if (modifierFlag) {
       requiredModifiers |= modifierFlag;
