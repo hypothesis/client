@@ -83,6 +83,16 @@ describe('Toolbar', () => {
     assert.calledWith(toggleHighlights);
   });
 
+  it('announces highlight visibility', () => {
+    const wrapper = createToolbar({ showHighlights: false });
+
+    const statusEl = wrapper.find('[data-testid="toolbar-status"]');
+    assert.equal(statusEl.text(), 'Highlights hidden');
+
+    wrapper.setProps({ showHighlights: true });
+    assert.equal(statusEl.text(), 'Highlights visible');
+  });
+
   it(
     'should pass a11y checks',
     checkAccessibility([
