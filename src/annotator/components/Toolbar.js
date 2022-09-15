@@ -31,6 +31,28 @@ function ToolbarButton({ ...buttonProps }) {
 }
 
 /**
+ * @typedef StatusNotifierProps
+ * @prop {boolean} highlightsVisible
+ */
+
+/**
+ * Hidden component that announces certain Hypothesis states.
+ *
+ * This is useful to inform assistive technology users when these states
+ * have been changed (eg. whether highlights are visible), given that they can
+ * be changed in multiple ways (keyboard shortcuts, toolbar button) etc.
+ *
+ * @param {StatusNotifierProps} props
+ */
+function StatusNotifier({ highlightsVisible }) {
+  return (
+    <div className="sr-only" aria-live="polite" data-testid="toolbar-status">
+      {highlightsVisible ? 'Highlights visible' : 'Highlights hidden'}
+    </div>
+  );
+}
+
+/**
  * @typedef ToolbarProps
  *
  * @prop {() => void} closeSidebar -
@@ -143,6 +165,7 @@ export default function Toolbar({
               onClick={createAnnotation}
             />
           </div>
+          <StatusNotifier highlightsVisible={showHighlights} />
         </>
       )}
     </div>
