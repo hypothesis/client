@@ -19,8 +19,9 @@ export type GuestToHostEvent =
   | 'anchorsChanged'
 
   /**
-   * Visibility of highlights was toggled from the guest frame (it can also be
-   * toggled from the host frame).
+   * Visibility of highlights was toggled from the guest frame. This event is
+   * not sent if highlights are turned on/off in the frame in response to a
+   * command from the sidebar or host frames.
    */
   | 'highlightsVisibleChanged';
 
