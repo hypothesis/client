@@ -46,7 +46,7 @@ function ToolbarButton({ ...buttonProps }) {
  */
 function StatusNotifier({ highlightsVisible }) {
   return (
-    <div className="sr-only" aria-live="polite" data-testid="toolbar-status">
+    <div className="sr-only" role="status" data-testid="toolbar-status">
       {highlightsVisible ? 'Highlights visible' : 'Highlights hidden'}
     </div>
   );
