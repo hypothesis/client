@@ -1,0 +1,123 @@
+name: Release
+
+concurrency:
+  group: ${{ github.event.repository.name }}-deploy
+  cancel-in-progress: true
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - github-actions-release # TESTING
+
+env:
+  # S3 bucket that hosts the client's assets
+  S3_BUCKET: cdn.hypothes.is
+  # URL that the client's assets are served from
+  CDN_URL: https://cdn.hypothes.is/hypothesis
+
+jobs:
+  continuous-integration:
+    uses: ./.github/workflows/continuous-integration.yml
+    name: continuous integration
+
+  release-qa:
+    runs-on: ubuntu-latest
+    environment: qa
+    env:
+      NOTEBOOK_APP_URL: https://qa.hypothes.is/notebook
+      SIDEBAR_APP_URL: https://qa.hypothes.is/app.html
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Cache the node_modules dir
+      uses: actions/cache@v2
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+    - name: Install
+      run: yarn install --frozen-lockfile
+    - name: Get version
+      run: |
+        git fetch --tags --quiet
+        LAST_COMMIT_HASH=$(git show HEAD --no-patch --format="%h")
+        QA_VERSION=$(git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2)-$LAST_COMMIT_HASH
+        echo "QA_VERSION=$QA_VERSION" >> $GITHUB_ENV
+    - name: Build app
+      run: yarn version --no-git-tag-version --new-version "$QA_VERSION"
+    - name: Upload files to Sentry
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
+      run: |
+        SENTRY_CMD="yarn run sentry-cli releases --org hypothesis --project client"
+        $SENTRY_CMD new $QA_VERSION
+        $SENTRY_CMD files $QA_VERSION upload-sourcemaps --url-prefix $CDN_URL/$QA_VERSION/build/scripts/ build/scripts
+        $SENTRY_CMD finalize $QA_VERSION
+    - name: Deploy to S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
+      run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }} --tag qa --no-cache-entry
+
+  release-prod:
+    needs: release-qa
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      NOTEBOOK_APP_URL: https://hypothes.is/notebook
+      SIDEBAR_APP_URL: https://hypothes.is/app.html
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Cache the node_modules dir
+      uses: actions/cache@v2
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+    - name: Install
+      run: yarn install --frozen-lockfile
+    - name: Determine release version
+      run: |
+        git fetch --tags --quiet
+        PREV_VERSION=$(git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2)
+        NEW_VERSION=$(node scripts/bump-version.mjs minor $PREV_VERSION)
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+    - name: Tag new version
+      run: |
+        git tag v$NEW_VERSION
+        git push https://github.com/hypothesis/client.git v$NEW_VERSION
+        sleep 2  # Wait for GitHub to see new tag
+    - name: Build app
+      run: yarn version --no-git-tag-version --new-version $NEW_VERSION
+    - name: Upload files to Sentry
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
+      run: |
+        SENTRY_CMD="yarn run sentry-cli releases --org hypothesis --project client"
+        $SENTRY_CMD new $NEW_VERSION
+        $SENTRY_CMD files $NEW_VERSION upload-sourcemaps --url-prefix $CDN_URL/$NEW_VERSION/build/scripts/ build/scripts
+        $SENTRY_CMD finalize $NEW_VERSION
+    - name: Create GitHub release
+      run: sh scripts/create-github-release.js v$NEW_VERSION
+    - name: Publish npm package
+      env:
+        NPM_TOKEN: ${{ secrets.npm_token }}
+      run: |
+        echo '//registry.npmjs.org/:_authToken=${{ env.NPM_TOKEN }}' >> $HOME/.npmrc
+        yarn publish --no-interactive --tag latest --new-version=$NEW_VERSION
+        scripts/wait-for-npm-release.sh latest
+    - name: Deploy to S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.aws_secret_access_key }}
+      run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }}
+
+  update-extension:
+    needs: release-prod
+    runs-on: ubuntu-latest
+    steps:
+    - name: Update extension
+      run: echo "TODO - Publish the new version of the extension"
