@@ -104,6 +104,8 @@ jobs:
         $SENTRY_CMD finalize $NEW_VERSION
     - name: Create GitHub release
       run: scripts/create-github-release.js v$NEW_VERSION
+      env:
+        GITHUB_TOKEN: ${{ secrets.github_token }}
     - name: Publish npm package
       env:
         NPM_TOKEN: ${{ secrets.npm_token }}
