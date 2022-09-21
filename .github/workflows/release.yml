@@ -23,6 +23,7 @@ jobs:
     name: continuous integration
 
   release-qa:
+    needs: continuous-integration
     runs-on: ubuntu-latest
     environment: qa
     env:
