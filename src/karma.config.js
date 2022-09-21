@@ -8,22 +8,6 @@ let chromeFlags = [];
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
-if (process.env.RUNNING_IN_DOCKER) {
-  // In Docker, the tests run as root, so the sandbox must be disabled.
-  chromeFlags.push('--no-sandbox');
-
-  // Disable `/dev/shm` usage as this can cause Chrome to fail to load large
-  // HTML pages.
-  //
-  // See https://github.com/GoogleChrome/puppeteer/issues/1834 and
-  // https://github.com/karma-runner/karma-chrome-launcher/issues/198.
-  chromeFlags.push('--disable-dev-shm-usage');
-
-  // Use Chromium from Alpine packages. The one that Puppeteer downloads won't
-  // load in Alpine.
-  process.env.CHROME_BIN = 'chromium-browser';
-}
-
 module.exports = function (config) {
   config.set({
     // Base path that will be used to resolve all patterns (eg. files, exclude)
