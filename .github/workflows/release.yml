@@ -103,7 +103,7 @@ jobs:
         $SENTRY_CMD files $NEW_VERSION upload-sourcemaps --url-prefix $CDN_URL/$NEW_VERSION/build/scripts/ build/scripts
         $SENTRY_CMD finalize $NEW_VERSION
     - name: Create GitHub release
-      run: sh scripts/create-github-release.js v$NEW_VERSION
+      run: scripts/create-github-release.js v$NEW_VERSION
     - name: Publish npm package
       env:
         NPM_TOKEN: ${{ secrets.npm_token }}
