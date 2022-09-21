@@ -1,8 +1,0 @@
-#!/bin/sh
-
-set -eu
-
-yarn config set version-sign-git-tag true
-
-# Bump minor package version. The `--minor` option was added in Yarn v1.7.0.
-yarn version --minor
