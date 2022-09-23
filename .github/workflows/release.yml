@@ -120,8 +120,18 @@ jobs:
       run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }}
 
   update-extension:
+    environment: production
     needs: release-prod
     runs-on: ubuntu-latest
     steps:
     - name: Update extension
-      run: echo "TODO - Publish the new version of the extension"
+      uses: actions/github-script@v5
+      with:
+        github-token: ${{ secrets.cross_repo_workflow_trigger_token }}
+        script: |
+          await github.rest.actions.createWorkflowDispatch({
+            owner: 'hypothesis',
+            repo: 'browser-extension',
+            workflow_id: 'update-client.yml',
+            ref: 'main',
+          });
