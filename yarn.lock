@@ -1229,7 +1229,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@npmcli/arborist@^5.0.4":
+"@npmcli/arborist@^5.0.4 || ^6.0.0 || ^6.0.0-pre.0":
   version "5.6.2"
   resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-5.6.2.tgz#552b554f34777e5dcc8e68ad86cdaeebc0788790"
   integrity sha512-Lyj2g+foWKzrwW2bT/RGO982VR9vb5tlvfD88n4PwWJRrDttQbJoIdcQzN9b+NIBhI1/8iEhC5b8far9U0fQxA==
@@ -6362,11 +6362,11 @@ npm-packlist@^5.1.0:
     npm-normalize-package-bin "^2.0.0"
 
 npm-packlist@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-6.0.0.tgz#61229c36a0e1cedbbcda8c8cf45dcda4d1a4f1e9"
-  integrity sha512-8KJryPP1M2fKqmrAGgBf3IcPpI7I+DSQQNBgUi7CLX/QO9ceMv5YQjA4TpJ0G+G+XlLuboO0IrZw+5iuKfh4vg==
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-6.0.1.tgz#8feb3f99bdbc0d9b95b365625a29a73f2b97f227"
+  integrity sha512-wndBwF5n0laa2pdzbc3NWsqw0+kLnaUGf08eC/UpT+nG9tv1FbEmvAyiRKMmvaMgCvaZ5ly/XP1XDRLlHoDJyQ==
   dependencies:
-    "@npmcli/arborist" "^5.0.4"
+    "@npmcli/arborist" "^5.0.4 || ^6.0.0 || ^6.0.0-pre.0"
     ignore-walk "^5.0.1"
 
 npm-pick-manifest@^7.0.0, npm-pick-manifest@^7.0.2:
