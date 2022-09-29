@@ -1,4 +1,4 @@
-import { LinkButton } from '@hypothesis/frontend-shared';
+import { LinkButton } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 
@@ -38,12 +38,13 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
     >
       <div className="flex justify-end">
         <LinkButton
-          classes="inline underline"
+          color="text"
           onClick={() => setCollapsed(!isCollapsed)}
           expanded={!isCollapsed}
           title="Toggle visibility of full excerpt text"
           style={linkStyle}
-          variant="dark"
+          underline="always"
+          inline
         >
           {isCollapsed ? 'More' : 'Less'}
         </LinkButton>
