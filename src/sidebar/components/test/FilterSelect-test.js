@@ -1,3 +1,4 @@
+import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
 import { mount } from 'enzyme';
 
 import FilterSelect, { $imports } from '../FilterSelect';
@@ -61,13 +62,12 @@ describe('FilterSelect', () => {
   });
 
   it('should render provided icon and selected option in label', () => {
-    const wrapper = createComponent({ icon: 'profile' });
+    const wrapper = createComponent({ icon: ProfileIcon });
 
     const label = mount(wrapper.find('Menu').props().label);
-    const icon = label.find('Icon');
+    const icon = label.find('ProfileIcon');
 
     assert.isTrue(icon.exists());
-    assert.equal(icon.props().name, 'profile');
     // Default option should be selected as we didn't indicate a selected option
     assert.include(label.text(), 'all');
   });
@@ -104,7 +104,7 @@ describe('FilterSelect', () => {
         content: () => {
           $imports.$restore();
           return createComponent({
-            icon: 'profile',
+            icon: ProfileIcon,
             title: 'Select something',
             selectedOption: { value: 'twovalue', display: 'Two Value' },
           });
