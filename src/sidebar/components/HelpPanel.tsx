@@ -1,4 +1,8 @@
-import { Icon, Link, LinkButton } from '@hypothesis/frontend-shared';
+import { Link, LinkButton } from '@hypothesis/frontend-shared/lib/next';
+import {
+  ArrowRightIcon,
+  ExternalIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import type { ComponentChildren as Children } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
@@ -25,9 +29,11 @@ function HelpPanelNavigationButton({
   onClick,
 }: HelpPanelNavigationButtonProps) {
   return (
-    <LinkButton classes="leading-none text-brand" onClick={onClick}>
-      {children}
-      <Icon classes="ml-1" name="arrow-right" />
+    <LinkButton color="brand" onClick={onClick} underline="hover">
+      <div className="flex items-center gap-x-1">
+        {children}
+        <ArrowRightIcon className="w-em h-em" />
+      </div>
     </LinkButton>
   );
 }
@@ -44,13 +50,15 @@ type HelpPanelTabProps = {
  */
 function HelpPanelTab({ linkText, url }: HelpPanelTabProps) {
   return (
-    <div className="flex-1 border-r last-of-type:border-r-0">
-      <Link
-        href={url}
-        classes="flex items-center justify-center space-x-2 text-color-text-light text-lg font-medium"
-        target="_blank"
-      >
-        <span>{linkText}</span> <Icon name="external" classes="w-3 h-3" />
+    <div
+      // Set this element's flex-basis and also establish
+      // a flex container (centered on both axes)
+      className="flex-1 flex items-center justify-center border-r last-of-type:border-r-0 text-lg font-medium"
+    >
+      <Link color="text-light" href={url} target="_blank">
+        <div className="flex items-center gap-x-2">
+          <span>{linkText}</span> <ExternalIcon className="w-3 h-3" />
+        </div>
       </Link>
     </div>
   );
