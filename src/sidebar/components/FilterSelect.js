@@ -1,4 +1,3 @@
-import { Icon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import Menu from './Menu';
@@ -6,12 +5,13 @@ import MenuItem from './MenuItem';
 
 /**
  * @typedef {import('../store/modules/filters').FilterOption} FilterOption
+ * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
  */
 
 /**
  * @typedef FilterSelectProps
  * @prop {FilterOption} defaultOption
- * @prop {string} [icon]
+ * @prop {IconComponent} [icon]
  * @prop {(selectedFilter: FilterOption) => void} onSelect
  * @prop {FilterOption[]} options
  * @prop {FilterOption} [selectedOption]
@@ -26,7 +26,7 @@ import MenuItem from './MenuItem';
  */
 function FilterSelect({
   defaultOption,
-  icon,
+  icon: Icon,
   onSelect,
   options,
   selectedOption,
@@ -43,7 +43,7 @@ function FilterSelect({
         'text-color-text font-bold text-lg'
       )}
     >
-      {icon && <Icon name={icon} classes="w-4 h-4" />}
+      {Icon && <Icon className="w-4 h-4" />}
       {selected.display}
     </span>
   );

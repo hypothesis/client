@@ -1,3 +1,4 @@
+import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
 import { mount } from 'enzyme';
 
 import NotebookFilters from '../NotebookFilters';
@@ -47,7 +48,7 @@ describe('NotebookFilters', () => {
       value: 'oneuser',
     });
     assert.deepEqual(props.defaultOption, { value: '', display: 'Everybody' });
-    assert.equal(props.icon, 'profile');
+    assert.equal(props.icon, ProfileIcon);
     assert.equal(props.title, 'Filter by user');
     assert.equal(props.options.length, 1);
     assert.isUndefined(props.selectedOption);

@@ -1,3 +1,5 @@
+import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
+
 import { useSidebarStore } from '../store';
 import { useUserFilterOptions } from './hooks/use-filter-options';
 
@@ -19,7 +21,7 @@ function NotebookFilters() {
   return (
     <FilterSelect
       defaultOption={{ value: '', display: 'Everybody' }}
-      icon="profile"
+      icon={ProfileIcon}
       onSelect={userFilter => store.setFilter('user', userFilter)}
       options={userFilterOptions}
       selectedOption={userFilter}
