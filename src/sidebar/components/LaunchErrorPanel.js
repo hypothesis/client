@@ -1,4 +1,4 @@
-import { Panel } from '@hypothesis/frontend-shared';
+import { Panel } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 /**
