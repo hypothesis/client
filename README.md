@@ -1,7 +1,6 @@
 Hypothesis client
 =================
 
-[![Continuous integration](https://github.com/hypothesis/client/workflows/Continuous%20integration/badge.svg?branch=main)][gha]
 [![npm version](https://img.shields.io/npm/v/hypothesis.svg)][npm]
 [![BSD licensed](https://img.shields.io/badge/license-BSD-blue.svg)][license]
 
