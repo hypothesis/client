@@ -120,7 +120,6 @@ jobs:
       run: scripts/deploy-to-s3.js --bucket ${{ env.S3_BUCKET }}
 
   update-extension:
-    environment: production
     needs: release-prod
     runs-on: ubuntu-latest
     steps:
