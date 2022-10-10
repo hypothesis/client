@@ -52,20 +52,21 @@ describe('FilterStatus', () => {
   }
 
   function assertButton(wrapper, expected) {
-    const buttonProps = wrapper.find('LabeledButton').props();
+    const button = wrapper.find('Button[data-testid="clear-button"]');
+    const buttonProps = button.props();
 
     assert.equal(buttonProps.title, expected.text);
-    assert.equal(buttonProps.icon, expected.icon);
+    assert.equal(button.find('CancelIcon').exists(), !!expected.icon);
     buttonProps.onClick();
     assert.calledOnce(expected.callback);
   }
 
   function assertClearButton(wrapper) {
-    assertButton(wrapper, {
-      text: 'Clear search',
-      icon: 'cancel',
-      callback: fakeStore.clearSelection,
-    });
+    const button = wrapper.find('Button[data-testid="clear-button"]');
+    assert.equal(button.text(), 'Clear search');
+    assert.isTrue(button.find('CancelIcon').exists());
+    button.props().onClick();
+    assert.calledOnce(fakeStore.clearSelection);
   }
 
   context('Loading', () => {
@@ -81,7 +82,9 @@ describe('FilterStatus', () => {
   context('(State 1): no search filters active', () => {
     it('should render hidden but available to screen readers', () => {
       const wrapper = createComponent();
-      const containerEl = wrapper.find('Card').getDOMNode();
+      const containerEl = wrapper
+        .find('div[data-testid="filter-status-container"]')
+        .getDOMNode();
 
       assert.include(containerEl.className, 'sr-only');
       assertFilterText(wrapper, '');
@@ -177,7 +180,7 @@ describe('FilterStatus', () => {
       fakeStore.annotationCount.returns(5);
       assertButton(createComponent(), {
         text: 'Show all (5)',
-        icon: 'cancel',
+        icon: true,
         callback: fakeStore.clearSelection,
       });
     });
@@ -187,7 +190,7 @@ describe('FilterStatus', () => {
       fakeStore.directLinkedAnnotationId.returns(1);
       assertButton(createComponent(), {
         text: 'Show all',
-        icon: 'cancel',
+        icon: true,
         callback: fakeStore.clearSelection,
       });
     });
@@ -229,7 +232,7 @@ describe('FilterStatus', () => {
     it('should provide a "Show all" button that toggles user focus mode', () => {
       assertButton(createComponent(), {
         text: 'Show all',
-        icon: null,
+        icon: false,
         callback: fakeStore.toggleFocusMode,
       });
     });
@@ -318,7 +321,7 @@ describe('FilterStatus', () => {
     it('should provide a "Show all" button', () => {
       assertButton(createComponent(), {
         text: 'Show all',
-        icon: 'cancel',
+        icon: true,
         callback: fakeStore.clearSelection,
       });
     });
@@ -353,7 +356,7 @@ describe('FilterStatus', () => {
     it('should provide a "Reset filters" button', () => {
       assertButton(createComponent(), {
         text: 'Reset filters',
-        icon: null,
+        icon: false,
         callback: fakeStore.clearSelection,
       });
     });
@@ -376,7 +379,7 @@ describe('FilterStatus', () => {
     it('should provide a button to activate user-focused mode', () => {
       assertButton(createComponent(), {
         text: 'Show only Ebenezer Studentolog',
-        icon: null,
+        icon: false,
         callback: fakeStore.toggleFocusMode,
       });
     });
