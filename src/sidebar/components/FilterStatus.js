@@ -1,5 +1,11 @@
-import { Card, LabeledButton, Spinner } from '@hypothesis/frontend-shared';
-import classNames from 'classnames';
+import {
+  Button,
+  CancelIcon,
+  Card,
+  CardContent,
+  Spinner,
+} from '@hypothesis/frontend-shared/lib/next';
+import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
 import { countVisible } from '../helpers/thread';
@@ -195,63 +201,67 @@ export default function FilterStatus() {
   ]);
 
   return (
-    <Card
-      classes={classNames('mb-3 p-3', {
-        // This container element needs to be present at all times but
-        // should only be visible when there are applied filters
-        'sr-only': !filterMode,
-      })}
+    <div
+      // This container element needs to be present at all times but
+      // should only be visible when there are applied filters
+      className={classnames('mb-3', { 'sr-only': !filterMode })}
+      data-testid="filter-status-container"
     >
-      <div className="flex items-center justify-center space-x-1">
-        {store.isLoading() ? (
-          <Spinner />
-        ) : (
-          <>
-            <div
-              className={classNames(
-                // Setting `min-width: 0` here allows wrapping to work as
-                // expected for long `filterQuery` strings. See
-                // https://css-tricks.com/flexbox-truncated-text/
-                'grow min-w-[0]'
-              )}
-              role="status"
-            >
+      <Card>
+        <CardContent>
+          {store.isLoading() ? (
+            <Spinner size="md" />
+          ) : (
+            <div className="flex items-center justify-center space-x-1">
+              <div
+                className={classnames(
+                  // Setting `min-width: 0` here allows wrapping to work as
+                  // expected for long `filterQuery` strings. See
+                  // https://css-tricks.com/flexbox-truncated-text/
+                  'grow min-w-[0]'
+                )}
+                role="status"
+              >
+                {filterMode && (
+                  <FilterStatusMessage
+                    additionalCount={additionalCount}
+                    entitySingular={
+                      filterMode === 'query' ? 'result' : 'annotation'
+                    }
+                    entityPlural={
+                      filterMode === 'query' ? 'results' : 'annotations'
+                    }
+                    filterQuery={filterQuery}
+                    focusDisplayName={
+                      filterMode !== 'selection' && focusState.active
+                        ? focusState.displayName
+                        : ''
+                    }
+                    resultCount={resultCount}
+                  />
+                )}
+              </div>
               {filterMode && (
-                <FilterStatusMessage
-                  additionalCount={additionalCount}
-                  entitySingular={
-                    filterMode === 'query' ? 'result' : 'annotation'
+                <Button
+                  onClick={
+                    filterMode === 'focus' && !forcedVisibleCount
+                      ? () => store.toggleFocusMode()
+                      : () => store.clearSelection()
                   }
-                  entityPlural={
-                    filterMode === 'query' ? 'results' : 'annotations'
-                  }
-                  filterQuery={filterQuery}
-                  focusDisplayName={
-                    filterMode !== 'selection' && focusState.active
-                      ? focusState.displayName
-                      : ''
-                  }
-                  resultCount={resultCount}
-                />
+                  size="sm"
+                  title={buttonText}
+                  variant="primary"
+                  data-testid="clear-button"
+                >
+                  {/** @TODO: Set `icon` prop in `Button` instead when https://github.com/hypothesis/frontend-shared/issues/675 is fixed*/}
+                  {filterMode !== 'focus' && <CancelIcon />}
+                  {buttonText}
+                </Button>
               )}
             </div>
-            {filterMode && (
-              <LabeledButton
-                icon={filterMode === 'focus' ? undefined : 'cancel'}
-                onClick={
-                  filterMode === 'focus' && !forcedVisibleCount
-                    ? () => store.toggleFocusMode()
-                    : () => store.clearSelection()
-                }
-                title={buttonText}
-                variant="primary"
-              >
-                {buttonText}
-              </LabeledButton>
-            )}
-          </>
-        )}
-      </div>
-    </Card>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
