@@ -15,7 +15,7 @@
     "@hypothesis/frontend-shared": "5.4.2",
     "@octokit/rest": "^19.0.3",
     "@rollup/plugin-babel": "^6.0.0",
-    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-commonjs": "^23.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^14.0.0",
     "@rollup/plugin-replace": "^5.0.0",
