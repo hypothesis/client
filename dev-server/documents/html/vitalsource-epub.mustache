@@ -10,6 +10,13 @@
       }
     </style>
     <script type="module">
+      const chapterURLs = [
+        '/document/little-women-1',
+        '/document/little-women-2',
+        '/document/little-women-3',
+      ];
+      const chapterTitles = ['Chapter One', 'Chapter Two', 'Chapter Three'];
+
       /**
        * Custom element that holds the book content frame. The class name is not
        * important but the `<mosaic-book>` tag name triggers the VitalSource integration.
@@ -19,19 +26,13 @@
           super();
           this.attachShadow({ mode: 'open' });
 
-          const chapterURLs = [
-            '/document/little-women-1',
-            '/document/little-women-2',
-            '/document/little-women-3',
-          ];
-
-          let chapterIndex = 0;
+          this._chapterIndex = 0;
 
           const setChapter = (index, { initialLoad = false } = {}) => {
             if (index < 0 || index >= chapterURLs.length) {
               return;
             }
-            chapterIndex = index;
+            this._chapterIndex = index;
 
             // We remove the current frame and create a new one, rather than just
             // change the `src` of the existing iframe, to mimic what Bookshelf
@@ -40,7 +41,7 @@
             this.contentFrame = document.createElement('iframe');
             this.shadowRoot.append(this.contentFrame);
 
-            const chapterURL = chapterURLs[chapterIndex];
+            const chapterURL = chapterURLs[this._chapterIndex];
 
             if (initialLoad) {
               // Simulate client loading after VS chapter content has already
@@ -83,15 +84,40 @@
 
           this.prevButton = document.createElement('button');
           this.prevButton.textContent = 'Prev chapter';
-          this.prevButton.onclick = () => setChapter(chapterIndex - 1);
+          this.prevButton.onclick = () => setChapter(this._chapterIndex - 1);
           controlBar.append(this.prevButton);
 
           this.nextButton = document.createElement('button');
           this.nextButton.textContent = 'Next chapter';
-          this.nextButton.onclick = () => setChapter(chapterIndex + 1);
+          this.nextButton.onclick = () => setChapter(this._chapterIndex + 1);
           controlBar.append(this.nextButton);
 
           setChapter(0, { initialLoad: true });
+
+          this.setChapter = setChapter;
+        }
+
+        getBookInfo() {
+          return { title: 'Little Women', isbn: '9780451529305' };
+        }
+
+        getCurrentPage() {
+          // The CFI is a reference to the current chapter's entry in the `<spine>`
+          // of the EPUB's Package Document. Element references in CFIs are
+          // even numbers counting from 2.
+          const cfi = `/${(this._chapterIndex + 1) * 2}`;
+          const url = chapterURLs[this._chapterIndex];
+          const title = chapterTitles[this._chapterIndex];
+          const page = ((this._chapterIndex + 1) * 10).toString()
+
+          return { cfi, page, chapterTitle: title, absoluteURL: url };
+        }
+
+        goToURL(url) {
+          const index = chapterURLs.findIndex(cu => cu === url);
+          if (index >= 0) {
+            this.setChapter(index);
+          }
         }
       }
       customElements.define('mosaic-book', MosaicElement);

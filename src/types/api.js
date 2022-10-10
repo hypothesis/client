@@ -69,10 +69,48 @@
  */
 
 /**
+ * Selector which identifies the Content Document within an EPUB that an
+ * annotation was made in.
+ *
+ * @typedef EPUBContentSelector
+ * @prop {'EPUBContentSelector'} type
+ * @prop {string} url - URL of the content document. This can either be an
+ *   absolute HTTP URL, or a URL that is relative to the root of the EPUB
+ * @prop {string} [cfi] - EPUB Canonical Fragment Identifier for the table of
+ *   contents entry that corresponds to this segment
+ * @prop {string} [title] - Title of the content document
+ */
+
+/**
+ * Selector which identifies the page of a document that an annotation was
+ * made on.
+ *
+ * This selector is only applicable for document formats which arrange their
+ * content as a sequence of pages, such as PDF. It should not be used in cases
+ * where a viewer synthesizes page numbers for a non-paginated format. For
+ * example, some viewers generate page numbers for EPUB books, but the number
+ * of pages depends on viewer settings such as the font size.
+ *
+ * @typedef PageSelector
+ * @prop {'PageSelector'} type
+ * @prop {number} index - The zero-based index of the page in the document's page
+ *   sequence.
+ * @prop {string} [label] - The label of the page, ie. the page number that is
+ *   or would be displayed on the page itself. In the simplest case this is
+ *   a 1-based page number.
+ * @prop {string} [title] - The title of the section that contains this page,
+ *   taken from the document's table of contents or other available metadata.
+ */
+
+/**
  * Serialized representation of a region of a document which an annotation
  * pertains to.
  *
- * @typedef {TextQuoteSelector | TextPositionSelector | RangeSelector} Selector
+ * @typedef {TextQuoteSelector |
+ *   TextPositionSelector |
+ *   RangeSelector |
+ *   EPUBContentSelector |
+ *   PageSelector} Selector
  */
 
 /**

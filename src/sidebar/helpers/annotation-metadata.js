@@ -292,26 +292,42 @@ export function annotationRole(annotation) {
   return 'Annotation';
 }
 
-/** Return a numeric key that can be used to sort annotations by location.
+/**
+ * @typedef LocationKey
+ * @prop {string} [cfi]
+ * @prop {number} [position]
+ */
+
+/**
+ * Return a key that can be used to sort annotations by location.
+ *
+ * The key is a hierarchical sequence of values. In a simple web page, the key
+ * could be one value which is just a text position. In a book however the key
+ * could be
  *
  * @param {Annotation} annotation
- * @return {number} - A key representing the location of the annotation in
- *                    the document, where lower numbers mean closer to the
- *                    start.
+ * @return {LocationKey}
  */
 export function location(annotation) {
-  if (annotation) {
-    const targets = annotation.target || [];
-    for (let i = 0; i < targets.length; i++) {
-      const selectors = targets[i].selector || [];
-      for (const selector of selectors) {
-        if (selector.type === 'TextPositionSelector') {
-          return selector.start;
-        }
-      }
+  const targets = annotation.target;
+  if (targets.length === 0) {
+    return {};
+  }
+
+  const target = targets[0];
+
+  let cfi;
+  let position;
+
+  for (const selector of target.selector ?? []) {
+    if (selector.type === 'TextPositionSelector') {
+      position = selector.start;
+    } else if (selector.type === 'EPUBContentSelector' && selector.cfi) {
+      cfi = selector.cfi;
     }
   }
-  return Number.POSITIVE_INFINITY;
+
+  return { cfi, position };
 }
 
 /**

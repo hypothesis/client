@@ -10,6 +10,7 @@ import { createStoreModule, makeAction } from '../create-store';
 /**
  * @typedef {import('../../../types/annotator').ContentInfoConfig} ContentInfoConfig
  * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
+ * @typedef {import('../../../types/annotator').SegmentInfo} SegmentInfo
  */
 
 /**
@@ -18,6 +19,8 @@ import { createStoreModule, makeAction } from '../create-store';
  *   - Sub-frames will all have a id (frame identifier) set. The main frame's id is always `null`
  * @prop {DocumentMetadata} metadata - Metadata about the document currently loaded in this frame
  * @prop {string} uri - Current primary URI of the document being displayed
+ * @prop {SegmentInfo} [segment] - Information about the segment of the
+ *   document that is currently loaded
  * @prop {boolean} [isAnnotationFetchComplete]
  */
 

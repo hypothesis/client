@@ -77,25 +77,36 @@ describe('sidebar/util/thread-sorters', () => {
   });
 
   describe('sorting by document location', () => {
+    // Create a position-only location. This is the common case for a web page
+    function posLocation(pos) {
+      return { position: pos };
+    }
+
+    // Create a location with an EPUB CFI and position. This would occur in
+    // an ebook.
+    function cfiLocation(cfi, pos) {
+      return { cfi, position: pos };
+    }
+
     [
       {
-        a: { annotation: { location: 5 } },
-        b: { annotation: { location: 10 } },
+        a: { annotation: { location: posLocation(5) } },
+        b: { annotation: { location: posLocation(10) } },
         expected: -1,
       },
       {
-        a: { annotation: { location: 10 } },
-        b: { annotation: { location: 10 } },
+        a: { annotation: { location: posLocation(10) } },
+        b: { annotation: { location: posLocation(10) } },
         expected: 0,
       },
       {
-        a: { annotation: { location: 10 } },
-        b: { annotation: { location: 5 } },
+        a: { annotation: { location: posLocation(10) } },
+        b: { annotation: { location: posLocation(5) } },
         expected: 1,
       },
       {
         a: {},
-        b: { annotation: { location: 5 } },
+        b: { annotation: { location: posLocation(5) } },
         expected: -1,
       },
       {
@@ -104,12 +115,53 @@ describe('sidebar/util/thread-sorters', () => {
         expected: 0,
       },
       {
-        a: { annotation: { location: 10 } },
+        a: { annotation: { location: posLocation(10) } },
         b: {},
         expected: 1,
       },
     ].forEach(testCase => {
       it('sorts by annotation location', () => {
+        assert.equal(
+          // Disable eslint: `sorters` properties start with capital letters
+          // to match their displayed sort option values
+          /* eslint-disable-next-line new-cap */
+          sorters.Location(testCase.a, testCase.b),
+          testCase.expected
+        );
+      });
+    });
+
+    [
+      // CFI only
+      {
+        a: { annotation: { location: cfiLocation('/2/2') } },
+        b: { annotation: { location: cfiLocation('/2/4') } },
+        expected: -1,
+      },
+      {
+        a: { annotation: { location: cfiLocation('/2/4') } },
+        b: { annotation: { location: cfiLocation('/2/4') } },
+        expected: 0,
+      },
+      {
+        a: { annotation: { location: cfiLocation('/2/4') } },
+        b: { annotation: { location: cfiLocation('/2/2') } },
+        expected: 1,
+      },
+
+      // CFI and position
+      {
+        a: { annotation: { location: cfiLocation('/2/2', 100) } },
+        b: { annotation: { location: cfiLocation('/2/4', 10) } },
+        expected: -1,
+      },
+      {
+        a: { annotation: { location: cfiLocation('/2/4', 100) } },
+        b: { annotation: { location: cfiLocation('/2/4', 10) } },
+        expected: 1,
+      },
+    ].forEach((testCase, index) => {
+      it(`sorts by CFI when present (${index})`, () => {
         assert.equal(
           // Disable eslint: `sorters` properties start with capital letters
           // to match their displayed sort option values

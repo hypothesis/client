@@ -23,7 +23,68 @@ import { injectClient } from '../hypothesis-injector';
 const MIN_CONTENT_WIDTH = 480;
 
 /**
+ * Metadata about a segment in a VitalSource book.
+ *
+ * Depending on the book type (PDF/fixed or EPUB/reflowable) and publisher,
+ * a segment may represent a single page, a whole chapter, or something inbetween.
+ * In the case of an EPUB, each content HTML file is a separate segment.
+ *
+ * In the case of "fixed" VitalSource books which are generated from PDFs,
+ * a segment is a single page.
+ *
+ * @typedef SegmentInfo
+ * @prop {string} absoluteURL - Path of the resource within the book that
+ *   contain's the segment's resources. eg. If the current content frame has
+ *   the URL "https://jigsaw.vitalsource.com/books/9780132119177/epub/OEBPS/html/ch06.html"
+ *   then the corresponding `absoluteURL` entry would be
+ *   "/books/9780132119177/epub/OEBPS/html/ch06.html".
+ * @prop {string} cfi - Identifies the entry in the EPUB's table of contents
+ *   for the current segment. See https://idpf.org/epub/linking/cfi/#sec-path-res.
+ *
+ *   For fixed/PDF books, VitalSource creates a synthetic CFI which is the page
+ *   index (eg. "/1" for the second page).
+ * @prop {string} page - Displayed page number for the first page of the segment
+ * @prop {number} index - Index of the current segment within the sequence of
+ *   pages or content documents that make up the book
+ * @prop {string} chapterTitle - Title of the entry in the table of contents
+ *   that refers to the current segment. Note that for PDF-based books, all
+ *   pages within a given section will have the same "chapter title".
+ */
+
+/**
+ * Metadata about a VitalSource book.
+ *
+ * @typedef BookInfo
+ * @prop {'epub'|'pbk'} format - Indicates the type of book. "epub" indicates
+ *   a reflowable EPUB. "pbk" indicates a fixed-layout book created from a PDF.
+ * @prop {string} isbn - VitalSource Book ID (VBID). This is _usually_ the book's
+ *   ISBN identifier, hence the field name, since VS recommend publishers should
+ *   re-use the ISBN as the VBID. However there are cases where this field value
+ *   is not actually a valid ISBN.
+ * @prop {string} title
+ */
+
+/**
+ * API of the `<mosaic-book>` element in the VitalSource container frame,
+ * excluding the standard HTML element API.
+ *
+ * This only includes a subset of the API that the client actually uses.
+ *
+ * @typedef MosaicBookElementExtensions
+ * @prop {() => Promise<SegmentInfo>} getCurrentPage
+ * @prop {() => BookInfo} getBookInfo
+ * @prop {(url: string) => void} goToURL
+ */
+
+/** @typedef {MosaicBookElementExtensions & HTMLElement} MosaicBookElement */
+
+/**
  * Return the custom DOM element that contains the book content iframe.
+ *
+ * This element also provides methods to query metadata associated with the
+ * book, query the current location in the book and navigate the book.
+ *
+ * @return {MosaicBookElement|null}
  */
 function findBookElement(document_ = document) {
   return document_.querySelector('mosaic-book');
@@ -207,18 +268,24 @@ function makeContentFrameScrollable(frame) {
 export class VitalSourceContentIntegration extends TinyEmitter {
   /**
    * @param {HTMLElement} container
+   * @param {FeatureFlags} [features]
    */
-  constructor(container = document.body) {
+  constructor(container = document.body, features) {
     super();
 
-    const features = new FeatureFlags();
+    this._features = features;
+
+    const htmlFeatures = new FeatureFlags();
 
     // Forcibly enable the side-by-side feature for VS books. This feature is
     // only behind a flag for regular web pages, which are typically more
     // complex and varied than EPUB books.
-    features.update({ html_side_by_side: true });
+    htmlFeatures.update({ html_side_by_side: true });
 
-    this._htmlIntegration = new HTMLIntegration({ container, features });
+    this._htmlIntegration = new HTMLIntegration({
+      container,
+      features: htmlFeatures,
+    });
 
     this._listeners = new ListenerCollection();
 
@@ -275,6 +342,20 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     }
   }
 
+  /**
+   * Find the `<mosaic-book>` element in the parent frame which provides APIs
+   * to get book metadata.
+   */
+  _getBookElement() {
+    const bookElement = findBookElement(window.parent.document);
+    if (!bookElement) {
+      throw new Error(
+        'Failed to find <mosaic-book> element in container frame'
+      );
+    }
+    return bookElement;
+  }
+
   canAnnotate() {
     return true;
   }
@@ -297,8 +378,36 @@ export class VitalSourceContentIntegration extends TinyEmitter {
    * @param {HTMLElement} root
    * @param {Range} range
    */
-  describe(root, range) {
-    return this._htmlIntegration.describe(root, range);
+  async describe(root, range) {
+    /** @type {Selector[]} */
+    const selectors = this._htmlIntegration.describe(root, range);
+
+    const bookElement = this._getBookElement();
+    const bookInfo = bookElement.getBookInfo();
+    const segmentInfo = await bookElement.getCurrentPage();
+
+    /** @type {Selector[]} */
+    const extraSelectors = [
+      {
+        type: 'EPUBContentSelector',
+        cfi: segmentInfo.cfi,
+        title: segmentInfo.chapterTitle,
+        url: segmentInfo.absoluteURL,
+      },
+    ];
+
+    if (bookInfo.format === 'pbk') {
+      extraSelectors.push({
+        type: 'PageSelector',
+        index: segmentInfo.index,
+        label: segmentInfo.page,
+        title: segmentInfo.chapterTitle,
+      });
+    }
+
+    selectors.push(...extraSelectors);
+
+    return selectors;
   }
 
   contentContainer() {
@@ -346,31 +455,37 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     }
   }
 
-  async getMetadata() {
-    // Return minimal metadata which includes only the information we really
-    // want to include.
+  /**
+   * @param {string} url
+   */
+  goToSegment(url) {
+    this._getBookElement().goToURL(url);
+  }
+
+  /** @return {Promise<import('../../types/annotator').SegmentInfo>} */
+  async segmentInfo() {
+    const pageInfo = await this._getBookElement().getCurrentPage();
     return {
-      title: document.title,
+      cfi: pageInfo.cfi,
+      page: pageInfo.page,
+      title: pageInfo.chapterTitle,
+      url: pageInfo.absoluteURL,
+    };
+  }
+
+  async getMetadata() {
+    const bookElement = this._getBookElement();
+    const bookInfo = bookElement.getBookInfo();
+    return {
+      title: bookInfo.title,
       link: [],
     };
   }
 
   async uri() {
-    // An example of a typical URL for the chapter content in the Bookshelf reader is:
-    //
-    // https://jigsaw.vitalsource.com/books/9781848317703/epub/OPS/xhtml/chapter_001.html#cfi=/6/10%5B;vnd.vst.idref=chap001%5D!/4
-    //
-    // Where "9781848317703" is the VitalSource book ID ("vbid"), "chapter_001.html"
-    // is the location of the HTML page for the current chapter within the book
-    // and the `#cfi` fragment identifies the scroll location.
-    //
-    // Note that this URL is typically different than what is displayed in the
-    // iframe's `src` attribute.
-
-    // Strip off search parameters and fragments.
-    const uri = new URL(document.location.href);
-    uri.search = '';
-    return uri.toString();
+    const bookElement = this._getBookElement();
+    const bookId = bookElement.getBookInfo().isbn;
+    return `https://bookshelf.vitalsource.com/books/reader/${bookId}`;
   }
 
   /**

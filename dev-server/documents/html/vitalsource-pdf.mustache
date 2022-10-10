@@ -24,20 +24,20 @@
             '/document/vitalsource-pdf-page'
           ];
 
-          let pageIndex = 0;
+          this._chapterIndex = 0;
 
           const setPage = index => {
             if (index < 0 || index >= pageURLs.length) {
               return;
             }
-            pageIndex = index;
+            this._chapterIndex = index;
 
             // We remove the current frame and create a new one, rather than just
             // change the `src` of the existing iframe, to mimic what Bookshelf
             // does. The client should be robust to either approach.
             this.contentFrame?.remove();
             this.contentFrame = document.createElement('iframe');
-            this.contentFrame.src = pageURLs[pageIndex];
+            this.contentFrame.src = pageURLs[this._chapterIndex];
             this.shadowRoot.append(this.contentFrame);
           };
 
@@ -56,6 +56,35 @@
           this.shadowRoot.append(controlBar);
 
           setPage(0);
+        }
+
+        getBookInfo() {
+          return { title: 'Principles of Economics', isbn: '9781938168239', format: 'pbk' };
+        }
+
+        getCurrentPage() {
+          // The CFI is a reference to the current chapter's entry in the `<spine>`
+          // of the EPUB's Package Document. Element references in CFIs are
+          // even numbers counting from 2.
+          const cfi = `/0`;
+          const page = (this._chapterIndex + 1).toString();
+          const title = 'Introduction to Choice in a World of Scarcity';
+          const url = '/principles-of-economics/pages/1';
+
+          return {
+            cfi,
+            page,
+            chapterTitle: title,
+            absoluteURL: url,
+            index: this._chapterIndex,
+          };
+        }
+
+        goToURL(url) {
+          const index = chapterURLs.findIndex(cu => cu === url);
+          if (index >= 0) {
+            this.setChapter(index);
+          }
         }
       }
       customElements.define('mosaic-book', MosaicElement);

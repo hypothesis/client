@@ -1,3 +1,4 @@
+import { compareCFIs } from '../util/cfi';
 import { location } from './annotation-metadata';
 import { rootAnnotations } from './thread';
 
@@ -54,6 +55,21 @@ function oldestRootAnnotationDate(thread) {
 /** @typedef {(a: Thread, b: Thread) => number} SortFunction */
 
 /**
+ * @template {number|string} T
+ * @param {T} a
+ * @param {T} b
+ */
+function compareValues(a, b) {
+  if (a < b) {
+    return -1;
+  } else if (a > b) {
+    return 1;
+  } else {
+    return 0;
+  }
+}
+
+/**
  * Sorting comparison functions for the three defined application options for
  * sorting annotation (threads)
  */
@@ -89,11 +105,24 @@ export const sorters = {
     }
     const aLocation = location(a.annotation);
     const bLocation = location(b.annotation);
-    if (aLocation < bLocation) {
+
+    // If these annotations come from an EPUB and specify which chapter they
+    // came from via a CFI, compare the chapter order first.
+    if (aLocation.cfi && bLocation.cfi) {
+      const cfiResult = compareCFIs(aLocation.cfi, bLocation.cfi);
+      if (cfiResult !== 0) {
+        return Math.sign(cfiResult);
+      }
+    } else if (aLocation.cfi) {
       return -1;
-    } else if (aLocation > bLocation) {
+    } else if (bLocation.cfi) {
       return 1;
     }
-    return 0;
+
+    // If the chapter number is the same or for other document types, compare
+    // the text location instead.
+    const aPos = aLocation.position ?? Number.POSITIVE_INFINITY;
+    const bPos = bLocation.position ?? Number.POSITIVE_INFINITY;
+    return compareValues(aPos, bPos);
   },
 };

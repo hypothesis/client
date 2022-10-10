@@ -222,8 +222,8 @@ describe('sidebar/helpers/annotation-metadata', () => {
   });
 
   describe('location', () => {
-    it('returns the position for annotations with a text position', () => {
-      assert.equal(
+    it('returns position for annotations with a text position', () => {
+      assert.deepEqual(
         annotationMetadata.location({
           target: [
             {
@@ -236,12 +236,35 @@ describe('sidebar/helpers/annotation-metadata', () => {
             },
           ],
         }),
-        100
+        { cfi: undefined, position: 100 }
       );
     });
 
-    it('returns +ve infinity for annotations without a text position', () => {
-      assert.equal(
+    it('returns CFI for annotations with a CFI', () => {
+      assert.deepEqual(
+        annotationMetadata.location({
+          target: [
+            {
+              selector: [
+                {
+                  type: 'EPUBContentSelector',
+                  cfi: '/2/4',
+                  url: 'content/chapter2.xhtml',
+                },
+                {
+                  type: 'TextPositionSelector',
+                  start: 200,
+                },
+              ],
+            },
+          ],
+        }),
+        { cfi: '/2/4', position: 200 }
+      );
+    });
+
+    it('returns undefined for annotations without a text position', () => {
+      assert.deepEqual(
         annotationMetadata.location({
           target: [
             {
@@ -249,7 +272,7 @@ describe('sidebar/helpers/annotation-metadata', () => {
             },
           ],
         }),
-        Number.POSITIVE_INFINITY
+        { cfi: undefined, position: undefined }
       );
     });
   });

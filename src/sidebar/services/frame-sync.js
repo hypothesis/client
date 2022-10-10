@@ -9,7 +9,9 @@ import { watch } from '../util/watch';
 /**
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').DocumentMetadata} DocumentMetadata
+ * @typedef {import('../../types/annotator').SegmentInfo} SegmentInfo
  * @typedef {import('../../types/api').Annotation} Annotation
+ * @typedef {import('../../types/api').EPUBContentSelector} EPUBContentSelector
  * @typedef {import('../../types/port-rpc-events').SidebarToHostEvent} SidebarToHostEvent
  * @typedef {import('../../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
  * @typedef {import('../../types/port-rpc-events').SidebarToGuestEvent} SidebarToGuestEvent
@@ -22,6 +24,7 @@ import { watch } from '../util/watch';
  * @prop {string|null} frameIdentifier
  * @prop {string} uri
  * @prop {DocumentMetadata} metadata
+ * @prop {SegmentInfo} [segmentInfo]
  */
 
 /**
@@ -66,6 +69,20 @@ function frameForAnnotation(frames, ann) {
   // If there is no main frame (eg. in VitalSource), fall back to whichever
   // frame connected first.
   return frames[0];
+}
+
+/**
+ * @param {Frame} frame
+ * @param {Annotation} ann
+ */
+function annotationMatchesCurrentSegment(frame, ann) {
+  const segmentSelector = /** @type {EPUBContentSelector|undefined} */ (
+    ann.target[0].selector?.find(s => s.type === 'EPUBContentSelector')
+  );
+  if (!segmentSelector || !frame.segment) {
+    return true;
+  }
+  return segmentSelector.url === frame.segment.url;
 }
 
 /**
@@ -184,16 +201,37 @@ export class FrameSyncService {
 
       // Send added annotations to matching frame.
       if (added.length > 0) {
+        /** @type {Set<string>} */
+        const assumeAnchored = new Set();
         /** @type {Map<string|null, Annotation[]>} */
         const addedByFrame = new Map();
+
         for (let annotation of added) {
           const frame = frameForAnnotation(frames, annotation);
           if (!frame) {
             continue;
           }
+          if (!annotationMatchesCurrentSegment(frame, annotation)) {
+            assumeAnchored.add(annotation.$tag);
+            continue;
+          }
           const anns = addedByFrame.get(frame.id) ?? [];
           anns.push(annotation);
           addedByFrame.set(frame.id, anns);
+        }
+
+        if (assumeAnchored.size > 0) {
+          /** @type {Record<string, 'anchored'>} */
+          const anchorStatusUpdates = {};
+          for (let tag of assumeAnchored) {
+            anchorStatusUpdates[tag] = 'anchored';
+          }
+          // nb. Update is deferred to avoid dispatching a store action in the
+          // middle of handling another action.
+          setTimeout(
+            () => this._store.updateAnchorStatus(anchorStatusUpdates),
+            0
+          );
         }
 
         for (let [frameId, anns] of addedByFrame) {
@@ -288,6 +326,7 @@ export class FrameSyncService {
         this._store.connectFrame({
           id: info.frameIdentifier,
           metadata: info.metadata,
+          segment: info.segmentInfo,
           uri: info.uri,
         });
       }
@@ -528,6 +567,8 @@ export class FrameSyncService {
    * @param {string} tag
    */
   scrollToAnnotation(tag) {
+    // TODO - If annotation is in a different segment than the current one,
+    // then navigate to the target segment.
     this._guestRPC.forEach(rpc => rpc.call('scrollToAnnotation', tag));
   }
 

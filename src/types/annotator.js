@@ -110,6 +110,20 @@
  */
 
 /**
+ * Identifies a loadable chunk or segment of a document.
+ *
+ * Some document viewers do not load the whole document at once. For example
+ * most ebook viewers only load one content HTML file from the publication at
+ * a time.
+ *
+ * @typedef SegmentInfo
+ * @prop {string} [cfi] - CFI selector for a segment of an EPUB
+ * @prop {string} [page] - Page number of the start of the current segment
+ * @prop {string} [url] - URL (relative or absolute) of the segment
+ * @prop {string} [title] - Title for the segment
+ */
+
+/**
  * Interface for document type/viewer integrations that handle all the details
  * of supporting a specific document type (web page, PDF, ebook, etc.).
  *
@@ -134,6 +148,10 @@
  *   false otherwise.
  * @prop {() => Promise<DocumentMetadata>} getMetadata - Return the metadata of
  *   the currently loaded document, such as title, PDF fingerprint, etc.
+ * @prop {(url: string) => void} [goToSegment] - Navigate to a segment of
+ *   the document.
+ * @prop {() => Promise<SegmentInfo>} [segmentInfo] - Identifies the current
+ *   page, chapter or other segment within the document that is loaded.
  * @prop {() => Promise<string>} uri - Return the URL of the currently loaded document.
  *   This may be different than the current URL (`location.href`) in a PDF for example.
  * @prop {(a: Anchor) => Promise<void>} scrollToAnchor - Scroll to an anchor.

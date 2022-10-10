@@ -1,4 +1,8 @@
 /**
+ * @typedef {import('../../types/annotator').SegmentInfo} SegmentInfo
+ */
+
+/**
  * @typedef AuthState
  * @prop {string|null} [userid]
  * @prop {string} [displayName]
@@ -24,9 +28,10 @@ export class VersionData {
    * @param {AuthState} userInfo
    * @param {DocumentInfo[]} documentInfo - Metadata for connected frames.
    *   If there are multiple frames, the "main" one should be listed first.
+   * @param {SegmentInfo} [segmentInfo]
    * @param {Window} window_ - test seam
    */
-  constructor(userInfo, documentInfo, window_ = window) {
+  constructor(userInfo, documentInfo, segmentInfo, window_ = window) {
     const noValueString = 'N/A';
 
     let accountString = noValueString;
@@ -47,6 +52,13 @@ export class VersionData {
 
     this.account = accountString;
     this.timestamp = new Date().toString();
+
+    if (segmentInfo) {
+      const segmentIds = [segmentInfo.cfi, segmentInfo.page, segmentInfo.url]
+        .filter(Boolean)
+        .join(', ');
+      this.segment = `(${segmentIds}) ${segmentInfo.title}`;
+    }
   }
 
   /**

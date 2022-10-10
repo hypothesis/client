@@ -101,7 +101,9 @@ function HelpPanel({ auth, session }: HelpPanelProps) {
       }
     });
 
-    return new VersionData(userInfo, documentInfo);
+    const segmentInfo = frames.find(f => f.segment)?.segment;
+
+    return new VersionData(userInfo, documentInfo, segmentInfo);
   }, [auth, frames, mainFrame]);
 
   // The support ticket URL encodes some version info in it to pre-fill in the

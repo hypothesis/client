@@ -12,7 +12,11 @@ import { getElementHeightWithMargins } from '../util/dom';
 
 import ThreadCard from './ThreadCard';
 
-/** @typedef {import('../helpers/build-thread').Thread} Thread */
+/**
+ * @typedef {import('../../types/api').EPUBContentSelector} EPUBContentSelector
+ * @typedef {import('../../types/api').PageSelector} PageSelector
+ * @typedef {import('../helpers/build-thread').Thread} Thread
+ */
 
 // The precision of the `scrollPosition` value in pixels; values will be rounded
 // down to the nearest multiple of this scale value
@@ -29,6 +33,40 @@ function getScrollContainer() {
 /** @param {number} pos */
 function roundScrollPosition(pos) {
   return Math.max(pos - (pos % SCROLL_PRECISION), 0);
+}
+
+/**
+ * @param {Thread} thread
+ * @return {string|null}
+ */
+function groupHeading(thread) {
+  if (!thread.annotation) {
+    return null;
+  }
+
+  const chapter = /** @type {EPUBContentSelector|undefined} */ (
+    thread.annotation.target[0].selector?.find(
+      s => s.type === 'EPUBContentSelector'
+    )
+  );
+
+  return chapter?.title ?? null;
+}
+
+/**
+ * @param {Thread} thread
+ * @return {string|null}
+ */
+function pageLabel(thread) {
+  if (!thread.annotation) {
+    return null;
+  }
+
+  const page = /** @type {PageSelector|undefined} */ (
+    thread.annotation.target[0].selector?.find(s => s.type === 'PageSelector')
+  );
+
+  return page?.label ?? null;
 }
 
 /**
@@ -202,25 +240,59 @@ function ThreadList({ threads }) {
     });
   }, [visibleThreads]);
 
+  const usedHeadings = new Set();
+  const headings = visibleThreads.map(thread => {
+    const heading = groupHeading(thread);
+    if (heading && !usedHeadings.has(heading)) {
+      usedHeadings.add(heading);
+      return heading;
+    } else {
+      return null;
+    }
+  });
+
+  const usedPages = new Set();
+  const pages = visibleThreads.map(thread => {
+    const page = pageLabel(thread);
+    if (page && !usedPages.has(page)) {
+      usedPages.add(page);
+      return page;
+    } else {
+      return null;
+    }
+  });
+
   return (
     <div>
       <div style={{ height: offscreenUpperHeight }} />
-      {visibleThreads.map(child => (
-        <div
-          className={classnames(
-            // The goal is to space out each annotation card vertically. Typically
-            // this is better handled by applying vertical spacing to the parent
-            // element (e.g. `space-y-3`) but in this case, the constraints of
-            // sibling divs before and after the list of annotation cards prevents
-            // this, so a bottom margin is added to each card's wrapping element.
-            'mb-3'
+      {visibleThreads.map((child, i) => (
+        <>
+          {headings[i] && (
+            <h2 className="text-md text-grey-7 font-bold pt-3 pb-2">
+              {headings[i]}
+            </h2>
           )}
-          data-testid="thread-card-container"
-          id={child.id}
-          key={child.id}
-        >
-          <ThreadCard thread={child} />
-        </div>
+          {pages[i] && (
+            <h3 className="text-sm text-grey-7 font-bold pt-2 pb-2">
+              Page {pages[i]}
+            </h3>
+          )}
+          <div
+            className={classnames(
+              // The goal is to space out each annotation card vertically. Typically
+              // this is better handled by applying vertical spacing to the parent
+              // element (e.g. `space-y-3`) but in this case, the constraints of
+              // sibling divs before and after the list of annotation cards prevents
+              // this, so a bottom margin is added to each card's wrapping element.
+              'mb-3'
+            )}
+            data-testid="thread-card-container"
+            id={child.id}
+            key={child.id}
+          >
+            <ThreadCard thread={child} />
+          </div>
+        </>
       ))}
       <div style={{ height: offscreenLowerHeight }} />
     </div>
