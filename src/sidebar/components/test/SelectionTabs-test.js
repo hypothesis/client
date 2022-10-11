@@ -80,7 +80,7 @@ describe('SelectionTabs', () => {
       fakeSettings.enableExperimentalNewNoteButton = true;
       const wrapper = createComponent();
       assert.equal(
-        wrapper.find('LabeledButton[data-testid="new-note-button"]').length,
+        wrapper.find('Button[data-testid="new-note-button"]').length,
         0
       );
     });
@@ -121,7 +121,7 @@ describe('SelectionTabs', () => {
         const wrapper = createComponent();
 
         assert.isTrue(
-          wrapper.find('LabeledButton[data-testid="new-note-button"]').exists()
+          wrapper.find('Button[data-testid="new-note-button"]').exists()
         );
       });
 
@@ -136,9 +136,7 @@ describe('SelectionTabs', () => {
 
         const wrapper = createComponent();
 
-        const button = wrapper.find(
-          'LabeledButton[data-testid="new-note-button"]'
-        );
+        const button = wrapper.find('Button[data-testid="new-note-button"]');
         assert.deepEqual(button.prop('style'), { backgroundColor: '#00f' });
       });
 
@@ -147,10 +145,7 @@ describe('SelectionTabs', () => {
         fakeStore.selectedTab.returns('note');
 
         const wrapper = createComponent();
-        wrapper
-          .find('LabeledButton[data-testid="new-note-button"]')
-          .props()
-          .onClick();
+        wrapper.find('Button[data-testid="new-note-button"]').props().onClick();
 
         assert.calledOnce(fakeAnnotationsService.createPageNote);
       });
@@ -237,7 +232,7 @@ describe('SelectionTabs', () => {
       const wrapper = createComponent({});
 
       assert.include(
-        wrapper.find('[data-testid="notes-unavailable-message"]').text(),
+        wrapper.find('Card[data-testid="notes-unavailable-message"]').text(),
         'There are no page notes in this group'
       );
     });
@@ -246,7 +241,9 @@ describe('SelectionTabs', () => {
       fakeStore.annotationCount.returns(0);
       const wrapper = createComponent({});
       assert.include(
-        wrapper.find('[data-testid="annotations-unavailable-message"]').text(),
+        wrapper
+          .find('Card[data-testid="annotations-unavailable-message"]')
+          .text(),
         'There are no annotations in this group'
       );
     });
