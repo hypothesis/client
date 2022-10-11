@@ -1,4 +1,4 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
+import { Button, CopyIcon } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import { copyText } from '../util/copy-to-clipboard';
@@ -79,9 +79,9 @@ function VersionInfo({ toastMessenger, versionData }) {
         <VersionInfoItem label="Date">{versionData.timestamp}</VersionInfoItem>
       </dl>
       <div className="flex items-center justify-center">
-        <LabeledButton onClick={copyVersionData} icon="copy">
+        <Button onClick={copyVersionData} icon={CopyIcon}>
           Copy version details
-        </LabeledButton>
+        </Button>
       </div>
     </div>
   );
