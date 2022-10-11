@@ -1,8 +1,17 @@
-import { Icon, Link } from '@hypothesis/frontend-shared';
+import {
+  LinkBase,
+  EmailIcon,
+  SocialFacebookIcon,
+  SocialTwitterIcon,
+} from '@hypothesis/frontend-shared/lib/next';
+
+/**
+ * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
+ */
 
 /**
  * @typedef ShareLinkProps
- * @prop {string} iconName - The name of the SVG icon to use for this link
+ * @prop {IconComponent} icon - The SVG icon component to use for this link
  * @prop {string} label - Accessible label/tooltip for link
  * @prop {string} uri - URI for sharing this annotation
  */
@@ -12,18 +21,22 @@ import { Icon, Link } from '@hypothesis/frontend-shared';
  *
  * @param {ShareLinkProps} props
  */
-function ShareLink({ label, iconName, uri }) {
+function ShareLink({ label, icon: Icon, uri }) {
   return (
     <li>
-      <Link
+      <LinkBase
         aria-label={label}
         classes="text-grey-6 hover:text-color-text block"
         href={uri}
         title={label}
         target="_blank"
       >
-        <Icon name={iconName} />
-      </Link>
+        <Icon
+          // Make the icons sized to the current text size to allow for
+          // differently-sized sharing icon links
+          className="w-em h-em"
+        />
+      </LinkBase>
     </li>
   );
 }
@@ -44,26 +57,28 @@ export default function ShareLinks({ shareURI }) {
   const encodedURI = encodeURIComponent(shareURI);
 
   return (
-    <ul className="flex flex-row gap-x-4 items-center justify-center border-t pt-2">
-      <ShareLink
-        iconName="twitter"
-        label="Tweet share link"
-        uri={`https://twitter.com/intent/tweet?url=${encodedURI}&hashtags=annotated`}
-      />
+    <div className="pt-2 border-t">
+      <ul className="flex flex-row gap-x-4 items-center justify-center">
+        <ShareLink
+          icon={SocialTwitterIcon}
+          label="Tweet share link"
+          uri={`https://twitter.com/intent/tweet?url=${encodedURI}&hashtags=annotated`}
+        />
 
-      <ShareLink
-        iconName="facebook"
-        label="Share on Facebook"
-        uri={`https://www.facebook.com/sharer/sharer.php?u=${encodedURI}`}
-      />
+        <ShareLink
+          icon={SocialFacebookIcon}
+          label="Share on Facebook"
+          uri={`https://www.facebook.com/sharer/sharer.php?u=${encodedURI}`}
+        />
 
-      <ShareLink
-        iconName="email"
-        label="Share via email"
-        uri={`mailto:?subject=${encodeURIComponent(
-          "Let's Annotate"
-        )}&body=${encodedURI}`}
-      />
-    </ul>
+        <ShareLink
+          icon={EmailIcon}
+          label="Share via email"
+          uri={`mailto:?subject=${encodeURIComponent(
+            "Let's Annotate"
+          )}&body=${encodedURI}`}
+        />
+      </ul>
+    </div>
   );
 }
