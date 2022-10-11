@@ -16,15 +16,11 @@ describe('MenuArrow', () => {
 
   it('should render an arrow pointing up by default', () => {
     const wrapper = createComponent();
-    const arrowClasses = wrapper.find('Icon').props().classes;
-
-    assert.notInclude(arrowClasses, 'rotate-180');
+    assert.isTrue(wrapper.find('PointerUpIcon').exists());
   });
 
   it('should render an arrow pointing down if direction is `down`', () => {
     const wrapper = createComponent({ direction: 'down' });
-    const arrowClasses = wrapper.find('Icon').props().classes;
-
-    assert.include(arrowClasses, 'rotate-180');
+    assert.isTrue(wrapper.find('PointerDownIcon').exists());
   });
 });

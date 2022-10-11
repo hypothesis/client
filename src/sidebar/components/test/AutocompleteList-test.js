@@ -33,12 +33,18 @@ describe('AutocompleteList', () => {
   it('hides the list container when `open` is false', () => {
     // `open` prop defaults to `false`
     const wrapper = createComponent();
-    assert.include(wrapper.find('Card').props().classes, 'hidden');
+    const container = wrapper.find(
+      '[data-testid="autocomplete-list-container"]'
+    );
+    assert.isTrue(container.getDOMNode().classList.contains('hidden'));
   });
 
   it('hides the list container when `list` is empty', () => {
     const wrapper = createComponent({ open: true, list: [] });
-    assert.include(wrapper.find('Card').props().classes, 'hidden');
+    const container = wrapper.find(
+      '[data-testid="autocomplete-list-container"]'
+    );
+    assert.isTrue(container.getDOMNode().classList.contains('hidden'));
   });
 
   it('renders the items in order of the list prop', () => {
