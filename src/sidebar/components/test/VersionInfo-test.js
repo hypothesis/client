@@ -79,7 +79,7 @@ describe('VersionInfo', () => {
     it('copies version info to clipboard when copy button clicked', () => {
       const wrapper = createComponent();
 
-      wrapper.find('LabeledButton').props().onClick();
+      wrapper.find('Button').props().onClick();
 
       assert.calledWith(fakeCopyToClipboard.copyText, 'fakeString');
     });
@@ -87,7 +87,7 @@ describe('VersionInfo', () => {
     it('confirms info copy when successful', () => {
       const wrapper = createComponent();
 
-      wrapper.find('LabeledButton').props().onClick();
+      wrapper.find('Button').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -99,7 +99,7 @@ describe('VersionInfo', () => {
       fakeCopyToClipboard.copyText.throws();
       const wrapper = createComponent();
 
-      wrapper.find('LabeledButton').props().onClick();
+      wrapper.find('Button').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.error,
