@@ -1,4 +1,4 @@
-import { Card } from '@hypothesis/frontend-shared';
+import { Card } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
@@ -85,20 +85,23 @@ export default function AutocompleteList({
   const isHidden = list.length === 0 || !open;
   return (
     <div className="relative">
-      <Card
-        classes={classnames(
+      <div
+        className={classnames(
           { hidden: isHidden },
           // Move the Card down a bit to make room for the up-pointing arrow
           'absolute top-[3px] z-3',
-          // Override full-width of Card, but set a min-width of `10em`
-          'w-auto min-w-[10em] theme-clean:border p-0'
+          // Ensure Card width is not too narrow
+          'min-w-[10em]'
         )}
+        data-testid="autocomplete-list-container"
       >
-        <ul tabIndex={-1} aria-label="Suggestions" role="listbox" {...props}>
-          {items}
-        </ul>
-        <MenuArrow direction="up" classes="top-[-10px] left-[3px]" />
-      </Card>
+        <Card width="auto">
+          <ul tabIndex={-1} aria-label="Suggestions" role="listbox" {...props}>
+            {items}
+          </ul>
+          <MenuArrow direction="up" classes="top-[-8px] left-[3px]" />
+        </Card>
+      </div>
     </div>
   );
 }

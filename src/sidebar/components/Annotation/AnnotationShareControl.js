@@ -188,7 +188,7 @@ function AnnotationShareControl({
           {showShareLinks && <ShareLinks shareURI={shareUri} />}
           <MenuArrow
             direction="down"
-            classes="bottom-[-12px] right-1 touch:right-[9px]"
+            classes="bottom-[-9px] right-1 touch:right-[9px]"
           />
         </Card>
       )}

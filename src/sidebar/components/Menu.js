@@ -205,7 +205,7 @@ export default function Menu({
             direction="up"
             classes={classnames(
               // Position menu-arrow caret near bottom right of menu label/toggle control
-              'right-0 top-[calc(100%-6px)] w-[15px]',
+              'right-0 top-[calc(100%-3px)] w-[15px]',
               arrowClass
             )}
           />
