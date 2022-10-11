@@ -1,7 +1,35 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
+import {
+  ButtonBase,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import { pageNumberOptions } from '../util/pagination';
+
+/**
+ * @typedef {import('@hypothesis/frontend-shared/lib/types').PresentationalProps} PresentationalProps
+ * @typedef {import('@hypothesis/frontend-shared/lib/components/input/ButtonBase').ButtonCommonProps} ButtonCommonProps
+ * @typedef {Omit<import('preact').JSX.HTMLAttributes<HTMLButtonElement>, 'icon'|'size'>} HTMLButtonAttributes
+ */
+
+/**
+ * Style a navigation button.
+ *
+ * @param {PresentationalProps & ButtonCommonProps & HTMLButtonAttributes} props
+ */
+function NavigationButton({ ...buttonProps }) {
+  return (
+    <ButtonBase
+      classes={classnames(
+        'px-3.5 py-2.5 gap-x-1 font-semibold',
+        // These colors are the same as the "dark" variant of IconButton
+        'text-grey-7 bg-grey-2 enabled:hover:text-grey-9 enabled:hover:bg-grey-3 disabled:text-grey-5 aria-pressed:bg-grey-3 aria-expanded:bg-grey-3'
+      )}
+      {...buttonProps}
+    />
+  );
+}
 
 /**
  * @typedef PaginationNavigationProps
@@ -44,9 +72,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
     >
       <div className="w-28 h-10">
         {hasPreviousPage && (
-          <LabeledButton
-            classes="p-navigation-button"
-            icon="arrow-left"
+          <NavigationButton
             title="Go to previous page"
             onClick={e =>
               changePageTo(
@@ -54,10 +80,10 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
                 /** @type {HTMLElement} */ (e.target)
               )
             }
-            variant="dark"
           >
+            <ArrowLeftIcon />
             prev
-          </LabeledButton>
+          </NavigationButton>
         )}
       </div>
       <ul
@@ -82,18 +108,16 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
             {page === null ? (
               <div data-testid="pagination-gap">...</div>
             ) : (
-              <LabeledButton
-                classes="p-navigation-button"
+              <NavigationButton
                 key={`page-${idx}`}
                 title={`Go to page ${page}`}
                 pressed={page === currentPage}
                 onClick={e =>
                   changePageTo(page, /** @type {HTMLElement} */ (e.target))
                 }
-                variant="dark"
               >
                 {page.toString()}
-              </LabeledButton>
+              </NavigationButton>
             )}
           </li>
         ))}
@@ -107,10 +131,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
         )}
       >
         {hasNextPage && (
-          <LabeledButton
-            classes="p-navigation-button"
-            icon="arrow-right"
-            iconPosition="right"
+          <NavigationButton
             title="Go to next page"
             onClick={e =>
               changePageTo(
@@ -118,10 +139,10 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
                 /** @type {HTMLElement} */ (e.target)
               )
             }
-            variant="dark"
           >
             next
-          </LabeledButton>
+            <ArrowRightIcon />
+          </NavigationButton>
         )}
       </div>
     </div>
