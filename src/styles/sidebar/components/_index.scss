@@ -50,12 +50,6 @@
   @apply line-through grayscale contrast-50 text-color-text-light;
 }
 
-// Applies to <LabeledButton>; asymmetrical padding used on pagination
-// navigation buttons
-.p-navigation-button {
-  @apply py-2.5 px-3.5;
-}
-
 // Disable scroll anchoring as it interferes with `ThreadList` and
 // `visible-threads` calculations and can cause a render loop
 .js-thread-list-scroll-root {
