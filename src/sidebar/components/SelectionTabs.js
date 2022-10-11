@@ -1,9 +1,11 @@
 import {
-  Frame,
-  Icon,
-  LabeledButton,
+  AnnotateIcon,
+  Button,
+  Card,
+  CardContent,
   LinkButton,
-} from '@hypothesis/frontend-shared';
+  PlusIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import { applyTheme } from '../helpers/theme';
@@ -50,21 +52,20 @@ function Tab({
 
   return (
     <LinkButton
-      classes={classnames(
-        'inline bg-transparent min-w-[5.25rem] text-color-text hover:!no-underline',
-        {
-          'font-bold': isSelected,
-        }
-      )}
+      classes={classnames('!inline bg-transparent min-w-[5.25rem]', {
+        'font-bold': isSelected,
+      })}
       // Listen for `onMouseDown` so that the tab is selected when _pressed_
       // as this makes the UI feel faster. Also listen for `onClick` as a fallback
       // to enable selecting the tab via other input methods.
+      color="text"
       onClick={selectTab}
       onMouseDown={selectTab}
       pressed={!!isSelected}
       role="tab"
       tabIndex={0}
       title={title}
+      underline="none"
     >
       <>
         {children}
@@ -153,38 +154,42 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
       </div>
       {selectedTab === 'note' && settings.enableExperimentalNewNoteButton && (
         <div className="flex justify-end">
-          <LabeledButton
+          <Button
             data-testid="new-note-button"
-            icon="add"
             onClick={() => annotationsService.createPageNote()}
             variant="primary"
             style={applyTheme(['ctaBackgroundColor'], settings)}
           >
+            <PlusIcon />
             New note
-          </LabeledButton>
+          </Button>
         </div>
       )}
       {!isLoading && showNotesUnavailableMessage && (
-        <Frame classes="text-center">
-          <span data-testid="notes-unavailable-message">
+        <Card data-testid="notes-unavailable-message" variant="flat">
+          <CardContent classes="text-center">
             There are no page notes in this group.
-          </span>
-        </Frame>
+          </CardContent>
+        </Card>
       )}
       {!isLoading && showAnnotationsUnavailableMessage && (
-        <Frame classes="text-center">
-          <span data-testid="annotations-unavailable-message">
-            There are no annotations in this group.
-            <br />
-            Create one by selecting some text and clicking the{' '}
-            <Icon
-              classes="inline m-0.5 -mt-0.5"
-              name="annotate"
-              title="Annotate"
-            />{' '}
-            button.
-          </span>
-        </Frame>
+        <Card data-testid="annotations-unavailable-message" variant="flat">
+          <CardContent
+            // TODO: Remove !important spacing class after
+            // https://github.com/hypothesis/frontend-shared/issues/676 is addressed
+            classes="text-center !space-y-1"
+          >
+            <p>There are no annotations in this group.</p>
+            <p>
+              Create one by selecting some text and clicking the{' '}
+              <AnnotateIcon
+                className="w-em h-em inline m-0.5 -mt-0.5"
+                title="Annotate"
+              />{' '}
+              button.
+            </p>
+          </CardContent>
+        </Card>
       )}
     </div>
   );
