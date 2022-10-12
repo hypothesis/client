@@ -62,7 +62,7 @@ describe('AnnotationPublishControl', () => {
   });
 
   const getPublishButton = wrapper =>
-    wrapper.find('LabeledButton[data-testid="publish-control-button"]');
+    wrapper.find('Button[data-testid="publish-control-button"]');
 
   describe('theming', () => {
     it('should apply theme styles', () => {
@@ -188,9 +188,7 @@ describe('AnnotationPublishControl', () => {
   describe('cancel button', () => {
     it('should invoke the `onCancel` callback when cancel button clicked', () => {
       const wrapper = createAnnotationPublishControl();
-      const cancelBtn = wrapper
-        .find('LabeledButton')
-        .filter({ icon: 'cancel' });
+      const cancelBtn = wrapper.find('Button[data-testid="cancel-button"]');
 
       cancelBtn.props().onClick();
 
