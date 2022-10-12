@@ -1,4 +1,8 @@
-import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  CollapseIcon,
+  ExpandIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useMemo, useState } from 'preact/hooks';
 
@@ -29,25 +33,21 @@ import TagListItem from '../TagListItem';
 function ToggleExcerptButton({ classes, setCollapsed, collapsed }) {
   const toggleText = collapsed ? 'More' : 'Less';
   return (
-    <LabeledButton
+    <Button
       classes={classnames('text-grey-7 font-normal', classes)}
       expanded={!collapsed}
       onClick={() => setCollapsed(!collapsed)}
       title={`Toggle visibility of full annotation text: Show ${toggleText}`}
     >
       <div className="flex items-center gap-x-2">
-        <Icon
-          classes={classnames(
-            // TODO: Refactor shared LabeledButton styles such that rules
-            // have lower specificity and we don't need an !important rule here
-            '!text-tiny'
-          )}
-          name={collapsed ? 'expand' : 'collapse'}
-          title={collapsed ? 'expand' : 'collapse'}
-        />
+        {collapsed ? (
+          <ExpandIcon className="w-3 h-3" />
+        ) : (
+          <CollapseIcon className="w-3 h-3" />
+        )}
         <div>{toggleText}</div>
       </div>
-    </LabeledButton>
+    </Button>
   );
 }
 
