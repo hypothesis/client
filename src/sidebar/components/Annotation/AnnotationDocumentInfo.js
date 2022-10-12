@@ -1,4 +1,4 @@
-import { Link } from '@hypothesis/frontend-shared';
+import { Link } from '@hypothesis/frontend-shared/lib/next';
 
 /**
  * @typedef AnnotationDocumentInfoProps
