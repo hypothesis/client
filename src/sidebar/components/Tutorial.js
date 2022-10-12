@@ -1,8 +1,17 @@
-import { Icon, Link } from '@hypothesis/frontend-shared';
+import {
+  Link,
+  AnnotateIcon,
+  HighlightIcon,
+  ReplyIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
+
+/**
+ * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
+ */
 
 /**
  * Subcomponent: an "instruction" within the tutorial step that includes an
@@ -11,19 +20,19 @@ import { withServices } from '../service-context';
  *
  * @param {object} props
  *   @param {string} props.commandName - Name of the "command" the instruction represents
- *   @param {string} props.iconName - Name of the icon to display
+ *   @param {IconComponent} props.icon icon to display
  */
-function TutorialInstruction({ commandName, iconName }) {
+function TutorialInstruction({ commandName, icon: Icon }) {
   return (
-    <span className="whitespace-nowrap">
+    <span className="whitespace-nowrap" data-testid="instruction">
       <Icon
-        name={iconName}
-        classes={classnames(
+        className={classnames(
+          'w-em h-em',
           'mx-1 -mt-1', // Give horizontal space; pull up top margin a little
           'text-color-text-light inline'
         )}
       />
-      <em>{commandName}</em>
+      <em data-testid="command-name">{commandName}</em>
     </span>
   );
 }
@@ -40,20 +49,20 @@ function Tutorial({ settings }) {
     <ol className="list-decimal pl-10 space-y-2">
       <li>
         To create an annotation, select text and then select the{' '}
-        <TutorialInstruction iconName="annotate" commandName="Annotate" />{' '}
+        <TutorialInstruction icon={AnnotateIcon} commandName="Annotate" />{' '}
         button.
       </li>
       <li>
         To create a highlight (
         <Link
-          classes="underline hover:underline"
           href="https://web.hypothes.is/help/why-are-highlights-private-by-default/"
           target="_blank"
+          underline="always"
         >
           visible only to you
         </Link>
         ), select text and then select the{' '}
-        <TutorialInstruction iconName="highlight" commandName="Highlight" />{' '}
+        <TutorialInstruction icon={HighlightIcon} commandName="Highlight" />{' '}
         button.
       </li>
       {canCreatePrivateGroups && (
@@ -61,9 +70,9 @@ function Tutorial({ settings }) {
           To annotate in a private group, select the group from the groups
           dropdown. Don&apos;t see your group? Ask the group creator to send a{' '}
           <Link
-            classes="underline hover:underline"
             href="https://web.hypothes.is/help/how-to-join-a-private-group/"
             target="_blank"
+            underline="always"
           >
             join link
           </Link>
@@ -72,7 +81,7 @@ function Tutorial({ settings }) {
       )}
       <li>
         To reply to an annotation, select the{' '}
-        <TutorialInstruction iconName="reply" commandName="Reply" /> button.
+        <TutorialInstruction icon={ReplyIcon} commandName="Reply" /> button.
       </li>
     </ol>
   );
