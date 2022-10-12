@@ -1,4 +1,8 @@
-import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  CancelIcon,
+  MenuExpandIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import { withServices } from '../../service-context';
@@ -50,14 +54,14 @@ function AnnotationPublishControl({
       className="w-9 h-9 flex items-center justify-center text-color-text-inverted"
       style={buttonStyle}
     >
-      <Icon name="expand-menu" classes="w-4 h-4" />
+      <MenuExpandIcon className="w-4 h-4" />
     </div>
   );
 
   return (
     <div className="flex flex-row gap-x-3">
       <div className="flex relative">
-        <LabeledButton
+        <Button
           classes={classnames(
             // Turn off right-side border radius to align with menu-open button
             'rounded-r-none'
@@ -66,11 +70,11 @@ function AnnotationPublishControl({
           style={buttonStyle}
           onClick={onSave}
           disabled={isDisabled}
-          size="large"
+          size="lg"
           variant="primary"
         >
           Post to {isPrivate ? 'Only Me' : group.name}
-        </LabeledButton>
+        </Button>
         {/* This wrapper div is necessary because of peculiarities with
              Safari: see https://github.com/hypothesis/client/issues/2302 */}
         <div
@@ -113,14 +117,10 @@ function AnnotationPublishControl({
         </div>
       </div>
       <div>
-        <LabeledButton
-          classes="p-2.5"
-          icon="cancel"
-          onClick={onCancel}
-          size="large"
-        >
+        <Button data-testid="cancel-button" onClick={onCancel} size="lg">
+          <CancelIcon />
           Cancel
-        </LabeledButton>
+        </Button>
       </div>
     </div>
   );
