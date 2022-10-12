@@ -125,7 +125,7 @@ describe('AnnotationBody', () => {
     });
     wrapper.update();
 
-    const button = wrapper.find('LabeledButton');
+    const button = wrapper.find('Button');
     assert.isOk(button.exists());
     assert.equal(
       button.props().title,
@@ -146,11 +146,11 @@ describe('AnnotationBody', () => {
     wrapper.update();
 
     act(() => {
-      wrapper.find('LabeledButton').props().onClick();
+      wrapper.find('Button').props().onClick();
     });
     wrapper.update();
 
-    const buttonProps = wrapper.find('LabeledButton').props();
+    const buttonProps = wrapper.find('Button').props();
 
     assert.equal(
       buttonProps.title,
