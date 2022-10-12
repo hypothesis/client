@@ -1,4 +1,11 @@
-import { IconButton } from '@hypothesis/frontend-shared';
+import {
+  IconButton,
+  EditIcon,
+  FlagIcon,
+  FlagFilledIcon,
+  ReplyIcon,
+  TrashIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 import { confirm } from '../../../shared/prompts';
 import { serviceConfig } from '../../config/service-config';
@@ -115,12 +122,12 @@ function AnnotationActionBar({
   return (
     <div className="flex text-xl" data-testid="annotation-action-bar">
       {showEditAction && (
-        <IconButton icon="edit" title="Edit" onClick={onEdit} />
+        <IconButton icon={EditIcon} title="Edit" onClick={onEdit} />
       )}
       {showDeleteAction && (
-        <IconButton icon="trash" title="Delete" onClick={onDelete} />
+        <IconButton icon={TrashIcon} title="Delete" onClick={onDelete} />
       )}
-      <IconButton icon="reply" title="Reply" onClick={onReplyClick} />
+      <IconButton icon={ReplyIcon} title="Reply" onClick={onReplyClick} />
       {shareLink && (
         <AnnotationShareControl
           annotation={annotation}
@@ -130,7 +137,7 @@ function AnnotationActionBar({
       )}
       {showFlagAction && !annotation.flagged && (
         <IconButton
-          icon="flag"
+          icon={FlagIcon}
           title="Report this annotation to moderators"
           onClick={onFlag}
         />
@@ -138,7 +145,7 @@ function AnnotationActionBar({
       {showFlagAction && annotation.flagged && (
         <IconButton
           pressed={true}
-          icon="flag--active"
+          icon={FlagFilledIcon}
           title="Annotation has been reported to the moderators"
         />
       )}

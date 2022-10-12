@@ -52,7 +52,9 @@ describe('AnnotationActionBar', () => {
   };
 
   const getButton = (wrapper, iconName) => {
-    return wrapper.find('IconButton').filter({ icon: iconName });
+    return wrapper
+      .find('IconButton')
+      .filterWhere(n => n.find(iconName).exists());
   };
 
   beforeEach(() => {
@@ -109,13 +111,12 @@ describe('AnnotationActionBar', () => {
     it('shows edit button if permissions allow', () => {
       allowOnly('update');
       const wrapper = createComponent();
-
-      assert.isTrue(getButton(wrapper, 'edit').exists());
+      assert.isTrue(getButton(wrapper, 'EditIcon').exists());
     });
 
     it('creates a new draft when `Edit` button clicked', () => {
       allowOnly('update');
-      const button = getButton(createComponent(), 'edit');
+      const button = getButton(createComponent(), 'EditIcon');
 
       button.props().onClick();
 
@@ -134,7 +135,7 @@ describe('AnnotationActionBar', () => {
 
       const wrapper = createComponent();
 
-      assert.isFalse(getButton(wrapper, 'edit').exists());
+      assert.isFalse(getButton(wrapper, 'EditIcon').exists());
     });
   });
 
@@ -143,12 +144,12 @@ describe('AnnotationActionBar', () => {
       allowOnly('delete');
       const wrapper = createComponent();
 
-      assert.isTrue(getButton(wrapper, 'trash').exists());
+      assert.isTrue(getButton(wrapper, 'TrashIcon').exists());
     });
 
     it('asks for confirmation before deletion', async () => {
       allowOnly('delete');
-      const button = getButton(createComponent(), 'trash');
+      const button = getButton(createComponent(), 'TrashIcon');
 
       await act(async () => {
         await button.props().onClick();
@@ -161,7 +162,7 @@ describe('AnnotationActionBar', () => {
     it('invokes delete on service when confirmed', async () => {
       allowOnly('delete');
       fakeConfirm.resolves(true);
-      const button = getButton(createComponent(), 'trash');
+      const button = getButton(createComponent(), 'TrashIcon');
 
       await act(async () => {
         await button.props().onClick();
@@ -173,7 +174,7 @@ describe('AnnotationActionBar', () => {
     it('sets a visually-hidden message when deletion succeeds', async () => {
       allowOnly('delete');
       fakeConfirm.resolves(true);
-      const button = getButton(createComponent(), 'trash');
+      const button = getButton(createComponent(), 'TrashIcon');
 
       await act(async () => {
         await button.props().onClick();
@@ -192,7 +193,7 @@ describe('AnnotationActionBar', () => {
       fakeConfirm.resolves(true);
       fakeAnnotationsService.delete.rejects();
 
-      const button = getButton(createComponent(), 'trash');
+      const button = getButton(createComponent(), 'TrashIcon');
       await act(async () => {
         await button.props().onClick();
       });
@@ -207,7 +208,7 @@ describe('AnnotationActionBar', () => {
 
       const wrapper = createComponent();
 
-      assert.isFalse(getButton(wrapper, 'trash').exists());
+      assert.isFalse(getButton(wrapper, 'TrashIcon').exists());
     });
   });
 
@@ -215,13 +216,13 @@ describe('AnnotationActionBar', () => {
     it('shows the reply button (in all cases)', () => {
       const wrapper = createComponent();
 
-      assert.isTrue(getButton(wrapper, 'reply').exists());
+      assert.isTrue(getButton(wrapper, 'ReplyIcon').exists());
     });
 
     describe('when clicked', () => {
       it('shows login prompt if user is not logged in', () => {
         fakeStore.isLoggedIn.returns(false);
-        const button = getButton(createComponent(), 'reply');
+        const button = getButton(createComponent(), 'ReplyIcon');
 
         act(() => {
           button.props().onClick();
@@ -233,7 +234,7 @@ describe('AnnotationActionBar', () => {
 
       it('invokes `onReply` callback if user is logged in', () => {
         fakeStore.isLoggedIn.returns(true);
-        const button = getButton(createComponent(), 'reply');
+        const button = getButton(createComponent(), 'ReplyIcon');
 
         act(() => {
           button.props().onClick();
@@ -275,7 +276,7 @@ describe('AnnotationActionBar', () => {
 
       const wrapper = createComponent();
 
-      assert.isFalse(getButton(wrapper, 'flag').exists());
+      assert.isFalse(getButton(wrapper, 'FlagIcon').exists());
     });
 
     it('hides flag button if user is author', () => {
@@ -283,24 +284,24 @@ describe('AnnotationActionBar', () => {
 
       const wrapper = createComponent();
 
-      assert.isFalse(getButton(wrapper, 'flag').exists());
+      assert.isFalse(getButton(wrapper, 'FlagIcon').exists());
     });
 
     it('hides flag button if flagging is disabled in the settings', () => {
       fakeSettings = { services: [{ allowFlagging: false }] };
       const wrapper = createComponent();
 
-      assert.isFalse(getButton(wrapper, 'flag').exists());
+      assert.isFalse(getButton(wrapper, 'FlagIcon').exists());
     });
 
     it('shows flag button if user is not author', () => {
       const wrapper = createComponent();
 
-      assert.isTrue(getButton(wrapper, 'flag').exists());
+      assert.isTrue(getButton(wrapper, 'FlagIcon').exists());
     });
 
     it('invokes flag on service when clicked', () => {
-      const button = getButton(createComponent(), 'flag');
+      const button = getButton(createComponent(), 'FlagIcon');
 
       act(() => {
         button.props().onClick();
@@ -312,7 +313,7 @@ describe('AnnotationActionBar', () => {
     it('sets flash error message if flagging fails on service', async () => {
       fakeAnnotationsService.flag.rejects();
 
-      const button = getButton(createComponent(), 'flag');
+      const button = getButton(createComponent(), 'FlagIcon');
 
       act(() => {
         button.props().onClick();
@@ -329,11 +330,11 @@ describe('AnnotationActionBar', () => {
       it('renders an active-state flag action button', () => {
         const wrapper = createComponent();
 
-        assert.isTrue(getButton(wrapper, 'flag--active').exists());
+        assert.isTrue(getButton(wrapper, 'FlagFilledIcon').exists());
       });
 
       it('does not set an `onClick` property for the flag action button', () => {
-        const button = getButton(createComponent(), 'flag--active');
+        const button = getButton(createComponent(), 'FlagFilledIcon');
 
         assert.isUndefined(button.props().onClick);
       });
