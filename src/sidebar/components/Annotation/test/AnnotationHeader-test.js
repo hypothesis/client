@@ -96,7 +96,7 @@ describe('AnnotationHeader', () => {
 
       const wrapper = createAnnotationHeader();
 
-      assert.isTrue(wrapper.find('Icon').filter({ name: 'lock' }).exists());
+      assert.isTrue(wrapper.find('LockIcon').exists());
     });
 
     it('should not render an "Only Me" icon if the annotation is being edited', () => {
@@ -104,7 +104,7 @@ describe('AnnotationHeader', () => {
 
       const wrapper = createAnnotationHeader({ isEditing: true });
 
-      assert.isFalse(wrapper.find('Icon').filter({ name: 'lock' }).exists());
+      assert.isFalse(wrapper.find('LockIcon').exists());
     });
 
     it('should not render an "Only Me" icon if the annotation is not private', () => {
@@ -303,9 +303,8 @@ describe('AnnotationHeader', () => {
         const wrapper = createAnnotationHeader({
           isEditing: false,
         });
-        const highlightIcon = wrapper.find('Icon[name="highlight"]');
 
-        assert.isTrue(highlightIcon.exists());
+        assert.isTrue(wrapper.find('HighlightIcon').exists());
       });
 
       it('should not display the is-highlight icon if annotation is not a highlight', () => {
@@ -313,9 +312,8 @@ describe('AnnotationHeader', () => {
         const wrapper = createAnnotationHeader({
           isEditing: false,
         });
-        const highlightIcon = wrapper.find('Icon[name="highlight"]');
 
-        assert.isFalse(highlightIcon.exists());
+        assert.isFalse(wrapper.find('HighlightIcon').exists());
       });
     });
 

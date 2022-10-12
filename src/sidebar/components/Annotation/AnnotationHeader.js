@@ -1,4 +1,8 @@
-import { Icon, LinkButton } from '@hypothesis/frontend-shared';
+import {
+  LinkButton,
+  HighlightIcon,
+  LockIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import { useMemo } from 'preact/hooks';
 
 import { withServices } from '../../service-context';
@@ -116,15 +120,19 @@ function AnnotationHeader({
     <header>
       <HeaderRow>
         {isPrivate(annotation.permissions) && !isEditing && (
-          <Icon
-            classes="text-tiny"
-            name="lock"
+          <LockIcon
+            className="text-tiny w-em h-em"
             title="This annotation is visible only to you"
           />
         )}
         <AnnotationUser authorLink={authorLink} displayName={authorName} />
         {replyCount > 0 && isCollapsedReply && (
-          <LinkButton onClick={onReplyCountClick} title="Expand replies">
+          <LinkButton
+            color="text-light"
+            onClick={onReplyCountClick}
+            title="Expand replies"
+            underline="hover"
+          >
             {`${replyCount} ${replyCount > 1 ? 'replies' : 'reply'}`}
           </LinkButton>
         )}
@@ -150,10 +158,9 @@ function AnnotationHeader({
             />
           )}
           {!isEditing && isHighlight(annotation) && (
-            <Icon
-              name="highlight"
+            <HighlightIcon
               title="This is a highlight. Click 'edit' to add a note or tag."
-              classes="text-tiny text-color-text-light"
+              className="text-tiny w-em h-em text-color-text-light"
             />
           )}
           {showDocumentInfo && (
