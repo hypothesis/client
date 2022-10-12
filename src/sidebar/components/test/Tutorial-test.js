@@ -43,17 +43,21 @@ describe('Tutorial', () => {
   });
 
   [
-    { iconName: 'annotate', commandName: 'Annotate' },
-    { iconName: 'highlight', commandName: 'Highlight' },
-    { iconName: 'reply', commandName: 'Reply' },
+    { iconName: 'AnnotateIcon', commandName: 'Annotate' },
+    { iconName: 'HighlightIcon', commandName: 'Highlight' },
+    { iconName: 'ReplyIcon', commandName: 'Reply' },
   ].forEach(testCase => {
-    it(`renders expected ${testCase.commandName} TutorialInstruction`, () => {
+    it(`renders expected ${testCase.commandName} Tutorial instruction`, () => {
       const wrapper = createComponent();
-      const instruction = wrapper.find('TutorialInstruction').filter({
-        iconName: testCase.iconName,
-        commandName: testCase.commandName,
-      });
+      const instruction = wrapper
+        .find('[data-testid="instruction"]')
+        .filterWhere(n => n.find(testCase.iconName).exists());
+
       assert.isTrue(instruction.exists());
+      assert.equal(
+        instruction.find('[data-testid="command-name"]').text(),
+        testCase.commandName
+      );
     });
   });
 
