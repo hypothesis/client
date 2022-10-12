@@ -1,10 +1,12 @@
+import { useElementShouldClose } from '@hypothesis/frontend-shared';
 import {
   Card,
   IconButton,
-  TextInput,
-  TextInputWithButton,
-  useElementShouldClose,
-} from '@hypothesis/frontend-shared';
+  Input,
+  InputGroup,
+  CopyIcon,
+  ShareIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
@@ -127,70 +129,70 @@ function AnnotationShareControl({
   return (
     <div className="relative" ref={shareRef}>
       <IconButton
-        icon="share"
+        icon={ShareIcon}
         title="Share"
         onClick={toggleSharePanel}
         expanded={isOpen}
       />
       {isOpen && (
-        <Card
-          classes={classnames(
-            // Prefer width 96 (24rem) but ensure that component isn't wider
-            // than 85vw
-            'w-96 max-w-[85vw]',
-            // Position this Card above its IconButton. Account for larger
-            // IconButtons in touch interfaces
-            'absolute bottom-8 right-1 touch:bottom-touch-minimum',
-            'space-y-2 p-2',
-            // Cards do not have a border in the clean theme. Turn it back on.
-            'theme-clean:border theme-clean:border-solid theme-clean:border-grey-3'
-          )}
+        <div
+          // Position this Card above its IconButton. Account for larger
+          // IconButtons in touch interfaces
+          className="absolute bottom-8 right-1 touch:bottom-touch-minimum"
         >
-          <div className="flex items-center">
+          <Card
+            classes={classnames(
+              // Prefer width 96 (24rem) but ensure that component isn't wider
+              // than 85vw
+              'w-96 max-w-[85vw]',
+              'space-y-2 p-2'
+            )}
+            width="custom"
+          >
             <h2 className="text-brand text-lg font-medium">
               Share this annotation
             </h2>
-          </div>
-          <div
-            className={classnames(
-              // Slightly larger font size for touch devices to correspond with
-              // larger button and input sizes
-              'flex w-full text-sm touch:text-base'
-            )}
-          >
-            <TextInputWithButton>
-              <TextInput
-                aria-label="Use this URL to share this annotation"
-                type="text"
-                value={shareUri}
-                readOnly
-                inputRef={inputRef}
-              />
-              <IconButton
-                icon="copy"
-                title="Copy share link to clipboard"
-                onClick={copyShareLink}
-                variant="dark"
-              />
-            </TextInputWithButton>
-          </div>
-          <div className="text-base font-normal" data-testid="share-details">
-            {inContextAvailable ? (
-              <>{annotationSharingInfo}</>
-            ) : (
-              <>
-                This annotation cannot be shared in its original context because
-                it was made on a document that is not available on the web. This
-                link shares the annotation by itself.
-              </>
-            )}
-          </div>
-          {showShareLinks && <ShareLinks shareURI={shareUri} />}
-          <MenuArrow
-            direction="down"
-            classes="bottom-[-9px] right-1 touch:right-[9px]"
-          />
-        </Card>
+            <div
+              className={classnames(
+                // Slightly larger font size for touch devices to correspond with
+                // larger button and input sizes
+                'flex w-full text-sm touch:text-base'
+              )}
+            >
+              <InputGroup>
+                <Input
+                  aria-label="Use this URL to share this annotation"
+                  type="text"
+                  value={shareUri}
+                  readOnly
+                  elementRef={inputRef}
+                />
+                <IconButton
+                  icon={CopyIcon}
+                  title="Copy share link to clipboard"
+                  onClick={copyShareLink}
+                  variant="dark"
+                />
+              </InputGroup>
+            </div>
+            <div className="text-base font-normal" data-testid="share-details">
+              {inContextAvailable ? (
+                <>{annotationSharingInfo}</>
+              ) : (
+                <>
+                  This annotation cannot be shared in its original context
+                  because it was made on a document that is not available on the
+                  web. This link shares the annotation by itself.
+                </>
+              )}
+            </div>
+            {showShareLinks && <ShareLinks shareURI={shareUri} />}
+            <MenuArrow
+              direction="down"
+              classes="bottom-[-8px] right-1 touch:right-[9px]"
+            />
+          </Card>
+        </div>
       )}
     </div>
   );
