@@ -1,5 +1,6 @@
 import classnames from 'classnames';
-import { Icon, useElementShouldClose } from '@hypothesis/frontend-shared';
+import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import { MenuExpandIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import MenuArrow from './MenuArrow';
@@ -194,7 +195,7 @@ export default function Menu({
                 'rotate-180 text-color-text': isOpen,
               })}
             >
-              <Icon name="expand-menu" classes="w-2.5 h-2.5" />
+              <MenuExpandIcon className="w-2.5 h-2.5" />
             </span>
           )}
         </span>
