@@ -19,7 +19,9 @@ describe('AnnotationShareControl', () => {
   let container;
 
   const getIconButton = (wrapper, iconName) => {
-    return wrapper.find('IconButton').filter({ icon: iconName });
+    return wrapper
+      .find('IconButton')
+      .filterWhere(n => n.find(iconName).exists());
   };
 
   function createComponent(props = {}) {
@@ -111,7 +113,7 @@ describe('AnnotationShareControl', () => {
 
   it('toggles the share control element when the button is clicked', () => {
     const wrapper = createComponent();
-    const button = getIconButton(wrapper, 'share');
+    const button = getIconButton(wrapper, 'ShareIcon');
 
     act(() => {
       button.props().onClick();
@@ -135,7 +137,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getIconButton(wrapper, 'copy').props().onClick();
+      getIconButton(wrapper, 'CopyIcon').props().onClick();
 
       assert.calledWith(
         fakeCopyToClipboard.copyText,
@@ -147,7 +149,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getIconButton(wrapper, 'copy').props().onClick();
+      getIconButton(wrapper, 'CopyIcon').props().onClick();
 
       assert.calledWith(
         fakeToastMessenger.success,
@@ -160,7 +162,7 @@ describe('AnnotationShareControl', () => {
       const wrapper = createComponent();
       openElement(wrapper);
 
-      getIconButton(wrapper, 'copy').props().onClick();
+      getIconButton(wrapper, 'CopyIcon').props().onClick();
 
       assert.calledWith(fakeToastMessenger.error, 'Unable to copy link');
     });
