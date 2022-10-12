@@ -1,4 +1,4 @@
-import { IconButton } from '@hypothesis/frontend-shared';
+import { IconButton, CancelIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import classnames from 'classnames';
 
@@ -126,7 +126,7 @@ export default function NotebookModal({ eventBus, config }) {
       <div className="relative w-full h-full" data-testid="notebook-inner">
         <div className="absolute right-0 text-xl m-3">
           <IconButton
-            icon="cancel"
+            icon={CancelIcon}
             title="Close the Notebook"
             onClick={onClose}
             variant="dark"
