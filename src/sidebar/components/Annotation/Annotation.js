@@ -1,4 +1,4 @@
-import { Actions, Spinner } from '@hypothesis/frontend-shared';
+import { CardActions, Spinner } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
@@ -45,15 +45,13 @@ function SavingMessage() {
       )}
       data-testid="saving-message"
     >
-      <Spinner
-        classes={classnames(
-          'text-xl',
-          // Slowly fade in the Spinner such that it only shows up if
-          // the saving is slow
-          'animate-fade-in-slow'
-        )}
-        size="small"
-      />
+      <span
+        // Slowly fade in the Spinner such that it only shows up if the saving
+        // is slow
+        className="text-xl animate-fade-in-slow"
+      >
+        <Spinner size="sm" />
+      </span>
       <div className="text-color-text-light font-medium">Saving...</div>
     </div>
   );
@@ -141,9 +139,9 @@ function Annotation({
           )}
           {isSaving && <SavingMessage />}
           {showActions && (
-            <Actions classes="grow">
+            <CardActions classes="grow">
               <AnnotationActionBar annotation={annotation} onReply={onReply} />
-            </Actions>
+            </CardActions>
           )}
         </footer>
       )}
