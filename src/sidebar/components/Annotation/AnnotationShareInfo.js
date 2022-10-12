@@ -1,5 +1,8 @@
-import { Icon, Link } from '@hypothesis/frontend-shared';
-import classnames from 'classnames';
+import {
+  LinkBase,
+  GlobeIcon,
+  GroupsIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 /**
  * @typedef {import("../../../types/api").Group} Group
@@ -25,17 +28,20 @@ function AnnotationShareInfo({ group, isPrivate }) {
   return (
     <>
       {group && linkToGroup && (
-        <Link
-          classes={classnames('flex items-baseline gap-x-1', 'p-muted-link')}
+        <LinkBase
+          // The light-text hover color is not a standard color for a Link, so
+          // LinkBase is used here
+          classes="text-color-text-light hover:text-color-text-light hover:underline flex items-baseline gap-x-1"
           href={group.links.html}
           target="_blank"
         >
-          <Icon
-            classes="text-tiny"
-            name={group.type === 'open' ? 'public' : 'groups'}
-          />
+          {group.type === 'open' ? (
+            <GlobeIcon className="w-2.5 h-2.5" />
+          ) : (
+            <GroupsIcon className="w-2.5 h-2.5" />
+          )}
           <span>{group.name}</span>
-        </Link>
+        </LinkBase>
       )}
       {isPrivate && !linkToGroup && (
         <div className="text-color-text-light" data-testid="private-info">

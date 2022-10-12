@@ -41,18 +41,14 @@ describe('AnnotationShareInfo', () => {
     it('should display a group icon for private and restricted groups', () => {
       const wrapper = createAnnotationShareInfo();
 
-      const groupIcon = wrapper.find('Icon[name="groups"]');
-
-      assert.isTrue(groupIcon.exists());
+      assert.isTrue(wrapper.find('GroupsIcon').exists());
     });
 
     it('should display a public/world icon for open groups', () => {
       fakeGroup.type = 'open';
       const wrapper = createAnnotationShareInfo();
 
-      const groupIcon = wrapper.find('Icon[name="public"]');
-
-      assert.isTrue(groupIcon.exists());
+      assert.isTrue(wrapper.find('GlobeIcon').exists());
     });
 
     it('should not show a link to third-party groups', () => {
