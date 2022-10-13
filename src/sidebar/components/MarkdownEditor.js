@@ -1,9 +1,20 @@
 import {
-  Icon,
+  ButtonBase,
   IconButton,
-  LabeledButton,
-  Link,
-} from '@hypothesis/frontend-shared';
+  LinkBase,
+} from '@hypothesis/frontend-shared/lib/next';
+import {
+  EditorLatexIcon,
+  EditorQuoteIcon,
+  EditorTextBoldIcon,
+  EditorTextItalicIcon,
+  HelpIcon,
+  ImageIcon,
+  LinkIcon,
+  ListOrderedIcon,
+  ListUnorderedIcon,
+} from '@hypothesis/frontend-shared/lib/next';
+
 import classnames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
@@ -24,7 +35,7 @@ import MarkdownView from './MarkdownView';
  */
 
 /**
- * @typedef {import("@hypothesis/frontend-shared/lib/components/Link").LinkProps} LinkProps
+ * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
  * @typedef {import('preact').JSX.HTMLAttributes<HTMLTextAreaElement>} TextAreaAttributes
  * @typedef {import('../markdown-commands').EditorState} EditorState
  */
@@ -131,32 +142,9 @@ function handleToolbarCommand(command, inputEl) {
 }
 
 /**
- * Style a Link to look like an IconButton, including touch sizing
- * affordances.
- *
- * @param {Omit<LinkProps, 'children'> & { icon: string }} props
- */
-function IconLink({ classes, icon, linkRef, ...restProps }) {
-  return (
-    <Link
-      classes={classnames(
-        'flex justify-center items-center',
-        'text-grey-7 hover:!text-grey-7',
-        'touch:h-touch-minimum touch:w-touch-minimum',
-        classes
-      )}
-      linkRef={linkRef}
-      {...restProps}
-    >
-      <Icon classes="text-tiny touch:text-base" name={icon} />
-    </Link>
-  );
-}
-
-/**
  * @typedef ToolbarButtonProps
  * @prop {boolean} [disabled]
- * @prop {string} [iconName]
+ * @prop {IconComponent} [icon]
  * @prop {string} [label]
  * @prop {(e: MouseEvent) => void} onClick
  * @prop {string} [shortcutKey]
@@ -166,7 +154,7 @@ function IconLink({ classes, icon, linkRef, ...restProps }) {
 /** @param {ToolbarButtonProps} props */
 function ToolbarButton({
   disabled = false,
-  iconName = '',
+  icon,
   label,
   onClick,
   shortcutKey,
@@ -181,24 +169,19 @@ function ToolbarButton({
 
   const buttonProps = {
     disabled,
-    icon: iconName,
+    icon,
     onClick,
     title: tooltip,
   };
 
   if (label) {
     return (
-      <LabeledButton
-        classes={classnames(
-          'font-normal bg-transparent',
-          // TODO: Refactor shared button styles to reduce specificity and make
-          // this !important rule unnecessary
-          'hover:!bg-transparent'
-        )}
+      <ButtonBase
+        classes="text-grey-7 hover:text-grey-9 p-1.5"
         {...buttonProps}
       >
         {label}
-      </LabeledButton>
+      </ButtonBase>
     );
   }
   return (
@@ -266,72 +249,75 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
     >
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="format-bold"
+        icon={EditorTextBoldIcon}
         onClick={() => onCommand('bold')}
         shortcutKey={SHORTCUT_KEYS.bold}
         title="Bold"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="format-italic"
+        icon={EditorTextItalicIcon}
         onClick={() => onCommand('italic')}
         shortcutKey={SHORTCUT_KEYS.italic}
         title="Italic"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="format-quote"
+        icon={EditorQuoteIcon}
         onClick={() => onCommand('quote')}
         shortcutKey={SHORTCUT_KEYS.quote}
         title="Quote"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="link"
+        icon={LinkIcon}
         onClick={() => onCommand('link')}
         shortcutKey={SHORTCUT_KEYS.link}
         title="Insert link"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="image"
+        icon={ImageIcon}
         onClick={() => onCommand('image')}
         shortcutKey={SHORTCUT_KEYS.image}
         title="Insert image"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="format-functions"
+        icon={EditorLatexIcon}
         onClick={() => onCommand('math')}
         title="Insert math (LaTeX is supported)"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="format-list-numbered"
+        icon={ListOrderedIcon}
         onClick={() => onCommand('numlist')}
         shortcutKey={SHORTCUT_KEYS.numlist}
         title="Numbered list"
       />
       <ToolbarButton
         disabled={isPreviewing}
-        iconName="format-list-unordered"
+        icon={ListUnorderedIcon}
         onClick={() => onCommand('list')}
         shortcutKey={SHORTCUT_KEYS.list}
         title="Bulleted list"
       />
       <div className="grow flex justify-end">
-        <IconLink
+        <LinkBase
           classes={classnames(
-            // Adjust padding to make element a little taller than wide
-            // This matches ToolbarButton styling
+            'flex justify-center items-center',
+            'text-grey-7 hover:!text-grey-7',
+            'touch:h-touch-minimum touch:w-touch-minimum',
             'px-2 py-2.5'
           )}
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
-          icon="help"
           target="_blank"
           title="Formatting help"
           aria-label="Formatting help"
-        />
+        >
+          <HelpIcon className="w-2.5 h-2.5" />
+        </LinkBase>
+
         <ToolbarButton
           label={isPreviewing ? 'Write' : 'Preview'}
           onClick={onTogglePreview}
