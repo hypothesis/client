@@ -1,4 +1,5 @@
-import { useElementShouldClose, TextInput } from '@hypothesis/frontend-shared';
+import { useElementShouldClose } from '@hypothesis/frontend-shared';
+import { Input } from '@hypothesis/frontend-shared/lib/next';
 import { useRef, useState } from 'preact/hooks';
 
 import { withServices } from '../service-context';
@@ -284,12 +285,11 @@ function TagEditor({
         aria-owns={`${tagEditorId}-AutocompleteList`}
         aria-haspopup="listbox"
       >
-        <TextInput
-          classes="w-full"
+        <Input
           onInput={handleOnInput}
           onKeyDown={handleKeyDown}
           onFocus={handleFocus}
-          inputRef={inputEl}
+          elementRef={inputEl}
           placeholder="Add new tags"
           type="text"
           autoComplete="off"
