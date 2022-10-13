@@ -1,4 +1,10 @@
-import { IconButton, LinkButton } from '@hypothesis/frontend-shared';
+import {
+  IconButton,
+  LinkButton,
+  HelpIcon,
+  RefreshIcon,
+  ShareIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import { serviceConfig } from '../config/service-config';
@@ -91,7 +97,7 @@ function TopBar({
         className={classnames(
           'container flex items-center h-full',
           // Text sizing will size icons in buttons correctly
-          'text-xl'
+          'text-[16px]'
         )}
         data-testid="top-bar-content"
       >
@@ -101,9 +107,9 @@ function TopBar({
             <>
               {pendingUpdateCount > 0 && (
                 <IconButton
-                  icon="refresh"
+                  icon={RefreshIcon}
                   onClick={applyPendingUpdates}
-                  size="small"
+                  size="xs"
                   variant="primary"
                   title={`Show ${pendingUpdateCount} new/updated ${
                     pendingUpdateCount === 1 ? 'annotation' : 'annotations'
@@ -117,20 +123,20 @@ function TopBar({
               <SortMenu />
               {showSharePageButton && (
                 <IconButton
-                  icon="share"
+                  icon={ShareIcon}
                   expanded={isAnnotationsPanelOpen}
                   onClick={toggleSharePanel}
-                  size="small"
+                  size="xs"
                   title="Share annotations on this page"
                 />
               )}
             </>
           )}
           <IconButton
-            icon="help"
+            icon={HelpIcon}
             expanded={isHelpPanelOpen}
             onClick={requestHelp}
-            size="small"
+            size="xs"
             title="Help"
           />
           {isLoggedIn ? (
@@ -147,7 +153,6 @@ function TopBar({
                     classes="inline"
                     onClick={onSignUp}
                     style={loginLinkStyle}
-                    variant="primary"
                   >
                     Sign up
                   </LinkButton>
@@ -156,7 +161,6 @@ function TopBar({
                     classes="inline"
                     onClick={onLogin}
                     style={loginLinkStyle}
-                    variant="primary"
                   >
                     Log in
                   </LinkButton>
