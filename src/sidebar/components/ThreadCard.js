@@ -1,5 +1,4 @@
-import { Card } from '@hypothesis/frontend-shared';
-import classnames from 'classnames';
+import { Card, CardContent } from '@hypothesis/frontend-shared/lib/next';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 
@@ -75,9 +74,8 @@ function ThreadCard({ frameSync, thread }) {
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <Card
-      classes={classnames('p-3 cursor-pointer focus-visible-ring', {
-        'is-hovered': isHovered,
-      })}
+      active={!!isHovered}
+      classes="cursor-pointer focus-visible-ring theme-clean:border-none"
       data-testid="thread-card"
       elementRef={cardRef}
       tabIndex={-1}
@@ -95,7 +93,7 @@ function ThreadCard({ frameSync, thread }) {
       onMouseLeave={() => focusThreadAnnotation(null)}
       key={thread.id}
     >
-      {threadContent}
+      <CardContent>{threadContent}</CardContent>
     </Card>
   );
 }
