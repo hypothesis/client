@@ -1,4 +1,9 @@
-import { IconButton, Spinner, TextInput } from '@hypothesis/frontend-shared';
+import {
+  IconButton,
+  Input,
+  SearchIcon,
+  Spinner,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useCallback, useRef, useState } from 'preact/hooks';
 
@@ -132,7 +137,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
       name="searchForm"
       onSubmit={onSubmit}
     >
-      <TextInput
+      <Input
         aria-label="Search"
         classes={classnames(
           // This element is ordered second in the flex layout (appears to the
@@ -169,7 +174,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         name="query"
         placeholder={(isLoading && 'Loading…') || 'Search…'}
         disabled={isLoading}
-        inputRef={input}
+        elementRef={input}
         value={pendingQuery || ''}
         onInput={e =>
           setPendingQuery(/** @type {HTMLInputElement} */ (e.target).value)
@@ -178,15 +183,15 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
       {!isLoading && (
         <div className="order-0">
           <IconButton
-            icon="search"
+            icon={SearchIcon}
             onClick={() => input.current?.focus()}
-            size="small"
+            size="xs"
             title="Search annotations"
           />
         </div>
       )}
 
-      {isLoading && <Spinner size="small" />}
+      {isLoading && <Spinner />}
     </form>
   );
 }
