@@ -1,4 +1,4 @@
-import { Icon, Link } from '@hypothesis/frontend-shared';
+import { Link, CancelIcon } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 /**
@@ -20,7 +20,7 @@ export default function TagListItem({ href, onRemoveTag, tag }) {
       <div className="grow px-1.5 py-1 touch:p-2">
         {href ? (
           <Link
-            classes="text-color-text-light hover:text-brand"
+            color="text-light"
             href={href}
             lang=""
             target="_blank"
@@ -58,7 +58,7 @@ export default function TagListItem({ href, onRemoveTag, tag }) {
           }}
           title={`Remove tag: ${tag}`}
         >
-          <Icon classes="font-base" name="cancel" title={`Remove ${tag}`} />
+          <CancelIcon className="font-base w-em h-em" title={`Remove ${tag}`} />
         </button>
       )}
     </li>
