@@ -1,4 +1,8 @@
-import { Icon, LabeledButton } from '@hypothesis/frontend-shared';
+import {
+  ButtonBase,
+  FlagIcon,
+  HideIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import { useSidebarStore } from '../store';
@@ -88,7 +92,11 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
           'bg-grey-6': annotation.hidden,
         })}
       >
-        <Icon name={annotation.hidden ? 'hide' : 'flag'} />
+        {annotation.hidden ? (
+          <HideIcon className="w-em h-em" />
+        ) : (
+          <FlagIcon className="w-em h-em" />
+        )}
       </div>
       <div className="self-center grow">
         {!annotation.hidden && (
@@ -100,18 +108,21 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
         {annotation.hidden && <span>Hidden from users</span>}
       </div>
       <div className="self-center pr-2">
-        <LabeledButton
-          classes="py-1 bg-slate-1"
+        <ButtonBase
+          classes={classnames(
+            'px-1.5 py-1 bg-slate-1 text-grey-7 bg-grey-2',
+            'enabled:hover:text-grey-9 enabled:hover:bg-grey-3 disabled:text-grey-5',
+            'aria-pressed:bg-grey-3 aria-expanded:bg-grey-3'
+          )}
           onClick={annotation.hidden ? unhideAnnotation : hideAnnotation}
           title={
             annotation.hidden
               ? 'Make this annotation visible to everyone'
               : 'Hide this annotationn from non-moderators'
           }
-          variant="dark"
         >
           {annotation.hidden ? 'Unhide' : 'Hide'}
-        </LabeledButton>
+        </ButtonBase>
       </div>
     </div>
   );
