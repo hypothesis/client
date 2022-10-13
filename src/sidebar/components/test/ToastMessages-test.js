@@ -133,12 +133,12 @@ describe('ToastMessages', () => {
     });
 
     [
-      { messages: [fakeSuccessMessage()], icons: ['success'] },
-      { messages: [fakeErrorMessage()], icons: ['error'] },
-      { messages: [fakeNoticeMessage()], icons: ['cancel'] },
+      { messages: [fakeSuccessMessage()], icons: ['CheckIcon'] },
+      { messages: [fakeErrorMessage()], icons: ['CancelIcon'] },
+      { messages: [fakeNoticeMessage()], icons: ['CautionIcon'] },
       {
         messages: [fakeSuccessMessage(), fakeErrorMessage()],
-        icons: ['success', 'error'],
+        icons: ['CheckIcon', 'CancelIcon'],
       },
     ].forEach(testCase => {
       it('should render an appropriate icon for the message type', () => {
@@ -146,11 +146,9 @@ describe('ToastMessages', () => {
 
         const wrapper = createComponent();
 
-        const iconProps = wrapper
-          .find('Icon')
-          .map(iconWrapper => iconWrapper.props().name);
-
-        assert.deepEqual(iconProps, testCase.icons);
+        testCase.icons.forEach(iconName => {
+          assert.isTrue(wrapper.find(iconName).exists());
+        });
       });
     });
   });

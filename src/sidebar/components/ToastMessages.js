@@ -1,5 +1,11 @@
 import classnames from 'classnames';
-import { Card, Icon, Link } from '@hypothesis/frontend-shared';
+import {
+  Card,
+  Link,
+  CancelIcon,
+  CautionIcon,
+  CheckIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
@@ -31,7 +37,20 @@ function ToastMessage({ message, onDismiss }) {
     message.type !== 'notice'
       ? `${message.type.charAt(0).toUpperCase() + message.type.slice(1)}: `
       : '';
-  const iconName = message.type === 'notice' ? 'cancel' : message.type;
+
+  let Icon;
+  switch (message.type) {
+    case 'success':
+      Icon = CheckIcon;
+      break;
+    case 'error':
+      Icon = CancelIcon;
+      break;
+    case 'notice':
+    default:
+      Icon = CautionIcon;
+      break;
+  }
   /**
    * a11y linting is disabled here: There is a click-to-remove handler on a
    * non-interactive element. This allows sighted users to get the toast message
@@ -43,7 +62,7 @@ function ToastMessage({ message, onDismiss }) {
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */
     <Card
-      classes={classnames('p-0 flex border', {
+      classes={classnames('flex', {
         'sr-only': message.visuallyHidden,
         'border-red-error': message.type === 'error',
         'border-yellow-notice': message.type === 'notice',
@@ -59,21 +78,13 @@ function ToastMessage({ message, onDismiss }) {
         })}
       >
         <Icon
-          name={iconName}
-          classes={classnames(
+          className={classnames(
             // Adjust alignment of icon to appear more aligned with text
             'mt-[2px]'
           )}
         />
       </div>
-      <div
-        className={classnames(
-          // TODO: After re-factoring of Card styling, `mt-0` should not need
-          // !important
-          'grow p-3 !mt-0'
-        )}
-        data-testid="toast-message-text"
-      >
+      <div className="grow p-3" data-testid="toast-message-text">
         <strong>{prefix}</strong>
         {message.message}
         {message.moreInfoURL && (
