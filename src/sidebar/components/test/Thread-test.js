@@ -115,7 +115,7 @@ describe('Thread', () => {
 
     // Retrieve the (caret) button for showing and hiding replies
     const getToggleButton = wrapper => {
-      return wrapper.find('IconButton');
+      return wrapper.find('button[data-testid="toggle-button"]');
     };
 
     beforeEach(() => {
@@ -209,9 +209,7 @@ describe('Thread', () => {
       collapsedThread.parent = '1';
       const wrapper = createComponent({ thread: collapsedThread });
 
-      assert.isTrue(
-        wrapper.find('IconButton[title="Expand replies"]').exists()
-      );
+      assert.isTrue(wrapper.find('button[title="Expand replies"]').exists());
     });
 
     it('does not render child threads', () => {
@@ -264,7 +262,10 @@ describe('Thread', () => {
       const wrapper = createComponent({ thread });
 
       act(() => {
-        wrapper.find('LabeledButton').props().onClick();
+        wrapper
+          .find('button[data-testid="show-hidden-button"]')
+          .props()
+          .onClick();
       });
 
       assert.calledOnce(fakeThreadsService.forceVisible);
