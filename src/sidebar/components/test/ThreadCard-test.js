@@ -59,12 +59,14 @@ describe('ThreadCard', () => {
     assert(wrapper.find('Thread').props().thread === fakeThread);
   });
 
-  it('applies a hovered CSS class if the annotation thread is hovered', () => {
+  it('sets Card to active if the annotation thread is hovered', () => {
     fakeStore.isAnnotationHovered.returns(true);
 
     const wrapper = createComponent();
 
-    assert.isTrue(wrapper.find(threadCardSelector).hasClass('is-hovered'));
+    assert.isTrue(
+      wrapper.find('Card[data-testid="thread-card"]').props().active
+    );
   });
 
   describe('mouse and click events', () => {
