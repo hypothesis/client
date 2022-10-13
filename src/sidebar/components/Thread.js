@@ -1,4 +1,9 @@
-import { IconButton, LabeledButton } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  ButtonBase,
+  CaretRightIcon,
+  MenuExpandIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useCallback, useMemo } from 'preact/hooks';
 
@@ -23,7 +28,7 @@ import ModerationBanner from './ModerationBanner';
  *   @param {() => void} props.onToggleReplies
  */
 function ThreadCollapseControl({ threadIsCollapsed, onToggleReplies }) {
-  const toggleIcon = threadIsCollapsed ? 'collapsed' : 'expand-menu';
+  const ToggleIcon = threadIsCollapsed ? CaretRightIcon : MenuExpandIcon;
   const toggleTitle = threadIsCollapsed ? 'Expand replies' : 'Collapse replies';
   return (
     <div
@@ -45,20 +50,20 @@ function ThreadCollapseControl({ threadIsCollapsed, onToggleReplies }) {
           'bg-white'
         )}
       >
-        <IconButton
+        <ButtonBase
           classes={classnames(
             // Pull the button up a little to align horizontally with the
             // thread/annotation's header. Override large touch targets for
             // touch interfaces; we need to conserve space here
-            '-mt-1 touch:min-w-[auto] touch:min-h-[auto]'
+            '-mt-1 touch:min-w-[auto] touch:min-h-[auto] p-[6.5px] text-grey-5 hover:text-grey-7'
           )}
+          data-testid="toggle-button"
           expanded={!threadIsCollapsed}
-          icon={toggleIcon}
           title={toggleTitle}
           onClick={onToggleReplies}
-          size="medium"
-          variant="light"
-        />
+        >
+          <ToggleIcon className="w-em h-em" />
+        </ButtonBase>
       </div>
     </div>
   );
@@ -186,11 +191,12 @@ function Thread({ thread, threadsService }) {
               />
             )}
             <div>
-              <LabeledButton
+              <Button
+                data-testid="show-hidden-button"
                 onClick={() => threadsService.forceVisible(thread)}
               >
                 Show {countHidden(thread)} more in conversation
-              </LabeledButton>
+              </Button>
             </div>
           </div>
         )}
