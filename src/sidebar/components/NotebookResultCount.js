@@ -1,4 +1,4 @@
-import { Spinner } from '@hypothesis/frontend-shared';
+import { Spinner } from '@hypothesis/frontend-shared/lib/next';
 
 import { useRootThread } from './hooks/use-root-thread';
 import { countVisible } from '../helpers/thread';
@@ -39,7 +39,7 @@ function NotebookResultCount({
 
   return (
     <div className="flex gap-x-1 leading-none">
-      {isLoading && <Spinner size="small" />}
+      {isLoading && <Spinner size="sm" />}
       {!isLoading && (
         <h2 className="font-bold">
           {!hasResults && <span>No results</span>}
