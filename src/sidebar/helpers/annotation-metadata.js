@@ -292,26 +292,45 @@ export function annotationRole(annotation) {
   return 'Annotation';
 }
 
-/** Return a numeric key that can be used to sort annotations by location.
+/**
+ * Key containing information needed to sort annotations based on their
+ * associated position within the document.
+ *
+ * @typedef LocationKey
+ * @prop {string} [cfi] - EPUB Canonical Fragment Identifier. For annotations
+ *   on EPUBs, this identifies the location of the chapter within the book's
+ *   table of contents.
+ * @prop {number} [position] - Text offset within the document segment, in UTF-16
+ *   code units. For web pages and PDFs this refers to the offset from the start
+ *   of the document. In EPUBs this refers to the offset from the start of the
+ *   Content Document (ie. chapter).
+ */
+
+/**
+ * Return a key that can be used to sort annotations by document position.
+ *
+ * Note that the key may not have any fields set if the annotation is a page
+ * note or was created via the Hypothesis API without providing the selectors
+ * that this function uses.
  *
  * @param {Annotation} annotation
- * @return {number} - A key representing the location of the annotation in
- *                    the document, where lower numbers mean closer to the
- *                    start.
+ * @return {LocationKey}
  */
 export function location(annotation) {
-  if (annotation) {
-    const targets = annotation.target || [];
-    for (let i = 0; i < targets.length; i++) {
-      const selectors = targets[i].selector || [];
-      for (const selector of selectors) {
-        if (selector.type === 'TextPositionSelector') {
-          return selector.start;
-        }
-      }
+  const targets = annotation.target;
+
+  let cfi;
+  let position;
+
+  for (const selector of targets[0]?.selector ?? []) {
+    if (selector.type === 'TextPositionSelector') {
+      position = selector.start;
+    } else if (selector.type === 'EPUBContentSelector' && selector.cfi) {
+      cfi = selector.cfi;
     }
   }
-  return Number.POSITIVE_INFINITY;
+
+  return { cfi, position };
 }
 
 /**
