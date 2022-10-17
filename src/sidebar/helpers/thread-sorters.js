@@ -1,3 +1,4 @@
+import { compareCFIs } from '../util/cfi';
 import { location } from './annotation-metadata';
 import { rootAnnotations } from './thread';
 
@@ -89,11 +90,25 @@ export const sorters = {
     }
     const aLocation = location(a.annotation);
     const bLocation = location(b.annotation);
-    if (aLocation < bLocation) {
+
+    // If these annotations come from an EPUB and specify which chapter they
+    // came from via a CFI, compare the chapter order first.
+    if (aLocation.cfi && bLocation.cfi) {
+      const cfiResult = compareCFIs(aLocation.cfi, bLocation.cfi);
+      if (cfiResult !== 0) {
+        return Math.sign(cfiResult);
+      }
+    } else if (aLocation.cfi) {
       return -1;
-    } else if (aLocation > bLocation) {
+    } else if (bLocation.cfi) {
       return 1;
     }
-    return 0;
+
+    // If the chapter number is the same or for other document types, compare
+    // the text position instead. Missing positions sort after any present
+    // positions.
+    const aPos = aLocation.position ?? Number.MAX_SAFE_INTEGER;
+    const bPos = bLocation.position ?? Number.MAX_SAFE_INTEGER;
+    return Math.sign(aPos - bPos);
   },
 };
