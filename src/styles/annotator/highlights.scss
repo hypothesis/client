@@ -1,55 +1,140 @@
-$color-highlight: rgba(255, 255, 60, 0.4);
-$color-highlight-second: rgba(206, 206, 60, 0.4);
-$color-highlight-focused: rgba(156, 230, 255, 0.5);
+@use 'tailwindcss/components';
 
-// Hide content from sighted users but make it visible to screen readers.
-//
-// Resources:
-// - https://webaim.org/techniques/css/invisiblecontent/ (see "CSS clip")
-// - https://cloudfour.com/thinks/see-no-evil-hidden-content-and-accessibility/#showing-additional-content-for-screen-readers
-// - https://tailwindcss.com/docs/screen-readers#screen-reader-only-elements Tailwind's `sr-only` class
-@mixin screen-reader-only {
-  // Take the content out of the normal layout flow.
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  white-space: nowrap;
+/**
+ * Base highlight styling. Highlights are styled:
+ *
+ * - In HTML documents: opaque light yellow, with nested highlights styled a
+ *   darker opaque yellow. There are two levels of visual distinction.
+ * - In PDF documents: All highlights are the same color of yellow, but nested
+ *   highlights appear more intense at each level because they use
+ *   mix-blend-mode: multiply.
+ */
+:root {
+  --hypothesis-color-default: #ffffb1;
+  --hypothesis-color-default-nested: #ebeb82;
 
-  // Visually hide the content and prevent it from interfering with mouse/touch
-  // text selection by clipping it to an empty box. Compared to moving content with
-  // `top`/`left` this is less likely to cause the browser to scroll to a
-  // different part of the page when the hidden text has screen-reader focus.
-  clip: rect(0 0 0 0);
-  overflow: hidden;
+  --hypothesis-color-blue: #e0f2fe;
+
+  --hypothesis-highlight-color-focused: var(--hypothesis-color-blue);
 }
 
-// SVG highlights when the "Show Highlights" toggle is turned off.
+.hypothesis-highlight {
+  --highlight-color: var(--hypothesis-color-default);
+  --highlight-decoration: none;
+}
+
+.hypothesis-highlight > .hypothesis-highlight {
+  --highlight-color: var(--hypothesis-color-default-nested);
+}
+
+// Variable/cluster styling not supported for PDF highlights (which are SVGs) yet
+.hypothesis-svg-highlight {
+  --highlight-color: rgba(255, 255, 60, 0.4);
+  --highlight-color-focused: rgba(156, 230, 255, 0.5);
+}
+
+/**
+ * Clustered highlight styling. This is enabled by the presence of the
+ * .hypothesis-highlights-clustered class on the guest's `element` (typically
+ * <body>). Each cluster of highlights may be styled independently. At present
+ * this is limited to highlight color and underlining.
+ *
+ * `cluster-styles` in the annotator updates the cluster- related CSS variables
+ *  per user inputs/preferences and manages the presence of the
+ *  .hypothesis-highlights-clustered class.
+ *
+ * This styling is currently only supported for HTML documents.
+ */
+:root {
+  --hypothesis-color-yellow: #fef9c3;
+  --hypothesis-color-purple: #ede9fe;
+  --hypothesis-color-orange: #ffedd5;
+  --hypothesis-color-green: #d1fae5;
+  --hypothesis-color-grey: #f5f5f4;
+  --hypothesis-color-pink: #ffe4e6;
+
+  --hypothesis-other-content-color: var(--hypothesis-color-default);
+  --hypothesis-other-content-decoration: none;
+
+  --hypothesis-user-highlights-color: var(--hypothesis-color-default);
+  --hypothesis-user-highlights-decoration: none;
+
+  --hypothesis-user-annotations-color: var(--hypothesis-color-default);
+  --hypothesis-user-annotations-decoration: none;
+}
+
+.hypothesis-highlights-clustered {
+  .hypothesis-highlight.other-content {
+    --highlight-color: var(--hypothesis-other-content-color);
+    --highlight-decoration: var(--hypothesis-other-content-decoration);
+  }
+
+  .hypothesis-highlight.user-highlights {
+    --highlight-color: var(--hypothesis-user-highlights-color);
+    --highlight-decoration: var(--hypothesis-user-highlights-decoration);
+  }
+
+  .hypothesis-highlight.user-annotations {
+    --highlight-color: var(--hypothesis-user-annotations-color);
+    --highlight-decoration: var(--hypothesis-user-annotations-decoration);
+  }
+
+  .other-content > .other-content,
+  .user-highlights > .user-highlights,
+  .user-annotations > .user-annotations {
+    mix-blend-mode: multiply;
+  }
+
+  &
+    .hypothesis-highlight
+    > .hypothesis-highlight
+    > .hypothesis-highlight
+    > .hypothesis-highlight
+    > .hypothesis-highlight {
+    // Cut off multiply blending to ensure that deeply-nested annotations don't get too dark
+    mix-blend-mode: normal;
+  }
+}
+
+// Highlights are non-visible when .hypothesis-highlight-always-on class not present.
+.hypothesis-highlight {
+  background-color: transparent;
+}
+
 .hypothesis-svg-highlight {
   fill: transparent;
 }
 
-// `hypothesis-highlights-always-on` is a class that is toggled on the root
-// of the annotated document when highlights are enabled/disabled.
+// Apply styling when highlights are visible
 .hypothesis-highlights-always-on {
   .hypothesis-svg-highlight {
-    fill: $color-highlight;
-
-    &.is-opaque {
-      fill: yellow;
-    }
+    fill: var(--highlight-color);
 
     &.is-focused {
-      fill: $color-highlight-focused;
+      fill: var(--highlight-color-focused);
     }
   }
 
   .hypothesis-highlight {
-    background-color: $color-highlight;
+    background-color: var(--highlight-color);
+    text-decoration: var(--highlight-decoration);
 
     // For PDFs, we still create highlight elements to wrap the text but the
     // highlight effect is created by another element.
     &.is-transparent {
-      background-color: transparent;
+      background-color: transparent !important;
+    }
+
+    // When an annotation card is hovered in the sidebar, the corresponding
+    // highlights are shown with a "focused" color.
+    &.hypothesis-highlight-focused {
+      mix-blend-mode: normal !important;
+      background-color: var(--hypothesis-highlight-color-focused) !important;
+      text-decoration: none;
+
+      .hypothesis-highlight {
+        background-color: transparent !important;
+      }
     }
 
     cursor: pointer;
@@ -57,45 +142,15 @@ $color-highlight-focused: rgba(156, 230, 255, 0.5);
     // Make highlights visible to screen readers.
     // See also - https://developer.paciellogroup.com/blog/2017/12/short-note-on-making-your-mark-more-accessible/.
     &::before {
-      @include screen-reader-only;
+      @apply sr-only;
 
       // nb. The leading/trailing spaces are intended to ensure the text is treated
       // as separate words by assistive technologies from the content before/after it.
       content: ' annotation start ';
     }
     &::after {
-      @include screen-reader-only;
+      @apply sr-only;
       content: ' annotation end ';
-    }
-
-    // Give a highlight inside a larger highlight a different color to stand out.
-    & .hypothesis-highlight {
-      background-color: $color-highlight-second;
-      &.is-transparent {
-        background-color: transparent;
-      }
-
-      // Limit the number of different highlight shades by making highlights
-      // that are 3+ levels deep transparent.
-      //
-      // This was historically done to improve readability in PDFs [1], but that
-      // is no longer an issue as in PDFs highlights are created by drawing
-      // SVGs on top of the <canvas>.
-      //
-      // [1] https://github.com/hypothesis/client/issues/1995.
-      & .hypothesis-highlight {
-        background-color: transparent;
-      }
-    }
-
-    // When an annotation card is hovered in the sidebar, the corresponding
-    // highlights are shown with a "focused" color.
-    &.hypothesis-highlight-focused {
-      background-color: $color-highlight-focused !important;
-
-      .hypothesis-highlight {
-        background-color: transparent !important;
-      }
     }
   }
 }

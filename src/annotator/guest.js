@@ -1,3 +1,5 @@
+import classnames from 'classnames';
+
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
@@ -6,6 +8,7 @@ import { matchShortcut } from '../shared/shortcut';
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
+import { ClusterStyleController } from './cluster-styles';
 import { FeatureFlags } from './features';
 import {
   getHighlightsContainingNode,
@@ -196,6 +199,10 @@ export class Guest {
     });
 
     this.features = new FeatureFlags();
+
+    this._clusterToolbar = new ClusterStyleController(element, {
+      features: this.features,
+    });
 
     /**
      * Integration that handles document-type specific functionality in the
@@ -543,7 +550,10 @@ export class Guest {
       }
 
       const highlights = /** @type {AnnotationHighlight[]} */ (
-        highlightRange(range)
+        highlightRange(
+          range,
+          classnames('hypothesis-highlight', anchor.annotation?.$cluster)
+        )
       );
       highlights.forEach(h => {
         h._annotation = anchor.annotation;
@@ -656,6 +666,7 @@ export class Guest {
       document: info.metadata,
       target,
       $highlight: highlight,
+      $cluster: highlight ? 'user-highlights' : 'user-annotations',
       $tag: 'a:' + generateHexString(8),
     };
 

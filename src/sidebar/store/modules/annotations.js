@@ -7,15 +7,18 @@ import { createSelector } from 'reselect';
 
 import { hasOwn } from '../../../shared/has-own';
 import * as metadata from '../../helpers/annotation-metadata';
-import { isSaved } from '../../helpers/annotation-metadata';
+import { isHighlight, isSaved } from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import { createStoreModule, makeAction } from '../create-store';
 
 import { routeModule } from './route';
+import { sessionModule } from './session';
 
 /**
  * @typedef {'anchored'|'orphan'|'timeout'} AnchorStatus
  * @typedef {import('../../../types/api').Annotation} Annotation
+ * @typedef {import('../../../types/shared').HighlightCluster} HighlightCluster
+ * @typedef {import('../../../types/shared').ClientAnnotationData} ClientAnnotationData
  * @typedef {import('../../../types/api').SavedAnnotation} SavedAnnotation
  */
 
@@ -71,18 +74,20 @@ function findByTag(annotations, tag) {
 }
 
 /**
- * Set custom private fields on an annotation object about to be added to the
- * store's collection of `annotations`.
+ * Merge client annotation data into the annotation object about to be added to
+ * the store's collection of `annotations`.
  *
  * `annotation` may either be new (unsaved) or a persisted annotation retrieved
  * from the service.
  *
  * @param {Omit<Annotation, '$anchorTimeout'>} annotation
- * @param {string} tag - The `$tag` value that should be used for this
- *                       if it doesn't have a `$tag` already
- * @return {Annotation} - annotation with local (`$*`) fields set
+ * @param {string} tag - The `$tag` value that should be used for this if it
+ *                       doesn't have a `$tag` already
+ * @param {string|null} currentUserId - The account id of the currently-auth'd
+ *                       user, if any
+ * @return {Annotation} - API annotation data with client annotation data merged
  */
-function initializeAnnotation(annotation, tag) {
+function initializeAnnotation(annotation, tag, currentUserId) {
   let orphan = annotation.$orphan;
 
   if (!annotation.id) {
@@ -90,11 +95,21 @@ function initializeAnnotation(annotation, tag) {
     orphan = false;
   }
 
-  return Object.assign({}, annotation, {
-    $anchorTimeout: false,
-    $tag: annotation.$tag || tag,
-    $orphan: orphan,
-  });
+  let $cluster = /** @type {HighlightCluster} */ ('other-content');
+  if (annotation.user === currentUserId) {
+    $cluster = isHighlight(annotation) ? 'user-highlights' : 'user-annotations';
+  }
+
+  return Object.assign(
+    {},
+    annotation,
+    /** @type {ClientAnnotationData} */ ({
+      $anchorTimeout: false,
+      $cluster,
+      $tag: annotation.$tag || tag,
+      $orphan: orphan,
+    })
+  );
 }
 
 const initialState = {
@@ -129,7 +144,7 @@ const initialState = {
 const reducers = {
   /**
    * @param {State} state
-   * @param {{ annotations: Annotation[], currentAnnotationCount: number }} action
+   * @param {{ annotations: Annotation[], currentAnnotationCount: number, currentUserId: string|null }} action
    */
   ADD_ANNOTATIONS(state, action) {
     const updatedIDs = new Set();
@@ -160,7 +175,9 @@ const reducers = {
           updatedTags.add(existing.$tag);
         }
       } else {
-        added.push(initializeAnnotation(annot, 't' + nextTag));
+        added.push(
+          initializeAnnotation(annot, 't' + nextTag, action.currentUserId)
+        );
         ++nextTag;
       }
     }
@@ -296,7 +313,7 @@ const reducers = {
 function addAnnotations(annotations) {
   /**
    * @param {import('redux').Dispatch} dispatch
-   * @param {() => { annotations: State, route: import('./route').State }} getState
+   * @param {() => { annotations: State, route: import('./route').State, session: import('./session').State }} getState
    */
   return function (dispatch, getState) {
     const added = annotations.filter(annot => {
@@ -305,10 +322,13 @@ function addAnnotations(annotations) {
       );
     });
 
+    const profile = sessionModule.selectors.profile(getState().session);
+
     dispatch(
       makeAction(reducers, 'ADD_ANNOTATIONS', {
         annotations,
         currentAnnotationCount: getState().annotations.annotations.length,
+        currentUserId: profile.userid,
       })
     );
 
