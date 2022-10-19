@@ -6,6 +6,7 @@ const fs = require('fs');
 const { extname } = require('path');
 
 const commander = require('commander');
+const Arborist = require('@npmcli/arborist');
 const packlist = require('npm-packlist');
 const AWS = require('aws-sdk');
 
@@ -99,7 +100,9 @@ class S3Uploader {
 async function uploadPackageToS3(bucket, options) {
   // Get list of files that are distributed with the package, respecting
   // the `files` field in `package.json`, `.npmignore` etc.
-  const files = await packlist({ path: '.' });
+  const arb = new Arborist({ path: '.' });
+  const tree = await arb.loadActual();
+  const files = await packlist(tree);
 
   // Get name, version and main module of the package.
   const packageJson = require(`${process.cwd()}/package.json`);
