@@ -29,6 +29,9 @@
  * An object representing an annotation in the document.
  *
  * @typedef AnnotationData
+ * @prop {'all'|'my-annotations'|'my-highlights'} [$cluster] - Which cluster of
+ *   anchors this annotation should be placed in by the annotator. Each cluster
+ *   of anchors is styled uniquely. Default `all`.
  * @prop {string} uri
  * @prop {Target[]} target
  * @prop {string} $tag

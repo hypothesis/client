@@ -1,3 +1,5 @@
+import classnames from 'classnames';
+
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
@@ -542,8 +544,14 @@ export class Guest {
         return;
       }
 
+      const isClustered = !!anchor.annotation?.$cluster;
       const highlights = /** @type {AnnotationHighlight[]} */ (
-        highlightRange(range)
+        highlightRange(
+          range,
+          classnames('hypothesis-highlight', {
+            [`cluster cluster-${anchor.annotation?.$cluster}`]: isClustered,
+          })
+        )
       );
       highlights.forEach(h => {
         h._annotation = anchor.annotation;

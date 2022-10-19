@@ -3,7 +3,7 @@ import shallowEqual from 'shallowequal';
 
 import { ListenerCollection } from '../../shared/listener-collection';
 import { PortFinder, PortRPC, isMessageEqual } from '../../shared/messaging';
-import { isReply, isPublic } from '../helpers/annotation-metadata';
+import { isHighlight, isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
 /**
@@ -33,13 +33,22 @@ import { watch } from '../util/watch';
  * within the current session and anchor it in the document.
  *
  * @param {Annotation} annotation
+ * @param {string|null} authUserId - The acctid of the currently-auth'd user
  * @return {AnnotationData}
  */
-export function formatAnnot({ $tag, target, uri }) {
+export function formatAnnot(annotation, authUserId) {
+  let $cluster = /** @type {AnnotationData['$cluster']} */ ('all');
+  if (isHighlight(annotation)) {
+    // Highlights always belong to the current user, as they are private
+    $cluster = 'my-highlights';
+  } else if (authUserId && annotation.user === authUserId) {
+    $cluster = 'my-annotations';
+  }
   return {
-    $tag,
-    target,
-    uri,
+    $cluster,
+    $tag: annotation.$tag,
+    target: annotation.target,
+    uri: annotation.uri,
   };
 }
 
@@ -184,6 +193,8 @@ export class FrameSyncService {
 
       // Send added annotations to matching frame.
       if (added.length > 0) {
+        // FIXME: This is prototype code
+        const userid = this._store.profile()?.userid;
         /** @type {Map<string|null, Annotation[]>} */
         const addedByFrame = new Map();
         for (let annotation of added) {
@@ -199,7 +210,10 @@ export class FrameSyncService {
         for (let [frameId, anns] of addedByFrame) {
           const rpc = this._guestRPC.get(frameId);
           if (rpc) {
-            rpc.call('loadAnnotations', anns.map(formatAnnot));
+            rpc.call(
+              'loadAnnotations',
+              anns.map(ann => formatAnnot(ann, userid))
+            );
           }
         }
 
