@@ -1,55 +1,150 @@
-$color-highlight: rgba(255, 255, 60, 0.4);
-$color-highlight-second: rgba(206, 206, 60, 0.4);
-$color-highlight-focused: rgba(156, 230, 255, 0.5);
-
-// Hide content from sighted users but make it visible to screen readers.
+// This module configures and applies styles for annotation highlights in
+// annotatable documents.
 //
-// Resources:
-// - https://webaim.org/techniques/css/invisiblecontent/ (see "CSS clip")
-// - https://cloudfour.com/thinks/see-no-evil-hidden-content-and-accessibility/#showing-additional-content-for-screen-readers
-// - https://tailwindcss.com/docs/screen-readers#screen-reader-only-elements Tailwind's `sr-only` class
-@mixin screen-reader-only {
-  // Take the content out of the normal layout flow.
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  white-space: nowrap;
+// The highlight elements themselves (`.hypothesis-highlight`) and overall
+// highlight visibility toggling via `.hypothesis-highlights-always-on` are
+// managed in the `highlighter` module.
+//
+// Styling differentation for annotation "clusters" is activated by the presence
+// of the `.hypothesis-highlights-clustered` class. This class and the values of
+// applicable root-level CSS variables are managed by the `cluster-styles`
+// module.
 
-  // Visually hide the content and prevent it from interfering with mouse/touch
-  // text selection by clipping it to an empty box. Compared to moving content with
-  // `top`/`left` this is less likely to cause the browser to scroll to a
-  // different part of the page when the hidden text has screen-reader focus.
-  clip: rect(0 0 0 0);
-  overflow: hidden;
+// Configure highlight styles //////////////////////////////////////////////
+
+:root {
+  // Colors available for clustered highlight styling
+  --hypothesis-color-blue: #e0f2fe;
+  --hypothesis-color-yellow: #fef9c3;
+  --hypothesis-color-purple: #ede9fe;
+  --hypothesis-color-orange: #ffedd5;
+  --hypothesis-color-green: #d1fae5;
+  --hypothesis-color-grey: #f5f5f4;
+  --hypothesis-color-pink: #ffe4e6;
+
+  // Initial styles for highlight clusters. These only apply if that feature is
+  // active. These variables are modified by the `cluster-styles` module.
+  --hypothesis-other-content-color: var(--hypothesis-color-yellow);
+  --hypothesis-other-content-decoration: none;
+
+  --hypothesis-user-highlights-color: var(--hypothesis-color-yellow);
+  --hypothesis-user-highlights-decoration: none;
+
+  --hypothesis-user-annotations-color: var(--hypothesis-color-yellow);
+  --hypothesis-user-annotations-decoration: none;
+
+  --hypothesis-cluster-blend-mode: multiply;
 }
 
-// SVG highlights when the "Show Highlights" toggle is turned off.
+// Configure Base highlight styling.
+
+// These configuration values are static but may be overridden if clustered
+// styling is active.
+.hypothesis-highlight {
+  --highlight-blend-mode: normal;
+  --highlight-color: rgba(255, 255, 60, 0.4);
+  --highlight-decoration: none;
+  --hypothesis-highlight-color-focused: rgba(156, 230, 255, 0.5);
+
+  & > & {
+    // nested highlight
+    --highlight-color: rgba(206, 206, 60, 0.4);
+  }
+
+  & > & > & {
+    // highlight nested two deep or more
+    --highlight-color: transparent;
+  }
+}
+
+.hypothesis-svg-highlight {
+  --highlight-color: rgba(255, 255, 60, 0.4);
+  --highlight-color-focused: rgba(156, 230, 255, 0.5);
+}
+
+// Configure clustered highlight styling
+
+.hypothesis-highlights-clustered .hypothesis-highlight {
+  // When clustered highlights are active, use an opaque blue for focused
+  // annotations so don't end up with a funny color mix
+  --hypothesis-highlight-color-focused: var(--hypothesis-color-blue);
+}
+
+.hypothesis-highlights-clustered .hypothesis-highlight.user-annotations {
+  --highlight-color: var(--hypothesis-user-annotations-color);
+  --highlight-decoration: var(--hypothesis-user-annotations-decoration);
+}
+
+.hypothesis-highlights-clustered .hypothesis-highlight.user-highlights {
+  --highlight-color: var(--hypothesis-user-highlights-color);
+  --highlight-decoration: var(--hypothesis-user-highlights-decoration);
+}
+
+.hypothesis-highlights-clustered .hypothesis-highlight.other-content {
+  --highlight-color: var(--hypothesis-other-content-color);
+  --highlight-decoration: var(--hypothesis-other-content-decoration);
+}
+
+.hypothesis-highlights-clustered {
+  .other-content > .other-content,
+  .user-highlights > .user-highlights,
+  .user-annotations > .user-annotations {
+    // When annotations of the same cluster are nested, apply blending as
+    // configured.
+    --highlight-blend-mode: var(--hypothesis-cluster-blend-mode);
+  }
+}
+
+// No matter what kind of highlight styling is applied, make sure nested
+// highlights don't pile up too high with blending.
+.hypothesis-highlight {
+  & & & & & {
+    --highlight-blend-mode: normal;
+  }
+}
+
+// Apply highlight styles //////////////////////////////////////////////////
+
+// Highlights are non-visible when .hypothesis-highlight-always-on class not present.
+.hypothesis-highlight {
+  background-color: transparent;
+}
+
 .hypothesis-svg-highlight {
   fill: transparent;
 }
 
-// `hypothesis-highlights-always-on` is a class that is toggled on the root
-// of the annotated document when highlights are enabled/disabled.
+// Apply styling when highlights are visible
 .hypothesis-highlights-always-on {
   .hypothesis-svg-highlight {
-    fill: $color-highlight;
-
-    &.is-opaque {
-      fill: yellow;
-    }
+    fill: var(--highlight-color);
 
     &.is-focused {
-      fill: $color-highlight-focused;
+      fill: var(--highlight-color-focused);
     }
   }
 
   .hypothesis-highlight {
-    background-color: $color-highlight;
+    background-color: var(--highlight-color);
+    text-decoration: var(--highlight-decoration);
+    mix-blend-mode: var(--highlight-blend-mode);
 
     // For PDFs, we still create highlight elements to wrap the text but the
     // highlight effect is created by another element.
     &.is-transparent {
-      background-color: transparent;
+      background-color: transparent !important;
+    }
+
+    // When an annotation card is hovered in the sidebar, the corresponding
+    // highlights are shown with a "focused" color.
+    &.hypothesis-highlight-focused {
+      mix-blend-mode: normal !important;
+      background-color: var(--hypothesis-highlight-color-focused) !important;
+      text-decoration: none;
+
+      .hypothesis-highlight {
+        background-color: transparent !important;
+      }
     }
 
     cursor: pointer;
@@ -57,45 +152,15 @@ $color-highlight-focused: rgba(156, 230, 255, 0.5);
     // Make highlights visible to screen readers.
     // See also - https://developer.paciellogroup.com/blog/2017/12/short-note-on-making-your-mark-more-accessible/.
     &::before {
-      @include screen-reader-only;
+      @apply sr-only;
 
       // nb. The leading/trailing spaces are intended to ensure the text is treated
       // as separate words by assistive technologies from the content before/after it.
       content: ' annotation start ';
     }
     &::after {
-      @include screen-reader-only;
+      @apply sr-only;
       content: ' annotation end ';
-    }
-
-    // Give a highlight inside a larger highlight a different color to stand out.
-    & .hypothesis-highlight {
-      background-color: $color-highlight-second;
-      &.is-transparent {
-        background-color: transparent;
-      }
-
-      // Limit the number of different highlight shades by making highlights
-      // that are 3+ levels deep transparent.
-      //
-      // This was historically done to improve readability in PDFs [1], but that
-      // is no longer an issue as in PDFs highlights are created by drawing
-      // SVGs on top of the <canvas>.
-      //
-      // [1] https://github.com/hypothesis/client/issues/1995.
-      & .hypothesis-highlight {
-        background-color: transparent;
-      }
-    }
-
-    // When an annotation card is hovered in the sidebar, the corresponding
-    // highlights are shown with a "focused" color.
-    &.hypothesis-highlight-focused {
-      background-color: $color-highlight-focused !important;
-
-      .hypothesis-highlight {
-        background-color: transparent !important;
-      }
     }
   }
 }

@@ -36,15 +36,12 @@ gulp.task('build-sidebar-tailwind-css', () =>
   )
 );
 
-// These CSS source files should not use Tailwind, as they are used in
-// third-party contexts.
-// TODO: Remove `tailwindConfig` after updating `sass` task in `frontend-build`.
-// Setting it is necessary currently to suppress a build warning.
 gulp.task('build-standalone-css', () =>
   buildCSS(
     [
-      // other styles used by annotator (standalone)
+      // styles processed by tailwind, used by annotator
       './src/styles/annotator/highlights.scss',
+      // other styles used by annotator (standalone)
       './src/styles/annotator/pdfjs-overrides.scss',
 
       // Vendor
