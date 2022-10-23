@@ -15,6 +15,7 @@ import { injectClient } from '../hypothesis-injector';
  * @typedef {import('../../types/annotator').Selector} Selector
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../hypothesis-injector').InjectConfig} InjectConfig
+ * @typedef {import('../../types/api').Context} Context
  */
 
 // When activating side-by-side mode for VitalSource PDF documents, make sure
@@ -299,6 +300,17 @@ export class VitalSourceContentIntegration extends TinyEmitter {
    */
   describe(root, range) {
     return this._htmlIntegration.describe(root, range);
+  }
+
+  /**
+   * Return the sentence from which the text is quoted.
+   *
+   * @param {HTMLElement} root
+   * @param {Range} range
+   * @return {Promise<Context>}
+   */
+  provideContext(root, range) {
+    return this._htmlIntegration.provideContext(root, range);
   }
 
   contentContainer() {

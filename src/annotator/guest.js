@@ -649,6 +649,9 @@ export class Guest {
       // `selector`, despite being a list.
       selector: selectors,
     }));
+    await Promise.all(
+      ranges.map(range => this._integration.provideContext(root, range))
+    );
 
     /** @type {AnnotationData} */
     const annotation = {

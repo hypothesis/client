@@ -1,3 +1,4 @@
+import { matchQuote } from './match-quote';
 import { RangeAnchor, TextPositionAnchor, TextQuoteAnchor } from './types';
 
 /**
@@ -5,6 +6,7 @@ import { RangeAnchor, TextPositionAnchor, TextQuoteAnchor } from './types';
  * @typedef {import('../../types/api').Selector} Selector
  * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
  * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
+ * @typedef {import('../../types/api').Context} Context
  */
 
 /**
@@ -110,4 +112,92 @@ export function describe(root, range) {
     }
   }
   return result;
+}
+
+/**
+ * Remove spaces and line breaks from a string.
+ *
+ * @param {String} str
+ */
+function cleanUpString(str) {
+  return str.replace(/\s\s+/g, ' ').replace(/[\n\r]/g, ' ');
+}
+
+/**
+ * Return the sentence from which the text is quoted.
+ *
+ * @param {HTMLElement} root
+ * @param {Range} range
+ * @return {Promise<Context>}
+ */
+export async function provideContext(root, range) {
+  const textQuoteAnchor = TextQuoteAnchor.fromRange(root, range);
+  const treeWalker = document.createTreeWalker(
+    root,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode(node) {
+        return node.textContent && /^\n*$/.test(node.textContent.trim())
+          ? NodeFilter.FILTER_REJECT
+          : NodeFilter.FILTER_ACCEPT;
+      },
+    }
+  );
+
+  const rootTextContentInNodes = [];
+  let currentNode;
+  // eslint-disable-next-line no-cond-assign
+  while (treeWalker.nextNode()) {
+    currentNode = treeWalker.currentNode;
+    if (currentNode && currentNode.textContent) {
+      rootTextContentInNodes.push(cleanUpString(currentNode.textContent));
+    }
+  }
+
+  const rootTextContentInString = cleanUpString(rootTextContentInNodes.join(' '));
+  let match;
+  const exact = cleanUpString(textQuoteAnchor.exact);
+  if (textQuoteAnchor.context.prefix && textQuoteAnchor.context.suffix) {
+    match = matchQuote(
+      rootTextContentInString,
+      exact,
+      {
+        prefix: cleanUpString(textQuoteAnchor.context.prefix),
+        suffix: cleanUpString(textQuoteAnchor.context.suffix),
+      }
+    );
+  }
+
+  if (!match) {
+    return {
+      type: 'Context',
+      prefix: '',
+      quote: exact,
+      suffix: ''
+    };
+  }
+
+  // @ts-ignore
+  const segmenter = new Intl.Segmenter('en', {granularity: "sentence"});
+  const contextLen = 500;
+  let prefix = rootTextContentInString.slice(Math.max(0, match.start - contextLen), match.start);
+  let suffix = rootTextContentInString.slice(match.end, Math.min(rootTextContentInString.length, match.end + contextLen))
+
+  let segments = segmenter.segment(prefix);
+  for (let {segment} of segments) {
+    prefix = segment
+  }
+
+  segments = segmenter.segment(suffix);
+  for (let {segment} of segments) {
+    suffix = segment
+    break;
+  }
+
+  return {
+    type: 'Context',
+    prefix: prefix.trimStart(),
+    quote: exact,
+    suffix: suffix.trimEnd()
+  }
 }

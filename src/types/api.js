@@ -37,6 +37,16 @@
  */
 
 /**
+ * Context contains the sentence from which the text is quoted.
+ *
+ * @typedef Context
+ * @prop {'Context'} type
+ * @prop {string} quote
+ * @prop {string} [prefix]
+ * @prop {string} [suffix]
+ */
+
+/**
  * Selector which identifies a document region using the selected text plus
  * the surrounding context.
  *

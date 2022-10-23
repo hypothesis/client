@@ -133,6 +133,7 @@ describe('Guest', () => {
       canAnnotate: sinon.stub().returns(true),
       contentContainer: sinon.stub().returns({}),
       describe: sinon.stub(),
+      provideContext: sinon.stub(),
       destroy: sinon.stub(),
       fitSideBySide: sinon.stub().returns(false),
       getMetadata: sinon.stub().resolves({
@@ -915,12 +916,24 @@ describe('Guest', () => {
 
       const selectorA = { type: 'TextPositionSelector', start: 0, end: 10 };
       const selectorB = { type: 'TextQuoteSelector', exact: 'foobar' };
+      const context = {
+        type: 'Context',
+        prefix: 'f',
+        quote: 'oo',
+        suffix: 'bar',
+      };
       fakeIntegration.anchor.resolves({});
       fakeIntegration.describe.returns([selectorA, selectorB]);
+      fakeIntegration.provideContext.returns(context);
 
       const annotation = await guest.createAnnotation({});
 
       assert.calledWith(fakeIntegration.describe, guest.element, fakeRange);
+      assert.calledWith(
+        fakeIntegration.provideContext,
+        guest.element,
+        fakeRange
+      );
       assert.deepEqual(annotation.target, [
         {
           source: await fakeIntegration.uri(),

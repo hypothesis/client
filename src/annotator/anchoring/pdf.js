@@ -2,6 +2,7 @@
 
 import { warnOnce } from '../../shared/warn-once';
 import { translateOffsets } from '../util/normalize';
+import { provideContext as provideContextHtml } from './html';
 import { matchQuote } from './match-quote';
 import { createPlaceholder } from './placeholder';
 import { TextPosition, TextRange } from './text-range';
@@ -11,6 +12,7 @@ import { TextQuoteAnchor } from './types';
  * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
  * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
  * @typedef {import('../../types/api').Selector} Selector
+ * @typedef {import('../../types/api').Context} Context
  *
  * @typedef {import('../../types/pdfjs').PDFPageView} PDFPageView
  * @typedef {import('../../types/pdfjs').PDFViewer} PDFViewer
@@ -681,6 +683,18 @@ export async function describe(root, range) {
   const quote = TextQuoteAnchor.fromRange(root, textRange).toSelector();
 
   return [position, quote];
+}
+
+/**
+ * Return the sentence from which the text is quoted.
+ *
+ * @param {HTMLElement} root
+ * @param {Range} range
+ * @return {Promise<Context>}
+ */
+export async function provideContext(root, range) {
+  const [textRange] = getTextLayerForRange(range);
+  return provideContextHtml(root, textRange)
 }
 
 /**

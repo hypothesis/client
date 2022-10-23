@@ -9,6 +9,7 @@ import {
   canDescribe,
   describe,
   documentHasText,
+  provideContext,
 } from '../anchoring/pdf';
 import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
 import Banners from '../components/Banners';
@@ -74,6 +75,7 @@ export class PDFIntegration extends TinyEmitter {
     super();
 
     this.annotator = annotator;
+    this.provideContext = provideContext;
 
     const window_ = /** @type {HypothesisWindow} */ (window);
 

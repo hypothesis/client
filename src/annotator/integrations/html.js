@@ -1,6 +1,6 @@
 import { TinyEmitter } from 'tiny-emitter';
 
-import { anchor, describe } from '../anchoring/html';
+import { anchor, describe, provideContext } from '../anchoring/html';
 
 import { HTMLMetadata } from './html-metadata';
 import {
@@ -44,6 +44,7 @@ export class HTMLIntegration extends TinyEmitter {
     this.container = container;
     this.anchor = anchor;
     this.describe = describe;
+    this.provideContext = provideContext;
 
     this._htmlMeta = new HTMLMetadata();
     this._prevURI = this._htmlMeta.uri();

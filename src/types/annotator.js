@@ -23,6 +23,7 @@
 /**
  * @typedef {import("./api").Selector} Selector
  * @typedef {import("./api").Target} Target
+ * @typedef {import('./api').Context} Context
  */
 
 /**
@@ -123,6 +124,8 @@
  * @prop {(root: HTMLElement, range: Range) => Selector[]|Promise<Selector[]>} describe -
  *   Generate a list of serializable selectors which represent the content in
  *   `range`.
+ * @prop {(root: HTMLElement, range: Range) => Context|Promise<Context>} provideContext -
+ *   Find the sentence from which the content is quoted.
  * @prop {() => HTMLElement} contentContainer -
  *   Return the main element that contains the document content. This is used
  *   by controls such as the bucket bar to know when the content might have scrolled.
