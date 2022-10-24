@@ -10,55 +10,8 @@
       }
     </style>
     <script type="module">
-      /**
-       * Custom element that holds the book content frame. The class name is not
-       * important but the `<mosaic-book>` tag name triggers the VitalSource integration.
-       */
-      class MosaicElement extends HTMLElement {
-        constructor() {
-          super();
-          this.attachShadow({ mode: 'open' });
-
-          // For now there is only one page.
-          const pageURLs = [
-            '/document/vitalsource-pdf-page'
-          ];
-
-          let pageIndex = 0;
-
-          const setPage = index => {
-            if (index < 0 || index >= pageURLs.length) {
-              return;
-            }
-            pageIndex = index;
-
-            // We remove the current frame and create a new one, rather than just
-            // change the `src` of the existing iframe, to mimic what Bookshelf
-            // does. The client should be robust to either approach.
-            this.contentFrame?.remove();
-            this.contentFrame = document.createElement('iframe');
-            this.contentFrame.src = pageURLs[pageIndex];
-            this.shadowRoot.append(this.contentFrame);
-          };
-
-          const styles = document.createElement('style');
-          styles.innerHTML = `
-            iframe {
-              width: 100%;
-              height: 800px;
-              resize: both;
-              overflow: auto;
-            }
-          `;
-          this.shadowRoot.append(styles);
-
-          const controlBar = document.createElement('div');
-          this.shadowRoot.append(controlBar);
-
-          setPage(0);
-        }
-      }
-      customElements.define('mosaic-book', MosaicElement);
+      import { MosaicBookElement } from '/scripts/vitalsource-mosaic-book-element.js';
+      customElements.define('mosaic-book', MosaicBookElement);
 
       // The `window.VST` object must exist in the parent frame, otherwise the
       // `window.innerPageData` variable is not set in the content frame.
@@ -84,7 +37,7 @@
       by searching for the book ID (9781938168239) in the Bookshelf store.
     </p>
 
-    <mosaic-book></mosaic-book>
+    <mosaic-book book="test-pdf"></mosaic-book>
 
     {{{hypothesisScript}}}
   </body>
