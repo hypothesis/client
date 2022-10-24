@@ -94,5 +94,8 @@ export class MosaicBookElement extends HTMLElement {
         this.contentFrame.contentWindow.location.href = chapterURL;
       }, 50);
     }
+
+    this.prevButton.disabled = index === 0;
+    this.nextButton.disabled = index === this.chapterURLs.length - 1;
   }
 }
