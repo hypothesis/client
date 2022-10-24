@@ -1,15 +1,21 @@
 /**
- * These types are the used in by `PortProvider` and `PortFinder` for the
- * inter-frame discovery and communication processes.
+ * Message sent by `PortProvider` and `PortFinder` to establish a
+ * MessageChannel-based connection between two frames.
  *
  * @typedef {'guest'|'host'|'notebook'|'sidebar'} Frame
  *
  * @typedef Message
- * @prop {Frame} frame1
- * @prop {Frame} frame2
- * @prop {'offer'|'request'} type
- * @prop {string} requestId - ID of the request. Used to associate `offer`
- *   responses with requests and enable PortProvider to ignore re-sent requests.
+ * @prop {Frame} frame1 - Role of the source frame
+ * @prop {Frame} frame2 - Role of the target frame
+ * @prop {'offer'|'request'} type - Message type. "request" messages are sent
+ *   by the source frame to the host frame to request a connection. "offer"
+ *   messages are sent from the host frame back to the source frame and also
+ *   to the target frame, accompanied by a MessagePort.
+ * @prop {string} requestId - ID of the request. Used to associate "offer"
+ *   messages with their corresponding "request" messages.
+ * @prop {string} [sourceId] - Identifier for the source frame. This is useful
+ *   in cases where multiple source frames with a given role may connect to
+ *   the same destination frame.
  */
 
 /**

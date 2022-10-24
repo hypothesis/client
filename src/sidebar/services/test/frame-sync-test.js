@@ -34,9 +34,6 @@ const fixtures = {
     metadata: {
       link: [],
     },
-
-    // This should match the guest frame ID from `framesListEntry`.
-    frameIdentifier: 'abc',
   },
 };
 
@@ -191,9 +188,10 @@ describe('FrameSyncService', () => {
   /**
    * Simulate a new guest frame connecting to the sidebar.
    *
+   * @param {string} [frameId] - Guest frame ID, or `undefined` for main frame
    * @return {MessagePort} - The port that was sent to the sidebar
    */
-  async function connectGuest() {
+  async function connectGuest(frameId) {
     const { port1 } = new MessageChannel();
     hostPort.postMessage(
       {
@@ -201,6 +199,7 @@ describe('FrameSyncService', () => {
         frame2: 'sidebar',
         type: 'offer',
         requestId: 'abc',
+        sourceId: frameId,
       },
       [port1]
     );
@@ -268,18 +267,16 @@ describe('FrameSyncService', () => {
       // Connect two guests, one representing the main frame and one representing
       // an iframe.
       await connectGuest();
-      await connectGuest();
+      await connectGuest('iframe');
 
       const mainGuestRPC = fakePortRPCs[1];
       const iframeGuestRPC = fakePortRPCs[2];
 
       mainGuestRPC.emit('documentInfoChanged', {
-        frameIdentifier: null,
         uri: mainFrameAnn.uri,
       });
 
       iframeGuestRPC.emit('documentInfoChanged', {
-        frameIdentifier: 'iframe',
         uri: iframeAnn.uri,
       });
 
@@ -310,8 +307,6 @@ describe('FrameSyncService', () => {
       // what happens in VitalSource for example.
       await connectGuest();
       emitGuestEvent('documentInfoChanged', {
-        frameIdentifier: 'iframe',
-
         // Note that URI does not match annotation URI. The backend can still return
         // the annotation for this frame based on URI equivalence information.
         uri: 'https://publisher.com/books/1234/chapter1.html',
@@ -573,14 +568,16 @@ describe('FrameSyncService', () => {
       frameSync.connect();
     });
 
-    it("adds the page's metadata to the frames list", async () => {
+    it('adds guest frame details to the store', async () => {
       const frameInfo = fixtures.htmlDocumentInfo;
-      await connectGuest();
+      const frameId = 'test-frame';
+
+      await connectGuest(frameId);
       emitGuestEvent('documentInfoChanged', frameInfo);
 
       assert.deepEqual(fakeStore.frames(), [
         {
-          id: frameInfo.frameIdentifier,
+          id: frameId,
           metadata: frameInfo.metadata,
           uri: frameInfo.uri,
 
@@ -642,7 +639,6 @@ describe('FrameSyncService', () => {
       await connectGuest();
 
       emitGuestEvent('documentInfoChanged', {
-        frameIdentifier: 'abc',
         uri: 'http://example.org',
       });
       emitGuestEvent('close');

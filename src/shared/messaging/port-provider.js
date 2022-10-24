@@ -144,7 +144,7 @@ export class PortProvider {
         return;
       }
 
-      const { frame1, frame2, requestId } = data;
+      const { frame1, frame2, requestId, sourceId } = data;
       const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
 
       if (!isSourceWindow(source)) {
@@ -183,7 +183,11 @@ export class PortProvider {
           ? this._sidebarHostChannel
           : new MessageChannel();
 
-      const message = { frame1, frame2, type: 'offer', requestId };
+      // The message that is sent to the target frame that the source wants to
+      // connect to, as well as the source frame requesting the connection.
+      // Each message is accompanied by a port for the appropriate end of the
+      // connection.
+      const message = { frame1, frame2, type: 'offer', requestId, sourceId };
 
       // If the source window has an opaque origin [1], `event.origin` will be
       // the string "null". This is not a legal value for the `targetOrigin`

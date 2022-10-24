@@ -1354,7 +1354,6 @@ describe('Guest', () => {
         title: 'Test title',
         documentFingerprint: 'test-fingerprint',
       },
-      frameIdentifier: null,
     });
   });
 
@@ -1371,7 +1370,6 @@ describe('Guest', () => {
       metadata: {
         title: 'Page 1',
       },
-      frameIdentifier: null,
     });
 
     sidebarRPCCall.resetHistory();
@@ -1386,7 +1384,6 @@ describe('Guest', () => {
       metadata: {
         title: 'Page 2',
       },
-      frameIdentifier: null,
     });
   });
 

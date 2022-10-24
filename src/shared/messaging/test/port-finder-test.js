@@ -16,8 +16,8 @@ describe('PortFinder', () => {
   let portFinder;
   let portFinders;
 
-  function createPortFinder(source = frame1) {
-    const instance = new PortFinder({ hostFrame: window, source });
+  function createPortFinder(source = frame1, sourceId) {
+    const instance = new PortFinder({ hostFrame: window, source, sourceId });
     portFinders.push(instance);
     return instance;
   }
@@ -99,6 +99,29 @@ describe('PortFinder', () => {
       })
     );
 
+    it('sends port request to host frame', async () => {
+      const clock = sinon.useFakeTimers();
+      try {
+        portFinder = createPortFinder('guest', 'guest-id');
+        portFinder.discover('sidebar');
+        clock.tick(POLLING_INTERVAL_FOR_PORT);
+
+        assert.calledWith(
+          window.postMessage,
+          {
+            frame1: 'guest',
+            frame2: 'sidebar',
+            type: 'request',
+            requestId,
+            sourceId: 'guest-id',
+          },
+          '*'
+        );
+      } finally {
+        clock.restore();
+      }
+    });
+
     [
       { source: 'guest', target: 'host' },
       { source: 'guest', target: 'sidebar' },
@@ -144,7 +167,13 @@ describe('PortFinder', () => {
       assert.callCount(window.postMessage, expectedCalls);
       assert.alwaysCalledWithExactly(
         window.postMessage,
-        { frame1, frame2: target, type: 'request', requestId },
+        {
+          frame1,
+          frame2: target,
+          type: 'request',
+          requestId,
+          sourceId: undefined,
+        },
         '*'
       );
 

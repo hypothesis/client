@@ -158,6 +158,7 @@ describe('PortProvider', () => {
         frame2: 'host',
         type: 'request',
         requestId: 'abcdef',
+        sourceId: undefined,
       };
 
       await sendPortFinderRequest({
@@ -178,6 +179,7 @@ describe('PortProvider', () => {
         frame2: 'sidebar',
         type: 'request',
         requestId: 'abcdef',
+        sourceId: undefined,
       };
 
       await sendPortFinderRequest({ data, origin: 'null' });
@@ -193,6 +195,7 @@ describe('PortProvider', () => {
         frame2: 'sidebar',
         type: 'request',
         requestId: 'abcdef',
+        sourceId: undefined,
       };
 
       for (let i = 0; i < 4; ++i) {
@@ -228,6 +231,7 @@ describe('PortProvider', () => {
         frame2: 'sidebar',
         type: 'request',
         requestId: 'ghijkl',
+        sourceId: 'test-frame',
       };
       await sendPortFinderRequest({
         data,
