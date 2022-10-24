@@ -10,21 +10,7 @@ export class MosaicBookElement extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
 
-    const book = this.getAttribute('book');
-
-    if (book === 'little-women') {
-      this.chapterURLs = [
-        '/document/little-women-1',
-        '/document/little-women-2',
-        '/document/little-women-3',
-      ];
-    } else if (book === 'test-pdf') {
-      this.chapterURLs = ['/document/vitalsource-pdf-page'];
-    } else {
-      console.warn(`Unknown VitalSource book "${book}"`);
-      this.chapterURLs = [];
-    }
-
+    this.chapterURLs = [];
     this.chapterIndex = 0;
 
     const styles = document.createElement('style');
@@ -50,6 +36,22 @@ export class MosaicBookElement extends HTMLElement {
     this.nextButton.textContent = 'Next chapter';
     this.nextButton.onclick = () => this.setChapter(this.chapterIndex + 1);
     controlBar.append(this.nextButton);
+  }
+
+  connectedCallback() {
+    const book = this.getAttribute('book');
+
+    if (book === 'little-women') {
+      this.chapterURLs = [
+        '/document/little-women-1',
+        '/document/little-women-2',
+        '/document/little-women-3',
+      ];
+    } else if (book === 'test-pdf') {
+      this.chapterURLs = ['/document/vitalsource-pdf-page'];
+    } else {
+      console.warn(`Unknown VitalSource book "${book}"`);
+    }
 
     this.setChapter(0, { initialLoad: true });
   }
