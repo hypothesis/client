@@ -25,12 +25,14 @@ export class PortFinder {
   /**
    * @param {object} options
    *   @param {Exclude<Frame, 'host'>} options.source - the role of this frame
+   *   @param {string} [options.sourceId] - Identifier for this frame
    *   @param {Window} options.hostFrame - the frame where the `PortProvider` is
    *     listening for messages.
    */
-  constructor({ hostFrame, source }) {
+  constructor({ hostFrame, source, sourceId }) {
     this._hostFrame = hostFrame;
     this._source = source;
+    this._sourceId = sourceId;
     this._listeners = new ListenerCollection();
   }
 
@@ -69,6 +71,7 @@ export class PortFinder {
             frame2: target,
             type: 'request',
             requestId,
+            sourceId: this._sourceId,
           },
           '*'
         );

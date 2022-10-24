@@ -2,11 +2,17 @@ import debounce from 'lodash.debounce';
 import shallowEqual from 'shallowequal';
 
 import { ListenerCollection } from '../../shared/listener-collection';
-import { PortFinder, PortRPC, isMessageEqual } from '../../shared/messaging';
+import {
+  PortFinder,
+  PortRPC,
+  isMessage,
+  isMessageEqual,
+} from '../../shared/messaging';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
 /**
+ * @typedef {import('../../shared/messaging').Message} Message
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').DocumentMetadata} DocumentMetadata
  * @typedef {import('../../types/api').Annotation} Annotation
@@ -19,7 +25,6 @@ import { watch } from '../util/watch';
 
 /**
  * @typedef DocumentInfo
- * @prop {string|null} frameIdentifier
  * @prop {string} uri
  * @prop {DocumentMetadata} metadata
  */
@@ -120,7 +125,6 @@ export class FrameSyncService {
      * @type {Map<string|null, PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>>}
      */
     this._guestRPC = new Map();
-    this._nextGuestId = 0;
 
     /**
      * Tags of annotations that are currently loaded into guest frames.
@@ -256,21 +260,13 @@ export class FrameSyncService {
    * Set up a connection to a new guest frame.
    *
    * @param {MessagePort} port - Port for communicating with the guest
+   * @param {string|null} sourceId - Identifier for the guest frame
    */
-  _connectGuest(port) {
+  _connectGuest(port, sourceId) {
     /** @type {PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>} */
     const guestRPC = new PortRPC();
 
-    // Add guest RPC to map with a temporary ID until we learn the real ID.
-    //
-    // We need to add the guest to the map immediately so that any notifications
-    // sent from this service to all guests, before we learn the real frame ID,
-    // are sent to this new guest.
-    ++this._nextGuestId;
-    let frameIdentifier = /** @type {string|null} */ (
-      `temp-${this._nextGuestId}`
-    );
-    this._guestRPC.set(frameIdentifier, guestRPC);
+    this._guestRPC.set(sourceId, guestRPC);
 
     // Update document metadata for this guest. We currently assume that the
     // guest will make this call once after it connects. To handle updates
@@ -280,13 +276,8 @@ export class FrameSyncService {
       'documentInfoChanged',
       /** @param {DocumentInfo} info */
       info => {
-        this._guestRPC.delete(frameIdentifier);
-
-        frameIdentifier = info.frameIdentifier;
-        this._guestRPC.set(frameIdentifier, guestRPC);
-
         this._store.connectFrame({
-          id: info.frameIdentifier,
+          id: sourceId,
           metadata: info.metadata,
           uri: info.uri,
         });
@@ -297,12 +288,12 @@ export class FrameSyncService {
     // a certain time frame.
 
     guestRPC.on('close', () => {
-      const frame = this._store.frames().find(f => f.id === frameIdentifier);
+      const frame = this._store.frames().find(f => f.id === sourceId);
       if (frame) {
         this._store.destroyFrame(frame);
       }
       guestRPC.destroy();
-      this._guestRPC.delete(frameIdentifier);
+      this._guestRPC.delete(sourceId);
     });
 
     // A new annotation, note or highlight was created in the frame
@@ -487,14 +478,20 @@ export class FrameSyncService {
     // Listen for guests connecting to the sidebar.
     this._listeners.add(hostPort, 'message', event => {
       const { data, ports } = event;
+
+      const message = /** @type {unknown|Message} */ (data);
+      if (!isMessage(message)) {
+        return;
+      }
+
       if (
-        isMessageEqual(data, {
+        isMessageEqual(message, {
           frame1: 'guest',
           frame2: 'sidebar',
           type: 'offer',
         })
       ) {
-        this._connectGuest(ports[0]);
+        this._connectGuest(ports[0], message.sourceId ?? null);
       }
     });
   }

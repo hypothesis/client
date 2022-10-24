@@ -192,6 +192,7 @@ export class Guest {
     this._portFinder = new PortFinder({
       hostFrame: this._hostFrame,
       source: 'guest',
+      sourceId: this._frameIdentifier ?? undefined,
     });
 
     this.features = new FeatureFlags();
@@ -316,7 +317,6 @@ export class Guest {
     return {
       uri: normalizeURI(uri),
       metadata,
-      frameIdentifier: this._frameIdentifier,
     };
   }
 
