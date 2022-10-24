@@ -1,7 +1,5 @@
-**/vendor/*
 .*/**
 build/
 coverage/
 docs/
-dev-server/static/*
-lib/
+dev-server/static/scripts/pdfjs/*
