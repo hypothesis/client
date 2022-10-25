@@ -12,8 +12,8 @@ import { injectClient } from '../hypothesis-injector';
  * @typedef {import('../../types/annotator').Anchor} Anchor
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').Integration} Integration
- * @typedef {import('../../types/annotator').Selector} Selector
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
+ * @typedef {import('../../types/api').Selector} Selector
  * @typedef {import('../hypothesis-injector').InjectConfig} InjectConfig
  */
 
