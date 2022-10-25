@@ -16,6 +16,18 @@
     // Upgrade TS rules from warning to error.
     "@typescript-eslint/no-unused-vars": "error",
 
+    // Replace no-use-before-define with TS version, to avoid incorrect warnings.
+    // See https://typescript-eslint.io/rules/no-use-before-define
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": [
+      "error",
+      {
+        "functions": false,
+        "typedefs": false,
+        "ignoreTypeReferences": false
+      }
+    ],
+
     // Disable TS rules that we dislike.
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-empty-function": "off",
