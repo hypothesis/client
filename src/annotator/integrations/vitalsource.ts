@@ -8,7 +8,12 @@ import { preserveScrollPosition } from './html-side-by-side';
 import { ImageTextLayer } from './image-text-layer';
 import { injectClient } from '../hypothesis-injector';
 
-import type { Anchor, Integration, SidebarLayout } from '../../types/annotator';
+import type {
+  Anchor,
+  FeatureFlags as IFeatureFlags,
+  Integration,
+  SidebarLayout,
+} from '../../types/annotator';
 import type { Selector } from '../../types/api';
 import type { InjectConfig } from '../hypothesis-injector';
 
@@ -201,21 +206,36 @@ export class VitalSourceContentIntegration
   extends TinyEmitter
   implements Integration
 {
+  private _features: IFeatureFlags;
   private _htmlIntegration: HTMLIntegration;
   private _listeners: ListenerCollection;
   private _textLayer?: ImageTextLayer;
 
-  constructor(container: HTMLElement = document.body) {
+  constructor(
+    container: HTMLElement = document.body,
+    options: { features: IFeatureFlags }
+  ) {
     super();
 
-    const features = new FeatureFlags();
+    this._features = options.features;
+
+    // If the book_as_single_document flag changed, this will change the
+    // document URI returned by this integration.
+    this._features.on('flagsChanged', () => {
+      this.emit('uriChanged');
+    });
+
+    const htmlFeatures = new FeatureFlags();
 
     // Forcibly enable the side-by-side feature for VS books. This feature is
     // only behind a flag for regular web pages, which are typically more
     // complex and varied than EPUB books.
-    features.update({ html_side_by_side: true });
+    htmlFeatures.update({ html_side_by_side: true });
 
-    this._htmlIntegration = new HTMLIntegration({ container, features });
+    this._htmlIntegration = new HTMLIntegration({
+      container,
+      features: htmlFeatures,
+    });
 
     this._listeners = new ListenerCollection();
 
@@ -339,24 +359,39 @@ export class VitalSourceContentIntegration
   }
 
   async uri() {
-    // An example of a typical URL for the chapter content in the Bookshelf reader is:
-    //
-    // https://jigsaw.vitalsource.com/books/9781848317703/epub/OPS/xhtml/chapter_001.html#cfi=/6/10%5B;vnd.vst.idref=chap001%5D!/4
-    //
-    // Where "9781848317703" is the VitalSource book ID ("vbid"), "chapter_001.html"
-    // is the location of the HTML page for the current chapter within the book
-    // and the `#cfi` fragment identifies the scroll location.
-    //
-    // Note that this URL is typically different than what is displayed in the
-    // iframe's `src` attribute.
+    if (this._bookIsSingleDocument()) {
+      // Dummy book ID that will in future be replaced with a real value
+      // retrieved via the `<mosaic-book>` element's API.
+      const bookId = '1234';
+      return `https://bookshelf.vitalsource.com/reader/books/${bookId}`;
+    } else {
+      // An example of a typical URL for the chapter content in the Bookshelf reader is:
+      //
+      // https://jigsaw.vitalsource.com/books/9781848317703/epub/OPS/xhtml/chapter_001.html#cfi=/6/10%5B;vnd.vst.idref=chap001%5D!/4
+      //
+      // Where "9781848317703" is the VitalSource book ID ("vbid"), "chapter_001.html"
+      // is the location of the HTML page for the current chapter within the book
+      // and the `#cfi` fragment identifies the scroll location.
+      //
+      // Note that this URL is typically different than what is displayed in the
+      // iframe's `src` attribute.
 
-    // Strip off search parameters and fragments.
-    const uri = new URL(document.location.href);
-    uri.search = '';
-    return uri.toString();
+      // Strip off search parameters and fragments.
+      const uri = new URL(document.location.href);
+      uri.search = '';
+      return uri.toString();
+    }
   }
 
   async scrollToAnchor(anchor: Anchor) {
     return this._htmlIntegration.scrollToAnchor(anchor);
+  }
+
+  /**
+   * Return true if the feature flag to treat books as one document is enabled,
+   * as opposed to treating each chapter/segment/page as a separate document.
+   */
+  _bookIsSingleDocument(): boolean {
+    return this._features.flagEnabled('book_as_single_document');
   }
 }

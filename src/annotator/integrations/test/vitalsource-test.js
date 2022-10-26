@@ -1,4 +1,5 @@
 import { delay, waitFor } from '../../../test-util/wait';
+import { FeatureFlags } from '../../features';
 import {
   VitalSourceInjector,
   VitalSourceContentIntegration,
@@ -54,12 +55,14 @@ class FakeVitalSourceViewer {
 }
 
 describe('annotator/integrations/vitalsource', () => {
+  let featureFlags;
   let fakeViewer;
   let FakeHTMLIntegration;
   let fakeHTMLIntegration;
   let fakeInjectClient;
 
   beforeEach(() => {
+    featureFlags = new FeatureFlags();
     fakeViewer = new FakeVitalSourceViewer();
 
     fakeHTMLIntegration = {
@@ -192,7 +195,9 @@ describe('annotator/integrations/vitalsource', () => {
     let integrations;
 
     function createIntegration() {
-      const integration = new VitalSourceContentIntegration();
+      const integration = new VitalSourceContentIntegration(document.body, {
+        features: featureFlags,
+      });
       integrations.push(integration);
       return integration;
     }
@@ -279,16 +284,43 @@ describe('annotator/integrations/vitalsource', () => {
         history.back();
       });
 
-      it('returns book URL excluding query string', async () => {
+      context('when "book_as_single_document" flag is off', () => {
+        it('returns book chapter URL excluding query string', async () => {
+          const integration = createIntegration();
+          const uri = await integration.uri();
+          const parsedURL = new URL(uri);
+          assert.equal(parsedURL.hostname, document.location.hostname);
+          assert.equal(
+            parsedURL.pathname,
+            '/books/abc/epub/OPS/xhtml/chapter_001.html'
+          );
+          assert.equal(parsedURL.search, '');
+        });
+      });
+
+      context('when "book_as_single_document" flag is on', () => {
+        it('returns book reader URL', async () => {
+          featureFlags.update({ book_as_single_document: true });
+          const integration = createIntegration();
+          const uri = await integration.uri();
+          assert.equal(
+            uri,
+            'https://bookshelf.vitalsource.com/reader/books/1234'
+          );
+        });
+      });
+
+      it('updates when "book_as_single_document" flag changes', async () => {
+        const uriChanged = sinon.stub();
         const integration = createIntegration();
-        const uri = await integration.uri();
-        const parsedURL = new URL(uri);
-        assert.equal(parsedURL.hostname, document.location.hostname);
-        assert.equal(
-          parsedURL.pathname,
-          '/books/abc/epub/OPS/xhtml/chapter_001.html'
-        );
-        assert.equal(parsedURL.search, '');
+        integration.on('uriChanged', uriChanged);
+        const uri1 = await integration.uri();
+
+        featureFlags.update({ book_as_single_document: true });
+
+        assert.calledOnce(uriChanged);
+        const uri2 = await integration.uri();
+        assert.notEqual(uri1, uri2);
       });
     });
 
