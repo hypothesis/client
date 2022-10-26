@@ -25,7 +25,9 @@ export function createIntegration(annotator) {
 
   const vsFrameRole = vitalSourceFrameRole();
   if (vsFrameRole === 'content') {
-    return new VitalSourceContentIntegration();
+    return new VitalSourceContentIntegration(document.body, {
+      features: annotator.features,
+    });
   }
 
   return new HTMLIntegration({ features: annotator.features });
