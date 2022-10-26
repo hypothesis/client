@@ -156,7 +156,7 @@ export function onNextDocumentReady(frame) {
  * next document fully loads (ie. when the frame's `load` event fires).
  *
  * @param {HTMLIFrameElement} frame
- * @param {(...args: [Error]|[null, Document]) => void} callback
+ * @param {(err: Error|null, document?: Document) => void} callback
  * @param {object} options
  *   @param {number} [options.pollInterval]
  * @return {() => void} Callback that unsubscribes from future changes

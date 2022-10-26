@@ -8,14 +8,9 @@ import { preserveScrollPosition } from './html-side-by-side';
 import { ImageTextLayer } from './image-text-layer';
 import { injectClient } from '../hypothesis-injector';
 
-/**
- * @typedef {import('../../types/annotator').Anchor} Anchor
- * @typedef {import('../../types/annotator').Annotator} Annotator
- * @typedef {import('../../types/annotator').Integration} Integration
- * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
- * @typedef {import('../../types/api').Selector} Selector
- * @typedef {import('../hypothesis-injector').InjectConfig} InjectConfig
- */
+import type { Anchor, Integration, SidebarLayout } from '../../types/annotator';
+import type { Selector } from '../../types/api';
+import type { InjectConfig } from '../hypothesis-injector';
 
 // When activating side-by-side mode for VitalSource PDF documents, make sure
 // at least this much space (in pixels) is left for the PDF document. Any
@@ -33,11 +28,13 @@ function findBookElement(document_ = document) {
  * Return the role of the current frame in the VitalSource Bookshelf reader or
  * `null` if the frame is not part of Bookshelf.
  *
- * @return {'container'|'content'|null} - `container` if this is the parent of
- *   the content frame, `content` if this is the frame that contains the book
- *   content or `null` if the document is not part of the Bookshelf reader.
+ * @return `container` if this is the parent of the content frame, `content` if
+ *   this is the frame that contains the book content or `null` if the document is
+ *   not part of the Bookshelf reader.
  */
-export function vitalSourceFrameRole(window_ = window) {
+export function vitalSourceFrameRole(
+  window_ = window
+): 'container' | 'content' | null {
   if (findBookElement(window_.document)) {
     return 'container';
   }
@@ -70,20 +67,21 @@ export function vitalSourceFrameRole(window_ = window) {
  * content frames when they are created.
  */
 export class VitalSourceInjector {
+  private _frameObserver: MutationObserver;
+
   /**
-   * @param {InjectConfig} config - Configuration for injecting the client into
+   * @param config - Configuration for injecting the client into
    *   book content frames
    */
-  constructor(config) {
+  constructor(config: InjectConfig) {
     const bookElement = findBookElement();
     if (!bookElement) {
       throw new Error('Book container element not found');
     }
 
-    /** @type {WeakSet<HTMLIFrameElement>} */
-    const contentFrames = new WeakSet();
+    const contentFrames = new WeakSet<HTMLIFrameElement>();
 
-    const shadowRoot = /** @type {ShadowRoot} */ (bookElement.shadowRoot);
+    const shadowRoot = bookElement.shadowRoot!;
     const injectClientIntoContentFrame = () => {
       const frame = shadowRoot.querySelector('iframe');
       if (!frame || contentFrames.has(frame)) {
@@ -130,32 +128,31 @@ export class VitalSourceInjector {
  *
  * Coordinates are expressed in percentage distance from the top-left corner
  * of the rendered page.
- *
- * @typedef GlyphBox
- * @prop {number} l
- * @prop {number} r
- * @prop {number} t
- * @prop {number} b
  */
+type GlyphBox = {
+  l: number;
+  r: number;
+  t: number;
+  b: number;
+};
 
-/**
- * @typedef PDFGlyphData
- * @prop {GlyphBox[]} glyphs
- */
+type PDFGlyphData = {
+  glyphs: GlyphBox[];
+};
 
 /**
  * Data that the VitalSource book reader renders into the page about the
  * content and location of text in the image.
- *
- * @typedef PDFTextData
- * @prop {PDFGlyphData} glyphs - Locations of each text character in the page
- * @prop {string} words - The text in the page
  */
+type PDFTextData = {
+  /** Locations of each text character in the page */
+  glyphs: PDFGlyphData;
+  /** The text in the page */
+  words: string;
+};
 
 function getPDFPageImage() {
-  return /** @type {HTMLImageElement|null} */ (
-    document.querySelector('img#pbk-page')
-  );
+  return document.querySelector('img#pbk-page') as HTMLImageElement | null;
 }
 
 /**
@@ -166,10 +163,8 @@ function getPDFPageImage() {
  * Some VitalSource books (PDFs) make content scrolling work by making the
  * content iframe really tall and having the parent frame scroll. This stops the
  * Hypothesis bucket bar and scrolling annotations into view from working.
- *
- * @param {HTMLIFrameElement} frame
  */
-function makeContentFrameScrollable(frame) {
+function makeContentFrameScrollable(frame: HTMLIFrameElement) {
   if (frame.getAttribute('scrolling') !== 'no') {
     // This is a book (eg. EPUB) where the workaround is not required.
     return;
@@ -201,14 +196,16 @@ function makeContentFrameScrollable(frame) {
  *    of the adder.
  *  - Create a hidden text layer in PDF-based books, so the user can select text
  *    in the PDF image. This is similar to what PDF.js does for us in PDFs.
- *
- * @implements {Integration}
  */
-export class VitalSourceContentIntegration extends TinyEmitter {
-  /**
-   * @param {HTMLElement} container
-   */
-  constructor(container = document.body) {
+export class VitalSourceContentIntegration
+  extends TinyEmitter
+  implements Integration
+{
+  private _htmlIntegration: HTMLIntegration;
+  private _listeners: ListenerCollection;
+  private _textLayer?: ImageTextLayer;
+
+  constructor(container: HTMLElement = document.body) {
     super();
 
     const features = new FeatureFlags();
@@ -230,7 +227,7 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     // event blocking must happen at the same level or higher in the DOM tree
     // than where SelectionObserver listens.
     const stopEvents = ['mouseup', 'mousedown', 'mouseout'];
-    for (let event of stopEvents) {
+    for (const event of stopEvents) {
       this._listeners.add(document.documentElement, event, e => {
         e.stopPropagation();
       });
@@ -239,7 +236,7 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     // Install scrolling workaround for PDFs. We do this in the content frame
     // so that it works whether Hypothesis is loaded directly into the content
     // frame or injected by VitalSourceInjector from the parent frame.
-    const frame = /** @type {HTMLIFrameElement|null} */ (window.frameElement);
+    const frame = window.frameElement as HTMLIFrameElement | null;
     if (frame) {
       makeContentFrameScrollable(frame);
     }
@@ -248,8 +245,7 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     // image.
     const bookImage = getPDFPageImage();
 
-    /** @type {PDFTextData|undefined} */
-    const pageData = /** @type {any} */ (window).innerPageData;
+    const pageData = (window as any).innerPageData as PDFTextData | undefined;
 
     if (bookImage && pageData) {
       const charRects = pageData.glyphs.glyphs.map(glyph => {
@@ -285,19 +281,11 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     this._htmlIntegration.destroy();
   }
 
-  /**
-   * @param {HTMLElement} root
-   * @param {Selector[]} selectors
-   */
-  anchor(root, selectors) {
+  anchor(root: HTMLElement, selectors: Selector[]) {
     return this._htmlIntegration.anchor(root, selectors);
   }
 
-  /**
-   * @param {HTMLElement} root
-   * @param {Range} range
-   */
-  describe(root, range) {
+  describe(root: HTMLElement, range: Range) {
     return this._htmlIntegration.describe(root, range);
   }
 
@@ -305,17 +293,12 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     return this._htmlIntegration.contentContainer();
   }
 
-  /**
-   * @param {SidebarLayout} layout
-   */
-  fitSideBySide(layout) {
+  fitSideBySide(layout: SidebarLayout) {
     // For PDF books, handle side-by-side mode in this integration. For EPUBs,
     // delegate to the HTML integration.
     const bookImage = getPDFPageImage();
     if (bookImage && this._textLayer) {
-      const bookContainer = /** @type {HTMLElement} */ (
-        bookImage.parentElement
-      );
+      const bookContainer = bookImage.parentElement as HTMLElement;
       const textLayer = this._textLayer;
 
       // Update the PDF image size and alignment to fit alongside the sidebar.
@@ -373,10 +356,7 @@ export class VitalSourceContentIntegration extends TinyEmitter {
     return uri.toString();
   }
 
-  /**
-   * @param {Anchor} anchor
-   */
-  async scrollToAnchor(anchor) {
+  async scrollToAnchor(anchor: Anchor) {
     return this._htmlIntegration.scrollToAnchor(anchor);
   }
 }
