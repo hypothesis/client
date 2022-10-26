@@ -212,6 +212,7 @@ export class VitalSourceContentIntegration
   private _textLayer?: ImageTextLayer;
 
   constructor(
+    /* istanbul ignore next - defaults are overridden in tests */
     container: HTMLElement = document.body,
     options: { features: IFeatureFlags }
   ) {
