@@ -23,10 +23,40 @@ import type { InjectConfig } from '../hypothesis-injector';
 const MIN_CONTENT_WIDTH = 480;
 
 /**
+ * Book metadata exposed by the VitalSource viewer.
+ */
+type BookInfo = {
+  /**
+   * Indicates the book type. "epub" means the book was created from an EPUB
+   * and the content is XHTML. "pbk" means the book was created from a PDF and
+   * has a fixed layout.
+   */
+  format: 'epub' | 'pbk';
+
+  /**
+   * VitalSource book ID ("vbid"). This identifier is _usually_ the book's
+   * ISBN, hence the field name. However this value is not always a valid ISBN.
+   */
+  isbn: string;
+  title: string;
+};
+
+/**
+ * `<mosaic-book>` custom element in the VitalSource container frame.
+ *
+ * This element has various extra methods that can be used to fetch book
+ * metadata, get information about the current location and navigate the book.
+ */
+type MosaicBookElement = HTMLElement & {
+  /** Returns metadata about the currently loaded book. */
+  getBookInfo(): BookInfo;
+};
+
+/**
  * Return the custom DOM element that contains the book content iframe.
  */
-function findBookElement(document_ = document) {
-  return document_.querySelector('mosaic-book');
+function findBookElement(document_ = document): MosaicBookElement | null {
+  return document_.querySelector('mosaic-book') as MosaicBookElement | null;
 }
 
 /**
@@ -206,6 +236,7 @@ export class VitalSourceContentIntegration
   extends TinyEmitter
   implements Integration
 {
+  private _bookElement: MosaicBookElement;
   private _features: IFeatureFlags;
   private _htmlIntegration: HTMLIntegration;
   private _listeners: ListenerCollection;
@@ -214,11 +245,24 @@ export class VitalSourceContentIntegration
   constructor(
     /* istanbul ignore next - defaults are overridden in tests */
     container: HTMLElement = document.body,
-    options: { features: IFeatureFlags }
+    options: {
+      features: IFeatureFlags;
+      // Test seam
+      bookElement?: MosaicBookElement;
+    }
   ) {
     super();
 
     this._features = options.features;
+
+    const bookElement =
+      options.bookElement ?? findBookElement(window.parent.document);
+    if (!bookElement) {
+      throw new Error(
+        'Failed to find <mosaic-book> element in container frame'
+      );
+    }
+    this._bookElement = bookElement;
 
     // If the book_as_single_document flag changed, this will change the
     // document URI returned by this integration.
@@ -351,6 +395,14 @@ export class VitalSourceContentIntegration
   }
 
   async getMetadata() {
+    if (this._bookIsSingleDocument()) {
+      const bookInfo = this._bookElement.getBookInfo();
+      return {
+        title: bookInfo.title,
+        link: [],
+      };
+    }
+
     // Return minimal metadata which includes only the information we really
     // want to include.
     return {
@@ -361,27 +413,26 @@ export class VitalSourceContentIntegration
 
   async uri() {
     if (this._bookIsSingleDocument()) {
-      // Dummy book ID that will in future be replaced with a real value
-      // retrieved via the `<mosaic-book>` element's API.
-      const bookId = '1234';
+      const bookInfo = this._bookElement.getBookInfo();
+      const bookId = bookInfo.isbn;
       return `https://bookshelf.vitalsource.com/reader/books/${bookId}`;
-    } else {
-      // An example of a typical URL for the chapter content in the Bookshelf reader is:
-      //
-      // https://jigsaw.vitalsource.com/books/9781848317703/epub/OPS/xhtml/chapter_001.html#cfi=/6/10%5B;vnd.vst.idref=chap001%5D!/4
-      //
-      // Where "9781848317703" is the VitalSource book ID ("vbid"), "chapter_001.html"
-      // is the location of the HTML page for the current chapter within the book
-      // and the `#cfi` fragment identifies the scroll location.
-      //
-      // Note that this URL is typically different than what is displayed in the
-      // iframe's `src` attribute.
-
-      // Strip off search parameters and fragments.
-      const uri = new URL(document.location.href);
-      uri.search = '';
-      return uri.toString();
     }
+
+    // An example of a typical URL for the chapter content in the Bookshelf reader is:
+    //
+    // https://jigsaw.vitalsource.com/books/9781848317703/epub/OPS/xhtml/chapter_001.html#cfi=/6/10%5B;vnd.vst.idref=chap001%5D!/4
+    //
+    // Where "9781848317703" is the VitalSource book ID ("vbid"), "chapter_001.html"
+    // is the location of the HTML page for the current chapter within the book
+    // and the `#cfi` fragment identifies the scroll location.
+    //
+    // Note that this URL is typically different than what is displayed in the
+    // iframe's `src` attribute.
+
+    // Strip off search parameters and fragments.
+    const uri = new URL(document.location.href);
+    uri.search = '';
+    return uri.toString();
   }
 
   async scrollToAnchor(anchor: Anchor) {

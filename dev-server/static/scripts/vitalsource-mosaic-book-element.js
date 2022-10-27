@@ -98,4 +98,24 @@ export class MosaicBookElement extends HTMLElement {
     this.prevButton.disabled = index === 0;
     this.nextButton.disabled = index === this.chapterURLs.length - 1;
   }
+
+  getBookInfo() {
+    const book = this.getAttribute('book');
+
+    if (book === 'little-women') {
+      return {
+        format: 'epub',
+        isbn: '9780451532084',
+        title: 'Little Women',
+      };
+    } else if (book === 'test-pdf') {
+      return {
+        format: 'pbk',
+        isbn: 'TEST-PDF',
+        title: 'Test PDF',
+      };
+    } else {
+      throw new Error('Unknown book ID');
+    }
+  }
 }
