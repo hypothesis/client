@@ -69,10 +69,64 @@ export type RangeSelector = {
 };
 
 /**
+ * Selector which identifies the Content Document within an EPUB that an
+ * annotation was made in.
+ */
+export type EPUBContentSelector = {
+  type: 'EPUBContentSelector';
+
+  /**
+   * URL of the content document. This can either be an absolute HTTP URL, or
+   * a URL that is relative to the root of the EPUB.
+   */
+  url: string;
+
+  /**
+   * EPUB Canonical Fragment Identifier for the table of contents entry that
+   * corresponds to the content document.
+   */
+  cfi?: string;
+
+  /** Title of the content document. */
+  title?: string;
+};
+
+/**
+ * Selector which identifies the page of a document that an annotation was made
+ * on.
+ *
+ * This selector is only applicable for document types where the association of
+ * content and page numbers can be done in a way that is independent of the
+ * viewer and display settings. This includes inherently paginated documents
+ * such as PDFs, but also content such as EPUBs when they include information
+ * about the location of page breaks in printed versions of a book. It does
+ * not include ordinary web pages or EPUBs without page break information
+ * however.
+ */
+export type PageSelector = {
+  type: 'PageSelector';
+
+  /** The zero-based index of the page in the document's page sequence. */
+  index: number;
+
+  /**
+   * Either the page number that is displayed on the page, or the 1-based
+   * number of the page in the document's page sequence, if the pages do not
+   * have numbers on them.
+   */
+  label?: string;
+};
+
+/**
  * Serialized representation of a region of a document which an annotation
  * pertains to.
  */
-export type Selector = TextQuoteSelector | TextPositionSelector | RangeSelector;
+export type Selector =
+  | TextQuoteSelector
+  | TextPositionSelector
+  | RangeSelector
+  | EPUBContentSelector
+  | PageSelector;
 
 /**
  * An entry in the `target` field of an annotation which identifies the document
