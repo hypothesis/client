@@ -191,12 +191,24 @@ describe('annotator/integrations/vitalsource', () => {
     });
   });
 
+  class FakeMosaicBookElement {
+    getBookInfo() {
+      return {
+        format: 'epub',
+        title: 'Test book title',
+        isbn: 'TEST-BOOK-ID',
+      };
+    }
+  }
+
   describe('VitalSourceContentIntegration', () => {
     let integrations;
+    let fakeBookElement;
 
     function createIntegration() {
       const integration = new VitalSourceContentIntegration(document.body, {
         features: featureFlags,
+        bookElement: fakeBookElement,
       });
       integrations.push(integration);
       return integration;
@@ -204,6 +216,7 @@ describe('annotator/integrations/vitalsource', () => {
 
     beforeEach(() => {
       integrations = [];
+      fakeBookElement = new FakeMosaicBookElement();
     });
 
     afterEach(() => {
@@ -265,11 +278,26 @@ describe('annotator/integrations/vitalsource', () => {
     });
 
     describe('#getMetadata', () => {
-      it('returns book metadata', async () => {
-        const integration = createIntegration();
-        const metadata = await integration.getMetadata();
-        assert.equal(metadata.title, document.title);
-        assert.deepEqual(metadata.link, []);
+      context('when "book_as_single_document" flag is off', () => {
+        it('returns metadata for current page/chapter', async () => {
+          const integration = createIntegration();
+          const metadata = await integration.getMetadata();
+          assert.equal(metadata.title, document.title);
+          assert.deepEqual(metadata.link, []);
+        });
+      });
+
+      context('when "book_as_single_document" flag is on', () => {
+        beforeEach(() => {
+          featureFlags.update({ book_as_single_document: true });
+        });
+
+        it('returns book metadata', async () => {
+          const integration = createIntegration();
+          const metadata = await integration.getMetadata();
+          assert.equal(metadata.title, 'Test book title');
+          assert.deepEqual(metadata.link, []);
+        });
       });
     });
 
@@ -305,7 +333,7 @@ describe('annotator/integrations/vitalsource', () => {
           const uri = await integration.uri();
           assert.equal(
             uri,
-            'https://bookshelf.vitalsource.com/reader/books/1234'
+            'https://bookshelf.vitalsource.com/reader/books/TEST-BOOK-ID'
           );
         });
       });
