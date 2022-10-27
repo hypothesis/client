@@ -13,8 +13,16 @@ export class MosaicBookElement extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
 
-    this.chapterURLs = [];
-    this.chapterIndex = 0;
+    /**
+     * Currently selected "page".
+     *
+     * We use the term "page" for consistency with the VitalSource API for this
+     * element (eg. `getCurrentPage`), but the unit depends on the book type.
+     * For PDFs each page is actually a page. For EPUBs each "page" is a
+     * separate "Content Document" from the EPUB.
+     */
+    this.pageIndex = 0;
+    this.pageData = [];
 
     const styles = document.createElement('style');
     styles.innerHTML = `
@@ -32,12 +40,12 @@ export class MosaicBookElement extends HTMLElement {
 
     this.prevButton = document.createElement('button');
     this.prevButton.textContent = 'Prev chapter';
-    this.prevButton.onclick = () => this.setChapter(this.chapterIndex - 1);
+    this.prevButton.onclick = () => this.setPage(this.pageIndex - 1);
     controlBar.append(this.prevButton);
 
     this.nextButton = document.createElement('button');
     this.nextButton.textContent = 'Next chapter';
-    this.nextButton.onclick = () => this.setChapter(this.chapterIndex + 1);
+    this.nextButton.onclick = () => this.setPage(this.pageIndex + 1);
     controlBar.append(this.nextButton);
   }
 
@@ -45,18 +53,42 @@ export class MosaicBookElement extends HTMLElement {
     const book = this.getAttribute('book');
 
     if (book === 'little-women') {
-      this.chapterURLs = [
-        '/document/little-women-1',
-        '/document/little-women-2',
-        '/document/little-women-3',
+      this.pageData = [
+        {
+          absoluteURL: '/document/little-women-1',
+          chapterTitle: 'Chapter One',
+          cfi: '/2',
+          index: 0,
+          page: '10',
+        },
+        {
+          absoluteURL: '/document/little-women-2',
+          cfi: '/4',
+          index: 1,
+          page: '20',
+        },
+        {
+          absoluteURL: '/document/little-women-3',
+          cfi: '/6',
+          index: 2,
+          page: '30',
+        },
       ];
     } else if (book === 'test-pdf') {
-      this.chapterURLs = ['/document/vitalsource-pdf-page'];
+      this.pageData = [
+        {
+          absoluteURL: '/document/vitalsource-pdf-page',
+          chapterTitle: 'Test chapter',
+          cfi: '/0',
+          index: 0,
+          page: '1',
+        },
+      ];
     } else {
       console.warn(`Unknown VitalSource book "${book}"`);
     }
 
-    this.setChapter(0, { initialLoad: true });
+    this.setPage(0, { initialLoad: true });
   }
 
   /**
@@ -64,11 +96,11 @@ export class MosaicBookElement extends HTMLElement {
    *
    * NOTE: This is a custom API that is not present on the real `<mosaic-book>` element.
    */
-  setChapter(index, { initialLoad = false } = {}) {
-    if (index < 0 || index >= this.chapterURLs.length) {
+  setPage(index, { initialLoad = false } = {}) {
+    if (index < 0 || index >= this.pageData.length) {
       return;
     }
-    this.chapterIndex = index;
+    this.pageIndex = index;
 
     // We remove the current frame and create a new one, rather than just
     // change the `src` of the existing iframe, to mimic what Bookshelf
@@ -77,12 +109,12 @@ export class MosaicBookElement extends HTMLElement {
     this.contentFrame = document.createElement('iframe');
     this.shadowRoot.append(this.contentFrame);
 
-    const chapterURL = this.chapterURLs[this.chapterIndex];
+    const pageURL = this.pageData[this.pageIndex].absoluteURL;
 
     if (initialLoad) {
       // Simulate client loading after VS chapter content has already
       // loaded.
-      this.contentFrame.src = chapterURL;
+      this.contentFrame.src = pageURL;
     } else {
       // Simulate chapter navigation after client is injected. These
       // navigations happen in several stages:
@@ -99,12 +131,12 @@ export class MosaicBookElement extends HTMLElement {
       setTimeout(() => {
         // Set the final URL in a way that doesn't update the `src` attribute
         // of the iframe, to make sure the client isn't relying on that.
-        this.contentFrame.contentWindow.location.href = chapterURL;
+        this.contentFrame.contentWindow.location.href = pageURL;
       }, 50);
     }
 
     this.prevButton.disabled = index === 0;
-    this.nextButton.disabled = index === this.chapterURLs.length - 1;
+    this.nextButton.disabled = index === this.pageData.length - 1;
   }
 
   getBookInfo() {
@@ -125,5 +157,9 @@ export class MosaicBookElement extends HTMLElement {
     } else {
       throw new Error('Unknown book ID');
     }
+  }
+
+  async getCurrentPage() {
+    return this.pageData[this.pageIndex];
   }
 }
