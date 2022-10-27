@@ -68,7 +68,12 @@ describe('annotator/integrations/vitalsource', () => {
     fakeHTMLIntegration = {
       anchor: sinon.stub(),
       contentContainer: sinon.stub(),
-      describe: sinon.stub(),
+      describe: sinon.stub().returns([
+        {
+          type: 'TextQuoteSelector',
+          exact: 'dummy selection',
+        },
+      ]),
       destroy: sinon.stub(),
       fitSideBySide: sinon.stub().returns(false),
       scrollToAnchor: sinon.stub(),
@@ -192,12 +197,46 @@ describe('annotator/integrations/vitalsource', () => {
   });
 
   class FakeMosaicBookElement {
+    constructor() {
+      this._format = 'epub';
+    }
+
+    selectEPUBBook() {
+      this._format = 'epub';
+    }
+
+    selectPDFBook() {
+      this._format = 'pbk';
+    }
+
     getBookInfo() {
       return {
-        format: 'epub',
+        format: this._format,
         title: 'Test book title',
         isbn: 'TEST-BOOK-ID',
       };
+    }
+
+    async getCurrentPage() {
+      if (this._format === 'epub') {
+        return {
+          absoluteURL: '/pages/chapter_02.xhtml',
+          cfi: '/2',
+          chapterTitle: 'Chapter two',
+          index: 1,
+          page: '20',
+        };
+      } else if (this._format === 'pbk') {
+        return {
+          absoluteURL: '/pages/2',
+          cfi: '/1',
+          index: 1,
+          page: '2',
+          chapterTitle: 'First chapter',
+        };
+      } else {
+        throw new Error('Unknown book');
+      }
     }
   }
 
@@ -275,6 +314,66 @@ describe('annotator/integrations/vitalsource', () => {
       const anchor = {};
       await integration.scrollToAnchor(anchor);
       assert.calledWith(fakeHTMLIntegration.scrollToAnchor, anchor);
+    });
+
+    context('when "book_as_single_document" flag is on', () => {
+      beforeEach(() => {
+        featureFlags.update({ book_as_single_document: true });
+      });
+
+      it('adds selector for current EPUB book Content Document', async () => {
+        const integration = createIntegration();
+        integration.contentContainer();
+        assert.calledWith(fakeHTMLIntegration.contentContainer);
+
+        const range = new Range();
+        const selectors = await integration.describe(range);
+
+        const cfiSelector = selectors.find(
+          s => s.type === 'EPUBContentSelector'
+        );
+
+        assert.ok(cfiSelector);
+        assert.deepEqual(cfiSelector, {
+          type: 'EPUBContentSelector',
+          url: '/pages/chapter_02.xhtml',
+          cfi: '/2',
+          title: 'Chapter two',
+        });
+
+        const pageSelector = selectors.find(s => s.type === 'PageSelector');
+        assert.notOk(pageSelector);
+      });
+
+      it('adds selector for current PDF book page', async () => {
+        fakeBookElement.selectPDFBook();
+
+        const integration = createIntegration();
+        integration.contentContainer();
+        assert.calledWith(fakeHTMLIntegration.contentContainer);
+
+        const range = new Range();
+        const selectors = await integration.describe(range);
+        const cfiSelector = selectors.find(
+          s => s.type === 'EPUBContentSelector'
+        );
+
+        assert.ok(cfiSelector);
+        assert.deepEqual(cfiSelector, {
+          type: 'EPUBContentSelector',
+          url: '/pages/2',
+          cfi: '/1',
+          title: 'First chapter',
+        });
+
+        const pageSelector = selectors.find(s => s.type === 'PageSelector');
+        assert.ok(pageSelector);
+        assert.deepEqual(pageSelector, {
+          type: 'PageSelector',
+          index: 1,
+          label: '2',
+        });
+      });
     });
 
     describe('#getMetadata', () => {

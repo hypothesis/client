@@ -419,6 +419,10 @@ export class VitalSourceContentIntegration
     }
 
     const pageInfo = await this._bookElement.getCurrentPage();
+
+    // We generate an "EPUBContentSelector" with a CFI for all VS books,
+    // although for PDF-based books the CFI is a string generated from the
+    // page number.
     const extraSelectors: Selector[] = [
       {
         type: 'EPUBContentSelector',
@@ -428,6 +432,11 @@ export class VitalSourceContentIntegration
       },
     ];
 
+    // If this is a PDF-based book, add a page selector. PDFs always have page
+    // numbers available. EPUB-based books _may_ have information about how
+    // content maps to page numbers in a printed edition of the book. We
+    // currently limit page number selectors to PDFs until more is understood
+    // about when EPUB page numbers are reliable/likely to remain stable.
     const bookInfo = this._bookElement.getBookInfo();
     if (bookInfo.format === 'pbk') {
       extraSelectors.push({
