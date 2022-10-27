@@ -1,7 +1,8 @@
 import type { TinyEmitter } from 'tiny-emitter';
 
-import type { Selector, Target } from './api';
+import type { Annotation, Selector, Target } from './api';
 import type { PDFViewerApplication } from './pdfjs';
+import type { ClientAnnotationData } from './shared';
 
 /**
  * Object representing a region of a document that an annotation
@@ -49,27 +50,13 @@ export type DocumentMetadata = {
 };
 
 /**
- * An object representing an annotation in the document.
+ * A subset of annotation data allowing the representation of an annotation in
+ * the document.
  */
-export type AnnotationData = {
-  uri: string;
-  target: Target[];
-  $tag: string;
-
-  /**
-   * Flag indicating that this annotation was created using the "Highlight" button,
-   * as opposed to "Annotate".
-   */
-  $highlight?: boolean;
-
-  /**
-   * Flag indicating that this annotation was not found in the document.
-   * It is initially `undefined` while anchoring is in progress and then set to
-   * `true` if anchoring failed or `false` if it succeeded.
-   */
-  $orphan?: boolean;
-  document?: DocumentMetadata;
-};
+export type AnnotationData = ClientAnnotationData &
+  Pick<Annotation, 'target' | 'uri'> & {
+    document?: DocumentMetadata;
+  };
 
 /**
  * An object representing the location in a document that an annotation is

@@ -1,3 +1,4 @@
+import type { ClientAnnotationData } from './shared';
 /**
  * Type definitions for objects returned from the Hypothesis API.
  *
@@ -84,7 +85,7 @@ export type Target = {
   selector?: Selector[];
 };
 
-export type Annotation = {
+export type Annotation = ClientAnnotationData & {
   /**
    * The server-assigned ID for the annotation. This is only set once the
    * annotation has been saved to the backend.
@@ -145,11 +146,6 @@ export type Annotation = {
   user_info?: {
     display_name: string | null;
   };
-
-  // Properties not present on API objects, but added by client.
-  $highlight?: boolean;
-  $orphan?: boolean;
-  $anchorTimeout?: boolean;
 };
 
 /**
