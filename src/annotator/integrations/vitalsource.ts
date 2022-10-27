@@ -258,6 +258,7 @@ export class VitalSourceContentIntegration
     const bookElement =
       options.bookElement ?? findBookElement(window.parent.document);
     if (!bookElement) {
+      /* istanbul ignore next */
       throw new Error(
         'Failed to find <mosaic-book> element in container frame'
       );
