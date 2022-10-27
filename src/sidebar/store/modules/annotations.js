@@ -91,7 +91,6 @@ function initializeAnnotation(annotation, tag) {
   }
 
   return Object.assign({}, annotation, {
-    // Flag indicating whether waiting for the annotation to anchor timed out.
     $anchorTimeout: false,
     $tag: annotation.$tag || tag,
     $orphan: orphan,
