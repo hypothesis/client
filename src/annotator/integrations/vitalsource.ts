@@ -44,8 +44,9 @@ type BookInfo = {
 /**
  * `<mosaic-book>` custom element in the VitalSource container frame.
  *
- * This element has various extra methods that can be used to fetch book
- * metadata, get information about the current location and navigate the book.
+ * This element is part of the VitalSource viewer. It contains the book content
+ * inside a frame within its Shadow DOM, and also has methods that can be used
+ * to fetch book metadata, get the current location and navigate the book.
  */
 type MosaicBookElement = HTMLElement & {
   /** Returns metadata about the currently loaded book. */
