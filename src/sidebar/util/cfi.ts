@@ -72,7 +72,7 @@ export function stripCFIAssertions(cfi: string): string {
  * The full sorting rules for CFIs are specified by https://idpf.org/epub/linking/cfi/#sec-sorting.
  *
  * This function currently only implements what is necessary to compare simple
- * CFIs that specify a location within a book's spine, without any step
+ * CFIs that specify a location within an EPUB's Package Document, without any step
  * indirections ("!"). These CFIs consist of a "/"-delimited sequence of numbers,
  * with optional assertions in `[...]` brackets (eg. "/2/4[chapter2ref]").
  *
