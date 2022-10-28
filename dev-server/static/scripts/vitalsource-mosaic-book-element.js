@@ -4,6 +4,9 @@
  *
  * This element is created in the book's container frame, and the element holds
  * the book's current content frame within its Shadow DOM.
+ *
+ * See `src/annotator/integrations/vitalsource.ts` for details of the APIs of
+ * this element which the Hypothesis client relies on.
  */
 export class MosaicBookElement extends HTMLElement {
   constructor() {
@@ -56,6 +59,11 @@ export class MosaicBookElement extends HTMLElement {
     this.setChapter(0, { initialLoad: true });
   }
 
+  /**
+   * Set the currently loaded chapter.
+   *
+   * NOTE: This is a custom API that is not present on the real `<mosaic-book>` element.
+   */
   setChapter(index, { initialLoad = false } = {}) {
     if (index < 0 || index >= this.chapterURLs.length) {
       return;
