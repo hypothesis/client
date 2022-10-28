@@ -260,10 +260,9 @@ export class FrameSyncService {
 
     this._guestRPC.set(sourceId, guestRPC);
 
-    // Update document metadata for this guest. We currently assume that the
-    // guest will make this call once after it connects. To handle updates
-    // to the document, we'll need to change `connectFrame` to update rather than
-    // add to the frame list.
+    // Update document metadata for this guest. The guest will call this method
+    // immediately after it connects to the sidebar. It may call it again
+    // later if the document in the guest frame is navigated.
     guestRPC.on('documentInfoChanged', (info: DocumentInfo) => {
       this._store.connectFrame({
         id: sourceId,
