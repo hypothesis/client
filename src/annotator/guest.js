@@ -1,3 +1,5 @@
+import classnames from 'classnames';
+
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
@@ -543,7 +545,10 @@ export class Guest {
       }
 
       const highlights = /** @type {AnnotationHighlight[]} */ (
-        highlightRange(range)
+        highlightRange(
+          range,
+          classnames('hypothesis-highlight', anchor.annotation?.$cluster)
+        )
       );
       highlights.forEach(h => {
         h._annotation = anchor.annotation;
@@ -656,6 +661,7 @@ export class Guest {
       document: info.metadata,
       target,
       $highlight: highlight,
+      $cluster: highlight ? 'user-highlights' : 'user-annotations',
       $tag: 'a:' + generateHexString(8),
     };
 

@@ -959,6 +959,18 @@ describe('Guest', () => {
       assert.equal(annotation.$highlight, true);
     });
 
+    it('sets `$cluster` to `user-highlights` if `highlight` is true', async () => {
+      const guest = createGuest();
+      const annotation = await guest.createAnnotation({ highlight: true });
+      assert.equal(annotation.$cluster, 'user-highlights');
+    });
+
+    it('sets `$cluster` to `user-annotations` if `highlight` is false', async () => {
+      const guest = createGuest();
+      const annotation = await guest.createAnnotation({ highlight: false });
+      assert.equal(annotation.$cluster, 'user-annotations');
+    });
+
     it('triggers a "createAnnotation" event', async () => {
       const guest = createGuest();
 
@@ -1123,6 +1135,22 @@ describe('Guest', () => {
         'syncAnchoringStatus',
         annotation,
       ]);
+    });
+
+    it('provides CSS classes for anchor highlight elements', async () => {
+      const guest = createGuest();
+      const annotation = {
+        $cluster: 'user-annotations',
+        target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
+      };
+      fakeIntegration.anchor.resolves(range);
+
+      await guest.anchor(annotation);
+
+      assert.equal(
+        highlighter.highlightRange.lastCall.args[1],
+        'hypothesis-highlight user-annotations'
+      );
     });
 
     it('returns a promise of the anchors for the annotation', () => {
