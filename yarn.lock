@@ -6373,9 +6373,9 @@ npm-packlist@^5.1.0:
     npm-normalize-package-bin "^2.0.0"
 
 npm-packlist@^7.0.1:
-  version "7.0.1"
-  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-7.0.1.tgz#984455991f12fed40d7018b8d012ed17a37303c0"
-  integrity sha512-XddbYutimy7hdmP7S1tHMjFwghn64lvgdnhYG0KLGFBWjEvMt1/jg95OR3vPNNCjkakHS+k4a//3XOO8JOGI2A==
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-7.0.2.tgz#f24177ce5b3593223348157bcc3eff1db8fae7d6"
+  integrity sha512-d2+7RMySjVXssww23rV5NuIq1NzGvM04OlI5kwnvtYKfFTAPVs6Zxmxns2HRtJEA1oNj7D/BbFXeVAOLmW3N3Q==
   dependencies:
     ignore-walk "^6.0.0"
 
