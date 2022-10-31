@@ -1580,9 +1580,9 @@
     tslib "^1.9.3"
 
 "@sentry/cli@^2.0.2":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-2.7.0.tgz#2a41e54c53d1c5ef8c041c59f8923cc51da08b57"
-  integrity sha512-rSKPFun5mKxQCWOo3ERdhz9avdTsiz3A7GD5GcsML2iB0NQ5ErlNQIMFGC+8EXOHCjjsLSi13lh6cPeccz81nw==
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-2.8.0.tgz#bbf4178ba490cc3333a4ac3f6063aec80728d131"
+  integrity sha512-tlYlFFvBN167/d4ussQcRThHNtYcr4SM+r58xP4/uiH3LmYNk1soRbVjiHMc2p3F5tWQ3Mu5JYT5ww39YT4m6w==
   dependencies:
     https-proxy-agent "^5.0.0"
     node-fetch "^2.6.7"
