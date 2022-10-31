@@ -17,7 +17,7 @@ class FakeWindow extends EventTarget {
 const testAnnotation = annotationFixtures.defaultAnnotation();
 
 const fixtures = {
-  ann: { $tag: 't1', ...testAnnotation },
+  ann: { $cluster: 'user-annotations', $tag: 't1', ...testAnnotation },
 
   // New annotation received from the frame
   newAnnFromFrame: {
@@ -218,6 +218,17 @@ describe('FrameSyncService', () => {
       frameSync.connect();
       const port = await connectGuest();
       assert.calledWith(guestRPC().connect, port);
+    });
+  });
+
+  describe('formatAnnot', () => {
+    it('formats annotations with only those properties needed by the annotator', () => {
+      assert.hasAllKeys(formatAnnot(fixtures.ann), [
+        '$cluster',
+        '$tag',
+        'target',
+        'uri',
+      ]);
     });
   });
 

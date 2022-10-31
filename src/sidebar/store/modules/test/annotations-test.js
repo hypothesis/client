@@ -3,9 +3,10 @@ import * as metadata from '../../../helpers/annotation-metadata';
 import { createStore } from '../../create-store';
 import { annotationsModule } from '../annotations';
 import { routeModule } from '../route';
+import { sessionModule } from '../session';
 
 function createTestStore() {
-  return createStore([annotationsModule, routeModule], [{}]);
+  return createStore([annotationsModule, routeModule, sessionModule], [{}]);
 }
 
 // Tests for some of the functionality in this store module are currently in
@@ -44,7 +45,7 @@ describe('sidebar/store/modules/annotations', () => {
       ]);
     });
 
-    it('assigns a local tag to annotations', () => {
+    it('assigns a $tag to annotations', () => {
       const annotA = Object.assign(fixtures.defaultAnnotation(), { id: 'a1' });
       const annotB = Object.assign(fixtures.defaultAnnotation(), { id: 'a2' });
 
@@ -55,6 +56,46 @@ describe('sidebar/store/modules/annotations', () => {
       });
 
       assert.deepEqual(tags, ['t1', 't2']);
+    });
+
+    it('assigns a $cluster to annotations', () => {
+      const getClusters = () =>
+        store.getState().annotations.annotations.map(a => a.$cluster);
+
+      const userHighlight = Object.assign(fixtures.defaultAnnotation(), {
+        id: 'a1',
+        user: 'acct:jondoe@hypothes.is',
+      });
+
+      const userAnnotation = Object.assign(fixtures.defaultAnnotation(), {
+        id: 'a2',
+        user: 'acct:jondoe@hypothes.is',
+        text: 'content', // This will ensure this is treated as an annotation instead of a highlight
+      });
+
+      const otherContent = Object.assign(fixtures.defaultAnnotation(), {
+        id: 'a3',
+        user: 'acct:someone-else@hypothes.is',
+        text: 'content',
+      });
+
+      store.updateProfile({ userid: 'acct:jondoe@hypothes.is' });
+      store.addAnnotations([userHighlight, userAnnotation, otherContent]);
+      assert.deepEqual(getClusters(), [
+        'user-highlights',
+        'user-annotations',
+        'other-content',
+      ]);
+
+      store.clearAnnotations();
+
+      store.updateProfile({ userid: null });
+      store.addAnnotations([userHighlight, userAnnotation, otherContent]);
+      assert.deepEqual(getClusters(), [
+        'other-content',
+        'other-content',
+        'other-content',
+      ]);
     });
 
     it('updates annotations with matching IDs in the store', () => {
@@ -69,7 +110,7 @@ describe('sidebar/store/modules/annotations', () => {
       assert.equal(updatedAnnot.text, 'update');
     });
 
-    it('updates annotations with matching tags in the store', () => {
+    it('updates annotations with matching $tags in the store', () => {
       const annot = fixtures.newAnnotation();
       annot.$tag = 'local-tag';
       store.addAnnotations([annot]);

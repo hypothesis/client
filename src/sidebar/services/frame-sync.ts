@@ -37,8 +37,14 @@ type DocumentInfo = {
  * JavaScript, it includes only the information needed to uniquely identify it
  * within the current session and anchor it in the document.
  */
-export function formatAnnot({ $tag, target, uri }: Annotation): AnnotationData {
+export function formatAnnot({
+  $cluster,
+  $tag,
+  target,
+  uri,
+}: Annotation): AnnotationData {
   return {
+    $cluster,
     $tag,
     target,
     uri,
