@@ -11,7 +11,11 @@ import { warnOnce } from '../shared/warn-once';
  *
  * @type {string[]}
  */
-const annotatorFlags = ['book_as_single_document', 'html_side_by_side'];
+const annotatorFlags = [
+  'book_as_single_document',
+  'html_side_by_side',
+  'styled_highlight_clusters',
+];
 
 /**
  * An observable container of feature flags.
