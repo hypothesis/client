@@ -10,6 +10,7 @@ import { createStoreModule, makeAction } from '../create-store';
 /**
  * @typedef {import('../../../types/annotator').ContentInfoConfig} ContentInfoConfig
  * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
+ * @typedef {import('../../../types/annotator').SegmentInfo} SegmentInfo
  */
 
 /**
@@ -19,6 +20,9 @@ import { createStoreModule, makeAction } from '../create-store';
  * @prop {DocumentMetadata} metadata - Metadata about the document currently loaded in this frame
  * @prop {string} uri - Current primary URI of the document being displayed
  * @prop {boolean} [isAnnotationFetchComplete]
+ * @prop {SegmentInfo} [segment] - Information about the section of a document
+ *   that is currently loaded. This is for content such as EPUBs, where the
+ *   content displayed in a guest frame is only part of the whole document.
  */
 
 const initialState = {

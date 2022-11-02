@@ -35,6 +35,19 @@ const fixtures = {
       link: [],
     },
   },
+
+  // Argument to the `documentInfoChanged` call made by a guest displaying an EPUB
+  // document.
+  epubDocumentInfo: {
+    uri: testAnnotation.uri,
+    metadata: {
+      title: 'Test book',
+    },
+    segmentInfo: {
+      cfi: '/2',
+      url: '/chapters/02.xhtml',
+    },
+  },
 };
 
 describe('FrameSyncService', () => {
@@ -579,25 +592,29 @@ describe('FrameSyncService', () => {
       frameSync.connect();
     });
 
-    it('adds guest frame details to the store', async () => {
-      const frameInfo = fixtures.htmlDocumentInfo;
-      const frameId = 'test-frame';
+    [fixtures.htmlDocumentInfo, fixtures.epubDocumentInfo].forEach(
+      frameInfo => {
+        it('adds guest frame details to the store', async () => {
+          const frameId = 'test-frame';
 
-      await connectGuest(frameId);
-      emitGuestEvent('documentInfoChanged', frameInfo);
+          await connectGuest(frameId);
+          emitGuestEvent('documentInfoChanged', frameInfo);
 
-      assert.deepEqual(fakeStore.frames(), [
-        {
-          id: frameId,
-          metadata: frameInfo.metadata,
-          uri: frameInfo.uri,
+          assert.deepEqual(fakeStore.frames(), [
+            {
+              id: frameId,
+              metadata: frameInfo.metadata,
+              uri: frameInfo.uri,
+              segment: frameInfo.segmentInfo,
 
-          // This would be false in the real application initially, but in these
-          // tests we pretend that the fetch completed immediately.
-          isAnnotationFetchComplete: true,
-        },
-      ]);
-    });
+              // This would be false in the real application initially, but in these
+              // tests we pretend that the fetch completed immediately.
+              isAnnotationFetchComplete: true,
+            },
+          ]);
+        });
+      }
+    );
 
     it("synchronizes highlight visibility in the guest with the sidebar's controls", async () => {
       let channel;
