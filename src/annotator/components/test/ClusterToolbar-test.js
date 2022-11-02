@@ -1,5 +1,4 @@
 import { mount } from 'enzyme';
-
 import { highlightStyles, defaultStyles } from '../../highlight-clusters';
 import ClusterToolbar from '../ClusterToolbar';
 
@@ -17,14 +16,37 @@ describe('ClusterToolbar', () => {
       />
     );
 
+  const toggleOpen = wrapper => {
+    wrapper
+      .find('button[data-testid="control-toggle-button"]')
+      .simulate('click');
+  };
+
   it('renders nothing if the cluster feature is not active', () => {
     const wrapper = createComponent({ active: false });
 
     assert.isEmpty(wrapper.html());
   });
 
+  it('renders collapsed until expanded', () => {
+    const wrapper = createComponent();
+
+    assert.equal(
+      wrapper.find('div[data-testid="cluster-style-controls"]').length,
+      0
+    );
+
+    toggleOpen(wrapper);
+
+    assert.equal(
+      wrapper.find('div[data-testid="cluster-style-controls"]').length,
+      1
+    );
+  });
+
   it('renders a control for each highlight cluster', () => {
     const wrapper = createComponent();
+    toggleOpen(wrapper);
 
     assert.equal(
       wrapper.find('ClusterStyleControl').length,
@@ -35,6 +57,7 @@ describe('ClusterToolbar', () => {
   it('calls style-change callback when user clicks on a style option', () => {
     const onStyleChange = sinon.stub();
     const wrapper = createComponent({ onStyleChange });
+    toggleOpen(wrapper);
 
     wrapper
       .find('#hypothesis-user-annotations-green')
