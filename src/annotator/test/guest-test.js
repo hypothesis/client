@@ -1382,6 +1382,30 @@ describe('Guest', () => {
         title: 'Test title',
         documentFingerprint: 'test-fingerprint',
       },
+      segmentInfo: undefined,
+    });
+  });
+
+  it('sends segment info to sidebar when available', async () => {
+    fakeIntegration.uri.resolves('https://bookstore.com/books/1234');
+    fakeIntegration.getMetadata.resolves({ title: 'A little book' });
+    fakeIntegration.segmentInfo = sinon.stub().resolves({
+      cfi: '/2',
+      url: '/chapters/02.xhtml',
+    });
+
+    createGuest();
+    await delay(0);
+
+    assert.calledWith(sidebarRPC().call, 'documentInfoChanged', {
+      uri: 'https://bookstore.com/books/1234',
+      metadata: {
+        title: 'A little book',
+      },
+      segmentInfo: {
+        cfi: '/2',
+        url: '/chapters/02.xhtml',
+      },
     });
   });
 
@@ -1398,6 +1422,7 @@ describe('Guest', () => {
       metadata: {
         title: 'Page 1',
       },
+      segmentInfo: undefined,
     });
 
     sidebarRPCCall.resetHistory();
@@ -1412,6 +1437,7 @@ describe('Guest', () => {
       metadata: {
         title: 'Page 2',
       },
+      segmentInfo: undefined,
     });
   });
 

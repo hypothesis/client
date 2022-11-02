@@ -50,6 +50,19 @@ export type DocumentMetadata = {
 };
 
 /**
+ * Identifies a loadable chunk or segment of a document.
+ *
+ * Some document viewers do not load the whole document at once. For example
+ * an EPUB reader will load one Content Document from the publication at a time.
+ */
+export type SegmentInfo = {
+  /** Canonical Fragment Identifier for an EPUB Content Document */
+  cfi?: string;
+  /** Relative or absolute URL of the segment. */
+  url?: string;
+};
+
+/**
  * A subset of annotation data allowing the representation of an annotation in
  * the document.
  */
@@ -168,14 +181,25 @@ export type IntegrationBase = {
    * false otherwise.
    */
   fitSideBySide(layout: SidebarLayout): boolean;
+
   /** Return the metadata of the currently loaded document, such as title, PDF fingerprint, etc. */
   getMetadata(): Promise<DocumentMetadata>;
+
+  /**
+   * Return information about which section of the document is currently loaded.
+   *
+   * This is used for content such as EPUBs, where typically one Content Document
+   * (typically one chapter) is loaded at a time.
+   */
+  segmentInfo?(): Promise<SegmentInfo>;
+
   /**
    * Return the URL of the currently loaded document.
    *
    * This may be different than the current URL (`location.href`) in a PDF for example.
    */
   uri(): Promise<string>;
+
   /**
    * Scroll to an anchor.
    *

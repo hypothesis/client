@@ -311,14 +311,16 @@ export class Guest {
    * Retrieve metadata for the current document.
    */
   async getDocumentInfo() {
-    const [uri, metadata] = await Promise.all([
+    const [uri, metadata, segmentInfo] = await Promise.all([
       this._integration.uri(),
       this._integration.getMetadata(),
+      this._integration.segmentInfo?.(),
     ]);
 
     return {
       uri: normalizeURI(uri),
       metadata,
+      segmentInfo,
     };
   }
 

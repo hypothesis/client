@@ -400,6 +400,17 @@ describe('annotator/integrations/vitalsource', () => {
       });
     });
 
+    describe('#segmentInfo', () => {
+      it('returns metadata for current page/chapter', async () => {
+        const integration = createIntegration();
+        const segment = await integration.segmentInfo();
+        assert.deepEqual(segment, {
+          cfi: '/2',
+          url: '/pages/chapter_02.xhtml',
+        });
+      });
+    });
+
     describe('#uri', () => {
       beforeEach(() => {
         const bookURI =

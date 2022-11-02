@@ -12,7 +12,11 @@ import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { watch } from '../util/watch';
 
 import type { Message } from '../../shared/messaging';
-import type { AnnotationData, DocumentMetadata } from '../../types/annotator';
+import type {
+  AnnotationData,
+  DocumentMetadata,
+  SegmentInfo,
+} from '../../types/annotator';
 import type { Annotation } from '../../types/api';
 import type {
   SidebarToHostEvent,
@@ -27,6 +31,7 @@ import type { AnnotationsService } from './annotations';
 type DocumentInfo = {
   uri: string;
   metadata: DocumentMetadata;
+  segmentInfo?: SegmentInfo;
 };
 
 /**
@@ -274,6 +279,7 @@ export class FrameSyncService {
         id: sourceId,
         metadata: info.metadata,
         uri: info.uri,
+        segment: info.segmentInfo,
       });
     });
 

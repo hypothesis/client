@@ -12,6 +12,7 @@ import type {
   Anchor,
   FeatureFlags as IFeatureFlags,
   Integration,
+  SegmentInfo,
   SidebarLayout,
 } from '../../types/annotator';
 import type { Selector } from '../../types/api';
@@ -505,6 +506,14 @@ export class VitalSourceContentIntegration
     return {
       title: document.title,
       link: [],
+    };
+  }
+
+  async segmentInfo(): Promise<SegmentInfo> {
+    const pageInfo = await this._bookElement.getCurrentPage();
+    return {
+      cfi: pageInfo.cfi,
+      url: pageInfo.absoluteURL,
     };
   }
 
