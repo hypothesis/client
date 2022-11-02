@@ -322,6 +322,8 @@ export function location(annotation) {
   let cfi;
   let position;
 
+  // nb. We ignore the possibility of an annotation having multiple targets here.
+  // h and the client only support one.
   for (const selector of targets[0]?.selector ?? []) {
     if (selector.type === 'TextPositionSelector') {
       position = selector.start;

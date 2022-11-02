@@ -96,6 +96,7 @@ export const sorters = {
     if (aLocation.cfi && bLocation.cfi) {
       const cfiResult = compareCFIs(aLocation.cfi, bLocation.cfi);
       if (cfiResult !== 0) {
+        // Annotations are in different chapters.
         return Math.sign(cfiResult);
       }
     } else if (aLocation.cfi) {
