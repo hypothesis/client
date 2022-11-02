@@ -1,101 +1,103 @@
-$color-highlight: rgba(255, 255, 60, 0.4);
-$color-highlight-second: rgba(206, 206, 60, 0.4);
-$color-highlight-focused: rgba(156, 230, 255, 0.5);
+:root {
+  // Default highlight styling configuration
+  --hypothesis-highlight-color: rgba(255, 255, 60, 0.4);
+  --hypothesis-highlight-focused-color: rgba(156, 230, 255, 0.5);
+  --hypothesis-highlight-blend-mode: normal;
+  --hypothesis-highlight-decoration: none;
 
-// Hide content from sighted users but make it visible to screen readers.
-//
-// Resources:
-// - https://webaim.org/techniques/css/invisiblecontent/ (see "CSS clip")
-// - https://cloudfour.com/thinks/see-no-evil-hidden-content-and-accessibility/#showing-additional-content-for-screen-readers
-// - https://tailwindcss.com/docs/screen-readers#screen-reader-only-elements Tailwind's `sr-only` class
-@mixin screen-reader-only {
-  // Take the content out of the normal layout flow.
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  white-space: nowrap;
-
-  // Visually hide the content and prevent it from interfering with mouse/touch
-  // text selection by clipping it to an empty box. Compared to moving content with
-  // `top`/`left` this is less likely to cause the browser to scroll to a
-  // different part of the page when the hidden text has screen-reader focus.
-  clip: rect(0 0 0 0);
-  overflow: hidden;
+  --hypothesis-highlight-second-color: rgba(206, 206, 60, 0.4);
+  --hypothesis-highlight-third-color: transparent;
 }
 
-// SVG highlights when the "Show Highlights" toggle is turned off.
+// Configure highlight styling.
+
+// Map `--hypothesis-*` root values to local `--highlight-*` values
+.hypothesis-svg-highlight {
+  --highlight-color: var(--hypothesis-highlight-color);
+  --highlight-color-focused: var(--hypothesis-highlight-focused-color);
+}
+
+.hypothesis-highlight {
+  --highlight-color: var(--hypothesis-highlight-color);
+  --highlight-blend-mode: var(--hypothesis-highlight-blend-mode);
+  --highlight-decoration: var(--hypothesis-highlight-decoration);
+  --highlight-color-focused: var(--hypothesis-highlight-focused-color);
+
+  & .hypothesis-highlight {
+    --highlight-color: var(--hypothesis-highlight-second-color);
+
+    .hypothesis-highlight {
+      // Highlights more than two levels deep are transparent by default.
+      --highlight-color: var(--hypothesis-highlight-third-color);
+    }
+  }
+}
+
+// Apply highlight styling.
+
+// Highlights are non-visible when .hypothesis-highlight-always-on class not present.
+.hypothesis-highlight {
+  background-color: transparent;
+  // For PDFs, we still create highlight elements to wrap the text but the
+  // highlight effect is created by another element.
+  &.is-transparent {
+    background-color: transparent !important;
+  }
+}
+
 .hypothesis-svg-highlight {
   fill: transparent;
 }
 
-// `hypothesis-highlights-always-on` is a class that is toggled on the root
-// of the annotated document when highlights are enabled/disabled.
-.hypothesis-highlights-always-on {
-  .hypothesis-svg-highlight {
-    fill: $color-highlight;
+// Apply styling using `--highlight-` values when highlights are visible
 
-    &.is-opaque {
-      fill: yellow;
-    }
+.hypothesis-highlights-always-on .hypothesis-svg-highlight {
+  fill: var(--highlight-color);
 
-    &.is-focused {
-      fill: $color-highlight-focused;
-    }
+  &.is-opaque {
+    fill: yellow;
   }
 
-  .hypothesis-highlight {
-    background-color: $color-highlight;
+  &.is-focused {
+    fill: var(--highlight-color-focused);
+  }
+}
 
-    // For PDFs, we still create highlight elements to wrap the text but the
-    // highlight effect is created by another element.
-    &.is-transparent {
-      background-color: transparent;
-    }
+.hypothesis-highlights-always-on .hypothesis-highlight {
+  background-color: var(--highlight-color);
+  text-decoration: var(--highlight-decoration);
+  mix-blend-mode: var(--highlight-blend-mode);
 
-    cursor: pointer;
+  cursor: pointer;
 
-    // Make highlights visible to screen readers.
-    // See also - https://developer.paciellogroup.com/blog/2017/12/short-note-on-making-your-mark-more-accessible/.
-    &::before {
-      @include screen-reader-only;
+  // Make highlights visible to screen readers.
+  // See also - https://developer.paciellogroup.com/blog/2017/12/short-note-on-making-your-mark-more-accessible/.
+  &::before {
+    @apply sr-only;
 
-      // nb. The leading/trailing spaces are intended to ensure the text is treated
-      // as separate words by assistive technologies from the content before/after it.
-      content: ' annotation start ';
-    }
-    &::after {
-      @include screen-reader-only;
-      content: ' annotation end ';
-    }
+    // nb. The leading/trailing spaces are intended to ensure the text is treated
+    // as separate words by assistive technologies from the content before/after it.
+    content: ' annotation start ';
+  }
+  &::after {
+    @apply sr-only;
+    content: ' annotation end ';
+  }
+}
 
-    // Give a highlight inside a larger highlight a different color to stand out.
-    & .hypothesis-highlight {
-      background-color: $color-highlight-second;
-      &.is-transparent {
-        background-color: transparent;
-      }
+// Apply focused-highlight styling
 
-      // Limit the number of different highlight shades by making highlights
-      // that are 3+ levels deep transparent.
-      //
-      // This was historically done to improve readability in PDFs [1], but that
-      // is no longer an issue as in PDFs highlights are created by drawing
-      // SVGs on top of the <canvas>.
-      //
-      // [1] https://github.com/hypothesis/client/issues/1995.
-      & .hypothesis-highlight {
-        background-color: transparent;
-      }
-    }
+.hypothesis-highlights-always-on
+  .hypothesis-highlight.hypothesis-highlight-focused {
+  // When an annotation card is hovered in the sidebar, the corresponding
+  // highlights are shown with a "focused" color.
+  &.hypothesis-highlight-focused {
+    mix-blend-mode: normal !important;
+    background-color: var(--highlight-color-focused) !important;
+    text-decoration: none;
 
-    // When an annotation card is hovered in the sidebar, the corresponding
-    // highlights are shown with a "focused" color.
-    &.hypothesis-highlight-focused {
-      background-color: $color-highlight-focused !important;
-
-      .hypothesis-highlight {
-        background-color: transparent !important;
-      }
+    .hypothesis-highlight {
+      background-color: transparent !important;
     }
   }
 }
