@@ -54,10 +54,20 @@ export class VersionData {
     this.timestamp = new Date().toString();
 
     if (segmentInfo) {
-      const segmentIds = [segmentInfo.cfi, segmentInfo.page, segmentInfo.url]
-        .filter(Boolean)
+      const segmentFields = [];
+      if (segmentInfo.cfi) {
+        segmentFields.push(['CFI', segmentInfo.cfi]);
+      }
+      if (segmentInfo.page !== undefined) {
+        segmentFields.push(['Page', segmentInfo.page]);
+      }
+      if (segmentInfo.url) {
+        segmentFields.push(['URL', segmentInfo.url]);
+      }
+
+      this.segment = segmentFields
+        .map(([field, value]) => `${field}: ${value}`)
         .join(', ');
-      this.segment = `(${segmentIds}) ${segmentInfo.title}`;
     }
   }
 
