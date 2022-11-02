@@ -1,4 +1,10 @@
 /**
+ * Functions for working with EPUB Canonical Fragment Identifiers.
+ *
+ * See https://idpf.org/epub/linking/cfi/.
+ */
+
+/**
  * Compare two arrays.
  *
  * Arrays are compared as a sequence of values in priority order. If the two
@@ -14,6 +20,11 @@ function compareArrays(
   for (let i = 0; i < Math.min(a.length, b.length); i++) {
     if (a[i] === b[i]) {
       continue;
+    } else if (typeof a[i] !== typeof b[i]) {
+      // The result of comparing a number with a string is undefined if the
+      // string cannot be coerced to a number. To simplify things, we just
+      // decide that numbers sort before strings.
+      return typeof a[i] === 'number' ? -1 : 1;
     } else if (a[i] < b[i]) {
       return -1;
     } else if (a[i] > b[i]) {
@@ -94,7 +105,10 @@ export function compareCFIs(a: string, b: string): number {
     return stripCFIAssertions(cfi)
       .split('/')
       .map(str => {
-        const intVal = parseInt(str);
+        // CFI step values _should_ always be integers. We currently handle
+        // invalid values by using a string comparison instead. We could
+        // alternatively treat all invalid CFIs as equal.
+        const intVal = parseInt(str, 10);
         return Number.isNaN(intVal) ? str : intVal;
       });
   };
