@@ -1,10 +1,14 @@
 import {
+  Button,
   Card,
   CardContent,
+  CaretDownIcon,
+  CaretRightIcon,
   HideIcon,
+  HighlightIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
-import { useCallback } from 'preact/hooks';
+import { useCallback, useState } from 'preact/hooks';
 
 import type { HighlightCluster } from '../../types/shared';
 import type { AppliedStyles, HighlightStyles } from '../highlight-clusters';
@@ -120,35 +124,58 @@ export default function ClusterToolbar({
     [onStyleChange]
   );
 
+  const [isOpen, setOpen] = useState(false);
+
   if (!active) {
     return null;
   }
 
   return (
     <Card>
-      <CardContent size="sm">
-        <ClusterStyleControl
-          highlightStyles={availableStyles}
-          label="My annotations"
-          cluster="user-annotations"
-          onChange={handleStyleChange}
-          currentStyles={currentStyles}
-        />
-        <ClusterStyleControl
-          highlightStyles={availableStyles}
-          label="My highlights"
-          cluster="user-highlights"
-          onChange={handleStyleChange}
-          currentStyles={currentStyles}
-        />
-        <ClusterStyleControl
-          highlightStyles={availableStyles}
-          label="Everybody's content"
-          cluster="other-content"
-          onChange={handleStyleChange}
-          currentStyles={currentStyles}
-        />
-      </CardContent>
+      <div className="flex flex-col text-annotator-base text-color-text">
+        <Button
+          data-testid="control-toggle-button"
+          onClick={() => setOpen(!isOpen)}
+          title={isOpen ? 'Hide highlight settings' : 'Show highlight settings'}
+        >
+          {isOpen ? (
+            <>
+              <CaretDownIcon />
+              <span>Highlight Appearance</span>
+            </>
+          ) : (
+            <>
+              <CaretRightIcon />
+              <HighlightIcon />
+            </>
+          )}
+        </Button>
+        {isOpen && (
+          <CardContent data-testid="cluster-style-controls" size="sm">
+            <ClusterStyleControl
+              highlightStyles={availableStyles}
+              label="My annotations"
+              cluster="user-annotations"
+              onChange={handleStyleChange}
+              currentStyles={currentStyles}
+            />
+            <ClusterStyleControl
+              highlightStyles={availableStyles}
+              label="My highlights"
+              cluster="user-highlights"
+              onChange={handleStyleChange}
+              currentStyles={currentStyles}
+            />
+            <ClusterStyleControl
+              highlightStyles={availableStyles}
+              label="Everybody's content"
+              cluster="other-content"
+              onChange={handleStyleChange}
+              currentStyles={currentStyles}
+            />
+          </CardContent>
+        )}
+      </div>
     </Card>
   );
 }
