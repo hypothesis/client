@@ -70,6 +70,11 @@ function VersionInfo({ toastMessenger, versionData }) {
         <VersionInfoItem label="Fingerprint">
           {versionData.fingerprint}
         </VersionInfoItem>
+        {versionData.segment && (
+          <VersionInfoItem label="Segment">
+            {versionData.segment}
+          </VersionInfoItem>
+        )}
         <VersionInfoItem label="Account">{versionData.account}</VersionInfoItem>
         <VersionInfoItem label="Date">{versionData.timestamp}</VersionInfoItem>
       </dl>

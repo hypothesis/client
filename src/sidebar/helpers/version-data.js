@@ -1,4 +1,8 @@
 /**
+ * @typedef {import('../../types/annotator').SegmentInfo} SegmentInfo
+ */
+
+/**
  * @typedef AuthState
  * @prop {string|null} [userid]
  * @prop {string} [displayName]
@@ -17,6 +21,7 @@
  * @typedef DocumentInfo
  * @prop {string=} [uri] - Current document URL
  * @prop {DocMetadata} [metadata] - Document metadata
+ * @prop {SegmentInfo} [segment]
  */
 
 export class VersionData {
@@ -47,6 +52,21 @@ export class VersionData {
 
     this.account = accountString;
     this.timestamp = new Date().toString();
+
+    const segmentInfo = documentInfo[0]?.segment;
+    if (segmentInfo) {
+      const segmentFields = [];
+      if (segmentInfo.cfi) {
+        segmentFields.push(['CFI', segmentInfo.cfi]);
+      }
+      if (segmentInfo.url) {
+        segmentFields.push(['URL', segmentInfo.url]);
+      }
+
+      this.segment = segmentFields
+        .map(([field, value]) => `${field}: ${value}`)
+        .join(', ');
+    }
   }
 
   /**

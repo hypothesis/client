@@ -80,6 +80,18 @@ describe('sidebar/helpers/version-data', () => {
         ]);
         assert.equal(versionData.fingerprint, 'DEADBEEF');
       });
+
+      it('sets `segment` property if `segment` is present in frame details', () => {
+        const versionData = new VersionData({}, [
+          { segment: { cfi: '/2', url: '/chapters/02.xhtml' } },
+        ]);
+        assert.equal(versionData.segment, 'CFI: /2, URL: /chapters/02.xhtml');
+      });
+
+      it('does not set `segment` property if `segment` is not present in frame details', () => {
+        const versionData = new VersionData({}, []);
+        assert.isUndefined(versionData.segment);
+      });
     });
   });
 
