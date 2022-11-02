@@ -61,7 +61,20 @@ describe('VersionInfo', () => {
     assert.include(componentText, 'fakeFingerprint');
     assert.include(componentText, 'fakeAccount');
     assert.include(componentText, 'fakeTimestamp');
+
+    // No `segment` property is set on the `versionData` prop by default, so
+    // the "Segment" field should not be displayed.
+    assert.notInclude(componentText, 'Segment');
   });
+
+  it('renders segment info if `versionData.segment` is set', () => {
+    fakeVersionData.segment = 'CFI: /2, URL: /chapters/foo.xhtml';
+    const wrapper = createComponent();
+    const componentText = wrapper.text();
+    assert.include(componentText, 'Segment');
+    assert.include(componentText, 'CFI: /2, URL: /chapters/foo.xhtml');
+  });
+
   describe('copy version info to clipboard', () => {
     it('copies version info to clipboard when copy button clicked', () => {
       const wrapper = createComponent();
