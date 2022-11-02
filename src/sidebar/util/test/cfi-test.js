@@ -38,6 +38,17 @@ describe('sidebar/util/cfi', () => {
         b: '/2/4',
         expected: 0,
       },
+      // CFIs of unequal length
+      {
+        a: '/2/4/8',
+        b: '/2/4',
+        expected: 1,
+      },
+      {
+        a: '/2/4',
+        b: '/2/4/8',
+        expected: -1,
+      },
       // Check numeric steps are treated as numbers and not as strings.
       {
         a: '/2/3',
@@ -68,6 +79,12 @@ describe('sidebar/util/cfi', () => {
         a: '/2/4/def',
         b: '/2/4/abc',
         expected: 1,
+      },
+      // Number steps sort before string steps.
+      {
+        a: '/2/4',
+        b: '/2/-',
+        expected: -1,
       },
       // Empty CFIs
       {
