@@ -8,6 +8,7 @@ import { matchShortcut } from '../shared/shortcut';
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
+import { HighlightClusterController } from './highlight-clusters';
 import { FeatureFlags } from './features';
 import {
   getHighlightsContainingNode,
@@ -198,6 +199,10 @@ export class Guest {
     });
 
     this.features = new FeatureFlags();
+
+    this._clusterToolbar = new HighlightClusterController(element, {
+      features: this.features,
+    });
 
     /**
      * Integration that handles document-type specific functionality in the
