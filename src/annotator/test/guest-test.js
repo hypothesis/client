@@ -39,6 +39,8 @@ describe('Guest', () => {
 
   let FakeBucketBarClient;
   let fakeBucketBarClient;
+  let fakeHighlightClusterController;
+  let FakeHighlightClusterController;
   let fakeCreateIntegration;
   let fakeFindClosestOffscreenAnchor;
   let fakeFrameFillsAncestor;
@@ -124,6 +126,13 @@ describe('Guest', () => {
     };
     FakeBucketBarClient = sinon.stub().returns(fakeBucketBarClient);
 
+    fakeHighlightClusterController = {
+      destroy: sinon.stub(),
+    };
+    FakeHighlightClusterController = sinon
+      .stub()
+      .returns(fakeHighlightClusterController);
+
     fakeFindClosestOffscreenAnchor = sinon.stub();
 
     fakeFrameFillsAncestor = sinon.stub().returns(true);
@@ -131,6 +140,7 @@ describe('Guest', () => {
     fakeIntegration = Object.assign(new TinyEmitter(), {
       anchor: sinon.stub(),
       canAnnotate: sinon.stub().returns(true),
+      canStyleClusteredHighlights: sinon.stub().returns(false),
       contentContainer: sinon.stub().returns({}),
       describe: sinon.stub(),
       destroy: sinon.stub(),
@@ -171,6 +181,9 @@ describe('Guest', () => {
       },
       './bucket-bar-client': {
         BucketBarClient: FakeBucketBarClient,
+      },
+      './highlight-clusters': {
+        HighlightClusterController: FakeHighlightClusterController,
       },
       './highlighter': highlighter,
       './integrations': {
@@ -1330,6 +1343,14 @@ describe('Guest', () => {
       guest.destroy();
       assert.called(sidebarRPC().destroy);
     });
+
+    it('removes the clustered highlights toolbar', () => {
+      fakeIntegration.canStyleClusteredHighlights.returns(true);
+
+      const guest = createGuest();
+      guest.destroy();
+      assert.called(fakeHighlightClusterController.destroy);
+    });
   });
 
   it('discovers and creates a channel for communication with the sidebar', async () => {
@@ -1371,6 +1392,22 @@ describe('Guest', () => {
       contentContainer,
       hostRPC: hostRPC(),
     });
+  });
+
+  it('does not create a HighlightClusterController if the integration does not support clustered highlights', () => {
+    fakeIntegration.canStyleClusteredHighlights.returns(false);
+
+    createGuest();
+
+    assert.notCalled(FakeHighlightClusterController);
+  });
+
+  it('creates a HighlightClustersController if the integration supports clustered highlights', () => {
+    fakeIntegration.canStyleClusteredHighlights.returns(true);
+
+    createGuest();
+
+    assert.calledOnce(FakeHighlightClusterController);
   });
 
   it('sends document metadata and URIs to sidebar', async () => {

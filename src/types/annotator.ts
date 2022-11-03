@@ -163,6 +163,10 @@ export type IntegrationBase = {
    */
   canAnnotate(range: Range): boolean;
   /**
+   * Return whether this integration supports styling multiple clusters of highlights
+   */
+  canStyleClusteredHighlights?(): boolean;
+  /**
    * Attempt to resolve a set of serialized selectors to the corresponding content in the current document.
    */
   anchor(root: HTMLElement, selectors: Selector[]): Promise<Range>;
