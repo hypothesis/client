@@ -109,6 +109,10 @@ export class HTMLIntegration extends TinyEmitter {
     return true;
   }
 
+  canStyleClusteredHighlights() {
+    return true;
+  }
+
   destroy() {
     this._navObserver.disconnect();
     this._metaObserver.disconnect();

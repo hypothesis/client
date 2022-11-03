@@ -199,11 +199,6 @@ export class Guest {
     });
 
     this.features = new FeatureFlags();
-
-    this._clusterToolbar = new HighlightClusterController(element, {
-      features: this.features,
-    });
-
     /**
      * Integration that handles document-type specific functionality in the
      * guest.
@@ -215,6 +210,12 @@ export class Guest {
     });
     if (config.contentInfoBanner) {
       this._integration.showContentInfo?.(config.contentInfoBanner);
+    }
+
+    if (this._integration.canStyleClusteredHighlights?.()) {
+      this._clusterToolbar = new HighlightClusterController(element, {
+        features: this.features,
+      });
     }
 
     /**
@@ -485,6 +486,7 @@ export class Guest {
     this._selectionObserver.disconnect();
     this._adder.destroy();
     this._bucketBarClient.destroy();
+    this._clusterToolbar?.destroy();
 
     removeAllHighlights(this.element);
 
