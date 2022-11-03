@@ -134,6 +134,9 @@ export type SidebarToGuestEvent =
    */
   | 'loadAnnotations'
 
+  /** Navigate to the segment of a book associated with an annotation. */
+  | 'navigateToSegment'
+
   /**
    * The sidebar is asking the guest(s) to scroll to certain annotation.
    */

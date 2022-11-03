@@ -162,4 +162,24 @@ export class MosaicBookElement extends HTMLElement {
   async getCurrentPage() {
     return this.pageData[this.pageIndex];
   }
+
+  goToCfi(cfi) {
+    for (let [i, page] of this.pageData.entries()) {
+      if (page.cfi === cfi) {
+        this.setPage(i);
+        return;
+      }
+    }
+    throw new Error(`No page found with CFI "${cfi}"`);
+  }
+
+  goToURL(url) {
+    for (let [i, page] of this.pageData.entries()) {
+      if (page.url === url) {
+        this.setPage(i);
+        return;
+      }
+    }
+    throw new Error(`No page found with URL "${url}"`);
+  }
 }

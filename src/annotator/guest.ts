@@ -444,6 +444,10 @@ export class Guest implements Annotator, Destroyable {
       this._integration.showContentInfo?.(info)
     );
 
+    this._sidebarRPC.on('navigateToSegment', (annotation: AnnotationData) =>
+      this._integration.navigateToSegment?.(annotation)
+    );
+
     // Connect to sidebar and send document info/URIs to it.
     //
     // RPC calls are deferred until a connection is made, so these steps can

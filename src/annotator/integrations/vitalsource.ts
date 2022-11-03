@@ -10,12 +10,13 @@ import { injectClient } from '../hypothesis-injector';
 
 import type {
   Anchor,
+  AnnotationData,
   FeatureFlags as IFeatureFlags,
   Integration,
   SegmentInfo,
   SidebarLayout,
 } from '../../types/annotator';
-import type { Selector } from '../../types/api';
+import type { EPUBContentSelector, Selector } from '../../types/api';
 import type { InjectConfig } from '../hypothesis-injector';
 
 // When activating side-by-side mode for VitalSource PDF documents, make sure
@@ -112,6 +113,16 @@ type MosaicBookElement = HTMLElement & {
    * chapter/segment (in an EPUB-based book).
    */
   getCurrentPage(): Promise<PageInfo>;
+
+  /**
+   * Navigate the book to the page or content document whose CFI matches `cfi`.
+   */
+  goToCfi(cfi: string): void;
+
+  /**
+   * Navigate the book to the page or content document whose URL matches `url`.
+   */
+  goToURL(url: string): void;
 };
 
 /**
@@ -507,6 +518,19 @@ export class VitalSourceContentIntegration
       title: document.title,
       link: [],
     };
+  }
+
+  navigateToSegment(ann: AnnotationData) {
+    const selector = ann.target[0].selector?.find(
+      s => s.type === 'EPUBContentSelector'
+    ) as EPUBContentSelector | undefined;
+    if (selector?.cfi) {
+      this._bookElement.goToCfi(selector.cfi);
+    } else if (selector?.url) {
+      this._bookElement.goToURL(selector.url);
+    } else {
+      throw new Error('No segment information available');
+    }
   }
 
   async segmentInfo(): Promise<SegmentInfo> {

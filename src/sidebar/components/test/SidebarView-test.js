@@ -134,19 +134,20 @@ describe('SidebarView', () => {
 
   context('when viewing a direct-linked annotation', () => {
     context('successful direct-linked annotation', () => {
+      let fakeAnnotation;
+
       beforeEach(() => {
+        fakeAnnotation = { $orphan: false, $tag: 'myTag' };
         fakeStore.isLoading.returns(false);
         fakeStore.annotationExists.withArgs('someId').returns(true);
         fakeStore.directLinkedAnnotationId.returns('someId');
-        fakeStore.findAnnotationByID
-          .withArgs('someId')
-          .returns({ $orphan: false, $tag: 'myTag' });
+        fakeStore.findAnnotationByID.withArgs('someId').returns(fakeAnnotation);
       });
 
       it('focuses and scrolls to direct-linked annotations once anchored', () => {
         createComponent();
         assert.calledOnce(fakeFrameSync.scrollToAnnotation);
-        assert.calledWith(fakeFrameSync.scrollToAnnotation, 'myTag');
+        assert.calledWith(fakeFrameSync.scrollToAnnotation, fakeAnnotation);
         assert.calledOnce(fakeFrameSync.hoverAnnotations);
         assert.calledWith(
           fakeFrameSync.hoverAnnotations,

@@ -73,7 +73,10 @@ describe('ThreadCard', () => {
 
       wrapper.find(threadCardSelector).simulate('click');
 
-      assert.calledWith(fakeFrameSync.scrollToAnnotation, 'myTag');
+      assert.calledWith(
+        fakeFrameSync.scrollToAnnotation,
+        fakeThread.annotation
+      );
     });
 
     it('focuses the annotation thread when mouse enters', () => {

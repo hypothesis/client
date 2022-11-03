@@ -149,6 +149,7 @@ describe('Guest', () => {
         title: 'Test title',
         documentFingerprint: 'test-fingerprint',
       }),
+      navigateToSegment: sinon.stub(),
       scrollToAnchor: sinon.stub().resolves(),
       showContentInfo: sinon.stub(),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
@@ -423,6 +424,15 @@ describe('Guest', () => {
 
         assert.notCalled(eventEmitted);
         assert.notCalled(fakeIntegration.scrollToAnchor);
+      });
+    });
+
+    describe('on "navigateToSegment" event', () => {
+      it('requests integration to navigate to segment associated with annotation', () => {
+        createGuest();
+        const annotation = {};
+        emitSidebarEvent('navigateToSegment', annotation);
+        assert.calledWith(fakeIntegration.navigateToSegment, annotation);
       });
     });
 
