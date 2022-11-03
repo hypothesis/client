@@ -116,9 +116,9 @@ function SidebarView({
   // When a `linkedAnnotationAnchorTag` becomes available, scroll to it
   // and focus it
   useEffect(() => {
-    if (linkedAnnotationAnchorTag) {
+    if (linkedAnnotation && linkedAnnotationAnchorTag) {
       frameSync.hoverAnnotations([linkedAnnotationAnchorTag]);
-      frameSync.scrollToAnnotation(linkedAnnotationAnchorTag);
+      frameSync.scrollToAnnotation(linkedAnnotation);
       store.selectTab(directLinkedTab);
     } else if (linkedAnnotation) {
       // Make sure to allow for orphaned annotations (which won't have an anchor)

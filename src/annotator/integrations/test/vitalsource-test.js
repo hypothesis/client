@@ -199,6 +199,9 @@ describe('annotator/integrations/vitalsource', () => {
   class FakeMosaicBookElement {
     constructor() {
       this._format = 'epub';
+
+      this.goToCfi = sinon.stub();
+      this.goToURL = sinon.stub();
     }
 
     selectEPUBBook() {
@@ -397,6 +400,66 @@ describe('annotator/integrations/vitalsource', () => {
           assert.equal(metadata.title, 'Test book title');
           assert.deepEqual(metadata.link, []);
         });
+      });
+    });
+
+    describe('#navigateToSegment', () => {
+      function createAnnotationWithSelector(selector) {
+        return {
+          target: [
+            {
+              selector: [selector],
+            },
+          ],
+        };
+      }
+
+      [
+        {
+          // Annotation with no selectors identifying a segment.
+          type: 'TextQuoteSelector',
+          exact: 'foo',
+        },
+        {
+          // Segment selector with no CFI or URL
+          type: 'EPUBContentSelector',
+        },
+      ].forEach(selector => {
+        it('throws if annotation has no segment info available', () => {
+          const integration = createIntegration();
+          const ann = createAnnotationWithSelector(selector);
+          assert.throws(() => {
+            integration.navigateToSegment(ann);
+          }, 'No segment information available');
+
+          assert.notCalled(fakeBookElement.goToCfi);
+          assert.notCalled(fakeBookElement.goToURL);
+        });
+      });
+
+      it('navigates to CFI if available', () => {
+        const integration = createIntegration();
+        const ann = createAnnotationWithSelector({
+          type: 'EPUBContentSelector',
+          cfi: '/2/4',
+          url: '/chapters/02.xhtml',
+        });
+
+        integration.navigateToSegment(ann);
+
+        assert.calledWith(fakeBookElement.goToCfi, '/2/4');
+      });
+
+      it('navigates to URL if no CFI available', () => {
+        const integration = createIntegration();
+        const ann = createAnnotationWithSelector({
+          type: 'EPUBContentSelector',
+          url: '/chapters/02.xhtml',
+        });
+
+        integration.navigateToSegment(ann);
+
+        assert.calledWith(fakeBookElement.goToURL, '/chapters/02.xhtml');
       });
     });
 

@@ -190,6 +190,14 @@ export type IntegrationBase = {
   getMetadata(): Promise<DocumentMetadata>;
 
   /**
+   * Navigate to the segment of a document associated with an annotation.
+   *
+   * This is used to navigate to eg. the chapter of an EPUB which corresponds
+   * to an annotation in the sidebar.
+   */
+  navigateToSegment?(ann: AnnotationData): void;
+
+  /**
    * Return information about which section of the document is currently loaded.
    *
    * This is used for content such as EPUBs, where typically one Content Document

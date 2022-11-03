@@ -9,6 +9,7 @@ import { withServices } from '../service-context';
 import Thread from './Thread';
 
 /**
+ * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
 
@@ -42,9 +43,9 @@ function ThreadCard({ frameSync, thread }) {
   );
 
   const scrollToAnnotation = useCallback(
-    /** @param {string} tag */
-    tag => {
-      frameSync.scrollToAnnotation(tag);
+    /** @param {Annotation} ann */
+    ann => {
+      frameSync.scrollToAnnotation(ann);
     },
     [frameSync]
   );
@@ -88,9 +89,9 @@ function ThreadCard({ frameSync, thread }) {
         // triggering a page scroll.
         if (
           !isFromButtonOrLink(/** @type {Element} */ (e.target)) &&
-          threadTag
+          thread.annotation
         ) {
-          scrollToAnnotation(threadTag);
+          scrollToAnnotation(thread.annotation);
         }
       }}
       onMouseEnter={() => focusThreadAnnotation(threadTag ?? null)}

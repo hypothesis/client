@@ -130,6 +130,17 @@ export class FrameSyncService {
   private _portFinder: PortFinder;
   private _store: SidebarStore;
 
+  /**
+   * ID of an annotation that should be scrolled to after anchoring completes.
+   *
+   * This is set when {@link scrollToAnnotation} is called and the document
+   * needs to be navigated to a different URL. This can happen in EPUBs.
+   *
+   * We store an ID rather than a tag because the navigation currently triggers
+   * a reload of annotations, which will change their tags but not their IDs.
+   */
+  private _pendingScrollToId: string | null;
+
   // Test seam
   private _window: Window;
 
@@ -151,6 +162,7 @@ export class FrameSyncService {
     this._guestRPC = new Map();
     this._inFrame = new Set<string>();
     this._highlightsVisible = false;
+    this._pendingScrollToId = null;
 
     this._setupSyncToGuests();
     this._setupHostEvents();
@@ -350,6 +362,14 @@ export class FrameSyncService {
       this._inFrame.add($tag);
       anchoringStatusUpdates[$tag] = $orphan ? 'orphan' : 'anchored';
       scheduleAnchoringStatusUpdate();
+
+      if (this._pendingScrollToId) {
+        const [id] = this._store.findIDsForTags([$tag]);
+        if (id === this._pendingScrollToId) {
+          this._pendingScrollToId = null;
+          guestRPC.call('scrollToAnnotation', $tag);
+        }
+      }
     });
 
     guestRPC.on(
@@ -497,10 +517,35 @@ export class FrameSyncService {
   }
 
   /**
-   * Scroll the frame to the highlight for an annotation with a given tag.
+   * Scroll the frame to the highlight for an annotation.
    */
-  scrollToAnnotation(tag: string) {
-    this._guestRPC.forEach(rpc => rpc.call('scrollToAnnotation', tag));
+  scrollToAnnotation(ann: Annotation) {
+    const frame = frameForAnnotation(this._store.frames(), ann);
+    if (!frame) {
+      return;
+    }
+    const guest = this._guestRPC.get(frame?.id);
+    if (!guest) {
+      return;
+    }
+
+    // If this annotation is for a different segment of a book than is loaded
+    // in the guest, then ask the guest to navigate to the appropriate segment.
+    //
+    // In EPUBs, this will cause the guest to disconnect and a new guest will
+    // connect when the new content has loaded. We will then need to wait for
+    // the annotation to anchor in the new guest frame before we can actually
+    // scroll to it.
+    if (frame.segment && !annotationMatchesSegment(ann, frame.segment)) {
+      if (ann.id) {
+        // Schedule scroll once anchoring completes.
+        this._pendingScrollToId = ann.id;
+      }
+      guest.call('navigateToSegment', formatAnnot(ann));
+      return;
+    }
+
+    guest.call('scrollToAnnotation', ann.$tag);
   }
 
   // Only used to cleanup tests

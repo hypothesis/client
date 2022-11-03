@@ -861,13 +861,89 @@ describe('FrameSyncService', () => {
   describe('#scrollToAnnotation', () => {
     beforeEach(async () => {
       frameSync.connect();
-      await connectGuest();
     });
 
-    it('should scroll to the annotation in the guest', () => {
-      frameSync.connect();
-      frameSync.scrollToAnnotation('atag');
-      assert.calledWith(guestRPC().call, 'scrollToAnnotation', 'atag');
+    it('does nothing if matching guest frame is not found', async () => {
+      frameSync.scrollToAnnotation(fixtures.ann);
+    });
+
+    function createEPUBAnnotation(cfi) {
+      return {
+        id: 'epub-id-1',
+        $tag: 'epub-tag-1',
+        target: [
+          {
+            selector: [
+              {
+                type: 'EPUBContentSelector',
+                cfi,
+              },
+            ],
+          },
+        ],
+      };
+    }
+
+    it('should scroll to the annotation in the correct guest', async () => {
+      await connectGuest();
+      emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
+
+      frameSync.scrollToAnnotation(fixtures.ann);
+
+      assert.calledWith(
+        guestRPC().call,
+        'scrollToAnnotation',
+        fixtures.ann.$tag
+      );
+    });
+
+    it('should trigger a navigation in an EPUB if needed', async () => {
+      await connectGuest();
+      emitGuestEvent('documentInfoChanged', fixtures.epubDocumentInfo);
+
+      // Create an annotation with a CFI that doesn't match `fixtures.epubDocumentInfo`.
+      const ann = createEPUBAnnotation('/4/8');
+      fakeStore.findIDsForTags.withArgs([ann.$tag]).returns([ann.id]);
+
+      // Request a scroll to this annotation, this will require a navigation of
+      // the guest frame.
+      frameSync.scrollToAnnotation(ann);
+
+      assert.isFalse(guestRPC().call.calledWith('scrollToAnnotation'));
+      assert.calledWith(
+        guestRPC().call,
+        'navigateToSegment',
+        sinon.match({
+          $tag: ann.$tag,
+          target: ann.target,
+        })
+      );
+
+      // After the guest navigates and the original target of the
+      // `scrollToAnnotation` call is anchored in the new guest, the sidebar
+      // should request that the new guest scroll to the annotation.
+      emitGuestEvent('syncAnchoringStatus', { $tag: ann.$tag, $orphan: false });
+      assert.calledWith(guestRPC().call, 'scrollToAnnotation', ann.$tag);
+
+      // After the `scrollToAnnotation` call has been sent, the pending-scroll
+      // state internally should be cleared and a later `syncAnchoringStatus`
+      // event should not re-scroll.
+      guestRPC().call.resetHistory();
+      emitGuestEvent('syncAnchoringStatus', { $tag: ann.$tag, $orphan: false });
+      assert.notCalled(guestRPC().call);
+    });
+
+    it('should not trigger a navigation in an EPUB if not needed', async () => {
+      await connectGuest();
+      emitGuestEvent('documentInfoChanged', fixtures.epubDocumentInfo);
+
+      const ann = createEPUBAnnotation(
+        fixtures.epubDocumentInfo.segmentInfo.cfi
+      );
+      frameSync.scrollToAnnotation(ann);
+
+      assert.isFalse(guestRPC().call.calledWith('navigateToSegment'));
+      assert.calledWith(guestRPC().call, 'scrollToAnnotation', ann.$tag);
     });
   });
 
