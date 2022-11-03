@@ -347,6 +347,57 @@ describe('FrameSyncService', () => {
       );
     });
 
+    context('in EPUB documents', () => {
+      it('sends annotations to frame if current segment matches frame', async () => {
+        const bookURI = 'https://publisher.com/books/1234';
+
+        const chapter1ann = {
+          uri: bookURI,
+          target: [
+            {
+              selector: [
+                {
+                  type: 'EPUBContentSelector',
+                  cfi: '/2',
+                  url: '/chapters/01.xhtml',
+                },
+              ],
+            },
+          ],
+        };
+        const chapter2ann = {
+          uri: bookURI,
+          target: [
+            {
+              selector: [
+                {
+                  type: 'EPUBContentSelector',
+                  cfi: '/4',
+                  url: '/chapters/02.xhtml',
+                },
+              ],
+            },
+          ],
+        };
+
+        await connectGuest();
+        emitGuestEvent('documentInfoChanged', {
+          uri: bookURI,
+          segmentInfo: {
+            cfi: '/4',
+            url: '/chapters/02.xhtml',
+          },
+        });
+        fakeStore.setState({ annotations: [chapter1ann, chapter2ann] });
+
+        assert.calledWithMatch(
+          guestRPC().call,
+          'loadAnnotations',
+          sinon.match([formatAnnot(chapter2ann)])
+        );
+      });
+    });
+
     it('sends a "loadAnnotations" message only for new annotations', async () => {
       const frameInfo = fixtures.htmlDocumentInfo;
       await connectGuest();

@@ -9,6 +9,7 @@ import {
   isMessageEqual,
 } from '../../shared/messaging';
 import { isReply, isPublic } from '../helpers/annotation-metadata';
+import { annotationMatchesSegment } from '../helpers/annotation-segment';
 import { watch } from '../util/watch';
 
 import type { Message } from '../../shared/messaging';
@@ -59,7 +60,7 @@ export function formatAnnot({
 /**
  * Return the frame which best matches an annotation.
  */
-function frameForAnnotation(frames: Frame[], ann: Annotation) {
+function frameForAnnotation(frames: Frame[], ann: Annotation): Frame | null {
   // Choose frame with an exact URL match if possible. In the unlikely situation
   // where multiple frames have the same URL, we'll use whichever connected first.
   const uriMatch = frames.find(f => f.uri === ann.uri);
@@ -75,7 +76,7 @@ function frameForAnnotation(frames: Frame[], ann: Annotation) {
 
   // If there is no main frame (eg. in VitalSource), fall back to whichever
   // frame connected first.
-  return frames[0];
+  return frames[0] ?? null;
 }
 
 /**
@@ -198,9 +199,14 @@ export class FrameSyncService {
       // Send added annotations to matching frame.
       if (added.length > 0) {
         const addedByFrame = new Map<string | null, Annotation[]>();
+
         for (const annotation of added) {
           const frame = frameForAnnotation(frames, annotation);
-          if (!frame) {
+          if (
+            !frame ||
+            (frame.segment &&
+              !annotationMatchesSegment(annotation, frame.segment))
+          ) {
             continue;
           }
           const anns = addedByFrame.get(frame.id) ?? [];
