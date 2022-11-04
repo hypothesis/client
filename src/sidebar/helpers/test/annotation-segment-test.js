@@ -64,6 +64,26 @@ describe('annotationMatchesSegment', () => {
       selector: { type: 'EPUBContentSelector', url: '/chapters/04.xhtml' },
       expected: false,
     },
+    // CFIs do not match but URLs do. The successful match wins.
+    {
+      segment: { cfi: '/2', url: '/chapters/02.xhtml' },
+      selector: {
+        type: 'EPUBContentSelector',
+        cfi: '/4',
+        url: '/chapters/02.xhtml',
+      },
+      expected: true,
+    },
+    // CFIs match but URLs do not. The successful match wins.
+    {
+      segment: { cfi: '/2', url: '/chapters/03.xhtml' },
+      selector: {
+        type: 'EPUBContentSelector',
+        cfi: '/2',
+        url: '/chapters/02.xhtml',
+      },
+      expected: true,
+    },
   ].forEach(({ segment, selector, expected }, index) => {
     it(`returns true if CFI or URL matches current segment (${index})`, () => {
       const ann = { target: [{ selector: [selector] }] };
