@@ -7,19 +7,16 @@ import {
 
 import { useSidebarStore } from '../store';
 
-/**
- * @typedef LoggedOutMessageProps
- * @prop {() => void} onLogin
- */
+export type LoggedOutMessageProps = {
+  onLogin: () => void;
+};
 
 /**
  * Render a call-to-action to log in or sign up. This message is intended to be
  * displayed to non-auth'd users when viewing a single annotation in a
  * direct-linked context (i.e. URL with syntax `/#annotations:<annotation_id>`)
- *
- * @param {LoggedOutMessageProps} props
  */
-function LoggedOutMessage({ onLogin }) {
+function LoggedOutMessage({ onLogin }: LoggedOutMessageProps) {
   const store = useSidebarStore();
 
   return (
