@@ -30,8 +30,8 @@ type SelectorMap<State> = { [name: string]: (s: State, ...args: any[]) => any };
 type Module<
   State,
   Actions extends object,
-  Selectors extends Object,
-  RootSelectors extends Object
+  Selectors extends Record<string, unknown>,
+  RootSelectors extends Record<string, unknown>
 > = {
   namespace: string;
   initialState: (...args: any[]) => State;
@@ -95,8 +95,8 @@ function bindSelectors<State, Selectors extends SelectorMap<State>>(
   selectors: Selectors,
   getState: () => State
 ): SelectorMethods<Selectors> {
-  const boundSelectors: Record<string, Function> = {};
-  for (let [name, selector] of Object.entries(selectors)) {
+  const boundSelectors: Record<string, () => unknown> = {};
+  for (const [name, selector] of Object.entries(selectors)) {
     boundSelectors[name] = (...args: any[]) => selector(getState(), ...args);
   }
   return boundSelectors as SelectorMethods<Selectors>;
@@ -107,7 +107,7 @@ function bindSelectors<State, Selectors extends SelectorMap<State>>(
  */
 function assignOnce<T extends object, U extends object>(target: T, source: U) {
   if (process.env.NODE_ENV !== 'production') {
-    for (let key of Object.keys(source)) {
+    for (const key of Object.keys(source)) {
       if (key in target) {
         throw new Error(`Cannot add duplicate '${key}' property to object`);
       }
@@ -162,12 +162,12 @@ export function createStore<
   middleware: any[] = []
 ): StoreFromModule<TupleToIntersection<Modules>> {
   const initialState: Record<string, unknown> = {};
-  for (let module of modules) {
+  for (const module of modules) {
     initialState[module.namespace] = module.initialState(...initArgs);
   }
 
   const allReducers: redux.ReducersMapObject = {};
-  for (let module of modules) {
+  for (const module of modules) {
     allReducers[module.namespace] = createReducer(module.reducers);
   }
 
@@ -194,7 +194,7 @@ export function createStore<
 
   // Add action creators as methods to the store.
   const actionCreators: Record<string, (...args: any[]) => redux.Action> = {};
-  for (let module of modules) {
+  for (const module of modules) {
     assignOnce(actionCreators, module.actionCreators);
   }
   const actionMethods = redux.bindActionCreators(
@@ -205,7 +205,7 @@ export function createStore<
 
   // Add selectors as methods to the store.
   const selectorMethods = {};
-  for (let module of modules) {
+  for (const module of modules) {
     const { namespace, selectors, rootSelectors } = module;
     const boundSelectors = bindSelectors(
       selectors,
@@ -251,7 +251,7 @@ type ModuleConfig<
   State,
   Actions,
   Selectors extends SelectorMap<State>,
-  RootSelectors = {}
+  RootSelectors = Record<string, unknown>
 > = {
   /** The key under which this module's state will live in the store's root state. */
   namespace: string;
@@ -290,9 +290,9 @@ type ModuleConfig<
  */
 export function createStoreModule<
   State,
-  Actions extends object,
+  Actions extends Record<string, unknown>,
   Selectors extends SelectorMap<State>,
-  RootSelectors extends object = {}
+  RootSelectors extends Record<string, unknown> = Record<string, unknown>
 >(
   initialState: State | ((...args: any[]) => State),
   config: ModuleConfig<State, Actions, Selectors, RootSelectors>
