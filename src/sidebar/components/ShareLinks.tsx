@@ -4,24 +4,23 @@ import {
   SocialFacebookIcon,
   SocialTwitterIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 
-/**
- * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
- */
+type ShareLinkProps = {
+  /** The SVG icon component to use for this link */
+  icon: IconComponent;
 
-/**
- * @typedef ShareLinkProps
- * @prop {IconComponent} icon - The SVG icon component to use for this link
- * @prop {string} label - Accessible label/tooltip for link
- * @prop {string} uri - URI for sharing this annotation
- */
+  /** Accessible label/tooltip for link */
+  label: string;
+
+  /** URI for sharing this annotation */
+  uri: string;
+};
 
 /**
  * A single sharing link as a list item
- *
- * @param {ShareLinkProps} props
  */
-function ShareLink({ label, icon: Icon, uri }) {
+function ShareLink({ label, icon: Icon, uri }: ShareLinkProps) {
   return (
     <li>
       <LinkBase
@@ -41,19 +40,14 @@ function ShareLink({ label, icon: Icon, uri }) {
   );
 }
 
-/**
- * @typedef ShareLinksProps
- * @prop {string} shareURI - The URL to share
- */
+export type ShareLinksProps = {
+  shareURI: string;
+};
 
 /**
  * A list of share links to social-media platforms.
- *
- * @param {ShareLinksProps} props
  */
-export default function ShareLinks({ shareURI }) {
-  // This is the double-encoded format needed for other services (the entire
-  // URI needs to be encoded because it's used as the value of querystring params)
+export default function ShareLinks({ shareURI }: ShareLinksProps) {
   const encodedURI = encodeURIComponent(shareURI);
 
   return (
