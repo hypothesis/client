@@ -13,28 +13,36 @@ import { useSidebarStore } from '../store';
 
 import { useRootThread } from './hooks/use-root-thread';
 
-/**
- * @typedef FilterStatusMessageProps
- * @prop {number} [additionalCount=0] -
- *   A count of items that are visible but do not match the filters
- * @prop {string} [entitySingular="annotation"] -
- *   singular variant of the "thing" being shown (e.g. "result" when there is
- *   a query string)
- * @prop {string} [entityPlural="annotations"]
- * @prop {string|null} [filterQuery] - Currently-applied filter query string, if any
- * @prop {string|null} [focusDisplayName] -
- *   Display name for the user currently being focused
- * @prop {number} resultCount -
- *   The number of "things" that match the current filter(s). When searching by
- *   query or focusing on a user, this value includes annotations and replies.
- *   When there are selected annotations, this number includes only top-level
- *   annotations.
- */
+type FilterStatusMessageProps = {
+  /**
+   * A count of items that are visible but do not match the filters (i.e. items
+   * that have been "forced visible" by the user)
+   */
+  additionalCount?: number;
+
+  /** Singular unit of the items being shown, e.g. "result" or "annotation" */
+  entitySingular?: string;
+
+  /** Plural unit of the items being shown */
+  entityPlural?: string;
+
+  /** Currently-applied filter query string, if any */
+  filterQuery?: string | null;
+
+  /** Display name for the user currently focused, if any */
+  focusDisplayName?: string | null;
+
+  /**
+   * The number of items that match the current filter(s). When searching by
+   * query or focusing on a user, this value includes annotations and replies.
+   * When there are selected annotations, this number includes only top-level
+   * annotations.
+   */
+  resultCount: number;
+};
 
 /**
  * Render status text describing the currently-applied filters.
- *
- * @param {FilterStatusMessageProps} props
  */
 function FilterStatusMessage({
   additionalCount = 0,
@@ -43,7 +51,7 @@ function FilterStatusMessage({
   filterQuery,
   focusDisplayName,
   resultCount,
-}) {
+}: FilterStatusMessageProps) {
   return (
     <>
       {resultCount > 0 && <span>Showing </span>}
