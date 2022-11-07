@@ -139,6 +139,10 @@ export type Target = {
   selector?: Selector[];
 };
 
+export type UserInfo = {
+  display_name: string | null;
+};
+
 export type Annotation = ClientAnnotationData & {
   /**
    * The server-assigned ID for the annotation. This is only set once the
@@ -197,9 +201,7 @@ export type Annotation = ClientAnnotationData & {
     html?: string;
   };
 
-  user_info?: {
-    display_name: string | null;
-  };
+  user_info?: UserInfo;
 };
 
 /**
@@ -213,9 +215,7 @@ export type Profile = {
     show_sidebar_tutorial?: boolean;
   };
   features: Record<string, boolean>;
-  user_info?: {
-    display_name: string | null;
-  };
+  user_info?: UserInfo;
 };
 
 export type Organization = {

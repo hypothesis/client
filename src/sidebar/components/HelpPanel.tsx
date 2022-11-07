@@ -6,7 +6,7 @@ import {
 import type { ComponentChildren as Children } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
-import type { AuthState } from '../helpers/version-data';
+import { username } from '../helpers/account-id';
 import { useSidebarStore } from '../store';
 import type { SessionService } from '../services/session';
 import { withServices } from '../service-context';
@@ -65,17 +65,19 @@ function HelpPanelTab({ linkText, url }: HelpPanelTabProps) {
 }
 
 type HelpPanelProps = {
-  auth: AuthState;
   session: SessionService;
 };
 
 /**
  * A help sidebar panel with two sub-panels: tutorial and version info.
  */
-function HelpPanel({ auth, session }: HelpPanelProps) {
+function HelpPanel({ session }: HelpPanelProps) {
   const store = useSidebarStore();
   const frames = store.frames();
   const mainFrame = store.mainFrame();
+  const profile = store.profile();
+  const displayName =
+    profile.user_info?.display_name ?? username(profile.userid);
 
   // Should this panel be auto-opened at app launch? Note that the actual
   // auto-open triggering of this panel is owned by the `HypothesisApp` component.
@@ -95,11 +97,9 @@ function HelpPanel({ auth, session }: HelpPanelProps) {
 
   // Build version details about this session/app
   const versionData = useMemo(() => {
-    const userInfo = auth || { status: 'logged-out' };
-
     // Sort frames so the main frame is listed first. Other frames will retain
     // their original order, assuming a stable sort.
-    const documentInfo = [...frames].sort((a, b) => {
+    const documentFrames = [...frames].sort((a, b) => {
       if (a === mainFrame) {
         return -1;
       } else if (b === mainFrame) {
@@ -109,8 +109,11 @@ function HelpPanel({ auth, session }: HelpPanelProps) {
       }
     });
 
-    return new VersionData(userInfo, documentInfo);
-  }, [auth, frames, mainFrame]);
+    return new VersionData(
+      { userid: profile.userid, displayName },
+      documentFrames
+    );
+  }, [profile, displayName, frames, mainFrame]);
 
   // The support ticket URL encodes some version info in it to pre-fill in the
   // create-new-ticket form
