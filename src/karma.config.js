@@ -1,12 +1,7 @@
-/* global __dirname, process */
+/* global __dirname */
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const path = require('path');
-
-let chromeFlags = [];
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 module.exports = function (config) {
   config.set({
@@ -60,15 +55,9 @@ module.exports = function (config) {
       terminal: true,
     },
 
-    browsers: ['ChromeHeadless_Custom'],
     browserNoActivityTimeout: 20000,
 
-    customLaunchers: {
-      ChromeHeadless_Custom: {
-        base: 'ChromeHeadless',
-        flags: chromeFlags,
-      },
-    },
+    browsers: ['ChromeHeadless'],
 
     // Log slow tests so we can fix them before they timeout
     reportSlowerThan: 500,
