@@ -2,7 +2,10 @@ import { Icon } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 
 import { serviceConfig } from '../config/service-config';
-import { isThirdPartyUser } from '../helpers/account-id';
+import {
+  isThirdPartyUser,
+  username as getUsername,
+} from '../helpers/account-id';
 import { withServices } from '../service-context';
 import { useSidebarStore } from '../store';
 
@@ -15,17 +18,7 @@ import MenuSection from './MenuSection';
  * /
 
 /**
- * @typedef AuthStateLoggedIn
- * @prop {'logged-in'} status
- * @prop {string} displayName
- * @prop {string} userid
- * @prop {string} username
- * @typedef {{status: 'logged-out'|'unknown'} | AuthStateLoggedIn}  AuthState
- */
-
-/**
  * @typedef UserMenuProps
- * @prop {AuthStateLoggedIn} auth - object representing authenticated user and auth status
  * @prop {() => void} onLogout - onClick callback for the "log out" button
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  * @prop {SidebarSettings} settings
@@ -39,12 +32,15 @@ import MenuSection from './MenuSection';
  *
  * @param {UserMenuProps} props
  */
-function UserMenu({ auth, frameSync, onLogout, settings }) {
+function UserMenu({ frameSync, onLogout, settings }) {
   const store = useSidebarStore();
   const defaultAuthority = store.defaultAuthority();
+  const profile = store.profile();
 
-  const isThirdParty = isThirdPartyUser(auth.userid, defaultAuthority);
+  const isThirdParty = isThirdPartyUser(profile.userid, defaultAuthority);
   const service = serviceConfig(settings);
+  const username = getUsername(profile.userid);
+  const displayName = profile.user_info?.display_name ?? username;
   const [isOpen, setOpen] = useState(false);
 
   /** @param {keyof import('../../types/config').Service} feature */
@@ -78,7 +74,7 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
     const props = {};
     if (isSelectableProfile) {
       if (!isThirdParty) {
-        props.href = store.getLink('user', { user: auth.username });
+        props.href = store.getLink('user', { user: username });
       }
       props.onClick = onProfileSelected;
     }
@@ -96,14 +92,14 @@ function UserMenu({ auth, frameSync, onLogout, settings }) {
     <div data-testid="user-menu" onKeyDown={onKeyDown}>
       <Menu
         label={menuLabel}
-        title={auth.displayName}
+        title={displayName}
         align="right"
         open={isOpen}
         onOpenChanged={setOpen}
       >
         <MenuSection>
           <MenuItem
-            label={auth.displayName}
+            label={displayName}
             isDisabled={!isSelectableProfile}
             {...profileItemProps}
           />

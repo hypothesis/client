@@ -14,7 +14,6 @@ import StreamSearchInput from './StreamSearchInput';
 import UserMenu from './UserMenu';
 
 /**
- * @typedef {import('../components/UserMenu').AuthState} AuthState
  * @typedef {import('preact').ComponentChildren} Children
  * @typedef {import('../services/frame-sync').FrameSyncService} FrameSyncService
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
@@ -23,7 +22,6 @@ import UserMenu from './UserMenu';
 
 /**
  * @typedef TopBarProps
- * @prop {AuthState} auth
  * @prop {FrameSyncService} frameSync - injected
  * @prop {boolean} isSidebar - Flag indicating whether the app is the sidebar or a top-level page.
  * @prop {() => void} onLogin - Callback invoked when user clicks "Login" button.
@@ -40,7 +38,6 @@ import UserMenu from './UserMenu';
  * @param {TopBarProps} props
  */
 function TopBar({
-  auth,
   frameSync,
   isSidebar,
   onLogin,
@@ -55,6 +52,8 @@ function TopBar({
   const store = useSidebarStore();
   const filterQuery = store.filterQuery();
   const pendingUpdateCount = store.pendingUpdateCount();
+  const isLoggedIn = store.isLoggedIn();
+  const hasFetchedProfile = store.hasFetchedProfile();
 
   const applyPendingUpdates = () => streamer.applyPendingUpdates();
 
@@ -134,15 +133,15 @@ function TopBar({
             size="small"
             title="Help"
           />
-          {auth.status === 'logged-in' ? (
-            <UserMenu auth={auth} onLogout={onLogout} />
+          {isLoggedIn ? (
+            <UserMenu onLogout={onLogout} />
           ) : (
             <div
               className="flex items-center text-lg font-medium space-x-1"
               data-testid="login-links"
             >
-              {auth.status === 'unknown' && <span>⋯</span>}
-              {auth.status === 'logged-out' && (
+              {!isLoggedIn && !hasFetchedProfile && <span>⋯</span>}
+              {!isLoggedIn && hasFetchedProfile && (
                 <>
                   <LinkButton
                     classes="inline"

@@ -17,6 +17,8 @@ describe('TopBar', () => {
 
     fakeStore = {
       filterQuery: sinon.stub().returns(null),
+      hasFetchedProfile: sinon.stub().returns(false),
+      isLoggedIn: sinon.stub().returns(false),
       isSidebarPanelOpen: sinon.stub().returns(false),
       pendingUpdateCount: sinon.stub().returns(0),
       setFilterQuery: sinon.stub(),
@@ -54,10 +56,8 @@ describe('TopBar', () => {
   }
 
   function createTopBar(props = {}) {
-    const auth = { status: 'unknown' };
     return mount(
       <TopBar
-        auth={auth}
         frameSync={fakeFrameSync}
         isSidebar={true}
         settings={fakeSettings}
@@ -131,18 +131,21 @@ describe('TopBar', () => {
     const getLoginText = wrapper => wrapper.find('[data-testid="login-links"]');
 
     it('Shows ellipsis when login state is unknown', () => {
-      const wrapper = createTopBar({ auth: { status: 'unknown' } });
+      fakeStore.hasFetchedProfile.returns(false);
+      fakeStore.isLoggedIn.returns(false);
+      const wrapper = createTopBar();
       const loginText = getLoginText(wrapper);
       assert.isTrue(loginText.exists());
       assert.equal(loginText.text(), '⋯');
     });
 
     it('Shows "Log in" and "Sign up" links when user is logged out', () => {
+      fakeStore.hasFetchedProfile.returns(true);
+      fakeStore.isLoggedIn.returns(false);
       const onLogin = sinon.stub();
       const onSignUp = sinon.stub();
 
       const wrapper = createTopBar({
-        auth: { status: 'logged-out' },
         onLogin,
         onSignUp,
       });
@@ -155,14 +158,16 @@ describe('TopBar', () => {
     });
 
     it('Shows user menu when logged in', () => {
+      fakeStore.hasFetchedProfile.returns(true);
+      fakeStore.isLoggedIn.returns(true);
+
       const onLogout = sinon.stub();
-      const auth = { status: 'logged-in' };
-      const wrapper = createTopBar({ auth, onLogout });
+      const wrapper = createTopBar({ onLogout });
       assert.isFalse(getLoginText(wrapper).exists());
 
       const userMenu = wrapper.find('UserMenu');
       assert.isTrue(userMenu.exists());
-      assert.include(userMenu.props(), { auth, onLogout });
+      assert.include(userMenu.props(), { onLogout });
     });
   });
 

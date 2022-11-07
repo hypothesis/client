@@ -3,7 +3,6 @@ import { useEffect, useMemo } from 'preact/hooks';
 
 import { confirm } from '../../shared/prompts';
 import { serviceConfig } from '../config/service-config';
-import { parseAccountID } from '../helpers/account-id';
 import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
@@ -20,34 +19,8 @@ import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
 
 /**
- * @typedef {import('../../types/api').Profile} Profile
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('./UserMenu').AuthState} AuthState
  */
-
-/**
- * Return the user's authentication status from their profile.
- *
- * @param {Profile} profile - The profile object from the API.
- * @return {AuthState}
- */
-function authStateFromProfile(profile) {
-  const parsed = parseAccountID(profile.userid);
-  if (parsed && profile.userid) {
-    let displayName = parsed.username;
-    if (profile.user_info && profile.user_info.display_name) {
-      displayName = profile.user_info.display_name;
-    }
-    return {
-      status: 'logged-in',
-      displayName,
-      userid: profile.userid,
-      username: parsed.username,
-    };
-  } else {
-    return { status: 'logged-out' };
-  }
-}
 
 /**
  * @typedef HypothesisAppProps
@@ -68,17 +41,8 @@ function authStateFromProfile(profile) {
  */
 function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
   const store = useSidebarStore();
-  const hasFetchedProfile = store.hasFetchedProfile();
   const profile = store.profile();
   const route = store.route();
-
-  /** @type {AuthState} */
-  const authState = useMemo(() => {
-    if (!hasFetchedProfile) {
-      return { status: 'unknown' };
-    }
-    return authStateFromProfile(profile);
-  }, [hasFetchedProfile, profile]);
 
   const backgroundStyle = useMemo(
     () => applyTheme(['appBackgroundColor'], settings),
@@ -183,7 +147,6 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
     >
       {route !== 'notebook' && (
         <TopBar
-          auth={authState}
           onLogin={login}
           onSignUp={signUp}
           onLogout={logout}
@@ -192,7 +155,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
       )}
       <div className="container">
         <ToastMessages />
-        <HelpPanel auth={authState.status === 'logged-in' ? authState : {}} />
+        <HelpPanel />
         <ShareAnnotationsPanel />
 
         {route && (

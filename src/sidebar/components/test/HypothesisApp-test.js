@@ -145,68 +145,6 @@ describe('HypothesisApp', () => {
     });
   });
 
-  describe('"status" field of "auth" prop passed to children', () => {
-    const getStatus = wrapper => wrapper.find('TopBar').prop('auth').status;
-
-    it('is "unknown" if profile has not yet been fetched', () => {
-      fakeStore.hasFetchedProfile.returns(false);
-      const wrapper = createComponent();
-      assert.equal(getStatus(wrapper), 'unknown');
-    });
-
-    it('is "logged-out" if userid is null', () => {
-      fakeStore.profile.returns({ userid: null });
-      const wrapper = createComponent();
-      assert.equal(getStatus(wrapper), 'logged-out');
-    });
-
-    it('is "logged-in" if userid is non-null', () => {
-      fakeStore.profile.returns({ userid: 'acct:jimsmith@hypothes.is' });
-      const wrapper = createComponent();
-      assert.equal(getStatus(wrapper), 'logged-in');
-    });
-  });
-
-  [
-    {
-      // User who has set a display name
-      profile: {
-        userid: 'acct:jim@hypothes.is',
-        user_info: {
-          display_name: 'Jim Smith',
-        },
-      },
-      expectedAuth: {
-        status: 'logged-in',
-        userid: 'acct:jim@hypothes.is',
-        username: 'jim',
-        displayName: 'Jim Smith',
-      },
-    },
-    {
-      // User who has not set a display name
-      profile: {
-        userid: 'acct:jim@hypothes.is',
-        user_info: {
-          display_name: null,
-        },
-      },
-      expectedAuth: {
-        status: 'logged-in',
-        userid: 'acct:jim@hypothes.is',
-        username: 'jim',
-        displayName: 'jim',
-      },
-    },
-  ].forEach(({ profile, expectedAuth }) => {
-    it('passes expected "auth" prop to children', () => {
-      fakeStore.profile.returns(profile);
-      const wrapper = createComponent();
-      const auth = wrapper.find('TopBar').prop('auth');
-      assert.deepEqual(auth, expectedAuth);
-    });
-  });
-
   describe('"Sign up" action', () => {
     const clickSignUp = wrapper => wrapper.find('TopBar').props().onSignUp();
 

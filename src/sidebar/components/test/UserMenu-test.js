@@ -5,7 +5,7 @@ import { mockImportedComponents } from '../../../test-util/mock-imported-compone
 import UserMenu, { $imports } from '../UserMenu';
 
 describe('UserMenu', () => {
-  let fakeAuth;
+  let fakeProfile;
   let fakeFrameSync;
   let fakeIsThirdPartyUser;
   let fakeOnLogout;
@@ -16,7 +16,6 @@ describe('UserMenu', () => {
   const createUserMenu = () => {
     return mount(
       <UserMenu
-        auth={fakeAuth}
         frameSync={fakeFrameSync}
         onLogout={fakeOnLogout}
         settings={fakeSettings}
@@ -31,11 +30,11 @@ describe('UserMenu', () => {
   };
 
   beforeEach(() => {
-    fakeAuth = {
-      displayName: 'Eleanor Fishtail',
-      status: 'logged-in',
+    fakeProfile = {
+      user_info: {
+        display_name: 'Eleanor Fishtail',
+      },
       userid: 'acct:eleanorFishtail@hypothes.is',
-      username: 'eleanorFishy',
     };
     fakeFrameSync = { notifyHost: sinon.stub() };
     fakeIsThirdPartyUser = sinon.stub();
@@ -46,6 +45,7 @@ describe('UserMenu', () => {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       focusedGroupId: sinon.stub().returns('mygroup'),
       getLink: sinon.stub(),
+      profile: sinon.stub().returns(fakeProfile),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -72,21 +72,30 @@ describe('UserMenu', () => {
       it('should be enabled', () => {
         const wrapper = createUserMenu();
 
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         assert.notOk(profileMenuItem.prop('isDisabled'));
       });
 
       it('should have a link (href)', () => {
         const wrapper = createUserMenu();
 
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         assert.equal(profileMenuItem.prop('href'), 'profile-link');
       });
 
       it('should have a callback', () => {
         const wrapper = createUserMenu();
 
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         assert.isFunction(profileMenuItem.prop('onClick'));
       });
     });
@@ -101,7 +110,10 @@ describe('UserMenu', () => {
 
         const wrapper = createUserMenu();
 
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         assert.isTrue(profileMenuItem.prop('isDisabled'));
       });
 
@@ -110,7 +122,10 @@ describe('UserMenu', () => {
 
         const wrapper = createUserMenu();
 
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         assert.isTrue(profileMenuItem.prop('isDisabled'));
       });
 
@@ -119,7 +134,10 @@ describe('UserMenu', () => {
 
         const wrapper = createUserMenu();
 
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         assert.notOk(profileMenuItem.prop('isDisabled'));
       });
 
@@ -128,7 +146,10 @@ describe('UserMenu', () => {
 
         const wrapper = createUserMenu();
 
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         assert.isFunction(profileMenuItem.prop('onClick'));
       });
     });
@@ -138,7 +159,10 @@ describe('UserMenu', () => {
         fakeServiceConfig.returns({ onProfileRequestProvided: true });
         fakeIsThirdPartyUser.returns(true);
         const wrapper = createUserMenu();
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         const onProfileSelected = profileMenuItem.prop('onClick');
 
         onProfileSelected();
@@ -150,7 +174,10 @@ describe('UserMenu', () => {
       it('should not fire profile event for first-party user', () => {
         fakeIsThirdPartyUser.returns(false);
         const wrapper = createUserMenu();
-        const profileMenuItem = findMenuItem(wrapper, fakeAuth.displayName);
+        const profileMenuItem = findMenuItem(
+          wrapper,
+          fakeProfile.user_info.display_name
+        );
         const onProfileSelected = profileMenuItem.prop('onClick');
 
         onProfileSelected();

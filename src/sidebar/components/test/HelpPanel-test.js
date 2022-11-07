@@ -7,7 +7,6 @@ import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('HelpPanel', () => {
-  let fakeAuth;
   let fakeSessionService;
   let fakeStore;
   let frames;
@@ -16,20 +15,23 @@ describe('HelpPanel', () => {
   let fakeVersionData;
 
   function createComponent(props) {
-    return mount(
-      <HelpPanel auth={fakeAuth} session={fakeSessionService} {...props} />
-    );
+    return mount(<HelpPanel session={fakeSessionService} {...props} />);
   }
 
   beforeEach(() => {
     frames = [];
-    fakeAuth = {};
     fakeSessionService = { dismissSidebarTutorial: sinon.stub() };
     fakeStore = {
       frames: () => frames,
       mainFrame: () => frames.find(f => !f.id) ?? null,
       profile: sinon.stub().returns({
-        preferences: { show_sidebar_tutorial: true },
+        preferences: {
+          show_sidebar_tutorial: true,
+        },
+        userid: 'acct:delores@hypothes.is',
+        user_info: {
+          display_name: 'Delores',
+        },
       }),
     };
     fakeVersionData = {
@@ -85,6 +87,16 @@ describe('HelpPanel', () => {
   });
 
   context('when viewing versionInfo sub-panel', () => {
+    it('provides info about the current user', () => {
+      createComponent();
+
+      const userInfo = FakeVersionData.getCall(0).args[0];
+      assert.deepEqual(userInfo, {
+        userid: 'acct:delores@hypothes.is',
+        displayName: 'Delores',
+      });
+    });
+
     it('shows document info for current frames', () => {
       // Unsorted frames
       frames = [
