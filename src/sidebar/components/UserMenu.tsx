@@ -1,38 +1,33 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useState } from 'preact/hooks';
 
+import type { Service, SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import {
   isThirdPartyUser,
   username as getUsername,
 } from '../helpers/account-id';
 import { withServices } from '../service-context';
+import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 
 import Menu from './Menu';
 import MenuItem from './MenuItem';
 import MenuSection from './MenuSection';
 
-/**
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * /
-
-/**
- * @typedef UserMenuProps
- * @prop {() => void} onLogout - onClick callback for the "log out" button
- * @prop {import('../services/frame-sync').FrameSyncService} frameSync
- * @prop {SidebarSettings} settings
- */
+export type UserMenuProps = {
+  onLogout: () => void;
+  frameSync: FrameSyncService;
+  settings: SidebarSettings;
+};
 
 /**
  * A menu with user and account links.
  *
  * This menu will contain different items depending on service configuration,
  * context and whether the user is first- or third-party.
- *
- * @param {UserMenuProps} props
  */
-function UserMenu({ frameSync, onLogout, settings }) {
+function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
   const store = useSidebarStore();
   const defaultAuthority = store.defaultAuthority();
   const profile = store.profile();
@@ -43,8 +38,8 @@ function UserMenu({ frameSync, onLogout, settings }) {
   const displayName = profile.user_info?.display_name ?? username;
   const [isOpen, setOpen] = useState(false);
 
-  /** @param {keyof import('../../types/config').Service} feature */
-  const serviceSupports = feature => service && !!service[feature];
+  const serviceSupports = (feature: keyof Service) =>
+    service && !!service[feature];
 
   const isSelectableProfile =
     !isThirdParty || serviceSupports('onProfileRequestProvided');
@@ -55,11 +50,9 @@ function UserMenu({ frameSync, onLogout, settings }) {
     frameSync.notifyHost('openNotebook', store.focusedGroupId());
   };
 
-  // Temporary access to the Notebook without feature flag:
+  // Access to the Notebook:
   // type the key 'n' when user menu is focused/open
-
-  /** @param {KeyboardEvent} event */
-  const onKeyDown = event => {
+  const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'n') {
       onSelectNotebook();
       setOpen(false);
@@ -68,18 +61,10 @@ function UserMenu({ frameSync, onLogout, settings }) {
 
   const onProfileSelected = () =>
     isThirdParty && frameSync.notifyHost('profileRequested');
-
-  // Generate dynamic props for the profile <MenuItem> component
-  const profileItemProps = (() => {
-    const props = {};
-    if (isSelectableProfile) {
-      if (!isThirdParty) {
-        props.href = store.getLink('user', { user: username });
-      }
-      props.onClick = onProfileSelected;
-    }
-    return props;
-  })();
+  const profileHref =
+    isSelectableProfile && !isThirdParty
+      ? store.getLink('user', { user: username })
+      : undefined;
 
   const menuLabel = (
     <span className="p-1">
@@ -101,7 +86,8 @@ function UserMenu({ frameSync, onLogout, settings }) {
           <MenuItem
             label={displayName}
             isDisabled={!isSelectableProfile}
-            {...profileItemProps}
+            href={profileHref}
+            onClick={isSelectableProfile ? onProfileSelected : undefined}
           />
           {!isThirdParty && (
             <MenuItem
