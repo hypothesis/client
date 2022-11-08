@@ -3,50 +3,49 @@ import {
   ArrowLeftIcon,
   ArrowRightIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import type { PresentationalProps } from '@hypothesis/frontend-shared/lib/types';
+import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import classnames from 'classnames';
+import type { JSX } from 'preact';
 
 import { pageNumberOptions } from '../util/pagination';
 
-/**
- * @typedef {import('@hypothesis/frontend-shared/lib/types').PresentationalProps} PresentationalProps
- * @typedef {import('@hypothesis/frontend-shared/lib/components/input/ButtonBase').ButtonCommonProps} ButtonCommonProps
- * @typedef {Omit<import('preact').JSX.HTMLAttributes<HTMLButtonElement>, 'icon'|'size'>} HTMLButtonAttributes
- */
+type NavigationButtonProps = PresentationalProps &
+  ButtonCommonProps &
+  Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'icon' | 'size'>;
 
-/**
- * Style a navigation button.
- *
- * @param {PresentationalProps & ButtonCommonProps & HTMLButtonAttributes} props
- */
-function NavigationButton({ ...buttonProps }) {
+function NavigationButton({ ...buttonProps }: NavigationButtonProps) {
   return (
     <ButtonBase
       classes={classnames(
         'px-3.5 py-2.5 gap-x-1 font-semibold',
         // These colors are the same as the "dark" variant of IconButton
-        'text-grey-7 bg-grey-2 enabled:hover:text-grey-9 enabled:hover:bg-grey-3 disabled:text-grey-5 aria-pressed:bg-grey-3 aria-expanded:bg-grey-3'
+        'text-grey-7 bg-grey-2 enabled:hover:text-grey-9 enabled:hover:bg-grey-3',
+        'disabled:text-grey-5 aria-pressed:bg-grey-3 aria-expanded:bg-grey-3'
       )}
       {...buttonProps}
     />
   );
 }
 
-/**
- * @typedef PaginationNavigationProps
- * @prop {number} currentPage - The currently-visible page of results. Pages
- *   start at 1 (not 0).
- * @prop {(page: number) => void} onChangePage - Callback for changing page
- * @prop {number} totalPages
- */
+export type PaginationNavigationProps = {
+  /** 1-indexed page number of currently-visible page of results */
+  currentPage: number;
+  onChangePage: (page: number) => void;
+  totalPages: number;
+};
 
 /**
  * Render pagination navigation controls, with buttons to go next, previous
  * and nearby pages. Buttons corresponding to nearby pages are shown on wider
  * screens; for narrow screens only Prev and Next buttons are shown.
  *
- * @param {PaginationNavigationProps} props
  */
-function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
+function PaginationNavigation({
+  currentPage,
+  onChangePage,
+  totalPages,
+}: PaginationNavigationProps) {
   // Pages are 1-indexed
   const hasNextPage = currentPage < totalPages;
   const hasPreviousPage = currentPage > 1;
@@ -56,7 +55,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
    * @param {number} pageNumber
    * @param {HTMLElement} element
    */
-  const changePageTo = (pageNumber, element) => {
+  const changePageTo = (pageNumber: number, element: HTMLElement) => {
     onChangePage(pageNumber);
     // Because changing pagination page doesn't reload the page (as it would
     // in a "traditional" HTML context), the clicked-upon navigation button
@@ -75,10 +74,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
           <NavigationButton
             title="Go to previous page"
             onClick={e =>
-              changePageTo(
-                currentPage - 1,
-                /** @type {HTMLElement} */ (e.target)
-              )
+              changePageTo(currentPage - 1, e.target as HTMLElement)
             }
           >
             <ArrowLeftIcon />
@@ -112,9 +108,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
                 key={`page-${idx}`}
                 title={`Go to page ${page}`}
                 pressed={page === currentPage}
-                onClick={e =>
-                  changePageTo(page, /** @type {HTMLElement} */ (e.target))
-                }
+                onClick={e => changePageTo(page, e.target as HTMLElement)}
               >
                 {page.toString()}
               </NavigationButton>
@@ -134,10 +128,7 @@ function PaginationNavigation({ currentPage, onChangePage, totalPages }) {
           <NavigationButton
             title="Go to next page"
             onClick={e =>
-              changePageTo(
-                currentPage + 1,
-                /** @type {HTMLElement} */ (e.target)
-              )
+              changePageTo(currentPage + 1, e.target as HTMLElement)
             }
           >
             next
