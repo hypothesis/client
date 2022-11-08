@@ -1172,7 +1172,7 @@ describe('Guest', () => {
 
       assert.equal(
         highlighter.highlightRange.lastCall.args[1],
-        'hypothesis-highlight user-annotations'
+        'user-annotations'
       );
     });
 
