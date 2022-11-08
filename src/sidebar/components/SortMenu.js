@@ -1,4 +1,4 @@
-import { Icon } from '@hypothesis/frontend-shared';
+import { SortIcon } from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
 
@@ -29,7 +29,7 @@ export default function SortMenu() {
 
   const menuLabel = (
     <span className="p-1">
-      <Icon name="sort" />
+      <SortIcon />
     </span>
   );
 
