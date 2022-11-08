@@ -1,3 +1,5 @@
+import classnames from 'classnames';
+
 import { isInPlaceholder } from './anchoring/placeholder';
 import { isNodeInRange } from './range-util';
 
@@ -50,8 +52,9 @@ function getPDFCanvas(highlightEl) {
  * @param {HighlightElement[]} highlightEls -
  *   An element that wraps the highlighted text in the transparent text layer
  *   above the PDF.
+ * @param {string} [cssClass] - CSS class(es) to add to the SVG highlight elements
  */
-function drawHighlightsAbovePDFCanvas(highlightEls) {
+function drawHighlightsAbovePDFCanvas(highlightEls, cssClass) {
   if (highlightEls.length === 0) {
     return;
   }
@@ -104,7 +107,10 @@ function drawHighlightsAbovePDFCanvas(highlightEls) {
     rect.setAttribute('y', (highlightRect.top - canvasRect.top).toString());
     rect.setAttribute('width', highlightRect.width.toString());
     rect.setAttribute('height', highlightRect.height.toString());
-    rect.setAttribute('class', 'hypothesis-svg-highlight');
+    rect.setAttribute(
+      'class',
+      classnames('hypothesis-svg-highlight', cssClass)
+    );
 
     // Make the highlight in the text layer transparent.
     highlightEl.classList.add('is-transparent');
@@ -199,10 +205,10 @@ function wholeTextNodesInRange(range) {
  * element of the specified class and returns the highlight Elements.
  *
  * @param {Range} range - Range to be highlighted
- * @param {string} cssClass - A CSS class to use for the highlight
+ * @param {string} [cssClass] - CSS class(es) to add to the highlight elements
  * @return {HighlightElement[]} - Elements wrapping text in `normedRange` to add a highlight effect
  */
-export function highlightRange(range, cssClass = 'hypothesis-highlight') {
+export function highlightRange(range, cssClass) {
   const textNodes = wholeTextNodesInRange(range);
 
   // Check if this range refers to a placeholder for not-yet-rendered content in
@@ -242,7 +248,7 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
 
     /** @type {HighlightElement} */
     const highlightEl = document.createElement('hypothesis-highlight');
-    highlightEl.className = cssClass;
+    highlightEl.className = classnames('hypothesis-highlight', cssClass);
 
     const parent = /** @type {Node} */ (nodes[0].parentNode);
     parent.replaceChild(highlightEl, nodes[0]);
@@ -261,7 +267,7 @@ export function highlightRange(range, cssClass = 'hypothesis-highlight') {
   // to reduce the number of forced reflows. We also skip creating them for
   // unrendered pages for performance reasons.
   if (!inPlaceholder) {
-    drawHighlightsAbovePDFCanvas(highlights);
+    drawHighlightsAbovePDFCanvas(highlights, cssClass);
   }
 
   return highlights;

@@ -1,5 +1,3 @@
-import classnames from 'classnames';
-
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
@@ -526,7 +524,7 @@ export class Guest implements Annotator, Destroyable {
 
       const highlights = highlightRange(
         range,
-        classnames('hypothesis-highlight', anchor.annotation?.$cluster)
+        anchor.annotation?.$cluster /* cssClass */
       ) as AnnotationHighlight[];
       highlights.forEach(h => {
         h._annotation = anchor.annotation;

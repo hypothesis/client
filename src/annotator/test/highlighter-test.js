@@ -47,26 +47,30 @@ function PDFPage({ showPlaceholder = false }) {
  *
  * @param {HTMLElement} pageContainer - HTML element into which `PDFPage`
  *   component has been rendered
+ * @param {string} [cssClass] additional CSS class(es) to apply to the highlight
+ *   and SVG rect elements
  * @return {HTMLElement} - `<hypothesis-highlight>` element
  */
-function highlightPDFRange(pageContainer) {
+function highlightPDFRange(pageContainer, cssClass = '') {
   const textSpan = pageContainer.querySelector('.testText');
   const range = new Range();
   range.setStartBefore(textSpan.childNodes[0]);
   range.setEndAfter(textSpan.childNodes[0]);
-  return highlightRange(range);
+  return highlightRange(range, cssClass);
 }
 
 /**
  * Render a fake PDF.js page (`PDFPage`) and return its container.
  *
+ * @param {string} [cssClass] additional CSS class(es) to apply to the highlight
+ *   and SVG rect elements
  * @return {HTMLElement}
  */
-function createPDFPageWithHighlight() {
+function createPDFPageWithHighlight(cssClass = '') {
   const container = document.createElement('div');
   render(<PDFPage />, container);
 
-  highlightPDFRange(container);
+  highlightPDFRange(container, cssClass);
 
   return container;
 }
@@ -81,12 +85,13 @@ describe('annotator/highlighter', () => {
       range.setStartBefore(text);
       range.setEndAfter(text);
 
-      const result = highlightRange(range);
+      const result = highlightRange(range, 'extra-css-class');
 
       assert.equal(result.length, 1);
       assert.strictEqual(el.childNodes[0], result[0]);
       assert.equal(result[0].nodeName, 'HYPOTHESIS-HIGHLIGHT');
       assert.isTrue(result[0].classList.contains('hypothesis-highlight'));
+      assert.isTrue(result[0].classList.contains('extra-css-class'));
     });
 
     const testText = 'one two three';
@@ -144,7 +149,7 @@ describe('annotator/highlighter', () => {
 
       assert.equal(
         el.innerHTML,
-        'foo <hypothesis-highlight class="">bar baz</hypothesis-highlight>'
+        'foo <hypothesis-highlight class="hypothesis-highlight">bar baz</hypothesis-highlight>'
       );
     });
 
@@ -248,6 +253,14 @@ describe('annotator/highlighter', () => {
         const page = createPDFPageWithHighlight();
         const highlight = page.querySelector('hypothesis-highlight');
         assert.isTrue(highlight.classList.contains('is-transparent'));
+      });
+
+      it('add extra CSS classes to both the highlight and SVG rect', () => {
+        const page = createPDFPageWithHighlight('extra-css-class');
+        const highlight = page.querySelector('hypothesis-highlight');
+        const svgRect = page.querySelector('rect');
+        assert.isTrue(highlight.classList.contains('extra-css-class'));
+        assert.isTrue(svgRect.classList.contains('extra-css-class'));
       });
 
       it('creates an SVG layer above the PDF canvas and draws a highlight in that', () => {
