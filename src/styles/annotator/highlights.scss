@@ -31,14 +31,9 @@
 }
 
 // Configure highlight styling.
-
 // Map `--hypothesis-*` root values to local `--highlight-*` values
+.hypothesis-highlight,
 .hypothesis-svg-highlight {
-  --highlight-color: var(--hypothesis-highlight-color);
-  --highlight-color-focused: var(--hypothesis-highlight-focused-color);
-}
-
-.hypothesis-highlight {
   --highlight-color: var(--hypothesis-highlight-color);
   --highlight-blend-mode: var(--hypothesis-highlight-blend-mode);
   --highlight-decoration: var(--hypothesis-highlight-decoration);
@@ -56,7 +51,8 @@
 
 // Configure clustered highlight styling. The `.hypothesis-highlights-clustered`
 // class is managed by `highlight-clusters`
-.hypothesis-highlights-clustered .hypothesis-highlight {
+.hypothesis-highlights-clustered .hypothesis-highlight,
+.hypothesis-highlights-clustered .hypothesis-svg-highlight {
   // When clustered highlights are active, use an opaque blue for focused
   // annotations so we don't end up with a funny color mix
   --highlight-color-focused: var(--hypothesis-color-blue);
