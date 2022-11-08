@@ -1,4 +1,4 @@
-import { Icon } from '@hypothesis/frontend-shared';
+import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useState } from 'preact/hooks';
 
 import { serviceConfig } from '../config/service-config';
@@ -83,7 +83,7 @@ function UserMenu({ frameSync, onLogout, settings }) {
 
   const menuLabel = (
     <span className="p-1">
-      <Icon name="profile" />
+      <ProfileIcon />
     </span>
   );
   return (
