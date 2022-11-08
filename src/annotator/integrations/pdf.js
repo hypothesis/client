@@ -202,6 +202,11 @@ export class PDFIntegration extends TinyEmitter {
     return canDescribe(range);
   }
 
+  /* istanbul ignore next */
+  canStyleClusteredHighlights() {
+    return true;
+  }
+
   /**
    * Generate selectors for the text in `range`.
    *
