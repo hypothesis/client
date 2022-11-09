@@ -68,6 +68,13 @@ describe('HypothesisInjector integration test', () => {
     container.remove();
   });
 
+  function extractClientConfig(frame) {
+    const configElement = frame.contentDocument.querySelector(
+      '.js-hypothesis-config'
+    );
+    return JSON.parse(configElement.textContent);
+  }
+
   describe('injectClient', () => {
     it('configures client', async () => {
       const frame = document.createElement('iframe');
@@ -75,15 +82,26 @@ describe('HypothesisInjector integration test', () => {
 
       await injectClient(frame, { clientUrl: 'https://hyp.is' });
 
-      const configElement = frame.contentDocument.querySelector(
-        '.js-hypothesis-config'
-      );
-      const config = JSON.parse(configElement.textContent);
+      const config = extractClientConfig(frame);
 
       assert.match(config.subFrameIdentifier, /[a-f0-9]+/);
       assert.notOk(config.assetRoot);
       assert.notOk(config.notebookAppUrl);
       assert.notOk(config.sidebarAppUrl);
+    });
+
+    it('configures client with specified frame ID', async () => {
+      const frame = document.createElement('iframe');
+      container.append(frame);
+
+      await injectClient(
+        frame,
+        { clientUrl: 'https://hyp.is' },
+        'some-frame-id'
+      );
+
+      const config = extractClientConfig(frame);
+      assert.equal(config.subFrameIdentifier, 'some-frame-id');
     });
 
     it('copies client asset locations from host frame', async () => {

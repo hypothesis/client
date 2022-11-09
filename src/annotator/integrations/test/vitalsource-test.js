@@ -137,7 +137,12 @@ describe('annotator/integrations/vitalsource', () => {
 
     it('injects client into content frame', async () => {
       await waitFor(() => fakeInjectClient.called);
-      assert.calledWith(fakeInjectClient, fakeViewer.contentFrame, fakeConfig);
+      assert.calledWith(
+        fakeInjectClient,
+        fakeViewer.contentFrame,
+        fakeConfig,
+        'vitalsource-content'
+      );
     });
 
     [
