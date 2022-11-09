@@ -127,7 +127,7 @@ export class MosaicBookElement extends HTMLElement {
       //    submission, which returns the decoded HTML.
       //
       // The client should only inject into the new frame after step 3.
-      this.contentFrame.src = 'about:blank';
+      this.contentFrame.src = '/document/vitalsource-temp-page';
       setTimeout(() => {
         // Set the final URL in a way that doesn't update the `src` attribute
         // of the iframe, to make sure the client isn't relying on that.
