@@ -198,7 +198,13 @@ export class VitalSourceInjector {
       }
       contentFrames.add(frame);
       onDocumentReady(frame, (err, document_) => {
-        const body = document_?.body;
+        if (err) {
+          return;
+        }
+
+        // If `err` is null, then `document_` will be set.
+        const body = document_!.body;
+
         const isBookContent =
           body &&
           // Check that this is not the temporary page containing encrypted and
