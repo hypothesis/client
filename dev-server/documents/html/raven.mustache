@@ -1,0 +1,729 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- This document is meant to demonstrate how Hypothesis works in HTML documents
+     with light text on a dark background.
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
+    <title>The Project Gutenberg eBook of The Raven, by Edgar Allan Poe.</title>
+    <style type="text/css">
+      body {
+        background-color: black;
+        color: white;
+      }
+      p {
+        margin-top: 0.75em;
+        text-align: justify;
+        margin-bottom: 0.75em;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        text-align: center; /* all headings centered */
+        clear: both;
+      }
+
+      hr {
+        width: 33%;
+        margin-top: 2em;
+        margin-bottom: 2em;
+        margin-left: auto;
+        margin-right: auto;
+        clear: both;
+      }
+
+      table {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      body {
+        margin-left: 10%;
+        margin-right: 10%;
+      }
+
+      .pagenum {
+        /*  uncomment the next line for invisible page numbers */
+        /*  visibility: hidden;  */
+        position: absolute;
+        left: 92%;
+        font-size: smaller;
+        text-align: right;
+        color: gray;
+      }
+
+      .linenum {
+        /* poetry number */
+        position: absolute;
+        top: auto;
+        left: 4%;
+      }
+
+      .blockquot {
+        margin-left: 5%;
+        margin-right: 10%;
+        font-size: smaller;
+      }
+
+      .sidenote {
+        width: 20%;
+        padding-bottom: 0.5em;
+        padding-top: 0.5em;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+        margin-left: 1em;
+        float: right;
+        clear: right;
+        margin-top: 1em;
+        font-size: smaller;
+        color: black;
+        background: #eeeeee;
+        border: dashed 1px;
+      }
+
+      .bb {
+        border-bottom: solid 2px;
+      }
+      .bl {
+        border-left: solid 2px;
+      }
+      .bt {
+        border-top: solid 2px;
+      }
+      .br {
+        border-right: solid 2px;
+      }
+      .bbox {
+        border: solid 1px;
+        padding-bottom: 0.5em;
+        padding-top: 0.5em;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+      }
+
+      .center {
+        text-align: center;
+      }
+      .right {
+        text-align: right;
+      }
+      .smcap {
+        font-variant: small-caps;
+      }
+      .u {
+        text-decoration: underline;
+      }
+
+      img {
+        border: none;
+      }
+
+      .hang {
+        text-indent: -3em;
+        margin-left: 3em;
+      }
+
+      .narrow {
+        /* like blockquote, but narrower and with equal margins */
+        margin-left: 20%;
+        margin-right: 20%;
+      }
+
+      .tnote {
+        /*  Transcriber's Note   */
+        font-size: 90%;
+        margin-left: 15%;
+        margin-right: 15%;
+        border-top: thin dotted;
+        border-bottom: thin dotted;
+        border-left: thin dotted;
+        border-right: thin dotted;
+        padding-bottom: 0.5em;
+        padding-top: 0.5em;
+        padding-left: 0.5em;
+        padding-right: 0.5em;
+      }
+
+      .caption {
+        font-weight: bold;
+        font-size: smaller;
+      }
+
+      .figcenter {
+        margin: auto;
+        text-align: center;
+      }
+
+      .figleft {
+        float: left;
+        clear: left;
+        margin-left: 0;
+        margin-bottom: 1em;
+        margin-top: 1em;
+        margin-right: 1em;
+        padding: 0;
+        text-align: center;
+      }
+
+      .figright {
+        float: right;
+        clear: right;
+        margin-left: 1em;
+        margin-bottom: 1em;
+        margin-top: 1em;
+        margin-right: 0;
+        padding: 0;
+        text-align: center;
+      }
+
+      .footnotes {
+        border: dashed 1px;
+      }
+      .footnote {
+        margin-left: 10%;
+        margin-right: 10%;
+        font-size: 0.9em;
+      }
+      .footnote .label {
+        position: absolute;
+        right: 84%;
+        text-align: right;
+      }
+      .fnanchor {
+        vertical-align: super;
+        font-size: 0.8em;
+        text-decoration: none;
+      }
+
+      .indent {
+        display: block;
+        margin-left: 3em;
+      }
+
+      .poem {
+        margin-left: 25%;
+        text-indent: 0%;
+      }
+      .poem .stanza {
+        margin-top: 1em;
+        margin-bottom: 1em;
+      }
+      .poem br {
+        display: none;
+      }
+      .poem span.i0 {
+        display: block;
+        margin-left: 0em;
+        padding-left: 3em;
+        text-indent: -3em;
+      }
+      .poem span.i2 {
+        display: block;
+        margin-left: 2em;
+        padding-left: 3em;
+        text-indent: -3em;
+      }
+      .poem span.i4 {
+        display: block;
+        margin-left: 4em;
+        padding-left: 3em;
+        text-indent: -3em;
+      }
+      .poem span.i1 {
+        display: block;
+        margin-left: 1em;
+        padding-left: 3em;
+        text-indent: -3em;
+      }
+      .poem span.i3 {
+        display: block;
+        margin-left: 3em;
+        padding-left: 3em;
+        text-indent: -3em;
+      }
+
+      .poem span.i10 {
+        display: block;
+        margin-left: 10em;
+        padding-left: 3em;
+        text-indent: -3em;
+      }
+    </style>
+  </head>
+  <body>
+    <pre>
+
+The Project Gutenberg EBook of The Raven, by Edgar Allan Poe
+
+This eBook is for the use of anyone anywhere at no cost and with
+almost no restrictions whatsoever.  You may copy it, give it away or
+re-use it under the terms of the Project Gutenberg License included
+with this eBook or online at www.gutenberg.org
+
+Title: The Raven
+
+Author: Edgar Allan Poe
+
+Commentator: Edmund C. Stedman
+
+Illustrator: Gustave Doré
+
+Release Date: November 30, 2005 [EBook #17192]
+[Last updated: October 6, 2012]
+
+Language: English
+
+Character set encoding: ISO-8859-1
+
+*** START OF THIS PROJECT GUTENBERG EBOOK THE RAVEN ***
+
+Produced by Jason Isbell, Melissa Er-Raqabi and the Online
+Distributed Proofreading Team at https://www.pgdp.net.
+
+
+</pre
+    >
+
+    <hr style="width: 45%" />
+
+    <h1>THE RAVEN</h1>
+
+    <div class="center">
+      <table
+        border="0"
+        cellpadding="4"
+        cellspacing="0"
+        summary="Author and Illustrator"
+      >
+        <tr>
+          <td align="center">
+            <span class="smcap">By</span><br />
+            <h2>EDGAR ALLAN POE</h2>
+          </td>
+          <td align="center">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          </td>
+          <td align="center">
+            ILLUSTRATED<br />
+            <h2><span class="smcap">By</span> GUSTAVE DOR&Eacute;</h2>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+
+    <p class="center"><big>WITH COMMENT BY EDMUND C. STEDMAN</big></p>
+
+    <p class="center">NEW YORK</p>
+
+    <p class="center">
+      <small>HARPER &amp; BROTHERS, PUBLISHERS, FRANKLIN SQUARE</small><br />
+      <small>1884</small>
+    </p>
+
+    <p><br /><br /><br /><br /><br /><br /></p>
+
+    <p class="center">
+      <small>Entered according to Act of Congress, in the year 1883, by</small
+      ><br />
+      <small>HARPER &amp; BROTHERS,</small><br />
+      <small>In the Office of the Librarian of Congress, at Washington.</small>
+    </p>
+
+    <p class="center">
+      <i><small>All rights reserved.</small></i>
+    </p>
+
+    <hr style="width: 65%" />
+    <p>
+      <span class="pagenum"><a name="Page_15" id="Page_15">[15]</a></span>
+    </p>
+    <h2><a name="THE_POEM" id="THE_POEM"></a>THE POEM.</h2>
+
+    <hr style="width: 65%" />
+    <p>
+      <span class="pagenum"><a name="Page_16" id="Page_16">[16]</a></span>
+    </p>
+    <p><br /></p>
+    <p>
+      <span class="pagenum"><a name="Page_17" id="Page_17">[17]</a></span>
+    </p>
+
+
+    <hr style="width: 65%" />
+    <p>
+      <span class="pagenum"><a name="Page_18" id="Page_18">[18]</a></span>
+    </p>
+    <p><br /></p>
+    <p>
+      <span class="pagenum"><a name="Page_19" id="Page_19">[19]</a></span>
+    </p>
+    <h2><a name="THE_RAVEN" id="THE_RAVEN"></a>THE RAVEN.</h2>
+
+    <div class="poem">
+      <div class="stanza">
+        <span class="i0"
+          >Once upon a midnight dreary, while I pondered, weak and weary,<br
+        /></span>
+        <span class="i0"
+          >Over many a quaint and curious volume of forgotten lore,<br
+        /></span>
+        <span class="i0"
+          >While I nodded, nearly napping, suddenly there came a tapping,<br
+        /></span>
+        <span class="i0"
+          >As of some one gently rapping, rapping at my chamber door.<br
+        /></span>
+        <span class="i0"
+          >"'T is some visiter," I muttered, "tapping at my chamber
+          door&mdash;<br
+        /></span>
+        <span class="i10">Only this, and nothing more."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >Ah, distinctly I remember it was in the bleak December,<br
+        /></span>
+        <span class="i0"
+          >And each separate dying ember wrought its ghost upon the floor.<br
+        /></span>
+        <span class="i0"
+          >Eagerly I wished the morrow:&mdash;vainly I had sought to borrow<br
+        /></span>
+        <span class="i0"
+          >From my books surcease of sorrow&mdash;sorrow for the lost
+          Lenore&mdash;<br
+        /></span>
+        <span class="i0"
+          >For the rare and radiant maiden whom the angels name Lenore&mdash;<br
+        /></span>
+        <span class="i10">Nameless here for evermore.<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >And the silken sad uncertain rustling of each purple curtain<br
+        /></span>
+        <span class="i0"
+          >Thrilled me&mdash;filled me with fantastic terrors never felt
+          before;<br
+        /></span>
+        <span class="i0"
+          >So that now, to still the beating of my heart, I stood repeating<br
+        /></span>
+        <span class="i0"
+          >"'T is some visiter entreating entrance at my chamber door<br
+        /></span>
+        <span class="i0"
+          >Some late visiter entreating entrance at my chamber door;&mdash;<br
+        /></span>
+        <span class="i10">This it is, and nothing more."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="pagenum"><a name="Page_20" id="Page_20">[20]</a></span>
+        <span class="i0"
+          >Presently my soul grew stronger; hesitating then no longer,<br
+        /></span>
+        <span class="i0"
+          >"Sir," said I, "or Madam, truly your forgiveness I implore;<br
+        /></span>
+        <span class="i0"
+          >But the fact is I was napping, and so gently you came rapping,<br
+        /></span>
+        <span class="i0"
+          >And so faintly you came tapping, tapping at my chamber door,<br
+        /></span>
+        <span class="i0"
+          >That I scarce was sure I heard you"&mdash;here I opened wide the
+          door;&mdash;<br
+        /></span>
+        <span class="i10">Darkness there, and nothing more.<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >Deep into that darkness peering, long I stood there wondering,
+          fearing,<br
+        /></span>
+        <span class="i0"
+          >Doubting, dreaming dreams no mortal ever dared to dream before;<br
+        /></span>
+        <span class="i0"
+          >But the silence was unbroken, and the darkness gave no token,<br
+        /></span>
+        <span class="i0"
+          >And the only word there spoken was the whispered word, "Lenore!"<br
+        /></span>
+        <span class="i0"
+          >This I whispered, and an echo murmured back the word, "Lenore!"<br
+        /></span>
+        <span class="i10">Merely this and nothing more.<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >Back into the chamber turning, all my soul within me burning,<br
+        /></span>
+        <span class="i0"
+          >Soon again I heard a tapping, somewhat louder than before.<br
+        /></span>
+        <span class="i0"
+          >"Surely," said I, "surely that is something at my window lattice;<br
+        /></span>
+        <span class="i0"
+          >Let me see, then, what thereat is, and this mystery explore&mdash;<br
+        /></span>
+        <span class="i0"
+          >Let my heart be still a moment and this mystery explore;&mdash;<br
+        /></span>
+        <span class="i10">'T is the wind and nothing more!"<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >Open here I flung the shutter, when, with many a flirt and
+          flutter,<br
+        /></span>
+        <span class="i0"
+          >In there stepped a stately Raven of the saintly days of yore.<br
+        /></span>
+        <span class="i0"
+          >Not the least obeisance made he; not a minute stopped or stayed
+          he;<br
+        /></span>
+        <span class="i0"
+          >But, with mien of lord or lady, perched above my chamber
+          door&mdash;<br
+        /></span>
+        <span class="i0"
+          >Perched upon a bust of Pallas just above my chamber door&mdash;<br
+        /></span>
+        <span class="i10">Perched, and sat, and nothing more.<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="pagenum"><a name="Page_21" id="Page_21">[21]</a></span>
+        <span class="i0"
+          >Then this ebony bird beguiling my sad fancy into smiling,<br
+        /></span>
+        <span class="i0"
+          >By the grave and stern decorum of the countenance it wore,<br
+        /></span>
+        <span class="i0"
+          >"Though thy crest be shorn and shaven, thou," I said, "art sure no
+          craven,<br
+        /></span>
+        <span class="i0"
+          >Ghastly grim and ancient Raven wandering from the Nightly
+          shore,&mdash;<br
+        /></span>
+        <span class="i0"
+          >Tell me what thy lordly name is on the Night's Plutonian shore!"<br
+        /></span>
+        <span class="i10">Quoth the Raven, "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >Much I marvelled this ungainly fowl to hear discourse so plainly,<br
+        /></span>
+        <span class="i0"
+          >Though its answer little meaning&mdash;little relevancy bore;<br
+        /></span>
+        <span class="i0"
+          >For we cannot help agreeing that no living human being<br
+        /></span>
+        <span class="i0"
+          >Ever yet was blessed with seeing bird above his chamber
+          door&mdash;<br
+        /></span>
+        <span class="i0"
+          >Bird or beast upon the sculptured bust above his chamber door,<br
+        /></span>
+        <span class="i10">With such name as "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >But the Raven, sitting lonely on the placid bust, spoke only<br
+        /></span>
+        <span class="i0"
+          >That one word, as if his soul in that one word he did outpour.<br
+        /></span>
+        <span class="i0"
+          >Nothing further then he uttered&mdash;not a feather then he
+          fluttered&mdash;<br
+        /></span>
+        <span class="i0"
+          >Till I scarcely more than muttered, "Other friends have flown
+          before&mdash;<br
+        /></span>
+        <span class="i0"
+          >On the morrow <i>he</i> will leave me, as my hopes have flown
+          before."<br
+        /></span>
+        <span class="i10">Then the bird said, "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >Startled at the stillness broken by reply so aptly spoken,<br
+        /></span>
+        <span class="i0"
+          >"Doubtless," said I, "what it utters is its only stock and store,<br
+        /></span>
+        <span class="i0"
+          >Caught from some unhappy master whom unmerciful Disaster<br
+        /></span>
+        <span class="i0"
+          >Followed fast and followed faster till his songs one burden
+          bore&mdash;<br
+        /></span>
+        <span class="i0"
+          >Till the dirges of his Hope that melancholy burden bore<br
+        /></span>
+        <span class="i10">Of 'Never&mdash;nevermore.'"<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="pagenum"><a name="Page_22" id="Page_22">[22]</a></span>
+        <span class="i0"
+          >But the Raven still beguiling all my sad soul into smiling,<br
+        /></span>
+        <span class="i0"
+          >Straight I wheeled a cushioned seat in front of bird and bust and
+          door;<br
+        /></span>
+        <span class="i0"
+          >Then, upon the velvet sinking, I betook myself to linking<br
+        /></span>
+        <span class="i0"
+          >Fancy unto fancy, thinking what this ominous bird of yore&mdash;<br
+        /></span>
+        <span class="i0"
+          >What this grim, ungainly, ghastly, gaunt and ominous bird of yore<br
+        /></span>
+        <span class="i10">Meant in croaking "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >This I sat engaged in guessing, but no syllable expressing<br
+        /></span>
+        <span class="i0"
+          >To the fowl whose fiery eyes now burned into my bosom's core;<br
+        /></span>
+        <span class="i0"
+          >This and more I sat divining, with my head at ease reclining<br
+        /></span>
+        <span class="i0"
+          >On the cushion's velvet lining that the lamplight gloated o'er,<br
+        /></span>
+        <span class="i0"
+          >But whose velvet violet lining with the lamplight gloating o'er<br
+        /></span>
+        <span class="i10"><i>She</i> shall press, ah, nevermore!<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >Then, methought, the air grew denser, perfumed from an unseen
+          censer<br
+        /></span>
+        <span class="i0"
+          >Swung by seraphim whose foot-falls tinkled on the tufted floor.<br
+        /></span>
+        <span class="i0"
+          >"Wretch," I cried, "thy God hath lent thee&mdash;by these angels he
+          hath sent thee<br
+        /></span>
+        <span class="i0"
+          >Respite&mdash;respite and nepenthe from thy memories of Lenore!<br
+        /></span>
+        <span class="i0"
+          >Quaff, oh quaff this kind nepenthe, and forget this lost Lenore!"<br
+        /></span>
+        <span class="i10">Quoth the Raven, "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >"Prophet!" said I, "thing of evil!&mdash;prophet still, if bird or
+          devil!&mdash;<br
+        /></span>
+        <span class="i0"
+          >Whether Tempter sent, or whether tempest tossed thee here ashore,<br
+        /></span>
+        <span class="i0"
+          >Desolate yet all undaunted, on this desert land enchanted&mdash;<br
+        /></span>
+        <span class="i0"
+          >On this home by Horror haunted&mdash;tell me truly, I
+          implore&mdash;<br
+        /></span>
+        <span class="i0"
+          >Is there&mdash;<i>is</i> there balm in Gilead?&mdash;tell
+          me&mdash;tell me, I implore!"<br
+        /></span>
+        <span class="i10">Quoth the Raven, "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="pagenum"><a name="Page_23" id="Page_23">[23]</a></span>
+        <span class="i0"
+          >"Prophet!" said I, "thing of evil&mdash;prophet still, if bird or
+          devil!<br
+        /></span>
+        <span class="i0"
+          >By that Heaven that bends above, us&mdash;by that God we both
+          adore&mdash;<br
+        /></span>
+        <span class="i0"
+          >Tell this soul with sorrow laden if, within the distant Aidenn,<br
+        /></span>
+        <span class="i0"
+          >It shall clasp a sainted maiden whom the angels name Lenore&mdash;<br
+        /></span>
+        <span class="i0"
+          >Clasp a rare and radiant maiden whom the angels name Lenore."<br
+        /></span>
+        <span class="i10">Quoth the Raven, "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >"Be that word our sign of parting, bird or fiend!" I shrieked,
+          upstarting&mdash;<br
+        /></span>
+        <span class="i0"
+          >"Get thee back into the tempest and the Night's Plutonian shore!<br
+        /></span>
+        <span class="i0"
+          >Leave no black plume as a token of that lie thy soul hath spoken!<br
+        /></span>
+        <span class="i0"
+          >Leave my loneliness unbroken!&mdash;quit the bust above my door!<br
+        /></span>
+        <span class="i0"
+          >Take thy beak from out my heart, and take thy form from off my
+          door!"<br
+        /></span>
+        <span class="i10">Quoth the Raven, "Nevermore."<br /></span>
+      </div>
+      <div class="stanza">
+        <span class="i0"
+          >And the Raven, never flitting, still is sitting, still is sitting<br
+        /></span>
+        <span class="i0"
+          >On the pallid bust of Pallas just above my chamber door;<br
+        /></span>
+        <span class="i0"
+          >And his eyes have all the seeming of a demon's that is dreaming,<br
+        /></span>
+        <span class="i0"
+          >And the lamplight o'er him streaming throws his shadow on the
+          floor;<br
+        /></span>
+        <span class="i0"
+          >And my soul from out that shadow that lies floating on the floor<br
+        /></span>
+        <span class="i10">Shall be lifted&mdash;nevermore!<br /></span>
+      </div>
+    </div>
+
+    <hr style="width: 65%" />
+
+
+{{{ hypothesisScript }}}
+  </body>
+</html>
