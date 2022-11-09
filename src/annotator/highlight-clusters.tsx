@@ -77,7 +77,7 @@ export class HighlightClusterController implements Destroyable {
     // For now, the controls are fixed at top-left of screen. This is temporary.
     Object.assign(this._outerContainer.style, {
       position: 'fixed',
-      top: '4px',
+      top: `${this._element.offsetTop + 4}px`,
       left: '4px',
     });
 
