@@ -4,6 +4,7 @@
   --hypothesis-highlight-focused-color: rgba(156, 230, 255, 0.5);
   --hypothesis-highlight-blend-mode: normal;
   --hypothesis-highlight-decoration: none;
+  --hypothesis-highlight-text-color: inherit;
 
   --hypothesis-highlight-second-color: rgba(206, 206, 60, 0.4);
   --hypothesis-highlight-third-color: transparent;
@@ -20,6 +21,7 @@
   // Clustered highlight styling configuration
   // These values are updated by the `highlight-clusters` module
   --hypothesis-cluster-blend-mode: multiply;
+  --hypothesis-cluster-text-color: #333333;
   --hypothesis-other-content-color: var(--hypothesis-color-yellow);
   --hypothesis-other-content-decoration: none;
 
@@ -35,6 +37,7 @@
 .hypothesis-highlight,
 .hypothesis-svg-highlight {
   --highlight-color: var(--hypothesis-highlight-color);
+  --highlight-text-color: var(--hypothesis-highlight-text-color);
   --highlight-blend-mode: var(--hypothesis-highlight-blend-mode);
   --highlight-decoration: var(--hypothesis-highlight-decoration);
   --highlight-color-focused: var(--hypothesis-highlight-focused-color);
@@ -51,6 +54,11 @@
 
 // Configure clustered highlight styling. The `.hypothesis-highlights-clustered`
 // class is managed by `highlight-clusters`
+
+.hypothesis-highlights-clustered .hypothesis-highlight {
+  --highlight-text-color: var(--hypothesis-cluster-text-color);
+}
+
 .hypothesis-highlights-clustered .hypothesis-highlight,
 .hypothesis-highlights-clustered .hypothesis-svg-highlight {
   // When clustered highlights are active, use an opaque blue for focused
@@ -127,6 +135,7 @@
 }
 
 .hypothesis-highlights-always-on .hypothesis-highlight {
+  color: var(--highlight-text-color);
   background-color: var(--highlight-color);
   text-decoration: var(--highlight-decoration);
   mix-blend-mode: var(--highlight-blend-mode);
