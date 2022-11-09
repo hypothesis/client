@@ -186,8 +186,15 @@ export function onDocumentReady(frame, callback, { pollInterval = 10 } = {}) {
 
   const checkForDocumentChange = () => {
     const currentDocument = frame.contentDocument;
+
+    // `contentDocument` may be null if the frame navigated to a URL that is
+    // cross-origin, or if the `<iframe>` was removed from the document.
     if (!currentDocument) {
-      callback(new Error('Frame is cross-origin'));
+      cancelPoll();
+      const errorMessage = frame.isConnected
+        ? 'Frame is cross-origin'
+        : 'Frame is disconnected';
+      callback(new Error(errorMessage));
       return;
     }
 

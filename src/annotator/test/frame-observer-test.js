@@ -164,6 +164,13 @@ describe('annotator/frame-observer', () => {
   // listening on the port.
   const crossOriginURL = 'http://localhost:12345/test.html';
 
+  function assertCalledOnceWithError(callback, message) {
+    assert.calledOnce(callback);
+    assert.calledWith(callback, sinon.match.instanceOf(Error));
+    const error = callback.args[0][0];
+    assert.equal(error.message, message);
+  }
+
   describe('onDocumentReady', () => {
     it('invokes callback with current document if it is already ready', async () => {
       const callback = sinon.stub();
@@ -219,13 +226,55 @@ describe('annotator/frame-observer', () => {
       const frame = createFrame(crossOriginURL);
       await waitForEvent(frame, 'load');
 
-      onDocumentReady(frame, callback);
+      const pollInterval = 1;
+      onDocumentReady(frame, callback, { pollInterval });
       await waitForCall(callback);
 
+      assertCalledOnceWithError(callback, 'Frame is cross-origin');
+
+      await delay(pollInterval + 10);
       assert.calledOnce(callback);
-      assert.calledWith(callback, sinon.match.instanceOf(Error));
-      const error = callback.args[0][0];
-      assert.equal(error.message, 'Frame is cross-origin');
+    });
+
+    it('invokes callback with error for subsequent navigations to cross-origin document', async () => {
+      const callback = sinon.stub();
+      const frame = createFrame(sameOriginURL);
+      await waitForEvent(frame, 'load');
+
+      const pollInterval = 1;
+      onDocumentReady(frame, callback, { pollInterval });
+      await waitForCall(callback);
+      callback.resetHistory();
+
+      frame.src = crossOriginURL;
+      await waitForEvent(frame, 'load');
+      assertCalledOnceWithError(callback, 'Frame is cross-origin');
+
+      // Wait a moment to check that callback was only invoked once.
+      await delay(pollInterval + 1);
+      assertCalledOnceWithError(callback, 'Frame is cross-origin');
+    });
+
+    it('invokes callback with error if frame is disconnected', async () => {
+      const callback = sinon.stub();
+      const frame = createFrame(sameOriginURL);
+      await waitForEvent(frame, 'load');
+
+      const pollInterval = 1;
+      onDocumentReady(frame, callback, { pollInterval });
+      await waitForCall(callback);
+      callback.resetHistory();
+
+      const frameUnloaded = waitForEvent(frame.contentWindow, 'unload');
+      frame.remove();
+      await frameUnloaded;
+
+      await delay(pollInterval);
+      assertCalledOnceWithError(callback, 'Frame is disconnected');
+
+      // Wait a moment to check that callback was only invoked once.
+      await delay(pollInterval);
+      assertCalledOnceWithError(callback, 'Frame is disconnected');
     });
 
     it('stops polling when subscription is canceled', async () => {
