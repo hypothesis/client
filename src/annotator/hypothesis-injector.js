@@ -68,8 +68,10 @@ function hasHypothesis(iframe) {
  *
  * @param {HTMLIFrameElement} frame
  * @param {InjectConfig} config -
+ * @param {string} [frameId] - The ID for the guest frame. If none is provided,
+ *   the guest will use a new randomly-generated ID.
  */
-export async function injectClient(frame, config) {
+export async function injectClient(frame, config, frameId) {
   if (hasHypothesis(frame)) {
     return;
   }
@@ -94,8 +96,7 @@ export async function injectClient(frame, config) {
     notebookAppUrl,
     sidebarAppUrl,
 
-    // Generate a random string to use as a frame ID. The format is not important.
-    subFrameIdentifier: generateHexString(10),
+    subFrameIdentifier: frameId ?? generateHexString(10),
   };
 
   const configElement = document.createElement('script');

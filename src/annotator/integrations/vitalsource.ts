@@ -220,7 +220,7 @@ export class VitalSourceInjector {
           !body.querySelector('#page-content');
 
         if (isBookContent) {
-          injectClient(frame, config);
+          injectClient(frame, config, 'vitalsource-content');
         }
       });
     };
