@@ -242,9 +242,12 @@ export class Guest implements Annotator, Destroyable {
     }
 
     if (this._integration.canStyleClusteredHighlights?.()) {
-      this._clusterToolbar = new HighlightClusterController(element, {
-        features: this.features,
-      });
+      this._clusterToolbar = new HighlightClusterController(
+        this._integration.contentContainer(),
+        {
+          features: this.features,
+        }
+      );
     }
 
     this._hostRPC = new PortRPC();
