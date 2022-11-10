@@ -13,11 +13,7 @@ import { annotationMatchesSegment } from '../helpers/annotation-segment';
 import { watch } from '../util/watch';
 
 import type { Message } from '../../shared/messaging';
-import type {
-  AnnotationData,
-  DocumentMetadata,
-  SegmentInfo,
-} from '../../types/annotator';
+import type { AnnotationData, DocumentInfo } from '../../types/annotator';
 import type { Annotation } from '../../types/api';
 import type {
   SidebarToHostEvent,
@@ -28,12 +24,6 @@ import type {
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
 import type { AnnotationsService } from './annotations';
-
-type DocumentInfo = {
-  uri: string;
-  metadata: DocumentMetadata;
-  segmentInfo?: SegmentInfo;
-};
 
 /**
  * Return a minimal representation of an annotation that can be sent from the
