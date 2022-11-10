@@ -582,4 +582,15 @@ export class VitalSourceContentIntegration
   _bookIsSingleDocument(): boolean {
     return this._features.flagEnabled('book_as_single_document');
   }
+
+  waitForFeatureFlags() {
+    // The `book_as_single_document` flag changes the URI reported by this
+    // integration.
+    //
+    // Ask the guest to delay reporting document metadata to the sidebar until
+    // feature flags have been received. This ensures that the initial document
+    // info reported to the sidebar after a chapter navigation is consistent
+    // between the previous/new guest frames.
+    return true;
+  }
 }

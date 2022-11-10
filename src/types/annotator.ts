@@ -221,6 +221,12 @@ export type IntegrationBase = {
   scrollToAnchor(a: Anchor): Promise<void>;
   /** Show information about the current document and content provider */
   showContentInfo?(config: ContentInfoConfig): void;
+
+  /**
+   * Whether the Guest should wait for feature flags to be received from the
+   * sidebar before sending initial document info to the sidebar.
+   */
+  waitForFeatureFlags?(): boolean;
 };
 
 export type Integration = Destroyable & TinyEmitter & IntegrationBase;

@@ -137,6 +137,9 @@ export class Guest implements Annotator, Destroyable {
 
   public features: FeatureFlags;
 
+  /** Promise that resolves when feature flags are received from the sidebar. */
+  private _featureFlagsReceived: Promise<void>;
+
   private _adder: Adder;
   private _clusterToolbar?: HighlightClusterController;
   private _hostFrame: Window;
@@ -233,12 +236,12 @@ export class Guest implements Annotator, Destroyable {
     });
 
     this.features = new FeatureFlags();
+    this._featureFlagsReceived = new Promise(resolve => {
+      this.features.on('flagsChanged', resolve);
+    });
 
     this._integration = createIntegration(this);
-    this._integration.on('uriChanged', async () => {
-      const metadata = await this.getDocumentInfo();
-      this._sidebarRPC.call('documentInfoChanged', metadata);
-    });
+    this._integration.on('uriChanged', () => this._sendDocumentInfo());
     if (config.contentInfoBanner) {
       this._integration.showContentInfo?.(config.contentInfoBanner);
     }
@@ -341,6 +344,15 @@ export class Guest implements Annotator, Destroyable {
       metadata,
       segmentInfo,
     };
+  }
+
+  /** Send the current document URI and metadata to the sidebar. */
+  async _sendDocumentInfo() {
+    if (this._integration.waitForFeatureFlags?.()) {
+      await this._featureFlagsReceived;
+    }
+    const metadata = await this.getDocumentInfo();
+    this._sidebarRPC.call('documentInfoChanged', metadata);
   }
 
   /**
@@ -455,9 +467,8 @@ export class Guest implements Annotator, Destroyable {
     this._portFinder.discover('sidebar').then(port => {
       this._sidebarRPC.connect(port);
     });
-    this.getDocumentInfo().then(metadata =>
-      this._sidebarRPC.call('documentInfoChanged', metadata)
-    );
+
+    this._sendDocumentInfo();
   }
 
   destroy() {
