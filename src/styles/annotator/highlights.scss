@@ -113,6 +113,7 @@
   // highlight effect is created by another element.
   &.is-transparent {
     background-color: transparent !important;
+    color: inherit !important;
   }
 }
 
