@@ -29,6 +29,7 @@ import type {
   Anchor,
   ContentInfoConfig,
   Destroyable,
+  DocumentInfo,
   Integration,
   SidebarLayout,
 } from '../types/annotator';
@@ -333,7 +334,7 @@ export class Guest implements Annotator, Destroyable {
   /**
    * Retrieve metadata for the current document.
    */
-  async getDocumentInfo() {
+  async getDocumentInfo(): Promise<DocumentInfo> {
     const [uri, metadata, segmentInfo] = await Promise.all([
       this._integration.uri(),
       this._integration.getMetadata(),

@@ -296,3 +296,25 @@ export type ContentInfoConfig = {
   container: ContentInfoItem;
   links: ContentInfoLinks;
 };
+
+/**
+ * Details about the document that is loaded in a guest frame.
+ */
+export type DocumentInfo = {
+  /**
+   * The main URI of the document. This is the primary URI that is associated with
+   * annotations created on the document.
+   */
+  uri: string;
+
+  /** Additional URIs and other metadata about the document. */
+  metadata: DocumentMetadata;
+
+  /**
+   * Information about which segment (page, chapter etc.) of a multi-segment
+   * document is loaded in a guest frame.
+   *
+   * This is used in EPUBs for example.
+   */
+  segmentInfo?: SegmentInfo;
+};
