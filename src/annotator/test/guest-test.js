@@ -1433,6 +1433,21 @@ describe('Guest', () => {
     });
   });
 
+  it('waits for feature flags before sending metadata if requested by integration', async () => {
+    fakeIntegration.waitForFeatureFlags = () => true;
+    createGuest();
+
+    await delay(0);
+    assert.isFalse(sidebarRPC().call.calledWith('documentInfoChanged'));
+
+    emitSidebarEvent('featureFlagsUpdated', {
+      book_as_single_document: true,
+    });
+
+    await delay(0);
+    assert.isTrue(sidebarRPC().call.calledWith('documentInfoChanged'));
+  });
+
   it('sends segment info to sidebar when available', async () => {
     fakeIntegration.uri.resolves('https://bookstore.com/books/1234');
     fakeIntegration.getMetadata.resolves({ title: 'A little book' });

@@ -272,7 +272,12 @@ describe('annotator/integrations/vitalsource', () => {
 
     it('allows annotation', () => {
       const integration = createIntegration();
-      assert.equal(integration.canAnnotate(), true);
+      assert.isTrue(integration.canAnnotate());
+    });
+
+    it('asks guest to wait for feature flags before sending document info', () => {
+      const integration = createIntegration();
+      assert.isTrue(integration.waitForFeatureFlags());
     });
 
     it('delegates to HTMLIntegration for side-by-side mode', () => {
