@@ -20,6 +20,8 @@ import { createStoreModule, makeAction } from '../create-store';
  * @prop {DocumentMetadata} metadata - Metadata about the document currently loaded in this frame
  * @prop {string} uri - Current primary URI of the document being displayed
  * @prop {boolean} [isAnnotationFetchComplete]
+ * @prop {boolean} persistent - Should this frame be retained in the sidebar
+ *   if the guest disconnects?
  * @prop {SegmentInfo} [segment] - Information about the section of a document
  *   that is currently loaded. This is for content such as EPUBs, where the
  *   content displayed in a guest frame is only part of the whole document.

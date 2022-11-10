@@ -34,6 +34,7 @@ const fixtures = {
     metadata: {
       link: [],
     },
+    persistent: false,
   },
 
   // Argument to the `documentInfoChanged` call made by a guest displaying an EPUB
@@ -47,6 +48,7 @@ const fixtures = {
       cfi: '/2',
       url: '/chapters/02.xhtml',
     },
+    persistent: true,
   },
 };
 
@@ -111,8 +113,11 @@ describe('FrameSyncService', () => {
         },
 
         connectFrame(frame) {
+          const otherFrames = this.getState().frames.filter(
+            f => f.id !== frame.id
+          );
           const frames = [
-            ...this.getState().frames,
+            ...otherFrames,
             {
               ...frame,
               isAnnotationFetchComplete: true,
@@ -186,8 +191,9 @@ describe('FrameSyncService', () => {
     return fakePortRPCs[0];
   }
 
-  function guestRPC() {
-    return fakePortRPCs[1];
+  /** Return the `PortRPC` for the index'th guest to connect. */
+  function guestRPC(index = 0) {
+    return fakePortRPCs[1 + index];
   }
 
   function emitHostEvent(event, ...args) {
@@ -657,6 +663,7 @@ describe('FrameSyncService', () => {
               metadata: frameInfo.metadata,
               uri: frameInfo.uri,
               segment: frameInfo.segmentInfo,
+              persistent: frameInfo.persistent,
 
               // This would be false in the real application initially, but in these
               // tests we pretend that the fetch completed immediately.
@@ -723,6 +730,55 @@ describe('FrameSyncService', () => {
       emitGuestEvent('close');
 
       assert.deepEqual(fakeStore.frames(), []);
+    });
+
+    // This test simulates what happens when a book chapter navigation occurs
+    // when the integration (such as VitalSource) has support for seamless
+    // transitions that do not unload annotations in the sidebar.
+    it('keeps frame in store if persistent', async () => {
+      frameSync.connect();
+
+      // Connect a guest frame which sets the `persistent` hint and a fixed ID.
+      await connectGuest('book-content');
+      emitGuestEvent('documentInfoChanged', {
+        uri: 'http://books.com/123',
+        persistent: true,
+        segment: {
+          cfi: '/2/4',
+        },
+      });
+      const frames = fakeStore.frames();
+      assert.equal(frames.length, 1);
+
+      // Load an annotation into this guest.
+      fakeStore.setState({
+        annotations: [fixtures.ann],
+      });
+
+      // Disconnect the guest, simulating a chapter navigation.
+      emitGuestEvent('close');
+
+      // Frames and annotations should be retained in the sidebar.
+      assert.equal(fakeStore.frames(), frames);
+
+      // Connect a new guest with the same ID and document URL. It should be
+      // associated with the existing frame.
+      await connectGuest('book-content');
+      emitGuestEvent('documentInfoChanged', {
+        uri: 'http://books.com/123',
+        persistent: true,
+        segment: {
+          cfi: '/2/6',
+        },
+      });
+      assert.deepEqual(fakeStore.frames(), frames);
+
+      // Check that the already-loaded annotations were sent to the new frame.
+      assert.calledWithMatch(
+        guestRPC(1).call,
+        'loadAnnotations',
+        sinon.match([formatAnnot(fixtures.ann)])
+      );
     });
   });
 
