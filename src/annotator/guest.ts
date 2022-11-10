@@ -345,6 +345,7 @@ export class Guest implements Annotator, Destroyable {
       uri: normalizeURI(uri),
       metadata,
       segmentInfo,
+      persistent: this._integration.persistFrame?.() ?? false,
     };
   }
 

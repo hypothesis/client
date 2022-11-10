@@ -280,6 +280,11 @@ describe('annotator/integrations/vitalsource', () => {
       assert.isTrue(integration.waitForFeatureFlags());
     });
 
+    it('asks sidebar to persist annotations after frame unloads', () => {
+      const integration = createIntegration();
+      assert.isTrue(integration.persistFrame());
+    });
+
     it('delegates to HTMLIntegration for side-by-side mode', () => {
       const integration = createIntegration();
       assert.calledOnce(FakeHTMLIntegration);

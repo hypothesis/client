@@ -294,6 +294,7 @@ export class FrameSyncService {
         metadata: info.metadata,
         uri: info.uri,
         segment: info.segmentInfo,
+        persistent: info.persistent,
       });
     });
 
@@ -302,9 +303,16 @@ export class FrameSyncService {
 
     guestRPC.on('close', () => {
       const frame = this._store.frames().find(f => f.id === sourceId);
-      if (frame) {
+      if (frame && !frame.persistent) {
         this._store.destroyFrame(frame);
       }
+
+      // Mark annotations as no longer being loaded in the guest, even if
+      // the frame was marked as `persistent`. In that case if a new guest
+      // connects with the same ID as the one that just went away, we'll send
+      // the already-loaded annotations to the new guest.
+      this._inFrame.clear();
+
       guestRPC.destroy();
       this._guestRPC.delete(sourceId);
     });

@@ -226,6 +226,12 @@ export type IntegrationBase = {
    * sidebar before sending initial document info to the sidebar.
    */
   waitForFeatureFlags?(): boolean;
+
+  /**
+   * Whether the Guest should set the {@link DocumentInfo.persistent} flag when
+   * reporting document information to the sidebar.
+   */
+  persistFrame?(): boolean;
 };
 
 export type Integration = Destroyable & TinyEmitter & IntegrationBase;
@@ -305,4 +311,13 @@ export type DocumentInfo = {
    * This is used in EPUBs for example.
    */
   segmentInfo?: SegmentInfo;
+
+  /**
+   * A hint that the frame is likely to be replaced by another guest frame
+   * showing a different segment of the same document in future.
+   *
+   * This flag is used to facilitate more seamless transitions between
+   * book chapters.
+   */
+  persistent: boolean;
 };
