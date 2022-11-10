@@ -24,11 +24,16 @@ import { PDFMetadata } from './pdf-metadata';
  * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
  * @typedef {import('../../types/annotator').Annotator} Annotator
  * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoConfig
- * @typedef {import('../../types/annotator').HypothesisWindow} HypothesisWindow
  * @typedef {import('../../types/annotator').Integration} Integration
  * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
  * @typedef {import('../../types/api').Selector} Selector
  * @typedef {import('../../types/pdfjs').PDFViewerApplication} PDFViewerApplication
+ */
+
+/**
+ * Window with additional globals set by PDF.js.
+ *
+ * @typedef {Window & { PDFViewerApplication: PDFViewerApplication}} PDFWindow
  */
 
 // The viewport and controls for PDF.js start breaking down below about 670px
@@ -75,12 +80,11 @@ export class PDFIntegration extends TinyEmitter {
 
     this.annotator = annotator;
 
-    const window_ = /** @type {HypothesisWindow} */ (window);
-
     // Assume this class is only used if we're in the PDF.js viewer.
-    const pdfViewerApp = /** @type {PDFViewerApplication} */ (
-      window_.PDFViewerApplication
+    const pdfWindow = /** @type {PDFWindow} */ (
+      /** @type {unknown} */ (window)
     );
+    const pdfViewerApp = pdfWindow.PDFViewerApplication;
 
     this.pdfViewer = pdfViewerApp.pdfViewer;
     this.pdfViewer.viewer.classList.add('has-transparent-text-layer');
@@ -126,7 +130,7 @@ export class PDFIntegration extends TinyEmitter {
     // layer appears above the invisible text layer and can interfere with text
     // selection. See https://github.com/hypothesis/client/issues/1464.
     this._updateAnnotationLayerVisibility = () => {
-      const selection = /** @type {Selection} */ (window_.getSelection());
+      const selection = /** @type {Selection} */ (pdfWindow.getSelection());
 
       // Add CSS class to indicate whether there is a selection. Annotation
       // layers are then hidden by a CSS rule in `pdfjs-overrides.scss`.

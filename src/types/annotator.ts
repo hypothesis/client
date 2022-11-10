@@ -1,7 +1,6 @@
 import type { TinyEmitter } from 'tiny-emitter';
 
 import type { Annotation, Selector, Target } from './api';
-import type { PDFViewerApplication } from './pdfjs';
 import type { ClientAnnotationData } from './shared';
 
 /**
@@ -230,17 +229,6 @@ export type IntegrationBase = {
 };
 
 export type Integration = Destroyable & TinyEmitter & IntegrationBase;
-
-/**
- * Global variables which the Hypothesis client looks for on the `window` object
- * when loaded in a frame that influence how it behaves.
- */
-export type Globals = {
-  /** PDF.js entry point. If set, triggers loading of PDF rather than HTML integration. */
-  PDFViewerApplication?: PDFViewerApplication;
-};
-
-export type HypothesisWindow = Window & Globals;
 
 /**
  * Destroyable classes implement the `destroy` method to properly remove all
