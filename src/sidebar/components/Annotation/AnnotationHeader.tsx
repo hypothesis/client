@@ -73,7 +73,7 @@ function AnnotationHeader({
   // Link (URL) to single-annotation view for this annotation, if it has
   // been provided by the service. Note: this property is not currently
   // present on third-party annotations.
-  const annotationUrl = annotation.links?.html || '';
+  const annotationURL = annotation.links?.html || '';
 
   const showEditedTimestamp = useMemo(() => {
     return hasBeenEdited(annotation) && !isCollapsedReply;
@@ -92,7 +92,7 @@ function AnnotationHeader({
   // is a third-party annotation.
   // Also, of course, verify that there is a URL to the document (titleLink)
   const documentLink =
-    annotationUrl && documentInfo.titleLink ? documentInfo.titleLink : '';
+    annotationURL && documentInfo.titleLink ? documentInfo.titleLink : '';
   // Show document information on non-sidebar routes, assuming there is a title
   // to show, at the least
   const showDocumentInfo =
@@ -131,7 +131,7 @@ function AnnotationHeader({
             <AnnotationTimestamps
               annotationCreated={annotation.created}
               annotationUpdated={annotation.updated}
-              annotationUrl={annotationUrl}
+              annotationURL={annotationURL}
               withEditedTimestamp={showEditedTimestamp}
             />
           </div>
