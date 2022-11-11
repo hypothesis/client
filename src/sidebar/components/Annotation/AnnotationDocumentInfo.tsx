@@ -1,19 +1,23 @@
 import { Link } from '@hypothesis/frontend-shared/lib/next';
 
-/**
- * @typedef AnnotationDocumentInfoProps
- * @prop {string} [domain] - The domain associated with the document
- * @prop {string} [link] - A link to the document (directly)
- * @prop {string} title - The document's title
- */
-
+export type AnnotationDocumentInfoProps = {
+  /** The domain associated with the document */
+  domain?: string;
+  /** A direct link to the document */
+  link?: string;
+  title: string;
+};
 /**
  * Render some metadata about an annotation's document and link to it
  * if a link is available.
  *
  * @param {AnnotationDocumentInfoProps} props
  */
-export default function AnnotationDocumentInfo({ domain, link, title }) {
+export default function AnnotationDocumentInfo({
+  domain,
+  link,
+  title,
+}: AnnotationDocumentInfoProps) {
   return (
     <div className="flex gap-x-1">
       <div className="text-color-text-light">
