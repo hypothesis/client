@@ -7,14 +7,13 @@ import {
   formatDate,
 } from '../../util/time';
 
-/**
- * @typedef AnnotationTimestampsProps
- * @prop {string} annotationCreated
- * @prop {string} annotationUpdated
- * @prop {string} [annotationUrl]
- * @prop {boolean} [withEditedTimestamp] - Should a timestamp for when this
- *   annotation was last edited be rendered?
- */
+export type AnnotationTimestampProps = {
+  annotationCreated: string;
+  annotationUpdated: string;
+  annotationURL?: string;
+  /** Display a relative last-updated timestamp */
+  withEditedTimestamp?: boolean;
+};
 
 /**
  * Render textual timestamp information for an annotation. This includes
@@ -29,9 +28,9 @@ import {
 export default function AnnotationTimestamps({
   annotationCreated,
   annotationUpdated,
-  annotationUrl,
+  annotationURL,
   withEditedTimestamp,
-}) {
+}: AnnotationTimestampProps) {
   // "Current" time, used when calculating the relative age of `timestamp`.
   const [now, setNow] = useState(() => new Date());
   const createdDate = useMemo(
@@ -88,14 +87,14 @@ export default function AnnotationTimestamps({
           ({editedString}){' '}
         </span>
       )}
-      {annotationUrl ? (
+      {annotationURL ? (
         <LinkBase
           // The light-text hover color is not a standard color for a Link, so
           // LinkBase is used here
           classes="text-color-text-light hover:text-color-text-light hover:underline"
           target="_blank"
           title={created.absolute}
-          href={annotationUrl}
+          href={annotationURL}
         >
           {created.relative}
         </LinkBase>

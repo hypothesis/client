@@ -14,7 +14,7 @@ describe('AnnotationTimestamps', () => {
       <AnnotationTimestamps
         annotationCreated="2015-05-10T20:18:56.613388+00:00"
         annotationUpdated="2015-05-10T20:18:56.613388+00:00"
-        annotationUrl="http://www.example.com"
+        annotationURL="http://www.example.com"
         withEditedTimestamp={false}
         {...props}
       />
@@ -49,7 +49,7 @@ describe('AnnotationTimestamps', () => {
   });
 
   it('renders an unlinked created timestamp if annotation does not have a link', () => {
-    const wrapper = createComponent({ annotationUrl: '' });
+    const wrapper = createComponent({ annotationURL: '' });
 
     const link = wrapper.find('Link');
     const span = wrapper.find('span[data-testid="timestamp-created"]');
