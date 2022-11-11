@@ -89,7 +89,7 @@ function frameForAnnotation(frames: Frame[], ann: Annotation): Frame | null {
  * the API and added to the sidebar's store are sent to the appropriate guest
  * to display highlights in the document.
  *
- * Only a minimal subset of annotation data is sent from the sidebar to guests
+ * Only a minimal subset of annotation data is sent from the sidebar to guests.
  * This is a security/privacy feature to prevent guest frames (which often
  * contain third-party JavaScript) from observing the contents or authors of
  * annotations.
