@@ -284,8 +284,10 @@ describe('AnnotationHeader', () => {
       fakeIsReply.returns(false);
       const wrapper = createAnnotationHeader();
 
-      // Extended header information is rendered in a second (flex) row
-      assert.equal(wrapper.find('HeaderRow').length, 2);
+      assert.equal(
+        wrapper.find('[data-testid="extended-header-info"]').length,
+        1
+      );
     });
 
     it('should not render extended header information if annotation is reply', () => {
@@ -294,7 +296,10 @@ describe('AnnotationHeader', () => {
         showDocumentInfo: true,
       });
 
-      assert.equal(wrapper.find('HeaderRow').length, 1);
+      assert.equal(
+        wrapper.find('[data-testid="extended-header-info"]').length,
+        0
+      );
     });
 
     describe('annotation is-highlight icon', () => {

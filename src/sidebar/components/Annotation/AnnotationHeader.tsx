@@ -5,6 +5,9 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 import { useMemo } from 'preact/hooks';
 
+import type { Annotation } from '../../../types/api';
+import type { SidebarSettings } from '../../../types/config';
+
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
 import {
@@ -24,29 +27,15 @@ import AnnotationShareInfo from './AnnotationShareInfo';
 import AnnotationTimestamps from './AnnotationTimestamps';
 import AnnotationUser from './AnnotationUser';
 
-/**
- * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
- */
+export type AnnotationHeaderProps = {
+  annotation: Annotation;
+  isEditing?: boolean;
+  replyCount: number;
+  threadIsCollapsed: boolean;
 
-/** @param {{ children: import("preact").ComponentChildren}} props */
-function HeaderRow({ children }) {
-  return (
-    <div className="flex gap-x-1 items-baseline flex-wrap-reverse">
-      {children}
-    </div>
-  );
-}
-
-/**
- * @typedef AnnotationHeaderProps
- * @prop {Annotation} annotation
- * @prop {boolean} [isEditing] - Whether the annotation is actively being edited
- * @prop {number} replyCount - How many replies this annotation currently has
- * @prop {boolean} threadIsCollapsed - Is this thread currently collapsed?
- * @prop {SidebarSettings} settings - Injected
- *
- */
+  // injected
+  settings: SidebarSettings;
+};
 
 /**
  * Render an annotation's header summary, including metadata about its user,
@@ -61,7 +50,7 @@ function AnnotationHeader({
   replyCount,
   threadIsCollapsed,
   settings,
-}) {
+}: AnnotationHeaderProps) {
   const store = useSidebarStore();
 
   const defaultAuthority = store.defaultAuthority();
@@ -112,13 +101,13 @@ function AnnotationHeader({
   const onReplyCountClick = () =>
     // If an annotation has replies it must have been saved and therefore have
     // an ID.
-    store.setExpanded(/** @type {string} */ (annotation.id), true);
+    store.setExpanded(annotation.id!, true);
 
   const group = store.getGroup(annotation.group);
 
   return (
     <header>
-      <HeaderRow>
+      <div className="flex gap-x-1 items-baseline flex-wrap-reverse">
         {isPrivate(annotation.permissions) && !isEditing && (
           <LockIcon
             className="text-tiny w-em h-em"
@@ -147,10 +136,13 @@ function AnnotationHeader({
             />
           </div>
         )}
-      </HeaderRow>
+      </div>
 
       {!isReply(annotation) && (
-        <HeaderRow>
+        <div
+          className="flex gap-x-1 items-baseline flex-wrap-reverse"
+          data-testid="extended-header-info"
+        >
           {group && (
             <AnnotationShareInfo
               group={group}
@@ -170,7 +162,7 @@ function AnnotationHeader({
               title={documentInfo.titleText}
             />
           )}
-        </HeaderRow>
+        </div>
       )}
     </header>
   );
