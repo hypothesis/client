@@ -80,22 +80,28 @@ function frameForAnnotation(frames: Frame[], ann: Annotation): Frame | null {
 }
 
 /**
- * Service that synchronizes annotations between the sidebar and host page.
+ * Service that handles communication between the sidebar and guest and host
+ * frames.
  *
- * Annotations are synced in both directions. New annotations created in the host
- * page are added to the store in the sidebar and persisted to the backend. Annotations
- * fetched from the API and added to the sidebar's store are sent to the host
- * page in order to create highlights in the document. When an annotation is
- * deleted in the sidebar it is removed from the host page.
+ * The service's main responsibility is to synchronize annotations between the
+ * sidebar and guests. New annotations created in guest frames are added to the
+ * store in the sidebar and persisted to the backend.  Annotations fetched from
+ * the API and added to the sidebar's store are sent to the appropriate guest
+ * to display highlights in the document.
  *
- * This service also synchronizes the selection and focus states of annotations,
- * so that clicking a highlight in the page filters the selection in the sidebar
- * and hovering an annotation in the sidebar highlights the corresponding
- * highlights in the page.
+ * Only a minimal subset of annotation data is sent from the sidebar to guests
+ * This is a security/privacy feature to prevent guest frames (which often
+ * contain third-party JavaScript) from observing the contents or authors of
+ * annotations.
  *
- * For annotations sent from the sidebar to host page, only the subset of annotation
- * data needed to create the highlights is sent. This is a security/privacy
- * feature to prevent the host page observing the contents or authors of annotations.
+ * In addition to annotation data, this service also handles:
+ *
+ *  - Synchronizing the selection and hover states of annotations between the
+ *    sidebar and guest frames
+ *  - Triggering scrolling or navigation of guest frames when an annotation is
+ *    clicked in the sidebar
+ *  - Sending feature flags to host and guest frames
+ *  - Various other interactions with guest and host frames
  *
  * @inject
  */
