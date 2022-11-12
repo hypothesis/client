@@ -27,7 +27,7 @@ describe('ThreadCard', () => {
 
     fakeDebounce = sinon.stub().returnsArg(0);
     fakeFrameSync = {
-      hoverAnnotations: sinon.stub(),
+      hoverAnnotation: sinon.stub(),
       scrollToAnnotation: sinon.stub(),
     };
     fakeStore = {
@@ -84,7 +84,7 @@ describe('ThreadCard', () => {
 
       wrapper.find(threadCardSelector).simulate('mouseenter');
 
-      assert.calledWith(fakeFrameSync.hoverAnnotations, sinon.match(['myTag']));
+      assert.calledWith(fakeFrameSync.hoverAnnotation, fakeThread.annotation);
     });
 
     it('unfocuses the annotation thread when mouse exits', () => {
@@ -92,7 +92,7 @@ describe('ThreadCard', () => {
 
       wrapper.find(threadCardSelector).simulate('mouseleave');
 
-      assert.calledWith(fakeFrameSync.hoverAnnotations, sinon.match([]));
+      assert.calledWith(fakeFrameSync.hoverAnnotation, null);
     });
 
     ['button', 'a'].forEach(tag => {

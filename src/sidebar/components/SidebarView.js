@@ -55,13 +55,6 @@ function SidebarView({
   const sidebarHasOpened = store.hasSidebarOpened();
   const userId = store.profile().userid;
 
-  // The local `$tag` of a direct-linked annotation; populated once it
-  // has anchored: meaning that it's ready to be focused and scrolled to
-  const linkedAnnotationAnchorTag =
-    linkedAnnotation && linkedAnnotation.$orphan === false
-      ? linkedAnnotation.$tag
-      : null;
-
   // If, after loading completes, no `linkedAnnotation` object is present when
   // a `linkedAnnotationId` is set, that indicates an error
   const hasDirectLinkedAnnotationError =
@@ -116,21 +109,15 @@ function SidebarView({
   // When a `linkedAnnotationAnchorTag` becomes available, scroll to it
   // and focus it
   useEffect(() => {
-    if (linkedAnnotation && linkedAnnotationAnchorTag) {
-      frameSync.hoverAnnotations([linkedAnnotationAnchorTag]);
+    if (linkedAnnotation && linkedAnnotation.$orphan === false) {
+      frameSync.hoverAnnotation(linkedAnnotation);
       frameSync.scrollToAnnotation(linkedAnnotation);
       store.selectTab(directLinkedTab);
     } else if (linkedAnnotation) {
       // Make sure to allow for orphaned annotations (which won't have an anchor)
       store.selectTab(directLinkedTab);
     }
-  }, [
-    directLinkedTab,
-    frameSync,
-    linkedAnnotation,
-    linkedAnnotationAnchorTag,
-    store,
-  ]);
+  }, [directLinkedTab, frameSync, linkedAnnotation, store]);
 
   // Connect to the streamer when the sidebar has opened or if user is logged in
   const hasFetchedProfile = store.hasFetchedProfile();
