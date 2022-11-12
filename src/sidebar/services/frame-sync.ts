@@ -137,6 +137,13 @@ export class FrameSyncService {
    */
   private _pendingScrollToId: string | null;
 
+  /**
+   * ID of an annotation that should be hovered after anchoring completes.
+   *
+   * See notes for {@link _pendingScrollToId}.
+   */
+  private _pendingHoverId: string | null;
+
   // Test seam
   private _window: Window;
 
@@ -158,7 +165,9 @@ export class FrameSyncService {
     this._guestRPC = new Map();
     this._inFrame = new Set<string>();
     this._highlightsVisible = false;
+
     this._pendingScrollToId = null;
+    this._pendingHoverId = null;
 
     this._setupSyncToGuests();
     this._setupHostEvents();
@@ -367,8 +376,12 @@ export class FrameSyncService {
       anchoringStatusUpdates[$tag] = $orphan ? 'orphan' : 'anchored';
       scheduleAnchoringStatusUpdate();
 
+      const [id] = this._store.findIDsForTags([$tag]);
+      if (id === this._pendingHoverId) {
+        this._pendingHoverId = null;
+        guestRPC.call('hoverAnnotations', [$tag]);
+      }
       if (this._pendingScrollToId) {
-        const [id] = this._store.findIDsForTags([$tag]);
         if (id === this._pendingScrollToId) {
           this._pendingScrollToId = null;
           guestRPC.call('scrollToAnnotation', $tag);
@@ -508,15 +521,41 @@ export class FrameSyncService {
   }
 
   /**
-   * Mark annotations as hovered.
+   * Mark annotation as hovered.
    *
    * This is used to indicate the highlights in the document that correspond
-   * to hovered annotations in the sidebar.
+   * to a hovered annotation in the sidebar.
    *
-   * @param tags - annotation $tags
+   * This function only accepts a single annotation because the user can only
+   * hover one annotation card in the sidebar at a time. Hover updates in the
+   * other direction (guest to sidebar) support multiple annotations since a
+   * user can hover multiple highlights in the document at once.
    */
-  hoverAnnotations(tags: string[]) {
+  hoverAnnotation(ann: Annotation | null) {
+    this._pendingHoverId = null;
+
+    if (!ann) {
+      this._guestRPC.forEach(rpc => rpc.call('hoverAnnotations', []));
+      return;
+    }
+
+    const tags = ann ? [ann.$tag] : [];
     this._store.hoverAnnotations(tags);
+
+    // If annotation is not currently anchored in a guest, schedule hover for
+    // when annotation is anchored. This can happen if an annotation is for a
+    // different chapter of an EPUB than the currently loaded one. See notes in
+    // `scrollToAnnotation`.
+    const frame = frameForAnnotation(this._store.frames(), ann);
+    if (
+      !frame ||
+      (frame.segment && !annotationMatchesSegment(ann, frame.segment))
+    ) {
+      if (ann.id) {
+        this._pendingHoverId = ann.id;
+      }
+      return;
+    }
     this._guestRPC.forEach(rpc => rpc.call('hoverAnnotations', tags));
   }
 

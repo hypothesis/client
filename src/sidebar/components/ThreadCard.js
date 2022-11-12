@@ -32,11 +32,8 @@ function ThreadCard({ frameSync, thread }) {
   const focusThreadAnnotation = useMemo(
     () =>
       debounce(
-        /** @param {string|null} tag */
-        tag => {
-          const focusTags = tag ? [tag] : [];
-          frameSync.hoverAnnotations(focusTags);
-        },
+        /** @param {Annotation|null} ann */
+        ann => frameSync.hoverAnnotation(ann),
         10
       ),
     [frameSync]
@@ -94,7 +91,7 @@ function ThreadCard({ frameSync, thread }) {
           scrollToAnnotation(thread.annotation);
         }
       }}
-      onMouseEnter={() => focusThreadAnnotation(threadTag ?? null)}
+      onMouseEnter={() => focusThreadAnnotation(thread.annotation ?? null)}
       onMouseLeave={() => focusThreadAnnotation(null)}
       key={thread.id}
     >

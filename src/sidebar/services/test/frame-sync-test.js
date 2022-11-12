@@ -147,7 +147,7 @@ describe('FrameSyncService', () => {
           this.setState({ contentInfo: info });
         },
 
-        findIDsForTags: sinon.stub(),
+        findIDsForTags: sinon.stub().returns([]),
         hoverAnnotations: sinon.stub(),
         isLoggedIn: sinon.stub().returns(false),
         openSidebarPanel: sinon.stub(),
@@ -224,6 +224,29 @@ describe('FrameSyncService', () => {
     );
     await delay(0);
     return port1;
+  }
+
+  /**
+   * Create a fake annotation for an EPUB book.
+   *
+   * @param {string} cfi - Canonical Fragment Identifier indicating which chapter
+   *   the annotation relates to
+   */
+  function createEPUBAnnotation(cfi) {
+    return {
+      id: 'epub-id-1',
+      $tag: 'epub-tag-1',
+      target: [
+        {
+          selector: [
+            {
+              type: 'EPUBContentSelector',
+              cfi,
+            },
+          ],
+        },
+      ],
+    };
   }
 
   describe('#connect', () => {
@@ -890,27 +913,63 @@ describe('FrameSyncService', () => {
     });
   });
 
-  describe('#hoverAnnotations', () => {
+  describe('#hoverAnnotation', () => {
     beforeEach(async () => {
       frameSync.connect();
       await connectGuest();
+      emitGuestEvent('documentInfoChanged', fixtures.htmlDocumentInfo);
     });
 
-    it('should update the focused annotations in the store', () => {
-      frameSync.hoverAnnotations(['a1', 'a2']);
+    it('updates the focused annotations in the store', () => {
+      frameSync.hoverAnnotation(fixtures.ann);
       assert.calledWith(
         fakeStore.hoverAnnotations,
-        sinon.match.array.deepEquals(['a1', 'a2'])
+        sinon.match.array.deepEquals([fixtures.ann.$tag])
       );
     });
 
-    it('should focus the associated highlights in the guest', () => {
-      frameSync.hoverAnnotations([1, 2]);
+    it('focuses the associated highlights in the guest', () => {
+      frameSync.hoverAnnotation(fixtures.ann);
       assert.calledWith(
         guestRPC().call,
         'hoverAnnotations',
-        sinon.match.array.deepEquals([1, 2])
+        sinon.match.array.deepEquals([fixtures.ann.$tag])
       );
+    });
+
+    it('clears focused annotations in guest if argument is `null`', () => {
+      frameSync.hoverAnnotation(null);
+      assert.calledWith(guestRPC().call, 'hoverAnnotations', []);
+    });
+
+    it('defers focusing highlights when annotation is in a different EPUB chapter', async () => {
+      emitGuestEvent('documentInfoChanged', fixtures.epubDocumentInfo);
+
+      // Create an annotation with a CFI that doesn't match `fixtures.epubDocumentInfo`.
+      const ann = createEPUBAnnotation('/4/8');
+      fakeStore.findIDsForTags.withArgs([ann.$tag]).returns([ann.id]);
+
+      // Request hover of annotation. The annotation is marked as hovered in
+      // the sidebar, but nothing is sent to the guest since the annotation's
+      // book chapter is not loaded.
+      frameSync.hoverAnnotation(ann);
+      assert.calledWith(
+        fakeStore.hoverAnnotations,
+        sinon.match.array.deepEquals([ann.$tag])
+      );
+      assert.isFalse(guestRPC().call.calledWith('hoverAnnotations'));
+
+      // Simulate annotation anchoring at a later point, after a chapter
+      // navigation.
+      emitGuestEvent('syncAnchoringStatus', { $tag: ann.$tag, $orphan: false });
+      assert.calledWith(guestRPC().call, 'hoverAnnotations', [ann.$tag]);
+
+      // After the `hoverAnnotations` call has been sent, the pending-hover
+      // state internally should be cleared and a later `syncAnchoringStatus`
+      // event should not re-hover.
+      guestRPC().call.resetHistory();
+      emitGuestEvent('syncAnchoringStatus', { $tag: ann.$tag, $orphan: false });
+      assert.notCalled(guestRPC().call);
     });
   });
 
@@ -922,23 +981,6 @@ describe('FrameSyncService', () => {
     it('does nothing if matching guest frame is not found', async () => {
       frameSync.scrollToAnnotation(fixtures.ann);
     });
-
-    function createEPUBAnnotation(cfi) {
-      return {
-        id: 'epub-id-1',
-        $tag: 'epub-tag-1',
-        target: [
-          {
-            selector: [
-              {
-                type: 'EPUBContentSelector',
-                cfi,
-              },
-            ],
-          },
-        ],
-      };
-    }
 
     it('should scroll to the annotation in the correct guest', async () => {
       await connectGuest();

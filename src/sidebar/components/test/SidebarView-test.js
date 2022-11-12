@@ -26,7 +26,7 @@ describe('SidebarView', () => {
 
   beforeEach(() => {
     fakeFrameSync = {
-      hoverAnnotations: sinon.stub(),
+      hoverAnnotation: sinon.stub(),
       scrollToAnnotation: sinon.stub(),
     };
     fakeLoadAnnotationsService = {
@@ -148,11 +148,8 @@ describe('SidebarView', () => {
         createComponent();
         assert.calledOnce(fakeFrameSync.scrollToAnnotation);
         assert.calledWith(fakeFrameSync.scrollToAnnotation, fakeAnnotation);
-        assert.calledOnce(fakeFrameSync.hoverAnnotations);
-        assert.calledWith(
-          fakeFrameSync.hoverAnnotations,
-          sinon.match(['myTag'])
-        );
+        assert.calledOnce(fakeFrameSync.hoverAnnotation);
+        assert.calledWith(fakeFrameSync.hoverAnnotation, fakeAnnotation);
       });
 
       it('selects the correct tab for direct-linked annotations once anchored', () => {
