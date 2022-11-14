@@ -1230,22 +1230,22 @@
     fastq "^1.6.0"
 
 "@npmcli/arborist@^6.1.1":
-  version "6.1.1"
-  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.1.1.tgz#8b0895eb2067d105ed36f2071d5c83650e78541a"
-  integrity sha512-dT7+4qICKQcBX5xWAw8O9+pzR4ejwUNRAWJWb98inY6fqGSwvhp1HAlvM/ZXTrN/BySbT0/TELShC01+icyxew==
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.1.2.tgz#7a7e5b5a5c6c39702dd86875dc38649f2ac7dce1"
+  integrity sha512-aZF7LGOhX+/CFZkAUpqADQVZqgz75S9Gvc2Is2G/RJAfAvWlG2GSJo3w6bMo1SwzA//zYmRhpSAQjScRg5Zmeg==
   dependencies:
     "@isaacs/string-locale-compare" "^1.1.0"
+    "@npmcli/fs" "^3.1.0"
     "@npmcli/installed-package-contents" "^2.0.0"
     "@npmcli/map-workspaces" "^3.0.0"
     "@npmcli/metavuln-calculator" "^5.0.0"
-    "@npmcli/move-file" "^3.0.0"
     "@npmcli/name-from-folder" "^1.0.1"
     "@npmcli/node-gyp" "^3.0.0"
     "@npmcli/package-json" "^3.0.0"
     "@npmcli/query" "^3.0.0"
     "@npmcli/run-script" "^6.0.0"
     bin-links "^4.0.1"
-    cacache "^17.0.1"
+    cacache "^17.0.2"
     common-ancestor-path "^1.0.1"
     hosted-git-info "^6.1.1"
     json-parse-even-better-errors "^3.0.0"
@@ -1263,7 +1263,6 @@
     promise-all-reject-late "^1.0.0"
     promise-call-limit "^1.0.1"
     read-package-json-fast "^3.0.1"
-    readdir-scoped-modules "^1.1.0"
     semver "^7.3.7"
     ssri "^10.0.0"
     treeverse "^3.0.0"
@@ -1331,14 +1330,6 @@
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@npmcli/move-file/-/move-file-2.0.1.tgz#26f6bdc379d87f75e55739bab89db525b06100e4"
   integrity sha512-mJd2Z5TjYWq/ttPLLGqArdtnC74J6bOzg4rMDnN+p1xTacZ2yPRCk2y0oSWQtygLR9YVQXgOcONrwtnk3JupxQ==
-  dependencies:
-    mkdirp "^1.0.4"
-    rimraf "^3.0.2"
-
-"@npmcli/move-file@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@npmcli/move-file/-/move-file-3.0.0.tgz#3e1be5c880c9ba2d9c6453709d3ffd2d7a4cf192"
-  integrity sha512-mOUBUIXsqAQBfn87vGIjBAve6JmD9PkP9Vdq2SayDqQh2Ol60hnXaBSvT4V6IQiho1otw6SipnVV1fulvOiyKQ==
   dependencies:
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
@@ -2228,11 +2219,6 @@ array.prototype.flatmap@^1.3.0:
     es-abstract "^1.19.2"
     es-shim-unscopables "^1.0.0"
 
-asap@^2.0.0:
-  version "2.0.6"
-  resolved "https://registry.yarnpkg.com/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
-  integrity sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==
-
 assertion-error@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/assertion-error/-/assertion-error-1.1.0.tgz#e60b6b0e8f301bd97e5375215bda406c85118c0b"
@@ -2604,7 +2590,7 @@ cacache@^16.1.0:
     tar "^6.1.11"
     unique-filename "^2.0.0"
 
-cacache@^17.0.0, cacache@^17.0.1:
+cacache@^17.0.0, cacache@^17.0.2:
   version "17.0.2"
   resolved "https://registry.yarnpkg.com/cacache/-/cacache-17.0.2.tgz#ff2bd029bf45099b3fe711f56fbf138b846c8d6d"
   integrity sha512-rYUs2x4OjSgCQND7nTrh21AHIBFgd7s/ctAYvU3a8u+nK+R5YaX/SFPDYz4Azz7SGL6+6L9ZZWI4Kawpb7grzQ==
@@ -3114,11 +3100,6 @@ debug@4, debug@4.3.4, debug@^4.1.0, debug@^4.1.1, debug@^4.3.2, debug@^4.3.3, de
   dependencies:
     ms "2.1.2"
 
-debuglog@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/debuglog/-/debuglog-1.0.1.tgz#aa24ffb9ac3df9a2351837cfb2d279360cd78492"
-  integrity sha512-syBZ+rnAK3EgMsH2aYEOLUW7mZSY9Gb+0wUMCFsZvcmiz+HigA0LOcq/HoQqVuGG+EKykunc7QG2bzrponfaSw==
-
 decamelize@^1.1.1:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
@@ -3243,14 +3224,6 @@ detective@^5.2.1:
     acorn-node "^1.8.2"
     defined "^1.0.0"
     minimist "^1.2.6"
-
-dezalgo@^1.0.0:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/dezalgo/-/dezalgo-1.0.4.tgz#751235260469084c132157dfa857f386d4c33d81"
-  integrity sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==
-  dependencies:
-    asap "^2.0.0"
-    wrappy "1"
 
 di@^0.0.1:
   version "0.0.1"
@@ -7208,16 +7181,6 @@ readable-stream@^4.1.0:
     buffer "^6.0.3"
     events "^3.3.0"
     process "^0.11.10"
-
-readdir-scoped-modules@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/readdir-scoped-modules/-/readdir-scoped-modules-1.1.0.tgz#8d45407b4f870a0dcaebc0e28670d18e74514309"
-  integrity sha512-asaikDeqAQg7JifRsZn1NJZXo9E+VwlyCfbkZhwyISinqk5zNS6266HS5kah6P0SaQKGF6SkNnZVHUzHFYxYDw==
-  dependencies:
-    debuglog "^1.0.1"
-    dezalgo "^1.0.0"
-    graceful-fs "^4.1.2"
-    once "^1.3.0"
 
 readdirp@^2.2.1:
   version "2.2.1"
