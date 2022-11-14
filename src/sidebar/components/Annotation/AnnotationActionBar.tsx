@@ -8,6 +8,9 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 
 import { confirm } from '../../../shared/prompts';
+import type { SavedAnnotation } from '../../../types/api';
+import type { SidebarSettings } from '../../../types/config';
+
 import { serviceConfig } from '../../config/service-config';
 import { annotationRole } from '../../helpers/annotation-metadata';
 import {
@@ -16,32 +19,29 @@ import {
 } from '../../helpers/annotation-sharing';
 import { isPrivate, permits } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
+import type { AnnotationsService } from '../../services/annotations';
+import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 
 import AnnotationShareControl from './AnnotationShareControl';
 
-/**
- *  @typedef {import("../../../types/api").SavedAnnotation} SavedAnnotation
- *  @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
- */
-
-/**
- * @typedef AnnotationActionBarProps
- * @prop {SavedAnnotation} annotation - The annotation in question
- * @prop {() => void} onReply - Callbacks for when action buttons are clicked/tapped
- * @prop {import('../../services/annotations').AnnotationsService} annotationsService
- * @prop {SidebarSettings} settings
- * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
- */
-
-/** @param {SidebarSettings} settings */
-function flaggingEnabled(settings) {
+function flaggingEnabled(settings: SidebarSettings) {
   const service = serviceConfig(settings);
   if (service?.allowFlagging === false) {
     return false;
   }
   return true;
 }
+
+export type AnnotationActionBarProps = {
+  annotation: SavedAnnotation;
+  onReply: () => void;
+
+  // injected
+  annotationsService: AnnotationsService;
+  settings: SidebarSettings;
+  toastMessenger: ToastMessengerService;
+};
 
 /**
  * A collection of buttons in the footer area of an annotation that take
@@ -55,15 +55,14 @@ function AnnotationActionBar({
   onReply,
   settings,
   toastMessenger,
-}) {
+}: AnnotationActionBarProps) {
   const store = useSidebarStore();
   const userProfile = store.profile();
   const annotationGroup = store.getGroup(annotation.group);
   const isLoggedIn = store.isLoggedIn();
 
   // Is the current user allowed to take the given `action` on this annotation?
-  /** @param {'update'|'delete'} action */
-  const userIsAuthorizedTo = action => {
+  const userIsAuthorizedTo = (action: 'update' | 'delete') => {
     return permits(annotation.permissions, action, userProfile.userid);
   };
 
