@@ -947,7 +947,6 @@ describe('FrameSyncService', () => {
 
       // Create an annotation with a CFI that doesn't match `fixtures.epubDocumentInfo`.
       const ann = createEPUBAnnotation('/4/8');
-      fakeStore.findIDsForTags.withArgs([ann.$tag]).returns([ann.id]);
 
       // Request hover of annotation. The annotation is marked as hovered in
       // the sidebar, but nothing is sent to the guest since the annotation's
@@ -1001,7 +1000,6 @@ describe('FrameSyncService', () => {
 
       // Create an annotation with a CFI that doesn't match `fixtures.epubDocumentInfo`.
       const ann = createEPUBAnnotation('/4/8');
-      fakeStore.findIDsForTags.withArgs([ann.$tag]).returns([ann.id]);
 
       // Request a scroll to this annotation, this will require a navigation of
       // the guest frame.
