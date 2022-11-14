@@ -9,9 +9,12 @@ import type { HighlightCluster } from '../types/shared';
 import ClusterToolbar from './components/ClusterToolbar';
 import { createShadowRoot } from './util/shadow-root';
 
+import type { HighlightElement } from './highlighter';
+
 export type HighlightStyle = {
   color: string;
-  decoration: string;
+  'color-1': string;
+  'color-2': string;
 };
 
 export type HighlightStyles = Record<string, HighlightStyle>;
@@ -21,31 +24,38 @@ export type AppliedStyles = Record<HighlightCluster, keyof HighlightStyles>;
 export const highlightStyles: HighlightStyles = {
   hidden: {
     color: 'transparent',
-    decoration: 'none',
+    ['color-1']: 'transparent',
+    ['color-2']: 'transparent',
   },
   green: {
     color: 'var(--hypothesis-color-green)',
-    decoration: 'none',
+    ['color-1']: 'var(--hypothesis-color-green-1)',
+    ['color-2']: 'var(--hypothesis-color-green-2)',
   },
   orange: {
     color: 'var(--hypothesis-color-orange)',
-    decoration: 'none',
+    ['color-1']: 'var(--hypothesis-color-orange-1)',
+    ['color-2']: 'var(--hypothesis-color-orange-2)',
   },
   pink: {
     color: 'var(--hypothesis-color-pink)',
-    decoration: 'none',
+    ['color-1']: 'var(--hypothesis-color-pink-1)',
+    ['color-2']: 'var(--hypothesis-color-pink-2)',
   },
   purple: {
     color: 'var(--hypothesis-color-purple)',
-    decoration: 'none',
+    ['color-1']: 'var(--hypothesis-color-purple-1)',
+    ['color-2']: 'var(--hypothesis-color-purple-2)',
   },
   yellow: {
     color: 'var(--hypothesis-color-yellow)',
-    decoration: 'none',
+    ['color-1']: 'var(--hypothesis-color-yellow-1)',
+    ['color-2']: 'var(--hypothesis-color-yellow-2)',
   },
-  grey: {
-    color: 'var(--hypothesis-color-grey)',
-    decoration: 'underline dotted',
+  blue: {
+    color: 'var(--hypothesis-color-blue)',
+    ['color-1']: 'var(--hypothesis-color-blue-1)',
+    ['color-2']: 'var(--hypothesis-color-blue-2)',
   },
 };
 
@@ -63,6 +73,7 @@ export class HighlightClusterController implements Destroyable {
   private _features: IFeatureFlags;
   private _outerContainer: HTMLElement;
   private _shadowRoot: ShadowRoot;
+  private _updateTimeout?: number;
 
   constructor(element: HTMLElement, options: { features: IFeatureFlags }) {
     this._element = element;
@@ -93,9 +104,20 @@ export class HighlightClusterController implements Destroyable {
   }
 
   destroy() {
+    clearTimeout(this._updateTimeout);
     render(null, this._shadowRoot); // unload the Preact component
     this._activate(false); // De-activate cluster styling
     this._outerContainer.remove();
+  }
+
+  /**
+   * Indicate that we need to update the nesting-related data attributes on all
+   * highlight elements in the document (<hypothesis-highlight> and
+   * SVG rect.hypothesis-svg-highlight elements)
+   */
+  scheduleClusterUpdates() {
+    clearTimeout(this._updateTimeout);
+    this._updateTimeout = setTimeout(() => this._updateClusters(), 100);
   }
 
   /**
@@ -111,6 +133,86 @@ export class HighlightClusterController implements Destroyable {
     }
 
     this._activate(this._isActive());
+  }
+
+  /**
+   * Update highlight elements — <hypothesis-highlight> elements and SVG <rect>s
+   * with data about their nesting depth, and order SVG <rect>s such that
+   * inner (nested) highlights are stacked on top of outer highlights.
+   */
+  _updateClusters() {
+    if (!this._isActive()) {
+      return;
+    }
+
+    const outerHighlights = Array.from(
+      this._element.getElementsByTagName('HYPOTHESIS-HIGHLIGHT')
+    ).filter(
+      highlight => highlight.parentElement?.tagName !== 'HYPOTHESIS-HIGHLIGHT'
+    );
+
+    this._updateHighlightData(outerHighlights as HighlightElement[]);
+  }
+
+  /**
+   * Walk a tree of <hypothesis-highlight> elements, adding `data-nesting-level`
+   * and `data-cluster-level` data attributes to <hypothesis-highlight>s and
+   * their associated SVG highlight (<rect>) elements.
+   *
+   * - `data-nesting-level` - generational depth of the applicable
+   *   `<hypothesis-highlight>` relative to outermost `<hypothesis-highlight>`.
+   * - `data-cluster-level` - number of `<hypothesis-highlight>` generations
+   *   since the cluster value changed.
+   *
+   * @param highlightEls - A collection of sibling <hypothesis-highlight>
+   * elements
+   * @param parentCluster - The cluster value of the parent highlight to
+   * `highlightEls`, if any
+   * @param nestingLevel - The nesting "level", relative to the outermost
+   * <hypothesis-highlight> element (0-based)
+   * @param parentClusterLevel - The parent's nesting depth, per its cluster
+   * value (`parentCluster`). i.e. How many levels since the cluster value
+   * changed? This allows for nested styling of highlights of the same cluster
+   * value.
+   */
+  _updateHighlightData(
+    highlightEls: HighlightElement[],
+    parentCluster = '',
+    nestingLevel = 0,
+    parentClusterLevel = 0
+  ) {
+    Array.from(highlightEls).forEach(hEl => {
+      const elCluster =
+        ['user-annotations', 'user-highlights', 'other-content'].find(
+          candidate => hEl.classList.contains(candidate)
+        ) ?? 'other-content';
+
+      const elClusterLevel =
+        parentCluster && elCluster === parentCluster
+          ? parentClusterLevel + 1
+          : 0;
+
+      hEl.setAttribute('data-nesting-level', `${nestingLevel}`);
+      hEl.setAttribute('data-cluster-level', `${elClusterLevel}`);
+
+      if (hEl.svgHighlight) {
+        hEl.svgHighlight.setAttribute('data-nesting-level', `${nestingLevel}`);
+        hEl.svgHighlight.setAttribute(
+          'data-cluster-level',
+          `${elClusterLevel}`
+        );
+      }
+
+      this._updateHighlightData(
+        Array.from(hEl.children).filter(
+          el => el.tagName === 'HYPOTHESIS-HIGHLIGHT'
+        ) as HighlightElement[],
+        elCluster,
+        nestingLevel + 1,
+        elClusterLevel
+      );
+    });
+  }
   }
 
   _isActive() {
@@ -140,7 +242,7 @@ export class HighlightClusterController implements Destroyable {
     >) {
       document.documentElement.style.setProperty(
         `--hypothesis-${cluster}-${ruleName}`,
-        styleRules[ruleName]
+        styleRules[ruleName] as string
       );
     }
   }

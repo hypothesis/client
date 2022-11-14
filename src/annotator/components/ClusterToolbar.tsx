@@ -68,7 +68,6 @@ function ClusterStyleControl({
               <div
                 style={{
                   backgroundColor: highlightStyles[styleName].color,
-                  textDecoration: highlightStyles[styleName].decoration,
                 }}
                 className={classnames(
                   'block w-6 h-6 rounded-full flex items-center justify-center',
