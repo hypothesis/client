@@ -63,12 +63,14 @@ export class MosaicBookElement extends HTMLElement {
         },
         {
           absoluteURL: '/document/little-women-2',
+          chapterTitle: 'Chapter Two',
           cfi: '/4',
           index: 1,
           page: '20',
         },
         {
           absoluteURL: '/document/little-women-3',
+          chapterTitle: 'Chapter Three',
           cfi: '/6',
           index: 2,
           page: '30',
