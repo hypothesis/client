@@ -4,11 +4,7 @@ import * as redux from 'redux';
 import thunk from 'redux-thunk';
 
 import { immutable } from '../util/immutable';
-
-/** Helper that strips the first argument from a function type. */
-type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
-  ? (...args: P) => R
-  : never;
+import type { OmitFirstArg, TupleToIntersection } from './type-utils';
 
 /**
  * Helper that converts an object of selector functions, which take a `state`
@@ -115,21 +111,6 @@ function assignOnce<T extends object, U extends object>(target: T, source: U) {
   }
   return Object.assign(target, source);
 }
-
-type MapContravariant<T> = { [K in keyof T]: (x: T[K]) => void };
-
-/**
- * Utility that turns a tuple type `[A, B, C]` into an intersection `A & B & C`.
- *
- * The implementation is magic adapted from
- * https://github.com/microsoft/TypeScript/issues/28323. Roughly speaking it
- * works by computing a type that could be assigned to any position in the
- * tuple, which must be the intersection of all the tuple element types.
- */
-type TupleToIntersection<
-  T,
-  Temp extends Record<number, unknown> = MapContravariant<T>
-> = Temp[number] extends (x: infer U) => unknown ? U : never;
 
 /**
  * Create a Redux store from a set of modules.
