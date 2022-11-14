@@ -26,6 +26,19 @@ describe('ThreadList', () => {
     return wrapper;
   }
 
+  function createThread(tag) {
+    const target = [
+      {
+        source: 'https://example.com',
+      },
+    ];
+    return {
+      id: tag,
+      children: [],
+      annotation: { $tag: tag, target },
+    };
+  }
+
   beforeEach(() => {
     wrappers = [];
     fakeDomUtil = {
@@ -44,21 +57,22 @@ describe('ThreadList', () => {
 
     fakeTopThread = {
       id: 't0',
-      annotation: { $tag: 'myTag0' },
       children: [
-        { id: 't1', children: [], annotation: { $tag: 't1' } },
-        { id: 't2', children: [], annotation: { $tag: 't2' } },
-        { id: 't3', children: [], annotation: { $tag: 't3' } },
-        { id: 't4', children: [], annotation: { $tag: 't4' } },
+        createThread('t1'),
+        createThread('t2'),
+        createThread('t3'),
+        createThread('t4'),
       ],
     };
 
     fakeVisibleThreadsUtil = {
-      calculateVisibleThreads: sinon.stub().returns({
+      // nb. Use `callsFake` here rather than `returns` to always use
+      // latest `fakeTopThread.children` reference.
+      calculateVisibleThreads: sinon.stub().callsFake(() => ({
         visibleThreads: fakeTopThread.children,
         offscreenUpperHeight: 400,
         offscreenLowerHeight: 600,
-      }),
+      })),
       THREAD_DIMENSION_DEFAULTS: {
         defaultHeight: 200,
       },
@@ -300,6 +314,73 @@ describe('ThreadList', () => {
     const wrapper = createComponent();
     const cards = wrapper.find('ThreadCard');
     assert.equal(cards.length, fakeTopThread.children.length);
+  });
+
+  describe('chapter headings', () => {
+    const addThread = (cfi, title) => {
+      const id = `t${fakeTopThread.children.length + 1}`;
+      const thread = createThread(id);
+      thread.annotation.target[0].selector = [
+        {
+          type: 'EPUBContentSelector',
+          cfi,
+          title,
+        },
+      ];
+      fakeTopThread.children.push(thread);
+    };
+
+    const getHeading = container => {
+      const heading = container.find('h2');
+      return heading.exists() ? heading.text() : null;
+    };
+
+    beforeEach(() => {
+      fakeTopThread.children = [];
+    });
+
+    it('renders section headings above first annotation from each section', () => {
+      // Add two groups of annotations.
+      addThread('/2/4', 'Chapter One');
+      addThread('/2/4', 'Chapter One');
+      addThread('/2/6', 'Chapter Two');
+      addThread('/2/6', 'Chapter Two');
+
+      // When annotations are sorted by date, rather than location, headings
+      // may be repeated.
+      addThread('/2/4', 'Chapter One');
+      addThread('/2/4', 'Chapter One');
+
+      const wrapper = createComponent();
+
+      const containers = wrapper.find('[data-testid="thread-card-container"]');
+      assert.equal(containers.length, fakeTopThread.children.length);
+      assert.equal(getHeading(containers.at(0)), 'Chapter One');
+      assert.equal(getHeading(containers.at(1)), null);
+      assert.equal(getHeading(containers.at(2)), 'Chapter Two');
+      assert.equal(getHeading(containers.at(3)), null);
+      assert.equal(getHeading(containers.at(4)), 'Chapter One');
+      assert.equal(getHeading(containers.at(5)), null);
+    });
+
+    it('uses last non-empty heading for each chapter', () => {
+      // Add annotations for same chapter but with different captured headings.
+      addThread('/2/4', 'Chapter 1');
+      addThread('/2/4', 'Chapter One');
+      addThread('/2/4', undefined);
+
+      // Add an annotation for a different chapter with no associated heading.
+      addThread('/2/8', undefined);
+
+      const wrapper = createComponent();
+
+      const containers = wrapper.find('[data-testid="thread-card-container"]');
+      assert.equal(containers.length, fakeTopThread.children.length);
+      assert.equal(getHeading(containers.at(0)), 'Chapter One');
+      assert.equal(getHeading(containers.at(1)), null);
+      assert.equal(getHeading(containers.at(2)), null);
+      assert.equal(getHeading(containers.at(3)), 'Untitled chapter');
+    });
   });
 
   it('does not error if thread heights cannot be measured', () => {
