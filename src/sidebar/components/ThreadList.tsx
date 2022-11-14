@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 
 import { ListenerCollection } from '../../shared/listener-collection';
+import type { Annotation, EPUBContentSelector } from '../../types/api';
 import type { Thread } from '../helpers/build-thread';
 import {
   calculateVisibleThreads,
@@ -32,6 +33,45 @@ function roundScrollPosition(pos: number) {
 export type ThreadListProps = {
   threads: Thread[];
 };
+
+/**
+ * Find the selector identifying the document segment which an annotation
+ * belongs to.
+ */
+function getSegmentSelector(ann: Annotation): EPUBContentSelector | undefined {
+  return ann.target[0].selector?.find(s => s.type === 'EPUBContentSelector') as
+    | EPUBContentSelector
+    | undefined;
+}
+
+/**
+ * Return a key that identifies the document section to which an annotation
+ * belongs.
+ */
+function headingKey(thread: Thread): string | null {
+  if (!thread.annotation) {
+    return null;
+  }
+  const chapter = getSegmentSelector(thread.annotation);
+  return chapter?.cfi ?? null;
+}
+
+/** Build a map of heading key (see {@link headingKey}) to section heading. */
+function headingMap(threads: Thread[]): Map<string, string> {
+  const headings = new Map();
+
+  for (const thread of threads) {
+    if (!thread.annotation) {
+      continue;
+    }
+    const selector = getSegmentSelector(thread.annotation);
+    if (selector?.title) {
+      headings.set(selector.cfi, selector.title);
+    }
+  }
+
+  return headings;
+}
 
 /**
  * Render a list of threads.
@@ -81,7 +121,8 @@ export default function ThreadList({ threads }: ThreadListProps) {
     };
   }, []);
 
-  // Map of thread ID to measured height of thread.
+  // Map of thread ID to measured height of thread. The height of each thread
+  // includes any headings displayed immediately above it.
   const [threadHeights, setThreadHeights] = useState(() => new Map());
 
   // ID of thread to scroll to after the next render. If the thread is not
@@ -114,6 +155,25 @@ export default function ThreadList({ threads }: ThreadListProps) {
     }
     return newAnnotations[newAnnotations.length - 1].$tag;
   })();
+
+  // Compute the heading to display above each thread.
+  //
+  // We compute the map based on the full list of threads, not just the rendered
+  // ones, so the association doesn't change while scrolling.
+  const headings = useMemo(() => {
+    let prevHeadingKey: string | null = null;
+    const headingForKey = headingMap(threads);
+
+    const headings = new Map();
+    for (const thread of threads) {
+      const key = headingKey(thread);
+      if (key && prevHeadingKey !== key) {
+        prevHeadingKey = key;
+        headings.set(thread, headingForKey.get(key) ?? 'Untitled chapter');
+      }
+    }
+    return headings;
+  }, [threads]);
 
   // Scroll to newly created annotations and replies.
   //
@@ -209,6 +269,11 @@ export default function ThreadList({ threads }: ThreadListProps) {
           id={child.id}
           key={child.id}
         >
+          {headings.get(child) && (
+            <h2 className="text-md text-grey-7 font-bold pt-3 pb-2">
+              {headings.get(child)}
+            </h2>
+          )}
           <ThreadCard thread={child} />
         </div>
       ))}
