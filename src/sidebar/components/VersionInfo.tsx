@@ -1,22 +1,19 @@
 import { Button, CopyIcon } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
+import type { ComponentChildren } from 'preact';
 
+import type { VersionData } from '../helpers/version-data';
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
 
-/**
- * @typedef VersionInfoProps
- * @prop {import('../helpers/version-data').VersionData} versionData - Object with version information
- * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
- */
+type VersionInfoItemProps = {
+  label: string;
+  children: ComponentChildren;
+  classes?: string;
+};
 
-/**
- * @param {object} props
- *   @param {string} props.label
- *   @param {import('preact').ComponentChildren} props.children
- *   @param {string} [props.classes]
- */
-function VersionInfoItem({ label, children, classes }) {
+function VersionInfoItem({ label, children, classes }: VersionInfoItemProps) {
   return (
     <>
       <dt className="col-span-1 sm:text-right font-medium">{label}</dt>
@@ -31,12 +28,15 @@ function VersionInfoItem({ label, children, classes }) {
     </>
   );
 }
-/**
- * Display current client version info
- *
- * @param {VersionInfoProps} props
- */
-function VersionInfo({ toastMessenger, versionData }) {
+
+export type VersionInfoProps = {
+  versionData: VersionData;
+
+  // injected
+  toastMessenger: ToastMessengerService;
+};
+
+function VersionInfo({ toastMessenger, versionData }: VersionInfoProps) {
   const copyVersionData = () => {
     try {
       copyText(versionData.asFormattedString());
