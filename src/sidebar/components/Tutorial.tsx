@@ -4,25 +4,21 @@ import {
   HighlightIcon,
   ReplyIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
+
+import type { SidebarSettings } from '../../types/config';
 
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
 
-/**
- * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
- */
+type LabeledIconProps = {
+  /** Name of the "command" the instruction represents */
+  commandName: string;
+  icon: IconComponent;
+};
 
-/**
- * Subcomponent: an "instruction" within the tutorial step that includes an
- * icon and a "command" associated with that icon. Encapsulating these together
- * allows for styling to keep them from having a line break between them.
- *
- * @param {object} props
- *   @param {string} props.commandName - Name of the "command" the instruction represents
- *   @param {IconComponent} props.icon icon to display
- */
-function TutorialInstruction({ commandName, icon: Icon }) {
+function LabeledIcon({ commandName, icon: Icon }: LabeledIconProps) {
   return (
     <span className="whitespace-nowrap" data-testid="instruction">
       <Icon
@@ -37,20 +33,21 @@ function TutorialInstruction({ commandName, icon: Icon }) {
   );
 }
 
+export type TutorialProps = {
+  // injected
+  settings: SidebarSettings;
+};
+
 /**
  * Tutorial for using the sidebar app
- *
- * @param {object} props
- *   @param {import('../../types/config').SidebarSettings} props.settings
  */
-function Tutorial({ settings }) {
+function Tutorial({ settings }: TutorialProps) {
   const canCreatePrivateGroups = !isThirdPartyService(settings);
   return (
     <ol className="list-decimal pl-10 space-y-2">
       <li>
         To create an annotation, select text and then select the{' '}
-        <TutorialInstruction icon={AnnotateIcon} commandName="Annotate" />{' '}
-        button.
+        <LabeledIcon icon={AnnotateIcon} commandName="Annotate" /> button.
       </li>
       <li>
         To create a highlight (
@@ -62,8 +59,7 @@ function Tutorial({ settings }) {
           visible only to you
         </Link>
         ), select text and then select the{' '}
-        <TutorialInstruction icon={HighlightIcon} commandName="Highlight" />{' '}
-        button.
+        <LabeledIcon icon={HighlightIcon} commandName="Highlight" /> button.
       </li>
       {canCreatePrivateGroups && (
         <li>
@@ -81,7 +77,7 @@ function Tutorial({ settings }) {
       )}
       <li>
         To reply to an annotation, select the{' '}
-        <TutorialInstruction icon={ReplyIcon} commandName="Reply" /> button.
+        <LabeledIcon icon={ReplyIcon} commandName="Reply" /> button.
       </li>
     </ol>
   );
