@@ -926,6 +926,9 @@ describe('FrameSyncService', () => {
         fakeStore.hoverAnnotations,
         sinon.match.array.deepEquals([fixtures.ann.$tag])
       );
+
+      frameSync.hoverAnnotation(null);
+      assert.calledWith(fakeStore.hoverAnnotations, []);
     });
 
     it('focuses the associated highlights in the guest', () => {

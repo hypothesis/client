@@ -530,13 +530,13 @@ export class FrameSyncService {
   hoverAnnotation(ann: Annotation | null) {
     this._pendingHoverTag = null;
 
+    const tags = ann ? [ann.$tag] : [];
+    this._store.hoverAnnotations(tags);
+
     if (!ann) {
       this._guestRPC.forEach(rpc => rpc.call('hoverAnnotations', []));
       return;
     }
-
-    const tags = ann ? [ann.$tag] : [];
-    this._store.hoverAnnotations(tags);
 
     // If annotation is not currently anchored in a guest, schedule hover for
     // when annotation is anchored. This can happen if an annotation is for a
