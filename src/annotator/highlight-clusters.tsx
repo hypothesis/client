@@ -152,6 +152,7 @@ export class HighlightClusterController implements Destroyable {
     );
 
     this._updateHighlightData(outerHighlights as HighlightElement[]);
+    this._updateHighlightOrdering();
   }
 
   /**
@@ -213,6 +214,45 @@ export class HighlightClusterController implements Destroyable {
       );
     });
   }
+
+  /**
+   * Ensure that SVG <rect> elements are ordered correctly: inner (nested)
+   * highlights should be visible on top of outer highlights.
+   *
+   * All SVG <rect>s drawn for a PDF page are siblings. To ensure that the
+   * <rect>s associated with outer highlights don't show up on top of (and thus
+   * obscure) nested highlights, order the <rects> by their `data-nesting-level`
+   * value if they are not already.
+   */
+  _updateHighlightOrdering() {
+    const nestingLevel = (el: Element) =>
+      parseInt(el.getAttribute('data-nesting-level') ?? '0', 10);
+
+    // TODO: update `highlighter` to export some util functions to retrieve
+    // these elements
+    const highlightLayers = Array.from(
+      this._element.getElementsByClassName('hypothesis-highlight-layer')
+    );
+
+    highlightLayers.forEach(hLayer => {
+      const svgHighlights = Array.from(
+        hLayer.querySelectorAll('rect.hypothesis-svg-highlight')
+      );
+
+      // See if there is at least one SVG rect in the set that is out of order:
+      // that is, has a nesting level that is lower than its previous sibling
+      const needsReordering = svgHighlights.find((svgEl, idx, allEls) => {
+        if (idx === 0) {
+          return false;
+        }
+        return nestingLevel(svgEl) < nestingLevel(allEls[idx - 1]);
+      });
+
+      if (needsReordering) {
+        svgHighlights.sort((a, b) => nestingLevel(a) - nestingLevel(b));
+        hLayer.replaceChildren(...svgHighlights);
+      }
+    });
   }
 
   _isActive() {
