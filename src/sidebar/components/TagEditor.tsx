@@ -3,32 +3,29 @@ import { Input } from '@hypothesis/frontend-shared/lib/next';
 import { useRef, useState } from 'preact/hooks';
 
 import { withServices } from '../service-context';
+import type { TagsService } from '../services/tags';
 
 import AutocompleteList from './AutocompleteList';
 import TagList from './TagList';
 import TagListItem from './TagListItem';
 
-/** @typedef {import("preact").JSX.Element} JSXElement */
-
 // Global counter used to create a unique id for each instance of a TagEditor
 let tagEditorIdCounter = 0;
 
-/**
- * @typedef TagEditorProps
- * @prop {(tag: string) => boolean} onAddTag - Callback to add a tag to the annotation
- * @prop {(tag: string) => boolean} onRemoveTag - Callback to remove a tag from the annotation
- * @prop {(tag: string) => void} onTagInput - Callback when inputted tag text changes
- * @prop {string[]} tagList - The list of tags for the annotation under edit
- * @prop {import('../services/tags').TagsService} tags
- */
+export type TagEditorProps = {
+  onAddTag: (tag: string) => boolean;
+  onRemoveTag: (tag: string) => boolean;
+  onTagInput: (tag: string) => void;
+  tagList: string[];
 
+  // injected
+  tags: TagsService;
+};
 /**
  * Component to edit annotation's tags.
  *
  * Component accessibility is modeled after "Combobox with Listbox Popup Examples" found here:
  * https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
- *
- * @param {TagEditorProps} props
  */
 function TagEditor({
   onAddTag,
@@ -36,9 +33,9 @@ function TagEditor({
   onTagInput,
   tagList,
   tags: tagsService,
-}) {
-  const inputEl = /** @type {{ current: HTMLInputElement }} */ (useRef());
-  const [suggestions, setSuggestions] = useState(/** @type {string[]} */ ([]));
+}: TagEditorProps) {
+  const inputEl = useRef<HTMLInputElement>();
+  const [suggestions, setSuggestions] = useState([] as string[]);
   const [activeItem, setActiveItem] = useState(-1); // -1 is unselected
   const [suggestionsListOpen, setSuggestionsListOpen] = useState(false);
   const [tagEditorId] = useState(() => {
@@ -47,7 +44,7 @@ function TagEditor({
   });
 
   // Set up callback to monitor outside click events to close the AutocompleteList
-  const closeWrapperRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
+  const closeWrapperRef = useRef<HTMLDivElement>(null);
   useElementShouldClose(closeWrapperRef, suggestionsListOpen, () => {
     setSuggestionsListOpen(false);
   });
@@ -55,24 +52,20 @@ function TagEditor({
   /**
    * Retrieve the current trimmed text value of the tag <input>
    */
-  const pendingTag = () => inputEl.current.value.trim();
+  const pendingTag = () => inputEl.current!.value.trim();
   const hasPendingTag = () => pendingTag() && pendingTag().length > 0;
   const clearPendingTag = () => {
-    inputEl.current.value = '';
+    inputEl.current!.value = '';
     onTagInput?.('');
   };
 
   /**
    * Helper function that returns a list of suggestions less any
    * results also found from the duplicates list.
-   *
-   * @param {string[]} suggestions - Original list of suggestions
-   * @param {string[]} duplicates - Items to be removed from the result
-   * @return {string[]}
    */
-  const removeDuplicates = (suggestions, duplicates) => {
+  const removeDuplicates = (suggestions: string[], duplicates: string[]) => {
     const suggestionsSet = [];
-    for (let suggestion of suggestions) {
+    for (const suggestion of suggestions) {
       if (duplicates.indexOf(suggestion) < 0) {
         suggestionsSet.push(suggestion);
       }
@@ -102,16 +95,14 @@ function TagEditor({
   /**
    * Invokes callback to add tag. If the tag was added, close the suggestions
    * list, clear the field content and maintain focus.
-   *
-   * @param {string} newTag
    */
-  const addTag = newTag => {
+  const addTag = (newTag: string) => {
     if (onAddTag(newTag)) {
       setSuggestionsListOpen(false);
       setActiveItem(-1);
 
       clearPendingTag();
-      inputEl.current.focus();
+      inputEl.current!.focus();
     }
   };
 
@@ -123,10 +114,8 @@ function TagEditor({
   /**
    *  Callback when the user clicked one of the items in the suggestions list.
    *  This will add a new tag.
-   *
-   * @param {string} item
    */
-  const handleSelect = item => {
+  const handleSelect = (item: string) => {
     if (item) {
       addTag(item);
     }
@@ -152,7 +141,7 @@ function TagEditor({
    *
    * @param {number} direction - Pass 1 for the next item or -1 for the previous
    */
-  const changeSelectedItem = direction => {
+  const changeSelectedItem = (direction: -1 | 1) => {
     let nextActiveItem = activeItem + direction;
     if (nextActiveItem < -1) {
       nextActiveItem = suggestions.length - 1;
@@ -165,10 +154,8 @@ function TagEditor({
   /**
    * Keydown handler for keyboard navigation of the tag editor field and the
    * suggested-tags list.
-   *
-   * @param {KeyboardEvent} e
    */
-  const handleKeyDown = e => {
+  const handleKeyDown = (e: KeyboardEvent) => {
     switch (e.key) {
       case 'ArrowUp':
         // Select the previous item in the suggestion list
@@ -227,11 +214,8 @@ function TagEditor({
    * Callback for formatting a suggested tag item. Use selective bolding
    * to help delineate which part of the entered tag text matches the
    * suggestion.
-   *
-   * @param {string} item - Suggested tag
-   * @return {JSXElement} - Formatted tag for use in list
    */
-  const formatSuggestedItem = item => {
+  const formatSuggestedItem = (item: string) => {
     // filtering of tags is case-insensitive
     const curVal = pendingTag().toLowerCase();
     const suggestedTag = item.toLowerCase();
