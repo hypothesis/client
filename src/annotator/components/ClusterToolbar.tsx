@@ -32,7 +32,7 @@ function ClusterStyleControl({
   highlightStyles,
 }: ClusterStyleControlProps) {
   const appliedStyleName = currentStyles[cluster];
-  const isHidden = appliedStyleName === 'hidden'; // This style is somewhat special
+  const isHidden = appliedStyleName === 'transparent'; // This style is somewhat special
   return (
     <div className="space-y-2">
       <div className="flex items-center gap-x-2 text-annotator-base">
@@ -68,7 +68,6 @@ function ClusterStyleControl({
               <div
                 style={{
                   backgroundColor: highlightStyles[styleName].color,
-                  textDecoration: highlightStyles[styleName].decoration,
                 }}
                 className={classnames(
                   'block w-6 h-6 rounded-full flex items-center justify-center',
@@ -78,7 +77,7 @@ function ClusterStyleControl({
                   }
                 )}
               >
-                {styleName === 'hidden' && (
+                {styleName === 'transparent' && (
                   <HideIcon
                     className={classnames('w-3 h-3', {
                       'text-slate-3': !isHidden,

@@ -11,7 +11,8 @@ import { createShadowRoot } from './util/shadow-root';
 
 export type HighlightStyle = {
   color: string;
-  decoration: string;
+  secondColor: string;
+  thirdColor: string;
 };
 
 export type HighlightStyles = Record<string, HighlightStyle>;
@@ -19,39 +20,46 @@ export type AppliedStyles = Record<HighlightCluster, keyof HighlightStyles>;
 
 // Available styles that users can apply to highlight clusters
 export const highlightStyles: HighlightStyles = {
-  hidden: {
+  transparent: {
     color: 'transparent',
-    decoration: 'none',
-  },
-  green: {
-    color: 'var(--hypothesis-color-green)',
-    decoration: 'none',
-  },
-  orange: {
-    color: 'var(--hypothesis-color-orange)',
-    decoration: 'none',
+    secondColor: 'transparent',
+    thirdColor: 'transparent',
   },
   pink: {
     color: 'var(--hypothesis-color-pink)',
-    decoration: 'none',
+    secondColor: 'var(--hypothesis-color-pink-1)',
+    thirdColor: 'var(--hypothesis-color-pink-2)',
   },
-  purple: {
-    color: 'var(--hypothesis-color-purple)',
-    decoration: 'none',
+  orange: {
+    color: 'var(--hypothesis-color-orange)',
+    secondColor: 'var(--hypothesis-color-orange-1)',
+    thirdColor: 'var(--hypothesis-color-orange-2)',
   },
   yellow: {
     color: 'var(--hypothesis-color-yellow)',
-    decoration: 'none',
+    secondColor: 'var(--hypothesis-color-yellow-1)',
+    thirdColor: 'var(--hypothesis-color-yellow-2)',
+  },
+  green: {
+    color: 'var(--hypothesis-color-green)',
+    secondColor: 'var(--hypothesis-color-green-1)',
+    thirdColor: 'var(--hypothesis-color-green-2)',
+  },
+  purple: {
+    color: 'var(--hypothesis-color-purple)',
+    secondColor: 'var(--hypothesis-color-purple-1)',
+    thirdColor: 'var(--hypothesis-color-purple-2)',
   },
   grey: {
     color: 'var(--hypothesis-color-grey)',
-    decoration: 'underline dotted',
+    secondColor: 'var(--hypothesis-color-grey-1)',
+    thirdColor: 'var(--hypothesis-color-grey-2)',
   },
 };
 
 // The default styles applied to each highlight cluster. For now, this is
 // hard-coded.
-export const defaultStyles: AppliedStyles = {
+export const defaultClusterStyles: AppliedStyles = {
   'other-content': 'yellow',
   'user-annotations': 'orange',
   'user-highlights': 'purple',
@@ -81,7 +89,7 @@ export class HighlightClusterController implements Destroyable {
       left: '4px',
     });
 
-    this.appliedStyles = defaultStyles;
+    this.appliedStyles = defaultClusterStyles;
 
     this._init();
 
@@ -107,7 +115,7 @@ export class HighlightClusterController implements Destroyable {
     for (const cluster of Object.keys(this.appliedStyles) as Array<
       keyof typeof this.appliedStyles
     >) {
-      this._setClusterStyle(cluster, this.appliedStyles[cluster]);
+      this._setClusterStyles(cluster, this.appliedStyles[cluster]);
     }
 
     this._activate(this._isActive());
@@ -126,10 +134,17 @@ export class HighlightClusterController implements Destroyable {
   }
 
   /**
+   * Set a value for an individual CSS variable at :root
+   */
+  _setClusterStyle(key: string, value: string) {
+    document.documentElement.style.setProperty(key, value);
+  }
+
+  /**
    * Set CSS variables for the highlight `cluster` to apply the
    * {@link HighlightStyle} `highlightStyles[styleName]`
    */
-  _setClusterStyle(
+  _setClusterStyles(
     cluster: HighlightCluster,
     styleName: keyof typeof highlightStyles
   ) {
@@ -138,9 +153,9 @@ export class HighlightClusterController implements Destroyable {
     for (const ruleName of Object.keys(styleRules) as Array<
       keyof HighlightStyle
     >) {
-      document.documentElement.style.setProperty(
+      this._setClusterStyle(
         `--hypothesis-${cluster}-${ruleName}`,
-        styleRules[ruleName]
+        styleRules[ruleName] as string
       );
     }
   }
@@ -153,7 +168,7 @@ export class HighlightClusterController implements Destroyable {
     styleName: keyof typeof highlightStyles
   ) {
     this.appliedStyles[cluster] = styleName;
-    this._setClusterStyle(cluster, styleName);
+    this._setClusterStyles(cluster, styleName);
     this._render();
   }
 

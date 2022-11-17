@@ -1,35 +1,55 @@
 :root {
   // Default highlight styling configuration
   --hypothesis-highlight-color: rgba(255, 255, 60, 0.4);
+  --hypothesis-highlight-secondColor: rgba(206, 206, 60, 0.4);
+  --hypothesis-highlight-thirdColor: transparent;
+
   --hypothesis-highlight-focused-color: rgba(156, 230, 255, 0.5);
-  --hypothesis-highlight-blend-mode: normal;
-  --hypothesis-highlight-decoration: none;
   --hypothesis-highlight-text-color: inherit;
 
-  --hypothesis-highlight-second-color: rgba(206, 206, 60, 0.4);
-  --hypothesis-highlight-third-color: transparent;
+  --hypothesis-color-cyan: #cffafe;
 
   // Colors available for clustered highlights
-  --hypothesis-color-blue: #e0f2fe;
-  --hypothesis-color-yellow: #fef9c3;
-  --hypothesis-color-purple: #ede9fe;
-  --hypothesis-color-orange: #ffedd5;
-  --hypothesis-color-green: #d1fae5;
+
   --hypothesis-color-grey: #f5f5f4;
-  --hypothesis-color-pink: #ffe4e6;
+  --hypothesis-color-grey-1: #e7e5e4;
+  --hypothesis-color-grey-2: #d6d3d1;
+
+  --hypothesis-color-yellow: rgb(254, 249, 195);
+  --hypothesis-color-yellow-1: rgb(253, 243, 149);
+  --hypothesis-color-yellow-2: rgb(252, 235, 111);
+
+  --hypothesis-color-purple: rgb(234, 231, 254);
+  --hypothesis-color-purple-1: rgb(219, 213, 253);
+  --hypothesis-color-purple-2: rgb(206, 199, 252);
+
+  --hypothesis-color-orange: rgb(255, 237, 214);
+  --hypothesis-color-orange-1: rgb(255, 223, 187);
+  --hypothesis-color-orange-2: rgb(255, 212, 167);
+
+  --hypothesis-color-green: rgb(209, 250, 229);
+  --hypothesis-color-green-1: rgb(179, 246, 211);
+  --hypothesis-color-green-2: rgb(144, 241, 188);
+
+  --hypothesis-color-pink: rgb(255, 229, 231);
+  --hypothesis-color-pink-1: rgb(255, 211, 213);
+  --hypothesis-color-pink-2: rgb(254, 197, 199);
 
   // Clustered highlight styling configuration
   // These values are updated by the `highlight-clusters` module
-  --hypothesis-cluster-blend-mode: multiply;
   --hypothesis-cluster-text-color: #333333;
+
   --hypothesis-other-content-color: var(--hypothesis-color-yellow);
-  --hypothesis-other-content-decoration: none;
+  --hypothesis-other-content-secondColor: var(--hypothesis-color-yellow);
+  --hypothesis-other-content-thirdColor: var(--hypothesis-color-yellow);
 
   --hypothesis-user-highlights-color: var(--hypothesis-color-yellow);
-  --hypothesis-user-highlights-decoration: none;
+  --hypothesis-user-highlights-secondColor: var(--hypothesis-color-yellow);
+  --hypothesis-user-highlights-thirdColor: var(--hypothesis-color-yellow);
 
   --hypothesis-user-annotations-color: var(--hypothesis-color-yellow);
-  --hypothesis-user-annotations-decoration: none;
+  --hypothesis-user-annotations-secondColor: var(--hypothesis-color-yellow);
+  --hypothesis-user-annotations-thirdColor: var(--hypothesis-color-yellow);
 }
 
 // Configure highlight styling.
@@ -38,70 +58,53 @@
 .hypothesis-svg-highlight {
   --highlight-color: var(--hypothesis-highlight-color);
   --highlight-text-color: var(--hypothesis-highlight-text-color);
-  --highlight-blend-mode: var(--hypothesis-highlight-blend-mode);
-  --highlight-decoration: var(--hypothesis-highlight-decoration);
   --highlight-color-focused: var(--hypothesis-highlight-focused-color);
 
   & .hypothesis-highlight {
-    --highlight-color: var(--hypothesis-highlight-second-color);
+    --highlight-color: var(--hypothesis-highlight-secondColor);
 
     .hypothesis-highlight {
       // Highlights more than two levels deep are transparent by default.
-      --highlight-color: var(--hypothesis-highlight-third-color);
+      --highlight-color: var(--hypothesis-highlight-thirdColor);
+    }
+  }
+}
+
+@mixin clusterHighlightStyles($clusterValue) {
+  .hypothesis-highlight.#{$clusterValue},
+  .hypothesis-svg-highlight.#{$clusterValue} {
+    // Base color for this cluster value
+    --highlight-color: var(--hypothesis-#{$clusterValue}-color);
+
+    // Style highlights based on DOM hierarchy of <hypothesis-highlight>
+    // elements. This is applicable to HTML documents.
+    & > .#{$clusterValue} {
+      --highlight-color: var(--hypothesis-#{$clusterValue}-secondColor);
+    }
+
+    & > .#{$clusterValue} > .#{$clusterValue} {
+      --highlight-color: var(--hypothesis-#{$clusterValue}-thirdColor);
     }
   }
 }
 
 // Configure clustered highlight styling. The `.hypothesis-highlights-clustered`
 // class is managed by `highlight-clusters`
-
-.hypothesis-highlights-clustered .hypothesis-highlight {
-  --highlight-text-color: var(--hypothesis-cluster-text-color);
-}
-
-.hypothesis-highlights-clustered .hypothesis-highlight,
-.hypothesis-highlights-clustered .hypothesis-svg-highlight {
-  // When clustered highlights are active, use an opaque blue for focused
-  // annotations so we don't end up with a funny color mix
-  --highlight-color-focused: var(--hypothesis-color-blue);
-
-  &.user-annotations {
-    --highlight-color: var(--hypothesis-user-annotations-color);
-    --highlight-decoration: var(--hypothesis-user-annotations-decoration);
-
-    & > .user-annotations {
-      --highlight-color: var(--hypothesis-user-annotations-color);
-      --highlight-blend-mode: var(--hypothesis-cluster-blend-mode);
-    }
+.hypothesis-highlights-clustered {
+  .hypothesis-highlight,
+  .hypothesis-svg-highlight {
+    // When clustered highlights are active, use an opaque color for focused
+    // annotations so we don't end up with a funny color mix
+    --highlight-color-focused: var(--hypothesis-color-cyan);
   }
 
-  &.user-highlights {
-    --highlight-color: var(--hypothesis-user-highlights-color);
-    --highlight-decoration: var(--hypothesis-user-highlights-decoration);
-
-    & > .user-highlights {
-      --highlight-color: var(--hypothesis-user-highlights-color);
-      --highlight-blend-mode: var(--hypothesis-cluster-blend-mode);
-    }
+  .hypothesis-highlight {
+    --highlight-text-color: var(--hypothesis-cluster-text-color);
   }
 
-  &.other-content {
-    --highlight-color: var(--hypothesis-other-content-color);
-    --highlight-decoration: var(--hypothesis-other-content-decoration);
-
-    & > .other-content {
-      --highlight-color: var(--hypothesis-other-content-color);
-      --highlight-blend-mode: var(--hypothesis-cluster-blend-mode);
-    }
-  }
-}
-
-// No matter what kind of highlight styling is applied, make sure nested
-// highlights don't pile up too high with blending.
-.hypothesis-highlight {
-  & & & & & {
-    --highlight-blend-mode: normal;
-  }
+  @include clusterHighlightStyles('user-highlights');
+  @include clusterHighlightStyles('user-annotations');
+  @include clusterHighlightStyles('other-content');
 }
 
 // Apply highlight styling.
@@ -124,6 +127,7 @@
 // Apply styling using `--highlight-` values when highlights are visible
 // The `.hypothesis-highlights-always-on` class is managed by `highlighter`
 .hypothesis-highlights-always-on .hypothesis-svg-highlight {
+  transition: fill 300ms;
   fill: var(--highlight-color);
 
   &.is-opaque {
@@ -138,8 +142,7 @@
 .hypothesis-highlights-always-on .hypothesis-highlight {
   color: var(--highlight-text-color);
   background-color: var(--highlight-color);
-  text-decoration: var(--highlight-decoration);
-  mix-blend-mode: var(--highlight-blend-mode);
+  transition: background-color 300ms;
 
   cursor: pointer;
 
@@ -167,7 +170,6 @@
   &.hypothesis-highlight-focused {
     mix-blend-mode: normal !important;
     background-color: var(--highlight-color-focused) !important;
-    text-decoration: none;
 
     .hypothesis-highlight {
       background-color: transparent !important;

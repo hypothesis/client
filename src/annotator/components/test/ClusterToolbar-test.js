@@ -1,5 +1,8 @@
 import { mount } from 'enzyme';
-import { highlightStyles, defaultStyles } from '../../highlight-clusters';
+import {
+  highlightStyles,
+  defaultClusterStyles,
+} from '../../highlight-clusters';
 import ClusterToolbar from '../ClusterToolbar';
 
 const noop = () => {};
@@ -10,7 +13,7 @@ describe('ClusterToolbar', () => {
       <ClusterToolbar
         active={true}
         availableStyles={highlightStyles}
-        currentStyles={defaultStyles}
+        currentStyles={defaultClusterStyles}
         onStyleChange={noop}
         {...props}
       />
@@ -50,7 +53,7 @@ describe('ClusterToolbar', () => {
 
     assert.equal(
       wrapper.find('ClusterStyleControl').length,
-      Object.keys(defaultStyles).length
+      Object.keys(defaultClusterStyles).length
     );
   });
 

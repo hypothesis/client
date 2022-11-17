@@ -58,8 +58,8 @@ describe('HighlightClusterController', () => {
     const toolbar = createToolbar();
 
     // Properties should be set for each cluster (keys of `toolbar.appliedStyles`)
-    // Each cluster has two properties (variables) to be set
-    const expectedCount = Object.keys(toolbar.appliedStyles).length * 2;
+    // Each cluster has three colors
+    const expectedCount = Object.keys(toolbar.appliedStyles).length * 3;
 
     assert.equal(fakeSetProperty.callCount, expectedCount);
   });
@@ -108,6 +108,6 @@ describe('HighlightClusterController', () => {
     fakeSetProperty.resetHistory();
     toolbarProps.onStyleChange('user-highlights', 'green');
 
-    assert.equal(fakeSetProperty.callCount, 2);
+    assert.equal(fakeSetProperty.callCount, 3);
   });
 });
