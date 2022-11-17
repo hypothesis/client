@@ -1,4 +1,5 @@
 import debounce from 'lodash.debounce';
+import type { DebouncedFunction } from 'lodash.debounce';
 import shallowEqual from 'shallowequal';
 
 import { ListenerCollection } from '../../shared/listener-collection';
@@ -141,6 +142,21 @@ export class FrameSyncService {
    */
   private _pendingHoverTag: string | null;
 
+  /**
+   * Map of annotation tag to anchoring status. This holds status updates
+   * which have been received from guest frames but not yet committed to the store.
+   *
+   * Commits are batched to reduce the reduce the overhead from re-rendering
+   * etc. triggered by `SidebarStore.updateAnchorStatus` calls.
+   */
+  private _pendingAnchorStatusUpdates: Map<string, 'anchored' | 'orphan'>;
+
+  /**
+   * Schedule a commit of the anchoring status updates in
+   * {@link _pendingAnchorStatusUpdates} to the store.
+   */
+  private _scheduleAnchorStatusUpdate: DebouncedFunction<[]>;
+
   // Test seam
   private _window: Window;
 
@@ -165,6 +181,15 @@ export class FrameSyncService {
 
     this._pendingScrollToTag = null;
     this._pendingHoverTag = null;
+    this._pendingAnchorStatusUpdates = new Map();
+
+    this._scheduleAnchorStatusUpdate = debounce(() => {
+      const records = Object.fromEntries(
+        this._pendingAnchorStatusUpdates.entries()
+      );
+      this._store.updateAnchorStatus(records);
+      this._pendingAnchorStatusUpdates.clear();
+    }, 10);
 
     this._setupSyncToGuests();
     this._setupHostEvents();
@@ -214,6 +239,15 @@ export class FrameSyncService {
       if (added.length > 0) {
         const addedByFrame = new Map<string | null, Annotation[]>();
 
+        // List of annotations to immediately mark as anchored, as opposed to
+        // waiting for the guest to report the status. This is used for
+        // annotations associated with content that is different from what is
+        // currently loaded in the guest frame (eg. different EPUB chapter).
+        //
+        // For these annotations, we optimistically assume they will anchor
+        // when the appropriate content is loaded.
+        const anchorImmediately = [];
+
         for (const annotation of added) {
           const frame = frameForAnnotation(frames, annotation);
           if (
@@ -221,11 +255,16 @@ export class FrameSyncService {
             (frame.segment &&
               !annotationMatchesSegment(annotation, frame.segment))
           ) {
+            anchorImmediately.push(annotation.$tag);
             continue;
           }
           const anns = addedByFrame.get(frame.id) ?? [];
           anns.push(annotation);
           addedByFrame.set(frame.id, anns);
+        }
+
+        if (anchorImmediately.length > 0) {
+          this._updateAnchorStatus(anchorImmediately, 'anchored');
         }
 
         for (const [frameId, anns] of addedByFrame) {
@@ -278,6 +317,17 @@ export class FrameSyncService {
         });
       }
     );
+  }
+
+  /**
+   * Schedule an update of the anchoring status of annotation(s) in the store.
+   */
+  _updateAnchorStatus(tag: string | string[], state: 'orphan' | 'anchored') {
+    const tags = Array.isArray(tag) ? tag : [tag];
+    for (const tag of tags) {
+      this._pendingAnchorStatusUpdates.set(tag, state);
+    }
+    this._scheduleAnchorStatusUpdate();
   }
 
   /**
@@ -352,26 +402,10 @@ export class FrameSyncService {
       this._annotationsService.create(annot);
     });
 
-    // Map of annotation tag to anchoring status
-    // ('anchored'|'orphan'|'timeout').
-    //
-    // Updates are coalesced to reduce the overhead from processing
-    // triggered by each `UPDATE_ANCHOR_STATUS` action that is dispatched.
-
-    let anchoringStatusUpdates: Record<
-      string,
-      'anchored' | 'orphan' | 'timeout'
-    > = {};
-    const scheduleAnchoringStatusUpdate = debounce(() => {
-      this._store.updateAnchorStatus(anchoringStatusUpdates);
-      anchoringStatusUpdates = {};
-    }, 10);
-
     // Anchoring an annotation in the frame completed
     guestRPC.on('syncAnchoringStatus', ({ $tag, $orphan }: AnnotationData) => {
       this._inFrame.add($tag);
-      anchoringStatusUpdates[$tag] = $orphan ? 'orphan' : 'anchored';
-      scheduleAnchoringStatusUpdate();
+      this._updateAnchorStatus($tag, $orphan ? 'orphan' : 'anchored');
 
       if ($tag === this._pendingHoverTag) {
         this._pendingHoverTag = null;

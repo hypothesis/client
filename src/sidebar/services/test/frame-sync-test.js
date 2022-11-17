@@ -249,6 +249,13 @@ describe('FrameSyncService', () => {
     };
   }
 
+  /**
+   * "Wait" for the debouncing timeout for anchoring status updates to expire.
+   */
+  function expireDebounceTimeout(clock) {
+    clock.tick(20);
+  }
+
   describe('#connect', () => {
     it('discovers and connects to the host frame', async () => {
       await frameSync.connect();
@@ -377,38 +384,41 @@ describe('FrameSyncService', () => {
     });
 
     context('in EPUB documents', () => {
-      it('sends annotations to frame if current segment matches frame', async () => {
-        const bookURI = 'https://publisher.com/books/1234';
+      const bookURI = 'https://publisher.com/books/1234';
 
-        const chapter1ann = {
-          uri: bookURI,
-          target: [
-            {
-              selector: [
-                {
-                  type: 'EPUBContentSelector',
-                  cfi: '/2',
-                  url: '/chapters/01.xhtml',
-                },
-              ],
-            },
-          ],
-        };
-        const chapter2ann = {
-          uri: bookURI,
-          target: [
-            {
-              selector: [
-                {
-                  type: 'EPUBContentSelector',
-                  cfi: '/4',
-                  url: '/chapters/02.xhtml',
-                },
-              ],
-            },
-          ],
-        };
+      const chapter1ann = {
+        uri: bookURI,
+        target: [
+          {
+            selector: [
+              {
+                type: 'EPUBContentSelector',
+                cfi: '/2',
+                url: '/chapters/01.xhtml',
+              },
+            ],
+          },
+        ],
+      };
 
+      const chapter2ann = {
+        uri: bookURI,
+        target: [
+          {
+            selector: [
+              {
+                type: 'EPUBContentSelector',
+                cfi: '/4',
+                url: '/chapters/02.xhtml',
+              },
+            ],
+          },
+        ],
+      };
+
+      let clock;
+
+      beforeEach(async () => {
         await connectGuest();
         emitGuestEvent('documentInfoChanged', {
           uri: bookURI,
@@ -417,6 +427,13 @@ describe('FrameSyncService', () => {
             url: '/chapters/02.xhtml',
           },
         });
+      });
+
+      afterEach(() => {
+        clock?.restore();
+      });
+
+      it('sends annotations to frame only if current segment matches frame', () => {
         fakeStore.setState({ annotations: [chapter1ann, chapter2ann] });
 
         assert.calledWithMatch(
@@ -424,6 +441,19 @@ describe('FrameSyncService', () => {
           'loadAnnotations',
           sinon.match([formatAnnot(chapter2ann)])
         );
+      });
+
+      it('"immediately" marks annotations for other document segments as anchored', () => {
+        clock = sinon.useFakeTimers();
+
+        fakeStore.setState({ annotations: [chapter1ann, chapter2ann] });
+        assert.notCalled(fakeStore.updateAnchorStatus);
+
+        expireDebounceTimeout(clock);
+
+        assert.calledWith(fakeStore.updateAnchorStatus, {
+          [chapter1ann.$tag]: 'anchored',
+        });
       });
     });
 
@@ -634,16 +664,10 @@ describe('FrameSyncService', () => {
       clock.restore();
     });
 
-    function expireDebounceTimeout() {
-      // "Wait" for debouncing timeout to expire and pending anchoring status
-      // updates to be applied.
-      clock.tick(20);
-    }
-
     it('updates the anchoring status for the annotation', () => {
       emitGuestEvent('syncAnchoringStatus', { $tag: 't1', $orphan: false });
 
-      expireDebounceTimeout();
+      expireDebounceTimeout(clock);
 
       assert.calledWith(fakeStore.updateAnchorStatus, { t1: 'anchored' });
     });
@@ -658,7 +682,7 @@ describe('FrameSyncService', () => {
         $orphan: true,
       });
 
-      expireDebounceTimeout();
+      expireDebounceTimeout(clock);
 
       assert.calledWith(fakeStore.updateAnchorStatus, {
         t1: 'anchored',
