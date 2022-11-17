@@ -3,6 +3,7 @@ import classnames from 'classnames';
 import debounce from 'lodash.debounce';
 
 import { ListenerCollection } from '../../shared/listener-collection';
+import type { Thread } from '../helpers/build-thread';
 import {
   calculateVisibleThreads,
   THREAD_DIMENSION_DEFAULTS,
@@ -11,8 +12,6 @@ import { useSidebarStore } from '../store';
 import { getElementHeightWithMargins } from '../util/dom';
 
 import ThreadCard from './ThreadCard';
-
-/** @typedef {import('../helpers/build-thread').Thread} Thread */
 
 // The precision of the `scrollPosition` value in pixels; values will be rounded
 // down to the nearest multiple of this scale value
@@ -26,15 +25,13 @@ function getScrollContainer() {
   return container;
 }
 
-/** @param {number} pos */
-function roundScrollPosition(pos) {
+function roundScrollPosition(pos: number) {
   return Math.max(pos - (pos % SCROLL_PRECISION), 0);
 }
 
-/**
- * @typedef ThreadListProps
- * @prop {Thread[]} threads
- */
+export type ThreadListProps = {
+  threads: Thread[];
+};
 
 /**
  * Render a list of threads.
@@ -44,10 +41,8 @@ function roundScrollPosition(pos) {
  * annotations (and replies) are complex interactive components whose
  * user-defined content may include rich media such as images, audio clips,
  * embedded YouTube videos, rendered math and more.
- *
- * @param {ThreadListProps} props
  */
-function ThreadList({ threads }) {
+export default function ThreadList({ threads }: ThreadListProps) {
   // Client height of the scroll container.
   const [scrollContainerHeight, setScrollContainerHeight] = useState(0);
 
@@ -91,9 +86,7 @@ function ThreadList({ threads }) {
 
   // ID of thread to scroll to after the next render. If the thread is not
   // present, the value persists until it can be "consumed".
-  const [scrollToId, setScrollToId] = useState(
-    /** @type {string|null} */ (null)
-  );
+  const [scrollToId, setScrollToId] = useState<string | null>(null);
 
   const topLevelThreads = threads;
 
@@ -151,8 +144,7 @@ function ThreadList({ threads }) {
     // Clear `scrollToId` so we don't scroll again after the next render.
     setScrollToId(null);
 
-    /** @param {Thread} thread */
-    const getThreadHeight = thread =>
+    const getThreadHeight = (thread: Thread) =>
       threadHeights.get(thread.id) || THREAD_DIMENSION_DEFAULTS.defaultHeight;
 
     const yOffset = topLevelThreads
@@ -168,10 +160,8 @@ function ThreadList({ threads }) {
   useEffect(() => {
     setThreadHeights(prevHeights => {
       const changedHeights = new Map();
-      for (let { id } of visibleThreads) {
-        const threadElement = /** @type {HTMLElement} */ (
-          document.getElementById(id)
-        );
+      for (const { id } of visibleThreads) {
+        const threadElement = document.getElementById(id)!;
 
         if (!threadElement) {
           // This could happen if the `ThreadList` DOM is not connected to the document.
@@ -226,5 +216,3 @@ function ThreadList({ threads }) {
     </div>
   );
 }
-
-export default ThreadList;
