@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 
 import type { HighlightCluster } from '../types/shared';
+import { generateHexString } from '../shared/random';
 
 import { isInPlaceholder } from './anchoring/placeholder';
 import { isNodeInRange } from './range-util';
@@ -294,15 +295,56 @@ export function removeAllHighlights(root: HTMLElement) {
  * Remove highlights from a range previously highlighted with `highlightRange`.
  */
 export function removeHighlights(highlights: HighlightElement[]) {
+  // Explicitly un-focus highlights to be removed. This ensures associated
+  // focused elements are removed from the document.
+  setHighlightsFocused(highlights, false);
   for (const h of highlights) {
     if (h.parentNode) {
       const children = Array.from(h.childNodes);
       replaceWith(h, children);
     }
-
     if (h.svgHighlight) {
       h.svgHighlight.remove();
     }
+  }
+}
+
+/**
+ * Focus or un-focus an individual SVG highlight element.
+ *
+ * When focusing an SVG highlight, make sure it is not obscured by other SVG
+ * highlight elements. As SVG highlights are siblings, this can be accomplished
+ * by putting the highlight at the end the set of highlights contained its
+ * parent. SVG highlight elements are cloned instead of moved so that their
+ * original stacking (nesting) order is not lost when later unfocused. A data
+ * attribute is added to associate the original SVG highlight element with its
+ * clone.
+ */
+function setSVGHighlightFocused(svgEl: SVGElement, focused: boolean) {
+  const parent = svgEl.parentNode as SVGElement;
+  // This attribute allows lookup of an associated, "focused" element. It is
+  // set if the highlight is already focused.
+  const focusedId = svgEl.getAttribute('data-focused-id');
+
+  const isFocused = Boolean(focusedId);
+  if (isFocused === focused) {
+    return;
+  }
+
+  if (focused) {
+    svgEl.setAttribute('data-focused-id', generateHexString(8));
+    const focusedHighlight = svgEl.cloneNode() as SVGElement;
+    // The cloned element will include the `data-focused-id` attribute
+    // for association with its original highlight. Set additional attribute
+    // to mark this as the focused clone of a highlight.
+    focusedHighlight.setAttribute('data-is-focused', 'data-is-focused');
+    parent.append(focusedHighlight);
+  } else {
+    const focusedHighlight = parent.querySelector(
+      `[data-focused-id="${focusedId}"][data-is-focused]`
+    );
+    focusedHighlight?.remove();
+    svgEl.removeAttribute('data-focused-id');
   }
 }
 
@@ -322,17 +364,7 @@ export function setHighlightsFocused(
     // effect is applied to that. In other documents the effect is applied to the
     // `<hypothesis-highlight>` element.
     if (h.svgHighlight) {
-      h.svgHighlight.classList.toggle('is-focused', focused);
-
-      // Ensure that focused highlights are drawn above un-focused highlights
-      // on the same page.
-      //
-      // SVG elements are rendered in document order so to achieve this we need
-      // to move the element to be the last child of its parent.
-      if (focused) {
-        const parent = h.svgHighlight.parentNode as SVGElement;
-        parent.append(h.svgHighlight);
-      }
+      setSVGHighlightFocused(h.svgHighlight, focused);
     } else {
       h.classList.toggle('hypothesis-highlight-focused', focused);
     }
@@ -510,6 +542,21 @@ function setNestingData(
 }
 
 /**
+ * Get the highlight nesting level of `el`. This is typically set with the
+ * `data-nesting-level` attribute on highlight elements. Focused SVG highlight
+ * elements should always have the highest nesting level — they should always
+ * come last when sorted, so as not to be obscured by any other highlights.
+ * These elements are indicated by the presence of the `data-is-focused`
+ * attribute.
+ */
+function nestingLevel(el: Element): number {
+  if (el.getAttribute('data-is-focused')) {
+    return Number.MAX_SAFE_INTEGER;
+  }
+  return parseInt(el.getAttribute('data-nesting-level') ?? '0', 10);
+}
+
+/**
  * Ensure that SVG <rect> elements are ordered correctly: inner (nested)
  * highlights should be visible on top of outer highlights.
  *
@@ -519,9 +566,6 @@ function setNestingData(
  * value if they are not already.
  */
 function updateSVGHighlightOrdering(element: Element) {
-  const nestingLevel = (el: Element) =>
-    parseInt(el.getAttribute('data-nesting-level') ?? '0', 10);
-
   for (const [layer, layerHighlights] of getSVGHighlights(element)) {
     const correctlyOrdered = layerHighlights.every((svgEl, idx, allEls) => {
       if (idx === 0) {
