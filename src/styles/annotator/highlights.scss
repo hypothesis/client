@@ -165,7 +165,7 @@
     fill: yellow;
   }
 
-  &.is-focused {
+  &[data-is-focused] {
     fill: var(--highlight-color-focused);
   }
 }
