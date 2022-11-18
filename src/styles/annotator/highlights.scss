@@ -1,4 +1,7 @@
 :root {
+  // Some variables here are camel-cased for ergonomic convenience when
+  // manipulating with JavaScript
+
   // Default highlight styling configuration
   --hypothesis-highlight-color: rgba(255, 255, 60, 0.4);
   --hypothesis-highlight-secondColor: rgba(206, 206, 60, 0.4);
@@ -10,27 +13,39 @@
   --hypothesis-color-cyan: #cffafe;
 
   // Colors available for clustered highlights
+  // Base colors sourced from https://tailwindcss.com/docs/customizing-colors
 
+  // Stone 100, 200 and 300
   --hypothesis-color-grey: #f5f5f4;
   --hypothesis-color-grey-1: #e7e5e4;
   --hypothesis-color-grey-2: #d6d3d1;
 
+  // Yellow 100
   --hypothesis-color-yellow: rgb(254, 249, 195);
+  // Hand-adjusted
   --hypothesis-color-yellow-1: rgb(253, 243, 149);
   --hypothesis-color-yellow-2: rgb(252, 235, 111);
 
+  // The second and third colors for the following are computed by:
+  // - color-1: multiply base color @ 80% alpha on white
+  // - color-2: multiply color-1 @ 40% alpha on white
+
+  // Violet 100
   --hypothesis-color-purple: rgb(234, 231, 254);
   --hypothesis-color-purple-1: rgb(219, 213, 253);
   --hypothesis-color-purple-2: rgb(206, 199, 252);
 
+  // Orange 100
   --hypothesis-color-orange: rgb(255, 237, 214);
   --hypothesis-color-orange-1: rgb(255, 223, 187);
   --hypothesis-color-orange-2: rgb(255, 212, 167);
 
+  // Emerald 100
   --hypothesis-color-green: rgb(209, 250, 229);
   --hypothesis-color-green-1: rgb(179, 246, 211);
   --hypothesis-color-green-2: rgb(144, 241, 188);
 
+  // Pink 100
   --hypothesis-color-pink: rgb(255, 229, 231);
   --hypothesis-color-pink-1: rgb(255, 211, 213);
   --hypothesis-color-pink-2: rgb(254, 197, 199);
@@ -70,20 +85,20 @@
   }
 }
 
-@mixin clusterHighlightStyles($clusterValue) {
-  .hypothesis-highlight.#{$clusterValue},
-  .hypothesis-svg-highlight.#{$clusterValue} {
-    // Base color for this cluster value
-    --highlight-color: var(--hypothesis-#{$clusterValue}-color);
+@mixin clusterHighlightStyles($clusterKey) {
+  .hypothesis-highlight.#{$clusterKey},
+  .hypothesis-svg-highlight.#{$clusterKey} {
+    // Base color for this cluster
+    --highlight-color: var(--hypothesis-#{$clusterKey}-color);
 
     // Style highlights based on DOM hierarchy of <hypothesis-highlight>
     // elements. This is applicable to HTML documents.
-    & > .#{$clusterValue} {
-      --highlight-color: var(--hypothesis-#{$clusterValue}-secondColor);
+    & > .#{$clusterKey} {
+      --highlight-color: var(--hypothesis-#{$clusterKey}-secondColor);
     }
 
-    & > .#{$clusterValue} > .#{$clusterValue} {
-      --highlight-color: var(--hypothesis-#{$clusterValue}-thirdColor);
+    & > .#{$clusterKey} > .#{$clusterKey} {
+      --highlight-color: var(--hypothesis-#{$clusterKey}-thirdColor);
     }
   }
 }
@@ -127,7 +142,6 @@
 // Apply styling using `--highlight-` values when highlights are visible
 // The `.hypothesis-highlights-always-on` class is managed by `highlighter`
 .hypothesis-highlights-always-on .hypothesis-svg-highlight {
-  transition: fill 300ms;
   fill: var(--highlight-color);
 
   &.is-opaque {
@@ -142,7 +156,6 @@
 .hypothesis-highlights-always-on .hypothesis-highlight {
   color: var(--highlight-text-color);
   background-color: var(--highlight-color);
-  transition: background-color 300ms;
 
   cursor: pointer;
 
