@@ -270,9 +270,9 @@ export default function ThreadList({ threads }: ThreadListProps) {
           key={child.id}
         >
           {headings.get(child) && (
-            <h2 className="text-md text-grey-7 font-bold pt-3 pb-2">
+            <h3 className="text-md text-grey-7 font-bold pt-3 pb-2">
               {headings.get(child)}
-            </h2>
+            </h3>
           )}
           <ThreadCard thread={child} />
         </div>

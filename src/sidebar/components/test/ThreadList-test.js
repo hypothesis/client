@@ -331,7 +331,7 @@ describe('ThreadList', () => {
     };
 
     const getHeading = container => {
-      const heading = container.find('h2');
+      const heading = container.find('h3');
       return heading.exists() ? heading.text() : null;
     };
 
