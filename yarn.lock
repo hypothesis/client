@@ -1589,13 +1589,12 @@
     tslib "^1.9.3"
 
 "@sentry/cli@^2.0.2":
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-2.8.1.tgz#b7803572e6d5ce727329c70459a6ef0fcd2aff33"
-  integrity sha512-V/Mzy/ooZaICBFC8OvSrhUg3Anw1vlEzQQKwUtXEH0EQmcKDJMGkgfo2hXlpoR6lybODjkXDlMkajKcspdF4RA==
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@sentry/cli/-/cli-2.9.0.tgz#a73c2e72c7d80b3ae4bff52b3effb2f63cb1ac90"
+  integrity sha512-0qq3aP5shbm/V5GQSyeGEXlDNPQlWKngwNu+h5zaaaDrCfG2gJeoRHybOq4of+raKFZTvx4kjVmwwWAUvHfTYg==
   dependencies:
     https-proxy-agent "^5.0.0"
     node-fetch "^2.6.7"
-    npmlog "^6.0.1"
     progress "^2.0.3"
     proxy-from-env "^1.1.0"
     which "^2.0.2"
@@ -6376,7 +6375,7 @@ npm-registry-fetch@^14.0.0, npm-registry-fetch@^14.0.2:
     npm-package-arg "^10.0.0"
     proc-log "^3.0.0"
 
-npmlog@^6.0.0, npmlog@^6.0.1:
+npmlog@^6.0.0:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/npmlog/-/npmlog-6.0.2.tgz#c8166017a42f2dea92d6453168dd865186a70830"
   integrity sha512-/vBvz5Jfr9dT/aFWd0FIRf+T/Q2WBsLENygUaFUqstqsycmZAP/t5BvFJTK0viFmSUxiUKTUplWy5vt+rvKIxg==
