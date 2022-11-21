@@ -613,6 +613,7 @@ export class Guest implements Annotator, Destroyable {
 
   _updateAnchors(anchors: Anchor[], notify: boolean) {
     this.anchors = anchors;
+    this._clusterToolbar?.scheduleClusterUpdates();
     if (notify) {
       this._bucketBarClient.update(this.anchors);
     }

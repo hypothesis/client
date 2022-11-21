@@ -1,5 +1,7 @@
 import classnames from 'classnames';
 
+import type { HighlightCluster } from '../types/shared';
+
 import { isInPlaceholder } from './anchoring/placeholder';
 import { isNodeInRange } from './range-util';
 
@@ -11,6 +13,12 @@ type HighlightProps = {
 };
 
 export type HighlightElement = HTMLElement & HighlightProps;
+
+export const clusterValues: HighlightCluster[] = [
+  'user-annotations',
+  'user-highlights',
+  'other-content',
+];
 
 /**
  * Return the canvas element underneath a highlight element in a PDF page's
@@ -384,4 +392,147 @@ export function getBoundingClientRect(collection: HTMLElement[]): Rect {
     bottom: Math.max(acc.bottom, r.bottom),
     right: Math.max(acc.right, r.right),
   }));
+}
+
+/**
+ * Add metadata and manipulate ordering of all highlights in `element` to
+ * allow styling of nested, clustered highlights.
+ */
+export function updateClusters(element: Element) {
+  setNestingData(getHighlights(element));
+  updateSVGHighlightOrdering(element);
+}
+
+/**
+ * Is `el` a highlight element? Work around inconsistency between HTML documents
+ * (`tagName` is upper-case) and XHTML documents (`tagName` is lower-case)
+ */
+const isHighlightElement = (el: Element): boolean =>
+  el.tagName.toLowerCase() === 'hypothesis-highlight';
+
+/**
+ * Return the closest generation of HighlightElements to `element`.
+ *
+ * If `element` is itself a HighlightElement, return immediate children that
+ * are also HighlightElements.
+ *
+ * Otherwise, return all HighlightElements that have no parent HighlightElement,
+ * i.e. the outermost highlights within `element`.
+ */
+function getHighlights(element: Element) {
+  let highlights;
+  if (isHighlightElement(element)) {
+    highlights = Array.from(element.children).filter(isHighlightElement);
+  } else {
+    highlights = Array.from(
+      element.getElementsByTagName('hypothesis-highlight')
+    ).filter(
+      highlight =>
+        !highlight.parentElement || !isHighlightElement(highlight.parentElement)
+    );
+  }
+  return highlights as HighlightElement[];
+}
+
+/**
+ * Get all of the SVG highlights within `root`, grouped by layer. A PDF
+ * document may have multiple layers of SVG highlights, typically one per page.
+ *
+ * @return a Map of layer Elements to all SVG highlights within that
+ *   layer Element
+ */
+function getSVGHighlights(root?: Element): Map<Element, HighlightElement[]> {
+  const svgHighlights: Map<Element, HighlightElement[]> = new Map();
+
+  for (const layer of (root ?? document).getElementsByClassName(
+    'hypothesis-highlight-layer'
+  )) {
+    svgHighlights.set(
+      layer,
+      Array.from(
+        layer.querySelectorAll('.hypothesis-svg-highlight')
+      ) as HighlightElement[]
+    );
+  }
+
+  return svgHighlights;
+}
+
+/**
+ * Walk a tree of <hypothesis-highlight> elements, adding `data-nesting-level`
+ * and `data-cluster-level` data attributes to <hypothesis-highlight>s and
+ * their associated SVG highlight (<rect>) elements.
+ *
+ * - `data-nesting-level` - generational depth of the applicable
+ *   `<hypothesis-highlight>` relative to outermost `<hypothesis-highlight>`.
+ * - `data-cluster-level` - number of `<hypothesis-highlight>` generations
+ *   since the cluster value changed.
+ *
+ * @param highlightEls - A collection of sibling <hypothesis-highlight>
+ * elements
+ * @param parentCluster - The cluster value of the parent highlight to
+ * `highlightEls`, if any
+ * @param nestingLevel - The nesting "level", relative to the outermost
+ * <hypothesis-highlight> element (0-based)
+ * @param parentClusterLevel - The parent's nesting depth, per its cluster
+ * value (`parentCluster`). i.e. How many levels since the cluster value
+ * changed? This allows for nested styling of highlights of the same cluster
+ * value.
+ */
+function setNestingData(
+  highlightEls: HighlightElement[],
+  parentCluster = '',
+  nestingLevel = 0,
+  parentClusterLevel = 0
+) {
+  for (const hEl of highlightEls) {
+    const elCluster =
+      clusterValues.find(cv => hEl.classList.contains(cv)) ?? 'other-content';
+
+    const elClusterLevel =
+      parentCluster && elCluster === parentCluster ? parentClusterLevel + 1 : 0;
+
+    hEl.setAttribute('data-nesting-level', `${nestingLevel}`);
+    hEl.setAttribute('data-cluster-level', `${elClusterLevel}`);
+
+    if (hEl.svgHighlight) {
+      hEl.svgHighlight.setAttribute('data-nesting-level', `${nestingLevel}`);
+      hEl.svgHighlight.setAttribute('data-cluster-level', `${elClusterLevel}`);
+    }
+
+    setNestingData(
+      getHighlights(hEl),
+      elCluster /* parentCluster */,
+      nestingLevel + 1 /* nestingLevel */,
+      elClusterLevel /* parentClusterLevel */
+    );
+  }
+}
+
+/**
+ * Ensure that SVG <rect> elements are ordered correctly: inner (nested)
+ * highlights should be visible on top of outer highlights.
+ *
+ * All SVG <rect>s drawn for a PDF page are siblings. To ensure that the
+ * <rect>s associated with outer highlights don't show up on top of (and thus
+ * obscure) nested highlights, order the <rects> by their `data-nesting-level`
+ * value if they are not already.
+ */
+function updateSVGHighlightOrdering(element: Element) {
+  const nestingLevel = (el: Element) =>
+    parseInt(el.getAttribute('data-nesting-level') ?? '0', 10);
+
+  for (const [layer, layerHighlights] of getSVGHighlights(element)) {
+    const correctlyOrdered = layerHighlights.every((svgEl, idx, allEls) => {
+      if (idx === 0) {
+        return true;
+      }
+      return nestingLevel(svgEl) >= nestingLevel(allEls[idx - 1]);
+    });
+
+    if (!correctlyOrdered) {
+      layerHighlights.sort((a, b) => nestingLevel(a) - nestingLevel(b));
+      layer.replaceChildren(...layerHighlights);
+    }
+  }
 }

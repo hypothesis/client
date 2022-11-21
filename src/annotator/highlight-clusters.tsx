@@ -9,6 +9,8 @@ import type { HighlightCluster } from '../types/shared';
 import ClusterToolbar from './components/ClusterToolbar';
 import { createShadowRoot } from './util/shadow-root';
 
+import { updateClusters } from './highlighter';
+
 export type HighlightStyle = {
   color: string;
   secondColor: string;
@@ -71,6 +73,7 @@ export class HighlightClusterController implements Destroyable {
   private _features: IFeatureFlags;
   private _outerContainer: HTMLElement;
   private _shadowRoot: ShadowRoot;
+  private _updateTimeout?: number;
 
   constructor(element: HTMLElement, options: { features: IFeatureFlags }) {
     this._element = element;
@@ -101,9 +104,19 @@ export class HighlightClusterController implements Destroyable {
   }
 
   destroy() {
+    clearTimeout(this._updateTimeout);
     render(null, this._shadowRoot); // unload the Preact component
     this._activate(false); // De-activate cluster styling
     this._outerContainer.remove();
+  }
+
+  /**
+   * Indicate that the set of highlights in the document has been dirtied and we
+   * should schedule an update to highlight data attributes and stacking order.
+   */
+  scheduleClusterUpdates() {
+    clearTimeout(this._updateTimeout);
+    this._updateTimeout = setTimeout(() => this._updateClusters(), 100);
   }
 
   /**
@@ -119,6 +132,14 @@ export class HighlightClusterController implements Destroyable {
     }
 
     this._activate(this._isActive());
+  }
+
+  _updateClusters() {
+    if (!this._isActive()) {
+      /* istanbul ignore next */
+      return;
+    }
+    updateClusters(this._element);
   }
 
   _isActive() {

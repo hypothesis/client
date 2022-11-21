@@ -8,6 +8,7 @@ import {
   removeAllHighlights,
   setHighlightsFocused,
   setHighlightsVisible,
+  updateClusters,
 } from '../highlighter';
 
 /**
@@ -49,7 +50,7 @@ function PDFPage({ showPlaceholder = false }) {
  *   component has been rendered
  * @param {string} [cssClass] additional CSS class(es) to apply to the highlight
  *   and SVG rect elements
- * @return {HTMLElement} - `<hypothesis-highlight>` element
+ * @return {HighlightElement[]} - `<hypothesis-highlight>` element
  */
 function highlightPDFRange(pageContainer, cssClass = '') {
   const textSpan = pageContainer.querySelector('.testText');
@@ -375,7 +376,7 @@ describe('annotator/highlighter', () => {
    *
    * Returns all the highlight elements.
    */
-  function createHighlights(root) {
+  function createHighlights(root, cssClass = '') {
     let highlights = [];
 
     for (let i = 0; i < 3; i++) {
@@ -385,11 +386,81 @@ describe('annotator/highlighter', () => {
       range.setStartBefore(span.childNodes[0]);
       range.setEndAfter(span.childNodes[0]);
       root.appendChild(span);
-      highlights.push(...highlightRange(range));
+      highlights.push(...highlightRange(range, cssClass));
     }
 
     return highlights;
   }
+
+  describe('updateClusters', () => {
+    const nestingLevel = el =>
+      parseInt(el.getAttribute('data-nesting-level'), 10);
+    const clusterLevel = el =>
+      parseInt(el.getAttribute('data-cluster-level'), 10);
+
+    it('sets nesting data on highlight elements', () => {
+      const container = document.createElement('div');
+      render(<PDFPage />, container);
+
+      const highlights = [
+        ...highlightPDFRange(container, 'user-annotations'),
+        ...highlightPDFRange(container, 'user-annotations'),
+        ...highlightPDFRange(container, 'user-annotations'),
+        ...highlightPDFRange(container, 'other-content'),
+      ];
+
+      updateClusters(container);
+
+      assert.equal(nestingLevel(highlights[0]), 0);
+      assert.equal(nestingLevel(highlights[1]), 1);
+      assert.equal(nestingLevel(highlights[2]), 2);
+      assert.equal(nestingLevel(highlights[3]), 3);
+
+      assert.equal(clusterLevel(highlights[0]), 0);
+      assert.equal(clusterLevel(highlights[1]), 1);
+      assert.equal(clusterLevel(highlights[2]), 2);
+      assert.equal(clusterLevel(highlights[3]), 0);
+    });
+
+    it('sets nesting data on SVG highlights', () => {
+      const container = document.createElement('div');
+      render(<PDFPage />, container);
+
+      const highlights = [
+        ...highlightPDFRange(container, 'user-annotations'),
+        ...highlightPDFRange(container, 'user-annotations'),
+      ];
+
+      updateClusters(container);
+
+      assert.equal(nestingLevel(highlights[0].svgHighlight), 0);
+      assert.equal(nestingLevel(highlights[1].svgHighlight), 1);
+
+      assert.equal(clusterLevel(highlights[0].svgHighlight), 0);
+      assert.equal(clusterLevel(highlights[1].svgHighlight), 1);
+    });
+
+    it('reorders SVG highlights based on nesting level', () => {
+      const container = document.createElement('div');
+      render(<PDFPage />, container);
+
+      // SVG highlights for these highlights will be added in order.
+      // These first three highlights will nest.
+      highlightPDFRange(container, 'user-annotations');
+      highlightPDFRange(container, 'user-annotations');
+      highlightPDFRange(container, 'other-content');
+      // these second three highlights are outer highlights
+      createHighlights(container.querySelector('.textLayer'));
+
+      updateClusters(container);
+
+      const orderedNestingLevels = Array.from(
+        container.querySelectorAll('rect')
+      ).map(el => nestingLevel(el));
+
+      assert.deepEqual(orderedNestingLevels, [0, 0, 0, 0, 1, 2]);
+    });
+  });
 
   describe('removeAllHighlights', () => {
     it('removes all highlight elements under the root element', () => {
