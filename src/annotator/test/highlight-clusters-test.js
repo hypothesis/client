@@ -7,6 +7,8 @@ import { FeatureFlags } from '../features';
 describe('HighlightClusterController', () => {
   let fakeFeatures;
   let fakeSetProperty;
+  let fakeUpdateClusters;
+
   let toolbarProps;
   let container;
   let controllers;
@@ -22,8 +24,11 @@ describe('HighlightClusterController', () => {
 
   beforeEach(() => {
     controllers = [];
+
     fakeFeatures = new FeatureFlags();
     fakeSetProperty = sinon.stub(document.documentElement.style, 'setProperty');
+    fakeUpdateClusters = sinon.stub();
+
     container = document.createElement('div');
     toolbarProps = {};
 
@@ -34,6 +39,9 @@ describe('HighlightClusterController', () => {
 
     $imports.$mock({
       './components/ClusterToolbar': FakeToolbar,
+      './highlighter': {
+        updateClusters: fakeUpdateClusters,
+      },
     });
   });
 
@@ -109,5 +117,36 @@ describe('HighlightClusterController', () => {
     toolbarProps.onStyleChange('user-highlights', 'green');
 
     assert.equal(fakeSetProperty.callCount, 3);
+  });
+
+  describe('updating highlight element data and ordering', () => {
+    let clock;
+
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+      fakeFeatures.update({ styled_highlight_clusters: true });
+    });
+
+    afterEach(() => {
+      clock.restore();
+    });
+
+    it('schedules a debounced task to update highlights', () => {
+      const controller = createToolbar();
+      controller.scheduleClusterUpdates();
+
+      assert.notCalled(fakeUpdateClusters);
+
+      clock.tick(1);
+
+      assert.notCalled(fakeUpdateClusters);
+
+      controller.scheduleClusterUpdates();
+      controller.scheduleClusterUpdates();
+
+      clock.tick(150);
+
+      assert.calledOnce(fakeUpdateClusters);
+    });
   });
 });
