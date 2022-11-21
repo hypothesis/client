@@ -100,6 +100,23 @@
     & > .#{$clusterKey} > .#{$clusterKey} {
       --highlight-color: var(--hypothesis-#{$clusterKey}-thirdColor);
     }
+
+    // Style highlights based on data attributes set by `highlight-clusters`
+    // This is available on any document type/integration that supports cluster
+    // highlights.
+
+    // Styling for any cluster-level depth > 1
+    &[data-cluster-level] {
+      --highlight-color: var(--hypothesis-#{$clusterKey}-thirdColor);
+    }
+
+    &[data-cluster-level='1'] {
+      --highlight-color: var(--hypothesis-#{$clusterKey}-secondColor);
+    }
+
+    &[data-cluster-level='0'] {
+      --highlight-color: var(--hypothesis-#{$clusterKey}-color);
+    }
   }
 }
 
