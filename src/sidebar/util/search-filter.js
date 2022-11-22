@@ -34,55 +34,54 @@ function splitTerm(term) {
 }
 
 /**
+ * Remove a quote character from the beginning and end of the string, but
+ * only if they match. ie:
+ *
+-*   'foo' -> foo
+-*   "bar" -> bar
+-*   'foo" -> 'foo"
+-*    bar"  -> bar"
+ *
+ * @param {string} text
+ */
+function removeSurroundingQuotes(text) {
+  const start = text.slice(0, 1);
+  const end = text.slice(-1);
+  if ((start === '"' || start === "'") && start === end) {
+    text = text.slice(1, text.length - 1);
+  }
+  return text;
+}
+
+/**
  * Tokenize a search query.
  *
- * Splits `searchText` into tokens, separated by spaces.
- * Quoted phrases in `searchText` are returned as a single token.
+ * Split `searchText` into an array of non-empty tokens. Terms not contained
+ * within quotes are split on whitespace. Terms inside single or double quotes
+ * are returned as whole tokens, with the surrounding quotes removed.
  *
  * @param {string} searchText
  * @return {string[]}
  */
 function tokenize(searchText) {
-  if (!searchText) {
+  const tokenMatches = searchText.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
+  if (!tokenMatches) {
     return [];
   }
 
-  /**
-   * Remove a quote character from the beginning and end of the string, but
-   * only if they match. ie:
-   *
--  *   'foo' -> foo
--  *   "bar" -> bar
--  *   'foo" -> 'foo"
--  *    bar"  -> bar"
-   *
-   * @param {string} text
-   */
-  const removeQuoteCharacter = text => {
-    const start = text.slice(0, 1);
-    const end = text.slice(-1);
-    if ((start === '"' || start === "'") && start === end) {
-      text = text.slice(1, text.length - 1);
-    }
-    return text;
-  };
-
-  let tokens = searchText.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g) || [];
-
-  // Cut the opening and closing quote characters
-  tokens = tokens.map(removeQuoteCharacter);
-
-  // Remove quotes for power search.
-  // I.e. 'tag:"foo bar"' -> 'tag:foo bar'
-  for (let index = 0; index < tokens.length; index++) {
-    const token = tokens[index];
-    const [filter, data] = splitTerm(token);
-    if (filter) {
-      tokens[index] = filter + ':' + removeQuoteCharacter(data);
-    }
-  }
-
-  return tokens;
+  return tokenMatches
+    .map(removeSurroundingQuotes)
+    .filter(token => token.length > 0)
+    .map(token => {
+      // Strip quotes from field values.
+      // eg. `tag:"foo bar"` => `tag:foo bar`.
+      const [filter, data] = splitTerm(token);
+      if (filter) {
+        return filter + ':' + removeSurroundingQuotes(data);
+      } else {
+        return token;
+      }
+    });
 }
 
 /**
@@ -98,23 +97,22 @@ export function toObject(searchText) {
   /** @param {string} field */
   const backendFilter = field => (field === 'tag' ? 'tags' : field);
 
-  if (searchText) {
-    const terms = tokenize(searchText);
-    for (const term of terms) {
-      let [field, data] = splitTerm(term);
-      if (!field) {
-        field = 'any';
-        data = term;
-      }
+  const terms = tokenize(searchText);
+  for (const term of terms) {
+    let [field, data] = splitTerm(term);
+    if (!field) {
+      field = 'any';
+      data = term;
+    }
 
-      const backendField = backendFilter(field);
-      if (obj[backendField]) {
-        obj[backendField].push(data);
-      } else {
-        obj[backendField] = [data];
-      }
+    const backendField = backendFilter(field);
+    if (obj[backendField]) {
+      obj[backendField].push(data);
+    } else {
+      obj[backendField] = [data];
     }
   }
+
   return obj;
 }
 
@@ -142,7 +140,6 @@ export function toObject(searchText) {
  * @return {Record<string,Facet>}
  */
 export function generateFacetedFilter(searchText, focusFilters = {}) {
-  let terms;
   const any = [];
   const quote = [];
   const since = [];
@@ -150,56 +147,56 @@ export function generateFacetedFilter(searchText, focusFilters = {}) {
   const text = [];
   const uri = [];
   const user = focusFilters.user ? [focusFilters.user] : [];
-  if (searchText) {
-    terms = tokenize(searchText);
-    for (const term of terms) {
-      const filter = term.slice(0, term.indexOf(':'));
-      const fieldValue = term.slice(filter.length + 1);
 
-      switch (filter) {
-        case 'quote':
-          quote.push(fieldValue);
-          break;
-        case 'since':
-          {
-            const time = term.slice(6).toLowerCase();
-            const secondsPerDay = 24 * 60 * 60;
-            const secondsPerUnit = {
-              sec: 1,
-              min: 60,
-              hour: 60 * 60,
-              day: secondsPerDay,
-              week: 7 * secondsPerDay,
-              month: 30 * secondsPerDay,
-              year: 365 * secondsPerDay,
-            };
-            const match = time.match(
-              /^(\d+)(sec|min|hour|day|week|month|year)?$/
+  const terms = tokenize(searchText);
+
+  for (const term of terms) {
+    const filter = term.slice(0, term.indexOf(':'));
+    const fieldValue = term.slice(filter.length + 1);
+
+    switch (filter) {
+      case 'quote':
+        quote.push(fieldValue);
+        break;
+      case 'since':
+        {
+          const time = term.slice(6).toLowerCase();
+          const secondsPerDay = 24 * 60 * 60;
+          const secondsPerUnit = {
+            sec: 1,
+            min: 60,
+            hour: 60 * 60,
+            day: secondsPerDay,
+            week: 7 * secondsPerDay,
+            month: 30 * secondsPerDay,
+            year: 365 * secondsPerDay,
+          };
+          const match = time.match(
+            /^(\d+)(sec|min|hour|day|week|month|year)?$/
+          );
+          if (match) {
+            const value = parseFloat(match[1]);
+            const unit = /** @type {keyof secondsPerUnit} */ (
+              match[2] || 'sec'
             );
-            if (match) {
-              const value = parseFloat(match[1]);
-              const unit = /** @type {keyof secondsPerUnit} */ (
-                match[2] || 'sec'
-              );
-              since.push(value * secondsPerUnit[unit]);
-            }
+            since.push(value * secondsPerUnit[unit]);
           }
-          break;
-        case 'tag':
-          tag.push(fieldValue);
-          break;
-        case 'text':
-          text.push(fieldValue);
-          break;
-        case 'uri':
-          uri.push(fieldValue);
-          break;
-        case 'user':
-          user.push(fieldValue);
-          break;
-        default:
-          any.push(term);
-      }
+        }
+        break;
+      case 'tag':
+        tag.push(fieldValue);
+        break;
+      case 'text':
+        text.push(fieldValue);
+        break;
+      case 'uri':
+        uri.push(fieldValue);
+        break;
+      case 'user':
+        user.push(fieldValue);
+        break;
+      default:
+        any.push(term);
     }
   }
 
