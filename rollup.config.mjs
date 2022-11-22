@@ -101,7 +101,7 @@ function bundleConfig({ name, entry, format = 'es' }) {
 export default [
   bundleConfig({
     name: 'annotator',
-    entry: 'src/annotator/index.js',
+    entry: 'src/annotator/index.ts',
 
     // The annotator bundle is created as a non-module script because module
     // scripts are not supported in Safari in XHTML documents.
