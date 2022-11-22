@@ -11,11 +11,8 @@
  *
  * ie. 'user:johndoe' -> ['user', 'johndoe']
  *     'example:text' -> [null, 'example:text']
- *
- * @param {string} term
- * @return {[null|string, string]}
  */
-function splitTerm(term) {
+function splitTerm(term: string): [null | string, string] {
   const filter = term.slice(0, term.indexOf(':'));
   if (!filter) {
     // The whole term is data
@@ -41,10 +38,8 @@ function splitTerm(term) {
 -*   "bar" -> bar
 -*   'foo" -> 'foo"
 -*    bar"  -> bar"
- *
- * @param {string} text
  */
-function removeSurroundingQuotes(text) {
+function removeSurroundingQuotes(text: string) {
   const start = text.slice(0, 1);
   const end = text.slice(-1);
   if ((start === '"' || start === "'") && start === end) {
@@ -59,11 +54,8 @@ function removeSurroundingQuotes(text) {
  * Split `searchText` into an array of non-empty tokens. Terms not contained
  * within quotes are split on whitespace. Terms inside single or double quotes
  * are returned as whole tokens, with the surrounding quotes removed.
- *
- * @param {string} searchText
- * @return {string[]}
  */
-function tokenize(searchText) {
+function tokenize(searchText: string): string[] {
   const tokenMatches = searchText.match(/(?:[^\s"']+|"[^"]*"|'[^']*')+/g);
   if (!tokenMatches) {
     return [];
@@ -86,16 +78,11 @@ function tokenize(searchText) {
 
 /**
  * Parse a search query into a map of search field to term.
- *
- * @param {string} searchText
- * @return {Record<string,string[]>}
  */
-export function toObject(searchText) {
-  /** @type {Record<string,string[]>} */
-  const obj = {};
+export function toObject(searchText: string): Record<string, string[]> {
+  const obj = {} as Record<string, string[]>;
 
-  /** @param {string} field */
-  const backendFilter = field => (field === 'tag' ? 'tags' : field);
+  const backendFilter = (field: string) => (field === 'tag' ? 'tags' : field);
 
   const terms = tokenize(searchText);
   for (const term of terms) {
@@ -116,16 +103,14 @@ export function toObject(searchText) {
   return obj;
 }
 
-/**
- * @typedef Facet
- * @prop {'and'|'or'} operator
- * @prop {string[]|number[]} terms
- */
+export type Facet = {
+  operator: 'and' | 'or';
+  terms: string[] | number[];
+};
 
-/**
- * @typedef FocusFilter
- * @prop {string} [user]
- */
+export type FocusFilter = {
+  user?: string;
+};
 
 /**
  * Parse a search query into a map of filters.
@@ -135,11 +120,13 @@ export function toObject(searchText) {
  * Terms that are not associated with a particular facet are stored in the "any"
  * facet.
  *
- * @param {string} searchText - Filter query to parse
- * @param {FocusFilter} focusFilters - Additional filter terms to mix in
- * @return {Record<string,Facet>}
+ * @param searchText - Filter query to parse
+ * @param focusFilters - Additional filter terms to mix in
  */
-export function generateFacetedFilter(searchText, focusFilters = {}) {
+export function generateFacetedFilter(
+  searchText: string,
+  focusFilters: FocusFilter = {}
+): Record<string, Facet> {
   const any = [];
   const quote = [];
   const since = [];
@@ -176,9 +163,7 @@ export function generateFacetedFilter(searchText, focusFilters = {}) {
           );
           if (match) {
             const value = parseFloat(match[1]);
-            const unit = /** @type {keyof secondsPerUnit} */ (
-              match[2] || 'sec'
-            );
+            const unit = (match[2] || 'sec') as keyof typeof secondsPerUnit;
             since.push(value * secondsPerUnit[unit]);
           }
         }
