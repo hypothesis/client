@@ -1363,6 +1363,16 @@ describe('Guest', () => {
     });
   });
 
+  it('emits "hostDisconnected" event when host frame closes connection with guest', () => {
+    const guest = createGuest();
+    const hostDisconnected = sinon.stub();
+    guest.on('hostDisconnected', hostDisconnected);
+
+    emitHostEvent('close');
+
+    assert.called(hostDisconnected);
+  });
+
   it('discovers and creates a channel for communication with the sidebar', async () => {
     const { port1 } = new MessageChannel();
     fakePortFinder.discover.resolves(port1);
