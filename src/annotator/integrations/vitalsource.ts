@@ -1,5 +1,6 @@
 import { TinyEmitter } from 'tiny-emitter';
 
+import { documentCFI } from '../../shared/cfi';
 import { ListenerCollection } from '../../shared/listener-collection';
 import { FeatureFlags } from '../features';
 import { onDocumentReady } from '../frame-observer';
@@ -93,8 +94,73 @@ type PageInfo = {
    * segment. For PDF-based books, a chapter will often have multiple pages
    * and all these pages will have the same title. In EPUBs, each content
    * document will typically have a different title.
+   *
+   * WARNING: This information may be incorrect in some books. See
+   * https://github.com/hypothesis/client/issues/4986. Data from
+   * {@link MosaicBookElement.getTOC} can be used instead.
    */
   chapterTitle: string;
+};
+
+/**
+ * An entry from a book's table of contents. This information comes from
+ * an EPUB's Navigation Document [1] or Navigation Control File ("toc.ncx") [2].
+ *
+ * [1] https://www.w3.org/publishing/epub3/epub-packages.html#sec-package-nav
+ * [2] https://www.niso.org/publications/ansiniso-z3986-2005-r2012-specifications-digital-talking-book
+ *
+ * An example entry looks like this:
+ *
+ * ```
+ * {
+ *   "title": "acknowledgments",
+ *   "path": "/OEBPS/Text/fm.htm#heading_id_4",
+ *   "level": 2,
+ *   "cfi": "/6/14[;vnd.vst.idref=fm.htm]!/4/20[heading_id_4]",
+ *   "page": "9",
+ * }
+ * ```
+ */
+type TableOfContentsEntry = {
+  /** The title of the book segment that this entry refers to. */
+  title: string;
+
+  /**
+   * The path of the EPUB Content Document containing the location that this
+   * TOC entry points to.
+   */
+  path: string;
+
+  /**
+   * The 1-based level of the entry in the table of contents tree.
+   */
+  level: number;
+
+  /**
+   * Canonical Fragment Identifier specifying the location within the book that
+   * this TOC entry points to.
+   */
+  cfi: string;
+
+  /** The page label associated with this location in the book. */
+  page: string;
+};
+
+/**
+ * A type that represents a successful data fetch or an error.
+ *
+ * This is a container type used in the return types of various
+ * {@link MosaicBookElement} methods.
+ */
+type DataResponse<T> = {
+  /** True if the data was fetched successfully. */
+  ok: boolean;
+
+  /** Fetched data. Will be missing if `ok` is false. */
+  data?: T;
+
+  /** HTTP status code. May be `undefined` if `ok` is false. */
+  status: number | undefined;
 };
 
 /**
@@ -113,6 +179,9 @@ type MosaicBookElement = HTMLElement & {
    * chapter/segment (in an EPUB-based book).
    */
   getCurrentPage(): Promise<PageInfo>;
+
+  /** Retrieve the book's table of contents. */
+  getTOC(): Promise<DataResponse<TableOfContentsEntry[]>>;
 
   /**
    * Navigate the book to the page or content document whose CFI matches `cfi`.
@@ -436,7 +505,23 @@ export class VitalSourceContentIntegration
       return selectors;
     }
 
-    const pageInfo = await this._bookElement.getCurrentPage();
+    const [pageInfo, toc] = await Promise.all([
+      this._bookElement.getCurrentPage(),
+      this._bookElement.getTOC(),
+    ]);
+
+    let title = pageInfo.chapterTitle;
+
+    // Find the first table of contents entry that corresponds to the current page,
+    // and use its title instead of `pageInfo.chapterTitle`. This works around
+    // https://github.com/hypothesis/client/issues/4986.
+    const pageCFI = documentCFI(pageInfo.cfi);
+    const tocEntry = toc.data?.find(
+      entry => documentCFI(entry.cfi) === pageCFI
+    );
+    if (tocEntry) {
+      title = tocEntry.title;
+    }
 
     // We generate an "EPUBContentSelector" with a CFI for all VS books,
     // although for PDF-based books the CFI is a string generated from the
@@ -446,7 +531,7 @@ export class VitalSourceContentIntegration
         type: 'EPUBContentSelector',
         cfi: pageInfo.cfi,
         url: pageInfo.absoluteURL,
-        title: pageInfo.chapterTitle,
+        title,
       },
     ];
 

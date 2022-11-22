@@ -1,4 +1,4 @@
-import { compareCFIs, stripCFIAssertions } from '../cfi';
+import { compareCFIs, documentCFI, stripCFIAssertions } from '../cfi';
 
 describe('sidebar/util/cfi', () => {
   describe('stripCFIAssertions', () => {
@@ -100,6 +100,23 @@ describe('sidebar/util/cfi', () => {
           `comparing CFIs "${a}" and "${b}" failed`
         );
       });
+    });
+  });
+
+  describe('documentCFI', () => {
+    it('returns part of CFI before first step indirection', () => {
+      // Typical CFI with one step indirection.
+      assert.equal(documentCFI('/2/4/8!/10/12'), '/2/4/8');
+
+      // Rarer case of CFI with multiple step indirections.
+      assert.equal(documentCFI('/2/4/8!/10/12!/2/4'), '/2/4/8');
+    });
+
+    it('strips assertions', () => {
+      assert.equal(
+        documentCFI('/6/152[;vnd.vst.idref=ch13_01]!/4/2[ch13_sec_1]'),
+        '/6/152'
+      );
     });
   });
 });
