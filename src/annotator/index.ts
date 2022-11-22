@@ -18,7 +18,10 @@ import { getConfig } from './config/index';
 import type { NotebookConfig } from './components/NotebookModal';
 import { Guest } from './guest';
 import type { GuestConfig } from './guest';
-import { HypothesisInjector } from './hypothesis-injector';
+import {
+  HypothesisInjector,
+  removeTemporaryClientConfig,
+} from './hypothesis-injector';
 import type { InjectConfig } from './hypothesis-injector';
 import {
   VitalSourceInjector,
@@ -112,6 +115,10 @@ function init() {
     // page by the boot script.
     const clientAssets = document.querySelectorAll('[data-hypothesis-asset]');
     clientAssets.forEach(el => el.remove());
+
+    // If this is a guest-only frame, remove client config added by the host
+    // frame. This enables the client to later be re-loaded in this frame.
+    removeTemporaryClientConfig();
   });
 }
 

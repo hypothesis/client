@@ -48,13 +48,23 @@ export class HypothesisInjector {
 }
 
 /**
- * Check if the client was added to a frame by {@link injectHypothesis}.
+ * Check if the client was added to a frame by {@link injectClient}.
  *
  * @param {HTMLIFrameElement} iframe
  */
 function hasHypothesis(iframe) {
   const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
   return iframeDocument.querySelector('script.js-hypothesis-config') !== null;
+}
+
+/**
+ * Remove the temporary configuration data added to a document by {@link injectClient}.
+ */
+export function removeTemporaryClientConfig(document_ = document) {
+  const tempConfigEls = Array.from(
+    document_.querySelectorAll('script.js-temp-config')
+  );
+  tempConfigEls.forEach(el => el.remove());
 }
 
 /**
@@ -65,6 +75,10 @@ function hasHypothesis(iframe) {
  *
  * This waits for the frame to finish loading before injecting the client.
  * See {@link onDocumentReady}.
+ *
+ * This function does nothing if the client has already been added to the frame.
+ * This is determined by the presence of temporary configuration `<script>`s
+ * added by this function, which can be removed with {@link removeTemporaryClientConfig}.
  *
  * @param {HTMLIFrameElement} frame
  * @param {InjectConfig} config -
@@ -100,7 +114,7 @@ export async function injectClient(frame, config, frameId) {
   };
 
   const configElement = document.createElement('script');
-  configElement.className = 'js-hypothesis-config';
+  configElement.className = 'js-hypothesis-config js-temp-config';
   configElement.type = 'application/json';
   configElement.innerText = JSON.stringify(injectedConfig);
 

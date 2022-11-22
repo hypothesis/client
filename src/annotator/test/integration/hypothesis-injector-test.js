@@ -3,6 +3,7 @@ import { DEBOUNCE_WAIT, onNextDocumentReady } from '../../frame-observer';
 import {
   HypothesisInjector,
   injectClient,
+  removeTemporaryClientConfig,
   $imports,
 } from '../../hypothesis-injector';
 
@@ -72,6 +73,9 @@ describe('HypothesisInjector integration test', () => {
     const configElement = frame.contentDocument.querySelector(
       '.js-hypothesis-config'
     );
+    if (!configElement) {
+      return null;
+    }
     return JSON.parse(configElement.textContent);
   }
 
@@ -261,5 +265,27 @@ describe('HypothesisInjector integration test', () => {
       getHypothesisScript(iframe),
       'expected dynamically added iframe to include the Hypothesis script'
     );
+  });
+
+  describe('removeTemporaryClientConfig', () => {
+    it('removes config `<script>`s added to page by `injectClient`', async () => {
+      const frame = document.createElement('iframe');
+      container.append(frame);
+
+      // Inject client into frame. Subsequent `injectClient` calls would be
+      // a no-op as the client is already injected.
+      await injectClient(frame, { clientUrl: 'https://hyp.is' });
+      assert.ok(extractClientConfig(frame));
+
+      // Remove client config. This should happen if the client is unloaded from
+      // the frame.
+      removeTemporaryClientConfig(frame.contentDocument);
+      assert.isNull(extractClientConfig(frame));
+
+      // After removing the temporary config, `injectClient` should once again
+      // be able to re-inject the client into the frame.
+      await injectClient(frame, { clientUrl: 'https://hyp.is' });
+      assert.ok(extractClientConfig(frame));
+    });
   });
 });
