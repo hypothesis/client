@@ -114,3 +114,23 @@ export function compareCFIs(a: string, b: string): number {
   };
   return compareArrays(parseCFI(a), parseCFI(b));
 }
+
+/**
+ * Return a slice of `cfi` up to the first step indirection [1], with assertions
+ * removed.
+ *
+ * A typical CFI consists of a path within the table of contents to indicate
+ * a content document, a step indirection ("!"), then the path of an element
+ * within the content document. For such a CFI, this function will retain only
+ * the content document path.
+ *
+ * [1] https://idpf.org/epub/linking/cfi/#sec-path-indirection
+ *
+ * @example
+ *   documentCFI('/6/152[;vnd.vst.idref=ch13_01]!/4/2[ch13_sec_1]') // Returns "/6/152"
+ */
+export function documentCFI(cfi: string): string {
+  const stripped = stripCFIAssertions(cfi);
+  const sepIndex = stripped.indexOf('!');
+  return sepIndex === -1 ? stripped : stripped.slice(0, sepIndex);
+}

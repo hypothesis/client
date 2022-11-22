@@ -246,6 +246,28 @@ describe('annotator/integrations/vitalsource', () => {
         throw new Error('Unknown book');
       }
     }
+
+    async getTOC() {
+      if (this._format === 'epub') {
+        const toc = [
+          {
+            cfi: '/1[foo]!/4/10',
+            title: 'Chapter one (from TOC)',
+          },
+          {
+            cfi: '/2[bar]!/2/8',
+            title: 'Chapter two (from TOC)',
+          },
+          {
+            cfi: '/4[bar]!/2/8',
+            title: 'Chapter three (from TOC)',
+          },
+        ];
+        return { ok: true, data: toc };
+      } else {
+        return { ok: false };
+      }
+    }
   }
 
   describe('VitalSourceContentIntegration', () => {
@@ -356,7 +378,7 @@ describe('annotator/integrations/vitalsource', () => {
           type: 'EPUBContentSelector',
           url: '/pages/chapter_02.xhtml',
           cfi: '/2',
-          title: 'Chapter two',
+          title: 'Chapter two (from TOC)',
         });
 
         const pageSelector = selectors.find(s => s.type === 'PageSelector');
