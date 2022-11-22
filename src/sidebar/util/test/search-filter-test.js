@@ -1,11 +1,29 @@
 import * as searchFilter from '../search-filter';
 
 describe('sidebar/util/search-filter', () => {
+  function isEmptyFilter(filter) {
+    return Object.values(filter).every(value => value.length === 0);
+  }
+
   describe('toObject', () => {
-    it('puts a simple search string under the any filter', () => {
+    it('puts a simple search string under the "any" filter', () => {
       const query = 'foo';
       const result = searchFilter.toObject(query);
       assert.equal(result.any[0], query);
+    });
+
+    it('returns an empty filter if input query is empty', () => {
+      // Verify `isEmptyFilter` returns false for non-empty query.
+      assert.isFalse(isEmptyFilter(searchFilter.toObject('some query')));
+
+      // Now check various queries which should produce empty filters
+      for (let emptyQuery of ['', '""', "''", ' ']) {
+        const result = searchFilter.toObject(emptyQuery);
+        assert.isTrue(
+          isEmptyFilter(result),
+          `expected "${emptyQuery}" to produce empty filter`
+        );
+      }
     });
 
     it('uses the filters as keys in the result object', () => {
@@ -74,6 +92,25 @@ describe('sidebar/util/search-filter', () => {
 
   describe('generateFacetedFilter', () => {
     [
+      // Empty queries.
+      {
+        query: '',
+        expectedFilter: {},
+      },
+      {
+        query: '  ',
+        expectedFilter: {},
+      },
+      {
+        query: '""',
+        expectedFilter: {},
+      },
+      {
+        query: "''",
+        expectedFilter: {},
+      },
+
+      // Simple queries without term filters.
       {
         query: 'one two three',
         expectedFilter: {
@@ -83,6 +120,8 @@ describe('sidebar/util/search-filter', () => {
           },
         },
       },
+
+      // Queries with term filters.
       {
         query: 'tag:foo tag:bar',
         expectedFilter: {
@@ -185,7 +224,7 @@ describe('sidebar/util/search-filter', () => {
     });
 
     it('filters to a focused user', () => {
-      const filter = searchFilter.generateFacetedFilter(null, {
+      const filter = searchFilter.generateFacetedFilter('', {
         user: 'fakeusername',
       });
       // Remove empty facets.
