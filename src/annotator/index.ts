@@ -13,34 +13,27 @@ import {
   PortProvider,
   installPortCloseWorkaroundForSafari,
 } from '../shared/messaging';
+import type { Destroyable } from '../types/annotator';
 import { getConfig } from './config/index';
+import type { NotebookConfig } from './components/NotebookModal';
 import { Guest } from './guest';
+import type { GuestConfig } from './guest';
 import { HypothesisInjector } from './hypothesis-injector';
+import type { InjectConfig } from './hypothesis-injector';
 import {
   VitalSourceInjector,
   vitalSourceFrameRole,
 } from './integrations/vitalsource';
 import { Notebook } from './notebook';
 import { Sidebar } from './sidebar';
+import type { SidebarConfig } from './sidebar';
 import { EventBus } from './util/emitter';
-
-/** @typedef {import('../types/annotator').Destroyable} Destroyable */
 
 // Look up the URL of the sidebar. This element is added to the page by the
 // boot script before the "annotator" bundle loads.
-const sidebarLinkElement = /** @type {HTMLLinkElement} */ (
-  document.querySelector(
-    'link[type="application/annotator+html"][rel="sidebar"]'
-  )
-);
-
-/**
- * @typedef {import('./components/NotebookModal').NotebookConfig} NotebookConfig
- * @typedef {import('./guest').GuestConfig} GuestConfig
- * @typedef {import('./hypothesis-injector').InjectConfig} InjectConfig
- * @typedef {import('./sidebar').SidebarConfig} SidebarConfig
- * @typedef {import('./sidebar').SidebarContainerConfig} SidebarContainerConfig
- */
+const sidebarLinkElement = document.querySelector(
+  'link[type="application/annotator+html"][rel="sidebar"]'
+) as HTMLLinkElement;
 
 /**
  * Entry point for the part of the Hypothesis client that runs in the page being
@@ -55,21 +48,18 @@ const sidebarLinkElement = /** @type {HTMLLinkElement} */ (
  * client is initially loaded, is also the only guest frame.
  */
 function init() {
-  const annotatorConfig = /** @type {GuestConfig & InjectConfig} */ (
-    getConfig('annotator')
-  );
+  const annotatorConfig = getConfig('annotator') as GuestConfig & InjectConfig;
 
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
-  /** @type {Destroyable[]} */
-  const destroyables = [];
+  const destroyables = [] as Destroyable[];
 
   if (hostFrame === window) {
     // Ensure port "close" notifications from eg. guest frames are delivered properly.
     const removeWorkaround = installPortCloseWorkaroundForSafari();
     destroyables.push({ destroy: removeWorkaround });
 
-    const sidebarConfig = /** @type {SidebarConfig} */ (getConfig('sidebar'));
+    const sidebarConfig = getConfig('sidebar') as SidebarConfig;
 
     const hypothesisAppsOrigin = new URL(sidebarConfig.sidebarAppUrl).origin;
     const portProvider = new PortProvider(hypothesisAppsOrigin);
@@ -79,7 +69,7 @@ function init() {
     const notebook = new Notebook(
       document.body,
       eventBus,
-      /** @type {NotebookConfig} */ (getConfig('notebook'))
+      getConfig('notebook') as NotebookConfig
     );
 
     portProvider.on('frameConnected', (source, port) =>
@@ -116,10 +106,8 @@ function init() {
 /**
  * Returns a Promise that resolves when the document has loaded (but subresources
  * may still be loading).
- *
- * @return {Promise<void>}
  */
-function documentReady() {
+function documentReady(): Promise<void> {
   return new Promise(resolve => {
     if (document.readyState !== 'loading') {
       resolve();
