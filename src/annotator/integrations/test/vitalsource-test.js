@@ -496,8 +496,14 @@ describe('annotator/integrations/vitalsource', () => {
         history.pushState({}, '', bookURI);
       });
 
-      afterEach(() => {
+      afterEach(async () => {
+        const urlChanged = new Promise(resolve => {
+          window.addEventListener('popstate', () => resolve(), { once: true });
+        });
+
         history.back();
+
+        await urlChanged;
       });
 
       context('when "book_as_single_document" flag is off', () => {
