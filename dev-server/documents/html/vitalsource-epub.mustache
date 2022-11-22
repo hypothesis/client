@@ -9,10 +9,6 @@
         font-family: sans-serif;
       }
     </style>
-    <script type="module">
-      import { MosaicBookElement } from '/scripts/vitalsource-mosaic-book-element.js';
-      customElements.define('mosaic-book', MosaicBookElement);
-    </script>
   </head>
   <body>
     <h1>Mock VitalSource EPUB book</h1>
@@ -27,7 +23,18 @@
       Gutenberg EPUB</a>.
     </p>
 
+    <button class="js-toggle-client">Unload client</button>
+
     <mosaic-book book="little-women"></mosaic-book>
+
+    <script type="module">
+      import { MosaicBookElement } from '/scripts/vitalsource-mosaic-book-element.js';
+      import { setupControls } from '/scripts/controls.js';
+
+      customElements.define('mosaic-book', MosaicBookElement);
+
+      setupControls();
+    </script>
 
     {{{hypothesisScript}}}
   </body>
