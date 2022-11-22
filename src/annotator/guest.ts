@@ -1,3 +1,5 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
@@ -119,7 +121,7 @@ export type GuestConfig = {
  * each frame connects to the sidebar and host frames as part of its
  * initialization.
  */
-export class Guest implements Annotator, Destroyable {
+export class Guest extends TinyEmitter implements Annotator, Destroyable {
   public element: HTMLElement;
 
   /** Ranges of the current text selection. */
@@ -193,6 +195,8 @@ export class Guest implements Annotator, Destroyable {
     config: GuestConfig = {},
     hostFrame: Window = window
   ) {
+    super();
+
     this.element = element;
     this._hostFrame = hostFrame;
     this._highlightsVisible = false;
@@ -400,6 +404,8 @@ export class Guest implements Annotator, Destroyable {
         this.fitSideBySide(sidebarLayout);
       }
     });
+
+    this._hostRPC.on('close', () => this.emit('hostDisconnected'));
 
     // Discover and connect to the host frame. All RPC events must be
     // registered before creating the channel.

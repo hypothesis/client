@@ -50,6 +50,12 @@ const sidebarLinkElement = document.querySelector(
 function init() {
   const annotatorConfig = getConfig('annotator') as GuestConfig & InjectConfig;
 
+  let resolveUnloadRequested = () => {};
+  const unloadRequested = new Promise<void>(resolve => {
+    resolveUnloadRequested = resolve;
+  });
+  sidebarLinkElement.addEventListener('destroy', resolveUnloadRequested);
+
   const hostFrame = annotatorConfig.subFrameIdentifier ? window.parent : window;
 
   const destroyables = [] as Destroyable[];
@@ -88,12 +94,18 @@ function init() {
       document.body,
       annotatorConfig
     );
+
     // Create the guest that handles creating annotations and displaying highlights.
     const guest = new Guest(document.body, annotatorConfig, hostFrame);
+
+    // When the client is unloaded in the host frame, also unload it from any
+    // connected iframes.
+    guest.on('hostDisconnected', resolveUnloadRequested);
+
     destroyables.push(hypothesisInjector, guest);
   }
 
-  sidebarLinkElement.addEventListener('destroy', () => {
+  unloadRequested.then(() => {
     destroyables.forEach(instance => instance.destroy());
 
     // Remove all the `<link>`, `<script>` and `<style>` elements added to the
