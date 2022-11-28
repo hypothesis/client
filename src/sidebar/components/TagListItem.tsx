@@ -1,20 +1,26 @@
 import { Link, CancelIcon } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
-/**
- * @typedef TagListItemProps
- * @prop {string} [href] - If present, tag will be linked to this URL
- * @prop {(tag: string) => void} [onRemoveTag] - Callback for deleting a tag. If
- *   present, a delete button will be provided for the tag
- * @prop {string} tag
- */
+export type TagListItemProps = {
+  /** If present, tag will be linked to this URL  */
+  href?: string;
+
+  /**
+   * Callback for deleting this tag. If present, a delete button will be
+   * rendered for the tag.
+   */
+  onRemoveTag?: (tag: string) => void;
+  tag: string;
+};
 
 /**
  * Render a single annotation tag as part of a list of tags
- *
- * @param {TagListItemProps} props
  */
-export default function TagListItem({ href, onRemoveTag, tag }) {
+export default function TagListItem({
+  href,
+  onRemoveTag,
+  tag,
+}: TagListItemProps) {
   return (
     <li className="flex items-center border rounded-sm bg-grey-0">
       <div className="grow px-1.5 py-1 touch:p-2">
