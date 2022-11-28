@@ -14,6 +14,8 @@ import {
   ListOrderedIcon,
   ListUnorderedIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import type { Ref, JSX } from 'preact';
 
 import classnames from 'classnames';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
@@ -24,44 +26,31 @@ import {
   toggleBlockStyle,
   toggleSpanStyle,
 } from '../markdown-commands';
+import type { EditorState } from '../markdown-commands';
 import { isMacOS } from '../../shared/user-agent';
 import { useArrowKeyNavigation } from '../../shared/keyboard-navigation';
 
 import MarkdownView from './MarkdownView';
 
 /**
- * @template T
- * @typedef {import('preact').RefObject<T>} Ref
- */
-
-/**
- * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
- * @typedef {import('preact').JSX.HTMLAttributes<HTMLTextAreaElement>} TextAreaAttributes
- * @typedef {import('../markdown-commands').EditorState} EditorState
- */
-
-/**
  * Toolbar commands that modify the editor state. This excludes the Help link
  * and Preview buttons.
- *
- * @typedef {'bold'|
- *   'image'|
- *   'italic'|
- *   'link'|
- *   'list' |
- *   'math'|
- *   'numlist'|
- *   'quote'
- * } Command
  */
+type Command =
+  | 'bold'
+  | 'image'
+  | 'italic'
+  | 'link'
+  | 'list'
+  | 'math'
+  | 'numlist'
+  | 'quote';
 
 /**
  * Mapping of toolbar command name to key for Ctrl+<key> keyboard shortcuts.
  * The shortcuts are taken from Stack Overflow's editor.
- *
- * @type {Record<Command, string>}
  */
-const SHORTCUT_KEYS = {
+const SHORTCUT_KEYS: Record<Command, string> = {
   bold: 'b',
   image: 'g',
   italic: 'i',
@@ -74,18 +63,17 @@ const SHORTCUT_KEYS = {
 
 /**
  * Apply a toolbar command to an editor input field.
- *
- * @param {Command} command
- * @param {HTMLInputElement|HTMLTextAreaElement} inputEl
  */
-function handleToolbarCommand(command, inputEl) {
-  /** @param {(prevState: EditorState) => EditorState} newStateFn */
-  const update = newStateFn => {
+function handleToolbarCommand(
+  command: Command,
+  inputEl: HTMLInputElement | HTMLTextAreaElement
+) {
+  const update = (newStateFn: (prevState: EditorState) => EditorState) => {
     // Apply the toolbar command to the current state of the input field.
     const newState = newStateFn({
       text: inputEl.value,
-      selectionStart: /** @type {number} */ (inputEl.selectionStart),
-      selectionEnd: /** @type {number} */ (inputEl.selectionEnd),
+      selectionStart: inputEl.selectionStart!,
+      selectionEnd: inputEl.selectionEnd!,
     });
 
     // Update the input field to match the new state.
@@ -97,8 +85,7 @@ function handleToolbarCommand(command, inputEl) {
     inputEl.focus();
   };
 
-  /** @param {EditorState} state */
-  const insertMath = state => {
+  const insertMath = (state: EditorState) => {
     const before = state.text.slice(0, state.selectionStart);
     if (
       before.length === 0 ||
@@ -141,17 +128,15 @@ function handleToolbarCommand(command, inputEl) {
   }
 }
 
-/**
- * @typedef ToolbarButtonProps
- * @prop {boolean} [disabled]
- * @prop {IconComponent} [icon]
- * @prop {string} [label]
- * @prop {(e: MouseEvent) => void} onClick
- * @prop {string} [shortcutKey]
- * @prop {string} [title]
- */
+type ToolbarButtonProps = {
+  disabled?: boolean;
+  icon?: IconComponent;
+  label?: string;
+  onClick: (e: MouseEvent) => void;
+  shortcutKey?: string;
+  title?: string;
+};
 
-/** @param {ToolbarButtonProps} props */
 function ToolbarButton({
   disabled = false,
   icon,
@@ -159,7 +144,7 @@ function ToolbarButton({
   onClick,
   shortcutKey,
   title = '',
-}) {
+}: ToolbarButtonProps) {
   const modifierKey = useMemo(() => (isMacOS() ? 'Cmd' : 'Ctrl'), []);
 
   let tooltip = title;
@@ -192,10 +177,16 @@ function ToolbarButton({
   );
 }
 
-/**
- * @param {TextAreaAttributes & { classes?: string, containerRef?: Ref<HTMLTextAreaElement> }} props
- */
-function TextArea({ classes, containerRef, ...restProps }) {
+type TextAreaProps = {
+  classes?: string;
+  containerRef?: Ref<HTMLTextAreaElement>;
+};
+
+function TextArea({
+  classes,
+  containerRef,
+  ...restProps
+}: TextAreaProps & JSX.HTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea
       className={classnames(
@@ -210,12 +201,16 @@ function TextArea({ classes, containerRef, ...restProps }) {
   );
 }
 
-/**
- * @typedef ToolbarProps
- * @prop {boolean} isPreviewing - `true` if the editor's "Preview" mode is active.
- * @prop {(a: Command) => void} onCommand - Callback invoked when a toolbar button is clicked.
- * @prop {() => void} onTogglePreview - Callback invoked when the "Preview" toggle button is clicked.
- */
+type ToolbarProps = {
+  /** Editor's "Preview" mode is active */
+  isPreviewing: boolean;
+
+  /** Callback invoked when a toolbar button is clicked */
+  onCommand: (command: Command) => void;
+
+  /** Callback invoked when the "Preview" toggle button is clicked */
+  onTogglePreview: () => void;
+};
 
 /**
  * An array of toolbar elements with a roving tab stop. Left and right
@@ -224,10 +219,8 @@ function TextArea({ classes, containerRef, ...restProps }) {
  *
  * Canonical example
  * https://www.w3.org/TR/wai-aria-practices/examples/toolbar/toolbar.html
- *
- * @param {ToolbarProps} props
  */
-function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
+function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
   const toolbarContainer = useRef(null);
   useArrowKeyNavigation(toolbarContainer);
 
@@ -327,34 +320,33 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }) {
   );
 }
 
-/**
- * @typedef MarkdownEditorProps
- * @prop {string} label - An accessible label for the input field.
- * @prop {Record<string,string>} [textStyle] -
- *   Additional CSS properties to apply to the input field and rendered preview
- * @prop {string} [text] - The markdown text to edit.
- * @prop {(text: string) => void} [onEditText]
- *   - Callback invoked with `{ text }` object when user edits text.
- *   TODO: Simplify this callback to take just a string rather than an object once the
- *   parent component is converted to Preact.
- */
+export type MarkdownEditorProps = {
+  /** An accessible label for the input field */
+  label: string;
+
+  /** Additional CSS properties to apply to the input field and rendered preview */
+  textStyle?: Record<string, string>;
+
+  /** The markdown text to edit */
+  text?: string;
+
+  onEditText?: (text: string) => void;
+};
 
 /**
  * Viewer/editor for the body of an annotation in markdown format.
- *
- * @param {MarkdownEditorProps} props
  */
 export default function MarkdownEditor({
   label = '',
   onEditText = () => {},
   text = '',
   textStyle = {},
-}) {
+}: MarkdownEditorProps) {
   // Whether the preview mode is currently active.
   const [preview, setPreview] = useState(false);
 
   // The input element where the user inputs their comment.
-  const input = useRef(/** @type {HTMLTextAreaElement|null} */ (null));
+  const input = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!preview) {
@@ -364,25 +356,23 @@ export default function MarkdownEditor({
 
   const togglePreview = () => setPreview(!preview);
 
-  /** @param {Command} command */
-  const handleCommand = command => {
+  const handleCommand = (command: Command) => {
     if (input.current) {
       handleToolbarCommand(command, input.current);
       onEditText(input.current.value);
     }
   };
 
-  /** @param {KeyboardEvent} event */
-  const handleKeyDown = event => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (!event.ctrlKey && !event.metaKey) {
       return;
     }
 
-    for (let [command, key] of Object.entries(SHORTCUT_KEYS)) {
+    for (const [command, key] of Object.entries(SHORTCUT_KEYS)) {
       if (key === event.key) {
         event.stopPropagation();
         event.preventDefault();
-        handleCommand(/** @type {Command} */ (command));
+        handleCommand(command as Command);
       }
     }
   };
@@ -412,10 +402,10 @@ export default function MarkdownEditor({
             'text-base touch:text-touch-base'
           )}
           containerRef={input}
-          onClick={e => e.stopPropagation()}
+          onClick={(e: Event) => e.stopPropagation()}
           onKeyDown={handleKeyDown}
-          onInput={e =>
-            onEditText(/** @type {HTMLTextAreaElement} */ (e.target).value)
+          onInput={(e: Event) =>
+            onEditText((e.target as HTMLInputElement).value)
           }
           value={text}
           style={textStyle}
