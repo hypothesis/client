@@ -7,10 +7,14 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
+import type { SidebarSettings } from '../../types/config';
+
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
+import type { FrameSyncService } from '../services/frame-sync';
+import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 
 import GroupList from './GroupList';
@@ -19,39 +23,38 @@ import SortMenu from './SortMenu';
 import StreamSearchInput from './StreamSearchInput';
 import UserMenu from './UserMenu';
 
-/**
- * @typedef {import('preact').ComponentChildren} Children
- * @typedef {import('../services/frame-sync').FrameSyncService} FrameSyncService
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../services/streamer').StreamerService} StreamerService
- */
+export type TopBarProps = {
+  /** Flag indicating whether the app is in a sidebar context */
+  isSidebar: boolean;
 
-/**
- * @typedef TopBarProps
- * @prop {FrameSyncService} frameSync - injected
- * @prop {boolean} isSidebar - Flag indicating whether the app is the sidebar or a top-level page.
- * @prop {() => void} onLogin - Callback invoked when user clicks "Login" button.
- * @prop {() => void} onLogout - Callback invoked when user clicks "Logout" action in account menu.
- * @prop {() => void} onSignUp - Callback invoked when user clicks "Sign up" button.
- * @prop {SidebarSettings} settings - injected
- * @prop {StreamerService} streamer - injected
- */
+  /** Callback invoked when user clicks "Login" button */
+  onLogin: () => void;
+
+  /** Callback invoked when user clicks "Logout" action in account menu */
+  onLogout: () => void;
+
+  /** Callback invoked when user clicks "Sign up" button */
+  onSignUp: () => void;
+
+  // injected
+  frameSync: FrameSyncService;
+  settings: SidebarSettings;
+  streamer: StreamerService;
+};
 
 /**
  * The toolbar which appears at the top of the sidebar providing actions
  * to switch groups, view account information, sort/filter annotations etc.
- *
- * @param {TopBarProps} props
  */
 function TopBar({
-  frameSync,
   isSidebar,
   onLogin,
   onLogout,
   onSignUp,
+  frameSync,
   settings,
   streamer,
-}) {
+}: TopBarProps) {
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
 
