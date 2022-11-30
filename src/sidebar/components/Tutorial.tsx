@@ -72,7 +72,7 @@ function Tutorial({ settings }: TutorialProps) {
           >
             join link
           </Link>
-          ).
+          .
         </li>
       )}
       <li>
