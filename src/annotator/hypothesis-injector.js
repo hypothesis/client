@@ -62,7 +62,9 @@ function hasHypothesis(iframe) {
  */
 export function removeTemporaryClientConfig(document_ = document) {
   const tempConfigEls = Array.from(
-    document_.querySelectorAll('script.js-temp-config')
+    document_.querySelectorAll(
+      'script.js-hypothesis-config[data-remove-on-unload]'
+    )
   );
   tempConfigEls.forEach(el => el.remove());
 }
@@ -114,7 +116,8 @@ export async function injectClient(frame, config, frameId) {
   };
 
   const configElement = document.createElement('script');
-  configElement.className = 'js-hypothesis-config js-temp-config';
+  configElement.className = 'js-hypothesis-config';
+  configElement.setAttribute('data-remove-on-unload', '');
   configElement.type = 'application/json';
   configElement.innerText = JSON.stringify(injectedConfig);
 
