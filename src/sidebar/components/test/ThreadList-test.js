@@ -317,7 +317,7 @@ describe('ThreadList', () => {
   });
 
   describe('chapter headings', () => {
-    const addThread = (cfi, title) => {
+    const addThreadInChapter = (cfi, title) => {
       const id = `t${fakeTopThread.children.length + 1}`;
       const thread = createThread(id);
       thread.annotation.target[0].selector = [
@@ -341,15 +341,15 @@ describe('ThreadList', () => {
 
     it('renders section headings above first annotation from each section', () => {
       // Add two groups of annotations.
-      addThread('/2/4', 'Chapter One');
-      addThread('/2/4', 'Chapter One');
-      addThread('/2/6', 'Chapter Two');
-      addThread('/2/6', 'Chapter Two');
+      addThreadInChapter('/2/4', 'Chapter One');
+      addThreadInChapter('/2/4', 'Chapter One');
+      addThreadInChapter('/2/6', 'Chapter Two');
+      addThreadInChapter('/2/6', 'Chapter Two');
 
       // When annotations are sorted by date, rather than location, headings
       // may be repeated.
-      addThread('/2/4', 'Chapter One');
-      addThread('/2/4', 'Chapter One');
+      addThreadInChapter('/2/4', 'Chapter One');
+      addThreadInChapter('/2/4', 'Chapter One');
 
       const wrapper = createComponent();
 
@@ -365,12 +365,12 @@ describe('ThreadList', () => {
 
     it('uses last non-empty heading for each chapter', () => {
       // Add annotations for same chapter but with different captured headings.
-      addThread('/2/4', 'Chapter 1');
-      addThread('/2/4', 'Chapter One');
-      addThread('/2/4', undefined);
+      addThreadInChapter('/2/4', 'Chapter 1');
+      addThreadInChapter('/2/4', 'Chapter One');
+      addThreadInChapter('/2/4', undefined);
 
       // Add an annotation for a different chapter with no associated heading.
-      addThread('/2/8', undefined);
+      addThreadInChapter('/2/8', undefined);
 
       const wrapper = createComponent();
 
