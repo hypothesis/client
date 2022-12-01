@@ -26,8 +26,8 @@ describe('ThreadList', () => {
     return wrapper;
   }
 
-  function createThread(tag) {
-    const target = [
+  function createThread(tag, target) {
+    const defaultTarget = [
       {
         source: 'https://example.com',
       },
@@ -35,7 +35,7 @@ describe('ThreadList', () => {
     return {
       id: tag,
       children: [],
-      annotation: { $tag: tag, target },
+      annotation: { $tag: tag, target: target ?? defaultTarget },
     };
   }
 
@@ -61,7 +61,10 @@ describe('ThreadList', () => {
         createThread('t1'),
         createThread('t2'),
         createThread('t3'),
-        createThread('t4'),
+
+        // Add an annotation with an empty target. This matches how new
+        // (but not saved) page notes are currently created.
+        createThread('t4', []),
       ],
     };
 

@@ -39,7 +39,15 @@ export type ThreadListProps = {
  * belongs to.
  */
 function getSegmentSelector(ann: Annotation): EPUBContentSelector | undefined {
-  return ann.target[0].selector?.find(s => s.type === 'EPUBContentSelector') as
+  const target = ann.target[0];
+  if (!target) {
+    // Page Notes that have just been created do not have a target. All saved
+    // annotations and new annotations/highlights do.
+    //
+    // FIXME - Fix this inconsistency for page notes.
+    return undefined;
+  }
+  return target.selector?.find(s => s.type === 'EPUBContentSelector') as
     | EPUBContentSelector
     | undefined;
 }
