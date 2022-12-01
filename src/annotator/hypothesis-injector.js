@@ -58,7 +58,8 @@ function hasHypothesis(iframe) {
 }
 
 /**
- * Remove the temporary configuration data added to a document by {@link injectClient}.
+ * Remove the temporary client configuration added to a document by
+ * {@link injectClient} or {@link HypothesisInjector}.
  */
 export function removeTemporaryClientConfig(document_ = document) {
   const tempConfigEls = Array.from(
