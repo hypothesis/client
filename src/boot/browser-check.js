@@ -13,8 +13,7 @@ export function isBrowserSupported() {
   // a falsey value if they fail.
   const checks = [
     // ES APIs.
-    () => Promise.resolve(),
-    () => new Map(),
+    () => Object.fromEntries([]),
 
     // DOM API checks for frequently-used APIs.
     () => new URL(document.location.href), // URL constructor.
