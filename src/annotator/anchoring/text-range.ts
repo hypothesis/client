@@ -149,7 +149,14 @@ export class TextPosition {
     offset: number;
   } {
     try {
-      return resolveOffsets(this.element, this.offset)[0];
+      const results = resolveOffsets(this.element, this.offset)[0];
+      if (
+        options.direction === ResolveDirection.BACKWARDS &&
+        results.offset === 0
+      ) {
+        throw new RangeError('Text node at end of range has no selected text');
+      }
+      return results;
     } catch (err) {
       if (this.offset === 0 && options.direction !== undefined) {
         const tw = document.createTreeWalker(
