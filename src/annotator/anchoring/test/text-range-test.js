@@ -1,9 +1,4 @@
-import {
-  TextPosition,
-  TextRange,
-  RESOLVE_FORWARDS,
-  RESOLVE_BACKWARDS,
-} from '../text-range';
+import { TextPosition, TextRange, ResolveDirection } from '../text-range';
 
 import { assertNodesEqual } from '../../../test-util/compare-dom';
 
@@ -114,13 +109,15 @@ describe('annotator/anchoring/text-range', () => {
         });
       });
 
-      describe('when `direction` is `RESOLVE_FORWARDS`', () => {
+      describe('when resolve `direction` is `FORWARDS`', () => {
         it('resolves to next text node if needed', () => {
           const el = document.createElement('div');
           el.innerHTML = '<b></b>bar';
 
           const pos = new TextPosition(el.querySelector('b'), 0);
-          const resolved = pos.resolve({ direction: RESOLVE_FORWARDS });
+          const resolved = pos.resolve({
+            direction: ResolveDirection.FORWARDS,
+          });
 
           assert.equal(resolved.node, el.childNodes[1]);
           assert.equal(resolved.offset, 0);
@@ -130,18 +127,20 @@ describe('annotator/anchoring/text-range', () => {
           const el = document.createElement('div');
           const pos = new TextPosition(el, 0);
           assert.throws(() => {
-            pos.resolve({ direction: RESOLVE_FORWARDS });
+            pos.resolve({ direction: ResolveDirection.FORWARDS });
           });
         });
       });
 
-      describe('when `direction` is `RESOLVE_BACKWARDS`', () => {
+      describe('when resolve `direction` is `BACKWARDS`', () => {
         it('resolves to previous text node if needed', () => {
           const el = document.createElement('div');
           el.innerHTML = 'bar<b></b>';
 
           const pos = new TextPosition(el.querySelector('b'), 0);
-          const resolved = pos.resolve({ direction: RESOLVE_BACKWARDS });
+          const resolved = pos.resolve({
+            direction: ResolveDirection.BACKWARDS,
+          });
 
           assert.equal(resolved.node, el.childNodes[0]);
           assert.equal(resolved.offset, el.childNodes[0].data.length);
@@ -151,7 +150,7 @@ describe('annotator/anchoring/text-range', () => {
           const el = document.createElement('div');
           const pos = new TextPosition(el, 0);
           assert.throws(() => {
-            pos.resolve({ direction: RESOLVE_BACKWARDS });
+            pos.resolve({ direction: ResolveDirection.BACKWARDS });
           });
         });
       });
