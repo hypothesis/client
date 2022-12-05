@@ -1,16 +1,14 @@
 /**
  * Return the combined length of text nodes contained in `node`.
- *
- * @param {Node} node
  */
-function nodeTextLength(node) {
+function nodeTextLength(node: Node): number {
   switch (node.nodeType) {
     case Node.ELEMENT_NODE:
     case Node.TEXT_NODE:
       // nb. `textContent` excludes text in comments and processing instructions
       // when called on a parent element, so we don't need to subtract that here.
 
-      return /** @type {string} */ (node.textContent).length;
+      return node.textContent?.length ?? 0;
     default:
       return 0;
   }
@@ -18,10 +16,8 @@ function nodeTextLength(node) {
 
 /**
  * Return the total length of the text of all previous siblings of `node`.
- *
- * @param {Node} node
  */
-function previousSiblingsTextLength(node) {
+function previousSiblingsTextLength(node: Node): number {
   let sibling = node.previousSibling;
   let length = 0;
   while (sibling) {
@@ -32,33 +28,37 @@ function previousSiblingsTextLength(node) {
 }
 
 /**
- * Resolve one or more character offsets within an element to (text node, position)
- * pairs.
+ * Resolve one or more character offsets within an element to (text node,
+ * position) pairs.
  *
- * @param {Element} element
- * @param {number[]} offsets - Offsets, which must be sorted in ascending order
- * @return {{ node: Text, offset: number }[]}
+ * @param element
+ * @param offsets - Offsets, which must be sorted in ascending order
+ * @throws {RangeError}
  */
-function resolveOffsets(element, ...offsets) {
+function resolveOffsets(
+  element: Element,
+  ...offsets: number[]
+): Array<{ node: Text; offset: number }> {
   let nextOffset = offsets.shift();
-  const nodeIter = /** @type {Document} */ (
-    element.ownerDocument
-  ).createNodeIterator(element, NodeFilter.SHOW_TEXT);
+  const nodeIter = element.ownerDocument.createNodeIterator(
+    element,
+    NodeFilter.SHOW_TEXT
+  );
   const results = [];
 
-  let currentNode = nodeIter.nextNode();
+  let currentNode = nodeIter.nextNode() as Text | null;
   let textNode;
   let length = 0;
 
   // Find the text node containing the `nextOffset`th character from the start
   // of `element`.
   while (nextOffset !== undefined && currentNode) {
-    textNode = /** @type {Text} */ (currentNode);
+    textNode = currentNode;
     if (length + textNode.data.length > nextOffset) {
       results.push({ node: textNode, offset: nextOffset - length });
       nextOffset = offsets.shift();
     } else {
-      currentNode = nodeIter.nextNode();
+      currentNode = nodeIter.nextNode() as Text | null;
       length += textNode.data.length;
     }
   }
@@ -76,8 +76,14 @@ function resolveOffsets(element, ...offsets) {
   return results;
 }
 
-export let RESOLVE_FORWARDS = 1;
-export let RESOLVE_BACKWARDS = 2;
+/**
+ * When resolving a TextPosition, specifies the direction to search for the
+ * nearest text node if `offset` is `0` and the element has no text.
+ */
+export enum ResolveDirection {
+  FORWARDS = 1,
+  BACKWARDS,
+}
 
 /**
  * Represents an offset within the text content of an element.
@@ -86,14 +92,10 @@ export let RESOLVE_BACKWARDS = 2;
  * DOM subtree of the element using the `resolve` method.
  */
 export class TextPosition {
-  /**
-   * Construct a `TextPosition` that refers to the text position `offset` within
-   * the text content of `element`.
-   *
-   * @param {Element} element
-   * @param {number} offset
-   */
-  constructor(element, offset) {
+  public element: Element;
+  public offset: number;
+
+  constructor(element: Element, offset: number) {
     if (offset < 0) {
       throw new Error('Offset is invalid');
     }
@@ -109,10 +111,9 @@ export class TextPosition {
    * Return a copy of this position with offset relative to a given ancestor
    * element.
    *
-   * @param {Element} parent - Ancestor of `this.element`
-   * @return {TextPosition}
+   * @param parent - Ancestor of `this.element`
    */
-  relativeTo(parent) {
+  relativeTo(parent: Element): TextPosition {
     if (!parent.contains(this.element)) {
       throw new Error('Parent is not an ancestor of current element');
     }
@@ -121,7 +122,7 @@ export class TextPosition {
     let offset = this.offset;
     while (el !== parent) {
       offset += previousSiblingsTextLength(el);
-      el = /** @type {Element} */ (el.parentElement);
+      el = el.parentElement!;
     }
 
     return new TextPosition(el, offset);
@@ -137,15 +138,17 @@ export class TextPosition {
    * Offsets at the boundary between two nodes are resolved to the start of the
    * node that begins at the boundary.
    *
-   * @param {object} [options]
-   *   @param {RESOLVE_FORWARDS|RESOLVE_BACKWARDS} [options.direction] -
-   *     Specifies in which direction to search for the nearest text node if
-   *     `this.offset` is `0` and `this.element` has no text. If not specified
-   *     an error is thrown.
-   * @return {{ node: Text, offset: number }}
+   * @param options.direction - Specifies in which direction to search for the
+   *                            nearest text node if `this.offset` is `0` and
+   *                            `this.element` has no text. If not specified an
+   *                            error is thrown.
+   *
    * @throws {RangeError}
    */
-  resolve(options = {}) {
+  resolve(options: { direction?: ResolveDirection } = {}): {
+    node: Text;
+    offset: number;
+  } {
     try {
       return resolveOffsets(this.element, this.offset)[0];
     } catch (err) {
@@ -155,10 +158,10 @@ export class TextPosition {
           NodeFilter.SHOW_TEXT
         );
         tw.currentNode = this.element;
-        const forwards = options.direction === RESOLVE_FORWARDS;
-        const text = /** @type {Text|null} */ (
-          forwards ? tw.nextNode() : tw.previousNode()
-        );
+        const forwards = options.direction === ResolveDirection.FORWARDS;
+        const text = forwards
+          ? (tw.nextNode() as Text | null)
+          : (tw.previousNode() as Text | null);
         if (!text) {
           throw err;
         }
@@ -172,17 +175,13 @@ export class TextPosition {
   /**
    * Construct a `TextPosition` that refers to the `offset`th character within
    * `node`.
-   *
-   * @param {Node} node
-   * @param {number} offset
-   * @return {TextPosition}
    */
-  static fromCharOffset(node, offset) {
+  static fromCharOffset(node: Node, offset: number): TextPosition {
     switch (node.nodeType) {
       case Node.TEXT_NODE:
         return TextPosition.fromPoint(node, offset);
       case Node.ELEMENT_NODE:
-        return new TextPosition(/** @type {Element} */ (node), offset);
+        return new TextPosition(node as Element, offset);
       default:
         throw new Error('Node is not an element or text node');
     }
@@ -191,14 +190,13 @@ export class TextPosition {
   /**
    * Construct a `TextPosition` representing the range start or end point (node, offset).
    *
-   * @param {Node} node - Text or Element node
-   * @param {number} offset - Offset within the node.
-   * @return {TextPosition}
+   * @param node
+   * @param offset - Offset within the node
    */
-  static fromPoint(node, offset) {
+  static fromPoint(node: Node, offset: number): TextPosition {
     switch (node.nodeType) {
       case Node.TEXT_NODE: {
-        if (offset < 0 || offset > /** @type {Text} */ (node).data.length) {
+        if (offset < 0 || offset > (node as Text).data.length) {
           throw new Error('Text node offset is out of range');
         }
 
@@ -222,7 +220,7 @@ export class TextPosition {
           textOffset += nodeTextLength(node.childNodes[i]);
         }
 
-        return new TextPosition(/** @type {Element} */ (node), textOffset);
+        return new TextPosition(node as Element, textOffset);
       }
       default:
         throw new Error('Point is not in an element or text node');
@@ -238,24 +236,20 @@ export class TextPosition {
  * of the range itself.
  */
 export class TextRange {
-  /**
-   * Construct an immutable `TextRange` from a `start` and `end` point.
-   *
-   * @param {TextPosition} start
-   * @param {TextPosition} end
-   */
-  constructor(start, end) {
+  public start: TextPosition;
+  public end: TextPosition;
+
+  constructor(start: TextPosition, end: TextPosition) {
     this.start = start;
     this.end = end;
   }
 
   /**
-   * Return a copy of this range with start and end positions relative to a
-   * given ancestor. See `TextPosition.relativeTo`.
-   *
-   * @param {Element} element
+   * Create a new TextRange whose `start` and `end` are computed relative to
+   * `element`. `element` must be an ancestor of both `start.element` and
+   * `end.element`.
    */
-  relativeTo(element) {
+  relativeTo(element: Element): TextRange {
     return new TextRange(
       this.start.relativeTo(element),
       this.end.relativeTo(element)
@@ -263,17 +257,15 @@ export class TextRange {
   }
 
   /**
-   * Resolve the `TextRange` to a DOM range.
+   * Resolve this TextRange to a (DOM) Range.
    *
    * The resulting DOM Range will always start and end in a `Text` node.
    * Hence `TextRange.fromRange(range).toRange()` can be used to "shrink" a
    * range to the text it contains.
    *
    * May throw if the `start` or `end` positions cannot be resolved to a range.
-   *
-   * @return {Range}
    */
-  toRange() {
+  toRange(): Range {
     let start;
     let end;
 
@@ -288,8 +280,10 @@ export class TextRange {
         this.end.offset
       );
     } else {
-      start = this.start.resolve({ direction: RESOLVE_FORWARDS });
-      end = this.end.resolve({ direction: RESOLVE_BACKWARDS });
+      start = this.start.resolve({
+        direction: ResolveDirection.FORWARDS,
+      });
+      end = this.end.resolve({ direction: ResolveDirection.BACKWARDS });
     }
 
     const range = new Range();
@@ -299,12 +293,9 @@ export class TextRange {
   }
 
   /**
-   * Convert an existing DOM `Range` to a `TextRange`
-   *
-   * @param {Range} range
-   * @return {TextRange}
+   * Create a TextRange from a (DOM) Range
    */
-  static fromRange(range) {
+  static fromRange(range: Range): TextRange {
     const start = TextPosition.fromPoint(
       range.startContainer,
       range.startOffset
@@ -314,13 +305,10 @@ export class TextRange {
   }
 
   /**
-   * Return a `TextRange` from the `start`th to `end`th characters in `root`.
-   *
-   * @param {Element} root
-   * @param {number} start
-   * @param {number} end
+   * Create a TextRange representing the `start`th to `end`th characters in
+   * `root`
    */
-  static fromOffsets(root, start, end) {
+  static fromOffsets(root: Element, start: number, end: number): TextRange {
     return new TextRange(
       new TextPosition(root, start),
       new TextPosition(root, end)
