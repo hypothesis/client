@@ -280,6 +280,7 @@ function TagEditor({
           aria-autocomplete="list"
           aria-activedescendant={activeDescendant}
           aria-controls={`${tagEditorId}-AutocompleteList`}
+          aria-label="Add tags"
           dir="auto"
         />
         <AutocompleteList
