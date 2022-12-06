@@ -7,32 +7,36 @@ import {
   PlusIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
+import type { ComponentChildren } from 'preact';
+
+import type { SidebarSettings } from '../../types/config';
+import type { TabName } from '../../types/sidebar';
 
 import { applyTheme } from '../helpers/theme';
+import type { AnnotationsService } from '../services/annotations';
 import { withServices } from '../service-context';
 import { useSidebarStore } from '../store';
 
-/**
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../../types/sidebar').TabName} TabName
- */
+type TabProps = {
+  children: ComponentChildren;
 
-/**
- * @typedef {import('preact').ComponentChildren} Children
- *
- * @typedef TabProps
- * @prop {Children} children
- * @prop {number} count - The total annotations for this tab
- * @prop {boolean} isSelected - Is this tab currently selected?
- * @prop {boolean} isWaitingToAnchor - Are there any annotations still waiting to anchor?
- * @prop {string} label - A string label to use for a11y
- * @prop {() => void} onSelect - Callback to invoke when this tab is selected
- */
+  /** The total number of annotations for this tab */
+  count: number;
+
+  /** Is this tab the currently-active tab? */
+  isSelected: boolean;
+
+  /** Are there any annotations still waiting to anchor? */
+  isWaitingToAnchor: boolean;
+
+  label: string;
+
+  /** Callback to invoke when this tab is selected */
+  onSelect: () => void;
+};
 
 /**
  * Display name of the tab and annotation count
- *
- * @param {TabProps} props
  */
 function Tab({
   children,
@@ -41,7 +45,7 @@ function Tab({
   isSelected,
   label,
   onSelect,
-}) {
+}: TabProps) {
   const selectTab = () => {
     if (!isSelected) {
       onSelect();
@@ -52,13 +56,13 @@ function Tab({
 
   return (
     <LinkButton
-      classes={classnames('!inline bg-transparent min-w-[5.25rem]', {
+      classes={classnames('bg-transparent min-w-[5.25rem]', {
         'font-bold': isSelected,
       })}
+      color="text"
       // Listen for `onMouseDown` so that the tab is selected when _pressed_
       // as this makes the UI feel faster. Also listen for `onClick` as a fallback
       // to enable selecting the tab via other input methods.
-      color="text"
       onClick={selectTab}
       onMouseDown={selectTab}
       pressed={!!isSelected}
@@ -79,19 +83,23 @@ function Tab({
   );
 }
 
-/**
- * @typedef SelectionTabsProps
- * @prop {boolean} isLoading - Are we waiting on any annotations from the server?
- * @prop {SidebarSettings} settings - Injected service.
- * @prop {import('../services/annotations').AnnotationsService} annotationsService
- */
+export type SelectionTabProps = {
+  /** Are we waiting on any annotations from the server? */
+  isLoading: boolean;
+
+  // injected
+  settings: SidebarSettings;
+  annotationsService: AnnotationsService;
+};
 
 /**
  * Tabbed display of annotations and notes
- *
- * @param {SelectionTabsProps} props
  */
-function SelectionTabs({ annotationsService, isLoading, settings }) {
+function SelectionTabs({
+  annotationsService,
+  isLoading,
+  settings,
+}: SelectionTabProps) {
   const store = useSidebarStore();
   const selectedTab = store.selectedTab();
   const noteCount = store.noteCount();
@@ -99,10 +107,7 @@ function SelectionTabs({ annotationsService, isLoading, settings }) {
   const orphanCount = store.orphanCount();
   const isWaitingToAnchorAnnotations = store.isWaitingToAnchorAnnotations();
 
-  /**
-   * @param {TabName} tabId
-   */
-  const selectTab = tabId => {
+  const selectTab = (tabId: TabName) => {
     store.clearSelection();
     store.selectTab(tabId);
   };
