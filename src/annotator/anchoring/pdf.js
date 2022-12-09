@@ -219,17 +219,19 @@ export async function createTextLayerForPage(pageIndex) {
   });
   const items = textContent.items;
 
-  debugger;
+  // TODO - Check that `pageWidth` and `pageHeight` are width/height rather
+  // than right/bottom coords.
+  const viewBox = pageView.viewport.viewBox;
+  const [, , pageWidth, pageHeight] = viewBox;
 
-  // TODO - Map word coordinates into the range `[0, 1]` and flip the Y axis.
   const wordBoxes = [];
 
   for (let item of items) {
-    const [sx, , , sy, tx, ty] = item.transform;
-    const x = tx;
-    const y = ty;
-    const width = item.width;
-    const height = item.height;
+    const [, , , , tx, ty] = item.transform;
+    const x = tx / pageWidth;
+    const y = (pageHeight - ty - item.height) / pageHeight;
+    const width = item.width / pageWidth;
+    const height = item.height / pageHeight;
     const wordRect = new DOMRect(x, y, width, height);
     wordBoxes.push({
       text: item.str,
@@ -238,13 +240,23 @@ export async function createTextLayerForPage(pageIndex) {
   }
 
   const pageContainer = document.querySelector(
-    `.page[data-page-number="${pageIndex}"]`
+    `.page[data-page-number="${pageIndex + 1}"]`
   );
+  if (!pageContainer) {
+    console.warn('Page container not found for page', pageIndex);
+    return null;
+  }
+
   const pageCanvas = pageContainer?.querySelector('canvas');
   if (!pageCanvas) {
-    console.warn('Page canvas not found', pageCanvas);
+    console.warn('Page canvas not found for page', pageIndex);
     return null;
-    // throw new Error('Unable to find page canvas');
+  }
+
+  // Prevent selection in PDF.js's own text layer.
+  const builtinTextLayer = pageContainer.querySelector('.textLayer');
+  if (builtinTextLayer) {
+    builtinTextLayer.style.display = 'none';
   }
 
   const textLayer = new ImageTextLayer(pageCanvas, { wordBoxes });
