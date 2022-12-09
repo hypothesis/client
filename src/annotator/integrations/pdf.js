@@ -7,6 +7,7 @@ import {
   RenderingStates,
   anchor,
   canDescribe,
+  createTextLayerForPage,
   describe,
   documentHasText,
 } from '../anchoring/pdf';
@@ -330,6 +331,7 @@ export class PDFIntegration extends TinyEmitter {
           // rendered. Remove this, which will cause the annotations to anchor
           // again, below.
           removePlaceholder(page.div);
+          createTextLayerForPage(pageIndex);
           break;
       }
     }
