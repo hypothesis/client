@@ -10,7 +10,7 @@ babel==2.10.3
     # via sphinx
 build==0.8.0
     # via pip-tools
-certifi==2022.6.15
+certifi==2022.12.7
     # via requests
 charset-normalizer==2.1.0
     # via requests
@@ -46,7 +46,7 @@ mdit-py-plugins==0.3.0
 mdurl==0.1.1
     # via markdown-it-py
 myst-parser==0.18.0
-    # via -r requirements/docs.in
+    # via -r docs.in
 packaging==21.3
     # via
     #   build
@@ -54,10 +54,10 @@ packaging==21.3
 pep517==0.13.0
     # via build
 pip-sync-faster==0.0.2
-    # via -r requirements/docs.in
+    # via -r docs.in
 pip-tools==6.8.0
     # via
-    #   -r requirements/docs.in
+    #   -r docs.in
     #   pip-sync-faster
 pygments==2.12.0
     # via sphinx
@@ -75,14 +75,14 @@ snowballstemmer==2.2.0
     # via sphinx
 sphinx==5.1.1
     # via
-    #   -r requirements/docs.in
+    #   -r docs.in
     #   myst-parser
     #   sphinx-autobuild
     #   sphinx-rtd-theme
 sphinx-autobuild==2021.3.14
-    # via -r requirements/docs.in
+    # via -r docs.in
 sphinx-rtd-theme==1.0.0
-    # via -r requirements/docs.in
+    # via -r docs.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
