@@ -63,7 +63,7 @@ describe('ToastMessages', () => {
     $imports.$restore();
   });
 
-  it('should render a `ToastMessage` for each message returned by the store', () => {
+  it('should render a `ToastMessageItem` for each message returned by the store', () => {
     fakeStore.getToastMessages.returns([
       fakeSuccessMessage(),
       fakeErrorMessage(),
@@ -72,16 +72,16 @@ describe('ToastMessages', () => {
 
     const wrapper = createComponent();
 
-    assert.lengthOf(wrapper.find('ToastMessage'), 3);
+    assert.lengthOf(wrapper.find('ToastMessageItem'), 3);
   });
 
-  describe('`ToastMessage` sub-component', () => {
+  describe('`ToastMessageItem` sub-component', () => {
     it('should dismiss the message when clicked', () => {
       fakeStore.getToastMessages.returns([fakeSuccessMessage()]);
 
       const wrapper = createComponent();
 
-      const messageContainer = wrapper.find('ToastMessage').getDOMNode();
+      const messageContainer = wrapper.find('ToastMessageItem').getDOMNode();
 
       act(() => {
         messageContainer.dispatchEvent(new Event('click'));
@@ -97,7 +97,7 @@ describe('ToastMessages', () => {
 
       const wrapper = createComponent();
 
-      const messageContainer = wrapper.find('ToastMessage').getDOMNode();
+      const messageContainer = wrapper.find('ToastMessageItem').getDOMNode();
       assert.include(messageContainer.className, 'sr-only');
     });
 
