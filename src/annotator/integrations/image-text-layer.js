@@ -195,7 +195,9 @@ export class ImageTextLayer {
     container.style.position = 'absolute';
     container.style.top = '0';
     container.style.left = '0';
-    container.style.color = 'transparent';
+
+    // TESTING
+    container.style.color = 'red';
 
     // Prevent inherited text alignment from affecting positioning.
     // VitalSource sets `text-align: center` for example.
