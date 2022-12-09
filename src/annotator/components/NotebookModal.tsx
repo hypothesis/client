@@ -4,28 +4,26 @@ import classnames from 'classnames';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';
+import type { EventBus, Emitter } from '../util/emitter';
 
 /**
  * Configuration used to launch the notebook application.
  *
  * This includes the URL for the iframe and configuration to pass to the
  * application on launch.
- *
- * @typedef {{ notebookAppUrl: string } & Record<string, unknown>} NotebookConfig
  */
+export type NotebookConfig = {
+  notebookAppUrl: string;
+} & Record<string, unknown>;
 
-/**
- * @typedef NotebookIframeProps
- * @prop {NotebookConfig} config
- * @prop {string} groupId
- */
-
+type NotebookIframeProps = {
+  config: NotebookConfig;
+  groupId: string;
+};
 /**
  * Create the iframe that will load the notebook application.
- *
- * @param {NotebookIframeProps} props
  */
-function NotebookIframe({ config, groupId }) {
+function NotebookIframe({ config, groupId }: NotebookIframeProps) {
   const notebookAppSrc = addConfigFragment(config.notebookAppUrl, {
     ...createAppConfig(config.notebookAppUrl, config),
 
@@ -47,30 +45,27 @@ function NotebookIframe({ config, groupId }) {
     />
   );
 }
-
-/** @typedef {import('../util/emitter').Emitter} Emitter */
-
-/**
- * @typedef NotebookModalProps
- * @prop {import('../util/emitter').EventBus} eventBus
- * @prop {NotebookConfig} config
- */
+export type NotebookModalProps = {
+  eventBus: EventBus;
+  config: NotebookConfig;
+};
 
 /**
  * Create a modal component that hosts (1) the notebook iframe and (2) a button to close the modal.
- *
- * @param {NotebookModalProps} props
  */
-export default function NotebookModal({ eventBus, config }) {
+export default function NotebookModal({
+  eventBus,
+  config,
+}: NotebookModalProps) {
   // Temporary solution: while there is no mechanism to sync new annotations in
   // the notebook, we force re-rendering of the iframe on every 'openNotebook'
   // event, so that the new annotations are displayed.
   // https://github.com/hypothesis/client/issues/3182
   const [iframeKey, setIframeKey] = useState(0);
   const [isHidden, setIsHidden] = useState(true);
-  const [groupId, setGroupId] = useState(/** @type {string|null} */ (null));
+  const [groupId, setGroupId] = useState<string | null>(null);
   const originalDocumentOverflowStyle = useRef('');
-  const emitterRef = useRef(/** @type {Emitter|null} */ (null));
+  const emitterRef = useRef<Emitter | null>(null);
 
   // Stores the original overflow CSS property of document.body and reset it
   // when the component is destroyed
@@ -94,7 +89,7 @@ export default function NotebookModal({ eventBus, config }) {
 
   useEffect(() => {
     const emitter = eventBus.createEmitter();
-    emitter.subscribe('openNotebook', (/** @type {string} */ groupId) => {
+    emitter.subscribe('openNotebook', (groupId: string) => {
       setIsHidden(false);
       setIframeKey(iframeKey => iframeKey + 1);
       setGroupId(groupId);
