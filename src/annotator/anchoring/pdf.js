@@ -208,7 +208,7 @@ const textLayers = new Map();
  *
  * @param {number} pageIndex
  */
-async function createTextLayerForPage(pageIndex) {
+export async function createTextLayerForPage(pageIndex) {
   if (textLayers.has(pageIndex)) {
     return textLayers.get(pageIndex);
   }
@@ -219,28 +219,35 @@ async function createTextLayerForPage(pageIndex) {
   });
   const items = textContent.items;
 
-  const charBoxes = [];
-  let text = '';
+  debugger;
+
+  // TODO - Map word coordinates into the range `[0, 1]` and flip the Y axis.
+  const wordBoxes = [];
 
   for (let item of items) {
-    const x = 0;
-    const y = 0;
-    const width = 0;
-    const height = 0;
+    const [sx, , , sy, tx, ty] = item.transform;
+    const x = tx;
+    const y = ty;
+    const width = item.width;
+    const height = item.height;
     const wordRect = new DOMRect(x, y, width, height);
-    for (let i=0; i < item.str.length; i++) {
-      charBoxes.push(wordRect);
-    }
-    text += item.str;
+    wordBoxes.push({
+      text: item.str,
+      rect: wordRect,
+    });
   }
 
-  const pageContainer = document.querySelector(`.page[data-page-number=${pageIndex}]`);
+  const pageContainer = document.querySelector(
+    `.page[data-page-number="${pageIndex}"]`
+  );
   const pageCanvas = pageContainer?.querySelector('canvas');
   if (!pageCanvas) {
-    throw new Error('Unable to find page canvas');
+    console.warn('Page canvas not found', pageCanvas);
+    return null;
+    // throw new Error('Unable to find page canvas');
   }
 
-  const textLayer = new ImageTextLayer(pageCanvas, charBoxes, text);
+  const textLayer = new ImageTextLayer(pageCanvas, { wordBoxes });
   textLayers.set(pageIndex, textLayer);
   return textLayer;
 }
