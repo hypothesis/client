@@ -27,20 +27,10 @@ import {
  */
 
 /**
- * Group characters in a page into words, lines and columns.
- *
- * The input is assumed to be _roughly_ reading order, more so at the low (word,
- * line) level. When the input is not in reading order, the output may be
- * divided into more lines / columns than expected. Downstream code is expected
- * to tolerate over-segmentation. This function should try to avoid producing
- * lines or columns that significantly intersect, as this can impair text
- * selection.
- *
- * @param {DOMRect[]} charBoxes - Bounding rectangle associated with each character on the page
- * @param {string} text - Text that corresponds to `charBoxes`
- * @return {ColumnBox[]}
+ * @param {DOMRect[]} charBoxes
+ * @param {string} text
  */
-function analyzeLayout(charBoxes, text) {
+function wordsFromChars(charBoxes, text) {
   /** @type {WordBox[]} */
   const words = [];
 
@@ -69,6 +59,23 @@ function analyzeLayout(charBoxes, text) {
   }
   addWord();
 
+  return words;
+}
+
+/**
+ * Group characters in a page into words, lines and columns.
+ *
+ * The input is assumed to be _roughly_ reading order, more so at the low (word,
+ * line) level. When the input is not in reading order, the output may be
+ * divided into more lines / columns than expected. Downstream code is expected
+ * to tolerate over-segmentation. This function should try to avoid producing
+ * lines or columns that significantly intersect, as this can impair text
+ * selection.
+ *
+ * @param {WordBox[]} words
+ * @return {ColumnBox[]}
+ */
+function analyzeLayout(words) {
   /** @type {LineBox[]} */
   const lines = [];
 
@@ -148,6 +155,15 @@ function analyzeLayout(charBoxes, text) {
 }
 
 /**
+ * @typedef ImageTextLayerInit
+ * @prop {DOMRect[]} [charBoxes] - Bounding boxes for chars in the image.
+ *   Coordinates should be in the range [0-1], where 0 is the top/left corner
+ *   of the image and 1 is the bottom right.
+ * @prop {string} [text] - Characters in the image corresponding to `charBoxes`
+ * @prop {WordBox[]} [wordBoxes] - Bounding boxes for words in the image.
+ */
+
+/**
  * ImageTextLayer maintains a transparent text layer on top of an image
  * which contains text. This enables the text in the image to be selected
  * and highlighted.
@@ -161,13 +177,10 @@ export class ImageTextLayer {
    *
    * @param {Element} image - Rendered image on which to overlay the text layer.
    *   The text layer will be inserted into the DOM as the next sibling of `image`.
-   * @param {DOMRect[]} charBoxes - Bounding boxes for characters in the image.
-   *   Coordinates should be in the range [0-1], where 0 is the top/left corner
-   *   of the image and 1 is the bottom/right.
-   * @param {string} text - Characters in the image corresponding to `charBoxes`
+   * @param {ImageTextLayerInit} options
    */
-  constructor(image, charBoxes, text) {
-    if (charBoxes.length !== text.length) {
+  constructor(image, { charBoxes, text, wordBoxes }) {
+    if (charBoxes && text && charBoxes.length !== text.length) {
       throw new Error('Char boxes length does not match text length');
     }
 
@@ -225,7 +238,15 @@ export class ImageTextLayer {
     //
     // This allows the browser to select the expected text when the cursor is
     // in-between lines or words.
-    const columns = analyzeLayout(charBoxes, text);
+    let columns;
+    if (charBoxes && text) {
+      const wordBoxes = wordsFromChars(charBoxes, text);
+      columns = analyzeLayout(wordBoxes);
+    } else if (wordBoxes) {
+      columns = analyzeLayout(wordBoxes);
+    } else {
+      throw new Error('Either `charBoxes` or `wordBoxes` must be set');
+    }
 
     for (let column of columns) {
       const columnEl = document.createElement('hypothesis-text-column');

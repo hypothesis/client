@@ -393,7 +393,7 @@ export class VitalSourceContentIntegration
     const pageData = (window as any).innerPageData as PDFTextData | undefined;
 
     if (bookImage && pageData) {
-      const charRects = pageData.glyphs.glyphs.map(glyph => {
+      const charBoxes = pageData.glyphs.glyphs.map(glyph => {
         const left = glyph.l / 100;
         const right = glyph.r / 100;
         const top = glyph.t / 100;
@@ -401,11 +401,10 @@ export class VitalSourceContentIntegration
         return new DOMRect(left, top, right - left, bottom - top);
       });
 
-      this._textLayer = new ImageTextLayer(
-        bookImage,
-        charRects,
-        pageData.words
-      );
+      this._textLayer = new ImageTextLayer(bookImage, {
+        charBoxes,
+        text: pageData.words,
+      });
 
       // VitalSource has several DOM elements in the page which are raised
       // above the image using z-index. One of these is used to handle VS's
