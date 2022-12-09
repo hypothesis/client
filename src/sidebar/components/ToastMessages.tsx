@@ -7,18 +7,15 @@ import {
   CheckIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
+import type { ToastMessage } from '../store/modules/toast-messages';
 import { withServices } from '../service-context';
 
-/**
- * @typedef {import('../store/modules/toast-messages').ToastMessage} ToastMessage
- */
-
-/**
- * @typedef ToastMessageProps
- * @prop {ToastMessage} message - The message object to render
- * @prop {(id: string) => void} onDismiss
- */
+type ToastMessageItemProps = {
+  message: ToastMessage;
+  onDismiss: (id: string) => void;
+};
 
 /**
  * An individual toast message: a brief and transient success or error message.
@@ -27,10 +24,8 @@ import { withServices } from '../service-context';
  *
  * Otherwise, the `toastMessenger` service handles removing messages after a
  * certain amount of time.
- *
- * @param {ToastMessageProps} props
  */
-function ToastMessage({ message, onDismiss }) {
+function ToastMessageItem({ message, onDismiss }: ToastMessageItemProps) {
   // Capitalize the message type for prepending; Don't prepend a message
   // type for "notice" messages
   const prefix =
@@ -106,18 +101,16 @@ function ToastMessage({ message, onDismiss }) {
   );
 }
 
-/**
- * @typedef ToastMessagesProps
- * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
- */
+export type ToastMessageProps = {
+  // injected
+  toastMessenger: ToastMessengerService;
+};
 
 /**
  * A collection of toast messages. These are rendered within an `aria-live`
  * region for accessibility with screen readers.
- *
- * @param {ToastMessagesProps} props
  */
-function ToastMessages({ toastMessenger }) {
+function ToastMessages({ toastMessenger }: ToastMessageProps) {
   const store = useSidebarStore();
   const messages = store.getToastMessages();
   // The `ul` containing any toast messages is absolute-positioned and the full
@@ -153,9 +146,9 @@ function ToastMessages({ toastMessenger }) {
             )}
             key={message.id}
           >
-            <ToastMessage
+            <ToastMessageItem
               message={message}
-              onDismiss={id => toastMessenger.dismiss(id)}
+              onDismiss={(id: string) => toastMessenger.dismiss(id)}
             />
           </li>
         ))}
