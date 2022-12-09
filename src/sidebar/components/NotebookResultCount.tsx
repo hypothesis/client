@@ -3,14 +3,18 @@ import { Spinner } from '@hypothesis/frontend-shared/lib/next';
 import { useRootThread } from './hooks/use-root-thread';
 import { countVisible } from '../helpers/thread';
 
-/**
- * @typedef NotebookResultCountProps
- * @prop {number} forcedVisibleCount
- * @prop {boolean} isFiltered
- * @prop {boolean} isLoading
- * @prop {number} resultCount
- */
+export type NotebookResultCountProps = {
+  /**
+   * Number of items that don't match applied filters but have been
+   * "forced visible" (expanded) by user interaction. These are described as
+   * "and <forcedVisibleCount> more" in filter descriptions
+   */
+  forcedVisibleCount: number;
 
+  isFiltered: boolean;
+  isLoading: boolean;
+  resultCount: number;
+};
 /**
  * Render count of annotations (or filtered results) visible in the notebook view
  *
@@ -27,7 +31,7 @@ function NotebookResultCount({
   isFiltered,
   isLoading,
   resultCount,
-}) {
+}: NotebookResultCountProps) {
   const rootThread = useRootThread();
   const visibleCount = isLoading ? resultCount : countVisible(rootThread);
 
