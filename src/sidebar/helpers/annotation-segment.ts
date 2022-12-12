@@ -1,4 +1,4 @@
-import { stripCFIAssertions } from '../util/cfi';
+import { stripCFIAssertions } from '../../shared/cfi';
 
 import type { SegmentInfo } from '../../types/annotator';
 import type { Annotation, EPUBContentSelector } from '../../types/api';
