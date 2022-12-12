@@ -5,9 +5,9 @@ import { TinyEmitter } from 'tiny-emitter';
 import { ListenerCollection } from '../../shared/listener-collection';
 import {
   RenderingStates,
+  TextLayerManager,
   anchor,
   canDescribe,
-  createTextLayerForPage,
   describe,
   documentHasText,
 } from '../anchoring/pdf';
@@ -151,6 +151,8 @@ export class PDFIntegration extends TinyEmitter {
     // A flag that indicates whether `destroy` has been called. Used to handle
     // `destroy` being called during async code elsewhere in the class.
     this._destroyed = false;
+
+    this._textLayers = new TextLayerManager();
   }
 
   destroy() {
@@ -317,6 +319,7 @@ export class PDFIntegration extends TinyEmitter {
       if (!page?.textLayer?.renderingDone) {
         continue;
       }
+      this._textLayers.createTextLayer(pageIndex);
 
       // Detect what needs to be done by checking the rendering state.
       switch (page.renderingState) {
@@ -331,7 +334,6 @@ export class PDFIntegration extends TinyEmitter {
           // rendered. Remove this, which will cause the annotations to anchor
           // again, below.
           removePlaceholder(page.div);
-          createTextLayerForPage(pageIndex);
           break;
       }
     }

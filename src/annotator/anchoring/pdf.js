@@ -200,68 +200,83 @@ function getPageTextContent(pageIndex) {
   return pageText;
 }
 
-/** @type {Map<number, ImageTextLayer>} */
-const textLayers = new Map();
-
-/**
- * TODO: Call this at an appropriate time to create the text layer.
- *
- * @param {number} pageIndex
- */
-export async function createTextLayerForPage(pageIndex) {
-  if (textLayers.has(pageIndex)) {
-    return textLayers.get(pageIndex);
+export class TextLayerManager {
+  constructor() {
+    /** @type {Map<number, ImageTextLayer>} */
+    this._layers = new Map();
   }
 
-  const pageView = await getPageView(pageIndex);
-  const textContent = await pageView.pdfPage.getTextContent({
-    normalizeWhitespace: true,
-  });
-  const items = textContent.items;
+  /**
+   * @param {number} pageIndex
+   */
+  removeTextLayer(pageIndex) {
+    const layer = this._layers.get(pageIndex);
+    this._layers.delete(pageIndex);
+    layer?.destroy();
+  }
 
-  // TODO - Check that `pageWidth` and `pageHeight` are width/height rather
-  // than right/bottom coords.
-  const viewBox = pageView.viewport.viewBox;
-  const [, , pageWidth, pageHeight] = viewBox;
+  /**
+   * Create a text layer for the given page.
+   *
+   * @param {number} pageIndex
+   */
+  async createTextLayer(pageIndex) {
+    if (this._layers.has(pageIndex)) {
+      return this._layers.get(pageIndex);
+    }
 
-  const wordBoxes = [];
-
-  for (let item of items) {
-    const [, , , , tx, ty] = item.transform;
-    const x = tx / pageWidth;
-    const y = (pageHeight - ty - item.height) / pageHeight;
-    const width = item.width / pageWidth;
-    const height = item.height / pageHeight;
-    const wordRect = new DOMRect(x, y, width, height);
-    wordBoxes.push({
-      text: item.str,
-      rect: wordRect,
+    const pageView = await getPageView(pageIndex);
+    const textContent = await pageView.pdfPage.getTextContent({
+      normalizeWhitespace: true,
     });
-  }
+    const items = textContent.items;
 
-  const pageContainer = document.querySelector(
-    `.page[data-page-number="${pageIndex + 1}"]`
-  );
-  if (!pageContainer) {
-    console.warn('Page container not found for page', pageIndex);
-    return null;
-  }
+    // TODO - Check that `pageWidth` and `pageHeight` are width/height rather
+    // than right/bottom coords.
+    const viewBox = pageView.viewport.viewBox;
+    const [, , pageWidth, pageHeight] = viewBox;
 
-  const pageCanvas = pageContainer?.querySelector('canvas');
-  if (!pageCanvas) {
-    console.warn('Page canvas not found for page', pageIndex);
-    return null;
-  }
+    const wordBoxes = [];
 
-  // Prevent selection in PDF.js's own text layer.
-  const builtinTextLayer = pageContainer.querySelector('.textLayer');
-  if (builtinTextLayer) {
-    builtinTextLayer.style.display = 'none';
-  }
+    for (let item of items) {
+      const [, , , , tx, ty] = item.transform;
+      const x = tx / pageWidth;
+      const y = (pageHeight - ty - item.height) / pageHeight;
+      const width = item.width / pageWidth;
+      const height = item.height / pageHeight;
+      const wordRect = new DOMRect(x, y, width, height);
+      wordBoxes.push({
+        text: item.str,
+        rect: wordRect,
+      });
+    }
 
-  const textLayer = new ImageTextLayer(pageCanvas, { wordBoxes });
-  textLayers.set(pageIndex, textLayer);
-  return textLayer;
+    const pageContainer = document.querySelector(
+      `.page[data-page-number="${pageIndex + 1}"]`
+    );
+    if (!pageContainer) {
+      console.warn('Page container not found for page', pageIndex);
+      return null;
+    }
+
+    const pageCanvas = pageContainer?.querySelector('canvas');
+    if (!pageCanvas) {
+      console.warn('Page canvas not found for page', pageIndex);
+      return null;
+    }
+
+    // Prevent selection in PDF.js's own text layer.
+    const builtinTextLayer = /** @type {HTMLElement|null} */ (
+      pageContainer.querySelector('.textLayer')
+    );
+    if (builtinTextLayer) {
+      builtinTextLayer.style.display = 'none';
+    }
+
+    const textLayer = new ImageTextLayer(pageCanvas, { wordBoxes });
+    this._layers.set(pageIndex, textLayer);
+    return textLayer;
+  }
 }
 
 /**
