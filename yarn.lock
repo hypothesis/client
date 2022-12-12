@@ -6431,9 +6431,9 @@ npm-package-arg@^10.0.0, npm-package-arg@^10.1.0:
     validate-npm-package-name "^5.0.0"
 
 npm-packlist@^7.0.0, npm-packlist@^7.0.1:
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-7.0.2.tgz#f24177ce5b3593223348157bcc3eff1db8fae7d6"
-  integrity sha512-d2+7RMySjVXssww23rV5NuIq1NzGvM04OlI5kwnvtYKfFTAPVs6Zxmxns2HRtJEA1oNj7D/BbFXeVAOLmW3N3Q==
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/npm-packlist/-/npm-packlist-7.0.4.tgz#033bf74110eb74daf2910dc75144411999c5ff32"
+  integrity sha512-d6RGEuRrNS5/N84iglPivjaJPxhDbZmlbTwTDX2IbcRHG5bZCdtysYMhwiPvcF4GisXHGn7xsxv+GQ7T/02M5Q==
   dependencies:
     ignore-walk "^6.0.0"
 
