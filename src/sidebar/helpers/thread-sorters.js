@@ -1,4 +1,4 @@
-import { compareCFIs } from '../util/cfi';
+import { compareCFIs } from '../../shared/cfi';
 import { location } from './annotation-metadata';
 import { rootAnnotations } from './thread';
 
