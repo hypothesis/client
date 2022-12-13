@@ -165,6 +165,20 @@ export class MosaicBookElement extends HTMLElement {
     return this.pageData[this.pageIndex];
   }
 
+  async getTOC() {
+    // In our VS test pages, the TOC entries are 1:1 with the page entries.
+    // However in a real VS book there may be multiple TOC entries for different
+    // parts of a single page, and there is also an issue where the titles
+    // may be different. See https://github.com/hypothesis/client/issues/4986.
+    const tocEntries = this.pageData.map(page => ({
+      cfi: page.cfi,
+      title: page.chapterTitle,
+      path: page.absoluteURL,
+      page: page.page,
+    }));
+    return { ok: true, data: tocEntries, status: 200 };
+  }
+
   goToCfi(cfi) {
     for (let [i, page] of this.pageData.entries()) {
       if (page.cfi === cfi) {
