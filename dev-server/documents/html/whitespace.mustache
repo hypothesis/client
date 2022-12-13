@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Document with whitespace examples</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type="text/css">
+
+      .testcase {
+        padding: 1em;
+        border: 1px dashed grey;
+        line-height: 1.7;
+      }
+
+      .testcase span {
+        border: 1px dotted red;
+        padding: 0.5em;
+      }
+    </style>
+  </head>
+  <body>
+  <h1>HTML document with examples of whitespace</h1>
+  <p>
+    This HTML document contains various types of whitespace, including HTML entities representing Unicode whitespace characters, as well as empty elements. It is intended to help test text selection. Some additional wrapping elements are present to exercise the application's ability to traverse and trim more complex selection ranges.
+  </p>
+  <p><em>Note:</em> Some information on Unicode whitespace characters and associated named entities can be found <a href="https://en.wikipedia.org/wiki/Whitespace_character#Unicode">on the <i>Whitespace character</i> Wikipedia page</a>.</p>
+  <p>
+    In general, it should not be possible to annotate or highlight a selection that consists of only whitespace, and the annotated selection should not contain preceding or trailing whitespace.
+  </p>
+  <h2>Examples</h2>
+    <div id="toplevel">
+      <div id="apple">
+
+        <h3>Examples with differing amounts of leading and internal whitespace, and some nested inline elements</h3>
+        <p class="testcase">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam fringilla ultrices lacus consequat pretium. <span>Curabitur posuere <i>posuere</i> <span></span></span> rhoncus. <b>Maecenas</b> sit <span></span>amet velit<span> </span> eget arcu aliquam pretium sed a tellus. Praesent sodales enim id justo bibendum condimentum sit amet sit amet lorem.
+        </p>
+
+        <p class="testcase"
+          >&nbsp;h<span> &#8195;i &#8195;</span>i
+        </p>
+
+        <p class="testcase">
+          <span>Interdum et malesuada fames ac ante&#8197;&#8197;&#8197;&#8197;&#8197;&#8197;&#8197;&#8197;ipsum primis in faucibus</span>
+        </p>
+
+        <div class="testcase">
+          <p>
+            Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec felis mauris, tristique aliquet dolor ac, facilisis dapibus metus. Morbi euismod congue erat, nec &#8201;&#8201;&#8201;&#8201;luctus ligula dapibus ac. Integer fringilla aliquet tellus, ac sodales justo åsemper quis.
+          </p>
+        </div>
+
+        <h3>
+          Example with non-Latin Unicode text
+        </h3>
+
+        <p class="testcase">
+          林花謝了春紅 太匆匆<br />無奈&nbsp;&nbsp;&#8195;朝來寒雨 晚來風<br />胭脂淚 留人醉&#8197;&#8197;&#8197; 幾時重<br />自是人生長恨 水長東
+        </p>
+
+        <h3>
+          Examples with empty or whitespace-only elements
+        </h3>
+
+        <div class="testcase">
+          <p>&nbsp;</p>
+          <p>&#8194;</p>
+          <p>
+            Preceded and followed by two paragraphs that contain only whitespace content. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec felis mauris, tristique aliquet dolor ac, facilisis dapibus metus. Morbi euismod congue erat, nec &#8201;&#8201;&#8201;&#8201;luctus ligula dapibus ac. Integer fringilla aliquet tellus, ac sodales justo åsemper quis.
+          </p>
+          <p>&nbsp;</p>
+          <p>&#8194;</p>
+        </div>
+
+        <div class="testcase">
+          <p>
+            Separated by empty and whitespace-only elements. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec felis mauris, tristique aliquet dolor ac, facilisis dapibus metus. Morbi euismod congue erat, nec &#8201;&#8201;&#8201;&#8201;luctus ligula dapibus ac. Integer fringilla aliquet tellus, ac sodales justo åsemper quis.
+          </p>
+          <p>&nbsp;</p>
+          <span>&#8232; &#8232;</span>
+          <p>
+            Separated by empty and whitespace-only elements. Interdum et malesuada fames ac ante ipsum primis in faucibus. Donec felis mauris, tristique aliquet dolor ac, facilisis dapibus metus. Morbi euismod congue erat, nec &#8201;&#8201;&#8201;&#8201;luctus ligula dapibus ac. Integer fringilla aliquet tellus, ac sodales justo åsemper quis.
+          </p>
+        </div>
+
+      </div>
+    </div>
+
+    <h3>Longer-form examples with various leading and internal whitespace</h3>
+    <div class="testcase">
+    <div id="aplusb">&#8197;</div>
+    <div id="banana">
+      <span></span>
+      <p>
+        Phasellus vehicula augue eget maximus tristique. In in lectus volutpat,
+        eleifend lectus ac, interdum risus. Mauris nec accumsan dolor, rhoncus
+        tempor ligula. Nulla congue, lectus et accumsan placerat, massa ligula
+        molestie odio, mollis interdum lectus purus id turpis. Vestibulum ante
+        ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae;
+        Mauris tempus libero id ipsum iaculis, &#8232; &#8232;id maximus erat
+        varius. Nulla facilisis erat sit amet lacus placerat, ac lobortis sem
+        volutpat. In hac habitasse platea dictumst. Nulla ornare rutrum ipsum in
+        pulvinar. Praesent &#8233; &#8233;n &#8233; diam purus, bibendum eu ex a,
+        faucibus convallis sapien. Proin tempus finibus nisi eu aliquam.
+      </p>
+    </div>
+
+    <p>&nbsp;</p>
+
+    <p>
+      In id odio a velit dictum molestie. Fusce et congue metus, varius faucibus
+      eros. Suspendisse sagittis venenatis nunc nec dignissim. Curabitur
+      fringilla, leo eget vehicula bibendum, enim orci eleifend mauris, vitae
+      sagittis ante arcu vel neque. &#5760; &#5760; &#5760;Quisque varius semper
+      nisl, a auctor enim pellentesque sed. Aliquam a lorem lectus. Morbi
+      gravida tristique dignissim. Suspendisse placerat sollicitudin erat, eget
+      tristique ante eleifend quis.
+    </p>
+
+    <p>
+      &nbsp; &nbsp; Ut tempor, felis iaculis ultrices posuere, lectus quam
+      accumsan ante, id commodo est sem et neque. Duis sit amet massa ac quam
+      pretium ornare. Vivamus sed dui at felis consequat interdum nec sit amet
+      elit. Donec hendrerit neque congue ultrices ornare. Fusce libero eros,
+      consectetur id feugiat sit amet, eleifend vitae ante. &#8194; &#8194;
+      &#8194; &#8194; &#8194;Sed a est placerat, fermentum justo eu, porttitor
+      nisl. In augue nunc, viverra eu varius id, interdum et libero. Vestibulum
+      congue accumsan sapien, sed sodales nunc vehicula quis. Etiam tincidunt
+      lacus nec sem ullamcorper, nec vulputate risus vulputate. Mauris fermentum
+      odio vitae diam lobortis sollicitudin. Nam sit amet congue urna, nec
+      varius urna.&nbsp;&nbsp;&nbsp;
+    </p>
+
+    <p>
+      Ut venenatis fringilla mauris, eget egestas neque sagittis id. Etiam
+      imperdiet eros quis placerat &#8199;&#8199;&#8199;&#8199;&#8199;suscipit.
+      Suspendisse sed ornare nunc. Duis finibus justo nec mi tempor mattis. Sed
+      pulvinar, dolor non bibendum tempor, dolor nunc vulputate massa, at
+      efficitur nulla enim id sapien. Integer imperdiet arcu vitae leo
+      ullamcorper commodo. Nunc at nisi ut arcu euismod venenatis quis in nisl.
+    </p>
+    </div>
+    {{{ hypothesisScript }}}
+  </body>
+</html>
