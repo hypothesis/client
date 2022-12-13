@@ -229,6 +229,11 @@ describe('sidebar/util/time', () => {
   });
 
   describe('formatDate', () => {
+    // Normalize "special" spaces (eg. "\u202F") to standard spaces.
+    function normalizeSpaces(str) {
+      return str.normalize('NFKC');
+    }
+
     it('returns absolute formatted date', () => {
       const date = new Date('2020-05-04T23:02:01');
       const fakeIntl = locale => ({
@@ -238,14 +243,14 @@ describe('sidebar/util/time', () => {
       });
 
       assert.equal(
-        formatDate(date, fakeIntl('en-US')),
+        normalizeSpaces(formatDate(date, fakeIntl('en-US'))),
         'Monday, May 04, 2020, 11:02 PM'
       );
 
       clearFormatters();
 
       assert.equal(
-        formatDate(date, fakeIntl('de-DE')),
+        normalizeSpaces(formatDate(date, fakeIntl('de-DE'))),
         'Montag, 04. Mai 2020, 23:02'
       );
     });
