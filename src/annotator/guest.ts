@@ -7,6 +7,7 @@ import { matchShortcut } from '../shared/shortcut';
 
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
+import { trimRange } from './anchoring/trim-range';
 import { BucketBarClient } from './bucket-bar-client';
 import { HighlightClusterController } from './highlight-clusters';
 import { FeatureFlags } from './features';
@@ -706,7 +707,16 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    * Show or hide the adder toolbar when the selection changes.
    */
   _onSelection(range: Range) {
-    if (!this._integration.canAnnotate(range)) {
+    let textRange: Range;
+    try {
+      textRange = TextRange.fromRange(range).toRange();
+      textRange = trimRange(textRange);
+    } catch {
+      this._onClearSelection();
+      return;
+    }
+
+    if (!this._integration.canAnnotate(textRange)) {
       this._onClearSelection();
       return;
     }
@@ -720,7 +730,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       return;
     }
 
-    this.selectedRanges = [range];
+    this.selectedRanges = [textRange];
     this._hostRPC.call('textSelected');
 
     this._adder.annotationsForSelection = annotationsForSelection();

@@ -114,7 +114,11 @@ export function selectionFocusRect(selection) {
   if (selection.isCollapsed) {
     return null;
   }
-  const textBoxes = getTextBoundingBoxes(selection.getRangeAt(0));
+  const range = selection.getRangeAt(0);
+  if (range.toString().trim() === '') {
+    return null;
+  }
+  const textBoxes = getTextBoundingBoxes(range);
   if (textBoxes.length === 0) {
     return null;
   }
