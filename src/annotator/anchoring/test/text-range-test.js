@@ -1,6 +1,6 @@
 import { TextPosition, TextRange, ResolveDirection } from '../text-range';
 
-import { assertNodesEqual } from '../../../test-util/compare-dom';
+import { assertNodesEqual, textNodes } from '../../../test-util/compare-dom';
 
 const html = `
 <main>
@@ -11,22 +11,6 @@ const html = `
   </article>
 </main>
 `;
-
-/**
- * Return all the `Text` descendants of `node`
- *
- * @param {Node} node
- * @return {Text[]}
- */
-function textNodes(node) {
-  const nodes = [];
-  const iter = document.createNodeIterator(node, NodeFilter.SHOW_TEXT);
-  let current;
-  while ((current = iter.nextNode())) {
-    nodes.push(current);
-  }
-  return nodes;
-}
 
 describe('annotator/anchoring/text-range', () => {
   describe('TextPosition', () => {

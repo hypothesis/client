@@ -46,3 +46,19 @@ export function assertNodesEqual(actual, expected) {
     );
   }
 }
+
+/**
+ * Return all the `Text` descendants of `node`
+ *
+ * @param {Node} node
+ * @return {Text[]}
+ */
+export function textNodes(node) {
+  const nodes = [];
+  const iter = document.createNodeIterator(node, NodeFilter.SHOW_TEXT);
+  let current;
+  while ((current = iter.nextNode())) {
+    nodes.push(current);
+  }
+  return nodes;
+}
