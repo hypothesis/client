@@ -139,7 +139,7 @@ describe('Guest', () => {
 
     fakeIntegration = Object.assign(new TinyEmitter(), {
       anchor: sinon.stub(),
-      canAnnotate: sinon.stub().returns(true),
+      getAnnotatableRange: sinon.stub().returnsArg(0),
       canStyleClusteredHighlights: sinon.stub().returns(false),
       contentContainer: sinon.stub().returns({}),
       describe: sinon.stub(),
@@ -726,8 +726,7 @@ describe('Guest', () => {
     it('hides the adder if the integration indicates that the selection cannot be annotated', () => {
       // Simulate integration indicating text is not part of annotatable content
       // (eg. text that is part of the PDF.js UI)
-      fakeIntegration.canAnnotate.returns(false);
-
+      fakeIntegration.getAnnotatableRange = sinon.stub().returns(null);
       createGuest();
       simulateSelectionWithText();
 

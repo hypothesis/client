@@ -1,6 +1,7 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 import { anchor, describe } from '../anchoring/html';
+import { TextRange } from '../anchoring/text-range';
 
 import { HTMLMetadata } from './html-metadata';
 import {
@@ -105,8 +106,21 @@ export class HTMLIntegration extends TinyEmitter {
     }
   }
 
-  canAnnotate() {
-    return true;
+  /**
+   * Return a Range trimmed to remove any leading or trailing whitespace, or
+   * `null` if no valid trimmed Range can be created from `range`
+   *
+   * @param {Range} range
+   */
+  getAnnotatableRange(range) {
+    try {
+      return TextRange.trimmedRange(range);
+    } catch (err) {
+      if (err instanceof RangeError) {
+        return null;
+      }
+      throw err;
+    }
   }
 
   canStyleClusteredHighlights() {

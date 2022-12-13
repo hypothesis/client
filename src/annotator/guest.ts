@@ -706,7 +706,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    * Show or hide the adder toolbar when the selection changes.
    */
   _onSelection(range: Range) {
-    if (!this._integration.canAnnotate(range)) {
+    const annotatableRange = this._integration.getAnnotatableRange(range);
+    if (!annotatableRange) {
       this._onClearSelection();
       return;
     }
@@ -720,7 +721,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       return;
     }
 
-    this.selectedRanges = [range];
+    this.selectedRanges = [annotatableRange];
     this._hostRPC.call('textSelected');
 
     this._adder.annotationsForSelection = annotationsForSelection();

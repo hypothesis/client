@@ -157,11 +157,6 @@ export type SidebarLayout = {
  */
 export type IntegrationBase = {
   /**
-   * Return whether the specified DOM range is part of the annotatable content
-   * of the current document.
-   */
-  canAnnotate(range: Range): boolean;
-  /**
    * Return whether this integration supports styling multiple clusters of highlights
    */
   canStyleClusteredHighlights?(): boolean;
@@ -184,6 +179,14 @@ export type IntegrationBase = {
    * false otherwise.
    */
   fitSideBySide(layout: SidebarLayout): boolean;
+
+  /**
+   * Return a DOM Range representing the extent of annotatable content within
+   * `range`, or `null` if `range` does not contain any annotatable content.
+   * For example, `range` might be trimmed of leading or trailing whitespace.
+   * `range` may be returned unmodified if already valid.
+   */
+  getAnnotatableRange(range: Range): Range | null;
 
   /** Return the metadata of the currently loaded document, such as title, PDF fingerprint, etc. */
   getMetadata(): Promise<DocumentMetadata>;
