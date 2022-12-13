@@ -2,6 +2,7 @@ import debounce from 'lodash.debounce';
 import { render } from 'preact';
 import { TinyEmitter } from 'tiny-emitter';
 
+import { TextRange } from '../anchoring/text-range';
 import { ListenerCollection } from '../../shared/listener-collection';
 import {
   RenderingStates,
@@ -198,12 +199,24 @@ export class PDFIntegration extends TinyEmitter {
   }
 
   /**
-   * Return true if the text in a range lies within the text layer of a PDF.
+   * Trim `range` to remove leading or trailing empty content, then check to see
+   * if that trimmed Range lies within a single PDF page's text layer. If so,
+   * return the trimmed Range.
    *
    * @param {Range} range
    */
-  canAnnotate(range) {
-    return canDescribe(range);
+  getAnnotatableRange(range) {
+    try {
+      const trimmedRange = TextRange.trimmedRange(range);
+      if (canDescribe(trimmedRange)) {
+        return trimmedRange;
+      }
+    } catch (err) {
+      if (!(err instanceof RangeError)) {
+        throw err;
+      }
+    }
+    return null;
   }
 
   /* istanbul ignore next */

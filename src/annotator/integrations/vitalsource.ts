@@ -304,8 +304,8 @@ export class VitalSourceContentIntegration
     }
   }
 
-  canAnnotate() {
-    return true;
+  getAnnotatableRange(range: Range) {
+    return this._htmlIntegration.getAnnotatableRange(range);
   }
 
   destroy() {

@@ -12,6 +12,12 @@ function awaitEvent(target, eventName) {
   });
 }
 
+class FakeTextRange {
+  static trimmedRange(range) {
+    return range;
+  }
+}
+
 describe('annotator/integrations/pdf', () => {
   describe('isPDF', () => {
     beforeEach(() => {
@@ -93,6 +99,7 @@ describe('annotator/integrations/pdf', () => {
           PDFMetadata: sinon.stub().returns(fakePDFMetadata),
         },
         '../anchoring/pdf': fakePDFAnchoring,
+        '../anchoring/text-range': { TextRange: FakeTextRange },
         '../util/scroll': fakeScrollUtils,
 
         // Disable debouncing of updates.
@@ -178,11 +185,36 @@ describe('annotator/integrations/pdf', () => {
       });
     });
 
-    describe('#canAnnotate', () => {
-      it('checks if range is in text layer of PDF', () => {
+    describe('#getAnnotatableRange', () => {
+      let fakeTrimmedRange;
+
+      beforeEach(() => {
+        fakeTrimmedRange = sinon.stub(FakeTextRange, 'trimmedRange');
+      });
+
+      afterEach(() => {
+        FakeTextRange.trimmedRange.restore();
+      });
+
+      it('verifies that range is in text layer of PDF', () => {
         const range = new Range();
-        assert.equal(pdfIntegration.canAnnotate(range), true);
+        fakeTrimmedRange.returns(range);
+        assert.equal(pdfIntegration.getAnnotatableRange(range), range);
         assert.calledWith(fakePDFAnchoring.canDescribe, range);
+      });
+
+      it('returns null if range-trimming encounters a RangeError', () => {
+        fakeTrimmedRange.throws(
+          new RangeError('Range contains no non-whitespace text')
+        );
+        const range = new Range();
+        assert.isNull(pdfIntegration.getAnnotatableRange(range));
+      });
+
+      it('throws if range-trimming encounters non-RangeError errors', () => {
+        fakeTrimmedRange.throws(new Error('non-handled Error'));
+        const range = new Range();
+        assert.throws(() => pdfIntegration.getAnnotatableRange(range));
       });
     });
 

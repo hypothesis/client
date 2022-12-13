@@ -2,6 +2,12 @@ import { delay } from '../../../test-util/wait';
 import { FeatureFlags } from '../../features';
 import { HTMLIntegration, $imports } from '../html';
 
+class FakeTextRange {
+  static trimmedRange(range) {
+    return range;
+  }
+}
+
 describe('HTMLIntegration', () => {
   let features;
   let fakeHTMLAnchoring;
@@ -39,6 +45,7 @@ describe('HTMLIntegration', () => {
     const HTMLMetadata = sinon.stub().returns(fakeHTMLMetadata);
     $imports.$mock({
       '../anchoring/html': fakeHTMLAnchoring,
+      '../anchoring/text-range': { TextRange: FakeTextRange },
       '../util/navigation-observer': {
         NavigationObserver: FakeNavigationObserver,
       },
@@ -67,11 +74,38 @@ describe('HTMLIntegration', () => {
     assert.equal(integration.describe, fakeHTMLAnchoring.describe);
   });
 
-  describe('#canAnnotate', () => {
-    it('is always true', () => {
+  describe('#getAnnotatableRange', () => {
+    let fakeTrimmedRange;
+
+    beforeEach(() => {
+      fakeTrimmedRange = sinon.stub(FakeTextRange, 'trimmedRange');
+    });
+
+    afterEach(() => {
+      FakeTextRange.trimmedRange.restore();
+    });
+
+    it('returns a trimmed range if range-trimming is successful', () => {
       const integration = createIntegration();
       const range = new Range();
-      assert.isTrue(integration.canAnnotate(range));
+      fakeTrimmedRange.returns(range);
+      assert.equal(integration.getAnnotatableRange(range), range);
+    });
+
+    it('returns null if range-trimming encounters a RangeError', () => {
+      fakeTrimmedRange.throws(
+        new RangeError('Range contains no non-whitespace text')
+      );
+      const integration = createIntegration();
+      const range = new Range();
+      assert.isNull(integration.getAnnotatableRange(range));
+    });
+
+    it('throws if range-trimming encounters non-RangeError errors', () => {
+      fakeTrimmedRange.throws(new Error('non-handled Error'));
+      const integration = createIntegration();
+      const range = new Range();
+      assert.throws(() => integration.getAnnotatableRange(range));
     });
   });
 

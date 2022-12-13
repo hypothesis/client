@@ -80,6 +80,7 @@ describe('annotator/integrations/vitalsource', () => {
       ]),
       destroy: sinon.stub(),
       fitSideBySide: sinon.stub().returns(false),
+      getAnnotatableRange: sinon.stub().returnsArg(0),
       scrollToAnchor: sinon.stub(),
       sideBySideEnabled: false,
     };
@@ -296,9 +297,12 @@ describe('annotator/integrations/vitalsource', () => {
       integrations.forEach(int => int.destroy());
     });
 
-    it('allows annotation', () => {
+    it('delegates to HTML integration to check if selected content is annotatable', () => {
       const integration = createIntegration();
-      assert.isTrue(integration.canAnnotate());
+      const range = new Range();
+
+      assert.equal(integration.getAnnotatableRange(range), range);
+      assert.calledWith(fakeHTMLIntegration.getAnnotatableRange, range);
     });
 
     it('asks guest to wait for feature flags before sending document info', () => {
