@@ -170,15 +170,29 @@ export default function ThreadList({ threads }: ThreadListProps) {
   // ones, so the association doesn't change while scrolling.
   const headings = useMemo(() => {
     let prevHeadingKey: string | null = null;
+    let prevHeading: string | null = null;
+
     const headingForKey = headingMap(threads);
 
     const headings = new Map();
     for (const thread of threads) {
       const key = headingKey(thread);
-      if (key && prevHeadingKey !== key) {
-        prevHeadingKey = key;
-        headings.set(thread, headingForKey.get(key) ?? 'Untitled chapter');
+      if (!key || prevHeadingKey === key) {
+        continue;
       }
+
+      prevHeadingKey = key;
+
+      const heading = headingForKey.get(key) ?? 'Untitled chapter';
+      if (prevHeading === heading) {
+        // In some books (eg. VitalSource PDF-based books) a single logical
+        // chapter gets split into many content documents and the heading is
+        // repeated for each of them. We only want to render distinct headings.
+        continue;
+      }
+
+      prevHeading = heading;
+      headings.set(thread, heading);
     }
     return headings;
   }, [threads]);

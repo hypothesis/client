@@ -384,6 +384,20 @@ describe('ThreadList', () => {
       assert.equal(getHeading(containers.at(2)), null);
       assert.equal(getHeading(containers.at(3)), 'Untitled chapter');
     });
+
+    it('does not render heading if same as previous chapter', () => {
+      // Add two annotations from different chapters/document segments, but
+      // with the same heading.
+      addThreadInChapter('/4', 'Chapter One');
+      addThreadInChapter('/6', 'Chapter One');
+
+      const wrapper = createComponent();
+
+      const containers = wrapper.find('[data-testid="thread-card-container"]');
+      assert.equal(containers.length, fakeTopThread.children.length);
+      assert.equal(getHeading(containers.at(0)), 'Chapter One');
+      assert.equal(getHeading(containers.at(1)), null);
+    });
   });
 
   it('does not error if thread heights cannot be measured', () => {
