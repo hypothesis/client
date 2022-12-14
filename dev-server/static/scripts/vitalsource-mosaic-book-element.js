@@ -172,6 +172,7 @@ export class MosaicBookElement extends HTMLElement {
     // may be different. See https://github.com/hypothesis/client/issues/4986.
     const tocEntries = this.pageData.map(page => ({
       cfi: page.cfi,
+      level: 1,
       title: page.chapterTitle,
       path: page.absoluteURL,
       page: page.page,
