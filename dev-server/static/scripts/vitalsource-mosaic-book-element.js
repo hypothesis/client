@@ -1,4 +1,8 @@
 /**
+ * @typedef {import('../../../src/types/vitalsource').MosaicBookElement} IMosaicBookElement
+ */
+
+/**
  * Mock implementation of the `<mosaic-book>` custom element in the
  * VitalSource Bookshelf reader.
  *
@@ -7,11 +11,13 @@
  *
  * See `src/annotator/integrations/vitalsource.ts` for details of the APIs of
  * this element which the Hypothesis client relies on.
+ *
+ * @implements {IMosaicBookElement}
  */
 export class MosaicBookElement extends HTMLElement {
   constructor() {
     super();
-    this.attachShadow({ mode: 'open' });
+    const shadowRoot = this.attachShadow({ mode: 'open' });
 
     /**
      * Currently selected "page".
@@ -33,10 +39,10 @@ export class MosaicBookElement extends HTMLElement {
         overflow: auto;
       }
     `;
-    this.shadowRoot.append(styles);
+    shadowRoot.append(styles);
 
     const controlBar = document.createElement('div');
-    this.shadowRoot.append(controlBar);
+    shadowRoot.append(controlBar);
 
     this.prevButton = document.createElement('button');
     this.prevButton.textContent = 'Prev chapter';
@@ -109,7 +115,7 @@ export class MosaicBookElement extends HTMLElement {
     // does. The client should be robust to either approach.
     this.contentFrame?.remove();
     this.contentFrame = document.createElement('iframe');
-    this.shadowRoot.append(this.contentFrame);
+    /** @type {ShadowRoot} */ (this.shadowRoot).append(this.contentFrame);
 
     const pageURL = this.pageData[this.pageIndex].absoluteURL;
 
@@ -133,7 +139,9 @@ export class MosaicBookElement extends HTMLElement {
       setTimeout(() => {
         // Set the final URL in a way that doesn't update the `src` attribute
         // of the iframe, to make sure the client isn't relying on that.
-        this.contentFrame.contentWindow.location.href = pageURL;
+        if (this.contentFrame?.contentWindow) {
+          this.contentFrame.contentWindow.location.href = pageURL;
+        }
       }, 50);
     }
 
@@ -145,17 +153,17 @@ export class MosaicBookElement extends HTMLElement {
     const book = this.getAttribute('book');
 
     if (book === 'little-women') {
-      return {
+      return /** @type {const} */ ({
         format: 'epub',
         isbn: '9780451532084',
         title: 'Little Women',
-      };
+      });
     } else if (book === 'test-pdf') {
-      return {
+      return /** @type {const} */ ({
         format: 'pbk',
         isbn: 'TEST-PDF',
         title: 'Test PDF',
-      };
+      });
     } else {
       throw new Error('Unknown book ID');
     }
