@@ -9,9 +9,6 @@
  * This element is created in the book's container frame, and the element holds
  * the book's current content frame within its Shadow DOM.
  *
- * See `src/annotator/integrations/vitalsource.ts` for details of the APIs of
- * this element which the Hypothesis client relies on.
- *
  * @implements {IMosaicBookElement}
  */
 export class MosaicBookElement extends HTMLElement {
