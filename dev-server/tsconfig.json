@@ -11,5 +11,5 @@
     "noImplicitAny": false,
     "target": "ES2020"
   },
-  "include": ["ui-playground/**/*.js"]
+  "include": ["ui-playground/**/*.js", "static/scripts/vitalsource-mosaic-book-element.js"]
 }
