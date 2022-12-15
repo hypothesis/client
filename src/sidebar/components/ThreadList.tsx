@@ -164,7 +164,8 @@ export default function ThreadList({ threads }: ThreadListProps) {
     return newAnnotations[newAnnotations.length - 1].$tag;
   })();
 
-  // Compute the heading to display above each thread.
+  // Compute the heading to display above each thread. Headings are only shown
+  // in some document types (eg. VitalSource books).
   //
   // We compute the map based on the full list of threads, not just the rendered
   // ones, so the association doesn't change while scrolling.
