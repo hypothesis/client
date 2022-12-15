@@ -1,4 +1,5 @@
 import debounce from 'lodash.debounce';
+import type { DebouncedFunction } from 'lodash.debounce';
 
 import { ListenerCollection } from '../../shared/listener-collection';
 import {
@@ -8,23 +9,24 @@ import {
   unionRects,
 } from '../util/geometry';
 
-/**
- * @typedef WordBox
- * @prop {string} text
- * @prop {DOMRect} rect - Bounding rectangle of all glyphs in word
- */
+type WordBox = {
+  text: string;
 
-/**
- * @typedef LineBox
- * @prop {WordBox[]} words
- * @prop {DOMRect} rect - Bounding rectangle of all words in line
- */
+  /** Bounding rect of all glyphs in word. */
+  rect: DOMRect;
+};
 
-/**
- * @typedef ColumnBox
- * @prop {LineBox[]} lines
- * @prop {DOMRect} rect - Bounding rectangle of all lines in column
- */
+type LineBox = {
+  words: WordBox[];
+  /** Bounding rect of all words in line. */
+  rect: DOMRect;
+};
+
+type ColumnBox = {
+  lines: LineBox[];
+  /** Bounding rect of all lines in column. */
+  rect: DOMRect;
+};
 
 /**
  * Group characters in a page into words, lines and columns.
@@ -36,16 +38,13 @@ import {
  * lines or columns that significantly intersect, as this can impair text
  * selection.
  *
- * @param {DOMRect[]} charBoxes - Bounding rectangle associated with each character on the page
- * @param {string} text - Text that corresponds to `charBoxes`
- * @return {ColumnBox[]}
+ * @param charBoxes - Bounding rectangle associated with each character on the page
+ * @param text - Text that corresponds to `charBoxes`
  */
-function analyzeLayout(charBoxes, text) {
-  /** @type {WordBox[]} */
-  const words = [];
+function analyzeLayout(charBoxes: DOMRect[], text: string): ColumnBox[] {
+  const words = [] as WordBox[];
 
-  /** @type {WordBox} */
-  let currentWord = { text: '', rect: new DOMRect() };
+  let currentWord = { text: '', rect: new DOMRect() } as WordBox;
 
   // Group characters into words.
   const addWord = () => {
@@ -54,7 +53,7 @@ function analyzeLayout(charBoxes, text) {
       currentWord = { text: '', rect: new DOMRect() };
     }
   };
-  for (let [i, rect] of charBoxes.entries()) {
+  for (const [i, rect] of charBoxes.entries()) {
     const char = text[i];
     const isSpace = /\s/.test(char);
 
@@ -69,11 +68,9 @@ function analyzeLayout(charBoxes, text) {
   }
   addWord();
 
-  /** @type {LineBox[]} */
-  const lines = [];
+  const lines = [] as LineBox[];
 
-  /** @type {LineBox} */
-  let currentLine = { words: [], rect: new DOMRect() };
+  let currentLine = { words: [], rect: new DOMRect() } as LineBox;
 
   // Group words into lines.
   const addLine = () => {
@@ -82,7 +79,7 @@ function analyzeLayout(charBoxes, text) {
       currentLine = { words: [], rect: new DOMRect() };
     }
   };
-  for (let word of words) {
+  for (const word of words) {
     const prevWord = currentLine.words[currentLine.words.length - 1];
     if (prevWord) {
       const prevCenter = rectCenter(prevWord.rect);
@@ -101,11 +98,9 @@ function analyzeLayout(charBoxes, text) {
   }
   addLine();
 
-  /** @type {ColumnBox[]} */
-  const columns = [];
+  const columns = [] as ColumnBox[];
 
-  /** @type {ColumnBox} */
-  let currentColumn = { lines: [], rect: new DOMRect() };
+  let currentColumn = { lines: [], rect: new DOMRect() } as ColumnBox;
 
   // Group lines into columns.
   const addColumn = () => {
@@ -114,7 +109,7 @@ function analyzeLayout(charBoxes, text) {
       currentColumn = { lines: [], rect: new DOMRect() };
     }
   };
-  for (let line of lines) {
+  for (const line of lines) {
     const prevLine = currentColumn.lines[currentColumn.lines.length - 1];
 
     if (prevLine) {
@@ -156,23 +151,29 @@ function analyzeLayout(charBoxes, text) {
  * viewer.
  */
 export class ImageTextLayer {
+  container: HTMLElement;
+
+  private _imageSizeObserver?: ResizeObserver;
+  private _listeners: ListenerCollection;
+  private _updateTextLayerSize: DebouncedFunction<[]>;
+
   /**
    * Create a text layer which is displayed on top of `image`.
    *
-   * @param {Element} image - Rendered image on which to overlay the text layer.
+   * @param image - Rendered image on which to overlay the text layer.
    *   The text layer will be inserted into the DOM as the next sibling of `image`.
-   * @param {DOMRect[]} charBoxes - Bounding boxes for characters in the image.
+   * @param charBoxes - Bounding boxes for characters in the image.
    *   Coordinates should be in the range [0-1], where 0 is the top/left corner
    *   of the image and 1 is the bottom/right.
-   * @param {string} text - Characters in the image corresponding to `charBoxes`
+   * @param text - Characters in the image corresponding to `charBoxes`
    */
-  constructor(image, charBoxes, text) {
+  constructor(image: Element, charBoxes: DOMRect[], text: string) {
     if (charBoxes.length !== text.length) {
       throw new Error('Char boxes length does not match text length');
     }
 
     // Create container for text layer and position it above the image.
-    const containerParent = /** @type {HTMLElement} */ (image.parentNode);
+    const containerParent = image.parentNode as HTMLElement;
     const container = document.createElement('hypothesis-text-layer');
     containerParent.insertBefore(container, image.nextSibling);
 
@@ -201,20 +202,15 @@ export class ImageTextLayer {
     container.style.fontSize = fontSize + 'px';
     container.style.fontFamily = fontFamily;
     const canvas = document.createElement('canvas');
-    const context = /** @type {CanvasRenderingContext2D} */ (
-      canvas.getContext('2d')
-    );
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D;
     context.font = `${fontSize}px ${fontFamily}`;
 
-    /**
-     * Generate a CSS value that scales with the `--x-scale` or `--y-scale` CSS variables.
-     *
-     * @param {'x'|'y'} dimension
-     * @param {number} value
-     * @param {string} unit
-     */
-    const scaledValue = (dimension, value, unit = 'px') =>
-      `calc(var(--${dimension}-scale) * ${value}${unit})`;
+    /** Generate a CSS value that scales with the `--x-scale` or `--y-scale` CSS variables. */
+    const scaledValue = (
+      dimension: 'x' | 'y',
+      value: number,
+      unit = 'px' as string
+    ) => `calc(var(--${dimension}-scale) * ${value}${unit})`;
 
     // Group characters into words, lines and columns. Then use the result to
     // create a hierarchical DOM structure in the text layer:
@@ -227,7 +223,7 @@ export class ImageTextLayer {
     // in-between lines or words.
     const columns = analyzeLayout(charBoxes, text);
 
-    for (let column of columns) {
+    for (const column of columns) {
       const columnEl = document.createElement('hypothesis-text-column');
       columnEl.style.display = 'block';
       columnEl.style.position = 'absolute';
@@ -235,7 +231,7 @@ export class ImageTextLayer {
       columnEl.style.top = scaledValue('y', column.rect.top);
 
       let prevLine = null;
-      for (let line of column.lines) {
+      for (const line of column.lines) {
         const lineEl = document.createElement('hypothesis-text-line');
         lineEl.style.display = 'block';
         lineEl.style.marginLeft = scaledValue(
@@ -256,7 +252,7 @@ export class ImageTextLayer {
         lineEl.style.whiteSpace = 'nowrap';
 
         let prevWord = null;
-        for (let word of line.words) {
+        for (const word of line.words) {
           const wordEl = document.createElement('hypothesis-text-word');
           wordEl.style.display = 'inline-block';
           wordEl.style.transformOrigin = 'top left';

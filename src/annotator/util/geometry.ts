@@ -1,10 +1,7 @@
 /**
  * Return the intersection of two rects.
- *
- * @param {DOMRect} rectA
- * @param {DOMRect} rectB
  */
-export function intersectRects(rectA, rectB) {
+export function intersectRects(rectA: DOMRect, rectB: DOMRect) {
   const left = Math.max(rectA.left, rectB.left);
   const right = Math.min(rectA.right, rectB.right);
   const top = Math.max(rectA.top, rectB.top);
@@ -18,10 +15,8 @@ export function intersectRects(rectA, rectB) {
  * An empty rect is defined as one with zero or negative width/height, eg.
  * as returned by `new DOMRect()` or `Element.getBoundingClientRect()` for a
  * hidden element.
- *
- * @param {DOMRect} rect
  */
-export function rectIsEmpty(rect) {
+export function rectIsEmpty(rect: DOMRect) {
   return rect.width <= 0 || rect.height <= 0;
 }
 
@@ -35,13 +30,8 @@ export function rectIsEmpty(rect) {
  *      c------d
  *
  * The inputs must be normalized such that b >= a and d >= c.
- *
- * @param {number} a
- * @param {number} b
- * @param {number} c
- * @param {number} d
  */
-function linesOverlap(a, b, c, d) {
+function linesOverlap(a: number, b: number, c: number, d: number) {
   const maxStart = Math.max(a, c);
   const minEnd = Math.min(b, d);
   return maxStart < minEnd;
@@ -49,11 +39,8 @@ function linesOverlap(a, b, c, d) {
 
 /**
  * Return true if the intersection of `rectB` and `rectA` is non-empty.
- *
- * @param {DOMRect} rectA
- * @param {DOMRect} rectB
  */
-export function rectIntersects(rectA, rectB) {
+export function rectIntersects(rectA: DOMRect, rectB: DOMRect) {
   if (rectIsEmpty(rectA) || rectIsEmpty(rectB)) {
     return false;
   }
@@ -66,11 +53,8 @@ export function rectIntersects(rectA, rectB) {
 
 /**
  * Return true if `rectB` is fully contained within `rectA`
- *
- * @param {DOMRect} rectA
- * @param {DOMRect} rectB
  */
-export function rectContains(rectA, rectB) {
+export function rectContains(rectA: DOMRect, rectB: DOMRect) {
   if (rectIsEmpty(rectA) || rectIsEmpty(rectB)) {
     return false;
   }
@@ -85,21 +69,15 @@ export function rectContains(rectA, rectB) {
 
 /**
  * Return true if two rects overlap vertically.
- *
- * @param {DOMRect} a
- * @param {DOMRect} b
  */
-export function rectsOverlapVertically(a, b) {
+export function rectsOverlapVertically(a: DOMRect, b: DOMRect) {
   return linesOverlap(a.top, a.bottom, b.top, b.bottom);
 }
 
 /**
  * Return true if two rects overlap horizontally.
- *
- * @param {DOMRect} a
- * @param {DOMRect} b
  */
-export function rectsOverlapHorizontally(a, b) {
+export function rectsOverlapHorizontally(a: DOMRect, b: DOMRect) {
   return linesOverlap(a.left, a.right, b.left, b.right);
 }
 
@@ -109,11 +87,8 @@ export function rectsOverlapHorizontally(a, b) {
  * The union of an empty rect (see {@link rectIsEmpty}) with a non-empty rect is
  * defined to be the non-empty rect. The union of two empty rects is an empty
  * rect.
- *
- * @param {DOMRect} a
- * @param {DOMRect} b
  */
-export function unionRects(a, b) {
+export function unionRects(a: DOMRect, b: DOMRect) {
   if (rectIsEmpty(a)) {
     return b;
   } else if (rectIsEmpty(b)) {
@@ -130,10 +105,8 @@ export function unionRects(a, b) {
 
 /**
  * Return the point at the center of a rect.
- *
- * @param {DOMRect} rect
  */
-export function rectCenter(rect) {
+export function rectCenter(rect: DOMRect) {
   return new DOMPoint(
     (rect.left + rect.right) / 2,
     (rect.top + rect.bottom) / 2
