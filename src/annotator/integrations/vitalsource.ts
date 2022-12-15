@@ -320,9 +320,6 @@ export class VitalSourceContentIntegration
 
   async describe(root: HTMLElement, range: Range) {
     const selectors: Selector[] = this._htmlIntegration.describe(root, range);
-    if (!this._bookIsSingleDocument()) {
-      return selectors;
-    }
 
     const {
       cfi,

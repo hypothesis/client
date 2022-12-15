@@ -360,63 +360,53 @@ describe('annotator/integrations/vitalsource', () => {
       assert.calledWith(fakeHTMLIntegration.scrollToAnchor, anchor);
     });
 
-    context('when "book_as_single_document" flag is on', () => {
-      beforeEach(() => {
-        featureFlags.update({ book_as_single_document: true });
+    it('adds selector for current EPUB book Content Document', async () => {
+      const integration = createIntegration();
+      integration.contentContainer();
+      assert.calledWith(fakeHTMLIntegration.contentContainer);
+
+      const range = new Range();
+      const selectors = await integration.describe(range);
+
+      const cfiSelector = selectors.find(s => s.type === 'EPUBContentSelector');
+
+      assert.ok(cfiSelector);
+      assert.deepEqual(cfiSelector, {
+        type: 'EPUBContentSelector',
+        url: resolveURL('/pages/chapter_02.xhtml'),
+        cfi: '/2',
+        title: 'Chapter two (from TOC)',
       });
 
-      it('adds selector for current EPUB book Content Document', async () => {
-        const integration = createIntegration();
-        integration.contentContainer();
-        assert.calledWith(fakeHTMLIntegration.contentContainer);
+      const pageSelector = selectors.find(s => s.type === 'PageSelector');
+      assert.notOk(pageSelector);
+    });
 
-        const range = new Range();
-        const selectors = await integration.describe(range);
+    it('adds selector for current PDF book page', async () => {
+      fakeBookElement.selectPDFBook();
 
-        const cfiSelector = selectors.find(
-          s => s.type === 'EPUBContentSelector'
-        );
+      const integration = createIntegration();
+      integration.contentContainer();
+      assert.calledWith(fakeHTMLIntegration.contentContainer);
 
-        assert.ok(cfiSelector);
-        assert.deepEqual(cfiSelector, {
-          type: 'EPUBContentSelector',
-          url: resolveURL('/pages/chapter_02.xhtml'),
-          cfi: '/2',
-          title: 'Chapter two (from TOC)',
-        });
+      const range = new Range();
+      const selectors = await integration.describe(range);
+      const cfiSelector = selectors.find(s => s.type === 'EPUBContentSelector');
 
-        const pageSelector = selectors.find(s => s.type === 'PageSelector');
-        assert.notOk(pageSelector);
+      assert.ok(cfiSelector);
+      assert.deepEqual(cfiSelector, {
+        type: 'EPUBContentSelector',
+        url: resolveURL('/pages/2'),
+        cfi: '/1',
+        title: 'First chapter',
       });
 
-      it('adds selector for current PDF book page', async () => {
-        fakeBookElement.selectPDFBook();
-
-        const integration = createIntegration();
-        integration.contentContainer();
-        assert.calledWith(fakeHTMLIntegration.contentContainer);
-
-        const range = new Range();
-        const selectors = await integration.describe(range);
-        const cfiSelector = selectors.find(
-          s => s.type === 'EPUBContentSelector'
-        );
-
-        assert.ok(cfiSelector);
-        assert.deepEqual(cfiSelector, {
-          type: 'EPUBContentSelector',
-          url: resolveURL('/pages/2'),
-          cfi: '/1',
-          title: 'First chapter',
-        });
-
-        const pageSelector = selectors.find(s => s.type === 'PageSelector');
-        assert.ok(pageSelector);
-        assert.deepEqual(pageSelector, {
-          type: 'PageSelector',
-          index: 1,
-          label: '2',
-        });
+      const pageSelector = selectors.find(s => s.type === 'PageSelector');
+      assert.ok(pageSelector);
+      assert.deepEqual(pageSelector, {
+        type: 'PageSelector',
+        index: 1,
+        label: '2',
       });
     });
 
