@@ -176,6 +176,18 @@ function makeContentFrameScrollable(frame: HTMLIFrameElement) {
 }
 
 /**
+ * Return a copy of URL with the origin removed.
+ *
+ * eg. "https://jigsaw.vitalsource.com/books/123/chapter.html?foo" =>
+ * "/books/123/chapter.html"
+ */
+function stripOrigin(url: string) {
+  // Resolve input URL in case it doesn't already have an origin.
+  const parsed = new URL(url, document.baseURI);
+  return parsed.pathname + parsed.search;
+}
+
+/**
  * Integration for the content frame in VitalSource's Bookshelf ebook reader.
  *
  * This integration delegates to the standard HTML integration for most
@@ -312,23 +324,13 @@ export class VitalSourceContentIntegration
       return selectors;
     }
 
-    const [pageInfo, toc] = await Promise.all([
-      this._bookElement.getCurrentPage(),
-      this._bookElement.getTOC(),
-    ]);
-
-    let title = pageInfo.chapterTitle;
-
-    // Find the first table of contents entry that corresponds to the current page,
-    // and use its title instead of `pageInfo.chapterTitle`. This works around
-    // https://github.com/hypothesis/client/issues/4986.
-    const pageCFI = documentCFI(pageInfo.cfi);
-    const tocEntry = toc.data?.find(
-      entry => documentCFI(entry.cfi) === pageCFI
-    );
-    if (tocEntry) {
-      title = tocEntry.title;
-    }
+    const {
+      cfi,
+      index: pageIndex,
+      page: pageLabel,
+      title,
+      url,
+    } = await this._getPageInfo(true /* includeTitle */);
 
     // We generate an "EPUBContentSelector" with a CFI for all VS books,
     // although for PDF-based books the CFI is a string generated from the
@@ -336,8 +338,8 @@ export class VitalSourceContentIntegration
     const extraSelectors: Selector[] = [
       {
         type: 'EPUBContentSelector',
-        cfi: pageInfo.cfi,
-        url: pageInfo.absoluteURL,
+        cfi,
+        url,
         title,
       },
     ];
@@ -351,8 +353,8 @@ export class VitalSourceContentIntegration
     if (bookInfo.format === 'pbk') {
       extraSelectors.push({
         type: 'PageSelector',
-        index: pageInfo.index,
-        label: pageInfo.page,
+        index: pageIndex,
+        label: pageLabel,
       });
     }
 
@@ -425,7 +427,7 @@ export class VitalSourceContentIntegration
     if (selector?.cfi) {
       this._bookElement.goToCfi(selector.cfi);
     } else if (selector?.url) {
-      this._bookElement.goToURL(selector.url);
+      this._bookElement.goToURL(stripOrigin(selector.url));
     } else {
       throw new Error('No segment information available');
     }
@@ -437,12 +439,51 @@ export class VitalSourceContentIntegration
     return true;
   }
 
-  async segmentInfo(): Promise<SegmentInfo> {
-    const pageInfo = await this._bookElement.getCurrentPage();
+  /**
+   * Retrieve information about the currently displayed content document or
+   * page.
+   *
+   * @param includeTitle - Whether to fetch the title. This involves some extra
+   *   work so should be skipped when not required.
+   */
+  async _getPageInfo(includeTitle: boolean) {
+    const [pageInfo, toc] = await Promise.all([
+      this._bookElement.getCurrentPage(),
+      includeTitle ? this._bookElement.getTOC() : undefined,
+    ]);
+
+    let title;
+
+    if (toc) {
+      title = pageInfo.chapterTitle;
+
+      // Find the first table of contents entry that corresponds to the current page,
+      // and use its title instead of `pageInfo.chapterTitle`. This works around
+      // https://github.com/hypothesis/client/issues/4986.
+      const pageCFI = documentCFI(pageInfo.cfi);
+      const tocEntry = toc.data?.find(
+        entry => documentCFI(entry.cfi) === pageCFI
+      );
+      if (tocEntry) {
+        title = tocEntry.title;
+      }
+    }
+
     return {
       cfi: pageInfo.cfi,
-      url: pageInfo.absoluteURL,
+      index: pageInfo.index,
+      page: pageInfo.page,
+      title,
+
+      // The `pageInfo.absoluteURL` URL is an absolute path that does not
+      // include the origin of VitalSource's CDN.
+      url: new URL(pageInfo.absoluteURL, document.baseURI).toString(),
     };
+  }
+
+  async segmentInfo(): Promise<SegmentInfo> {
+    const { cfi, url } = await this._getPageInfo(false /* includeTitle */);
+    return { cfi, url };
   }
 
   async uri() {

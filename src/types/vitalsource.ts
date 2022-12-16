@@ -174,6 +174,8 @@ export type MosaicBookElement = HTMLElement & {
 
   /**
    * Navigate the book to the page or content document whose URL matches `url`.
+   *
+   * `url` must be a relative URL with an absolute path (eg. "/books/123/chapter01.xhtml").
    */
   goToURL(url: string): void;
 };

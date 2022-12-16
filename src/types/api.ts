@@ -76,8 +76,8 @@ export type EPUBContentSelector = {
   type: 'EPUBContentSelector';
 
   /**
-   * URL of the content document. This can either be an absolute HTTP URL, or
-   * a URL that is relative to the root of the EPUB.
+   * URL of the content document. This should be an absolute HTTPS URL if
+   * available, but may be relative to the root of the EPUB.
    */
   url: string;
 

@@ -54,6 +54,10 @@ class FakeVitalSourceViewer {
   }
 }
 
+function resolveURL(relativeURL) {
+  return new URL(relativeURL, document.baseURI).toString();
+}
+
 describe('annotator/integrations/vitalsource', () => {
   let featureFlags;
   let fakeViewer;
@@ -376,7 +380,7 @@ describe('annotator/integrations/vitalsource', () => {
         assert.ok(cfiSelector);
         assert.deepEqual(cfiSelector, {
           type: 'EPUBContentSelector',
-          url: '/pages/chapter_02.xhtml',
+          url: resolveURL('/pages/chapter_02.xhtml'),
           cfi: '/2',
           title: 'Chapter two (from TOC)',
         });
@@ -401,7 +405,7 @@ describe('annotator/integrations/vitalsource', () => {
         assert.ok(cfiSelector);
         assert.deepEqual(cfiSelector, {
           type: 'EPUBContentSelector',
-          url: '/pages/2',
+          url: resolveURL('/pages/2'),
           cfi: '/1',
           title: 'First chapter',
         });
@@ -479,7 +483,7 @@ describe('annotator/integrations/vitalsource', () => {
         const ann = createAnnotationWithSelector({
           type: 'EPUBContentSelector',
           cfi: '/2/4',
-          url: '/chapters/02.xhtml',
+          url: resolveURL('/chapters/02.xhtml'),
         });
 
         integration.navigateToSegment(ann);
@@ -491,7 +495,7 @@ describe('annotator/integrations/vitalsource', () => {
         const integration = createIntegration();
         const ann = createAnnotationWithSelector({
           type: 'EPUBContentSelector',
-          url: '/chapters/02.xhtml',
+          url: resolveURL('/chapters/02.xhtml'),
         });
 
         integration.navigateToSegment(ann);
@@ -506,7 +510,7 @@ describe('annotator/integrations/vitalsource', () => {
         const segment = await integration.segmentInfo();
         assert.deepEqual(segment, {
           cfi: '/2',
-          url: '/pages/chapter_02.xhtml',
+          url: resolveURL('/pages/chapter_02.xhtml'),
         });
       });
     });
