@@ -1,9 +1,12 @@
 /**
- * This module defines the types exposed by the VitalSource Bookshelf reader
+ * This module defines the APIs exposed by the VitalSource Bookshelf reader
  * to our JavaScript code running in the viewer.
  *
  * The primary entry point is the `<mosaic-book>` custom element in the container
  * frame, whose API is described by {@link MosaicBookElement}.
+ *
+ * In content frames, there are also global variables containing data needed
+ * to generate the text layer. See {@link ContentFrameGlobals}.
  */
 
 /**
@@ -173,4 +176,39 @@ export type MosaicBookElement = HTMLElement & {
    * Navigate the book to the page or content document whose URL matches `url`.
    */
   goToURL(url: string): void;
+};
+
+/**
+ * Bounding box of a single character in the page.
+ *
+ * Coordinates are expressed in percentage distance from the top-left corner
+ * of the rendered page.
+ */
+export type GlyphBox = {
+  l: number;
+  r: number;
+  t: number;
+  b: number;
+};
+
+export type PDFGlyphData = {
+  glyphs: GlyphBox[];
+};
+
+/**
+ * Data that the VitalSource book reader renders into the content frame for
+ * PDF-based books, containing the content and location of text.
+ */
+export type PDFTextData = {
+  /** Locations of each text character in the page */
+  glyphs: PDFGlyphData;
+  /** The text in the page */
+  words: string;
+};
+
+/**
+ * Globals that VitalSource adds to the `Window` object in the content frame.
+ */
+export type ContentFrameGlobals = {
+  innerPageData?: PDFTextData;
 };
