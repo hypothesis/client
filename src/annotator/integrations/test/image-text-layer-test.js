@@ -10,13 +10,22 @@ const lineSpacing = 0.1;
 
 /**
  * Create character bounding box data for text in an image.
+ *
+ * Lines are broken after new-line chars and also before any indicies in
+ * `breakPositions`.
  */
-function createCharBoxes(text) {
+function createCharBoxes(text, breakPositions = []) {
   const charBoxes = [];
   let lineIndex = 0;
   let charIndex = 0;
 
-  for (let char of text) {
+  for (let i = 0; i < text.length; i++) {
+    if (breakPositions.includes(i)) {
+      charIndex = 0;
+      ++lineIndex;
+    }
+
+    const char = text[i];
     charBoxes.push({
       left: charIndex * charSpacing,
       right: charIndex * charSpacing + charWidth,
@@ -198,6 +207,23 @@ describe('ImageTextLayer', () => {
       expectedBoxOffsetAndSize(imageWidth, imageHeight, 1, 7, 'line'),
     ];
     assert.deepEqual(wordBoxPositions, expectedPositions);
+  });
+
+  it('breaks words when characters do not overlap vertically', () => {
+    const { image } = createPageImage();
+    const imageText = 'first linesecond line';
+    const textLayer = createTextLayer(
+      image,
+      createCharBoxes(imageText, [imageText.indexOf('second')]),
+      imageText
+    );
+
+    assert.equal(textLayer.container.textContent, 'first linesecond line');
+    const wordBoxes = getWordBoxes(textLayer);
+    assert.deepEqual(
+      wordBoxes.map(ws => ws.textContent),
+      ['first ', 'line', 'second ', 'line']
+    );
   });
 
   it('creates lines and columns in the text layer', () => {
