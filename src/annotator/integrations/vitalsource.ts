@@ -17,7 +17,10 @@ import type {
   SegmentInfo,
   SidebarLayout,
 } from '../../types/annotator';
-import type { MosaicBookElement } from '../../types/vitalsource';
+import type {
+  ContentFrameGlobals,
+  MosaicBookElement,
+} from '../../types/vitalsource';
 import type { EPUBContentSelector, Selector } from '../../types/api';
 import type { InjectConfig } from '../hypothesis-injector';
 
@@ -137,34 +140,6 @@ export class VitalSourceInjector {
     this._frameObserver.disconnect();
   }
 }
-
-/**
- * Bounding box of a single character in the page.
- *
- * Coordinates are expressed in percentage distance from the top-left corner
- * of the rendered page.
- */
-type GlyphBox = {
-  l: number;
-  r: number;
-  t: number;
-  b: number;
-};
-
-type PDFGlyphData = {
-  glyphs: GlyphBox[];
-};
-
-/**
- * Data that the VitalSource book reader renders into the page about the
- * content and location of text in the image.
- */
-type PDFTextData = {
-  /** Locations of each text character in the page */
-  glyphs: PDFGlyphData;
-  /** The text in the page */
-  words: string;
-};
 
 function getPDFPageImage() {
   return document.querySelector('img#pbk-page') as HTMLImageElement | null;
@@ -291,7 +266,7 @@ export class VitalSourceContentIntegration
     // image.
     const bookImage = getPDFPageImage();
 
-    const pageData = (window as any).innerPageData as PDFTextData | undefined;
+    const pageData = (window as ContentFrameGlobals).innerPageData;
 
     if (bookImage && pageData) {
       const charRects = pageData.glyphs.glyphs.map(glyph => {
