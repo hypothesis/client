@@ -22,6 +22,8 @@ export function annotationMatchesSegment(
   }
 
   return Boolean(
+    // nb. The URL comparison here assumes that both URLs are either absolute
+    // or relative to the same root.
     (segment.url && selector.url === segment.url) ||
       (segment.cfi &&
         selector.cfi &&
