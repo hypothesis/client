@@ -57,6 +57,13 @@ function analyzeLayout(charBoxes: DOMRect[], text: string): ColumnBox[] {
     const char = text[i];
     const isSpace = /\s/.test(char);
 
+    if (
+      currentWord.text.length > 0 &&
+      !rectsOverlapVertically(currentWord.rect, rect)
+    ) {
+      addWord();
+    }
+
     currentWord.rect = unionRects(currentWord.rect, rect);
 
     // To simplify downstream logic, normalize whitespace.
