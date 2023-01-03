@@ -1,3 +1,5 @@
+import { trimRange } from './trim-range';
+
 /**
  * Return the combined length of text nodes contained in `node`.
  */
@@ -313,5 +315,13 @@ export class TextRange {
       new TextPosition(root, start),
       new TextPosition(root, end)
     );
+  }
+
+  /**
+   * Return a new Range representing `range` trimmed of any leading or trailing
+   * whitespace
+   */
+  static trimmedRange(range: Range): Range {
+    return trimRange(TextRange.fromRange(range).toRange());
   }
 }
