@@ -452,5 +452,21 @@ describe('annotator/anchoring/text-range', () => {
         assert.equal(textRange.end.offset, 10);
       });
     });
+
+    describe('trimmedRange', () => {
+      it('adjusts Range start and end positions to remove whitespace', () => {
+        const el = document.createElement('div');
+        el.textContent = ' one two three ';
+
+        const range = new Range();
+        range.selectNodeContents(el);
+
+        const textRange = TextRange.fromRange(range).toRange();
+        const trimmedRange = TextRange.trimmedRange(range);
+
+        assert.equal(trimmedRange.startOffset, textRange.startOffset + 1);
+        assert.equal(trimmedRange.endOffset, textRange.endOffset - 1);
+      });
+    });
   });
 });
