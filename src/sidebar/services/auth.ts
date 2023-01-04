@@ -1,16 +1,20 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 import { serviceConfig } from '../config/service-config';
+import type { APIRoutesService } from './api-routes';
+import type { LocalStorageService } from './local-storage';
+import type { SidebarSettings } from '../../types/config';
+import type { ToastMessengerService } from './toast-messenger';
 import { OAuthClient } from '../util/oauth-client';
+import type { TokenInfo } from '../util/oauth-client';
 import { resolve } from '../util/url';
 
-/**
- * @typedef {import('../util/oauth-client').TokenInfo} TokenInfo
- *
- * @typedef RefreshOptions
- * @prop {boolean} persist - True if access tokens should be persisted for
- *   use in future sessions.
- */
+type RefreshOptions = {
+  /**
+   * True if access tokens should be persisted for use in future sessions.
+   */
+  persist: boolean;
+};
 
 /**
  * Authorization service.
@@ -28,33 +32,32 @@ import { resolve } from '../util/url';
  * @inject
  */
 export class AuthService extends TinyEmitter {
-  /**
-   * @param {Window} $window
-   * @param {import('./api-routes').APIRoutesService} apiRoutes
-   * @param {import('./local-storage').LocalStorageService} localStorage
-   * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
-   * @param {import('../../types/config').SidebarSettings} settings
-   */
-  constructor($window, apiRoutes, localStorage, settings, toastMessenger) {
+  public login: () => void;
+  public logout: () => void;
+  public getAccessToken: () => void;
+
+  constructor(
+    $window: Window,
+    apiRoutes: APIRoutesService,
+    localStorage: LocalStorageService,
+    settings: SidebarSettings,
+    toastMessenger: ToastMessengerService
+  ) {
     super();
 
     /**
      * Authorization code from auth popup window.
-     * @type {string|null}
      */
-    let authCode;
+    let authCode: string | null;
 
     /**
      * Token info retrieved via `POST /api/token` endpoint.
      *
      * Resolves to `null` if the user is not logged in.
-     *
-     * @type {Promise<TokenInfo|null>|null}
      */
-    let tokenInfoPromise;
+    let tokenInfoPromise: Promise<TokenInfo | null> | null;
 
-    /** @type {OAuthClient} */
-    let client;
+    let client: OAuthClient;
 
     /**
      * Absolute URL of the `/api/token` endpoint.
@@ -63,10 +66,8 @@ export class AuthService extends TinyEmitter {
 
     /**
      * Show an error message telling the user that the access token has expired.
-     *
-     * @param {string} message
      */
-    function showAccessTokenExpiredErrorMessage(message) {
+    function showAccessTokenExpiredErrorMessage(message: string) {
       toastMessenger.error(`Hypothesis login lost: ${message}`, {
         autoDismiss: false,
       });
@@ -114,10 +115,8 @@ export class AuthService extends TinyEmitter {
 
     /**
      * Persist access & refresh tokens for future use.
-     *
-     * @param {TokenInfo} token
      */
-    function saveToken(token) {
+    function saveToken(token: TokenInfo) {
       localStorage.setObject(storageKey(), token);
     }
 
@@ -152,12 +151,11 @@ export class AuthService extends TinyEmitter {
 
     /**
      * Exchange a refresh token for a new access token and refresh token pair.
-     *
-     * @param {string} refreshToken
-     * @param {RefreshOptions} options
-     * @return {Promise<TokenInfo|null>} Promise for the new access token
      */
-    const refreshAccessToken = async (refreshToken, options) => {
+    const refreshAccessToken = async (
+      refreshToken: string,
+      options: RefreshOptions
+    ): Promise<TokenInfo | null> => {
       const client = await oauthClient();
 
       let token;
@@ -186,9 +184,8 @@ export class AuthService extends TinyEmitter {
      * Exchange authorization code retrieved from login popup for a new
      * access token.
      *
-     * @param {string} code
      */
-    const exchangeAuthCodeForToken = async code => {
+    const exchangeAuthCodeForToken = async (code: string) => {
       const client = await oauthClient();
       const tokenInfo = await client.exchangeAuthCode(code);
       saveToken(tokenInfo);
@@ -207,9 +204,9 @@ export class AuthService extends TinyEmitter {
     /**
      * Retrieve an access token for the API.
      *
-     * @return {Promise<string|null>} The API access token or `null` if not logged in.
+     * @return The API access token string or `null` if not logged in.
      */
-    const getAccessToken = async () => {
+    const getAccessToken = async (): Promise<string | null> => {
       // Determine how to get an access token, depending on the login method being used.
       if (!tokenInfoPromise) {
         const grantToken = getGrantToken();
