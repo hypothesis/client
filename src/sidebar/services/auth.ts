@@ -1,18 +1,18 @@
 import { TinyEmitter } from 'tiny-emitter';
 
-import { serviceConfig } from '../config/service-config';
-import type { APIRoutesService } from './api-routes';
-import type { LocalStorageService } from './local-storage';
 import type { SidebarSettings } from '../../types/config';
-import type { ToastMessengerService } from './toast-messenger';
 import { OAuthClient } from '../util/oauth-client';
 import type { TokenInfo } from '../util/oauth-client';
 import { resolve } from '../util/url';
 
+import { serviceConfig } from '../config/service-config';
+
+import type { APIRoutesService } from './api-routes';
+import type { LocalStorageService } from './local-storage';
+import type { ToastMessengerService } from './toast-messenger';
+
 type RefreshOptions = {
-  /**
-   * True if access tokens should be persisted for use in future sessions.
-   */
+  /** True if access tokens should be persisted for use in future sessions. */
   persist: boolean;
 };
 
@@ -32,9 +32,28 @@ type RefreshOptions = {
  * @inject
  */
 export class AuthService extends TinyEmitter {
-  public login: () => void;
-  public logout: () => void;
-  public getAccessToken: () => void;
+  /**
+   * Authorization code from auth popup window. Set by the login method
+   * and exchanged for an Access Token on the next API call.
+   */
+  private _authCode: string | null;
+
+  /** Cached OAuthClient */
+  private _client: OAuthClient | null;
+
+  /**
+   * Token info retrieved via `POST /api/token` endpoint.
+   *
+   * Resolves to `null` if the user is not logged in.
+   */
+  private _tokenInfoPromise: Promise<TokenInfo | null> | null;
+
+  // Injected services
+  private _apiRoutes: APIRoutesService;
+  private _localStorage: LocalStorageService;
+  private _settings: SidebarSettings;
+  private _toastMessenger: ToastMessengerService;
+  private _window: Window;
 
   constructor(
     $window: Window,
@@ -45,275 +64,268 @@ export class AuthService extends TinyEmitter {
   ) {
     super();
 
-    /**
-     * Authorization code from auth popup window.
-     */
-    let authCode: string | null;
+    this._authCode = null;
+    this._client = null;
+    this._tokenInfoPromise = null;
 
-    /**
-     * Token info retrieved via `POST /api/token` endpoint.
-     *
-     * Resolves to `null` if the user is not logged in.
-     */
-    let tokenInfoPromise: Promise<TokenInfo | null> | null;
+    this._apiRoutes = apiRoutes;
+    this._localStorage = localStorage;
+    this._settings = settings;
+    this._toastMessenger = toastMessenger;
+    this._window = $window;
 
-    let client: OAuthClient;
+    this._listenForTokenStorageEvents();
+  }
 
-    /**
-     * Absolute URL of the `/api/token` endpoint.
-     */
-    const tokenUrl = resolve('token', settings.apiUrl);
-
-    /**
-     * Show an error message telling the user that the access token has expired.
-     */
-    function showAccessTokenExpiredErrorMessage(message: string) {
-      toastMessenger.error(`Hypothesis login lost: ${message}`, {
-        autoDismiss: false,
-      });
-    }
-
-    /**
-     * Return the storage key used for storing access/refresh token data for a given
-     * annotation service.
-     */
-    function storageKey() {
-      // Use a unique key per annotation service. Currently OAuth tokens are only
-      // persisted for the default annotation service. If in future we support
-      // logging into other services from the client, this function will need to
-      // take the API URL as an argument.
-      let apiDomain = new URL(settings.apiUrl).hostname;
-
-      // Percent-encode periods to avoid conflict with section delimeters.
-      apiDomain = apiDomain.replace(/\./g, '%2E');
-
-      return `hypothesis.oauth.${apiDomain}.token`;
-    }
-
-    /**
-     * Fetch the last-saved access/refresh tokens for `authority` from local
-     * storage.
-     */
-    function loadToken() {
-      const token = localStorage.getObject(storageKey());
-
-      if (
-        !token ||
-        typeof token.accessToken !== 'string' ||
-        typeof token.refreshToken !== 'string' ||
-        typeof token.expiresAt !== 'number'
-      ) {
-        return null;
+  /**
+   * Listen for updated access and refresh tokens saved by other instances of
+   * the client.
+   */
+  private _listenForTokenStorageEvents() {
+    this._window.addEventListener('storage', ({ key }) => {
+      if (key === this._storageKey()) {
+        // Reset cached token information. Tokens will be reloaded from storage
+        // on the next call to `getAccessToken()`.
+        this._tokenInfoPromise = null;
+        this.emit('oauthTokensChanged');
       }
+    });
+  }
 
-      return {
-        accessToken: token.accessToken,
-        refreshToken: token.refreshToken,
-        expiresAt: token.expiresAt,
-      };
+  /**
+   * Fetch the last-saved access/refresh tokens from local storage.
+   */
+  private _loadToken() {
+    const token = this._localStorage.getObject(this._storageKey());
+
+    if (
+      !token ||
+      typeof token.accessToken !== 'string' ||
+      typeof token.refreshToken !== 'string' ||
+      typeof token.expiresAt !== 'number'
+    ) {
+      return null;
     }
 
-    /**
-     * Persist access & refresh tokens for future use.
-     */
-    function saveToken(token: TokenInfo) {
-      localStorage.setObject(storageKey(), token);
+    return {
+      accessToken: token.accessToken,
+      refreshToken: token.refreshToken,
+      expiresAt: token.expiresAt,
+    };
+  }
+
+  /**
+   * Return a cached OAuthClient if available, or configure one and return it.
+   */
+  async _oauthClient() {
+    if (this._client) {
+      return this._client;
     }
 
-    /**
-     * Listen for updated access & refresh tokens saved by other instances of the
-     * client.
-     */
-    const listenForTokenStorageEvents = () => {
-      $window.addEventListener('storage', ({ key }) => {
-        if (key === storageKey()) {
-          // Reset cached token information. Tokens will be reloaded from storage
-          // on the next call to `getAccessToken()`.
-          tokenInfoPromise = null;
-          this.emit('oauthTokensChanged');
+    const links = await this._apiRoutes.links();
+    this._client = new OAuthClient({
+      clientId: this._settings.oauthClientId,
+      authorizationEndpoint: links['oauth.authorize'],
+      revokeEndpoint: links['oauth.revoke'],
+      tokenEndpoint: resolve('token', this._settings.apiUrl),
+    });
+    return this._client;
+  }
+
+  /**
+   * Exchange the authorization code retrieved from login popup for a new
+   * access token.
+   */
+  private async _exchangeAuthCodeForToken(code: string) {
+    const client = await this._oauthClient();
+    const tokenInfo = await client.exchangeAuthCode(code);
+    this._saveToken(tokenInfo);
+    return tokenInfo;
+  }
+
+  /**
+   * Attempt to exchange a grant token for an access token.
+   *
+   * Publishers or other embedders can set a grant token for a user in service
+   * configuration.
+   */
+  private async _exchangeGrantToken(grantToken: string) {
+    const client = await this._oauthClient();
+    try {
+      return await client.exchangeGrantToken(grantToken);
+    } catch (err) {
+      this._toastMessenger.error(
+        `Hypothesis login lost: You must reload the page to annotate.`,
+        {
+          autoDismiss: false,
         }
-      });
-    };
+      );
+      throw err;
+    }
+  }
 
-    const oauthClient = async () => {
-      if (client) {
-        return client;
-      }
-      const links = await apiRoutes.links();
-      client = new OAuthClient({
-        clientId: settings.oauthClientId,
-        authorizationEndpoint: links['oauth.authorize'],
-        revokeEndpoint: links['oauth.revoke'],
-        tokenEndpoint: tokenUrl,
-      });
-      return client;
-    };
+  /**
+   * Retrieve any grant token set by service configuration
+   */
+  private _getGrantToken(): string | undefined {
+    return serviceConfig(this._settings)?.grantToken;
+  }
 
-    /**
-     * Exchange a refresh token for a new access token and refresh token pair.
-     */
-    const refreshAccessToken = async (
-      refreshToken: string,
-      options: RefreshOptions
-    ): Promise<TokenInfo | null> => {
-      const client = await oauthClient();
+  /**
+   * Return the storage key used for storing access/refresh token data for a
+   * given annotation service.
+   */
+  private _storageKey() {
+    // Use a unique key per annotation service. Currently OAuth tokens are only
+    // persisted for the default annotation service. If in future we support
+    // logging into other services from the client, this function will need to
+    // take the API URL as an argument.
+    let apiDomain = new URL(this._settings.apiUrl).hostname;
 
-      let token;
-      try {
-        token = await client.refreshToken(refreshToken);
+    // Percent-encode periods to avoid conflict with section delimeters.
+    apiDomain = apiDomain.replace(/\./g, '%2E');
 
-        // Sanity check that prevents an infinite loop. Mostly useful in
-        // tests.
-        if (Date.now() > token.expiresAt) {
-          /* istanbul ignore next */
-          throw new Error('Refreshed token expired in the past');
-        }
-      } catch {
-        // If refreshing the token fails, the user is simply logged out.
-        return null;
-      }
+    return `hypothesis.oauth.${apiDomain}.token`;
+  }
 
-      if (options.persist) {
-        saveToken(token);
-      }
+  /**
+   * Persist access and refresh tokens for later reuse
+   */
+  private _saveToken(token: TokenInfo) {
+    this._localStorage.setObject(this._storageKey(), token);
+  }
 
-      return token;
-    };
+  /**
+   * Exchange a refresh token for a new access token and refresh token pair
+   */
+  private async _refreshAccessToken(
+    refreshToken: string,
+    options: RefreshOptions
+  ): Promise<TokenInfo | null> {
+    const client = await this._oauthClient();
 
-    /**
-     * Exchange authorization code retrieved from login popup for a new
-     * access token.
-     *
-     */
-    const exchangeAuthCodeForToken = async (code: string) => {
-      const client = await oauthClient();
-      const tokenInfo = await client.exchangeAuthCode(code);
-      saveToken(tokenInfo);
-      return tokenInfo;
-    };
+    let token;
+    try {
+      token = await client.refreshToken(refreshToken);
 
-    /**
-     * Return the grant token provided by the host page or parent frame used
-     * for automatic login. This will be:
-     *  - `undefined` if automatic login is not used
-     *  - `null` if automatic login is used but the user is not logged in
-     *  - a non-empty string if automatic login is used and the user is logged in
-     */
-    const getGrantToken = () => serviceConfig(settings)?.grantToken;
-
-    /**
-     * Retrieve an access token for the API.
-     *
-     * @return The API access token string or `null` if not logged in.
-     */
-    const getAccessToken = async (): Promise<string | null> => {
-      // Determine how to get an access token, depending on the login method being used.
-      if (!tokenInfoPromise) {
-        const grantToken = getGrantToken();
-        if (grantToken !== undefined) {
-          if (grantToken) {
-            // User is logged-in on the publisher's website.
-            // Exchange the grant token for a new access token.
-            tokenInfoPromise = oauthClient()
-              .then(client => client.exchangeGrantToken(grantToken))
-              .catch(err => {
-                showAccessTokenExpiredErrorMessage(
-                  'You must reload the page to annotate.'
-                );
-                throw err;
-              });
-          } else {
-            // User is anonymous on the publisher's website.
-            tokenInfoPromise = Promise.resolve(null);
-          }
-        } else if (authCode) {
-          tokenInfoPromise = exchangeAuthCodeForToken(authCode);
-          authCode = null; // Auth codes can only be used once.
-        } else {
-          // Attempt to load the tokens from the previous session.
-          tokenInfoPromise = Promise.resolve(loadToken());
-        }
-      }
-
-      // Wait for the token to be fetched, and check that it is valid and that
-      // it wasn't invalidated while it was being fetched.
-      const origToken = tokenInfoPromise;
-      const token = await tokenInfoPromise;
-
-      if (!token) {
-        // No token available. User will need to log in.
-        return null;
-      }
-
-      if (origToken !== tokenInfoPromise) {
-        // The token source was changed while waiting for the token to be fetched.
-        // This can happen for various reasons. We'll just need to try again.
-        return getAccessToken();
-      }
-
+      // Sanity check that prevents an infinite loop. Mostly useful in
+      // tests.
       if (Date.now() > token.expiresAt) {
-        // Token has expired, so we need to fetch a new one.
-        const grantToken = getGrantToken();
-        tokenInfoPromise = refreshAccessToken(token.refreshToken, {
-          // Only persist tokens if automatic login is not being used.
-          persist: typeof grantToken === 'undefined',
-        });
-        return getAccessToken();
+        /* istanbul ignore next */
+        throw new Error('Refreshed token expired in the past');
       }
-
-      return token.accessToken;
-    };
-
-    /**
-     * Login to the annotation service using OAuth.
-     *
-     * This displays a popup window which allows the user to login to the service
-     * (if necessary) and then responds with an auth code which the client can
-     * then exchange for access and refresh tokens.
-     */
-    async function login() {
-      // Any async steps before the call to `client.authorize` must complete
-      // in less than ~1 second, otherwise the browser's popup blocker may block
-      // the popup.
-      //
-      // `oauthClient` is async in case in needs to fetch links from the API.
-      // This should already have happened by the time this function is called
-      // however, so it will just be returning a cached value.
-      const client = await oauthClient();
-      const code = await client.authorize($window);
-
-      // Save the auth code. It will be exchanged for an access token when the
-      // next API request is made.
-      authCode = code;
-      tokenInfoPromise = null;
+    } catch {
+      // If refreshing the token fails, the user is simply logged out.
+      return null;
     }
 
-    /**
-     * Log out of the service (in the client only).
-     *
-     * This revokes and then forgets any OAuth credentials that the user has.
-     */
-    async function logout() {
-      const [token, client] = await Promise.all([
-        tokenInfoPromise,
-        oauthClient(),
-      ]);
-
-      if (token) {
-        await client.revokeToken(token.accessToken);
-      }
-
-      // eslint-disable-next-line require-atomic-updates
-      tokenInfoPromise = Promise.resolve(null);
-
-      localStorage.removeItem(storageKey());
+    if (options.persist) {
+      this._saveToken(token);
     }
 
-    listenForTokenStorageEvents();
+    return token;
+  }
 
-    // TODO - Convert these to ordinary class methods.
-    this.login = login;
-    this.logout = logout;
-    this.getAccessToken = getAccessToken;
+  /**
+   * Retrieve an access token for use with the API
+   */
+  async getAccessToken(): Promise<string | null> {
+    if (!this._tokenInfoPromise) {
+      // No access token is set: determine how to get one. This will depend on
+      // which type of login is being used
+      const grantToken = this._getGrantToken();
+      if (grantToken !== undefined) {
+        // The user is logged in through a publisher/embedder's site and
+        // a grant token has been included in service configuration
+        if (!grantToken) {
+          // Grant token is present but empty: this user is anonymous on the
+          // publisher/embedder website
+          this._tokenInfoPromise = Promise.resolve(null);
+        } else {
+          this._tokenInfoPromise = this._exchangeGrantToken(grantToken);
+        }
+      } else if (this._authCode) {
+        // User has authorized through pop-up window and we have an
+        // authorization code we can exchange for an access token
+        this._tokenInfoPromise = this._exchangeAuthCodeForToken(this._authCode);
+        this._authCode = null; // Consume the single-use auth code
+      } else {
+        // Attempt to retrieve stored token from previous session
+        this._tokenInfoPromise = Promise.resolve(this._loadToken());
+      }
+    }
+
+    // Wait for the token to resolve. Ensure that it is valid and that
+    // it wasn't invalidated while it was being fetched. Refresh if needed.
+
+    const origToken = this._tokenInfoPromise;
+    const token = await this._tokenInfoPromise;
+
+    if (!token) {
+      // No token available. User will need to log in.
+      return null;
+    }
+
+    if (origToken !== this._tokenInfoPromise) {
+      // The token source was changed while waiting for the token to be fetched.
+      // This can happen for various reasons. We'll just need to try again.
+      return this.getAccessToken();
+    }
+
+    if (Date.now() > token.expiresAt) {
+      // Token has expired, so we need to fetch a new one.
+      const grantToken = this._getGrantToken();
+      this._tokenInfoPromise = this._refreshAccessToken(token.refreshToken, {
+        // Only persist tokens if automatic login is not being used.
+        persist: typeof grantToken === 'undefined',
+      });
+      return this.getAccessToken();
+    }
+
+    return token.accessToken;
+  }
+
+  /**
+   * Log in to the service using OAuth.
+   *
+   * Authorize through OAuthClient (this shows a pop-up window to the user).
+   * Store the resulting authorization code to exchange for an access token in
+   * the next API call ( {@see getAccessToken} )
+   */
+  async login() {
+    // Any async steps before the call to `client.authorize` must complete
+    // in less than ~1 second, otherwise the browser's popup blocker may block
+    // the popup.
+    //
+    // `oauthClient` is async in case it needs to fetch links from the API.
+    // This should already have happened by the time this function is called
+    // however, so it will just be returning a cached value.
+    const client = await this._oauthClient();
+    const authCode = await client.authorize(this._window);
+
+    // Save the auth code. It will be exchanged for an access token when the
+    // next API request is made.
+    this._authCode = authCode;
+    this._tokenInfoPromise = null;
+  }
+
+  /**
+   * Log out of the service (in the client only).
+   *
+   * This revokes and then forgets any OAuth credentials that the user has.
+   */
+  async logout() {
+    const [token, client] = await Promise.all([
+      this._tokenInfoPromise,
+      this._oauthClient(),
+    ]);
+
+    if (token) {
+      await client.revokeToken(token.accessToken);
+    }
+
+    this._tokenInfoPromise = null;
+
+    this._localStorage.removeItem(this._storageKey());
   }
 }
