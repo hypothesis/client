@@ -137,7 +137,7 @@ describe('AuthService', () => {
     context('when the access token request fails', () => {
       const expectedErr = new Error('Grant token exchange failed');
       beforeEach('make access token requests fail', () => {
-        fakeClient.exchangeGrantToken.returns(Promise.reject(expectedErr));
+        fakeClient.exchangeGrantToken.rejects(expectedErr);
       });
 
       function assertThatAccessTokenPromiseWasRejectedAnd(func) {

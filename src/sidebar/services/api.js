@@ -217,7 +217,7 @@ export class APIService {
     /** @param {string} route */
     const apiCall = route =>
       createAPICall(links, route, {
-        getAccessToken: auth.getAccessToken,
+        getAccessToken: () => auth.getAccessToken(),
         getClientId,
         onRequestStarted: store.apiRequestStarted,
         onRequestFinished: store.apiRequestFinished,
