@@ -10,24 +10,28 @@ import { useCallback, useMemo } from 'preact/hooks';
 import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
 import { countHidden, countVisible } from '../helpers/thread';
+import type { Thread as IThread } from '../helpers/build-thread';
+import type { ThreadsService } from '../services/threads';
 
 import Annotation from './Annotation';
 import AnnotationHeader from './Annotation/AnnotationHeader';
 import EmptyAnnotation from './Annotation/EmptyAnnotation';
 import ModerationBanner from './ModerationBanner';
 
-/** @typedef {import('../helpers/build-thread').Thread} Thread */
+type ThreadCollapseControlProps = {
+  threadIsCollapsed: boolean;
+  onToggleReplies: () => void;
+};
 
 /**
  * Render a gutter area to the left of a thread's content with a control for
  * expanding/collapsing the thread and a visual vertical line showing the
  * extent of the thread.
- *
- * @param {object} props
- *   @param {boolean} props.threadIsCollapsed
- *   @param {() => void} props.onToggleReplies
  */
-function ThreadCollapseControl({ threadIsCollapsed, onToggleReplies }) {
+function ThreadCollapseControl({
+  threadIsCollapsed,
+  onToggleReplies,
+}: ThreadCollapseControlProps) {
   const ToggleIcon = threadIsCollapsed ? CaretRightIcon : MenuExpandIcon;
   const toggleTitle = threadIsCollapsed ? 'Expand replies' : 'Collapse replies';
   return (
@@ -69,11 +73,12 @@ function ThreadCollapseControl({ threadIsCollapsed, onToggleReplies }) {
   );
 }
 
-/**
- * @typedef ThreadProps
- * @prop {Thread} thread
- * @prop {import('../services/threads').ThreadsService} threadsService
- */
+export type ThreadProps = {
+  thread: IThread;
+
+  // injected
+  threadsService: ThreadsService;
+};
 
 /**
  * A thread, which contains a single annotation at its top level, and its
@@ -89,10 +94,8 @@ function ThreadCollapseControl({ threadIsCollapsed, onToggleReplies }) {
  *
  * Top-level threads do not render a collapse control, as they are not
  * collapsible.
- *
- * @param {ThreadProps} props
  */
-function Thread({ thread, threadsService }) {
+function Thread({ thread, threadsService }: ThreadProps) {
   const isReply = !!thread.parent;
 
   // If rendering child threads, only render those that have at least one
