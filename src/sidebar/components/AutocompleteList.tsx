@@ -4,30 +4,45 @@ import { useMemo } from 'preact/hooks';
 
 import MenuArrow from './MenuArrow';
 
-/**
- * @template T
- * @param {T} item
- */
-const defaultListFormatter = item => item;
+const defaultListFormatter = <Item,>(item: Item) => item;
 
-/**
- * @template T
- * @typedef AutocompleteListProps
- * @prop {number} [activeItem] - The index of the highlighted item.
- * @prop {string} [id] - Optional unique HTML attribute id. This can be used
- *   for parent `aria-controls` coupling.
- * @prop {string} [itemPrefixId] - Optional unique HTML attribute id prefix
- *   for each item in the list. The final value of each items' id is
- *   `{itemPrefixId}{activeItem}`
- * @prop {T[]} list - The list of items to render. This can be a simple
- *   list of strings or a list of objects when used with listFormatter.
- * @prop {(item: T, index?: number) => any} [listFormatter] - An optional formatter
- *   to render each item inside an <li> tag This is useful if the list is an array of
- *   objects rather than just strings.
- * @prop {(item: T) => void} onSelectItem - Callback when an item is clicked with
- *   the mouse.
- * @prop {boolean} [open] - Is the list open or closed?
- */
+export type AutocompleteListProps<Item> = {
+  /**
+   * The index of the highlighted item in the `list` of items. Defaults to `-1`
+   * (no item selected)
+   */
+  activeItem?: number;
+
+  /**
+   * Optional unique HTML attribute id. This can be used for parent
+   * `aria-controls` coupling.
+   */
+  id?: string;
+
+  /**
+   * Optional unique HTML attribute id prefix for each item in the list. The
+   * final value of each items' id is `{itemPrefixId}{activeItem}`
+   */
+  itemPrefixId?: string;
+
+  /**
+   * The list of items to render. This can be a simple list of strings or a list
+   * of objects when used with listFormatter.
+   */
+  list: Item[];
+
+  /**
+   * An optional formatter to render each item inside an <li> tag This is useful
+   * if the list is an array of objects rather than just strings.
+   */
+  listFormatter?: (item: Item, index?: number) => any;
+
+  /** Callback when an item is clicked */
+  onSelectItem: (item: Item) => void;
+
+  /** Is the AutocompleteList currently open (visible)? */
+  open?: boolean;
+};
 
 /**
  * Custom autocomplete component. Use this in conjunction with an <input> field.
@@ -36,11 +51,8 @@ const defaultListFormatter = item => item;
  * used by itself.
  *
  * Modeled after the "ARIA 1.1 Combobox with Listbox Popup"
- *
- * @template T
- * @param {AutocompleteListProps<T>} props
  */
-export default function AutocompleteList({
+export default function AutocompleteList<Item>({
   activeItem = -1,
   id,
   itemPrefixId,
@@ -48,7 +60,7 @@ export default function AutocompleteList({
   listFormatter = defaultListFormatter,
   onSelectItem,
   open = false,
-}) {
+}: AutocompleteListProps<Item>) {
   const items = useMemo(() => {
     return list.map((item, index) => {
       // only add an id if itemPrefixId is passed
