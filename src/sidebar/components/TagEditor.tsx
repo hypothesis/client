@@ -262,12 +262,6 @@ function TagEditor({
         id={tagEditorId}
         data-testid="combobox-container"
         ref={closeWrapperRef}
-        // Disabled because aria-controls must be attached to the <input> field
-        // eslint-disable-next-line jsx-a11y/role-has-required-aria-props
-        role="combobox"
-        aria-expanded={suggestionsListOpen.toString()}
-        aria-owns={`${tagEditorId}-AutocompleteList`}
-        aria-haspopup="listbox"
       >
         <Input
           onInput={handleOnInput}
@@ -280,8 +274,10 @@ function TagEditor({
           aria-autocomplete="list"
           aria-activedescendant={activeDescendant}
           aria-controls={`${tagEditorId}-AutocompleteList`}
+          aria-expanded={suggestionsListOpen.toString()}
           aria-label="Add tags"
           dir="auto"
+          role="combobox"
         />
         <AutocompleteList
           id={`${tagEditorId}-AutocompleteList`}

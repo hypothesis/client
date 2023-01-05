@@ -453,23 +453,13 @@ describe('TagEditor', () => {
   });
 
   describe('accessibility attributes and ids', () => {
-    const comboboxSelector = '[data-testid="combobox-container"]';
+    const comboboxSelector = 'input[role="combobox"]';
     it('creates multiple <TagEditor> components with unique AutocompleteList `id` props', () => {
       const wrapper1 = createComponent();
       const wrapper2 = createComponent();
       assert.notEqual(
         wrapper1.find('AutocompleteList').prop('id'),
         wrapper2.find('AutocompleteList').prop('id')
-      );
-    });
-
-    it('sets the <AutocompleteList> `id` prop to the same value as the `aria-owns` attribute', () => {
-      const wrapper = createComponent();
-      wrapper.find('AutocompleteList');
-
-      assert.equal(
-        wrapper.find(comboboxSelector).prop('aria-owns'),
-        wrapper.find('AutocompleteList').prop('id')
       );
     });
 
