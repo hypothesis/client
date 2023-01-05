@@ -2,6 +2,10 @@ import { Card, CardContent } from '@hypothesis/frontend-shared/lib/next';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 
+import type { Annotation } from '../../types/api';
+
+import type { Thread as IThread } from '../helpers/build-thread';
+import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
 
@@ -18,29 +22,28 @@ import Thread from './Thread';
  * @prop {import('../services/frame-sync').FrameSyncService} frameSync
  */
 
+export type ThreadCardProps = {
+  thread: IThread;
+
+  // injected
+  frameSync: FrameSyncService;
+};
 /**
  * A "top-level" `Thread`, rendered as a "card" in the sidebar. A `Thread`
  * renders its own child `Thread`s within itself.
- *
- * @param {ThreadCardProps} props
  */
-function ThreadCard({ frameSync, thread }) {
+function ThreadCard({ frameSync, thread }: ThreadCardProps) {
   const store = useSidebarStore();
   const threadTag = thread.annotation?.$tag ?? null;
-  const isHovered = threadTag && store.isAnnotationHovered(threadTag);
+  const isHovered = !!(threadTag && store.isAnnotationHovered(threadTag));
   const focusThreadAnnotation = useMemo(
     () =>
-      debounce(
-        /** @param {Annotation|null} ann */
-        ann => frameSync.hoverAnnotation(ann),
-        10
-      ),
+      debounce((ann: Annotation | null) => frameSync.hoverAnnotation(ann), 10),
     [frameSync]
   );
 
   const scrollToAnnotation = useCallback(
-    /** @param {Annotation} ann */
-    ann => {
+    (ann: Annotation) => {
       frameSync.scrollToAnnotation(ann);
     },
     [frameSync]
@@ -52,7 +55,7 @@ function ThreadCard({ frameSync, thread }) {
    *
    * @param {Element} target
    */
-  const isFromButtonOrLink = target => {
+  const isFromButtonOrLink = (target: Element) => {
     return !!target.closest('button') || !!target.closest('a');
   };
 
@@ -62,7 +65,7 @@ function ThreadCard({ frameSync, thread }) {
 
   // Handle requests to give this thread keyboard focus.
   const focusRequest = store.annotationFocusRequest();
-  const cardRef = useRef(/** @type {HTMLElement|null} */ (null));
+  const cardRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
     if (focusRequest !== thread.id || !cardRef.current) {
       return;
@@ -74,7 +77,7 @@ function ThreadCard({ frameSync, thread }) {
   return (
     /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <Card
-      active={!!isHovered}
+      active={isHovered}
       classes="cursor-pointer focus-visible-ring theme-clean:border-none"
       data-testid="thread-card"
       elementRef={cardRef}
@@ -82,10 +85,7 @@ function ThreadCard({ frameSync, thread }) {
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
-        if (
-          !isFromButtonOrLink(/** @type {Element} */ (e.target)) &&
-          thread.annotation
-        ) {
+        if (!isFromButtonOrLink(e.target as Element) && thread.annotation) {
           scrollToAnnotation(thread.annotation);
         }
       }}
