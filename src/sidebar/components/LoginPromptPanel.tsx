@@ -4,18 +4,18 @@ import { useSidebarStore } from '../store';
 
 import SidebarPanel from './SidebarPanel';
 
-/**
- * @typedef LoginPromptPanelProps
- * @prop {() => void} onLogin
- * @prop {() => void} onSignUp
- */
+export type LoginPromptPanelProps = {
+  onLogin: () => void;
+  onSignUp: () => void;
+};
 
 /**
  * A sidebar panel that prompts a user to log in (or sign up) to annotate.
- *
- * @param {LoginPromptPanelProps} props
  */
-export default function LoginPromptPanel({ onLogin, onSignUp }) {
+export default function LoginPromptPanel({
+  onLogin,
+  onSignUp,
+}: LoginPromptPanelProps) {
   const store = useSidebarStore();
   const isLoggedIn = store.isLoggedIn();
   if (isLoggedIn) {
