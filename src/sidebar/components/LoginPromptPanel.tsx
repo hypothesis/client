@@ -1,4 +1,4 @@
-import { Actions, LabeledButton } from '@hypothesis/frontend-shared';
+import { Button, CardActions } from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
 
@@ -28,14 +28,14 @@ export default function LoginPromptPanel({
       panelName="loginPrompt"
     >
       <p>Please log in to create annotations or highlights.</p>
-      <Actions>
-        <LabeledButton title="Sign up" onClick={onSignUp}>
+      <CardActions>
+        <Button title="Sign up" onClick={onSignUp}>
           Sign up
-        </LabeledButton>
-        <LabeledButton title="Log in" variant="primary" onClick={onLogin}>
+        </Button>
+        <Button title="Log in" variant="primary" onClick={onLogin}>
           Log in
-        </LabeledButton>
-      </Actions>
+        </Button>
+      </CardActions>
     </SidebarPanel>
   );
 }
