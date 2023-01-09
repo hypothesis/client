@@ -44,7 +44,7 @@ describe('AnnotationReplyToggle', () => {
 
   it('invokes the toggle callback when clicked', () => {
     const wrapper = createComponent();
-    const button = wrapper.find('LinkButton');
+    const button = wrapper.find('button');
 
     act(() => {
       button.props().onClick();
