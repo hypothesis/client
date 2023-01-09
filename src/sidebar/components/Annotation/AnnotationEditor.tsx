@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'preact/hooks';
 
+import type { Annotation } from '../../../types/api';
+import type { SidebarSettings } from '../../../types/config';
 import { withServices } from '../../service-context';
 import {
   annotationRole,
@@ -7,7 +9,11 @@ import {
   isSaved,
 } from '../../helpers/annotation-metadata';
 import { applyTheme } from '../../helpers/theme';
+import type { AnnotationsService } from '../../services/annotations';
+import type { TagsService } from '../../services/tags';
+import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
+import type { Draft } from '../../store/modules/drafts';
 
 import MarkdownEditor from '../MarkdownEditor';
 import TagEditor from '../TagEditor';
@@ -15,26 +21,21 @@ import TagEditor from '../TagEditor';
 import AnnotationLicense from './AnnotationLicense';
 import AnnotationPublishControl from './AnnotationPublishControl';
 
-/**
- * @typedef {import("../../../types/api").Annotation} Annotation
- * @typedef {import("../../store/modules/drafts").Draft} Draft
- * @typedef {import("../../../types/config").SidebarSettings} SidebarSettings
- */
+type AnnotationEditorProps = {
+  /** The annotation under edit */
+  annotation: Annotation;
+  /** The annotation's draft */
+  draft: Draft;
 
-/**
- * @typedef AnnotationEditorProps
- * @prop {Annotation} annotation - The annotation under edit
- * @prop {Draft} draft - The annotation's draft
- * @prop {import('../../services/annotations').AnnotationsService} annotationsService
- * @prop {SidebarSettings} settings - Injected service
- * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
- * @prop {import('../../services/tags').TagsService} tags
- */
+  // Injected
+  annotationsService: AnnotationsService;
+  settings: SidebarSettings;
+  toastMessenger: ToastMessengerService;
+  tags: TagsService;
+};
 
 /**
  * Display annotation content in an editable format.
- *
- * @param {AnnotationEditorProps} props
  */
 function AnnotationEditor({
   annotation,
@@ -43,11 +44,9 @@ function AnnotationEditor({
   settings,
   tags: tagsService,
   toastMessenger,
-}) {
+}: AnnotationEditorProps) {
   // Track the currently-entered text in the tag editor's input
-  const [pendingTag, setPendingTag] = useState(
-    /** @type {string|null} */ (null)
-  );
+  const [pendingTag, setPendingTag] = useState<string | null>(null);
 
   const store = useSidebarStore();
   const group = store.getGroup(annotation.group);
@@ -60,8 +59,7 @@ function AnnotationEditor({
   const isEmpty = !text && !tags.length;
 
   const onEditTags = useCallback(
-    /** @param {string[]} tags */
-    tags => {
+    (tags: string[]) => {
       store.createDraft(draft.annotation, { ...draft, tags });
     },
     [draft, store]
@@ -71,11 +69,10 @@ function AnnotationEditor({
     /**
      * Verify `newTag` has content and is not a duplicate; add the tag
      *
-     * @param {string} newTag
-     * @return {boolean} Tag was added to the draft's tags; `false` if duplicate
-     *   or empty
+     * @return `true` if tag was added to the draft; `false` if duplicate or
+     * empty
      */
-    newTag => {
+    (newTag: string) => {
       if (!newTag || tags.indexOf(newTag) >= 0) {
         // don't add empty or duplicate tags
         return false;
@@ -93,10 +90,10 @@ function AnnotationEditor({
     /**
      * Remove tag from draft if present.
      *
-     * @param {string} tag
-     * @return {boolean} Tag removed from draft
+     * @return `true` if tag removed from draft, `false` if tag not found in
+     * draft tags
      */
-    tag => {
+    (tag: string) => {
       const newTagList = [...tags]; // make a copy
       const index = newTagList.indexOf(tag);
       if (index >= 0) {
@@ -110,19 +107,14 @@ function AnnotationEditor({
   );
 
   const onEditText = useCallback(
-    /** @param {string} text */
-    text => {
+    (text: string) => {
       store.createDraft(draft.annotation, { ...draft, text });
     },
     [draft, store]
   );
 
-  /**
-   * @param {boolean} isPrivate
-   */
   const onSetPrivate = useCallback(
-    /** @param {boolean} isPrivate */
-    isPrivate => {
+    (isPrivate: boolean) => {
       store.createDraft(annotation, {
         ...draft,
         isPrivate,
@@ -162,8 +154,7 @@ function AnnotationEditor({
   }, [annotation, store]);
 
   // Allow saving of annotation by pressing CMD/CTRL-Enter
-  /** @param {KeyboardEvent} event */
-  const onKeyDown = event => {
+  const onKeyDown = (event: KeyboardEvent) => {
     const key = event.key;
     if (isEmpty) {
       return;
