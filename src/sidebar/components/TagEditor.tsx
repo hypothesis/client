@@ -24,8 +24,8 @@ export type TagEditorProps = {
 /**
  * Component to edit annotation's tags.
  *
- * Component accessibility is modeled after "Combobox with Listbox Popup Examples" found here:
- * https://www.w3.org/TR/wai-aria-practices/examples/combobox/aria1.1pattern/listbox-combo.html
+ * Component accessibility is modeled after "Combobox with Listbox Autocomplete Example" found here:
+ * https://www.w3.org/WAI/ARIA/apg/example-index/combobox/combobox-autocomplete-list.html
  */
 function TagEditor({
   onAddTag,
