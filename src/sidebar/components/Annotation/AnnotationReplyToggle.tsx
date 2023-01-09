@@ -1,4 +1,5 @@
-import { LinkButton } from '@hypothesis/frontend-shared';
+import { ButtonBase } from '@hypothesis/frontend-shared/lib/next';
+import classnames from 'classnames';
 
 export type AnnotationReplyToggleProps = {
   onToggleReplies: () => void;
@@ -18,9 +19,18 @@ function AnnotationReplyToggle({
   const toggleText = `${toggleAction} (${replyCount})`;
 
   return (
-    <LinkButton onClick={onToggleReplies} title={toggleText}>
+    <ButtonBase
+      classes={classnames(
+        // This button has a non-standard color combination: it uses a lighter
+        // text color than other LinkButtons
+        'text-grey-7 enabled:hover:text-brand-dark',
+        'no-underline enabled:hover:underline'
+      )}
+      onClick={onToggleReplies}
+      title={toggleText}
+    >
       {toggleText}
-    </LinkButton>
+    </ButtonBase>
   );
 }
 
