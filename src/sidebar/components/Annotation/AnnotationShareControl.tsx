@@ -10,30 +10,36 @@ import {
 import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
+import { isIOS } from '../../../shared/user-agent';
+import type { Annotation, Group } from '../../../types/api';
+
 import { isShareableURI } from '../../helpers/annotation-sharing';
-import { copyText } from '../../util/copy-to-clipboard';
 import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
-import { isIOS } from '../../../shared/user-agent';
+import type { ToastMessengerService } from '../../services/toast-messenger';
+import { copyText } from '../../util/copy-to-clipboard';
 
 import MenuArrow from '../MenuArrow';
 import ShareLinks from '../ShareLinks';
 
-/**
- * @typedef {import('../../../types/api').Annotation} Annotation
- * @typedef {import('../../../types/api').Group} Group
- */
+export type AnnotationShareControlProps = {
+  /** The annotation in question */
+  annotation: Annotation;
 
-/**
- * @typedef AnnotationShareControlProps
- * @prop {Annotation} annotation - The annotation in question
- * @prop {Group} [group] -
- *  Group that the annotation is in. If missing, this component will not render.
- *  FIXME: Refactor after root cause is addressed.
- *  See https://github.com/hypothesis/client/issues/1542
- * @prop {string} shareUri - The URI to view the annotation on its own
- * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
- */
+  /**
+   *  Group that the annotation is in. If missing, this component will not
+   *  render.
+   * FIXME: Refactor after root cause is addressed. See
+   *  https://github.com/hypothesis/client/issues/1542
+   */
+  group?: Group;
+
+  /** The URI to view the annotation on its own */
+  shareUri: string;
+
+  // Injected
+  toastMessenger: ToastMessengerService;
+};
 
 function selectionOverflowsInputElement() {
   // On iOS the selection overflows the input element
@@ -51,11 +57,11 @@ function AnnotationShareControl({
   toastMessenger,
   group,
   shareUri,
-}) {
+}: AnnotationShareControlProps) {
   const annotationIsPrivate = isPrivate(annotation.permissions);
   const inContextAvailable = isShareableURI(annotation.uri);
-  const shareRef = useRef(/** @type {HTMLDivElement|null} */ (null));
-  const inputRef = useRef(/** @type {HTMLInputElement|null} */ (null));
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const shareRef = useRef<HTMLDivElement | null>(null);
 
   const [isOpen, setOpen] = useState(false);
   const wasOpen = useRef(isOpen);
