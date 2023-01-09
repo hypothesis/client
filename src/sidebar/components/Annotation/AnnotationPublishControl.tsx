@@ -5,28 +5,40 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
+import type { Group } from '../../../types/api';
+import type { SidebarSettings } from '../../../types/config';
+
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
 
 import Menu from '../Menu';
 import MenuItem from '../MenuItem';
 
-/**
- * @typedef {import('../../../types/api').Group} Group
- * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
- */
+export type AnnotationPublishControlProps = {
+  /** The group this annotation or draft would publish to */
+  group: Group;
 
-/**
- * @typedef AnnotationPublishControlProps
- * @prop {Group} group - The group this annotation or draft would publish to
- * @prop {boolean} [isDisabled]
- *  - Should the save button be disabled? Hint: it will be if the annotation has no content
- * @prop {boolean} isPrivate - Annotation or draft is "Only Me"
- * @prop {() => void} onCancel - Callback for cancel button click
- * @prop {() => void} onSave - Callback for save button click
- * @prop {(isPrivate: boolean) => void} onSetPrivate - Callback for save button click
- * @prop {SidebarSettings} settings - Injected service
- */
+  /**
+   * Should the save button be disabled? Hint: it will be if the annotation has
+   * no content
+   */
+  isDisabled?: boolean;
+
+  /** Annotation or draft is "Only Me" */
+  isPrivate: boolean;
+
+  /** Callback for cancel button click */
+  onCancel: () => void;
+
+  /** Callback for save button click */
+  onSave: () => void;
+
+  /** Callback when privacy level is changed (publish to group vs. Only me) */
+  onSetPrivate: (isPrivate: boolean) => void;
+
+  // Injected
+  settings: SidebarSettings;
+};
 
 /**
  * Render a compound control button for publishing (saving) an annotation:
@@ -43,7 +55,7 @@ function AnnotationPublishControl({
   onSave,
   onSetPrivate,
   settings,
-}) {
+}: AnnotationPublishControlProps) {
   const buttonStyle = applyTheme(
     ['ctaTextColor', 'ctaBackgroundColor'],
     settings
