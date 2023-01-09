@@ -15,6 +15,7 @@ describe('AnnotationShareControl', () => {
   let fakeIsShareableURI;
   let fakeShareUri;
   let fakeIsIOS;
+  let fakeStore;
 
   let container;
 
@@ -29,7 +30,6 @@ describe('AnnotationShareControl', () => {
       <AnnotationShareControl
         annotation={fakeAnnotation}
         toastMessenger={fakeToastMessenger}
-        group={fakeGroup}
         shareUri={fakeShareUri}
         {...props}
       />,
@@ -80,6 +80,10 @@ describe('AnnotationShareControl', () => {
     fakeShareUri = 'https://www.example.com';
     fakeIsIOS = sinon.stub().returns(false);
 
+    fakeStore = {
+      getGroup: sinon.stub().returns(fakeGroup),
+    };
+
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
       '@hypothesis/frontend-shared': {
@@ -90,6 +94,7 @@ describe('AnnotationShareControl', () => {
       },
       '../../util/copy-to-clipboard': fakeCopyToClipboard,
       '../../helpers/permissions': { isPrivate: fakeIsPrivate },
+      '../../store': { useSidebarStore: () => fakeStore },
       '../../../shared/user-agent': { isIOS: fakeIsIOS },
     });
   });
@@ -99,8 +104,9 @@ describe('AnnotationShareControl', () => {
     container.remove();
   });
 
-  it('does not render component if `group` prop not OK', () => {
-    const wrapper = createComponent({ group: undefined });
+  it('does not render component if annotation group is not available', () => {
+    fakeStore.getGroup.returns(undefined);
+    const wrapper = createComponent();
     assert.equal(wrapper.html(), '');
   });
 
