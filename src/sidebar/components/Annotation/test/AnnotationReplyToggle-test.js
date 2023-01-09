@@ -37,6 +37,17 @@ describe('AnnotationReplyToggle', () => {
     assert.match(wrapper.text(), /^Hide replies/);
   });
 
+  it('sets `aria-expanded` based on thread collapsed status', () => {
+    const expandedWrapper = createComponent({ threadIsCollapsed: false });
+    const collapsedWrapper = createComponent({ threadIsCollapsed: true });
+
+    const expandedButton = expandedWrapper.find('button').getDOMNode();
+    const collapsedButton = collapsedWrapper.find('button').getDOMNode();
+
+    assert.equal(expandedButton.getAttribute('aria-expanded'), 'true');
+    assert.equal(collapsedButton.getAttribute('aria-expanded'), 'false');
+  });
+
   it('shows the reply count', () => {
     const wrapper = createComponent({ replyCount: 7 });
     assert.equal(wrapper.text(), 'Show replies (7)');
@@ -55,8 +66,15 @@ describe('AnnotationReplyToggle', () => {
 
   it(
     'should pass a11y checks',
-    checkAccessibility({
-      content: () => createComponent(),
-    })
+    checkAccessibility([
+      {
+        name: 'when collapsed',
+        content: () => createComponent(),
+      },
+      {
+        name: 'when expanded',
+        content: () => createComponent({ threadIsCollapsed: false }),
+      },
+    ])
   );
 });

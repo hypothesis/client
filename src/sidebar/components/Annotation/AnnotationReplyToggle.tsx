@@ -26,6 +26,7 @@ function AnnotationReplyToggle({
         'text-grey-7 enabled:hover:text-brand-dark',
         'no-underline enabled:hover:underline'
       )}
+      expanded={!threadIsCollapsed}
       onClick={onToggleReplies}
       title={toggleText}
     >
