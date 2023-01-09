@@ -11,12 +11,13 @@ import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { isIOS } from '../../../shared/user-agent';
-import type { Annotation, Group } from '../../../types/api';
+import type { Annotation } from '../../../types/api';
 
 import { isShareableURI } from '../../helpers/annotation-sharing';
 import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import type { ToastMessengerService } from '../../services/toast-messenger';
+import { useSidebarStore } from '../../store';
 import { copyText } from '../../util/copy-to-clipboard';
 
 import MenuArrow from '../MenuArrow';
@@ -25,14 +26,6 @@ import ShareLinks from '../ShareLinks';
 export type AnnotationShareControlProps = {
   /** The annotation in question */
   annotation: Annotation;
-
-  /**
-   *  Group that the annotation is in. If missing, this component will not
-   *  render.
-   * FIXME: Refactor after root cause is addressed. See
-   *  https://github.com/hypothesis/client/issues/1542
-   */
-  group?: Group;
 
   /** The URI to view the annotation on its own */
   shareUri: string;
@@ -55,9 +48,11 @@ function selectionOverflowsInputElement() {
 function AnnotationShareControl({
   annotation,
   toastMessenger,
-  group,
   shareUri,
 }: AnnotationShareControlProps) {
+  const store = useSidebarStore();
+  const group = store.getGroup(annotation.group);
+
   const annotationIsPrivate = isPrivate(annotation.permissions);
   const inContextAvailable = isShareableURI(annotation.uri);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -84,8 +79,9 @@ function AnnotationShareControl({
     }
   }, [isOpen]);
 
-  // FIXME: See https://github.com/hypothesis/client/issues/1542
   if (!group) {
+    // This can happen if groups have just been unloaded but annotations have
+    // not yet been unloaded, e.g. on logout if a private group was focused
     return null;
   }
 

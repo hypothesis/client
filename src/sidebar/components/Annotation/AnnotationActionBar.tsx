@@ -58,7 +58,6 @@ function AnnotationActionBar({
 }: AnnotationActionBarProps) {
   const store = useSidebarStore();
   const userProfile = store.profile();
-  const annotationGroup = store.getGroup(annotation.group);
   const isLoggedIn = store.isLoggedIn();
 
   // Is the current user allowed to take the given `action` on this annotation?
@@ -128,11 +127,7 @@ function AnnotationActionBar({
       )}
       <IconButton icon={ReplyIcon} title="Reply" onClick={onReplyClick} />
       {shareLink && (
-        <AnnotationShareControl
-          annotation={annotation}
-          group={annotationGroup}
-          shareUri={shareLink}
-        />
+        <AnnotationShareControl annotation={annotation} shareUri={shareLink} />
       )}
       {showFlagAction && !annotation.flagged && (
         <IconButton

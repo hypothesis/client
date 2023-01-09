@@ -83,7 +83,6 @@ describe('AnnotationActionBar', () => {
 
     fakeStore = {
       createDraft: sinon.stub(),
-      getGroup: sinon.stub().returns({}),
       isLoggedIn: sinon.stub(),
       openSidebarPanel: sinon.stub(),
       profile: sinon.stub().returns(fakeUserProfile),
