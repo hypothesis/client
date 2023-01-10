@@ -3,16 +3,15 @@ import {
   GlobeIcon,
   GroupsIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import classnames from 'classnames';
 
-/**
- * @typedef {import("../../../types/api").Group} Group
- */
+import type { Group } from '../../../types/api';
 
-/**
- * @typedef AnnotationShareInfoProps
- * @prop {Group} group - Group to which the annotation belongs
- * @prop {boolean} isPrivate
- */
+export type AnnotationShareInfoProps = {
+  /** Group to which the annotation belongs */
+  group: Group;
+  isPrivate: boolean;
+};
 
 /**
  * Render information about what group an annotation is in and
@@ -20,7 +19,7 @@ import {
  *
  * @param {AnnotationShareInfoProps} props
  */
-function AnnotationShareInfo({ group, isPrivate }) {
+function AnnotationShareInfo({ group, isPrivate }: AnnotationShareInfoProps) {
   // Only show the name of the group and link to it if there is a
   // URL (link) returned by the API for this group. Some groups do not have links
   const linkToGroup = group?.links.html;
@@ -31,7 +30,10 @@ function AnnotationShareInfo({ group, isPrivate }) {
         <LinkBase
           // The light-text hover color is not a standard color for a Link, so
           // LinkBase is used here
-          classes="text-color-text-light hover:text-color-text-light hover:underline flex items-baseline gap-x-1"
+          classes={classnames(
+            'flex items-baseline gap-x-1',
+            'text-color-text-light hover:text-color-text-light hover:underline'
+          )}
           href={group.links.html}
           target="_blank"
         >
