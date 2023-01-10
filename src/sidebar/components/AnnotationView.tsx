@@ -2,23 +2,26 @@ import { useEffect, useState } from 'preact/hooks';
 
 import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
+import type { LoadAnnotationsService } from '../services/load-annotations';
 import { useRootThread } from './hooks/use-root-thread';
 
 import ThreadList from './ThreadList';
 import SidebarContentError from './SidebarContentError';
 
-/**
- * @typedef AnnotationViewProps
- * @prop {() => void} onLogin
- * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
- */
+type AnnotationViewProps = {
+  onLogin: () => void;
+
+  // Injected
+  loadAnnotationsService: LoadAnnotationsService;
+};
 
 /**
  * The main content for the single annotation page (aka. https://hypothes.is/a/<annotation ID>)
- *
- * @param {AnnotationViewProps} props
  */
-function AnnotationView({ loadAnnotationsService, onLogin }) {
+function AnnotationView({
+  loadAnnotationsService,
+  onLogin,
+}: AnnotationViewProps) {
   const store = useSidebarStore();
   const annotationId = store.routeParams().id;
   const rootThread = useRootThread();
@@ -56,9 +59,7 @@ function AnnotationView({ loadAnnotationsService, onLogin }) {
 
         // Make the full thread of annotations visible. By default replies are
         // not shown until the user expands the thread.
-        annots.forEach(annot =>
-          store.setExpanded(/** @type {string} */ (annot.id), true)
-        );
+        annots.forEach(annot => annot.id && store.setExpanded(annot.id, true));
 
         // FIXME - This should show a visual indication of which reply the
         // annotation ID in the URL refers to. That isn't currently working.
