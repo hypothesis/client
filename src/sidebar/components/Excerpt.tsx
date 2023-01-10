@@ -1,25 +1,27 @@
 import { LinkButton } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
+import type { ComponentChildren } from 'preact';
 import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
 
 import { observeElementSize } from '../util/observe-element-size';
 import { withServices } from '../service-context';
 import { applyTheme } from '../helpers/theme';
 
-/**
- * @typedef InlineControlsProps
- * @prop {boolean} isCollapsed
- * @prop {(collapsed: boolean) => void} setCollapsed
- * @prop {Record<string, string>} [linkStyle]
- */
+type InlineControlsProps = {
+  isCollapsed: boolean;
+  setCollapsed: (collapsed: boolean) => void;
+  linkStyle: Record<string, string>;
+};
 
 /**
  * An optional toggle link at the bottom of an excerpt which controls whether
  * it is expanded or collapsed.
- *
- * @param {InlineControlsProps} props
  */
-function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
+function InlineControls({
+  isCollapsed,
+  setCollapsed,
+  linkStyle,
+}: InlineControlsProps) {
   return (
     <div
       className={classnames(
@@ -55,27 +57,45 @@ function InlineControls({ isCollapsed, setCollapsed, linkStyle = {} }) {
 
 const noop = () => {};
 
-/**
- * @typedef ExcerptProps
- * @prop {object} [children]
- * @prop {boolean} [inlineControls] - If `true`, the excerpt provides internal
- *   controls to expand and collapse the content. If `false`, the caller sets
- *   the collapsed state via the `collapse` prop.  When using inline controls,
- *   the excerpt is initially collapsed.
- * @prop {boolean} [collapse] - If the content should be truncated if its height
- *   exceeds `collapsedHeight + overflowThreshold`.  This prop is only used if
- *   `inlineControls` is false.
- * @prop {number} collapsedHeight - Maximum height of the container, in pixels,
- *   when it is collapsed.
- * @prop {number} [overflowThreshold] - An additional margin of pixels by which
- *   the content height can exceed `collapsedHeight` before it becomes collapsible.
- * @prop {(isCollapsible: boolean) => void} [onCollapsibleChanged] - Called when the content height
- *   exceeds or falls below `collapsedHeight + overflowThreshold`.
- * @prop {(collapsed: boolean) => void} [onToggleCollapsed] - When `inlineControls` is `false`, this
- *   function is called when the user requests to expand the content by clicking a
- *   zone at the bottom of the container.
- * @prop {object} [settings] - Used for theming.
- */
+type ExcerptProps = {
+  children?: ComponentChildren;
+  /**
+   * If `true`, the excerpt provides internal controls to expand and collapse
+   * the content. If `false`, the caller sets the collapsed state via the
+   * `collapse` prop.  When using inline controls, the excerpt is initially
+   * collapsed.
+   */
+  inlineControls?: boolean;
+  /**
+   * If the content should be truncated if its height exceeds
+   * `collapsedHeight + overflowThreshold`. This prop is only used if
+   * `inlineControls` is false.
+   */
+  collapse?: boolean;
+  /**
+   * Maximum height of the container, in pixels, when it is collapsed.
+   */
+  collapsedHeight: number;
+  /**
+   * An additional margin of pixels by which the content height can exceed
+   * `collapsedHeight` before it becomes collapsible.
+   */
+  overflowThreshold?: number;
+  /**
+   * Called when the content height exceeds or falls below
+   * `collapsedHeight + overflowThreshold`.
+   */
+  onCollapsibleChanged?: (isCollapsible: boolean) => void;
+  /**
+   * When `inlineControls` is `false`, this function is called when the user
+   * requests to expand the content by clicking a zone at the bottom of the
+   * container.
+   */
+  onToggleCollapsed?: (collapsed: boolean) => void;
+
+  // Injected
+  settings: object;
+};
 
 /**
  * A container which truncates its content when they exceed a specified height.
@@ -83,8 +103,6 @@ const noop = () => {};
  * The collapsed state of the container can be handled either via internal
  * controls (if `inlineControls` is `true`) or by the caller using the
  * `collapse` prop.
- *
- * @param {ExcerptProps} props
  */
 function Excerpt({
   children,
@@ -95,11 +113,11 @@ function Excerpt({
   onToggleCollapsed = noop,
   overflowThreshold = 0,
   settings = {},
-}) {
+}: ExcerptProps) {
   const [collapsedByInlineControls, setCollapsedByInlineControls] =
     useState(true);
 
-  const contentElement = /** @type {{ current: HTMLDivElement }} */ (useRef());
+  const contentElement = useRef<HTMLDivElement | null>(null);
 
   // Measured height of `contentElement` in pixels
   const [contentHeight, setContentHeight] = useState(0);
@@ -107,7 +125,7 @@ function Excerpt({
   // Update the measured height of the content container after initial render,
   // and when the size of the content element changes.
   const updateContentHeight = useCallback(() => {
-    const newContentHeight = contentElement.current.clientHeight;
+    const newContentHeight = contentElement.current!.clientHeight;
     setContentHeight(newContentHeight);
 
     // prettier-ignore
@@ -118,7 +136,7 @@ function Excerpt({
 
   useLayoutEffect(() => {
     const cleanup = observeElementSize(
-      contentElement.current,
+      contentElement.current!,
       updateContentHeight
     );
     updateContentHeight();
@@ -132,14 +150,12 @@ function Excerpt({
   const isCollapsed = inlineControls ? collapsedByInlineControls : collapse;
   const isExpandable = isOverflowing && isCollapsed;
 
-  /** @type {Record<string, number>} */
-  const contentStyle = {};
+  const contentStyle: Record<string, number> = {};
   if (contentHeight !== 0) {
     contentStyle['max-height'] = isExpandable ? collapsedHeight : contentHeight;
   }
 
-  /** @param {boolean} collapsed */
-  const setCollapsed = collapsed =>
+  const setCollapsed = (collapsed: boolean) =>
     inlineControls
       ? setCollapsedByInlineControls(collapsed)
       : onToggleCollapsed(collapsed);
