@@ -6,10 +6,6 @@ import { useUserFilterOptions } from './hooks/use-filter-options';
 import FilterSelect from './FilterSelect';
 
 /**
- * @typedef {import('../store/modules/filters').FilterOption} FilterOption
- */
-
-/**
  * Filters for the Notebook
  */
 function NotebookFilters() {
