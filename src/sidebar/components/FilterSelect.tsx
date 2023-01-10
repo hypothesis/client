@@ -1,28 +1,23 @@
 import classnames from 'classnames';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+
+import type { FilterOption } from '../store/modules/filters';
 
 import Menu from './Menu';
 import MenuItem from './MenuItem';
 
-/**
- * @typedef {import('../store/modules/filters').FilterOption} FilterOption
- * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
- */
-
-/**
- * @typedef FilterSelectProps
- * @prop {FilterOption} defaultOption
- * @prop {IconComponent} [icon]
- * @prop {(selectedFilter: FilterOption) => void} onSelect
- * @prop {FilterOption[]} options
- * @prop {FilterOption} [selectedOption]
- * @prop {string} title
- */
+type FilterSelectProps = {
+  defaultOption: FilterOption;
+  icon?: IconComponent;
+  onSelect: (selectedFilter: FilterOption) => void;
+  options: FilterOption[];
+  selectedOption?: FilterOption;
+  title: string;
+};
 
 /**
  * A select-element-like control for selecting one of a defined set of
  * options.
- *
- * @param {FilterSelectProps} props
  */
 function FilterSelect({
   defaultOption,
@@ -31,7 +26,7 @@ function FilterSelect({
   options,
   selectedOption,
   title,
-}) {
+}: FilterSelectProps) {
   const filterOptions = [defaultOption, ...options];
   const selected = selectedOption ?? defaultOption;
 
