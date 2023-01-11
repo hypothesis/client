@@ -158,7 +158,7 @@ function AnnotationShareControl({
               className={classnames(
                 // Slightly larger font size for touch devices to correspond with
                 // larger button and input sizes
-                'flex w-full text-sm touch:text-base'
+                'flex w-full text-xs touch:text-base'
               )}
             >
               <InputGroup>
