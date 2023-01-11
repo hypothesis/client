@@ -1,29 +1,29 @@
 import classnames from 'classnames';
 
+import type { SidebarSettings } from '../../../types/config';
+
 import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
 
 import Excerpt from '../Excerpt';
 import StyledText from '../StyledText';
 
-/**
- * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
- */
-
-/**
- * @typedef AnnotationQuoteProps
- * @prop {string} quote
- * @prop {boolean} [isHovered]
- * @prop {boolean} [isOrphan]
- * @prop {SidebarSettings} settings
- */
+type AnnotationQuoteProps = {
+  quote: string;
+  isHovered?: boolean;
+  isOrphan?: boolean;
+  settings: SidebarSettings;
+};
 
 /**
  * Display the selected text from the document associated with an annotation.
- *
- * @param {AnnotationQuoteProps} props
  */
-function AnnotationQuote({ quote, isHovered, isOrphan, settings }) {
+function AnnotationQuote({
+  quote,
+  isHovered,
+  isOrphan,
+  settings,
+}: AnnotationQuoteProps) {
   return (
     <Excerpt collapsedHeight={35} inlineControls={true} overflowThreshold={20}>
       <StyledText classes={classnames({ 'p-redacted-text': isOrphan })}>
