@@ -35,7 +35,7 @@ function SavingMessage() {
       <span
         // Slowly fade in the Spinner such that it only shows up if the saving
         // is slow
-        className="text-xl animate-fade-in-slow"
+        className="text-[16px] animate-fade-in-slow"
       >
         <Spinner size="sm" />
       </span>

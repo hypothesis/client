@@ -110,7 +110,7 @@ function AnnotationHeader({
       <div className="flex gap-x-1 items-baseline flex-wrap-reverse">
         {isPrivate(annotation.permissions) && !isEditing && (
           <LockIcon
-            className="text-tiny w-em h-em"
+            className="w-[10px] h-[10px]"
             title="This annotation is visible only to you"
           />
         )}
@@ -152,7 +152,7 @@ function AnnotationHeader({
           {!isEditing && isHighlight(annotation) && (
             <HighlightIcon
               title="This is a highlight. Click 'edit' to add a note or tag."
-              className="text-tiny w-em h-em text-color-text-light"
+              className="w-[10px] h-[10px] text-color-text-light"
             />
           )}
           {showDocumentInfo && (

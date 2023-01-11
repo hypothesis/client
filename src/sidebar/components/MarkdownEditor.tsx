@@ -139,7 +139,7 @@ type ToolbarButtonProps = {
 
 function ToolbarButton({
   disabled = false,
-  icon,
+  icon: Icon,
   label,
   onClick,
   shortcutKey,
@@ -154,7 +154,6 @@ function ToolbarButton({
 
   const buttonProps = {
     disabled,
-    icon,
     onClick,
     title: tooltip,
   };
@@ -170,10 +169,11 @@ function ToolbarButton({
     );
   }
   return (
-    <IconButton
-      classes="px-2 py-2.5 text-tiny touch:text-base"
-      {...buttonProps}
-    />
+    <IconButton classes="px-2 py-2.5" {...buttonProps}>
+      {Icon && (
+        <Icon className="w-[10px] h-[10px] touch:w-[13px] touch:h-[13px]" />
+      )}
+    </IconButton>
   );
 }
 

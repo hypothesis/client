@@ -17,8 +17,8 @@ export default function AnnotationLicense() {
         target="_blank"
         title="View more information about the Creative Commons Public Domain dedication"
       >
-        <CcStdIcon className="w-em h-em text-tiny" />
-        <CcZeroIcon className="w-em h-em ml-px text-tiny" />
+        <CcStdIcon className="w-[10px] h-[10px]" />
+        <CcZeroIcon className="w-[10px] h-[10px] ml-px" />
         <div className="ml-1">
           Annotations can be freely reused by anyone for any purpose.
         </div>

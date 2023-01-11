@@ -118,7 +118,7 @@ function AnnotationActionBar({
   };
 
   return (
-    <div className="flex text-xl" data-testid="annotation-action-bar">
+    <div className="flex text-[16px]" data-testid="annotation-action-bar">
       {showEditAction && (
         <IconButton icon={EditIcon} title="Edit" onClick={onEdit} />
       )}

@@ -119,13 +119,14 @@ export default function NotebookModal({
       data-testid="notebook-outer"
     >
       <div className="relative w-full h-full" data-testid="notebook-inner">
-        <div className="absolute right-0 text-xl m-3">
+        <div className="absolute right-0 m-3">
           <IconButton
-            icon={CancelIcon}
             title="Close the Notebook"
             onClick={onClose}
             variant="dark"
-          />
+          >
+            <CancelIcon className="w-4 h-4" />
+          </IconButton>
         </div>
         <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
       </div>
