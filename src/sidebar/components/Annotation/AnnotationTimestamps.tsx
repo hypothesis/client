@@ -80,7 +80,7 @@ export default function AnnotationTimestamps({
     <div>
       {withEditedTimestamp && (
         <span
-          className="text-color-text-light text-sm italic"
+          className="text-color-text-light text-xs italic"
           data-testid="timestamp-edited"
           title={updated.absolute}
         >

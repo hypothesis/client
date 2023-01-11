@@ -9,7 +9,7 @@ import {
  */
 export default function AnnotationLicense() {
   return (
-    <div className="pt-2 border-t text-sm leading-none">
+    <div className="pt-2 border-t text-xs leading-none">
       <Link
         classes="flex items-center"
         color="text-light"
