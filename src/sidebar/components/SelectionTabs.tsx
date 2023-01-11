@@ -74,7 +74,7 @@ function Tab({
       <>
         {children}
         {count > 0 && !isWaitingToAnchor && (
-          <span className="relative bottom-[3px] left-[2px] text-tiny">
+          <span className="relative bottom-[3px] left-[2px] text-[10px]">
             {count}
           </span>
         )}
