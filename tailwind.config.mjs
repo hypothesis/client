@@ -86,8 +86,7 @@ export default {
         base: ['13px', '1.4'], // Current base font size for sidebar
         md: ['14px'],
         lg: ['14px'],
-        xl: ['16px'],
-        '2xl': ['18px'],
+        xl: ['18px'],
         'touch-base': ['16px', '1.4'], // Used for touch interfaces in certain UIs
         // Font sizes for annotator controls that should scale with text in the
         // document. These can only be used within shadow roots that include the

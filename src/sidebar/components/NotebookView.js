@@ -131,7 +131,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   return (
     <div className="grid gap-2 lg:grid-cols-2" data-testid="notebook-container">
       <header className="leading-none lg:col-span-2" ref={threadListScrollTop}>
-        <h1 className="text-2xl font-bold" data-testid="notebook-group-name">
+        <h1 className="text-xl font-bold" data-testid="notebook-group-name">
           {groupName}
         </h1>
       </header>
