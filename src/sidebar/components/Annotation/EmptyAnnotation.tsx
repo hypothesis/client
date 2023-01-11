@@ -1,23 +1,22 @@
 import AnnotationReplyToggle from './AnnotationReplyToggle';
+import type { AnnotationProps } from './Annotation';
 
-/**
- * @typedef {import('./Annotation').AnnotationProps} AnnotationProps
- * @typedef {Omit<AnnotationProps, 'annotation' | 'annotationsService'>} EmptyAnnotationProps
- */
+type EmptyAnnotationProps = Omit<
+  AnnotationProps,
+  'annotation' | 'annotationsService'
+>;
 
 /**
  * Render an "annotation" when the annotation itself is missing. This can
  * happen when an annotation is deleted by its author but there are still
  * replies that pertain to it.
- *
- * @param {EmptyAnnotationProps} props
  */
 export default function EmptyAnnotation({
   isReply,
   replyCount,
   threadIsCollapsed,
   onToggleReplies,
-}) {
+}: EmptyAnnotationProps) {
   return (
     <article
       className="space-y-4"
