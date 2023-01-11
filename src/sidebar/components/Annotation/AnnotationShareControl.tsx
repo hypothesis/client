@@ -151,7 +151,7 @@ function AnnotationShareControl({
             )}
             width="custom"
           >
-            <h2 className="text-brand text-lg font-medium">
+            <h2 className="text-brand text-md font-medium">
               Share this annotation
             </h2>
             <div

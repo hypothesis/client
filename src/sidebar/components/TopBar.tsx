@@ -146,7 +146,7 @@ function TopBar({
             <UserMenu onLogout={onLogout} />
           ) : (
             <div
-              className="flex items-center text-lg font-medium space-x-1"
+              className="flex items-center text-md font-medium space-x-1"
               data-testid="login-links"
             >
               {!isLoggedIn && !hasFetchedProfile && <span>⋯</span>}

@@ -90,7 +90,7 @@ function GroupList({ settings }) {
       <span
         className={classnames(
           // Don't allow this label to shrink (wrap to next line)
-          'shrink-0 flex items-center gap-x-1 text-lg text-color-text font-bold'
+          'shrink-0 flex items-center gap-x-1 text-md text-color-text font-bold'
         )}
       >
         {icon && (

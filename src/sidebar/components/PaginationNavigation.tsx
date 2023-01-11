@@ -66,7 +66,7 @@ function PaginationNavigation({
 
   return (
     <div
-      className="flex items-center text-lg"
+      className="flex items-center text-md"
       data-testid="pagination-navigation"
     >
       <div className="w-28 h-10">

@@ -53,7 +53,7 @@ function HelpPanelTab({ linkText, url }: HelpPanelTabProps) {
     <div
       // Set this element's flex-basis and also establish
       // a flex container (centered on both axes)
-      className="flex-1 flex items-center justify-center border-r last-of-type:border-r-0 text-lg font-medium"
+      className="flex-1 flex items-center justify-center border-r last-of-type:border-r-0 text-md font-medium"
     >
       <Link color="text-light" href={url} target="_blank">
         <div className="flex items-center gap-x-2">
@@ -144,7 +144,7 @@ function HelpPanel({ session }: HelpPanelProps) {
     >
       <div className="space-y-4">
         <div className="flex items-center">
-          <h3 className="grow text-lg font-medium" data-testid="subpanel-title">
+          <h3 className="grow text-md font-medium" data-testid="subpanel-title">
             {subPanelTitles[activeSubPanel]}
           </h3>
           {activeSubPanel === 'versionInfo' && (
