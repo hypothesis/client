@@ -138,7 +138,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
       <div className="justify-self-start">
         <NotebookFilters />
       </div>
-      <div className="flex items-center lg:justify-self-end text-lg font-medium">
+      <div className="flex items-center lg:justify-self-end text-md font-medium">
         {pendingUpdateCount > 0 && !hasAppliedFilter && (
           <IconButton
             icon="refresh"

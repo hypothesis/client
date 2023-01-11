@@ -214,7 +214,7 @@ export default function Menu({
               'focus-visible-ring',
               // Position menu content near bottom of menu label/toggle control
               'absolute top-[calc(100%+5px)] z-1 border shadow',
-              'bg-white text-lg',
+              'bg-white text-md',
               {
                 'left-0': align === 'left',
                 'right-0': align === 'right',

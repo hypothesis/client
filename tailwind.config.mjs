@@ -83,6 +83,7 @@ export default {
         // are descriptive, not aspirational or prescriptive.
         sm: ['11px', '1.4'],
         base: ['13px', '1.4'], // Current base font size for sidebar
+        md: ['14px'],
         lg: ['14px'],
         xl: ['16px'],
         '2xl': ['18px'],
