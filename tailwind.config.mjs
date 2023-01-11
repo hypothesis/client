@@ -82,10 +82,10 @@ export default {
         // which will grow during the conversion-to-Tailwind process. These
         // are descriptive, not aspirational or prescriptive.
         xs: ['11px', '1.4'],
-        sm: ['11px', '1.4'],
+        sm: ['13px', '1.4'],
         base: ['13px', '1.4'], // Current base font size for sidebar
         md: ['14px'],
-        lg: ['14px'],
+        lg: ['16px'],
         xl: ['18px'],
         'touch-base': ['16px', '1.4'], // Used for touch interfaces in certain UIs
         // Font sizes for annotator controls that should scale with text in the
