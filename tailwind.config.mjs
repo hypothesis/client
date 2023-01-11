@@ -81,7 +81,6 @@ export default {
         // This is a collection of font sizes used in existing sidebar components,
         // which will grow during the conversion-to-Tailwind process. These
         // are descriptive, not aspirational or prescriptive.
-        tiny: ['10px'],
         sm: ['11px', '1.4'],
         base: ['13px', '1.4'], // Current base font size for sidebar
         lg: ['14px'],
