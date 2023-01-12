@@ -2,23 +2,23 @@ import { useCallback, useEffect } from 'preact/hooks';
 
 import * as searchFilter from '../util/search-filter';
 import { withServices } from '../service-context';
+import type { APIService } from '../services/api';
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { useRootThread } from './hooks/use-root-thread';
 import { useSidebarStore } from '../store';
 
 import ThreadList from './ThreadList';
 
-/**
- * @typedef StreamViewProps
- * @prop {import('../services/api').APIService} api
- * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
- */
+export type StreamViewProps = {
+  // injected
+  api: APIService;
+  toastMessenger: ToastMessengerService;
+};
 
 /**
  * The main content of the "stream" route (https://hypothes.is/stream)
- *
- * @param {StreamViewProps} props
  */
-function StreamView({ api, toastMessenger }) {
+function StreamView({ api, toastMessenger }: StreamViewProps) {
   const store = useSidebarStore();
   const currentQuery = store.routeParams().q;
 
@@ -26,8 +26,7 @@ function StreamView({ api, toastMessenger }) {
    * Fetch annotations from the API and display them in the stream.
    */
   const loadAnnotations = useCallback(
-    /** @param {string} query */
-    async query => {
+    async (query: string) => {
       const queryParams = {
         _separate_replies: true,
 
