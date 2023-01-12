@@ -1,4 +1,3 @@
-import { IconButton, CancelIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import classnames from 'classnames';
 
@@ -94,17 +93,13 @@ export default function NotebookModal({
       setIframeKey(iframeKey => iframeKey + 1);
       setGroupId(groupId);
     });
+    emitter.subscribe('closeNotebook', () => setIsHidden(true));
     emitterRef.current = emitter;
 
     return () => {
       emitter.destroy();
     };
   }, [eventBus]);
-
-  const onClose = () => {
-    setIsHidden(true);
-    emitterRef.current?.publish('closeNotebook');
-  };
 
   if (groupId === null) {
     return null;
@@ -119,15 +114,6 @@ export default function NotebookModal({
       data-testid="notebook-outer"
     >
       <div className="relative w-full h-full" data-testid="notebook-inner">
-        <div className="absolute right-0 m-3">
-          <IconButton
-            title="Close the Notebook"
-            onClick={onClose}
-            variant="dark"
-          >
-            <CancelIcon className="w-4 h-4" />
-          </IconButton>
-        </div>
         <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
       </div>
     </div>

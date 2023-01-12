@@ -1,3 +1,4 @@
+import { CancelIcon, IconButton } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useEffect, useMemo } from 'preact/hooks';
 
@@ -145,6 +146,17 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
       data-testid="hypothesis-app"
       style={backgroundStyle}
     >
+      {route === 'notebook' && (
+        <div className="absolute right-0 top-0 m-3">
+          <IconButton
+            title="Close the Notebook"
+            onClick={() => {}}
+            variant="dark"
+          >
+            <CancelIcon className="w-4 h-4" />
+          </IconButton>
+        </div>
+      )}
       {route !== 'notebook' && (
         <TopBar
           onLogin={login}
