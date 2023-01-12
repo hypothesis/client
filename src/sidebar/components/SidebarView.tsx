@@ -1,9 +1,13 @@
 import { useEffect, useRef } from 'preact/hooks';
 
-import { useRootThread } from './hooks/use-root-thread';
-import { withServices } from '../service-context';
-import { useSidebarStore } from '../store';
 import { tabForAnnotation } from '../helpers/tabs';
+import { withServices } from '../service-context';
+import type { FrameSyncService } from '../services/frame-sync';
+import type { LoadAnnotationsService } from '../services/load-annotations';
+import type { StreamerService } from '../services/streamer';
+import { useSidebarStore } from '../store';
+
+import { useRootThread } from './hooks/use-root-thread';
 
 import FilterStatus from './FilterStatus';
 import LoggedOutMessage from './LoggedOutMessage';
@@ -12,19 +16,18 @@ import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
 
-/**
- * @typedef SidebarViewProps
- * @prop {() => void} onLogin
- * @prop {() => void} onSignUp
- * @prop {import('../services/frame-sync').FrameSyncService} frameSync
- * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
- * @prop {import('../services/streamer').StreamerService} streamer
- */
+export type SidebarViewProps = {
+  onLogin: () => void;
+  onSignUp: () => void;
+
+  // injected
+  frameSync: FrameSyncService;
+  loadAnnotationsService: LoadAnnotationsService;
+  streamer: StreamerService;
+};
 
 /**
- * Render the sidebar and its components
- *
- * @param {SidebarViewProps} props
+ * Render the content of the sidebar, including tabs and threads (annotations)
  */
 function SidebarView({
   frameSync,
@@ -32,7 +35,7 @@ function SidebarView({
   onSignUp,
   loadAnnotationsService,
   streamer,
-}) {
+}: SidebarViewProps) {
   const rootThread = useRootThread();
 
   // Store state values
@@ -89,7 +92,7 @@ function SidebarView({
       // on a particular user).
       if (prevGroupId.current) {
         // Respect applied focus-mode filtering when changing focused group
-        let restoreFocus = store.focusState().active;
+        const restoreFocus = store.focusState().active;
 
         store.clearSelection();
         if (restoreFocus) {
