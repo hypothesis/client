@@ -36,7 +36,7 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
   const store = useSidebarStore();
   const threadTag = thread.annotation?.$tag ?? null;
   const isHovered = !!(threadTag && store.isAnnotationHovered(threadTag));
-  const focusThreadAnnotation = useMemo(
+  const setThreadHovered = useMemo(
     () =>
       debounce((ann: Annotation | null) => frameSync.hoverAnnotation(ann), 10),
     [frameSync]
@@ -89,8 +89,8 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
           scrollToAnnotation(thread.annotation);
         }
       }}
-      onMouseEnter={() => focusThreadAnnotation(thread.annotation ?? null)}
-      onMouseLeave={() => focusThreadAnnotation(null)}
+      onMouseEnter={() => setThreadHovered(thread.annotation ?? null)}
+      onMouseLeave={() => setThreadHovered(null)}
       key={thread.id}
     >
       <CardContent>{threadContent}</CardContent>
