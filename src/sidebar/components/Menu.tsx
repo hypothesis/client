@@ -1,6 +1,7 @@
 import classnames from 'classnames';
 import { useElementShouldClose } from '@hypothesis/frontend-shared';
 import { MenuExpandIcon } from '@hypothesis/frontend-shared/lib/next';
+import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
 import MenuArrow from './MenuArrow';
@@ -13,37 +14,62 @@ import MenuKeyboardNavigation from './MenuKeyboardNavigation';
  */
 let ignoreNextClick = false;
 
-/**
- * @typedef MenuProps
- * @prop {'left'|'right'} [align] -
- *   Whether the menu content is aligned with the left (default) or right edges of the
- *   toggle element.
- * @prop {string} [arrowClass] -
- *   Additional CSS class for the arrow caret at the edge of the menu content that "points"
- *   toward the menu's toggle button. This can be used to adjust the position of that caret
- *   respective to the toggle button.
- * @prop {object|string} [label] - Label element for the toggle button that hides and shows the menu.
- * @prop {object} [children] -
- *   Menu items and sections to display in the content area of the menu.  These are typically
- *   `MenuSection` and `MenuItem` components, but other custom content is also allowed.
- * @prop {boolean} [containerPositioned] -
- *   Whether the menu elements should be positioned relative to the Menu container. When
- *   `false`, the consumer is responsible for positioning.
- * @prop {string} [contentClass] - Additional CSS classes to apply to the menu.
- * @prop {boolean} [defaultOpen] - Whether the menu is open or closed when initially rendered.
- *   Ignored if `open` is present.
- * @prop {(open: boolean) => void} [onOpenChanged] - Callback invoked when the menu is
- *   opened or closed.  This can be used, for example, to reset any ephemeral state that the
- *   menu content may have.
- * @prop {boolean} [open] - Whether the menu is currently open; overrides internal state
- *   management for openness. External components managing state in this way should
- *   also pass an `onOpenChanged` handler to respond when the user closes the menu.
- * @prop {string} title -
- *   A title for the menu. This is important for accessibility if the menu's toggle button
- *   has only an icon as a label.
- * @prop {boolean} [menuIndicator] -
- *   Whether to display an indicator next to the label that there is a dropdown menu.
- */
+export type MenuProps = {
+  /**
+   * Whether the menu content is aligned with the left (default) or right edges
+   * of the toggle element.
+   */
+  align?: 'left' | 'right';
+
+  /**
+   * Additional CSS class for the arrow caret at the edge of the menu content
+   * that "points" toward the menu's toggle button. This can be used to adjust
+   * the position of that caret respective to the toggle button.
+   */
+  arrowClass?: string;
+
+  /**
+   * Label element or string for the toggle button that hides and shows the menu
+   */
+  label: ComponentChildren;
+
+  /** Menu content, typically `MenuSection` and `MenuItem` components  */
+  children: ComponentChildren;
+
+  /**
+   * Whether the menu elements should be positioned relative to the Menu
+   * container. When `false`, the consumer is responsible for positioning.
+   */
+  containerPositioned?: boolean;
+
+  /** Additional CSS classes to apply to the Menu */
+  contentClass?: string;
+
+  /**
+   * Whether the menu is open when initially rendered. Ignored if `open` is
+   * present.
+   */
+  defaultOpen?: boolean;
+
+  /** Whether to render an (arrow) indicator next to the Menu label */
+  menuIndicator?: boolean;
+
+  /** Callback when the Menu is opened or closed. */
+  onOpenChanged?: (open: boolean) => void;
+
+  /**
+   * Whether the Menu is currently open, when the Menu is being used as a
+   * controlled component. In these cases, an `onOpenChanged` handler should
+   * be provided to respond to the user opening or closing the menu.
+   */
+  open?: boolean;
+
+  /**
+   * A title for the menu. This is important for accessibility if the menu's
+   * toggle button has only an icon as a label.
+   */
+  title: string;
+};
 
 const noop = () => {};
 
@@ -64,8 +90,6 @@ const noop = () => {};
  *       <MenuItem label="Log out"/>
  *     </MenuSection>
  *   </Menu>
- *
- * @param {MenuProps} props
  */
 export default function Menu({
   align = 'left',
@@ -79,9 +103,9 @@ export default function Menu({
   onOpenChanged,
   menuIndicator = true,
   title,
-}) {
-  /** @type {[boolean, (open: boolean) => void]} */
-  let [isOpen, setOpen] = useState(defaultOpen);
+}: MenuProps) {
+  let [isOpen, setOpen]: [boolean, (open: boolean) => void] =
+    useState(defaultOpen);
   if (typeof open === 'boolean') {
     isOpen = open;
     setOpen = onOpenChanged || noop;
@@ -96,11 +120,12 @@ export default function Menu({
     }
   }, [isOpen, onOpenChanged]);
 
-  // Toggle menu when user presses toggle button. The menu is shown on mouse
-  // press for a more responsive/native feel but also handles a click event for
-  // activation via other input methods.
-  /** @param {Event} event */
-  const toggleMenu = event => {
+  /**
+   * Toggle menu when user presses toggle button. The menu is shown on mouse
+   * press for a more responsive/native feel but also handles a click event for
+   * activation via other input methods.
+   */
+  const toggleMenu = (event: Event) => {
     // If the menu was opened on press, don't close it again on the subsequent
     // mouse up ("click") event.
     if (event.type === 'mousedown') {
@@ -122,18 +147,16 @@ export default function Menu({
   //
   // These handlers close the menu when the user taps or clicks outside the
   // menu or presses Escape.
-  const menuRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   // Menu element should close via `closeMenu` whenever it's open and there
   // are user interactions outside of it (e.g. clicks) in the document
   useElementShouldClose(menuRef, isOpen, closeMenu);
 
-  /** @param {Event} e */
-  const stopPropagation = e => e.stopPropagation();
+  const stopPropagation = (e: Event) => e.stopPropagation();
 
   // It should also close if the user presses a key which activates menu items.
-  /** @param {KeyboardEvent} event */
-  const handleMenuKeyDown = event => {
+  const handleMenuKeyDown = (event: KeyboardEvent) => {
     const key = event.key;
     if (key === 'Enter' || key === ' ') {
       // The browser will not open the link if the link element is removed
@@ -145,7 +168,6 @@ export default function Menu({
     }
   };
 
-  /** @type {{ position: 'relative'|'static' }} */
   const containerStyle = {
     position: containerPositioned ? 'relative' : 'static',
   };
