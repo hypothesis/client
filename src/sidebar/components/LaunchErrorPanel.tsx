@@ -1,20 +1,17 @@
 import { Panel } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
-/**
- * @typedef LaunchErrorPanelProps
- * @prop {Error} error - The error that prevented the client from launching
- */
-
+export type LaunchErrorPanelProps = {
+  /** The error that prevented the client from launching */
+  error: Error;
+};
 /**
  * An error panel displayed when a fatal error occurs during app startup.
  *
  * Note that this component cannot use any of the services or store that are
  * normally available to UI components in the client.
- *
- * @param {LaunchErrorPanelProps} props
  */
-export default function LaunchErrorPanel({ error }) {
+export default function LaunchErrorPanel({ error }: LaunchErrorPanelProps) {
   return (
     <div
       className={classnames(
