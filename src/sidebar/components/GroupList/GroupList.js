@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+import { PlusIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useMemo, useState } from 'preact/hooks';
 
 import { serviceConfig } from '../../config/service-config';
@@ -158,7 +159,11 @@ function GroupList({ settings }) {
       )}
 
       {canCreateNewGroup && (
-        <MenuItem icon="add" href={newGroupLink} label="New private group" />
+        <MenuItem
+          icon={PlusIcon}
+          href={newGroupLink}
+          label="New private group"
+        />
       )}
     </Menu>
   );

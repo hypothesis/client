@@ -127,9 +127,9 @@ describe('GroupListItem', () => {
       .returns(group.organization.name);
 
     const wrapper = createGroupListItem(group);
-    const altText = wrapper.find('MenuItem').prop('iconAlt');
+    const leftContent = wrapper.find('MenuItem').prop('leftChannelContent');
 
-    assert.equal(altText, group.organization.name);
+    assert.equal(leftContent.props.alt, group.organization.name);
   });
 
   describe('selected state', () => {

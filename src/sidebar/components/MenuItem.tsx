@@ -1,8 +1,8 @@
 import classnames from 'classnames';
-import { Icon } from '@hypothesis/frontend-shared';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import {
+  CaretUpIcon,
   MenuExpandIcon,
-  MenuCollapseIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import type { ComponentChildren, Ref } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
@@ -21,7 +21,9 @@ function SubmenuToggle({
   isExpanded,
   onToggleSubmenu,
 }: SubmenuToggleProps) {
-  const Icon = isExpanded ? MenuCollapseIcon : MenuExpandIcon;
+  // FIXME: Use `MenuCollapseIcon` instead of `CaretUpIcon` once size
+  // disparities are addressed
+  const Icon = isExpanded ? CaretUpIcon : MenuExpandIcon;
   return (
     <div
       data-testid="submenu-toggle"
@@ -53,10 +55,7 @@ function SubmenuToggle({
       onClick={onToggleSubmenu}
       title={title}
     >
-      <Icon
-        name={isExpanded ? 'collapse-menu' : 'expand-menu'}
-        className="w-3 h-3"
-      />
+      <Icon className="w-3 h-3" />
     </div>
   );
 }
@@ -67,17 +66,13 @@ export type MenuItemProps = {
    * `href` or an `onClick` callback should be supplied.
    */
   href?: string;
-  /** Alt text for icon */
-  iconAlt?: string;
 
   /**
-   * Name or URL of icon to display. If the value is a URL it is displayed using
-   * an `<img>`; if it is a non-URL string it is assumed to be the `name` of a
-   * registered icon. If the property is `"blank"` a blank placeholder is
-   * displayed in place of an icon. The placeholder is useful to keep menu item
-   * labels aligned.
+   * Icon to render for this item. This will show to the left of the item label
+   * unless this is a submenu item, in which case it goes on the right. Ignored
+   * if this is not a submenu item and `leftChannelContent` is also provided.
    */
-  icon?: string;
+  icon?: IconComponent;
 
   /**
    * Dim the label to indicate that this item is not currently available.  The
@@ -108,7 +103,15 @@ export type MenuItemProps = {
    */
   isSubmenuVisible?: boolean;
 
-  label: string;
+  label: ComponentChildren;
+
+  /**
+   * Optional content to render into a left channel. This accommodates small
+   * non-icon images or spacing and will supersede any provided icon if this
+   * is not a submenu item.
+   */
+  leftChannelContent?: ComponentChildren;
+
   onClick?: (e: Event) => void;
   onToggleSubmenu?: (e: Event) => void;
   /**
@@ -138,20 +141,18 @@ export type MenuItemProps = {
  */
 export default function MenuItem({
   href,
-  icon,
-  iconAlt,
+  icon: Icon,
   isDisabled,
   isExpanded,
   isSelected,
   isSubmenuItem,
   isSubmenuVisible,
   label,
+  leftChannelContent,
   onClick,
   onToggleSubmenu,
   submenu,
 }: MenuItemProps) {
-  const iconIsUrl = icon && icon.indexOf('/') !== -1;
-
   const menuItemRef = useRef<HTMLAnchorElement | HTMLDivElement | null>(null);
 
   let focusTimer: number | undefined;
@@ -197,40 +198,27 @@ export default function MenuItem({
     }
   };
 
-  let renderedIcon = null;
-  if (icon && icon !== 'blank') {
-    renderedIcon = iconIsUrl ? (
-      <img className="w-4 h-4" alt={iconAlt} src={icon} />
-    ) : (
-      <Icon name={icon} classes="h-3 w-3" />
-    );
-  }
-  const leftIcon = isSubmenuItem ? null : renderedIcon;
+  const renderedIcon = Icon ? <Icon className="h-3 w-3" /> : null;
+  const leftIcon = !isSubmenuItem ? renderedIcon : null;
   const rightIcon = isSubmenuItem ? renderedIcon : null;
 
-  // MenuItem content layout consists of:
-  // - Sometimes a left item, which may contain an icon or serve as
-  //   an indenting space for label alignment
-  // - Always a label
-  // - Sometimes a right item, which contains an icon (submenu items)
-  // - Sometimes a submenu-toggle control (only if the item has a submenu)
-  const hasLeftItem = leftIcon || isSubmenuItem || icon === 'blank';
-  const hasRightItem = rightIcon && isSubmenuItem;
+  const hasLeftChannel = leftChannelContent || isSubmenuItem || !!leftIcon;
+  const hasRightContent = !!rightIcon;
 
   const menuItemContent = (
     <>
-      {hasLeftItem && (
+      {hasLeftChannel && (
         <div
           className="w-7 flex items-center justify-center"
           data-testid="left-item-container"
         >
-          {leftIcon}
+          {leftChannelContent ?? leftIcon}
         </div>
       )}
       <span className="flex items-center grow whitespace-nowrap px-1">
         {label}
       </span>
-      {hasRightItem && (
+      {hasRightContent && (
         <div
           className="w-8 flex items-center justify-center"
           data-testid="right-item-container"
