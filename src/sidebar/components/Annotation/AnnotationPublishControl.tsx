@@ -1,6 +1,9 @@
 import {
   Button,
   CancelIcon,
+  GlobeIcon,
+  GroupsIcon,
+  LockIcon,
   MenuExpandIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
@@ -114,13 +117,13 @@ function AnnotationPublishControl({
             align="left"
           >
             <MenuItem
-              icon={group.type === 'open' ? 'public' : 'groups'}
+              icon={group.type === 'open' ? GlobeIcon : GroupsIcon}
               label={group.name}
               isSelected={!isPrivate}
               onClick={() => onSetPrivate(false)}
             />
             <MenuItem
-              icon="lock"
+              icon={LockIcon}
               label="Only Me"
               isSelected={isPrivate}
               onClick={() => onSetPrivate(true)}

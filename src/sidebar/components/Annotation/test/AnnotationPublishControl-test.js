@@ -1,3 +1,8 @@
+import {
+  GlobeIcon,
+  GroupsIcon,
+  LockIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
@@ -140,7 +145,7 @@ describe('AnnotationPublishControl', () => {
           const wrapper = createAnnotationPublishControl();
           const shareMenuItem = wrapper.find('MenuItem').first();
 
-          assert.equal(shareMenuItem.prop('icon'), 'groups');
+          assert.equal(shareMenuItem.props().icon, GroupsIcon);
         });
       });
 
@@ -153,7 +158,7 @@ describe('AnnotationPublishControl', () => {
           const wrapper = createAnnotationPublishControl();
           const shareMenuItem = wrapper.find('MenuItem').first();
 
-          assert.equal(shareMenuItem.prop('icon'), 'public');
+          assert.equal(shareMenuItem.props().icon, GlobeIcon);
         });
       });
     });
@@ -173,7 +178,7 @@ describe('AnnotationPublishControl', () => {
         const wrapper = createAnnotationPublishControl();
         const privateMenuItem = wrapper.find('MenuItem').at(1);
 
-        assert.equal(privateMenuItem.prop('icon'), 'lock');
+        assert.equal(privateMenuItem.prop('icon'), LockIcon);
       });
 
       it('should have an "Only me" label', () => {

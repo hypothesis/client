@@ -1,3 +1,4 @@
+import { EditIcon } from '@hypothesis/frontend-shared/lib/next';
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
@@ -38,13 +39,6 @@ describe('MenuItem', () => {
       assert.equal(link.length, 1);
       assert.equal(link.prop('href'), 'https://example.com');
       assert.equal(link.prop('rel'), 'noopener noreferrer');
-    });
-
-    it('renders an `<img>` icon if an icon URL is provided', () => {
-      const src = 'https://example.com/icon.svg';
-      const wrapper = createMenuItem({ icon: src });
-      const icon = wrapper.find('img');
-      assert.equal(icon.prop('src'), src);
     });
 
     it('invokes `onClick` callback when pressing `Enter` or space', () => {
@@ -93,20 +87,25 @@ describe('MenuItem', () => {
   });
 
   describe('icons for top-level menu items', () => {
-    it('renders an icon if an icon name is provided', () => {
-      const wrapper = createMenuItem({ icon: 'edit' });
-      assert.isTrue(wrapper.exists('Icon[name="edit"]'));
+    it('renders an icon if an icon is provided', () => {
+      const wrapper = createMenuItem({ icon: EditIcon });
+      assert.isTrue(wrapper.exists('EditIcon'));
     });
 
-    it('adds a left container if `icon` is "blank"', () => {
-      const wrapper = createMenuItem({ icon: 'blank' });
-      assert.equal(
-        wrapper.find('[data-testid="left-item-container"]').length,
-        1
+    it('adds a left container if left content is provided', () => {
+      const wrapper = createMenuItem({
+        leftChannelContent: <span>Hi</span>,
+        icon: EditIcon,
+      });
+      const leftChannel = wrapper.find('[data-testid="left-item-container"]');
+      assert.equal(leftChannel.text(), 'Hi');
+      assert.isFalse(
+        wrapper.exists('EditIcon'),
+        'Icon ignored if left channel content provided'
       );
     });
 
-    it('does not add a left container if `icon` is missing', () => {
+    it('does not add a left container if neither icon nor left content provided', () => {
       const wrapper = createMenuItem();
       assert.equal(
         wrapper.find('[data-testid="left-item-container"]').length,
@@ -115,7 +114,7 @@ describe('MenuItem', () => {
     });
 
     it('renders an icon on the left if `icon` provided', () => {
-      const wrapper = createMenuItem({ icon: 'edit' });
+      const wrapper = createMenuItem({ icon: EditIcon });
       const leftItem = wrapper.find('[data-testid="left-item-container"]');
 
       // There should be only one icon space, on the left.
@@ -174,16 +173,12 @@ describe('MenuItem', () => {
 
     it('renders submenu item icons on the right', () => {
       const wrapper = createMenuItem({
-        icon: 'edit',
+        icon: EditIcon,
         isSubmenuItem: true,
         submenu: <div role="menuitem">Submenu content</div>,
       });
       const rightItem = wrapper.find('[data-testid="right-item-container"]');
-
-      assert.equal(rightItem.length, 1);
-
-      // The actual icon for the submenu should be shown on the right.
-      assert.equal(rightItem.at(0).children().length, 1);
+      assert.isTrue(rightItem.find('EditIcon').exists());
     });
 
     it('does not render submenu content if `isSubmenuVisible` is undefined', () => {

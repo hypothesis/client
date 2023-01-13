@@ -1,4 +1,9 @@
 import classnames from 'classnames';
+import {
+  CopyIcon,
+  ExternalIcon,
+  LeaveIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';
@@ -95,15 +100,20 @@ function GroupListItem({
   const copyLinkLabel =
     group.type === 'private' ? 'Copy invite link' : 'Copy activity link';
 
+  const leftChannelContent = group.logo ? (
+    <img className="w-4 h-4" alt={orgName(group)} src={group.logo} />
+  ) : (
+    <span className="sr-only">{orgName(group)}</span>
+  );
+
   return (
     <MenuItem
-      icon={group.logo || 'blank'}
-      iconAlt={orgName(group)}
       isDisabled={!isSelectable}
       isExpanded={hasActionMenu ? isExpanded : false}
       isSelected={isSelected}
       isSubmenuVisible={hasActionMenu ? isExpanded : undefined}
       label={group.name}
+      leftChannelContent={leftChannelContent}
       onClick={isSelectable ? focusGroup : toggleSubmenu}
       onToggleSubmenu={toggleSubmenu}
       submenu={
@@ -113,7 +123,7 @@ function GroupListItem({
               <li>
                 <MenuItem
                   href={activityUrl}
-                  icon="external"
+                  icon={ExternalIcon}
                   isSubmenuItem={true}
                   label="View group activity"
                 />
@@ -123,7 +133,7 @@ function GroupListItem({
               <li>
                 <MenuItem
                   onClick={() => copyLink(activityUrl)}
-                  icon="copy"
+                  icon={CopyIcon}
                   isSubmenuItem={true}
                   label={copyLinkLabel}
                 />
@@ -132,7 +142,7 @@ function GroupListItem({
             {group.canLeave && (
               <li>
                 <MenuItem
-                  icon="leave"
+                  icon={LeaveIcon}
                   isSubmenuItem={true}
                   label="Leave group"
                   onClick={leaveGroup}
