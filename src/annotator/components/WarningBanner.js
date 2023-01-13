@@ -7,7 +7,7 @@ import classnames from 'classnames';
  */
 export default function WarningBanner() {
   return (
-    <div className="bg-white">
+    <div className="bg-white" role="alert">
       <div
         className={classnames(
           'flex items-center gap-x-2',
