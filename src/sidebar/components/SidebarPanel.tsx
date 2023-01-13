@@ -1,32 +1,31 @@
 import { Panel } from '@hypothesis/frontend-shared';
+import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
+import type { PanelName } from '../../types/sidebar';
 import { useSidebarStore } from '../store';
 
 import Slider from './Slider';
 
-/**
- * @typedef {import("../../types/sidebar").PanelName} PanelName
- */
-
-/**
- * @typedef SidebarPanelProps
- * @prop {import("preact").ComponentChildren} children
- * @prop {string} [icon] - An optional icon name for display next to the panel's title
- * @prop {PanelName} panelName -
- *   A string identifying this panel. Only one `panelName` may be active at any time.
- *   Multiple panels with the same `panelName` would be "in sync", opening and closing together.
- * @prop {string} title - The panel's title
- * @prop {(active: boolean) => void} [onActiveChanged] -
- *   Optional callback to invoke when this panel's active status changes
- */
+export type SidebarPanelProps = {
+  children: ComponentChildren;
+  /** An optional icon name for display next to the panel's title */
+  icon?: string;
+  /**
+   * A string identifying this panel. Only one `panelName` may be active at any
+   * time. Multiple panels with the same `panelName` would be "in sync", opening
+   * and closing together.
+   */
+  panelName: PanelName;
+  title: string;
+  /** Optional callback to invoke when this panel's active status changes */
+  onActiveChanged?: (active: boolean) => void;
+};
 
 /**
  * Base component for a sidebar panel. Only one sidebar panel
  * (as defined by the panel's `panelName`) is active (visible) at one time.
- *
- * @param {SidebarPanelProps} props
  */
 export default function SidebarPanel({
   children,
@@ -34,11 +33,11 @@ export default function SidebarPanel({
   panelName,
   title,
   onActiveChanged,
-}) {
+}: SidebarPanelProps) {
   const store = useSidebarStore();
   const panelIsActive = store.isSidebarPanelOpen(panelName);
 
-  const panelElement = useRef(/** @type {HTMLDivElement|null}*/ (null));
+  const panelElement = useRef<HTMLDivElement | null>(null);
   const panelWasActive = useRef(panelIsActive);
 
   // Scroll the panel into view if it has just been opened
