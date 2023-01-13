@@ -134,7 +134,7 @@ describe('MenuItem', () => {
       assert.equal(wrapper.find(menuItemSelector).prop('aria-expanded'), true);
 
       wrapper.setProps({ isSubmenuVisible: false });
-      assert.isTrue(wrapper.exists('Icon[name="expand-menu"]'));
+      assert.isTrue(wrapper.exists('MenuExpandIcon'));
       assert.equal(wrapper.find(menuItemSelector).prop('aria-haspopup'), true);
       assert.equal(wrapper.find(menuItemSelector).prop('aria-expanded'), false);
       assert.isNotOk(wrapper.find(menuItemSelector).prop('aria-expanded'));
