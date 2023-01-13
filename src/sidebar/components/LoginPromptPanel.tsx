@@ -1,4 +1,8 @@
-import { Button, CardActions } from '@hypothesis/frontend-shared/lib/next';
+import {
+  Button,
+  CardActions,
+  RestrictedIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
 
@@ -23,7 +27,7 @@ export default function LoginPromptPanel({
   }
   return (
     <SidebarPanel
-      icon="restricted"
+      icon={RestrictedIcon}
       title="Login needed"
       panelName="loginPrompt"
     >

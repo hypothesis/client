@@ -1,4 +1,5 @@
-import { Panel } from '@hypothesis/frontend-shared';
+import { Panel } from '@hypothesis/frontend-shared/lib/next';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
@@ -11,7 +12,7 @@ import Slider from './Slider';
 export type SidebarPanelProps = {
   children: ComponentChildren;
   /** An optional icon name for display next to the panel's title */
-  icon?: string;
+  icon?: IconComponent;
   /**
    * A string identifying this panel. Only one `panelName` may be active at any
    * time. Multiple panels with the same `panelName` would be "in sync", opening
@@ -29,7 +30,7 @@ export type SidebarPanelProps = {
  */
 export default function SidebarPanel({
   children,
-  icon = '',
+  icon,
   panelName,
   title,
   onActiveChanged,
