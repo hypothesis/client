@@ -10,15 +10,16 @@ import { useSidebarStore } from '../store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
 import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { notNull } from '../util/typing';
 
 import ShareLinks from './ShareLinks';
 import SidebarPanel from './SidebarPanel';
 
-/**
- * @typedef ShareAnnotationsPanelProps
- * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
- */
+export type ShareAnnotationPanelProps = {
+  // injected
+  toastMessenger: ToastMessengerService;
+};
 
 /**
  * A panel for sharing the current group's annotations on the current document.
@@ -26,10 +27,8 @@ import SidebarPanel from './SidebarPanel';
  * Links within this component allow a user to share the set of annotations that
  * are on the current page (as defined by the main frame's URI) and contained
  * within the app's currently-focused group.
- *
- * @param {ShareAnnotationsPanelProps} props
  */
-function ShareAnnotationsPanel({ toastMessenger }) {
+function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
   const store = useSidebarStore();
   const mainFrame = store.mainFrame();
   const focusedGroup = store.focusedGroup();
@@ -41,13 +40,14 @@ function ShareAnnotationsPanel({ toastMessenger }) {
   const sharingReady = focusedGroup && mainFrame;
 
   const shareURI =
-    sharingReady &&
-    pageSharingLink(notNull(mainFrame).uri, notNull(focusedGroup).id);
+    sharingReady && pageSharingLink(mainFrame.uri, focusedGroup.id);
 
   const copyShareLink = () => {
     try {
-      copyText(/** @type {string} */ (shareURI));
-      toastMessenger.success('Copied share link to clipboard');
+      if (shareURI) {
+        copyText(shareURI);
+        toastMessenger.success('Copied share link to clipboard');
+      }
     } catch (err) {
       toastMessenger.error('Unable to copy link');
     }
