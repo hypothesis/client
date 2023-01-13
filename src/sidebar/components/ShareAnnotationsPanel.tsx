@@ -1,10 +1,11 @@
 import {
+  CopyIcon,
   IconButton,
+  Input,
+  InputGroup,
+  LockIcon,
   Spinner,
-  Icon,
-  TextInput,
-  TextInputWithButton,
-} from '@hypothesis/frontend-shared';
+} from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
@@ -57,7 +58,7 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
     <SidebarPanel title={panelTitle} panelName="shareGroupAnnotations">
       {!sharingReady && (
         <div className="flex flex-row items-center justify-center">
-          <Spinner />
+          <Spinner size="md" />
         </div>
       )}
       {sharingReady && (
@@ -78,20 +79,20 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
                 )}
               </div>
               <div>
-                <TextInputWithButton>
-                  <TextInput
+                <InputGroup>
+                  <Input
                     aria-label="Use this URL to share these annotations"
                     type="text"
                     value={shareURI}
                     readOnly
                   />
                   <IconButton
-                    icon="copy"
+                    icon={CopyIcon}
                     onClick={copyShareLink}
                     title="Copy share link"
                     variant="dark"
                   />
-                </TextInputWithButton>
+                </InputGroup>
               </div>
               <p data-testid="sharing-details">
                 {notNull(focusedGroup).type === 'private' ? (
@@ -108,8 +109,8 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
                 )}{' '}
                 <span>
                   Private (
-                  <Icon name="lock" classes="inline -mt-0.5" /> <em>Only Me</em>
-                  ) annotations are only visible to you.
+                  <LockIcon className="inline w-em h-em ml-0.5 -mt-0.5" />{' '}
+                  <em>Only Me</em>) annotations are only visible to you.
                 </span>
               </p>
               <div className="text-[24px]">
