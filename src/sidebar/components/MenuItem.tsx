@@ -1,24 +1,27 @@
 import classnames from 'classnames';
 import { Icon } from '@hypothesis/frontend-shared';
+import {
+  MenuExpandIcon,
+  MenuCollapseIcon,
+} from '@hypothesis/frontend-shared/lib/next';
+import type { ComponentChildren, Ref } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
 import Slider from './Slider';
 
-/**
- * @typedef {import('../icons').sidebarIcons} SidebarIcons
- */
+type SubmenuToggleProps = {
+  title: string;
+  isExpanded: boolean;
+  onToggleSubmenu?: (e: Event) => void;
+};
 
-/**
- * Render a clickable div that will toggle the expanded state of the
- * associated submenu via `onToggleSubmenu`.
- *
- * @param {object} props
- *   @param {string} props.title
- *   @param {boolean} props.isExpanded
- *   @param {(e: Event) => void} [props.onToggleSubmenu]
- */
-function SubmenuToggle({ title, isExpanded, onToggleSubmenu }) {
+function SubmenuToggle({
+  title,
+  isExpanded,
+  onToggleSubmenu,
+}: SubmenuToggleProps) {
+  const Icon = isExpanded ? MenuCollapseIcon : MenuExpandIcon;
   return (
     <div
       data-testid="submenu-toggle"
@@ -52,48 +55,70 @@ function SubmenuToggle({ title, isExpanded, onToggleSubmenu }) {
     >
       <Icon
         name={isExpanded ? 'collapse-menu' : 'expand-menu'}
-        classes="w-3 h-3"
+        className="w-3 h-3"
       />
     </div>
   );
 }
 
-/**
- * @typedef MenuItemProps
- * @prop {string} [href] -
- *   URL of the external link to open when this item is clicked. Either the `href` or an
- *   `onClick` callback should be supplied.
- * @prop {string} [iconAlt] - Alt text for icon.
- * @prop {string} [icon] -
- *   Name or URL of icon to display. If the value is a URL it is displayed using an `<img>`;
- *   if it is a non-URL string it is assumed to be the `name` of a registered icon.
- *   If the property is `"blank"` a blank placeholder is displayed in place of an icon.
- *   The placeholder is useful to keep menu item labels aligned.
- * @prop {boolean} [isDisabled] -
- *   Dim the label to indicate that this item is not currently available.  The `onClick`
- *   callback will still be invoked when this item is clicked and the submenu, if any,
- *   can still be toggled.
- * @prop {boolean} [isExpanded] -
- *   Indicates that the submenu associated with this item is currently open.
- * @prop {boolean} [isSelected] -
- *   Display an indicator to show that this menu item represents something which is currently
- *   selected/active/focused.
- * @prop {boolean} [isSubmenuItem] -
- *   True if this item is part of a submenu, in which case it is rendered with a different
- *   style (shaded background)
- * @prop {boolean|undefined} [isSubmenuVisible] -
- *   If present, display a button to toggle the sub-menu associated with this item and
- *   indicate the current state; `true` if the submenu is visible. Note. Omit this prop,
- *    or set it to null, if there is no `submenu`.
- * @prop {string} label - Label of the menu item.
- * @prop {(e: Event) => void} [onClick] - Callback to invoke when the menu item is clicked.
- * @prop {(e: Event) => void} [onToggleSubmenu] -
- *   Callback when the user clicks on the toggle to change the expanded state of the menu.
- * @prop {object} [submenu] -
- *   Contents of the submenu for this item.  This is typically a list of `MenuItem` components
- *    with the `isSubmenuItem` prop set to `true`, but can include other content as well.
- *    The submenu is only rendered if `isSubmenuVisible` is `true`.
- */
+export type MenuItemProps = {
+  /**
+   * URL of the external link to open when this item is clicked. Either the
+   * `href` or an `onClick` callback should be supplied.
+   */
+  href?: string;
+  /** Alt text for icon */
+  iconAlt?: string;
+
+  /**
+   * Name or URL of icon to display. If the value is a URL it is displayed using
+   * an `<img>`; if it is a non-URL string it is assumed to be the `name` of a
+   * registered icon. If the property is `"blank"` a blank placeholder is
+   * displayed in place of an icon. The placeholder is useful to keep menu item
+   * labels aligned.
+   */
+  icon?: string;
+
+  /**
+   * Dim the label to indicate that this item is not currently available.  The
+   * `onClick` callback will still be invoked when this item is clicked and the
+   * submenu, if any, can still be toggled.
+   */
+  isDisabled?: boolean;
+
+  /** Indicates that the submenu associated with this item is currently open */
+  isExpanded?: boolean;
+
+  /**
+   * Display an indicator to show that this menu item represents something which
+   * is currently selected/active/focused.
+   */
+  isSelected?: boolean;
+
+  /**
+   * True if this item is part of a submenu, in which case it is rendered with a
+   * different style (shaded background)
+   */
+  isSubmenuItem?: boolean;
+
+  /**
+   * If present, display a button to toggle the sub-menu associated with this
+   * item and indicate the current state; `true` if the submenu is visible.
+   * Note. Omit this prop, or set it to null, if there is no `submenu`.
+   */
+  isSubmenuVisible?: boolean;
+
+  label: string;
+  onClick?: (e: Event) => void;
+  onToggleSubmenu?: (e: Event) => void;
+  /**
+   * Contents of the submenu for this item.  This is typically a list of
+   * `MenuItem` components with the `isSubmenuItem` prop set to `true`, but can
+   * include other content as well. The submenu is only rendered if
+   * `isSubmenuVisible` is `true`.
+   */
+  submenu?: ComponentChildren;
+};
 
 /**
  * An item in a dropdown menu.
@@ -105,13 +130,11 @@ function SubmenuToggle({ title, isExpanded, onToggleSubmenu }) {
  * is provided, or perform a custom action via the `onClick` callback.
  *
  * The icon can either be an external SVG image, referenced by URL, or the
- * name of an icon registered in the application. @see {SidebarIcons}
+ * name of an icon registered in the application.
  *
  * For items that have submenus, the `MenuItem` will call the `renderSubmenu`
  * prop to render the content of the submenu, when the submenu is visible.
  * Note that the `submenu` is not supported for link (`href`) items.
- *
- * @param {MenuItemProps} props
  */
 export default function MenuItem({
   href,
@@ -126,14 +149,12 @@ export default function MenuItem({
   onClick,
   onToggleSubmenu,
   submenu,
-}) {
+}: MenuItemProps) {
   const iconIsUrl = icon && icon.indexOf('/') !== -1;
 
-  const menuItemRef =
-    /** @type {{ current: HTMLAnchorElement & HTMLDivElement }} */ (useRef());
+  const menuItemRef = useRef<HTMLAnchorElement | HTMLDivElement | null>(null);
 
-  /** @type {number|undefined} */
-  let focusTimer;
+  let focusTimer: number | undefined;
 
   // menuItem can be either a link or a button
   let menuItem;
@@ -148,19 +169,17 @@ export default function MenuItem({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** @param {Event} event */
-  const onCloseSubmenu = event => {
+  const onCloseSubmenu = (event: Event) => {
     if (onToggleSubmenu) {
       onToggleSubmenu(event);
     }
     // The focus won't work without delaying rendering.
     focusTimer = setTimeout(() => {
-      menuItemRef.current.focus();
+      menuItemRef.current!.focus();
     });
   };
 
-  /** @param {KeyboardEvent} event */
-  const onKeyDown = event => {
+  const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case 'ArrowRight':
         if (onToggleSubmenu) {
@@ -264,7 +283,7 @@ export default function MenuItem({
     // The menu item is a link
     menuItem = (
       <a
-        ref={menuItemRef}
+        ref={menuItemRef as Ref<HTMLAnchorElement>}
         className={wrapperClasses}
         data-testid="menu-item"
         href={href}
@@ -282,7 +301,7 @@ export default function MenuItem({
     // In either case there may be an optional submenu.
     menuItem = (
       <div
-        ref={menuItemRef}
+        ref={menuItemRef as Ref<HTMLDivElement>}
         className={wrapperClasses}
         data-testid="menu-item"
         tabIndex={-1}
@@ -301,10 +320,10 @@ export default function MenuItem({
     <>
       {menuItem}
       {hasSubmenuVisible && (
-        <Slider visible={/** @type {boolean} */ (isSubmenuVisible)}>
+        <Slider visible={isSubmenuVisible}>
           <MenuKeyboardNavigation
             closeMenu={onCloseSubmenu}
-            visible={/** @type {boolean} */ (isSubmenuVisible)}
+            visible={isSubmenuVisible}
             className="border-b"
           >
             {submenu}
