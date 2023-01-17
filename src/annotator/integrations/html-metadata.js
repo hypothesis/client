@@ -216,10 +216,8 @@ export class HTMLMetadata {
       // they don't have a type.
       if (name === 'doi') {
         for (let doi of values) {
-          if (doi.slice(0, 4) !== 'doi:') {
-            doi = `doi:${doi}`;
-          }
-          links.push({ href: doi });
+          const href = this._getDoiUri(doi);
+          if (href) links.push({ href });
         }
       }
     }
@@ -303,5 +301,59 @@ export class HTMLMetadata {
     // Fall back to returning the document URI, even though the scheme is not
     // in the allowed list.
     return href;
+  }
+
+  /**
+   * Normalize a DOI string (DOI, DOI URI or DOI URL) to a DOI URI.
+   *
+   * @param {string} doi
+   * @returns {string|undefined}
+   *
+   * @example
+   * // DOI
+   * this._getDoiUri("10.3998/mp.9460447.0005.205");
+   * // DOI URI
+   * this._getDoiUri("doi:10.3998/mp.9460447.0005.205");
+   * // DOI URL
+   * this._getDoiUri("https://doi.org/10.3998/mp.9460447.0005.205");
+   * this._getDoiUri("https://dx.doi.org/10.3998/mp.9460447.0005.205");
+   *
+   * // returns "doi:10.3998/mp.9460447.0005.205"
+   *
+   * @todo Validate DOI value
+   * {@link https://www.crossref.org/blog/dois-and-matching-regular-expressions/}
+   * {@link https://github.com/regexhq/doi-regex}
+   *
+   * @todo Handle ShortDOI {@link https://shortdoi.org/}
+   */
+  _getDoiUri(doi) {
+    try {
+      const { protocol, hostname, pathname } = new URL(doi);
+      switch(protocol) {
+        case 'doi:':
+          return doi;
+        case 'http:':
+        case 'https:':
+          switch(hostname) {
+            /**
+             * 'dx.doi.org' hostname is not used anymore but still backward compatible
+             * @see "DOIs such as http://dx.doi.org/ and http://doi.org/ which conform to older guidelines will continue to work indefinitely"
+             * @see {@link https://www.crossref.org/display-guidelines/#changes-to-guidelines-in-march-2017a-id00555-href00555a|
+             *       DOI display guidelines > Changes to guidelines in March 2017}
+             */
+            case 'doi.org':
+            case 'dx.doi.org':
+              // Slice pathname first `/` and possible last `/`.
+              return `doi:${pathname.slice(1).replace(/\/$/, '')}`;
+            default:
+              break;
+          }
+        default:
+          break;
+      }
+    } catch(_) {
+      // Assuming that if it's not an DOI URI nor an DOI URL, the string is a DOI.
+      return `doi:${doi}`;
+    }
   }
 }
