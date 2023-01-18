@@ -159,14 +159,14 @@ describe('NotebookView', () => {
       fakeStore.hasAppliedFilter.returns(true);
       const wrapper = createComponent();
 
-      const button = wrapper.find('IconButton[icon="refresh"]');
+      const button = wrapper.find('button[data-testid="refresh-button"]');
       assert.isFalse(button.exists());
     });
 
     it('shows button to synchronize annotations if no filters are applied', () => {
       const wrapper = createComponent();
 
-      const button = wrapper.find('IconButton[icon="refresh"]');
+      const button = wrapper.find('button[data-testid="refresh-button"]');
       assert.isTrue(button.exists());
       assert.include(button.prop('title'), 'Show 3 new or updated annotations');
     });
@@ -174,7 +174,7 @@ describe('NotebookView', () => {
     it('synchronizes pending annotations', () => {
       const wrapper = createComponent();
 
-      const button = wrapper.find('IconButton[icon="refresh"]');
+      const button = wrapper.find('button[data-testid="refresh-button"]');
       assert.isTrue(button.exists());
       button.prop('onClick')();
       assert.called(fakeStreamer.applyPendingUpdates);

@@ -1,4 +1,9 @@
-import { IconButton, Panel } from '@hypothesis/frontend-shared';
+import {
+  IconButton,
+  Link,
+  Panel,
+  RefreshIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
@@ -140,7 +145,8 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
       <div className="flex items-center lg:justify-self-end text-md font-medium">
         {pendingUpdateCount > 0 && !hasAppliedFilter && (
           <IconButton
-            icon="refresh"
+            data-testid="refresh-button"
+            icon={RefreshIcon}
             onClick={() => streamer.applyPendingUpdates()}
             variant="primary"
             title={tooltip}
@@ -157,14 +163,21 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
         {hasTooManyAnnotationsError && (
           <div className="py-4" data-testid="notebook-messages">
             <Panel title="Too many results to show">
-              This preview of the Notebook can show{' '}
-              <strong>up to {maxResults} results</strong> at a time (there are{' '}
-              {resultCount} to show here).{' '}
-              <a href="mailto:support@hypothes.is?subject=Hypothesis%20Notebook&body=Please%20notify%20me%20when%20the%20Hypothesis%20Notebook%20is%20updated%20to%20support%20more%20than%205000%20annotations">
-                Contact us
-              </a>{' '}
-              if you would like to be notified when support for more annotations
-              is available.
+              <p>
+                This preview of the Notebook can show{' '}
+                <strong>up to {maxResults} results</strong> at a time (there are{' '}
+                {resultCount} to show here).
+              </p>
+              <p>
+                <Link
+                  href="mailto:support@hypothes.is?subject=Hypothesis%20Notebook&body=Please%20notify%20me%20when%20the%20Hypothesis%20Notebook%20is%20updated%20to%20support%20more%20than%205000%20annotations"
+                  underline="always"
+                >
+                  Contact us
+                </Link>{' '}
+                if you would like to be notified when support for more
+                annotations is available.
+              </p>
             </Panel>
           </div>
         )}
