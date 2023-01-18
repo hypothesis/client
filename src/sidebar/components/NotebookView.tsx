@@ -4,6 +4,8 @@ import scrollIntoView from 'scroll-into-view';
 
 import { ResultSizeError } from '../search-client';
 import { withServices } from '../service-context';
+import type { LoadAnnotationsService } from '../services/load-annotations';
+import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 
 import NotebookFilters from './NotebookFilters';
@@ -11,18 +13,17 @@ import NotebookResultCount from './NotebookResultCount';
 import PaginatedThreadList from './PaginatedThreadList';
 import { useRootThread } from './hooks/use-root-thread';
 
-/**
- * @typedef NotebookViewProps
- * @prop {import('../services/load-annotations').LoadAnnotationsService} loadAnnotationsService
- * @prop {import('../services/streamer').StreamerService} streamer
- */
-
+export type NotebookViewProps = {
+  // injected
+  loadAnnotationsService: LoadAnnotationsService;
+  streamer: StreamerService;
+};
 /**
  * The main content of the "notebook" route (https://hypothes.is/notebook)
  *
  * @param {NotebookViewProps} props
  */
-function NotebookView({ loadAnnotationsService, streamer }) {
+function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
   const store = useSidebarStore();
 
   const filters = store.getFilterValues();
@@ -56,8 +57,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   // of them: this is a performance safety valve.
   const maxResults = 5000;
 
-  /** @param {Error} error */
-  const onLoadError = error => {
+  const onLoadError = (error: Error) => {
     if (error instanceof ResultSizeError) {
       setHasTooManyAnnotationsError(true);
     }
@@ -102,8 +102,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
     }
   }, [loadAnnotationsService, groupId, store]);
 
-  /** @param {number} newPage */
-  const onChangePage = newPage => {
+  const onChangePage = (newPage: number) => {
     setPaginationPage(newPage);
   };
 
@@ -113,7 +112,7 @@ function NotebookView({ loadAnnotationsService, streamer }) {
   }, [filters, focusedGroup]);
 
   // Scroll back to here when pagination page changes
-  const threadListScrollTop = useRef(/** @type {HTMLElement|null}*/ (null));
+  const threadListScrollTop = useRef<HTMLElement | null>(null);
   useLayoutEffect(() => {
     // TODO: Transition and effects here should be improved
     if (paginationPage !== lastPaginationPage.current) {
