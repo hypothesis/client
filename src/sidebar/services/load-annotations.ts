@@ -1,29 +1,43 @@
+import type { Annotation } from '../../types/api';
+
 import { isReply } from '../helpers/annotation-metadata';
 import { SearchClient } from '../search-client';
+import type { SortBy, SortOrder } from '../search-client';
+import type { SidebarStore } from '../store';
 
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../search-client').SortBy} SortBy
- * @typedef {import('../search-client').SortOrder} SortOrder
- */
+import type { APIService } from './api';
+import type { StreamerService } from './streamer';
+import type { StreamFilter } from './stream-filter';
 
-/**
- * @typedef LoadAnnotationOptions
- * @prop {string} groupId
- * @prop {string[]} [uris]
- * @prop {number} [maxResults] - If number of annotations in search results
- *   exceeds this value, do not load annotations (see: `SearchClient`)
- * @prop {SortBy} [sortBy] - Together with `sortOrder`, this controls in what
- *   order annotations are loaded. To minimize visible content changing as
- *   annotations load, `sortBy` and `sortOrder` should be chosen to correlate
- *   with the expected presentation order of annotations/threads in the current
- *   view.
- * @prop {SortOrder} [sortOrder]
- * @prop {(error: Error) => void} [onError] - Optional error handler for
- *   SearchClient. Default error handling logs errors to console.
- * @prop {'uri'|'group'} [streamFilterBy] - Set the websocket stream
- *   to filter by either URIs or groupIds.
- */
+export type LoadAnnotationOptions = {
+  groupId: string;
+  uris?: string[];
+  /**
+   * If number of annotations in search results exceeds this value, do not load
+   * annotations (see: `SearchClient`)
+   */
+  maxResults?: number;
+
+  /**
+   * `sortBy` and `sortOrder` control in what order annotations are loaded. To
+   * minimize visible content changing as annotations load, `sortBy` and
+   * `sortOrder` should be chosen to correlate with the expected presentation
+   * order of annotations/threads in the current view.
+   */
+  sortBy?: SortBy;
+  sortOrder?: SortOrder;
+
+  /**
+   * Optional error handler for SearchClient. Default error handling logs errors
+   * to console.
+   */
+  onError?: (error: Error) => void;
+
+  /**
+   * Set the websocket stream to filter by either URIs or groupIds.
+   */
+  streamFilterBy?: 'uri' | 'group';
+};
 
 /**
  * A service for fetching annotations via the Hypothesis API and loading them
@@ -36,19 +50,23 @@ import { SearchClient } from '../search-client';
  * @inject
  */
 export class LoadAnnotationsService {
-  /**
-   * @param {import('./api').APIService} api
-   * @param {import('../store').SidebarStore} store
-   * @param {import('./streamer').StreamerService} streamer
-   * @param {import('./stream-filter').StreamFilter} streamFilter
-   */
-  constructor(api, store, streamer, streamFilter) {
+  private _api: APIService;
+  private _store: SidebarStore;
+  private _streamer: StreamerService;
+  private _streamFilter: StreamFilter;
+  private _searchClient: SearchClient | null;
+
+  constructor(
+    api: APIService,
+    store: SidebarStore,
+    streamer: StreamerService,
+    streamFilter: StreamFilter
+  ) {
     this._api = api;
     this._store = store;
     this._streamer = streamer;
     this._streamFilter = streamFilter;
 
-    /** @type {SearchClient|null} */
     this._searchClient = null;
   }
 
@@ -57,8 +75,6 @@ export class LoadAnnotationsService {
    *
    * The existing set of loaded annotations is cleared before the new set
    * is fetched. If an existing annotation fetch is in progress it is canceled.
-   *
-   * @param {LoadAnnotationOptions} options
    */
   load({
     groupId,
@@ -68,7 +84,7 @@ export class LoadAnnotationsService {
     sortBy,
     sortOrder,
     streamFilterBy = 'uri',
-  }) {
+  }: LoadAnnotationOptions) {
     this._store.removeAnnotations(this._store.savedAnnotations());
 
     // Cancel previously running search client.
@@ -123,33 +139,23 @@ export class LoadAnnotationsService {
 
     this._searchClient = new SearchClient(this._api.search, searchOptions);
 
-    this._searchClient.on(
-      'resultCount',
-      /** @param {number} count */
-      count => {
-        this._store.setAnnotationResultCount(count);
-      }
-    );
+    this._searchClient.on('resultCount', (count: number) => {
+      this._store.setAnnotationResultCount(count);
+    });
 
-    this._searchClient.on(
-      'results',
-      /** @param {Annotation[]} results */ results => {
-        if (results.length) {
-          this._store.addAnnotations(results);
-        }
+    this._searchClient.on('results', (results: Annotation[]) => {
+      if (results.length) {
+        this._store.addAnnotations(results);
       }
-    );
+    });
 
-    this._searchClient.on(
-      'error',
-      /** @param {Error} error */ error => {
-        if (typeof onError === 'function') {
-          onError(error);
-        } else {
-          console.error(error);
-        }
+    this._searchClient.on('error', (error: Error) => {
+      if (typeof onError === 'function') {
+        onError(error);
+      } else {
+        console.error(error);
       }
-    );
+    });
 
     this._searchClient.on('end', () => {
       // Remove client as it's no longer active.
@@ -172,10 +178,10 @@ export class LoadAnnotationsService {
   /**
    * Fetch all annotations in the same thread as `id` and add them to the store.
    *
-   * @param {string} id - Annotation ID. This may be an annotation or a reply.
-   * @return Promise<Annotation[]> - The annotation, followed by any replies.
+   * @param id - Annotation ID. This may be an annotation or a reply.
+   * @return Top-level annotation in the thread, followed by any replies.
    */
-  async loadThread(id) {
+  async loadThread(id: string) {
     let annotation;
     let replySearchResult;
 
@@ -191,7 +197,7 @@ export class LoadAnnotationsService {
       //    fetch the top-level annotation
       if (isReply(annotation)) {
         annotation = await this._api.annotation.get({
-          id: /** @type {string[]} */ (annotation.references)[0],
+          id: annotation.references![0],
         });
       }
 
@@ -209,7 +215,7 @@ export class LoadAnnotationsService {
     // configure the connection to the real-time update service to send us
     // updates to any of the annotations in the thread.
     if (!isReply(annotation)) {
-      const id = /** @type {string} */ (annotation.id);
+      const id = annotation.id!;
       this._streamFilter
         .addClause('/references', 'one_of', id, true)
         .addClause('/id', 'equals', id, true);
