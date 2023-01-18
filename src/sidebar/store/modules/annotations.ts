@@ -15,14 +15,12 @@ import { isHighlight, isSaved } from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import { createStoreModule, makeAction } from '../create-store';
 
-import { routeModule } from './route';
-import type { State as RouteState } from './route';
 import { sessionModule } from './session';
 import type { State as SessionState } from './session';
 
 type AnchorStatus = 'anchored' | 'orphan' | 'timeout';
 
-type AnchorStatusUpdates = {
+export type AnchorStatusUpdates = {
   [$tag: string]: AnchorStatus;
 };
 
@@ -303,61 +301,21 @@ function addAnnotations(annotations: Annotation[]) {
     dispatch: Dispatch,
     getState: () => {
       annotations: State;
-      route: RouteState;
       session: SessionState;
     }
   ) {
-    const added = annotations.filter(annot => {
-      return (
-        !annot.id || !findByID(getState().annotations.annotations, annot.id)
-      );
-    });
-
     const profile = sessionModule.selectors.profile(getState().session);
 
-    dispatch(
-      makeAction(reducers, 'ADD_ANNOTATIONS', {
-        annotations,
-        currentAnnotationCount: getState().annotations.annotations.length,
-        currentUserId: profile.userid,
-      })
-    );
+    // The `ADD_ANNOTATIONS` action payload is defined in this module but there
+    // is an `ADD_ANNOTATIONS` reducer in the `selection` store module that
+    // relies on the `currentAnnotationCount` prop.
+    const actionPayload = {
+      annotations,
+      currentAnnotationCount: getState().annotations.annotations.length,
+      currentUserId: profile.userid,
+    };
 
-    // If we're not in the sidebar, we're done here.
-    // FIXME Split the annotation-adding from the anchoring code; possibly
-    // move into service
-    if (routeModule.selectors.route(getState().route) !== 'sidebar') {
-      return;
-    }
-
-    // If anchoring fails to complete in a reasonable amount of time, then
-    // we assume that the annotation failed to anchor. If it does later
-    // successfully anchor then the status will be updated.
-    const ANCHORING_TIMEOUT = 500;
-
-    const anchoringIds = added
-      .filter(metadata.isWaitingToAnchor)
-      .map(ann => ann.id);
-
-    if (anchoringIds.length > 0) {
-      setTimeout(() => {
-        // Find annotations which haven't yet been anchored in the document.
-        const anns = getState().annotations.annotations;
-        const annsStillAnchoring = anchoringIds
-          .map(id => (id ? findByID(anns, id) : null))
-          .filter(ann => ann && metadata.isWaitingToAnchor(ann));
-
-        // Mark anchoring as timed-out for these annotations.
-        const anchorStatusUpdates = annsStillAnchoring.reduce(
-          (updates, ann) => {
-            updates[ann!.$tag] = 'timeout';
-            return updates;
-          },
-          {} as AnchorStatusUpdates
-        );
-        dispatch(updateAnchorStatus(anchorStatusUpdates));
-      }, ANCHORING_TIMEOUT);
-    }
+    dispatch(makeAction(reducers, 'ADD_ANNOTATIONS', actionPayload));
   };
 }
 
