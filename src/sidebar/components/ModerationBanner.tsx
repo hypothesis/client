@@ -5,30 +5,31 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
+import type { Annotation } from '../../types/api';
+
+import type { APIService } from '../services/api';
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import * as annotationMetadata from '../helpers/annotation-metadata';
 import { withServices } from '../service-context';
 
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- */
+export type ModerationBannerProps = {
+  annotation: Annotation;
+
+  // injected
+  api: APIService;
+  toastMessenger: ToastMessengerService;
+};
 
 /**
- * @typedef ModerationBannerProps
- * @prop {Annotation} annotation -
- *   The annotation object for this banner. This contains state about the flag count
- *   or its hidden value.
- * @prop {import('../services/api').APIService} api
- * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
+ * Banner allows moderators to hide/unhide the flagged annotation from other
+ * users.
  */
-
-/**
- * Banner allows moderators to hide/unhide the flagged
- * annotation from other users.
- *
- * @param {ModerationBannerProps} props
- */
-function ModerationBanner({ annotation, api, toastMessenger }) {
+function ModerationBanner({
+  annotation,
+  api,
+  toastMessenger,
+}: ModerationBannerProps) {
   const store = useSidebarStore();
   const flagCount = annotationMetadata.flagCount(annotation);
 
@@ -39,7 +40,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
    * Hide an annotation from non-moderator users.
    */
   const hideAnnotation = () => {
-    const id = /** @type {string} */ (annotation.id);
+    const id = annotation.id!;
     api.annotation
       .hide({ id })
       .then(() => {
@@ -54,7 +55,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
    * Un-hide an annotation from non-moderator users.
    */
   const unhideAnnotation = () => {
-    const id = /** @type {string} */ (annotation.id);
+    const id = annotation.id!;
     api.annotation
       .unhide({ id })
       .then(() => {
@@ -72,9 +73,7 @@ function ModerationBanner({ annotation, api, toastMessenger }) {
     <div
       className={classnames(
         'flex gap-x-3 bg-grey-1 text-color-text font-semibold',
-        // Vertical margins should ultimately be handled by the parent, but
-        // until we can refactor outer components (e.g. `ThreadCard`), this
-        // component manages its own bottom margin
+        // FIXME: Refactor margins: where possible manage them in a parent
         'mb-2 ',
         {
           // For top-level annotations, use negative margins to "break out" of
