@@ -101,7 +101,7 @@ describe('MarkdownEditor', () => {
     {
       command: 'Numbered list',
       key: 'o',
-      effect: [fakeMarkdownCommands.toggleBlockStyle, '1. '],
+      effect: [fakeMarkdownCommands.toggleBlockStyle, sinon.match.func],
     },
   ];
   commands.forEach(({ command, key, effect }) => {

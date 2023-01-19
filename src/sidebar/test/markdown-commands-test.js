@@ -111,6 +111,17 @@ describe('markdown commands', () => {
         assert.equal(formatState(output), fixture.output);
       });
     });
+
+    it('adds formatting to multi-line blocks', () => {
+      const output = commands.toggleBlockStyle(
+        parseState('one\n<sel>two\nthree\nfour</sel>\nfive'),
+        lineIndex => `::${lineIndex * 2}:: `
+      );
+      assert.equal(
+        formatState(output),
+        'one\n::0:: <sel>two\n::2:: three\n::4:: four</sel>\nfive'
+      );
+    });
   });
 
   describe('link formatting', () => {

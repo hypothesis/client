@@ -118,7 +118,9 @@ function handleToolbarCommand(
       update(insertMath);
       break;
     case 'numlist':
-      update(state => toggleBlockStyle(state, '1. '));
+      update(state =>
+        toggleBlockStyle(state, lineIndex => `${lineIndex + 1}. `)
+      );
       break;
     case 'list':
       update(state => toggleBlockStyle(state, '* '));

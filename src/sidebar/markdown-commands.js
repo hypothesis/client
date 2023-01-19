@@ -209,19 +209,20 @@ function endOfLine(str, pos) {
  * @param {EditorState} state - The initial state of the input field
  * @param {number} start - The start position within the input text
  * @param {number} end - The end position within the input text
- * @param {(s: EditorState, start: number, end: number) => EditorState} callback
+ * @param {(s: EditorState, start: number, end: number, lineIndex: number) => EditorState} callback
  *  - Callback which is invoked with the current state of the input and
  *    the start of the current line and returns the new state of the input.
  */
 function transformLines(state, start, end, callback) {
   let lineStart = startOfLine(state.text, start);
   let lineEnd = endOfLine(state.text, start);
+  let lineIndex = 0;
 
   while (lineEnd <= endOfLine(state.text, end)) {
     const isLastLine = lineEnd === state.text.length;
     const currentLineLength = lineEnd - lineStart;
 
-    state = callback(state, lineStart, lineEnd);
+    state = callback(state, lineStart, lineEnd, lineIndex);
 
     const newLineLength = endOfLine(state.text, lineStart) - lineStart;
     end += newLineLength - currentLineLength;
@@ -231,6 +232,7 @@ function transformLines(state, start, end, callback) {
     }
     lineStart = lineStart + newLineLength + 1;
     lineEnd = endOfLine(state.text, lineStart);
+    lineIndex += 1;
   }
   return state;
 }
@@ -239,18 +241,24 @@ function transformLines(state, start, end, callback) {
  * Toggle Markdown-style formatting around a block of text.
  *
  * @param {EditorState} state - The current state of the input field.
- * @param {string} prefix - The prefix to add or remove before each line
- *                          of the selection.
+ * @param {string|((lineIndex: number) => string)} prefix - The prefix
+ *        to add or remove before each line of the selection, or a callback
+ *        which returns said prefix for a specific line index (useful for
+ *        multi-line selections that require different prefixes per line).
  * @return {EditorState} - The new state of the input field.
  */
 export function toggleBlockStyle(state, prefix) {
   const start = state.selectionStart;
   const end = state.selectionEnd;
+  /** @param {number} lineIndex */
+  const prefixToString = lineIndex =>
+    typeof prefix === 'function' ? prefix(lineIndex) : prefix;
 
   // Test whether all lines in the selected range already have the style
   // applied
   let blockHasStyle = true;
-  transformLines(state, start, end, (state, lineStart) => {
+  transformLines(state, start, end, (state, lineStart, _lineEnd, lineIndex) => {
+    const prefix = prefixToString(lineIndex);
     if (state.text.slice(lineStart, lineStart + prefix.length) !== prefix) {
       blockHasStyle = false;
     }
@@ -259,17 +267,29 @@ export function toggleBlockStyle(state, prefix) {
 
   if (blockHasStyle) {
     // Remove the formatting.
-    return transformLines(state, start, end, (state, lineStart) => {
-      return replaceText(state, lineStart, prefix.length, '');
-    });
+    return transformLines(
+      state,
+      start,
+      end,
+      (state, lineStart, _lineEnd, lineIndex) => {
+        const prefix = prefixToString(lineIndex);
+        return replaceText(state, lineStart, prefix.length, '');
+      }
+    );
   } else {
     // Add the block style to any lines which do not already have it applied
-    return transformLines(state, start, end, (state, lineStart) => {
-      if (state.text.slice(lineStart, lineStart + prefix.length) === prefix) {
-        return state;
-      } else {
-        return replaceText(state, lineStart, 0, prefix);
+    return transformLines(
+      state,
+      start,
+      end,
+      (state, lineStart, _lineEnd, lineIndex) => {
+        const prefix = prefixToString(lineIndex);
+        if (state.text.slice(lineStart, lineStart + prefix.length) === prefix) {
+          return state;
+        } else {
+          return replaceText(state, lineStart, 0, prefix);
+        }
       }
-    });
+    );
   }
 }
