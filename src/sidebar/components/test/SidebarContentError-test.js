@@ -36,7 +36,7 @@ describe('SidebarContentError', () => {
 
   const findButtonByText = (wrapper, text) => {
     return wrapper
-      .find('LabeledButton')
+      .find('button')
       .filterWhere(button => button.text() === text)
       .at(0);
   };
