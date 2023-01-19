@@ -212,13 +212,16 @@ export class FrameSyncService {
       prevAnnotations: Annotation[]
     ) => {
       let publicAnns = 0;
+      // `$tag`s of top-level annotations loaded in the sidebar store
       const inSidebar = new Set<string>();
+      // Top-level annotations that have been added and should be communicated
+      // to guest frames
       const added = [] as Annotation[];
 
       // Determine which annotations have been added or deleted in the sidebar.
       annotations.forEach(annot => {
         if (isReply(annot)) {
-          // The frame does not need to know about replies
+          // Guest frames do not need to know about replies
           return;
         }
 
