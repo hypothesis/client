@@ -45,6 +45,16 @@ describe('render-markdown', () => {
           'https://hypothes.is/stream?q=tag:group_test_needs_card</a></p>'
       );
     });
+
+    ['.', ',', '!', '?'].forEach(symbol => {
+      it('should autolink URLs excluding trailing punctuation symbols', () => {
+        assert.equal(
+          render(`See this link - http://arxiv.org/article${symbol}`),
+          '<p>See this link - <a href="http://arxiv.org/article" target="_blank">' +
+            `http://arxiv.org/article</a>${symbol}</p>`
+        );
+      });
+    });
   });
 
   describe('markdown rendering', () => {

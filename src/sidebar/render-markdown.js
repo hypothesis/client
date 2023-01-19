@@ -31,6 +31,7 @@ function renderMarkdown(markdown) {
     converter = new showdown.Converter({
       extensions: [targetBlank],
       simplifiedAutoLink: true,
+      excludeTrailingPunctuationFromURLs: true,
       // Since we're using simplifiedAutoLink we also use
       // literalMidWordUnderscores because otherwise _'s in URLs get
       // transformed into <em>'s.
