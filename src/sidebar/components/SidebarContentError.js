@@ -1,4 +1,8 @@
-import { LabeledButton, Panel } from '@hypothesis/frontend-shared';
+import {
+  Button,
+  Panel,
+  RestrictedIcon,
+} from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
 
@@ -41,21 +45,21 @@ export default function SidebarContentError({
 
   return (
     <div className="mb-4">
-      <Panel icon="restricted" title={errorTitle}>
+      <Panel icon={RestrictedIcon} title={errorTitle}>
         <p>{errorMessage}</p>
         <div className="flex justify-end space-x-2">
           {showClearSelection && (
-            <LabeledButton
+            <Button
               variant={isLoggedIn ? 'primary' : undefined}
               onClick={() => store.clearSelection()}
             >
               Show all annotations
-            </LabeledButton>
+            </Button>
           )}
           {!isLoggedIn && (
-            <LabeledButton variant="primary" onClick={onLoginRequest}>
+            <Button variant="primary" onClick={onLoginRequest}>
               Log in
-            </LabeledButton>
+            </Button>
           )}
         </div>
       </Panel>
