@@ -6,24 +6,25 @@ import {
 
 import { useSidebarStore } from '../store';
 
-/**
- * @typedef SidebarContentErrorProps
- * @prop {'annotation'|'group'} errorType
- * @prop {boolean} [showClearSelection] - Whether to show a "Clear selection" button.
- * @prop {() => void} onLoginRequest - A function that will launch the login flow for the user.
- */
+export type SidebarContentErrorProps = {
+  errorType: 'annotation' | 'group';
+
+  /** Whether or not to render a "Clear selection" button */
+  showClearSelection?: boolean;
+
+  /** A function that will launch the login flow for the user */
+  onLoginRequest: () => void;
+};
 
 /**
  * Show an error indicating that an annotation or group referenced in the URL
  * could not be fetched.
- *
- * @param {SidebarContentErrorProps} props
  */
 export default function SidebarContentError({
   errorType,
   onLoginRequest,
   showClearSelection = false,
-}) {
+}: SidebarContentErrorProps) {
   const store = useSidebarStore();
   const isLoggedIn = store.isLoggedIn();
 
