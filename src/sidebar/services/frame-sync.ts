@@ -9,8 +9,13 @@ import {
   isMessage,
   isMessageEqual,
 } from '../../shared/messaging';
-import { isReply, isPublic } from '../helpers/annotation-metadata';
+import {
+  isReply,
+  isPublic,
+  isWaitingToAnchor,
+} from '../helpers/annotation-metadata';
 import { annotationMatchesSegment } from '../helpers/annotation-segment';
+import type { AnchorStatusUpdates } from '../store/modules/annotations';
 import { watch } from '../util/watch';
 
 import type { Message } from '../../shared/messaging';
@@ -157,6 +162,11 @@ export class FrameSyncService {
    */
   private _scheduleAnchorStatusUpdate: DebouncedFunction<[]>;
 
+  /**
+   * Pending timeouts to check anchoring status of added annotations
+   */
+  private _anchorCheckTimeouts: number[];
+
   // Test seam
   private _window: Window;
 
@@ -182,6 +192,8 @@ export class FrameSyncService {
     this._pendingScrollToTag = null;
     this._pendingHoverTag = null;
     this._pendingAnchorStatusUpdates = new Map();
+
+    this._anchorCheckTimeouts = [];
 
     this._scheduleAnchorStatusUpdate = debounce(() => {
       const records = Object.fromEntries(
@@ -270,6 +282,33 @@ export class FrameSyncService {
           this._updateAnchorStatus(anchorImmediately, 'anchored');
         }
 
+        // For added annotations that still need to anchor, re-check them after
+        // ANCHORING_TIMEOUT has elapsed. Any added annotations not anchored
+        // by that time should be marked as having an anchor timeout.
+        const anchoringIds = added
+          .filter(ann => isWaitingToAnchor(ann))
+          .map(ann => ann.id);
+
+        const ANCHORING_TIMEOUT = 500;
+
+        if (anchoringIds.length > 0) {
+          const anchoringTimeout = setTimeout(() => {
+            const annsStillAnchoring = anchoringIds
+              .map(id => (id ? this._store.findAnnotationByID(id) : null))
+              .filter(ann => ann && isWaitingToAnchor(ann));
+            const anchorStatusUpdates = annsStillAnchoring.reduce(
+              (updates, ann) => {
+                updates[ann!.$tag] = 'timeout';
+                return updates;
+              },
+              {} as AnchorStatusUpdates
+            );
+            this._store.updateAnchorStatus(anchorStatusUpdates);
+          }, ANCHORING_TIMEOUT);
+          this._anchorCheckTimeouts.push(anchoringTimeout);
+        }
+
+        // Load added annotations into their appropriate guest frame
         for (const [frameId, anns] of addedByFrame) {
           const rpc = this._guestRPC.get(frameId);
           if (rpc) {
@@ -624,5 +663,6 @@ export class FrameSyncService {
   destroy() {
     this._portFinder.destroy();
     this._listeners.removeAll();
+    this._anchorCheckTimeouts.map(timeout => clearTimeout(timeout));
   }
 }
