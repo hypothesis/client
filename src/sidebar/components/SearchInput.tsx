@@ -5,6 +5,7 @@ import {
   Spinner,
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
+import type { RefObject } from 'preact';
 import { useCallback, useRef, useState } from 'preact/hooks';
 
 import { useShortcut } from '../../shared/shortcut';
@@ -20,15 +21,14 @@ import { useSidebarStore } from '../store';
  *   (everyone else)
  * - Restore previous focus when the user presses 'Escape' while the search
  *   input is focused.
- *
- * @param {import('preact').RefObject<HTMLInputElement>} searchInputRef
  */
-function useSearchKeyboardShortcuts(searchInputRef) {
-  const prevFocusRef =
-    /** @type {import('preact').RefObject<HTMLOrSVGElement>} */ (useRef());
+function useSearchKeyboardShortcuts(
+  searchInputRef: RefObject<HTMLInputElement>
+) {
+  const prevFocusRef = useRef<HTMLOrSVGElement | null>(null);
 
   const focusSearch = useCallback(
-    /** @param {KeyboardEvent} event */ event => {
+    (event: KeyboardEvent) => {
       // When user is in an input field, respond to CMD-/CTRL-K keypresses,
       // but ignore '/' keypresses
       if (
@@ -39,12 +39,12 @@ function useSearchKeyboardShortcuts(searchInputRef) {
       ) {
         return;
       }
-      prevFocusRef.current = /** @type {HTMLOrSVGElement|null} */ (
-        document.activeElement
-      );
-      searchInputRef.current?.focus();
-      event.preventDefault();
-      event.stopPropagation();
+      prevFocusRef.current = document.activeElement as HTMLOrSVGElement | null;
+      if (searchInputRef.current) {
+        searchInputRef.current?.focus();
+        event.preventDefault();
+        event.stopPropagation();
+      }
     },
     [searchInputRef]
   );
@@ -66,15 +66,19 @@ function useSearchKeyboardShortcuts(searchInputRef) {
   useShortcut('escape', restoreFocus);
 }
 
-/**
- * @typedef SearchInputProps
- * @prop {boolean} [alwaysExpanded] -
- *   If true, the input field is always shown. If false, the input field is only shown
- *   if the query is non-empty.
- * @prop {string|null} query - The currently active filter query
- * @prop {(value: string) => void} onSearch -
- *   Callback to invoke when the current filter query changes
- */
+export type SearchInputProps = {
+  /**
+   * When true, the input field is always shown. If false, the input field is
+   * only shown if the query is non-empty.
+   */
+  alwaysExpanded?: boolean;
+
+  /** The currently-active filter query */
+  query: string | null;
+
+  /** Callback for when the current filter query changes */
+  onSearch: (value: string) => void;
+};
 
 /**
  * An input field in the top bar for entering a query that filters annotations
@@ -84,15 +88,15 @@ function useSearchKeyboardShortcuts(searchInputRef) {
  * This component also renders a eloading spinner to indicate when the client
  * is fetching for data from the API or in a "loading" state for any other
  * reason.
- *
- * @param {SearchInputProps} props
  */
-export default function SearchInput({ alwaysExpanded, query, onSearch }) {
+export default function SearchInput({
+  alwaysExpanded,
+  query,
+  onSearch,
+}: SearchInputProps) {
   const store = useSidebarStore();
   const isLoading = store.isLoading();
-  const input = /** @type {import('preact').RefObject<HTMLInputElement>} */ (
-    useRef()
-  );
+  const input = useRef<HTMLInputElement | null>(null);
   useSearchKeyboardShortcuts(input);
 
   // The active filter query from the previous render.
@@ -101,8 +105,7 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
   // The query that the user is currently typing, but may not yet have applied.
   const [pendingQuery, setPendingQuery] = useState(query);
 
-  /** @param {Event} e */
-  const onSubmit = e => {
+  const onSubmit = (e: Event) => {
     e.preventDefault();
     if (input.current?.value || prevQuery) {
       // Don't set an initial empty query, but allow a later empty query to
@@ -176,8 +179,8 @@ export default function SearchInput({ alwaysExpanded, query, onSearch }) {
         disabled={isLoading}
         elementRef={input}
         value={pendingQuery || ''}
-        onInput={e =>
-          setPendingQuery(/** @type {HTMLInputElement} */ (e.target).value)
+        onInput={(e: Event) =>
+          setPendingQuery((e.target as HTMLInputElement).value)
         }
       />
       {!isLoading && (
