@@ -146,7 +146,8 @@
 /**
  * @typedef TextLayer
  * @prop {boolean} renderingDone
- * @prop {HTMLElement} textLayerDiv
+ * @prop {HTMLElement} [div] - New name for root element of text layer in PDF.js >= v3.2.146
+ * @prop {HTMLElement} [textLayerDiv] - Old name for root element of text layer
  */
 
 export {};
