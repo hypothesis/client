@@ -1,4 +1,4 @@
-import { Icon, Link } from '@hypothesis/frontend-shared';
+import { CautionIcon, Link } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 /**
@@ -15,13 +15,14 @@ export default function WarningBanner() {
         )}
       >
         <div className="bg-yellow-notice text-white p-2">
-          <Icon name="caution" classes="text-annotator-xl" />
+          <CautionIcon className="text-annotator-xl" />
         </div>
         <div>
           <strong>This PDF does not contain selectable text:</strong>{' '}
           <Link
             target="_blank"
             href="https://web.hypothes.is/help/how-to-ocr-optimize-pdfs/"
+            underline="always"
           >
             Learn how to fix this
           </Link>{' '}
