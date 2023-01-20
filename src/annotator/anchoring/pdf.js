@@ -314,7 +314,12 @@ async function anchorByPosition(pageIndex, start, end) {
     // `getPageTextContent` and the text layer content. Any other differences
     // will cause mis-anchoring.
 
-    const root = page.textLayer.textLayerDiv;
+    const root = page.textLayer.textLayerDiv ?? page.textLayer.div;
+    if (!root) {
+      /* istanbul ignore next */
+      throw new Error('Unable to find PDF.js text layer root');
+    }
+
     const textLayerStr = /** @type {string} */ (root.textContent);
 
     const [textLayerStart, textLayerEnd] = translateOffsets(
