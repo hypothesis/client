@@ -8,21 +8,26 @@ import {
   NoteIcon,
   ShowIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import type {
+  IconComponent,
+  PresentationalProps,
+} from '@hypothesis/frontend-shared/lib/types';
+import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import classnames from 'classnames';
+import type { JSX, RefObject } from 'preact';
 
-/**
- * @typedef {import('@hypothesis/frontend-shared/lib/types').PresentationalProps} PresentationalProps
- * @typedef {import('@hypothesis/frontend-shared/lib/components/input/ButtonBase').ButtonCommonProps} ButtonCommonProps
- * @typedef {Omit<import('preact').JSX.HTMLAttributes<HTMLButtonElement>, 'icon'|'size'>} HTMLButtonAttributes
- * @typedef {import('@hypothesis/frontend-shared/lib/types').IconComponent} IconComponent
- */
+// TODO: ToolbarButton should be extracted as a shared design pattern or
+// component
+type ToolbarButtonProps = PresentationalProps &
+  ButtonCommonProps &
+  Omit<JSX.HTMLAttributes<HTMLButtonElement>, 'icon' | 'size'> & {
+    icon: IconComponent;
+  };
 
 /**
  * Style an IconButton for use on the Toolbar
- *
- * @param {PresentationalProps & ButtonCommonProps & HTMLButtonAttributes & {icon: IconComponent}} props
  */
-function ToolbarButton({ icon: Icon, ...buttonProps }) {
+function ToolbarButton({ icon: Icon, ...buttonProps }: ToolbarButtonProps) {
   return (
     <ButtonBase
       classes={classnames(
@@ -40,20 +45,13 @@ function ToolbarButton({ icon: Icon, ...buttonProps }) {
 }
 
 /**
- * @typedef StatusNotifierProps
- * @prop {boolean} highlightsVisible
- */
-
-/**
  * Hidden component that announces certain Hypothesis states.
  *
  * This is useful to inform assistive technology users when these states
  * have been changed (eg. whether highlights are visible), given that they can
  * be changed in multiple ways (keyboard shortcuts, toolbar button) etc.
- *
- * @param {StatusNotifierProps} props
  */
-function StatusNotifier({ highlightsVisible }) {
+function StatusNotifier({ highlightsVisible }: { highlightsVisible: boolean }) {
   return (
     <div className="sr-only" role="status" data-testid="toolbar-status">
       {highlightsVisible ? 'Highlights visible' : 'Highlights hidden'}
@@ -61,33 +59,51 @@ function StatusNotifier({ highlightsVisible }) {
   );
 }
 
-/**
- * @typedef ToolbarProps
- *
- * @prop {() => void} closeSidebar -
- *   Callback for the "Close sidebar" button. This button is only shown when
- *   `useMinimalControls` is true and the sidebar is open.
- * @prop {() => void} createAnnotation -
- *   Callback for the "Create annotation" / "Create page note" button. The type
- *   of annotation depends on whether there is a text selection and is decided
- *   by the caller.
- * @prop {boolean} isSidebarOpen - Is the sidebar currently visible?
- * @prop {'annotation'|'note'} newAnnotationType -
- *   Icon to show on the "Create annotation" button indicating what kind of annotation
- *   will be created.
- * @prop {boolean} showHighlights - Are highlights currently visible in the document?
- * @prop {() => void} toggleHighlights -
- *   Callback to toggle visibility of highlights in the document.
- * @prop {() => void} toggleSidebar -
- *   Callback to toggle the visibility of the sidebar.
- * @prop {import("preact").RefObject<HTMLElement>} [toggleSidebarRef] -
- *   Ref that gets set to the toolbar button for toggling the sidebar.
- *   This is exposed to enable the drag-to-resize functionality of this
- *   button.
- * @prop {boolean} [useMinimalControls] -
- *   If true, all controls are hidden except for the "Close sidebar" button
- *   when the sidebar is open. This is enabled in the "clean" theme.
- */
+export type ToolbarProps = {
+  /**
+   * Callback for the "Close sidebar" button. This button is only shown when
+   * `useMinimalControls` is true and the sidebar is open.
+   */
+  closeSidebar: () => void;
+
+  /** Callback for when "Create annotation" button is clicked. */
+  createAnnotation: () => void;
+
+  /** Is the sidebar currently open? */
+  isSidebarOpen: boolean;
+
+  /**
+   * Informs which icon to show on the "Create annotation" button and what type
+   * of annotation should be created by the `createAnnotation` callback. The
+   * type of annotation depends on whether there is a text selection in the
+   * document.
+   */
+  newAnnotationType: 'annotation' | 'note';
+
+  /** Are highlights currently visible in the document? */
+  showHighlights: boolean;
+
+  /** Callback for the show/hide highlights button */
+  toggleHighlights: () => void;
+
+  /**
+   * Callback for toggling the visibility of the sidebar when the show/hide
+   * sidebar button is clicked
+   */
+  toggleSidebar: () => void;
+
+  /**
+   * Ref to apply to the show/hide-sidebar button. This is exposed to enable
+   * drag-to-resize functionality.
+   */
+  toggleSidebarRef?: RefObject<HTMLElement>;
+
+  /**
+   * When true, all controls are hidden except for the "Close sidebar" button
+   * when the sidebar is open. This is enabled for the "clean" theme.
+   */
+  useMinimalControls?: boolean;
+};
 
 /**
  * Controls on the edge of the sidebar for opening/closing the sidebar,
@@ -96,8 +112,6 @@ function StatusNotifier({ highlightsVisible }) {
  * This component and its buttons are sized with absolute units such that they
  * don't scale with changes to the host page's root font size. They will still
  * properly scale with user/browser zooming.
- *
- * @param {ToolbarProps} props
  */
 export default function Toolbar({
   closeSidebar,
@@ -109,7 +123,7 @@ export default function Toolbar({
   toggleSidebar,
   toggleSidebarRef,
   useMinimalControls = false,
-}) {
+}: ToolbarProps) {
   return (
     <div
       className={classnames(
