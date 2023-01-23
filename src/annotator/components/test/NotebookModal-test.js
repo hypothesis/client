@@ -121,7 +121,7 @@ describe('NotebookModal', () => {
     wrapper.update();
 
     let outer = wrapper.find(outerSelector);
-    assert.isFalse(outer.hasClass('hidden'));
+    assert.isTrue(outer.is('[open=true]'));
 
     act(() => {
       wrapper.find('IconButton').prop('onClick')();
@@ -130,7 +130,7 @@ describe('NotebookModal', () => {
 
     outer = wrapper.find(outerSelector);
 
-    assert.isTrue(outer.hasClass('hidden'));
+    assert.isFalse(outer.is('[open=true]'));
   });
 
   it('resets document scrollability on closing the modal', () => {

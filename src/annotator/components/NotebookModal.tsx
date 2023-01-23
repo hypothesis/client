@@ -1,6 +1,5 @@
 import { IconButton, CancelIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useEffect, useRef, useState } from 'preact/hooks';
-import classnames from 'classnames';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';
@@ -111,11 +110,9 @@ export default function NotebookModal({
   }
 
   return (
-    <div
-      className={classnames(
-        'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
-        { hidden: isHidden }
-      )}
+    <dialog
+      open={!isHidden}
+      className="z-max w-full h-full top-0 p-3 bg-black/50"
       data-testid="notebook-outer"
     >
       <div className="relative w-full h-full" data-testid="notebook-inner">
@@ -130,6 +127,6 @@ export default function NotebookModal({
         </div>
         <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
       </div>
-    </div>
+    </dialog>
   );
 }
