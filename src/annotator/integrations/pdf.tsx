@@ -20,22 +20,21 @@ import { offsetRelativeTo, scrollElement } from '../util/scroll';
 
 import { PDFMetadata } from './pdf-metadata';
 
-/**
- * @typedef {import('../../types/annotator').Anchor} Anchor
- * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
- * @typedef {import('../../types/annotator').Annotator} Annotator
- * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoConfig
- * @typedef {import('../../types/annotator').Integration} Integration
- * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
- * @typedef {import('../../types/api').Selector} Selector
- * @typedef {import('../../types/pdfjs').PDFViewerApplication} PDFViewerApplication
- */
+import type {
+  Anchor,
+  AnnotationData,
+  Annotator,
+  ContentInfoConfig,
+  Integration,
+  SidebarLayout,
+} from '../../types/annotator';
+import type { Selector } from '../../types/api';
+import type { PDFViewer, PDFViewerApplication } from '../../types/pdfjs';
 
 /**
  * Window with additional globals set by PDF.js.
- *
- * @typedef {Window & { PDFViewerApplication: PDFViewerApplication}} PDFWindow
  */
+type PDFWindow = Window & { PDFViewerApplication: PDFViewerApplication };
 
 // The viewport and controls for PDF.js start breaking down below about 670px
 // of available space, so only render PDF and sidebar side-by-side if there
@@ -44,16 +43,13 @@ const MIN_PDF_WIDTH = 680;
 
 /**
  * Return true if `anchor` is in an un-rendered page.
- *
- * @param {Anchor} anchor
  */
-function anchorIsInPlaceholder(anchor) {
+function anchorIsInPlaceholder(anchor: Anchor) {
   const highlight = anchor.highlights?.[0];
   return highlight && isInPlaceholder(highlight);
 }
 
-/** @param {number} ms */
-function delay(ms) {
+function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -61,67 +57,84 @@ function delay(ms) {
  * Is the current document the PDF.js viewer application?
  */
 export function isPDF() {
-  // @ts-ignore - TS doesn't know about PDFViewerApplication global.
-  return typeof PDFViewerApplication !== 'undefined';
+  const maybePDFJS: Window & { PDFViewerApplication?: PDFViewerApplication } =
+    window;
+  return typeof maybePDFJS.PDFViewerApplication !== 'undefined';
 }
 
 /**
  * Integration that works with PDF.js
- * @implements {Integration}
  */
-export class PDFIntegration extends TinyEmitter {
+export class PDFIntegration extends TinyEmitter implements Integration {
+  private _annotator: Annotator;
+
+  /** Banners shown at the top of the PDF viewer. */
+  private _banner: HTMLElement | null;
+
+  /** State indicating which banners to show above the PDF viewer. */
+  private _bannerState: {
+    contentInfo: ContentInfoConfig | null;
+    /** Warning that the current PDF does not have selectable text. */
+    noTextWarning: boolean;
+  };
+
   /**
-   * @param {Annotator} annotator
-   * @param {object} options
-   *   @param {number} [options.reanchoringMaxWait] - Max time to wait for
+   * A flag that indicates whether `destroy` has been called. Used to handle
+   * `destroy` being called during async code elsewhere in the class.
+   */
+  private _destroyed: boolean;
+  private _listeners: ListenerCollection;
+  private _observer: MutationObserver;
+  private _pdfContainer: HTMLElement;
+  private _pdfMetadata: PDFMetadata;
+  private _pdfViewer: PDFViewer;
+
+  /**
+   * Amount of time to wait for re-anchoring to complete when scrolling to
+   * an anchor in a not-yet-rendered page.
+   */
+  private _reanchoringMaxWait: number;
+  private _updateAnnotationLayerVisibility: () => void;
+
+  /**
+   * @param annotator
+   * @param options
+   *   @param [options.reanchoringMaxWait] - Max time to wait for
    *     re-anchoring to complete when scrolling to an un-rendered page.
    */
-  constructor(annotator, options = {}) {
+  constructor(
+    annotator: Annotator,
+    options: { reanchoringMaxWait?: number } = {}
+  ) {
     super();
 
-    this.annotator = annotator;
+    this._annotator = annotator;
 
     // Assume this class is only used if we're in the PDF.js viewer.
-    const pdfWindow = /** @type {PDFWindow} */ (
-      /** @type {unknown} */ (window)
-    );
+    const pdfWindow = window as unknown as PDFWindow;
     const pdfViewerApp = pdfWindow.PDFViewerApplication;
 
-    this.pdfViewer = pdfViewerApp.pdfViewer;
-    this.pdfViewer.viewer.classList.add('has-transparent-text-layer');
+    this._pdfViewer = pdfViewerApp.pdfViewer;
+    this._pdfViewer.viewer.classList.add('has-transparent-text-layer');
 
     // Get the element that contains all of the PDF.js UI. This is typically
     // `document.body`.
-    this.pdfContainer = pdfViewerApp.appConfig?.appContainer ?? document.body;
+    this._pdfContainer = pdfViewerApp.appConfig?.appContainer ?? document.body;
 
-    this.pdfMetadata = new PDFMetadata(pdfViewerApp);
+    this._pdfMetadata = new PDFMetadata(pdfViewerApp);
 
-    this.observer = new MutationObserver(debounce(() => this._update(), 100));
-    this.observer.observe(this.pdfViewer.viewer, {
+    this._observer = new MutationObserver(debounce(() => this._update(), 100));
+    this._observer.observe(this._pdfViewer.viewer, {
       attributes: true,
       attributeFilter: ['data-loaded'],
       childList: true,
       subtree: true,
     });
 
-    /**
-     * Amount of time to wait for re-anchoring to complete when scrolling to
-     * an anchor in a not-yet-rendered page.
-     */
     this._reanchoringMaxWait = options.reanchoringMaxWait ?? 3000;
-
-    /**
-     * Banners shown at the top of the PDF viewer.
-     *
-     * @type {HTMLElement|null}
-     */
     this._banner = null;
-
-    /** State indicating which banners to show above the PDF viewer. */
     this._bannerState = {
-      /** @type {ContentInfoConfig|null} */
       contentInfo: null,
-      /** Warning that the current PDF does not have selectable text. */
       noTextWarning: false,
     };
     this._updateBannerState(this._bannerState);
@@ -131,11 +144,11 @@ export class PDFIntegration extends TinyEmitter {
     // layer appears above the invisible text layer and can interfere with text
     // selection. See https://github.com/hypothesis/client/issues/1464.
     this._updateAnnotationLayerVisibility = () => {
-      const selection = /** @type {Selection} */ (pdfWindow.getSelection());
+      const selection = pdfWindow.getSelection()!;
 
       // Add CSS class to indicate whether there is a selection. Annotation
       // layers are then hidden by a CSS rule in `pdfjs-overrides.scss`.
-      this.pdfViewer.viewer.classList.toggle(
+      this._pdfViewer.viewer.classList.toggle(
         'is-selecting',
         !selection.isCollapsed
       );
@@ -148,15 +161,13 @@ export class PDFIntegration extends TinyEmitter {
       this._updateAnnotationLayerVisibility
     );
 
-    // A flag that indicates whether `destroy` has been called. Used to handle
-    // `destroy` being called during async code elsewhere in the class.
     this._destroyed = false;
   }
 
   destroy() {
     this._listeners.removeAll();
-    this.pdfViewer.viewer.classList.remove('has-transparent-text-layer');
-    this.observer.disconnect();
+    this._pdfViewer.viewer.classList.remove('has-transparent-text-layer');
+    this._observer.disconnect();
     this._banner?.remove();
     this._destroyed = true;
   }
@@ -165,34 +176,28 @@ export class PDFIntegration extends TinyEmitter {
    * Return the URL of the currently loaded PDF document.
    */
   uri() {
-    return this.pdfMetadata.getUri();
+    return this._pdfMetadata.getUri();
   }
 
   /**
    * Return the metadata (eg. title) for the currently loaded PDF document.
    */
   getMetadata() {
-    return this.pdfMetadata.getMetadata();
+    return this._pdfMetadata.getMetadata();
   }
 
   /**
    * Display a banner at the top of the PDF viewer showing information about the
    * current document.
-   *
-   * @param {ContentInfoConfig} contentInfo
    */
-  showContentInfo(contentInfo) {
+  showContentInfo(contentInfo: ContentInfoConfig) {
     this._updateBannerState({ contentInfo });
   }
 
   /**
    * Resolve serialized `selectors` from an annotation to a range.
-   *
-   * @param {HTMLElement} root
-   * @param {Selector[]} selectors
-   * @return {Promise<Range>}
    */
-  anchor(root, selectors) {
+  anchor(root: HTMLElement, selectors: Selector[]): Promise<Range> {
     // nb. The `root` argument is not really used by `anchor`. It existed for
     // consistency between HTML and PDF anchoring and could be removed.
     return anchor(root, selectors);
@@ -202,10 +207,8 @@ export class PDFIntegration extends TinyEmitter {
    * Trim `range` to remove leading or trailing empty content, then check to see
    * if that trimmed Range lies within a single PDF page's text layer. If so,
    * return the trimmed Range.
-   *
-   * @param {Range} range
    */
-  getAnnotatableRange(range) {
+  getAnnotatableRange(range: Range) {
     try {
       const trimmedRange = TextRange.trimmedRange(range);
       if (canDescribe(trimmedRange)) {
@@ -226,12 +229,8 @@ export class PDFIntegration extends TinyEmitter {
 
   /**
    * Generate selectors for the text in `range`.
-   *
-   * @param {HTMLElement} root
-   * @param {Range} range
-   * @return {Promise<Selector[]>}
    */
-  describe(root, range) {
+  describe(root: HTMLElement, range: Range): Promise<Selector[]> {
     // nb. The `root` argument is not really used by `anchor`. It existed for
     // consistency between HTML and PDF anchoring and could be removed.
     return describe(root, range);
@@ -265,17 +264,17 @@ export class PDFIntegration extends TinyEmitter {
 
   /**
    * Update banners shown above the PDF viewer.
-   *
-   * @param {Partial<typeof PDFIntegration.prototype._bannerState>} state
    */
-  _updateBannerState(state) {
+  _updateBannerState(
+    state: Partial<typeof PDFIntegration.prototype._bannerState>
+  ) {
     this._bannerState = { ...this._bannerState, ...state };
 
     // Get a reference to the top-level DOM element associated with the PDF.js
     // viewer.
-    const outerContainer = /** @type {HTMLElement} */ (
-      document.querySelector('#outerContainer')
-    );
+    const outerContainer = document.querySelector(
+      '#outerContainer'
+    ) as HTMLElement;
 
     const showBanner =
       this._bannerState.contentInfo || this._bannerState.noTextWarning;
@@ -304,7 +303,7 @@ export class PDFIntegration extends TinyEmitter {
         )}
         {this._bannerState.noTextWarning && <WarningBanner />}
       </Banners>,
-      /** @type {ShadowRoot} */ (this._banner.shadowRoot)
+      this._banner.shadowRoot!
     );
 
     const bannerHeight = this._banner.getBoundingClientRect().height;
@@ -321,11 +320,11 @@ export class PDFIntegration extends TinyEmitter {
   // This method (re-)anchors annotations when pages are rendered and destroyed.
   _update() {
     // A list of annotations that need to be refreshed.
-    const refreshAnnotations = /** @type {AnnotationData[]} */ ([]);
+    const refreshAnnotations = [] as AnnotationData[];
 
-    const pageCount = this.pdfViewer.pagesCount;
+    const pageCount = this._pdfViewer.pagesCount;
     for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
-      const page = this.pdfViewer.getPageView(pageIndex);
+      const page = this._pdfViewer.getPageView(pageIndex);
       if (!page?.textLayer?.renderingDone) {
         continue;
       }
@@ -348,7 +347,7 @@ export class PDFIntegration extends TinyEmitter {
     }
 
     // Find all the anchors that have been invalidated by page state changes.
-    for (let anchor of this.annotator.anchors) {
+    for (const anchor of this._annotator.anchors) {
       // Skip any we already know about.
       if (anchor.highlights) {
         if (refreshAnnotations.includes(anchor.annotation)) {
@@ -370,18 +369,14 @@ export class PDFIntegration extends TinyEmitter {
       }
     }
 
-    refreshAnnotations.map(annotation => this.annotator.anchor(annotation));
+    refreshAnnotations.map(annotation => this._annotator.anchor(annotation));
   }
 
   /**
    * Return the scrollable element which contains the document content.
-   *
-   * @return {HTMLElement}
    */
-  contentContainer() {
-    return /** @type {HTMLElement} */ (
-      document.querySelector('#viewerContainer')
-    );
+  contentContainer(): HTMLElement {
+    return document.querySelector('#viewerContainer') as HTMLElement;
   }
 
   /**
@@ -391,10 +386,9 @@ export class PDFIntegration extends TinyEmitter {
    * for the sidebar, and prompt PDF.js to re-render the PDF pages to scale
    * within that resized container.
    *
-   * @param {SidebarLayout} sidebarLayout
-   * @return {boolean} - True if side-by-side mode was activated
+   * @return - True if side-by-side mode was activated
    */
-  fitSideBySide(sidebarLayout) {
+  fitSideBySide(sidebarLayout: SidebarLayout): boolean {
     const maximumWidthToFit = window.innerWidth - sidebarLayout.width;
     const active = sidebarLayout.expanded && maximumWidthToFit >= MIN_PDF_WIDTH;
 
@@ -408,10 +402,10 @@ export class PDFIntegration extends TinyEmitter {
     const reservedSpace = active
       ? sidebarLayout.width
       : sidebarLayout.toolbarWidth;
-    this.pdfContainer.style.width = `calc(100% - ${reservedSpace}px)`;
+    this._pdfContainer.style.width = `calc(100% - ${reservedSpace}px)`;
 
     // The following logic is pulled from PDF.js `webViewerResize`
-    const currentScaleValue = this.pdfViewer.currentScaleValue;
+    const currentScaleValue = this._pdfViewer.currentScaleValue;
     if (
       currentScaleValue === 'auto' ||
       currentScaleValue === 'page-fit' ||
@@ -419,10 +413,10 @@ export class PDFIntegration extends TinyEmitter {
     ) {
       // NB: There is logic within the setter for `currentScaleValue`
       // Setting this scale value will prompt PDF.js to recalculate viewport
-      this.pdfViewer.currentScaleValue = currentScaleValue;
+      this._pdfViewer.currentScaleValue = currentScaleValue;
     }
     // This will cause PDF pages to re-render if their scaling has changed
-    this.pdfViewer.update();
+    this._pdfViewer.update();
 
     return active;
   }
@@ -436,10 +430,8 @@ export class PDFIntegration extends TinyEmitter {
    * then `scrollToAnchor` waits until the page's text layer is rendered and
    * the annotation is re-anchored in the fully rendered page. Then it scrolls
    * again to the final location.
-   *
-   * @param {Anchor} anchor
    */
-  async scrollToAnchor(anchor) {
+  async scrollToAnchor(anchor: Anchor) {
     const annotation = anchor.annotation;
     const inPlaceholder = anchorIsInPlaceholder(anchor);
     const offset = this._anchorOffset(anchor);
@@ -470,18 +462,17 @@ export class PDFIntegration extends TinyEmitter {
 
   /**
    * Wait for an annotation to be anchored in a rendered page.
-   *
-   * @param {AnnotationData} annotation
-   * @param {number} maxWait
-   * @return {Promise<Anchor|null>}
    */
-  async _waitForAnnotationToBeAnchored(annotation, maxWait) {
+  async _waitForAnnotationToBeAnchored(
+    annotation: AnnotationData,
+    maxWait: number
+  ): Promise<Anchor | null> {
     const start = Date.now();
     let anchor;
     do {
       // nb. Re-anchoring might result in a different anchor object for the
       // same annotation.
-      anchor = this.annotator.anchors.find(a => a.annotation === annotation);
+      anchor = this._annotator.anchors.find(a => a.annotation === annotation);
       if (!anchor || anchorIsInPlaceholder(anchor)) {
         anchor = null;
 
@@ -497,10 +488,9 @@ export class PDFIntegration extends TinyEmitter {
    * Return the offset that the PDF content container would need to be scrolled
    * to, in order to make an anchor visible.
    *
-   * @param {Anchor} anchor
-   * @return {number|null} - Target offset or `null` if this anchor was not resolved
+   * @return - Target offset or `null` if this anchor was not resolved
    */
-  _anchorOffset(anchor) {
+  _anchorOffset(anchor: Anchor): number | null {
     if (!anchor.highlights) {
       // This anchor was not resolved to a location in the document.
       return null;
