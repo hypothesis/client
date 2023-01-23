@@ -124,7 +124,7 @@ describe('Buckets', () => {
       const wrapper = createComponent();
       const upButton = wrapper.find(upButtonSelector);
       // The list item element wrapping the button
-      const bucketItem = wrapper.find('BucketItem').first();
+      const bucketItem = wrapper.find('li').first();
 
       assert.isTrue(upButton.exists());
       assert.equal(
@@ -144,7 +144,7 @@ describe('Buckets', () => {
 
       const downButton = wrapper.find(downButtonSelector);
       // The list item element wrapping the button
-      const bucketItem = wrapper.find('BucketItem').last();
+      const bucketItem = wrapper.find('li').last();
 
       assert.isTrue(downButton.exists());
       assert.equal(

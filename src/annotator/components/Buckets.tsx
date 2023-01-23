@@ -1,19 +1,55 @@
 import { LabeledButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
-/**
- * @typedef {import('../util/buckets').Bucket} Bucket
- * @typedef {import("preact").ComponentChildren} Children
- */
+import type { Bucket } from '../util/buckets';
+
+export type BucketsProps = {
+  /**
+   * Bucket containing the $tags of any annotations that are offscreen above
+   * the current viewport. If the set of $tags is non-empty, up navigation
+   * will be rendered.
+   */
+  above: Bucket;
+
+  /**
+   * Bucket containing the $tags of any annotations that are offscreen below
+   * the current viewport. If the set of $tags is non-empty, down navigation
+   * will be rendered.
+   */
+  below: Bucket;
+
+  /**
+   * A list of buckets visible on-screen. A left-pointing arrow will be
+   * rendered for each bucket.
+   */
+  buckets: Bucket[];
+  onFocusAnnotations: ($tags: string[]) => void;
+  onScrollToClosestOffScreenAnchor: (
+    $tags: string[],
+    direction: 'down' | 'up'
+  ) => void;
+  onSelectAnnotations: ($tags: string[], toggle: boolean) => void;
+};
 
 /**
- * Render a set of buckets in a vertical channel positioned along the edge of
- * the sidebar.
+ * A list of buckets, including up and down navigation (when applicable) and
+ * on-screen buckets
  *
- * @param {object} props
- *   @param {Children} props.children
+ * This component and its buttons are sized with absolute units such that they
+ * don't scale with changes to the host page's root font size. They will still
+ * properly scale with user/browser zooming.
  */
-function BucketList({ children }) {
+export default function Buckets({
+  above,
+  below,
+  buckets,
+  onFocusAnnotations,
+  onScrollToClosestOffScreenAnchor,
+  onSelectAnnotations,
+}: BucketsProps) {
+  const showUpNavigation = above.tags.size > 0;
+  const showDownNavigation = below.tags.size > 0;
+
   return (
     <ul
       className={classnames(
@@ -29,65 +65,11 @@ function BucketList({ children }) {
         'pointer-events-none'
       )}
     >
-      {children}
-    </ul>
-  );
-}
-
-/**
- * Render a vertically-positioned bucket-list item.
- *
- * @param {object} props
- *  @param {Children} props.children
- *  @param {number} props.topPosition - The vertical top position, in pixels,
- *   for this bucket item relative to the top of the containing BucketList
- */
-function BucketItem({ children, topPosition }) {
-  return (
-    <li
-      className={classnames(
-        'absolute right-0',
-        // Re-enable pointer events, which are disabled on the containing list
-        'pointer-events-auto'
-      )}
-      style={{ top: topPosition }}
-    >
-      {children}
-    </li>
-  );
-}
-
-/**
- * A list of buckets, including up and down navigation (when applicable) and
- * on-screen buckets
- *
- * This component and its buttons are sized with absolute units such that they
- * don't scale with changes to the host page's root font size. They will still
- * properly scale with user/browser zooming.
- *
- * @param {object} props
- *   @param {Bucket} props.above
- *   @param {Bucket} props.below
- *   @param {Bucket[]} props.buckets
- *   @param {(tags: string[]) => void} props.onFocusAnnotations
- *   @param {(tags: string[], direction: 'down'|'up') => void} props.onScrollToClosestOffScreenAnchor
- *   @param {(tags: string[], toggle: boolean) => void} props.onSelectAnnotations
- */
-export default function Buckets({
-  above,
-  below,
-  buckets,
-  onFocusAnnotations,
-  onScrollToClosestOffScreenAnchor,
-  onSelectAnnotations,
-}) {
-  const showUpNavigation = above.tags.size > 0;
-  const showDownNavigation = below.tags.size > 0;
-
-  return (
-    <BucketList>
       {showUpNavigation && (
-        <BucketItem topPosition={above.position}>
+        <li
+          className="absolute right-0 pointer-events-auto"
+          style={{ top: above.position }}
+        >
           <LabeledButton
             className={classnames(
               'BucketButton UpBucketButton',
@@ -109,10 +91,14 @@ export default function Buckets({
           >
             {above.tags.size}
           </LabeledButton>
-        </BucketItem>
+        </li>
       )}
       {buckets.map((bucket, index) => (
-        <BucketItem topPosition={bucket.position} key={index}>
+        <li
+          className="absolute right-0 pointer-events-auto"
+          key={index}
+          style={{ top: bucket.position }}
+        >
           <LabeledButton
             className={classnames(
               'BucketButton LeftBucketButton',
@@ -134,10 +120,13 @@ export default function Buckets({
           >
             {bucket.tags.size}
           </LabeledButton>
-        </BucketItem>
+        </li>
       ))}
       {showDownNavigation && (
-        <BucketItem topPosition={below.position}>
+        <li
+          className="absolute right-0 pointer-events-auto"
+          style={{ top: below.position }}
+        >
           <LabeledButton
             className="BucketButton DownBucketButton right-0"
             data-testid="down-navigation-button"
@@ -152,8 +141,8 @@ export default function Buckets({
           >
             {below.tags.size}
           </LabeledButton>
-        </BucketItem>
+        </li>
       )}
-    </BucketList>
+    </ul>
   );
 }
