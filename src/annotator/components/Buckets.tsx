@@ -1,4 +1,4 @@
-import { LabeledButton } from '@hypothesis/frontend-shared';
+import { PointerButton } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
 import type { Bucket } from '../util/buckets';
@@ -61,25 +61,18 @@ export default function Buckets({
         // The background is set to low opacity when the sidebar is collapsed.
         'bg-grey-2 sidebar-collapsed:bg-black/[.08]',
         // Disable pointer events along the sidebar itself; re-enable them in
-        // bucket indicator buttons
+        // the list elements containing bucket buttons
         'pointer-events-none'
       )}
     >
       {showUpNavigation && (
         <li
-          className="absolute right-0 pointer-events-auto"
+          className="absolute right-0 pointer-events-auto mt-[-11px]"
           style={{ top: above.position }}
         >
-          <LabeledButton
-            className={classnames(
-              'BucketButton UpBucketButton',
-              // Center the button vertically at `above.position` by pulling
-              // its top margin up by about half the button's height.
-              // This puts it nearer the toolbar's other buttons above the
-              // bucket list.
-              'right-0 mt-[-11px]'
-            )}
+          <PointerButton
             data-testid="up-navigation-button"
+            direction="up"
             onClick={() =>
               onScrollToClosestOffScreenAnchor([...above.tags], 'up')
             }
@@ -90,22 +83,17 @@ export default function Buckets({
             title={`Go up to next annotations (${above.tags.size})`}
           >
             {above.tags.size}
-          </LabeledButton>
+          </PointerButton>
         </li>
       )}
       {buckets.map((bucket, index) => (
         <li
-          className="absolute right-0 pointer-events-auto"
+          className="absolute right-0 pointer-events-auto mt-[-8px]"
           key={index}
           style={{ top: bucket.position }}
         >
-          <LabeledButton
-            className={classnames(
-              'BucketButton LeftBucketButton',
-              // Center the bucket indicator button vertically on `bucket.position`
-              // by pulling it by half the height of the button
-              'right-0 mt-[-8px]'
-            )}
+          <PointerButton
+            direction="left"
             onClick={event =>
               onSelectAnnotations(
                 [...bucket.tags],
@@ -119,7 +107,7 @@ export default function Buckets({
             title={`Select nearby annotations (${bucket.tags.size})`}
           >
             {bucket.tags.size}
-          </LabeledButton>
+          </PointerButton>
         </li>
       ))}
       {showDownNavigation && (
@@ -127,9 +115,9 @@ export default function Buckets({
           className="absolute right-0 pointer-events-auto"
           style={{ top: below.position }}
         >
-          <LabeledButton
-            className="BucketButton DownBucketButton right-0"
+          <PointerButton
             data-testid="down-navigation-button"
+            direction="down"
             onClick={() =>
               onScrollToClosestOffScreenAnchor([...below.tags], 'down')
             }
@@ -140,7 +128,7 @@ export default function Buckets({
             title={`Go up to next annotations (${below.tags.size})`}
           >
             {below.tags.size}
-          </LabeledButton>
+          </PointerButton>
         </li>
       )}
     </ul>
