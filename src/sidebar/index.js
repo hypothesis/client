@@ -88,12 +88,6 @@ function setupFrameSync(frameSync, store) {
   }
 }
 
-// Register icons used by the sidebar app (and maybe other assets in future).
-import { registerIcons } from '@hypothesis/frontend-shared';
-import { sidebarIcons } from './icons';
-
-registerIcons(sidebarIcons);
-
 // The entry point component for the app.
 import { render } from 'preact';
 import HypothesisApp from './components/HypothesisApp';
