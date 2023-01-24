@@ -26,4 +26,6 @@ jobs:
     - name: Test
       run: yarn test
     - name: Upload coverage report
-      run: yarn run report-coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage/coverage-final.json
