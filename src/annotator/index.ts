@@ -4,11 +4,6 @@ import 'focus-visible';
 // Enable debug checks for Preact. Removed in prod builds by Rollup config.
 import 'preact/debug';
 
-// Load icons.
-import { registerIcons } from '@hypothesis/frontend-shared';
-import { annotatorIcons } from './icons';
-registerIcons(annotatorIcons);
-
 import {
   PortProvider,
   installPortCloseWorkaroundForSafari,

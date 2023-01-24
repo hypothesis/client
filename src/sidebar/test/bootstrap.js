@@ -13,15 +13,6 @@ import { Adapter } from 'enzyme-adapter-preact-pure';
 
 configure({ adapter: new Adapter() });
 
-// Make all the icons that are registered by the application available in tests.
-import { sidebarIcons } from '../icons';
-import { annotatorIcons } from '../../annotator/icons';
-import { registerIcons } from '@hypothesis/frontend-shared';
-registerIcons({
-  ...sidebarIcons,
-  ...annotatorIcons,
-});
-
 // Ensure that uncaught exceptions between tests result in the tests failing.
 // This works around an issue with mocha / karma-mocha, see
 // https://github.com/hypothesis/client/issues/2249.
