@@ -45,7 +45,6 @@
     "chai": "^4.1.2",
     "chance": "^1.0.13",
     "classnames": "^2.2.4",
-    "codecov": "^3.1.0",
     "commander": "^10.0.0",
     "cross-env": "^7.0.0",
     "diff": "^5.0.0",
@@ -113,7 +112,6 @@
     "format": "prettier --cache --list-different --write '**/*.{js,scss,ts,tsx,d.ts}'",
     "test": "gulp test",
     "typecheck": "tsc --build tsconfig.json",
-    "report-coverage": "codecov -f coverage/coverage-final.json",
     "version": "make clean build"
   }
 }
