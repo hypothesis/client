@@ -11,11 +11,8 @@ import { watch } from '../util/watch';
 const DEFAULT_ORG_ID = '__default__';
 
 // @ts-ignore - TS doesn't know about SVG files.
-import { logo } from '@hypothesis/frontend-shared/lib/icons';
+import { default as logo } from '../../images/icons/logo.svg';
 
-/**
- * FIXME: There is almost assuredly a better way to handle a fallback, default logo
- */
 const DEFAULT_ORGANIZATION = {
   id: DEFAULT_ORG_ID,
   name: '__DEFAULT__',
