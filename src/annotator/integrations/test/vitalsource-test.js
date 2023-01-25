@@ -405,6 +405,34 @@ describe('annotator/integrations/vitalsource', () => {
       });
     });
 
+    ['absoluteURL', 'cfi', 'index', 'page'].forEach(field => {
+      it(`throws if page info field "${field}" is missing`, async () => {
+        fakeBookElement.selectPDFBook();
+
+        const pageInfo = { ...(await fakeBookElement.getCurrentPage()) };
+        delete pageInfo[field];
+        fakeBookElement.getCurrentPage = async () => pageInfo;
+
+        const integration = createIntegration();
+        integration.contentContainer();
+        assert.calledWith(fakeHTMLIntegration.contentContainer);
+
+        const range = new Range();
+        let error;
+        try {
+          await integration.describe(range);
+        } catch (err) {
+          error = err;
+        }
+
+        assert.instanceOf(error, Error);
+        assert.equal(
+          error.message,
+          `Chapter metadata field "${field}" is missing`
+        );
+      });
+    });
+
     describe('#getMetadata', () => {
       it('returns book metadata', async () => {
         const integration = createIntegration();

@@ -430,6 +430,18 @@ export class VitalSourceContentIntegration
       includeTitle ? this._bookElement.getTOC() : undefined,
     ]);
 
+    // If changes in VitalSource ever mean that critical chapter/page metadata
+    // fields are missing, fail loudly. Otherwise we might create annotations
+    // that cannot be re-anchored in future.
+    const expectedFields = ['absoluteURL', 'cfi', 'index', 'page'];
+    for (const field of expectedFields) {
+      // nb. We intentionally allow properties anywhere on the prototype chain,
+      // rather than requiring `hasOwnProperty`.
+      if (!(field in pageInfo)) {
+        throw new Error(`Chapter metadata field "${field}" is missing`);
+      }
+    }
+
     let title;
 
     if (toc) {
