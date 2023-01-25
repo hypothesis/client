@@ -12,7 +12,6 @@ import { injectClient } from '../hypothesis-injector';
 import type {
   Anchor,
   AnnotationData,
-  FeatureFlags as IFeatureFlags,
   Integration,
   SegmentInfo,
   SidebarLayout,
@@ -204,7 +203,6 @@ export class VitalSourceContentIntegration
   implements Integration
 {
   private _bookElement: MosaicBookElement;
-  private _features: IFeatureFlags;
   private _htmlIntegration: HTMLIntegration;
   private _listeners: ListenerCollection;
   private _textLayer?: ImageTextLayer;
@@ -212,15 +210,13 @@ export class VitalSourceContentIntegration
   constructor(
     /* istanbul ignore next - defaults are overridden in tests */
     container: HTMLElement = document.body,
+    /* istanbul ignore next - defaults are overridden in tests */
     options: {
-      features: IFeatureFlags;
       // Test seam
       bookElement?: MosaicBookElement;
-    }
+    } = {}
   ) {
     super();
-
-    this._features = options.features;
 
     const bookElement =
       options.bookElement ?? findBookElement(window.parent.document);
@@ -231,12 +227,6 @@ export class VitalSourceContentIntegration
       );
     }
     this._bookElement = bookElement;
-
-    // If the book_as_single_document flag changed, this will change the
-    // document URI returned by this integration.
-    this._features.on('flagsChanged', () => {
-      this.emit('uriChanged');
-    });
 
     const htmlFeatures = new FeatureFlags();
 
@@ -401,18 +391,9 @@ export class VitalSourceContentIntegration
   }
 
   async getMetadata() {
-    if (this._bookIsSingleDocument()) {
-      const bookInfo = this._bookElement.getBookInfo();
-      return {
-        title: bookInfo.title,
-        link: [],
-      };
-    }
-
-    // Return minimal metadata which includes only the information we really
-    // want to include.
+    const bookInfo = this._bookElement.getBookInfo();
     return {
-      title: document.title,
+      title: bookInfo.title,
       link: [],
     };
   }
@@ -484,49 +465,15 @@ export class VitalSourceContentIntegration
   }
 
   async uri() {
-    if (this._bookIsSingleDocument()) {
-      const bookInfo = this._bookElement.getBookInfo();
-      const bookId = bookInfo.isbn;
-      return `https://bookshelf.vitalsource.com/reader/books/${bookId}`;
+    const bookInfo = this._bookElement.getBookInfo();
+    const bookId = bookInfo.isbn;
+    if (!bookId) {
+      throw new Error('Unable to get book ID from VitalSource');
     }
-
-    // An example of a typical URL for the chapter content in the Bookshelf reader is:
-    //
-    // https://jigsaw.vitalsource.com/books/9781848317703/epub/OPS/xhtml/chapter_001.html#cfi=/6/10%5B;vnd.vst.idref=chap001%5D!/4
-    //
-    // Where "9781848317703" is the VitalSource book ID ("vbid"), "chapter_001.html"
-    // is the location of the HTML page for the current chapter within the book
-    // and the `#cfi` fragment identifies the scroll location.
-    //
-    // Note that this URL is typically different than what is displayed in the
-    // iframe's `src` attribute.
-
-    // Strip off search parameters and fragments.
-    const uri = new URL(document.location.href);
-    uri.search = '';
-    return uri.toString();
+    return `https://bookshelf.vitalsource.com/reader/books/${bookId}`;
   }
 
   async scrollToAnchor(anchor: Anchor) {
     return this._htmlIntegration.scrollToAnchor(anchor);
-  }
-
-  /**
-   * Return true if the feature flag to treat books as one document is enabled,
-   * as opposed to treating each chapter/segment/page as a separate document.
-   */
-  _bookIsSingleDocument(): boolean {
-    return this._features.flagEnabled('book_as_single_document');
-  }
-
-  waitForFeatureFlags() {
-    // The `book_as_single_document` flag changes the URI reported by this
-    // integration.
-    //
-    // Ask the guest to delay reporting document metadata to the sidebar until
-    // feature flags have been received. This ensures that the initial document
-    // info reported to the sidebar after a chapter navigation is consistent
-    // between the previous/new guest frames.
-    return true;
   }
 }
