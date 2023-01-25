@@ -1,5 +1,4 @@
 import { delay, waitFor } from '../../../test-util/wait';
-import { FeatureFlags } from '../../features';
 import {
   VitalSourceInjector,
   VitalSourceContentIntegration,
@@ -59,14 +58,12 @@ function resolveURL(relativeURL) {
 }
 
 describe('annotator/integrations/vitalsource', () => {
-  let featureFlags;
   let fakeViewer;
   let FakeHTMLIntegration;
   let fakeHTMLIntegration;
   let fakeInjectClient;
 
   beforeEach(() => {
-    featureFlags = new FeatureFlags();
     fakeViewer = new FakeVitalSourceViewer();
 
     fakeHTMLIntegration = {
@@ -281,7 +278,6 @@ describe('annotator/integrations/vitalsource', () => {
 
     function createIntegration() {
       const integration = new VitalSourceContentIntegration(document.body, {
-        features: featureFlags,
         bookElement: fakeBookElement,
       });
       integrations.push(integration);
@@ -303,11 +299,6 @@ describe('annotator/integrations/vitalsource', () => {
 
       assert.equal(integration.getAnnotatableRange(range), range);
       assert.calledWith(fakeHTMLIntegration.getAnnotatableRange, range);
-    });
-
-    it('asks guest to wait for feature flags before sending document info', () => {
-      const integration = createIntegration();
-      assert.isTrue(integration.waitForFeatureFlags());
     });
 
     it('asks sidebar to persist annotations after frame unloads', () => {
@@ -415,26 +406,11 @@ describe('annotator/integrations/vitalsource', () => {
     });
 
     describe('#getMetadata', () => {
-      context('when "book_as_single_document" flag is off', () => {
-        it('returns metadata for current page/chapter', async () => {
-          const integration = createIntegration();
-          const metadata = await integration.getMetadata();
-          assert.equal(metadata.title, document.title);
-          assert.deepEqual(metadata.link, []);
-        });
-      });
-
-      context('when "book_as_single_document" flag is on', () => {
-        beforeEach(() => {
-          featureFlags.update({ book_as_single_document: true });
-        });
-
-        it('returns book metadata', async () => {
-          const integration = createIntegration();
-          const metadata = await integration.getMetadata();
-          assert.equal(metadata.title, 'Test book title');
-          assert.deepEqual(metadata.link, []);
-        });
+      it('returns book metadata', async () => {
+        const integration = createIntegration();
+        const metadata = await integration.getMetadata();
+        assert.equal(metadata.title, 'Test book title');
+        assert.deepEqual(metadata.link, []);
       });
     });
 
@@ -526,43 +502,32 @@ describe('annotator/integrations/vitalsource', () => {
         await urlChanged;
       });
 
-      context('when "book_as_single_document" flag is off', () => {
-        it('returns book chapter URL excluding query string', async () => {
-          const integration = createIntegration();
-          const uri = await integration.uri();
-          const parsedURL = new URL(uri);
-          assert.equal(parsedURL.hostname, document.location.hostname);
-          assert.equal(
-            parsedURL.pathname,
-            '/books/abc/epub/OPS/xhtml/chapter_001.html'
-          );
-          assert.equal(parsedURL.search, '');
-        });
-      });
-
-      context('when "book_as_single_document" flag is on', () => {
-        it('returns book reader URL', async () => {
-          featureFlags.update({ book_as_single_document: true });
-          const integration = createIntegration();
-          const uri = await integration.uri();
-          assert.equal(
-            uri,
-            'https://bookshelf.vitalsource.com/reader/books/TEST-BOOK-ID'
-          );
-        });
-      });
-
-      it('updates when "book_as_single_document" flag changes', async () => {
-        const uriChanged = sinon.stub();
+      it('returns book reader URL', async () => {
         const integration = createIntegration();
-        integration.on('uriChanged', uriChanged);
-        const uri1 = await integration.uri();
+        const uri = await integration.uri();
+        assert.equal(
+          uri,
+          'https://bookshelf.vitalsource.com/reader/books/TEST-BOOK-ID'
+        );
+      });
 
-        featureFlags.update({ book_as_single_document: true });
+      it('throws if book ID is missing', async () => {
+        fakeBookElement.getBookInfo = () => ({
+          format: 'epub',
+          title: 'Test book title',
+          // `isbn` field is missing
+        });
 
-        assert.calledOnce(uriChanged);
-        const uri2 = await integration.uri();
-        assert.notEqual(uri1, uri2);
+        const integration = createIntegration();
+        let error;
+        try {
+          await integration.uri();
+        } catch (err) {
+          error = err;
+        }
+
+        assert.instanceOf(error, Error);
+        assert.equal(error.message, 'Unable to get book ID from VitalSource');
       });
     });
 

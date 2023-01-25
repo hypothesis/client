@@ -1451,7 +1451,7 @@ describe('Guest', () => {
     assert.isFalse(sidebarRPC().call.calledWith('documentInfoChanged'));
 
     emitSidebarEvent('featureFlagsUpdated', {
-      book_as_single_document: true,
+      some_new_feature: true,
     });
 
     await delay(0);
