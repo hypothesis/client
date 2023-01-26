@@ -337,7 +337,7 @@ export class VitalSourceContentIntegration
     // currently limit page number selectors to PDFs until more is understood
     // about when EPUB page numbers are reliable/likely to remain stable.
     const bookInfo = this._bookElement.getBookInfo();
-    if (bookInfo.format === 'pbk') {
+    if (bookInfo.format === 'pbk' && typeof pageIndex === 'number') {
       extraSelectors.push({
         type: 'PageSelector',
         index: pageIndex,
@@ -433,12 +433,12 @@ export class VitalSourceContentIntegration
     // If changes in VitalSource ever mean that critical chapter/page metadata
     // fields are missing, fail loudly. Otherwise we might create annotations
     // that cannot be re-anchored in future.
-    const expectedFields = ['absoluteURL', 'cfi', 'index', 'page'];
-    for (const field of expectedFields) {
+    const requiredFields = ['absoluteURL', 'cfi'];
+    for (const field of requiredFields) {
       // nb. We intentionally allow properties anywhere on the prototype chain,
       // rather than requiring `hasOwnProperty`.
       if (!(field in pageInfo)) {
-        throw new Error(`Chapter metadata field "${field}" is missing`);
+        throw new Error(`Page metadata field "${field}" is missing`);
       }
     }
 
