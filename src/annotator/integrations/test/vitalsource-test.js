@@ -405,7 +405,7 @@ describe('annotator/integrations/vitalsource', () => {
       });
     });
 
-    ['absoluteURL', 'cfi', 'index', 'page'].forEach(field => {
+    ['absoluteURL', 'cfi'].forEach(field => {
       it(`throws if page info field "${field}" is missing`, async () => {
         fakeBookElement.selectPDFBook();
 
@@ -428,7 +428,7 @@ describe('annotator/integrations/vitalsource', () => {
         assert.instanceOf(error, Error);
         assert.equal(
           error.message,
-          `Chapter metadata field "${field}" is missing`
+          `Page metadata field "${field}" is missing`
         );
       });
     });

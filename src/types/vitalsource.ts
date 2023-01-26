@@ -65,13 +65,13 @@ export type PageInfo = {
    * that is displayed in the VitalSource navigation controls when the
    * chapter is scrolled to the top.
    */
-  page: string;
+  page?: string;
 
   /**
    * Index of the current segment within the sequence of pages or content
    * documents that make up the book.
    */
-  index: number;
+  index?: number;
 
   /**
    * Title of the entry in the table of contents that refers to the current
