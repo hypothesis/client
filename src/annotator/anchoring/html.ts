@@ -1,18 +1,20 @@
+import type {
+  RangeSelector,
+  Selector,
+  TextPositionSelector,
+  TextQuoteSelector,
+} from '../../types/api';
+
 import { RangeAnchor, TextPositionAnchor, TextQuoteAnchor } from './types';
 
-/**
- * @typedef {import('../../types/api').RangeSelector} RangeSelector
- * @typedef {import('../../types/api').Selector} Selector
- * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
- * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
- */
+type Options = {
+  hint?: number;
+};
 
-/**
- * @param {RangeAnchor|TextPositionAnchor|TextQuoteAnchor} anchor
- * @param {object} [options]
- *  @param {number} [options.hint]
- */
-async function querySelector(anchor, options = {}) {
+async function querySelector(
+  anchor: RangeAnchor | TextPositionAnchor | TextQuoteAnchor,
+  options: Options
+) {
   return anchor.toRange(options);
 }
 
@@ -23,18 +25,20 @@ async function querySelector(anchor, options = {}) {
  * It encapsulates the core anchoring algorithm, using the selectors alone or
  * in combination to establish the best anchor within the document.
  *
- * @param {Element} root - The root element of the anchoring context.
- * @param {Selector[]} selectors - The selectors to try.
- * @param {object} [options]
- *   @param {number} [options.hint]
+ * @param root - The root element of the anchoring context
+ * @param selectors - The selectors to try
  */
-export function anchor(root, selectors, options = {}) {
-  let position = /** @type {TextPositionSelector|null} */ (null);
-  let quote = /** @type {TextQuoteSelector|null} */ (null);
-  let range = /** @type {RangeSelector|null} */ (null);
+export function anchor(
+  root: Element,
+  selectors: Selector[],
+  options: Options = {}
+) {
+  let position: TextPositionSelector | null = null;
+  let quote: TextQuoteSelector | null = null;
+  let range: RangeSelector | null = null;
 
   // Collect all the selectors
-  for (let selector of selectors) {
+  for (const selector of selectors) {
     switch (selector.type) {
       case 'TextPositionSelector':
         position = selector;
@@ -51,9 +55,8 @@ export function anchor(root, selectors, options = {}) {
 
   /**
    * Assert the quote matches the stored quote, if applicable
-   * @param {Range} range
    */
-  const maybeAssertQuote = range => {
+  const maybeAssertQuote = (range: Range) => {
     if (quote?.exact && range.toString() !== quote.exact) {
       throw new Error('quote mismatch');
     } else {
@@ -63,14 +66,13 @@ export function anchor(root, selectors, options = {}) {
 
   // From a default of failure, we build up catch clauses to try selectors in
   // order, from simple to complex.
-  /** @type {Promise<Range>} */
-  let promise = Promise.reject('unable to anchor');
+  let promise: Promise<Range> = Promise.reject('unable to anchor');
 
   if (range) {
     // Const binding assures TS that it won't be re-assigned when callback runs.
     const range_ = range;
     promise = promise.catch(() => {
-      let anchor = RangeAnchor.fromSelector(root, range_);
+      const anchor = RangeAnchor.fromSelector(root, range_);
       return querySelector(anchor, options).then(maybeAssertQuote);
     });
   }
@@ -78,7 +80,7 @@ export function anchor(root, selectors, options = {}) {
   if (position) {
     const position_ = position;
     promise = promise.catch(() => {
-      let anchor = TextPositionAnchor.fromSelector(root, position_);
+      const anchor = TextPositionAnchor.fromSelector(root, position_);
       return querySelector(anchor, options).then(maybeAssertQuote);
     });
   }
@@ -86,7 +88,7 @@ export function anchor(root, selectors, options = {}) {
   if (quote) {
     const quote_ = quote;
     promise = promise.catch(() => {
-      let anchor = TextQuoteAnchor.fromSelector(root, quote_);
+      const anchor = TextQuoteAnchor.fromSelector(root, quote_);
       return querySelector(anchor, options);
     });
   }
@@ -94,19 +96,15 @@ export function anchor(root, selectors, options = {}) {
   return promise;
 }
 
-/**
- * @param {Element} root
- * @param {Range} range
- */
-export function describe(root, range) {
+export function describe(root: Element, range: Range) {
   const types = [RangeAnchor, TextPositionAnchor, TextQuoteAnchor];
   const result = [];
-  for (let type of types) {
+  for (const type of types) {
     try {
       const anchor = type.fromRange(root, range);
       result.push(anchor.toSelector());
     } catch (error) {
-      continue;
+      // If resolving some anchor fails, we just want to skip it silently
     }
   }
   return result;
