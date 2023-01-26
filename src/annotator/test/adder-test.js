@@ -1,12 +1,7 @@
 import { act } from 'preact/test-utils';
 import { mount } from 'enzyme';
 
-import {
-  Adder,
-  ARROW_POINTING_UP,
-  ARROW_POINTING_DOWN,
-  $imports,
-} from '../adder';
+import { Adder, ArrowDirection, $imports } from '../adder';
 
 function rect(left, top, width, height) {
   return { left, top, width, height };
@@ -199,25 +194,25 @@ describe('Adder', () => {
     it('positions the adder below the selection if the selection is forwards', () => {
       const target = adder._calculateTarget(rect(100, 200, 100, 20), false);
       assert.isAbove(target.top, 220);
-      assert.equal(target.arrowDirection, ARROW_POINTING_UP);
+      assert.equal(target.arrowDirection, ArrowDirection.UP);
     });
 
     it('positions the adder above the selection if the selection is backwards', () => {
       const target = adder._calculateTarget(rect(100, 200, 100, 20), true);
       assert.isBelow(target.top, 200);
-      assert.equal(target.arrowDirection, ARROW_POINTING_DOWN);
+      assert.equal(target.arrowDirection, ArrowDirection.DOWN);
     });
 
     it('does not position the adder above the top of the viewport', () => {
       const target = adder._calculateTarget(rect(100, -100, 100, 20), false);
       assert.isAtLeast(target.top, 0);
-      assert.equal(target.arrowDirection, ARROW_POINTING_UP);
+      assert.equal(target.arrowDirection, ArrowDirection.UP);
     });
 
     it('does not position the adder above the top of the viewport even when selection is backwards', () => {
       const target = adder._calculateTarget(rect(100, -100, 100, 20), true);
       assert.isAtLeast(target.top, 0);
-      assert.equal(target.arrowDirection, ARROW_POINTING_UP);
+      assert.equal(target.arrowDirection, ArrowDirection.UP);
     });
 
     it('does not position the adder below the bottom of the viewport', () => {
@@ -252,7 +247,7 @@ describe('Adder', () => {
         });
         const target = adder._calculateTarget(rect(100, 200, 100, 20), true);
         assert.isAbove(target.top, 220);
-        assert.equal(target.arrowDirection, ARROW_POINTING_UP);
+        assert.equal(target.arrowDirection, ArrowDirection.UP);
       });
     });
   });
@@ -337,7 +332,7 @@ describe('Adder', () => {
   describe('#_showAt', () => {
     context('when the document and body elements have no offset', () => {
       it('shows adder at target position', () => {
-        adder._showAt(100, 100, ARROW_POINTING_UP);
+        adder._showAt(100, 100, ArrowDirection.UP);
 
         const { left, top } = adderRect();
         assert.equal(left, 100);
@@ -355,7 +350,7 @@ describe('Adder', () => {
       });
 
       it('shows adder at target position', () => {
-        adder._showAt(100, 100, ARROW_POINTING_UP);
+        adder._showAt(100, 100, ArrowDirection.UP);
 
         const { left, top } = adderRect();
         assert.equal(left, 100);
@@ -373,7 +368,7 @@ describe('Adder', () => {
       });
 
       it('shows adder at target position when document element is offset', () => {
-        adder._showAt(100, 100, ARROW_POINTING_UP);
+        adder._showAt(100, 100, ArrowDirection.UP);
 
         const { left, top } = adderRect();
         assert.equal(left, 100);
@@ -399,7 +394,7 @@ describe('Adder', () => {
 
   describe('#hide', () => {
     it('shows the container in the correct location', () => {
-      adder._showAt(100, 100, ARROW_POINTING_UP);
+      adder._showAt(100, 100, ArrowDirection.UP);
 
       let pos = adderRect();
       assert.equal(pos.left, 100);
