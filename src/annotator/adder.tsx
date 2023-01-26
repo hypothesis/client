@@ -1,38 +1,27 @@
 import { render } from 'preact';
 
 import AdderToolbar from './components/AdderToolbar';
+import type { Command } from './components/AdderToolbar';
 import { isTouchDevice } from '../shared/user-agent';
+import type { Destroyable } from '../types/annotator';
+
 import { createShadowRoot } from './util/shadow-root';
 
-/**
- *  @typedef {1} ArrowPointingDown
- * Show the adder above the selection with an arrow pointing down at the
- * selected text.
- */
-export const ARROW_POINTING_DOWN = 1;
+export enum ArrowDirection {
+  DOWN = 1,
+  UP = 2,
+}
 
-/**
- *  @typedef {2} ArrowPointingUp
- * Show the adder above the selection with an arrow pointing up at the
- * selected text.
- */
-export const ARROW_POINTING_UP = 2;
+type Target = {
+  /** Offset from left edge of viewport */
+  left: number;
+  /** Offset from top edge of viewport */
+  top: number;
+  /** Direction of the adder's arrow */
+  arrowDirection: ArrowDirection;
+};
 
-/**
- *  @typedef {ArrowPointingDown|ArrowPointingUp} ArrowDirection
- * Show the adder above the selection with an arrow pointing up at the
- * selected text.
- */
-
-/**
- * @typedef Target
- * @prop {number} left - Offset from left edge of viewport.
- * @prop {number} top - Offset from top edge of viewport.
- * @prop {ArrowDirection} arrowDirection - Direction of the adder's arrow.
- */
-
-/** @param {number} pixels */
-function toPx(pixels) {
+function toPx(pixels: number) {
   return pixels.toString() + 'px';
 }
 
@@ -44,14 +33,10 @@ const ARROW_H_MARGIN = 20;
 
 /**
  * Return the closest ancestor of `el` which has been positioned.
- *
  * If no ancestor has been positioned, returns the root element.
- *
- * @param {Element} el
- * @return {Element}
  */
-function nearestPositionedAncestor(el) {
-  let parentEl = /** @type {Element} */ (el.parentElement);
+function nearestPositionedAncestor(el: Element): Element {
+  let parentEl = el.parentElement!;
   while (parentEl.parentElement) {
     if (getComputedStyle(parentEl).position !== 'static') {
       break;
@@ -61,15 +46,14 @@ function nearestPositionedAncestor(el) {
   return parentEl;
 }
 
-/**
- * @typedef AdderOptions
- * @prop {() => void} onAnnotate - Callback invoked when "Annotate" button is clicked
- * @prop {() => void} onHighlight - Callback invoked when "Highlight" button is clicked
- * @prop {(tags: string[]) => void} onShowAnnotations -
- *   Callback invoked when  "Show" button is clicked
- *
- * @typedef {import('../types/annotator').Destroyable} Destroyable
- */
+type AdderOptions = {
+  /** Callback invoked when "Annotate" button is clicked */
+  onAnnotate: () => void;
+  /** Callback invoked when "Highlight" button is clicked */
+  onHighlight: () => void;
+  /** Callback invoked when  "Show" button is clicked */
+  onShowAnnotations: (tags: string[]) => void;
+};
 
 /**
  * Container for the 'adder' toolbar which provides controls for the user to
@@ -79,20 +63,29 @@ function nearestPositionedAncestor(el) {
  * the container for the toolbar that positions it on the page and isolates
  * it from the page's styles using shadow DOM, and the `AdderToolbar` Preact
  * component which actually renders the toolbar.
- *
- * @implements {Destroyable}
  */
-export class Adder {
+export class Adder implements Destroyable {
+  private _outerContainer: HTMLElement;
+  private _shadowRoot: ShadowRoot;
+  private _view: Window;
+  private _isVisible: boolean;
+  private _arrowDirection: 'up' | 'down';
+  private _onAnnotate: () => void;
+  private _onHighlight: () => void;
+  private _onShowAnnotations: (tags: string[]) => void;
+  /** Annotation tags associated with the current selection. */
+  private _annotationsForSelection: string[];
+
   /**
    * Create the toolbar's container and hide it.
    *
    * The adder is initially hidden.
    *
-   * @param {HTMLElement} element - The DOM element into which the adder will be created
-   * @param {AdderOptions} options - Options object specifying `onAnnotate` and `onHighlight`
+   * @param element - The DOM element into which the adder will be created
+   * @param options - Options object specifying `onAnnotate` and `onHighlight`
    *        event handlers.
    */
-  constructor(element, options) {
+  constructor(element: HTMLElement, options: AdderOptions) {
     this._outerContainer = document.createElement('hypothesis-adder');
     element.appendChild(this._outerContainer);
     this._shadowRoot = createShadowRoot(this._outerContainer);
@@ -105,33 +98,14 @@ export class Adder {
       left: 0,
     });
 
-    this._view = /** @type {Window} */ (element.ownerDocument.defaultView);
-
-    this._width = () => {
-      const firstChild = /** @type {Element} */ (this._shadowRoot.firstChild);
-      return firstChild.getBoundingClientRect().width;
-    };
-
-    this._height = () => {
-      const firstChild = /** @type {Element} */ (this._shadowRoot.firstChild);
-      return firstChild.getBoundingClientRect().height;
-    };
-
+    this._view = element.ownerDocument.defaultView!;
     this._isVisible = false;
-
-    /** @type {'up'|'down'} */
     this._arrowDirection = 'up';
+    this._annotationsForSelection = [];
 
     this._onAnnotate = options.onAnnotate;
     this._onHighlight = options.onHighlight;
     this._onShowAnnotations = options.onShowAnnotations;
-
-    /**
-     * Annotation tags associated with the current selection.
-     *
-     * @type {string[]}
-     */
-    this._annotationsForSelection = [];
 
     this._render();
   }
@@ -173,13 +147,12 @@ export class Adder {
    * Display the adder in the best position in order to target the
    * selected text in `selectionRect`.
    *
-   * @param {DOMRect} selectionRect - The rect of text to target, in viewport
-   *        coordinates.
-   * @param {boolean} isRTLselection - True if the selection was made
-   *        rigth-to-left, such that the focus point is mosty likely at the
-   *        top-left edge of `targetRect`.
+   * @param selectionRect - The rect of text to target, in viewport coordinates.
+   * @param isRTLselection - True if the selection was made right-to-left, such
+   *        that the focus point is mostly likely at the top-left edge of
+   *        `targetRect`.
    */
-  show(selectionRect, isRTLselection) {
+  show(selectionRect: DOMRect, isRTLselection: boolean) {
     const { left, top, arrowDirection } = this._calculateTarget(
       selectionRect,
       isRTLselection
@@ -187,9 +160,19 @@ export class Adder {
     this._showAt(left, top);
 
     this._isVisible = true;
-    this._arrowDirection = arrowDirection === ARROW_POINTING_UP ? 'up' : 'down';
+    this._arrowDirection = arrowDirection === ArrowDirection.UP ? 'up' : 'down';
 
     this._render();
+  }
+
+  private _width(): number {
+    const firstChild = this._shadowRoot.firstChild as Element;
+    return firstChild.getBoundingClientRect().width;
+  }
+
+  private _height(): number {
+    const firstChild = this._shadowRoot.firstChild as Element;
+    return firstChild.getBoundingClientRect().height;
   }
 
   /**
@@ -200,24 +183,25 @@ export class Adder {
    * - Position the Adder below the selection (arrow pointing up) for LTR selections
    *   and above (arrow down) for RTL selections
    *
-   * @param {DOMRect} selectionRect - The rect of text to target, in viewport
-   *        coordinates.
-   * @param {boolean} isRTLselection - True if the selection was made
-   *        rigth-to-left, such that the focus point is mosty likely at the
-   *        top-left edge of `targetRect`.
-   * @return {Target}
+   * @param selectionRect - The rect of text to target, in viewport coordinates.
+   * @param isRTLselection - True if the selection was made right-to-left, such
+   *        that the focus point is mostly likely at the top-left edge of
+   *        `targetRect`.
    */
-  _calculateTarget(selectionRect, isRTLselection) {
+  private _calculateTarget(
+    selectionRect: DOMRect,
+    isRTLselection: boolean
+  ): Target {
     // Set the initial arrow direction based on whether the selection was made
     // forwards/upwards or downwards/backwards.
-    /** @type {ArrowDirection} */ let arrowDirection;
+    let arrowDirection: ArrowDirection;
     if (isRTLselection && !isTouchDevice()) {
-      arrowDirection = ARROW_POINTING_DOWN;
+      arrowDirection = ArrowDirection.DOWN;
     } else {
       // Render the adder below the selection for touch devices due to competing
       // space with the native copy/paste bar that typical (not always) renders above
       // the selection.
-      arrowDirection = ARROW_POINTING_UP;
+      arrowDirection = ArrowDirection.UP;
     }
     let top;
     let left;
@@ -241,14 +225,14 @@ export class Adder {
     // bottom of the viewport.
     if (
       selectionRect.top - adderHeight < 0 &&
-      arrowDirection === ARROW_POINTING_DOWN
+      arrowDirection === ArrowDirection.DOWN
     ) {
-      arrowDirection = ARROW_POINTING_UP;
+      arrowDirection = ArrowDirection.UP;
     } else if (selectionRect.top + adderHeight > this._view.innerHeight) {
-      arrowDirection = ARROW_POINTING_DOWN;
+      arrowDirection = ArrowDirection.DOWN;
     }
 
-    if (arrowDirection === ARROW_POINTING_UP) {
+    if (arrowDirection === ArrowDirection.UP) {
       top =
         selectionRect.top +
         selectionRect.height +
@@ -272,11 +256,11 @@ export class Adder {
    * Find a Z index value that will cause the adder to appear on top of any
    * content in the document when the adder is shown at (left, top).
    *
-   * @param {number} left - Horizontal offset from left edge of viewport.
-   * @param {number} top - Vertical offset from top edge of viewport.
-   * @return {number} - greatest zIndex (default value of 1)
+   * @param left - Horizontal offset from left edge of viewport.
+   * @param top - Vertical offset from top edge of viewport.
+   * @return greatest zIndex (default value of 1)
    */
-  _findZindex(left, top) {
+  private _findZindex(left: number, top: number): number {
     if (document.elementsFromPoint === undefined) {
       // In case of not being able to use `document.elementsFromPoint`,
       // default to the large arbitrary number (2^15)
@@ -317,15 +301,15 @@ export class Adder {
    * Show the adder at the given position and with the arrow pointing in
    * `arrowDirection`.
    *
-   * @param {number} left - Horizontal offset from left edge of viewport.
-   * @param {number} top - Vertical offset from top edge of viewport.
+   * @param left - Horizontal offset from left edge of viewport.
+   * @param top - Vertical offset from top edge of viewport.
    */
-  _showAt(left, top) {
+  private _showAt(left: number, top: number) {
     // Translate the (left, top) viewport coordinates into positions relative to
     // the adder's nearest positioned ancestor (NPA).
     //
-    // Typically the adder is a child of the `<body>` and the NPA is the root
-    // `<html>` element. However page styling may make the `<body>` positioned.
+    // Typically, the adder is a child of the `<body>` and the NPA is the root
+    // `<html>` element. However, page styling may make the `<body>` positioned.
     // See https://github.com/hypothesis/client/issues/487.
     const positionedAncestor = nearestPositionedAncestor(this._outerContainer);
     const parentRect = positionedAncestor.getBoundingClientRect();
@@ -339,9 +323,8 @@ export class Adder {
     });
   }
 
-  _render() {
-    /** @param {import('./components/AdderToolbar').Command} command */
-    const handleCommand = command => {
+  private _render() {
+    const handleCommand = (command: Command) => {
       switch (command) {
         case 'annotate':
           this._onAnnotate();
