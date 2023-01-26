@@ -1,31 +1,28 @@
 import approxSearch from 'approx-string-match';
+import type { Match as StringMatch } from 'approx-string-match';
+
+type Match = {
+  /** Start offset of match in text */
+  start: number;
+  /** End offset of match in text */
+  end: number;
+
+  /**
+   * Score for the match between 0 and 1.0, where 1.0 indicates a perfect match
+   * for the quote and context.
+   */
+  score: number;
+};
 
 /**
- * @typedef {import('approx-string-match').Match} StringMatch
+ * Find the best approximate matches for `str` in `text` allowing up to
+ * `maxErrors` errors.
  */
-
-/**
- * @typedef Match
- * @prop {number} start - Start offset of match in text
- * @prop {number} end - End offset of match in text
- * @prop {number} score -
- *   Score for the match between 0 and 1.0, where 1.0 indicates a perfect match
- *   for the quote and context.
- */
-
-/**
- * Find the best approximate matches for `str` in `text` allowing up to `maxErrors` errors.
- *
- * @param {string} text
- * @param {string} str
- * @param {number} maxErrors
- * @return {StringMatch[]}
- */
-function search(text, str, maxErrors) {
+function search(text: string, str: string, maxErrors: number): StringMatch[] {
   // Do a fast search for exact matches. The `approx-string-match` library
   // doesn't currently incorporate this optimization itself.
   let matchPos = 0;
-  let exactMatches = [];
+  const exactMatches: StringMatch[] = [];
   while (matchPos !== -1) {
     matchPos = text.indexOf(str, matchPos);
     if (matchPos !== -1) {
@@ -48,11 +45,8 @@ function search(text, str, maxErrors) {
 
 /**
  * Compute a score between 0 and 1.0 for the similarity between `text` and `str`.
- *
- * @param {string} text
- * @param {string} str
  */
-function textMatchScore(text, str) {
+function textMatchScore(text: string, str: string) {
   // `search` will return no matches if either the text or pattern is empty,
   // otherwise it will return at least one match if the max allowed error count
   // is at least `str.length`.
@@ -66,22 +60,29 @@ function textMatchScore(text, str) {
   return 1 - (matches[0].errors / str.length);
 }
 
+type Context = {
+  /** Expected text before the quote */
+  prefix?: string;
+  /** Expected text after the quote */
+  suffix?: string;
+  /** Expected offset of match within text */
+  hint?: number;
+};
+
 /**
  * Find the best approximate match for `quote` in `text`.
  *
- * Returns `null` if no match exceeding the minimum quality threshold was found.
- *
- * @param {string} text - Document text to search
- * @param {string} quote - String to find within `text`
- * @param {object} context -
- *   Context in which the quote originally appeared. This is used to choose the
- *   best match.
- *   @param {string} [context.prefix] - Expected text before the quote
- *   @param {string} [context.suffix] - Expected text after the quote
- *   @param {number} [context.hint] - Expected offset of match within text
- * @return {Match|null}
+ * @param text - Document text to search
+ * @param quote - String to find within `text`
+ * @param context - Context in which the quote originally appeared. This is
+ *        used to choose the best match.
+ * @return `null` if no match exceeding the minimum quality threshold was found.
  */
-export function matchQuote(text, quote, context = {}) {
+export function matchQuote(
+  text: string,
+  quote: string,
+  context: Context = {}
+): Match | null {
   if (quote.length === 0) {
     return null;
   }
@@ -97,7 +98,7 @@ export function matchQuote(text, quote, context = {}) {
   //     `O((maxErrors / 32) * text.length)`. See `approx-string-match` docs.
   const maxErrors = Math.min(256, quote.length / 2);
 
-  // Find closest matches for `quote` in `text` based on edit distance.
+  // Find the closest matches for `quote` in `text` based on edit distance.
   const matches = search(text, quote, maxErrors);
 
   if (matches.length === 0) {
@@ -106,10 +107,8 @@ export function matchQuote(text, quote, context = {}) {
 
   /**
    * Compute a score between 0 and 1.0 for a match candidate.
-   *
-   * @param {StringMatch} match
    */
-  const scoreMatch = match => {
+  const scoreMatch = (match: StringMatch) => {
     const quoteWeight = 50; // Similarity of matched text to quote.
     const prefixWeight = 20; // Similarity of text before matched text to `context.prefix`.
     const suffixWeight = 20; // Similarity of text after matched text to `context.suffix`.
@@ -158,7 +157,7 @@ export function matchQuote(text, quote, context = {}) {
     score: scoreMatch(m),
   }));
 
-  // Choose match with highest score.
+  // Choose match with the highest score.
   scoredMatches.sort((a, b) => b.score - a.score);
   return scoredMatches[0];
 }
