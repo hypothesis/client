@@ -64,13 +64,13 @@ export type PageInfo = {
    * The page label for the first page of the segment. This is the page number
    * that is displayed in the VitalSource navigation controls when the
    * chapter is scrolled to the top.
+   *
+   * This may be missing in EPUBs that do not contain page break information.
+   * It should always be present in PDF books.
    */
   page?: string;
 
-  /**
-   * Index of the current segment within the sequence of pages or content
-   * documents that make up the book.
-   */
+  /** Index of the current page. Only available in PDF-based books. */
   index?: number;
 
   /**
