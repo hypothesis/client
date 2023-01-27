@@ -102,11 +102,22 @@ export type PDFPageProxy = {
   getTextContent(o?: GetTextContentParameters): Promise<TextContent>;
 };
 
+export type PageViewport = {
+  /** Tuple of [xMin, yMin, xMax, yMax] coordinates. */
+  viewBox: [number, number, number, number];
+  /**
+   * Scale factor that converts from viewport coordinates to canvas coordinates
+   * (ie. pixels on screen).
+   */
+  scale: number;
+};
+
 export type PDFPageView = {
   /** Container element for the PDF page. */
   div: HTMLElement;
   pdfPage: PDFPageProxy;
   textLayer: TextLayer | null;
+  viewport: PageViewport;
   /** See `RenderingStates` enum in src/annotator/anchoring/pdf.js */
   renderingState: number;
 };

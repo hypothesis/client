@@ -209,13 +209,11 @@ export class TextLayerManager {
     });
     const items = textContent.items;
 
-    // TODO - Check that `pageWidth` and `pageHeight` are width/height rather
-    // than right/bottom coords.
-    const viewBox = pageView.viewport.viewBox;
-    const [, , pageWidth, pageHeight] = viewBox;
+    const [xMin, yMin, xMax, yMax] = pageView.viewport.viewBox;
+    const pageWidth = xMax - xMin;
+    const pageHeight = yMax - yMin;
 
     const wordBoxes = [];
-
     for (let item of items) {
       const [, , , , tx, ty] = item.transform;
       const x = tx / pageWidth;
@@ -223,6 +221,15 @@ export class TextLayerManager {
       const width = item.width / pageWidth;
       const height = item.height / pageHeight;
       const wordRect = new DOMRect(x, y, width, height);
+
+      // FIXME - This hack ensures that empty spaces are converted into word
+      // rects that have some vertical overlap with the previous word on the
+      // line, so that ImageTextLayer doesn't create a line/column break.
+      if (wordRect.height === 0) {
+        wordRect.height = 0.001;
+        wordRect.y -= 0.002;
+      }
+
       wordBoxes.push({
         text: item.str,
         rect: wordRect,

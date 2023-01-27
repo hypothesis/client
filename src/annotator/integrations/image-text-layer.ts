@@ -293,8 +293,13 @@ export class ImageTextLayer {
         for (const word of line.words) {
           const wordEl = document.createElement('hypothesis-text-word');
           wordEl.style.display = 'inline-block';
-          wordEl.style.transformOrigin = 'top left';
-          wordEl.textContent = word.text;
+          wordEl.style.position = 'relative';
+
+          const wordContentEl = document.createElement('hypothesis-text-content');
+          wordEl.append(wordContentEl);
+          wordContentEl.style.transformOrigin = 'top left';
+          wordContentEl.style.position = 'absolute';
+          wordContentEl.textContent = word.text;
 
           if (prevWord) {
             wordEl.style.marginLeft = scaledValue(
@@ -311,7 +316,7 @@ export class ImageTextLayer {
 
           // Don't collapse whitespace at end of words, so it remains visible
           // in selected text. Also prevent line breaks due to overflows.
-          wordEl.style.whiteSpace = 'pre';
+          wordContentEl.style.whiteSpace = 'pre';
 
           // Scale content using a transform. This affects the rendered size
           // of the text, used by text selection and
@@ -319,7 +324,7 @@ export class ImageTextLayer {
           const metrics = context.measureText(word.text);
           const xScale = scaledValue('x', word.rect.width / metrics.width, '');
           const yScale = scaledValue('y', word.rect.height / fontSize, '');
-          wordEl.style.transform = `scale(${xScale}, ${yScale})`;
+          wordContentEl.style.transform = `scale(${xScale}, ${yScale})`;
 
           lineEl.append(wordEl);
         }
