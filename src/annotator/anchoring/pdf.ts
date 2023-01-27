@@ -183,15 +183,13 @@ function getPageTextContent(pageIndex: number): Promise<string> {
 }
 
 export class TextLayerManager {
+  private _layers: Map<number, ImageTextLayer>;
+
   constructor() {
-    /** @type {Map<number, ImageTextLayer>} */
     this._layers = new Map();
   }
 
-  /**
-   * @param {number} pageIndex
-   */
-  removeTextLayer(pageIndex) {
+  removeTextLayer(pageIndex: number) {
     const layer = this._layers.get(pageIndex);
     this._layers.delete(pageIndex);
     layer?.destroy();
@@ -199,10 +197,8 @@ export class TextLayerManager {
 
   /**
    * Create a text layer for the given page.
-   *
-   * @param {number} pageIndex
    */
-  async createTextLayer(pageIndex) {
+  async createTextLayer(pageIndex: number) {
     if (this._layers.has(pageIndex)) {
       return this._layers.get(pageIndex);
     }
@@ -248,9 +244,9 @@ export class TextLayerManager {
     }
 
     // Prevent selection in PDF.js's own text layer.
-    const builtinTextLayer = /** @type {HTMLElement|null} */ (
-      pageContainer.querySelector('.textLayer')
-    );
+    const builtinTextLayer = pageContainer.querySelector(
+      '.textLayer'
+    ) as HTMLElement | null;
     if (builtinTextLayer) {
       builtinTextLayer.style.display = 'none';
     }

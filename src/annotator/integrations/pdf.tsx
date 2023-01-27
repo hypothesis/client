@@ -95,6 +95,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    * an anchor in a not-yet-rendered page.
    */
   private _reanchoringMaxWait: number;
+  private _textLayers: TextLayerManager;
   private _updateAnnotationLayerVisibility: () => void;
 
   /**
