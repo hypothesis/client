@@ -10,6 +10,7 @@
  * @typedef AnnotatorConfig
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
  * @prop {string} notebookAppUrl - The URL of the sidebar's notebook
+ * @prop {string} profileAppUrl - The URL of the sidebar's profile
  * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
  * @prop {Record<string,string>} manifest -
  *   A mapping from canonical asset path to cache-busted asset path

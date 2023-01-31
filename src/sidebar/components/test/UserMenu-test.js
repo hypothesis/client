@@ -12,6 +12,7 @@ describe('UserMenu', () => {
   let fakeServiceConfig;
   let fakeSettings;
   let fakeStore;
+  let fakeIsFeatureEnabled;
 
   const createUserMenu = () => {
     return mount(
@@ -41,11 +42,13 @@ describe('UserMenu', () => {
     fakeOnLogout = sinon.stub();
     fakeServiceConfig = sinon.stub();
     fakeSettings = {};
+    fakeIsFeatureEnabled = sinon.stub().returns(false);
     fakeStore = {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       focusedGroupId: sinon.stub().returns('mygroup'),
       getLink: sinon.stub(),
       profile: sinon.stub().returns(fakeProfile),
+      isFeatureEnabled: fakeIsFeatureEnabled,
     };
 
     $imports.$mock(mockImportedComponents());
@@ -205,6 +208,57 @@ describe('UserMenu', () => {
 
       const accountMenuItem = findMenuItem(wrapper, 'Account settings');
       assert.isFalse(accountMenuItem.exists());
+    });
+  });
+
+  describe('open profile item', () => {
+    [
+      {
+        isFeatureEnabled: true,
+        title:
+          'includes the open profile item if the feature flag is "enabled"',
+      },
+      {
+        isFeatureEnabled: false,
+        title:
+          'does not include the open profile item if the feature flag is "disabled"',
+      },
+    ].forEach(({ isFeatureEnabled, title }) => {
+      it(title, () => {
+        fakeIsFeatureEnabled.returns(isFeatureEnabled);
+
+        const wrapper = createUserMenu();
+        const openProfileItem = findMenuItem(wrapper, 'Open profile');
+
+        assert.equal(isFeatureEnabled, openProfileItem.exists());
+      });
+    });
+
+    it('opens the profile when clicked', () => {
+      fakeIsFeatureEnabled.returns(true);
+
+      const wrapper = createUserMenu();
+      const openProfileItem = findMenuItem(wrapper, 'Open profile');
+
+      openProfileItem.props().onClick();
+      assert.calledOnce(fakeFrameSync.notifyHost);
+      assert.calledWith(fakeFrameSync.notifyHost, 'openProfile');
+    });
+
+    it('opens the profile and closes itself when `p` is typed', () => {
+      const wrapper = createUserMenu();
+      // Make the menu "open"
+      act(() => wrapper.find('Menu').props().onOpenChanged(true));
+      wrapper.update();
+      assert.isTrue(wrapper.find('Menu').props().open);
+
+      wrapper
+        .find('[data-testid="user-menu"]')
+        .simulate('keydown', { key: 'p' });
+      assert.calledOnce(fakeFrameSync.notifyHost);
+      assert.calledWith(fakeFrameSync.notifyHost, 'openProfile');
+      // Now the menu is "closed" again
+      assert.isFalse(wrapper.find('Menu').props().open);
     });
   });
 

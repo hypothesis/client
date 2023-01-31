@@ -475,3 +475,7 @@ These settings configure where the client's assets are loaded from.
 .. option:: notebookAppUrl
 
    ``String``. The URL for the notebook application (Default: ``"https://hypothes.is/notebook"``).
+
+.. option:: profileAppUrl
+
+   ``String``. The URL for the profile application (Default: ``"https://hypothes.is/user-profile"``).

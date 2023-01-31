@@ -21,6 +21,10 @@ const notebookAppUrl = process.env.NOTEBOOK_APP_URL
   ? `${process.env.NOTEBOOK_APP_URL}`
   : `${localhost}:5000/notebook`;
 
+const profileAppUrl = process.env.PROFILE_APP_URL
+  ? `${process.env.PROFILE_APP_URL}`
+  : `${localhost}:5000/user-profile`;
+
 const sidebarAppUrl = process.env.SIDEBAR_APP_URL
   ? `${process.env.SIDEBAR_APP_URL}`
   : `${localhost}:5000/app.html`;
@@ -52,6 +56,7 @@ export default {
       values: {
         __ASSET_ROOT__: assetRoot,
         __NOTEBOOK_APP_URL__: notebookAppUrl,
+        __PROFILE_APP_URL__: profileAppUrl,
         __SIDEBAR_APP_URL__: sidebarAppUrl,
       },
     }),
