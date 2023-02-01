@@ -39,7 +39,6 @@ export function ProfileModal({ eventBus, config }: ProfileModalProps) {
   useEffect(() => {
     const emitter = eventBus.createEmitter();
     emitter.subscribe('openProfile', () => {
-      console.log('Open!');
       setIsHidden(false);
     });
     emitterRef.current = emitter;

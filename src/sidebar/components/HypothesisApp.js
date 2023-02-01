@@ -44,6 +44,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
   const store = useSidebarStore();
   const profile = store.profile();
   const route = store.route();
+  const isModalRoute = route === 'notebook' || route === 'profile';
 
   const backgroundStyle = useMemo(
     () => applyTheme(['appBackgroundColor'], settings),
@@ -139,14 +140,14 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
           'theme-clean': isThemeClean,
           // Make room at top for the TopBar (40px) plus custom padding (9px)
           // but not in the Notebook or Profile, which don't use the TopBar
-          'pt-[49px]': route !== 'notebook',
-          'p-4 lg:p-12': route === 'notebook' || route === 'profile',
+          'pt-[49px]': !isModalRoute,
+          'p-4 lg:p-12': isModalRoute,
         }
       )}
       data-testid="hypothesis-app"
       style={backgroundStyle}
     >
-      {route !== 'notebook' && (
+      {!isModalRoute && (
         <TopBar
           onLogin={login}
           onSignUp={signUp}

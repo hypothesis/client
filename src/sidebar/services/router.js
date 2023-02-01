@@ -1,5 +1,5 @@
 /**
- * @typedef {'annotation'|'notebook'|'stream'|'sidebar'} RouteName
+ * @typedef {'annotation'|'notebook'|'profile'|'stream'|'sidebar'} RouteName
  * @typedef {Record<string,string>} RouteParams
  */
 
@@ -58,6 +58,9 @@ export class RouterService {
       case 'notebook':
         route = 'notebook';
         break;
+      case 'user-profile':
+        route = 'profile';
+        break;
       case 'stream':
         route = 'stream';
         break;
@@ -89,6 +92,9 @@ export class RouterService {
         break;
       case 'notebook':
         url = '/notebook';
+        break;
+      case 'profile':
+        url = '/user-profile';
         break;
       case 'stream':
         url = '/stream';

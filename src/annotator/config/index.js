@@ -61,9 +61,10 @@ function configurationKeys(context) {
       'theme',
       'usernameUrl',
     ],
-    profile: [ // TODO Check what's missing
+    profile: [
+      // TODO Check what's missing
       'profileAppUrl',
-    ]
+    ],
   };
 
   switch (context) {
