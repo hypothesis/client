@@ -45,8 +45,9 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
     !isThirdParty || serviceSupports('onProfileRequestProvided');
   const isLogoutEnabled =
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
-  const isProfileEnabled =
-    /* isThirdParty || */ store.isFeatureEnabled('client_new_profile');
+  const isProfileEnabled = /* isThirdParty || */ store.isFeatureEnabled(
+    'client_user_profile'
+  );
 
   const onSelectNotebook = () => {
     frameSync.notifyHost('openNotebook', store.focusedGroupId());

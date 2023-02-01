@@ -11,6 +11,7 @@ import {
 import type { Destroyable } from '../types/annotator';
 import { getConfig } from './config/index';
 import type { NotebookConfig } from './components/NotebookModal';
+import type { ProfileConfig } from './components/ProfileModal';
 import { Guest } from './guest';
 import type { GuestConfig } from './guest';
 import {
@@ -26,6 +27,7 @@ import { Notebook } from './notebook';
 import { Sidebar } from './sidebar';
 import type { SidebarConfig } from './sidebar';
 import { EventBus } from './util/emitter';
+import { Profile } from './profile';
 
 // Look up the URL of the sidebar. This element is added to the page by the
 // boot script before the "annotator" bundle loads.
@@ -75,11 +77,16 @@ function init() {
       eventBus,
       getConfig('notebook') as NotebookConfig
     );
+    const profile = new Profile(
+      document.body,
+      eventBus,
+      getConfig('profile') as ProfileConfig
+    );
 
     portProvider.on('frameConnected', (source, port) =>
       sidebar.onFrameConnected(source, port)
     );
-    destroyables.push(portProvider, sidebar, notebook);
+    destroyables.push(portProvider, sidebar, notebook, profile);
   }
 
   const vsFrameRole = vitalSourceFrameRole();

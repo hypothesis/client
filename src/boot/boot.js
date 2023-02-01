@@ -155,6 +155,9 @@ export function bootHypothesisClient(doc, config) {
   // Register the URL of the notebook app which the Hypothesis client should load.
   injectLink(doc, 'notebook', 'html', config.notebookAppUrl);
 
+  // Register the URL of the profile app which the Hypothesis client should load.
+  injectLink(doc, 'profile', 'html', config.profileAppUrl);
+
   // Preload the styles used by the shadow roots of annotator UI elements.
   preloadURL(doc, 'style', assetURL(config, 'styles/annotator.css'));
 

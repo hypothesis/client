@@ -14,6 +14,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  * @prop {string} clientUrl
  * @prop {string} sidebarAppUrl
  * @prop {string} notebookAppUrl
+ * @prop {string} profileAppUrl
  * @prop {(name: string) => unknown} hostPageSetting
  */
 
@@ -174,6 +175,9 @@ export function settingsFrom(window_) {
     },
     get notebookAppUrl() {
       return urlFromLinkTag(window_, 'notebook', 'html');
+    },
+    get profileAppUrl() {
+      return urlFromLinkTag(window_, 'profile', 'html');
     },
     get showHighlights() {
       return showHighlights();

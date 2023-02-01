@@ -14,6 +14,7 @@ import StreamView from './StreamView';
 
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
+import ProfileView from './ProfileView';
 import ShareAnnotationsPanel from './ShareAnnotationsPanel';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
@@ -137,9 +138,9 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
         {
           'theme-clean': isThemeClean,
           // Make room at top for the TopBar (40px) plus custom padding (9px)
-          // but not in the Notebook, which doesn't use the TopBar
+          // but not in the Notebook or Profile, which don't use the TopBar
           'pt-[49px]': route !== 'notebook',
-          'p-4 lg:p-12': route === 'notebook',
+          'p-4 lg:p-12': route === 'notebook' || route === 'profile',
         }
       )}
       data-testid="hypothesis-app"
@@ -162,6 +163,7 @@ function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
           <main>
             {route === 'annotation' && <AnnotationView onLogin={login} />}
             {route === 'notebook' && <NotebookView />}
+            {route === 'profile' && <ProfileView />}
             {route === 'stream' && <StreamView />}
             {route === 'sidebar' && (
               <SidebarView onLogin={login} onSignUp={signUp} />

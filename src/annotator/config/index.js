@@ -23,7 +23,7 @@ import { urlFromLinkTag } from './url-from-link-tag';
  * Named subset of the Hypothesis client configuration that is relevant in
  * a particular context.
  *
- * @typedef {'sidebar'|'notebook'|'annotator'|'all'} Context
+ * @typedef {'sidebar'|'notebook'|'profile'|'annotator'|'all'} Context
  */
 
 /**
@@ -61,6 +61,9 @@ function configurationKeys(context) {
       'theme',
       'usernameUrl',
     ],
+    profile: [ // TODO Check what's missing
+      'profileAppUrl',
+    ]
   };
 
   switch (context) {
@@ -70,9 +73,11 @@ function configurationKeys(context) {
       return contexts.sidebar;
     case 'notebook':
       return contexts.notebook;
+    case 'profile':
+      return contexts.profile;
     case 'all':
       // Complete list of configuration keys used for testing.
-      return [...contexts.annotator, ...contexts.sidebar, ...contexts.notebook];
+      return Object.values(contexts).flat();
     default:
       throw new Error(`Invalid application context used: "${context}"`);
   }
@@ -176,6 +181,11 @@ const configDefinitions = {
     allowInBrowserExt: true,
     defaultValue: null,
     getValue: settings => settings.notebookAppUrl,
+  },
+  profileAppUrl: {
+    allowInBrowserExt: true,
+    defaultValue: null,
+    getValue: settings => settings.profileAppUrl,
   },
   sidebarAppUrl: {
     allowInBrowserExt: true,
