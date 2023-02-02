@@ -16,6 +16,11 @@ const fixtures = [
     params: {},
   },
   {
+    path: '/user-profile',
+    route: 'profile',
+    params: {},
+  },
+  {
     path: '/a/foo',
     route: 'annotation',
     params: { id: 'foo' },

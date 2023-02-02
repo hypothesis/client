@@ -259,6 +259,10 @@ describe('annotator/config/index', () => {
           'usernameUrl',
         ],
       },
+      {
+        app: 'profile',
+        expectedKeys: ['profileAppUrl'],
+      },
     ].forEach(test => {
       it(`ignores values not belonging to "${test.app}" context`, () => {
         const config = getConfig(test.app, 'WINDOW');
