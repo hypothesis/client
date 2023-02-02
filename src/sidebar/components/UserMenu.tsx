@@ -45,9 +45,8 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
     !isThirdParty || serviceSupports('onProfileRequestProvided');
   const isLogoutEnabled =
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
-  const isProfileEnabled = /* isThirdParty || */ store.isFeatureEnabled(
-    'client_user_profile'
-  );
+  const isProfileEnabled =
+    isThirdParty && store.isFeatureEnabled('client_user_profile');
 
   const onSelectNotebook = () => {
     frameSync.notifyHost('openNotebook', store.focusedGroupId());
@@ -60,7 +59,7 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
     if (event.key === 'n') {
       onSelectNotebook();
       setOpen(false);
-    } else if (event.key === 'p') {
+    } else if (isProfileEnabled && event.key === 'p') {
       onSelectProfile();
       setOpen(false);
     }
