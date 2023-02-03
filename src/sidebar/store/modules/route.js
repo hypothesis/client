@@ -1,7 +1,7 @@
 import { createStoreModule, makeAction } from '../create-store';
 
 /**
- * @typedef {'annotation'|'notebook'|'sidebar'|'stream'} RouteName
+ * @typedef {'annotation'|'notebook'|'profile'|'sidebar'|'stream'} RouteName
  */
 
 const initialState = {
