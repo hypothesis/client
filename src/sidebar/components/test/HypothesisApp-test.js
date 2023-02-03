@@ -120,6 +120,10 @@ describe('HypothesisApp', () => {
       contentComponent: 'NotebookView',
     },
     {
+      route: 'profile',
+      contentComponent: 'ProfileView',
+    },
+    {
       route: 'stream',
       contentComponent: 'StreamView',
     },

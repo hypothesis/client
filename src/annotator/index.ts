@@ -10,6 +10,7 @@ import {
 import type { Destroyable } from '../types/annotator';
 import type { NotebookConfig } from './components/NotebookModal';
 import { getConfig } from './config/index';
+import type { ProfileConfig } from './components/ProfileModal';
 import { Guest } from './guest';
 import type { GuestConfig } from './guest';
 import {
@@ -22,6 +23,7 @@ import {
   vitalSourceFrameRole,
 } from './integrations/vitalsource';
 import { Notebook } from './notebook';
+import { Profile } from './profile';
 import { Sidebar } from './sidebar';
 import type { SidebarConfig } from './sidebar';
 import { EventBus } from './util/emitter';
@@ -74,11 +76,16 @@ function init() {
       eventBus,
       getConfig('notebook') as NotebookConfig
     );
+    const profile = new Profile(
+      document.body,
+      eventBus,
+      getConfig('profile') as ProfileConfig
+    );
 
     portProvider.on('frameConnected', (source, port) =>
       sidebar.onFrameConnected(source, port)
     );
-    destroyables.push(portProvider, sidebar, notebook);
+    destroyables.push(portProvider, sidebar, notebook, profile);
   }
 
   const vsFrameRole = vitalSourceFrameRole();
