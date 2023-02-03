@@ -62,7 +62,6 @@ function configurationKeys(context) {
       'usernameUrl',
     ],
     profile: [
-      // TODO Check what's missing
       'profileAppUrl',
     ],
   };

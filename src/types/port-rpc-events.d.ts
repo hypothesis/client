@@ -194,7 +194,7 @@ export type SidebarToHostEvent =
   | 'openNotebook'
 
   /**
-   * The sidebar is asking the host to open the profile.
+   * The sidebar is asking the host to open the user profile.
    */
   | 'openProfile'
 

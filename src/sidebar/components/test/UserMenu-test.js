@@ -242,7 +242,7 @@ describe('UserMenu', () => {
         fakeIsThirdPartyUser.returns(isThirdParty);
 
         const wrapper = createUserMenu();
-        const openProfileItem = findMenuItem(wrapper, 'Open profile');
+        const openProfileItem = findMenuItem(wrapper, 'Your profile');
 
         assert.equal(
           isFeatureEnabled && isThirdParty,
@@ -256,7 +256,7 @@ describe('UserMenu', () => {
       fakeIsThirdPartyUser.returns(true);
 
       const wrapper = createUserMenu();
-      const openProfileItem = findMenuItem(wrapper, 'Open profile');
+      const openProfileItem = findMenuItem(wrapper, 'Your profile');
 
       openProfileItem.props().onClick();
       assert.calledOnce(fakeFrameSync.notifyHost);

@@ -13,7 +13,7 @@ build tasks.
 .. envvar:: PROFILE_APP_URL
 
    The default value for the :option:`profileAppUrl` config setting (the URL of
-   the profile app's iframe), used when the host page does not contain a
+   the user profile iframe), used when the host page does not contain a
    :option:`profileAppUrl` setting.
    ``https://hypothes.is/user-profile`` by default.
 

@@ -10,7 +10,7 @@
  * @typedef AnnotatorConfig
  * @prop {string} assetRoot - The root URL to which URLs in `manifest` are relative
  * @prop {string} notebookAppUrl - The URL of the sidebar's notebook
- * @prop {string} profileAppUrl - The URL of the sidebar's profile
+ * @prop {string} profileAppUrl - The URL of the sidebar's user profile view
  * @prop {string} sidebarAppUrl - The URL of the sidebar's HTML page
  * @prop {Record<string,string>} manifest -
  *   A mapping from canonical asset path to cache-busted asset path
@@ -155,7 +155,7 @@ export function bootHypothesisClient(doc, config) {
   // Register the URL of the notebook app which the Hypothesis client should load.
   injectLink(doc, 'notebook', 'html', config.notebookAppUrl);
 
-  // Register the URL of the profile app which the Hypothesis client should load.
+  // Register the URL of the user profile app which the Hypothesis client should load.
   injectLink(doc, 'profile', 'html', config.profileAppUrl);
 
   // Preload the styles used by the shadow roots of annotator UI elements.

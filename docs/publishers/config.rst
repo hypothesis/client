@@ -478,4 +478,4 @@ These settings configure where the client's assets are loaded from.
 
 .. option:: profileAppUrl
 
-   ``String``. The URL for the profile application (Default: ``"https://hypothes.is/user-profile"``).
+   ``String``. The URL for the user profile application (Default: ``"https://hypothes.is/user-profile"``).
