@@ -13,28 +13,7 @@ type ProfileModalProps = {
 
 export function ProfileModal({ eventBus, config }: ProfileModalProps) {
   const [isHidden, setIsHidden] = useState(true);
-  const originalDocumentOverflowStyle = useRef('');
   const emitterRef = useRef<Emitter | null>(null);
-
-  // Stores the original overflow CSS property of document.body and reset it
-  // when the component is destroyed
-  useEffect(() => {
-    originalDocumentOverflowStyle.current = document.body.style.overflow;
-
-    return () => {
-      document.body.style.overflow = originalDocumentOverflowStyle.current;
-    };
-  }, []);
-
-  // The overflow CSS property is set to hidden to prevent scrolling of the host page,
-  // while the profile modal is open. It is restored when the modal is closed.
-  useEffect(() => {
-    if (isHidden) {
-      document.body.style.overflow = originalDocumentOverflowStyle.current;
-    } else {
-      document.body.style.overflow = 'hidden';
-    }
-  }, [isHidden]);
 
   useEffect(() => {
     const emitter = eventBus.createEmitter();
@@ -81,12 +60,6 @@ export function ProfileModal({ eventBus, config }: ProfileModalProps) {
         <iframe
           title={'Hypothesis profile'}
           className="h-full w-full border-0"
-          // Enable media in annotations to be shown fullscreen.
-          // TODO: Use `allow="fullscreen" once `allow` attribute available for
-          // iframe elements in all supported browsers
-          // See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-allow
-          // eslint-disable-next-line react/no-unknown-property
-          allowFullScreen
           src={config.profileAppUrl}
         />
       </div>
