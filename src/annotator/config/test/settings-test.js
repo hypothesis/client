@@ -35,6 +35,16 @@ describe('annotator/config/settingsFrom', () => {
     });
   });
 
+  describe('#profileAppUrl', () => {
+    it('calls urlFromLinkTag with appropriate params', () => {
+      assert.equal(
+        settingsFrom(window).profileAppUrl,
+        'http://example.com/app.html'
+      );
+      assert.calledWith(fakeUrlFromLinkTag, window, 'profile', 'html');
+    });
+  });
+
   describe('#sidebarAppUrl', () => {
     it('calls urlFromLinkTag with appropriate params', () => {
       assert.equal(

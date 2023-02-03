@@ -39,6 +39,9 @@ if (isBrowserSupported()) {
     const notebookAppUrl = processUrlTemplate(
       annotatorConfig.notebookAppUrl || '__NOTEBOOK_APP_URL__'
     );
+    const profileAppUrl = processUrlTemplate(
+      annotatorConfig.profileAppUrl || '__PROFILE_APP_URL__'
+    );
     const sidebarAppUrl = processUrlTemplate(
       annotatorConfig.sidebarAppUrl || '__SIDEBAR_APP_URL__'
     );
@@ -46,6 +49,7 @@ if (isBrowserSupported()) {
       assetRoot,
       manifest,
       notebookAppUrl,
+      profileAppUrl,
       sidebarAppUrl,
     });
   }

@@ -12,6 +12,7 @@ describe('annotator/config/index', () => {
       clientUrl: 'fakeValue',
       group: 'fakeValue',
       notebookAppUrl: 'fakeValue',
+      profileAppUrl: 'fakeValue',
       showHighlights: 'fakeValue',
       sidebarAppUrl: 'fakeValue',
       query: 'fakeValue',
@@ -83,6 +84,7 @@ describe('annotator/config/index', () => {
             focus: null,
             group: 'fakeValue',
             notebookAppUrl: 'fakeValue',
+            profileAppUrl: 'fakeValue',
             onLayoutChange: null,
             openSidebar: true, // coerced
             query: 'fakeValue',
@@ -115,6 +117,7 @@ describe('annotator/config/index', () => {
             focus: 'fakeValue',
             group: 'fakeValue',
             notebookAppUrl: 'fakeValue',
+            profileAppUrl: 'fakeValue',
             onLayoutChange: 'fakeValue',
             openSidebar: true, // coerced
             query: 'fakeValue',
@@ -171,6 +174,7 @@ describe('annotator/config/index', () => {
         focus: null,
         group: null,
         notebookAppUrl: null,
+        profileAppUrl: null,
         onLayoutChange: null,
         openSidebar: false,
         query: null,
@@ -254,6 +258,10 @@ describe('annotator/config/index', () => {
           'theme',
           'usernameUrl',
         ],
+      },
+      {
+        app: 'profile',
+        expectedKeys: ['profileAppUrl'],
       },
     ].forEach(test => {
       it(`ignores values not belonging to "${test.app}" context`, () => {

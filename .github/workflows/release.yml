@@ -28,6 +28,7 @@ jobs:
     environment: qa
     env:
       NOTEBOOK_APP_URL: https://qa.hypothes.is/notebook
+      PROFILE_APP_URL: https://qa.hypothes.is/user-profile
       SIDEBAR_APP_URL: https://qa.hypothes.is/app.html
 
     steps:
@@ -69,6 +70,7 @@ jobs:
     environment: production
     env:
       NOTEBOOK_APP_URL: https://hypothes.is/notebook
+      PROFILE_APP_URL: https://hypothes.is/user-profile
       SIDEBAR_APP_URL: https://hypothes.is/app.html
 
     steps:

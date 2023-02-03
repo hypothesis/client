@@ -36,7 +36,7 @@ export function createAppConfig(appURL, config) {
   appConfig.origin = new URL(appURL).origin;
 
   // Pass the version of the client, so we can check if it is the same as the
-  // one used in the sidebar/notebook.
+  // one used in the sidebar/notebook/profile.
   appConfig.version = '__VERSION__';
 
   // Pass the URL of the page that embedded the client.
