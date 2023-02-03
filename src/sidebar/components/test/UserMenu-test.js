@@ -12,6 +12,7 @@ describe('UserMenu', () => {
   let fakeServiceConfig;
   let fakeSettings;
   let fakeStore;
+  let fakeIsFeatureEnabled;
 
   const createUserMenu = () => {
     return mount(
@@ -41,11 +42,13 @@ describe('UserMenu', () => {
     fakeOnLogout = sinon.stub();
     fakeServiceConfig = sinon.stub();
     fakeSettings = {};
+    fakeIsFeatureEnabled = sinon.stub().returns(false);
     fakeStore = {
       defaultAuthority: sinon.stub().returns('hypothes.is'),
       focusedGroupId: sinon.stub().returns('mygroup'),
       getLink: sinon.stub(),
       profile: sinon.stub().returns(fakeProfile),
+      isFeatureEnabled: fakeIsFeatureEnabled,
     };
 
     $imports.$mock(mockImportedComponents());
@@ -206,6 +209,54 @@ describe('UserMenu', () => {
       const accountMenuItem = findMenuItem(wrapper, 'Account settings');
       assert.isFalse(accountMenuItem.exists());
     });
+  });
+
+  describe('open profile item', () => {
+    [{ isFeatureEnabled: true }, { isFeatureEnabled: false }].forEach(
+      ({ isFeatureEnabled }) => {
+        it('includes profile item only for users with the feature flag enabled', () => {
+          fakeIsFeatureEnabled.returns(isFeatureEnabled);
+
+          const wrapper = createUserMenu();
+          const openProfileItem = findMenuItem(wrapper, 'Your profile');
+
+          assert.equal(isFeatureEnabled, openProfileItem.exists());
+        });
+      }
+    );
+
+    it('opens the profile when clicked', () => {
+      fakeIsFeatureEnabled.returns(true);
+      fakeIsThirdPartyUser.returns(true);
+
+      const wrapper = createUserMenu();
+      const openProfileItem = findMenuItem(wrapper, 'Your profile');
+
+      openProfileItem.props().onClick();
+      assert.calledOnce(fakeFrameSync.notifyHost);
+      assert.calledWith(fakeFrameSync.notifyHost, 'openProfile');
+    });
+
+    [{ featureIsEnabled: true }, { featureIsEnabled: false }].forEach(
+      ({ featureIsEnabled }) => {
+        it('responds to `p` keypress only when feature is enabled', () => {
+          fakeIsFeatureEnabled.returns(featureIsEnabled);
+
+          const wrapper = createUserMenu();
+          // Make the menu "open"
+          act(() => wrapper.find('Menu').props().onOpenChanged(true));
+          wrapper.update();
+          assert.isTrue(wrapper.find('Menu').props().open);
+
+          wrapper
+            .find('[data-testid="user-menu"]')
+            .simulate('keydown', { key: 'p' });
+
+          assert.equal(featureIsEnabled, fakeFrameSync.notifyHost.called);
+          assert.equal(!featureIsEnabled, wrapper.find('Menu').props().open);
+        });
+      }
+    );
   });
 
   describe('open notebook item', () => {
