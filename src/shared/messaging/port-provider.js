@@ -22,16 +22,18 @@ import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
  *    where either (1) the hypothesis client has been injected or (2) the
  *    hypothesis client has been configured to act exclusively as a `guest` (not
  *    showing the sidebar).
- * - `notebook`: another hypothesis app that runs in a separate iframe.
- * - `sidebar`: the main hypothesis app. It runs in an iframe on a different
- *    origin than the host and is responsible for the communication with the
- *    backend (fetching and saving annotations).
+ * - `notebook` and `profile`: front-end app views that each have their own
+ *    iframe.
+ * - `sidebar`: the main hypothesis front-end app. It runs in an iframe on a
+ *    different origin than the host and is responsible for the communication
+ *    with the backend (fetching and saving annotations).
  *
  * This layout represents the current arrangement of frames:
  *
  * `host` frame
  * |-> `sidebar` iframe
  * |-> `notebook` iframe
+ * |-> `profile` iframe
  * |-> [`guest` iframes]
  *
  * Currently, we support communication between the following pairs of frames:

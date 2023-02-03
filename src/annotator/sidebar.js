@@ -370,8 +370,9 @@ export class Sidebar {
 
     this._sidebarRPC.on('closeSidebar', () => this.close());
 
-    // Sidebar listens to the `openNotebook` event coming from the sidebar's
-    // iframe and re-publishes it via the emitter to the Notebook
+    // Sidebar listens to the `openNotebook` and `openProfile` events coming
+    // from the sidebar's iframe and re-publishes it via the emitter to the
+    // Notebook/Profile
     this._sidebarRPC.on(
       'openNotebook',
       /** @param {string} groupId */
@@ -380,6 +381,13 @@ export class Sidebar {
         this._emitter.publish('openNotebook', groupId);
       }
     );
+    this._sidebarRPC.on('openProfile', () => {
+      this.hide();
+      this._emitter.publish('openProfile');
+    });
+    this._emitter.subscribe('closeProfile', () => {
+      this.show();
+    });
 
     this._emitter.subscribe('closeNotebook', () => {
       this.show();
