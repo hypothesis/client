@@ -45,16 +45,21 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
     !isThirdParty || serviceSupports('onProfileRequestProvided');
   const isLogoutEnabled =
     !isThirdParty || serviceSupports('onLogoutRequestProvided');
+  const isProfileEnabled = store.isFeatureEnabled('client_user_profile');
 
   const onSelectNotebook = () => {
     frameSync.notifyHost('openNotebook', store.focusedGroupId());
   };
+  const onSelectProfile = () => frameSync.notifyHost('openProfile');
 
   // Access to the Notebook:
   // type the key 'n' when user menu is focused/open
   const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'n') {
       onSelectNotebook();
+      setOpen(false);
+    } else if (isProfileEnabled && event.key === 'p') {
+      onSelectProfile();
       setOpen(false);
     }
   };
@@ -94,6 +99,9 @@ function UserMenu({ frameSync, onLogout, settings }: UserMenuProps) {
               label="Account settings"
               href={store.getLink('account.settings')}
             />
+          )}
+          {isProfileEnabled && (
+            <MenuItem label="Your profile" onClick={() => onSelectProfile()} />
           )}
           <MenuItem label="Open notebook" onClick={() => onSelectNotebook()} />
         </MenuSection>
