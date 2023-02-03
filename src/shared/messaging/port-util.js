@@ -2,7 +2,7 @@
  * Message sent by `PortProvider` and `PortFinder` to establish a
  * MessageChannel-based connection between two frames.
  *
- * @typedef {'guest'|'host'|'notebook'|'sidebar'} Frame
+ * @typedef {'guest'|'host'|'notebook'|'profile'|'sidebar'} Frame
  *
  * @typedef Message
  * @prop {Frame} frame1 - Role of the source frame
