@@ -380,6 +380,28 @@ describe('Sidebar', () => {
       });
     });
 
+    describe('on "openProfile" event', () => {
+      it('hides the sidebar', () => {
+        const sidebar = createSidebar();
+        sinon.stub(sidebar, 'hide').callThrough();
+        sinon.stub(sidebar._emitter, 'publish');
+        emitSidebarEvent('openProfile');
+        assert.calledWith(sidebar._emitter.publish, 'openProfile');
+        assert.calledOnce(sidebar.hide);
+        assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
+      });
+    });
+
+    describe('on "closeProfile" internal event', () => {
+      it('shows the sidebar', () => {
+        const sidebar = createSidebar();
+        sinon.stub(sidebar, 'show').callThrough();
+        sidebar._emitter.publish('closeProfile');
+        assert.calledOnce(sidebar.show);
+        assert.equal(sidebar.iframeContainer.style.visibility, '');
+      });
+    });
+
     describe('on "loginRequested" event', () => {
       it('calls the onLoginRequest callback function if one was provided', () => {
         const onLoginRequest = sandbox.stub();
