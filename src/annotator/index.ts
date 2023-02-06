@@ -9,8 +9,8 @@ import {
 } from '../shared/messaging';
 import type { Destroyable } from '../types/annotator';
 import type { NotebookConfig } from './components/NotebookModal';
-import { getConfig } from './config/index';
 import type { ProfileConfig } from './components/ProfileModal';
+import { getConfig } from './config/index';
 import { Guest } from './guest';
 import type { GuestConfig } from './guest';
 import {

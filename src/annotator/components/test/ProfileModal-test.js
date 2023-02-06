@@ -1,5 +1,5 @@
-import { act } from 'preact/test-utils';
 import { mount } from 'enzyme';
+import { act } from 'preact/test-utils';
 
 import { EventBus } from '../../util/emitter';
 import { ProfileModal } from '../ProfileModal';
@@ -34,17 +34,15 @@ describe('ProfileModal', () => {
     components.forEach(component => component.unmount());
   });
 
-  it('hides modal on first render', () => {
+  it('does not render anything before the modal has been opened at least once', () => {
     const wrapper = createComponent();
-    const outer = wrapper.find(outerSelector);
-
-    assert.isTrue(outer.hasClass('hidden'));
+    assert.equal(wrapper.find(outerSelector).length, 0);
   });
 
   it('shows modal on "openProfile" event', () => {
     const wrapper = createComponent();
 
-    emitter.publish('openProfile', 'myGroup');
+    emitter.publish('openProfile');
     wrapper.update();
 
     const outer = wrapper.find(outerSelector);
@@ -57,7 +55,7 @@ describe('ProfileModal', () => {
   it('hides modal on closing', () => {
     const wrapper = createComponent();
 
-    emitter.publish('openProfile', 'myGroup');
+    emitter.publish('openProfile');
     wrapper.update();
 
     let outer = wrapper.find(outerSelector);

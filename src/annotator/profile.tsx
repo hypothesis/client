@@ -1,7 +1,6 @@
 import { render } from 'preact';
 
 import type { Destroyable } from '../types/annotator';
-
 import type { ProfileConfig } from './components/ProfileModal';
 import { ProfileModal } from './components/ProfileModal';
 import type { EventBus } from './util/emitter';
