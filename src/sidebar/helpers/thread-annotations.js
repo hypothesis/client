@@ -1,10 +1,10 @@
-import { buildThread } from './build-thread';
-
 import { memoize } from '../util/memoize';
 import { generateFacetedFilter } from '../util/search-filter';
-import { filterAnnotations } from './view-filter';
+
+import { buildThread } from './build-thread';
 import { shouldShowInTab } from './tabs';
 import { sorters } from './thread-sorters';
+import { filterAnnotations } from './view-filter';
 
 /** @typedef {import('../../types/api').Annotation} Annotation */
 /** @typedef {import('./build-thread').Thread} Thread */

@@ -5,7 +5,7 @@
     "plugin:@typescript-eslint/recommended"
   ],
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "import"],
   "rules": {
     "prefer-arrow-callback": ["error", { "allowNamedFunctions": true }],
     "object-shorthand": ["error", "properties"],
@@ -43,7 +43,17 @@
     //   exports is not enabled yet because that requires setting up type-aware
     //   linting.
     "@typescript-eslint/consistent-type-assertions": "error",
-    "@typescript-eslint/consistent-type-imports": "error"
+    "@typescript-eslint/consistent-type-imports": "error",
+
+    "import/order": [
+      "error",
+      {
+        "newlines-between": "always",
+        "alphabetize": {
+          "order": "asc"
+        }
+      }
+    ]
   },
   "overrides": [
     {
