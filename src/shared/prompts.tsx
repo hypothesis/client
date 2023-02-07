@@ -1,10 +1,11 @@
 import { render } from 'preact';
+import type { ComponentChildren } from 'preact';
 
-import { ConfirmModal } from '@hypothesis/frontend-shared';
+import { Button, Modal } from '@hypothesis/frontend-shared/lib/next';
 
 export type ConfirmModalProps = {
   title?: string;
-  message: string;
+  message: ComponentChildren;
   confirmAction?: string;
 };
 
@@ -43,13 +44,26 @@ export async function confirm({
     };
 
     render(
-      <ConfirmModal
+      <Modal
+        buttons={
+          <>
+            <Button data-testid="cancel-button" onClick={() => close(false)}>
+              Cancel
+            </Button>
+            <Button
+              data-testid="confirm-button"
+              variant="primary"
+              onClick={() => close(true)}
+            >
+              {confirmAction}
+            </Button>
+          </>
+        }
         title={title}
-        message={message}
-        confirmAction={confirmAction}
-        onConfirm={() => close(true)}
-        onCancel={() => close(false)}
-      />,
+        onClose={() => close(false)}
+      >
+        {message}
+      </Modal>,
       container
     );
   });
