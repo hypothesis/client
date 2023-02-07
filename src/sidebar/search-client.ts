@@ -1,11 +1,6 @@
 import { TinyEmitter } from 'tiny-emitter';
 
-/**
- * @typedef {import('../types/api').Annotation} Annotation
- * @typedef {import('../types/api').SearchQuery} SearchQuery
- * @typedef {import('../types/api').SearchResponse} SearchResponse
- *
- */
+import type { Annotation, SearchQuery, SearchResponse } from '../types/api';
 
 /**
  * Indicates that there are more annotations matching the current API
@@ -13,68 +8,92 @@ import { TinyEmitter } from 'tiny-emitter';
  * (Notebook).
  */
 export class ResultSizeError extends Error {
-  /**
-   * @param {number} limit
-   */
-  constructor(limit) {
+  constructor(limit: number) {
     super(`Results size exceeds ${limit}`);
   }
 }
 
+export type SortBy = 'created' | 'updated';
+
+export type SortOrder = 'asc' | 'desc';
+
 /**
- * @typedef {'created'|'updated'} SortBy
- * @typedef {'asc'|'desc'} SortOrder
- */
-/**
- * Default callback used to get the page size for iterating through annotations.
+ * Default implementation of {@link SearchOptions.getPageSize}.
  *
  * This uses a small number for the first page to reduce the time until some
  * results are displayed and a larger number for remaining pages to lower the
  * total fetch time.
- *
- * @param {number} index
  */
-function defaultPageSize(index) {
+function defaultPageSize(index: number) {
   return index === 0 ? 50 : 200;
 }
 
+export type SearchOptions = {
+  /**
+   * Callback that returns the page size to use when fetching the index'th page
+   * of results.  Callers can vary this to balance the latency of getting some
+   * results against the time taken to fetch all results.
+   *
+   * The returned page size must be at least 1 and no more than the maximum
+   * value of the `limit` query param for the search API.
+   */
+  getPageSize?: (index: number) => number;
+
+  /**
+   * When `true`, request that top-level annotations and replies be returned
+   * separately. NOTE: This has issues with annotations that have large numbers
+   * of replies.
+   */
+  separateReplies?: boolean;
+
+  /** Emit `results` events incrementally as pages of annotations are fetched. */
+  incremental?: boolean;
+
+  /**
+   * Safety valve for protection when loading all annotations in a group in the
+   * NotebookView. If the Notebook is opened while focused on a group that
+   * contains many thousands of annotations, it could cause rendering and
+   * network misery in the browser.  When present, do not load annotations if
+   * the result set size exceeds this value.
+   */
+  maxResults?: number | null;
+
+  /**
+   * Specifies which annotation field to sort results by. Together with
+   * {@link SearchOptions.sortOrder} this controls how the results are ordered.
+   */
+  sortBy?: SortBy;
+
+  sortOrder?: SortOrder;
+};
+
 /**
- * Client for the Hypothesis search API [1]
+ * Client for the Hypothesis annotation search API [1].
  *
- * SearchClient handles paging through results, canceling search etc.
+ * SearchClient does not directly call the `/api/search` endpoint, but uses a
+ * consumer-provided callback for that. What it does handle is generating query
+ * params for the API call, paging through results and emitting events as
+ * results are received.
  *
  * [1] https://h.readthedocs.io/en/latest/api-reference/#tag/annotations/paths/~1search/get
  */
 export class SearchClient extends TinyEmitter {
+  private _canceled: boolean;
+  private _getPageSize: (pageIndex: number) => number;
+  private _incremental: boolean;
+  private _maxResults: number | null;
+  private _resultCount: null | number;
+  private _results: Annotation[];
+  private _searchFn: (query: SearchQuery) => Promise<SearchResponse>;
+  private _separateReplies: boolean;
+  private _sortBy: SortBy;
+  private _sortOrder: SortOrder;
+
   /**
-   * @param {(query: SearchQuery) => Promise<SearchResponse>} searchFn -
-   *   Callback that executes a search request against the Hypothesis API
-   * @param {object} options
-   *   @param {(index: number) => number} [options.getPageSize] -
-   *     Callback that returns the page size to use when fetching the index'th
-   *     page of results.  Callers can vary this to balance the latency of
-   *     getting some results against the time taken to fetch all results.
-   *
-   *     The returned page size must be at least 1 and no more than the maximum
-   *     value of the `limit` query param for the search API.
-   *   @param {boolean} [options.separateReplies] - When `true`, request that
-   *   top-level annotations and replies be returned separately.
-   *   NOTE: This has issues with annotations that have large numbers of
-   *   replies.
-   *   @param {boolean} [options.incremental] - Emit `results` events incrementally
-   *   as pages of annotations are fetched
-   *   @param {number|null} [options.maxResults] - Safety valve for protection when
-   *   loading all annotations in a group in the NotebookView. If the Notebook
-   *   is opened while focused on a group that contains many thousands of
-   *   annotations, it could cause rendering and network misery in the browser.
-   *   When present, do not load annotations if the result set size exceeds
-   *   this value.
-   *   @param {SortBy} [options.sortBy] - Together with `sortOrder`, specifies in
-   *     what order annotations are fetched from the backend.
-   *   @param {SortOrder} [options.sortOrder]
+   * @param searchFn - Callback that executes a search request against the Hypothesis API
    */
   constructor(
-    searchFn,
+    searchFn: (query: SearchQuery) => Promise<SearchResponse>,
     {
       getPageSize = defaultPageSize,
       separateReplies = true,
@@ -82,7 +101,7 @@ export class SearchClient extends TinyEmitter {
       maxResults = null,
       sortBy = 'created',
       sortOrder = 'asc',
-    } = {}
+    }: SearchOptions = {}
   ) {
     super();
     this._searchFn = searchFn;
@@ -94,7 +113,6 @@ export class SearchClient extends TinyEmitter {
     this._sortOrder = sortOrder;
 
     this._canceled = false;
-    /** @type {Annotation[]} */
     this._results = [];
     this._resultCount = null;
   }
@@ -102,16 +120,14 @@ export class SearchClient extends TinyEmitter {
   /**
    * Fetch a page of annotations.
    *
-   * @param {SearchQuery} query - Query params for /api/search call
-   * @param {string} [searchAfter] - Cursor value to use when paginating
+   * @param query - Query params for /api/search call
+   * @param [searchAfter] - Cursor value to use when paginating
    *   through results. Omitted for the first page. See docs for `search_after`
    *   query param for /api/search API.
-   * @param {number} [pageIndex]
    */
-  async _getPage(query, searchAfter, pageIndex = 0) {
+  async _getPage(query: SearchQuery, searchAfter?: string, pageIndex = 0) {
     const pageSize = this._getPageSize(pageIndex);
 
-    /** @type {SearchQuery} */
     const searchQuery = {
       limit: pageSize,
       sort: this._sortBy,
@@ -119,7 +135,7 @@ export class SearchClient extends TinyEmitter {
       _separate_replies: this._separateReplies,
 
       ...query,
-    };
+    } as SearchQuery;
 
     if (searchAfter) {
       searchQuery.search_after = searchAfter;
@@ -195,10 +211,8 @@ export class SearchClient extends TinyEmitter {
    *
    * Emits an 'error' event if the search fails.
    * Emits an 'end' event once the search completes.
-   *
-   * @param {SearchQuery} query
    */
-  get(query) {
+  get(query: SearchQuery) {
     this._results = [];
     this._resultCount = null;
     this._getPage(query);
@@ -206,6 +220,7 @@ export class SearchClient extends TinyEmitter {
 
   /**
    * Cancel the current search and emit the 'end' event.
+   *
    * No further events will be emitted after this.
    */
   cancel() {
