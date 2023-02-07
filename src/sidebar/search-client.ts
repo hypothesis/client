@@ -82,8 +82,16 @@ export class SearchClient extends TinyEmitter {
   private _getPageSize: (pageIndex: number) => number;
   private _incremental: boolean;
   private _maxResults: number | null;
-  private _resultCount: null | number;
+
+  /** Total number of results we expect to receive, from the `total` field. */
+  private _expectedCount: null | number;
+
+  /** Total number of results we have received. */
+  private _fetchedCount: number;
+
+  /** Results received so far, if we are not emitting results incrementally. */
   private _results: Annotation[];
+
   private _searchFn: (query: SearchQuery) => Promise<SearchResponse>;
   private _separateReplies: boolean;
   private _sortBy: SortBy;
@@ -113,8 +121,9 @@ export class SearchClient extends TinyEmitter {
     this._sortOrder = sortOrder;
 
     this._canceled = false;
+    this._expectedCount = null;
+    this._fetchedCount = 0;
     this._results = [];
-    this._resultCount = null;
   }
 
   /**
@@ -147,10 +156,10 @@ export class SearchClient extends TinyEmitter {
         return;
       }
 
-      if (this._resultCount === null) {
+      if (this._expectedCount === null) {
         // Emit the result count (total) on first encountering it
-        this._resultCount = results.total;
-        this.emit('resultCount', this._resultCount);
+        this._expectedCount = results.total;
+        this.emit('resultCount', this._expectedCount);
       }
 
       // For now, abort loading of annotations if `maxResults` is set and the
@@ -176,16 +185,29 @@ export class SearchClient extends TinyEmitter {
       } else {
         this._results = this._results.concat(page);
       }
+      this._fetchedCount += page.length;
 
-      // If the current page was full, there might be additional pages available.
-      const nextPageAvailable = page.length === pageSize;
+      // Check if we're expecting more results. If the `total` value from the
+      // API is "small" it will be exact. If large, it may be a lower bound, in
+      // which case we'll keep fetching until we get no more. Calculating this
+      // is just an optimization to reduce the number of search API calls and
+      // make the loading state disappear sooner.
+      //
+      // See also https://www.elastic.co/guide/en/elasticsearch/reference/7.17/search-your-data.html#track-total-hits.
+      const expectMore =
+        this._fetchedCount < this._expectedCount || this._expectedCount > 1000;
 
-      // Get the cursor for the start of the next page. This is the last
-      // value for whatever field results are sorted by from the current page.
-      const nextSearchAfter =
-        page.length > 0 ? page[page.length - 1][this._sortBy] : null;
+      // Get the cursor for the start of the next page.
+      //
+      // Ideally this would be part of the API response (see
+      // https://github.com/hypothesis/h/issues/7841), but since it isn't yet,
+      // we have to construct this ourselves.
+      let nextSearchAfter = null;
+      if (page.length > 0 && expectMore) {
+        nextSearchAfter = page[page.length - 1][this._sortBy];
+      }
 
-      if (nextPageAvailable && nextSearchAfter) {
+      if (nextSearchAfter) {
         this._getPage(query, nextSearchAfter, pageIndex + 1);
       } else {
         if (!this._incremental) {
@@ -213,8 +235,9 @@ export class SearchClient extends TinyEmitter {
    * Emits an 'end' event once the search completes.
    */
   get(query: SearchQuery) {
+    this._expectedCount = null;
+    this._fetchedCount = 0;
     this._results = [];
-    this._resultCount = null;
     this._getPage(query);
   }
 

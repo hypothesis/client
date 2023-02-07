@@ -14,6 +14,7 @@ const RESULTS = [
   { id: 'two', created: '2020-01-02', updated: '2020-02-03' },
   { id: 'three', created: '2020-01-03', updated: '2020-02-02' },
   { id: 'four', created: '2020-01-04', updated: '2020-02-01' },
+  { id: 'five', created: '2020-01-05', updated: '2020-01-31' },
 ];
 
 /**
@@ -264,12 +265,12 @@ describe('SearchClient', () => {
     {
       sortBy: 'updated',
       sortOrder: 'asc',
-      expectedSearchAfter: [undefined, '2020-02-02', '2020-02-04'],
+      expectedSearchAfter: [undefined, '2020-02-01', '2020-02-03'],
     },
     {
       sortBy: 'created',
       sortOrder: 'desc',
-      expectedSearchAfter: [undefined, '2020-01-03', '2020-01-01'],
+      expectedSearchAfter: [undefined, '2020-01-04', '2020-01-02'],
     },
   ].forEach(({ sortBy, sortOrder, expectedSearchAfter }) => {
     it('sets correct "search_after" query parameter depending on `sortBy` and `sortOrder`', async () => {
@@ -304,5 +305,41 @@ describe('SearchClient', () => {
     assert.deepEqual(limitParams, pageSizes);
     const pageIndexes = getPageSize.getCalls().map(call => call.args[0]);
     assert.deepEqual(pageIndexes, [0, 1, 2]);
+  });
+
+  // See https://github.com/hypothesis/client/issues/5219. Once
+  // https://github.com/hypothesis/h/issues/7841 is completed this test and the
+  // next one will become obsolete.
+  it('fetches remaining pages if a page contains fewer annotations than requested', async () => {
+    // Wrap search function to return fewer results in a page than requested.
+    const fetchPage = args => fakeSearchFn({ ...args, limit: 1 });
+    const client = new SearchClient(fetchPage, {
+      getPageSize: () => 2,
+    });
+    const onResults = sinon.stub();
+    client.on('results', onResults);
+
+    client.get({ uri: 'http://example.com' });
+    await awaitEvent(client, 'end');
+
+    for (let i = 0; i < RESULTS.length; i++) {
+      assert.calledWith(onResults, RESULTS.slice(i, i + 1));
+    }
+  });
+
+  it('continues fetching until result page is empty if expected result count is large', async () => {
+    const fetchPage = sinon.spy(async args => {
+      const result = await fakeSearchFn(args);
+      result.total = 3000;
+      return result;
+    });
+    const client = new SearchClient(fetchPage, {
+      getPageSize: () => RESULTS.length,
+    });
+
+    client.get({ uri: 'http://example.com' });
+    await awaitEvent(client, 'end');
+
+    assert.calledTwice(fetchPage);
   });
 });
