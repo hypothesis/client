@@ -128,14 +128,14 @@ export class SearchClient extends TinyEmitter {
   async _getPage(query: SearchQuery, searchAfter?: string, pageIndex = 0) {
     const pageSize = this._getPageSize(pageIndex);
 
-    const searchQuery = {
+    const searchQuery: SearchQuery = {
       limit: pageSize,
       sort: this._sortBy,
       order: this._sortOrder,
       _separate_replies: this._separateReplies,
 
       ...query,
-    } as SearchQuery;
+    };
 
     if (searchAfter) {
       searchQuery.search_after = searchAfter;
