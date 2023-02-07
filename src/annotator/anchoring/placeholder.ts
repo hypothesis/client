@@ -16,10 +16,10 @@ const placeholderSelector = '.annotator-placeholder';
  * When the viewport is scrolled to the non-rendered page, the placeholder
  * is removed and annotations are re-anchored to the real content.
  *
- * @param {HTMLElement} container - The container element for the page or tile
- *   which is not rendered.
+ * @param container - The container element for the page or tile which is not
+ *   rendered.
  */
-export function createPlaceholder(container) {
+export function createPlaceholder(container: HTMLElement) {
   let placeholder = container.querySelector(placeholderSelector);
   if (placeholder) {
     return placeholder;
@@ -33,19 +33,15 @@ export function createPlaceholder(container) {
 
 /**
  * Return true if a page/tile container has a placeholder.
- *
- * @param {HTMLElement} container
  */
-export function hasPlaceholder(container) {
+export function hasPlaceholder(container: HTMLElement): boolean {
   return container.querySelector(placeholderSelector) !== null;
 }
 
 /**
  * Remove the placeholder element in `container`, if present.
- *
- * @param {HTMLElement} container
  */
-export function removePlaceholder(container) {
+export function removePlaceholder(container: HTMLElement) {
   container.querySelector(placeholderSelector)?.remove();
 }
 
@@ -54,10 +50,8 @@ export function removePlaceholder(container) {
  *
  * This is typically used to test if a highlight element associated with an
  * anchor is inside a placeholder.
- *
- * @param {Node} node
  */
-export function isInPlaceholder(node) {
+export function isInPlaceholder(node: Node): boolean {
   if (!node.parentElement) {
     return false;
   }
