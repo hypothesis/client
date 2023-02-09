@@ -1,10 +1,8 @@
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../../types/config';
-
-import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
-
+import { withServices } from '../../service-context';
 import Excerpt from '../Excerpt';
 import StyledText from '../StyledText';
 

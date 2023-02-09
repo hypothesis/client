@@ -2,19 +2,16 @@
  * State management for the set of annotations currently loaded into the
  * sidebar.
  */
-
 import type { Dispatch } from 'redux';
 import { createSelector } from 'reselect';
 
 import { hasOwn } from '../../../shared/has-own';
 import type { Annotation, SavedAnnotation } from '../../../types/api';
 import type { HighlightCluster } from '../../../types/shared';
-
 import * as metadata from '../../helpers/annotation-metadata';
 import { isHighlight, isSaved } from '../../helpers/annotation-metadata';
 import { countIf, toTrueMap, trueKeys } from '../../util/collections';
 import { createStoreModule, makeAction } from '../create-store';
-
 import { routeModule } from './route';
 import type { State as RouteState } from './route';
 import { sessionModule } from './session';

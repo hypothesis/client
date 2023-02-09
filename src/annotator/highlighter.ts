@@ -1,8 +1,7 @@
 import classnames from 'classnames';
 
-import type { HighlightCluster } from '../types/shared';
 import { generateHexString } from '../shared/random';
-
+import type { HighlightCluster } from '../types/shared';
 import { isInPlaceholder } from './anchoring/placeholder';
 import { isNodeInRange } from './range-util';
 

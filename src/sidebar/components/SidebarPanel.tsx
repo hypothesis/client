@@ -6,7 +6,6 @@ import scrollIntoView from 'scroll-into-view';
 
 import type { PanelName } from '../../types/sidebar';
 import { useSidebarStore } from '../store';
-
 import Slider from './Slider';
 
 export type SidebarPanelProps = {

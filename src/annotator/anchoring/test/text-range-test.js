@@ -1,6 +1,5 @@
-import { TextPosition, TextRange, ResolveDirection } from '../text-range';
-
 import { assertNodesEqual, textNodes } from '../../../test-util/compare-dom';
+import { TextPosition, TextRange, ResolveDirection } from '../text-range';
 
 const html = `
 <main>

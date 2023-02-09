@@ -1,6 +1,6 @@
+import { toBoolean } from '../../shared/type-coercions';
 import { isBrowserExtension } from './is-browser-extension';
 import { settingsFrom } from './settings';
-import { toBoolean } from '../../shared/type-coercions';
 import { urlFromLinkTag } from './url-from-link-tag';
 
 /**

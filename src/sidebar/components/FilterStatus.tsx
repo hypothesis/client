@@ -10,7 +10,6 @@ import { useMemo } from 'preact/hooks';
 
 import { countVisible } from '../helpers/thread';
 import { useSidebarStore } from '../store';
-
 import { useRootThread } from './hooks/use-root-thread';
 
 type FilterStatusMessageProps = {

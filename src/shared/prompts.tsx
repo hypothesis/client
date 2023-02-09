@@ -1,7 +1,6 @@
+import { Button, Modal } from '@hypothesis/frontend-shared/lib/next';
 import { render } from 'preact';
 import type { ComponentChildren } from 'preact';
-
-import { Button, Modal } from '@hypothesis/frontend-shared/lib/next';
 
 export type ConfirmModalProps = {
   title?: string;

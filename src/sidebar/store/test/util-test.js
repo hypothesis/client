@@ -1,5 +1,4 @@
 import { fakeReduxStore } from '../../test/fake-redux-store';
-
 import { actionTypes, awaitStateChange } from '../util';
 
 describe('sidebar/store/util', () => {

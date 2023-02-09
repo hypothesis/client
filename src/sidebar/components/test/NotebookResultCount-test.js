@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
-
 import NotebookResultCount, { $imports } from '../NotebookResultCount';
 
 describe('NotebookResultCount', () => {

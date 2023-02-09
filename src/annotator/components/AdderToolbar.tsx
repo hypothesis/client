@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import {
   AnnotateIcon,
   ButtonBase,
@@ -7,6 +6,7 @@ import {
   PointerUpIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import classnames from 'classnames';
 
 import { useShortcut } from '../../shared/shortcut';
 

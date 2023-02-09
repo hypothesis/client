@@ -1,4 +1,5 @@
 import EventEmitter from 'tiny-emitter';
+
 import { RouterService } from '../router';
 
 const fixtures = [

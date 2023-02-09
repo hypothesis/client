@@ -1,7 +1,7 @@
 import { mount } from 'enzyme';
 
-import { waitFor } from '../../../test-util/wait';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import { waitFor } from '../../../test-util/wait';
 import AnnotationView, { $imports } from '../AnnotationView';
 
 describe('AnnotationView', () => {

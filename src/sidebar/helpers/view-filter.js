@@ -2,9 +2,8 @@
  * @typedef {import('../../types/api').Annotation} Annotation
  * @typedef {import('../util/search-filter').Facet} Facet
  */
-
-import { quote } from './annotation-metadata';
 import * as unicodeUtils from '../util/unicode';
+import { quote } from './annotation-metadata';
 
 /**
  * @typedef Filter

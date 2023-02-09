@@ -9,10 +9,6 @@ import {
   isMessage,
   isMessageEqual,
 } from '../../shared/messaging';
-import { isReply, isPublic } from '../helpers/annotation-metadata';
-import { annotationMatchesSegment } from '../helpers/annotation-segment';
-import { watch } from '../util/watch';
-
 import type { Message } from '../../shared/messaging';
 import type { AnnotationData, DocumentInfo } from '../../types/annotator';
 import type { Annotation } from '../../types/api';
@@ -22,8 +18,11 @@ import type {
   SidebarToGuestEvent,
   GuestToSidebarEvent,
 } from '../../types/port-rpc-events';
+import { isReply, isPublic } from '../helpers/annotation-metadata';
+import { annotationMatchesSegment } from '../helpers/annotation-segment';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
+import { watch } from '../util/watch';
 import type { AnnotationsService } from './annotations';
 
 /**

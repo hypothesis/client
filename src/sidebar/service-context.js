@@ -11,7 +11,6 @@
 /**
  * @typedef {import("redux").Store} Store
  */
-
 import { createContext } from 'preact';
 import { useContext } from 'preact/hooks';
 

@@ -4,15 +4,12 @@
 // The same boot script is used for both entry points so that the browser
 // already has it cached when it encounters the reference in the sidebar
 // application.
-
-import { parseJsonConfig } from './parse-json-config';
-
-import { bootHypothesisClient, bootSidebarApp } from './boot';
-import { processUrlTemplate } from './url-template';
-import { isBrowserSupported } from './browser-check';
-
 // @ts-ignore - This file is generated before the boot bundle is built.
 import manifest from '../../build/manifest.json';
+import { bootHypothesisClient, bootSidebarApp } from './boot';
+import { isBrowserSupported } from './browser-check';
+import { parseJsonConfig } from './parse-json-config';
+import { processUrlTemplate } from './url-template';
 
 /**
  * @typedef {import('./boot').AnnotatorConfig} AnnotatorConfig

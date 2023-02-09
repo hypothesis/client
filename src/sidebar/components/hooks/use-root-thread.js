@@ -1,7 +1,7 @@
 import { useMemo } from 'preact/hooks';
 
-import { useSidebarStore } from '../../store';
 import { threadAnnotations } from '../../helpers/thread-annotations';
+import { useSidebarStore } from '../../store';
 
 /** @typedef {import('../../helpers/build-thread').Thread} Thread */
 

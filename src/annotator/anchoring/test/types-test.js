@@ -1,11 +1,10 @@
+import { TextRange } from '../text-range';
 import {
   RangeAnchor,
   TextPositionAnchor,
   TextQuoteAnchor,
   $imports,
 } from '../types';
-
-import { TextRange } from '../text-range';
 
 // These are primarily basic API tests for the anchoring classes. Tests for
 // anchoring a variety of HTML and PDF content exist in `html-test` and

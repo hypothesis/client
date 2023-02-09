@@ -1,10 +1,9 @@
 import EventEmitter from 'tiny-emitter';
 
 import { Injector } from '../../../shared/injector';
+import { delay } from '../../../test-util/wait';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import { fakeReduxStore } from '../../test/fake-redux-store';
-import { delay } from '../../../test-util/wait';
-
 import { FrameSyncService, $imports, formatAnnot } from '../frame-sync';
 
 class FakeWindow extends EventTarget {

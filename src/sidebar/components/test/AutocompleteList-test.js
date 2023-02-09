@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import AutocompleteList, { $imports } from '../AutocompleteList';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import AutocompleteList, { $imports } from '../AutocompleteList';
 
 describe('AutocompleteList', () => {
   let fakeList;

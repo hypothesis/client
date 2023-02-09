@@ -12,14 +12,12 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { isIOS } from '../../../shared/user-agent';
 import type { Annotation } from '../../../types/api';
-
 import { isShareableURI } from '../../helpers/annotation-sharing';
 import { isPrivate } from '../../helpers/permissions';
 import { withServices } from '../../service-context';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import { copyText } from '../../util/copy-to-clipboard';
-
 import MenuArrow from '../MenuArrow';
 import ShareLinks from '../ShareLinks';
 

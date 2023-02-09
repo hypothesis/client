@@ -1,5 +1,4 @@
 /* global process */
-
 import * as redux from 'redux';
 import thunk from 'redux-thunk';
 

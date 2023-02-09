@@ -3,7 +3,6 @@ import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
 import type { Annotation as IAnnotation } from '../../../types/api';
-import { useSidebarStore } from '../../store';
 import {
   annotationRole,
   isOrphan,
@@ -11,9 +10,9 @@ import {
   quote,
 } from '../../helpers/annotation-metadata';
 import { annotationDisplayName } from '../../helpers/annotation-user';
-import type { AnnotationsService } from '../../services/annotations';
 import { withServices } from '../../service-context';
-
+import type { AnnotationsService } from '../../services/annotations';
+import { useSidebarStore } from '../../store';
 import AnnotationActionBar from './AnnotationActionBar';
 import AnnotationBody from './AnnotationBody';
 import AnnotationEditor from './AnnotationEditor';

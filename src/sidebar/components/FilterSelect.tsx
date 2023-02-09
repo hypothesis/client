@@ -1,8 +1,7 @@
-import classnames from 'classnames';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import classnames from 'classnames';
 
 import type { FilterOption } from '../store/modules/filters';
-
 import Menu from './Menu';
 import MenuItem from './MenuItem';
 

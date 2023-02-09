@@ -6,10 +6,8 @@ import type { FrameSyncService } from '../services/frame-sync';
 import type { LoadAnnotationsService } from '../services/load-annotations';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
-
-import { useRootThread } from './hooks/use-root-thread';
-
 import FilterStatus from './FilterStatus';
+import { useRootThread } from './hooks/use-root-thread';
 import LoggedOutMessage from './LoggedOutMessage';
 import LoginPromptPanel from './LoginPromptPanel';
 import SelectionTabs from './SelectionTabs';

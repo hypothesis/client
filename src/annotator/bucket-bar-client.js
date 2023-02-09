@@ -1,5 +1,4 @@
 import { ListenerCollection } from '../shared/listener-collection';
-
 import { computeAnchorPositions } from './util/buckets';
 
 /**

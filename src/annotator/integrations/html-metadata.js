@@ -16,7 +16,6 @@
  *
  * @typedef {import('../../types/annotator').DocumentMetadata} Metadata
  */
-
 import { normalizeURI } from '../util/url';
 
 /**

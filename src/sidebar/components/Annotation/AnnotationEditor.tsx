@@ -2,22 +2,20 @@ import { useCallback, useState } from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
-import { withServices } from '../../service-context';
 import {
   annotationRole,
   isReply,
   isSaved,
 } from '../../helpers/annotation-metadata';
 import { applyTheme } from '../../helpers/theme';
+import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
 import type { TagsService } from '../../services/tags';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import type { Draft } from '../../store/modules/drafts';
-
 import MarkdownEditor from '../MarkdownEditor';
 import TagEditor from '../TagEditor';
-
 import AnnotationLicense from './AnnotationLicense';
 import AnnotationPublishControl from './AnnotationPublishControl';
 

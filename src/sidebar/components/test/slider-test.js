@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 
-import Slider from '../Slider';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
+import Slider from '../Slider';
 
 describe('Slider', () => {
   let container;

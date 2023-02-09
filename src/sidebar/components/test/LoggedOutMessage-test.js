@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import LoggedOutMessage, { $imports } from '../LoggedOutMessage';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import LoggedOutMessage, { $imports } from '../LoggedOutMessage';
 
 describe('LoggedOutMessage', () => {
   let fakeStore;

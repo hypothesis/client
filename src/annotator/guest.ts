@@ -4,27 +4,6 @@ import { ListenerCollection } from '../shared/listener-collection';
 import { PortFinder, PortRPC } from '../shared/messaging';
 import { generateHexString } from '../shared/random';
 import { matchShortcut } from '../shared/shortcut';
-
-import { Adder } from './adder';
-import { TextRange } from './anchoring/text-range';
-import { BucketBarClient } from './bucket-bar-client';
-import { HighlightClusterController } from './highlight-clusters';
-import { FeatureFlags } from './features';
-import {
-  getHighlightsContainingNode,
-  highlightRange,
-  removeAllHighlights,
-  removeHighlights,
-  setHighlightsFocused,
-  setHighlightsVisible,
-} from './highlighter';
-import { createIntegration } from './integrations';
-import * as rangeUtil from './range-util';
-import { SelectionObserver, selectedRange } from './selection-observer';
-import { findClosestOffscreenAnchor } from './util/buckets';
-import { frameFillsAncestor } from './util/frame';
-import { normalizeURI } from './util/url';
-
 import type {
   AnnotationData,
   Annotator,
@@ -42,6 +21,25 @@ import type {
   GuestToSidebarEvent,
   SidebarToGuestEvent,
 } from '../types/port-rpc-events';
+import { Adder } from './adder';
+import { TextRange } from './anchoring/text-range';
+import { BucketBarClient } from './bucket-bar-client';
+import { FeatureFlags } from './features';
+import { HighlightClusterController } from './highlight-clusters';
+import {
+  getHighlightsContainingNode,
+  highlightRange,
+  removeAllHighlights,
+  removeHighlights,
+  setHighlightsFocused,
+  setHighlightsVisible,
+} from './highlighter';
+import { createIntegration } from './integrations';
+import * as rangeUtil from './range-util';
+import { SelectionObserver, selectedRange } from './selection-observer';
+import { findClosestOffscreenAnchor } from './util/buckets';
+import { frameFillsAncestor } from './util/frame';
+import { normalizeURI } from './util/url';
 
 /** HTML element created by the highlighter with an associated annotation. */
 type AnnotationHighlight = HTMLElement & { _annotation?: AnnotationData };

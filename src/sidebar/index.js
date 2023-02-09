@@ -1,11 +1,41 @@
-import { parseJsonConfig } from '../boot/parse-json-config';
+// Load polyfill for :focus-visible pseudo-class.
+import 'focus-visible';
+// The entry point component for the app.
+import { render } from 'preact';
+// Enable debugging checks for Preact. Removed in prod builds by Rollup config.
+import 'preact/debug';
 
-import { checkEnvironment } from './config/check-env';
+import { parseJsonConfig } from '../boot/parse-json-config';
+import { Injector } from '../shared/injector';
+import HypothesisApp from './components/HypothesisApp';
+import LaunchErrorPanel from './components/LaunchErrorPanel';
 import { buildSettings } from './config/build-settings';
+import { checkEnvironment } from './config/check-env';
 import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
 } from './cross-origin-rpc.js';
+import { ServiceContext } from './service-context';
+import { AnnotationActivityService } from './services/annotation-activity';
+import { AnnotationsService } from './services/annotations';
+import { APIService } from './services/api';
+import { APIRoutesService } from './services/api-routes';
+import { AuthService } from './services/auth';
+import { AutosaveService } from './services/autosave';
+import { FrameSyncService } from './services/frame-sync';
+import { GroupsService } from './services/groups';
+import { LoadAnnotationsService } from './services/load-annotations';
+import { LocalStorageService } from './services/local-storage';
+import { PersistedDefaultsService } from './services/persisted-defaults';
+import { RouterService } from './services/router';
+import { ServiceURLService } from './services/service-url';
+import { SessionService } from './services/session';
+import { StreamFilter } from './services/stream-filter';
+import { StreamerService } from './services/streamer';
+import { TagsService } from './services/tags';
+import { ThreadsService } from './services/threads';
+import { ToastMessengerService } from './services/toast-messenger';
+import { createSidebarStore } from './store';
 import { disableOpenerForExternalLinks } from './util/disable-opener-for-external-links';
 import * as sentry from './util/sentry';
 
@@ -29,12 +59,6 @@ if (configFromSidebar.sentry && envOk) {
 
 // Prevent tab-jacking.
 disableOpenerForExternalLinks(document.body);
-
-// Load polyfill for :focus-visible pseudo-class.
-import 'focus-visible';
-
-// Enable debugging checks for Preact. Removed in prod builds by Rollup config.
-import 'preact/debug';
 
 /**
  * @param {import('./services/api').APIService} api
@@ -87,39 +111,6 @@ function setupFrameSync(frameSync, store) {
     frameSync.connect();
   }
 }
-
-// The entry point component for the app.
-import { render } from 'preact';
-import HypothesisApp from './components/HypothesisApp';
-import LaunchErrorPanel from './components/LaunchErrorPanel';
-import { ServiceContext } from './service-context';
-
-// Services.
-import { AnnotationsService } from './services/annotations';
-import { AnnotationActivityService } from './services/annotation-activity';
-import { APIService } from './services/api';
-import { APIRoutesService } from './services/api-routes';
-import { AuthService } from './services/auth';
-import { AutosaveService } from './services/autosave';
-import { FrameSyncService } from './services/frame-sync';
-import { GroupsService } from './services/groups';
-import { LoadAnnotationsService } from './services/load-annotations';
-import { LocalStorageService } from './services/local-storage';
-import { PersistedDefaultsService } from './services/persisted-defaults';
-import { RouterService } from './services/router';
-import { ServiceURLService } from './services/service-url';
-import { SessionService } from './services/session';
-import { StreamFilter } from './services/stream-filter';
-import { StreamerService } from './services/streamer';
-import { TagsService } from './services/tags';
-import { ThreadsService } from './services/threads';
-import { ToastMessengerService } from './services/toast-messenger';
-
-// Redux store.
-import { createSidebarStore } from './store';
-
-// Utilities.
-import { Injector } from '../shared/injector';
 
 /**
  * Launch the client application corresponding to the current URL.

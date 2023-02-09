@@ -1,10 +1,10 @@
+import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import {
   ButtonBase,
   ArrowLeftIcon,
   ArrowRightIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import type { PresentationalProps } from '@hypothesis/frontend-shared/lib/types';
-import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import classnames from 'classnames';
 import type { JSX } from 'preact';
 

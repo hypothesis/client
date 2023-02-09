@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef } from 'preact/hooks';
 
 import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
-
 import StyledText from './StyledText';
 
 /**

@@ -1,10 +1,9 @@
 import { render } from 'preact';
 
-import AdderToolbar from './components/AdderToolbar';
-import type { Command } from './components/AdderToolbar';
 import { isTouchDevice } from '../shared/user-agent';
 import type { Destroyable } from '../types/annotator';
-
+import AdderToolbar from './components/AdderToolbar';
+import type { Command } from './components/AdderToolbar';
 import { createShadowRoot } from './util/shadow-root';
 
 export enum ArrowDirection {

@@ -1,11 +1,9 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
 import { mount } from 'enzyme';
 
-import FilterSelect, { $imports } from '../FilterSelect';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
-
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import FilterSelect, { $imports } from '../FilterSelect';
 
 describe('FilterSelect', () => {
   let someOptions;

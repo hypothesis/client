@@ -1,5 +1,7 @@
 import shallowEqual from 'shallowequal';
 
+// @ts-ignore - TS doesn't know about SVG files.
+import { default as logo } from '../../images/icons/logo.svg';
 import { serviceConfig } from '../config/service-config';
 import { isReply } from '../helpers/annotation-metadata';
 import { combineGroups } from '../helpers/groups';
@@ -9,9 +11,6 @@ import { watch } from '../util/watch';
 /** @typedef {import('../../types/api').Group} Group */
 
 const DEFAULT_ORG_ID = '__default__';
-
-// @ts-ignore - TS doesn't know about SVG files.
-import { default as logo } from '../../images/icons/logo.svg';
 
 const DEFAULT_ORGANIZATION = {
   id: DEFAULT_ORG_ID,

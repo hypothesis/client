@@ -7,12 +7,11 @@ import {
 import classnames from 'classnames';
 import { useCallback, useMemo } from 'preact/hooks';
 
-import { useSidebarStore } from '../store';
-import { withServices } from '../service-context';
-import { countHidden, countVisible } from '../helpers/thread';
 import type { Thread as IThread } from '../helpers/build-thread';
+import { countHidden, countVisible } from '../helpers/thread';
+import { withServices } from '../service-context';
 import type { ThreadsService } from '../services/threads';
-
+import { useSidebarStore } from '../store';
 import Annotation from './Annotation';
 import AnnotationHeader from './Annotation/AnnotationHeader';
 import EmptyAnnotation from './Annotation/EmptyAnnotation';

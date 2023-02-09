@@ -1,5 +1,5 @@
-import { act } from 'preact/test-utils';
 import { mount } from 'enzyme';
+import { act } from 'preact/test-utils';
 
 import { Adder, ArrowDirection, $imports } from '../adder';
 

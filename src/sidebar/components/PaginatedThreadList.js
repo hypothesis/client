@@ -1,7 +1,6 @@
 import { useMemo } from 'preact/hooks';
 
 import { countVisible } from '../helpers/thread';
-
 import PaginationNavigation from './PaginationNavigation';
 import ThreadList from './ThreadList';
 

@@ -1,4 +1,3 @@
-import classnames from 'classnames';
 import {
   Card,
   Link,
@@ -6,11 +5,12 @@ import {
   CautionIcon,
   CheckIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import classnames from 'classnames';
 
+import { withServices } from '../service-context';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import type { ToastMessage } from '../store/modules/toast-messages';
-import { withServices } from '../service-context';
 
 type ToastMessageItemProps = {
   message: ToastMessage;

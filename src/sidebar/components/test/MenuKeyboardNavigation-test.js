@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import MenuKeyboardNavigation, { $imports } from '../MenuKeyboardNavigation';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import MenuKeyboardNavigation, { $imports } from '../MenuKeyboardNavigation';
 
 describe('MenuKeyboardNavigation', () => {
   let fakeCloseMenu;

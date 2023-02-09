@@ -1,5 +1,4 @@
 // Functions that determine which tab an annotation should be displayed in.
-
 import * as metadata from '../helpers/annotation-metadata';
 
 /**

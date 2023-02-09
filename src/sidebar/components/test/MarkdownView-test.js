@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 
-import MarkdownView, { $imports } from '../MarkdownView';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
+import MarkdownView, { $imports } from '../MarkdownView';
 
 describe('MarkdownView', () => {
   let fakeRenderMathAndMarkdown;

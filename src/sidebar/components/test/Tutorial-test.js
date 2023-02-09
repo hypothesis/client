@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import Tutorial, { $imports } from '../Tutorial';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import Tutorial, { $imports } from '../Tutorial';
 
 describe('Tutorial', () => {
   let fakeIsThirdPartyService;

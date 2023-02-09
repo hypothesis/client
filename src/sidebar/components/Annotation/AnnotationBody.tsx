@@ -8,13 +8,11 @@ import { useMemo, useState } from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
-
-import { useSidebarStore } from '../../store';
 import { isThirdPartyUser } from '../../helpers/account-id';
 import { isHidden } from '../../helpers/annotation-metadata';
-import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
-
+import { withServices } from '../../service-context';
+import { useSidebarStore } from '../../store';
 import Excerpt from '../Excerpt';
 import MarkdownView from '../MarkdownView';
 import TagList from '../TagList';

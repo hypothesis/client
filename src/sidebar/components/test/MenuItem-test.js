@@ -2,10 +2,9 @@ import { EditIcon } from '@hypothesis/frontend-shared/lib/next';
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import MenuItem, { $imports } from '../MenuItem';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import MenuItem, { $imports } from '../MenuItem';
 
 describe('MenuItem', () => {
   let containers = [];

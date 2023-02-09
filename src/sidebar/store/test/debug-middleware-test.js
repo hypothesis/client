@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-
 import * as redux from 'redux';
 
 import { debugMiddleware } from '../debug-middleware';

@@ -1,7 +1,6 @@
 import fetchMock from 'fetch-mock';
 
 import { APIService } from '../api';
-
 // API route directory.
 //
 // This should mirror https://hypothes.is/api/. The domain name has been changed
@@ -12,6 +11,7 @@ import { APIService } from '../api';
 // `curl https://hypothes.is/api/ | sed 's/hypothes.is/example.com/g' | jq . > api-index.json`
 //
 import apiIndex from './api-index.json';
+
 const routes = apiIndex.links;
 
 describe('APIService', () => {

@@ -1,5 +1,4 @@
 import * as html from '../html';
-
 import fixture from './html-anchoring-fixture.html';
 import { htmlBaselines } from './html-baselines';
 

@@ -7,14 +7,12 @@ import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import { useSidebarStore } from '../store';
-
 import AnnotationView from './AnnotationView';
-import SidebarView from './SidebarView';
-import StreamView from './StreamView';
-
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
 import ShareAnnotationsPanel from './ShareAnnotationsPanel';
+import SidebarView from './SidebarView';
+import StreamView from './StreamView';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
 

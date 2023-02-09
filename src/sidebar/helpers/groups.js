@@ -3,7 +3,6 @@
  * @typedef {import('../../types/api').Group} Group
  * @typedef {import('../../types/api').GroupIdentifier} GroupIdentifier
  */
-
 import escapeStringRegexp from 'escape-string-regexp';
 
 import { serviceConfig } from '../config/service-config';

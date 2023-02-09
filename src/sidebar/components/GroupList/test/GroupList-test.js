@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import GroupList, { $imports } from '../GroupList';
-
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
+import GroupList, { $imports } from '../GroupList';
 
 describe('GroupList', () => {
   let fakeServiceConfig;

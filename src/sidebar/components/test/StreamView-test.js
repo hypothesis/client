@@ -2,7 +2,6 @@ import { mount } from 'enzyme';
 
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import { waitFor } from '../../../test-util/wait';
-
 import StreamView, { $imports } from '../StreamView';
 
 describe('StreamView', () => {

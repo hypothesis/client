@@ -2,7 +2,6 @@ import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
-
 import AnnotationTimestamps, { $imports } from '../AnnotationTimestamps';
 
 describe('AnnotationTimestamps', () => {

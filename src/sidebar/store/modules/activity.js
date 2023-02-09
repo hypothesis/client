@@ -2,7 +2,6 @@
  * Store module which tracks activity happening in the application that may
  * need to be reflected in the UI.
  */
-
 import { createStoreModule, makeAction } from '../create-store';
 
 /** @typedef {import('../../../types/api').Annotation} Annotation */

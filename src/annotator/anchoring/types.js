@@ -7,7 +7,6 @@
  *  2. Insulating the rest of the code from API changes in the underlying anchoring
  *     libraries.
  */
-
 import { matchQuote } from './match-quote';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';

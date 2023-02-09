@@ -1,6 +1,6 @@
+import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 import { getApiUrl } from './get-api-url';
 import { hostPageConfig } from './host-config';
-import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 
 /**
  * @typedef {import('../../types/config').ConfigFromHost} ConfigFromHost

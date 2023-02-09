@@ -4,7 +4,6 @@ import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortRPC } from '../shared/messaging';
-
 import { annotationCounts } from './annotation-counts';
 import { BucketBar } from './bucket-bar';
 import { createAppConfig } from './config/app';

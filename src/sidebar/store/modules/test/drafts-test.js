@@ -1,9 +1,9 @@
+import { immutable } from '../../../util/immutable';
 import { createStore } from '../../create-store';
 import { annotationsModule } from '../annotations';
 import { draftsModule } from '../drafts';
 import { Draft } from '../drafts';
 import { selectionModule } from '../selection';
-import { immutable } from '../../../util/immutable';
 
 const fixtures = immutable({
   draftWithText: {

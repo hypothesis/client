@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import StreamSearchInput, { $imports } from '../StreamSearchInput';
-
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import StreamSearchInput, { $imports } from '../StreamSearchInput';
 
 describe('StreamSearchInput', () => {
   let fakeRouter;

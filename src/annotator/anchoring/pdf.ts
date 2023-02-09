@@ -1,18 +1,16 @@
 /* global PDFViewerApplication */
-
 import { warnOnce } from '../../shared/warn-once';
-import { translateOffsets } from '../util/normalize';
-import { matchQuote } from './match-quote';
-import { createPlaceholder } from './placeholder';
-import { TextPosition, TextRange } from './text-range';
-import { TextQuoteAnchor } from './types';
-
 import type {
   TextPositionSelector,
   TextQuoteSelector,
   Selector,
 } from '../../types/api';
 import type { PDFPageView, PDFViewer } from '../../types/pdfjs';
+import { translateOffsets } from '../util/normalize';
+import { matchQuote } from './match-quote';
+import { createPlaceholder } from './placeholder';
+import { TextPosition, TextRange } from './text-range';
+import { TextQuoteAnchor } from './types';
 
 type PDFTextRange = {
   pageIndex: number;

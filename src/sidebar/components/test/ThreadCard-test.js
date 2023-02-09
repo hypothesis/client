@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import ThreadCard, { $imports } from '../ThreadCard';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import ThreadCard, { $imports } from '../ThreadCard';
 
 describe('ThreadCard', () => {
   let container;

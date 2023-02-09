@@ -24,6 +24,7 @@
     "@rollup/plugin-virtual": "^3.0.0",
     "@sentry/browser": "^7.1.1",
     "@sentry/cli": "^2.0.2",
+    "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@types/dompurify": "^2.3.3",
     "@types/escape-html": "^1.0.1",
     "@types/hammerjs": "^2.0.41",
@@ -102,7 +103,10 @@
   "browserslist": "chrome 70, firefox 70, safari 11.1",
   "prettier": {
     "arrowParens": "avoid",
-    "singleQuote": true
+    "singleQuote": true,
+    "importOrder": ["^[./]"],
+    "importOrderSeparation": true,
+    "importOrderCaseInsensitive": true
   },
   "main": "./build/boot.js",
   "scripts": {

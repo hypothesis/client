@@ -4,7 +4,6 @@ import { useRef, useState } from 'preact/hooks';
 
 import { withServices } from '../service-context';
 import type { TagsService } from '../services/tags';
-
 import AutocompleteList from './AutocompleteList';
 import TagList from './TagList';
 import TagListItem from './TagListItem';

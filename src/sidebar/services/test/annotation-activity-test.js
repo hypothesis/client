@@ -1,5 +1,4 @@
 import * as fixtures from '../../test/annotation-fixtures';
-
 import { AnnotationActivityService, $imports } from '../annotation-activity';
 
 describe('AnnotationActivityService', () => {

@@ -7,9 +7,6 @@ import { useMemo } from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
-
-import { withServices } from '../../service-context';
-import { useSidebarStore } from '../../store';
 import {
   domainAndTitle,
   isHighlight,
@@ -21,7 +18,8 @@ import {
   annotationDisplayName,
 } from '../../helpers/annotation-user';
 import { isPrivate } from '../../helpers/permissions';
-
+import { withServices } from '../../service-context';
+import { useSidebarStore } from '../../store';
 import AnnotationDocumentInfo from './AnnotationDocumentInfo';
 import AnnotationShareInfo from './AnnotationShareInfo';
 import AnnotationTimestamps from './AnnotationTimestamps';

@@ -1,5 +1,4 @@
 import { warnOnce } from '../shared/warn-once';
-
 import { normalizeGroupIds } from './helpers/groups';
 
 /**

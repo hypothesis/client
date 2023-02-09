@@ -1,5 +1,4 @@
 /* global process */
-
 import { createStore, createStoreModule } from '../create-store';
 
 function initialState(value = 0) {

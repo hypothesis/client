@@ -2,8 +2,8 @@ import { options as preactOptions, render } from 'preact';
 import { useRef } from 'preact/hooks';
 import { act } from 'preact/test-utils';
 
-import { useArrowKeyNavigation } from '../keyboard-navigation';
 import { waitFor } from '../../test-util/wait';
+import { useArrowKeyNavigation } from '../keyboard-navigation';
 
 function Toolbar({ navigationOptions = {} }) {
   const containerRef = useRef();

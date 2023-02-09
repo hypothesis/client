@@ -20,10 +20,8 @@
 //  3. Fetch the annotations for the web page via the Hypothesis API and save
 //     them as `<fixture name>.json` in this directory
 //  4. Add an entry to the fixture list below.
-
 import minimalDoc from './minimal.html';
 import minimalJSON from './minimal.json';
-
 import wikipediaDoc from './wikipedia-regression-testing.html';
 import wikipediaJSON from './wikipedia-regression-testing.json';
 

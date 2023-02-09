@@ -5,7 +5,6 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
-
 import SidebarPanel from './SidebarPanel';
 
 export type LoginPromptPanelProps = {

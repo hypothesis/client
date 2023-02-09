@@ -1,7 +1,6 @@
 /**
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
-
 import { serviceConfig } from '../config/service-config';
 
 /**
