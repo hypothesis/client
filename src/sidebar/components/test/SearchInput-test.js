@@ -1,10 +1,9 @@
 import { mount } from 'enzyme';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import SearchInput from '../SearchInput';
 import { $imports } from '../SearchInput';
-
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
-import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('SearchInput', () => {
   let fakeIsMacOS;

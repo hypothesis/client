@@ -1,4 +1,5 @@
 import { mount } from 'enzyme';
+
 import {
   highlightStyles,
   defaultClusterStyles,

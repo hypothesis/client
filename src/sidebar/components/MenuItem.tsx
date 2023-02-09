@@ -1,9 +1,9 @@
-import classnames from 'classnames';
-import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import {
   CaretUpIcon,
   MenuExpandIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
+import classnames from 'classnames';
 import type { ComponentChildren, Ref } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 

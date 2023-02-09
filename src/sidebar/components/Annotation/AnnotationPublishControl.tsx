@@ -10,10 +10,8 @@ import classnames from 'classnames';
 
 import type { Group } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
-
-import { withServices } from '../../service-context';
 import { applyTheme } from '../../helpers/theme';
-
+import { withServices } from '../../service-context';
 import Menu from '../Menu';
 import MenuItem from '../MenuItem';
 

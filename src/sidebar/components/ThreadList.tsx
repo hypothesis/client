@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'preact/hooks';
 
 import { ListenerCollection } from '../../shared/listener-collection';
 import type { Annotation, EPUBContentSelector } from '../../types/api';
@@ -11,7 +11,6 @@ import {
 } from '../helpers/visible-threads';
 import { useSidebarStore } from '../store';
 import { getElementHeightWithMargins } from '../util/dom';
-
 import ThreadCard from './ThreadCard';
 
 // The precision of the `scrollPosition` value in pixels; values will be rounded

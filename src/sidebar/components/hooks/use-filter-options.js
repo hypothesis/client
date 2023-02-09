@@ -1,8 +1,8 @@
 import { useMemo } from 'preact/hooks';
 
-import { useSidebarStore } from '../../store';
 import { username } from '../../helpers/account-id';
 import { annotationDisplayName } from '../../helpers/annotation-user';
+import { useSidebarStore } from '../../store';
 
 /** @typedef {import('../../store/modules/filters').FilterOption} FilterOption */
 

@@ -9,7 +9,6 @@
  * each of the relevant classes in PDF.js. The APIs of the fakes should conform
  * to the corresponding interfaces defined in `src/types/pdfjs.js`.
  */
-
 import { TinyEmitter as EventEmitter } from 'tiny-emitter';
 
 import { RenderingStates } from '../pdf';

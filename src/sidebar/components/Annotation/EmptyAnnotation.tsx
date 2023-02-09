@@ -1,5 +1,5 @@
-import AnnotationReplyToggle from './AnnotationReplyToggle';
 import type { AnnotationProps } from './Annotation';
+import AnnotationReplyToggle from './AnnotationReplyToggle';
 
 type EmptyAnnotationProps = Omit<
   AnnotationProps,

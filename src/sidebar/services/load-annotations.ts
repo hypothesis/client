@@ -1,13 +1,11 @@
 import type { Annotation } from '../../types/api';
-
 import { isReply } from '../helpers/annotation-metadata';
 import { SearchClient } from '../search-client';
 import type { SortBy, SortOrder } from '../search-client';
 import type { SidebarStore } from '../store';
-
 import type { APIService } from './api';
-import type { StreamerService } from './streamer';
 import type { StreamFilter } from './stream-filter';
+import type { StreamerService } from './streamer';
 
 export type LoadAnnotationOptions = {
   groupId: string;

@@ -5,11 +5,9 @@ import type {
   FeatureFlags as IFeatureFlags,
 } from '../types/annotator';
 import type { HighlightCluster } from '../types/shared';
-
 import ClusterToolbar from './components/ClusterToolbar';
-import { createShadowRoot } from './util/shadow-root';
-
 import { updateClusters } from './highlighter';
+import { createShadowRoot } from './util/shadow-root';
 
 export type HighlightStyle = {
   color: string;

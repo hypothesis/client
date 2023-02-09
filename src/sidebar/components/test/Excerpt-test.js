@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import Excerpt, { $imports } from '../Excerpt';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
+import Excerpt, { $imports } from '../Excerpt';
 
 describe('Excerpt', () => {
   const SHORT_DIV = <div id="foo" style={{ height: 5 }} />;

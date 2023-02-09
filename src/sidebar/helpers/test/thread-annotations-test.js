@@ -1,8 +1,7 @@
 import * as annotationFixtures from '../../test/annotation-fixtures';
-
+import { immutable } from '../../util/immutable';
 import { threadAnnotations, $imports } from '../thread-annotations';
 import { sorters } from '../thread-sorters';
-import { immutable } from '../../util/immutable';
 
 const fixtures = immutable({
   emptyThread: {

@@ -1,7 +1,6 @@
-import { hasOwn } from '../../shared/has-own';
 import { parseJsonConfig } from '../../boot/parse-json-config';
+import { hasOwn } from '../../shared/has-own';
 import { toBoolean } from '../../shared/type-coercions';
-
 import { configFuncSettingsFrom } from './config-func-settings-from';
 import { urlFromLinkTag } from './url-from-link-tag';
 

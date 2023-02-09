@@ -1,12 +1,10 @@
 import { TinyEmitter } from 'tiny-emitter';
 
 import type { SidebarSettings } from '../../types/config';
+import { serviceConfig } from '../config/service-config';
 import { OAuthClient } from '../util/oauth-client';
 import type { TokenInfo } from '../util/oauth-client';
 import { resolve } from '../util/url';
-
-import { serviceConfig } from '../config/service-config';
-
 import type { APIRoutesService } from './api-routes';
 import type { LocalStorageService } from './local-storage';
 import type { ToastMessengerService } from './toast-messenger';

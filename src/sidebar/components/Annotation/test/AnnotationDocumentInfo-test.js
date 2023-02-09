@@ -1,7 +1,6 @@
 import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
-
 import AnnotationDocumentInfo from '../AnnotationDocumentInfo';
 
 describe('AnnotationDocumentInfo', () => {

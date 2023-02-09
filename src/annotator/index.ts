@@ -1,6 +1,5 @@
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
-
 // Enable debug checks for Preact. Removed in prod builds by Rollup config.
 import 'preact/debug';
 
@@ -9,8 +8,8 @@ import {
   installPortCloseWorkaroundForSafari,
 } from '../shared/messaging';
 import type { Destroyable } from '../types/annotator';
-import { getConfig } from './config/index';
 import type { NotebookConfig } from './components/NotebookModal';
+import { getConfig } from './config/index';
 import { Guest } from './guest';
 import type { GuestConfig } from './guest';
 import {

@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import TagListItem from '../TagListItem';
-import TagList from '../TagList';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
+import TagList from '../TagList';
+import TagListItem from '../TagListItem';
 
 describe('TagListItem', () => {
   const createComponent = props =>

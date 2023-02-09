@@ -1,10 +1,9 @@
 import { mount } from 'enzyme';
 
-import SidebarContentError from '../SidebarContentError';
-import { $imports } from '../SidebarContentError';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import SidebarContentError from '../SidebarContentError';
+import { $imports } from '../SidebarContentError';
 
 describe('SidebarContentError', () => {
   let fakeStore;

@@ -1,8 +1,7 @@
 import { delay } from '../../../test-util/wait';
-import * as pdfAnchoring from '../pdf';
 import { matchQuote } from '../match-quote';
+import * as pdfAnchoring from '../pdf';
 import { TextRange } from '../text-range';
-
 import { FakePDFViewerApplication } from './fake-pdf-viewer-application';
 
 /**

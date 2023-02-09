@@ -11,10 +11,9 @@ import type { ComponentChildren } from 'preact';
 
 import type { SidebarSettings } from '../../types/config';
 import type { TabName } from '../../types/sidebar';
-
 import { applyTheme } from '../helpers/theme';
-import type { AnnotationsService } from '../services/annotations';
 import { withServices } from '../service-context';
+import type { AnnotationsService } from '../services/annotations';
 import { useSidebarStore } from '../store';
 
 type TabProps = {

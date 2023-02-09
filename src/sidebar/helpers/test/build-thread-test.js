@@ -1,5 +1,5 @@
-import { buildThread } from '../build-thread';
 import * as metadata from '../../helpers/annotation-metadata';
+import { buildThread } from '../build-thread';
 
 // Fixture with two top level annotations, one note and one reply
 const SIMPLE_FIXTURE = [

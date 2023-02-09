@@ -15,11 +15,12 @@ import {
   ListUnorderedIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
-import type { Ref, JSX } from 'preact';
-
 import classnames from 'classnames';
+import type { Ref, JSX } from 'preact';
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 
+import { useArrowKeyNavigation } from '../../shared/keyboard-navigation';
+import { isMacOS } from '../../shared/user-agent';
 import {
   LinkType,
   convertSelectionToLink,
@@ -27,9 +28,6 @@ import {
   toggleSpanStyle,
 } from '../markdown-commands';
 import type { EditorState } from '../markdown-commands';
-import { isMacOS } from '../../shared/user-agent';
-import { useArrowKeyNavigation } from '../../shared/keyboard-navigation';
-
 import MarkdownView from './MarkdownView';
 
 /**

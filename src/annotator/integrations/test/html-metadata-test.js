@@ -9,7 +9,6 @@
  ** Dual licensed under the MIT and GPLv3 licenses.
  ** https://github.com/openannotation/annotator/blob/master/LICENSE
  */
-
 import { HTMLMetadata } from '../html-metadata';
 
 describe('HTMLMetadata', () => {

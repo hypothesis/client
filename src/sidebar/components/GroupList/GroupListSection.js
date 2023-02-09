@@ -1,5 +1,4 @@
 import MenuSection from '../MenuSection';
-
 import GroupListItem from './GroupListItem';
 
 /**

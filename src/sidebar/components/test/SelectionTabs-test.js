@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
-import SelectionTabs, { $imports } from '../SelectionTabs';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import SelectionTabs, { $imports } from '../SelectionTabs';
 
 describe('SelectionTabs', () => {
   // mock services

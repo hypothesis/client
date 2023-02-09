@@ -1,11 +1,10 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import Thread from '../Thread';
-import { $imports } from '../Thread';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import Thread from '../Thread';
+import { $imports } from '../Thread';
 
 // Utility functions to build nested threads
 let lastThreadId = 0;

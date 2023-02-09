@@ -2,7 +2,6 @@
  * @typedef {import("../../types/api").Annotation} Annotation
  * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
  */
-
 import { isThirdPartyUser, username } from './account-id';
 
 /**

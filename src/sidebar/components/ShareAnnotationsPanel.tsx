@@ -7,13 +7,12 @@ import {
   Spinner,
 } from '@hypothesis/frontend-shared/lib/next';
 
-import { useSidebarStore } from '../store';
 import { pageSharingLink } from '../helpers/annotation-sharing';
-import { copyText } from '../util/copy-to-clipboard';
 import { withServices } from '../service-context';
 import type { ToastMessengerService } from '../services/toast-messenger';
+import { useSidebarStore } from '../store';
+import { copyText } from '../util/copy-to-clipboard';
 import { notNull } from '../util/typing';
-
 import ShareLinks from './ShareLinks';
 import SidebarPanel from './SidebarPanel';
 

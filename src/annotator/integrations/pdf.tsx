@@ -2,24 +2,7 @@ import debounce from 'lodash.debounce';
 import { render } from 'preact';
 import { TinyEmitter } from 'tiny-emitter';
 
-import { TextRange } from '../anchoring/text-range';
 import { ListenerCollection } from '../../shared/listener-collection';
-import {
-  RenderingStates,
-  anchor,
-  canDescribe,
-  describe,
-  documentHasText,
-} from '../anchoring/pdf';
-import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
-import Banners from '../components/Banners';
-import ContentInfoBanner from '../components/ContentInfoBanner';
-import WarningBanner from '../components/WarningBanner';
-import { createShadowRoot } from '../util/shadow-root';
-import { offsetRelativeTo, scrollElement } from '../util/scroll';
-
-import { PDFMetadata } from './pdf-metadata';
-
 import type {
   Anchor,
   AnnotationData,
@@ -30,6 +13,21 @@ import type {
 } from '../../types/annotator';
 import type { Selector } from '../../types/api';
 import type { PDFViewer, PDFViewerApplication } from '../../types/pdfjs';
+import {
+  RenderingStates,
+  anchor,
+  canDescribe,
+  describe,
+  documentHasText,
+} from '../anchoring/pdf';
+import { isInPlaceholder, removePlaceholder } from '../anchoring/placeholder';
+import { TextRange } from '../anchoring/text-range';
+import Banners from '../components/Banners';
+import ContentInfoBanner from '../components/ContentInfoBanner';
+import WarningBanner from '../components/WarningBanner';
+import { offsetRelativeTo, scrollElement } from '../util/scroll';
+import { createShadowRoot } from '../util/shadow-root';
+import { PDFMetadata } from './pdf-metadata';
 
 /**
  * Window with additional globals set by PDF.js.

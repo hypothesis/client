@@ -1,12 +1,11 @@
 import { useCallback, useEffect } from 'preact/hooks';
 
-import * as searchFilter from '../util/search-filter';
 import { withServices } from '../service-context';
 import type { APIService } from '../services/api';
 import type { ToastMessengerService } from '../services/toast-messenger';
-import { useRootThread } from './hooks/use-root-thread';
 import { useSidebarStore } from '../store';
-
+import * as searchFilter from '../util/search-filter';
+import { useRootThread } from './hooks/use-root-thread';
 import ThreadList from './ThreadList';
 
 export type StreamViewProps = {

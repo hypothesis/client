@@ -1,7 +1,7 @@
 import { delay } from '../../../test-util/wait';
-import { FakePDFViewerApplication } from '../../anchoring/test/fake-pdf-viewer-application';
 import { RenderingStates } from '../../anchoring/pdf';
 import { createPlaceholder } from '../../anchoring/placeholder';
+import { FakePDFViewerApplication } from '../../anchoring/test/fake-pdf-viewer-application';
 import { PDFIntegration, isPDF, $imports } from '../pdf';
 
 function awaitEvent(target, eventName) {

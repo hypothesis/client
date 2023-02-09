@@ -1,7 +1,6 @@
 import { SortIcon } from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
-
 import Menu from './Menu';
 import MenuItem from './MenuItem';
 

@@ -1,8 +1,6 @@
 import { waitFor } from '../../test-util/wait';
-
-import { HighlightClusterController, $imports } from '../highlight-clusters';
-
 import { FeatureFlags } from '../features';
+import { HighlightClusterController, $imports } from '../highlight-clusters';
 
 describe('HighlightClusterController', () => {
   let fakeFeatures;

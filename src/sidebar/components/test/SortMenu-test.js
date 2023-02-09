@@ -1,9 +1,8 @@
 import { mount } from 'enzyme';
 
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import SortMenu from '../SortMenu';
 import { $imports } from '../SortMenu';
-
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('SortMenu', () => {
   let fakeStore;

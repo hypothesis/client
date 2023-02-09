@@ -1,7 +1,6 @@
+import { waitFor } from '../../../test-util/wait';
 import * as annotationFixtures from '../../test/annotation-fixtures';
 import { fakeReduxStore } from '../../test/fake-redux-store';
-import { waitFor } from '../../../test-util/wait';
-
 import { AutosaveService, $imports } from '../autosave';
 
 describe('AutosaveService', () => {

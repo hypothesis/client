@@ -1,6 +1,5 @@
-import { useSidebarStore } from '../store';
 import { withServices } from '../service-context';
-
+import { useSidebarStore } from '../store';
 import SearchInput from './SearchInput';
 
 /**

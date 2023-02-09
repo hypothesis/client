@@ -7,11 +7,10 @@ import type { ComponentChildren as Children } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 
 import { username } from '../helpers/account-id';
-import { useSidebarStore } from '../store';
-import type { SessionService } from '../services/session';
-import { withServices } from '../service-context';
 import { VersionData } from '../helpers/version-data';
-
+import { withServices } from '../service-context';
+import type { SessionService } from '../services/session';
+import { useSidebarStore } from '../store';
 import SidebarPanel from './SidebarPanel';
 import Tutorial from './Tutorial';
 import VersionInfo from './VersionInfo';

@@ -1,7 +1,7 @@
 import { Spinner } from '@hypothesis/frontend-shared/lib/next';
 
-import { useRootThread } from './hooks/use-root-thread';
 import { countVisible } from '../helpers/thread';
+import { useRootThread } from './hooks/use-root-thread';
 
 export type NotebookResultCountProps = {
   /**

@@ -2,11 +2,10 @@ import { mount } from 'enzyme';
 import { render } from 'preact';
 import { act } from 'preact/test-utils';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import { LinkType } from '../../markdown-commands';
 import MarkdownEditor, { $imports } from '../MarkdownEditor';
-
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
-import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('MarkdownEditor', () => {
   const formatResult = {

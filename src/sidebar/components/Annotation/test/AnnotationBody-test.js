@@ -1,11 +1,9 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import * as fixtures from '../../../test/annotation-fixtures';
-
 import { checkAccessibility } from '../../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
-
+import * as fixtures from '../../../test/annotation-fixtures';
 import AnnotationBody, { $imports } from '../AnnotationBody';
 
 describe('AnnotationBody', () => {

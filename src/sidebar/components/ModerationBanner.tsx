@@ -6,12 +6,11 @@ import {
 import classnames from 'classnames';
 
 import type { Annotation } from '../../types/api';
-
+import * as annotationMetadata from '../helpers/annotation-metadata';
+import { withServices } from '../service-context';
 import type { APIService } from '../services/api';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
-import * as annotationMetadata from '../helpers/annotation-metadata';
-import { withServices } from '../service-context';
 
 export type ModerationBannerProps = {
   annotation: Annotation;

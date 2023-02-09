@@ -1,9 +1,8 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
 
 import { useSidebarStore } from '../store';
-import { useUserFilterOptions } from './hooks/use-filter-options';
-
 import FilterSelect from './FilterSelect';
+import { useUserFilterOptions } from './hooks/use-filter-options';
 
 /**
  * Filters for the Notebook

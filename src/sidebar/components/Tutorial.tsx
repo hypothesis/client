@@ -8,7 +8,6 @@ import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../types/config';
-
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { withServices } from '../service-context';
 

@@ -2,14 +2,13 @@ import { TinyEmitter } from 'tiny-emitter';
 
 import { anchor, describe } from '../anchoring/html';
 import { TextRange } from '../anchoring/text-range';
-
+import { NavigationObserver } from '../util/navigation-observer';
+import { scrollElementIntoView } from '../util/scroll';
 import { HTMLMetadata } from './html-metadata';
 import {
   guessMainContentArea,
   preserveScrollPosition,
 } from './html-side-by-side';
-import { NavigationObserver } from '../util/navigation-observer';
-import { scrollElementIntoView } from '../util/scroll';
 
 /**
  * @typedef {import('../../types/annotator').Anchor} Anchor

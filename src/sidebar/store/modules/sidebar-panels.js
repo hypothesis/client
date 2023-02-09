@@ -11,7 +11,6 @@
 /**
  * @typedef {import("../../../types/sidebar").PanelName} PanelName
  */
-
 import { createStoreModule, makeAction } from '../create-store';
 
 const initialState = {

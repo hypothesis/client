@@ -3,12 +3,10 @@ import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 
 import type { Annotation } from '../../types/api';
-
 import type { Thread as IThread } from '../helpers/build-thread';
+import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
 import { useSidebarStore } from '../store';
-import { withServices } from '../service-context';
-
 import Thread from './Thread';
 
 /**

@@ -1,7 +1,6 @@
 import { createSelector } from 'reselect';
 
 import { createStoreModule, makeAction } from '../create-store';
-
 import { sessionModule } from './session';
 
 /**

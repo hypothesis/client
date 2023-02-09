@@ -1,10 +1,9 @@
 import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
 import { mount } from 'enzyme';
 
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import NotebookFilters from '../NotebookFilters';
 import { $imports } from '../NotebookFilters';
-
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 
 describe('NotebookFilters', () => {
   let fakeStore;

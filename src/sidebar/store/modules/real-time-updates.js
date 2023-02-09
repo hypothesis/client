@@ -9,7 +9,6 @@
  * @typedef {import('./groups').State} GroupsState
  * @typedef {import('./route').State} RouteState
  */
-
 import { createSelector } from 'reselect';
 
 import { hasOwn } from '../../../shared/has-own';

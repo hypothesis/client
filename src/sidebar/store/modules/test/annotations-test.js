@@ -1,5 +1,5 @@
-import * as fixtures from '../../../test/annotation-fixtures';
 import * as metadata from '../../../helpers/annotation-metadata';
+import * as fixtures from '../../../test/annotation-fixtures';
 import { createStore } from '../../create-store';
 import { annotationsModule } from '../annotations';
 import { routeModule } from '../route';

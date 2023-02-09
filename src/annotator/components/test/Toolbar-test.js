@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 
-import Toolbar from '../Toolbar';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
+import Toolbar from '../Toolbar';
 
 const noop = () => {};
 

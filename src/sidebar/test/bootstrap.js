@@ -1,15 +1,15 @@
-// Expose the sinon assertions.
-sinon.assert.expose(assert, { prefix: null });
-
 // Patch extra assert helper methods
-import { patch } from '../../test-util/assert-methods';
-patch(assert);
-
+import { configure } from 'enzyme';
+import { Adapter } from 'enzyme-adapter-preact-pure';
 // Configure Enzyme for UI tests.
 import 'preact/debug';
 
-import { configure } from 'enzyme';
-import { Adapter } from 'enzyme-adapter-preact-pure';
+import { patch } from '../../test-util/assert-methods';
+
+// Expose the sinon assertions.
+sinon.assert.expose(assert, { prefix: null });
+
+patch(assert);
 
 configure({ adapter: new Adapter() });
 

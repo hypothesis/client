@@ -4,7 +4,6 @@ import type {
   TextPositionSelector,
   TextQuoteSelector,
 } from '../../types/api';
-
 import { RangeAnchor, TextPositionAnchor, TextQuoteAnchor } from './types';
 
 type Options = {

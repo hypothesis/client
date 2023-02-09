@@ -1,6 +1,5 @@
 // Tests that the expected parts of the page are highlighted when annotations
 // with various combinations of selector are anchored.
-
 import { Guest, $imports as guestImports } from '../../guest';
 import testPageHTML from './test-page.html';
 

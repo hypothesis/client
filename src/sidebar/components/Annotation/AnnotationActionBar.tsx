@@ -10,7 +10,6 @@ import {
 import { confirm } from '../../../shared/prompts';
 import type { SavedAnnotation } from '../../../types/api';
 import type { SidebarSettings } from '../../../types/config';
-
 import { serviceConfig } from '../../config/service-config';
 import { annotationRole } from '../../helpers/annotation-metadata';
 import {
@@ -22,7 +21,6 @@ import { withServices } from '../../service-context';
 import type { AnnotationsService } from '../../services/annotations';
 import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
-
 import AnnotationShareControl from './AnnotationShareControl';
 
 function flaggingEnabled(settings: SidebarSettings) {

@@ -1,3 +1,4 @@
+import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import {
   ButtonBase,
   AnnotateIcon,
@@ -12,7 +13,6 @@ import type {
   IconComponent,
   PresentationalProps,
 } from '@hypothesis/frontend-shared/lib/types';
-import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import classnames from 'classnames';
 import type { JSX, RefObject } from 'preact';
 

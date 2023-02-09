@@ -1,4 +1,5 @@
 import type { ClientAnnotationData } from './shared';
+
 /**
  * Type definitions for objects returned from the Hypothesis API.
  *

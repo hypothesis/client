@@ -1,9 +1,9 @@
+import * as fixtures from '../../../test/annotation-fixtures';
 import { createStore } from '../../create-store';
 import { annotationsModule } from '../annotations';
 import { filtersModule } from '../filters';
-import { selectionModule } from '../selection';
 import { routeModule } from '../route';
-import * as fixtures from '../../../test/annotation-fixtures';
+import { selectionModule } from '../selection';
 
 describe('sidebar/store/modules/selection', () => {
   let store;

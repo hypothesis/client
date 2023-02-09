@@ -1,16 +1,15 @@
-import classnames from 'classnames';
 import {
   CopyIcon,
   ExternalIcon,
   LeaveIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import classnames from 'classnames';
 
+import { confirm } from '../../../shared/prompts';
 import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
 import { copyText } from '../../util/copy-to-clipboard';
-import { confirm } from '../../../shared/prompts';
-
 import MenuItem from '../MenuItem';
 
 /**

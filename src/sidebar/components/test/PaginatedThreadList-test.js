@@ -1,8 +1,7 @@
 import { mount } from 'enzyme';
 
-import PaginatedThreadList, { $imports } from '../PaginatedThreadList';
-
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import PaginatedThreadList, { $imports } from '../PaginatedThreadList';
 
 describe('PaginatedThreadList', () => {
   // Fake props

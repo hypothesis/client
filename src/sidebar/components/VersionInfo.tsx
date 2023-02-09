@@ -3,9 +3,9 @@ import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 
 import type { VersionData } from '../helpers/version-data';
+import { withServices } from '../service-context';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { copyText } from '../util/copy-to-clipboard';
-import { withServices } from '../service-context';
 
 type VersionInfoItemProps = {
   label: string;

@@ -8,7 +8,6 @@ import {
 import classnames from 'classnames';
 
 import type { SidebarSettings } from '../../types/config';
-
 import { serviceConfig } from '../config/service-config';
 import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { applyTheme } from '../helpers/theme';
@@ -16,7 +15,6 @@ import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
-
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
 import SortMenu from './SortMenu';

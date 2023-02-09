@@ -1,6 +1,6 @@
 import { IconButton, CancelIcon } from '@hypothesis/frontend-shared/lib/next';
-import { useEffect, useRef, useState } from 'preact/hooks';
 import classnames from 'classnames';
+import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { createAppConfig } from '../config/app';

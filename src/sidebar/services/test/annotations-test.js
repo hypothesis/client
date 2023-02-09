@@ -1,5 +1,4 @@
 import * as fixtures from '../../test/annotation-fixtures';
-
 import { AnnotationsService, $imports } from '../annotations';
 
 describe('AnnotationsService', () => {

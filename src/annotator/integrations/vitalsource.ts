@@ -2,13 +2,6 @@ import { TinyEmitter } from 'tiny-emitter';
 
 import { documentCFI } from '../../shared/cfi';
 import { ListenerCollection } from '../../shared/listener-collection';
-import { FeatureFlags } from '../features';
-import { onDocumentReady } from '../frame-observer';
-import { HTMLIntegration } from './html';
-import { preserveScrollPosition } from './html-side-by-side';
-import { ImageTextLayer } from './image-text-layer';
-import { injectClient } from '../hypothesis-injector';
-
 import type {
   Anchor,
   AnnotationData,
@@ -16,12 +9,18 @@ import type {
   SegmentInfo,
   SidebarLayout,
 } from '../../types/annotator';
+import type { EPUBContentSelector, Selector } from '../../types/api';
 import type {
   ContentFrameGlobals,
   MosaicBookElement,
 } from '../../types/vitalsource';
-import type { EPUBContentSelector, Selector } from '../../types/api';
+import { FeatureFlags } from '../features';
+import { onDocumentReady } from '../frame-observer';
+import { injectClient } from '../hypothesis-injector';
 import type { InjectConfig } from '../hypothesis-injector';
+import { HTMLIntegration } from './html';
+import { preserveScrollPosition } from './html-side-by-side';
+import { ImageTextLayer } from './image-text-layer';
 
 // When activating side-by-side mode for VitalSource PDF documents, make sure
 // at least this much space (in pixels) is left for the PDF document. Any

@@ -1,6 +1,7 @@
-import { createShadowRoot } from './util/shadow-root';
 import { render } from 'preact';
+
 import NotebookModal from './components/NotebookModal';
+import { createShadowRoot } from './util/shadow-root';
 
 /**
  * @typedef {import('../types/annotator').Destroyable} Destroyable

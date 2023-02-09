@@ -1,5 +1,5 @@
-import classnames from 'classnames';
 import { PlusIcon } from '@hypothesis/frontend-shared/lib/next';
+import classnames from 'classnames';
 import { useMemo, useState } from 'preact/hooks';
 
 import { serviceConfig } from '../../config/service-config';
@@ -9,10 +9,8 @@ import { groupsByOrganization } from '../../helpers/group-organizations';
 import { isThirdPartyService } from '../../helpers/is-third-party-service';
 import { withServices } from '../../service-context';
 import { useSidebarStore } from '../../store';
-
 import Menu from '../Menu';
 import MenuItem from '../MenuItem';
-
 import GroupListSection from './GroupListSection';
 
 /**

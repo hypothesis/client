@@ -1,10 +1,10 @@
 import { render } from 'preact';
 import { act } from 'preact/test-utils';
 
-import * as annotationFixtures from '../../test/annotation-fixtures';
-import { createSidebarStore, useSidebarStore } from '../index';
-import { immutable } from '../../util/immutable';
 import { ServiceContext } from '../../service-context';
+import * as annotationFixtures from '../../test/annotation-fixtures';
+import { immutable } from '../../util/immutable';
+import { createSidebarStore, useSidebarStore } from '../index';
 
 const defaultAnnotation = annotationFixtures.defaultAnnotation;
 const newAnnotation = annotationFixtures.newAnnotation;

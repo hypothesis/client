@@ -1,6 +1,6 @@
 import { textNodes } from '../../../test-util/compare-dom';
-import { trimRange } from '../trim-range';
 import { TextRange } from '../text-range';
+import { trimRange } from '../trim-range';
 
 describe('annotator/anchoring/trim-range', () => {
   let container;

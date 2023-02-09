@@ -1,11 +1,10 @@
-import classnames from 'classnames';
-
 import {
   Link,
   LinkBase,
   CaretLeftIcon,
   CaretRightIcon,
 } from '@hypothesis/frontend-shared/lib/next';
+import classnames from 'classnames';
 
 /**
  * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoConfig

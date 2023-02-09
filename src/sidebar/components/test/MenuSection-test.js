@@ -1,10 +1,9 @@
 import { mount } from 'enzyme';
 
-import MenuSection from '../MenuSection';
-import { $imports } from '../MenuSection';
-
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import MenuSection from '../MenuSection';
+import { $imports } from '../MenuSection';
 
 describe('MenuSection', () => {
   const createMenuSection = props =>

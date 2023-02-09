@@ -1,11 +1,10 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
+import { checkAccessibility } from '../../../test-util/accessibility';
+import { mockImportedComponents } from '../../../test-util/mock-imported-components';
 import Menu from '../Menu';
 import { $imports } from '../Menu';
-
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
-import { checkAccessibility } from '../../../test-util/accessibility';
 
 describe('Menu', () => {
   let container;
