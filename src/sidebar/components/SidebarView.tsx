@@ -7,12 +7,12 @@ import type { LoadAnnotationsService } from '../services/load-annotations';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 import FilterStatus from './FilterStatus';
-import { useRootThread } from './hooks/use-root-thread';
 import LoggedOutMessage from './LoggedOutMessage';
 import LoginPromptPanel from './LoginPromptPanel';
 import SelectionTabs from './SelectionTabs';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
+import { useRootThread } from './hooks/use-root-thread';
 
 export type SidebarViewProps = {
   onLogin: () => void;

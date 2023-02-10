@@ -35,6 +35,7 @@
     "@types/showdown": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
     "@typescript-eslint/parser": "^5.35.1",
+    "@vue/compiler-sfc": "./scripts/stub-package",
     "approx-string-match": "^2.0.0",
     "autoprefixer": "^10.0.1",
     "aws-sdk": "^2.345.0",
@@ -105,8 +106,7 @@
     "arrowParens": "avoid",
     "singleQuote": true,
     "importOrder": ["^[./]"],
-    "importOrderSeparation": true,
-    "importOrderCaseInsensitive": true
+    "importOrderSeparation": true
   },
   "main": "./build/boot.js",
   "scripts": {

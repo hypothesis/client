@@ -3,9 +3,9 @@ import { useEffect, useState } from 'preact/hooks';
 import { withServices } from '../service-context';
 import type { LoadAnnotationsService } from '../services/load-annotations';
 import { useSidebarStore } from '../store';
-import { useRootThread } from './hooks/use-root-thread';
 import SidebarContentError from './SidebarContentError';
 import ThreadList from './ThreadList';
+import { useRootThread } from './hooks/use-root-thread';
 
 type AnnotationViewProps = {
   onLogin: () => void;

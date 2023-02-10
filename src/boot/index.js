@@ -4,6 +4,7 @@
 // The same boot script is used for both entry points so that the browser
 // already has it cached when it encounters the reference in the sidebar
 // application.
+//
 // @ts-ignore - This file is generated before the boot bundle is built.
 import manifest from '../../build/manifest.json';
 import { bootHypothesisClient, bootSidebarApp } from './boot';
