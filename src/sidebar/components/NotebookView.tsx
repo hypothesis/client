@@ -12,10 +12,10 @@ import { withServices } from '../service-context';
 import type { LoadAnnotationsService } from '../services/load-annotations';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
-import { useRootThread } from './hooks/use-root-thread';
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
 import PaginatedThreadList from './PaginatedThreadList';
+import { useRootThread } from './hooks/use-root-thread';
 
 export type NotebookViewProps = {
   // injected

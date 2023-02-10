@@ -1,0 +1,12 @@
+{
+  "name": "@vue/compiler-sfc",
+  "version": "3.0.0",
+  "description": "This is a workaround for a peer dependency on @trivago/prettier-plugin-sort-imports which is not properly marked as optional. To be removed once solved: https://github.com/trivago/prettier-plugin-sort-imports/issues/201",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

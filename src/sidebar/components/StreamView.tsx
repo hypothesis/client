@@ -5,8 +5,8 @@ import type { APIService } from '../services/api';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import * as searchFilter from '../util/search-filter';
-import { useRootThread } from './hooks/use-root-thread';
 import ThreadList from './ThreadList';
+import { useRootThread } from './hooks/use-root-thread';
 
 export type StreamViewProps = {
   // injected

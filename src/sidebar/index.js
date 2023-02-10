@@ -1,6 +1,5 @@
 // Load polyfill for :focus-visible pseudo-class.
 import 'focus-visible';
-// The entry point component for the app.
 import { render } from 'preact';
 // Enable debugging checks for Preact. Removed in prod builds by Rollup config.
 import 'preact/debug';
