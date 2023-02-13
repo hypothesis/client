@@ -1236,39 +1236,39 @@
     fastq "^1.6.0"
 
 "@npmcli/arborist@^6.1.1":
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.2.1.tgz#caaa29eff7fb369653ccf1ddb1bca1b279c7debb"
-  integrity sha512-5bpihPqBgAMdOoM7pCeziVVP5NHmAqnjTUq9v8qrzrFcesEbBRpeiD0h3M4tw16NtQ6f024sI6EvWASUrxTHHw==
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.2.2.tgz#3ea668e7d368376a8477bd7bc3389bf634603b5b"
+  integrity sha512-cjK9CuA1cEovr4E1ljdgYU1UBdKJb4KvvULAEYOM1/qU0Que2X4DKyjIDBEy8MSWRY6PyaQ8oLGhwYIh8gUEEA==
   dependencies:
     "@isaacs/string-locale-compare" "^1.1.0"
     "@npmcli/fs" "^3.1.0"
     "@npmcli/installed-package-contents" "^2.0.0"
-    "@npmcli/map-workspaces" "^3.0.0"
+    "@npmcli/map-workspaces" "^3.0.2"
     "@npmcli/metavuln-calculator" "^5.0.0"
-    "@npmcli/name-from-folder" "^1.0.1"
+    "@npmcli/name-from-folder" "^2.0.0"
     "@npmcli/node-gyp" "^3.0.0"
     "@npmcli/package-json" "^3.0.0"
     "@npmcli/query" "^3.0.0"
     "@npmcli/run-script" "^6.0.0"
     bin-links "^4.0.1"
-    cacache "^17.0.3"
+    cacache "^17.0.4"
     common-ancestor-path "^1.0.1"
     hosted-git-info "^6.1.1"
     json-parse-even-better-errors "^3.0.0"
     json-stringify-nice "^1.1.4"
-    minimatch "^5.1.1"
+    minimatch "^6.1.6"
     nopt "^7.0.0"
     npm-install-checks "^6.0.0"
     npm-package-arg "^10.1.0"
     npm-pick-manifest "^8.0.1"
     npm-registry-fetch "^14.0.3"
     npmlog "^7.0.1"
-    pacote "^15.0.7"
+    pacote "^15.0.8"
     parse-conflict-json "^3.0.0"
     proc-log "^3.0.0"
     promise-all-reject-late "^1.0.0"
     promise-call-limit "^1.0.1"
-    read-package-json-fast "^3.0.1"
+    read-package-json-fast "^3.0.2"
     semver "^7.3.7"
     ssri "^10.0.1"
     treeverse "^3.0.0"
@@ -1312,14 +1312,14 @@
     npm-bundled "^3.0.0"
     npm-normalize-package-bin "^3.0.0"
 
-"@npmcli/map-workspaces@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@npmcli/map-workspaces/-/map-workspaces-3.0.0.tgz#7863da57470cdd7fda76d807567d7925a642ddb3"
-  integrity sha512-aaEDwQ+fUH80iNYSDAcKv9lxIFWsgGkLjIPZENyep75hKeAk2CfSbCAZ6IHDDrVlNybvvNmlFjPap6GdTz9cCw==
+"@npmcli/map-workspaces@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@npmcli/map-workspaces/-/map-workspaces-3.0.2.tgz#aa3f9ebccb213073d6d6bf743047272108c29f06"
+  integrity sha512-bCEC4PG7HbadtAYkW/TTUVNEOSr5Dhfmv6yGLgByJgCvdCqq7teq09cjvJ1LhzJU/euWjvYMcQxsfj7yDD2ikg==
   dependencies:
-    "@npmcli/name-from-folder" "^1.0.1"
+    "@npmcli/name-from-folder" "^2.0.0"
     glob "^8.0.1"
-    minimatch "^5.0.1"
+    minimatch "^6.1.6"
     read-package-json-fast "^3.0.0"
 
 "@npmcli/metavuln-calculator@^5.0.0":
@@ -1340,10 +1340,10 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
-"@npmcli/name-from-folder@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@npmcli/name-from-folder/-/name-from-folder-1.0.1.tgz#77ecd0a4fcb772ba6fe927e2e2e155fbec2e6b1a"
-  integrity sha512-qq3oEfcLFwNfEYOQ8HLimRGKlD8WSeGEdtUa7hmzpR8Sa7haL1KVQrvgO6wqMjhWFFVjgtrh1gIxDz+P8sjUaA==
+"@npmcli/name-from-folder@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@npmcli/name-from-folder/-/name-from-folder-2.0.0.tgz#c44d3a7c6d5c184bb6036f4d5995eee298945815"
+  integrity sha512-pwK+BfEBZJbKdNYpHHRTNBwBoqrN/iIMO0AiGvYsp3Hoaq0WbgGSWQR6SCldZovoDpY3yje5lkFUe6gsDgJ2vg==
 
 "@npmcli/node-gyp@^3.0.0":
   version "3.0.0"
@@ -2596,13 +2596,13 @@ cacache@^16.1.0:
     tar "^6.1.11"
     unique-filename "^2.0.0"
 
-cacache@^17.0.0, cacache@^17.0.3:
-  version "17.0.3"
-  resolved "https://registry.yarnpkg.com/cacache/-/cacache-17.0.3.tgz#9ba14e0e50eca763ae7e2ee89036a948a13035ed"
-  integrity sha512-pwsIK/grdM0cHpfVaNFxMdzElBtLJGsVPE+JnxqXP1l40O01Z1mfDE8MbRTuwomGq/UwEtGisOylutOEVJxEqg==
+cacache@^17.0.0, cacache@^17.0.4:
+  version "17.0.4"
+  resolved "https://registry.yarnpkg.com/cacache/-/cacache-17.0.4.tgz#5023ed892ba8843e3b7361c26d0ada37e146290c"
+  integrity sha512-Z/nL3gU+zTUjz5pCA5vVjYM8pmaw2kxM7JEiE0fv3w77Wj+sFbi70CrBruUWH0uNcEdvLDixFpgA2JM4F4DBjA==
   dependencies:
     "@npmcli/fs" "^3.1.0"
-    fs-minipass "^2.1.0"
+    fs-minipass "^3.0.0"
     glob "^8.0.1"
     lru-cache "^7.7.1"
     minipass "^4.0.0"
@@ -4311,6 +4311,13 @@ fs-minipass@^2.0.0, fs-minipass@^2.1.0:
   integrity sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==
   dependencies:
     minipass "^3.0.0"
+
+fs-minipass@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/fs-minipass/-/fs-minipass-3.0.1.tgz#853809af15b6d03e27638d1ab6432e6b378b085d"
+  integrity sha512-MhaJDcFRTuLidHrIttu0RDGyyXs/IYHVmlcxfLAEFIWjc1vdLAkdwT7Ace2u7DbitWC0toKMl5eJZRYNVreIMw==
+  dependencies:
+    minipass "^4.0.0"
 
 fs-mkdirp-stream@^1.0.0:
   version "1.0.0"
@@ -6105,10 +6112,17 @@ minimatch@^3.0.4, minimatch@^3.0.5, minimatch@^3.1.2:
   dependencies:
     brace-expansion "^1.1.7"
 
-minimatch@^5.0.1, minimatch@^5.1.1:
+minimatch@^5.0.1:
   version "5.1.1"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.1.tgz#6c9dffcf9927ff2a31e74b5af11adf8b9604b022"
   integrity sha512-362NP+zlprccbEt/SkxKfRMHnNY85V74mVnpUpNyr3F35covl09Kec7/sEFLt3RA4oXmewtoaanoIf67SE5Y5g==
+  dependencies:
+    brace-expansion "^2.0.1"
+
+minimatch@^6.1.6:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-6.2.0.tgz#2b70fd13294178c69c04dfc05aebdb97a4e79e42"
+  integrity sha512-sauLxniAmvnhhRjFwPNnJKaPFYyddAgbYdeUpHULtCT/GhzdCx/MDNy+Y40lBxTQUrMzDE8e0S43Z5uqfO0REg==
   dependencies:
     brace-expansion "^2.0.1"
 
@@ -6798,17 +6812,17 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-pacote@^15.0.0, pacote@^15.0.7:
-  version "15.0.7"
-  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.7.tgz#8f68210e4c973d01d8f4b524926e47189cebd756"
-  integrity sha512-OFf4dl3SM1PpsZvi1zk4vvMA0EplnyO0Ajbrtoyx6E3dXOWBoPnMapnLgQdInEfqPkNT8mrd2bY6c5t8JZ69sQ==
+pacote@^15.0.0, pacote@^15.0.8:
+  version "15.0.8"
+  resolved "https://registry.yarnpkg.com/pacote/-/pacote-15.0.8.tgz#8a1cb1e0207f9f3c74894feaa716aaa9e35f890e"
+  integrity sha512-UlcumB/XS6xyyIMwg/WwMAyUmga+RivB5KgkRwA1hZNtrx+0Bt41KxHCvg1kr0pZ/ZeD8qjhW4fph6VaYRCbLw==
   dependencies:
     "@npmcli/git" "^4.0.0"
     "@npmcli/installed-package-contents" "^2.0.1"
     "@npmcli/promise-spawn" "^6.0.1"
     "@npmcli/run-script" "^6.0.0"
     cacache "^17.0.0"
-    fs-minipass "^2.1.0"
+    fs-minipass "^3.0.0"
     minipass "^4.0.0"
     npm-package-arg "^10.0.0"
     npm-packlist "^7.0.0"
@@ -7273,10 +7287,10 @@ read-cmd-shim@^4.0.0:
   resolved "https://registry.yarnpkg.com/read-cmd-shim/-/read-cmd-shim-4.0.0.tgz#640a08b473a49043e394ae0c7a34dd822c73b9bb"
   integrity sha512-yILWifhaSEEytfXI76kB9xEEiG1AiozaCJZ83A87ytjRiN+jVibXjedjCRNjoZviinhG+4UkalO3mWTd8u5O0Q==
 
-read-package-json-fast@^3.0.0, read-package-json-fast@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/read-package-json-fast/-/read-package-json-fast-3.0.1.tgz#de13ae1c591850534daf77e083e851f94af67733"
-  integrity sha512-8+HW7Yo+cjfF+md8DqsZHgats2mxf7gGYow/+2JjxrftoHFZz9v4dzd0EubzYbkNaLxrTVcnllHwklXN2+7aTQ==
+read-package-json-fast@^3.0.0, read-package-json-fast@^3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/read-package-json-fast/-/read-package-json-fast-3.0.2.tgz#394908a9725dc7a5f14e70c8e7556dff1d2b1049"
+  integrity sha512-0J+Msgym3vrLOUB3hzQCuZHII0xkNGCtz/HJH9xZshwv9DbDwkw1KaE3gx/e2J5rpEY5rtOy6cyhKOPrkP7FZw==
   dependencies:
     json-parse-even-better-errors "^3.0.0"
     npm-normalize-package-bin "^3.0.0"
