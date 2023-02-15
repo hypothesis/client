@@ -47,6 +47,8 @@ function HypothesisApp({
   const profile = store.profile();
   const route = store.route();
   const isModalRoute = route === 'notebook' || route === 'profile';
+  const shouldRenderProfile =
+    route === 'profile' && store.isFeatureEnabled('client_user_profile');
 
   const backgroundStyle = useMemo(
     () => applyTheme(['appBackgroundColor'], settings),
@@ -166,7 +168,7 @@ function HypothesisApp({
           <main>
             {route === 'annotation' && <AnnotationView onLogin={login} />}
             {route === 'notebook' && <NotebookView />}
-            {route === 'profile' && <ProfileView />}
+            {shouldRenderProfile && <ProfileView />}
             {route === 'stream' && <StreamView />}
             {route === 'sidebar' && (
               <SidebarView onLogin={login} onSignUp={signUp} />

@@ -14,6 +14,7 @@ describe('HypothesisApp', () => {
   let fakeShouldAutoDisplayTutorial = null;
   let fakeSettings = null;
   let fakeToastMessenger = null;
+  let fakeIsFeatureEnabled;
 
   const createComponent = (props = {}) => {
     return mount(
@@ -32,6 +33,7 @@ describe('HypothesisApp', () => {
     fakeApplyTheme = sinon.stub().returns({});
     fakeServiceConfig = sinon.stub();
     fakeShouldAutoDisplayTutorial = sinon.stub().returns(false);
+    fakeIsFeatureEnabled = sinon.stub().returns(true);
 
     fakeStore = {
       clearGroups: sinon.stub(),
@@ -53,6 +55,8 @@ describe('HypothesisApp', () => {
       route: sinon.stub().returns('sidebar'),
 
       getLink: sinon.stub(),
+
+      isFeatureEnabled: fakeIsFeatureEnabled,
     };
 
     fakeAuth = {};
@@ -133,6 +137,14 @@ describe('HypothesisApp', () => {
       const wrapper = createComponent();
       assert.isTrue(wrapper.find(contentComponent).exists());
     });
+  });
+
+  it('does not render profile if the feature is not enabled', () => {
+    fakeStore.route.returns('profile');
+    fakeIsFeatureEnabled.returns(false);
+
+    const wrapper = createComponent();
+    assert.isFalse(wrapper.find('ProfileView').exists());
   });
 
   describe('auto-opening tutorial', () => {
