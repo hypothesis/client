@@ -68,10 +68,16 @@ describe('HTMLIntegration', () => {
     return new HTMLIntegration({ features });
   }
 
-  it('implements `anchor` and `destroy` using HTML anchoring', () => {
+  it('implements `anchor` and `destroy` using HTML anchoring', async () => {
     const integration = createIntegration();
-    assert.equal(integration.anchor, fakeHTMLAnchoring.anchor);
-    assert.equal(integration.describe, fakeHTMLAnchoring.describe);
+    const root = {};
+    const selectors = [];
+
+    const range = await integration.anchor(root, selectors);
+    assert.calledWith(fakeHTMLAnchoring.anchor, root, selectors);
+
+    integration.describe(root, range);
+    assert.calledWith(fakeHTMLAnchoring.describe, root, range);
   });
 
   describe('#getAnnotatableRange', () => {

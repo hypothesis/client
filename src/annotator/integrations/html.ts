@@ -1,5 +1,12 @@
 import { TinyEmitter } from 'tiny-emitter';
 
+import type {
+  Anchor,
+  FeatureFlags,
+  Integration,
+  SidebarLayout,
+} from '../../types/annotator';
+import type { Selector } from '../../types/api';
 import { anchor, describe } from '../anchoring/html';
 import { TextRange } from '../anchoring/text-range';
 import { NavigationObserver } from '../util/navigation-observer';
@@ -9,14 +16,6 @@ import {
   guessMainContentArea,
   preserveScrollPosition,
 } from './html-side-by-side';
-
-/**
- * @typedef {import('../../types/annotator').Anchor} Anchor
- * @typedef {import('../../types/annotator').Annotator} Annotator
- * @typedef {import('../../types/annotator').FeatureFlags} FeatureFlags
- * @typedef {import('../../types/annotator').Integration} Integration
- * @typedef {import('../../types/annotator').SidebarLayout} SidebarLayout
- */
 
 // When activating side-by-side mode, make sure there is at least this amount
 // of space (in pixels) left for the document's content. Any narrower and the
@@ -28,36 +27,46 @@ const MIN_HTML_WIDTH = 480;
  *
  * This integration is used for web pages and applications that are not handled
  * by a more specific integration (eg. for PDFs).
- *
- * @implements {Integration}
  */
-export class HTMLIntegration extends TinyEmitter {
+export class HTMLIntegration extends TinyEmitter implements Integration {
+  container: HTMLElement;
+  features: FeatureFlags;
+
+  private _flagsChanged: () => void;
+  private _htmlMeta: HTMLMetadata;
+  private _prevURI: string;
+
+  /** Whether to attempt to resize the document to fit alongside sidebar. */
+  private _sideBySideEnabled: boolean;
+
   /**
-   * @param {object} options
-   *   @param {FeatureFlags} options.features
-   *   @param {HTMLElement} [options.container]
+   * Whether the document is currently being resized to fit alongside an
+   * open sidebar.
    */
-  constructor({ features, container = document.body }) {
+  private _sideBySideActive: boolean;
+
+  private _lastLayout: SidebarLayout | null;
+
+  private _navObserver: NavigationObserver;
+  private _metaObserver: MutationObserver;
+
+  constructor({
+    features,
+    container = document.body,
+  }: {
+    features: FeatureFlags;
+    container?: HTMLElement;
+  }) {
     super();
 
     this.features = features;
     this.container = container;
-    this.anchor = anchor;
-    this.describe = describe;
 
     this._htmlMeta = new HTMLMetadata();
     this._prevURI = this._htmlMeta.uri();
 
-    /** Whether to attempt to resize the document to fit alongside sidebar. */
     this._sideBySideEnabled = this.features.flagEnabled('html_side_by_side');
-
-    /**
-     * Whether the document is currently being resized to fit alongside an
-     * open sidebar.
-     */
     this._sideBySideActive = false;
-
-    /** @type {SidebarLayout|null} */
     this._lastLayout = null;
 
     // Watch for changes to `location.href`.
@@ -97,6 +106,14 @@ export class HTMLIntegration extends TinyEmitter {
     this.features.on('flagsChanged', this._flagsChanged);
   }
 
+  anchor(root: Element, selectors: Selector[]): Promise<Range> {
+    return anchor(root, selectors);
+  }
+
+  describe(root: Element, range: Range): Selector[] {
+    return describe(root, range);
+  }
+
   _checkForURIChange() {
     const currentURI = this._htmlMeta.uri();
     if (currentURI !== this._prevURI) {
@@ -108,10 +125,8 @@ export class HTMLIntegration extends TinyEmitter {
   /**
    * Return a Range trimmed to remove any leading or trailing whitespace, or
    * `null` if no valid trimmed Range can be created from `range`
-   *
-   * @param {Range} range
    */
-  getAnnotatableRange(range) {
+  getAnnotatableRange(range: Range) {
     try {
       return TextRange.trimmedRange(range);
     } catch (err) {
@@ -136,10 +151,7 @@ export class HTMLIntegration extends TinyEmitter {
     return this.container;
   }
 
-  /**
-   * @param {SidebarLayout} layout
-   */
-  fitSideBySide(layout) {
+  fitSideBySide(layout: SidebarLayout) {
     this._lastLayout = layout;
 
     const maximumWidthToFit = window.innerWidth - layout.width;
@@ -161,10 +173,8 @@ export class HTMLIntegration extends TinyEmitter {
 
   /**
    * Resize the document content after side-by-side mode is activated.
-   *
-   * @param {number} sidebarWidth
    */
-  _activateSideBySide(sidebarWidth) {
+  _activateSideBySide(sidebarWidth: number) {
     // When side-by-side mode is activated, what we want to achieve is that the
     // main content of the page is fully visible alongside the sidebar, with
     // as much space given to the main content as possible. A challenge is that
@@ -201,8 +211,7 @@ export class HTMLIntegration extends TinyEmitter {
     const padding = 12;
     const rightMargin = sidebarWidth + padding;
 
-    /** @param {HTMLElement} element */
-    const computeLeftMargin = element =>
+    const computeLeftMargin = (element: HTMLElement) =>
       parseInt(window.getComputedStyle(element).marginLeft, 10);
 
     preserveScrollPosition(() => {
@@ -270,10 +279,7 @@ export class HTMLIntegration extends TinyEmitter {
     return this._htmlMeta.uri();
   }
 
-  /**
-   * @param {Anchor} anchor
-   */
-  async scrollToAnchor(anchor) {
+  async scrollToAnchor(anchor: Anchor) {
     const highlight = anchor.highlights?.[0];
     if (!highlight) {
       return;
