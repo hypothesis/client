@@ -161,7 +161,9 @@ export default function SearchInput({
           },
           {
             // Make the input dimensionless when not expanded (or focused)
-            'max-w-0 p-0': !isExpanded,
+            // Make the 0-padding rule `!important` so that it doesn't get
+            // superseded by `Input` padding
+            'max-w-0 !p-0': !isExpanded,
             // Make the input have dimensions and padding when focused or
             // expanded. The left-margin is to make room for the focus ring of
             // the search icon-button when navigating by keyboard. Set a
