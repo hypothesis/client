@@ -2,10 +2,15 @@ import classnames from 'classnames';
 import { useEffect, useMemo } from 'preact/hooks';
 
 import { confirm } from '../../shared/prompts';
+import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { shouldAutoDisplayTutorial } from '../helpers/session';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
+import type { AuthService } from '../services/auth';
+import type { FrameSyncService } from '../services/frame-sync';
+import type { SessionService } from '../services/session';
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import AnnotationView from './AnnotationView';
 import HelpPanel from './HelpPanel';
@@ -17,28 +22,27 @@ import StreamView from './StreamView';
 import ToastMessages from './ToastMessages';
 import TopBar from './TopBar';
 
-/**
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- */
-
-/**
- * @typedef HypothesisAppProps
- * @prop {import('../services/auth').AuthService} auth
- * @prop {import('../services/frame-sync').FrameSyncService} frameSync
- * @prop {SidebarSettings} settings
- * @prop {import('../services/session').SessionService} session
- * @prop {import('../services/toast-messenger').ToastMessengerService} toastMessenger
- */
+export type HypothesisAppProps = {
+  auth: AuthService;
+  frameSync: FrameSyncService;
+  settings: SidebarSettings;
+  session: SessionService;
+  toastMessenger: ToastMessengerService;
+};
 
 /**
  * The root component for the Hypothesis client.
  *
  * This handles login/logout actions and renders the top navigation bar
  * and content appropriate for the current route.
- *
- * @param {HypothesisAppProps} props
  */
-function HypothesisApp({ auth, frameSync, settings, session, toastMessenger }) {
+function HypothesisApp({
+  auth,
+  frameSync,
+  settings,
+  session,
+  toastMessenger,
+}: HypothesisAppProps) {
   const store = useSidebarStore();
   const profile = store.profile();
   const route = store.route();
