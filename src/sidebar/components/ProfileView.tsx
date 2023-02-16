@@ -1,4 +1,15 @@
-/* istanbul ignore next - this is a temporary dummy implementation */
+import { useSidebarStore } from '../store';
+
 export default function ProfileView() {
-  return <div className="text-center">Profile</div>;
+  const store = useSidebarStore();
+
+  if (!store.isFeatureEnabled('client_user_profile')) {
+    return null;
+  }
+
+  return (
+    <div className="text-center" data-testid="profile-container">
+      Profile
+    </div>
+  );
 }
