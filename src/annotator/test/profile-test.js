@@ -34,7 +34,7 @@ describe('Profile', () => {
     };
 
     $imports.$mock({
-      './components/ProfileModal': { ProfileModal: FakeProfileModal },
+      './components/ProfileModal': FakeProfileModal,
     });
   });
 

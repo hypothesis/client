@@ -11,7 +11,7 @@ type ProfileModalProps = {
   config: ProfileConfig;
 };
 
-export function ProfileModal({ eventBus, config }: ProfileModalProps) {
+export default function ProfileModal({ eventBus, config }: ProfileModalProps) {
   const [isHidden, setIsHidden] = useState(true);
   const emitterRef = useRef<Emitter | null>(null);
   // Used only to track when was this modal first open, delaying the iframe to

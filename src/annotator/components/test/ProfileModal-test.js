@@ -2,7 +2,7 @@ import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
 import { EventBus } from '../../util/emitter';
-import { ProfileModal } from '../ProfileModal';
+import ProfileModal from '../ProfileModal';
 
 describe('ProfileModal', () => {
   const profileURL = 'https://test.hypothes.is/user-profile';
