@@ -164,11 +164,14 @@ export default function SearchInput({
             // Make the 0-padding rule `!important` so that it doesn't get
             // superseded by `Input` padding
             'max-w-0 !p-0': !isExpanded,
+            // However, if the input it focused, it is visually expanded, and
+            // needs that padding back
+            'focus:!p-1.5': true,
             // Make the input have dimensions and padding when focused or
             // expanded. The left-margin is to make room for the focus ring of
             // the search icon-button when navigating by keyboard. Set a
             // max-width to allow transition to work when exact width is unknown.
-            'focus:max-w-[150px] focus:p-1.5 focus:ml-[2px]': true,
+            'focus:max-w-[150px] focus:ml-[2px]': true,
             'max-w-[150px] p-1.5 ml-[2px]': isExpanded,
           },
           'transition-[max-width] duration-300 ease-out'
