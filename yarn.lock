@@ -1237,9 +1237,9 @@
     glob "^7.2.0"
 
 "@hypothesis/frontend-shared@^5.6.0":
-  version "5.9.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-5.9.0.tgz#1ccd6007e237c90fee77689417bfd19a0fde0498"
-  integrity sha512-FyeTvDLJ55Ma676f3pJoy1Ybst++eiNnDAuXgIH0tlYBE+OTg2paQBnC7evb19E9O1m0m9zpTZV0TKjjQTF7SA==
+  version "5.11.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-5.11.0.tgz#2edcbe738130da88cc568c6548993e5c25c7e128"
+  integrity sha512-gqfbocJkRjdv/fr72NclPsWxpITFGa4nbxD+wI1Ysazd0eKd2ND7+sOCNqKKTfkPHRFv/qukv6HNXJncdlEG8Q==
   dependencies:
     highlight.js "^11.6.0"
 
