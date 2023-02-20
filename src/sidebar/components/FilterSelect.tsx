@@ -47,9 +47,11 @@ function FilterSelect({
       label={menuLabel}
       title={title}
       contentClass={classnames(
-        // Don't let filter list get too terribly tall. On shorter screens,
-        // restrict to 70vh; set a static max-height for taller screens.
-        'max-h-[70vh] tall:max-h-[504px] overflow-y-auto'
+        // Don't let filter list get too terribly tall. Where space allows,
+        // use `504px` (this odd number is to maximize the likelihood that the
+        // overflow cutoff is in the middle of an option, making it more obvious
+        // that the list is scrollable), but don't exceed 60vh.
+        'max-h-[min(60vh,504px)] overflow-y-auto'
       )}
     >
       {filterOptions.map(filterOption => (

@@ -179,7 +179,6 @@ export default {
         'annotator-md': '480px',
         // Tablet and up
         'annotator-lg': '600px',
-        tall: { raw: '(min-height: 700px)' },
       },
       spacing: {
         // These are selective, pixel-specific variants of Tailwind's default
