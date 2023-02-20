@@ -21,6 +21,7 @@ export default {
         'fade-in': 'fade-in 0.3s forwards',
         'fade-in-slow': 'fade-in 1s ease-in',
         'fade-out': 'fade-out 0.3s forwards',
+        'pulse-fade-out': 'pulse-fade-out 5s ease-in-out forwards',
         'slide-in-from-right': 'slide-in-from-right 0.3s forwards ease-in-out',
       },
       borderRadius: {
@@ -147,6 +148,21 @@ export default {
         'fade-out': {
           '0%': {
             opacity: '1',
+          },
+          '100%': {
+            opacity: '0',
+          },
+        },
+        'pulse-fade-out': {
+          '0%': {
+            opacity: '1',
+            transform: 'scale(1.1)',
+          },
+          '8%': {
+            transform: 'scale(1)',
+          },
+          '90%': {
+            opacity: '0.8',
           },
           '100%': {
             opacity: '0',
