@@ -45,6 +45,7 @@ function NotebookIframe({ config, groupId }: NotebookIframeProps) {
     />
   );
 }
+
 export type NotebookModalProps = {
   eventBus: EventBus;
   config: NotebookConfig;
@@ -57,12 +58,6 @@ export default function NotebookModal({
   eventBus,
   config,
 }: NotebookModalProps) {
-  // Temporary solution: while there is no mechanism to sync new annotations in
-  // the notebook, we force re-rendering of the iframe on every 'openNotebook'
-  // event, so that the new annotations are displayed.
-  // https://github.com/hypothesis/client/issues/3182
-  const [iframeKey, setIframeKey] = useState(0);
-  const [isHidden, setIsHidden] = useState(true);
   const [groupId, setGroupId] = useState<string | null>(null);
   const originalDocumentOverflowStyle = useRef('');
   const emitterRef = useRef<Emitter | null>(null);
@@ -80,18 +75,16 @@ export default function NotebookModal({
   // The overflow CSS property is set to hidden to prevent scrolling of the host page,
   // while the notebook modal is open. It is restored when the modal is closed.
   useEffect(() => {
-    if (isHidden) {
+    if (groupId === null) {
       document.body.style.overflow = originalDocumentOverflowStyle.current;
     } else {
       document.body.style.overflow = 'hidden';
     }
-  }, [isHidden]);
+  }, [groupId]);
 
   useEffect(() => {
     const emitter = eventBus.createEmitter();
     emitter.subscribe('openNotebook', (groupId: string) => {
-      setIsHidden(false);
-      setIframeKey(iframeKey => iframeKey + 1);
       setGroupId(groupId);
     });
     emitterRef.current = emitter;
@@ -102,20 +95,21 @@ export default function NotebookModal({
   }, [eventBus]);
 
   const onClose = () => {
-    setIsHidden(true);
+    setGroupId(null);
     emitterRef.current?.publish('closeNotebook');
   };
 
+  // Temporary solution: while there is no mechanism to sync new annotations in
+  // the notebook, we force re-rendering of the iframe on every 'openNotebook'
+  // event, so that the new annotations are displayed.
+  // https://github.com/hypothesis/client/issues/3182
   if (groupId === null) {
     return null;
   }
 
   return (
     <div
-      className={classnames(
-        'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
-        { hidden: isHidden }
-      )}
+      className="fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50"
       data-testid="notebook-outer"
     >
       <div className="relative w-full h-full" data-testid="notebook-inner">
@@ -135,7 +129,7 @@ export default function NotebookModal({
             <CancelIcon className="w-4 h-4" />
           </IconButton>
         </div>
-        <NotebookIframe key={iframeKey} config={config} groupId={groupId} />
+        <NotebookIframe config={config} groupId={groupId} />
       </div>
     </div>
   );

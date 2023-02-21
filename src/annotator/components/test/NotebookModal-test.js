@@ -55,55 +55,19 @@ describe('NotebookModal', () => {
 
   it('shows modal on "openNotebook" event', () => {
     const wrapper = createComponent();
-    let outer = wrapper.find(outerSelector);
 
-    assert.isFalse(outer.exists());
-    assert.isFalse(wrapper.find('iframe').exists());
+    assert.isFalse(wrapper.find(outerSelector).exists());
 
     emitter.publish('openNotebook', 'myGroup');
     wrapper.update();
 
-    outer = wrapper.find(outerSelector);
-    assert.isFalse(outer.hasClass('hidden'));
+    assert.isTrue(wrapper.find(outerSelector).exists());
 
     const iframe = wrapper.find('iframe');
     assert.equal(
       iframe.prop('src'),
       addConfigFragment(notebookURL, { group: 'myGroup' })
     );
-  });
-
-  it('creates a new iframe element on every "openNotebook" event', () => {
-    const wrapper = createComponent();
-
-    emitter.publish('openNotebook', '1');
-    wrapper.update();
-
-    const iframe1 = wrapper.find('iframe');
-    assert.equal(
-      iframe1.prop('src'),
-      addConfigFragment(notebookURL, { group: '1' })
-    );
-
-    emitter.publish('openNotebook', '1');
-    wrapper.update();
-
-    const iframe2 = wrapper.find('iframe');
-    assert.equal(
-      iframe2.prop('src'),
-      addConfigFragment(notebookURL, { group: '1' })
-    );
-    assert.notEqual(iframe1.getDOMNode(), iframe2.getDOMNode());
-
-    emitter.publish('openNotebook', '2');
-    wrapper.update();
-
-    const iframe3 = wrapper.find('iframe');
-    assert.equal(
-      iframe3.prop('src'),
-      addConfigFragment(notebookURL, { group: '2' })
-    );
-    assert.notEqual(iframe1.getDOMNode(), iframe3.getDOMNode());
   });
 
   it('makes the document unscrollable on "openNotebook" event', () => {
@@ -120,17 +84,14 @@ describe('NotebookModal', () => {
     emitter.publish('openNotebook', 'myGroup');
     wrapper.update();
 
-    let outer = wrapper.find(outerSelector);
-    assert.isFalse(outer.hasClass('hidden'));
+    assert.isTrue(wrapper.find(outerSelector).exists());
 
     act(() => {
       wrapper.find('IconButton').prop('onClick')();
     });
     wrapper.update();
 
-    outer = wrapper.find(outerSelector);
-
-    assert.isTrue(outer.hasClass('hidden'));
+    assert.isFalse(wrapper.find(outerSelector).exists());
   });
 
   it('resets document scrollability on closing the modal', () => {
