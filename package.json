@@ -105,7 +105,9 @@
   "prettier": {
     "arrowParens": "avoid",
     "singleQuote": true,
-    "importOrder": ["^[./]"],
+    "importOrder": [
+      "^[./]"
+    ],
     "importOrderSeparation": true
   },
   "main": "./build/boot.js",
