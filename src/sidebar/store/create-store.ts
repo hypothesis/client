@@ -158,14 +158,22 @@ export function createStore<
     thunk,
   ];
 
-  const enhancer = redux.applyMiddleware(...defaultMiddleware, ...middleware);
+  // In debug builds, allow using redux dev tools
+  // See https://github.com/reduxjs/redux-devtools/tree/main/extension#11-basic-store
+  const isDebug = process.env.NODE_ENV !== 'production';
+  const composeEnhancers =
+    (isDebug && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__) ||
+    redux.compose;
+  const enhancer = composeEnhancers(
+    redux.applyMiddleware(...defaultMiddleware, ...middleware)
+  );
 
   // Combine the reducers for all modules
   let reducer = redux.combineReducers(allReducers);
 
   // In debug builds, freeze the new state after each action to catch any attempts
   // to mutate it, which indicates a bug since it is supposed to be immutable.
-  if (process.env.NODE_ENV !== 'production') {
+  if (isDebug) {
     const originalReducer = reducer;
     reducer = (state, action) => immutable(originalReducer(state, action));
   }
