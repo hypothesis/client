@@ -14,15 +14,11 @@ type ProfileModalProps = {
 export default function ProfileModal({ eventBus, config }: ProfileModalProps) {
   const [isHidden, setIsHidden] = useState(true);
   const emitterRef = useRef<Emitter | null>(null);
-  // Used only to track when was this modal first open, delaying the iframe to
-  // be loaded until strictly necessary.
-  const [hasOpened, setHasOpened] = useState(false);
 
   useEffect(() => {
     const emitter = eventBus.createEmitter();
     emitter.subscribe('openProfile', () => {
       setIsHidden(false);
-      setHasOpened(true);
     });
     emitterRef.current = emitter;
 
@@ -36,16 +32,13 @@ export default function ProfileModal({ eventBus, config }: ProfileModalProps) {
     emitterRef.current?.publish('closeProfile');
   };
 
-  if (!hasOpened) {
+  if (isHidden) {
     return null;
   }
 
   return (
     <div
-      className={classnames(
-        'fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50',
-        { hidden: isHidden }
-      )}
+      className="fixed z-max top-0 left-0 right-0 bottom-0 p-3 bg-black/50"
       data-testid="profile-outer"
     >
       <div className="relative w-full h-full" data-testid="profile-inner">
