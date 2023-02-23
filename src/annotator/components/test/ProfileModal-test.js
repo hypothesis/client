@@ -34,7 +34,7 @@ describe('ProfileModal', () => {
     components.forEach(component => component.unmount());
   });
 
-  it('does not render anything before the modal has been opened at least once', () => {
+  it('does not render anything while the modal is closed', () => {
     const wrapper = createComponent();
     assert.equal(wrapper.find(outerSelector).length, 0);
   });
@@ -45,29 +45,25 @@ describe('ProfileModal', () => {
     emitter.publish('openProfile');
     wrapper.update();
 
-    const outer = wrapper.find(outerSelector);
-    assert.isFalse(outer.hasClass('hidden'));
+    assert.isTrue(wrapper.find(outerSelector).exists());
 
     const iframe = wrapper.find('iframe');
     assert.equal(iframe.prop('src'), profileURL);
   });
 
-  it('hides modal on closing', () => {
+  it("removes the modal's content on closing", () => {
     const wrapper = createComponent();
 
     emitter.publish('openProfile');
     wrapper.update();
 
-    let outer = wrapper.find(outerSelector);
-    assert.isFalse(outer.hasClass('hidden'));
+    assert.isTrue(wrapper.find(outerSelector).exists());
 
     act(() => {
       wrapper.find('IconButton').prop('onClick')();
     });
     wrapper.update();
 
-    outer = wrapper.find(outerSelector);
-
-    assert.isTrue(outer.hasClass('hidden'));
+    assert.isFalse(wrapper.find(outerSelector).exists());
   });
 });
