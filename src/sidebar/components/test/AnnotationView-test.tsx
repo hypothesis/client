@@ -1,27 +1,44 @@
 import { mount } from 'enzyme';
+import sinon from 'sinon';
+import type { SinonStub } from 'sinon';
 
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
+import { getImports } from '../../../test-util/mockable-imports';
 import { waitFor } from '../../../test-util/wait';
-import AnnotationView, { $imports } from '../AnnotationView';
+import type { LoadAnnotationsService } from '../../services/load-annotations';
+import type { SidebarStore } from '../../store';
+import * as AnnotationViewExports from '../AnnotationView';
+import type { AnnotationViewProps } from '../AnnotationView';
+
+const AnnotationView = AnnotationViewExports.default;
+const $imports = getImports(AnnotationViewExports);
 
 describe('AnnotationView', () => {
-  let fakeStore;
-  let fakeOnLogin;
+  let highlightAnnotations: SinonStub;
+  let setExpanded: SinonStub;
+  let profile: SinonStub;
+  let fakeStore: SidebarStore;
+  let fakeOnLogin: SinonStub;
   let fakeUseRootThread;
-  let fakeLoadAnnotationsService;
+  let loadThread: SinonStub;
+  let fakeLoadAnnotationsService: LoadAnnotationsService;
 
   beforeEach(() => {
+    highlightAnnotations = sinon.stub();
+    setExpanded = sinon.stub();
+    profile = sinon.stub().returns({ userid: null });
     fakeStore = {
       clearAnnotations: sinon.stub(),
-      highlightAnnotations: sinon.stub(),
+      highlightAnnotations,
       routeParams: sinon.stub().returns({ id: 'test_annotation_id' }),
-      profile: sinon.stub().returns({ userid: null }),
-      setExpanded: sinon.stub(),
-    };
+      profile,
+      setExpanded,
+    } as unknown as SidebarStore; // We need a proper mocking lib
 
+    loadThread = sinon.stub().resolves([]);
     fakeLoadAnnotationsService = {
-      loadThread: sinon.stub().resolves([]),
-    };
+      loadThread,
+    } as unknown as LoadAnnotationsService; // We need a proper mocking lib
 
     fakeOnLogin = sinon.stub();
 
@@ -40,13 +57,15 @@ describe('AnnotationView', () => {
     $imports.$restore();
   });
 
-  function createComponent(props = {}) {
+  function createComponent(props: Partial<AnnotationViewProps> = {}) {
     return mount(
-      <AnnotationView
-        loadAnnotationsService={fakeLoadAnnotationsService}
-        onLogin={fakeOnLogin}
-        {...props}
-      />
+      (
+        <AnnotationView
+          loadAnnotationsService={fakeLoadAnnotationsService}
+          onLogin={fakeOnLogin}
+          {...props}
+        />
+      ) as any // See https://github.com/preactjs/preact/issues/1206#issuecomment-854862736
     );
   }
 
@@ -54,12 +73,12 @@ describe('AnnotationView', () => {
     it('loads the annotation thread', () => {
       createComponent();
 
-      assert.calledOnce(fakeLoadAnnotationsService.loadThread);
+      assert.calledOnce(loadThread);
     });
 
     context('successfully-loaded annotation thread', () => {
       beforeEach(() => {
-        fakeLoadAnnotationsService.loadThread.resolves([
+        loadThread.resolves([
           { id: 'test_annotation_id' },
           { id: 'test_reply_id', references: ['test_annotation_id'] },
         ]);
@@ -70,7 +89,7 @@ describe('AnnotationView', () => {
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        assert.notCalled(fakeStore.highlightAnnotations);
+        assert.notCalled(highlightAnnotations);
       });
 
       it('expands the thread', async () => {
@@ -78,13 +97,13 @@ describe('AnnotationView', () => {
 
         await new Promise(resolve => setTimeout(resolve, 0));
 
-        assert.calledWith(fakeStore.setExpanded, 'test_annotation_id', true);
-        assert.calledWith(fakeStore.setExpanded, 'test_reply_id', true);
+        assert.calledWith(setExpanded, 'test_annotation_id', true);
+        assert.calledWith(setExpanded, 'test_reply_id', true);
       });
     });
 
     it('shows an error if the annotation could not be fetched', async () => {
-      fakeLoadAnnotationsService.loadThread.rejects();
+      loadThread.rejects();
       const onLogin = sinon.stub();
       const wrapper = createComponent({ onLogin });
 
@@ -96,27 +115,25 @@ describe('AnnotationView', () => {
       });
 
       // Simulate clicking the "Login" button in the error.
-      const onLoginRequest = wrapper
+      const onLoginRequest: () => void = wrapper
         .find('SidebarContentError')
         .prop('onLoginRequest');
       onLoginRequest();
       assert.called(onLogin);
 
-      fakeLoadAnnotationsService.loadThread.resetHistory();
-      fakeLoadAnnotationsService.loadThread.resolves([
-        { id: 'test_annotation_id' },
-      ]);
-      fakeStore.profile.returns({ userid: 'acct:jimsmith@hypothes.is' });
+      loadThread.resetHistory();
+      loadThread.resolves([{ id: 'test_annotation_id' }]);
+      profile.returns({ userid: 'acct:jimsmith@hypothes.is' });
 
       // Force re-render. `useStore` would do this in the actual app.
       wrapper.setProps({});
 
-      await waitFor(() => fakeLoadAnnotationsService.loadThread.called);
+      await waitFor(() => loadThread.called);
       assert.isFalse(wrapper.exists('SidebarContentError'));
     });
 
     it('highlights the annotation if it is a reply', async () => {
-      fakeLoadAnnotationsService.loadThread.resolves([
+      loadThread.resolves([
         { id: 'parent_id' },
         { id: 'test_annotation_id', references: ['parent_id'] },
       ]);
@@ -125,7 +142,7 @@ describe('AnnotationView', () => {
 
       await new Promise(resolve => setTimeout(resolve, 0));
       assert.calledWith(
-        fakeStore.highlightAnnotations,
+        highlightAnnotations,
         sinon.match(['test_annotation_id'])
       );
     });

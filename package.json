@@ -27,6 +27,7 @@
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
     "@types/chai": "^4.3.4",
     "@types/dompurify": "^2.3.3",
+    "@types/enzyme": "^3.10.12",
     "@types/escape-html": "^1.0.1",
     "@types/hammerjs": "^2.0.41",
     "@types/katex": "^0.16.0",
