@@ -1,7 +1,7 @@
 import type { assert as chaiAssert } from 'chai';
 import type { assert as sinonAssert } from 'sinon';
 
-import type { rejects } from './assert-methods';
+import type { Rejects } from './assert-methods';
 
 // During tests bootstrap, we expose sinon's assert and merge it with chai's
 // one. Then, on tests, we perform assertions via the global `assert` object.
@@ -9,6 +9,5 @@ import type { rejects } from './assert-methods';
 // has the types of both chai's assert and sinon's assert.
 // Additionally, we also add the `rejects` method to it.
 declare global {
-  const assert: typeof chaiAssert &
-    typeof sinonAssert & { rejects: typeof rejects };
+  const assert: typeof chaiAssert & typeof sinonAssert & { rejects: Rejects };
 }

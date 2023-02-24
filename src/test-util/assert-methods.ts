@@ -9,12 +9,15 @@
  *
  * e.g. await rejects(someAsyncFunction(), /expected error/g);
  *
- * @param {Promise} promiseResult - The returned promise a function to test
- * @param {RegEx|String} errorMessage - A string or regex that matches the error
- * which is expected to be thrown.
+ * @param promiseResult - The returned promise a function to test
+ * @param errorMessage - A string or regex that matches the error which is
+ *    expected to be thrown.
  */
 
-export const rejects = async (promiseResult, errorMessage) => {
+const rejects = async (
+  promiseResult: Promise<any>,
+  errorMessage: RegExp | string
+) => {
   try {
     await promiseResult;
     const error = new Error();
@@ -34,12 +37,14 @@ export const rejects = async (promiseResult, errorMessage) => {
   }
 };
 
+export type Rejects = typeof rejects;
+
 /**
- * Patches the assert object with additional custom helper methods
+ * Patches the `assert` object with additional custom helper methods
  * defined in this module.
  *
- * @param {object} assert - global assertion object.
+ * @param assert - global assertion object.
  */
-export function patch(assert) {
+export function patch(assert: any) {
   assert.rejects = rejects;
 }
