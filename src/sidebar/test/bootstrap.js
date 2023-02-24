@@ -1,9 +1,9 @@
-// Patch extra assert helper methods
 import { configure } from 'enzyme';
 import { Adapter } from 'enzyme-adapter-preact-pure';
 // Configure Enzyme for UI tests.
 import 'preact/debug';
 
+// Patch extra assert helper methods
 import { patch } from '../../test-util/assert-methods';
 
 // Expose the sinon assertions.

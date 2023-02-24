@@ -14,7 +14,7 @@
  * which is expected to be thrown.
  */
 
-const rejects = async (promiseResult, errorMessage) => {
+export const rejects = async (promiseResult, errorMessage) => {
   try {
     await promiseResult;
     const error = new Error();
