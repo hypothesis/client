@@ -106,17 +106,26 @@ function TopBar({
         <div className="grow flex items-center justify-end">
           {isSidebar && (
             <>
-              {pendingUpdateCount > 0 && (
-                <IconButton
-                  icon={RefreshIcon}
-                  onClick={applyPendingUpdates}
-                  size="xs"
-                  variant="primary"
-                  title={`Show ${pendingUpdateCount} new/updated ${
-                    pendingUpdateCount === 1 ? 'annotation' : 'annotations'
-                  }`}
-                />
-              )}
+              <span aria-live="polite">
+                {pendingUpdateCount > 0 && (
+                  <>
+                    <IconButton
+                      icon={RefreshIcon}
+                      onClick={applyPendingUpdates}
+                      size="xs"
+                      variant="primary"
+                      title={`Show ${pendingUpdateCount} new/updated ${
+                        pendingUpdateCount === 1 ? 'annotation' : 'annotations'
+                      }`}
+                    />
+                    <span className="sr-only">
+                      Show {pendingUpdateCount} new/updated {
+                      pendingUpdateCount === 1 ? 'annotation' : 'annotations'
+                    }
+                    </span>
+                  </>
+                )}
+              </span>
               <SearchInput
                 query={filterQuery || null}
                 onSearch={store.setFilterQuery}
