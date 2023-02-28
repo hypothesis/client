@@ -54,8 +54,8 @@ describe('AutocompleteList', () => {
 
   it('sets `aria-selected` on the <li> at the matching index to `activeItem`', () => {
     const wrapper = createComponent({ open: true, activeItem: 0 });
-    assert.equal(wrapper.find('li').at(0).prop('aria-selected'), 'true');
-    assert.equal(wrapper.find('li').at(1).prop('aria-selected'), 'false');
+    assert.equal(wrapper.find('li').at(0).prop('aria-selected'), true);
+    assert.equal(wrapper.find('li').at(1).prop('aria-selected'), false);
   });
 
   it('calls `onSelect` when an <li> is clicked with the corresponding item', () => {
