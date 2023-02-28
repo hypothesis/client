@@ -72,7 +72,7 @@ export default function AutocompleteList<Item>({
         <li
           key={`AutocompleteList-${index}`}
           role="option"
-          aria-selected={(activeItem === index).toString()}
+          aria-selected={activeItem === index}
           className={classnames(
             'flex items-center',
             'border-l-4 py-1 px-3 cursor-pointer hover:bg-grey-2',
