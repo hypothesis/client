@@ -466,16 +466,10 @@ describe('TagEditor', () => {
       const wrapper = createComponent();
       wrapper.find('input').instance().value = 'non-empty'; // to open list
       typeInput(wrapper);
-      assert.equal(
-        wrapper.find(comboboxSelector).prop('aria-expanded'),
-        'true'
-      );
+      assert.equal(wrapper.find(comboboxSelector).prop('aria-expanded'), true);
       selectOption(wrapper, 'tag4');
       wrapper.update();
-      assert.equal(
-        wrapper.find(comboboxSelector).prop('aria-expanded'),
-        'false'
-      );
+      assert.equal(wrapper.find(comboboxSelector).prop('aria-expanded'), false);
     });
 
     it('sets the <AutocompleteList> `activeItem` prop to match the selected item index', () => {

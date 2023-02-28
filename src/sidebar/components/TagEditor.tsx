@@ -273,7 +273,7 @@ function TagEditor({
           aria-autocomplete="list"
           aria-activedescendant={activeDescendant}
           aria-controls={`${tagEditorId}-AutocompleteList`}
-          aria-expanded={suggestionsListOpen.toString()}
+          aria-expanded={suggestionsListOpen}
           aria-label="Add tags"
           dir="auto"
           role="combobox"
