@@ -2,7 +2,6 @@ import {
   IconButton,
   LinkButton,
   HelpIcon,
-  RefreshIcon,
   ShareIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
@@ -16,6 +15,7 @@ import type { FrameSyncService } from '../services/frame-sync';
 import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
+import PendingUpdatesButton from './PendingUpdatesButton';
 import SearchInput from './SearchInput';
 import SortMenu from './SortMenu';
 import StreamSearchInput from './StreamSearchInput';
@@ -106,26 +106,10 @@ function TopBar({
         <div className="grow flex items-center justify-end">
           {isSidebar && (
             <>
-              <span aria-live="polite">
-                {pendingUpdateCount > 0 && (
-                  <>
-                    <IconButton
-                      icon={RefreshIcon}
-                      onClick={applyPendingUpdates}
-                      size="xs"
-                      variant="primary"
-                      title={`Show ${pendingUpdateCount} new/updated ${
-                        pendingUpdateCount === 1 ? 'annotation' : 'annotations'
-                      }`}
-                    />
-                    <span className="sr-only">
-                      Show {pendingUpdateCount} new/updated {
-                      pendingUpdateCount === 1 ? 'annotation' : 'annotations'
-                    }
-                    </span>
-                  </>
-                )}
-              </span>
+              <PendingUpdatesButton
+                pendingUpdateCount={pendingUpdateCount}
+                onClick={applyPendingUpdates}
+              />
               <SearchInput
                 query={filterQuery || null}
                 onSearch={store.setFilterQuery}

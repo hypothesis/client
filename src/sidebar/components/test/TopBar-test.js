@@ -69,23 +69,9 @@ describe('TopBar', () => {
     );
   }
 
-  it('shows the pending update count', () => {
-    fakeStore.pendingUpdateCount.returns(1);
-    const wrapper = createTopBar();
-    const applyBtn = getButton(wrapper, 'RefreshIcon');
-    assert.isTrue(applyBtn.exists());
-  });
-
-  it('does not show the pending update count when there are no updates', () => {
-    const wrapper = createTopBar();
-    const applyBtn = getButton(wrapper, 'RefreshIcon');
-    assert.isFalse(applyBtn.exists());
-  });
-
   it('applies updates when clicked', () => {
-    fakeStore.pendingUpdateCount.returns(1);
     const wrapper = createTopBar();
-    const applyBtn = getButton(wrapper, 'RefreshIcon');
+    const applyBtn = wrapper.find('PendingUpdatesButton');
 
     applyBtn.props().onClick();
 
