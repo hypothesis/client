@@ -4,29 +4,30 @@ import { replaceLinksWithEmbeds } from '../media-embedder';
 import { renderMathAndMarkdown } from '../render-markdown';
 import StyledText from './StyledText';
 
-/**
- * @typedef MarkdownViewProps
- * @prop {string} markdown - The string of markdown to display
- * @prop {string} [classes]
- * @prop {Record<string,string>} [style]
-
- */
+export type MarkdownViewProps = {
+  /** The string of markdown to display as HTML. */
+  markdown: string;
+  classes?: string;
+  style?: Record<string, string>;
+};
 
 /**
  * A component which renders markdown as HTML and replaces recognized links
  * with embedded video/audio.
- *
- * @param {MarkdownViewProps} props
  */
-export default function MarkdownView({ markdown, classes, style }) {
+export default function MarkdownView({
+  markdown,
+  classes,
+  style,
+}: MarkdownViewProps) {
   const html = useMemo(
     () => (markdown ? renderMathAndMarkdown(markdown) : ''),
     [markdown]
   );
-  const content = /** @type {{ current: HTMLDivElement }} */ (useRef());
+  const content = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    replaceLinksWithEmbeds(content.current, {
+    replaceLinksWithEmbeds(content.current!, {
       // Make embeds the full width of the sidebar, unless the sidebar has been
       // made wider than the `md` breakpoint. In that case, restrict width
       // to 380px.

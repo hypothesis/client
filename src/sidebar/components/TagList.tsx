@@ -1,14 +1,13 @@
-/**
- * @typedef TagListProps
- * @prop {import("preact").ComponentChildren} children
- */
+import type { ComponentChildren } from 'preact';
+
+export type TagListProps = {
+  children: ComponentChildren;
+};
 
 /**
  * Render a list container for a list of annotation tags.
- *
- * @param {TagListProps} props
  */
-function TagList({ children }) {
+export default function TagList({ children }: TagListProps) {
   return (
     <ul
       className="flex flex-wrap gap-2 leading-none"
@@ -18,5 +17,3 @@ function TagList({ children }) {
     </ul>
   );
 }
-
-export default TagList;

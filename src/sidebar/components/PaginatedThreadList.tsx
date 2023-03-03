@@ -1,27 +1,23 @@
 import { useMemo } from 'preact/hooks';
 
+import type { Thread } from '../helpers/build-thread';
 import { countVisible } from '../helpers/thread';
 import PaginationNavigation from './PaginationNavigation';
 import ThreadList from './ThreadList';
 
-/** @typedef {import('../helpers/build-thread').Thread} Thread */
-
-/**
- * @typedef PaginatedThreadListProps
- * @prop {number} currentPage
- * @prop {boolean} isLoading
- * @prop {(page: number) => void} onChangePage
- * @prop {Thread[]} threads
- * @prop {number} [pageSize]
- */
+export type PaginatedThreadListProps = {
+  currentPage: number;
+  isLoading: boolean;
+  onChangePage: (page: number) => void;
+  threads: Thread[];
+  pageSize?: number;
+};
 
 /**
  * Determine which subset of all current `threads` to show on the current
  * page of results, and how many pages of results there are total.
  *
  * Render the threads for the current page of results, and pagination controls.
- *
- * @param {PaginatedThreadListProps} props
  */
 function PaginatedThreadList({
   currentPage,
@@ -29,7 +25,7 @@ function PaginatedThreadList({
   onChangePage,
   threads,
   pageSize = 25,
-}) {
+}: PaginatedThreadListProps) {
   const { paginatedThreads, totalPages } = useMemo(() => {
     const visibleThreads = threads.filter(thread => countVisible(thread) > 0);
     const startIndex = (currentPage - 1) * pageSize;

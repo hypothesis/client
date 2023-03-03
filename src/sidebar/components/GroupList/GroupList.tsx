@@ -2,6 +2,8 @@ import { PlusIcon } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 import { useMemo, useState } from 'preact/hooks';
 
+import type { Group } from '../../../types/api';
+import type { SidebarSettings } from '../../../types/config';
 import { serviceConfig } from '../../config/service-config';
 import { isThirdPartyUser } from '../../helpers/account-id';
 import { orgName } from '../../helpers/group-list-item-common';
@@ -14,33 +16,23 @@ import MenuItem from '../MenuItem';
 import GroupListSection from './GroupListSection';
 
 /**
- * @typedef {import('../../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../../../types/api').Group} Group
- */
-
-/**
  * Return the custom icon for the top bar configured by the publisher in
  * the Hypothesis client configuration.
- *
- * @param {SidebarSettings} settings
  */
-function publisherProvidedIcon(settings) {
+function publisherProvidedIcon(settings: SidebarSettings) {
   const svc = serviceConfig(settings);
   return svc && svc.icon ? svc.icon : null;
 }
 
-/**
- * @typedef GroupListProps
- * @prop {SidebarSettings} settings
- */
+export type GroupListProps = {
+  settings: SidebarSettings;
+};
 
 /**
  * Menu allowing the user to select which group to show and also access
  * additional actions related to groups.
- *
- * @param {GroupListProps} props
  */
-function GroupList({ settings }) {
+function GroupList({ settings }: GroupListProps) {
   const store = useSidebarStore();
   const currentGroups = store.getCurrentlyViewingGroups();
   const featuredGroups = store.getFeaturedGroups();
@@ -73,9 +65,7 @@ function GroupList({ settings }) {
   //
   // nb. If we create other menus that behave similarly in future, we may want
   // to move this state to the `Menu` component.
-  const [expandedGroup, setExpandedGroup] = useState(
-    /** @type {Group|null} */ (null)
-  );
+  const [expandedGroup, setExpandedGroup] = useState<Group | null>(null);
 
   let label;
   if (focusedGroup) {

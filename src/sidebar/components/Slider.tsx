@@ -1,10 +1,13 @@
+import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
 
-/**
- * @typedef SliderProps
- * @prop {object} [children] - The slideable content to hide or reveal.
- * @prop {boolean} visible - Whether the content should be visible or not.
- */
+export type SliderProps = {
+  /** The content to hide or reveal. */
+  children?: ComponentChildren;
+
+  /** Whether the content should be visible or not. */
+  visible: boolean;
+};
 
 /**
  * A container which reveals its content when `visible` is `true` using
@@ -15,11 +18,9 @@ import { useCallback, useEffect, useRef, useState } from 'preact/hooks';
  * order.
  *
  * Currently the only reveal/expand direction supported is top-down.
- *
- * @param {SliderProps} props
  */
-export default function Slider({ children, visible }) {
-  const containerRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
+export default function Slider({ children, visible }: SliderProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerHeight, setContainerHeight] = useState(visible ? 'auto' : 0);
 
   // Whether the content is currently partially or wholly visible. This is
@@ -35,7 +36,7 @@ export default function Slider({ children, visible }) {
       return;
     }
 
-    const el = containerRef.current;
+    const el = containerRef.current!;
     if (visible) {
       // Show the content synchronously so that we can measure it here.
       el.style.display = '';
