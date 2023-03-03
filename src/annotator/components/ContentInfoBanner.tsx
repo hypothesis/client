@@ -6,9 +6,9 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
-/**
- * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoConfig
- */
+import type { ContentInfoConfig } from '../../types/annotator';
+
+export type ContentInfoBannerProps = { info: ContentInfoConfig };
 
 /**
  * A banner that displays information about the current document and the entity
@@ -18,11 +18,8 @@ import classnames from 'classnames';
  *  - Logo
  *  - Container title (only shown on screens at `2xl` breakpoint and wider)
  *  - Item title with previous and next links
- *
- * @param {object} props
- *   @param {ContentInfoConfig} props.info
  */
-export default function ContentInfoBanner({ info }) {
+export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
   // Format item title to show subtitle
   let itemTitle = info.item.title;
   if (info.item.subtitle) {
