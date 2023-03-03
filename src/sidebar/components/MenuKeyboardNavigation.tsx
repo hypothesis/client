@@ -1,17 +1,25 @@
+import type { ComponentChildren } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
-/** @param {HTMLElement} element */
-function isElementVisible(element) {
+function isElementVisible(element: HTMLElement) {
   return element.offsetParent !== null;
 }
 
-/**
- * @typedef MenuKeyboardNavigationProps
- * @prop {string} [className]
- * @prop {(e: KeyboardEvent) => void} [closeMenu] - Callback when the menu is closed via keyboard input
- * @prop {boolean} [visible] - When  true`, sets focus on the first item in the list
- * @prop {import('preact').ComponentChildren} children - Array of nodes which may contain <MenuItems> or any nodes
- */
+export type MenuKeyboardNavigationProps = {
+  className?: string;
+
+  /** Callback invoked when the menu is closed via a keyboard command. */
+  closeMenu?: (e: KeyboardEvent) => void;
+
+  /**
+   * If true, the first element in children with `role=menuitem` is focused when
+   * this component is mounted.
+   */
+  visible?: boolean;
+
+  /** Content to display, which is typically a list of `<MenuItem>` elements. */
+  children: ComponentChildren;
+};
 
 /**
  * Helper component used by Menu and MenuItem to facilitate keyboard navigation of a
@@ -19,26 +27,25 @@ function isElementVisible(element) {
  *
  * Note that `ArrowRight` shall be handled by the parent <MenuItem> directly and
  * all other focus() related navigation is handled here.
- *
- * @param {MenuKeyboardNavigationProps} props
  */
 export default function MenuKeyboardNavigation({
   className,
   closeMenu,
   children,
   visible,
-}) {
-  const menuRef = /** @type {{ current: HTMLDivElement }} */ (useRef());
+}: MenuKeyboardNavigationProps) {
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    /** @type {number|undefined} */
-    let focusTimer;
+    let focusTimer: number | undefined;
     if (visible) {
       focusTimer = setTimeout(() => {
         // The focus won't work without delaying rendering.
-        const firstItem = menuRef.current.querySelector('[role^="menuitem"]');
+        const firstItem = menuRef.current!.querySelector(
+          '[role^="menuitem"]'
+        ) as HTMLElement;
         if (firstItem) {
-          /** @type {HTMLElement} */ (firstItem).focus();
+          firstItem.focus();
         }
       });
     }
@@ -48,11 +55,11 @@ export default function MenuKeyboardNavigation({
     };
   }, [visible]);
 
-  /** @param {KeyboardEvent} event */
-  const onKeyDown = event => {
+  const onKeyDown = (event: KeyboardEvent) => {
     const menuItems = Array.from(
-      /** @type {NodeListOf<HTMLElement>} */
-      (menuRef.current.querySelectorAll('[role^="menuitem"]'))
+      menuRef.current!.querySelectorAll(
+        '[role^="menuitem"]'
+      ) as NodeListOf<HTMLElement>
     ).filter(isElementVisible);
 
     let focusedIndex = menuItems.findIndex(el =>

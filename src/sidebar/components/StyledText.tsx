@@ -1,17 +1,19 @@
 import classnames from 'classnames';
+import type { ComponentChildren, JSX } from 'preact';
 
-/**
- * @typedef StyledTextProps
- * @prop {import('preact').ComponentChildren} children
- * @prop {string} [classes]
- */
+export type StyledTextProps = JSX.HTMLAttributes<HTMLDivElement> & {
+  children: ComponentChildren;
+  classes?: string;
+};
 
 /**
  * Render children as styled text: basic prose styling for HTML
- *
- * @param {StyledTextProps & import('preact').JSX.HTMLAttributes<HTMLDivElement>} props
  */
-export default function StyledText({ children, classes, ...restProps }) {
+export default function StyledText({
+  children,
+  classes,
+  ...restProps
+}: StyledTextProps) {
   // The language for the quote may be different than the client's UI (set by
   // `<html lang="...">`).
   //

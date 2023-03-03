@@ -1,12 +1,13 @@
 import { toChildArray } from 'preact';
+import type { ComponentChildren, VNode } from 'preact';
 
-/** @typedef {import("preact").JSX.Element} JSXElement */
+export type MenuSectionProps = {
+  /** Heading displayed at the top of the menu. */
+  heading?: string;
 
-/**
- * @typedef MenuSectionProps
- * @prop {string} [heading] - Heading displayed at the top of the menu.
- * @prop {object} children - Menu items to display in this section.
- */
+  /** Menu items to display in this section. */
+  children: ComponentChildren;
+};
 
 /**
  * Group a set of menu items together visually, with an optional header.
@@ -25,7 +26,7 @@ import { toChildArray } from 'preact';
  *
  * @param {MenuSectionProps} props
  */
-export default function MenuSection({ heading, children }) {
+export default function MenuSection({ heading, children }: MenuSectionProps) {
   return (
     <>
       {heading && (
@@ -35,7 +36,7 @@ export default function MenuSection({ heading, children }) {
       )}
       <ul className="border-b">
         {toChildArray(children).map(child => (
-          <li key={/** @type {JSXElement} **/ (child).key}>{child}</li>
+          <li key={(child as VNode).key}>{child}</li>
         ))}
       </ul>
     </>

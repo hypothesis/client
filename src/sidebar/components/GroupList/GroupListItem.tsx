@@ -6,33 +6,33 @@ import {
 import classnames from 'classnames';
 
 import { confirm } from '../../../shared/prompts';
+import type { Group } from '../../../types/api';
 import { orgName } from '../../helpers/group-list-item-common';
 import { withServices } from '../../service-context';
+import type { GroupsService } from '../../services/groups';
+import type { ToastMessengerService } from '../../services/toast-messenger';
 import { useSidebarStore } from '../../store';
 import { copyText } from '../../util/copy-to-clipboard';
 import MenuItem from '../MenuItem';
 
-/**
- * @typedef {import('../../../types/api').Group} Group
- */
+export type GroupListItemProps = {
+  group: Group;
 
-/**
- * @typedef GroupListItemProps
- * @prop {Group} group
- * @prop {boolean} [isExpanded] - Whether the submenu for this group is expanded
- * @prop {(expand: boolean) => void} onExpand -
- *   Callback invoked to expand or collapse the current group
- * @prop {import('../../services/groups').GroupsService} groups
- * @prop {import('../../services/toast-messenger').ToastMessengerService} toastMessenger
- */
+  /** Whether the submenu for this group is expanded. */
+  isExpanded?: boolean;
+
+  /** Callback invoked to expand or collapse the current group. */
+  onExpand: (expand: boolean) => void;
+
+  groups: GroupsService;
+  toastMessenger: ToastMessengerService;
+};
 
 /**
  * An item in the groups selection menu.
  *
  * The item has a primary action which selects the group, along with a set of
  * secondary actions accessible via a toggle menu.
- *
- * @param {GroupListItemProps} props
  */
 function GroupListItem({
   isExpanded,
@@ -40,7 +40,7 @@ function GroupListItem({
   groups: groupsService,
   onExpand,
   toastMessenger,
-}) {
+}: GroupListItemProps) {
   const activityUrl = group.links.html;
   const hasActionMenu = activityUrl || group.canLeave;
   const isSelectable =
@@ -69,12 +69,7 @@ function GroupListItem({
     }
   };
 
-  /**
-   * Opens or closes the submenu.
-   *
-   * @param {Event} event
-   */
-  const toggleSubmenu = event => {
+  const toggleSubmenu = (event: Event) => {
     event.stopPropagation();
 
     // Prevents group items opening a new window when clicked.
@@ -84,10 +79,7 @@ function GroupListItem({
     onExpand(!isExpanded);
   };
 
-  /**
-   * @param {string} url
-   */
-  const copyLink = url => {
+  const copyLink = (url: string) => {
     try {
       copyText(url);
       toastMessenger.success(`Copied link for "${group.name}"`);
