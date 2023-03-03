@@ -214,6 +214,11 @@ export default {
       // class to the sidebar frame when it's collapsed. This modifier allows
       // sub-components to select for that state.
       addVariant('sidebar-collapsed', '.sidebar-collapsed &');
+      // Add a custom variant such that the `theme-clean:` modifier is available
+      // for all tailwind utility classes. e.g. `.theme-clean:bg-white` would
+      // only apply (set the element's background color to white) if a parent
+      // element had the `.theme-clean` class.
+      addVariant('theme-clean', '.theme-clean &');
     }),
     plugin(({ addComponents, addUtilities }) => {
       // Tailwind does not provide hyphens-related utility classes.
