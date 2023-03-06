@@ -1308,13 +1308,13 @@
     fastq "^1.6.0"
 
 "@npmcli/arborist@^6.1.1":
-  version "6.2.3"
-  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.2.3.tgz#31f8aed2588341864d3811151d929c01308f8e71"
-  integrity sha512-lpGOC2ilSJXcc2zfW9QtukcCTcMbl3fVI0z4wvFB2AFIl0C+Q6Wv7ccrpdrQa8rvJ1ZVuc6qkX7HVTyKlzGqKA==
+  version "6.2.4"
+  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.2.4.tgz#a9c567a33012a7df5af86dfd1a3308686b056d92"
+  integrity sha512-8nwyvv/WyGupcD9CRm3SOyFVgysHehMbkFgNXwz6db8Dd4hCkG8bptgPL5dveJzRUiA2AGKaGhX5CQsXaCyI/g==
   dependencies:
     "@isaacs/string-locale-compare" "^1.1.0"
     "@npmcli/fs" "^3.1.0"
-    "@npmcli/installed-package-contents" "^2.0.0"
+    "@npmcli/installed-package-contents" "^2.0.2"
     "@npmcli/map-workspaces" "^3.0.2"
     "@npmcli/metavuln-calculator" "^5.0.0"
     "@npmcli/name-from-folder" "^2.0.0"
@@ -1376,10 +1376,10 @@
     semver "^7.3.5"
     which "^3.0.0"
 
-"@npmcli/installed-package-contents@^2.0.0", "@npmcli/installed-package-contents@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@npmcli/installed-package-contents/-/installed-package-contents-2.0.1.tgz#3cad3141c95613426820128757a3549bef1b346b"
-  integrity sha512-GIykAFdOVK31Q1/zAtT5MbxqQL2vyl9mvFJv+OGu01zxbhL3p0xc8gJjdNGX1mWmUT43aEKVO2L6V/2j4TOsAA==
+"@npmcli/installed-package-contents@^2.0.1", "@npmcli/installed-package-contents@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@npmcli/installed-package-contents/-/installed-package-contents-2.0.2.tgz#bfd817eccd9e8df200919e73f57f9e3d9e4f9e33"
+  integrity sha512-xACzLPhnfD51GKvTOOuNX2/V4G4mz9/1I2MfDoye9kBM3RYe5g2YbscsaGoTlaWqkxeiapBWyseULVKpSVHtKQ==
   dependencies:
     npm-bundled "^3.0.0"
     npm-normalize-package-bin "^3.0.0"
