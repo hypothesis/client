@@ -9,6 +9,7 @@ describe('TopBar', () => {
   let fakeFrameSync;
   let fakeStore;
   let fakeStreamer;
+  let fakeToastMessenger;
   let fakeIsThirdPartyService;
   let fakeServiceConfig;
 
@@ -33,6 +34,10 @@ describe('TopBar', () => {
 
     fakeStreamer = {
       applyPendingUpdates: sinon.stub(),
+    };
+
+    fakeToastMessenger = {
+      success: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -64,6 +69,7 @@ describe('TopBar', () => {
         isSidebar={true}
         settings={fakeSettings}
         streamer={fakeStreamer}
+        toastMessenger={fakeToastMessenger}
         {...props}
       />
     );

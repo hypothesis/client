@@ -6,6 +6,7 @@ import {
   ShareIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
+import { useEffect } from 'preact/hooks';
 
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
@@ -14,6 +15,7 @@ import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
 import type { StreamerService } from '../services/streamer';
+import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
 import SearchInput from './SearchInput';
@@ -38,6 +40,7 @@ export type TopBarProps = {
   frameSync: FrameSyncService;
   settings: SidebarSettings;
   streamer: StreamerService;
+  toastMessenger: ToastMessengerService;
 };
 
 /**
@@ -52,6 +55,7 @@ function TopBar({
   frameSync,
   settings,
   streamer,
+  toastMessenger,
 }: TopBarProps) {
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
@@ -72,6 +76,17 @@ function TopBar({
   const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
     'shareGroupAnnotations'
   );
+
+  useEffect(() => {
+    if (pendingUpdateCount > 0) {
+      toastMessenger.success(
+        `There are ${pendingUpdateCount} new annotations.`,
+        {
+          visuallyHidden: true,
+        }
+      );
+    }
+  }, [pendingUpdateCount, toastMessenger]);
 
   /**
    * Open the help panel, or, if a service callback is configured to handle
@@ -175,4 +190,9 @@ function TopBar({
   );
 }
 
-export default withServices(TopBar, ['frameSync', 'settings', 'streamer']);
+export default withServices(TopBar, [
+  'frameSync',
+  'settings',
+  'streamer',
+  'toastMessenger',
+]);
