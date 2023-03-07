@@ -1,4 +1,5 @@
 import { generateHexString } from '../../shared/random';
+import type { SidebarStore } from '../store';
 
 // How long toast messages should be displayed before they are dismissed, in ms
 const MESSAGE_DISPLAY_TIME = 5000;
@@ -7,13 +8,19 @@ const MESSAGE_DISMISS_DELAY = 500;
 
 /**
  * Additional control over the display of a particular message.
- *
- * @typedef MessageOptions
- * @prop {boolean} [autoDismiss=true] - Whether the toast message automatically disappears.
- * @prop {string} [moreInfoURL=''] - Optional URL for users to visit for "more info"
- * @prop {boolean} [visuallyHidden=false] - When `true`, message will be visually
- *   hidden but still available to screen readers.
  */
+type MessageOptions = {
+  /** Whether the toast message automatically disappears. */
+  autoDismiss?: boolean;
+  /** Optional URL for users to visit for "more info" */
+  moreInfoURL?: string;
+
+  /**
+   * When `true`, message will be visually hidden but still available to screen
+   * readers.
+   */
+  visuallyHidden?: boolean;
+};
 
 /**
  * A service for managing toast messages. The service will auto-dismiss and
@@ -22,10 +29,9 @@ const MESSAGE_DISMISS_DELAY = 500;
  */
 // @inject
 export class ToastMessengerService {
-  /**
-   * @param {import('../store').SidebarStore} store
-   */
-  constructor(store) {
+  private _store: SidebarStore;
+
+  constructor(store: SidebarStore) {
     this._store = store;
   }
 
@@ -34,10 +40,10 @@ export class ToastMessengerService {
    * it after a bit. This allows effects/animations to happen before the
    * message is removed entirely.
    *
-   * @param {string} messageId - The value of the `id` property for the
-   *                             message that is to be dismissed.
+   * @param messageId - The value of the `id` property for the message that is
+   *                    to be dismissed.
    */
-  dismiss(messageId) {
+  dismiss(messageId: string) {
     const message = this._store.getToastMessage(messageId);
     if (message && !message.isDismissed) {
       this._store.updateToastMessage({ ...message, isDismissed: true });
@@ -52,15 +58,15 @@ export class ToastMessengerService {
    * after some time. This method will not add a message that is already
    * extant in the store's collection of toast messages (i.e. has the same
    * `type` and `message` text of an existing message).
-   *
-   * @param {('error'|'success'|'notice')} type
-   * @param {string} messageText - The message to be rendered
-   * @param {MessageOptions} options
    */
-  _addMessage(
-    type,
-    messageText,
-    { autoDismiss = true, moreInfoURL = '', visuallyHidden = false } = {}
+  private _addMessage(
+    type: 'error' | 'success' | 'notice',
+    messageText: string,
+    {
+      autoDismiss = true,
+      moreInfoURL = '',
+      visuallyHidden = false,
+    }: MessageOptions = {}
   ) {
     // Do not add duplicate messages (messages with the same type and text)
     if (this._store.hasToastMessage(type, messageText)) {
@@ -93,31 +99,22 @@ export class ToastMessengerService {
 
   /**
    * Add an error toast message with `messageText`
-   *
-   * @param {string} messageText
-   * @param {MessageOptions} [options]
    */
-  error(messageText, options) {
+  error(messageText: string, options?: MessageOptions) {
     this._addMessage('error', messageText, options);
   }
 
   /**
    * Add a success toast message with `messageText`
-   *
-   * @param {string} messageText
-   * @param {MessageOptions} [options]
    */
-  success(messageText, options) {
+  success(messageText: string, options?: MessageOptions) {
     this._addMessage('success', messageText, options);
   }
 
   /**
    * Add a warn/notice toast message with `messageText`
-   *
-   * @param {string} messageText
-   * @param {MessageOptions} [options]
    */
-  notice(messageText, options) {
+  notice(messageText: string, options?: MessageOptions) {
     this._addMessage('notice', messageText, options);
   }
 }
