@@ -75,17 +75,29 @@ describe('TopBar', () => {
     );
   }
 
-  it('shows the pending update count', () => {
-    fakeStore.pendingUpdateCount.returns(1);
-    const wrapper = createTopBar();
-    const applyBtn = getButton(wrapper, 'RefreshIcon');
-    assert.isTrue(applyBtn.exists());
+  [1, 10, 50].forEach(pendingUpdateCount => {
+    it('shows the pending update count', () => {
+      fakeStore.pendingUpdateCount.returns(pendingUpdateCount);
+      const wrapper = createTopBar();
+      const applyBtn = getButton(wrapper, 'RefreshIcon');
+
+      assert.isTrue(applyBtn.exists());
+      assert.calledWith(
+        fakeToastMessenger.success,
+        `There are ${pendingUpdateCount} new annotations.`,
+        {
+          visuallyHidden: true,
+        }
+      );
+    });
   });
 
   it('does not show the pending update count when there are no updates', () => {
     const wrapper = createTopBar();
     const applyBtn = getButton(wrapper, 'RefreshIcon');
+
     assert.isFalse(applyBtn.exists());
+    assert.notCalled(fakeToastMessenger.success);
   });
 
   it('applies updates when clicked', () => {
