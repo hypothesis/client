@@ -2,11 +2,9 @@ import {
   IconButton,
   LinkButton,
   HelpIcon,
-  RefreshIcon,
   ShareIcon,
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
-import { useEffect } from 'preact/hooks';
 
 import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
@@ -15,9 +13,9 @@ import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
 import type { StreamerService } from '../services/streamer';
-import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
+import PendingUpdatesButton from './PendingUpdatesButton';
 import SearchInput from './SearchInput';
 import SortMenu from './SortMenu';
 import StreamSearchInput from './StreamSearchInput';
@@ -40,7 +38,6 @@ export type TopBarProps = {
   frameSync: FrameSyncService;
   settings: SidebarSettings;
   streamer: StreamerService;
-  toastMessenger: ToastMessengerService;
 };
 
 /**
@@ -55,7 +52,6 @@ function TopBar({
   frameSync,
   settings,
   streamer,
-  toastMessenger,
 }: TopBarProps) {
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
@@ -76,17 +72,6 @@ function TopBar({
   const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
     'shareGroupAnnotations'
   );
-
-  useEffect(() => {
-    if (pendingUpdateCount > 0) {
-      toastMessenger.success(
-        `There are ${pendingUpdateCount} new annotations.`,
-        {
-          visuallyHidden: true,
-        }
-      );
-    }
-  }, [pendingUpdateCount, toastMessenger]);
 
   /**
    * Open the help panel, or, if a service callback is configured to handle
@@ -121,17 +106,10 @@ function TopBar({
         <div className="grow flex items-center justify-end">
           {isSidebar && (
             <>
-              {pendingUpdateCount > 0 && (
-                <IconButton
-                  icon={RefreshIcon}
-                  onClick={applyPendingUpdates}
-                  size="xs"
-                  variant="primary"
-                  title={`Show ${pendingUpdateCount} new/updated ${
-                    pendingUpdateCount === 1 ? 'annotation' : 'annotations'
-                  }`}
-                />
-              )}
+              <PendingUpdatesButton
+                pendingUpdateCount={pendingUpdateCount}
+                onClick={applyPendingUpdates}
+              />
               <SearchInput
                 query={filterQuery || null}
                 onSearch={store.setFilterQuery}
@@ -190,9 +168,4 @@ function TopBar({
   );
 }
 
-export default withServices(TopBar, [
-  'frameSync',
-  'settings',
-  'streamer',
-  'toastMessenger',
-]);
+export default withServices(TopBar, ['frameSync', 'settings', 'streamer']);
