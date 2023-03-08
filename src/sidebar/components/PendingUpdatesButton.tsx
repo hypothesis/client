@@ -3,9 +3,9 @@ import { useEffect } from 'preact/hooks';
 
 import { withServices } from '../service-context';
 import type { ToastMessengerService } from '../services/toast-messenger';
+import { useSidebarStore } from '../store';
 
 export type PendingUpdatesButtonProps = {
-  pendingUpdateCount: number;
   onClick: () => void;
 
   // Injected
@@ -13,12 +13,15 @@ export type PendingUpdatesButtonProps = {
 };
 
 function PendingUpdatesButton({
-  pendingUpdateCount,
   onClick,
   toastMessenger,
 }: PendingUpdatesButtonProps) {
+  const store = useSidebarStore();
+  const pendingUpdateCount = store.pendingUpdateCount();
+  const hasPendingUpdates = store.hasPendingUpdates();
+
   useEffect(() => {
-    if (pendingUpdateCount > 0) {
+    if (hasPendingUpdates) {
       toastMessenger.success(
         `There are ${pendingUpdateCount} new annotations.`,
         {
@@ -26,9 +29,12 @@ function PendingUpdatesButton({
         }
       );
     }
-  }, [pendingUpdateCount, toastMessenger]);
+    // We only want this effect to trigger when changing from no-updates to at
+    // least one update, not every time the amount changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasPendingUpdates]);
 
-  if (pendingUpdateCount === 0) {
+  if (!hasPendingUpdates) {
     return null;
   }
 

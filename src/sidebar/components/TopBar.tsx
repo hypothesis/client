@@ -58,7 +58,6 @@ function TopBar({
 
   const store = useSidebarStore();
   const filterQuery = store.filterQuery();
-  const pendingUpdateCount = store.pendingUpdateCount();
   const isLoggedIn = store.isLoggedIn();
   const hasFetchedProfile = store.hasFetchedProfile();
 
@@ -106,10 +105,7 @@ function TopBar({
         <div className="grow flex items-center justify-end">
           {isSidebar && (
             <>
-              <PendingUpdatesButton
-                pendingUpdateCount={pendingUpdateCount}
-                onClick={applyPendingUpdates}
-              />
+              <PendingUpdatesButton onClick={applyPendingUpdates} />
               <SearchInput
                 query={filterQuery || null}
                 onSearch={store.setFilterQuery}

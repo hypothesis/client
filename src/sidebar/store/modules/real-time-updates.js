@@ -217,6 +217,17 @@ function hasPendingDeletion(state, id) {
   return hasOwn(state.pendingDeletions, id);
 }
 
+/**
+ * Return true if an annotation has been deleted on the server but the deletion
+ * has not yet been applied.
+ *
+ * @param {State} state
+ * @return {boolean}
+ */
+function hasPendingUpdates(state) {
+  return Object.keys(state.pendingUpdates).length > 0;
+}
+
 export const realTimeUpdatesModule = createStoreModule(initialState, {
   namespace: 'realTimeUpdates',
   reducers,
@@ -226,6 +237,7 @@ export const realTimeUpdatesModule = createStoreModule(initialState, {
   },
   selectors: {
     hasPendingDeletion,
+    hasPendingUpdates,
     pendingDeletions,
     pendingUpdates,
     pendingUpdateCount,

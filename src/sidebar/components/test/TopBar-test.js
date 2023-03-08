@@ -20,7 +20,6 @@ describe('TopBar', () => {
       hasFetchedProfile: sinon.stub().returns(false),
       isLoggedIn: sinon.stub().returns(false),
       isSidebarPanelOpen: sinon.stub().returns(false),
-      pendingUpdateCount: sinon.stub().returns(0),
       setFilterQuery: sinon.stub(),
       toggleSidebarPanel: sinon.stub(),
     };
@@ -70,7 +69,6 @@ describe('TopBar', () => {
   }
 
   it('applies updates when clicked', () => {
-    fakeStore.pendingUpdateCount.returns(1);
     const wrapper = createTopBar();
     const updatesBtn = wrapper.find('PendingUpdatesButton');
 

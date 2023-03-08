@@ -1,26 +1,42 @@
 import { mount } from 'enzyme';
 
-import PendingUpdatesButton from '../PendingUpdatesButton';
+import PendingUpdatesButton, { $imports } from '../PendingUpdatesButton';
 
 describe('PendingUpdatesButton', () => {
   let fakeOnClick;
   let fakeToastMessenger;
+  let fakeStore;
 
   beforeEach(() => {
     fakeOnClick = sinon.stub();
     fakeToastMessenger = {
       success: sinon.stub(),
     };
+    fakeStore = {
+      pendingUpdateCount: sinon.stub().returns(0),
+      hasPendingUpdates: sinon.stub().returns(true),
+    };
+
+    $imports.$mock({
+      '../store': { useSidebarStore: () => fakeStore },
+    });
   });
 
-  const createButton = count =>
-    mount(
+  afterEach(() => {
+    $imports.$restore();
+  });
+
+  const createButton = count => {
+    fakeStore.pendingUpdateCount.returns(count);
+    fakeStore.hasPendingUpdates.returns(count > 0);
+
+    return mount(
       <PendingUpdatesButton
-        pendingUpdateCount={count}
         onClick={fakeOnClick}
         toastMessenger={fakeToastMessenger}
       />
     );
+  };
 
   it('shows an empty wrapper when there are no pending updates', () => {
     const wrapper = createButton(0);
