@@ -9,7 +9,6 @@ describe('TopBar', () => {
   let fakeFrameSync;
   let fakeStore;
   let fakeStreamer;
-  let fakeToastMessenger;
   let fakeIsThirdPartyService;
   let fakeServiceConfig;
 
@@ -34,10 +33,6 @@ describe('TopBar', () => {
 
     fakeStreamer = {
       applyPendingUpdates: sinon.stub(),
-    };
-
-    fakeToastMessenger = {
-      success: sinon.stub(),
     };
 
     $imports.$mock(mockImportedComponents());
@@ -69,43 +64,17 @@ describe('TopBar', () => {
         isSidebar={true}
         settings={fakeSettings}
         streamer={fakeStreamer}
-        toastMessenger={fakeToastMessenger}
         {...props}
       />
     );
   }
 
-  [1, 10, 50].forEach(pendingUpdateCount => {
-    it('shows the pending update count', () => {
-      fakeStore.pendingUpdateCount.returns(pendingUpdateCount);
-      const wrapper = createTopBar();
-      const applyBtn = getButton(wrapper, 'RefreshIcon');
-
-      assert.isTrue(applyBtn.exists());
-      assert.calledWith(
-        fakeToastMessenger.success,
-        `There are ${pendingUpdateCount} new annotations.`,
-        {
-          visuallyHidden: true,
-        }
-      );
-    });
-  });
-
-  it('does not show the pending update count when there are no updates', () => {
-    const wrapper = createTopBar();
-    const applyBtn = getButton(wrapper, 'RefreshIcon');
-
-    assert.isFalse(applyBtn.exists());
-    assert.notCalled(fakeToastMessenger.success);
-  });
-
   it('applies updates when clicked', () => {
     fakeStore.pendingUpdateCount.returns(1);
     const wrapper = createTopBar();
-    const applyBtn = getButton(wrapper, 'RefreshIcon');
+    const updatesBtn = wrapper.find('PendingUpdatesButton');
 
-    applyBtn.props().onClick();
+    updatesBtn.props().onClick();
 
     assert.called(fakeStreamer.applyPendingUpdates);
   });
