@@ -182,4 +182,15 @@ describe('sidebar/store/modules/real-time-updates', () => {
       assert.equal(store.hasPendingDeletion('deleted-ann'), true);
     });
   });
+
+  describe('hasPendingUpdates', () => {
+    it('returns false if there are no pending updates', () => {
+      assert.equal(store.hasPendingUpdates(), false);
+    });
+
+    it('returns true if there are pending updates', () => {
+      addPendingUpdates(store);
+      assert.equal(store.hasPendingUpdates(), true);
+    });
+  });
 });
