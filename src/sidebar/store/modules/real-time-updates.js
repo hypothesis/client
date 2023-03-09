@@ -218,8 +218,8 @@ function hasPendingDeletion(state, id) {
 }
 
 /**
- * Return true if an annotation has been deleted on the server but the deletion
- * has not yet been applied.
+ * Return true if an annotation has been created on the server, but it has not
+ * yet been applied.
  *
  * @param {State} state
  * @return {boolean}
