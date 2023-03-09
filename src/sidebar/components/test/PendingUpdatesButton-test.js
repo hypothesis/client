@@ -75,4 +75,16 @@ describe('PendingUpdatesButton', () => {
 
     assert.called(fakeStreamer.applyPendingUpdates);
   });
+
+  it('applies updates when `.` is pressed', () => {
+    createButton(1);
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: '.',
+        bubbles: true,
+      })
+    );
+
+    assert.called(fakeStreamer.applyPendingUpdates);
+  });
 });
