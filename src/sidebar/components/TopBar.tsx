@@ -12,7 +12,6 @@ import { isThirdPartyService } from '../helpers/is-third-party-service';
 import { applyTheme } from '../helpers/theme';
 import { withServices } from '../service-context';
 import type { FrameSyncService } from '../services/frame-sync';
-import type { StreamerService } from '../services/streamer';
 import { useSidebarStore } from '../store';
 import GroupList from './GroupList';
 import PendingUpdatesButton from './PendingUpdatesButton';
@@ -37,7 +36,6 @@ export type TopBarProps = {
   // injected
   frameSync: FrameSyncService;
   settings: SidebarSettings;
-  streamer: StreamerService;
 };
 
 /**
@@ -51,7 +49,6 @@ function TopBar({
   onSignUp,
   frameSync,
   settings,
-  streamer,
 }: TopBarProps) {
   const showSharePageButton = !isThirdPartyService(settings);
   const loginLinkStyle = applyTheme(['accentColor'], settings);
@@ -60,8 +57,6 @@ function TopBar({
   const filterQuery = store.filterQuery();
   const isLoggedIn = store.isLoggedIn();
   const hasFetchedProfile = store.hasFetchedProfile();
-
-  const applyPendingUpdates = () => streamer.applyPendingUpdates();
 
   const toggleSharePanel = () => {
     store.toggleSidebarPanel('shareGroupAnnotations');
@@ -105,7 +100,7 @@ function TopBar({
         <div className="grow flex items-center justify-end">
           {isSidebar && (
             <>
-              <PendingUpdatesButton onClick={applyPendingUpdates} />
+              <PendingUpdatesButton />
               <SearchInput
                 query={filterQuery || null}
                 onSearch={store.setFilterQuery}
@@ -164,4 +159,4 @@ function TopBar({
   );
 }
 
-export default withServices(TopBar, ['frameSync', 'settings', 'streamer']);
+export default withServices(TopBar, ['frameSync', 'settings']);

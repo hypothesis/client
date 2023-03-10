@@ -3,18 +3,20 @@ import { mount } from 'enzyme';
 import PendingUpdatesButton, { $imports } from '../PendingUpdatesButton';
 
 describe('PendingUpdatesButton', () => {
-  let fakeOnClick;
   let fakeToastMessenger;
   let fakeStore;
+  let fakeStreamer;
 
   beforeEach(() => {
-    fakeOnClick = sinon.stub();
     fakeToastMessenger = {
-      success: sinon.stub(),
+      notice: sinon.stub(),
     };
     fakeStore = {
       pendingUpdateCount: sinon.stub().returns(0),
       hasPendingUpdates: sinon.stub().returns(true),
+    };
+    fakeStreamer = {
+      applyPendingUpdates: sinon.stub(),
     };
 
     $imports.$mock({
@@ -32,7 +34,7 @@ describe('PendingUpdatesButton', () => {
 
     return mount(
       <PendingUpdatesButton
-        onClick={fakeOnClick}
+        streamer={fakeStreamer}
         toastMessenger={fakeToastMessenger}
       />
     );
@@ -42,7 +44,7 @@ describe('PendingUpdatesButton', () => {
     const wrapper = createButton(0);
 
     assert.isFalse(wrapper.find('IconButton').exists());
-    assert.notCalled(fakeToastMessenger.success);
+    assert.notCalled(fakeToastMessenger.notice);
   });
 
   [1, 10, 50].forEach(pendingUpdateCount => {
@@ -51,8 +53,8 @@ describe('PendingUpdatesButton', () => {
 
       assert.isTrue(wrapper.find('IconButton').exists());
       assert.calledWith(
-        fakeToastMessenger.success,
-        `There are ${pendingUpdateCount} new annotations.`,
+        fakeToastMessenger.notice,
+        `New annotations are available.`,
         {
           visuallyHidden: true,
         }
@@ -71,6 +73,6 @@ describe('PendingUpdatesButton', () => {
 
     applyBtn.props().onClick();
 
-    assert.called(fakeOnClick);
+    assert.called(fakeStreamer.applyPendingUpdates);
   });
 });
