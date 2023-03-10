@@ -336,6 +336,12 @@ export class Sidebar {
     annotationCounts(document.body, this._sidebarRPC);
     sidebarTrigger(document.body, () => this.open());
 
+    document.documentElement.addEventListener(
+      'keypress',
+      /** @param {KeyboardEvent} e */ e =>
+        this._sidebarRPC.call('keypress', e.key)
+    );
+
     this._sidebarRPC.on(
       'featureFlagsUpdated',
       /** @param {Record<string, boolean>} flags */ flags =>

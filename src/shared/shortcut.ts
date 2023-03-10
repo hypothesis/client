@@ -1,5 +1,7 @@
 import { useEffect } from 'preact/hooks';
 
+import type { FrameSyncService } from '../sidebar/services/frame-sync';
+
 /**
  * Bit flags indicating modifiers required by a shortcut or pressed in a key event.
  */
@@ -119,4 +121,24 @@ export function useShortcut(
     }
     return installShortcut(shortcut, onPress, { rootElement });
   }, [shortcut, onPress, rootElement]);
+}
+
+export function useGlobalShortcut({
+  frameSync,
+  shortcut,
+  onPress,
+  options,
+}: {
+  frameSync: FrameSyncService;
+  shortcut: string | null;
+  onPress: () => void;
+  options?: ShortcutOptions;
+}) {
+  useShortcut(shortcut, onPress, options);
+  useEffect(() => {
+    if (!shortcut) {
+      return undefined;
+    }
+    return frameSync.onHostKeyPressed(shortcut, onPress);
+  }, [frameSync, shortcut, onPress]);
 }

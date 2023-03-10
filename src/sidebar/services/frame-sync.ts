@@ -123,6 +123,7 @@ export class FrameSyncService {
   private _inFrame: Set<string>;
 
   private _listeners: ListenerCollection;
+  private _keyListeners: Map<string, (() => void)[]>;
   private _portFinder: PortFinder;
   private _store: SidebarStore;
 
@@ -172,6 +173,7 @@ export class FrameSyncService {
       source: 'sidebar',
     });
     this._listeners = new ListenerCollection();
+    this._keyListeners = new Map();
 
     this._hostRPC = new PortRPC();
     this._guestRPC = new Map();
@@ -519,6 +521,11 @@ export class FrameSyncService {
   async connect() {
     // Create channel for sidebar-host communication.
     const hostPort = await this._portFinder.discover('host');
+
+    this._hostRPC.on('keypress', (pressedKey: string) => {
+      const callbacks = this._keyListeners.get(pressedKey) ?? [];
+      callbacks.forEach(callback => callback());
+    });
     this._hostRPC.connect(hostPort);
 
     // Listen for guests connecting to the sidebar.
@@ -614,6 +621,20 @@ export class FrameSyncService {
     }
 
     guest.call('scrollToAnnotation', ann.$tag);
+  }
+
+  onHostKeyPressed(key: string, callback: () => void) {
+    const current = this._keyListeners.get(key) ?? [];
+    current.push(callback);
+    this._keyListeners.set(key, current);
+
+    return () => {
+      const current = this._keyListeners.get(key) ?? [];
+      this._keyListeners.set(
+        key,
+        current.filter(value => value !== callback)
+      );
+    };
   }
 
   // Only used to cleanup tests

@@ -54,7 +54,7 @@ describe('PendingUpdatesButton', () => {
       assert.isTrue(wrapper.find('IconButton').exists());
       assert.calledWith(
         fakeToastMessenger.notice,
-        `New annotations are available.`,
+        `New annotations are available. Press "." to load them.`,
         {
           visuallyHidden: true,
         }

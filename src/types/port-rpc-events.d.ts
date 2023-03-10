@@ -111,7 +111,12 @@ export type HostToSidebarEvent =
   /**
    * The host informs the sidebar that the sidebar has been opened.
    */
-  | 'sidebarOpened';
+  | 'sidebarOpened'
+
+  /**
+   * A key has been pressed in host.
+   */
+  | 'keypress';
 
 /**
  * Events that the sidebar sends to the guest(s)
