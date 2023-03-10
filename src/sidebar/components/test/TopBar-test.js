@@ -68,15 +68,6 @@ describe('TopBar', () => {
     );
   }
 
-  it('applies updates when clicked', () => {
-    const wrapper = createTopBar();
-    const updatesBtn = wrapper.find('PendingUpdatesButton');
-
-    updatesBtn.props().onClick();
-
-    assert.called(fakeStreamer.applyPendingUpdates);
-  });
-
   describe('`HelpButton` and help requests', () => {
     context('no help service handler configured in services (default)', () => {
       it('toggles Help Panel on click', () => {
