@@ -1,19 +1,14 @@
 import { compareCFIs } from '../../shared/cfi';
 import { location } from './annotation-metadata';
+import type { Thread } from './build-thread';
 import { rootAnnotations } from './thread';
-
-/** @typedef {import('./build-thread').Thread} Thread */
 
 /**
  * Sort comparison function when one or both threads being compared is lacking
  * an annotation.
  * Sort such that a thread without an annotation sorts to the top
- *
- * @param {Thread} a
- * @param {Thread} b
- * @return {number}
  */
-function compareHeadlessThreads(a, b) {
+function compareHeadlessThreads(a: Thread, b: Thread): number {
   if (!a.annotation && !b.annotation) {
     return 0;
   } else {
@@ -23,11 +18,8 @@ function compareHeadlessThreads(a, b) {
 
 /**
  * Find the most recent created date amongst a thread's root annotation set
- *
- * @param {Thread} thread
- * @return {string}
  */
-function newestRootAnnotationDate(thread) {
+function newestRootAnnotationDate(thread: Thread): string {
   const annotations = rootAnnotations([thread]);
   return annotations.reduce(
     (newestDate, annotation) =>
@@ -38,11 +30,8 @@ function newestRootAnnotationDate(thread) {
 
 /**
  * Find the oldest created date amongst a thread's root annotation set
- *
- * @param {Thread} thread
- * @return {string}
  */
-function oldestRootAnnotationDate(thread) {
+function oldestRootAnnotationDate(thread: Thread): string {
   const annotations = rootAnnotations([thread]);
   return annotations.reduce((oldestDate, annotation) => {
     if (!oldestDate) {
@@ -52,14 +41,13 @@ function oldestRootAnnotationDate(thread) {
   }, '');
 }
 
-/** @typedef {(a: Thread, b: Thread) => number} SortFunction */
+type SortFunction = (a: Thread, b: Thread) => number;
 
 /**
  * Sorting comparison functions for the three defined application options for
  * sorting annotation (threads)
  */
 export const sorters = {
-  /** @type {SortFunction} */
   Newest: (a, b) => {
     const dateA = newestRootAnnotationDate(a);
     const dateB = newestRootAnnotationDate(b);
@@ -71,7 +59,6 @@ export const sorters = {
     return 0;
   },
 
-  /** @type {SortFunction} */
   Oldest: (a, b) => {
     const dateA = oldestRootAnnotationDate(a);
     const dateB = oldestRootAnnotationDate(b);
@@ -83,7 +70,6 @@ export const sorters = {
     return 0;
   },
 
-  /** @type {SortFunction} */
   Location: (a, b) => {
     if (!a.annotation || !b.annotation) {
       return compareHeadlessThreads(a, b);
@@ -112,4 +98,4 @@ export const sorters = {
     const bPos = bLocation.position ?? Number.MAX_SAFE_INTEGER;
     return Math.sign(aPos - bPos);
   },
-};
+} satisfies Record<string, SortFunction>;
