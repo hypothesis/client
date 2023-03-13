@@ -1,13 +1,7 @@
+import type { Group, Organization } from '../../types/api';
 import { immutable } from '../util/immutable';
 
-/**
- * @typedef {import('../../types/api').Group} Group
- * @typedef {import('../../types/api').Organization} Organization
- */
-
-/**
- * @typedef {Organization & { groups: Group[] }} OrganizationWithGroups
- */
+type OrganizationWithGroups = Organization & { groups: Group[] };
 
 // TODO: Update when this is a property available on the API response
 const DEFAULT_ORG_ID = '__default__';
@@ -15,11 +9,8 @@ const DEFAULT_ORG_ID = '__default__';
 /**
  * Generate consistent object keys for organizations so that they
  * may be sorted
- *
- * @param {Organization} organization
- * @return {String}
  */
-function orgKey(organization) {
+function orgKey(organization: Organization): string {
   if (organization.id === DEFAULT_ORG_ID) {
     return DEFAULT_ORG_ID;
   }
@@ -29,12 +20,8 @@ function orgKey(organization) {
 /**
  * Add a clone of the group object to the given organization object's
  * groups Array.
- *
- * @param {Group} group
- * @param {OrganizationWithGroups} organization
- * @return undefined - organization is mutated in place
  */
-function addGroup(group, organization) {
+function addGroup(group: Group, organization: OrganizationWithGroups) {
   // Object.assign won't suffice because of nested objects on groups
   const groupObj = Object.assign({}, group);
   const groupList = organization.groups;
@@ -50,13 +37,13 @@ function addGroup(group, organization) {
  * Iterate over groups and locate unique organizations. Slot groups into
  * their appropriate "parent" organizations.
  *
- * @param {Group[]} groups
- * @return {Record<string, OrganizationWithGroups>} - A collection of all unique
- *   organizations, containing their groups. Keyed by each org's "orgKey"
+ * @return A collection of all unique organizations, containing their groups.
+ *         Keyed by each org's "orgKey"
  */
-function organizations(groups) {
-  /** @type {Record<string, OrganizationWithGroups>} */
-  const orgs = {};
+function organizations(
+  groups: Group[]
+): Record<string, OrganizationWithGroups> {
+  const orgs: Record<string, OrganizationWithGroups> = {};
   groups.forEach(group => {
     // Ignore groups with undefined or non-object organizations
     if (typeof group.organization !== 'object') {
@@ -85,12 +72,11 @@ function organizations(groups) {
  * in each organization will have a logo property (if available on the
  * organization).
  *
- * @param {Group[]} groups
- * @return {Group[]} - groups sorted by which organization they're in
+ * @return groups sorted by which organization they're in
  */
-export function groupsByOrganization(groups) {
+export function groupsByOrganization(groups: Group[]): Group[] {
   const orgs = organizations(groups);
-  const defaultOrganizationGroups = /** @type {Group[]} */ ([]);
+  const defaultOrganizationGroups: Group[] = [];
   const sortedGroups = [];
 
   const sortedOrgKeys = Object.keys(orgs).sort();
