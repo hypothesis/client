@@ -1,9 +1,6 @@
-/**
- * @typedef {import('../../types/config').ThemeProperty} ThemeProperty
- */
+import type { ThemeProperty } from '../../types/config';
 
-/** @type {Record<ThemeProperty, string>} */
-const supportedThemeProperties = {
+const supportedThemeProperties: Record<ThemeProperty, string> = {
   accentColor: 'color',
   appBackgroundColor: 'backgroundColor',
   ctaBackgroundColor: 'backgroundColor',
@@ -14,10 +11,10 @@ const supportedThemeProperties = {
 
 /**
  * Subset of the config from the host page which includes theme configuration.
- *
- * @typedef Settings
- * @prop {Record<ThemeProperty,string>} [branding]
  */
+type Settings = {
+  branding?: Record<ThemeProperty, string>;
+};
 
 /**
  * Return a React `style` object suitable for use as the value of the `style`
@@ -35,11 +32,9 @@ const supportedThemeProperties = {
  *
  * See https://reactjs.org/docs/dom-elements.html#style
  *
- * @param {ThemeProperty[]} themeProperties -
- *   Which of the supported theme properties should have applied rules in the `style`
- *   object
- * @param {Settings} settings
- * @return {Record<string,string>} - Object that can be passed as the `style` prop
+ * @param themeProperties - Which of the supported theme properties should have
+ *   applied rules in the `style` object
+ * @return Object that can be passed as the `style` prop
  *
  * @example
  * let themeProperties = ['accentColor', 'ctaTextColor', 'foo'];
@@ -52,9 +47,11 @@ const supportedThemeProperties = {
  * // only one of those has a value in the `settings` object, so:
  * applyTheme(themeProperties, settings); // -> { color: '#ffc '}
  */
-export function applyTheme(themeProperties, settings) {
-  /** @type {Record<string,string>} */
-  const style = {};
+export function applyTheme(
+  themeProperties: ThemeProperty[],
+  settings: Settings
+): Record<string, string> {
+  const style: Record<string, string> = {};
   if (!settings.branding) {
     return style;
   }
