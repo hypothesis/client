@@ -1,18 +1,12 @@
 // Functions that determine which tab an annotation should be displayed in.
+import type { Annotation } from '../../types/api';
+import type { TabName } from '../../types/sidebar';
 import * as metadata from '../helpers/annotation-metadata';
 
 /**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/sidebar').TabName} TabName
- */
-
-/**
  * Return the tab in which an annotation should be displayed.
- *
- * @param {Annotation} ann
- * @return {TabName}
  */
-export function tabForAnnotation(ann) {
+export function tabForAnnotation(ann: Annotation): TabName {
   if (metadata.isOrphan(ann)) {
     return 'orphan';
   } else if (metadata.isPageNote(ann)) {
@@ -24,11 +18,8 @@ export function tabForAnnotation(ann) {
 
 /**
  * Return true if an annotation should be displayed in a given tab.
- *
- * @param {Annotation} ann
- * @param {TabName} tab
  */
-export function shouldShowInTab(ann, tab) {
+export function shouldShowInTab(ann: Annotation, tab: TabName): boolean {
   if (metadata.isWaitingToAnchor(ann)) {
     // Until this annotation anchors or fails to anchor, we do not know which
     // tab it should be displayed in.
