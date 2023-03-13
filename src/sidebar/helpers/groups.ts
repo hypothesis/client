@@ -1,10 +1,7 @@
-/**
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../../types/api').Group} Group
- * @typedef {import('../../types/api').GroupIdentifier} GroupIdentifier
- */
 import escapeStringRegexp from 'escape-string-regexp';
 
+import type { Group, GroupIdentifier } from '../../types/api';
+import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 
 /**
@@ -12,11 +9,8 @@ import { serviceConfig } from '../config/service-config';
  * are a member? Users may leave private groups unless
  * explicitly disallowed in the service configuration of the
  * `settings` object.
- *
- * @param {SidebarSettings} settings
- * @return {boolean}
  */
-function allowLeavingGroups(settings) {
+function allowLeavingGroups(settings: SidebarSettings): boolean {
   const config = serviceConfig(settings);
   if (!config) {
     return true;
@@ -30,12 +24,16 @@ function allowLeavingGroups(settings) {
  * Add an isScopedToUri property to each group indicating whether the uri matches the group's
  *   uri patterns. If no uri patterns are specified, defaults to True.
  *
- * @param {Group[]} userGroups - groups the user is a member of
- * @param {Group[]} featuredGroups - all other groups, may include some duplicates from the userGroups
- * @param {string|null} uri - uri of the current page
- * @param {SidebarSettings} settings
+ * @param userGroups - groups the user is a member of
+ * @param featuredGroups - all other groups, may include some duplicates from the userGroups
+ * @param uri - uri of the current page
  */
-export function combineGroups(userGroups, featuredGroups, uri, settings) {
+export function combineGroups(
+  userGroups: Group[],
+  featuredGroups: Group[],
+  uri: string | null,
+  settings: SidebarSettings
+) {
   const worldGroup = featuredGroups.find(g => g.id === '__world__');
   if (worldGroup) {
     userGroups.unshift(worldGroup);
@@ -66,11 +64,7 @@ export function combineGroups(userGroups, featuredGroups, uri, settings) {
   return groups;
 }
 
-/**
- * @param {Group} group
- * @param {string|null} uri
- */
-function isScopedToUri(group, uri) {
+function isScopedToUri(group: Group, uri: string | null): boolean {
   /* If a scope check cannot be performed, meaning:
    * - the group doesn't have a scopes attribute
    * - the group has no scopes.uri_patterns present
@@ -83,30 +77,23 @@ function isScopedToUri(group, uri) {
   return true;
 }
 
-/**
- * @param {string} uri
- * @param {string[]} scopes
- */
-function uriMatchesScopes(uri, scopes) {
-  return (
-    scopes.find(uriRegex =>
-      uri.match(
-        // Convert *'s to .*'s for regex matching and escape all other special characters.
-        uriRegex.split('*').map(escapeStringRegexp).join('.*')
-      )
-    ) !== undefined
+function uriMatchesScopes(uri: string, scopes: string[]): boolean {
+  return scopes.some(uriRegex =>
+    uri.match(
+      // Convert *'s to .*'s for regex matching and escape all other special characters.
+      uriRegex.split('*').map(escapeStringRegexp).join('.*')
+    )
   );
 }
 
 /**
  * Find groups in `groups` by GroupIdentifier, which may be either an `id` or
  * `groupid`.
- *
- * @param {GroupIdentifier[]} groupIds
- * @param {Group[]} groups
- * @return {Group[]}
  */
-function findGroupsByAnyIds(groupIds, groups) {
+function findGroupsByAnyIds(
+  groupIds: GroupIdentifier[],
+  groups: Group[]
+): Group[] {
   return groups.filter(
     g => groupIds.includes(g.id) || (g.groupid && groupIds.includes(g.groupid))
   );
@@ -117,11 +104,10 @@ function findGroupsByAnyIds(groupIds, groups) {
  * (pubid) or a `groupid` into a list of `id`s by locating associated groups
  * in the set of all `groups`. Only return entries for groups that can be
  * found in `groups`.
- *
- * @param {GroupIdentifier[]} groupIds
- * @param {Group[]} groups
- * @return {Group["id"][]}
  */
-export function normalizeGroupIds(groupIds, groups) {
+export function normalizeGroupIds(
+  groupIds: GroupIdentifier[],
+  groups: Group[]
+): Group['id'][] {
   return findGroupsByAnyIds(groupIds, groups).map(g => g.id);
 }
