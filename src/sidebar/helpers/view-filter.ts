@@ -1,36 +1,34 @@
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../util/search-filter').Facet} Facet
- */
+import type { Annotation } from '../../types/api';
+import type { Facet } from '../util/search-filter';
 import * as unicodeUtils from '../util/unicode';
 import { quote } from './annotation-metadata';
 
-/**
- * @typedef Filter
- * @prop {(ann: Annotation) => boolean} matches
- */
+type Filter = {
+  matches: (ann: Annotation) => boolean;
+};
 
 /**
  * A Matcher specifies how to test whether an annotation matches a query term
  * for a specific field.
- *
- * @template [T=string] - Type of parsed query terms and field values
- * @typedef Matcher
- * @prop {(ann: Annotation) => T[]} fieldValues - Extract the field values to be
- *   matched against a query term
- * @prop {(value: T, term: T) => boolean} matches - Test whether a query term
- *   matches a field value. Both value and term will have been normalized using
- *   `normalize`.
- * @prop {(val: T) => T} normalize - Normalize a parsed term or field value for
- *   comparison
  */
+type Matcher<T = string> = {
+  /** Extract the field values to be matched against a query term */
+  fieldValues: (ann: Annotation) => T[];
+
+  /**
+   * Test whether a query term matches a field value. Both value and term will
+   * have been normalized using `normalize`.
+   */
+  matches: (value: T, term: T) => boolean;
+
+  /** Normalize a parsed term or field value for comparison */
+  normalize: (val: T) => T;
+};
 
 /**
  * Normalize a string query term or field value.
- *
- * @param {string} val
  */
-function normalizeStr(val) {
+function normalizeStr(val: string): string {
   return unicodeUtils.fold(unicodeUtils.normalize(val)).toLowerCase();
 }
 
@@ -40,22 +38,19 @@ function normalizeStr(val) {
  * @template TermType
  * @implements {Filter}
  */
-class TermFilter {
-  /**
-   * @param {TermType} term
-   * @param {Matcher<TermType>} matcher
-   */
-  constructor(term, matcher) {
+class TermFilter<TermType extends string> implements Filter {
+  public term: TermType;
+  public matcher: Matcher<TermType>;
+
+  constructor(term: TermType, matcher: Matcher<TermType>) {
     this.term = matcher.normalize(term);
     this.matcher = matcher;
   }
 
   /**
    * Return true if an annotation matches this filter.
-   *
-   * @param {Annotation} ann
    */
-  matches(ann) {
+  matches(ann: Annotation): boolean {
     const matcher = this.matcher;
     return matcher
       .fieldValues(ann)
@@ -65,25 +60,24 @@ class TermFilter {
 
 /**
  * Filter that combines other filters using AND or OR combinators.
- *
- * @implements {Filter}
  */
-class BooleanOpFilter {
+class BooleanOpFilter implements Filter {
+  public operator: 'and' | 'or';
+  public filters: Filter[];
+
   /**
-   * @param {'and'|'or'} op - Boolean operator
-   * @param {Filter[]} filters - Array of filters to test against
+   * @param op - Boolean operator
+   * @param filters - Array of filters to test against
    */
-  constructor(op, filters) {
+  constructor(op: 'and' | 'or', filters: Filter[]) {
     this.operator = op;
     this.filters = filters;
   }
 
   /**
    * Return true if an annotation matches this filter.
-   *
-   * @param {Annotation} ann
    */
-  matches(ann) {
+  matches(ann: Annotation): boolean {
     if (this.operator === 'and') {
       return this.filters.every(filter => filter.matches(ann));
     } else {
@@ -95,11 +89,10 @@ class BooleanOpFilter {
 /**
  * Create a matcher that tests whether a query term appears anywhere in a
  * string field value.
- *
- * @param {(ann: Annotation) => string[]} fieldValues
- * @return {Matcher}
  */
-function stringFieldMatcher(fieldValues) {
+function stringFieldMatcher(
+  fieldValues: (ann: Annotation) => string[]
+): Matcher {
   return {
     fieldValues,
     matches: (value, term) => value.includes(term),
@@ -109,20 +102,17 @@ function stringFieldMatcher(fieldValues) {
 
 /**
  * Map of field name (from a parsed query) to matcher for that field.
- *
- * @type {Record<string, Matcher|Matcher<number>>}
  */
-const fieldMatchers = {
+const fieldMatchers: Record<string, Matcher | Matcher<number>> = {
   quote: stringFieldMatcher(ann => [quote(ann) ?? '']),
 
-  /** @type {Matcher<number>} */
   since: {
     fieldValues: ann => [new Date(ann.updated).valueOf()],
-    matches: (updatedTime, age) => {
+    matches: (updatedTime: number, age: number) => {
       const delta = (Date.now() - updatedTime) / 1000;
       return delta <= age;
     },
-    normalize: timestamp => timestamp,
+    normalize: (timestamp: number) => timestamp,
   },
 
   tag: stringFieldMatcher(ann => ann.tags),
@@ -137,22 +127,18 @@ const fieldMatchers = {
 /**
  * Filter a set of annotations against a parsed query.
  *
- * @param {Annotation[]} annotations
- * @param {Record<string, Facet>} filters
- * @return {string[]} IDs of matching annotations.
+ * @return IDs of matching annotations.
  */
-export function filterAnnotations(annotations, filters) {
-  /**
-   * @template TermType
-   * @param {string} field
-   * @param {TermType} term
-   */
-  const makeTermFilter = (field, term) =>
+export function filterAnnotations(
+  annotations: Annotation[],
+  filters: Record<string, Facet>
+): string[] {
+  const makeTermFilter = <TermType>(field: string, term: TermType) =>
     new TermFilter(
       term,
       // Suppress error about potential mismatch of query term type
       // and what the matcher expects. We assume these match up.
-      /** @type {Matcher<any>} */ (fieldMatchers[field])
+      fieldMatchers[field] as Matcher<any>
     );
 
   // Convert the input filter object into a filter tree, expanding "any"
@@ -182,5 +168,5 @@ export function filterAnnotations(annotations, filters) {
     .filter(ann => {
       return ann.id && rootFilter.matches(ann);
     })
-    .map(ann => /** @type {string} */ (ann.id));
+    .map(ann => ann.id as string);
 }
