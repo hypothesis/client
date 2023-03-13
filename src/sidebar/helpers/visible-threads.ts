@@ -1,6 +1,4 @@
-/**
- * @typedef {import('../helpers/build-thread').Thread} Thread
- */
+import type { Thread } from './build-thread';
 
 export const THREAD_DIMENSION_DEFAULTS = {
   // When we don't have a real measurement of a thread card's height (yet)
@@ -13,28 +11,31 @@ export const THREAD_DIMENSION_DEFAULTS = {
   marginBelow: 800,
 };
 
+type VisibleThreads = {
+  visibleThreads: Thread[];
+  offscreenUpperHeight: number;
+  offscreenLowerHeight: number;
+};
+
 /**
  * Calculate the set of `ThreadCard`s that should be rendered by
  * estimating which of the threads are within or near the viewport.
  *
- * @param {Thread[]} threads - List of threads in the order they appear
- * @param {Map<string, number>} threadHeights - Map of thread ID to measured height
- * @param {number} scrollPos - Vertical scroll offset of scrollable container
- * @param {number} windowHeight -
- *   Height of the visible area of the scrollable container.
- * @param {typeof THREAD_DIMENSION_DEFAULTS} options - Dimensional overrides (in px) for defaults
+ * @param threads - List of threads in the order they appear
+ * @param threadHeights - Map of thread ID to measured height
+ * @param scrollPos - Vertical scroll offset of scrollable container
+ * @param windowHeight - Height of the visible area of the scrollable container.
+ * @param options - Dimensional overrides (in px) for defaults
  */
 export function calculateVisibleThreads(
-  threads,
-  threadHeights,
-  scrollPos,
-  windowHeight,
-  options = THREAD_DIMENSION_DEFAULTS
-) {
+  threads: Thread[],
+  threadHeights: Map<string, number>,
+  scrollPos: number,
+  windowHeight: number,
+  options: typeof THREAD_DIMENSION_DEFAULTS = THREAD_DIMENSION_DEFAULTS
+): VisibleThreads {
   const { defaultHeight, marginAbove, marginBelow } = options;
-
-  /** @type {Thread[]} */
-  const visibleThreads = [];
+  const visibleThreads: Thread[] = [];
 
   // Total height used up by the top-level thread cards
   let totalHeight = 0;
