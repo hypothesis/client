@@ -1,6 +1,4 @@
-/**
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- */
+import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 
 /**
@@ -10,11 +8,8 @@ import { serviceConfig } from '../config/service-config';
  * services array in the host page is a third-party service, `false` otherwise.
  *
  * If no custom annotation services are configured then return `false`.
- *
- * @param {SidebarSettings} settings
- * @return {boolean}
  */
-export function isThirdPartyService(settings) {
+export function isThirdPartyService(settings: SidebarSettings): boolean {
   const service = serviceConfig(settings);
 
   if (service?.authority) {
