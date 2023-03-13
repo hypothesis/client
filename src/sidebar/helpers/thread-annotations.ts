@@ -1,40 +1,33 @@
+import type { Annotation } from '../../types/api';
 import { memoize } from '../util/memoize';
 import { generateFacetedFilter } from '../util/search-filter';
 import { buildThread } from './build-thread';
+import type { Thread, BuildThreadOptions } from './build-thread';
 import { shouldShowInTab } from './tabs';
 import { sorters } from './thread-sorters';
 import { filterAnnotations } from './view-filter';
 
-/** @typedef {import('../../types/api').Annotation} Annotation */
-/** @typedef {import('./build-thread').Thread} Thread */
-/** @typedef {import('./build-thread').BuildThreadOptions} BuildThreadOptions */
-
-/**
- * @typedef ThreadState
- * @prop {Annotation[]} annotations
- * @prop {object} selection
- *   @prop {Record<string,boolean>} selection.expanded
- *   @prop {string|null} selection.filterQuery
- *   @prop {Record<string,string>} selection.filters
- *   @prop {string[]} selection.forcedVisible
- *   @prop {string[]} selection.selected
- *   @prop {keyof sorters} selection.sortKey
- *   @prop {'annotation'|'note'|'orphan'} selection.selectedTab
- * @prop {string|null} route
- */
+type ThreadState = {
+  annotations: Annotation[];
+  route: string | null;
+  selection: {
+    expanded: Record<string, boolean>;
+    filterQuery: string | null;
+    filters: Record<string, string>;
+    forcedVisible: string[];
+    selected: string[];
+    sortKey: keyof typeof sorters;
+    selectedTab: 'annotation' | 'note' | 'orphan';
+  };
+};
 
 /**
  * Cobble together the right set of options and filters based on current
  * `threadState` to build the root thread.
- *
- * @param {ThreadState} threadState
- * @return {Thread}
  */
-function buildRootThread(threadState) {
+function buildRootThread(threadState: ThreadState): Thread {
   const selection = threadState.selection;
-
-  /** @type {BuildThreadOptions} */
-  const options = {
+  const options: BuildThreadOptions = {
     expanded: selection.expanded,
     forcedVisible: selection.forcedVisible,
     selected: selection.selected,
