@@ -1,27 +1,45 @@
 import { hasOwn } from '../../shared/has-own';
+import type { Annotation } from '../../types/api';
 
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- *
- * @typedef Thread
- * @prop {string} id - The thread's id, which equivalent to the id of its
- *       annotation. For unsaved annotations, the id is derived from the
- *       annotation's local `$tag` property.
- * @prop {Annotation} [annotation] - This thread's annotation. Undefined in cases
- *       when an annotation _should_ exist—it's implied by a reference from
- *       another annotation—but is not present in our collection of annotations.
- *       This can happen when a reply has been deleted, but still has children
- *       that exist.
- * @prop {string} [parent] - The id of this thread's parent. Top-level threads
- *       do not have parents
- * @prop {boolean} visible - Whether this thread should be visible when rendered.
- *       true when the thread's annotation matches current annotation filters.
- * @prop {boolean} collapsed - Whether the replies in this thread should be
- *       rendered as collapsed (when true) or expanded (when false)
- * @prop {Thread[]} children
- * @prop {number} replyCount - Computed count of all replies to a thread
- * @prop {number} depth - The thread's depth in the hierarchy
- */
+export type Thread = {
+  /**
+   * The thread's id, which equivalent to the id of its annotation. For unsaved
+   * annotations, the id is derived from the annotation's local `$tag` property.
+   */
+  id: string;
+
+  /**
+   * This thread's annotation. Undefined in cases when an annotation _should_
+   * exist—it's implied by a reference from another annotation—but is not
+   * present in our collection of annotations.
+   * This can happen when a reply has been deleted, but still has children that
+   * exist.
+   */
+  annotation?: Annotation;
+
+  /** The id of this thread's parent. Top-level threads do not have parents */
+  parent?: string;
+
+  /**
+   * Whether this thread should be visible when rendered. true when the thread's
+   * annotation matches current annotation filters.
+   */
+  visible: boolean;
+
+  /**
+   * Whether the replies in this thread should be rendered as collapsed
+   * (when true) or expanded (when false).
+   */
+  collapsed: boolean;
+
+  children: Thread[];
+
+  /** Computed count of all replies to a thread */
+  replyCount: number;
+
+  /** The thread's depth in the hierarchy */
+  depth: number;
+};
 
 /**
  * Default state for new threads
@@ -38,11 +56,8 @@ const DEFAULT_THREAD_STATE = {
  * If the Annotation has been created on the server, it will have
  * an id assigned, otherwise we fall back to the local-only '$tag'
  * property.
- *
- * @param {Annotation} annotation
- * @return {string}
  */
-function annotationId(annotation) {
+function annotationId(annotation: Annotation): string {
   return annotation.id || annotation.$tag;
 }
 
@@ -50,13 +65,15 @@ function annotationId(annotation) {
  * Is there a valid path from the thread indicated by `id` to the root thread,
  * with no circular references?
  *
- * @param {Record<string, Thread>} threads
- * @param {string} id - The id of the thread to be verified
- * @param {string} ancestorId - The ancestor of the thread indicated by id that
- *        is to be verified: is it extant and not a circular reference?
- * @return {boolean}
+ * @param id - The id of the thread to be verified
+ * @param ancestorId - The ancestor of the thread indicated by id that is to be
+ *        verified: is it extant and not a circular reference?
  */
-function hasPathToRoot(threads, id, ancestorId) {
+function hasPathToRoot(
+  threads: Record<string, Thread>,
+  id: string,
+  ancestorId: string
+): boolean {
   const ancestor = threads[ancestorId];
   if (!ancestor || ancestor.parent === id) {
     // Thread for ancestor not found, or points at itself: circular reference
@@ -70,12 +87,14 @@ function hasPathToRoot(threads, id, ancestorId) {
 
 /**
  * Link the thread's annotation to its parent
- * @param {Record<string,Thread>} threads
- * @param {string} id
- * @param {string[]} [parents] - ids of parent annotations, from the
- *        annotation's `references` field. Immediate parent is last entry.
+ * @param parents - ids of parent annotations, from the annotation's
+ *        `references` field. Immediate parent is last entry.
  */
-function setParent(threads, id, parents = []) {
+function setParent(
+  threads: Record<string, Thread>,
+  id: string,
+  parents: string[] = []
+) {
   if (threads[id].parent || !parents.length) {
     // Parent already assigned, do not try to change it.
     return;
@@ -111,12 +130,11 @@ function setParent(threads, id, parents = []) {
  * incomplete ordered list of the parents of an annotation, from furthest to
  * nearest ancestor.
  *
- * @param {Annotation[]} annotations - The input annotations to thread.
- * @return {Thread} - The input annotations threaded into a tree structure.
+ * @param annotations - The input annotations to thread.
+ * @return The input annotations threaded into a tree structure.
  */
-function threadAnnotations(annotations) {
-  /** @type {Record<string,Thread>} */
-  const threads = {};
+function threadAnnotations(annotations: Annotation[]): Thread {
+  const threads: Record<string, Thread> = {};
 
   // Create a `Thread` for each annotation
   annotations.forEach(annotation => {
@@ -161,12 +179,8 @@ function threadAnnotations(annotations) {
 /**
  * Returns a copy of `thread` with the thread
  * and each of its children transformed by mapFn(thread).
- *
- * @param {Thread} thread
- * @param {(t: Thread) => Thread} mapFn
- * @return {Thread}
  */
-function mapThread(thread, mapFn) {
+function mapThread(thread: Thread, mapFn: (t: Thread) => Thread): Thread {
   return Object.assign({}, mapFn(thread), {
     children: thread.children.map(child => {
       return mapThread(child, mapFn);
@@ -179,14 +193,14 @@ function mapThread(thread, mapFn) {
  * Sort the children of top-level threads using `compareFn` and all other
  * children using `replyCompareFn`.
  *
- * @param {Thread} thread
- * @param {(a: Thread, b: Thread) => number} compareFn - comparison function
- *   for sorting top-level annotations
- * @param {(a: Thread, b: Thread) => number} replyCompareFn - comparison
- *   function for sorting replies
- * @return {Thread}
+ * @param compareFn - comparison function for sorting top-level annotations
+ * @param replyCompareFn - comparison function for sorting replies
  */
-function sortThread(thread, compareFn, replyCompareFn) {
+function sortThread(
+  thread: Thread,
+  compareFn: (a: Thread, b: Thread) => number,
+  replyCompareFn: (a: Thread, b: Thread) => number
+): Thread {
   const children = thread.children.map(child =>
     sortThread(child, replyCompareFn, replyCompareFn)
   );
@@ -199,12 +213,8 @@ function sortThread(thread, compareFn, replyCompareFn) {
 /**
  * Return a copy of `thread` with the `replyCount` and `depth` properties
  * updated.
- *
- * @param {Thread} thread
- * @param {number} depth
- * @return {Thread}
  */
-function countRepliesAndDepth(thread, depth) {
+function countRepliesAndDepth(thread: Thread, depth: number): Thread {
   const children = thread.children.map(c => countRepliesAndDepth(c, depth + 1));
   const replyCount = children.reduce(
     (total, child) => total + 1 + child.replyCount,
@@ -220,40 +230,43 @@ function countRepliesAndDepth(thread, depth) {
 
 /**
  * Does this thread have any visible children?
- *
- * @param {Thread} thread
- * @return {boolean}
  */
-function hasVisibleChildren(thread) {
+function hasVisibleChildren(thread: Thread): boolean {
   return thread.children.some(child => {
     return child.visible || hasVisibleChildren(child);
   });
 }
 
-/**
- * @typedef BuildThreadOptions
- * @prop {Record<string, boolean>} expanded - Map of thread id => expansion state
- * @prop {string[]} forcedVisible - List of $tags of annotations that have
- *       been explicitly expanded by the user, even if they don't
- *       match current filters
- * @prop {string[]} selected - List of currently-selected annotation ids, from
- *       the data store
- * @prop {(a: Thread, b: Thread) => number} sortCompareFn - comparison
- *       function for sorting top-level annotations
- * @prop {(a: Annotation) => boolean} [filterFn] - Predicate function that
- *       returns `true` if annotation should be visible
- * @prop {(t: Thread) => boolean} [threadFilterFn] - Predicate function that
- *       returns `true` if the annotation should be included in the thread tree
- */
+export type BuildThreadOptions = {
+  /** Map of thread id => expansion state */
+  expanded: Record<string, boolean>;
+
+  /**
+   * List of $tags of annotations that have been explicitly expanded by the
+   * user, even if they don't match current filters
+   */
+  forcedVisible: string[];
+
+  /** List of currently-selected annotation ids, from the data store */
+  selected: string[];
+
+  /** Comparison function for sorting top-level annotations */
+  sortCompareFn: (a: Thread, b: Thread) => number;
+
+  /** Predicate function that returns `true` if annotation should be visible */
+  filterFn?: (a: Annotation) => boolean;
+
+  /**
+   * Predicate function that returns `true` if the annotation should be included
+   * in the thread tree
+   */
+  threadFilterFn?: (t: Thread) => boolean;
+};
 
 /**
  * Sort by reply (Annotation) `created` date
- *
- * @param {Thread} a
- * @param {Thread} b
- * @return {number}
  */
-const replySortCompareFn = (a, b) => {
+const replySortCompareFn = (a: Thread, b: Thread): number => {
   if (!a.annotation || !b.annotation) {
     return 0;
   }
@@ -283,12 +296,12 @@ const replySortCompareFn = (a, b) => {
  * (an exception is made if that annotation's thead has been forced visible by
  * a user).
  *
- * @param {Annotation[]} annotations - A list of annotations and replies
- * @param {BuildThreadOptions} options
- * @return {Thread} - The root thread, whose children are the top-level
- *                    annotations to display.
+ * @return The root thread, whose children are the top-level annotations to display.
  */
-export function buildThread(annotations, options) {
+export function buildThread(
+  annotations: Annotation[],
+  options: BuildThreadOptions
+): Thread {
   const hasSelection = options.selected.length > 0;
   const hasForcedVisible = options.forcedVisible.length > 0;
 
