@@ -6,16 +6,18 @@
  *
  * Principals are strings of the form `type:id` where `type` is `'acct'` (for a
  * specific user) or `'group'` (for a group).
- *
- * @typedef Permissions
- * @prop {string[]} read - List of principals that can read the annotation
- * @prop {string[]} update - List of principals that can edit the annotation
- * @prop {string[]} delete - List of principals that can delete the
- * annotation
  */
 
-/** @param {string|null} savedLevel */
-function defaultLevel(savedLevel) {
+type Permissions = {
+  /** List of principals that can read the annotation */
+  read: string[];
+  /** List of principals that can edit the annotation */
+  update: string[];
+  /** List of principals that can delete the annotation */
+  delete: string[];
+};
+
+function defaultLevel(savedLevel: string | null): string {
   switch (savedLevel) {
     case 'private':
     case 'shared':
@@ -30,10 +32,9 @@ function defaultLevel(savedLevel) {
  *
  * A private annotation is one which is readable only by its author.
  *
- * @param {string} userid - User ID of the author
- * @return {Permissions}
+ * @param userid - User ID of the author
  */
-export function privatePermissions(userid) {
+export function privatePermissions(userid: string): Permissions {
   return {
     read: [userid],
     update: [userid],
@@ -45,26 +46,29 @@ export function privatePermissions(userid) {
  * Return the permissions for an annotation that is shared with the given
  * group.
  *
- * @param {string} userid - User ID of the author
- * @param {string} groupid - ID of the group the annotation is being
- * shared with
- * @return {Permissions}
+ * @param userid - User ID of the author
+ * @param groupid - ID of the group the annotation is being shared with
  */
-export function sharedPermissions(userid, groupid) {
+export function sharedPermissions(
+  userid: string,
+  groupid: string
+): Permissions {
   return Object.assign(privatePermissions(userid), {
     read: ['group:' + groupid],
   });
 }
+
 /**
  * Return the default permissions for an annotation in a given group.
  *
- * @param {string} userid - User ID of the author
- * @param {string} groupid - ID of the group the annotation is being shared
- * with
- * @param {string|null} savedLevel
- * @return {Permissions}
+ * @param userid - User ID of the author
+ * @param groupid - ID of the group the annotation is being shared with
  */
-export function defaultPermissions(userid, groupid, savedLevel) {
+export function defaultPermissions(
+  userid: string,
+  groupid: string,
+  savedLevel: string | null
+): Permissions {
   if (defaultLevel(savedLevel) === 'private' && userid) {
     return privatePermissions(userid);
   } else {
@@ -75,11 +79,8 @@ export function defaultPermissions(userid, groupid, savedLevel) {
 /**
  * Return true if an annotation with the given permissions is shared with any
  * group.
- *
- * @param {Permissions} perms
- * @return {boolean}
  */
-export function isShared(perms) {
+export function isShared(perms: Permissions): boolean {
   return perms.read.some(principal => {
     return principal.indexOf('group:') === 0;
   });
@@ -87,22 +88,18 @@ export function isShared(perms) {
 
 /**
  * Return true if an annotation with the given permissions is private.
- *
- * @param {Permissions} perms
- * @return {boolean}
  */
-export function isPrivate(perms) {
+export function isPrivate(perms: Permissions): boolean {
   return !isShared(perms);
 }
 
 /**
  * Return true if a user can perform the given `action` on an annotation.
- *
- * @param {Permissions} perms
- * @param {'update'|'delete'} action
- * @param {string|null} userid
- * @return {boolean}
  */
-export function permits(perms, action, userid) {
+export function permits(
+  perms: Permissions,
+  action: 'update' | 'delete',
+  userid: string | null
+): boolean {
   return perms[action].indexOf(userid || '') !== -1;
 }
