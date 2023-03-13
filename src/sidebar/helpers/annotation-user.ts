@@ -1,7 +1,5 @@
-/**
- * @typedef {import("../../types/api").Annotation} Annotation
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- */
+import type { Annotation } from '../../types/api';
+import type { SidebarSettings } from '../../types/config';
 import { isThirdPartyUser, username } from './account-id';
 
 /**
@@ -15,18 +13,12 @@ import { isThirdPartyUser, username } from './account-id';
  *
  * Return the string that should be used for display on an annotation: either the
  * username or the display name.
- *
- * @param {Pick<Annotation, 'user'|'user_info'>} annotation
- * @param {string} defaultAuthority
- * @param {boolean} displayNamesEnabled
- *
- * @return {string}
  */
 export function annotationDisplayName(
-  annotation,
-  defaultAuthority,
-  displayNamesEnabled
-) {
+  annotation: Pick<Annotation, 'user' | 'user_info'>,
+  defaultAuthority: string,
+  displayNamesEnabled: boolean
+): string {
   const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
 
   const useDisplayName = displayNamesEnabled || isThirdParty;
@@ -39,18 +31,13 @@ export function annotationDisplayName(
  * Return a URL to the annotation author's user page, when available. Author
  * links for third-party users are only available if a `usernameUrl` is
  * provided in `settings`.
- *
- * @param {Pick<Annotation, 'user'>} annotation
- * @param {SidebarSettings} settings
- * @param {string} defaultAuthority
- * @param {string} [userLink]
  */
 export function annotationAuthorLink(
-  annotation,
-  settings,
-  defaultAuthority,
-  userLink
-) {
+  annotation: Pick<Annotation, 'user'>,
+  settings: SidebarSettings,
+  defaultAuthority: string,
+  userLink?: string
+): string | undefined {
   const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
 
   if (!isThirdParty && userLink) {
