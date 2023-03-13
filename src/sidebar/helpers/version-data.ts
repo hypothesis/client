@@ -1,22 +1,30 @@
-/**
- * @typedef {import('../../types/annotator').SegmentInfo} SegmentInfo
- * @typedef {import('../store/modules/frames').Frame} Frame
- */
+import type { SegmentInfo } from '../../types/annotator';
+import type { Frame } from '../store/modules/frames';
 
-/**
- * @typedef UserDetails
- * @prop {string|null} [userid]
- * @prop {string} [displayName]
- */
+type UserDetails = {
+  userid?: string | null;
+  displayName?: string;
+};
 
 export class VersionData {
+  public version: string;
+  public userAgent: string;
+  public urls: string;
+  public fingerprint: string;
+  public account: string;
+  public timestamp: string;
+  public segment: string | undefined;
+
   /**
-   * @param {UserDetails} userInfo
-   * @param {Frame[]} documentFrames - Metadata for connected frames.
+   * @param documentFrames - Metadata for connected frames.
    *   If there are multiple frames, the "main" one should be listed first.
-   * @param {Window} window_ - test seam
+   * @param window_ - test seam
    */
-  constructor(userInfo, documentFrames, window_ = window) {
+  constructor(
+    userInfo: UserDetails,
+    documentFrames: Frame[],
+    window_: Window = window
+  ) {
     const noValueString = 'N/A';
 
     let accountString = noValueString;
@@ -38,7 +46,7 @@ export class VersionData {
     this.account = accountString;
     this.timestamp = new Date().toString();
 
-    const segmentInfo = documentFrames[0]?.segment;
+    const segmentInfo: SegmentInfo | undefined = documentFrames[0]?.segment;
     if (segmentInfo) {
       const segmentFields = [];
       if (segmentInfo.cfi) {
@@ -58,9 +66,9 @@ export class VersionData {
    * Return a single formatted string representing version data, suitable for
    * copying to the clipboard.
    *
-   * @return {string} - Single, multiline string representing current version data
+   * @return Single, multiline string representing current version data
    */
-  asFormattedString() {
+  asFormattedString(): string {
     return `Version: ${this.version}
 User Agent: ${this.userAgent}
 URL: ${this.urls}
@@ -74,9 +82,9 @@ Date: ${this.timestamp}
    * Return a single, encoded URL string of version data suitable for use in
    * a querystring (as the value of a single parameter)
    *
-   * @return {string} - URI-encoded string
+   * @return URI-encoded string
    */
-  asEncodedURLString() {
+  asEncodedURLString(): string {
     return encodeURIComponent(this.asFormattedString());
   }
 }
