@@ -1,20 +1,23 @@
+import type {
+  Annotation,
+  SavedAnnotation,
+  TextQuoteSelector,
+} from '../../types/api';
+
 /**
  * Utility functions for querying annotation metadata.
  */
 
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/api').SavedAnnotation} SavedAnnotation
- * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
- * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
- */
+type DocumentMetadata = {
+  uri: string;
+  domain: string;
+  title: string;
+};
 
 /**
  * Extract document metadata from an annotation.
- *
- * @param {Annotation} annotation
  */
-export function documentMetadata(annotation) {
+export function documentMetadata(annotation: Annotation): DocumentMetadata {
   const uri = annotation.uri;
 
   let domain;
@@ -23,7 +26,7 @@ export function documentMetadata(annotation) {
   } catch {
     // Annotation URI parsing on the backend is very liberal compared to the URL
     // constructor. There is also some historic invalid data in h (eg [1]).
-    // Hence we must handle URL parsing failures in the client.
+    // Hence, we must handle URL parsing failures in the client.
     //
     // [1] https://github.com/hypothesis/client/issues/3666
     domain = '';
@@ -44,13 +47,17 @@ export function documentMetadata(annotation) {
   };
 }
 
+type DomainAndTitle = {
+  domain: string;
+  titleText: string;
+  titleLink: string | null;
+};
+
 /**
  * Return the domain and title of an annotation for display on an annotation
  * card.
- *
- * @param {Annotation} annotation
  */
-export function domainAndTitle(annotation) {
+export function domainAndTitle(annotation: Annotation): DomainAndTitle {
   return {
     domain: domainTextFromAnnotation(annotation),
     titleText: titleTextFromAnnotation(annotation),
@@ -58,11 +65,8 @@ export function domainAndTitle(annotation) {
   };
 }
 
-/**
- * @param {Annotation} annotation
- */
-function titleLinkFromAnnotation(annotation) {
-  let titleLink = /** @type {string|null} */ (annotation.uri);
+function titleLinkFromAnnotation(annotation: Annotation): string | null {
+  let titleLink: string | null = annotation.uri;
 
   if (
     titleLink &&
@@ -80,10 +84,8 @@ function titleLinkFromAnnotation(annotation) {
 }
 /**
  * Returns the domain text from an annotation.
- *
- * @param {Annotation} annotation
  */
-function domainTextFromAnnotation(annotation) {
+function domainTextFromAnnotation(annotation: Annotation): string {
   const document = documentMetadata(annotation);
 
   let domainText = '';
@@ -103,10 +105,8 @@ function domainTextFromAnnotation(annotation) {
 /**
  * Returns the title text from an annotation and crops it to 30 chars
  * if needed.
- *
- * @param {Annotation} annotation
  */
-function titleTextFromAnnotation(annotation) {
+function titleTextFromAnnotation(annotation: Annotation): string {
   const document = documentMetadata(annotation);
 
   let titleText = document.title;
@@ -119,21 +119,16 @@ function titleTextFromAnnotation(annotation) {
 
 /**
  * Return `true` if the given annotation is a reply, `false` otherwise.
- *
- * @param {Annotation} annotation
  */
-export function isReply(annotation) {
+export function isReply(annotation: Annotation): boolean {
   return (annotation.references || []).length > 0;
 }
 
 /**
  * Return true if the given annotation has been saved to the backend and assigned
  * an ID.
- *
- * @param {Annotation} annotation
- * @return {annotation is SavedAnnotation}
  */
-export function isSaved(annotation) {
+export function isSaved(annotation: Annotation): annotation is SavedAnnotation {
   return !!annotation.id;
 }
 
@@ -141,18 +136,15 @@ export function isSaved(annotation) {
  * Return true if an annotation has not been saved to the backend.
  *
  * @deprecated - Use {@link isSaved} instead
- * @param {Annotation} annotation
  */
-export function isNew(annotation) {
+export function isNew(annotation: Annotation): boolean {
   return !annotation.id;
 }
 
 /**
  * Return `true` if the given annotation is public, `false` otherwise.
- *
- * @param {Annotation} annotation
  */
-export function isPublic(annotation) {
+export function isPublic(annotation: Annotation): boolean {
   let isPublic = false;
 
   if (!annotation.permissions) {
@@ -175,10 +167,8 @@ export function isPublic(annotation) {
  * An annotation which has a selector refers to a specific part of a document,
  * as opposed to a Page Note which refers to the whole document or a reply,
  * which refers to another annotation.
- *
- * @param {Annotation} annotation
  */
-function hasSelector(annotation) {
+function hasSelector(annotation: Annotation): boolean {
   return !!(
     annotation.target &&
     annotation.target.length > 0 &&
@@ -191,10 +181,8 @@ function hasSelector(annotation) {
  *
  * Returns false if anchoring is still in process but the flag indicating that
  * the initial timeout allowed for anchoring has expired.
- *
- * @param {Annotation} annotation
  */
-export function isWaitingToAnchor(annotation) {
+export function isWaitingToAnchor(annotation: Annotation): boolean {
   return (
     hasSelector(annotation) &&
     typeof annotation.$orphan === 'undefined' &&
@@ -204,11 +192,8 @@ export function isWaitingToAnchor(annotation) {
 
 /**
  * Has this annotation hidden by moderators?
- *
- * @param {Annotation} annotation
- * @return {boolean}
  */
-export function isHidden(annotation) {
+export function isHidden(annotation: Annotation): boolean {
   return !!annotation.hidden;
 }
 
@@ -217,11 +202,8 @@ export function isHidden(annotation) {
  *
  * Highlights are generally identifiable by having no text content AND no tags,
  * but there is some nuance.
- *
- * @param {Annotation} annotation
- * @return {boolean}
  */
-export function isHighlight(annotation) {
+export function isHighlight(annotation: Annotation): boolean {
   // `$highlight` is an ephemeral attribute set by the `annotator` on new
   // annotation objects (created by clicking the "highlight" button).
   // It is not persisted and cannot be relied upon, but if it IS present,
@@ -251,37 +233,31 @@ export function isHighlight(annotation) {
 
 /**
  * Return `true` if the given annotation is an orphan.
- *
- * @param {Annotation} annotation
  */
-export function isOrphan(annotation) {
+export function isOrphan(annotation: Annotation): boolean {
   return hasSelector(annotation) && annotation.$orphan === true;
 }
 
 /**
  * Return `true` if the given annotation is a page note.
- *
- * @param {Annotation} annotation
  */
-export function isPageNote(annotation) {
+export function isPageNote(annotation: Annotation): boolean {
   return !hasSelector(annotation) && !isReply(annotation);
 }
 
 /**
  * Return `true` if the given annotation is a top level annotation, `false` otherwise.
- *
- * @param {Annotation} annotation
  */
-export function isAnnotation(annotation) {
+export function isAnnotation(annotation: Annotation): boolean {
   return !!(hasSelector(annotation) && !isOrphan(annotation));
 }
 
+type AnnotationRole = 'Reply' | 'Highlight' | 'Page note' | 'Annotation';
+
 /**
  * Return a human-readable string describing the annotation's role.
- *
- * @param {Annotation} annotation
  */
-export function annotationRole(annotation) {
+export function annotationRole(annotation: Annotation): AnnotationRole {
   if (isReply(annotation)) {
     return 'Reply';
   } else if (isHighlight(annotation)) {
@@ -295,16 +271,22 @@ export function annotationRole(annotation) {
 /**
  * Key containing information needed to sort annotations based on their
  * associated position within the document.
- *
- * @typedef LocationKey
- * @prop {string} [cfi] - EPUB Canonical Fragment Identifier. For annotations
- *   on EPUBs, this identifies the location of the chapter within the book's
- *   table of contents.
- * @prop {number} [position] - Text offset within the document segment, in UTF-16
- *   code units. For web pages and PDFs this refers to the offset from the start
- *   of the document. In EPUBs this refers to the offset from the start of the
- *   Content Document (ie. chapter).
  */
+type LocationKey = {
+  /**
+   * EPUB Canonical Fragment Identifier. For annotations on EPUBs, this
+   * identifies the location of the chapter within the book's table of contents.
+   */
+  cfi?: string;
+
+  /**
+   * Text offset within the document segment, in UTF-16 code units. For web
+   * pages and PDFs this refers to the offset from the start of the document.
+   * In EPUBs this refers to the offset from the start of the Content Document
+   * (ie. chapter).
+   */
+  position?: number;
+};
 
 /**
  * Return a key that can be used to sort annotations by document position.
@@ -312,11 +294,8 @@ export function annotationRole(annotation) {
  * Note that the key may not have any fields set if the annotation is a page
  * note or was created via the Hypothesis API without providing the selectors
  * that this function uses.
- *
- * @param {Annotation} annotation
- * @return {LocationKey}
  */
-export function location(annotation) {
+export function location(annotation: Annotation): LocationKey {
   const targets = annotation.target;
 
   let cfi;
@@ -338,11 +317,8 @@ export function location(annotation) {
 /**
  * Return the number of times the annotation has been flagged
  * by other users. If moderation metadata is not present, returns `null`.
- *
- * @param {Annotation} annotation
- * @return {number|null}
  */
-export function flagCount(annotation) {
+export function flagCount(annotation: Annotation): number | null {
   if (!annotation.moderation) {
     return null;
   }
@@ -351,11 +327,8 @@ export function flagCount(annotation) {
 
 /**
  * Return the text quote that an annotation refers to.
- *
- * @param {Annotation} annotation
- * @return {string|null}
  */
-export function quote(annotation) {
+export function quote(annotation: Annotation): string | null {
   if (annotation.target.length === 0) {
     return null;
   }
@@ -363,17 +336,16 @@ export function quote(annotation) {
   if (!target.selector) {
     return null;
   }
-  const quoteSel = target.selector.find(s => s.type === 'TextQuoteSelector');
-  return quoteSel ? /** @type {TextQuoteSelector}*/ (quoteSel).exact : null;
+  const quoteSel = target.selector.find(s => s.type === 'TextQuoteSelector') as
+    | TextQuoteSelector
+    | undefined;
+  return quoteSel ? quoteSel.exact : null;
 }
 
 /**
  * Has this annotation been edited subsequent to its creation?
- *
- * @param {Annotation} annotation
- * @return {boolean}
  */
-export function hasBeenEdited(annotation) {
+export function hasBeenEdited(annotation: Annotation): boolean {
   // New annotations created with the current `h` API service will have
   // equivalent (string) values for `created` and `updated` datetimes.
   // However, in the past, these values could have sub-second differences,
