@@ -1,7 +1,5 @@
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- */
+import type { Annotation } from '../../types/api';
+import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 
 /**
@@ -16,11 +14,8 @@ import { serviceConfig } from '../config/service-config';
  *
  * Note that `html` links are not provided by the service for third-party
  * annotations.
- *
- * @param {Annotation} annotation
- * @return {string|null}
  */
-export function annotationSharingLink(annotation) {
+export function annotationSharingLink(annotation: Annotation): string | null {
   if (isShareableURI(annotation.uri)) {
     return annotation.links?.incontext ?? annotation.links?.html ?? null;
   } else {
@@ -32,12 +27,11 @@ export function annotationSharingLink(annotation) {
  * Generate a URI for sharing: a bouncer link built to share annotations in
  * a specific group (groupID) on a specific document (documentURI). If the
  * `documentURI` provided is not a web-accessible URL, no link is generated.
- *
- * @param {string} documentURI
- * @param {string} groupID
- * @return {string|null}
  */
-export function pageSharingLink(documentURI, groupID) {
+export function pageSharingLink(
+  documentURI: string,
+  groupID: string
+): string | null {
   if (!isShareableURI(documentURI)) {
     return null;
   }
@@ -50,26 +44,16 @@ export function pageSharingLink(documentURI, groupID) {
  * Are annotations made against `uri` meaningfully shareable? The
  * target URI needs to be available on the web, which here is determined by
  * a protocol of `http` or `https`.
- *
- * @param {string} uri
- * @return {boolean}
  */
-export function isShareableURI(uri) {
+export function isShareableURI(uri: string): boolean {
   return /^http(s?):/i.test(uri);
 }
 
 /**
  * Is the sharing of annotations enabled? Check for any defined `serviceConfig`,
  * but default to `true` if none found.
- *
- * @param {SidebarSettings} settings
- * @return {boolean}
  */
-export function sharingEnabled(settings) {
+export function sharingEnabled(settings: SidebarSettings): boolean {
   const service = serviceConfig(settings);
-
-  if (service?.enableShareLinks === false) {
-    return false;
-  }
-  return true;
+  return service?.enableShareLinks !== false;
 }
