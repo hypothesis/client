@@ -1,18 +1,15 @@
+import type { Annotation } from '../../types/api';
 import { notNull } from '../util/typing';
-
-/** @typedef {import('../../types/api').Annotation} Annotation */
-/** @typedef {import('./build-thread').Thread} Thread */
+import type { Thread } from './build-thread';
 
 /**
  * Count the number of annotations/replies in the `thread` whose `visible`
  * property matches `visibility`.
  *
- * @param {Thread} thread
- * @param {boolean} visibility — `true`: count visible annotations
- *                               `false`: count hidden annotations
- * @return {number}
+ * @param visibility — `true`: count visible annotations
+ *                     `false`: count hidden annotations
  */
-function countByVisibility(thread, visibility) {
+function countByVisibility(thread: Thread, visibility: boolean): number {
   const matchesVisibility = thread.visible === visibility;
   return thread.children.reduce(
     (count, reply) => count + countByVisibility(reply, visibility),
@@ -22,19 +19,15 @@ function countByVisibility(thread, visibility) {
 
 /**
  * Count the hidden annotations/replies in the `thread`
- *
- * @param {Thread} thread
  */
-export function countHidden(thread) {
+export function countHidden(thread: Thread): number {
   return countByVisibility(thread, false);
 }
 
 /**
  * Count the visible annotations/replies in the `thread`
- *
- * @param {Thread} thread
  */
-export function countVisible(thread) {
+export function countVisible(thread: Thread): number {
   return countByVisibility(thread, true);
 }
 
@@ -64,11 +57,8 @@ export function countVisible(thread) {
  *          - reply 6
  *
  * Return [reply 1, reply 4, reply 5]
- *
- * @param {Thread[]} threads
- * @return {Annotation[]}
  */
-export function rootAnnotations(threads) {
+export function rootAnnotations(threads: Thread[]): Annotation[] {
   // If there are any threads at this level with extant annotations, return
   // those annotations
   const threadAnnotations = threads
@@ -80,8 +70,7 @@ export function rootAnnotations(threads) {
   }
 
   // Else, search across all children at once (an entire hierarchical level)
-  /** @type {Thread[]} */
-  const allChildren = [];
+  const allChildren: Thread[] = [];
   threads.forEach(thread => {
     if (thread.children) {
       allChildren.push(...thread.children);
