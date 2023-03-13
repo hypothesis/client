@@ -1,4 +1,7 @@
+import type { SidebarStore } from '../store';
 import { retryPromiseOperation } from '../util/retry';
+import type { AnnotationsService } from './annotations';
+import type { ToastMessengerService } from './toast-messenger';
 
 /**
  * A service for automatically saving new highlights.
@@ -6,20 +9,25 @@ import { retryPromiseOperation } from '../util/retry';
  * @inject
  */
 export class AutosaveService {
-  /**
-   * @param {import('./annotations').AnnotationsService} annotationsService
-   * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
-   * @param {import('../store').SidebarStore} store
-   */
-  constructor(annotationsService, toastMessenger, store) {
+  private _annotationsService: AnnotationsService;
+  private _toastMessenger: ToastMessengerService;
+  private _store: SidebarStore;
+
+  /** A set of annotation $tags that have save requests in-flight */
+  private _saving: Set<string>;
+  /** A set of annotation $tags that have failed to save after retries */
+  private _failed: Set<string>;
+
+  constructor(
+    annotationsService: AnnotationsService,
+    toastMessenger: ToastMessengerService,
+    store: SidebarStore
+  ) {
     this._annotationsService = annotationsService;
     this._toastMessenger = toastMessenger;
     this._store = store;
 
-    // A set of annotation $tags that have save requests in-flight
     this._saving = new Set();
-
-    // A set of annotation $tags that have failed to save after retries
     this._failed = new Set();
   }
 
@@ -32,10 +40,9 @@ export class AutosaveService {
      * Determine whether we should try to send a save request for the highlight
      * indicated by `htag`
      *
-     * @param {string} htag - The local unique identifier for the unsaved highlight
-     * @return {boolean}
+     * @param htag - The local unique identifier for the unsaved highlight
      */
-    const shouldSaveHighlight = htag => {
+    const shouldSaveHighlight = (htag: string): boolean => {
       return !this._saving.has(htag) && !this._failed.has(htag);
     };
 
