@@ -3,6 +3,7 @@ import { ToastMessengerService } from '../toast-messenger';
 describe('ToastMessengerService', () => {
   let clock;
   let fakeStore;
+  let fakeWindow;
   let service;
 
   beforeEach(() => {
@@ -13,9 +14,15 @@ describe('ToastMessengerService', () => {
       removeToastMessage: sinon.stub(),
       updateToastMessage: sinon.stub(),
     };
+    fakeWindow = {
+      addEventListener: sinon.stub(),
+      document: {
+        hasFocus: sinon.stub(),
+      },
+    };
 
     clock = sinon.useFakeTimers();
-    service = new ToastMessengerService(fakeStore);
+    service = new ToastMessengerService(fakeStore, fakeWindow);
   });
 
   afterEach(() => {
