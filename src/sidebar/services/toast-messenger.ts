@@ -9,7 +9,7 @@ const MESSAGE_DISMISS_DELAY = 500;
 /**
  * Additional control over the display of a particular message.
  */
-type MessageOptions = {
+export type MessageOptions = {
   /** Whether the toast message automatically disappears. */
   autoDismiss?: boolean;
   /** Optional URL for users to visit for "more info" */
@@ -30,6 +30,14 @@ type MessageOptions = {
   delayed?: boolean;
 };
 
+export type MessageType = 'error' | 'success' | 'notice';
+
+type MessageData = {
+  type: MessageType;
+  messageText: string;
+  options: MessageOptions;
+};
+
 /**
  * A service for managing toast messages. The service will auto-dismiss and
  * remove toast messages created with `#success()` or `#error()`. Added
@@ -39,22 +47,23 @@ type MessageOptions = {
 export class ToastMessengerService {
   private _store: SidebarStore;
   private _window: Window;
-  private _delayedMessagesQueue: Set<{
-    type: 'error' | 'success' | 'notice';
-    messageText: string;
-    options: MessageOptions;
-  }>;
+
+  /**
+   * This holds a queue of delayed messages that need to be published as soon as
+   * the window gets focused
+   */
+  private _delayedMessageQueue: MessageData[];
 
   constructor(store: SidebarStore, $window: Window) {
     this._store = store;
     this._window = $window;
-    this._delayedMessagesQueue = new Set();
+    this._delayedMessageQueue = [];
 
     this._window.addEventListener('focus', () => {
-      this._delayedMessagesQueue.forEach(({ type, messageText, options }) =>
+      this._delayedMessageQueue.forEach(({ type, messageText, options }) =>
         this._addMessage(type, messageText, options)
       );
-      this._delayedMessagesQueue.clear();
+      this._delayedMessageQueue = [];
     });
   }
 
@@ -83,7 +92,7 @@ export class ToastMessengerService {
    * `type` and `message` text of an existing message).
    */
   private _addMessage(
-    type: 'error' | 'success' | 'notice',
+    type: MessageType,
     messageText: string,
     {
       autoDismiss = true,
@@ -97,6 +106,14 @@ export class ToastMessengerService {
       return;
     }
 
+    if (delayed && !this._window.document.hasFocus()) {
+      // Ignore the "delayed" option to avoid an infinite loop of re-enqueuing
+      // the same messages over and over
+      const options = { autoDismiss, moreInfoURL, visuallyHidden };
+      this._delayedMessageQueue.push({ type, messageText, options });
+      return;
+    }
+
     const id = generateHexString(10);
     const message = {
       type,
@@ -105,16 +122,6 @@ export class ToastMessengerService {
       moreInfoURL,
       visuallyHidden,
     };
-
-    // Just enqueue delayed messages when the document is not focused, and do
-    // nothing else for now
-    if (delayed && !this._window.document.hasFocus()) {
-      // Purposefully ignore the "delayed" option to avoid an infinite loop of
-      // re-enqueuing the same messages over and over
-      const options = { autoDismiss, moreInfoURL, visuallyHidden };
-      this._delayedMessagesQueue.add({ type, messageText, options });
-      return;
-    }
 
     this._store.addToastMessage({
       isDismissed: false,
