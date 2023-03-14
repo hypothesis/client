@@ -14,11 +14,9 @@ describe('ToastMessengerService', () => {
       removeToastMessage: sinon.stub(),
       updateToastMessage: sinon.stub(),
     };
-    fakeWindow = {
-      addEventListener: sinon.stub(),
-      document: {
-        hasFocus: sinon.stub(),
-      },
+    fakeWindow = new EventTarget();
+    fakeWindow.document = {
+      hasFocus: sinon.stub().returns(true),
     };
 
     clock = sinon.useFakeTimers();
@@ -204,6 +202,35 @@ describe('ToastMessengerService', () => {
 
       assert.calledOnce(fakeStore.removeToastMessage);
       assert.calledWith(fakeStore.removeToastMessage, 'someid');
+    });
+  });
+
+  context('when the message is delayed', () => {
+    it('behaves same as non-delayed message if document is focused', () => {
+      fakeWindow.document.hasFocus.returns(true);
+      service.notice('foo', { delayed: true });
+
+      assert.calledWith(
+        fakeStore.addToastMessage,
+        sinon.match({ type: 'notice', message: 'foo' })
+      );
+    });
+
+    it('defers adding message if the document is not focused', () => {
+      fakeWindow.document.hasFocus.returns(false);
+      service.notice('foo', { delayed: true });
+
+      assert.notCalled(fakeStore.addToastMessage);
+    });
+
+    it('dispatches all deferred messages when the document is focused', () => {
+      fakeWindow.document.hasFocus.returns(false);
+      service.notice('foo', { delayed: true });
+      service.notice('bar', { delayed: true });
+
+      assert.notCalled(fakeStore.addToastMessage);
+      fakeWindow.dispatchEvent(new Event('focus'));
+      assert.calledTwice(fakeStore.addToastMessage);
     });
   });
 });
