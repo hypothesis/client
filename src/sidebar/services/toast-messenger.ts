@@ -20,6 +20,14 @@ type MessageOptions = {
    * readers.
    */
   visuallyHidden?: boolean;
+
+  /**
+   * When `true`, the message will not be created until the frame where the
+   * ToastMessengerService is running, is focused.
+   * Usage example: messages where you want to announce the availability of
+   * keyboard shortcuts that wouldn't work when other frames are focused.
+   */
+  delayed?: boolean;
 };
 
 /**
@@ -30,9 +38,24 @@ type MessageOptions = {
 // @inject
 export class ToastMessengerService {
   private _store: SidebarStore;
+  private _window: Window;
+  private _delayedMessagesQueue: Set<{
+    type: 'error' | 'success' | 'notice';
+    messageText: string;
+    options: MessageOptions;
+  }>;
 
-  constructor(store: SidebarStore) {
+  constructor(store: SidebarStore, $window: Window) {
     this._store = store;
+    this._window = $window;
+    this._delayedMessagesQueue = new Set();
+
+    this._window.addEventListener('focus', () => {
+      this._delayedMessagesQueue.forEach(({ type, messageText, options }) =>
+        this._addMessage(type, messageText, options)
+      );
+      this._delayedMessagesQueue.clear();
+    });
   }
 
   /**
@@ -66,6 +89,7 @@ export class ToastMessengerService {
       autoDismiss = true,
       moreInfoURL = '',
       visuallyHidden = false,
+      delayed = false,
     }: MessageOptions = {}
   ) {
     // Do not add duplicate messages (messages with the same type and text)
@@ -81,6 +105,16 @@ export class ToastMessengerService {
       moreInfoURL,
       visuallyHidden,
     };
+
+    // Just enqueue delayed messages when the document is not focused, and do
+    // nothing else for now
+    if (delayed && !this._window.document.hasFocus()) {
+      // Purposefully ignore the "delayed" option to avoid an infinite loop of
+      // re-enqueuing the same messages over and over
+      const options = { autoDismiss, moreInfoURL, visuallyHidden };
+      this._delayedMessagesQueue.add({ type, messageText, options });
+      return;
+    }
 
     this._store.addToastMessage({
       isDismissed: false,
