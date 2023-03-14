@@ -8,7 +8,7 @@
  * specific user) or `'group'` (for a group).
  */
 
-type Permissions = {
+export type Permissions = {
   /** List of principals that can read the annotation */
   read: string[];
   /** List of principals that can edit the annotation */

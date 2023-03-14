@@ -12,7 +12,7 @@ const supportedThemeProperties: Record<ThemeProperty, string> = {
 /**
  * Subset of the config from the host page which includes theme configuration.
  */
-type Settings = {
+export type Settings = {
   branding?: Record<ThemeProperty, string>;
 };
 
