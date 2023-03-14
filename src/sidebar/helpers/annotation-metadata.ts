@@ -8,7 +8,7 @@ import type {
  * Utility functions for querying annotation metadata.
  */
 
-type DocumentMetadata = {
+export type DocumentMetadata = {
   uri: string;
   domain: string;
   title: string;
@@ -47,7 +47,7 @@ export function documentMetadata(annotation: Annotation): DocumentMetadata {
   };
 }
 
-type DomainAndTitle = {
+export type DomainAndTitle = {
   domain: string;
   titleText: string;
   titleLink: string | null;
@@ -252,12 +252,10 @@ export function isAnnotation(annotation: Annotation): boolean {
   return !!(hasSelector(annotation) && !isOrphan(annotation));
 }
 
-type AnnotationRole = 'Reply' | 'Highlight' | 'Page note' | 'Annotation';
-
 /**
  * Return a human-readable string describing the annotation's role.
  */
-export function annotationRole(annotation: Annotation): AnnotationRole {
+export function annotationRole(annotation: Annotation): string {
   if (isReply(annotation)) {
     return 'Reply';
   } else if (isHighlight(annotation)) {
