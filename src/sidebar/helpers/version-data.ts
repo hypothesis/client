@@ -7,13 +7,13 @@ type UserDetails = {
 };
 
 export class VersionData {
-  public version: string;
-  public userAgent: string;
-  public urls: string;
-  public fingerprint: string;
-  public account: string;
-  public timestamp: string;
-  public segment: string | undefined;
+  version: string;
+  userAgent: string;
+  urls: string;
+  fingerprint: string;
+  account: string;
+  timestamp: string;
+  segment: string | undefined;
 
   /**
    * @param documentFrames - Metadata for connected frames.
