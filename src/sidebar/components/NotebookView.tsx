@@ -1,9 +1,4 @@
-import {
-  IconButton,
-  Link,
-  Panel,
-  RefreshIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { Link, Panel } from '@hypothesis/frontend-shared/lib/next';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
@@ -15,6 +10,7 @@ import { useSidebarStore } from '../store';
 import NotebookFilters from './NotebookFilters';
 import NotebookResultCount from './NotebookResultCount';
 import PaginatedThreadList from './PaginatedThreadList';
+import PendingUpdatesButton from './PendingUpdatesButton';
 import { useRootThread } from './hooks/use-root-thread';
 
 export type NotebookViewProps = {
@@ -36,7 +32,6 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
   const hasAppliedFilter = store.hasAppliedFilter();
   const isLoading = store.isLoading();
   const resultCount = store.annotationResultCount();
-  const pendingUpdateCount = store.pendingUpdateCount();
 
   const rootThread = useRootThread();
 
@@ -127,10 +122,6 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
     }
   }, [paginationPage]);
 
-  const tooltip = `Show ${pendingUpdateCount} new or updated ${
-    pendingUpdateCount > 1 ? 'annotations' : 'annotation'
-  }`;
-
   return (
     <div className="grid gap-2 lg:grid-cols-2" data-testid="notebook-container">
       <header className="leading-none lg:col-span-2" ref={threadListScrollTop}>
@@ -142,15 +133,7 @@ function NotebookView({ loadAnnotationsService, streamer }: NotebookViewProps) {
         <NotebookFilters />
       </div>
       <div className="flex items-center lg:justify-self-end text-md font-medium">
-        {pendingUpdateCount > 0 && !hasAppliedFilter && (
-          <IconButton
-            data-testid="refresh-button"
-            icon={RefreshIcon}
-            onClick={() => streamer.applyPendingUpdates()}
-            variant="primary"
-            title={tooltip}
-          />
-        )}
+        <PendingUpdatesButton />
         <NotebookResultCount
           forcedVisibleCount={forcedVisibleCount}
           isFiltered={hasAppliedFilter}
