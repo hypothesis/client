@@ -34,13 +34,10 @@ function normalizeStr(val: string): string {
 
 /**
  * Filter that matches annotations against a single query term.
- *
- * @template TermType
- * @implements {Filter}
  */
 class TermFilter<TermType extends string> implements Filter {
-  public term: TermType;
-  public matcher: Matcher<TermType>;
+  term: TermType;
+  matcher: Matcher<TermType>;
 
   constructor(term: TermType, matcher: Matcher<TermType>) {
     this.term = matcher.normalize(term);
@@ -62,8 +59,8 @@ class TermFilter<TermType extends string> implements Filter {
  * Filter that combines other filters using AND or OR combinators.
  */
 class BooleanOpFilter implements Filter {
-  public operator: 'and' | 'or';
-  public filters: Filter[];
+  operator: 'and' | 'or';
+  filters: Filter[];
 
   /**
    * @param op - Boolean operator
@@ -168,5 +165,5 @@ export function filterAnnotations(
     .filter(ann => {
       return ann.id && rootFilter.matches(ann);
     })
-    .map(ann => ann.id as string);
+    .map(ann => ann.id!);
 }
