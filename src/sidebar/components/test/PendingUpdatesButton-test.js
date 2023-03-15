@@ -54,9 +54,17 @@ describe('PendingUpdatesButton', () => {
       assert.isTrue(wrapper.find('IconButton').exists());
       assert.calledWith(
         fakeToastMessenger.notice,
-        `New annotations are available.`,
+        'New annotations are available.',
         {
           visuallyHidden: true,
+        }
+      );
+      assert.calledWith(
+        fakeToastMessenger.notice,
+        'Press "l" to load new annotations.',
+        {
+          visuallyHidden: true,
+          delayed: true,
         }
       );
     });
@@ -72,6 +80,18 @@ describe('PendingUpdatesButton', () => {
     const applyBtn = wrapper.find('IconButton');
 
     applyBtn.props().onClick();
+
+    assert.called(fakeStreamer.applyPendingUpdates);
+  });
+
+  it('applies updates when keyboard shortcut is pressed', () => {
+    createButton(1);
+    document.body.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'l',
+        bubbles: true,
+      })
+    );
 
     assert.called(fakeStreamer.applyPendingUpdates);
   });
