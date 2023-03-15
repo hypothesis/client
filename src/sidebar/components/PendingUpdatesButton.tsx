@@ -1,6 +1,7 @@
 import { IconButton, RefreshIcon } from '@hypothesis/frontend-shared/lib/next';
 import { useEffect } from 'preact/hooks';
 
+import { useShortcut } from '../../shared/shortcut';
 import { withServices } from '../service-context';
 import type { StreamerService } from '../services/streamer';
 import type { ToastMessengerService } from '../services/toast-messenger';
@@ -19,11 +20,18 @@ function PendingUpdatesButton({
   const store = useSidebarStore();
   const pendingUpdateCount = store.pendingUpdateCount();
   const hasPendingUpdates = store.hasPendingUpdates();
+  const applyPendingUpdates = () => streamer.applyPendingUpdates();
+
+  useShortcut('l', () => hasPendingUpdates && applyPendingUpdates());
 
   useEffect(() => {
     if (hasPendingUpdates) {
-      toastMessenger.notice(`New annotations are available.`, {
+      toastMessenger.notice('New annotations are available.', {
         visuallyHidden: true,
+      });
+      toastMessenger.notice('Press "l" to load new annotations.', {
+        visuallyHidden: true,
+        delayed: true,
       });
     }
   }, [hasPendingUpdates, toastMessenger]);
@@ -35,7 +43,7 @@ function PendingUpdatesButton({
   return (
     <IconButton
       icon={RefreshIcon}
-      onClick={() => streamer.applyPendingUpdates()}
+      onClick={applyPendingUpdates}
       size="xs"
       variant="primary"
       title={`Show ${pendingUpdateCount} new/updated ${
