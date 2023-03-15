@@ -1,3 +1,4 @@
+/* global Navigation */
 import { ListenerCollection } from '../../shared/listener-collection';
 
 /**
@@ -39,6 +40,28 @@ function stripFragment(url) {
 }
 
 /**
+ * Return the Navigation API entry point for the current window.
+ *
+ * This is a wrapper around `window.navigation` which checks both that the
+ * object exists and has the expected type. See also
+ * https://github.com/hypothesis/client/issues/5324.
+ *
+ * @return {EventTarget|null}
+ */
+export function getNavigation() {
+  const navigation = /** @type {any} */ (window).navigation;
+  if (
+    // @ts-expect-error - Navigation API is missing from TS
+    typeof Navigation === 'function' &&
+    // @ts-expect-error
+    navigation instanceof Navigation
+  ) {
+    return navigation;
+  }
+  return null;
+}
+
+/**
  * Utility for detecting client-side navigations of an HTML document.
  *
  * This uses the Navigation API [1] if available, or falls back to
@@ -76,8 +99,7 @@ export class NavigationObserver {
       }
     };
 
-    // @ts-expect-error - TS is missing Navigation API types.
-    const navigation = window.navigation;
+    const navigation = getNavigation();
     if (navigation) {
       this._listeners.add(navigation, 'navigatesuccess', () =>
         checkForURLChange()
