@@ -48,7 +48,7 @@
     }
 
     &.sidebar-collapsed {
-      @apply ml-0;
+      @apply ml-[-1px];
     }
   }
 
