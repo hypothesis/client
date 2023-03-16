@@ -1,5 +1,5 @@
 import { IconButton, RefreshIcon } from '@hypothesis/frontend-shared/lib/next';
-import { useEffect } from 'preact/hooks';
+import { useCallback, useEffect } from 'preact/hooks';
 
 import { useShortcut } from '../../shared/shortcut';
 import { withServices } from '../service-context';
@@ -20,7 +20,10 @@ function PendingUpdatesButton({
   const store = useSidebarStore();
   const pendingUpdateCount = store.pendingUpdateCount();
   const hasPendingUpdates = store.hasPendingUpdates();
-  const applyPendingUpdates = () => streamer.applyPendingUpdates();
+  const applyPendingUpdates = useCallback(
+    () => streamer.applyPendingUpdates(),
+    [streamer]
+  );
 
   useShortcut('l', () => hasPendingUpdates && applyPendingUpdates());
 
