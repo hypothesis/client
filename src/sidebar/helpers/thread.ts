@@ -1,5 +1,4 @@
 import type { Annotation } from '../../types/api';
-import { notNull } from '../util/typing';
 import type { Thread } from './build-thread';
 
 /**
@@ -63,7 +62,7 @@ export function rootAnnotations(threads: Thread[]): Annotation[] {
   // those annotations
   const threadAnnotations = threads
     .filter(thread => !!thread.annotation)
-    .map(thread => notNull(thread.annotation));
+    .map(thread => thread.annotation!);
 
   if (threadAnnotations.length) {
     return threadAnnotations;

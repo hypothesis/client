@@ -12,7 +12,6 @@ import { withServices } from '../service-context';
 import type { ToastMessengerService } from '../services/toast-messenger';
 import { useSidebarStore } from '../store';
 import { copyText } from '../util/copy-to-clipboard';
-import { notNull } from '../util/typing';
 import ShareLinks from './ShareLinks';
 import SidebarPanel from './SidebarPanel';
 
@@ -68,7 +67,7 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
                 className="text-color-text font-medium"
                 data-testid="sharing-intro"
               >
-                {notNull(focusedGroup).type === 'private' ? (
+                {focusedGroup!.type === 'private' ? (
                   <p>
                     Use this link to share these annotations with other group
                     members:
@@ -94,16 +93,16 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
                 </InputGroup>
               </div>
               <p data-testid="sharing-details">
-                {notNull(focusedGroup).type === 'private' ? (
+                {focusedGroup!.type === 'private' ? (
                   <span>
                     Annotations in the private group{' '}
-                    <em>{notNull(focusedGroup).name}</em> are only visible to
-                    group members.
+                    <em>{focusedGroup.name}</em> are only visible to group
+                    members.
                   </span>
                 ) : (
                   <span>
                     Anyone using this link may view the annotations in the group{' '}
-                    <em>{notNull(focusedGroup).name}</em>.
+                    <em>{focusedGroup.name}</em>.
                   </span>
                 )}{' '}
                 <span>
