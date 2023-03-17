@@ -289,5 +289,21 @@ describe('sidebar/util/oauth-client', () => {
         assert.equal(code, 'second-code');
       });
     });
+
+    it('ignores responses with non-object values', () => {
+      const authorized = authorize();
+
+      fakeWindow.sendMessage('not-an-object');
+
+      fakeWindow.sendMessage({
+        type: 'authorization_response',
+        code: 'second-code',
+        state: 'notrandom',
+      });
+
+      return authorized.then(code => {
+        assert.equal(code, 'second-code');
+      });
+    });
   });
 });
