@@ -252,7 +252,7 @@ export class OAuthClient {
    *
    * @param data - Form field name/value dictionary
    */
-  async _formPost(url: string, data: Record<string, string>) {
+  private async _formPost(url: string, data: Record<string, string>) {
     const params = new URLSearchParams();
     for (const [key, value] of Object.entries(data)) {
       params.set(key, value);
@@ -278,7 +278,9 @@ export class OAuthClient {
    *
    * @param data - Fields for form POST request
    */
-  async _getAccessToken(data: Record<string, string>): Promise<TokenInfo> {
+  private async _getAccessToken(
+    data: Record<string, string>
+  ): Promise<TokenInfo> {
     let response;
     try {
       response = (await this._formPost(
