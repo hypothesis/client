@@ -77,7 +77,7 @@ class CacheEntry {
  *     );
  *   }
  *
- * @template {import('./create-store').Store<unknown, unknown, unknown>} Store
+ * @template {import('./create-store').Store<object, object, object>} Store
  * @param {Store} store - The store to wrap
  * @return {Store} - A proxy with the same API as `store`
  */
