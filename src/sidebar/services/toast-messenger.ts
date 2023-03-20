@@ -1,5 +1,6 @@
 import { generateHexString } from '../../shared/random';
 import type { SidebarStore } from '../store';
+import type { FrameSyncService } from './frame-sync';
 
 // How long toast messages should be displayed before they are dismissed, in ms
 const MESSAGE_DISPLAY_TIME = 5000;
@@ -47,6 +48,7 @@ type MessageData = {
 export class ToastMessengerService {
   private _store: SidebarStore;
   private _window: Window;
+  private _frameSyncFactory: () => FrameSyncService;
 
   /**
    * This holds a queue of delayed messages that need to be published as soon as
@@ -54,9 +56,14 @@ export class ToastMessengerService {
    */
   private _delayedMessageQueue: MessageData[];
 
-  constructor(store: SidebarStore, $window: Window) {
+  constructor(
+    store: SidebarStore,
+    $window: Window,
+    frameSyncFactory: () => FrameSyncService
+  ) {
     this._store = store;
     this._window = $window;
+    this._frameSyncFactory = frameSyncFactory;
     this._delayedMessageQueue = [];
 
     this._window.addEventListener('focus', () => {
@@ -122,6 +129,12 @@ export class ToastMessengerService {
       moreInfoURL,
       visuallyHidden,
     };
+
+    // Forward hidden messages to "host" when sidebar is collapsed
+    if (visuallyHidden /* && sidebarIsCollapsed */) {
+      this._frameSyncFactory().notifyHost('toastMessagePushed', message);
+      return;
+    }
 
     this._store.addToastMessage({
       isDismissed: false,

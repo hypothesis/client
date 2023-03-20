@@ -64,6 +64,15 @@ export class Injector {
       return this._instances.get(name);
     }
 
+    if (name.endsWith('Factory')) {
+      const [actualName] = name.split('Factory');
+      const instance = () => this.get(actualName);
+
+      this._instances.set(name, instance);
+
+      return instance;
+    }
+
     const provider = this._providers.get(name);
 
     if (!provider) {

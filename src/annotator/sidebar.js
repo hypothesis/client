@@ -1,9 +1,11 @@
 import * as Hammer from 'hammerjs';
+import { render } from 'preact';
 
 import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortRPC } from '../shared/messaging';
+import HostToastMessages from '../sidebar/components/HostToastMessages';
 import { annotationCounts } from './annotation-counts';
 import { BucketBar } from './bucket-bar';
 import { createAppConfig } from './config/app';
@@ -161,6 +163,13 @@ export class Sidebar {
       shadowRoot.appendChild(this.iframeContainer);
 
       element.appendChild(this.hypothesisSidebar);
+
+      const messagesElement = document.createElement('div');
+      shadowRoot.appendChild(messagesElement);
+      render(
+        <HostToastMessages sidebarRPC={this._sidebarRPC} />,
+        messagesElement
+      );
     }
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.

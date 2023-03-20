@@ -225,4 +225,9 @@ export type SidebarToHostEvent =
    * The sidebar is asking the host to do a partner site sign-up.
    * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onsignuprequest
    */
-  | 'signupRequested';
+  | 'signupRequested'
+
+  /**
+   * The sidebar is asking the host to toast a message
+   */
+  | 'toastMessagePushed';
