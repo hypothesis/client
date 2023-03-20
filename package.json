@@ -25,7 +25,7 @@
     "@sentry/browser": "^7.1.1",
     "@sentry/cli": "^2.0.2",
     "@trivago/prettier-plugin-sort-imports": "^4.1.1",
-    "@types/dompurify": "^2.3.3",
+    "@types/dompurify": "^3.0.0",
     "@types/escape-html": "^1.0.1",
     "@types/hammerjs": "^2.0.41",
     "@types/katex": "^0.16.0",
