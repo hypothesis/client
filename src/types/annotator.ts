@@ -147,6 +147,8 @@ export type SidebarLayout = {
   expanded: boolean;
   /** Current width of sidebar in pixels */
   width: number;
+  /** Current height of sidebar in pixels */
+  height: number;
   /** Width of controls (toolbar, bucket bar) on the edge of the sidebar */
   toolbarWidth: number;
 };

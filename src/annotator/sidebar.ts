@@ -4,25 +4,26 @@ import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
 import { ListenerCollection } from '../shared/listener-collection';
 import { PortRPC } from '../shared/messaging';
+import type {
+  AnchorPosition,
+  SidebarLayout,
+  Destroyable,
+} from '../types/annotator';
+import type { Service } from '../types/config';
+import type {
+  GuestToHostEvent,
+  HostToGuestEvent,
+  HostToSidebarEvent,
+  SidebarToHostEvent,
+} from '../types/port-rpc-events';
 import { annotationCounts } from './annotation-counts';
 import { BucketBar } from './bucket-bar';
 import { createAppConfig } from './config/app';
 import { FeatureFlags } from './features';
 import { sidebarTrigger } from './sidebar-trigger';
 import { ToolbarController } from './toolbar';
+import type { Emitter, EventBus } from './util/emitter';
 import { createShadowRoot } from './util/shadow-root';
-
-/**
- * @typedef {import('./guest').Guest} Guest
- * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
- * @typedef {import('../types/annotator').SidebarLayout} SidebarLayout
- * @typedef {import('../types/annotator').Destroyable} Destroyable
- * @typedef {import('../types/config').Service} Service
- * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
- * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
- * @typedef {import('../types/port-rpc-events').HostToSidebarEvent} HostToSidebarEvent
- * @typedef {import('../types/port-rpc-events').SidebarToHostEvent} SidebarToHostEvent
- */
 
 // Minimum width to which the iframeContainer can be resized.
 export const MIN_RESIZE = 280;
@@ -32,33 +33,38 @@ export const MIN_RESIZE = 280;
  *
  * This includes the URL for the iframe and configuration to pass to the
  * application on launch.
- *
- * @typedef {{ sidebarAppUrl: string } & Record<string, unknown>} SidebarConfig
  */
+export type SidebarConfig = { sidebarAppUrl: string } & Record<string, unknown>;
 
 /**
  * Client configuration used by the sidebar container ({@link Sidebar}).
- *
- * @typedef SidebarContainerConfig
- * @prop {Service[]} [services] - Details of the annotation service the
- *   client should connect to. This includes callbacks provided by the host
- *   page to handle certain actions in the sidebar (eg. the Login button).
- * @prop {string} [externalContainerSelector] - CSS selector of a container
- *   element in the host page which the sidebar should be added into, instead
- *   of creating a new container.
- * @prop {(layout: SidebarLayout) => void} [onLayoutChange] - Callback that
- *   allows the host page to react to the sidebar being opened, closed or
- *   resized
  */
+export type SidebarContainerConfig = {
+  /**
+   * Details of the annotation service the client should connect to.
+   * This includes callbacks provided by the host page to handle certain actions
+   * in the sidebar (eg. the Login button).
+   */
+  services?: Service[];
+
+  /**
+   * CSS selector of a container element in the host page which the sidebar
+   * should be added into, instead of creating a new container.
+   */
+  externalContainerSelector?: string;
+
+  /**
+   * Callback that allows the host page to react to the sidebar being opened,
+   * closed or resized
+   */
+  onLayoutChange?: (layout: SidebarLayout) => void;
+};
 
 /**
  * Create the iframe that will load the sidebar application.
- *
- * @param {SidebarConfig} config
- * @return {HTMLIFrameElement}
  */
-function createSidebarIframe(config) {
-  const sidebarURL = /** @type {string} */ (config.sidebarAppUrl);
+function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
+  const sidebarURL = config.sidebarAppUrl;
   const sidebarAppSrc = addConfigFragment(
     sidebarURL,
     createAppConfig(sidebarURL, config)
@@ -76,60 +82,79 @@ function createSidebarIframe(config) {
   return sidebarFrame;
 }
 
+type GestureState = {
+  /** Initial position at the start of a drag/pan resize event (in pixels). */
+  initial: number | null;
+  /** Final position at end of drag resize event. */
+  final: number | null;
+};
+
 /**
  * The `Sidebar` class creates (1) the sidebar application iframe, (2) its container,
  * as well as (3) the adjacent controls.
- *
- * @implements {Destroyable}
  */
-export class Sidebar {
+export class Sidebar implements Destroyable {
+  private _emitter: Emitter;
+  private _config: SidebarContainerConfig & SidebarConfig;
+  private _listeners: ListenerCollection;
+  private _gestureState: GestureState;
+  private _layoutState: SidebarLayout;
+  private _hammerManager: HammerManager | undefined;
+  private _hypothesisSidebar: HTMLElement | undefined;
+  private _toolbarWidth: number;
+  private _renderFrame: number | undefined;
+
   /**
-   * @param {HTMLElement} element
-   * @param {import('./util/emitter').EventBus} eventBus -
-   *   Enables communication between components sharing the same eventBus
-   * @param {SidebarContainerConfig & SidebarConfig} config
+   * Tracks which `Guest` has a text selection. `null` indicates to default to
+   * the first connected guest frame.
    */
-  constructor(element, eventBus, config) {
+  private _guestWithSelection: PortRPC<
+    GuestToHostEvent,
+    HostToGuestEvent
+  > | null;
+
+  /** Channel for host-sidebar communication. */
+  private _sidebarRPC: PortRPC<SidebarToHostEvent, HostToSidebarEvent>;
+
+  /** Channels for host-guest communication. */
+  private _guestRPC: PortRPC<GuestToHostEvent, HostToGuestEvent>[];
+
+  bucketBar: BucketBar | null;
+  features: FeatureFlags;
+  externalFrame: Element | undefined;
+  iframeContainer: HTMLDivElement | undefined;
+  toolbar: ToolbarController;
+  onLoginRequest: Service['onLoginRequest'];
+  onLogoutRequest: Service['onLogoutRequest'];
+  onSignupRequest: Service['onSignupRequest'];
+  onProfileRequest: Service['onProfileRequest'];
+  onHelpRequest: Service['onHelpRequest'];
+  onLayoutChange: SidebarContainerConfig['onLayoutChange'];
+
+  /** The `<iframe>` element containing the sidebar application. */
+  iframe: HTMLIFrameElement;
+
+  /**
+   * @param eventBus - Enables communication between components sharing the same
+   *                   eventBus
+   */
+  constructor(
+    element: HTMLElement,
+    eventBus: EventBus,
+    config: SidebarContainerConfig & SidebarConfig
+  ) {
     this._emitter = eventBus.createEmitter();
-
-    /**
-     * Tracks which `Guest` has a text selection. `null` indicates to default
-     * to the first connected guest frame.
-     *
-     * @type {PortRPC<GuestToHostEvent, HostToGuestEvent>|null}
-     */
     this._guestWithSelection = null;
-
-    /**
-     * Channels for host-guest communication.
-     *
-     * @type {PortRPC<GuestToHostEvent, HostToGuestEvent>[]}
-     */
     this._guestRPC = [];
-
-    /**
-     * Channel for host-sidebar communication.
-     *
-     * @type {PortRPC<SidebarToHostEvent, HostToSidebarEvent>}
-     */
     this._sidebarRPC = new PortRPC();
-
-    /**
-     * The `<iframe>` element containing the sidebar application.
-     */
     this.iframe = createSidebarIframe(config);
-
     this._config = config;
-
-    /** @type {BucketBar|null} */
     this.bucketBar = null;
-
     this.features = new FeatureFlags();
 
     if (config.externalContainerSelector) {
       this.externalFrame =
-        /** @type {HTMLElement} */
-        (document.querySelector(config.externalContainerSelector)) ?? element;
+        document.querySelector(config.externalContainerSelector) ?? element;
       this.externalFrame.appendChild(this.iframe);
     } else {
       this.iframeContainer = document.createElement('div');
@@ -155,12 +180,13 @@ export class Sidebar {
 
       this.iframeContainer.appendChild(this.iframe);
 
-      // Wrap up the 'iframeContainer' element into a shadow DOM so it is not affected by host CSS styles
-      this.hypothesisSidebar = document.createElement('hypothesis-sidebar');
-      const shadowRoot = createShadowRoot(this.hypothesisSidebar);
+      // Wrap up the 'iframeContainer' element into a shadow DOM, so it is not
+      // affected by host CSS styles
+      this._hypothesisSidebar = document.createElement('hypothesis-sidebar');
+      const shadowRoot = createShadowRoot(this._hypothesisSidebar);
       shadowRoot.appendChild(this.iframeContainer);
 
-      element.appendChild(this.hypothesisSidebar);
+      element.appendChild(this._hypothesisSidebar);
     }
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.
@@ -194,21 +220,18 @@ export class Sidebar {
     if (this.iframeContainer) {
       // If using our own container frame for the sidebar, add the toolbar to it.
       this.iframeContainer.prepend(toolbarContainer);
-      this.toolbarWidth = this.toolbar.getWidth();
+      this._toolbarWidth = this.toolbar.getWidth();
     } else {
       // If using a host-page provided container for the sidebar, the toolbar is
       // not shown.
-      this.toolbarWidth = 0;
+      this._toolbarWidth = 0;
     }
 
     this._listeners.add(window, 'resize', () => this._onResize());
 
     this._gestureState = {
-      // Initial position at the start of a drag/pan resize event (in pixels).
-      initial: /** @type {number|null} */ (null),
-
-      // Final position at end of drag resize event.
-      final: /** @type {number|null} */ (null),
+      initial: null,
+      final: null,
     };
     this._setupGestures();
     this.close();
@@ -225,10 +248,10 @@ export class Sidebar {
 
     this.onLayoutChange = config.onLayoutChange;
 
-    /** @type {SidebarLayout} */
     this._layoutState = {
       expanded: false,
       width: 0,
+      height: 0,
       toolbarWidth: 0,
     };
 
@@ -243,8 +266,8 @@ export class Sidebar {
     this.bucketBar?.destroy();
     this._listeners.removeAll();
     this._hammerManager?.destroy();
-    if (this.hypothesisSidebar) {
-      this.hypothesisSidebar.remove();
+    if (this._hypothesisSidebar) {
+      this._hypothesisSidebar.remove();
     } else {
       this.iframe.remove();
     }
@@ -256,11 +279,8 @@ export class Sidebar {
 
   /**
    * Setup communication with a frame that has connected to the host.
-   *
-   * @param {'guest'|'sidebar'} source
-   * @param {MessagePort} port
    */
-  onFrameConnected(source, port) {
+  onFrameConnected(source: 'guest' | 'sidebar', port: MessagePort) {
     switch (source) {
       case 'guest':
         this._connectGuest(port);
@@ -271,12 +291,8 @@ export class Sidebar {
     }
   }
 
-  /**
-   * @param {MessagePort} port
-   */
-  _connectGuest(port) {
-    /** @type {PortRPC<GuestToHostEvent, HostToGuestEvent>} */
-    const guestRPC = new PortRPC();
+  _connectGuest(port: MessagePort) {
+    const guestRPC = new PortRPC<GuestToHostEvent, HostToGuestEvent>();
 
     guestRPC.on('textSelected', () => {
       this._guestWithSelection = guestRPC;
@@ -294,28 +310,20 @@ export class Sidebar {
         .forEach(rpc => rpc.call('clearSelection'));
     });
 
-    guestRPC.on(
-      'highlightsVisibleChanged',
-      /** @param {boolean} visible */
-      visible => {
-        this.setHighlightsVisible(visible);
-      }
-    );
+    guestRPC.on('highlightsVisibleChanged', (visible: boolean) => {
+      this.setHighlightsVisible(visible);
+    });
 
     // The listener will do nothing if the sidebar doesn't have a bucket bar
     // (clean theme)
     const bucketBar = this.bucketBar;
     // Currently, we ignore `anchorsChanged` for all the guests except the first connected guest.
     if (bucketBar) {
-      guestRPC.on(
-        'anchorsChanged',
-        /** @param {AnchorPosition[]} positions  */
-        positions => {
-          if (this._guestRPC.indexOf(guestRPC) === 0) {
-            bucketBar.update(positions);
-          }
+      guestRPC.on('anchorsChanged', (positions: AnchorPosition[]) => {
+        if (this._guestRPC.indexOf(guestRPC) === 0) {
+          bucketBar.update(positions);
         }
-      );
+      });
     }
 
     guestRPC.on('close', () => {
@@ -338,8 +346,7 @@ export class Sidebar {
 
     this._sidebarRPC.on(
       'featureFlagsUpdated',
-      /** @param {Record<string, boolean>} flags */ flags =>
-        this.features.update(flags)
+      (flags: Record<string, boolean>) => this.features.update(flags)
     );
 
     this._sidebarRPC.on('connect', () => {
@@ -372,14 +379,10 @@ export class Sidebar {
     // Sidebar listens to the `openNotebook` and `openProfile` events coming
     // from the sidebar's iframe and re-publishes it via the emitter to the
     // Notebook/Profile
-    this._sidebarRPC.on(
-      'openNotebook',
-      /** @param {string} groupId */
-      groupId => {
-        this.hide();
-        this._emitter.publish('openNotebook', groupId);
-      }
-    );
+    this._sidebarRPC.on('openNotebook', (groupId: string) => {
+      this.hide();
+      this._emitter.publish('openNotebook', groupId);
+    });
     this._sidebarRPC.on('openProfile', () => {
       this.hide();
       this._emitter.publish('openProfile');
@@ -392,8 +395,10 @@ export class Sidebar {
       this.show();
     });
 
-    /** @type {Array<[SidebarToHostEvent, Function|undefined]>} */
-    const eventHandlers = [
+    // Suppressing ban-types here because the functions are originally defined
+    // as `Function` somewhere else. To be fixed when that is migrated to TS
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    const eventHandlers: Array<[SidebarToHostEvent, Function | undefined]> = [
       ['loginRequested', this.onLoginRequest],
       ['logoutRequested', this.onLogoutRequest],
       ['signupRequested', this.onSignupRequest],
@@ -429,19 +434,19 @@ export class Sidebar {
   // Schedule any changes needed to update the sidebar layout.
   _updateLayout() {
     // Only schedule one frame at a time.
-    if (this.renderFrame) {
+    if (this._renderFrame) {
       return;
     }
 
     // Schedule a frame.
-    this.renderFrame = requestAnimationFrame(() => {
-      this.renderFrame = null;
+    this._renderFrame = requestAnimationFrame(() => {
+      this._renderFrame = undefined;
 
       if (
         this._gestureState.final !== this._gestureState.initial &&
         this.iframeContainer
       ) {
-        const margin = /** @type {number} */ (this._gestureState.final);
+        const margin: number = this._gestureState.final!;
         const width = -margin;
         this.iframeContainer.style.marginLeft = `${margin}px`;
         if (width >= MIN_RESIZE) {
@@ -459,11 +464,11 @@ export class Sidebar {
    *
    * This is called when the sidebar is opened, closed or resized.
    *
-   * @param {boolean} [expanded] -
+   * @param expanded -
    *   `true` or `false` if the sidebar is being directly opened or closed, as
    *   opposed to being resized via the sidebar's drag handles
    */
-  _updateLayoutState(expanded) {
+  _updateLayoutState(expanded?: boolean) {
     // The sidebar structure is:
     //
     // [ Toolbar    ][                                   ]
@@ -474,10 +479,8 @@ export class Sidebar {
     // its container.
 
     const toolbarWidth = (this.iframeContainer && this.toolbar.getWidth()) || 0;
-    const frame = /** @type {HTMLElement} */ (
-      this.iframeContainer ?? this.externalFrame
-    );
-    const rect = frame.getBoundingClientRect();
+    const frame: Element = this.iframeContainer ?? this.externalFrame!;
+    const { height } = frame.getBoundingClientRect();
     const computedStyle = window.getComputedStyle(frame);
     const width = parseInt(computedStyle.width);
     const leftMargin = parseInt(computedStyle.marginLeft);
@@ -502,17 +505,15 @@ export class Sidebar {
       expanded = frameVisibleWidth > toolbarWidth;
     }
 
-    const layoutState = /** @type {SidebarLayout} */ ({
+    const layoutState: SidebarLayout = {
       expanded,
       width: expanded ? frameVisibleWidth : toolbarWidth,
-      height: rect.height,
+      height,
       toolbarWidth,
-    });
+    };
 
     this._layoutState = layoutState;
-    if (this.onLayoutChange) {
-      this.onLayoutChange(layoutState);
-    }
+    this.onLayoutChange?.(layoutState);
 
     this._guestRPC.forEach(rpc =>
       rpc.call('sidebarLayoutChanged', layoutState)
@@ -532,8 +533,7 @@ export class Sidebar {
     }
   }
 
-  /** @param {HammerInput} event */
-  _onPan(event) {
+  _onPan(event: HammerInput) {
     const frame = this.iframeContainer;
     if (!frame) {
       return;
@@ -621,10 +621,8 @@ export class Sidebar {
 
   /**
    * Set whether highlights are visible in guest frames.
-   *
-   * @param {boolean} visible
    */
-  setHighlightsVisible(visible) {
+  setHighlightsVisible(visible: boolean) {
     this.toolbar.highlightsVisible = visible;
 
     // Notify sidebar app of change which will in turn reflect state to guest frames.
@@ -635,17 +633,13 @@ export class Sidebar {
    * Shows the sidebar's controls
    */
   show() {
-    if (this.iframeContainer) {
-      this.iframeContainer.classList.remove('is-hidden');
-    }
+    this.iframeContainer?.classList.remove('is-hidden');
   }
 
   /**
    * Hides the sidebar's controls
    */
   hide() {
-    if (this.iframeContainer) {
-      this.iframeContainer.classList.add('is-hidden');
-    }
+    this.iframeContainer?.classList.add('is-hidden');
   }
 }
