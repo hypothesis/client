@@ -55,6 +55,7 @@ describe('FrameSyncService', () => {
   let FakePortRPC;
 
   let fakeAnnotationsService;
+  let fakeToastMessenger;
   let fakePortRPCs;
   let fakePortFinder;
 
@@ -70,6 +71,7 @@ describe('FrameSyncService', () => {
 
   beforeEach(() => {
     fakeAnnotationsService = { create: sinon.stub() };
+    fakeToastMessenger = new EventEmitter();
     fakePortRPCs = [];
     setupPortRPC = null;
 
@@ -173,6 +175,7 @@ describe('FrameSyncService', () => {
       .register('$window', { value: fakeWindow })
       .register('annotationsService', { value: fakeAnnotationsService })
       .register('store', { value: fakeStore })
+      .register('toastMessenger', { value: fakeToastMessenger })
       .register('frameSync', FrameSyncService)
       .get('frameSync');
   });

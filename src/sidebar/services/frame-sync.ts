@@ -22,8 +22,10 @@ import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { annotationMatchesSegment } from '../helpers/annotation-segment';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
+import type { ToastMessage } from '../store/modules/toast-messages';
 import { watch } from '../util/watch';
 import type { AnnotationsService } from './annotations';
+import type { ToastMessengerService } from './toast-messenger';
 
 /**
  * Return a minimal representation of an annotation that can be sent from the
@@ -125,6 +127,7 @@ export class FrameSyncService {
   private _listeners: ListenerCollection;
   private _portFinder: PortFinder;
   private _store: SidebarStore;
+  private _toastMessenger: ToastMessengerService;
 
   /**
    * Tag of an annotation that should be scrolled to after anchoring completes.
@@ -156,17 +159,22 @@ export class FrameSyncService {
    */
   private _scheduleAnchorStatusUpdate: DebouncedFunction<[]>;
 
+  /** Tells if the sidebar is currently open or closed */
+  private _sidebarIsOpen: boolean;
+
   // Test seam
   private _window: Window;
 
   constructor(
     $window: Window,
     annotationsService: AnnotationsService,
-    store: SidebarStore
+    store: SidebarStore,
+    toastMessenger: ToastMessengerService
   ) {
     this._window = $window;
     this._annotationsService = annotationsService;
     this._store = store;
+    this._toastMessenger = toastMessenger;
     this._portFinder = new PortFinder({
       hostFrame: this._window.parent,
       source: 'sidebar',
@@ -190,16 +198,19 @@ export class FrameSyncService {
       this._pendingAnchorStatusUpdates.clear();
     }, 10);
 
+    this._sidebarIsOpen = true;
+
     this._setupSyncToGuests();
     this._setupHostEvents();
     this._setupFeatureFlagSync();
+    this._setupToastMessengerEvents();
   }
 
   /**
    * Watch for changes to the set of annotations loaded in the sidebar and
    * notify connected guests about new/updated/deleted annotations.
    */
-  _setupSyncToGuests() {
+  private _setupSyncToGuests() {
     let prevPublicAnns = 0;
 
     /**
@@ -321,7 +332,10 @@ export class FrameSyncService {
   /**
    * Schedule an update of the anchoring status of annotation(s) in the store.
    */
-  _updateAnchorStatus(tag: string | string[], state: 'orphan' | 'anchored') {
+  private _updateAnchorStatus(
+    tag: string | string[],
+    state: 'orphan' | 'anchored'
+  ) {
     const tags = Array.isArray(tag) ? tag : [tag];
     for (const tag of tags) {
       this._pendingAnchorStatusUpdates.set(tag, state);
@@ -335,7 +349,7 @@ export class FrameSyncService {
    * @param port - Port for communicating with the guest
    * @param sourceId - Identifier for the guest frame
    */
-  _connectGuest(port: MessagePort, sourceId: string | null) {
+  private _connectGuest(port: MessagePort, sourceId: string | null) {
     const guestRPC = new PortRPC<GuestToSidebarEvent, SidebarToGuestEvent>();
 
     this._guestRPC.set(sourceId, guestRPC);
@@ -479,9 +493,13 @@ export class FrameSyncService {
   /**
    * Listen for messages coming from the host frame.
    */
-  _setupHostEvents() {
+  private _setupHostEvents() {
     this._hostRPC.on('sidebarOpened', () => {
+      this._sidebarIsOpen = true;
       this._store.setSidebarOpened(true);
+    });
+    this._hostRPC.on('sidebarClosed', () => {
+      this._sidebarIsOpen = false;
     });
 
     // When user toggles the highlight visibility control in the sidebar container,
@@ -495,7 +513,7 @@ export class FrameSyncService {
   /**
    * Set up synchronization of feature flags to host and guest frames.
    */
-  _setupFeatureFlagSync() {
+  private _setupFeatureFlagSync() {
     const getFlags = () => this._store.profile().features;
 
     const sendFlags = (flags: Record<string, boolean>) => {
@@ -511,6 +529,15 @@ export class FrameSyncService {
 
     // Watch for future flag changes.
     watch(this._store.subscribe, getFlags, sendFlags);
+  }
+
+  private _setupToastMessengerEvents() {
+    this._toastMessenger.on('toastMessagePushed', (message: ToastMessage) => {
+      // Forward hidden messages to "host" when sidebar is collapsed
+      if (message.visuallyHidden && !this._sidebarIsOpen) {
+        this.notifyHost('toastMessagePushed', message);
+      }
+    });
   }
 
   /**
