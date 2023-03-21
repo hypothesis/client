@@ -602,6 +602,7 @@ export class Sidebar implements Destroyable {
     }
 
     this._updateLayoutState(true);
+    this._sidebarRPC.call('sidebarOpened');
   }
 
   close() {
@@ -617,6 +618,7 @@ export class Sidebar implements Destroyable {
     }
 
     this._updateLayoutState(false);
+    this._sidebarRPC.call('sidebarClosed');
   }
 
   /**

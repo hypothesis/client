@@ -111,7 +111,12 @@ export type HostToSidebarEvent =
   /**
    * The host informs the sidebar that the sidebar has been opened.
    */
-  | 'sidebarOpened';
+  | 'sidebarOpened'
+
+  /**
+   * The host informs the sidebar that the sidebar has been closed.
+   */
+  | 'sidebarClosed';
 
 /**
  * Events that the sidebar sends to the guest(s)
@@ -225,4 +230,9 @@ export type SidebarToHostEvent =
    * The sidebar is asking the host to do a partner site sign-up.
    * https://h.readthedocs.io/projects/client/en/latest/publishers/config/#cmdoption-arg-onsignuprequest
    */
-  | 'signupRequested';
+  | 'signupRequested'
+
+  /**
+   * The sidebar is asking the host to toast a message
+   */
+  | 'toastMessagePushed';

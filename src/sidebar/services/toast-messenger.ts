@@ -1,3 +1,5 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import { generateHexString } from '../../shared/random';
 import type { SidebarStore } from '../store';
 
@@ -44,7 +46,7 @@ type MessageData = {
  * messages may be manually dismissed with the `#dismiss()` method.
  */
 // @inject
-export class ToastMessengerService {
+export class ToastMessengerService extends TinyEmitter {
   private _store: SidebarStore;
   private _window: Window;
 
@@ -55,6 +57,8 @@ export class ToastMessengerService {
   private _delayedMessageQueue: MessageData[];
 
   constructor(store: SidebarStore, $window: Window) {
+    super();
+
     this._store = store;
     this._window = $window;
     this._delayedMessageQueue = [];
@@ -127,6 +131,7 @@ export class ToastMessengerService {
       isDismissed: false,
       ...message,
     });
+    this.emit('toastMessagePushed', message);
 
     if (autoDismiss) {
       // Attempt to dismiss message after a set time period. NB: The message may
