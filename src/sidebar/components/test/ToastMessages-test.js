@@ -7,15 +7,13 @@ describe('ToastMessages', () => {
   let fakeStore;
   let fakeToastMessenger;
 
-  const fakeMessage = () => {
-    return {
-      type: 'notice',
-      message: 'you should know...',
-      id: 'someId',
-      isDismissed: false,
-      moreInfoURL: 'http://www.example.com',
-    };
-  };
+  const fakeMessage = () => ({
+    type: 'notice',
+    message: 'you should know...',
+    id: 'someId',
+    isDismissed: false,
+    moreInfoURL: 'http://www.example.com',
+  });
 
   function createComponent(props) {
     return mount(

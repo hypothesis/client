@@ -1,4 +1,5 @@
 import * as Hammer from 'hammerjs';
+import { render } from 'preact';
 
 import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
@@ -18,6 +19,7 @@ import type {
 } from '../types/port-rpc-events';
 import { annotationCounts } from './annotation-counts';
 import { BucketBar } from './bucket-bar';
+import ToastMessages from './components/ToastMessages';
 import { createAppConfig } from './config/app';
 import { FeatureFlags } from './features';
 import { sidebarTrigger } from './sidebar-trigger';
@@ -187,6 +189,12 @@ export class Sidebar implements Destroyable {
       shadowRoot.appendChild(this.iframeContainer);
 
       element.appendChild(this._hypothesisSidebar);
+
+      // Render a container for toast messages in the host frame. The sidebar
+      // will forward messages to render here while it is collapsed.
+      const messagesElement = document.createElement('div');
+      shadowRoot.appendChild(messagesElement);
+      render(<ToastMessages sidebarRPC={this._sidebarRPC} />, messagesElement);
     }
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.
