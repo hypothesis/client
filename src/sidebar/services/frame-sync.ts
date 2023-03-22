@@ -538,6 +538,9 @@ export class FrameSyncService {
         this.notifyHost('toastMessagePushed', message);
       }
     });
+    this._toastMessenger.on('toastMessageDismissed', (messageId: string) => {
+      this.notifyHost('toastMessageDismissed', messageId);
+    });
   }
 
   /**
