@@ -132,7 +132,7 @@ export class ToastMessengerService extends TinyEmitter {
       isDismissed: false,
       ...message,
     });
-    this.emit('toastMessagePushed', message);
+    this.emit('toastMessageAdded', message);
 
     if (autoDismiss) {
       // Attempt to dismiss message after a set time period. NB: The message may

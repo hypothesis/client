@@ -602,10 +602,11 @@ export class Sidebar implements Destroyable {
     }
 
     this._updateLayoutState(true);
-    this._sidebarRPC.call('sidebarOpened');
   }
 
   close() {
+    this._sidebarRPC.call('sidebarClosed');
+
     if (this.iframeContainer) {
       this.iframeContainer.style.marginLeft = '';
       this.iframeContainer.classList.add('sidebar-collapsed');
@@ -618,7 +619,6 @@ export class Sidebar implements Destroyable {
     }
 
     this._updateLayoutState(false);
-    this._sidebarRPC.call('sidebarClosed');
   }
 
   /**

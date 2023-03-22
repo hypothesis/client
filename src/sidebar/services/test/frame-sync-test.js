@@ -1127,31 +1127,31 @@ describe('FrameSyncService', () => {
     });
   });
 
-  context('when a toast message is pushed', () => {
+  context('when a toast message is added', () => {
     it('forwards the message to the host if it is hidden and the sidebar is collapsed', () => {
       const message = { visuallyHidden: true };
 
       emitHostEvent('sidebarClosed');
-      fakeToastMessenger.emit('toastMessagePushed', message);
+      fakeToastMessenger.emit('toastMessageAdded', message);
 
-      assert.calledWith(hostRPC().call, 'toastMessagePushed', message);
+      assert.calledWith(hostRPC().call, 'toastMessageAdded', message);
     });
 
     it('ignores the message if it is not hidden', () => {
       const message = { visuallyHidden: false };
 
-      emitHostEvent('sidebarClosed');
-      fakeToastMessenger.emit('toastMessagePushed', message);
+      fakeToastMessenger.emit('toastMessageAdded', message);
 
-      assert.neverCalledWith(hostRPC().call, 'toastMessagePushed', message);
+      assert.neverCalledWith(hostRPC().call, 'toastMessageAdded', message);
     });
 
     it('ignores the message if the sidebar is not collapsed', () => {
       const message = { visuallyHidden: true };
 
-      fakeToastMessenger.emit('toastMessagePushed', message);
+      emitHostEvent('sidebarOpened');
+      fakeToastMessenger.emit('toastMessageAdded', message);
 
-      assert.neverCalledWith(hostRPC().call, 'toastMessagePushed', message);
+      assert.neverCalledWith(hostRPC().call, 'toastMessageAdded', message);
     });
   });
 
