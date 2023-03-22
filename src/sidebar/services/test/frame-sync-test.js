@@ -1154,4 +1154,14 @@ describe('FrameSyncService', () => {
       assert.neverCalledWith(hostRPC().call, 'toastMessagePushed', message);
     });
   });
+
+  context('when a toast message is dismissed', () => {
+    it('forwards the message ID to the host', () => {
+      const messageId = 'someId';
+
+      fakeToastMessenger.emit('toastMessageDismissed', messageId);
+
+      assert.calledWith(hostRPC().call, 'toastMessageDismissed', messageId);
+    });
+  });
 });

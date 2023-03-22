@@ -235,4 +235,9 @@ export type SidebarToHostEvent =
   /**
    * The sidebar is asking the host to toast a message
    */
-  | 'toastMessagePushed';
+  | 'toastMessagePushed'
+
+  /**
+   * The sidebar is asking the host to dismiss a toast message
+   */
+  | 'toastMessageDismissed';

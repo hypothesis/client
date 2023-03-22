@@ -83,6 +83,7 @@ export class ToastMessengerService extends TinyEmitter {
     const message = this._store.getToastMessage(messageId);
     if (message && !message.isDismissed) {
       this._store.updateToastMessage({ ...message, isDismissed: true });
+      this.emit('toastMessageDismissed', messageId);
       setTimeout(() => {
         this._store.removeToastMessage(messageId);
       }, MESSAGE_DISMISS_DELAY);
