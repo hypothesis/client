@@ -159,7 +159,7 @@ export class FrameSyncService {
    */
   private _scheduleAnchorStatusUpdate: DebouncedFunction<[]>;
 
-  /** Tells if the sidebar is currently open or closed */
+  /** Indicates if the sidebar is currently open or closed */
   private _sidebarIsOpen: boolean;
 
   // Test seam
@@ -198,7 +198,7 @@ export class FrameSyncService {
       this._pendingAnchorStatusUpdates.clear();
     }, 10);
 
-    this._sidebarIsOpen = true;
+    this._sidebarIsOpen = false;
 
     this._setupSyncToGuests();
     this._setupHostEvents();
@@ -532,10 +532,12 @@ export class FrameSyncService {
   }
 
   private _setupToastMessengerEvents() {
-    this._toastMessenger.on('toastMessagePushed', (message: ToastMessage) => {
-      // Forward hidden messages to "host" when sidebar is collapsed
+    this._toastMessenger.on('toastMessageAdded', (message: ToastMessage) => {
+      // Forward hidden messages to "host" when sidebar is collapsed, with the
+      // intention that another container can be used to render those messages
+      // there, ensuring screen readers announce them.
       if (message.visuallyHidden && !this._sidebarIsOpen) {
-        this.notifyHost('toastMessagePushed', message);
+        this.notifyHost('toastMessageAdded', message);
       }
     });
     this._toastMessenger.on('toastMessageDismissed', (messageId: string) => {
