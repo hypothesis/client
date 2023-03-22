@@ -657,13 +657,13 @@ export class Sidebar implements Destroyable {
    * Shows the sidebar's controls
    */
   show() {
-    this.iframeContainer?.classList.remove('is-hidden');
+    this.iframeContainer?.classList.remove('hidden');
   }
 
   /**
    * Hides the sidebar's controls
    */
   hide() {
-    this.iframeContainer?.classList.add('is-hidden');
+    this.iframeContainer?.classList.add('hidden');
   }
 }

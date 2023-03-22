@@ -36,10 +36,6 @@
     // Wider screens: apply transition when opening/closing of the sidebar
     @apply annotator-lg:sidebar-transition-margin;
 
-    &.is-hidden {
-      @apply sidebar-transition-visibility;
-    }
-
     // We can't use `theme-clean:` or `sidebar-collapsed:` tailwind modifiers
     // here because this is the one place in the project where the relevant
     // classes are assigned to the same element, not a parent element.
