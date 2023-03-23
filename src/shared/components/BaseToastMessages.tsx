@@ -7,7 +7,14 @@ import {
 } from '@hypothesis/frontend-shared/lib/next';
 import classnames from 'classnames';
 
-import type { ToastMessage } from '../../sidebar/store/modules/toast-messages';
+export type ToastMessage = {
+  type: 'error' | 'success' | 'notice';
+  id: string;
+  message: string;
+  moreInfoURL: string;
+  isDismissed: boolean;
+  visuallyHidden: boolean;
+};
 
 type ToastMessageItemProps = {
   message: ToastMessage;
@@ -18,9 +25,6 @@ type ToastMessageItemProps = {
  * An individual toast message: a brief and transient success or error message.
  * The message may be dismissed by clicking on it. `visuallyHidden` toast
  * messages will not be visible but are still available to screen readers.
- *
- * Otherwise, the `toastMessenger` service handles removing messages after a
- * certain amount of time.
  */
 function ToastMessageItem({ message, onDismiss }: ToastMessageItemProps) {
   // Capitalize the message type for prepending; Don't prepend a message
@@ -98,7 +102,7 @@ function ToastMessageItem({ message, onDismiss }: ToastMessageItemProps) {
   );
 }
 
-export type ToastMessageProps = {
+export type BaseToastMessageProps = {
   messages: ToastMessage[];
   onMessageDismiss: (messageId: string) => void;
 };
@@ -110,7 +114,7 @@ export type ToastMessageProps = {
 export default function BaseToastMessages({
   messages,
   onMessageDismiss,
-}: ToastMessageProps) {
+}: BaseToastMessageProps) {
   // The `ul` containing any toast messages is absolute-positioned and the full
   // width of the viewport. Each toast message `li` has its position and width
   // constrained by `container` configuration in tailwind.

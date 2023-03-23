@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'preact/hooks';
 
 import BaseToastMessages from '../../shared/components/BaseToastMessages';
+import type { ToastMessage } from '../../shared/components/BaseToastMessages';
 import type { PortRPC } from '../../shared/messaging';
-import type { ToastMessage } from '../../sidebar/store/modules/toast-messages';
 import type {
   HostToSidebarEvent,
   SidebarToHostEvent,
