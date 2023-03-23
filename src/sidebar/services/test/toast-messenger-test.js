@@ -84,6 +84,20 @@ describe('ToastMessengerService', () => {
       assert.calledOnce(fakeStore.getToastMessage);
       assert.notCalled(fakeStore.updateToastMessage);
     });
+
+    it('emits "toastMessageAdded" event', () => {
+      fakeStore.hasToastMessage.returns(false);
+
+      const fakeHandler = sinon.stub();
+      service.on('toastMessageAdded', fakeHandler);
+
+      service.success('hooray', {});
+
+      assert.calledWith(
+        fakeHandler,
+        sinon.match({ message: 'hooray', type: 'success' })
+      );
+    });
   });
 
   describe('#notice', () => {
@@ -202,6 +216,21 @@ describe('ToastMessengerService', () => {
 
       assert.calledOnce(fakeStore.removeToastMessage);
       assert.calledWith(fakeStore.removeToastMessage, 'someid');
+    });
+
+    it('emits "toastMessageDismissed" event', () => {
+      fakeStore.getToastMessage.returns({
+        id: 'someid',
+        type: 'success',
+        message: 'yay',
+        isDismissed: false,
+      });
+
+      const fakeHandler = sinon.stub();
+      service.on('toastMessageDismissed', fakeHandler);
+
+      service.dismiss('someid');
+      assert.calledWith(fakeHandler, 'someid');
     });
   });
 
