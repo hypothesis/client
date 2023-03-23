@@ -2,6 +2,7 @@ import debounce from 'lodash.debounce';
 import type { DebouncedFunction } from 'lodash.debounce';
 import shallowEqual from 'shallowequal';
 
+import type { ToastMessage } from '../../shared/components/BaseToastMessages';
 import { ListenerCollection } from '../../shared/listener-collection';
 import {
   PortFinder,
@@ -22,7 +23,6 @@ import { isReply, isPublic } from '../helpers/annotation-metadata';
 import { annotationMatchesSegment } from '../helpers/annotation-segment';
 import type { SidebarStore } from '../store';
 import type { Frame } from '../store/modules/frames';
-import type { ToastMessage } from '../store/modules/toast-messages';
 import { watch } from '../util/watch';
 import type { AnnotationsService } from './annotations';
 import type { ToastMessengerService } from './toast-messenger';

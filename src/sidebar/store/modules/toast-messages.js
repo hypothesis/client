@@ -1,13 +1,7 @@
 import { createStoreModule, makeAction } from '../create-store';
 
 /**
- * @typedef ToastMessage
- * @prop {('error'|'success'|'notice')} type
- * @prop {string} id
- * @prop {string} message
- * @prop {string} moreInfoURL
- * @prop {boolean} isDismissed
- * @prop {boolean} visuallyHidden
+ * @typedef {import('../../../shared/components/BaseToastMessages').ToastMessage} ToastMessage
  */
 
 /**

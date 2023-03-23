@@ -9,7 +9,7 @@ export type ToastMessageProps = {
 };
 
 /**
- * A component designed to render toast messages handled by the sidebar store.
+ * Component that renders the active toast messages from the sidebar store
  */
 function ToastMessages({ toastMessenger }: ToastMessageProps) {
   const store = useSidebarStore();
