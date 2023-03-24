@@ -8,18 +8,18 @@ import type {
   SidebarToHostEvent,
 } from '../../types/port-rpc-events';
 
-export type HostToastMessagesProps = {
+export type ToastMessagesProps = {
   sidebarRPC: PortRPC<SidebarToHostEvent, HostToSidebarEvent>;
 };
 
 /**
- * A component designed to render toast messages coming from the sidebar, in a
- * way that they "appear" in the viewport even when the sidebar is collapsed.
+ * A component that renders toast messages coming from the sidebar, in a way
+ * that they "appear" in the viewport even when the sidebar is collapsed.
  * This is useful to make sure screen readers announce hidden messages.
  */
-export default function ToastMessages({ sidebarRPC }: HostToastMessagesProps) {
+export default function ToastMessages({ sidebarRPC }: ToastMessagesProps) {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
-  const pushMessage = useCallback(
+  const addMessage = useCallback(
     (newMessage: ToastMessage) => setMessages(prev => [...prev, newMessage]),
     []
   );
@@ -30,9 +30,9 @@ export default function ToastMessages({ sidebarRPC }: HostToastMessagesProps) {
   );
 
   useEffect(() => {
-    sidebarRPC.on('toastMessageAdded', pushMessage);
+    sidebarRPC.on('toastMessageAdded', addMessage);
     sidebarRPC.on('toastMessageDismissed', dismissMessage);
-  }, [sidebarRPC, dismissMessage, pushMessage]);
+  }, [sidebarRPC, dismissMessage, addMessage]);
 
   return (
     <BaseToastMessages messages={messages} onMessageDismiss={dismissMessage} />

@@ -103,6 +103,7 @@ export class Sidebar implements Destroyable {
   private _layoutState: SidebarLayout;
   private _hammerManager: HammerManager | undefined;
   private _hypothesisSidebar: HTMLElement | undefined;
+  private _messagesElement: HTMLElement | undefined;
   private _toolbarWidth: number;
   private _renderFrame: number | undefined;
 
@@ -192,9 +193,12 @@ export class Sidebar implements Destroyable {
 
       // Render a container for toast messages in the host frame. The sidebar
       // will forward messages to render here while it is collapsed.
-      const messagesElement = document.createElement('div');
-      shadowRoot.appendChild(messagesElement);
-      render(<ToastMessages sidebarRPC={this._sidebarRPC} />, messagesElement);
+      this._messagesElement = document.createElement('div');
+      shadowRoot.appendChild(this._messagesElement);
+      render(
+        <ToastMessages sidebarRPC={this._sidebarRPC} />,
+        this._messagesElement
+      );
     }
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.
@@ -275,6 +279,8 @@ export class Sidebar implements Destroyable {
     this._listeners.removeAll();
     this._hammerManager?.destroy();
     if (this._hypothesisSidebar) {
+      // Explicitly unmounting the "messages" element, to make sure effects are clean-up
+      render(null, this._messagesElement!);
       this._hypothesisSidebar.remove();
     } else {
       this.iframe.remove();
