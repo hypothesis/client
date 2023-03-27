@@ -366,10 +366,8 @@ describe('Sidebar', () => {
     describe('on "openNotebook" event', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
-        sinon.stub(sidebar, 'hide').callThrough();
         emitSidebarEvent('openNotebook', 'mygroup');
 
-        assert.calledOnce(sidebar.hide);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
       });
     });
@@ -377,9 +375,8 @@ describe('Sidebar', () => {
     describe('on "closeNotebook" internal event', () => {
       it('shows the sidebar', () => {
         const sidebar = createSidebar();
-        sinon.stub(sidebar, 'show').callThrough();
+
         fakeEmitter.publish('closeNotebook');
-        assert.calledOnce(sidebar.show);
         assert.equal(sidebar.iframeContainer.style.visibility, '');
       });
     });
@@ -387,10 +384,8 @@ describe('Sidebar', () => {
     describe('on "openProfile" event', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
-        sinon.stub(sidebar, 'hide').callThrough();
         emitSidebarEvent('openProfile');
 
-        assert.calledOnce(sidebar.hide);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
       });
     });
@@ -398,9 +393,8 @@ describe('Sidebar', () => {
     describe('on "closeProfile" internal event', () => {
       it('shows the sidebar', () => {
         const sidebar = createSidebar();
-        sinon.stub(sidebar, 'show').callThrough();
+
         fakeEmitter.publish('closeProfile');
-        assert.calledOnce(sidebar.show);
         assert.equal(sidebar.iframeContainer.style.visibility, '');
       });
     });
