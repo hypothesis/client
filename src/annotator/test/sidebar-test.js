@@ -1,6 +1,8 @@
+import { TinyEmitter } from 'tiny-emitter';
+
 import { addConfigFragment } from '../../shared/config-fragment';
 import { Sidebar, MIN_RESIZE, $imports } from '../sidebar';
-import { EventBus } from '../util/emitter';
+import { Emitter, EventBus } from '../util/emitter';
 
 const DEFAULT_WIDTH = 350;
 const DEFAULT_HEIGHT = 600;
@@ -25,6 +27,7 @@ describe('Sidebar', () => {
   let FakeToolbarController;
   let fakeToolbar;
   let fakeSendErrorsTo;
+  let fakeEmitter;
 
   before(() => {
     sinon.stub(window, 'requestAnimationFrame').yields();
@@ -97,7 +100,7 @@ describe('Sidebar', () => {
     document.body.appendChild(container);
     containers.push(container);
 
-    const eventBus = new EventBus();
+    const eventBus = { createEmitter: () => fakeEmitter };
     const sidebar = new Sidebar(container, eventBus, config);
     sidebars.push(sidebar);
 
@@ -149,6 +152,8 @@ describe('Sidebar', () => {
     FakeToolbarController = sinon.stub().returns(fakeToolbar);
 
     fakeSendErrorsTo = sinon.stub();
+
+    fakeEmitter = new Emitter(new TinyEmitter());
 
     const fakeCreateAppConfig = sinon.spy((appURL, config) => {
       const appConfig = { ...config };
