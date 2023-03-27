@@ -2,7 +2,7 @@ import { TinyEmitter } from 'tiny-emitter';
 
 import { addConfigFragment } from '../../shared/config-fragment';
 import { Sidebar, MIN_RESIZE, $imports } from '../sidebar';
-import { Emitter, EventBus } from '../util/emitter';
+import { Emitter } from '../util/emitter';
 
 const DEFAULT_WIDTH = 350;
 const DEFAULT_HEIGHT = 600;
@@ -367,9 +367,8 @@ describe('Sidebar', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'hide').callThrough();
-        sinon.stub(sidebar._emitter, 'publish');
         emitSidebarEvent('openNotebook', 'mygroup');
-        assert.calledWith(sidebar._emitter.publish, 'openNotebook', 'mygroup');
+
         assert.calledOnce(sidebar.hide);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
       });
@@ -379,7 +378,7 @@ describe('Sidebar', () => {
       it('shows the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'show').callThrough();
-        sidebar._emitter.publish('closeNotebook');
+        fakeEmitter.publish('closeNotebook');
         assert.calledOnce(sidebar.show);
         assert.equal(sidebar.iframeContainer.style.visibility, '');
       });
@@ -389,9 +388,8 @@ describe('Sidebar', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'hide').callThrough();
-        sinon.stub(sidebar._emitter, 'publish');
         emitSidebarEvent('openProfile');
-        assert.calledWith(sidebar._emitter.publish, 'openProfile');
+
         assert.calledOnce(sidebar.hide);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
       });
@@ -401,7 +399,7 @@ describe('Sidebar', () => {
       it('shows the sidebar', () => {
         const sidebar = createSidebar();
         sinon.stub(sidebar, 'show').callThrough();
-        sidebar._emitter.publish('closeProfile');
+        fakeEmitter.publish('closeProfile');
         assert.calledOnce(sidebar.show);
         assert.equal(sidebar.iframeContainer.style.visibility, '');
       });
@@ -409,23 +407,25 @@ describe('Sidebar', () => {
 
     describe('on "toastMessageAdded" event', () => {
       it('re-publishes event via emitter', () => {
-        const sidebar = createSidebar();
-        sinon.stub(sidebar._emitter, 'publish');
+        createSidebar();
+
+        const eventHandler = sinon.stub();
+        fakeEmitter.subscribe('toastMessageAdded', eventHandler);
         emitSidebarEvent('toastMessageAdded', {});
-        assert.calledWith(sidebar._emitter.publish, 'toastMessageAdded', {});
+
+        assert.calledWith(eventHandler, {});
       });
     });
 
     describe('on "toastMessageDismissed" event', () => {
       it('re-publishes event via emitter', () => {
-        const sidebar = createSidebar();
-        sinon.stub(sidebar._emitter, 'publish');
+        createSidebar();
+
+        const eventHandler = sinon.stub();
+        fakeEmitter.subscribe('toastMessageDismissed', eventHandler);
         emitSidebarEvent('toastMessageDismissed', 'someId');
-        assert.calledWith(
-          sidebar._emitter.publish,
-          'toastMessageDismissed',
-          'someId'
-        );
+
+        assert.calledWith(eventHandler, 'someId');
       });
     });
 
