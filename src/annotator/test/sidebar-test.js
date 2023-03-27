@@ -402,6 +402,28 @@ describe('Sidebar', () => {
       });
     });
 
+    describe('on "toastMessageAdded" event', () => {
+      it('re-publishes event via emitter', () => {
+        const sidebar = createSidebar();
+        sinon.stub(sidebar._emitter, 'publish');
+        emitSidebarEvent('toastMessageAdded', {});
+        assert.calledWith(sidebar._emitter.publish, 'toastMessageAdded', {});
+      });
+    });
+
+    describe('on "toastMessageDismissed" event', () => {
+      it('re-publishes event via emitter', () => {
+        const sidebar = createSidebar();
+        sinon.stub(sidebar._emitter, 'publish');
+        emitSidebarEvent('toastMessageDismissed', 'someId');
+        assert.calledWith(
+          sidebar._emitter.publish,
+          'toastMessageDismissed',
+          'someId'
+        );
+      });
+    });
+
     describe('on "loginRequested" event', () => {
       it('calls the onLoginRequest callback function if one was provided', () => {
         const onLoginRequest = sandbox.stub();
