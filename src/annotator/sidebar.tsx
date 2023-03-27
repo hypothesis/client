@@ -1,6 +1,7 @@
 import * as Hammer from 'hammerjs';
 import { render } from 'preact';
 
+import type { ToastMessage } from '../shared/components/BaseToastMessages';
 import { addConfigFragment } from '../shared/config-fragment';
 import { sendErrorsTo } from '../shared/frame-error-capture';
 import { ListenerCollection } from '../shared/listener-collection';
@@ -195,10 +196,7 @@ export class Sidebar implements Destroyable {
       // will forward messages to render here while it is collapsed.
       this._messagesElement = document.createElement('div');
       shadowRoot.appendChild(this._messagesElement);
-      render(
-        <ToastMessages sidebarRPC={this._sidebarRPC} />,
-        this._messagesElement
-      );
+      render(<ToastMessages emitter={this._emitter} />, this._messagesElement);
     }
 
     // Register the sidebar as a handler for Hypothesis errors in this frame.
@@ -391,7 +389,7 @@ export class Sidebar implements Destroyable {
     this._sidebarRPC.on('closeSidebar', () => this.close());
 
     // Sidebar listens to the `openNotebook` and `openProfile` events coming
-    // from the sidebar's iframe and re-publishes it via the emitter to the
+    // from the sidebar's iframe and re-publishes them via the emitter to the
     // Notebook/Profile
     this._sidebarRPC.on('openNotebook', (groupId: string) => {
       this.hide();
@@ -407,6 +405,16 @@ export class Sidebar implements Destroyable {
 
     this._emitter.subscribe('closeNotebook', () => {
       this.show();
+    });
+
+    // Sidebar listens to the `toastMessageAdded` and `toastMessageDismissed`
+    // events coming from the sidebar's iframe and re-publishes them via the
+    // emitter
+    this._sidebarRPC.on('toastMessageAdded', (newMessage: ToastMessage) => {
+      this._emitter.publish('toastMessageAdded', newMessage);
+    });
+    this._sidebarRPC.on('toastMessageDismissed', (messageId: string) => {
+      this._emitter.publish('toastMessageDismissed', messageId);
     });
 
     // Suppressing ban-types here because the functions are originally defined

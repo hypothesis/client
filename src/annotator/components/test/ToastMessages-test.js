@@ -1,11 +1,11 @@
 import { mount } from 'enzyme';
 import EventEmitter from 'tiny-emitter';
 
+import { Emitter } from '../../util/emitter';
 import ToastMessages from '../ToastMessages';
 
 describe('ToastMessages', () => {
   let emitter;
-  let fakeSidebarRPC;
 
   const fakeMessage = (id = 'someId') => ({
     id,
@@ -15,23 +15,21 @@ describe('ToastMessages', () => {
     moreInfoURL: 'http://www.example.com',
   });
 
-  const createComponent = () =>
-    mount(<ToastMessages sidebarRPC={fakeSidebarRPC} />);
+  const createComponent = () => mount(<ToastMessages emitter={emitter} />);
 
   beforeEach(() => {
-    emitter = new EventEmitter();
-    fakeSidebarRPC = { on: (...args) => emitter.on(...args) };
+    emitter = new Emitter(new EventEmitter());
   });
 
-  it('pushes new toast messages on toastMessageAdded', () => {
+  it('adds new toast messages on toastMessageAdded', () => {
     const wrapper = createComponent();
 
     // Initially messages is empty
     assert.lengthOf(wrapper.find('BaseToastMessages').prop('messages'), 0);
 
-    emitter.emit('toastMessageAdded', fakeMessage('someId1'));
-    emitter.emit('toastMessageAdded', fakeMessage('someId2'));
-    emitter.emit('toastMessageAdded', fakeMessage('someId3'));
+    emitter.publish('toastMessageAdded', fakeMessage('someId1'));
+    emitter.publish('toastMessageAdded', fakeMessage('someId2'));
+    emitter.publish('toastMessageAdded', fakeMessage('someId3'));
     wrapper.update();
 
     assert.lengthOf(wrapper.find('BaseToastMessages').prop('messages'), 3);
@@ -41,14 +39,14 @@ describe('ToastMessages', () => {
     const wrapper = createComponent();
 
     // We push some messages first
-    emitter.emit('toastMessageAdded', fakeMessage('someId1'));
-    emitter.emit('toastMessageAdded', fakeMessage('someId2'));
-    emitter.emit('toastMessageAdded', fakeMessage('someId3'));
+    emitter.publish('toastMessageAdded', fakeMessage('someId1'));
+    emitter.publish('toastMessageAdded', fakeMessage('someId2'));
+    emitter.publish('toastMessageAdded', fakeMessage('someId3'));
     wrapper.update();
 
-    emitter.emit('toastMessageDismissed', 'someId1');
+    emitter.publish('toastMessageDismissed', 'someId1');
     // We can also "dismiss" unknown messages. Those will be ignored
-    emitter.emit('toastMessageDismissed', 'someId4');
+    emitter.publish('toastMessageDismissed', 'someId4');
     wrapper.update();
 
     assert.lengthOf(wrapper.find('BaseToastMessages').prop('messages'), 2);
