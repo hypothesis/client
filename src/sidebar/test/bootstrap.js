@@ -1,7 +1,5 @@
-// Patch extra assert helper methods
 import { configure } from 'enzyme';
 import { Adapter } from 'enzyme-adapter-preact-pure';
-// Configure Enzyme for UI tests.
 import 'preact/debug';
 
 import { patch } from '../../test-util/assert-methods';
@@ -9,8 +7,10 @@ import { patch } from '../../test-util/assert-methods';
 // Expose the sinon assertions.
 sinon.assert.expose(assert, { prefix: null });
 
+// Add extra assert methods
 patch(assert);
 
+// Configure Enzyme for UI tests.
 configure({ adapter: new Adapter() });
 
 // Ensure that uncaught exceptions between tests result in the tests failing.
