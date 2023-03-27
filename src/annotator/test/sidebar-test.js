@@ -366,8 +366,12 @@ describe('Sidebar', () => {
     describe('on "openNotebook" event', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
+
+        const eventHandler = sinon.stub();
+        fakeEmitter.subscribe('openNotebook', eventHandler);
         emitSidebarEvent('openNotebook', 'mygroup');
 
+        assert.calledWith(eventHandler, 'mygroup');
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
       });
     });
@@ -384,8 +388,12 @@ describe('Sidebar', () => {
     describe('on "openProfile" event', () => {
       it('hides the sidebar', () => {
         const sidebar = createSidebar();
+
+        const eventHandler = sinon.stub();
+        fakeEmitter.subscribe('openProfile', eventHandler);
         emitSidebarEvent('openProfile');
 
+        assert.calledOnce(eventHandler);
         assert.notEqual(sidebar.iframeContainer.style.visibility, 'hidden');
       });
     });
