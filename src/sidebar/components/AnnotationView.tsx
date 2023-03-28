@@ -22,7 +22,7 @@ function AnnotationView({
   onLogin,
 }: AnnotationViewProps) {
   const store = useSidebarStore();
-  const annotationId = store.routeParams().id;
+  const annotationId = store.routeParams().id ?? '';
   const rootThread = useRootThread();
   const userid = store.profile().userid;
 

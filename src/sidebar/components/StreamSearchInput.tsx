@@ -14,7 +14,7 @@ export type StreamSearchInputProps = {
  */
 function StreamSearchInput({ router }: StreamSearchInputProps) {
   const store = useSidebarStore();
-  const query = store.routeParams().q;
+  const { q } = store.routeParams();
   const setQuery = (query: string) => {
     // Re-route the user to `/stream` if they are on `/a/:id` and then set
     // the search query.
@@ -22,7 +22,7 @@ function StreamSearchInput({ router }: StreamSearchInputProps) {
   };
 
   return (
-    <SearchInput query={query} onSearch={setQuery} alwaysExpanded={true} />
+    <SearchInput query={q ?? ''} onSearch={setQuery} alwaysExpanded={true} />
   );
 }
 
