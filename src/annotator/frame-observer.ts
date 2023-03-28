@@ -2,7 +2,7 @@ import debounce from 'lodash.debounce';
 
 export const DEBOUNCE_WAIT = 40;
 
-/** @typedef {(frame: HTMLIFrameElement) => void} FrameCallback */
+type FrameCallback = (frame: HTMLIFrameElement) => void;
 
 /**
  * FrameObserver detects iframes added and deleted from the document.
@@ -15,18 +15,28 @@ export const DEBOUNCE_WAIT = 40;
  * https://github.com/hypothesis/client/issues/530
  */
 export class FrameObserver {
+  private _element: Element;
+  private _onFrameAdded: FrameCallback;
+  private _onFrameRemoved: FrameCallback;
+  private _annotatableFrames: Set<HTMLIFrameElement>;
+  private _isDisconnected: boolean;
+  private _mutationObserver: MutationObserver;
+
   /**
-   * @param {Element} element - root of the DOM subtree to watch for the addition
-   *   and removal of annotatable iframes
-   * @param {FrameCallback} onFrameAdded - callback fired when an annotatable iframe is added
-   * @param {FrameCallback} onFrameRemoved - callback triggered when the annotatable iframe is removed
+   * @param element - root of the DOM subtree to watch for the addition and
+   *   removal of annotatable iframes
+   * @param onFrameAdded - callback fired when an annotatable iframe is added
+   * @param onFrameRemoved - callback triggered when the annotatable iframe is removed
    */
-  constructor(element, onFrameAdded, onFrameRemoved) {
+  constructor(
+    element: Element,
+    onFrameAdded: FrameCallback,
+    onFrameRemoved: FrameCallback
+  ) {
     this._element = element;
     this._onFrameAdded = onFrameAdded;
     this._onFrameRemoved = onFrameRemoved;
-    /** @type {Set<HTMLIFrameElement>} */
-    this._annotatableFrames = new Set();
+    this._annotatableFrames = new Set<HTMLIFrameElement>();
     this._isDisconnected = false;
 
     this._mutationObserver = new MutationObserver(
@@ -47,10 +57,7 @@ export class FrameObserver {
     this._mutationObserver.disconnect();
   }
 
-  /**
-   * @param {HTMLIFrameElement} frame
-   */
-  async _addFrame(frame) {
+  private async _addFrame(frame: HTMLIFrameElement) {
     this._annotatableFrames.add(frame);
     try {
       await onNextDocumentReady(frame);
@@ -58,9 +65,8 @@ export class FrameObserver {
         return;
       }
       const frameWindow = frame.contentWindow;
-      // @ts-expect-error
       // This line raises an exception if the iframe is from a different origin
-      frameWindow.addEventListener('unload', () => {
+      frameWindow!.addEventListener('unload', () => {
         this._removeFrame(frame);
       });
       this._onFrameAdded(frame);
@@ -71,28 +77,23 @@ export class FrameObserver {
     }
   }
 
-  /**
-   * @param {HTMLIFrameElement} frame
-   */
-  _removeFrame(frame) {
+  private _removeFrame(frame: HTMLIFrameElement) {
     this._annotatableFrames.delete(frame);
     this._onFrameRemoved(frame);
   }
 
-  _discoverFrames() {
-    const frames = new Set(
-      /** @type {NodeListOf<HTMLIFrameElement> } */ (
-        this._element.querySelectorAll('iframe[enable-annotation]')
-      )
+  private _discoverFrames() {
+    const frames = new Set<HTMLIFrameElement>(
+      this._element.querySelectorAll('iframe[enable-annotation]')
     );
 
-    for (let frame of frames) {
+    for (const frame of frames) {
       if (!this._annotatableFrames.has(frame)) {
         this._addFrame(frame);
       }
     }
 
-    for (let frame of this._annotatableFrames) {
+    for (const frame of this._annotatableFrames) {
       if (!frames.has(frame)) {
         this._removeFrame(frame);
       }
@@ -103,10 +104,8 @@ export class FrameObserver {
 /**
  * Test if this is the empty document that a new iframe has before the URL
  * specified by its `src` attribute loads.
- *
- * @param {HTMLIFrameElement} frame
  */
-function hasBlankDocumentThatWillNavigate(frame) {
+function hasBlankDocumentThatWillNavigate(frame: HTMLIFrameElement): boolean {
   return (
     frame.contentDocument?.location.href === 'about:blank' &&
     // Do we expect the frame to navigate away from about:blank?
@@ -120,11 +119,10 @@ function hasBlankDocumentThatWillNavigate(frame) {
  * the first time that a document in `frame` becomes ready.
  *
  * See {@link onDocumentReady} for the definition of _ready_.
- *
- * @param {HTMLIFrameElement} frame
- * @return {Promise<Document>}
  */
-export function onNextDocumentReady(frame) {
+export function onNextDocumentReady(
+  frame: HTMLIFrameElement
+): Promise<Document> {
   return new Promise((resolve, reject) => {
     const unsubscribe = onDocumentReady(frame, (err, doc) => {
       unsubscribe();
@@ -155,17 +153,16 @@ export function onNextDocumentReady(frame) {
  * navigations, but due to platform limitations, it will only fire after the
  * next document fully loads (ie. when the frame's `load` event fires).
  *
- * @param {HTMLIFrameElement} frame
- * @param {(err: Error|null, document?: Document) => void} callback
- * @param {object} options
- *   @param {number} [options.pollInterval]
- * @return {() => void} Callback that unsubscribes from future changes
+ * @return Callback that unsubscribes from future changes
  */
-export function onDocumentReady(frame, callback, { pollInterval = 10 } = {}) {
-  /** @type {number|undefined} */
-  let pollTimer;
-  /** @type {() => void} */
-  let pollForDocumentChange;
+export function onDocumentReady(
+  frame: HTMLIFrameElement,
+  callback: (err: Error | null, document?: Document) => void,
+  { pollInterval = 10 }: { pollInterval?: number } = {}
+): () => void {
+  let pollTimer: number | undefined;
+  // eslint-disable-next-line prefer-const
+  let pollForDocumentChange: () => void;
 
   // Visited documents for which we have fired the callback or are waiting
   // to become ready.
