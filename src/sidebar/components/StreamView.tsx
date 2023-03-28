@@ -53,7 +53,7 @@ function StreamView({ api, toastMessenger }: StreamViewProps) {
     // Sort the stream so that the newest annotations are at the top
     store.setSortKey('Newest');
     store.clearAnnotations();
-    loadAnnotations(currentQuery).catch(err => {
+    loadAnnotations(currentQuery ?? '').catch(err => {
       toastMessenger.error(`Unable to fetch annotations: ${err.message}`);
     });
   }, [currentQuery, loadAnnotations, store, toastMessenger]);
