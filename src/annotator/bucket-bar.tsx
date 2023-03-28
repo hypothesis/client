@@ -1,34 +1,35 @@
 import { render } from 'preact';
 
+import type { AnchorPosition, Destroyable } from '../types/annotator';
 import Buckets from './components/Buckets';
 import { computeBuckets } from './util/buckets';
 
-/**
- * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
- * @typedef {import('../types/annotator').Destroyable} Destroyable
- */
+export type BucketBarOptions = {
+  onFocusAnnotations: (tags: string[]) => void;
+  onScrollToClosestOffScreenAnchor: (
+    tags: string[],
+    direction: 'down' | 'up'
+  ) => void;
+  onSelectAnnotations: (tags: string[], toggle: boolean) => void;
+};
 
 /**
  * Controller for the "bucket bar" shown alongside the sidebar indicating where
  * annotations are in the document.
- *
- * @implements {Destroyable}
  */
-export class BucketBar {
-  /**
-   * @param {HTMLElement} container
-   * @param {object} options
-   *   @param {(tags: string[]) => void} options.onFocusAnnotations
-   *   @param {(tags: string[], direction: 'down'|'up') => void} options.onScrollToClosestOffScreenAnchor
-   *   @param {(tags: string[], toggle: boolean) => void} options.onSelectAnnotations
-   */
+export class BucketBar implements Destroyable {
+  private _bucketsContainer: HTMLDivElement;
+  private _onFocusAnnotations: BucketBarOptions['onFocusAnnotations'];
+  private _onScrollToClosestOffScreenAnchor: BucketBarOptions['onScrollToClosestOffScreenAnchor'];
+  private _onSelectAnnotations: BucketBarOptions['onSelectAnnotations'];
+
   constructor(
-    container,
+    container: HTMLElement,
     {
       onFocusAnnotations,
       onScrollToClosestOffScreenAnchor,
       onSelectAnnotations,
-    }
+    }: BucketBarOptions
   ) {
     this._bucketsContainer = document.createElement('div');
     container.appendChild(this._bucketsContainer);
@@ -46,10 +47,7 @@ export class BucketBar {
     this._bucketsContainer.remove();
   }
 
-  /**
-   * @param {AnchorPosition[]} positions
-   */
-  update(positions) {
+  update(positions: AnchorPosition[]) {
     const buckets = computeBuckets(positions);
     render(
       <Buckets
