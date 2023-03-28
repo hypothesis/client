@@ -1,13 +1,13 @@
 import { createRef, render } from 'preact';
+import type { RefObject } from 'preact';
 
 import Toolbar from './components/Toolbar';
 
-/**
- * @typedef ToolbarOptions
- * @prop {() => void} createAnnotation
- * @prop {(open: boolean) => void} setSidebarOpen
- * @prop {(visible: boolean) => void} setHighlightsVisible
- */
+export type ToolbarOptions = {
+  createAnnotation: () => void;
+  setSidebarOpen: (open: boolean) => void;
+  setHighlightsVisible: (visible: boolean) => void;
+};
 
 /**
  * Controller for the toolbar on the edge of the sidebar.
@@ -16,20 +16,26 @@ import Toolbar from './components/Toolbar';
  * highlight visibility etc.
  */
 export class ToolbarController {
+  private _container: HTMLElement;
+  private _newAnnotationType: 'annotation' | 'note';
+  private _useMinimalControls: boolean;
+  private _highlightsVisible: boolean;
+  private _sidebarOpen: boolean;
+  private _closeSidebar: () => void;
+  private _toggleSidebar: () => void;
+  private _toggleHighlights: () => void;
+  private _createAnnotation: () => void;
+  private _sidebarToggleButton: RefObject<HTMLElement>;
+
   /**
-   * @param {HTMLElement} container - Element into which the toolbar is rendered
-   * @param {ToolbarOptions} options
+   * @param container - Element into which the toolbar is rendered
    */
-  constructor(container, options) {
+  constructor(container: HTMLElement, options: ToolbarOptions) {
     const { createAnnotation, setSidebarOpen, setHighlightsVisible } = options;
 
     this._container = container;
-
     this._useMinimalControls = false;
-
-    /** @type {'annotation'|'note'} */
     this._newAnnotationType = 'note';
-
     this._highlightsVisible = false;
     this._sidebarOpen = false;
 
@@ -43,13 +49,13 @@ export class ToolbarController {
     };
 
     /** Reference to the sidebar toggle button. */
-    this._sidebarToggleButton = createRef();
+    this._sidebarToggleButton = createRef<HTMLElement>();
 
     this.render();
   }
 
   getWidth() {
-    const content = /** @type {HTMLElement} */ (this._container.firstChild);
+    const content = this._container.firstChild as HTMLElement;
     return content.getBoundingClientRect().width;
   }
 
@@ -106,11 +112,9 @@ export class ToolbarController {
 
   /**
    * Return the DOM element that toggles the sidebar's visibility.
-   *
-   * @type {HTMLButtonElement}
    */
   get sidebarToggleButton() {
-    return this._sidebarToggleButton.current;
+    return this._sidebarToggleButton.current as HTMLButtonElement;
   }
 
   render() {
