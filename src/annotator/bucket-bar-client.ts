@@ -1,35 +1,34 @@
 import { ListenerCollection } from '../shared/listener-collection';
+import type { PortRPC } from '../shared/messaging';
+import type { Anchor, Destroyable } from '../types/annotator';
+import type {
+  HostToGuestEvent,
+  GuestToHostEvent,
+} from '../types/port-rpc-events';
 import { computeAnchorPositions } from './util/buckets';
 
-/**
- * @typedef {import('../shared/messaging').PortRPC<HostToGuestEvent, GuestToHostEvent>} HostRPC
- * @typedef {import('../types/annotator').Anchor} Anchor
- * @typedef {import('../types/annotator').AnchorPosition} AnchorPosition
- * @typedef {import('../types/annotator').Destroyable} Destroyable
- * @typedef {import('../types/port-rpc-events').HostToGuestEvent} HostToGuestEvent
- * @typedef {import('../types/port-rpc-events').GuestToHostEvent} GuestToHostEvent
- */
+type HostRPC = PortRPC<HostToGuestEvent, GuestToHostEvent>;
+
+export type BucketBarClientOptions = {
+  contentContainer: Element;
+  hostRPC: HostRPC;
+};
 
 /**
  * Communicate to the host frame when:
  *
  * 1. The set of anchors has been changed (due to annotations being added or removed)
  * 2. The position of anchors relative to the viewport of the guest has changed
- *
- * @implements {Destroyable}
  */
-export class BucketBarClient {
-  /**
-   * @param {object} options
-   *   @param {Element} options.contentContainer - The scrollable container element for the
-   *     document content. All of the highlights that the bucket bar's buckets point
-   *     at should be contained within this element.
-   *   @param {HostRPC} options.hostRPC
-   */
-  constructor({ contentContainer, hostRPC }) {
+export class BucketBarClient implements Destroyable {
+  private _hostRPC: HostRPC;
+  private _updatePending: boolean;
+  private _anchors: Anchor[];
+  private _listeners: ListenerCollection;
+
+  constructor({ contentContainer, hostRPC }: BucketBarClientOptions) {
     this._hostRPC = hostRPC;
     this._updatePending = false;
-    /** @type {Anchor[]} */
     this._anchors = [];
     this._listeners = new ListenerCollection();
 
@@ -50,10 +49,9 @@ export class BucketBarClient {
    * Updates are debounced to reduce the overhead of gathering and sending anchor
    * position data across frames.
    *
-   * @param {Anchor[]} [anchors] - pass this option when anchors are added or
-   *   deleted
+   * @param anchors - pass this option when anchors are added or deleted
    */
-  update(anchors) {
+  update(anchors?: Anchor[]) {
     if (anchors) {
       this._anchors = anchors;
     }
