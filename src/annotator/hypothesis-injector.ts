@@ -1,19 +1,15 @@
 import { parseJsonConfig } from '../boot/parse-json-config';
 import { generateHexString } from '../shared/random';
+import type { Destroyable } from '../types/annotator';
 import { onNextDocumentReady, FrameObserver } from './frame-observer';
-
-/**
- * @typedef {import('../types/annotator').Destroyable} Destroyable
- */
 
 /**
  * Options for injecting the client into child frames.
  *
  * This includes the URL of the client's boot script, plus configuration
  * for the client when it loads in the child frame.
- *
- * @typedef {{ clientUrl: string } & Record<string, unknown>} InjectConfig
  */
+export type InjectConfig = { clientUrl: string } & Record<string, unknown>;
 
 /**
  * HypothesisInjector injects the Hypothesis client into same-origin iframes.
@@ -21,16 +17,16 @@ import { onNextDocumentReady, FrameObserver } from './frame-observer';
  * The client will be injected automatically into frames that have the
  * `enable-annotation` attribute set (see {@link FrameObserver}) and can be
  * manually injected into other frames using {@link injectClient}.
- *
- * @implements {Destroyable}
  */
-export class HypothesisInjector {
+export class HypothesisInjector implements Destroyable {
+  private _config: InjectConfig;
+  private _frameObserver: FrameObserver;
+
   /**
-   * @param {Element} element - root of the DOM subtree to watch for the
-   *   addition and removal of annotatable iframes
-   * @param {InjectConfig} config
+   * @param element - root of the DOM subtree to watch for the addition and
+   *   removal of annotatable iframes
    */
-  constructor(element, config) {
+  constructor(element: Element, config: InjectConfig) {
     this._config = config;
     this._frameObserver = new FrameObserver(
       element,
@@ -49,11 +45,9 @@ export class HypothesisInjector {
 
 /**
  * Check if the client was added to a frame by {@link injectClient}.
- *
- * @param {HTMLIFrameElement} iframe
  */
-function hasHypothesis(iframe) {
-  const iframeDocument = /** @type {Document} */ (iframe.contentDocument);
+function hasHypothesis(iframe: HTMLIFrameElement) {
+  const iframeDocument = iframe.contentDocument!;
   return iframeDocument.querySelector('script.js-hypothesis-config') !== null;
 }
 
@@ -61,7 +55,7 @@ function hasHypothesis(iframe) {
  * Remove the temporary client configuration added to a document by
  * {@link injectClient} or {@link HypothesisInjector}.
  */
-export function removeTemporaryClientConfig(document_ = document) {
+export function removeTemporaryClientConfig(document_: Document = document) {
   const tempConfigEls = Array.from(
     document_.querySelectorAll(
       'script.js-hypothesis-config[data-remove-on-unload]'
@@ -83,12 +77,14 @@ export function removeTemporaryClientConfig(document_ = document) {
  * This is determined by the presence of temporary configuration `<script>`s
  * added by this function, which can be removed with {@link removeTemporaryClientConfig}.
  *
- * @param {HTMLIFrameElement} frame
- * @param {InjectConfig} config -
- * @param {string} [frameId] - The ID for the guest frame. If none is provided,
- *   the guest will use a new randomly-generated ID.
+ * @param frameId - The ID for the guest frame. If none is provided, the guest
+ *   will use a new randomly-generated ID.
  */
-export async function injectClient(frame, config, frameId) {
+export async function injectClient(
+  frame: HTMLIFrameElement,
+  config: InjectConfig,
+  frameId?: string
+) {
   if (hasHypothesis(frame)) {
     return;
   }
@@ -126,7 +122,7 @@ export async function injectClient(frame, config, frameId) {
   bootScript.async = true;
   bootScript.src = config.clientUrl;
 
-  const iframeDocument = /** @type {Document} */ (frame.contentDocument);
+  const iframeDocument = frame.contentDocument!;
   iframeDocument.body.appendChild(configElement);
   iframeDocument.body.appendChild(bootScript);
 }
