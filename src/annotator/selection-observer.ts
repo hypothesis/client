@@ -1,12 +1,9 @@
 import { ListenerCollection } from '../shared/listener-collection';
 
 /**
- * Return the current selection or `null` if there is no selection or it is empty.
- *
- * @param {Document} document
- * @return {Range|null}
+ * Return the current selection or `null` if there is no selection, or it is empty.
  */
-export function selectedRange(document) {
+export function selectedRange(document: Document): Range | null {
   const selection = document.getSelection();
   if (!selection || selection.rangeCount === 0) {
     return null;
@@ -22,15 +19,21 @@ export function selectedRange(document) {
  * An observer that watches for and buffers changes to the document's current selection.
  */
 export class SelectionObserver {
+  private _pendingCallback: number | null;
+  private _document: Document;
+  private _listeners: ListenerCollection;
+
   /**
    * Start observing changes to the current selection in the document.
    *
-   * @param {(range: Range|null) => void} callback -
-   *   Callback invoked with the selected region of the document when it has
-   *   changed.
-   * @param {Document} document_ - Test seam
+   * @param callback - Callback invoked with the selected region of the document
+   *                   when it has changed.
+   * @param document_ - Test seam
    */
-  constructor(callback, document_ = document) {
+  constructor(
+    callback: (range: Range | null) => void,
+    document_: Document = document
+  ) {
     let isMouseDown = false;
 
     this._pendingCallback = null;
@@ -41,8 +44,7 @@ export class SelectionObserver {
       }, delay);
     };
 
-    /** @param {Event} event */
-    const eventHandler = event => {
+    const eventHandler = (event: Event) => {
       if (event.type === 'mousedown') {
         isMouseDown = true;
       }
@@ -93,7 +95,7 @@ export class SelectionObserver {
     this._cancelPendingCallback();
   }
 
-  _cancelPendingCallback() {
+  private _cancelPendingCallback() {
     if (this._pendingCallback) {
       clearTimeout(this._pendingCallback);
       this._pendingCallback = null;
