@@ -97,6 +97,9 @@ describe('StreamView', () => {
       'reply_2',
       'reply_3',
     ]);
+
+    // Assert that we use an empty string as query, when the `q` param is not set
+    assert.calledWith(fakeSearchFilter.toObject, '');
   });
 
   it('displays an error if fetching annotations fails', async () => {
