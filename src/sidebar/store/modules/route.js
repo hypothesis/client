@@ -19,7 +19,7 @@ const initialState = {
    * - The "stream" route has a "q" (query) parameter.
    * - The "sidebar" route has no parameters.
    *
-   * @type {Record<string, string>}
+   * @type {Record<string, string | undefined>}
    */
   params: {},
 };
