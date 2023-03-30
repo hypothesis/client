@@ -73,8 +73,7 @@ export function getTextBoundingBoxes(range: Range): DOMRect[] {
     }
   });
 
-  let rects: DOMRect[] = [];
-  textNodes.forEach(node => {
+  return textNodes.flatMap(node => {
     const nodeRange = node.ownerDocument.createRange();
     nodeRange.selectNodeContents(node);
     if (node === range.startContainer) {
@@ -86,15 +85,14 @@ export function getTextBoundingBoxes(range: Range): DOMRect[] {
     if (nodeRange.collapsed) {
       // If the range ends at the start of this text node or starts at the end
       // of this node then do not include it.
-      return;
+      return [];
     }
 
     // Measure the range and translate from viewport to document coordinates
     const viewportRects = Array.from(nodeRange.getClientRects());
     nodeRange.detach();
-    rects = rects.concat(viewportRects);
+    return viewportRects;
   });
-  return rects;
 }
 
 /**
