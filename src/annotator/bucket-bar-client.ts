@@ -10,7 +10,12 @@ import { computeAnchorPositions } from './util/buckets';
 type HostRPC = PortRPC<HostToGuestEvent, GuestToHostEvent>;
 
 export type BucketBarClientOptions = {
+  /**
+   * The scrollable container element for the document content. All the highlights
+   * that the bucket bar's buckets point at should be contained within this element.
+   */
   contentContainer: Element;
+
   hostRPC: HostRPC;
 };
 

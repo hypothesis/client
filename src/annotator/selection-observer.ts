@@ -19,6 +19,7 @@ export function selectedRange(document: Document): Range | null {
  * An observer that watches for and buffers changes to the document's current selection.
  */
 export class SelectionObserver {
+  /** Tracks the timeout ID of the last scheduled callback */
   private _pendingCallback: number | null;
   private _document: Document;
   private _listeners: ListenerCollection;
