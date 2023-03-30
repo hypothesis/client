@@ -52,10 +52,12 @@ export function forEachNodeInRange(range: Range, callback: (n: Node) => void) {
 }
 
 function nodeIsText(node: Node): node is Text {
+  return node.nodeType === Node.TEXT_NODE;
+}
+
+function textNodeContainsText(textNode: Text): boolean {
   const whitespaceOnly = /^\s*$/;
-  return (
-    node.nodeType === Node.TEXT_NODE && !node.textContent!.match(whitespaceOnly)
-  );
+  return !textNode.textContent!.match(whitespaceOnly);
 }
 
 /**
@@ -66,7 +68,7 @@ function nodeIsText(node: Node): node is Text {
 export function getTextBoundingBoxes(range: Range): DOMRect[] {
   const textNodes: Text[] = [];
   forEachNodeInRange(range, node => {
-    if (nodeIsText(node)) {
+    if (nodeIsText(node) && textNodeContainsText(node)) {
       textNodes.push(node);
     }
   });
