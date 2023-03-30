@@ -161,6 +161,10 @@ export function onDocumentReady(
   { pollInterval = 10 }: { pollInterval?: number } = {}
 ): () => void {
   let pollTimer: number | undefined;
+  // Two linting rules are conflicting here, so muting one of them.
+  // This should be fixable by refactoring the whole function, as there are
+  // crossed dependencies between local callbacks, that rely on each other
+  // having been called in a specific order.
   // eslint-disable-next-line prefer-const
   let pollForDocumentChange: () => void;
 
