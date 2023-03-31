@@ -1,10 +1,9 @@
 import { hasOwn } from '../../shared/has-own';
 
-/**
- * @typedef HypothesisWindowProps
- * @prop {() => Record<string, unknown>} [hypothesisConfig] - Function that returns configuration
- *   for the Hypothesis client
- */
+type HypothesisWindowProps = {
+  /** Function that returns configuration for the Hypothesis client */
+  hypothesisConfig?: () => Record<string, unknown>;
+};
 
 /**
  * Return an object containing config settings from window.hypothesisConfig().
@@ -20,10 +19,12 @@ import { hasOwn } from '../../shared/has-own';
  *
  * If there's no window.hypothesisConfig() function then return {}.
  *
- * @param {Window & HypothesisWindowProps} window_ - The window to search for a hypothesisConfig() function
- * @return {Record<string, unknown>} - Any config settings returned by hypothesisConfig()
+ * @param window_ - The window to search for a hypothesisConfig() function
+ * @return Any config settings returned by hypothesisConfig()
  */
-export function configFuncSettingsFrom(window_) {
+export function configFuncSettingsFrom(
+  window_: Window & HypothesisWindowProps
+): Record<string, unknown> {
   if (!hasOwn(window_, 'hypothesisConfig')) {
     return {};
   }
