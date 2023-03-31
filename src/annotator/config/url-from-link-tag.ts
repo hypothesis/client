@@ -6,18 +6,19 @@
  * in a separate JavaScript realm (eg. in the browser extension), and thus can share information
  * with the annotator code via the DOM but not JS globals.
  *
- * @param {Window} window_
- * @param {string} rel - The `rel` attribute to match
- * @param {'javascript'|'html'} type - Type of resource that the link refers to
+ * @param rel - The `rel` attribute to match
+ * @param type - Type of resource that the link refers to
  * @throws {Error} - If there's no link with the `rel` indicated, or the first
  *   matching link has no `href`
  */
-export function urlFromLinkTag(window_, rel, type) {
-  const link = /** @type {HTMLLinkElement} */ (
-    window_.document.querySelector(
-      `link[type="application/annotator+${type}"][rel="${rel}"]`
-    )
-  );
+export function urlFromLinkTag(
+  window_: Window,
+  rel: string,
+  type: 'javascript' | 'html'
+) {
+  const link = window_.document.querySelector(
+    `link[type="application/annotator+${type}"][rel="${rel}"]`
+  ) as HTMLLinkElement | undefined;
 
   if (!link) {
     throw new Error(
