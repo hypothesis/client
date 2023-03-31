@@ -1,37 +1,40 @@
 import { toBoolean } from '../../shared/type-coercions';
 import { isBrowserExtension } from './is-browser-extension';
 import { settingsFrom } from './settings';
+import type { SettingsGetters } from './settings';
 import { urlFromLinkTag } from './url-from-link-tag';
 
-/**
- * @typedef {import('./settings').SettingsGetters} SettingsGetters
- * @typedef {(settings: SettingsGetters, name: string) => any} ValueGetter
- *
- * @typedef ConfigDefinition
- * @prop {ValueGetter} getValue - Method to retrieve the value from the incoming source
- * @prop {boolean} allowInBrowserExt -
- *  Allow this setting to be read in the browser extension. If this is false
- *  and browser extension context is true, use `defaultValue` if provided otherwise
- *  ignore the config key
- * @prop {any} [defaultValue] - Sets a default if `getValue` returns undefined
- * @prop {(value: any) => any} [coerce] - Transform a value's type, value or both
- *
- * @typedef {Record<string, ConfigDefinition>} ConfigDefinitionMap
- */
+type ValueGetter = (settings: SettingsGetters, name: string) => any;
+
+type ConfigDefinition = {
+  /** Method to retrieve the value from the incoming source */
+  getValue: ValueGetter;
+
+  /**
+   * Allow this setting to be read in the browser extension. If this is false
+   * and browser extension context is true, use `defaultValue` if provided
+   * otherwise ignore the config key
+   */
+  allowInBrowserExt: boolean;
+
+  /** Sets a default if `getValue` returns undefined */
+  defaultValue?: any;
+  /** Transform a value's type, value or both */
+  coerce?: (value: any) => any;
+};
+
+type ConfigDefinitionMap = Record<string, ConfigDefinition>;
 
 /**
  * Named subset of the Hypothesis client configuration that is relevant in
  * a particular context.
- *
- * @typedef {'sidebar'|'notebook'|'profile'|'annotator'|'all'} Context
  */
+type Context = 'sidebar' | 'notebook' | 'profile' | 'annotator' | 'all';
 
 /**
  * Returns the configuration keys that are relevant to a particular context.
- *
- * @param {Context} context
  */
-function configurationKeys(context) {
+function configurationKeys(context: Context): string[] {
   const contexts = {
     annotator: ['clientUrl', 'contentInfoBanner', 'subFrameIdentifier'],
     sidebar: [
@@ -81,17 +84,13 @@ function configurationKeys(context) {
   }
 }
 
-/** @type {ValueGetter} */
-function getHostPageSetting(settings, name) {
-  return settings.hostPageSetting(name);
-}
+const getHostPageSetting: ValueGetter = (settings, name) =>
+  settings.hostPageSetting(name);
 
 /**
  * Definitions of configuration keys
- *
- * @type {ConfigDefinitionMap}
  */
-const configDefinitions = {
+const configDefinitions: ConfigDefinitionMap = {
   annotations: {
     allowInBrowserExt: true,
     defaultValue: null,
@@ -214,18 +213,14 @@ const configDefinitions = {
  * the embedder, the boot script also passes some additional configuration
  * to the annotator, such as URLs of the various sub-applications and the
  * boot script itself.
- *
- * @param {Context} context
  */
-export function getConfig(context, window_ = window) {
+export function getConfig(context: Context, window_: Window = window) {
   const settings = settingsFrom(window_);
-
-  /** @type {Record<string, unknown>} */
-  const config = {};
+  const config: Record<string, unknown> = {};
 
   // Filter the config based on the application context as some config values
   // may be inappropriate or erroneous for some applications.
-  for (let key of configurationKeys(context)) {
+  for (const key of configurationKeys(context)) {
     const configDef = configDefinitions[key];
     const hasDefault = configDef.defaultValue !== undefined; // A default could be null
     const isURLFromBrowserExtension = isBrowserExtension(
