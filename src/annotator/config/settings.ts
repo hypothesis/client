@@ -4,45 +4,36 @@ import { toBoolean } from '../../shared/type-coercions';
 import { configFuncSettingsFrom } from './config-func-settings-from';
 import { urlFromLinkTag } from './url-from-link-tag';
 
-/**
- * @typedef SettingsGetters
- * @prop {string|null} annotations
- * @prop {string|null} query
- * @prop {string|null} group
- * @prop {string} showHighlights
- * @prop {string} clientUrl
- * @prop {string} sidebarAppUrl
- * @prop {string} notebookAppUrl
- * @prop {string} profileAppUrl
- * @prop {(name: string) => unknown} hostPageSetting
- */
+export type SettingsGetters = {
+  annotations: string | null;
+  query: string | null;
+  group: string | null;
+  showHighlights: string;
+  clientUrl: string;
+  sidebarAppUrl: string;
+  notebookAppUrl: string;
+  profileAppUrl: string;
+  hostPageSetting: (name: string) => unknown;
+};
 
 /**
  * Discard a setting if it is not a string.
- *
- * @param {unknown} value
  */
-function checkIfString(value) {
+function checkIfString(value: unknown): string | null {
   return typeof value === 'string' ? value : null;
 }
 
-/**
- * @param {Window} window_
- * @return {SettingsGetters}
- */
-export function settingsFrom(window_) {
+export function settingsFrom(window_: Window): SettingsGetters {
   // Prioritize the `window.hypothesisConfig` function over the JSON format
   // Via uses `window.hypothesisConfig` and makes it non-configurable and non-writable.
   // In addition, Via sets the `ignoreOtherConfiguration` option to prevent configuration merging.
   const configFuncSettings = configFuncSettingsFrom(window_);
 
-  /** @type {Record<string, unknown>} */
-  let jsonConfigs;
-  if (toBoolean(configFuncSettings.ignoreOtherConfiguration)) {
-    jsonConfigs = {};
-  } else {
-    jsonConfigs = parseJsonConfig(window_.document);
-  }
+  const jsonConfigs: Record<string, unknown> = toBoolean(
+    configFuncSettings.ignoreOtherConfiguration
+  )
+    ? {}
+    : parseJsonConfig(window_.document);
 
   /**
    * Return the `#annotations:*` ID from the given URL's fragment.
@@ -50,9 +41,9 @@ export function settingsFrom(window_) {
    * If the URL contains a `#annotations:<ANNOTATION_ID>` fragment then return
    * the annotation ID extracted from the fragment. Otherwise return `null`.
    *
-   * @return {string|null} - The extracted ID, or null.
+   * @return The extracted ID, or null.
    */
-  function annotations() {
+  function annotations(): string | null {
     /** Return the annotations from the URL, or null. */
     function annotationsFromURL() {
       // Annotation IDs are url-safe-base64 identifiers
@@ -75,9 +66,9 @@ export function settingsFrom(window_) {
    * If the URL contains a `#annotations:group:<GROUP_ID>` fragment then return
    * the group ID extracted from the fragment. Otherwise return `null`.
    *
-   * @return {string|null} - The extracted ID, or null.
+   * @return The extracted ID, or null.
    */
-  function group() {
+  function group(): string | null {
     function groupFromURL() {
       const groupFragmentMatch = window_.location.href.match(
         /#annotations:group:([A-Za-z0-9_-]+)$/
@@ -119,9 +110,9 @@ export function settingsFrom(window_) {
    *
    * Otherwise return null.
    *
-   * @return {string|null} - The config.query setting, or null.
+   * @return The config.query setting, or null.
    */
-  function query() {
+  function query(): string | null {
     /** Return the query from the URL, or null. */
     function queryFromURL() {
       const queryFragmentMatch = window_.location.href.match(
@@ -148,9 +139,9 @@ export function settingsFrom(window_) {
    *
    * If the setting is not found in either source, then return undefined.
    *
-   * @param {string} name - Unique name of the setting
+   * @param name - Unique name of the setting
    */
-  function hostPageSetting(name) {
+  function hostPageSetting(name: string) {
     if (hasOwn(configFuncSettings, name)) {
       return configFuncSettings[name];
     }
