@@ -2,15 +2,15 @@
  * Create the JSON-serializable subset of annotator configuration that should
  * be passed to the sidebar or notebook applications.
  *
- * @param {string} appURL - URL from which the application will be served
- * @param {Record<string, unknown>} config
- * @return {Record<string, unknown>}
+ * @param appURL - URL from which the application will be served
  */
-export function createAppConfig(appURL, config) {
-  /** @type {Record<string, unknown>} */
-  const appConfig = {};
+export function createAppConfig(
+  appURL: string,
+  config: Record<string, unknown>
+): Record<string, unknown> {
+  const appConfig: Record<string, unknown> = {};
 
-  for (let [key, value] of Object.entries(config)) {
+  for (const [key, value] of Object.entries(config)) {
     // Remove several annotator-only properties.
     //
     // nb. We don't currently strip all the annotator-only properties here.
