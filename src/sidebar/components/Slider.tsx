@@ -7,6 +7,9 @@ export type SliderProps = {
 
   /** Whether the content should be visible or not. */
   visible: boolean;
+
+  /** Invoked once the open/close transitions have finished */
+  onTransitionEnd?: (direction: 'in' | 'out') => void;
 };
 
 /**
@@ -17,9 +20,13 @@ export type SliderProps = {
  * DOM using `display: none` so it does not appear in the keyboard navigation
  * order.
  *
- * Currently the only reveal/expand direction supported is top-down.
+ * Currently, the only reveal/expand direction supported is top-down.
  */
-export default function Slider({ children, visible }: SliderProps) {
+export default function Slider({
+  children,
+  visible,
+  onTransitionEnd,
+}: SliderProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [containerHeight, setContainerHeight] = useState(visible ? 'auto' : 0);
 
@@ -68,13 +75,15 @@ export default function Slider({ children, visible }: SliderProps) {
   const handleTransitionEnd = useCallback(() => {
     if (visible) {
       setContainerHeight('auto');
+      onTransitionEnd?.('in');
     } else {
       // When the collapse animation completes, stop rendering the content so
       // that the browser has fewer nodes to render and the content is removed
       // from keyboard navigation.
       setContentVisible(false);
+      onTransitionEnd?.('out');
     }
-  }, [setContainerHeight, visible]);
+  }, [setContainerHeight, visible, onTransitionEnd]);
 
   const isFullyVisible = containerHeight === 'auto';
 

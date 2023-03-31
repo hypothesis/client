@@ -1,4 +1,4 @@
-import { Panel } from '@hypothesis/frontend-shared/lib/next';
+import { Dialog } from '@hypothesis/frontend-shared/lib/next';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
@@ -47,9 +47,7 @@ export default function SidebarPanel({
       if (panelIsActive && panelElement.current) {
         scrollIntoView(panelElement.current);
       }
-      if (typeof onActiveChanged === 'function') {
-        onActiveChanged(panelIsActive);
-      }
+      onActiveChanged?.(panelIsActive);
     }
   }, [panelIsActive, onActiveChanged]);
 
@@ -58,12 +56,20 @@ export default function SidebarPanel({
   }, [store, panelName]);
 
   return (
-    <Slider visible={panelIsActive}>
-      <div ref={panelElement} className="mb-4">
-        <Panel title={title} icon={icon} onClose={closePanel}>
+    <>
+      {panelIsActive && (
+        <Dialog
+          restoreFocus
+          ref={panelElement}
+          classes="mb-4"
+          title={title}
+          icon={icon}
+          onClose={closePanel}
+          transitionComponent={Slider}
+        >
           {children}
-        </Panel>
-      </div>
-    </Slider>
+        </Dialog>
+      )}
+    </>
   );
 }
