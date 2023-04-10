@@ -126,7 +126,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Update extension
-      uses: actions/github-script@v5
+      uses: actions/github-script@v6
       with:
         github-token: ${{ secrets.cross_repo_workflow_trigger_token }}
         script: |
