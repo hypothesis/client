@@ -33,6 +33,8 @@ if (isBrowserSupported()) {
       apiUrl: sidebarConfig.apiUrl,
     });
   } else {
+    // nb. If new asset URLs are added here, the browser extension and
+    // `hypothesis-injector.ts` need to be updated.
     const annotatorConfig = /** @type {AnnotatorConfig} */ (config);
     const notebookAppUrl = processUrlTemplate(
       annotatorConfig.notebookAppUrl || '__NOTEBOOK_APP_URL__'

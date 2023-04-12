@@ -90,6 +90,7 @@ describe('HypothesisInjector integration test', () => {
 
       assert.match(config.subFrameIdentifier, /[a-f0-9]+/);
       assert.notOk(config.assetRoot);
+      assert.notOk(config.profileAppUrl);
       assert.notOk(config.notebookAppUrl);
       assert.notOk(config.sidebarAppUrl);
     });
@@ -112,6 +113,7 @@ describe('HypothesisInjector integration test', () => {
       hostJSONConfig = {
         clientUrl: 'chrome-extension://abc/client/build/boot.js',
         assetRoot: 'chrome-extension://abc/client',
+        profileAppUrl: 'chrome-extension://abc/client/profile.html',
         notebookAppUrl: 'chrome-extension://abc/client/notebook.html',
         sidebarAppUrl: 'chrome-extension://abc/client/sidebar.html',
       };
@@ -127,6 +129,10 @@ describe('HypothesisInjector integration test', () => {
       const config = JSON.parse(configElement.textContent);
 
       assert.equal(config.assetRoot, 'chrome-extension://abc/client');
+      assert.equal(
+        config.profileAppUrl,
+        'chrome-extension://abc/client/profile.html'
+      );
       assert.equal(
         config.notebookAppUrl,
         'chrome-extension://abc/client/notebook.html'

@@ -99,16 +99,24 @@ export async function injectClient(
   // We could potentially do this by allowing these settings to be part of
   // the "annotator" config (see `annotator/config/index.js`) which gets passed
   // to the constructor.
-  const { assetRoot, notebookAppUrl, sidebarAppUrl } =
+  const { assetRoot, notebookAppUrl, profileAppUrl, sidebarAppUrl } =
     parseJsonConfig(document);
 
   const injectedConfig = {
     ...config,
 
     assetRoot,
+
+    // FIXME - We propagate these settings because the boot script expects them,
+    // but they shouldn't actually be needed when launching the client in a
+    // frame as a guest only (ie. no sidebar). A caveat is that the
+    // `<link>` element generated using the `sidebarAppUrl` value does also get
+    // used for other purposes by the annotator entry point.
     notebookAppUrl,
+    profileAppUrl,
     sidebarAppUrl,
 
+    // Tell the client that it should load as a guest only (no sidebar).
     subFrameIdentifier: frameId ?? generateHexString(10),
   };
 
