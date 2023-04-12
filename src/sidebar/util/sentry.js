@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/browser';
 
 import { parseConfigFragment } from '../../shared/config-fragment';
+import { currentScriptOrigin } from '../../shared/current-script-origin';
 import { handleErrorsInFrames } from '../../shared/frame-error-capture';
 import { warnOnce } from '../../shared/warn-once';
 
@@ -15,18 +16,6 @@ const maxEventsToSendPerSession = 5;
 
 /** @type {(() => void)|null} */
 let removeFrameErrorHandler = null;
-
-function currentScriptOrigin() {
-  // It might be possible to simplify this as `url` appears to be required
-  // according to the HTML spec.
-  //
-  // See https://html.spec.whatwg.org/multipage/webappapis.html#hostgetimportmetaproperties.
-  let url = import.meta.url;
-  if (!url) {
-    return null;
-  }
-  return new URL(url).origin;
-}
 
 /**
  * Initialize the Sentry integration.
