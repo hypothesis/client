@@ -133,7 +133,9 @@ function assetURL(config, path) {
 /**
  * Bootstrap the Hypothesis client.
  *
- * This triggers loading of the necessary resources for the client
+ * This triggers loading of the necessary resources for the client in a host
+ * or guest frame. We could in future simplify booting in guest-only frames
+ * by omitting resources that are only needed in the host frame.
  *
  * @param {Document} doc
  * @param {AnnotatorConfig} config
