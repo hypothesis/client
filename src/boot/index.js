@@ -21,6 +21,18 @@ if (isBrowserSupported()) {
   const config = /** @type {AnnotatorConfig|SidebarAppConfig} */ (
     parseJsonConfig(document)
   );
+
+  // When the boot script is executed from the browser extension, at least one
+  // config is required
+  const isExtensionContext = !!(
+    /** @type {any} */ (window).chrome?.runtime?.id
+  );
+  if (!Object.keys(config).length && isExtensionContext) {
+    throw new Error(
+      'Could not start Hypothesis extension as configuration is missing'
+    );
+  }
+
   const assetRoot = processUrlTemplate(config.assetRoot || '__ASSET_ROOT__');
 
   // Check whether this is the sidebar app (indicated by the presence of a
