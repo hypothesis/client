@@ -15,7 +15,7 @@ describe('SidebarPanel', () => {
     fakeScrollIntoView = sinon.stub();
 
     fakeStore = {
-      isSidebarPanelOpen: sinon.stub().returns(false),
+      isSidebarPanelOpen: sinon.stub().returns(true),
       toggleSidebarPanel: sinon.stub(),
     };
 
@@ -36,16 +36,16 @@ describe('SidebarPanel', () => {
       icon: 'restricted',
     });
 
-    const panel = wrapper.find('Panel');
+    const dialog = wrapper.find('Dialog');
 
-    assert.equal(panel.props().icon, 'restricted');
-    assert.equal(panel.props().title, 'My Panel');
+    assert.equal(dialog.props().icon, 'restricted');
+    assert.equal(dialog.props().title, 'My Panel');
   });
 
   it('provides an `onClose` handler that closes the panel', () => {
     const wrapper = createSidebarPanel({ panelName: 'flibberty' });
 
-    wrapper.find('Panel').props().onClose();
+    wrapper.find('Dialog').props().onClose();
 
     assert.calledWith(fakeStore.toggleSidebarPanel, 'flibberty', false);
   });
@@ -59,7 +59,7 @@ describe('SidebarPanel', () => {
   it('hides content if not active', () => {
     fakeStore.isSidebarPanelOpen.returns(false);
     const wrapper = createSidebarPanel();
-    assert.isFalse(wrapper.find('Slider').prop('visible'));
+    assert.isFalse(wrapper.find('Dialog').exists());
   });
 
   context('when panel state changes', () => {
