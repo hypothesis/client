@@ -1,5 +1,7 @@
-import { Button, Modal } from '@hypothesis/frontend-shared/lib/next';
+import { Button, ModalDialog } from '@hypothesis/frontend-shared/lib/next';
 import { render } from 'preact';
+import { createRef } from 'preact';
+import type { RefObject } from 'preact';
 import type { ComponentChildren } from 'preact';
 
 export type ConfirmModalProps = {
@@ -25,6 +27,7 @@ export async function confirm({
   message,
   confirmAction = 'Yes',
 }: ConfirmModalProps): Promise<boolean> {
+  const cancelButton = createRef<HTMLElement | undefined>();
   const container = document.createElement('div');
   container.setAttribute('data-testid', 'confirm-container');
 
@@ -43,10 +46,14 @@ export async function confirm({
     };
 
     render(
-      <Modal
+      <ModalDialog
         buttons={
           <>
-            <Button data-testid="cancel-button" onClick={() => close(false)}>
+            <Button
+              elementRef={cancelButton}
+              data-testid="cancel-button"
+              onClick={() => close(false)}
+            >
               Cancel
             </Button>
             <Button
@@ -58,11 +65,12 @@ export async function confirm({
             </Button>
           </>
         }
+        initialFocus={cancelButton as RefObject<HTMLElement>}
         title={title}
         onClose={() => close(false)}
       >
         {message}
-      </Modal>,
+      </ModalDialog>,
       container
     );
   });
