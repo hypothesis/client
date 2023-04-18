@@ -34,29 +34,24 @@ describe('browser-extension-utils', () => {
   });
 
   describe('hasExtensionConfig', () => {
-    let fakeDocument;
-
-    beforeEach(() => {
-      fakeDocument = {
-        querySelector: sinon.stub(),
-      };
+    afterEach(() => {
+      const script = document.querySelector('.js-hypothesis-config-test');
+      script?.remove();
     });
 
-    [
-      { element: null, configExists: false },
-      { element: {}, configExists: true },
-    ].forEach(({ element, configExists }) => {
+    [false, true].forEach(configExists => {
       it('returns proper result if the config script was found', () => {
-        fakeDocument.querySelector.returns(element);
+        if (configExists) {
+          const configScript = document.createElement('script');
+          configScript.className =
+            'js-hypothesis-config js-hypothesis-config-test';
+          configScript.setAttribute('data-extension-id', 'hypothesisId');
+          configScript.type = 'application/json';
+          configScript.innerText = '{}';
+          document.body.append(configScript);
+        }
 
-        assert.equal(
-          hasExtensionConfig('hypothesisId', fakeDocument),
-          configExists
-        );
-        assert.calledWith(
-          fakeDocument.querySelector,
-          sinon.match('hypothesisId')
-        );
+        assert.equal(hasExtensionConfig('hypothesisId'), configExists);
       });
     });
   });
