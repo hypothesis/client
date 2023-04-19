@@ -9,61 +9,49 @@
  ** Dual licensed under the MIT and GPLv3 licenses.
  ** https://github.com/openannotation/annotator/blob/master/LICENSE
  */
-
-/**
- * nb. The `DocumentMetadata` type is renamed to avoid a conflict with the
- * `DocumentMetadata` class below.
- *
- * @typedef {import('../../types/annotator').DocumentMetadata} Metadata
- */
 import { normalizeURI } from '../util/url';
 
-/**
- * @typedef Link
- * @prop {string} link.href
- * @prop {string} [link.rel]
- * @prop {string} [link.type]
- */
+type Link = {
+  href: string;
+  rel?: string;
+  type?: string;
+};
 
 /**
  * Extension of the `Metadata` type with non-optional fields for `dc`, `eprints` etc.
- *
- * @typedef HTMLDocumentMetadata
- * @prop {string} title
- * @prop {Link[]} link
- * @prop {Record<string, string[]>} dc
- * @prop {Record<string, string[]>} eprints
- * @prop {Record<string, string[]>} facebook
- * @prop {Record<string, string[]>} highwire
- * @prop {Record<string, string[]>} prism
- * @prop {Record<string, string[]>} twitter
- * @prop {string} [favicon]
- * @prop {string} [documentFingerprint]
  */
+type HTMLDocumentMetadata = {
+  title: string;
+  link: Link[];
+  dc: Record<string, string[]>;
+  eprints: Record<string, string[]>;
+  facebook: Record<string, string[]>;
+  highwire: Record<string, string[]>;
+  prism: Record<string, string[]>;
+  twitter: Record<string, string[]>;
+  favicon?: string;
+  documentFingerprint?: string;
+};
 
 /**
  * HTMLMetadata reads metadata/links from the current HTML document.
  */
 export class HTMLMetadata {
-  /**
-   * @param {object} [options]
-   *   @param {Document} [options.document]
-   */
-  constructor(options = {}) {
+  document: Document;
+
+  constructor(options: { document?: Document } = {}) {
     this.document = options.document || document;
   }
 
   /**
    * Returns the primary URI for the document being annotated
-   *
-   * @return {string}
    */
-  uri() {
+  uri(): string {
     let uri = decodeURIComponent(this._getDocumentHref());
 
     // Use the `link[rel=canonical]` element's href as the URL if present.
     const links = this._getLinks();
-    for (let link of links) {
+    for (const link of links) {
       if (link.rel === 'canonical') {
         uri = link.href;
       }
@@ -74,12 +62,9 @@ export class HTMLMetadata {
 
   /**
    * Return metadata for the current page.
-   *
-   * @return {HTMLDocumentMetadata}
    */
-  getDocumentMetadata() {
-    /** @type {HTMLDocumentMetadata} */
-    const metadata = {
+  getDocumentMetadata(): HTMLDocumentMetadata {
+    const metadata: HTMLDocumentMetadata = {
       title: document.title,
       link: [],
 
@@ -111,14 +96,14 @@ export class HTMLMetadata {
    * Return an array of all the `content` values of `<meta>` tags on the page
    * where the value of the attribute begins with `<prefix>`.
    *
-   * @param {string} attribute
-   * @param {string} prefix - it is interpreted as a regex
-   * @return {Record<string,string[]>}
+   * @param prefix - it is interpreted as a regex
    */
-  _getMetaTags(attribute, prefix) {
-    /** @type {Record<string,string[]>} */
-    const tags = {};
-    for (let meta of Array.from(this.document.querySelectorAll('meta'))) {
+  private _getMetaTags(
+    attribute: string,
+    prefix: string
+  ): Record<string, string[]> {
+    const tags: Record<string, string[]> = {};
+    for (const meta of Array.from(this.document.querySelectorAll('meta'))) {
       const name = meta.getAttribute(attribute);
       const { content } = meta;
       if (name && content) {
@@ -136,8 +121,7 @@ export class HTMLMetadata {
     return tags;
   }
 
-  /** @param {HTMLDocumentMetadata} metadata */
-  _getTitle(metadata) {
+  private _getTitle(metadata: HTMLDocumentMetadata): string {
     if (metadata.highwire.title) {
       return metadata.highwire.title[0];
     } else if (metadata.eprints.title) {
@@ -158,17 +142,19 @@ export class HTMLMetadata {
   /**
    * Get document URIs from `<link>` and `<meta>` elements on the page.
    *
-   * @param {Pick<HTMLDocumentMetadata, 'highwire'|'dc'>} [metadata] -
-   *   Dublin Core and Highwire metadata parsed from `<meta>` tags.
-   * @return {Link[]}
+   * @param [metadata] - Dublin Core and Highwire metadata parsed from `<meta>` tags.
    */
-  _getLinks(metadata = { dc: {}, highwire: {} }) {
-    /** @type {Link[]} */
-    const links = [{ href: this._getDocumentHref() }];
+  private _getLinks(
+    metadata: Pick<HTMLDocumentMetadata, 'highwire' | 'dc'> = {
+      dc: {},
+      highwire: {},
+    }
+  ): Link[] {
+    const links: Link[] = [{ href: this._getDocumentHref() }];
 
     // Extract links from `<link>` tags with certain `rel` values.
     const linkElements = Array.from(this.document.querySelectorAll('link'));
-    for (let link of linkElements) {
+    for (const link of linkElements) {
       if (
         !['alternate', 'canonical', 'bookmark', 'shortlink'].includes(link.rel)
       ) {
@@ -195,10 +181,10 @@ export class HTMLMetadata {
     }
 
     // Look for links in scholar metadata
-    for (let name of Object.keys(metadata.highwire)) {
+    for (const name of Object.keys(metadata.highwire)) {
       const values = metadata.highwire[name];
       if (name === 'pdf_url') {
-        for (let url of values) {
+        for (const url of values) {
           try {
             links.push({
               href: this._absoluteUrl(url),
@@ -224,10 +210,10 @@ export class HTMLMetadata {
     }
 
     // Look for links in Dublin Core data
-    for (let name of Object.keys(metadata.dc)) {
+    for (const name of Object.keys(metadata.dc)) {
       const values = metadata.dc[name];
       if (name === 'identifier') {
-        for (let id of values) {
+        for (const id of values) {
           if (id.slice(0, 4) === 'doi:') {
             links.push({ href: id });
           }
@@ -254,9 +240,9 @@ export class HTMLMetadata {
     return links;
   }
 
-  _getFavicon() {
+  private _getFavicon(): string | null {
     let favicon = null;
-    for (let link of Array.from(this.document.querySelectorAll('link'))) {
+    for (const link of Array.from(this.document.querySelectorAll('link'))) {
       if (['shortcut icon', 'icon'].includes(link.rel)) {
         try {
           favicon = this._absoluteUrl(link.href);
@@ -271,17 +257,17 @@ export class HTMLMetadata {
   /**
    * Convert a possibly relative URI to an absolute one. This will throw an
    * exception if the URL cannot be parsed.
-   *
-   * @param {string} url
    */
-  _absoluteUrl(url) {
+  private _absoluteUrl(url: string): string {
     return normalizeURI(url, this.document.baseURI);
   }
 
-  // Get the true URI record when it's masked via a different protocol.
-  // This happens when an href is set with a uri using the 'blob:' protocol
-  // but the document can set a different uri through a <base> tag.
-  _getDocumentHref() {
+  /**
+   * Get the true URI record when it's masked via a different protocol.
+   * This happens when an href is set with a uri using the 'blob:' protocol
+   * but the document can set a different uri through a <base> tag.
+   */
+  private _getDocumentHref(): string {
     const { href } = this.document.location;
     const allowedSchemes = ['http:', 'https:', 'file:'];
 
