@@ -121,7 +121,7 @@ function elementContentRect(element: Element) {
 function* textNodesInRect(
   root: Element,
   rect: DOMRect,
-  shouldVisit: (el: Element) => boolean = () => true
+  shouldVisit: (el: Element) => boolean
 ): Generator<Text> {
   let node: Node | null = root.firstChild;
   while (node) {
