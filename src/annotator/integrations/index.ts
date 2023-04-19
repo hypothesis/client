@@ -1,3 +1,4 @@
+import type { Annotator, Integration } from '../../types/annotator';
 import { HTMLIntegration } from './html';
 import { PDFIntegration, isPDF } from './pdf';
 import {
@@ -6,19 +7,10 @@ import {
 } from './vitalsource';
 
 /**
- * @typedef {import('../../types/annotator').Annotator} Annotator
- * @typedef {import('../../types/annotator').ContentInfoConfig} ContentInfoBanner
- * @typedef {import('../../types/annotator').Integration} Integration
- */
-
-/**
  * Create the integration that handles document-type specific aspects of
  * guest functionality.
- *
- * @param {Annotator} annotator
- * @return {Integration}
  */
-export function createIntegration(annotator) {
+export function createIntegration(annotator: Annotator): Integration {
   if (isPDF()) {
     return new PDFIntegration(annotator);
   }
