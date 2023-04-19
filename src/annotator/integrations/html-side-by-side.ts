@@ -1,4 +1,5 @@
 import { rectContains, rectIntersects } from '../util/geometry';
+import { nodeIsElement, nodeIsText } from '../util/node';
 
 /**
  * CSS selectors used to find elements that are considered potentially part
@@ -14,18 +15,14 @@ const contentSelectors = [
 /**
  * Attempt to guess the region of the page that contains the main content.
  *
- * @param {Element} root
- * @return {{ left: number, right: number }|null} -
- *   The left/right content margins or `null` if they could not be determined
+ * @return The left/right content margins or `null` if they could not be determined
  */
-export function guessMainContentArea(root) {
+export function guessMainContentArea(
+  root: Element
+): { left: number; right: number } | null {
   // Maps of (margin X coord, votes) for margin positions.
-
-  /** @type {Map<number,number>} */
-  const leftMarginVotes = new Map();
-
-  /** @type {Map<number,number>} */
-  const rightMarginVotes = new Map();
+  const leftMarginVotes = new Map<number, number>();
+  const rightMarginVotes = new Map<number, number>();
 
   // Gather data about the paragraphs of text in the document.
   //
@@ -37,7 +34,7 @@ export function guessMainContentArea(root) {
     .map(p => {
       // Gather some data about them.
       const rect = p.getBoundingClientRect();
-      const textLength = /** @type {string} */ (p.textContent).length;
+      const textLength = p.textContent!.length;
       return { rect, textLength };
     })
     .filter(({ rect }) => {
@@ -76,17 +73,12 @@ export function guessMainContentArea(root) {
   return { left: leftPos, right: rightPos };
 }
 
-/** @type {Range} */
-let textRectRange;
+let textRectRange: Range;
 
 /**
  * Return the viewport-relative rect occupied by part of a text node.
- *
- * @param {Text} text
- * @param {number} start
- * @param {number} end
  */
-function textRect(text, start = 0, end = text.data.length) {
+function textRect(text: Text, start = 0, end: number = text.data.length) {
   if (!textRectRange) {
     // Allocate a range only on the first call to avoid the overhead of
     // constructing and maintaining a large number of live ranges.
@@ -97,8 +89,7 @@ function textRect(text, start = 0, end = text.data.length) {
   return textRectRange.getBoundingClientRect();
 }
 
-/** @param {Element} element */
-function hasFixedPosition(element) {
+function hasFixedPosition(element: Element) {
   switch (getComputedStyle(element).position) {
     case 'fixed':
     case 'sticky':
@@ -112,10 +103,8 @@ function hasFixedPosition(element) {
  * Return the bounding rect that contains the element's content. Unlike
  * `Element.getBoundingClientRect`, this includes content which overflows
  * the element's specified size.
- *
- * @param {Element} element
  */
-function elementContentRect(element) {
+function elementContentRect(element: Element) {
   const rect = element.getBoundingClientRect();
   rect.x -= element.scrollLeft;
   rect.y -= element.scrollTop;
@@ -127,33 +116,29 @@ function elementContentRect(element) {
 /**
  * Yield all the text node descendants of `root` that intersect `rect`.
  *
- * @param {Element} root
- * @param {DOMRect} rect
- * @param {(el: Element) => boolean} shouldVisit - Optional filter that determines
- *   whether to visit a subtree
- * @return {Generator<Text>}
+ * @param shouldVisit - Optional filter that determines whether to visit a subtree
  */
-function* textNodesInRect(root, rect, shouldVisit = () => true) {
-  /** @type {Node|null} */
-  let node = root.firstChild;
+function* textNodesInRect(
+  root: Element,
+  rect: DOMRect,
+  shouldVisit: (el: Element) => boolean = () => true
+): Generator<Text> {
+  let node: Node | null = root.firstChild;
   while (node) {
-    if (node.nodeType === Node.ELEMENT_NODE) {
-      const element = /** @type {Element} */ (node);
+    if (nodeIsElement(node)) {
       const contentIntersectsRect = rectIntersects(
-        elementContentRect(element),
+        elementContentRect(node),
         rect
       );
 
       // Only examine subtrees which are visible.
-      if (shouldVisit(element) && contentIntersectsRect) {
-        yield* textNodesInRect(element, rect, shouldVisit);
+      if (shouldVisit(node) && contentIntersectsRect) {
+        yield* textNodesInRect(node, rect, shouldVisit);
       }
-    } else if (node.nodeType === Node.TEXT_NODE) {
-      const text = /** @type {Text} */ (node);
-
+    } else if (nodeIsText(node)) {
       // Skip over text nodes which are entirely outside the viewport or empty.
-      if (rectIntersects(textRect(text), rect)) {
-        yield text;
+      if (rectIntersects(textRect(node), rect)) {
+        yield node;
       }
     }
     node = node.nextSibling;
@@ -164,25 +149,21 @@ function* textNodesInRect(root, rect, shouldVisit = () => true) {
  * Find content within an element to use as an anchor when applying a layout
  * change to the document.
  *
- * @param {Element} root
- * @param {DOMRect} viewport
- * @return {Range|null} - Range to use as an anchor or `null` if a suitable
- *   range could not be found
+ * @return Range to use as an anchor or `null` if a suitable range could not be found
  */
-function getScrollAnchor(root, viewport) {
+function getScrollAnchor(root: Element, viewport: DOMRect): Range | null {
   // Range representing the content whose position within the viewport we will
   // try to maintain after running the callback.
-  let anchorRange = /** @type {Range|null} */ (null);
+  let anchorRange: Range | null = null;
 
   // Find the first word (non-whitespace substring of a text node) that is fully
   // visible in the viewport.
 
   // Text inside fixed-position elements is ignored because its position won't
   // be affected by a layout change and so it makes a poor scroll anchor.
-  /** @param {Element} el */
-  const shouldVisit = el => !hasFixedPosition(el);
+  const shouldVisit = (el: Element) => !hasFixedPosition(el);
 
-  textNodeLoop: for (let textNode of textNodesInRect(
+  textNodeLoop: for (const textNode of textNodesInRect(
     root,
     viewport,
     shouldVisit
@@ -190,7 +171,7 @@ function getScrollAnchor(root, viewport) {
     let textLen = 0;
 
     // Visit all the non-whitespace substrings of the text node.
-    for (let word of textNode.data.split(/\b/)) {
+    for (const word of textNode.data.split(/\b/)) {
       if (/\S/.test(word)) {
         const start = textLen;
         const end = textLen + word.length;
@@ -217,20 +198,19 @@ function getScrollAnchor(root, viewport) {
  * and tries to preserve the position of this content within the viewport
  * after the callback is invoked.
  *
- * @param {() => void} callback - Callback that will apply the layout change
- * @param {Element} [scrollRoot]
- * @param {DOMRect} [viewport] - Area to consider "in the viewport". Defaults to
- *   the viewport of the current window.
- * @return {number} - Amount by which the scroll position was adjusted to keep
- *   the anchored content in view
+ * @param callback - Callback that will apply the layout change
+ * @param [viewport] - Area to consider "in the viewport". Defaults to the
+ *   viewport of the current window.
+ * @return Amount by which the scroll position was adjusted to keep the anchored
+ *   content in view
  */
 export function preserveScrollPosition(
-  callback,
+  callback: () => void,
   /* istanbul ignore next */
-  scrollRoot = document.documentElement,
+  scrollRoot: Element = document.documentElement,
   /* istanbul ignore next */
-  viewport = new DOMRect(0, 0, window.innerWidth, window.innerHeight)
-) {
+  viewport: DOMRect = new DOMRect(0, 0, window.innerWidth, window.innerHeight)
+): number {
   const anchor = getScrollAnchor(scrollRoot, viewport);
   if (!anchor) {
     callback();
