@@ -109,7 +109,7 @@ gulp.task('watch-boot-script', () => {
       //
       // We could alternatively use `watchJS` to rebuild the bundle, but we'd
       // need to make its logging less noisy first.
-      'src/boot/**/*.js',
+      'src/boot/**/*.{js,ts,tsx}',
     ],
     { delay: 500 },
     gulp.task('build-boot-script')

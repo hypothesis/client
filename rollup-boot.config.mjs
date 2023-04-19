@@ -64,11 +64,11 @@ export default {
       // Rollup docs recommend against "inline", but for this tiny bundle it
       // produces a prod bundle of the same size and dev bundle that has less cruft in it.
       babelHelpers: 'inline',
-
       exclude: 'node_modules/**',
+      extensions: ['.js', '.ts', '.tsx']
     }),
     json(),
-    nodeResolve(),
+    nodeResolve({ extensions: ['.js', '.ts', '.tsx'] }),
     ...prodPlugins,
   ],
 };
