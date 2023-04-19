@@ -1,35 +1,31 @@
+import type { PDFViewerApplication } from '../../types/pdfjs';
 import { normalizeURI } from '../util/url';
 
-/**
- * @typedef {import('../../types/pdfjs').PDFViewerApplication} PDFViewerApplication
- */
+type Link = { href: string };
 
-/**
- * @typedef Link
- * @prop {string} href
- */
+type Metadata = {
+  /** The document title */
+  title: string;
+  /** Array of URIs associated with this document */
+  link: Link[];
 
-/**
- * @typedef Metadata
- * @prop {string} title - The document title
- * @prop {Link[]} link - Array of URIs associated with this document
- * @prop {string} documentFingerprint - The fingerprint of this PDF. This is
- *   referred to as the "File Identifier" in the PDF spec. It may be a hash of
- *   part of the content if the PDF file does not have a File Identifier.
- *
- *   PDFs may have two file identifiers. The first is the "original" identifier
- *   which is not supposed to change if the file is updated and the second
- *   one is the "last modified" identifier. This property is the original
- *   identifier.
- */
+  /**
+   * The fingerprint of this PDF. This is referred to as the "File Identifier"
+   * in the PDF spec. It may be a hash of part of the content if the PDF file
+   * does not have a File Identifier.
+   *
+   * PDFs may have two file identifiers. The first is the "original" identifier
+   * which is not supposed to change if the file is updated and the second
+   * one is the "last modified" identifier. This property is the original
+   * identifier.
+   */
+  documentFingerprint: string;
+};
 
 /**
  * Wait for a PDFViewerApplication to be initialized.
- *
- * @param {PDFViewerApplication} app
- * @return {Promise<void>}
  */
-function pdfViewerInitialized(app) {
+function pdfViewerInitialized(app: PDFViewerApplication): Promise<void> {
   // `initializedPromise` was added in PDF.js v2.4.456.
   // See https://github.com/mozilla/pdf.js/pull/11607. In earlier versions the
   // `initialized` property can be queried.
@@ -65,14 +61,15 @@ function pdfViewerInitialized(app) {
  * })
  */
 export class PDFMetadata {
+  private _loaded: Promise<PDFViewerApplication>;
+
   /**
    * Construct a `PDFMetadata` that returns URIs/metadata associated with a
    * given PDF viewer.
    *
-   * @param {PDFViewerApplication} app - The `PDFViewerApplication` global from PDF.js
+   * @param app - The `PDFViewerApplication` global from PDF.js
    */
-  constructor(app) {
-    /** @type {Promise<PDFViewerApplication>} */
+  constructor(app: PDFViewerApplication) {
     this._loaded = pdfViewerInitialized(app).then(() => {
       // Check if document has already loaded.
       if (app.downloadComplete) {
@@ -115,10 +112,8 @@ export class PDFMetadata {
    *
    * If the PDF is currently loading, the returned promise resolves once loading
    * is complete.
-   *
-   * @return {Promise<string>}
    */
-  getUri() {
+  getUri(): Promise<string> {
     return this._loaded.then(app => {
       let uri = getPDFURL(app);
       if (!uri) {
@@ -133,10 +128,8 @@ export class PDFMetadata {
    *
    * If the PDF is currently loading, the returned promise resolves once loading
    * is complete.
-   *
-   * @return {Promise<Metadata>}
    */
-  async getMetadata() {
+  async getMetadata(): Promise<Metadata> {
     const app = await this._loaded;
     const {
       info: documentInfo,
@@ -157,7 +150,7 @@ export class PDFMetadata {
     // This logic is similar to how PDF.js sets `document.title`.
     let title;
     if (metadata?.has('dc:title') && metadata.get('dc:title') !== 'Untitled') {
-      title = /** @type {string} */ (metadata.get('dc:title'));
+      title = metadata.get('dc:title');
     } else if (documentInfo?.Title) {
       title = documentInfo.Title;
     } else if (contentDispositionFilename) {
@@ -183,32 +176,24 @@ export class PDFMetadata {
 
 /**
  * Get the fingerprint/file identifier of the currently loaded PDF.
- *
- * @param {PDFViewerApplication} app
  */
-function getFingerprint(app) {
+function getFingerprint(app: PDFViewerApplication): string {
   if (Array.isArray(app.pdfDocument.fingerprints)) {
     return app.pdfDocument.fingerprints[0];
   } else {
-    return /** @type {string} */ (app.pdfDocument.fingerprint);
+    return app.pdfDocument.fingerprint!;
   }
 }
 
 /**
  * Generate a URI from a PDF fingerprint suitable for storing as the main
  * or associated URI of an annotation.
- *
- * @param {string} fingerprint
  */
-function fingerprintToURN(fingerprint) {
+function fingerprintToURN(fingerprint: string) {
   return `urn:x-pdf:${fingerprint}`;
 }
 
-/**
- * @param {PDFViewerApplication} app
- * @return {string|null} - Valid URL string or `null`
- */
-function getPDFURL(app) {
+function getPDFURL(app: PDFViewerApplication): string | null {
   if (!app.url) {
     return null;
   }
@@ -227,11 +212,8 @@ function getPDFURL(app) {
 
 /**
  * Return the last component of the path part of a URL.
- *
- * @param {string} url - A valid URL string
- * @return {string}
  */
-function filenameFromURL(url) {
+function filenameFromURL(url: string): string {
   const parsed = new URL(url);
   const pathSegments = parsed.pathname.split('/');
   return pathSegments[pathSegments.length - 1];
