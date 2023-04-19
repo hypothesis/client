@@ -1,3 +1,5 @@
+import { nodeIsText } from './util/node';
+
 /**
  * Returns true if the start point of a selection occurs after the end point,
  * in document order.
@@ -49,10 +51,6 @@ export function forEachNodeInRange(range: Range, callback: (n: Node) => void) {
       callback(currentNode);
     }
   }
-}
-
-function nodeIsText(node: Node): node is Text {
-  return node.nodeType === Node.TEXT_NODE;
 }
 
 function textNodeContainsText(textNode: Text): boolean {
