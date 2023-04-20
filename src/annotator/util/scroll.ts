@@ -35,7 +35,7 @@ export function offsetRelativeTo(
   return offset;
 }
 
-type DurationOptions = { maxDuration?: number };
+export type DurationOptions = { maxDuration?: number };
 
 /**
  * Scroll `element` until its `scrollTop` offset reaches a target value.
