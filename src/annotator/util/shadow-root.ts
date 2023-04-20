@@ -1,14 +1,12 @@
 /**
  * Load stylesheets for annotator UI components into the shadow DOM root.
- *
- * @param {ShadowRoot} shadowRoot
  */
-function loadStyles(shadowRoot) {
+function loadStyles(shadowRoot: ShadowRoot) {
   // Find the preloaded stylesheet added by the boot script.
-  const url = /** @type {HTMLLinkElement|undefined} */ (
+  const url = (
     document.querySelector(
       'link[rel="preload"][href*="/build/styles/annotator.css"]'
-    )
+    ) as HTMLLinkElement | undefined
   )?.href;
 
   if (!url) {
@@ -25,10 +23,9 @@ function loadStyles(shadowRoot) {
  * Create the shadow root for an annotator UI component and load the annotator
  * CSS styles into it.
  *
- * @param {HTMLElement} container - Container element to render the UI into
- * @return {ShadowRoot}
+ * @param container - Container element to render the UI into
  */
-export function createShadowRoot(container) {
+export function createShadowRoot(container: HTMLElement): ShadowRoot {
   const shadowRoot = container.attachShadow({ mode: 'open' });
   loadStyles(shadowRoot);
 
@@ -53,10 +50,8 @@ export function createShadowRoot(container) {
  * Another benefit is that click and touchstart typically causes the sidebar to close.
  * By preventing the bubble up of these events, we don't have to individually stop
  * the propagation.
- *
- * @param {HTMLElement|ShadowRoot} element
  */
-function stopEventPropagation(element) {
+function stopEventPropagation(element: HTMLElement | ShadowRoot) {
   element.addEventListener('mouseup', event => event.stopPropagation());
   element.addEventListener('mousedown', event => event.stopPropagation());
   element.addEventListener('touchstart', event => event.stopPropagation(), {
