@@ -1,26 +1,17 @@
 /**
  * Get the node name for use in generating an xpath expression.
- *
- * @param {Node} node
  */
-function getNodeName(node) {
+function getNodeName(node: Node): string {
   const nodeName = node.nodeName.toLowerCase();
-  let result = nodeName;
-  if (nodeName === '#text') {
-    result = 'text()';
-  }
-  return result;
+  return nodeName === '#text' ? 'text()' : nodeName;
 }
 
 /**
  * Get the index of the node as it appears in its parent's child list
- *
- * @param {Node} node
  */
-function getNodePosition(node) {
+function getNodePosition(node: Node): number {
   let pos = 0;
-  /** @type {Node|null} */
-  let tmp = node;
+  let tmp: Node | null = node;
   while (tmp) {
     if (tmp.nodeName === node.nodeName) {
       pos += 1;
@@ -30,8 +21,7 @@ function getNodePosition(node) {
   return pos;
 }
 
-/** @param {Node} node */
-function getPathSegment(node) {
+function getPathSegment(node: Node): string {
   const name = getNodeName(node);
   const pos = getNodePosition(node);
   return `${name}[${pos}]`;
@@ -41,14 +31,13 @@ function getPathSegment(node) {
  * A simple XPath generator which can generate XPaths of the form
  * /tag[index]/tag[index].
  *
- * @param {Node} node - The node to generate a path to
- * @param {Node} root - Root node to which the returned path is relative
+ * @param node - The node to generate a path to
+ * @param root - Root node to which the returned path is relative
  */
-export function xpathFromNode(node, root) {
+export function xpathFromNode(node: Node, root: Node) {
   let xpath = '';
 
-  /** @type {Node|null} */
-  let elem = node;
+  let elem: Node | null = node;
   while (elem !== root) {
     if (!elem) {
       throw new Error('Node is not a descendant of root');
@@ -65,12 +54,12 @@ export function xpathFromNode(node, root) {
 /**
  * Return the `index`'th immediate child of `element` whose tag name is
  * `nodeName` (case insensitive).
- *
- * @param {Element} element
- * @param {string} nodeName
- * @param {number} index
  */
-function nthChildOfType(element, nodeName, index) {
+function nthChildOfType(
+  element: Element,
+  nodeName: string,
+  index: number
+): Element | null {
   nodeName = nodeName.toUpperCase();
 
   let matchIndex = -1;
@@ -99,16 +88,12 @@ function nthChildOfType(element, nodeName, index) {
  *  - Is not affected by the document's _type_ (HTML or XML/XHTML)
  *  - Ignores element namespaces when matching element names in the XPath against
  *    elements in the DOM tree
- *  - Is case insensitive for all elements, not just HTML elements
+ *  - Is case-insensitive for all elements, not just HTML elements
  *
  * The matching element is returned or `null` if no such element is found.
  * An error is thrown if `xpath` is not a simple XPath.
- *
- * @param {string} xpath
- * @param {Element} root
- * @return {Element|null}
  */
-function evaluateSimpleXPath(xpath, root) {
+function evaluateSimpleXPath(xpath: string, root: Element): Element | null {
   const isSimpleXPath =
     xpath.match(/^(\/[A-Za-z0-9-]+(\[[0-9]+\])?)+$/) !== null;
   if (!isSimpleXPath) {
@@ -122,7 +107,7 @@ function evaluateSimpleXPath(xpath, root) {
   // has at least two segments, with the first being empty and the others non-empty.
   segments.shift();
 
-  for (let segment of segments) {
+  for (const segment of segments) {
     let elementName;
     let elementIndex;
 
@@ -156,12 +141,12 @@ function evaluateSimpleXPath(xpath, root) {
  *
  * Example:
  *   node = nodeFromXPath('/main/article[1]/p[3]', document.body)
- *
- * @param {string} xpath
- * @param {Element} [root]
- * @return {Node|null}
  */
-export function nodeFromXPath(xpath, root = document.body) {
+export function nodeFromXPath(
+  xpath: string,
+  /* istanbul ignore next */
+  root: Element = document.body
+): Node | null {
   try {
     return evaluateSimpleXPath(xpath, root);
   } catch (err) {
