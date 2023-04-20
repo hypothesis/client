@@ -15,13 +15,14 @@ function createTimeout(delay, message) {
 /**
  * Make a JSON-RPC call to a server in another frame using `postMessage`.
  *
+ * @template T
  * @param {Window} frame - Frame to send call to
  * @param {string} origin - Origin filter for `window.postMessage` call
  * @param {string} method - Name of the JSON-RPC method
  * @param {unknown[]} params - Parameters of the JSON-RPC method
  * @param {number} [timeout] - Maximum time to wait in ms
  * @param {Window} [window_] - Test seam.
- * @return {Promise<unknown>} - A Promise for the response to the call
+ * @return {Promise<T>} - A Promise for the response to the call
  */
 export function call(
   frame,

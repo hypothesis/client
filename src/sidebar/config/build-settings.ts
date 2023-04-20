@@ -1,25 +1,21 @@
+import type {
+  ConfigFromHost,
+  ConfigFromAnnotator,
+  ConfigFromEmbedder,
+  ConfigFromSidebar,
+  RPCSettings,
+  SidebarSettings,
+} from '../../types/config';
 import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
 import { getApiUrl } from './get-api-url';
 import { hostPageConfig } from './host-config';
 
 /**
- * @typedef {import('../../types/config').ConfigFromHost} ConfigFromHost
- * @typedef {import('../../types/config').ConfigFromAnnotator} ConfigFromAnnotator
- * @typedef {import('../../types/config').ConfigFromEmbedder} ConfigFromEmbedder
- * @typedef {import('../../types/config').ConfigFromSidebar} ConfigFromSidebar
- * @typedef {import('../../types/config').RPCSettings} RPCSettings
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../../types/config').Service['groups']} ServiceGroups
- */
-
-/**
  * Ascend `levels` from `window_` to find the designated embedder frame.
  *
- * @param {number} levels - Number of ancestors levels to ascend
- * @param {Window=} window_
- * @return {Window}
+ * @param levels - Number of ancestors levels to ascend
  */
-function getEmbedderFrame(levels, window_ = window) {
+function getEmbedderFrame(levels: number, window_: Window = window): Window {
   let ancestorWindow = window_;
   for (let i = 0; i < levels; i++) {
     if (ancestorWindow === ancestorWindow.top) {
@@ -40,14 +36,11 @@ function getEmbedderFrame(levels, window_ = window) {
  * This function (maybe) mutates values in the provided `configFromHost`'s
  * ServiceGroups: `$rpc:requestGroups` values are replaced with
  * `Promise<string[]>`.
- *
- * @see ServiceGroups
- *
- * @param {ConfigFromHost} configFromHost
- * @param {RPCSettings} rpcSettings
- * @return {ConfigFromHost}
  */
-function fetchServiceGroups(configFromHost, rpcSettings) {
+function fetchServiceGroups(
+  configFromHost: ConfigFromHost,
+  rpcSettings: RPCSettings
+): ConfigFromHost {
   const services = configFromHost.services;
   if (!Array.isArray(services)) {
     return configFromHost;
@@ -56,19 +49,17 @@ function fetchServiceGroups(configFromHost, rpcSettings) {
     if (service.groups === '$rpc:requestGroups') {
       // The `groups` need to be fetched from a secondary RPC call and
       // there should be no timeout as it may be waiting for user input.
-      service.groups = /** @type {Promise<string[]>} */ (
-        postMessageJsonRpc
-          .call(
-            rpcSettings.targetFrame,
-            rpcSettings.origin,
-            'requestGroups',
-            [index],
-            0 // no timeout
-          )
-          .catch(() => {
-            throw new Error('Unable to fetch groups');
-          })
-      );
+      service.groups = postMessageJsonRpc
+        .call<string[]>(
+          rpcSettings.targetFrame,
+          rpcSettings.origin,
+          'requestGroups',
+          [index],
+          0 // no timeout
+        )
+        .catch(() => {
+          throw new Error('Unable to fetch groups');
+        });
     }
   });
   return configFromHost;
@@ -76,12 +67,11 @@ function fetchServiceGroups(configFromHost, rpcSettings) {
 
 /**
  * Derive RPC settings from the provided `ConfigFromAnnotator`, if any are present.
- *
- * @param {ConfigFromAnnotator} configFromAnnotator
- * @param {Window} window_
- * @return {import('../../types/config').RPCSettings|null}
  */
-function buildRPCSettings(configFromAnnotator, window_) {
+function buildRPCSettings(
+  configFromAnnotator: ConfigFromAnnotator,
+  window_: Window
+): RPCSettings | null {
   const rpcConfig = configFromAnnotator.requestConfigFromFrame;
   if (!rpcConfig) {
     return null;
@@ -101,20 +91,17 @@ function buildRPCSettings(configFromAnnotator, window_) {
 
 /**
  * Retrieve host configuration from embedder frame
- *
- * @param {ConfigFromAnnotator} configFromAnnotator
- * @param {RPCSettings} rpcSettings
- * @return {Promise<ConfigFromEmbedder>}
  */
-async function getEmbedderConfig(configFromAnnotator, rpcSettings) {
-  const configFromEmbedder = /** @type {ConfigFromEmbedder} */ (
-    await postMessageJsonRpc.call(
-      rpcSettings.targetFrame,
-      rpcSettings.origin,
-      'requestConfig',
-      [],
-      3000
-    )
+async function getEmbedderConfig(
+  configFromAnnotator: ConfigFromAnnotator,
+  rpcSettings: RPCSettings
+): Promise<ConfigFromEmbedder> {
+  const configFromEmbedder = await postMessageJsonRpc.call<ConfigFromEmbedder>(
+    rpcSettings.targetFrame,
+    rpcSettings.origin,
+    'requestConfig',
+    [],
+    3000
   );
 
   // In cases where host configuration is requested from the embedder frame
@@ -138,11 +125,12 @@ async function getEmbedderConfig(configFromAnnotator, rpcSettings) {
  * @see {ConfigFromEmbedder}
  * @see {ConfigFromHost}
  *
- * @param {ConfigFromSidebar} configFromSidebar
- * @param {Window} window_ - Test seam
- * @return {Promise<SidebarSettings>} - The merged settings
+ * @return The merged settings
  */
-export async function buildSettings(configFromSidebar, window_ = window) {
+export async function buildSettings(
+  configFromSidebar: ConfigFromSidebar,
+  window_: Window = window
+): Promise<SidebarSettings> {
   const configFromAnnotator = hostPageConfig(window);
 
   const rpcSettings = buildRPCSettings(configFromAnnotator, window_);
@@ -160,8 +148,7 @@ export async function buildSettings(configFromSidebar, window_ = window) {
     configFromHost = configFromAnnotator;
   }
 
-  /** @type {SidebarSettings} */
-  const sidebarSettings = {
+  const sidebarSettings: SidebarSettings = {
     ...configFromSidebar,
     ...configFromHost,
   };
