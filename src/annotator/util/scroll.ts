@@ -3,7 +3,7 @@ import scrollIntoView from 'scroll-into-view';
 /**
  * Return a promise that resolves on the next animation frame.
  */
-function nextAnimationFrame() {
+function nextAnimationFrame(): Promise<number> {
   return new Promise(resolve => {
     requestAnimationFrame(resolve);
   });
@@ -12,46 +12,44 @@ function nextAnimationFrame() {
 /**
  * Linearly interpolate between two values.
  *
- * @param {number} a
- * @param {number} b
- * @param {number} fraction - Value in [0, 1]
+ * @param fraction - Value in [0, 1]
  */
-function interpolate(a, b, fraction) {
+function interpolate(a: number, b: number, fraction: number): number {
   return a + fraction * (b - a);
 }
 
 /**
  * Return the offset of `element` from the top of a positioned ancestor `parent`.
  *
- * @param {HTMLElement} element
- * @param {HTMLElement} parent - Positioned ancestor of `element`
- * @return {number}
+ * @param parent - Positioned ancestor of `element`
  */
-export function offsetRelativeTo(element, parent) {
+export function offsetRelativeTo(
+  element: HTMLElement,
+  parent: HTMLElement
+): number {
   let offset = 0;
   while (element !== parent && parent.contains(element)) {
     offset += element.offsetTop;
-    element = /** @type {HTMLElement} */ (element.offsetParent);
+    element = element.offsetParent as HTMLElement;
   }
   return offset;
 }
 
+type DurationOptions = { maxDuration?: number };
+
 /**
  * Scroll `element` until its `scrollTop` offset reaches a target value.
  *
- * @param {Element} element - Container element to scroll
- * @param {number} offset - Target value for the scroll offset
- * @param {object} options
- *   @param {number} [options.maxDuration]
- * @return {Promise<void>} - A promise that resolves once the scroll animation
- *   is complete
+ * @param element - Container element to scroll
+ * @param offset - Target value for the scroll offset
+ * @return A promise that resolves once the scroll animation is complete
  */
 export async function scrollElement(
-  element,
-  offset,
+  element: Element,
+  offset: number,
   /* istanbul ignore next - defaults are overridden in tests */
-  { maxDuration = 500 } = {}
-) {
+  { maxDuration = 500 }: DurationOptions = {}
+): Promise<void> {
   const startOffset = element.scrollTop;
   const endOffset = offset;
   const scrollStart = Date.now();
@@ -74,16 +72,12 @@ export async function scrollElement(
 
 /**
  * Smoothly scroll an element into view.
- *
- * @param {HTMLElement} element
- * @param {object} options
- *   @param {number} [options.maxDuration]
  */
 export async function scrollElementIntoView(
-  element,
+  element: HTMLElement,
   /* istanbul ignore next - defaults are overridden in tests */
-  { maxDuration = 500 } = {}
-) {
+  { maxDuration = 500 }: DurationOptions = {}
+): Promise<void> {
   // Make the body's `tagName` return an upper-case string in XHTML documents
   // like it does in HTML documents. This is a workaround for
   // `scrollIntoView`'s detection of the <body> element. See
