@@ -3,16 +3,13 @@ import { useMemo } from 'preact/hooks';
 import { username } from '../../helpers/account-id';
 import { annotationDisplayName } from '../../helpers/annotation-user';
 import { useSidebarStore } from '../../store';
-
-/** @typedef {import('../../store/modules/filters').FilterOption} FilterOption */
+import type { FilterOption } from '../../store/modules/filters';
 
 /**
  * Generate a list of users for filtering annotations; update when set of
  * annotations or filter state changes meaningfully.
- *
- * @return {FilterOption[]}
  */
-export function useUserFilterOptions() {
+export function useUserFilterOptions(): FilterOption[] {
   const store = useSidebarStore();
   const annotations = store.allAnnotations();
   const focusFilters = store.getFocusFilters();
@@ -22,8 +19,7 @@ export function useUserFilterOptions() {
 
   return useMemo(() => {
     // Determine unique users (authors) in annotation collection
-    /** @type {Record<string, string>} */
-    const users = {};
+    const users: Record<string, string> = {};
     annotations.forEach(annotation => {
       const username_ = username(annotation.user);
       users[username_] = annotationDisplayName(

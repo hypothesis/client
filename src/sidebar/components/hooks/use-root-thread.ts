@@ -1,17 +1,15 @@
 import { useMemo } from 'preact/hooks';
 
+import type { Thread } from '../../helpers/build-thread';
 import { threadAnnotations } from '../../helpers/thread-annotations';
+import type { ThreadState } from '../../helpers/thread-annotations';
 import { useSidebarStore } from '../../store';
-
-/** @typedef {import('../../helpers/build-thread').Thread} Thread */
 
 /**
  * Gather together state relevant to building a root thread of annotations and
  * replies and return an updated root thread when changes occur.
- *
- * @return {Thread}
  */
-export function useRootThread() {
+export function useRootThread(): Thread {
   const store = useSidebarStore();
   const annotations = store.allAnnotations();
   const query = store.filterQuery();
@@ -19,8 +17,7 @@ export function useRootThread() {
   const selectionState = store.selectionState();
   const filters = store.getFilterValues();
 
-  const threadState = useMemo(() => {
-    /** @type {Record<string,string>} */
+  const threadState = useMemo((): ThreadState => {
     return {
       annotations,
       route,
