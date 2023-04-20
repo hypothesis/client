@@ -7,7 +7,7 @@ import { shouldShowInTab } from './tabs';
 import { sorters } from './thread-sorters';
 import { filterAnnotations } from './view-filter';
 
-type ThreadState = {
+export type ThreadState = {
   annotations: Annotation[];
   route: string | null;
   selection: {
