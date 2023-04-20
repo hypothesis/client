@@ -1,13 +1,13 @@
 /**
  * Find the smallest offset in `str` which contains at least `count` chars
  * that match `filter` before it.
- *
- * @param {string} str
- * @param {number} count
- * @param {(char: string) => boolean} filter
- * @param {number} [startPos]
  */
-function advance(str, count, filter, startPos = 0) {
+function advance(
+  str: string,
+  count: number,
+  filter: (char: string) => boolean,
+  startPos = 0
+): number {
   let pos = startPos;
   while (pos < str.length && count > 0) {
     if (filter(str[pos])) {
@@ -20,13 +20,13 @@ function advance(str, count, filter, startPos = 0) {
 
 /**
  * Count characters which match `filter` in `str`.
- *
- * @param {string} str
- * @param {(char: string) => boolean} filter
- * @param {number} startPos
- * @param {number} endPos
  */
-function countChars(str, filter, startPos, endPos) {
+function countChars(
+  str: string,
+  filter: (char: string) => boolean,
+  startPos: number,
+  endPos: number
+): number {
   let count = 0;
   for (let pos = startPos; pos < endPos; pos++) {
     if (filter(str[pos])) {
@@ -58,20 +58,23 @@ function countChars(str, filter, startPos, endPos) {
  *   // The returned offsets select the substring "b c" in the "output" argument.
  *   translateOffsets('abcd', ' a b c d ', 1, 3, char => char !== ' ')
  *
- * @param {string} input
- * @param {string} output
- * @param {number} start - Start offset in `input`
- * @param {number} end - End offset in `input`
- * @param {(ch: string) => boolean} filter - Filter function that returns true
- *   if a character should be counted when relating positions between `input`
- *   and `output`.
- * @return {[number, number]} - Start and end offsets in `output`
+ * @param start - Start offset in `input`
+ * @param end - End offset in `input`
+ * @param filter - Filter function that returns true if a character should be
+ *   counted when relating positions between `input` and `output`.
+ * @return Start and end offsets in `output`
  */
-export function translateOffsets(input, output, start, end, filter) {
+export function translateOffsets(
+  input: string,
+  output: string,
+  start: number,
+  end: number,
+  filter: (ch: string) => boolean
+): [number, number] {
   const beforeStartCount = countChars(input, filter, 0, start);
   const startToEndCount = countChars(input, filter, start, end);
 
-  // Find smallest offset in `output` with same number of non-ignored characters
+  // Find the smallest offset in `output` with same number of non-ignored characters
   // before it as before `start` in the input. This offset might correspond to
   // an ignored character.
   let outputStart = advance(output, beforeStartCount, filter);
