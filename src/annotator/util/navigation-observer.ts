@@ -6,14 +6,14 @@ import { ListenerCollection } from '../../shared/listener-collection';
  *
  * The `handler` is not invoked if the observed method throws.
  *
- * @template {any} T
- * @param {T} object
- * @param {keyof T} method
- * @param {(...args: unknown[]) => void} handler - Handler that is invoked
- *   after the monitored method has been called.
- * @return {() => void} Callback that removes the observer and restores `object[method]`.
+ * @param handler - Handler that is invoked after the monitored method has been called.
+ * @return Callback that removes the observer and restores `object[method]`.
  */
-function observeCalls(object, method, handler) {
+function observeCalls<T>(
+  object: T,
+  method: keyof T,
+  handler: (...args: unknown[]) => void
+): () => void {
   const origHandler = object[method];
 
   /* istanbul ignore next */
@@ -21,21 +21,20 @@ function observeCalls(object, method, handler) {
     throw new Error('Can only intercept functions');
   }
 
-  /** @param {unknown[]} args */
-  const wrapper = (...args) => {
+  const wrapper = (...args: unknown[]) => {
     const result = origHandler.call(object, ...args);
     handler(...args);
     return result;
   };
-  object[method] = /** @type {any} */ (wrapper);
+  // @ts-expect-error Already checked type is function some lines above
+  object[method] = wrapper;
 
   return () => {
     object[method] = origHandler;
   };
 }
 
-/** @param {string} url */
-function stripFragment(url) {
+function stripFragment(url: string): string {
   return url.replace(/#.*/, '');
 }
 
@@ -45,11 +44,9 @@ function stripFragment(url) {
  * This is a wrapper around `window.navigation` which checks both that the
  * object exists and has the expected type. See also
  * https://github.com/hypothesis/client/issues/5324.
- *
- * @return {EventTarget|null}
  */
-export function getNavigation() {
-  const navigation = /** @type {any} */ (window).navigation;
+export function getNavigation(): EventTarget | null {
+  const navigation = (window as any).navigation;
   if (
     // @ts-expect-error - Navigation API is missing from TS
     typeof Navigation === 'function' &&
@@ -76,16 +73,19 @@ export function getNavigation() {
  * [2] https://developer.mozilla.org/en-US/docs/Web/API/History
  */
 export class NavigationObserver {
+  private _listeners: ListenerCollection;
+  private _unpatchHistory: (() => void) | undefined;
+
   /**
    * Begin observing navigation changes.
    *
-   * @param {(url: string) => void} onNavigate - Callback invoked when a navigation
+   * @param onNavigate - Callback invoked when a navigation
    *   occurs. The callback is fired after the navigation has completed and the
    *   new URL is reflected in `location.href`.
-   * @param {() => string} getLocation - Test seam that returns the current URL
+   * @param getLocation - Test seam that returns the current URL
    */
   constructor(
-    onNavigate,
+    onNavigate: (url: string) => void,
     /* istanbul ignore next - default overridden in tests */
     getLocation = () => location.href
   ) {
