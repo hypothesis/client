@@ -5,17 +5,13 @@ import {
   toObject,
   toString,
 } from '../../shared/type-coercions';
-
-/** @typedef {import('../../types/config').ConfigFromAnnotator} ConfigFromAnnotator */
+import type { ConfigFromAnnotator } from '../../types/config';
 
 /**
  * Return the app configuration specified by the frame embedding the Hypothesis
  * client.
- *
- * @param {Window} window
- * @return {ConfigFromAnnotator}
  */
-export function hostPageConfig(window) {
+export function hostPageConfig(window: Window): ConfigFromAnnotator {
   const config = parseConfigFragment(window.location.href);
 
   // Known configuration parameters which we will import from the host page.
@@ -70,7 +66,7 @@ export function hostPageConfig(window) {
   // into the config and this ensures they safely work downstream even if they
   // are incorrect.
   //
-  // Currently we are only handling the following config values do to the fact
+  // Currently, we are only handling the following config values due to the fact
   // that via3 will soon discontinue passing boolean types or integer types.
   //  - requestConfigFromFrame
   //  - openSidebar
@@ -79,20 +75,18 @@ export function hostPageConfig(window) {
   // even validate all such config values.
   // See https://github.com/hypothesis/client/issues/1968
 
-  /** @type {Record<string, (value: unknown) => unknown>} */
-  const coercions = {
+  const coercions: Record<string, (value: unknown) => unknown> = {
     openSidebar: toBoolean,
 
-    /** @param {unknown} value */
     requestConfigFromFrame: value => {
       if (typeof value === 'string') {
         // Legacy `requestConfigFromFrame` value which holds only the origin.
         return value;
       }
-      const objectVal =
-        /** @type {{ origin: unknown, ancestorLevel: unknown }} */ (
-          toObject(value)
-        );
+      const objectVal = toObject(value) as {
+        origin: unknown;
+        ancestorLevel: unknown;
+      };
       return {
         origin: toString(objectVal.origin),
         ancestorLevel: toInteger(objectVal.ancestorLevel),
@@ -100,9 +94,8 @@ export function hostPageConfig(window) {
     },
   };
 
-  /** @type {Record<string, unknown>} */
-  const result = {};
-  for (let [key, value] of Object.entries(config)) {
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(config)) {
     if (!paramWhiteList.includes(key)) {
       continue;
     }
