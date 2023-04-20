@@ -1,39 +1,54 @@
+import type { Anchor, AnchorPosition } from '../../types/annotator';
 import { getBoundingClientRect } from '../highlighter';
 
-/**
- * @typedef {import('../../types/annotator').Anchor} Anchor
- * @typedef {import('../../types/annotator').AnchorPosition} AnchorPosition
- */
+export type Bucket = {
+  /** The annotation tags in this bucket */
+  tags: Set<string>;
+  /** The vertical pixel offset where this bucket should appear in the bucket bar */
+  position: number;
+};
 
-/**
- * @typedef Bucket
- * @prop {Set<string>} tags - The annotation tags in this bucket
- * @prop {number} position - The vertical pixel offset where this bucket should
- *   appear in the bucket bar
- */
+export type BucketSet = {
+  /**
+   * A single bucket containing all the annotation tags whose anchors are
+   * offscreen upwards
+   */
+  above: Bucket;
 
-/**
- * @typedef BucketSet
- * @prop {Bucket} above - A single bucket containing all the annotation
- *   tags whose anchors are offscreen upwards
- * @prop {Bucket} below - A single bucket containing all the annotation
- *   tags which anchors are offscreen downwards
- * @prop {Bucket[]} buckets - On-screen buckets
- */
+  /**
+   * A single bucket containing all the annotation tags which anchors are
+   * offscreen downwards
+   */
+  below: Bucket;
 
-/**
- * @typedef WorkingBucket
- * @prop {Set<string>} tags - The annotation tags in this bucket
- * @prop {number} position - The computed position (offset) for this bucket,
- *   based on the current anchors. This is centered between `top` and `bottom`
- * @prop {number} top - The uppermost (lowest) vertical offset for the anchors
- *   in this bucket — the lowest `top` position value, akin to the top offset of
- *   a theoretical box drawn around all of the anchor highlights in this bucket
- * @prop {number} bottom - The bottommost (highest) vertical offset for the
- *   anchors in this bucket — the highest `top` position value, akin to the
- *   bottom of a theoretical box drawn around all of the anchor highlights in
- *   this bucket
- */
+  /** On-screen buckets */
+  buckets: Bucket[];
+};
+
+export type WorkingBucket = {
+  /** The annotation tags in this bucket */
+  tags: Set<string>;
+
+  /**
+   * The computed position (offset) for this bucket, based on the current anchors.
+   * This is centered between `top` and `bottom`
+   */
+  position: number;
+
+  /**
+   * The uppermost (lowest) vertical offset for the anchors in this bucket —
+   * the lowest `top` position value, akin to the top offset of a theoretical
+   * box drawn around all the anchor highlights in this bucket
+   */
+  top: number;
+
+  /**
+   * he bottommost (highest) vertical offset for the anchors in this bucket —
+   * the highest `top` position value, akin to the bottom of a theoretical box
+   * drawn around all the anchor highlights in this bucket
+   */
+  bottom: number;
+};
 
 // Only anchors with top offsets between `BUCKET_TOP_THRESHOLD` and
 // `window.innerHeight - BUCKET_BOTTOM_THRESHOLD` are considered "on-screen"
@@ -49,15 +64,16 @@ const BUCKET_GAP_SIZE = 60;
  * Find the closest valid anchor in `anchors` that is offscreen in the direction
  * indicated.
  *
- * @param {Anchor[]} anchors
- * @param {'up'|'down'} direction
- * @return {Anchor|null} - The closest anchor or `null` if no valid anchor found
+ * @return The closest anchor or `null` if no valid anchor found
  */
-export function findClosestOffscreenAnchor(anchors, direction) {
+export function findClosestOffscreenAnchor(
+  anchors: Anchor[],
+  direction: 'up' | 'down'
+): Anchor | null {
   let closestAnchor = null;
   let closestTop = 0;
 
-  for (let anchor of anchors) {
+  for (const anchor of anchors) {
     if (!anchor.highlights?.length) {
       continue;
     }
@@ -98,13 +114,9 @@ export function findClosestOffscreenAnchor(anchors, direction) {
 /**
  * Compute the top and bottom positions for the set of anchors' highlights, sorted
  * vertically, from top to bottom.
- *
- * @param {Anchor[]} anchors
- * @return {AnchorPosition[]}
  */
-export function computeAnchorPositions(anchors) {
-  /** @type {AnchorPosition[]} */
-  const positions = [];
+export function computeAnchorPositions(anchors: Anchor[]): AnchorPosition[] {
+  const positions: AnchorPosition[] = [];
 
   anchors.forEach(({ annotation, highlights }) => {
     if (!highlights?.length) {
@@ -131,31 +143,18 @@ export function computeAnchorPositions(anchors) {
   return positions;
 }
 
-/**
- * Compute buckets
- *
- * @param {AnchorPosition[]} anchorPositions
- * @return {BucketSet}
- */
-export function computeBuckets(anchorPositions) {
-  /** @type {Set<string>} */
-  const aboveTags = new Set();
-  /** @type {Set<string>} */
-  const belowTags = new Set();
-  /** @type {Bucket[]} */
-  const buckets = [];
+export function computeBuckets(anchorPositions: AnchorPosition[]): BucketSet {
+  const aboveTags = new Set<string>();
+  const belowTags = new Set<string>();
+  const buckets: Bucket[] = [];
 
   // Hold current working anchors and positions as we build each bucket
-  /** @type {WorkingBucket|null} */
-  let currentBucket = null;
+  let currentBucket: WorkingBucket | null = null;
 
   /**
    * Create a new working bucket based on the provided `AnchorPosition`
-   *
-   * @param {AnchorPosition} anchorPosition
-   * @return {WorkingBucket}
    */
-  function newBucket({ bottom, tag, top }) {
+  function newBucket({ bottom, tag, top }: AnchorPosition): WorkingBucket {
     const anchorHeight = bottom - top;
     const bucketPosition = top + anchorHeight / 2;
     return {
