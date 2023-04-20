@@ -1,54 +1,48 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
+/*
+ * Disable @typescript-eslint/ban-types for the whole file, as changing the
+ * event's callback type away from `Function` has multiple implications that
+ * should be addressed separately
+ */
 import { TinyEmitter } from 'tiny-emitter';
 
-/** @typedef {import('../../types/annotator').Destroyable} Destroyable */
+import type { Destroyable } from '../../types/annotator';
 
 /**
  * Emitter is a communication class that implements the publisher/subscriber
  * pattern. It allows sending and listening events through a shared EventBus.
  * The different elements of the application can communicate with each other
  * without being tightly coupled.
- *
- * @implements {Destroyable}
  */
-export class Emitter {
-  /**
-   * @param {TinyEmitter} emitter
-   */
-  constructor(emitter) {
-    this._emitter = emitter;
+export class Emitter implements Destroyable {
+  private _emitter: TinyEmitter;
+  private _subscriptions: [event: string, callback: Function][];
 
-    /** @type {[event: string, callback: Function][]} */
+  constructor(emitter: TinyEmitter) {
+    this._emitter = emitter;
     this._subscriptions = [];
   }
 
   /**
    * Fire an event.
-   *
-   * @param {string} event
-   * @param {unknown[]} args
    */
-  publish(event, ...args) {
+  publish(event: string, ...args: unknown[]) {
     this._emitter.emit(event, ...args);
   }
 
   /**
    * Register an event listener.
-   *
-   * @param {string} event
-   * @param {Function} callback
    */
-  subscribe(event, callback) {
+  subscribe(event: string, callback: Function) {
     this._emitter.on(event, callback);
     this._subscriptions.push([event, callback]);
   }
 
   /**
    * Remove an event listener.
-   *
-   * @param {string} event
-   * @param {Function} callback
    */
-  unsubscribe(event, callback) {
+  unsubscribe(event: string, callback: Function) {
     this._emitter.off(event, callback);
     this._subscriptions = this._subscriptions.filter(
       ([subEvent, subCallback]) =>
@@ -60,7 +54,7 @@ export class Emitter {
    * Remove all event listeners.
    */
   destroy() {
-    for (let [event, callback] of this._subscriptions) {
+    for (const [event, callback] of this._subscriptions) {
       this._emitter.off(event, callback);
     }
     this._subscriptions = [];
@@ -68,6 +62,8 @@ export class Emitter {
 }
 
 export class EventBus {
+  private _emitter: TinyEmitter;
+
   constructor() {
     this._emitter = new TinyEmitter();
   }
