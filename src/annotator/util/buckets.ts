@@ -43,7 +43,7 @@ export type WorkingBucket = {
   top: number;
 
   /**
-   * he bottommost (highest) vertical offset for the anchors in this bucket —
+   * The bottommost (highest) vertical offset for the anchors in this bucket —
    * the highest `top` position value, akin to the bottom of a theoretical box
    * drawn around all the anchor highlights in this bucket
    */
