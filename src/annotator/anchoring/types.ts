@@ -7,44 +7,45 @@
  *  2. Insulating the rest of the code from API changes in the underlying anchoring
  *     libraries.
  */
+import type {
+  RangeSelector,
+  TextPositionSelector,
+  TextQuoteSelector,
+} from '../../types/api';
 import { matchQuote } from './match-quote';
 import { TextRange, TextPosition } from './text-range';
 import { nodeFromXPath, xpathFromNode } from './xpath';
 
 /**
- * @typedef {import('../../types/api').RangeSelector} RangeSelector
- * @typedef {import('../../types/api').TextPositionSelector} TextPositionSelector
- * @typedef {import('../../types/api').TextQuoteSelector} TextQuoteSelector
- */
-
-/**
  * Converts between `RangeSelector` selectors and `Range` objects.
  */
 export class RangeAnchor {
+  root: Node;
+  range: Range;
+
   /**
-   * @param {Node} root - A root element from which to anchor.
-   * @param {Range} range -  A range describing the anchor.
+   * @param root - A root element from which to anchor.
+   * @param range - A range describing the anchor.
    */
-  constructor(root, range) {
+  constructor(root: Node, range: Range) {
     this.root = root;
     this.range = range;
   }
 
   /**
-   * @param {Node} root -  A root element from which to anchor.
-   * @param {Range} range -  A range describing the anchor.
+   * @param root - A root element from which to anchor.
+   * @param range - A range describing the anchor.
    */
-  static fromRange(root, range) {
+  static fromRange(root: Node, range: Range): RangeAnchor {
     return new RangeAnchor(root, range);
   }
 
   /**
    * Create an anchor from a serialized `RangeSelector` selector.
    *
-   * @param {Element} root -  A root element from which to anchor.
-   * @param {RangeSelector} selector
+   * @param root - A root element from which to anchor.
    */
-  static fromSelector(root, selector) {
+  static fromSelector(root: Element, selector: RangeSelector): RangeAnchor {
     const startContainer = nodeFromXPath(selector.startContainer, root);
     if (!startContainer) {
       throw new Error('Failed to resolve startContainer XPath');
@@ -68,14 +69,11 @@ export class RangeAnchor {
     return new RangeAnchor(root, range);
   }
 
-  toRange() {
+  toRange(): Range {
     return this.range;
   }
 
-  /**
-   * @return {RangeSelector}
-   */
-  toSelector() {
+  toSelector(): RangeSelector {
     // "Shrink" the range so that it tightly wraps its text. This ensures more
     // predictable output for a given text selection.
     const normalizedRange = TextRange.fromRange(this.range).toRange();
@@ -98,22 +96,17 @@ export class RangeAnchor {
  * Converts between `TextPositionSelector` selectors and `Range` objects.
  */
 export class TextPositionAnchor {
-  /**
-   * @param {Element} root
-   * @param {number} start
-   * @param {number} end
-   */
-  constructor(root, start, end) {
+  root: Element;
+  start: number;
+  end: number;
+
+  constructor(root: Element, start: number, end: number) {
     this.root = root;
     this.start = start;
     this.end = end;
   }
 
-  /**
-   * @param {Element} root
-   * @param {Range} range
-   */
-  static fromRange(root, range) {
+  static fromRange(root: Element, range: Range): TextPositionAnchor {
     const textRange = TextRange.fromRange(range).relativeTo(root);
     return new TextPositionAnchor(
       root,
@@ -121,18 +114,15 @@ export class TextPositionAnchor {
       textRange.end.offset
     );
   }
-  /**
-   * @param {Element} root
-   * @param {TextPositionSelector} selector
-   */
-  static fromSelector(root, selector) {
+
+  static fromSelector(
+    root: Element,
+    selector: TextPositionSelector
+  ): TextPositionAnchor {
     return new TextPositionAnchor(root, selector.start, selector.end);
   }
 
-  /**
-   * @return {TextPositionSelector}
-   */
-  toSelector() {
+  toSelector(): TextPositionSelector {
     return {
       type: 'TextPositionSelector',
       start: this.start,
@@ -140,28 +130,37 @@ export class TextPositionAnchor {
     };
   }
 
-  toRange() {
+  toRange(): Range {
     return TextRange.fromOffsets(this.root, this.start, this.end).toRange();
   }
 }
 
-/**
- * @typedef QuoteMatchOptions
- * @prop {number} [hint] - Expected position of match in text. See `matchQuote`.
- */
+type QuoteMatchOptions = {
+  /** Expected position of match in text. See `matchQuote`. */
+  hint?: number;
+};
+
+export type TextQuoteAnchorContext = {
+  prefix?: string;
+  suffix?: string;
+};
 
 /**
  * Converts between `TextQuoteSelector` selectors and `Range` objects.
  */
 export class TextQuoteAnchor {
+  root: Element;
+  exact: string;
+  context: TextQuoteAnchorContext;
+
   /**
-   * @param {Element} root - A root element from which to anchor.
-   * @param {string} exact
-   * @param {object} context
-   *   @param {string} [context.prefix]
-   *   @param {string} [context.suffix]
+   * @param root - A root element from which to anchor.
    */
-  constructor(root, exact, context = {}) {
+  constructor(
+    root: Element,
+    exact: string,
+    context: TextQuoteAnchorContext = {}
+  ) {
     this.root = root;
     this.exact = exact;
     this.context = context;
@@ -171,12 +170,9 @@ export class TextQuoteAnchor {
    * Create a `TextQuoteAnchor` from a range.
    *
    * Will throw if `range` does not contain any text nodes.
-   *
-   * @param {Element} root
-   * @param {Range} range
    */
-  static fromRange(root, range) {
-    const text = /** @type {string} */ (root.textContent);
+  static fromRange(root: Element, range: Range): TextQuoteAnchor {
+    const text = root.textContent!;
     const textRange = TextRange.fromRange(range).relativeTo(root);
 
     const start = textRange.start.offset;
@@ -199,19 +195,15 @@ export class TextQuoteAnchor {
     });
   }
 
-  /**
-   * @param {Element} root
-   * @param {TextQuoteSelector} selector
-   */
-  static fromSelector(root, selector) {
+  static fromSelector(
+    root: Element,
+    selector: TextQuoteSelector
+  ): TextQuoteAnchor {
     const { prefix, suffix } = selector;
     return new TextQuoteAnchor(root, selector.exact, { prefix, suffix });
   }
 
-  /**
-   * @return {TextQuoteSelector}
-   */
-  toSelector() {
+  toSelector(): TextQuoteSelector {
     return {
       type: 'TextQuoteSelector',
       exact: this.exact,
@@ -220,18 +212,12 @@ export class TextQuoteAnchor {
     };
   }
 
-  /**
-   * @param {QuoteMatchOptions} [options]
-   */
-  toRange(options = {}) {
+  toRange(options: QuoteMatchOptions = {}): Range {
     return this.toPositionAnchor(options).toRange();
   }
 
-  /**
-   * @param {QuoteMatchOptions} [options]
-   */
-  toPositionAnchor(options = {}) {
-    const text = /** @type {string} */ (this.root.textContent);
+  toPositionAnchor(options: QuoteMatchOptions = {}): TextPositionAnchor {
+    const text = this.root.textContent!;
     const match = matchQuote(text, this.exact, {
       ...this.context,
       hint: options.hint,
