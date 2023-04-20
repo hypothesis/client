@@ -13,7 +13,7 @@ import { hostPageConfig } from './host-config';
 /**
  * Ascend `levels` from `window_` to find the designated embedder frame.
  *
- * @param levels - Number of ancestors levels to ascend
+ * @param levels - Number of ancestor levels to ascend
  */
 function getEmbedderFrame(levels: number, window_: Window = window): Window {
   let ancestorWindow = window_;
