@@ -7,10 +7,9 @@ import { parseConfigFragment } from '../../shared/config-fragment';
  * This function does not check for supported browser features. That is handled
  * by the boot script.
  *
- * @param {Window} window
- * @return {boolean} `true` if the checks passed
+ * @return `true` if the checks passed
  */
-export function checkEnvironment(window) {
+export function checkEnvironment(window: Window): boolean {
   const { version, origin } = parseConfigFragment(window.location.href);
 
   // If the sidebar and annotator code are using different versions of the
