@@ -1,10 +1,7 @@
 /**
  * Test whether an iframe fills the viewport of an ancestor frame.
- *
- * @param {Window} frame
- * @param {Window} ancestor
  */
-export function frameFillsAncestor(frame, ancestor) {
+export function frameFillsAncestor(frame: Window, ancestor: Window): boolean {
   if (frame === ancestor) {
     return true;
   }
