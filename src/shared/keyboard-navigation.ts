@@ -1,18 +1,32 @@
+import type { RefObject } from 'preact';
 import { useEffect } from 'preact/hooks';
 
 import { ListenerCollection } from './listener-collection';
 
-/**
- * @param {HTMLElement & { disabled?: boolean }} element
- */
-function isElementDisabled(element) {
+function isElementDisabled(
+  element: HTMLElement & { disabled?: boolean }
+): element is HTMLElement & { disabled: true } {
   return typeof element.disabled === 'boolean' && element.disabled;
 }
 
-/** @param {HTMLElement} element */
-function isElementVisible(element) {
+function isElementVisible(element: HTMLElement): boolean {
   return element.offsetParent !== null;
 }
+
+export type ArrowKeyNavigationOptions = {
+  /**
+   * Whether to focus the first element in the set of matching elements when the
+   * component is mounted
+   */
+  autofocus?: boolean;
+
+  /** Enable navigating elements using left/right arrow keys */
+  horizontal?: boolean;
+  /** Enable navigating elements using up/down arrow keys */
+  vertical?: boolean;
+  /** CSS selector which specifies the elements that navigation moves between */
+  selector?: string;
+};
 
 /**
  * Enable arrow key navigation between interactive descendants of a
@@ -45,24 +59,15 @@ function isElementVisible(element) {
  *
  * [1] https://www.w3.org/TR/wai-aria-practices/#kbd_roving_tabindex
  * [2] https://www.w3.org/TR/wai-aria-practices/#keyboard
- *
- * @param {import('preact').RefObject<HTMLElement>} containerRef
- * @param {object} options
- *   @param {boolean} [options.autofocus] - Whether to focus the first element
- *     in the set of matching elements when the component is mounted
- *   @param {boolean} [options.horizontal] - Enable navigating elements using left/right arrow keys
- *   @param {boolean} [options.vertical] - Enable navigating elements using up/down arrow keys
- *   @param {string} [options.selector] - CSS selector which specifies the
- *     elements that navigation moves between
  */
 export function useArrowKeyNavigation(
-  containerRef,
+  containerRef: RefObject<HTMLElement>,
   {
     autofocus = false,
     horizontal = true,
     vertical = true,
     selector = 'a,button',
-  } = {}
+  }: ArrowKeyNavigationOptions = {}
 ) {
   useEffect(() => {
     if (!containerRef.current) {
@@ -71,8 +76,8 @@ export function useArrowKeyNavigation(
     const container = containerRef.current;
 
     const getNavigableElements = () => {
-      const elements = /** @type {HTMLElement[]} */ (
-        Array.from(container.querySelectorAll(selector))
+      const elements: HTMLElement[] = Array.from(
+        container.querySelectorAll(selector)
       );
       return elements.filter(
         el => isElementVisible(el) && !isElementDisabled(el)
@@ -85,14 +90,13 @@ export function useArrowKeyNavigation(
      * Exactly one element will have `tabindex=0` and all others will have
      * `tabindex=1`.
      *
-     * @param {HTMLElement[]} elements
-     * @param {number} currentIndex - Index of element in `elements` to make current.
+     * @param currentIndex - Index of element in `elements` to make current.
      *   Defaults to the current element if there is one, or the first element
      *   otherwise.
-     * @param {boolean} setFocus - Whether to focus the current element
+     * @param setFocus - Whether to focus the current element
      */
     const updateTabIndexes = (
-      elements = getNavigableElements(),
+      elements: HTMLElement[] = getNavigableElements(),
       currentIndex = -1,
       setFocus = false
     ) => {
@@ -103,7 +107,7 @@ export function useArrowKeyNavigation(
         }
       }
 
-      for (let [index, element] of elements.entries()) {
+      for (const [index, element] of elements.entries()) {
         element.tabIndex = index === currentIndex ? 0 : -1;
         if (index === currentIndex && setFocus) {
           element.focus();
@@ -111,8 +115,7 @@ export function useArrowKeyNavigation(
       }
     };
 
-    /** @param {KeyboardEvent} event */
-    const onKeyDown = event => {
+    const onKeyDown = (event: KeyboardEvent) => {
       const elements = getNavigableElements();
       let currentIndex = elements.findIndex(item => item.tabIndex === 0);
 
@@ -164,19 +167,13 @@ export function useArrowKeyNavigation(
     // is triggered.
     listeners.add(container, 'focusin', event => {
       const elements = getNavigableElements();
-      const targetIndex = elements.indexOf(
-        /** @type {HTMLElement} */ (event.target)
-      );
+      const targetIndex = elements.indexOf(event.target as HTMLElement);
       if (targetIndex >= 0) {
         updateTabIndexes(elements, targetIndex);
       }
     });
 
-    listeners.add(
-      container,
-      'keydown',
-      /** @type {EventListener} */ (onKeyDown)
-    );
+    listeners.add(container, 'keydown', onKeyDown);
 
     // Update the tab indexes of elements as they are added, removed, enabled
     // or disabled.
