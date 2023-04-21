@@ -7,14 +7,9 @@
  * Note that if the values passed are plain javascript values (such as ones
  * produced from JSON.parse), then these methods do not throw errors.
  */
+import type { Ref } from 'preact';
 
-/**
- * Returns a boolean
- *
- * @param {any} value - initial value
- * @return {boolean}
- */
-export function toBoolean(value) {
+export function toBoolean(value: any): boolean {
   if (typeof value === 'string') {
     if (value.trim().toLocaleLowerCase() === 'false') {
       // "false", "False", " false", "FALSE" all return false
@@ -25,28 +20,22 @@ export function toBoolean(value) {
   if (!isNaN(numericalVal)) {
     return Boolean(numericalVal);
   }
-  // Any non numerical or falsely string should return true, otherwise return false
+  // Any non-numerical or falsely string should return true, otherwise return false
   return typeof value === 'string';
 }
 
 /**
  * Returns either an integer or NaN
- *
- * @param {any} value - initial value
- * @return {number}
  */
-export function toInteger(value) {
+export function toInteger(value: any): number {
   // Acts as a simple wrapper
   return parseInt(value);
 }
 
 /**
- * Returns either the value if its an object or an empty object
- *
- * @param {any} value - initial value
- * @return {object}
+ * Returns either the value if it's an object or an empty object
  */
-export function toObject(value) {
+export function toObject(value: any): object {
   if (typeof value === 'object' && value !== null) {
     return value;
   }
@@ -57,21 +46,13 @@ export function toObject(value) {
 /**
  * Returns the value as a string or an empty string if the
  * value undefined, null or otherwise falsely.
- *
- * @param {any} value - initial value
- * @return {string}
  */
-export function toString(value) {
+export function toString(value: any): string {
   if (value && typeof value.toString === 'function') {
     return value.toString();
   }
   return '';
 }
-
-/**
- * @template T
- * @typedef {import('preact').Ref<T>} Ref
- */
 
 /**
  * Helper for downcasting a ref to a more specific type, where that is safe
@@ -80,12 +61,7 @@ export function toString(value) {
  * This is mainly useful to cast a generic `Ref<HTMLElement>` to a more specific
  * element type (eg. `Ref<HTMLDivElement>`) for use with the `ref` prop of a JSX element.
  * Since Preact only writes to the `ref` prop, such a cast is safe.
- *
- * @template T
- * @template {T} U
- * @param {Ref<T>|undefined} ref
- * @return {Ref<U>|undefined}
  */
-export function downcastRef(ref) {
-  return /** @type {Ref<U>|undefined} */ (ref);
+export function downcastRef<T, U>(ref: Ref<T> | undefined): Ref<U> | undefined {
+  return ref as Ref<U> | undefined;
 }
