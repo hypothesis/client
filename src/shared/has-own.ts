@@ -3,10 +3,7 @@
  *
  * `hasOwn(someObject, property)` should be used instead of
  * `someObject.hasOwnProperty(name)`.
- *
- * @param {object} object
- * @param {string} property
  */
-export function hasOwn(object, property) {
+export function hasOwn(object: object, property: string): boolean {
   return Object.prototype.hasOwnProperty.call(object, property);
 }
