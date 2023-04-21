@@ -1,17 +1,15 @@
-/** @type {Window|null} */
-let errorDestination = null;
+let errorDestination: Window | null = null;
 
 /**
  * Wrap a callback with an error handler which forwards errors to another frame
  * using {@link sendError}.
  *
- * @template {unknown[]} Args
- * @template Result
- * @param {(...args: Args) => Result} callback
- * @param {string} context - A short message indicating where the error happened.
- * @return {(...args: Args) => Result}
+ * @param context - A short message indicating where the error happened.
  */
-export function captureErrors(callback, context) {
+export function captureErrors<Result, Args = unknown>(
+  callback: (...args: Args[]) => Result,
+  context: string
+): (...args: Args[]) => Result {
   return (...args) => {
     try {
       return callback(...args);
@@ -22,22 +20,18 @@ export function captureErrors(callback, context) {
   };
 }
 
-/**
- * @typedef ErrorData
- * @prop {string} message
- * @prop {string} [stack]
- */
+type ErrorData = {
+  message: string;
+  stack?: string;
+};
 
 /**
  * Return a cloneable representation of an Error.
  *
  * This is needed in browsers that don't support structured-cloning of Error
  * objects, or if the error is not cloneable for some reason.
- *
- * @param {Error|unknown} err
- * @return {ErrorData}
  */
-function serializeError(err) {
+function serializeError(err: Error | unknown): ErrorData {
   if (!(err instanceof Error)) {
     return { message: String(err), stack: undefined };
   }
@@ -50,11 +44,8 @@ function serializeError(err) {
 
 /**
  * Convert error data serialized by {@link serializeError} back into an Error.
- *
- * @param {ErrorData} data
- * @return {Error}
  */
-function deserializeError(data) {
+function deserializeError(data: ErrorData): ErrorData {
   const err = new Error(data.message);
   err.stack = data.stack;
   return err;
@@ -71,10 +62,9 @@ function deserializeError(data) {
  * for the moment because we are trying to rule out problems with
  * MessageChannel/MessagePort when setting up sidebar <-> host communication.
  *
- * @param {unknown} error
- * @param {string} context - A short message indicating where the error happened.
+ * @param context - A short message indicating where the error happened.
  */
-export function sendError(error, context) {
+export function sendError(error: unknown, context: string) {
   if (!errorDestination) {
     return;
   }
@@ -109,12 +99,12 @@ export function sendError(error, context) {
 /**
  * Register a handler for errors sent to the current frame using {@link sendError}
  *
- * @param {(error: unknown, context: string) => void} callback
- * @return {() => void} A function that unregisters the handler
+ * @return A function that unregisters the handler
  */
-export function handleErrorsInFrames(callback) {
-  /** @param {MessageEvent} event */
-  const handleMessage = event => {
+export function handleErrorsInFrames(
+  callback: (error: unknown, context: string) => void
+): () => void {
+  const handleMessage = (event: MessageEvent) => {
     const { data } = event;
     if (data && data?.type === 'hypothesis-error') {
       const { context, error } = data;
@@ -130,9 +120,7 @@ export function handleErrorsInFrames(callback) {
 
 /**
  * Register a destination frame that {@link sendError} should submit errors to.
- *
- * @param {Window|null} destination
  */
-export function sendErrorsTo(destination) {
+export function sendErrorsTo(destination: Window | null) {
   errorDestination = destination;
 }
