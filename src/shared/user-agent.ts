@@ -5,23 +5,20 @@
 /**
  * Returns true when the OS is Mac OS.
  *
- * @param _userAgent {string} - Test seam
+ * @param _userAgent - Test seam
  */
-export const isMacOS = (_userAgent = window.navigator.userAgent) => {
+export const isMacOS = (_userAgent: string = window.navigator.userAgent) => {
   return _userAgent.indexOf('Mac OS') >= 0;
 };
 
 /**
  * Returns true when device is iOS.
  * https://stackoverflow.com/a/9039885/14463679
- *
- * @param _navigator {{platform: string, userAgent: string}}
- * @param _ontouchend {boolean}
  */
 export const isIOS = (
-  _navigator = window.navigator,
-  _ontouchend = 'ontouchend' in document
-) => {
+  _navigator: { platform: string; userAgent: string } = window.navigator,
+  _ontouchend: boolean = 'ontouchend' in document
+): boolean => {
   return (
     [
       'iPad Simulator',
@@ -40,9 +37,7 @@ export const isIOS = (
  * Returns true when the device is a touch device such
  * as android or iOS.
  * https://developer.mozilla.org/en-US/docs/Web/CSS/@media/pointer#browser_compatibility
- *
- * @param _window {Window} - Test seam
  */
-export const isTouchDevice = (_window = window) => {
+export const isTouchDevice = (_window: Window = window): boolean => {
   return _window.matchMedia('(pointer: coarse)').matches;
 };
