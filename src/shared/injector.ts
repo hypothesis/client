@@ -1,22 +1,38 @@
-/**
- * @typedef Provider
- * @prop {unknown} [value] - The value for the object
- * @prop {Function} [class] - A class that should be instantiated to create the object
- * @prop {Function} [factory] - Function that should be called to create the object
- */
+type ValueProvider = { value: unknown };
 
-/**
- * @param {Provider} provider
- */
-function isValidProvider(provider) {
+type Constructible = {
+  new (...args: any[]): unknown;
+};
+
+type ClassProvider = { class: Constructible & { $inject?: string[] } };
+
+type FactoryProvider = {
+  factory: ((...args: any[]) => unknown) & { $inject?: string[] };
+};
+
+type Provider = ValueProvider | ClassProvider | FactoryProvider;
+
+function isValueProvider(provider: object): provider is ValueProvider {
+  return 'value' in provider;
+}
+
+function isClassProvider(provider: object): provider is ClassProvider {
+  return 'class' in provider && typeof provider.class === 'function';
+}
+
+function isFactoryProvider(provider: object): provider is FactoryProvider {
+  return 'factory' in provider && typeof provider.factory === 'function';
+}
+
+function isValidProvider(provider: unknown): provider is Provider {
   if (typeof provider !== 'object' || provider === null) {
     return false;
   }
 
   return (
-    'value' in provider ||
-    typeof provider.class === 'function' ||
-    typeof provider.factory === 'function'
+    isValueProvider(provider) ||
+    isClassProvider(provider) ||
+    isFactoryProvider(provider)
   );
 }
 
@@ -41,25 +57,26 @@ function isValidProvider(provider) {
  * use the `run` method.
  */
 export class Injector {
+  /** Map of name to object specifying how to create/provide that object. */
+  private _providers: Map<string, Provider>;
+  /** Map of name to existing instance. */
+  private _instances: Map<string, unknown>;
+  /** Set of instances already being constructed. Used to detect circular dependencies. */
+  private _constructing: Set<string>;
+
   constructor() {
-    // Map of name to object specifying how to create/provide that object.
-    this._providers = new Map();
-
-    // Map of name to existing instance.
-    this._instances = new Map();
-
-    // Set of instances already being constructed. Used to detect circular
-    // dependencies.
-    this._constructing = new Set();
+    this._providers = new Map<string, Provider>();
+    this._instances = new Map<string, unknown>();
+    this._constructing = new Set<string>();
   }
 
   /**
    * Construct or return the existing instance of an object with a given `name`
    *
-   * @param {string} name - Name of object to construct
-   * @return {unknown} - The constructed object
+   * @param name - Name of object to construct
+   * @return The constructed object
    */
-  get(name) {
+  get(name: string): unknown {
     if (this._instances.has(name)) {
       return this._instances.get(name);
     }
@@ -70,7 +87,7 @@ export class Injector {
       throw new Error(`"${name}" is not registered`);
     }
 
-    if ('value' in provider) {
+    if (isValueProvider(provider)) {
       this._instances.set(name, provider.value);
       return provider.value;
     }
@@ -85,8 +102,8 @@ export class Injector {
     try {
       const resolvedDependencies = [];
       const dependencies =
-        ('class' in provider && provider.class.$inject) ||
-        ('factory' in provider && provider.factory.$inject) ||
+        (isClassProvider(provider) && provider.class.$inject) ||
+        (isFactoryProvider(provider) && provider.factory.$inject) ||
         [];
 
       for (const dependency of dependencies) {
@@ -103,7 +120,7 @@ export class Injector {
       }
 
       let instance;
-      if (provider.class) {
+      if (isClassProvider(provider)) {
         // eslint-disable-next-line new-cap
         instance = new provider.class(...resolvedDependencies);
       } else {
@@ -124,12 +141,10 @@ export class Injector {
    * If `provider` is a function, it is treated like a class. In other words
    * `register(name, SomeClass)` is the same as `register(name, { class: SomeClass })`.
    *
-   * @param {string} name - Name of object
-   * @param {Function|Provider} provider -
-   *   The class or other provider to use to create the object.
-   * @return {this}
+   * @param name - Name of object
+   * @param provider - The class or other provider to use to create the object.
    */
-  register(name, provider) {
+  register(name: string, provider: Constructible | Provider): this {
     if (typeof provider === 'function') {
       provider = { class: provider };
     } else if (!isValidProvider(provider)) {
@@ -144,18 +159,17 @@ export class Injector {
    * Run a function which uses one or more dependencies provided by the
    * container.
    *
-   * @template T
-   * @param {(...args: any[]) => T} callback -
+   * @param callback -
    *   A callback to run, with dependencies annotated in the same way as
    *   functions or classes passed to `register`.
-   * @return {any} - Returns the result of running the function.
+   * @return Returns the result of running the function.
    */
-  run(callback) {
+  run<T>(callback: (...args: any[]) => T): T {
     const tempName = 'Injector.run';
     this.register(tempName, { factory: callback });
 
     try {
-      return this.get(tempName);
+      return this.get(tempName) as T;
     } finally {
       this._instances.delete(tempName);
       this._providers.delete(tempName);

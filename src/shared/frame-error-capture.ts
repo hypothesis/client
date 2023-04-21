@@ -45,7 +45,7 @@ function serializeError(err: Error | unknown): ErrorData {
 /**
  * Convert error data serialized by {@link serializeError} back into an Error.
  */
-function deserializeError(data: ErrorData): ErrorData {
+function deserializeError(data: ErrorData): Error {
   const err = new Error(data.message);
   err.stack = data.stack;
   return err;
