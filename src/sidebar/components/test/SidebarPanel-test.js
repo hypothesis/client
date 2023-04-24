@@ -53,7 +53,7 @@ describe('SidebarPanel', () => {
   it('shows content if active', () => {
     fakeStore.isSidebarPanelOpen.returns(true);
     const wrapper = createSidebarPanel();
-    assert.isTrue(wrapper.find('Slider').prop('visible'));
+    assert.equal(wrapper.find('Slider').prop('direction'), 'in');
   });
 
   it('hides content if not active', () => {

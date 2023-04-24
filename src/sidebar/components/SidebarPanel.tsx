@@ -1,4 +1,4 @@
-import { Dialog } from '@hypothesis/frontend-shared';
+import { Dialog, Slider } from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef } from 'preact/hooks';
@@ -6,7 +6,6 @@ import scrollIntoView from 'scroll-into-view';
 
 import type { PanelName } from '../../types/sidebar';
 import { useSidebarStore } from '../store';
-import Slider from './Slider';
 
 export type SidebarPanelProps = {
   children: ComponentChildren;

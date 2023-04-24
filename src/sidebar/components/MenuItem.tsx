@@ -1,11 +1,14 @@
-import { CaretUpIcon, MenuExpandIcon } from '@hypothesis/frontend-shared';
+import {
+  CaretUpIcon,
+  MenuExpandIcon,
+  Slider,
+} from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { ComponentChildren, Ref } from 'preact';
 import { useEffect, useRef } from 'preact/hooks';
 
 import MenuKeyboardNavigation from './MenuKeyboardNavigation';
-import Slider from './Slider';
 
 type SubmenuToggleProps = {
   title: string;
@@ -305,7 +308,7 @@ export default function MenuItem({
     <>
       {menuItem}
       {hasSubmenuVisible && (
-        <Slider visible={isSubmenuVisible}>
+        <Slider direction={isSubmenuVisible ? 'in' : 'out'}>
           <MenuKeyboardNavigation
             closeMenu={onCloseSubmenu}
             visible={isSubmenuVisible}
