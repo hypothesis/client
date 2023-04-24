@@ -1272,9 +1272,9 @@
     fastq "^1.6.0"
 
 "@npmcli/arborist@^6.1.1":
-  version "6.2.7"
-  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.2.7.tgz#434b66fb90c598b25d4d0ba116b124bf504d6e65"
-  integrity sha512-7Gp1lZEweW1GzoMOo0Z10zAm4SKZsVYUWtFSCrahXmV5H3Mp4Pgwg1nIgkXj4LkjqT+fLsXmjK6rQBauDH64Jg==
+  version "6.2.8"
+  resolved "https://registry.yarnpkg.com/@npmcli/arborist/-/arborist-6.2.8.tgz#bfc53ab964b157fd220c3c138b88e958c209be8b"
+  integrity sha512-z8qQIbuZBk476/S5rATAS4zwWb7QHzYbtH0468K9c8gfxcH6VeZF5a6MqUiEcdg41OWwiBHqq0I65jdH2Alidw==
   dependencies:
     "@isaacs/string-locale-compare" "^1.1.0"
     "@npmcli/fs" "^3.1.0"
@@ -1308,7 +1308,7 @@
     semver "^7.3.7"
     ssri "^10.0.1"
     treeverse "^3.0.0"
-    walk-up-path "^1.0.0"
+    walk-up-path "^3.0.1"
 
 "@npmcli/fs@^2.1.0":
   version "2.1.2"
@@ -8953,10 +8953,10 @@ void-elements@^2.0.0:
   resolved "https://registry.yarnpkg.com/void-elements/-/void-elements-2.0.1.tgz#c066afb582bb1cb4128d60ea92392e94d5e9dbec"
   integrity sha1-wGavtYK7HLQSjWDqkjkulNXp2+w=
 
-walk-up-path@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/walk-up-path/-/walk-up-path-1.0.0.tgz#d4745e893dd5fd0dbb58dd0a4c6a33d9c9fec53e"
-  integrity sha512-hwj/qMDUEjCU5h0xr90KGCf0tg0/LgJbmOWgrWKYlcJZM7XvquvUJZ0G/HMGr7F7OQMOUuPHWP9JpriinkAlkg==
+walk-up-path@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/walk-up-path/-/walk-up-path-3.0.1.tgz#c8d78d5375b4966c717eb17ada73dbd41490e886"
+  integrity sha512-9YlCL/ynK3CTlrSRrDxZvUauLzAswPCrsaCgilqFevUYpeEW0/3ScEjaa3kbW/T0ghhkEr7mv+fpjqn1Y1YuTA==
 
 webidl-conversions@^3.0.0:
   version "3.0.1"
