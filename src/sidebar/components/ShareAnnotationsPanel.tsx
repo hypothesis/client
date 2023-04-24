@@ -5,7 +5,7 @@ import {
   InputGroup,
   LockIcon,
   Spinner,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 
 import { pageSharingLink } from '../helpers/annotation-sharing';
 import { withServices } from '../service-context';

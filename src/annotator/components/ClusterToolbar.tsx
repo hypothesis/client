@@ -6,7 +6,7 @@ import {
   CaretRightIcon,
   HideIcon,
   HighlightIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useState } from 'preact/hooks';
 

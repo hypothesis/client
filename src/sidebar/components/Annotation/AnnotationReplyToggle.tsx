@@ -1,4 +1,4 @@
-import { ButtonBase } from '@hypothesis/frontend-shared/lib/next';
+import { ButtonBase } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 export type AnnotationReplyToggleProps = {

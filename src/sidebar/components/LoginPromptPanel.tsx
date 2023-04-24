@@ -2,7 +2,7 @@ import {
   Button,
   CardActions,
   RestrictedIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 
 import { useSidebarStore } from '../store';
 import SidebarPanel from './SidebarPanel';

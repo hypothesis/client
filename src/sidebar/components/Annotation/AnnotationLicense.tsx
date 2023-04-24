@@ -1,8 +1,4 @@
-import {
-  Link,
-  CcStdIcon,
-  CcZeroIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { Link, CcStdIcon, CcZeroIcon } from '@hypothesis/frontend-shared';
 
 /**
  * Render information about CC licensing

@@ -1,4 +1,4 @@
-import { IconButton, RefreshIcon } from '@hypothesis/frontend-shared/lib/next';
+import { IconButton, RefreshIcon } from '@hypothesis/frontend-shared';
 import { useCallback, useEffect } from 'preact/hooks';
 
 import { useShortcut } from '../../shared/shortcut';

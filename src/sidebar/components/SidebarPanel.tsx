@@ -1,4 +1,4 @@
-import { Dialog } from '@hypothesis/frontend-shared/lib/next';
+import { Dialog } from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef } from 'preact/hooks';

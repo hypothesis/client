@@ -5,7 +5,7 @@ import {
   FlagFilledIcon,
   ReplyIcon,
   TrashIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 
 import { confirm } from '../../../shared/prompts';
 import type { SavedAnnotation } from '../../../types/api';

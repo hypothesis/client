@@ -1,4 +1,4 @@
-import { LinkButton } from '@hypothesis/frontend-shared/lib/next';
+import { LinkButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';

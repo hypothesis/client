@@ -2,7 +2,7 @@ import {
   LinkButton,
   HighlightIcon,
   LockIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import { useMemo } from 'preact/hooks';
 
 import type { Annotation } from '../../../types/api';

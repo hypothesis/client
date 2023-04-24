@@ -3,7 +3,7 @@ import {
   EmailIcon,
   SocialFacebookIcon,
   SocialTwitterIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 
 type ShareLinkProps = {

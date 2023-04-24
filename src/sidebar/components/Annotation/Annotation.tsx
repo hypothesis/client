@@ -1,4 +1,4 @@
-import { CardActions, Spinner } from '@hypothesis/frontend-shared/lib/next';
+import { CardActions, Spinner } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 

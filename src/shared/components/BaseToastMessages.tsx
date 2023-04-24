@@ -4,7 +4,7 @@ import {
   CancelIcon,
   CautionIcon,
   CheckIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 export type ToastMessage = {

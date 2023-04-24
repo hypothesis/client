@@ -4,7 +4,7 @@ import {
   Card,
   CardContent,
   Spinner,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 

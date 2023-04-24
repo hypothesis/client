@@ -1,4 +1,4 @@
-import { LinkBase } from '@hypothesis/frontend-shared/lib/next';
+import { LinkBase } from '@hypothesis/frontend-shared';
 
 type AnnotationUserProps = {
   authorLink?: string;

@@ -1,4 +1,4 @@
-import { Link, CancelIcon } from '@hypothesis/frontend-shared/lib/next';
+import { Link, CancelIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 export type TagListItemProps = {

@@ -1,4 +1,3 @@
-import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import {
   ButtonBase,
   AnnotateIcon,
@@ -8,7 +7,8 @@ import {
   HideIcon,
   NoteIcon,
   ShowIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
+import type { ButtonCommonProps } from '@hypothesis/frontend-shared/lib/components/input/ButtonBase';
 import type {
   IconComponent,
   PresentationalProps,

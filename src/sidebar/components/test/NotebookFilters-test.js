@@ -1,4 +1,4 @@
-import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
+import { ProfileIcon } from '@hypothesis/frontend-shared';
 import { mount } from 'enzyme';
 
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';

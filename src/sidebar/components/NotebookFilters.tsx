@@ -1,4 +1,4 @@
-import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
+import { ProfileIcon } from '@hypothesis/frontend-shared';
 
 import { useSidebarStore } from '../store';
 import FilterSelect from './FilterSelect';

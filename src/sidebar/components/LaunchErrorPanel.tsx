@@ -1,4 +1,4 @@
-import { Panel } from '@hypothesis/frontend-shared/lib/next';
+import { Panel } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 export type LaunchErrorPanelProps = {

@@ -1,7 +1,4 @@
-import {
-  CaretUpIcon,
-  MenuExpandIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { CaretUpIcon, MenuExpandIcon } from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { ComponentChildren, Ref } from 'preact';

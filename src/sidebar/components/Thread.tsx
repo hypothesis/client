@@ -3,7 +3,7 @@ import {
   ButtonBase,
   CaretRightIcon,
   MenuExpandIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useCallback, useMemo } from 'preact/hooks';
 

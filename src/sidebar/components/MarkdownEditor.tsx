@@ -1,8 +1,4 @@
-import {
-  ButtonBase,
-  IconButton,
-  LinkBase,
-} from '@hypothesis/frontend-shared/lib/next';
+import { ButtonBase, IconButton, LinkBase } from '@hypothesis/frontend-shared';
 import {
   EditorLatexIcon,
   EditorQuoteIcon,
@@ -13,7 +9,7 @@ import {
   LinkIcon,
   ListOrderedIcon,
   ListUnorderedIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 import type { Ref, JSX } from 'preact';

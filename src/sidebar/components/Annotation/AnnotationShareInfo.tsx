@@ -1,8 +1,4 @@
-import {
-  LinkBase,
-  GlobeIcon,
-  GroupsIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { LinkBase, GlobeIcon, GroupsIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { Group } from '../../../types/api';

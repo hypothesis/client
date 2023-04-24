@@ -1,4 +1,4 @@
-import { CancelIcon, IconButton } from '@hypothesis/frontend-shared/lib/next';
+import { CancelIcon, IconButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useEffect, useRef, useState } from 'preact/hooks';
 

@@ -1,8 +1,4 @@
-import {
-  GlobeIcon,
-  GroupsIcon,
-  LockIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { GlobeIcon, GroupsIcon, LockIcon } from '@hypothesis/frontend-shared';
 import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';

@@ -1,8 +1,4 @@
-import {
-  ButtonBase,
-  FlagIcon,
-  HideIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { ButtonBase, FlagIcon, HideIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { Annotation } from '../../types/api';

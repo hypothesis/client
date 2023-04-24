@@ -1,5 +1,5 @@
 import { useElementShouldClose } from '@hypothesis/frontend-shared';
-import { MenuExpandIcon } from '@hypothesis/frontend-shared/lib/next';
+import { MenuExpandIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useEffect, useRef, useState } from 'preact/hooks';

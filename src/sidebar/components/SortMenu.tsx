@@ -1,4 +1,4 @@
-import { SortIcon } from '@hypothesis/frontend-shared/lib/next';
+import { SortIcon } from '@hypothesis/frontend-shared';
 
 import { useSidebarStore } from '../store';
 import Menu from './Menu';

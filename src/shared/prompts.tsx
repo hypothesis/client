@@ -1,4 +1,4 @@
-import { Button, ModalDialog } from '@hypothesis/frontend-shared/lib/next';
+import { Button, ModalDialog } from '@hypothesis/frontend-shared';
 import { render } from 'preact';
 import { createRef } from 'preact';
 import type { RefObject } from 'preact';

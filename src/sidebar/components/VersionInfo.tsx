@@ -1,4 +1,4 @@
-import { Button, CopyIcon } from '@hypothesis/frontend-shared/lib/next';
+import { Button, CopyIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 

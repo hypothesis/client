@@ -1,4 +1,4 @@
-import { Card } from '@hypothesis/frontend-shared/lib/next';
+import { Card } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo } from 'preact/hooks';
 
