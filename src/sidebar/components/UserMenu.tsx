@@ -1,4 +1,4 @@
-import { ProfileIcon } from '@hypothesis/frontend-shared/lib/next';
+import { ProfileIcon } from '@hypothesis/frontend-shared';
 import { useState } from 'preact/hooks';
 
 import type { Service, SidebarSettings } from '../../types/config';

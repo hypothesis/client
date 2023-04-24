@@ -1,4 +1,4 @@
-import { EditIcon } from '@hypothesis/frontend-shared/lib/next';
+import { EditIcon } from '@hypothesis/frontend-shared';
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 

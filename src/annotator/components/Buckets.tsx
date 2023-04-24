@@ -1,4 +1,4 @@
-import { PointerButton } from '@hypothesis/frontend-shared/lib/next';
+import { PointerButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { Bucket } from '../util/buckets';

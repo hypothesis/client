@@ -1,4 +1,4 @@
-import { CautionIcon, Link } from '@hypothesis/frontend-shared/lib/next';
+import { CautionIcon, Link } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 /**

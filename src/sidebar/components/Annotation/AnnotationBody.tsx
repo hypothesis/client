@@ -1,8 +1,4 @@
-import {
-  Button,
-  CollapseIcon,
-  ExpandIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { Button, CollapseIcon, ExpandIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import { useMemo, useState } from 'preact/hooks';
 

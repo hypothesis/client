@@ -1,8 +1,4 @@
-import {
-  CopyIcon,
-  ExternalIcon,
-  LeaveIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { CopyIcon, ExternalIcon, LeaveIcon } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import { confirm } from '../../../shared/prompts';

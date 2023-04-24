@@ -3,7 +3,7 @@ import {
   LinkBase,
   LinkButton,
   LogoIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 
 import { useSidebarStore } from '../store';
 

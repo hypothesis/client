@@ -1,4 +1,4 @@
-import { LinkBase } from '@hypothesis/frontend-shared/lib/next';
+import { LinkBase } from '@hypothesis/frontend-shared';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import {

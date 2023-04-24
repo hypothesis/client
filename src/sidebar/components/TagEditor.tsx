@@ -1,5 +1,5 @@
 import { useElementShouldClose } from '@hypothesis/frontend-shared';
-import { Input } from '@hypothesis/frontend-shared/lib/next';
+import { Input } from '@hypothesis/frontend-shared';
 import { useRef, useState } from 'preact/hooks';
 
 import { withServices } from '../service-context';

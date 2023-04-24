@@ -5,7 +5,7 @@ import {
   GroupsIcon,
   LockIcon,
   MenuExpandIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { Group } from '../../../types/api';

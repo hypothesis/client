@@ -1,8 +1,5 @@
-import { Link, LinkButton } from '@hypothesis/frontend-shared/lib/next';
-import {
-  ArrowRightIcon,
-  ExternalIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { Link, LinkButton } from '@hypothesis/frontend-shared';
+import { ArrowRightIcon, ExternalIcon } from '@hypothesis/frontend-shared';
 import type { ComponentChildren as Children } from 'preact';
 import { useCallback, useMemo, useState } from 'preact/hooks';
 

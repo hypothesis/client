@@ -5,7 +5,7 @@ import {
   CardContent,
   LinkButton,
   PlusIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 

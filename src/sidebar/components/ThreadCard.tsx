@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@hypothesis/frontend-shared/lib/next';
+import { Card, CardContent } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 

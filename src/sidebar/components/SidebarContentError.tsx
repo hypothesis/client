@@ -1,8 +1,4 @@
-import {
-  Button,
-  Panel,
-  RestrictedIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+import { Button, Panel, RestrictedIcon } from '@hypothesis/frontend-shared';
 
 import { useSidebarStore } from '../store';
 

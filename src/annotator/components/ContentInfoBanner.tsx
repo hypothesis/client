@@ -3,7 +3,7 @@ import {
   LinkBase,
   CaretLeftIcon,
   CaretRightIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 
 import type { ContentInfoConfig } from '../../types/annotator';

@@ -4,7 +4,7 @@ import {
   HighlightIcon,
   PointerDownIcon,
   PointerUpIcon,
-} from '@hypothesis/frontend-shared/lib/next';
+} from '@hypothesis/frontend-shared';
 import type { IconComponent } from '@hypothesis/frontend-shared/lib/types';
 import classnames from 'classnames';
 

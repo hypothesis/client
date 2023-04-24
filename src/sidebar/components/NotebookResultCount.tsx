@@ -1,4 +1,4 @@
-import { Spinner } from '@hypothesis/frontend-shared/lib/next';
+import { Spinner } from '@hypothesis/frontend-shared';
 
 import { countVisible } from '../helpers/thread';
 import { useRootThread } from './hooks/use-root-thread';

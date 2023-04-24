@@ -1,4 +1,4 @@
-import { Link } from '@hypothesis/frontend-shared/lib/next';
+import { Link } from '@hypothesis/frontend-shared';
 
 export type AnnotationDocumentInfoProps = {
   /** The domain associated with the document */

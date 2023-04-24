@@ -1,4 +1,4 @@
-import { Link, Panel } from '@hypothesis/frontend-shared/lib/next';
+import { Link, Panel } from '@hypothesis/frontend-shared';
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import scrollIntoView from 'scroll-into-view';
 
