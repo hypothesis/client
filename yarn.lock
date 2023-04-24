@@ -1166,10 +1166,10 @@
     fancy-log "^1.3.3"
     glob "^7.2.0"
 
-"@hypothesis/frontend-shared@^5.6.0":
-  version "5.14.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-5.14.0.tgz#465729295b29cc537867f12e009f211204e08d93"
-  integrity sha512-IyGQdWYkj+92wZV64OPBSOrRjPvANjpHroz85GjkX8UMuBQG3ngUuFh1k0KQ2sZmUyDbILbD5mNuhc5syrqx0A==
+"@hypothesis/frontend-shared@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-6.0.0.tgz#27ef2944c406145e9ccee2d852ad73c179ff3ea9"
+  integrity sha512-sJIxjBLVq5YGdQIYT1ayV8GQ/NlUxXY5nJMcG45Xxl7hgmrmwL+4G7l9h2gAD2PwXx1Rt9gjbdF9Zmrq6Yp0IQ==
   dependencies:
     highlight.js "^11.6.0"
 
