@@ -14,18 +14,15 @@ DOMPurify.addHook('afterSanitizeAttributes', node => {
 });
 
 function targetBlank() {
-  /** @param {string} text */
-  function filter(text) {
+  function filter(text: string) {
     return text.replace(/<a href=/g, '<a target="_blank" href=');
   }
   return [{ type: 'output', filter }];
 }
 
-/** @type {showdown.Converter} */
-let converter;
+let converter: showdown.Converter;
 
-/** @param {string} markdown */
-function renderMarkdown(markdown) {
+function renderMarkdown(markdown: string) {
   if (!converter) {
     // see https://github.com/showdownjs/showdown#valid-options
     converter = new showdown.Converter({
@@ -44,30 +41,27 @@ function renderMarkdown(markdown) {
   return converter.makeHtml(markdown);
 }
 
-/** @param {number} id */
-function mathPlaceholder(id) {
+function mathPlaceholder(id: number) {
   return '{math:' + id.toString() + '}';
 }
 
-/**
- * @typedef MathBlock
- * @prop {number} id
- * @prop {boolean} inline
- * @prop {string} expression
- */
+type MathBlock = {
+  id: number;
+  inline: boolean;
+  expression: string;
+};
 
 /**
  * Parses a string containing mixed markdown and LaTeX in between
  * '$$..$$' or '\( ... \)' delimiters and returns an object containing a
  * list of math blocks found in the string, plus the input string with math
  * blocks replaced by placeholders.
- *
- * @param {string} content
- * @return {{ content: string, mathBlocks: MathBlock[]}}
  */
-function extractMath(content) {
-  /** @type {MathBlock[]} */
-  const mathBlocks = [];
+function extractMath(content: string): {
+  content: string;
+  mathBlocks: MathBlock[];
+} {
+  const mathBlocks: MathBlock[] = [];
   let pos = 0;
   let replacedContent = content;
 
@@ -129,11 +123,7 @@ function extractMath(content) {
   };
 }
 
-/**
- * @param {string} html
- * @param {MathBlock[]} mathBlocks
- */
-function insertMath(html, mathBlocks) {
+function insertMath(html: string, mathBlocks: MathBlock[]) {
   return mathBlocks.reduce((html, block) => {
     let renderedMath;
     try {
@@ -152,9 +142,15 @@ function insertMath(html, mathBlocks) {
 }
 
 /**
- * @param {string} markdown
+ * Convert a string of markdown and math into sanitized HTML.
+ *
+ * Math expressions in the input are written as LaTeX and must be enclosed in
+ * `$$ .. $$` or `\( .. \)` delimiters to indicate block or inline math
+ * expressions. These expressions are extracted and rendered using KaTeX.
+ *
+ * @return - A string of sanitized HTML.
  */
-export function renderMathAndMarkdown(markdown) {
+export function renderMathAndMarkdown(markdown: string): string {
   // KaTeX takes care of escaping its input, so we want to avoid passing its
   // output through the HTML sanitizer. Therefore we first extract the math
   // blocks from the input, render and sanitize the remaining markdown and then
