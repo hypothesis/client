@@ -61,7 +61,10 @@ export function toString(value: any): string {
  * This is mainly useful to cast a generic `Ref<HTMLElement>` to a more specific
  * element type (eg. `Ref<HTMLDivElement>`) for use with the `ref` prop of a JSX element.
  * Since Preact only writes to the `ref` prop, such a cast is safe.
+ *
+ * @fixme Ignoring from code coverage, as this function is currently not used
  */
+/* istanbul ignore next */
 export function downcastRef<T, U>(ref: Ref<T> | undefined): Ref<U> | undefined {
   return ref as Ref<U> | undefined;
 }
