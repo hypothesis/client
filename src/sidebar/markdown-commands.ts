@@ -9,18 +9,16 @@
 
 /**
  * Describes the state of a plain text input field.
- *
- * @typedef EditorState
- * @prop {string} text
- * @prop {number} selectionStart
- * @prop {number} selectionEnd
  */
+export type EditorState = {
+  text: string;
+  selectionStart: number;
+  selectionEnd: number;
+};
 
 /**
  * Types of Markdown link that can be inserted with
- * convertSelectionToLink()
- *
- * @enum {number}
+ * {@link convertSelectionToLink}.
  */
 export const LinkType = {
   ANCHOR_LINK: 0,
@@ -30,13 +28,18 @@ export const LinkType = {
 /**
  * Replace text in an input field and return the new state.
  *
- * @param {EditorState} state - The state of the input field.
- * @param {number} pos - The start position of the text to remove.
- * @param {number} length - The number of characters to remove.
- * @param {string} text - The replacement text to insert at `pos`.
- * @return {EditorState} - The new state of the input field.
+ * @param state - The state of the input field.
+ * @param pos - The start position of the text to remove.
+ * @param length - The number of characters to remove.
+ * @param text - The replacement text to insert at `pos`.
+ * @return The new state of the input field.
  */
-function replaceText(state, pos, length, text) {
+function replaceText(
+  state: EditorState,
+  pos: number,
+  length: number,
+  text: string
+): EditorState {
   let newSelectionStart = state.selectionStart;
   let newSelectionEnd = state.selectionEnd;
 
@@ -82,11 +85,14 @@ function replaceText(state, pos, length, text) {
 /**
  * Convert the selected text into a Markdown link.
  *
- * @param {EditorState} state - The current state of the input field.
- * @param {LinkType} [linkType] - The type of link to insert.
- * @return {EditorState} - The new state of the input field.
+ * @param state - The current state of the input field.
+ * @param [linkType] - The type of link to insert.
+ * @return The new state of the input field.
  */
-export function convertSelectionToLink(state, linkType = LinkType.ANCHOR_LINK) {
+export function convertSelectionToLink(
+  state: EditorState,
+  linkType: number = LinkType.ANCHOR_LINK
+): EditorState {
   const selection = state.text.slice(state.selectionStart, state.selectionEnd);
 
   let linkPrefix = '';
@@ -128,16 +134,20 @@ export function convertSelectionToLink(state, linkType = LinkType.ANCHOR_LINK) {
 /**
  * Toggle Markdown-style formatting around a span of text.
  *
- * @param {EditorState} state - The current state of the input field.
- * @param {string} prefix - The prefix to add or remove
- *                          before the selection.
- * @param {string|undefined} suffix - The suffix to add or remove after the selection,
- *                           defaults to being the same as the prefix.
- * @param {string} placeholder - The text to insert between 'prefix' and
- *                               'suffix' if the input text is empty.
- * @return {EditorState} The new state of the input field.
+ * @param state - The current state of the input field.
+ * @param prefix - The prefix to add or remove before the selection.
+ * @param suffix - The suffix to add or remove after the selection, defaults to
+ *   being the same as the prefix.
+ * @param placeholder - The text to insert between 'prefix' and 'suffix' if the
+ *   input text is empty.
+ * @return The new state of the input field.
  */
-export function toggleSpanStyle(state, prefix, suffix, placeholder) {
+export function toggleSpanStyle(
+  state: EditorState,
+  prefix: string,
+  suffix: string | undefined,
+  placeholder: string
+): EditorState {
   if (typeof suffix === 'undefined') {
     suffix = prefix;
   }
@@ -175,11 +185,8 @@ export function toggleSpanStyle(state, prefix, suffix, placeholder) {
 
 /**
  * Find the nearest line beginning searching backwards from `pos`.
- *
- * @param {string} str
- * @param {number} pos
  */
-function startOfLine(str, pos) {
+function startOfLine(str: string, pos: number) {
   const start = str.lastIndexOf('\n', pos);
   if (start < 0) {
     return 0;
@@ -190,11 +197,8 @@ function startOfLine(str, pos) {
 
 /**
  * Find the nearest line ending searching forwards from `pos`.
- *
- * @param {string} str
- * @param {number} pos
  */
-function endOfLine(str, pos) {
+function endOfLine(str: string, pos: number) {
   const end = str.indexOf('\n', pos);
   if (end < 0) {
     return str.length;
@@ -203,17 +207,29 @@ function endOfLine(str, pos) {
   }
 }
 
+type TransformLinesCallback = (
+  state: EditorState,
+  start: number,
+  end: number,
+  lineIndex: number
+) => EditorState;
+
 /**
  * Transform lines between two positions in an input field.
  *
- * @param {EditorState} state - The initial state of the input field
- * @param {number} start - The start position within the input text
- * @param {number} end - The end position within the input text
- * @param {(s: EditorState, start: number, end: number, lineIndex: number) => EditorState} callback
+ * @param state - The initial state of the input field
+ * @param start - The start position within the input text
+ * @param end - The end position within the input text
+ * @param callback
  *  - Callback which is invoked with the current state of the input and
  *    the start of the current line and returns the new state of the input.
  */
-function transformLines(state, start, end, callback) {
+function transformLines(
+  state: EditorState,
+  start: number,
+  end: number,
+  callback: TransformLinesCallback
+) {
   let lineStart = startOfLine(state.text, start);
   let lineEnd = endOfLine(state.text, start);
   let lineIndex = 0;
@@ -240,18 +256,20 @@ function transformLines(state, start, end, callback) {
 /**
  * Toggle Markdown-style formatting around a block of text.
  *
- * @param {EditorState} state - The current state of the input field.
- * @param {string|((lineIndex: number) => string)} prefix - The prefix
- *        to add or remove before each line of the selection, or a callback
- *        which returns said prefix for a specific line index (useful for
- *        multi-line selections that require different prefixes per line).
- * @return {EditorState} - The new state of the input field.
+ * @param state - The current state of the input field.
+ * @param prefix - The prefix to add or remove before each line of the
+ *   selection, or a callback which returns said prefix for a specific line
+ *   index (useful for multi-line selections that require different prefixes
+ *   per line).
+ * @return The new state of the input field.
  */
-export function toggleBlockStyle(state, prefix) {
+export function toggleBlockStyle(
+  state: EditorState,
+  prefix: string | ((lineIndex: number) => string)
+): EditorState {
   const start = state.selectionStart;
   const end = state.selectionEnd;
-  /** @param {number} lineIndex */
-  const prefixToString = lineIndex =>
+  const prefixToString = (lineIndex: number) =>
     typeof prefix === 'function' ? prefix(lineIndex) : prefix;
 
   // Test whether all lines in the selected range already have the style
