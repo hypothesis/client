@@ -1,4 +1,4 @@
-import * as mediaEmbedder from '../media-embedder.js';
+import * as mediaEmbedder from '../media-embedder';
 
 describe('sidebar/media-embedder', () => {
   function domElement(html) {

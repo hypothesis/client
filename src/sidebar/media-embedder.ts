@@ -1,9 +1,7 @@
 /**
  * Return an HTML5 audio player with the given src URL.
- *
- * @param {string} src
  */
-function audioElement(src) {
+function audioElement(src: string): HTMLAudioElement {
   const html5audio = document.createElement('audio');
   html5audio.controls = true;
   html5audio.src = src;
@@ -16,11 +14,14 @@ function audioElement(src) {
  *
  * See https://css-tricks.com/aspect-ratio-boxes/.
  *
- * @param {HTMLElement} element
- * @param {number} aspectRatio - Aspect ratio as `width/height`
- * @return {HTMLElement}
+ * @param element
+ * @param aspectRatio - Aspect ratio as `width/height`
+ * @return - A container element which wraps `element`
  */
-function wrapInAspectRatioContainer(element, aspectRatio) {
+function wrapInAspectRatioContainer(
+  element: HTMLElement,
+  aspectRatio: number
+): HTMLElement {
   element.style.position = 'absolute';
   element.style.top = '0';
   element.style.left = '0';
@@ -37,11 +38,8 @@ function wrapInAspectRatioContainer(element, aspectRatio) {
 
 /**
  * Return an iframe DOM element with the given src URL.
- *
- * @param {string} src
- * @param {number} [aspectRatio]
  */
-function iframe(src, aspectRatio = 16 / 9) {
+function iframe(src: string, aspectRatio = 16 / 9): HTMLElement {
   const iframe_ = document.createElement('iframe');
   iframe_.src = src;
   iframe_.setAttribute('frameborder', '0');
@@ -55,15 +53,15 @@ function iframe(src, aspectRatio = 16 / 9) {
  * '\dh\dm\ds' format. If `timeValue` is numeric (only),
  * it's assumed to be seconds and is left alone.
  *
- * @param {string} timeValue - value of `t` or `start` param in YouTube URL
- * @return {string} timeValue in seconds
+ * @param timeValue - value of `t` or `start` param in YouTube URL
+ * @return timeValue in seconds
  * @example
  * formatYouTubeTime('5m'); // returns '300'
  * formatYouTubeTime('20m10s'); // returns '1210'
  * formatYouTubeTime('1h1s'); // returns '3601'
  * formatYouTubeTime('10'); // returns '10'
  **/
-function parseTimeString(timeValue) {
+function parseTimeString(timeValue: string): string {
   const timePattern = /(\d+)([hms]?)/g;
   const multipliers = {
     h: 60 * 60,
@@ -76,7 +74,7 @@ function parseTimeString(timeValue) {
   // match[2] - Unit (e.g. 'h','m','s', or empty)
   while ((match = timePattern.exec(timeValue)) !== null) {
     if (match[2]) {
-      const unit = /** @type {keyof multipliers} */ (match[2]);
+      const unit = match[2] as keyof typeof multipliers;
       seconds += Number(match[1]) * multipliers[unit];
     } else {
       seconds += +match[1]; // Treat values missing units as seconds
@@ -90,8 +88,7 @@ function parseTimeString(timeValue) {
  * See https://developers.google.com/youtube/player_parameters for
  * all parameter possibilities.
  *
- * @param {HTMLAnchorElement} link
- * @return {string} formatted filtered URL query string, e.g. '?start=90' or
+ * @return Formatted filtered URL query string, e.g. '?start=90' or
  *   an empty string if the filtered query is empty.
  * @example
  * // returns '?end=10&start=5'
@@ -99,10 +96,8 @@ function parseTimeString(timeValue) {
  * // - `t` is translated to `start`
  * // - `baz` is not allowed param
  * // - param keys are sorted
- *
- * @param {HTMLAnchorElement} link
  */
-function youTubeQueryParams(link) {
+function youTubeQueryParams(link: HTMLAnchorElement): string {
   const allowedParams = [
     'end',
     'start',
@@ -112,7 +107,7 @@ function youTubeQueryParams(link) {
   const filteredQuery = new URLSearchParams();
 
   // Copy allowed params into `filteredQuery`.
-  for (let [key, value] of linkParams) {
+  for (const [key, value] of linkParams) {
     if (!allowedParams.includes(key)) {
       continue;
     }
@@ -135,13 +130,11 @@ function youTubeQueryParams(link) {
   }
   return query;
 }
+
 /**
  * Return a YouTube embed (<iframe>) DOM element for the given video ID.
- *
- * @param {string} id
- * @param {HTMLAnchorElement} link
  */
-function youTubeEmbed(id, link) {
+function youTubeEmbed(id: string, link: HTMLAnchorElement): HTMLElement {
   const query = youTubeQueryParams(link);
   return iframe(`https://www.youtube.com/embed/${id}${query}`);
 }
@@ -150,24 +143,22 @@ function youTubeEmbed(id, link) {
  * Create an iframe embed generator for links that have the form
  * `https://<hostname>/<path containing a video ID>`
  *
- * @param {string} hostname
- * @param {RegExp} pathPattern -
+ * @param hostname
+ * @param pathPattern -
  *   Pattern to match against the pathname part of the link. This regex should
  *   contain a single capture group which matches the video ID within the path.
- * @param {(videoId: string) => string} iframeUrlGenerator -
+ * @param iframeUrlGenerator -
  *   Generate the URL for an embedded video iframe from a video ID
- * @param {object} options
- *   @param {number} [options.aspectRatio]
- * @return {(link: HTMLAnchorElement) => HTMLElement|null}
+ * @return Function that takes an `<a>` element and returns the embedded iframe
+ *   for that link, or `null` if we don't have a matching embed generator.
  */
 function createEmbedGenerator(
-  hostname,
-  pathPattern,
-  iframeUrlGenerator,
-  { aspectRatio } = {}
-) {
-  /** @param {HTMLAnchorElement} link */
-  const generator = link => {
+  hostname: string,
+  pathPattern: RegExp,
+  iframeUrlGenerator: (videoId: string) => string,
+  { aspectRatio }: { aspectRatio?: number } = {}
+): (link: HTMLAnchorElement) => HTMLElement | null {
+  const generator = (link: HTMLAnchorElement) => {
     if (link.hostname !== hostname) {
       return null;
     }
@@ -190,151 +181,145 @@ function createEmbedGenerator(
  *
  * Each function either returns `undefined` if it can't generate an embed for
  * the link, or a DOM element if it can.
- *
- * @type {Array<(link: HTMLAnchorElement) => (HTMLElement|null)>}
  */
-const embedGenerators = [
-  // Matches URLs like https://www.youtube.com/watch?v=rw6oWkCojpw
-  function iframeFromYouTubeWatchURL(link) {
-    if (link.hostname !== 'www.youtube.com') {
-      return null;
-    }
-
-    if (!/\/watch\/?/.test(link.pathname)) {
-      return null;
-    }
-
-    const groups = /[&?]v=([^&#]+)/.exec(link.search);
-    if (groups) {
-      return youTubeEmbed(groups[1], link);
-    }
-    return null;
-  },
-
-  // Matches URLs like https://youtu.be/rw6oWkCojpw
-  function iframeFromYouTubeShareURL(link) {
-    if (link.hostname !== 'youtu.be') {
-      return null;
-    }
-
-    // extract video ID from URL
-    const groups = /^\/([^/]+)\/?$/.exec(link.pathname);
-    if (groups) {
-      return youTubeEmbed(groups[1], link);
-    }
-    return null;
-  },
-
-  // Matches URLs like https://vimeo.com/149000090
-  createEmbedGenerator(
-    'vimeo.com',
-    /^\/([^/?#]+)\/?$/,
-    id => `https://player.vimeo.com/video/${id}`
-  ),
-
-  // Matches URLs like https://vimeo.com/channels/staffpicks/148845534
-  createEmbedGenerator(
-    'vimeo.com',
-    /^\/channels\/[^/]+\/([^/?#]+)\/?$/,
-    id => `https://player.vimeo.com/video/${id}`
-  ),
-
-  // Matches URLs like https://flipgrid.com/s/030475b8ceff
-  createEmbedGenerator(
-    'flipgrid.com',
-    /^\/s\/([^/]+)$/,
-    id => `https://flipgrid.com/s/${id}?embed=true`
-  ),
-
-  /**
-   * Match Internet Archive URLs
-   *
-   *  The patterns are:
-   *
-   *  1. https://archive.org/embed/{slug}?start={startTime}&end={endTime}
-   *     (Embed links)
-   *
-   *  2. https://archive.org/details/{slug}?start={startTime}&end={endTime}
-   *     (Video page links for most videos)
-   *
-   *  3. https://archive.org/details/{slug}/start/{startTime}/end/{endTime}
-   *     (Video page links for the TV News Archive [1])
-   *
-   *  (2) and (3) allow users to copy and paste URLs from archive.org video
-   *  details pages directly into the sidebar to generate video embeds.
-   *
-   *  [1] https://archive.org/details/tv
-   */
-  function iFrameFromInternetArchiveLink(link) {
-    if (link.hostname !== 'archive.org') {
-      return null;
-    }
-
-    // Extract the unique slug from the path.
-    const slugMatch = /^\/(embed|details)\/(.+)/.exec(link.pathname);
-    if (!slugMatch) {
-      return null;
-    }
-
-    // Extract start and end times, which may appear either as query string
-    // params or path params.
-    let slug = slugMatch[2];
-    const linkParams = new URLSearchParams(link.search);
-    let startTime = linkParams.get('start');
-    let endTime = linkParams.get('end');
-
-    if (!startTime) {
-      const startPathParam = slug.match(/\/start\/([^/]+)/);
-      if (startPathParam) {
-        startTime = startPathParam[1];
-        slug = slug.replace(startPathParam[0], '');
+const embedGenerators: Array<(link: HTMLAnchorElement) => HTMLElement | null> =
+  [
+    // Matches URLs like https://www.youtube.com/watch?v=rw6oWkCojpw
+    function iframeFromYouTubeWatchURL(link) {
+      if (link.hostname !== 'www.youtube.com') {
+        return null;
       }
-    }
 
-    if (!endTime) {
-      const endPathParam = slug.match(/\/end\/([^/]+)/);
-      if (endPathParam) {
-        endTime = endPathParam[1];
-        slug = slug.replace(endPathParam[0], '');
+      if (!/\/watch\/?/.test(link.pathname)) {
+        return null;
       }
-    }
 
-    // Generate embed URL.
-    const iframeUrl = new URL(`https://archive.org/embed/${slug}`);
-    if (startTime) {
-      iframeUrl.searchParams.append('start', startTime);
-    }
-    if (endTime) {
-      iframeUrl.searchParams.append('end', endTime);
-    }
-    return iframe(iframeUrl.href);
-  },
+      const groups = /[&?]v=([^&#]+)/.exec(link.search);
+      if (groups) {
+        return youTubeEmbed(groups[1], link);
+      }
+      return null;
+    },
 
-  // Matches URLs that end with .mp3, .ogg, or .wav (assumed to be audio files)
-  function html5audioFromMp3Link(link) {
-    if (
-      link.pathname.endsWith('.mp3') ||
-      link.pathname.endsWith('.ogg') ||
-      link.pathname.endsWith('.wav')
-    ) {
-      return audioElement(link.href);
-    }
-    return null;
-  },
-];
+    // Matches URLs like https://youtu.be/rw6oWkCojpw
+    function iframeFromYouTubeShareURL(link) {
+      if (link.hostname !== 'youtu.be') {
+        return null;
+      }
+
+      // extract video ID from URL
+      const groups = /^\/([^/]+)\/?$/.exec(link.pathname);
+      if (groups) {
+        return youTubeEmbed(groups[1], link);
+      }
+      return null;
+    },
+
+    // Matches URLs like https://vimeo.com/149000090
+    createEmbedGenerator(
+      'vimeo.com',
+      /^\/([^/?#]+)\/?$/,
+      id => `https://player.vimeo.com/video/${id}`
+    ),
+
+    // Matches URLs like https://vimeo.com/channels/staffpicks/148845534
+    createEmbedGenerator(
+      'vimeo.com',
+      /^\/channels\/[^/]+\/([^/?#]+)\/?$/,
+      id => `https://player.vimeo.com/video/${id}`
+    ),
+
+    // Matches URLs like https://flipgrid.com/s/030475b8ceff
+    createEmbedGenerator(
+      'flipgrid.com',
+      /^\/s\/([^/]+)$/,
+      id => `https://flipgrid.com/s/${id}?embed=true`
+    ),
+
+    /**
+     * Match Internet Archive URLs
+     *
+     *  The patterns are:
+     *
+     *  1. https://archive.org/embed/{slug}?start={startTime}&end={endTime}
+     *     (Embed links)
+     *
+     *  2. https://archive.org/details/{slug}?start={startTime}&end={endTime}
+     *     (Video page links for most videos)
+     *
+     *  3. https://archive.org/details/{slug}/start/{startTime}/end/{endTime}
+     *     (Video page links for the TV News Archive [1])
+     *
+     *  (2) and (3) allow users to copy and paste URLs from archive.org video
+     *  details pages directly into the sidebar to generate video embeds.
+     *
+     *  [1] https://archive.org/details/tv
+     */
+    function iFrameFromInternetArchiveLink(link: HTMLAnchorElement) {
+      if (link.hostname !== 'archive.org') {
+        return null;
+      }
+
+      // Extract the unique slug from the path.
+      const slugMatch = /^\/(embed|details)\/(.+)/.exec(link.pathname);
+      if (!slugMatch) {
+        return null;
+      }
+
+      // Extract start and end times, which may appear either as query string
+      // params or path params.
+      let slug = slugMatch[2];
+      const linkParams = new URLSearchParams(link.search);
+      let startTime = linkParams.get('start');
+      let endTime = linkParams.get('end');
+
+      if (!startTime) {
+        const startPathParam = slug.match(/\/start\/([^/]+)/);
+        if (startPathParam) {
+          startTime = startPathParam[1];
+          slug = slug.replace(startPathParam[0], '');
+        }
+      }
+
+      if (!endTime) {
+        const endPathParam = slug.match(/\/end\/([^/]+)/);
+        if (endPathParam) {
+          endTime = endPathParam[1];
+          slug = slug.replace(endPathParam[0], '');
+        }
+      }
+
+      // Generate embed URL.
+      const iframeUrl = new URL(`https://archive.org/embed/${slug}`);
+      if (startTime) {
+        iframeUrl.searchParams.append('start', startTime);
+      }
+      if (endTime) {
+        iframeUrl.searchParams.append('end', endTime);
+      }
+      return iframe(iframeUrl.href);
+    },
+
+    // Matches URLs that end with .mp3, .ogg, or .wav (assumed to be audio files)
+    function html5audioFromMp3Link(link: HTMLAnchorElement) {
+      if (
+        link.pathname.endsWith('.mp3') ||
+        link.pathname.endsWith('.ogg') ||
+        link.pathname.endsWith('.wav')
+      ) {
+        return audioElement(link.href);
+      }
+      return null;
+    },
+  ];
 
 /**
  * Return an embed element for the given link if it's an embeddable link.
  *
  * If the link is a link for a YouTube video or other embeddable media then
  * return an embed DOM element (for example an <iframe>) for that media.
- *
- * Otherwise return undefined.
- *
- * @param {HTMLAnchorElement} link
- * @return {HTMLElement|null}
  */
-function embedForLink(link) {
+function embedForLink(link: HTMLAnchorElement): HTMLElement | null {
   let embed;
   let j;
   for (j = 0; j < embedGenerators.length; j++) {
@@ -368,17 +353,14 @@ function embedForLink(link) {
  * with no way to just insert a media link without it being embedded.
  *
  * If the link is not a link to an embeddable media it will be left untouched.
- *
- * @param {HTMLAnchorElement} link
- * @return {HTMLElement|null}
  */
-function replaceLinkWithEmbed(link) {
+function replaceLinkWithEmbed(link: HTMLAnchorElement): HTMLElement | null {
   // The link's text may or may not be percent encoded. The `link.href` property
   // will always be percent encoded. When comparing the two we need to be
   // agnostic as to which representation is used.
   if (link.href !== link.textContent) {
     try {
-      const encodedText = encodeURI(/** @type {string} */ (link.textContent));
+      const encodedText = encodeURI(link.textContent!);
       if (link.href !== encodedText) {
         return null;
       }
@@ -389,10 +371,18 @@ function replaceLinkWithEmbed(link) {
 
   const embed = embedForLink(link);
   if (embed) {
-    /** @type {Element} */ (link.parentElement).replaceChild(embed, link);
+    link.parentElement!.replaceChild(embed, link);
   }
   return embed;
 }
+
+export type EmbedOptions = {
+  /**
+   * Class name to apply to embed containers. An important function of this
+   * class is to set the width of the embed.
+   */
+  className?: string;
+};
 
 /**
  * Replace all embeddable link elements beneath the given element with embeds.
@@ -400,18 +390,17 @@ function replaceLinkWithEmbed(link) {
  * All links to YouTube videos or other embeddable media will be replaced with
  * embeds of the same media.
  *
- * @param {HTMLElement} element
- * @param {object} options
- *   @param {string} [options.className] -
- *     Class name to apply to embed containers. An important function of this class is to set
- *     the width of the embed.
+ * @param element - Root element to search for links
  */
-export function replaceLinksWithEmbeds(element, { className } = {}) {
+export function replaceLinksWithEmbeds(
+  element: HTMLElement,
+  { className }: EmbedOptions = {}
+) {
   // Get a static (non-live) list of <a> children of `element`.
   // It needs to be static because we may replace these elements as we iterate over them.
   const links = Array.from(element.getElementsByTagName('a'));
 
-  for (let link of links) {
+  for (const link of links) {
     const embed = replaceLinkWithEmbed(link);
     if (embed) {
       if (className) {
