@@ -143,7 +143,6 @@ function youTubeEmbed(id: string, link: HTMLAnchorElement): HTMLElement {
  * Create an iframe embed generator for links that have the form
  * `https://<hostname>/<path containing a video ID>`
  *
- * @param hostname
  * @param pathPattern -
  *   Pattern to match against the pathname part of the link. This regex should
  *   contain a single capture group which matches the video ID within the path.
