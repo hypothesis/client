@@ -20,10 +20,10 @@ export type EditorState = {
  * Types of Markdown link that can be inserted with
  * {@link convertSelectionToLink}.
  */
-export const LinkType = {
-  ANCHOR_LINK: 0,
-  IMAGE_LINK: 1,
-};
+export enum LinkType {
+  ANCHOR_LINK,
+  IMAGE_LINK,
+}
 
 /**
  * Replace text in an input field and return the new state.
@@ -91,7 +91,7 @@ function replaceText(
  */
 export function convertSelectionToLink(
   state: EditorState,
-  linkType: number = LinkType.ANCHOR_LINK
+  linkType: LinkType = LinkType.ANCHOR_LINK
 ): EditorState {
   const selection = state.text.slice(state.selectionStart, state.selectionEnd);
 
