@@ -21,8 +21,8 @@ export type EditorState = {
  * {@link convertSelectionToLink}.
  */
 export enum LinkType {
-  ANCHOR_LINK,
-  IMAGE_LINK,
+  ANCHOR_LINK = 'ANCHOR_LINK',
+  IMAGE_LINK = 'IMAGE_LINK',
 }
 
 /**
