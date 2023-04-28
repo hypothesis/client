@@ -1167,11 +1167,12 @@
     glob "^7.2.0"
 
 "@hypothesis/frontend-shared@^6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-6.0.0.tgz#27ef2944c406145e9ccee2d852ad73c179ff3ea9"
-  integrity sha512-sJIxjBLVq5YGdQIYT1ayV8GQ/NlUxXY5nJMcG45Xxl7hgmrmwL+4G7l9h2gAD2PwXx1Rt9gjbdF9Zmrq6Yp0IQ==
+  version "6.1.1"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-6.1.1.tgz#c3bd46f162e20c9c5612dd66f3fa4bb2e911f674"
+  integrity sha512-GGk6eb8pRNuqLN+QtQHQn+CC2ab7m5+a6cye0MSWkvuEclh8wLSxEHQk8/74xN9BJeWRWPbBNEswxKui8kph/A==
   dependencies:
     highlight.js "^11.6.0"
+    wouter-preact "^2.10.0-alpha.1"
 
 "@isaacs/string-locale-compare@^1.1.0":
   version "1.1.0"
@@ -9072,6 +9073,11 @@ workerpool@6.2.1:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/workerpool/-/workerpool-6.2.1.tgz#46fc150c17d826b86a008e5a4508656777e9c343"
   integrity sha512-ILEIE97kDZvF9Wb9f6h5aXK4swSlKGUcOEGiIYb2OOu/IrDU9iwj0fD//SsA6E5ibwJxpEvhullJY4Sl4GcpAw==
+
+wouter-preact@^2.10.0-alpha.1:
+  version "2.10.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/wouter-preact/-/wouter-preact-2.10.0-alpha.1.tgz#213394a210d1566f8bd5bfc794909b10cafb09b2"
+  integrity sha512-V6K8YBIURy9PHbF1e2P0gCuhCy0Oe0GbD1EZ1VxEWLU/rtBZ7IwkTj+6QVJ236NFbCklDuwL68PiUg44sSgq/w==
 
 wrap-ansi@^2.0.0:
   version "2.1.0"
