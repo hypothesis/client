@@ -7,20 +7,15 @@
  * [1] See https://reactjs.org/docs/context.html#api and
  *     https://reactjs.org/docs/hooks-reference.html#usecontext
  */
-
-/**
- * @typedef {import("redux").Store} Store
- */
 import { createContext } from 'preact';
+import type { ComponentType } from 'preact';
 import { useContext } from 'preact/hooks';
 
-/**
- * @typedef ServiceProvider
- * @prop {(serviceName: string) => unknown} get
- */
+type ServiceProvider = {
+  get: (serviceName: string) => unknown;
+};
 
-/** @type {ServiceProvider} */
-const fallbackInjector = {
+const fallbackInjector: ServiceProvider = {
   get(service) {
     throw new Error(
       `Missing ServiceContext provider to provide "${service}" prop`
@@ -38,11 +33,6 @@ const fallbackInjector = {
  * `withServices` wrapper.
  */
 export const ServiceContext = createContext(fallbackInjector);
-
-/**
- * @template Props
- * @typedef {import("preact").ComponentType<Props>} ComponentType
- */
 
 /**
  * Wrap a Preact component to inject specified props using a dependency injector.
@@ -64,15 +54,16 @@ export const ServiceContext = createContext(fallbackInjector);
  *   // Wrap `MyComponent` to inject "settings" service from context.
  *   export default withServices(MyComponent, ['settings']);
  *
- * @template {Record<string, unknown>} Props
- * @template {string} ServiceName
- * @param {ComponentType<Props>} Component
- * @param {ServiceName[]} serviceNames - List of prop names that should be injected
- * @return {ComponentType<Omit<Props,ServiceName>>}
+ * @param serviceNames - List of prop names that should be injected
  */
-export function withServices(Component, serviceNames) {
-  /** @param {Omit<Props,ServiceName>} props */
-  function Wrapper(props) {
+export function withServices<
+  Props extends Record<string, unknown>,
+  ServiceName extends string
+>(
+  Component: ComponentType<Props>,
+  serviceNames: ServiceName[]
+): ComponentType<Omit<Props, ServiceName>> {
+  function Wrapper(props: Omit<Props, ServiceName>) {
     // Get the current dependency injector instance that is provided by a
     // `ServiceContext.Provider` somewhere higher up the component tree.
     const injector = useContext(ServiceContext);
@@ -80,9 +71,8 @@ export function withServices(Component, serviceNames) {
     // Inject services, unless they have been overridden by props passed from
     // the parent component.
 
-    /** @type {Record<string,unknown>} */
-    const services = {};
-    for (let service of serviceNames) {
+    const services: Record<string, unknown> = {};
+    for (const service of serviceNames) {
       // Debugging check to make sure the store is used correctly.
       if (process.env.NODE_ENV !== 'production') {
         if (service === 'store') {
@@ -97,7 +87,7 @@ export function withServices(Component, serviceNames) {
       }
     }
 
-    const propsWithServices = /** @type {Props} */ ({ ...services, ...props });
+    const propsWithServices = { ...services, ...props } as Props;
     return <Component {...propsWithServices} />;
   }
 
@@ -115,9 +105,9 @@ export function withServices(Component, serviceNames) {
  * This is an alternative to `withServices` that is mainly useful in the
  * context of custom hooks.
  *
- * @param {string} service - Name of the service to look up
+ * @param service - Name of the service to look up
  */
-export function useService(service) {
+export function useService(service: string) {
   const injector = useContext(ServiceContext);
   return injector.get(service);
 }
