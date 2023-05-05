@@ -113,7 +113,7 @@ export default [
     // by changing the URL fragment each time.
     format: 'iife',
   }),
-  bundleConfig({ name: 'sidebar', entry: 'src/sidebar/index.js' }),
+  bundleConfig({ name: 'sidebar', entry: 'src/sidebar/index.tsx' }),
   bundleConfig({
     name: 'ui-playground',
     entry: 'dev-server/ui-playground/index.js',
