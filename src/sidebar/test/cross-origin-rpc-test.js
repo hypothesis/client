@@ -1,6 +1,6 @@
 import EventEmitter from 'tiny-emitter';
 
-import { startServer, preStartServer, $imports } from '../cross-origin-rpc.js';
+import { startServer, preStartServer, $imports } from '../cross-origin-rpc';
 
 class FakeWindow {
   constructor() {

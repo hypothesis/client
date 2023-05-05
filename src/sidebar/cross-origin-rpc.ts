@@ -1,27 +1,23 @@
 import { warnOnce } from '../shared/warn-once';
+import type { ContentInfoConfig } from '../types/annotator';
+import type { SidebarSettings } from '../types/config';
+import type { FocusUserInfo } from '../types/rpc';
 import { normalizeGroupIds } from './helpers/groups';
-
-/**
- * @typedef {import('../types/annotator').ContentInfoConfig} ContentInfoConfig
- * @typedef {import('../types/rpc').FocusUserInfo} FocusUserInfo
- */
+import type { SidebarStore } from './store';
 
 /**
  * List of not-yet-processed messages received during application startup.
- *
- * @type {MessageEvent[]}
  */
-let preStartQueue = [];
+let preStartQueue: MessageEvent[] = [];
 
 /**
  * Return the mapped methods that can be called remotely via this server.
  *
- * @param {import('./store').SidebarStore} store - The global store
+ * @param store - The global store
  */
-const registeredMethods = store => {
+const registeredMethods = (store: SidebarStore) => {
   return {
-    /** @param {FocusUserInfo} userInfo */
-    changeFocusModeUser: userInfo => {
+    changeFocusModeUser: (userInfo: FocusUserInfo) => {
       store.changeFocusModeUser(userInfo);
 
       const groupIds = userInfo?.groups ?? [];
@@ -32,8 +28,7 @@ const registeredMethods = store => {
       store.filterGroups(filteredGroupIds);
     },
 
-    /** @param {ContentInfoConfig} contentInfo */
-    showContentInfo: contentInfo => {
+    showContentInfo: (contentInfo: ContentInfoConfig) => {
       store.setContentInfo(contentInfo);
     },
   };
@@ -41,21 +36,18 @@ const registeredMethods = store => {
 
 /**
  * See https://www.jsonrpc.org/specification#request_object.
- *
- * @typedef JSONRPCRequest
- * @prop {string} jsonrpc
- * @prop {string} id
- * @prop {string} method
- * @prop {unknown[]} [params]
  */
+type JSONRPCRequest = {
+  jsonrpc: string;
+  id: string;
+  method: string;
+  params?: unknown[];
+};
 
 /**
  * Return true if `data` "looks like" a JSON-RPC message.
- *
- * @param {any} data
- * @return {data is JSONRPCRequest}
  */
-function isJSONRPCRequest(data) {
+function isJSONRPCRequest(data: any): data is JSONRPCRequest {
   // eslint-disable-next-line eqeqeq
   if (data == null || typeof data !== 'object') {
     return false;
@@ -82,14 +74,15 @@ function isJSONRPCRequest(data) {
  *
  * All methods called upon must be mapped in the `registeredMethods` function.
  *
- * @param {import('./store').SidebarStore} store
- * @param {import('../types/config').SidebarSettings} settings
- * @param {Window} $window
  * @inject
  */
-export function startServer(store, settings, $window) {
-  /** @type {Record<string, (...args: any[]) => void>} */
-  const methods = registeredMethods(store);
+export function startServer(
+  store: SidebarStore,
+  settings: SidebarSettings,
+  $window: Window
+) {
+  const methods: Record<string, (...args: any[]) => void> =
+    registeredMethods(store);
 
   // Process the pre-start incoming RPC requests
   preStartQueue.forEach(event => {
@@ -102,9 +95,8 @@ export function startServer(store, settings, $window) {
   // Start listening to new RPC requests
   $window.addEventListener('message', receiveMessage);
 
-  /** @param {MessageEvent} event */
-  function receiveMessage(event) {
-    let allowedOrigins = settings.rpcAllowedOrigins || [];
+  function receiveMessage(event: MessageEvent) {
+    const allowedOrigins = settings.rpcAllowedOrigins || [];
 
     if (!isJSONRPCRequest(event.data)) {
       return;
@@ -119,18 +111,16 @@ export function startServer(store, settings, $window) {
 
     // The entire JSON-RPC request object is contained in the postMessage()
     // data param.
-    let jsonRpcRequest = event.data;
+    const jsonRpcRequest = event.data;
 
-    const source = /** @type {Window} */ (event.source);
+    const source = event.source as Window;
     source.postMessage(jsonRpcResponse(jsonRpcRequest), event.origin);
   }
 
   /**
    * Return a JSON-RPC response to the given JSON-RPC request object.
-   *
-   * @param {JSONRPCRequest} request
    */
-  function jsonRpcResponse(request) {
+  function jsonRpcResponse(request: JSONRPCRequest) {
     const method = methods[request.method];
 
     // Return an error response if the method name is not registered with
@@ -156,9 +146,9 @@ export function startServer(store, settings, $window) {
 /**
  * Queues all incoming RPC requests so they can be handled later.
  *
- * @param {MessageEvent} event - RPC event payload
+ * @param event - RPC event payload
  */
-function preStartMessageListener(event) {
+function preStartMessageListener(event: MessageEvent) {
   preStartQueue.push(event);
 }
 
@@ -171,9 +161,7 @@ function preStartMessageListener(event) {
  * This allows the client to fetch its config from the parent app frame and potentially
  * receive new unsolicited incoming requests that the parent app may send before this
  * RPC server starts.
- *
- * @param {Window} window_ - Test seam
  */
-export function preStartServer(window_ = window) {
+export function preStartServer(window_: Window = window) {
   window_.addEventListener('message', preStartMessageListener);
 }
