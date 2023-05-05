@@ -13,7 +13,7 @@ import { checkEnvironment } from './config/check-env';
 import {
   startServer as startRPCServer,
   preStartServer as preStartRPCServer,
-} from './cross-origin-rpc.js';
+} from './cross-origin-rpc';
 import { ServiceContext } from './service-context';
 import { AnnotationActivityService } from './services/annotation-activity';
 import { AnnotationsService } from './services/annotations';
