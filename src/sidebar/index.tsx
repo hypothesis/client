@@ -6,6 +6,8 @@ import 'preact/debug';
 
 import { parseJsonConfig } from '../boot/parse-json-config';
 import { Injector } from '../shared/injector';
+import type { ConfigFromSidebar } from '../types/config';
+import type { SidebarSettings } from '../types/config';
 import HypothesisApp from './components/HypothesisApp';
 import LaunchErrorPanel from './components/LaunchErrorPanel';
 import { buildSettings } from './config/build-settings';
@@ -35,14 +37,12 @@ import { TagsService } from './services/tags';
 import { ThreadsService } from './services/threads';
 import { ToastMessengerService } from './services/toast-messenger';
 import { createSidebarStore } from './store';
+import type { SidebarStore } from './store';
 import { disableOpenerForExternalLinks } from './util/disable-opener-for-external-links';
 import * as sentry from './util/sentry';
 
 // Read settings rendered into sidebar app HTML by service/extension.
-const configFromSidebar =
-  /** @type {import('../types/config').ConfigFromSidebar} */ (
-    parseJsonConfig(document)
-  );
+const configFromSidebar = parseJsonConfig(document) as ConfigFromSidebar;
 
 // Check for known issues which may prevent the client from working.
 //
@@ -60,11 +60,9 @@ if (configFromSidebar.sentry && envOk) {
 disableOpenerForExternalLinks(document.body);
 
 /**
- * @param {import('./services/api').APIService} api
- * @param {import('./services/streamer').StreamerService} streamer
  * @inject
  */
-function setupApi(api, streamer) {
+function setupApi(api: APIService, streamer: StreamerService) {
   api.setClientId(streamer.clientId);
 }
 
@@ -72,12 +70,13 @@ function setupApi(api, streamer) {
  * Perform the initial fetch of groups and user profile and then set the initial
  * route to match the current URL.
  *
- * @param {import('./services/groups').GroupsService} groups
- * @param {import('./services/session').SessionService} session
- * @param {import('./services/router').RouterService} router
  * @inject
  */
-function setupRoute(groups, session, router) {
+function setupRoute(
+  groups: GroupsService,
+  session: SessionService,
+  router: RouterService
+) {
   groups.load();
   session.load();
   router.sync();
@@ -89,23 +88,22 @@ function setupRoute(groups, session, router) {
  * These processes include persisting or synchronizing data from one place
  * to another.
  *
- * @param {import('./services/autosave').AutosaveService} autosaveService
- * @param {import('./services/persisted-defaults').PersistedDefaultsService} persistedDefaults
- * @param {import('./services/service-url').ServiceURLService} serviceURL
  * @inject
  */
-function initServices(autosaveService, persistedDefaults, serviceURL) {
+function initServices(
+  autosaveService: AutosaveService,
+  persistedDefaults: PersistedDefaultsService,
+  serviceURL: ServiceURLService
+) {
   autosaveService.init();
   persistedDefaults.init();
   serviceURL.init();
 }
 
 /**
- * @param {import('./services/frame-sync').FrameSyncService} frameSync
- * @param {import('./store').SidebarStore} store
  * @inject
  */
-function setupFrameSync(frameSync, store) {
+function setupFrameSync(frameSync: FrameSyncService, store: SidebarStore) {
   if (store.route() === 'sidebar') {
     frameSync.connect();
   }
@@ -114,10 +112,9 @@ function setupFrameSync(frameSync, store) {
 /**
  * Launch the client application corresponding to the current URL.
  *
- * @param {import('../types/config').SidebarSettings} settings
- * @param {HTMLElement} appEl - Root HTML container for the app
+ * @param appEl - Root HTML container for the app
  */
-function startApp(settings, appEl) {
+function startApp(settings: SidebarSettings, appEl: HTMLElement) {
   const container = new Injector();
 
   // Register services.
@@ -167,11 +164,7 @@ function startApp(settings, appEl) {
   );
 }
 
-/**
- * @param {Error} error
- * @param {HTMLElement} appEl
- */
-function reportLaunchError(error, appEl) {
+function reportLaunchError(error: Error, appEl: HTMLElement) {
   // Report error. In the sidebar the console log is the only notice the user
   // gets because the sidebar does not appear at all if the app fails to start.
   console.error('Failed to start Hypothesis client: ', error);
@@ -181,9 +174,7 @@ function reportLaunchError(error, appEl) {
   render(<LaunchErrorPanel error={error} />, appEl);
 }
 
-const appEl = /** @type {HTMLElement} */ (
-  document.querySelector('hypothesis-app')
-);
+const appEl = document.querySelector('hypothesis-app') as HTMLElement;
 
 // Start capturing RPC requests before we start the RPC server (startRPCServer)
 preStartRPCServer();
