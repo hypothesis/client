@@ -66,6 +66,19 @@ describe('BucketBarClient', () => {
     assert.calledWith(fakeRPC.call, 'anchorsChanged');
   });
 
+  it('should update buckets when descendant of contentContainer element scrolls', async () => {
+    createBucketBarClient();
+
+    const scrollBox = document.createElement('div');
+    contentContainer.append(scrollBox);
+
+    scrollBox.dispatchEvent(new Event('scroll'));
+    await delay(0);
+
+    assert.calledOnce(fakeRPC.call);
+    assert.calledWith(fakeRPC.call, 'anchorsChanged');
+  });
+
   describe('#destroy', () => {
     it('stops listening for events', async () => {
       const bucketBarClient = createBucketBarClient();

@@ -39,7 +39,14 @@ export class BucketBarClient implements Destroyable {
 
     this._listeners.add(window, 'resize', () => this.update());
     this._listeners.add(window, 'scroll', () => this.update());
-    this._listeners.add(contentContainer, 'scroll', () => this.update());
+
+    // Update bucket positions when container or scrollable descendants are
+    // scrolled.
+    this._listeners.add(contentContainer, 'scroll', () => this.update(), {
+      // "scroll" event does not bubble, so use a capture listener to observe
+      // event in descendants.
+      capture: true,
+    });
   }
 
   destroy() {
