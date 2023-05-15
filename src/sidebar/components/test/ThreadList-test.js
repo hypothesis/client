@@ -142,6 +142,9 @@ describe('ThreadList', () => {
     beforeEach(() => {
       fakeScrollTop = sinon.stub();
       sinon.stub(fakeScrollContainer, 'scrollTop').set(fakeScrollTop);
+      // We've interfered with the setter, so we need to ensure that
+      // `scrollTop`'s getter provides a valid number
+      sinon.stub(fakeScrollContainer, 'scrollTop').get(() => 0);
       sinon
         .stub(document, 'querySelector')
         .withArgs('.js-thread-list-scroll-root')
