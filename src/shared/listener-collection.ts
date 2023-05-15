@@ -2,6 +2,7 @@ type Listener = {
   eventTarget: EventTarget;
   eventType: string;
   listener: (event: Event) => void;
+  options?: AddEventListenerOptions;
 };
 
 /**
@@ -49,6 +50,7 @@ export class ListenerCollection {
       eventType,
       // eslint-disable-next-line object-shorthand
       listener: listener as EventListener,
+      options,
     });
     return symbol;
   }
@@ -59,15 +61,15 @@ export class ListenerCollection {
   remove(listenerId: symbol) {
     const event = this._listeners.get(listenerId);
     if (event) {
-      const { eventTarget, eventType, listener } = event;
-      eventTarget.removeEventListener(eventType, listener);
+      const { eventTarget, eventType, listener, options } = event;
+      eventTarget.removeEventListener(eventType, listener, options);
       this._listeners.delete(listenerId);
     }
   }
 
   removeAll() {
-    this._listeners.forEach(({ eventTarget, eventType, listener }) => {
-      eventTarget.removeEventListener(eventType, listener);
+    this._listeners.forEach(({ eventTarget, eventType, listener, options }) => {
+      eventTarget.removeEventListener(eventType, listener, options);
     });
     this._listeners.clear();
   }
