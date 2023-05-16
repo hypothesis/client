@@ -27,7 +27,7 @@ function getJSON<T>(url: string): Promise<T> {
  */
 // @inject
 export class APIRoutesService {
-  private _apiURL: SidebarSettings['apiUrl'];
+  private _apiURL: string;
   private _routeCache: Promise<RouteMap> | null;
   private _linkCache: Promise<LinksResponse> | null;
 

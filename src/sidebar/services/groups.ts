@@ -162,7 +162,11 @@ export class GroupsService {
     // logging in or logging out.
     watch(
       this._store.subscribe,
-      () => [this._store.hasFetchedProfile(), this._store.profile().userid],
+      () =>
+        [
+          this._store.hasFetchedProfile(),
+          this._store.profile().userid,
+        ] as const,
       (_, [prevFetchedProfile]) => {
         if (!prevFetchedProfile) {
           // Ignore the first time that the profile is loaded.
