@@ -57,7 +57,7 @@ export class AnnotationsService {
    */
   private _initialize(
     annotationData: Omit<AnnotationData, '$tag'>,
-    now = new Date()
+    now: Date
   ): Annotation {
     const defaultPrivacy = this._store.getDefault('annotationPrivacy');
     const groupid = this._store.focusedGroupId();
