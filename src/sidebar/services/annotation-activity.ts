@@ -1,30 +1,22 @@
+import type { Annotation } from '../../types/api';
+import type { AnnotationEventType, SidebarSettings } from '../../types/config';
 import { isShared } from '../helpers/permissions';
 import * as postMessageJsonRpc from '../util/postmessage-json-rpc';
-
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/config').SidebarSettings} SidebarSettings
- * @typedef {import('../../types/config').AnnotationEventType} AnnotationEventType
- */
 
 /**
  * Send messages to configured ancestor frame on annotation activity
  */
 // @inject
 export class AnnotationActivityService {
-  /**
-   * @param {SidebarSettings} settings
-   */
-  constructor(settings) {
+  private _rpc: SidebarSettings['rpc'];
+  private _reportConfig: SidebarSettings['reportActivity'];
+
+  constructor(settings: SidebarSettings) {
     this._rpc = settings.rpc;
     this._reportConfig = settings.reportActivity;
   }
 
-  /**
-   * @param {AnnotationEventType} eventType
-   * @param {Annotation} annotation
-   */
-  reportActivity(eventType, annotation) {
+  reportActivity(eventType: AnnotationEventType, annotation: Annotation) {
     if (!this._rpc || !this._reportConfig) {
       return;
     }
