@@ -20,13 +20,6 @@ function truthTable(columns) {
   ];
 }
 
-// Return a mock session service containing three groups.
-const sessionWithThreeGroups = function () {
-  return {
-    state: {},
-  };
-};
-
 const dummyGroups = [
   {
     name: 'Group 1',
@@ -40,7 +33,6 @@ const dummyGroups = [
 describe('GroupsService', () => {
   let fakeAuth;
   let fakeStore;
-  let fakeSession;
   let fakeSettings;
   let fakeApi;
   let fakeMetadata;
@@ -98,7 +90,6 @@ describe('GroupsService', () => {
         route: sinon.stub().returns('sidebar'),
       }
     );
-    fakeSession = sessionWithThreeGroups();
     fakeApi = {
       annotation: {
         get: sinon.stub(),
@@ -135,7 +126,6 @@ describe('GroupsService', () => {
       fakeStore,
       fakeApi,
       fakeAuth,
-      fakeSession,
       fakeSettings,
       fakeToastMessenger
     );

@@ -2,13 +2,18 @@ import shallowEqual from 'shallowequal';
 
 // @ts-ignore - TS doesn't know about SVG files.
 import { default as logo } from '../../images/icons/logo.svg';
+import type { Group } from '../../types/api';
+import type { SidebarSettings } from '../../types/config';
+import type { Service } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
 import { isReply } from '../helpers/annotation-metadata';
 import { combineGroups } from '../helpers/groups';
+import type { SidebarStore } from '../store';
 import { awaitStateChange } from '../store/util';
 import { watch } from '../util/watch';
-
-/** @typedef {import('../../types/api').Group} Group */
+import type { APIService } from './api';
+import type { AuthService } from './auth';
+import type { ToastMessengerService } from './toast-messenger';
 
 const DEFAULT_ORG_ID = '__default__';
 
@@ -23,10 +28,8 @@ const DEFAULT_ORGANIZATION = {
  * the default Hypothesis organization.
  *
  * Mutates group objects in place
- *
- * @param {Group[]} groups
  */
-function injectOrganizations(groups) {
+function injectOrganizations(groups: Group[]) {
   groups.forEach(group => {
     if (!group.organization || typeof group.organization !== 'object') {
       group.organization = DEFAULT_ORGANIZATION;
@@ -34,11 +37,7 @@ function injectOrganizations(groups) {
   });
 }
 
-/**
- * @param {any} value
- * @return {value is Promise<unknown>}
- */
-function isPromise(value) {
+function isPromise(value: any): value is Promise<unknown> {
   return typeof value?.then === 'function';
 }
 
@@ -54,15 +53,21 @@ const expandParam = ['organization', 'scopes'];
  * @inject
  */
 export class GroupsService {
-  /**
-   * @param {import('../store').SidebarStore} store
-   * @param {import('./api').APIService} api
-   * @param {import('./auth').AuthService} auth
-   * @param {import('./session').SessionService} session
-   * @param {import('../../types/config').SidebarSettings} settings
-   * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
-   */
-  constructor(store, api, auth, session, settings, toastMessenger) {
+  private _store: SidebarStore;
+  private _api: APIService;
+  private _auth: AuthService;
+  private _settings: SidebarSettings;
+  private _toastMessenger: ToastMessengerService;
+  private _serviceConfig: Service | null;
+  private _reloadSetUp: boolean;
+
+  constructor(
+    store: SidebarStore,
+    api: APIService,
+    auth: AuthService,
+    settings: SidebarSettings,
+    toastMessenger: ToastMessengerService
+  ) {
     this._store = store;
     this._api = api;
     this._auth = auth;
@@ -77,7 +82,7 @@ export class GroupsService {
    * Return the main document URI that is used to fetch groups associated with
    * the site that the user is on.
    */
-  _mainURI() {
+  private _mainURI(): string | null {
     return this._store.mainFrame()?.uri ?? null;
   }
 
@@ -86,19 +91,13 @@ export class GroupsService {
    *
    * `filterGroups` performs client-side filtering to hide the "Public" group
    * for logged-out users under certain conditions.
-   *
-   * @param {Group[]} groups
-   * @param {boolean} isLoggedIn
-   * @param {string|null} directLinkedAnnotationGroupId
-   * @param {string|null} directLinkedGroupId
-   * @return {Promise<Group[]>}
    */
-  async _filterGroups(
-    groups,
-    isLoggedIn,
-    directLinkedAnnotationGroupId,
-    directLinkedGroupId
-  ) {
+  private async _filterGroups(
+    groups: Group[],
+    isLoggedIn: boolean,
+    directLinkedAnnotationGroupId: string | null,
+    directLinkedGroupId: string | null
+  ): Promise<Group[]> {
     // Filter the directLinkedGroup out if it is out of scope and scope is enforced.
     if (directLinkedGroupId) {
       const directLinkedGroup = groups.find(g => g.id === directLinkedGroupId);
@@ -145,7 +144,7 @@ export class GroupsService {
    * Set up automatic re-fetching of groups in response to various events
    * in the sidebar.
    */
-  _setupAutoReload() {
+  private _setupAutoReload() {
     if (this._reloadSetUp) {
       return;
     }
@@ -163,11 +162,7 @@ export class GroupsService {
     // logging in or logging out.
     watch(
       this._store.subscribe,
-      () =>
-        /** @type {const} */ ([
-          this._store.hasFetchedProfile(),
-          this._store.profile().userid,
-        ]),
+      () => [this._store.hasFetchedProfile(), this._store.profile().userid],
       (_, [prevFetchedProfile]) => {
         if (!prevFetchedProfile) {
           // Ignore the first time that the profile is loaded.
@@ -181,11 +176,8 @@ export class GroupsService {
 
   /**
    * Add groups to the store and set the initial focused group.
-   *
-   * @param {Group[]} groups
-   * @param {string|null} groupToFocus
    */
-  _addGroupsToStore(groups, groupToFocus) {
+  private _addGroupsToStore(groups: Group[], groupToFocus: string | null) {
     // Add a default organization to groups that don't have one. The organization
     // provides the logo to display when the group is selected and is also used
     // to order groups.
@@ -210,21 +202,16 @@ export class GroupsService {
 
   /**
    * Fetch a specific group.
-   *
-   * @param {string} id
-   * @return {Promise<Group>}
    */
-  _fetchGroup(id) {
+  private _fetchGroup(id: string): Promise<Group> {
     return this._api.group.read({ id, expand: expandParam });
   }
 
   /**
    * Fetch the groups associated with the current user and document, as well
    * as any groups that have been direct-linked to.
-   *
-   * @return {Promise<Group[]>}
    */
-  async _loadGroupsForUserAndDocument() {
+  private async _loadGroupsForUserAndDocument(): Promise<Group[]> {
     const getDocumentUriForGroupSearch = () =>
       awaitStateChange(this._store, () => this._mainURI());
 
@@ -273,8 +260,11 @@ export class GroupsService {
         });
     }
 
-    /** @type {{ authority?: string, expand: string[], document_uri?: string }} */
-    const listParams = {
+    const listParams: {
+      authority?: string;
+      expand: string[];
+      document_uri?: string;
+    } = {
       expand: expandParam,
     };
     const authority = this._serviceConfig?.authority;
@@ -359,9 +349,11 @@ export class GroupsService {
   /**
    * Load the specific groups configured by the annotation service.
    *
-   * @param {string[]} groupIds - `id` or `groupid`s of groups to fetch
+   * @param groupIds - `id` or `groupid`s of groups to fetch
    */
-  async _loadServiceSpecifiedGroups(groupIds) {
+  private async _loadServiceSpecifiedGroups(
+    groupIds: string[]
+  ): Promise<Group[]> {
     // Fetch the groups that the user is a member of in one request and then
     // fetch any other groups not returned in that request directly.
     //
@@ -372,9 +364,8 @@ export class GroupsService {
       expand: expandParam,
     });
 
-    let error;
-    /** @param {string} id */
-    const tryFetchGroup = async id => {
+    let error: Error | null = null;
+    const tryFetchGroup = async (id: string) => {
       try {
         return await this._fetchGroup(id);
       } catch (e) {
@@ -383,15 +374,12 @@ export class GroupsService {
       }
     };
 
-    /** @param {string} id */
-    const getGroup = id =>
+    const getGroup = (id: string) =>
       userGroups.find(g => g.id === id || g.groupid === id) ||
       tryFetchGroup(id);
 
     const groupResults = await Promise.all(groupIds.map(getGroup));
-    const groups = /** @type {Group[]} */ (
-      groupResults.filter(g => g !== null)
-    );
+    const groups = groupResults.filter(g => g !== null) as Group[];
 
     // Optional direct linked group id. This is used in the Notebook context.
     const focusedGroupId = this._store.directLinkedGroupId();
@@ -423,17 +411,14 @@ export class GroupsService {
    *
    * 2. The annotation service specifies exactly which groups to load via the
    *    configuration it passes to the client.
-   *
-   * @return {Promise<Group[]>}
    */
-  async load() {
+  async load(): Promise<Group[]> {
     // The `groups` property may be a list of group IDs or a promise for one,
     // if we're in the LMS app and the group list is being fetched asynchronously.
     const groupIdsOrPromise = this._serviceConfig?.groups;
 
     if (Array.isArray(groupIdsOrPromise) || isPromise(groupIdsOrPromise)) {
-      /** @type {string[]} */
-      let groupIds = [];
+      let groupIds: string[] = [];
       try {
         groupIds = await groupIdsOrPromise;
       } catch (e) {
@@ -451,10 +436,8 @@ export class GroupsService {
    * Update the focused group. Update the store, then check to see if
    * there are any new (unsaved) annotations—if so, update those annotations
    * such that they are associated with the newly-focused group.
-   *
-   * @param {string} groupId
    */
-  focus(groupId) {
+  focus(groupId: string) {
     const prevGroupId = this._store.focusedGroupId();
 
     this._store.focusGroup(groupId);
@@ -481,11 +464,8 @@ export class GroupsService {
 
   /**
    * Request to remove the current user from a group.
-   *
-   * @param {string} id - The group ID
-   * @return {Promise<void>}
    */
-  leave(id) {
+  leave(id: string): Promise<void> {
     // The groups list will be updated in response to a session state
     // change notification from the server. We could improve the UX here
     // by optimistically updating the session state
