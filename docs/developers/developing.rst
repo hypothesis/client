@@ -109,21 +109,14 @@ Hypothesis uses Karma and mocha for testing. To run all the tests once, run:
 
    make test
 
-You can filter the tests which are run by running ``make test ARGS='--grep <pattern>'``,
-or ``yarn test --grep <pattern>``. Only test files matching the regex ``<pattern>`` will
-be executed.
+You can filter the tests which are run by running ``yarn test --grep <pattern>``.
+Only test files matching the regex ``<pattern>`` will be executed.
 
 To run tests and automatically re-run them whenever any source files change, run:
 
 .. code-block:: sh
 
-   make test ARGS='--watch' 
-
-or
-
-.. code-block:: sh
-
-   yarn test --watch
+   yarn test:watch
 
 This command will also serve the tests on localhost (typically `http://localhost:9876`)
 so that break points can be set and the browser's console can be used for interactive
