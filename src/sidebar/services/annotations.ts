@@ -1,16 +1,16 @@
 import { generateHexString } from '../../shared/random';
+import type { AnnotationData } from '../../types/annotator';
+import type { Annotation, SavedAnnotation } from '../../types/api';
+import type { AnnotationEventType } from '../../types/config';
 import * as metadata from '../helpers/annotation-metadata';
 import {
   defaultPermissions,
   privatePermissions,
   sharedPermissions,
 } from '../helpers/permissions';
-
-/**
- * @typedef {import('../../types/api').Annotation} Annotation
- * @typedef {import('../../types/annotator').AnnotationData} AnnotationData
- * @typedef {import('../../types/api').SavedAnnotation} SavedAnnotation
- */
+import type { SidebarStore } from '../store';
+import type { AnnotationActivityService } from './annotation-activity';
+import type { APIService } from './api';
 
 /**
  * A service for creating, updating and persisting annotations both in the
@@ -18,12 +18,15 @@ import {
  */
 // @inject
 export class AnnotationsService {
-  /**
-   * @param {import('./api').APIService} api
-   * @param {import('./annotation-activity').AnnotationActivityService} annotationActivity
-   * @param {import('../store').SidebarStore} store
-   */
-  constructor(annotationActivity, api, store) {
+  private _activity: AnnotationActivityService;
+  private _api: APIService;
+  private _store: SidebarStore;
+
+  constructor(
+    annotationActivity: AnnotationActivityService,
+    api: APIService,
+    store: SidebarStore
+  ) {
     this._activity = annotationActivity;
     this._api = api;
     this._store = store;
@@ -32,11 +35,9 @@ export class AnnotationsService {
   /**
    * Apply changes for the given `annotation` from its draft in the store (if
    * any) and return a new object with those changes integrated.
-   *
-   * @param {Annotation} annotation
    */
-  _applyDraftChanges(annotation) {
-    const changes = {};
+  private _applyDraftChanges(annotation: Annotation): Annotation {
+    const changes: Partial<Annotation> = {};
     const draft = this._store.getDraft(annotation);
 
     if (draft) {
@@ -53,12 +54,11 @@ export class AnnotationsService {
 
   /**
    * Extend new annotation objects with defaults and permissions.
-   *
-   * @param {Omit<AnnotationData, '$tag'>} annotationData
-   * @param {Date} now
-   * @return {Annotation}
    */
-  _initialize(annotationData, now = new Date()) {
+  private _initialize(
+    annotationData: Omit<AnnotationData, '$tag'>,
+    now = new Date()
+  ): Annotation {
     const defaultPrivacy = this._store.getDefault('annotationPrivacy');
     const groupid = this._store.focusedGroupId();
     const profile = this._store.profile();
@@ -109,11 +109,8 @@ export class AnnotationsService {
    * Populate a new annotation object from `annotation` and add it to the store.
    * Create a draft for it unless it's a highlight and clear other empty
    * drafts out of the way.
-   *
-   * @param {Omit<AnnotationData, '$tag'>} annotationData
-   * @param {Date} now
    */
-  create(annotationData, now = new Date()) {
+  create(annotationData: Omit<AnnotationData, '$tag'>, now = new Date()) {
     const annotation = this._initialize(annotationData, now);
 
     this._store.addAnnotations([annotation]);
@@ -170,10 +167,8 @@ export class AnnotationsService {
 
   /**
    * Delete an annotation via the API and update the store.
-   *
-   * @param {SavedAnnotation} annotation
    */
-  async delete(annotation) {
+  async delete(annotation: SavedAnnotation) {
     await this._api.annotation.delete({ id: annotation.id });
     this._activity.reportActivity('delete', annotation);
     this._store.removeAnnotations([annotation]);
@@ -181,10 +176,8 @@ export class AnnotationsService {
 
   /**
    * Flag an annotation for review by a moderator.
-   *
-   * @param {SavedAnnotation} annotation
    */
-  async flag(annotation) {
+  async flag(annotation: SavedAnnotation) {
     await this._api.annotation.flag({ id: annotation.id });
     this._activity.reportActivity('flag', annotation);
     this._store.updateFlagStatus(annotation.id, true);
@@ -192,11 +185,8 @@ export class AnnotationsService {
 
   /**
    * Create a reply to `annotation` by the user `userid` and add to the store.
-   *
-   * @param {SavedAnnotation} annotation
-   * @param {string} userid
    */
-  reply(annotation, userid) {
+  reply(annotation: SavedAnnotation, userid: string) {
     const replyAnnotation = {
       group: annotation.group,
       permissions: metadata.isPublic(annotation)
@@ -213,13 +203,10 @@ export class AnnotationsService {
    * Save new (or update existing) annotation. On success,
    * the annotation's `Draft` will be removed and the annotation added
    * to the store.
-   *
-   * @param {Annotation} annotation
    */
-  async save(annotation) {
-    let saved;
-    /** @type {import('../../types/config').AnnotationEventType} */
-    let eventType;
+  async save(annotation: Annotation) {
+    let saved: Promise<Annotation>;
+    let eventType: AnnotationEventType;
 
     const annotationWithChanges = this._applyDraftChanges(annotation);
 
@@ -234,8 +221,7 @@ export class AnnotationsService {
       eventType = 'update';
     }
 
-    /** @type {Annotation} */
-    let savedAnnotation;
+    let savedAnnotation: Annotation;
     this._store.annotationSaveStarted(annotation);
     try {
       savedAnnotation = await saved;
@@ -246,9 +232,9 @@ export class AnnotationsService {
 
     // Copy local/internal fields from the original annotation to the saved
     // version.
-    for (let [key, value] of Object.entries(annotation)) {
+    for (const [key, value] of Object.entries(annotation)) {
       if (key.startsWith('$')) {
-        const fields = /** @type {Record<string, any>} */ (savedAnnotation);
+        const fields: Record<string, any> = savedAnnotation;
         fields[key] = value;
       }
     }
