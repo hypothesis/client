@@ -116,6 +116,7 @@
     "checkformatting": "prettier --cache --check '**/*.{js,scss,ts,tsx,d.ts}'",
     "format": "prettier --cache --list-different --write '**/*.{js,scss,ts,tsx,d.ts}'",
     "test": "gulp test",
+    "test:watch": "gulp test --live",
     "typecheck": "tsc --build tsconfig.json",
     "version": "make clean build"
   }
