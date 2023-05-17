@@ -1,12 +1,10 @@
+import type { SidebarStore } from '../store';
+import type { Key } from '../store/modules/defaults';
 import { entries } from '../util/collections';
 import { watch } from '../util/watch';
+import type { LocalStorageService } from './local-storage';
 
-/**
- * @typedef {import('../store/modules/defaults').Key} Key
- */
-
-/** @type {Record<Key, string>} */
-const DEFAULT_KEYS = {
+const DEFAULT_KEYS: Record<Key, string> = {
   annotationPrivacy: 'hypothesis.privacy',
   focusedGroup: 'hypothesis.groups.focus',
 };
@@ -18,11 +16,10 @@ const DEFAULT_KEYS = {
  * @inject
  */
 export class PersistedDefaultsService {
-  /**
-   * @param {import('./local-storage').LocalStorageService} localStorage
-   * @param {import('../store').SidebarStore} store
-   */
-  constructor(localStorage, store) {
+  private _storage: LocalStorageService;
+  private _store: SidebarStore;
+
+  constructor(localStorage: LocalStorageService, store: SidebarStore) {
     this._storage = localStorage;
     this._store = store;
   }
@@ -36,12 +33,12 @@ export class PersistedDefaultsService {
     /**
      * Store subscribe callback for persisting changes to defaults. It will only
      * persist defaults that it "knows about" via `DEFAULT_KEYS`.
-     *
-     * @param {Record<Key, any>} defaults
-     * @param {Record<Key, any>} prevDefaults
      */
-    const persistChangedDefaults = (defaults, prevDefaults) => {
-      for (let [defaultKey, newValue] of entries(defaults)) {
+    const persistChangedDefaults = (
+      defaults: Record<Key, any>,
+      prevDefaults: Record<Key, any>
+    ) => {
+      for (const [defaultKey, newValue] of entries(defaults)) {
         if (
           prevDefaults[defaultKey] !== newValue &&
           defaultKey in DEFAULT_KEYS
@@ -52,7 +49,7 @@ export class PersistedDefaultsService {
     };
 
     // Read persisted defaults into the store
-    for (let [defaultKey, key] of entries(DEFAULT_KEYS)) {
+    for (const [defaultKey, key] of entries(DEFAULT_KEYS)) {
       // `localStorage.getItem` will return `null` for a non-existent key
       const defaultValue = this._storage.getItem(key);
       this._store.setDefault(defaultKey, defaultValue);
