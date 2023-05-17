@@ -1,3 +1,6 @@
+import type { SidebarStore } from '../store';
+import type { APIRoutesService } from './api-routes';
+
 /**
  * Service for fetching the data needed to render URLs that point to the H
  * service.
@@ -11,11 +14,10 @@
  * @inject
  */
 export class ServiceURLService {
-  /**
-   * @param {import('./api-routes').APIRoutesService} apiRoutes
-   * @param {import('../store').SidebarStore} store
-   */
-  constructor(apiRoutes, store) {
+  private _apiRoutes: APIRoutesService;
+  private _store: SidebarStore;
+
+  constructor(apiRoutes: APIRoutesService, store: SidebarStore) {
     this._apiRoutes = apiRoutes;
     this._store = store;
   }
