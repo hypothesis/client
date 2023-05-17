@@ -1,7 +1,8 @@
-/**
- * @typedef {'annotation'|'notebook'|'profile'|'stream'|'sidebar'} RouteName
- * @typedef {Record<string,string>} RouteParams
- */
+import type { SidebarStore } from '../store';
+
+type RouteName = 'annotation' | 'notebook' | 'profile' | 'stream' | 'sidebar';
+
+type RouteParams = Record<string, string>;
 
 /**
  * A service that manages the association between the route and route parameters
@@ -9,11 +10,11 @@
  */
 // @inject
 export class RouterService {
-  /**
-   * @param {Window} $window
-   * @param {import('../store').SidebarStore} store
-   */
-  constructor($window, store) {
+  private _window: Window;
+  private _store: SidebarStore;
+  private _didRegisterPopstateListener: boolean;
+
+  constructor($window: Window, store: SidebarStore) {
     this._window = $window;
     this._store = store;
     this._didRegisterPopstateListener = false;
@@ -21,17 +22,14 @@ export class RouterService {
 
   /**
    * Return the name and parameters of the current route.
-   *
-   * @return {{ route: RouteName, params: RouteParams }}
    */
-  currentRoute() {
+  currentRoute(): { route: RouteName; params: RouteParams } {
     const path = this._window.location.pathname;
     const pathSegments = path.slice(1).split('/');
     const searchParams = new URLSearchParams(this._window.location.search);
 
-    /** @type {Record<string, string>} */
-    const params = {};
-    for (let [key, value] of searchParams) {
+    const params: Record<string, string> = {};
+    for (const [key, value] of searchParams) {
       params[key] = value;
     }
 
@@ -47,8 +45,7 @@ export class RouterService {
     // extension.
     const mainSegment = pathSegments[0].replace(/\.html$/, '');
 
-    /** @type {RouteName} */
-    let route;
+    let route: RouteName;
 
     switch (mainSegment) {
       case 'a':
@@ -74,11 +71,8 @@ export class RouterService {
 
   /**
    * Generate a URL for a given route.
-   *
-   * @param {RouteName} name
-   * @param {RouteParams} params
    */
-  routeUrl(name, params = {}) {
+  routeUrl(name: RouteName, params: RouteParams = {}) {
     let url;
     const queryParams = { ...params };
 
@@ -105,7 +99,7 @@ export class RouterService {
 
     let hasParams = false;
     const searchParams = new URLSearchParams();
-    for (let [key, value] of Object.entries(queryParams)) {
+    for (const [key, value] of Object.entries(queryParams)) {
       hasParams = true;
       searchParams.set(key, value);
     }
@@ -144,11 +138,8 @@ export class RouterService {
 
   /**
    * Navigate to a given route.
-   *
-   * @param {RouteName} name
-   * @param {RouteParams} params
    */
-  navigate(name, params) {
+  navigate(name: RouteName, params: RouteParams) {
     this._window.history.pushState({}, '', this.routeUrl(name, params));
     this.sync();
   }
