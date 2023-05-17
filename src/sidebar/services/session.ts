@@ -1,10 +1,14 @@
+import type { Profile } from '../../types/api';
+import type { SidebarSettings } from '../../types/config';
 import { serviceConfig } from '../config/service-config';
+import type { SidebarStore } from '../store';
 import { retryPromiseOperation } from '../util/retry';
 import * as sentry from '../util/sentry';
+import type { APIService } from './api';
+import type { AuthService } from './auth';
+import type { ToastMessengerService } from './toast-messenger';
 
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-/** @typedef {import('../../types/api').Profile} Profile */
 
 /**
  * This service handles fetching the user's profile, updating profile settings
@@ -13,25 +17,28 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * @inject
  */
 export class SessionService {
-  /**
-   * @param {import('../store').SidebarStore} store
-   * @param {import('./api').APIService} api
-   * @param {import('./auth').AuthService} auth
-   * @param {import('../../types/config').SidebarSettings} settings
-   * @param {import('./toast-messenger').ToastMessengerService} toastMessenger
-   */
-  constructor(store, api, auth, settings, toastMessenger) {
+  private _store: SidebarStore;
+  private _api: APIService;
+  private _auth: AuthService;
+  private _toastMessenger: ToastMessengerService;
+  private _authority: string | null;
+  private _lastLoad: Promise<Profile> | null;
+  private _lastLoadTime: number | null;
+
+  constructor(
+    store: SidebarStore,
+    api: APIService,
+    auth: AuthService,
+    settings: SidebarSettings,
+    toastMessenger: ToastMessengerService
+  ) {
     this._api = api;
     this._auth = auth;
     this._store = store;
     this._toastMessenger = toastMessenger;
 
     this._authority = serviceConfig(settings)?.authority ?? null;
-
-    /** @type {Promise<Profile>|null} */
     this._lastLoad = null;
-
-    /** @type {number|null} */
     this._lastLoadTime = null;
 
     // Re-fetch profile when user logs in or out in another tab.
@@ -44,9 +51,9 @@ export class SessionService {
    * If the profile has been previously fetched within `CACHE_TTL` ms, then this
    * method returns a cached profile instead of triggering another fetch.
    *
-   * @return {Promise<Profile>} A promise for the user's profile data.
+   * @return A promise for the user's profile data.
    */
-  load() {
+  load(): Promise<Profile> {
     if (
       !this._lastLoad ||
       !this._lastLoadTime ||
@@ -93,10 +100,9 @@ export class SessionService {
    * This method can be used to update the profile data in the client when new
    * data is pushed from the server via the real-time API.
    *
-   * @param {Profile} profile
-   * @return {Profile} The updated profile data
+   * @return The updated profile data
    */
-  update(profile) {
+  update(profile: Profile): Profile {
     const prevProfile = this._store.profile();
     const userChanged = profile.userid !== prevProfile.userid;
 
