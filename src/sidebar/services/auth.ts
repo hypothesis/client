@@ -14,6 +14,16 @@ type RefreshOptions = {
   persist: boolean;
 };
 
+const isTokenInfo = (token: unknown): token is TokenInfo =>
+  !!token &&
+  typeof token === 'object' &&
+  'accessToken' in token &&
+  typeof token.accessToken === 'string' &&
+  'refreshToken' in token &&
+  typeof token.refreshToken === 'string' &&
+  'expiresAt' in token &&
+  typeof token.expiresAt === 'number';
+
 /**
  * Authorization service.
  *
@@ -96,12 +106,7 @@ export class AuthService extends TinyEmitter {
   private _loadToken() {
     const token = this._localStorage.getObject(this._storageKey());
 
-    if (
-      !token ||
-      typeof token.accessToken !== 'string' ||
-      typeof token.refreshToken !== 'string' ||
-      typeof token.expiresAt !== 'number'
-    ) {
+    if (!isTokenInfo(token)) {
       return null;
     }
 
