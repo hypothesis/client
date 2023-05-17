@@ -67,6 +67,7 @@ export class TagsService {
    */
   store(tags) {
     // Update the stored (tag, frequency) map.
+    /** @type Record<string, { text: string; count: number; updated: number }> */
     const savedTags = this._storage.getObject(TAGS_MAP_KEY) || {};
     tags.forEach(tag => {
       if (savedTags[tag]) {

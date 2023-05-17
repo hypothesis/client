@@ -59,7 +59,7 @@ export class LocalStorageService {
   /**
    * Look up and deserialize a value from storage.
    */
-  getObject<T = any>(key: string): T | null {
+  getObject<T = unknown>(key: string): T | null {
     const item = this._storage.getItem(key);
     return item ? (JSON.parse(item) as T) : null;
   }
