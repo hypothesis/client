@@ -1,26 +1,24 @@
+type BasicStorage = Omit<Storage, 'length' | 'clear' | 'key'>;
+
 /**
  * Fallback in-memory store if `localStorage` is not read/writable.
  */
-class InMemoryStorage {
+class InMemoryStorage implements BasicStorage {
+  private _store: Map<string, string>;
+
   constructor() {
     this._store = new Map();
   }
 
-  /** @param {string} key */
-  getItem(key) {
+  getItem(key: string): string | null {
     return this._store.get(key) ?? null;
   }
 
-  /**
-   * @param {string} key
-   * @param {string} value
-   */
-  setItem(key, value) {
+  setItem(key: string, value: string) {
     this._store.set(key, value);
   }
 
-  /** @param {string} key */
-  removeItem(key) {
+  removeItem(key: string) {
     this._store.delete(key);
   }
 }
@@ -35,11 +33,10 @@ class InMemoryStorage {
  */
 // @inject
 export class LocalStorageService {
-  /**
-   * @param {Window} $window
-   */
-  constructor($window) {
-    let testKey = 'hypothesis.testKey';
+  private _storage: BasicStorage;
+
+  constructor($window: Window) {
+    const testKey = 'hypothesis.testKey';
 
     try {
       // Test whether we can read/write localStorage.
@@ -54,51 +51,38 @@ export class LocalStorageService {
 
   /**
    * Look up a value in local storage.
-   *
-   * @param {string} key
-   * @return {string|null}
    */
-  getItem(key) {
+  getItem(key: string): string | null {
     return this._storage.getItem(key);
   }
 
   /**
    * Look up and deserialize a value from storage.
-   *
-   * @param {string} key
    */
-  getObject(key) {
+  getObject<T = any>(key: string): T | null {
     const item = this._storage.getItem(key);
-    return item ? JSON.parse(item) : null;
+    return item ? (JSON.parse(item) as T) : null;
   }
 
   /**
    * Set a value in local storage.
-   *
-   * @param {string} key
-   * @param {string} value
    */
-  setItem(key, value) {
+  setItem(key: string, value: string) {
     this._storage.setItem(key, value);
   }
 
   /**
    * Serialize `value` to JSON and persist it.
-   *
-   * @param {string} key
-   * @param {any} value
    */
-  setObject(key, value) {
+  setObject(key: string, value: any) {
     const repr = JSON.stringify(value);
     this._storage.setItem(key, repr);
   }
 
   /**
    * Remove an item from storage.
-   *
-   * @param {string} key
    */
-  removeItem(key) {
+  removeItem(key: string) {
     this._storage.removeItem(key);
   }
 }
