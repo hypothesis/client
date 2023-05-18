@@ -1,31 +1,43 @@
 /**
  * Filter clause against which annotation updates are tested before being
  * sent to the client.
- *
- * @typedef FilterClause
- * @prop {'/group'|'/id'|'/references'|'/uri'} field
- * @prop {'equals'|'one_of'} operator
- * @prop {string|string[]} value
- * @prop {boolean} case_sensitive - TODO: Backend doesn't use this at present,
- *   but it seems important for certain fields (eg. ID).
  */
+type FilterClause = {
+  field: '/group' | '/id' | '/references' | '/uri';
+  operator: 'equals' | 'one_of';
+  value: string | string[];
 
-/**
- * @typedef Filter
- * @prop {string} match_policy - TODO: Remove this, the backend doesn't use it any more.
- * @prop {FilterClause[]} clauses
- * @prop {object} actions - TODO: Remove this, the backend doesn't use it any more.
- *  @prop {boolean} [actions.create]
- *  @prop {boolean} [actions.update]
- *  @prop {boolean} [actions.delete]
- */
+  /**
+   * @todo Backend doesn't use this at present, but it seems important for
+   *       certain fields (eg. ID).
+   */
+  case_sensitive: boolean;
+};
+
+type Filter = {
+  clauses: FilterClause[];
+
+  /**
+   * @deprecated
+   * @todo Remove this, the backend doesn't use it any more.
+   */
+  match_policy: string;
+
+  /**
+   * @deprecated
+   * @todo Remove this, the backend doesn't use it any more.
+   */
+  actions: {
+    create: boolean;
+    update: boolean;
+    delete: boolean;
+  };
+};
 
 /**
  * Return a filter which matches every update that is visible to the current user.
- *
- * @return {Filter}
  */
-function defaultFilter() {
+function defaultFilter(): Filter {
   return {
     match_policy: 'include_any',
     clauses: [],
@@ -45,6 +57,8 @@ function defaultFilter() {
  * for the schema.
  */
 export class StreamFilter {
+  private _filter: Filter;
+
   constructor() {
     this._filter = defaultFilter();
   }
@@ -52,12 +66,17 @@ export class StreamFilter {
   /**
    * Add a matching clause to the configuration.
    *
-   * @param {FilterClause['field']} field - Field to filter by
-   * @param {FilterClause['operator']} operator - How to filter
-   * @param {FilterClause['value']} value - Value to match
-   * @param {FilterClause['case_sensitive']} caseSensitive - Whether matching should be case sensitive
+   * @param field - Field to filter by
+   * @param operator - How to filter
+   * @param value - Value to match
+   * @param caseSensitive - Whether matching should be case-sensitive
    */
-  addClause(field, operator, value, caseSensitive = false) {
+  addClause(
+    field: FilterClause['field'],
+    operator: FilterClause['operator'],
+    value: FilterClause['value'],
+    caseSensitive: FilterClause['case_sensitive'] = false
+  ) {
     this._filter.clauses.push({
       field,
       operator,
