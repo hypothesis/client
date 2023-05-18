@@ -1,7 +1,12 @@
 import { generateHexString } from '../../shared/random';
 import { warnOnce } from '../../shared/warn-once';
+import type { SidebarStore } from '../store';
 import { watch } from '../util/watch';
 import { Socket } from '../websocket';
+import type { APIRoutesService } from './api-routes';
+import type { AuthService } from './auth';
+import type { GroupsService } from './groups';
+import type { SessionService } from './session';
 
 /**
  * `StreamerService` manages the WebSocket connection to the Hypothesis Real-Time
@@ -21,46 +26,54 @@ import { Socket } from '../websocket';
  * @inject
  */
 export class StreamerService {
+  private _auth: AuthService;
+  private _groups: GroupsService;
+  private _session: SessionService;
+  private _store: SidebarStore;
+  private _websocketURL: Promise<string>;
+  private _socket: Socket | null;
+  private _reconnectSetUp: boolean;
+
   /**
-   * @param {import('../store').SidebarStore} store
-   * @param {import('./api-routes').APIRoutesService} apiRoutes
-   * @param {import('./auth').AuthService} auth
-   * @param {import('./groups').GroupsService} groups
-   * @param {import('./session').SessionService} session
+   * Flag that controls whether to apply updates immediately or defer them
+   * until "manually" applied via `applyPendingUpdates`
    */
-  constructor(store, apiRoutes, auth, groups, session) {
+  private _updateImmediately: boolean;
+
+  /**
+   * Client configuration messages, to be sent each time a new connection is
+   * established.
+   */
+  private _configMessages: Record<string, object>;
+
+  /**
+   * Number of automatic reconnection attempts that have been made following
+   * an unexpected disconnection.
+   */
+  private _reconnectionAttempts: number;
+
+  /** The randomly generated session ID */
+  clientId: string;
+
+  constructor(
+    store: SidebarStore,
+    apiRoutes: APIRoutesService,
+    auth: AuthService,
+    groups: GroupsService,
+    session: SessionService
+  ) {
     this._auth = auth;
     this._groups = groups;
     this._session = session;
     this._store = store;
     this._websocketURL = apiRoutes.links().then(links => links.websocket);
 
-    /** The randomly generated session ID */
     this.clientId = generateHexString(32);
 
-    /** @type {Socket|null} */
     this._socket = null;
-
-    /**
-     * Flag that controls whether to apply updates immediately or defer them
-     * until "manually" applied via `applyPendingUpdates`
-     */
     this._updateImmediately = true;
-
-    /**
-     * Client configuration messages, to be sent each time a new connection is
-     * established.
-     *
-     * @type {Record<string, object>}
-     */
     this._configMessages = {};
-
-    /**
-     * Number of automatic reconnection attempts that have been made following
-     * an unexpected disconnection.
-     */
     this._reconnectionAttempts = 0;
-
     this._reconnectSetUp = false;
   }
 
@@ -84,11 +97,7 @@ export class StreamerService {
     this._store.clearPendingUpdates();
   }
 
-  /**
-   * @param {string} websocketURL
-   * @param {ErrorEvent} event
-   */
-  _handleSocketError(websocketURL, event) {
+  private _handleSocketError(websocketURL: string, event: ErrorEvent) {
     warnOnce('Error connecting to H push notification service:', event);
 
     // In development, warn if the connection failure might be due to
@@ -107,8 +116,7 @@ export class StreamerService {
     }
   }
 
-  /** @param {MessageEvent} event */
-  _handleSocketMessage(event) {
+  private _handleSocketMessage(event: MessageEvent) {
     const message = JSON.parse(event.data);
     if (!message) {
       return;
@@ -151,8 +159,7 @@ export class StreamerService {
     }
   }
 
-  /** @param {Socket} socket */
-  _sendClientConfig(socket) {
+  private _sendClientConfig(socket: Socket) {
     Object.keys(this._configMessages).forEach(key => {
       if (this._configMessages[key]) {
         socket.send(this._configMessages[key]);
@@ -164,11 +171,8 @@ export class StreamerService {
    * Send a configuration message to the push notification service.
    * Each message is associated with a key, which is used to re-send
    * configuration data to the server in the event of a reconnection.
-   *
-   * @param {string} key
-   * @param {object} configMessage
    */
-  setConfig(key, configMessage) {
+  setConfig(key: string, configMessage: object) {
     this._configMessages[key] = configMessage;
     if (this._socket?.isConnected()) {
       this._socket.send(configMessage);
@@ -222,15 +226,11 @@ export class StreamerService {
         );
       }
     });
-    newSocket.on(
-      'error',
-      /** @param {ErrorEvent} event */ event =>
-        this._handleSocketError(websocketURL, event)
+    newSocket.on('error', (event: ErrorEvent) =>
+      this._handleSocketError(websocketURL, event)
     );
-    newSocket.on(
-      'message',
-      /** @param {MessageEvent} event */ event =>
-        this._handleSocketMessage(event)
+    newSocket.on('message', (event: MessageEvent) =>
+      this._handleSocketMessage(event)
     );
     this._socket = newSocket;
 
@@ -254,12 +254,12 @@ export class StreamerService {
    *
    * If the service has already connected this does nothing.
    *
-   * @param {object} [options]
-   *   @param {boolean} [options.applyUpdatesImmediately] - true if pending updates should be applied immediately
-   * @return {Promise<void>} Promise which resolves once the WebSocket connection
-   *    process has started.
+   * @param [options.applyUpdatesImmediately] - true if pending updates should be applied immediately
+   * @return Promise which resolves once the WebSocket connection process has started.
    */
-  async connect(options = {}) {
+  async connect(
+    options: { applyUpdatesImmediately?: boolean } = {}
+  ): Promise<void> {
     this._updateImmediately = options.applyUpdatesImmediately ?? true;
 
     // Setup reconnection when user changes, as auth token will have changed.
