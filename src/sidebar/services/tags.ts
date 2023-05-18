@@ -68,8 +68,8 @@ export class TagsService {
    */
   store(tags: string[]) {
     // Update the stored (tag, frequency) map.
-    const savedTags: Record<string, Tag> =
-      this._storage.getObject(TAGS_MAP_KEY) || {};
+    const savedTags =
+      this._storage.getObject<Record<string, Tag>>(TAGS_MAP_KEY) || {};
     tags.forEach(tag => {
       if (savedTags[tag]) {
         savedTags[tag].count += 1;
