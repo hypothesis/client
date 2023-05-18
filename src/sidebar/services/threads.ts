@@ -1,16 +1,14 @@
-/**
- * @typedef {import('../helpers/build-thread').Thread} Thread
- */
+import type { Thread } from '../helpers/build-thread';
+import type { SidebarStore } from '../store';
 
 /**
  * A service for performing operations related to the current set of threads.
  */
 // @inject
 export class ThreadsService {
-  /**
-   * @param {import('../store').SidebarStore} store
-   */
-  constructor(store) {
+  private _store: SidebarStore;
+
+  constructor(store: SidebarStore) {
     this._store = store;
   }
 
@@ -19,10 +17,8 @@ export class ThreadsService {
    * "unhiding" a thread which is currently hidden by an applied search filter
    * (as well as its child threads). Only threads that are not currently visible
    * will be forced visible.
-   *
-   * @param {Thread} thread
    */
-  forceVisible(thread) {
+  forceVisible(thread: Thread) {
     thread.children.forEach(child => {
       this.forceVisible(child);
     });
