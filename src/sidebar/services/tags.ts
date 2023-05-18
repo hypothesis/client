@@ -1,11 +1,15 @@
 import escapeStringRegexp from 'escape-string-regexp';
 
-/**
- * @typedef Tag
- * @prop {string} text - The label of the tag
- * @prop {number} count - The number of times this tag has been used.
- * @prop {number} updated - The timestamp when this tag was last used.
- */
+import type { LocalStorageService } from './local-storage';
+
+type Tag = {
+  /** The label of the tag */
+  text: string;
+  /** The number of times this tag has been used. */
+  count: number;
+  /** The timestamp when this tag was last used. */
+  updated: number;
+};
 
 const TAGS_LIST_KEY = 'hypothesis.user.tags.list';
 const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
@@ -19,24 +23,23 @@ const TAGS_MAP_KEY = 'hypothesis.user.tags.map';
  */
 // @inject
 export class TagsService {
+  private _storage: LocalStorageService;
+
   /**
-   * @param {import('./local-storage').LocalStorageService} localStorage -
-   *   Storage used to persist the tags
+   * @param localStorage - Storage used to persist the tags
    */
-  constructor(localStorage) {
+  constructor(localStorage: LocalStorageService) {
     this._storage = localStorage;
   }
 
   /**
    * Return a list of tag suggestions matching `query`.
    *
-   * @param {string} query
-   * @param {number|null} limit - Optional limit of the results.
-   * @return {string[]} List of matching tags
+   * @param limit - Optional limit of the results.
+   * @return List of matching tags
    */
-  filter(query, limit = null) {
-    /** @type {string[]} */
-    const savedTags = this._storage.getObject(TAGS_LIST_KEY) || [];
+  filter(query: string, limit: number | null = null): string[] {
+    const savedTags = this._storage.getObject<string[]>(TAGS_LIST_KEY) || [];
     let resultCount = 0;
     // Match any tag where the query is a prefix of the tag or a word within the tag.
     return savedTags.filter(tag => {
@@ -62,13 +65,11 @@ export class TagsService {
   /**
    * Update the list of stored tag suggestions based on the tags that a user has
    * entered for a given annotation.
-   *
-   * @param {string[]} tags - List of tags.
    */
-  store(tags) {
+  store(tags: string[]) {
     // Update the stored (tag, frequency) map.
-    /** @type Record<string, { text: string; count: number; updated: number }> */
-    const savedTags = this._storage.getObject(TAGS_MAP_KEY) || {};
+    const savedTags: Record<string, Tag> =
+      this._storage.getObject(TAGS_MAP_KEY) || {};
     tags.forEach(tag => {
       if (savedTags[tag]) {
         savedTags[tag].count += 1;
