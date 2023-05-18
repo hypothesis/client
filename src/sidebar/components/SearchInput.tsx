@@ -195,6 +195,16 @@ export default function SearchInput({
             onClick={() => input.current?.focus()}
             size="xs"
             title="Search annotations"
+            // The containing form has a white background. The top bar is only
+            // 40px high. If we allow standard touch-minimum height here (44px),
+            // the visible white background exceeds the height of the top bar in
+            // touch contexts. Disable touch sizing, then add back the width
+            // rule to keep horizontal spacing consistent.
+            // FIXME:
+            // Button/IconButton are due a pass for responsive styling and
+            // appropriate styling API controls (@hypothesis/frontend-shared)
+            disableTouchSizing
+            classes="touch:min-w-touch-minimum"
           />
         </div>
       )}
