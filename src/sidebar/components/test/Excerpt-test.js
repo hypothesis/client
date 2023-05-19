@@ -110,7 +110,7 @@ describe('Excerpt', () => {
   it('calls `onToggleCollapsed` when user clicks in bottom area to expand excerpt', () => {
     const onToggleCollapsed = sinon.stub();
     const wrapper = createExcerpt({ onToggleCollapsed }, TALL_DIV);
-    const control = wrapper.find('[data-testid="excerpt-expand"]');
+    const control = wrapper.find('button[data-testid="excerpt-expand"]');
     assert.equal(getExcerptHeight(wrapper), 40);
     control.simulate('click');
     assert.called(onToggleCollapsed);

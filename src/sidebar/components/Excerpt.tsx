@@ -1,4 +1,4 @@
-import { LinkButton } from '@hypothesis/frontend-shared';
+import { ButtonBase, LinkButton } from '@hypothesis/frontend-shared';
 import classnames from 'classnames';
 import type { ComponentChildren } from 'preact';
 import { useCallback, useLayoutEffect, useRef, useState } from 'preact/hooks';
@@ -27,7 +27,7 @@ function InlineControls({
       className={classnames(
         // Position these controls at the bottom right of the excerpt
         'absolute block right-0 bottom-0',
-        // Give extra width for larger tap target and gradient fade
+        // Give extra width for larger tap target and gradient fade.
         // Fade transparent-to-white left-to-right to make the toggle
         // control text (More/Less) more readable above other text.
         // This gradient is implemented to-left to take advantage of Tailwind's
@@ -161,37 +161,38 @@ function Excerpt({
       : onToggleCollapsed(collapsed);
 
   return (
-    <div
-      data-testid="excerpt-container"
-      className={classnames(
-        'relative overflow-hidden',
-        'transition-[max-height] ease-in duration-150'
-      )}
-      style={contentStyle}
-    >
+    <div className="relative">
       <div
+        data-testid="excerpt-container"
         className={classnames(
-          // Establish new block-formatting context to prevent margin-collapsing
-          // in descendent elements from potentially "leaking out" and pushing
-          // this element down from the top of the container.
-          // See https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
-          // See https://github.com/hypothesis/client/issues/1518
-          'inline-block w-full'
+          'overflow-hidden',
+          'transition-[max-height] ease-in duration-150'
         )}
-        data-testid="excerpt-content"
-        ref={contentElement}
+        style={contentStyle}
       >
-        {children}
+        <div
+          className={classnames(
+            // Establish new block-formatting context to prevent margin-collapsing
+            // in descendent elements from potentially "leaking out" and pushing
+            // this element down from the top of the container.
+            // See https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Block_formatting_context
+            // See https://github.com/hypothesis/client/issues/1518
+            'inline-block w-full'
+          )}
+          data-testid="excerpt-content"
+          ref={contentElement}
+        >
+          {children}
+        </div>
       </div>
-      <div
+      <ButtonBase
         data-testid="excerpt-expand"
-        role="presentation"
         onClick={() => setCollapsed(false)}
-        className={classnames(
+        classes={classnames(
           // This element provides a clickable area at the bottom of an
           // expandable excerpt to expand it.
           'transition-[opacity] duration-150 ease-linear',
-          'absolute w-full bottom-0 h-touch-minimum',
+          'absolute w-full bottom-0 left-0 h-touch-minimum',
           {
             // For expandable excerpts not using inlineControls, style this
             // element with a custom shadow-like gradient
