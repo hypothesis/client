@@ -336,7 +336,7 @@ describe('Guest', () => {
     });
 
     describe('on "scrollToAnnotation" event', () => {
-      it('scrolls to the anchor with the matching tag', () => {
+      const setupGuest = () => {
         const highlight = document.createElement('span');
         const guest = createGuest();
         const fakeRange = sinon.stub();
@@ -347,8 +347,21 @@ describe('Guest', () => {
             range: new FakeTextRange(fakeRange),
           },
         ];
+        return guest;
+      };
 
+      const triggerScroll = async () => {
         emitSidebarEvent('scrollToAnnotation', 'tag1');
+
+        // The call to `scrollToAnchor` on the integration happens
+        // asynchronously. Wait for the minimum delay before this happens.
+        await delay(0);
+      };
+
+      it('scrolls to the anchor with the matching tag', async () => {
+        const guest = setupGuest();
+
+        await triggerScroll();
 
         assert.called(fakeIntegration.scrollToAnchor);
         assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
@@ -376,22 +389,38 @@ describe('Guest', () => {
         });
       });
 
-      it('allows the default scroll behaviour to be prevented', () => {
-        const highlight = document.createElement('span');
-        const guest = createGuest();
-        const fakeRange = sandbox.stub();
-        guest.anchors = [
-          {
-            annotation: { $tag: 'tag1' },
-            highlights: [highlight],
-            range: new FakeTextRange(fakeRange),
-          },
-        ];
+      it('defers scrolling if "scrolltorange" event\'s `waitUntil` method is called', async () => {
+        const guest = setupGuest();
+        let contentReady;
+        const listener = event => {
+          event.waitUntil(
+            new Promise(resolve => {
+              contentReady = resolve;
+            })
+          );
+        };
+        guest.element.addEventListener('scrolltorange', listener);
+
+        // Trigger scroll. `scrollToAnchor` shouldn't be called immediately
+        // because `ScrollToRangeEvent.waitUntil` was used to defer scrolling.
+        await triggerScroll();
+        assert.notCalled(fakeIntegration.scrollToAnchor);
+
+        // Resolve promise passed to `ScrollToRangeEvent.waitUntil`.
+        contentReady();
+        await delay(0);
+
+        assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
+      });
+
+      it('allows the default scroll behaviour to be prevented', async () => {
+        const guest = setupGuest();
         guest.element.addEventListener('scrolltorange', event =>
           event.preventDefault()
         );
 
         emitSidebarEvent('scrollToAnnotation', 'tag1');
+        await delay(0);
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
