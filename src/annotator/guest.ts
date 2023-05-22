@@ -103,6 +103,50 @@ export type GuestConfig = {
 };
 
 /**
+ * Event dispatched by the client when it is about to scroll a highlight into
+ * view.
+ *
+ * The host page can listen for this event in order to reveal the content if
+ * not already visible. If the content will be revealed asynchronously,
+ * {@link waitUntil} can be used to notify the client when it is ready.
+ *
+ * For more flexibility the host page can completely take over scrolling to the
+ * range by calling {@link Event.preventDefault} on the event.
+ */
+export class ScrollToRangeEvent extends CustomEvent<Range> {
+  private _ready: Promise<void> | null;
+
+  /**
+   * @param range - The DOM range that Hypothesis will scroll into view.
+   */
+  constructor(range: Range) {
+    super('scrolltorange', {
+      bubbles: true,
+      cancelable: true,
+      detail: range,
+    });
+
+    this._ready = null;
+  }
+
+  /**
+   * If scrolling was deferred using {@link waitUntil}, returns the promise
+   * that must resolve before the highlight is scrolled to.
+   */
+  get ready(): Promise<void> | null {
+    return this._ready;
+  }
+
+  /**
+   * Provide Hypothesis with a promise that resolves when the content
+   * associated with the event's range is ready to be scrolled into view.
+   */
+  waitUntil(ready: Promise<void>) {
+    this._ready = ready;
+  }
+}
+
+/**
  * `Guest` is the central class of the annotator that handles anchoring (locating)
  * annotations in the document when they are fetched by the sidebar, rendering
  * highlights for them and handling subsequent interactions with the highlights.
@@ -433,18 +477,16 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
         return;
       }
 
-      // Emit a custom event that the host page can respond to. This is useful,
-      // for example, if the highlighted content is contained in a collapsible
-      // section of the page that needs to be un-collapsed.
-      const event = new CustomEvent('scrolltorange', {
-        bubbles: true,
-        cancelable: true,
-        detail: range,
-      });
+      // Emit a custom event that the host page can respond to. This is useful
+      // if the content is in a hidden section of the page that needs to be
+      // revealed before it can be scrolled to.
+      const event = new ScrollToRangeEvent(range);
+
       const defaultNotPrevented = this.element.dispatchEvent(event);
 
       if (defaultNotPrevented) {
-        this._integration.scrollToAnchor(anchor);
+        const ready = Promise.resolve(event.ready);
+        ready.then(() => this._integration.scrollToAnchor(anchor));
       }
     });
 
