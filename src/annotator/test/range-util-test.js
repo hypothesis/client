@@ -1,4 +1,5 @@
 import * as rangeUtil from '../range-util';
+import { selectedRange } from '../range-util';
 
 function createRange(node, start, end) {
   const range = node.ownerDocument.createRange();
@@ -146,6 +147,66 @@ describe('annotator.range-util', () => {
         testNode.offsetTop + testNode.offsetHeight,
         1
       );
+    });
+  });
+
+  describe('selectedRange', () => {
+    it('returns `null` if selection has no ranges', () => {
+      window.getSelection().empty();
+      assert.isNull(selectedRange());
+    });
+
+    it('returns `null` if selected range is collapsed', () => {
+      const range = new Range();
+      range.setStart(document.body, 0);
+      range.setEnd(document.body, 0);
+
+      window.getSelection().addRange(range);
+
+      assert.isNull(selectedRange());
+    });
+
+    it('returns first range in selection if not collapsed', () => {
+      const range = new Range();
+      range.selectNodeContents(document.body);
+
+      window.getSelection().addRange(range);
+
+      assert.instanceOf(selectedRange(), Range);
+    });
+
+    // Test handling of a Firefox-specific issue where selection may contain
+    // multiple ranges. In spec-compliant browsers (eg. Chrome), the selection
+    // only contains zero or one range.
+    it('returns union of all ranges in selection if there are multiple', () => {
+      const parent = document.createElement('div');
+      const el1 = document.createElement('div');
+      el1.textContent = 'foo';
+      const el2 = document.createElement('div');
+      el2.textContent = 'bar';
+      const el3 = document.createElement('div');
+      el3.textContent = 'baz';
+      parent.append(el1, el2, el3);
+
+      const ranges = [new Range(), new Range(), new Range()];
+      ranges[0].selectNodeContents(el1);
+      ranges[1].selectNodeContents(el2);
+      ranges[2].selectNodeContents(el3);
+
+      const fakeSelection = {
+        rangeCount: 3,
+        getRangeAt: index => ranges[index],
+      };
+
+      let range = selectedRange(fakeSelection);
+      assert.equal(range.toString(), 'foobarbaz');
+
+      // Test with the ordering of ranges reversed. The merged range should
+      // be the same.
+      ranges.reverse();
+
+      range = selectedRange(fakeSelection);
+      assert.equal(range.toString(), 'foobarbaz');
     });
   });
 

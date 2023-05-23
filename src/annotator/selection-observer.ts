@@ -1,19 +1,5 @@
 import { ListenerCollection } from '../shared/listener-collection';
-
-/**
- * Return the current selection or `null` if there is no selection, or it is empty.
- */
-export function selectedRange(document: Document): Range | null {
-  const selection = document.getSelection();
-  if (!selection || selection.rangeCount === 0) {
-    return null;
-  }
-  const range = selection.getRangeAt(0);
-  if (range.collapsed) {
-    return null;
-  }
-  return range;
-}
+import { selectedRange } from './range-util';
 
 /**
  * An observer that watches for and buffers changes to the document's current selection.
@@ -41,7 +27,7 @@ export class SelectionObserver {
 
     const scheduleCallback = (delay = 10) => {
       this._pendingCallback = setTimeout(() => {
-        callback(selectedRange(document_));
+        callback(selectedRange(document_.getSelection()));
       }, delay);
     };
 

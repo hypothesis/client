@@ -48,7 +48,6 @@ describe('Guest', () => {
   let fakePortFinder;
   let FakePortRPC;
   let fakePortRPCs;
-  let fakeSelectedRange;
 
   const createGuest = (config = {}) => {
     const element = document.createElement('div');
@@ -85,6 +84,34 @@ describe('Guest', () => {
     }
   };
 
+  const simulateSelectionWithText = () => {
+    rangeUtil.selectionFocusRect.returns({
+      left: 0,
+      top: 0,
+      width: 5,
+      height: 5,
+    });
+
+    const element = document.createElement('div');
+    element.textContent = 'foobar';
+    const range = new Range();
+    range.selectNodeContents(element);
+
+    rangeUtil.selectedRange.returns(range);
+    notifySelectionChanged(range);
+  };
+
+  const simulateSelectionWithoutText = () => {
+    rangeUtil.selectionFocusRect.returns(null);
+
+    const element = document.createElement('div');
+    const range = new Range();
+    range.selectNodeContents(element);
+
+    rangeUtil.selectedRange.returns(range);
+    notifySelectionChanged(range);
+  };
+
   beforeEach(() => {
     guests = [];
     highlighter = {
@@ -103,6 +130,7 @@ describe('Guest', () => {
       itemsForRange: sinon.stub().returns([]),
       isSelectionBackwards: sinon.stub(),
       selectionFocusRect: sinon.stub(),
+      selectedRange: sinon.stub().returns(null),
     };
 
     FakeAdder.instance = null;
@@ -169,8 +197,6 @@ describe('Guest', () => {
       }
     }
 
-    fakeSelectedRange = sinon.stub();
-
     $imports.$mock({
       '../shared/messaging': {
         PortFinder: sinon.stub().returns(fakePortFinder),
@@ -193,7 +219,6 @@ describe('Guest', () => {
       './range-util': rangeUtil,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
-        selectedRange: fakeSelectedRange,
       },
       './util/buckets': {
         findClosestOffscreenAnchor: fakeFindClosestOffscreenAnchor,
@@ -617,26 +642,19 @@ describe('Guest', () => {
       }
     });
 
-    it('does not reposition the adder on window "resize" event if the adder is hidden', () => {
-      sandbox.stub(guest, '_repositionAdder').callThrough();
-      sandbox.stub(guest, '_onSelection'); // Calling _onSelect makes the adder to reposition
-
+    it('does not reposition the adder if hidden when the window is resized', () => {
       window.dispatchEvent(new Event('resize'));
-
-      assert.called(guest._repositionAdder);
-      assert.notCalled(guest._onSelection);
+      assert.notCalled(FakeAdder.instance.show);
     });
 
-    it('reposition the adder on window "resize" event if the adder is shown', () => {
-      sandbox.stub(guest, '_repositionAdder').callThrough();
-      sandbox.stub(guest, '_onSelection'); // Calling _onSelect makes the adder to reposition
-
-      guest._isAdderVisible = true;
-      sandbox.stub(window, 'getSelection').returns({ getRangeAt: () => true });
+    it('repositions the adder when the window is resized', () => {
+      simulateSelectionWithText();
+      assert.calledOnce(FakeAdder.instance.show);
+      FakeAdder.instance.show.resetHistory();
 
       window.dispatchEvent(new Event('resize'));
 
-      assert.called(guest._onSelection);
+      assert.called(FakeAdder.instance.show);
     });
 
     it('focuses annotations in the sidebar when hovering highlights in the document', () => {
@@ -691,34 +709,6 @@ describe('Guest', () => {
   });
 
   describe('when the selection changes', () => {
-    let container;
-
-    beforeEach(() => {
-      container = document.createElement('div');
-      container.innerHTML = 'test text';
-      document.body.appendChild(container);
-      window.getSelection().selectAllChildren(container);
-    });
-
-    afterEach(() => {
-      container.remove();
-    });
-
-    const simulateSelectionWithText = () => {
-      rangeUtil.selectionFocusRect.returns({
-        left: 0,
-        top: 0,
-        width: 5,
-        height: 5,
-      });
-      notifySelectionChanged({});
-    };
-
-    const simulateSelectionWithoutText = () => {
-      rangeUtil.selectionFocusRect.returns(null);
-      notifySelectionChanged({});
-    };
-
     it('shows the adder if the selection contains text', () => {
       createGuest();
       simulateSelectionWithText();
@@ -728,10 +718,10 @@ describe('Guest', () => {
     it('sets the annotations associated with the selection', () => {
       createGuest();
       const ann = { $tag: 't1' };
-      container._annotation = ann;
-      rangeUtil.itemsForRange.callsFake((range, callback) => [
-        callback(range.startContainer),
-      ]);
+      rangeUtil.itemsForRange.callsFake((range, callback) => {
+        range.startContainer._annotation = ann;
+        return [callback(range.startContainer)];
+      });
       simulateSelectionWithText();
 
       assert.deepEqual(FakeAdder.instance.annotationsForSelection, ['t1']);
@@ -787,7 +777,6 @@ describe('Guest', () => {
 
         // Guest has text selected
         simulateSelectionWithText();
-        fakeSelectedRange.returns({});
 
         hostRPC().call.resetHistory();
         emitHostEvent('clearSelection');
@@ -811,7 +800,7 @@ describe('Guest', () => {
         guest.selectedRanges = [1];
 
         // Guest has no text selected
-        fakeSelectedRange.returns(null);
+        rangeUtil.selectedRange.returns(null);
 
         hostRPC().call.resetHistory();
         emitHostEvent('clearSelection');

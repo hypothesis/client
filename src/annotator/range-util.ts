@@ -1,6 +1,57 @@
 import { nodeIsText } from './util/node';
 
 /**
+ * Return a range that spans from the earlier of a or b's start point to
+ * the later of a or b's end point, in document order.
+ */
+function unionRanges(a: Range, b: Range): Range {
+  const result = new Range();
+
+  if (a.compareBoundaryPoints(Range.START_TO_START, b) <= 0) {
+    result.setStart(a.startContainer, a.startOffset);
+  } else {
+    result.setStart(b.startContainer, b.startOffset);
+  }
+
+  if (a.compareBoundaryPoints(Range.END_TO_END, b) >= 0) {
+    result.setEnd(a.endContainer, a.endOffset);
+  } else {
+    result.setEnd(b.endContainer, b.endOffset);
+  }
+
+  return result;
+}
+
+/**
+ * Return the currently selected {@link Range} or `null` if there is no
+ * selection.
+ */
+export function selectedRange(
+  selection: Selection | null = document.getSelection()
+): Range | null {
+  if (!selection || selection.rangeCount === 0) {
+    return null;
+  }
+
+  let range = selection.getRangeAt(0);
+
+  // Work around a Firefox issue [1] where a selection can have multiple ranges,
+  // in contradiction to the Selection API [2] spec. The workaround is to
+  // union the ranges to produce the same single range as other browsers.
+  //
+  // [1] https://bugzilla.mozilla.org/show_bug.cgi?id=1773065
+  // [2] https://w3c.github.io/selection-api/#dom-selection-rangecount
+  for (let i = 1; i < selection.rangeCount; i++) {
+    range = unionRanges(range, selection.getRangeAt(i));
+  }
+
+  if (range.collapsed) {
+    return null;
+  }
+  return range;
+}
+
+/**
  * Returns true if the start point of a selection occurs after the end point,
  * in document order.
  */
@@ -9,7 +60,8 @@ export function isSelectionBackwards(selection: Selection) {
     return selection.focusOffset < selection.anchorOffset;
   }
 
-  const range = selection.getRangeAt(0);
+  const range = selectedRange(selection)!;
+
   // Does not work correctly on iOS when selecting nodes backwards.
   // https://bugs.webkit.org/show_bug.cgi?id=220523
   return range.startContainer === selection.focusNode;
@@ -100,10 +152,11 @@ export function getTextBoundingBoxes(range: Range): DOMRect[] {
  * Returns null if the selection is empty.
  */
 export function selectionFocusRect(selection: Selection): DOMRect | null {
-  if (selection.isCollapsed) {
+  const range = selectedRange(selection);
+  if (!range) {
     return null;
   }
-  const textBoxes = getTextBoundingBoxes(selection.getRangeAt(0));
+  const textBoxes = getTextBoundingBoxes(range);
   if (textBoxes.length === 0) {
     return null;
   }
