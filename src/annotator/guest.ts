@@ -35,8 +35,13 @@ import {
   setHighlightsVisible,
 } from './highlighter';
 import { createIntegration } from './integrations';
-import * as rangeUtil from './range-util';
-import { SelectionObserver, selectedRange } from './selection-observer';
+import {
+  itemsForRange,
+  isSelectionBackwards,
+  selectionFocusRect,
+  selectedRange,
+} from './range-util';
+import { SelectionObserver } from './selection-observer';
 import { findClosestOffscreenAnchor } from './util/buckets';
 import { frameFillsAncestor } from './util/frame';
 import { normalizeURI } from './util/url';
@@ -46,10 +51,8 @@ type AnnotationHighlight = HTMLElement & { _annotation?: AnnotationData };
 
 /** Return all the annotations tags associated with the selected text. */
 function annotationsForSelection(): string[] {
-  const selection = window.getSelection()!;
-  const range = selection.getRangeAt(0);
-  const tags = rangeUtil.itemsForRange(
-    range,
+  const tags = itemsForRange(
+    selectedRange() ?? new Range(),
     node => (node as AnnotationHighlight)._annotation?.$tag
   );
   return tags;
@@ -408,10 +411,10 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    * Shift the position of the adder on window 'resize' events
    */
   _repositionAdder() {
-    if (this._isAdderVisible === false) {
+    if (!this._isAdderVisible) {
       return;
     }
-    const range = window.getSelection()?.getRangeAt(0);
+    const range = selectedRange();
     if (range) {
       this._onSelection(range);
     }
@@ -419,7 +422,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
 
   async _connectHost(hostFrame: Window) {
     this._hostRPC.on('clearSelection', () => {
-      if (selectedRange(document)) {
+      if (selectedRange()) {
         this._informHostOnNextSelectionClear = false;
         removeTextSelection();
       }
@@ -753,8 +756,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     }
 
     const selection = document.getSelection()!;
-    const isBackwards = rangeUtil.isSelectionBackwards(selection);
-    const focusRect = rangeUtil.selectionFocusRect(selection);
+    const isBackwards = isSelectionBackwards(selection);
+    const focusRect = selectionFocusRect(selection);
     if (!focusRect) {
       // The selected range does not contain any text
       this._onClearSelection();
