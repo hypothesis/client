@@ -171,7 +171,7 @@ function Thread({ thread, threadsService }: ThreadProps) {
         className={classnames(
           // Set a max-width to ensure that annotation content does not exceed
           // the width of the container
-          'grow max-w-full'
+          'grow max-w-full min-w-0'
         )}
         data-testid="thread-content"
       >
