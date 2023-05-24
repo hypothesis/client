@@ -1,5 +1,5 @@
 import {
-  LinkBase,
+  Link,
   EmailIcon,
   SocialFacebookIcon,
   SocialTwitterIcon,
@@ -23,19 +23,21 @@ type ShareLinkProps = {
 function ShareLink({ label, icon: Icon, uri }: ShareLinkProps) {
   return (
     <li>
-      <LinkBase
+      <Link
         aria-label={label}
-        classes="text-grey-6 hover:text-color-text block"
+        classes="text-grey-6 hover:text-color-text"
         href={uri}
         title={label}
         target="_blank"
+        variant="custom"
+        underline="none"
       >
         <Icon
           // Make the icons sized to the current text size to allow for
           // differently-sized sharing icon links
           className="w-em h-em"
         />
-      </LinkBase>
+      </Link>
     </li>
   );
 }
