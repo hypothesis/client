@@ -36,11 +36,6 @@
   }
 }
 
-// Applies to <Link>
-.p-muted-link {
-  @apply text-color-text-light hover:text-color-text-light hover:underline;
-}
-
 // Applies to any text: strikeout effect
 .p-redacted-text {
   @apply line-through grayscale contrast-50 text-color-text-light;
