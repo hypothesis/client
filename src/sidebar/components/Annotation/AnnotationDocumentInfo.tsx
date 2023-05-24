@@ -23,7 +23,7 @@ export default function AnnotationDocumentInfo({
       <div className="text-color-text-light">
         on &quot;
         {link ? (
-          <Link href={link} target="_blank">
+          <Link href={link} target="_blank" underline="none">
             {title}
           </Link>
         ) : (

@@ -51,7 +51,7 @@ function HelpPanelTab({ linkText, url }: HelpPanelTabProps) {
       // a flex container (centered on both axes)
       className="flex-1 flex items-center justify-center border-r last-of-type:border-r-0 text-md font-medium"
     >
-      <Link color="text-light" href={url} target="_blank">
+      <Link variant="text-light" href={url} target="_blank" underline="none">
         <div className="flex items-center gap-x-2">
           <span>{linkText}</span> <ExternalIcon className="w-3 h-3" />
         </div>

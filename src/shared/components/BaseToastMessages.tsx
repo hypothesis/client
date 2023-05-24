@@ -92,6 +92,7 @@ function ToastMessageItem({ message, onDismiss }: ToastMessageItemProps) {
                   event.stopPropagation() /* consume the event so that it does not dismiss the message */
               }
               target="_new"
+              underline="none"
             >
               More info
             </Link>

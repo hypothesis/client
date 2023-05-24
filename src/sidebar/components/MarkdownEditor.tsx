@@ -1,4 +1,4 @@
-import { ButtonBase, IconButton, LinkBase } from '@hypothesis/frontend-shared';
+import { ButtonBase, IconButton, Link } from '@hypothesis/frontend-shared';
 import {
   EditorLatexIcon,
   EditorQuoteIcon,
@@ -292,20 +292,25 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
         title="Bulleted list"
       />
       <div className="grow flex justify-end">
-        <LinkBase
-          classes={classnames(
-            'flex justify-center items-center',
-            'text-grey-7 hover:!text-grey-7',
-            'touch:h-touch-minimum touch:w-touch-minimum',
-            'px-2 py-2.5'
-          )}
+        <Link
+          classes="text-grey-7 hover:!text-grey-7"
           href="https://web.hypothes.is/help/formatting-annotations-with-markdown/"
           target="_blank"
           title="Formatting help"
           aria-label="Formatting help"
+          underline="none"
+          variant="custom"
         >
-          <HelpIcon className="w-2.5 h-2.5" />
-        </LinkBase>
+          <div
+            className={classnames(
+              'flex justify-center items-center',
+              'touch:h-touch-minimum touch:w-touch-minimum',
+              'px-2 py-2.5 touch:p-0'
+            )}
+          >
+            <HelpIcon className="w-2.5 h-2.5" />
+          </div>
+        </Link>
 
         <ToolbarButton
           label={isPreviewing ? 'Write' : 'Preview'}

@@ -26,12 +26,13 @@ export default function TagListItem({
       <div className="grow px-1.5 py-1 touch:p-2">
         {href ? (
           <Link
-            color="text-light"
+            variant="text-light"
             href={href}
             lang=""
             target="_blank"
             aria-label={`Tag: ${tag}`}
             title={`View annotations with tag: ${tag}`}
+            underline="none"
           >
             {tag}
           </Link>

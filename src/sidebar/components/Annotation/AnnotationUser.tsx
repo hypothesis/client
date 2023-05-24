@@ -1,4 +1,4 @@
-import { LinkBase } from '@hypothesis/frontend-shared';
+import { Link } from '@hypothesis/frontend-shared';
 
 type AnnotationUserProps = {
   authorLink?: string;
@@ -14,9 +14,9 @@ function AnnotationUser({ authorLink, displayName }: AnnotationUserProps) {
 
   if (authorLink) {
     return (
-      <LinkBase href={authorLink} target="_blank">
+      <Link href={authorLink} target="_blank" underline="none" variant="custom">
         {user}
-      </LinkBase>
+      </Link>
     );
   }
 

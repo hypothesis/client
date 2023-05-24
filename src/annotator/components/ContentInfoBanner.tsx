@@ -1,6 +1,5 @@
 import {
   Link,
-  LinkBase,
   CaretLeftIcon,
   CaretRightIcon,
 } from '@hypothesis/frontend-shared';
@@ -37,7 +36,12 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
     >
       <div data-testid="content-logo">
         {info.logo && (
-          <Link href={info.logo.link} target="_blank" data-testid="logo-link">
+          <Link
+            href={info.logo.link}
+            target="_blank"
+            data-testid="logo-link"
+            underline="none"
+          >
             <img
               alt={info.logo.title}
               src={info.logo.logo}
@@ -78,15 +82,16 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
         {info.links.previousItem && (
           <>
             <Link
-              classes="flex gap-x-1 items-center text-annotator-sm whitespace-nowrap"
               title="Open previous item"
               href={info.links.previousItem}
               underline="always"
               target="_blank"
               data-testid="content-previous-link"
             >
-              <CaretLeftIcon className="w-em h-em" />
-              <span>Previous</span>
+              <div className="flex gap-x-1 items-center text-annotator-sm whitespace-nowrap">
+                <CaretLeftIcon className="w-em h-em" />
+                <span>Previous</span>
+              </div>
             </Link>
             <div className="text-annotator-sm">|</div>
           </>
@@ -99,7 +104,7 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
             'min-w-0 whitespace-nowrap overflow-hidden text-ellipsis shrink font-medium'
           )}
         >
-          <LinkBase
+          <Link
             title={itemTitle}
             href={info.links.currentItem}
             data-testid="content-item-link"
@@ -107,7 +112,7 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
             unstyled
           >
             {itemTitle}
-          </LinkBase>
+          </Link>
         </div>
 
         {info.links.nextItem && (
@@ -115,14 +120,15 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
             <div className="text-annotator-sm">|</div>
             <Link
               title="Open next item"
-              classes="flex gap-x-1 items-center text-annotator-sm whitespace-nowrap"
               href={info.links.nextItem}
               underline="always"
               target="_blank"
               data-testid="content-next-link"
             >
-              <span>Next</span>
-              <CaretRightIcon className="w-em h-em" />
+              <div className="flex gap gap-x-1 items-center text-annotator-sm whitespace-nowrap">
+                <span>Next</span>
+                <CaretRightIcon className="w-em h-em" />
+              </div>
             </Link>
           </>
         )}

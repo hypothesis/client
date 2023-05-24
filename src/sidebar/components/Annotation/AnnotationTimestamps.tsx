@@ -1,4 +1,4 @@
-import { LinkBase } from '@hypothesis/frontend-shared';
+import { Link } from '@hypothesis/frontend-shared';
 import { useEffect, useMemo, useState } from 'preact/hooks';
 
 import {
@@ -88,16 +88,18 @@ export default function AnnotationTimestamps({
         </span>
       )}
       {annotationURL ? (
-        <LinkBase
+        <Link
           // The light-text hover color is not a standard color for a Link, so
           // LinkBase is used here
-          classes="text-color-text-light hover:text-color-text-light hover:underline"
+          classes="text-color-text-light hover:text-color-text-light"
           target="_blank"
           title={created.absolute}
           href={annotationURL}
+          underline="hover"
+          variant="custom"
         >
           {created.relative}
-        </LinkBase>
+        </Link>
       ) : (
         <span
           className="color-text-color-light"
