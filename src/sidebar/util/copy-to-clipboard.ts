@@ -7,9 +7,8 @@
  * @throws {Error}
  *   This function may throw an exception if the browser rejects the attempt
  *   to copy text.
- * @param {string} text
  */
-export function copyText(text) {
+export function copyText(text: string) {
   const temp = document.createElement('textarea'); // use textarea instead of input to preserve line breaks
   temp.value = text;
   temp.setAttribute('data-testid', 'copy-text');
@@ -20,7 +19,7 @@ export function copyText(text) {
 
   try {
     const range = document.createRange();
-    const selection = /** @type {Selection} */ (document.getSelection());
+    const selection = document.getSelection()!;
 
     selection.removeAllRanges();
     range.selectNodeContents(temp);
