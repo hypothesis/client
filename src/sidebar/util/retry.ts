@@ -4,22 +4,22 @@ import retry from 'retry';
  * Options passed that control how the operation is retried.
  *
  * See https://github.com/tim-kos/node-retry#retrytimeoutsoptions
- *
- * @typedef RetryOptions
- * @prop {number} minTimeout
  */
+export type RetryOptions = {
+  minTimeout: number;
+};
 
 /**
  * Retry a Promise-returning operation until it succeeds or
  * fails after a set number of attempts.
  *
- * @template T
- * @param {() => Promise<T>} callback - The operation to retry
- * @param {RetryOptions} [options]
- * @return {Promise<T>} - Result of first successful `callback` call (ie. that
- *   did not reject)
+ * @param callback - The operation to retry
+ * @return Result of first successful `callback` call (ie. that did not reject)
  */
-export function retryPromiseOperation(callback, options) {
+export function retryPromiseOperation<T>(
+  callback: () => Promise<T>,
+  options?: RetryOptions
+): Promise<T> {
   return new Promise((resolve, reject) => {
     const operation = retry.operation(options);
     operation.attempt(async () => {

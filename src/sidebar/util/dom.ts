@@ -9,7 +9,7 @@
  * @param element - DOM element to measure
  * @return The element's height in pixels
  */
-export function getElementHeightWithMargins(element: Element): number | null {
+export function getElementHeightWithMargins(element: Element): number {
   const style = window.getComputedStyle(element);
   // Get the height of the element inside the border-box, excluding
   // top and bottom margins.

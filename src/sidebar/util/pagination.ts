@@ -30,6 +30,7 @@ type PageNumber = number | null;
 export function pageNumberOptions(
   currentPage: number,
   totalPages: number,
+  /* istanbul ignore next */
   maxPages = 5
 ): PageNumber[] {
   if (totalPages <= 1) {

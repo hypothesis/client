@@ -24,6 +24,7 @@ export function call<T>(
   frame: Window,
   origin: string,
   method: string,
+  /* istanbul ignore next */
   params: unknown[] = [],
   timeout = 2000,
   /* istanbul ignore next */
@@ -108,6 +109,7 @@ export function notify(
   frame: Window,
   origin: string,
   method: string,
+  /* istanbul ignore next */
   params: unknown[] = []
 ) {
   const request = {
