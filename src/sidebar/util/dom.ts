@@ -6,10 +6,10 @@
  * descendants which may contribute to the effective margin due to CSS "margin
  * collapsing".
  *
- * @param {Element} element - DOM element to measure
- * @return {number|null} - The element's height in pixels
+ * @param element - DOM element to measure
+ * @return The element's height in pixels
  */
-export function getElementHeightWithMargins(element) {
+export function getElementHeightWithMargins(element: Element): number | null {
   const style = window.getComputedStyle(element);
   // Get the height of the element inside the border-box, excluding
   // top and bottom margins.
