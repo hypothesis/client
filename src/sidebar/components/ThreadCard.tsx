@@ -1,4 +1,4 @@
-import { Card, CardContent } from '@hypothesis/frontend-shared';
+import { ButtonBase, Card, CardContent } from '@hypothesis/frontend-shared';
 import debounce from 'lodash.debounce';
 import { useCallback, useEffect, useMemo, useRef } from 'preact/hooks';
 
@@ -17,8 +17,8 @@ export type ThreadCardProps = {
 };
 
 /**
- * A "top-level" `Thread`, rendered as a "card" in the sidebar. A `Thread`
- * renders its own child `Thread`s within itself.
+ * A "top-level" `Thread`, rendered as a "card" wrapped in a "button" (for a11y).
+ * A `Thread` renders its own child `Thread`s within itself.
  */
 function ThreadCard({ frameSync, thread }: ThreadCardProps) {
   const store = useSidebarStore();
@@ -36,15 +36,18 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
     },
     [frameSync]
   );
+  const threadRef = useRef<HTMLElement | null>(null);
 
   /**
-   * Is the target's event an <a> or <button> element, or does it have
-   * either as an ancestor?
+   * Is the target's event an <a> or a <button> other than the thread itself, or
+   * does it have either as an ancestor?
    *
    * @param {Element} target
    */
-  const isFromButtonOrLink = (target: Element) => {
-    return !!target.closest('button') || !!target.closest('a');
+  const isFromChildButtonOrLink = (target: Element) => {
+    return (
+      target.closest('button') !== threadRef.current || !!target.closest('a')
+    );
   };
 
   // Memoize threads to reduce avoid re-rendering when something changes in a
@@ -53,27 +56,26 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
 
   // Handle requests to give this thread keyboard focus.
   const focusRequest = store.annotationFocusRequest();
-  const cardRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    if (focusRequest !== thread.id || !cardRef.current) {
+    if (focusRequest !== thread.id || !threadRef.current) {
       return;
     }
-    cardRef.current.focus();
+    threadRef.current.focus();
     store.clearAnnotationFocusRequest();
   }, [focusRequest, store, thread.id]);
 
   return (
-    /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
-    <Card
-      active={isHovered}
-      classes="cursor-pointer focus-visible-ring theme-clean:border-none"
-      data-testid="thread-card"
-      elementRef={cardRef}
-      tabIndex={-1}
+    <ButtonBase
+      unstyled
+      classes="focus-visible-ring text-left w-full"
+      elementRef={threadRef}
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
-        if (!isFromButtonOrLink(e.target as Element) && thread.annotation) {
+        if (
+          !isFromChildButtonOrLink(e.target as Element) &&
+          thread.annotation
+        ) {
           scrollToAnnotation(thread.annotation);
         }
       }}
@@ -81,8 +83,14 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       onMouseLeave={() => setThreadHovered(null)}
       key={thread.id}
     >
-      <CardContent>{threadContent}</CardContent>
-    </Card>
+      <Card
+        active={isHovered}
+        classes="theme-clean:border-none"
+        data-testid="thread-card"
+      >
+        <CardContent>{threadContent}</CardContent>
+      </Card>
+    </ButtonBase>
   );
 }
 
