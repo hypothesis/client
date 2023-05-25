@@ -5,11 +5,8 @@
  *
  * This only works for plain objects, arrays and objects where data is stored
  * in enumerable fields.
- *
- * @template {object} T
- * @param {T} object
  */
-function deepFreeze(object) {
+function deepFreeze<T extends object>(object: T) {
   if (Object.isFrozen(object)) {
     return object;
   }
@@ -32,7 +29,7 @@ function deepFreeze(object) {
  * @param {T} object
  * @return {T} Returns the input object
  */
-export function immutable(object) {
+export function immutable<T extends object>(object: T) {
   if (process.env.NODE_ENV === 'production') {
     return object;
   } else {
