@@ -1,6 +1,5 @@
 import {
   Button,
-  ButtonBase,
   CaretRightIcon,
   MenuExpandIcon,
 } from '@hypothesis/frontend-shared';
@@ -53,20 +52,23 @@ function ThreadCollapseControl({
           'bg-white'
         )}
       >
-        <ButtonBase
+        <Button
           classes={classnames(
             // Pull the button up a little to align horizontally with the
             // thread/annotation's header. Override large touch targets for
             // touch interfaces; we need to conserve space here
-            '-mt-1 touch:min-w-[auto] touch:min-h-[auto] p-[6.5px] text-grey-5 hover:text-grey-7'
+            '-mt-1 touch:min-w-[auto] touch:min-h-[auto] p-[6.5px]',
+            'text-grey-5 hover:text-grey-7'
           )}
           data-testid="toggle-button"
           expanded={!threadIsCollapsed}
           title={toggleTitle}
           onClick={onToggleReplies}
+          size="custom"
+          variant="custom"
         >
           <ToggleIcon className="w-em h-em" />
-        </ButtonBase>
+        </Button>
       </div>
     </div>
   );
