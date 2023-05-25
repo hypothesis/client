@@ -35,6 +35,7 @@ type IntlType = typeof window.Intl;
 function format(
   date: Date,
   options: Intl.DateTimeFormatOptions,
+  /* istanbul ignore next */
   Intl: IntlType = window.Intl
 ): string {
   const key = JSON.stringify(options);

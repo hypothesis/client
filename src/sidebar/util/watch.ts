@@ -32,19 +32,21 @@
  *   );
  *
  * @template T
- * @param {(callback: () => void) => VoidFunction} subscribe - Function to
- *   subscribe to changes from the data source.
- * @param {() => T} getValue - Callback that extracts information of interest
- *   from the data source.
- * @param {(current: T, previous: T) => void} callback -
- *   A callback that receives the data extracted by `getValue`. It is called
- *   each time the result of `getValue` changes.
- * @param {((current: T, previous: T) => boolean)} [compare] -
- *   Comparison function that tests whether the results of two `getValue` calls
- *   are equal. If omitted, a strict equality check is used
- * @return {VoidFunction} - Return value of `subscribe`
+ * @param subscribe - Function to subscribe to changes from the data source.
+ * @param getValue - Callback that extracts information of interest from the
+ *   data source.
+ * @param callback - A callback that receives the data extracted by `getValue`.
+ *   It is called each time the result of `getValue` changes.
+ * @param compare - Comparison function that tests whether the results of two
+ *   `getValue` calls are equal. If omitted, a strict equality check is used
+ * @return Return value of `subscribe`
  */
-export function watch(subscribe, getValue, callback, compare) {
+export function watch<T>(
+  subscribe: (callback: VoidFunction) => VoidFunction,
+  getValue: () => T,
+  callback: (current: T, previous: T) => void,
+  compare?: (current: T, previous: T) => boolean
+): VoidFunction {
   let prevValue = getValue();
   const unsubscribe = subscribe(() => {
     const currentValue = getValue();
