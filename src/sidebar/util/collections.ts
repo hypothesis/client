@@ -4,13 +4,8 @@
 
 /**
  * Return the number of elements in `ary` for which `predicate` returns true.
- *
- * @template T
- * @param {T[]} ary
- * @param {(item: T) => boolean} predicate
- * @return {number}
  */
-export function countIf(ary, predicate) {
+export function countIf<T>(ary: T[], predicate: (item: T) => boolean): number {
   return ary.reduce((count, item) => {
     return predicate(item) ? count + 1 : count;
   }, 0);
@@ -19,24 +14,18 @@ export function countIf(ary, predicate) {
 /**
  * Convert an array of strings into an object mapping each array entry
  * to `true`.
- *
- * @param {string[]} arr
- * @return {Record<string,true>}
  */
-export function toTrueMap(arr) {
-  const obj = /** @type {Record<string,true>} */ ({});
+export function toTrueMap(arr: string[]): Record<string, true> {
+  const obj: Record<string, true> = {};
   arr.forEach(key => (obj[key] = true));
   return obj;
 }
 
 /**
- * Utility function that returns all of the properties of an object whose
+ * Utility function that returns all the properties of an object whose
  * value is `true`.
- *
- * @param {Record<string, boolean>} obj
- * @return {string[]}
  */
-export function trueKeys(obj) {
+export function trueKeys(obj: Record<string, boolean>): string[] {
   return Object.keys(obj).filter(key => obj[key] === true);
 }
 
@@ -45,11 +34,9 @@ export function trueKeys(obj) {
  * `Record<Key, Value>`.
  *
  * Unlike `Object.entries`, this preserves the type of the key.
- *
- * @template {string|number|symbol} Key
- * @template Value
- * @param {Record<Key, Value>} object
  */
-export function entries(object) {
-  return /** @type {[Key, Value][]} */ (Object.entries(object));
+export function entries<Key extends string | number | symbol, Value>(
+  object: Record<Key, Value>
+): [Key, Value][] {
+  return Object.entries(object) as [Key, Value][];
 }
