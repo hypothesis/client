@@ -1,3 +1,9 @@
+function isHTMLAnchorElement(
+  element: HTMLElement
+): element is HTMLAnchorElement {
+  return element.tagName === 'A';
+}
+
 /**
  * Prevent windows or tabs opened via links under `root` from accessing their
  * opening `Window`.
@@ -12,17 +18,14 @@
  * [1] https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types#noopener
  * [2] https://mathiasbynens.github.io/rel-noopener/
  * [3] https://bugs.chromium.org/p/chromium/issues/detail?id=753314
- *
- * @param {Element} root - Root element
  */
-export function disableOpenerForExternalLinks(root) {
+export function disableOpenerForExternalLinks(root: Element) {
   root.addEventListener('click', event => {
-    const target = /** @type {HTMLElement} */ (event.target);
+    const target = event.target as HTMLElement;
 
-    if (target.tagName === 'A') {
-      const linkEl = /** @type {HTMLAnchorElement} */ (target);
-      if (linkEl.target === '_blank') {
-        linkEl.rel = 'noopener';
+    if (isHTMLAnchorElement(target)) {
+      if (target.target === '_blank') {
+        target.rel = 'noopener';
       }
     }
   });
