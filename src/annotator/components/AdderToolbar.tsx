@@ -1,6 +1,6 @@
 import {
   AnnotateIcon,
-  ButtonBase,
+  Button,
   HighlightIcon,
   PointerDownIcon,
   PointerUpIcon,
@@ -76,10 +76,8 @@ function ToolbarButton({
   const title = shortcut ? `${label} (${shortcut})` : label;
 
   return (
-    <ButtonBase
+    <Button
       classes={classnames(
-        'flex-col gap-y-1 py-2.5 px-2',
-        'text-annotator-sm leading-none',
         // Default color when the toolbar is not hovered
         'text-grey-7',
         // When the parent .group element is hovered (but this element itself is
@@ -93,11 +91,22 @@ function ToolbarButton({
       )}
       onClick={onClick}
       title={title}
+      size="custom"
+      variant="custom"
     >
-      {Icon && <Icon className="text-annotator-lg" title={title} />}
-      {typeof badgeCount === 'number' && <NumberIcon badgeCount={badgeCount} />}
-      <span>{label}</span>
-    </ButtonBase>
+      <div
+        className={classnames(
+          'flex flex-col items-center gap-y-1 py-2.5 px-2',
+          'text-annotator-sm leading-none'
+        )}
+      >
+        {Icon && <Icon className="text-annotator-lg" title={title} />}
+        {typeof badgeCount === 'number' && (
+          <NumberIcon badgeCount={badgeCount} />
+        )}
+        <span data-testid="adder-button-label">{label}</span>
+      </div>
+    </Button>
   );
 }
 

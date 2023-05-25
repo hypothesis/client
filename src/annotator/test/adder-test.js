@@ -143,7 +143,7 @@ describe('Adder', () => {
 
     it("calls onAnnotate callback when Annotate button's label is clicked", () => {
       const annotateLabel = getContent(adder).querySelector(
-        'button[title^="Annotate"] > span'
+        'button[title^="Annotate"] [data-testid="adder-button-label"]'
       );
       annotateLabel.dispatchEvent(new Event('click', { bubbles: true }));
       assert.called(adderCallbacks.onAnnotate);
