@@ -1,27 +1,26 @@
 import * as Sentry from '@sentry/browser';
+import type { User } from '@sentry/browser';
 
 import { parseConfigFragment } from '../../shared/config-fragment';
 import { handleErrorsInFrames } from '../../shared/frame-error-capture';
 import { warnOnce } from '../../shared/warn-once';
 
-/**
- * @typedef SentryConfig
- * @prop {string} dsn
- * @prop {string} environment
- */
+type SentryConfig = {
+  dsn: string;
+  environment: string;
+};
 
 let eventsSent = 0;
 const maxEventsToSendPerSession = 5;
 
-/** @type {(() => void)|null} */
-let removeFrameErrorHandler = null;
+let removeFrameErrorHandler: (() => void) | null = null;
 
 function currentScriptOrigin() {
   // It might be possible to simplify this as `url` appears to be required
   // according to the HTML spec.
   //
   // See https://html.spec.whatwg.org/multipage/webappapis.html#hostgetimportmetaproperties.
-  let url = import.meta.url;
+  const url = import.meta.url;
   if (!url) {
     return null;
   }
@@ -33,10 +32,8 @@ function currentScriptOrigin() {
  *
  * This will activate Sentry and enable capturing of uncaught errors and
  * unhandled promise rejections.
- *
- * @param {SentryConfig} config
  */
-export function init(config) {
+export function init(config: SentryConfig) {
   const scriptOrigin = currentScriptOrigin();
   const allowUrls = scriptOrigin ? [scriptOrigin] : undefined;
 
@@ -112,8 +109,7 @@ export function init(config) {
     // Ignore errors parsing configuration.
   }
 
-  /** @param {HTMLScriptElement} script */
-  const isJavaScript = script =>
+  const isJavaScript = (script: HTMLScriptElement) =>
     !script.type || script.type.match(/javascript|module/);
 
   // Include information about the scripts on the page. This may help with
@@ -137,10 +133,8 @@ export function init(config) {
  * Record the user ID of the logged-in user.
  *
  * See https://docs.sentry.io/platforms/javascript/#capturing-the-user
- *
- * @param {import('@sentry/browser').User|null} user
  */
-export function setUserInfo(user) {
+export function setUserInfo(user: User | null) {
   Sentry.setUser(user);
 }
 
