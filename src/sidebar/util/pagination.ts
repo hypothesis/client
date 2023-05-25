@@ -1,9 +1,8 @@
 /**
  * The number of an available pagination page, or `null`, indicating a gap
  * between sequential numbered pages.
- *
- * @typedef {number|null} PageNumber
  */
+type PageNumber = number | null;
 
 /**
  * Determine the set of (pagination) page numbers that should be provided to
@@ -22,16 +21,17 @@
  *   pageNumberOptions(9, 10, 5) => [1, null, 7, 8, 9, 10]
  *   pageNumberOptions(2, 3, 5) => [1, 2, 3]
  *
- * @param {number} currentPage - The currently-visible/-active page of results.
+ * @param currentPage - The currently-visible/-active page of results.
  *   Note that pages are 1-indexed
- * @param {number} totalPages
- * @param {number} [maxPages] - The maximum number of numbered pages to make
- *   available
- * @return {PageNumber[]} Set of navigation page options to show. `null`
- *   values represent gaps in the sequence of pages, to be represented later
- *   as ellipses (...)
+ * @param maxPages - The maximum number of numbered pages to make available
+ * @return Set of navigation page options to show. `null` values represent gaps
+ *   in the sequence of pages, to be represented later as ellipses (...)
  */
-export function pageNumberOptions(currentPage, totalPages, maxPages = 5) {
+export function pageNumberOptions(
+  currentPage: number,
+  totalPages: number,
+  maxPages = 5
+): PageNumber[] {
   if (totalPages <= 1) {
     return [];
   }
@@ -53,7 +53,7 @@ export function pageNumberOptions(currentPage, totalPages, maxPages = 5) {
     ++increment;
   }
 
-  const pageOptions = /** @type {PageNumber[]} */ ([]);
+  const pageOptions: PageNumber[] = [];
 
   // Construct a numerically-sorted array with `null` entries inserted
   // between non-sequential entries
