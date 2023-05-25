@@ -1,4 +1,4 @@
-import { ButtonBase, IconButton, Link } from '@hypothesis/frontend-shared';
+import { Button, IconButton, Link } from '@hypothesis/frontend-shared';
 import {
   EditorLatexIcon,
   EditorQuoteIcon,
@@ -156,12 +156,14 @@ function ToolbarButton({
 
   if (label) {
     return (
-      <ButtonBase
-        classes="text-grey-7 hover:text-grey-9 p-1.5"
+      <Button
+        classes="p-1.5 text-grey-7 hover:text-grey-9"
         {...buttonProps}
+        size="custom"
+        variant="custom"
       >
         {label}
-      </ButtonBase>
+      </Button>
     );
   }
   return (
