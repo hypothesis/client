@@ -8,15 +8,12 @@ import { hasOwn } from '../../shared/has-own';
  *
  *   replaceURLParams('/things/:id', {id: 'foo', q: 'bar'}) =>
  *     {url: '/things/foo', unusedParams: {q: 'bar'}}
- *
- * @template Param
- * @param {string} url
- * @param {Record<string, Param>} params
- * @return {{ url: string, unusedParams: Record<string, Param>}}
  */
-export function replaceURLParams(url, params) {
-  /** @type {Record<string, Param>} */
-  const unusedParams = {};
+export function replaceURLParams<Param>(
+  url: string,
+  params: Record<string, Param>
+): { url: string; unusedParams: Record<string, Param> } {
+  const unusedParams: Record<string, Param> = {};
   for (const param in params) {
     if (hasOwn(params, param)) {
       const value = params[param];
@@ -33,10 +30,7 @@ export function replaceURLParams(url, params) {
 
 /**
  * Resolve a relative URL against a base URL to get an absolute URL.
- *
- * @param {string} relativeURL
- * @param {string} baseURL
  */
-export function resolve(relativeURL, baseURL) {
+export function resolve(relativeURL: string, baseURL: string): string {
   return new URL(relativeURL, baseURL).href;
 }
