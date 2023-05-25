@@ -7,13 +7,14 @@ import { ListenerCollection } from '../../shared/listener-collection';
  * Returns a cleanup function which should be called to remove observers when
  * updates are no longer needed.
  *
- * @param {Element} element - HTML element to watch
- * @param {(width: number, height: number) => void} onSizeChanged -
- *   Callback to invoke with the `clientWidth` and `clientHeight` of the
- *   element when a change in its size is detected.
- * @return {() => void}
+ * @param element - HTML element to watch
+ * @param onSizeChanged - Callback to invoke with the `clientWidth` and
+ *   `clientHeight` of the element when a change in its size is detected.
  */
-export function observeElementSize(element, onSizeChanged) {
+export function observeElementSize(
+  element: Element,
+  onSizeChanged: (width: number, height: number) => void
+): () => void {
   if (typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(() =>
       onSizeChanged(element.clientWidth, element.clientHeight)
