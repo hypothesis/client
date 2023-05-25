@@ -2,11 +2,8 @@ import { generateHexString } from '../../shared/random';
 
 /**
  * Return a Promise that rejects with an error after `delay` ms.
- *
- * @param {number} delay
- * @param {string} message
  */
-function createTimeout(delay, message) {
+function createTimeout(delay: number, message: string) {
   return new Promise((_, reject) => {
     setTimeout(() => reject(new Error(message)), delay);
   });
@@ -15,24 +12,23 @@ function createTimeout(delay, message) {
 /**
  * Make a JSON-RPC call to a server in another frame using `postMessage`.
  *
- * @template T
- * @param {Window} frame - Frame to send call to
- * @param {string} origin - Origin filter for `window.postMessage` call
- * @param {string} method - Name of the JSON-RPC method
- * @param {unknown[]} params - Parameters of the JSON-RPC method
- * @param {number} [timeout] - Maximum time to wait in ms
- * @param {Window} [window_] - Test seam.
- * @return {Promise<T>} - A Promise for the response to the call
+ * @param frame - Frame to send call to
+ * @param origin - Origin filter for `window.postMessage` call
+ * @param method - Name of the JSON-RPC method
+ * @param params - Parameters of the JSON-RPC method
+ * @param timeout - Maximum time to wait in ms
+ * @param window_ - Test seam.
+ * @return A Promise for the response to the call
  */
-export function call(
-  frame,
-  origin,
-  method,
-  params = [],
+export function call<T>(
+  frame: Window,
+  origin: string,
+  method: string,
+  params: unknown[] = [],
   timeout = 2000,
   /* istanbul ignore next */
-  window_ = window
-) {
+  window_: Window = window
+): Promise<T> {
   const id = generateHexString(10);
 
   // Send RPC request.
@@ -50,8 +46,7 @@ export function call(
   }
 
   // Await response or timeout.
-  /** @type {(e: MessageEvent) => void} */
-  let listener;
+  let listener: (e: MessageEvent) => void;
   const response = new Promise((resolve, reject) => {
     listener = event => {
       if (event.origin !== origin) {
@@ -92,7 +87,7 @@ export function call(
   return Promise.race(responseOrTimeout)
     .then(result => {
       window_.removeEventListener('message', listener);
-      return result;
+      return result as T;
     })
     .catch(err => {
       window_.removeEventListener('message', listener);
@@ -104,12 +99,17 @@ export function call(
  * Send a JSON-RPC 2.0 notification request to another frame via `postMessage`.
  * No response is expected.
  *
- * @param {Window} frame - Frame to send call to
- * @param {string} origin - Origin filter for `window.postMessage` call
- * @param {string} method - Name of the JSON-RPC method
- * @param {unknown[]} params - Parameters of the JSON-RPC method
+ * @param frame - Frame to send call to
+ * @param origin - Origin filter for `window.postMessage` call
+ * @param method - Name of the JSON-RPC method
+ * @param params - Parameters of the JSON-RPC method
  */
-export function notify(frame, origin, method, params = []) {
+export function notify(
+  frame: Window,
+  origin: string,
+  method: string,
+  params: unknown[] = []
+) {
   const request = {
     jsonrpc: '2.0',
     method,
