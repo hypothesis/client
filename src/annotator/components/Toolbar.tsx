@@ -1,5 +1,5 @@
 import {
-  ButtonBase,
+  Button,
   AnnotateIcon,
   CancelIcon,
   CaretRightIcon,
@@ -29,18 +29,18 @@ type ToolbarButtonProps = PresentationalProps &
  */
 function ToolbarButton({ icon: Icon, ...buttonProps }: ToolbarButtonProps) {
   return (
-    <ButtonBase
+    <Button
       classes={classnames(
-        'w-[30px] h-[30px]', // These buttons have precise dimensions
-        'rounded-px', // size of border radius in absolute units
-        'flex items-center justify-center',
-        'border bg-white text-grey-6 hover:text-grey-9',
-        'shadow transition-colors'
+        'justify-center rounded-px',
+        'w-[30px] h-[30px]',
+        'shadow border bg-white text-grey-6 hover:text-grey-9'
       )}
       {...buttonProps}
+      size="custom"
+      variant="custom"
     >
       <Icon />
-    </ButtonBase>
+    </Button>
   );
 }
 
@@ -137,8 +137,9 @@ export default function Toolbar({
           absolutely positioned some way down the edge of the sidebar.
       */}
       {useMinimalControls && isSidebarOpen && (
-        <ButtonBase
+        <Button
           classes={classnames(
+            'transition-colors focus-visible-ring ring-inset',
             'w-[27px] h-[27px] mt-[140px] ml-px-1.5',
             'flex items-center justify-center bg-white border',
             'text-grey-6 hover:text-grey-9 transition-colors',
@@ -150,14 +151,16 @@ export default function Toolbar({
           )}
           title="Close annotation sidebar"
           onClick={closeSidebar}
+          unstyled
         >
           <CancelIcon />
-        </ButtonBase>
+        </Button>
       )}
       {!useMinimalControls && (
         <>
-          <ButtonBase
+          <Button
             classes={classnames(
+              'transition-colors focus-visible-ring ring-inset',
               // Height and width to align with the sidebar's top bar
               'h-[40px] w-[33px] pl-[6px]',
               'bg-white text-grey-5 hover:text-grey-9',
@@ -170,9 +173,10 @@ export default function Toolbar({
             expanded={isSidebarOpen}
             pressed={isSidebarOpen}
             onClick={toggleSidebar}
+            unstyled
           >
             {isSidebarOpen ? <CaretRightIcon /> : <CaretLeftIcon />}
-          </ButtonBase>
+          </Button>
           <div className="space-y-px-1.5 mt-px-2">
             <ToolbarButton
               title="Show highlights"
