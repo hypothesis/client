@@ -22,7 +22,7 @@ function roundCoords(rect) {
   };
 }
 
-describe('annotator.range-util', () => {
+describe('annotator/range-util', () => {
   let selection;
   let testNode;
 
@@ -45,7 +45,7 @@ describe('annotator.range-util', () => {
     selection.addRange(range);
   }
 
-  describe('#isNodeInRange', () => {
+  describe('isNodeInRange', () => {
     it('returns true for a node in the range', () => {
       const range = createRange(testNode, 0, 1);
       assert.isTrue(rangeUtil.isNodeInRange(range, testNode.firstChild));
@@ -80,7 +80,7 @@ describe('annotator.range-util', () => {
     });
   });
 
-  describe('#getTextBoundingBoxes', () => {
+  describe('getTextBoundingBoxes', () => {
     it('gets the bounding box of a range in a text node', () => {
       testNode.innerHTML = 'plain text';
       const rng = createRange(testNode.firstChild, 0, 5);
@@ -119,7 +119,7 @@ describe('annotator.range-util', () => {
     });
   });
 
-  describe('#selectionFocusRect', () => {
+  describe('selectionFocusRect', () => {
     it('returns null if the selection is empty', () => {
       assert.isNull(rangeUtil.selectionFocusRect(selection));
     });
