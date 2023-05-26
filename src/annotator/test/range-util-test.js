@@ -1,5 +1,5 @@
 import * as rangeUtil from '../range-util';
-import { selectedRange } from '../range-util';
+import { isSelectionBackwards, selectedRange } from '../range-util';
 
 function createRange(node, start, end) {
   const range = node.ownerDocument.createRange();
@@ -207,6 +207,37 @@ describe('annotator/range-util', () => {
 
       range = selectedRange(fakeSelection);
       assert.equal(range.toString(), 'foobarbaz');
+    });
+  });
+
+  describe('isSelectionBackwards', () => {
+    let container;
+
+    beforeEach(() => {
+      container = document.createElement('div');
+      container.append('first', 'second');
+      document.body.append(container);
+    });
+
+    afterEach(() => {
+      container.remove();
+    });
+
+    [
+      { nodeA: 0, offsetA: 5, nodeB: 0, offsetB: 2, backwards: true },
+      { nodeA: 0, offsetA: 2, nodeB: 0, offsetB: 5, backwards: false },
+      { nodeA: 1, offsetA: 0, nodeB: 0, offsetB: 0, backwards: true },
+      { nodeA: 0, offsetA: 0, nodeB: 1, offsetB: 0, backwards: false },
+    ].forEach(({ nodeA, offsetA, nodeB, offsetB, backwards }) => {
+      it('returns true if focus is before anchor', () => {
+        getSelection().setBaseAndExtent(
+          container.childNodes[nodeA],
+          offsetA,
+          container.childNodes[nodeB],
+          offsetB
+        );
+        assert.equal(isSelectionBackwards(getSelection()), backwards);
+      });
     });
   });
 
