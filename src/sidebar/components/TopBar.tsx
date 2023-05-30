@@ -138,6 +138,7 @@ function TopBar({
                     classes="inline"
                     onClick={onSignUp}
                     style={loginLinkStyle}
+                    underline="none"
                   >
                     Sign up
                   </LinkButton>
@@ -146,6 +147,7 @@ function TopBar({
                     classes="inline"
                     onClick={onLogin}
                     style={loginLinkStyle}
+                    underline="none"
                   >
                     Log in
                   </LinkButton>
