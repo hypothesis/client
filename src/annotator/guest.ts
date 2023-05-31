@@ -458,6 +458,31 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._hostRPC.connect(hostPort);
   }
 
+  /**
+   * Scroll an anchor into view and notify the host page.
+   *
+   * Returns a promise that resolves when scrolling has completed. See
+   * {@link Integration.scrollToAnchor}.
+   */
+  private async _scrollToAnchor(anchor: Anchor) {
+    const range = resolveAnchor(anchor);
+    if (!range) {
+      return;
+    }
+
+    // Emit a custom event that the host page can respond to. This is useful
+    // if the content is in a hidden section of the page that needs to be
+    // revealed before it can be scrolled to.
+    const event = new ScrollToRangeEvent(range);
+
+    const defaultNotPrevented = this.element.dispatchEvent(event);
+
+    if (defaultNotPrevented) {
+      await event.ready;
+      await this._integration.scrollToAnchor(anchor);
+    }
+  }
+
   async _connectSidebar() {
     this._sidebarRPC.on(
       'featureFlagsUpdated',
@@ -475,22 +500,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       if (!anchor?.highlights) {
         return;
       }
-      const range = resolveAnchor(anchor);
-      if (!range) {
-        return;
-      }
-
-      // Emit a custom event that the host page can respond to. This is useful
-      // if the content is in a hidden section of the page that needs to be
-      // revealed before it can be scrolled to.
-      const event = new ScrollToRangeEvent(range);
-
-      const defaultNotPrevented = this.element.dispatchEvent(event);
-
-      if (defaultNotPrevented) {
-        const ready = Promise.resolve(event.ready);
-        ready.then(() => this._integration.scrollToAnchor(anchor));
-      }
+      this._scrollToAnchor(anchor);
     });
 
     // Handler for controls on the sidebar
@@ -735,13 +745,16 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   /**
    * Scroll to the closest off screen anchor.
    */
-  _scrollToClosestOffScreenAnchor(tags: string[], direction: 'down' | 'up') {
+  private async _scrollToClosestOffScreenAnchor(
+    tags: string[],
+    direction: 'down' | 'up'
+  ) {
     const anchors = this.anchors.filter(({ annotation }) =>
       tags.includes(annotation.$tag)
     );
     const closest = findClosestOffscreenAnchor(anchors, direction);
     if (closest) {
-      this._integration.scrollToAnchor(closest);
+      await this._scrollToAnchor(closest);
     }
   }
 
