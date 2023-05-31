@@ -68,12 +68,14 @@ describe('Guest', () => {
     return fakePortRPCs[1];
   };
 
+  // Simulate event from host frame.
+  //
+  // Returns the result of the guest's event handler. That result would normally
+  // not be used, but is useful as a way for the guest to indicate to tests
+  // when async handling is done, by returning a promise.
   const emitHostEvent = (event, ...args) => {
-    for (let [evt, fn] of hostRPC().on.args) {
-      if (event === evt) {
-        fn(...args);
-      }
-    }
+    const [, callback] = hostRPC().on.args.find(args => args[0] === event);
+    return callback?.(...args);
   };
 
   const emitSidebarEvent = (event, ...args) => {
@@ -274,25 +276,24 @@ describe('Guest', () => {
     });
 
     describe('on "scrollToClosestOffScreenAnchor" event', () => {
-      it('scrolls to the nearest off-screen anchor"', () => {
+      it('scrolls to the nearest off-screen anchor"', async () => {
         const guest = createGuest();
         guest.anchors = [
-          { annotation: { $tag: 't1' } },
-          { annotation: { $tag: 't2' } },
+          { annotation: { $tag: 't1' }, range: new FakeTextRange({}) },
+          { annotation: { $tag: 't2' }, range: new FakeTextRange({}) },
         ];
-        const anchor = {};
-        fakeFindClosestOffscreenAnchor.returns(anchor);
+        fakeFindClosestOffscreenAnchor.returns(guest.anchors[0]);
         const tags = ['t1', 't2'];
         const direction = 'down';
 
-        emitHostEvent('scrollToClosestOffScreenAnchor', tags, direction);
+        await emitHostEvent('scrollToClosestOffScreenAnchor', tags, direction);
 
         assert.calledWith(
           fakeFindClosestOffscreenAnchor,
           guest.anchors,
           direction
         );
-        assert.calledWith(fakeIntegration.scrollToAnchor, anchor);
+        assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
       });
     });
 
