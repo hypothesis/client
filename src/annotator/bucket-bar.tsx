@@ -3,6 +3,7 @@ import { render } from 'preact';
 import type { AnchorPosition, Destroyable } from '../types/annotator';
 import Buckets from './components/Buckets';
 import { computeBuckets } from './util/buckets';
+import { createShadowRoot } from './util/shadow-root';
 
 export type BucketBarOptions = {
   onFocusAnnotations: (tags: string[]) => void;
@@ -14,11 +15,13 @@ export type BucketBarOptions = {
 };
 
 /**
- * Controller for the "bucket bar" shown alongside the sidebar indicating where
- * annotations are in the document.
+ * Controller for the "bucket bar" showing where annotations are in the document.
+ *
+ * This is usually positioned along the edge of the sidebar but can be
+ * rendered elsewhere for certain content viewers.
  */
 export class BucketBar implements Destroyable {
-  private _bucketsContainer: HTMLDivElement;
+  private _bucketsContainer: HTMLElement;
   private _onFocusAnnotations: BucketBarOptions['onFocusAnnotations'];
   private _onScrollToClosestOffScreenAnchor: BucketBarOptions['onScrollToClosestOffScreenAnchor'];
   private _onSelectAnnotations: BucketBarOptions['onSelectAnnotations'];
@@ -31,7 +34,11 @@ export class BucketBar implements Destroyable {
       onSelectAnnotations,
     }: BucketBarOptions
   ) {
-    this._bucketsContainer = document.createElement('div');
+    this._bucketsContainer = document.createElement('hypothesis-bucket-bar');
+    this._bucketsContainer.style.display = 'block';
+    this._bucketsContainer.style.width = '100%';
+
+    createShadowRoot(this._bucketsContainer);
     container.appendChild(this._bucketsContainer);
 
     this._onFocusAnnotations = onFocusAnnotations;
@@ -48,7 +55,7 @@ export class BucketBar implements Destroyable {
   }
 
   update(positions: AnchorPosition[]) {
-    const buckets = computeBuckets(positions);
+    const buckets = computeBuckets(positions, this._bucketsContainer);
     render(
       <Buckets
         above={buckets.above}
@@ -62,7 +69,7 @@ export class BucketBar implements Destroyable {
           this._onSelectAnnotations(tags, toogle)
         }
       />,
-      this._bucketsContainer
+      this._bucketsContainer.shadowRoot!
     );
   }
 }
