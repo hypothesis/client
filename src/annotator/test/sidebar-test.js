@@ -1053,9 +1053,12 @@ describe('Sidebar', () => {
   });
 
   describe('bucket bar', () => {
-    it('displays the bucket bar by default', () => {
+    it('displays the bucket bar alongside the sidebar by default', () => {
       const sidebar = createSidebar();
       assert.isNotNull(sidebar.bucketBar);
+      assert.calledOnce(FakeBucketBar);
+      const container = FakeBucketBar.args[0][0];
+      assert.equal(container.getAttribute('data-testid'), 'sidebar-edge');
     });
 
     it('does not display the bucket bar if using the "clean" theme', () => {
@@ -1068,6 +1071,37 @@ describe('Sidebar', () => {
         externalContainerSelector: `.${EXTERNAL_CONTAINER_SELECTOR}`,
       });
       assert.isNull(sidebar.bucketBar);
+    });
+
+    it('creates bucket bar in specified container if `bucketBarContainer` config is supplied', () => {
+      const bucketBarContainer = document.createElement('div');
+      bucketBarContainer.id = 'bucket-bar-container';
+      document.body.append(bucketBarContainer);
+
+      try {
+        const sidebar = createSidebar({
+          bucketBarContainer: '#bucket-bar-container',
+        });
+        assert.ok(sidebar.bucketBar);
+        assert.calledWith(FakeBucketBar, bucketBarContainer, sinon.match.any);
+      } finally {
+        bucketBarContainer.remove();
+      }
+    });
+
+    it('warns if `bucketBarContainer` config is supplied but invalid', () => {
+      sinon.stub(console, 'warn');
+      try {
+        createSidebar({
+          bucketBarContainer: '#invalid-selector',
+        });
+        assert.calledWith(
+          console.warn,
+          `Custom bucket bar container "#invalid-selector" not found`
+        );
+      } finally {
+        console.warn.restore();
+      }
     });
 
     it('calls the "hoverAnnotations" RPC method', () => {

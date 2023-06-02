@@ -50,7 +50,9 @@ describe('BucketBar', () => {
   it('should render the bucket bar with no buckets when constructed', () => {
     const bucketBar = createBucketBar();
     assert.calledWith(fakeComputeBuckets, []);
-    assert.ok(bucketBar._bucketsContainer.querySelector('.FakeBuckets'));
+    assert.ok(
+      bucketBar._bucketsContainer.shadowRoot.querySelector('.FakeBuckets')
+    );
   });
 
   it('passes "onFocusAnnotations" to the Bucket component', () => {

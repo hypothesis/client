@@ -1,3 +1,4 @@
+import classnames from 'classnames';
 import * as Hammer from 'hammerjs';
 import { render } from 'preact';
 
@@ -43,6 +44,9 @@ export type SidebarConfig = { sidebarAppUrl: string } & Record<string, unknown>;
  * Client configuration used by the sidebar container ({@link Sidebar}).
  */
 export type SidebarContainerConfig = {
+  /** CSS selector for the container of the bucket bar. */
+  bucketBarContainer?: string;
+
   /**
    * Details of the annotation service the client should connect to.
    * This includes callbacks provided by the host page to handle certain actions
@@ -168,7 +172,46 @@ export class Sidebar implements Destroyable {
       if (config.theme === 'clean') {
         this.iframeContainer.classList.add('theme-clean');
       } else {
-        this.bucketBar = new BucketBar(this.iframeContainer, {
+        let bucketBarContainer: HTMLElement | undefined;
+        if (config.bucketBarContainer) {
+          bucketBarContainer = document.querySelector(
+            config.bucketBarContainer
+          ) as HTMLElement | undefined;
+          if (!bucketBarContainer) {
+            console.warn(
+              `Custom bucket bar container "${config.bucketBarContainer}" not found`
+            );
+          }
+        }
+
+        // Create the background for the bucket bar and toolbar. This also
+        // serves as the default container for the bucket bar.
+        const sidebarEdge = document.createElement('div');
+        sidebarEdge.setAttribute('data-testid', 'sidebar-edge');
+        sidebarEdge.className = classnames(
+          // Position the background along the left edge of the sidebar.
+          //
+          // `width` is 1px more than `left` to avoid a gap on iOS.
+          // See https://github.com/hypothesis/client/pull/2750.
+          'absolute top-0 bottom-0 w-[23px] left-[-22px]',
+
+          // Make the bucket bar fill the container, with large padding on top
+          // so that buckets are below the toolbar, and small padding on the
+          // right to align the right edge of the buckets with the right edge
+          // of toolbar icons.
+          'flex flex-column pt-[110px] pr-[5px]',
+
+          // Use a grey background, with lower opacity with the sidebar is
+          // collapsed, so the page content behind it can be read.
+          'bg-grey-2 sidebar-collapsed:bg-black/[.08]'
+        );
+        this.iframeContainer.append(sidebarEdge);
+
+        if (!bucketBarContainer) {
+          bucketBarContainer = sidebarEdge;
+        }
+
+        this.bucketBar = new BucketBar(bucketBarContainer, {
           onFocusAnnotations: tags =>
             this._guestRPC.forEach(rpc => rpc.call('hoverAnnotations', tags)),
           onScrollToClosestOffScreenAnchor: (tags, direction) =>

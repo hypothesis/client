@@ -50,12 +50,6 @@ export type WorkingBucket = {
   bottom: number;
 };
 
-// Only anchors with top offsets between `BUCKET_TOP_THRESHOLD` and
-// `window.innerHeight - BUCKET_BOTTOM_THRESHOLD` are considered "on-screen"
-// and will be bucketed. This is to account for bucket-bar tool buttons (top
-// and the height of the bottom navigation bucket (bottom)
-export const BUCKET_TOP_THRESHOLD = 137;
-export const BUCKET_BOTTOM_THRESHOLD = 22;
 // Generated buckets of annotation anchor highlights should be spaced by
 // at least this amount, in pixels
 const BUCKET_GAP_SIZE = 60;
@@ -70,6 +64,11 @@ export function findClosestOffscreenAnchor(
   anchors: Anchor[],
   direction: 'up' | 'down'
 ): Anchor | null {
+  // Thresholds for how far away an anchor has to be from the top/bottom of
+  // the viewport to be considered off-screen.
+  const BUCKET_TOP_THRESHOLD = 137;
+  const BUCKET_BOTTOM_THRESHOLD = 22;
+
   let closestAnchor = null;
   let closestTop = 0;
 
@@ -143,7 +142,22 @@ export function computeAnchorPositions(anchors: Anchor[]): AnchorPosition[] {
   return positions;
 }
 
-export function computeBuckets(anchorPositions: AnchorPosition[]): BucketSet {
+/**
+ * Gap between the top/bottom of the container and the top/bottom of buckets.
+ */
+export const BUCKET_BAR_VERTICAL_MARGIN = 30;
+
+/**
+ * Group anchors into buckets and determine a suitable vertical position
+ * for them within {@link container}.
+ *
+ * @param anchorPositions - Positions of anchors relative to viewport
+ * @param container - Container into which buckets will be rendered
+ */
+export function computeBuckets(
+  anchorPositions: AnchorPosition[],
+  container: Element
+): BucketSet {
   const aboveTags = new Set<string>();
   const belowTags = new Set<string>();
   const buckets: Bucket[] = [];
@@ -165,22 +179,33 @@ export function computeBuckets(anchorPositions: AnchorPosition[]): BucketSet {
     };
   }
 
+  const containerRect = container.getBoundingClientRect();
+  const vMargin = BUCKET_BAR_VERTICAL_MARGIN;
+
+  // Compute positions of buckets relative to bucket bar instead of viewport.
+  const relativePositions = anchorPositions.map(aPos => ({
+    tag: aPos.tag,
+    top: aPos.top - containerRect.top,
+    bottom: aPos.bottom - containerRect.top,
+  }));
+
   // Build buckets from position information
-  anchorPositions.forEach(aPos => {
+  for (const aPos of relativePositions) {
     const center = (aPos.top + aPos.bottom) / 2;
-    if (center < BUCKET_TOP_THRESHOLD) {
+
+    if (center < vMargin) {
       aboveTags.add(aPos.tag);
-      return;
-    } else if (center > window.innerHeight - BUCKET_BOTTOM_THRESHOLD) {
+      continue;
+    } else if (center > containerRect.height - vMargin) {
       belowTags.add(aPos.tag);
-      return;
+      continue;
     }
 
     if (!currentBucket) {
       // We've encountered our first on-screen anchor position:
       // We'll need a bucket!
       currentBucket = newBucket(aPos);
-      return;
+      continue;
     }
     // We want to contain overlapping highlights and those near each other
     // within a shared bucket
@@ -212,7 +237,7 @@ export function computeBuckets(anchorPositions: AnchorPosition[]): BucketSet {
       currentBucket.bottom = updatedBottom;
       currentBucket.position = currentBucket.top + updatedHeight / 2;
     }
-  });
+  }
 
   if (currentBucket) {
     buckets.push(currentBucket);
@@ -221,13 +246,13 @@ export function computeBuckets(anchorPositions: AnchorPosition[]): BucketSet {
   // Add an upper "navigation" bucket with offscreen-above anchors
   const above = {
     tags: aboveTags,
-    position: BUCKET_TOP_THRESHOLD,
+    position: vMargin,
   };
 
   // Add a lower "navigation" bucket with offscreen-below anchors
   const below = {
     tags: belowTags,
-    position: window.innerHeight - BUCKET_BOTTOM_THRESHOLD,
+    position: containerRect.height - vMargin,
   };
 
   return {

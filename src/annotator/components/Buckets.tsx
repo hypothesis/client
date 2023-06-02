@@ -1,5 +1,4 @@
 import { PointerButton } from '@hypothesis/frontend-shared';
-import classnames from 'classnames';
 
 import type { Bucket } from '../util/buckets';
 
@@ -51,17 +50,7 @@ export default function Buckets({
   const showDownNavigation = below.tags.size > 0;
 
   return (
-    <ul
-      className={classnames(
-        // 2020-11-20: Making bucket bar one pixel wider (23px vs 22px) is an
-        // interim and pragmatic solution for an apparent glitch on
-        // Safari and Chrome. Adding one pixel resolves this issue:
-        // https://github.com/hypothesis/client/pull/2750
-        'absolute w-[23px] left-[-22px] h-full',
-        // The background is set to low opacity when the sidebar is collapsed.
-        'bg-grey-2 sidebar-collapsed:bg-black/[.08]'
-      )}
-    >
+    <ul className="relative">
       {showUpNavigation && (
         <li
           className="absolute right-0 pointer-events-auto mt-[-11px]"

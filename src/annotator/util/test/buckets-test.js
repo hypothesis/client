@@ -3,8 +3,7 @@ import {
   computeAnchorPositions,
   computeBuckets,
   $imports,
-  BUCKET_TOP_THRESHOLD,
-  BUCKET_BOTTOM_THRESHOLD,
+  BUCKET_BAR_VERTICAL_MARGIN,
 } from '../buckets';
 
 const FAKE_WINDOW_HEIGHT = 410;
@@ -13,6 +12,8 @@ describe('annotator/util/buckets', () => {
   let fakeAnchors;
   let fakeGetBoundingClientRect;
   let stubbedInnerHeight;
+
+  let bucketBarContainer;
 
   beforeEach(() => {
     // In a normal `Anchor` object, `highlights` would be an array of
@@ -48,6 +49,17 @@ describe('annotator/util/buckets', () => {
       };
     });
 
+    bucketBarContainer = document.createElement('div');
+    bucketBarContainer.style.position = 'fixed';
+
+    // Set the vertical position and width of the bucket bar to roughly match
+    // what it will be when positioned along the edge of the sidebar.
+    const topOffset = 100;
+    bucketBarContainer.style.top = `${topOffset}px`;
+    bucketBarContainer.style.height = `${FAKE_WINDOW_HEIGHT - topOffset}px`;
+    bucketBarContainer.style.width = '25px';
+    document.body.append(bucketBarContainer);
+
     $imports.$mock({
       '../highlighter': {
         getBoundingClientRect: fakeGetBoundingClientRect,
@@ -57,6 +69,7 @@ describe('annotator/util/buckets', () => {
 
   afterEach(() => {
     $imports.$restore();
+    bucketBarContainer.remove();
     stubbedInnerHeight.restore();
   });
 
@@ -203,42 +216,56 @@ describe('annotator/util/buckets', () => {
       ];
     });
 
-    it('puts anchors whose center is above the screen into the `above` bucket', () => {
-      const thresholdPos = BUCKET_TOP_THRESHOLD;
-      const bucketSet = computeBuckets([
-        ...fakeAnchorPositions,
-        {
-          tag: 'just-on-screen',
-          top: thresholdPos - 10,
-          bottom: thresholdPos + 11,
-        },
-        {
-          tag: 'just-off-screen',
-          top: thresholdPos - 11,
-          bottom: thresholdPos + 10,
-        },
-      ]);
+    it('puts anchors whose center is above the container into the `above` bucket', () => {
+      const thresholdPos =
+        bucketBarContainer.getBoundingClientRect().top +
+        BUCKET_BAR_VERTICAL_MARGIN;
+
+      const bucketSet = computeBuckets(
+        [
+          ...fakeAnchorPositions,
+          {
+            tag: 'just-on-screen',
+            top: thresholdPos - 10,
+            bottom: thresholdPos + 11,
+          },
+          {
+            tag: 'just-off-screen',
+            top: thresholdPos - 11,
+            bottom: thresholdPos + 10,
+          },
+        ],
+        bucketBarContainer
+      );
+
       assert.deepEqual(
         [...bucketSet.above.tags],
         ['t0', 't1', 'just-off-screen']
       );
     });
 
-    it('puts anchors whose center is below the screen into the `below` bucket', () => {
-      const thresholdPos = FAKE_WINDOW_HEIGHT - BUCKET_BOTTOM_THRESHOLD;
-      const bucketSet = computeBuckets([
-        ...fakeAnchorPositions,
-        {
-          tag: 'just-on-screen',
-          top: thresholdPos - 11,
-          bottom: thresholdPos + 10,
-        },
-        {
-          tag: 'just-off-screen',
-          top: thresholdPos - 10,
-          bottom: thresholdPos + 11,
-        },
-      ]);
+    it('puts anchors whose center is below the container into the `below` bucket', () => {
+      const thresholdPos =
+        bucketBarContainer.getBoundingClientRect().bottom -
+        BUCKET_BAR_VERTICAL_MARGIN;
+
+      const bucketSet = computeBuckets(
+        [
+          ...fakeAnchorPositions,
+          {
+            tag: 'just-on-screen',
+            top: thresholdPos - 11,
+            bottom: thresholdPos + 10,
+          },
+          {
+            tag: 'just-off-screen',
+            top: thresholdPos - 10,
+            bottom: thresholdPos + 11,
+          },
+        ],
+        bucketBarContainer
+      );
+
       assert.deepEqual(
         [...bucketSet.below.tags],
         ['t4', 't5', 'just-off-screen']
@@ -246,7 +273,7 @@ describe('annotator/util/buckets', () => {
     });
 
     it('puts on-screen anchors into a buckets', () => {
-      const bucketSet = computeBuckets(fakeAnchorPositions);
+      const bucketSet = computeBuckets(fakeAnchorPositions, bucketBarContainer);
       assert.deepEqual([...bucketSet.buckets[0].tags], ['t2', 't3']);
     });
 
@@ -254,7 +281,8 @@ describe('annotator/util/buckets', () => {
       fakeAnchorPositions[2].bottom = 216;
       fakeAnchorPositions[3].top = 301; // more than 60px from 216
 
-      const bucketSet = computeBuckets(fakeAnchorPositions);
+      const bucketSet = computeBuckets(fakeAnchorPositions, bucketBarContainer);
+
       assert.deepEqual([...bucketSet.buckets[0].tags], ['t2']);
       assert.deepEqual([...bucketSet.buckets[1].tags], ['t3']);
     });
@@ -262,7 +290,7 @@ describe('annotator/util/buckets', () => {
     it('puts overlapping anchors into a shared bucket', () => {
       fakeAnchorPositions[2].bottom = 401;
       fakeAnchorPositions[3].bottom = 385;
-      const bucketSet = computeBuckets(fakeAnchorPositions);
+      const bucketSet = computeBuckets(fakeAnchorPositions, bucketBarContainer);
       assert.deepEqual([...bucketSet.buckets[0].tags], ['t2', 't3']);
     });
 
@@ -271,8 +299,14 @@ describe('annotator/util/buckets', () => {
       fakeAnchorPositions[2].bottom = 250;
       fakeAnchorPositions[3].top = 225;
       fakeAnchorPositions[3].bottom = 300;
-      const bucketSet = computeBuckets(fakeAnchorPositions);
-      assert.equal(bucketSet.buckets[0].position, 250);
+
+      const bucketSet = computeBuckets(fakeAnchorPositions, bucketBarContainer);
+
+      const expected =
+        (fakeAnchorPositions[2].top + fakeAnchorPositions[3].bottom) / 2 -
+        bucketBarContainer.getBoundingClientRect().top;
+
+      assert.equal(bucketSet.buckets[0].position, expected);
     });
 
     it('returns only above- and below-screen anchors if none are on-screen', () => {
@@ -281,7 +315,9 @@ describe('annotator/util/buckets', () => {
         fakeAnchorPositions[index].top += 1000;
         fakeAnchorPositions[index].bottom += 1000;
       });
-      const bucketSet = computeBuckets(fakeAnchorPositions);
+
+      const bucketSet = computeBuckets(fakeAnchorPositions, bucketBarContainer);
+
       assert.equal(bucketSet.buckets.length, 0);
       // Above-screen
       assert.deepEqual([...bucketSet.above.tags], ['t0', 't1']);
