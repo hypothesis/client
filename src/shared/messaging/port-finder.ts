@@ -1,6 +1,8 @@
+import type { Destroyable } from '../../types/annotator';
 import { ListenerCollection } from '../listener-collection';
 import { generateHexString } from '../random';
 import { isMessageEqual } from './port-util';
+import type { Frame } from './port-util';
 
 /** Timeout for waiting for the host frame to respond to a port request. */
 export const MAX_WAIT_FOR_PORT = 1000 * 20;
@@ -8,28 +10,29 @@ export const MAX_WAIT_FOR_PORT = 1000 * 20;
 /** Polling interval for requests to the host frame for a port. */
 export const POLLING_INTERVAL_FOR_PORT = 250;
 
-/**
- * @typedef {import('../../types/annotator').Destroyable} Destroyable
- * @typedef {import('./port-util').Message} Message
- * @typedef {import('./port-util').Frame} Frame
- */
+export type Options = {
+  /** The role of this frame. */
+  source: Exclude<Frame, 'host'>;
+
+  /** Identifier for this frame. */
+  sourceId?: string;
+
+  /** The frame where the `PortProvider` is listening for messages. */
+  hostFrame: Window;
+};
 
 /**
  * PortFinder is used by non-host frames in the client to establish a
  * MessagePort-based connection to other frames. It is used together with
  * PortProvider which runs in the host frame. See PortProvider for an overview.
- *
- * @implements {Destroyable}
  */
-export class PortFinder {
-  /**
-   * @param {object} options
-   *   @param {Exclude<Frame, 'host'>} options.source - the role of this frame
-   *   @param {string} [options.sourceId] - Identifier for this frame
-   *   @param {Window} options.hostFrame - the frame where the `PortProvider` is
-   *     listening for messages.
-   */
-  constructor({ hostFrame, source, sourceId }) {
+export class PortFinder implements Destroyable {
+  private _hostFrame: Window;
+  private _listeners: ListenerCollection;
+  private _source: Exclude<Frame, 'host'>;
+  private _sourceId: string | undefined;
+
+  constructor({ hostFrame, source, sourceId }: Options) {
     this._hostFrame = hostFrame;
     this._source = source;
     this._sourceId = sourceId;
@@ -43,10 +46,9 @@ export class PortFinder {
   /**
    * Request a specific port from the host frame
    *
-   * @param {Frame} target - the frame aiming to be discovered
-   * @return {Promise<MessagePort>}
+   * @param target - the frame aiming to be discovered
    */
-  async discover(target) {
+  async discover(target: Frame): Promise<MessagePort> {
     let isValidRequest = false;
     if (
       (this._source === 'guest' && target === 'host') ||
