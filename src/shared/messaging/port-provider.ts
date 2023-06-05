@@ -1,15 +1,16 @@
 import { TinyEmitter } from 'tiny-emitter';
 
+import type { Destroyable } from '../../types/annotator';
 import { captureErrors, sendError } from '../frame-error-capture';
 import { ListenerCollection } from '../listener-collection';
 import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
+import type { Message } from './port-util';
 
-/**
- * @typedef {import('../../types/annotator').Destroyable} Destroyable
- * @typedef {import('./port-util').Message} Message
- * @typedef {import('./port-util').Frame} Frame
- * @typedef {'guest-host'|'guest-sidebar'|'notebook-sidebar'|'sidebar-host'} Channel
- */
+type Channel =
+  | 'guest-host'
+  | 'guest-sidebar'
+  | 'notebook-sidebar'
+  | 'sidebar-host';
 
 /**
  * PortProvider creates a `MessageChannel` for communication between two
@@ -57,30 +58,34 @@ import { isMessage, isMessageEqual, isSourceWindow } from './port-util';
  *                                                        5. Send second port to other frame
  *                                                           (eg. via MessageChannel connection
  *                                                           between host and other frame)
- *
- * @implements {Destroyable}
  */
-export class PortProvider {
+export class PortProvider implements Destroyable {
+  private _allowedMessages: Array<Partial<Message> & { allowedOrigin: string }>;
+  private _emitter: TinyEmitter;
+  private _hypothesisAppsOrigin: string;
+
+  /**
+   * IDs of port requests that have been handled.
+   *
+   * This is used to avoid responding to the same request multiple times.
+   * Guest frames in particular may send duplicate requests (see comments in
+   * PortFinder).
+   */
+  private _handledRequests: Set<string>;
+
+  private _listeners: ListenerCollection;
+  private _sidebarHostChannel: MessageChannel;
+
   /**
    * Begin listening to port requests from other frames.
    *
-   * @param {string} hypothesisAppsOrigin - the origin of the hypothesis apps
-   *   is use to send the notebook and sidebar ports to only the frames that
-   *   match the origin.
+   * @param hypothesisAppsOrigin - Origin of the Hypothesis apps (sidebar,
+   *   notebook). Used to verify requests for ports.
    */
-  constructor(hypothesisAppsOrigin) {
+  constructor(hypothesisAppsOrigin: string) {
     this._hypothesisAppsOrigin = hypothesisAppsOrigin;
     this._emitter = new TinyEmitter();
 
-    /**
-     * IDs of port requests that have been handled.
-     *
-     * This is used to avoid responding to the same request multiple times.
-     * Guest frames in particular may send duplicate requests (see comments in
-     * PortFinder).
-     *
-     * @type {Set<string>}
-     */
     this._handledRequests = new Set();
 
     // Create the `sidebar-host` channel immediately, while other channels are
@@ -89,7 +94,6 @@ export class PortProvider {
 
     this._listeners = new ListenerCollection();
 
-    /** @type {Array<Partial<Message> & {allowedOrigin: string}>} */
     this._allowedMessages = [
       {
         allowedOrigin: '*',
@@ -120,12 +124,11 @@ export class PortProvider {
     this._listen();
   }
 
-  _listen() {
+  private _listen() {
     const errorContext = 'Handling port request';
-    const sentErrors = /** @type {Set<string>} */ (new Set());
+    const sentErrors = new Set<string>();
 
-    /** @param {string} message */
-    const reportError = message => {
+    const reportError = (message: string) => {
       if (sentErrors.has(message)) {
         // PortFinder will send requests repeatedly until it gets a response or
         // a timeout is reached.
@@ -137,8 +140,7 @@ export class PortProvider {
       sendError(new Error(message), errorContext);
     };
 
-    /** @param {MessageEvent} event */
-    const handleRequest = event => {
+    const handleRequest = (event: MessageEvent) => {
       const { data, origin, source } = event;
 
       if (!isMessage(data) || data.type !== 'request') {
@@ -147,7 +149,7 @@ export class PortProvider {
       }
 
       const { frame1, frame2, requestId, sourceId } = data;
-      const channel = /** @type {Channel} */ (`${frame1}-${frame2}`);
+      const channel = `${frame1}-${frame2}` as Channel;
 
       if (!isSourceWindow(source)) {
         reportError(
@@ -217,17 +219,24 @@ export class PortProvider {
     );
   }
 
-  /**
-   * @param {object} options
-   *   @param {Partial<Message>} options.allowedMessage - the `data` must match this
-   *     `Message`.
-   *   @param {string} options.allowedOrigin - the `origin` must match this
-   *     value. If `allowedOrigin` is '*', the origin is ignored.
-   *   @param {unknown} options.data - the data to be compared with `allowedMessage`.
-   *   @param {string} options.origin - the origin to be compared with
-   *     `allowedOrigin`.
-   */
-  _messageMatches({ allowedMessage, allowedOrigin, data, origin }) {
+  private _messageMatches({
+    allowedMessage,
+    allowedOrigin,
+    data,
+    origin,
+  }: {
+    /** Fields that the message must match. */
+    allowedMessage: Partial<Message>;
+
+    /** Origin must match this value. Accepts `*` wildcard. */
+    allowedOrigin: string;
+
+    /** Data to be compared with `allowedMessage` */
+    data: unknown;
+
+    /** Origin to be compared with `allowedOrigin`. */
+    origin: string;
+  }) {
     if (allowedOrigin !== '*' && origin !== allowedOrigin) {
       return false;
     }
@@ -235,12 +244,10 @@ export class PortProvider {
     return isMessageEqual(data, allowedMessage);
   }
 
-  /**
-   * @param {'frameConnected'} eventName
-   * @param {(source: 'guest'|'sidebar', port: MessagePort) => void} handler - this handler
-   *   fires when a frame connects to the host frame
-   */
-  on(eventName, handler) {
+  on(
+    eventName: 'frameConnected',
+    handler: (source: 'guest' | 'sidebar', port: MessagePort) => void
+  ) {
     this._emitter.on(eventName, handler);
   }
 
