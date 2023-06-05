@@ -161,11 +161,22 @@ function isCallback(value: any): value is Callback {
 export class PortRPC<OnMethod extends string, CallMethod extends string>
   implements Destroyable
 {
+  /**
+   * Map of sequence number to response callback, for RPC calls sent from
+   * this instance.
+   */
   private _callbacks: Map<number, Callback>;
+
   private _destroyed: boolean;
   private _listeners: ListenerCollection;
+
+  /** Map of method name to handler for RPC calls received by this instance. */
   private _methods: Map<string, Callback>;
+
+  /** The underlying communication channel. */
   private _port: MessagePort | null;
+
+  /** Sequence number for next call. */
   private _sequence: number;
 
   /**
@@ -215,6 +226,9 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
 
   /**
    * Register a method handler for incoming RPC requests.
+   *
+   * The arguments to the handler will be the arguments passed to {@link call}
+   * plus a final callback arg that can be used to return results to the caller.
    *
    * This can also be used to register a handler for the built-in "connect"
    * and "close" events.
