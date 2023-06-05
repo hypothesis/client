@@ -301,7 +301,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
   /**
    * Validate message
    */
-  _parseMessage({ data }: MessageEvent): Message | null {
+  private _parseMessage({ data }: MessageEvent): Message | null {
     if (!data || typeof data !== 'object') {
       return null;
     }
@@ -318,7 +318,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
     return data;
   }
 
-  _handle(event: MessageEvent) {
+  private _handle(event: MessageEvent) {
     const msg = this._parseMessage(event);
     const port = this._port;
 
