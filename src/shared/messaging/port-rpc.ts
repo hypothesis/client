@@ -1,3 +1,4 @@
+import type { Destroyable } from '../../types/annotator';
 import { ListenerCollection } from '../listener-collection';
 
 /*
@@ -31,42 +32,43 @@ const PROTOCOL = 'frame-rpc';
  * Format of messages sent between frames.
  *
  * See https://github.com/substack/frame-rpc#protocol
- *
- * @typedef RequestMessage
- * @prop {unknown[]} arguments
- * @prop {string} method
- * @prop {PROTOCOL} protocol
- * @prop {number} sequence
- * @prop {VERSION} version
- *
- * @typedef ResponseMessage
- * @prop {unknown[]} arguments
- * @prop {PROTOCOL} protocol
- * @prop {number} response
- * @prop {VERSION} version
- *
- * @typedef {RequestMessage|ResponseMessage} Message
- *
- * @typedef {import('../../types/annotator').Destroyable} Destroyable
  */
+type RequestMessage = {
+  arguments: unknown[];
+  method: string;
+  protocol: typeof PROTOCOL;
+  sequence: number;
+  version: typeof VERSION;
+};
+
+type ResponseMessage = {
+  arguments: unknown[];
+  protocol: typeof PROTOCOL;
+  response: number;
+  version: typeof VERSION;
+};
+
+type Message = RequestMessage | ResponseMessage;
 
 /**
  * Send a PortRPC method call.
  *
- * @param {MessagePort} port
- * @param {string} method
- * @param {unknown[]} [args]
- * @param {number} [sequence] - Sequence number used for replies
+ * @param [sequence] - Sequence number used for replies
  */
-function sendCall(port, method, args = [], sequence = -1) {
+function sendCall(
+  port: MessagePort,
+  method: string,
+  args: unknown[] = [],
+  sequence = -1
+) {
   port.postMessage(
-    /** @type {RequestMessage} */ ({
+    /** @type {RequestMessage} */ {
       protocol: PROTOCOL,
       version: VERSION,
       arguments: args,
       method,
       sequence,
-    })
+    }
   );
 }
 
@@ -79,19 +81,18 @@ function sendCall(port, method, args = [], sequence = -1) {
  * in the host frame to ensure delivery of "close" notifications from "guest"
  * frames.
  *
- * @param {string} [userAgent] - Test seam
- * @return {() => void} - Callback that removes the listener
+ * @param [userAgent] - Test seam
+ * @return Callback that removes the listener
  */
 export function installPortCloseWorkaroundForSafari(
   /* istanbul ignore next */
   userAgent = navigator.userAgent
-) {
+): () => void {
   if (!shouldUseSafariWorkaround(userAgent)) {
     return () => {};
   }
 
-  /** @param {MessageEvent} event */
-  const handler = event => {
+  const handler = (event: MessageEvent) => {
     if (event.data?.type === 'hypothesisPortClosed' && event.ports[0]) {
       const port = event.ports[0];
       sendCall(port, 'close');
@@ -105,10 +106,8 @@ export function installPortCloseWorkaroundForSafari(
 
 /**
  * Test whether this browser needs the workaround for https://bugs.webkit.org/show_bug.cgi?id=231167.
- *
- * @param {string} userAgent
  */
-function shouldUseSafariWorkaround(userAgent) {
+function shouldUseSafariWorkaround(userAgent: string) {
   const webkitVersionMatch = userAgent.match(/\bAppleWebKit\/([0-9]+)\b/);
   if (!webkitVersionMatch) {
     return false;
@@ -127,15 +126,10 @@ function shouldUseSafariWorkaround(userAgent) {
 
 /**
  * Callback type used for RPC method handlers and result callbacks.
- *
- * @typedef {(...args: unknown[]) => void} Callback
  */
+type Callback = (...args: unknown[]) => void;
 
-/**
- * @param {any} value
- * @return {value is Callback}
- */
-function isCallback(value) {
+function isCallback(value: any): value is Callback {
   return typeof value === 'function';
 }
 
@@ -161,29 +155,33 @@ function isCallback(value) {
  *
  * [1] https://developer.mozilla.org/en-US/docs/Web/API/Channel_Messaging_API
  *
- * @template {string} OnMethod - Names of RPC methods this client responds to
- * @template {string} CallMethod - Names of RPC methods this client invokes
- * @implements {Destroyable}
+ * @template OnMethod - Names of RPC methods this client responds to
+ * @template CallMethod - Names of RPC methods this client invokes
  */
-export class PortRPC {
+export class PortRPC<OnMethod extends string, CallMethod extends string>
+  implements Destroyable
+{
+  private _callbacks: Map<number, Callback>;
+  private _destroyed: boolean;
+  private _listeners: ListenerCollection;
+  private _methods: Map<string, Callback>;
+  private _port: MessagePort | null;
+  private _sequence: number;
+
   /**
-   * @param {object} options
-   *   @param {string} [options.userAgent] - Test seam
-   *   @param {Window} [options.currentWindow] - Test seam
+   * Method and arguments of pending RPC calls made before a port was connected.
    */
+  private _pendingCalls: Array<[CallMethod, unknown[]]>;
+
+  private _receivedCloseEvent: boolean;
+
   constructor({
     userAgent = navigator.userAgent,
     currentWindow = window,
-  } = {}) {
-    /** @type {MessagePort|null} */
+  }: { userAgent?: string; currentWindow?: Window } = {}) {
     this._port = null;
-
-    /** @type {Map<string, Callback>} */
     this._methods = new Map();
-
     this._sequence = 1;
-
-    /** @type {Map<number, Callback>} */
     this._callbacks = new Map();
 
     this._listeners = new ListenerCollection();
@@ -209,13 +207,9 @@ export class PortRPC {
       }
     });
 
-    /**
-     * Method and arguments of pending RPC calls made before a port was connected.
-     *
-     * @type {Array<[CallMethod, unknown[]]>}
-     */
     this._pendingCalls = [];
 
+    this._destroyed = false;
     this._receivedCloseEvent = false;
   }
 
@@ -226,30 +220,27 @@ export class PortRPC {
    * and "close" events.
    *
    * All handlers must be registered before {@link connect} is invoked.
-   *
-   * @template {function} Handler
-   * @param {OnMethod|'close'|'connect'} method
-   * @param {Handler} handler
    */
-  on(method, handler) {
+  on<Handler extends (...args: any[]) => void>(
+    method: OnMethod | 'close' | 'connect',
+    handler: Handler
+  ) {
     if (this._port) {
       throw new Error('Cannot add a method handler after a port is connected');
     }
-    this._methods.set(method, /** @type {any} */ (handler));
+    this._methods.set(method, handler as any);
   }
 
   /**
    * Connect to a MessagePort and process any queued RPC requests.
-   *
-   * @param {MessagePort} port
    */
-  connect(port) {
+  connect(port: MessagePort) {
     this._port = port;
     this._listeners.add(port, 'message', event => this._handle(event));
     port.start();
     sendCall(port, 'connect');
 
-    for (let [method, args] of this._pendingCalls) {
+    for (const [method, args] of this._pendingCalls) {
       this.call(method, ...args);
     }
     this._pendingCalls = [];
@@ -275,11 +266,8 @@ export class PortRPC {
    *
    * If the final argument in `args` is a function, it is treated as a callback
    * which is invoked with the response in the form of (error, result) arguments.
-   *
-   * @param {CallMethod} method
-   * @param {unknown[]} args
    */
-  call(method, ...args) {
+  call(method: CallMethod, ...args: unknown[]) {
     if (!this._port) {
       this._pendingCalls.push([method, args]);
     }
@@ -300,11 +288,8 @@ export class PortRPC {
 
   /**
    * Validate message
-   *
-   * @param {MessageEvent} event
-   * @return {null|Message}
    */
-  _parseMessage({ data }) {
+  _parseMessage({ data }: MessageEvent): Message | null {
     if (!data || typeof data !== 'object') {
       return null;
     }
@@ -321,10 +306,7 @@ export class PortRPC {
     return data;
   }
 
-  /**
-   * @param {MessageEvent} event
-   */
-  _handle(event) {
+  _handle(event: MessageEvent) {
     const msg = this._parseMessage(event);
     const port = this._port;
 
@@ -347,10 +329,8 @@ export class PortRPC {
         return;
       }
 
-      /** @param {unknown[]} args */
-      const callback = (...args) => {
-        /** @type {ResponseMessage} */
-        const message = {
+      const callback = (...args: unknown[]) => {
+        const message: ResponseMessage = {
           arguments: args,
           protocol: PROTOCOL,
           response: msg.sequence,
