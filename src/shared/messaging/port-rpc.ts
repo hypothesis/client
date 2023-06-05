@@ -61,15 +61,13 @@ function sendCall(
   args: unknown[] = [],
   sequence = -1
 ) {
-  port.postMessage(
-    /** @type {RequestMessage} */ {
-      protocol: PROTOCOL,
-      version: VERSION,
-      arguments: args,
-      method,
-      sequence,
-    }
-  );
+  port.postMessage({
+    protocol: PROTOCOL,
+    version: VERSION,
+    arguments: args,
+    method,
+    sequence,
+  } satisfies RequestMessage);
 }
 
 /**
