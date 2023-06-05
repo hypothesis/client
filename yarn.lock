@@ -1251,9 +1251,9 @@
     glob "^10.0.0"
 
 "@hypothesis/frontend-shared@^6.0.0":
-  version "6.2.0"
-  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-6.2.0.tgz#c226a2b4509ac46b2de4a82559d367b18b027f5a"
-  integrity sha512-3fFbVlwTbb7KzZL2AcPrbgj1svaQfpgRNqX00GDD1B3SRm8391hnHiWs0hKnElyJmJ3gcTyguRNCw4zVGzw9Iw==
+  version "6.3.0"
+  resolved "https://registry.yarnpkg.com/@hypothesis/frontend-shared/-/frontend-shared-6.3.0.tgz#4b5b5190edab671747a1506316647bd0f5c61862"
+  integrity sha512-vM8BeeLgHJiW4iOi25ZDVFfzM/LE4YGMMT/stWhFIycTJ+g6oujkyDtn1Xu+ZN2GolBtY3Jx3bovvLCVFcW+PA==
   dependencies:
     highlight.js "^11.6.0"
     wouter-preact "^2.10.0-alpha.1"
