@@ -59,10 +59,7 @@ export default function Buckets({
         // https://github.com/hypothesis/client/pull/2750
         'absolute w-[23px] left-[-22px] h-full',
         // The background is set to low opacity when the sidebar is collapsed.
-        'bg-grey-2 sidebar-collapsed:bg-black/[.08]',
-        // Disable pointer events along the sidebar itself; re-enable them in
-        // the list elements containing bucket buttons
-        'pointer-events-none'
+        'bg-grey-2 sidebar-collapsed:bg-black/[.08]'
       )}
     >
       {showUpNavigation && (
