@@ -3,7 +3,11 @@ import {
   computeAnchorPositions,
   computeBuckets,
   $imports,
+  BUCKET_TOP_THRESHOLD,
+  BUCKET_BOTTOM_THRESHOLD,
 } from '../buckets';
+
+const FAKE_WINDOW_HEIGHT = 410;
 
 describe('annotator/util/buckets', () => {
   let fakeAnchors;
@@ -31,7 +35,9 @@ describe('annotator/util/buckets', () => {
       { annotation: { $tag: 't5' }, highlights: [501, 50] },
     ];
 
-    stubbedInnerHeight = sinon.stub(window, 'innerHeight').value(410);
+    stubbedInnerHeight = sinon
+      .stub(window, 'innerHeight')
+      .value(FAKE_WINDOW_HEIGHT);
 
     fakeGetBoundingClientRect = sinon.stub().callsFake(highlights => {
       // Use the entries of the faked anchor's `highlights` array to
@@ -161,6 +167,7 @@ describe('annotator/util/buckets', () => {
 
     beforeEach(() => {
       fakeAnchorPositions = [
+        // Above-screen anchors.
         {
           tag: 't0',
           top: 1,
@@ -171,6 +178,7 @@ describe('annotator/util/buckets', () => {
           top: 101,
           bottom: 151,
         },
+        // On-screen anchors.
         {
           tag: 't2',
           top: 201,
@@ -181,6 +189,7 @@ describe('annotator/util/buckets', () => {
           top: 301,
           bottom: 351,
         },
+        // Below-screen anchors.
         {
           tag: 't4',
           top: 401,
@@ -194,14 +203,46 @@ describe('annotator/util/buckets', () => {
       ];
     });
 
-    it('puts anchors that are above the screen into the `above` bucket', () => {
-      const bucketSet = computeBuckets(fakeAnchorPositions);
-      assert.deepEqual([...bucketSet.above.tags], ['t0', 't1']);
+    it('puts anchors whose center is above the screen into the `above` bucket', () => {
+      const thresholdPos = BUCKET_TOP_THRESHOLD;
+      const bucketSet = computeBuckets([
+        ...fakeAnchorPositions,
+        {
+          tag: 'just-on-screen',
+          top: thresholdPos - 10,
+          bottom: thresholdPos + 11,
+        },
+        {
+          tag: 'just-off-screen',
+          top: thresholdPos - 11,
+          bottom: thresholdPos + 10,
+        },
+      ]);
+      assert.deepEqual(
+        [...bucketSet.above.tags],
+        ['t0', 't1', 'just-off-screen']
+      );
     });
 
-    it('puts anchors that are below the screen into the `below` bucket', () => {
-      const bucketSet = computeBuckets(fakeAnchorPositions);
-      assert.deepEqual([...bucketSet.below.tags], ['t4', 't5']);
+    it('puts anchors whose center is below the screen into the `below` bucket', () => {
+      const thresholdPos = FAKE_WINDOW_HEIGHT - BUCKET_BOTTOM_THRESHOLD;
+      const bucketSet = computeBuckets([
+        ...fakeAnchorPositions,
+        {
+          tag: 'just-on-screen',
+          top: thresholdPos - 11,
+          bottom: thresholdPos + 10,
+        },
+        {
+          tag: 'just-off-screen',
+          top: thresholdPos - 10,
+          bottom: thresholdPos + 11,
+        },
+      ]);
+      assert.deepEqual(
+        [...bucketSet.below.tags],
+        ['t4', 't5', 'just-off-screen']
+      );
     });
 
     it('puts on-screen anchors into a buckets', () => {
