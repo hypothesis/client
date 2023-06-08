@@ -54,8 +54,8 @@ export type WorkingBucket = {
 // `window.innerHeight - BUCKET_BOTTOM_THRESHOLD` are considered "on-screen"
 // and will be bucketed. This is to account for bucket-bar tool buttons (top
 // and the height of the bottom navigation bucket (bottom)
-const BUCKET_TOP_THRESHOLD = 137;
-const BUCKET_BOTTOM_THRESHOLD = 22;
+export const BUCKET_TOP_THRESHOLD = 137;
+export const BUCKET_BOTTOM_THRESHOLD = 22;
 // Generated buckets of annotation anchor highlights should be spaced by
 // at least this amount, in pixels
 const BUCKET_GAP_SIZE = 60;
@@ -167,10 +167,11 @@ export function computeBuckets(anchorPositions: AnchorPosition[]): BucketSet {
 
   // Build buckets from position information
   anchorPositions.forEach(aPos => {
-    if (aPos.top < BUCKET_TOP_THRESHOLD) {
+    const center = (aPos.top + aPos.bottom) / 2;
+    if (center < BUCKET_TOP_THRESHOLD) {
       aboveTags.add(aPos.tag);
       return;
-    } else if (aPos.top > window.innerHeight - BUCKET_BOTTOM_THRESHOLD) {
+    } else if (center > window.innerHeight - BUCKET_BOTTOM_THRESHOLD) {
       belowTags.add(aPos.tag);
       return;
     }
