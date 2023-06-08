@@ -849,6 +849,10 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    */
   fitSideBySide(sidebarLayout: SidebarLayout) {
     this._sideBySideActive = this._integration.fitSideBySide(sidebarLayout);
+    this.element.classList.toggle(
+      'hypothesis-sidebyside-active',
+      this._sideBySideActive
+    );
   }
 
   /**

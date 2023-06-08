@@ -1547,6 +1547,25 @@ describe('Guest', () => {
       assert.calledWith(fakeIntegration.fitSideBySide, layout);
     });
 
+    it('sets an html class on the element if side by side is activated', () => {
+      const guest = createGuest();
+      fakeIntegration.fitSideBySide.returns(true);
+      const layout = { expanded: true, width: 100 };
+
+      guest.fitSideBySide(layout);
+
+      assert.isTrue(
+        guest.element.classList.contains('hypothesis-sidebyside-active')
+      );
+
+      fakeIntegration.fitSideBySide.returns(false);
+      guest.fitSideBySide(layout);
+
+      assert.isFalse(
+        guest.element.classList.contains('hypothesis-sidebyside-active')
+      );
+    });
+
     it('enables closing sidebar on document click if side-by-side is not activated', () => {
       const guest = createGuest();
       fakeIntegration.fitSideBySide.returns(false);
