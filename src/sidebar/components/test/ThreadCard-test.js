@@ -114,6 +114,39 @@ describe('ThreadCard', () => {
     });
   });
 
+  describe('keyboard events', () => {
+    ['Enter', ' '].forEach(key => {
+      it('scrolls to annotation when `Enter` or `Space` are pressed', () => {
+        const wrapper = createComponent();
+
+        wrapper.find(threadCardSelector).simulate('keydown', { key });
+
+        assert.calledWith(
+          fakeFrameSync.scrollToAnnotation,
+          fakeThread.annotation
+        );
+      });
+
+      it('does not scroll to annotation when it is not set', () => {
+        const wrapper = createComponent({ thread: {} });
+
+        wrapper.find(threadCardSelector).simulate('keypress', { key });
+
+        assert.notCalled(fakeFrameSync.scrollToAnnotation);
+      });
+    });
+
+    ['a', 'b', 'Escape', 'ArrowDown'].forEach(key => {
+      it('does not scroll to annotation when key other than `Enter` or `Space` is pressed', () => {
+        const wrapper = createComponent();
+
+        wrapper.find(threadCardSelector).simulate('keypress', { key });
+
+        assert.notCalled(fakeFrameSync.scrollToAnnotation);
+      });
+    });
+  });
+
   describe('keyboard focus request handling', () => {
     [null, 'other-annotation'].forEach(focusRequest => {
       it('does not focus thread if there is no matching focus request', () => {

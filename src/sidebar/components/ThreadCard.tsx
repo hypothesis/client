@@ -63,13 +63,14 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
   }, [focusRequest, store, thread.id]);
 
   return (
-    /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
     <Card
       active={isHovered}
       classes="cursor-pointer focus-visible-ring theme-clean:border-none"
       data-testid="thread-card"
       elementRef={cardRef}
-      tabIndex={-1}
+      tabIndex={0}
+      role="button"
+      aria-label="Press Enter to scroll annotation into view"
       onClick={e => {
         // Prevent click events intended for another action from
         // triggering a page scroll.
@@ -79,6 +80,13 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       }}
       onMouseEnter={() => setThreadHovered(thread.annotation ?? null)}
       onMouseLeave={() => setThreadHovered(null)}
+      onKeyDown={e => {
+        // Simulate default button behavior, where `Enter` and `Space` trigger
+        // click action
+        if (['Enter', ' '].includes(e.key) && thread.annotation) {
+          scrollToAnnotation(thread.annotation);
+        }
+      }}
       key={thread.id}
     >
       <CardContent>{threadContent}</CardContent>
