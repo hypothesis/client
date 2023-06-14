@@ -48,7 +48,9 @@ jobs:
         QA_VERSION=$(git tag --list | sort --version-sort --reverse | head -n1 | tail -c +2)-$LAST_COMMIT_HASH
         echo "QA_VERSION=$QA_VERSION" >> $GITHUB_ENV
     - name: Build app
-      run: yarn version "$QA_VERSION"
+      run: |
+        yarn version "$QA_VERSION"
+        make clean build
     - name: Upload files to Sentry
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}
@@ -95,7 +97,9 @@ jobs:
         git push https://github.com/hypothesis/client.git v$NEW_VERSION
         sleep 2  # Wait for GitHub to see new tag
     - name: Build app
-      run: yarn version $NEW_VERSION
+      run: |
+        yarn version $NEW_VERSION
+        make clean build
     - name: Upload files to Sentry
       env:
         SENTRY_AUTH_TOKEN: ${{ secrets.sentry_auth_token }}

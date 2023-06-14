@@ -117,8 +117,7 @@
     "format": "prettier --cache --list-different --write '**/*.{js,scss,ts,tsx,d.ts}'",
     "test": "gulp test",
     "test:watch": "gulp test --live",
-    "typecheck": "tsc --build tsconfig.json",
-    "version": "make clean build"
+    "typecheck": "tsc --build tsconfig.json"
   },
   "packageManager": "yarn@3.6.0"
 }
