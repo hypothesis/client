@@ -112,8 +112,8 @@ jobs:
       env:
         NPM_TOKEN: ${{ secrets.npm_token }}
       run: |
-        echo '//registry.npmjs.org/:_authToken=${{ env.NPM_TOKEN }}' >> $HOME/.npmrc
-        yarn publish --no-interactive --tag latest --new-version=$NEW_VERSION
+        echo 'npmAuthToken: "${{ env.NPM_TOKEN }}"' >> $HOME/.yarnrc.yml
+        yarn npm publish
         scripts/wait-for-npm-release.sh latest
     - name: Deploy to S3
       env:
