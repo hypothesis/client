@@ -1,17 +1,17 @@
-/** @typedef {import('redux').Store} Store */
+import type { Store } from 'redux';
 
 /**
  * Return an object where each key in `updateFns` is mapped to the key itself.
  *
- * @template {Record<string,Function>} T
- * @param {T} reducers - Object containing reducer functions
- * @return {{ [index in keyof T]: string }}
+ * @param reducers - Object containing reducer functions
  */
-export function actionTypes(reducers) {
-  return Object.keys(reducers).reduce((types, key) => {
+export function actionTypes<T extends Record<string, unknown>>(
+  reducers: T
+): { [index in keyof T]: string } {
+  return Object.keys(reducers).reduce<any>((types, key) => {
     types[key] = key;
     return types;
-  }, /** @type {any} */ ({}));
+  }, {});
 }
 
 /**
@@ -20,13 +20,13 @@ export function actionTypes(reducers) {
  * `await` returns a Promise which resolves when a selector function,
  * which reads values from a Redux store, returns non-null.
  *
- * @template T
- * @param {import('redux').Store} store
- * @param {(s: Store) => T|null} selector - Function which returns a value from the
- *   store if the criteria is met or `null` otherwise.
- * @return {Promise<T>}
+ * @param selector - Function which returns a value from the store if the
+ *   criteria is met or `null` otherwise.
  */
-export function awaitStateChange(store, selector) {
+export function awaitStateChange<T>(
+  store: Store,
+  selector: (s: Store) => T | null
+): Promise<T> {
   const result = selector(store);
   if (result !== null) {
     return Promise.resolve(result);
