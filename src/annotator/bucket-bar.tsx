@@ -35,8 +35,16 @@ export class BucketBar implements Destroyable {
     }: BucketBarOptions
   ) {
     this._bucketsContainer = document.createElement('hypothesis-bucket-bar');
-    this._bucketsContainer.style.display = 'block';
-    this._bucketsContainer.style.width = '100%';
+    Object.assign(this._bucketsContainer.style, {
+      display: 'block',
+      flexGrow: '1',
+
+      // The bucket bar uses absolute positioning for the buckets and does not
+      // currently have an intrinsic width. This should be revisited so that
+      // host pages using a custom bucket bar container don't need to hardcode
+      // assumptions about its width.
+      width: '100%',
+    });
 
     createShadowRoot(this._bucketsContainer);
     container.appendChild(this._bucketsContainer);
