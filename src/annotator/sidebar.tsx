@@ -45,7 +45,7 @@ export type SidebarConfig = { sidebarAppUrl: string } & Record<string, unknown>;
  */
 export type SidebarContainerConfig = {
   /** CSS selector for the container of the bucket bar. */
-  bucketBarContainer?: string;
+  bucketContainerSelector?: string;
 
   /**
    * Details of the annotation service the client should connect to.
@@ -173,13 +173,13 @@ export class Sidebar implements Destroyable {
         this.iframeContainer.classList.add('theme-clean');
       } else {
         let bucketBarContainer: HTMLElement | undefined;
-        if (config.bucketBarContainer) {
+        if (config.bucketContainerSelector) {
           bucketBarContainer = document.querySelector(
-            config.bucketBarContainer
+            config.bucketContainerSelector
           ) as HTMLElement | undefined;
           if (!bucketBarContainer) {
             console.warn(
-              `Custom bucket bar container "${config.bucketBarContainer}" not found`
+              `Custom bucket container "${config.bucketContainerSelector}" not found`
             );
           }
         }
