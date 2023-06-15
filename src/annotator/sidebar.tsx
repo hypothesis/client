@@ -199,7 +199,7 @@ export class Sidebar implements Destroyable {
           // so that buckets are below the toolbar, and small padding on the
           // right to align the right edge of the buckets with the right edge
           // of toolbar icons.
-          'flex flex-column pt-[110px] pr-[5px]',
+          'flex flex-col pt-[110px] pr-[5px]',
 
           // Use a grey background, with lower opacity with the sidebar is
           // collapsed, so the page content behind it can be read.
