@@ -1,3 +1,4 @@
+import type { SidebarSettings } from '../../types/config';
 import { useService } from '../service-context';
 import { createStore } from './create-store';
 import { debugMiddleware } from './debug-middleware';
@@ -19,7 +20,7 @@ import { toastMessagesModule } from './modules/toast-messages';
 import { viewerModule } from './modules/viewer';
 import { useStore } from './use-store';
 
-/** @typedef {ReturnType<createSidebarStore>} SidebarStore */
+export type SidebarStore = ReturnType<typeof createSidebarStore>;
 
 /**
  * Create the central state store for the sidebar application.
@@ -30,15 +31,14 @@ import { useStore } from './use-store';
  *
  * [1] https://redux.js.org
  *
- * @param {import('../../types/config').SidebarSettings} settings
  * @inject
  */
-export function createSidebarStore(settings) {
+export function createSidebarStore(settings: SidebarSettings) {
   const middleware = [debugMiddleware];
 
   // `const` type gives `modules` a tuple type, which allows `createStore`
   // to infer properties (eg. action and selector methods) of returned store.
-  const modules = /** @type {const} */ ([
+  const modules = [
     activityModule,
     annotationsModule,
     defaultsModule,
@@ -55,7 +55,7 @@ export function createSidebarStore(settings) {
     sidebarPanelsModule,
     toastMessagesModule,
     viewerModule,
-  ]);
+  ] as const;
   return createStore(modules, [settings], middleware);
 }
 
@@ -67,6 +67,6 @@ export function createSidebarStore(settings) {
  * {@link useStore}.
  */
 export function useSidebarStore() {
-  const store = /** @type {SidebarStore} */ (useService('store'));
+  const store = useService('store') as SidebarStore;
   return useStore(store);
 }
