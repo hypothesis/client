@@ -1073,14 +1073,14 @@ describe('Sidebar', () => {
       assert.isNull(sidebar.bucketBar);
     });
 
-    it('creates bucket bar in specified container if `bucketBarContainer` config is supplied', () => {
+    it('creates bucket bar in specified container if `bucketContainerSelector` config is supplied', () => {
       const bucketBarContainer = document.createElement('div');
       bucketBarContainer.id = 'bucket-bar-container';
       document.body.append(bucketBarContainer);
 
       try {
         const sidebar = createSidebar({
-          bucketBarContainer: '#bucket-bar-container',
+          bucketContainerSelector: '#bucket-bar-container',
         });
         assert.ok(sidebar.bucketBar);
         assert.calledWith(FakeBucketBar, bucketBarContainer, sinon.match.any);
@@ -1089,15 +1089,15 @@ describe('Sidebar', () => {
       }
     });
 
-    it('warns if `bucketBarContainer` config is supplied but invalid', () => {
+    it('warns if `bucketContainerSelector` config is supplied but invalid', () => {
       sinon.stub(console, 'warn');
       try {
         createSidebar({
-          bucketBarContainer: '#invalid-selector',
+          bucketContainerSelector: '#invalid-selector',
         });
         assert.calledWith(
           console.warn,
-          `Custom bucket bar container "#invalid-selector" not found`
+          `Custom bucket container "#invalid-selector" not found`
         );
       } finally {
         console.warn.restore();

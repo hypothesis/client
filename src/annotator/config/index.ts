@@ -41,7 +41,7 @@ function configurationKeys(context: Context): string[] {
       'appType',
       'annotations',
       'branding',
-      'bucketBarContainer',
+      'bucketContainerSelector',
       'enableExperimentalNewNoteButton',
       'externalContainerSelector',
       'focus',
@@ -107,7 +107,7 @@ const configDefinitions: ConfigDefinitionMap = {
     allowInBrowserExt: false,
     getValue: getHostPageSetting,
   },
-  bucketBarContainer: {
+  bucketContainerSelector: {
     defaultValue: null,
     allowInBrowserExt: false,
     getValue: getHostPageSetting,
