@@ -66,6 +66,10 @@ export function findClosestOffscreenAnchor(
 ): Anchor | null {
   // Thresholds for how far away an anchor has to be from the top/bottom of
   // the viewport to be considered off-screen.
+  //
+  // TODO - This needs to be adapted for when a custom bucket container is
+  // being used. In that case these thresholds might not match where the
+  // above/below-screen buckets are in the viewport.
   const BUCKET_TOP_THRESHOLD = 137;
   const BUCKET_BOTTOM_THRESHOLD = 22;
 
