@@ -1115,22 +1115,15 @@ describe('Sidebar', () => {
       assert.calledWith(guestRPC().call, 'hoverAnnotations', tags);
     });
 
-    it('calls the "scrollToClosestOffScreenAnchor" RPC method', () => {
+    it('calls the "scrollToAnnotation" RPC method', () => {
       const sidebar = createSidebar();
       connectGuest(sidebar);
-      const { onScrollToClosestOffScreenAnchor } =
-        FakeBucketBar.getCall(0).args[1];
-      const tags = ['t1', 't2'];
-      const direction = 'down';
+      const { onScrollToAnnotation } = FakeBucketBar.getCall(0).args[1];
+      const tag = 't1';
 
-      onScrollToClosestOffScreenAnchor(tags, direction);
+      onScrollToAnnotation(tag);
 
-      assert.calledWith(
-        guestRPC().call,
-        'scrollToClosestOffScreenAnchor',
-        tags,
-        direction
-      );
+      assert.calledWith(guestRPC().call, 'scrollToAnnotation', tag);
     });
 
     it('calls the "selectAnnotations" RPC method', () => {

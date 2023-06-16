@@ -7,10 +7,7 @@ import { createShadowRoot } from './util/shadow-root';
 
 export type BucketBarOptions = {
   onFocusAnnotations: (tags: string[]) => void;
-  onScrollToClosestOffScreenAnchor: (
-    tags: string[],
-    direction: 'down' | 'up'
-  ) => void;
+  onScrollToAnnotation: (tag: string) => void;
   onSelectAnnotations: (tags: string[], toggle: boolean) => void;
 };
 
@@ -23,14 +20,14 @@ export type BucketBarOptions = {
 export class BucketBar implements Destroyable {
   private _bucketsContainer: HTMLElement;
   private _onFocusAnnotations: BucketBarOptions['onFocusAnnotations'];
-  private _onScrollToClosestOffScreenAnchor: BucketBarOptions['onScrollToClosestOffScreenAnchor'];
+  private _onScrollToAnnotation: BucketBarOptions['onScrollToAnnotation'];
   private _onSelectAnnotations: BucketBarOptions['onSelectAnnotations'];
 
   constructor(
     container: HTMLElement,
     {
       onFocusAnnotations,
-      onScrollToClosestOffScreenAnchor,
+      onScrollToAnnotation,
       onSelectAnnotations,
     }: BucketBarOptions
   ) {
@@ -50,7 +47,7 @@ export class BucketBar implements Destroyable {
     container.appendChild(this._bucketsContainer);
 
     this._onFocusAnnotations = onFocusAnnotations;
-    this._onScrollToClosestOffScreenAnchor = onScrollToClosestOffScreenAnchor;
+    this._onScrollToAnnotation = onScrollToAnnotation;
     this._onSelectAnnotations = onSelectAnnotations;
 
     // Immediately render the bucket bar
@@ -70,9 +67,7 @@ export class BucketBar implements Destroyable {
         below={buckets.below}
         buckets={buckets.buckets}
         onFocusAnnotations={tags => this._onFocusAnnotations(tags)}
-        onScrollToClosestOffScreenAnchor={(tags, direction) =>
-          this._onScrollToClosestOffScreenAnchor(tags, direction)
-        }
+        onScrollToAnnotation={tag => this._onScrollToAnnotation(tag)}
         onSelectAnnotations={(tags, toogle) =>
           this._onSelectAnnotations(tags, toogle)
         }

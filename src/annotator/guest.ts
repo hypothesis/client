@@ -43,7 +43,6 @@ import {
   selectedRange,
 } from './range-util';
 import { SelectionObserver } from './selection-observer';
-import { findClosestOffscreenAnchor } from './util/buckets';
 import { frameFillsAncestor } from './util/frame';
 import { normalizeURI } from './util/url';
 
@@ -440,11 +439,9 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       this._hoverAnnotations(tags)
     );
 
-    this._hostRPC.on(
-      'scrollToClosestOffScreenAnchor',
-      (tags: string[], direction: 'down' | 'up') =>
-        this._scrollToClosestOffScreenAnchor(tags, direction)
-    );
+    this._hostRPC.on('scrollToAnnotation', (tag: string) => {
+      this._scrollToAnnotation(tag);
+    });
 
     this._hostRPC.on('selectAnnotations', (tags: string[], toggle: boolean) =>
       this.selectAnnotations(tags, { toggle })
@@ -499,6 +496,14 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     }
   }
 
+  private async _scrollToAnnotation(tag: string) {
+    const anchor = this.anchors.find(a => a.annotation.$tag === tag);
+    if (!anchor?.highlights) {
+      return;
+    }
+    this._scrollToAnchor(anchor);
+  }
+
   async _connectSidebar() {
     this._sidebarRPC.on(
       'featureFlagsUpdated',
@@ -512,11 +517,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     );
 
     this._sidebarRPC.on('scrollToAnnotation', (tag: string) => {
-      const anchor = this.anchors.find(a => a.annotation.$tag === tag);
-      if (!anchor?.highlights) {
-        return;
-      }
-      this._scrollToAnchor(anchor);
+      this._scrollToAnnotation(tag);
     });
 
     // Handler for controls on the sidebar
@@ -756,22 +757,6 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     }
 
     this._sidebarRPC.call('hoverAnnotations', tags);
-  }
-
-  /**
-   * Scroll to the closest off-screen anchor.
-   */
-  private async _scrollToClosestOffScreenAnchor(
-    tags: string[],
-    direction: 'down' | 'up'
-  ) {
-    const anchors = this.anchors.filter(({ annotation }) =>
-      tags.includes(annotation.$tag)
-    );
-    const closest = findClosestOffscreenAnchor(anchors, direction);
-    if (closest) {
-      await this._scrollToAnchor(closest);
-    }
   }
 
   /**

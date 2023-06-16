@@ -2,8 +2,8 @@ import type { Anchor, AnchorPosition } from '../../types/annotator';
 import { getBoundingClientRect } from '../highlighter';
 
 export type Bucket = {
-  /** The annotation tags in this bucket */
-  tags: Set<string>;
+  /** The anchors in this bucket. */
+  anchors: AnchorPosition[];
   /** The vertical pixel offset where this bucket should appear in the bucket bar */
   position: number;
 };
@@ -26,8 +26,8 @@ export type BucketSet = {
 };
 
 export type WorkingBucket = {
-  /** The annotation tags in this bucket */
-  tags: Set<string>;
+  /** The anchors in this bucket. */
+  anchors: AnchorPosition[];
 
   /**
    * The computed position (offset) for this bucket, based on the current anchors.
@@ -53,66 +53,6 @@ export type WorkingBucket = {
 // Generated buckets of annotation anchor highlights should be spaced by
 // at least this amount, in pixels
 const BUCKET_GAP_SIZE = 60;
-
-/**
- * Find the closest valid anchor in `anchors` that is offscreen in the direction
- * indicated.
- *
- * @return The closest anchor or `null` if no valid anchor found
- */
-export function findClosestOffscreenAnchor(
-  anchors: Anchor[],
-  direction: 'up' | 'down'
-): Anchor | null {
-  // Thresholds for how far away an anchor has to be from the top/bottom of
-  // the viewport to be considered off-screen.
-  //
-  // TODO - This needs to be adapted for when a custom bucket container is
-  // being used. In that case these thresholds might not match where the
-  // above/below-screen buckets are in the viewport.
-  const BUCKET_TOP_THRESHOLD = 137;
-  const BUCKET_BOTTOM_THRESHOLD = 22;
-
-  let closestAnchor = null;
-  let closestTop = 0;
-
-  for (const anchor of anchors) {
-    if (!anchor.highlights?.length) {
-      continue;
-    }
-
-    const top = getBoundingClientRect(anchor.highlights).top;
-
-    // Verify that the anchor is offscreen in the direction we're headed
-    if (direction === 'up' && top >= BUCKET_TOP_THRESHOLD) {
-      // We're headed up but the anchor is already below the
-      // visible top of the bucket bar: it's not our guy
-      continue;
-    } else if (
-      direction === 'down' &&
-      top <= window.innerHeight - BUCKET_BOTTOM_THRESHOLD
-    ) {
-      // We're headed down but this anchor is already above
-      // the usable bottom of the screen: it's not our guy
-      continue;
-    }
-
-    if (
-      !closestAnchor ||
-      (direction === 'up' && top > closestTop) ||
-      (direction === 'down' && top < closestTop)
-    ) {
-      // This anchor is either:
-      // - The first anchor we've encountered off-screen in the direction
-      //   we're headed, or
-      // - Closer to the screen than the previous `closestAnchor`
-      closestAnchor = anchor;
-      closestTop = top;
-    }
-  }
-
-  return closestAnchor;
-}
 
 /**
  * Compute the top and bottom positions for the set of anchors' highlights, sorted
@@ -162,8 +102,8 @@ export function computeBuckets(
   anchorPositions: AnchorPosition[],
   container: Element
 ): BucketSet {
-  const aboveTags = new Set<string>();
-  const belowTags = new Set<string>();
+  const aboveAnchors = [] as AnchorPosition[];
+  const belowAnchors = [] as AnchorPosition[];
   const buckets: Bucket[] = [];
 
   // Hold current working anchors and positions as we build each bucket
@@ -172,13 +112,14 @@ export function computeBuckets(
   /**
    * Create a new working bucket based on the provided `AnchorPosition`
    */
-  function newBucket({ bottom, tag, top }: AnchorPosition): WorkingBucket {
+  function newBucket(anchor: AnchorPosition): WorkingBucket {
+    const { bottom, top } = anchor;
     const anchorHeight = bottom - top;
     const bucketPosition = top + anchorHeight / 2;
     return {
       bottom,
       position: bucketPosition,
-      tags: new Set([tag]),
+      anchors: [anchor],
       top,
     };
   }
@@ -198,10 +139,10 @@ export function computeBuckets(
     const center = (aPos.top + aPos.bottom) / 2;
 
     if (center < vMargin) {
-      aboveTags.add(aPos.tag);
+      aboveAnchors.push(aPos);
       continue;
     } else if (center > containerRect.height - vMargin) {
-      belowTags.add(aPos.tag);
+      belowAnchors.push(aPos);
       continue;
     }
 
@@ -237,7 +178,7 @@ export function computeBuckets(
         aPos.bottom > currentBucket.bottom ? aPos.bottom : currentBucket.bottom;
       const updatedHeight = updatedBottom - currentBucket.top;
 
-      currentBucket.tags.add(aPos.tag);
+      currentBucket.anchors.push(aPos);
       currentBucket.bottom = updatedBottom;
       currentBucket.position = currentBucket.top + updatedHeight / 2;
     }
@@ -248,14 +189,14 @@ export function computeBuckets(
   }
 
   // Add an upper "navigation" bucket with offscreen-above anchors
-  const above = {
-    tags: aboveTags,
+  const above: Bucket = {
+    anchors: aboveAnchors,
     position: vMargin,
   };
 
   // Add a lower "navigation" bucket with offscreen-below anchors
-  const below = {
-    tags: belowTags,
+  const below: Bucket = {
+    anchors: belowAnchors,
     position: containerRect.height - vMargin,
   };
 

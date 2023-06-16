@@ -6,7 +6,7 @@ describe('BucketBar', () => {
   let container;
   let fakeComputeBuckets;
   let fakeOnFocusAnnotations;
-  let fakeOnScrollToClosestOffScreenAnchor;
+  let fakeOnScrollToAnnotation;
   let fakeOnSelectAnnotations;
 
   beforeEach(() => {
@@ -17,7 +17,7 @@ describe('BucketBar', () => {
     fakeComputeBuckets = sinon.stub().returns({});
 
     fakeOnFocusAnnotations = sinon.stub();
-    fakeOnScrollToClosestOffScreenAnchor = sinon.stub();
+    fakeOnScrollToAnnotation = sinon.stub();
     fakeOnSelectAnnotations = sinon.stub();
 
     const FakeBuckets = props => {
@@ -40,7 +40,7 @@ describe('BucketBar', () => {
   const createBucketBar = () => {
     const bucketBar = new BucketBar(container, {
       onFocusAnnotations: fakeOnFocusAnnotations,
-      onScrollToClosestOffScreenAnchor: fakeOnScrollToClosestOffScreenAnchor,
+      onScrollToAnnotation: fakeOnScrollToAnnotation,
       onSelectAnnotations: fakeOnSelectAnnotations,
     });
     bucketBars.push(bucketBar);
@@ -64,14 +64,10 @@ describe('BucketBar', () => {
     assert.calledWith(fakeOnFocusAnnotations, tags);
   });
 
-  it('passes "onScrollToClosestOffScreenAnchor" to the Bucket component', () => {
+  it('passes "onScrollToAnnotation" to the Bucket component', () => {
     createBucketBar();
-    const tags = ['t1', 't2'];
-    const direction = 'down';
-
-    bucketProps.onScrollToClosestOffScreenAnchor(tags, direction);
-
-    assert.calledWith(fakeOnScrollToClosestOffScreenAnchor, tags, direction);
+    bucketProps.onScrollToAnnotation('t1');
+    assert.calledWith(fakeOnScrollToAnnotation, 't1');
   });
 
   it('passes "onSelectAnnotations" to the Bucket component', () => {

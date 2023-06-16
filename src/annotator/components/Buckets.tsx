@@ -4,16 +4,14 @@ import type { Bucket } from '../util/buckets';
 
 export type BucketsProps = {
   /**
-   * Bucket containing the $tags of any annotations that are offscreen above
-   * the current viewport. If the set of $tags is non-empty, up navigation
-   * will be rendered.
+   * Bucket containing anchors that are above the bucket bar. If non-empty,
+   * an "Up" bucket will be rendered.
    */
   above: Bucket;
 
   /**
-   * Bucket containing the $tags of any annotations that are offscreen below
-   * the current viewport. If the set of $tags is non-empty, down navigation
-   * will be rendered.
+   * Bucket containing anchors that are below the bucket bar. If non-empty,
+   * a "Down" bucket will be rendered.
    */
   below: Bucket;
 
@@ -23,10 +21,7 @@ export type BucketsProps = {
    */
   buckets: Bucket[];
   onFocusAnnotations: ($tags: string[]) => void;
-  onScrollToClosestOffScreenAnchor: (
-    $tags: string[],
-    direction: 'down' | 'up'
-  ) => void;
+  onScrollToAnnotation: ($tag: string) => void;
   onSelectAnnotations: ($tags: string[], toggle: boolean) => void;
 };
 
@@ -43,11 +38,12 @@ export default function Buckets({
   below,
   buckets,
   onFocusAnnotations,
-  onScrollToClosestOffScreenAnchor,
+  onScrollToAnnotation,
   onSelectAnnotations,
 }: BucketsProps) {
-  const showUpNavigation = above.tags.size > 0;
-  const showDownNavigation = below.tags.size > 0;
+  const showUpNavigation = above.anchors.length > 0;
+  const showDownNavigation = below.anchors.length > 0;
+  const bucketTags = (b: Bucket) => b.anchors.map(a => a.tag);
 
   return (
     <ul className="relative">
@@ -59,16 +55,20 @@ export default function Buckets({
           <PointerButton
             data-testid="up-navigation-button"
             direction="up"
-            onClick={() =>
-              onScrollToClosestOffScreenAnchor([...above.tags], 'up')
-            }
+            onClick={() => {
+              const anchors = [...above.anchors].sort(
+                (a, b) => a.bottom - b.bottom
+              );
+              const bottomAnchor = anchors[anchors.length - 1];
+              onScrollToAnnotation(bottomAnchor.tag);
+            }}
             onBlur={() => onFocusAnnotations([])}
-            onFocus={() => onFocusAnnotations([...above.tags])}
-            onMouseEnter={() => onFocusAnnotations([...above.tags])}
+            onFocus={() => onFocusAnnotations(bucketTags(above))}
+            onMouseEnter={() => onFocusAnnotations(bucketTags(above))}
             onMouseOut={() => onFocusAnnotations([])}
-            title={`Go up to next annotations (${above.tags.size})`}
+            title={`Go up to next annotations (${above.anchors.length})`}
           >
-            {above.tags.size}
+            {above.anchors.length}
           </PointerButton>
         </li>
       )}
@@ -82,17 +82,17 @@ export default function Buckets({
             direction="left"
             onClick={event =>
               onSelectAnnotations(
-                [...bucket.tags],
+                bucketTags(bucket),
                 event.metaKey || event.ctrlKey
               )
             }
             onBlur={() => onFocusAnnotations([])}
-            onFocus={() => onFocusAnnotations([...bucket.tags])}
-            onMouseEnter={() => onFocusAnnotations([...bucket.tags])}
+            onFocus={() => onFocusAnnotations(bucketTags(bucket))}
+            onMouseEnter={() => onFocusAnnotations(bucketTags(bucket))}
             onMouseOut={() => onFocusAnnotations([])}
-            title={`Select nearby annotations (${bucket.tags.size})`}
+            title={`Select nearby annotations (${bucket.anchors.length})`}
           >
-            {bucket.tags.size}
+            {bucket.anchors.length}
           </PointerButton>
         </li>
       ))}
@@ -104,16 +104,18 @@ export default function Buckets({
           <PointerButton
             data-testid="down-navigation-button"
             direction="down"
-            onClick={() =>
-              onScrollToClosestOffScreenAnchor([...below.tags], 'down')
-            }
+            onClick={() => {
+              const anchors = [...below.anchors].sort((a, b) => a.top - b.top);
+              const topAnchor = anchors[0];
+              onScrollToAnnotation(topAnchor.tag);
+            }}
             onBlur={() => onFocusAnnotations([])}
-            onFocus={() => onFocusAnnotations([...below.tags])}
-            onMouseEnter={() => onFocusAnnotations([...below.tags])}
+            onFocus={() => onFocusAnnotations(bucketTags(below))}
+            onMouseEnter={() => onFocusAnnotations(bucketTags(below))}
             onMouseOut={() => onFocusAnnotations([])}
-            title={`Go up to next annotations (${below.tags.size})`}
+            title={`Go up to next annotations (${below.anchors.length})`}
           >
-            {below.tags.size}
+            {below.anchors.length}
           </PointerButton>
         </li>
       )}
