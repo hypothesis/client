@@ -95,9 +95,9 @@ export type HostToGuestEvent =
   | 'sidebarLayoutChanged'
 
   /**
-   * The host informs guests to scroll to the closest off-screen anchor associated with a set of annotations.
+   * Scroll to an annotation given its tag.
    */
-  | 'scrollToClosestOffScreenAnchor';
+  | 'scrollToAnnotation';
 
 /**
  * Events that the host sends to the sidebar

@@ -214,10 +214,8 @@ export class Sidebar implements Destroyable {
         this.bucketBar = new BucketBar(bucketBarContainer, {
           onFocusAnnotations: tags =>
             this._guestRPC.forEach(rpc => rpc.call('hoverAnnotations', tags)),
-          onScrollToClosestOffScreenAnchor: (tags, direction) =>
-            this._guestRPC.forEach(rpc =>
-              rpc.call('scrollToClosestOffScreenAnchor', tags, direction)
-            ),
+          onScrollToAnnotation: tag =>
+            this._guestRPC.forEach(rpc => rpc.call('scrollToAnnotation', tag)),
           onSelectAnnotations: (tags, toggle) =>
             this._guestRPC.forEach(rpc =>
               rpc.call('selectAnnotations', tags, toggle)

@@ -42,7 +42,6 @@ describe('Guest', () => {
   let fakeHighlightClusterController;
   let FakeHighlightClusterController;
   let fakeCreateIntegration;
-  let fakeFindClosestOffscreenAnchor;
   let fakeFrameFillsAncestor;
   let fakeIntegration;
   let fakePortFinder;
@@ -163,8 +162,6 @@ describe('Guest', () => {
       .stub()
       .returns(fakeHighlightClusterController);
 
-    fakeFindClosestOffscreenAnchor = sinon.stub();
-
     fakeFrameFillsAncestor = sinon.stub().returns(true);
 
     fakeIntegration = Object.assign(new TinyEmitter(), {
@@ -221,9 +218,6 @@ describe('Guest', () => {
       './range-util': rangeUtil,
       './selection-observer': {
         SelectionObserver: FakeSelectionObserver,
-      },
-      './util/buckets': {
-        findClosestOffscreenAnchor: fakeFindClosestOffscreenAnchor,
       },
       './util/frame': {
         frameFillsAncestor: fakeFrameFillsAncestor,
@@ -299,28 +293,6 @@ describe('Guest', () => {
       });
     });
 
-    describe('on "scrollToClosestOffScreenAnchor" event', () => {
-      it('scrolls to the nearest off-screen anchor"', async () => {
-        const guest = createGuest();
-        guest.anchors = [
-          { annotation: { $tag: 't1' }, range: new FakeTextRange({}) },
-          { annotation: { $tag: 't2' }, range: new FakeTextRange({}) },
-        ];
-        fakeFindClosestOffscreenAnchor.returns(guest.anchors[0]);
-        const tags = ['t1', 't2'];
-        const direction = 'down';
-
-        await emitHostEvent('scrollToClosestOffScreenAnchor', tags, direction);
-
-        assert.calledWith(
-          fakeFindClosestOffscreenAnchor,
-          guest.anchors,
-          direction
-        );
-        assert.calledWith(fakeIntegration.scrollToAnchor, guest.anchors[0]);
-      });
-    });
-
     describe('on "selectAnnotations" event', () => {
       it('selects annotations', () => {
         const guest = createGuest();
@@ -337,71 +309,28 @@ describe('Guest', () => {
     });
   });
 
-  describe('events from sidebar frame', () => {
-    describe('on "hoverAnnotations" event', () => {
-      it('marks associated highlights as focused', () => {
-        const highlight0 = document.createElement('span');
-        const highlight1 = document.createElement('span');
-        const guest = createGuest();
-        guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
-          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
-        ];
+  describe('on "scrollToAnnotation" event from host or sidebar', () => {
+    const setupGuest = () => {
+      const highlight = document.createElement('span');
+      const guest = createGuest();
+      const fakeRange = sinon.stub();
+      guest.anchors = [
+        {
+          annotation: { $tag: 'tag1' },
+          highlights: [highlight],
+          range: new FakeTextRange(fakeRange),
+        },
+      ];
+      return guest;
+    };
 
-        emitSidebarEvent('hoverAnnotations', ['tag1']);
-
-        assert.calledWith(
-          highlighter.setHighlightsFocused,
-          guest.anchors[0].highlights,
-          true
-        );
-      });
-
-      it('marks highlights of other annotations as not focused', () => {
-        const highlight0 = document.createElement('span');
-        const highlight1 = document.createElement('span');
-        const guest = createGuest();
-        guest.anchors = [
-          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
-          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
-        ];
-
-        emitSidebarEvent('hoverAnnotations', ['tag1']);
-
-        assert.calledWith(
-          highlighter.setHighlightsFocused,
-          guest.anchors[1].highlights,
-          false
-        );
-      });
-
-      it('updates hovered tag set', () => {
-        const guest = createGuest();
-
-        emitSidebarEvent('hoverAnnotations', ['tag1']);
-        emitSidebarEvent('hoverAnnotations', ['tag2', 'tag3']);
-
-        assert.deepEqual([...guest.hoveredAnnotationTags], ['tag2', 'tag3']);
-      });
-    });
-
-    describe('on "scrollToAnnotation" event', () => {
-      const setupGuest = () => {
-        const highlight = document.createElement('span');
-        const guest = createGuest();
-        const fakeRange = sinon.stub();
-        guest.anchors = [
-          {
-            annotation: { $tag: 'tag1' },
-            highlights: [highlight],
-            range: new FakeTextRange(fakeRange),
-          },
-        ];
-        return guest;
-      };
-
+    ['host', 'sidebar'].forEach(source => {
       const triggerScroll = async () => {
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
+        if (source === 'sidebar') {
+          emitSidebarEvent('scrollToAnnotation', 'tag1');
+        } else {
+          emitHostEvent('scrollToAnnotation', 'tag1');
+        }
 
         // The call to `scrollToAnchor` on the integration happens
         // asynchronously. Wait for the minimum delay before this happens.
@@ -469,22 +398,21 @@ describe('Guest', () => {
           event.preventDefault()
         );
 
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
-        await delay(0);
+        await triggerScroll();
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
 
-      it('does nothing if the anchor has no highlights', () => {
+      it('does nothing if the anchor has no highlights', async () => {
         const guest = createGuest();
 
         guest.anchors = [{ annotation: { $tag: 'tag1' } }];
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
+        await triggerScroll();
 
         assert.notCalled(fakeIntegration.scrollToAnchor);
       });
 
-      it("does nothing if the anchor's range cannot be resolved", () => {
+      it("does nothing if the anchor's range cannot be resolved", async () => {
         const highlight = document.createElement('span');
         const guest = createGuest();
         guest.anchors = [
@@ -499,10 +427,59 @@ describe('Guest', () => {
         const eventEmitted = sandbox.stub();
         guest.element.addEventListener('scrolltorange', eventEmitted);
 
-        emitSidebarEvent('scrollToAnnotation', 'tag1');
+        await triggerScroll();
 
         assert.notCalled(eventEmitted);
         assert.notCalled(fakeIntegration.scrollToAnchor);
+      });
+    });
+  });
+
+  describe('events from sidebar frame', () => {
+    describe('on "hoverAnnotations" event', () => {
+      it('marks associated highlights as focused', () => {
+        const highlight0 = document.createElement('span');
+        const highlight1 = document.createElement('span');
+        const guest = createGuest();
+        guest.anchors = [
+          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
+          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
+        ];
+
+        emitSidebarEvent('hoverAnnotations', ['tag1']);
+
+        assert.calledWith(
+          highlighter.setHighlightsFocused,
+          guest.anchors[0].highlights,
+          true
+        );
+      });
+
+      it('marks highlights of other annotations as not focused', () => {
+        const highlight0 = document.createElement('span');
+        const highlight1 = document.createElement('span');
+        const guest = createGuest();
+        guest.anchors = [
+          { annotation: { $tag: 'tag1' }, highlights: [highlight0] },
+          { annotation: { $tag: 'tag2' }, highlights: [highlight1] },
+        ];
+
+        emitSidebarEvent('hoverAnnotations', ['tag1']);
+
+        assert.calledWith(
+          highlighter.setHighlightsFocused,
+          guest.anchors[1].highlights,
+          false
+        );
+      });
+
+      it('updates hovered tag set', () => {
+        const guest = createGuest();
+
+        emitSidebarEvent('hoverAnnotations', ['tag1']);
+        emitSidebarEvent('hoverAnnotations', ['tag2', 'tag3']);
+
+        assert.deepEqual([...guest.hoveredAnnotationTags], ['tag2', 'tag3']);
       });
     });
 

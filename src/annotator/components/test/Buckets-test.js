@@ -8,27 +8,40 @@ describe('Buckets', () => {
   let fakeBelow;
   let fakeBuckets;
   let fakeOnFocusAnnotations;
-  let fakeOnScrollToClosestOffScreenAnchor;
+  let fakeOnScrollToAnnotation;
   let fakeOnSelectAnnotations;
+
+  function anchorPosition(tag, top = 0, bottom = 100) {
+    return { tag, top, bottom };
+  }
 
   beforeEach(() => {
     fakeAbove = {
-      tags: new Set(['a1', 'a2']),
+      anchors: [anchorPosition('a1', 0, 10), anchorPosition('a2', 20, 30)],
       position: 150,
     };
     fakeBelow = {
-      tags: new Set(['b1', 'b2']),
+      anchors: [anchorPosition('b1', 100, 110), anchorPosition('b2', 130, 150)],
       position: 550,
     };
     fakeBuckets = [
       {
-        tags: new Set(['t1', 't2']),
+        anchors: [anchorPosition('t1'), anchorPosition('t2')],
         position: 250,
       },
-      { tags: new Set(['t3', 't4', 't5', 't6']), position: 350 },
+      {
+        anchors: [
+          anchorPosition('t3'),
+          anchorPosition('t4'),
+          anchorPosition('t5'),
+          anchorPosition('t6'),
+        ],
+
+        position: 350,
+      },
     ];
     fakeOnFocusAnnotations = sinon.stub();
-    fakeOnScrollToClosestOffScreenAnchor = sinon.stub();
+    fakeOnScrollToAnnotation = sinon.stub();
     fakeOnSelectAnnotations = sinon.stub();
   });
 
@@ -39,7 +52,7 @@ describe('Buckets', () => {
         below={fakeBelow}
         buckets={fakeBuckets}
         onFocusAnnotations={fakeOnFocusAnnotations}
-        onScrollToClosestOffScreenAnchor={fakeOnScrollToClosestOffScreenAnchor}
+        onScrollToAnnotation={fakeOnScrollToAnnotation}
         onSelectAnnotations={fakeOnSelectAnnotations}
       />
     );
@@ -134,7 +147,7 @@ describe('Buckets', () => {
     });
 
     it('does not render an up navigation button if there are no above-screen anchors', () => {
-      fakeAbove = { tags: new Set(), position: 150 };
+      fakeAbove = { anchors: [], position: 150 };
       const wrapper = createComponent();
       assert.isFalse(wrapper.find(upButtonSelector).exists());
     });
@@ -154,35 +167,27 @@ describe('Buckets', () => {
     });
 
     it('does not render a down navigation button if there are no below-screen anchors', () => {
-      fakeBelow = { tags: new Set(), position: 550 };
+      fakeBelow = { anchors: [], position: 550 };
       const wrapper = createComponent();
       assert.isFalse(wrapper.find(downButtonSelector).exists());
     });
 
-    it('scrolls to anchors above when up navigation button is pressed', () => {
+    it('scrolls to anchor above with lowest bottom position when "up" button is pressed', () => {
       const wrapper = createComponent();
       const upButton = wrapper.find(upButtonSelector);
 
       upButton.simulate('click');
 
-      assert.calledWith(
-        fakeOnScrollToClosestOffScreenAnchor,
-        ['a1', 'a2'],
-        'up'
-      );
+      assert.calledWith(fakeOnScrollToAnnotation, 'a2');
     });
 
-    it('scrolls to anchors below when down navigation button is pressed', () => {
+    it('scrolls to anchor below with highest top position when "down" button is pressed', () => {
       const wrapper = createComponent();
       const downButton = wrapper.find(downButtonSelector);
 
       downButton.simulate('click');
 
-      assert.calledWith(
-        fakeOnScrollToClosestOffScreenAnchor,
-        ['b1', 'b2'],
-        'down'
-      );
+      assert.calledWith(fakeOnScrollToAnnotation, 'b1');
     });
   });
 
@@ -240,7 +245,10 @@ describe('Buckets', () => {
 
       assert.calledOnce(fakeOnSelectAnnotations);
       const call = fakeOnSelectAnnotations.getCall(0);
-      assert.deepEqual(call.args[0], [...fakeBuckets[0].tags]);
+      assert.deepEqual(
+        call.args[0],
+        fakeBuckets[0].anchors.map(a => a.tag)
+      );
       assert.equal(call.args[1], false);
     });
 
