@@ -46,7 +46,7 @@
     "chai": "^4.1.2",
     "chance": "^1.0.13",
     "classnames": "^2.2.4",
-    "commander": "^10.0.0",
+    "commander": "^11.0.0",
     "cross-env": "^7.0.0",
     "diff": "^5.0.0",
     "dompurify": "^3.0.0",
