@@ -24,6 +24,7 @@ import type {
 import { Adder } from './adder';
 import { TextRange } from './anchoring/text-range';
 import { BucketBarClient } from './bucket-bar-client';
+import { LayoutChangeEvent } from './events';
 import { FeatureFlags } from './features';
 import { HighlightClusterController } from './highlight-clusters';
 import {
@@ -453,6 +454,16 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       if (frameFillsAncestor(window, hostFrame)) {
         this.fitSideBySide(sidebarLayout);
       }
+
+      // Emit a custom event that the host page can respond to. This is useful
+      // if the host app needs to change its layout depending on the sidebar's
+      // visibility and size.
+      this.element.dispatchEvent(
+        new LayoutChangeEvent({
+          sidebarLayout,
+          isSideBySideActive: this._sideBySideActive,
+        })
+      );
     });
 
     this._hostRPC.on('close', () => this.emit('hostDisconnected'));
@@ -748,7 +759,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   }
 
   /**
-   * Scroll to the closest off screen anchor.
+   * Scroll to the closest off-screen anchor.
    */
   private async _scrollToClosestOffScreenAnchor(
     tags: string[],

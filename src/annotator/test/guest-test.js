@@ -259,6 +259,24 @@ describe('Guest', () => {
 
         assert.notCalled(fakeIntegration.fitSideBySide);
       });
+
+      it('emits a "hypothesis:layoutchange" DOM event', done => {
+        const guest = createGuest();
+        const dummyLayout = {
+          expanded: true,
+          width: 100,
+          height: 300,
+          toolbarWidth: 10,
+        };
+
+        guest.element.addEventListener('hypothesis:layoutchange', e => {
+          assert.equal(e.detail.sidebarLayout, dummyLayout);
+          // This ensures the test will timeout if this event is not emitted
+          done();
+        });
+
+        emitHostEvent('sidebarLayoutChanged', dummyLayout);
+      });
     });
 
     describe('on "hoverAnnotations" event', () => {
