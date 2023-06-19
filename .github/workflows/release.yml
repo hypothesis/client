@@ -40,7 +40,7 @@ jobs:
         path: node_modules
         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
     - name: Install
-      run: yarn install --frozen-lockfile
+      run: yarn install --immutable
     - name: Get version
       run: |
         git fetch --tags --quiet
@@ -84,7 +84,7 @@ jobs:
         path: node_modules
         key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
     - name: Install
-      run: yarn install --frozen-lockfile
+      run: yarn install --immutable
     - name: Determine release version
       run: |
         git fetch --tags --quiet
