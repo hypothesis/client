@@ -461,7 +461,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       this.element.dispatchEvent(
         new LayoutChangeEvent({
           sidebarLayout,
-          isSideBySideActive: this._sideBySideActive,
+          sideBySideActive: this._sideBySideActive,
         })
       );
     });
