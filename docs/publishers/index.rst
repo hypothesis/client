@@ -13,3 +13,4 @@ pages will help you get started.
    embedding
    config
    host-page-integration
+   events

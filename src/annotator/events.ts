@@ -1,7 +1,7 @@
 import type { SidebarLayout } from '../types/annotator';
 
 type LayoutChangeEventDetail = {
-  isSideBySideActive: boolean;
+  sideBySideActive: boolean;
   sidebarLayout: SidebarLayout;
 };
 

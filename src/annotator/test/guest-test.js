@@ -260,7 +260,7 @@ describe('Guest', () => {
         assert.notCalled(fakeIntegration.fitSideBySide);
       });
 
-      it('emits a "hypothesis:layoutchange" DOM event', done => {
+      it('emits a "hypothesis:layoutchange" DOM event', () => {
         const guest = createGuest();
         const dummyLayout = {
           expanded: true,
@@ -268,14 +268,20 @@ describe('Guest', () => {
           height: 300,
           toolbarWidth: 10,
         };
+        const listener = sinon.stub();
 
-        guest.element.addEventListener('hypothesis:layoutchange', e => {
-          assert.equal(e.detail.sidebarLayout, dummyLayout);
-          // This ensures the test will timeout if this event is not emitted
-          done();
-        });
+        guest.element.addEventListener('hypothesis:layoutchange', listener);
 
         emitHostEvent('sidebarLayoutChanged', dummyLayout);
+
+        assert.calledWith(
+          listener,
+          sinon.match({
+            detail: sinon.match({
+              sidebarLayout: dummyLayout,
+            }),
+          })
+        );
       });
     });
 
