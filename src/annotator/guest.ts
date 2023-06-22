@@ -501,7 +501,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     if (!anchor?.highlights) {
       return;
     }
-    this._scrollToAnchor(anchor);
+    await this._scrollToAnchor(anchor);
   }
 
   async _connectSidebar() {
