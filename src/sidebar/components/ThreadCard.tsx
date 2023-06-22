@@ -82,8 +82,13 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
       onMouseLeave={() => setThreadHovered(null)}
       onKeyDown={e => {
         // Simulate default button behavior, where `Enter` and `Space` trigger
-        // click action
-        if (['Enter', ' '].includes(e.key) && thread.annotation) {
+        // click action.
+        // Make sure the event was triggered on the card itself and not a children
+        if (
+          e.target === cardRef.current &&
+          ['Enter', ' '].includes(e.key) &&
+          thread.annotation
+        ) {
           scrollToAnnotation(thread.annotation);
         }
       }}
