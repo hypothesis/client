@@ -127,10 +127,23 @@ describe('ThreadCard', () => {
         );
       });
 
+      it('does not scroll to annotation when event target is not the Card', () => {
+        const wrapper = createComponent();
+
+        // Trigger keydown through the prop itself, as `target` cannot be
+        // overwritten on an event
+        wrapper.find(threadCardSelector).prop('onKeyDown')({
+          key,
+          target: 'foo',
+        });
+
+        assert.notCalled(fakeFrameSync.scrollToAnnotation);
+      });
+
       it('does not scroll to annotation when it is not set', () => {
         const wrapper = createComponent({ thread: {} });
 
-        wrapper.find(threadCardSelector).simulate('keypress', { key });
+        wrapper.find(threadCardSelector).simulate('keydown', { key });
 
         assert.notCalled(fakeFrameSync.scrollToAnnotation);
       });
