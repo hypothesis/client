@@ -99,7 +99,7 @@ tomli==2.0.1
     # via
     #   build
     #   pep517
-tornado==6.2
+tornado==6.3.2
     # via livereload
 typing-extensions==4.3.0
     # via myst-parser
