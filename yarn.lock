@@ -2193,8 +2193,8 @@ __metadata:
   linkType: hard
 
 "@rollup/plugin-commonjs@npm:^25.0.0":
-  version: 25.0.1
-  resolution: "@rollup/plugin-commonjs@npm:25.0.1"
+  version: 25.0.2
+  resolution: "@rollup/plugin-commonjs@npm:25.0.2"
   dependencies:
     "@rollup/pluginutils": ^5.0.1
     commondir: ^1.0.1
@@ -2207,7 +2207,7 @@ __metadata:
   peerDependenciesMeta:
     rollup:
       optional: true
-  checksum: 886340bac6ba8c20bb16e3b7fa4d0357019708043697153e7b18cecb7e1fdbe7ec6f26974079f32091c6168c67300960f023ad3d167d2d0d9a9e3bd713cd22a4
+  checksum: d8c4e22d264c5b9286f697653c2f9288149c0fe0169d49b83b5dc8b542f96cc0b9113da3f30d241f2f277513fbf3f8c207d95def5559eb3800190f1872add794
   languageName: node
   linkType: hard
 
