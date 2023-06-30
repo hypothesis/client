@@ -3,7 +3,9 @@ import {
   IconButton,
   Input,
   InputGroup,
+  Link,
   LockIcon,
+  ShareIcon,
   Spinner,
 } from '@hypothesis/frontend-shared';
 
@@ -29,6 +31,7 @@ export type ShareAnnotationPanelProps = {
  */
 function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
   const store = useSidebarStore();
+  const allAnnotations = store.allAnnotations();
   const mainFrame = store.mainFrame();
   const focusedGroup = store.focusedGroup();
   const groupName = (focusedGroup && focusedGroup.name) || '...';
@@ -51,6 +54,26 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
       toastMessenger.error('Unable to copy link');
     }
   };
+
+  /**
+   * Serialize JSON of current set of loaded annotations and download as
+   * JSON
+   */
+  function handleExport(event: Event) {
+    const linkEl = event.currentTarget as Element;
+    const data = {
+      total: allAnnotations.length,
+      rows: allAnnotations,
+    };
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json',
+    });
+    const blobUrl = URL.createObjectURL(blob);
+
+    linkEl.setAttribute('href', blobUrl);
+    linkEl.setAttribute('download', 'better-filename-later.json');
+  }
 
   return (
     <SidebarPanel title={panelTitle} panelName="shareGroupAnnotations">
@@ -110,6 +133,14 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
                   <LockIcon className="inline w-em h-em ml-0.5 -mt-0.5" />{' '}
                   <em>Only Me</em>) annotations are only visible to you.
                 </span>
+              </p>
+              <p className="text-center">
+                <Link href="#" onClick={e => handleExport(e)}>
+                  <div className="border border-brand rounded-md p-2 flex gap-x-2">
+                    <ShareIcon />
+                    Export these annotations
+                  </div>
+                </Link>
               </p>
               <div className="text-[24px]">
                 <ShareLinks shareURI={shareURI} />
