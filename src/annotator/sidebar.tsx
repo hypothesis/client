@@ -203,7 +203,11 @@ export class Sidebar implements Destroyable {
 
           // Use a grey background, with lower opacity with the sidebar is
           // collapsed, so the page content behind it can be read.
-          'bg-grey-2 sidebar-collapsed:bg-black/[.08]'
+          'bg-grey-2 sidebar-collapsed:bg-black/[.08]',
+
+          // Allow pointer events to go through this container to page elements
+          // (eg. scroll bar thumbs) which are behind it.
+          'pointer-events-none'
         );
         this.iframeContainer.append(sidebarEdge);
 
