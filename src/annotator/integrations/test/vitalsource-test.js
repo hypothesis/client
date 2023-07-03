@@ -79,6 +79,8 @@ describe('annotator/integrations/vitalsource', () => {
       fitSideBySide: sinon.stub().returns(false),
       getAnnotatableRange: sinon.stub().returnsArg(0),
       scrollToAnchor: sinon.stub(),
+      sideBySideActive: sinon.stub().returns(false),
+
       sideBySideEnabled: false,
     };
 
@@ -313,11 +315,13 @@ describe('annotator/integrations/vitalsource', () => {
       assert.isTrue(htmlOptions.features.flagEnabled('html_side_by_side'));
 
       fakeHTMLIntegration.fitSideBySide.returns(true);
+      fakeHTMLIntegration.sideBySideActive.returns(true);
       const layout = { expanded: true, width: 150 };
       const isActive = integration.fitSideBySide(layout);
 
       assert.isTrue(isActive);
       assert.calledWith(fakeHTMLIntegration.fitSideBySide, layout);
+      assert.isTrue(integration.sideBySideActive());
     });
 
     it('stops mouse events from propagating to parent frame', () => {
@@ -692,12 +696,16 @@ describe('annotator/integrations/vitalsource', () => {
           const sidebarWidth = window.innerWidth - 481;
           const expectedWidth = window.innerWidth - sidebarWidth;
           integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+          assert.isTrue(integration.sideBySideActive());
           assert.equal(fakePageImage.parentElement.style.textAlign, 'left');
           assert.equal(fakePageImage.style.width, `${expectedWidth}px`);
           assert.calledOnce(fakeImageTextLayer.updateSync);
 
           // Deactivate side-by-side mode. Style overrides should be removed.
           integration.fitSideBySide({ expanded: false });
+
+          assert.isFalse(integration.sideBySideActive());
           assert.equal(fakePageImage.parentElement.style.textAlign, '');
           assert.equal(fakePageImage.style.width, '');
           assert.calledTwice(fakeImageTextLayer.updateSync);
@@ -710,6 +718,8 @@ describe('annotator/integrations/vitalsource', () => {
           // This will leave less than 480px available to the main content
           const sidebarWidth = window.innerWidth - 479;
           integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+          assert.isFalse(integration.sideBySideActive());
           assert.equal(fakePageImage.parentElement.style.textAlign, '');
           assert.equal(fakePageImage.style.width, '');
         });

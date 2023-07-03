@@ -179,6 +179,7 @@ describe('Guest', () => {
       navigateToSegment: sinon.stub(),
       scrollToAnchor: sinon.stub().resolves(),
       showContentInfo: sinon.stub(),
+      sideBySideActive: sinon.stub().returns(false),
       uri: sinon.stub().resolves('https://example.com/test.pdf'),
     });
 
@@ -633,9 +634,7 @@ describe('Guest', () => {
 
     it('does not hide sidebar if side-by-side mode is active', () => {
       for (let event of ['mousedown', 'touchstart']) {
-        // Activate side-by-side mode
-        fakeIntegration.fitSideBySide.returns(true);
-        guest.fitSideBySide({ expanded: true, width: 100 });
+        fakeIntegration.sideBySideActive.returns(true);
 
         rootElement.dispatchEvent(new Event(event));
 
@@ -1546,38 +1545,6 @@ describe('Guest', () => {
       guest.fitSideBySide(layout);
 
       assert.calledWith(fakeIntegration.fitSideBySide, layout);
-    });
-
-    it('sets an html class on the element if side by side is activated', () => {
-      const guest = createGuest();
-      fakeIntegration.fitSideBySide.returns(true);
-      const layout = { expanded: true, width: 100 };
-
-      guest.fitSideBySide(layout);
-
-      assert.isTrue(
-        guest.element.classList.contains('hypothesis-sidebyside-active')
-      );
-
-      fakeIntegration.fitSideBySide.returns(false);
-      guest.fitSideBySide(layout);
-
-      assert.isFalse(
-        guest.element.classList.contains('hypothesis-sidebyside-active')
-      );
-    });
-
-    it('enables closing sidebar on document click if side-by-side is not activated', () => {
-      const guest = createGuest();
-      fakeIntegration.fitSideBySide.returns(false);
-      const layout = { expanded: true, width: 100 };
-
-      guest.fitSideBySide(layout);
-      assert.isFalse(guest.sideBySideActive);
-
-      fakeIntegration.fitSideBySide.returns(true);
-      guest.fitSideBySide(layout);
-      assert.isTrue(guest.sideBySideActive);
     });
   });
 

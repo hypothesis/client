@@ -94,6 +94,8 @@ export class PDFIntegration extends TinyEmitter implements Integration {
   private _reanchoringMaxWait: number;
   private _updateAnnotationLayerVisibility: () => void;
 
+  private _sideBySideActive: boolean;
+
   /**
    * @param annotator
    * @param options
@@ -137,6 +139,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     };
     this._updateBannerState(this._bannerState);
     this._checkForSelectableText();
+    this._sideBySideActive = false;
 
     // Hide annotation layer when the user is making a selection. The annotation
     // layer appears above the invisible text layer and can interfere with text
@@ -416,7 +419,13 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     // This will cause PDF pages to re-render if their scaling has changed
     this._pdfViewer.update();
 
+    this._sideBySideActive = active;
+
     return active;
+  }
+
+  sideBySideActive() {
+    return this._sideBySideActive;
   }
 
   /**

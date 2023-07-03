@@ -216,7 +216,6 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
 
   private _bucketBarClient: BucketBarClient;
 
-  private _sideBySideActive: boolean;
   private _listeners: ListenerCollection;
 
   /**
@@ -314,8 +313,6 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       hostRPC: this._hostRPC,
     });
 
-    this._sideBySideActive = false;
-
     // Setup event handlers on the root element
     this._listeners = new ListenerCollection();
     this._setupElementEvents();
@@ -334,15 +331,17 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     // elements in the sidebar's vertical toolbar or adder won't close the
     // sidebar.
     const maybeCloseSidebar = (element: Element) => {
-      if (this._sideBySideActive) {
-        // Don't hide the sidebar if event was disabled because the sidebar
-        // doesn't overlap the content.
+      // Don't hide the sidebar if event was disabled because the sidebar
+      // doesn't overlap the content.
+      if (this._integration.sideBySideActive()) {
         return;
       }
+
+      // Don't hide the sidebar if the event comes from an element that contains a highlight
       if (annotationsAt(element).length) {
-        // Don't hide the sidebar if the event comes from an element that contains a highlight
         return;
       }
+
       this._sidebarRPC.call('closeSidebar');
     };
 
@@ -458,7 +457,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       this.element.dispatchEvent(
         new LayoutChangeEvent({
           sidebarLayout,
-          sideBySideActive: this._sideBySideActive,
+          sideBySideActive: this._integration.sideBySideActive(),
         })
       );
     });
@@ -849,22 +848,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    * @param sidebarLayout
    */
   fitSideBySide(sidebarLayout: SidebarLayout) {
-    this._sideBySideActive = this._integration.fitSideBySide(sidebarLayout);
-    this.element.classList.toggle(
-      'hypothesis-sidebyside-active',
-      this._sideBySideActive
-    );
-  }
-
-  /**
-   * Return true if side-by-side mode is currently active.
-   *
-   * Side-by-side mode is activated or de-activated when `fitSideBySide` is called
-   * depending on whether the sidebar is expanded and whether there is room for
-   * the content alongside the sidebar.
-   */
-  get sideBySideActive() {
-    return this._sideBySideActive;
+    this._integration.fitSideBySide(sidebarLayout);
   }
 
   /**
