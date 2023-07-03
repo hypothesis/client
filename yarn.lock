@@ -2330,8 +2330,8 @@ __metadata:
   linkType: hard
 
 "@sentry/cli@npm:^2.0.2":
-  version: 2.19.2
-  resolution: "@sentry/cli@npm:2.19.2"
+  version: 2.19.4
+  resolution: "@sentry/cli@npm:2.19.4"
   dependencies:
     https-proxy-agent: ^5.0.0
     node-fetch: ^2.6.7
@@ -2340,7 +2340,7 @@ __metadata:
     which: ^2.0.2
   bin:
     sentry-cli: bin/sentry-cli
-  checksum: e10b40494359f5d405f66c88769d91e87da45ad0f138dd44d6e2d9237f8b876bc39fd607a82b1eb0508174b8b6a0878f92f987ac6ab6544f08a81c64d8c70b25
+  checksum: 1f2442857a5eec2bc6f872a633d88fc2f11ed7f434db36627a034d904390f4cbbb4dccc33c571a8815e423cd36b863c72621298d49a1541b28370c7f7308f0dc
   languageName: node
   linkType: hard
 
