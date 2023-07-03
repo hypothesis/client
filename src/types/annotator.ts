@@ -183,6 +183,16 @@ export type IntegrationBase = {
   fitSideBySide(layout: SidebarLayout): boolean;
 
   /**
+   * Return true if side-by-side mode is currently active.
+   *
+   * In most cases this will only change when `fitSideBySide` is called, but in
+   * some integrations this may change at other times. For example this can
+   * happen if the content layout changed and there is more or less room than
+   * before.
+   */
+  sideBySideActive(): boolean;
+
+  /**
    * Return a DOM Range representing the extent of annotatable content within
    * `range`, or `null` if `range` does not contain any annotatable content.
    * For example, `range` might be trimmed of leading or trailing whitespace.

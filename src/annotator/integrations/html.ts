@@ -168,7 +168,15 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
       this._deactivateSideBySide();
     }
     this._sideBySideActive = active;
+    this.container.classList.toggle(
+      'hypothesis-sidebyside-active',
+      this._sideBySideActive
+    );
     return active;
+  }
+
+  sideBySideActive() {
+    return this._sideBySideActive;
   }
 
   /**

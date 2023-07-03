@@ -183,6 +183,7 @@ describe('HTMLIntegration', () => {
     it('does nothing when disabled', () => {
       const integration = createIntegration();
       integration.fitSideBySide({});
+      assert.isFalse(integration.sideBySideActive());
     });
 
     context('when enabled', () => {
@@ -195,6 +196,7 @@ describe('HTMLIntegration', () => {
 
         integration.fitSideBySide({ expanded: true, width: sidebarWidth });
 
+        assert.isTrue(integration.sideBySideActive());
         assert.deepEqual(getMargins(), [padding, sidebarWidth + padding]);
       });
 
@@ -205,6 +207,7 @@ describe('HTMLIntegration', () => {
         // window.innerWidth (800) - 321 = 479 --> too small
         integration.fitSideBySide({ expanded: true, width: 321 });
 
+        assert.isFalse(integration.sideBySideActive());
         assert.deepEqual(getMargins(), [null, null]);
       });
 
@@ -337,6 +340,26 @@ describe('HTMLIntegration', () => {
           assert.equal(updatedMargins[0], expectedLeftMargin);
           assert.isBelow(updatedMargins[0], autoMargin);
         });
+      });
+
+      it('sets an html class on the element if side by side is activated', () => {
+        const integration = createIntegration();
+
+        integration.fitSideBySide({ expanded: true, width: 100 });
+
+        assert.isTrue(
+          integration.container.classList.contains(
+            'hypothesis-sidebyside-active'
+          )
+        );
+
+        integration.fitSideBySide({ expanded: false, width: 100 });
+
+        assert.isFalse(
+          integration.container.classList.contains(
+            'hypothesis-sidebyside-active'
+          )
+        );
       });
     });
 

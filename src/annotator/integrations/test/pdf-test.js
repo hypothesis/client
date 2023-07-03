@@ -398,6 +398,7 @@ describe('annotator/integrations/pdf', () => {
       it('resizes and activates side-by-side mode when sidebar expanded', () => {
         sandbox.stub(window, 'innerWidth').value(1350);
         pdfIntegration = createPDFIntegration();
+        assert.isFalse(pdfIntegration.sideBySideActive());
 
         const active = pdfIntegration.fitSideBySide({
           expanded: true,
@@ -406,6 +407,7 @@ describe('annotator/integrations/pdf', () => {
         });
 
         assert.isTrue(active);
+        assert.isTrue(pdfIntegration.sideBySideActive());
         assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
         assert.equal(pdfContainer().style.width, 'calc(100% - 428px)');
       });
@@ -430,6 +432,7 @@ describe('annotator/integrations/pdf', () => {
           });
 
           assert.isTrue(active);
+          assert.isTrue(pdfIntegration.sideBySideActive());
           assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
           assert.equal(pdfContainer().style.width, 'calc(100% - 428px)');
         });
@@ -447,6 +450,7 @@ describe('annotator/integrations/pdf', () => {
         });
 
         assert.isFalse(active);
+        assert.isFalse(pdfIntegration.sideBySideActive());
         assert.equal(pdfContainer().style.width, 'calc(100% - 115px)');
       });
 
@@ -462,6 +466,7 @@ describe('annotator/integrations/pdf', () => {
         });
 
         assert.isFalse(active);
+        assert.isFalse(pdfIntegration.sideBySideActive());
         assert.calledOnce(fakePDFViewerApplication.pdfViewer.update);
         assert.equal(pdfContainer().style.width, 'calc(100% - 115px)');
       });

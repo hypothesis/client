@@ -204,7 +204,15 @@ export class VitalSourceContentIntegration
   private _bookElement: MosaicBookElement;
   private _htmlIntegration: HTMLIntegration;
   private _listeners: ListenerCollection;
+
+  /** Hidden text layer. Only used in PDF books. */
   private _textLayer?: ImageTextLayer;
+
+  /**
+   * Whether side-by-side is active. Only used in PDF books. For EPUB books
+   * side-by-side delegates to the HTML integration.
+   */
+  private _sideBySideActive?: boolean;
 
   constructor(
     /* istanbul ignore next - defaults are overridden in tests */
@@ -290,6 +298,8 @@ export class VitalSourceContentIntegration
       //
       // Set a z-index on our text layer to raise it above VS's own one.
       this._textLayer.container.style.zIndex = '100';
+
+      this._sideBySideActive = false;
     }
   }
 
@@ -365,6 +375,7 @@ export class VitalSourceContentIntegration
       // `ImageTextLayer` will handle adjusting the text layer to match.
       const newWidth = window.innerWidth - layout.width;
 
+      this._sideBySideActive = false;
       preserveScrollPosition(() => {
         if (layout.expanded && newWidth > MIN_CONTENT_WIDTH) {
           // The VS book viewer sets `text-align: center` on the <body> element
@@ -372,6 +383,7 @@ export class VitalSourceContentIntegration
           // is open we need the image to be left-aligned.
           bookContainer.style.textAlign = 'left';
           bookImage.style.width = `${newWidth}px`;
+          this._sideBySideActive = true;
         } else {
           bookContainer.style.textAlign = '';
           bookImage.style.width = '';
@@ -383,9 +395,17 @@ export class VitalSourceContentIntegration
         textLayer.updateSync();
       });
 
-      return layout.expanded;
+      return this._sideBySideActive;
     } else {
       return this._htmlIntegration.fitSideBySide(layout);
+    }
+  }
+
+  sideBySideActive() {
+    if (typeof this._sideBySideActive === 'boolean') {
+      return this._sideBySideActive;
+    } else {
+      return this._htmlIntegration.sideBySideActive();
     }
   }
 
