@@ -624,23 +624,37 @@ describe('Guest', () => {
       fakeSidebarFrame?.remove();
     });
 
-    it('hides sidebar on user "mousedown" or "touchstart" events in the document', () => {
-      for (let event of ['mousedown', 'touchstart']) {
-        rootElement.dispatchEvent(new Event(event));
+    context('clicks/taps on the document', () => {
+      const simulateClick = (element = rootElement, clientX = 0) =>
+        element.dispatchEvent(
+          new PointerEvent('pointerdown', { bubbles: true, clientX })
+        );
+
+      it('hides sidebar', () => {
+        simulateClick();
         assert.calledWith(sidebarRPC().call, 'closeSidebar');
-        sidebarRPC().call.resetHistory();
-      }
-    });
+      });
 
-    it('does not hide sidebar if side-by-side mode is active', () => {
-      for (let event of ['mousedown', 'touchstart']) {
+      it('does not hide sidebar if target is a highlight', () => {
+        simulateClick(fakeHighlight);
+        assert.notCalled(sidebarRPC().call);
+      });
+
+      it('does not hide sidebar if side-by-side mode is active', () => {
         fakeIntegration.sideBySideActive.returns(true);
+        simulateClick();
+        assert.notCalled(sidebarRPC().call);
+      });
 
-        rootElement.dispatchEvent(new Event(event));
+      it('does not hide sidebar if event is within the bounds of the sidebar', () => {
+        createGuest();
+        emitHostEvent('sidebarLayoutChanged', { expanded: true, width: 300 });
+
+        // Simulate click on the left edge of the sidebar.
+        simulateClick(rootElement, window.innerWidth - 295);
 
         assert.notCalled(sidebarRPC().call);
-        sidebarRPC().call.resetHistory();
-      }
+      });
     });
 
     it('does not reposition the adder if hidden when the window is resized', () => {
