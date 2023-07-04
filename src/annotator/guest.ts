@@ -214,6 +214,11 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   /** Channel for guest-sidebar communication. */
   private _sidebarRPC: PortRPC<SidebarToGuestEvent, GuestToSidebarEvent>;
 
+  /**
+   * The most recently received sidebar layout information from the host frame.
+   */
+  private _sidebarLayout: SidebarLayout | null;
+
   private _bucketBarClient: BucketBarClient;
 
   private _listeners: ListenerCollection;
@@ -306,6 +311,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._connectHost(hostFrame);
 
     this._sidebarRPC = new PortRPC();
+    this._sidebarLayout = null;
     this._connectSidebar();
 
     this._bucketBarClient = new BucketBarClient({
@@ -330,7 +336,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     // them from propagating out of their shadow roots, and hence clicking on
     // elements in the sidebar's vertical toolbar or adder won't close the
     // sidebar.
-    const maybeCloseSidebar = (element: Element) => {
+    const maybeCloseSidebar = (event: PointerEvent) => {
       // Don't hide the sidebar if event was disabled because the sidebar
       // doesn't overlap the content.
       if (this._integration.sideBySideActive()) {
@@ -338,7 +344,19 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       }
 
       // Don't hide the sidebar if the event comes from an element that contains a highlight
-      if (annotationsAt(element).length) {
+      if (annotationsAt(event.target as Element).length) {
+        return;
+      }
+
+      // If the click is within the bounds of the sidebar, ignore it. We don't
+      // want to close the sidebar if the user clicks eg. in transparent areas
+      // of the toolbar / bucket bar along the edge. Clicks within the sidebar
+      // iframe won't be received by the guest frame(s) at all.
+      if (
+        frameFillsAncestor(window, this._hostFrame) &&
+        this._sidebarLayout?.expanded &&
+        window.innerWidth - event.clientX < this._sidebarLayout.width
+      ) {
         return;
       }
 
@@ -354,15 +372,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       }
     });
 
-    this._listeners.add(this.element, 'mousedown', ({ target }) => {
-      maybeCloseSidebar(target as Element);
-    });
-
-    // Allow taps on the document to hide the sidebar as well as clicks.
-    // On iOS < 13 (2019), elements like h2 or div don't emit 'click' events.
-    this._listeners.add(this.element, 'touchstart', ({ target }) => {
-      maybeCloseSidebar(target as Element);
-    });
+    this._listeners.add(this.element, 'pointerdown', maybeCloseSidebar);
 
     this._listeners.add(this.element, 'mouseover', ({ target }) => {
       const tags = annotationsAt(target as Element);
@@ -848,6 +858,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    * @param sidebarLayout
    */
   fitSideBySide(sidebarLayout: SidebarLayout) {
+    this._sidebarLayout = sidebarLayout;
     this._integration.fitSideBySide(sidebarLayout);
   }
 
