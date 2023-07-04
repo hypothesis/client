@@ -17,16 +17,16 @@ type FilterStatusMessageProps = {
    * A count of items that are visible but do not match the filters (i.e. items
    * that have been "forced visible" by the user)
    */
-  additionalCount?: number;
+  additionalCount: number;
 
   /** Singular unit of the items being shown, e.g. "result" or "annotation" */
-  entitySingular?: string;
+  entitySingular: string;
 
   /** Plural unit of the items being shown */
-  entityPlural?: string;
+  entityPlural: string;
 
   /** Currently-applied filter query string, if any */
-  filterQuery?: string | null;
+  filterQuery: string | null;
 
   /** Display name for the user currently focused, if any */
   focusDisplayName?: string | null;
@@ -44,9 +44,9 @@ type FilterStatusMessageProps = {
  * Render status text describing the currently-applied filters.
  */
 function FilterStatusMessage({
-  additionalCount = 0,
-  entitySingular = 'annotation',
-  entityPlural = 'annotations',
+  additionalCount,
+  entitySingular,
+  entityPlural,
   filterQuery,
   focusDisplayName,
   resultCount,

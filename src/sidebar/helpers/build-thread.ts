@@ -93,7 +93,7 @@ function hasPathToRoot(
 function setParent(
   threads: Record<string, Thread>,
   id: string,
-  parents: string[] = []
+  parents: string[]
 ) {
   if (threads[id].parent || !parents.length) {
     // Parent already assigned, do not try to change it.

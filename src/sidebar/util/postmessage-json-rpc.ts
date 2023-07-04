@@ -26,6 +26,7 @@ export function call<T>(
   method: string,
   /* istanbul ignore next */
   params: unknown[] = [],
+  /* istanbul ignore next */
   timeout = 2000,
   /* istanbul ignore next */
   window_: Window = window

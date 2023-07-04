@@ -16,7 +16,6 @@ describe('Toolbar', () => {
         isSidebarOpen={false}
         showHighlights={false}
         newAnnotationType="note"
-        useMinimalControls={false}
         {...props}
       />
     );

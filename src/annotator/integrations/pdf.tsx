@@ -104,6 +104,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    */
   constructor(
     annotator: Annotator,
+    /* istanbul ignore next */
     options: { reanchoringMaxWait?: number } = {}
   ) {
     super();
