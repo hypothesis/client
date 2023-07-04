@@ -68,6 +68,39 @@ describe('HTMLIntegration', () => {
     return new HTMLIntegration({ features, sideBySideOptions });
   }
 
+  function getMargins() {
+    const bodyStyle = document.body.style;
+    const leftMargin = bodyStyle.marginLeft
+      ? parseInt(bodyStyle.marginLeft)
+      : null;
+    const rightMargin = bodyStyle.marginRight
+      ? parseInt(bodyStyle.marginRight)
+      : null;
+    return [leftMargin, rightMargin];
+  }
+
+  // Fixed amount of padding used in side-by-side mode. See
+  // `HTMLIntegration._activateSideBySide`.
+  const sideBySidePadding = 12;
+
+  // Value used for width of sidebar in various tests.
+  const sidebarWidth = 200;
+
+  // Generate a dummy response for `guessMainContentArea`. This response
+  // is what would be returned when the content fills the full width of the
+  // viewport, mins space for an open sidebar and some padding.
+  //
+  // The sidebar space is included because `fitSideBySide` adjusts the margins
+  // on the body before calling `guessMainContentArea`.
+  function fullWidthContentRect() {
+    return new DOMRect(
+      0,
+      0,
+      window.innerWidth - sidebarWidth - sideBySidePadding,
+      window.innerHeight
+    );
+  }
+
   it('implements `anchor` and `destroy` using HTML anchoring', async () => {
     const integration = createIntegration();
     const root = {};
@@ -123,6 +156,22 @@ describe('HTMLIntegration', () => {
   });
 
   describe('#destroy', () => {
+    it('undoes side-by-side mode changes', () => {
+      const padding = sideBySidePadding;
+
+      features.update({ html_side_by_side: true });
+      fakeGuessMainContentArea.returns(fullWidthContentRect());
+
+      const integration = createIntegration();
+      integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+      assert.isTrue(integration.sideBySideActive());
+      assert.deepEqual(getMargins(), [padding, sidebarWidth + padding]);
+
+      integration.destroy();
+
+      assert.deepEqual(getMargins(), [null, null]);
+    });
+
     it('cleans up feature flag listeners', () => {
       sinon.spy(features, 'on');
       sinon.spy(features, 'off');
@@ -140,35 +189,6 @@ describe('HTMLIntegration', () => {
   });
 
   describe('#fitSideBySide', () => {
-    function getMargins() {
-      const bodyStyle = document.body.style;
-      const leftMargin = bodyStyle.marginLeft
-        ? parseInt(bodyStyle.marginLeft)
-        : null;
-      const rightMargin = bodyStyle.marginRight
-        ? parseInt(bodyStyle.marginRight)
-        : null;
-      return [leftMargin, rightMargin];
-    }
-
-    const sidebarWidth = 200;
-    const padding = 12;
-
-    // Generate a dummy response for `guessMainContentArea`. This response
-    // is what would be returned when the content fills the full width of the
-    // viewport, mins space for an open sidebar and some padding.
-    //
-    // The sidebar space is included because `fitSideBySide` adjusts the margins
-    // on the body before calling `guessMainContentArea`.
-    function fullWidthContentRect() {
-      return new DOMRect(
-        0,
-        0,
-        window.innerWidth - sidebarWidth - padding,
-        window.innerHeight
-      );
-    }
-
     beforeEach(() => {
       // By default, pretend that the content fills the page.
       fakeGuessMainContentArea.returns(fullWidthContentRect());
@@ -197,7 +217,10 @@ describe('HTMLIntegration', () => {
         integration.fitSideBySide({ expanded: true, width: sidebarWidth });
 
         assert.isTrue(integration.sideBySideActive());
-        assert.deepEqual(getMargins(), [padding, sidebarWidth + padding]);
+        assert.deepEqual(getMargins(), [
+          sideBySidePadding,
+          sidebarWidth + sideBySidePadding,
+        ]);
       });
 
       it('does not set left and right margins if there is not enough room to enable', () => {
@@ -215,6 +238,7 @@ describe('HTMLIntegration', () => {
         const integration = createIntegration();
 
         const contentRect = fullWidthContentRect();
+
         // Pretend there is some content to the right of the main content
         // in the document (eg. related stories, ads).
         contentRect.width -= 100;
@@ -222,7 +246,10 @@ describe('HTMLIntegration', () => {
 
         integration.fitSideBySide({ expanded: true, width: sidebarWidth });
 
-        assert.deepEqual(getMargins(), [padding, sidebarWidth + padding - 100]);
+        assert.deepEqual(getMargins(), [
+          sideBySidePadding,
+          sidebarWidth + sideBySidePadding - 100,
+        ]);
       });
 
       it('does nothing if the content area cannot be determined', () => {

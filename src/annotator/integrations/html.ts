@@ -148,6 +148,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
   }
 
   destroy() {
+    this._deactivateSideBySide();
     this._navObserver.disconnect();
     this._metaObserver.disconnect();
     this.features.off('flagsChanged', this._flagsChanged);
