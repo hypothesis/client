@@ -22,6 +22,11 @@ import {
 // content line lengths and scale are too short to be readable.
 const MIN_HTML_WIDTH = 480;
 
+type SideBySideOptions = {
+  minWidth: number;
+  mode: 'auto' | 'all' | 'off'; // TODO Review possible values
+};
+
 /**
  * Document type integration for ordinary web pages.
  *
@@ -32,12 +37,14 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
   container: HTMLElement;
   features: FeatureFlags;
 
-  private _flagsChanged: () => void;
+  private _flagsChanged?: () => void;
   private _htmlMeta: HTMLMetadata;
   private _prevURI: string;
 
-  /** Whether to attempt to resize the document to fit alongside sidebar. */
-  private _sideBySideEnabled: boolean;
+  /** Configuration for how to resize the document to fit alongside sidebar */
+  private _sideBySideOptions: SideBySideOptions & {
+    modeExplicitlySet: boolean;
+  };
 
   /**
    * Whether the document is currently being resized to fit alongside an
@@ -53,9 +60,11 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
   constructor({
     features,
     container = document.body,
+    sideBySideOptions = {},
   }: {
     features: FeatureFlags;
     container?: HTMLElement;
+    sideBySideOptions?: Partial<SideBySideOptions>;
   }) {
     super();
 
@@ -65,7 +74,13 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     this._htmlMeta = new HTMLMetadata();
     this._prevURI = this._htmlMeta.uri();
 
-    this._sideBySideEnabled = this.features.flagEnabled('html_side_by_side');
+    this._sideBySideOptions = {
+      minWidth: sideBySideOptions.minWidth ?? MIN_HTML_WIDTH,
+      modeExplicitlySet: !!sideBySideOptions.mode,
+      mode:
+        sideBySideOptions.mode ??
+        (this.features.flagEnabled('html_side_by_side') ? 'auto' : 'off'),
+    };
     this._sideBySideActive = false;
     this._lastLayout = null;
 
@@ -91,19 +106,25 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
       ],
     });
 
-    this._flagsChanged = () => {
-      const sideBySide = features.flagEnabled('html_side_by_side');
-      if (sideBySide !== this._sideBySideEnabled) {
-        this._sideBySideEnabled = sideBySide;
+    // If side-by-side mode was not explicitly set via config, listen for feature
+    // flag changes in order to update the value
+    if (!this._sideBySideOptions.modeExplicitlySet) {
+      this._flagsChanged = () => {
+        const sideBySide = features.flagEnabled('html_side_by_side')
+          ? 'auto'
+          : 'off';
+        if (sideBySide !== this._sideBySideOptions.mode) {
+          this._sideBySideOptions.mode = sideBySide;
 
-        // `fitSideBySide` is normally called by Guest when the sidebar layout
-        // changes. When the feature flag changes, we need to re-run the method.
-        if (this._lastLayout) {
-          this.fitSideBySide(this._lastLayout);
+          // `fitSideBySide` is normally called by Guest when the sidebar layout
+          // changes. When the feature flag changes, we need to re-run the method.
+          if (this._lastLayout) {
+            this.fitSideBySide(this._lastLayout);
+          }
         }
-      }
-    };
-    this.features.on('flagsChanged', this._flagsChanged);
+      };
+      this.features.on('flagsChanged', this._flagsChanged);
+    }
   }
 
   anchor(root: Element, selectors: Selector[]): Promise<Range> {
@@ -144,7 +165,9 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
   destroy() {
     this._navObserver.disconnect();
     this._metaObserver.disconnect();
-    this.features.off('flagsChanged', this._flagsChanged);
+    if (this._flagsChanged) {
+      this.features.off('flagsChanged', this._flagsChanged);
+    }
   }
 
   contentContainer() {
@@ -156,9 +179,9 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
 
     const maximumWidthToFit = window.innerWidth - layout.width;
     const active =
-      this._sideBySideEnabled &&
+      this._sideBySideOptions.mode !== 'off' &&
       layout.expanded &&
-      maximumWidthToFit >= MIN_HTML_WIDTH;
+      maximumWidthToFit >= this._sideBySideOptions.minWidth;
 
     if (active) {
       // nb. We call `_activateSideBySide` regardless of whether side-by-side
@@ -203,7 +226,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     //   it by a smaller amount and let the Hypothesis sidebar cover up the
     //   document's sidebar, leaving as much space as possible to the content.
     //
-    // Therefore what we do is to initially reduce the width of the document by
+    // Therefore, what we do is to initially reduce the width of the document by
     // the full width of the sidebar, then we use heuristics to analyze the
     // resulting page layout and determine whether there is significant "free space"
     // (ie. anything that is not the main content of the document, such as ads or

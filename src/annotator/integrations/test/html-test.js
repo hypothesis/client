@@ -64,8 +64,8 @@ describe('HTMLIntegration', () => {
     $imports.$restore();
   });
 
-  function createIntegration() {
-    return new HTMLIntegration({ features });
+  function createIntegration(sideBySideOptions = {}) {
+    return new HTMLIntegration({ features, sideBySideOptions });
   }
 
   it('implements `anchor` and `destroy` using HTML anchoring', async () => {
@@ -186,7 +186,7 @@ describe('HTMLIntegration', () => {
       assert.isFalse(integration.sideBySideActive());
     });
 
-    context('when enabled', () => {
+    context('when enabled via feature flag', () => {
       beforeEach(() => {
         features.update({ html_side_by_side: true });
       });
@@ -200,15 +200,21 @@ describe('HTMLIntegration', () => {
         assert.deepEqual(getMargins(), [padding, sidebarWidth + padding]);
       });
 
-      it('does not set left and right margins if there is not enough room to enable', () => {
-        const integration = createIntegration();
-
-        // Minimum available content width for side-by-side is 480
+      [
+        // Default minimum available content width for side-by-side is 480
         // window.innerWidth (800) - 321 = 479 --> too small
-        integration.fitSideBySide({ expanded: true, width: 321 });
+        { sideBySideOptions: {}, width: 321 },
+        // window.innerWidth (800) - 201 = 599 --> too small
+        { sideBySideOptions: { minWidth: 600 }, width: 201 },
+      ].forEach(({ sideBySideOptions, width }) => {
+        it('does not set left and right margins if there is not enough room to enable', () => {
+          const integration = createIntegration(sideBySideOptions);
 
-        assert.isFalse(integration.sideBySideActive());
-        assert.deepEqual(getMargins(), [null, null]);
+          integration.fitSideBySide({ expanded: true, width });
+
+          assert.isFalse(integration.sideBySideActive());
+          assert.deepEqual(getMargins(), [null, null]);
+        });
       });
 
       it('allows sidebar to overlap non-main content on the side of the page', () => {
@@ -363,6 +369,32 @@ describe('HTMLIntegration', () => {
       });
     });
 
+    context('when enabled via config', () => {
+      it('sets left and right margins on body element when activated', () => {
+        // Disabled via feature flag. Config will have precedence
+        features.update({ html_side_by_side: false });
+        const integration = createIntegration({ mode: 'auto' });
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+        assert.isTrue(integration.sideBySideActive());
+        assert.deepEqual(getMargins(), [padding, sidebarWidth + padding]);
+      });
+    });
+
+    context('when disabled via config', () => {
+      it('does not set left and right margins if there is not enough room to enable', () => {
+        // Enabled via feature flag. Config will have precedence
+        features.update({ html_side_by_side: true });
+        const integration = createIntegration({ mode: 'off' });
+
+        integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+
+        assert.isFalse(integration.sideBySideActive());
+        assert.deepEqual(getMargins(), [null, null]);
+      });
+    });
+
     const isSideBySideActive = () => {
       const [left, right] = getMargins();
       return left !== null || right !== null;
@@ -379,6 +411,17 @@ describe('HTMLIntegration', () => {
 
       features.update({ html_side_by_side: false });
       assert.isFalse(isSideBySideActive());
+    });
+
+    it('ignores feature flag changes when mode is provided via config', () => {
+      const integration = createIntegration({ mode: 'auto' });
+
+      integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+      assert.isTrue(isSideBySideActive());
+
+      // After disabling feature flag, side-by-side mode is still active
+      features.update({ html_side_by_side: false });
+      assert.isTrue(isSideBySideActive());
     });
   });
 
