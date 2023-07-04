@@ -339,8 +339,6 @@ export class Adder implements Destroyable {
         case 'hide':
           this.hide();
           break;
-        default:
-          break;
       }
     };
 

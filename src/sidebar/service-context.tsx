@@ -76,6 +76,7 @@ export function withServices<
       // Debugging check to make sure the store is used correctly.
       if (process.env.NODE_ENV !== 'production') {
         if (service === 'store') {
+          /* istanbul ignore next - Ignore debug code */
           throw new Error(
             'Do not use `withServices` to inject the `store` service. Use the `useStore` hook instead'
           );

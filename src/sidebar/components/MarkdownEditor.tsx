@@ -119,8 +119,6 @@ function handleToolbarCommand(
     case 'list':
       update(state => toggleBlockStyle(state, '* '));
       break;
-    default:
-      throw new Error(`Unknown toolbar command "${command}"`);
   }
 }
 
@@ -331,7 +329,7 @@ export type MarkdownEditorProps = {
   textStyle?: Record<string, string>;
 
   /** The markdown text to edit */
-  text?: string;
+  text: string;
 
   onEditText?: (text: string) => void;
 };
@@ -340,9 +338,9 @@ export type MarkdownEditorProps = {
  * Viewer/editor for the body of an annotation in markdown format.
  */
 export default function MarkdownEditor({
-  label = '',
+  label,
   onEditText = () => {},
-  text = '',
+  text,
   textStyle = {},
 }: MarkdownEditorProps) {
   // Whether the preview mode is currently active.

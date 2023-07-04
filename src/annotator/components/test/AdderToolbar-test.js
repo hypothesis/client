@@ -9,7 +9,6 @@ describe('AdderToolbar', () => {
     mount(
       <AdderToolbar
         direction="up"
-        annotationCount={0}
         onCommand={() => {}}
         isVisible={true}
         {...props}

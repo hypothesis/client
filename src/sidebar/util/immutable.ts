@@ -31,6 +31,7 @@ function deepFreeze<T extends object>(object: T) {
  */
 export function immutable<T extends object>(object: T) {
   if (process.env.NODE_ENV === 'production') {
+    /* istanbul ignore next */
     return object;
   } else {
     return deepFreeze(object);
