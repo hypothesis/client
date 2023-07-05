@@ -1,74 +1,70 @@
+import type { SidebarSettings } from '../../../types/config';
 import { createStoreModule, makeAction } from '../create-store';
 
-/** @param {import('../../../types/config').SidebarSettings} settings */
-function initialState(settings) {
+export type State = {
+  /**
+   * The ID of the direct-linked group.
+   *
+   * This ID is initialized from the client's configuration to indicate that
+   * the client should focus on a particular group initially. The user may
+   * need to log in for this step to complete. When the user navigates away
+   * from the group or clears the selection, the direct link is "consumed"
+   * and no longer used.
+   */
+  directLinkedGroupId: string | null;
+
+  /**
+   * The ID of the direct-linked annotation.
+   *
+   * This ID is initialized from the client's configuration to indicate that
+   * the client should focus on a particular annotation. The user may need to
+   * log in to see the annotation. When the user clears the selection or
+   * switches to a different group manually, the direct link is "consumed"
+   * and no longer used.
+   */
+  directLinkedAnnotationId: string | null;
+
+  /**
+   * Indicates that an error occurred in retrieving/showing the direct linked group.
+   * This could be because:
+   * - the group does not exist
+   * - the user does not have permission
+   * - the group is out of scope for the given page
+   */
+  directLinkedGroupFetchFailed: boolean;
+};
+
+function initialState(settings: SidebarSettings): State {
   return {
-    /**
-     * The ID of the direct-linked group.
-     *
-     * This ID is initialized from the client's configuration to indicate that
-     * the client should focus on a particular group initially. The user may
-     * need to login for this step to complete. When the user navigates away
-     * from the group or clears the selection, the direct link is "consumed"
-     * and no longer used.
-     *
-     * @type {string|null}
-     */
     directLinkedGroupId: settings.group || null,
-
-    /**
-     * The ID of the direct-linked annotation.
-     *
-     * This ID is initialized from the client's configuration to indicate that
-     * the client should focus on a particular annotation. The user may need to
-     * login to see the annotation. When the user clears the selection or
-     * switches to a different group manually, the direct link is "consumed"
-     * and no longer used.
-     *
-     * @type {string|null}
-     */
     directLinkedAnnotationId: settings.annotations || null,
-
-    /**
-     * Indicates that an error occurred in retrieving/showing the direct linked group.
-     * This could be because:
-     * - the group does not exist
-     * - the user does not have permission
-     * - the group is out of scope for the given page
-     * @type {boolean}
-     */
     directLinkedGroupFetchFailed: false,
   };
 }
 
-/** @typedef {ReturnType<initialState>} State */
-
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ directLinkedGroupFetchFailed: boolean }} action
-   */
-  UPDATE_DIRECT_LINKED_GROUP_FETCH_FAILED(state, action) {
+  UPDATE_DIRECT_LINKED_GROUP_FETCH_FAILED(
+    state: State,
+    action: { directLinkedGroupFetchFailed: boolean }
+  ) {
     return {
       directLinkedGroupFetchFailed: action.directLinkedGroupFetchFailed,
     };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ directLinkedGroupId: string }} action
-   */
-  UPDATE_DIRECT_LINKED_GROUP_ID(state, action) {
+  UPDATE_DIRECT_LINKED_GROUP_ID(
+    state: State,
+    action: { directLinkedGroupId: string }
+  ) {
     return {
       directLinkedGroupId: action.directLinkedGroupId,
     };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ directLinkedAnnotationId: string }} action
-   */
-  UPDATE_DIRECT_LINKED_ANNOTATION_ID(state, action) {
+  UPDATE_DIRECT_LINKED_ANNOTATION_ID(
+    state: State,
+    action: { directLinkedAnnotationId: string }
+  ) {
     return {
       directLinkedAnnotationId: action.directLinkedAnnotationId,
     };
@@ -90,23 +86,13 @@ const reducers = {
   },
 };
 
-/**
- * Set the direct linked group id.
- *
- * @param {string} groupId
- */
-function setDirectLinkedGroupId(groupId) {
+function setDirectLinkedGroupId(groupId: string) {
   return makeAction(reducers, 'UPDATE_DIRECT_LINKED_GROUP_ID', {
     directLinkedGroupId: groupId,
   });
 }
 
-/**
- * Set the direct linked annotation's id.
- *
- * @param {string} annId
- */
-function setDirectLinkedAnnotationId(annId) {
+function setDirectLinkedAnnotationId(annId: string) {
   return makeAction(reducers, 'UPDATE_DIRECT_LINKED_ANNOTATION_ID', {
     directLinkedAnnotationId: annId,
   });
@@ -121,9 +107,6 @@ function setDirectLinkedGroupFetchFailed() {
   });
 }
 
-/**
- * Clear the direct linked group fetch failure.
- */
 function clearDirectLinkedGroupFetchFailed() {
   return makeAction(reducers, 'UPDATE_DIRECT_LINKED_GROUP_FETCH_FAILED', {
     directLinkedGroupFetchFailed: false,
@@ -140,18 +123,15 @@ function clearDirectLinkedIds() {
   return makeAction(reducers, 'CLEAR_DIRECT_LINKED_IDS', undefined);
 }
 
-/** @param {State} state */
-function directLinkedAnnotationId(state) {
+function directLinkedAnnotationId(state: State) {
   return state.directLinkedAnnotationId;
 }
 
-/** @param {State} state */
-function directLinkedGroupId(state) {
+function directLinkedGroupId(state: State) {
   return state.directLinkedGroupId;
 }
 
-/** @param {State} state */
-function directLinkedGroupFetchFailed(state) {
+function directLinkedGroupFetchFailed(state: State) {
   return state.directLinkedGroupFetchFailed;
 }
 
