@@ -14,31 +14,25 @@ import { createStoreModule, makeAction } from '../create-store';
  * `persistedDefaults` service.
  */
 
-const initialState = {
-  annotationPrivacy: /** @type {'private'|'shared'|null} */ (null),
-  focusedGroup: /** @type {string|null} */ (null),
+export type State = {
+  annotationPrivacy: 'private' | 'shared' | null;
+  focusedGroup: string | null;
 };
 
-/**
- * @typedef {keyof initialState} Key
- * @typedef {typeof initialState} State
- */
+export type Key = keyof State;
+
+const initialState: State = {
+  annotationPrivacy: null,
+  focusedGroup: null,
+};
 
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ defaultKey: Key, value: string|null }} action
-   */
-  SET_DEFAULT(state, action) {
+  SET_DEFAULT(state: State, action: { defaultKey: Key; value: string | null }) {
     return { [action.defaultKey]: action.value };
   },
 };
 
-/**
- * @param {Key} defaultKey
- * @param {string|null} value
- */
-function setDefault(defaultKey, value) {
+function setDefault(defaultKey: Key, value: string | null) {
   return makeAction(reducers, 'SET_DEFAULT', { defaultKey, value });
 }
 
@@ -46,16 +40,12 @@ function setDefault(defaultKey, value) {
 
 /**
  * Retrieve the state's current value for `defaultKey`.
- *
- * @param {State} state
- * @param {Key} defaultKey
  */
-function getDefault(state, defaultKey) {
+function getDefault(state: State, defaultKey: Key) {
   return state[defaultKey];
 }
 
-/** @param {State} state */
-function getDefaults(state) {
+function getDefaults(state: State) {
   return state;
 }
 
