@@ -1,37 +1,25 @@
-import { createSelector } from 'reselect';
-
-import { createStoreModule, makeAction } from '../create-store';
-import { removeAnnotations } from './annotations';
-
-/**
- * @typedef {import('redux-thunk/extend-redux')} Dummy
- * @typedef {import('../../../types/api').Annotation} Annotation
- */
-
 /**
  * The drafts store provides temporary storage for unsaved edits to new or
  * existing annotations.
  */
+import type { Dispatch } from 'redux';
+import { createSelector } from 'reselect';
 
-const initialState = {
-  /** @type {Draft[]} */
-  drafts: [],
-};
+import type { Annotation } from '../../../types/api';
+import { createStoreModule, makeAction } from '../create-store';
+import { removeAnnotations } from './annotations';
 
-/** @typedef {typeof initialState} State */
-
-/**
- * @typedef {Pick<Annotation, 'id'|'$tag'>} AnnotationID
- */
+type AnnotationID = Pick<Annotation, 'id' | '$tag'>;
 
 /**
  * Edits made to a new or existing annotation by a user.
  *
- * @typedef DraftChanges
- * @prop {boolean} isPrivate
- * @prop {string[]} tags
- * @prop {string} text
  */
+type DraftChanges = {
+  isPrivate: boolean;
+  tags: string[];
+  text: string;
+};
 
 /**
  * An unsaved set of changes to an annotation.
@@ -40,11 +28,12 @@ const initialState = {
  * ({@link DraftChanges}) made by the user.
  */
 export class Draft {
-  /**
-   * @param {AnnotationID} annotation
-   * @param {DraftChanges} changes
-   */
-  constructor(annotation, changes) {
+  annotation: AnnotationID;
+  isPrivate: boolean;
+  tags: string[];
+  text: string;
+
+  constructor(annotation: AnnotationID, changes: DraftChanges) {
     this.annotation = { id: annotation.id, $tag: annotation.$tag };
     this.isPrivate = changes.isPrivate;
     this.tags = changes.tags;
@@ -54,10 +43,8 @@ export class Draft {
    * Returns true if this draft matches a given annotation.
    *
    * Annotations are matched by ID or local tag.
-   *
-   * @param {AnnotationID} annotation
    */
-  match(annotation) {
+  match(annotation: AnnotationID) {
     return (
       (this.annotation.$tag && annotation.$tag === this.annotation.$tag) ||
       (this.annotation.id && annotation.id === this.annotation.id)
@@ -72,32 +59,32 @@ export class Draft {
   }
 }
 
+export type State = {
+  drafts: Draft[];
+};
+
+const initialState: State = {
+  drafts: [],
+};
+
 const reducers = {
   DISCARD_ALL_DRAFTS() {
     return { drafts: [] };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ annotation: AnnotationID }} action
-   */
-  REMOVE_DRAFT(state, action) {
+  REMOVE_DRAFT(state: State, action: { annotation: AnnotationID }) {
     const drafts = state.drafts.filter(draft => {
       return !draft.match(action.annotation);
     });
     return { drafts };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ draft: Draft }} action
-   */
-  UPDATE_DRAFT(state, action) {
+  UPDATE_DRAFT(state: State, action: { draft: Draft }) {
     // removes a matching existing draft, then adds
     const drafts = state.drafts.filter(draft => {
       return !draft.match(action.draft.annotation);
     });
-    drafts.push(action.draft); // push ok since its a copy
+    drafts.push(action.draft); // push ok since it's a copy
     return { drafts };
   },
 };
@@ -105,11 +92,8 @@ const reducers = {
 /**
  * Create or update the draft version for a given annotation by
  * replacing any existing draft or simply creating a new one.
- *
- * @param {AnnotationID} annotation
- * @param {DraftChanges} changes
  */
-function createDraft(annotation, changes) {
+function createDraft(annotation: AnnotationID, changes: DraftChanges) {
   return makeAction(reducers, 'UPDATE_DRAFT', {
     draft: new Draft(annotation, changes),
   });
@@ -121,11 +105,7 @@ function createDraft(annotation, changes) {
  * An empty draft has no text and no reference tags.
  */
 function deleteNewAndEmptyDrafts() {
-  /**
-   * @param {import('redux').Dispatch} dispatch
-   * @param {() => { drafts: State }} getState
-   */
-  return (dispatch, getState) => {
+  return (dispatch: Dispatch, getState: () => { drafts: State }) => {
     const newDrafts = getState().drafts.drafts.filter(draft => {
       return (
         !draft.annotation.id &&
@@ -149,30 +129,23 @@ function discardAllDrafts() {
 
 /**
  * Remove the draft version of an annotation.
- *
- * @param {AnnotationID} annotation
  */
-function removeDraft(annotation) {
+function removeDraft(annotation: AnnotationID) {
   return makeAction(reducers, 'REMOVE_DRAFT', { annotation });
 }
 
 /**
  * Returns the number of drafts - both unsaved new annotations, and unsaved
  * edits to saved annotations - currently stored.
- *
- * @param {State} state
  */
-function countDrafts(state) {
+function countDrafts(state: State) {
   return state.drafts.length;
 }
 
 /**
  * Retrieve the draft changes for an annotation.
- *
- * @param {State} state
- * @param {AnnotationID} annotation
  */
-function getDraft(state, annotation) {
+function getDraft(state: State, annotation: AnnotationID) {
   const drafts = state.drafts;
   for (let i = 0; i < drafts.length; i++) {
     const draft = drafts[i];
@@ -187,11 +160,8 @@ function getDraft(state, annotation) {
 /**
  * Returns the draft changes for an annotation, or null if no draft exists
  * or the draft is empty.
- *
- * @param {State} state
- * @param {AnnotationID} annotation
  */
-function getDraftIfNotEmpty(state, annotation) {
+function getDraftIfNotEmpty(state: State, annotation: AnnotationID) {
   const draft = getDraft(state, annotation);
   if (!draft) {
     return null;
@@ -203,9 +173,9 @@ function getDraftIfNotEmpty(state, annotation) {
  * Returns a list of draft annotations which have no id.
  */
 const unsavedAnnotations = createSelector(
-  /** @param {State} state */
-  state => state.drafts,
-  drafts => drafts.filter(d => !d.annotation.id).map(d => d.annotation)
+  (state: State) => state.drafts,
+  (drafts: Draft[]) =>
+    drafts.filter(d => !d.annotation.id).map(d => d.annotation)
 );
 
 export const draftsModule = createStoreModule(initialState, {
