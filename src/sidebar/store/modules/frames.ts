@@ -5,49 +5,53 @@ import {
 } from 'reselect';
 import shallowEqual from 'shallowequal';
 
+import type {
+  ContentInfoConfig,
+  DocumentMetadata,
+  SegmentInfo,
+} from '../../../types/annotator';
 import { createStoreModule, makeAction } from '../create-store';
 
-/**
- * @typedef {import('../../../types/annotator').ContentInfoConfig} ContentInfoConfig
- * @typedef {import('../../../types/annotator').DocumentMetadata} DocumentMetadata
- * @typedef {import('../../../types/annotator').SegmentInfo} SegmentInfo
- */
+export type Frame = {
+  /**
+   * Sub-frames will all have a id (frame identifier) set. The main frame's id
+   * is always `null`
+   */
+  id: string | null;
 
-/**
- * @typedef Frame
- * @prop {string|null} id
- *   - Sub-frames will all have a id (frame identifier) set. The main frame's id is always `null`
- * @prop {DocumentMetadata} metadata - Metadata about the document currently loaded in this frame
- * @prop {string} uri - Current primary URI of the document being displayed
- * @prop {boolean} [isAnnotationFetchComplete]
- * @prop {boolean} persistent - Should this frame be retained in the sidebar
- *   if the guest disconnects?
- * @prop {SegmentInfo} [segment] - Information about the section of a document
- *   that is currently loaded. This is for content such as EPUBs, where the
- *   content displayed in a guest frame is only part of the whole document.
- */
+  /** Metadata about the document currently loaded in this frame */
+  metadata: DocumentMetadata;
+  /** Current primary URI of the document being displayed */
+  uri: string;
+  isAnnotationFetchComplete?: boolean;
+  /** Should this frame be retained in the sidebar if the guest disconnects? */
+  persistent: boolean;
 
-const initialState = {
-  /** @type {Frame[]} */
-  frames: [],
+  /**
+   * Information about the section of a document that is currently loaded.
+   * This is for content such as EPUBs, where the content displayed in a guest
+   * frame is only part of the whole document.
+   */
+  segment?: SegmentInfo;
+};
+
+export type State = {
+  frames: Frame[];
 
   /**
    * Data for the content information banner shown above the content in the main
    * guest frame.
-   *
-   * @type {ContentInfoConfig|null}
    */
+  contentInfo: ContentInfoConfig | null;
+};
+
+const initialState: State = {
+  frames: [],
   contentInfo: null,
 };
 
-/** @typedef {typeof initialState} State */
-
 const reducers = {
-  /**
-   * @param {State} state
-   * @param {{ frame: Frame }} action
-   */
-  CONNECT_FRAME(state, action) {
+  CONNECT_FRAME(state: State, action: { frame: Frame }) {
     const frameIndex = state.frames.findIndex(
       frame => frame.id === action.frame.id
     );
@@ -60,20 +64,15 @@ const reducers = {
     return { frames: newFrames };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ frame: Frame }} action
-   */
-  DESTROY_FRAME(state, action) {
+  DESTROY_FRAME(state: State, action: { frame: Frame }) {
     const frames = state.frames.filter(f => f !== action.frame);
     return { frames };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ uri: string, isAnnotationFetchComplete: boolean }} action
-   */
-  UPDATE_FRAME_ANNOTATION_FETCH_STATUS(state, action) {
+  UPDATE_FRAME_ANNOTATION_FETCH_STATUS(
+    state: State,
+    action: { uri: string; isAnnotationFetchComplete: boolean }
+  ) {
     const frames = state.frames.map(frame => {
       const match = frame.uri && frame.uri === action.uri;
       if (match) {
@@ -87,11 +86,7 @@ const reducers = {
     return { frames };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ info: ContentInfoConfig }} action
-   */
-  SET_CONTENT_INFO(state, action) {
+  SET_CONTENT_INFO(state: State, action: { info: ContentInfoConfig }) {
     return { contentInfo: action.info };
   },
 };
@@ -101,46 +96,39 @@ const reducers = {
  *
  * If a frame exists with the same ID as `frame` it is replaced, otherwise
  * a new frame is added.
- *
- * @param {Frame} frame
  */
-function connectFrame(frame) {
+function connectFrame(frame: Frame) {
   return makeAction(reducers, 'CONNECT_FRAME', { frame });
 }
 
 /**
  * Remove a frame from the list of connected frames.
- *
- * @param {Frame} frame
  */
-function destroyFrame(frame) {
+function destroyFrame(frame: Frame) {
   return makeAction(reducers, 'DESTROY_FRAME', { frame });
 }
 
 /**
  * Update the `isAnnotationFetchComplete` flag of the frame.
- *
- * @param {string} uri
- * @param {boolean} isFetchComplete
  */
-function updateFrameAnnotationFetchStatus(uri, isFetchComplete) {
+function updateFrameAnnotationFetchStatus(
+  uri: string,
+  isFetchComplete: boolean
+) {
   return makeAction(reducers, 'UPDATE_FRAME_ANNOTATION_FETCH_STATUS', {
     uri,
     isAnnotationFetchComplete: isFetchComplete,
   });
 }
 
-/** @param {ContentInfoConfig} info */
-function setContentInfo(info) {
+function setContentInfo(info: ContentInfoConfig) {
   return makeAction(reducers, 'SET_CONTENT_INFO', { info });
 }
 
 /**
  * Return the list of frames currently connected to the sidebar app.
- *
- * @param {State} state
  */
-function frames(state) {
+function frames(state: State) {
   return state.frames;
 }
 
@@ -155,18 +143,14 @@ function frames(state) {
  * This may be `null` during startup.
  */
 const mainFrame = createSelector(
-  /** @param {State} state */
-  state => state.frames,
+  (state: State) => state.frames,
 
   // Sub-frames will all have a "frame identifier" set. The main frame is the
   // one with a `null` id.
   frames => frames.find(f => !f.id) || null
 );
 
-/**
- * @param {Frame} frame
- */
-function searchUrisForFrame(frame) {
+function searchUrisForFrame(frame: Frame): string[] {
   let uris = [frame.uri];
 
   if (frame.metadata && frame.metadata.documentFingerprint) {
@@ -197,17 +181,15 @@ const createShallowEqualSelector = createSelectorCreator(
  * values of the array change (are not shallow-equal).
  */
 const searchUris = createShallowEqualSelector(
-  /** @param {State} state */
-  state =>
-    state.frames.reduce(
+  (state: State) =>
+    state.frames.reduce<string[]>(
       (uris, frame) => uris.concat(searchUrisForFrame(frame)),
-      /** @type {string[]} */ ([])
+      []
     ),
   uris => uris
 );
 
-/** @param {State} state */
-function getContentInfo(state) {
+function getContentInfo(state: State) {
   return state.contentInfo;
 }
 
