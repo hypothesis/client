@@ -2,51 +2,46 @@
  * Store module which tracks activity happening in the application that may
  * need to be reflected in the UI.
  */
+import type { Annotation } from '../../../types/api';
 import { createStoreModule, makeAction } from '../create-store';
 
-/** @typedef {import('../../../types/api').Annotation} Annotation */
-
-const initialState = {
+export type State = {
   /**
    * Annotation `$tag`s that correspond to annotations with active API requests
-   *
-   * @type {string[]}
    */
-  activeAnnotationSaveRequests: [],
-  /**
-   * The number of API requests that have started and not yet completed.
-   */
-  activeApiRequests: 0,
-  /**
-   * The number of annotation fetches that have started and not yet completed.
-   */
-  activeAnnotationFetches: 0,
-  /**
-   * Have annotations ever been fetched?
-   */
-  hasFetchedAnnotations: false,
+  activeAnnotationSaveRequests: string[];
+
+  /** The number of API requests that have started and not yet completed. */
+  activeApiRequests: number;
+  /** The number of annotation fetches that have started and not yet completed. */
+  activeAnnotationFetches: number;
+  /** Have annotations ever been fetched? */
+  hasFetchedAnnotations: boolean;
+
   /**
    * The number of total annotation results the service reported as
    * matching the most recent load/search request
-   *
-   * @type {number|null}
    */
+  annotationResultCount: number | null;
+};
+
+const initialState: State = {
+  activeAnnotationSaveRequests: [],
+  activeApiRequests: 0,
+  activeAnnotationFetches: 0,
+  hasFetchedAnnotations: false,
   annotationResultCount: null,
 };
 
-/** @typedef {typeof initialState} State */
-
 const reducers = {
-  /** @param {State} state */
-  API_REQUEST_STARTED(state) {
+  API_REQUEST_STARTED(state: State) {
     return {
       ...state,
       activeApiRequests: state.activeApiRequests + 1,
     };
   },
 
-  /** @param {State} state */
-  API_REQUEST_FINISHED(state) {
+  API_REQUEST_FINISHED(state: State) {
     if (state.activeApiRequests === 0) {
       throw new Error(
         'API_REQUEST_FINISHED action when no requests were active'
@@ -59,12 +54,8 @@ const reducers = {
     };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ annotation: Annotation }} action
-   */
-  ANNOTATION_SAVE_STARTED(state, action) {
-    let addToStarted = [];
+  ANNOTATION_SAVE_STARTED(state: State, action: { annotation: Annotation }) {
+    const addToStarted = [];
     if (
       action.annotation.$tag &&
       !state.activeAnnotationSaveRequests.includes(action.annotation.$tag)
@@ -79,11 +70,7 @@ const reducers = {
     };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ annotation: Annotation }} action
-   */
-  ANNOTATION_SAVE_FINISHED(state, action) {
+  ANNOTATION_SAVE_FINISHED(state: State, action: { annotation: Annotation }) {
     const updatedSaves = state.activeAnnotationSaveRequests.filter(
       $tag => $tag !== action.annotation.$tag
     );
@@ -93,16 +80,14 @@ const reducers = {
     };
   },
 
-  /** @param {State} state */
-  ANNOTATION_FETCH_STARTED(state) {
+  ANNOTATION_FETCH_STARTED(state: State) {
     return {
       ...state,
       activeAnnotationFetches: state.activeAnnotationFetches + 1,
     };
   },
 
-  /** @param {State} state */
-  ANNOTATION_FETCH_FINISHED(state) {
+  ANNOTATION_FETCH_FINISHED(state: State) {
     if (state.activeAnnotationFetches === 0) {
       throw new Error(
         'ANNOTATION_FETCH_FINISHED action when no annotation fetches were active'
@@ -116,11 +101,7 @@ const reducers = {
     };
   },
 
-  /**
-   * @param {State} state
-   * @param {{ resultCount: number }} action
-   */
-  SET_ANNOTATION_RESULT_COUNT(state, action) {
+  SET_ANNOTATION_RESULT_COUNT(state: State, action: { resultCount: number }) {
     return {
       annotationResultCount: action.resultCount,
     };
@@ -135,17 +116,11 @@ function annotationFetchFinished() {
   return makeAction(reducers, 'ANNOTATION_FETCH_FINISHED', undefined);
 }
 
-/**
- * @param {Annotation} annotation — annotation object with a `$tag` property
- */
-function annotationSaveStarted(annotation) {
+function annotationSaveStarted(annotation: Annotation) {
   return makeAction(reducers, 'ANNOTATION_SAVE_STARTED', { annotation });
 }
 
-/**
- * @param {Annotation} annotation — annotation object with a `$tag` property
- */
-function annotationSaveFinished(annotation) {
+function annotationSaveFinished(annotation: Annotation) {
   return makeAction(reducers, 'ANNOTATION_SAVE_FINISHED', { annotation });
 }
 
@@ -157,39 +132,32 @@ function apiRequestFinished() {
   return makeAction(reducers, 'API_REQUEST_FINISHED', undefined);
 }
 
-/** @param {number} resultCount */
-function setAnnotationResultCount(resultCount) {
+function setAnnotationResultCount(resultCount: number) {
   return makeAction(reducers, 'SET_ANNOTATION_RESULT_COUNT', { resultCount });
 }
 
 /** Selectors */
 
-/** @param {State} state */
-function annotationResultCount(state) {
+function annotationResultCount(state: State) {
   return state.annotationResultCount;
 }
 
-/** @param {State} state */
-function hasFetchedAnnotations(state) {
+function hasFetchedAnnotations(state: State) {
   return state.hasFetchedAnnotations;
 }
 
 /**
  * Return true when annotations are actively being fetched.
- *
- * @param {State} state
  */
-function isFetchingAnnotations(state) {
+function isFetchingAnnotations(state: State) {
   return state.activeAnnotationFetches > 0;
 }
 
 /**
  * Return true when any activity is happening in the app that needs to complete
  * before the UI is ready for interactivity with annotations.
- *
- * @param {State} state
  */
-function isLoading(state) {
+function isLoading(state: State) {
   return state.activeApiRequests > 0 || !state.hasFetchedAnnotations;
 }
 
@@ -197,11 +165,8 @@ function isLoading(state) {
  * Return `true` if `$tag` exists in the array of annotation `$tag`s that
  * have in-flight save requests, i.e. the annotation in question is actively
  * being saved to a remote service.
- *
- * @param {State} state
- * @param {Annotation} annotation
  */
-function isSavingAnnotation(state, annotation) {
+function isSavingAnnotation(state: State, annotation: Annotation) {
   if (!annotation.$tag) {
     return false;
   }
