@@ -39,7 +39,7 @@ function ToastBadge({
   return (
     <div
       className={classnames(
-        'flex items-center gap-x-1 py-1 px-2 rounded',
+        'flex items-center gap-x-1 py-1 px-2 rounded-[4px]',
         'bg-green-success/10 animate-pulse-fade-out',
         classes
       )}

@@ -31,7 +31,7 @@ function ToolbarButton({ icon: Icon, ...buttonProps }: ToolbarButtonProps) {
   return (
     <Button
       classes={classnames(
-        'justify-center rounded-px',
+        'justify-center rounded-[4px]',
         'w-[30px] h-[30px]',
         'shadow border bg-white text-grey-6 hover:text-grey-9'
       )}

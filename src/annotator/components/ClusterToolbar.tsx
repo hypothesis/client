@@ -37,7 +37,7 @@ function ClusterStyleControl({
     <div className="space-y-2">
       <div className="flex items-center gap-x-2 text-annotator-base">
         <div
-          className="grow text-color-text px-2 py-1 rounded"
+          className="grow text-color-text px-2 py-1 rounded-[4px]"
           style={{
             backgroundColor: highlightStyles[appliedStyleName].color,
           }}
