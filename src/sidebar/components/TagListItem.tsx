@@ -22,7 +22,7 @@ export default function TagListItem({
   tag,
 }: TagListItemProps) {
   return (
-    <li className="flex items-center border rounded-sm bg-grey-0">
+    <li className="flex items-center border rounded bg-grey-0">
       <div className="grow px-1.5 py-1 touch:p-2">
         {href ? (
           <Link
@@ -54,7 +54,7 @@ export default function TagListItem({
             // Rounded border to match container edges and make keyboard focus
             // ring shape conform. Turn off left side
             // border radius to maintain a straight dividing line
-            'border-l rounded-sm rounded-l-none',
+            'border-l rounded rounded-l-none',
             'text-grey-6 hover:text-color-text hover:bg-grey-2',
             // Emulates transitions on *Button shared component styling
             'transition-colors duration-200',

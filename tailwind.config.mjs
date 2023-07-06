@@ -26,12 +26,8 @@ export default {
         'slide-in-from-right': 'slide-in-from-right 0.3s forwards ease-in-out',
       },
       borderRadius: {
-        // Tailwind provides a default set of border-radius utility styles
-        // in rem units. Add some values for places where border radius needs
-        // to be a fixed size and not scale with changes to root font size
-        // example: bucket bar indicator buttons
-        'px-sm': '2px',
-        px: '4px',
+        // Equivalent to tailwind default `rounded-sm` size
+        DEFAULT: '0.125rem',
       },
       boxShadow: {
         'adder-toolbar': '0px 2px 10px 0px rgba(0, 0, 0, 0.25)',
@@ -232,8 +228,8 @@ export default {
         },
         // Tailwind does not provide this specific break utility: https://tailwindcss.com/docs/word-break
         '.break-anywhere': {
-          'overflow-wrap': 'anywhere'
-        }
+          'overflow-wrap': 'anywhere',
+        },
       });
       addComponents({
         // Add a custom class to set all properties to initial values. Used

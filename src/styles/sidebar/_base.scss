@@ -17,7 +17,7 @@
     // Ensure the tag has width in order for :focus styling to render correctly.
     @apply inline-block;
     // Give links a radius to allow :focus styling to appear similar to that of buttons
-    @apply rounded-sm;
+    @apply rounded;
     @apply text-brand no-underline;
   }
 
