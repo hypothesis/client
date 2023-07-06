@@ -194,7 +194,7 @@ export default function Menu({
         aria-haspopup={true}
         className={classnames(
           'focus-visible-ring',
-          'flex items-center justify-center rounded-sm transition-colors',
+          'flex items-center justify-center rounded transition-colors',
           {
             'text-grey-7 hover:text-grey-9': !isOpen,
             'text-brand': isOpen,
