@@ -19,7 +19,7 @@ function NumberIcon({ badgeCount }: { badgeCount: number }) {
   return (
     <span
       className={classnames(
-        'rounded px-1 py-0.5',
+        'rounded-[4px] px-1 py-0.5',
         // The background color is inherited from the current text color in
         // the containing button and will vary depending on hover state.
         'bg-current'
@@ -238,7 +238,7 @@ export default function AdderToolbar({
         // default border values from Tailwind and have to be explicit about all
         // border attributes.
         'border border-solid border-grey-3',
-        'absolute select-none bg-white rounded shadow-adder-toolbar',
+        'absolute select-none bg-white rounded-[4px] shadow-adder-toolbar',
         // Start at a very low opacity as we're going to fade in in the animation
         'opacity-5',
         {

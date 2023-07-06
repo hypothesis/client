@@ -225,7 +225,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
       className={classnames(
         // Allow buttons to wrap to second line if necessary.
         'flex flex-wrap w-full items-center',
-        'p-1 border-x border-t rounded-t bg-white',
+        'p-1 border-x border-t rounded-t-[4px] bg-white',
         // For touch interfaces, allow height to scale to larger button targets.
         // Don't wrap buttons but instead scroll horizontally. Add bottom
         // padding to provide some space for scrollbar.
