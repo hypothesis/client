@@ -33,9 +33,9 @@ export type FilterOption = {
 /**
  * Valid/recognized filters
  */
-type FilterKey = 'user';
+export type FilterKey = 'user';
 
-type Filters = Partial<Record<FilterKey, FilterOption | undefined>>;
+export type Filters = Partial<Record<FilterKey, FilterOption | undefined>>;
 
 type FocusState = {
   active: boolean;
