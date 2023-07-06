@@ -336,3 +336,16 @@ export type DocumentInfo = {
    */
   persistent: boolean;
 };
+
+/**
+ * `auto`: The client will decide if side-by-side is enabled. If enabled, it
+ *         will apply some heuristics to determine how the content is affected.
+ *         This is default value.
+ * `manual`: The host app wants to manually take full control of side-by-side,
+ *           effectively disabling the logic in client.
+ */
+export type SideBySideMode = 'auto' | 'manual';
+
+export type SideBySideOptions = {
+  mode: SideBySideMode;
+};

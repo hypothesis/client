@@ -5,6 +5,7 @@ import type {
   FeatureFlags,
   Integration,
   SidebarLayout,
+  SideBySideOptions,
 } from '../../types/annotator';
 import type { Selector } from '../../types/api';
 import { anchor, describe } from '../anchoring/html';
@@ -36,8 +37,9 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
   private _htmlMeta: HTMLMetadata;
   private _prevURI: string;
 
-  /** Whether to attempt to resize the document to fit alongside sidebar. */
-  private _sideBySideEnabled: boolean;
+  /** Controls how we resize the document to fit alongside sidebar. */
+  private _sideBySideOptions: SideBySideOptions;
+  private _sideBySideFlagEnabled: boolean;
 
   /**
    * Whether the document is currently being resized to fit alongside an
@@ -53,9 +55,11 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
   constructor({
     features,
     container = document.body,
+    sideBySideOptions,
   }: {
     features: FeatureFlags;
     container?: HTMLElement;
+    sideBySideOptions?: SideBySideOptions;
   }) {
     super();
 
@@ -65,7 +69,9 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     this._htmlMeta = new HTMLMetadata();
     this._prevURI = this._htmlMeta.uri();
 
-    this._sideBySideEnabled = this.features.flagEnabled('html_side_by_side');
+    this._sideBySideFlagEnabled =
+      this.features.flagEnabled('html_side_by_side');
+    this._sideBySideOptions = sideBySideOptions ?? { mode: 'auto' };
     this._sideBySideActive = false;
     this._lastLayout = null;
 
@@ -92,9 +98,9 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     });
 
     this._flagsChanged = () => {
-      const sideBySide = features.flagEnabled('html_side_by_side');
-      if (sideBySide !== this._sideBySideEnabled) {
-        this._sideBySideEnabled = sideBySide;
+      const sideBySideEnabled = features.flagEnabled('html_side_by_side');
+      if (sideBySideEnabled !== this._sideBySideFlagEnabled) {
+        this._sideBySideFlagEnabled = sideBySideEnabled;
 
         // `fitSideBySide` is normally called by Guest when the sidebar layout
         // changes. When the feature flag changes, we need to re-run the method.
@@ -156,7 +162,8 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
 
     const maximumWidthToFit = window.innerWidth - layout.width;
     const active =
-      this._sideBySideEnabled &&
+      this._sideBySideFlagEnabled &&
+      this._sideBySideOptions.mode === 'auto' &&
       layout.expanded &&
       maximumWidthToFit >= MIN_HTML_WIDTH;
 

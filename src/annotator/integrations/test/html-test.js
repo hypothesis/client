@@ -64,8 +64,8 @@ describe('HTMLIntegration', () => {
     $imports.$restore();
   });
 
-  function createIntegration() {
-    return new HTMLIntegration({ features });
+  function createIntegration(sideBySideOptions) {
+    return new HTMLIntegration({ features, sideBySideOptions });
   }
 
   it('implements `anchor` and `destroy` using HTML anchoring', async () => {
@@ -378,6 +378,18 @@ describe('HTMLIntegration', () => {
       assert.isTrue(isSideBySideActive());
 
       features.update({ html_side_by_side: false });
+      assert.isFalse(isSideBySideActive());
+    });
+
+    it('manual side-by-side is not changed by enabled feature flag', () => {
+      features.update({ html_side_by_side: true });
+      const integration = createIntegration({ mode: 'manual' });
+
+      integration.fitSideBySide({ expanded: true, width: sidebarWidth });
+      assert.isFalse(isSideBySideActive());
+
+      // Even if the feature flag is enabled, side-by-side stays disabled/manual
+      features.update({ html_side_by_side: true });
       assert.isFalse(isSideBySideActive());
     });
   });
