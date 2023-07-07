@@ -624,6 +624,10 @@ describe('Guest', () => {
       fakeSidebarFrame?.remove();
     });
 
+    function sidebarClosed() {
+      return sidebarRPC().call.calledWith('closeSidebar');
+    }
+
     context('clicks/taps on the document', () => {
       const simulateClick = (element = rootElement, clientX = 0) =>
         element.dispatchEvent(
@@ -632,18 +636,18 @@ describe('Guest', () => {
 
       it('hides sidebar', () => {
         simulateClick();
-        assert.calledWith(sidebarRPC().call, 'closeSidebar');
+        assert.isTrue(sidebarClosed());
       });
 
       it('does not hide sidebar if target is a highlight', () => {
         simulateClick(fakeHighlight);
-        assert.notCalled(sidebarRPC().call);
+        assert.isFalse(sidebarClosed());
       });
 
       it('does not hide sidebar if side-by-side mode is active', () => {
         fakeIntegration.sideBySideActive.returns(true);
         simulateClick();
-        assert.notCalled(sidebarRPC().call);
+        assert.isFalse(sidebarClosed());
       });
 
       it('does not hide sidebar if event is within the bounds of the sidebar', () => {
@@ -653,7 +657,7 @@ describe('Guest', () => {
         // Simulate click on the left edge of the sidebar.
         simulateClick(rootElement, window.innerWidth - 295);
 
-        assert.notCalled(sidebarRPC().call);
+        assert.isFalse(sidebarClosed());
       });
     });
 
