@@ -308,7 +308,19 @@ export class VitalSourceContentIntegration
   }
 
   destroy() {
-    this._textLayer?.destroy();
+    if (this._textLayer) {
+      this._textLayer.destroy();
+
+      // Turn off side-by-side for PDF books. For EPUBs this is handled by
+      // `this._htmlIntegration.destroy()`.
+      this.fitSideBySide({
+        // Dummy layout. Setting `expanded: false` disables side-by-side mode.
+        expanded: false,
+        height: window.innerHeight,
+        width: 0,
+        toolbarWidth: 0,
+      });
+    }
     this._listeners.removeAll();
     this._htmlIntegration.destroy();
   }

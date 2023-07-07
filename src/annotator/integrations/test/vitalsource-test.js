@@ -275,15 +275,28 @@ describe('annotator/integrations/vitalsource', () => {
   }
 
   describe('VitalSourceContentIntegration', () => {
+    // List of active integrations.
     let integrations;
+
     let fakeBookElement;
 
+    /** Create a new integration and add it to the active list. */
     function createIntegration() {
       const integration = new VitalSourceContentIntegration(document.body, {
         bookElement: fakeBookElement,
       });
       integrations.push(integration);
       return integration;
+    }
+
+    /** Destroy an integration and remove it from the active list. */
+    function destroyIntegration(integration) {
+      const idx = integrations.indexOf(integration);
+      if (idx === -1) {
+        throw new Error('Integration is not in list of active integrations');
+      }
+      integrations.splice(idx, 1);
+      integration.destroy();
     }
 
     beforeEach(() => {
@@ -683,6 +696,18 @@ describe('annotator/integrations/vitalsource', () => {
         integration.destroy();
 
         assert.calledOnce(fakeImageTextLayer.destroy);
+      });
+
+      it('disables side-by-side mode when destroyed', () => {
+        createPageImageAndData();
+        const integration = createIntegration();
+
+        integration.fitSideBySide({ expanded: true, width: 100 });
+        assert.isTrue(integration.sideBySideActive());
+
+        destroyIntegration(integration);
+
+        assert.isFalse(integration.sideBySideActive());
       });
 
       context('when side-by-side mode is toggled', () => {
