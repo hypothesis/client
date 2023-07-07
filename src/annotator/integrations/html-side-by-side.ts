@@ -1,3 +1,4 @@
+import type { SideBySideMode } from '../../types/annotator';
 import { rectContains, rectIntersects } from '../util/geometry';
 import { nodeIsElement, nodeIsText } from '../util/node';
 
@@ -227,4 +228,8 @@ export function preserveScrollPosition(
   scrollRoot.scrollTop += scrollDelta;
 
   return scrollDelta;
+}
+
+export function isSideBySideMode(mode: unknown): mode is SideBySideMode {
+  return typeof mode === 'string' && ['auto', 'manual'].includes(mode);
 }

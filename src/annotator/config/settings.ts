@@ -1,6 +1,9 @@
 import { parseJsonConfig } from '../../boot/parse-json-config';
 import { hasOwn } from '../../shared/has-own';
+import { isObject } from '../../shared/is-object';
 import { toBoolean } from '../../shared/type-coercions';
+import type { SideBySideOptions } from '../../types/annotator';
+import { isSideBySideMode } from '../integrations/html-side-by-side';
 import { configFuncSettingsFrom } from './config-func-settings-from';
 import { urlFromLinkTag } from './url-from-link-tag';
 
@@ -14,6 +17,7 @@ export type SettingsGetters = {
   notebookAppUrl: string;
   profileAppUrl: string;
   hostPageSetting: (name: string) => unknown;
+  sideBySide: SideBySideOptions;
 };
 
 /**
@@ -39,7 +43,7 @@ export function settingsFrom(window_: Window): SettingsGetters {
    * Return the `#annotations:*` ID from the given URL's fragment.
    *
    * If the URL contains a `#annotations:<ANNOTATION_ID>` fragment then return
-   * the annotation ID extracted from the fragment. Otherwise return `null`.
+   * the annotation ID extracted from the fragment. Otherwise, return `null`.
    *
    * @return The extracted ID, or null.
    */
@@ -99,16 +103,27 @@ export function settingsFrom(window_: Window): SettingsGetters {
     }
   }
 
+  function sideBySide(): SideBySideOptions {
+    const value = hostPageSetting('sideBySide');
+
+    return {
+      mode:
+        !isObject(value) || !('mode' in value) || !isSideBySideMode(value.mode)
+          ? 'auto'
+          : value.mode,
+    };
+  }
+
   /**
    * Return the config.query setting from the host page or from the URL.
    *
    * If the host page contains a js-hypothesis-config script containing a
    * query setting then return that.
    *
-   * Otherwise if the host page's URL has a `#annotations:query:*` (or
+   * Otherwise, if the host page's URL has a `#annotations:query:*` (or
    * `#annotations:q:*`) fragment then return the query value from that.
    *
-   * Otherwise return null.
+   * Otherwise, return null.
    *
    * @return The config.query setting, or null.
    */
@@ -177,6 +192,9 @@ export function settingsFrom(window_: Window): SettingsGetters {
     },
     get query() {
       return query();
+    },
+    get sideBySide() {
+      return sideBySide();
     },
     hostPageSetting,
   };

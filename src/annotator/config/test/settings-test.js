@@ -395,4 +395,47 @@ describe('annotator/config/settingsFrom', () => {
       });
     });
   });
+
+  describe('#sideBySide', () => {
+    [
+      {
+        input: 'foo',
+        expectedResult: { mode: 'auto' },
+      },
+      {
+        input: {},
+        expectedResult: { mode: 'auto' },
+      },
+      {
+        input: { mode: 'invalid' },
+        expectedResult: { mode: 'auto' },
+      },
+      {
+        input: { mode: 'auto' },
+        expectedResult: { mode: 'auto' },
+      },
+      {
+        input: { mode: 'manual' },
+        expectedResult: { mode: 'manual' },
+      },
+    ].forEach(({ input, expectedResult }) => {
+      it('parses config from script', () => {
+        fakeParseJsonConfig.returns({
+          sideBySide: input,
+        });
+        const settings = settingsFrom(fakeWindow());
+
+        assert.deepEqual(settings.sideBySide, expectedResult);
+      });
+
+      it('parses config from window', () => {
+        fakeConfigFuncSettingsFrom.returns({
+          sideBySide: input,
+        });
+        const settings = settingsFrom(fakeWindow());
+
+        assert.deepEqual(settings.sideBySide, expectedResult);
+      });
+    });
+  });
 });

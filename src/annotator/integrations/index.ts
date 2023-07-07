@@ -20,5 +20,8 @@ export function createIntegration(annotator: Annotator): Integration {
     return new VitalSourceContentIntegration(document.body);
   }
 
-  return new HTMLIntegration({ features: annotator.features });
+  return new HTMLIntegration({
+    features: annotator.features,
+    sideBySideOptions: annotator.sideBySide,
+  });
 }

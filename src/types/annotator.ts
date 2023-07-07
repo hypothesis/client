@@ -134,6 +134,7 @@ export type Annotator = {
   anchors: Anchor[];
   anchor(ann: AnnotationData): Promise<Anchor[]>;
   features: FeatureFlags;
+  sideBySide?: SideBySideOptions;
 };
 
 /**
