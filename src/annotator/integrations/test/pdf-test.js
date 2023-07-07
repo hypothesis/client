@@ -244,6 +244,19 @@ describe('annotator/integrations/pdf', () => {
           )
         );
       });
+
+      it('undoes side-by-side layout changes', () => {
+        pdfIntegration = createPDFIntegration();
+        pdfIntegration.fitSideBySide({
+          expanded: true,
+          width: 100,
+        });
+        assert.isTrue(pdfIntegration.sideBySideActive());
+
+        pdfIntegration.destroy();
+
+        assert.isFalse(pdfIntegration.sideBySideActive());
+      });
     });
 
     function getBanner() {

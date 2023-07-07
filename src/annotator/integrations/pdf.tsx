@@ -167,6 +167,14 @@ export class PDFIntegration extends TinyEmitter implements Integration {
   }
 
   destroy() {
+    this.fitSideBySide({
+      // Dummy layout that will cause side-by-side mode to be undone.
+      expanded: false,
+      width: 0,
+      toolbarWidth: 0,
+      height: window.innerHeight,
+    });
+
     this._listeners.removeAll();
     this._pdfViewer.viewer.classList.remove('has-transparent-text-layer');
     this._observer.disconnect();
