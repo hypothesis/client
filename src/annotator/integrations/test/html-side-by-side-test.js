@@ -1,5 +1,6 @@
 import {
   guessMainContentArea,
+  isSideBySideMode,
   preserveScrollPosition,
 } from '../html-side-by-side';
 
@@ -252,6 +253,21 @@ the fighting was.`;
 
       assert.equal(delta, 0);
       assert.equal(scrollRoot.scrollTop, initialScrollTop);
+    });
+  });
+
+  describe('isSideBySideMode', () => {
+    [
+      { mode: 'auto', expectedResult: true },
+      { mode: 'manual', expectedResult: true },
+      { mode: 'invalid', expectedResult: false },
+      { mode: 123, expectedResult: false },
+      { mode: {}, expectedResult: false },
+      { mode: false, expectedResult: false },
+    ].forEach(({ mode, expectedResult }) => {
+      it('returns expected result for different modes', () => {
+        assert.equal(expectedResult, isSideBySideMode(mode));
+      });
     });
   });
 });

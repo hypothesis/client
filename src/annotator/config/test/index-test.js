@@ -16,6 +16,7 @@ describe('annotator/config/index', () => {
       showHighlights: 'fakeValue',
       sidebarAppUrl: 'fakeValue',
       query: 'fakeValue',
+      sideBySide: { mode: 'auto' },
     });
     fakeIsBrowserExtension = sinon.stub();
 
@@ -96,6 +97,7 @@ describe('annotator/config/index', () => {
             subFrameIdentifier: 'fakeValue',
             theme: null,
             usernameUrl: null,
+            sideBySide: { mode: 'auto' },
           },
           config
         );
@@ -130,6 +132,7 @@ describe('annotator/config/index', () => {
             subFrameIdentifier: 'fakeValue',
             theme: 'fakeValue',
             usernameUrl: 'fakeValue',
+            sideBySide: { mode: 'auto' },
           },
           config
         );
@@ -227,7 +230,12 @@ describe('annotator/config/index', () => {
     [
       {
         app: 'annotator',
-        expectedKeys: ['clientUrl', 'contentInfoBanner', 'subFrameIdentifier'],
+        expectedKeys: [
+          'clientUrl',
+          'contentInfoBanner',
+          'subFrameIdentifier',
+          'sideBySide',
+        ],
       },
       {
         app: 'sidebar',

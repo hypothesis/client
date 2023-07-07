@@ -450,6 +450,39 @@ loads.
                               // relative from the receiving iframe.
     }
 
+.. option:: sideBySide
+
+  ``Object``. This option lets you customize how side-by-side mode behaves.
+
+  .. note::
+
+    Side-by-side mode allows the space used by the web page's main content
+    area to be adapted while the sidebar is open, ensuring it does not overlap
+    with annotatable content.
+
+  For example:
+
+  .. code-block:: javascript
+
+     window.hypothesisConfig = () => ({
+       sideBySide: {
+         mode: 'manual'
+       }
+     });
+
+  The following keys are supported in the :option:`sideBySide` object.
+
+  .. option:: mode
+
+    ``auto`` or ``manual``. Auto is the default value, where the main page
+    content will be automatically resized to fit alongside the sidebar, while manual
+    indicates the web page wants to take full control of handling side-by-side.
+    This disables automatic resizing of the content.
+
+    When setting it to ``manual``, you should
+    `listen for layout changes </publishers/events/#cmdoption-arg-hypothesis-layoutchange>`_
+    and adapt content to fit alongside the sidebar, if it is reasonable to do so.
+
 Asset and Sidebar App Location
 ##############################
 
@@ -465,7 +498,7 @@ These settings configure where the client's assets are loaded from.
    the URL where the contents of the hypothesis package are hosted, including
    the trailing slash. (Default: for production builds:
    ``"https://cdn.hypothes.is/hypothesis/X.Y.Z/"``, for development builds:
-   ``"http://localhost:3001/hypothesis/X.Y.Z/""`.
+   ``"http://localhost:3001/hypothesis/X.Y.Z/"``.
    ``X.Y.Z`` is the package version from ``package.json``).
 
 .. option:: sidebarAppUrl

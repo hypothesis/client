@@ -13,6 +13,7 @@ import type {
   DocumentInfo,
   Integration,
   SidebarLayout,
+  SideBySideOptions,
 } from '../types/annotator';
 import type { Target } from '../types/api';
 import type {
@@ -103,6 +104,8 @@ export type GuestConfig = {
 
   /** Configures a banner or other indicators showing where the content has come from. */
   contentInfoBanner?: ContentInfoConfig;
+
+  sideBySide?: SideBySideOptions;
 };
 
 /**
@@ -182,6 +185,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   public anchors: Anchor[];
 
   public features: FeatureFlags;
+
+  public sideBySide?: SideBySideOptions;
 
   /** Promise that resolves when feature flags are received from the sidebar. */
   private _featureFlagsReceived: Promise<void>;
@@ -291,6 +296,8 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._featureFlagsReceived = new Promise(resolve => {
       this.features.on('flagsChanged', resolve);
     });
+
+    this.sideBySide = config.sideBySide;
 
     this._integration = createIntegration(this);
     this._integration.on('uriChanged', () => this._sendDocumentInfo());

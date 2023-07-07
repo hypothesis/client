@@ -31,12 +31,21 @@ type ConfigDefinitionMap = Record<string, ConfigDefinition>;
  */
 type Context = 'sidebar' | 'notebook' | 'profile' | 'annotator' | 'all';
 
+function throwInvalidContext(context: string): never {
+  throw new Error(`Invalid application context used: "${context}"`);
+}
+
 /**
  * Returns the configuration keys that are relevant to a particular context.
  */
 function configurationKeys(context: Context): string[] {
   const contexts = {
-    annotator: ['clientUrl', 'contentInfoBanner', 'subFrameIdentifier'],
+    annotator: [
+      'clientUrl',
+      'contentInfoBanner',
+      'subFrameIdentifier',
+      'sideBySide',
+    ],
     sidebar: [
       'appType',
       'annotations',
@@ -68,21 +77,12 @@ function configurationKeys(context: Context): string[] {
     profile: ['profileAppUrl'],
   };
 
-  switch (context) {
-    case 'annotator':
-      return contexts.annotator;
-    case 'sidebar':
-      return contexts.sidebar;
-    case 'notebook':
-      return contexts.notebook;
-    case 'profile':
-      return contexts.profile;
-    case 'all':
-      // Complete list of configuration keys used for testing.
-      return Object.values(contexts).flat();
-    default:
-      throw new Error(`Invalid application context used: "${context}"`);
+  if (context === 'all') {
+    // Complete list of configuration keys used for testing.
+    return Object.values(contexts).flat();
   }
+
+  return contexts[context] ?? throwInvalidContext(context);
 }
 
 const getHostPageSetting: ValueGetter = (settings, name) =>
@@ -206,6 +206,10 @@ const configDefinitions: ConfigDefinitionMap = {
     allowInBrowserExt: false,
     defaultValue: null,
     getValue: getHostPageSetting,
+  },
+  sideBySide: {
+    allowInBrowserExt: true,
+    getValue: settings => settings.sideBySide,
   },
 };
 
