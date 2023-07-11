@@ -467,6 +467,9 @@ loads.
      window.hypothesisConfig = () => ({
        sideBySide: {
          mode: 'manual'
+         isActive: () => {
+          // Return true if side-by-side is active.
+         }
        }
      });
 
@@ -482,6 +485,13 @@ loads.
     When setting it to ``manual``, you should
     `listen for layout changes </publishers/events/#cmdoption-arg-hypothesis-layoutchange>`_
     and adapt content to fit alongside the sidebar, if it is reasonable to do so.
+
+  .. option:: isActive
+
+    When ``mode`` is set to ``manual``, Hypothesis will invoke this to determine
+    if side-by-side is active or not. This is called, for example, when the
+    user clicks somewhere in the document outside of the sidebar, so the client
+    can determine whether it should close the sidebar or not.
 
 Asset and Sidebar App Location
 ##############################

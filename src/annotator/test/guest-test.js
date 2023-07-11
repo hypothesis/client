@@ -599,14 +599,18 @@ describe('Guest', () => {
   describe('document events', () => {
     let fakeHighlight;
     let fakeSidebarFrame;
-    let guest;
     let rootElement;
 
-    beforeEach(() => {
-      fakeSidebarFrame = null;
-      guest = createGuest();
+    const createGuest = (config = {}) => {
+      const guest = new Guest(rootElement, config, hostFrame);
       guest.setHighlightsVisible(true);
-      rootElement = guest.element;
+      guests.push(guest);
+      return guest;
+    };
+
+    beforeEach(() => {
+      rootElement = document.createElement('div');
+      fakeSidebarFrame = null;
 
       // Create a fake highlight as a target for hover and click events.
       fakeHighlight = document.createElement('hypothesis-highlight');
@@ -635,19 +639,45 @@ describe('Guest', () => {
         );
 
       it('hides sidebar', () => {
+        createGuest();
         simulateClick();
         assert.isTrue(sidebarClosed());
       });
 
       it('does not hide sidebar if target is a highlight', () => {
+        const guest = createGuest();
+        guest.setHighlightsVisible(true);
         simulateClick(fakeHighlight);
         assert.isFalse(sidebarClosed());
       });
 
       it('does not hide sidebar if side-by-side mode is active', () => {
+        createGuest();
         fakeIntegration.sideBySideActive.returns(true);
         simulateClick();
         assert.isFalse(sidebarClosed());
+      });
+
+      it('does not hide sidebar if host page reports side-by-side is active', () => {
+        const isActive = sinon.stub().returns(true);
+        createGuest({
+          sideBySide: {
+            mode: 'manual',
+            isActive,
+          },
+        });
+
+        simulateClick();
+
+        assert.calledOnce(isActive);
+        assert.isFalse(sidebarClosed());
+
+        isActive.returns(false);
+
+        simulateClick();
+
+        assert.isTrue(sidebarClosed());
+        assert.calledTwice(isActive);
       });
 
       it('does not hide sidebar if event is within the bounds of the sidebar', () => {
@@ -662,11 +692,13 @@ describe('Guest', () => {
     });
 
     it('does not reposition the adder if hidden when the window is resized', () => {
+      createGuest();
       window.dispatchEvent(new Event('resize'));
       assert.notCalled(FakeAdder.instance.show);
     });
 
     it('repositions the adder when the window is resized', () => {
+      createGuest();
       simulateSelectionWithText();
       assert.calledOnce(FakeAdder.instance.show);
       FakeAdder.instance.show.resetHistory();
@@ -677,6 +709,8 @@ describe('Guest', () => {
     });
 
     it('focuses annotations in the sidebar when hovering highlights in the document', () => {
+      createGuest();
+
       // Hover the highlight
       fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
       assert.calledWith(highlighter.getHighlightsContainingNode, fakeHighlight);
@@ -690,6 +724,7 @@ describe('Guest', () => {
     });
 
     it('does not focus annotations in the sidebar when a non-highlight element is hovered', () => {
+      createGuest();
       rootElement.dispatchEvent(new Event('mouseover', { bubbles: true }));
 
       assert.calledWith(highlighter.getHighlightsContainingNode, rootElement);
@@ -697,6 +732,7 @@ describe('Guest', () => {
     });
 
     it('does not focus or select annotations in the sidebar if highlights are hidden', () => {
+      const guest = createGuest();
       guest.setHighlightsVisible(false);
 
       fakeHighlight.dispatchEvent(new Event('mouseover', { bubbles: true }));
@@ -707,6 +743,7 @@ describe('Guest', () => {
     });
 
     it('selects annotations in the sidebar when clicking on a highlight', () => {
+      createGuest();
       fakeHighlight.dispatchEvent(new Event('mouseup', { bubbles: true }));
 
       assert.calledWith(sidebarRPC().call, 'showAnnotations', [
@@ -716,6 +753,7 @@ describe('Guest', () => {
     });
 
     it('toggles selected annotations in the sidebar when Ctrl/Cmd-clicking a highlight', () => {
+      createGuest();
       fakeHighlight.dispatchEvent(
         new MouseEvent('mouseup', { bubbles: true, ctrlKey: true })
       );

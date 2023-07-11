@@ -333,6 +333,13 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._hoveredAnnotations = new Set();
   }
 
+  private _sideBySideActive(): boolean {
+    if (this.sideBySide?.mode === 'manual' && this.sideBySide.isActive) {
+      return this.sideBySide.isActive();
+    }
+    return this._integration.sideBySideActive();
+  }
+
   // Add DOM event listeners for clicks, taps etc. on the document and
   // highlights.
   _setupElementEvents() {
@@ -346,7 +353,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     const maybeCloseSidebar = (event: PointerEvent) => {
       // Don't hide the sidebar if event was disabled because the sidebar
       // doesn't overlap the content.
-      if (this._integration.sideBySideActive()) {
+      if (this._sideBySideActive()) {
         return;
       }
 
@@ -474,7 +481,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
       this.element.dispatchEvent(
         new LayoutChangeEvent({
           sidebarLayout,
-          sideBySideActive: this._integration.sideBySideActive(),
+          sideBySideActive: this._sideBySideActive(),
         })
       );
     });

@@ -105,12 +105,24 @@ export function settingsFrom(window_: Window): SettingsGetters {
 
   function sideBySide(): SideBySideOptions {
     const value = hostPageSetting('sideBySide');
+    if (!isObject(value)) {
+      return { mode: 'auto' };
+    }
+
+    const mode =
+      'mode' in value && isSideBySideMode(value.mode) ? value.mode : 'auto';
+    if (mode === 'auto') {
+      return { mode };
+    }
+
+    const isActive =
+      'isActive' in value && typeof value.isActive === 'function'
+        ? (value.isActive as () => boolean)
+        : undefined;
 
     return {
-      mode:
-        !isObject(value) || !('mode' in value) || !isSideBySideMode(value.mode)
-          ? 'auto'
-          : value.mode,
+      mode,
+      isActive,
     };
   }
 

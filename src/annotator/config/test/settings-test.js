@@ -397,6 +397,8 @@ describe('annotator/config/settingsFrom', () => {
   });
 
   describe('#sideBySide', () => {
+    const fakeIsActive = () => true;
+
     [
       {
         input: 'foo',
@@ -415,8 +417,12 @@ describe('annotator/config/settingsFrom', () => {
         expectedResult: { mode: 'auto' },
       },
       {
-        input: { mode: 'manual' },
-        expectedResult: { mode: 'manual' },
+        input: { mode: 'manual', isActive: 42 },
+        expectedResult: { mode: 'manual', isActive: undefined },
+      },
+      {
+        input: { mode: 'manual', isActive: fakeIsActive },
+        expectedResult: { mode: 'manual', isActive: fakeIsActive },
       },
     ].forEach(({ input, expectedResult }) => {
       it('parses config from script', () => {
