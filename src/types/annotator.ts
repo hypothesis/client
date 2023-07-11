@@ -345,8 +345,15 @@ export type DocumentInfo = {
  * `manual`: The host app wants to manually take full control of side-by-side,
  *           effectively disabling the logic in client.
  */
-export type SideBySideMode = 'auto' | 'manual';
+export type SideBySideOptions =
+  | { mode: 'auto' }
+  | {
+      mode: 'manual';
+      /**
+       * A callback that Hypothesis will call to determine whether side-by-side
+       * layout has been applied or not.
+       */
+      isActive?: () => boolean;
+    };
 
-export type SideBySideOptions = {
-  mode: SideBySideMode;
-};
+export type SideBySideMode = SideBySideOptions['mode'];
