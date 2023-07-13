@@ -417,6 +417,10 @@ describe('annotator/config/settingsFrom', () => {
         expectedResult: { mode: 'auto' },
       },
       {
+        input: { mode: 'auto', isActive: fakeIsActive },
+        expectedResult: { mode: 'auto' },
+      },
+      {
         input: { mode: 'manual', isActive: 42 },
         expectedResult: { mode: 'manual', isActive: undefined },
       },
