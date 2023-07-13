@@ -31,15 +31,11 @@ type ConfigDefinitionMap = Record<string, ConfigDefinition>;
  */
 type Context = 'sidebar' | 'notebook' | 'profile' | 'annotator' | 'all';
 
-function throwInvalidContext(context: string): never {
-  throw new Error(`Invalid application context used: "${context}"`);
-}
-
 /**
  * Returns the configuration keys that are relevant to a particular context.
  */
 function configurationKeys(context: Context): string[] {
-  const contexts = {
+  const contexts: Record<Exclude<Context, 'all'>, string[]> = {
     annotator: [
       'clientUrl',
       'contentInfoBanner',
@@ -82,7 +78,7 @@ function configurationKeys(context: Context): string[] {
     return Object.values(contexts).flat();
   }
 
-  return contexts[context] ?? throwInvalidContext(context);
+  return contexts[context];
 }
 
 const getHostPageSetting: ValueGetter = (settings, name) =>
