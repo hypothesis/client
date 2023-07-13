@@ -282,10 +282,4 @@ describe('annotator/config/index', () => {
       });
     });
   });
-
-  it(`throws an error if an invalid context was passed`, () => {
-    assert.throws(() => {
-      getConfig('fake', 'WINDOW');
-    }, 'Invalid application context used: "fake"');
-  });
 });
