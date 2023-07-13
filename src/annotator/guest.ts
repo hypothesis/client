@@ -333,10 +333,13 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     this._hoveredAnnotations = new Set();
   }
 
+  /** Return true if the sidebar is shown alongside the page content. */
   private _sideBySideActive(): boolean {
     if (this.sideBySide?.mode === 'manual' && this.sideBySide.isActive) {
+      // Host page is handling side-by-side.
       return this.sideBySide.isActive();
     }
+    // Hypothesis is handling side-by-side.
     return this._integration.sideBySideActive();
   }
 
