@@ -1336,6 +1336,27 @@ describe('Guest', () => {
 
       assert.lengthOf(guest.anchors, 0);
     });
+
+    it('waits for content to be ready before anchoring', async () => {
+      const events = [];
+      fakeIntegration.anchor = async () => {
+        events.push('fakeIntegration.anchor');
+        return range;
+      };
+      const contentReady = delay(1).then(() => {
+        events.push('contentReady');
+      });
+
+      const guest = createGuest({ contentReady });
+
+      const annotation = {
+        $tag: 'tag1',
+        target: [{ selector: [{ type: 'TextQuoteSelector', exact: 'hello' }] }],
+      };
+      await guest.anchor(annotation);
+
+      assert.deepEqual(events, ['contentReady', 'fakeIntegration.anchor']);
+    });
   });
 
   describe('#detach', () => {

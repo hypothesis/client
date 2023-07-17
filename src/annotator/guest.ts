@@ -105,6 +105,12 @@ export type GuestConfig = {
   /** Configures a banner or other indicators showing where the content has come from. */
   contentInfoBanner?: ContentInfoConfig;
 
+  /**
+   * Promise that the guest should wait for before it attempts to anchor
+   * annotations.
+   */
+  contentReady?: Promise<void>;
+
   sideBySide?: SideBySideOptions;
 };
 
@@ -191,6 +197,12 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
   /** Promise that resolves when feature flags are received from the sidebar. */
   private _featureFlagsReceived: Promise<void>;
 
+  /**
+   * Promise that the guest will wait for before attempting to anchor
+   * annotations.
+   */
+  private _contentReady?: Promise<void>;
+
   private _adder: Adder;
   private _clusterToolbar?: HighlightClusterController;
   private _hostFrame: Window;
@@ -252,6 +264,7 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
     super();
 
     this.element = element;
+    this._contentReady = config.contentReady;
     this._hostFrame = hostFrame;
     this._highlightsVisible = false;
     this._isAdderVisible = false;
@@ -603,6 +616,11 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
    * re-anchoring the annotation.
    */
   async anchor(annotation: AnnotationData): Promise<Anchor[]> {
+    if (this._contentReady) {
+      await this._contentReady;
+      this._contentReady = undefined;
+    }
+
     /**
      * Resolve an annotation's selectors to a concrete range.
      */
