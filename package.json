@@ -34,7 +34,7 @@
     "@types/shallowequal": "^1.1.1",
     "@types/showdown": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^5.35.1",
-    "@typescript-eslint/parser": "^5.35.1",
+    "@typescript-eslint/parser": "^6.0.0",
     "approx-string-match": "^2.0.0",
     "autoprefixer": "^10.0.1",
     "aws-sdk": "^2.345.0",
