@@ -39,6 +39,7 @@ function configurationKeys(context: Context): string[] {
     annotator: [
       'clientUrl',
       'contentInfoBanner',
+      'contentReady',
       'subFrameIdentifier',
       'sideBySide',
     ],
@@ -117,6 +118,11 @@ const configDefinitions: ConfigDefinitionMap = {
   },
   contentInfoBanner: {
     allowInBrowserExt: false,
+    defaultValue: null,
+    getValue: getHostPageSetting,
+  },
+  contentReady: {
+    allowInBrowserExt: true,
     defaultValue: null,
     getValue: getHostPageSetting,
   },
