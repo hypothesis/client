@@ -352,6 +352,14 @@ loads.
     of that text when it is being viewed as well as the font-family of the
     editor as the annotation is being written.
 
+.. option:: contentReady
+
+  ``Promise``. A promise that signals to Hypothesis when the document's content
+  is ready. In web applications where the content loads asynchronously, this
+  allows Hypothesis to be loaded concurrently with the content, while making
+  sure that Hypothesis waits for the content to be ready before attempting to
+  locate annotated content in the document.
+
 .. option:: onLayoutChange
 
   ``function``. This function will be a registered callback to be invoked when the sidebar
