@@ -566,8 +566,16 @@ export class Guest extends TinyEmitter implements Annotator, Destroyable {
 
     this._sidebarRPC.on('deleteAnnotation', (tag: string) => this.detach(tag));
 
-    this._sidebarRPC.on('loadAnnotations', (annotations: AnnotationData[]) =>
-      annotations.forEach(annotation => this.anchor(annotation))
+    this._sidebarRPC.on(
+      'loadAnnotations',
+      async (annotations: AnnotationData[]) => {
+        try {
+          await Promise.all(annotations.map(ann => this.anchor(ann)));
+        } catch (e) {
+          /* istanbul ignore next */
+          console.warn('Failed to anchor annotations:', e);
+        }
+      }
     );
 
     this._sidebarRPC.on('showContentInfo', (info: ContentInfoConfig) =>
