@@ -19,6 +19,7 @@ import {
 import { ServiceContext } from './service-context';
 import { AnnotationActivityService } from './services/annotation-activity';
 import { AnnotationsService } from './services/annotations';
+import { AnnotationsExporter } from './services/annotations-exporter';
 import { APIService } from './services/api';
 import { APIRoutesService } from './services/api-routes';
 import { AuthService } from './services/auth';
@@ -119,6 +120,7 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
 
   // Register services.
   container
+    .register('annotationsExporter', AnnotationsExporter)
     .register('annotationsService', AnnotationsService)
     .register('annotationActivity', AnnotationActivityService)
     .register('api', APIService)
