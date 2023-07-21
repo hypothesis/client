@@ -1,3 +1,4 @@
+import { publicAnnotation } from '../../test/annotation-fixtures';
 import { AnnotationsExporter } from '../annotations-exporter';
 
 describe('AnnotationsExporter', () => {
@@ -14,7 +15,18 @@ describe('AnnotationsExporter', () => {
 
   it('generates export content with provided annotations', () => {
     const now = new Date();
-    const annotations = [{}, {}];
+    const firstBaseAnnotation = publicAnnotation();
+    const secondBaseAnnotation = publicAnnotation();
+    const annotations = [
+      {
+        ...firstBaseAnnotation,
+        $tag: '',
+      },
+      {
+        ...secondBaseAnnotation,
+        $highlight: true,
+      },
+    ];
     fakeStore.allAnnotations.returns(annotations);
 
     const result = exporter.buildExportContent(now);
@@ -23,7 +35,7 @@ describe('AnnotationsExporter', () => {
       export_date: now.toISOString(),
       export_userid: 'userId',
       client_version: '__VERSION__',
-      annotations,
+      annotations: [firstBaseAnnotation, secondBaseAnnotation],
     });
   });
 });

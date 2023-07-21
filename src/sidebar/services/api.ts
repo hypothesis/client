@@ -5,27 +5,12 @@ import type {
   RouteMetadata,
   Profile,
 } from '../../types/api';
+import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import type { SidebarStore } from '../store';
 import { fetchJSON } from '../util/fetch';
 import { replaceURLParams } from '../util/url';
 import type { APIRoutesService } from './api-routes';
 import type { AuthService } from './auth';
-
-/**
- * Return a shallow clone of `obj` with all client-only properties removed.
- * Client-only properties are marked by a '$' prefix.
- */
-function stripInternalProperties(
-  obj: Record<string, unknown>
-): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(obj)) {
-    if (!key.startsWith('$')) {
-      result[key] = value;
-    }
-  }
-  return result;
-}
 
 /**
  * Types of value that can be passed as a parameter to API calls.
