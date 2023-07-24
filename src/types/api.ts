@@ -38,6 +38,19 @@ export type IndexResponse = {
 export type LinksResponse = Record<string, string>;
 
 /**
+ * Selector which indicates the time range within a video or audio file that
+ * an annotation refers to.
+ */
+export type MediaTimeSelector = {
+  type: 'MediaTimeSelector';
+
+  /** Offset from start of media in seconds. */
+  start: number;
+  /** Offset from start of media in seconds. */
+  end: number;
+};
+
+/**
  * Selector which identifies a document region using the selected text plus
  * the surrounding context.
  */
@@ -127,6 +140,7 @@ export type Selector =
   | TextPositionSelector
   | RangeSelector
   | EPUBContentSelector
+  | MediaTimeSelector
   | PageSelector;
 
 /**

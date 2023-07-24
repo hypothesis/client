@@ -1,17 +1,23 @@
 import type {
+  MediaTimeSelector,
   RangeSelector,
   Selector,
   TextPositionSelector,
   TextQuoteSelector,
 } from '../../types/api';
-import { RangeAnchor, TextPositionAnchor, TextQuoteAnchor } from './types';
+import {
+  MediaTimeAnchor,
+  RangeAnchor,
+  TextPositionAnchor,
+  TextQuoteAnchor,
+} from './types';
 
 type Options = {
   hint?: number;
 };
 
 async function querySelector(
-  anchor: RangeAnchor | TextPositionAnchor | TextQuoteAnchor,
+  anchor: MediaTimeAnchor | RangeAnchor | TextPositionAnchor | TextQuoteAnchor,
   options: Options
 ) {
   return anchor.toRange(options);
@@ -32,6 +38,7 @@ export function anchor(
   selectors: Selector[],
   options: Options = {}
 ) {
+  let mediaTime: MediaTimeSelector | null = null;
   let position: TextPositionSelector | null = null;
   let quote: TextQuoteSelector | null = null;
   let range: RangeSelector | null = null;
@@ -48,6 +55,9 @@ export function anchor(
         break;
       case 'RangeSelector':
         range = selector;
+        break;
+      case 'MediaTimeSelector':
+        mediaTime = selector;
         break;
     }
   }
@@ -92,16 +102,30 @@ export function anchor(
     });
   }
 
+  if (mediaTime) {
+    const mediaTime_ = mediaTime;
+    promise = promise.catch(() =>
+      MediaTimeAnchor.fromSelector(root, mediaTime_).toRange()
+    );
+  }
+
   return promise;
 }
 
 export function describe(root: Element, range: Range) {
-  const types = [RangeAnchor, TextPositionAnchor, TextQuoteAnchor];
+  const types = [
+    MediaTimeAnchor,
+    RangeAnchor,
+    TextPositionAnchor,
+    TextQuoteAnchor,
+  ];
   const result = [];
   for (const type of types) {
     try {
       const anchor = type.fromRange(root, range);
-      result.push(anchor.toSelector());
+      if (anchor) {
+        result.push(anchor.toSelector());
+      }
     } catch (error) {
       // If resolving some anchor fails, we just want to skip it silently
     }

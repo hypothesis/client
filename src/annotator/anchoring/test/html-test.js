@@ -371,6 +371,30 @@ describe('HTML anchoring', () => {
     });
   });
 
+  it('anchors "MediaTimeSelector" selectors', async () => {
+    const container = document.createElement('div');
+    container.innerHTML = `<p data-time-start="0" data-time-end="10">One</p>
+<p data-time-start="10" data-time-end="20">Two</p>`;
+    const range = new Range();
+    range.setStart(container.querySelector('p').firstChild, 0);
+    range.setEnd(container.querySelector('p:nth-of-type(2)').firstChild, 3);
+
+    const selectors = html.describe(container, range);
+
+    const mediaTimeSelector = selectors.find(
+      s => s.type === 'MediaTimeSelector'
+    );
+    assert.ok(mediaTimeSelector);
+    assert.deepEqual(mediaTimeSelector, {
+      type: 'MediaTimeSelector',
+      start: 0,
+      end: 20,
+    });
+
+    const anchored = await html.anchor(container, [mediaTimeSelector]);
+    assert.equal(anchored.toString(), 'One\nTwo');
+  });
+
   describe('When anchoring fails', () => {
     const validQuoteSelector = {
       type: 'TextQuoteSelector',
