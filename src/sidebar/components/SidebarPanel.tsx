@@ -20,6 +20,8 @@ export type SidebarPanelProps = {
   title: string;
   /** Optional callback to invoke when this panel's active status changes */
   onActiveChanged?: (active: boolean) => void;
+  /** What Dialog variant to use */
+  variant?: 'panel' | 'custom';
 };
 
 /**
@@ -31,6 +33,7 @@ export default function SidebarPanel({
   icon,
   panelName,
   title,
+  variant = 'panel',
   onActiveChanged,
 }: SidebarPanelProps) {
   const store = useSidebarStore();
@@ -65,6 +68,7 @@ export default function SidebarPanel({
           icon={icon}
           onClose={closePanel}
           transitionComponent={Slider}
+          variant={variant}
         >
           {children}
         </Dialog>

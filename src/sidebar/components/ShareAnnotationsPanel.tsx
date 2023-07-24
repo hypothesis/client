@@ -53,7 +53,11 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
   };
 
   return (
-    <SidebarPanel title={panelTitle} panelName="shareGroupAnnotations">
+    <SidebarPanel
+      title={panelTitle}
+      panelName="shareGroupAnnotations"
+      variant="custom"
+    >
       {!sharingReady && (
         <div className="flex flex-row items-center justify-center">
           <Spinner size="md" />
