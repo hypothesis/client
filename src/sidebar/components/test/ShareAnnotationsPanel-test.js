@@ -1,4 +1,5 @@
 import { mount } from 'enzyme';
+import { act } from 'preact/test-utils';
 
 import { checkAccessibility } from '../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../test-util/mock-imported-components';
@@ -36,7 +37,10 @@ describe('ShareAnnotationsPanel', () => {
     };
 
     fakeStore = {
+      allAnnotations: sinon.stub().returns(0),
       focusedGroup: sinon.stub().returns(fakePrivateGroup),
+      isLoading: sinon.stub().returns(false),
+      isFeatureEnabled: sinon.stub().returns(false),
       mainFrame: () => ({
         uri: 'https://www.example.com',
       }),
@@ -56,8 +60,8 @@ describe('ShareAnnotationsPanel', () => {
     $imports.$restore();
   });
 
-  describe('panel title', () => {
-    it("sets sidebar panel title to include group's name", () => {
+  describe('panel dialog title', () => {
+    it("sets sidebar panel dialog title to include group's name", () => {
       const wrapper = createShareAnnotationsPanel();
 
       assert.equal(
@@ -77,8 +81,8 @@ describe('ShareAnnotationsPanel', () => {
     });
   });
 
-  describe('panel content', () => {
-    it('does not render panel content if needed info not available', () => {
+  describe('share panel content', () => {
+    it('does not render share panel content if needed info not available', () => {
       fakeStore.focusedGroup.returns(undefined);
 
       const wrapper = createShareAnnotationsPanel();
@@ -200,6 +204,92 @@ describe('ShareAnnotationsPanel', () => {
     });
   });
 
+  describe('tabbed dialog panel', () => {
+    it('does not render a tabbed dialog if export feature flag is not enabled', () => {
+      const wrapper = createShareAnnotationsPanel();
+
+      assert.isFalse(wrapper.find('TabHeader').exists());
+    });
+
+    context('export feature enabled', () => {
+      beforeEach(() => {
+        fakeStore.isFeatureEnabled.withArgs('export_annotations').returns(true);
+      });
+
+      it('renders a tabbed dialog with share panel active', () => {
+        const wrapper = createShareAnnotationsPanel();
+
+        assert.isTrue(wrapper.find('TabHeader').exists());
+        assert.isTrue(
+          wrapper.find('Tab[aria-controls="share-panel"]').props().selected
+        );
+        assert.isTrue(
+          wrapper.find('TabPanel[id="share-panel"]').props().active
+        );
+      });
+
+      it('shows the export tab panel when export tab clicked', () => {
+        const wrapper = createShareAnnotationsPanel();
+        const shareTabSelector = 'Tab[aria-controls="share-panel"]';
+        const exportTabSelector = 'Tab[aria-controls="export-panel"]';
+
+        act(() => {
+          wrapper
+            .find(exportTabSelector)
+            .getDOMNode()
+            .dispatchEvent(new Event('click'));
+        });
+        wrapper.update();
+
+        const selectedTab = wrapper.find('Tab').filter({ selected: true });
+        assert.equal(selectedTab.text(), 'Export');
+        assert.equal(selectedTab.props()['aria-controls'], 'export-panel');
+
+        const activeTabPanel = wrapper
+          .find('TabPanel')
+          .filter({ active: true });
+        assert.equal(activeTabPanel.props().id, 'export-panel');
+        assert.isTrue(activeTabPanel.find('Input').exists());
+
+        // Now, reselect share tab
+        act(() => {
+          wrapper
+            .find(shareTabSelector)
+            .getDOMNode()
+            .dispatchEvent(new Event('click'));
+        });
+        wrapper.update();
+
+        const shareTabPanel = wrapper.find('TabPanel').filter({ active: true });
+        assert.equal(shareTabPanel.props().id, 'share-panel');
+      });
+
+      it('shows a loading indicator on the export tab if not ready', () => {
+        const wrapper = createShareAnnotationsPanel();
+        const exportTabSelector = 'Tab[aria-controls="export-panel"]';
+        fakeStore.isLoading.returns(true);
+
+        act(() => {
+          wrapper
+            .find(exportTabSelector)
+            .getDOMNode()
+            .dispatchEvent(new Event('click'));
+        });
+        wrapper.update();
+
+        const activeTabPanel = wrapper
+          .find('TabPanel')
+          .filter({ active: true });
+        assert.equal(activeTabPanel.props().id, 'export-panel');
+        assert.isFalse(activeTabPanel.find('Input').exists());
+        assert.isTrue(
+          activeTabPanel.find('[data-testid="loading-spinner"]').exists()
+        );
+      });
+    });
+  });
+
+  // TODO: Add a11y test for tabbed interface
   it(
     'should pass a11y checks',
     checkAccessibility({
