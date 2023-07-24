@@ -1,5 +1,8 @@
+import { render } from 'preact';
+
 import { TextRange } from '../text-range';
 import {
+  MediaTimeAnchor,
   RangeAnchor,
   TextPositionAnchor,
   TextQuoteAnchor,
@@ -446,6 +449,142 @@ describe('annotator/anchoring/types', () => {
 
         const newRange = anchor.toRange();
         assert.equal(newRange.toString(), 'Four');
+      });
+    });
+  });
+
+  describe('MediaTimeAnchor', () => {
+    function createTranscript() {
+      const container = document.createElement('div');
+      render(
+        <article>
+          <p data-time-start="0" data-time-end="2.2">
+            First segment.
+          </p>
+          <p data-time-start="2.2" data-time-end="5.6">
+            Second segment.
+          </p>
+          <p data-time-start="5.6" data-time-end="10.02">
+            Third segment.
+          </p>
+          <p data-time-start="invalid" data-time-end="12">
+            Invalid one
+          </p>
+          <p data-time-start="12" data-time-end="invalid">
+            Invalid two
+          </p>
+        </article>,
+        container
+      );
+      return container;
+    }
+
+    function createRange(
+      container,
+      startPara,
+      startOffset,
+      endPara,
+      endOffset
+    ) {
+      const range = new Range();
+      range.setStart(
+        container.querySelector(`p:nth-of-type(${startPara + 1})`).firstChild,
+        startOffset
+      );
+      range.setEnd(
+        container.querySelector(`p:nth-of-type(${endPara + 1})`).firstChild,
+        endOffset
+      );
+      return range;
+    }
+
+    describe('#fromRange', () => {
+      it('can convert a range to a selector', () => {
+        const container = createTranscript();
+        const range = createRange(container, 0, 6, 1, 5);
+
+        const anchor = MediaTimeAnchor.fromRange(container, range);
+        assert.isNotNull(anchor);
+        const selector = anchor.toSelector();
+
+        assert.deepEqual(selector, {
+          type: 'MediaTimeSelector',
+          start: 0,
+          end: 5.6,
+        });
+      });
+
+      function replaceAttr(elem, attr, val) {
+        if (val === null) {
+          elem.removeAttribute(attr);
+        } else {
+          elem.setAttribute(attr, val);
+        }
+      }
+
+      [null, '', 'abc', '-2'].forEach(startAttr => {
+        it('returns `null` if start time is missing or invalid', () => {
+          const container = createTranscript();
+          const range = createRange(container, 0, 6, 1, 5);
+
+          replaceAttr(
+            range.startContainer.parentElement,
+            'data-time-start',
+            startAttr
+          );
+          const anchor = MediaTimeAnchor.fromRange(container, range);
+
+          assert.isNull(anchor);
+        });
+      });
+
+      [null, '', 'abc', '-2'].forEach(endAttr => {
+        it('returns `null` if end time is missing or invalid', () => {
+          const container = createTranscript();
+          const range = createRange(container, 0, 6, 1, 5);
+
+          replaceAttr(
+            range.endContainer.parentElement,
+            'data-time-end',
+            endAttr
+          );
+          const anchor = MediaTimeAnchor.fromRange(container, range);
+
+          assert.isNull(anchor);
+        });
+      });
+    });
+
+    describe('#toRange', () => {
+      it('can convert a selector to a range', () => {
+        const container = createTranscript();
+        const selector = {
+          type: 'MediaTimeSelector',
+          start: 0,
+          end: 5.6,
+        };
+        const range = MediaTimeAnchor.fromSelector(
+          container,
+          selector
+        ).toRange();
+        assert.equal(range.toString(), 'First segment.Second segment.');
+      });
+
+      [
+        { start: 20, end: 22, error: 'Start segment not found' },
+        { start: 0, end: -1, error: 'End segment not found' },
+      ].forEach(({ start, end, error }) => {
+        it('throws error if elements with matching time ranges are not found', () => {
+          const container = createTranscript();
+          const selector = {
+            type: 'MediaTimeSelector',
+            start,
+            end,
+          };
+          assert.throws(() => {
+            MediaTimeAnchor.fromSelector(container, selector).toRange();
+          }, error);
+        });
       });
     });
   });

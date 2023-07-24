@@ -8,6 +8,7 @@
  *     libraries.
  */
 import type {
+  MediaTimeSelector,
   RangeSelector,
   TextPositionSelector,
   TextQuoteSelector,
@@ -226,5 +227,151 @@ export class TextQuoteAnchor {
       throw new Error('Quote not found');
     }
     return new TextPositionAnchor(this.root, match.start, match.end);
+  }
+}
+
+/**
+ * Parse a string containing a time offset in seconds, since the start of some
+ * media, into a float.
+ */
+function parseMediaTime(timeStr: string): number | null {
+  const val = parseFloat(timeStr);
+  if (!Number.isFinite(val) || val < 0) {
+    return null;
+  }
+  return val;
+}
+
+/** Implementation of {@link Array.prototype.findLastIndex} */
+function findLastIndex<T>(ary: T[], pred: (val: T) => boolean): number {
+  for (let i = ary.length - 1; i >= 0; i--) {
+    if (pred(ary[i])) {
+      return i;
+    }
+  }
+  return -1;
+}
+
+function closestElement(node: Node) {
+  return node instanceof Element ? node : node.parentElement;
+}
+
+/**
+ * Get the media time range associated with an element or pair of elements,
+ * from `data-time-{start, end}` attributes on them.
+ */
+function getMediaTimeRange(
+  start: Element | undefined | null,
+  end: Element | undefined | null = start
+): [number, number] | null {
+  const startTime = parseMediaTime(
+    start?.getAttribute('data-time-start') ?? ''
+  );
+  const endTime = parseMediaTime(end?.getAttribute('data-time-end') ?? '');
+  if (
+    typeof startTime !== 'number' ||
+    typeof endTime !== 'number' ||
+    endTime < startTime
+  ) {
+    return null;
+  }
+  return [startTime, endTime];
+}
+
+export class MediaTimeAnchor {
+  root: Element;
+
+  /** Offset from start of media in seconds. */
+  start: number;
+  /** Offset from end of media in seconds. */
+  end: number;
+
+  constructor(root: Element, start: number, end: number) {
+    this.root = root;
+    this.start = start;
+    this.end = end;
+  }
+
+  /**
+   * Return a {@link MediaTimeAnchor} that represents a range, or `null` if
+   * no time range information is present on elements in the range.
+   */
+  static fromRange(root: Element, range: Range): MediaTimeAnchor | null {
+    const start = closestElement(range.startContainer)?.closest(
+      '[data-time-start]'
+    );
+    const end = closestElement(range.endContainer)?.closest('[data-time-end]');
+    const timeRange = getMediaTimeRange(start, end);
+    if (!timeRange) {
+      return null;
+    }
+    const [startTime, endTime] = timeRange;
+    return new MediaTimeAnchor(root, startTime, endTime);
+  }
+
+  /**
+   * Convert this anchor to a DOM range.
+   *
+   * This returned range will start from the beginning of the element whose
+   * associated time range includes `start` and continue to the end of the
+   * element whose associated time range includes `end`.
+   */
+  toRange(): Range {
+    // Find the segments that span the start and end times of this anchor.
+    // This is inefficient since we re-find all segments for each annotation
+    // that is anchored. Changing this will involve revising the anchoring
+    // API however.
+    type Segment = { element: Element; start: number; end: number };
+    const segments = [...this.root.querySelectorAll('[data-time-start]')]
+      .map(element => {
+        const timeRange = getMediaTimeRange(element);
+        if (!timeRange) {
+          return null;
+        }
+        const [start, end] = timeRange;
+        return { element, start, end };
+      })
+      .filter(s => s !== null) as Segment[];
+    segments.sort((a, b) => a.start - b.start);
+
+    const startIdx = findLastIndex(
+      segments,
+      s => s.start <= this.start && s.end >= this.start
+    );
+    if (startIdx === -1) {
+      throw new Error('Start segment not found');
+    }
+    const endIdx =
+      startIdx +
+      segments
+        .slice(startIdx)
+        .findIndex(s => s.start <= this.end && s.end >= this.end);
+    if (endIdx === -1) {
+      throw new Error('End segment not found');
+    }
+
+    const range = new Range();
+    range.setStart(segments[startIdx].element, 0);
+
+    const endEl = segments[endIdx].element;
+    range.setEnd(endEl, endEl.childNodes.length);
+
+    return range;
+  }
+
+  static fromSelector(
+    root: Element,
+    selector: MediaTimeSelector
+  ): MediaTimeAnchor {
+    const { start, end } = selector;
+    return new MediaTimeAnchor(root, start, end);
+  }
+
+  toSelector(): MediaTimeSelector {
+    return {
+      type: 'MediaTimeSelector',
+      start: this.start,
+      end: this.end,
+    };
   }
 }
