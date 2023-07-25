@@ -2,18 +2,13 @@ import {
   Button,
   Card,
   CardActions,
-  CardTitle,
-  CloseButton,
   CopyIcon,
   IconButton,
   Input,
   InputGroup,
   LockIcon,
-  TabList,
   Tab,
 } from '@hypothesis/frontend-shared';
-import classnames from 'classnames';
-import type { ComponentChildren, JSX } from 'preact';
 import { useCallback, useState } from 'preact/hooks';
 
 import { pageSharingLink } from '../../helpers/annotation-sharing';
@@ -24,63 +19,8 @@ import { copyText } from '../../util/copy-to-clipboard';
 import ShareLinks from '../ShareLinks';
 import SidebarPanel from '../SidebarPanel';
 import LoadingSpinner from './LoadingSpinner';
-
-/**
- * Render a header to go above a Card, with contents in a TabList
- */
-function TabHeader({ children }: { children: ComponentChildren }) {
-  return (
-    <div data-testid="tab-header" className="flex items-center">
-      <CloseButton
-        classes={classnames(
-          // This element comes first in source order before tabs, but is
-          // positioned last. This puts this button earlier in the tab
-          // sequence than the tabs, allowing tabs to be immediately adjacent
-          // to their controlled tab panels/tab content in the tab sequence.
-          'order-last',
-          // Always render this button at 16px square regardless of parent
-          // font size
-          'text-[16px]',
-          'text-grey-6 hover:text-grey-7 hover:bg-grey-3/50'
-        )}
-        title="Close"
-        variant="custom"
-        size="sm"
-      />
-      <TabList classes="grow gap-x-1 -mb-[1px] z-2">{children}</TabList>
-    </div>
-  );
-}
-
-type TabPanelProps = {
-  active?: boolean;
-  title?: ComponentChildren;
-} & JSX.HTMLAttributes<HTMLDivElement>;
-
-/**
- * Render a `role="tabpanel"` element within a Card layout. It will be
- * visually hidden unless `active`.
- */
-function TabPanel({
-  children,
-  active,
-  title,
-  ...htmlAttributes
-}: TabPanelProps) {
-  return (
-    <div
-      role="tabpanel"
-      {...htmlAttributes}
-      className={classnames('p-3 focus-visible-ring ring-inset', {
-        hidden: !active,
-      })}
-      hidden={!active}
-    >
-      {title && <CardTitle>{title}</CardTitle>}
-      <div className="space-y-3 pt-2">{children}</div>
-    </div>
-  );
-}
+import TabHeader from './TabHeader';
+import TabPanel from './TabPanel';
 
 type SharePanelContentProps = {
   loading: boolean;
