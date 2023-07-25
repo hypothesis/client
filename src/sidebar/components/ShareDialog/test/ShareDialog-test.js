@@ -80,13 +80,6 @@ describe('ShareDialog', () => {
   });
 
   describe('share panel content', () => {
-    it('does not render share panel content if needed info not available', () => {
-      fakeStore.focusedGroup.returns(undefined);
-
-      const wrapper = createComponent();
-      assert.isFalse(wrapper.exists('.ShareAnnotationsPanel'));
-    });
-
     it('renders a spinner if focused group not available yet', () => {
       fakeStore.focusedGroup.returns(undefined);
 
