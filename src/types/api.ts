@@ -144,20 +144,12 @@ export type UserInfo = {
   display_name: string | null;
 };
 
-export type Annotation = ClientAnnotationData & {
+export type APIAnnotationData = {
   /**
    * The server-assigned ID for the annotation. This is only set once the
    * annotation has been saved to the backend.
    */
   id?: string;
-
-  /**
-   * A locally-generated unique identifier for annotations.
-   *
-   * This is set for all annotations, whether they have been saved to the
-   * backend or not.
-   */
-  $tag: string;
 
   references?: string[];
   created: string;
@@ -204,6 +196,8 @@ export type Annotation = ClientAnnotationData & {
 
   user_info?: UserInfo;
 };
+
+export type Annotation = ClientAnnotationData & APIAnnotationData;
 
 /**
  * An annotation which has been saved to the backend and assigned an ID.
