@@ -45,6 +45,8 @@ describe('ShareDialog', () => {
     };
 
     $imports.$mock(mockImportedComponents());
+    // Don't mock this very simple component
+    $imports.$restore({ './LoadingSpinner': true });
     $imports.$mock({
       '../../store': { useSidebarStore: () => fakeStore },
       '../../helpers/annotation-sharing': {
