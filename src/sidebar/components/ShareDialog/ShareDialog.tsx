@@ -9,7 +9,6 @@ import {
   Input,
   InputGroup,
   LockIcon,
-  Spinner,
   TabList,
   Tab,
 } from '@hypothesis/frontend-shared';
@@ -24,17 +23,7 @@ import { useSidebarStore } from '../../store';
 import { copyText } from '../../util/copy-to-clipboard';
 import ShareLinks from '../ShareLinks';
 import SidebarPanel from '../SidebarPanel';
-
-function LoadingSpinner() {
-  return (
-    <div
-      className="flex flex-row items-center justify-center"
-      data-testid="loading-spinner"
-    >
-      <Spinner size="md" />
-    </div>
-  );
-}
+import LoadingSpinner from './LoadingSpinner';
 
 /**
  * Render a header to go above a Card, with contents in a TabList
