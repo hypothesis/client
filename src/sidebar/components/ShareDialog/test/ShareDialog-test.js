@@ -1,12 +1,12 @@
 import { mount } from 'enzyme';
 import { act } from 'preact/test-utils';
 
-import { checkAccessibility } from '../../../test-util/accessibility';
-import { mockImportedComponents } from '../../../test-util/mock-imported-components';
-import ShareAnnotationsPanel from '../ShareAnnotationsPanel';
-import { $imports } from '../ShareAnnotationsPanel';
+import { checkAccessibility } from '../../../../test-util/accessibility';
+import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
+import ShareDialog from '../ShareDialog';
+import { $imports } from '../ShareDialog';
 
-describe('ShareAnnotationsPanel', () => {
+describe('ShareDialog', () => {
   let fakeStore;
   let fakeBouncerLink;
   let fakePageSharingLink;
@@ -19,10 +19,8 @@ describe('ShareAnnotationsPanel', () => {
     id: 'testprivate',
   };
 
-  const createShareAnnotationsPanel = props =>
-    mount(
-      <ShareAnnotationsPanel toastMessenger={fakeToastMessenger} {...props} />
-    );
+  const createComponent = props =>
+    mount(<ShareDialog toastMessenger={fakeToastMessenger} {...props} />);
 
   beforeEach(() => {
     fakeBouncerLink = 'http://hyp.is/go?url=http%3A%2F%2Fwww.example.com';
@@ -48,11 +46,11 @@ describe('ShareAnnotationsPanel', () => {
 
     $imports.$mock(mockImportedComponents());
     $imports.$mock({
-      '../store': { useSidebarStore: () => fakeStore },
-      '../helpers/annotation-sharing': {
+      '../../store': { useSidebarStore: () => fakeStore },
+      '../../helpers/annotation-sharing': {
         pageSharingLink: fakePageSharingLink,
       },
-      '../util/copy-to-clipboard': fakeCopyToClipboard,
+      '../../util/copy-to-clipboard': fakeCopyToClipboard,
     });
   });
 
@@ -62,7 +60,7 @@ describe('ShareAnnotationsPanel', () => {
 
   describe('panel dialog title', () => {
     it("sets sidebar panel dialog title to include group's name", () => {
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
 
       assert.equal(
         wrapper.find('SidebarPanel').prop('title'),
@@ -73,7 +71,7 @@ describe('ShareAnnotationsPanel', () => {
     it('sets a temporary title if focused group not available', () => {
       fakeStore.focusedGroup = sinon.stub().returns({});
 
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
       assert.equal(
         wrapper.find('SidebarPanel').prop('title'),
         'Share Annotations in ...'
@@ -85,19 +83,19 @@ describe('ShareAnnotationsPanel', () => {
     it('does not render share panel content if needed info not available', () => {
       fakeStore.focusedGroup.returns(undefined);
 
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
       assert.isFalse(wrapper.exists('.ShareAnnotationsPanel'));
     });
 
     it('renders a spinner if focused group not available yet', () => {
       fakeStore.focusedGroup.returns(undefined);
 
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
       assert.isTrue(wrapper.find('Spinner').exists());
     });
 
     it('renders panel content if needed info available', () => {
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
       assert.isFalse(wrapper.find('Spinner').exists());
     });
   });
@@ -129,7 +127,7 @@ describe('ShareAnnotationsPanel', () => {
         id: 'testid,',
       });
 
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
 
       assert.match(
         wrapper.find('[data-testid="sharing-intro"]').text(),
@@ -146,7 +144,7 @@ describe('ShareAnnotationsPanel', () => {
       it('renders explanatory text about inability to share', () => {
         fakePageSharingLink.returns(null);
 
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
 
         const panelEl = wrapper.find('[data-testid="no-sharing"]');
         assert.include(panelEl.text(), 'These annotations cannot be shared');
@@ -156,7 +154,7 @@ describe('ShareAnnotationsPanel', () => {
 
   describe('web share link', () => {
     it('displays web share link in readonly form input', () => {
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
 
       const inputEl = wrapper.find('input');
       assert.equal(inputEl.prop('value'), fakeBouncerLink);
@@ -166,7 +164,7 @@ describe('ShareAnnotationsPanel', () => {
     context('document URI cannot be shared', () => {
       it('does not render an input field with share link', () => {
         fakePageSharingLink.returns(null);
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
 
         const inputEl = wrapper.find('input');
         assert.isFalse(inputEl.exists());
@@ -175,7 +173,7 @@ describe('ShareAnnotationsPanel', () => {
 
     describe('copy link to clipboard', () => {
       it('copies link to clipboard when copy button clicked', () => {
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
 
         wrapper.find('IconButton').props().onClick();
 
@@ -183,7 +181,7 @@ describe('ShareAnnotationsPanel', () => {
       });
 
       it('confirms link copy when successful', () => {
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
 
         wrapper.find('IconButton').props().onClick();
 
@@ -195,7 +193,7 @@ describe('ShareAnnotationsPanel', () => {
 
       it('flashes an error if link copying unsuccessful', () => {
         fakeCopyToClipboard.copyText.throws();
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
 
         wrapper.find('IconButton').props().onClick();
 
@@ -206,7 +204,7 @@ describe('ShareAnnotationsPanel', () => {
 
   describe('tabbed dialog panel', () => {
     it('does not render a tabbed dialog if export feature flag is not enabled', () => {
-      const wrapper = createShareAnnotationsPanel();
+      const wrapper = createComponent();
 
       assert.isFalse(wrapper.find('TabHeader').exists());
     });
@@ -217,7 +215,7 @@ describe('ShareAnnotationsPanel', () => {
       });
 
       it('renders a tabbed dialog with share panel active', () => {
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
 
         assert.isTrue(wrapper.find('TabHeader').exists());
         assert.isTrue(
@@ -229,7 +227,7 @@ describe('ShareAnnotationsPanel', () => {
       });
 
       it('shows the export tab panel when export tab clicked', () => {
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
         const shareTabSelector = 'Tab[aria-controls="share-panel"]';
         const exportTabSelector = 'Tab[aria-controls="export-panel"]';
 
@@ -265,7 +263,7 @@ describe('ShareAnnotationsPanel', () => {
       });
 
       it('shows a loading indicator on the export tab if not ready', () => {
-        const wrapper = createShareAnnotationsPanel();
+        const wrapper = createComponent();
         const exportTabSelector = 'Tab[aria-controls="export-panel"]';
         fakeStore.isLoading.returns(true);
 
@@ -293,7 +291,7 @@ describe('ShareAnnotationsPanel', () => {
   it(
     'should pass a11y checks',
     checkAccessibility({
-      content: () => createShareAnnotationsPanel(),
+      content: () => createComponent(),
     })
   );
 });

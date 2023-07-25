@@ -17,13 +17,13 @@ import classnames from 'classnames';
 import type { ComponentChildren, JSX } from 'preact';
 import { useCallback, useState } from 'preact/hooks';
 
-import { pageSharingLink } from '../helpers/annotation-sharing';
-import { withServices } from '../service-context';
-import type { ToastMessengerService } from '../services/toast-messenger';
-import { useSidebarStore } from '../store';
-import { copyText } from '../util/copy-to-clipboard';
-import ShareLinks from './ShareLinks';
-import SidebarPanel from './SidebarPanel';
+import { pageSharingLink } from '../../helpers/annotation-sharing';
+import { withServices } from '../../service-context';
+import type { ToastMessengerService } from '../../services/toast-messenger';
+import { useSidebarStore } from '../../store';
+import { copyText } from '../../util/copy-to-clipboard';
+import ShareLinks from '../ShareLinks';
+import SidebarPanel from '../SidebarPanel';
 
 function LoadingSpinner() {
   return (
@@ -213,7 +213,7 @@ function ExportPanelContent({
   );
 }
 
-export type ShareAnnotationPanelProps = {
+export type ShareDialogProps = {
   // injected
   toastMessenger: ToastMessengerService;
 };
@@ -225,7 +225,7 @@ export type ShareAnnotationPanelProps = {
  * are on the current page (as defined by the main frame's URI) and contained
  * within the app's currently-focused group.
  */
-function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
+function ShareDialog({ toastMessenger }: ShareDialogProps) {
   const store = useSidebarStore();
   const mainFrame = store.mainFrame();
   const focusedGroup = store.focusedGroup();
@@ -329,4 +329,4 @@ function ShareAnnotationsPanel({ toastMessenger }: ShareAnnotationPanelProps) {
   );
 }
 
-export default withServices(ShareAnnotationsPanel, ['toastMessenger']);
+export default withServices(ShareDialog, ['toastMessenger']);
