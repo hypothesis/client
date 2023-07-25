@@ -16,7 +16,7 @@ import AnnotationView from './AnnotationView';
 import HelpPanel from './HelpPanel';
 import NotebookView from './NotebookView';
 import ProfileView from './ProfileView';
-import ShareAnnotationsPanel from './ShareAnnotationsPanel';
+import ShareDialog from './ShareDialog';
 import SidebarView from './SidebarView';
 import StreamView from './StreamView';
 import ToastMessages from './ToastMessages';
@@ -160,7 +160,7 @@ function HypothesisApp({
       <div className="container">
         <ToastMessages />
         <HelpPanel />
-        <ShareAnnotationsPanel />
+        <ShareDialog />
 
         {route && (
           <main>
