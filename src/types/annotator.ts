@@ -1,6 +1,6 @@
 import type { TinyEmitter } from 'tiny-emitter';
 
-import type { Annotation, Selector, Target } from './api';
+import type { APIAnnotationData, Selector, Target } from './api';
 import type { ClientAnnotationData } from './shared';
 
 /**
@@ -66,7 +66,7 @@ export type SegmentInfo = {
  * the document.
  */
 export type AnnotationData = ClientAnnotationData &
-  Pick<Annotation, 'target' | 'uri'> & {
+  Pick<APIAnnotationData, 'target' | 'uri'> & {
     document?: DocumentMetadata;
   };
 

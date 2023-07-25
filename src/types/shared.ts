@@ -13,6 +13,7 @@ export type HighlightCluster =
  */
 export type ClientAnnotationData = {
   $cluster?: HighlightCluster;
+
   /**
    * Client-side identifier: set even if annotation does not have a
    * server-provided `id` (i.e. is unsaved)
