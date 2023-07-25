@@ -1,7 +1,5 @@
 import {
-  Button,
   Card,
-  CardActions,
   CopyIcon,
   IconButton,
   Input,
@@ -18,6 +16,7 @@ import { useSidebarStore } from '../../store';
 import { copyText } from '../../util/copy-to-clipboard';
 import ShareLinks from '../ShareLinks';
 import SidebarPanel from '../SidebarPanel';
+import ExportAnnotations from './ExportAnnotations';
 import LoadingSpinner from './LoadingSpinner';
 import TabHeader from './TabHeader';
 import TabPanel from './TabPanel';
@@ -110,38 +109,6 @@ function SharePanelContent({
   );
 }
 
-type ExportPanelContentProps = {
-  loading: boolean;
-  annotationCount: number;
-};
-
-/**
- * Render content for "export" tab panel
- */
-function ExportPanelContent({
-  loading,
-  annotationCount,
-}: ExportPanelContentProps) {
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
-  // TODO: Handle 0 annotations
-  return (
-    <>
-      <p>
-        Export <strong>{annotationCount} annotations</strong> in a file named:
-      </p>
-      <Input id="export-filename" value="filename-tbd-export.json" />
-      <CardActions>
-        <Button variant="primary" disabled>
-          Export
-        </Button>
-      </CardActions>
-    </>
-  );
-}
-
 export type ShareDialogProps = {
   // injected
   toastMessenger: ToastMessengerService;
@@ -160,7 +127,6 @@ function ShareDialog({ toastMessenger }: ShareDialogProps) {
   const focusedGroup = store.focusedGroup();
   const groupName = (focusedGroup && focusedGroup.name) || '...';
   const panelTitle = `Share Annotations in ${groupName}`;
-  const allAnnotations = store.allAnnotations();
 
   const tabbedDialog = store.isFeatureEnabled('export_annotations');
   const [selectedTab, setSelectedTab] = useState<'share' | 'export'>('share');
@@ -169,7 +135,6 @@ function ShareDialog({ toastMessenger }: ShareDialogProps) {
   // be available
   const sharingReady = focusedGroup && mainFrame;
   // Show a loading spinner in the export tab if annotations are loading
-  const exportReady = focusedGroup && !store.isLoading();
 
   const shareURI =
     sharingReady && pageSharingLink(mainFrame.uri, focusedGroup.id);
@@ -237,10 +202,7 @@ function ShareDialog({ toastMessenger }: ShareDialogProps) {
               aria-labelledby="export-panel-tab"
               title={`Export from ${focusedGroup?.name ?? '...'}`}
             >
-              <ExportPanelContent
-                annotationCount={allAnnotations.length}
-                loading={!exportReady}
-              />
+              <ExportAnnotations />
             </TabPanel>
           </Card>
         </>

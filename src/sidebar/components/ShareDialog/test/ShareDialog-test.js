@@ -45,7 +45,7 @@ describe('ShareDialog', () => {
     };
 
     $imports.$mock(mockImportedComponents());
-    // Don't mock these simple components for now
+    // Don't mock these related components for now
     $imports.$restore({
       './LoadingSpinner': true,
       './TabHeader': true,
@@ -246,7 +246,6 @@ describe('ShareDialog', () => {
           .find('TabPanel')
           .filter({ active: true });
         assert.equal(activeTabPanel.props().id, 'export-panel');
-        assert.isTrue(activeTabPanel.find('Input').exists());
 
         // Now, reselect share tab
         act(() => {
@@ -259,29 +258,6 @@ describe('ShareDialog', () => {
 
         const shareTabPanel = wrapper.find('TabPanel').filter({ active: true });
         assert.equal(shareTabPanel.props().id, 'share-panel');
-      });
-
-      it('shows a loading indicator on the export tab if not ready', () => {
-        const wrapper = createComponent();
-        const exportTabSelector = 'Tab[aria-controls="export-panel"]';
-        fakeStore.isLoading.returns(true);
-
-        act(() => {
-          wrapper
-            .find(exportTabSelector)
-            .getDOMNode()
-            .dispatchEvent(new Event('click'));
-        });
-        wrapper.update();
-
-        const activeTabPanel = wrapper
-          .find('TabPanel')
-          .filter({ active: true });
-        assert.equal(activeTabPanel.props().id, 'export-panel');
-        assert.isFalse(activeTabPanel.find('Input').exists());
-        assert.isTrue(
-          activeTabPanel.find('[data-testid="loading-spinner"]').exists()
-        );
       });
     });
   });
