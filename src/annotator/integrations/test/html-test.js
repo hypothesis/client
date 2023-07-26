@@ -88,7 +88,7 @@ describe('HTMLIntegration', () => {
 
   // Generate a dummy response for `guessMainContentArea`. This response
   // is what would be returned when the content fills the full width of the
-  // viewport, mins space for an open sidebar and some padding.
+  // viewport, minus space for an open sidebar and some padding.
   //
   // The sidebar space is included because `fitSideBySide` adjusts the margins
   // on the body before calling `guessMainContentArea`.
