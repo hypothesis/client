@@ -8,7 +8,6 @@ describe('AnnotationsExporter', () => {
   beforeEach(() => {
     fakeStore = {
       profile: sinon.stub().returns({ userid: 'userId' }),
-      allAnnotations: sinon.stub(),
     };
     exporter = new AnnotationsExporter(fakeStore);
   });
@@ -27,9 +26,8 @@ describe('AnnotationsExporter', () => {
         $highlight: true,
       },
     ];
-    fakeStore.allAnnotations.returns(annotations);
 
-    const result = exporter.buildExportContent(now);
+    const result = exporter.buildExportContent(annotations, now);
 
     assert.deepEqual(result, {
       export_date: now.toISOString(),

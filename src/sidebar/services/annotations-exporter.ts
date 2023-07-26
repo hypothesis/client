@@ -1,4 +1,4 @@
-import type { APIAnnotationData } from '../../types/api';
+import type { Annotation, APIAnnotationData } from '../../types/api';
 import { stripInternalProperties } from '../helpers/strip-internal-properties';
 import { VersionData } from '../helpers/version-data';
 import type { SidebarStore } from '../store';
@@ -22,21 +22,21 @@ export class AnnotationsExporter {
     this._store = store;
   }
 
-  /**
-   * @param now - Test seam
-   */
-  buildExportContent(now = new Date()): ExportContent {
+  buildExportContent(
+    annotations: Annotation[],
+    /* istanbul ignore next - test seam */
+    now = new Date()
+  ): ExportContent {
     const profile = this._store.profile();
-    const annotations = this._store
-      .allAnnotations()
-      .map(stripInternalProperties) as APIAnnotationData[];
     const versionData = new VersionData(profile, []);
 
     return {
       export_date: now.toISOString(),
       export_userid: profile.userid ?? '',
       client_version: versionData.version,
-      annotations,
+      annotations: annotations.map(
+        stripInternalProperties
+      ) as APIAnnotationData[],
     };
   }
 }
