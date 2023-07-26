@@ -10,6 +10,16 @@ export type ExportContent = {
   annotations: APIAnnotationData[];
 };
 
+export type ExportContentResult = {
+  content: ExportContent;
+
+  /**
+   * The amount of annotations known by the client, that were not included in
+   * the export content because they are considered "drafts"
+   */
+  excludedAnnotations: number;
+};
+
 /**
  * Generates annotations exports
  *
@@ -25,18 +35,37 @@ export class AnnotationsExporter {
   /**
    * @param now - Test seam
    */
-  buildExportContent(now = new Date()): ExportContent {
+  buildExportContent(now = new Date()): ExportContentResult {
     const profile = this._store.profile();
-    const annotations = this._store
-      .allAnnotations()
-      .map(stripInternalProperties) as APIAnnotationData[];
+    const { annotations, excludedAnnotations } =
+      this._resolveAnnotationsToExport();
     const versionData = new VersionData(profile, []);
 
     return {
-      export_date: now.toISOString(),
-      export_userid: profile.userid ?? '',
-      client_version: versionData.version,
-      annotations,
+      content: {
+        export_date: now.toISOString(),
+        export_userid: profile.userid ?? '',
+        client_version: versionData.version,
+        annotations,
+      },
+      excludedAnnotations,
+    };
+  }
+
+  private _resolveAnnotationsToExport(): {
+    annotations: APIAnnotationData[];
+    excludedAnnotations: number;
+  } {
+    const allAnnotations = this._store.allAnnotations();
+    const filteredAnnotations = allAnnotations.filter(
+      annotation => !!annotation.id
+    );
+
+    return {
+      annotations: filteredAnnotations.map(
+        stripInternalProperties
+      ) as APIAnnotationData[],
+      excludedAnnotations: allAnnotations.length - filteredAnnotations.length,
     };
   }
 }
