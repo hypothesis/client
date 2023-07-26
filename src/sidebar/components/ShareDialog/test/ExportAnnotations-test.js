@@ -2,11 +2,14 @@ import { mount } from 'enzyme';
 
 import { checkAccessibility } from '../../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
+import * as fixtures from '../../../test/annotation-fixtures';
 import ExportAnnotations from '../ExportAnnotations';
 import { $imports } from '../ExportAnnotations';
 
 describe('ExportAnnotations', () => {
   let fakeStore;
+  let fakeAnnotationsExporter;
+  let fakeDownloadJSONFile;
 
   const fakePrivateGroup = {
     type: 'private',
@@ -14,19 +17,40 @@ describe('ExportAnnotations', () => {
     id: 'testprivate',
   };
 
-  const createComponent = props => mount(<ExportAnnotations {...props} />);
+  const createComponent = props =>
+    mount(
+      <ExportAnnotations
+        annotationsExporter={fakeAnnotationsExporter}
+        {...props}
+      />
+    );
 
   beforeEach(() => {
+    fakeAnnotationsExporter = {
+      buildExportContent: sinon.stub().returns({}),
+    };
+    fakeDownloadJSONFile = sinon.stub();
     fakeStore = {
-      allAnnotations: sinon.stub().returns(0),
+      countDrafts: sinon.stub().returns(0),
       focusedGroup: sinon.stub().returns(fakePrivateGroup),
       isLoading: sinon.stub().returns(false),
+      savedAnnotations: sinon
+        .stub()
+        .returns([fixtures.oldAnnotation(), fixtures.oldAnnotation()]),
     };
 
     $imports.$mock(mockImportedComponents());
 
     $imports.$mock({
+      '../../../shared/download-json-file': {
+        downloadJSONFile: fakeDownloadJSONFile,
+      },
       '../../store': { useSidebarStore: () => fakeStore },
+    });
+
+    // Restore this very simple component to get it test coverage
+    $imports.$restore({
+      './LoadingSpinner': true,
     });
   });
 
@@ -34,7 +58,7 @@ describe('ExportAnnotations', () => {
     $imports.$restore();
   });
 
-  context('export annotations not ready', () => {
+  context('export annotations not ready (loading)', () => {
     it('renders a loading spinner if there is no focused group', () => {
       fakeStore.focusedGroup.returns(null);
 
@@ -52,11 +76,114 @@ describe('ExportAnnotations', () => {
     });
   });
 
+  it('shows a count of annotations for export', () => {
+    fakeStore.savedAnnotations.returns([fixtures.oldAnnotation()]);
+    const wrapperSingular = createComponent();
+    fakeStore.savedAnnotations.returns([
+      fixtures.oldAnnotation(),
+      fixtures.oldAnnotation(),
+    ]);
+    const wrapperPlural = createComponent();
+
+    assert.include(
+      wrapperSingular.find('[data-testid="export-count"]').text(),
+      'Export 1 annotation in a file'
+    );
+
+    assert.include(
+      wrapperPlural.find('[data-testid="export-count"]').text(),
+      'Export 2 annotations in a file'
+    );
+  });
+
   it('provides a filename field', () => {
-    // TODO expand as component logic is implemented
     const wrapper = createComponent();
 
     assert.isTrue(wrapper.find('Input').exists());
+  });
+
+  describe('export button clicked', () => {
+    it('builds an export file from the non-draft annotations', () => {
+      const wrapper = createComponent();
+      const annotationsToExport = [
+        fixtures.oldAnnotation(),
+        fixtures.oldAnnotation(),
+      ];
+      fakeStore.savedAnnotations.returns(annotationsToExport);
+
+      wrapper.find('button[data-testid="export-button"]').simulate('click');
+
+      assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
+      assert.calledWith(
+        fakeAnnotationsExporter.buildExportContent,
+        annotationsToExport
+      );
+    });
+
+    it('downloads a file using user-entered filename appended with `.json`', () => {
+      const wrapper = createComponent();
+
+      wrapper.find('input[data-testid="export-filename"]').getDOMNode().value =
+        'my-filename';
+
+      wrapper.find('button[data-testid="export-button"]').simulate('click');
+
+      assert.calledOnce(fakeDownloadJSONFile);
+      assert.calledWith(
+        fakeDownloadJSONFile,
+        sinon.match.object,
+        'my-filename.json'
+      );
+    });
+  });
+
+  context('no annotations available to export', () => {
+    beforeEach(() => {
+      fakeStore.savedAnnotations.returns([]);
+    });
+
+    it('shows a message that no annotations are available', () => {
+      const wrapper = createComponent();
+
+      assert.include(
+        wrapper.find('[data-testid="no-annotations-message"]').text(),
+        'There are no annotations available for export'
+      );
+    });
+
+    it('disables the export button', () => {
+      const wrapper = createComponent();
+
+      assert.isTrue(
+        wrapper.find('button[data-testid="export-button"]').props().disabled
+      );
+    });
+
+    it('does not show the filename input field', () => {
+      const wrapper = createComponent();
+
+      assert.isFalse(wrapper.find('Input').exists());
+    });
+  });
+
+  context('there are draft annotations', () => {
+    it('shows a message with a count of draft annotations', () => {
+      fakeStore.countDrafts.returns(1);
+      const wrapperSingular = createComponent();
+
+      fakeStore.countDrafts.returns(2);
+      const wrapperPlural = createComponent();
+
+      assert.include(
+        wrapperSingular.find('[data-testid="drafts-message"]').text(),
+        'You have 1 unsaved annotation that'
+      );
+
+      assert.include(
+        wrapperPlural.find('[data-testid="drafts-message"]').text(),
+        'You have 2 unsaved annotations that'
+      );
+    });
   });
 
   it(
