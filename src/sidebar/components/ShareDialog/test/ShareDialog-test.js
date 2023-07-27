@@ -125,16 +125,20 @@ describe('ShareDialog', () => {
       fakeStore.isFeatureEnabled.withArgs('export_annotations').returns(true);
     });
 
-    // TODO: This test is not useful for non-tabbed interfaces because the
-    // ReactWrapper is empty. It is failing currently when the tabbed dialog
-    // is enabled on a `aria-invalid-attr-value` error on `aria-controls`
-    // attributes. I believe the rendered component markup is valid, but this
-    // failing test needs debugging. As the tabbed interface is behind a
-    // feature flag right now, deferring for followup.
-    it.skip(
+    it(
       'should pass a11y checks',
       checkAccessibility({
-        content: () => createComponent(),
+        content: () =>
+          // ShareDialog renders a Fragment as its top-level component when
+          // `export_annotations` feature is enabled.
+          // Wrapping it in a `div` ensures `checkAccessibility` internal logic
+          // does not discard all the Fragment children but the first one.
+          // See https://github.com/hypothesis/client/issues/5671
+          mount(
+            <div>
+              <ShareDialog />
+            </div>,
+          ),
       }),
     );
   });
