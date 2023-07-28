@@ -5,6 +5,7 @@ import { downloadJSONFile } from '../../../shared/download-json-file';
 import { withServices } from '../../service-context';
 import type { AnnotationsExporter } from '../../services/annotations-exporter';
 import { useSidebarStore } from '../../store';
+import { suggestedFilename } from '../../util/export-annotations';
 import LoadingSpinner from './LoadingSpinner';
 
 export type ExportAnnotationsProps = {
@@ -13,7 +14,6 @@ export type ExportAnnotationsProps = {
 };
 
 // TODO: Validate user-entered filename
-// TODO: Initial filename suggestion (date + group name + ...?)
 // TODO: does the Input need a label?
 
 /**
@@ -61,7 +61,7 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
           <Input
             data-testid="export-filename"
             id="export-filename"
-            defaultValue="suggested-filename-tbd"
+            defaultValue={suggestedFilename({ group })}
             elementRef={inputRef}
           />
         </>
