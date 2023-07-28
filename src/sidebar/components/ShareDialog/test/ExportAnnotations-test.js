@@ -54,11 +54,6 @@ describe('ExportAnnotations', () => {
     $imports.$restore({
       './LoadingSpinner': true,
     });
-
-    // Restore this very simple component to get it test coverage
-    $imports.$restore({
-      './LoadingSpinner': true,
-    });
   });
 
   afterEach(() => {
