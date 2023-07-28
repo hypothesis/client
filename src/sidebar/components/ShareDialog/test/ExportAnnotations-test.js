@@ -3,8 +3,7 @@ import { mount } from 'enzyme';
 import { checkAccessibility } from '../../../../test-util/accessibility';
 import { mockImportedComponents } from '../../../../test-util/mock-imported-components';
 import * as fixtures from '../../../test/annotation-fixtures';
-import ExportAnnotations from '../ExportAnnotations';
-import { $imports } from '../ExportAnnotations';
+import ExportAnnotations, { $imports } from '../ExportAnnotations';
 
 describe('ExportAnnotations', () => {
   let fakeStore;
@@ -46,6 +45,9 @@ describe('ExportAnnotations', () => {
         downloadJSONFile: fakeDownloadJSONFile,
       },
       '../../store': { useSidebarStore: () => fakeStore },
+      '../../util/export-annotations': {
+        suggestedFilename: () => 'suggested-filename',
+      },
     });
 
     // Restore this very simple component to get it test coverage
@@ -96,10 +98,12 @@ describe('ExportAnnotations', () => {
     );
   });
 
-  it('provides a filename field', () => {
+  it('provides a filename field with a default suggested name', () => {
     const wrapper = createComponent();
+    const input = wrapper.find('Input');
 
-    assert.isTrue(wrapper.find('Input').exists());
+    assert.isTrue(input.exists());
+    assert.equal(input.prop('defaultValue'), 'suggested-filename');
   });
 
   describe('export button clicked', () => {
