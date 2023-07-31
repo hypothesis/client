@@ -2678,9 +2678,9 @@ __metadata:
   linkType: hard
 
 "@types/katex@npm:^0.16.0":
-  version: 0.16.1
-  resolution: "@types/katex@npm:0.16.1"
-  checksum: f09c40920dbbc214ec3bb8f0028f5f155002f4fb77316f7b72cbe7ad751ce5ea565772c37ecdb1549611b0d71a2b006be8387e6a871cc49e9b72e0fe2bb9276e
+  version: 0.16.2
+  resolution: "@types/katex@npm:0.16.2"
+  checksum: c681c3b8b5ec5de9422ec041ffdf43227a3ef2877b2b1d1c906b8d87341d385259b468febbb0426dd8834d2803fe5ab86384557b70dfbd89e9ae0af6886898ba
   languageName: node
   linkType: hard
 
