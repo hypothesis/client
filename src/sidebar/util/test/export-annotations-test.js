@@ -1,4 +1,4 @@
-import { suggestedFilename } from '../export-annotations';
+import { suggestedFilename, validateFilename } from '../export-annotations';
 
 describe('suggestedFilename', () => {
   [
@@ -21,5 +21,23 @@ describe('suggestedFilename', () => {
     it('builds expected filename for provided arguments', () => {
       assert.equal(suggestedFilename({ date, group }), expectedResult);
     });
+  });
+});
+
+describe('validateFilename', () => {
+  ['\\n', ':', '\\', '/', '*', '?', '"', "'", '<', '>'].forEach(character => {
+    it(`returns 'false' when filename includes '${character}'`, () => {
+      assert.isFalse(validateFilename(`filename${character}`));
+    });
+  });
+
+  ['', ''.padStart(256, 'a')].forEach(filename => {
+    it('returns `false` when filename does not have a valid length', () => {
+      assert.isFalse(validateFilename(filename));
+    });
+  });
+
+  it('returns `true` for valid filenames', () => {
+    assert.isTrue(validateFilename('my-file-name'));
   });
 });

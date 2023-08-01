@@ -1,11 +1,14 @@
 import { Button, CardActions, Input } from '@hypothesis/frontend-shared';
-import { useRef } from 'preact/hooks';
+import { useMemo, useState } from 'preact/hooks';
 
 import { downloadJSONFile } from '../../../shared/download-json-file';
 import { withServices } from '../../service-context';
 import type { AnnotationsExporter } from '../../services/annotations-exporter';
 import { useSidebarStore } from '../../store';
-import { suggestedFilename } from '../../util/export-annotations';
+import {
+  suggestedFilename,
+  validateFilename,
+} from '../../util/export-annotations';
 import LoadingSpinner from './LoadingSpinner';
 
 export type ExportAnnotationsProps = {
@@ -13,7 +16,6 @@ export type ExportAnnotationsProps = {
   annotationsExporter: AnnotationsExporter;
 };
 
-// TODO: Validate user-entered filename
 // TODO: does the Input need a label?
 
 /**
@@ -28,14 +30,20 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
   const exportCount = exportableAnnotations.length;
   const draftCount = store.countDrafts();
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [inputValue, setInputValue] = useState<string>(
+    suggestedFilename({ group }),
+  );
+  const isValidFilename = useMemo(
+    () => validateFilename(inputValue),
+    [inputValue],
+  );
 
   if (!exportReady) {
     return <LoadingSpinner />;
   }
 
   const exportAnnotations = () => {
-    const filename = `${inputRef.current!.value}.json`;
+    const filename = `${inputValue}.json`;
     const exportData = annotationsExporter.buildExportContent(
       exportableAnnotations,
     );
@@ -61,8 +69,9 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
           <Input
             data-testid="export-filename"
             id="export-filename"
-            defaultValue={suggestedFilename({ group })}
-            elementRef={inputRef}
+            value={inputValue}
+            onInput={e => setInputValue((e.target as HTMLInputElement).value)}
+            hasError={!isValidFilename}
           />
         </>
       ) : (
@@ -80,7 +89,7 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
         <Button
           data-testid="export-button"
           variant="primary"
-          disabled={!exportCount}
+          disabled={!exportCount || !isValidFilename}
           onClick={exportAnnotations}
         >
           Export

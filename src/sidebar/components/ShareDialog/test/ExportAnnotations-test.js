@@ -103,7 +103,7 @@ describe('ExportAnnotations', () => {
     const input = wrapper.find('Input');
 
     assert.isTrue(input.exists());
-    assert.equal(input.prop('defaultValue'), 'suggested-filename');
+    assert.equal(input.prop('value'), 'suggested-filename');
   });
 
   describe('export button clicked', () => {
@@ -126,93 +126,10 @@ describe('ExportAnnotations', () => {
 
     it('downloads a file using user-entered filename appended with `.json`', () => {
       const wrapper = createComponent();
+      const input = wrapper.find('input[data-testid="export-filename"]');
 
-      wrapper.find('input[data-testid="export-filename"]').getDOMNode().value =
-        'my-filename';
-
-      wrapper.find('button[data-testid="export-button"]').simulate('click');
-
-      assert.calledOnce(fakeDownloadJSONFile);
-      assert.calledWith(
-        fakeDownloadJSONFile,
-        sinon.match.object,
-        'my-filename.json',
-      );
-    });
-  });
-
-  context('no annotations available to export', () => {
-    beforeEach(() => {
-      fakeStore.savedAnnotations.returns([]);
-    });
-
-    it('shows a message that no annotations are available', () => {
-      const wrapper = createComponent();
-
-      assert.include(
-        wrapper.find('[data-testid="no-annotations-message"]').text(),
-        'There are no annotations available for export',
-      );
-    });
-
-    it('disables the export button', () => {
-      const wrapper = createComponent();
-
-      assert.isTrue(
-        wrapper.find('button[data-testid="export-button"]').props().disabled,
-      );
-    });
-
-    it('does not show the filename input field', () => {
-      const wrapper = createComponent();
-
-      assert.isFalse(wrapper.find('Input').exists());
-    });
-  });
-
-  context('there are draft annotations', () => {
-    it('shows a message with a count of draft annotations', () => {
-      fakeStore.countDrafts.returns(1);
-      const wrapperSingular = createComponent();
-
-      fakeStore.countDrafts.returns(2);
-      const wrapperPlural = createComponent();
-
-      assert.include(
-        wrapperSingular.find('[data-testid="drafts-message"]').text(),
-        'You have 1 unsaved annotation that',
-      );
-
-      assert.include(
-        wrapperPlural.find('[data-testid="drafts-message"]').text(),
-        'You have 2 unsaved annotations that',
-      );
-    });
-  });
-
-  describe('export button clicked', () => {
-    it('builds an export file from the non-draft annotations', () => {
-      const wrapper = createComponent();
-      const annotationsToExport = [
-        fixtures.oldAnnotation(),
-        fixtures.oldAnnotation(),
-      ];
-      fakeStore.savedAnnotations.returns(annotationsToExport);
-
-      wrapper.find('button[data-testid="export-button"]').simulate('click');
-
-      assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
-      assert.calledWith(
-        fakeAnnotationsExporter.buildExportContent,
-        annotationsToExport,
-      );
-    });
-
-    it('downloads a file using user-entered filename appended with `.json`', () => {
-      const wrapper = createComponent();
-
-      wrapper.find('input[data-testid="export-filename"]').getDOMNode().value =
-        'my-filename';
+      input.getDOMNode().value = 'my-filename';
+      input.simulate('input');
 
       wrapper.find('button[data-testid="export-button"]').simulate('click');
 
