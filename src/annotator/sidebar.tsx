@@ -74,7 +74,7 @@ function createSidebarIframe(config: SidebarConfig): HTMLIFrameElement {
   const sidebarURL = config.sidebarAppUrl;
   const sidebarAppSrc = addConfigFragment(
     sidebarURL,
-    createAppConfig(sidebarURL, config)
+    createAppConfig(sidebarURL, config),
   );
 
   const sidebarFrame = document.createElement('iframe');
@@ -149,7 +149,7 @@ export class Sidebar implements Destroyable {
   constructor(
     element: HTMLElement,
     eventBus: EventBus,
-    config: SidebarContainerConfig & SidebarConfig
+    config: SidebarContainerConfig & SidebarConfig,
   ) {
     this._emitter = eventBus.createEmitter();
     this._guestWithSelection = null;
@@ -175,11 +175,11 @@ export class Sidebar implements Destroyable {
         let bucketBarContainer: HTMLElement | undefined;
         if (config.bucketContainerSelector) {
           bucketBarContainer = document.querySelector(
-            config.bucketContainerSelector
+            config.bucketContainerSelector,
           ) as HTMLElement | undefined;
           if (!bucketBarContainer) {
             console.warn(
-              `Custom bucket container "${config.bucketContainerSelector}" not found`
+              `Custom bucket container "${config.bucketContainerSelector}" not found`,
             );
           }
         }
@@ -207,7 +207,7 @@ export class Sidebar implements Destroyable {
 
           // Allow pointer events to go through this container to page elements
           // (eg. scroll bar thumbs) which are behind it.
-          'pointer-events-none'
+          'pointer-events-none',
         );
         this.iframeContainer.append(sidebarEdge);
 
@@ -222,7 +222,7 @@ export class Sidebar implements Destroyable {
             this._guestRPC.forEach(rpc => rpc.call('scrollToAnnotation', tag)),
           onSelectAnnotations: (tags, toggle) =>
             this._guestRPC.forEach(rpc =>
-              rpc.call('selectAnnotations', tags, toggle)
+              rpc.call('selectAnnotations', tags, toggle),
             ),
         });
       }
@@ -403,7 +403,7 @@ export class Sidebar implements Destroyable {
 
     this._sidebarRPC.on(
       'featureFlagsUpdated',
-      (flags: Record<string, boolean>) => this.features.update(flags)
+      (flags: Record<string, boolean>) => this.features.update(flags),
     );
 
     this._sidebarRPC.on('connect', () => {
@@ -426,7 +426,7 @@ export class Sidebar implements Destroyable {
     });
 
     this._sidebarRPC.on('showHighlights', () =>
-      this.setHighlightsVisible(true)
+      this.setHighlightsVisible(true),
     );
 
     this._sidebarRPC.on('openSidebar', () => this.open());
@@ -490,10 +490,10 @@ export class Sidebar implements Destroyable {
       this._hammerManager.on(
         'panstart panend panleft panright',
         /* istanbul ignore next */
-        event => this._onPan(event)
+        event => this._onPan(event),
       );
       this._hammerManager.add(
-        new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL })
+        new Hammer.Pan({ direction: Hammer.DIRECTION_HORIZONTAL }),
       );
     }
   }
@@ -583,7 +583,7 @@ export class Sidebar implements Destroyable {
     this.onLayoutChange?.(layoutState);
 
     this._guestRPC.forEach(rpc =>
-      rpc.call('sidebarLayoutChanged', layoutState)
+      rpc.call('sidebarLayoutChanged', layoutState),
     );
   }
 
@@ -617,7 +617,7 @@ export class Sidebar implements Destroyable {
         frame.style.pointerEvents = 'none';
 
         this._gestureState.initial = parseInt(
-          getComputedStyle(frame).marginLeft
+          getComputedStyle(frame).marginLeft,
         );
 
         break;

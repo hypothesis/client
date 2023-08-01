@@ -75,7 +75,7 @@ export class StreamFilter {
     field: FilterClause['field'],
     operator: FilterClause['operator'],
     value: FilterClause['value'],
-    caseSensitive: FilterClause['case_sensitive'] = false
+    caseSensitive: FilterClause['case_sensitive'] = false,
   ) {
     this._filter.clauses.push({
       field,

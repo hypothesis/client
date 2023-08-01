@@ -25,7 +25,7 @@ export function useUserFilterOptions(): FilterOption[] {
       users[username_] = annotationDisplayName(
         annotation,
         defaultAuthority,
-        displayNamesEnabled
+        displayNamesEnabled,
       );
     });
 

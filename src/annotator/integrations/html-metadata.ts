@@ -100,7 +100,7 @@ export class HTMLMetadata {
    */
   private _getMetaTags(
     attribute: string,
-    prefix: string
+    prefix: string,
   ): Record<string, string[]> {
     const tags: Record<string, string[]> = {};
     for (const meta of Array.from(this.document.querySelectorAll('meta'))) {
@@ -148,7 +148,7 @@ export class HTMLMetadata {
     metadata: Pick<HTMLDocumentMetadata, 'highwire' | 'dc'> = {
       dc: {},
       highwire: {},
-    }
+    },
   ): Link[] {
     const links: Link[] = [{ href: this._getDocumentHref() }];
 

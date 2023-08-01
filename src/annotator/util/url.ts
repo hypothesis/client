@@ -8,7 +8,7 @@
  */
 export function normalizeURI(
   uri: string,
-  base: string = document.baseURI
+  base: string = document.baseURI,
 ): string {
   const absUrl = new URL(uri, base).href;
 

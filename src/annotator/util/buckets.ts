@@ -100,7 +100,7 @@ export const BUCKET_BAR_VERTICAL_MARGIN = 30;
  */
 export function computeBuckets(
   anchorPositions: AnchorPosition[],
-  container: Element
+  container: Element,
 ): BucketSet {
   const aboveAnchors = [] as AnchorPosition[];
   const belowAnchors = [] as AnchorPosition[];

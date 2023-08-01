@@ -44,7 +44,7 @@ function resolveOffsets(
   let nextOffset = offsets.shift();
   const nodeIter = element.ownerDocument.createNodeIterator(
     element,
-    NodeFilter.SHOW_TEXT
+    NodeFilter.SHOW_TEXT,
   );
   const results = [];
 
@@ -157,7 +157,7 @@ export class TextPosition {
       if (this.offset === 0 && options.direction !== undefined) {
         const tw = document.createTreeWalker(
           this.element.getRootNode(),
-          NodeFilter.SHOW_TEXT
+          NodeFilter.SHOW_TEXT,
         );
         tw.currentNode = this.element;
         const forwards = options.direction === ResolveDirection.FORWARDS;
@@ -254,7 +254,7 @@ export class TextRange {
   relativeTo(element: Element): TextRange {
     return new TextRange(
       this.start.relativeTo(element),
-      this.end.relativeTo(element)
+      this.end.relativeTo(element),
     );
   }
 
@@ -279,7 +279,7 @@ export class TextRange {
       [start, end] = resolveOffsets(
         this.start.element,
         this.start.offset,
-        this.end.offset
+        this.end.offset,
       );
     } else {
       start = this.start.resolve({
@@ -300,7 +300,7 @@ export class TextRange {
   static fromRange(range: Range): TextRange {
     const start = TextPosition.fromPoint(
       range.startContainer,
-      range.startOffset
+      range.startOffset,
     );
     const end = TextPosition.fromPoint(range.endContainer, range.endOffset);
     return new TextRange(start, end);
@@ -313,7 +313,7 @@ export class TextRange {
   static fromOffsets(root: Element, start: number, end: number): TextRange {
     return new TextRange(
       new TextPosition(root, start),
-      new TextPosition(root, end)
+      new TextPosition(root, end),
     );
   }
 

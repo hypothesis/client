@@ -19,7 +19,7 @@ describe('NotebookModal', () => {
       <NotebookModal
         eventBus={eventBus}
         config={{ notebookAppUrl: notebookURL, ...config }}
-      />
+      />,
     );
     components.push(component);
     return component;
@@ -69,7 +69,7 @@ describe('NotebookModal', () => {
     const iframe = wrapper.find('iframe');
     assert.equal(
       iframe.prop('src'),
-      addConfigFragment(notebookURL, { group: 'myGroup' })
+      addConfigFragment(notebookURL, { group: 'myGroup' }),
     );
   });
 
@@ -82,7 +82,7 @@ describe('NotebookModal', () => {
     const iframe1 = wrapper.find('iframe');
     assert.equal(
       iframe1.prop('src'),
-      addConfigFragment(notebookURL, { group: '1' })
+      addConfigFragment(notebookURL, { group: '1' }),
     );
 
     emitter.publish('openNotebook', '1');
@@ -91,7 +91,7 @@ describe('NotebookModal', () => {
     const iframe2 = wrapper.find('iframe');
     assert.equal(
       iframe2.prop('src'),
-      addConfigFragment(notebookURL, { group: '1' })
+      addConfigFragment(notebookURL, { group: '1' }),
     );
     assert.notEqual(iframe1.getDOMNode(), iframe2.getDOMNode());
 
@@ -101,7 +101,7 @@ describe('NotebookModal', () => {
     const iframe3 = wrapper.find('iframe');
     assert.equal(
       iframe3.prop('src'),
-      addConfigFragment(notebookURL, { group: '2' })
+      addConfigFragment(notebookURL, { group: '2' }),
     );
     assert.notEqual(iframe1.getDOMNode(), iframe3.getDOMNode());
   });

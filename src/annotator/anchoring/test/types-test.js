@@ -248,7 +248,7 @@ describe('annotator/anchoring/types', () => {
           FakeTextRange.fromOffsets,
           container,
           anchor.start,
-          anchor.end
+          anchor.end,
         );
       });
     });
@@ -308,7 +308,7 @@ describe('annotator/anchoring/types', () => {
         const range = TextRange.fromOffsets(
           container,
           pos,
-          pos + quote.length
+          pos + quote.length,
         ).toRange();
 
         const anchor = TextQuoteAnchor.fromRange(container, range);
@@ -393,7 +393,7 @@ describe('annotator/anchoring/types', () => {
         fakeMatchQuote.returns(null);
         const quoteAnchor = new TextQuoteAnchor(
           container,
-          'five score and nine years ago'
+          'five score and nine years ago',
         );
         assert.throws(() => {
           quoteAnchor.toRange();
@@ -419,7 +419,7 @@ describe('annotator/anchoring/types', () => {
         fakeMatchQuote.returns(null);
         const quoteAnchor = new TextQuoteAnchor(
           container,
-          'five score and nine years ago'
+          'five score and nine years ago',
         );
         assert.throws(() => {
           quoteAnchor.toPositionAnchor();
@@ -474,7 +474,7 @@ describe('annotator/anchoring/types', () => {
             Invalid two
           </p>
         </article>,
-        container
+        container,
       );
       return container;
     }
@@ -484,16 +484,16 @@ describe('annotator/anchoring/types', () => {
       startPara,
       startOffset,
       endPara,
-      endOffset
+      endOffset,
     ) {
       const range = new Range();
       range.setStart(
         container.querySelector(`p:nth-of-type(${startPara + 1})`).firstChild,
-        startOffset
+        startOffset,
       );
       range.setEnd(
         container.querySelector(`p:nth-of-type(${endPara + 1})`).firstChild,
-        endOffset
+        endOffset,
       );
       return range;
     }
@@ -530,7 +530,7 @@ describe('annotator/anchoring/types', () => {
           replaceAttr(
             range.startContainer.parentElement,
             'data-time-start',
-            startAttr
+            startAttr,
           );
           const anchor = MediaTimeAnchor.fromRange(container, range);
 
@@ -546,7 +546,7 @@ describe('annotator/anchoring/types', () => {
           replaceAttr(
             range.endContainer.parentElement,
             'data-time-end',
-            endAttr
+            endAttr,
           );
           const anchor = MediaTimeAnchor.fromRange(container, range);
 
@@ -565,7 +565,7 @@ describe('annotator/anchoring/types', () => {
         };
         const range = MediaTimeAnchor.fromSelector(
           container,
-          selector
+          selector,
         ).toRange();
         assert.equal(range.toString(), 'First segment.Second segment.');
       });

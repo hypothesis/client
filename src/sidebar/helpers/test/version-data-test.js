@@ -46,7 +46,7 @@ describe('sidebar/helpers/version-data', () => {
             userid: 'acct:foo@bar.com',
             displayName: 'Fred Hubert',
           },
-          []
+          [],
         );
         assert.equal(versionData.account, 'Fred Hubert (acct:foo@bar.com)');
       });
@@ -126,7 +126,7 @@ describe('sidebar/helpers/version-data', () => {
         const versionData = new VersionData({}, []);
         const encoded = versionData.asEncodedURLString();
         const subStr = encodeURIComponent(
-          `${prop[0]}: ${versionData[prop[1]]}\n`
+          `${prop[0]}: ${versionData[prop[1]]}\n`,
         );
         assert.include(encoded, subStr);
       });

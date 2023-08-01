@@ -40,7 +40,7 @@ describe('annotator/util/normalize', () => {
           outStr,
           start,
           end,
-          isNotSpace
+          isNotSpace,
         );
 
         assert.equal(outStart, expectedStart, 'Incorrect start offset');
@@ -56,7 +56,7 @@ describe('annotator/util/normalize', () => {
         outStr,
         0,
         5,
-        isNotSpace
+        isNotSpace,
       );
       assert.equal(outStart, 5);
       assert.equal(outEnd, 5);
@@ -72,7 +72,7 @@ describe('annotator/util/normalize', () => {
         outStr,
         start,
         end,
-        isNotSpace
+        isNotSpace,
       );
       assert.equal(outStart, outStr.indexOf('a'));
       assert.equal(outEnd, outStr.indexOf('d') + 1);
@@ -88,7 +88,7 @@ describe('annotator/util/normalize', () => {
         outStr,
         start,
         end,
-        isNotSpace
+        isNotSpace,
       );
       assert.equal(outStart, outStr.indexOf('c'));
       assert.equal(outEnd, outStr.indexOf('d') + 1);
@@ -104,7 +104,7 @@ describe('annotator/util/normalize', () => {
         outStr,
         start,
         start,
-        isNotSpace
+        isNotSpace,
       );
 
       assert.equal(outStart, outStr.indexOf('c'));
@@ -123,7 +123,7 @@ describe('annotator/util/normalize', () => {
           outStr,
           start,
           end,
-          isNotSpace
+          isNotSpace,
         );
         const outSubStr = outStr.slice(outStart, outEnd);
         assert.equal(outSubStr, inStr.slice(start, start + outSubStr.length));

@@ -153,7 +153,7 @@ export class PortProvider implements Destroyable {
 
       if (!isSourceWindow(source)) {
         reportError(
-          `Ignored port request for channel ${channel} from non-Window source`
+          `Ignored port request for channel ${channel} from non-Window source`,
         );
         return;
       }
@@ -165,12 +165,12 @@ export class PortProvider implements Destroyable {
             allowedOrigin,
             data,
             origin,
-          })
+          }),
       );
 
       if (match === undefined) {
         reportError(
-          `Ignored invalid port request for channel ${channel} from ${origin}`
+          `Ignored invalid port request for channel ${channel} from ${origin}`,
         );
         return;
       }
@@ -215,7 +215,7 @@ export class PortProvider implements Destroyable {
     this._listeners.add(
       window,
       'message',
-      captureErrors(handleRequest, errorContext)
+      captureErrors(handleRequest, errorContext),
     );
   }
 
@@ -246,7 +246,7 @@ export class PortProvider implements Destroyable {
 
   on(
     eventName: 'frameConnected',
-    handler: (source: 'guest' | 'sidebar', port: MessagePort) => void
+    handler: (source: 'guest' | 'sidebar', port: MessagePort) => void,
   ) {
     this._emitter.on(eventName, handler);
   }

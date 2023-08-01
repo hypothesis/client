@@ -91,8 +91,8 @@ describe('sidebar/config/build-settings', () => {
             'https://embedder.com',
             'requestConfig',
             [],
-            3000
-          )
+            3000,
+          ),
         );
       });
 
@@ -119,7 +119,7 @@ describe('sidebar/config/build-settings', () => {
         });
         await assert.rejects(
           buildSettings({}, fakeWindow),
-          /The target parent frame has exceeded the ancestor tree|Try reducing the/g
+          /The target parent frame has exceeded the ancestor tree|Try reducing the/g,
         );
       });
 
@@ -154,7 +154,7 @@ describe('sidebar/config/build-settings', () => {
         const configFromSidebar = { foo: 'bar', appType: 'via' };
         await assert.rejects(
           buildSettings(configFromSidebar, fakeWindow),
-          'Nope'
+          'Nope',
         );
       });
 
@@ -185,8 +185,8 @@ describe('sidebar/config/build-settings', () => {
             'https://embedder.com',
             'requestGroups',
             [0], // passes service index to requestGroups
-            0 // no timeout
-          )
+            0, // no timeout
+          ),
         );
       });
 
@@ -202,7 +202,7 @@ describe('sidebar/config/build-settings', () => {
         const result = await buildSettings(configFromSidebar, fakeWindow);
         await assert.rejects(
           result.services[0].groups,
-          'Unable to fetch groups'
+          'Unable to fetch groups',
         );
       });
 
@@ -246,7 +246,7 @@ describe('sidebar/config/build-settings', () => {
         });
         await assert.rejects(
           buildSettings({}, fakeWindow),
-          'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
+          'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified',
         );
       });
 
@@ -259,7 +259,7 @@ describe('sidebar/config/build-settings', () => {
         });
         await assert.rejects(
           buildSettings({}, fakeWindow),
-          'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
+          'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified',
         );
       });
     });

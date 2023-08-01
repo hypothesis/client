@@ -20,7 +20,7 @@ function audioElement(src: string): HTMLAudioElement {
  */
 function wrapInAspectRatioContainer(
   element: HTMLElement,
-  aspectRatio: number
+  aspectRatio: number,
 ): HTMLElement {
   element.style.position = 'absolute';
   element.style.top = '0';
@@ -155,7 +155,7 @@ function createEmbedGenerator(
   hostname: string,
   pathPattern: RegExp,
   iframeUrlGenerator: (videoId: string) => string,
-  { aspectRatio }: { aspectRatio?: number } = {}
+  { aspectRatio }: { aspectRatio?: number } = {},
 ): (link: HTMLAnchorElement) => HTMLElement | null {
   const generator = (link: HTMLAnchorElement) => {
     if (link.hostname !== hostname) {
@@ -218,21 +218,21 @@ const embedGenerators: Array<(link: HTMLAnchorElement) => HTMLElement | null> =
     createEmbedGenerator(
       'vimeo.com',
       /^\/([^/?#]+)\/?$/,
-      id => `https://player.vimeo.com/video/${id}`
+      id => `https://player.vimeo.com/video/${id}`,
     ),
 
     // Matches URLs like https://vimeo.com/channels/staffpicks/148845534
     createEmbedGenerator(
       'vimeo.com',
       /^\/channels\/[^/]+\/([^/?#]+)\/?$/,
-      id => `https://player.vimeo.com/video/${id}`
+      id => `https://player.vimeo.com/video/${id}`,
     ),
 
     // Matches URLs like https://flipgrid.com/s/030475b8ceff
     createEmbedGenerator(
       'flipgrid.com',
       /^\/s\/([^/]+)$/,
-      id => `https://flipgrid.com/s/${id}?embed=true`
+      id => `https://flipgrid.com/s/${id}?embed=true`,
     ),
 
     /**
@@ -393,7 +393,7 @@ export type EmbedOptions = {
  */
 export function replaceLinksWithEmbeds(
   element: HTMLElement,
-  { className }: EmbedOptions = {}
+  { className }: EmbedOptions = {},
 ) {
   // Get a static (non-live) list of <a> children of `element`.
   // It needs to be static because we may replace these elements as we iterate over them.

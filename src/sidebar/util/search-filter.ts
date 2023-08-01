@@ -125,7 +125,7 @@ export type FocusFilter = {
  */
 export function generateFacetedFilter(
   searchText: string,
-  focusFilters: FocusFilter = {}
+  focusFilters: FocusFilter = {},
 ): Record<string, Facet> {
   const any = [];
   const quote = [];
@@ -159,7 +159,7 @@ export function generateFacetedFilter(
             year: 365 * secondsPerDay,
           };
           const match = time.match(
-            /^(\d+)(sec|min|hour|day|week|month|year)?$/
+            /^(\d+)(sec|min|hour|day|week|month|year)?$/,
           );
           if (match) {
             const value = parseFloat(match[1]);

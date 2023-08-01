@@ -12,7 +12,7 @@ describe('EmptyAnnotation', () => {
         replyCount={0}
         threadIsCollapsed={true}
         {...props}
-      />
+      />,
     );
   };
 
@@ -58,7 +58,7 @@ describe('EmptyAnnotation', () => {
 
       assert.equal(
         wrapper.find('article').props()['aria-label'],
-        'Annotation with unavailable content'
+        'Annotation with unavailable content',
       );
       assert.equal(wrapper.text(), 'Message not available.');
     });
@@ -70,7 +70,7 @@ describe('EmptyAnnotation', () => {
 
       assert.equal(
         wrapper.find('article').props()['aria-label'],
-        'Reply with unavailable content'
+        'Reply with unavailable content',
       );
     });
   });
@@ -93,6 +93,6 @@ describe('EmptyAnnotation', () => {
           return createComponent({ isReply: true, threadIsCollapsed: true });
         },
       },
-    ])
+    ]),
   );
 });

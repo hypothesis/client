@@ -52,7 +52,7 @@ export default function ProfileModal({ eventBus, config }: ProfileModalProps) {
               // interfering with modal overlays. Re-activate the dark variant's
               // background color on hover.
               // See https://github.com/hypothesis/client/issues/3676
-              '!bg-transparent enabled:hover:!bg-grey-3'
+              '!bg-transparent enabled:hover:!bg-grey-3',
             )}
           >
             <CancelIcon className="w-4 h-4" />

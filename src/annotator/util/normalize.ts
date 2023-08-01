@@ -6,7 +6,7 @@ function advance(
   str: string,
   count: number,
   filter: (char: string) => boolean,
-  startPos = 0
+  startPos = 0,
 ): number {
   let pos = startPos;
   while (pos < str.length && count > 0) {
@@ -25,7 +25,7 @@ function countChars(
   str: string,
   filter: (char: string) => boolean,
   startPos: number,
-  endPos: number
+  endPos: number,
 ): number {
   let count = 0;
   for (let pos = startPos; pos < endPos; pos++) {
@@ -69,7 +69,7 @@ export function translateOffsets(
   output: string,
   start: number,
   end: number,
-  filter: (ch: string) => boolean
+  filter: (ch: string) => boolean,
 ): [number, number] {
   const beforeStartCount = countChars(input, filter, 0, start);
   const startToEndCount = countChars(input, filter, start, end);

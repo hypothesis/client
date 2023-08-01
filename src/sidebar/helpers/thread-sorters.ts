@@ -24,7 +24,7 @@ function newestRootAnnotationDate(thread: Thread): string {
   return annotations.reduce(
     (newestDate, annotation) =>
       annotation.created > newestDate ? annotation.created : newestDate,
-    ''
+    '',
   );
 }
 

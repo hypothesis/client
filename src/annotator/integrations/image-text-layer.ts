@@ -216,7 +216,7 @@ export class ImageTextLayer {
     const scaledValue = (
       dimension: 'x' | 'y',
       value: number,
-      unit = 'px' as string
+      unit = 'px' as string,
     ) => `calc(var(--${dimension}-scale) * ${value}${unit})`;
 
     // Group characters into words, lines and columns. Then use the result to
@@ -243,14 +243,14 @@ export class ImageTextLayer {
         lineEl.style.display = 'block';
         lineEl.style.marginLeft = scaledValue(
           'x',
-          line.rect.left - column.rect.left
+          line.rect.left - column.rect.left,
         );
         lineEl.style.height = scaledValue('y', line.rect.height);
 
         if (prevLine) {
           lineEl.style.marginTop = scaledValue(
             'y',
-            line.rect.top - prevLine.rect.bottom
+            line.rect.top - prevLine.rect.bottom,
           );
         }
         prevLine = line;
@@ -268,7 +268,7 @@ export class ImageTextLayer {
           if (prevWord) {
             wordEl.style.marginLeft = scaledValue(
               'x',
-              word.rect.left - prevWord.rect.right
+              word.rect.left - prevWord.rect.right,
             );
           }
           prevWord = word;

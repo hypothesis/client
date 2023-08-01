@@ -49,7 +49,7 @@ describe('annotator/util/shadow-root', () => {
 
     it('does not inject stylesheets into the shadow root if style is not found', () => {
       const link = document.querySelector(
-        'link[rel="preload"][href*="/build/styles/annotator.css"]'
+        'link[rel="preload"][href*="/build/styles/annotator.css"]',
       );
       // Removing the `rel` attribute is enough for the URL to not be found
       link.removeAttribute('rel');
@@ -71,7 +71,7 @@ describe('annotator/util/shadow-root', () => {
       innerElement.dispatchEvent(
         // `composed` property is necessary to bubble up the event out of the shadow DOM.
         // browser generated events, have this property set to true.
-        new Event('mouseup', { bubbles: true, composed: true })
+        new Event('mouseup', { bubbles: true, composed: true }),
       );
 
       assert.notCalled(onClick);
@@ -87,7 +87,7 @@ describe('annotator/util/shadow-root', () => {
       innerElement.dispatchEvent(
         // `composed` property is necessary to bubble up the event out of the shadow DOM.
         // browser generated events, have this property set to true.
-        new Event('mousedown', { bubbles: true, composed: true })
+        new Event('mousedown', { bubbles: true, composed: true }),
       );
 
       assert.notCalled(onClick);
@@ -103,7 +103,7 @@ describe('annotator/util/shadow-root', () => {
       // `composed` property is necessary to bubble up the event out of the shadow DOM.
       // browser generated events, have this property set to true.
       innerElement.dispatchEvent(
-        new Event('touchstart', { bubbles: true, composed: true })
+        new Event('touchstart', { bubbles: true, composed: true }),
       );
 
       assert.notCalled(onTouch);

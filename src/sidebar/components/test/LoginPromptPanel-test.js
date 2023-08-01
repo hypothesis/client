@@ -16,7 +16,7 @@ describe('LoginPromptPanel', () => {
         onLogin={fakeOnLogin}
         onSignUp={fakeOnSignUp}
         {...props}
-      />
+      />,
     );
   }
 
@@ -56,6 +56,6 @@ describe('LoginPromptPanel', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

@@ -27,7 +27,7 @@ function SavingMessage() {
         'flex grow justify-end items-center gap-x-1',
         // Make sure height matches that of action-bar icons so that there
         // isn't a height change when transitioning in and out of saving state
-        'h-8 touch:h-touch-minimum'
+        'h-8 touch:h-touch-minimum',
       )}
       data-testid="saving-message"
     >
@@ -99,7 +99,7 @@ function Annotation({
   const authorName = useMemo(
     () =>
       annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled),
-    [annotation, defaultAuthority, displayNamesEnabled]
+    [annotation, defaultAuthority, displayNamesEnabled],
   );
 
   const annotationDescription = isSaved(annotation)

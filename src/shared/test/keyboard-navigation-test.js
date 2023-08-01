@@ -188,7 +188,7 @@ describe('shared/keyboard-navigation', () => {
         assert.equal(
           event.defaultPrevented,
           shouldHandle,
-          `${key} defaultPrevented`
+          `${key} defaultPrevented`,
         );
         assert.equal(handleKeyDown.called, !shouldHandle, `${key} propagated`);
         handleKeyDown.resetHistory();

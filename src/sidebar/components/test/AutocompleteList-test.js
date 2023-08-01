@@ -14,7 +14,7 @@ describe('AutocompleteList', () => {
         list={fakeList}
         onSelectItem={fakeOnSelectItem}
         {...props}
-      />
+      />,
     );
   }
 
@@ -33,7 +33,7 @@ describe('AutocompleteList', () => {
     // `open` prop defaults to `false`
     const wrapper = createComponent();
     const container = wrapper.find(
-      '[data-testid="autocomplete-list-container"]'
+      '[data-testid="autocomplete-list-container"]',
     );
     assert.isTrue(container.getDOMNode().classList.contains('hidden'));
   });
@@ -41,7 +41,7 @@ describe('AutocompleteList', () => {
   it('hides the list container when `list` is empty', () => {
     const wrapper = createComponent({ open: true, list: [] });
     const container = wrapper.find(
-      '[data-testid="autocomplete-list-container"]'
+      '[data-testid="autocomplete-list-container"]',
     );
     assert.isTrue(container.getDOMNode().classList.contains('hidden'));
   });
@@ -100,6 +100,6 @@ describe('AutocompleteList', () => {
           return createComponent({ open: true, activeItem: 1 });
         },
       },
-    ])
+    ]),
   );
 });

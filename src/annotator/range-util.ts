@@ -27,7 +27,7 @@ function unionRanges(a: Range, b: Range): Range {
  * selection.
  */
 export function selectedRange(
-  selection: Selection | null = document.getSelection()
+  selection: Selection | null = document.getSelection(),
 ): Range | null {
   if (!selection || selection.rangeCount === 0) {
     return null;
@@ -94,7 +94,7 @@ export function forEachNodeInRange(range: Range, callback: (n: Node) => void) {
   const root = range.commonAncestorContainer;
   const nodeIter: NodeIterator = root.ownerDocument!.createNodeIterator(
     root,
-    NodeFilter.SHOW_ALL
+    NodeFilter.SHOW_ALL,
   );
 
   let currentNode;
@@ -178,7 +178,7 @@ export function selectionFocusRect(selection: Selection): DOMRect | null {
  */
 export function itemsForRange<T>(
   range: Range,
-  itemForNode: (n: Node) => NonNullable<T> | null | undefined
+  itemForNode: (n: Node) => NonNullable<T> | null | undefined,
 ): NonNullable<T>[] {
   const checkedNodes = new Set<Node>();
   const items = new Set<NonNullable<T>>();

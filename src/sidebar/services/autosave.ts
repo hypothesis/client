@@ -21,7 +21,7 @@ export class AutosaveService {
   constructor(
     annotationsService: AnnotationsService,
     toastMessenger: ToastMessengerService,
-    store: SidebarStore
+    store: SidebarStore,
   ) {
     this._annotationsService = annotationsService;
     this._toastMessenger = toastMessenger;

@@ -80,7 +80,7 @@ export default function AutocompleteList<Item>({
             {
               'border-brand bg-grey-1': activeItem === index,
               'border-transparent': activeItem !== index,
-            }
+            },
           )}
           onClick={() => {
             onSelectItem(item);
@@ -103,7 +103,7 @@ export default function AutocompleteList<Item>({
           // Move the Card down a bit to make room for the up-pointing arrow
           'absolute top-[3px] z-3',
           // Ensure Card width is not too narrow
-          'min-w-[10em]'
+          'min-w-[10em]',
         )}
         data-testid="autocomplete-list-container"
       >

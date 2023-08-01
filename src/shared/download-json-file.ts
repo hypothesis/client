@@ -10,7 +10,7 @@ export function downloadJSONFile(
   data: object,
   filename: string,
   /* istanbul ignore next */
-  _document = document
+  _document = document,
 ): string {
   const link = _document.createElement('a');
   const fileContent = JSON.stringify(data, null, 2);

@@ -34,7 +34,7 @@ export function settingsFrom(window_: Window): SettingsGetters {
   const configFuncSettings = configFuncSettingsFrom(window_);
 
   const jsonConfigs: Record<string, unknown> = toBoolean(
-    configFuncSettings.ignoreOtherConfiguration
+    configFuncSettings.ignoreOtherConfiguration,
   )
     ? {}
     : parseJsonConfig(window_.document);
@@ -53,7 +53,7 @@ export function settingsFrom(window_: Window): SettingsGetters {
       // Annotation IDs are url-safe-base64 identifiers
       // See https://tools.ietf.org/html/rfc4648#page-7
       const annotFragmentMatch = window_.location.href.match(
-        /#annotations:([A-Za-z0-9_-]+)$/
+        /#annotations:([A-Za-z0-9_-]+)$/,
       );
       if (annotFragmentMatch) {
         return annotFragmentMatch[1];
@@ -75,7 +75,7 @@ export function settingsFrom(window_: Window): SettingsGetters {
   function group(): string | null {
     function groupFromURL() {
       const groupFragmentMatch = window_.location.href.match(
-        /#annotations:group:([A-Za-z0-9_-]+)$/
+        /#annotations:group:([A-Za-z0-9_-]+)$/,
       );
       if (groupFragmentMatch) {
         return groupFragmentMatch[1];
@@ -143,7 +143,7 @@ export function settingsFrom(window_: Window): SettingsGetters {
     /** Return the query from the URL, or null. */
     function queryFromURL() {
       const queryFragmentMatch = window_.location.href.match(
-        /#annotations:(query|q):(.+)$/i
+        /#annotations:(query|q):(.+)$/i,
       );
       if (queryFragmentMatch) {
         try {

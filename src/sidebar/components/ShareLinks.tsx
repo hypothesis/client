@@ -71,7 +71,7 @@ export default function ShareLinks({ shareURI }: ShareLinksProps) {
           icon={EmailIcon}
           label="Share via email"
           uri={`mailto:?subject=${encodeURIComponent(
-            "Let's Annotate"
+            "Let's Annotate",
           )}&body=${encodedURI}`}
         />
       </ul>

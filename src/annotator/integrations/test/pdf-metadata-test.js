@@ -85,7 +85,7 @@ class FakePDFViewerApplication {
       eventBusEvents = true,
       initializedPromise = true,
       newFingerprintAPI = true,
-    } = {}
+    } = {},
   ) {
     this.url = url;
     this.documentInfo = undefined;
@@ -218,7 +218,7 @@ describe('PDFMetadata', () => {
 
         assert.equal(await uriPromise, 'http://fake.com/');
       });
-    }
+    },
   );
 
   // The `initializedPromise` param simulates different versions of PDF.js with
@@ -251,7 +251,7 @@ describe('PDFMetadata', () => {
   function createPDFMetadata(metadata = testMetadata, viewerOptions) {
     const fakePDFViewerApplication = new FakePDFViewerApplication(
       '',
-      viewerOptions
+      viewerOptions,
     );
     fakePDFViewerApplication.completeInit();
     fakePDFViewerApplication.finishLoading(metadata);
@@ -277,7 +277,7 @@ describe('PDFMetadata', () => {
             url: 'file:///test.pdf',
             fingerprint: 'fakeFingerprint',
           },
-          { newFingerprintAPI }
+          { newFingerprintAPI },
         );
         const uri = await pdfMetadata.getUri();
         assert.equal(uri, 'urn:x-pdf:fakeFingerprint');
@@ -294,7 +294,7 @@ describe('PDFMetadata', () => {
 
       const expected = new URL(
         fakePDFViewerApplication.url,
-        document.location.href
+        document.location.href,
       ).toString();
       assert.equal(uri, expected);
     });
@@ -336,7 +336,7 @@ describe('PDFMetadata', () => {
       const metadata = await pdfMetadata.getMetadata();
 
       const fileLink = metadata.link.find(link =>
-        link.href.includes('file://')
+        link.href.includes('file://'),
       );
       assert.isUndefined(fileLink);
     });

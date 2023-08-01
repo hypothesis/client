@@ -88,7 +88,7 @@ class BooleanOpFilter implements Filter {
  * string field value.
  */
 function stringFieldMatcher(
-  fieldValues: (ann: Annotation) => string[]
+  fieldValues: (ann: Annotation) => string[],
 ): Matcher {
   return {
     fieldValues,
@@ -128,14 +128,14 @@ const fieldMatchers: Record<string, Matcher | Matcher<number>> = {
  */
 export function filterAnnotations(
   annotations: Annotation[],
-  filters: Record<string, Facet>
+  filters: Record<string, Facet>,
 ): string[] {
   const makeTermFilter = <TermType>(field: string, term: TermType) =>
     new TermFilter(
       term,
       // Suppress error about potential mismatch of query term type
       // and what the matcher expects. We assume these match up.
-      fieldMatchers[field] as Matcher<any>
+      fieldMatchers[field] as Matcher<any>,
     );
 
   // Convert the input filter object into a filter tree, expanding "any"
@@ -150,8 +150,8 @@ export function filterAnnotations(
           term =>
             new BooleanOpFilter(
               'or',
-              anyFields.map(field => makeTermFilter(field, term))
-            )
+              anyFields.map(field => makeTermFilter(field, term)),
+            ),
         );
       } else {
         termFilters = filter.terms.map(term => makeTermFilter(field, term));

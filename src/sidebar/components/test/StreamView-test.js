@@ -51,7 +51,7 @@ describe('StreamView', () => {
 
   function createComponent() {
     return mount(
-      <StreamView api={fakeApi} toastMessenger={fakeToastMessenger} />
+      <StreamView api={fakeApi} toastMessenger={fakeToastMessenger} />,
     );
   }
 
@@ -110,7 +110,7 @@ describe('StreamView', () => {
 
     assert.calledWith(
       fakeToastMessenger.error,
-      'Unable to fetch annotations: Server error'
+      'Unable to fetch annotations: Server error',
     );
   });
 

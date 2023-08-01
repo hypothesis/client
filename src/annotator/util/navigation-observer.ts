@@ -12,7 +12,7 @@ import { ListenerCollection } from '../../shared/listener-collection';
 function observeCalls<T>(
   object: T,
   method: keyof T,
-  handler: (...args: unknown[]) => void
+  handler: (...args: unknown[]) => void,
 ): () => void {
   const origHandler = object[method];
 
@@ -87,7 +87,7 @@ export class NavigationObserver {
   constructor(
     onNavigate: (url: string) => void,
     /* istanbul ignore next - default overridden in tests */
-    getLocation = () => location.href
+    getLocation = () => location.href,
   ) {
     this._listeners = new ListenerCollection();
 
@@ -102,7 +102,7 @@ export class NavigationObserver {
     const navigation = getNavigation();
     if (navigation) {
       this._listeners.add(navigation, 'navigatesuccess', () =>
-        checkForURLChange()
+        checkForURLChange(),
       );
     } else {
       const unpatchers = [

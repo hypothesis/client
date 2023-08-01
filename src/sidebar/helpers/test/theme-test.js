@@ -19,7 +19,7 @@ describe('sidebar/helpers/theme', () => {
   it('populates the style object with values for defined, supported theme props', () => {
     const style = applyTheme(
       ['accentColor', 'appBackgroundColor', 'selectionFontFamily'],
-      fakeSettings
+      fakeSettings,
     );
 
     assert.include(style, {
@@ -50,7 +50,7 @@ describe('sidebar/helpers/theme', () => {
     };
     const style = applyTheme(
       ['appBackgroundColor', 'ctaTextColor'],
-      fakeSettings
+      fakeSettings,
     );
 
     assert.hasAllKeys(style, ['backgroundColor']);
@@ -62,7 +62,7 @@ describe('sidebar/helpers/theme', () => {
 
     const style = applyTheme(
       ['appBackgroundColor', 'ctaTextColor'],
-      fakeSettings
+      fakeSettings,
     );
 
     assert.isEmpty(style);

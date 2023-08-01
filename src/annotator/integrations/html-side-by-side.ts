@@ -19,7 +19,7 @@ const contentSelectors = [
  * @return The left/right content margins or `null` if they could not be determined
  */
 export function guessMainContentArea(
-  root: Element
+  root: Element,
 ): { left: number; right: number } | null {
   // Maps of (margin X coord, votes) for margin positions.
   const leftMarginVotes = new Map<number, number>();
@@ -65,7 +65,7 @@ export function guessMainContentArea(
 
   const leftMargin = [...leftMarginVotes.entries()].sort((a, b) => b[1] - a[1]);
   const rightMargin = [...rightMarginVotes.entries()].sort(
-    (a, b) => b[1] - a[1]
+    (a, b) => b[1] - a[1],
   );
 
   const [leftPos] = leftMargin[0];
@@ -122,14 +122,14 @@ function elementContentRect(element: Element) {
 function* textNodesInRect(
   root: Element,
   rect: DOMRect,
-  shouldVisit: (el: Element) => boolean
+  shouldVisit: (el: Element) => boolean,
 ): Generator<Text> {
   let node: Node | null = root.firstChild;
   while (node) {
     if (nodeIsElement(node)) {
       const contentIntersectsRect = rectIntersects(
         elementContentRect(node),
-        rect
+        rect,
       );
 
       // Only examine subtrees which are visible.
@@ -167,7 +167,7 @@ function getScrollAnchor(root: Element, viewport: DOMRect): Range | null {
   textNodeLoop: for (const textNode of textNodesInRect(
     root,
     viewport,
-    shouldVisit
+    shouldVisit,
   )) {
     let textLen = 0;
 
@@ -210,7 +210,7 @@ export function preserveScrollPosition(
   /* istanbul ignore next */
   scrollRoot: Element = document.documentElement,
   /* istanbul ignore next */
-  viewport: DOMRect = new DOMRect(0, 0, window.innerWidth, window.innerHeight)
+  viewport: DOMRect = new DOMRect(0, 0, window.innerWidth, window.innerHeight),
 ): number {
   const anchor = getScrollAnchor(scrollRoot, viewport);
   if (!anchor) {

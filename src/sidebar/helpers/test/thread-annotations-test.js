@@ -94,7 +94,7 @@ describe('sidebar/helpers/thread-annotations', () => {
           expanded: fakeThreadState.selection.expanded,
           forcedVisible: fakeThreadState.selection.forcedVisible,
           selected: fakeThreadState.selection.selected,
-        })
+        }),
       );
     });
 
@@ -139,13 +139,13 @@ describe('sidebar/helpers/thread-annotations', () => {
 
             const threadFilterFn = fakeBuildThread.args[0][1].threadFilterFn;
             const filteredThreads = fakeThreads.filter(thread =>
-              threadFilterFn(thread)
+              threadFilterFn(thread),
             );
 
             assert.lengthOf(filteredThreads, 1);
             assert.equal(
               filteredThreads[0].annotation,
-              annotations[selectedTab]
+              annotations[selectedTab],
             );
           });
         });
@@ -191,7 +191,7 @@ describe('sidebar/helpers/thread-annotations', () => {
         assert.calledWith(
           fakeSearchFilter.generateFacetedFilter,
           fakeThreadState.selection.filterQuery,
-          fakeThreadState.selection.filters
+          fakeThreadState.selection.filters,
         );
         assert.isTrue(filterFn(annotation));
       });
@@ -205,7 +205,7 @@ describe('sidebar/helpers/thread-annotations', () => {
         assert.calledWith(
           fakeSearchFilter.generateFacetedFilter,
           sinon.match.any,
-          sinon.match({ user: 'somebody' })
+          sinon.match({ user: 'somebody' }),
         );
       });
     });

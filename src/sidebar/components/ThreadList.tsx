@@ -112,7 +112,7 @@ export default function ThreadList({ threads }: ThreadListProps) {
         setScrollPosition(roundScrollPosition(scrollContainer.scrollTop));
       },
       10,
-      { maxWait: 100 }
+      { maxWait: 100 },
     );
 
     listeners.add(scrollContainer, 'scroll', updateScrollPosition);
@@ -145,9 +145,9 @@ export default function ThreadList({ threads }: ThreadListProps) {
           topLevelThreads,
           threadHeights,
           scrollPosition,
-          scrollContainerHeight
+          scrollContainerHeight,
         ),
-      [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight]
+      [topLevelThreads, threadHeights, scrollPosition, scrollContainerHeight],
     );
 
   const store = useSidebarStore();
@@ -253,7 +253,7 @@ export default function ThreadList({ threads }: ThreadListProps) {
           // although we don't in general try to make all effects robust to that
           // as it is a problem that needs to be handled elsewhere.
           console.warn(
-            'ThreadList could not measure thread. Element not found.'
+            'ThreadList could not measure thread. Element not found.',
           );
           return prevHeights;
         }
@@ -285,7 +285,7 @@ export default function ThreadList({ threads }: ThreadListProps) {
             // element (e.g. `space-y-3`) but in this case, the constraints of
             // sibling divs before and after the list of annotation cards prevents
             // this, so a bottom margin is added to each card's wrapping element.
-            'mb-3'
+            'mb-3',
           )}
           data-testid="thread-card-container"
           id={child.id}

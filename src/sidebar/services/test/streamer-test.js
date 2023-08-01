@@ -88,7 +88,7 @@ describe('StreamerService', () => {
       fakeAPIRoutes,
       fakeAuth,
       fakeGroups,
-      fakeSession
+      fakeSession,
     );
   }
 
@@ -114,7 +114,7 @@ describe('StreamerService', () => {
         }),
         receiveRealTimeUpdates: sinon.stub(),
         removeAnnotations: sinon.stub(),
-      }
+      },
     );
 
     fakeGroups = {
@@ -164,7 +164,7 @@ describe('StreamerService', () => {
     createDefaultStreamer();
     return activeStreamer.connect().then(() => {
       const clientIdMsg = fakeWebSocket.messages.find(
-        msg => msg.messageType === 'client_id'
+        msg => msg.messageType === 'client_id',
       );
       assert.ok(clientIdMsg);
       assert.equal(clientIdMsg.value, activeStreamer.clientId);
@@ -175,7 +175,7 @@ describe('StreamerService', () => {
     createDefaultStreamer();
     return activeStreamer.connect().then(() => {
       const whoamiMsg = fakeWebSocket.messages.find(
-        msg => msg.type === 'whoami'
+        msg => msg.type === 'whoami',
       );
       assert.ok(whoamiMsg);
     });
@@ -202,7 +202,7 @@ describe('StreamerService', () => {
       return activeStreamer.connect().then(() => {
         assert.equal(
           fakeWebSocket.url,
-          'ws://example.com/ws?access_token=dummy-access-token'
+          'ws://example.com/ws?access_token=dummy-access-token',
         );
       });
     });
@@ -215,7 +215,7 @@ describe('StreamerService', () => {
       return activeStreamer.connect().then(() => {
         assert.equal(
           fakeWebSocket.url,
-          'ws://example.com/ws?foo=bar&access_token=dummy-access-token'
+          'ws://example.com/ws?foo=bar&access_token=dummy-access-token',
         );
       });
     });
@@ -317,7 +317,7 @@ describe('StreamerService', () => {
       assert.lengthOf(fakeWebSockets, 10);
       assert.calledWith(
         console.error,
-        'Gave up trying to reconnect to Hypothesis real time update service'
+        'Gave up trying to reconnect to Hypothesis real time update service',
       );
     });
 
@@ -350,7 +350,7 @@ describe('StreamerService', () => {
     assert.calledWith(
       fakeWarnOnce,
       'Error connecting to H push notification service:',
-      event
+      event,
     );
   });
 
@@ -374,7 +374,7 @@ describe('StreamerService', () => {
     assert.calledWith(
       fakeWarnOnce,
       'Received unsupported notification',
-      'unknown-event'
+      'unknown-event',
     );
   });
 
@@ -401,7 +401,7 @@ describe('StreamerService', () => {
         });
         assert.calledWith(
           fakeStore.addAnnotations,
-          fixtures.createNotification.payload
+          fixtures.createNotification.payload,
         );
       });
     });
@@ -457,7 +457,7 @@ describe('StreamerService', () => {
 
       assert.calledWithMatch(
         fakeStore.removeAnnotations,
-        sinon.match([{ id: 'an-id' }])
+        sinon.match([{ id: 'an-id' }]),
       );
     });
 

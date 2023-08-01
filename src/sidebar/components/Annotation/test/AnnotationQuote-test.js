@@ -15,7 +15,7 @@ describe('AnnotationQuote', () => {
         isOrphan={false}
         settings={{}}
         {...props}
-      />
+      />,
     );
   }
 
@@ -56,6 +56,6 @@ describe('AnnotationQuote', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createQuote(),
-    })
+    }),
   );
 });

@@ -36,7 +36,7 @@ export class PersistedDefaultsService {
      */
     const persistChangedDefaults = (
       defaults: Record<Key, any>,
-      prevDefaults: Record<Key, any>
+      prevDefaults: Record<Key, any>,
     ) => {
       for (const [defaultKey, newValue] of entries(defaults)) {
         if (
@@ -59,7 +59,7 @@ export class PersistedDefaultsService {
     watch(
       this._store.subscribe,
       () => this._store.getDefaults(),
-      persistChangedDefaults
+      persistChangedDefaults,
     );
   }
 }

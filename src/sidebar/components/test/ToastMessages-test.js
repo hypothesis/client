@@ -17,7 +17,7 @@ describe('ToastMessages', () => {
 
   function createComponent(props) {
     return mount(
-      <ToastMessages toastMessenger={fakeToastMessenger} {...props} />
+      <ToastMessages toastMessenger={fakeToastMessenger} {...props} />,
     );
   }
 

@@ -31,7 +31,7 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
         'grid items-center',
         // Two columns in narrower viewports; three in wider
         'grid-cols-[100px_minmax(0,auto)]',
-        '2xl:grid-cols-[100px_minmax(0,auto)_minmax(0,auto)] 2xl:gap-x-3'
+        '2xl:grid-cols-[100px_minmax(0,auto)_minmax(0,auto)] 2xl:gap-x-3',
       )}
     >
       <div data-testid="content-logo">
@@ -55,7 +55,7 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
           // Container title (this element) is not shown on narrow screens
           'hidden',
           '2xl:block 2xl:whitespace-nowrap 2xl:overflow-hidden 2xl:text-ellipsis',
-          'font-semibold'
+          'font-semibold',
         )}
         data-testid="content-container-info"
         title={info.container.title}
@@ -65,7 +65,7 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
       <div
         className={classnames(
           // Flex layout for item title, next and previous links
-          'flex justify-center items-center gap-x-2'
+          'flex justify-center items-center gap-x-2',
         )}
         data-testid="content-item-info"
       >
@@ -76,7 +76,7 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
             'hidden',
             // Wider viewports align this flex content to the right:
             // This empty element is needed to fill extra space at left
-            '2xl:block 2xl:grow'
+            '2xl:block 2xl:grow',
           )}
         />
         {info.links.previousItem && (
@@ -101,7 +101,7 @@ export default function ContentInfoBanner({ info }: ContentInfoBannerProps) {
             // This element will shrink and truncate fluidly.
             // Overriding min-width `auto` prevents the content from overflowing
             // See https://stackoverflow.com/a/66689926/434243.
-            'min-w-0 whitespace-nowrap overflow-hidden text-ellipsis shrink font-medium'
+            'min-w-0 whitespace-nowrap overflow-hidden text-ellipsis shrink font-medium',
           )}
         >
           <Link

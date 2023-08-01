@@ -88,7 +88,7 @@ describe('GroupsService', () => {
         clearDirectLinkedGroupFetchFailed: sinon.stub(),
         profile: sinon.stub().returns({ userid: null }),
         route: sinon.stub().returns('sidebar'),
-      }
+      },
     );
     fakeApi = {
       annotation: {
@@ -127,7 +127,7 @@ describe('GroupsService', () => {
       fakeApi,
       fakeAuth,
       fakeSettings,
-      fakeToastMessenger
+      fakeToastMessenger,
     );
   }
 
@@ -164,7 +164,7 @@ describe('GroupsService', () => {
           sinon.match([
             { $tag: '1', group: 'newgroup' },
             { $tag: '2', group: 'newgroup' },
-          ])
+          ]),
         );
 
         const updatedAnnotations = fakeStore.addAnnotations.getCall(0).args[0];
@@ -236,9 +236,9 @@ describe('GroupsService', () => {
         Promise.reject(
           new Error(
             "404 Not Found: Either the resource you requested doesn't exist, \
-          or you are not currently authorized to see it."
-          )
-        )
+          or you are not currently authorized to see it.",
+          ),
+        ),
       );
       return svc.load().then(() => {
         // The failure state is captured in the store.
@@ -318,7 +318,7 @@ describe('GroupsService', () => {
           fakeApi.group.read,
           sinon.match({
             id: 'selected-id',
-          })
+          }),
         );
       });
     });
@@ -334,22 +334,22 @@ describe('GroupsService', () => {
     it('sends `expand` parameter', () => {
       const svc = createService();
       fakeApi.groups.list.returns(
-        Promise.resolve([{ id: 'groupa', name: 'GroupA' }])
+        Promise.resolve([{ id: 'groupa', name: 'GroupA' }]),
       );
       fakeStore.directLinkedGroupId.returns('group-id');
 
       return svc.load().then(() => {
         assert.calledWith(
           fakeApi.profile.groups.read,
-          sinon.match({ expand: ['organization', 'scopes'] })
+          sinon.match({ expand: ['organization', 'scopes'] }),
         );
         assert.calledWith(
           fakeApi.groups.list,
-          sinon.match({ expand: ['organization', 'scopes'] })
+          sinon.match({ expand: ['organization', 'scopes'] }),
         );
         assert.calledWith(
           fakeApi.group.read,
-          sinon.match({ expand: ['organization', 'scopes'] })
+          sinon.match({ expand: ['organization', 'scopes'] }),
         );
       });
     });
@@ -373,7 +373,7 @@ describe('GroupsService', () => {
         Promise.resolve({
           id: 'ann-id',
           group: dummyGroups[2].id,
-        })
+        }),
       );
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, dummyGroups[2].id);
@@ -390,7 +390,7 @@ describe('GroupsService', () => {
         Promise.resolve({
           id: 'ann-id',
           group: dummyGroups[1].id,
-        })
+        }),
       );
       return svc.load().then(() => {
         assert.calledWith(fakeStore.focusGroup, dummyGroups[1].id);
@@ -478,7 +478,7 @@ describe('GroupsService', () => {
       return svc.load().then(() => {
         assert.calledWith(
           fakeApi.groups.list,
-          sinon.match({ authority: 'publisher.org' })
+          sinon.match({ authority: 'publisher.org' }),
         );
       });
     });
@@ -499,15 +499,15 @@ describe('GroupsService', () => {
       fakeStore.directLinkedAnnotationId.returns('ann-id');
       fakeApi.profile.groups.read.returns(Promise.resolve([]));
       fakeApi.groups.list.returns(
-        Promise.resolve([{ name: 'BioPub', id: 'biopub' }])
+        Promise.resolve([{ name: 'BioPub', id: 'biopub' }]),
       );
       fakeApi.annotation.get.returns(
         Promise.reject(
           new Error(
             "404 Not Found: Either the resource you requested doesn't exist, \
-          or you are not currently authorized to see it."
-          )
-        )
+          or you are not currently authorized to see it.",
+          ),
+        ),
       );
 
       return svc.load().then(groups => {
@@ -526,21 +526,21 @@ describe('GroupsService', () => {
         Promise.resolve([
           { name: 'BioPub', id: 'biopub' },
           { name: 'Public', id: '__world__' },
-        ])
+        ]),
       );
       fakeApi.group.read.returns(
         Promise.reject(
           new Error(
             "404 Not Found: Either the resource you requested doesn't exist, \
-          or you are not currently authorized to see it."
-          )
-        )
+          or you are not currently authorized to see it.",
+          ),
+        ),
       );
       fakeApi.annotation.get.returns(
         Promise.resolve({
           id: 'ann-id',
           group: 'out-of-scope',
-        })
+        }),
       );
 
       // The user is logged out.
@@ -562,21 +562,21 @@ describe('GroupsService', () => {
         Promise.resolve([
           { name: 'BioPub', id: 'biopub' },
           { name: 'Public', id: '__world__' },
-        ])
+        ]),
       );
       fakeApi.group.read.returns(
-        Promise.resolve({ name: 'Restricted', id: 'out-of-scope' })
+        Promise.resolve({ name: 'Restricted', id: 'out-of-scope' }),
       );
       fakeApi.annotation.get.returns(
         Promise.resolve({
           id: 'ann-id',
           group: 'out-of-scope',
-        })
+        }),
       );
 
       return svc.load().then(groups => {
         const directLinkedAnnGroupShown = groups.some(
-          g => g.id === 'out-of-scope'
+          g => g.id === 'out-of-scope',
         );
         assert.isTrue(directLinkedAnnGroupShown);
       });
@@ -595,16 +595,16 @@ describe('GroupsService', () => {
         Promise.resolve([
           { name: 'BioPub', id: 'biopub' },
           { name: 'Public', id: '__world__' },
-        ])
+        ]),
       );
       fakeApi.group.read.returns(
-        Promise.resolve({ name: 'Restricted', id: 'out-of-scope' })
+        Promise.resolve({ name: 'Restricted', id: 'out-of-scope' }),
       );
       fakeApi.annotation.get.returns(
         Promise.resolve({
           id: 'ann-id',
           group: '__world__',
-        })
+        }),
       );
 
       // The user is logged out.
@@ -631,10 +631,10 @@ describe('GroupsService', () => {
         Promise.resolve([
           { name: 'BioPub', id: 'biopub' },
           { name: 'Public', id: '__world__' },
-        ])
+        ]),
       );
       fakeApi.group.read.returns(
-        Promise.resolve({ name: 'Public', id: '__world__' })
+        Promise.resolve({ name: 'Public', id: '__world__' }),
       );
 
       fakeAuth.getAccessToken.returns(null);
@@ -660,7 +660,7 @@ describe('GroupsService', () => {
               Promise.resolve({
                 id: 'direct-linked-ann',
                 group: '__world__',
-              })
+              }),
             );
             fakeStore.directLinkedAnnotationId.returns('direct-linked-ann');
           }
@@ -679,7 +679,7 @@ describe('GroupsService', () => {
             assert.equal(publicGroupShown, shouldShowPublicGroup);
           });
         });
-      }
+      },
     );
 
     context('when service config specifies which groups to show', () => {
@@ -706,7 +706,7 @@ describe('GroupsService', () => {
 
         assert.deepEqual(
           groups.map(g => g.id),
-          ['id-a', 'id-b']
+          ['id-a', 'id-b'],
         );
       });
 
@@ -719,7 +719,7 @@ describe('GroupsService', () => {
 
         assert.deepEqual(
           groups.map(g => g.id),
-          ['id-a', 'id-b']
+          ['id-a', 'id-b'],
         );
       });
 
@@ -743,7 +743,7 @@ describe('GroupsService', () => {
         assert.calledWith(fakeApi.group.read, { expand, id: 'id-c' });
         assert.deepEqual(
           groups.map(g => g.id),
-          ['id-a', 'id-b', 'id-c']
+          ['id-a', 'id-b', 'id-c'],
         );
       });
 
@@ -767,19 +767,19 @@ describe('GroupsService', () => {
 
         assert.calledWith(
           fakeToastMessenger.error,
-          'Unable to fetch groups: Not Found'
+          'Unable to fetch groups: Not Found',
         );
 
         // The groups that were found should still be loaded.
         assert.deepEqual(
           groups.map(g => g.id),
-          ['id-a']
+          ['id-a'],
         );
       });
 
       it('reports an error if fetching group IDs from service config fails', async () => {
         setServiceConfigGroups(
-          Promise.reject(new Error('Something went wrong'))
+          Promise.reject(new Error('Something went wrong')),
         );
 
         const svc = createService();
@@ -787,7 +787,7 @@ describe('GroupsService', () => {
 
         assert.calledWith(
           fakeToastMessenger.error,
-          'Unable to fetch group configuration: Something went wrong'
+          'Unable to fetch group configuration: Something went wrong',
         );
         assert.deepEqual(groups, []);
       });

@@ -8,7 +8,7 @@ let errorDestination: Window | null = null;
  */
 export function captureErrors<Result, Args = unknown>(
   callback: (...args: Args[]) => Result,
-  context: string
+  context: string,
 ): (...args: Args[]) => Result {
   return (...args) => {
     try {
@@ -102,7 +102,7 @@ export function sendError(error: unknown, context: string) {
  * @return A function that unregisters the handler
  */
 export function handleErrorsInFrames(
-  callback: (error: unknown, context: string) => void
+  callback: (error: unknown, context: string) => void,
 ): () => void {
   const handleMessage = (event: MessageEvent) => {
     const { data } = event;
@@ -110,7 +110,7 @@ export function handleErrorsInFrames(
       const { context, error } = data;
       callback(
         error instanceof Error ? error : deserializeError(error),
-        context
+        context,
       );
     }
   };

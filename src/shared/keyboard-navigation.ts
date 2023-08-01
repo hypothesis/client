@@ -4,7 +4,7 @@ import { useEffect } from 'preact/hooks';
 import { ListenerCollection } from './listener-collection';
 
 function isElementDisabled(
-  element: HTMLElement & { disabled?: boolean }
+  element: HTMLElement & { disabled?: boolean },
 ): element is HTMLElement & { disabled: true } {
   return typeof element.disabled === 'boolean' && element.disabled;
 }
@@ -67,7 +67,7 @@ export function useArrowKeyNavigation(
     horizontal = true,
     vertical = true,
     selector = 'a,button',
-  }: ArrowKeyNavigationOptions = {}
+  }: ArrowKeyNavigationOptions = {},
 ) {
   useEffect(() => {
     if (!containerRef.current) {
@@ -77,10 +77,10 @@ export function useArrowKeyNavigation(
 
     const getNavigableElements = () => {
       const elements: HTMLElement[] = Array.from(
-        container.querySelectorAll(selector)
+        container.querySelectorAll(selector),
       );
       return elements.filter(
-        el => isElementVisible(el) && !isElementDisabled(el)
+        el => isElementVisible(el) && !isElementDisabled(el),
       );
     };
 
@@ -98,7 +98,7 @@ export function useArrowKeyNavigation(
     const updateTabIndexes = (
       elements: HTMLElement[] = getNavigableElements(),
       currentIndex = -1,
-      setFocus = false
+      setFocus = false,
     ) => {
       if (currentIndex < 0) {
         currentIndex = elements.findIndex(el => el.tabIndex === 0);

@@ -17,7 +17,7 @@ import { isThirdPartyUser, username } from './account-id';
 export function annotationDisplayName(
   annotation: Pick<Annotation, 'user' | 'user_info'>,
   defaultAuthority: string,
-  displayNamesEnabled: boolean
+  displayNamesEnabled: boolean,
 ): string {
   const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
 
@@ -36,7 +36,7 @@ export function annotationAuthorLink(
   annotation: Pick<Annotation, 'user'>,
   settings: SidebarSettings,
   defaultAuthority: string,
-  userLink?: string
+  userLink?: string,
 ): string | undefined {
   const isThirdParty = isThirdPartyUser(annotation.user, defaultAuthority);
 

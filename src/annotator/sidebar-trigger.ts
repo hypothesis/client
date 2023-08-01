@@ -9,7 +9,7 @@ const SIDEBAR_TRIGGER_BTN_ATTR = 'data-hypothesis-trigger';
  */
 export function sidebarTrigger(rootEl: Element, showFn: () => void) {
   const triggerElems = rootEl.querySelectorAll(
-    '[' + SIDEBAR_TRIGGER_BTN_ATTR + ']'
+    '[' + SIDEBAR_TRIGGER_BTN_ATTR + ']',
   );
 
   Array.from(triggerElems).forEach(triggerElem => {

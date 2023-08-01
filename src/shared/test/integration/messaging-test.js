@@ -64,7 +64,7 @@ describe('PortProvider-PortFinder-PortRPC integration', () => {
         hostRPC.call('ping', response => {
           assert.equal(response, 'pong');
           resolve();
-        })
+        }),
       );
     };
 
@@ -101,7 +101,7 @@ describe('PortProvider-PortFinder-PortRPC integration', () => {
         hostRPC.call('ping', response => {
           assert.equal(response, 'pong');
           resolve();
-        })
+        }),
       );
     };
 

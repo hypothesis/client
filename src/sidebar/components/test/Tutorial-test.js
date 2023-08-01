@@ -55,7 +55,7 @@ describe('Tutorial', () => {
       assert.isTrue(instruction.exists());
       assert.equal(
         instruction.find('[data-testid="command-name"]').text(),
-        testCase.commandName
+        testCase.commandName,
       );
     });
   });
@@ -64,6 +64,6 @@ describe('Tutorial', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

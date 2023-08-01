@@ -14,7 +14,7 @@ describe('sidebar/util/pagination', () => {
       it('should produce expected available page numbers', () => {
         assert.deepEqual(
           pageNumberOptions(...testCase.args),
-          testCase.expected
+          testCase.expected,
         );
       });
     });

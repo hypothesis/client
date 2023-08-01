@@ -77,7 +77,7 @@ function ModerationBanner({
           '-mt-3 -ml-3 -mr-3': !annotationMetadata.isReply(annotation),
           // For replies, break out of the right padding only
           '-mr-3': annotationMetadata.isReply(annotation),
-        }
+        },
       )}
     >
       <div
@@ -107,7 +107,7 @@ function ModerationBanner({
             'px-1.5 py-1',
             'bg-slate-1 text-grey-7 bg-grey-2',
             'enabled:hover:text-grey-9 enabled:hover:bg-grey-3 disabled:text-grey-5',
-            'aria-pressed:bg-grey-3 aria-expanded:bg-grey-3'
+            'aria-pressed:bg-grey-3 aria-expanded:bg-grey-3',
           )}
           onClick={annotation.hidden ? unhideAnnotation : hideAnnotation}
           title={

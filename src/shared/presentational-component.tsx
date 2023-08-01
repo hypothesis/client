@@ -20,7 +20,7 @@ export type PresentationalComponentProps = {
  */
 export function makePresentationalComponent(
   displayName: string,
-  classes: string | string[]
+  classes: string | string[],
 ) {
   function PresentationalComponent({
     classes: extraClasses,

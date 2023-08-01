@@ -44,7 +44,7 @@ const reducers = {
   API_REQUEST_FINISHED(state: State) {
     if (state.activeApiRequests === 0) {
       throw new Error(
-        'API_REQUEST_FINISHED action when no requests were active'
+        'API_REQUEST_FINISHED action when no requests were active',
       );
     }
 
@@ -72,7 +72,7 @@ const reducers = {
 
   ANNOTATION_SAVE_FINISHED(state: State, action: { annotation: Annotation }) {
     const updatedSaves = state.activeAnnotationSaveRequests.filter(
-      $tag => $tag !== action.annotation.$tag
+      $tag => $tag !== action.annotation.$tag,
     );
     return {
       ...state,
@@ -90,7 +90,7 @@ const reducers = {
   ANNOTATION_FETCH_FINISHED(state: State) {
     if (state.activeAnnotationFetches === 0) {
       throw new Error(
-        'ANNOTATION_FETCH_FINISHED action when no annotation fetches were active'
+        'ANNOTATION_FETCH_FINISHED action when no annotation fetches were active',
       );
     }
 

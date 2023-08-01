@@ -14,7 +14,7 @@ describe('annotator/anchoring/placeholder', () => {
       assert.ok(placeholder);
       assert.equal(
         container.querySelector('.annotator-placeholder'),
-        placeholder
+        placeholder,
       );
     });
 

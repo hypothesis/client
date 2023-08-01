@@ -42,17 +42,17 @@ function GroupList({ settings }: GroupListProps) {
 
   const myGroupsSorted = useMemo(
     () => groupsByOrganization(myGroups),
-    [myGroups]
+    [myGroups],
   );
 
   const featuredGroupsSorted = useMemo(
     () => groupsByOrganization(featuredGroups),
-    [featuredGroups]
+    [featuredGroups],
   );
 
   const currentGroupsSorted = useMemo(
     () => groupsByOrganization(currentGroups),
-    [currentGroups]
+    [currentGroups],
   );
 
   const defaultAuthority = store.defaultAuthority();
@@ -79,14 +79,14 @@ function GroupList({ settings }: GroupListProps) {
       <span
         className={classnames(
           // Don't allow this label to shrink (wrap to next line)
-          'shrink-0 flex items-center gap-x-1 text-md text-color-text font-bold'
+          'shrink-0 flex items-center gap-x-1 text-md text-color-text font-bold',
         )}
       >
         {icon && (
           <img
             className={classnames(
               // Tiny adjustment to make H logo align better with group name
-              'relative top-[1px] w-4 h-4'
+              'relative top-[1px] w-4 h-4',
             )}
             src={icon}
             alt={altName}

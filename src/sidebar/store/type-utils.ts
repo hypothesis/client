@@ -10,7 +10,7 @@ type MapContravariant<T> = { [K in keyof T]: (x: T[K]) => void };
  */
 export type TupleToIntersection<
   T,
-  Temp extends Record<number, unknown> = MapContravariant<T>
+  Temp extends Record<number, unknown> = MapContravariant<T>,
 > = Temp[number] extends (x: infer U) => unknown ? U : never;
 
 /**

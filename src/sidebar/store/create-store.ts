@@ -26,7 +26,7 @@ type Module<
   State,
   Actions extends object,
   Selectors extends Record<string, unknown>,
-  RootSelectors extends Record<string, unknown>
+  RootSelectors extends Record<string, unknown>,
 > = {
   namespace: string;
   initialState: (...args: any[]) => State;
@@ -60,7 +60,7 @@ type StoreFromModule<T> = T extends Module<
 export type Store<
   Actions extends object,
   Selectors extends object,
-  RootSelectors extends object
+  RootSelectors extends object,
 > = redux.Store &
   Actions &
   SelectorMethods<Selectors> &
@@ -88,7 +88,7 @@ function createReducer<State>(reducers: ReducerMap<State>) {
  */
 function bindSelectors<State, Selectors extends SelectorMap<State>>(
   selectors: Selectors,
-  getState: () => State
+  getState: () => State,
 ): SelectorMethods<Selectors> {
   const boundSelectors: Record<string, () => unknown> = {};
   for (const [name, selector] of Object.entries(selectors)) {
@@ -135,11 +135,11 @@ function assignOnce<T extends object, U extends object>(target: T, source: U) {
  * depends upon and re-render when it changes.
  */
 export function createStore<
-  Modules extends readonly Module<any, any, any, any>[]
+  Modules extends readonly Module<any, any, any, any>[],
 >(
   modules: Modules,
   initArgs: any[] = [],
-  middleware: any[] = []
+  middleware: any[] = [],
 ): StoreFromModule<TupleToIntersection<Modules>> {
   const initialState: Record<string, unknown> = {};
   for (const module of modules) {
@@ -179,7 +179,7 @@ export function createStore<
   }
   const actionMethods = redux.bindActionCreators(
     actionCreators,
-    store.dispatch
+    store.dispatch,
   );
   Object.assign(store, actionMethods);
 
@@ -189,7 +189,7 @@ export function createStore<
     const { namespace, selectors, rootSelectors } = module;
     const boundSelectors = bindSelectors(
       selectors,
-      () => store.getState()[namespace]
+      () => store.getState()[namespace],
     );
     assignOnce(selectorMethods, boundSelectors);
 
@@ -214,7 +214,7 @@ export function createStore<
  */
 export function makeAction<
   Reducers extends ReducerMap<any>,
-  Type extends keyof Reducers
+  Type extends keyof Reducers,
 >(reducers: Reducers, type: Type, payload: Parameters<Reducers[Type]>[1]) {
   // nb. `reducers` is not used here. It exists purely for type inference.
   return { type, ...payload };
@@ -231,7 +231,7 @@ type ModuleConfig<
   State,
   Actions,
   Selectors extends SelectorMap<State>,
-  RootSelectors = Record<string, unknown>
+  RootSelectors = Record<string, unknown>,
 > = {
   /** The key under which this module's state will live in the store's root state. */
   namespace: string;
@@ -272,10 +272,10 @@ export function createStoreModule<
   State,
   Actions extends Record<string, unknown>,
   Selectors extends SelectorMap<State>,
-  RootSelectors extends Record<string, unknown> = Record<string, unknown>
+  RootSelectors extends Record<string, unknown> = Record<string, unknown>,
 >(
   initialState: State | ((...args: any[]) => State),
-  config: ModuleConfig<State, Actions, Selectors, RootSelectors>
+  config: ModuleConfig<State, Actions, Selectors, RootSelectors>,
 ): Module<State, Actions, Selectors, RootSelectors> {
   if (!(initialState instanceof Function)) {
     const state = initialState;

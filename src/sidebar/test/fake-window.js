@@ -32,7 +32,7 @@ export class FakeWindow {
 
   removeEventListener(event, callback) {
     this.callbacks = this.callbacks.filter(
-      cb => !(cb.event === event && cb.callback === callback)
+      cb => !(cb.event === event && cb.callback === callback),
     );
   }
 

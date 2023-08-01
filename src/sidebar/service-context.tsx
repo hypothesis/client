@@ -18,7 +18,7 @@ type ServiceProvider = {
 const fallbackInjector: ServiceProvider = {
   get(service) {
     throw new Error(
-      `Missing ServiceContext provider to provide "${service}" prop`
+      `Missing ServiceContext provider to provide "${service}" prop`,
     );
   },
 };
@@ -58,10 +58,10 @@ export const ServiceContext = createContext(fallbackInjector);
  */
 export function withServices<
   Props extends Record<string, unknown>,
-  ServiceName extends string
+  ServiceName extends string,
 >(
   Component: ComponentType<Props>,
-  serviceNames: ServiceName[]
+  serviceNames: ServiceName[],
 ): ComponentType<Omit<Props, ServiceName>> {
   function Wrapper(props: Omit<Props, ServiceName>) {
     // Get the current dependency injector instance that is provided by a
@@ -78,7 +78,7 @@ export function withServices<
         if (service === 'store') {
           /* istanbul ignore next - Ignore debug code */
           throw new Error(
-            'Do not use `withServices` to inject the `store` service. Use the `useStore` hook instead'
+            'Do not use `withServices` to inject the `store` service. Use the `useStore` hook instead',
           );
         }
       }

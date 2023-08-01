@@ -41,7 +41,7 @@ function ToastBadge({
       className={classnames(
         'flex items-center gap-x-1 py-1 px-2 rounded-[4px]',
         'bg-green-success/10 animate-pulse-fade-out',
-        classes
+        classes,
       )}
       onAnimationEnd={onClose}
       {...htmlAttributes}
@@ -88,7 +88,7 @@ export default function ProfileView() {
         clearTimeout(savingTimeout);
       };
     },
-    [loading]
+    [loading],
   );
 
   if (!store.isFeatureEnabled('client_user_profile')) {
@@ -109,7 +109,7 @@ export default function ProfileView() {
           // Ensure there is enough height to clear both the heading text and the
           // success toast message without any danger of a jiggle
           'h-12',
-          'px-3 border-b flex items-center'
+          'px-3 border-b flex items-center',
         )}
       >
         <div className="grow">

@@ -26,7 +26,7 @@ describe('matchQuote', () => {
     assert.equal(match.score, 1.0);
     assert.equal(
       fixtures.solitude.slice(match.start, match.end),
-      'discover ice'
+      'discover ice',
     );
   });
 
@@ -36,7 +36,7 @@ describe('matchQuote', () => {
     assert.isTrue(match.score < 1);
     assert.equal(
       fixtures.solitude.slice(match.start, match.end),
-      'Many years later'
+      'Many years later',
     );
   });
 
@@ -68,7 +68,7 @@ describe('matchQuote', () => {
 
     const quote = ', as he faced the firing squad';
     const scores = prefixes.map(
-      p => matchQuote(fixtures.solitude, quote, { prefix: p }).score
+      p => matchQuote(fixtures.solitude, quote, { prefix: p }).score,
     );
 
     for (let i = 1; i < scores.length; i++) {
@@ -88,7 +88,7 @@ describe('matchQuote', () => {
 
     const quote = 'Many years later';
     const scores = suffixes.map(
-      s => matchQuote(fixtures.solitude, quote, { suffix: s }).score
+      s => matchQuote(fixtures.solitude, quote, { suffix: s }).score,
     );
 
     for (let i = 1; i < scores.length; i++) {
@@ -203,7 +203,7 @@ describe('matchQuote', () => {
     assert.isAbove(context.prefix.length, match.start);
     assert.equal(
       fixtures.solitude.slice(match.start, match.end),
-      'years later'
+      'years later',
     );
   });
 

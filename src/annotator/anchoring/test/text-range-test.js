@@ -40,7 +40,7 @@ describe('annotator/anchoring/text-range', () => {
       it('resolves text position in middle of element to correct node and offset', () => {
         const pos = new TextPosition(
           container,
-          container.textContent.indexOf('is a')
+          container.textContent.indexOf('is a'),
         );
 
         const { node, offset } = pos.resolve();
@@ -76,7 +76,7 @@ describe('annotator/anchoring/text-range', () => {
       it('throws if offset exceeds current text content length', () => {
         const pos = new TextPosition(
           container,
-          container.textContent.length + 1
+          container.textContent.length + 1,
         );
 
         assert.throws(() => {
@@ -196,14 +196,14 @@ describe('annotator/anchoring/text-range', () => {
       it('returns TextPosition for offset in Text node', () => {
         assert.deepEqual(
           TextPosition.fromCharOffset(el.firstChild, 1),
-          TextPosition.fromPoint(el.firstChild, 1)
+          TextPosition.fromPoint(el.firstChild, 1),
         );
       });
 
       it('returns TextPosition for offset in Element node', () => {
         assert.deepEqual(
           TextPosition.fromCharOffset(el, 5),
-          new TextPosition(el, 5)
+          new TextPosition(el, 5),
         );
       });
 
@@ -289,7 +289,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(el, 4),
-          new TextPosition(el, 7)
+          new TextPosition(el, 7),
         );
         const range = textRange.toRange();
 
@@ -302,7 +302,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(el, 0),
-          new TextPosition(el, el.textContent.length)
+          new TextPosition(el, el.textContent.length),
         );
         const range = textRange.toRange();
 
@@ -315,7 +315,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(el, 7),
-          new TextPosition(el, 4)
+          new TextPosition(el, 4),
         );
         const range = textRange.toRange();
 
@@ -334,7 +334,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(firstChild, 0),
-          new TextPosition(secondChild, 3)
+          new TextPosition(secondChild, 3),
         );
         const range = textRange.toRange();
 
@@ -347,7 +347,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(el, 100),
-          new TextPosition(el, 5)
+          new TextPosition(el, 5),
         );
 
         assert.throws(() => {
@@ -361,7 +361,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(el, 5),
-          new TextPosition(el, 100)
+          new TextPosition(el, 100),
         );
 
         assert.throws(() => {
@@ -375,7 +375,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(el.querySelector('b'), 0),
-          new TextPosition(el.querySelector('u'), 0)
+          new TextPosition(el.querySelector('u'), 0),
         );
         const range = textRange.toRange();
 
@@ -384,7 +384,7 @@ describe('annotator/anchoring/text-range', () => {
         // Start position is not in `textRange.start.element` but the subsequent
         // text node.
         assert.isTrue(
-          range.startContainer === el.querySelector('i').firstChild
+          range.startContainer === el.querySelector('i').firstChild,
         );
         // End position is not in `textRange.end.element` but the preceding
         // text node.
@@ -403,7 +403,7 @@ describe('annotator/anchoring/text-range', () => {
 
         const textRange = new TextRange(
           new TextPosition(firstChild, 0),
-          new TextPosition(secondChild, 3)
+          new TextPosition(secondChild, 3),
         );
         const parentRange = textRange.relativeTo(parent);
 

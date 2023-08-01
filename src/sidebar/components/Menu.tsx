@@ -198,7 +198,7 @@ export default function Menu({
           {
             'text-grey-7 hover:text-grey-9': !isOpen,
             'text-brand': isOpen,
-          }
+          },
         )}
         data-testid="menu-toggle-button"
         onMouseDown={toggleMenu}
@@ -229,7 +229,7 @@ export default function Menu({
             classes={classnames(
               // Position menu-arrow caret near bottom right of menu label/toggle control
               'right-0 top-[calc(100%-3px)] w-[15px]',
-              arrowClass
+              arrowClass,
             )}
           />
           <div
@@ -242,7 +242,7 @@ export default function Menu({
                 'left-0': align === 'left',
                 'right-0': align === 'right',
               },
-              contentClass
+              contentClass,
             )}
             data-testid="menu-content"
             role="menu"

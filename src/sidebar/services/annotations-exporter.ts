@@ -25,7 +25,7 @@ export class AnnotationsExporter {
   buildExportContent(
     annotations: Annotation[],
     /* istanbul ignore next - test seam */
-    now = new Date()
+    now = new Date(),
   ): ExportContent {
     const profile = this._store.profile();
     const versionData = new VersionData(profile, []);
@@ -35,7 +35,7 @@ export class AnnotationsExporter {
       export_userid: profile.userid ?? '',
       client_version: versionData.version,
       annotations: annotations.map(
-        stripInternalProperties
+        stripInternalProperties,
       ) as APIAnnotationData[],
     };
   }

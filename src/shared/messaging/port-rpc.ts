@@ -59,7 +59,7 @@ function sendCall(
   port: MessagePort,
   method: string,
   args: unknown[] = [],
-  sequence = -1
+  sequence = -1,
 ) {
   port.postMessage({
     protocol: PROTOCOL,
@@ -84,7 +84,7 @@ function sendCall(
  */
 export function installPortCloseWorkaroundForSafari(
   /* istanbul ignore next */
-  userAgent = navigator.userAgent
+  userAgent = navigator.userAgent,
 ): () => void {
   if (!shouldUseSafariWorkaround(userAgent)) {
     return () => {};
@@ -210,7 +210,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
           currentWindow.parent.postMessage(
             { type: 'hypothesisPortClosed' },
             '*',
-            [this._port]
+            [this._port],
           );
         }
       }
@@ -235,7 +235,7 @@ export class PortRPC<OnMethod extends string, CallMethod extends string>
    */
   on<Handler extends (...args: any[]) => void>(
     method: OnMethod | 'close' | 'connect',
-    handler: Handler
+    handler: Handler,
   ) {
     if (this._port) {
       throw new Error('Cannot add a method handler after a port is connected');

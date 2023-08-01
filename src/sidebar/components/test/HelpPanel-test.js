@@ -79,7 +79,7 @@ describe('HelpPanel', () => {
       assert.isTrue(wrapper.find('VersionInfo').exists());
       assert.equal(
         wrapper.find('VersionInfo').prop('versionData'),
-        fakeVersionData
+        fakeVersionData,
       );
       assert.isFalse(wrapper.find('Tutorial').exists());
     });
@@ -186,7 +186,7 @@ describe('HelpPanel', () => {
         wrapper
           .find('HelpPanelTab')
           .filter({ linkText: 'Help topics' })
-          .exists()
+          .exists(),
       );
     });
 
@@ -271,6 +271,6 @@ describe('HelpPanel', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

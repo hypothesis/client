@@ -36,7 +36,7 @@ function format(
   date: Date,
   options: Intl.DateTimeFormatOptions,
   /* istanbul ignore next */
-  Intl: IntlType = window.Intl
+  Intl: IntlType = window.Intl,
 ): string {
   const key = JSON.stringify(options);
   let formatter = formatters[key];
@@ -76,7 +76,7 @@ const dayAndMonthAndYear: DateFormatter = (date, now, Intl) => {
   return format(
     date,
     { day: 'numeric', month: 'short', year: 'numeric' },
-    Intl
+    Intl,
   );
 };
 
@@ -189,7 +189,7 @@ export function nextFuzzyUpdate(date: Date | null, now: Date): number | null {
  */
 export function decayingInterval(
   date: string,
-  callback: () => void
+  callback: () => void,
 ): () => void {
   let timer: number | undefined;
   const timestamp = new Date(date);
@@ -230,7 +230,7 @@ export function decayingInterval(
 export function formatRelativeDate(
   date: Date | null,
   now: Date,
-  Intl?: IntlType
+  Intl?: IntlType,
 ): string {
   if (!date) {
     return '';
@@ -259,6 +259,6 @@ export function formatDate(date: Date, Intl?: IntlType): string {
       hour: '2-digit',
       minute: '2-digit',
     },
-    Intl
+    Intl,
   );
 }

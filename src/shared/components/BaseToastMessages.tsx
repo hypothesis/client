@@ -90,7 +90,7 @@ export default function BaseToastMessages({
           // Set an aggressive z-index as we want to ensure toast messages are
           // rendered above other content
           'z-10',
-          'absolute left-0 w-full'
+          'absolute left-0 w-full',
         )}
       >
         {messages.map(message => (

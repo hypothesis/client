@@ -178,7 +178,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
     this._sideBySideActive = active;
     this.container.classList.toggle(
       'hypothesis-sidebyside-active',
-      this._sideBySideActive
+      this._sideBySideActive,
     );
     return active;
   }
@@ -249,7 +249,7 @@ export class HTMLIntegration extends TinyEmitter implements Integration {
         // sidebar overlap stuff in the document to the right of the main content.
         const freeSpace = Math.max(
           0,
-          window.innerWidth - rightMargin - contentArea.right
+          window.innerWidth - rightMargin - contentArea.right,
         );
         if (freeSpace > 0) {
           const adjustedMargin = Math.max(0, rightMargin - freeSpace);

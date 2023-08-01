@@ -58,12 +58,12 @@ function AnnotationHeader({
   const authorName = useMemo(
     () =>
       annotationDisplayName(annotation, defaultAuthority, displayNamesEnabled),
-    [annotation, defaultAuthority, displayNamesEnabled]
+    [annotation, defaultAuthority, displayNamesEnabled],
   );
 
   const authorLink = useMemo(
     () => annotationAuthorLink(annotation, settings, defaultAuthority, userURL),
-    [annotation, settings, defaultAuthority, userURL]
+    [annotation, settings, defaultAuthority, userURL],
   );
 
   const isCollapsedReply = isReply(annotation) && threadIsCollapsed;

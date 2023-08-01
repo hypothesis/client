@@ -123,7 +123,7 @@ describe('sidebar/util/time', () => {
           assert.equal(formatRelativeDate(timeStamp, now, fakeIntl), test.text);
           assert.calledWith(fakeIntl.DateTimeFormat, undefined, test.options);
           assert.calledWith(fakeIntl.DateTimeFormat().format, timeStamp); // eslint-disable-line new-cap
-        }
+        },
       );
     });
   });
@@ -244,14 +244,14 @@ describe('sidebar/util/time', () => {
 
       assert.equal(
         normalizeSpaces(formatDate(date, fakeIntl('en-US'))),
-        'Monday, May 04, 2020, 11:02 PM'
+        'Monday, May 04, 2020, 11:02 PM',
       );
 
       clearFormatters();
 
       assert.equal(
         normalizeSpaces(formatDate(date, fakeIntl('de-DE'))),
-        'Montag, 04. Mai 2020, 23:02'
+        'Montag, 04. Mai 2020, 23:02',
       );
     });
   });

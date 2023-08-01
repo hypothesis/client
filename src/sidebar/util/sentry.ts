@@ -72,7 +72,7 @@ export function init(config: SentryConfig) {
         // Sentry implements its own server-side rate limiting in addition.
         // See https://docs.sentry.io/accounts/quotas/.
         warnOnce(
-          'Client-side Sentry quota reached. No further Sentry events will be sent'
+          'Client-side Sentry quota reached. No further Sentry events will be sent',
         );
         return null;
       }

@@ -92,7 +92,7 @@ describe('sidebar/util/watch', () => {
       const unsubscribe = watch(
         store.subscribe,
         () => store.getState().a,
-        callback
+        callback,
       );
       store.dispatch({ type: 'INCREMENT_A' });
 

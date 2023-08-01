@@ -29,7 +29,7 @@ describe('annotator/config/settingsFrom', () => {
     it('calls urlFromLinkTag with appropriate params', () => {
       assert.equal(
         settingsFrom(window).notebookAppUrl,
-        'http://example.com/app.html'
+        'http://example.com/app.html',
       );
       assert.calledWith(fakeUrlFromLinkTag, window, 'notebook', 'html');
     });
@@ -39,7 +39,7 @@ describe('annotator/config/settingsFrom', () => {
     it('calls urlFromLinkTag with appropriate params', () => {
       assert.equal(
         settingsFrom(window).profileAppUrl,
-        'http://example.com/app.html'
+        'http://example.com/app.html',
       );
       assert.calledWith(fakeUrlFromLinkTag, window, 'profile', 'html');
     });
@@ -49,7 +49,7 @@ describe('annotator/config/settingsFrom', () => {
     it('calls urlFromLinkTag with appropriate params', () => {
       assert.equal(
         settingsFrom(window).sidebarAppUrl,
-        'http://example.com/app.html'
+        'http://example.com/app.html',
       );
       assert.calledWith(fakeUrlFromLinkTag, window, 'sidebar', 'html');
     });
@@ -59,13 +59,13 @@ describe('annotator/config/settingsFrom', () => {
     it('calls urlFromLinkTag with appropriate params', () => {
       assert.equal(
         settingsFrom(window).clientUrl,
-        'http://example.com/app.html'
+        'http://example.com/app.html',
       );
       assert.calledWith(
         fakeUrlFromLinkTag,
         window,
         'hypothesis-client',
-        'javascript'
+        'javascript',
       );
     });
   });
@@ -94,7 +94,7 @@ describe('annotator/config/settingsFrom', () => {
         it('returns the annotations from the js-hypothesis-config script', () => {
           assert.equal(
             settingsFrom(fakeWindow()).annotations,
-            'annotationsFromJSON'
+            'annotationsFromJSON',
           );
         });
 
@@ -105,18 +105,18 @@ describe('annotator/config/settingsFrom', () => {
               'js-hypothesis-config annotations override URL ones',
               () => {
                 const window_ = fakeWindow(
-                  'http://localhost:3000#annotations:annotationsFromURL'
+                  'http://localhost:3000#annotations:annotationsFromURL',
                 );
 
                 assert.equal(
                   settingsFrom(window_).annotations,
-                  'annotationsFromJSON'
+                  'annotationsFromJSON',
                 );
-              }
+              },
             );
-          }
+          },
         );
-      }
+      },
     );
 
     [
@@ -149,7 +149,7 @@ describe('annotator/config/settingsFrom', () => {
         it(test.it, () => {
           assert.deepEqual(
             settingsFrom(fakeWindow(test.url)).annotations,
-            test.returns
+            test.returns,
           );
         });
       });
@@ -196,13 +196,13 @@ describe('annotator/config/settingsFrom', () => {
         context("when there's also a query in the URL fragment", () => {
           specify('js-hypothesis-config queries override URL ones', () => {
             const window_ = fakeWindow(
-              'http://localhost:3000#annotations:query:queryFromUrl'
+              'http://localhost:3000#annotations:query:queryFromUrl',
             );
 
             assert.equal(settingsFrom(window_).query, 'queryFromJSON');
           });
         });
-      }
+      },
     );
 
     [
@@ -253,7 +253,7 @@ describe('annotator/config/settingsFrom', () => {
         it(test.it, () => {
           assert.deepEqual(
             settingsFrom(fakeWindow(test.url)).query,
-            test.returns
+            test.returns,
           );
         });
       });

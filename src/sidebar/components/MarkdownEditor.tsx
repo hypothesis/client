@@ -60,7 +60,7 @@ const SHORTCUT_KEYS: Record<Command, string> = {
  */
 function handleToolbarCommand(
   command: Command,
-  inputEl: HTMLInputElement | HTMLTextAreaElement
+  inputEl: HTMLInputElement | HTMLTextAreaElement,
 ) {
   const update = (newStateFn: (prevState: EditorState) => EditorState) => {
     // Apply the toolbar command to the current state of the input field.
@@ -113,7 +113,7 @@ function handleToolbarCommand(
       break;
     case 'numlist':
       update(state =>
-        toggleBlockStyle(state, lineIndex => `${lineIndex + 1}. `)
+        toggleBlockStyle(state, lineIndex => `${lineIndex + 1}. `),
       );
       break;
     case 'list':
@@ -189,7 +189,7 @@ function TextArea({
         'border rounded p-2',
         'text-color-text-light bg-grey-0',
         'focus:bg-white focus:outline-none focus:shadow-focus-inner',
-        classes
+        classes,
       )}
       {...restProps}
       ref={containerRef}
@@ -229,7 +229,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
         // For touch interfaces, allow height to scale to larger button targets.
         // Don't wrap buttons but instead scroll horizontally. Add bottom
         // padding to provide some space for scrollbar.
-        'touch:h-auto touch:overflow-x-scroll touch:flex-nowrap touch:pb-2.5'
+        'touch:h-auto touch:overflow-x-scroll touch:flex-nowrap touch:pb-2.5',
       )}
       data-testid="markdown-toolbar"
       role="toolbar"
@@ -305,7 +305,7 @@ function Toolbar({ isPreviewing, onCommand, onTogglePreview }: ToolbarProps) {
             className={classnames(
               'flex justify-center items-center',
               'touch:h-touch-minimum touch:w-touch-minimum',
-              'px-2 py-2.5 touch:p-0'
+              'px-2 py-2.5 touch:p-0',
             )}
           >
             <HelpIcon className="w-2.5 h-2.5" />
@@ -400,7 +400,7 @@ export default function MarkdownEditor({
             // Turn off border-radius on top edges to align with toolbar above
             'rounded-t-none',
             // Larger font on touch devices
-            'text-base touch:text-touch-base'
+            'text-base touch:text-touch-base',
           )}
           containerRef={input}
           onClick={(e: Event) => e.stopPropagation()}

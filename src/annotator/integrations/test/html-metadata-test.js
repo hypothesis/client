@@ -211,7 +211,7 @@ describe('HTMLMetadata', () => {
         assert.equal(metadata.link[4].rel, 'shortlink');
         assert.equal(
           metadata.link[4].href,
-          'http://example.com/bookmark/short'
+          'http://example.com/bookmark/short',
         );
         assert.equal(metadata.link[5].rel, 'canonical');
         assert.equal(metadata.link[5].href, 'http://example.com/canonical');
@@ -225,7 +225,7 @@ describe('HTMLMetadata', () => {
         // and <identifier> is the percent-encoded value of the last dc.identifier meta element.
         assert.equal(
           metadata.link[9].href,
-          'urn:x-dc:isbn%3A123456789/foobar-abcxyz'
+          'urn:x-dc:isbn%3A123456789/foobar-abcxyz',
         );
       });
 
@@ -364,7 +364,7 @@ describe('HTMLMetadata', () => {
         const baseURI = 'https://publisher.org/';
         const doc = createDoc(href, baseURI);
         assert.equal(doc.uri(), href);
-      })
+      }),
     );
 
     it("should return the baseURI if the document's URL does not have an allowed scheme", () => {
@@ -400,7 +400,7 @@ describe('HTMLMetadata', () => {
       const doc = createDoc(
         'https://publisher.org/not-canonical',
         null,
-        htmlDoc
+        htmlDoc,
       );
 
       assert.equal(doc.uri(), canonicalLink.href);

@@ -16,7 +16,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       const groupA = groups.find(g => g.id === 'groupa');
       assert.equal(groupA.isMember, true);
@@ -28,7 +28,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       const groupA = groups.find(g => g.id === 'groupa');
       const groupB = groups.find(g => g.id === 'groupb');
@@ -45,7 +45,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       const groupA = groups.find(g => g.id === 'groupa');
       const groupB = groups.find(g => g.id === 'groupb');
@@ -63,7 +63,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       const groupA = groups.find(g => g.id === 'groupa');
       const groupB = groups.find(g => g.id === 'groupb');
@@ -83,7 +83,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       const ids = groups.map(g => g.id);
       assert.deepEqual(ids, ['__world__', 'groupa', 'groupb']);
@@ -105,7 +105,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       groups.forEach(g => assert.equal(g.isMember, expectedMembership[g.id]));
     });
@@ -123,7 +123,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       const ids = groups.map(g => g.id);
       assert.deepEqual(ids, ['one', 'two', 'three']);
@@ -136,7 +136,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       assert.equal(groups[0].id, '__world__');
     });
@@ -148,7 +148,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
       assert.deepEqual(groups, []);
     });
@@ -223,7 +223,7 @@ describe('sidebar/helpers/groups', () => {
       const groups = combineGroups(
         userGroups,
         featuredGroups,
-        'https://foo.com/bar'
+        'https://foo.com/bar',
       );
 
       groups.forEach(g => assert.equal(g.isScopedToUri, true));
@@ -290,7 +290,7 @@ describe('sidebar/helpers/groups', () => {
       it(`returns the correct set of IDs when ${testCase.description}`, () => {
         assert.deepEqual(
           normalizeGroupIds(testCase.groupIds, testCase.groups),
-          testCase.expected
+          testCase.expected,
         );
       });
     });

@@ -18,7 +18,7 @@ type Options = {
 
 async function querySelector(
   anchor: MediaTimeAnchor | RangeAnchor | TextPositionAnchor | TextQuoteAnchor,
-  options: Options
+  options: Options,
 ) {
   return anchor.toRange(options);
 }
@@ -36,7 +36,7 @@ async function querySelector(
 export function anchor(
   root: Element,
   selectors: Selector[],
-  options: Options = {}
+  options: Options = {},
 ) {
   let mediaTime: MediaTimeSelector | null = null;
   let position: TextPositionSelector | null = null;
@@ -105,7 +105,7 @@ export function anchor(
   if (mediaTime) {
     const mediaTime_ = mediaTime;
     promise = promise.catch(() =>
-      MediaTimeAnchor.fromSelector(root, mediaTime_).toRange()
+      MediaTimeAnchor.fromSelector(root, mediaTime_).toRange(),
     );
   }
 

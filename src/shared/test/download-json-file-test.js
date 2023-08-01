@@ -35,7 +35,7 @@ describe('download-json-file', () => {
     assert.calledWith(
       fakeLink.setAttribute.firstCall,
       'href',
-      sinon.match.string
+      sinon.match.string,
     );
     assert.calledWith(fakeLink.setAttribute.secondCall, 'download', filename);
     assert.equal('hidden', fakeLink.style.visibility);

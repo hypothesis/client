@@ -61,7 +61,7 @@ describe('sidebar/util/fetch', () => {
       assert.equal(err.response, fakeResponse);
       assert.equal(
         err.message,
-        'Network request failed (200): Failed to parse response'
+        'Network request failed (200): Failed to parse response',
       );
     });
 
@@ -79,7 +79,7 @@ describe('sidebar/util/fetch', () => {
       assert.equal(err.response, fakeResponse);
       assert.equal(
         err.message,
-        'Network request failed (404): Thing not found'
+        'Network request failed (404): Thing not found',
       );
     });
 

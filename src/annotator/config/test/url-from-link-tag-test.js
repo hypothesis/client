@@ -16,7 +16,7 @@ describe('url-from-link-tag', () => {
     const link = appendLink('http://example.com/app.html', 'sidebar', 'html');
     assert.equal(
       urlFromLinkTag(window, 'sidebar', 'html'),
-      'http://example.com/app.html'
+      'http://example.com/app.html',
     );
     link.remove();
   });
@@ -25,11 +25,11 @@ describe('url-from-link-tag', () => {
     const link = appendLink(
       'http://example.com/app.html',
       'hypothesis-client',
-      'javascript'
+      'javascript',
     );
     assert.equal(
       urlFromLinkTag(window, 'hypothesis-client', 'javascript'),
-      'http://example.com/app.html'
+      'http://example.com/app.html',
     );
     link.remove();
   });
@@ -40,7 +40,7 @@ describe('url-from-link-tag', () => {
       const link2 = appendLink('http://example.com/app2', 'notebook', 'html');
       assert.equal(
         urlFromLinkTag(window, 'notebook', 'html'),
-        'http://example.com/app1'
+        'http://example.com/app1',
       );
       link1.remove();
       link2.remove();

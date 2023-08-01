@@ -89,7 +89,7 @@ describe('GroupList', () => {
     fakeStore.getCurrentlyViewingGroups.returns([testGroup]);
     const wrapper = createGroupList();
     assert.isTrue(
-      wrapper.exists('GroupListSection[heading="Currently Viewing"]')
+      wrapper.exists('GroupListSection[heading="Currently Viewing"]'),
     );
   });
 
@@ -97,7 +97,7 @@ describe('GroupList', () => {
     fakeStore.getFeaturedGroups.returns([testGroup]);
     const wrapper = createGroupList();
     assert.isTrue(
-      wrapper.exists('GroupListSection[heading="Featured Groups"]')
+      wrapper.exists('GroupListSection[heading="Featured Groups"]'),
     );
   });
 
@@ -124,7 +124,7 @@ describe('GroupList', () => {
     sections.forEach(section => {
       assert.deepEqual(
         section.prop('groups'),
-        fakeGroupsByOrganization(testGroups)
+        fakeGroupsByOrganization(testGroups),
       );
     });
   });
@@ -147,7 +147,7 @@ describe('GroupList', () => {
       fakeStore.profile.returns({ userid });
       const wrapper = createGroupList();
       const newGroupButton = wrapper.find(
-        'MenuItem[label="New private group"]'
+        'MenuItem[label="New private group"]',
       );
       assert.equal(newGroupButton.length, expectNewGroupButton ? 1 : 0);
     });
@@ -231,7 +231,7 @@ describe('GroupList', () => {
     // Expand a group in one of the sections.
     act(() => {
       wrapper.find('GroupListSection').first().prop('onExpandGroup')(
-        testGroups[0]
+        testGroups[0],
       );
     });
     wrapper.update();
@@ -252,7 +252,7 @@ describe('GroupList', () => {
     // Expand one of the submenus.
     act(() => {
       wrapper.find('GroupListSection').first().prop('onExpandGroup')(
-        testGroups[0]
+        testGroups[0],
       );
     });
     wrapper.update();

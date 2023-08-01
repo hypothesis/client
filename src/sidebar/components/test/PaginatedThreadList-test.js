@@ -27,7 +27,7 @@ describe('PaginatedThreadList', () => {
         onChangePage={fakeOnChangePage}
         threads={fakeThreads}
         {...props}
-      />
+      />,
     );
   }
 
@@ -108,7 +108,7 @@ describe('PaginatedThreadList', () => {
 
       assert.equal(
         wrapper.find('PaginationNavigation').props().totalPages,
-        testCase.pageCount
+        testCase.pageCount,
       );
     });
 
@@ -122,7 +122,7 @@ describe('PaginatedThreadList', () => {
 
       assert.equal(
         wrapper.find('PaginationNavigation').props().currentPage,
-        testCase.currentPage
+        testCase.currentPage,
       );
     });
 
@@ -136,7 +136,7 @@ describe('PaginatedThreadList', () => {
 
       assert.deepEqual(
         wrapper.find('ThreadList').props().threads,
-        testCase.pageThreads
+        testCase.pageThreads,
       );
     });
   });

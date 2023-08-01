@@ -31,7 +31,7 @@ import { EventBus } from './util/emitter';
 // Look up the URL of the sidebar. This element is added to the page by the
 // boot script before the "annotator" bundle loads.
 const sidebarLinkElement = document.querySelector(
-  'link[type="application/annotator+html"][rel="sidebar"]'
+  'link[type="application/annotator+html"][rel="sidebar"]',
 ) as HTMLLinkElement;
 
 /**
@@ -74,16 +74,16 @@ function init() {
     const notebook = new Notebook(
       document.body,
       eventBus,
-      getConfig('notebook') as NotebookConfig
+      getConfig('notebook') as NotebookConfig,
     );
     const profile = new Profile(
       document.body,
       eventBus,
-      getConfig('profile') as ProfileConfig
+      getConfig('profile') as ProfileConfig,
     );
 
     portProvider.on('frameConnected', (source, port) =>
-      sidebar.onFrameConnected(source, port)
+      sidebar.onFrameConnected(source, port),
     );
     destroyables.push(portProvider, sidebar, notebook, profile);
   }
@@ -96,7 +96,7 @@ function init() {
     // Set up automatic injection of the client into iframes in this frame.
     const hypothesisInjector = new HypothesisInjector(
       document.body,
-      annotatorConfig
+      annotatorConfig,
     );
 
     // Create the guest that handles creating annotations and displaying highlights.

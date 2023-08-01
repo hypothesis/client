@@ -18,7 +18,7 @@ export type RetryOptions = {
  */
 export function retryPromiseOperation<T>(
   callback: () => Promise<T>,
-  options?: RetryOptions
+  options?: RetryOptions,
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const operation = retry.operation(options);

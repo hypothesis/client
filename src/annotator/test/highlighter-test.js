@@ -120,7 +120,7 @@ describe('annotator/highlighter', () => {
 
         const highlightedText = result.reduce(
           (str, el) => str + el.textContent,
-          ''
+          '',
         );
         assert.equal(highlightedText, testText.slice(startPos, endPos));
         assert.equal(el.textContent, testText);
@@ -150,7 +150,7 @@ describe('annotator/highlighter', () => {
 
       assert.equal(
         el.innerHTML,
-        'foo <hypothesis-highlight class="hypothesis-highlight">bar baz</hypothesis-highlight>'
+        'foo <hypothesis-highlight class="hypothesis-highlight">bar baz</hypothesis-highlight>',
       );
     });
 
@@ -296,7 +296,7 @@ describe('annotator/highlighter', () => {
         // ... with multiple <rect>s
         assert.equal(
           page.querySelector('svg').querySelectorAll('rect').length,
-          2
+          2,
         );
       });
 
@@ -455,7 +455,7 @@ describe('annotator/highlighter', () => {
       updateClusters(container);
 
       const orderedNestingLevels = Array.from(
-        container.querySelectorAll('rect')
+        container.querySelectorAll('rect'),
       ).map(el => nestingLevel(el));
 
       assert.deepEqual(orderedNestingLevels, [0, 0, 0, 0, 1, 2]);
@@ -485,7 +485,7 @@ describe('annotator/highlighter', () => {
       assert.equal(
         svgEls().length,
         4,
-        'cloned, focused highlight element added'
+        'cloned, focused highlight element added',
       );
 
       updateClusters(container);
@@ -493,7 +493,7 @@ describe('annotator/highlighter', () => {
       assert.deepEqual(
         orderedNestingLevels(),
         [0, 1, 2, 0],
-        'Focused highlight remains at end after re-ordering'
+        'Focused highlight remains at end after re-ordering',
       );
 
       setHighlightsFocused(toFocus, false);
@@ -536,7 +536,7 @@ describe('annotator/highlighter', () => {
       setHighlightsFocused(highlights, true);
 
       highlights.forEach(h =>
-        assert.isTrue(h.classList.contains('hypothesis-highlight-focused'))
+        assert.isTrue(h.classList.contains('hypothesis-highlight-focused')),
       );
     });
 
@@ -548,7 +548,7 @@ describe('annotator/highlighter', () => {
       setHighlightsFocused(highlights, false);
 
       highlights.forEach(h =>
-        assert.isFalse(h.classList.contains('hypothesis-highlight-focused'))
+        assert.isFalse(h.classList.contains('hypothesis-highlight-focused')),
       );
     });
 
@@ -560,7 +560,7 @@ describe('annotator/highlighter', () => {
       setHighlightsFocused(highlights, true);
 
       highlights.forEach(h =>
-        assert.isTrue(h.classList.contains('hypothesis-highlight-focused'))
+        assert.isTrue(h.classList.contains('hypothesis-highlight-focused')),
       );
     });
 
@@ -582,7 +582,7 @@ describe('annotator/highlighter', () => {
       assert.isTrue(svgLayer.lastChild.hasAttribute('data-is-focused'));
       assert.equal(
         svgLayer.lastChild.getAttribute('data-focused-id'),
-        highlights[0].svgHighlight.getAttribute('data-focused-id')
+        highlights[0].svgHighlight.getAttribute('data-focused-id'),
       );
     });
 
@@ -604,11 +604,11 @@ describe('annotator/highlighter', () => {
       assert.equal(
         svgLayer.children.length,
         highlights.length + 1,
-        'No additional cloned highlights are added'
+        'No additional cloned highlights are added',
       );
       assert.equal(
         svgLayer.lastChild.getAttribute('data-focused-id'),
-        highlights[0].svgHighlight.getAttribute('data-focused-id')
+        highlights[0].svgHighlight.getAttribute('data-focused-id'),
       );
     });
 
@@ -651,7 +651,7 @@ describe('annotator/highlighter', () => {
 
       assert.equal(
         svgLayer.querySelectorAll('rect').length,
-        highlights.length - 1
+        highlights.length - 1,
       );
       assert.equal(svgLayer.querySelectorAll('[data-focused-id]').length, 0);
       assert.equal(svgLayer.querySelectorAll('[data-is-focused]').length, 0);
@@ -672,7 +672,7 @@ describe('annotator/highlighter', () => {
       setHighlightsVisible(root, false);
 
       assert.isFalse(
-        root.classList.contains('hypothesis-highlights-always-on')
+        root.classList.contains('hypothesis-highlights-always-on'),
       );
     });
   });

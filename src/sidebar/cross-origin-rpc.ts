@@ -79,7 +79,7 @@ function isJSONRPCRequest(data: any): data is JSONRPCRequest {
 export function startServer(
   store: SidebarStore,
   settings: SidebarSettings,
-  $window: Window
+  $window: Window,
 ) {
   const methods: Record<string, (...args: any[]) => void> =
     registeredMethods(store);
@@ -104,7 +104,7 @@ export function startServer(
 
     if (!allowedOrigins.includes(event.origin)) {
       warnOnce(
-        `Ignoring JSON-RPC request from non-whitelisted origin ${event.origin}`
+        `Ignoring JSON-RPC request from non-whitelisted origin ${event.origin}`,
       );
       return;
     }

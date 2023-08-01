@@ -27,14 +27,14 @@ function ThreadCard({ frameSync, thread }: ThreadCardProps) {
   const setThreadHovered = useMemo(
     () =>
       debounce((ann: Annotation | null) => frameSync.hoverAnnotation(ann), 10),
-    [frameSync]
+    [frameSync],
   );
 
   const scrollToAnnotation = useCallback(
     (ann: Annotation) => {
       frameSync.scrollToAnnotation(ann);
     },
-    [frameSync]
+    [frameSync],
   );
 
   /**

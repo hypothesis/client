@@ -217,7 +217,7 @@ describe('sidebar/util/oauth-client', () => {
         fakeWindow.open,
         expectedAuthURL,
         'Log in to Hypothesis',
-        'left=274.5,top=169,width=475,height=430'
+        'left=274.5,top=169,width=475,height=430',
       );
 
       fakeWindow.sendMessage({

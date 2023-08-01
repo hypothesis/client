@@ -32,7 +32,7 @@ export function combineGroups(
   userGroups: Group[],
   featuredGroups: Group[],
   uri: string | null,
-  settings: SidebarSettings
+  settings: SidebarSettings,
 ) {
   const worldGroup = featuredGroups.find(g => g.id === '__world__');
   if (worldGroup) {
@@ -81,8 +81,8 @@ function uriMatchesScopes(uri: string, scopes: string[]): boolean {
   return scopes.some(uriRegex =>
     uri.match(
       // Convert *'s to .*'s for regex matching and escape all other special characters.
-      uriRegex.split('*').map(escapeStringRegexp).join('.*')
-    )
+      uriRegex.split('*').map(escapeStringRegexp).join('.*'),
+    ),
   );
 }
 
@@ -92,10 +92,10 @@ function uriMatchesScopes(uri: string, scopes: string[]): boolean {
  */
 function findGroupsByAnyIds(
   groupIds: GroupIdentifier[],
-  groups: Group[]
+  groups: Group[],
 ): Group[] {
   return groups.filter(
-    g => groupIds.includes(g.id) || (g.groupid && groupIds.includes(g.groupid))
+    g => groupIds.includes(g.id) || (g.groupid && groupIds.includes(g.groupid)),
   );
 }
 
@@ -107,7 +107,7 @@ function findGroupsByAnyIds(
  */
 export function normalizeGroupIds(
   groupIds: GroupIdentifier[],
-  groups: Group[]
+  groups: Group[],
 ): Group['id'][] {
   return findGroupsByAnyIds(groupIds, groups).map(g => g.id);
 }

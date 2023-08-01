@@ -87,7 +87,7 @@ describe('annotator/anchoring/xpath', () => {
         textNodes.forEach((node, index) => {
           assert.equal(
             xpathFromNode(node, document.body),
-            test.xpaths[index + 1]
+            test.xpaths[index + 1],
           );
         });
       });

@@ -37,7 +37,7 @@ describe('SortMenu', () => {
     fakeStore.sortKeys().forEach(sortKey => {
       assert.lengthOf(
         menuItems.filterWhere(menuItem => menuItem.prop('label') === sortKey),
-        1
+        1,
       );
     });
   });

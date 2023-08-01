@@ -14,21 +14,21 @@
 export function urlFromLinkTag(
   window_: Window,
   rel: string,
-  type: 'javascript' | 'html'
+  type: 'javascript' | 'html',
 ) {
   const link = window_.document.querySelector(
-    `link[type="application/annotator+${type}"][rel="${rel}"]`
+    `link[type="application/annotator+${type}"][rel="${rel}"]`,
   ) as HTMLLinkElement | undefined;
 
   if (!link) {
     throw new Error(
-      `No application/annotator+${type} (rel="${rel}") link in the document`
+      `No application/annotator+${type} (rel="${rel}") link in the document`,
     );
   }
 
   if (!link.href) {
     throw new Error(
-      `application/annotator+${type} (rel="${rel}") link has no href`
+      `application/annotator+${type} (rel="${rel}") link has no href`,
     );
   }
 

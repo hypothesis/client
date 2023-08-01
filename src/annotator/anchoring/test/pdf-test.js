@@ -175,7 +175,7 @@ describe('annotator/anchoring/pdf', () => {
 
       await assert.rejects(
         pdfAnchoring.describe(container, range),
-        'Selecting across page breaks is not supported'
+        'Selecting across page breaks is not supported',
       );
     });
 
@@ -190,7 +190,7 @@ describe('annotator/anchoring/pdf', () => {
 
       await assert.rejects(
         pdfAnchoring.describe(container, range),
-        'Selection is outside page text'
+        'Selection is outside page text',
       );
     });
 
@@ -204,7 +204,7 @@ describe('annotator/anchoring/pdf', () => {
 
       await assert.rejects(
         pdfAnchoring.describe(container, range),
-        'Selection does not contain text'
+        'Selection does not contain text',
       );
     });
   });
@@ -275,7 +275,7 @@ describe('annotator/anchoring/pdf', () => {
               assert.equal(
                 anchoredRange.toString(),
                 range.toString(),
-                description
+                description,
               );
             })
             .catch(err => {
@@ -299,7 +299,7 @@ describe('annotator/anchoring/pdf', () => {
           assert.instanceOf(error, Error);
           assert.equal(error.message, 'No quote selector found');
         });
-      }
+      },
     );
 
     it('anchors text in older PDF.js versions', async () => {
@@ -374,7 +374,7 @@ describe('annotator/anchoring/pdf', () => {
     ].forEach(({ test, prefix, suffix, expectedMatch }) => {
       it(`prefers a context match for quote selectors (${test})`, async () => {
         const expectedPage = fixtures.pdfPages.findIndex(page =>
-          page.includes(expectedMatch)
+          page.includes(expectedMatch),
         );
         assert.notEqual(expectedPage, -1);
 
@@ -398,7 +398,7 @@ describe('annotator/anchoring/pdf', () => {
         assert.equal(range.toString(), 'Netherfield');
         assert.include(
           range.startContainer.parentElement.textContent,
-          expectedMatch
+          expectedMatch,
         );
       });
     });
@@ -525,7 +525,7 @@ describe('annotator/anchoring/pdf', () => {
       const anchoredRange = await pdfAnchoring.anchor(container, [quote]);
       assert.equal(
         anchoredRange.toString(),
-        'z o m b i e   i n   p o s s e s s i o n'
+        'z o m b i e   i n   p o s s e s s i o n',
       );
     });
 
@@ -547,14 +547,14 @@ describe('annotator/anchoring/pdf', () => {
         viewer.pdfViewer.getPageView(1).textLayer.textLayerDiv;
       textLayerEl.textContent = textLayerEl.textContent.replace(
         'zombie',
-        'zomby'
+        'zomby',
       );
 
       const anchoredRange = await pdfAnchoring.anchor(container, [quote]);
       assert.equal(anchoredRange.toString(), 'zomby in possession o');
       assert.calledWith(
         warnOnce,
-        'Text layer text does not match page text. Highlights will be mis-aligned.'
+        'Text layer text does not match page text. Highlights will be mis-aligned.',
       );
     });
 
@@ -597,7 +597,7 @@ describe('annotator/anchoring/pdf', () => {
           // Adjust the position selector so that anchoring fails, and a fallback
           // to the quote selector is required.
           const position = selectors.find(
-            s => s.type === 'TextPositionSelector'
+            s => s.type === 'TextPositionSelector',
           );
           position.start += 100;
           position.end += 100;

@@ -27,7 +27,7 @@ function findNode(context, query) {
     context,
     null,
     XPathResult.FIRST_ORDERED_NODE_TYPE,
-    null
+    null,
   );
   return result.singleNodeValue;
 }
@@ -382,7 +382,7 @@ describe('HTML anchoring', () => {
     const selectors = html.describe(container, range);
 
     const mediaTimeSelector = selectors.find(
-      s => s.type === 'MediaTimeSelector'
+      s => s.type === 'MediaTimeSelector',
     );
     assert.ok(mediaTimeSelector);
     assert.deepEqual(mediaTimeSelector, {
@@ -408,7 +408,7 @@ describe('HTML anchoring', () => {
       };
       await assert.rejects(
         html.anchor(container, [quoteSelector]),
-        'Quote not found'
+        'Quote not found',
       );
     });
 

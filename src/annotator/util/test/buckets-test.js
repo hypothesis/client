@@ -118,7 +118,7 @@ describe('annotator/util/buckets', () => {
 
       assert.deepEqual(
         computeAnchorPositions(anchors1),
-        computeAnchorPositions(anchors2)
+        computeAnchorPositions(anchors2),
       );
     });
   });
@@ -183,7 +183,7 @@ describe('annotator/util/buckets', () => {
             bottom: thresholdPos + 10,
           },
         ],
-        bucketBarContainer
+        bucketBarContainer,
       );
 
       assert.deepEqual(bucketTags(bucketSet.above), [
@@ -212,7 +212,7 @@ describe('annotator/util/buckets', () => {
             bottom: thresholdPos + 11,
           },
         ],
-        bucketBarContainer
+        bucketBarContainer,
       );
 
       assert.deepEqual(bucketTags(bucketSet.below), [

@@ -70,7 +70,7 @@ describe('createSidebarStore', () => {
     it('sets `directLinkedGroupFetchFailed` to false', () => {
       store.clearSelection();
       assert.isFalse(
-        store.getState().directLinked.directLinkedGroupFetchFailed
+        store.getState().directLinked.directLinkedGroupFetchFailed,
       );
     });
 
@@ -180,7 +180,7 @@ describe('useSidebarStore', () => {
         <ServiceContext.Provider value={services}>
           <AnnotationCard id={annot.id} />
         </ServiceContext.Provider>,
-        el
+        el,
       );
     });
     assert.equal(el.innerHTML, '<div>Initial text</div>');

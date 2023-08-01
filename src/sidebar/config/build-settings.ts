@@ -20,7 +20,7 @@ function getEmbedderFrame(levels: number, window_: Window = window): Window {
   for (let i = 0; i < levels; i++) {
     if (ancestorWindow === ancestorWindow.top) {
       throw new Error(
-        'The target parent frame has exceeded the ancestor tree. Try reducing the `requestConfigFromFrame.ancestorLevel` value in the `hypothesisConfig`'
+        'The target parent frame has exceeded the ancestor tree. Try reducing the `requestConfigFromFrame.ancestorLevel` value in the `hypothesisConfig`',
       );
     }
     ancestorWindow = ancestorWindow.parent;
@@ -39,7 +39,7 @@ function getEmbedderFrame(levels: number, window_: Window = window): Window {
  */
 function fetchServiceGroups(
   configFromHost: ConfigFromHost,
-  rpcSettings: RPCSettings
+  rpcSettings: RPCSettings,
 ): ConfigFromHost {
   const services = configFromHost.services;
   if (!Array.isArray(services)) {
@@ -55,7 +55,7 @@ function fetchServiceGroups(
           rpcSettings.origin,
           'requestGroups',
           [index],
-          0 // no timeout
+          0, // no timeout
         )
         .catch(() => {
           throw new Error('Unable to fetch groups');
@@ -70,7 +70,7 @@ function fetchServiceGroups(
  */
 function buildRPCSettings(
   configFromAnnotator: ConfigFromAnnotator,
-  window_: Window
+  window_: Window,
 ): RPCSettings | null {
   const rpcConfig = configFromAnnotator.requestConfigFromFrame;
   if (!rpcConfig) {
@@ -80,7 +80,7 @@ function buildRPCSettings(
     typeof rpcConfig.origin !== 'string'
   ) {
     throw new Error(
-      'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified'
+      'Improper `requestConfigFromFrame` object. Both `ancestorLevel` and `origin` need to be specified',
     );
   }
   return {
@@ -94,14 +94,14 @@ function buildRPCSettings(
  */
 async function getEmbedderConfig(
   configFromAnnotator: ConfigFromAnnotator,
-  rpcSettings: RPCSettings
+  rpcSettings: RPCSettings,
 ): Promise<ConfigFromEmbedder> {
   const configFromEmbedder = await postMessageJsonRpc.call<ConfigFromEmbedder>(
     rpcSettings.targetFrame,
     rpcSettings.origin,
     'requestConfig',
     [],
-    3000
+    3000,
   );
 
   // In cases where host configuration is requested from the embedder frame
@@ -129,7 +129,7 @@ async function getEmbedderConfig(
  */
 export async function buildSettings(
   configFromSidebar: ConfigFromSidebar,
-  window_: Window = window
+  window_: Window = window,
 ): Promise<SidebarSettings> {
   const configFromAnnotator = hostPageConfig(window);
 
@@ -141,7 +141,7 @@ export async function buildSettings(
     // the correct groups asynchronously as well.
     const configFromEmbedder = await getEmbedderConfig(
       configFromAnnotator,
-      rpcSettings
+      rpcSettings,
     );
     configFromHost = fetchServiceGroups(configFromEmbedder, rpcSettings);
   } else {

@@ -55,7 +55,7 @@ describe('AnnotationActivityService', () => {
         fakePostMessageJsonRpc.notify,
         window,
         'https://www.example.com',
-        'remoteMethod'
+        'remoteMethod',
       );
     });
 

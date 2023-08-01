@@ -23,7 +23,7 @@ export class VersionData {
   constructor(
     userInfo: UserDetails,
     documentFrames: Frame[],
-    window_: Window = window
+    window_: Window = window,
   ) {
     const noValueString = 'N/A';
 

@@ -17,7 +17,7 @@ export class Profile implements Destroyable {
 
     render(
       <ProfileModal eventBus={eventBus} config={config} />,
-      this.shadowRoot
+      this.shadowRoot,
     );
   }
 

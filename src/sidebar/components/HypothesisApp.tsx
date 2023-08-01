@@ -50,7 +50,7 @@ function HypothesisApp({
 
   const backgroundStyle = useMemo(
     () => applyTheme(['appBackgroundColor'], settings),
-    [settings]
+    [settings],
   );
   const isThemeClean = settings.theme === 'clean';
 
@@ -144,7 +144,7 @@ function HypothesisApp({
           // but not in the Notebook or Profile, which don't use the TopBar
           'pt-[49px]': !isModalRoute,
           'p-4 lg:p-12': isModalRoute,
-        }
+        },
       )}
       data-testid="hypothesis-app"
       style={backgroundStyle}

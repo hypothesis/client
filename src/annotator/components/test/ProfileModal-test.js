@@ -18,7 +18,7 @@ describe('ProfileModal', () => {
       <ProfileModal
         eventBus={eventBus}
         config={{ profileAppUrl: profileURL, ...config }}
-      />
+      />,
     );
     components.push(component);
     return component;

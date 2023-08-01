@@ -39,7 +39,7 @@ function AnnotationView({
         // part of. This will be different to `annotationId` if `annotationId`
         // is a reply. A top-level annotation will not have any references.
         const topLevelAnnot = annots.filter(
-          ann => (ann.references || []).length === 0
+          ann => (ann.references || []).length === 0,
         )[0];
 
         if (!topLevelAnnot) {

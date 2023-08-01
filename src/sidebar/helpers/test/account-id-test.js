@@ -33,7 +33,7 @@ describe('sidebar/helpers/account-id', () => {
 
     it('should return false if user is not a third party user', () => {
       assert.isFalse(
-        isThirdPartyUser('acct:someone@example.com', 'example.com')
+        isThirdPartyUser('acct:someone@example.com', 'example.com'),
       );
     });
 

@@ -57,7 +57,7 @@ export default function Buckets({
             direction="up"
             onClick={() => {
               const anchors = [...above.anchors].sort(
-                (a, b) => a.bottom - b.bottom
+                (a, b) => a.bottom - b.bottom,
               );
               const bottomAnchor = anchors[anchors.length - 1];
               onScrollToAnnotation(bottomAnchor.tag);
@@ -83,7 +83,7 @@ export default function Buckets({
             onClick={event =>
               onSelectAnnotations(
                 bucketTags(bucket),
-                event.metaKey || event.ctrlKey
+                event.metaKey || event.ctrlKey,
               )
             }
             onBlur={() => onFocusAnnotations([])}

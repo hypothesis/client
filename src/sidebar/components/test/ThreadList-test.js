@@ -19,7 +19,7 @@ describe('ThreadList', () => {
       <ThreadList threads={fakeTopThread.children} {...props} />,
       {
         attachTo: fakeScrollContainer,
-      }
+      },
     );
     wrappers.push(wrapper);
     return wrapper;
@@ -105,7 +105,7 @@ describe('ThreadList', () => {
       fakeTopThread.children,
       sinon.match({}),
       0,
-      sinon.match.number
+      sinon.match.number,
     );
   });
 
@@ -280,7 +280,7 @@ describe('ThreadList', () => {
         getRect(cards.at(1)).top - getRect(cards.at(0)).bottom;
       const totalThreadHeight = fakeTopThread.children.reduce(
         (totalHeight, thread) => totalHeight + threadHeights[thread.id],
-        0
+        0,
       );
       const expectedScrollHeight =
         totalThreadHeight + spaceBelowEachCard * fakeTopThread.children.length;
@@ -293,7 +293,7 @@ describe('ThreadList', () => {
       const defaultThreadHeight = 200;
       assert.equal(
         lowerSpacer.getBoundingClientRect().height % defaultThreadHeight,
-        0
+        0,
       );
 
       // Scroll through the list "slowly", such that we render every thread at
@@ -409,7 +409,7 @@ describe('ThreadList', () => {
     wrappers.push(wrapper);
     assert.calledWith(
       console.warn,
-      'ThreadList could not measure thread. Element not found.'
+      'ThreadList could not measure thread. Element not found.',
     );
   });
 
@@ -420,6 +420,6 @@ describe('ThreadList', () => {
         const wrapper = createComponent();
         return wrapper;
       },
-    })
+    }),
   );
 });

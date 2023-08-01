@@ -25,7 +25,7 @@ export class AnnotationsService {
   constructor(
     annotationActivity: AnnotationActivityService,
     api: APIService,
-    store: SidebarStore
+    store: SidebarStore,
   ) {
     this._activity = annotationActivity;
     this._api = api;
@@ -57,7 +57,7 @@ export class AnnotationsService {
    */
   private _initialize(
     annotationData: Omit<AnnotationData, '$tag'>,
-    now: Date
+    now: Date,
   ): Annotation {
     const defaultPrivacy = this._store.getDefault('annotationPrivacy');
     const groupid = this._store.focusedGroupId();
@@ -93,7 +93,7 @@ export class AnnotationsService {
         links: {},
         document: { title: '' },
       },
-      annotationData
+      annotationData,
     );
 
     // Highlights are peculiar in that they always have private permissions
@@ -214,7 +214,7 @@ export class AnnotationsService {
     } else {
       saved = this._api.annotation.update(
         { id: annotation.id },
-        annotationWithChanges
+        annotationWithChanges,
       );
       eventType = 'update';
     }

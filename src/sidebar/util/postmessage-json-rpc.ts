@@ -29,7 +29,7 @@ export function call<T>(
   /* istanbul ignore next */
   timeout = 2000,
   /* istanbul ignore next */
-  window_: Window = window
+  window_: Window = window,
 ): Promise<T> {
   const id = generateHexString(10);
 
@@ -80,7 +80,7 @@ export function call<T>(
   const responseOrTimeout = [response];
   if (timeout) {
     responseOrTimeout.push(
-      createTimeout(timeout, `Request to ${origin} timed out`)
+      createTimeout(timeout, `Request to ${origin} timed out`),
     );
   }
 
@@ -111,7 +111,7 @@ export function notify(
   origin: string,
   method: string,
   /* istanbul ignore next */
-  params: unknown[] = []
+  params: unknown[] = [],
 ) {
   const request = {
     jsonrpc: '2.0',

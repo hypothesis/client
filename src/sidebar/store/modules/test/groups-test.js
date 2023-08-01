@@ -291,7 +291,7 @@ describe('sidebar/store/modules/groups', () => {
           const featuredGroups = getListAssertNoDupes(store, 'featuredGroups');
           assert.deepEqual(featuredGroups, expectedFeaturedGroups);
         });
-      }
+      },
     );
 
     it('should filter the returned featured groups if filtered groups are set', () => {
@@ -384,7 +384,7 @@ describe('sidebar/store/modules/groups', () => {
 
         const currentlyViewing = getListAssertNoDupes(
           store,
-          'currentlyViewingGroups'
+          'currentlyViewingGroups',
         );
 
         assert.deepEqual(currentlyViewing, allGroups);

@@ -24,7 +24,7 @@ function AnnotationReplyToggle({
         // This button has a non-standard color combination: it uses a lighter
         // text color than other Buttons
         'text-grey-7 enabled:hover:text-brand-dark',
-        'enabled:hover:underline'
+        'enabled:hover:underline',
       )}
       onClick={onToggleReplies}
       title={toggleText}

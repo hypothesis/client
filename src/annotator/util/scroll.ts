@@ -25,7 +25,7 @@ function interpolate(a: number, b: number, fraction: number): number {
  */
 export function offsetRelativeTo(
   element: HTMLElement,
-  parent: HTMLElement
+  parent: HTMLElement,
 ): number {
   let offset = 0;
   while (element !== parent && parent.contains(element)) {
@@ -48,7 +48,7 @@ export async function scrollElement(
   element: Element,
   offset: number,
   /* istanbul ignore next - defaults are overridden in tests */
-  { maxDuration = 500 }: DurationOptions = {}
+  { maxDuration = 500 }: DurationOptions = {},
 ): Promise<void> {
   const startOffset = element.scrollTop;
   const endOffset = offset;
@@ -59,7 +59,7 @@ export async function scrollElement(
   const pixelsPerMs = 3;
   const scrollDuration = Math.min(
     Math.abs(endOffset - startOffset) / pixelsPerMs,
-    maxDuration
+    maxDuration,
   );
 
   let scrollFraction = 0.0;
@@ -76,7 +76,7 @@ export async function scrollElement(
 export async function scrollElementIntoView(
   element: HTMLElement,
   /* istanbul ignore next - defaults are overridden in tests */
-  { maxDuration = 500 }: DurationOptions = {}
+  { maxDuration = 500 }: DurationOptions = {},
 ): Promise<void> {
   // Make the body's `tagName` return an upper-case string in XHTML documents
   // like it does in HTML documents. This is a workaround for
@@ -91,6 +91,6 @@ export async function scrollElementIntoView(
   }
 
   await new Promise(resolve =>
-    scrollIntoView(element, { time: maxDuration }, resolve)
+    scrollIntoView(element, { time: maxDuration }, resolve),
   );
 }

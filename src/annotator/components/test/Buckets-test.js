@@ -54,7 +54,7 @@ describe('Buckets', () => {
         onFocusAnnotations={fakeOnFocusAnnotations}
         onScrollToAnnotation={fakeOnScrollToAnnotation}
         onSelectAnnotations={fakeOnSelectAnnotations}
-      />
+      />,
     );
 
   describe('up and down navigation', () => {
@@ -142,7 +142,7 @@ describe('Buckets', () => {
       assert.isTrue(upButton.exists());
       assert.equal(
         bucketItem.getDOMNode().style.top,
-        `${fakeAbove.position}px`
+        `${fakeAbove.position}px`,
       );
     });
 
@@ -162,7 +162,7 @@ describe('Buckets', () => {
       assert.isTrue(downButton.exists());
       assert.equal(
         bucketItem.getDOMNode().style.top,
-        `${fakeBelow.position}px`
+        `${fakeBelow.position}px`,
       );
     });
 
@@ -247,7 +247,7 @@ describe('Buckets', () => {
       const call = fakeOnSelectAnnotations.getCall(0);
       assert.deepEqual(
         call.args[0],
-        fakeBuckets[0].anchors.map(a => a.tag)
+        fakeBuckets[0].anchors.map(a => a.tag),
       );
       assert.equal(call.args[1], false);
     });
@@ -272,6 +272,6 @@ describe('Buckets', () => {
       {
         content: () => createComponent(),
       },
-    ])
+    ]),
   );
 });

@@ -55,14 +55,14 @@ describe('MarkdownView', () => {
 
   it('applies `textClass` class to container', () => {
     const wrapper = mount(
-      <MarkdownView markdown="foo" classes={'fancy-effect'} />
+      <MarkdownView markdown="foo" classes={'fancy-effect'} />,
     );
     assert.isTrue(wrapper.find('.fancy-effect').exists());
   });
 
   it('applies `textStyle` style to container', () => {
     const wrapper = mount(
-      <MarkdownView markdown="foo" style={{ fontFamily: 'serif' }} />
+      <MarkdownView markdown="foo" style={{ fontFamily: 'serif' }} />,
     );
     assert.deepEqual(wrapper.find(markdownSelector).prop('style'), {
       fontFamily: 'serif',
@@ -74,6 +74,6 @@ describe('MarkdownView', () => {
     checkAccessibility({
       // eslint-disable-next-line react/display-name
       content: () => <MarkdownView markdown="foo" />,
-    })
+    }),
   );
 });

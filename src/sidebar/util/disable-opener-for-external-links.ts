@@ -1,5 +1,5 @@
 function isHTMLAnchorElement(
-  element: HTMLElement
+  element: HTMLElement,
 ): element is HTMLAnchorElement {
   return element.tagName === 'A';
 }

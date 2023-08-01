@@ -44,7 +44,7 @@ describe('APIService', () => {
     method,
     pathAndQuery,
     status = 200,
-    body = defaultBodyForStatus(status)
+    body = defaultBodyForStatus(status),
   ) {
     const url = `https://example.com/api/${pathAndQuery}`;
     if (status > 0) {
@@ -56,7 +56,7 @@ describe('APIService', () => {
           status,
           throws: new Error(body),
         },
-        { method }
+        { method },
       );
     }
   }
@@ -153,7 +153,7 @@ describe('APIService', () => {
   it('encodes semicolons in query parameters', () => {
     expectCall(
       'get',
-      'search?uri=http%3A%2F%2Ffoobar.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux'
+      'search?uri=http%3A%2F%2Ffoobar.com%2F%3Ffoo%3Dbar%3Bbaz%3Dqux',
     );
     return api.search({ uri: 'http://foobar.com/?foo=bar;baz=qux' });
   });
@@ -168,8 +168,8 @@ describe('APIService', () => {
     expectCall(
       'get',
       `search?uri=${encodeURIComponent(pdfURL)}&uri=${encodeURIComponent(
-        fingerprintURL
-      )}`
+        fingerprintURL,
+      )}`,
     );
 
     return api.search({ uri: [pdfURL, fingerprintURL] });
@@ -239,7 +239,7 @@ describe('APIService', () => {
         response,
         sinon.match({
           userid: 'acct:user@example.com',
-        })
+        }),
       );
     });
   });
@@ -273,7 +273,7 @@ describe('APIService', () => {
     expectCall('get', 'profile');
     return api.profile.read({}).then(() => {
       assert.isTrue(
-        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
+        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted),
       );
     });
   });
@@ -282,7 +282,7 @@ describe('APIService', () => {
     expectCall('get', 'profile', 400);
     return api.profile.read({}).catch(() => {
       assert.isTrue(
-        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
+        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted),
       );
     });
   });
@@ -292,7 +292,7 @@ describe('APIService', () => {
 
     return api.profile.read({}).catch(() => {
       assert.isTrue(
-        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted)
+        fakeStore.apiRequestFinished.calledAfter(fakeStore.apiRequestStarted),
       );
     });
   });

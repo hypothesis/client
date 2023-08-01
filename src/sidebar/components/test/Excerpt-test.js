@@ -27,7 +27,7 @@ describe('Excerpt', () => {
       >
         {content}
       </Excerpt>,
-      { attachTo: container }
+      { attachTo: container },
     );
   }
 
@@ -119,7 +119,7 @@ describe('Excerpt', () => {
   context('when inline controls are enabled', () => {
     const getToggleButton = wrapper =>
       wrapper.find(
-        'LinkButton[title="Toggle visibility of full excerpt text"]'
+        'LinkButton[title="Toggle visibility of full excerpt text"]',
       );
 
     it('displays inline controls if collapsed', () => {
@@ -174,6 +174,6 @@ describe('Excerpt', () => {
         name: 'internal controls',
         content: () => createExcerpt({ inlineControls: true }, TALL_DIV),
       },
-    ])
+    ]),
   );
 });

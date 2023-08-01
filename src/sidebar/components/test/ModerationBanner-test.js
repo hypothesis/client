@@ -17,7 +17,7 @@ describe('ModerationBanner', () => {
         api={fakeApi}
         toastMessenger={fakeToastMessenger}
         {...props}
-      />
+      />,
     );
   }
 
@@ -153,13 +153,13 @@ describe('ModerationBanner', () => {
       }),
     });
     fakeApi.annotation.unhide.returns(
-      Promise.reject(new Error('Network Error'))
+      Promise.reject(new Error('Network Error')),
     );
     wrapper.find('button').simulate('click');
     setTimeout(() => {
       assert.calledWith(
         fakeToastMessenger.error,
-        'Failed to unhide annotation'
+        'Failed to unhide annotation',
       );
       done();
     }, 0);
@@ -174,6 +174,6 @@ describe('ModerationBanner', () => {
             flagCount: 10,
           }),
         }),
-    })
+    }),
   );
 });

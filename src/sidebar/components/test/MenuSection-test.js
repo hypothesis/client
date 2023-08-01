@@ -10,7 +10,7 @@ describe('MenuSection', () => {
     mount(
       <MenuSection {...props}>
         <div className="MenuItem">Test item</div>
-      </MenuSection>
+      </MenuSection>,
     );
 
   beforeEach(() => {
@@ -40,6 +40,6 @@ describe('MenuSection', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createMenuSection(),
-    })
+    }),
   );
 });

@@ -72,7 +72,7 @@ function templateContext(config) {
   // combines this config with a <script> that adds the embed script
   const configTemplate = fs.readFileSync(
     `${TEMPLATE_PATH}client-config.js.mustache`,
-    'utf-8'
+    'utf-8',
   );
   const hypothesisConfig = Mustache.render(configTemplate, {
     exampleConfig: config.clientConfig

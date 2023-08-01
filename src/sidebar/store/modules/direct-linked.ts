@@ -45,7 +45,7 @@ function initialState(settings: SidebarSettings): State {
 const reducers = {
   UPDATE_DIRECT_LINKED_GROUP_FETCH_FAILED(
     state: State,
-    action: { directLinkedGroupFetchFailed: boolean }
+    action: { directLinkedGroupFetchFailed: boolean },
   ) {
     return {
       directLinkedGroupFetchFailed: action.directLinkedGroupFetchFailed,
@@ -54,7 +54,7 @@ const reducers = {
 
   UPDATE_DIRECT_LINKED_GROUP_ID(
     state: State,
-    action: { directLinkedGroupId: string }
+    action: { directLinkedGroupId: string },
   ) {
     return {
       directLinkedGroupId: action.directLinkedGroupId,
@@ -63,7 +63,7 @@ const reducers = {
 
   UPDATE_DIRECT_LINKED_ANNOTATION_ID(
     state: State,
-    action: { directLinkedAnnotationId: string }
+    action: { directLinkedAnnotationId: string },
   ) {
     return {
       directLinkedAnnotationId: action.directLinkedAnnotationId,

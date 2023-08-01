@@ -169,7 +169,7 @@ export class FrameSyncService {
     $window: Window,
     annotationsService: AnnotationsService,
     store: SidebarStore,
-    toastMessenger: ToastMessengerService
+    toastMessenger: ToastMessengerService,
   ) {
     this._window = $window;
     this._annotationsService = annotationsService;
@@ -192,7 +192,7 @@ export class FrameSyncService {
 
     this._scheduleAnchorStatusUpdate = debounce(() => {
       const records = Object.fromEntries(
-        this._pendingAnchorStatusUpdates.entries()
+        this._pendingAnchorStatusUpdates.entries(),
       );
       this._store.updateAnchorStatus(records);
       this._pendingAnchorStatusUpdates.clear();
@@ -219,7 +219,7 @@ export class FrameSyncService {
     const onStoreAnnotationsChanged = (
       annotations: Annotation[],
       frames: Frame[],
-      prevAnnotations: Annotation[]
+      prevAnnotations: Annotation[],
     ) => {
       let publicAnns = 0;
       const inSidebar = new Set<string>();
@@ -242,7 +242,7 @@ export class FrameSyncService {
         }
       });
       const deleted = prevAnnotations.filter(
-        annot => !inSidebar.has(annot.$tag)
+        annot => !inSidebar.has(annot.$tag),
       );
 
       // Send added annotations to matching frame.
@@ -313,7 +313,7 @@ export class FrameSyncService {
       () => [this._store.allAnnotations(), this._store.frames()] as const,
       ([annotations, frames], [prevAnnotations]) =>
         onStoreAnnotationsChanged(annotations, frames, prevAnnotations),
-      shallowEqual
+      shallowEqual,
     );
 
     watch(
@@ -325,7 +325,7 @@ export class FrameSyncService {
         this._guestRPC.forEach(guest => {
           guest.call('showContentInfo', contentInfo);
         });
-      }
+      },
     );
   }
 
@@ -334,7 +334,7 @@ export class FrameSyncService {
    */
   private _updateAnchorStatus(
     tag: string | string[],
-    state: 'orphan' | 'anchored'
+    state: 'orphan' | 'anchored',
   ) {
     const tags = Array.isArray(tag) ? tag : [tag];
     for (const tag of tags) {
@@ -453,7 +453,7 @@ export class FrameSyncService {
           // if the user has no interacted with the frame since it loaded.
           window.focus();
         }
-      }
+      },
     );
 
     guestRPC.on('hoverAnnotations', (tags: string[]) => {

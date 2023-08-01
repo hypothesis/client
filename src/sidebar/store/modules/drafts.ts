@@ -175,7 +175,7 @@ function getDraftIfNotEmpty(state: State, annotation: AnnotationID) {
 const unsavedAnnotations = createSelector(
   (state: State) => state.drafts,
   (drafts: Draft[]) =>
-    drafts.filter(d => !d.annotation.id).map(d => d.annotation)
+    drafts.filter(d => !d.annotation.id).map(d => d.annotation),
 );
 
 export const draftsModule = createStoreModule(initialState, {

@@ -50,7 +50,7 @@ function SubmenuToggle({
           // When the parent menu item is hovered, it gets a darker background.
           // Make the toggle background darker also.
           'group-hover:bg-grey-3': !isExpanded,
-        }
+        },
       )}
       onClick={onToggleSubmenu}
       title={title}
@@ -264,7 +264,7 @@ export default function MenuItem({
       'border-b-transparent': !isExpanded,
       'text-color-text-light': isDisabled,
       'text-color-text': !isDisabled,
-    }
+    },
   );
 
   if (href) {

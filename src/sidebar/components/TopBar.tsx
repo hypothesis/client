@@ -64,7 +64,7 @@ function TopBar({
 
   const isHelpPanelOpen = store.isSidebarPanelOpen('help');
   const isAnnotationsPanelOpen = store.isSidebarPanelOpen(
-    'shareGroupAnnotations'
+    'shareGroupAnnotations',
   );
 
   /**
@@ -84,7 +84,7 @@ function TopBar({
     <div
       className={classnames(
         'absolute h-10 left-0 top-0 right-0 z-4',
-        'text-grey-7 border-b theme-clean:border-b-0 bg-white'
+        'text-grey-7 border-b theme-clean:border-b-0 bg-white',
       )}
       data-testid="top-bar"
     >
@@ -92,7 +92,7 @@ function TopBar({
         className={classnames(
           'container flex items-center h-full',
           // Text sizing will size icons in buttons correctly
-          'text-[16px]'
+          'text-[16px]',
         )}
         data-testid="top-bar-content"
       >

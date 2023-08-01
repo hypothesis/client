@@ -20,7 +20,7 @@ function VersionInfoItem({ label, children, classes }: VersionInfoItemProps) {
       <dd
         className={classnames(
           'col-span-1 sm:col-span-3 text-color-text-light break-words',
-          classes
+          classes,
         )}
       >
         {children}
@@ -61,7 +61,7 @@ function VersionInfo({ toastMessenger, versionData }: VersionInfoProps) {
             // more inelgant wrapping in all browsers, but is safely contained
             // in the layout.
             // See: https://github.com/hypothesis/client/issues/4469
-            'break-all'
+            'break-all',
           )}
           label="URL"
         >

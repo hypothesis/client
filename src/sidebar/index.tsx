@@ -76,7 +76,7 @@ function setupApi(api: APIService, streamer: StreamerService) {
 function setupRoute(
   groups: GroupsService,
   session: SessionService,
-  router: RouterService
+  router: RouterService,
 ) {
   groups.load();
   session.load();
@@ -94,7 +94,7 @@ function setupRoute(
 function initServices(
   autosaveService: AutosaveService,
   persistedDefaults: PersistedDefaultsService,
-  serviceURL: ServiceURLService
+  serviceURL: ServiceURLService,
 ) {
   autosaveService.init();
   persistedDefaults.init();
@@ -162,7 +162,7 @@ function startApp(settings: SidebarSettings, appEl: HTMLElement) {
     <ServiceContext.Provider value={container}>
       <HypothesisApp />
     </ServiceContext.Provider>,
-    appEl
+    appEl,
   );
 }
 

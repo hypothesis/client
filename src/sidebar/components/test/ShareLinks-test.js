@@ -52,6 +52,6 @@ describe('ShareLinks', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

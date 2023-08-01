@@ -25,7 +25,7 @@ type Param = string | number | boolean;
 type APICall<
   Params = Record<string, Param | Param[]>,
   Body = void,
-  Result = void
+  Result = void,
 > = (params: Params, data?: Body) => Promise<Result>;
 
 /**
@@ -48,7 +48,7 @@ type APIMethodCallbacks = {
 };
 
 function isRouteMetadata(
-  link: RouteMap | RouteMetadata
+  link: RouteMap | RouteMetadata,
 ): link is RouteMetadata {
   return 'url' in link;
 }
@@ -60,7 +60,7 @@ function isRouteMetadata(
  */
 function findRouteMetadata(
   routeMap: RouteMap,
-  route: string
+  route: string,
 ): RouteMetadata | null {
   let cursor = routeMap;
   const pathSegments = route.split('.');
@@ -97,7 +97,7 @@ function createAPICall(
     getClientId,
     onRequestStarted,
     onRequestFinished,
-  }: APIMethodCallbacks
+  }: APIMethodCallbacks,
 ): APICall<Record<string, any>, Record<string, any> | void, unknown> {
   return async (params, data) => {
     onRequestStarted();
@@ -124,7 +124,7 @@ function createAPICall(
 
       const { url, unusedParams: queryParams } = replaceURLParams(
         descriptor.url,
-        params
+        params,
       );
 
       const apiURL = new URL(url);
@@ -228,7 +228,7 @@ export class APIService {
   constructor(
     apiRoutes: APIRoutesService,
     auth: AuthService,
-    store: SidebarStore
+    store: SidebarStore,
   ) {
     this._clientId = null;
 

@@ -51,7 +51,7 @@ describe('BucketBar', () => {
     const bucketBar = createBucketBar();
     assert.calledWith(fakeComputeBuckets, []);
     assert.ok(
-      bucketBar._bucketsContainer.shadowRoot.querySelector('.FakeBuckets')
+      bucketBar._bucketsContainer.shadowRoot.querySelector('.FakeBuckets'),
     );
   });
 

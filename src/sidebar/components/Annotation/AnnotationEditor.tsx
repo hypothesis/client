@@ -60,7 +60,7 @@ function AnnotationEditor({
     (tags: string[]) => {
       store.createDraft(draft.annotation, { ...draft, tags });
     },
-    [draft, store]
+    [draft, store],
   );
 
   const onAddTag = useCallback(
@@ -81,7 +81,7 @@ function AnnotationEditor({
       onEditTags(tagList);
       return true;
     },
-    [onEditTags, tags, tagsService]
+    [onEditTags, tags, tagsService],
   );
 
   const onRemoveTag = useCallback(
@@ -101,14 +101,14 @@ function AnnotationEditor({
       }
       return false;
     },
-    [onEditTags, tags]
+    [onEditTags, tags],
   );
 
   const onEditText = useCallback(
     (text: string) => {
       store.createDraft(draft.annotation, { ...draft, text });
     },
-    [draft, store]
+    [draft, store],
   );
 
   const onSetPrivate = useCallback(
@@ -122,7 +122,7 @@ function AnnotationEditor({
         store.setDefault('annotationPrivacy', isPrivate ? 'private' : 'shared');
       }
     },
-    [annotation, draft, store]
+    [annotation, draft, store],
   );
 
   const onSave = async () => {

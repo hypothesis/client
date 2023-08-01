@@ -36,7 +36,7 @@ export function username(user: string | null) {
  */
 export function isThirdPartyUser(
   user: string | null,
-  defaultAuthority: string
+  defaultAuthority: string,
 ) {
   const account = parseAccountID(user);
 

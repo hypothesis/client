@@ -41,7 +41,7 @@ function ThreadCollapseControl({
         'cursor-auto',
         {
           'bg-thread-line': !threadIsCollapsed,
-        }
+        },
       )}
       data-testid="thread-collapse-channel"
     >
@@ -49,7 +49,7 @@ function ThreadCollapseControl({
         className={classnames(
           // Set a background color so the dashed line in the background
           // doesn't show through the button
-          'bg-white'
+          'bg-white',
         )}
       >
         <Button
@@ -58,7 +58,7 @@ function ThreadCollapseControl({
             // thread/annotation's header. Override large touch targets for
             // touch interfaces; we need to conserve space here
             '-mt-1 touch:min-w-[auto] touch:min-h-[auto] p-[6.5px]',
-            'text-grey-5 hover:text-grey-7'
+            'text-grey-5 hover:text-grey-7',
           )}
           data-testid="toggle-button"
           expanded={!threadIsCollapsed}
@@ -102,7 +102,7 @@ function Thread({ thread, threadsService }: ThreadProps) {
   // If rendering child threads, only render those that have at least one
   // visible item within them—i.e. don't render empty/totally-hidden threads.
   const visibleChildren = thread.children.filter(
-    child => countVisible(child) > 0
+    child => countVisible(child) > 0,
   );
 
   const store = useSidebarStore();
@@ -114,7 +114,7 @@ function Thread({ thread, threadsService }: ThreadProps) {
 
   const onToggleReplies = useCallback(
     () => store.setExpanded(thread.id, !!thread.collapsed),
-    [store, thread.id, thread.collapsed]
+    [store, thread.id, thread.collapsed],
   );
 
   const showReplyToggle =
@@ -155,7 +155,7 @@ function Thread({ thread, threadsService }: ThreadProps) {
       thread.replyCount,
       thread.collapsed,
       thread.visible,
-    ]
+    ],
   );
 
   return (
@@ -171,7 +171,7 @@ function Thread({ thread, threadsService }: ThreadProps) {
         className={classnames(
           // Set a max-width to ensure that annotation content does not exceed
           // the width of the container
-          'grow max-w-full min-w-0'
+          'grow max-w-full min-w-0',
         )}
         data-testid="thread-content"
       >
@@ -210,7 +210,7 @@ function Thread({ thread, threadsService }: ThreadProps) {
             className={classnames(
               // Pull this list to the left to bring it closer to the left edge
               // of the ThreadCard and give more space for nested replies' content
-              '-ml-3'
+              '-ml-3',
             )}
             data-testid="thread-children"
           >
@@ -221,7 +221,7 @@ function Thread({ thread, threadsService }: ThreadProps) {
                   'mt-2',
                   // Ensure correct rendering of replies with RTL content.
                   // See https://github.com/hypothesis/client/issues/4705.
-                  '[text-align:start]'
+                  '[text-align:start]',
                 )}
               >
                 <Thread thread={child} threadsService={threadsService} />

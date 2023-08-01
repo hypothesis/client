@@ -16,7 +16,7 @@ import { isValidElement } from 'preact';
 
 async function testScenario(
   elementOrWrapper,
-  { backgroundColor = 'white' } = {}
+  { backgroundColor = 'white' } = {},
 ) {
   const container = document.createElement('div');
   container.style.backgroundColor = backgroundColor;
@@ -68,7 +68,7 @@ export function checkAccessibility(scenarios) {
     for (let { name = 'default', content, ...config } of scenarios) {
       if (typeof content !== 'function') {
         throw new Error(
-          `"content" key for accessibility scenario "${name}" should be a function but is a ${typeof content}`
+          `"content" key for accessibility scenario "${name}" should be a function but is a ${typeof content}`,
         );
       }
 
@@ -79,7 +79,7 @@ export function checkAccessibility(scenarios) {
         !isValidElement(elementOrWrapper)
       ) {
         throw new Error(
-          `Expected "content" function for scenario "${name}" to return a Preact element or an Enzyme wrapper`
+          `Expected "content" function for scenario "${name}" to return a Preact element or an Enzyme wrapper`,
         );
       }
 
@@ -87,7 +87,7 @@ export function checkAccessibility(scenarios) {
       assert.deepEqual(
         violations,
         [],
-        `Scenario "${name}" has accessibility violations`
+        `Scenario "${name}" has accessibility violations`,
       );
     }
   };

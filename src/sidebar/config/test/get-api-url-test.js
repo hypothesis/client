@@ -37,9 +37,9 @@ describe('sidebar/config/get-api-url', () => {
             getApiUrl(settings);
           },
           Error,
-          'Service should contain an apiUrl value'
+          'Service should contain an apiUrl value',
         );
       });
-    }
+    },
   );
 });

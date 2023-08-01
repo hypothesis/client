@@ -59,7 +59,7 @@ function AnnotationPublishControl({
 }: AnnotationPublishControlProps) {
   const buttonStyle = applyTheme(
     ['ctaTextColor', 'ctaBackgroundColor'],
-    settings
+    settings,
   );
 
   const menuLabel = (
@@ -77,7 +77,7 @@ function AnnotationPublishControl({
         <Button
           classes={classnames(
             // Turn off right-side border radius to align with menu-open button
-            'rounded-r-none'
+            'rounded-r-none',
           )}
           data-testid="publish-control-button"
           style={buttonStyle}
@@ -93,7 +93,7 @@ function AnnotationPublishControl({
         <div
           className={classnames(
             // Round the right side of this menu-open button only
-            'flex flex-row rounded-r-sm bg-grey-7 hover:bg-grey-8'
+            'flex flex-row rounded-r-sm bg-grey-7 hover:bg-grey-8',
           )}
           style={buttonStyle}
         >
@@ -101,13 +101,13 @@ function AnnotationPublishControl({
             arrowClass={classnames(
               // Position up-pointing menu caret aligned beneath the
               // down-pointing menu-open button icon
-              'right-[10px]'
+              'right-[10px]',
             )}
             containerPositioned={false}
             contentClass={classnames(
               // Ensure the menu is wide enough to "reach" the right-aligned
               // up-pointing menu arrow
-              'min-w-full'
+              'min-w-full',
             )}
             label={menuLabel}
             menuIndicator={false}

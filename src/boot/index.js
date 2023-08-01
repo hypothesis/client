@@ -39,7 +39,7 @@ if (isBrowserSupported()) {
     const extensionId = getExtensionId();
     if (extensionId && !hasExtensionConfig(extensionId)) {
       throw new Error(
-        'Could not start Hypothesis extension as configuration is missing'
+        'Could not start Hypothesis extension as configuration is missing',
       );
     }
 
@@ -47,13 +47,13 @@ if (isBrowserSupported()) {
     // `hypothesis-injector.ts` need to be updated.
     const annotatorConfig = /** @type {AnnotatorConfig} */ (config);
     const notebookAppUrl = processUrlTemplate(
-      annotatorConfig.notebookAppUrl || '__NOTEBOOK_APP_URL__'
+      annotatorConfig.notebookAppUrl || '__NOTEBOOK_APP_URL__',
     );
     const profileAppUrl = processUrlTemplate(
-      annotatorConfig.profileAppUrl || '__PROFILE_APP_URL__'
+      annotatorConfig.profileAppUrl || '__PROFILE_APP_URL__',
     );
     const sidebarAppUrl = processUrlTemplate(
-      annotatorConfig.sidebarAppUrl || '__SIDEBAR_APP_URL__'
+      annotatorConfig.sidebarAppUrl || '__SIDEBAR_APP_URL__',
     );
     bootHypothesisClient(document, {
       assetRoot,
@@ -69,6 +69,6 @@ if (isBrowserSupported()) {
   //
   // In Via or when using the bookmarklet we could show something louder.
   console.warn(
-    'The Hypothesis annotation tool is not supported in this browser. See https://web.hypothes.is/help/which-browsers-are-supported-by-hypothesis/.'
+    'The Hypothesis annotation tool is not supported in this browser. See https://web.hypothes.is/help/which-browsers-are-supported-by-hypothesis/.',
   );
 }

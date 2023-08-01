@@ -58,7 +58,7 @@ export default function TagListItem({
             'text-grey-6 hover:text-color-text hover:bg-grey-2',
             // Emulates transitions on *Button shared component styling
             'transition-colors duration-200',
-            'focus-visible-ring ring-inset'
+            'focus-visible-ring ring-inset',
           )}
           onClick={() => {
             onRemoveTag(tag);

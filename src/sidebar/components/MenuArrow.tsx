@@ -24,7 +24,7 @@ export default function MenuArrow({
       name="pointer"
       className={classnames(
         'absolute inline z-2 text-grey-3 fill-white',
-        classes
+        classes,
       )}
     />
   );

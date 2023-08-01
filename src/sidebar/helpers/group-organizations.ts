@@ -41,7 +41,7 @@ function addGroup(group: Group, organization: OrganizationWithGroups) {
  *         Keyed by each org's "orgKey"
  */
 function organizations(
-  groups: Group[]
+  groups: Group[],
 ): Record<string, OrganizationWithGroups> {
   const orgs: Record<string, OrganizationWithGroups> = {};
   groups.forEach(group => {

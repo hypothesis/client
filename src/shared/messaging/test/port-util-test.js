@@ -148,7 +148,7 @@ describe('port-util', () => {
     ].forEach(({ expectedResult, reason, source }) =>
       it(`returns '${expectedResult}' because the source is ${reason}`, () => {
         assert.equal(expectedResult, isSourceWindow(source));
-      })
+      }),
     );
   });
 });

@@ -81,7 +81,7 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
 
   const shouldLinkTags = useMemo(
     () => annotation && !isThirdPartyUser(annotation?.user, defaultAuthority),
-    [annotation, defaultAuthority]
+    [annotation, defaultAuthority],
   );
 
   const createTagSearchURL = (tag: string) => {
@@ -132,7 +132,7 @@ function AnnotationBody({ annotation, settings }: AnnotationBodyProps) {
               <ToggleExcerptButton
                 classes={classnames(
                   // Pull button up toward bottom of excerpt content
-                  '-mt-3'
+                  '-mt-3',
                 )}
                 collapsed={collapsed}
                 setCollapsed={setCollapsed}

@@ -7,7 +7,7 @@
  */
 function setupClientToggleButtons() {
   const toggleButtons = Array.from(
-    document.querySelectorAll('.js-toggle-client')
+    document.querySelectorAll('.js-toggle-client'),
   );
 
   for (const toggle of toggleButtons) {

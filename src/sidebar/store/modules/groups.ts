@@ -34,7 +34,7 @@ const reducers = {
       };
     }
     const filteredGroups = state.groups.filter(g =>
-      action.filteredGroupIds.includes(g.id)
+      action.filteredGroupIds.includes(g.id),
     );
     if (!filteredGroups.length) {
       // If there are no matches in the full set of groups for any of the
@@ -58,7 +58,7 @@ const reducers = {
     const group = state.groups.find(g => g.id === action.id);
     if (!group) {
       console.error(
-        `Attempted to focus group ${action.id} which is not loaded`
+        `Attempted to focus group ${action.id} which is not loaded`,
       );
       return {};
     }
@@ -171,7 +171,7 @@ function getGroup(state: State, id: string): Group | undefined {
  */
 const getFeaturedGroups = createSelector(
   (state: State) => filteredGroups(state),
-  groups => groups.filter(group => !group.isMember && group.isScopedToUri)
+  groups => groups.filter(group => !group.isMember && group.isScopedToUri),
 );
 
 /**
@@ -181,7 +181,7 @@ const getFeaturedGroups = createSelector(
  */
 const getInScopeGroups = createSelector(
   (state: State) => filteredGroups(state),
-  groups => groups.filter(g => g.isScopedToUri)
+  groups => groups.filter(g => g.isScopedToUri),
 );
 
 // Selectors that receive root state.
@@ -205,7 +205,7 @@ const getMyGroups = createSelector(
       return groups.filter(g => g.isMember);
     }
     return [];
-  }
+  },
 );
 
 /**
@@ -217,9 +217,9 @@ const getCurrentlyViewingGroups = createSelector(
   (rootState: RootState) => getFeaturedGroups(rootState.groups),
   (allGroups, myGroups, featuredGroups) => {
     return allGroups.filter(
-      g => !myGroups.includes(g) && !featuredGroups.includes(g)
+      g => !myGroups.includes(g) && !featuredGroups.includes(g),
     );
-  }
+  },
 );
 
 export const groupsModule = createStoreModule(initialState, {

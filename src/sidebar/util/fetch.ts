@@ -49,7 +49,7 @@ export class FetchError extends Error {
  */
 export async function fetchJSON(
   url: string,
-  init?: RequestInit
+  init?: RequestInit,
 ): Promise<unknown> {
   let response;
   try {

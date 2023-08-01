@@ -47,7 +47,7 @@ export class AnnotationActivityService {
         this._rpc.targetFrame,
         this._rpc.origin,
         this._reportConfig.method,
-        [eventType, data]
+        [eventType, data],
       );
     }
   }

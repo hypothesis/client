@@ -16,7 +16,7 @@ describe('AnnotationTimestamps', () => {
         annotationURL="http://www.example.com"
         withEditedTimestamp={false}
         {...props}
-      />
+      />,
     );
 
   beforeEach(() => {
@@ -102,6 +102,6 @@ describe('AnnotationTimestamps', () => {
 
         return createComponent();
       },
-    })
+    }),
   );
 });

@@ -58,7 +58,7 @@ export function xpathFromNode(node: Node, root: Node) {
 function nthChildOfType(
   element: Element,
   nodeName: string,
-  index: number
+  index: number,
 ): Element | null {
   nodeName = nodeName.toUpperCase();
 
@@ -145,7 +145,7 @@ function evaluateSimpleXPath(xpath: string, root: Element): Element | null {
 export function nodeFromXPath(
   xpath: string,
   /* istanbul ignore next */
-  root: Element = document.body
+  root: Element = document.body,
 ): Node | null {
   try {
     return evaluateSimpleXPath(xpath, root);
@@ -158,7 +158,7 @@ export function nodeFromXPath(
       // but required in Edge Legacy.
       null /* namespaceResolver */,
       XPathResult.FIRST_ORDERED_NODE_TYPE,
-      null /* result */
+      null /* result */,
     ).singleNodeValue;
   }
 }

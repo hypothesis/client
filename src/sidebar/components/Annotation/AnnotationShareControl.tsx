@@ -151,7 +151,7 @@ function AnnotationShareControl({
               // Prefer width 96 (24rem) but ensure that component isn't wider
               // than 85vw
               'w-96 max-w-[85vw]',
-              'space-y-2 p-2'
+              'space-y-2 p-2',
             )}
             width="custom"
           >
@@ -162,7 +162,7 @@ function AnnotationShareControl({
               className={classnames(
                 // Slightly larger font size for touch devices to correspond with
                 // larger button and input sizes
-                'flex w-full text-xs touch:text-base'
+                'flex w-full text-xs touch:text-base',
               )}
             >
               <InputGroup>

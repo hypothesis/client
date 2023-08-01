@@ -42,7 +42,7 @@ export default function MenuKeyboardNavigation({
       focusTimer = setTimeout(() => {
         // The focus won't work without delaying rendering.
         const firstItem = menuRef.current!.querySelector(
-          '[role^="menuitem"]'
+          '[role^="menuitem"]',
         ) as HTMLElement;
         if (firstItem) {
           firstItem.focus();
@@ -58,12 +58,12 @@ export default function MenuKeyboardNavigation({
   const onKeyDown = (event: KeyboardEvent) => {
     const menuItems = Array.from(
       menuRef.current!.querySelectorAll(
-        '[role^="menuitem"]'
-      ) as NodeListOf<HTMLElement>
+        '[role^="menuitem"]',
+      ) as NodeListOf<HTMLElement>,
     ).filter(isElementVisible);
 
     let focusedIndex = menuItems.findIndex(el =>
-      el.contains(document.activeElement)
+      el.contains(document.activeElement),
     );
 
     let handled = false;

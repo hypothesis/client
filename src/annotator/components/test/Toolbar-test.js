@@ -17,7 +17,7 @@ describe('Toolbar', () => {
         showHighlights={false}
         newAnnotationType="note"
         {...props}
-      />
+      />,
     );
 
   const findButton = (wrapper, label) =>
@@ -105,6 +105,6 @@ describe('Toolbar', () => {
             isSidebarOpen: false,
           }),
       },
-    ])
+    ]),
   );
 });

@@ -16,7 +16,7 @@ type Listener = {
  */
 type EventType<
   Target extends EventTarget,
-  Type extends string
+  Type extends string,
 > = `on${Type}` extends keyof Target
   ? Target[`on${Type}`] extends ((...args: any[]) => void) | null
     ? Parameters<NonNullable<Target[`on${Type}`]>>[0]
@@ -41,7 +41,7 @@ export class ListenerCollection {
     eventTarget: Target,
     eventType: Type,
     listener: (event: EventType<Target, Type>) => void,
-    options?: AddEventListenerOptions
+    options?: AddEventListenerOptions,
   ) {
     eventTarget.addEventListener(eventType, listener as EventListener, options);
     const symbol = Symbol();

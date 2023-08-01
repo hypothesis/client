@@ -134,10 +134,10 @@ describe('store/modules/toast-messages', () => {
         store.addToastMessage(fakeToastMessage);
 
         assert.isFalse(
-          store.hasToastMessage('anotherType', 'This is a message')
+          store.hasToastMessage('anotherType', 'This is a message'),
         );
         assert.isFalse(
-          store.hasToastMessage('anyType', 'This is another message')
+          store.hasToastMessage('anyType', 'This is another message'),
         );
       });
     });

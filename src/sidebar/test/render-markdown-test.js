@@ -30,19 +30,19 @@ describe('render-markdown', () => {
       assert.equal(
         render('See this link - http://arxiv.org/article'),
         '<p>See this link - <a href="http://arxiv.org/article" target="_blank">' +
-          'http://arxiv.org/article</a></p>'
+          'http://arxiv.org/article</a></p>',
       );
     });
 
     it("should autolink URLs with _'s in them correctly", () => {
       assert.equal(
         render(
-          'See this https://hypothes.is/stream?q=tag:group_test_needs_card'
+          'See this https://hypothes.is/stream?q=tag:group_test_needs_card',
         ),
         '<p>See this <a ' +
           'href="https://hypothes.is/stream?q=tag:group_test_needs_card" ' +
           'target="_blank">' +
-          'https://hypothes.is/stream?q=tag:group_test_needs_card</a></p>'
+          'https://hypothes.is/stream?q=tag:group_test_needs_card</a></p>',
       );
     });
 
@@ -51,7 +51,7 @@ describe('render-markdown', () => {
         assert.equal(
           render(`See this link - http://arxiv.org/article${symbol}`),
           '<p>See this link - <a href="http://arxiv.org/article" target="_blank">' +
-            `http://arxiv.org/article</a>${symbol}</p>`
+            `http://arxiv.org/article</a>${symbol}</p>`,
         );
       });
     });
@@ -61,7 +61,7 @@ describe('render-markdown', () => {
     it('should render markdown', () => {
       assert.equal(
         render('one **two** three'),
-        '<p>one <strong>two</strong> three</p>'
+        '<p>one <strong>two</strong> three</p>',
       );
     });
 
@@ -71,21 +71,21 @@ describe('render-markdown', () => {
       // is left to DOMPurify's tests.
       assert.equal(
         renderMathAndMarkdown('one **two** <script>alert("three")</script>'),
-        '<p>one <strong>two</strong> </p>'
+        '<p>one <strong>two</strong> </p>',
       );
     });
 
     it('should open links in a new window', () => {
       assert.equal(
         renderMathAndMarkdown('<a href="http://example.com">test</a>'),
-        '<p><a href="http://example.com" target="_blank">test</a></p>'
+        '<p><a href="http://example.com" target="_blank">test</a></p>',
       );
     });
 
     it('should render strikethrough', () => {
       assert.equal(
         renderMathAndMarkdown('This is ~~no longer the case~~'),
-        '<p>This is <del>no longer the case</del></p>'
+        '<p>This is <del>no longer the case</del></p>',
       );
     });
   });
@@ -99,7 +99,7 @@ describe('render-markdown', () => {
       assert.equal(
         render('one $$x*2$$ two $$x*3$$ three'),
         '<p>one </p>\n<p>math+display:x*2</p>\n' +
-          '<p>two </p>\n<p>math+display:x*3</p>\n<p>three</p>'
+          '<p>two </p>\n<p>math+display:x*3</p>\n<p>three</p>',
       );
     });
 
@@ -113,7 +113,7 @@ describe('render-markdown', () => {
     it('should render mixed inline and block math', () => {
       assert.equal(
         render('one \\(x*2\\) three $$x*3$$'),
-        '<p>one math:x*2 three </p>\n<p>math+display:x*3</p>'
+        '<p>one math:x*2 three </p>\n<p>math+display:x*3</p>',
       );
     });
   });
@@ -126,7 +126,7 @@ describe('render-markdown', () => {
     it('should render mixed inline LaTeX blocks', () => {
       assert.equal(
         render('one \\(x+2\\) two \\(x+3\\) four'),
-        '<p>one math:x+2 two math:x+3 four</p>'
+        '<p>one math:x+2 two math:x+3 four</p>',
       );
     });
   });

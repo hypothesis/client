@@ -4,21 +4,21 @@ describe('shared/prompts', () => {
   describe('confirm', () => {
     function clickClose() {
       const closeButton = getCustomDialog().querySelector(
-        '[aria-label="Close"]'
+        '[aria-label="Close"]',
       );
       closeButton.click();
     }
 
     function clickCancel() {
       const cancelButton = getCustomDialog().querySelector(
-        '[data-testid="cancel-button"]'
+        '[data-testid="cancel-button"]',
       );
       cancelButton.click();
     }
 
     function clickConfirm() {
       const confirmButton = getCustomDialog().querySelector(
-        '[data-testid="confirm-button"]'
+        '[data-testid="confirm-button"]',
       );
       confirmButton.click();
     }

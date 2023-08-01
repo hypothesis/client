@@ -109,7 +109,7 @@ export class SearchClient extends TinyEmitter {
       maxResults = null,
       sortBy = 'created',
       sortOrder = 'asc',
-    }: SearchOptions = {}
+    }: SearchOptions = {},
   ) {
     super();
     this._searchFn = searchFn;

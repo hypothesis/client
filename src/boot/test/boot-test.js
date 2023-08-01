@@ -59,13 +59,13 @@ describe('bootstrap', () => {
 
   function findAssets(doc_) {
     const scripts = Array.from(
-      doc_.querySelectorAll('script[data-hypothesis-asset]')
+      doc_.querySelectorAll('script[data-hypothesis-asset]'),
     ).map(el => {
       return { src: el.src, type: el.type === 'module' ? 'module' : 'script' };
     });
 
     const styles = Array.from(
-      doc_.querySelectorAll('link[rel="stylesheet"][data-hypothesis-asset]')
+      doc_.querySelectorAll('link[rel="stylesheet"][data-hypothesis-asset]'),
     ).map(el => {
       return { src: el.href, type: 'stylesheet' };
     });
@@ -129,7 +129,7 @@ describe('bootstrap', () => {
 
       assert.equal(
         preloadLinks[0].href,
-        'https://marginal.ly/client/build/styles/annotator.1234.css'
+        'https://marginal.ly/client/build/styles/annotator.1234.css',
       );
       assert.equal(preloadLinks[0].as, 'style');
       assert.equal(preloadLinks[0].crossOrigin, null);
@@ -139,7 +139,7 @@ describe('bootstrap', () => {
       runBoot('annotator');
 
       const sidebarAppLink = iframe.contentDocument.querySelector(
-        'link[type="application/annotator+html"]'
+        'link[type="application/annotator+html"]',
       );
       assert.ok(sidebarAppLink);
       assert.isTrue(sidebarAppLink.hasAttribute('data-hypothesis-asset'));

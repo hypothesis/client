@@ -162,7 +162,7 @@ describe('sidebar/util/postmessage-json-rpc', () => {
     it('rejects with an error if the timeout is exceeded', async () => {
       await assert.rejects(
         doCall(),
-        'Request to https://embedder.com timed out'
+        'Request to https://embedder.com timed out',
       );
     });
 

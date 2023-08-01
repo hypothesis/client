@@ -13,11 +13,11 @@ import { ListenerCollection } from '../../shared/listener-collection';
  */
 export function observeElementSize(
   element: Element,
-  onSizeChanged: (width: number, height: number) => void
+  onSizeChanged: (width: number, height: number) => void,
 ): () => void {
   if (typeof ResizeObserver !== 'undefined') {
     const observer = new ResizeObserver(() =>
-      onSizeChanged(element.clientWidth, element.clientHeight)
+      onSizeChanged(element.clientWidth, element.clientHeight),
     );
     observer.observe(element);
     return () => observer.disconnect();

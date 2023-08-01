@@ -11,7 +11,7 @@ const EXTERNAL_CONTAINER_SELECTOR = 'test-external-container';
 describe('Sidebar', () => {
   const sidebarURL = new URL(
     '/base/annotator/test/empty.html',
-    window.location.href
+    window.location.href,
   ).toString();
 
   const sandbox = sinon.createSandbox();
@@ -229,7 +229,7 @@ describe('Sidebar', () => {
     const sidebar = createSidebar({ annotations: '1234' });
     assert.equal(
       getConfigString(sidebar),
-      addConfigFragment(sidebarURL, { annotations: '1234' })
+      addConfigFragment(sidebarURL, { annotations: '1234' }),
     );
   });
 
@@ -610,7 +610,7 @@ describe('Sidebar', () => {
         sidebar._onPan({ type: 'panstart' });
 
         assert.isTrue(
-          sidebar.iframeContainer.classList.contains('sidebar-no-transition')
+          sidebar.iframeContainer.classList.contains('sidebar-no-transition'),
         );
         assert.equal(sidebar.iframeContainer.style.pointerEvents, 'none');
       });
@@ -629,7 +629,7 @@ describe('Sidebar', () => {
         sidebar._gestureState = { final: 0 };
         sidebar._onPan({ type: 'panend' });
         assert.isFalse(
-          sidebar.iframeContainer.classList.contains('sidebar-no-transition')
+          sidebar.iframeContainer.classList.contains('sidebar-no-transition'),
         );
         assert.equal(sidebar.iframeContainer.style.pointerEvents, '');
       });
@@ -917,7 +917,7 @@ describe('Sidebar', () => {
         assert.calledWith(
           guestRPC().call,
           'sidebarLayoutChanged',
-          sinon.match.any
+          sinon.match.any,
         );
         assertLayoutValues(guestRPC().call.lastCall.args[1], {
           expanded: true,
@@ -942,7 +942,7 @@ describe('Sidebar', () => {
           sinon.match({
             expanded: true,
             width: DEFAULT_WIDTH + fakeToolbar.getWidth(),
-          })
+          }),
         );
       });
 
@@ -1097,7 +1097,7 @@ describe('Sidebar', () => {
         });
         assert.calledWith(
           console.warn,
-          `Custom bucket container "#invalid-selector" not found`
+          `Custom bucket container "#invalid-selector" not found`,
         );
       } finally {
         console.warn.restore();

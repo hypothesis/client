@@ -133,7 +133,7 @@ describe('#parseJsonConfig', () => {
       'settings from later in the page override ones from earlier',
       () => {
         assert.equal(parseJsonConfig(document).foo, 'third');
-      }
+      },
     );
   });
 });

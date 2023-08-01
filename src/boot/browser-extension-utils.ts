@@ -12,9 +12,9 @@ export function getExtensionId(window_: Window = window): string | undefined {
  */
 export function hasExtensionConfig(
   extensionId: string,
-  document_: Document = document
+  document_: Document = document,
 ): boolean {
   return !!document_.querySelector(
-    `script.js-hypothesis-config[data-extension-id=${extensionId}]`
+    `script.js-hypothesis-config[data-extension-id=${extensionId}]`,
   );
 }

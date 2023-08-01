@@ -10,7 +10,7 @@
 export async function waitFor(
   condition,
   timeout = 10,
-  what = condition.toString()
+  what = condition.toString(),
 ) {
   const result = condition();
   if (result) {

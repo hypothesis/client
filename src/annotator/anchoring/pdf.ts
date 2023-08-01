@@ -274,7 +274,7 @@ const isNotSpace = (char: string) => !isSpace(char);
 async function anchorByPosition(
   pageIndex: number,
   start: number,
-  end: number
+  end: number,
 ): Promise<Range> {
   const [page, pageText] = await Promise.all([
     getPageView(pageIndex),
@@ -305,16 +305,16 @@ async function anchorByPosition(
       textLayerStr,
       start,
       end,
-      isNotSpace
+      isNotSpace,
     );
 
     const textLayerQuote = stripSpaces(
-      textLayerStr.slice(textLayerStart, textLayerEnd)
+      textLayerStr.slice(textLayerStart, textLayerEnd),
     );
     const pageTextQuote = stripSpaces(pageText.slice(start, end));
     if (textLayerQuote !== pageTextQuote) {
       warnOnce(
-        'Text layer text does not match page text. Highlights will be mis-aligned.'
+        'Text layer text does not match page text. Highlights will be mis-aligned.',
       );
     }
 
@@ -366,7 +366,7 @@ function stripSpaces(str: string) {
  */
 async function anchorQuote(
   quoteSelector: TextQuoteSelector,
-  positionHint?: number
+  positionHint?: number,
 ): Promise<Range> {
   // Determine which pages to search and in what order. If we have a position
   // hint we'll try to use that. Otherwise we'll just search all pages in order.
@@ -421,7 +421,7 @@ async function anchorQuote(
           strippedText,
           expectedOffsetInPage,
           expectedOffsetInPage,
-          isNotSpace
+          isNotSpace,
         );
       } else {
         strippedHint = 0; // Prefer matches closer to start of page.
@@ -446,7 +446,7 @@ async function anchorQuote(
         text,
         match.start,
         match.end,
-        isNotSpace
+        isNotSpace,
       );
       bestMatch = {
         page,
@@ -473,7 +473,7 @@ async function anchorQuote(
         strippedPrefix !== undefined &&
         strippedText.slice(
           Math.max(0, match.start - strippedPrefix.length),
-          match.start
+          match.start,
         ) === strippedPrefix;
 
       const exactSuffixMatch =
@@ -520,7 +520,7 @@ async function anchorQuote(
  */
 export async function anchor(
   root: HTMLElement,
-  selectors: Selector[]
+  selectors: Selector[],
 ): Promise<Range> {
   const quote = selectors.find(s => s.type === 'TextQuoteSelector') as
     | TextQuoteSelector
@@ -565,7 +565,7 @@ export async function anchor(
         const range = await anchorByPosition(
           pageIndex,
           anchor.start,
-          anchor.end
+          anchor.end,
         );
         return range;
       }
@@ -631,18 +631,18 @@ export function canDescribe(range: Range) {
  */
 export async function describe(
   root: HTMLElement,
-  range: Range
+  range: Range,
 ): Promise<Selector[]> {
   const [textRange, textLayer] = getTextLayerForRange(range);
 
   const startPos = TextPosition.fromPoint(
     textRange.startContainer,
-    textRange.startOffset
+    textRange.startOffset,
   ).relativeTo(textLayer);
 
   const endPos = TextPosition.fromPoint(
     textRange.endContainer,
-    textRange.endOffset
+    textRange.endOffset,
   ).relativeTo(textLayer);
 
   const startPageIndex = getSiblingIndex(textLayer.parentNode!);

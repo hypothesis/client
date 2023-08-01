@@ -34,7 +34,7 @@ describe('TagEditor', () => {
         tags={fakeTagsService}
         {...props}
       />,
-      { attachTo: newContainer }
+      { attachTo: newContainer },
     );
   }
 
@@ -395,7 +395,7 @@ describe('TagEditor', () => {
         assert.equal(tagListItems.length, 2);
         assert.equal(
           tagListItems.first().props().onRemoveTag,
-          wrapper.props().onRemoveTag
+          wrapper.props().onRemoveTag,
         );
       });
     });
@@ -458,7 +458,7 @@ describe('TagEditor', () => {
       const wrapper2 = createComponent();
       assert.notEqual(
         wrapper1.find('AutocompleteList').prop('id'),
-        wrapper2.find('AutocompleteList').prop('id')
+        wrapper2.find('AutocompleteList').prop('id'),
       );
     });
 
@@ -483,7 +483,7 @@ describe('TagEditor', () => {
         const activeDescendantIndex = activeDescendant.split(itemPrefixId);
         assert.equal(
           activeDescendantIndex[1],
-          wrapper.find('AutocompleteList').prop('activeItem')
+          wrapper.find('AutocompleteList').prop('activeItem'),
         );
       }
 
@@ -536,7 +536,7 @@ describe('TagEditor', () => {
             return createComponent();
           },
         },
-      ])
+      ]),
     );
   });
 });

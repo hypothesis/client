@@ -108,12 +108,12 @@ export type AnchoringImpl = {
   anchor(
     root: HTMLElement,
     selectors: Selector[],
-    options: unknown
+    options: unknown,
   ): Promise<Range>;
   describe(
     root: HTMLElement,
     range: Range,
-    options: unknown
+    options: unknown,
   ): Selector[] | Promise<Selector[]>;
 };
 

@@ -36,7 +36,7 @@ describe('ToastMessengerService', () => {
       assert.calledWith(
         fakeStore.hasToastMessage,
         'success',
-        'This is my message'
+        'This is my message',
       );
       assert.notCalled(fakeStore.addToastMessage);
     });
@@ -52,7 +52,7 @@ describe('ToastMessengerService', () => {
           type: 'success',
           message: 'hooray',
           visuallyHidden: true,
-        })
+        }),
       );
     });
 
@@ -67,7 +67,7 @@ describe('ToastMessengerService', () => {
           type: 'success',
           message: 'hooray',
           moreInfoURL: 'http://www.example.com',
-        })
+        }),
       );
     });
 
@@ -95,7 +95,7 @@ describe('ToastMessengerService', () => {
 
       assert.calledWith(
         fakeHandler,
-        sinon.match({ message: 'hooray', type: 'success' })
+        sinon.match({ message: 'hooray', type: 'success' }),
       );
     });
   });
@@ -108,7 +108,7 @@ describe('ToastMessengerService', () => {
 
       assert.calledWith(
         fakeStore.addToastMessage,
-        sinon.match({ type: 'notice', message: 'boo' })
+        sinon.match({ type: 'notice', message: 'boo' }),
       );
     });
   });
@@ -122,7 +122,7 @@ describe('ToastMessengerService', () => {
       assert.calledWith(
         fakeStore.hasToastMessage,
         'error',
-        'This is my message'
+        'This is my message',
       );
       assert.notCalled(fakeStore.addToastMessage);
     });
@@ -134,7 +134,7 @@ describe('ToastMessengerService', () => {
 
       assert.calledWith(
         fakeStore.addToastMessage,
-        sinon.match({ type: 'error', message: 'boo' })
+        sinon.match({ type: 'error', message: 'boo' }),
       );
     });
 
@@ -198,7 +198,7 @@ describe('ToastMessengerService', () => {
 
       assert.calledWith(
         fakeStore.updateToastMessage,
-        sinon.match({ isDismissed: true })
+        sinon.match({ isDismissed: true }),
       );
     });
 
@@ -241,7 +241,7 @@ describe('ToastMessengerService', () => {
 
       assert.calledWith(
         fakeStore.addToastMessage,
-        sinon.match({ type: 'notice', message: 'foo' })
+        sinon.match({ type: 'notice', message: 'foo' }),
       );
     });
 

@@ -154,7 +154,7 @@ describe('sidebar/store/modules/annotations', () => {
       clock.tick(ANCHOR_TIME_LIMIT);
 
       assert.isFalse(
-        store.getState().annotations.annotations[0].$anchorTimeout
+        store.getState().annotations.annotations[0].$anchorTimeout,
       );
     });
 

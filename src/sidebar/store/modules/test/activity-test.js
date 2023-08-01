@@ -134,7 +134,7 @@ describe('sidebar/store/modules/activity', () => {
 
       assert.lengthOf(
         store.getState().activity.activeAnnotationSaveRequests,
-        0
+        0,
       );
     });
 

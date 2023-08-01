@@ -14,7 +14,7 @@ describe('AnnotationReplyToggle', () => {
         replyCount={5}
         threadIsCollapsed={true}
         {...props}
-      />
+      />,
     );
   }
 
@@ -56,6 +56,6 @@ describe('AnnotationReplyToggle', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

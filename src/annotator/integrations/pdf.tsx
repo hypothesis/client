@@ -105,7 +105,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
   constructor(
     annotator: Annotator,
     /* istanbul ignore next */
-    options: { reanchoringMaxWait?: number } = {}
+    options: { reanchoringMaxWait?: number } = {},
   ) {
     super();
 
@@ -152,7 +152,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
       // layers are then hidden by a CSS rule in `pdfjs-overrides.scss`.
       this._pdfViewer.viewer.classList.toggle(
         'is-selecting',
-        !selection.isCollapsed
+        !selection.isCollapsed,
       );
     };
 
@@ -160,7 +160,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     this._listeners.add(
       document,
       'selectionchange',
-      this._updateAnnotationLayerVisibility
+      this._updateAnnotationLayerVisibility,
     );
 
     this._destroyed = false;
@@ -276,14 +276,14 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    * Update banners shown above the PDF viewer.
    */
   _updateBannerState(
-    state: Partial<typeof PDFIntegration.prototype._bannerState>
+    state: Partial<typeof PDFIntegration.prototype._bannerState>,
   ) {
     this._bannerState = { ...this._bannerState, ...state };
 
     // Get a reference to the top-level DOM element associated with the PDF.js
     // viewer.
     const outerContainer = document.querySelector(
-      '#outerContainer'
+      '#outerContainer',
     ) as HTMLElement;
 
     const showBanner =
@@ -313,7 +313,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
         )}
         {this._bannerState.noTextWarning && <WarningBanner />}
       </Banners>,
-      this._banner.shadowRoot!
+      this._banner.shadowRoot!,
     );
 
     const bannerHeight = this._banner.getBoundingClientRect().height;
@@ -463,7 +463,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
     if (inPlaceholder) {
       const anchor = await this._waitForAnnotationToBeAnchored(
         annotation,
-        this._reanchoringMaxWait
+        this._reanchoringMaxWait,
       );
       if (!anchor) {
         return;
@@ -481,7 +481,7 @@ export class PDFIntegration extends TinyEmitter implements Integration {
    */
   async _waitForAnnotationToBeAnchored(
     annotation: AnnotationData,
-    maxWait: number
+    maxWait: number,
   ): Promise<Anchor | null> {
     const start = Date.now();
     let anchor;

@@ -32,7 +32,7 @@ describe('AnnotationActionBar', () => {
         onReply={fakeOnReply}
         settings={fakeSettings}
         {...props}
-      />
+      />,
     );
   }
 
@@ -342,6 +342,6 @@ describe('AnnotationActionBar', () => {
     'should pass a11y checks',
     checkAccessibility({
       content: () => createComponent(),
-    })
+    }),
   );
 });

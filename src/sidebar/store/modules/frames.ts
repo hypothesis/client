@@ -53,7 +53,7 @@ const initialState: State = {
 const reducers = {
   CONNECT_FRAME(state: State, action: { frame: Frame }) {
     const frameIndex = state.frames.findIndex(
-      frame => frame.id === action.frame.id
+      frame => frame.id === action.frame.id,
     );
     const newFrames = [...state.frames];
     if (frameIndex !== -1) {
@@ -71,7 +71,7 @@ const reducers = {
 
   UPDATE_FRAME_ANNOTATION_FETCH_STATUS(
     state: State,
-    action: { uri: string; isAnnotationFetchComplete: boolean }
+    action: { uri: string; isAnnotationFetchComplete: boolean },
   ) {
     const frames = state.frames.map(frame => {
       const match = frame.uri && frame.uri === action.uri;
@@ -113,7 +113,7 @@ function destroyFrame(frame: Frame) {
  */
 function updateFrameAnnotationFetchStatus(
   uri: string,
-  isFetchComplete: boolean
+  isFetchComplete: boolean,
 ) {
   return makeAction(reducers, 'UPDATE_FRAME_ANNOTATION_FETCH_STATUS', {
     uri,
@@ -147,7 +147,7 @@ const mainFrame = createSelector(
 
   // Sub-frames will all have a "frame identifier" set. The main frame is the
   // one with a `null` id.
-  frames => frames.find(f => !f.id) || null
+  frames => frames.find(f => !f.id) || null,
 );
 
 function searchUrisForFrame(frame: Frame): string[] {
@@ -173,7 +173,7 @@ function searchUrisForFrame(frame: Frame): string[] {
 // "selector creator" that uses `shallowEqual` instead of `===` for memoization
 const createShallowEqualSelector = createSelectorCreator(
   defaultMemoize,
-  shallowEqual
+  shallowEqual,
 );
 
 /**
@@ -184,9 +184,9 @@ const searchUris = createShallowEqualSelector(
   (state: State) =>
     state.frames.reduce<string[]>(
       (uris, frame) => uris.concat(searchUrisForFrame(frame)),
-      []
+      [],
     ),
-  uris => uris
+  uris => uris,
 );
 
 function getContentInfo(state: State) {

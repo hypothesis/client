@@ -85,7 +85,7 @@ describe('NotebookFilters', () => {
     assert.calledWith(
       fakeStore.setFilter,
       'user',
-      sinon.match({ display: 'One User', value: 'oneuser' })
+      sinon.match({ display: 'One User', value: 'oneuser' }),
     );
   });
 });

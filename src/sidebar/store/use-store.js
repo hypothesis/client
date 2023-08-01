@@ -154,7 +154,7 @@ export function useStore(store) {
         // to things which no longer exist (for example, an object ID for an object
         // which has been unloaded). It is assumed that store selector methods are
         // robust to this.
-        entry => entry.method.apply(store, entry.args) !== entry.result
+        entry => entry.method.apply(store, entry.args) !== entry.result,
       );
 
       if (invalidEntry) {

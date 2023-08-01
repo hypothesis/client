@@ -49,7 +49,7 @@ export type Settings = {
  */
 export function applyTheme(
   themeProperties: ThemeProperty[],
-  settings: Settings
+  settings: Settings,
 ): Record<string, string> {
   const style: Record<string, string> = {};
   if (!settings.branding) {

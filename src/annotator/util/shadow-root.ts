@@ -5,7 +5,7 @@ function loadStyles(shadowRoot: ShadowRoot) {
   // Find the preloaded stylesheet added by the boot script.
   const url = (
     document.querySelector(
-      'link[rel="preload"][href*="/build/styles/annotator.css"]'
+      'link[rel="preload"][href*="/build/styles/annotator.css"]',
     ) as HTMLLinkElement | undefined
   )?.href;
 

@@ -32,7 +32,7 @@ export function calculateVisibleThreads(
   threadHeights: Map<string, number>,
   scrollPos: number,
   windowHeight: number,
-  options: typeof THREAD_DIMENSION_DEFAULTS = THREAD_DIMENSION_DEFAULTS
+  options: typeof THREAD_DIMENSION_DEFAULTS = THREAD_DIMENSION_DEFAULTS,
 ): VisibleThreads {
   const { defaultHeight, marginAbove, marginBelow } = options;
   const visibleThreads: Thread[] = [];

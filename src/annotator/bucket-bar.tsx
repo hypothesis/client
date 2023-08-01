@@ -29,7 +29,7 @@ export class BucketBar implements Destroyable {
       onFocusAnnotations,
       onScrollToAnnotation,
       onSelectAnnotations,
-    }: BucketBarOptions
+    }: BucketBarOptions,
   ) {
     this._bucketsContainer = document.createElement('hypothesis-bucket-bar');
     Object.assign(this._bucketsContainer.style, {
@@ -72,7 +72,7 @@ export class BucketBar implements Destroyable {
           this._onSelectAnnotations(tags, toogle)
         }
       />,
-      this._bucketsContainer.shadowRoot!
+      this._bucketsContainer.shadowRoot!,
     );
   }
 }

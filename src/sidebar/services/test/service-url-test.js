@@ -41,7 +41,7 @@ describe('ServiceURLService', () => {
       assert.notCalled(fakeStore.updateLinks);
       assert.calledWith(
         console.warn,
-        'Failed to fetch Hypothesis links: Fetch failed'
+        'Failed to fetch Hypothesis links: Fetch failed',
       );
     });
   });
