@@ -22,7 +22,7 @@ describe('ExportAnnotations', () => {
       <ExportAnnotations
         annotationsExporter={fakeAnnotationsExporter}
         {...props}
-      />
+      />,
     );
 
   beforeEach(() => {
@@ -87,12 +87,12 @@ describe('ExportAnnotations', () => {
 
     assert.include(
       wrapperSingular.find('[data-testid="export-count"]').text(),
-      'Export 1 annotation in a file'
+      'Export 1 annotation in a file',
     );
 
     assert.include(
       wrapperPlural.find('[data-testid="export-count"]').text(),
-      'Export 2 annotations in a file'
+      'Export 2 annotations in a file',
     );
   });
 
@@ -116,7 +116,7 @@ describe('ExportAnnotations', () => {
       assert.calledOnce(fakeAnnotationsExporter.buildExportContent);
       assert.calledWith(
         fakeAnnotationsExporter.buildExportContent,
-        annotationsToExport
+        annotationsToExport,
       );
     });
 
@@ -132,7 +132,7 @@ describe('ExportAnnotations', () => {
       assert.calledWith(
         fakeDownloadJSONFile,
         sinon.match.object,
-        'my-filename.json'
+        'my-filename.json',
       );
     });
   });
@@ -147,7 +147,7 @@ describe('ExportAnnotations', () => {
 
       assert.include(
         wrapper.find('[data-testid="no-annotations-message"]').text(),
-        'There are no annotations available for export'
+        'There are no annotations available for export',
       );
     });
 
@@ -155,7 +155,7 @@ describe('ExportAnnotations', () => {
       const wrapper = createComponent();
 
       assert.isTrue(
-        wrapper.find('button[data-testid="export-button"]').props().disabled
+        wrapper.find('button[data-testid="export-button"]').props().disabled,
       );
     });
 
@@ -176,12 +176,12 @@ describe('ExportAnnotations', () => {
 
       assert.include(
         wrapperSingular.find('[data-testid="drafts-message"]').text(),
-        'You have 1 unsaved annotation that'
+        'You have 1 unsaved annotation that',
       );
 
       assert.include(
         wrapperPlural.find('[data-testid="drafts-message"]').text(),
-        'You have 2 unsaved annotations that'
+        'You have 2 unsaved annotations that',
       );
     });
   });

@@ -37,7 +37,7 @@ function ExportAnnotations({ annotationsExporter }: ExportAnnotationsProps) {
   const exportAnnotations = () => {
     const filename = `${inputRef.current!.value}.json`;
     const exportData = annotationsExporter.buildExportContent(
-      exportableAnnotations
+      exportableAnnotations,
     );
     downloadJSONFile(exportData, filename);
   };
